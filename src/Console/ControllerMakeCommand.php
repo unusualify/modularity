@@ -1,0 +1,154 @@
+<?php
+
+namespace Unusual\CRM\Base\Console;
+
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
+use Nwidart\Modules\Support\Stub;
+use Illuminate\Support\Str;
+use Nwidart\Modules\Support\Config\GeneratorPath;
+
+class ControllerMakeCommand extends BaseCommand
+{
+
+
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $name = 'unusual:make:controller';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Create Controller with repository for specified module.';
+
+    protected $argumentName = 'name';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['name', InputArgument::REQUIRED, 'The name of the controller class.'],
+            ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
+        ];
+    }
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['example', null, InputOption::VALUE_OPTIONAL, 'An example option.', null],
+        ];
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getTemplateContents()
+    {
+        $name = $this->argument('name');
+
+        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+
+        return (new Stub($this->getStubName(), [
+            'BASE_CONTROLLER_NAMESPACE' => $this->baseConfig('base_controller'),
+            'BASE_CONTROLLER'           => get_class_short_name( $this->baseConfig('base_controller') ),
+            'MODULE'                    => $module->getStudlyName(),
+            'CONTROLLERNAME'            => $this->getControllerName(),
+            'NAME'                      => $this->getModuleName(),
+            'MODULE_NAMESPACE'          => $this->laravel['modules']->config('namespace'),
+            // 'CLASS_NAMESPACE'   => $this->getClassNamespace($module),
+            'MODULE_LOWER_NAME'         => $module->getLowerName(),
+            'MODULE_STUDLY_NAME'        => $module->getStudlyName(),
+            'STUDLY_NAME'               => $this->getStudlyName($name),
+            'LOWER_NAME'                => $this->getLowerName($name),
+            'NAMESPACE'                 => $this->getClassNamespace($module),
+            // 'NAMESPACE'         => $module->getStudlyName(),
+            // 'CLASS'             => $this->getClass().'Controller',
+            'CLASS'                     => $this->getControllerNameWithoutNamespace(),
+            // 'MODULE'            => $this->argument('module'),
+            // 'MODULE'            => $this->getModuleName(),
+        ]))->render();
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getDestinationFilePath()
+    {
+        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+
+        $controllerPath = new GeneratorPath( $this->baseConfig('paths.generator.route-controller') );
+
+        return $path . $controllerPath->getPath() . '/' . $this->getFileName() . 'Controller.php';
+    }
+
+    /**
+     * @return array|string
+     */
+    protected function getControllerName()
+    {
+        $controller = Str::studly($this->argument('name'));
+
+        if (Str::contains(strtolower($controller), 'controller') === false) {
+            $controller .= 'Controller';
+        }
+
+        return $controller;
+    }
+
+
+    /**
+     * @return array|string
+     */
+    private function getControllerNameWithoutNamespace()
+    {
+        return class_basename($this->getControllerName());
+    }
+
+    public function getDefaultNamespace() : string
+    {
+        return $this->baseConfig('paths.generator.route-controller.namespace') ?:
+            $this->baseConfig('paths.generator.route-controller.path', 'Http\Controllers');
+    }
+
+        /**
+     * @return string
+     */
+    private function getFileName()
+    {
+        return Str::studly($this->argument('name'));
+    }
+
+
+    /**
+     * @return string
+     */
+    protected function getStubName(): string
+    {
+        return '/route-controller.stub';
+    }
+
+
+}

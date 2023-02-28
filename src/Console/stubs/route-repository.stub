@@ -1,0 +1,17 @@
+<?php
+
+namespace $NAMESPACE$;
+
+use $BASE_REPOSITORY$;
+use $MODEL_CLASS$;
+$TRAIT_NAMESPACES$
+
+class $CLASS$ extends Repository
+{
+    $TRAITS$
+
+    public function __construct($MODEL_NAME$ $model)
+    {
+        $this->model = $model;
+    }
+}

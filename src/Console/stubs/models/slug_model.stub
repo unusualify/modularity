@@ -1,0 +1,11 @@
+<?php
+
+namespace $NAMESPACE$;
+
+use $BASE_MODEL$;
+
+class $SLUG_CLASS$ extends Model
+{
+    protected $table = "$MODEL_SNAKE$_slugs";
+}
+

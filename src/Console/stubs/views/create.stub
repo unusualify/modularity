@@ -1,0 +1,19 @@
+@extends('base::layouts.master', [
+    'title' => '$STUDLY_NAME$'
+])
+
+@section('content')
+    <main-component :menu-configuration='@json($menuConfiguration)' >
+        
+        <div >
+
+        </div>
+
+    </main-component>
+@endsection
+
+@section('initial-scripts')
+
+    <script src="{{ asset('js/admin.js') }}"></script>
+
+@endsection

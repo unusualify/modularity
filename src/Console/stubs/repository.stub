@@ -1,0 +1,38 @@
+<?php
+
+namespace $NAMESPACE$;
+
+use Unusual\CRM\Base\Repositories\BaseRepository;
+use Illuminate\Http\Request;
+use Unusual\CRM\Base\Traits\Tabulable;
+
+class $CLASS$ extends BaseRepository
+{
+    use Tabulable;
+
+    /**
+     * Module name
+     */
+    public $module = '$MODULE$';
+
+    /**
+     * Name to be shown
+     */
+    public $name = '$STUDLY_NAME$';
+
+    /**
+     * Model Class
+     */
+    public $model = $MODEL$;
+
+    /**
+     * Searchable in table
+     */
+    public $searchable = true;
+
+    /**
+     * Number of items in table pagination
+     */
+    public $itemsPerPage = 10;
+
+}

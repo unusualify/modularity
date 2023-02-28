@@ -1,0 +1,52 @@
+<?php
+
+namespace Unusual\CRM\Base\Repositories\Traits;
+
+use Carbon\Carbon;
+
+trait DatesTrait
+{
+    /**
+     * @param array $fields
+     * @return array
+     */
+    public function prepareFieldsBeforeCreateDatesTrait($fields)
+    {
+        return $this->prepareFieldsBeforeSaveDatesTrait(null, $fields);
+    }
+
+    /**
+     * @param \Unusual\CRM\Base\Entities\Model|null $object
+     * @param array $fields
+     * @return array
+     */
+    public function prepareFieldsBeforeSaveDatesTrait($object, $fields)
+    {
+        foreach ($this->model->getDates() as $f) {
+            if (isset($fields[$f])) {
+                if (!empty($fields[$f])) {
+                    $fields = $this->prepareDatesField($fields, $f);
+                } else {
+                    $fields[$f] = null;
+                }
+            }
+        }
+        return $fields;
+    }
+
+    /**
+     * @param array $fields
+     * @param string $f
+     * @return array
+     */
+    public function prepareDatesField($fields, $f)
+    {
+        if ($date = Carbon::parse($fields[$f])) {
+            $fields[$f] = $date->format("Y-m-d H:i:s");
+        } else {
+            $fields[$f] = null;
+        }
+
+        return $fields;
+    }
+}

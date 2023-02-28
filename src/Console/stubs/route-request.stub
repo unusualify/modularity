@@ -1,0 +1,38 @@
+<?php
+
+namespace $NAMESPACE$;
+
+use $BASE_REQUEST_CLASS$;
+
+class $CLASS$ extends $BASE_REQUEST_NAME$
+{
+    /**
+     * Get the default validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rulesForAll()
+    {
+        return $RULES$;
+    }
+
+    /**
+     * Get the validation rules that apply to the post request.
+     *
+     * @return array
+     */
+    public function rulesForCreate()
+    {
+        return [];
+    }
+
+    /**
+     * Get the validation rules that apply to the put/patch request.
+     *
+     * @return array
+     */
+    public function rulesForUpdate()
+    {
+        return [];
+    }
+}

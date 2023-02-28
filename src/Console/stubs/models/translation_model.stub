@@ -1,0 +1,11 @@
+<?php
+
+namespace $NAMESPACE$;
+
+use $BASE_MODEL$;
+use $MODEL_NAMESPACE$;
+
+class $TRANSLATION_CLASS$ extends Model
+{
+    protected $baseModuleModel = $MODEL_CLASS$::class;
+}

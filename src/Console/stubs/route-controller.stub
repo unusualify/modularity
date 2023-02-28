@@ -1,0 +1,25 @@
+<?php
+
+namespace $NAMESPACE$;
+
+use Illuminate\Http\Request;
+use $BASE_CONTROLLER_NAMESPACE$;
+
+class $CLASS$ extends $BASE_CONTROLLER$
+{
+    /**
+     * @var string
+     */
+    // protected $namespace = '$MODULE_NAMESPACE$\$MODULE_STUDLY_NAME$';
+
+    /**
+     * @var string
+     */
+     protected $moduleName = '$MODULE_STUDLY_NAME$';
+
+    /**
+     * @var string
+     */
+     protected $routeName = '$LOWER_NAME$';
+
+}
