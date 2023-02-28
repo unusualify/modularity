@@ -97,7 +97,7 @@
                 window['{{ config('twill.js_namespace') }}'].STORE.medias.types.push({
                     value: 'image',
                     text: '{{ twillTrans("twill::lang.media-library.images") }}',
-                    total: {{ \Unusual\CRM\Base\Models\Media::count() }},
+                    total: {{ \OoBook\CRM\Base\Models\Media::count() }},
                     endpoint: '{{ route('admin.media-library.medias.index') }}',
                     tagsEndpoint: '{{ route('admin.media-library.medias.tags') }}',
                     uploaderConfig: {!! json_encode($mediasUploaderConfig) !!}
@@ -109,7 +109,7 @@
                 window['{{ config('twill.js_namespace') }}'].STORE.medias.types.push({
                     value: 'file',
                     text: '{{ twillTrans("twill::lang.media-library.files") }}',
-                    total: {{ \Unusual\CRM\Base\Models\File::count() }},
+                    total: {{ \OoBook\CRM\Base\Models\File::count() }},
                     endpoint: '{{ route('admin.file-library.files.index') }}',
                     tagsEndpoint: '{{ route('admin.file-library.files.tags') }}',
                     uploaderConfig: {!! json_encode($filesUploaderConfig) !!}

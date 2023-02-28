@@ -1,13 +1,13 @@
 <?php
 
-namespace Unusual\CRM\Base\Providers;
+namespace OoBook\CRM\Base\Providers;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factory;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
-use Unusual\CRM\Base\View\Table;
+use OoBook\CRM\Base\View\Table;
 use Nwidart\Modules\Facades\Module;
 
 class ConfigServiceProvider extends ServiceProvider

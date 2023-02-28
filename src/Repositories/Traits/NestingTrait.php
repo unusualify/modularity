@@ -1,8 +1,8 @@
 <?php
 
-namespace Unusual\CRM\Base\Repositories\Traits;
+namespace OoBook\CRM\Base\Repositories\Traits;
 
-use Unusual\CRM\Base\Jobs\ReorderNestedModuleItems;
+use OoBook\CRM\Base\Jobs\ReorderNestedModuleItems;
 
 trait NestingTrait
 {
@@ -18,7 +18,7 @@ trait NestingTrait
      * @param array $with
      * @param array $withCount
      * @param array $scopes
-     * @return \Unusual\CRM\Base\Entities\Model|null
+     * @return \OoBook\CRM\Base\Entities\Model|null
      */
     public function forNestedSlug($nestedSlug, $with = [], $withCount = [], $scopes = [])
     {
@@ -40,7 +40,7 @@ trait NestingTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Entities\Model $object
+     * @param \OoBook\CRM\Base\Entities\Model $object
      * @return void
      */
     public function afterRestore($object)

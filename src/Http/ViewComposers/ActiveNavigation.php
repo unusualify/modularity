@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Http\ViewComposers;
+namespace OoBook\CRM\Base\Http\ViewComposers;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;

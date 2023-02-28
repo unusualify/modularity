@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Activators;
+namespace OoBook\CRM\Base\Activators;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Config\Repository as Config;
@@ -59,7 +59,7 @@ class FileActivator extends ActivatorsFileActivator
      */
     private function config(string $key, $default = null)
     {
-        return $this->config->get('base.activators.file.' . $key, $default);
+        return $this->config->get('unusual.activators.file.' . $key, $default);
     }
 
     /**
@@ -70,7 +70,7 @@ class FileActivator extends ActivatorsFileActivator
      */
     private function getRoutesStatuses(): array
     {
-        if (!$this->config->get('base.cache.enabled')) {
+        if (!$this->config->get('unusual.cache.enabled')) {
             return $this->readRoutesJson();
         }
 

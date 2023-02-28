@@ -1,8 +1,8 @@
 <?php
 
-namespace Unusual\CRM\Base\Repositories\Traits;
+namespace OoBook\CRM\Base\Repositories\Traits;
 
-use Unusual\CRM\Base\Entities\File;
+use OoBook\CRM\Base\Entities\File;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
@@ -10,9 +10,9 @@ use Illuminate\Support\Collection;
 trait FilesTrait
 {
     /**
-     * @param \Unusual\CRM\Base\Entities\Model $object
+     * @param \OoBook\CRM\Base\Entities\Model $object
      * @param array $fields
-     * @return \Unusual\CRM\Base\Entities\Model
+     * @return \OoBook\CRM\Base\Entities\Model
      */
     public function hydrateFilesTrait($object, $fields)
     {
@@ -36,7 +36,7 @@ trait FilesTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Entities\Model $object
+     * @param \OoBook\CRM\Base\Entities\Model $object
      * @param array $fields
      * @return void
      */
@@ -89,7 +89,7 @@ trait FilesTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Entities\Model $object
+     * @param \OoBook\CRM\Base\Entities\Model $object
      * @param array $fields
      * @return array
      */

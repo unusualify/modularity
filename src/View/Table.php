@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\View;
+namespace OoBook\CRM\Base\View;
 
 use Illuminate\View\Component;
 

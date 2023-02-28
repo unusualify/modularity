@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Console;
+namespace OoBook\CRM\Base\Console;
 
 class RefreshCommand extends BaseCommand
 {
@@ -41,7 +41,7 @@ class RefreshCommand extends BaseCommand
     private function publishAssets()
     {
         $this->call('vendor:publish', [
-            '--provider' => 'Unusual\CRM\Base\Providers\UnusualProvider',
+            '--provider' => 'OoBook\CRM\Base\Providers\UnusualProvider',
             '--tag' => 'assets',
             '--force' => true,
         ]);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Facades;
+namespace OoBook\CRM\Base\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

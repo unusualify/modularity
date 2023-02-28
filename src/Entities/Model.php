@@ -1,9 +1,9 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities;
+namespace OoBook\CRM\Base\Entities;
 
-use Unusual\CRM\Base\Entities\Traits\HasPresenter;
-use Unusual\CRM\Base\Entities\Traits\IsTranslatable;
+use OoBook\CRM\Base\Entities\Traits\HasPresenter;
+use OoBook\CRM\Base\Entities\Traits\IsTranslatable;
 use Carbon\Carbon;
 use Cartalyst\Tags\TaggableInterface;
 use Cartalyst\Tags\TaggableTrait;

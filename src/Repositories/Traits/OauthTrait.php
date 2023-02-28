@@ -1,13 +1,13 @@
 <?php
 
-namespace Unusual\CRM\Base\Repositories\Traits;
+namespace OoBook\CRM\Base\Repositories\Traits;
 
 trait OauthTrait
 {
 
     /**
      * @param \Laravel\Socialite\Contracts\User $oauthUser
-     * @return \Unusual\CRM\Base\Entities\User
+     * @return \OoBook\CRM\Base\Entities\User
      */
     public function oauthUser($oauthUser)
     {
@@ -31,7 +31,7 @@ trait OauthTrait
     /**
      * @param \Laravel\Socialite\Contracts\User $oauthUser
      * @param string $provider
-     * @return \Unusual\CRM\Base\Entities\User
+     * @return \OoBook\CRM\Base\Entities\User
      */
     public function oauthUpdateProvider($oauthUser, $provider)
     {
@@ -49,7 +49,7 @@ trait OauthTrait
 
     /**
      * @param \Laravel\Socialite\Contracts\User $oauthUser
-     * @return \Unusual\CRM\Base\Entities\User
+     * @return \OoBook\CRM\Base\Entities\User
      */
     public function oauthCreateUser($oauthUser)
     {

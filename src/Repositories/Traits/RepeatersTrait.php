@@ -1,9 +1,9 @@
 <?php
 
-namespace Unusual\CRM\Base\Repositories\Traits;
+namespace OoBook\CRM\Base\Repositories\Traits;
 
-use Unusual\CRM\Base\Facades\TwillBlocks;
-use Unusual\CRM\Base\Facades\TwillUtil;
+use OoBook\CRM\Base\Facades\TwillBlocks;
+use OoBook\CRM\Base\Facades\TwillUtil;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -33,7 +33,7 @@ trait RepeatersTrait
     protected $repeaters = [];
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param array $fields
      * @return void
      */
@@ -51,7 +51,7 @@ trait RepeatersTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param array $fields
      * @return array
      */
@@ -71,11 +71,11 @@ trait RepeatersTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param array $fields
      * @param string $relation
      * @param bool $keepExisting
-     * @param \Unusual\CRM\Base\Models\Model|null $model
+     * @param \OoBook\CRM\Base\Models\Model|null $model
      * @return void
      */
     public function updateRepeaterMany($object, $fields, $relation, $keepExisting = true, $model = null)
@@ -96,11 +96,11 @@ trait RepeatersTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param array $fields
      * @param string $relation
      * @param string|null $morph
-     * @param \Unusual\CRM\Base\Models\Model|null $model
+     * @param \OoBook\CRM\Base\Models\Model|null $model
      * @param string|null $repeaterName
      * @return void
      */
@@ -171,10 +171,10 @@ trait RepeatersTrait
     /**
      * Given relation, model and repeaterName, retrieve the repeater data from request and update the database record.
      *
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param array $fields
      * @param string $relation
-     * @param \Unusual\CRM\Base\Models\Model|\Unusual\CRM\Base\Repositories\ModuleRepository|null $modelOrRepository
+     * @param \OoBook\CRM\Base\Models\Model|\OoBook\CRM\Base\Repositories\ModuleRepository|null $modelOrRepository
      * @param string|null $repeaterName
      * @return void
      */
@@ -253,10 +253,10 @@ trait RepeatersTrait
     /**
      * Given relation, model and repeaterName, get the necessary fields for rendering a repeater.
      *
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param array $fields
      * @param string $relation
-     * @param \Unusual\CRM\Base\Models\Model|\Unusual\CRM\Base\Repositories\ModuleRepository|null $modelOrRepository
+     * @param \OoBook\CRM\Base\Models\Model|\OoBook\CRM\Base\Repositories\ModuleRepository|null $modelOrRepository
      * @param string|null $repeaterName
      * @return array
      */

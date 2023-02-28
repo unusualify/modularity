@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Http\ViewComposers;
+namespace OoBook\CRM\Base\Http\ViewComposers;
 
 use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\View\View;

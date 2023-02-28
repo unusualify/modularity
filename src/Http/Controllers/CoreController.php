@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Http\Controllers;
+namespace OoBook\CRM\Base\Http\Controllers;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -20,13 +20,13 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
-use Unusual\CRM\Base\Transformers\RoleResource;
+use OoBook\CRM\Base\Transformers\RoleResource;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Illuminate\Routing\Controller;
-use Unusual\CRM\Base\Facades\Module as FacadesModule;
-use Unusual\CRM\Base\Services\MessageStage;
-use Unusual\CRM\Base\Support\Finder;
+use OoBook\CRM\Base\Facades\Module as FacadesModule;
+use OoBook\CRM\Base\Services\MessageStage;
+use OoBook\CRM\Base\Support\Finder;
 use Nwidart\Modules\Facades\Module;
 use stdClass;
 
@@ -85,7 +85,7 @@ abstract class CoreController extends Controller
     protected $modelTitle;
 
     /**
-     * @var \Unusual\CRM\Base\Repositories\ModuleRepository
+     * @var \OoBook\CRM\Base\Repositories\ModuleRepository
      */
     protected $repository;
 
@@ -409,7 +409,7 @@ abstract class CoreController extends Controller
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $item
+     * @param \OoBook\CRM\Base\Models\Model $item
      * @return int|string
      */
     protected function getItemIdentifier($item)
@@ -590,7 +590,7 @@ abstract class CoreController extends Controller
     }
 
     /**
-     * @return \Unusual\CRM\Base\Http\Requests\Admin\Request
+     * @return \OoBook\CRM\Base\Http\Requests\Admin\Request
      */
     protected function validateFormRequest()
     {
@@ -712,7 +712,7 @@ abstract class CoreController extends Controller
     }
 
     /**
-     * @return \Unusual\CRM\Base\Repositories\ModuleRepository
+     * @return \OoBook\CRM\Base\Repositories\ModuleRepository
      */
     protected function getRepository()
     {
@@ -730,7 +730,7 @@ abstract class CoreController extends Controller
     }
 
     /**
-     * @return \Unusual\CRM\Base\Transformers\
+     * @return \OoBook\CRM\Base\Transformers\
      */
     protected function getTransformer($data = [])
     {
@@ -742,7 +742,7 @@ abstract class CoreController extends Controller
     }
 
     /**
-     * @return \Unusual\CRM\Base\Transformers
+     * @return \OoBook\CRM\Base\Transformers
      */
     protected function getTransformerClass()
     {

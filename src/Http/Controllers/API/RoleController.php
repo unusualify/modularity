@@ -1,14 +1,14 @@
 <?php
 
-namespace Unusual\CRM\Base\Http\Controllers\API;
+namespace OoBook\CRM\Base\Http\Controllers\API;
 
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Unusual\CRM\Base\Http\Requests\StoreRoleRequest;
-use Unusual\CRM\Base\Http\Requests\RoleRequest;
-use Unusual\CRM\Base\Repositories\RoleRepository;
-use Unusual\CRM\Base\Transformers\RoleResource;
+use OoBook\CRM\Base\Http\Requests\StoreRoleRequest;
+use OoBook\CRM\Base\Http\Requests\RoleRequest;
+use OoBook\CRM\Base\Repositories\RoleRepository;
+use OoBook\CRM\Base\Transformers\RoleResource;
 use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller

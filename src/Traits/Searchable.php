@@ -1,5 +1,5 @@
 <?php
-namespace Unusual\CRM\Base\Traits;
+namespace OoBook\CRM\Base\Traits;
 
 use Illuminate\Http\Request;
 

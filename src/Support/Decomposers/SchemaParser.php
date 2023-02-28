@@ -1,12 +1,12 @@
 <?php
 
-namespace Unusual\CRM\Base\Support\Decomposers;
+namespace OoBook\CRM\Base\Support\Decomposers;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Nwidart\Modules\Support\Migrations\SchemaParser as Parser;
 use Illuminate\Support\Str;
-use Unusual\CRM\Base\Traits\Namable;
+use OoBook\CRM\Base\Traits\Namable;
 use phpDocumentor\Reflection\Types\Boolean;
 use PhpParser\Node\Expr\FuncCall;
 

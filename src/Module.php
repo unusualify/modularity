@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base;
+namespace OoBook\CRM\Base;
 
 use Illuminate\Container\Container;
 use Nwidart\Modules\Module as NwidartModule;

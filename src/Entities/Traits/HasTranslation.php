@@ -1,8 +1,8 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities\Traits;
+namespace OoBook\CRM\Base\Entities\Traits;
 
-use Unusual\CRM\Base\Facades\TwillCapsules;
+use OoBook\CRM\Base\Facades\TwillCapsules;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;

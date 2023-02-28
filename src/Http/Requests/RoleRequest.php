@@ -1,9 +1,9 @@
 <?php
 
-namespace Unusual\CRM\Base\Http\Requests;
+namespace OoBook\CRM\Base\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Unusual\CRM\Base\Http\Requests\BaseFormRequest;
+use OoBook\CRM\Base\Http\Requests\BaseFormRequest;
 
 class RoleRequest extends BaseFormRequest
 {

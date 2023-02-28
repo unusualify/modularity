@@ -1,9 +1,9 @@
 <?php
 
-namespace Unusual\CRM\Base;
+namespace OoBook\CRM\Base;
 
-use Unusual\CRM\Base\Models\Enums\UserRole;
-use Unusual\CRM\Base\Models\User;
+use OoBook\CRM\Base\Models\Enums\UserRole;
+use OoBook\CRM\Base\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 

@@ -1,12 +1,12 @@
 <?php
 
-namespace Unusual\CRM\Base\Repositories\Traits;
+namespace OoBook\CRM\Base\Repositories\Traits;
 
 /**
  * Mimic BrowsersTrait, but when the relation uses
  * HasRelated instead of being a proper model relation.
  *
- * @see Unusual\CRM\Base\Repositories\Traits\HandleBrowsers
+ * @see OoBook\CRM\Base\Repositories\Traits\HandleBrowsers
  * @see https://github.com/area17/twill/discussions/940
  */
 trait RelatedBrowsersTrait
@@ -34,7 +34,7 @@ trait RelatedBrowsersTrait
     protected $relatedBrowsers = [];
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param array $fields
      * @return void
      */
@@ -46,7 +46,7 @@ trait RelatedBrowsersTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param array $fields
      * @return array
      */

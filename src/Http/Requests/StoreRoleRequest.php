@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Http\Requests;
+namespace OoBook\CRM\Base\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 

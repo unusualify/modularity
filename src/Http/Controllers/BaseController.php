@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Http\Controllers;
+namespace OoBook\CRM\Base\Http\Controllers;
 
 use Illuminate\Contracts\Support\Renderable;
 // use Modules\Payment\Repositories\PaymentRepository;
@@ -20,8 +20,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
-use Unusual\CRM\Base\Services\MessageStage;
-use Unusual\CRM\Base\Transformers\RoleResource;
+use OoBook\CRM\Base\Services\MessageStage;
+use OoBook\CRM\Base\Transformers\RoleResource;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Nwidart\Modules\Facades\Module;
@@ -276,7 +276,7 @@ abstract class BaseController extends CoreController
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $item
+     * @param \OoBook\CRM\Base\Models\Model $item
      * @return array
      */
     protected function indexItemData($item)
@@ -285,7 +285,7 @@ abstract class BaseController extends CoreController
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $item
+     * @param \OoBook\CRM\Base\Models\Model $item
      * @param array $column
      * @return array
      */
@@ -845,7 +845,7 @@ abstract class BaseController extends CoreController
 
     /**
      * @param int $id
-     * @param \Unusual\CRM\Base\Models\Model|null $item
+     * @param \OoBook\CRM\Base\Models\Model|null $item
      * @return array
      */
     protected function form($id, $item = null, $nested=null)

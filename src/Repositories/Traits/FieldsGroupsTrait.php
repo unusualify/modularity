@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Repositories\Traits;
+namespace OoBook\CRM\Base\Repositories\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -8,9 +8,9 @@ use Illuminate\Support\Str;
 trait FieldsGroupsTrait
 {
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param array|null $fields
-     * @return \Unusual\CRM\Base\Models\Model
+     * @return \OoBook\CRM\Base\Models\Model
      */
     public function hydrateFieldsGroupsTrait($object, $fields)
     {
@@ -28,7 +28,7 @@ trait FieldsGroupsTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model|null $object
+     * @param \OoBook\CRM\Base\Models\Model|null $object
      * @param array $fields
      * @return array
      */
@@ -47,7 +47,7 @@ trait FieldsGroupsTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param array $fields
      * @return array
      */
@@ -124,7 +124,7 @@ trait FieldsGroupsTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @return array
      */
     protected function getModelCasts($object)

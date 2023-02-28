@@ -1,14 +1,14 @@
 <?php
 
-namespace Unusual\CRM\Base\Providers;
+namespace OoBook\CRM\Base\Providers;
 
 use Nwidart\Modules\Facades\Module;
 use Illuminate\Support\Facades\View;
-use Unusual\CRM\Base\Http\ViewComposers\ActiveNavigation;
-use Unusual\CRM\Base\Http\ViewComposers\CurrentUser;
-use Unusual\CRM\Base\Http\ViewComposers\FilesUploaderConfig;
-use Unusual\CRM\Base\Http\ViewComposers\Localization;
-use Unusual\CRM\Base\Http\ViewComposers\MediasUploaderConfig;
+use OoBook\CRM\Base\Http\ViewComposers\ActiveNavigation;
+use OoBook\CRM\Base\Http\ViewComposers\CurrentUser;
+use OoBook\CRM\Base\Http\ViewComposers\FilesUploaderConfig;
+use OoBook\CRM\Base\Http\ViewComposers\Localization;
+use OoBook\CRM\Base\Http\ViewComposers\MediasUploaderConfig;
 
 class ResourceServiceProvider extends ServiceProvider
 {

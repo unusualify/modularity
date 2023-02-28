@@ -1,6 +1,6 @@
 <?php
 
-use Unusual\CRM\Base\Services\Assets;
+use OoBook\CRM\Base\Services\Assets;
 
 if (!function_exists('unusualMix')) {
     /**

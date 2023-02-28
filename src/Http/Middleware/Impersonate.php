@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Http\Middleware;
+namespace OoBook\CRM\Base\Http\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;

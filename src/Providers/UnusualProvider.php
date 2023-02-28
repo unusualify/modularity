@@ -1,12 +1,12 @@
 <?php
 
-namespace Unusual\CRM\Base\Providers;
+namespace OoBook\CRM\Base\Providers;
 
 use Illuminate\Database\Eloquent\Factory;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
-use Unusual\CRM\Base\View\Table;
+use OoBook\CRM\Base\View\Table;
 
 class UnusualProvider extends ServiceProvider
 {

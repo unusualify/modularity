@@ -1,12 +1,12 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities\Traits;
+namespace OoBook\CRM\Base\Entities\Traits;
 
-use Unusual\CRM\Base\Exceptions\MediaCropNotFoundException;
-use Unusual\CRM\Base\Entities\Media;
+use OoBook\CRM\Base\Exceptions\MediaCropNotFoundException;
+use OoBook\CRM\Base\Entities\Media;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Unusual\CRM\Base\Services\MediaLibrary\ImageService;
+use OoBook\CRM\Base\Services\MediaLibrary\ImageService;
 
 trait HasMedias
 {
@@ -21,7 +21,7 @@ trait HasMedias
     {
         self::deleted(static function (Model $model) {
             if (!method_exists($model, 'isForceDeleting') || $model->isForceDeleting()) {
-                /** @var \Unusual\CRM\Base\Entities\Traits\HasMedias $model */
+                /** @var \OoBook\CRM\Base\Entities\Traits\HasMedias $model */
                 $model->medias()->detach();
             }
         });
@@ -344,7 +344,7 @@ trait HasMedias
      * @param array $params Parameters compatible with the current image service, like `w` or `h`.
      * @param bool $has_fallback Indicate that you can provide a fallback. Will return `null` instead of the default image fallback.
      * @return string|null
-     * @see \Unusual\CRM\Base\Commands\RefreshLQIP
+     * @see \OoBook\CRM\Base\Commands\RefreshLQIP
      */
     public function lowQualityImagePlaceholder($role, $crop = "default", $params = [], $has_fallback = false)
     {

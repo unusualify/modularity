@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Console;
+namespace OoBook\CRM\Base\Console;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
 use Nwidart\Modules\Support\Stub;
-use Unusual\CRM\Base\Generators\RouteGenerator;
+use OoBook\CRM\Base\Generators\RouteGenerator;
 
 class RouteMakeCommand extends BaseCommand
 {

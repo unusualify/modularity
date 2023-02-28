@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities;
+namespace OoBook\CRM\Base\Entities;
 
 use Cartalyst\Tags\IlluminateTag;
 

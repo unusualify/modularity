@@ -2,7 +2,7 @@
 
 namespace $NAMESPACE$;
 
-use Unusual\CRM\Base\Http\Requests\BaseFormRequest as FormRequest;
+use OoBook\CRM\Base\Http\Requests\BaseFormRequest as FormRequest;
 
 class $CLASS$ extends FormRequest
 {

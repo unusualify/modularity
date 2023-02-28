@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities\Traits;
+namespace OoBook\CRM\Base\Entities\Traits;
 
 trait HasPresenter
 {

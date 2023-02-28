@@ -1,14 +1,14 @@
 <?php
 
-namespace Unusual\CRM\Base\Console;
+namespace OoBook\CRM\Base\Console;
 
 use Illuminate\Support\Facades\Config;
-use Unusual\CRM\Base\Support\Decomposers\SchemaParser;
+use OoBook\CRM\Base\Support\Decomposers\SchemaParser;
 use Nwidart\Modules\Commands\GeneratorCommand;
 use Nwidart\Modules\Facades\Module;
 use Nwidart\Modules\Support\Stub;
 use Nwidart\Modules\Traits\ModuleCommandTrait;
-use Unusual\CRM\Base\Traits\Namable;
+use OoBook\CRM\Base\Traits\Namable;
 
 class BaseCommand extends GeneratorCommand
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities;
+namespace OoBook\CRM\Base\Entities;
 
-use Unusual\CRM\Base\Entities\Traits\HasFiles;
-use Unusual\CRM\Base\Entities\Traits\HasMedias;
-use Unusual\CRM\Base\Entities\Traits\HasPresenter;
-use Unusual\CRM\Base\Entities\Traits\HasRelated;
+use OoBook\CRM\Base\Entities\Traits\HasFiles;
+use OoBook\CRM\Base\Entities\Traits\HasMedias;
+use OoBook\CRM\Base\Entities\Traits\HasPresenter;
+use OoBook\CRM\Base\Entities\Traits\HasRelated;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 
 class Block extends BaseModel
@@ -45,7 +45,7 @@ class Block extends BaseModel
 
     public function children()
     {
-        return $this->hasMany('Unusual\CRM\Base\Entities\Block', 'parent_id');
+        return $this->hasMany('OoBook\CRM\Base\Entities\Block', 'parent_id');
     }
 
     public function input($name)

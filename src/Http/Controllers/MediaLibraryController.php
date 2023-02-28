@@ -1,12 +1,12 @@
 <?php
 
-namespace Unusual\CRM\Base\Http\Controllers;
+namespace OoBook\CRM\Base\Http\Controllers;
 
-use Unusual\CRM\Base\Http\Requests\Admin\MediaRequest;
-use Unusual\CRM\Base\Models\Media;
-use Unusual\CRM\Base\Services\Uploader\SignAzureUpload;
-use Unusual\CRM\Base\Services\Uploader\SignS3Upload;
-use Unusual\CRM\Base\Services\Uploader\SignUploadListener;
+use OoBook\CRM\Base\Http\Requests\Admin\MediaRequest;
+use OoBook\CRM\Base\Models\Media;
+use OoBook\CRM\Base\Services\Uploader\SignAzureUpload;
+use OoBook\CRM\Base\Services\Uploader\SignS3Upload;
+use OoBook\CRM\Base\Services\Uploader\SignUploadListener;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\JsonResponse;
@@ -25,7 +25,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
     /**
      * @var string
      */
-    protected $namespace = 'Unusual\CRM\Base';
+    protected $namespace = 'OoBook\CRM\Base';
 
     /**
      * @var array

@@ -1,8 +1,8 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities\Traits;
+namespace OoBook\CRM\Base\Entities\Traits;
 
-use Unusual\CRM\Base\Entities\RelatedItem;
+use OoBook\CRM\Base\Entities\RelatedItem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
@@ -50,7 +50,7 @@ trait HasRelated
         return $this->relatedCache[$browser_name] = $this->relatedItems
             ->where('browser_name', $browser_name)
             ->map(function ($item) {
-                /** @var \Unusual\CRM\Base\Entities\Model $model */
+                /** @var \OoBook\CRM\Base\Entities\Model $model */
                 $model = $item->related;
 
                 $model->setRelation('pivot', $item);

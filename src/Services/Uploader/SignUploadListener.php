@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Services\Uploader;
+namespace OoBook\CRM\Base\Services\Uploader;
 
 interface SignUploadListener
 {

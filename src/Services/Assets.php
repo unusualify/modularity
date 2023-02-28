@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Services;
+namespace OoBook\CRM\Base\Services;
 
 use Illuminate\Support\Facades\Cache;
 

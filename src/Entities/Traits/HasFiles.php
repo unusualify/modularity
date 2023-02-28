@@ -1,9 +1,9 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities\Traits;
+namespace OoBook\CRM\Base\Entities\Traits;
 
-use Unusual\CRM\Base\Entities\File;
-use Unusual\CRM\Base\Services\FileLibrary\FileService;
+use OoBook\CRM\Base\Entities\File;
+use OoBook\CRM\Base\Services\FileLibrary\FileService;
 
 trait HasFiles
 {

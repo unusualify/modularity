@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Services\MediaLibrary;
+namespace OoBook\CRM\Base\Services\MediaLibrary;
 
 /**
  * Base class to implement image service parameter compatibility.

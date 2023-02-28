@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Services\MediaLibrary;
+namespace OoBook\CRM\Base\Services\MediaLibrary;
 
 use Illuminate\Support\Facades\Storage;
 

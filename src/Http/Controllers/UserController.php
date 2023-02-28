@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Http\Controllers;
+namespace OoBook\CRM\Base\Http\Controllers;
 
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;

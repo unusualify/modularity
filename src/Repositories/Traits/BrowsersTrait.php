@@ -1,8 +1,8 @@
 <?php
 
-namespace Unusual\CRM\Base\Repositories\Traits;
+namespace OoBook\CRM\Base\Repositories\Traits;
 
-use Unusual\CRM\Base\Models\Behaviors\HasMedias;
+use OoBook\CRM\Base\Models\Behaviors\HasMedias;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -34,7 +34,7 @@ trait BrowsersTrait
     protected $browsers = [];
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param array $fields
      * @return void
      */
@@ -46,7 +46,7 @@ trait BrowsersTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param array $fields
      * @return array
      */
@@ -63,7 +63,7 @@ trait BrowsersTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param array $fields
      * @param string $relationship
      * @param string $positionAttribute
@@ -117,7 +117,7 @@ trait BrowsersTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param array $fields
      * @param string $relationship
      * @param string $positionAttribute
@@ -129,7 +129,7 @@ trait BrowsersTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param array $fields
      * @param string $browserName
      * @return void
@@ -140,7 +140,7 @@ trait BrowsersTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param string $relation
      * @param string|null $routePrefix
      * @param string $titleKey
@@ -169,7 +169,7 @@ trait BrowsersTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Models\Model $object
+     * @param \OoBook\CRM\Base\Models\Model $object
      * @param string $relation
      * @return array
      */

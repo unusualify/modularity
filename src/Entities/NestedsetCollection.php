@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities;
+namespace OoBook\CRM\Base\Entities;
 
 use Kalnoy\Nestedset\Collection as BaseNestedsetCollection;
 use Kalnoy\Nestedset\NodeTrait;

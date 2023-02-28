@@ -1,12 +1,12 @@
 <?php
 
-namespace Unusual\CRM\Base\Support\Decomposers;
+namespace OoBook\CRM\Base\Support\Decomposers;
 
-use Unusual\CRM\Base\Traits\Namable;
+use OoBook\CRM\Base\Traits\Namable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Unusual\CRM\Base\Support\Finder;
+use OoBook\CRM\Base\Support\Finder;
 
 
 

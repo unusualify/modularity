@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Generators;
+namespace OoBook\CRM\Base\Generators;
 
 use Nwidart\Modules\Generators\Generator;
 use Illuminate\Config\Repository as Config;
@@ -8,8 +8,8 @@ use Illuminate\Console\Command as Console;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
-use Unusual\CRM\Base\Support\Decomposers\SchemaParser;
-use Unusual\CRM\Base\Traits\Namable;
+use OoBook\CRM\Base\Support\Decomposers\SchemaParser;
+use OoBook\CRM\Base\Traits\Namable;
 use Nwidart\Modules\Facades\Module;
 use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
@@ -616,8 +616,8 @@ class RouteGenerator extends Generator
                 'url' => $lowerName,
                 'route_name' => $lowerName,
                 'table' => [
-                    'headers' => $this->getHeaders(), //in Unusual\CRM\Base\Support\Migrations\SchemaParser::class
-                    'inputs' => $this->getInputs() //in Unusual\CRM\Base\Support\Migrations\SchemaParser::class
+                    'headers' => $this->getHeaders(), //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
+                    'inputs' => $this->getInputs() //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
                 ]
             ];
         }else{
@@ -626,8 +626,8 @@ class RouteGenerator extends Generator
                 'url' => $lowerName,
                 'route_name' => $lowerName,
                 'table' => [
-                    'headers' => $this->getHeaders(), //in Unusual\CRM\Base\Support\Migrations\SchemaParser::class
-                    'inputs' => $this->getInputs() //in Unusual\CRM\Base\Support\Migrations\SchemaParser::class
+                    'headers' => $this->getHeaders(), //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
+                    'inputs' => $this->getInputs() //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
                 ]
             ];
         }

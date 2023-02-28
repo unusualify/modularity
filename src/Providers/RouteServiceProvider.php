@@ -1,19 +1,19 @@
 <?php
 
-namespace Unusual\CRM\Base\Providers;
+namespace OoBook\CRM\Base\Providers;
 
 use Illuminate\Container\Util;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
-use Unusual\CRM\Base\Facades\UnusualRoutes;
+use OoBook\CRM\Base\Facades\UnusualRoutes;
 use Nwidart\Modules\Facades\Module;
 
 class RouteServiceProvider extends ServiceProvider
 {
 
-    protected $namespace = 'Unusual\CRM\Base\Http\Controllers';
+    protected $namespace = 'OoBook\CRM\Base\Http\Controllers';
 
     /**
      * Bootstraps the package services.
@@ -149,7 +149,7 @@ class RouteServiceProvider extends ServiceProvider
 
         if (
             config('base.media_library.image_service') ===
-            'Unusual\CRM\Base\Services\MediaLibrary\Glide'
+            'OoBook\CRM\Base\Services\MediaLibrary\Glide'
         ) {
             $router
                 ->get(

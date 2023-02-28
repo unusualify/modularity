@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Console;
+namespace OoBook\CRM\Base\Console;
 
 use Illuminate\Console\Command;
 use Nwidart\Modules\Module;

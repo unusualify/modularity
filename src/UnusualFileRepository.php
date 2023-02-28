@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base;
+namespace OoBook\CRM\Base;
 
 use Nwidart\Modules\FileRepository;
 
@@ -12,7 +12,7 @@ class UnusualFileRepository extends FileRepository
     protected function createModule(...$args)
     {
         // dd($args[2]);
-        return new \Unusual\CRM\Base\Module(...$args);
+        return new \OoBook\CRM\Base\Module(...$args);
     }
 
 

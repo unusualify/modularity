@@ -1,8 +1,8 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities\Traits;
+namespace OoBook\CRM\Base\Entities\Traits;
 
-use Unusual\CRM\Base\Entities\UserOauth;
+use OoBook\CRM\Base\Entities\UserOauth;
 
 trait HasOauth
 {

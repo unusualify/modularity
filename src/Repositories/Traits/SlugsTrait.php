@@ -1,11 +1,11 @@
 <?php
 
-namespace Unusual\CRM\Base\Repositories\Traits;
+namespace OoBook\CRM\Base\Repositories\Traits;
 
 trait SlugsTrait
 {
     /**
-     * @param \Unusual\CRM\Base\Entities\Model $object
+     * @param \OoBook\CRM\Base\Entities\Model $object
      * @param array $fields
      * @return void
      */
@@ -27,7 +27,7 @@ trait SlugsTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Entities\Model $object
+     * @param \OoBook\CRM\Base\Entities\Model $object
      * @return void
      */
     public function afterDeleteSlugsTrait($object)
@@ -36,7 +36,7 @@ trait SlugsTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Entities\Model $object
+     * @param \OoBook\CRM\Base\Entities\Model $object
      * @return void
      */
     public function afterRestoreSlugsTrait($object)
@@ -45,7 +45,7 @@ trait SlugsTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Entities\Model $object
+     * @param \OoBook\CRM\Base\Entities\Model $object
      * @param array $fields
      * @return array
      */
@@ -65,7 +65,7 @@ trait SlugsTrait
     }
 
     /**
-     * @param \Unusual\CRM\Base\Entities\Model $object
+     * @param \OoBook\CRM\Base\Entities\Model $object
      * @param array $fields
      * @param array $slug
      * @return array
@@ -90,7 +90,7 @@ trait SlugsTrait
      * @param array $with
      * @param array $withCount
      * @param array $scopes
-     * @return \Unusual\CRM\Base\Entities\Model|null
+     * @return \OoBook\CRM\Base\Entities\Model|null
      */
     public function forSlug($slug, $with = [], $withCount = [], $scopes = [])
     {
@@ -126,7 +126,7 @@ trait SlugsTrait
      * @param string $slug
      * @param array $with
      * @param array $withCount
-     * @return \Unusual\CRM\Base\Entities\Model
+     * @return \OoBook\CRM\Base\Entities\Model
      */
     public function forSlugPreview($slug, $with = [], $withCount = [])
     {

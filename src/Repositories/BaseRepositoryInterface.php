@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Repositories;
+namespace OoBook\CRM\Base\Repositories;
 
 interface BaseRepositoryInterface
 {

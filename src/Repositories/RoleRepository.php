@@ -1,10 +1,10 @@
 <?php
 
-namespace Unusual\CRM\Base\Repositories;
+namespace OoBook\CRM\Base\Repositories;
 
 use Illuminate\Http\Request;
-use Unusual\CRM\Base\Repositories\Traits\TreeviewTrait;
-use Unusual\CRM\Base\Traits\Tabulable;
+use OoBook\CRM\Base\Repositories\Traits\TreeviewTrait;
+use OoBook\CRM\Base\Traits\Tabulable;
 
 class RoleRepository extends Repository
 {

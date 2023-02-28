@@ -1,9 +1,9 @@
 <?php
 
-namespace Unusual\CRM\Base\Repositories;
+namespace OoBook\CRM\Base\Repositories;
 
-use Unusual\CRM\Base\Entities\Media;
-use Unusual\CRM\Base\Repositories\Traits\TagsTrait;
+use OoBook\CRM\Base\Entities\Media;
+use OoBook\CRM\Base\Repositories\Traits\TagsTrait;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use ImageService;

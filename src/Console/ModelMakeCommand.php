@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Console;
+namespace OoBook\CRM\Base\Console;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
@@ -9,8 +9,8 @@ use Nwidart\Modules\Support\Stub;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Support\Str;
-use Unusual\CRM\Base\Support\Decomposers\RelationParser;
-use Unusual\CRM\Base\Support\Decomposers\SchemaParser;
+use OoBook\CRM\Base\Support\Decomposers\RelationParser;
+use OoBook\CRM\Base\Support\Decomposers\SchemaParser;
 use Nwidart\Modules\Support\Config\GeneratorPath;
 
 use Nwidart\Modules\Generators\FileGenerator;

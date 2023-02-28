@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities;
+namespace OoBook\CRM\Base\Entities;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

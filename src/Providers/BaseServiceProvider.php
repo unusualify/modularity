@@ -1,15 +1,10 @@
 <?php
 
-namespace Unusual\CRM\Base\Providers;
+namespace OoBook\CRM\Base\Providers;
 
-use Illuminate\Database\Eloquent\Factory;
-
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Unusual\CRM\Base\Activators\FileActivator;
 use Unusual\CRM\Base\UnusualFileRepository;
-use Unusual\CRM\Base\View\Table;
-use Nwidart\Modules\Contracts\ActivatorInterface;
 
 class BaseServiceProvider extends ServiceProvider
 {
@@ -18,7 +13,7 @@ class BaseServiceProvider extends ServiceProvider
      * Namespace of the terminal commands
      * @var string
      */
-    protected $terminalNamespace = "Unusual\\CRM\\Base\\Console";
+    protected $terminalNamespace = "OoBook\\CRM\\Base\\Console";
 
     /**
      * Boot the application events.

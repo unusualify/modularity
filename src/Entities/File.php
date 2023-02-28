@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities;
+namespace OoBook\CRM\Base\Entities;
 
 use FileService;
 use Illuminate\Support\Facades\DB;

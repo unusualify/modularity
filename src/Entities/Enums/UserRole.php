@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities\Enums;
+namespace OoBook\CRM\Base\Entities\Enums;
 
 use MyCLabs\Enum\Enum;
 

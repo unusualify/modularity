@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusual\CRM\Base\Http\Controllers;
+namespace OoBook\CRM\Base\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 class RoleController extends BaseController
 {
 
-    protected $namespace = 'Unusual\CRM\Base';
+    protected $namespace = 'OoBook\CRM\Base';
 
     protected $moduleName = 'User';
 

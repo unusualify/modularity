@@ -1,9 +1,9 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities\Traits;
+namespace OoBook\CRM\Base\Entities\Traits;
 
 use Kalnoy\Nestedset\NodeTrait;
-use Unusual\CRM\Base\Entities\NestedsetCollection;
+use OoBook\CRM\Base\Entities\NestedsetCollection;
 
 trait HasNesting
 {

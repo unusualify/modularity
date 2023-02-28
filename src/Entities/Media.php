@@ -1,11 +1,11 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities;
+namespace OoBook\CRM\Base\Entities;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Unusual\CRM\Base\Services\MediaLibrary\ImageService;
+use OoBook\CRM\Base\Services\MediaLibrary\ImageService;
 
 class Media extends Model
 {

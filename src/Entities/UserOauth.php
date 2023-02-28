@@ -1,8 +1,8 @@
 <?php
 
-namespace Unusual\CRM\Base\Entities;
+namespace OoBook\CRM\Base\Entities;
 
-use Unusual\CRM\Base\Entities\User;
+use OoBook\CRM\Base\Entities\User;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 
 class UserOauth extends BaseModel
