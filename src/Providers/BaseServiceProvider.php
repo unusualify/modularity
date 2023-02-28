@@ -3,8 +3,8 @@
 namespace OoBook\CRM\Base\Providers;
 
 use Illuminate\Support\Facades\Route;
-use Unusual\CRM\Base\Activators\FileActivator;
-use Unusual\CRM\Base\UnusualFileRepository;
+use OoBook\CRM\Base\Activators\FileActivator;
+use OoBook\CRM\Base\UnusualFileRepository;
 
 class BaseServiceProvider extends ServiceProvider
 {
