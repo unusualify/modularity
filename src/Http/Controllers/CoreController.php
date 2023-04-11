@@ -121,6 +121,16 @@ abstract class CoreController extends Controller
     ];
 
     /**
+     * @var array
+     */
+    protected $defaultTableOptions = [
+        'createOnModal' => true,
+        'editOnModal' => true,
+        'isRowEditing' => false,
+        'actionsType' => 'inline'
+    ];
+
+    /**
      * Relations to eager load for the index view.
      *
      * @var array
@@ -209,6 +219,8 @@ abstract class CoreController extends Controller
     protected $titleFormKey;
 
     protected $isNested;
+
+    protected $tableOptions;
 
     /**
      * Feature field name if the controller is using the feature route (defaults to "featured").
@@ -352,7 +364,7 @@ abstract class CoreController extends Controller
                 'search' => collect( $this->indexColumns ?? [] )->filter(function ($item) {
                     return isset($item['searchable']) ? $item['searchable'] : false;
                 })->map(function($item){
-                    return $item['value'];
+                    return $item['key'];
                 })->implode('|')
             ];
         }
@@ -566,19 +578,20 @@ abstract class CoreController extends Controller
     {
         $orders = [];
 
-        if ($this->request->has('sortBy') && $this->request->has('sortDesc')) {
-            if (($key = $this->request->get('sortBy')) == 'name') {
-                $sortBy = $this->titleColumnKey;
-            } elseif (! empty($key)) {
-                $sortBy = $key;
-            }
-            // dd(
-            //     $sortBy,
-            //     $this->request->get('sortDesc'),
-            // );
-            // dd($sortBy, $this->request->all());
-            if (isset($sortBy)) {
-                $orders[$this->indexColumns[$sortBy]['sortBy'] ?? $sortBy] = $this->request->get('sortDesc') == "true" ? 'desc' : 'asc';
+        if ($this->request->has('sortBy')) {
+
+            foreach( $this->request->get('sortBy') as $str ){
+                $sort = json_decode($str);
+
+                if ( $sort->key == 'name') {
+                    $sortBy = $this->titleColumnKey;
+                } elseif (! empty($sort->key)) {
+                    $sortBy = $sort->key;
+                }
+
+                if (isset($sortBy)) {
+                    $orders[$this->indexColumns[$sortBy]['sortBy'] ?? $sortBy] = $sort->order;
+                }
             }
         }
 
@@ -871,11 +884,18 @@ abstract class CoreController extends Controller
 
     public function getTableOptions()
     {
+
         return Collection::make(
             $this->isParentRoute()
-            ? $this->config->parent_route->table_option
-            : $this->config->sub_routes->{camelName($this->routeName)}->table_options
+                ? $this->config->parent_route->table_option
+                : $this->config->sub_routes->{camelName($this->routeName)}->table_options
+            ?? $this->defaultTableOptions
         )->toArray();
+    }
+
+    public function getTableOption($option)
+    {
+        return $this->tableOptions[$option] ?? false;
     }
 
     /**

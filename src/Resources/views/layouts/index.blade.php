@@ -15,14 +15,14 @@
     $controlLanguagesPublication = $controlLanguagesPublication ?? true;
 
     // dd($tableMainFilters);
-    // dd($inputs, $headers);
-    // dd($formSchema);
+    // dd($formSchema, $headers);
+    // dd($listOptions);
 @endphp
 
 
 @section('content')
-    <div>
-        <ue-datatable class="mx-5 my-5"
+    <div class="mx-5 my-5">
+        <ue-datatable
             title-key="{{ $titleKey }}"
             {{-- name="{{$name}}" --}}
             name="{{ $routeName }}"
@@ -44,15 +44,19 @@
     </div>
 @stop
 
-@push('post_js')
-    {{-- <script src="{{ unusualMix('vendor~utils-1.js') }}"></script> --}}
-    {{-- <script src="{{ unusualMix('manifest.js') }}"></script> --}}
-    <script src="{{ unusualMix('runtime.js') }}"></script>
+@push('head_last_js')
+    {{-- <script src="{{ unusualMix('runtime.js') }}"></script>
     <script src="{{ unusualMix('vendor.js') }}"></script>
-    {{-- <script src="{{ unusualMix('vanilla.js') }}"></script>
-    <script src="{{ unusualMix('vue.js') }}"></script> --}}
+    <script src="{{ unusualMix('core-index.js') }}"></script> --}}
+    @if( app()->isProduction() )
+        <link href="{{ unusualMix('core-index.js') }}" rel="preload" as="script" crossorigin />
+    @else
+
+
+    @endif
+@endpush
+@push('post_js')
     <script src="{{ unusualMix('core-index.js') }}"></script>
-    {{-- <script src="{{ asset('js/admin.js') }}"></script> --}}
 @endpush
 
 @section('STORE')

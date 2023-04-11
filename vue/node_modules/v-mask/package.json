@@ -1,0 +1,54 @@
+{
+  "name": "v-mask",
+  "version": "2.3.0",
+  "description": "Tiny input mask library for Vue.js based on text-mask-core (~5kb) exposed as directive. No dependencies",
+  "main": "dist/v-mask.js",
+  "module": "dist/v-mask.esm.js",
+  "scripts": {
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "npx testcafe `npx testcafe -b | paste -sd \",\" -` tests/e2e/**",
+    "test:e2e:ci": "testcafe chrome:headless tests/e2e/**",
+    "build": "npm run bundle && npm run bundle:min",
+    "bundle": "rollup -c build/rollup.conf.js",
+    "bundle:min": "rollup -c build/rollup.conf.min.js",
+    "lint": "eslint src tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/probil/v-mask.git"
+  },
+  "keywords": [
+    "vue.js",
+    "vue",
+    "vue-mask"
+  ],
+  "author": "Max Lyashuk <m_lyashuk@ukr.net>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/probil/v-mask/issues"
+  },
+  "homepage": "https://github.com/probil/v-mask#readme",
+  "devDependencies": {
+    "@babel/core": "7.15.5",
+    "@babel/preset-env": "7.15.6",
+    "@vue/test-utils": "1.2.2",
+    "babel-core": "7.0.0-bridge.0",
+    "eslint": "7.32.0",
+    "eslint-config-airbnb-base": "14.2.1",
+    "eslint-plugin-import": "2.24.2",
+    "eslint-plugin-jest": "24.4.2",
+    "eslint-plugin-testcafe": "0.2.1",
+    "jest": "27.2.2",
+    "rollup": "2.57.0",
+    "rollup-plugin-babel": "4.4.0",
+    "rollup-plugin-node-resolve": "5.2.0",
+    "rollup-plugin-terser": "7.0.2",
+    "testcafe": "1.16.0",
+    "text-mask-addons": "3.8.0",
+    "text-mask-core": "5.1.2",
+    "vue": "2.6.14",
+    "vue-server-renderer": "2.6.14",
+    "vue-template-compiler": "2.6.14"
+  }
+}

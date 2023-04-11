@@ -112,14 +112,14 @@ class BuildCommand extends BaseCommand
         $progressBar->setMessage("Building assets started...\n\n");
         $progressBar->advance();
 
+        $resource_path = resource_path('js/**/*.vue');
+        $resource_path = base_path($this->baseConfig('vendor_path') . '/vue/src/**');
+
         if ($this->option('hot')) {
-            // $this->startWatcher(resource_path('js/**/*.vue'), 'php artisan unusual:build --copyOnly');
+            $this->startWatcher( $resource_path, 'php artisan unusual:build --copyOnly');
             $this->runUnusualProcess(['npm', 'run', 'serve', '--', "--port={$this->getDevPort()}"], true);
         } elseif ($this->option('watch')) {
-            // dd(
-            //     resource_path('js/**/*.vue')
-            // );
-            // $this->startWatcher(resource_path('js/**/*.vue'), 'php artisan unusual:build --copyOnly');
+            $this->startWatcher( $resource_path, 'php artisan unusual:build --copyOnly');
             $this->runUnusualProcess(['npm', 'run', 'watch'], true);
         } else {
             $this->runUnusualProcess(['npm', 'run', 'build']);
@@ -157,7 +157,7 @@ class BuildCommand extends BaseCommand
             return;
         }
 
-        $chokidarPath = base_path($this->baseConfig('vendor_path')) . '/node_modules/.bin/chokidar';
+        $chokidarPath = base_path($this->baseConfig('vendor_path') . '/vue') . '/node_modules/.bin/chokidar';
         $chokidarCommand = [$chokidarPath, $pattern, "-c", $command];
 
         if ($this->filesystem->exists($chokidarPath)) {
@@ -183,7 +183,7 @@ class BuildCommand extends BaseCommand
      */
     private function runUnusualProcess(array $command, $disableTimeout = false)
     {
-        $process = new Process($command, base_path($this->baseConfig('vendor_path')) . '/vite' );
+        $process = new Process($command, base_path($this->baseConfig('vendor_path')) . '/vue' );
         $process->setTty(Process::isTtySupported());
 
         if ($disableTimeout) {
@@ -211,7 +211,7 @@ class BuildCommand extends BaseCommand
     private function copyComponents()
     {
         $localCustomComponentsPath = resource_path($this->baseConfig('custom_components_resource_path', 'js/components'));
-        $unusualCustomComponentsPath = base_path($this->baseConfig('vendor_path')) . '/vite/src/js/components/customs';
+        $unusualCustomComponentsPath = base_path($this->baseConfig('vendor_path')) . '/vue/src/js/components/customs';
 
         if (!$this->filesystem->exists($unusualCustomComponentsPath)) {
             $this->filesystem->makeDirectory($unusualCustomComponentsPath, 0755, true);

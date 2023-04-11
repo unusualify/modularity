@@ -2,7 +2,7 @@
 
 namespace OoBook\CRM\Base;
 
-use OoBook\CRM\Base\Models\Enums\UserRole;
+// use OoBook\CRM\Base\Models\Enums\UserRole;
 use OoBook\CRM\Base\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;

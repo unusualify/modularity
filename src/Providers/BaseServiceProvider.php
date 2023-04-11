@@ -22,11 +22,9 @@ class BaseServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
         $this->loadMigrationsFrom(
             base_path( config( $this->moduleNameLower . '.vendor_path') . '/src/Database/Migrations' )
         );
-
     }
 
     /**

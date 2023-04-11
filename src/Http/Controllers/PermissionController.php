@@ -28,6 +28,12 @@ class PermissionController extends BaseController
     protected $routeName = 'Permission';
 
 
+    protected $titleColumnKey = 'name';
+
+
+    protected $perPage = 5;
+
+
     /**
      * @var string
      */

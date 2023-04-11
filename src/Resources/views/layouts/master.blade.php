@@ -7,11 +7,12 @@
         <title> {{ $title ?? 'Module Template' }}</title>
         <meta name="csrf-token" content="{{ csrf_token() }}">
         @yield('pre-scripts') --}}
-
         @include('base::partials.head')
+
+        @stack('head_last_js')
     </head>
     <body>
-        @include('partials.icons.svg-sprite')
+        @include('base::partials.icons.svg-sprite')
 
         {{-- @dd( auth()->user() ) --}}
         @php
@@ -21,9 +22,8 @@
         {{-- @dd($sideMenu) --}}
 
         <div id="admin">
-
             <ue-main
-                ref="main"
+                ref='main'
                 :configuration='@json($configuration)'
                 >
                 <div id="ue-main-body">
@@ -42,24 +42,20 @@
 
                         @endif
 
-                        <ue-alert ref="alert"
+                        <ue-alert ref='alert'
                         ></ue-alert>
 
                         {{-- <ue-modal-test></ue-modal-test> --}}
                     </div>
                 </div>
             </ue-main>
-
-
         </div>
         {{-- <script src="{{ asset('js/admin.js') }}"></script> --}}
 
         {{-- @yield('initial-scripts') --}}
-
         <script>
             window['{{ config('base.js_namespace') }}'] = {};
             window['{{ config('base.js_namespace') }}'].version = '{{ config('base.version') }}';
-            window['{{ config('base.js_namespace') }}'].unusualLocalization = {!! json_encode($unusualLocalization) !!};
             window['{{ config('base.js_namespace') }}'].STORE = {};
 
             window['{{ config('base.js_namespace') }}'].STORE.config = {
@@ -99,9 +95,13 @@
             // window['{{ config('base.js_namespace') }}'].STORE.medias.crops = {!! json_encode(([]) + config('base.block_editor.crops', []) + (config('base.settings.crops') ?? [])) !!}
             // window['{{ config('base.js_namespace') }}'].STORE.medias.selected = {}
 
+            window['{{ config('base.js_namespace') }}'].unusualLocalization = {!! json_encode($unusualLocalization) !!};
 
             @yield('STORE')
         </script>
+
+        <script src="{{ unusualMix('chunk-common.js')}}" > </script>
+        <script src="{{ unusualMix('chunk-vendors.js') }}"> </script>
 
         @stack('post_js')
 

@@ -17,22 +17,22 @@ return [
             ],
             'headers' => [
                 [
-                    'text' => 'Name',
-                    'value' => 'name',
+                    'title' => 'Name',
+                    'key' => 'name',
                     'align' => 'start',
                     'sortable' => false,
                     'searchable' => true,
                 ],
                 [
-                    'text' => 'Type',
-                    'value' => 'type',
+                    'title' => 'Type',
+                    'key' => 'type',
                     'align' => 'start',
                     'sortable' => false,
                     'searchable' => true,
                 ],
                 [
-                    'text' => 'Actions',
-                    'value' => 'actions',
+                    'itlet' => 'Actions',
+                    'key' => 'actions',
                     'sortable' => false,
                 ],
             ],
@@ -71,10 +71,10 @@ return [
                 ],
                 'headers' => [
                     [
-                        'text' => 'Name',
-                        'value' => 'name',
+                        'title' => 'Name',
+                        'key' => 'name',
                         'align' => 'start',
-                        'sortable' => false,
+                        'sortable' => true,
                         'filterable' => false,
                         'groupable' => false,
                         'divider' => false,
@@ -92,8 +92,8 @@ return [
                     ],
                     [
                         // vuetify datatable header fields start
-                        'text' => 'Guard Name',
-                        'value' => 'guard_name',
+                        'title' => 'Guard Name',
+                        'key' => 'guard_name',
                         'align' => 'start',
                         'sortable' => false,
                         'filterable' => false,
@@ -112,9 +112,9 @@ return [
                         // custom fields for ue-datatable end
                     ],
                     [
-                        'text' => 'Created Time',
-                        'value' => 'created_at',
-                        'sortable' => false,
+                        'title' => 'Created Time',
+                        'key' => 'created_at',
+                        'sortable' => true,
                         'filterable' => true,
                         'groupable' => false,
                         'divider' => false,
@@ -131,8 +131,8 @@ return [
                         // custom fields for ue-datatable end
                     ],
                     [
-                        'text' => 'Actions',
-                        'value' => 'actions',
+                        'title' => 'Actions',
+                        'key' => 'actions',
                         'sortable' => false
                     ],
                 ],
@@ -167,13 +167,13 @@ return [
                         'props' => [
                             'placeholder' => 'web',
                             'prepend-icon' => 'mdi-account-child',
-                            'readonly', 
-                            'dense', 
-                            'disabled', 
-                            'error', 
-                            'flat', 
-                            // 'full-width', 
-                            'hide-spin-buttons', 
+                            'readonly',
+                            'dense',
+                            'disabled',
+                            'error',
+                            'flat',
+                            // 'full-width',
+                            'hide-spin-buttons',
                             'outlined'
                         ]
                     ],
@@ -206,7 +206,7 @@ return [
                         'props' => [
                             'prepend-icon' => 'mdi-account-arrow-right',
                             'color' => 'success',
-                            'mandatory', 
+                            'mandatory',
                             'row',
                             'outlined',
                             'dense',
@@ -232,12 +232,12 @@ return [
                         'xl' => 4,
                         'props' => [
                             'color' => 'success',
-                            // 'readonly', 
-                            'dense', 
-                            // 'disabled', 
-                            // 'error', 
-                            'flat', 
-                            'full-width', 
+                            // 'readonly',
+                            'dense',
+                            // 'disabled',
+                            // 'error',
+                            'flat',
+                            'full-width',
                             'hide-spin-buttons',
                             'prepend-icon' => 'mdi-glass-stange',
 
@@ -250,7 +250,7 @@ return [
                             // 'offIcon' => 'mdi-inactive',
                             // 'onIcon' => 'mdi-radioactive',
                         ],
-                    ],   
+                    ],
                     [
                         'title' => 'Status',
                         'name' => 'status',
@@ -280,7 +280,7 @@ return [
                             'prepend-icon' => 'mdi-chart-arc',
                             'activeClass' => '',
                             'color' => 'success',
-                            
+
                             'mandatory',
                             'row',
 
@@ -332,7 +332,7 @@ return [
                             // 'background-color' => 'success',
                             'hint' => '',
                             // 'vertical',
-                        ]    
+                        ]
                     ],
                     [
                         'title' => 'Color',
@@ -344,7 +344,7 @@ return [
                         'md' => 6,
                         'lg' => 6,
                         'xl' => 4,
-                        
+
                         'props' => [
                             'placeholder' => '#FFDD11FF',
                             // 'dotSize' => 'rgba',
@@ -356,7 +356,7 @@ return [
 
 
                         ]
-                    ],   
+                    ],
                     [
                         'title' => 'Start Date',
                         'name' => 'start_date',
@@ -384,7 +384,7 @@ return [
 
                             // 'show-adjacent-months',
                         ]
-                    ],    
+                    ],
                     [
                         'title' => 'Start Time',
                         'name' => 'start_time',
@@ -409,7 +409,7 @@ return [
                             // 'range',
                             // 'show-adjacent-months',
                         ]
-                    ],          
+                    ],
                     [
                         'title' => 'Icon',
                         'name' => 'icon',
@@ -426,7 +426,7 @@ return [
                             'prepend-icon' => 'mdi-card-text-outline',
                             // 'dense' => true
                         ]
-                    ],          
+                    ],
                 ],
 
                 'inputs' => [
@@ -495,53 +495,53 @@ return [
                             'order-xl' => 0,
                         ],
                         'prepend-icon' => 'mdi-account-child',
-                        'readonly', 
-                        'dense', 
-                        'disabled', 
-                        'error', 
-                        'flat', 
-                        // 'full-width', 
-                        'hide-spin-buttons', 
+                        'readonly',
+                        'dense',
+                        'disabled',
+                        'error',
+                        'flat',
+                        // 'full-width',
+                        'hide-spin-buttons',
                         'outlined',
                     ],
-                    'permissions' => [
-                        'type' => 'treeview',
-                        // 'type' => 'custom-input-treeview',
-                        'name' => 'permissions',
-                        'label' => 'Permissions of the role',
-                        'col' => [
-                            'cols' => 12,
-                            'sm' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                            'xl' => 12
-                        ],
-                        'offset' => [
-                            'offset' => 0,
-                            'offset-sm' => 2,
-                            'offset-md' => 0,
-                            'offset-lg' => 0,
-                            'offset-xl' => 0,
-                        ],
-                        'order' => [
-                            'order' => 0,
-                            'order-sm' => 1,
-                            'order-md' => 1,
-                            'order-lg' => 1,
-                            'order-xl' => 1,
-                        ],
+                    // 'permissions' => [
+                    //     'type' => 'treeview',
+                    //     // 'type' => 'custom-input-treeview',
+                    //     'name' => 'permissions',
+                    //     'label' => 'Permissions of the role',
+                    //     'col' => [
+                    //         'cols' => 12,
+                    //         'sm' => 12,
+                    //         'md' => 12,
+                    //         'lg' => 12,
+                    //         'xl' => 12
+                    //     ],
+                    //     'offset' => [
+                    //         'offset' => 0,
+                    //         'offset-sm' => 2,
+                    //         'offset-md' => 0,
+                    //         'offset-lg' => 0,
+                    //         'offset-xl' => 0,
+                    //     ],
+                    //     'order' => [
+                    //         'order' => 0,
+                    //         'order-sm' => 1,
+                    //         'order-md' => 1,
+                    //         'order-lg' => 1,
+                    //         'order-xl' => 1,
+                    //     ],
 
-                        "activatable" => true,
-                        "selectable" => true,
-                        "multipleActive" => false,
-                        "slot" => [
-                            "prepend",
-                            "label"
-                        ],
+                    //     "activatable" => true,
+                    //     "selectable" => true,
+                    //     "multipleActive" => false,
+                    //     "slot" => [
+                    //         "prepend",
+                    //         "label"
+                    //     ],
 
-                        'route' => 'permission',
-                        'model' => Spatie\Permission\Models\Permission::class,
-                    ],
+                    //     'route' => 'permission',
+                    //     'model' => Spatie\Permission\Models\Permission::class,
+                    // ],
                     // 'permissions_' => [
                     //     'type' => 'autocomplete',
                     //     'name' => 'permissions_',
@@ -584,7 +584,7 @@ return [
                     //     ],
                     //     'prepend-icon' => 'mdi-account-arrow-right',
                     //     'color' => 'success',
-                    //     'mandatory', 
+                    //     'mandatory',
                     //     'row',
                     //     'outlined',
                     //     'dense',
@@ -595,7 +595,7 @@ return [
                     //         'openOnClick' => false,
                     //         'maxHeight' => 304
                     //     ],
-                        
+
                     // ],
                     // 'is_active' => [
                     //     'type' => 'checkbox',
@@ -625,12 +625,12 @@ return [
 
                     //     'prepend-icon' => 'mdi-glass-stange',
                     //     'color' => 'success',
-                    //     // 'readonly', 
-                    //     'dense', 
-                    //     // 'disabled', 
-                    //     // 'error', 
-                    //     'flat', 
-                    //     // 'full-width', 
+                    //     // 'readonly',
+                    //     'dense',
+                    //     // 'disabled',
+                    //     // 'error',
+                    //     'flat',
+                    //     // 'full-width',
                     //     'hide-spin-buttons',
                     //     // 'false-value' => false,
                     //     // 'false-value' => true,
@@ -724,7 +724,7 @@ return [
                     //     'outlined',
                     //     'dense'
                     // ],
-                    // 'day_interval' => [ 
+                    // 'day_interval' => [
                     //     // 'type' => 'text',
                     //     // 'ext' => 'custom-input-range',
                     //     'type' => 'custom-input-range',
@@ -753,7 +753,7 @@ return [
                     //         'order-lg' => 6,
                     //         'order-xl' => 6,
                     //     ],
-                        
+
                     //     'max' => 100,
                     //     'min' => 0,
                     //     'tick-size' => 1,
@@ -767,7 +767,7 @@ return [
                     //     'label' => 'Color',
                     //     'name' => 'color',
                     //     'default' => '#32010121',
-                        
+
                     //     'col' => [
                     //         'cols' => 10,
                     //         'sm' => 10,
@@ -789,7 +789,7 @@ return [
                     //         'order-lg' => 7,
                     //         'order-xl' => 7,
                     //     ],
-                        
+
                     //     'placeholder' => '#FFDD11FF',
                     //     // 'dotSize' => 'rgba',
                     //     'prepend-icon' => 'mdi-palette',
@@ -918,7 +918,7 @@ return [
                     //     'dense',
                     //     'outlined',
                     //     'prepend-icon' => 'mdi-card-text-outline',
-                    // ]                                      
+                    // ]
                 ],
                 'rules' => [
                     'view' => [],
@@ -927,7 +927,7 @@ return [
                     'destroy' => []
                 ],
 
-                
+
             ],
             'permission' =>  [
                 'name' => 'Permission',
@@ -943,20 +943,20 @@ return [
                 ],
                 'headers' => [
                     [
-                        'text' => 'Name',
+                        'title' => 'Name',
+                        'key' => 'name',
                         'align' => 'start',
-                        'value' => 'name',
                         'sortable' => false,
                         'searchable' => true,
                     ],
                     [
-                        'text' => 'Guard Name',
-                        'value' => 'guard_name',
+                        'title' => 'Guard Name',
+                        'key' => 'guard_name',
                         'searchable' => true,
                     ],
                     [
-                        'text' => 'Actions',
-                        'value' => 'actions',
+                        'title' => 'Actions',
+                        'key' => 'actions',
                         'sortable' => false
                     ],
                 ],
@@ -988,13 +988,13 @@ return [
                         'md' => 4,
                         'props' => [
                             'prepend-icon' => 'mdi-account-child',
-                            'readonly', 
-                            'dense', 
-                            'disabled', 
-                            'error', 
-                            'flat', 
-                            // 'full-width', 
-                            'hide-spin-buttons', 
+                            'readonly',
+                            'dense',
+                            'disabled',
+                            'error',
+                            'flat',
+                            // 'full-width',
+                            'hide-spin-buttons',
                             'outlined'
                         ]
                     ],
@@ -1025,7 +1025,7 @@ return [
                         'sm' => 12,
                         'props' => [
                             'color' => 'success',
-                            'mandatory', 
+                            'mandatory',
                             'row',
                             'outlined',
                             'dense',
@@ -1050,12 +1050,12 @@ return [
                     //     'sm' => 12,
                     //     'props' => [
                     //         'color' => 'success',
-                    //         // 'readonly', 
-                    //         'dense', 
-                    //         // 'disabled', 
-                    //         // 'error', 
-                    //         'flat', 
-                    //         'full-width', 
+                    //         // 'readonly',
+                    //         'dense',
+                    //         // 'disabled',
+                    //         // 'error',
+                    //         'flat',
+                    //         'full-width',
                     //         'hide-spin-buttons',
                     //         // 'false-value' => false,
 
@@ -1093,7 +1093,7 @@ return [
                     //     'props' => [
                     //         'activeClass' => '',
                     //         'color' => 'success',
-                            
+
                     //         'mandatory',
                     //         'row',
 
@@ -1150,7 +1150,7 @@ return [
                     //     'cols' => 12,
                     //     'sm' => 12,
                     //     'md' => 12,
-                        
+
                     //     'props' => [
                     //         'placeholder' => '#FFDD11FF',
                     //         // 'dotSize' => 'rgba',
@@ -1212,21 +1212,19 @@ return [
 
                     //         // 'show-adjacent-months',
                     //     ]
-                    // ],                     
+                    // ],
                 ],
                 'inputs' => [
                     'name' => [
                         'type' => 'text',
-
                         'title' => 'Name',
                         'name' => 'name',
                         // 'placeholder' => '',
                         'default' => '',
                         'col' => [
-
                             'cols' => 12,
-                            'sm' => 6,
-                            'md' => 4,
+                            'sm' => 8,
+                            'md' => 6,
                         ],
 
                         // 'outlined',
@@ -1236,23 +1234,25 @@ return [
 
                     ],
                     [
+                        'type' => 'text',
                         'title' => 'Guard Name',
                         'name' => 'guard_name',
-                        'type' => 'text',
                         'placeholder' => 'web',
                         'default' => 'web',
-                        'cols' => 12,
-                        'sm' => 6,
-                        'md' => 4,
+                        'col' => [
+                            'cols' => 12,
+                            'sm' => 8,
+                            'md' => 6,
+                        ],
 
                         'prepend-icon' => 'mdi-account-child',
-                        'readonly', 
-                        'dense', 
-                        'disabled', 
-                        'error', 
-                        'flat', 
-                        // 'full-width', 
-                        'hide-spin-buttons', 
+                        'readonly',
+                        'dense',
+                        'disabled',
+                        'error',
+                        'flat',
+                        // 'full-width',
+                        'hide-spin-buttons',
                         'outlined',
 
                     ],
@@ -1283,7 +1283,7 @@ return [
                     //     'sm' => 12,
                     //     'props' => [
                     //         'color' => 'success',
-                    //         'mandatory', 
+                    //         'mandatory',
                     //         'row',
                     //         'outlined',
                     //         'dense',
@@ -1308,12 +1308,12 @@ return [
                     //     'sm' => 12,
                     //     'props' => [
                     //         'color' => 'success',
-                    //         // 'readonly', 
-                    //         'dense', 
-                    //         // 'disabled', 
-                    //         // 'error', 
-                    //         'flat', 
-                    //         'full-width', 
+                    //         // 'readonly',
+                    //         'dense',
+                    //         // 'disabled',
+                    //         // 'error',
+                    //         'flat',
+                    //         'full-width',
                     //         'hide-spin-buttons',
                     //         // 'false-value' => false,
 
@@ -1351,7 +1351,7 @@ return [
                     //     'props' => [
                     //         'activeClass' => '',
                     //         'color' => 'success',
-                            
+
                     //         'mandatory',
                     //         'row',
 
@@ -1408,7 +1408,7 @@ return [
                     //     'cols' => 12,
                     //     'sm' => 12,
                     //     'md' => 12,
-                        
+
                     //     'props' => [
                     //         'placeholder' => '#FFDD11FF',
                     //         // 'dotSize' => 'rgba',
@@ -1470,7 +1470,7 @@ return [
 
                     //         // 'show-adjacent-months',
                     //     ]
-                    // ],                     
+                    // ],
                 ],
                 'rules' => [
                     'view' => [],

@@ -50,8 +50,9 @@ class UnusualProvider extends ServiceProvider
 
     private function publishAssets(): void
     {
+
         $this->publishes([
-            base_path( config( $this->moduleNameLower . '.vendor_path') . '/vite/dist') => public_path('_test'),
+            base_path( env('UNUSUAL_VENDOR_PATH', 'vendor/oobook/crm-base') . '/vue/dist') => public_path(),
         ], 'assets');
     }
 }

@@ -7,8 +7,8 @@
 
 <title> {{ $title ?? 'Module Template' }}</title>
 <meta name="csrf-token" content="{{ csrf_token() }}">
-
 <!-- Fonts -->
+
 @if(app()->isProduction())
     <link href="{{ unusualMix('Inter-Regular.woff2') }}" rel="preload" as="font" type="font/woff2" crossorigin>
     <link href="{{ unusualMix('Inter-Medium.woff2') }}" rel="preload" as="font" type="font/woff2" crossorigin>
@@ -16,14 +16,13 @@
 
 <!-- CSS -->
 @if(app()->isProduction())
-    {{-- <link href="{{ unusualMix('chunk-common.css') }}" rel="preload" as="style" crossorigin/>
-    <link href="{{ unusualMix('chunk-vendors.css') }}" rel="preload" as="style" crossorigin/> --}}
-    {{-- <link href="{{ unusualMix('chunk-vendors.css') }}" rel="preload" as="style" crossorigin/> --}}
+    {{-- <link href="{{ unusualMix('chunk-common.css') }}" rel="preload" as="style" crossorigin/> --}}
+    <link href="{{ unusualMix('chunk-vendors.css') }}" rel="preload" as="style" crossorigin/>
 @endif
 
 @unless(config('base.is_development', false))
     {{-- <link href="{{ unusualMix('chunk-common.css') }}" rel="stylesheet" crossorigin/> --}}
-    {{-- <link href="{{ unusualMix('chunk-vendors.css' )}}" rel="stylesheet" crossorigin/> --}}
+    <link href="{{ unusualMix('chunk-vendors.css' )}}" rel="stylesheet" crossorigin/>
 @endunless
 
 

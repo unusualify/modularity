@@ -1,0 +1,47 @@
+{
+    "cancel": "İptal",
+    "close": "Kapat",
+    "confirm": "Onayla",
+    "confirm-deletion": "{name} {route} kaydını silmek istediğinize emin misiniz?",
+    "confirm-description": "Bu işlemi yapmak istediğinize emin misiniz?",
+
+    "delete": "Kaldır",
+
+    "edit": "Düzenle",
+    "edit-item": "{item} Düzenle",
+    "errors": {
+        "missingMessage": "Lütfen @.lower:messageı yazın."
+    },
+    
+    "language-select": "Dil Seçimi",
+    "list": "liste | {n} liste | {count} liste",
+    "list-of-item": "{0} Listesi",
+    
+    "message": "Mesaj",
+    "messages": {
+        "success": "Başarıyla Tamamlandı!",
+        "info": "Tamamlandı!",
+        "warning": "Bir Uyarı Var!",
+        "error": "Bir Hata Oluştu!"
+    },
+    "modules": {
+        "invoice": "Fatura",
+        "payment": "Ödeme",
+        "permission": "İzin",
+        "role": "Rol",
+        "user": "Kullanıcı"
+    },
+
+    "new-item": "Yeni {item}",
+
+    "save": "Kaydet",
+    "saved": "Kaydedildi!|{0} kaydedildi!",
+
+    "show": "Göster",
+    "submit": "Gönder",
+    "success-create": "Başarıyla Oluşturuldu.",
+    "success-update": "Başarıyla Güncellendi.",
+    "success-delete": "Başarıyla Silindi.",
+    
+    "update": "Güncelle"
+}

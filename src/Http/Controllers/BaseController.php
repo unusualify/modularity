@@ -40,6 +40,8 @@ abstract class BaseController extends CoreController
 
         $this->viewPrefix = $this->getViewPrefix();
 
+        $this->tableOptions = $this->getTableOptions();
+
     }
 
     public function index($parentModuleId = null)
@@ -82,8 +84,9 @@ abstract class BaseController extends CoreController
         $view = Collection::make([
             "$this->viewPrefix.index",
             // "base::$this->routeName.index",
+            "base::$this->viewPrefix.index",
             "base::layouts.index",
-            "base::layouts.listing",
+            "base::layouts.index",
         ])->first(function ($view) {
             return View::exists($view);
         });
@@ -134,7 +137,7 @@ abstract class BaseController extends CoreController
              * */
             // 'createOnModal' => $table_options['createOnModal'] ?? true,
             // 'editOnModal' => $table_options['editOnModal'] ?? true,
-            // 'isRowEditing' => $table_options['editOnModal'] ?? true, // whether row editing is active in unusual datatable component
+            // 'isRowEditing' => $table_options['isRowEditing'] ?? true, // whether row editing is active in unusual datatable component
             // 'actionsType' => "inline", // 'dropdown|inline' for actions of rows in unusual datatable
             'actions' => [
                 [
@@ -267,9 +270,9 @@ abstract class BaseController extends CoreController
             'page'          => request()->has('page') ? intval(request()->query('page')) : 1,
             'itemsPerPage'  => request()->has('itemsPerPage') ? intval(request()->query('itemsPerPage')) : ($this->perPage ?? 10),
             'sortBy'        => request()->has('sortBy') ? [request()->get('sortBy')] : [],
-            'sortDesc'      => request()->has('sortDesc') ? [request()->get('sortDesc')] : [],
+            // 'sortDesc'      => request()->has('sortDesc') ? [request()->get('sortDesc')] : [],
             'groupBy'       => [],
-            'groupDesc'     => [],
+            // 'groupDesc'     => [],
             'multiSort'     => false,
             'mustSort'      => false,
         ];
@@ -584,13 +587,13 @@ abstract class BaseController extends CoreController
 
         // $this->fireEvent($input);
 
-        dd(
-            $parentModuleId,
-            $input
-        );
+        // dd(
+        //     $parentModuleId,
+        //     $input
+        // );
         Session::put($this->moduleName . '_retain', true);
 
-        if ($this->getIndexOption('editInModal')) {
+        if ($this->getTableOption('editOnModal')) {
             return $this->respondWithSuccess(unusualTrans('base::lang.publisher.save-success'));
         }
 
@@ -822,10 +825,10 @@ abstract class BaseController extends CoreController
 
         $item = $this->repository->getById($id);
 
-        return $this->respondWithSuccess(unusualTrans('base::lang.listing.delete.success', ['modelTitle' => $this->modelTitle]));
+        // return $this->respondWithSuccess(unusualTrans('base::lang.listing.delete.success', ['modelTitle' => $this->modelTitle]));
 
         if ($this->repository->delete($id)) {
-            $this->fireEvent();
+            // $this->fireEvent();
             activity()->performedOn($item)->log('deleted');
 
             return $this->respondWithSuccess(unusualTrans('base::lang.listing.delete.success', ['modelTitle' => $this->modelTitle]));
