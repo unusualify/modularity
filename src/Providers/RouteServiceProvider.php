@@ -121,7 +121,7 @@ class RouteServiceProvider extends ServiceProvider
             }
         );
 
-        if (config('base.templates_on_frontend_domain')) {
+        if (config(getUnusualBaseKey() . '.templates_on_frontend_domain')) {
             $router->group(
                 [
                     'namespace' => $this->namespace . '\Admin',
@@ -148,12 +148,12 @@ class RouteServiceProvider extends ServiceProvider
         }
 
         if (
-            config('base.media_library.image_service') ===
+            config(getUnusualBaseKey() . '.media_library.image_service') ===
             'OoBook\CRM\Base\Services\MediaLibrary\Glide'
         ) {
             $router
                 ->get(
-                    '/' . config('base.glide.base_path') . '/{path}',
+                    '/' . config(getUnusualBaseKey() . '.glide.base_path') . '/{path}',
                     GlideController::class
                 )
                 ->where('path', '.*');
@@ -383,27 +383,37 @@ class RouteServiceProvider extends ServiceProvider
 
             Route::middleware($middlewares)->group( function() use($config){
 
-                $parentLower = strtolower( $config['name'] );
+                $parent = $config['parent_route'] ?? '';
                 $parentStudly = studlyName( $config['name'] );
-                $parent_camel = camelName( $config['name'] );
+                $parent_camel = camelCase( $config['name'] );
+                $parent_kebab = kebabCase( $config['name'] );
+                $parent_snake = snakeCase( $config['name'] );
 
                 if( is_array( $sub_routes = $config['sub_routes'] ) ){
                     foreach( $sub_routes as $key => $sub) {
 
-                        $sub_camel = camelName( $sub['name'] );
+                        $sub_camel = camelCase( $sub['name'] );
                         $subStudly = studlyName($sub['name']);
 
                         $url = $value['url'] ?? $sub_camel;
 
-                        $names = $sub['route_name'] ?? $url;
+                        $names = $sub['route_name'] ?? $sub_camel;
                         // dd($sub, $config);
                         // Route::resource($url, $studlyName.'Controller' , ['names' => $names]);
                         if(isset($sub['nested']) && $sub['nested']){
-                            Route::resource($parent_camel.".".$url, $parentStudly.$subStudly.'Controller' );
+                            Route::resource($parent_camel.".".$url, $parentStudly.$subStudly.'Controller',[
+                                'names' => ($parent['route_name'] ?? $parent_camel) . "." . $names
+                            ])->parameters([
+                                // $parent_camel => $parentStudly,
+                                // $url => $subStudly,
+                            ]);
                         }else{
                             Route::resource($parent_camel."/".$url, $subStudly.'Controller',[
-                                'as' => $parent_camel
-                            ] );
+                                'as' => $parent_camel,
+                                'names' => $names
+                            ])->parameters([
+                                // $url => $subStudly,
+                            ]);
                         }
 
                         // inner nested for sub_route
@@ -437,9 +447,18 @@ class RouteServiceProvider extends ServiceProvider
 
                 if( is_array( $parent = ($config['parent_route'] ?? '') ) ){
 
-                    $url = $parent['url'] ?? $parent_camel;
+                    $url = $parent['url'] ?? $parent_kebab;
+                    $name = $parent['route_name'] ?? $parent_snake;
 
-                    Route::resource($url, $parentStudly.'Controller');
+                    if(preg_match('/press/', $url)){
+
+                    }
+
+                    Route::resource( $url, $parentStudly.'Controller', [
+                        'names' => $name
+                    ])->parameters([
+                        // $url => $parentStudly
+                    ]);
                     // Route::resource($url, $studlyName.'Controller', [
                     //     // 'parameters' => [
                     //     //     'payment' => 'payment'
@@ -456,12 +475,19 @@ class RouteServiceProvider extends ServiceProvider
                 $routeFile = fileTrace($pattern);
             }
 
-            $lowerModule  = getCurrentModuleLowerName($routeFile);
+            $kebabCase  = kebabCase(getCurrentModuleName($routeFile));
+            $snakeCase  = snakeCase(getCurrentModuleName($routeFile));
 
-            $config = config( $lowerModule );
+            $config = config( $snakeCase );
 
             if( !!$config )
                 Route::configRoutes($config, $middlewares);
+            else
+                dd(
+                    $kebabCase,
+                    $snakeCase,
+                    $config
+                );
 
         });
 

@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
+use Illuminate\Support\Str;
 class CreateTwillDefaultMediasTables extends Migration
 {
     /**
@@ -13,8 +13,10 @@ class CreateTwillDefaultMediasTables extends Migration
      */
     public function up()
     {
-        $twillMediasTable = config('base.medias_table', 'unusual_medias');
-        $twillMediablesTable = config('base.mediables_table', 'unusual_mediables');
+
+
+        $twillMediasTable = config(getUnusualBaseKey() . '.medias_table', 'unusual_medias');
+        $twillMediablesTable = config(getUnusualBaseKey() . '.mediables_table', 'unusual_mediables');
 
         if (!Schema::hasTable($twillMediasTable)) {
             Schema::create($twillMediasTable, function (Blueprint $table) {
@@ -60,8 +62,8 @@ class CreateTwillDefaultMediasTables extends Migration
      */
     public function down()
     {
-        $twillMediasTable = config('base.medias_table', 'unusual_medias');
-        $twillMediablesTable = config('base.mediables_table', 'unusual_mediables');
+        $twillMediasTable = config(getUnusualBaseKey() . '.medias_table', 'unusual_medias');
+        $twillMediablesTable = config(getUnusualBaseKey() . '.mediables_table', 'unusual_mediables');
 
         Schema::dropIfExists($twillMediablesTable);
         Schema::dropIfExists($twillMediasTable);

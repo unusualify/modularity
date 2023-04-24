@@ -52,9 +52,10 @@
       </div>
       <slot></slot>
 
-      <ue-media
+      <ue-modal-media
+        v-model="showMediaLibrary"
         ref="mediaLibrary"
-      ></ue-media>
+      ></ue-modal-media>
 
     </v-main>
 
@@ -211,7 +212,9 @@ export default {
           icon: 'mdi-instagram',
           url: 'instagram.com'
         }
-      ]
+      ],
+
+      showMediaLibrary: false
     }
   },
 

@@ -2,7 +2,7 @@
 
 namespace OoBook\CRM\Base\Support\Decomposers;
 
-use OoBook\CRM\Base\Traits\Namable;
+use OoBook\CRM\Base\Traits\ManagesNames;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -12,7 +12,7 @@ use OoBook\CRM\Base\Support\Finder;
 
 class RelationParser implements Arrayable
 {
-    use Namable;
+    use ManagesNames;
 
     protected $methods = [
         'belongsTo',

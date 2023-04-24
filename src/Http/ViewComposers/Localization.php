@@ -26,15 +26,15 @@ class Localization
      */
     public function compose(View $view)
     {
-        $name = lowerName( config('base.name') );
+        $name = lowerName( config(getUnusualBaseKey() . '.name') );
 
-        $currentLang = Lang::get("{$name}::lang", [], config('base.locale'));
-        $fallbackLang = Lang::get("{$name}::lang", [], config('base.fallback_locale', 'en'));
+        $currentLang = Lang::get("{$name}::lang", [], config(getUnusualBaseKey() . '.locale'));
+        $fallbackLang = Lang::get("{$name}::lang", [], config(getUnusualBaseKey() . '.fallback_locale', 'en'));
         $lang = array_replace_recursive($fallbackLang, $currentLang);
 
         $unusualLocalization = [
-            'locale' => config('base.locale'),
-            'fallback_locale' => config('base.fallback_locale', 'en'),
+            'locale' => config(getUnusualBaseKey() . '.locale'),
+            'fallback_locale' => config(getUnusualBaseKey() . '.fallback_locale', 'en'),
             'lang' => $lang
         ];
 

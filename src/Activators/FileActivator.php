@@ -10,7 +10,7 @@ use Illuminate\Filesystem\Filesystem;
 use Nwidart\Modules\Activators\FileActivator as ActivatorsFileActivator;
 use Nwidart\Modules\Contracts\ActivatorInterface;
 use Nwidart\Modules\Module;
-
+use Illuminate\Support\Str;
 class FileActivator extends ActivatorsFileActivator
 {
 
@@ -18,6 +18,38 @@ class FileActivator extends ActivatorsFileActivator
      * @var module name
      */
     private $module;
+
+    /**
+     * @var Illuminate\Filesystem\Filesystem
+     */
+    private $files;
+
+    /**
+     * @var Illuminate\Filesystem\Filesystem
+     */
+    private $cache;
+
+    /**
+     * @var Illuminate\Config\Repository
+     */
+    private $config;
+
+    /**
+     * @var string
+     */
+    private $cacheKey;
+
+    /**
+     * @var int
+     */
+    private $cacheLifetime;
+
+    /**
+     * Route Statuses File
+     *
+     * @var string path
+     */
+    private $statusesFile;
 
     /**
      * Array of modules activation statuses
@@ -35,6 +67,7 @@ class FileActivator extends ActivatorsFileActivator
         $this->config = $app['config'];
         $this->cacheKey = $this->config('cache-key');
         $this->cacheLifetime = $this->config('cache-lifetime');
+
         // $this->statusesFile = $this->config('statuses-file');
         // $this->routesStatuses = $this->getroutesStatuses();
 
@@ -47,7 +80,6 @@ class FileActivator extends ActivatorsFileActivator
         $this->statusesFile = base_path( config('modules.namespace') . "/" . $this->module ."/" . $this->config('statuses-file')) ;
 
         $this->routesStatuses = $this->getRoutesStatuses();
-
     }
 
     /**
@@ -59,7 +91,7 @@ class FileActivator extends ActivatorsFileActivator
      */
     private function config(string $key, $default = null)
     {
-        return $this->config->get('unusual.activators.file.' . $key, $default);
+        return $this->config->get(getUnusualBaseKey() . '.activators.file.' . $key, $default);
     }
 
     /**
@@ -70,7 +102,7 @@ class FileActivator extends ActivatorsFileActivator
      */
     private function getRoutesStatuses(): array
     {
-        if (!$this->config->get('unusual.cache.enabled')) {
+        if (!$this->config->get(getUnusualBaseKey() . '.cache.enabled')) {
             return $this->readRoutesJson();
         }
 

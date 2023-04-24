@@ -42,8 +42,9 @@ export default {
     // app.config.compilerOptions.isCustomElement = (tag) => {
     //   return tag.startsWith('ue-')
     // }
-    app.config.globalProperties.$ = $
-    app.config.globalProperties.axios = axios
+    app.config.globalProperties.$jquery = window.$
+    app.config.globalProperties.$axios = window.axios
+    app.config.globalProperties.$lodash = window._
 
     app.config.errorHandler = (err) => {
       __log(err)
@@ -60,7 +61,7 @@ export default {
       //   i18n,
       methods: {
         openFreeMediaLibrary: function () {
-          // __log('openFreeMedialibrary triggered')
+          // __log('openFreeMedialibrary triggered', this.$root.$refs.main.$refs)
           this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_CONNECTOR, null) // reset connector
           this.$store.commit(MEDIA_LIBRARY.RESET_MEDIA_TYPE) // reset to first available type
           this.$store.commit(MEDIA_LIBRARY.UPDATE_REPLACE_INDEX, -1) // we are not replacing an image here
@@ -70,7 +71,9 @@ export default {
           this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_HEIGHT_MIN, 0) // set height min to 0
           this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_MODE, false) // set the strict to false (you can change the active type)
 
-          if (this.$root.$refs.main && this.$root.$refs.main.$refs.mediaLibrary) { this.$root.$refs.main.$refs.mediaLibrary.openModal() }
+          if (this.$root.$refs.main && this.$root.$refs.main.$refs.mediaLibrary) {
+            this.$root.$refs.main.$refs.mediaLibrary.openModal()
+          }
           // if (this.$root.$refs.mediaLibrary) this.$root.$refs.mediaLibrary.open()
         }
       }
@@ -82,7 +85,7 @@ export default {
     app.component('v-custom-form-base', VCustomFormBase)
     app.component('ue-modal', UEModal)
     app.component('ue-modal-dialog', UEModalDialog)
-    app.component('ue-media', UEModalMedia)
+    app.component('ue-modal-media', UEModalMedia)
     // Vue.component('ue-medialibrary', UEMediaLibrary)
 
     includeGlobalComponents.keys().forEach((path) => {

@@ -19,22 +19,22 @@ class Assets
             return $manifest[$file];
         }
 
-        return '/' . config('base.public_dir', 'unusual') . '/' . $file;
+        return '/' . config(getUnusualBaseKey() . '.public_dir', 'unusual') . '/' . $file;
     }
 
     public function getManifestFilename()
     {
         $fileName =
-            public_path(config('base.public_dir', 'unusual')) .
+            public_path(config(getUnusualBaseKey() . '.public_dir', 'unusual')) .
             '/' .
-            config('base.manifest', 'unusual-manifest.json');
+            config(getUnusualBaseKey() . '.manifest', 'unusual-manifest.json');
 
         if (file_exists($fileName)) {
             return $fileName;
         }
 
         return base_path(
-            config('base.vendor_path') . '/vue/dist/' . config('base.public_dir') . '/' . config('base.manifest')
+            config(getUnusualBaseKey() . '.vendor_path') . '/vue/dist/' . config(getUnusualBaseKey() . '.public_dir') . '/' . config(getUnusualBaseKey() . '.manifest')
         );
     }
 
@@ -44,22 +44,22 @@ class Assets
             return null;
         }
 
-        $devServerUrl = config('base.development_url', 'http://localhost:8080');
+        $devServerUrl = config(getUnusualBaseKey() . '.development_url', 'http://localhost:8080');
         try {
             $manifest = $this->readJson(
                 'http://workspace:8080'.
                     '/' .
-                    config('base.public_dir') .
+                    config(getUnusualBaseKey() . '.public_dir') .
                     '/' .
-                    config('base.manifest', 'unusual-manifest.json')
+                    config(getUnusualBaseKey() . '.manifest', 'unusual-manifest.json')
             );
         } catch (\Exception $e) {
             dd(
                 $devServerUrl .
                 '/' .
-                config('base.public_dir') .
+                config(getUnusualBaseKey() . '.public_dir') .
                 '/' .
-                config('base.manifest', 'unusual-manifest.json'),
+                config(getUnusualBaseKey() . '.manifest', 'unusual-manifest.json'),
 
                 $file,
                 debug_backtrace()
@@ -101,6 +101,6 @@ class Assets
     private function devMode()
     {
         return app()->environment('local', 'development') &&
-            config('base.is_development', false);
+            config(getUnusualBaseKey() . '.is_development', false);
     }
 }

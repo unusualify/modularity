@@ -13,26 +13,21 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\View;
+
 use Illuminate\Support\Str;
-use OoBook\CRM\Base\Transformers\RoleResource;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Illuminate\Routing\Controller;
-use OoBook\CRM\Base\Facades\Module as FacadesModule;
-use OoBook\CRM\Base\Services\MessageStage;
-use OoBook\CRM\Base\Support\Finder;
 use Nwidart\Modules\Facades\Module;
-use stdClass;
+use OoBook\CRM\Base\Traits\MakesResponses;
+use OoBook\CRM\Base\Traits\ManagesNames;
+use OoBook\CRM\Base\Traits\ManagesScopes;
 
 abstract class CoreController extends Controller
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    use AuthorizesRequests, DispatchesJobs, ValidatesRequests,
+        ManagesNames,
+        MakesResponses,
+        ManagesScopes;
 
     /**
      * @var Application
@@ -43,6 +38,13 @@ abstract class CoreController extends Controller
      * @var Request
      */
     protected $request;
+
+    /**
+     * baseKey
+     *
+     * @var string snake_case
+     */
+    protected $baseKey;
 
     /**
      * @var string
@@ -65,9 +67,25 @@ abstract class CoreController extends Controller
     protected $routeName;
 
     /**
-     * @var
+     * whether route is parent or not
+     *
+     * @var string
      */
-    protected $baseModule;
+    protected $isParent;
+
+    /**
+     * whether route is nested or not
+     *
+     * @var string
+     */
+    protected $isNested;
+
+    /**
+     * integer if route is nested, or null
+     *
+     * @var integer
+     */
+    protected $parentId;
 
     /**
      * @var object
@@ -88,6 +106,11 @@ abstract class CoreController extends Controller
      * @var \OoBook\CRM\Base\Repositories\ModuleRepository
      */
     protected $repository;
+
+    /**
+     * @var string
+     */
+    protected $viewPrefix;
 
     /**
      * Options of the index view.
@@ -193,6 +216,13 @@ abstract class CoreController extends Controller
     ];
 
     /**
+     * List of permissions keyed by a request field. Can be used to prevent unauthorized field updates.
+     *
+     * @var array
+     */
+    protected $fieldsPermissions = [];
+
+    /**
      * @var int
      */
     protected $perPage = 20;
@@ -218,9 +248,36 @@ abstract class CoreController extends Controller
      */
     protected $titleFormKey;
 
-    protected $isNested;
+    /**
+     * @var array
+     */
+    protected $indexOptions;
 
-    protected $tableOptions;
+    /**
+     * @var array
+     */
+    protected $indexTableColumns;
+
+    /**
+     * @var array
+     */
+    protected $defaultFilters;
+
+
+    protected $tableOptions = [];
+
+    protected $childrenTree = [];
+
+
+    /**
+     * @var array
+     */
+    // protected $browserColumns;
+
+    /**
+     * @var string
+     */
+    // protected $permalinkBase;
 
     /**
      * Feature field name if the controller is using the feature route (defaults to "featured").
@@ -249,48 +306,9 @@ abstract class CoreController extends Controller
     // protected $disableEditor = false;
 
     /**
-     * @var array
-     */
-    protected $indexOptions;
-
-    /**
-     * @var array
-     */
-    protected $indexColumns;
-
-    /**
-     * @var array
-     */
-    // protected $browserColumns;
-
-    /**
-     * @var string
-     */
-    // protected $permalinkBase;
-
-    /**
-     * @var array
-     */
-    protected $defaultFilters;
-
-    /**
-     * @var string
-     */
-    protected $viewPrefix;
-
-    /**
      * @var string
      */
     // protected $previewView;
-
-    /**
-     * List of permissions keyed by a request field. Can be used to prevent unauthorized field updates.
-     *
-     * @var array
-     */
-    protected $fieldsPermissions = [];
-
-    protected $childrenTree = [];
 
     public function __construct(
         Application $app,
@@ -303,73 +321,45 @@ abstract class CoreController extends Controller
 
         $this->app = $app;
         $this->request = $request;
-
-
+        $this->baseKey = getUnusualBaseKey();
 
         $this->setMiddlewarePermission();
 
-        $this->baseModule = Module::find('Base');
         $this->moduleName = $this->getModuleName();
         $this->routeName = $this->getRouteName();
         $this->config = $this->getModuleConfig();
 
-        // dd(
-        //     $this->moduleName,
-        //     $this->app['ue_modules']->find($this->moduleName),
-        //     $this->config->parent_route,
-        //     Module::find($this->moduleName)
-        //     // FacadesModule::find('Base')
-        // );
         $this->isParent = $this->isParentRoute();
-
-        $this->nested = $this->isNestedRoute();
+        $this->isNested = $this->isNestedRoute();
+        $this->parentId = $this->getParentId();
 
         $this->modelName = $this->getModelName();
         $this->routePrefix = $this->getRoutePrefix();
         $this->namespace = $this->getNamespace();
         $this->repository = $this->getRepository();
-        $this->viewPrefix = $this->getViewPrefix();
         $this->modelTitle = $this->getModelTitle();
-
         /*
          * Apply any filters that are selected by default
          */
         $this->applyFiltersDefaultOptions();
 
-        /*
-         * Available columns of the index view
-         */
-
-        $this->indexColumns = $this->getIndexColumns();
-
-        if (! isset($this->indexColumns) ) {
-            // $this->indexColumns = [
-            //     $this->titleColumnKey => [
-            //         'title' => ucfirst($this->titleColumnKey),
-            //         'field' => $this->titleColumnKey,
-            //         'sort' => true,
-            //     ],
-            // ];
-        }
-
-        /*
-         * Default filters for the index view
-         * By default, the search field will run a like query on the title field
-         */
-        if (! isset($this->defaultFilters)) {
-            // $this->defaultFilters = [
-            //     // 'search' => ($this->routeHasTrait('translations') ? '' : '%') . $this->titleColumnKey,
-            // ];
-            $this->defaultFilters = [
-                'search' => collect( $this->indexColumns ?? [] )->filter(function ($item) {
-                    return isset($item['searchable']) ? $item['searchable'] : false;
-                })->map(function($item){
-                    return $item['key'];
-                })->implode('|')
-            ];
-        }
-
-
+        // /*
+        //  * Default filters for the index view
+        //  * By default, the search field will run a like query on the title field
+        //  */
+        // if (! isset($this->defaultFilters)) {
+        //     // $this->defaultFilters = [
+        //     //     // 'search' => ($this->routeHasTrait('translations') ? '' : '%') . $this->titleColumnKey,
+        //     // ];
+        //     $this->defaultFilters = [
+        //         'search' => collect( $this->indexTableColumns ?? [] )->filter(function ($item) {
+        //             return isset($item['searchable']) ? $item['searchable'] : false;
+        //         })->map(function($item){
+        //             return $item['key'];
+        //         })->implode('|')
+        //     ];
+        // }
+        // dd($this->defaultFilters, $this);
 
     }
 
@@ -396,18 +386,27 @@ abstract class CoreController extends Controller
         // $this->middleware('can:delete', ['only' => ['destroy', 'bulkDelete', 'restore', 'bulkRestore', 'forceDelete', 'bulkForceDelete', 'restoreRevision']]);
     }
 
+    protected function getParentId()
+    {
+        if( $this->moduleName !== $this->routeName && $this->isNested ){
+            $param = $this->getSnakeCase( Str::singular($this->moduleName) );
+
+            return $this->request->route()->parameters()[$param];
+        }
+
+        return null;
+    }
+
     /**
      * @param Request $request
      * @return string|int|null
      */
     protected function getParentModuleIdFromRequest(Request $request)
     {
-        // dd(
-        //     $request,
-        //     $this->moduleName,
-        //     $request->route()->parameters()
-        // );
+
+
         return null;
+
 
         $moduleParts = explode('.', $this->moduleName);
 
@@ -418,6 +417,22 @@ abstract class CoreController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isParentRoute()
+    {
+        return $this->isParent ?? $this->moduleName == $this->routeName;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isNestedRoute()
+    {
+        return $this->config->sub_routes->{$this->routeName}->nested ?? false;
     }
 
     /**
@@ -476,131 +491,6 @@ abstract class CoreController extends Controller
         });
     }
 
-    /**
-     * @param array $prepend
-     * @return array
-     */
-    protected function filterScope($prepend = [])
-    {
-        $scope = [];
-
-        $requestFilters = $this->getRequestFilters();
-
-        $this->filters = array_merge($this->defaultFilters, $this->filters);
-
-        if (array_key_exists('status', $requestFilters)) {
-            switch ($requestFilters['status']) {
-                case 'published':
-                    $scope['published'] = true;
-                    break;
-                case 'draft':
-                    $scope['draft'] = true;
-                    break;
-                case 'trash':
-                    $scope['onlyTrashed'] = true;
-                    break;
-                case 'mine':
-                    $scope['mine'] = true;
-                    break;
-            }
-
-            unset($requestFilters['status']);
-        }
-        foreach ($this->filters as $key => $field) {
-            if (array_key_exists($key, $requestFilters)) {
-                $value = $requestFilters[$key];
-                if ($value == 0 || ! empty($value)) {
-                    // add some syntaxic sugar to scope the same filter on multiple columns
-
-                    $fieldSplitted = explode('|', $field);
-
-                    if( $key == 'search' && $field != 'search'){
-                        $fieldSplitted = explode('|', $field);
-
-                        $scope['searches'] = $fieldSplitted;
-
-                        $scope[$key] = $requestFilters[$key]; // search
-                    }
-
-                    if (count($fieldSplitted) > 1) {
-                        $requestValue = $requestFilters[$key];
-
-                        // $scope[$scopeKey] =
-                        Collection::make($fieldSplitted)->each(function ($scopeKey) use (&$scope, $requestValue) {
-                            $scope[$scopeKey] = $requestValue;
-                        });
-                    } else {
-                        $scope[$field] = $requestFilters[$key];
-                    }
-                }
-            }
-        }
-
-        return $prepend + $scope;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getRequestFilters()
-    {
-        if ($this->request->has('search')) {
-            return ['search' => $this->request->get('search')];
-        }
-
-        return json_decode($this->request->get('filter'), true) ?? [];
-    }
-
-    /**
-     * @return void
-     */
-    protected function applyFiltersDefaultOptions()
-    {
-        if (! count($this->filtersDefaultOptions) || $this->request->has('search')) {
-            return;
-        }
-
-        $filters = $this->getRequestFilters();
-
-        foreach ($this->filtersDefaultOptions as $filterName => $defaultOption) {
-            if (! isset($filters[$filterName])) {
-                $filters[$filterName] = $defaultOption;
-            }
-        }
-
-        $this->request->merge(['filter' => json_encode($filters)]);
-    }
-
-    /**
-     * @return array
-     */
-    protected function orderScope()
-    {
-        $orders = [];
-
-        if ($this->request->has('sortBy')) {
-
-            foreach( $this->request->get('sortBy') as $str ){
-                $sort = json_decode($str);
-
-                if ( $sort->key == 'name') {
-                    $sortBy = $this->titleColumnKey;
-                } elseif (! empty($sort->key)) {
-                    $sortBy = $sort->key;
-                }
-
-                if (isset($sortBy)) {
-                    $orders[$this->indexColumns[$sortBy]['sortBy'] ?? $sortBy] = $sort->order;
-                }
-            }
-        }
-
-        // don't apply default orders if reorder is enabled
-        $reorder = $this->getIndexOption('reorder');
-        $defaultOrders = ($reorder ? [] : ($this->defaultOrders ?? []));
-
-        return $orders + $defaultOrders;
-    }
 
     /**
      * @return \OoBook\CRM\Base\Http\Requests\Admin\Request
@@ -618,10 +508,43 @@ abstract class CoreController extends Controller
         return $this->getFormRequestClass();
     }
 
+    /**
+     * @param array $scopes
+     * @param bool $forcePagination
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    protected function getIndexItems($scopes = [], $forcePagination = false)
+    {
+        // dd(
+        //     $this->orderScope()
+        // );
+        return $this->transformIndexItems($this->repository->get(
+            $this->indexWith,
+            $scopes,
+            $this->orderScope(),
+            $this->request->get('itemsPerPage') ?? $this->perPage ?? 50,
+            $forcePagination
+        ));
+    }
+
+    /**
+     * @param \Illuminate\Database\Eloquent\Collection $items
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    protected function transformIndexItems($items)
+    {
+        return $items;
+    }
+
+    /**
+     * getJSONData
+     *
+     * @return
+     */
     protected function getJSONData(){
 
-        $scopes = $this->filterScope($this->submodule ? [
-            $this->getParentModuleForeignKey() => $this->submoduleParentId,
+        $scopes = $this->filterScope($this->isNested ? [
+            $this->getParentModuleForeignKey() => $this->parentId,
         ] : []);
 
         $items = $this->getIndexItems($scopes);
@@ -629,6 +552,11 @@ abstract class CoreController extends Controller
         return $this->getTransformer( $items->toArray() );
     }
 
+    /**
+     * getFormRequestClass
+     *
+     * @return void
+     */
     public function getFormRequestClass()
     {
         $formRequest = "$this->namespace\Http\Requests\\" . $this->modelName . 'Request';
@@ -645,7 +573,11 @@ abstract class CoreController extends Controller
      */
     protected function getNamespace()
     {
-        return $this->namespace ?? Config::get("{$this->baseModule->getLowerName()}.namespace")."\\{$this->moduleName}";
+        try {
+            return $this->namespace ?? 'Modules'."\\{$this->moduleName}";
+        } catch (\Throwable $th) {
+            dd($th);
+        }
     }
 
     /**
@@ -664,19 +596,24 @@ abstract class CoreController extends Controller
         return $this->routeName ?? $this->moduleName;
     }
 
+    /**
+     * getModuleConfig
+     *
+     * @return void
+     */
     public function getModuleConfig()
     {
-        $camel = camelName($this->moduleName);
+        $snakeCase = $this->getSnakeCase($this->moduleName);
 
         return arrayToObject(
-            Config::get( camelName( env('BASE_NAME', 'Base') ) . '.internal_modules.' . $camel)
-            ?: Config::get( $camel )
+            Config::get( $this->getCamelCase( env('BASE_NAME', 'Base') ) . '.internal_modules.' . $snakeCase)
+            ?: Config::get( $snakeCase )
         );
 
-        return Collection::make(
-            Config::get( camelName( env('BASE_NAME', 'Base') ) . '.internal_modules.' . $camel)
-            ?: Config::get( $camel )
-        )->recursive();
+        // return Collection::make(
+        //     Config::get( $this->getCamelCase( env('BASE_NAME', 'Base') ) . '.internal_modules.' . $kebabCase)
+        //     ?: Config::get( $kebabCase )
+        // )->recursive();
     }
 
     /**
@@ -696,20 +633,12 @@ abstract class CoreController extends Controller
         if ($this->request->route() != null) {
             $routePrefix = ltrim(
                 str_replace(
-                    Config::get('base.admin_app_path'), // TODO uri segment control
+                    Config::get(getUnusualBaseKey() . '.admin_app_path'), // TODO uri segment control
                     '',
                     $this->request->route()->getPrefix()
                 ),
                 '/'
             );
-            // dd(
-            //     // $this->request,
-            //     // $this->request->route(),
-            //     // get_class_methods($this->request->route()),
-            //     $this->request->route()->getPrefix(),
-            //     $routePrefix
-            // );
-
             return str_replace('/', '.', $routePrefix);
         }
 
@@ -732,6 +661,12 @@ abstract class CoreController extends Controller
         return App::make($this->getRepositoryClass($this->modelName));
     }
 
+    /**
+     * getRepositoryClass
+     *
+     * @param  mixed $model
+     * @return void
+     */
     public function getRepositoryClass($model)
     {
         if (@class_exists($class = "$this->namespace\Repositories\\" . $model . 'Repository')) {
@@ -771,131 +706,7 @@ abstract class CoreController extends Controller
      */
     protected function getModelTitle()
     {
-        return camelCaseToWords($this->modelName);
-    }
-
-    public function getIndexColumns()
-    {
-        if(!!$this->indexColumns)
-            return $this->indexColumns;
-        else if(!$this->config)
-            return [];
-        else{
-            return $this->indexColumns = Collection::make(
-                $this->isParentRoute()
-                ? $this->config->parent_route->headers
-                : $this->config->sub_routes->{camelName($this->routeName)}->headers
-            )->map(function($item){ return (array) $item;})
-            ->toArray();
-        }
-
-    }
-
-    public function getFormInputs()
-    {
-
-        return Collection::make(
-            $this->isParentRoute()
-            ? $this->config->parent_route->inputs
-            : $this->config->sub_routes->{camelName($this->routeName)}->inputs
-        )->map(function($item){ return (array) $item;})
-        ->toArray();
-    }
-
-    public function getFormSchema()
-    {
-        return Collection::make(
-            $this->isParentRoute()
-            ? $this->config->parent_route->input_schema
-            : $this->config->sub_routes->{camelName($this->routeName)}->inputs
-        )->mapWithKeys(function($item, $key){
-            return $this->getInputSchema($item);
-        })->toArray();
-    }
-
-    public function getInputSchema($input)
-    {
-        if($object = $this->generateCustomInput($input)){
-            return $object;
-        }
-        return isset($input->name)
-            ? [ $input->name => collect($input)->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];})]
-            : [];
-    }
-
-    public function generateCustomInput($input)
-    {
-        $object = null;
-
-        switch ($input->type) {
-            case 'custom-input-treeview':
-            case 'treeview':
-                $relation_model = null;
-
-                // dd(
-                //     $this->app['ue_modules']->find($this->moduleName),
-                //     // $this->config->parent_route,
-                //     // FacadesModule::find('Base')
-                // );
-                if(!!$input->model){
-                    $relation_model = App::make($input->model);
-                }else if(!!$input->route){
-                    $finder = new Finder();
-                    $module = $this->app['ue_modules']->find($this->moduleName);
-
-                    if( $module->isEnabledRoute($input->route) ){
-                        if($this->config->parent_route->route_name == $input->route){
-                            $table = Str::plural($input->route);
-                            $relation_model = $finder->getModel($table);
-                        }else if(!!$this->config->parent_route->sub_routes){
-
-                            foreach ($this->config->parent_route->sub_routes as $sr) {
-                                if($sr->route_name == $input->route){
-                                    $table = Str::plural($input->route);
-                                    $relation_model = $finder->getModel($table);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                $object = [];
-
-                $_input = (array) $input;
-                $object[$input->name] =   Arr::except($_input, ['route','model']) + [
-                    'items' => [
-                        [
-                            'id' => -1,
-                            'name' => 'Role Group',
-                            'children' => $relation_model->all(['id', 'name'])->toArray()
-                        ]
-                    ]
-                ];
-
-                break;
-
-            default:
-                # code...
-                break;
-        }
-        return $object;
-    }
-
-
-    public function getTableOptions()
-    {
-
-        return Collection::make(
-            $this->isParentRoute()
-                ? $this->config->parent_route->table_option
-                : $this->config->sub_routes->{camelName($this->routeName)}->table_options
-            ?? $this->defaultTableOptions
-        )->toArray();
-    }
-
-    public function getTableOption($option)
-    {
-        return $this->tableOptions[$option] ?? false;
+        return $this->getHeadline($this->modelName);
     }
 
     /**
@@ -903,7 +714,7 @@ abstract class CoreController extends Controller
      */
     protected function getParentModuleForeignKey()
     {
-        return Str::singular( camelName($this->moduleName) ) . '_id';
+        return Str::singular( $this->getCamelCase(($this->moduleName)) ) . '_id';
 
         $moduleParts = explode('.', $this->moduleName);
 
@@ -927,7 +738,7 @@ abstract class CoreController extends Controller
         //     // moduleRoute(strtolower($this->moduleName), $this->routePrefix, $action, [$id])
         //     // moduleRoute($this->moduleName, $this->routePrefix, $action, [$id])
         // );
-        return moduleRoute($this->routeName, $this->routePrefix, $action, [ camelName($this->routeName) => $id]);
+        return moduleRoute($this->routeName, $this->routePrefix, $action, [ camelCase($this->routeName) => $id]);
     }
 
     /**
@@ -949,134 +760,6 @@ abstract class CoreController extends Controller
         );
     }
 
-
-    /**
-     * @return bool
-     */
-    protected function isParentRoute()
-    {
-        return $this->isParent ?? $this->moduleName == $this->routeName;
-    }
-
-    /**
-     * @return bool
-     */
-    protected function isNestedRoute()
-    {
-        return $this->config->sub_routes->{lowerName($this->routeName)}->nested
-            ?? false;
-    }
-
-    /**
-     * @param string|null $back_link
-     * @param array $params
-     * @return void
-     */
-    protected function setBackLink($back_link = null, $params = [])
-    {
-        if (! isset($back_link)) {
-            if (($back_link = Session::get($this->getBackLinkSessionKey())) == null) {
-                $back_link = $this->request->headers->get('referer') ?? moduleRoute(
-                    $this->moduleName,
-                    $this->routePrefix,
-                    'index',
-                    $params
-                );
-            }
-        }
-
-        if (! Session::get($this->moduleName . '_retain')) {
-            Session::put($this->getBackLinkSessionKey(), $back_link);
-        } else {
-            Session::put($this->moduleName . '_retain', false);
-        }
-    }
-
-    /**
-     * @param string|null $fallback
-     * @param array $params
-     * @return string
-     */
-    protected function getBackLink($fallback = null, $params = [])
-    {
-        $back_link = Session::get($this->getBackLinkSessionKey(), $fallback);
-
-        return $back_link ?? moduleRoute($this->moduleName, $this->routePrefix, 'index', $params);
-    }
-
-    /**
-     * @return string
-     */
-    protected function getBackLinkSessionKey()
-    {
-        return $this->moduleName . ($this->nested ? $this->submoduleParentId ?? '' : '') . '_back_link';
-        return $this->moduleName . ($this->submodule ? $this->submoduleParentId ?? '' : '') . '_back_link';
-    }
-
-    /**
-     * @param int $id
-     * @param array $params
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    protected function redirectToForm($id, $params = [])
-    {
-        Session::put($this->moduleName . '_retain', true);
-        dd(
-            $this->moduleName,
-            $this->routePrefix,
-            'edit',
-            array_filter($params) + [Str::singular($this->moduleName) => $id],
-        );
-        return Redirect::to(moduleRoute(
-            $this->moduleName,
-            $this->routePrefix,
-            'edit',
-            array_filter($params) + [Str::singular($this->moduleName) => $id]
-        ));
-    }
-
-    /**
-     * @param string $message
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function respondWithSuccess($message)
-    {
-        return $this->respondWithJson($message, MessageStage::SUCCESS);
-    }
-
-    /**
-     * @param string $redirectUrl
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function respondWithRedirect($redirectUrl)
-    {
-        return Response::json([
-            'redirect' => $redirectUrl,
-        ]);
-    }
-
-    /**
-     * @param string $message
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function respondWithError($message)
-    {
-        return $this->respondWithJson($message, MessageStage::ERROR);
-    }
-
-    /**
-     * @param string $message
-     * @param mixed $variant
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function respondWithJson($message, $variant)
-    {
-        return Response::json([
-            'message' => $message,
-            'variant' => $variant,
-        ]);
-    }
-
     /**
      * @param array $input
      * @return void
@@ -1084,31 +767,6 @@ abstract class CoreController extends Controller
     protected function fireEvent($input = [])
     {
         fireCmsEvent('cms-module.saved', $input);
-    }
-
-    protected function getSchemaWiths($schema)
-    {
-        return collect($schema)->filter(function($item){
-            return $this->hasWithModel($item['type']);
-        })->map(function($item, $i){
-            return $item['name'];
-        })
-        ->values()
-        ->toArray();
-    }
-
-        /**
-     * @param string $option
-     * @return bool
-     */
-    protected function hasWithModel($type)
-    {
-        $types = [
-            'treeview',
-            'custom-input-treeview'
-        ];
-
-        return in_array($type, $types);
     }
 
     /**
@@ -1119,43 +777,5 @@ abstract class CoreController extends Controller
         return TwillBlocks::getBlockCollection()->getRepeaters()->mapWithKeys(function (Block $repeater) {
             return [$repeater->name => $repeater->toList()];
         });
-    }
-
-    public function paginate()
-    {
-        // return $this->repository
-        $request = $this->request;
-
-        $search = $request->query('search') ?? "";
-
-        $perPage = $request->query('per-page') ?? $this->perPage;
-
-        $model = $this->repository->getModel();
-
-
-        // dd( app($this->model), app($this->model)->getAttributes() );
-
-        if($search != ""){
-
-            $search_columns = collect( $this->indexColumns ?? [] )->filter(function ($value) {
-                return isset($value['searchable']) ? $value['searchable'] : false;
-            })->map(function($value){
-                return $value['value'];
-            })->toArray();
-            // dd($search_columns);
-
-            $items = $model::where(function($query) use($search, $search_columns){
-                foreach ($search_columns as $column) {
-                    $query->orWhere($column, 'like', "%{$search}%");
-                }
-                // dd($query->toSql());
-            })->paginate($perPage);
-            // dd($items);
-        }else{
-            $items =  $model::paginate($perPage);
-        }
-
-        return $items;
-
     }
 }

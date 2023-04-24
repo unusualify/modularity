@@ -8,11 +8,11 @@ use Nwidart\Modules\Commands\GeneratorCommand;
 use Nwidart\Modules\Facades\Module;
 use Nwidart\Modules\Support\Stub;
 use Nwidart\Modules\Traits\ModuleCommandTrait;
-use OoBook\CRM\Base\Traits\Namable;
+use OoBook\CRM\Base\Traits\ManagesNames;
 
 class BaseCommand extends GeneratorCommand
 {
-    use ModuleCommandTrait, Namable;
+    use ModuleCommandTrait, ManagesNames;
 
     /**
      * The name of 'name' argument.
@@ -21,15 +21,15 @@ class BaseCommand extends GeneratorCommand
      */
     protected $argumentName = '';
 
-    protected $baseModule;
-
     protected $isAskable = true;
 
     protected $responses = [];
 
     protected $defaultReject = false;
 
-    protected $config_base = "base";
+    protected $configBaseKey = "base";
+
+    protected $schemaParser;
 
     /**
      * Create a new command instance.
@@ -40,13 +40,13 @@ class BaseCommand extends GeneratorCommand
     {
         parent::__construct();
 
-        // $this->baseModule = Module::find('Base');
+        $this->configBaseKey = \Illuminate\Support\Str::snake(env('BASE_NAME', 'Base'));
 
         Stub::setBasePath( $this->baseConfig('stubs.path', dirname(__FILE__).'/stubs') );
     }
 
     public function baseConfig($string, $default = null){
-        return Config::get( lowerName( env('BASE_NAME','Base') ) .".".$string, $default);
+        return Config::get( $this->configBaseKey .".".$string, $default);
     }
 
     /**

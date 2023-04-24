@@ -102,7 +102,7 @@
 @endpush
 
 @section('STORE')
-    window['{{ config('base.js_namespace') }}'].ENDPOINTS = {
+    window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {
         @if($editable)
             update: '{{ $actionUrl }}',
         @else
@@ -110,7 +110,7 @@
         @endif
 
     }
-    window['{{ config('base.js_namespace') }}'].STORE.form = {
+    window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].STORE.form = {
 
         inputs: {!! json_encode($formSchema ?? new StdClass()) !!},
 

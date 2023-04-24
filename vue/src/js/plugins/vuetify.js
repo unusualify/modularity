@@ -18,7 +18,7 @@ import dark from '@/config/themes/dark'
 
 // import { md2 } from 'vuetify/blueprints'
 
-import { VBtn } from 'vuetify/lib/components'
+import { VBtn, VTextField } from 'vuetify/lib/components'
 
 function loadIcons ($font) {
   const locales = require.context('../config/icons', true, /[A-Za-z0-9-_,\s]+.json$/i)
@@ -48,6 +48,9 @@ const opts = {
     },
     VSheet: {
     //   elevation: 4
+    },
+    VTextField: {
+      variant: 'outlined'
     },
     VBtn: {
       color: 'primary'

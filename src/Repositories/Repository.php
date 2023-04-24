@@ -77,16 +77,28 @@ abstract class Repository
         // dd($orders);
         $query = $this->order($query, $orders);
 
-        // dd($query->dd());
         if (!$forcePagination && $this->model instanceof Sortable) {
             return $query->ordered()->get();
         }
 
         if ($perPage == -1) {
+            return $query->paginate(0);
             return $query->get();
         }
 
-        return $query->paginate($perPage);
+        try {
+            //code...
+            return $query->paginate($perPage);
+        } catch (\Throwable $th) {
+            //throw $th;
+            dd(
+                $with,
+                $scopes,
+                $orders,
+                $perPage
+            );
+        }
+
     }
 
     /**

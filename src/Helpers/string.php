@@ -14,9 +14,21 @@ if (! function_exists('studlyName')) {
     }
 }
 
-if (! function_exists('camelName')) {
-    function camelName($string) {
+if (! function_exists('camelCase')) {
+    function camelCase($string) {
         return Str::camel($string);
+    }
+}
+
+if (! function_exists('kebabCase')) {
+    function kebabCase($string) {
+        return Str::kebab($string);
+    }
+}
+
+if (! function_exists('snakeCase')) {
+    function snakeCase($string) {
+        return Str::snake($string);
     }
 }
 

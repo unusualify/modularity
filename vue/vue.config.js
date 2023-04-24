@@ -94,8 +94,7 @@ const plugins = [
     }
   }),
   new webpack.ProvidePlugin({
-    $: 'jquery',
-    axios: 'axios',
+    'window.axios': 'axios',
     'window.$': 'jquery',
     'window._': 'lodash'
     // 'window.jQuery': 'jquery'
@@ -219,7 +218,7 @@ module.exports = defineConfig({
     extract: false,
     loaderOptions: {
       // define global settings imported in all components
-      sass: {
+      scss: {
         additionalData: `
             @import "styles/setup/_settings.scss";
         `

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use OoBook\CRM\Base\View\Table;
 use Nwidart\Modules\Facades\Module;
+use Illuminate\Support\Str;
 
 class ConfigServiceProvider extends ServiceProvider
 {
@@ -41,14 +42,14 @@ class ConfigServiceProvider extends ServiceProvider
     {
         $this->registerUnusualConfig();
         // dd(glob(__DIR__."/../Config/modules/*.php"));
-        // $base_config_name = strtolower(config($this->moduleNameLower . '.name'));
+        // $base_config_name = strtolower(config($this->baseKey . '.name'));
 
-        $this->mergeConfigFrom(__DIR__ . '/../Config/internal_modules.php', $this->moduleNameLower . '.internal_modules');
-        $this->mergeConfigFrom(__DIR__ . '/../Config/media-library.php', $this->moduleNameLower . '.media_library');
-        $this->mergeConfigFrom(__DIR__ . '/../Config/imgix.php', $this->moduleNameLower . '.imgix');
-        $this->mergeConfigFrom(__DIR__ . '/../Config/glide.php', $this->moduleNameLower . '.glide');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/internal_modules.php', $this->baseKey . '.internal_modules');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/media-library.php', $this->baseKey . '.media_library');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/imgix.php', $this->baseKey . '.imgix');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/glide.php', $this->baseKey . '.glide');
 
-        if (config($this->moduleNameLower . '.enabled.users-management')) {
+        if (config($this->baseKey . '.enabled.users-management')) {
             config(['auth.providers.unusual_users' => [
                 'driver' => 'eloquent',
                 'model' => User::class,
@@ -62,7 +63,7 @@ class ConfigServiceProvider extends ServiceProvider
             if (blank(config('auth.passwords.unusual_users'))) {
                 config(['auth.passwords.unusual_users' => [
                     'provider' => 'unusual_users',
-                    'table' => config($this->moduleNameLower . '.password_resets_table', 'unusual_password_resets'),
+                    'table' => config($this->baseKey . '.password_resets_table', 'unusual_password_resets'),
                     'expire' => 60,
                     'throttle' => 60,
                 ]]);
@@ -80,7 +81,7 @@ class ConfigServiceProvider extends ServiceProvider
     protected function registerUnusualConfig()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../Config/config.php', $this->moduleNameLower
+            __DIR__ . '/../Config/config.php', $this->baseKey
         );
     }
 
@@ -93,7 +94,7 @@ class ConfigServiceProvider extends ServiceProvider
                 //     module_path($module->getName(), 'Config/config.php') => config_path($module->getLowerName() . '.php'),
                 // ], 'config');
                 $this->mergeConfigFrom(
-                    module_path($module->getName(), 'Config/config.php'), $module->getLowerName()
+                    module_path($module->getName(), 'Config/config.php'), snakeCase($module->getName())
                 );
             }
         }

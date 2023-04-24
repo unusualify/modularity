@@ -1,4 +1,3 @@
-import { mapState, mapGetters } from 'vuex'
 import htmlClasses from '@/utils/htmlClasses'
 
 export default {
@@ -50,7 +49,6 @@ export default {
     closeModal () {
       this.show = false
     },
-
     cancelModal (callback = null) {
       if (typeof this.cancelCallback === 'undefined') {
         this.closeModal()

@@ -289,7 +289,6 @@ const actions = {
       }
       return !_changed
     })
-
     if (_changed) {
       commit(DATATABLE.UPDATE_DATATABLE_LOADING, true)
       const parameters = {
@@ -305,7 +304,6 @@ const actions = {
         }, {})),
         ...(state.search !== '' ? { search: state.search } : {})
       }
-
       api.get(parameters, function (resp) {
         commit(DATATABLE.UPDATE_DATATABLE_DATA, resp.data)
         commit(DATATABLE.UPDATE_DATATABLE_TOTAL, resp.total)

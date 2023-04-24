@@ -132,7 +132,8 @@ class Module extends NwidartModule
 
     private function flushModuleCache(): void
     {
-        if (config('base.cache.enabled')) {
+
+        if (config(getUnusualBaseKey() . '.cache.enabled')) {
             $this->cache->store()->flush();
         }
     }

@@ -7,7 +7,7 @@ if (!function_exists('getLocales')) {
      */
     function getLocales()
     {
-        $locales = collect(config('base.translatable.locales'))->map(function ($locale, $index) {
+        $locales = collect(config(getUnusualBaseKey() . '.translatable.locales'))->map(function ($locale, $index) {
             return collect($locale)->map(function ($country) use ($locale, $index) {
                 return is_numeric($index)
                     ? $locale

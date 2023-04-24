@@ -15,7 +15,7 @@ class MenuServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        view()->composer('base::layouts.master', function ($view)
+        view()->composer("$this->baseKey::layouts.master", function ($view)
         {
             $configuration = [
                 'current_url' => url()->current(),
@@ -24,10 +24,10 @@ class MenuServiceProvider extends ServiceProvider
             ];
 
             $configs = array_merge(
-                config($this->moduleNameLower . '.internal_modules'),
+                config($this->baseKey . '.internal_modules'),
                 array_map(
                     function($item){
-                        return config($item->getLowerName());
+                        return config(snakeCase($item->getName()));
                     },
                     array_filter(Module::all(), function($item){
                         return $item->getName() != 'Base' && $item->isStatus(true);
@@ -40,7 +40,16 @@ class MenuServiceProvider extends ServiceProvider
                 // 'icon' => '$modules'
             ];
             foreach ( $configs as $name => $config) {
-                $name = $config['name'];
+                try {
+                    $name = $config['name'];
+                    //code...
+                } catch (\Throwable $th) {
+                    dd(
+                        $name,
+                        $config,
+                        $configs,
+                    );
+                }
                 $pr = $config['parent_route']; //  parent_route array|object
                 // dd($config);
                 // menu list element
@@ -56,7 +65,7 @@ class MenuServiceProvider extends ServiceProvider
                     $parent_route_name = $pr['route_name'].".index";
 
                     if(isset($config['base_prefix']) && $config['base_prefix'])
-                        $parent_route_name = strtolower(config($this->moduleNameLower . '.name')) . "." . $parent_route_name;
+                        $parent_route_name = strtolower(config($this->baseKey . '.name')) . "." . $parent_route_name;
 
                     if( Route::has($parent_route_name) ){
                         $link = route( $parent_route_name );
@@ -75,7 +84,7 @@ class MenuServiceProvider extends ServiceProvider
                         $route_name = $pr['route_name'] . '.' . $sr['route_name'] . ".index";
 
                         if(isset($config['base_prefix']) && $config['base_prefix'])
-                            $route_name = strtolower(config($this->moduleNameLower . '.name')) . "." . $route_name;
+                            $route_name = strtolower(config($this->baseKey . '.name')) . "." . $route_name;
 
                         if( Route::has($route_name) ){
                             $text = Str::plural( $sr['name'] );
@@ -112,7 +121,7 @@ class MenuServiceProvider extends ServiceProvider
                     $route_name =  $pr['route_name'].".index";
 
                     if(isset($config['base_prefix']) && $config['base_prefix'])
-                        $route_name = strtolower(config($this->moduleNameLower . '.name')) . "." . $route_name;
+                        $route_name = strtolower(config($this->baseKey . '.name')) . "." . $route_name;
 
                     if( Route::has($route_name) ){
                         $link = route( $route_name );

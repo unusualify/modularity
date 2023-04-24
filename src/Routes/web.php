@@ -26,7 +26,7 @@ Route::group(['prefix' => 'api/user', 'as' => 'api.user.', 'namespace' => 'API']
     Route::apiResource('permission', PermissionController::class);
 });
 
-if (config('base.enabled.media-library')) {
+if (config(getUnusualBaseKey() . '.enabled.media-library')) {
     Route::group(['prefix' => 'media-library', 'as' => 'media-library.'], function () {
         Route::post('sign-s3-upload', ['as' => 'sign-s3-upload', 'uses' => 'MediaLibraryController@signS3Upload']);
         Route::get('sign-azure-upload', ['as' => 'sign-azure-upload', 'uses' => 'MediaLibraryController@signAzureUpload']);

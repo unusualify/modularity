@@ -31,7 +31,7 @@ class PermissionController extends BaseController
     protected $titleColumnKey = 'name';
 
 
-    protected $perPage = 5;
+    // protected $perPage = 2;
 
 
     /**

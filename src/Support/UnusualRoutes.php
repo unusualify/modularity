@@ -38,11 +38,13 @@ class UnusualRoutes
 
                 $router->group(
                     $groupOptions + [
-                        'domain' => config('base.app_url', env('APP_URL')),
+                        'domain' => config(getUnusualBaseKey() . '.app_url', env('APP_URL')),
                     ],
                     $hostRoutes
                 );
 
+            }else{
+                $routesFile;
             }
         };
 
@@ -60,7 +62,7 @@ class UnusualRoutes
 
     public function configureRoutePatterns(): void
     {
-        if (($patterns = config('base.route_patterns')) != null) {
+        if (($patterns = config(getUnusualBaseKey() . '.route_patterns')) != null) {
             if (is_array($patterns)) {
                 foreach ($patterns as $label => $pattern) {
                     Route::pattern($label, $pattern);
@@ -76,7 +78,7 @@ class UnusualRoutes
     {
         return [
             // 'as'            => config('twill.admin_route_name_prefix', 'admin.'),
-            'middleware'    => [config('base.admin_middleware_group', 'web')],
+            'middleware'    => [config(getUnusualBaseKey() . '.admin_middleware_group', 'web')],
             // 'prefix'        => rtrim(ltrim(config('twill.admin_app_path'), '/'), '/'),
         ];
     }
@@ -91,7 +93,7 @@ class UnusualRoutes
     public function internalGroupOptions(): array
     {
         return array_merge([
-            // 'as' => strtolower( config('base.name') ).".",
+            // 'as' => strtolower( config(getUnusualBaseKey() . '.name') ).".",
         ], $this->groupOptions());
     }
 

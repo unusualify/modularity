@@ -7,10 +7,6 @@ use $BASE_CONTROLLER_NAMESPACE$;
 
 class $CLASS$ extends $BASE_CONTROLLER$
 {
-    /**
-     * @var string
-     */
-    // protected $namespace = '$MODULE_NAMESPACE$\$MODULE_STUDLY_NAME$';
 
     /**
      * @var string
@@ -20,6 +16,6 @@ class $CLASS$ extends $BASE_CONTROLLER$
     /**
      * @var string
      */
-     protected $routeName = '$LOWER_NAME$';
+     protected $routeName = '$ROUTE_NAME$';
 
 }

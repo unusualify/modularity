@@ -11,12 +11,12 @@ class ServiceProvider extends Provider
     /**
      * @var string $moduleName
      */
-    protected $moduleName;
+    protected $baseName;
 
     /**
      * @var string $moduleNameLower
      */
-    protected $moduleNameLower;
+    protected $baseKey;
 
     /**
      * Create a new service provider instance.
@@ -28,8 +28,8 @@ class ServiceProvider extends Provider
     {
         parent::__construct($app);
 
-        $this->moduleName = env('BASE_NAME', 'Base');
+        $this->baseName = env('BASE_NAME', 'Base');
 
-        $this->moduleNameLower = Str::snake($this->moduleName);
+        $this->baseKey = Str::snake($this->baseName);
     }
 }

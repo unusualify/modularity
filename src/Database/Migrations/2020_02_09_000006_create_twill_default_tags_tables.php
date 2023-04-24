@@ -13,7 +13,7 @@ class CreateTwillDefaultTagsTables extends Migration
      */
     public function up()
     {
-        $twillTaggedTable = config('base.tagged_table', 'tagged');
+        $twillTaggedTable = config(getUnusualBaseKey() . '.tagged_table', 'tagged');
 
         if (!Schema::hasTable($twillTaggedTable)) {
             Schema::create($twillTaggedTable, function (Blueprint $table) {
@@ -26,7 +26,7 @@ class CreateTwillDefaultTagsTables extends Migration
         }
 
 
-        $twillTagsTable = config('base.tags_table', 'tags');
+        $twillTagsTable = config(getUnusualBaseKey() . '.tags_table', 'tags');
 
         if (!Schema::hasTable($twillTagsTable)) {
             Schema::create($twillTagsTable, function (Blueprint $table) {
@@ -46,7 +46,7 @@ class CreateTwillDefaultTagsTables extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(config('base.tags_table', 'tags'));
-        Schema::dropIfExists(config('base.tagged_table', 'tagged'));
+        Schema::dropIfExists(config(getUnusualBaseKey() . '.tags_table', 'tags'));
+        Schema::dropIfExists(config(getUnusualBaseKey() . '.tagged_table', 'tagged'));
     }
 }

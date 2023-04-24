@@ -58,7 +58,14 @@ export default {
       return this[functionName](...val)
     },
     handleVmFunctionCall (functionName, ...val) {
-      return window.vm[functionName](...val)
+      // __log(
+      //   // window.vm,
+      //   this.$app._instance,
+      //   functionName
+      // )
+      // this.openFreeMediaLibrary()
+      this[functionName](...val)
+      // return window.vm[functionName](...val)
     },
     openMediaLibrary () {
 

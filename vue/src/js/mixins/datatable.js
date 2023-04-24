@@ -17,21 +17,6 @@ export default {
     isRowEditing: Boolean,
     createOnModal: Boolean,
     editOnModal: Boolean
-    // tableOptions: {
-    //   type: Object,
-    //   default() {
-    //     return {
-    //       page: 1,
-    //       itemsPerPage: 5,
-    //       sortBy: [],
-    //       sortDesc: [],
-    //       groupBy: [],
-    //       groupDesc: [],
-    //       multiSort: false,
-    //       mustSort: false
-    //     }
-    //   }
-    // },
   },
   data: function () {
     return {

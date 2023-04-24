@@ -8,12 +8,12 @@
 // window.axios = require('axios');
 // axios = require('axios');
 
-axios.defaults.headers.common = {
+window.axios.defaults.headers.common = {
   'X-Requested-With': 'XMLHttpRequest',
   Accept: 'application/json'
 }
 
-axios.defaults.headers.post = {
+window.axios.defaults.headers.post = {
   'Content-Type': 'application/json'
 }
 

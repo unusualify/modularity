@@ -72,23 +72,21 @@ class ControllerMakeCommand extends BaseCommand
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
 
         return (new Stub($this->getStubName(), [
+            'NAMESPACE'                 => $this->getClassNamespace($module),
             'BASE_CONTROLLER_NAMESPACE' => $this->baseConfig('base_controller'),
+            'CLASS'                     => $this->getControllerNameWithoutNamespace(),
             'BASE_CONTROLLER'           => get_class_short_name( $this->baseConfig('base_controller') ),
             'MODULE'                    => $module->getStudlyName(),
-            'CONTROLLERNAME'            => $this->getControllerName(),
-            'NAME'                      => $this->getModuleName(),
-            'MODULE_NAMESPACE'          => $this->laravel['modules']->config('namespace'),
-            // 'CLASS_NAMESPACE'   => $this->getClassNamespace($module),
-            'MODULE_LOWER_NAME'         => $module->getLowerName(),
             'MODULE_STUDLY_NAME'        => $module->getStudlyName(),
-            'STUDLY_NAME'               => $this->getStudlyName($name),
-            'LOWER_NAME'                => $this->getLowerName($name),
-            'NAMESPACE'                 => $this->getClassNamespace($module),
-            // 'NAMESPACE'         => $module->getStudlyName(),
-            // 'CLASS'             => $this->getClass().'Controller',
-            'CLASS'                     => $this->getControllerNameWithoutNamespace(),
-            // 'MODULE'            => $this->argument('module'),
-            // 'MODULE'            => $this->getModuleName(),
+            'ROUTE_NAME'                => $this->getStudlyName($name),
+
+
+            // 'MODULE_NAMESPACE'          => $this->laravel['modules']->config('namespace'),
+            // 'CONTROLLERNAME'            => $this->getControllerName(),
+            // 'NAME'                      => $this->getModuleName(),
+            // 'MODULE_LOWER_NAME'         => $module->getLowerName(),
+            // 'STUDLY_NAME'               => $this->getStudlyName($name),
+
         ]))->render();
     }
 

@@ -23,7 +23,7 @@ class BaseServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->loadMigrationsFrom(
-            base_path( config( $this->moduleNameLower . '.vendor_path') . '/src/Database/Migrations' )
+            base_path( config( $this->baseKey . '.vendor_path') . '/src/Database/Migrations' )
         );
     }
 
@@ -51,15 +51,15 @@ class BaseServiceProvider extends ServiceProvider
             return new FileActivator($app);
         });
 
-        if (config($this->moduleNameLower . '.enabled.media-library')) {
+        if (config($this->baseKey . '.enabled.media-library')) {
             $this->app->singleton('imageService', function () {
-                return $this->app->make(config($this->moduleNameLower . '.media_library.image_service'));
+                return $this->app->make(config($this->baseKey . '.media_library.image_service'));
             });
         }
 
-        if (config($this->moduleNameLower . '.enabled.file-library')) {
+        if (config($this->baseKey . '.enabled.file-library')) {
             $this->app->singleton('fileService', function () {
-                return $this->app->make(config($this->moduleNameLower . '.file_library.file_service'));
+                return $this->app->make(config($this->baseKey . '.file_library.file_service'));
             });
         }
 
@@ -85,8 +85,8 @@ class BaseServiceProvider extends ServiceProvider
     {
         $paths = [];
         foreach (\Config::get('view.paths') as $path) {
-            if (is_dir($path . '/modules/' . $this->moduleNameLower)) {
-                $paths[] = $path . '/modules/' . $this->moduleNameLower;
+            if (is_dir($path . '/modules/' . $this->baseKey)) {
+                $paths[] = $path . '/modules/' . $this->baseKey;
             }
         }
         return $paths;
@@ -106,78 +106,6 @@ class BaseServiceProvider extends ServiceProvider
      * {@inheritdoc}
      */
     private function macros(){
-
-        Route::macro('moduleRoutes', function ($file = null) {
-
-            if(!$file){
-                $pattern = '/[M|m]odules\/[A-Za-z]*\/Routes\//';
-
-                $file = fileTrace($pattern);
-            }
-            // echo $file;
-
-            Route::middleware('auth')->group( function() use($file){
-
-
-                Route::name( getCurrentModuleLowerName($file).'.')
-                    ->group(function() use($file){
-
-                    if( is_array( $parent = config( getCurrentModuleLowerName($file).'.parent_route' ) ) ){
-                        $url = $parent['url'] ?? lowerName($parent['name']);
-                        $studlyName = studlyName($parent['name']);
-                        // $names = $value['route_name'] ?? $url;
-                        // dd(request());
-                        Route::resource($url, $studlyName.'Controller');
-                    }
-                    Route::prefix( getCurrentModuleLowerName($file) )->group(function () use($file){
-
-                        if( is_array(config( getCurrentModuleLowerName($file).'.sub_routes' ))){
-                            foreach( config( getCurrentModuleLowerName($file).'.sub_routes' ) as $key => $value) {
-                                $url = $value['url'] ?? lowerName($value['name']);
-                                $studlyName = studlyName($value['name']);
-                                $names = $value['route_name'] ?? $url;
-                                // dd(request());
-                                Route::resource($url, $studlyName.'Controller' , ['names' => $names]);
-                            }
-                        }
-
-                    });
-                });
-
-                Route::resource( getCurrentModuleLowerName($file) , getCurrentModuleStudlyName($file).'Controller');
-
-                Route::prefix('api')
-                    ->name('api.')
-                    ->namespace('API')
-                    ->group(function() use($file){
-
-                    // Route::apiResource( getCurrentModuleLowerName($file) , getCurrentModuleStudlyName($file).'Controller');
-                    if( is_array( $parent = config( getCurrentModuleLowerName($file).'.parent_route' ) ) ){
-                        $url = $parent['url'] ?? lowerName($parent['name']);
-                        $studlyName = studlyName($parent['name']);
-                        // $names = $value['route_name'] ?? $url;
-                        // dd(request());
-                        Route::apiResource($url, $studlyName.'Controller');
-                    }
-                    Route::prefix( getCurrentModuleLowerName($file) )
-                        ->name( getCurrentModuleLowerName($file).'.' )
-                        ->group(function() use($file){
-
-                        if( is_array(config( getCurrentModuleLowerName($file).'.sub_routes' ))){
-                            foreach( config( getCurrentModuleLowerName($file).'.sub_routes' ) as $value) {
-                                $url = $value['url'] ?? lowerName($value['name']);
-                                $studlyName = studlyName($value['name']);
-                                $names = $value['route_name'] ?? $url;
-
-                                Route::apiResource($url, $studlyName.'Controller', ['names' => $names]);
-                            }
-                        }
-                    });
-
-                });
-
-            });
-        });
 
         \Illuminate\Support\Collection::macro('recursive', function () {
             return $this->map(function ($value) {

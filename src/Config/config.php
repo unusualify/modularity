@@ -42,13 +42,13 @@ return [
 
     'stubs' => [
         'enabled' => false,
-        'path' => base_path('Modules/Base/Console/stubs'),
+        'path' => base_path( env('UNUSUAL_STUB_PATH') ?? '/packages/oobook/crm-base/Console/stubs') ,
         'files' => [
             'routes/web' => 'Routes/web.php',
             'routes/api' => 'Routes/api.php',
-            'views/index' => 'Resources/views/$LOWER_NAME$/index.blade.php',
-            'views/create' => 'Resources/views/$LOWER_NAME$/create.blade.php',
-            'views/edit' => 'Resources/views/$LOWER_NAME$/edit.blade.php',
+            'views/index' => 'Resources/views/$SNAKE_CASE$/index.blade.php',
+            'views/create' => 'Resources/views/$SNAKE_CASE$/create.blade.php',
+            'views/edit' => 'Resources/views/$SNAKE_CASE$/edit.blade.php',
             // 'repository' => 'Repositories/$STUDLY_NAME$Repository.php',
             // 'route-controller' => 'Http/Controllers/$STUDLY_NAME$Controller.php',
             // 'route-controller-api' => 'Http/Controllers/API/$STUDLY_NAME$Controller.php',

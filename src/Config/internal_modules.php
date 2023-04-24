@@ -926,8 +926,6 @@ return [
                     'update' => [],
                     'destroy' => []
                 ],
-
-
             ],
             'permission' =>  [
                 'name' => 'Permission',

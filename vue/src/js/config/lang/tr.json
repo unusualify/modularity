@@ -30,7 +30,8 @@
         "payment": "Ödeme",
         "permission": "İzin",
         "role": "Rol",
-        "user": "Kullanıcı"
+        "user": "Kullanıcı",
+        "press_release": "Haber Bülteni"
     },
 
     "new-item": "Yeni {item}",

@@ -6,13 +6,13 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Nwidart\Modules\Support\Migrations\SchemaParser as Parser;
 use Illuminate\Support\Str;
-use OoBook\CRM\Base\Traits\Namable;
+use OoBook\CRM\Base\Traits\ManagesNames;
 use phpDocumentor\Reflection\Types\Boolean;
 use PhpParser\Node\Expr\FuncCall;
 
 class SchemaParser extends Parser
 {
-    use Namable;
+    use ManagesNames;
 
     /**
      * defaultHeaders
@@ -21,20 +21,20 @@ class SchemaParser extends Parser
      */
     protected $defaultHeaders = [
         [
-            'text' => 'Created Time',
-            'value' => 'created_at',
+            'title' => 'Created Time',
+            'key' => 'created_at',
             'formatter' => 'formatDate',
             'searchable' => true
         ],
         [
-            'text' => 'Update Time',
-            'value' => 'updated_at',
+            'title' => 'Update Time',
+            'key' => 'updated_at',
             'formatter' => 'formatDate',
             'searchable' => true
         ],
         [
-            'text' => 'Actions',
-            'value' => 'actions',
+            'title' => 'Actions',
+            'key' => 'actions',
             'sortable' => false
         ]
     ];
@@ -47,7 +47,7 @@ class SchemaParser extends Parser
     protected $defaultInputs = [
         [
             'title' => 'Name',
-            'name' => 'name',
+            'key' => 'name',
             'type' => 'text',
             'placeholder' => '',
             'cols' => 12,
@@ -85,25 +85,25 @@ class SchemaParser extends Parser
     {
         parent::__construct($schema);
 
-        $this->baseNamespace = Config::get('base.namespace')."\\".Config::get('base.name');
+        $this->baseNamespace = Config::get(getUnusualBaseKey() . '.namespace')."\\".Config::get(getUnusualBaseKey() . '.name');
 
-        $this->traits += Collection::make(Config::get('base.traits',[]))->mapWithKeys(function($object, $key){
+        $this->traits += Collection::make(Config::get(getUnusualBaseKey() . '.traits',[]))->mapWithKeys(function($object, $key){
             return [ $key => $object['model']];
         })->toArray();
 
-        $this->traitNamespaces += Collection::make(Config::get('base.traits',[]))->mapWithKeys(function($object, $key){
+        $this->traitNamespaces += Collection::make(Config::get(getUnusualBaseKey() . '.traits',[]))->mapWithKeys(function($object, $key){
             return [ $key => "{$this->baseNamespace}\\Entities\\Traits\\{$object['model']}"];
         })->toArray();
 
-        $this->repositoryTraits += Collection::make(Config::get('base.traits',[]))->mapWithKeys(function($object, $key){
+        $this->repositoryTraits += Collection::make(Config::get(getUnusualBaseKey() . '.traits',[]))->mapWithKeys(function($object, $key){
             return [ $key => isset($object['repository']) ? $object['repository'] : ''];
         })->toArray();
 
-        $this->repositoryTraitNamespaces += Collection::make(Config::get('base.traits',[]))->mapWithKeys(function($object, $key){
+        $this->repositoryTraitNamespaces += Collection::make(Config::get(getUnusualBaseKey() . '.traits',[]))->mapWithKeys(function($object, $key){
             return [ $key => isset($object['repository']) ?  "{$this->baseNamespace}\\Repositories\\Traits\\{$object['repository']}" : ''];
         })->toArray();
 
-        $this->interfaces += Collection::make(Config::get('base.traits',[]))->mapWithKeys(function($object, $key){
+        $this->interfaces += Collection::make(Config::get(getUnusualBaseKey() . '.traits',[]))->mapWithKeys(function($object, $key){
 
             return array_key_exists('implementations', $object) ? [
                 $key =>Collection::make($object['implementations'])->map(function($interface){
@@ -112,7 +112,7 @@ class SchemaParser extends Parser
             ] : [ $key => [] ];
         })->toArray();
 
-        $this->interfaceNamespaces += Collection::make(Config::get('base.traits',[]))->mapWithKeys(function($object, $key){
+        $this->interfaceNamespaces += Collection::make(Config::get(getUnusualBaseKey() . '.traits',[]))->mapWithKeys(function($object, $key){
             return array_key_exists('implementations', $object) ? [
                 $key => Collection::make($object['implementations'])->map(function($interface){
                     return (new \ReflectionClass($interface))->getName();
@@ -254,11 +254,23 @@ class SchemaParser extends Parser
     public function headerFormat(string $column) : array
     {
         return [
-            'text' => $this->getHeadline($column),
-            'value' => $column,
+            'title' => $this->getHeadline($column),
+            'key' => $column,
             'align' => 'start',
             'sortable' => false,
+            'filterable' => false,
+            'groupable' => false,
+            'divider' => false,
+            'class' => '', // || []
+            'cellClass' => '', // || []
+            'width' => '', // || int
+            // vuetify datatable header fields end
+
+            // custom fields for ue-datatable start
             'searchable' => true,
+            'isRowEditable' => true,
+            'isColumnEditable' => true,
+            'formatter' => '',
         ];
     }
 
@@ -287,13 +299,36 @@ class SchemaParser extends Parser
     public function inputFormat(string $column) : array
     {
         return [
-            'title' => $this->getHeadline($column),
             'name' => $column,
+            'label' => $this->getHeadline($column),
             'type' => 'text',
-            'placeholder' => '',
+            'hint' => '',
+            'placeholder' => "{$this->getHeadline($column)} Value",
+            'default' => '',
             'cols' => 12,
             'sm' => 12,
-            'md' => 8
+            'md' => 8,
+            'col' => [
+                'cols' => 12,
+                'sm' => 12,
+                'md' => 12,
+                'lg' => 6,
+                'xl' => 4
+            ],
+            'offset' => [
+                'offset' => 0,
+                'offset-sm' => 0,
+                'offset-md' => 0,
+                'offset-lg' => 0,
+                'offset-xl' => 0,
+            ],
+            'order' => [
+                'order' => 0,
+                'order-sm' => 0,
+                'order-md' => 0,
+                'order-lg' => 0,
+                'order-xl' => 0,
+            ],
         ];
     }
 

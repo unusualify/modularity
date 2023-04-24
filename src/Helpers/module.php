@@ -5,12 +5,19 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
+// use Module;
 
+
+if (! function_exists('getUnusualBaseName')) {
+    function getUnusualBaseKey() {
+        return \Illuminate\Support\Str::snake(env('BASE_NAME', 'Base'));
+    }
+}
 if (! function_exists('getModule')) {
     function getModule($name = "Base") {
         // dd( app()['modules']->find( ucfirst( strtolower($name ) ) ) );
         // return app()['modules']->find( ucfirst( strtolower($name ) ) );
-        return Module::find( ucfirst( strtolower($name ) ) );
+        return Module::find( studlyName($name )  );
     }
 }
 
@@ -46,7 +53,7 @@ if (! function_exists('getCurrentModuleName')) {
             dd($file, $matches, $dir, debug_backtrace());
         }
 
-        return ucfirst( strtolower($matches[0]));
+        return studlyName($matches[0]);
 
     }
 }
@@ -140,7 +147,8 @@ if (!function_exists('moduleRoute')) {
     function moduleRoute($moduleName, $prefix, $action = '', $parameters = [], $absolute = true)
     {
         // Fix module name case
-        $moduleName = Str::camel($moduleName);
+        $kebabName = kebabCase($moduleName);
+        $snakeName = snakeCase($moduleName);
 
         // Nested module, pass in current parameters for deeply nested modules
         if (Str::contains($moduleName, '.')) {
@@ -153,22 +161,24 @@ if (!function_exists('moduleRoute')) {
 
         // Prefix it with module name only if prefix doesn't contains it already
         if (
-            config('base.allow_duplicates_on_route_names', false) ||
+            config(getUnusualBaseKey() . '.allow_duplicates_on_route_names', false) ||
             ($prefix !== $moduleName &&
                 !Str::endsWith($prefix, '.' . $moduleName))
         ) {
-            $routeName .= "{$moduleName}";
+            $routeName .= "{$snakeName}";
         }
 
-        if(preg_match('/edit|show|update|destroy/', $action) && !array_key_exists($moduleName, $parameters)){
-            $parameters[$moduleName] = ":id";
+        if(preg_match('/edit|show|update|destroy/', $action) && !array_key_exists($snakeName, $parameters)){
+            $parameters[$snakeName] = ":id";
+            // dd(
+            //     $routeName,
+            //     $parameters
+            // );
         }
 
         //  Add the action name
         $routeName .= $action ? ".{$action}" : '';
-        // dd($routeName, $moduleName, $prefix);
-        // Build the route
-        // dd($routeName);
+       // Build the route
         try {
             //code...
             return route($routeName, $parameters, $absolute);
@@ -182,7 +192,8 @@ if (!function_exists('moduleRoute')) {
                     'action' => $action,
                     'parameters' => $parameters,
                     'absolute' => $absolute
-                ]
+                ],
+                debug_backtrace()
             );
             //throw $th;
         }
@@ -212,7 +223,7 @@ if (!function_exists('unusualRoute')) {
 
         // Prefix it with module name only if prefix doesn't contains it already
         if (
-            config('base.allow_duplicates_on_route_names', false) ||
+            config(getUnusualBaseKey() . '.allow_duplicates_on_route_names', false) ||
             ($prefix !== $route &&
                 !Str::endsWith($prefix, '.' . $route))
         ) {
@@ -235,7 +246,7 @@ if (! function_exists('getUnusualTraits')) {
      */
     function getUnusualTraits()
     {
-        return array_keys(Config::get('base.traits'));
+        return array_keys(Config::get(getUnusualBaseKey() . '.traits'));
         // return [
         //     // 'hasBlocks',
         //     'translationTrait',
@@ -269,7 +280,7 @@ if (! function_exists('unusualTraitOptions')) {
      */
     function unusualTraitOptions()
     {
-        return Collection::make(Config::get('base.traits'))->map(function ($trait, $key) {
+        return Collection::make(Config::get(getUnusualBaseKey() . '.traits'))->map(function ($trait, $key) {
                 return [
                     $key,
                     $trait['command_option']['shortcut'] ?? null,

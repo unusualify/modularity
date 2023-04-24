@@ -3,7 +3,7 @@
 namespace OoBook\CRM\Base\Support;
 
 use Nwidart\Modules\Support\Migrations\SchemaParser as Parser;
-use OoBook\CRM\Base\Traits\Namable;
+use OoBook\CRM\Base\Traits\ManagesNames;
 
 use Composer\Autoload\ClassMapGenerator;
 
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\File;
 
 class Finder
 {
-    use Namable;
+    use ManagesNames;
 
     /**
      * Create new instance.

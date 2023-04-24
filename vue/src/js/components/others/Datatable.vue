@@ -39,7 +39,7 @@
       >
         <!-- #title.left-top -->
         <v-toolbar-title>
-          {{ $t('list-of-item', [name, $t('modules.' + name.toLowerCase() )] ) }}
+          {{ $t('list-of-item', [name, $t('modules.' + $lodash.snakeCase(name) )] ) }}
           <!-- {{ $t('errors.missingMessage') }} -->
         </v-toolbar-title>
 
@@ -48,10 +48,11 @@
         <!-- #search input -->
         <v-text-field
           v-model="search"
-          append-icon="mdi-magnify"
+          append-inner-icon="mdi-magnify"
           label="Search"
           single-line
           hide-details
+          variant="underlined"
         >
         </v-text-field>
 
@@ -140,7 +141,6 @@
     </template>
 
     <template v-slot:item.actions="{ item }">
-
       <!-- @click's editItem|deleteItem -->
       <!-- #actions -->
       <v-menu v-if="rowActionsType == 'dropdown' || $vuetify.display.smOnly"
@@ -173,6 +173,7 @@
       </v-menu>
 
       <div v-else>
+
         <v-icon
           v-for="(action, k) in rowActions"
           :key="k"
@@ -187,12 +188,14 @@
     </template>
 
     <template v-slot:no-data>
-      <v-btn
-        color="primary"
-        @click="initialize"
-      >
-        Reset
-      </v-btn>
+      <div class="w-100 d-flex justify-center">
+        <v-btn
+          color="primary"
+          @click="initialize"
+        >
+          Reset
+        </v-btn>
+      </div>
     </template>
 
     <!-- #formatterColumns -->
@@ -312,7 +315,7 @@ export default {
       })
     },
     transName () {
-      return this.$t('modules.' + this.name.toLowerCase())
+      return this.$t('modules.' + this.$lodash.snakeCase(this.name))
     }
   },
   created () {

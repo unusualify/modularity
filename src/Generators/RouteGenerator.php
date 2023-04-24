@@ -9,7 +9,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use OoBook\CRM\Base\Support\Decomposers\SchemaParser;
-use OoBook\CRM\Base\Traits\Namable;
+use OoBook\CRM\Base\Traits\ManagesNames;
 use Nwidart\Modules\Facades\Module;
 use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
@@ -20,7 +20,7 @@ use Illuminate\Container\Container;
 
 class RouteGenerator extends Generator
 {
-    use Namable;
+    use ManagesNames;
 
     /**
      * The route name will created.
@@ -102,6 +102,13 @@ class RouteGenerator extends Generator
 
     ];
 
+    protected static $defaultTableOptions = [
+        'createOnModal' => true,
+        'editOnModal' => true,
+        'isRowEditing' => false,
+        'actionsType' => 'inline',
+    ];
+
     /**
      * The constructor.
      * @param $name
@@ -124,7 +131,7 @@ class RouteGenerator extends Generator
         $this->console = $console;
         $this->module = $module;
 
-        Stub::setBasePath( config('modules.paths.modules').'/Base/Console/stubs');
+        // Stub::setBasePath( config('modules.paths.modules').'/Base/Console/stubs');
     }
 
     /**
@@ -285,7 +292,7 @@ class RouteGenerator extends Generator
      */
     public function getFolders()
     {
-        return $this->config->get('base.paths.generator');
+        return $this->config->get(getUnusualBaseKey() . '.paths.generator');
     }
 
     /**
@@ -295,7 +302,7 @@ class RouteGenerator extends Generator
      */
     public function getFiles()
     {
-        return $this->config->get('base.stubs.files');
+        return $this->config->get(getUnusualBaseKey() . '.stubs.files');
     }
 
     /**
@@ -406,8 +413,9 @@ class RouteGenerator extends Generator
     public function generate() : int
     {
         $name = $this->getName();
-        // dd( $this->config->get('base') );
+
         // dd( get_class($this->module), $name );
+
         // if ($this->module->has($name)) {
         //     if ($this->force) {
         //         $this->module->delete($name);
@@ -467,7 +475,7 @@ class RouteGenerator extends Generator
 
             $this->filesystem->makeDirectory($path, 0755, true);
 
-            if ( $this->config->get('base.stubs.gitkeep')) {
+            if ( $this->config->get(getUnusualBaseKey() . '.stubs.gitkeep')) {
                 $this->generateGitKeep($path);
             }
         }
@@ -602,34 +610,33 @@ class RouteGenerator extends Generator
      */
     public function updateConfigFile() :bool
     {
-        $config = $this->getConfig()->get( $this->getModule()->getLowerName() );
+        $config = $this->getConfig()->get( $this->getModule()->getLowerName() ) ?? [];
 
         $lowerName = $this->getLowerNameReplacement();
-
         $studlyName = $this->getStudlyNameReplacement();
+        $headline = $this->getHeadline($this->getName());
+        $kebabCase = $this->getKebabCase($this->getName());
+        $snakeCase = $this->getSnakeCase($this->getName());
 
         $configPath = $this->module->getPath().'/Config/config.php';
 
+        $route_array = [
+            'name' => $headline,
+            'url' => $kebabCase,
+            'route_name' => $snakeCase,
+            'icon' => '$modules',
+            'table_options' => static::$defaultTableOptions,
+            'headers' => $this->getHeaders(), //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
+            'inputs' => $this->getInputs() //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
+        ];
+
         if( $this->getModule()->getName() === $this->getName()){
-            $config['parent_route'] = [
-                'name' => $studlyName,
-                'url' => $lowerName,
-                'route_name' => $lowerName,
-                'table' => [
-                    'headers' => $this->getHeaders(), //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
-                    'inputs' => $this->getInputs() //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
-                ]
-            ];
+            $config['name'] = $studlyName;
+            $config['base_prefix'] = false;
+            $config['parent_route'] = $route_array;
+            $config['sub_routes'] = [];
         }else{
-            $config['sub_routes'][$this->getLowerNameReplacement()] = [
-                'name' => $studlyName,
-                'url' => $lowerName,
-                'route_name' => $lowerName,
-                'table' => [
-                    'headers' => $this->getHeaders(), //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
-                    'inputs' => $this->getInputs() //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
-                ]
-            ];
+            $config['sub_routes'][$this->getSnakeCase($this->getName())] = $route_array;
         }
 
         return $this->filesystem->put($configPath, phpArrayFileContent($config));
@@ -658,12 +665,12 @@ class RouteGenerator extends Generator
      */
     public function getReplacements()
     {
-        return $this->config->get('base.stubs.replacements');
+        return $this->config->get(getUnusualBaseKey() . '.stubs.replacements');
     }
 
     public function generatorConfig($generator)
     {
-        return (new GeneratorPath($this->config->get('base.paths.generator.'.$generator)));
+        return (new GeneratorPath($this->config->get(getUnusualBaseKey() . '.paths.generator.'.$generator)));
     }
 
     /**
@@ -706,6 +713,11 @@ class RouteGenerator extends Generator
         $patterns = [
             '/\$LOWER_NAME\$/' => $this->getLowerNameReplacement(),
             '/\$STUDLY_NAME\$/' => $this->getStudlyNameReplacement(),
+
+            '/\$KEBAB_CASE\$/' => $this->getKebabCase($this->getName()),
+            '/\$PASCAL_CASE\$/' => $this->getPascalCase($this->getName()),
+            '/\$SNAKE_CASE\$/' => $this->getSnakeCase($this->getName()),
+            '/\$CAMEL_CASE\$/' => $this->getCamelCase($this->getName()),
         ];
 
         return preg_replace( array_keys($patterns), array_values($patterns), $string);

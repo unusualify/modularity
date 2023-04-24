@@ -49,11 +49,12 @@ class ResourceServiceProvider extends ServiceProvider
     {
         $sourcePath = __DIR__ .  '/../Resources/views';
         // dd(
-        //     $this->moduleNameLower,
+        //     $this->baseKey,
         //     $sourcePath,
-        //     $this->getPublishableViewPaths($this->moduleNameLower),
+        //     $this->getPublishableViewPaths($this->baseKey),
         // );
-        $this->loadViewsFrom(array_merge($this->getPublishableViewPaths($this->moduleNameLower), [$sourcePath]), $this->moduleNameLower);
+
+        $this->loadViewsFrom(array_merge($this->getPublishableViewPaths($this->baseKey), [$sourcePath]), $this->baseKey);
 
         foreach(Module::all() as $module){
             // if( $module->getName() != 'Base' && $module->isStatus(true)){
@@ -65,7 +66,15 @@ class ResourceServiceProvider extends ServiceProvider
                 // $this->publishes([
                 //     $sourcePath => $viewPath
                 // ], ['views', $module->getLowerName() . '-module-views']);
-                $this->loadViewsFrom(array_merge($this->getPublishableViewPaths($module->getLowerName()), [$sourcePath]), $module->getLowerName());
+                $this->loadViewsFrom(
+                    array_merge(
+                        $this->getPublishableViewPaths(
+                            snakeCase($module->getName())
+                        ),
+                        [$sourcePath]
+                    ),
+                    snakeCase($module->getName())
+                );
             }
         }
     }
@@ -77,7 +86,6 @@ class ResourceServiceProvider extends ServiceProvider
      */
     public function bootTranslations()
     {
-
         $this->bootUnusualTranslation();
 
         foreach(Module::all() as $module){
@@ -94,24 +102,24 @@ class ResourceServiceProvider extends ServiceProvider
                 }
             }
         }
-        // $langPath = resource_path('lang/modules/' . $this->moduleNameLower);
+        // $langPath = resource_path('lang/modules/' . $this->baseKey);
 
         // if (is_dir($langPath)) {
-        //     $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
+        //     $this->loadTranslationsFrom($langPath, $this->baseKey);
         // } else {
-        //     $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
+        //     $this->loadTranslationsFrom(module_path($this->baseName, 'Resources/lang'), $this->baseKey);
         // }
     }
 
     /**
      * {@inheritdoc}
      */
-    private function getPublishableViewPaths($lower_module_name): array
+    private function getPublishableViewPaths($name): array
     {
         $paths = [];
         foreach (\Config::get('view.paths') as $path) {
-            if (is_dir($path . '/modules/' . $lower_module_name)) {
-                $paths[] = $path . '/modules/' . $lower_module_name;
+            if (is_dir($path . '/modules/' . $name)) {
+                $paths[] = $path . '/modules/' . $name;
             }
         }
         return $paths;
@@ -133,21 +141,25 @@ class ResourceServiceProvider extends ServiceProvider
      */
     private function addViewComposers(): void
     {
-        if (config($this->moduleNameLower . '.enabled.users-management')) {
-            View::composer(['admin.*', 'base::*'], CurrentUser::class);
+        view()->composer('*',function($view) {
+            $view->with('BASE_KEY', $this->baseKey);
+        });
+
+        if (config($this->baseKey . '.enabled.users-management')) {
+            View::composer(['admin.*', "$this->baseKey::*"], CurrentUser::class);
         }
 
-        if (config($this->moduleNameLower . '.enabled.media-library')) {
-            View::composer('base::layouts.master', MediasUploaderConfig::class);
+        if (config($this->baseKey . '.enabled.media-library')) {
+            View::composer("$this->baseKey::layouts.master", MediasUploaderConfig::class);
         }
 
-        if (config($this->moduleNameLower . '.enabled.file-library')) {
-            View::composer('base::layouts.master', FilesUploaderConfig::class);
+        if (config($this->baseKey . '.enabled.file-library')) {
+            View::composer("$this->baseKey::layouts.master", FilesUploaderConfig::class);
         }
 
-        View::composer('base::partials.navigation.*', ActiveNavigation::class);
+        View::composer("$this->baseKey::partials.navigation.*", ActiveNavigation::class);
 
-        View::composer(['admin.*', 'templates.*', 'base::*'], function ($view) {
+        View::composer(['admin.*', 'templates.*', "$this->baseKey::*"], function ($view) {
             $with = array_merge([
                 'renderForBlocks' => false,
                 'renderForModal' => false,
@@ -156,12 +168,12 @@ class ResourceServiceProvider extends ServiceProvider
             return $view->with($with);
         });
 
-        View::composer(['base::layouts.master'], Localization::class);
+        View::composer(["$this->baseKey::layouts.master"], Localization::class);
     }
 
     private function bootUnusualTranslation()
     {
-        $name = lowerName( config($this->moduleNameLower . '.name') );
+        $name = lowerName( config($this->baseKey . '.name') );
         $langPath = resource_path('lang/modules/' . 'base');
 
         if (is_dir($langPath)) {
@@ -176,8 +188,3 @@ class ResourceServiceProvider extends ServiceProvider
     }
 
 }
-
-
-
-
-
