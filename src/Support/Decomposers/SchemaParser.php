@@ -23,13 +23,13 @@ class SchemaParser extends Parser
         [
             'title' => 'Created Time',
             'key' => 'created_at',
-            'formatter' => 'formatDate',
+            'formatter' => ['date', 'long'],
             'searchable' => true
         ],
         [
             'title' => 'Update Time',
             'key' => 'updated_at',
-            'formatter' => 'formatDate',
+            'formatter' => ['date', 'long'],
             'searchable' => true
         ],
         [
@@ -50,9 +50,6 @@ class SchemaParser extends Parser
             'key' => 'name',
             'type' => 'text',
             'placeholder' => '',
-            'cols' => 12,
-            'sm' => 12,
-            'md' => 8
         ]
     ];
 
@@ -104,7 +101,6 @@ class SchemaParser extends Parser
         })->toArray();
 
         $this->interfaces += Collection::make(Config::get(getUnusualBaseKey() . '.traits',[]))->mapWithKeys(function($object, $key){
-
             return array_key_exists('implementations', $object) ? [
                 $key =>Collection::make($object['implementations'])->map(function($interface){
                     return (new \ReflectionClass($interface))->getShortName();
@@ -251,11 +247,11 @@ class SchemaParser extends Parser
      * @param  mixed $column
      * @return array
      */
-    public function headerFormat(string $column) : array
+    public function headerFormat(string $column_name, $options = []) : array
     {
         return [
-            'title' => $this->getHeadline($column),
-            'key' => $column,
+            'title' => $this->getHeadline($column_name),
+            'key' => $column_name,
             'align' => 'start',
             'sortable' => false,
             'filterable' => false,
@@ -269,8 +265,8 @@ class SchemaParser extends Parser
             // custom fields for ue-datatable start
             'searchable' => true,
             'isRowEditable' => true,
-            'isColumnEditable' => true,
-            'formatter' => '',
+            'isColumnEditable' => false,
+            'formatter' =>  $options[0] == 'timestamp' ? ['date', 'long'] : [],
         ];
     }
 
@@ -281,12 +277,13 @@ class SchemaParser extends Parser
      */
     public function getHeaderFormats() : array
     {
+
         $filter = array_filter($this->parse($this->schema), function($v,$k){
             return !array_key_exists($k, $this->customAttributes);
         }, ARRAY_FILTER_USE_BOTH );
 
-        return array_map(function($v, $k){
-            return $this->headerFormat($k);
+        return array_map(function($o, $k){
+            return $this->headerFormat($k, $o);
         }, $filter, array_keys($filter) ) + $this->defaultHeaders;
     }
 
@@ -296,39 +293,28 @@ class SchemaParser extends Parser
      * @param  mixed $column
      * @return array
      */
-    public function inputFormat(string $column) : array
+    public function inputFormat(string $column, $options = []) : array
     {
+        $extra_formats = [];
+
+        if($options[0] == 'timestamp'){
+            $extra_formats['ext'] = 'date';
+        }
         return [
             'name' => $column,
             'label' => $this->getHeadline($column),
             'type' => 'text',
+            ...$extra_formats,
             'hint' => '',
             'placeholder' => "{$this->getHeadline($column)} Value",
             'default' => '',
-            'cols' => 12,
-            'sm' => 12,
-            'md' => 8,
             'col' => [
                 'cols' => 12,
                 'sm' => 12,
                 'md' => 12,
                 'lg' => 6,
                 'xl' => 4
-            ],
-            'offset' => [
-                'offset' => 0,
-                'offset-sm' => 0,
-                'offset-md' => 0,
-                'offset-lg' => 0,
-                'offset-xl' => 0,
-            ],
-            'order' => [
-                'order' => 0,
-                'order-sm' => 0,
-                'order-md' => 0,
-                'order-lg' => 0,
-                'order-xl' => 0,
-            ],
+            ]
         ];
     }
 
@@ -343,8 +329,8 @@ class SchemaParser extends Parser
             return !array_key_exists($k, $this->customAttributes);
         }, ARRAY_FILTER_USE_BOTH );
 
-        return array_map(function($v, $k){
-            return $this->inputFormat($k);
+        return array_map(function($o, $k){
+            return $this->inputFormat($k, $o);
         }, $filter, array_keys($filter) ) ?: $this->defaultInputs;
     }
 
@@ -408,7 +394,6 @@ class SchemaParser extends Parser
 
     }
 
-
     /**
      * hasSoftDelete
      *
@@ -418,7 +403,4 @@ class SchemaParser extends Parser
     {
         return in_array('soft_delete', $this->getColumns());
     }
-
-
-
 }

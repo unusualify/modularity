@@ -1,19 +1,23 @@
 <template>
     <v-range-slider
-        :value="value"
-        :label="label"
-        @change="update($event)"
-        :error-messages="errorMessages(attributes.name)"
-
-        v-bind="props"
+        v-model="input"
+        :label="obj.schema.label"
+        v-bind="obj.schema"
     ></v-range-slider>
 </template>
 
 <script>
-import { InputMixin } from '@/mixins'
+import { CustomInputMixin } from '@/mixins'
 
 export default {
-    mixins: [InputMixin],
+    mixins: [CustomInputMixin],
+    name:'ue-custom-input-range',  
+    
+    created() {
 
+    },
+    computed:{
+
+    }  
 }
 </script>

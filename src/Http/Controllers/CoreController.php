@@ -18,9 +18,8 @@ use Illuminate\Support\Str;
 
 use Illuminate\Routing\Controller;
 use Nwidart\Modules\Facades\Module;
-use OoBook\CRM\Base\Traits\MakesResponses;
-use OoBook\CRM\Base\Traits\ManagesNames;
-use OoBook\CRM\Base\Traits\ManagesScopes;
+use OoBook\CRM\Base\Traits\{MakesResponses, ManagesNames, ManagesScopes};
+
 
 abstract class CoreController extends Controller
 {
@@ -606,7 +605,7 @@ abstract class CoreController extends Controller
         $snakeCase = $this->getSnakeCase($this->moduleName);
 
         return arrayToObject(
-            Config::get( $this->getCamelCase( env('BASE_NAME', 'Base') ) . '.internal_modules.' . $snakeCase)
+            Config::get( getUnusualBaseKey() . '.internal_modules.' . $snakeCase)
             ?: Config::get( $snakeCase )
         );
 
@@ -658,7 +657,15 @@ abstract class CoreController extends Controller
      */
     protected function getRepository()
     {
-        return App::make($this->getRepositoryClass($this->modelName));
+        try {
+            return $this->getRepositoryClass($this->modelName) ? App::make($this->getRepositoryClass($this->modelName)) : null;
+            //code...
+        } catch (\Throwable $th) {
+            dd(
+                "repositoryClass not exists for {$this->moduleName}",
+            );
+            throw $th;
+        }
     }
 
     /**
@@ -777,5 +784,12 @@ abstract class CoreController extends Controller
         return TwillBlocks::getBlockCollection()->getRepeaters()->mapWithKeys(function (Block $repeater) {
             return [$repeater->name => $repeater->toList()];
         });
+    }
+
+    protected function getConfigFieldsByRoute($field_name)
+    {
+        return $this->isParentRoute()
+            ? $this->config->parent_route->{$field_name}
+            : $this->config->sub_routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
     }
 }

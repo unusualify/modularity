@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import core from '@/core'
 
 // import VFormBase from 'vuetify-form-base';
@@ -10,7 +9,6 @@ import UEModalDialog from '__components/modals/ModalDialog.vue'
 import UEModalMedia from '__components/modals/ModalMedia.vue'
 
 // global mixins
-import { PropsMixin } from '@/mixins'
 
 // mutations
 import { MEDIA_LIBRARY } from '@/store/mutations'
@@ -29,11 +27,15 @@ import { VueMaskDirective } from 'v-mask'
 
 // Directives
 import SvgSprite from '@/directives/svg'
+import Column from '@/directives/column'
+import FitGrid from '@/directives/fit-grid'
+import commonMethods from '@/utils/common-methods'
 
 const includeGlobalComponents = require.context('__components', false, /[A-Za-z]*(?<!_)\.vue$/i)
+const includeLabComponents = require.context('__components/labs', false, /[A-Za-z]*(?<!_)\.vue$/i)
 const includeLayouts = require.context('__components/layouts/', false, /[A-Za-z]*(?<!_)\.vue$/i)
-const includeFormInputs = require.context('__components/inputs', true, /\.vue$/i)
-const includeCustomFormInputs = require.context('__components/customInputs', true, /\.vue$/i)
+// const includeFormInputs = require.context('__components/inputs', true, /\.vue$/i)
+const includeCustomFormInputs = require.context('__components/inputs', true, /\.vue$/i)
 
 export default {
   install: (app, opts) => {
@@ -42,22 +44,38 @@ export default {
     // app.config.compilerOptions.isCustomElement = (tag) => {
     //   return tag.startsWith('ue-')
     // }
-    app.config.globalProperties.$jquery = window.$
-    app.config.globalProperties.$axios = window.axios
-    app.config.globalProperties.$lodash = window._
 
-    app.config.errorHandler = (err) => {
-      __log(err)
-    }
     app.use(vuetify)
     app.use(store)
     app.use(i18n)
 
-    app.mixin(PropsMixin)
+    app.config.globalProperties.$jquery = window.$
+    app.config.globalProperties.$axios = window.axios
+    app.config.globalProperties.$lodash = window._
+    app.config.globalProperties.window = window
+
+    app.config.errorHandler = (err) => {
+      __log(err)
+    }
+
+    // set locale wrt user profile preference
+    // __log(store._state.data.currentUser.locale)
+    i18n.global.locale.value = store._state.data.currentUser.locale
+    // i18n.global.locale = store._state.data.currentUser.locale
+
+    // add Global methods to all components
+    app.config.globalProperties = {
+      ...app.config.globalProperties,
+      ...commonMethods,
+      $te: function (key, locale) {
+        const func = i18n.global.te
+        return func(key, locale) ?? false
+      }
+    }
 
     // Global Vue mixin : Use global mixins sparsely and carefully!
     app.mixin({
-    //   vuetify,
+      //   vuetify,
       //   i18n,
       methods: {
         openFreeMediaLibrary: function () {
@@ -88,44 +106,45 @@ export default {
     app.component('ue-modal-media', UEModalMedia)
     // Vue.component('ue-medialibrary', UEMediaLibrary)
 
+    // package components
+
     includeGlobalComponents.keys().forEach((path) => {
       const prefix = 'ue'
       const fileName = path.split('/').pop().split('.')[0]
       const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
       app.component(componentName, require('__components/' + fileName + '.vue').default)
     })
-
+    includeLabComponents.keys().forEach((path) => {
+      const prefix = 'ue'
+      const fileName = path.split('/').pop().split('.')[0]
+      const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
+      app.component(componentName, require('__components/labs/' + fileName + '.vue').default)
+    })
     includeLayouts.keys().forEach((path) => {
       const prefix = 'ue'
       const fileName = path.split('/').pop().split('.')[0]
       const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
       app.component(componentName, require('__components/layouts/' + fileName + '.vue').default)
     })
-
-    includeFormInputs.keys().forEach((path) => {
-      const prefix = 'ue-input'
-      const fileName = path.split('/').pop().split('.')[0]
-      const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
-      // __log(componentName)
-      app.component(componentName, require('__components/inputs/' + fileName + '.vue').default)
-    })
+    // includeFormInputs.keys().forEach((path) => {
+    //   const prefix = 'ue-input'
+    //   const fileName = path.split('/').pop().split('.')[0]
+    //   const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
+    //   // __log(componentName)
+    //   app.component(componentName, require('__components/inputs/' + fileName + '.vue').default)
+    // })
     includeCustomFormInputs.keys().forEach((path) => {
       const prefix = 'v-custom-input'
       const fileName = path.split('/').pop().split('.')[0]
       const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
       // __log(componentName)
-      app.component(componentName, require('__components/customInputs/' + fileName + '.vue').default)
+      app.component(componentName, require('__components/inputs/' + fileName + '.vue').default)
     })
 
     // // Configurations
     // Vue.config.productionTip = isProd
     // Vue.config.devtools = true
     // app.config.globalProperties.$http = axios
-
-    app.config.globalProperties.$trans = function (key, defaultValue) {
-      return _.get(window[process.env.VUE_APP_NAME].unusualLocalization.lang, key, defaultValue)
-      // return get(window[process.env.VUE_APP_NAME].unusualLocalization.lang, key, defaultValue)
-    }
 
     // axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 
@@ -144,9 +163,10 @@ export default {
 
     // Directives
     app.directive('mask', VueMaskDirective)
+    // app.directive('svg', SvgSprite)
     app.use(SvgSprite)
-    // Vue.use(Tooltip)
-    // Vue.use(Sticky)
+    app.use(Column)
+    app.use(FitGrid)
 
     app.config.globalProperties.$app = app
     app.provide('$app', app)

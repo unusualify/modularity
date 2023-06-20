@@ -2,25 +2,25 @@
 
 use Illuminate\Support\Str;
 
-if (!function_exists('twillIncrementsMethod')) {
+if (!function_exists('unusualIncrementsMethod')) {
     /**
      * @return string
      */
-    function twillIncrementsMethod()
+    function unusualIncrementsMethod()
     {
-        return config('twill.migrations_use_big_integers')
+        return config(getUnusualBaseKey().'.use_big_integers_on_migrations')
             ? 'bigIncrements'
             : 'increments';
     }
 }
 
-if (!function_exists('twillIntegerMethod')) {
+if (!function_exists('unusualIntegerMethod')) {
     /**
      * @return string
      */
-    function twillIntegerMethod()
+    function unusualIntegerMethod()
     {
-        return config('twill.migrations_use_big_integers')
+        return config(getUnusualBaseKey().'.use_big_integers_on_migrations')
             ? 'bigInteger'
             : 'integer';
     }
@@ -37,7 +37,7 @@ if (!function_exists('createDefaultFields')) {
      */
     function createDefaultTableFields($table, $softDeletes = true, $published = true, $publishDates = false, $visibility = false)
     {
-        $table->{twillIncrementsMethod()}('id');
+        $table->{unusualIncrementsMethod()}('id');
 
         if ($softDeletes) {
             $table->softDeletes();
@@ -73,8 +73,8 @@ if (!function_exists('createDefaultTranslationsTableFields')) {
             $tableNamePlural = Str::plural($tableNameSingular);
         }
 
-        $table->{twillIncrementsMethod()}('id');
-        $table->{twillIntegerMethod()}("{$tableNameSingular}_id")->unsigned();
+        $table->{unusualIncrementsMethod()}('id');
+        $table->{unusualIntegerMethod()}("{$tableNameSingular}_id")->unsigned();
 
         $table->softDeletes();
         $table->timestamps();
@@ -99,8 +99,8 @@ if (!function_exists('createDefaultSlugsTableFields')) {
             $tableNamePlural = Str::plural($tableNameSingular);
         }
 
-        $table->{twillIncrementsMethod()}('id');
-        $table->{twillIntegerMethod()}("{$tableNameSingular}_id")->unsigned();
+        $table->{unusualIncrementsMethod()}('id');
+        $table->{unusualIntegerMethod()}("{$tableNameSingular}_id")->unsigned();
 
         $table->softDeletes();
         $table->timestamps();
@@ -129,8 +129,8 @@ if (!function_exists('createDefaultRelationshipTableFields')) {
             $table2NamePlural = Str::plural($table2NameSingular);
         }
 
-        $table->{twillIntegerMethod()}("{$table1NameSingular}_id")->unsigned();
-        $table->{twillIntegerMethod()}("{$table2NameSingular}_id")->unsigned();
+        $table->{unusualIntegerMethod()}("{$table1NameSingular}_id")->unsigned();
+        $table->{unusualIntegerMethod()}("{$table2NameSingular}_id")->unsigned();
 
         $table->foreign("{$table1NameSingular}_id")->references('id')->on($table1NamePlural)->onDelete('cascade');
         $table->foreign("{$table2NameSingular}_id")->references('id')->on($table2NamePlural)->onDelete('cascade');
@@ -151,13 +151,13 @@ if (!function_exists('createDefaultRevisionsTableFields')) {
             $tableNamePlural = Str::plural($tableNameSingular);
         }
 
-        $table->{twillIncrementsMethod()}('id');
-        $table->{twillIntegerMethod()}("{$tableNameSingular}_id")->unsigned();
-        $table->{twillIntegerMethod()}('user_id')->unsigned()->nullable();
+        $table->{unusualIncrementsMethod()}('id');
+        $table->{unusualIntegerMethod()}("{$tableNameSingular}_id")->unsigned();
+        $table->{unusualIntegerMethod()}('user_id')->unsigned()->nullable();
 
         $table->timestamps();
         $table->json('payload');
         $table->foreign("{$tableNameSingular}_id")->references('id')->on("{$tableNamePlural}")->onDelete('cascade');
-        $table->foreign('user_id')->references('id')->on(config('twill.users_table', 'twill_users'))->onDelete('set null');
+        $table->foreign('user_id')->references('id')->on(config(getUnusualBaseKey().'.users_table_name', 'users'))->onDelete('set null');
     }
 }

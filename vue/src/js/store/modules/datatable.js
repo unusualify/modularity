@@ -62,9 +62,9 @@ const getters = {
   totalElements: state => {
     return state.total
   },
-  formatterColumns: state => {
-    return state.headers.filter((h) => h.hasOwnProperty('formatter') && !!h.formatter)
-  },
+  // formatterColumns: state => {
+  //   return state.headers.filter((h) => h.hasOwnProperty('formatter') && h.formatter.length > 0)
+  // },
   editableColumns: state => {
     return state.headers.filter((h) => (h.hasOwnProperty('isColumnEditable') && h.isColumnEditable))
   },

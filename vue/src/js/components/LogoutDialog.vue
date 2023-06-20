@@ -1,17 +1,24 @@
 <template>
     <v-dialog
         v-model="dialog"
-        width="500"
+
         >
         <template v-slot:activator="{ props }">
-            <v-btn
-                class="w-66 m-auto"
-                color="red lighten-2"
-                dark
-                v-bind="props"
-                >
-                Logout
-            </v-btn>
+            <slot
+              name="activator"
+              :props="{
+                  ...props
+              }"
+            >
+              <v-btn
+                  class="w-66 m-auto"
+                  color="red lighten-2"
+                  dark
+                  v-bind="props"
+                  >
+                  Logout
+              </v-btn>
+            </slot>
         </template>
 
         <v-card>

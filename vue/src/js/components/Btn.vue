@@ -1,8 +1,8 @@
 <template>
     <v-btn
-        v-bind="bindProps()"
+        v-bind="$bindAttributes()"
         @click="click"
-    >
+      >
         <slot>
             Button
         </slot>

@@ -58,20 +58,15 @@ export default {
       return this[functionName](...val)
     },
     handleVmFunctionCall (functionName, ...val) {
-      // __log(
-      //   // window.vm,
-      //   this.$app._instance,
-      //   functionName
-      // )
+      __log(
+        functionName
+      )
       // this.openFreeMediaLibrary()
-      this[functionName](...val)
+      return this[functionName](...val)
       // return window.vm[functionName](...val)
     },
     openMediaLibrary () {
 
-    },
-    bindProps (vue) {
-      __log(vue)
     }
   },
   mounted () {

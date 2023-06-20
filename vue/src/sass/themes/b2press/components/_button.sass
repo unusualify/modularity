@@ -1,0 +1,33 @@
+.v-btn
+  &:not(.v-btn--icon):not(.v-btn--variant-plain)
+    height: $button-height
+    min-width: $button-min-width
+    // margin-left: auto !important
+    // margin-right: auto !important
+
+  &.bg-primary,
+  &.bg-cta
+    color: $global-dark-text-color
+  &.bg-primary
+    &:hover
+      background-color: $primary-2-color !important
+  &.v-btn--variant-outlined // for v-btn-secondary
+    &:hover
+      border: thin solid $tertiary-color
+      background-color: $tertiary-color !important
+      color: $tertiary-text-color !important
+  &.bg-tertiary
+    &:hover
+      background-color: $primary-color !important
+      color: $primary-text-color !important
+  &.bg-cta
+    &:hover
+      background-color: $cta-hover-color !important
+  &.bg-cta-secondary
+    &:hover
+      background-color: $cta-color !important
+      color: $cta-text-color !important
+
+.v-input--density-default
+  --v-input-control-height: 50px
+  --v-input-padding-top: 15px

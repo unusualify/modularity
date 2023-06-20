@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use OoBook\CRM\Base\Http\Controllers\DashboardController;
+use OoBook\CRM\Base\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,13 +20,18 @@ use Illuminate\Support\Facades\Route;
 
 //     Route::resource('permission', PermissionController::class);
 // });
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+Route::put('/profile/{profile}', [ProfileController::class, 'update'])->name('profile.update');
+
 Route::unusualWebRoutes();
 
 Route::group(['prefix' => 'api/user', 'as' => 'api.user.', 'namespace' => 'API'], function(){
     Route::apiResource('role', RoleController::class);
-
     Route::apiResource('permission', PermissionController::class);
 });
+
 
 if (config(getUnusualBaseKey() . '.enabled.media-library')) {
     Route::group(['prefix' => 'media-library', 'as' => 'media-library.'], function () {

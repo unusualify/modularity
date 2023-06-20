@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
-
+use Illuminate\Support\Facades\Config;
 use OoBook\CRM\Base\Support\Finder;
-
+use stdClass;
 
 trait ConfigureViewFields {
 
@@ -31,7 +31,7 @@ trait ConfigureViewFields {
 
             'titleKey' => $this->titleColumnKey,
             'headers' => $this->getIndexTableColumns(), // headers to be used in unusual datatable component
-            'formSchema'  => $this->getFormSchema(), // input fields to be used in unusual datatable component
+            'formSchema'  => $this->getFormSchema($this->getConfigFieldsByRoute('inputs')), // input fields to be used in unusual datatable component
 
             'indexEndpoint' => route(
                 ($this->isParentRoute() ? '' : $this->getSnakeCase($this->moduleName) . '.')
@@ -62,7 +62,6 @@ trait ConfigureViewFields {
             ],
 
         ] + $this->getIndexUrls() + $this->tableOptions;
-
         // $baseUrl = $this->getPermalinkBaseUrl();
 
         $options = [
@@ -109,7 +108,8 @@ trait ConfigureViewFields {
         ] : []) + $scopes;
 
         $statusFilters[] = [
-            'name' => unusualTrans('base::lang.listing.filter.all-items'),
+            // 'name' => unusualTrans("{$this->baseKey}::lang.listing.filter.all-items"),
+            'name' => ___("listing.filter.all-items"),
             'slug' => 'all',
             'number' => $this->repository->getCountByStatusSlug('all', $scope),
         ];
@@ -163,9 +163,7 @@ trait ConfigureViewFields {
             return [];
         else{
             return $this->indexTableColumns = Collection::make(
-                $this->isParentRoute()
-                ? $this->config->parent_route->headers
-                : $this->config->sub_routes->{camelCase($this->routeName)}->headers
+                $this->getConfigFieldsByRoute('headers')
             )->map(function($item){ return (array) $item;})
             ->toArray();
         }
@@ -181,10 +179,7 @@ trait ConfigureViewFields {
     {
         try {
             return Collection::make(
-                $this->isParentRoute()
-                    ? $this->config->parent_route->table_options
-                    : $this->config->sub_routes->{$this->getSnakeCase($this->routeName)}->table_options
-                ?? $this->defaultTableOptions
+                $this->getConfigFieldsByRoute('table_options') ?? $this->defaultTableOptions
             )->toArray();
         } catch (\Throwable $th) {
             return [];
@@ -281,7 +276,7 @@ trait ConfigureViewFields {
      */
     protected function getFormData($id, $item = null, $nested=null)
     {
-        $schema = $this->getFormSchema();
+        $schema = $this->getFormSchema($this->getConfigFieldsByRoute('inputs'));
 
         if (!$item && $id) {
             $item = $this->repository->getById(
@@ -306,8 +301,6 @@ trait ConfigureViewFields {
 
         $itemId = $this->getItemIdentifier($item);
 
-        // dd($item);
-
         $data = [
             'editable' => !!$itemId,
             'item' => $item,
@@ -316,10 +309,7 @@ trait ConfigureViewFields {
             'routePrefix' => $this->routePrefix,
             'titleFormKey' => $this->titleFormKey ?? $this->titleColumnKey,
 
-            // 'input_schema'  => ($inputSchema = $this->getFormSchema()), // input fields to be used in unusual datatable component
-            // 'inputs'  => ($inputs = $this->getFormInputs()), // input fields to be used in unusual datatable component
             'formSchema'  => $schema, // input fields to be used in unusual datatable component
-
             'defaultItem' => collect($schema)->mapWithKeys(function($item, $key){
                 return [ $item['name'] => $item['default'] ?? ''];
                 $carry[$key] = $item->default ?? '';
@@ -396,24 +386,22 @@ trait ConfigureViewFields {
         return [];
     }
 
-    public function getFormSchema()
+    public function getFormSchema($inputs)
     {
-        return Collection::make(
-            $this->isParentRoute()
-            ? $this->config->parent_route->inputs
-            : $this->config->sub_routes->{camelCase($this->routeName)}->inputs
-        )->mapWithKeys(function($item, $key){
+        return Collection::make( $inputs )->mapWithKeys(function($item, $key){
             return $this->getInputSchema($item);
         })->toArray();
     }
 
-    public function getInputSchema($input)
+    public function getInputSchema(stdClass $input)
     {
         if($object = $this->generateCustomInput($input)){
             return $object;
         }
+
+        $default_inputs = collect(Config::get(getUnusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
         return isset($input->name)
-            ? [ $input->name => collect($input)->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];})]
+            ? [ $input->name => $default_inputs->merge(collect($input)->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];})) ]
             : [];
     }
 

@@ -1,0 +1,19 @@
+.v-table
+  > .v-table__wrapper
+    > table
+      border-top: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
+      thead,tbody
+        tr
+          td,th
+            border-bottom: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
+            &:not(:last-child)
+              border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity))
+      > thead
+        > tr
+          > th
+            > .v-data-table-header__content
+              font-weight: map-get($font-weights, 'semiBold')
+      > tbody
+        > tr
+          > td
+            font-size: 0.9rem

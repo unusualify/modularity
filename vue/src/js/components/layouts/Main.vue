@@ -1,13 +1,46 @@
 <template>
   <v-app id="inspire">
 
+    <v-app-bar app v-if="$vuetify.display.mdAndDown">
+      <v-app-bar-nav-icon
+        v-if="$root.showToggleButton"
+        @click="$root.toggleSidebar">
+      </v-app-bar-nav-icon>
+
+      <v-toolbar-title>CRM</v-toolbar-title>
+
+      <v-btn
+        v-if="false"
+        class="ma-2"
+        :loading="loading"
+        :disabled="loading"
+        color="secondary"
+        @click="addSidebarItem"
+      >
+        Add Sidebar Item
+      </v-btn>
+
+      <!-- #language selector -->
+      <v-toolbar-title v-if="false">
+        <!-- {{ $t('list') }}
+        {{ $n(100.77, 'currency') }} -->
+        {{ $t('language-select') }}
+        <select v-model="$i18n.locale">
+          <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">
+            {{ lang }}
+          </option>
+        </select>
+      </v-toolbar-title>
+
+    </v-app-bar>
+
     <ue-sidebar
       :items="sidebarItems"
       ref="sidebar"
 
     />
 
-    <v-app-bar app>
+    <v-app-bar app v-if="false">
       <v-app-bar-nav-icon
         v-if="$root.showToggleButton"
         @click="$root.toggleSidebar">
@@ -43,7 +76,7 @@
     <v-main>
       <!--  -->
       <!-- <ue-footer :items="footerLinks" /> -->
-      <div>
+      <div v-if="false">
           <v-breadcrumbs :items="breadcrumbs">
             <template v-slot:divider>
               <v-icon>mdi-forward</v-icon>

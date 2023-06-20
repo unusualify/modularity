@@ -3,7 +3,7 @@
         v-model="dialog"
 
         v-bind="{
-            ...bindProps()
+            ...$bindAttributes()
         }"
         :fullscreen="full"
         :width="modalWidth"

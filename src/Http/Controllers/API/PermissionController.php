@@ -39,7 +39,7 @@ class PermissionController extends Controller
         $validated['guard_name'] = "web";
 
         $role = Permission::create($validated);
-        return view('base::create');
+        return view("{$this->baseKey}::create");
     }
 
     /**

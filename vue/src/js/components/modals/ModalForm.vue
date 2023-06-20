@@ -32,7 +32,7 @@
                 </v-card-title>
                 <v-card-text>
                     <!-- <ue-form :ref="formReference()"/> -->
-                    <ue-form-base :ref="formReference()"/>
+                    <ue-form :ref="formReference()"/>
 
                 </v-card-text>
                 <v-divider></v-divider>
@@ -66,7 +66,6 @@
 </template>
 
 <script>
-// import UEForm from '__components/Form.vue'
 import { ModalMixin } from '@/mixins'
 
 export default {

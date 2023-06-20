@@ -41,6 +41,6 @@ class Table extends Component
      */
     public function render()
     {
-        return view('base::components.table');
+        return view("{$this->baseKey}::components.table");
     }
 }

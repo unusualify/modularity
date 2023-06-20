@@ -1,4 +1,4 @@
-@extends('base::layouts.master', [
+@extends("{$BASE_KEY}::layouts.master", [
     'title' => 'Role Management'
 ])
 
@@ -10,18 +10,18 @@
 
             @endif
             {{-- {!! $repository->renderDataTable() !!} --}}
-            {{-- <x-table    
+            {{-- <x-table
                 :headers="$headers"
                 :inputs="$inputs">
 
             </x-table> --}}
-            {{-- @include('base::components.table',[
+            {{-- @include("{$BASE_KEY}::components.table",[
                 'headers' => $headers,
                 'inputs' => $inputs
             ]) --}}
 
             {{-- <footer-component :show='footerDisplay' :items="footerLinks" class="bottom: 0; position:fixed;">
-    
+
             </footer-component> --}}
         {{-- </div>
     </main-component> --}}

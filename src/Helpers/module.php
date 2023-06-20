@@ -290,3 +290,15 @@ if (! function_exists('unusualTraitOptions')) {
             })->toArray();
     }
 }
+if (! function_exists('unusualConfig')) {
+    /**
+     * @return string|array
+     */
+    function unusualConfig($notation, $default = '')
+    {
+        if($notation == '')
+            return config(getUnusualBaseKey());
+        else
+            return config(getUnusualBaseKey() . '.' . $notation, $default);
+    }
+}

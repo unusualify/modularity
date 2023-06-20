@@ -1,10 +1,8 @@
-@extends('base::layouts.master')
+@extends("{$BASE_KEY}::layouts.master")
 
 @section('appTypeClass', 'body--listing')
 
 @php
-    // dd( get_defined_vars() );
-    // dd(request()->all());
     $translate = $translate ?? false;
     $translateTitle = $translateTitle ?? $translate ?? false;
     $reorder = $reorder ?? false;
@@ -22,7 +20,7 @@
 
 
 @section('content')
-    @include('base::components.datatable')
+    @include("{$BASE_KEY}::components.datatable")
 @stop
 
 @push('head_last_js')

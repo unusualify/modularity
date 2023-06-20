@@ -52,7 +52,8 @@
           label="Search"
           single-line
           hide-details
-          variant="underlined"
+          density="compact"
+          variant="solo"
         >
         </v-text-field>
 
@@ -203,8 +204,9 @@
       v-for="(col, i) in formatterColumns"
       v-slot:[`item.${col.key}`]="{ item }"
       >
-        {{ handleFunctionCall(col.formatter, item.raw[col.key] ) }}
-        <!-- {{ [header.formatter](value) }} -->
+        {{ handleFormatter(col.formatter, item.raw[col.key] ) }}
+        <!-- {{ formatterDate(item.raw[col.key], col.formatter[1] ) }} -->
+        <!-- {{ [`formatter${$lodash.startCase($lodash.camelCase(col.formatter[0])).replace(/ /g, '')}`](item.raw[col.key], col.formatter[1]) }} -->
     </template>
 
     <!-- #edit-dialog for editableColumns-->
@@ -240,6 +242,26 @@
         </v-edit-dialog>
     </template> -->
 
+    <!-- <template v-for="header in headers" v-slot:[`column.${header.key}`]="{ column }">
+        <v-icon v-if="header.removable" icon="$close" @click="() => hideColumn(header.key)"></v-icon>
+        <span class="mr-2">{{ header.title }}</span>
+    </template> -->
+    <!-- <template v-slot:headers="{ columns }">
+      <tr>
+        <template v-for="column in columns" :key="column.key">
+          <td>
+            <v-icon v-if="column.removable" icon="$close" @click="() => hideColumn(column.key)"></v-icon>
+            <span class="mr-2">{{ column.title }}</span>
+            <v-icon
+              key="icon"
+              v-if="column.removable"
+              class="v-data-table-header__sort-icon"
+              :icon="getSortIcon(column.key)"
+            />
+          </td>
+        </template>
+      </tr>
+    </template> -->
     <!-- <template v-slot:headers="{props}">
       <tr>
         <th>
@@ -268,14 +290,13 @@
         <th
           v-for="header in props.headers"
           :key="header.text"
-        >
+          >
           <div v-if="filters.hasOwnProperty(header.value)">
             <v-select flat hide-details small multiple clearable
               :items="columnValueList(header.value)" v-model="filters[header.value]"
               >
 
             </v-select>
-
           </div>
         </th>
       </tr>
@@ -285,24 +306,62 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex'
 import { VDataTable, VDataTableServer } from 'vuetify/labs/VDataTable'
 import ACTIONS from '@/store/actions'
 
 import { DatatableMixin } from '@/mixins'
+import { useTable } from '@/hooks/table.js'
 
 export default {
   components: {
     // VDataTable,
     VDataTableServer
   },
-  mixins: [DatatableMixin],
+  setup (props, context) {
+    const tableDefaults = useTable(props, context)
+
+    return {
+      ...tableDefaults
+    }
+  },
+  props: {
+    name: {
+      type: String,
+      default: 'Item'
+    },
+    titleKey: {
+      type: String,
+      default: 'name'
+    },
+    items: {
+      type: Array
+    },
+    hideHeaders: {
+      type: Boolean,
+      default: false
+    },
+    columns: {
+      type: Array
+    },
+    inputFields: {
+      type: Array
+    },
+    tableOptions: {
+      type: Object
+    },
+    hideDefaultHeader: Boolean,
+    hideDefaultFooter: Boolean,
+    isRowEditing: Boolean,
+    createOnModal: Boolean,
+    editOnModal: Boolean
+  },
   data: function () {
     return {
       formModalActive: false,
       dialogActive: false,
 
       langs: ['tr', 'en'],
-
       cellInput: ''
 
     }
@@ -316,26 +375,50 @@ export default {
     },
     transName () {
       return this.$t('modules.' + this.$lodash.snakeCase(this.name))
-    }
+    },
+    ...mapState({
+      // datatable module
+      // headers: state => state.datatable.headers,
+      loading: state => state.datatable.loading,
+      // elements: state => state.datatable.data,
+
+      // form module
+      inputs: state => state.form.inputs,
+      editedItem: state => state.form.editedItem,
+      formLoading: state => state.form.loading,
+      formErrors: state => state.form.errors
+    })
   },
   created () {
 
   },
-
   watch: {
     formModalActive (val) {
-      __log(
-        this.defaultItem,
-        this.editedItem
-      )
       val || this.resetEditedItem()
     },
     dialogActive (val) {
       val || this.resetEditedItem()
     }
   },
-
   methods: {
+    changeSort (column) {
+      if (this.pagination.sortBy === column) {
+        this.pagination.descending = !this.pagination.descending
+      } else {
+        this.pagination.sortBy = column
+        this.pagination.descending = false
+      }
+    },
+    columnValueList (val) {
+      return this.elements.map(d => d[val])
+    },
+    columnChanged (value) {
+      this.cellInput = value
+    },
+    deleteItem (item) {
+      this.setEditedItem(item)
+      this.$refs.dialog.openModal()
+    },
     deleteRow: function () {
       this.$store.dispatch(ACTIONS.DELETE_ITEM, {
         id: this.editedItem.id,
@@ -347,12 +430,21 @@ export default {
         }
       })
     },
-    columnChanged (value) {
-      this.cellInput = value
+    editItem (item) {
+      if (this.editOnModal) {
+        this.setEditedItem(item)
+        this.$refs.formModal.openModal()
+      } else {
+        const route = this.editUrl.replace(':id', item.id)
+        window.open(route)
+      }
     },
-    /**
-         * @param {string} key - related key of object
-         */
+    handleFunctionCall (functionName, ...val) {
+      return this[functionName](...val)
+    },
+    hideColumn (key) {
+      this.headers = this.headers.filter(header => header.key !== key)
+    },
     updateCell (key) {
       this.$store.commit(ALERT.CLEAR_ALERT)
 
@@ -365,20 +457,7 @@ export default {
 
         this.$store.dispatch(ACTIONS.SAVE_FORM, { item: data })
       }
-    },
-
-    changeSort (column) {
-      if (this.pagination.sortBy === column) {
-        this.pagination.descending = !this.pagination.descending
-      } else {
-        this.pagination.sortBy = column
-        this.pagination.descending = false
-      }
-    },
-    columnValueList (val) {
-      return this.elements.map(d => d[val])
     }
-
   }
 }
 </script>

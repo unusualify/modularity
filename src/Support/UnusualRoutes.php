@@ -107,7 +107,9 @@ class UnusualRoutes
             // 'twill_auth:twill_users',
             // 'impersonate',
             // 'validateBackHistory',
-            // 'localization',
+
+            'impersonate',
+            'language',
             'auth'
         ];
 

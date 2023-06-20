@@ -1,0 +1,47 @@
+{
+  "cancel": "Cancel",
+  "close": "Close",
+  "confirm": "Confirm",
+  "confirm-deletion": "Are you sure want to delete {name} {route}?",
+  "confirm-description": "Are you sure you want to do this?",
+
+  "delete": "Delete",
+
+  "edit": "Edit",
+  "edit-item": "Edit {item}",
+  "errors": {
+    "missingMessage": "Please provide @.lower:message."
+  },
+
+  "language-select": "Lang Select",
+  "list": "no list | one list | {count} list",
+  "list-of-item": "{0} List",
+  "loading-text": "Loading... Please wait",
+
+  "message": "message",
+  "messages": {
+    "success": "Completed Successfully!",
+    "info": "Completed!",
+    "warning": "There is a warning!",
+    "error": "There is an error!"
+  },
+  "modules": {
+    "invoice": "Invoice",
+    "payment": "Payment",
+    "permission": "Permission",
+    "role": "Role",
+    "user": "User"
+  },
+
+  "new-item": "New {item}",
+
+  "save": "Save",
+  "saved": "Saved!|{0} is saved!",
+  "show": "Show",
+  "submit": "Submit",
+  "success-create": "Created Successfully.",
+  "success-update": "Updated Successfully.",
+  "success-delete": "Removed Successfully.",
+
+  "update": "Update"
+}

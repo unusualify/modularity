@@ -38,7 +38,6 @@ abstract class BaseController extends CoreController
         parent::__construct($app,$request);
 
         // $this->setMiddlewarePermission();
-
         $this->viewPrefix = $this->getViewPrefix();
 
         /*

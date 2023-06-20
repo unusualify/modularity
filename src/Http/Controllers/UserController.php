@@ -6,74 +6,46 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
-class UserController extends Controller
+class UserController extends BaseController
 {
     /**
-     * Display a listing of the resource.
-     * @return Renderable
+     * @var string
      */
-    public function index()
-    {
-        return view('base::index');
-    }
+    protected $namespace = 'OoBook\CRM\Base';
 
     /**
-     * Show the form for creating a new resource.
-     * @return Renderable
+     * @var string
      */
-    public function create()
-    {
-        return view('base::create');
-    }
+    protected $moduleName = 'User';
 
     /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
+     * @var string
      */
-    public function store(Request $request)
-    {
-        //
-    }
+    protected $routeName = 'User';
+
+
+    protected $titleColumnKey = 'name';
+
+
+    // protected $perPage = 2;
+
 
     /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
+     * @var string
      */
-    public function show($id)
-    {
-        return view('base::show');
-    }
+    // protected $routePrefix = 'User';
 
     /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
+     * @var string
      */
-    public function edit($id)
-    {
-        return view('base::edit');
-    }
+    protected $modelName = "User";
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
+    public function __construct(\Illuminate\Foundation\Application $app,Request $request)
     {
-        //
+        parent::__construct(
+            $app,
+            $request
+        );
     }
 }

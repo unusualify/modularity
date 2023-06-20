@@ -1,32 +1,30 @@
 <template>
     <v-list
         v-model="activeIndex"
+        v-model:opened="opened"
         :style="style"
         :active-class="`sidebar-item-active sidebar-item-active-${level}`"
         class="mb-2"
         >
-
         <template
             v-for="(item, i) in items"
             >
-
             <v-list-group
                 v-if="isSubgroup(item)"
                 :key="i + 'subgroup'"
                 :index="i"
                 :prepend-icon="item.icon"
-                :value="item.is_active"
                 :ripple="true"
                 :sub-group="false"
                 :active-class="`sidebar-item-active sidebar-item-active-${level}`"
+                :value="item.text"
                 >
                 <template v-slot:activator="{ props }">
                     <v-list-item
                         v-bind="props"
                         :title="item.text"
-                        :icon="item.icon"
+                        :prepend-icon="item.icon"
                     ></v-list-item>
-
                 </template>
                 <ue-list-group
                     :items="item.items"
@@ -41,8 +39,10 @@
                 :ripple="false"
                 :href="item.link"
                 :append="false"
-                :icon="item.icon"
+                :prepend-icon="item.icon"
                 :title="item.text"
+                :active="activeIndex === i"
+                :active-class="`sidebar-item-active sidebar-item-active-${level}`"
                 >
             </v-list-item>
 
@@ -53,8 +53,10 @@
                 :ripple="false"
                 :append="false"
                 @click="$root.handleVmFunctionCall(item.event)"
-                :icon="item.icon"
+                :prepend-icon="item.icon"
                 :title="item.text"
+                :active="activeIndex === i"
+                :active-class="`sidebar-item-active sidebar-item-active-${level}`"
                 >
 
                 <!-- <v-list-item-icon v-if="!!item.icon">
@@ -83,7 +85,7 @@
                     :inactive="true"
                     :append="false"
                     disabled
-                    :icon="item.icon"
+                    :prepend-icon="item.icon"
                     :title="item.text"
                     >
 
@@ -97,12 +99,36 @@
                 </v-list-item>
             </template>
         </template>
-
     </v-list>
 </template>
 
 <script>
+import { toRef } from 'vue'
+
 export default {
+  setup (props, context) {
+    // const items = toRef(props, 'items')
+    // const opened = getListGroupOpens([], items.value)
+    // const opened = []
+
+    const getListGroupOpens = (matches, items) => {
+      if (!Array.isArray(items)) return matches
+
+      items.forEach(function (i) {
+        if (__isset(i.is_active) && i.is_active && __isset(i.items)) {
+          matches.push(i.text)
+          getListGroupOpens(matches, i.items)
+        }
+      })
+
+      return matches
+    }
+
+    return {
+      // opened,
+      getListGroupOpens
+    }
+  },
   name: 'ue-list-group',
   props: {
     items: {
@@ -114,24 +140,27 @@ export default {
       default: 0
     }
   },
-  data: function () {
-    return {
-      activeBackgroundColorLevels: [
-        '#97ffff', // light blue
-        '#7cffb9' // light green
-      ]
-    }
-  },
-
+  data: () => ({
+    opened: []
+  }),
   computed: {
+    // opened: {
+    //   get () {
+    //     const matches = []
+    //     this.getListGroupOpens(matches, this.items)
+
+    //     __log('opened getter', matches)
+    //     return matches
+    //   },
+    //   set (val) {
+    //     // __log('opened setter', val)
+    //     return val
+    //   }
+
+    // },
+
     activeIndex: {
       get () {
-        // __log(
-        //     'getter selectIndex',
-        //     this.items,
-        //     this.items.find(item => item.is_active == 1 ),
-        //     this.items.findIndex(item => item.is_active == 1 )
-        // )
         return this.items.findIndex(item => item.is_active == 1)
       },
       set (value) {
@@ -152,11 +181,9 @@ export default {
     }
 
   },
-
   created () {
-
+    this.opened = this.getListGroupOpens([], this.items)
   },
-
   methods: {
     isSubgroup (item) {
       return !!item.items
@@ -171,30 +198,24 @@ export default {
       return !item.link && !item.items
     }
   }
-
 }
 </script>
 
 <style>
-    .v-list-item-group .v-list-item-active {
-        color: grey;
-    }
-    .sidebar-item-active{
-        background: #ddd;
+    /* .sidebar-item-active{
+        background: #11758D;
         text-decoration: none;
-    }
-    .sidebar-item-active-0{
+    } */
+    /* .sidebar-item-active-0{
         background: #6ff4f4;
         border-radius: 10%;
     }
     .sidebar-item-active-1{
-        /* background: #7cffb9; */
         background: #97ffff;
         border-radius: 0%;
     }
     .sidebar-item-active-2{
         background: #a9ffff;
         border-radius: 0%;
-    }
-
+    } */
 </style>

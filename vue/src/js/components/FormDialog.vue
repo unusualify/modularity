@@ -36,11 +36,9 @@
 </template>
 
 <script>
-import Form from './Form'
-
 export default {
   components: {
-    'ue-form': Form
+
   },
   name: 'ue-form-dialog',
   props: {

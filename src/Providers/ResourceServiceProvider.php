@@ -10,6 +10,8 @@ use OoBook\CRM\Base\Http\ViewComposers\FilesUploaderConfig;
 use OoBook\CRM\Base\Http\ViewComposers\Localization;
 use OoBook\CRM\Base\Http\ViewComposers\MediasUploaderConfig;
 
+use Illuminate\Support\Facades\Lang;
+
 class ResourceServiceProvider extends ServiceProvider
 {
     /**
@@ -173,18 +175,28 @@ class ResourceServiceProvider extends ServiceProvider
 
     private function bootUnusualTranslation()
     {
-        $name = lowerName( config($this->baseKey . '.name') );
+        $name = snakeCase( config($this->baseKey . '.name') );
         $langPath = resource_path('lang/modules/' . 'base');
 
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, $name);
         } else {
-            $this->loadTranslationsFrom(
-                // module_path('Base', 'Resources/lang'),
-                __DIR__ .  '/../Resources/lang',
-                $name
+            // Lang::addNamespace('unusual',  __DIR__ .  '/../../lang');
+            // $this->app['translation.loader']->addNamespace('unusual',  __DIR__ .  '/../../lang');
+
+            // $this->loadTranslationsFrom(
+            //     __DIR__ .  '/../../lang',
+            //     $name
+            // );
+
+            $this->loadJsonTranslationsFrom(
+                __DIR__ .  '/../../lang',
             );
         }
+
+        // dd(
+        //     ___('edit-item', ['item' => 'hagü']),
+        // );
     }
 
 }

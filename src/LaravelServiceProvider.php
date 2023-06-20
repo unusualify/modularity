@@ -9,7 +9,6 @@ final class LaravelServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        dd('ok');
         $this->publishMigrations();
 
     }
@@ -32,7 +31,7 @@ final class LaravelServiceProvider extends ServiceProvider
     private function publishAssets(): void
     {
         $this->publishes([
-            __DIR__ . '/../vite/dist' => public_path(),
+            __DIR__ . '/../vue/dist' => public_path(),
         ], 'assets');
     }
 }

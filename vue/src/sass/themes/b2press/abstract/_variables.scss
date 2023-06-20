@@ -1,0 +1,202 @@
+/*
+  settings_vuetify_variables
+
+  /* GLOBAL
+  body-padding: 30px;
+  text-color: #000000
+
+  primary: #27A0B4
+  primary-hover: #11758D
+  primary-light: #63C0C4
+
+  primary-text-color: #FFFFFF
+  secondary-text-color: $primary
+  tertiary-text-color: #F6A505
+
+  secondary: #F08712
+  secondary-light: #F6A505
+  secondary-hover: #E65100
+
+  sidebar-item-hover: #35ABB8
+  sidebar-item-active: $primary-hover //#11758D
+
+  /* BUTTONS
+  button-primary: $primary
+  button-primary-text-color: $primary-text-color
+  button-primary-hover: #178DA0
+
+  button-secondary: #FFFFFF
+  button-secondary-text-color: #27A0B4
+  button-secondary-border-color: #27A0B4
+  button-secondary-hover: #DFEFF0
+
+  button-tertiary: #DFEFF0
+  button-tertiary-text-color: #27A0B4
+  button-tertiary-hover: #F08712
+  button-tertiary-hover-text-color: $primary-text-color
+
+  button-cta: #F6A505
+  button-cta-text-color: $primary-text-color
+  button-cta-hover: #F08712
+
+  button-cta-secondary: $primary-text-color
+  button-cta-secondary-text-color: #F6A505
+  button-cta-secondary-border-color: #F6A505
+  button-cta-secondary-hover: #F6A505
+  button-cta-secondary-text-color: $primary-text-color
+
+  anchor-cta-text-color: #F6A505
+
+  button-success: #7CB749
+  button-success-text-color: #FFFFFF
+  button-success-hover: #5A9527
+
+  /* TEXT FIELDS
+  input-text-color: $text-color
+
+  input-focus-border-color: $primary-color
+  input-focus-label-color: $primary-color
+
+  input-hover-background-color: $primary-color
+  input-hover-label-color: $primary-color
+
+  /** FONT SIZES 1920 x 1080
+  sidebar list-font-size-1: 22px
+  sidebar list-font-size-2: 20px
+  sidebar font-size-logout: 20px
+
+  card-font-size-header: 22px bold
+  card-font-size-label: 20px semibold
+  card-font-size-value: 25px
+
+  card-font-size-button: 15px semibold
+
+  table-font-size-column: 20px semibold
+  table-font-size-cell: 18px regular
+
+*/
+$body-font-family: 'Montserrat', sans-serif;
+
+$font-weights: (
+  regular: 200,
+  medium: 400,
+  semiBold: 600,
+  bold: 800
+);
+
+$theme-padding: 1.56vw; //1.56%;
+$global-light-text-color: #000000;
+$global-dark-text-color: #FFFFFF;
+
+// $calc(100% * 320/1920)
+
+$primary-color: #27A0B4;
+$primary-2-color: #178DA0;
+$primary-light-color: #63C0C4;
+$secondary-color: #FFFFFF;
+$tertiary-color: #DFEFF0;
+$cta-color: #F6A505;
+$cta-secondary-color: #FFFFFF;
+
+$primary-hover-color: #11758D;
+$secondary-hover-color: #DFEFF0;;
+$tertiary-hover-color: #27A0B4;
+$cta-hover-color: #F08712;
+$cta-secondary-hover-color: #F6A505;
+
+$primary-text-color: #FFFFFF;
+$secondary-text-color: #27A0B4;
+$tertiary-text-color: #27A0B4;
+$cta-text-color: #FFFFFF;
+$cta-secondary-text-color: #F6A505;
+
+$sidebar-background: $primary-2-color;
+
+  /* BUTTONS */
+$button-height: 2.5rem; //2.5rem
+$button-min-width: 10rem;
+$button-max-width: 300px;
+$button-font-weight: 700;
+$button-font-size: 0.75rem;
+
+$button-primary: $primary-color;
+$button-secondary: $secondary-color;
+$button-tertiary: $tertiary-color;
+$button-cta: $cta-color;
+$button-cta-secondary: $cta-secondary-color;
+
+$button-primary-text-color: $primary-text-color;
+$button-secondary-text-color: $secondary-text-color;
+$button-tertiary-text-color: $tertiary-text-color;
+$button-cta-text-color: $cta-text-color;
+$button-cta-secondary-text-color: $cta-secondary-text-color;
+
+$button-primary-hover: $primary-hover-color;
+$button-secondary-hover: $secondary-hover-color;
+$button-tertiary-hover: $tertiary-hover-color;
+$button-cta-hover: $cta-hover-color;
+$button-cta-secondary-hover: $cta-secondary-hover-color;
+
+$button-secondary-border-color: $primary-color;
+$button-cta-secondary-border-color: $cta-color;
+
+$button-tertiary-hover-text-color: $primary-text-color;
+
+$input-font-size: .8rem;
+
+
+// Vuetify Variables
+$vuetify: (
+  utilities: '',
+
+  button-height: $button-height,
+  button-max-width: $button-max-width,
+  button-font-weight:  map-get($font-weights, 'semiBold'),
+  button-font-size: $button-font-size,
+
+  field-font-size: $input-font-size,
+
+  navigation-drawer-background: $sidebar-background,
+  navigation-drawer-color: $global-dark-text-color,
+
+  // list-background: $sidebar-background,
+  // list-color: #DFEFF0,//rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)),
+  list-padding: 8px 0px,
+  list-nav-padding: 1px,
+  list-item-one-line-padding: 8px 13px,
+  list-item-padding: 4px $theme-padding,
+
+  // table-background: rgb(var(--v-theme-surface)),
+  // table-border: thin solid $table-border-color,
+  table-border-color: #E0E0E0, //rgba(var(--v-border-color), var(--v-border-opacity)),
+  // table-color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)),
+  // table-column-padding: 0 16px,
+  // table-density: ('default': 0, 'comfortable': -2, 'compact': -4),
+  // table-header-font-size: tools.map-deep-get(settings.$typography, 'caption', 'size'),
+  // table-header-font-weight: 500,
+  // table-header-height: 56px,
+  // table-hover-color: (rgba(var(--v-border-color), var(--v-hover-opacity)),
+  // table-line-height: 1.5,
+  // table-row-font-size: tools.map-deep-get(settings.$typography, 'subtitle-2', 'size'),
+  // table-row-height: var(--v-table-row-height, 52px),
+  // table-them: ($table-background, $table-color),
+);
+
+/// Twill variables
+
+// Breakpoint information, where each starts and stops
+// if a breakpoint is not fluid, then the start value is equal to the main col value plus 2x the gutter at this breakpoint
+/* 1540 = $max-width + 50 + 50 */
+$breakpoints: (
+  xsmall: (start: null, end: 599),
+  small: (start: 600, end: 849),
+  medium: (start: 850, end: 1039),
+  large: (start: 1040, end: 1539),
+  xlarge: (start: 1540, end: null),
+);
+$color__border: #e5e5e5;//$color__black--10;
+$color__border--hover: #d9d9d9;
+$color__border--light: #f2f2f2;
+
+$color__text: #262626; //$color__black--85;
+$color__text--light: #8c8c8c; //$color__black--45;

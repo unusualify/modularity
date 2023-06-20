@@ -6,19 +6,24 @@ import { fa } from 'vuetify/iconsets/fa'
 import '@fortawesome/fontawesome-free/css/all.min.css' // Ensure you are using css-loader
 import '@mdi/font/css/materialdesignicons.css' // Ensure you are using css-loader
 
-import 'vuetify/styles'
-// import 'vuetify/lib/styles/main.sass'
+import 'styles/themes/b2press/_main.scss'
+// import 'vuetify/styles'
+
 import * as components from 'vuetify/lib/components'
 import * as directives from 'vuetify/lib/directives'
 // import { VTreeview } from 'vuetify/lib/components/VTreeview'
 
 import customMdiIcons from '@/config/icons/mdi'
-import light from '@/config/themes/light'
-import dark from '@/config/themes/dark'
 
 // import { md2 } from 'vuetify/blueprints'
 
-import { VBtn, VTextField } from 'vuetify/lib/components'
+import { VBtn } from 'vuetify/lib/components'
+
+import * as themes from '@/config/themes'
+// import 'vuetify/lib/styles/main.sass'
+
+const APP_THEME = process.env.VUE_APP_THEME
+// import('../../sass/themes/' + APP_THEME + '/_index.sass')
 
 function loadIcons ($font) {
   const locales = require.context('../config/icons', true, /[A-Za-z0-9-_,\s]+.json$/i)
@@ -40,6 +45,8 @@ const opts = {
   aliases: {
     VBtnSecondary: VBtn,
     VBtnTertiary: VBtn,
+    VBtnCta: VBtn,
+    VBtnCtaSecondary: VBtn,
     VBtnSuccess: VBtn
   },
   defaults: {
@@ -47,21 +54,28 @@ const opts = {
       ripple: false
     },
     VSheet: {
+      class: 'rounded'
     //   elevation: 4
     },
-    VTextField: {
-      variant: 'outlined'
-    },
     VBtn: {
-      color: 'primary'
+      color: 'primary',
+      style: { textTransform: 'none' }
     },
     VBtnSecondary: {
-      color: 'secondary',
-      variant: 'tonal'
+      color: 'primary',
+      variant: 'outlined'
     },
     VBtnTertiary: {
-      rounded: true,
-      variant: 'plain'
+      color: 'tertiary'
+      // variant: 'plain'
+    },
+    VBtnCta: {
+      color: 'cta'
+      // variant: 'plain'
+    },
+    VBtnCtaSecondary: {
+      color: 'cta-secondary'
+      // variant: 'plain'
     },
     VBtnSuccess: {
       color: 'success',
@@ -69,13 +83,9 @@ const opts = {
     }
 
   },
-
   theme: {
-    // defaultTheme: 'dark',
-    themes: {
-      light,
-      dark
-    }
+    defaultTheme: APP_THEME,
+    themes
   },
   icons: {
     defaultSet: 'mdi',
@@ -94,11 +104,11 @@ const opts = {
 
     // }
   },
+  directives,
   components: {
     ...components
     // VTreeview
-  },
-  directives
+  }
 }
 
 export default createVuetify(opts)

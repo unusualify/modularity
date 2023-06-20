@@ -3,17 +3,13 @@ const webpack = require('webpack')
 const fs = require('fs')
 const path = require('path')
 const dotenv = require('dotenv')
+const stack = require('callsite')
 
-const env = dotenv.config({ path: path.resolve(__dirname, '../../../../.env') })
-
-const isProd = process.env.NODE_ENV === 'production'
-
+const env = dotenv.config({ path: path.resolve(__dirname, '../../../../.env') }).parsed
+const isProd = env.NODE_ENV === 'production'
 const URL = 'crm.template'
-const DEV_ENV = process.env.UNUSUAL_DEV_ENV || 'container'
-
-// Define global vue variables
-process.env.VUE_APP_NAME = process.env.VUE_APP_NAME || 'UNUSUAL'
-process.env.BASE_URL = process.env.BASE_URL || 'crm.template:8080'
+const DEV_ENV = env.UNUSUAL_DEV_ENV || 'container'
+const APP_THEME = process.env.VUE_APP_THEME
 
 // eslint-disable-next-line no-console
 console.log('\x1b[32m', `\n🔥 Building Unusual assets in ${isProd ? 'production' : 'dev'} mode.`)
@@ -41,19 +37,18 @@ const WebpackNotifierPlugin = require('webpack-notifier')
 
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin')
 
-const { VueLoaderPlugin } = require('vue-loader')
+const { VuetifyPlugin } = require('webpack-plugin-vuetify')
 
 const srcDirectory = 'src'
-const partialsDirectory = '../../src/views/partials'
-const outputDir = isProd ? 'dist' : (process.env.UNUSUAL_DEV_ASSETS_PATH || 'dist')
-const assetsDir = process.env.UNUSUAL_ASSETS_DIR || 'unusual'
+const partialsDirectory = '../../src/Resources/views/partials'
+const outputDir = isProd ? 'dist' : (env.UNUSUAL_DEV_ASSETS_PATH || 'dist')
+const assetsDir = env.UNUSUAL_ASSETS_DIR || 'unusual'
 
 const pages = {
+  'core-dashboard': `${srcDirectory}/js/core-dashboard.js`,
   'core-form': `${srcDirectory}/js/core-form.js`,
-  'core-index': `${srcDirectory}/js/core-index.js`
-//   'main-buckets': `${srcDirectory}/js/main-buckets.js`,
-//   'main-dashboard': `${srcDirectory}/js/main-dashboard.js`,
-//   'main-free': `${srcDirectory}/js/main-free.js`
+  'core-index': `${srcDirectory}/js/core-index.js`,
+  'core-free': `${srcDirectory}/js/core-free.js`
 }
 
 const svgConfig = (suffix = null) => {
@@ -97,22 +92,14 @@ const plugins = [
     'window.axios': 'axios',
     'window.$': 'jquery',
     'window._': 'lodash'
-    // 'window.jQuery': 'jquery'
   }),
-  new webpack.DefinePlugin({
-    'process.env': JSON.stringify({
-      VUE_APP_NAME: process.env.VUE_APP_NAME,
-      ...env.parsed
-    }),
-    __VUE_I18N_FULL_INSTALL__: JSON.stringify(true),
-    __VUE_I18N_LEGACY_API__: JSON.stringify(true),
-    __INTLIFY_PROD_DEVTOOLS__: JSON.stringify(true)
-
-  })
-//   new VueLoaderPlugin()
-  //   new SVGSpritemapPlugin(`${srcDirectory}/icons/**/*.svg`, svgConfig()),
-  //   new SVGSpritemapPlugin(`${srcDirectory}/icons-files/**/*.svg`, svgConfig('files')),
-  //   new SVGSpritemapPlugin(`${srcDirectory}/icons-wysiwyg/**/*.svg`, svgConfig('wysiwyg')),
+  new VuetifyPlugin({
+    styles: {
+      configFile: 'src/sass/themes/' + APP_THEME + '/_settings.scss'
+    }
+  }),
+  new SVGSpritemapPlugin(`${srcDirectory}/icons/**/*.svg`, svgConfig()),
+  new SVGSpritemapPlugin(`${srcDirectory}/sass/themes/${APP_THEME}/icons/**/*.svg`, svgConfig('theme'))
 ]
 
 if (!isProd) {
@@ -205,9 +192,9 @@ if (fs.existsSync(appModuleFolder)) {
 }
 
 module.exports = defineConfig({
-//   transpileDependencies: [
-//     'vuetify'
-//   ],
+  // transpileDependencies: [
+  //   'vuetify'
+  // ],
   // Define base outputDir of build
   outputDir,
   // Define root asset directory
@@ -220,8 +207,26 @@ module.exports = defineConfig({
       // define global settings imported in all components
       scss: {
         additionalData: `
-            @import "styles/setup/_settings.scss";
-        `
+          // @import "styles/setup/_settings.scss";æ
+          @import "styles/themes/${APP_THEME}/_additional.scss";
+        `,
+        // debugInfo: true,
+        // sourceMap: true,
+        sassOptions: {
+          outputStyle: isProd ? 'expanded' : 'compressed',
+          // sourceComments: true,
+          // sourceMap: true,
+          // sourceMapContents: true,
+          functions: {
+            // debug (...args) {
+            //   const frame = stack()[1]
+            //   const fileInfo = `${frame.getFileName()}:${frame.getLineNumber()}`
+            //   console.log(`DEBUG [${fileInfo}]:`, ...args)
+            //   return null
+            // }
+          }
+        }
+
       }
     }
   },
@@ -230,6 +235,9 @@ module.exports = defineConfig({
   //   devServer,
   runtimeCompiler: true,
   configureWebpack: {
+    stats: {
+      loggingDebug: ['sass-loader']
+    },
     resolve: {
       alias: {
         // vue$: path.join(__dirname, 'node_modules/vue/dist/vue.esm-bundler.js'),
@@ -263,6 +271,7 @@ module.exports = defineConfig({
     config.resolve.alias.set('fonts', path.resolve(`${srcDirectory}/fonts`))
     config.resolve.alias.set('@', path.resolve(`${srcDirectory}/js`))
     config.resolve.alias.set('styles', path.resolve(`${srcDirectory}/sass`))
+    config.resolve.alias.set('css', path.resolve(`${srcDirectory}/css`))
     config.resolve.alias.set('__components', path.resolve(`${srcDirectory}/js/components`))
     config.resolve.alias.set('__layouts', path.resolve(`${srcDirectory}/js/components/layouts`))
     config.resolve.alias.set('__setup', path.resolve(`${srcDirectory}/js/setup`))

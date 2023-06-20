@@ -1,7 +1,7 @@
 <template>
     <ue-modal
         v-model="show"
-        v-bind="bindProps()"
+        v-bind="$bindAttributes()"
         width-type="md"
         >
         <template

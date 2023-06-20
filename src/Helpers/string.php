@@ -32,6 +32,12 @@ if (! function_exists('snakeCase')) {
     }
 }
 
+if (! function_exists('pluralize')) {
+    function pluralize($string) {
+        return Str::plural($string);
+    }
+}
+
 /**
  * Get the short name of class from class namespace
  *

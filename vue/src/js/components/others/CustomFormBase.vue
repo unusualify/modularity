@@ -5,7 +5,7 @@
     v-resize.quiet="onResize"
   >
     <!-- FORM-BASE TOP SLOT -->
-    <slot :name="getFormTopSlot()" :id= "id"/>
+    <slot :name="getFormTopSlot()" :id="id" />
     <!-- main loop over components/controls -->
     <template v-for="(obj, index) in flatCombinedArraySorted" :key="index">
       <!-- Tooltip Wrapper -->
@@ -32,7 +32,6 @@
             @dragstart="dragstart($event, obj)"
             @dragover="dragover($event, obj)"
             @drop="drop($event, obj)"
-
           >
             <!-- slot on top of type  -> <div slot="slot-bottom-type-[propertyName]"> -->
             <slot :name="getTypeTopSlot(obj)" v-bind= "{ obj, index, id }"/>
@@ -67,7 +66,7 @@
                 <v-radio-group
                   v-if="obj.schema.type === 'radio'"
                   v-bind="bindSchema(obj)"
-                  :value="setValue(obj)"
+                  :modelValue="setValue(obj)"
                   @change="onInput($event, obj)"
                 >
                   <v-radio
@@ -92,9 +91,9 @@
                         ...bindSchemaText(obj),
                         ...props
                       }"
-                      :value="setValue(obj)"
+                      :modelValue="setValue(obj)"
                       @[suspendClickAppend(obj)]="onEvent($event, obj, append)"
-                      @click:append-outer="onEvent($event, obj, appendOuter)"
+                      @click:append-inner="onEvent($event, obj, appendInner)"
                       @click:prepend="onEvent($event, obj, prepend)"
                       @click:prepend-inner="onEvent($event, obj, prependInner)"
                     />
@@ -104,8 +103,8 @@
                     :is="mapTypeToComponent( obj.schema.type )"
                     v-bind="bindSchema(obj)"
                     :type="checkInternType(obj)"
-                    :value="setValue(obj)"
-                    @update:model-value="onInput($event, obj)"
+                    :modelValue="setValue(obj)"
+                    @update:modelValue="onInput($event, obj)"
                     @click:hour="onEvent({type:'click'}, obj, hour)"
                     @click:minute="onEvent({type:'click'}, obj, minute)"
                     @click:second="onEvent({type:'click'}, obj, second)"
@@ -121,7 +120,7 @@
                     v-for="(item, idx) in setValue(obj)"
                     :key="getKeyForArray(id, obj, item, idx)"
                     v-bind="bindSchema(obj)"
-                    :value="setValue(obj)"
+                    :modelValue="setValue(obj)"
                   >
                     <slot :name="getArrayTopSlot(obj)" v-bind= "{ obj, id, index, idx, item}"/>
                     <slot :name="getArrayItemSlot(obj)" v-bind= "{ obj, id, index, idx, item}">
@@ -154,7 +153,7 @@
                     <v-card-title v-if="obj.schema.title">{{obj.schema.title}}</v-card-title>
                     <v-card-subtitle v-if="obj.schema.subtitle">{{obj.schema.subtitle}}</v-card-subtitle>
 
-                    <v-form-base
+                    <v-custom-form-base
                       :id="`${id}-${obj.key}`"
                       :model="setValue(obj)"
                       :schema="obj.schema.schema"
@@ -162,11 +161,11 @@
                       :col="getColGroupOrArray(obj)"
                       :class="`${id}-${obj.key}`"
                       v-bind="$attrs"
-                    >
+                      >
                       <!-- Based on https://gist.github.com/loilo/73c55ed04917ecf5d682ec70a2a1b8e2 -->
                       <template v-for="(_, name) in $slots" #[name]="slotData"><slot :name="name" v-bind= "{ id, obj, index,  ...slotData}" /></template>
 
-                    </v-form-base>
+                    </v-custom-form-base>
                   </component>
                 </template>
               <!-- END GROUP | WRAP -->
@@ -182,8 +181,8 @@
                   @update:active="onEvent({type:'click'}, obj, 'selected' )"
 
                   :items="obj.schema.items"
-                  :value="setValue(obj)"
-                  @update:model-value= "onInput($event, obj)"
+                  :modelValue="setValue(obj)"
+                  @update:modelValue= "onInput($event, obj)"
                 >
                   <!-- works with #[s]="slotData" " -->
                   <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]="slotData"><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index,  ...slotData}" /></template>
@@ -240,7 +239,7 @@
                 <component
                   v-else-if="/(switch|checkbox)/.test(obj.schema.type)"
                   :is="mapTypeToComponent(obj.schema.type)"
-                  :model-value="setValue(obj)"
+                  :modelValue="setValue(obj)"
                   v-bind="bindSchema(obj)"
                   @change="onInput($event, obj)"
                 >
@@ -253,7 +252,7 @@
                 <v-file-input
                   v-else-if="obj.schema.type === 'file' "
                   v-bind="bindSchema(obj)"
-                  :value="setValue(obj)"
+                  :modelValue="setValue(obj)"
                   @focus="onEvent($event, obj)"
                   @blur="onEvent($event, obj)"
                   @change="onInput($event, obj)"
@@ -275,7 +274,7 @@
                 <v-slider
                   v-else-if="obj.schema.type === 'slider'"
                   v-bind="bindSchema(obj)"
-                  @update:model-value="onInput($event, obj)"
+                  @update:modelValue="onInput($event, obj)"
                 >
                   <!-- some component works with #[s]="slotData"  some doesn't work with slot data ie: 'label'  / but 'thumb-label' works only with scopeData -->
                   <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index }" /></template>
@@ -299,7 +298,7 @@
                 <v-btn-toggle
                   v-else-if="obj.schema.type === 'btn-toggle'"
                   v-bind="bindSchema(obj)"
-                  :model-value="setValue(obj)"
+                  :modelValue="setValue(obj)"
                   @change="onInput($event, obj)"
                 >
                   <v-btn
@@ -354,20 +353,20 @@
                   v-bind="bindSchema(obj)"
                   v-mask="obj.schema.mask"
                   :type="checkExtensionType(obj)"
-                  :model-value="setValue(obj)"
+                  :modelValue="setValue(obj)"
                   :obj="obj"
                   v-model:[searchInputSync(obj)]="obj.schema.searchInput"
                   @focus= "onEvent($event, obj)"
                   @blur= "onEvent($event, obj)"
                   @[suspendClickAppend(obj)]="onEvent($event, obj, append)"
-                  @click:append-outer="onEvent($event, obj, appendOuter)"
+                  @click:append-inner="onEvent($event, obj, appendInner)"
                   @click:prepend="onEvent($event, obj, prepend )"
                   @click:prepend-inner="onEvent($event, obj, prependInner)"
                   @click:clear="onEvent($event, obj, clear )"
                   @click:hour="onEvent({type:'click'}, obj, hour)"
                   @click:minute="onEvent({type:'click'}, obj, minute)"
                   @click:second="onEvent({type:'click'}, obj, second)"
-                  @update:model-value="onInput($event, obj)"
+                  @update:modelValue="onInput($event, obj)"
                 >
                   <!-- component doesn't work with #[s]="slotData" " -->
                   <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index }"/></template>
@@ -380,20 +379,21 @@
                   :is="mapTypeToComponent(obj.schema.type)"
                   v-bind="bindSchema(obj)"
                   :type="checkExtensionType(obj)"
-                  :model-value="setValue(obj)"
+                  :modelValue="setValue(obj)"
                   :obj="obj"
                   v-model:[searchInputSync(obj)]="obj.schema.searchInput"
-                  @focus= "onEvent($event, obj)"
-                  @blur= "onEvent($event, obj)"
+                  @focus="onEvent($event, obj)"
+                  @blur="onEvent($event, obj)"
                   @[suspendClickAppend(obj)]="onEvent($event, obj, append)"
-                  @click:append-outer= "onEvent($event, obj, appendOuter)"
+                  @click:append-inner="onEvent($event, obj, appendInner)"
                   @click:prepend= "onEvent($event, obj, prepend )"
                   @click:prepend-inner= "onEvent($event, obj, prependInner)"
                   @click:clear= "onEvent($event, obj, clear )"
                   @click:hour= "onEvent({type:'click'}, obj, hour)"
                   @click:minute= "onEvent({type:'click'}, obj, minute)"
                   @click:second= "onEvent({type:'click'}, obj, second)"
-                  @update:model-value= "onInput($event, obj)"
+
+                  @update:modelValue="onInput($event, obj)"
                 >
                   <!-- component doesn't work with #[s]="slotData" " -->
                   <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]><slot :name= "getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index }"/></template>
@@ -426,10 +426,11 @@
 </template>
 
 <script>
+
 // Import
 // import Vue from 'vue'
-// import { getCurrentInstance } from 'vue'
-import { get, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay } from 'lodash'
+import { getCurrentInstance } from 'vue'
+import { get, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex } from 'lodash'
 
 // import VueMask from 'v-mask'
 // Vue.use(VueMask, {
@@ -451,25 +452,25 @@ const typeToComponent = {
   search: 'v-text-field',
   number: 'v-text-field',
   /*
-        { type:'text, ext:'typeOfTextField', ...}
-        For native <INPUT> type use alternative schema prop ext  -> schema:{ type:'text, ext:'date', ...}
-        correspond to <input type="number" >
-        number: 'v-text-field',   //  { type:'text, ext:'number', ...}
-        range: 'v-text-field',   //  { type:'text, ext:'range', ...}
-        date: 'v-text-field',    //  { type:'text, ext:'date', ...}
-        time: 'v-text-field',    //  { type:'text, ext:'time', ...}
-        color: 'v-text-field',   //  { type:'text, ext:'color', ...}
-      */
+    { type:'text, ext:'typeOfTextField', ...}
+    For native <INPUT> type use alternative schema prop ext  -> schema:{ type:'text, ext:'date', ...}
+    correspond to <input type="number" >
+    number: 'v-text-field',   //  { type:'text, ext:'number', ...}
+    range: 'v-text-field',   //  { type:'text, ext:'range', ...}
+    date: 'v-text-field',    //  { type:'text, ext:'date', ...}
+    time: 'v-text-field',    //  { type:'text, ext:'time', ...}
+    color: 'v-text-field',   //  { type:'text, ext:'color', ...}
+  */
 
   date: 'v-date-picker',
   time: 'v-time-picker',
   color: 'v-color-picker',
   /*
-        INFO: 3 Types of PICKER DATE / TIME / COLOR
-        Date-Native Input    - schema:{ type:'text, ext:'date', ...}
-        Date-Picker          - schema:{ type:'date', ...}
-        Date-Picker-Textmenu     - schema:{ type:'date', ext:'text'...}
-      */
+    INFO: 3 Types of PICKER DATE / TIME / COLOR
+    Date-Native Input    - schema:{ type:'text, ext:'date', ...}
+    Date-Picker          - schema:{ type:'date', ...}
+    Date-Picker-Textmenu     - schema:{ type:'date', ext:'text'...}
+  */
 
   // map schema.type to vuetify-control (vuetify 2.0)
   img: 'v-img',
@@ -480,35 +481,35 @@ const typeToComponent = {
   checkbox: 'v-checkbox',
   card: 'v-card'
   /*
-        HOW TO USE CUSTOM Components
-        1)
-          Name and Register your Custom-Control Component globally in 'main.js'
-          but avoid collision with registered names of Vuetify - Controls
-          See: https://vuejs.org/v2/guide/components-registration.html
+    HOW TO USE CUSTOM Components
+    1)
+      Name and Register your Custom-Control Component globally in 'main.js'
+      but avoid collision with registered names of Vuetify - Controls
+      See: https://vuejs.org/v2/guide/components-registration.html
 
-          Vue.component('custom-component', () => import('@/components/custom-component.vue') )
+      Vue.component('custom-component', () => import('@/components/custom-component.vue') )
 
-        2)
-          use it in Schema
+    2)
+      use it in Schema
 
-          mySchema: { myCustom: { type: 'custom-component' }
+      mySchema: { myCustom: { type: 'custom-component' }
 
-        3) // custom-component.vue
-          <template>
-            <v-text-field v-model="inp"  label="Basic"></v-text-field>
-          </template>
-          <script>
-            export default {
-              props: ['type','value', 'obj'],
-              computed:{
-                inp:{
-                  get(){  return this.value},
-                  set(v){ this.$emit('input', v)}
-                }
-              }
+    3) // custom-component.vue
+      <template>
+        <v-text-field v-model="inp"  label="Basic"></v-text-field>
+      </template>
+      <script>
+        export default {
+          props: ['type','value', 'obj'],
+          computed:{
+            inp:{
+              get(){  return this.value},
+              set(v){ this.$emit('input', v)}
             }
-          < /script>
-      */
+          }
+        }
+      < /script>
+  */
 
 }
 const orderDirection = 'ASC'
@@ -549,6 +550,7 @@ const focus = 'focus'
 const blur = 'blur'
 const append = 'append'
 const appendOuter = 'append-outer'
+const appendInner = 'append-inner'
 const prepend = 'prepend'
 const prependInner = 'prepend-inner'
 
@@ -577,7 +579,16 @@ const defaultPickerSchemaMenu = { closeOnContentClick: false, transition: 'scale
 const defaultInternGroupType = 'v-card'
 //
 export default {
+  setup () {
+    const _instance = getCurrentInstance()
+    const vueInstance = _instance.appContext
+
+    return {
+      vueInstance
+    }
+  },
   name: 'VFormBase',
+  // emits: ['update:modelValue'],
   props: {
     id: {
       type: String,
@@ -601,8 +612,7 @@ export default {
       default: () => null
     },
     model: {
-      type: [Object, Array],
-      default: () => ({})
+      type: [Object, Array]
     },
     schema: {
       type: [Object, Array],
@@ -620,18 +630,22 @@ export default {
       blur,
       append,
       appendOuter,
+      appendInner,
       prepend,
       prependInner,
       hour,
       minute,
-      second
+      second,
+
+      formSchema: this.schema
     }
   },
   computed: {
     valueIntern () {
-      // use <formbase :model="myData" />  ->  legacy code <formbase :value="myData" />
+      // use <formbase :model="myData" />  ->  legacy code <formbase :modelValue="myData" />
+      // __log('valueIntern computed', this.model, this.modelValue)
       const model = this.model || this.modelValue
-      this.updateArrayFromState(model, this.schema)
+      this.updateArrayFromState(model, this.formSchema)
       return model
     },
     parent () {
@@ -651,33 +665,49 @@ export default {
       return this.row || rowDefault
     },
     flatCombinedArraySorted () {
+      // __log('flatCombinedArraySorted computed', this.valueIntern, this.formSchema)
       return orderBy(this.flatCombinedArray, ['schema.sort'], [orderDirection])
     },
     storeStateData () {
-      this.updateArrayFromState(this.valueIntern, this.schema)
+      // __log('storeStateData computed', this.$lodash.pick(this.valueIntern, ['country_id', 'city_id', 'district_id']))
+      this.updateArrayFromState(this.valueIntern, this.formSchema)
       return this.valueIntern
     },
     storeStateSchema () {
-      this.updateArrayFromState(this.valueIntern, this.schema)
-      return this.schema
+      // __log('storeStateSchema computed', this.valueIntern, this.storeStateData)
+
+      this.updateArrayFromState(this.valueIntern, this.formSchema)
+      for (const key in this.formSchema) {
+        const sch = this.formSchema[key]
+        if (sch.type === 'select' && sch.hasOwnProperty('cascade')) {
+          // __log(
+          //   'storeStateSchema computed',
+          //   sch.name,
+          //   this.valueIntern[sch.name],
+          //   this.storeStateData,
+          //   sch.items,
+          //   find(sch.items, [sch.itemValue, this.valueIntern[sch.name]])
+          // )
+          this.formSchema[sch.cascade].items = find(sch.items, [sch.itemValue, this.valueIntern[sch.name]]).items ?? []
+          // this.formSchema[key].items = find(this.formSchema[sch.parent].items, [this.formSchema[sch.parent].itemValue, this.valueIntern[sch.parent]]).items
+        }
+      }
+      return this.formSchema
     }
   },
   watch: {
-    schema: function (newSchema) {
+    formSchema: function (newSchema) {
+      // __log('formSchema watch', this.valueIntern)
       this.rebuildArrays(this.valueIntern, newSchema)
-      // this.schema = newSchema
+      this.formSchema = newSchema
     }
   },
   methods: {
     // MAP TYPE
     mapTypeToComponent (type) {
-      // __log(
-      //   this,
-      //   this.$app,
-      //   this.$app._instance
-      // )
+      // __log(this.vueInstance.components)
       // merge global registered components into typeToComponent Object
-      const allTypeComponents = { ...typeToComponent, ...this.$app._instance.appContext.components }
+      const allTypeComponents = { ...typeToComponent, ...this.vueInstance.components }
       // const typeToComponent -> maps type to according v-component
       // ie. schema:{ type:'password', ... } to specific vuetify-control or default to v-text-field'
       return allTypeComponents[type] ? allTypeComponents[type] : `v-${type}`
@@ -1014,6 +1044,11 @@ export default {
       value = obj.schema.type === 'number' ? Number(value) : value
       // update deep nested prop(key) with value
       this.setObjectByPath(this.storeStateData, obj.key, value)
+      obj.value = obj.value !== value ? value : obj.value
+      // __log(value, obj.key)
+
+      // when cascade select changed
+      this.setCascadeSelect(obj)
 
       const emitObj = {
         on: type,
@@ -1027,7 +1062,21 @@ export default {
         schema: this.storeStateSchema,
         parent: this.parent
       }
+
+      // __log(
+      //   'v-custom-form-base onInput',
+      //   type,
+      //   value,
+      //   this.storeStateData.name,
+      //   this.model.name
+      // )
+      // __log(
+      //   'v-custom-form-base onInput',
+      //   obj
+      // )
+      // __log('onInput', type, emitObj)
       this.emitValue(type, emitObj)
+
       return emitObj
     },
     onEvent (event = {}, obj, tag) {
@@ -1053,7 +1102,7 @@ export default {
       }
 
       delay(() => { this.emitValue(event.type, emitObj), onEventDelay })
-
+      // __log(emitObj)
       return emitObj
     },
     onClickOutside (event, obj) {
@@ -1075,8 +1124,18 @@ export default {
     //
     // EMIT EVENT
     emitValue (event, val) {
-      const emitEvent = change.includes(event) ? 'change' : watch.includes(event) ? 'watch' : mouse.includes(event) ? 'mouse' : display.includes(event) ? 'display' : event
+      // const mouse = 'mouseenter|mouseleave'
+      // const change = 'input|click' // event change collects events 'input|click'
+      // const watch = 'focus|input|click|blur' // event watch collects events 'focus|input|click|blur'
+      // const display = 'resize|swipe|intersect' // event watch collects events 'resize|swipe|intersect'
 
+      // const emitEvent = change.includes(event) ? 'change' : watch.includes(event) ? 'watch' : mouse.includes(event) ? 'mouse' : display.includes(event) ? 'display' : event
+      // const listener = event
+
+      const emitEvent = change.includes(event) ? 'onChange' : watch.includes(event) ? 'onWatch' : mouse.includes(event) ? 'onMouse' : display.includes(event) ? 'onDisplay' : event
+      const listener = 'on' + this.$lodash.startCase(this.$lodash.camelCase(event)).replace(/ /g, '')
+
+      // __log(event, emitEvent, listener, this.id, this.$attrs)
       if (this.$attrs[`${emitEvent}:${this.id}`]) {
         this.deprecateEventCustomID(emitEvent)
         this.deprecateCombinedEvents(emitEvent, event)
@@ -1084,11 +1143,15 @@ export default {
       } else if (this.$attrs[`${emitEvent}`]) {
         this.deprecateCombinedEvents(emitEvent, event)
         this.$emit(emitEvent, val) // listen to specific event only
-      } else if (this.$attrs[`${event}:${this.id}`]) {
+      } else if (this.$attrs[`${listener}:${this.id}`]) {
         this.deprecateEventCustomID(event)
         this.$emit(`${event}:${this.id}`, val) // listen to specific event only
-      } else if (this.$attrs[`${event}`]) {
+      } else if (this.$attrs[`${listener}`]) {
+        // __log(event, listener, this.$attrs)
+        // __log(listener, event, val, this.storeStateData)
         this.$emit(event, val) // listen to specific event only
+        this.$emit(listener, val) // listen to specific event only
+        this.$emit('update:modelValue', this.storeStateData) // listen to specific event only
       }
     },
     deprecateEventCustomID (ev) {
@@ -1110,11 +1173,15 @@ export default {
       // resolves chained keys (like 'user.address.street') on an object and set the value
       const pathArray = path.split(pathDelimiter)
       pathArray.forEach((p, ix) => {
+        // if (ix === pathArray.length - 1) this.$set(object, p, value)
         if (ix === pathArray.length - 1) object[p] = value
         object = object[p]
       })
+      // __log(object)
     },
     updateArrayFromState (data, schema) {
+      // __log(this.flatCombinedArray)
+
       this.flatCombinedArray.forEach(obj => {
         obj.value = get(data, obj.key, null) // get - lodash
         obj.schema = get(schema, obj.key, null) // get - lodash
@@ -1179,7 +1246,7 @@ export default {
         return val
       })
       // assign root props to avoid manipulating prop: schema
-      Object.keys(schema).forEach(key => this.schema[key] = schema[key])
+      Object.keys(schema).forEach(key => this.formSchema[key] = schema[key])
     },
 
     tryAutogenerateModelStructure (model, schema) {
@@ -1229,12 +1296,47 @@ export default {
       if (isEmpty(schema)) this.autogenerateSchema(model)
 
       // create flatted working array from schema and value
+      // __log(
+      //   this.storeStateData,
+      //   this.storeStateSchema
+      //   // this.flattenAndCombineToArray(this.storeStateData, this.storeStateSchema)
+      // )
+      // __log(this.storeStateData, this.storeStateSchema)
       this.flatCombinedArray = this.flattenAndCombineToArray(this.storeStateData, this.storeStateSchema)
+    },
+
+    setCascadeSelect (obj) {
+      if (obj.schema.type === 'select' && obj.schema.hasOwnProperty('cascade')) {
+        const cascadedSelectName = obj.schema.cascade
+        const selectItemValue = obj.schema.itemValue ?? 'id'
+
+        this.formSchema[cascadedSelectName].items = find(obj.schema.items, [selectItemValue, this.valueIntern[obj.key]]).items ?? []
+
+        const sortIndex = findIndex(this.flatCombinedArraySorted, ['key', cascadedSelectName])
+        // this.onInput(this.formSchema[obj.schema.cascade].items[0].value, this.flatCombinedArraySorted[sortedIndex], 'change')
+
+        this.storeStateData[cascadedSelectName] = this.formSchema[cascadedSelectName].items.length > 0 ? this.formSchema[cascadedSelectName].items[0].value : null
+        this.flatCombinedArraySorted[sortIndex].value = this.valueIntern[cascadedSelectName]
+
+        // __log(
+        //   'setCascadeSelect()',
+        //   this.$lodash.pick(this.storeStateData, ['country_id', 'city_id', 'district_id']),
+        //   this.$lodash.pick(this.valueIntern, ['country_id', 'city_id', 'district_id']),
+        //   this.$lodash.pick(this.model, ['country_id', 'city_id', 'district_id']),
+        //   this.$lodash.pick(this.modelValue, ['country_id', 'city_id', 'district_id'])
+        // )
+        this.setCascadeSelect(this.flatCombinedArraySorted[sortIndex])
+      }
     }
+
     //
   },
   created () {
-    this.rebuildArrays(this.valueIntern, this.schema)
+    // setInterval((self) => {
+    //   __log(self.flatCombinedArray)
+    // }, 5000, this)
+    // __log(this.formSchema)
+    this.rebuildArrays(this.valueIntern, this.formSchema)
   }
 }
 </script>

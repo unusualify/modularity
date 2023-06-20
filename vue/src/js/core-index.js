@@ -1,7 +1,7 @@
 import * as exports from '@/imports'
 
-// styles
-import 'styles/datatable.scss'
+// import 'styles/datatable.scss'
+// import `styles/themes/${process.env.VUE_APP_THEME}/pages/index.scss`
 
 // Component Imports
 import UEDatatable from '__components/others/Datatable.vue'
@@ -10,6 +10,8 @@ import UEModalForm from '__components/modals/ModalForm.vue'
 // Store modules
 import datatable from '@/store/modules/datatable'
 import form from '@/store/modules/form'
+// styles
+__log(process.env)
 
 const store = exports.store
 

@@ -1,3 +1,3 @@
-<div class="mx-5 my-5">
+<div class="rounded">
     <ue-table/>
 </div>

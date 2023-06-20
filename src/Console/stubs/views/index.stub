@@ -1,19 +1,65 @@
-@extends('base::layouts.master', [
-    'title' => '$STUDLY_NAME$'
-])
+@extends("$BASE_KEY::layouts.master")
+
+@section('appTypeClass', 'body--listing')
+
+@php
+    $translate = $translate ?? false;
+    $translateTitle = $translateTitle ?? $translate ?? false;
+    $reorder = $reorder ?? false;
+    $nested = $nested ?? false;
+    $bulkEdit = $bulkEdit ?? true;
+    $create = $create ?? false;
+    $skipCreateModal = $skipCreateModal ?? false;
+    $controlLanguagesPublication = $controlLanguagesPublication ?? true;
+@endphp
+
 
 @section('content')
-    <main-component :menu-configuration='@json($menuConfiguration)' >
-        
-        <div >
-            {!! $repository->renderDataTable() !!}
-        </div>
+    @include("$BASE_KEY::components.datatable")
+@stop
 
-    </main-component>
+@push('head_last_js')
+    @if( app()->isProduction() )
+        <link href="{{ unusualMix('core-index.js') }}" rel="preload" as="script" crossorigin />
+    @else
+
+
+    @endif
+@endpush
+@push('post_js')
+    <script src="{{ unusualMix('core-index.js') }}"></script>
+@endpush
+
+@section('STORE')
+    window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {
+        index:  '{{ $indexEndpoint }}',
+        create: '{{ $createEndpoint ?? $indexEndpoint."/create" }}',
+        edit:   '{{ $editEndpoint ?? $indexEndpoint."/:id/edit" }}',
+        store:  '{{ $indexEndpoint }}',
+        update: '{{ $indexEndpoint . "/:id" }}',
+        delete: '{{ $indexEndpoint . "/:id" }}',
+    }
+
+    window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].STORE.form = {
+        inputs: {!! json_encode($formSchema) !!},
+        fields: []
+    }
+
+    window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].STORE.datatable = {
+        baseUrl: '{{ rtrim(config('app.url'), '/') . '/' }}',
+        name: '{{ $routeName}}',
+        headers: {!! json_encode($headers) !!},
+        searchText: '{{ $searchText ?? '' }}',
+        options: {!! json_encode($listOptions) !!},
+        actions: {!! json_encode($actions) !!},
+        actionsType: '{{ $actionsType ?? 'inline' }}',
+        data: {!! json_encode($initialResource['data']) !!},
+        total: '{{ $initialResource['total'] ?? 0 }}',
+        mainFilters: {!! json_encode($tableMainFilters) !!},
+        filter: { status: '{{ $filters['status'] ?? $defaultFilterSlug ?? 'all' }}' },
+    }
+
 @endsection
 
-@section('initial-scripts')
 
-    <script src="{{ asset('js/admin.js') }}"></script>
 
-@endsection

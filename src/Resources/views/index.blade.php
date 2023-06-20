@@ -1,4 +1,4 @@
-@extends('base::layouts.master')
+@extends("{$BASE_KEY}::layouts.master")
 
 @section('content')
     <h1>Hello World</h1>

@@ -18,10 +18,46 @@ return [
     'manifest' => 'unusual-manifest.json',
     'js_namespace' => 'UNUSUAL',
     'build_timeout' => 300,
+    'use_big_integers_on_migrations' => true,
 
-    'locale' => 'en',
+    'users_table_name' => 'users',
 
+    'locale' => 'tr',
     'fallback_locale' => 'en',
+
+    'default_input' => [
+        'hint' => '',
+        'placeholder' => '',
+        'default' => '',
+        'col' => [
+            'cols' => 12,
+            'sm' => 12,
+            'md' => 8,
+            'lg' => 6,
+            'xl' => 6,
+        ],
+        'offset' => [
+            'offset' => 0,
+            'offset-sm' => 0,
+            'offset-md' => 0,
+            'offset-lg' => 0,
+            'offset-xl' => 0,
+        ],
+        'order' => [
+            'order' => 0,
+            'order-sm' => 0,
+            'order-md' => 0,
+            'order-lg' => 0,
+            'order-xl' => 0,
+        ],
+        'prependIcon' => '',
+        'prependInnerIcon' => '',
+        'appendIcon' => '',
+        'appendInnerIcon' => '',
+        'variant' => 'outlined',
+        // 'density' => 'compact',
+        // 'dense',
+    ],
 
     'paths' => [
         'generator' => [
@@ -31,7 +67,7 @@ return [
             'route-controller' => ['path' => 'Http/Controllers', 'generate' => true],
             'route-controller-api' => ['path' => 'Http/Controllers/API', 'generate' => true],
             'route-request' => ['path' => 'Http/Requests', 'generate' => true],
-            'view' => ['path' => 'Resources/views/$LOWER_NAME$', 'generate' => true],
+            // 'view' => ['path' => 'Resources/views/$SNAKE_NAME$', 'generate' => true],
         ]
     ],
 
@@ -47,8 +83,7 @@ return [
             'routes/web' => 'Routes/web.php',
             'routes/api' => 'Routes/api.php',
             'views/index' => 'Resources/views/$SNAKE_CASE$/index.blade.php',
-            'views/create' => 'Resources/views/$SNAKE_CASE$/create.blade.php',
-            'views/edit' => 'Resources/views/$SNAKE_CASE$/edit.blade.php',
+            'views/form' => 'Resources/views/$SNAKE_CASE$/form.blade.php',
             // 'repository' => 'Repositories/$STUDLY_NAME$Repository.php',
             // 'route-controller' => 'Http/Controllers/$STUDLY_NAME$Controller.php',
             // 'route-controller-api' => 'Http/Controllers/API/$STUDLY_NAME$Controller.php',
@@ -57,8 +92,7 @@ return [
             'routes/web' => ['LOWER_NAME', 'STUDLY_NAME'],
             'routes/api' => ['LOWER_NAME'],
             'views/index' => ['STUDLY_NAME'],
-            'views/create' => ['STUDLY_NAME'],
-            'views/edit' => ['STUDLY_NAME'],
+            'views/form' => ['STUDLY_NAME'],
             // 'route-controller' => ['NAMESPACE', 'MODULE', 'MODULE_NAMESPACE', 'CLASS', 'STUDLY_NAME', 'LOWER_NAME'],
             // 'route-controller-api' => ['NAMESPACE', 'MODULE', 'CLASS', 'STUDLY_NAME', 'LOWER_NAME'],
             // 'repository' => ['NAMESPACE', 'CLASS', 'MODULE','STUDLY_NAME', 'MODEL']
@@ -159,6 +193,7 @@ return [
     'enabled' => [
         'media-library' => true,
         'users-management' => true,
+
         // 'file-library' => true,
         // 'block-editor' => true,
         // 'buckets' => true,

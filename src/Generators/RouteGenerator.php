@@ -457,6 +457,7 @@ class RouteGenerator extends Generator
      */
     public function generateFolders()
     {
+
         foreach ($this->getFolders() as $key => $folder) {
 
             $folder = $this->generatorConfig($key);
@@ -612,16 +613,17 @@ class RouteGenerator extends Generator
     {
         $config = $this->getConfig()->get( $this->getModule()->getLowerName() ) ?? [];
 
-        $lowerName = $this->getLowerNameReplacement();
+        // $lowerName = $this->getLowerNameReplacement();
+        // $headline = $this->getHeadline($this->getName());
         $studlyName = $this->getStudlyNameReplacement();
-        $headline = $this->getHeadline($this->getName());
         $kebabCase = $this->getKebabCase($this->getName());
         $snakeCase = $this->getSnakeCase($this->getName());
 
         $configPath = $this->module->getPath().'/Config/config.php';
 
         $route_array = [
-            'name' => $headline,
+            'name' => $studlyName,
+            'headline' => pluralize($this->getName()),
             'url' => $kebabCase,
             'route_name' => $snakeCase,
             'icon' => '$modules',

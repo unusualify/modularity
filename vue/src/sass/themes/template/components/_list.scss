@@ -1,0 +1,10 @@
+.v-application {
+  span.icon{
+    &.icon--main-logo{
+      svg{
+        max-height: 60px;
+        padding: 10px 0;
+      }
+    }
+  }
+}

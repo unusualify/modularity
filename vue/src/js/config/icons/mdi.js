@@ -16,6 +16,8 @@ export default {
   media: 'mdi-image-album',
   modules: 'mdi-view-module',
 
+  'non-visibility': 'mdi-eye-off',
+
   package: 'mdi-package',
   permission: 'mdi-account-arrow-right',
   product: 'mdi-dropbox',
@@ -26,5 +28,7 @@ export default {
 
   // userAdd: 'fa-user-plus',
   userAdd: 'mdi-account-edit',
-  users: 'mdi:mdi-account-multiple'
+  users: 'mdi:mdi-account-multiple',
+
+  visibility: 'mdi-eye'
 }

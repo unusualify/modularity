@@ -9,6 +9,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 
 use OoBook\CRM\Base\Facades\UnusualRoutes;
 use Nwidart\Modules\Facades\Module;
+use OoBook\CRM\Base\Http\Middleware\{LanguageMiddleware, ImpersonateMiddleware};
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -53,59 +54,46 @@ class RouteServiceProvider extends ServiceProvider
         );
     }
 
-    private function mapModuleRoutes(
-        $router,
-        $groupOptions,
-        $middlewares
-    ) {
-        foreach(Module::all() as $module){
-            if( $module->getName() != 'Base' && $module->isStatus(true)){
-                UnusualRoutes::registerRoutes(
-                    $router,
-                    $groupOptions,
-                    $middlewares,
-                    'Modules' . "\\" . $module->getStudlyName() . '\Http\Controllers',
-                    $module->getPath()."/Routes/web.php",
-                    true
-                );
-
-            }
-        }
-    }
-
     private function mapBaseRoutes(
         $router,
         $groupOptions,
         $middlewares,
         $supportSubdomainRouting = false
     ) {
-
-        $internalRoutes = function ($router) use (
-            $middlewares,
-            $supportSubdomainRouting
-        ) {
-
-            $router->group(
-                [
-                    'middleware' => $middlewares
-                ],
-                function ($router) {
-                    require __DIR__ . '/../Routes/web.php';
-                }
-            );
-
-        };
-
         $router->group(
             $groupOptions + [
                 'namespace' => $this->namespace,
             ],
-            function ($router) use ($internalRoutes, $supportSubdomainRouting) {
+            function ($router) use ($middlewares, $supportSubdomainRouting) {
+
+                $router->group(
+                    [
+                        'middleware' => $supportSubdomainRouting ? ['supportSubdomainRouting'] : [],
+                    ],
+                    function ($router) {
+                        require __DIR__ . '/../Routes/auth.php';
+                    }
+                );
+                // internal routes web.php
                 $router->group(
                     [
                         // 'domain' => config('twill.admin_app_url'),
                     ],
-                    $internalRoutes
+                    function ($router) use (
+                        $middlewares,
+                        $supportSubdomainRouting
+                    ) {
+
+                        $router->group(
+                            [
+                                'middleware' => $middlewares
+                            ],
+                            function ($router) {
+                                require __DIR__ . '/../Routes/web.php';
+                            }
+                        );
+
+                    }
                 );
 
                 // if ($supportSubdomainRouting) {
@@ -160,6 +148,26 @@ class RouteServiceProvider extends ServiceProvider
         }
     }
 
+    private function mapModuleRoutes(
+        $router,
+        $groupOptions,
+        $middlewares
+    ) {
+        foreach(Module::all() as $module){
+            if( $module->getName() != 'Base' && $module->isStatus(true)){
+                UnusualRoutes::registerRoutes(
+                    $router,
+                    $groupOptions,
+                    $middlewares,
+                    'Modules' . "\\" . $module->getStudlyName() . '\Http\Controllers',
+                    $module->getPath()."/Routes/web.php",
+                    true
+                );
+
+            }
+        }
+    }
+
     /**
      * Register Route middleware.
      *
@@ -168,18 +176,23 @@ class RouteServiceProvider extends ServiceProvider
      */
     private function registerRouteMiddlewares(Router $router)
     {
-        Route::aliasMiddleware(
-            'supportSubdomainRouting',
-            SupportSubdomainRouting::class
-        );
-        Route::aliasMiddleware('impersonate', Impersonate::class);
-        Route::aliasMiddleware('twill_auth', Authenticate::class);
-        Route::aliasMiddleware('twill_guest', RedirectIfAuthenticated::class);
-        Route::aliasMiddleware(
-            'validateBackHistory',
-            ValidateBackHistory::class
-        );
-        Route::aliasMiddleware('localization', Localization::class);
+        // Route::aliasMiddleware(
+        //     'supportSubdomainRouting',
+        //     SupportSubdomainRouting::class
+        // );
+        // Route::aliasMiddleware('twill_auth', Authenticate::class);
+        // Route::aliasMiddleware('twill_guest', RedirectIfAuthenticated::class);
+        // Route::aliasMiddleware(
+            //     'validateBackHistory',
+            //     ValidateBackHistory::class
+            // );
+
+        Route::aliasMiddleware('impersonate', ImpersonateMiddleware::class);
+        Route::aliasMiddleware('language', LanguageMiddleware::class);
+
+        Route::aliasMiddleware('role', \Spatie\Permission\Middlewares\RoleMiddleware::class);
+        Route::aliasMiddleware('permission', \Spatie\Permission\Middlewares\PermissionMiddleware::class);
+        Route::aliasMiddleware('role_or_permission', \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class);
     }
 
     /**
@@ -398,8 +411,7 @@ class RouteServiceProvider extends ServiceProvider
                         $url = $value['url'] ?? $sub_camel;
 
                         $names = $sub['route_name'] ?? $sub_camel;
-                        // dd($sub, $config);
-                        // Route::resource($url, $studlyName.'Controller' , ['names' => $names]);
+
                         if(isset($sub['nested']) && $sub['nested']){
                             Route::resource($parent_camel.".".$url, $parentStudly.$subStudly.'Controller',[
                                 'names' => ($parent['route_name'] ?? $parent_camel) . "." . $names

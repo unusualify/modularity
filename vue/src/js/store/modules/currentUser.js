@@ -1,5 +1,5 @@
 const state = {
-
+  locale: window[process.env.VUE_APP_NAME].LOCALE ?? 'en'
 }
 
 const getters = {

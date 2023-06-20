@@ -1,0 +1,81 @@
+@use 'abstract/variables' as c;
+@use 'styles/abstract/functions' as *;
+@forward 'vuetify/settings' with (
+  $color-pack: false,
+  $utilities: '',
+
+  // $button-height: map-get(c.$vuetify, 'button-height'),
+  $button-font-weight: map-get(c.$vuetify, 'button-font-weight'),
+  $button-font-size: map-get(c.$vuetify, 'button-font-size'),
+  $button-max-width: map-get(c.$vuetify, 'button-max-width'),
+
+  // INPUT
+  // $field-border-radius: settings.$border-radius-root !default;
+  // $field-rounded-border-radius: map-get(settings.$rounded, 'pill') !default;
+  // $field-color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity)) !default;
+  // $field-disabled-color: rgba(var(--v-theme-on-surface), var(--v-disabled-opacity)) !default;
+  // $field-error-color: rgb(var(--v-theme-error)) !default;
+  $field-font-size: map-get(c.$vuetify, 'field-font-size'),
+  // $field-letter-spacing: .009375em !default;
+  // $field-max-width: 100% !default;
+  // $field-transition-timing: .15s settings.$standard-easing !default;
+  // $field-subtle-transition-timing: 250ms settings.$standard-easing !default;
+  // $field-underlined-margin-bottom: 4px !default;
+  // $field-clearable-margin: 4px !default;
+  // $field-clearable-transition: .15s opacity, .15s width settings.$standard-easing !default;
+
+  // // CONTROL
+  // $field-control-solo-background: rgb(var(--v-theme-surface)) !default;
+  // $field-control-solo-color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)) !default;
+  // $field-control-solo-elevation: 2 !default;
+  // $field-control-solo-inverted-color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)) !default;
+  // $field-control-solo-inverted-focused-color: rgb(var(--v-theme-on-surface-variant)) !default;
+  // $field-control-filled-background: rgba(var(--v-theme-on-surface), var(--v-idle-opacity)) !default;
+  // $field-control-padding-start: 16px !default;
+  // $field-control-padding-end: 16px !default;
+  // $field-control-padding-top: 10px !default;
+  // $field-control-padding-bottom: 5px !default;
+  // $field-control-affixed-padding: 12px !default;
+  // $field-control-affixed-inner-padding: 6px !default;
+  // $field-control-underlined-height: 48px !default;
+  // $field-control-underlined-padding-bottom: 2px !default;
+  // $field-control-height: 56px !default;
+
+  $field-label-floating-scale: 0.81,
+
+  // $input-density: ('default': 0, 'comfortable': -2, 'compact': -4) !default;
+  // $input-control-height: 40px,
+  // $input-font-size: tools.map-deep-get(settings.$typography, 'body-1', 'size') !default;
+  // $input-font-weight: tools.map-deep-get(settings.$typography, 'body-1', 'weight') !default;
+  $input-line-height: 1.3,
+  // $input-details-font-size: .75rem !default;
+  // $input-details-font-weight: 400 !default;
+  // $input-details-letter-spacing: .0333333333em !default;
+  // $input-details-line-height: normal !default;
+  // $input-details-min-height: 22px !default;
+  // $input-details-padding-above: 6px !default;
+  // $input-details-transition: 150ms settings.$standard-easing !default;
+
+  $navigation-drawer-background: map-get(c.$vuetify, 'navigation-drawer-background'),
+  $navigation-drawer-color: map-get(c.$vuetify, 'navigation-drawer-color'),
+
+  // $list-background: map-get(c.$vuetify, 'list-background'),
+  $list-color: map-get(c.$vuetify, 'list-color'), //rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)),
+  $list-padding: map-get(c.$vuetify, 'list-padding'),
+  $list-nav-padding: map-get(c.$vuetify, 'list-nav-padding'),
+  $list-item-one-line-padding: map-get(c.$vuetify, 'list-item-one-line-padding'),
+  $list-item-padding: map-get(c.$vuetify, 'list-item-padding'),
+
+  $table-border-color: map-get(c.$vuetify, 'table-border-color'),
+);
+// @use 'vuetify/settings' as v;
+
+
+// @use 'config/variables' as c;
+// @include use-with(c.$vuetify, 'vuetify/settings');
+// @use 'vuetify/settings' with($vuetify);
+
+$vuetify: map-list-to-map(c.$vuetify);
+
+// @debug( map-get($vuetify, 'list-color') );
+

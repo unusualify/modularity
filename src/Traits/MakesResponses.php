@@ -51,7 +51,7 @@ trait MakesResponses {
      */
     protected function getBackLinkSessionKey()
     {
-        return $this->moduleName . ($this->nested ? $this->submoduleParentId ?? '' : '') . '_back_link';
+        return $this->moduleName . ($this->isNested ? $this->submoduleParentId ?? '' : '') . '_back_link';
         return $this->moduleName . ($this->submodule ? $this->submoduleParentId ?? '' : '') . '_back_link';
     }
 
@@ -68,6 +68,7 @@ trait MakesResponses {
             $this->routePrefix,
             'edit',
             array_filter($params) + [Str::singular($this->moduleName) => $id],
+            debug_backtrace()
         );
         return Redirect::to(moduleRoute(
             $this->moduleName,

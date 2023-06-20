@@ -8,6 +8,10 @@ import store from '@/store'
 
 import { RootMixin } from '@/mixins'
 
+// Global styles
+import 'styles/wireframe.scss'
+// import 'styles/themes/default/_main.scss'
+// import(`styles/themes/${process.env.VUE_APP_THEME}/pages/index.scss`)
 // import { loadFonts } from '@/plugins/webfontloader'
 
 // loadFonts()

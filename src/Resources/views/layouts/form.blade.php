@@ -1,4 +1,4 @@
-@extends('base::layouts.master')
+@extends("{$BASE_KEY}::layouts.master")
 
 @section('appTypeClass', 'body--form')
 
@@ -74,16 +74,18 @@
     @endif
 
     @if($new_form)
-        <ue-form-base
-            :has-submit="true"
-            :sticky-button="true"
-            :schema='@json($formSchema)'
-            @if($editable)
-                :value='@json($item)'
-            @endif
-            >
-
-        </ue-form-base>
+        <v-sheet>
+            {{-- <ue-stepper-form></ue-stepper-form> --}}
+            <ue-form
+                :has-submit="true"
+                :sticky-button="false"
+                :schema='@json($formSchema)'
+                @if($editable)
+                    :model-value='@json($item)'
+                @endif
+                >
+            </ue-form>
+        </v-sheet>
     @endif
 @stop
 

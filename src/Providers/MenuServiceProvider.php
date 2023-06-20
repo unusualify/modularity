@@ -54,13 +54,14 @@ class MenuServiceProvider extends ServiceProvider
                 // dd($config);
                 // menu list element
                 $array = [
-                    'text' => $config['name'] ?? $pr['name'] ?? 'Items',
-                    'icon' => $config['icon'] ?? $pr['icon'] ?? '',
+                    'text' => $config['headline'] ?? $pr['headline'] ?? pluralize($pr['name']) ?? pluralize($config['name']) ??'Items',
+                    'icon' => '',
                     'is_active' => 0
                 ];
 
                 if( isset($config['sub_routes']) && !empty($config['sub_routes']) ){
                     $array['items'] = [];
+                    $array['icon'] = $config['icon'] ?? '';
 
                     $parent_route_name = $pr['route_name'].".index";
 
@@ -71,8 +72,12 @@ class MenuServiceProvider extends ServiceProvider
                         $link = route( $parent_route_name );
                         $is_active = $link == $configuration['current_url'] ? 1 : 0;
 
+                        if($is_active){
+                            $array['is_active'] = $is_active;
+                        }
+
                         $array['items'][] = [
-                            'text' => Str::plural( $pr['name'] ),
+                            'text' => $pr['headline'] ?? pluralize($pr['name']) ?? pluralize($config['name']) ??'Items',
                             'link' => route($parent_route_name),
                             'icon' => $config['parent_route']['icon'] ?? '',
                             'is_active' => $is_active
@@ -87,7 +92,7 @@ class MenuServiceProvider extends ServiceProvider
                             $route_name = strtolower(config($this->baseKey . '.name')) . "." . $route_name;
 
                         if( Route::has($route_name) ){
-                            $text = Str::plural( $sr['name'] );
+                            $text = $sr['headline'] ?? pluralize($sr['name']);
                             $link = route( $route_name );
                             $is_active = $link == $configuration['current_url'] ? 1 : 0;
 
@@ -108,8 +113,8 @@ class MenuServiceProvider extends ServiceProvider
                             }
 
                             $array['items'][] = [
-                                'icon' => $sr['icon'] ?? '',
                                 'text' => $text,
+                                'icon' => $sr['icon'] ?? '',
                                 'link' => $link,
                                 'is_active' => $is_active,
                             ];
@@ -117,6 +122,7 @@ class MenuServiceProvider extends ServiceProvider
                     }
 
                 } else {
+                    $array['icon'] = $pr['icon'] ?? '';
 
                     $route_name =  $pr['route_name'].".index";
 
@@ -142,14 +148,12 @@ class MenuServiceProvider extends ServiceProvider
             // ];
             $configuration['sideMenu'][] = [
                 'text' => 'Media Library',
-                'icon' => '$media',
+                // 'icon' => '$media',
                 'attr' => 'data-medialib-btn',
                 // 'event' => '_triggerOpenMediaLibrary',
                 'event' => 'openFreeMediaLibrary',
             ];
 
-
-            // dd($configuration);
             // dd($configuration, $configs);
             $view->with('configuration', $configuration);
         });

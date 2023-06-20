@@ -7,16 +7,15 @@
         <title> {{ $title ?? 'Module Template' }}</title>
         <meta name="csrf-token" content="{{ csrf_token() }}">
         @yield('pre-scripts') --}}
-        @include('base::partials.head')
+        @include("{$BASE_KEY}::partials.head")
 
         @stack('head_last_js')
     </head>
     <body>
-        @include('base::partials.icons.svg-sprite')
+        @include("{$BASE_KEY}::partials.icons.svg-sprite")
 
         {{-- @dd( auth()->user() ) --}}
         @php
-
             $isMiniSidebar = false;
         @endphp
         {{-- @dd($sideMenu) --}}
@@ -26,7 +25,7 @@
                 ref='main'
                 :configuration='@json($configuration)'
                 >
-                <div id="ue-main-body">
+                <div id="ue-main-body" class="ue--main-container">
 
                     @yield('content')
 
@@ -54,7 +53,9 @@
         {{-- @yield('initial-scripts') --}}
         <script>
             window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'] = {};
+            window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].LOCALE = '{{ config(getUnusualBaseKey() . '.locale') }}';
             window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].version = '{{ config(getUnusualBaseKey() . '.version') }}';
+            window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {};
             window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].STORE = {};
 
             window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].STORE.config = {
@@ -72,7 +73,7 @@
             @if (config(getUnusualBaseKey() . '.enabled.media-library'))
                 window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].STORE.medias.types.push({
                     value: 'image',
-                    text: '{{ unusualTrans("base::lang.media-library.images") }}',
+                    text: '{{ unusualTrans("{$BASE_KEY}::lang.media-library.images") }}',
                     total: {{ \OoBook\CRM\Base\Entities\Media::count() }},
                     endpoint: '{{ route('media-library.medias.index') }}',
                     tagsEndpoint: '{{ route('media-library.medias.tags') }}',
@@ -95,6 +96,10 @@
             // window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].STORE.medias.selected = {}
 
             window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].unusualLocalization = {!! json_encode($unusualLocalization) !!};
+
+            window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].STORE.datatable = {}
+            window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].STORE.form = {}
+
 
             @yield('STORE')
         </script>

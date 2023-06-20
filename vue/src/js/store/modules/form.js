@@ -31,7 +31,9 @@ const state = {
 
   // editedItem: window[process.env.VUE_APP_NAME].STORE.form.inputs.reduce( (a,c) => (a[c.name] = c.default ?? '', a), {}),
   // editedItem: Object.keys(window[process.env.VUE_APP_NAME].STORE.form.inputs).reduce( (a,c) => (a[window[process.env.VUE_APP_NAME].STORE.form.inputs[c].name] = window[process.env.VUE_APP_NAME].STORE.form.inputs[c].hasOwnProperty('default') ? window[process.env.VUE_APP_NAME].STORE.form.inputs[c].default : '', a), {}),
-  editedItem: getSchemaModel(window[process.env.VUE_APP_NAME].STORE.form.inputs),
+  editedItem: window[process.env.VUE_APP_NAME].STORE.form.inputs
+    ? getSchemaModel(window[process.env.VUE_APP_NAME].STORE.form.inputs)
+    : {},
 
   /**
    * Force reload on successful submit
@@ -175,22 +177,7 @@ const actions = {
 
     api[method](url, data, function (response) {
       commit(FORM.UPDATE_FORM_LOADING, false)
-      // __log(
-      //   response
-      // )
-      // if (successResponse.data.hasOwnProperty('redirect')) {
-      //   window.location.replace(successResponse.data.redirect)
-      // }
 
-      // if (state.reloadOnSuccess) {
-      //   window.location.reload()
-      // }
-
-      // commit(PUBLICATION.UPDATE_PUBLISH_SUBMIT)
-      // if (successResponse.data.hasOwnProperty('revisions')) {
-      //   commit(REVISION.UPDATE_REV_ALL, successResponse.data.revisions)
-      // }
-      // __log(reload)
       if (response.data.hasOwnProperty('errors')) {
         commit(FORM.SET_FORM_ERRORS, response.data.errors)
       } else if (response.data.hasOwnProperty('variant') && response.data.variant.toLowerCase() === 'success') {

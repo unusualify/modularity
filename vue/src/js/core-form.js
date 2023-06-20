@@ -6,7 +6,7 @@
 import * as exports from '@/imports'
 
 // styles
-import 'styles/form.scss'
+// import 'styles/form.scss'
 
 // Store modules
 import form from '@/store/modules/form'
