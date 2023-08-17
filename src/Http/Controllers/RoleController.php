@@ -4,6 +4,9 @@ namespace OoBook\CRM\Base\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\View;
 
 class RoleController extends BaseController
 {
@@ -20,7 +23,7 @@ class RoleController extends BaseController
 
     protected $titleColumnKey = "name";
 
-    protected $perPage = 5;
+    protected $perPage = 15;
 
     protected $childrenTree = [
         'permission'

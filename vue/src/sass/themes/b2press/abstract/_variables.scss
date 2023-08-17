@@ -78,112 +78,39 @@
 $body-font-family: 'Montserrat', sans-serif;
 
 $font-weights: (
-  regular: 200,
-  medium: 400,
-  semiBold: 600,
-  bold: 800
+  'regular': 200,
+  'semi-bold': 600,
+  'bold': 800
+
+  // 'thin': 100,
+  // 'light': 300,
+  // 'regular': 400,
+  // 'medium': 500,
+  // 'bold': 700,
+  // 'black': 900
 );
 
-$theme-padding: 1.56vw; //1.56%;
-$global-light-text-color: #000000;
-$global-dark-text-color: #FFFFFF;
+$theme-space: 1.56vw; //1.56%;
 
-// $calc(100% * 320/1920)
 
-$primary-color: #27A0B4;
-$primary-2-color: #178DA0;
-$primary-light-color: #63C0C4;
-$secondary-color: #FFFFFF;
-$tertiary-color: #DFEFF0;
-$cta-color: #F6A505;
-$cta-secondary-color: #FFFFFF;
-
-$primary-hover-color: #11758D;
-$secondary-hover-color: #DFEFF0;;
-$tertiary-hover-color: #27A0B4;
-$cta-hover-color: #F08712;
-$cta-secondary-hover-color: #F6A505;
-
-$primary-text-color: #FFFFFF;
-$secondary-text-color: #27A0B4;
-$tertiary-text-color: #27A0B4;
-$cta-text-color: #FFFFFF;
-$cta-secondary-text-color: #F6A505;
-
-$sidebar-background: $primary-2-color;
-
-  /* BUTTONS */
+/* BUTTONS */
 $button-height: 2.5rem; //2.5rem
-$button-min-width: 10rem;
+$button-min-width: 7.5rem;
 $button-max-width: 300px;
 $button-font-weight: 700;
 $button-font-size: 0.75rem;
 
-$button-primary: $primary-color;
-$button-secondary: $secondary-color;
-$button-tertiary: $tertiary-color;
-$button-cta: $cta-color;
-$button-cta-secondary: $cta-secondary-color;
-
-$button-primary-text-color: $primary-text-color;
-$button-secondary-text-color: $secondary-text-color;
-$button-tertiary-text-color: $tertiary-text-color;
-$button-cta-text-color: $cta-text-color;
-$button-cta-secondary-text-color: $cta-secondary-text-color;
-
-$button-primary-hover: $primary-hover-color;
-$button-secondary-hover: $secondary-hover-color;
-$button-tertiary-hover: $tertiary-hover-color;
-$button-cta-hover: $cta-hover-color;
-$button-cta-secondary-hover: $cta-secondary-hover-color;
-
-$button-secondary-border-color: $primary-color;
-$button-cta-secondary-border-color: $cta-color;
-
-$button-tertiary-hover-text-color: $primary-text-color;
-
 $input-font-size: .8rem;
+$input-control-height: 36px;
+$input-line-height: 1.1; // default 1.5
 
+$line-height-root: 1.5; // default 1.5
 
-// Vuetify Variables
-$vuetify: (
-  utilities: '',
+$field-control-height: 36px;
 
-  button-height: $button-height,
-  button-max-width: $button-max-width,
-  button-font-weight:  map-get($font-weights, 'semiBold'),
-  button-font-size: $button-font-size,
-
-  field-font-size: $input-font-size,
-
-  navigation-drawer-background: $sidebar-background,
-  navigation-drawer-color: $global-dark-text-color,
-
-  // list-background: $sidebar-background,
-  // list-color: #DFEFF0,//rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)),
-  list-padding: 8px 0px,
-  list-nav-padding: 1px,
-  list-item-one-line-padding: 8px 13px,
-  list-item-padding: 4px $theme-padding,
-
-  // table-background: rgb(var(--v-theme-surface)),
-  // table-border: thin solid $table-border-color,
-  table-border-color: #E0E0E0, //rgba(var(--v-border-color), var(--v-border-opacity)),
-  // table-color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)),
-  // table-column-padding: 0 16px,
-  // table-density: ('default': 0, 'comfortable': -2, 'compact': -4),
-  // table-header-font-size: tools.map-deep-get(settings.$typography, 'caption', 'size'),
-  // table-header-font-weight: 500,
-  // table-header-height: 56px,
-  // table-hover-color: (rgba(var(--v-border-color), var(--v-hover-opacity)),
-  // table-line-height: 1.5,
-  // table-row-font-size: tools.map-deep-get(settings.$typography, 'subtitle-2', 'size'),
-  // table-row-height: var(--v-table-row-height, 52px),
-  // table-them: ($table-background, $table-color),
-);
+$field-label-floating-scale: 0.81;
 
 /// Twill variables
-
 // Breakpoint information, where each starts and stops
 // if a breakpoint is not fluid, then the start value is equal to the main col value plus 2x the gutter at this breakpoint
 /* 1540 = $max-width + 50 + 50 */

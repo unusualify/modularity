@@ -1,68 +1,68 @@
 <template>
-    <ue-modal
-        v-model="show"
+  <ue-modal
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
 
-        scrollable
-        content-class="bg-primary"
-        width-type="lg"
-        systembar
-        @screenListener="screenListener"
+    scrollable
+    content-class="bg-primary"
+    width-type="lg"
+    systembar
+    @screenListener="screenListener"
 
-        transition="dialog-bottom-transition"
+    transition="dialog-bottom-transition"
 
-        >
-        <template v-slot:activator="{ props }">
-            <slot
-                name="activator"
-                :props="{...props}"
+    >
+    <template v-slot:activator="{ props }">
+      <slot
+          name="activator"
+          :props="{...props}"
+          >
+      </slot>
+    </template>
+
+    <template
+      v-slot:body="props"
+      >
+      <v-card >
+        <v-card-title class="text-h5 grey lighten-2">
+          <slot name="title">
+              <span class="text-h5" >
+                {{ formTitle }}
+              </span>
+          </slot>
+        </v-card-title>
+        <v-card-text>
+          <!-- <ue-form :ref="formReference()"/> -->
+          <ue-form :ref="formRef"/>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+            <v-spacer></v-spacer>
+            <!-- <v-btn
+                color="error darken-1"
+                text
+                @click="cancelModal(on.closeDialog)"
                 >
-            </slot>
-        </template>
-
-        <template
-            v-slot:body="{props}"
-            >
-            <v-card >
-                <v-card-title class="text-h5 grey lighten-2">
-                    <slot name="title">
-                        <span class="text-h5" >
-                            {{ formTitle }}
-                        </span>
-                    </slot>
-                </v-card-title>
-                <v-card-text>
-                    <!-- <ue-form :ref="formReference()"/> -->
-                    <ue-form :ref="formReference()"/>
-
-                </v-card-text>
-                <v-divider></v-divider>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <!-- <v-btn
-                        color="error darken-1"
-                        text
-                        @click="cancelModal(on.closeDialog)"
-                        >
-                        {{ $t('cancel') }}
-                    </v-btn> -->
-                    <v-btn
-                        color="error darken-1"
-                        text
-                        @click="cancelModal(props.onClose)"
-                        >
-                        {{ textCancel }}
-                    </v-btn>
-                    <v-btn
-                        color="teal darken-1"
-                        text
-                        @click="confirmModal(props.onClose)"
-                        >
-                        {{ $t('save') }}
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </template>
-    </ue-modal>
+                {{ $t('cancel') }}
+            </v-btn> -->
+            <v-btn
+                color="error darken-1"
+                text
+                @click="cancelModal(props.onClose)"
+                >
+                {{ textCancel }}
+            </v-btn>
+            <v-btn
+                color="teal darken-1"
+                text
+                @click="confirmModal(props.onClose)"
+                >
+                {{ $t('save') }}
+            </v-btn>
+        </v-card-actions>
+      </v-card>
+    </template>
+  </ue-modal>
 </template>
 
 <script>
@@ -84,7 +84,6 @@ export default {
       full: false
     }
   },
-
   computed: {
     formTitle () {
     //   __log(this.$store.state)
@@ -93,22 +92,21 @@ export default {
     },
     activatorText () {
       return this.$t('new-item', { item: this.routeName })
+    },
+    formRef () {
+      return this.id + '-form'
     }
   },
-
   methods: {
     screenListener (e) {
       // __log(e.target);
       this.full = e.target.fullScreen
     },
-    formReference () {
-      return this.id + '-form'
-    },
 
     confirmCallback () {
       const self = this
-      this.$refs[this.formReference()].saveForm((res) => {
-        self.closeModal()
+      this.$refs[this.formRef].saveForm((res) => {
+        if (Object.prototype.hasOwnProperty.call(res, 'variant') && res.variant.toLowerCase() === 'success') { self.closeModal() }
       })
     },
 

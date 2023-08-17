@@ -9,18 +9,19 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use OoBook\CRM\Base\Support\Decomposers\SchemaParser;
-use OoBook\CRM\Base\Traits\ManagesNames;
+use OoBook\CRM\Base\Traits\ManageNames;
 use Nwidart\Modules\Facades\Module;
 use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Nwidart\Modules\Support\Config\GeneratorPath;
 use Nwidart\Modules\Support\Stub;
 use Illuminate\Container\Container;
-
+use OoBook\CRM\Base\Entities\Enums\Permission;
+use OoBook\CRM\Base\Repositories\PermissionRepository;
 
 class RouteGenerator extends Generator
 {
-    use ManagesNames;
+    use ManageNames;
 
     /**
      * The route name will created.
@@ -69,6 +70,20 @@ class RouteGenerator extends Generator
      * @var bool
      */
     protected $force = false;
+
+    /**
+     * Migration status.
+     *
+     * @var bool
+     */
+    protected $migrate = true;
+
+    /**
+     * Plain Status.
+     *
+     * @var bool
+     */
+    protected $plain = false;
 
     /**
      * set default module type.
@@ -292,7 +307,7 @@ class RouteGenerator extends Generator
      */
     public function getFolders()
     {
-        return $this->config->get(getUnusualBaseKey() . '.paths.generator');
+        return $this->config->get(unusualBaseKey() . '.paths.generator');
     }
 
     /**
@@ -302,7 +317,7 @@ class RouteGenerator extends Generator
      */
     public function getFiles()
     {
-        return $this->config->get(getUnusualBaseKey() . '.stubs.files');
+        return $this->config->get(unusualBaseKey() . '.stubs.files');
     }
 
     /**
@@ -315,6 +330,34 @@ class RouteGenerator extends Generator
     public function setForce($force)
     {
         $this->force = $force;
+
+        return $this;
+    }
+
+    /**
+     * Set migrate status.
+     *
+     * @param bool|int $notMigrate
+     *
+     * @return $this
+     */
+    public function setMigrate($notMigrate)
+    {
+        $this->migrate = !$notMigrate;
+
+        return $this;
+    }
+
+    /**
+     * Set plain status.
+     *
+     * @param bool|int $force
+     *
+     * @return $this
+     */
+    public function setPlain($plain)
+    {
+        $this->plain = $plain;
 
         return $this;
     }
@@ -426,15 +469,54 @@ class RouteGenerator extends Generator
         //     }
         // }
 
-        $this->generateFolders();
+        // dd(
+        //     $this->getModelFillables(),
+        //     $this->getModelRelationships(),
+        //     $this->schema,
 
-        $this->generateResources();
+        //     $this->console->call('unusual:make:model', [
+        //             'module' => $this->module->getStudlyName(),
+        //             'model' => $this->getName()
+        //         ]
+        //         + ( count($this->getModelFillables()) ?  ['--fillable' => implode(",", $this->getModelFillables())] : [])
+        //         + ( count($this->getModelRelationships()) ?  ['--relationships' => implode(",", $this->getModelRelationships())] : [])
+        //         + ['--translationTrait' => true, '--positionTrait' => true]
+        //         + ( ['--soft-delete' => true])
+        //         + ( ['--has-factory' => true])
+        //         + ['--notAsk' => true]
+        //     )
+        // );
+        // dd($this->schema);
+        // $this->console->call('unusual:make:migration', [
+        //     'module' => $this->module->getStudlyName(),
+        //     'name' => "create_{$this->getDBTableName($this->name)}_table",
+        // ] + ( $this->schema ?  ['--fields' => $this->schema] : [])
+        // );
 
-        $this->generateFiles();
+        // dd('s');
 
         $this->updateConfigFile();
 
         $this->updateRoutesStatuses();
+
+        if(!$this->plain){
+
+            $this->generateFolders();
+
+            $this->generateResources();
+
+            $this->generateFiles();
+
+            $this->createRoutePermissions();
+
+            if($this->migrate){
+                $this->console->call('unusual:migrate', [
+                    'module' => $this->module->getStudlyName()
+                ]);
+
+                $this->console->info("Migration of [{$name}] run.");
+            }
+        }
 
 
         // $this->generateRouteJsonFile();
@@ -476,7 +558,7 @@ class RouteGenerator extends Generator
 
             $this->filesystem->makeDirectory($path, 0755, true);
 
-            if ( $this->config->get(getUnusualBaseKey() . '.stubs.gitkeep')) {
+            if ( $this->config->get(unusualBaseKey() . '.stubs.gitkeep')) {
                 $this->generateGitKeep($path);
             }
         }
@@ -520,17 +602,18 @@ class RouteGenerator extends Generator
      */
     public function generateResources()
     {
+
         if($this->generatorConfig('route-controller')->generate()){
             $this->console->call('unusual:make:controller', [
+                'module' => $this->module->getStudlyName(),
                 'name' => $this->getName(),
-                'module' => $this->module->getStudlyName()
             ]);
         }
 
         if($this->generatorConfig('route-controller-api')->generate()){
             $this->console->call('unusual:make:controller:api', [
+                'module' => $this->module->getStudlyName(),
                 'name' => $this->getName(),
-                'module' => $this->module->getStudlyName()
             ]);
         }
 
@@ -539,8 +622,8 @@ class RouteGenerator extends Generator
         })->toArray();
 
         $this->console->call('unusual:make:model', [
-                'model' => $this->getName(),
-                'module' => $this->module->getStudlyName()
+            'module' => $this->module->getStudlyName(),
+                'model' => $this->getName()
             ]
             + ( count($this->getModelFillables()) ?  ['--fillable' => implode(",", $this->getModelFillables())] : [])
             + ( count($this->getModelRelationships()) ?  ['--relationships' => implode(",", $this->getModelRelationships())] : [])
@@ -550,8 +633,8 @@ class RouteGenerator extends Generator
         );
 
         $this->console->call('unusual:make:migration', [
-            'name' => "create_{$this->getDBTableName($this->name)}_table",
             'module' => $this->module->getStudlyName(),
+            'name' => "create_{$this->getDBTableName($this->name)}_table",
         ] + ( $this->schema ?  ['--fields' => $this->schema] : [])
           + $console_traits
         );
@@ -559,8 +642,8 @@ class RouteGenerator extends Generator
         if($this->generatorConfig('repository')->generate()){
             // $this->console->call('module:make-repository', [
             $this->console->call('unusual:make:repository', [
-                    'repository' => $this->getName(),
-                    'module' => $this->module->getStudlyName()
+                'module' => $this->module->getStudlyName(),
+                'repository' => $this->getName()
                 ]
                 + $console_traits
                 + ['--notAsk' => true]
@@ -583,8 +666,6 @@ class RouteGenerator extends Generator
             ]);
         }
 
-
-
     }
 
     /**
@@ -594,7 +675,7 @@ class RouteGenerator extends Generator
      */
     public function updateRoutesStatuses()
     {
-        $module = $this->app['ue_modules']->findOrFail($this->module);
+        $module = $this->app['unusual.repository']->findOrFail($this->module);
 
         $module->setModuleActivator($this->module);
 
@@ -611,38 +692,59 @@ class RouteGenerator extends Generator
      */
     public function updateConfigFile() :bool
     {
-        $config = $this->getConfig()->get( $this->getModule()->getLowerName() ) ?? [];
+        $config = $this->getConfig()->get( $this->getModule()->getSnakeName() ) ?? [];
 
         // $lowerName = $this->getLowerNameReplacement();
-        // $headline = $this->getHeadline($this->getName());
+        $headline = $this->getHeadline($this->getName());
         $studlyName = $this->getStudlyNameReplacement();
         $kebabCase = $this->getKebabCase($this->getName());
         $snakeCase = $this->getSnakeCase($this->getName());
 
         $configPath = $this->module->getPath().'/Config/config.php';
 
-        $route_array = [
-            'name' => $studlyName,
-            'headline' => pluralize($this->getName()),
-            'url' => $kebabCase,
-            'route_name' => $snakeCase,
-            'icon' => '$modules',
-            'table_options' => static::$defaultTableOptions,
-            'headers' => $this->getHeaders(), //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
-            'inputs' => $this->getInputs() //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
-        ];
-
         if( $this->getModule()->getName() === $this->getName()){
             $config['name'] = $studlyName;
             $config['base_prefix'] = false;
-            $config['parent_route'] = $route_array;
-            $config['sub_routes'] = [];
-        }else{
-            $config['sub_routes'][$this->getSnakeCase($this->getName())] = $route_array;
+            $config['headline'] = pluralize($headline);
+            // $config['parent_route'] = $route_array;
+            $config['routes'] = [];
+        }
+
+        if(!$this->plain){
+            $route_array = ($this->getModule()->getName() === $this->getName() ? ['parent' => true] : []) + [
+                'name' => $studlyName,
+                'headline' => pluralize($headline),
+                'url' => pluralize($kebabCase),
+                'route_name' => $snakeCase,
+                'icon' => '', //'$modules',
+                'table_options' => static::$defaultTableOptions,
+                'headers' => $this->getHeaders(), //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
+                'inputs' => $this->getInputs() //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
+            ];
+            $config['routes'][$this->getSnakeCase($this->getName())] = $route_array;
         }
 
         return $this->filesystem->put($configPath, phpArrayFileContent($config));
 
+    }
+    /**
+     * updateConfigFile
+     *
+     * @return bool
+     */
+    public function createRoutePermissions() :bool
+    {
+        $kebabCase = $this->getKebabCase($this->getName());
+
+        $repository = App::make(PermissionRepository::class);
+
+        // default permissions of a module
+        $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::VIEW->value, 'guard_name' => 'unusual_users']);
+        $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::CREATE->value, 'guard_name' => 'unusual_users']);
+        $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::EDIT->value, 'guard_name' => 'unusual_users']);
+        $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::DELETE->value, 'guard_name' => 'unusual_users']);
+
+        return true;
     }
 
     /**
@@ -667,12 +769,12 @@ class RouteGenerator extends Generator
      */
     public function getReplacements()
     {
-        return $this->config->get(getUnusualBaseKey() . '.stubs.replacements');
+        return $this->config->get(unusualBaseKey() . '.stubs.replacements');
     }
 
     public function generatorConfig($generator)
     {
-        return (new GeneratorPath($this->config->get(getUnusualBaseKey() . '.paths.generator.'.$generator)));
+        return (new GeneratorPath($this->config->get(unusualBaseKey() . '.paths.generator.'.$generator)));
     }
 
     /**

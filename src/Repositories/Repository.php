@@ -61,12 +61,14 @@ abstract class Repository
      */
     public function get($with = [], $scopes = [], $orders = [], $perPage = 20, $forcePagination = false)
     {
-        $query = $this->model->with($with);
-
+        $query = $this->model->query();
         // dd(
-        //     $scopes,
-        //     $query->toSql()
+        //     DB::table('roles'),
+        //     get_class_methods(DB::table('roles'))
         // );
+
+        $query = $query->with($this->formatWiths($query, $with));
+
         if( isset($scopes['searches']) && isset($scopes['search']) && is_array($scopes['searches']) ){
 
             $this->searchIn($query, $scopes, 'search', $scopes['searches']);
@@ -74,9 +76,9 @@ abstract class Repository
             unset($scopes['searches']);
         }
         $query = $this->filter($query, $scopes);
-        // dd($orders);
         $query = $this->order($query, $orders);
 
+        // $query->get()->pluck('roles.*.id')
         if (!$forcePagination && $this->model instanceof Sortable) {
             return $query->ordered()->get();
         }
@@ -88,10 +90,15 @@ abstract class Repository
 
         try {
             //code...
+            // dd(
+            //     $query,
+            //     $query->paginate($perPage)
+            // );
             return $query->paginate($perPage);
         } catch (\Throwable $th) {
             //throw $th;
             dd(
+                $th,
                 $with,
                 $scopes,
                 $orders,
@@ -175,7 +182,9 @@ abstract class Repository
      */
     public function getById($id, $with = [], $withCount = [])
     {
-        return $this->model->with($with)->withCount($withCount)->findOrFail($id);
+        $query = $this->model->query();
+
+        return $query->with($this->formatWiths($query, $with))->withCount($withCount)->findOrFail($id);
     }
 
     /**
@@ -678,14 +687,14 @@ abstract class Repository
      * @param \OoBook\CRM\Base\Models\Model $object
      * @return array
      */
-    public function getFormFields($object)
+    public function getFormFields($object, $schema = [])
     {
         $fields = $object->attributesToArray();
 
         foreach ($this->traitsMethods(__FUNCTION__) as $method) {
-            $fields = $this->$method($object, $fields);
+            $fields = $this->$method($object, $fields, $schema);
         }
-
+        // dd($fields);
         return $fields;
     }
 
@@ -985,5 +994,37 @@ abstract class Repository
     public function isTranslatable($column)
     {
         return $this->model->isTranslatable($column);
+    }
+
+    /**
+     * Post::with('user:id,username')->get();
+     * Post::query()
+     *   ->with(['user' => function ($query) {
+     *      $query->select('id', 'username');
+     *   }])
+     *
+     * @param Illuminate\Database\Eloquent\Builder $query
+     * @param array $with for instance ['roles' => ['select', 'id', 'name']]
+     * @return array
+     */
+    public function formatWiths($query, $with)
+    {
+        return array_map(function($item) {
+            return is_array($item)
+                    ? function($query) use($item){
+                        // $db->table('roles')->pluck('id');
+                        // $query->addSelect('id');
+
+                        if(is_array($item[0])){
+                            foreach ($item as $key => $args) {
+                                $query->{array_shift($args)}(...$args);
+                            }
+                        }else{
+                            $query->{array_shift($item)}(...$item);
+                        }
+                        $query->without('pivot');
+                    }
+                    : $item;
+        }, $with);
     }
 }

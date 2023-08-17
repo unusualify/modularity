@@ -4,8 +4,11 @@ namespace OoBook\CRM\Base\Entities;
 
 class Company extends Model
 {
+    protected $table = 'unusual_companies';
+
     protected $fillable = [
         'id',
+        'public',
         'name',
         'address',
         'city',
@@ -21,6 +24,5 @@ class Company extends Model
     {
         return $this->hasMany(User::class);
     }
-
 
 }

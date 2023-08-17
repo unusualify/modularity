@@ -11,7 +11,7 @@ const getObject = (container, id, callback) => {
       if (item.children) getObject(item.children, id, callback)
     })
 }
-  
+
 const deepRemoveFromObj = (items, keys = ['id', 'children'], deep = 'children') => {
     const deepItems = JSON.parse(JSON.stringify(items))
     deepItems.forEach((obj) => {
@@ -19,7 +19,7 @@ const deepRemoveFromObj = (items, keys = ['id', 'children'], deep = 'children') 
         if (!keys.includes(prop)) {
           delete obj[prop]
         }
-  
+
         if (prop === deep) {
           obj[prop] = deepRemoveFromObj(obj[prop])
         }
@@ -39,23 +39,23 @@ const state = {
     options: window[process.env.JS_APP_NAME].STORE.datatable.options,
     actions: window[process.env.JS_APP_NAME].STORE.datatable.actions,
     actionsType: window[process.env.JS_APP_NAME].STORE.datatable.actionsType,
-    
+
     data: window[process.env.JS_APP_NAME].STORE.datatable.data || [],
     total: parseInt( window[process.env.JS_APP_NAME].STORE.datatable.total ),
 
     filter: window[process.env.JS_APP_NAME].STORE.datatable.filter || {},
     mainFilters: window[process.env.JS_APP_NAME].STORE.datatable.mainFilters || [],
-    
+
     bulk: [],
     // localStorageKey: window[process.env.JS_APP_NAME].STORE.datatable.localStorageKey || window.location.pathname,
     loading: false,
     updateTracker: 0,
-    
+
     // columns: window[process.env.JS_APP_NAME].STORE.datatable.columns || [],
     // dialog: false
 
 }
-  
+
 // getters
 const getters = {
     // defaultItem: state => {
@@ -85,7 +85,7 @@ const getters = {
     }
 
 }
-  
+
 const mutations = {
     [DATATABLE.UPDATE_DATATABLE_OPTIONS] (state, options) {
         state.options = options
@@ -157,23 +157,23 @@ const mutations = {
         for (let i = 0; i < columnNames.length; i++) {
           if (columnNames[i] === column.name) {
             column.visible = true
-  
+
             break
           }
-  
+
           column.visible = false
         }
       })
     },
     [DATATABLE.UPDATE_DATATABLE_SORT] (state, column) {
       const defaultSortDirection = 'asc'
-  
+
       if (state.sortKey === column.name) {
         state.sortDir = state.sortDir === defaultSortDirection ? 'desc' : defaultSortDirection
       } else {
         state.sortDir = defaultSortDirection
       }
-  
+
       state.sortKey = column.name
     },
     [DATATABLE.UPDATE_DATATABLE_NAV] (state, newFilters) {
@@ -186,25 +186,25 @@ const mutations = {
     [DATATABLE.PUBLISH_DATATABLE] (state, data) {
       const id = data.id
       const value = data.value
-  
+
       function updateState (index) {
         if (index >= 0) {
           if (value === 'toggle') state.data[index].published = !state.data[index].published
           else state.data[index].published = value
         }
       }
-  
+
       function getIndex (id) {
         return state.data.findIndex(function (item, index) { return (item.id === id) })
       }
-  
+
       // bulk
       if (Array.isArray(id)) {
         id.forEach(function (itemId) {
           const index = getIndex(itemId)
           updateState(index)
         })
-  
+
         state.bulk = []
       } else {
         const index = getIndex(id)
@@ -214,25 +214,25 @@ const mutations = {
     [DATATABLE.FEATURE_DATATABLE] (state, data) {
       const id = data.id
       const value = data.value
-  
+
       function updateState (index) {
         if (index >= 0) {
           if (value === 'toggle') state.data[index].featured = !state.data[index].featured
           else state.data[index].featured = value
         }
       }
-  
+
       function getIndex (id) {
         return state.data.findIndex(function (item, index) { return (item.id === id) })
       }
-  
+
       // bulk
       if (Array.isArray(id)) {
         id.forEach(function (itemId) {
           const index = getIndex(itemId)
           updateState(index)
         })
-  
+
         state.bulk = []
       } else {
         const index = getIndex(id)
@@ -288,7 +288,7 @@ const actions = {
     },
     [ACTIONS.GET_DATATABLE] ({ commit, state, getters }, { payload = {}, callback = null, errorCallback = null } = {}) {
       // if (!state.loading) {
-        
+
         let keys = Object.keys(payload);
         let _changed = keys.length == 0 ? true : false  ;
 
@@ -298,17 +298,17 @@ const actions = {
               _changed = ! (Object.equals(payload[key], state[key]) );
             else if( Array.isArray(payload[key]) && Array.isArray(state[key]) )
               _changed = !( Array.equals(payload[key], state[key]) );
-            else 
+            else
               _changed = ( state[key] !== payload[key]);
           }
           return !_changed;
-        })  
-        
+        })
+
         if( _changed ){
           commit(DATATABLE.UPDATE_DATATABLE_LOADING, true)
           const parameters = {
               ...( Object.keys(state.options).reduce(function(filtered, key) {
-                let {active, value} = activeOption( 
+                let {active, value} = activeOption(
                   __isset( payload.options ) ? payload.options[key] : state.options[key],
                   key
                 )
@@ -339,7 +339,7 @@ const actions = {
                 commit(DATATABLE.UPDATE_DATATABLE_OPTIONS, payload.options);
               if( __isset(payload.search) )
                 commit(DATATABLE.UPDATE_DATATABLE_SEARCH, payload.search);
-              
+
           })
         }
       // }
@@ -355,7 +355,7 @@ const actions = {
     },
     [ACTIONS.SET_DATATABLE] ({ commit, state, dispatch }) {
       const ids = state.data.map((row) => row.id)
-  
+
       api.reorder(ids, function (resp) {
         commit(NOTIFICATION.SET_NOTIF, { message: resp.data.message, variant: resp.data.variant })
       })
@@ -449,7 +449,7 @@ const actions = {
       })
     }
 }
-  
+
 export default {
     state,
     getters,

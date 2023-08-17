@@ -5,75 +5,97 @@ return [
         'name' => 'User',
         'base_prefix' => false,
         'headline' => 'User Management',
-        'parent_route' => [
-            'name' => 'User',
-            'headline' => 'Users',
-            'url' => 'user',
-            'route_name' => 'user',
-            'icon' => '$users',
-            'table_options' => [
-                'createOnModal' => true,
-                'editOnModal' => true,
-                'isRowEditing' => true,
-                'actionsType' => 'inline',
-            ],
-            'headers' => [
-                [
-                    'title' => 'Name',
-                    'key' => 'name',
-                    'align' => 'start',
-                    'sortable' => false,
-                    'searchable' => true,
+        'routes' => [
+            'user' => [
+                'parent' => true,
+                'name' => 'User',
+                'headline' => 'Users',
+                'url' => 'users',
+                'route_name' => 'user',
+                'icon' => '$users',
+                'table_options' => [
+                    'createOnModal' => false,
+                    'editOnModal' => true,
+                    'isRowEditing' => true,
+                    'actionsType' => 'inline',
                 ],
-                [
-                    'title' => 'Email',
-                    'key' => 'email',
-                    'align' => 'start',
-                    'sortable' => false,
-                    'searchable' => true,
-                ],
-                [
-                    'itlet' => 'Actions',
-                    'key' => 'actions',
-                    'sortable' => false,
-                ],
-            ],
-            'inputs' => [
-                [
-                    'title' => 'Name',
-                    'name' => 'name',
-                    'type' => 'text',
-                    'placeholder' => '',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
+                'headers' => [
+                    [
+                        'title' => 'Name',
+                        'key' => 'name',
+                        'sortable' => false,
+                        'searchable' => true,
                     ],
-                    'placeholder' => '',
-                    'prepend-icon' => 'mdi-card-text-outline',
-                    'dense'
-                ],
-                [
-                    'type' => 'text',
-                    'title' => 'Email',
-                    'name' => 'email',
-                    'placeholder' => '',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
+                    [
+                        'title' => 'Email',
+                        'key' => 'email',
+                        'align' => 'start',
+                        'sortable' => false,
+                        'searchable' => true,
                     ],
-                    'placeholder' => '',
-                    'prepend-icon' => 'mdi-card-text-outline',
-                    'dense'
+                    [
+                        'title' => 'Company',
+                        'key' => 'company'
+                    ],
+                    [
+                        'title' => 'Roles',
+                        'key' => 'roles',
+                    ],
+                    [
+                        'title' => 'Actions',
+                        'key' => 'actions',
+                        'sortable' => false,
+                    ],
                 ],
-            ]
-        ],
-        'sub_routes' => [
+                'inputs' => [
+                    [
+                        'label' => 'Name',
+                        'name' => 'name',
+                        'type' => 'text',
+                        'col' => [
+                            'cols' => 12,
+                            'sm' => 8,
+                            'md' => 6,
+                        ],
+                        // 'prepend-icon' => 'mdi-card-text-outline',
+                        'dense'
+                    ],
+                    [
+                        'name' => 'company_id',
+                        'label' => 'Company',
+                        'type' => 'select',
+                        'repository' => 'OoBook\\CRM\\Base\\Repositories\\CompanyRepository',
+                    ],
+                    [
+                        'type' => 'text',
+                        'label' => 'Email',
+                        'name' => 'email',
+                        'col' => [
+                            'cols' => 12,
+                            'sm' => 8,
+                            'md' => 6,
+                        ],
+                        // 'prepend-icon' => 'mdi-card-text-outline',
+                        'dense'
+                    ],
+                    [
+                        'type' => 'select',
+                        'label' => 'Roles',
+                        'name' => 'roles',
+                        'col' => [
+                            'cols' => 12,
+                            'sm' => 8,
+                            'md' => 6,
+                        ],
+                        'route' => 'role',
+                        'repository' => \OoBook\CRM\Base\Repositories\RoleRepository::class,
+                    ],
+                ]
+            ],
             'role' => [
                 'name' => 'Role',
                 'headline' => 'Roles',
-                'url' => 'role',
+                'url' => 'roles',
                 'route_name' => 'role',
                 'icon' => '$role',
                 'table_options' => [
@@ -125,25 +147,25 @@ return [
                         'formatter' => [],
                         // custom fields for ue-datatable end
                     ],
-                    [
-                        'title' => 'Created Time',
-                        'key' => 'created_at',
-                        'sortable' => true,
-                        'filterable' => true,
-                        'groupable' => false,
-                        'divider' => false,
-                        'class' => '', // || []
-                        'cellClass' => '', // || []
-                        'width' => '', // || int
-                        // vuetify datatable header fields end
+                    // [
+                    //     'title' => 'Created Time',
+                    //     'key' => 'created_at',
+                    //     'sortable' => true,
+                    //     'filterable' => true,
+                    //     'groupable' => false,
+                    //     'divider' => false,
+                    //     'class' => '', // || []
+                    //     'cellClass' => '', // || []
+                    //     'width' => '', // || int
+                    //     // vuetify datatable header fields end
 
-                        // custom fields for ue-datatable start
-                        'searchable' => true,
-                        'isRowEditable' => false,
-                        'isColumnEditable' => false,
-                        'formatter' => ['date', 'long'],
-                        // custom fields for ue-datatable end
-                    ],
+                    //     // custom fields for ue-datatable start
+                    //     'searchable' => true,
+                    //     'isRowEditable' => false,
+                    //     'isColumnEditable' => false,
+                    //     'formatter' => ['date', 'long'],
+                    //     // custom fields for ue-datatable end
+                    // ],
                     [
                         'title' => 'Actions',
                         'key' => 'actions',
@@ -444,7 +466,7 @@ return [
                 ],
 
                 'inputs' => [
-                    'name' => [
+                    [
                         'type' => 'text',
                         'name' => 'name',
                         'label' => 'Name',
@@ -452,66 +474,56 @@ return [
                         'placeholder' => '',
                         'default' => '',
                         // 'tooltip' => 'Enter a usual name',
-
                         'col' => [
                             'cols' => 10,
                             'sm' => 10,
                             'md' => 6,
                             'lg' => 6,
-                            'xl' => 4
+                            'xl' => 6
                         ],
-                        'offset' => [
-                            'offset' => 0,
-                            'offset-sm' => 2,
-                            'offset-md' => 0,
-                            'offset-lg' => 0,
-                            'offset-xl' => 0,
-                        ],
-                        'order' => [
-                            'order' => 0,
-                            'order-sm' => 1,
-                            'order-md' => 1,
-                            'order-lg' => 1,
-                            'order-xl' => 1,
-                        ],
+                        'rules' => [
+                            ['min', 3]
+                        ]
                         // 'prepend-icon' => 'mdi-card-text-outline',
                     ],
-                    'guard_name' => [
+                    [
                         'type' => 'text',
                         'name' => 'guard_name',
                         'label' => 'Guard Name',
-                        'placeholder' => 'web',
+                        'placeholder' => 'unusual_users',
                         // 'tooltip' => 'Enter the guard name',
-                        'default' => 'web',
+                        'default' => 'unusual_users',
 
                         'col' => [
                             'cols' => 10,
                             'sm' => 10,
                             'md' => 6,
                             'lg' => 6,
-                            'xl' => 4
-                        ],
-                        'offset' => [
-                            'offset' => 0,
-                            'offset-sm' => 2,
-                            'offset-md' => 0,
-                            'offset-lg' => 0
-                        ],
-                        'order' => [
-                            'order' => 1,
-                            'order-sm' => 0,
-                            'order-md' => 0,
-                            'order-lg' => 0,
-                            'order-xl' => 0,
+                            'xl' => 6
                         ],
                         // 'prepend-icon' => 'mdi-account-child',
                         'readonly',
                         'disabled',
-                        'error',
                         'flat',
                         // 'full-width',
                         'hide-spin-buttons',
 
+                    ],
+                    'permissions' => [
+                        'type' => 'checklist',
+                        // 'type' => 'custom-input-treeview',
+                        'name' => 'permissions',
+                        'label' => 'Permissions of the role',
+                        'col' => [
+                            'cols' => 12,
+                            'sm' => 12,
+                            'md' => 12,
+                            'lg' => 12,
+                            'xl' => 12
+                        ],
+
+                        'route' => 'permission',
+                        'model' => Spatie\Permission\Models\Permission::class,
                     ],
                     // 'permissions' => [
                     //     'type' => 'treeview',
@@ -939,7 +951,7 @@ return [
             'permission' =>  [
                 'name' => 'Permission',
                 'headline' => 'Permissions',
-                'url' => 'permission',
+                'url' => 'permissions',
                 'route_name' => 'permission',
                 'icon' => '$permission',
                 'model' => \Spatie\Permission\Models\Permission::class,
@@ -969,7 +981,7 @@ return [
                     ],
                 ],
                 'inputs' => [
-                    'name' => [
+                    [
                         'type' => 'text',
                         'title' => 'Name',
                         'name' => 'name',
@@ -981,6 +993,9 @@ return [
                             'sm' => 8,
                             'md' => 6,
                         ],
+                        'rules' => [
+                            ['min', 3]
+                        ]
                         // 'prepend-icon' => 'mdi-card-text-outline',
                     ],
                     [
@@ -989,7 +1004,7 @@ return [
                         'name' => 'guard_name',
                         'label' => 'Guard Name',
                         'placeholder' => 'web',
-                        'default' => 'web',
+                        'default' => 'unusual_users',
                         'col' => [
                             'cols' => 12,
                             'sm' => 8,
@@ -998,7 +1013,6 @@ return [
                         // 'prepend-icon' => 'mdi-account-child',
                         'readonly',
                         'disabled',
-                        'error',
                         'flat',
                         'hide-spin-buttons',
                         // 'full-width',
@@ -1224,6 +1238,202 @@ return [
                     'store' => [],
                     'update' => [],
                     'destroy' => []
+                ],
+            ],
+            'company' =>  [
+                'name' => 'Company',
+                'headline' => 'Companies',
+                'icon' => 'company',
+                'url' => 'companies',
+                'route_name' => 'company',
+                'icon' => '$company',
+                'table_options' => [
+                    'createOnModal' => true,
+                    'editOnModal' => true,
+                    'isRowEditing' => true,
+                    'actionsType' => 'inline',
+                ],
+                'headers' => [
+                    [
+                        'title' => 'Name',
+                        'key' => 'name',
+                        'align' => 'start',
+                        'sortable' => true,
+                        'searchable' => true,
+                    ],
+                    [
+                        'title' => 'Users',
+                        'key' => 'users',
+                    ],
+                    [
+                        'title' => 'Actions',
+                        'key' => 'actions',
+                        'align' => 'center',
+                        'sortable' => false,
+                        'width' => '15%',
+
+                        'class' => 'actions-extra'
+                    ],
+                ],
+                'inputs' => [
+                    [
+                        'type' => 'text',
+                        'title' => 'Name',
+                        'name' => 'name',
+                        'label' => 'Company Name',
+                        'placeholder' => '',
+                        'default' => '',
+                        'col' => [
+                            'cols' => 12,
+                            'sm' => 8,
+                            'md' => 6,
+                        ],
+                        'rules' => [
+                            ['min', 3]
+                        ]
+                    ],
+                    [
+                        'type' => 'text',
+                        'title' => 'Address',
+                        'name' => 'address',
+                        'label' => 'Company Address',
+                        'placeholder' => '',
+                        'default' => '',
+                        'col' => [
+                            'cols' => 12,
+                            'sm' => 8,
+                            'md' => 6,
+                        ],
+                        'rules' => [
+                            ['min', 3]
+                        ]
+                    ],
+                    [
+                        'type' => 'text',
+                        'title' => 'City',
+                        'name' => 'city',
+                        'label' => 'Company City',
+                        'placeholder' => '',
+                        'default' => '',
+                        'col' => [
+                            'cols' => 12,
+                            'sm' => 8,
+                            'md' => 6,
+                        ],
+                        'rules' => [
+                            ['min', 3]
+                        ]
+                    ],
+                    [
+                        'type' => 'text',
+                        'title' => 'state',
+                        'name' => 'state',
+                        'label' => 'Company state',
+                        'placeholder' => '',
+                        'default' => '',
+                        'col' => [
+                            'cols' => 12,
+                            'sm' => 8,
+                            'md' => 6,
+                        ],
+                        'rules' => [
+                            ['min', 3]
+                        ]
+                    ],
+                    [
+                        'type' => 'text',
+                        'title' => 'Country',
+                        'name' => 'country',
+                        'label' => 'Company Country',
+                        'placeholder' => '',
+                        'default' => '',
+                        'col' => [
+                            'cols' => 12,
+                            'sm' => 8,
+                            'md' => 6,
+                        ],
+                        'rules' => [
+                            ['min', 3]
+                        ]
+                    ],
+                    [
+                        'type' => 'text',
+                        'title' => 'Zip Code',
+                        'name' => 'zip_code',
+                        'label' => 'Zip Code',
+                        'placeholder' => '',
+                        'default' => '',
+                        'col' => [
+                            'cols' => 12,
+                            'sm' => 8,
+                            'md' => 6,
+                        ],
+                        'rules' => [
+                            ['min', 3]
+                        ]
+                    ],
+                    [
+                        'type' => 'custom-input-phone',
+                        'title' => 'Phone',
+                        'name' => 'phone',
+                        'label' => 'Company Phone',
+                        'col' => [
+                            'cols' => 12,
+                            'sm' => 8,
+                            'md' => 6,
+                        ]
+                    ],
+                    [
+                        'type' => 'text',
+                        'title' => 'Vat Number',
+                        'name' => 'vat_number',
+                        'label' => 'Vat Number',
+                        'placeholder' => '',
+                        'default' => '',
+                        'col' => [
+                            'cols' => 12,
+                            'sm' => 8,
+                            'md' => 6,
+                        ],
+                        'rules' => [
+                            ['min', 3]
+                        ]
+                    ],
+                    [
+                        'type' => 'text',
+                        'title' => 'Tax ID',
+                        'name' => 'tax_id',
+                        'label' => 'Tax ID',
+                        'placeholder' => '',
+                        'default' => '',
+                        'col' => [
+                            'cols' => 12,
+                            'sm' => 8,
+                            'md' => 6,
+                        ],
+                        'rules' => [
+                            ['min', 3]
+                        ]
+                    ],
+                    // [
+                    //     'type' => 'text',
+                    //     'title' => 'Guard Name',
+                    //     'name' => 'guard_name',
+                    //     'label' => 'Guard Name',
+                    //     'placeholder' => 'web',
+                    //     'default' => 'unusual_users',
+                    //     'col' => [
+                    //         'cols' => 12,
+                    //         'sm' => 8,
+                    //         'md' => 6,
+                    //     ],
+                    //     // 'prepend-icon' => 'mdi-account-child',
+                    //     'readonly',
+                    //     'disabled',
+                    //     'flat',
+                    //     'hide-spin-buttons',
+                    //     // 'full-width',
+                    // ],
                 ],
             ]
         ],

@@ -30,6 +30,33 @@ abstract class BaseController extends CoreController
 {
     use ConfigureViewFields;
 
+    /**
+     * @var string
+     */
+    protected $viewPrefix;
+
+    /**
+     * Name of the index column to use as identifier column.
+     *
+     * @var string
+     */
+    protected $identifierColumnKey = 'id';
+
+    /**
+     * Attribute to use as title in forms.
+     *
+     * @var string
+     */
+    protected $titleFormKey;
+
+    /**
+     * @var array
+     */
+    protected $indexTableColumns;
+
+    protected $tableOptions = [];
+
+
     public function __construct(
         Application $app,
         Request $request
@@ -60,9 +87,6 @@ abstract class BaseController extends CoreController
          * By default, the search field will run a like query on the title field
          */
         if (! isset($this->defaultFilters)) {
-            // $this->defaultFilters = [
-            //     // 'search' => ($this->routeHasTrait('translations') ? '' : '%') . $this->titleColumnKey,
-            // ];
             $this->defaultFilters = [
                 'search' => collect( $this->indexTableColumns ?? [] )->filter(function ($item) {
                     return isset($item['searchable']) ? $item['searchable'] : false;
@@ -73,8 +97,6 @@ abstract class BaseController extends CoreController
         }
 
         $this->tableOptions = $this->getTableOptions();
-
-
     }
 
     public function index($parentId = null)
@@ -86,9 +108,14 @@ abstract class BaseController extends CoreController
         // $this->submoduleParentId = $parentId;
 
         if ($this->request->ajax()) {
-            // dd($this->getJSONData());
+            $formSchema = $this->getFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+            // dd(
+            //     $this->getSchemaWiths($formSchema),
+            //     $this->getJSONData($this->getSchemaWiths($formSchema))
+            // );
             return [
-                'resource' => $this->getJSONData(),
+                'resource' => $this->getJSONData($this->getSchemaWiths($formSchema)),
                 'replaceUrl' => true
             ];
             // return $indexData + ['replaceUrl' => true];
@@ -98,11 +125,9 @@ abstract class BaseController extends CoreController
             $this->getParentModuleForeignKey() => $parentId,
         ] : []);
 
-
         if ($this->request->has('openCreate') && $this->request->get('openCreate')) {
             $indexData += ['openCreate' => true];
         }
-
 
         $view = Collection::make([
             "$this->viewPrefix.index",
@@ -157,6 +182,7 @@ abstract class BaseController extends CoreController
         $parentId = $this->parentId ?? $parentId;
 
         $input = $this->validateFormRequest()->all();
+
         $optionalParent = $parentId ? [$this->getParentModuleForeignKey() => $parentId] : [];
 
         // if (isset($input['cmsSaveType']) && $input['cmsSaveType'] === 'cancel') {
@@ -180,7 +206,7 @@ abstract class BaseController extends CoreController
         Session::put($this->moduleName . '_retain', true);
 
         if ($this->getTableOption('editOnModal')) {
-            return $this->respondWithSuccess(unusualTrans("$this->baseKey::lang.publisher.save-success"));
+            return $this->respondWithSuccess(___('save-success'));
         }
 
         if (isset($input['cmsSaveType']) && Str::endsWith($input['cmsSaveType'], '-close')) {
@@ -356,13 +382,13 @@ abstract class BaseController extends CoreController
 
             if ($this->routeHasTrait('revisions')) {
                 return Response::json([
-                    'message' => unusualTrans("$this->baseKey::lang.publisher.save-success"),
+                    'message' => ___("save-success"),
                     'variant' => MessageStage::SUCCESS,
                     'revisions' => $item->revisionsArray(),
                 ]);
             }
 
-            return $this->respondWithSuccess(unusualTrans("$this->baseKey::lang.publisher.save-success"));
+            return $this->respondWithSuccess(___("save-success"));
         }
     }
 
@@ -383,10 +409,112 @@ abstract class BaseController extends CoreController
             // $this->fireEvent();
             activity()->performedOn($item)->log('deleted');
 
-            return $this->respondWithSuccess(unusualTrans("$this->baseKey::lang.listing.delete.success", ['modelTitle' => $this->modelTitle]));
+            return $this->respondWithSuccess(___("listing.delete.success", ['modelTitle' => $this->modelTitle]));
+            // return $this->respondWithSuccess(___("$this->baseKey::lang.listing.delete.success", ['modelTitle' => $this->modelTitle]));
         }
 
-        return $this->respondWithError(unusualTrans("$this->baseKey::lang.listing.delete.error", ['modelTitle' => $this->modelTitle]));
+        return $this->respondWithError(___("listing.delete.error", ['modelTitle' => $this->modelTitle]));
+        // return $this->respondWithError(unusualTrans("$this->baseKey::lang.listing.delete.error", ['modelTitle' => $this->modelTitle]));
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function forceDelete()
+    {
+        if ($this->repository->forceDelete($this->request->get('id'))) {
+            $this->fireEvent();
+
+            return $this->respondWithSuccess(twillTrans('twill::lang.listing.force-delete.success', ['modelTitle' => $this->modelTitle]));
+        }
+
+        return $this->respondWithError(twillTrans('twill::lang.listing.force-delete.error', ['modelTitle' => $this->modelTitle]));
+    }
+
+    /**
+     *
+     *
+     * @param  Illuminate\Pagination\LengthAwarePaginator $paginator
+     * @return array
+     */
+    public function getFormattedIndexItems($paginator) // getIndexTableItems
+    {
+        $translated = $this->moduleHas('translations');
+
+        $paginator->getCollection()->transform(function ($item) use($translated) {
+
+            // $columnsData = [];
+            // foreach ($this->indexTableColumns as $key => &$column) {
+            //     $columnsData = array_merge($columnsData, $this->getItemColumnData($item, $column));
+            // }
+            $columnsData = Collection::make($this->indexTableColumns)->mapWithKeys(function (&$column) use ($item) {
+                return $this->getItemColumnData($item, $column);
+            })->toArray();
+            $name = $columnsData[$this->titleColumnKey];
+
+            if (empty($name)) {
+                if ($this->moduleHas('translations')) {
+                    $fallBackTranslation = $item->translations()->where('active', true)->first();
+
+                    if (isset($fallBackTranslation->{$this->titleColumnKey})) {
+                        $name = $fallBackTranslation->{$this->titleColumnKey};
+                    }
+                }
+
+                $name = $name ?? ('Missing ' . $this->titleColumnKey);
+            }
+
+            unset($columnsData[$this->titleColumnKey]);
+
+            $itemIsTrashed = method_exists($item, 'trashed') && $item->trashed();
+            $itemCanDelete = $this->getIndexOption('delete') && ($item->canDelete ?? true);
+            $canEdit = $this->getIndexOption('edit');
+            $canDuplicate = $this->getIndexOption('duplicate');
+
+            $itemId = $this->getItemIdentifier($item);
+
+            return array_replace(
+                $item->toArray()
+                + [
+                    // 'id' => $itemId,
+                    $this->titleColumnKey => $name,
+                    // 'publish_start_date' => $item->publish_start_date,
+                    // 'publish_end_date' => $item->publish_end_date,
+                    // 'edit' => $canEdit ? $this->getModuleRoute($itemId, 'edit') : null,
+                    // 'duplicate' => $canDuplicate ? $this->getModuleRoute($itemId, 'duplicate') : null,
+                    // 'delete' => $itemCanDelete ? $this->getModuleRoute($itemId, 'destroy') : null,
+                ]
+                // + ($this->getIndexOption('editInModal') ? [
+                //     'editInModal' => $this->getModuleRoute($itemId, 'edit'),
+                //     'updateUrl' => $this->getModuleRoute($itemId, 'update'),
+                // ] : [])
+                // + ($this->getIndexOption('publish') && ($item->canPublish ?? true) ? [
+                //     'published' => $item->published,
+                // ] : [])
+                // + ($this->getIndexOption('feature') && ($item->canFeature ?? true) ? [
+                //     'featured' => $item->{$this->featureField},
+                // ] : [])
+                // + (($this->getIndexOption('restore') && $itemIsTrashed) ? [
+                //     'deleted' => true,
+                // ] : [])
+                // + (($this->getIndexOption('forceDelete') && $itemIsTrashed) ? [
+                //     'destroyable' => true,
+                // ] : [])
+                // + ($translated ? [
+                //     'languages' => $item->getActiveLanguages(),
+                // ] : [])
+                + $columnsData
+                , $this->indexItemData($item)
+            );
+        });
+
+        return $paginator->toArray();
+        // dd($paginator);
+        // $paginator['data'] = collect($paginator->items())->map(function ($item) use ($translated) {
+
+        // })->toArray();
+        // dd($paginator);
+        // return $paginator;
     }
 
     /**
@@ -394,8 +522,9 @@ abstract class BaseController extends CoreController
      * @param array $column
      * @return array
      */
-    protected function _getItemColumnData($item, $column)
+    protected function getItemColumnData($item, $column)
     {
+
         if (isset($column['thumb']) && $column['thumb']) {
             if (isset($column['present']) && $column['present']) {
                 return [
@@ -423,11 +552,19 @@ abstract class BaseController extends CoreController
             $value .= moduleRoute("$this->moduleName.$field", $this->routePrefix, 'index', [$module => $this->getItemIdentifier($item)]);
             $value .= '">' . $nestedCount . ' ' . (strtolower(Str::plural($column['title'], $nestedCount))) . '</a>';
         } else {
-            // dd($column);
-            // $field = $column['field'];
-            $field = $column['value'];
+            $field = $column['key'];
             // dd($item->$field);
             $value = $item->$field;
+        }
+
+        // for relationship fields
+        if(preg_match('/(.*)(_relation)/', $column['key'], $matches)){
+            // $field = $column['key'];
+            $relation = $item->{$matches[1]}();
+            $itemTitle = $column['itemTitle'] ?? 'name';
+            $value = collect($relation->get())
+                ->pluck($itemTitle)
+                ->join(', ');
         }
 
         if (isset($column['relationship'])) {
@@ -573,5 +710,14 @@ abstract class BaseController extends CoreController
         // } catch (NoCapsuleFoundException $e) {
         //     return null;
         // }
+    }
+
+    /**
+     * @param \OoBook\CRM\Base\Models\Model $item
+     * @return int|string
+     */
+    protected function getItemIdentifier($item)
+    {
+        return $item->{$this->identifierColumnKey};
     }
 }

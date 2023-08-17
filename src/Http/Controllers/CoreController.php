@@ -18,15 +18,15 @@ use Illuminate\Support\Str;
 
 use Illuminate\Routing\Controller;
 use Nwidart\Modules\Facades\Module;
-use OoBook\CRM\Base\Traits\{MakesResponses, ManagesNames, ManagesScopes};
-
+use OoBook\CRM\Base\Entities\Enums\Permission;
+use OoBook\CRM\Base\Traits\{MakesResponses, ManageNames, ManageScopes};
 
 abstract class CoreController extends Controller
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests,
-        ManagesNames,
+        ManageNames,
         MakesResponses,
-        ManagesScopes;
+        ManageScopes;
 
     /**
      * @var Application
@@ -37,6 +37,11 @@ abstract class CoreController extends Controller
      * @var Request
      */
     protected $request;
+
+    /**
+     * @var OoBook\CRM\Base\Entities\Model
+     */
+    protected $user;
 
     /**
      * baseKey
@@ -107,16 +112,12 @@ abstract class CoreController extends Controller
     protected $repository;
 
     /**
-     * @var string
-     */
-    protected $viewPrefix;
-
-    /**
      * Options of the index view.
      *
      * @var array
      */
     protected $defaultIndexOptions = [
+        'index' => true,
         'create' => true,
         'edit' => true,
         'destroy' => true,
@@ -145,12 +146,7 @@ abstract class CoreController extends Controller
     /**
      * @var array
      */
-    protected $defaultTableOptions = [
-        'createOnModal' => true,
-        'editOnModal' => true,
-        'isRowEditing' => false,
-        'actionsType' => 'inline'
-    ];
+    protected $indexOptions;
 
     /**
      * Relations to eager load for the index view.
@@ -158,61 +154,6 @@ abstract class CoreController extends Controller
      * @var array
      */
     protected $indexWith = [];
-
-    /**
-     * Relations to eager load for the form view.
-     *
-     * @var array
-     */
-    protected $formWith = [];
-
-    /**
-     * Relation count to eager load for the form view.
-     *
-     * @var array
-     */
-    protected $formWithCount = [];
-
-    /**
-     * Additional filters for the index view.
-     *
-     * To automatically have your filter added to the index view use the following convention:
-     * suffix the key containing the list of items to show in the filter by 'List' and
-     * name it the same as the filter you defined in this array.
-     *
-     * Example: 'fCategory' => 'category_id' here and 'fCategoryList' in indexData()
-     * By default, this will run a where query on the category_id column with the value
-     * of fCategory if found in current request parameters. You can intercept this behavior
-     * from your repository in the filter() function.
-     *
-     * @var array
-     */
-    protected $filters = [];
-
-    /**
-     * Additional links to display in the listing filter.
-     *
-     * @var array
-     */
-    protected $filterLinks = [];
-
-    /**
-     * Filters that are selected by default in the index view.
-     *
-     * Example: 'filter_key' => 'default_filter_value'
-     *
-     * @var array
-     */
-    protected $filtersDefaultOptions = [];
-
-    /**
-     * Default orders for the index view.
-     *
-     * @var array
-     */
-    protected $defaultOrders = [
-        'created_at' => 'desc',
-    ];
 
     /**
      * List of permissions keyed by a request field. Can be used to prevent unauthorized field updates.
@@ -231,42 +172,7 @@ abstract class CoreController extends Controller
      *
      * @var string
      */
-    protected $titleColumnKey = 'title';
-
-    /**
-     * Name of the index column to use as identifier column.
-     *
-     * @var string
-     */
-    protected $identifierColumnKey = 'id';
-
-    /**
-     * Attribute to use as title in forms.
-     *
-     * @var string
-     */
-    protected $titleFormKey;
-
-    /**
-     * @var array
-     */
-    protected $indexOptions;
-
-    /**
-     * @var array
-     */
-    protected $indexTableColumns;
-
-    /**
-     * @var array
-     */
-    protected $defaultFilters;
-
-
-    protected $tableOptions = [];
-
-    protected $childrenTree = [];
-
+    protected $titleColumnKey = 'name';
 
     /**
      * @var array
@@ -320,8 +226,15 @@ abstract class CoreController extends Controller
 
         $this->app = $app;
         $this->request = $request;
-        $this->baseKey = getUnusualBaseKey();
+        $this->baseKey = unusualBaseKey();
 
+        $this->middleware(function ($request, $next) {
+            $this->user = Auth::user();
+
+            return $next($request);
+        });
+
+        // $this->setMiddlewareBasePermission();
         $this->setMiddlewarePermission();
 
         $this->moduleName = $this->getModuleName();
@@ -337,28 +250,11 @@ abstract class CoreController extends Controller
         $this->namespace = $this->getNamespace();
         $this->repository = $this->getRepository();
         $this->modelTitle = $this->getModelTitle();
+
         /*
          * Apply any filters that are selected by default
          */
         $this->applyFiltersDefaultOptions();
-
-        // /*
-        //  * Default filters for the index view
-        //  * By default, the search field will run a like query on the title field
-        //  */
-        // if (! isset($this->defaultFilters)) {
-        //     // $this->defaultFilters = [
-        //     //     // 'search' => ($this->routeHasTrait('translations') ? '' : '%') . $this->titleColumnKey,
-        //     // ];
-        //     $this->defaultFilters = [
-        //         'search' => collect( $this->indexTableColumns ?? [] )->filter(function ($item) {
-        //             return isset($item['searchable']) ? $item['searchable'] : false;
-        //         })->map(function($item){
-        //             return $item['key'];
-        //         })->implode('|')
-        //     ];
-        // }
-        // dd($this->defaultFilters, $this);
 
     }
 
@@ -371,12 +267,45 @@ abstract class CoreController extends Controller
     public function removeMiddleware($middleware)
     {
         if (($key = array_search($middleware, Arr::pluck($this->middleware, 'middleware'))) !== false) {
-            unset($this->middleware[$key]);
+            $order = false;
+            foreach($this->middleware as $i => $array){
+                if($array['middleware'] == $middleware){
+                    $order = $i;
+                    break;
+                }
+            }
+            if($order !== false){
+                unset($this->middleware[$order]);
+            }
+            // unset($this->middleware[$key]);
         }
+    }
+
+    protected function permissionPrefix($permission = '') {
+        return $this->getKebabCase($this->routeName) . ($permission != '' ? "_{$permission}" : '') ;
     }
 
     protected function setMiddlewarePermission()
     {
+
+        // dd('setMiddlewarePermission', $this->getSnakeCase($this->routeName), $this->user );
+        // Permission::where('name', 'LIKE', "%{$this->getKebabCase($this->routeName)}%")->get(),
+
+        $name = $this->getKebabCase($this->routeName);
+        foreach ( Permission::cases() as $permission) {
+            // $this->middleware("can:{$name}_{$permission->value}", ['only' => ['index', 'show']]);
+        }
+
+        // dd(Permission::ACCESS->value, $name);
+
+        if($this->isGateable()){
+            $this->middleware("can:{$this->permissionPrefix(Permission::VIEW->value)}", ['only' => ['index', 'show']]);
+            $this->middleware("can:{$this->permissionPrefix(Permission::CREATE->value)}", ['only' => ['create', 'store']]);
+            $this->middleware("can:{$this->permissionPrefix(Permission::EDIT->value)}", ['only' => ['edit', 'update']]);
+            $this->middleware("can:{$this->permissionPrefix(Permission::DELETE->value)}", ['only' => ['delete']]);
+            $this->middleware("can:{$this->permissionPrefix(Permission::DESTROY->value)}", ['only' => ['destroy']]);
+        }
+
         // $this->middleware('can:list', ['only' => ['index', 'show']]);
         // $this->middleware('can:edit', ['only' => ['store', 'edit', 'update']]);
         // $this->middleware('can:duplicate', ['only' => ['duplicate']]);
@@ -435,15 +364,6 @@ abstract class CoreController extends Controller
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $item
-     * @return int|string
-     */
-    protected function getItemIdentifier($item)
-    {
-        return $item->{$this->identifierColumnKey};
-    }
-
-    /**
      * @param string $option
      * @return bool
      */
@@ -451,45 +371,65 @@ abstract class CoreController extends Controller
     {
         return once(function () use ($option) {
             $customOptionNamesMapping = [
-                'index' => 'index',
                 'store' => 'create',
                 'update' => 'edit',
-                'show' => 'edit',
-                'delete' => 'destroy',
+                // 'store' => Permission::CREATE->value,
+                // 'update' => Permission::EDIT->value,
+                // 'show' => Permission::EDIT->value,
+                // 'delete' => Permission::DELETE->value,
             ];
+            // dd($option, $customOptionNamesMapping);
 
             $option = array_key_exists($option, $customOptionNamesMapping) ? $customOptionNamesMapping[$option] : $option;
 
             $authorizableOptions = [
-                'create' => 'edit',
-                'edit' => 'edit',
-                'publish' => 'publish',
-                'feature' => 'feature',
-                'reorder' => 'reorder',
-                'delete' => 'delete',
-                'duplicate' => 'duplicate',
-                'restore' => 'delete',
-                'forceDelete' => 'delete',
-                'bulkForceDelete' => 'delete',
-                'bulkPublish' => 'publish',
-                'bulkRestore' => 'delete',
-                'bulkFeature' => 'feature',
-                'bulkDelete' => 'delete',
-                'bulkEdit' => 'edit',
-                'editInModal' => 'edit',
-                'skipCreateModal' => 'edit',
+                'index' => $this->permissionPrefix(Permission::VIEW->value),
+                'create' => $this->permissionPrefix(Permission::CREATE->value),
+                'edit' => $this->permissionPrefix(Permission::EDIT->value),
+                'delete' => $this->permissionPrefix(Permission::DELETE->value),
+                'destroy' => $this->permissionPrefix(Permission::DELETE->value),
+
+                // 'index' => 'access',
+                // 'create' => 'edit',
+                // 'edit' => 'edit',
+                // 'publish' => 'publish',
+                // 'feature' => 'feature',
+                // 'reorder' => 'reorder',
+                // 'delete' => 'delete',
+                // 'duplicate' => 'duplicate',
+                // 'restore' => 'delete',
+                // 'forceDelete' => 'delete',
+                // 'bulkForceDelete' => 'delete',
+                // 'bulkPublish' => 'publish',
+                // 'bulkRestore' => 'delete',
+                // 'bulkFeature' => 'feature',
+                // 'bulkDelete' => 'delete',
+                // 'bulkEdit' => 'edit',
+                // 'editInModal' => 'edit',
+                // 'skipCreateModal' => 'edit',
             ];
+
             /**
              * TODO #guard
              *
              */
-            // $authorized = array_key_exists($option, $authorizableOptions) ? Auth::guard('twill_users')->user()->can($authorizableOptions[$option]) : true;
-            $authorized = true;
+            // dd(
+            //     $authorizableOptions,
+            //     $option,
+            //     Auth::guard('unusual_users')->user(),
+            //     debug_backtrace(),
+            // );
+            $authorized = ( $this->isGateable() && array_key_exists($option, $authorizableOptions))
+                ? Auth::guard('unusual_users')->user()->can($authorizableOptions[$option])
+                : true;
+            // $authorized = true;
+
+            if(!$authorized){
+            }
 
             return ($this->indexOptions[$option] ?? $this->defaultIndexOptions[$option] ?? false) && $authorized;
         });
     }
-
 
     /**
      * @return \OoBook\CRM\Base\Http\Requests\Admin\Request
@@ -497,7 +437,7 @@ abstract class CoreController extends Controller
     protected function validateFormRequest()
     {
         $unauthorizedFields = Collection::make($this->fieldsPermissions)->filter(function ($permission, $field) {
-            return Auth::guard('twill_users')->user()->cannot($permission);
+            return Auth::guard('unusual_users')->user()->cannot($permission);
         })->keys();
 
         $unauthorizedFields->each(function ($field) {
@@ -512,13 +452,13 @@ abstract class CoreController extends Controller
      * @param bool $forcePagination
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    protected function getIndexItems($scopes = [], $forcePagination = false)
+    protected function getIndexItems($with=[], $scopes = [], $forcePagination = false, )
     {
         // dd(
         //     $this->orderScope()
         // );
         return $this->transformIndexItems($this->repository->get(
-            $this->indexWith,
+            $this->indexWith + $with,
             $scopes,
             $this->orderScope(),
             $this->request->get('itemsPerPage') ?? $this->perPage ?? 50,
@@ -536,19 +476,31 @@ abstract class CoreController extends Controller
     }
 
     /**
-     * getJSONData
+     *
      *
      * @return
      */
-    protected function getJSONData(){
+    protected function getJSONData($with = []){
 
         $scopes = $this->filterScope($this->isNested ? [
             $this->getParentModuleForeignKey() => $this->parentId,
         ] : []);
 
-        $items = $this->getIndexItems($scopes);
+        $paginator = $this->getIndexItems($with, $scopes);
 
-        return $this->getTransformer( $items->toArray() );
+        return $this->getTransformer( $this->getFormattedIndexItems($paginator) );
+        // return $this->getTransformer( $paginator->toArray() );
+    }
+
+    /**
+     *
+     *
+     * @param  array $paginator
+     * @return array
+     */
+    public function getFormattedIndexItems($paginator) // getIndexTableItems
+    {
+        return $paginator;
     }
 
     /**
@@ -604,8 +556,8 @@ abstract class CoreController extends Controller
     {
         $snakeCase = $this->getSnakeCase($this->moduleName);
 
-        return arrayToObject(
-            Config::get( getUnusualBaseKey() . '.internal_modules.' . $snakeCase)
+        return array2Object(
+            Config::get( unusualBaseKey() . '.internal_modules.' . $snakeCase)
             ?: Config::get( $snakeCase )
         );
 
@@ -626,13 +578,13 @@ abstract class CoreController extends Controller
         if( $this->routeName == $this->moduleName )
             return '';
         else
-            return Str::camel($this->moduleName);
+            return Str::snake($this->moduleName);
 
 
         if ($this->request->route() != null) {
             $routePrefix = ltrim(
                 str_replace(
-                    Config::get(getUnusualBaseKey() . '.admin_app_path'), // TODO uri segment control
+                    Config::get(unusualBaseKey() . '.admin_app_path'), // TODO uri segment control
                     '',
                     $this->request->route()->getPrefix()
                 ),
@@ -689,7 +641,7 @@ abstract class CoreController extends Controller
      */
     protected function getTransformer($data = [])
     {
-        // dd($this->getTransformerClass());
+
         if( !($concrete = $this->getTransformerClass()))
             return $data;
 
@@ -733,7 +685,7 @@ abstract class CoreController extends Controller
      * @param string $action
      * @return string
      */
-    protected function getModuleRoute($id, $action)
+    protected function getModuleRoute($id, $action, $singleton = false)
     {
         // dd(
         //     $id,
@@ -745,7 +697,9 @@ abstract class CoreController extends Controller
         //     // moduleRoute(strtolower($this->moduleName), $this->routePrefix, $action, [$id])
         //     // moduleRoute($this->moduleName, $this->routePrefix, $action, [$id])
         // );
-        return moduleRoute($this->routeName, $this->routePrefix, $action, [ camelCase($this->routeName) => $id]);
+        $parameters = $singleton ? [] : [ camelCase($this->routeName) => $id];
+
+        return moduleRoute($this->routeName, $this->routePrefix, $action, $parameters, singleton: $singleton);
     }
 
     /**
@@ -788,8 +742,55 @@ abstract class CoreController extends Controller
 
     protected function getConfigFieldsByRoute($field_name)
     {
-        return $this->isParentRoute()
-            ? $this->config->parent_route->{$field_name}
-            : $this->config->sub_routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
+        try {
+            return $this->config->routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
+        } catch (\Throwable $th) {
+            return [];
+            dd(
+                // $th,
+                $this,
+                debug_backtrace()
+            );
+        }
+        return $this->config->routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
+        // return $this->isParentRoute()
+        //     ? $this->config->parent_route->{$field_name}
+        //     : $this->config->sub_routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
+    }
+
+    /**
+     * @param string $behavior
+     * @return bool
+     */
+    protected function moduleHas($behavior)
+    {
+        return $this->repository->hasBehavior($behavior);
+    }
+
+    public function isGateable()
+    {
+        return !env('PERMISSION_GATES_DEACTIVATE', false);
+    }
+
+    public function isRelationField($key) {
+        $model_relations = [];
+
+        if(@method_exists($this->repository->getModel(), 'definedRelations')){
+            $model_relations = $this->repository->definedRelations();
+        }
+
+        if(preg_match('/(.*)(_id)/', $key, $matches)){
+            $key = pluralize($matches[1]);
+        }
+
+
+        return in_array($key, $model_relations);
+        // if(in_array($key, $model_relations)){
+
+        // }
+
+
+        // return false;
+        // return in_array($key, $model_relations);
     }
 }

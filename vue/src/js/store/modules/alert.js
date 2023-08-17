@@ -7,7 +7,7 @@ const state = {
   error: null,
 
   show: false,
-  type: "info",
+  type: 'info',
   message: null
 }
 
@@ -32,7 +32,7 @@ const mutations = {
   },
   [ALERT.CLEAR_ALERT] (state, variant) {
     state.show = false
-    state.type = "info"
+    state.type = 'info'
     state.message = null
   }
 }

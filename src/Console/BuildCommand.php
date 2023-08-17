@@ -112,8 +112,8 @@ class BuildCommand extends BaseCommand
         $progressBar->setMessage("Building assets started...\n\n");
         $progressBar->advance();
 
-        $resource_path = resource_path('js/**/*.vue');
-        $resource_path = base_path($this->baseConfig('vendor_path') . '/vue/src/**');
+        $resource_path = resource_path('js/unusual/*.vue');
+        // $resource_path = base_path($this->baseConfig('vendor_path') . '/vue/src/**');
 
         if ($this->option('hot')) {
             $mode = env('NODE_ENV');
@@ -162,6 +162,7 @@ class BuildCommand extends BaseCommand
         $chokidarPath = base_path($this->baseConfig('vendor_path') . '/vue') . '/node_modules/.bin/chokidar';
         $chokidarCommand = [$chokidarPath, $pattern, "-c", $command];
 
+
         if ($this->filesystem->exists($chokidarPath)) {
             $process = new Process($chokidarCommand, base_path());
             $process->setTty(Process::isTtySupported());
@@ -205,6 +206,8 @@ class BuildCommand extends BaseCommand
         $this->info("Copying custom components...");
         $this->copyComponents();
         $this->info("Done.");
+
+        return 1;
     }
 
     /**
@@ -212,7 +215,7 @@ class BuildCommand extends BaseCommand
      */
     private function copyComponents()
     {
-        $localCustomComponentsPath = resource_path($this->baseConfig('custom_components_resource_path', 'js/components'));
+        $localCustomComponentsPath = resource_path($this->baseConfig('custom_components_resource_path', 'js/unusual'));
         $unusualCustomComponentsPath = base_path($this->baseConfig('vendor_path')) . '/vue/src/js/components/customs';
 
         if (!$this->filesystem->exists($unusualCustomComponentsPath)) {

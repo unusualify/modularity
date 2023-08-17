@@ -15,13 +15,49 @@ class MenuServiceProvider extends ServiceProvider
      */
     public function register()
     {
+
+    }
+
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        // dd(auth()->user());
+
         view()->composer("$this->baseKey::layouts.master", function ($view)
         {
+
+            // dd(
+            //     makeSidebarMenuItem([
+            //         'name' => 'Dashboard',
+            //         'route' => route('dashboard'),
+            //     ]),
+            //     ...unusualConfig('navigation.menu')
+            // );
             $configuration = [
                 'current_url' => url()->current(),
-                'sideMenu' => [],
+                'sideMenu' => [
+                    makeSidebarMenuItem([
+                        'name' => 'Dashboard',
+                        'route' => route('dashboard'),
+                    ]),
+                    ...config(unusualBaseKey() .'-navigation.menu')
+                ],
                 'breadcrumbs' => []
             ];
+
+            // dd($configuration);
+            $view->with('configuration', $configuration);
+
+            return;
+
+            dd(
+                $configuration,
+                // unusualConfig('navigation.menu', [])
+            );
 
             $configs = array_merge(
                 config($this->baseKey . '.internal_modules'),
@@ -34,11 +70,13 @@ class MenuServiceProvider extends ServiceProvider
                     })
                 )
             );
-
-            $configuration['sideMenu'][] = [
-                'text' => 'Modules',
-                // 'icon' => '$modules'
-            ];
+            dd(
+                $configs
+            );
+            // $configuration['sideMenu'][] = [
+            //     'name' => 'Modules',
+            //     // 'icon' => '$modules'
+            // ];
             foreach ( $configs as $name => $config) {
                 try {
                     $name = $config['name'];
@@ -54,7 +92,7 @@ class MenuServiceProvider extends ServiceProvider
                 // dd($config);
                 // menu list element
                 $array = [
-                    'text' => $config['headline'] ?? $pr['headline'] ?? pluralize($pr['name']) ?? pluralize($config['name']) ??'Items',
+                    'name' => $config['headline'] ?? $pr['headline'] ?? pluralize($pr['name']) ?? pluralize($config['name']) ??'Items',
                     'icon' => '',
                     'is_active' => 0
                 ];
@@ -69,16 +107,16 @@ class MenuServiceProvider extends ServiceProvider
                         $parent_route_name = strtolower(config($this->baseKey . '.name')) . "." . $parent_route_name;
 
                     if( Route::has($parent_route_name) ){
-                        $link = route( $parent_route_name );
-                        $is_active = $link == $configuration['current_url'] ? 1 : 0;
+                        $route = route( $parent_route_name );
+                        $is_active = $route == $configuration['current_url'] ? 1 : 0;
 
                         if($is_active){
                             $array['is_active'] = $is_active;
                         }
 
                         $array['items'][] = [
-                            'text' => $pr['headline'] ?? pluralize($pr['name']) ?? pluralize($config['name']) ??'Items',
-                            'link' => route($parent_route_name),
+                            'name' => $pr['headline'] ?? pluralize($pr['name']) ?? pluralize($config['name']) ??'Items',
+                            'route' => route($parent_route_name),
                             'icon' => $config['parent_route']['icon'] ?? '',
                             'is_active' => $is_active
                         ];
@@ -92,30 +130,30 @@ class MenuServiceProvider extends ServiceProvider
                             $route_name = strtolower(config($this->baseKey . '.name')) . "." . $route_name;
 
                         if( Route::has($route_name) ){
-                            $text = $sr['headline'] ?? pluralize($sr['name']);
-                            $link = route( $route_name );
-                            $is_active = $link == $configuration['current_url'] ? 1 : 0;
+                            $name = $sr['headline'] ?? pluralize($sr['name']);
+                            $route = route( $route_name );
+                            $is_active = $route == $configuration['current_url'] ? 1 : 0;
 
                             if($is_active){
                                 $array['is_active'] = $is_active;
 
-                                // Addition of breadcrumb for active links
+                                // Addition of breadcrumb for active routes
                                 $configuration['breadcrumbs'][] = [
-                                    "text" => $array['text'],
+                                    "name" => $array['name'],
                                     "disabled" => true,
                                     "href" => '',
                                 ];
                                 $configuration['breadcrumbs'][] = [
-                                    "text" => $text,
+                                    "name" => $name,
                                     "disabled" => false,
-                                    "href" => $link,
+                                    "href" => $route,
                                 ];
                             }
 
                             $array['items'][] = [
-                                'text' => $text,
+                                'name' => $name,
                                 'icon' => $sr['icon'] ?? '',
-                                'link' => $link,
+                                'route' => $route,
                                 'is_active' => $is_active,
                             ];
                         }
@@ -130,10 +168,10 @@ class MenuServiceProvider extends ServiceProvider
                         $route_name = strtolower(config($this->baseKey . '.name')) . "." . $route_name;
 
                     if( Route::has($route_name) ){
-                        $link = route( $route_name );
-                        $is_active = $link == $configuration['current_url'] ? 1 : 0;
+                        $route = route( $route_name );
+                        $is_active = $route == $configuration['current_url'] ? 1 : 0;
 
-                        $array['link'] =  $link;
+                        $array['route'] =  $route;
                         $array['is_active'] = $is_active;
                     }
 
@@ -142,30 +180,20 @@ class MenuServiceProvider extends ServiceProvider
                 $configuration['sideMenu'][] = $array;
             }
             // $configuration['sideMenu'][] = [
-            //     'text' => 'Media Library',
+            //     'name' => 'Media Library',
             //     'attr' => 'data-medialib-btn'
             //     // 'icon' => '$media'
             // ];
             $configuration['sideMenu'][] = [
-                'text' => 'Media Library',
+                'name' => 'Media Library',
                 // 'icon' => '$media',
                 'attr' => 'data-medialib-btn',
                 // 'event' => '_triggerOpenMediaLibrary',
                 'event' => 'openFreeMediaLibrary',
             ];
 
-            // dd($configuration, $configs);
+            // dd($configuration);
             $view->with('configuration', $configuration);
         });
-    }
-
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-
     }
 }

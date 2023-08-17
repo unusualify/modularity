@@ -34,10 +34,9 @@ app.use(exports.UEConfig)
 app.component('ue-datatable', UEDatatable)
 app.component('ue-modal-form', UEModalForm)
 
+const includeClientComponents = require.context('__components/customs', true, /\.vue$/i)
+app.config.globalProperties.registerComponents(includeClientComponents, 'customs', 'ue-custom')
+
 app.mount('#admin')
-__log(
-//   app._instance
-//   app._instance.appContext.components
-)
 
 // document.addEventListener('DOMContentLoaded', core(app))

@@ -30,10 +30,7 @@ class MigrationMakeCommand extends BaseCommand
      */
     protected $description = 'Create a new migration for the specified module.';
 
-    protected $defaultFieldSchemas = [
-        "title:string('title'\,200):nullable",
-        "description:text:nullable",
-    ];
+    protected $defaultFieldSchemas = [];
 
 
     /**
@@ -41,7 +38,7 @@ class MigrationMakeCommand extends BaseCommand
      */
     public function handle() : int
     {
-        $this->defaultFieldSchemas += $this->baseConfig('schemas.default_fields') ?? [];
+        $this->defaultFieldSchemas = $this->baseConfig('schemas.default_fields') ?? [];
 
         if (parent::handle() === E_ERROR) {
             return E_ERROR;
@@ -65,8 +62,8 @@ class MigrationMakeCommand extends BaseCommand
     protected function getArguments()
     {
         return [
+            ['module', InputArgument::REQUIRED, 'The name of module that the migration will be created in.'],
             ['name', InputArgument::REQUIRED, 'The migration name will be created.'],
-            ['module', InputArgument::OPTIONAL, 'The name of module will be created.'],
         ];
     }
 

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\View;
 use Modules\PressRelease\Entities\PressRelease;
 use Modules\PressRelease\Repositories\PressReleaseRepository;
+use OoBook\CRM\Base\Entities\Enums\Permission;
 
 class DashboardController extends BaseController
 {
@@ -27,6 +28,9 @@ class DashboardController extends BaseController
             $app,
             $request
         );
+
+        $this->removeMiddleware("can:{$this->permissionPrefix()}_". Permission::VIEW->value);
+        $this->middleware('can:dashboard', ['only' => ['index']]);
     }
 
     public function index($parentId = null)
@@ -53,167 +57,183 @@ class DashboardController extends BaseController
         $data = [
             'blocks' => [
                 [
-                    'component' => 'table',
+                    'component' => 'custom-board-information',
                     'col' => [
-                        'cols' => '12',
-                        'xxl' => '3',
-                        'xl' => '4',
-                        'lg' => '4',
+                        'cols' => 12,
+                        'xxl' => 8,
+                        'xl' => 8,
+                        'lg' => 8,
+                        'class' => 'pr-theme-semi pb-theme-semi'
                     ],
                     'attributes' => [
-                        'name' => 'Revision',
-                        'title-key' => '',
-                        'custom-title' => 'Recent Revisions',
-                        'hide-headers' => true,
-                        'items' =>  App::make(PressReleaseRepository::class)->get([], [], [
-                            'created_at' => 'desc'
-                        ], 2)->items(),
-                        'columns' => [
-                            [
-                                'title' => 'Release Date',
-                                'key' => 'release_date',
-                                'align' => 'start',
-                                'sortable' => false,
-                                'filterable' => false,
-                                'groupable' => false,
-                                'divider' => false,
-                                'class' => '',
-                                'cellClass' => '',
-                                'width' => '',
-                                'searchable' => true,
-                                'isRowEditable' => true,
-                                'isColumnEditable' => false,
-                                'formatter' => ['date', 'numeric'],
-                            ],
-                            [
-                                'title' => 'Headline',
-                                'key' => 'headline',
-                                'align' => 'start',
-                                'sortable' => false,
-                                'filterable' => false,
-                                'groupable' => false,
-                                'divider' => false,
-                                'class' => '',
-                                'cellClass' => '',
-                                'width' => '',
-                                'searchable' => true,
-                                'isRowEditable' => true,
-                                'isColumnEditable' => false,
-                                'formatter' => [],
-                            ]
-                        ],
-                        'table-options' => [
-                            'page'          => 1,
-                            'itemsPerPage'  => 2,
-                            'sortBy'        => [],
-                            'multiSort'     => false,
-                            'mustSort'      => false,
-                            'groupBy'       => [],
-                        ],
-                        'slots' => [
-                            'bottom' => [
-                                'elements' => [
-                                    [
-                                        'tag' => 'div',
-                                        'attributes' => [
-                                            'class' => 'text-right pa-10',
-                                        ],
-                                        'elements' => [
-                                            [
-                                                'tag' => 'v-btn-tertiary',
-                                                'elements' => 'MANAGE RELEASES'
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
+
                     ],
                 ],
-                [
-                    'component' => 'table',
-                    'col' => [
-                        'cols' => '12',
-                        'xxl' => '6',
-                        'xl' => '8',
-                        'lg' => '8',
-                    ],
-                    'attributes' => [
-                        'name' => 'Revision',
-                        'title-key' => '',
-                        'custom-title' => 'Recently Published',
-                        'items' =>  App::make(PressReleaseRepository::class)->get([], [], [
-                            'created_at' => 'desc'
-                        ], 8)->items(),
-                        'columns' => [
-                            [
-                                'title' => 'Date',
-                                'key' => 'release_date',
-                                'align' => 'start',
-                                'sortable' => false,
-                                'filterable' => false,
-                                'groupable' => false,
-                                'divider' => false,
-                                'class' => '',
-                                'cellClass' => '',
-                                'width' => '',
-                                'searchable' => true,
-                                'isRowEditable' => true,
-                                'isColumnEditable' => false,
-                                'formatter' => ['date', 'numeric'],
-                            ],
-                            [
-                                'title' => 'PR Headline',
-                                'key' => 'headline',
-                                'align' => 'start',
-                                'sortable' => false,
-                                'filterable' => false,
-                                'groupable' => false,
-                                'divider' => false,
-                                'class' => '',
-                                'cellClass' => '',
-                                'width' => '',
-                                'searchable' => true,
-                                'isRowEditable' => true,
-                                'isColumnEditable' => false,
-                                'formatter' => [],
-                            ]
-                        ],
-                        'table-options' => [
-                            'page'          => 1,
-                            'itemsPerPage'  => 8,
-                            'sortBy'        => [],
-                            'multiSort'     => false,
-                            'mustSort'      => false,
-                            'groupBy'       => [],
-                        ],
-                        'slots' => [
-                            'bottom' => [
-                                'elements' => [
-                                    [
-                                        'tag' => 'div',
-                                        'attributes' => [
-                                            'class' => 'text-right pa-10',
-                                        ],
-                                        'elements' => [
-                                            [
-                                                'tag' => 'v-btn-secondary',
-                                                'attributes' => [
-                                                    'class' => 'mr-5'
-                                                ],
-                                                'elements' => 'CONTINUE IN PROGRESS'
-                                            ],
-                                            [
-                                                'tag' => 'v-btn',
-                                                'elements' => 'CREATE PRESS RELEASE'
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                ],
+                // [
+                //     'component' => 'table',
+                //     'col' => [
+                //         'cols' => 12,
+                //         'xxl' => 3,
+                //         'xl' => 4,
+                //         'lg' => 4,
+                //         'class' => 'pl-theme-semi pb-theme-semi'
+                //     ],
+                //     'attributes' => [
+                //         'name' => 'Revision',
+                //         'title-key' => '',
+                //         'custom-header' => 'Recent Revisions',
+                //         'hide-headers' => true,
+                //         'items' =>  App::make(PressReleaseRepository::class)->get([], [], [
+                //             'created_at' => 'desc'
+                //         ], 2)->items(),
+                //         'columns' => [
+                //             [
+                //                 'title' => 'Release Date',
+                //                 'key' => 'release_date',
+                //                 'align' => 'start',
+                //                 'sortable' => false,
+                //                 'filterable' => false,
+                //                 'groupable' => false,
+                //                 'divider' => false,
+                //                 'class' => '',
+                //                 'cellClass' => '',
+                //                 'width' => '',
+                //                 'searchable' => true,
+                //                 'isRowEditable' => true,
+                //                 'isColumnEditable' => false,
+                //                 'formatter' => ['date', 'numeric'],
+                //             ],
+                //             [
+                //                 'title' => 'Headline',
+                //                 'key' => 'headline',
+                //                 'align' => 'start',
+                //                 'sortable' => false,
+                //                 'filterable' => false,
+                //                 'groupable' => false,
+                //                 'divider' => false,
+                //                 'class' => '',
+                //                 'cellClass' => '',
+                //                 'width' => '',
+                //                 'searchable' => true,
+                //                 'isRowEditable' => true,
+                //                 'isColumnEditable' => false,
+                //                 'formatter' => [],
+                //             ]
+                //         ],
+                //         'table-options' => [
+                //             'page'          => 1,
+                //             'itemsPerPage'  => 2,
+                //             'sortBy'        => [],
+                //             'multiSort'     => false,
+                //             'mustSort'      => false,
+                //             'groupBy'       => [],
+                //         ],
+                //         'slots' => [
+                //             'bottom' => [
+                //                 'elements' => [
+                //                     [
+                //                         'tag' => 'div',
+                //                         'attributes' => [
+                //                             'class' => 'text-right pa-10',
+                //                         ],
+                //                         'elements' => [
+                //                             [
+                //                                 'tag' => 'v-btn-tertiary',
+                //                                 'elements' => 'MANAGE RELEASES'
+                //                             ]
+                //                         ]
+                //                     ]
+                //                 ]
+                //             ]
+                //         ]
+                //     ],
+                // ],
+                // [
+                //     'component' => 'table',
+                //     'col' => [
+                //         'cols' => 12,
+                //         'xxl' => 6,
+                //         'xl' => 8,
+                //         'lg' => 8,
+                //         'class' => 'pr-theme-semi pt-theme-semi'
+
+                //     ],
+                //     'attributes' => [
+                //         'name' => 'Revision',
+                //         'title-key' => '',
+                //         'custom-header' => 'Recently Published',
+                //         'items' =>  App::make(PressReleaseRepository::class)->get([], [], [
+                //             'created_at' => 'desc'
+                //         ], 8)->items(),
+                //         'columns' => [
+                //             [
+                //                 'title' => 'Date',
+                //                 'key' => 'release_date',
+                //                 'align' => 'start',
+                //                 'sortable' => false,
+                //                 'filterable' => false,
+                //                 'groupable' => false,
+                //                 'divider' => false,
+                //                 'class' => '',
+                //                 'cellClass' => '',
+                //                 'width' => '',
+                //                 'searchable' => true,
+                //                 'isRowEditable' => true,
+                //                 'isColumnEditable' => false,
+                //                 'formatter' => ['date', 'numeric'],
+                //             ],
+                //             [
+                //                 'title' => 'PR Headline',
+                //                 'key' => 'headline',
+                //                 'align' => 'start',
+                //                 'sortable' => false,
+                //                 'filterable' => false,
+                //                 'groupable' => false,
+                //                 'divider' => false,
+                //                 'class' => '',
+                //                 'cellClass' => '',
+                //                 'width' => '',
+                //                 'searchable' => true,
+                //                 'isRowEditable' => true,
+                //                 'isColumnEditable' => false,
+                //                 'formatter' => [],
+                //             ]
+                //         ],
+                //         'table-options' => [
+                //             'page'          => 1,
+                //             'itemsPerPage'  => 8,
+                //             'sortBy'        => [],
+                //             'multiSort'     => false,
+                //             'mustSort'      => false,
+                //             'groupBy'       => [],
+                //         ],
+                //         'slots' => [
+                //             'bottom' => [
+                //                 'elements' => [
+                //                     [
+                //                         'tag' => 'div',
+                //                         'attributes' => [
+                //                             'class' => 'text-right pa-10',
+                //                         ],
+                //                         'elements' => [
+                //                             [
+                //                                 'tag' => 'v-btn-secondary',
+                //                                 'attributes' => [
+                //                                     'class' => 'mr-5'
+                //                                 ],
+                //                                 'elements' => 'CONTINUE IN PROGRESS'
+                //                             ],
+                //                             [
+                //                                 'tag' => 'v-btn',
+                //                                 'elements' => 'CREATE PRESS RELEASE'
+                //                             ]
+                //                         ]
+                //                     ]
+                //                 ]
+                //             ]
+                //         ]
+                //     ],
+                // ],
             ]
         ];
         // dd($data);

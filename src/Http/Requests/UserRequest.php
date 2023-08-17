@@ -36,7 +36,7 @@ class UserRequest extends BaseFormRequest
     public function store()
     {
         return [
-            'name' => 'required|unique:users|min:15',
+            'name' => 'required|unique:users|min:3',
 
         ];
     }
@@ -44,7 +44,10 @@ class UserRequest extends BaseFormRequest
     public function update()
     {
         return [
-            'name' => 'required|min:17|unique:users,name,'.$this->id,
+            'name' => 'required|min:3|unique:users,name,'.$this->id,
+
+            'password' => 'sometimes|missing_with:name|min:6|confirmed',
+            // 'password_confirmation' => 'missing_with:name|required|min:6'
         ];
     }
 }

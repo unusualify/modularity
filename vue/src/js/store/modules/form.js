@@ -7,13 +7,12 @@ import { getSchemaModel } from '@/utils/getFormData.js'
 const getFieldIndex = (stateKey, field) => {
   return stateKey.findIndex(f => f.name === field.name)
 }
-
+// __log(
+//   window[process.env.VUE_APP_NAME].STORE.form
+// )
 const state = {
-
   baseUrl: window[process.env.VUE_APP_NAME].STORE.form.baseUrl || '',
-
   inputs: window[process.env.VUE_APP_NAME].STORE.form.inputs,
-
   saveUrl: window[process.env.VUE_APP_NAME].STORE.form.saveUrl || '',
 
   /**
@@ -170,35 +169,39 @@ const actions = {
     let method = 'post'
     let url = window[process.env.VUE_APP_NAME].ENDPOINTS.store
 
-    if (data.hasOwnProperty('id')) {
+    if (Object.prototype.hasOwnProperty.call(data, 'id')) {
       method = 'put'
       url = window[process.env.VUE_APP_NAME].ENDPOINTS.update.replace(':id', data.id)
     }
 
     api[method](url, data, function (response) {
       commit(FORM.UPDATE_FORM_LOADING, false)
-
-      if (response.data.hasOwnProperty('errors')) {
+      // __log('200', response.data)
+      if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
         commit(FORM.SET_FORM_ERRORS, response.data.errors)
-      } else if (response.data.hasOwnProperty('variant') && response.data.variant.toLowerCase() === 'success') {
+      } else if (Object.prototype.hasOwnProperty.call(response.data, 'variant') && response.data.variant.toLowerCase() === 'success') {
         commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
 
-        dispatch(ACTIONS.GET_DATATABLE)
-        if (!data.hasOwnProperty('reload') || data.reload) { dispatch(ACTIONS.GET_DATATABLE) }
+        try {
+          dispatch(ACTIONS.GET_DATATABLE)
+        } catch (error) {
+
+        }
+        // if (!data.hasOwnProperty('reload') || data.reload) { dispatch(ACTIONS.GET_DATATABLE) }
       }
 
       if (callback && typeof callback === 'function') callback(response.data)
-    }, function (errorResponse) {
+    }, function (response) {
       commit(FORM.UPDATE_FORM_LOADING, false)
-
-      if (errorResponse.response.data.hasOwnProperty('exception')) {
+      __log('400 response', response)
+      if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
         commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
       } else {
-        dispatch(ACTIONS.HANDLE_ERRORS, errorResponse.response.data)
+        dispatch(ACTIONS.HANDLE_ERRORS, response.data)
         commit(ALERT.SET_ALERT, { message: 'Your submission could not be validated, please fix and retry', variant: 'error' })
       }
 
-      if (errorCallback && typeof errorCallback === 'function') errorCallback(errorResponse.data)
+      if (errorCallback && typeof errorCallback === 'function') errorCallback(response.data)
     })
   },
 

@@ -1,53 +1,45 @@
 <template>
-    <v-dialog
-        v-model="dialog"
-
-        v-bind="{
-            ...$bindAttributes()
-        }"
-        :fullscreen="full"
-        :width="modalWidth"
-        transition="dialog-bottom-transition"
-
+  <v-dialog
+    v-model="dialog"
+    v-bind="{
+        ...$bindAttributes()
+    }"
+    :fullscreen="full"
+    :width="modalWidth"
+    transition="dialog-bottom-transition"
     >
 
-        <template v-slot:activator="{ props }">
-            <slot
-                name="activator"
-                :props="{
-                    ...props
-                }"
-                >
+    <template v-for="(_, name) in $slots" v-slot:[name]="slotProps">
+      <slot :name="name" v-bind="slotProps || {}"></slot>
+    </template>
 
-            </slot>
-        </template>
+    <!-- <template v-slot:activator="{ props }">
+      <slot name="activator" :props="{...props}"></slot>
+    </template> -->
 
-        <v-card>
-            <slot v-if="systembar" name="systembar">
-                <v-layout style="height: 40px">
-                    <v-system-bar dark>
-                        <v-icon @click="toggleFullScreen()" :x-small="full">
-                            mdi-checkbox-blank-outline
-                        </v-icon>
-                        <!-- <v-icon @click="cancelModal(on.closeDialog)" >mdi-close</v-icon> -->
-                        <v-icon @click="close()">mdi-close</v-icon>
-                    </v-system-bar>
-                </v-layout>
-            </slot>
-            <slot
-                name="body"
-                :props="{
-                    onOpen: this.open,
-                    onClose: this.close,
-                    onConfirm: this.confirm
-                }"
-
-                :closeDialog="close"
-                >
-
-            </slot>
-        </v-card>
-    </v-dialog>
+    <v-card>
+      <slot v-if="systembar" name="systembar">
+        <v-layout style="height: 40px">
+          <v-system-bar dark>
+            <v-icon @click="toggleFullScreen()" :x-small="full">
+              mdi-checkbox-blank-outline
+            </v-icon>
+            <!-- <v-icon @click="cancelModal(on.closeDialog)" >mdi-close</v-icon> -->
+            <v-icon @click="close()">mdi-close</v-icon>
+          </v-system-bar>
+        </v-layout>
+      </slot>
+      <slot name="body"
+        v-bind="{
+            onOpen: this.open,
+            onClose: this.close,
+            onConfirm: this.confirm
+        }"
+        :closeDialog="close"
+        >
+      </slot>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -152,7 +144,7 @@ export default {
       return attrs
     },
     toggleFullScreen () {
-      return this.full = !this.full
+      this.full = !this.full
     },
     screenListener (e) {
       this.full = e.target.fullScreen

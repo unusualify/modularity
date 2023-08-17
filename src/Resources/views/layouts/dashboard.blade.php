@@ -9,14 +9,14 @@
 
 @push('head_last_js')
     @if( app()->isProduction() )
-        <link href="{{ unusualMix('core-dashboard.js') }}" rel="preload" as="script" crossorigin />
+        <link href="{{ unusualMix('core-free.js') }}" rel="preload" as="script" crossorigin />
     @else
 
 
     @endif
 @endpush
 @push('post_js')
-    <script src="{{ unusualMix('core-dashboard.js') }}"></script>
+    <script src="{{ unusualMix('core-free.js') }}"></script>
 @endpush
 
 @section('content')

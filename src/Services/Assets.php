@@ -19,22 +19,22 @@ class Assets
             return $manifest[$file];
         }
 
-        return '/' . config(getUnusualBaseKey() . '.public_dir', 'unusual') . '/' . $file;
+        return '/' . config(unusualBaseKey() . '.public_dir', 'unusual') . '/' . $file;
     }
 
     public function getManifestFilename()
     {
         $fileName =
-            public_path(config(getUnusualBaseKey() . '.public_dir', 'unusual')) .
+            public_path(config(unusualBaseKey() . '.public_dir', 'unusual')) .
             '/' .
-            config(getUnusualBaseKey() . '.manifest', 'unusual-manifest.json');
+            config(unusualBaseKey() . '.manifest', 'unusual-manifest.json');
 
         if (file_exists($fileName)) {
             return $fileName;
         }
 
         return base_path(
-            config(getUnusualBaseKey() . '.vendor_path') . '/vue/dist/' . config(getUnusualBaseKey() . '.public_dir') . '/' . config(getUnusualBaseKey() . '.manifest')
+            config(unusualBaseKey() . '.vendor_path') . '/vue/dist/' . config(unusualBaseKey() . '.public_dir') . '/' . config(unusualBaseKey() . '.manifest')
         );
     }
 
@@ -44,22 +44,22 @@ class Assets
             return null;
         }
 
-        $devServerUrl = config(getUnusualBaseKey() . '.development_url', 'http://localhost:8080');
+        $devServerUrl = config(unusualBaseKey() . '.development_url', 'http://localhost:8080');
         try {
             $manifest = $this->readJson(
                 'http://workspace:8080'.
                     '/' .
-                    config(getUnusualBaseKey() . '.public_dir') .
+                    config(unusualBaseKey() . '.public_dir') .
                     '/' .
-                    config(getUnusualBaseKey() . '.manifest', 'unusual-manifest.json')
+                    config(unusualBaseKey() . '.manifest', 'unusual-manifest.json')
             );
         } catch (\Exception $e) {
             dd(
                 $devServerUrl .
                 '/' .
-                config(getUnusualBaseKey() . '.public_dir') .
+                config(unusualBaseKey() . '.public_dir') .
                 '/' .
-                config(getUnusualBaseKey() . '.manifest', 'unusual-manifest.json'),
+                config(unusualBaseKey() . '.manifest', 'unusual-manifest.json'),
 
                 $file,
                 debug_backtrace()
@@ -101,6 +101,6 @@ class Assets
     private function devMode()
     {
         return app()->environment('local', 'development') &&
-            config(getUnusualBaseKey() . '.is_development', false);
+            config(unusualBaseKey() . '.is_development', false);
     }
 }

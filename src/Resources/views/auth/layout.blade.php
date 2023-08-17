@@ -1,31 +1,89 @@
 <!DOCTYPE html>
-<html dir="ltr" lang="{{ unusualConfig('locale', 'en') }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale() ) }}">
     <head>
         @include("{$BASE_KEY}::partials.head")
+
+        @if( app()->isProduction() )
+            <link href="{{ unusualMix('core-auth.js') }}" rel="preload" as="script" crossorigin />
+        @else
+            <script src="{{ unusualMix('chunk-common.js')}}" defer></script>
+            <script src="{{ unusualMix('chunk-vendors.js') }}" defer></script>
+            <script type="text/javascript" src="{{ unusualMix('core-auth.js') }}" defer></script>
+        @endif
+
+        @stack('head_last_js')
     </head>
-    <body class="env env--{{ app()->environment() }}">
-        <div class="a17 a17--login">
-            <section class="login">
-                <form accept-charset="UTF-8" action="{{ $route }}" method="post">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <h1 class="f--heading login__heading login__heading--title">{{ config('app.name') }} <span class="envlabel envlabel--heading">{{ app()->environment() === 'production' ? 'prod' : app()->environment() }}</span></h1>
-                    <h2 class="f--heading login__heading">{{ $screenTitle }}</h2>
+    <body>
+        @include("{$BASE_KEY}::partials.icons.svg-sprite")
+        {{-- @dd(get_defined_vars()) --}}
+        <div id="auth">
+            <ue-auth>
+                @section('content')
+                    <v-sheet>
+                        <ue-form v-bind='@json($formAttributes)'>
+                            <template v-slot:submit="object">
+                                <v-btn block dense type="submit" :disabled="!object.validForm">
+                                @{{ object.buttonDefaultText.toUpperCase() }}
+                                </v-btn>
+                            </template>
+                        </ue-form>
+                    </v-sheet>
 
+                    @foreach( ($slots ?? []) as $slotName => $configuration)
+                        <template v-slot:[@json($slotName)] >
+                            <ue-recursive-shit
+                                :configuration='@json($configuration)'
+                            />
+                        </template>
+                        {{-- <template v-slot:bottom1 >
+                            <ue-recursive-shit
+                                :configuration='@json($configuration)'
+                            />
+                        </template> --}}
+                    @endforeach
 
-                    @yield('form')
-                </form>
-            </section>
-
-            @include("{$BASE_KEY}::partials.toaster")
-
-            <div class="login__copyright f--small">
-                <a href="https://twill.io/" target="_blank" rel="noopener">Made with
-                    <svg xmlns="http://www.w3.org/2000/svg" width="55" height="24">
-                        <path fill="currentColor" d="M42 2h5v21h-5zM49 2h5v21h-5zM26.776 16.587L23.24 9h-4.097l-3.37 7.11L12.532 9H8V5H3v4H1v4h2v10h5V13h1.333l5.205 10h3.449l3.421-7.762L24.998 23h3.393l5.303-10H35v10h5V9h-9.66z"/>
-                        <circle fill="currentColor" cx="37.5" cy="4.5" r="2.875"/>
-                    </svg>
-                </a>
-            </div>
+                @stop
+                @yield('content')
+            </ue-auth>
         </div>
+        <script>
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'] = {};
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].LOCALE = '{{ config(unusualBaseKey() . '.locale') }}';
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].version = '{{ config(unusualBaseKey() . '.version') }}';
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {};
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE = {};
+
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.config = {
+                // isMiniSidebar:  '{{ $isMiniSidebar ?? true }}',
+                isMiniSidebar:  {!! json_encode($isMiniSidebar ?? true) !!},
+            },
+
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias = {};
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types = [];
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.config = {
+                useWysiwyg: {{ config(unusualBaseKey() . '.media_library.media_caption_use_wysiwyg') ? 'true' : 'false' }},
+                wysiwygOptions: {!! json_encode(config(unusualBaseKey() . '.media_library.media_caption_wysiwyg_options')) !!}
+            };
+
+
+
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].unusualLocalization = {!! json_encode($unusualLocalization) !!};
+
+            // window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.datatable = {}
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {}
+
+            @section('STORE')
+                window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
+                window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {!! json_encode($formStore ?? new StdClass()) !!}
+            @stop
+            @yield('STORE')
+        </script>
+
+        {{-- <script src="{{ unusualMix('chunk-common.js')}}" > </script>
+        <script src="{{ unusualMix('chunk-vendors.js') }}"> </script>
+        <script type="text/javascript" src="{{ unusualMix('core-auth.js') }}"></script> --}}
+
+        @stack('post_js')
+
     </body>
 </html>

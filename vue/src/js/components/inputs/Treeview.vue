@@ -17,14 +17,16 @@
 </template>
 
 <script>
-import { CustomInputMixin } from '@/mixins'
+import { InputMixin } from '@/mixins'
+import { useInput } from '@/hooks'
+
 // import { VTreeview } from 'vuetify/lib/components/VTreeview'
 
 export default {
   components: {
     // VTreeview
   },
-  mixins: [CustomInputMixin],
+  mixins: [InputMixin],
   name: 'ue-custom-input-range',
 
   created () {

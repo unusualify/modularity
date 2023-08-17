@@ -1,6 +1,8 @@
 import axios from 'axios'
 import { replaceState } from '@/utils/pushState.js'
-// import { globalError } from '@/utils/errors'
+import { globalError } from '@/utils/errors'
+
+const component = 'DATATABLE'
 
 export default {
   /*
@@ -45,7 +47,7 @@ export default {
 
   // delete (item, callback) {
   delete (id, callback) {
-    const url = window[process.env.VUE_APP_NAME].ENDPOINTS.delete.replace(':id', id)
+    const url = window[process.env.VUE_APP_NAME].ENDPOINTS.destroy.replace(':id', id)
     // var url = window[process.env.VUE_APP_NAME].ENDPOINTS.index.replace(':id', item.id);
 
     axios.delete(url).then(function (resp) {
@@ -55,7 +57,7 @@ export default {
         message: 'Delete request error.',
         value: resp
       }
-      //   globalError(component, error)
+      globalError(component, error)
     })
   }
 

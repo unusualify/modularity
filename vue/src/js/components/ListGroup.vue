@@ -4,7 +4,7 @@
         v-model:opened="opened"
         :style="style"
         :active-class="`sidebar-item-active sidebar-item-active-${level}`"
-        class="mb-2"
+        class="mb-2 py-0"
         >
         <template
             v-for="(item, i) in items"
@@ -17,30 +17,30 @@
                 :ripple="true"
                 :sub-group="false"
                 :active-class="`sidebar-item-active sidebar-item-active-${level}`"
-                :value="item.text"
+                :value="item.name"
                 >
                 <template v-slot:activator="{ props }">
                     <v-list-item
                         v-bind="props"
-                        :title="item.text"
+                        :title="item.name"
                         :prepend-icon="item.icon"
                     ></v-list-item>
                 </template>
                 <ue-list-group
-                    :items="item.items"
-                    :level="level+1"
+                  :items="item.items"
+                  :level="level+1"
                 />
             </v-list-group>
 
             <v-list-item
-                v-else-if="isLink(item)"
-                :key="i + 'link'"
+                v-else-if="isRoute(item)"
+                :key="i + 'route'"
                 :index="i"
                 :ripple="false"
-                :href="item.link"
+                :href="item.route"
                 :append="false"
                 :prepend-icon="item.icon"
-                :title="item.text"
+                :title="item.name"
                 :active="activeIndex === i"
                 :active-class="`sidebar-item-active sidebar-item-active-${level}`"
                 >
@@ -54,7 +54,7 @@
                 :append="false"
                 @click="$root.handleVmFunctionCall(item.event)"
                 :prepend-icon="item.icon"
-                :title="item.text"
+                :title="item.name"
                 :active="activeIndex === i"
                 :active-class="`sidebar-item-active sidebar-item-active-${level}`"
                 >
@@ -64,13 +64,13 @@
                 </v-list-item-icon>
 
                 <v-list-item-content>
-                    <v-list-item-title v-text="item.text"></v-list-item-title>
+                    <v-list-item-title v-text="item.name"></v-list-item-title>
                 </v-list-item-content> -->
 
             </v-list-item>
 
             <template
-                v-else
+                v-else-if="isHeader(item)"
                 >
                 <v-divider
                     v-if="i != 0"
@@ -86,7 +86,7 @@
                     :append="false"
                     disabled
                     :prepend-icon="item.icon"
-                    :title="item.text"
+                    :title="item.name"
                     >
 
                     <!-- <v-list-item-icon v-if="!!item.icon">
@@ -94,7 +94,7 @@
                     </v-list-item-icon>
 
                     <v-list-item-content>
-                        <v-list-item-title v-text="item.text"></v-list-item-title>
+                        <v-list-item-title v-text="item.name"></v-list-item-title>
                     </v-list-item-content> -->
                 </v-list-item>
             </template>
@@ -116,7 +116,7 @@ export default {
 
       items.forEach(function (i) {
         if (__isset(i.is_active) && i.is_active && __isset(i.items)) {
-          matches.push(i.text)
+          matches.push(i.name)
           getListGroupOpens(matches, i.items)
         }
       })
@@ -188,14 +188,14 @@ export default {
     isSubgroup (item) {
       return !!item.items
     },
-    isLink (item) {
-      return !item.items && !!item.link
+    isRoute (item) {
+      return !item.items && !!item.route
     },
     isEvent (item) {
       return !!item.attr
     },
     isHeader (item) {
-      return !item.link && !item.items
+      return !item.route && !item.items && !!item.name
     }
   }
 }

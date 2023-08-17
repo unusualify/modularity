@@ -8,11 +8,12 @@ use Symfony\Component\Console\Input\InputOption;
 // use Module;
 
 
-if (! function_exists('getUnusualBaseName')) {
-    function getUnusualBaseKey() {
+if (! function_exists('unusualBaseKey')) {
+    function unusualBaseKey() {
         return \Illuminate\Support\Str::snake(env('BASE_NAME', 'Base'));
     }
 }
+
 if (! function_exists('getModule')) {
     function getModule($name = "Base") {
         // dd( app()['modules']->find( ucfirst( strtolower($name ) ) ) );
@@ -68,9 +69,19 @@ if (! function_exists('getCurrentModuleStudlyName')) {
 
 if (! function_exists('getCurrentModuleLowerName')) {
     function getCurrentModuleLowerName($file = null) {
-        // dd( getCurrentModule() );
-        // dd($file);
         return getCurrentModule($file)->getLowerName();
+    }
+}
+
+if (! function_exists('getCurrentModuleSnakeName')) {
+    function getCurrentModuleSnakeName($file = null) {
+        return getCurrentModule($file)->getSnakeName();
+    }
+}
+
+if (! function_exists('getCurrentModuleUrlName')) {
+    function getCurrentModuleUrlName($file = null) {
+        return pluralize( kebabCase(getCurrentModule($file)->getName()));
     }
 }
 
@@ -144,8 +155,9 @@ if (!function_exists('moduleRoute')) {
      * @param bool $absolute
      * @return string
      */
-    function moduleRoute($moduleName, $prefix, $action = '', $parameters = [], $absolute = true)
+    function moduleRoute($moduleName, $prefix, $action = '', $parameters = [], $absolute = true, $singleton = false)
     {
+
         // Fix module name case
         $kebabName = kebabCase($moduleName);
         $snakeName = snakeCase($moduleName);
@@ -161,14 +173,14 @@ if (!function_exists('moduleRoute')) {
 
         // Prefix it with module name only if prefix doesn't contains it already
         if (
-            config(getUnusualBaseKey() . '.allow_duplicates_on_route_names', false) ||
+            config(unusualBaseKey() . '.allow_duplicates_on_route_names', false) ||
             ($prefix !== $moduleName &&
                 !Str::endsWith($prefix, '.' . $moduleName))
         ) {
             $routeName .= "{$snakeName}";
         }
 
-        if(preg_match('/edit|show|update|destroy/', $action) && !array_key_exists($snakeName, $parameters)){
+        if(preg_match('/edit|show|update|destroy/', $action) && !array_key_exists($snakeName, $parameters) && !$singleton){
             $parameters[$snakeName] = ":id";
             // dd(
             //     $routeName,
@@ -178,6 +190,14 @@ if (!function_exists('moduleRoute')) {
 
         //  Add the action name
         $routeName .= $action ? ".{$action}" : '';
+
+        // dd(
+        //     $routeName,
+        //     $parameters,
+        //     $absolute,
+        //     route($routeName, $parameters, $absolute),
+        //     $singleton
+        // );
        // Build the route
         try {
             //code...
@@ -223,7 +243,7 @@ if (!function_exists('unusualRoute')) {
 
         // Prefix it with module name only if prefix doesn't contains it already
         if (
-            config(getUnusualBaseKey() . '.allow_duplicates_on_route_names', false) ||
+            config(unusualBaseKey() . '.allow_duplicates_on_route_names', false) ||
             ($prefix !== $route &&
                 !Str::endsWith($prefix, '.' . $route))
         ) {
@@ -246,7 +266,7 @@ if (! function_exists('getUnusualTraits')) {
      */
     function getUnusualTraits()
     {
-        return array_keys(Config::get(getUnusualBaseKey() . '.traits'));
+        return array_keys(Config::get(unusualBaseKey() . '.traits'));
         // return [
         //     // 'hasBlocks',
         //     'translationTrait',
@@ -280,7 +300,7 @@ if (! function_exists('unusualTraitOptions')) {
      */
     function unusualTraitOptions()
     {
-        return Collection::make(Config::get(getUnusualBaseKey() . '.traits'))->map(function ($trait, $key) {
+        return Collection::make(Config::get(unusualBaseKey() . '.traits'))->map(function ($trait, $key) {
                 return [
                     $key,
                     $trait['command_option']['shortcut'] ?? null,
@@ -290,15 +310,28 @@ if (! function_exists('unusualTraitOptions')) {
             })->toArray();
     }
 }
+
 if (! function_exists('unusualConfig')) {
     /**
      * @return string|array
      */
-    function unusualConfig($notation, $default = '')
+    function unusualConfig($notation = '', $default = '')
     {
         if($notation == '')
-            return config(getUnusualBaseKey());
+            return config(unusualBaseKey());
         else
-            return config(getUnusualBaseKey() . '.' . $notation, $default);
+            return config(unusualBaseKey() . '.' . $notation, $default);
+    }
+}
+
+if (! function_exists('findParentRoute')) {
+    /**
+     * @return string|array
+     */
+    function findParentRoute($config)
+    {
+        return array_values(array_filter($config['routes'], function($r){
+            return isset($r['parent']) && $r['parent'];
+        }))[0] ?? [];
     }
 }

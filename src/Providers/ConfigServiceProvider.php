@@ -2,7 +2,6 @@
 
 namespace OoBook\CRM\Base\Providers;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factory;
 
 use Illuminate\Support\Facades\Blade;
@@ -10,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use OoBook\CRM\Base\View\Table;
 use Nwidart\Modules\Facades\Module;
 use Illuminate\Support\Str;
+use OoBook\CRM\Base\Entities\User;
 
 class ConfigServiceProvider extends ServiceProvider
 {
@@ -44,6 +44,10 @@ class ConfigServiceProvider extends ServiceProvider
         // dd(glob(__DIR__."/../Config/modules/*.php"));
         // $base_config_name = strtolower(config($this->baseKey . '.name'));
 
+        // $this->mergeConfigFrom(__DIR__ . '/../config/twill.php', 'twill');
+
+        // $this->mergeConfigFrom(__DIR__ . '/../Config/config.php', 'unusual');
+
         $this->mergeConfigFrom(__DIR__ . '/../Config/internal_modules.php', $this->baseKey . '.internal_modules');
         $this->mergeConfigFrom(__DIR__ . '/../Config/media-library.php', $this->baseKey . '.media_library');
         $this->mergeConfigFrom(__DIR__ . '/../Config/imgix.php', $this->baseKey . '.imgix');
@@ -63,7 +67,7 @@ class ConfigServiceProvider extends ServiceProvider
             if (blank(config('auth.passwords.unusual_users'))) {
                 config(['auth.passwords.unusual_users' => [
                     'provider' => 'unusual_users',
-                    'table' => config($this->baseKey . '.password_resets_table', 'unusual_password_resets'),
+                    'table' => config($this->baseKey . '.password_resets_table', 'password_resets'),
                     'expire' => 60,
                     'throttle' => 60,
                 ]]);

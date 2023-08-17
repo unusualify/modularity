@@ -2,8 +2,7 @@
 
 namespace OoBook\CRM\Base\Entities;
 
-use OoBook\CRM\Base\Entities\Traits\HasPresenter;
-use OoBook\CRM\Base\Entities\Traits\IsTranslatable;
+use OoBook\CRM\Base\Entities\Traits\{HasPresenter,HasHelpers, IsTranslatable};
 use Carbon\Carbon;
 use Cartalyst\Tags\TaggableInterface;
 use Cartalyst\Tags\TaggableTrait;
@@ -14,7 +13,7 @@ use Illuminate\Support\Str;
 
 abstract class Model extends BaseModel implements TaggableInterface
 {
-    use HasPresenter, SoftDeletes, TaggableTrait, IsTranslatable;
+    use HasPresenter, HasHelpers, SoftDeletes, TaggableTrait, IsTranslatable;
 
     public $timestamps = true;
 
@@ -121,4 +120,5 @@ abstract class Model extends BaseModel implements TaggableInterface
             'tag_id'
         );
     }
+
 }

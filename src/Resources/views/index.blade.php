@@ -4,6 +4,6 @@
     <h1>Hello World</h1>
 
     <p>
-        This view is loaded from module: {!! config(getUnusualBaseKey() . '.name') !!}
+        This view is loaded from module: {!! config(unusualBaseKey() . '.name') !!}
     </p>
 @endsection

@@ -3,18 +3,19 @@
 namespace OoBook\CRM\Base\Support;
 
 use Nwidart\Modules\Support\Migrations\SchemaParser as Parser;
-use OoBook\CRM\Base\Traits\ManagesNames;
+use OoBook\CRM\Base\Traits\ManageNames;
 
 use Composer\Autoload\ClassMapGenerator;
 
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 
 class Finder
 {
-    use ManagesNames;
+    use ManageNames;
 
     /**
      * Create new instance.
@@ -71,6 +72,40 @@ class Finder
 
         if($model_class !== '') return $model_class;
 
+
+        return false;
+    }
+
+    public function getRepository($table)
+    {
+        $class = '';
+        // dd( array_filter( glob( base_path( config('modules.namespace')).'/*'), 'is_dir') );
+
+        foreach (array_filter( glob( base_path( config('modules.namespace')).'/*'), 'is_dir') as $module_path) {
+
+            if( !file_exists( $module_path.'/Repositories') ) continue;
+
+            foreach($this->getClasses( $module_path.'/Repositories' ) as $_class){
+                // dd($module_path, $class);
+                if( App::make($_class)->getTable() == $table ){
+                    $class = $_class;
+                    break 2;
+                }
+            }
+        }
+
+        if($class !== '') return $class;
+
+        foreach($this->getClasses( app_path('Repositories')) as $_class){
+            if( method_exists($_class,'getTable') ){
+                if( with(new $_class())->getTable() == $table ){
+                    $class = $class;
+                    break;
+                }
+            }
+        }
+
+        if($class !== '') return $class;
 
         return false;
     }

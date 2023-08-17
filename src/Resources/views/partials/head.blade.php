@@ -4,8 +4,7 @@
 <meta name="robots" content="noindex,nofollow" />
 
 {{-- <title>{{ config('app.name') }} {{ config('twill.admin_app_title_suffix') }}</title> --}}
-
-<title> {{ $title ?? 'Module Template' }}</title>
+<title> {{ $pageTitle ?? 'Module Template' }}</title>
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <!-- Fonts -->
 
@@ -20,7 +19,7 @@
     <link href="{{ unusualMix('chunk-vendors.css') }}" rel="preload" as="style" crossorigin/>
 @endif
 
-@unless(config(getUnusualBaseKey() . '.is_development', false))
+@unless(config(unusualBaseKey() . '.is_development', false))
     {{-- <link href="{{ unusualMix('chunk-common.css') }}" rel="stylesheet" crossorigin/> --}}
     <link href="{{ unusualMix('chunk-vendors.css' )}}" rel="stylesheet" crossorigin/>
 @endunless

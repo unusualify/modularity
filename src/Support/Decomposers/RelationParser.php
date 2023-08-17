@@ -2,9 +2,10 @@
 
 namespace OoBook\CRM\Base\Support\Decomposers;
 
-use OoBook\CRM\Base\Traits\ManagesNames;
+use OoBook\CRM\Base\Traits\ManageNames;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use OoBook\CRM\Base\Support\Finder;
 
@@ -12,7 +13,7 @@ use OoBook\CRM\Base\Support\Finder;
 
 class RelationParser implements Arrayable
 {
-    use ManagesNames;
+    use ManageNames;
 
     protected $methods = [
         'belongsTo',
@@ -29,7 +30,6 @@ class RelationParser implements Arrayable
         'hasOneThrough'     => ['table', 'table', 'foreign_key', 'foreign_key', 'local_key', 'local_key'],
         'hasManyThrough'    => ['table', 'table', 'foreign_key', 'foreign_key', 'local_key', 'local_key']
     ];
-
 
     /**
      * The model relation.
@@ -66,9 +66,7 @@ class RelationParser implements Arrayable
 
         foreach ($this->getRelations() as $relation) {
             $method = $this->getMethod($relation);
-
             $parameters = $this->getParameters($method, $relation);
-
             $function = $this->getFunctionName($method, $relation);
 
             if($parameters !== false )
@@ -216,14 +214,20 @@ class RelationParser implements Arrayable
     public function generateParameter($method, $index, $param)
     {
         $format = $this->arguments[$method][$index];
-
         switch ($format) {
             case 'table':
+                // dd(
+                //     $param,
+                //     (new Finder())->getModel($param),
+                //     "\\". (new Finder())->getModel($param) . "::class",
+                //     get_class_methods( App::make((new Finder())->getModel($param)) )
+                // );
+                return  "\\". (new Finder())->getModel($param) . "::class";
                 return  (new Finder())->getModel($param);
                 break;
 
             default:
-                return $param;
+                return "'{$param}'";
 
                 break;
         }
@@ -238,27 +242,34 @@ class RelationParser implements Arrayable
 
         switch ($attr['method']) {
             case 'belongsTo':
-                $comment = "\n\t/**\n\t* Get the {$attr['function_name']} of the {$model}.\n\t*/";
-
+                // $comment = "/**\n\t* Get the {$attr['function_name']} of the {$model}.\n\t*/";
+                $comment = $this->commentStructure(["Get the {$attr['function_name']} of the {$model}."]);
                 break;
             case 'hasOne':
-                $comment = "\n\t/**\n\t* Get the {$attr['function_name']} associated with the {$model}.\n\t*/";
+                $comment = "/**\n\t* Get the {$attr['function_name']} associated with the {$model}.\n\t*/";
 
                 break;
             case 'hasMany':
-                $comment = "\n\t/**\n\t* Get the {$attr['function_name']} for the {$model}.\n\t*/";
+                $comment = "/**\n\t* Get the {$attr['function_name']} for the {$model}.\n\t*/";
 
                 break;
 
             default:
-                $comment = "\n\t/**\n\t* Get .\n\t*/";
+                $comment = "/**\n\t* Get .\n\t*/";
                 break;
         }
 
         return $comment;
     }
 
-
+    public function commentStructure($array)
+    {
+        $message = array_reduce($array, function($carry, $text){
+            $carry .= "{$text}\n\t* ";
+            return $carry;
+        }, '');
+        return "/**\n\t* {$message}\n\t*/";
+    }
 
     /**
      * Render the migration to formatted script.
@@ -270,8 +281,7 @@ class RelationParser implements Arrayable
         $methods = [];
 
         foreach ($this->toArray() as $attr) {
-
-            $args = implode(',', array_map(function($v){ return "'{$v}'";}, $attr['parameters']) );
+            $args = implode(', ', array_map(function($v){ return "{$v}";}, $attr['parameters']) );
 
             $comment = $this->generateMethodComment($attr);
 
@@ -280,7 +290,4 @@ class RelationParser implements Arrayable
 
         return $methods;
     }
-
-
-
 }

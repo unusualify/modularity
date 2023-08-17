@@ -1,25 +1,35 @@
 {
+    "ADD NEW": "EKLE",
+    "Are you sure logout?" : "Çıkış yapmak istediğinize emin misiniz?",
+    "AT A GLANCE": "GENEL BAKIŞ",
     "auth" : {
-        "back-to-login" : "Giriş Dön",
+        "back-to-login" : "Girişe Dön",
         "choose-password" : "Şifre Girin",
         "email" : "E-Posta",
         "forgot-password" : "Şifrenizi Mi Unuttunuz",
         "login" : "Giriş Yap",
+        "name" : "Adınız",
         "login-title" : "Giriş Yap",
         "oauth-link-title" : ":provider Hesabınızın Şifresini Yeniden Girin",
         "otp" : "Tek Seferlik Şifre",
         "password" : "Şifre",
         "password-confirmation" : "Şifre Tekrar",
+        "register": "Kayıt Ol",
         "reset-password" : "Şifre Sıfırla",
         "reset-send" : "Şifre Sıfırlama Bağlantısı Gönder",
-        "verify-login" : "Girişi Doğrula"
+        "surname" : "Soyadınız",
+        "verify-login" : "Girişi Doğrula",
+        "logout": "Çıkış Yap"
+
     },
 
     "cancel": "İptal",
     "close": "Kapat",
+    "Company Information": "Şirket Bilgileri",
     "confirm": "Onayla",
     "confirm-deletion": "{name} {route} kaydını silmek istediğinize emin misiniz?",
     "confirm-description": "Bu işlemi yapmak istediğinize emin misiniz?",
+    "country": "Ülke",
 
     "delete": "Kaldır",
 
@@ -195,15 +205,22 @@
         "error": "Bir Hata Oluştu!"
     },
     "modules": {
-        "invoice": "Fatura",
-        "payment": "Ödeme",
-        "permission": "İzin",
-        "role": "Rol",
-        "user": "Kullanıcı",
-        "press_release": "Haber Bülteni"
+        "company": "Şirket | Şirketler | {n} Şirket",
+        "invoice": "Fatura | Faturalar | {n} Fatura",
+        "package": "Paket | Paketler",
+        "package_continent": "Kıta | Kıtalar",
+        "package_region": "Bölge | Bölgeler",
+        "package_country": "Ülke| Ülkeler",
+        "payment": "Ödeme | Ödemeler | {n} Ödeme",
+        "permission": "İzin | İzinler | {n} İzin",
+        "role": "Rol | Roller | {n} Rol",
+        "user": "Kullanıcı | Kullanıcılar | {n} Kullanıcı",
+        "press_release": "Haber Bülteni | Haber Bültenleri | {n} Haber Bülteni"
     },
 
+
     "new-item": "Yeni {item}",
+    "No": "Hayır",
 
     "Personal Information": "Kişisel Bilgiler",
 
@@ -216,5 +233,11 @@
     "success-update": "Başarıyla Güncellendi.",
     "success-delete": "Başarıyla Silindi.",
 
-    "update": "Güncelle"
+    "update": "Güncelle",
+    "Update Password": "Şifreyi Güncelle",
+
+    "Yes": "Evet"
+
+
+
 }

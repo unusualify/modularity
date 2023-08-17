@@ -15,15 +15,12 @@ use OoBook\CRM\Base\Http\Controllers\ProfileController;
 |
 */
 
-// Route::group(['prefix' => 'user', 'as' => 'user.'], function(){
-//     Route::resource('role', RoleController::class);
+// Route::get('', ['as' => 'dashboard', 'uses' => 'DashboardController@index']);
+Route::resource('', 'DashboardController', ['as' => 'dashboard', 'names' => ['index' => 'dashboard']])->only(['index']);
 
-//     Route::resource('permission', PermissionController::class);
-// });
-
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
-Route::put('/profile/{profile}', [ProfileController::class, 'update'])->name('profile.update');
+// Route::resource('profile', 'ProfileController', ['names' => ['index' => 'profile']])->only(['index', 'update']);
+Route::singleton('profile', 'ProfileController', ['names' => ['edit' => 'profile']]);
+Route::put('profile/company', 'ProfileController@updateCompany')->name('profile.company');
 
 Route::unusualWebRoutes();
 
@@ -33,7 +30,7 @@ Route::group(['prefix' => 'api/user', 'as' => 'api.user.', 'namespace' => 'API']
 });
 
 
-if (config(getUnusualBaseKey() . '.enabled.media-library')) {
+if (config(unusualBaseKey() . '.enabled.media-library')) {
     Route::group(['prefix' => 'media-library', 'as' => 'media-library.'], function () {
         Route::post('sign-s3-upload', ['as' => 'sign-s3-upload', 'uses' => 'MediaLibraryController@signS3Upload']);
         Route::get('sign-azure-upload', ['as' => 'sign-azure-upload', 'uses' => 'MediaLibraryController@signAzureUpload']);

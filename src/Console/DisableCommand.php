@@ -27,7 +27,8 @@ class DisableCommand extends Command
     public function handle() : int
     {
         /** @var Module $module */
-        $module = $this->laravel['ue_modules']->findOrFail($this->argument('module'));
+        $module = $this->laravel['unusual.repository']->findOrFail($this->argument('module'));
+
         $module->setModuleActivator($this->argument('module'));
 
         $route = $this->argument('route');

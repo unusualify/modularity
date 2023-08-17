@@ -1,8 +1,8 @@
 <template>
   <v-row>
-    <v-col xxl="6" xl="8" lg="8" cols="12" v-fit-grid>
-      <ue-board-information></ue-board-information>
-    </v-col>
+    <!-- <v-col xxl="6" xl="8" lg="8" cols="12" v-fit-grid>
+      <ue-customboard-information></ue-customboard-information>
+    </v-col> -->
     <v-col
       v-for="(block,i) in blocks"
       :key="`block-${i}`"

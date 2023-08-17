@@ -27,7 +27,7 @@ class ImpersonateMiddleware
     public function handle($request, Closure $next)
     {
         if ($request->session()->has('impersonate')) {
-            $this->authFactory->guard('twill_users')->onceUsingId($request->session()->get('impersonate'));
+            $this->authFactory->guard('unusual_users')->onceUsingId($request->session()->get('impersonate'));
         }
 
         return $next($request);

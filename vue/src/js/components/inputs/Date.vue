@@ -1,39 +1,34 @@
 <template>
-    <v-menu
-      v-model="menuActive"
-      :close-on-content-click="false"
-      :nudge-right="40"
-      transition="scale-transition"
-      offset-y
-      max-width="600px"
-      min-width="290px"
-      >
-      <template v-slot:activator="{ on }">
-          <v-text-field
-              v-on="on"
-              v-model="dateFormattedLocale"
-              v-bind="obj.schema"
-              readonly
+    <v-sheet>
+      <v-text-field
+        v-model="dateHtmlFormat"
+        v-bind="{
+          ...$lodash.omit(boundProps, ['offset', 'order', 'type']),
+        }"
+        type="date"
 
-          ></v-text-field>
-      </template>
-
-      <v-date-picker
-          v-model="input"
-          :locale="$i18n.locale"
-          v-bind="$bindAttributes(obj.schema.picker_props)"
-          >
-      </v-date-picker>
-
-    </v-menu>
+        >
+      </v-text-field>
+    </v-sheet>
 </template>
 
 <script>
-import { CustomInputMixin } from '@/mixins'
+import { InputMixin } from '@/mixins' // for props
+import { useInput } from '@/hooks'
+
+import { VDatePicker } from 'vuetify/labs/VDatePicker'
 
 export default {
-  mixins: [CustomInputMixin],
-  name: 'ue-custom-input-color',
+  mixins: [InputMixin],
+  components: {
+    VDatePicker
+  },
+  name: 'ue-custom-input-date',
+  setup (props, context) {
+    return {
+      ...useInput(props, context)
+    }
+  },
   data () {
     return {
       menuActive: false
@@ -43,9 +38,20 @@ export default {
     computedDateFormattedMomentjs () {
       return this.input ? moment(this.input).format('dddd, MMMM Do YYYY') : ''
     },
+    dateHtmlFormat: {
+      get () {
+        return this.input ? (new Date(this.input)).toISOString().split('T')[0] : ''
+      },
+      set (val) {
+        this.input = val
+        // context.emit('update:modelValue', val)
+      }
+    },
     dateFormattedLocale () {
+      // __log(this.input)
       // __log(this.input, !!this.input)
-      return this.input ? this.$d(new Date(this.input), 'short') : ''
+      // return this.input ? this.$d(new Date(this.input), 'short') : ''
+      return this.input ? this.$d(new Date(this.input), 'medium') : ''
       return this.input ? this.$d(new Date(this.input), 'long') : ''
     }
   }

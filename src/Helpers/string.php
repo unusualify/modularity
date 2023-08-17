@@ -38,6 +38,12 @@ if (! function_exists('pluralize')) {
     }
 }
 
+if (! function_exists('headline')) {
+    function headline($string) {
+        return Str::headline($string);
+    }
+}
+
 /**
  * Get the short name of class from class namespace
  *

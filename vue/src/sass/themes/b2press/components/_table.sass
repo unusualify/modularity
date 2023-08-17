@@ -1,19 +1,31 @@
 .v-table
+  &.v-table--has-wrapper-space
+    > .v-table__wrapper
+      padding-left: $theme-space !important
+      padding-right: $theme-space !important
+
+      > table
+        border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity))
+        border-left: 1px solid rgba(var(--v-border-color), var(--v-border-opacity))
+
+  > .ue-table-header, .ue-table-form__embedded
+    padding-left: $theme-space !important
+    padding-right: $theme-space !important
   > .v-table__wrapper
     > table
       border-top: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
-      thead,tbody
+      .v-data-table-header__content
+        font-weight: map-get($font-weights, 'bold') !important
+      &,tbody
         tr
           td,th
             border-bottom: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
+            padding-left: $theme-space !important
             &:not(:last-child)
               border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity))
-      > thead
-        > tr
-          > th
-            > .v-data-table-header__content
-              font-weight: map-get($font-weights, 'semiBold')
       > tbody
         > tr
           > td
             font-size: 0.9rem
+
+// .v-table.v-table--has-wrapper-space

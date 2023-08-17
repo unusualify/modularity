@@ -1296,7 +1296,7 @@ export const defaultOptions = {
   invalidMsg: '',
   required: false,
   allCountries,
-  defaultCountry: '',
+  defaultCountry: 'tr',
   enabledCountryCode: false,
   enabledFlags: true,
   preferredCountries: [],

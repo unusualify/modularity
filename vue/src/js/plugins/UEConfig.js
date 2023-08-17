@@ -30,6 +30,7 @@ import SvgSprite from '@/directives/svg'
 import Column from '@/directives/column'
 import FitGrid from '@/directives/fit-grid'
 import commonMethods from '@/utils/common-methods'
+import { ALERT } from '../store/mutations'
 
 const includeGlobalComponents = require.context('__components', false, /[A-Za-z]*(?<!_)\.vue$/i)
 const includeLabComponents = require.context('__components/labs', false, /[A-Za-z]*(?<!_)\.vue$/i)
@@ -54,8 +55,11 @@ export default {
     app.config.globalProperties.$lodash = window._
     app.config.globalProperties.window = window
 
+    app.config.globalProperties.$app = app
+
     app.config.errorHandler = (err) => {
-      __log(err)
+      err
+      // __log(err)
     }
 
     // set locale wrt user profile preference
@@ -70,6 +74,15 @@ export default {
       $te: function (key, locale) {
         const func = i18n.global.te
         return func(key, locale) ?? false
+      },
+      registerComponents: function (components, folder = '', prefix = 'ue') {
+        folder = folder !== '' ? folder + '/' : ''
+        components.keys().forEach((path) => {
+          const fileName = path.split('/').pop().split('.')[0]
+          const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
+          // __log(componentName, fileName, folder)
+          app.component(componentName, require(`__components/${folder}${fileName}.vue`).default)
+        })
       }
     }
 
@@ -78,6 +91,9 @@ export default {
       //   vuetify,
       //   i18n,
       methods: {
+        notif: function (Obj) {
+          this.$store.commit(ALERT.SET_ALERT, Obj)
+        },
         openFreeMediaLibrary: function () {
           // __log('openFreeMedialibrary triggered', this.$root.$refs.main.$refs)
           this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_CONNECTOR, null) // reset connector
@@ -97,8 +113,8 @@ export default {
       }
 
     })
-
     // all components
+
     // app.component('v-form-base', VFormBase);
     app.component('v-custom-form-base', VCustomFormBase)
     app.component('ue-modal', UEModal)
@@ -106,40 +122,11 @@ export default {
     app.component('ue-modal-media', UEModalMedia)
     // Vue.component('ue-medialibrary', UEMediaLibrary)
 
-    // package components
-
-    includeGlobalComponents.keys().forEach((path) => {
-      const prefix = 'ue'
-      const fileName = path.split('/').pop().split('.')[0]
-      const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
-      app.component(componentName, require('__components/' + fileName + '.vue').default)
-    })
-    includeLabComponents.keys().forEach((path) => {
-      const prefix = 'ue'
-      const fileName = path.split('/').pop().split('.')[0]
-      const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
-      app.component(componentName, require('__components/labs/' + fileName + '.vue').default)
-    })
-    includeLayouts.keys().forEach((path) => {
-      const prefix = 'ue'
-      const fileName = path.split('/').pop().split('.')[0]
-      const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
-      app.component(componentName, require('__components/layouts/' + fileName + '.vue').default)
-    })
-    // includeFormInputs.keys().forEach((path) => {
-    //   const prefix = 'ue-input'
-    //   const fileName = path.split('/').pop().split('.')[0]
-    //   const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
-    //   // __log(componentName)
-    //   app.component(componentName, require('__components/inputs/' + fileName + '.vue').default)
-    // })
-    includeCustomFormInputs.keys().forEach((path) => {
-      const prefix = 'v-custom-input'
-      const fileName = path.split('/').pop().split('.')[0]
-      const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
-      // __log(componentName)
-      app.component(componentName, require('__components/inputs/' + fileName + '.vue').default)
-    })
+    // crm base package components
+    app.config.globalProperties.registerComponents(includeGlobalComponents)
+    app.config.globalProperties.registerComponents(includeLabComponents, 'labs')
+    app.config.globalProperties.registerComponents(includeLayouts, 'layouts')
+    app.config.globalProperties.registerComponents(includeCustomFormInputs, 'inputs', 'v-custom-input')
 
     // // Configurations
     // Vue.config.productionTip = isProd
@@ -168,7 +155,6 @@ export default {
     app.use(Column)
     app.use(FitGrid)
 
-    app.config.globalProperties.$app = app
     app.provide('$app', app)
   }
 }

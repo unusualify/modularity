@@ -8,7 +8,7 @@ if (!function_exists('unusualIncrementsMethod')) {
      */
     function unusualIncrementsMethod()
     {
-        return config(getUnusualBaseKey().'.use_big_integers_on_migrations')
+        return config(unusualBaseKey().'.use_big_integers_on_migrations')
             ? 'bigIncrements'
             : 'increments';
     }
@@ -20,7 +20,7 @@ if (!function_exists('unusualIntegerMethod')) {
      */
     function unusualIntegerMethod()
     {
-        return config(getUnusualBaseKey().'.use_big_integers_on_migrations')
+        return config(unusualBaseKey().'.use_big_integers_on_migrations')
             ? 'bigInteger'
             : 'integer';
     }
@@ -35,15 +35,23 @@ if (!function_exists('createDefaultFields')) {
      * @param bool $visibility
      * @return void
      */
-    function createDefaultTableFields($table, $softDeletes = true, $published = true, $publishDates = false, $visibility = false)
+    function createDefaultTableFields($table, $has_name = true)
     {
         $table->{unusualIncrementsMethod()}('id');
-
-        if ($softDeletes) {
-            $table->softDeletes();
-        }
-
-        $table->timestamps();
+        // $table->string('name');
+    }
+}
+if (!function_exists('createDefaultExtraTableFields')) {
+    /**
+     * @param \Illuminate\Database\Schema\Blueprint $table
+     * @param bool $softDeletes
+     * @param bool $published
+     * @param bool $publishDates
+     * @param bool $visibility
+     * @return void
+     */
+    function createDefaultExtraTableFields($table, $softDeletes = true, $published = false, $publishDates = false, $visibility = true)
+    {
 
         if ($published) {
             $table->boolean('published')->default(false);
@@ -56,6 +64,12 @@ if (!function_exists('createDefaultFields')) {
 
         if ($visibility) {
             $table->boolean('public')->default(true);
+        }
+
+        $table->timestamps();
+
+        if ($softDeletes) {
+            $table->softDeletes();
         }
     }
 }
@@ -158,6 +172,6 @@ if (!function_exists('createDefaultRevisionsTableFields')) {
         $table->timestamps();
         $table->json('payload');
         $table->foreign("{$tableNameSingular}_id")->references('id')->on("{$tableNamePlural}")->onDelete('cascade');
-        $table->foreign('user_id')->references('id')->on(config(getUnusualBaseKey().'.users_table_name', 'users'))->onDelete('set null');
+        $table->foreign('user_id')->references('id')->on(config(unusualBaseKey().'.users_table_name', 'users'))->onDelete('set null');
     }
 }

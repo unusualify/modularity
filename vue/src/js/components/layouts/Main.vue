@@ -77,11 +77,11 @@
       <!--  -->
       <!-- <ue-footer :items="footerLinks" /> -->
       <div v-if="false">
-          <v-breadcrumbs :items="breadcrumbs">
-            <template v-slot:divider>
-              <v-icon>mdi-forward</v-icon>
-            </template>
-          </v-breadcrumbs>
+        <v-breadcrumbs :items="breadcrumbs">
+          <template v-slot:divider>
+            <v-icon>mdi-forward</v-icon>
+          </template>
+        </v-breadcrumbs>
       </div>
       <slot></slot>
 
@@ -90,8 +90,8 @@
         ref="mediaLibrary"
       ></ue-modal-media>
 
+      <ue-alert ref='alert'></ue-alert>
     </v-main>
-
   </v-app>
 </template>
 
@@ -102,7 +102,7 @@ export default {
       type: Object,
       default () {
         return {
-          sideMenu: [
+          sidebar: [
             {
               icon: '$package',
               text: 'Packages',
@@ -223,7 +223,7 @@ export default {
         }
       ],
 
-      sidebarItems: this.configuration.sideMenu,
+      sidebarItems: this.configuration.sidebar,
       // activeItem: this.configuration.activeItem ?? 0,
       // activeSubItem: this.configuration.activeSubItem ?? -1,
       breadcrumbs: this.configuration.breadcrumbs ?? [],

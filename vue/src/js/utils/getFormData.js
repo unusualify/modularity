@@ -157,42 +157,45 @@ export const getFormData = (rootState) => {
 
 export const getSchemaModel = (inputs) => {
   // __log(inputs)
-  const isTreeview = 'custom-input-treeview|treeview'
+  const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist'
   const values = Object.keys(inputs).reduce((a, c) => {
-    if (isTreeview.includes(inputs[c].type)) {
+    if (isArrayable.includes(inputs[c].type)) {
       a[inputs[c].name] = []
     } else if (__isObject(inputs[c])) {
-      a[inputs[c].name] = inputs[c].hasOwnProperty('default') ? inputs[c].default : ''
+      a[inputs[c].name] = Object.prototype.hasOwnProperty.call(inputs[c], 'default') ? inputs[c].default : ''
     }
     return a
   }
   , {})
 
+  // __log('getSchemaModel', values)
+
   return values
 
-  Object.keys(inputs).reduce((a, c) => (
-    a[inputs[c].name] = inputs[c].hasOwnProperty('default') ? inputs[c].default : '',
-    a
-  )
-  , {})
+  // Object.keys(inputs).reduce((a, c) => (
+  //   a[inputs[c].name] = inputs[c].hasOwnProperty('default') ? inputs[c].default : '',
+  //   a
+  // )
+  // , {})
 }
 
-export const getSchema = (inputs) => {
-  // __log(inputs)
-  const values = Object.keys(inputs).reduce((a, c) => {
-    if (__isObject(inputs[c])) {
-      a[inputs[c].name] = inputs[c].hasOwnProperty('default') ? inputs[c].default : ''
-    } else if (Array.isArray(inputs[c])) {
-      a[inputs[c].name] = []
-    }
-    return a
-  }
-  , {})
-  return values
+// export const getSchema = (inputs) => {
+//   // __log(inputs)
+//   const values = Object.keys(inputs).reduce((a, c) => {
+//     if (__isObject(inputs[c])) {
+//       Object.prototype.hasOwnProperty.call(inputs[c], 'default')
+//       a[inputs[c].name] = inputs[c].hasOwnProperty('default') ? inputs[c].default : ''
+//     } else if (Array.isArray(inputs[c])) {
+//       a[inputs[c].name] = []
+//     }
+//     return a
+//   }
+//   , {})
+//   return values
 
-  Object.keys(inputs).reduce((a, c) => (
-    a[inputs[c].name] = inputs[c].hasOwnProperty('default') ? inputs[c].default : '',
-    a
-  )
-  , {})
-}
+//   Object.keys(inputs).reduce((a, c) => (
+//     a[inputs[c].name] = inputs[c].hasOwnProperty('default') ? inputs[c].default : '',
+//     a
+//   )
+//   , {})
+// }

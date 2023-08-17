@@ -7,17 +7,18 @@
 </template>
 
 <script>
-import { CustomInputMixin } from '@/mixins'
+import { InputMixin } from '@/mixins'
+import { useInput } from '@/hooks'
 
 export default {
-    mixins: [CustomInputMixin],
-    name:'ue-custom-input-range',  
-    
-    created() {
+  mixins: [InputMixin],
+  name: 'ue-custom-input-range',
 
-    },
-    computed:{
+  created () {
 
-    }  
+  },
+  computed: {
+
+  }
 }
 </script>

@@ -39,11 +39,11 @@
 </template>
 
 <script>
-import { CustomInputMixin } from '@/mixins'
-import { useInput } from '@/hooks/input.js'
+import { InputMixin } from '@/mixins'
+import { useInput } from '@/hooks'
 
 export default {
-  mixins: [CustomInputMixin],
+  mixins: [InputMixin],
   name: 'ue-custom-input-color',
   setup (props, context) {
     return {

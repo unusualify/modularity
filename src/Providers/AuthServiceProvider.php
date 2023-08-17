@@ -1,36 +1,74 @@
 <?php
 
-namespace OoBook\CRM\Base;
+namespace OoBook\CRM\Base\Providers;
 
 // use OoBook\CRM\Base\Models\Enums\UserRole;
-use OoBook\CRM\Base\Models\User;
+use OoBook\CRM\Base\Entities\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Spatie\Permission\Models\Permission;
 
 class AuthServiceProvider extends ServiceProvider
 {
-    const SUPERADMIN = 'SUPERADMIN';
+    const SUPERADMIN = 'superadmin';
 
     protected function authorize($user, $callback)
     {
-        if (!$user->isPublished()) {
-            return false;
-        }
+        // if (!$user->isPublished()) {
+        //     return false;
+        // }
 
-        if ($user->isSuperAdmin()) {
-            return true;
-        }
+        // if ($user->isSuperAdmin()) {
+        //     return true;
+        // }
 
         return $callback($user);
     }
 
     protected function userHasRole($user, $roles)
     {
-        return in_array($user->role_value, $roles);
+        // dd($user->roles);
+        return in_array($user->roles, $roles);
+    }
+
+    protected function userHasPermission($user, $permissions)
+    {
+        return in_array($user->permissions, $permissions);
     }
 
     public function boot()
     {
+        Gate::before(function (User $user, $ability) {
+            // dd($user, $user->roles);
+            // if($user->hasRole('superadmin')){
+            //     dd($user);
+            // }
+            return $user->hasRole(1) ? true : null;
+        });
+
+        Gate::define('dashboard', function ($user) {
+            return $this->authorize($user, function ($user){
+                return $this->userHasPermission($user, ['dashboard']);
+                // return $this->userHasRole($user, [UserRole::VIEWONLY, UserRole::PUBLISHER, UserRole::ADMIN]);
+            });
+        });
+
+        foreach( Permission::all() as $permission ){
+            Gate::define($permission->name, function ($user) use($permission) {
+                return $this->authorize($user, function ($user) use($permission){
+                    return $this->userHasPermission($user, [$permission->name]);
+                    // return $this->userHasRole($user, [UserRole::VIEWONLY, UserRole::PUBLISHER, UserRole::ADMIN]);
+                });
+            });
+        }
+
+        // Gate::define('press-release_access', function ($user) {
+        //     return $this->authorize($user, function ($user) {
+        //         return $this->userHasPermission($user, ['press-release_access']);
+        //         // return $this->userHasRole($user, [UserRole::VIEWONLY, UserRole::PUBLISHER, UserRole::ADMIN]);
+        //     });
+        // });
+
         // Gate::define('list', function ($user) {
         //     return $this->authorize($user, function ($user) {
         //         return $this->userHasRole($user, [UserRole::VIEWONLY, UserRole::PUBLISHER, UserRole::ADMIN]);

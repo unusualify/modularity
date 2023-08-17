@@ -11,8 +11,6 @@ import UEModalForm from '__components/modals/ModalForm.vue'
 import datatable from '@/store/modules/datatable'
 import form from '@/store/modules/form'
 // styles
-__log(process.env)
-
 const store = exports.store
 
 // Stores

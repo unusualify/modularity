@@ -1,25 +1,75 @@
 <template>
-  <v-form
-    :id="id"
-    :ref="reference"
-    v-model="validForm"
-    @submit="submit"
-    >
-    <v-container>
-      <v-row>
-        <v-col v-if="hasStickyFrame"
-          v-bind="stickyColumnAttrs"
-          class="d-flex flex-column"
+  <v-sheet>
+    <v-form
+      :id="id"
+      :ref="reference"
+      :action="actionUrl"
+      method="POST"
+
+      :class="formClass"
+
+      v-model="validForm"
+      @submit="submit"
+      >
+      <v-sheet class="d-flex">
+
+        <v-sheet class=" w-100">
+          <!-- <div class="text-h8 pt-5 pb-10 text-primary font-weight-bold" v-if="formTitle && false">
+            {{ ($te(formTitle) ? $t(formTitle).toLocaleUpperCase($i18n.locale.toUpperCase()) : formTitle.toLocaleUpperCase($i18n.locale.toUpperCase())) }}
+          </div> -->
+          <ue-title v-if="title" :classes="['me-auto']">
+            <div class="d-flex">
+              <div class="me-auto">
+                {{ ($te(title)
+                      ? $t(title).toLocaleUpperCase($i18n.locale.toUpperCase())
+                      : title.toLocaleUpperCase($i18n.locale.toUpperCase()))
+                }}
+              </div>
+              <slot name="headerRight">
+                <!-- <v-btn
+                    class=""
+                    variant="text"
+                    icon="$close"
+                    density="compact"
+                  ></v-btn> -->
+              </slot>
+            </div>
+          </ue-title>
+          <v-custom-form-base
+            id="treeview-slot"
+            class="pt-5"
+
+            v-model="model"
+            v-model:schema="inputSchema"
+            :row="rowAttribute"
+
+            @update="handleUpdate"
+            @input="handleInput"
+            @resize="handleResize"
+            @blur="handleBlur"
+            @click="handleClick"
+            >
+            <template v-slot:[`slot-inject-prepend-key-treeview-slot-permissions`]="{open}" >
+              <v-icon color="blue">
+                  {{open ? 'mdi-folder-open' : 'mdi-folder'}}
+              </v-icon>
+            </template>
+            <template #slot-inject-label-key-treeview-slot-permissions="{item}" >
+              <span class="caption" >
+                {{item.name.toUpperCase()}}
+              </span>
+            </template>
+          </v-custom-form-base>
+        </v-sheet>
+        <div v-if="hasStickyFrame"
+          class="d-flex flex-column mx-5"
           style="position:sticky;"
           >
           <div class="d-flex flex-column align-items-center ml-auto mr-auto" style="position:sticky;top:100px;">
-            <slot v-if="hasSubmit && stickyButton"
-              name="submitButton"
-              :attrs="{}"
-              >
-              <ue-btn :form="id" type="submit" width="60%" >
-                {{ $t('submit') }}
-              </ue-btn>
+            <slot v-if="hasSubmit && stickyButton" name="submit" v-bind="{validForm, buttonDefaultText}" >
+              <v-btn type="submit" :disabled="!validForm" class="ml-auto">
+                {{ buttonDefaultText }}
+              </v-btn>
             </slot>
             <slot name="stickyBody" :attrs="{}">
               <!-- <v-card class="mt-6" height="">
@@ -31,86 +81,43 @@
             </slot>
           </div>
           <!-- <v-spacer></v-spacer> -->
-        </v-col>
-        <v-col v-bind="formColumnAttrs">
-          <v-row>
-            <v-col cols="12" v-if="formTitle">
-              <div class="text-h8 pt-2 text-primary font-weight-bold">
-                <!-- {{ tableTitle }} -->
-                {{ ($te(formTitle) ? $t(formTitle) : formTitle) }}
-              </div>
-            </v-col>
-            <v-col>
-              <v-custom-form-base
-                id="treeview-slot"
+        </div>
+      </v-sheet>
 
-                :row="rowAttribute"
-                v-model="model"
-                v-model:schema="inputSchema"
+      <v-sheet class="d-flex pt-6" v-if="hasSubmit && !stickyButton">
+        <slot name="submit" v-bind="{validForm,buttonDefaultText}">
+          <v-btn type="submit" :disabled="!validForm" class="ml-auto">
+            {{ buttonDefaultText }}
+          </v-btn>
+        </slot>
+      </v-sheet>
 
-                @update="handleUpdate"
-                @input="handleInput"
-                @resize="handleResize"
-                @blur="handleBlur"
-                @click="handleClick"
-
-                >
-                <template v-slot:[`slot-inject-prepend-key-treeview-slot-permissions`]="{open}" >
-                  <v-icon color="blue">
-                      {{open ? 'mdi-folder-open' : 'mdi-folder'}}
-                  </v-icon>
-                </template>
-                <template #slot-inject-label-key-treeview-slot-permissions="{item}" >
-                  <span class="caption" >
-                    {{item.name.toUpperCase()}}
-                  </span>
-                </template>
-              </v-custom-form-base>
-            </v-col>
-          </v-row>
-
-        </v-col>
-      </v-row>
-    </v-container>
-
-    <v-container v-if="hasSubmit && !stickyButton">
-      <!-- <v-spacer></v-spacer> -->
-      <slot name="submitButton"
-        :attrs="{
-          validForm
-        }"
-        >
-          <div class="text-right">
-            <div>
-              <v-btn type="submit" :disabled="!validForm">
-                {{ buttonText ? ($te(buttonText) ? $t(buttonText) : buttonText) : $t('submit') }}
-              </v-btn>
-            </div>
-          </div>
-      </slot>
-    </v-container>
-
-    <v-container>
-        <v-text-field
+      <v-sheet  v-if="hasSubmit && !stickyButton">
+        <v-progress-linear
           v-if="loading"
-          color="success"
-          loading
-          disabled
+          indeterminate
+          color="green"
         />
-    </v-container>
-  </v-form>
+      </v-sheet>
+
+    </v-form>
+  </v-sheet>
 </template>
 
 <script>
+import { computed } from 'vue'
 import { mapState } from 'vuex'
 import { FORM, ALERT } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
 import api from '@/store/api/form'
 
+import { useI18n } from 'vue-i18n'
+
 import logger from '@/utils/logger'
 
-import { useInputHandlers } from '@/hooks/input-handlers.js'
-import { useValidations } from '@/hooks/validations.js'
+import { useInputHandlers, useValidation } from '@/hooks'
+
+import UeTitle from '@/components/labs/Title.vue'
 
 // Helper & Partial Functions
 const minLen = l => v => (v && v.length >= l) || `min. ${l} Characters`
@@ -130,6 +137,9 @@ const rules = {
 
 export default {
   name: 'ue-form',
+  components: {
+    UeTitle
+  },
   props: {
     modelValue: {
       type: Object,
@@ -137,25 +147,28 @@ export default {
         return {}
       }
     },
+    formClass: {
+      type: [Array, String],
+      default: 'px-5 pb-5'
+    },
+    actionUrl: {
+      type: String
+    },
+    title: {
+      type: String
+    },
     schema: {
       type: Object,
       default () {
         return {}
       }
     },
-    rowAttribute: {
-      type: Object,
-      default () {
-        return {
-          noGutters: false
-          // justify:'center',
-          // align:'center'
-        }
-      }
-    },
     async: {
       type: Boolean,
       default: true
+    },
+    buttonText: {
+      type: String
     },
     hasSubmit: {
       type: Boolean,
@@ -169,49 +182,48 @@ export default {
       type: Boolean,
       default: false
     },
-    buttonText: {
-      type: String
+    rowAttribute: {
+      type: Object,
+      default () {
+        return {
+          noGutters: false
+          // justify:'center',
+          // align:'center'
+        }
+      }
     },
-    actionUrl: {
-      type: String
-    },
-    formTitle: {
-      type: String
+    slots: {
+      type: Object,
+      default () {
+        return {}
+      }
     }
   },
   setup (props, context) {
     const inputHandlers = useInputHandlers()
-    const validations = useValidations()
+    const validations = useValidation()
 
-    // const states = {
+    const { t, te } = useI18n({ useScope: 'global' })
 
-    // }
-
+    const buttonDefaultText = computed(() => props.buttonText ? (te(props.buttonText) ? t(props.buttonText) : props.buttonText) : t('submit'))
     return {
       ...inputHandlers,
-      ...validations
+      ...validations,
+      buttonDefaultText
     }
   },
   data () {
     return {
       id: Math.ceil(Math.random() * 1000000) + '-form',
 
-      // cascadeSelectables: this.$lodash.omitBy((this.issetSchema ? this.schema : this.$store.state.form.inputs),
-      //   o => !(o.type === 'select' && o.hasOwnProperty('parent'))
-      // )
-      // model: {}
+      _loading: false,
+      _errors: {},
+      _schema: this.invokeRuleGenerator(this.schema)
 
-      validForm: false
+      // validForm: false
     }
   },
 
-  beforeCreate () {
-
-  },
-
-  mounted () {
-
-  },
   created () {
 
   },
@@ -219,6 +231,10 @@ export default {
   watch: {
     model (newValue, oldValue) {
       // __log('model watcher', newValue.country_id, oldValue.country_id)
+    },
+    errors (newValue, oldValue) {
+      // __log('errors')
+      this.setSchemaErrors(newValue)
     }
   },
 
@@ -235,18 +251,15 @@ export default {
 
     inputSchema: {
       get () {
-        // return this.makeCascadeSelect(
-        //   this.invokeRuleGenerator(this.issetSchema ? this.schema : this.$store.state.form.inputs)
-        // )
-        // return this.syncCascadeSelects(
-        //   this.invokeRuleGenerator(this.issetSchema ? this.schema : this.$store.state.form.inputs)
-        // )
-        return this.invokeRuleGenerator(
-          this.issetSchema ? this.schema : this.$store.state.form.inputs
-        )
+        return this.issetSchema
+          ? this._schema
+          : this.invokeRuleGenerator(
+            this.$store.state.form.inputs
+          )
       },
       set (value) {
-        __log('inputSchema setter', value.city_id.items)
+        // this._schema = value
+        // __log('inputSchema setter', value, this.inputSchema)
       }
     },
 
@@ -263,25 +276,31 @@ export default {
         return this.defaultItem
       },
       set (value) {
-        // __log(this.inputSchema)
+        // __log(value)
       }
     },
 
-    loading: {
-      get () {
-        return this.actionUrl ? false : this.$store.state.form.loading
-      },
-      set (value) {
-        __log('loading setter', value)
-      }
+    loading () {
+      return this.actionUrl ? this._loading : this.$store.state.form.loading
+      // get () {
+      //   return this.actionUrl ? this._loading : this.$store.state.form.loading
+      // },
+      // set (value) {
+      //   __log('loading setter', value, this.loading)
+      // }
     },
-    errors: {
-      get () {
-        return this.actionUrl ? this.errors : this.$store.state.form.errors
-      },
-      set (value) {
-        __log('errors setter', value)
-      }
+    errors () {
+      return this.actionUrl ? this._errors : this.$store.state.form.errors
+      // get () {
+      //   return this.actionUrl ? this._errors : this.$store.state.form.errors
+      // },
+      // set (value) {
+      //   for (const name in value) {
+      //     __log('errors setter', value[name][0], this.inputSchema)
+      //     this.inputSchema[name].errorMessages = value[name][0]
+      //   }
+      //   __log('errors setter', value, this.errors)
+      // }
     },
 
     reference () {
@@ -335,6 +354,7 @@ export default {
       // )
 
       if (on === 'input' && !!key && !!value) {
+        this.resetSchemaError(key)
         // __log(obj.schema, key)
       }
     },
@@ -364,40 +384,44 @@ export default {
       if (this.model.id) { fields.id = this.model.id }
 
       if (this.actionUrl) {
-        this.errors = []
-        this.loading = true
+        this._errors = {}
+        this._loading = true
 
-        const method = fields.hasOwnProperty('id') ? 'put' : 'post'
+        const method = Object.prototype.hasOwnProperty.call(fields, 'id') ? 'put' : 'post'
         const self = this
 
         api[method](this.actionUrl, fields, function (response) {
-          self.loading = false
-
-          if (response.data.hasOwnProperty('errors')) {
-            self.errors = response.data.errors
-          } else if (response.data.hasOwnProperty('variant') && response.data.variant.toLowerCase() === 'success') {
+          self._loading = false
+          if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
+            self._errors = response.data.errors
+          } else if (Object.prototype.hasOwnProperty.call(response.data, 'variant')) {
             self.$store.commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
           }
-        }, function (errorResponse) {
-          // this.loading = false
 
-          if (errorResponse.response.data.hasOwnProperty('exception')) {
+          if (Object.prototype.hasOwnProperty.call(response.data, 'redirector')) {
+            window.location.href = response.data.redirector
+          }
+        }, function (response) {
+          self._loading = false
+          __log(
+            response
+          )
+          if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
             self.$store.commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
           } else {
-            self.$store.dispatch(ACTIONS.HANDLE_ERRORS, errorResponse.response.data)
+            self.$store.dispatch(ACTIONS.HANDLE_ERRORS, response.response.data)
             self.$store.commit(ALERT.SET_ALERT, { message: 'Your submission could not be validated, please fix and retry', variant: 'error' })
           }
 
-          if (errorCallback && typeof errorCallback === 'function') errorCallback(errorResponse.data)
+          if (errorCallback && typeof errorCallback === 'function') errorCallback(response.data)
         })
       } else {
-        self.$store.commit(FORM.SET_EDITED_ITEM, fields)
-        self.$store.dispatch(ACTIONS.SAVE_FORM, { item: null, callback, errorCallback })
+        this.$store.commit(FORM.SET_EDITED_ITEM, fields)
+        this.$store.dispatch(ACTIONS.SAVE_FORM, { item: null, callback, errorCallback })
       }
     },
 
     submit (e) {
-      // __log(this.validForm)
       if (this.validForm) {
         if (this.async) {
           e.preventDefault() // don't perform submit action (i.e., `<form>.action`)
@@ -427,6 +451,15 @@ export default {
         // obj.schema.type === 'password' ? obj.schema.appendInnerIcon = '$non-visibility' : obj.schema.appendInnerIcon = '$visibility'
         // obj.schema.type = obj.schema.type === 'password' ? 'text' : 'password'
       }
+    },
+
+    setSchemaErrors (errors) {
+      for (const name in errors) {
+        this.inputSchema[name].errorMessages = errors[name]
+      }
+    },
+    resetSchemaError (key) {
+      this.inputSchema[key].errorMessages = []
     }
   }
 

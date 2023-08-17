@@ -10,6 +10,6 @@ class Tag extends IlluminateTag
 
     public function getTable()
     {
-        return config(getUnusualBaseKey() . '.tags_table', 'tags');
+        return config(unusualBaseKey() . '.tags_table', 'tags');
     }
 }

@@ -1,9 +1,14 @@
 export default {
-  check: 'mdi-check',
+  arrowLeft: 'mdi-arrow-left-thin',
+  arrowRight: 'mdi-arrow-right-thin',
 
+  check: 'mdi-check',
+  close: 'mdi-close',
+  company: 'mdi-office-building-cog',
   creditCards: 'mdi-credit-card-search',
 
-  delete: 'mdi-delete',
+  delete: 'mdi-trash-can-outline',
+  trash: 'mdi-delete',
 
   edit: 'mdi-pencil',
 

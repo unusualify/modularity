@@ -56,11 +56,17 @@ const state = {
 
 // getters
 const getters = {
+  activeHeaders: state => {
+
+  },
   // defaultItem: state => {
   //   return state.inputs.reduce( (a,c) => (a[c.name] = c.default, a), {})
   // },
   totalElements: state => {
     return state.total
+  },
+  totalPage: state => {
+    return Math.ceil(state.total / state.options.itemsPerPage)
   },
   // formatterColumns: state => {
   //   return state.headers.filter((h) => h.hasOwnProperty('formatter') && h.formatter.length > 0)
@@ -270,11 +276,18 @@ const actions = {
   [ACTIONS.DELETE_ITEM] ({ commit, state, dispatch }, { id = null, callback = null, errorCallback = null } = {}) {
     api.delete(id, function (resp) {
       commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
-      __log(resp.data.variant.toLowerCase())
       if (resp.data.variant.toLowerCase() === 'success') {
         dispatch(ACTIONS.GET_DATATABLE)
         callback(resp.data)
       } else { errorCallback(resp.data) }
+    }, function (response) {
+      __log('400 response', response)
+      if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
+        commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
+      } else {
+        dispatch(ACTIONS.HANDLE_ERRORS, response.data)
+        commit(ALERT.SET_ALERT, { message: 'Your submission could not be validated, please fix and retry', variant: 'error' })
+      }
     })
   },
   [ACTIONS.GET_DATATABLE] ({ commit, state, getters }, { payload = {}, callback = null, errorCallback = null } = {}) {
@@ -289,6 +302,9 @@ const actions = {
       }
       return !_changed
     })
+
+    if (keys.includes('options')) _changed = true
+
     if (_changed) {
       commit(DATATABLE.UPDATE_DATATABLE_LOADING, true)
       const parameters = {

@@ -46,8 +46,8 @@ class ControllerMakeCommand extends BaseCommand
     protected function getArguments()
     {
         return [
+            ['module', InputArgument::REQUIRED, 'The name of module will be used.'],
             ['name', InputArgument::REQUIRED, 'The name of the controller class.'],
-            ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
         ];
     }
     /**

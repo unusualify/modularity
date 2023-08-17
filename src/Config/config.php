@@ -8,12 +8,12 @@ return [
     'name' => env('BASE_NAME','Base'),
 
     'version' => '1.0.0',
-
+    'auth_login_redirect_path' => '/',
     'is_development' => env('UNUSUAL_DEV', false),
     'development_url' => env('UNUSUAL_DEV_URL', 'http://localhost:8080'),
     'public_dir' => env('UNUSUAL_ASSETS_DIR', 'unusual'),
     'vendor_path' => env('UNUSUAL_VENDOR_PATH', 'vendor/oobook/crm-base'),
-    'custom_components_resource_path' => 'js/components',
+    'custom_components_resource_path' => 'js/unusual',
     // 'vendor_components_resource_path' => 'assets/vendor/js/components',
     'manifest' => 'unusual-manifest.json',
     'js_namespace' => 'UNUSUAL',
@@ -22,19 +22,22 @@ return [
 
     'users_table_name' => 'users',
 
-    'locale' => 'tr',
+    'locale' => 'en',
     'fallback_locale' => 'en',
 
     'default_input' => [
+        'type' => 'text',
         'hint' => '',
         'placeholder' => '',
-        'default' => '',
+        'errorMessages' => [],
         'col' => [
             'cols' => 12,
-            'sm' => 12,
-            'md' => 8,
-            'lg' => 6,
-            'xl' => 6,
+            // 'sm' => 12,
+            // 'md' => 8,
+            // 'lg' => 6,
+            // 'xl' => 6,
+            // 'class' => 'pr-theme-semi pl-theme-semi pb-2 pt-2',
+            'class' => 'pb-2 pt-2'
         ],
         'offset' => [
             'offset' => 0,
@@ -50,13 +53,40 @@ return [
             'order-lg' => 0,
             'order-xl' => 0,
         ],
+        // 'class' => 'mx-2 mb-1',
         'prependIcon' => '',
         'prependInnerIcon' => '',
         'appendIcon' => '',
         'appendInnerIcon' => '',
+
+        'density' => 'comfortable', // default | comfortable | compact
+
         'variant' => 'outlined',
-        // 'density' => 'compact',
+        // 'variant' => 'underlined',
+
+        'clearable',
+
         // 'dense',
+    ],
+
+    'default_header' => [
+        'align' => 'start',
+        'sortable' => false,
+        'filterable' => false,
+        'groupable' => false,
+        'divider' => false,
+        'class' => 'text-primary', // || []
+        'cellClass' => '', // || []
+        'width' => 30, // || int
+
+        'noPadding' => true,
+        // vuetify datatable header fields end
+
+        // custom fields for ue-datatable start
+        'searchable' => false, //true,
+        'isRowEditable' => false,
+        'isColumnEditable' => false,
+        'formatter' => [],
     ],
 
     'paths' => [
@@ -78,7 +108,7 @@ return [
 
     'stubs' => [
         'enabled' => false,
-        'path' => base_path( env('UNUSUAL_STUB_PATH') ?? '/packages/oobook/crm-base/Console/stubs') ,
+        'path' => base_path( env('UNUSUAL_STUB_PATH') ?? '/packages/oobook/crm-base/src/Console/stubs') ,
         'files' => [
             'routes/web' => 'Routes/web.php',
             'routes/api' => 'Routes/api.php',
@@ -102,15 +132,49 @@ return [
 
     'schemas' => [
         'default_fields' => [
-            "title:string('title'\,200):nullable",
-            "description:text:nullable",
+            "name:string",
+            // "description:text:nullable",
         ],
         'fillables' => [
             'published:boolean:default(false)'
         ],
         'translated_attributes' => [
             'active:boolean'
-        ]
+        ],
+        'default_inputs' => [
+            [
+                'name' => 'name',
+                'label' => 'Name',
+                'type' => 'text',
+            ]
+        ],
+        'default_pre_headers' => [
+            [
+                'title' => 'Name',
+                'key' => 'name',
+                'formatter' => ['edit'],
+                'searchable' => true
+            ],
+        ],
+        'default_post_headers' => [
+            [
+                'title' => 'Created Time',
+                'key' => 'created_at',
+                'formatter' => ['date', 'long'],
+                'searchable' => true
+            ],
+            // [
+            //     'title' => 'Update Time',
+            //     'key' => 'updated_at',
+            //     'formatter' => ['date', 'long'],
+            //     'searchable' => true
+            // ],
+            [
+                'title' => 'Actions',
+                'key' => 'actions',
+                'sortable' => false
+            ]
+        ],
     ],
 
     'traits' => [

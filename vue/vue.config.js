@@ -45,6 +45,7 @@ const outputDir = isProd ? 'dist' : (env.UNUSUAL_DEV_ASSETS_PATH || 'dist')
 const assetsDir = env.UNUSUAL_ASSETS_DIR || 'unusual'
 
 const pages = {
+  'core-auth': `${srcDirectory}/js/core-auth.js`,
   'core-dashboard': `${srcDirectory}/js/core-dashboard.js`,
   'core-form': `${srcDirectory}/js/core-form.js`,
   'core-index': `${srcDirectory}/js/core-index.js`,
@@ -235,6 +236,7 @@ module.exports = defineConfig({
   //   devServer,
   runtimeCompiler: true,
   configureWebpack: {
+    devtool: 'source-map',
     stats: {
       loggingDebug: ['sass-loader']
     },

@@ -2,12 +2,11 @@
     <v-navigation-drawer
         v-model="$root.sidebarToggle"
         id="navigation-drawer"
-        app
         :expand-on-hover="$root.isHoverable"
         :mini-variant="$root.isMini"
         v-model:mini-variant="$root.miniStatus"
         @update:mini-variant="miniChanging"
-        width="256"
+        :width="width"
         >
 
         <!-- <v-avatar class="d-block text-center mx-auto mt-2">
@@ -27,8 +26,7 @@
         </ue-list-element> -->
 
             <ue-list-group
-                :items="items"
-                >
+                :items="items">
             </ue-list-group>
 
         <!-- <template v-slot:append>
@@ -54,12 +52,11 @@
                   v-bind="props"
                   color="white"
                   prepend-icon="mdi-power"
-
                   >
                   <!-- <template v-slot:prepend>
                     <v-icon color="success"></v-icon>
                   </template> -->
-                  Logout
+                  {{$t('auth.logout')}}
               </v-btn>
             </template>
           </ue-logout-dialog>
@@ -76,10 +73,7 @@
               color="white"
               size="x-small"
             >
-              <v-icon
-                size="medium"
-                color="primary"
-              ></v-icon>
+              <v-icon size="medium" color="primary"></v-icon>
             </v-btn>
           </div>
         </template>
@@ -150,7 +144,9 @@ export default {
   },
 
   computed: {
-
+    width () {
+      return this.$root.isXlAndUp ? 320 : 256
+    }
   },
   methods: {
     onChange (event) {

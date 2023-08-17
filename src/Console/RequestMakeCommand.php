@@ -58,8 +58,8 @@ class RequestMakeCommand extends BaseCommand
     protected function getArguments()
     {
         return [
+            ['module', InputArgument::REQUIRED, 'The name of module will be used.'],
             ['request', InputArgument::REQUIRED, 'The name of the request class.'],
-            ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
         ];
     }
     /**

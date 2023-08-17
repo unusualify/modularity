@@ -1,0 +1,14 @@
+@use 'abstract/_vuetify' as c;
+@use 'styles/abstract/functions' as *;
+@forward 'vuetify/settings' with($map-to-withClause(c.$vuetify))
+// @use 'vuetify/settings' as v;
+
+
+// @use 'config/variables' as c;
+// @include use-with(c.$vuetify, 'vuetify/settings');
+// @use 'vuetify/settings' with($vuetify);
+
+$vuetify: map-list-to-map(c.$vuetify);
+
+// @debug( map-get($vuetify, 'list-color') );
+

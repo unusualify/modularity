@@ -2,12 +2,12 @@
 
 namespace OoBook\CRM\Base\Support\Decomposers;
 
-use OoBook\CRM\Base\Traits\ManagesNames;
+use OoBook\CRM\Base\Traits\ManageNames;
 use Illuminate\Contracts\Support\Arrayable;
 
 class ValidatorParser implements Arrayable
 {
-    use ManagesNames;
+    use ManageNames;
 
     protected $methods = [
         'belongsTo',

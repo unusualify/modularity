@@ -1,27 +1,28 @@
 <template>
   <div :class="['vue-tel-input-vuetify', $lodash.pick(boundProps, ['wrapperClasses']) ?? getDefault('wrapperClasses')]">
     <v-row>
-      <v-col cols="4" style="padding-right: 1px;">
+      <v-col cols="5" style="padding-right: 1px;">
         <v-select
-          ref="countryInput"
+          :ref="makeReference('countryInput')"
           v-model="countryCode"
           :items="sortedCountries"
           item-title="iso2"
           item-value="iso2"
 
-          return-object
-
-          v-bind="$lodash.pick(boundProps, ['variant', 'menuProps', 'selectClasses', 'selectLabel', 'dense'])"
+          v-bind="$lodash.pick(boundProps, ['variant', 'menuProps', 'selectClasses', 'selectLabel', 'dense', 'density'])"
           :label="$t('country')"
+
+          return-object
           >
-          <template #selection1="">
-            <!-- <div :class="activeCountry.iso2.toLowerCase()" class="vti__flag" /> -->
-            <span class="v-select__selection-text">
+          <template #selection="object">
+            <!-- {{ $log(object) }} -->
+            <div :class="activeCountry.iso2.toLowerCase()" class="vti__flag" />
+            <!-- <span class="v-select__selection-text">
               {{ activeCountry.iso2 }}
-            </span>
+            </span> -->
           </template>
-          <template #item="{item, index, props}">
-            <!-- {{  window.__log(props) }} -->
+          <template #item="{props}">
+            <!-- {{  $log(props) }} -->
             <v-list-item :title="`${props.value.name} +${props.value.dialCode}`" @click="props.onClick">
               <template #prepend>
                 <span :class="props.value.iso2.toLowerCase()" class="vti__flag" />
@@ -32,9 +33,9 @@
           </template>
         </v-select>
       </v-col>
-      <v-col cols="8" style="padding-left: 0px;">
+      <v-col cols="7" style="padding-left: 0px;">
         <v-text-field
-          ref="input"
+          :ref="makeReference('phoneInput')"
           type="tel"
 
           v-model="phone"
@@ -62,7 +63,8 @@
 </template>
 
 <script>
-import { CustomInputMixin } from '@/mixins'
+import { InputMixin } from '@/mixins'
+import { useInput } from '@/hooks'
 
 import PhoneNumber, { getExample } from 'awesome-phonenumber'
 import Phone, { getCountry, setCaretPosition } from '@/utils/phone'
@@ -83,7 +85,7 @@ function getParents (node, memo) {
 
 export default {
   // name: 'VueTelInputVuetify',
-  mixins: [CustomInputMixin],
+  mixins: [InputMixin],
   emits: [
     'country-changed',
     'validate',
@@ -142,16 +144,10 @@ export default {
     }
   },
   props: {
-    modelValue: {
-      type: String,
-      default: ''
-    },
-
     invalidMsg: {
       type: String,
       default: () => getDefault('invalidMsg')
     },
-
     mode: {
       type: String,
       default: () => getDefault('mode')
@@ -184,6 +180,11 @@ export default {
     }
 
   },
+  setup (props, context) {
+    return {
+      ...useInput(props, context)
+    }
+  },
   data () {
     return {
       phone: '',
@@ -197,9 +198,6 @@ export default {
       countryCode: null,
 
       phoneRule: v => {
-        // __log(
-        //   v
-        // )
         return v
           ? (PhoneNumber(
               this.phone || '',
@@ -247,16 +245,7 @@ export default {
       return [...preferredCountries, ...this.filteredCountries]
     },
     phoneObject () {
-      // parsePhoneNumber(this.preparePhoneNumber(phone), this.internalCountryCode.toString())
-
-      // parsePhoneNumber(' 8 (800) 555-35-35 ', 'RU')
-      // getExampleNumber('RU', examples)
-      // getCountries()
-      // isValidPhoneNumber('8 (800) 555-35-35', 'RU')
-      // validatePhoneNumberLength('8 (800) 555', 'RU')
-
-      // phoneNumber.formatNational() === '8 (912) 345-67-89'
-
+      // __log('phoneObject', this.input, this.activeCountry.iso2)
       const result = PhoneNumber(
         this.phone || '',
         this.activeCountry.iso2
@@ -271,13 +260,6 @@ export default {
       // if (result.valid) { __log('phoneObject computed isValid', result) }
 
       if (!this.phone) {
-        // __log(
-        //   'phoneObject computed',
-        //   result
-        //   // this.parsedMode,
-        //   // PhoneNumber(this.phone || ' 8 (800) 555-35-35 ', 'RU').toJSON(),
-        //   // parsePhoneNumber(this.phone || ' 8 (800) 555-35-35 ', 'RU')
-        // )
         return {
           ...result,
           number: {
@@ -308,8 +290,8 @@ export default {
       this.$emit('onValidate', this.phoneObject) // Deprecated
     },
     modelValue (val, oldValue) {
-      // __log('modelValue watch', val, oldValue)
-      this.phone = this.modelValue
+      // __log('phone.vue modelValue watch', val, this.modelValue, this.phone)
+      if (__isString(val)) { this.phone = this.modelValue }
     },
     open (isDropdownOpened) {
       // Emit open and close events
@@ -321,7 +303,7 @@ export default {
     },
     phone (newValue, oldValue) {
       // __log('phone watch', newValue, oldValue)
-      if (newValue) {
+      if (newValue || __isString(newValue)) {
         if (newValue[0] === '+') {
           const code = PhoneNumber(newValue).getRegionCode()
           if (code) {
@@ -332,13 +314,12 @@ export default {
       // Reset the cursor to current position if it's not the last character.
       if (oldValue && this.cursorPosition < oldValue.length) {
         this.$nextTick(() => {
-          setCaretPosition(this.$refs.input, this.cursorPosition)
+          setCaretPosition(this.$refs[this.getReference('phoneInput')], this.cursorPosition)
         })
       }
 
       // this.$emit('input', this.phoneText, this.phoneObject)
-      // __log(this.phoneText, this.phoneObject)
-      this.update(this.phoneText, this.phoneObject)
+      this.updateModelValue(this.phoneText)
     },
     activeCountry (value) {
       // __log('activeCountry watch', value)
@@ -354,24 +335,46 @@ export default {
     }
   },
   mounted () {
-    this.$watch('$refs.countryInput.isResetting', v => v && this.reset())
+    this.$watch(`$refs.${this.getReference('countryInput')}.isResetting`, v => v && this.reset())
     this.reset()
   },
   created () {
-    if (this.value) {
+    if (this.modelValue) {
       this.phone = this.modelValue.trim()
     }
-
     this.boundProps.rules.push(this.phoneRule)
   },
   methods: {
+
+    inputOnSet (newValue, oldValue) {
+      // __log('phone watch', newValue, oldValue)
+      if (newValue || __isString(newValue)) {
+        if (newValue[0] === '+') {
+          const code = PhoneNumber(newValue).getRegionCode()
+          if (code) {
+            this.activeCountry = this.findCountry(code) || this.activeCountry
+          }
+        }
+      }
+      // Reset the cursor to current position if it's not the last character.
+      if (oldValue && this.cursorPosition < oldValue.length) {
+        this.$nextTick(() => {
+          setCaretPosition(this.$refs[this.getReference('phoneInput')], this.cursorPosition)
+        })
+      }
+
+      // this.$emit('input', this.phoneText, this.phoneObject)
+      this.updateModelValue(this.phoneText)
+      // this.updateModelValue(val)
+      // context.emit('update:modelValue', val)
+    },
     initializeCountry () {
       return new Promise((resolve) => {
         /**
          * 1. If the phone included prefix (+12), try to get the country and set it
          */
         if (this.phone && this.phone[0] === '+') {
-          const activeCountry = PhoneNumber(this.phone).getRegionCode()
+          const activeCountry = PhoneNumber(this.input).getRegionCode()
           if (activeCountry) {
             this.choose(activeCountry)
             resolve()
@@ -474,7 +477,8 @@ export default {
     },
 
     reset () {
-      this.countryCode = this.activeCountry
+      // __log('reset()', this.activeCountry)
+      if (__isObject(this.activeCountry) && this.activeCountry.iso2) { this.countryCode = this.activeCountry }
       this.initializeCountry()
         .then(() => {
           if (
@@ -503,7 +507,6 @@ export default {
       // Returns response.number to assign it to v-model (if being used)
       // Returns full response for cases @input is used
       // and parent wants to return the whole response.
-      // __log('onInput', this.phoneText, this.phoneObject, this.phone)
       this.$emit('input', this.phoneText, this.phoneObject)
       this.$emit('onInput', this.phoneObject) // Deprecated
       // Keep the current cursor position just in case the input reformatted
@@ -543,7 +546,7 @@ export default {
       this.$emit('onSpace') // Deprecated
     },
     focus () {
-      this.$refs.input.focus()
+      this.$refs[this.getReference('phoneInput')].focus()
     },
     toggleDropdown () {
       if (this.disabled) {

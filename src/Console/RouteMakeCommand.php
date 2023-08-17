@@ -110,6 +110,8 @@ class RouteMakeCommand extends BaseCommand
             ->setModule($module)
             ->setSchema($this->option('schema'))
             ->setRules($this->option('rules'))
+            ->setMigrate($this->option('no-migrate'))
+            ->setPlain($this->option('plain'))
             ->generate();
 
         if ($code === E_ERROR) {
@@ -143,8 +145,10 @@ class RouteMakeCommand extends BaseCommand
             ['schema', null, InputOption::VALUE_OPTIONAL, 'The specified migration schema table.', null],
             ['rules', null, InputOption::VALUE_OPTIONAL, 'The specified validation rules for FormRequest.', null],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
+            ['plain', '--p', InputOption::VALUE_NONE, 'Don\'t create route.'],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
+            ['no-migrate', null, InputOption::VALUE_NONE, 'don\'t migrate.'],
         ] + unusualTraitOptions();
     }
 

@@ -1,0 +1,11 @@
+{
+    "Hello!": "Merhaba!",
+
+    "Reset Password Notification" : "Yeni Şifre Oluşturma Bildirimi",
+    "You are receiving this email because we received a password reset request for your account.": "Hesabınızın şifresini sıfırlamak için bu maili alıyorsunuz",
+    "Reset Password": "Yeni Şifre Oluştur",
+    "This password reset link will expire in :count minutes.": "Bu şifre oluşturma linki :count dakika içerisinde sonlanacak.",
+    "If you did not request a password reset, no further action is required.": "Şifre sıfırlama talebinde bulunmadıysanız, herhangi bir işlem yapmanız gerekli değildir",
+
+    "Regards": "Saygılar"
+}

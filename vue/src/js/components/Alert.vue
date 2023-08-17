@@ -1,24 +1,29 @@
 <template>
-    <v-snackbar
-        v-model="show"
-        :timeout="timeout"
-        :color="type"
-        absolute
-        top
-        right
+  <v-snackbar
+    v-model="show"
+    :timeout="timeout"
+    :color="type"
     >
-        {{ text }}
-
-        <template v-slot:action="{ attrs }">
-            <v-btn
-                v-bind="attrs"
-                text
-                @click="show = false"
-            >
-                {{ $t('close') }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    <template v-slot:actions>
+      <!-- <v-icon
+          :color="closeButtonColor"
+          icon="$close"
+          @click="show = false"
+      /> -->
+      <v-btn
+        :color="closeButtonColor"
+        variant="plain"
+        density="compact"
+        @click="show = false"
+      >
+        <v-icon
+          :color="closeButtonColor"
+          icon="$close"
+        />
+      </v-btn>
+    </template>
+    {{ text }}
+  </v-snackbar>
 </template>
 
 <script>
@@ -26,12 +31,20 @@ import { AlertMixin } from '@/mixins'
 export default {
   mixins: [AlertMixin],
   data: () => ({
-    // show: false,
-    // message: null,
-    // type: 'info',
     timeout: 3000
   }),
   computed: {
+    closeButtonColor () {
+      switch (this.type) {
+        case 'success':
+        case 'warning':
+        case 'info':
+        case 'error':
+          return 'white'
+        default:
+          return 'white'
+      }
+    },
     text () {
       return this.message || this.defaultMessage
     },

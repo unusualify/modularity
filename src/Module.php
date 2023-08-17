@@ -28,7 +28,7 @@ class Module extends NwidartModule
         // dd($path);
         parent::__construct($app, $name, $path);
 
-        $this->moduleActivator = $app['module_activator'];
+        $this->moduleActivator = $app['unusual.activator'];
         $this->moduleActivator->setModule($name);
         // dd($this->moduleActivator, $app);
     }
@@ -133,7 +133,7 @@ class Module extends NwidartModule
     private function flushModuleCache(): void
     {
 
-        if (config(getUnusualBaseKey() . '.cache.enabled')) {
+        if (config(unusualBaseKey() . '.cache.enabled')) {
             $this->cache->store()->flush();
         }
     }

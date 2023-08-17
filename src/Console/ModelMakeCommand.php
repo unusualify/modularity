@@ -99,8 +99,8 @@ class ModelMakeCommand extends BaseCommand
     protected function getArguments()
     {
         return [
+            ['module', InputArgument::REQUIRED, 'The name of module will be used.'],
             ['model', InputArgument::REQUIRED, 'The name of model will be created.'],
-            ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
         ];
     }
 
@@ -111,9 +111,10 @@ class ModelMakeCommand extends BaseCommand
      */
     protected function getOptions()
     {
+
         return [
             ['fillable', null, InputOption::VALUE_OPTIONAL, 'The fillable attributes.', null],
-            ['relationships', null, InputOption::VALUE_OPTIONAL, 'The fillable attributes.', null],
+            ['relationships', null, InputOption::VALUE_OPTIONAL, 'The relationship attributes.', null],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             ['soft-delete', 's', InputOption::VALUE_NONE, 'Flag to add softDeletes trait to model.'],
@@ -128,7 +129,15 @@ class ModelMakeCommand extends BaseCommand
     protected function getTemplateContents()
     {
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
-
+        // dd(
+        //     [
+        //         'TRAITS'                => $this->getTraits(),
+        //         'FILLABLE'              => ltrim($this->getFillable()),
+        //         'TRANSLATED_ATTRIBUTES' => ltrim($this->getTranslatedAttributes()),
+        //         'SLUG_ATTRIBUTES' => ltrim($this->getSlugAttributes()),
+        //         'METHODS'               => $this->getMethods()
+        //     ]
+        // );
         return  (new Stub( $this->getStubName(), [
             'BASE_MODEL'            => $this->baseConfig('base_model'),
             'NAMESPACE'             => $this->getClassNamespace($module),
@@ -216,12 +225,11 @@ class ModelMakeCommand extends BaseCommand
 
         $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
 
-        $fields = array_merge($fields, $this->defaultFillables);
+        $fields = array_merge($this->defaultFillables, $fields);
 
         if(!$this->getTraitResponse('translationTrait')){
             $fillable = $this->option('fillable');
-
-            $fields = array_merge( $fields, explode(',', $fillable));
+            $fields = array_merge( $fields, $fillable != "" ? explode(',', $fillable) : []);
         }
 
         $fillable = "\t/**\n"
@@ -234,7 +242,7 @@ class ModelMakeCommand extends BaseCommand
             . collect($fields)->map(function($field){
                 return "\t\t'{$field}'";
             })->implode(",\n")."\n"
-            . "\t]; \n";
+            . "\t];\n";
 
         return $fillable;
     }
@@ -313,7 +321,7 @@ class ModelMakeCommand extends BaseCommand
                 $traits[] = $this->getTrait($trait);
         }
 
-        return count($traits) ? "use ".implode(',',$traits).";" : '';
+        return count($traits) ? "use ".implode(', ',$traits).";\n" : '';
     }
 
     /**
@@ -347,15 +355,14 @@ class ModelMakeCommand extends BaseCommand
         $methods = [];
 
         if( $this->option('has-factory') ){
-
             $module_namespace = $this->laravel['modules']->config('namespace');
             $module = $this->getModuleName();
             $name = $this->getModelName();
 
             $str = "\\{$module_namespace}\\{$module}\\Database\\factories\\{$name}Factory";
 
-            if( class_exists($str) ){
-                $methods[] = "\n\tprotected static function newFactory()\n\t{\n\t\treturn {$str}::new();\n\t}";
+            if( @class_exists($str) ){
+                $methods[] = "\tprotected static function newFactory()\n\t{\n\t\treturn {$str}::new();\n\t}";
             }
             // dd($str, class_exists($str), $methods);
         }

@@ -3,16 +3,20 @@
 namespace OoBook\CRM\Base\Http\Controllers;
 
 use OoBook\CRM\Base\Http\Requests\Admin\OauthRequest;
-use OoBook\CRM\Base\Models\User;
+use OoBook\CRM\Base\Entities\User;
 use OoBook\CRM\Base\Repositories\UserRepository;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Response;
 use Illuminate\View\Factory as ViewFactory;
+use OoBook\CRM\Base\Traits\ConfigureViewFields;
 use PragmaRX\Google2FA\Google2FA;
 use Socialite;
 
@@ -29,7 +33,7 @@ class LoginController extends Controller
     |
      */
 
-    use AuthenticatesUsers;
+    use AuthenticatesUsers, ConfigureViewFields;
 
     /**
      * @var AuthManager
@@ -78,7 +82,7 @@ class LoginController extends Controller
         $this->viewFactory = $viewFactory;
         $this->config = $config;
 
-        // $this->middleware('twill_guest', ['except' => 'logout']);
+        $this->middleware('unusual_guest', ['except' => 'logout']);
         $this->redirectTo = unusualConfig('auth_login_redirect_path', '/');
     }
 
@@ -87,7 +91,68 @@ class LoginController extends Controller
      */
     protected function guard()
     {
-        return $this->authManager->guard('twill_users');
+        return $this->authManager->guard('unusual_users');
+    }
+
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function login(Request $request)
+    {
+        // dd(App::getLocale());
+
+        $this->validateLogin($request);
+
+        // If the class is using the ThrottlesLogins trait, we can automatically throttle
+        // the login attempts for this application. We'll key this by the username and
+        // the IP address of the client making these requests into this application.
+        if (method_exists($this, 'hasTooManyLoginAttempts') &&
+            $this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
+
+            return $this->sendLockoutResponse($request);
+        }
+
+        if ($this->attemptLogin($request)) {
+            if ($request->hasSession()) {
+                $request->session()->put('auth.password_confirmed_at', time());
+            }
+
+            $request->session()->regenerate();
+
+            $this->clearLoginAttempts($request);
+
+            if ($response = $this->authenticated($request, $this->guard()->user())) {
+                return $response;
+            }
+
+            return $request->wantsJson()
+                ?   new JsonResponse([
+                        'redirector' => $this->redirectPath()
+                    ], 200)
+                :   $this->sendLoginResponse($request);
+
+            // return $this->sendLoginResponse($request);
+        }
+
+        // If the login attempt was unsuccessful we will increment the number of attempts
+        // to login and redirect the user back to the login form. Of course, when this
+        // user surpasses their maximum number of attempts they will get locked out.
+        $this->incrementLoginAttempts($request);
+
+
+        return $request->wantsJson()
+            ?   new JsonResponse([
+                    $this->username() => [trans('auth.failed')],
+                    'message' => ___('auth.failed'),
+                    'variant' => 'warning'
+                ])
+            :   $this->sendFailedLoginResponse($request);
     }
 
     /**
@@ -95,7 +160,72 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-        return $this->viewFactory->make('unusual::auth.login');
+        return $this->viewFactory->make('unusual::auth.login', [
+            'formAttributes' => [
+                'hasSubmit' => true,
+
+                // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
+                'schema' => ($schema = $this->getFormSchema([
+                    'email' => [
+                        "type" => "text",
+                        "name" => "email",
+                        "label" => ___('auth.email'),
+                        "default" => "",
+                        'col' => [
+                            'cols' => 12,
+                        ],
+                        'rules' => [
+                            ['email']
+                        ]
+                    ],
+                    'password' => [
+                        "type" => "password",
+                        "name" => "password",
+                        "label" => ___('auth.password'),
+                        "default" => "",
+                        "appendInnerIcon" => '$non-visibility',
+                        "slotHandlers" => [
+                            'appendInner' => 'password',
+                        ],
+                        'col' => [
+                            'cols' => 12
+                        ]
+                    ]
+                ])),
+
+                'actionUrl' => route('login'),
+                'buttonText' => 'auth.login',
+                'formClass' => 'px-5',
+            ],
+            'slots' => [
+                'bottom' => [
+                    'tag' => 'v-sheet',
+                    'attributes' => [
+                        'class' => 'd-flex pb-5 mx-8 justify-space-between',
+                    ],
+                    'elements' => [
+                        [
+                            "tag" => "v-btn",
+                            'elements' => ___('auth.forgot-password'),
+                            "attributes" => [
+                                'variant' => 'plain',
+                                'href' => route('password.reset.link'),
+                                'class' => 'float-right'
+                            ],
+                        ],
+                        [
+                            "tag" => "v-btn",
+                            'elements' => ___('auth.register'),
+                            "attributes" => [
+                                'variant' => 'plain',
+                                'href' => route('register.form'),
+                                'class' => 'float-right'
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        ]);
     }
 
     /**
@@ -118,7 +248,7 @@ class LoginController extends Controller
 
         $request->session()->regenerateToken();
 
-        return $this->redirector->to(route('admin.login'));
+        return $this->redirector->to(route('login.form'));
     }
 
     /**
@@ -133,15 +263,24 @@ class LoginController extends Controller
 
     private function afterAuthentication(Request $request, $user)
     {
+
         if ($user->google_2fa_secret && $user->google_2fa_enabled) {
             $this->guard()->logout();
 
             $request->session()->put('2fa:user:id', $user->id);
 
-            return $this->redirector->to(route('admin.login-2fa.form'));
+            return $request->wantsJson()
+                ?   new JsonResponse([
+                        'redirector' => $this->redirector->to(route('admin.login-2fa.form'))->getTargetUrl(),
+                    ])
+                :   $this->redirector->to(route('admin.login-2fa.form'));
         }
 
-        return $this->redirector->intended($this->redirectTo);
+        return $request->wantsJson()
+            ?   new JsonResponse([
+                    'redirector' => $this->redirector->intended($this->redirectPath())->getTargetUrl(),
+                ])
+            :   $this->redirector->intended($this->redirectPath());
     }
 
     /**
@@ -163,7 +302,7 @@ class LoginController extends Controller
         );
 
         if ($valid) {
-            $this->authManager->guard('twill_users')->loginUsingId($userId);
+            $this->authManager->guard('unusual_users')->loginUsingId($userId);
 
             $request->session()->pull('2fa:user:id');
 
@@ -205,7 +344,7 @@ class LoginController extends Controller
                 $user = $repository->oauthUpdateProvider($oauthUser, $provider);
 
                 // Login and redirect
-                $this->authManager->guard('twill_users')->login($user);
+                $this->authManager->guard('unusual_users')->login($user);
                 return $this->afterAuthentication($request, $user);
             } else {
                 if ($user->password) {
@@ -220,7 +359,7 @@ class LoginController extends Controller
                     $user->linkProvider($oauthUser, $provider);
 
                     // Login and redirect
-                    $this->authManager->guard('twill_users')->login($user);
+                    $this->authManager->guard('unusual_users')->login($user);
                     return $this->afterAuthentication($request, $user);
                 }
             }
@@ -230,7 +369,7 @@ class LoginController extends Controller
             $user->linkProvider($oauthUser, $provider);
 
             // Login and redirect
-            $this->authManager->guard('twill_users')->login($user);
+            $this->authManager->guard('unusual_users')->login($user);
             return $this->redirector->intended($this->redirectTo);
         }
     }
@@ -263,7 +402,7 @@ class LoginController extends Controller
 
             // Link the provider and login
             $user->linkProvider($request->session()->get('oauth:user'), $request->session()->get('oauth:provider'));
-            $this->authManager->guard('twill_users')->login($user);
+            $this->authManager->guard('unusual_users')->login($user);
 
             // Remove session variables
             $request->session()->forget('oauth:user_id');
@@ -275,5 +414,10 @@ class LoginController extends Controller
         } else {
             return $this->sendFailedLoginResponse($request);
         }
+    }
+
+    public function redirectTo()
+    {
+        return route('dashboard');
     }
 }

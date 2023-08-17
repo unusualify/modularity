@@ -59,10 +59,11 @@
 </template>
 
 <script>
-import { CustomInputMixin } from '@/mixins'
+import { InputMixin } from '@/mixins'
+import { useInput } from '@/hooks'
 
 export default {
-  mixins: [CustomInputMixin],
+  mixins: [InputMixin],
   name: 'ue-custom-input-icon',
   data () {
     return {

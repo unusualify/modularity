@@ -16,7 +16,7 @@
     :search="search"
     :hide-default-header="hideDefaultHeader"
     :hide-default-footer="hideDefaultFooter"
-    :footer-props="{
+    :footer-propss="{
       showFirstLastPage: true,
       firstIcon: 'mdi-arrow-collapse-left',
       lastIcon: 'mdi-arrow-collapse-right',
@@ -26,12 +26,14 @@
 
     :disable-pagination="false"
     :disable-sort="false"
+    :loading-text="$t('loading-text')"
 
     v-model="selectedItems"
     show-selected
-
-    :loading-text="$t('loading-text')"
-
+    sticky
+    fixed-header
+    fixed-footer
+    height="600"
   >
     <template v-slot:top>
       <v-toolbar
@@ -99,12 +101,12 @@
 
         <!-- #form dialog -->
         <slot
-          v-if="createOnModal || editOnModal"
+          v-if="(createOnModal || editOnModal) && !embeddedForm"
           name="FormDialog"
           >
           <ue-modal-form
               ref="formModal"
-              v-model="formModalActive"
+              v-model="formActive"
               :route-name="name"
               >
               <template v-slot:activator="{props}">
@@ -141,28 +143,64 @@
       </v-toolbar>
     </template>
 
+    <template v-slot:column.actions="_obj">
+      {{ $log(_obj) }}
+      <v-menu
+        :close-on-content-click="false"
+        open-on-hover
+        left
+        >
+        <template v-slot:activator="{ props }">
+          <v-icon
+            size="large"
+            icon="mdi-cog-outline"
+            v-bind="props"
+            >
+          </v-icon>
+        </template>
+        <!-- <v-list>
+          <v-list-item>
+            <v-checkbox label="Name"></v-checkbox>
+          </v-list-item>
+          <v-list-item>
+            <v-checkbox label="Guard Name"></v-checkbox>
+          </v-list-item>
+        </v-list> -->
+      </v-menu>
+    </template>
     <template v-slot:item.actions="{ item }">
       <!-- @click's editItem|deleteItem -->
       <!-- #actions -->
-      <v-menu v-if="rowActionsType == 'dropdown' || $vuetify.display.smOnly"
+      <v-menu v-if="rowActionsType == 'dropdown' || $root.isSmAndDown"
         :close-on-content-click="false"
         open-on-hover
         left
         offset-x
         >
         <template v-slot:activator="{ props }">
-          <v-btn icon v-bind="props">
-            <v-icon color="green darken-2">
-              $list
+          <!-- <v-btn icon v-bind="props" >
+            <v-icon
+              size="medium"
+              color="primary"
+              icon="$list"
+              v-bind="props"
+              >
             </v-icon>
-          </v-btn>
+          </v-btn> -->
+          <v-icon
+            size="large"
+            color="primary"
+            icon="$list"
+            v-bind="props"
+            >
+          </v-icon>
         </template>
         <v-list>
 
           <v-list-item
             v-for="(action, k) in rowActions"
             :key="k"
-            @click="handleFunctionCall(action.name + 'Item', item.raw)"
+            @click="$call(action.name + 'Item', item.raw)"
             >
               <v-icon small :color="action.color" left>
                 {{ action.icon ? action.icon : '$' + action.name }}
@@ -172,7 +210,6 @@
 
         </v-list>
       </v-menu>
-
       <div v-else>
 
         <v-icon
@@ -180,21 +217,22 @@
           :key="k"
           small
           class="mr-2"
-          @click="handleFunctionCall(action.name + 'Item', item.raw)"
+          @click="$call(action.name + 'Item', elements.find((_item => _item.id == item.value)))"
           :color="action.color"
           >
+          <!-- {{ $log(item, elements.find((_item => _item.id == item.value))) }} -->
           {{ action.icon ? action.icon : '$' + action.name }}
         </v-icon>
       </div>
     </template>
 
     <template v-slot:no-data>
-      <div class="w-100 d-flex justify-center">
+      <div class="w-100 d-flex justify-center my-5">
         <v-btn
           color="primary"
           @click="initialize"
         >
-          Reset
+          {{ $t('reset') }}
         </v-btn>
       </div>
     </template>
@@ -204,9 +242,20 @@
       v-for="(col, i) in formatterColumns"
       v-slot:[`item.${col.key}`]="{ item }"
       >
-        {{ handleFormatter(col.formatter, item.raw[col.key] ) }}
-        <!-- {{ formatterDate(item.raw[col.key], col.formatter[1] ) }} -->
-        <!-- {{ [`formatter${$lodash.startCase($lodash.camelCase(col.formatter[0])).replace(/ /g, '')}`](item.raw[col.key], col.formatter[1]) }} -->
+        <template v-if="col.formatter == 'edit'">
+          <v-btn
+            :key="i"
+            class="pa-0"
+            variant="plain"
+            :color="`primary darken-1`"
+            @click="editItem(item.raw)"
+            >
+            {{ item.raw[col.key] }}
+          </v-btn>
+        </template>
+        <template v-else>
+          {{ handleFormatter(col.formatter, item.raw[col.key] ) }}
+        </template>
     </template>
 
     <!-- #edit-dialog for editableColumns-->
@@ -310,56 +359,26 @@ import { mapState, mapGetters } from 'vuex'
 import { VDataTable, VDataTableServer } from 'vuetify/labs/VDataTable'
 import ACTIONS from '@/store/actions'
 
-import { DatatableMixin } from '@/mixins'
-import { useTable } from '@/hooks/table.js'
+import { TableMixin } from '@/mixins'
+import { useTable } from '@/hooks'
+import { ALERT } from '@/store/mutations'
 
 export default {
+  mixins: [TableMixin],
   components: {
     // VDataTable,
     VDataTableServer
   },
   setup (props, context) {
-    const tableDefaults = useTable(props, context)
-
     return {
-      ...tableDefaults
+      ...useTable(props, context)
     }
   },
   props: {
-    name: {
-      type: String,
-      default: 'Item'
-    },
-    titleKey: {
-      type: String,
-      default: 'name'
-    },
-    items: {
-      type: Array
-    },
-    hideHeaders: {
-      type: Boolean,
-      default: false
-    },
-    columns: {
-      type: Array
-    },
-    inputFields: {
-      type: Array
-    },
-    tableOptions: {
-      type: Object
-    },
-    hideDefaultHeader: Boolean,
-    hideDefaultFooter: Boolean,
-    isRowEditing: Boolean,
-    createOnModal: Boolean,
-    editOnModal: Boolean
+
   },
   data: function () {
     return {
-      formModalActive: false,
-      dialogActive: false,
 
       langs: ['tr', 'en'],
       cellInput: ''
@@ -367,38 +386,24 @@ export default {
     }
   },
   computed: {
-    dialogDescription () {
-      return this.$t('confirm-deletion', {
-        route: this.transName.toLowerCase(),
-        name: this.editedItem[this.titleKey]
-      })
-    },
-    transName () {
-      return this.$t('modules.' + this.$lodash.snakeCase(this.name))
-    },
     ...mapState({
       // datatable module
       // headers: state => state.datatable.headers,
-      loading: state => state.datatable.loading,
-      // elements: state => state.datatable.data,
+      // loading: state => state.datatable.loading,
+      // // elements: state => state.datatable.data,
 
-      // form module
-      inputs: state => state.form.inputs,
-      editedItem: state => state.form.editedItem,
-      formLoading: state => state.form.loading,
-      formErrors: state => state.form.errors
+      // // form module
+      // inputs: state => state.form.inputs,
+      // editedItem: state => state.form.editedItem,
+      // formLoading: state => state.form.loading,
+      // formErrors: state => state.form.errors
     })
   },
   created () {
 
   },
   watch: {
-    formModalActive (val) {
-      val || this.resetEditedItem()
-    },
-    dialogActive (val) {
-      val || this.resetEditedItem()
-    }
+
   },
   methods: {
     changeSort (column) {
@@ -415,33 +420,7 @@ export default {
     columnChanged (value) {
       this.cellInput = value
     },
-    deleteItem (item) {
-      this.setEditedItem(item)
-      this.$refs.dialog.openModal()
-    },
-    deleteRow: function () {
-      this.$store.dispatch(ACTIONS.DELETE_ITEM, {
-        id: this.editedItem.id,
-        callback: () => {
-          this.$refs.dialog.closeModal()
-        },
-        errorCallback: () => {
 
-        }
-      })
-    },
-    editItem (item) {
-      if (this.editOnModal) {
-        this.setEditedItem(item)
-        this.$refs.formModal.openModal()
-      } else {
-        const route = this.editUrl.replace(':id', item.id)
-        window.open(route)
-      }
-    },
-    handleFunctionCall (functionName, ...val) {
-      return this[functionName](...val)
-    },
     hideColumn (key) {
       this.headers = this.headers.filter(header => header.key !== key)
     },

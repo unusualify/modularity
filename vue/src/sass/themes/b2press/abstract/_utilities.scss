@@ -1,0 +1,67 @@
+@use "sass:math";
+@use './variables' as variables;
+
+$_spaces: ('theme': variables.$theme-space, 'theme-semi': math.div(variables.$theme-space, 2) );
+@each $name, $value in $_spaces {
+  .ma-#{$name} {
+    margin: #{$value} !important;
+  }
+
+  .mx-#{$name} {
+    margin-left: #{$value} !important;
+    margin-right: #{$value} !important;
+  }
+
+  .my-#{$name} {
+    margin-top: #{$value} !important;
+    margin-bottom: #{$value} !important;
+
+  }
+
+  .ml-#{$name} {
+    margin-left: #{$value} !important;
+  }
+
+  .mr-#{$name} {
+    margin-right: #{$value} !important;
+  }
+
+  .mb-#{$name} {
+    margin-bottom: #{$value} !important;
+  }
+
+  .mt-#{$name} {
+    margin-top: #{$value} !important;
+  }
+
+  .pa-#{$name} {
+    padding: #{$value} !important;
+  }
+
+  .px-#{$name} {
+    padding-left: #{$value} !important;
+    padding-right: #{$value} !important;
+  }
+
+  .py-#{$name} {
+    padding-top: #{$value} !important;
+    padding-bottom: #{$value} !important;
+
+  }
+
+  .pl-#{$name} {
+    padding-left: #{$value} !important;
+  }
+
+  .pr-#{$name} {
+    padding-right: #{$value} !important;
+  }
+
+  .pb-#{$name} {
+    padding-bottom: #{$value} !important;
+  }
+
+  .pt-#{$name} {
+    padding-top: #{$value} !important;
+  }
+}

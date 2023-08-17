@@ -14,10 +14,6 @@
     // $controlLanguagesPublication = $controlLanguagesPublication ?? true;
     $disableContentFieldset = $disableContentFieldset ?? false;
     // $editModalTitle = ($createWithoutModal ?? false) ? twillTrans('twill::lang.modal.create.title') : null;
-
-    $new_form = true;
-    $old_form = false;
-
     // dd($formSchema);
     // $formSchema = $formSchema + [
     //     "treeview" => [
@@ -34,59 +30,18 @@
     //         ]
     //     ]
     // ];
+    // dd($formAttributes, $formStore );
 @endphp
 
 
 @section('content')
-
-    {{-- @dd( get_defined_vars() ) --}}
-
-    @if($old_form)
-
+    <v-sheet>
+        {{-- <ue-stepper-form></ue-stepper-form> --}}
         <ue-form
-            :async='@json($async)'
-            :has-submit="true"
-            :sticky-button="true"
-            :inputs='@json($inputs)'
-            @isset($defaultItem)
-                :defaultItem='@json($defaultItem)'
-            @endisset
+            v-bind='@json($formAttributes)'
             >
-            {{-- <template v-slot:body="{ attrs }">
-                <v-row>
-                    @foreach ($inputs as $i => $input)
-                        <v-col
-                            key="{{ $i }}"
-                            index='{{ $i }}'
-                            cols="{{ $input['cols'] }}"
-                            md="{{ $input['md'] }}"
-                            sm="{{ $input['sm'] }}"
-                        >
-                            <component
-                                is="{{ "ue-input-" . $input['type']}}"
-                                :attributes='@json($input)'
-                                />
-                        </v-col>
-                    @endforeach
-                </v-row>
-            </template> --}}
         </ue-form>
-    @endif
-
-    @if($new_form)
-        <v-sheet>
-            {{-- <ue-stepper-form></ue-stepper-form> --}}
-            <ue-form
-                :has-submit="true"
-                :sticky-button="false"
-                :schema='@json($formSchema)'
-                @if($editable)
-                    :model-value='@json($item)'
-                @endif
-                >
-            </ue-form>
-        </v-sheet>
-    @endif
+    </v-sheet>
 @stop
 
 @push('head_last_js')
@@ -104,17 +59,11 @@
 @endpush
 
 @section('STORE')
-    window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {
-        @if($editable)
-            update: '{{ $actionUrl }}',
-        @else
-            store:  '{{ $actionUrl }}',
-        @endif
-
-    }
-    window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].STORE.form = {
-
-        inputs: {!! json_encode($formSchema ?? new StdClass()) !!},
+    {{-- window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = @json($endpoints) --}}
+    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
+    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {!! json_encode($formStore ?? new StdClass()) !!}
+    {{-- window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = { --}}
+        {{-- inputs: {!! json_encode($formSchema ?? new StdClass()) !!}, --}}
 
         {{-- baseUrl: '{{ $baseUrl ?? '' }}',
         saveUrl: '{{ $saveUrl }}',
@@ -127,8 +76,7 @@
         editor: {{ $editor ? 'true' : 'false' }},
         isCustom: {{ $customForm ? 'true' : 'false' }},
         reloadOnSuccess: {{ ($reloadOnSuccess ?? false) ? 'true' : 'false' }}, --}}
-
-    }
+    {{-- } --}}
 @endsection
 
 

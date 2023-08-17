@@ -47,5 +47,16 @@ class UserController extends BaseController
             $app,
             $request
         );
+        // dd(
+        //     $this->request->user(),
+        //     auth()->user()
+        // );
+        // dd(
+        //     // $this->repository->getById(1, ['role']),
+        //     // $this->repository->getFormFields(
+        //     //     $this->repository->getById(1, ['roles']),
+        //     //     $this->getFormSchema($this->getConfigFieldsByRoute('inputs'))
+        //     // )
+        // );
     }
 }

@@ -6,54 +6,44 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Nwidart\Modules\Support\Migrations\SchemaParser as Parser;
 use Illuminate\Support\Str;
-use OoBook\CRM\Base\Traits\ManagesNames;
+use OoBook\CRM\Base\Support\Finder;
+use OoBook\CRM\Base\Traits\ManageNames;
 use phpDocumentor\Reflection\Types\Boolean;
 use PhpParser\Node\Expr\FuncCall;
 
 class SchemaParser extends Parser
 {
-    use ManagesNames;
+    use ManageNames;
 
     /**
-     * defaultHeaders
+     * Starting header formats to add to headerFormats
      *
      * @var array
      */
-    protected $defaultHeaders = [
-        [
-            'title' => 'Created Time',
-            'key' => 'created_at',
-            'formatter' => ['date', 'long'],
-            'searchable' => true
-        ],
-        [
-            'title' => 'Update Time',
-            'key' => 'updated_at',
-            'formatter' => ['date', 'long'],
-            'searchable' => true
-        ],
-        [
-            'title' => 'Actions',
-            'key' => 'actions',
-            'sortable' => false
-        ]
-    ];
+    protected $defaultPreHeaders = [];
+
+    /**
+     * End header formats to add to headerFormats
+     *
+     * @var array
+     */
+    protected $defaultPostHeaders = [];
+
+    /**
+     * default header format for ui table header
+     *
+     * @var array
+     */
+    protected $defaultHeaderFormat = [];
 
     /**
      * defaultInputs
      *
      * @var array
      */
-    protected $defaultInputs = [
-        [
-            'title' => 'Name',
-            'key' => 'name',
-            'type' => 'text',
-            'placeholder' => '',
-        ]
-    ];
+    protected $defaultInputs = [];
 
-    protected $baseModelNamespace;
+    protected $baseNamespace;
 
     protected $traitNamespaces = [
         'soft_delete' => 'Illuminate\Database\Eloquent\SoftDeletes',
@@ -73,6 +63,7 @@ class SchemaParser extends Parser
 
     protected $interfaceNamespaces = [];
 
+
     /**
      * Create new instance.
      *
@@ -82,39 +73,35 @@ class SchemaParser extends Parser
     {
         parent::__construct($schema);
 
-        $this->baseNamespace = Config::get(getUnusualBaseKey() . '.namespace')."\\".Config::get(getUnusualBaseKey() . '.name');
+        $this->defaultInputs = Config::get(unusualBaseKey() . '.schemas.default_inputs',[]);
+        $this->defaultPreHeaders = Config::get(unusualBaseKey() . '.schemas.default_pre_headers',[]);
+        $this->defaultPostHeaders = Config::get(unusualBaseKey() . '.schemas.default_post_headers',[]);
+        $this->defaultHeaderFormat = Config::get(unusualBaseKey() . '.default_header',[]);
 
-        $this->traits += Collection::make(Config::get(getUnusualBaseKey() . '.traits',[]))->mapWithKeys(function($object, $key){
-            return [ $key => $object['model']];
-        })->toArray();
+        // $this->baseNamespace = Config::get(unusualBaseKey() . '.namespace')."\\".Config::get(unusualBaseKey() . '.name');
+        $this->baseNamespace = Config::get(unusualBaseKey() . '.namespace');
 
-        $this->traitNamespaces += Collection::make(Config::get(getUnusualBaseKey() . '.traits',[]))->mapWithKeys(function($object, $key){
-            return [ $key => "{$this->baseNamespace}\\Entities\\Traits\\{$object['model']}"];
-        })->toArray();
+        $traits = Config::get(unusualBaseKey() . '.traits',[]);
 
-        $this->repositoryTraits += Collection::make(Config::get(getUnusualBaseKey() . '.traits',[]))->mapWithKeys(function($object, $key){
-            return [ $key => isset($object['repository']) ? $object['repository'] : ''];
-        })->toArray();
+        foreach ($traits as $key => $object) {
+            $this->traits[$key] = $object['model'];
+            $this->traitNamespaces[$key] = "{$this->baseNamespace}\\Entities\\Traits\\{$object['model']}";
 
-        $this->repositoryTraitNamespaces += Collection::make(Config::get(getUnusualBaseKey() . '.traits',[]))->mapWithKeys(function($object, $key){
-            return [ $key => isset($object['repository']) ?  "{$this->baseNamespace}\\Repositories\\Traits\\{$object['repository']}" : ''];
-        })->toArray();
+            $this->repositoryTraits[$key] = isset($object['repository']) ? $object['repository'] : '';
+            $this->repositoryTraitNamespaces[$key] = isset($object['repository']) ?  "{$this->baseNamespace}\\Repositories\\Traits\\{$object['repository']}" : '';
 
-        $this->interfaces += Collection::make(Config::get(getUnusualBaseKey() . '.traits',[]))->mapWithKeys(function($object, $key){
-            return array_key_exists('implementations', $object) ? [
-                $key =>Collection::make($object['implementations'])->map(function($interface){
+            if(array_key_exists('implementations', $object)){
+                $this->interfaces[$key] = Collection::make($object['implementations'])->map(function($interface){
                     return (new \ReflectionClass($interface))->getShortName();
-                })
-            ] : [ $key => [] ];
-        })->toArray();
-
-        $this->interfaceNamespaces += Collection::make(Config::get(getUnusualBaseKey() . '.traits',[]))->mapWithKeys(function($object, $key){
-            return array_key_exists('implementations', $object) ? [
-                $key => Collection::make($object['implementations'])->map(function($interface){
+                })->toArray();
+                $this->interfaceNamespaces[$key] = Collection::make($object['implementations'])->map(function($interface){
                     return (new \ReflectionClass($interface))->getName();
-                })
-            ] : [ $key => [] ];
-        })->toArray();
+                })->toArray();
+            }else{
+                $this->interfaces[$key] = [];
+                $this->interfaceNamespaces[$key] = [];
+            }
+        }
 
         $this->relationshipKeys[] = 'hasMany';
     }
@@ -147,11 +134,11 @@ class SchemaParser extends Parser
 
         $parsed = [];
 
-        foreach ($this->getSchemas() as $schemaArray) {
+        foreach ($this->getSchemas() as $schema) {
 
-            $schema = explode(':', $schemaArray);
+            $schemaArray = explode(':', $schema);
 
-            $column = !in_array($this->getColumn($schemaArray), $this->relationshipKeys) ? $this->getColumn($schemaArray) : $schema[1].'_'.$schema[2];
+            $column = !in_array($this->getColumn($schema), $this->relationshipKeys) ? $this->getColumn($schema) : ($schemaArray[1]).'_id';
 
             $parsed[] = $column;
         }
@@ -184,11 +171,10 @@ class SchemaParser extends Parser
         $relationships = [];
 
         foreach ($this->parse($this->schema) as $col_name => $methods) {
-
             if (in_array($col_name, $this->relationshipKeys)) {
                 $foreign_key = $methods[0].'_id';
-                $owner_key = $methods[1];
-                $table_name = $methods[2];
+                $owner_key = $methods[1] ?? 'id';
+                $table_name = $methods[2] ?? pluralize($methods[0]);
                 $relationships[] = "belongsTo:{$table_name}:{$foreign_key}:{$owner_key}";
 
             } else{
@@ -249,29 +235,40 @@ class SchemaParser extends Parser
      */
     public function headerFormat(string $column_name, $options = []) : array
     {
+        // dd(
+        //     $column_name,
+        //     $options,
+        //     $this->relationshipKeys
+        // );
+        if(in_array($options[0], $this->relationshipKeys)){
+            $column_name = $this->getCamelCase($column_name);
+        }
+
         return [
             'title' => $this->getHeadline($column_name),
             'key' => $column_name,
-            'align' => 'start',
-            'sortable' => false,
-            'filterable' => false,
-            'groupable' => false,
-            'divider' => false,
-            'class' => '', // || []
-            'cellClass' => '', // || []
-            'width' => '', // || int
+            // 'align' => 'start',
+            // 'sortable' => false,
+            // 'filterable' => false,
+            // 'groupable' => false,
+            // 'divider' => false,
+            // 'class' => '', // || []
+            // 'cellClass' => '', // || []
+            // 'width' => '', // || int
             // vuetify datatable header fields end
 
             // custom fields for ue-datatable start
-            'searchable' => true,
-            'isRowEditable' => true,
-            'isColumnEditable' => false,
-            'formatter' =>  $options[0] == 'timestamp' ? ['date', 'long'] : [],
-        ];
+            // 'searchable' => !in_array($options[0], $this->relationshipKeys), //true,
+            // 'isRowEditable' => false,
+            // 'isColumnEditable' => false,
+            // 'formatter' =>  $options[0] == 'timestamp' ? ['date', 'long'] : [],
+        ]
+        + ( $options[0] == 'timestamp' ? ['formatter' => ['date', 'long']] : [])
+        + ( !in_array($options[0], $this->relationshipKeys) ? ['searchable' => true] : []);
     }
 
     /**
-     * getHeaderFormats
+     *
      *
      * @return array
      */
@@ -281,10 +278,28 @@ class SchemaParser extends Parser
         $filter = array_filter($this->parse($this->schema), function($v,$k){
             return !array_key_exists($k, $this->customAttributes);
         }, ARRAY_FILTER_USE_BOTH );
-
-        return array_map(function($o, $k){
-            return $this->headerFormat($k, $o);
-        }, $filter, array_keys($filter) ) + $this->defaultHeaders;
+        // dd(
+        //     array_merge(
+        //         array_merge($this->defaultPreHeaders, array_map(function($k, $options){
+        //             if(in_array($k, $this->relationshipKeys)){
+        //                 // $options[0] => 'relation_name'
+        //                 return $this->headerFormat($options[0], [$k]);
+        //             }
+        //             return $this->headerFormat($k, $options);
+        //         }, array_keys($filter), $filter  )),
+        //         $this->defaultPostHeaders
+        //     )
+        // );
+        return array_merge(
+            array_merge($this->defaultPreHeaders, array_map(function($k, $options){
+                if(in_array($k, $this->relationshipKeys)){
+                    // $options[0] => 'relation_name'
+                    return $this->headerFormat($options[0], [$k]);
+                }
+                return $this->headerFormat($k, $options);
+            }, array_keys($filter), $filter  )),
+            $this->defaultPostHeaders
+        );
     }
 
     /**
@@ -295,26 +310,48 @@ class SchemaParser extends Parser
      */
     public function inputFormat(string $column, $options = []) : array
     {
-        $extra_formats = [];
+        $extra_options = [];
+
+        $type = 'text';
+        $name = $column;
+        $label = $this->getHeadline($column);
 
         if($options[0] == 'timestamp'){
-            $extra_formats['ext'] = 'date';
+            $extra_options['ext'] = 'date';
+        }
+
+        if(in_array($options[0], $this->relationshipKeys)){
+            if($options[0] == 'belongsTo'){
+                $type = 'select';
+                $name .= '_id';
+
+                $finder = new Finder();
+                $extra_options['repository'] = $finder->getRepository(pluralize($column));
+            } else if($options[0] == 'hasMany'){
+                $type = 'checklist';
+                $name = pluralize($name);
+                $label = pluralize($label);
+
+                $finder = new Finder();
+                $extra_options['repository'] = $finder->getRepository(pluralize($column));
+            }
         }
         return [
-            'name' => $column,
-            'label' => $this->getHeadline($column),
-            'type' => 'text',
-            ...$extra_formats,
-            'hint' => '',
-            'placeholder' => "{$this->getHeadline($column)} Value",
-            'default' => '',
-            'col' => [
-                'cols' => 12,
-                'sm' => 12,
-                'md' => 12,
-                'lg' => 6,
-                'xl' => 4
-            ]
+            'name' => $name,
+            'label' => $label,
+            'type' => $type,
+            ...$extra_options,
+            // 'placeholder' => "{$this->getHeadline($column)} Value",
+
+            // 'hint' => '',
+            // 'default' => '',
+            // 'col' => [
+            //     'cols' => 12,
+            //     'sm' => 12,
+            //     'md' => 12,
+            //     'lg' => 6,
+            //     'xl' => 4
+            // ]
         ];
     }
 
@@ -329,9 +366,13 @@ class SchemaParser extends Parser
             return !array_key_exists($k, $this->customAttributes);
         }, ARRAY_FILTER_USE_BOTH );
 
-        return array_map(function($o, $k){
-            return $this->inputFormat($k, $o);
-        }, $filter, array_keys($filter) ) ?: $this->defaultInputs;
+        return array_merge( $this->defaultInputs, array_map(function($k, $options){
+            if(in_array($k, $this->relationshipKeys)){
+                // $options[0] => 'relation_name'
+                return $this->inputFormat($options[0], [$k]);
+            }
+            return $this->inputFormat($k, $options);
+        }, array_keys($filter), $filter ));
     }
 
     /**
@@ -355,6 +396,7 @@ class SchemaParser extends Parser
     {
         return $this->repositoryTraitNamespaces[$string];
     }
+
     /**
      * getInterfaceNamespace
      *

@@ -85,8 +85,8 @@ class RepositoryMakeCommand extends BaseCommand
     protected function getArguments()
     {
         return [
-            ['repository', InputArgument::REQUIRED, 'The name of the repository class.'],
             ['module', InputArgument::REQUIRED, 'The name of module will be used.'],
+            ['repository', InputArgument::REQUIRED, 'The name of the repository class.'],
         ];
     }
 

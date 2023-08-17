@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth')
-    ->prefix( getCurrentModuleLowerName() )
-    ->name( getCurrentModuleLowerName().'.')
+    ->prefix( getCurrentModuleUrlName() )
+    ->name( getCurrentModuleSnakeName().'.')
     ->group(function(){
 
 
@@ -27,8 +27,8 @@ Route::middleware('auth')
     ->namespace('API')
     ->group(function(){
 
-    Route::prefix( getCurrentModuleLowerName() )
-        ->name( getCurrentModuleLowerName().'.' )
+    Route::prefix( getCurrentModuleUrlName() )
+        ->name( getCurrentModuleSnakeName().'.' )
         ->group(function(){
 
 

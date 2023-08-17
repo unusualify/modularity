@@ -13,8 +13,8 @@ namespace OoBook\CRM\Base\Services;
 // }
 
 enum MessageStage:string {
-  case SUCCESS = 'Success';
-  case ERROR = 'Error';
-  case WARNING = 'Caution';
-  case INFO = 'Help';
+  case SUCCESS = 'success';
+  case ERROR = 'error';
+  case WARNING = 'warning';
+  case INFO = 'info';
 }

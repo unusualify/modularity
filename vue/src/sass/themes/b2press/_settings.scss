@@ -1,8 +1,9 @@
-@use 'abstract/variables' as c;
+@use 'abstract/_vuetify' as c;
 @use 'styles/abstract/functions' as *;
-@forward 'vuetify/settings' with (
-  $color-pack: false,
-  $utilities: '',
+@use 'vuetify/settings' with (
+  $color-pack: map-get(c.$vuetify, 'color-pack'),
+  $utilities: map-get(c.$vuetify, 'utilities'),
+  $font-weights: map-get(c.$vuetify, 'font-weights'),
 
   // $button-height: map-get(c.$vuetify, 'button-height'),
   $button-font-weight: map-get(c.$vuetify, 'button-font-weight'),
@@ -39,15 +40,18 @@
   // $field-control-affixed-inner-padding: 6px !default;
   // $field-control-underlined-height: 48px !default;
   // $field-control-underlined-padding-bottom: 2px !default;
-  // $field-control-height: 56px !default;
+  // $field-control-height: map-get(c.$vuetify, 'field-control-height'), // 50px
 
-  $field-label-floating-scale: 0.81,
+  $field-label-floating-scale: map-get(c.$vuetify, 'field-label-floating-scale'), //0.81,
 
   // $input-density: ('default': 0, 'comfortable': -2, 'compact': -4) !default;
   // $input-control-height: 40px,
   // $input-font-size: tools.map-deep-get(settings.$typography, 'body-1', 'size') !default;
   // $input-font-weight: tools.map-deep-get(settings.$typography, 'body-1', 'weight') !default;
-  $input-line-height: 1.3,
+
+  // $input-line-height: map-get(c.$vuetify, 'input-line-height'),
+  // $input-control-height: map-get(c.$vuetify, 'input-control-height'),
+
   // $input-details-font-size: .75rem !default;
   // $input-details-font-weight: 400 !default;
   // $input-details-letter-spacing: .0333333333em !default;
@@ -58,6 +62,9 @@
 
   $navigation-drawer-background: map-get(c.$vuetify, 'navigation-drawer-background'),
   $navigation-drawer-color: map-get(c.$vuetify, 'navigation-drawer-color'),
+
+  $line-height-root: map-get(c.$vuetify, 'line-height-root'),
+
 
   // $list-background: map-get(c.$vuetify, 'list-background'),
   $list-color: map-get(c.$vuetify, 'list-color'), //rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)),
@@ -70,12 +77,11 @@
 );
 // @use 'vuetify/settings' as v;
 
-
 // @use 'config/variables' as c;
 // @include use-with(c.$vuetify, 'vuetify/settings');
 // @use 'vuetify/settings' with($vuetify);
 
-$vuetify: map-list-to-map(c.$vuetify);
+// $vuetify: map-list-to-map(c.$vuetify);
 
 // @debug( map-get($vuetify, 'list-color') );
 

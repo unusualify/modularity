@@ -63,12 +63,13 @@ export default {
 
     confirmModal (callback = null) {
       if (typeof this.confirmCallback === 'undefined') {
-        this.closeModal()
+        if (callback) {
+          callback()
+        } else {
+          this.closeModal()
+        }
       } else {
         this.confirmCallback()
-      }
-      if (callback) {
-        callback()
       }
 
       this.$emit('confirm')

@@ -4,6 +4,7 @@ namespace OoBook\CRM\Base\Providers;
 
 use Illuminate\Support\ServiceProvider as Provider;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Foundation\CachesConfiguration;
 
 
 class ServiceProvider extends Provider
@@ -31,5 +32,33 @@ class ServiceProvider extends Provider
         $this->baseName = env('BASE_NAME', 'Base');
 
         $this->baseKey = Str::snake($this->baseName);
+    }
+
+    /**
+     *
+     *
+     * Merge the given configuration with the existing configuration.
+     *
+     * @param  string  $path
+     * @param  string  $key
+     * @return void
+     */
+    protected function mergeConfigFrom($path, $key)
+    {
+        if (! ($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
+            $config = $this->app->make('config');
+            // if($key == 'unusual'){
+            //     dd(
+            //         require $path,
+            //         $config->get($key, []),
+            //         array_merge(
+            //             require $path, $config->get($key, [])
+            //         )
+            //     );
+            // }
+            $config->set($key, array_merge_recursive_preserve(
+                require $path, $config->get($key, [])
+            ));
+        }
     }
 }

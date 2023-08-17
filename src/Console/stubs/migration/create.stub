@@ -9,9 +9,11 @@ class $CLASS$ extends Migration
     public function up()
     {
         Schema::create('$TABLE$', function (Blueprint $table) {
-            // this will create an id, a "published" column, and soft delete and timestamps columns
+            // this will create an id, name field
             createDefaultTableFields($table);
             $FIELDS$
+            // a "published" column, and soft delete and timestamps columns
+            createDefaultExtraTableFields($table);
         });
 
         $UP_SCHEMAS$

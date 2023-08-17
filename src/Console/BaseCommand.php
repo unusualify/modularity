@@ -8,11 +8,11 @@ use Nwidart\Modules\Commands\GeneratorCommand;
 use Nwidart\Modules\Facades\Module;
 use Nwidart\Modules\Support\Stub;
 use Nwidart\Modules\Traits\ModuleCommandTrait;
-use OoBook\CRM\Base\Traits\ManagesNames;
+use OoBook\CRM\Base\Traits\ManageNames;
 
 class BaseCommand extends GeneratorCommand
 {
-    use ModuleCommandTrait, ManagesNames;
+    use ModuleCommandTrait, ManageNames;
 
     /**
      * The name of 'name' argument.

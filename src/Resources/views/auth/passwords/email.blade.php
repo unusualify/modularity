@@ -1,13 +1,20 @@
-@extends('twill::auth.layout', [
-    'route' => route('admin.password.reset.email'),
-    'screenTitle' => ___('auth.reset-password')
+@extends("{$BASE_KEY}::auth.layout", [
+    'pageTitle' => ___('auth.forgot-password')
 ])
+@section('appTypeClass', 'body--form')
 
-@section('form')
-    <fieldset class="login__fieldset">
-        <label class="login__label" for="email">{{ ___('auth.email') }}</label>
-        <input type="email" name="email" id="email" class="login__input" required autofocus />
-    </fieldset>
 
-    <input class="login__button" type="submit" value="{{ ___('auth.reset-send') }}">
-@stop
+{{-- @dd(
+    __('auth.failed'),
+    ___('auth.failed'),
+    Lang::get('auth.failed'),
+
+    __('Reset Password Notification'),
+    ___('Reset Password Notification'),
+    Lang::get('Reset Password Notification'),
+) --}}
+{{-- @dd( __('auth'), ___('auth')) --}}
+
+
+
+

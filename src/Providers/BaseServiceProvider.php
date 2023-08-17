@@ -2,13 +2,13 @@
 
 namespace OoBook\CRM\Base\Providers;
 
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Route;
 use OoBook\CRM\Base\Activators\FileActivator;
+use OoBook\CRM\Base\Support\UnusualNavigation;
 use OoBook\CRM\Base\UnusualFileRepository;
-
 class BaseServiceProvider extends ServiceProvider
 {
-
     /**
      * Namespace of the terminal commands
      * @var string
@@ -22,9 +22,7 @@ class BaseServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadMigrationsFrom(
-            base_path( config( $this->baseKey . '.vendor_path') . '/src/Database/Migrations' )
-        );
+
     }
 
     /**
@@ -41,15 +39,22 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->commands($this->resolveCommands());
 
-        $this->app->singleton(Contracts\RepositoryInterface::class, function ($app) {
+        // $this->app->singleton(\OoBook\CRM\Base\Contracts\RepositoryInterface::class, function ($app) {
+        $this->app->singleton('unusual.repository', function ($app) {
             $path = $app['config']->get('modules.paths.modules');
 
             return new UnusualFileRepository($app, $path);
         });
 
-        $this->app->singleton(FileActivator::class, function ($app) {
+        // $this->app->singleton(FileActivator::class, function ($app) {
+        $this->app->singleton('unusual.activator', function ($app) {
             return new FileActivator($app);
         });
+
+        // $this->app->singleton('unusual.ge', function ($app) {
+        //     return new FileActivator($app);
+        // });
+
 
         if (config($this->baseKey . '.enabled.media-library')) {
             $this->app->singleton('imageService', function () {
@@ -63,8 +68,13 @@ class BaseServiceProvider extends ServiceProvider
             });
         }
 
-        $this->app->alias(Contracts\RepositoryInterface::class, 'ue_modules');
-        $this->app->alias(FileActivator::class, 'module_activator');
+        $this->app->singleton('unusual.navigation', UnusualNavigation::class);
+        // $this->app->alias(\OoBook\CRM\Base\Contracts\RepositoryInterface::class, 'ue_modules');
+        // $this->app->alias('unusual.repository', 'ue_modules');
+
+        // $this->app->alias(FileActivator::class, 'module_activator');
+
+        $this->app->alias(\Torann\GeoIP\Facades\GeoIP::class, 'GeoIP');
 
     }
 

@@ -4,7 +4,10 @@ namespace OoBook\CRM\Base\Http\Controllers;
 
 use Illuminate\Auth\Passwords\PasswordBrokerManager;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\Factory as ViewFactory;
+use OoBook\CRM\Base\Traits\ConfigureViewFields;
 
 class ForgotPasswordController extends Controller
 {
@@ -19,7 +22,7 @@ class ForgotPasswordController extends Controller
     |
      */
 
-    use SendsPasswordResetEmails;
+    use SendsPasswordResetEmails, ConfigureViewFields;
 
     /**
      * @var PasswordBrokerManager
@@ -31,7 +34,7 @@ class ForgotPasswordController extends Controller
         parent::__construct();
 
         $this->passwordBrokerManager = $passwordBrokerManager;
-        $this->middleware('twill_guest');
+        $this->middleware('unusual_guest');
     }
 
     /**
@@ -39,7 +42,7 @@ class ForgotPasswordController extends Controller
      */
     public function broker()
     {
-        return $this->passwordBrokerManager->broker('twill_users');
+        return $this->passwordBrokerManager->broker('users');
     }
 
     /**
@@ -48,6 +51,100 @@ class ForgotPasswordController extends Controller
      */
     public function showLinkRequestForm(ViewFactory $viewFactory)
     {
-        return $viewFactory->make('twill::auth.passwords.email');
+        // return $viewFactory->make('unusual::auth.passwords.email');
+        return $viewFactory->make('unusual::auth.passwords.email', [
+            'formAttributes' => [
+                'hasSubmit' => true,
+
+                // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
+                'schema' => ($schema = $this->getFormSchema([
+                    'email' => [
+                        "type" => "text",
+                        "name" => "email",
+                        "label" => ___('auth.email'),
+                        "default" => "",
+                        'col' => [
+                            'cols' => 12,
+                        ],
+                        'rules' => [
+                            ['email']
+                        ]
+                    ],
+                ])),
+
+                'actionUrl' => route('password.reset.email'),
+                'buttonText' => 'auth.reset-send',
+
+                'formClass' => 'px-5',
+
+            ],
+            'slots' => [
+                'bottom' => [
+                    'tag' => 'v-sheet',
+                    'attributes' => [
+                        'class' => 'd-flex pb-5 mx-8 justify-end',
+
+                    ],
+                    'elements' => [
+                        [
+                            "tag" => "v-btn",
+                            'elements' => ___('auth.back-to-login'),
+                            "attributes" => [
+                                'variant' => 'plain',
+                                'href' => route('login.form'),
+                                'class' => ''
+                            ],
+                        ]
+                    ]
+
+                ]
+            ]
+        ]);
+
+    }
+
+        /**
+     * Get the response for a successful password reset link.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    protected function sendResetLinkResponse(Request $request, $response)
+    {
+        return $request->wantsJson()
+                    ? new JsonResponse([
+                        'message' => trans($response),
+                        'variant' => 'success'
+                    ], 200)
+                    : back()->with('status', trans($response));
+    }
+
+    /**
+     * Get the response for a failed password reset link.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $response
+     * @return \Illuminate\Http\RedirectResponse
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendResetLinkFailedResponse(Request $request, $response)
+    {
+        if ($request->wantsJson()) {
+            // dd('safa');
+            return new JsonResponse([
+                'email' => [trans($response)],
+                'message' => trans($response),
+                'variant' => 'warning'
+            ]);
+            // throw ValidationException::withMessages([
+            //     'email' => [trans($response)],
+            // ]);
+        }
+
+        return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['email' => trans($response)]);
     }
 }

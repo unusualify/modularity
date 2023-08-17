@@ -1,3 +1,5 @@
+import { ALERT } from '../store/mutations'
+
 export default {
   $trans: function (key, defaultValue) {
     return this.$lodash.get(window[process.env.VUE_APP_NAME].unusualLocalization.lang, key, defaultValue)
@@ -25,5 +27,11 @@ export default {
     }
     // __log(_props)
     return _attributes
+  },
+  $log: function (...args) {
+    window.__log(...args)
+  },
+  $notif: function (Obj) {
+    this.$store.commit(ALERT.SET_ALERT, Obj)
   }
 }

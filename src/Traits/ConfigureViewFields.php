@@ -13,6 +13,30 @@ use stdClass;
 trait ConfigureViewFields {
 
     /**
+     * @var array
+     */
+    protected $defaultTableOptions = [
+        'createOnModal' => true,
+        'editOnModal' => true,
+        'isRowEditing' => false,
+        'actionsType' => 'inline'
+    ];
+
+    /**
+     * Relations to eager load for the form view.
+     *
+     * @var array
+     */
+    protected $formWith = [];
+
+    /**
+     * Relation count to eager load for the form view.
+     *
+     * @var array
+     */
+    protected $formWithCount = [];
+
+    /**
      * @param array $prependScope
      * @return array
      */
@@ -21,52 +45,47 @@ trait ConfigureViewFields {
         // $scopes = $this->filterScope($prependScope);
         // $items = $this->getIndexItems($scopes);
 
+        $formSchema = $this->getFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        // dd(
+        //     $this->getSchemaWiths($formSchema),
+        //     $this->getJSONData($this->getSchemaWiths($formSchema))
+        // );
         $data = [
             // 'hiddenFilters' => array_keys(Arr::except($this->filters, array_keys($this->defaultFilters))),
             // 'filterLinks' => $this->filterLinks ?? [],
 
-            'initialResource' => $this->getJSONData(), //
+            'initialResource' => $this->getJSONData($this->getSchemaWiths($formSchema)), //
             'tableMainFilters' => $this->getIndexTableMainFilters(),
             'filters' => json_decode($this->request->get('filter'), true) ?? [],
 
             'titleKey' => $this->titleColumnKey,
             'headers' => $this->getIndexTableColumns(), // headers to be used in unusual datatable component
-            'formSchema'  => $this->getFormSchema($this->getConfigFieldsByRoute('inputs')), // input fields to be used in unusual datatable component
+            'formSchema'  => $formSchema, // input fields to be used in unusual datatable component
 
-            'indexEndpoint' => route(
-                ($this->isParentRoute() ? '' : $this->getSnakeCase($this->moduleName) . '.')
-                    . $this->getSnakeCase($this->routeName)
-                    . ".index"
-            ), // basic laravel index url for create|edit|store|update|delete routes
+            // 'indexEndpoint' => route(
+            //     ($this->isParentRoute() ? '' : $this->getSnakeCase($this->moduleName) . '.')
+            //         . $this->getSnakeCase($this->routeName)
+            //         . ".index"
+            // ), // basic laravel index url for create|edit|store|update|delete routes
             'searchText' =>  request()->has('search') ? request()->query('search') : "", // for current text of search parameter
             'requestFilter' => json_decode(request()->get('filter'), true) ?? [],
-            'listOptions' => $this->getVuetifyDatatableOptions(), // options to be used in unusual datatable component
 
             /***
              * TODO variables to be assigned dynamically
              *
              * */
-            // 'createOnModal' => $table_options['createOnModal'] ?? true,
-            // 'editOnModal' => $table_options['editOnModal'] ?? true,
-            // 'isRowEditing' => $table_options['isRowEditing'] ?? true, // whether row editing is active in unusual datatable component
-            // 'actionsType' => "inline", // 'dropdown|inline' for actions of rows in unusual datatable
-            'actions' => [
-                [
-                    'name' => 'edit',
-                    'color' => 'green darken-2'
-                ],
-                [
-                    'name' => 'delete',
-                    'color' => 'red darken-2'
-                ]
-            ],
+            'actions' => $this->getTableActions(),
 
-        ] + $this->getIndexUrls() + $this->tableOptions;
+            'endpoints' => $this->getIndexUrls()
+
+        ] + $this->tableOptions + $this->getViewLayoutVariables();
         // $baseUrl = $this->getPermalinkBaseUrl();
-
         $options = [
             'moduleName' => $this->getHeadline($this->moduleName),
             'routeName' => $this->getHeadline($this->routeName),
+            'listOptions' => $this->getVuetifyDatatableOptions(), // options to be used in unusual datatable component
+
 
             // 'skipCreateModal' => $this->getIndexOption('skipCreateModal'),
             // 'reorder' => $this->getIndexOption('reorder'),
@@ -82,14 +101,14 @@ trait ConfigureViewFields {
             // 'additionalTableActions' => $this->additionalTableActions(),
         ];
 
-        return array_replace_recursive($data + $options, $this->extraIndexData($this->request));
+        return array_replace_recursive($data + $options, $this->indexData($this->request));
     }
 
     /** xx
      * @param Request $request
      * @return array
      */
-    protected function extraIndexData($request)
+    protected function indexData($request)
     {
         return [];
     }
@@ -146,6 +165,10 @@ trait ConfigureViewFields {
         return $statusFilters;
     }
 
+    public function getIndexItemData($item)
+    {
+        # code...
+    }
     /**
      * @param \OoBook\CRM\Base\Models\Model $item
      * @return array
@@ -164,7 +187,10 @@ trait ConfigureViewFields {
         else{
             return $this->indexTableColumns = Collection::make(
                 $this->getConfigFieldsByRoute('headers')
-            )->map(function($item){ return (array) $item;})
+            )->map(function($item){
+                // dd( (array) $item + unusualConfig('default_header'), $item);
+                return $this->getHeader((array) $item);
+            })
             ->toArray();
         }
 
@@ -177,13 +203,17 @@ trait ConfigureViewFields {
      */
     public function getTableOptions()
     {
-        try {
-            return Collection::make(
-                $this->getConfigFieldsByRoute('table_options') ?? $this->defaultTableOptions
-            )->toArray();
-        } catch (\Throwable $th) {
-            return [];
+        if(!!$this->config) {
+            try {
+                return Collection::make(
+                    $this->getConfigFieldsByRoute('table_options') ?? $this->defaultTableOptions
+                )->toArray();
+            } catch (\Throwable $th) {
+                return [];
+            }
         }
+
+        return [];
     }
 
     /**
@@ -223,9 +253,21 @@ trait ConfigureViewFields {
      */
     protected function getIndexUrls()
     {
+
+        // 'indexEndpoint' => route(
+        //     ($this->isParentRoute() ? '' : $this->getSnakeCase($this->moduleName) . '.')
+        //         . $this->getSnakeCase($this->routeName)
+        //         . ".index"
+        // ), // basic laravel index url for create|edit|store|update|delete routes
+
         return Collection::make([
+            'index',
             'create',
+            'store',
             'edit',
+            'update',
+            'destroy',
+            // 'delete',
 
             // 'show',
             // 'update',
@@ -254,9 +296,28 @@ trait ConfigureViewFields {
             // if($optionIsActive){
             //     $boundEndpoints =
             // }
+            // dd(
+            //     $action,
+            //     $optionIsActive,
 
+            //     moduleRoute(
+            //         $this->routeName,
+            //         $this->routePrefix,
+            //         $action,
+            //         $parameters
+            //     ),
+            //     route(
+            //         ($this->isParentRoute() ? '' : $this->getSnakeCase($this->moduleName) . '.')
+            //             . $this->getSnakeCase($this->routeName)
+            //             . ".index"
+            //     )
+            // );
+            if(!$optionIsActive){
+                dd($action);
+            }
             return [
-                $action . 'Endpoint' => $optionIsActive
+                // $action . 'Endpoint' => $optionIsActive
+                $action => $optionIsActive
                                             ?   moduleRoute(
                                                     $this->routeName,
                                                     $this->routePrefix,
@@ -300,22 +361,36 @@ trait ConfigureViewFields {
         // $localizedPermalinkBase = $this->getLocalizedPermalinkBase();
 
         $itemId = $this->getItemIdentifier($item);
-
+        // dd($item);
         $data = [
-            'editable' => !!$itemId,
-            'item' => $item,
-            'moduleName' => $this->moduleName,
-            'routeName' => $this->routeName,
-            'routePrefix' => $this->routePrefix,
-            'titleFormKey' => $this->titleFormKey ?? $this->titleColumnKey,
+            'formAttributes' => [
+                'hasSubmit' => true,
+                'stickyButton' => false,
+                'modelValue' => $this->repository->getFormFields($item, $schema),
+                'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => $this->routeName]),
+                // 'schema'  => $schema, // input fields to be used in unusual datatable component
+                // 'defaultItem' => collect($schema)->mapWithKeys(function($item, $key){
+                //     return [ $item['name'] => $item['default'] ?? ''];
+                //     $carry[$key] = $item->default ?? '';
+                // })->toArray(),
+                // 'actionUrl' => $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]),
+            ],
+            'endpoints' => [
+                (!!$itemId ? 'update' : 'store') => $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId])
+            ],
 
-            'formSchema'  => $schema, // input fields to be used in unusual datatable component
-            'defaultItem' => collect($schema)->mapWithKeys(function($item, $key){
-                return [ $item['name'] => $item['default'] ?? ''];
-                $carry[$key] = $item->default ?? '';
-            })->toArray(),
-            'actionUrl' => $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]),
-            'async' => true,
+            'formStore' => [
+                'inputs' => $schema,
+                // 'inputs' => $this->repository->getFormFields($item, $schema),
+            ]
+
+            // 'editable' => !!$itemId,
+
+            // 'moduleName' => $this->moduleName,
+            // 'routeName' => $this->routeName,
+            // 'routePrefix' => $this->routePrefix,
+            // 'titleFormKey' => $this->titleFormKey ?? $this->titleColumnKey,
+
 
             // 'publish' => $item->canPublish ?? true,
             // 'publishDate24Hr' => Config::get('twill.publish_date_24h') ?? false,
@@ -341,6 +416,9 @@ trait ConfigureViewFields {
             'restoreUrl' => moduleRoute($this->moduleName, $this->routePrefix, 'restoreRevision', [$itemId]),
         ] : []);
 
+        // dd(
+        //     array_replace_recursive($data, $this->extraFormData($this->request))
+        // );
         return array_replace_recursive($data, $this->extraFormData($this->request));
     }
 
@@ -393,49 +471,74 @@ trait ConfigureViewFields {
         })->toArray();
     }
 
-    public function getInputSchema(stdClass $input)
+    public function getInputSchema($input)
     {
+        // $default_input = collect(Config::get(unusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
+        // $default_input = $this->configureInput(array2Object(Config::get(unusualBaseKey() . '.default_input')));
+        $default_input = (array) Config::get(unusualBaseKey() . '.default_input');
+        // dd($default_input, $input);
+        $input = object2Array($input);
+
         if($object = $this->generateCustomInput($input)){
-            return $object;
+            $input = $object;
         }
 
-        $default_inputs = collect(Config::get(getUnusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
-        return isset($input->name)
-            ? [ $input->name => $default_inputs->merge(collect($input)->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];})) ]
+        // dd(
+        //     $default_input,
+        //     $input,
+        //     array_merge_recursive_preserve( $this->configureInput($input), $default_input )
+        // );
+
+        return isset($input['name'])
+            // ? [ $input->name => $default_input->union( $this->configureInput($input) ) ]
+            // ? [ $input['name'] => array_merge_recursive_preserve( $default_input, $this->configureInput($input) ) ]
+            ? [ $input['name'] => $this->configureInput( array_merge_recursive_preserve( $default_input, $input )) ]
             : [];
     }
 
+    /**
+     * @param Array|stdClass $input
+     * @return Collection
+     */
+    public function configureInput($input)
+    {
+        return collect($input)
+            ->mapWithKeys(function($v, $k){
+                return is_numeric($k) ? [$v => true] : [$k => $v];
+            })
+            ->toArray();
+    }
+
+    /**
+     * @param Array|stdClass $input
+     * @return Collection
+     */
     public function generateCustomInput($input)
     {
         $object = null;
-
-        switch ($input->type) {
+        switch ($input['type']) {
             case 'custom-input-treeview':
             case 'treeview':
-                $relation_model = null;
+                $relation_class = null;
 
                 // dd(
-                //     $this->app['ue_modules']->find($this->moduleName),
+                //     $this->app['unusual.repository']->find($this->moduleName),
                 //     // $this->config->parent_route,
                 //     // FacadesModule::find('Base')
                 // );
-                if(!!$input->model){
-                    $relation_model = App::make($input->model);
-                }else if(!!$input->route){
+                if(isset($input['repository'])){
+                    $relation_class = App::make($input['repository']);
+                }else if(isset($input['model'])){
+                    $relation_class = App::make($input['model']);
+                }else if(isset($input['route'])){
                     $finder = new Finder();
-                    $module = $this->app['ue_modules']->find($this->moduleName);
+                    $module = $this->app['unusual.repository']->find($this->moduleName);
 
-                    if( $module->isEnabledRoute($input->route) ){
-                        if($this->config->parent_route->route_name == $input->route){
-                            $table = Str::plural($input->route);
-                            $relation_model = $finder->getModel($table);
-                        }else if(!!$this->config->parent_route->sub_routes){
-
-                            foreach ($this->config->parent_route->sub_routes as $sr) {
-                                if($sr->route_name == $input->route){
-                                    $table = Str::plural($input->route);
-                                    $relation_model = $finder->getModel($table);
-                                }
+                    if( $module->isEnabledRoute($input['route']) ){
+                        foreach ($this->config->routes as $r) {
+                            if($r->route_name == $input['route']){
+                                $table = Str::plural($input['route']);
+                                $relation_class = $finder->getModel($table);
                             }
                         }
                     }
@@ -449,27 +552,118 @@ trait ConfigureViewFields {
                         [
                             'id' => -1,
                             'name' => 'Role Group',
-                            'children' => $relation_model->all(['id', 'name'])->toArray()
+                            'children' => $relation_class->all(['id', 'name'])->toArray()
                         ]
                     ]
                 ];
 
-                break;
+            break;
+            case 'checklist':
+                // dd($input);
+                $relation_class = null;
 
+                $input['itemValue'] = $input['itemValue'] ?? 'id';
+                $input['itemTitle'] = $input['itemTitle'] ?? 'name';
+                $input['type'] = 'custom-input-checklist';
+                $input['default'] = [];
+
+                if(isset($input['repository'])){
+                    $relation_class = App::make($input['repository']);
+                }else if(isset($input['model'])){
+                    $relation_class = App::make($input['model']);
+                }else if(isset($input['route'])){
+                    $finder = new Finder();
+                    $module = $this->app['unusual.repository']->find($this->moduleName);
+
+                    if( $module->isEnabledRoute($input['route']) ){
+                        foreach ($this->config->routes as $r) {
+                            if($r->route_name == $input['route']){
+                                $table = Str::plural($input['route']);
+                                $relation_class = $finder->getRepository($table);
+                            }
+                        }
+                    }
+                }
+
+                // $object[$input['name']] =  Arr::except($input, ['route','model']) + [
+                $object =  Arr::except($input, ['route','model', 'repository']) + [
+                    'items' => $relation_class->all([$input['itemValue'], $input['itemTitle']])->toArray()
+                ];
+
+            break;
+            case 'select':
+            case 'combobox':
+                // dd($input);
+                $relation_class= null;
+
+                if(isset($input['items'])) break;
+
+                $input['itemValue'] = $input['itemValue'] ?? 'id';
+                $input['itemTitle'] = $input['itemTitle'] ?? 'name';
+                $input['default'] = [];
+                // $input[] = 'multiple';
+
+
+                if(isset($input['repository'])){
+                    $relation_class = App::make($input['repository']);
+                }else if(isset($input['model'])){
+                    $relation_class = App::make($input['model']);
+                }else if(isset($input['route'])){
+                    $finder = new Finder();
+                    $module = $this->app['unusual.repository']->find($this->moduleName);
+
+                    if(!isset($module)){
+                        $input['items'] = [];
+                        break;
+                    }
+
+                    if( $module->isEnabledRoute($input['route']) ){
+                        foreach ($this->config->routes as $r) {
+                            if($r->route_name == $input['route']){
+                                $table = Str::plural($input['route']);
+                                $relation_class = $finder->getRepository($table);
+                            }
+                        }
+                    }
+                }
+
+                // $object[$input['name']] =  Arr::except($input, ['route','model']) + [
+                $object =  Arr::except($input, ['route','model', 'repository']) + [
+                    'items' => $relation_class->all([$input['itemValue'], $input['itemTitle']])->toArray()
+                ];
+
+            break;
             default:
-                # code...
+
                 break;
         }
+
         return $object;
     }
 
     protected function getSchemaWiths($schema)
     {
+        // return collect($schema)->filter(function($item){
+        //     return $this->hasWithModel($item['type']);
+        // })->map(function($item){
+        //     return "{$item['name']}:{$item['itemValue']}";
+        // })->toArray();
+
         return collect($schema)->filter(function($item){
             return $this->hasWithModel($item['type']);
-        })->map(function($item, $i){
-            return $item['name'];
-        })->values()->toArray();
+        })->mapWithKeys(function($item){
+            $key = $item['name'];
+            if(preg_match('/(.*)(_id)/', $key, $matches)){
+                $key = $this->getCamelCase($matches[1]);
+            }
+            return [
+                $key => [
+                    // ['select', $item['itemValue'], $item['itemTitle']],
+                    ['addSelect', $item['itemValue']],
+                    ['addSelect', $item['itemTitle']]
+                ]
+            ];
+        })->toArray();
     }
 
     /**
@@ -480,10 +674,53 @@ trait ConfigureViewFields {
     {
         $types = [
             'treeview',
-            'custom-input-treeview'
+            'custom-input-treeview',
+            'custom-input-checklist',
+            'select',
         ];
+
 
         return in_array($type, $types);
     }
 
+    public function getHeader($header)
+    {
+        return $this->generateCustomHeader($header + unusualConfig('default_header'));
+    }
+
+    public function generateCustomHeader($header)
+    {
+        if($this->isRelationField($header['key']))
+            $header['key'] .= '_relation';
+
+        return $header;
+    }
+
+    public function getTableActions()
+    {
+        $actions = [];
+
+        if($this->getIndexOption('edit') ){
+            $actions[] = [
+                'name' => 'edit',
+                // 'color' => 'green darken-2',
+                'color' => 'primary darken-2',
+            ];
+        }
+        if($this->getIndexOption('delete')){
+            $actions[] = [
+                'name' => 'delete',
+                // 'color' => 'red darken-2',
+                'color' => 'primary',
+            ];
+        }
+
+        return $actions;
+    }
+
+    public function getViewLayoutVariables() {
+        return [
+            'pageTitle' => $this->getHeadline($this->routeName) . " Module"
+        ];
+    }
 }

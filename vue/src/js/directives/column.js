@@ -22,16 +22,17 @@ export default {
       // called right before the element is inserted into the DOM.
       beforeMount (el, binding, vnode, prevVnode) {
         const Columns = binding.value
-        __log(binding.arg)
         if (!Columns) {
           Object.entries(defaultColumns).forEach(([key, value]) => {
-            el.setAttribute(key, value)
+            // el.setAttribute(key, value)
+            el.classList.add(`v-col-${key === 'cols' ? value : key + '-' + value}`)
           })
           // el.setAttribute('md', '6')
         } else if (__isObject(Columns)) {
           // Set the column information as attributes
           Object.entries(Columns).forEach(([key, value]) => {
-            el.setAttribute(key, value)
+            // el.setAttribute(key, value)
+            el.classList.add(`v-col-${key === 'cols' ? value : key + '-' + value}`)
           })
         }
       },

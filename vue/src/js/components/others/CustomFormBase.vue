@@ -549,7 +549,6 @@ const list = 'list'
 const focus = 'focus'
 const blur = 'blur'
 const append = 'append'
-const appendOuter = 'append-outer'
 const appendInner = 'append-inner'
 const prepend = 'prepend'
 const prependInner = 'prepend-inner'
@@ -626,13 +625,15 @@ export default {
       button,
       treeview,
       list,
+
       focus,
       blur,
+
       append,
-      appendOuter,
       appendInner,
       prepend,
       prependInner,
+
       hour,
       minute,
       second,
@@ -679,15 +680,7 @@ export default {
       this.updateArrayFromState(this.valueIntern, this.formSchema)
       for (const key in this.formSchema) {
         const sch = this.formSchema[key]
-        if (sch.type === 'select' && sch.hasOwnProperty('cascade')) {
-          // __log(
-          //   'storeStateSchema computed',
-          //   sch.name,
-          //   this.valueIntern[sch.name],
-          //   this.storeStateData,
-          //   sch.items,
-          //   find(sch.items, [sch.itemValue, this.valueIntern[sch.name]])
-          // )
+        if (sch.type === 'select' && Object.prototype.hasOwnProperty.call(sch, 'cascade')) {
           this.formSchema[sch.cascade].items = find(sch.items, [sch.itemValue, this.valueIntern[sch.name]]).items ?? []
           // this.formSchema[key].items = find(this.formSchema[sch.parent].items, [this.formSchema[sch.parent].itemValue, this.valueIntern[sch.parent]]).items
         }
@@ -697,15 +690,15 @@ export default {
   },
   watch: {
     formSchema: function (newSchema) {
-      // __log('formSchema watch', this.valueIntern)
+      __log('formSchema watch', newSchema)
       this.rebuildArrays(this.valueIntern, newSchema)
       this.formSchema = newSchema
+      this.schema = newSchema
     }
   },
   methods: {
     // MAP TYPE
     mapTypeToComponent (type) {
-      // __log(this.vueInstance.components)
       // merge global registered components into typeToComponent Object
       const allTypeComponents = { ...typeToComponent, ...this.vueInstance.components }
       // const typeToComponent -> maps type to according v-component
@@ -1152,6 +1145,7 @@ export default {
         this.$emit(event, val) // listen to specific event only
         this.$emit(listener, val) // listen to specific event only
         this.$emit('update:modelValue', this.storeStateData) // listen to specific event only
+        this.$emit('update:schema', this.storeStateSchema) // listen to specific event only
       }
     },
     deprecateEventCustomID (ev) {

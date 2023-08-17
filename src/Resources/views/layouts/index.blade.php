@@ -14,10 +14,8 @@
     $controlLanguagesPublication = $controlLanguagesPublication ?? true;
 
     // dd($tableMainFilters);
-    // dd($formSchema, $headers);
     // dd(get_defined_vars());
 @endphp
-
 
 @section('content')
     @include("{$BASE_KEY}::components.datatable")
@@ -39,12 +37,9 @@
 @endpush
 
 @section('STORE')
-    {{-- @dd(
-        get_defined_vars(),
-        $tableData,
-        $tableInputs
-    ) --}}
-    window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {
+
+    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
+    {{-- window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {
         index:  '{{ $indexEndpoint }}',
         create: '{{ $createEndpoint ?? $indexEndpoint."/create" }}',
         edit:   '{{ $editEndpoint ?? $indexEndpoint."/:id/edit" }}',
@@ -52,8 +47,8 @@
         update: '{{ $indexEndpoint . "/:id" }}',
         delete: '{{ $indexEndpoint . "/:id" }}',
 
-        {{-- index: @if(isset($indexUrl)) '{{ $indexUrl }}' @else window.location.href.split('?')[0] @endif, --}}
-        {{-- publish: '{{ $publishUrl }}',
+        index: @if(isset($indexUrl)) '{{ $indexUrl }}' @else window.location.href.split('?')[0] @endif,
+        publish: '{{ $publishUrl }}',
         bulkPublish: '{{ $bulkPublishUrl }}',
         restore: '{{ $restoreUrl }}',
         bulkRestore: '{{ $bulkRestoreUrl }}',
@@ -63,17 +58,17 @@
         create: '{{ $createUrl ?? '' }}',
         feature: '{{ $featureUrl }}',
         bulkFeature: '{{ $bulkFeatureUrl }}',
-        bulkDelete: '{{ $bulkDeleteUrl }}' --}}
-    }
+        bulkDelete: '{{ $bulkDeleteUrl }}'
+    } --}}
 
     {{-- dd($inputs); --}}
-    window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].STORE.form = {
+    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {
         {{-- inputs: {!! json_encode($tableInputs) !!}, --}}
         inputs: {!! json_encode($formSchema) !!},
         fields: []
     }
 
-    window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].STORE.datatable = {
+    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.datatable = {
         baseUrl: '{{ rtrim(config('app.url'), '/') . '/' }}',
 
         name: '{{ $routeName}}',

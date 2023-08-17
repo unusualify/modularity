@@ -8,6 +8,8 @@ module.exports = {
     '@vue/standard'
   ],
   rules: {
+    'vue/html-comment-indent': 'off'
+
     // indent
     // 'indent': ['error', 2, { 'SwitchCase': 1 }],
     // 'vue/script-indent': ['error', 2, {

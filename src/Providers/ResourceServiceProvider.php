@@ -21,6 +21,7 @@ class ResourceServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->registerTranslations();
 
         $this->bootViews();
 
@@ -39,7 +40,6 @@ class ResourceServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
     }
 
     /**
@@ -82,12 +82,13 @@ class ResourceServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register translations.
+     * Boot translations.
      *
      * @return void
      */
     public function bootTranslations()
     {
+
         $this->bootUnusualTranslation();
 
         foreach(Module::all() as $module){
@@ -113,6 +114,28 @@ class ResourceServiceProvider extends ServiceProvider
         // }
     }
 
+    public function registerTranslations()
+    {
+        $this->app->singleton('translation.loader', function ($app) {
+            return new \Illuminate\Translation\FileLoader($app['files'], [__DIR__.'/../../laravel-lang',  $app['path.lang']]);
+        });
+
+        $this->app->singleton('translator', function ($app) {
+            $loader = $app['translation.loader'];
+
+            // When registering the translator component, we'll need to set the default
+            // locale as well as the fallback locale. So, we'll grab the application
+            // configuration so we can easily get both of these values from there.
+            $locale = $app['config']['app.locale'];
+
+            $trans = new \Illuminate\Translation\Translator($loader, $locale);
+
+            $trans->setFallback($app['config']['app.fallback_locale']);
+
+            return $trans;
+        });
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -131,9 +154,7 @@ class ResourceServiceProvider extends ServiceProvider
      * {@inheritdoc}
      */
     private function bootComponents(){
-
         // Blade::component('table', Table::class);
-
     }
 
     /**
@@ -170,7 +191,7 @@ class ResourceServiceProvider extends ServiceProvider
             return $view->with($with);
         });
 
-        View::composer(["$this->baseKey::layouts.master"], Localization::class);
+        View::composer(["$this->baseKey::layouts.master", "$this->baseKey::auth.layout"], Localization::class);
     }
 
     private function bootUnusualTranslation()
@@ -181,6 +202,7 @@ class ResourceServiceProvider extends ServiceProvider
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, $name);
         } else {
+            // dd('resource');
             // Lang::addNamespace('unusual',  __DIR__ .  '/../../lang');
             // $this->app['translation.loader']->addNamespace('unusual',  __DIR__ .  '/../../lang');
 

@@ -1,19 +1,28 @@
 {
+    "ADD NEW": "ADD NEW",
+    "Are you sure logout?" : "Are you sure logout?",
+    "AT A GLANCE": "AT A GLANCE",
+
     "auth" : {
         "back-to-login" : "Back to Login",
         "choose-password" : "Choose password",
         "email" : "Email",
         "forgot-password" : "Forgot password",
         "login" : "Login",
+        "name" : "Name",
         "login-title" : "Login",
         "oauth-link-title" : "Re-enter your password to link :provider to your account",
         "otp" : "One-time password",
         "password" : "Password",
         "password-confirmation" : "Confirm password",
+        "register": "Register",
         "reset-password" : "Reset password",
         "reset-send" : "Send password reset link",
-        "verify-login" : "Verify login"
+        "surname" : "Surname",
+        "verify-login" : "Verify login",
+        "logout": "Logout"
     },
+
     "cancel": "Cancel",
     "close": "Close",
     "city": "City",
@@ -198,11 +207,17 @@
       "error": "There is an error!"
     },
     "modules": {
-      "invoice": "Invoice",
-      "payment": "Payment",
-      "permission": "Permission",
-      "role": "Role",
-      "user": "User"
+      "company": "Company | Companies | {n} Companies",
+      "invoice": "Invoice | Invoices | {n}  Invoices",
+      "package": "Package | Packages",
+      "package_continent": "Continent | Continents",
+      "package_region": "Region | Regions",
+      "package_country": "Country | Countries",
+      "payment": "Payment | Payments",
+      "permission": "Permission | Permissions | {n}  Permissions",
+      "press_release": "Press Release | Press Releases | {n} Releases",
+      "role": "Role | Roles | {n}  Roles",
+      "user": "User | Users | {n} Users"
     },
 
     "neighbourhood": "Neighbourhood",
@@ -211,8 +226,12 @@
 
     "Personal Information": "Personal Information",
 
+    "reset": "Reset",
+
     "save": "Save",
     "saved": "Saved!|{0} is saved!",
+    "save-success": "Content saved. All good!",
+
     "show": "Show",
     "submit": "Submit",
     "success-create": "Created Successfully.",

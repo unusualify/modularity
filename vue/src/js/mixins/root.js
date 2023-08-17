@@ -35,6 +35,12 @@ export default {
     isLgAndUp () {
       return this.$vuetify.display.lgAndUp
     },
+    isXlAndUp () {
+      return this.$vuetify.display.xlAndUp
+    },
+    isSmAndDown () {
+      return this.$vuetify.display.smAndDown
+    },
     ...mapState({
       isMiniSidebar: state => state.config.isMiniSidebar
     })
@@ -59,15 +65,15 @@ export default {
     },
     handleVmFunctionCall (functionName, ...val) {
       __log(
-        functionName
+        functionName,
+        this
       )
-      // this.openFreeMediaLibrary()
       return this[functionName](...val)
       // return window.vm[functionName](...val)
-    },
-    openMediaLibrary () {
-
     }
+    // openMediaLibrary () {
+
+    // }
   },
   mounted () {
     if (this.isMiniSidebar && this.isLgAndUp) {

@@ -67,6 +67,16 @@
     $value: nth($item, 2);
     $map: map-merge($map, ($key: $value));
   }
+  // @warn($map);
   @return $map;
+}
+
+@function map-to-withClause($map) {
+  $withClause: ('$utilities': 'false');
+  @for $i from 1 through length($list) {
+
+  }
+  // @warn($map);
+  @return $withClause;
 }
 

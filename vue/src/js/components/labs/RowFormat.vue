@@ -1,8 +1,8 @@
 <template>
   <v-row>
-    <v-col v-for="(element,i) in elements" :key="i" :sm="element.col" >
+    <v-col v-for="(element,i) in elements" :key="i" v-bind="element.col" >
       <label
-        :class="`${textColor}`"
+        :class="[`${textColor}`, element.class]"
         :style="element.style">
         {{ element.text }}
       </label>

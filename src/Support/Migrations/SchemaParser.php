@@ -174,7 +174,8 @@ class SchemaParser implements Arrayable
         if ($key === 0) {
             $relatedColumn = Str::snake(class_basename($field)) . '_id';
 
-            return "->integer('{$relatedColumn}')->unsigned();" . PHP_EOL . "\t\t\t" . "\$table->foreign('{$relatedColumn}')";
+            // return "->integer('{$relatedColumn}')->unsigned();" . PHP_EOL . "\t\t\t" . "\$table->foreignId('{$relatedColumn}')";
+            return "->foreignId('{$relatedColumn}')->constrained()->onUpdate('cascade')->onDelete('cascade')";
         }
         if ($key === 1) {
             return "->references(  '{$field}')";
@@ -204,7 +205,7 @@ class SchemaParser implements Arrayable
         if ($this->hasCustomAttribute($column)) {
             return '->' . $field;
         }
-        
+
         if (Str::contains($field, '(')) {
             return '->' . preg_replace( '/\\\,/', ',',$field);
         }

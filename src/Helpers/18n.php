@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\App;
 if (!function_exists('unusualTrans')) {
     function unusualTrans($key, $replace = [])
     {
-        $locale = config(getUnusualBaseKey() . '.locale', config(getUnusualBaseKey() . '.fallback_locale', 'en'));
+        $locale = config(unusualBaseKey() . '.locale', config(unusualBaseKey() . '.fallback_locale', 'en'));
         return trans($key, $replace, $locale);
     }
 }
@@ -19,6 +19,9 @@ function ___($key = null, $replace = [], $locale = null)
     if (is_null($key))
         return $key;
 
+    // dd(
+    //     app('translator')
+    // );
     // Search in .json file
     $search = Arr::get(trans()->get('*'), $key);
     if ($search !== null)
@@ -78,7 +81,7 @@ if (!function_exists('getLabelFromLocale')) {
      */
     function getLabelFromLocale($code, $native = false)
     {
-        $base_key = getUnusualBaseKey();
+        $base_key = unusualBaseKey();
 
         if (class_exists(Locale::class)) {
             if ($native) {

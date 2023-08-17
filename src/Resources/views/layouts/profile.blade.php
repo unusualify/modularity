@@ -9,25 +9,25 @@
 
 @push('head_last_js')
     @if( app()->isProduction() )
-        <link href="{{ unusualMix('core-form.js') }}" rel="preload" as="script" crossorigin />
+        <link href="{{ unusualMix('core-free.js') }}" rel="preload" as="script" crossorigin />
     @else
 
 
     @endif
 @endpush
 @push('post_js')
-    <script src="{{ unusualMix('core-dashboard.js') }}"></script>
+    <script src="{{ unusualMix('core-free.js') }}"></script>
 @endpush
 
-{{-- @dd($forms) --}}
+{{-- @dd($elements) --}}
 @section('content')
-    @foreach ($elements as $i => $context)
-        <ue-recursive-shit
-            :configuration='@json($context)'
-        />
-    @endforeach
-
-
+    <div>
+        @foreach ($elements as $i => $context)
+            <ue-recursive-shit
+                :configuration='@json($context)'
+                />
+        @endforeach
+    </div>
     {{-- <v-row>
         @foreach ($forms as $form)
             <v-col
@@ -75,7 +75,7 @@
 @stop
 
 @section('STORE')
-    window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {
+    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {
         {{-- @if($editable)
             update: '{{ $actionUrl }}',
         @else
@@ -83,7 +83,7 @@
         @endif --}}
 
     }
-    window['{{ config(getUnusualBaseKey() . '.js_namespace') }}'].STORE.form = {
+    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {
         {{-- inputs: {!! json_encode($formSchema ?? new StdClass()) !!}, --}}
     }
 @stop

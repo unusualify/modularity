@@ -1,7 +1,7 @@
 <template>
   <v-sheet class="rounded-0">
     <v-alert
-      class="rounded-0 v-callout"
+      class="rounded-0 v-callout pl-theme"
       border="start"
       :color="bgColor"
       :border-color="color"
@@ -11,11 +11,11 @@
         :elements="[
           {
             text: title,
-            col: 8
+            col: {'cols': 8, class: 'd-flex align-center'},
           },
           {
             text: value,
-            col: 4,
+            col: {'cols': 4},
             style: {
               'font-size': '1.5rem'
             }
