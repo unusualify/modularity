@@ -7,16 +7,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 use Spatie\Permission\Traits\HasRoles;
 use OoBook\CRM\Base\Entities\Traits\HasHelpers;
-
-use Illuminate\Support\Facades\Hash;
-
+use OoBook\CRM\Base\Entities\Traits\IsTranslatable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, HasHelpers;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, HasHelpers, IsTranslatable;
 
     /**
      * The attributes that are mass assignable.
@@ -71,4 +71,27 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Company::class);
     }
+
+    public function setImpersonating($id)
+    {
+        Session::put('impersonate', $id);
+    }
+
+    public function stopImpersonating()
+    {
+        Session::forget('impersonate');
+    }
+
+    public function isImpersonating()
+    {
+        return Session::has('impersonate');
+    }
+
+    public function isSuperAdmin()
+    {
+        return $this->hasRole('superadmin');
+        return $this->roles === 'SUPERADMIN';
+    }
+
+
 }

@@ -1,10 +1,6 @@
 <template>
   <div :class="[defaultClasses, (!paddingReset ? paddingClasses: []), classes]">
-    <slot
-      v-bind="{
-        text
-      }"
-      >
+    <slot v-bind="{text}">
       {{ text }}
     </slot>
   </div>

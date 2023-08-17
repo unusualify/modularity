@@ -1,0 +1,45 @@
+<?php
+
+namespace OoBook\CRM\Base\Http\Controllers;
+
+use Illuminate\Auth\AuthManager;
+use OoBook\CRM\Base\Repositories\UserRepository;
+
+class ImpersonateController extends Controller
+{
+    // /**
+    //  * @var AuthManager
+    //  */
+    // protected $authManager;
+
+    public function __construct(protected AuthManager $authManager)
+    {
+        parent::__construct();
+
+        // $this->authManager = $authManager;
+    }
+
+    /**
+     * @param int $id
+     * @param UserRepository $users
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function impersonate($id, UserRepository $users)
+    {
+        if ($this->authManager->guard('unusual_users')->user()->can('impersonate')) {
+            $user = $users->getById($id);
+            $this->authManager->guard('unusual_users')->user()->setImpersonating($user->id);
+        }
+
+        return back();
+    }
+
+    /**
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function stopImpersonate()
+    {
+        $this->authManager->guard('unusual_users')->user()->stopImpersonating();
+        return back();
+    }
+}

@@ -193,7 +193,7 @@ abstract class Repository
      * @param null $exceptId
      * @return \Illuminate\Support\Collection
      */
-    public function listAll($column = 'title', $orders = [], $exceptId = null)
+    public function listAll($column = 'name', $orders = [], $exceptId = null)
     {
         $query = $this->model->newQuery();
 

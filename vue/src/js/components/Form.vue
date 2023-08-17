@@ -117,8 +117,6 @@ import logger from '@/utils/logger'
 
 import { useInputHandlers, useValidation } from '@/hooks'
 
-import UeTitle from '@/components/labs/Title.vue'
-
 // Helper & Partial Functions
 const minLen = l => v => (v && v.length >= l) || `min. ${l} Characters`
 const maxLen = l => v => (v && v.length <= l) || `max. ${l} Characters`
@@ -137,9 +135,6 @@ const rules = {
 
 export default {
   name: 'ue-form',
-  components: {
-    UeTitle
-  },
   props: {
     modelValue: {
       type: Object,

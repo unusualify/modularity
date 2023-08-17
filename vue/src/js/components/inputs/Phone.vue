@@ -1,7 +1,7 @@
 <template>
   <div :class="['vue-tel-input-vuetify', $lodash.pick(boundProps, ['wrapperClasses']) ?? getDefault('wrapperClasses')]">
     <v-row>
-      <v-col cols="5" style="padding-right: 1px;">
+      <v-col cols="5" xl="4" style="padding-right: 1px;">
         <v-select
           :ref="makeReference('countryInput')"
           v-model="countryCode"
@@ -33,7 +33,7 @@
           </template>
         </v-select>
       </v-col>
-      <v-col cols="7" style="padding-left: 0px;">
+      <v-col cols="7" xl="8" style="padding-left: 0px;">
         <v-text-field
           :ref="makeReference('phoneInput')"
           type="tel"

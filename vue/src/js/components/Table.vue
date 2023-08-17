@@ -236,8 +236,6 @@
 import { ref, onMounted, useSlots } from 'vue'
 import { VDataTable, VDataTableServer, VDataTableFooter } from 'vuetify/labs/VDataTable'
 
-import UeTitle from '@/components/labs/Title.vue'
-
 import { TableMixin } from '../mixins'
 import { useTable } from '@/hooks'
 
@@ -246,8 +244,7 @@ export default {
   components: {
     VDataTable,
     VDataTableFooter,
-    VDataTableServer,
-    UeTitle
+    VDataTableServer
   },
   props: {
 
