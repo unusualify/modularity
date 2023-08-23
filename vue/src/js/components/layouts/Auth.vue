@@ -6,6 +6,8 @@
           <div class="bg-primary darken-3">
             <span v-svg symbol="main-logo"></span>
           </div>
+          <slot name="cardTop"></slot>
+
           <v-sheet class="px-6 py-8" :width="width">
               <slot
                 v-bind="{

@@ -30,7 +30,7 @@
                     </v-sheet>
 
                     @foreach( ($slots ?? []) as $slotName => $configuration)
-                        <template v-slot:[@json($slotName)] >
+                        <template v-slot:{{ $slotName }} >
                             <ue-recursive-shit
                                 :configuration='@json($configuration)'
                             />

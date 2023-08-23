@@ -30,6 +30,23 @@ class ImpersonateMiddleware
             $this->authFactory->guard('unusual_users')->onceUsingId($request->session()->get('impersonate'));
         }
 
+        view()->composer(unusualBaseKey()."::layouts.master", function ($view)
+        {
+            $userRepository = app()->make(\OoBook\CRM\Base\Repositories\UserRepository::class);
+            $users = $userRepository->whereNot('id', 1)->get();
+
+            $configuration = [
+                'active' => auth()->user()->isSuperAdmin() || auth()->user()->isImpersonating(),
+                'users' =>  $users,
+                'impersonated' => auth()->user()->isImpersonating(),
+                'stopRoute' => route('impersonate.stop'),
+                'route' => route('impersonate', ['id' => ':id'])
+            ];
+            // setActiveMenuItem($configuration['sidebar'], $configuration['current_url']);
+            $view->with('impersonateConfiguration', $configuration);
+        });
+
+
         return $next($request);
     }
 }

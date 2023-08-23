@@ -1,5 +1,7 @@
 ```
     php artisan vendor:publish --provider="OoBook\CRM\Base\LaravelServiceProvider" --tag="config"
+    
+    php artisan unusual:build --noInstall --hot
 
     php artisan unusual:make:module Package 
         -TP 
@@ -44,6 +46,7 @@
     php artisan unusual:make:route Package PackageContinent --no-migrate
     php artisan unusual:make:route Package PackageRegion --schema="belongsTo:package_continent" --no-migrate
     php artisan unusual:make:route Package PackageCountry --schema="belongsTo:package_region" --no-migrate
+    
     php artisan unusual:make:route Package PackageDistributionLanguage --schema="code:string" --no-migrate
     php artisan unusual:make:route Package PackageFeature --schema="" --no-migrate
 ```

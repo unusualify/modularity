@@ -25,23 +25,10 @@
             <ue-main
                 ref='main'
                 :configuration='@json($configuration)'
+                :impersonate-configuration='@json($impersonateConfiguration)'
+
                 >
                 <div id="ue-main-body" class="ue--main-container">
-                    @if($currentUser->isSuperAdmin() || $currentUser->isImpersonating())
-                        @php
-                            $userRepository = app()->make(\OoBook\CRM\Base\Repositories\UserRepository::class);
-
-                            $users = $userRepository->whereNot('id', 1)->get();
-                        @endphp
-                        <ue-impersonate-toolbar
-                            :users='@json($users)'
-                            :impersonated='@json($currentUser->isImpersonating())'
-                            :stop-route='@json(route('impersonate.stop'))'
-                            :route='@json(route('impersonate', ['id' => ':id']))'
-                            >
-
-                        </ue-impersonate-toolbar>
-                    @endif
 
                     @yield('content')
 

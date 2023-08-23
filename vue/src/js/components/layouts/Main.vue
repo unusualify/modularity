@@ -1,6 +1,8 @@
 <template>
   <v-app id="inspire">
 
+    <slot name="top"></slot>
+
     <v-app-bar app v-if="$vuetify.display.mdAndDown">
       <v-app-bar-nav-icon
         v-if="$root.showToggleButton"
@@ -34,6 +36,11 @@
 
     </v-app-bar>
 
+    <ue-impersonate-toolbar
+      v-if="$root.isLgAndUp && impersonateConfiguration.active"
+      v-model="showImpersonateToolbar"
+      v-bind="impersonateConfiguration"
+    />
     <ue-sidebar
       :items="sidebarItems"
       ref="sidebar"
@@ -74,6 +81,7 @@
     </v-app-bar>
 
     <v-main>
+
       <!--  -->
       <!-- <ue-footer :items="footerLinks" /> -->
       <div v-if="false">
@@ -91,6 +99,27 @@
       ></ue-modal-media>
 
       <ue-alert ref='alert'></ue-alert>
+
+      <v-layout-item
+        v-if="impersonateConfiguration.active"
+        class="text-end pointer-events-none"
+        model-value
+        position="bottom"
+        size="88"
+      >
+        <div class="ma-4">
+          <v-fab-transition>
+            <v-btn
+              class="mt-auto pointer-events-initial"
+              color="error"
+              elevation="8"
+              :icon="(showImpersonateToolbar ? 'mdi-chevron-down' : 'mdi-chevron-up')"
+              size="large"
+              @click="showImpersonateToolbar = !showImpersonateToolbar"
+            />
+          </v-fab-transition>
+        </div>
+      </v-layout-item>
     </v-main>
   </v-app>
 </template>
@@ -167,6 +196,14 @@ export default {
               is_active: false
             }
           ]
+        }
+      }
+    },
+    impersonateConfiguration: {
+      type: Object,
+      default () {
+        return {
+
         }
       }
     }
@@ -247,7 +284,8 @@ export default {
         }
       ],
 
-      showMediaLibrary: false
+      showMediaLibrary: false,
+      showImpersonateToolbar: false
     }
   },
 

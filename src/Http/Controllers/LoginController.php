@@ -170,6 +170,7 @@ class LoginController extends Controller
                         "type" => "text",
                         "name" => "email",
                         "label" => ___('auth.email'),
+                        'hint' => 'enter @example.com',
                         "default" => "",
                         'col' => [
                             'cols' => 12,
