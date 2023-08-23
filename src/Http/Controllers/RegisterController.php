@@ -64,18 +64,6 @@ class RegisterController extends Controller
                             ['email']
                         ]
                     ],
-                    'email' => [
-                        "type" => "text",
-                        "name" => "email",
-                        "label" => ___('auth.email'),
-                        "default" => "",
-                        'col' => [
-                            'cols' => 12,
-                        ],
-                        'rules' => [
-                            ['email']
-                        ]
-                    ],
                     'password' => [
                         "type" => "password",
                         "name" => "password",
@@ -178,7 +166,7 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'surname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', 'min:8'],
         ];
     }
 
