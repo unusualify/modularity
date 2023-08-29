@@ -113,7 +113,7 @@ class UnusualRoutes
             'language',
             'navigation',
             'auth',
-            'company'
+            'company_registration'
             // 'teams_permission',
         ];
 

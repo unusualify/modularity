@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Redirect;
 use OoBook\CRM\Base\Entities\Company;
 
-class CompanyMiddleware{
+class CompanyRegistrationMiddleware{
 
   /**
    * @var AuthFactory

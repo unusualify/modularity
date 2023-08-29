@@ -196,7 +196,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::aliasMiddleware('impersonate', ImpersonateMiddleware::class);
         Route::aliasMiddleware('language', LanguageMiddleware::class);
         Route::aliasMiddleware('navigation', NavigationMiddleware::class);
-        Route::aliasMiddleware('company', CompanyMiddleware::class);
+        Route::aliasMiddleware('company_registration', CompanyMiddleware::class);
 
 
         // Route::aliasMiddleware('role', \Spatie\Permission\Middlewares\RoleMiddleware::class);
