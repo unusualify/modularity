@@ -792,7 +792,7 @@ class ProfileController extends BaseController
         // ];
 
         $view = "$this->baseKey::layouts.profile";
-
+        
         return View::make($view, $data);
     }
 

@@ -26,6 +26,7 @@
     "cancel": "Cancel",
     "close": "Close",
     "city": "City",
+
     "Company Information": "Company Information",
 
     "confirm": "Confirm",
@@ -239,5 +240,8 @@
     "success-delete": "Removed Successfully.",
 
     "update": "Update",
-    "Update Password": "Update Password"
+    "Update Password": "Update Password",
+    "user": {
+        "invalidCompany": "Company fields must be filled!"
+    }
   }

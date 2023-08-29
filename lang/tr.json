@@ -235,6 +235,9 @@
 
     "update": "Güncelle",
     "Update Password": "Şifreyi Güncelle",
+    "user": {
+        "invalidCompany": "Şirket detayları doldurulmak zorundadır!"
+    },
 
     "Yes": "Evet"
 
