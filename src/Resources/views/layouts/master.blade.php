@@ -26,7 +26,17 @@
                 ref='main'
                 :configuration='@json($configuration)'
                 :impersonate-configuration='@json($impersonateConfiguration)'
+
                 >
+                @if(auth()->user()->invalidCompany)
+                <template v-slot:main-top>
+                    <v-alert
+                        density="compact"
+                        type="warning"
+                        text="{{ ___('user.invalidCompany') }}"
+                    ></v-alert>
+                </template>
+                @endif
                 <div id="ue-main-body" class="ue--main-container">
 
                     @yield('content')

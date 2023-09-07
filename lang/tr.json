@@ -353,6 +353,9 @@
         "not_in" : "Seçili :attribute geçersiz.",
         "not_regex" : ":attribute biçimi geçersiz.",
         "numeric" : ":attribute sayı olmalıdır.",
+    "user": {
+        "invalidCompany": "Şirket detayları doldurulmak zorundadır!"
+    },
 
         "password" : {
             "letters" : ":attribute en az bir harf içermelidir.",

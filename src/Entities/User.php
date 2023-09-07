@@ -3,6 +3,7 @@
 namespace OoBook\CRM\Base\Entities;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -92,6 +93,39 @@ class User extends Authenticatable
         return $this->hasRole('superadmin');
         return $this->roles === 'SUPERADMIN';
     }
+
+
+    protected function invalidCompany():Attribute
+    {
+        $inValid = false;
+        if($this->company_id != null){
+            $companyAttr = $this->company;
+            // dd($companyAttr, debug_backtrace());
+            foreach ($companyAttr as $key => $node) {
+                if (!str_contains($key, '_at') && $key != 'id') {
+                    if ($node == null)
+                        $inValid = true;
+                }
+            }
+        }
+        return Attribute::make(
+            get: fn () => $inValid,
+        );
+    }
+     
+    // public function getInvalidCompanyAttribute(){
+    //     //Check null attributes for proper intercept
+    //     $companyAttr = $this->company;
+    //     // dd($companyAttr, debug_backtrace());
+    //     foreach ($companyAttr as $key => $node) {
+    //         if (!str_contains($key, '_at') && $key != 'id') {
+    //             if ($node == null)
+    //             return false;
+    //         }
+    //     }
+    //     return true;
+        
+    // }
 
 
 }
