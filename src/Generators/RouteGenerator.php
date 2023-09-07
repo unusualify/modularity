@@ -469,31 +469,7 @@ class RouteGenerator extends Generator
         //     }
         // }
 
-        // dd(
-        //     $this->getModelFillables(),
-        //     $this->getModelRelationships(),
-        //     $this->schema,
-
-        //     $this->console->call('unusual:make:model', [
-        //             'module' => $this->module->getStudlyName(),
-        //             'model' => $this->getName()
-        //         ]
-        //         + ( count($this->getModelFillables()) ?  ['--fillable' => implode(",", $this->getModelFillables())] : [])
-        //         + ( count($this->getModelRelationships()) ?  ['--relationships' => implode(",", $this->getModelRelationships())] : [])
-        //         + ['--translationTrait' => true, '--positionTrait' => true]
-        //         + ( ['--soft-delete' => true])
-        //         + ( ['--has-factory' => true])
-        //         + ['--notAsk' => true]
-        //     )
-        // );
-        // dd($this->schema);
-        // $this->console->call('unusual:make:migration', [
-        //     'module' => $this->module->getStudlyName(),
-        //     'name' => "create_{$this->getDBTableName($this->name)}_table",
-        // ] + ( $this->schema ?  ['--fields' => $this->schema] : [])
-        // );
-
-        // dd('s');
+        // $this->addLanguageVariable();
 
         $this->updateConfigFile();
 
@@ -635,8 +611,9 @@ class RouteGenerator extends Generator
         $this->console->call('unusual:make:migration', [
             'module' => $this->module->getStudlyName(),
             'name' => "create_{$this->getDBTableName($this->name)}_table",
-        ] + ( $this->schema ?  ['--fields' => $this->schema] : [])
-          + $console_traits
+            ]
+            + ( $this->schema ?  ['--fields' => $this->schema] : [])
+            + $console_traits
         );
 
         if($this->generatorConfig('repository')->generate()){
@@ -727,6 +704,25 @@ class RouteGenerator extends Generator
         return $this->filesystem->put($configPath, phpArrayFileContent($config));
 
     }
+    /**
+     * addLanguageVariable
+     *
+     * @return bool
+     */
+    public function addLanguageVariable() :bool
+    {
+        $headline = $this->getHeadline($this->getName());
+        $plural = pluralize($headline);
+
+        foreach (glob(__DIR__ . "/../../lang/*.json") as $filename) {
+            $arr = json_decode( file_get_contents($filename), true );
+            $arr['modules'][$this->getSnakeCase($this->name)] = "{$headline} | {$plural} | {n} {$plural}";
+            file_put_contents($filename, collect($arr)->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        }
+        // \Illuminate\Support\Facades\File::get( __DIR__ . '/');
+        return true;
+    }
+
     /**
      * updateConfigFile
      *

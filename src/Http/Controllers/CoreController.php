@@ -762,7 +762,7 @@ abstract class CoreController extends Controller
      * @param string $behavior
      * @return bool
      */
-    protected function moduleHas($behavior)
+    protected function routeHas($behavior)
     {
         return $this->repository->hasBehavior($behavior);
     }

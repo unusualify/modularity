@@ -56,7 +56,6 @@ class SchemaParser implements Arrayable
         $this->schema = $schema;
 
         $parsed = [];
-
         foreach ($this->getSchemas() as $schemaArray) {
             $column = $this->getColumn($schemaArray);
 
@@ -75,7 +74,7 @@ class SchemaParser implements Arrayable
      */
     public function getSchemas()
     {
-        if (is_null($this->schema)) {
+        if (is_null($this->schema) || empty($this->schema) ) {
             return [];
         }
 
@@ -148,7 +147,6 @@ class SchemaParser implements Arrayable
     public function createField($column, $attributes, $type = 'add')
     {
         $results = "\t\t\t" . '$table';
-
         foreach ($attributes as $key => $field) {
             if (in_array($column, $this->relationshipKeys)) {
                 $results .= $this->addRelationColumn($key, $field, $column);

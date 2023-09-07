@@ -43,6 +43,12 @@ if (! function_exists('headline')) {
         return Str::headline($string);
     }
 }
+if (! function_exists('abbreviation')) {
+    function abbreviation($string) {
+        preg_match_all('/\b\w/', Str::headline($string), $matches);
+        return implode('', $matches[0]);
+    }
+}
 
 /**
  * Get the short name of class from class namespace
@@ -53,6 +59,19 @@ if (! function_exists('headline')) {
 if (! function_exists('get_class_short_name')) {
     function get_class_short_name($class) {
         return (new \ReflectionClass($class))->getShortName();
+    }
+}
+
+if (! function_exists('class_namespace')) {
+    /**
+     * Get the class "basename" of the given object / class.
+     *
+     * @param  string|object  $class
+     * @return string
+     */
+    function class_namespace($class)
+    {
+        return (new \ReflectionClass($class))->getNamespaceName();
     }
 }
 

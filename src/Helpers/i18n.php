@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\App;
 
@@ -16,14 +17,24 @@ if (!function_exists('unusualTrans')) {
 function ___($key = null, $replace = [], $locale = null)
 {
     // Default behavior
-    if (is_null($key))
-        return $key;
+    if (is_null($key)) return $key;
+
+    // dd(
+    //     $key,
+    //     \Lang::has($key),
+    //     trans()->has($key),
+    //     trans('auth'),
+    //     trans('authentication'),
+    //     __($key),
+    //     trans()->get('*', [], config('app.fallback_locale')),
+    // );
 
     // dd(
     //     app('translator')
     // );
     // Search in .json file
     $search = Arr::get(trans()->get('*'), $key);
+
     if ($search !== null)
         return trans_replacements($search, $replace);
 
@@ -37,6 +48,34 @@ function ___($key = null, $replace = [], $locale = null)
     // Return key name if not found
     else
         return $key;
+}
+
+/**
+ * Determine if a translation exists.
+ *
+ * @param  string  $key
+ * @param  string|null  $locale
+ * @param  bool  $fallback
+ * @return bool
+ */
+function hasUnusualTrans($key, $locale = null, $fallback = true)
+{
+    $locale = $locale ?: App::getLocale();
+
+    $line = ___($key, [], $locale, $fallback);
+
+    dd(
+        $key,
+        $line
+    );
+    // For JSON translations, the loaded files will contain the correct line.
+    // Otherwise, we must assume we are handling typical translation file
+    // and check if the returned line is not the same as the given key.
+    // if (! is_null($this->loaded['*']['*'][$locale][$key] ?? null)) {
+    //     return true;
+    // }
+
+    return $line !== $key;
 }
 
 function trans_replacements($line, array $replace)
@@ -263,6 +302,48 @@ if (!function_exists('getCode2LanguageTexts')) {
             'ji' => 'Yiddish',
             'yo' => 'Yoruba',
             'zu' => 'Zulu',
+        ];
+    }
+}
+
+
+if (!function_exists('getLanguagesForVueStore')) {
+    /**
+     * @param array $form_fields
+     * @param bool $translate
+     * @return array
+     */
+    function getLanguagesForVueStore($form_fields = [], $translate = true)
+    {
+        $manageMultipleLanguages = count(getLocales()) > 1;
+        if ($manageMultipleLanguages && $translate) {
+            $allLanguages = Collection::make(getLocales())->map(function ($locale, $index) use ($form_fields) {
+                return [
+                    'shortlabel' => strtoupper($locale),
+                    'label' => getLabelFromLocale($locale),
+                    'value' => $locale,
+                    'disabled' => false,
+                    'published' => $form_fields['translations']['active'][$locale] ?? ($index === 0),
+                ];
+            });
+
+            return [
+                'all' => $allLanguages,
+                'active' => request()->has('lang') ? $allLanguages->where('value', request('lang'))->first() : null,
+            ];
+        }
+
+        $locale = config('app.locale');
+        return [
+            'all' => [
+                [
+                    'shortlabel' => strtoupper($locale),
+                    'label' => getLabelFromLocale($locale),
+                    'value' => $locale,
+                    'disabled' => false,
+                    'published' => true,
+                ],
+            ],
         ];
     }
 }

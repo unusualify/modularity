@@ -1,5 +1,5 @@
 @extends("{$BASE_KEY}::auth.layout", [
-    'pageTitle' => ___('auth.login')
+    'pageTitle' => ___('authentication.login')
 ])
 @section('appTypeClass', 'body--form')
 

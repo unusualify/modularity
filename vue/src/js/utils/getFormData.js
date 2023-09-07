@@ -1,4 +1,4 @@
-import isEmpty from 'lodash/isEmpty'
+import { isEmpty, find } from 'lodash'
 
 /*
 * Gather selected items in a selected object (currently used for medias and browsers)
@@ -146,6 +146,7 @@ export const getFormData = (rootState) => {
     publish_end_date: rootState.publication.endDate,
     languages: rootState.language.all,
     parent_id: rootState.parents.active,
+
     medias: gatherSelected(rootState.mediaLibrary.selected),
     browsers: gatherSelected(rootState.browser.selected),
     blocks: gatherBlocks(rootState),
@@ -155,20 +156,37 @@ export const getFormData = (rootState) => {
   return data
 }
 
-export const getSchemaModel = (inputs) => {
-  // __log(inputs)
+export const getSchemaModel = (inputs, item = null) => {
+  // __log(window[process.env.VUE_APP_NAME].STORE.languages.all)
   const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist'
+  const editing = __isset(item) && !!item.id
+
   const values = Object.keys(inputs).reduce((a, c) => {
+    // default model value
+    let value = Object.prototype.hasOwnProperty.call(inputs[c], 'default') ? inputs[c].default : ''
     if (isArrayable.includes(inputs[c].type)) {
-      a[inputs[c].name] = []
-    } else if (__isObject(inputs[c])) {
-      a[inputs[c].name] = Object.prototype.hasOwnProperty.call(inputs[c], 'default') ? inputs[c].default : ''
+      value = editing ? item[c] : []
+    }
+
+    if (__isObject(inputs[c])) {
+      if (Object.prototype.hasOwnProperty.call(inputs[c], 'translated')) {
+        a[inputs[c].name] = window[process.env.VUE_APP_NAME].STORE.languages.all.reduce(function (map, language) {
+          if (editing) {
+            value = find(item.translations, { locale: language.value })[inputs[c].name]
+          }
+          map[language.value] = value
+          return map
+        }, {})
+      } else {
+        a[inputs[c].name] = editing ? item[inputs[c].name] : value
+      }
     }
     return a
-  }
-  , {})
+  }, {})
 
-  // __log('getSchemaModel', values)
+  if (editing) {
+    values.id = item.id
+  }
 
   return values
 

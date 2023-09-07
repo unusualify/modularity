@@ -22,7 +22,7 @@
     $editor = $editor ?? false;
     $translate = $translate ?? false;
     $translateTitle = $translateTitle ?? $translate ?? false;
-    $titleFormKey = $titleFormKey ?? 'title';
+    $titleFormKey = $titleFormKey ?? 'name';
     $customForm = $customForm ?? false;
     $controlLanguagesPublication = $controlLanguagesPublication ?? true;
     $disableContentFieldset = $disableContentFieldset ?? false;

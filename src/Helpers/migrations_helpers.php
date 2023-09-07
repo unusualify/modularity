@@ -95,7 +95,17 @@ if (!function_exists('createDefaultTranslationsTableFields')) {
         $table->string('locale', 7)->index();
         $table->boolean('active');
 
-        $table->foreign("{$tableNameSingular}_id", "fk_{$tableNameSingular}_translations_{$tableNameSingular}_id")->references('id')->on($tableNamePlural)->onDelete('CASCADE');
+        $foreignIndexName = "fk_{$tableNameSingular}_translations_{$tableNameSingular}_id";
+
+        if( strlen($tableNameSingular) > 18){
+            $shortcut = abbreviation($tableNameSingular);
+            $foreignIndexName = "fk_{$tableNameSingular}_translations_{$shortcut}_id";
+        }
+
+        $table->foreign("{$tableNameSingular}_id", $foreignIndexName)
+            ->references('id')
+            ->on($tableNamePlural)
+            ->onDelete('CASCADE');
         $table->unique(["{$tableNameSingular}_id", 'locale'], "{$tableNameSingular}_id_locale_unique");
     }
 }

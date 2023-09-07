@@ -97,10 +97,10 @@ abstract class Model extends BaseModel implements TaggableInterface
         return $fillable;
     }
 
-    public function getTranslatedAttributes()
-    {
-        return $this->translatedAttributes ?? [];
-    }
+    // public function getTranslatedAttributes()
+    // {
+    //     return $this->translatedAttributes ?? [];
+    // }
 
     protected static function bootTaggableTrait()
     {

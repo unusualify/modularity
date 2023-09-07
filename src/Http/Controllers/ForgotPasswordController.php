@@ -61,7 +61,7 @@ class ForgotPasswordController extends Controller
                     'email' => [
                         "type" => "text",
                         "name" => "email",
-                        "label" => ___('auth.email'),
+                        "label" => ___('authentication.email'),
                         "default" => "",
                         'col' => [
                             'cols' => 12,
@@ -73,7 +73,7 @@ class ForgotPasswordController extends Controller
                 ])),
 
                 'actionUrl' => route('password.reset.email'),
-                'buttonText' => 'auth.reset-send',
+                'buttonText' => 'authentication.reset-send',
 
                 'formClass' => 'px-5',
 
@@ -88,7 +88,7 @@ class ForgotPasswordController extends Controller
                     'elements' => [
                         [
                             "tag" => "v-btn",
-                            'elements' => ___('auth.back-to-login'),
+                            'elements' => ___('authentication.back-to-login'),
                             "attributes" => [
                                 'variant' => 'plain',
                                 'href' => route('login.form'),
@@ -114,10 +114,10 @@ class ForgotPasswordController extends Controller
     {
         return $request->wantsJson()
                     ? new JsonResponse([
-                        'message' => trans($response),
+                        'message' => ___($response),
                         'variant' => 'success'
                     ], 200)
-                    : back()->with('status', trans($response));
+                    : back()->with('status', ___($response));
     }
 
     /**
@@ -134,8 +134,8 @@ class ForgotPasswordController extends Controller
         if ($request->wantsJson()) {
             // dd('safa');
             return new JsonResponse([
-                'email' => [trans($response)],
-                'message' => trans($response),
+                'email' => [___($response)],
+                'message' => ___($response),
                 'variant' => 'warning'
             ]);
             // throw ValidationException::withMessages([
@@ -145,6 +145,6 @@ class ForgotPasswordController extends Controller
 
         return back()
                 ->withInput($request->only('email'))
-                ->withErrors(['email' => trans($response)]);
+                ->withErrors(['email' => ___($response)]);
     }
 }

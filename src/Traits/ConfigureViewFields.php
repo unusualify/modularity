@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Lang;
 use OoBook\CRM\Base\Support\Finder;
 use stdClass;
 
@@ -81,18 +82,20 @@ trait ConfigureViewFields {
 
         ] + $this->tableOptions + $this->getViewLayoutVariables();
         // $baseUrl = $this->getPermalinkBaseUrl();
+
         $options = [
             'moduleName' => $this->getHeadline($this->moduleName),
             'routeName' => $this->getHeadline($this->routeName),
             'listOptions' => $this->getVuetifyDatatableOptions(), // options to be used in unusual datatable component
+
+            'translate' => $this->routeHas('translations'),
+            // 'translateTitle' => $this->titleIsTranslatable(),
 
 
             // 'skipCreateModal' => $this->getIndexOption('skipCreateModal'),
             // 'reorder' => $this->getIndexOption('reorder'),
             // 'create' => $this->getIndexOption('create'),
             // 'duplicate' => $this->getIndexOption('duplicate'),
-            // 'translate' => $this->routeHasTrait('translations'),
-            // 'translateTitle' => $this->titleIsTranslatable(),
             // 'permalink' => $this->getIndexOption('permalink'),
             // 'bulkEdit' => $this->getIndexOption('bulkEdit'),
             // 'titleFormKey' => $this->titleFormKey ?? $this->titleColumnKey,
@@ -479,7 +482,7 @@ trait ConfigureViewFields {
         // dd($default_input, $input);
         $input = object2Array($input);
 
-        if($object = $this->generateCustomInput($input)){
+        if($object = $this->hydrateCustomInput($input)){
             $input = $object;
         }
 
@@ -504,6 +507,11 @@ trait ConfigureViewFields {
     {
         return collect($input)
             ->mapWithKeys(function($v, $k){
+                if($k == 'label' && ___("form-labels.{$v}") !== "form-labels.{$v}")
+                    $v = ___("form-labels.{$v}");
+                // if($k == 'label')
+                //     $v = ___("form-labels.{$v}");
+
                 return is_numeric($k) ? [$v => true] : [$k => $v];
             })
             ->toArray();
@@ -513,9 +521,10 @@ trait ConfigureViewFields {
      * @param Array|stdClass $input
      * @return Collection
      */
-    public function generateCustomInput($input)
+    public function hydrateCustomInput($input)
     {
         $object = null;
+
         switch ($input['type']) {
             case 'custom-input-treeview':
             case 'treeview':
@@ -638,6 +647,18 @@ trait ConfigureViewFields {
                 break;
         }
 
+        if(isset($this->repository)){
+
+            if(method_exists($this->repository->getModel(), 'getTranslatedAttributes') && in_array($input['name'], $this->repository->getTranslatedAttributes()) ){
+                $input['translated'] = true;
+
+                // $input['locale_input'] = $input['type'];
+                // $input['type'] = 'custom-input-locale';
+                $object = $input;
+            }
+
+        }
+
         return $object;
     }
 
@@ -685,10 +706,10 @@ trait ConfigureViewFields {
 
     public function getHeader($header)
     {
-        return $this->generateCustomHeader($header + unusualConfig('default_header'));
+        return $this->hydrateCustomHeader($header + unusualConfig('default_header'));
     }
 
-    public function generateCustomHeader($header)
+    public function hydrateCustomHeader($header)
     {
         if($this->isRelationField($header['key']))
             $header['key'] .= '_relation';

@@ -439,7 +439,7 @@ abstract class BaseController extends CoreController
      */
     public function getFormattedIndexItems($paginator) // getIndexTableItems
     {
-        $translated = $this->moduleHas('translations');
+        $translated = $this->routeHas('translations');
 
         $paginator->getCollection()->transform(function ($item) use($translated) {
 
@@ -453,7 +453,7 @@ abstract class BaseController extends CoreController
             $name = $columnsData[$this->titleColumnKey];
 
             if (empty($name)) {
-                if ($this->moduleHas('translations')) {
+                if ($this->routeHas('translations')) {
                     $fallBackTranslation = $item->translations()->where('active', true)->first();
 
                     if (isset($fallBackTranslation->{$this->titleColumnKey})) {

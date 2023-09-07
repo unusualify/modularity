@@ -34,9 +34,5 @@ app.component('ue-datatable', UEDatatable)
 app.component('ue-modal-form', UEModalForm)
 
 app.mount('#admin')
-__log(
-//   app._instance
-//   app._instance.appContext.components
-)
 
 // document.addEventListener('DOMContentLoaded', core(app))

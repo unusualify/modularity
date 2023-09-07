@@ -14,7 +14,7 @@
           dark
           v-bind="props"
           >
-          {{ $t('auth.logout') }}
+          {{ $t('authentication.logout') }}
         </v-btn>
       </slot>
     </template>

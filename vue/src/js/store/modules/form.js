@@ -58,7 +58,8 @@ const getters = {
 
 const mutations = {
   [FORM.SET_EDITED_ITEM] (state, item) {
-    state.editedItem = Object.assign({}, item)
+    state.editedItem = getSchemaModel(state.inputs, item)
+    // state.editedItem = Object.assign({}, item)
   },
 
   [FORM.PREVENT_SUBMIT] (state) {
@@ -164,7 +165,6 @@ const actions = {
 
     // const data = getFormData(rootState)
     const data = item ?? state.editedItem
-
     // const method = rootState.publication.createWithoutModal ? 'post' : 'put'
     let method = 'post'
     let url = window[process.env.VUE_APP_NAME].ENDPOINTS.store

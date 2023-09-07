@@ -979,7 +979,7 @@ abstract class Repository
      */
     public function hasBehavior($behavior)
     {
-        $hasBehavior = classHasTrait($this, 'OoBook\CRM\Base\Repositories\Behaviors\Handle' . ucfirst($behavior));
+        $hasBehavior = classHasTrait($this, 'OoBook\CRM\Base\Repositories\Traits\\' . ucfirst($behavior) . 'Trait');
         // dd($behavior, $hasBehavior, Str::startsWith($behavior, 'translation'));
         if (Str::startsWith($behavior, 'translation')) {
             $hasBehavior = $hasBehavior && $this->model->isTranslatable();

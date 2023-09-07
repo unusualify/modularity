@@ -150,7 +150,7 @@ class ResetPasswordController extends Controller
                         'email' => [
                             "type" => "text",
                             "name" => "email",
-                            "label" => ___('auth.email'),
+                            "label" => ___('authentication.email'),
                             "default" => "",
                             'col' => [
                                 'cols' => 12,
@@ -162,7 +162,7 @@ class ResetPasswordController extends Controller
                         'password' => [
                             "type" => "password",
                             "name" => "password",
-                            "label" => ___('auth.password'),
+                            "label" => ___('authentication.password'),
                             "default" => "",
                             "appendInnerIcon" => '$non-visibility',
                             "slotHandlers" => [
@@ -175,7 +175,7 @@ class ResetPasswordController extends Controller
                         'password_confirmation' => [
                             "type" => "password",
                             "name" => "password_confirmation",
-                            "label" => ___('auth.password-confirmation'),
+                            "label" => ___('authentication.password-confirmation'),
                             "default" => "",
                             "appendInnerIcon" => '$non-visibility',
                             "slotHandlers" => [
@@ -193,7 +193,7 @@ class ResetPasswordController extends Controller
                     ])),
 
                     'actionUrl' => route('password.reset.update'),
-                    'buttonText' => 'auth.reset-password',
+                    'buttonText' => 'authentication.reset-password',
                     'formClass' => 'px-5',
                 ],
             ]);

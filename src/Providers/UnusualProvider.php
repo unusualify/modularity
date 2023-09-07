@@ -43,10 +43,6 @@ class UnusualProvider extends ServiceProvider
     public function register()
     {
         $this->registerProviders();
-
-        $this->publishConfigs();
-
-        $this->publishAssets();
     }
 
     /**
@@ -101,18 +97,5 @@ class UnusualProvider extends ServiceProvider
         foreach ($this->providers as $provider) {
             $this->app->register($provider);
         }
-    }
-
-    private function publishAssets(): void
-    {
-        $this->publishes([
-            base_path( env('UNUSUAL_VENDOR_PATH', 'vendor/oobook/crm-base') . '/vue/dist') => public_path(),
-        ], 'assets');
-    }
-
-    private function publishConfigs(): void
-    {
-        // $this->publishes([__DIR__ . '/../config/publish.php' => config_path('unusual.php')], 'config');
-        // $this->publishes([__DIR__ . '/../config/navigation-publish.php' => config_path('unusual-navigation.php')], 'config');
     }
 }

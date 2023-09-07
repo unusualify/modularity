@@ -26,7 +26,6 @@
                 ref='main'
                 :configuration='@json($configuration)'
                 :impersonate-configuration='@json($impersonateConfiguration)'
-
                 >
                 <div id="ue-main-body" class="ue--main-container">
 
@@ -70,6 +69,8 @@
                 useWysiwyg: {{ config(unusualBaseKey() . '.media_library.media_caption_use_wysiwyg') ? 'true' : 'false' }},
                 wysiwygOptions: {!! json_encode(config(unusualBaseKey() . '.media_library.media_caption_wysiwyg_options')) !!}
             };
+
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.languages = {!! json_encode(getLanguagesForVueStore($form_fields ?? [], $translate ?? false)) !!};
 
             @if (config(unusualBaseKey() . '.enabled.media-library'))
                 window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types.push({

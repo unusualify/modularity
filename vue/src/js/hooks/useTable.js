@@ -40,7 +40,7 @@ export default function useTable (props, context) {
     tableHeader: computed(() => {
       return __isset(props.customHeader)
         ? _.upperCase(props.customHeader)
-        : t(`modules.${state.snakeName}`, 2)
+        : t(`modules.${state.snakeName}`, 1)
         // : this.$t(`modules.${this.$lodash.snakeCase(this.name)}`, { n: 3 })
         // : this.$lodash.upperCase(this.$t('list-of-item', [this.name, this.$t('modules.' + this.$lodash.snakeCase(this.name))]))
     }),
@@ -59,7 +59,7 @@ export default function useTable (props, context) {
 
     formTitle: computed(() => {
       return t((state.editedIndex === -1 ? 'new-item' : 'edit-item'), {
-        item: te(`modules.${state.snakeName}`) ? t(`modules.${state.snakeName}`) : props.name
+        item: te(`modules.${state.snakeName}`) ? t(`modules.${state.snakeName}`, 0) : props.name
       })
     }),
     elements: computed(() => props.items ?? store.state.datatable.data ?? []),
@@ -118,6 +118,7 @@ export default function useTable (props, context) {
       store.dispatch(ACTIONS.GET_DATATABLE)
     },
     setEditedItem: function (item) {
+      // __log(item)
       store.commit(FORM.SET_EDITED_ITEM, item)
     },
     resetEditedItem: function () {
@@ -175,7 +176,7 @@ export default function useTable (props, context) {
   })
 
   watch(() => state.editedItem, (newValue, oldValue) => {
-    __log('editedItem watch', newValue, oldValue, state.elements.findIndex(o => { return o.id === newValue.id }))
+    // __log('editedItem watch', newValue, oldValue, state.elements.findIndex(o => { return o.id === newValue.id }))
     state.editedIndex = state.elements.findIndex(o => { return o.id === newValue.id })
   })
   watch(() => state.formActive, (newValue, oldValue) => {

@@ -59,10 +59,6 @@ const impersonateRoute = computed(() => {
       <v-btn v-if="impersonated" color="red" :href="stopRoute">
           Stop Impersonating
       </v-btn>
-      <!-- <div v-else>
-
-      </div> -->
-
       <v-select
         v-if="!impersonated" class="mt-5"
         v-model="selected" :items="users"
@@ -90,7 +86,7 @@ export default {
   //   }
   // },
   created () {
-    __log(this.users)
+
   }
 }
 </script>
