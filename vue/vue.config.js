@@ -118,6 +118,13 @@ if (!isProd) {
 }
 
 const devServer = {
+  watchFiles: {
+    // paths: ['src/**/*.php', 'public/**/*'],
+    paths: ['../../../../lang/**/*'],
+    options: {
+      usePolling: false
+    }
+  },
   devMiddleware: {
     index: false // specify to enable root proxying
   },

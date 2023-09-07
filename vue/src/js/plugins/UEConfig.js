@@ -67,6 +67,14 @@ export default {
     i18n.global.locale.value = store._state.data.currentUser.locale
     // i18n.global.locale = store._state.data.currentUser.locale
 
+    window.axios.get('/api/languages')
+      .then((response) => {
+        for (const language in response.data) {
+          i18n.global.setLocaleMessage(language, response.data[language])
+        }
+      })
+    // i18n.global.setLocaleMessage('tr', { 'AT A GLANCE': 'GENEL BAKIŞ İşte' })
+
     // add Global methods to all components
     app.config.globalProperties = {
       ...app.config.globalProperties,
