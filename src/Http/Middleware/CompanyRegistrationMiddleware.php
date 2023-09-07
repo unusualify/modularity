@@ -24,13 +24,7 @@ class CompanyRegistrationMiddleware{
     public function handle($request, Closure $next)
     {
         // dd(auth()->user()->invalidCompany);
-        dd(
-            auth()->user()->invalidCompany
-        );
         if (!($request->routeIs('profile.*') || $request->routeIs('profile'))) {
-            dd(
-                auth()->user()->invalidCompany
-            );
             if (auth()->user()->invalidCompany) {
                 return redirect()->route('profile');
             }
