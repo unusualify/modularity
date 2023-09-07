@@ -66,9 +66,9 @@ class UnusualProvider extends ServiceProvider
         // dd(
         //     $this->app->config->get(unusualBaseKey() . '-navigation')
         // );
-        $this->app->config->set([
-            unusualBaseKey() . '-navigation.sidebar' => UnusualNavigation::formatSidebarMenus($this->app->config->get(unusualBaseKey() . '-navigation.sidebar'))
-        ]);
+        // $this->app->config->set([
+        //     unusualBaseKey() . '-navigation.sidebar' => UnusualNavigation::formatSidebarMenus($this->app->config->get(unusualBaseKey() . '-navigation.sidebar'))
+        // ]);
 
         // load base module migrations
         $this->loadMigrationsFrom(
@@ -112,7 +112,7 @@ class UnusualProvider extends ServiceProvider
 
     private function publishConfigs(): void
     {
-        $this->publishes([__DIR__ . '/../config/publish.php' => config_path('unusual.php')], 'config');
-        $this->publishes([__DIR__ . '/../config/navigation-publish.php' => config_path('unusual-navigation.php')], 'config');
+        // $this->publishes([__DIR__ . '/../config/publish.php' => config_path('unusual.php')], 'config');
+        // $this->publishes([__DIR__ . '/../config/navigation-publish.php' => config_path('unusual-navigation.php')], 'config');
     }
 }
