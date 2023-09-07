@@ -5,6 +5,7 @@ composer.lock
 .env
 .env.backup
 .env.production
+.env.development
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
@@ -14,3 +15,4 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+vue/src/js/components/customs
