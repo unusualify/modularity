@@ -245,5 +245,8 @@
     "success-update": "Updated Successfully.",
     "success-delete": "Removed Successfully.",
     "update": "Update",
-    "Update Password": "Update Password"
+    "Update Password": "Update Password",
+    "user": {
+        "invalidCompany": "Company fields must be filled!"
+    }
   }
