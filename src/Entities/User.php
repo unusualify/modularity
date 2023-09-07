@@ -113,19 +113,4 @@ class User extends Authenticatable
         );
     }
 
-    // public function getInvalidCompanyAttribute(){
-    //     //Check null attributes for proper intercept
-    //     $companyAttr = $this->company;
-    //     // dd($companyAttr, debug_backtrace());
-    //     foreach ($companyAttr as $key => $node) {
-    //         if (!str_contains($key, '_at') && $key != 'id') {
-    //             if ($node == null)
-    //             return false;
-    //         }
-    //     }
-    //     return true;
-
-    // }
-
-
 }
