@@ -1,243 +1,420 @@
 {
     "ADD NEW": "ADD NEW",
-    "Are you sure logout?" : "Are you sure logout?",
+    "Are you sure logout?": "Are you sure logout?",
     "AT A GLANCE": "AT A GLANCE",
-
-    "auth" : {
-        "back-to-login" : "Back to Login",
-        "choose-password" : "Choose password",
-        "email" : "Email",
-        "forgot-password" : "Forgot password",
-        "login" : "Login",
-        "name" : "Name",
-        "login-title" : "Login",
-        "oauth-link-title" : "Re-enter your password to link :provider to your account",
-        "otp" : "One-time password",
-        "password" : "Password",
-        "password-confirmation" : "Confirm password",
+    "authentication": {
+        "back-to-login": "Back to Login",
+        "choose-password": "Choose password",
+        "email": "Email",
+        "forgot-password": "Forgot password",
+        "login": "Login",
+        "name": "Name",
+        "login-title": "Login",
+        "oauth-link-title": "Re-enter your password to link :provider to your account",
+        "otp": "One-time password",
+        "password": "Password",
+        "password-confirmation": "Confirm password",
         "register": "Register",
-        "reset-password" : "Reset password",
-        "reset-send" : "Send password reset link",
-        "surname" : "Surname",
-        "verify-login" : "Verify login",
+        "reset-password": "Reset password",
+        "reset-send": "Send password reset link",
+        "surname": "Surname",
+        "verify-login": "Verify login",
         "logout": "Logout"
     },
-
     "cancel": "Cancel",
     "close": "Close",
     "city": "City",
     "Company Information": "Company Information",
-
     "confirm": "Confirm",
     "confirm-deletion": "Are you sure want to delete {name} {route}?",
     "confirm-description": "Are you sure you want to do this?",
-
     "country": "Country",
-
     "delete": "Delete",
-
     "edit": "Edit",
     "edit-item": "Edit {item}",
     "errors": {
-      "missingMessage": "Please provide @.lower:message."
+        "missingMessage": "Please provide @.lower:message."
     },
-
+    "fields": {
+        "generic": {
+            "switch-language": "Switch language"
+        }
+    },
+    "form-labels": {
+        "Address": "Address",
+        "City": "City",
+        "Code": "Code",
+        "Company": "Company",
+        "Country": "Country",
+        "Description": "Description",
+        "Email": "Email",
+        "Guard Name": "Guard Name",
+        "Name": "Name",
+        "State": "State",
+        "Tax ID": "Tax ID",
+        "Vat Number": "Vat Number",
+        "Zip Code": "Zip Code"
+    },
     "language-select": "Lang Select",
     "list": "no list | one list | {count} list",
     "list-of-item": "{0} List",
-
-    "listing" : {
-        "add-new-button" : "Add new",
-        "bulk-actions" : "Bulk actions",
-        "bulk-clear" : "Clear",
-        "columns" : {
-            "featured" : "Featured",
-            "name" : "Name",
-            "published" : "Published",
-            "show" : "Show",
-            "thumbnail" : "Thumbnail"
+    "listing": {
+        "add-new-button": "Add new",
+        "bulk-actions": "Bulk actions",
+        "bulk-clear": "Clear",
+        "columns": {
+            "featured": "Featured",
+            "name": "Name",
+            "published": "Published",
+            "show": "Show",
+            "thumbnail": "Thumbnail"
         },
-        "dialogs" : {
-            "delete" : {
-                "confirm" : "Delete",
-                "disclaimer" : "The item won\"t be deleted but moved to trash.",
-                "move-to-trash" : "Move to trash",
-                "title" : "Delete item"
+        "dialogs": {
+            "delete": {
+                "confirm": "Delete",
+                "disclaimer": "The item won\"t be deleted but moved to trash.",
+                "move-to-trash": "Move to trash",
+                "title": "Delete item"
             },
-            "destroy" : {
-                "confirm" : "Destroy",
-                "destroy-permanently" : "Destroy permanently",
-                "disclaimer" : "The item won\"t be able to be restored anymore.",
-                "title" : "Destroy item"
+            "destroy": {
+                "confirm": "Destroy",
+                "destroy-permanently": "Destroy permanently",
+                "disclaimer": "The item won\"t be able to be restored anymore.",
+                "title": "Destroy item"
             }
         },
-        "dropdown" : {
-            "delete" : "Delete",
-            "destroy" : "Destroy",
-            "duplicate" : "Duplicate",
-            "edit" : "Edit",
-            "publish" : "Publish",
-            "feature" : "Feature",
-            "restore" : "Restore",
-            "unfeature" : "Unfeature",
-            "unpublish" : "Unpublish"
+        "dropdown": {
+            "delete": "Delete",
+            "destroy": "Destroy",
+            "duplicate": "Duplicate",
+            "edit": "Edit",
+            "publish": "Publish",
+            "feature": "Feature",
+            "restore": "Restore",
+            "unfeature": "Unfeature",
+            "unpublish": "Unpublish"
         },
-        "filter" : {
-            "all-items" : "All items",
-            "draft" : "Draft",
-            "mine" : "Mine",
-            "published" : "Published",
-            "trash" : "Trash"
+        "filter": {
+            "all-items": "All items",
+            "draft": "Draft",
+            "mine": "Mine",
+            "published": "Published",
+            "trash": "Trash"
         },
-        "languages" : "Languages",
-        "listing-empty-message" : "There is no item here yet.",
-        "paginate" : {
-            "rows-per-page" : "Rows per page:"
+        "languages": "Languages",
+        "listing-empty-message": "There is no item here yet.",
+        "paginate": {
+            "rows-per-page": "Rows per page:"
         },
-        "bulk-selected-item" : "item selected",
-        "bulk-selected-items" : "items selected",
-        "reorder" : {
-            "success" : ":modelTitle order changed!",
-            "error" : ":modelTitle order was not changed. Something wrong happened!"
+        "bulk-selected-item": "item selected",
+        "bulk-selected-items": "items selected",
+        "reorder": {
+            "success": ":modelTitle order changed!",
+            "error": ":modelTitle order was not changed. Something wrong happened!"
         },
-        "restore" : {
-            "success" : ":modelTitle restored!",
-            "error" : ":modelTitle was not restored. Something wrong happened!"
+        "restore": {
+            "success": ":modelTitle restored!",
+            "error": ":modelTitle was not restored. Something wrong happened!"
         },
-        "bulk-restore" : {
-            "success" : ":modelTitle items restored!",
-            "error" : ":modelTitle items were not restored. Something wrong happened!"
+        "bulk-restore": {
+            "success": ":modelTitle items restored!",
+            "error": ":modelTitle items were not restored. Something wrong happened!"
         },
-        "force-delete" : {
-            "success" : ":modelTitle destroyed!",
-            "error" : ":modelTitle was not destroyed. Something wrong happened!"
+        "force-delete": {
+            "success": ":modelTitle destroyed!",
+            "error": ":modelTitle was not destroyed. Something wrong happened!"
         },
-        "bulk-force-delete" : {
-            "success" : ":modelTitle items destroyed!",
-            "error" : ":modelTitle items were not destroyed. Something wrong happened!"
+        "bulk-force-delete": {
+            "success": ":modelTitle items destroyed!",
+            "error": ":modelTitle items were not destroyed. Something wrong happened!"
         },
-        "delete" : {
-            "success" : ":modelTitle moved to trash!",
-            "error" : ":modelTitle was not moved to trash. Something wrong happened!"
+        "delete": {
+            "success": ":modelTitle moved to trash!",
+            "error": ":modelTitle was not moved to trash. Something wrong happened!"
         },
-        "bulk-delete" : {
-            "success" : ":modelTitle items moved to trash!",
-            "error" : ":modelTitle items were not moved to trash. Something wrong happened!"
+        "bulk-delete": {
+            "success": ":modelTitle items moved to trash!",
+            "error": ":modelTitle items were not moved to trash. Something wrong happened!"
         },
-        "duplicate" : {
-            "success" : ":modelTitle duplicated with Success!",
-            "error" : ":modelTitle was not duplicated. Something wrong happened!"
+        "duplicate": {
+            "success": ":modelTitle duplicated with Success!",
+            "error": ":modelTitle was not duplicated. Something wrong happened!"
         },
-        "publish" : {
-            "unpublished" : ":modelTitle unpublished!",
-            "published" : ":modelTitle published!",
-            "error" : ":modelTitle was not published. Something wrong happened!"
+        "publish": {
+            "unpublished": ":modelTitle unpublished!",
+            "published": ":modelTitle published!",
+            "error": ":modelTitle was not published. Something wrong happened!"
         },
-        "featured" : {
-            "unfeatured" : ":modelTitle unfeatured!",
-            "featured" : ":modelTitle featured!",
-            "error" : ":modelTitle was not featured. Something wrong happened!"
+        "featured": {
+            "unfeatured": ":modelTitle unfeatured!",
+            "featured": ":modelTitle featured!",
+            "error": ":modelTitle was not featured. Something wrong happened!"
         },
-        "bulk-featured" : {
-            "unfeatured" : ":modelTitle items unfeatured!",
-            "featured" : ":modelTitle items featured!",
-            "error" : ":modelTitle items were not featured. Something wrong happened!"
+        "bulk-featured": {
+            "unfeatured": ":modelTitle items unfeatured!",
+            "featured": ":modelTitle items featured!",
+            "error": ":modelTitle items were not featured. Something wrong happened!"
         },
-        "bulk-publish" : {
-            "unpublished" : ":modelTitle items unpublished!",
-            "published" : ":modelTitle items published!",
-            "error" : ":modelTitle items were not published. Something wrong happened!"
+        "bulk-publish": {
+            "unpublished": ":modelTitle items unpublished!",
+            "published": ":modelTitle items published!",
+            "error": ":modelTitle items were not published. Something wrong happened!"
         }
     },
     "loading-text": "Loading... Please wait",
-
-    "media-library" : {
-        "files" : "Files",
-        "filter-select-label" : "Filter by tag",
-        "images" : "Images",
-        "insert" : "Insert",
-        "sidebar" : {
-            "alt-text" : "Alt text",
-            "caption" : "Caption",
-            "clear" : "Clear",
-            "dimensions" : "Dimensions",
-            "empty-text" : "No file selected",
-            "files-selected" : "files selected",
-            "tags" : "Tags"
+    "media-library": {
+        "files": "Files",
+        "filter-select-label": "Filter by tag",
+        "images": "Images",
+        "insert": "Insert",
+        "sidebar": {
+            "alt-text": "Alt text",
+            "caption": "Caption",
+            "clear": "Clear",
+            "dimensions": "Dimensions",
+            "empty-text": "No file selected",
+            "files-selected": "files selected",
+            "tags": "Tags"
         },
-        "title" : "Media Library",
-        "update" : "Update",
-        "unused-filter-label" : "Show unused only",
-        "no-tags-found" : "Sorry, no tags found.",
-        "dialogs" : {
-            "delete" : {
-                "delete-media-title" : "Delete media",
-                "delete-media-desc" : "Are you sure ?<br />This change can\"t be undone.",
-                "delete-media-confirm" : "Delete",
-                "title" : "Are you sure ?",
-                "allow-delete-multiple-medias" : "Some files are used and can\"t be deleted. Do you want to delete the others ?",
-                "allow-delete-one-media" : "This file is used and can\"t be deleted. Do you want to delete the others ?",
-                "dont-allow-delete-multiple-medias" : "This files are used and can\"t be deleted.",
-                "dont-allow-delete-one-media" : "This file is used and can\"t be deleted."
+        "title": "Media Library",
+        "update": "Update",
+        "unused-filter-label": "Show unused only",
+        "no-tags-found": "Sorry, no tags found.",
+        "dialogs": {
+            "delete": {
+                "delete-media-title": "Delete media",
+                "delete-media-desc": "Are you sure ?<br />This change can\"t be undone.",
+                "delete-media-confirm": "Delete",
+                "title": "Are you sure ?",
+                "allow-delete-multiple-medias": "Some files are used and can\"t be deleted. Do you want to delete the others ?",
+                "allow-delete-one-media": "This file is used and can\"t be deleted. Do you want to delete the others ?",
+                "dont-allow-delete-multiple-medias": "This files are used and can\"t be deleted.",
+                "dont-allow-delete-one-media": "This file is used and can\"t be deleted."
             },
-            "replace" : {
-                "replace-media-title" : "Replace media",
-                "replace-media-desc" : "Are you sure ?<br />This change can\"t be undone.",
-                "replace-media-confirm" : "Replace"
+            "replace": {
+                "replace-media-title": "Replace media",
+                "replace-media-desc": "Are you sure ?<br />This change can\"t be undone.",
+                "replace-media-confirm": "Replace"
             }
         },
-        "types" : {
-            "single" : {
-                "image" : "image",
-                "video" : "video",
-                "file" : "file"
+        "types": {
+            "single": {
+                "image": "image",
+                "video": "video",
+                "file": "file"
             },
-            "multiple" : {
-                "image" : "images",
-                "video" : "videos",
-                "file" : "files"
+            "multiple": {
+                "image": "images",
+                "video": "videos",
+                "file": "files"
             }
         }
     },
     "message": "message",
     "messages": {
-      "success": "Completed Successfully!",
-      "info": "Completed!",
-      "warning": "There is a warning!",
-      "error": "There is an error!"
+        "success": "Completed Successfully!",
+        "info": "Completed!",
+        "warning": "There is a warning!",
+        "error": "There is an error!"
     },
     "modules": {
-      "company": "Company | Companies | {n} Companies",
-      "invoice": "Invoice | Invoices | {n}  Invoices",
-      "package": "Package | Packages",
-      "package_continent": "Continent | Continents",
-      "package_region": "Region | Regions",
-      "package_country": "Country | Countries",
-      "payment": "Payment | Payments",
-      "permission": "Permission | Permissions | {n}  Permissions",
-      "press_release": "Press Release | Press Releases | {n} Releases",
-      "role": "Role | Roles | {n}  Roles",
-      "user": "User | Users | {n} Users"
+        "company": "Company | Companies | {n} Companies",
+        "invoice": "Invoice | Invoices | {n} Invoices",
+        "package": "Package | Packages",
+        "package_continent": "Continent | Continents",
+        "package_region": "Region | Regions",
+        "package_country": "Country | Countries",
+        "payment": "Payment | Payments",
+        "permission": "Permission | Permissions | {n}  Permissions",
+        "press_release": "Press Release | Press Releases | {n} Releases",
+        "role": "Role | Roles | {n}  Roles",
+        "user": "User | Users | {n} Users",
+        "package_distribution_language": "Distribution Language | Distribution Languages | {n} Distribution Languages"
     },
-
     "neighbourhood": "Neighbourhood",
-
     "new-item": "New {item}",
-
     "Personal Information": "Personal Information",
-
     "reset": "Reset",
-
     "save": "Save",
     "saved": "Saved!|{0} is saved!",
     "save-success": "Content saved. All good!",
-
     "show": "Show",
     "submit": "Submit",
     "success-create": "Created Successfully.",
     "success-update": "Updated Successfully.",
     "success-delete": "Removed Successfully.",
-
     "update": "Update",
-    "Update Password": "Update Password"
-  }
+    "Update Password": "Update Password",
+
+    "auth": {
+        "failed" : "These credentials do not match our records.",
+        "password" : "The provided password is incorrect.",
+        "throttle" : "Too many login attempts. Please try again in :seconds seconds."
+    },
+    "pagination": {
+        "previous" : "&laquo; Previous",
+        "next" : "Next &raquo;"
+    },
+    "passwords": {
+        "reset" : "Your password has been reset.",
+        "sent" : "We have emailed your password reset link.",
+        "throttled" : "Please wait before retrying.",
+        "token" : "This password reset token is invalid.",
+        "user" : "We can\"t find a user with that email."
+    },
+    "validation": {
+        "accepted" : "The :attribute field must be accepted.",
+        "accepted_if" : "The :attribute field must be accepted when :other is :value.",
+        "active_url" : "The :attribute field must be a valid URL.",
+        "after" : "The :attribute field must be a date after :date.",
+        "after_or_equal" : "The :attribute field must be a date after or equal to :date.",
+        "alpha" : "The :attribute field must only contain letters.",
+        "alpha_dash" : "The :attribute field must only contain letters, numbers, dashes, and underscores.",
+        "alpha_num" : "The :attribute field must only contain letters and numbers.",
+        "array" : "The :attribute field must be an array.",
+        "ascii" : "The :attribute field must only contain single-byte alphanumeric characters and symbols.",
+        "before" : "The :attribute field must be a date before :date.",
+        "before_or_equal" : "The :attribute field must be a date before or equal to :date.",
+        "between" : {
+            "array" : "The :attribute field must have between :min and :max items.",
+            "file" : "The :attribute field must be between :min and :max kilobytes.",
+            "numeric" : "The :attribute field must be between :min and :max.",
+            "string" : "The :attribute field must be between :min and :max characters."
+        },
+        "boolean" : "The :attribute field must be true or false.",
+        "can" : "The :attribute field contains an unauthorized value.",
+        "confirmed" : "The :attribute field confirmation does not match.",
+        "current_password" : "The password is incorrect.",
+        "date" : "The :attribute field must be a valid date.",
+        "date_equals" : "The :attribute field must be a date equal to :date.",
+        "date_format" : "The :attribute field must match the format :format.",
+        "decimal" : "The :attribute field must have :decimal decimal places.",
+        "declined" : "The :attribute field must be declined.",
+        "declined_if" : "The :attribute field must be declined when :other is :value.",
+        "different" : "The :attribute field and :other must be different.",
+        "digits" : "The :attribute field must be :digits digits.",
+        "digits_between" : "The :attribute field must be between :min and :max digits.",
+        "dimensions" : "The :attribute field has invalid image dimensions.",
+        "distinct" : "The :attribute field has a duplicate value.",
+        "doesnt_end_with" : "The :attribute field must not end with one of the following: :values.",
+        "doesnt_start_with" : "The :attribute field must not start with one of the following: :values.",
+        "email" : "The :attribute field must be a valid email address.",
+        "ends_with" : "The :attribute field must end with one of the following: :values.",
+        "enum" : "The selected :attribute is invalid.",
+        "exists" : "The selected :attribute is invalid.",
+        "file" : "The :attribute field must be a file.",
+        "filled" : "The :attribute field must have a value.",
+        "gt" : {
+            "array" : "The :attribute field must have more than :value items.",
+            "file" : "The :attribute field must be greater than :value kilobytes.",
+            "numeric" : "The :attribute field must be greater than :value.",
+            "string" : "The :attribute field must be greater than :value characters."
+        },
+        "gte" : {
+            "array" : "The :attribute field must have :value items or more.",
+            "file" : "The :attribute field must be greater than or equal to :value kilobytes.",
+            "numeric" : "The :attribute field must be greater than or equal to :value.",
+            "string" : "The :attribute field must be greater than or equal to :value characters."
+        },
+        "image" : "The :attribute field must be an image.",
+        "in" : "The selected :attribute is invalid.",
+        "in_array" : "The :attribute field must exist in :other.",
+        "integer" : "The :attribute field must be an integer.",
+        "ip" : "The :attribute field must be a valid IP address.",
+        "ipv4" : "The :attribute field must be a valid IPv4 address.",
+        "ipv6" : "The :attribute field must be a valid IPv6 address.",
+        "json" : "The :attribute field must be a valid JSON string.",
+        "lowercase" : "The :attribute field must be lowercase.",
+        "lt" : {
+            "array" : "The :attribute field must have less than :value items.",
+            "file" : "The :attribute field must be less than :value kilobytes.",
+            "numeric" : "The :attribute field must be less than :value.",
+            "string" : "The :attribute field must be less than :value characters."
+        },
+        "lte" : {
+            "array" : "The :attribute field must not have more than :value items.",
+            "file" : "The :attribute field must be less than or equal to :value kilobytes.",
+            "numeric" : "The :attribute field must be less than or equal to :value.",
+            "string" : "The :attribute field must be less than or equal to :value characters."
+        },
+        "mac_address" : "The :attribute field must be a valid MAC address.",
+        "max" : {
+            "array" : "The :attribute field must not have more than :max items.",
+            "file" : "The :attribute field must not be greater than :max kilobytes.",
+            "numeric" : "The :attribute field must not be greater than :max.",
+            "string" : "The :attribute field must not be greater than :max characters."
+        },
+        "max_digits" : "The :attribute field must not have more than :max digits.",
+        "mimes" : "The :attribute field must be a file of type: :values.",
+        "mimetypes" : "The :attribute field must be a file of type: :values.",
+        "min" : {
+            "array" : "The :attribute field must have at least :min items.",
+            "file" : "The :attribute field must be at least :min kilobytes.",
+            "numeric" : "The :attribute field must be at least :min.",
+            "string" : "The :attribute field must be at least :min characters."
+        },
+        "min_digits" : "The :attribute field must have at least :min digits.",
+        "missing" : "The :attribute field must be missing.",
+        "missing_if" : "The :attribute field must be missing when :other is :value.",
+        "missing_unless" : "The :attribute field must be missing unless :other is :value.",
+        "missing_with" : "The :attribute field must be missing when :values is present.",
+        "missing_with_all" : "The :attribute field must be missing when :values are present.",
+        "multiple_of" : "The :attribute field must be a multiple of :value.",
+        "not_in" : "The selected :attribute is invalid.",
+        "not_regex" : "The :attribute field format is invalid.",
+        "numeric" : "The :attribute field must be a number.",
+        "password" : {
+            "letters" : "The :attribute field must contain at least one letter.",
+            "mixed" : "The :attribute field must contain at least one uppercase and one lowercase letter.",
+            "numbers" : "The :attribute field must contain at least one number.",
+            "symbols" : "The :attribute field must contain at least one symbol.",
+            "uncompromised" : "The given :attribute has appeared in a data leak. Please choose a different :attribute."
+        },
+        "present" : "The :attribute field must be present.",
+        "prohibited" : "The :attribute field is prohibited.",
+        "prohibited_if" : "The :attribute field is prohibited when :other is :value.",
+        "prohibited_unless" : "The :attribute field is prohibited unless :other is in :values.",
+        "prohibits" : "The :attribute field prohibits :other from being present.",
+        "regex" : "The :attribute field format is invalid.",
+        "required" : "The :attribute field is required.",
+        "required_array_keys" : "The :attribute field must contain entries for: :values.",
+        "required_if" : "The :attribute field is required when :other is :value.",
+        "required_if_accepted" : "The :attribute field is required when :other is accepted.",
+        "required_unless" : "The :attribute field is required unless :other is in :values.",
+        "required_with" : "The :attribute field is required when :values is present.",
+        "required_with_all" : "The :attribute field is required when :values are present.",
+        "required_without" : "The :attribute field is required when :values is not present.",
+        "required_without_all" : "The :attribute field is required when none of :values are present.",
+        "same" : "The :attribute field must match :other.",
+        "size" : {
+            "array" : "The :attribute field must contain :size items.",
+            "file" : "The :attribute field must be :size kilobytes.",
+            "numeric" : "The :attribute field must be :size.",
+            "string" : "The :attribute field must be :size characters."
+        },
+        "starts_with" : "The :attribute field must start with one of the following: :values.",
+        "string" : "The :attribute field must be a string.",
+        "timezone" : "The :attribute field must be a valid timezone.",
+        "unique" : "The :attribute has already been taken.",
+        "uploaded" : "The :attribute failed to upload.",
+        "uppercase" : "The :attribute field must be uppercase.",
+        "url" : "The :attribute field must be a valid URL.",
+        "ulid" : "The :attribute field must be a valid ULID.",
+        "uuid" : "The :attribute field must be a valid UUID.",
+
+
+        "custom" : {
+            "attribute-name" : {
+                "rule-name" : "custom-message"
+            }
+        },
+
+        "attributes" : {}
+    },
+
+    "Reset Password Notification" : "Reset Password Notification",
+    "You are receiving this email because we received a password reset request for your account": "You are receiving this email because we received a password reset request for your account",
+    "Reset Password": "Reset Password",
+    "This password reset link will expire in :count minutes.": "This password reset link will expire in :count minutes.",
+    "If you did not request a password reset, no further action is required": "If you did not request a password reset, no further action is required"
+}
