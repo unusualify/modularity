@@ -98,21 +98,21 @@ class User extends Authenticatable
     protected function invalidCompany():Attribute
     {
         $inValid = false;
+
         if($this->company_id != null){
-            $companyAttr = $this->company;
-            // dd($companyAttr, debug_backtrace());
-            foreach ($companyAttr as $key => $node) {
-                if (!str_contains($key, '_at') && $key != 'id') {
-                    if ($node == null)
+            foreach ($this->company->getAttributes() as $attr => $value) {
+                if (!str_contains($attr, '_at') && $attr != 'id') {
+                    if ($value == null)
                         $inValid = true;
                 }
             }
         }
+
         return Attribute::make(
             get: fn () => $inValid,
         );
     }
-     
+
     // public function getInvalidCompanyAttribute(){
     //     //Check null attributes for proper intercept
     //     $companyAttr = $this->company;
@@ -124,7 +124,7 @@ class User extends Authenticatable
     //         }
     //     }
     //     return true;
-        
+
     // }
 
 
