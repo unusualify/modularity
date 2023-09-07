@@ -58,6 +58,8 @@
                 isMiniSidebar:  {!! json_encode($isMiniSidebar ?? true) !!},
             },
 
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.languages = {!! json_encode(getLanguagesForVueStore($form_fields ?? [], $translate ?? false)) !!};
+
             window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias = {};
             window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types = [];
             window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.config = {

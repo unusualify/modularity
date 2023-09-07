@@ -33,7 +33,7 @@
                         <v-alert
                             density="compact"
                             type="warning"
-                            text="{{ ___('user.invalidCompany') }}"
+                            text="{{ ___('messages.invalid-company') }}"
                         ></v-alert>
                     </template>
                 @endif
