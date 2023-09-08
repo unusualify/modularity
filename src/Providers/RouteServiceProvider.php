@@ -10,7 +10,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use OoBook\CRM\Base\Facades\UnusualRoutes;
 use Nwidart\Modules\Facades\Module;
 use OoBook\CRM\Base\Http\Controllers\DashboardController;
-use OoBook\CRM\Base\Http\Middleware\{AuthenticateMiddleware, CompanyMiddleware, LanguageMiddleware, ImpersonateMiddleware, NavigationMiddleware, RedirectIfAuthenticatedMiddleware, TeamsPermissionMiddleware};
+use OoBook\CRM\Base\Http\Middleware\{AuthenticateMiddleware, CompanyRegistrationMiddleware, LanguageMiddleware, ImpersonateMiddleware, NavigationMiddleware, RedirectIfAuthenticatedMiddleware, TeamsPermissionMiddleware};
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -196,7 +196,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::aliasMiddleware('impersonate', ImpersonateMiddleware::class);
         Route::aliasMiddleware('language', LanguageMiddleware::class);
         Route::aliasMiddleware('navigation', NavigationMiddleware::class);
-        Route::aliasMiddleware('company_registration', CompanyMiddleware::class);
+        Route::aliasMiddleware('company_registration', CompanyRegistrationMiddleware::class);
 
 
         // Route::aliasMiddleware('role', \Spatie\Permission\Middlewares\RoleMiddleware::class);

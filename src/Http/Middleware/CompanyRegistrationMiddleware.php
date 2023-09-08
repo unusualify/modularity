@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Redirect;
-use OoBook\CRM\Base\Entities\Company;
 
 class CompanyRegistrationMiddleware{
 
@@ -23,7 +22,7 @@ class CompanyRegistrationMiddleware{
   public function handle($request, Closure $next)
   {
     // dd(auth()->user()->invalidCompany);
-    if (!($request->routeIs('profile.*') || $request->routeIs('profile'))) {
+    if (!($request->routeIs('profile.*') || $request->routeIs( 'profile'))) {
       if (auth()->user()->invalidCompany) {
         return redirect()->route('profile');
       }
