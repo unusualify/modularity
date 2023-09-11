@@ -149,7 +149,7 @@ class LoginController extends Controller
         return $request->wantsJson()
             ?   new JsonResponse([
                     $this->username() => [trans('auth.failed')],
-                    'message' => ___('auth.failed'),
+                    'message' => __('auth.failed'),
                     'variant' => 'warning'
                 ])
             :   $this->sendFailedLoginResponse($request);
@@ -169,7 +169,7 @@ class LoginController extends Controller
                     'email' => [
                         "type" => "text",
                         "name" => "email",
-                        "label" => ___('auth.email'),
+                        "label" => ___('authentication.email'),
                         'hint' => 'enter @example.com',
                         "default" => "",
                         'col' => [
@@ -182,7 +182,7 @@ class LoginController extends Controller
                     'password' => [
                         "type" => "password",
                         "name" => "password",
-                        "label" => ___('auth.password'),
+                        "label" => ___('authentication.password'),
                         "default" => "",
                         "appendInnerIcon" => '$non-visibility',
                         "slotHandlers" => [
@@ -195,7 +195,7 @@ class LoginController extends Controller
                 ])),
 
                 'actionUrl' => route('login'),
-                'buttonText' => 'auth.login',
+                'buttonText' => 'authentication.login',
                 'formClass' => 'px-5',
             ],
             'slots' => [
@@ -207,7 +207,7 @@ class LoginController extends Controller
                     'elements' => [
                         [
                             "tag" => "v-btn",
-                            'elements' => ___('auth.forgot-password'),
+                            'elements' => ___('authentication.forgot-password'),
                             "attributes" => [
                                 'variant' => 'plain',
                                 'href' => route('password.reset.link'),
@@ -216,7 +216,7 @@ class LoginController extends Controller
                         ],
                         [
                             "tag" => "v-btn",
-                            'elements' => ___('auth.register'),
+                            'elements' => ___('authentication.register'),
                             "attributes" => [
                                 'variant' => 'plain',
                                 'href' => route('register.form'),

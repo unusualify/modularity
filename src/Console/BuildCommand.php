@@ -80,7 +80,7 @@ class BuildCommand extends BaseCommand
         ];
     }
 
-        /*
+    /*
      * @return void
      */
     private function fullBuild()

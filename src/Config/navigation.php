@@ -21,10 +21,21 @@ return [
                 'name' => 'Dashboard',
                 'route_name' => 'dashboard',
             ],
-            '_system_modules' => [
-                'name' => 'System Modules',
+            '_system_settings' => [
+                'name' => 'System Settings',
             ],
             ...UnusualNavigation::baseMenu(),
+            'system-settings' => [
+                'name' => 'System Settings',
+                'items' => [
+                    'locales' => [
+                        'name' => 'Locales',
+                        'icon' => 'mdi-exit-to-app',
+                        'route_name' => 'languages.index',
+                        'target' => '_blank',
+                    ]
+                ]
+            ],
             '_modules' => [
                 'name' => 'Modules',
             ],
@@ -37,9 +48,10 @@ return [
                 'event' => 'openFreeMediaLibrary',
             ],
             'profile' => [
-                'name' => 'Settings',
+                'name' => 'Profile Settings',
                 'route_name' => 'profile',
             ],
+
         ],
         'client' => [
             'account' => [

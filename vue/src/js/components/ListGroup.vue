@@ -43,6 +43,7 @@
                 :title="item.name"
                 :active="activeIndex === i"
                 :active-class="`sidebar-item-active sidebar-item-active-${level}`"
+                v-bind="$bindAttributes(item)"
                 >
             </v-list-item>
 

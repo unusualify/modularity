@@ -56,7 +56,7 @@
                   <!-- <template v-slot:prepend>
                     <v-icon color="success"></v-icon>
                   </template> -->
-                  {{$t('auth.logout')}}
+                  {{$t('authentication.logout')}}
               </v-btn>
             </template>
           </ue-logout-dialog>

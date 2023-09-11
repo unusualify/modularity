@@ -1,5 +1,5 @@
 @php
-$passwordText = isset($welcome) && $welcome ? ___('auth.choose-password') : ___('auth.reset-password');
+$passwordText = isset($welcome) && $welcome ? ___('authentication.choose-password') : ___('authentication.reset-password');
 @endphp
 
 @extends('twill::auth.layout', [
@@ -9,17 +9,17 @@ $passwordText = isset($welcome) && $welcome ? ___('auth.choose-password') : ___(
 
 @section('form')
     <fieldset class="login__fieldset">
-        <label class="login__label" for="email">{{ ___('auth.email') }}</label>
+        <label class="login__label" for="email">{{ ___('authentication.email') }}</label>
         <input type="email" name="email" id="email" class="login__input" required autofocus value="{{ $email ?? '' }}" />
     </fieldset>
 
     <fieldset class="login__fieldset">
-        <label class="login__label" for="password">{{ ___('auth.password') }}</label>
+        <label class="login__label" for="password">{{ ___('authentication.password') }}</label>
         <input type="password" name="password" id="password" class="login__input" required />
     </fieldset>
 
     <fieldset class="login__fieldset">
-        <label class="login__label" for="password_confirmation">{{ ___('auth.password-confirmation') }}</label>
+        <label class="login__label" for="password_confirmation">{{ ___('authentication.password-confirmation') }}</label>
         <input type="password" name="password_confirmation" id="password_confirmation" class="login__input" required />
     </fieldset>
 

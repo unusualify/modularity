@@ -4,7 +4,7 @@
 
 
 @php
-    $titleFormKey = $titleFormKey ?? 'title';
+    $titleFormKey = $titleFormKey ?? 'name';
     $disableContentFieldset = $disableContentFieldset ?? false;
     // $editModalTitle = ($createWithoutModal ?? false) ? twillTrans('twill::lang.modal.create.title') : null;
     // dd(

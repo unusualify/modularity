@@ -225,9 +225,9 @@ class ModelMakeCommand extends BaseCommand
 
         $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
 
-        $fields = array_merge($this->defaultFillables, $fields);
-
         if(!$this->getTraitResponse('translationTrait')){
+            $fields = array_merge($this->defaultFillables, $fields);
+
             $fillable = $this->option('fillable');
             $fields = array_merge( $fields, $fillable != "" ? explode(',', $fillable) : []);
         }
@@ -266,7 +266,7 @@ class ModelMakeCommand extends BaseCommand
 
             $fields = array_merge( $fields, (new SchemaParser($defaultTranslatedSchema))->getColumns() );
 
-            $attributes .= "\tprotected \$translatedAttributes = [\n"
+            $attributes .= "\tpublic \$translatedAttributes = [\n"
                 . collect($fields )->map(function($field){
                     return "\t\t'{$field}'";
                 })->implode(",\n")."\n"

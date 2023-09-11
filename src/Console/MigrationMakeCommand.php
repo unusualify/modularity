@@ -67,7 +67,6 @@ class MigrationMakeCommand extends BaseCommand
         ];
     }
 
-
     /**
      * Get the console command options.
      *
@@ -87,8 +86,6 @@ class MigrationMakeCommand extends BaseCommand
             // ['filesTrait', '--F', InputOption::VALUE_NONE, 'Whether model has file trait or not'],
         ] + unusualTraitOptions();
     }
-
-
 
     /**
      * @throws \InvalidArgumentException

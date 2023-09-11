@@ -3,7 +3,7 @@
 @section('appTypeClass', 'body--form')
 
 @php
-    $titleFormKey = $titleFormKey ?? 'title';
+    $titleFormKey = $titleFormKey ?? 'name';
     $disableContentFieldset = $disableContentFieldset ?? false;
 @endphp
 

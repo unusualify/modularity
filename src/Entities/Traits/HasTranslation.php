@@ -18,12 +18,23 @@ trait HasTranslation
      */
     public function getTranslationModelNameDefault()
     {
-        $repository = config('twill.namespace') . "\Models\Translations\\" . class_basename($this) . 'Translation';
+        $model = config('unusual.namespace') . "\Entities\Translations\\" . class_basename($this) . 'Translation';
 
-        if (@class_exists($repository)) {
-            return $repository;
+        if (@class_exists($model)) {
+            return $model;
         }
 
+        $model = class_namespace($this) . "\Translations\\" . class_basename($this) . 'Translation';
+
+        if (@class_exists($model)) {
+            return $model;
+        }
+        dd(
+            $model,
+            class_namespace($this),
+
+            get_class($this)
+        );
         return TwillCapsules::getCapsuleForModel(class_basename($this))->getTranslationModel();
     }
 
@@ -137,7 +148,7 @@ trait HasTranslation
 
             return [
                 'shortlabel' => strtoupper($locale),
-                'label' => getLanguageLabelFromLocaleCode($locale),
+                'label' => getLabelFromLocale($locale),
                 'value' => $locale,
                 'published' => $translation->active ?? false,
             ];
@@ -155,6 +166,10 @@ trait HasTranslation
         return $this->translations->mapWithKeys(function ($translation) use ($key) {
             return [$translation->locale => $this->translate($translation->locale)->$key];
         });
+    }
+
+    public function getTranslatedAttributes() {
+        return $this->translatedAttributes ?? [];
     }
 
 }

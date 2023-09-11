@@ -60,9 +60,4 @@ trait HasHelpers
             ->all();
     }
 
-    public function getTranslatedAttributes()
-    {
-        return $this->translatedAttributes ?? [];
-    }
-
 }

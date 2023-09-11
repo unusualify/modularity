@@ -52,6 +52,8 @@
 ```
 
 
+### REGEX
+
 ```
     Repository behaviour name change
     (['|\s|a-z])Conduct([A-Z]\w+)

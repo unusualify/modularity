@@ -31,7 +31,7 @@ class RegisterController extends Controller
                     'name' => [
                         "type" => "text",
                         "name" => "name",
-                        "label" => ___('auth.name'),
+                        "label" => ___('authentication.name'),
                         "default" => "",
                         'col' => [
                             'cols' => 12,
@@ -43,7 +43,7 @@ class RegisterController extends Controller
                     'surname' => [
                         "type" => "text",
                         "name" => "surname",
-                        "label" => ___('auth.surname'),
+                        "label" => ___('authentication.surname'),
                         "default" => "",
                         'col' => [
                             'cols' => 12,
@@ -55,7 +55,7 @@ class RegisterController extends Controller
                     'email' => [
                         "type" => "text",
                         "name" => "email",
-                        "label" => ___('auth.email'),
+                        "label" => ___('authentication.email'),
                         "default" => "",
                         'col' => [
                             'cols' => 12,
@@ -67,7 +67,7 @@ class RegisterController extends Controller
                     'password' => [
                         "type" => "password",
                         "name" => "password",
-                        "label" => ___('auth.password'),
+                        "label" => ___('authentication.password'),
                         "default" => "",
                         "appendInnerIcon" => '$non-visibility',
                         "slotHandlers" => [
@@ -80,7 +80,7 @@ class RegisterController extends Controller
                 ])),
 
                 'actionUrl' => route('register'),
-                'buttonText' => 'auth.register',
+                'buttonText' => 'authentication.register',
                 'formClass' => 'px-5',
             ],
             'slots' => [
@@ -92,7 +92,7 @@ class RegisterController extends Controller
                     'elements' => [
                         [
                             "tag" => "v-btn",
-                            'elements' => ___('auth.back-to-login'),
+                            'elements' => ___('authentication.back-to-login'),
                             "attributes" => [
                                 'variant' => 'plain',
                                 'href' => route('login.form'),
@@ -119,6 +119,11 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
+        // dd(
+        //     trans('validation.unique'),
+        //     __('validation.unique'),
+        //     ___('validation.unique'),
+        // );
         return Validator::make($data, $this->rules());
     }
 

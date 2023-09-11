@@ -29,6 +29,10 @@ Route::group(['prefix' => 'api/user', 'as' => 'api.user.', 'namespace' => 'API']
     Route::apiResource('permission', PermissionController::class);
 });
 
+Route::group(['prefix' => 'api', 'as' => 'api.lang.', 'namespace' => 'API'], function(){
+    Route::apiResource('languages', LanguageController::class);
+});
+
 if (config(unusualBaseKey() . '.enabled.media-library')) {
     Route::group(['prefix' => 'media-library', 'as' => 'media-library.'], function () {
         Route::post('sign-s3-upload', ['as' => 'sign-s3-upload', 'uses' => 'MediaLibraryController@signS3Upload']);

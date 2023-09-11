@@ -8,3 +8,6 @@ export { default as ALERT } from './alert'
 
 /* media-library */
 export { default as MEDIA_LIBRARY } from './media-library'
+
+/* language */
+export { default as LANGUAGE } from './language'

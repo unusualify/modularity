@@ -21,7 +21,7 @@ class ResourceServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerTranslations();
+        // $this->registerTranslations();
 
         $this->bootViews();
 
@@ -93,7 +93,7 @@ class ResourceServiceProvider extends ServiceProvider
 
         foreach(Module::all() as $module){
             if(  $module->isStatus(true) && $module->getLowerName() != 'base' ){
-                $langPath = resource_path('lang/modules/' . $module->getLowerName());
+                $langPath = base_path('lang/modules/' . $module->getLowerName());
 
                 if (is_dir($langPath)) {
                     $this->loadTranslationsFrom($langPath, $module->getLowerName());
@@ -114,9 +114,44 @@ class ResourceServiceProvider extends ServiceProvider
         // }
     }
 
+    private function bootUnusualTranslation()
+    {
+
+        // $name = snakeCase( config($this->baseKey . '.name') );
+        $name = unusualBaseKey();
+        $langPath = base_path('lang/modules/' . $name);
+        $laravelLangPath = base_path('lang');
+
+        if (is_dir($langPath)) {
+            $this->loadTranslationsFrom($langPath, $name);
+        } else {
+            // dd('resource');
+            // Lang::addNamespace('unusual',  __DIR__ .  '/../../lang');
+            // $this->app['translation.loader']->addNamespace('unusual',  __DIR__ .  '/../../lang');
+
+            // $this->loadTranslationsFrom(
+            //     __DIR__ .  '/../../lang',
+            //     $name
+            // );
+
+            // $this->loadJsonTranslationsFrom(
+            //     __DIR__ .  '/../../lang',
+            // );
+        }
+
+        // if (is_dir($laravelLangPath)) {
+        //     $this->loadJsonTranslationsFrom($laravelLangPath);
+        // }
+
+        // dd(
+        //     ___('edit-item', ['item' => 'hagü']),
+        // );
+    }
+
     public function registerTranslations()
     {
         $this->app->singleton('translation.loader', function ($app) {
+            return new \Illuminate\Translation\FileLoader($app['files'], [__DIR__.'/../../lang',  $app['path.lang']]);
             return new \Illuminate\Translation\FileLoader($app['files'], [__DIR__.'/../../laravel-lang',  $app['path.lang']]);
         });
 
@@ -127,9 +162,7 @@ class ResourceServiceProvider extends ServiceProvider
             // locale as well as the fallback locale. So, we'll grab the application
             // configuration so we can easily get both of these values from there.
             $locale = $app['config']['app.locale'];
-
             $trans = new \Illuminate\Translation\Translator($loader, $locale);
-
             $trans->setFallback($app['config']['app.fallback_locale']);
 
             return $trans;
@@ -194,31 +227,6 @@ class ResourceServiceProvider extends ServiceProvider
         View::composer(["$this->baseKey::layouts.master", "$this->baseKey::auth.layout"], Localization::class);
     }
 
-    private function bootUnusualTranslation()
-    {
-        $name = snakeCase( config($this->baseKey . '.name') );
-        $langPath = resource_path('lang/modules/' . 'base');
 
-        if (is_dir($langPath)) {
-            $this->loadTranslationsFrom($langPath, $name);
-        } else {
-            // dd('resource');
-            // Lang::addNamespace('unusual',  __DIR__ .  '/../../lang');
-            // $this->app['translation.loader']->addNamespace('unusual',  __DIR__ .  '/../../lang');
-
-            // $this->loadTranslationsFrom(
-            //     __DIR__ .  '/../../lang',
-            //     $name
-            // );
-
-            $this->loadJsonTranslationsFrom(
-                __DIR__ .  '/../../lang',
-            );
-        }
-
-        // dd(
-        //     ___('edit-item', ['item' => 'hagü']),
-        // );
-    }
 
 }
