@@ -169,7 +169,7 @@
         <template v-if="col.formatter == 'edit'">
           <v-btn
             :key="i"
-            class="pa-0"
+            class="pa-0 justify-start"
             variant="plain"
             :color="`primary darken-1`"
             @click="editItem(item.raw)"

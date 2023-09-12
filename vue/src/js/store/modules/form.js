@@ -61,7 +61,9 @@ const mutations = {
     state.editedItem = getSchemaModel(state.inputs, item)
     // state.editedItem = Object.assign({}, item)
   },
-
+  [FORM.RESET_EDITED_ITEM] (state, item) {
+    state.editedItem = getSchemaModel(state.inputs)
+  },
   [FORM.PREVENT_SUBMIT] (state) {
     state.isSubmitPrevented = true
   },
@@ -176,12 +178,15 @@ const actions = {
 
     api[method](url, data, function (response) {
       commit(FORM.UPDATE_FORM_LOADING, false)
-      // __log('200', response.data)
+
       if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
         commit(FORM.SET_FORM_ERRORS, response.data.errors)
       } else if (Object.prototype.hasOwnProperty.call(response.data, 'variant') && response.data.variant.toLowerCase() === 'success') {
         commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
 
+        if (method === 'post') {
+          commit(FORM.RESET_EDITED_ITEM)
+        }
         try {
           dispatch(ACTIONS.GET_DATATABLE)
         } catch (error) {

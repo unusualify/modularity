@@ -28,7 +28,7 @@
                 activator="parent"
                 location="top"
                 >
-                {{ $t('fields.generic.switch-language') }}
+                {{ $t('fields.switch-language') }}
               </v-tooltip>
             </v-chip>
           </template>

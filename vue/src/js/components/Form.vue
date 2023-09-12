@@ -211,9 +211,9 @@ export default {
     return {
       id: Math.ceil(Math.random() * 1000000) + '-form',
 
-      _loading: false,
-      _errors: {},
-      _schema: this.invokeRuleGenerator(this.schema)
+      loading: false,
+      errors: {},
+      inputs: this.invokeRuleGenerator(this.schema)
 
       // validForm: false
     }
@@ -225,7 +225,8 @@ export default {
 
   watch: {
     model (newValue, oldValue) {
-      // __log('model watcher', newValue.country_id, oldValue.country_id)
+      // __log('model watcher', newValue, oldValue)
+      // this.resetValidation()
     },
     errors (newValue, oldValue) {
       // __log('errors')
@@ -247,7 +248,7 @@ export default {
     inputSchema: {
       get () {
         return this.issetSchema
-          ? this._schema
+          ? this.inputs
           : this.invokeRuleGenerator(
             this.$store.state.form.inputs
           )
@@ -272,10 +273,11 @@ export default {
       },
       set (value) {
         // __log(value)
+        // this.resetValidation()
       }
     },
 
-    loading () {
+    loading_ () {
       return this.actionUrl ? this._loading : this.$store.state.form.loading
       // get () {
       //   return this.actionUrl ? this._loading : this.$store.state.form.loading
@@ -284,7 +286,7 @@ export default {
       //   __log('loading setter', value, this.loading)
       // }
     },
-    errors () {
+    errors_ () {
       return this.actionUrl ? this._errors : this.$store.state.form.errors
       // get () {
       //   return this.actionUrl ? this._errors : this.$store.state.form.errors
@@ -411,7 +413,10 @@ export default {
           if (errorCallback && typeof errorCallback === 'function') errorCallback(response.data)
         })
       } else {
-        this.$store.commit(FORM.SET_EDITED_ITEM, fields)
+        // __log(
+        //   fields
+        // )
+        // this.$store.commit(FORM.SET_EDITED_ITEM, fields)
         this.$store.dispatch(ACTIONS.SAVE_FORM, { item: null, callback, errorCallback })
       }
     },

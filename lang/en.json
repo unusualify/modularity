@@ -37,9 +37,7 @@
         "missingMessage": "Please provide @.lower:message."
     },
     "fields": {
-        "generic": {
-            "switch-language": "Switch language"
-        }
+        "switch-language": "Switch language"
     },
     "form-labels": {
         "Address": "Address",

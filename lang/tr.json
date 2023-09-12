@@ -35,9 +35,7 @@
         "missingMessage": "Lütfen @.lower:messageı yazın."
     },
     "fields": {
-        "generic": {
-            "switch-language": "Dili Değiştir"
-        }
+        "switch-language": "Dili Değiştir"
     },
     "form-labels": {
         "Address": "Adres",

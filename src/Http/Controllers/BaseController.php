@@ -203,7 +203,7 @@ abstract class BaseController extends CoreController
         //     $parentModuleId,
         //     $input
         // );
-        Session::put($this->moduleName . '_retain', true);
+        Session::put($this->routeName . '_retain', true);
 
         if ($this->getTableOption('editOnModal')) {
             return $this->respondWithSuccess(___('save-success'));
@@ -214,19 +214,19 @@ abstract class BaseController extends CoreController
         }
 
         if (isset($input['cmsSaveType']) && Str::endsWith($input['cmsSaveType'], '-new')) {
-            return $this->respondWithRedirect(moduleRoute(
-                $this->moduleName,
+            return $this->respondWithRedirect(moduleRoute($this->routeName,
                 $this->routePrefix,
                 'create'
             ));
         }
 
-        return $this->respondWithRedirect(moduleRoute(
-            $this->moduleName,
-            $this->routePrefix,
-            'edit',
-            [Str::singular(last(explode('.', $this->moduleName))) => $this->getItemIdentifier($item)]
-        ));
+        return $this->request->ajax()
+            ? $this->respondWithSuccess(___("save-success"))
+            : $this->respondWithRedirect(moduleRoute($this->routeName,
+                $this->routePrefix,
+                'edit',
+                [Str::singular(last(explode('.', $this->moduleName))) => $this->getItemIdentifier($item)]
+            ));
     }
 
     /**
@@ -238,7 +238,7 @@ abstract class BaseController extends CoreController
     public function show($id, $submoduleId = null)
     {
         if ($this->getIndexOption('editInModal')) {
-            return Redirect::to(moduleRoute($this->moduleName, $this->routePrefix, 'index'));
+            return Redirect::to(moduleRoute($this->routeName, $this->routePrefix, 'index'));
         }
 
         return $this->redirectToForm($this->getParentModuleIdFromRequest($this->request) ?? $submoduleId ?? $id);
@@ -263,7 +263,7 @@ abstract class BaseController extends CoreController
         if ($this->getIndexOption('editInModal')) {
             return $this->request->ajax()
             ? Response::json($this->modalFormData($id))
-            : Redirect::to(moduleRoute($this->moduleName, $this->routePrefix, 'index'));
+            : Redirect::to(moduleRoute($this->routeName, $this->routePrefix, 'index'));
         }
 
         $this->setBackLink();
@@ -293,7 +293,7 @@ abstract class BaseController extends CoreController
         if ($this->getIndexOption('editInModal')) {
             return $this->request->ajax()
             ? Response::json($this->modalFormData($id))
-            : Redirect::to(moduleRoute($this->moduleName, $this->routePrefix, 'index'));
+            : Redirect::to(moduleRoute($this->routeName, $this->routePrefix, 'index'));
         }
 
         $this->setBackLink();
@@ -328,8 +328,7 @@ abstract class BaseController extends CoreController
         $input = $this->request->all();
 
         if (isset($input['cmsSaveType']) && $input['cmsSaveType'] === 'cancel') {
-            return $this->respondWithRedirect(moduleRoute(
-                $this->moduleName,
+            return $this->respondWithRedirect(moduleRoute($this->routeName,
                 $this->routePrefix,
                 'edit',
                 [Str::singular($this->moduleName) => $id]
@@ -355,15 +354,13 @@ abstract class BaseController extends CoreController
                     return $this->respondWithRedirect($this->getBackLink());
                 } elseif (Str::endsWith($input['cmsSaveType'], '-new')) {
                     if ($this->getIndexOption('skipCreateModal')) {
-                        return $this->respondWithRedirect(moduleRoute(
-                            $this->moduleName,
+                        return $this->respondWithRedirect(moduleRoute($this->routeName,
                             $this->routePrefix,
                             'create'
                         ));
                     }
 
-                    return $this->respondWithRedirect(moduleRoute(
-                        $this->moduleName,
+                    return $this->respondWithRedirect(moduleRoute($this->routeName,
                         $this->routePrefix,
                         'index',
                         ['openCreate' => true]
@@ -371,8 +368,7 @@ abstract class BaseController extends CoreController
                 } elseif ($input['cmsSaveType'] === 'restore') {
                     Session::flash('status', unusualTrans("$this->baseKey::lang.publisher.restore-success"));
 
-                    return $this->respondWithRedirect(moduleRoute(
-                        $this->moduleName,
+                    return $this->respondWithRedirect(moduleRoute($this->routeName,
                         $this->routePrefix,
                         'edit',
                         [Str::singular($this->moduleName) => $id]
@@ -388,6 +384,7 @@ abstract class BaseController extends CoreController
                 ]);
             }
 
+            // if()
             return $this->respondWithSuccess(___("save-success"));
         }
     }
