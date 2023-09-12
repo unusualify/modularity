@@ -35,8 +35,8 @@ CRM Base Module
     - [x] chokidar watcher for base_path('lang') files
 
 ### Timezone Integration
-- [ ] User timezone integration
-- [ ] ModelTrait or RepositoryTrait casting datetime fields wrt user timezone
+- [x] User timezone integration
+- [ ] This timezone info to use in press release timezone at future and maybe on invoices
 
 ### Press Release Module
 - [ ] Create Press Release Module

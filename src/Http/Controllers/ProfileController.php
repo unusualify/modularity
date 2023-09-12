@@ -82,8 +82,8 @@ class ProfileController extends BaseController
         //         ->get()
         //         ->items()
         //     // $this->getIndexItems([])
-
         // );
+
         $user = auth()->user();
         $userSchema = $this->getFormSchema([
             'name' => [
@@ -240,10 +240,11 @@ class ProfileController extends BaseController
                 }, unusualConfig('available_user_locales', ['en', 'tr']))
             ],
             'timezone' => [
-                "type" => "select",
+                "type" => "combobox",
                 "name" => "timezone",
                 "label" => "Timezone",
                 "default" => 0,
+                "returnObject" => false,
                 'col' => [
                     'cols' => 12,
                     'xxl' => 6,
@@ -254,16 +255,12 @@ class ProfileController extends BaseController
                 ],
                 'itemTitle' => 'label',
                 'itemValue' => 'value',
-                'items' => [
-                    [
-                        'label' => 'Europe/London',
-                        'value' => 'Europe/London',
-                    ],
-                    // [
-                    //     'label' => 'Europe/London',
-                    //     'value' => 'Europe/London',
-                    // ]
-                ],
+                'items' => collect((new \Camroncade\Timezone\Timezone())->timezoneList)->map(function($value,$key){
+                    return [
+                        'label' => $key,
+                        'value' => $value
+                    ];
+                })->values()->toArray(),
                 'items_' => array_map(function($locale) {
                     return [
                         'value' => $locale,
@@ -792,7 +789,7 @@ class ProfileController extends BaseController
         // ];
 
         $view = "$this->baseKey::layouts.profile";
-        
+
         return View::make($view, $data);
     }
 

@@ -24,6 +24,7 @@ return [
 
     'locale' => 'en',
     'fallback_locale' => 'en',
+    'timezone' => 'Europe/London',
 
     'default_input' => [
         'type' => 'text',

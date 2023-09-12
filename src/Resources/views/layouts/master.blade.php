@@ -63,8 +63,9 @@
         {{-- @yield('initial-scripts') --}}
         <script>
             window['{{ config(unusualBaseKey() . '.js_namespace') }}'] = {};
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].LOCALE = '{{ config(unusualBaseKey() . '.locale') }}';
             window['{{ config(unusualBaseKey() . '.js_namespace') }}'].version = '{{ config(unusualBaseKey() . '.version') }}';
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].LOCALE = '{{ config(unusualBaseKey() . '.locale') }}';
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].TIMEZONE = '{{ config(unusualBaseKey() . '.timezone') }}';
             window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {};
             window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE = {};
 
