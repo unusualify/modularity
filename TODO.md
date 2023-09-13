@@ -43,10 +43,28 @@ CRM Base Module
 - [ ] Custom Form Page for Submit Press Release including Stepper Form, Package selection, feature details, prices and ...
 - [ ] Custom Form Page for Manage Press Release including chat inputs, file adding, summary details of a package for client and admin users
 
+### B2press Package Module
+- [ ] Create Package Feature 
+    - [ ] add Translation fields (description)
 ### Support Module
-- [ ] Create Model for support model
+- [ ] Create Support Module
+- [ ] edit page on free.blade.php
 - [ ] Ticket system to be generated from admin user
+- [ ] how should the file input field be?
 
+### Announcement Module
+- [ ] Create Announcement Module
+- [ ] edit page on free.blade.php
+- [ ] how should the recipient input field be? which options will be in this select input?
+
+### Users Module
+- [ ] Create Users Module
+- [ ] Show Only company users, but not system users
+- [ ] add company filter at future
+- [ ] open a modal with clicking first column of table
+    - [ ] Company Information
+    - [ ] Press Releases
+    - [ ] Credits & Invoices
 ### Payment System
 - [ ] TEB and Garanti Virtual POS to be added
 - [ ] Paypal Integration
@@ -57,3 +75,16 @@ CRM Base Module
 ### Invoice System
 - [ ] relation to payment syste
 - [ ] specify which invoice system to use
+
+### Dashboard
+- [ ] Dashboard Division
+    - [ ] create a service class for rendering dashboard acc. to role
+    - [ ] Admin User UI components
+    - [ ] Client User UI components
+
+### Index Page
+- [ ] Table Features
+    - [ ] make border box table and padding&margin adjustments for Package Module
+    - [ ] adjustment width of embedded form of table for instance Package Module routes
+    - [ ] add status column formatter to table & datatable components
+    - [ ] open the edit form under the table row as collapsible, inspect manage press releases page
