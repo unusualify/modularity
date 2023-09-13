@@ -62,7 +62,7 @@ CRM Base Module
 - [ ] Show Only company users, but not system users
 - [ ] add company filter at future
 - [ ] open a modal with clicking first column of table
-    - [ ] Company Information
+    - [ ] Company Information
     - [ ] Press Releases
     - [ ] Credits & Invoices
 ### Payment System
