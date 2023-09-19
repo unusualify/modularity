@@ -126,7 +126,7 @@ export default {
     // app.component('v-form-base', VFormBase);
     app.component('v-custom-form-base', VCustomFormBase)
     app.component('ue-modal', UEModal)
-    app.component('ue-modal-dialog', UEModalDialog)
+    // app.component('ue-modal-dialog', UEModalDialog)
     app.component('ue-modal-media', UEModalMedia)
     // Vue.component('ue-medialibrary', UEMediaLibrary)
 

@@ -398,6 +398,8 @@ export default {
           if (Object.prototype.hasOwnProperty.call(response.data, 'redirector')) {
             window.location.href = response.data.redirector
           }
+
+          if (callback && typeof callback === 'function') callback(response.data)
         }, function (response) {
           self._loading = false
           __log(
@@ -416,7 +418,7 @@ export default {
         // __log(
         //   fields
         // )
-        // this.$store.commit(FORM.SET_EDITED_ITEM, fields)
+        this.$store.commit(FORM.SET_EDITED_ITEM, fields)
         this.$store.dispatch(ACTIONS.SAVE_FORM, { item: null, callback, errorCallback })
       }
     },

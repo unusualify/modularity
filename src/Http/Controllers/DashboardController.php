@@ -80,7 +80,7 @@ class DashboardController extends BaseController
                         'class' => 'pl-theme-semi pb-theme-semi'
                     ],
                     'attributes' => [
-                        'name' => 'Revision',
+                        'name' => 'pressRelease',
                         'title-key' => '',
                         'custom-header' => 'Recent Revisions',
                         'hide-headers' => true,
@@ -160,7 +160,7 @@ class DashboardController extends BaseController
 
                     ],
                     'attributes' => [
-                        'name' => 'Revision',
+                        'name' => 'pressRelease',
                         'title-key' => '',
                         'custom-header' => 'Recently Published',
                         'items' =>  App::make(PackageContinentRepository::class)->get([], [], [
@@ -168,36 +168,17 @@ class DashboardController extends BaseController
                         ], 8)->items(),
                         'columns' => [
                             [
-                                'title' => 'name',
+                                'title' => 'Name',
                                 'key' => 'name',
                                 'align' => 'start',
-                                'sortable' => false,
-                                'filterable' => false,
-                                'groupable' => false,
-                                'divider' => false,
-                                'class' => '',
-                                'cellClass' => '',
-                                'width' => '',
-                                'searchable' => true,
-                                'isRowEditable' => true,
-                                'isColumnEditable' => false,
-                                // 'formatter' => ['date', 'numeric'],
+                                // 'formatter' => [
+                                //     'edit'
+                                // ]
                             ],
                             [
                                 'title' => 'PR Headline',
                                 'key' => 'headline',
                                 'align' => 'start',
-                                'sortable' => false,
-                                'filterable' => false,
-                                'groupable' => false,
-                                'divider' => false,
-                                'class' => '',
-                                'cellClass' => '',
-                                'width' => '',
-                                'searchable' => true,
-                                'isRowEditable' => true,
-                                'isColumnEditable' => false,
-                                'formatter' => [],
                             ]
                         ],
                         'table-options' => [

@@ -30,14 +30,11 @@ const deepRemoveFromObj = (items, keys = ['id', 'children'], deep = 'children') 
 
 const state = {
   baseUrl: window[process.env.VUE_APP_NAME].STORE.datatable.baseUrl || '',
-  name: window[process.env.VUE_APP_NAME].STORE.datatable.name,
+  // name: window[process.env.VUE_APP_NAME].STORE.datatable.name,
   headers: window[process.env.VUE_APP_NAME].STORE.datatable.headers,
   // inputs: window[process.env.VUE_APP_NAME].STORE.datatable.inputs,
   search: window[process.env.VUE_APP_NAME].STORE.datatable.searchText,
   options: window[process.env.VUE_APP_NAME].STORE.datatable.options,
-  actions: window[process.env.VUE_APP_NAME].STORE.datatable.actions,
-  actionsType: window[process.env.VUE_APP_NAME].STORE.datatable.actionsType,
-
   data: window[process.env.VUE_APP_NAME].STORE.datatable.data || [],
   total: parseInt(window[process.env.VUE_APP_NAME].STORE.datatable.total),
 
@@ -51,6 +48,8 @@ const state = {
 
   // columns: window[process.env.VUE_APP_NAME].STORE.datatable.columns || [],
   // dialog: false
+  // actions: window[process.env.VUE_APP_NAME].STORE.datatable.actions,
+  // actionsType: window[process.env.VUE_APP_NAME].STORE.datatable.actionsType,
 
 }
 
@@ -76,12 +75,6 @@ const getters = {
   },
   rowEditables: state => {
     return state.headers.filter((h) => (h.hasOwnProperty('isRowEditable') && h.isRowEditable))
-  },
-  rowActions: state => {
-    return state.actions
-  },
-  rowActionsType: state => {
-    return state.actionsType
   },
   mainFilters: state => {
     return state.mainFilters

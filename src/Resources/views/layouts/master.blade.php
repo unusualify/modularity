@@ -37,7 +37,7 @@
                         ></v-alert>
                     </template>
                 @endif
-                <div id="ue-main-body" class="ue--main-container">
+                <div id="ue-main-body" class="ue--main-container" style="min-height: 100vh">
 
                     @yield('content')
 

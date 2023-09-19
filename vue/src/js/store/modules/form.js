@@ -58,6 +58,9 @@ const getters = {
 
 const mutations = {
   [FORM.SET_EDITED_ITEM] (state, item) {
+    // __log(
+    //   item, getSchemaModel(state.inputs, item)
+    // )
     state.editedItem = getSchemaModel(state.inputs, item)
     // state.editedItem = Object.assign({}, item)
   },
@@ -175,7 +178,9 @@ const actions = {
       method = 'put'
       url = window[process.env.VUE_APP_NAME].ENDPOINTS.update.replace(':id', data.id)
     }
-
+    // __log(
+    //   'actions.save_form', data
+    // )
     api[method](url, data, function (response) {
       commit(FORM.UPDATE_FORM_LOADING, false)
 

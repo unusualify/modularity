@@ -31,7 +31,7 @@ app.use(exports.UEConfig)
 
 // Component Includes
 app.component('ue-datatable', UEDatatable)
-app.component('ue-modal-form', UEModalForm)
+// app.component('ue-modal-form', UEModalForm)
 
 app.mount('#admin')
 

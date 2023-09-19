@@ -297,7 +297,6 @@ abstract class CoreController extends Controller
         }
 
         // dd(Permission::ACCESS->value, $name);
-
         if($this->isGateable()){
             $this->middleware("can:{$this->permissionPrefix(Permission::VIEW->value)}", ['only' => ['index', 'show']]);
             $this->middleware("can:{$this->permissionPrefix(Permission::CREATE->value)}", ['only' => ['create', 'store']]);

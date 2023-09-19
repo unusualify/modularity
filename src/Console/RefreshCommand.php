@@ -41,7 +41,7 @@ class RefreshCommand extends BaseCommand
     private function publishAssets()
     {
         $this->call('vendor:publish', [
-            '--provider' => 'OoBook\CRM\Base\Providers\UnusualProvider',
+            '--provider' => 'OoBook\CRM\Base\LaravelServiceProvider',
             '--tag' => 'assets',
             '--force' => true,
         ]);

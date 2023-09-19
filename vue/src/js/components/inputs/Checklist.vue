@@ -5,17 +5,15 @@
     </ue-title>
     <v-row>
       <v-col v-for="(item, index) in items"
-          :key="`checkbox-${index}`"
-          cols="12" lg="3"
-        >
-        <v-checkbox
-          v-model="input"
-          :label="item[`${itemTitle}`]"
-          :value="item[`${itemValue}`]"
-          color="success"
-          hide-details
-          >
-        </v-checkbox>
+          :key="`checkbox-${index}`" cols="4">
+          <v-checkbox
+            v-model="input"
+            :label="item[`${itemTitle}`]"
+            :value="item[`${itemValue}`]"
+            color="success"
+            hide-details
+            >
+          </v-checkbox>
       </v-col>
     </v-row>
   </div>
@@ -27,12 +25,15 @@ import { useInput } from '@/hooks'
 
 export default {
   setup (props, context) {
+    __log(
+      useInput(props, context)
+    )
     return {
       ...useInput(props, context)
     }
   },
   mixins: [InputMixin],
-  name: 'ue-custom-input-checklist',
+  name: 'v-custom-input-checklist',
   props: {
     label: {
       type: String,

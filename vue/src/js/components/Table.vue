@@ -1,7 +1,14 @@
 <template>
   <v-data-table-server
+    v-bind="$bindAttributes()"
+
+    width="53px"
     :class="[tableClasses]"
     id="ue-table"
+
+    :headers="headers"
+    :items="elements"
+    :hover="true"
 
     v-model:options="options"
     v-model:page="options.page"
@@ -9,69 +16,99 @@
     v-model:multi-sort="options.multiSort"
     v-model:must-sort="options.mustSort"
 
-    :headers="headers"
-    :items="elements"
-    :hover="true"
-
     :items-length="totalElements"
     :item-title="titleKey"
     ref="datatable"
   >
-
     <template v-slot:top>
       <!-- <div class="text-h8 text-primary font-weight-bold">
-        {{ tableHeader }}
+        {{ tableTitle }}
       </div> -->
-      <slot name="header"
-        v-bind="{
-          tableHeader
-        }"
-        >
+      <slot name="header" v-bind="{tableTitle}">
         <ue-title
-          :text="tableHeader"
+          :text="tableTitle"
           :classes="['ue-table-header', 'pt-theme', 'pb-theme']"
           padding-reset
         />
       </slot>
 
-      <div v-if="embeddedForm" class="ue-table-form__embedded">
+      <div v-if="embeddedForm" class="ue-table-form__embedded"
+        :style="formStyles">
         <v-btn @click="createForm" class="mb-theme">
           {{ $t('ADD NEW')}}
         </v-btn>
         <v-expand-transition>
           <v-card class="mb-7" elevation="4" v-show="formActive">
-            <ue-form
-              has-submit
-              button-text="save"
-              :title="formTitle"
-            >
-              <template #headerRight>
-                <v-btn
-                  class=""
-                  variant="text"
-                  icon="$close"
-                  density="compact"
+            <ue-form has-submit button-text="save" :title="formTitle">
+              <template v-slot:headerRight>
+                <v-btn class="" variant="text" icon="$close" density="compact"
                   @click="closeForm()"
                 ></v-btn>
               </template>
             </ue-form>
           </v-card>
-          <!-- <v-row v-show="formActive">
-            <v-col cols="12" md="6">
-
-            </v-col>
-          </v-row> -->
         </v-expand-transition>
       </div>
+      <slot v-else-if="(createOnModal || editOnModal)" name="formDialog" >
+        <ue-modal
+            ref="formModal"
+            v-model="formActive"
+            scrollable
+            transition="dialog-bottom-transition"
+            width-type="xl"
+            >
+            <template v-slot:activator="{props}">
+              <v-btn-success v-if="createOnModal" v-bind="props" dark>
+                  {{ $t('add-item', {'item': transNameSingular} ) }}
+              </v-btn-success>
+            </template>
+            <template v-slot:body="props">
+              <v-card >
+                <v-card-title class="text-h5 grey lighten-2"> </v-card-title>
+                <v-card-text>
+                  <ue-form :title="formTitle" :ref="formRef"/>
+                </v-card-text>
+                <v-divider/>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="error darken-1" text @click="closeForm()">
+                        {{ props.textCancel }}
+                    </v-btn>
+                    <v-btn color="teal darken-1" text @click="confirmFormModal()">
+                        {{ $t('save') }}
+                    </v-btn>
+                </v-card-actions>
 
-      <!-- general #dialog -->
-      <ue-modal-dialog
-        v-model="dialogActive"
-        ref="dialog"
-        :description="dialogDescription"
-        @cancel="resetEditedItem"
-        @confirm="deleteRow"
-      />
+              </v-card>
+            </template>
+        </ue-modal>
+      </slot>
+
+      <!-- #deletemodal-->
+      <ue-modal
+        ref="deleteModal"
+        v-model="deleteModalActive"
+        transition="dialog-bottom-transition"
+        width-type="md"
+        >
+        <template v-slot:body="props" >
+          <v-card >
+            <v-card-title class="text-h5 text-center" style="word-break: break-word;">
+              <!-- {{ textDescription }} -->
+            </v-card-title>
+            <v-card-text class="text-center" style="word-break: break-word;" >
+              {{ deleteQuestion }}
+            </v-card-text>
+            <v-divider/>
+            <v-card-actions>
+              <v-spacer/>
+              <v-btn color="blue" text @click="closeDeleteModal()"> {{ props.textCancel }}</v-btn>
+              <v-btn color="blue" text @click="deleteRow()"> {{ props.textConfirm }}</v-btn>
+              <v-spacer></v-spacer>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </ue-modal>
     </template>
     <!-- <template v-slot:top>
       <v-data-table-footer
@@ -177,26 +214,57 @@
             {{ item.raw[col.key] }}
           </v-btn>
         </template>
+        <template v-else-if="col.formatter == 'switch'">
+            <v-switch
+              :key="i"
+              :model-value="item.raw[col.key]"
+              color="success"
+              :true-value="1"
+              false-value="0"
+              hide-details
+              @update:modelValue="switchItem($event, col.key, item.raw)"
+              >
+              <template v-slot:label></template>
+            </v-switch>
+        </template>
         <template v-else>
           {{ handleFormatter(col.formatter, item.raw[col.key] ) }}
         </template>
     </template>
 
+    <template v-slot:column.actions="_obj">
+      <v-menu
+        :close-on-content-click="false"
+        open-on-hover
+        left
+        >
+        <template v-slot:activator="{ props }">
+          <v-icon
+            size="large"
+            icon="mdi-cog-outline"
+            v-bind="props"
+            >
+          </v-icon>
+        </template>
+      </v-menu>
+    </template>
     <template v-slot:item.actions="{ item }">
       <!-- @click's editItem|deleteItem -->
       <!-- #actions -->
-      <v-menu v-if="rowActionsType == 'dropdown' || $vuetify.display.smOnly"
+      <v-menu v-if="rowActionsType == 'dropdown' || $root.isSmAndDown"
         :close-on-content-click="false"
         open-on-hover
         left
         offset-x
         >
         <template v-slot:activator="{ props }">
-          <v-btn icon v-bind="props">
-            <v-icon color="green darken-2">
-              $list
-            </v-icon>
-          </v-btn>
+          <v-icon
+            size="large"
+            color="primary"
+            icon="$list"
+            v-bind="props"
+            >
+          </v-icon>
         </template>
         <v-list>
 
@@ -233,27 +301,30 @@
 </template>
 
 <script>
-import { ref, onMounted, useSlots } from 'vue'
-import { VDataTable, VDataTableServer, VDataTableFooter } from 'vuetify/labs/VDataTable'
+// import { ref, onMounted, useSlots } from 'vue'
+import {
+  VDataTableServer
+  // VDataTable,
+  // VDataTableFooter
+} from 'vuetify/labs/VDataTable'
 
-import { TableMixin } from '../mixins'
-import { useTable } from '@/hooks'
+import { makeTableProps, useTable } from '@/hooks'
 
 export default {
-  mixins: [TableMixin],
+  // mixins: [TableMixin],
   components: {
-    VDataTable,
-    VDataTableFooter,
+    // VDataTable,
+    // VDataTableFooter,
     VDataTableServer
   },
   props: {
-
+    ...makeTableProps()
   },
   setup (props, context) {
-    const tableDefaults = useTable(props, context)
+    // const tableDefaults = ...useTable(props, context)
 
     return {
-      ...tableDefaults
+      ...useTable(props, context)
     }
   },
   data () {
@@ -262,7 +333,7 @@ export default {
     }
   },
   computed: {
-    // tableHeader () {
+    // tableTitle () {
     //   return __isset(this.customHeader)
     //     ? this.$lodash.upperCase(this.customHeader)
     //     : this.$t(`modules.${this.$lodash.snakeCase(this.name)}`, 1)

@@ -11,14 +11,16 @@
     //     get_defined_vars()
     // );
     // dd($formAttributes)
+    // dd($formAttributes, $formStore, $endpoints );
+
 @endphp
 
 
 @section('content')
     <v-sheet>
         {{-- <ue-stepper-form></ue-stepper-form> --}}
-        <ue-form v-bind='@json($formAttributes)'>
-        </ue-form>
+        <ue-form v-bind='@json($formAttributes)'/>
+
     </v-sheet>
 @stop
 

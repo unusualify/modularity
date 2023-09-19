@@ -79,6 +79,19 @@ class RouteServiceProvider extends ServiceProvider
                         require __DIR__ . '/../Routes/auth.php';
                     }
                 );
+
+                $router->group(
+                    [
+                        // 'middleware' => $supportSubdomainRouting ? ['supportSubdomainRouting'] : [],
+                        'middleware' => [
+                            'language',
+                            ...($supportSubdomainRouting ? ['supportSubdomainRouting'] : [])
+                        ],
+                    ],
+                    function ($router) {
+                        require __DIR__ . '/../Routes/api.php';
+                    }
+                );
                 // internal routes web.php
                 $router->group(
                     [

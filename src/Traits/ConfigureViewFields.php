@@ -16,12 +16,22 @@ trait ConfigureViewFields {
     /**
      * @var array
      */
-    protected $defaultTableOptions = [
+    protected $defaultTableAttributes = [
+        'embeddedForm' => true,
         'createOnModal' => true,
         'editOnModal' => true,
+        'formWidth' => '60%',
         'isRowEditing' => false,
-        'actionsType' => 'inline'
+        'rowActionsType' => 'inline',
+        'hideDefaultFooter' => false,
     ];
+
+    /**
+     * @var array
+     */
+
+    protected $tableAttributes = [];
+
 
     /**
      * Relations to eager load for the form view.
@@ -37,6 +47,7 @@ trait ConfigureViewFields {
      */
     protected $formWithCount = [];
 
+
     /**
      * @param array $prependScope
      * @return array
@@ -47,11 +58,6 @@ trait ConfigureViewFields {
         // $items = $this->getIndexItems($scopes);
 
         $formSchema = $this->getFormSchema($this->getConfigFieldsByRoute('inputs'));
-
-        // dd(
-        //     $this->getSchemaWiths($formSchema),
-        //     $this->getJSONData($this->getSchemaWiths($formSchema))
-        // );
         $data = [
             // 'hiddenFilters' => array_keys(Arr::except($this->filters, array_keys($this->defaultFilters))),
             // 'filterLinks' => $this->filterLinks ?? [],
@@ -59,36 +65,38 @@ trait ConfigureViewFields {
             'initialResource' => $this->getJSONData($this->getSchemaWiths($formSchema)), //
             'tableMainFilters' => $this->getIndexTableMainFilters(),
             'filters' => json_decode($this->request->get('filter'), true) ?? [],
+            'requestFilter' => json_decode(request()->get('filter'), true) ?? [],
+            'searchText' =>  request()->has('search') ? request()->query('search') : "", // for current text of search parameter
 
-            'titleKey' => $this->titleColumnKey,
             'headers' => $this->getIndexTableColumns(), // headers to be used in unusual datatable component
             'formSchema'  => $formSchema, // input fields to be used in unusual datatable component
-
-            // 'indexEndpoint' => route(
-            //     ($this->isParentRoute() ? '' : $this->getSnakeCase($this->moduleName) . '.')
-            //         . $this->getSnakeCase($this->routeName)
-            //         . ".index"
-            // ), // basic laravel index url for create|edit|store|update|delete routes
-            'searchText' =>  request()->has('search') ? request()->query('search') : "", // for current text of search parameter
-            'requestFilter' => json_decode(request()->get('filter'), true) ?? [],
 
             /***
              * TODO variables to be assigned dynamically
              *
              * */
-            'actions' => $this->getTableActions(),
-
-            'endpoints' => $this->getIndexUrls()
-
-        ] + $this->tableOptions + $this->getViewLayoutVariables();
+            // 'actions' => $this->getTableActions(),
+            'endpoints' => $this->getIndexUrls(),
+        ] + $this->getViewLayoutVariables();
         // $baseUrl = $this->getPermalinkBaseUrl();
+        // dd($this->tableAttributes, $this->getViewLayoutVariables());
 
         $options = [
             'moduleName' => $this->getHeadline($this->moduleName),
-            'routeName' => $this->getHeadline($this->routeName),
-            'listOptions' => $this->getVuetifyDatatableOptions(), // options to be used in unusual datatable component
-
             'translate' => $this->routeHas('translations'),
+
+            'tableAttributes' => array_merge_recursive_preserve(
+                [
+                    'name' => $this->getHeadline($this->routeName),
+                    'titleKey' => $this->titleColumnKey,
+                ],
+                $this->tableAttributes,
+            )
+            + ['rowActions' => $this->getTableActions()],
+
+            'listOptions' => $this->getVuetifyDatatableOptions(), // options to be used in unusual table components in datatable store
+
+            // 'routeName' => $this->getHeadline($this->routeName),
             // 'translateTitle' => $this->titleIsTranslatable(),
 
 
@@ -204,12 +212,12 @@ trait ConfigureViewFields {
      *
      * @return void
      */
-    public function getTableOptions()
+    public function getTableAttributes()
     {
         if(!!$this->config) {
             try {
                 return Collection::make(
-                    $this->getConfigFieldsByRoute('table_options') ?? $this->defaultTableOptions
+                    $this->getConfigFieldsByRoute('table_options') ?? $this->defaultTableAttributes
                 )->toArray();
             } catch (\Throwable $th) {
                 return [];
@@ -640,7 +648,16 @@ trait ConfigureViewFields {
                 $object =  Arr::except($input, ['route','model', 'repository']) + [
                     'items' => $relation_class->all([$input['itemValue'], $input['itemTitle']])->toArray()
                 ];
+            break;
+            case 'switch':
+            case 'checkbox':
+                $input['color'] ??= 'success';
+                $input['trueValue'] ??= 1;
+                $input['falseValue'] ??= 0;
+                $input['hideDetails'] = true;
+                $input['default'] = 0;
 
+                $object = $input;
             break;
             default:
 
@@ -706,13 +723,31 @@ trait ConfigureViewFields {
 
     public function getHeader($header)
     {
-        return $this->hydrateCustomHeader($header + unusualConfig('default_header'));
+        return array_merge_recursive_preserve( unusualConfig('default_header'), $this->hydrateCustomHeader($header) );
     }
 
     public function hydrateCustomHeader($header)
     {
         if($this->isRelationField($header['key']))
             $header['key'] .= '_relation';
+
+        // add edit functionality to table title cell
+        if($this->titleColumnKey == $header['key'] && !isset($header['formatter']))
+            $header['formatter'] = [
+                'edit'
+            ];
+
+        // switch column
+        if(isset($header['formatter']) && count($header['formatter']) && $header['formatter'][0] == 'switch'){
+            $header['width'] = '20px';
+            // $header['align'] = 'center';
+        }
+
+        if($header['key'] == 'actions'){
+            $header['width'] ??= '20px';
+            $header['align'] ??= 'center';
+            $header['sortable'] ??= false;
+        }
 
         return $header;
     }

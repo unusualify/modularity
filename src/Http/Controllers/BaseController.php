@@ -54,8 +54,6 @@ abstract class BaseController extends CoreController
      */
     protected $indexTableColumns;
 
-    protected $tableOptions = [];
-
 
     public function __construct(
         Application $app,
@@ -96,7 +94,7 @@ abstract class BaseController extends CoreController
             ];
         }
 
-        $this->tableOptions = $this->getTableOptions();
+        $this->tableAttributes = $this->getTableAttributes();
     }
 
     public function index($parentId = null)
