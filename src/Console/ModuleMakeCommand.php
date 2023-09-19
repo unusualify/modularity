@@ -47,7 +47,7 @@ class ModuleMakeCommand extends BaseCommand
         //     $this->responses[$_trait] = $this->checkOption($_trait);
         // }
 
-        $console_traits =  collect($traits)->mapWithKeys(function ($item, $key) {
+        $console_traits = collect($traits)->mapWithKeys(function ($item, $key) {
             return ["--{$key}" => $item];
         })->toArray();
 
@@ -90,15 +90,15 @@ class ModuleMakeCommand extends BaseCommand
      */
     protected function getOptions()
     {
-        return [
+        return array_merge([
             ['schema', null, InputOption::VALUE_OPTIONAL, 'The specified migration schema table.', null],
             ['rules', null, InputOption::VALUE_OPTIONAL, 'The specified validation rules for FormRequest.', null],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
-            ['plain', '--p', InputOption::VALUE_NONE, 'Don\'t create route.'],
+            ['plain', null, InputOption::VALUE_NONE, 'Don\'t create route.'],
             ['no-migrate', null, InputOption::VALUE_NONE, 'don\'t migrate.'],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
-        ] + unusualTraitOptions();
+        ], unusualTraitOptions());
     }
 
     /**

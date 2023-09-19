@@ -112,7 +112,7 @@ class ModelMakeCommand extends BaseCommand
     protected function getOptions()
     {
 
-        return [
+        return array_merge([
             ['fillable', null, InputOption::VALUE_OPTIONAL, 'The fillable attributes.', null],
             ['relationships', null, InputOption::VALUE_OPTIONAL, 'The relationship attributes.', null],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
@@ -120,7 +120,7 @@ class ModelMakeCommand extends BaseCommand
             ['soft-delete', 's', InputOption::VALUE_NONE, 'Flag to add softDeletes trait to model.'],
             ['has-factory', null, InputOption::VALUE_NONE, 'Flag to add hasFactory to model.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
-        ] + unusualTraitOptions();
+        ], unusualTraitOptions());
     }
 
     /**
@@ -225,7 +225,7 @@ class ModelMakeCommand extends BaseCommand
 
         $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
 
-        if(!$this->getTraitResponse('translationTrait')){
+        if(!$this->getTraitResponse('addTranslation')){
             $fields = array_merge($this->defaultFillables, $fields);
 
             $fillable = $this->option('fillable');
@@ -251,7 +251,7 @@ class ModelMakeCommand extends BaseCommand
     {
         $attributes = "";
 
-        if($this->getTraitResponse('translationTrait')){
+        if($this->getTraitResponse('addTranslation')){
             $fillable = $this->option('fillable');
 
             $fields = array_merge( $this->defaultFillables, explode(',', $fillable));
@@ -280,7 +280,7 @@ class ModelMakeCommand extends BaseCommand
     {
         $attributes = "";
 
-        if($this->getTraitResponse('slugTrait')){
+        if($this->getTraitResponse('addSlug')){
 
             $fields[] = $this->defaultFillables[0];
 
@@ -443,11 +443,11 @@ class ModelMakeCommand extends BaseCommand
 
         $questions = [
             // 'hasBlocks' => 'Do you need to use the block editor on this module?',
-            'translationTrait' => 'Do you need to translate content on this module?',
+            'addTranslation' => 'Do you need to translate content on this module?',
             // 'slugTrait' => 'Do you need to generate slugs on this module?',
-            'mediaTrait' => 'Do you need to attach images on this module?',
-            'fileTrait' => 'Do you need to attach files on this module?',
-            'positionTrait' => 'Do you need to manage the position of records on this module?',
+            'addMedia' => 'Do you need to attach images on this module?',
+            'addFile' => 'Do you need to attach files on this module?',
+            'addPosition' => 'Do you need to manage the position of records on this module?',
             // 'revisionsTrait' => 'Do you need to enable revisions on this module?',
             // 'nestingTrait' => 'Do you need to enable nesting on this module?',
         ];
@@ -478,7 +478,7 @@ class ModelMakeCommand extends BaseCommand
 
         $modelPath = new GeneratorPath( $this->baseConfig('paths.generator.model') );
 
-        if($this->getTraitResponse('translationTrait')){
+        if($this->getTraitResponse('addTranslation')){
             $content = (new Stub( '/models/translation_model.stub', [
                 'NAMESPACE'         => $this->getClassNamespace($module)."\\Translations",
                 'BASE_MODEL'        => $this->baseConfig('base_model'),
@@ -496,7 +496,7 @@ class ModelMakeCommand extends BaseCommand
             (new FileGenerator($fullPath, $content))->withFileOverwrite($overwriteFile)->generate();
         }
 
-        if( $this->getTraitResponse('slugTrait') ){
+        if( $this->getTraitResponse('addSlug') ){
 
             $content = (new Stub( '/models/slug_model.stub', [
                 'NAMESPACE'         => $this->getClassNamespace($module)."\\Slugs",

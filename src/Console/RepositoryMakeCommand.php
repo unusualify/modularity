@@ -97,11 +97,11 @@ class RepositoryMakeCommand extends BaseCommand
      */
     protected function getOptions()
     {
-        return [
+        return array_merge([
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
-        ] + unusualTraitOptions();
+        ], unusualTraitOptions());
     }
 
     /**
