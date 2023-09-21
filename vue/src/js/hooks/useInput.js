@@ -1,8 +1,7 @@
 // hooks/formatter .js
 
 // import { ref, watch, computed, nextTick } from 'vue'
-import { ref, reactive, toRefs, computed } from 'vue'
-import { useStore } from 'vuex'
+import { reactive, toRefs, computed } from 'vue'
 
 // by convention, composable function names start with "use"
 export default function useInput (props, context) {

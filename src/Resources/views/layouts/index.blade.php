@@ -18,7 +18,7 @@
 @endphp
 
 @section('content')
-    @include("{$BASE_KEY}::components.datatable")
+    @include("{$BASE_KEY}::components.datatable", $tableAttributes ?? [])
 @stop
 
 @push('head_last_js')
@@ -70,21 +70,17 @@
 
     window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.datatable = {
         baseUrl: '{{ rtrim(config('app.url'), '/') . '/' }}',
-
-        name: '{{ $routeName}}',
         headers: {!! json_encode($headers) !!},
-        {{-- inputs: {!! json_encode($inputs) !!}, --}}
         searchText: '{{ $searchText ?? '' }}',
         options: {!! json_encode($listOptions) !!},
-        actions: {!! json_encode($actions) !!},
-        actionsType: '{{ $actionsType ?? 'inline' }}',
-        {{-- initialAsync: '{{ count($tableData['data']) ? true : false }}', --}}
         data: {!! json_encode($initialResource['data']) !!},
         total: '{{ $initialResource['total'] ?? 0 }}',
-
         mainFilters: {!! json_encode($tableMainFilters) !!},
         filter: { status: '{{ $filters['status'] ?? $defaultFilterSlug ?? 'all' }}' },
 
+        {{-- inputs: {!! json_encode($inputs) !!}, --}}
+        {{-- initialAsync: '{{ count($tableData['data']) ? true : false }}', --}}
+        {{-- name: '{{ $routeName}}', --}}
         {{-- columns: {!! json_encode($tableColumns) !!}, --}}
     }
 

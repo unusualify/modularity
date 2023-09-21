@@ -50,7 +50,7 @@ if (!function_exists('createDefaultExtraTableFields')) {
      * @param bool $visibility
      * @return void
      */
-    function createDefaultExtraTableFields($table, $softDeletes = true, $published = false, $publishDates = false, $visibility = true)
+    function createDefaultExtraTableFields($table, $softDeletes = true, $published = true, $publishDates = false, $visibility = false)
     {
 
         if ($published) {

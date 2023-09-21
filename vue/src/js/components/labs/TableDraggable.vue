@@ -71,7 +71,7 @@
     </template>
 
     <template #tbody="props">
-      {{ $log(props.items) }}
+      <!-- {{ $log(props.items) }} -->
       <draggable v-model="props.items" itemKey="value" tag="transition-group" :component-data="{name:'fade'}">
         <!-- {{
           $log(
@@ -93,9 +93,7 @@
       </draggable>
     </template>
 
-    <template v-if="hideHeaders" v-slot:headers="{ columns, isSorted, getSortIcon, toggleSort }">
-
-    </template>
+    <template v-if="hideHeaders" v-slot:headers="{ columns, isSorted, getSortIcon, toggleSort }"></template>
 
     <template v-slot:bottom="{page, pageCount}">
       <div class="text-right py-theme">

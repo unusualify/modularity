@@ -74,17 +74,14 @@ class MigrationMakeCommand extends BaseCommand
      */
     protected function getOptions()
     {
-        return [
+
+        return array_merge([
             ['fields', null, InputOption::VALUE_OPTIONAL, 'The specified fields table.', null],
             ['plain', null, InputOption::VALUE_NONE, 'Create plain migration.'],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
-            // ['translationTrait', '--T', InputOption::VALUE_NONE, 'Whether model has translation trait or not'],
-            // ['positionTrait', '--P', InputOption::VALUE_NONE, 'Whether model has position trait or not'],
-            // ['mediasTrait', '--M', InputOption::VALUE_NONE, 'Whether model has media trait or not'],
-            // ['filesTrait', '--F', InputOption::VALUE_NONE, 'Whether model has file trait or not'],
-        ] + unusualTraitOptions();
+        ], unusualTraitOptions());
     }
 
     /**
@@ -153,11 +150,11 @@ class MigrationMakeCommand extends BaseCommand
 
         $fields = '';
 
-        if($this->option('positionTrait')){
+        if($this->option('addPosition')){
             $fields .= "position:integer:unsigned:nullable,";
         }
 
-        if(!$this->option('translationTrait')){
+        if(!$this->option('addTranslation')){
             $fields .= implode(",", $this->defaultFieldSchemas).",";
             $fields .= $this->option('fields');
         }
@@ -170,7 +167,7 @@ class MigrationMakeCommand extends BaseCommand
         $schemas = "";
         $singular_table = Str::singular( (new NameParser($this->argument('name')))->getTableName() );
 
-        if($this->option('translationTrait')){
+        if($this->option('addTranslation')){
             $fields = implode(",", $this->defaultFieldSchemas).","
                 .$this->option('fields');
 
@@ -192,7 +189,7 @@ class MigrationMakeCommand extends BaseCommand
 
         $singular_table = Str::singular( $table );
 
-        if($this->option('translationTrait')){
+        if($this->option('addTranslation')){
             // $results = "\t\t\t" . '$table';
             $schemas .= "\t\t\tSchema::dropIfExists('{$singular_table}_translations');\n";
         }

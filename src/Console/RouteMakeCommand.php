@@ -91,7 +91,6 @@ class RouteMakeCommand extends BaseCommand
         $route = $this->argument('route');
 
         $module = $this->argument('module');
-        // dd($name, $module);
 
         $traits = activeUnusualTraits($this->options());
 
@@ -141,7 +140,7 @@ class RouteMakeCommand extends BaseCommand
      */
     protected function getOptions()
     {
-        return [
+        return array_merge([
             ['schema', null, InputOption::VALUE_OPTIONAL, 'The specified migration schema table.', null],
             ['rules', null, InputOption::VALUE_OPTIONAL, 'The specified validation rules for FormRequest.', null],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
@@ -149,7 +148,7 @@ class RouteMakeCommand extends BaseCommand
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
             ['no-migrate', null, InputOption::VALUE_NONE, 'don\'t migrate.'],
-        ] + unusualTraitOptions();
+        ], unusualTraitOptions());
     }
 
     private function checkOption($option)

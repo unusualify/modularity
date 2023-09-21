@@ -45,10 +45,12 @@
             "OoBook\\CRM\\Base\\": "src"
         },
         "files": [
-          "src/Support/Migrations/SchemaParser.php"
+          "src/Support/Migrations/SchemaParser.php",
+          "src/Services/Translation.php"
         ],
         "exclude-from-classmap": [
-          "../../../vendor/nwidart/laravel-modules/src/Support/Migrations/SchemaParser.php"
+          "../../../vendor/nwidart/laravel-modules/src/Support/Migrations/SchemaParser.php",
+          "../../../vendor/joedixon/laravel-translation/src/Drivers/Translation.php"
         ]
     },
     "minimum-stability": "dev",

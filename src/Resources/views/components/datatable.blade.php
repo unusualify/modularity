@@ -1,7 +1,21 @@
-<div class="mx-5 my-5">
+@once
+    @php
+        $defaultTableAttributes = [
+            'hideDefaultFooter' => false,
+            'createOnModal' => true,
+            'editOnModal' => true,
+        ];
+    @endphp
+@endonce
+
+@php
+    $vBind = array_merge_recursive_preserve($defaultTableAttributes, $tableAttributes ?? []);
+@endphp
+
+<ue-datatable v-bind='@json($vBind)' />
+{{-- <div class="mx-5 my-5">
     <ue-datatable
         title-key="{{ $titleKey }}"
-        {{-- name="{{$name}}" --}}
         name="{{ $routeName }}"
         :hide-default-header="false"
         :hide-default-footer="false"
@@ -9,13 +23,5 @@
         :create-on-modal="@json($createOnModal ?? true)"
         :edit-on-modal="@json($editOnModal ?? true)"
     >
-
-        {{-- <ue-modal-create
-            slot="FormDialog"
-            route-name="{{ $routeName }}"
-            inputs='@json($tableInputs)'
-            >
-        </ue-modal-create> --}}
-
     </ue-datatable>
-</div>
+</div> --}}

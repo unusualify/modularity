@@ -1,19 +1,22 @@
 @once
     @php
-        $default_attributes = [
-            'class' => 'h-100',
+        $defaultTableAttributes = [
+            'class' => 'ue-table',
             'name' => $routeName ?? 'Item',
             'titleKey' => $titleKey ?? 'name',
             'hideDefaultFooter' => false,
             'createOnModal' => true,
             'editOnModal' => true,
-            'embeddedForm' => true
+            'embeddedForm' => true,
+            'formWidth' => '60%',
+            // 'showSelect' => true,
         ];
     @endphp
 @endonce
 
 @php
-    $vBind = array_merge_recursive_preserve($default_attributes, $_attributes ?? []);
+    $vBind = array_merge_recursive_preserve($defaultTableAttributes, $tableAttributes ?? []);
+    // dd($vBind)
 @endphp
 
 {{-- <div class="rounded">

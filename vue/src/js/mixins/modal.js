@@ -1,12 +1,19 @@
 import htmlClasses from '@/utils/htmlClasses'
+import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
+const makeModalProps = propsFactory({
+  modelValue: {
+    type: Boolean,
+    default: false
+  }
+})
 export default {
   emits: ['update:modelValue', 'confirm', 'cancel'],
   props: {
-    modelValue: {
-      type: Boolean,
-      default: false
-    },
+    // modelValue: {
+    //   type: Boolean,
+    //   default: false
+    // },
     cancelText: {
       type: String,
       default: ''
@@ -14,7 +21,8 @@ export default {
     confirmText: {
       type: String,
       default: ''
-    }
+    },
+    ...makeModalProps()
   },
   data () {
     return {
@@ -60,7 +68,6 @@ export default {
       }
       this.$emit('cancel')
     },
-
     confirmModal (callback = null) {
       if (typeof this.confirmCallback === 'undefined') {
         if (callback) {

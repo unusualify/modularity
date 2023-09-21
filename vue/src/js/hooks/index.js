@@ -1,6 +1,7 @@
 export { default as useFormatter } from './useFormatter.js'
 export { default as useInput } from './useInput.js'
 export { default as useInputHandlers } from './useInputHandlers.js'
-export { default as useTable } from './useTable.js'
+export { default as useTable, makeTableProps } from './useTable.js'
 export { default as useValidation } from './useValidation.js'
 export { default as useFormBase } from './useFormBase.js'
+export { default as useModal, makeModalProps } from './useModal.js'

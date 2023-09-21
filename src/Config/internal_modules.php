@@ -14,10 +14,10 @@ return [
                 'route_name' => 'user',
                 'icon' => '$users',
                 'table_options' => [
-                    'createOnModal' => false,
+                    'createOnModal' => true,
                     'editOnModal' => true,
                     'isRowEditing' => true,
-                    'actionsType' => 'inline',
+                    'rowActionsType' => 'inline',
                 ],
                 'headers' => [
                     [
@@ -102,27 +102,29 @@ return [
                     'createOnModal' => false,
                     'editOnModal' => false,
                     'isRowEditing' => true,
-                    'actionsType' => 'inline',
+                    'rowActionsType' => 'inline',
                 ],
                 'headers' => [
                     [
                         'title' => 'Name',
                         'key' => 'name',
                         'align' => 'start',
-                        'sortable' => true,
+                        'sortable' => false,
                         'filterable' => false,
                         'groupable' => false,
                         'divider' => false,
                         'class' => '', // || []
                         'cellClass' => '', // || []
-                        'width' => '', // || int
+                        // 'width' => '', // || int
                         // vuetify datatable header fields end
 
                         // custom fields for ue-datatable start
                         'searchable' => true,
-                        'isRowEditable' => true,
-                        'isColumnEditable' => true,
-                        'formatter' => [],
+                        'isRowEditable' => false,
+                        'isColumnEditable' => false,
+                        'formatter' => [
+                            0 => 'edit',
+                        ],
                         // custom fields for ue-datatable end
                     ],
                     [
@@ -136,7 +138,7 @@ return [
                         'divider' => false,
                         'class' => '', // || []
                         'cellClass' => '', // || []
-                        'width' => '', // || int
+                        // 'width' => '', // || int
                         // vuetify datatable header fields end
 
                         // custom fields for ue-datatable start
@@ -169,6 +171,7 @@ return [
                     [
                         'title' => 'Actions',
                         'key' => 'actions',
+                        'width' => 50,
                         'sortable' => false
                     ],
                 ],
@@ -954,12 +957,12 @@ return [
                 'url' => 'permissions',
                 'route_name' => 'permission',
                 'icon' => '$permission',
-                'model' => \Spatie\Permission\Models\Permission::class,
+                // 'model' => \Spatie\Permission\Models\Permission::class,
                 'table_options' => [
                     'createOnModal' => true,
                     'editOnModal' => true,
                     'isRowEditing' => true,
-                    'actionsType' => 'inline',
+                    'rowActionsType' => 'inline',
                 ],
                 'headers' => [
                     [
@@ -968,6 +971,9 @@ return [
                         'align' => 'start',
                         'sortable' => false,
                         'searchable' => true,
+                        'formatter' => [
+                            0 => 'edit',
+                        ],
                     ],
                     [
                         'title' => 'Guard Name',
@@ -1251,7 +1257,7 @@ return [
                     'createOnModal' => true,
                     'editOnModal' => true,
                     'isRowEditing' => true,
-                    'actionsType' => 'inline',
+                    'rowActionsType' => 'inline',
                 ],
                 'headers' => [
                     [

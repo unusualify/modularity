@@ -1,7 +1,7 @@
 import axios from 'axios'
-// import {
-//     globalError
-// } from '@/utils/errors'
+import {
+  globalError
+} from '@/utils/errors'
 
 const component = 'FORM'
 
@@ -14,7 +14,7 @@ export default {
         message: 'Get request error.',
         value: resp
       }
-      // globalError(component, error)
+      globalError(component, error)
       if (errorCallback && typeof errorCallback === 'function') errorCallback(resp)
     })
   },
@@ -22,12 +22,11 @@ export default {
     axios.post(endpoint, data).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
-      __log(resp)
       const error = {
         message: 'Post request error.',
         value: resp
       }
-      // globalError(component, error)
+      globalError(component, error)
       if (errorCallback && typeof errorCallback === 'function') errorCallback(resp)
     })
   },
@@ -36,10 +35,10 @@ export default {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
       const error = {
-        message: 'Save request error.',
+        message: 'Put request error.',
         value: resp
       }
-      // globalError(component, error)
+      globalError(component, error)
       if (errorCallback && typeof errorCallback === 'function') errorCallback(resp)
     })
   }

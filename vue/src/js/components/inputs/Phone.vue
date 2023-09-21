@@ -2,7 +2,7 @@
   <div :class="['vue-tel-input-vuetify', $lodash.pick(boundProps, ['wrapperClasses']) ?? getDefault('wrapperClasses')]">
     <v-row>
       <v-col cols="5" xl="4" style="padding-right: 1px;">
-        <v-select
+        <v-combobox
           :ref="makeReference('countryInput')"
           v-model="countryCode"
           :items="sortedCountries"
@@ -21,17 +21,18 @@
               {{ activeCountry.iso2 }}
             </span> -->
           </template>
-          <template #item="{props}">
-            <!-- {{  $log(props) }} -->
-            <v-list-item :title="`${props.value.name} +${props.value.dialCode}`" @click="props.onClick">
+          <template #item="itemSlot">
+            <!-- {{  $log(itemSlot) }} -->
+            {{ itemSlot.item.raw.name }}
+            <!-- <v-list-item :title="`${itemSlot.item.raw.name} +${itemSlot.item.raw.dialCode}`" @click="itemSlot.props.onClick">
               <template #prepend>
-                <span :class="props.value.iso2.toLowerCase()" class="vti__flag" />
+                <span :class="itemSlot.raw.iso2.toLowerCase()" class="vti__flag" />
               </template>
-            </v-list-item>
+            </v-list-item> -->
             <!-- <span :class="item.iso2.toLowerCase()" class="vti__flag" />
             <span>{{ item.name }} {{ `+${item.dialCode}` }}</span> -->
           </template>
-        </v-select>
+        </v-combobox>
       </v-col>
       <v-col cols="7" xl="8" style="padding-left: 0px;">
         <v-text-field

@@ -24,6 +24,7 @@ return [
 
     'locale' => 'en',
     'fallback_locale' => 'en',
+    'timezone' => 'Europe/London',
 
     'default_input' => [
         'type' => 'text',
@@ -178,7 +179,7 @@ return [
     ],
 
     'traits' => [
-        'translationTrait' => [
+        'addTranslation' => [
             'model' => 'HasTranslation',
             'repository' => 'TranslationsTrait',
             'question' => 'Do you need to translate content on this route?',
@@ -188,7 +189,7 @@ return [
                 'description' => 'Whether model has translation trait or not'
             ]
         ],
-        'mediaTrait' => [
+        'addMedia' => [
             'model' => 'HasMedias',
             'repository' => 'MediasTrait',
             'question' => 'Do you need to attach images on this module?',
@@ -198,7 +199,7 @@ return [
                 'description' => 'Do you need to attach images on this module?'
             ]
         ],
-        'fileTrait' => [
+        'addFile' => [
             'model' => 'HasFiles',
             'repository' => 'FilesTrait',
             'question' => 'Do you need to attach files on this module?',
@@ -208,7 +209,7 @@ return [
                 'description' => 'Do you need to attach files on this module?'
             ]
         ],
-        'positionTrait' => [
+        'addPosition' => [
             'model' => 'HasPosition',
             'question' => 'Do you need to manage the position of records on this module?',
             'command_option' => [

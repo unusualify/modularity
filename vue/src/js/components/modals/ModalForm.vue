@@ -4,7 +4,6 @@
     @update:modelValue="$emit('update:modelValue', $event)"
 
     scrollable
-    content-class="bg-primary"
     width-type="lg"
     systembar
     @screenListener="screenListener"
@@ -13,29 +12,27 @@
 
     >
     <template v-slot:activator="{ props }">
-      <slot
-          name="activator"
-          :props="{...props}"
-          >
-      </slot>
+      <slot name="activator" :props="{...props}" />
     </template>
 
-    <template
-      v-slot:body="props"
-      >
+    <template v-slot:body="props">
       <v-card >
         <v-card-title class="text-h5 grey lighten-2">
           <slot name="title">
-              <span class="text-h5" >
+              <!-- <span class="text-h5" >
                 {{ formTitle }}
-              </span>
+              </span> -->
           </slot>
         </v-card-title>
         <v-card-text>
           <!-- <ue-form :ref="formReference()"/> -->
-          <ue-form :ref="formRef"/>
+          <ue-form
+            :title="formTitle"
+            :ref="formRef"/>
         </v-card-text>
+
         <v-divider></v-divider>
+
         <v-card-actions>
             <v-spacer></v-spacer>
             <!-- <v-btn
@@ -91,7 +88,7 @@ export default {
       return this.$t((this.editedIndex === -1 ? 'new-item' : 'edit-item'), { item: this.routeName })
     },
     activatorText () {
-      return this.$t('new-item', { item: this.routeName })
+      return this.$t('add-item', { item: this.routeName })
     },
     formRef () {
       return this.id + '-form'

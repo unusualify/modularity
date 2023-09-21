@@ -121,7 +121,7 @@ class RouteGenerator extends Generator
         'createOnModal' => true,
         'editOnModal' => true,
         'isRowEditing' => false,
-        'actionsType' => 'inline',
+        'rowActionsType' => 'inline',
     ];
 
     /**

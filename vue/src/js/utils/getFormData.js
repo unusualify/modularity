@@ -160,25 +160,27 @@ export const getSchemaModel = (inputs, item = null) => {
   // __log(window[process.env.VUE_APP_NAME].STORE.languages.all)
   const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist'
   const editing = __isset(item) && !!item.id
+  const submitting = __isset(item)
 
   const values = Object.keys(inputs).reduce((a, c) => {
     // default model value
     let value = Object.prototype.hasOwnProperty.call(inputs[c], 'default') ? inputs[c].default : ''
     if (isArrayable.includes(inputs[c].type)) {
-      value = editing ? item[c] : []
+      value = submitting ? item[c] : []
     }
 
     if (__isObject(inputs[c])) {
       if (Object.prototype.hasOwnProperty.call(inputs[c], 'translated')) {
         a[inputs[c].name] = window[process.env.VUE_APP_NAME].STORE.languages.all.reduce(function (map, language) {
-          if (editing) {
+          if (submitting && Object.prototype.hasOwnProperty.call(item, 'translations')) {
+            // __log(item, submitting)
             value = find(item.translations, { locale: language.value })[inputs[c].name]
           }
           map[language.value] = value
           return map
         }, {})
       } else {
-        a[inputs[c].name] = editing ? item[inputs[c].name] : value
+        a[inputs[c].name] = submitting ? item[inputs[c].name] : value
       }
     }
     return a
@@ -187,6 +189,8 @@ export const getSchemaModel = (inputs, item = null) => {
   if (editing) {
     values.id = item.id
   }
+
+  // __log(values)
 
   return values
 

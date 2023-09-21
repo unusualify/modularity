@@ -1,5 +1,7 @@
 <template>
   <v-data-table-server
+    v-bind="$bindAttributes()"
+
     class="elevation-1 "
     :headers="headers"
     :items="elements"
@@ -41,8 +43,14 @@
       >
         <!-- #title.left-top -->
         <v-toolbar-title>
-          {{ $t('list-of-item', [name, $t('modules.' + $lodash.snakeCase(name) )] ) }}
-          <!-- {{ $t('errors.missingMessage') }} -->
+          <!-- {{ $t('list-of-item', [name, $t('modules.' + $lodash.snakeCase(name) )] ) }} -->
+          <slot name="header" v-bind="{tableTitle}">
+            <ue-title
+              :text="tableTitle"
+              :classes="['ue-table-header', 'pt-theme', 'pb-theme']"
+              padding-reset
+            />
+          </slot>
         </v-toolbar-title>
 
         <v-divider class="mx-4" inset vertical></v-divider>
@@ -100,51 +108,104 @@
         <v-spacer></v-spacer>
 
         <!-- #form dialog -->
-        <slot
-          v-if="(createOnModal || editOnModal) && !embeddedForm"
-          name="FormDialog"
-          >
-          <ue-modal-form
+        <slot v-if="(createOnModal || editOnModal) && !embeddedForm" name="formDialog" >
+          <!-- <ue-modal-form
               ref="formModal"
               v-model="formActive"
               :route-name="name"
               >
+              <template v-slot:title>
+
+              </template>
               <template v-slot:activator="{props}">
                 <v-btn-success
                     v-if="createOnModal"
                     v-bind="props"
                     dark
                     >
-                    {{ $t('new-item', {'item': name} ) }}
+                    {{ $t('add-item', {'item': name} ) }}
                 </v-btn-success>
               </template>
-          </ue-modal-form>
+          </ue-modal-form> -->
+          <ue-modal
+              ref="formModal"
+              v-model="formActive"
+              scrollable
+              transition="dialog-bottom-transition"
+              width-type="xl"
+              >
+              <template v-slot:activator="{props}">
+                <v-btn-success v-if="createOnModal" v-bind="props" dark>
+                    {{ $t('add-item', {'item': transNameSingular} ) }}
+                </v-btn-success>
+              </template>
+              <template v-slot:body="props">
+                <v-card >
+                  <v-card-title class="text-h5 grey lighten-2"> </v-card-title>
+
+                  <v-card-text>
+                    <ue-form :title="formTitle" :ref="formRef"/>
+                  </v-card-text>
+
+                  <v-divider/>
+
+                  <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="error darken-1" text @click="closeForm()">
+                          {{ props.textCancel }}
+                      </v-btn>
+                      <v-btn color="teal darken-1" text @click="confirmFormModal()">
+                          {{ $t('save') }}
+                      </v-btn>
+                  </v-card-actions>
+
+                </v-card>
+              </template>
+          </ue-modal>
         </slot>
 
-        <v-btn-success
-          v-if="!createOnModal"
-          :href="createUrl"
-          target="_blank"
-          dark
-          >
-          {{ $t('new-item', {'item': name} ) }}
+        <v-btn-success v-if="!createOnModal" :href="createUrl" target="_blank" dark>
+          {{ $t('add-item', {'item': transNameSingular} ) }}
         </v-btn-success>
 
-        <!-- general #dialog -->
-        <ue-modal-dialog
-          v-model="dialogActive"
+        <!-- #deletemodal-->
+        <!-- <ue-modal-dialog
+          v-model="deleteModalActive"
           ref="dialog"
           :description="dialogDescription"
           @cancel="resetEditedItem"
           @confirm="deleteRow"
         >
-        </ue-modal-dialog>
+        </ue-modal-dialog> -->
+        <ue-modal
+          ref="deleteModal"
+          v-model="deleteModalActive"
+          transition="dialog-bottom-transition"
+          width-type="md"
+          >
+          <template v-slot:body="props" >
+            <v-card >
+              <v-card-title class="text-h5 text-center" style="word-break: break-word;">
+                <!-- {{ textDescription }} -->
+              </v-card-title>
+              <v-card-text class="text-center" style="word-break: break-word;" >
+                {{ deleteQuestion }}
+              </v-card-text>
+              <v-divider/>
+              <v-card-actions>
+                <v-spacer/>
+                <v-btn color="blue" text @click="closeDeleteModal()"> {{ props.textCancel }}</v-btn>
+                <v-btn color="blue" text @click="deleteRow()"> {{ props.textConfirm }}</v-btn>
+                <v-spacer></v-spacer>
+              </v-card-actions>
+            </v-card>
+          </template>
+        </ue-modal>
 
       </v-toolbar>
     </template>
 
     <template v-slot:column.actions="_obj">
-      {{ $log(_obj) }}
       <v-menu
         :close-on-content-click="false"
         open-on-hover
@@ -210,7 +271,7 @@
 
         </v-list>
       </v-menu>
-      <div v-else>
+      <template v-else>
 
         <v-icon
           v-for="(action, k) in rowActions"
@@ -223,7 +284,7 @@
           <!-- {{ $log(item, elements.find((_item => _item.id == item.value))) }} -->
           {{ action.icon ? action.icon : '$' + action.name }}
         </v-icon>
-      </div>
+      </template>
     </template>
 
     <template v-slot:no-data>
@@ -245,13 +306,26 @@
         <template v-if="col.formatter == 'edit'">
           <v-btn
             :key="i"
-            class="pa-0"
+            class="pa-0 justify-start"
             variant="plain"
             :color="`primary darken-1`"
             @click="editItem(item.raw)"
             >
             {{ item.raw[col.key] }}
           </v-btn>
+        </template>
+        <template v-else-if="col.formatter == 'switch'">
+            <v-switch
+              :key="i"
+              :model-value="item.raw[col.key]"
+              color="success"
+              :true-value="1"
+              false-value="0"
+              hide-details
+              @update:modelValue="switchItem($event, col.key, item.raw)"
+              >
+              <template v-slot:label></template>
+            </v-switch>
         </template>
         <template v-else>
           {{ handleFormatter(col.formatter, item.raw[col.key] ) }}
@@ -356,15 +430,16 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import { VDataTable, VDataTableServer } from 'vuetify/labs/VDataTable'
+import {
+  // VDataTable,
+  VDataTableServer
+} from 'vuetify/labs/VDataTable'
 import ACTIONS from '@/store/actions'
 
-import { TableMixin } from '@/mixins'
-import { useTable } from '@/hooks'
+import { useTable, makeTableProps } from '@/hooks'
 import { ALERT } from '@/store/mutations'
 
 export default {
-  mixins: [TableMixin],
   components: {
     // VDataTable,
     VDataTableServer
@@ -375,7 +450,7 @@ export default {
     }
   },
   props: {
-
+    ...makeTableProps()
   },
   data: function () {
     return {
@@ -420,7 +495,6 @@ export default {
     columnChanged (value) {
       this.cellInput = value
     },
-
     hideColumn (key) {
       this.headers = this.headers.filter(header => header.key !== key)
     },
@@ -436,6 +510,12 @@ export default {
 
         this.$store.dispatch(ACTIONS.SAVE_FORM, { item: data })
       }
+    },
+    confirmFormModal () {
+      const self = this
+      this.$refs[this.formRef].saveForm((res) => {
+        if (Object.prototype.hasOwnProperty.call(res, 'variant') && res.variant.toLowerCase() === 'success') { self.closeForm() }
+      })
     }
   }
 }

@@ -20,6 +20,7 @@ export const ADD_FORM_FIELDS = 'addFormField'
 export const EMPTY_FORM_FIELDS = 'emptyFormField'
 
 export const SET_EDITED_ITEM = 'setEditedItem'
+export const RESET_EDITED_ITEM = 'resetEditedItem'
 
 /* Modal forms */
 export const EMPTY_MODAL_FIELDS = 'emptyModalField'
@@ -29,7 +30,8 @@ export const REPLACE_MODAL_FIELDS = 'replaceModalField'
 
 export default {
   SET_EDITED_ITEM,
-  
+  RESET_EDITED_ITEM,
+
   PREVENT_SUBMIT,
   ALLOW_SUBMIT,
   UPDATE_FORM_PERMALINK,

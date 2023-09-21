@@ -239,8 +239,8 @@
                   v-else-if="/(switch|checkbox)/.test(obj.schema.type)"
                   :is="mapTypeToComponent(obj.schema.type)"
                   :modelValue="setValue(obj)"
+                  @update:modelValue="onInput($event, obj)"
                   v-bind="bindSchema(obj)"
-                  @change="onInput($event, obj)"
                 >
                   <!-- component doesn't work with #[s]="slotData" " -->
                   <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index }"/></template>
@@ -732,6 +732,12 @@ export default {
       return { ...defaultPickerSchemaMenu, ...obj.schema.menu }
     },
     bindSchema (obj) {
+      if (Object.prototype.hasOwnProperty.call(obj.schema, 'falseValue') && obj.schema.falseValue == 0) {
+        obj.schema.falseValue = '0'
+      }
+      // if (Object.prototype.hasOwnProperty.call(obj.schema, 'falseValue') && obj.schema.falseValue == 1) {
+      //   obj.schema.falseValue = '0'
+      // }
       return obj.schema
     },
     suspendClickAppend (obj) {

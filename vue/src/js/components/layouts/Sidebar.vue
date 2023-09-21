@@ -40,11 +40,11 @@
                 </v-btn>
             </div>
             <div class="d-flex justify-content-center pa-2">
-                <ue-logout-dialog :csrf="$root.csrf" />
+                <ue-logout-modal :csrf="$root.csrf" />
             </div>
         </template> -->
         <template v-slot:append>
-          <ue-logout-dialog :csrf="$root.csrf">
+          <ue-logout-modal :csrf="$root.csrf">
             <template v-slot:activator="{props}">
               <v-btn
                   class="v-button--logout my-3"
@@ -59,9 +59,8 @@
                   {{$t('authentication.logout')}}
               </v-btn>
             </template>
-          </ue-logout-dialog>
-          <div class="">
-          </div>
+          </ue-logout-modal>
+
           <div class="d-flex justify-center">
             <v-btn
               v-for="[_icon, _link] in socialMediaLinks"

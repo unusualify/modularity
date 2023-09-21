@@ -1,14 +1,11 @@
 <template>
   <v-dialog
     v-model="dialog"
-    v-bind="{
-        ...$bindAttributes()
-    }"
+    v-bind="$bindAttributes()"
+    transition="dialog-bottom-transition"
     :fullscreen="full"
     :width="modalWidth"
-    transition="dialog-bottom-transition"
     >
-
     <template v-for="(_, name) in $slots" v-slot:[name]="slotProps">
       <slot :name="name" v-bind="slotProps || {}"></slot>
     </template>
@@ -17,14 +14,13 @@
       <slot name="activator" :props="{...props}"></slot>
     </template> -->
 
-    <v-card>
+    <!-- <v-card>
       <slot v-if="systembar" name="systembar">
         <v-layout style="height: 40px">
           <v-system-bar dark>
             <v-icon @click="toggleFullScreen()" :x-small="full">
               mdi-checkbox-blank-outline
             </v-icon>
-            <!-- <v-icon @click="cancelModal(on.closeDialog)" >mdi-close</v-icon> -->
             <v-icon @click="close()">mdi-close</v-icon>
           </v-system-bar>
         </v-layout>
@@ -38,68 +34,74 @@
         :closeDialog="close"
         >
       </slot>
-    </v-card>
+    </v-card> -->
+
+    <slot v-if="systembar" name="systembar">
+      <v-layout style="height: 40px">
+        <v-col>
+          <v-system-bar dark>
+            <v-icon @click="toggleFullScreen()" :x-small="full">
+              mdi-checkbox-blank-outline
+            </v-icon>
+            <v-icon @click="close()">mdi-close</v-icon>
+          </v-system-bar>
+        </v-col>
+      </v-layout>
+    </slot>
+    <slot name="body"
+        v-bind="{
+            textCancel: this.textCancel,
+            textConfirm: this.textConfirm,
+
+            onOpen: this.open,
+            onClose: this.close,
+            onConfirm: this.confirm,
+        }"
+        :closeDialog="close"
+        >
+    </slot>
   </v-dialog>
 </template>
 
 <script>
 import htmlClasses from '@/utils/htmlClasses'
+import { makeModalProps, useModal } from '@/hooks'
 
 export default {
   emits: ['update:modelValue'],
   props: {
-    modelValue: {
-      type: Boolean
-    },
-    name: {
-      type: String,
-      default: 'Item'
-    },
-    transition: {
-      type: String,
-      default: 'bottom'
-    },
-
-    widthType: {
-      type: String
-    },
-    systembar: {
-      type: Boolean,
-      default: false
-    },
-    fullscreen: {
-      type: Boolean,
-      default: false
-    }
-
+    ...makeModalProps()
   },
-  data () {
+  setup (props, context) {
     return {
-      // dialog: this.value,
-      widths: {
-        sm: '300px',
-        md: '500px',
-        lg: '750px'
-      },
-      width: this.widthType,
-
-      modalClass: htmlClasses.modal,
-      firstFocusableEl: null,
-      lastFocusableEl: null,
-
-      full: this.fullscreen
+      ...useModal(props, context)
     }
   },
+  // data () {
+  //   return {
+  //     // dialog: this.value,
+  //     widths: {
+  //       sm: '300px',
+  //       md: '500px',
+  //       lg: '750px'
+  //     },
+  //     width: this.widthType,
+
+  //     modalClass: htmlClasses.modal,
+
+  //     full: this.fullscreen
+  //   }
+  // },
 
   computed: {
-    dialog: {
-      get () {
-        return this.modelValue
-      },
-      set (value) {
-        this.$emit('update:modelValue', value)
-      }
-    },
+    // dialog: {
+    //   get () {
+    //     return this.modelValue
+    //   },
+    //   set (value) {
+    //     this.$emit('update:modelValue', value)
+    //   }
+    // },
     // full: {
     //     get () {
     //         return this.fullscreen
@@ -109,40 +111,59 @@ export default {
     //         // this.$emit('screenListener', this.full)
     //     }
     // },
-    togglePersistent () {
-      return this.persistent
-    },
 
-    toggleScrollable () {
-      return this.scrollable
+    // togglePersistent () {
+    //   return this.persistent
+    // },
+
+    // toggleScrollable () {
+    //   return this.scrollable
+    // },
+    // modalWidth () {
+    //   return this.width ? this.widths[this.width] : null
+    // },
+
+    textCancel () {
+      return this.cancelText !== '' ? this.cancelText : this.$t('cancel')
     },
-    modalWidth () {
-      return this.width ? this.widths[this.width] : null
+    textConfirm () {
+      return this.confirmText !== '' ? this.confirmText : this.$t('confirm')
     }
   },
 
   watch: {
-    dialog (newVal, oldVal) {
-    //   __log('modal vue watcher dialog', newVal, oldVal)
-    }
+    // dialog (value, oldVal) {
+    //   __log('modal vue watcher dialog', value, oldVal)
+    //   this.$emit('update:modelValue', value)
+    // }
   },
 
   methods: {
     toggle () {
       this.dialog = !this.dialog
     },
-    close () {
+    close (callback = null) {
+      __log('model.vue close()', callback)
+      if (callback) {
+        callback()
+      }
       this.dialog = false
     },
-    open () {
+    open (callback = null) {
+      if (callback) {
+        callback()
+      }
       this.dialog = true
     },
-    confirm () {
+    confirm (callback = null) {
+      if (callback) {
+        callback()
+      }
       this.dialog = false
     },
-    attrs (attrs) {
-      return attrs
-    },
+    // attrs (attrs) {
+    //   return attrs
+    // },
     toggleFullScreen () {
       this.full = !this.full
     },

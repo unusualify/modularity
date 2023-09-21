@@ -307,7 +307,7 @@ if (! function_exists('unusualTraitOptions')) {
                     $trait['command_option']['input_type'] ?? InputOption::VALUE_NONE,
                     $trait['command_option']['description'] ?? '',
                 ];
-            })->toArray();
+            })->values()->toArray();
     }
 }
 

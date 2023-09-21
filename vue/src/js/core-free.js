@@ -32,7 +32,7 @@ app.use(exports.UEConfig)
 
 // Component Includes
 app.component('ue-datatable', UEDatatable)
-app.component('ue-modal-form', UEModalForm)
+// app.component('ue-modal-form', UEModalForm)
 
 const includeClientComponents = require.context('__components/customs', true, /\.vue$/i)
 app.config.globalProperties.registerComponents(includeClientComponents, 'customs', 'ue-custom')

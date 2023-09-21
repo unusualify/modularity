@@ -58,12 +58,11 @@ export default {
     app.config.globalProperties.$app = app
 
     app.config.errorHandler = (err) => {
-      err
       // __log(err)
     }
 
     // set locale wrt user profile preference
-    // __log(store._state.data.currentUser.locale)
+    // __log(i18n.global)
     i18n.global.locale.value = store._state.data.currentUser.locale
     // i18n.global.locale = store._state.data.currentUser.locale
 
@@ -73,7 +72,8 @@ export default {
           i18n.global.setLocaleMessage(language, response.data[language])
         }
       })
-    // i18n.global.setLocaleMessage('tr', { 'AT A GLANCE': 'GENEL BAKIŞ İşte' })
+
+    // i18n.global.setDateTimeFormat('tr', 'Europe/Istanbul')
 
     // add Global methods to all components
     app.config.globalProperties = {
@@ -126,7 +126,7 @@ export default {
     // app.component('v-form-base', VFormBase);
     app.component('v-custom-form-base', VCustomFormBase)
     app.component('ue-modal', UEModal)
-    app.component('ue-modal-dialog', UEModalDialog)
+    // app.component('ue-modal-dialog', UEModalDialog)
     app.component('ue-modal-media', UEModalMedia)
     // Vue.component('ue-medialibrary', UEMediaLibrary)
 
