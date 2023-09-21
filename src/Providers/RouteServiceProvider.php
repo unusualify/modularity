@@ -6,7 +6,7 @@ use Illuminate\Container\Util;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
-
+use OoBook\CRM\Base\Http\Controllers\GlideController;
 use OoBook\CRM\Base\Facades\UnusualRoutes;
 use Nwidart\Modules\Facades\Module;
 use OoBook\CRM\Base\Http\Controllers\DashboardController;
@@ -308,7 +308,7 @@ class RouteServiceProvider extends ServiceProvider
                 // Prevent Laravel from generating route names with duplication
                 $resourceCustomGroupPrefix = '';
             }
-
+        
             foreach ($customRoutes as $route) {
                 $routeSlug = "{$prefixSlug}/{$route}";
                 $mapping = [

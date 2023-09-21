@@ -66,13 +66,12 @@ abstract class Repository
         //     DB::table('roles'),
         //     get_class_methods(DB::table('roles'))
         // );
-
+       
         $query = $query->with($this->formatWiths($query, $with));
-
+       
         if( isset($scopes['searches']) && isset($scopes['search']) && is_array($scopes['searches']) ){
 
             $this->searchIn($query, $scopes, 'search', $scopes['searches']);
-
             unset($scopes['searches']);
         }
         $query = $this->filter($query, $scopes);
@@ -95,6 +94,7 @@ abstract class Repository
             //     $query->paginate($perPage)
             // );
             return $query->paginate($perPage);
+            
         } catch (\Throwable $th) {
             //throw $th;
             dd(

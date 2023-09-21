@@ -44,14 +44,31 @@ class ConfigServiceProvider extends ServiceProvider
         // dd(glob(__DIR__."/../Config/modules/*.php"));
         // $base_config_name = strtolower(config($this->baseKey . '.name'));
 
-        // $this->mergeConfigFrom(__DIR__ . '/../config/twill.php', 'twill');
+        // $this->mergeConfigFrom(__DIR__ . '/../config/unusual.php', 'unusual');
 
         // $this->mergeConfigFrom(__DIR__ . '/../Config/config.php', 'unusual');
 
         $this->mergeConfigFrom(__DIR__ . '/../Config/internal_modules.php', $this->baseKey . '.internal_modules');
         $this->mergeConfigFrom(__DIR__ . '/../Config/media-library.php', $this->baseKey . '.media_library');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/file-library.php', $this->baseKey . '.file_library');
         $this->mergeConfigFrom(__DIR__ . '/../Config/imgix.php', $this->baseKey . '.imgix');
         $this->mergeConfigFrom(__DIR__ . '/../Config/glide.php', $this->baseKey . '.glide');
+        $this->mergeConfigFrom(__DIR__ . '/../config/disks.php', 'filesystems.disks');
+
+        if (
+            config('unusual.media_library.endpoint_type') === 'local'
+            && config('unusual.media_library.disk') === 'unusual_media_library'
+        ) {
+            // dd($this->setLocalDiskUrl('media'));
+            $this->setLocalDiskUrl('media');
+        }
+        
+        if (
+            config('unusual.file_library.endpoint_type') === 'local'
+            && config('unusual.file_library.disk') === 'unusual_file_library'
+        ) {
+            $this->setLocalDiskUrl('file');
+        }
 
         if (config($this->baseKey . '.enabled.users-management')) {
             config(['auth.providers.unusual_users' => [
@@ -102,5 +119,16 @@ class ConfigServiceProvider extends ServiceProvider
                 );
             }
         }
+    }
+    private function setLocalDiskUrl($type): void
+    {
+
+        config([
+            'filesystems.disks.unusual_' . $type . '_library.url' => request()->getScheme()
+                . '://'
+                . str_replace(['http://', 'https://'], '', config('app.url'))
+                . '/storage/'
+                . trim(config('unusual.' . $type . '_library.local_path'), '/ '),
+        ]);
     }
 }

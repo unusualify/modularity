@@ -2,7 +2,7 @@
 
 namespace OoBook\CRM\Base\Http\Controllers;
 
-use OoBook\CRM\Base\Http\Requests\Admin\MediaRequest;
+use OoBook\CRM\Base\Http\Requests\MediaRequest;
 use OoBook\CRM\Base\Models\Media;
 use OoBook\CRM\Base\Services\Uploader\SignAzureUpload;
 use OoBook\CRM\Base\Services\Uploader\SignS3Upload;
@@ -103,7 +103,9 @@ class MediaLibraryController extends BaseController implements SignUploadListene
      */
     public function getIndexData($prependScope = [])
     {
+        
         $scopes = $this->filterScope($prependScope);
+        // dd($this->getIndexItems($scopes));
         $items = $this->getIndexItems($scopes);
 
         return [
@@ -148,7 +150,6 @@ class MediaLibraryController extends BaseController implements SignUploadListene
         } else {
             $media = $this->storeReference($request);
         }
-
         return $this->responseFactory->json(['media' => $media->toCmsArray(), 'success' => true], 200);
     }
 
@@ -162,7 +163,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
 
         $filename = sanitizeFilename($originalFilename);
 
-        dd($filename);
+        // dd($filename);
 
         $fileDirectory = $request->input('unique_folder_name');
 
@@ -188,7 +189,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
             'width' => $w,
             'height' => $h,
         ];
-
+        
         if ($this->shouldReplaceMedia($id = $request->input('media_to_replace_id'))) {
             $media = $this->repository->whereId($id)->first();
             $this->repository->afterDelete($media);

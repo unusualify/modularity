@@ -457,6 +457,15 @@ abstract class CoreController extends Controller
         // dd(
         //     $this->orderScope()
         // );
+        // dd(
+        //     $this->transformIndexItems($this->repository->get(
+        //     $this->indexWith + $with,
+        //     $scopes,
+        //     $this->orderScope(),
+        //     $this->request->get('itemsPerPage') ?? $this->perPage ?? 50,
+        //     $forcePagination
+        // ))
+        // );
         return $this->transformIndexItems($this->repository->get(
             $this->indexWith + $with,
             $scopes,
