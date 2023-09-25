@@ -75,10 +75,12 @@
   table-font-size-cell: 18px regular
 
 */
-$body-font-family: 'Montserrat', sans-serif;
+@import url('https://fonts.googleapis.com/css?family=Montserrat:200,400,500,600,700,800,900');
+
+$body-font-family: 'Montserrat';
 
 $font-weights: (
-  'regular': 200,
+  // 'regular': 400,
   'semi-bold': 600,
   'bold': 800
 
@@ -89,7 +91,7 @@ $font-weights: (
   // 'bold': 700,
   // 'black': 900
 );
-
+$line-height-root: 1.5; // default 1.5
 $theme-space: 1.56vw; //1.56%;
 
 
@@ -104,13 +106,9 @@ $input-font-size: .8rem;
 $input-control-height: 36px;
 $input-line-height: 1.1; // default 1.5
 
-$line-height-root: 1.5; // default 1.5
-
 $field-control-height: 36px;
-
 $field-label-floating-scale: 0.81;
 
-/// Twill variables
 // Breakpoint information, where each starts and stops
 // if a breakpoint is not fluid, then the start value is equal to the main col value plus 2x the gutter at this breakpoint
 /* 1540 = $max-width + 50 + 50 */
@@ -121,9 +119,3 @@ $breakpoints: (
   large: (start: 1040, end: 1539),
   xlarge: (start: 1540, end: null),
 );
-$color__border: #e5e5e5;//$color__black--10;
-$color__border--hover: #d9d9d9;
-$color__border--light: #f2f2f2;
-
-$color__text: #262626; //$color__black--85;
-$color__text--light: #8c8c8c; //$color__black--45;

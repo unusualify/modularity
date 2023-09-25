@@ -1,0 +1,28 @@
+// themes/${theme}/vuetify/_settings.scss
+@use '../abstract' as *;
+@use 'vuetify/settings' with (
+  // $body-font-family: map-get(c.$vuetify, 'body-font-family'),
+  $utilities: '',
+
+  // $button-height: map-get(c.$vuetify, 'button-height'),
+  $button-font-weight: map-get($font-weights, 'semiBold'),
+  $button-font-size: $button-font-size,
+  $button-max-width: $button-max-width,
+
+  // INPUT
+  $field-font-size: $input-font-size,
+  $field-label-floating-scale: $field-label-floating-scale, //0.81,
+
+  $navigation-drawer-background: $sidebar-background,
+  $navigation-drawer-color: $global-dark-text-color,
+
+  // $list-color: map-get(c.$vuetify, 'list-color'), //rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)),
+  $list-padding: 8px 0px,
+  $list-nav-padding: 1px,
+  $list-item-one-line-padding: 8px 13px,
+  $list-item-padding: 4px $theme-space,
+
+  $table-border-color: #E0E0E0,
+
+  $font-weights: $font-weights,
+);

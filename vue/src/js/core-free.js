@@ -5,7 +5,6 @@ import * as exports from '@/imports'
 
 // Component Imports
 import UEDatatable from '__components/others/Datatable.vue'
-import UEModalForm from '__components/modals/ModalForm.vue'
 
 // Store modules
 import datatable from '@/store/modules/datatable'
