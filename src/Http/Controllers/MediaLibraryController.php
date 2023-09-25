@@ -106,7 +106,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
         
         $scopes = $this->filterScope($prependScope);
         // dd($this->getIndexItems($scopes));
-        $items = $this->getIndexItems($scopes);
+        $items = $this->getIndexItems([],$scopes,false);
 
         return [
             'items' => $items->map(function ($item) {

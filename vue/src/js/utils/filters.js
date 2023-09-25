@@ -1,15 +1,19 @@
 import config from '@/store/modules/config'
 import dateFormat from 'date-fns/format'
+// import { locales, getCurrentLocale, getTimeFormatForCurrentLocale } from '@/utils/locale'
 
-import { locales, getCurrentLocale, getTimeFormatForCurrentLocale } from '@/utils/locale'
+// import { useI18n } from 'vue-i18n'
 
-function dateFormatLocale (date, format) {
-  const locale = locales[getCurrentLocale()]
 
-  return dateFormat(date, format, {
-    locale: locale !== undefined && locale.hasOwnProperty('date-fns') ? locale['date-fns'] : require('date-fns/locale/en')
-  })
-}
+// function dateFormatLocale (date, format) {
+//   // const locale = locales[getCurrentLocale()]
+  
+//   return d(new Date(value), datetimeFormat);
+
+//   // return dateFormat(date, format, {
+//   //   locale: locale !== undefined && locale.hasOwnProperty('date-fns') ? locale['date-fns'] : require('date-fns/locale/en')
+//   // })
+// }
 
 const filters = {
   slugify: function (value) {
@@ -42,25 +46,24 @@ const filters = {
     value = value.toString()
     return value.charAt(0).toUpperCase() + value.slice(1)
   },
-  formatDate: function (value) {
-    if (!value) return ''
+  // formatDate: function (value) {
+  //   if (!value) return ''
 
-    return dateFormatLocale(value, 'MMM, DD, YYYY, ' + getTimeFormatForCurrentLocale())
-  },
-  formatDateWithFormat: function (value, format) {
-    if (!value) value = new Date()
-    return dateFormatLocale(value, format)
-  },
-  formatDatatableDate: function (value) {
-    const datepickerFormat = config.state.publishDateDisplayFormat.length > 0 ? config.state.publishDateDisplayFormat : 'MMM DD, YYYY'
-    if (!value) value = new Date()
-    return dateFormatLocale(value, datepickerFormat)
-  },
-  formatCalendarDate: function (value) {
-    const datepickerFormat = 'MMM, DD, YYYY, ' + getTimeFormatForCurrentLocale()
-    if (!value) value = new Date()
-    return dateFormatLocale(value, datepickerFormat)
-  }
+  //   return dateFormatLocale(value, 'long')
+  // },
+  // formatDateWithFormat: function (value, format) {
+  //   if (!value) value = new Date()
+  //   return dateFormatLocale(value, 'long')
+  // },
+  // formatDatatableDate: function (value) {
+  //   const datepickerFormat = config.state.publishDateDisplayFormat.length > 0 ? config.state.publishDateDisplayFormat : 'MMM DD, YYYY'
+  //   if (!value) value = new Date()
+  //   return dateFormatLocale(value, 'long')
+  // },
+  // formatCalendarDate: function (value) {
+  //   if (!value) value = new Date()
+  //   return dateFormatLocale(value, 'long')
+  // }
 }
 
 export default filters

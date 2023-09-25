@@ -10,8 +10,8 @@
                 type="search"
                 class="form__input form__input--small v-filter__search__input"
                 name="search"
-                :value="searchValue"
-                @change="onSearchInput"
+                :modelValue="searchValue"
+                @update:modelValue="onSearchInput"
                 :placeholder="placeholder"
                 />
             <ue-btn
