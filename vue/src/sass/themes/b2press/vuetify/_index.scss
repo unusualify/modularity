@@ -1,0 +1,13 @@
+// themes/${theme}/vuetify/_index.scss
+@use '../abstract' as *;
+@use 'vuetify' with (
+  $color-pack: false,
+  $body-font-family: $body-font-family,
+
+  // $font-size-root: 2rem, // 1rem
+  $line-height-root: $line-height-root, //1.5
+  // $border-color-root: rgba(var(--v-border-color), var(--v-border-opacity)),
+  // $border-radius-root: 4px,
+  // $border-style-root: solid,
+
+);

@@ -6,10 +6,11 @@ import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 import htmlClasses from '@/utils/htmlClasses'
 
 const defaultWidths = {
-  sm: '300px',
-  md: '500px',
-  lg: '750px',
-  xl: '1000px'
+  xs: '320px',
+  sm: '480px',
+  md: '540px',
+  lg: '1080px',
+  xl: '1200px'
 }
 
 export const makeModalProps = propsFactory({

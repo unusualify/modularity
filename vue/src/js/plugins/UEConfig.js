@@ -5,7 +5,6 @@ import VCustomFormBase from '__components/others/CustomFormBase.vue'
 
 // Template Components
 import UEModal from '__components/modals/Modal.vue'
-import UEModalDialog from '__components/modals/ModalDialog.vue'
 import UEModalMedia from '__components/modals/ModalMedia.vue'
 
 // global mixins

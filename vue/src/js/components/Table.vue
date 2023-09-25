@@ -24,38 +24,39 @@
       <!-- <div class="text-h8 text-primary font-weight-bold">
         {{ tableTitle }}
       </div> -->
-      <slot name="header" v-bind="{tableTitle}">
-        <ue-title
-          :text="tableTitle"
-          :classes="['ue-table-header', 'pt-theme', 'pb-theme']"
-          padding-reset
-        />
-      </slot>
+      <div class="ue-table-top__wrapper">
+        <slot name="header" v-bind="{tableTitle}">
+          <ue-title
+            :text="tableTitle"
+            :classes="['ue-table-header']"
+            padding-reset
+          />
+        </slot>
 
-      <div v-if="embeddedForm" class="ue-table-form__embedded"
-        :style="formStyles">
-        <v-btn @click="createForm" class="mb-theme">
-          {{ $t('ADD NEW')}}
-        </v-btn>
-        <v-expand-transition>
-          <v-card class="mb-7" elevation="4" v-show="formActive">
-            <ue-form has-submit button-text="save" :title="formTitle">
-              <template v-slot:headerRight>
-                <v-btn class="" variant="text" icon="$close" density="compact"
-                  @click="closeForm()"
-                ></v-btn>
-              </template>
-            </ue-form>
-          </v-card>
-        </v-expand-transition>
-      </div>
-      <slot v-else-if="(createOnModal || editOnModal)" name="formDialog" >
-        <ue-modal
+        <div v-if="embeddedForm && !noForm" class="ue-table-form__embedded"
+          :style="formStyles">
+          <v-btn @click="createForm">
+            {{ $t('ADD NEW')}}
+          </v-btn>
+          <v-expand-transition>
+            <v-card class="mt-theme" elevation="4" v-show="formActive">
+              <ue-form has-submit button-text="save" :title="formTitle">
+                <template v-slot:headerRight>
+                  <v-btn class="" variant="text" icon="$close" density="compact"
+                    @click="closeForm()"
+                  ></v-btn>
+                </template>
+              </ue-form>
+            </v-card>
+          </v-expand-transition>
+        </div>
+        <slot v-else-if="(createOnModal || editOnModal) && !noForm" name="formDialog" >
+          <ue-modal
             ref="formModal"
             v-model="formActive"
             scrollable
             transition="dialog-bottom-transition"
-            width-type="xl"
+            width-type="lg"
             >
             <template v-slot:activator="{props}">
               <v-btn-success v-if="createOnModal" v-bind="props" dark>
@@ -81,34 +82,103 @@
 
               </v-card>
             </template>
-        </ue-modal>
-      </slot>
+          </ue-modal>
+        </slot>
 
-      <!-- #deletemodal-->
-      <ue-modal
-        ref="deleteModal"
-        v-model="deleteModalActive"
-        transition="dialog-bottom-transition"
-        width-type="md"
-        >
-        <template v-slot:body="props" >
-          <v-card >
-            <v-card-title class="text-h5 text-center" style="word-break: break-word;">
-              <!-- {{ textDescription }} -->
-            </v-card-title>
-            <v-card-text class="text-center" style="word-break: break-word;" >
-              {{ deleteQuestion }}
-            </v-card-text>
-            <v-divider/>
-            <v-card-actions>
-              <v-spacer/>
-              <v-btn color="blue" text @click="closeDeleteModal()"> {{ props.textCancel }}</v-btn>
-              <v-btn color="blue" text @click="deleteRow()"> {{ props.textConfirm }}</v-btn>
-              <v-spacer></v-spacer>
-            </v-card-actions>
-          </v-card>
-        </template>
-      </ue-modal>
+        <!-- #deletemodal-->
+        <ue-modal
+          ref="deleteModal"
+          v-model="deleteModalActive"
+          transition="dialog-bottom-transition"
+          width-type="sm"
+          >
+          <template v-slot:body="props" >
+            <v-card >
+              <v-card-title class="text-h5 text-center" style="word-break: break-word;">
+                <!-- {{ textDescription }} -->
+              </v-card-title>
+              <v-card-text class="text-center" style="word-break: break-word;" >
+                {{ deleteQuestion }}
+              </v-card-text>
+              <v-divider/>
+              <v-card-actions>
+                <v-spacer/>
+                <v-btn color="blue" text @click="closeDeleteModal()"> {{ props.textCancel }}</v-btn>
+                <v-btn color="blue" text @click="deleteRow()"> {{ props.textConfirm }}</v-btn>
+                <v-spacer></v-spacer>
+              </v-card-actions>
+            </v-card>
+          </template>
+        </ue-modal>
+
+        <slot name="customModal">
+          <ue-modal
+            ref="formModal"
+            v-model="customModalActive"
+            scrollable
+            transition="dialog-bottom-transition"
+            width-type="md"
+            >
+            <template v-slot:activator="{props}">
+              <v-btn-cta v-bind="props" dark class="mt-theme">
+                  CUSTOM MODAL
+              </v-btn-cta>
+            </template>
+            <template v-slot:body="props">
+              <v-card>
+                <v-item-group selected-class="bg-primary">
+                  <v-container>
+                    <v-row>
+                      <!-- <v-col
+                        v-for="n in 3"
+                        :key="n"
+                        cols="12"
+                        md="6"
+                        >
+                          <v-item v-slot="{ isSelected, selectedClass, toggle }">
+                            <v-card
+                              :class="['d-flex align-center', selectedClass]"
+                              dark
+                              height="200"
+                              @click="toggle"
+                            >
+                              <div
+                                class="text-h3 flex-grow-1 text-center"
+                              >
+                                {{ isSelected ? 'Selected' : 'Click Me!' }}
+                              </div>
+                          </v-card>
+                        </v-item>
+                      </v-col> -->
+                      <v-col cols="12" md="6" class="pa-4">
+                        <v-item v-slot="{ isSelected, selectedClass, toggle }">
+                          <v-card :class="['d-flex align-center bg-primary ue-card-button px-4', selectedClass]" dark height="200" @click="toggle" >
+                            <div class="text-h6 font-weight-bold flex-grow-1 text-center" > COMPANY INFORMATION</div>
+                          </v-card>
+                        </v-item>
+                      </v-col>
+                      <v-col cols="12" md="6" class="pa-4">
+                        <v-item v-slot="{ isSelected, selectedClass, toggle }">
+                          <v-card :class="['d-flex align-center bg-cta ue-card-button px-4', selectedClass]" dark height="200" @click="toggle" >
+                            <div class="text-h6 font-weight-bold flex-grow-1 text-center" > PRESS RELEASES </div>
+                          </v-card>
+                        </v-item>
+                      </v-col>
+                      <v-col cols="12" md="12" class="pa-4">
+                        <v-item v-slot="{ isSelected, selectedClass, toggle }">
+                          <v-card :class="['d-flex align-center bg-success ue-card-button px-4', selectedClass]" dark height="80" @click="toggle" >
+                            <div class="text-h6 font-weight-bold flex-grow-1 text-center"> CREDITS & INVOICES </div>
+                          </v-card>
+                        </v-item>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                </v-item-group>
+              </v-card>
+            </template>
+          </ue-modal>
+        </slot>
+      </div>
     </template>
     <!-- <template v-slot:top>
       <v-data-table-footer

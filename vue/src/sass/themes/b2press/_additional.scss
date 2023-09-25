@@ -1,2 +1,5 @@
-@import 'abstract/variables';
-@import 'styles/mixins';
+@use 'abstract';
+@use 'styles/mixins';
+
+@forward 'abstract';
+@forward 'styles/mixins'

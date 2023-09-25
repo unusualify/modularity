@@ -1,3 +1,5 @@
+@use '../abstract' as *
+
 .v-btn
   &:not(.v-btn--icon):not(.v-btn--variant-plain):not(.v-btn--block)
     height: $button-height
@@ -6,8 +8,11 @@
     // margin-right: auto !important
 
   &.bg-primary,
+  &.bg-secondary,
   &.bg-cta
     color: $global-dark-text-color
+
+.v-btn, .ue-card-button
   &.bg-primary
     &:hover
       background-color: $primary-2-color !important

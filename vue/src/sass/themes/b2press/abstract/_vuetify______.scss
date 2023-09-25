@@ -1,7 +1,11 @@
 @use '../abstract' as *;
 
+// @warn $body-font-family;
+
 // Vuetify Variables
 $vuetify: (
+  // body-font-family: $body-font-family,
+
   color-pack: false,
   utilities: '',
   font-weights: $font-weights,
