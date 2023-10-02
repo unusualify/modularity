@@ -1,3 +1,5 @@
+@use '../abstract' as *
+
 #ue-main-body
   > .v-table
     min-height: calc(100vh - (2*$theme-space))
@@ -10,7 +12,7 @@
       > table
         // width: min-content
         min-width: 60%
-  &.v-table--has-wrapper-space > .v-table__wrapper, .ue-table-form__embedded ~ .v-table__wrapper
+  &.v-table--has-wrapper-space > .v-table__wrapper, .ue-table-top__wrapper ~ .v-table__wrapper
       padding-left: $theme-space !important
       padding-right: $theme-space !important
 
@@ -19,9 +21,13 @@
         border-right: 1px solid #E0E0E0
         border-left: 1px solid rgba(var(--v-border-color), var(--v-border-opacity))
 
-  > .ue-table-header, .ue-table-form__embedded
+  > .ue-table-top__wrapper
     padding-left: $theme-space !important
     padding-right: $theme-space !important
+    margin-bottom: $theme-space !important
+    .ue-table-header, .ue-table-form__embedded
+      padding-top: $theme-space
+
   > .v-table__wrapper
     > table
       border-top: thin solid rgba(var(--v-border-color), var(--v-border-opacity))

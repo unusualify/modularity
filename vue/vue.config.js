@@ -96,7 +96,7 @@ const plugins = [
   }),
   new VuetifyPlugin({
     styles: {
-      configFile: 'src/sass/themes/' + APP_THEME + '/_settings.scss'
+      configFile: 'src/sass/themes/' + APP_THEME + '/vuetify/_settings.scss'
     }
   }),
   new SVGSpritemapPlugin(`${srcDirectory}/icons/**/*.svg`, svgConfig()),
@@ -215,8 +215,7 @@ module.exports = defineConfig({
       // define global settings imported in all components
       scss: {
         additionalData: `
-          // @import "styles/setup/_settings.scss";æ
-          @import "styles/themes/${APP_THEME}/_additional.scss";
+          @use "styles/themes/${APP_THEME}/_additional.scss" as *;
         `,
         // debugInfo: true,
         // sourceMap: true,

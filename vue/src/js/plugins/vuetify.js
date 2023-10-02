@@ -1,4 +1,3 @@
-
 import { createVuetify } from 'vuetify'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import { fa } from 'vuetify/iconsets/fa'
@@ -6,7 +5,7 @@ import { fa } from 'vuetify/iconsets/fa'
 import '@fortawesome/fontawesome-free/css/all.min.css' // Ensure you are using css-loader
 import '@mdi/font/css/materialdesignicons.css' // Ensure you are using css-loader
 
-import 'styles/themes/b2press/_main.scss'
+import 'styles/themes/b2press/main.scss'
 // import 'vuetify/styles'
 
 import * as components from 'vuetify/lib/components'

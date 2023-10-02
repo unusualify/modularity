@@ -41,14 +41,6 @@
     php artisan unusual:migrate:rollback Package
     php artisan unusual:migrate:refresh Package
 
-    PRESS_RELEASE 
-    php artisan unusual:make:module Package --plain --no-migrate
-    php artisan unusual:make:route Package PackageContinent --no-migrate
-    php artisan unusual:make:route Package PackageRegion --schema="belongsTo:package_continent" --no-migrate
-    php artisan unusual:make:route Package PackageCountry --schema="belongsTo:package_region" --no-migrate
-    php artisan unusual:make:route Package PackageDistributionLanguage --schema="code:string --no-migrate -T
-
-    php artisan unusual:make:route Package PackageFeature --schema="" --no-migrate
 ```
 
 

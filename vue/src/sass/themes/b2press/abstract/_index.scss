@@ -1,2 +1,8 @@
+// themes/${theme_name}/abstract/_*.scss
+@use 'variables';
+@use 'colors';
+@use 'utilities';
+
 @forward 'variables';
 @forward 'colors';
+// @forward 'utilities';
