@@ -1,5 +1,5 @@
 {
-    "name": "unusualify/crm-base",
+    "name": "unusualify/modularity",
     "type": "library",
     "license": "MIT",
     "description": "Unusual CRM Base for module development",
