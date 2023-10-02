@@ -237,6 +237,8 @@ export default {
       this.$refs.modal.hide()
     },
     opened: function () {
+
+      console.log('here');
       if (!this.gridLoaded) this.reloadGrid()
 
       this.listenScrollPosition()
