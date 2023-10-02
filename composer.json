@@ -1,17 +1,26 @@
 {
-    "name": "oobook/crm-base",
+    "name": "unusualify/crm-base",
     "type": "library",
     "license": "MIT",
     "description": "Unusual CRM Base for module development",
     "keywords": [
-        "Unusual",
-        "crm",
+        "unusual",
+        "unusualify",
+        "CRM",
         "laravel"
     ],
     "authors": [
         {
             "name": "Oğuzhan Bükçüoğlu",
-            "email": "oguz.bukcuoglu@gmail.com"
+            "email": "oguzhan@unusualgrowth.com"
+        },
+        {
+            "name": "Güneş Bizim",
+            "email": "gunes@unusualgrowth.com"
+        },
+        {
+            "name": "Hazarcan Doğa Bakan",
+            "email": "doga@unusualgrowth.com"
         }
     ],
     "require": {
