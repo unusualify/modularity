@@ -102,6 +102,19 @@ const mutations = {
     state.dialog = val
   },
 
+  [DATATABLE.UPDATE_DATATABLE_FILTER] (state, filter) {
+    state.filter = Object.assign({}, state.filter, filter)
+  },
+  [DATATABLE.CLEAR_DATATABLE_FILTER] (state) {
+    state.filter = Object.assign({}, {
+      search: '',
+      status: state.filter.status
+    })
+  },
+  [DATATABLE.UPDATE_DATATABLE_FILTER_STATUS] (state, slug) {
+    state.filter.status = slug
+  },
+
   [DATATABLE.UPDATE_DATATABLE_BULK] (state, id) {
     if (state.bulk.indexOf(id) > -1) {
       state.bulk = state.bulk.filter(function (item) {
@@ -121,18 +134,6 @@ const mutations = {
     state.columns.forEach(function (column, index) {
       if (column.name === columnName) state.columns.splice(index, 1)
     })
-  },
-  [DATATABLE.UPDATE_DATATABLE_FILTER] (state, filter) {
-    state.filter = Object.assign({}, state.filter, filter)
-  },
-  [DATATABLE.CLEAR_DATATABLE_FILTER] (state) {
-    state.filter = Object.assign({}, {
-      search: '',
-      status: state.filter.status
-    })
-  },
-  [DATATABLE.UPDATE_DATATABLE_FILTER_STATUS] (state, slug) {
-    state.filter.status = slug
   },
   [DATATABLE.UPDATE_DATATABLE_OFFSET] (state, offsetNumber) {
     state.offset = offsetNumber
@@ -311,11 +312,15 @@ const actions = {
 
           return filtered
         }, {})),
-        ...(state.search !== '' ? { search: state.search } : {})
+        ...(state.search !== '' ? { search: state.search } : {}),
+        ...(state.filter.status !== 'all' ? { filter: state.filter } : {})
       }
+
+      // __log(parameters)
       api.get(parameters, function (resp) {
-        commit(DATATABLE.UPDATE_DATATABLE_DATA, resp.data)
-        commit(DATATABLE.UPDATE_DATATABLE_TOTAL, resp.total)
+        commit(DATATABLE.UPDATE_DATATABLE_DATA, resp.resource.data)
+        commit(DATATABLE.UPDATE_DATATABLE_TOTAL, resp.resource.total)
+        commit(DATATABLE.UPDATE_DATATABLE_NAV, resp.mainFilters)
         commit(DATATABLE.UPDATE_DATATABLE_LOADING, false)
 
         if (__isset(payload.options)) { commit(DATATABLE.UPDATE_DATATABLE_OPTIONS, payload.options) }

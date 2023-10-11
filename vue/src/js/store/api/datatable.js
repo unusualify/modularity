@@ -34,7 +34,7 @@ export default {
           //     // maxPage: (resp.data.maxPage ? resp.data.maxPage : 1)
           // }
 
-          callback(resp.data.resource)
+          callback(resp.data)
         }
       }, function (resp) {
         const error = {
