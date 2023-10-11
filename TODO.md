@@ -78,7 +78,7 @@ Modularity System Base Module
 - [x] Show Only company users, but not system users
 - [ ] add company filter at future
 - [ ] open a modal with clicking first column of table
-    - [ ] Company Information
+    - [x] Company Information
     - [ ] Press Releases
     - [ ] Credits & Invoices
 
