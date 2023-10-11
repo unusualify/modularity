@@ -69,6 +69,9 @@ export default function useModal (props, context) {
   const methods = reactive({
     emitModelValue: function (val) {
       context.emit('update:modelValue', val)
+    },
+    clickOutside: function (event) {
+      context.emit('click:outside', event)
     }
   })
 
