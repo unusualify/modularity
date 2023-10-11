@@ -5,20 +5,21 @@ use Symfony\Component\Console\Input\InputOption;
 
 return [
     'namespace' => env('BASE_NAMESPACE','OoBook\\CRM\\Base'),
-    'name' => env('BASE_NAME','Base'),
+    'name' => env('UNUSUAL_BASE_NAME','Unusual'),
 
     'version' => '1.0.0',
     'auth_login_redirect_path' => '/',
     'is_development' => env('UNUSUAL_DEV', false),
-    'development_url' => env('UNUSUAL_DEV_URL', 'http://localhost:8080'),
+    'development_url' => "http://" . env('UNUSUAL_DEV_URL', 'localhost:8080'),
     'public_dir' => env('UNUSUAL_ASSETS_DIR', 'unusual'),
-    'vendor_path' => env('UNUSUAL_VENDOR_PATH', 'vendor/oobook/crm-base'),
+    'vendor_path' => env('UNUSUAL_VENDOR_PATH', 'vendor/unusualify/modularity'),
     'custom_components_resource_path' => 'js/unusual',
     // 'vendor_components_resource_path' => 'assets/vendor/js/components',
     'manifest' => 'unusual-manifest.json',
-    'js_namespace' => 'UNUSUAL',
+    'js_namespace' => env('VUE_APP_NAME','UNUSUAL'),
     'build_timeout' => 300,
     'use_big_integers_on_migrations' => true,
+    'base_prefix' => 'system',
 
     'users_table_name' => 'users',
 
@@ -70,6 +71,243 @@ return [
         // 'dense',
     ],
 
+    'input_drafts' => [
+        'user' => [
+            'name' => [
+                "type" => "text",
+                "name" => "name",
+                "label" => "Name",
+                "default" => "",
+                'rules' => [
+                    ['min', 3]
+                ]
+            ],
+            'surname' => [
+                "type" => "text",
+                "name" => "surname",
+                "label" => "Surname",
+                "default" => "",
+                'rules' => [
+                    ['min', 2]
+                ]
+            ],
+            'job_title' => [
+                "type" => "text",
+                "name" => "job_title",
+                "label" => "Job Title",
+                "default" => "",
+                'rules' => [
+                    ['min', 2]
+                ]
+            ],
+            'email' => [
+                "type" => "text",
+                "name" => "email",
+                "label" => "E-mail",
+                "default" => "",
+                'rules' => [
+                    ['email']
+                ]
+            ],
+            'phone' => [
+                "type" => "custom-input-phone",
+                "name" => "phone",
+                "label" => "Phone Number",
+                "default" => "",
+                'clearable' => false
+            ],
+            'country' => [
+                "type" => "text",
+                "name" => "country",
+                "label" => "Country",
+                "default" => "",
+                'rules' => [
+                    ['min', 3]
+                ]
+            ],
+            'language' => [
+                "type" => "select",
+                "name" => "language",
+                "label" => "Preferred Language",
+                "default" => 0,
+                'itemTitle' => 'label',
+                // 'itemValue' => 'value',
+                'items_' => [
+                    [
+                        'text' => 'TR',
+                        'value' => 1,
+                    ],
+                    [
+                        'text' => 'EN',
+                        'value' => 2
+                    ]
+                ],
+                'items' => array_map(function($locale) {
+                    return [
+                        'value' => $locale,
+                        'label' => getLabelFromLocale($locale, true)
+                    ];
+                }, unusualConfig('available_user_locales', ['en', 'tr']))
+            ],
+            'timezone' => [
+                "type" => "combobox",
+                "name" => "timezone",
+                "label" => "Timezone",
+                "default" => 0,
+                "returnObject" => false,
+                'itemTitle' => 'label',
+                'itemValue' => 'value',
+                'items' => collect((new \Camroncade\Timezone\Timezone())->timezoneList)->map(function($value,$key){
+                    return [
+                        'label' => $key,
+                        'value' => $value
+                    ];
+                })->values()->toArray(),
+            ],
+        ],
+        'user_password' => [
+            'password' => [
+                "type" => "password",
+                // "ext" => "password",
+                "name" => "password",
+                "label" => "Current Password",
+                "default" => "",
+                "appendInnerIcon" => '$non-visibility',
+                "slotHandlers" => [
+                    'appendInner' => 'password',
+                ],
+            ],
+            'gap-1' => [
+                'type' => 'v-sheet',
+                'name' => 'gap-1',
+                'class' => 'd-none d-md-block',
+                'col' => [
+                    'cols' => 0,
+                    'sm' => 6,
+                    'class' => 'd-none d-sm-block',
+                ]
+            ],
+            'new-password' => [
+                "type" => "password",
+                // "ext" => "password",
+                "name" => "new_password",
+                "label" => "New Password",
+                "default" => "",
+                "appendInnerIcon" => '$non-visibility',
+                "slotHandlers" => [
+                    'appendInner' => 'password',
+                ],
+                'rules' => [
+                    ['min', 6]
+                ]
+            ],
+            'confirm-password' => [
+                "type" => "password",
+                // "ext" => "password",
+                "name" => "confirm_password",
+                "label" => "Confirm Password",
+                "default" => "",
+                "appendInnerIcon" => '$non-visibility',
+                "slotHandlers" => [
+                    'appendInner' => 'password',
+                ],
+                'rules' => [
+                    ['min', 6],
+                    ['confirmation', 'new_password'],
+                ]
+            ],
+        ],
+        'company' => [
+            'name' => [
+                "type" => "text",
+                "name" => "name",
+                "label" => "Company",
+                "default" => "",
+                'rules' => [
+                    ['min', 3]
+                ]
+            ],
+            'address' => [
+                "type" => "text",
+                "name" => "address",
+                "label" => "Address",
+                "default" => "",
+                'col' => [
+                    'cols' => 12,
+                    'sm' => 12,
+                ],
+                'rules' => [
+                    // ['email']
+                ]
+            ],
+            'city' => [
+                "type" => "text",
+                "name" => "city",
+                "label" => "City",
+                "default" => "",
+
+                'rules' => [
+                    ['min', 3]
+                ]
+            ],
+            'state' => [
+                "type" => "text",
+                "name" => "state",
+                "label" => "State/Province",
+                "default" => "",
+                'rules' => [
+                    ['min', 3]
+                ]
+            ],
+            'country' => [
+                "type" => "text",
+                "name" => "country",
+                "label" => "Country",
+                "default" => "",
+                'rules' => [
+                    ['min', 3]
+                ]
+            ],
+            'zip_code' => [
+                "type" => "text",
+                "name" => "zip_code",
+                "label" => "ZIP/Postal Code",
+                "default" => "",
+                'rules' => [
+                    ['min', 3]
+                ]
+            ],
+            'phone' => [
+                "type" => "custom-input-phone",
+                "name" => "phone",
+                "label" => "Phone Number",
+                "default" => "",
+                'rules' => [
+                    // ['email']
+                ],
+                'clearable' => false
+            ],
+            'vat_number' => [
+                "type" => "text",
+                "name" => "vat_number",
+                "label" => "VAT Number",
+                "default" => "",
+                'rules' => [
+                    ['min', 3]
+                ]
+            ],
+            'tax_id' => [
+                "type" => "text",
+                "name" => "tax_id",
+                "label" => "Tax ID",
+                "default" => "",
+                'rules' => [
+                    ['min', 3]
+                ]
+            ],
+        ]
+    ],
+
     'default_header' => [
         'align' => 'start',
         'sortable' => false,
@@ -109,7 +347,7 @@ return [
 
     'stubs' => [
         'enabled' => false,
-        'path' => base_path( env('UNUSUAL_STUB_PATH') ?? '/packages/oobook/crm-base/src/Console/stubs') ,
+        'path' => base_path( env('UNUSUAL_STUB_PATH') ?? 'vendor/unusualify/modularity/src/Console/stubs'),
         'files' => [
             'routes/web' => 'Routes/web.php',
             'routes/api' => 'Routes/api.php',

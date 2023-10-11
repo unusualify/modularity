@@ -38,3 +38,23 @@ if (!function_exists('getTimezoneList')) {
     }
 }
 
+if (!function_exists('getInputDraft')) {
+
+    function getInputDraft($name, $overwrites = [], $excludes = [], $preserve = true)
+    {
+
+        $draft = $preserve
+            ? array_merge_recursive_preserve( unusualConfig("input_drafts.{$name}", []), $overwrites)
+            : array_merge( unusualConfig("input_drafts.{$name}", []), $overwrites);
+
+        if(count($excludes)){
+
+            $draft = array_filter($draft, function($value, $key) use($excludes){
+                return !in_array($key, $excludes);
+            }, ARRAY_FILTER_USE_BOTH);
+        }
+
+        return $draft;
+    }
+}
+
