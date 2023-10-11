@@ -1,6 +1,6 @@
-# CRM-BASE TODO's
+# Modularity TODO's
 
-CRM Base Module
+Modularity System Base Module
 
 <!-- [![Upgrade](https://img.shields.io/badge/description-upgrade-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 [![Bug](https://img.shields.io/badge/bug-red.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
@@ -39,7 +39,7 @@ CRM Base Module
 ### Localization GUI ✔️️
 
 - [x] composer joedixon/laravel-translation adding and configuration
-    - [x] adapting json files into crm-base lang/*.json files ⏳
+    - [x] adapting json files into unusualify/modularity lang/*.json files ⏳
     - [x] adapting translation group/single groundwork
     - [x] chokidar watcher for base_path('lang') files
 
@@ -74,8 +74,8 @@ CRM Base Module
 
 ### Users Module
 
-- [ ] Create Users Module
-- [ ] Show Only company users, but not system users
+- [x] Create Users Module
+- [x] Show Only company users, but not system users
 - [ ] add company filter at future
 - [ ] open a modal with clicking first column of table
     - [ ] Company Information
@@ -112,6 +112,6 @@ CRM Base Module
 
 ## BUGS
 
-- [ ] $store.commit(FORM.SET_EDITED_ITEM, fields) working on standard but not translated fields in Form.vue [![Bug](https://img.shields.io/badge/bug-red.svg)](https://github.com/OoBook/crm-base/blob/main/vue/src/js/components/Form.vue#L419)
+- [ ] $store.commit(FORM.SET_EDITED_ITEM, fields) working on standard but not translated fields in Form.vue [![Bug](https://img.shields.io/badge/bug-red.svg)](https://github.com/unusualify/modularity/blob/main/vue/src/js/components/Form.vue#L419)
 
-- [ ] ModalMedia fullscreen attributes [![Bug](https://img.shields.io/badge/bug-red.svg)](https://github.com/OoBook/crm-base/blob/main/vue/src/js/components/modals/ModalMedia.vue)
+- [ ] ModalMedia fullscreen attributes [![Bug](https://img.shields.io/badge/bug-red.svg)](https://github.com/unusualify/modularity/blob/main/vue/src/js/components/modals/ModalMedia.vue)

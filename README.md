@@ -1,4 +1,4 @@
-# crm-base
+# Modularity
 
 # TODO
 ## B2press menu sidebar
@@ -148,11 +148,11 @@
 
 from
     (?<=[Config::get\(|config\(])\s?'base\.
-    (?<=[Config::get\(|config\(])\s?\\Illuminate\\Support\\Str::snake\(env\('BASE_NAME',\s?'Base'\)\)\s?\.\s?'\.
-    (?<=[Config::get\(|config\(])\s?Str::snake\(env\('BASE_NAME',\s?'Base'\)\)\s?\.\s?'\.
+    (?<=[Config::get\(|config\(])\s?\\Illuminate\\Support\\Str::snake\(env\('UNUSUAL_BASE_NAME',\s?'Base'\)\)\s?\.\s?'\.
+    (?<=[Config::get\(|config\(])\s?Str::snake\(env\('UNUSUAL_BASE_NAME',\s?'Base'\)\)\s?\.\s?'\.
     (?<=[Config::get\(|config\(])\s?getUnusualBaseKey\(\)\s?\.\s?'\.
 to 
-    \Illuminate\Support\Str::snake(env('BASE_NAME', 'Base')) . '.
+    \Illuminate\Support\Str::snake(env('UNUSUAL_BASE_NAME', 'Base')) . '.
     unusualBaseKey() . '.
 
 from 

@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 if (! function_exists('unusualBaseKey')) {
     function unusualBaseKey() {
-        return \Illuminate\Support\Str::snake(env('BASE_NAME', 'Base'));
+        return \Illuminate\Support\Str::snake(env('UNUSUAL_BASE_NAME', 'Unusual'));
     }
 }
 
