@@ -2,13 +2,7 @@
 
 namespace OoBook\CRM\Base\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
-use OoBook\CRM\Base\Http\Requests\StorePermissionRequest;
-use OoBook\CRM\Base\Transformers\PermissionResource;
-use Spatie\Permission\Models\Permission;
-
 class PermissionController extends BaseController
 {
 
@@ -20,7 +14,7 @@ class PermissionController extends BaseController
     /**
      * @var string
      */
-    protected $moduleName = 'User';
+    protected $moduleName = 'SystemUser';
 
     /**
      * @var string

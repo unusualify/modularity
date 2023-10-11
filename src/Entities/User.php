@@ -12,12 +12,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 
 use Spatie\Permission\Traits\HasRoles;
-use OoBook\CRM\Base\Entities\Traits\HasHelpers;
-use OoBook\CRM\Base\Entities\Traits\IsTranslatable;
-
+use OoBook\CRM\Base\Entities\Traits\{HasHelpers, HasScopes, IsTranslatable};
+use OoBook\CRM\Base\Entities\Model;
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, HasHelpers, IsTranslatable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, HasHelpers, HasScopes, IsTranslatable;
 
     /**
      * The attributes that are mass assignable.
@@ -35,6 +34,7 @@ class User extends Authenticatable
         'phone',
         'country',
         'password',
+        'published'
     ];
 
     /**
@@ -94,7 +94,6 @@ class User extends Authenticatable
         return $this->roles === 'SUPERADMIN';
     }
 
-
     protected function invalidCompany():Attribute
     {
         $inValid = false;
@@ -111,6 +110,11 @@ class User extends Authenticatable
         return Attribute::make(
             get: fn () => $inValid,
         );
+    }
+
+    public function scopeCompanyUser($query)
+    {
+        return $query->whereNotNull("{$this->getTable()}.company_id");
     }
 
 }

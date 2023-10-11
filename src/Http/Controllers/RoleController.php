@@ -4,16 +4,13 @@ namespace OoBook\CRM\Base\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\View;
 
 class RoleController extends BaseController
 {
 
     protected $namespace = 'OoBook\CRM\Base';
 
-    protected $moduleName = 'User';
+    protected $moduleName = 'SystemUser';
 
     protected $routeName = 'Role';
 

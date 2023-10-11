@@ -16,7 +16,7 @@ class UserController extends BaseController
     /**
      * @var string
      */
-    protected $moduleName = 'User';
+    protected $moduleName = 'SystemUser';
 
     /**
      * @var string

@@ -1,9 +1,9 @@
 <?php
 
 return [
-    'user' => [
-        'name' => 'User',
-        'base_prefix' => false,
+    'system_user' => [
+        'name' => 'SystemUser',
+        'base_prefix' => true,
         'headline' => 'User Management',
         'routes' => [
             'user' => [
@@ -40,6 +40,13 @@ return [
                     [
                         'title' => 'Roles',
                         'key' => 'roles',
+                    ],
+                    [
+                        'title' => 'Status',
+                        'key' => 'published',
+                        'formatter' => [
+                            'switch'
+                        ]
                     ],
                     [
                         'title' => 'Actions',
@@ -1444,5 +1451,4 @@ return [
             ]
         ],
     ]
-
 ];

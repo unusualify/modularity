@@ -39,7 +39,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map(Router $router)
     {
-
         UnusualRoutes::configureRoutePatterns();
 
         $this->mapBaseRoutes(
@@ -418,7 +417,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function bootMacros()
     {
         Route::macro('configRoutes', function($config, $middlewares = [], $options = []){
-
+            // dd($config, $middlewares, $options);
             Route::middleware($middlewares)->group( function() use($config, $options){
 
                 $customRoutes = $defaults = [
@@ -451,11 +450,16 @@ class RouteServiceProvider extends ServiceProvider
                     );
                 }
 
-                $lastRouteGroupName = RouteServiceProvider::getLastRouteGroupName();
 
+                $lastRouteGroupName = RouteServiceProvider::getLastRouteGroupName();
                 $groupPrefix = RouteServiceProvider::getGroupPrefix();
 
+                // dd($config, $lastRouteGroupName, $groupPrefix);
+
                 $pr = findParentRoute($config);
+
+                $system_prefix = (isset($config['base_prefix']) && $config['base_prefix']) ? unusualConfig('base_prefix', 'system-settings') . '/' : '';
+                $system_route_name = (isset($config['base_prefix']) && $config['base_prefix']) ? snakeCase(studlyName(unusualConfig('base_prefix', 'system-settings'))) : '';
 
                 $parent_studly = studlyName( $config['name'] ); // UserCompany
                 $parent_camel = camelCase( $config['name'] ); // userCompany
@@ -474,23 +478,50 @@ class RouteServiceProvider extends ServiceProvider
                         $controller = $route_studly.'Controller';
 
                         // $names = $item['route_name'] ?? $route_camel;
+                        // dd(
+                        //     $key,
+                        //     $item,
+                        //     $url,
+                        //     $item['route_name']
+                        // );
+                        // $resource_options = [
+                        //     'names' => $item['route_name'] ?? $route_snake,
+                        // ];
 
+                        $resource_options_names = $item['route_name'] ?? $route_snake;
+                        $resource_options_as = [];
 
-                        $resource_options = [
-                            'names' => $item['route_name'] ?? $route_snake,
-                        ];
+                        if( $system_route_name ){
+                            $resource_options_as[] = $system_route_name;
+                        }
 
                         if(isset($sub['nested']) && $item['nested']){
-                            $url = $parent_camel.".".$url;
+                            $url =  $parent_camel . "." . $url;
+
                             $controller = $parent_studly . $controller;
-                            $resource_options['names'] = ($parent['route_name'] ?? $parent_snake) . "." . $resource_options['names'];
+
+                            $resource_options_names = ($parent['route_name'] ?? $parent_snake) . "." . $resource_options_names;
 
                         }else if( isset($item['parent']) && $item['parent'] ){
-
+                            // dd(
+                            //     $url,
+                            //     $system_prefix,
+                            //     $system_route_name,
+                            //     $resource_options_as,
+                            //     $resource_options_names,
+                            // );
                         }else{
                             $url = $parent_url . "/" . $url;
-                            $resource_options['as'] = $parent_snake;
+
+                            $resource_options_as[] = $parent_snake;
                         }
+
+                        $url = $system_prefix . $url;
+
+                        $resource_options = [
+                            'names' => $resource_options_names,
+                            'as' => implode( '.', $resource_options_as)
+                        ];
 
 
                         // if(isset($sub['nested']) && $item['nested']){
@@ -509,6 +540,9 @@ class RouteServiceProvider extends ServiceProvider
                         //     ]);
                         // }
                         // dd($url, $controller, $resource_options);
+                        // if($key == 'user'){
+                        //     dd($url, $controller, $resource_options);
+                        // }
                         Route::resource($url, $controller, $resource_options)->parameters([
                             // $url => $sub_studly,
                         ]);
@@ -588,14 +622,11 @@ class RouteServiceProvider extends ServiceProvider
 
         });
 
-
         Route::macro('unusualWebRoutes', function ($middlewares = [], $options = []) {
-            $config = config(
-                snakeCase(env('BASE_NAME', 'unusual'))
-            );
+            $base_config = config( unusualBaseKey());
 
-            if(isset($config['internal_modules'])){
-                foreach ($config['internal_modules'] as $name => $_config) {
+            if(isset($base_config['internal_modules'])){
+                foreach ($base_config['internal_modules'] as $name => $config) {
                     // Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
                     // dd($_config);
                     // Route::configRoutes([
@@ -611,7 +642,7 @@ class RouteServiceProvider extends ServiceProvider
                     //         ]
                     //     ]
                     // ], $middlewares, $options);
-                    Route::configRoutes($_config, $middlewares, $options);
+                    Route::configRoutes($config, $middlewares, $options);
                 }
             }
 
@@ -677,6 +708,8 @@ class RouteServiceProvider extends ServiceProvider
     {
         // Get the current route groups
         $routeGroups = Route::getGroupStack() ?? [];
+
+        // dd(Route::getGroupStack(), end($routeGroups));
 
         // Get the name prefix of the last group
         return end($routeGroups)['as'] ?? '';
