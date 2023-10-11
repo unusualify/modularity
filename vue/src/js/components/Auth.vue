@@ -9,11 +9,7 @@
           <slot name="cardTop"></slot>
 
           <v-sheet class="px-6 py-8" :width="width">
-              <slot
-                v-bind="{
-                  // validForm,
-                  // buttonDefaultText
-                }"
+              <slot v-bind="{}"
                 >
                 <!-- <ue-form
                   :model="model"
@@ -31,13 +27,7 @@
                 </ue-form> -->
               </slot>
           </v-sheet>
-          <slot name="bottom"
-            v-bind="{
-              // validForm,
-              // buttonDefaultText
-            }"
-            >
-          </slot>
+          <slot name="bottom" v-bind="{}"></slot>
         </v-card>
       </v-main>
     </v-layout>
@@ -92,9 +82,6 @@ export default {
       // must use .value
       switch (name.value) {
         case 'xs': return 300
-        // case 'sm': return 400
-        // case 'md': return 400
-        // case 'lg': return 400
         case 'xl': return 600
         case 'xxl': return 600
         default: return 400
@@ -104,16 +91,7 @@ export default {
     return { width }
   },
   methods: {
-    onSubmit () {
-      if (!this.form) return
 
-      this.loading = true
-
-      setTimeout(() => (this.loading = false), 2000)
-    },
-    required (v) {
-      return !!v || 'Field is required'
-    }
   }
 }
 </script>

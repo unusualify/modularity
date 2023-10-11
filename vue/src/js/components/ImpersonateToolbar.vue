@@ -76,15 +76,9 @@ const impersonateRoute = computed(() => {
 export default {
   data () {
     return {
-      // selected: null,
-      // show: true
+
     }
   },
-  // computed: {
-  //   impersonateRoute () {
-  //     return this.route.replace(':id', this.selected)
-  //   }
-  // },
   created () {
 
   }

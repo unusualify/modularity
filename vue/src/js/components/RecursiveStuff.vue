@@ -4,7 +4,7 @@
     v-bind="{...configuration.attributes}"
     >
     <template v-if="isArray(configuration.elements)">
-      <ue-recursive-shit
+      <ue-recursive-stuff
         v-for="(_configuration, i) in configuration.elements"
         :key="`tag-${level}-${i}`"
         :level="level+1"
@@ -61,7 +61,7 @@ export default {
     }
   },
   created () {
-    // __log(this.configuration.attributes)
+    // __log(this.configuration)
   }
 }
 </script>
