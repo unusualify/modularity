@@ -49,12 +49,6 @@ abstract class BaseController extends CoreController
      */
     protected $titleFormKey;
 
-    /**
-     * @var array
-     */
-    protected $indexTableColumns;
-
-
     public function __construct(
         Application $app,
         Request $request
@@ -106,14 +100,9 @@ abstract class BaseController extends CoreController
         // $this->submoduleParentId = $parentId;
 
         if ($this->request->ajax()) {
-            $formSchema = $this->getFormSchema($this->getConfigFieldsByRoute('inputs'));
-
-            // dd(
-            //     $this->getSchemaWiths($formSchema),
-            //     $this->getJSONData($this->getSchemaWiths($formSchema))
-            // );
             return [
-                'resource' => $this->getJSONData($this->getSchemaWiths($formSchema)),
+                'resource' => $this->getJSONData(),
+                'mainFilters' => $this->getTableMainFilters(),
                 'replaceUrl' => true
             ];
             // return $indexData + ['replaceUrl' => true];
@@ -445,6 +434,7 @@ abstract class BaseController extends CoreController
             $columnsData = Collection::make($this->indexTableColumns)->mapWithKeys(function (&$column) use ($item) {
                 return $this->getItemColumnData($item, $column);
             })->toArray();
+
             $name = $columnsData[$this->titleColumnKey];
 
             if (empty($name)) {

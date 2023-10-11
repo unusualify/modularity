@@ -28,6 +28,14 @@ trait ManageScopes {
     protected $filters = [];
 
     /**
+     * Fixed filters for the index view.
+     *
+     *
+     * @var array
+     */
+    protected $fixedFilters = [];
+
+    /**
      * Additional links to display in the listing filter.
      *
      * @var array
@@ -82,6 +90,7 @@ trait ManageScopes {
 
             unset($requestFilters['status']);
         }
+
         foreach ($this->filters as $key => $field) {
             if (array_key_exists($key, $requestFilters)) {
                 $value = $requestFilters[$key];
@@ -111,6 +120,19 @@ trait ManageScopes {
                 }
             }
         }
+        foreach ($this->fixedFilters as $key => $value) {
+            $scope[$key] = $value;
+        }
+
+        // dd(
+        //     $requestFilters,
+        //     $this->defaultFilters,
+        //     $this->filters,
+        //     $this->concreteFilters,
+
+        //     $prepend,
+        //     $scope
+        // );
 
         return $prepend + $scope;
     }

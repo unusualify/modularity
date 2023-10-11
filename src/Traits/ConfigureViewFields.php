@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Lang;
+use OoBook\CRM\Base\Services\View\UWrapper;
 use OoBook\CRM\Base\Support\Finder;
 use stdClass;
 
@@ -29,7 +29,6 @@ trait ConfigureViewFields {
     /**
      * @var array
      */
-
     protected $tableAttributes = [];
 
 
@@ -47,6 +46,10 @@ trait ConfigureViewFields {
      */
     protected $formWithCount = [];
 
+    /**
+     * @var array
+     */
+    protected $indexTableColumns;
 
     /**
      * @param array $prependScope
@@ -54,23 +57,17 @@ trait ConfigureViewFields {
      */
     protected function getIndexData($prependScope = [])
     {
-        // $scopes = $this->filterScope($prependScope);
-        // $items = $this->getIndexItems($scopes);
-
-        $formSchema = $this->getFormSchema($this->getConfigFieldsByRoute('inputs'));
         $data = [
             // 'hiddenFilters' => array_keys(Arr::except($this->filters, array_keys($this->defaultFilters))),
             // 'filterLinks' => $this->filterLinks ?? [],
-
-            'initialResource' => $this->getJSONData($this->getSchemaWiths($formSchema)), //
-            'tableMainFilters' => $this->getIndexTableMainFilters(),
+            'initialResource' => $this->getJSONData(), //
+            'tableMainFilters' => $this->getTableMainFilters(),
             'filters' => json_decode($this->request->get('filter'), true) ?? [],
             'requestFilter' => json_decode(request()->get('filter'), true) ?? [],
             'searchText' =>  request()->has('search') ? request()->query('search') : "", // for current text of search parameter
 
             'headers' => $this->getIndexTableColumns(), // headers to be used in unusual datatable component
-            'formSchema'  => $formSchema, // input fields to be used in unusual datatable component
-
+            'formSchema'  => $this->getFormSchema($this->getConfigFieldsByRoute('inputs')), // input fields to be used in unusual datatable component
             /***
              * TODO variables to be assigned dynamically
              *
@@ -92,6 +89,7 @@ trait ConfigureViewFields {
                 ],
                 $this->tableAttributes,
             )
+            + ['nestedData' => $this->getNestedData()]
             + ['rowActions' => $this->getTableActions()],
 
             'listOptions' => $this->getVuetifyDatatableOptions(), // options to be used in unusual table components in datatable store
@@ -111,15 +109,24 @@ trait ConfigureViewFields {
             // 'permalinkPrefix' => $this->getPermalinkPrefix($baseUrl),
             // 'additionalTableActions' => $this->additionalTableActions(),
         ];
-
+        // dd($this->getVuetifyDatatableOptions());
         return array_replace_recursive($data + $options, $this->indexData($this->request));
     }
 
-    /** xx
+    /**
      * @param Request $request
      * @return array
      */
-    protected function indexData($request)
+    public function indexData($request)
+    {
+        return [];
+    }
+
+    /**
+     * @param \OoBook\CRM\Base\Models\Model $item
+     * @return array
+     */
+    public function indexItemData($item)
     {
         return [];
     }
@@ -129,7 +136,7 @@ trait ConfigureViewFields {
      * @param array $scopes
      * @return array
      */
-    protected function getIndexTableMainFilters($scopes = [])
+    protected function getTableMainFilters($scopes = [])
     {
         $statusFilters = [];
 
@@ -152,41 +159,44 @@ trait ConfigureViewFields {
         //     ];
         // }
 
-        if ($this->getIndexOption('publish')) {
+        $fillables = $this->repository->getFillable();
+
+        if(in_array('published', $fillables)){
             $statusFilters[] = [
-                'name' => unusualTrans("$this->baseKey::lang.listing.filter.published"),
+                'name' => ___("listing.filter.published"),
                 'slug' => 'published',
                 'number' => $this->repository->getCountByStatusSlug('published', $scope),
             ];
-            $statusFilters[] = [
-                'name' => unusualTrans("$this->baseKey::lang.listing.filter.draft"),
-                'slug' => 'draft',
-                'number' => $this->repository->getCountByStatusSlug('draft', $scope),
-            ];
         }
+
+        if ($this->getIndexOption('publish')) {
+            // $statusFilters[] = [
+            //     'name' => ___("listing.filter.published"),
+            //     'slug' => 'published',
+            //     'number' => $this->repository->getCountByStatusSlug('published', $scope),
+            // ];
+            // $statusFilters[] = [
+            //     'name' => ___("listing.filter.draft"),
+            //     'slug' => 'draft',
+            //     'number' => $this->repository->getCountByStatusSlug('draft', $scope),
+            // ];
+        }
+
+        // $statusFilters[] = [
+        //     'name' => ___("listing.filter.trash"),
+        //     'slug' => 'trash',
+        //     'number' => $this->repository->getCountByStatusSlug('trash', $scope),
+        // ];
 
         if ($this->getIndexOption('restore')) {
             $statusFilters[] = [
-                'name' => unusualTrans("$this->baseKey::lang.listing.filter.trash"),
+                'name' => ___("listing.filter.trash"),
                 'slug' => 'trash',
                 'number' => $this->repository->getCountByStatusSlug('trash', $scope),
             ];
         }
 
         return $statusFilters;
-    }
-
-    public function getIndexItemData($item)
-    {
-        # code...
-    }
-    /**
-     * @param \OoBook\CRM\Base\Models\Model $item
-     * @return array
-     */
-    protected function indexItemData($item)
-    {
-        return [];
     }
 
     public function getIndexTableColumns()
@@ -227,6 +237,28 @@ trait ConfigureViewFields {
         return [];
     }
 
+    protected function getTableActions()
+    {
+        $actions = [];
+
+        if($this->getIndexOption('edit') ){
+            $actions[] = [
+                'name' => 'edit',
+                // 'color' => 'green darken-2',
+                'color' => 'primary darken-2',
+            ];
+        }
+        if($this->getIndexOption('delete')){
+            $actions[] = [
+                'name' => 'delete',
+                // 'color' => 'red darken-2',
+                'color' => 'primary',
+            ];
+        }
+
+        return $actions;
+    }
+
     /**
      * getTableOption
      *
@@ -249,9 +281,10 @@ trait ConfigureViewFields {
             'page'          => request()->has('page') ? intval(request()->query('page')) : 1,
             'itemsPerPage'  => request()->has('itemsPerPage') ? intval(request()->query('itemsPerPage')) : ($this->perPage ?? 10),
             'sortBy'        => request()->has('sortBy') ? [request()->get('sortBy')] : [],
-            'multiSort'     => true,
-            'mustSort'      => false,
             'groupBy'       => [],
+            'search'        => ''
+            // 'multiSort'     => true,
+            // 'mustSort'      => false,
             // 'groupDesc'     => [],
             // 'sortDesc'      => request()->has('sortDesc') ? [request()->get('sortDesc')] : [],
         ];
@@ -427,17 +460,23 @@ trait ConfigureViewFields {
             'restoreUrl' => moduleRoute($this->moduleName, $this->routePrefix, 'restoreRevision', [$itemId]),
         ] : []);
 
-        // dd(
-        //     array_replace_recursive($data, $this->extraFormData($this->request))
-        // );
-        return array_replace_recursive($data, $this->extraFormData($this->request));
+        return array_replace_recursive($data, $this->formData($this->request));
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function formData($request)
+    {
+        return [];
     }
 
     /**
      * @param int $id
      * @return array
      */
-    protected function modalFormData($id)
+    protected function getModalFormData($id)
     {
         $item = $this->repository->getById($id, $this->formWith, $this->formWithCount);
         $fields = $this->repository->getFormFields($item);
@@ -463,26 +502,26 @@ trait ConfigureViewFields {
             ];
         }
 
-        return array_replace_recursive($data, $this->extraFormData($this->request));
+        return array_replace_recursive($data, $this->modalFormData($this->request));
     }
 
     /**
      * @param Request $request
      * @return array
      */
-    protected function extraFormData($request)
+    public function modalFormData($request)
     {
         return [];
     }
 
-    public function getFormSchema($inputs)
+    protected function getFormSchema($inputs)
     {
         return Collection::make( $inputs )->mapWithKeys(function($item, $key){
             return $this->getInputSchema($item);
         })->toArray();
     }
 
-    public function getInputSchema($input)
+    protected function getInputSchema($input)
     {
         // $default_input = collect(Config::get(unusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
         // $default_input = $this->configureInput(array2Object(Config::get(unusualBaseKey() . '.default_input')));
@@ -511,7 +550,7 @@ trait ConfigureViewFields {
      * @param Array|stdClass $input
      * @return Collection
      */
-    public function configureInput($input)
+    protected function configureInput($input)
     {
         return collect($input)
             ->mapWithKeys(function($v, $k){
@@ -529,7 +568,7 @@ trait ConfigureViewFields {
      * @param Array|stdClass $input
      * @return Collection
      */
-    public function hydrateCustomInput($input)
+    protected function hydrateCustomInput($input)
     {
         $object = null;
 
@@ -585,7 +624,7 @@ trait ConfigureViewFields {
                 $input['default'] = [];
 
                 if(isset($input['repository'])){
-                    $relation_class = App::make($input['repository']);
+                    $relation_class = App::ma*ke($input['repository']);
                 }else if(isset($input['model'])){
                     $relation_class = App::make($input['model']);
                 }else if(isset($input['route'])){
@@ -668,7 +707,6 @@ trait ConfigureViewFields {
 
             if(method_exists($this->repository->getModel(), 'getTranslatedAttributes') && in_array($input['name'], $this->repository->getTranslatedAttributes()) ){
                 $input['translated'] = true;
-
                 // $input['locale_input'] = $input['type'];
                 // $input['type'] = 'custom-input-locale';
                 $object = $input;
@@ -679,54 +717,12 @@ trait ConfigureViewFields {
         return $object;
     }
 
-    protected function getSchemaWiths($schema)
-    {
-        // return collect($schema)->filter(function($item){
-        //     return $this->hasWithModel($item['type']);
-        // })->map(function($item){
-        //     return "{$item['name']}:{$item['itemValue']}";
-        // })->toArray();
-
-        return collect($schema)->filter(function($item){
-            return $this->hasWithModel($item['type']);
-        })->mapWithKeys(function($item){
-            $key = $item['name'];
-            if(preg_match('/(.*)(_id)/', $key, $matches)){
-                $key = $this->getCamelCase($matches[1]);
-            }
-            return [
-                $key => [
-                    // ['select', $item['itemValue'], $item['itemTitle']],
-                    ['addSelect', $item['itemValue']],
-                    ['addSelect', $item['itemTitle']]
-                ]
-            ];
-        })->toArray();
-    }
-
-    /**
-     * @param string $option
-     * @return bool
-     */
-    protected function hasWithModel($type)
-    {
-        $types = [
-            'treeview',
-            'custom-input-treeview',
-            'custom-input-checklist',
-            'select',
-        ];
-
-
-        return in_array($type, $types);
-    }
-
-    public function getHeader($header)
+    protected function getHeader($header)
     {
         return array_merge_recursive_preserve( unusualConfig('default_header'), $this->hydrateCustomHeader($header) );
     }
 
-    public function hydrateCustomHeader($header)
+    protected function hydrateCustomHeader($header)
     {
         if($this->isRelationField($header['key']))
             $header['key'] .= '_relation';
@@ -752,31 +748,113 @@ trait ConfigureViewFields {
         return $header;
     }
 
-    public function getTableActions()
-    {
-        $actions = [];
-
-        if($this->getIndexOption('edit') ){
-            $actions[] = [
-                'name' => 'edit',
-                // 'color' => 'green darken-2',
-                'color' => 'primary darken-2',
-            ];
-        }
-        if($this->getIndexOption('delete')){
-            $actions[] = [
-                'name' => 'delete',
-                // 'color' => 'red darken-2',
-                'color' => 'primary',
-            ];
-        }
-
-        return $actions;
-    }
-
     public function getViewLayoutVariables() {
         return [
             'pageTitle' => $this->getHeadline($this->routeName) . " Module"
         ];
+    }
+
+    public function getNestedData() {
+
+        $result = Collection::make($this->getConfigFieldsByRoute('modules', []))->map(function($context, $key){
+
+            $context->title = isset($context->title) ? ___($context->title) : headline($context->title);
+
+            if(isset($context->type)){
+                if($context->type == 'formWrapper'){
+                    $context->elements = UWrapper::makeFormWrapper(Collection::make($context->elements)->map(function($element){
+
+                        $schema = $this->getFormSchema(getInputDraft($element->draft));
+
+                        $parameters = Collection::make(Route::getRoutes()->getByName($element->route)->parameterNames())->mapWithKeys(function($parameter, $j){
+                            return [ $parameter => ":{$parameter}"];
+                        })->toArray();
+
+                        // $modelValueAbstract = $this->getSnakeCase($this->routeName);
+                        // if(isset($element->relation)){
+                        //     $modelValueAbstract = $element->relation;
+                        //     // $this->indexWith[] = $element->relation;
+                        // }
+                        $modelValueAbstract = isset($element->relation) ? $element->relation : $this->getSnakeCase($this->routeName);
+                        return [
+                            'title' => isset($element->title) ? ___($element->title) : '',
+                            'buttonText' => 'update',
+                            'hasSubmit' => true,
+
+                            'modelValue' => "\${$modelValueAbstract}",
+                            // 'modelValue' => [],
+                            'schema' => $schema,
+                            'defaultItem' => collect($schema)->mapWithKeys(function($item, $key){
+                                return [ $item['name'] => $item['default'] ?? ''];
+                                $carry[$key] = $item->default ?? '';
+                            })->toArray(),
+                            'actionUrl' => route($element->route, $parameters),
+                        ];
+                    })->toArray());
+                }
+                unset($context->type);
+            }
+
+
+            return $context;
+        })->toArray();
+
+        return $result;
+    }
+
+    protected function addIndexWithsSchema() : array
+    {
+        // $this->indexWith += collect($schema)->filter(function($item){
+        return collect($this->getConfigFieldsByRoute('inputs'))->filter(function($item){
+            // return $this->hasWithModel($item['type']);
+            return in_array($item->type, [
+                'treeview',
+                'custom-input-treeview',
+                'checklist',
+                'custom-input-checklist',
+                'select',
+                'combobox',
+                'autocomplete'
+            ]);
+        })->mapWithKeys(function($item){
+            $key = $item->name;
+            if(preg_match('/(.*)(_id)/', $key, $matches)){
+                $key = $this->getCamelCase($matches[1]);
+            }
+            return [
+                $key => [
+                    // ['select', $item['itemValue'], $item['itemTitle']],
+                    ['addSelect', $item->itemValue ?? 'id'],
+                    ['addSelect', $item->itemTitle ?? 'name']
+                ]
+            ];
+        })->toArray();
+    }
+
+    protected function addIndexWithsNestedData() : array
+    {
+        $withs = [];
+
+        foreach ($this->getConfigFieldsByRoute('modules', []) as $key => $item) {
+            if(isset($item->type) && $item->type == 'formWrapper'){
+                foreach($item->elements as $element){
+                    if(isset($element->relation))
+                        $withs[] = $element->relation;
+                }
+            }
+        }
+
+        return $withs;
+
+        // return collect($this->getConfigFieldsByRoute('modules', []))->filter(function($item){
+        //     return in_array(isset($item->type) ? $item->type : '', [
+        //         'formWrapper'
+        //     ]);
+        // })->map(function($item){
+        //     $item->elements;
+        //     return [
+
+        //     ];
+        // })->toArray();
     }
 }

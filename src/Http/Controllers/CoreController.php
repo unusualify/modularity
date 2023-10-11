@@ -256,6 +256,9 @@ abstract class CoreController extends Controller
          */
         $this->applyFiltersDefaultOptions();
 
+        $this->addIndexWiths();
+        // $this->addFormWiths();
+
     }
 
     /**
@@ -351,7 +354,7 @@ abstract class CoreController extends Controller
      */
     protected function isParentRoute()
     {
-        return $this->isParent ?? $this->moduleName == $this->routeName;
+        return $this->isParent ?? $this->getConfigFieldsByRoute('parent') ?: $this->moduleName == $this->routeName;
     }
 
     /**
@@ -391,7 +394,7 @@ abstract class CoreController extends Controller
                 // 'index' => 'access',
                 // 'create' => 'edit',
                 // 'edit' => 'edit',
-                // 'publish' => 'publish',
+                'publish' => 'publish',
                 // 'feature' => 'feature',
                 // 'reorder' => 'reorder',
                 // 'delete' => 'delete',
@@ -453,9 +456,6 @@ abstract class CoreController extends Controller
      */
     protected function getIndexItems($with=[], $scopes = [], $forcePagination = false, )
     {
-        // dd(
-        //     $this->orderScope()
-        // );
         return $this->transformIndexItems($this->repository->get(
             $this->indexWith + $with,
             $scopes,
@@ -561,7 +561,7 @@ abstract class CoreController extends Controller
         );
 
         // return Collection::make(
-        //     Config::get( $this->getCamelCase( env('BASE_NAME', 'Base') ) . '.internal_modules.' . $kebabCase)
+        //     Config::get( $this->getCamelCase( env('UNUSUAL_BASE_NAME', 'Unusual') ) . '.internal_modules.' . $kebabCase)
         //     ?: Config::get( $kebabCase )
         // )->recursive();
     }
@@ -574,11 +574,15 @@ abstract class CoreController extends Controller
         if( $this->routePrefix !== null )
             return $this->routePrefix;
 
-        if( $this->routeName == $this->moduleName )
-            return '';
-        else
-            return Str::snake($this->moduleName);
+        $routePrefixes = [];
 
+        if( isset($this->config->base_prefix) && $this->config->base_prefix)
+            $routePrefixes[] = snakeCase(studlyName(unusualConfig('base_prefix', 'system-settings')));
+
+        if( !$this->isParent )
+            $routePrefixes[] = Str::snake($this->moduleName);
+
+        return implode('.', $routePrefixes);
 
         if ($this->request->route() != null) {
             $routePrefix = ltrim(
@@ -739,12 +743,12 @@ abstract class CoreController extends Controller
         });
     }
 
-    protected function getConfigFieldsByRoute($field_name)
+    protected function getConfigFieldsByRoute($field_name, $default = null)
     {
         try {
             return $this->config->routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
         } catch (\Throwable $th) {
-            return [];
+            return $default;
             dd(
                 // $th,
                 $this,
@@ -791,5 +795,16 @@ abstract class CoreController extends Controller
 
         // return false;
         // return in_array($key, $model_relations);
+    }
+
+    protected function addIndexWiths()
+    {
+        $methods = array_filter(get_class_methods(static::class), function($method){
+            return preg_match('/addIndexWiths[A-Z]{1}[A-Za-z]+/', $method);
+        });
+
+        foreach ($methods as $key => $method) {
+            $this->indexWith += $this->{$method}();
+        }
     }
 }

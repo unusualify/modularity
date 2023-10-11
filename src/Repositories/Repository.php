@@ -62,10 +62,6 @@ abstract class Repository
     public function get($with = [], $scopes = [], $orders = [], $perPage = 20, $forcePagination = false)
     {
         $query = $this->model->query();
-        // dd(
-        //     DB::table('roles'),
-        //     get_class_methods(DB::table('roles'))
-        // );
 
         $query = $query->with($this->formatWiths($query, $with));
 
@@ -78,7 +74,6 @@ abstract class Repository
         $query = $this->filter($query, $scopes);
         $query = $this->order($query, $orders);
 
-        // $query->get()->pluck('roles.*.id')
         if (!$forcePagination && $this->model instanceof Sortable) {
             return $query->ordered()->get();
         }
@@ -719,8 +714,9 @@ abstract class Repository
         }
 
         foreach ($scopes as $column => $value) {
-            if (method_exists($this->model, 'scope' . ucfirst($column))) {
-                $query->$column();
+            $studlyColumn = studlyName($column);
+            if (method_exists($this->model, 'scope' . $studlyColumn)) {
+                $query->$studlyColumn();
             } else {
                 if (is_array($value)) {
                     $query->whereIn($column, $value);
