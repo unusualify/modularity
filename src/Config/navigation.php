@@ -1,7 +1,11 @@
 <?php
 
-use OoBook\CRM\Base\Facades\UnusualNavigation;
+use OoBook\CRM\Base\Facades\UNavigation;
 
+// dd(
+//     UNavigation::baseMenu(),
+//     UNavigation::modulesMenu()
+// );
 return [
     /*
     |--------------------------------------------------------------------------
@@ -24,7 +28,7 @@ return [
             '_system_settings' => [
                 'name' => 'System Settings',
             ],
-            ...UnusualNavigation::baseMenu(),
+            ...UNavigation::baseMenu(),
             'system-settings' => [
                 'name' => 'System Settings',
                 'items' => [
@@ -39,7 +43,7 @@ return [
             '_modules' => [
                 'name' => 'Modules',
             ],
-            ...UnusualNavigation::modulesMenu(),
+            ...UNavigation::modulesMenu(),
             'media_library' => [
                 'name' => 'Media Library',
                 // 'icon' => '$media',

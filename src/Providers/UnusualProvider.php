@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 use Nwidart\Modules\Facades\Module;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
-use OoBook\CRM\Base\Facades\UnusualNavigation;
+use OoBook\CRM\Base\Facades\UNavigation;
 use OoBook\CRM\Base\View\Table;
 
 class UnusualProvider extends ServiceProvider
@@ -63,7 +63,7 @@ class UnusualProvider extends ServiceProvider
         //     $this->app->config->get(unusualBaseKey() . '-navigation')
         // );
         // $this->app->config->set([
-        //     unusualBaseKey() . '-navigation.sidebar' => UnusualNavigation::formatSidebarMenus($this->app->config->get(unusualBaseKey() . '-navigation.sidebar'))
+        //     unusualBaseKey() . '-navigation.sidebar' => UNavigation::formatSidebarMenus($this->app->config->get(unusualBaseKey() . '-navigation.sidebar'))
         // ]);
 
         // load base module migrations

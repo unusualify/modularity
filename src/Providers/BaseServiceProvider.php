@@ -5,7 +5,7 @@ namespace OoBook\CRM\Base\Providers;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Route;
 use OoBook\CRM\Base\Activators\FileActivator;
-use OoBook\CRM\Base\Support\UnusualNavigation;
+use OoBook\CRM\Base\Services\View\UNavigation;
 use OoBook\CRM\Base\UnusualFileRepository;
 class BaseServiceProvider extends ServiceProvider
 {
@@ -68,7 +68,7 @@ class BaseServiceProvider extends ServiceProvider
             });
         }
 
-        $this->app->singleton('unusual.navigation', UnusualNavigation::class);
+        $this->app->singleton('unusual.navigation', UNavigation::class);
         // $this->app->alias(\OoBook\CRM\Base\Contracts\RepositoryInterface::class, 'ue_modules');
         // $this->app->alias('unusual.repository', 'ue_modules');
 

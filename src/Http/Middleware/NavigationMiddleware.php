@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Menus\GetSidebarMenu;
 use App\Models\Menulist;
 use App\Models\RoleHierarchy;
-use OoBook\CRM\Base\Facades\UnusualNavigation;
+use OoBook\CRM\Base\Facades\UNavigation;
 use Spatie\Permission\Models\Role;
 
 class NavigationMiddleware
@@ -23,7 +23,7 @@ class NavigationMiddleware
     public function handle($request, Closure $next)
     {
         app()->config->set([
-            unusualBaseKey() . '-navigation.sidebar' => UnusualNavigation::formatSidebarMenus(app()->config->get(unusualBaseKey() . '-navigation.sidebar'))
+            unusualBaseKey() . '-navigation.sidebar' => UNavigation::formatSidebarMenus(app()->config->get(unusualBaseKey() . '-navigation.sidebar'))
         ]);
 
         view()->composer( [unusualBaseKey()."::layouts.master", 'translation::layout'], function ($view)
