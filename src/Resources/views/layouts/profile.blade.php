@@ -23,7 +23,7 @@
 @section('content')
     <div>
         @foreach ($elements as $i => $context)
-            <ue-recursive-shit
+            <ue-recursive-stuff
                 :configuration='@json($context)'
                 />
         @endforeach

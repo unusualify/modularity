@@ -1,7 +1,7 @@
 @once
     @php
         $defaultTableAttributes = [
-            'class' => 'ue-table',
+            // 'class' => 'ue-table',
             'name' => $routeName ?? 'Item',
             'titleKey' => $titleKey ?? 'name',
             'hideDefaultFooter' => false,

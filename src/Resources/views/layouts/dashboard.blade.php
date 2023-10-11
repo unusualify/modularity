@@ -21,9 +21,7 @@
 
 @section('content')
     <div class="dashboard">
-        <ue-dashboard
-            :blocks='@json($blocks ?? [])'
-        >
+        <ue-dashboard :blocks='@json($blocks ?? [])'>
     </div>
 @stop
 

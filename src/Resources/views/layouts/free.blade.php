@@ -8,9 +8,7 @@
 
 @section('content')
     @foreach ($elements as $i => $context)
-        <ue-recursive-shit
-            :configuration='@json($context)'
-        />
+        <ue-recursive-stuff :configuration='@json($context)'/>
     @endforeach
 @stop
 

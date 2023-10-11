@@ -173,7 +173,7 @@ class LoginController extends Controller
                         'hint' => 'enter @example.com',
                         "default" => "",
                         'col' => [
-                            'cols' => 12,
+                            'lg' => 12
                         ],
                         'rules' => [
                             ['email']
@@ -189,7 +189,7 @@ class LoginController extends Controller
                             'appendInner' => 'password',
                         ],
                         'col' => [
-                            'cols' => 12
+                            'lg' => 12
                         ]
                     ]
                 ])),

@@ -31,12 +31,12 @@
 
                     @foreach( ($slots ?? []) as $slotName => $configuration)
                         <template v-slot:{{ $slotName }} >
-                            <ue-recursive-shit
+                            <ue-recursive-stuff
                                 :configuration='@json($configuration)'
                             />
                         </template>
                         {{-- <template v-slot:bottom1 >
-                            <ue-recursive-shit
+                            <ue-recursive-stuff
                                 :configuration='@json($configuration)'
                             />
                         </template> --}}

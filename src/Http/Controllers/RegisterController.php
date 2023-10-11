@@ -35,6 +35,7 @@ class RegisterController extends Controller
                         "default" => "",
                         'col' => [
                             'cols' => 12,
+                            'lg' => 12
                         ],
                         'rules' => [
                             ['min', 3]
@@ -47,6 +48,7 @@ class RegisterController extends Controller
                         "default" => "",
                         'col' => [
                             'cols' => 12,
+                            'lg' => 12
                         ],
                         'rules' => [
                             ['min', 2]
@@ -59,6 +61,7 @@ class RegisterController extends Controller
                         "default" => "",
                         'col' => [
                             'cols' => 12,
+                            'lg' => 12
                         ],
                         'rules' => [
                             ['email']
@@ -74,7 +77,8 @@ class RegisterController extends Controller
                             'appendInner' => 'password',
                         ],
                         'col' => [
-                            'cols' => 12
+                            'cols' => 12,
+                            'lg' => 12
                         ]
                     ],
                 ])),
@@ -157,11 +161,11 @@ class RegisterController extends Controller
         //         'guard_name' => 'unusual_users'
         //     ]);
         // });
-        $user->assignRole('manager');
+        $user->assignRole('client-manager');
 
         return $request->wantsJson()
         ?   new JsonResponse([
-                'redirector' => redirect()->route('login.form')
+                'redirector' => route('login.form')
             ], 200)
         :   $this->sendLoginResponse($request);
     }

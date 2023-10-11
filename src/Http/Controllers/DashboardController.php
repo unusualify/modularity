@@ -84,6 +84,8 @@ class DashboardController extends BaseController
                         'title-key' => '',
                         'custom-header' => 'Recent Revisions',
                         'hide-headers' => true,
+                        'fullWidthWrapper' => true,
+                        'style' => 'min-height: 100%',
                         'items' =>  App::make(PackageContinentRepository::class)->get([], [], [
                             'created_at' => 'desc'
                         ], 2)->items(),
@@ -135,7 +137,7 @@ class DashboardController extends BaseController
                                     [
                                         'tag' => 'div',
                                         'attributes' => [
-                                            'class' => 'text-right pa-10',
+                                            'class' => 'text-right pa-8',
                                         ],
                                         'elements' => [
                                             [
@@ -163,6 +165,8 @@ class DashboardController extends BaseController
                         'name' => 'pressRelease',
                         'title-key' => '',
                         'custom-header' => 'Recently Published',
+                        'fullWidthWrapper' => true,
+                        'style' => 'min-height: 100%',
                         'items' =>  App::make(PackageContinentRepository::class)->get([], [], [
                             'created_at' => 'desc'
                         ], 8)->items(),
@@ -195,7 +199,7 @@ class DashboardController extends BaseController
                                     [
                                         'tag' => 'div',
                                         'attributes' => [
-                                            'class' => 'text-right pa-10',
+                                            'class' => 'text-right pa-8',
                                         ],
                                         'elements' => [
                                             [
@@ -218,7 +222,7 @@ class DashboardController extends BaseController
                 ],
             ]
         ];
-        // dd($data);
+        // dd($data['blocks']);
         $view = "$this->baseKey::layouts.dashboard";
 
         return View::make($view, $data);
