@@ -1,8 +1,9 @@
 // themes/${theme}/vuetify/_settings.scss
 @use '../abstract' as *;
-@use 'vuetify/settings' with (
+
+@forward 'vuetify/settings' with (
   // $body-font-family: map-get(c.$vuetify, 'body-font-family'),
-  $utilities: '',
+  // $utilities: '',
 
   // $button-height: map-get(c.$vuetify, 'button-height'),
   $button-font-weight: map-get($font-weights, 'semiBold'),
@@ -12,6 +13,8 @@
   // INPUT
   $field-font-size: $input-font-size,
   $field-label-floating-scale: $field-label-floating-scale, //0.81,
+  $field-control-height: $field-control-height, //56px,
+  $input-control-height: $field-control-height, //56px,
 
   $navigation-drawer-background: $sidebar-background,
   $navigation-drawer-color: $global-dark-text-color,
@@ -22,7 +25,31 @@
   $list-item-one-line-padding: 8px 13px,
   $list-item-padding: 4px $theme-space,
 
-  $table-border-color: #E0E0E0,
+  $table-border-color: #E0E0E0, // rgba(var(--v-border-color), var(--v-border-opacity)) !default;
+  $table-column-padding: 0 $theme-space, // 0 16px !default;
+  $table-row-height: 49px, // var(--v-table-row-height, 52px) !default
+  $table-header-height: 49px, // 56px !default;
 
   $font-weights: $font-weights,
+
+  // spaces
+  $grid-gutter: $theme-space,
+  // $spacer: $spacer,
+
+  // $alert-padding: $spacer * 4,
+  // $alert-border-thin-width: $spacer * 2,
+  // $banner-padding: $spacer * 2,
+  // $banner-action-margin: $spacer * 4,
+  // $breadcrumbs-padding-y: $spacer * 4,
+  // $btn-group-height: $spacer * 10,
+  // $field-control-height: $spacer * 12,
+  // $input-control-height: $spacer * 12,
+  // $list-item-min-height: $spacer * 10,
+  // $list-subheader-min-height: $spacer * 10,
+  // $progress-circular-size: $spacer * 6,
+  // $selection-control-size: $spacer * 8,
+  // $size-scale: $spacer * 7,
+  // $tabs-height: $spacer * 12,
+  // $tabs-stacked-height: $spacer * 18,
+
 );
