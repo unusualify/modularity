@@ -5,24 +5,23 @@ import { fa } from 'vuetify/iconsets/fa'
 import '@fortawesome/fontawesome-free/css/all.min.css' // Ensure you are using css-loader
 import '@mdi/font/css/materialdesignicons.css' // Ensure you are using css-loader
 
-import 'styles/themes/b2press/main.scss'
+// import 'styles/themes/b2press/main.scss'
 // import 'vuetify/styles'
 
 import * as components from 'vuetify/lib/components'
 import * as directives from 'vuetify/lib/directives'
 // import { VTreeview } from 'vuetify/lib/components/VTreeview'
+// import { VBtn } from 'vuetify/lib/components'
 
 import customMdiIcons from '@/config/icons/mdi'
-
 // import { md2 } from 'vuetify/blueprints'
-
-import { VBtn } from 'vuetify/lib/components'
 
 import * as themes from '@/config/themes'
 // import 'vuetify/lib/styles/main.sass'
 
-const APP_THEME = process.env.VUE_APP_THEME
-// import('../../sass/themes/' + APP_THEME + '/_index.sass')
+const APP_THEME = process.env.VUE_APP_THEME || 'unusual'
+
+require('styles/themes/' + APP_THEME + '/main.scss')
 
 function loadIcons ($font) {
   const locales = require.context('../config/icons', true, /[A-Za-z0-9-_,\s]+.json$/i)
@@ -42,11 +41,11 @@ function loadIcons ($font) {
 const opts = {
 //   blueprint: md2,
   aliases: {
-    VBtnSecondary: VBtn,
-    VBtnTertiary: VBtn,
-    VBtnCta: VBtn,
-    VBtnCtaSecondary: VBtn,
-    VBtnSuccess: VBtn
+    VBtnSecondary: components.VBtn,
+    VBtnTertiary: components.VBtn,
+    VBtnCta: components.VBtn,
+    VBtnCtaSecondary: components.VBtn,
+    VBtnSuccess: components.VBtn
   },
   defaults: {
     global: {
