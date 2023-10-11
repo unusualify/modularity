@@ -166,20 +166,19 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="sass">
   // @use 'styles/themes/b2press/settings' with(
   //   $button-text-transform: 'capitalize'
   // );
+  .border
+    padding-left: 12px
+    /* margin-right: 12px; */
+    background: #97ffff
+    border-radius: 10%
+    text-decoration: none
 </style>
 
 <style>
-    .border{
-        padding-left: 12px;
-        /* margin-right: 12px; */
-        background: #97ffff;
-        border-radius: 10%;
-        text-decoration: none;
-    }
 
     /* .v-list-item-group .v-list-item-active {
       color: grey;

@@ -1,14 +1,13 @@
 <template>
   <v-sheet class="rounded-0">
     <v-alert
-      class="rounded-0 v-callout pl-theme"
+      class="rounded-0 v-callout"
       border="start"
       :color="bgColor"
       :border-color="color"
       elevation="2"
     >
-      <ue-row-format
-        :elements="[
+      <ue-row-format :elements="[
           {
             text: title,
             col: {'cols': 8, class: 'd-flex align-center'},

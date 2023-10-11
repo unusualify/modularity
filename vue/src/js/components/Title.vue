@@ -11,11 +11,11 @@ const props = defineProps({
   text: String,
   defaultClasses: {
     type: [String, Array],
-    default: 'text-h8 text-primary font-weight-bold'
+    default: 'text-h8 text-primary font-weight-bold ue-title'
   },
   paddingClasses: {
     type: [String, Array],
-    default: 'pt-5 pb-5'
+    default: ''
   },
   classes: {
     type: [String, Array]
@@ -35,6 +35,12 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="sass" scoped>
+  .ue-title
+    padding-top: .75rem
+    padding-bottom: .75rem
+    padding-left: $theme-space
+    padding-right: $theme-space
+    text-transform: uppercase!important
 
 </style>

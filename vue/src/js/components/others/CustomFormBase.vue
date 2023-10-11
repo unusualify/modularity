@@ -40,27 +40,6 @@
             <slot :name="getTypeItemSlot(obj)" v-bind= "{ obj, index, id }">
               <!-- slot replaces complete item of defined KEY -> <div slot="slot-item-key-[propertyName]">-->
               <slot :name="getKeyItemSlot(obj)" v-bind= "{ obj, index, id }">
-
-                  <!-- <div class="caption">
-                    OBJ:{{obj}}
-                    <br>
-                    FORM:{{getFormTopSlot()}}
-                    <br>
-                    INJECT:{{getKeyInjectSlot(obj)}}
-                    <br>
-                    ARRAY:{{getArrayItemSlot(obj)}}
-                    <br>
-                    TYPE:{{getTypeItemSlot(obj)}}
-                    <br>
-                    KEY:{{getKeyItemSlot(obj)}}
-                    <br>
-                    CLASS:{{getClassName(obj)}}
-                    <br>
-                    Slots: {{getInjectedScopedSlots(id, obj)}}
-                    <br>
-                    VAL:{{setValue(obj)}}
-                  </div> -->
-
               <!-- RADIO -->
                 <v-radio-group
                   v-if="obj.schema.type === 'radio'"

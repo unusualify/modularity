@@ -17,7 +17,7 @@
           <!-- <div class="text-h8 pt-5 pb-10 text-primary font-weight-bold" v-if="formTitle && false">
             {{ ($te(formTitle) ? $t(formTitle).toLocaleUpperCase($i18n.locale.toUpperCase()) : formTitle.toLocaleUpperCase($i18n.locale.toUpperCase())) }}
           </div> -->
-          <ue-title v-if="title" :classes="['me-auto']">
+          <ue-title v-if="title" :classes="['pl-0']">
             <div class="d-flex">
               <div class="me-auto">
                 {{ ($te(title)
@@ -86,7 +86,7 @@
 
       <v-sheet class="d-flex pt-6" v-if="hasSubmit && !stickyButton">
         <slot name="submit" v-bind="{validForm,buttonDefaultText}">
-          <v-btn type="submit" :disabled="!validForm" class="ml-auto">
+          <v-btn type="submit" :disabled="!validForm" class="ml-auto mb-5">
             {{ buttonDefaultText }}
           </v-btn>
         </slot>
@@ -144,7 +144,7 @@ export default {
     },
     formClass: {
       type: [Array, String],
-      default: 'px-5 pb-5'
+      default: 'px-theme pb-theme'
     },
     actionUrl: {
       type: String
@@ -396,7 +396,10 @@ export default {
           }
 
           if (Object.prototype.hasOwnProperty.call(response.data, 'redirector')) {
-            window.location.href = response.data.redirector
+            // self.$store.commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
+            setTimeout(function (url) {
+              window.location.href = url
+            }, 2000, response.data.redirector)
           }
 
           if (callback && typeof callback === 'function') callback(response.data)

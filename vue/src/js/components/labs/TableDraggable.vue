@@ -129,7 +129,7 @@
       :key="`customSlot-${slotName}`"
       >
       <div>
-        <ue-recursive-shit
+        <ue-recursive-stuff
           v-for="(configuration, i) in context.elements"
           :key="`tag-0-${i}`"
           :configuration="configuration"
@@ -215,13 +215,13 @@ import { mergeProps as _mergeProps, createVNode as _createVNode } from 'vue'
 
 import { VDataTableServer, VDataTableRows, VDataTableRow } from 'vuetify/labs/VDataTable'
 
-import { TableMixin } from '@/mixins'
+// import { TableMixin } from '@/mixins'
 import { useTable } from '@/hooks'
 
 import draggable from 'vuedraggable'
 
 export default {
-  mixins: [TableMixin],
+  // mixins: [TableMixin],
   components: {
     VDataTableServer,
     VDataTableRow,

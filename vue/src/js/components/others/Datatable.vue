@@ -16,8 +16,6 @@
     :item-title="titleKey"
 
     :search="search"
-    :hide-default-header="hideDefaultHeader"
-    :hide-default-footer="hideDefaultFooter"
     :footer-propss="{
       showFirstLastPage: true,
       firstIcon: 'mdi-arrow-collapse-left',
@@ -88,17 +86,18 @@
               v-bind="props"
               variant="elevated"
             >
-              {{ mainFilters.at(0).name }}
+              {{ `${filterActive.name} (${filterActive.number})` }}
               <v-spacer></v-spacer>
               <v-icon right :style="{ transform: isActive ? 'rotate(-180deg)' : 'rotate(0)' }">mdi-chevron-down</v-icon>
             </v-btn>
           </template>
           <v-list>
             <v-list-item
-              v-for="(item, index) in mainFilters"
+              v-for="(filter, index) in mainFilters"
               :key="index"
+              v-on:click.prevent="filterStatus(filter.slug)"
             >
-              <v-list-item-title>{{ item.name}}</v-list-item-title>
+              <v-list-item-title>{{ filter.name + '(' + filter.number+ ')'}} </v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -132,7 +131,7 @@
               v-model="formActive"
               scrollable
               transition="dialog-bottom-transition"
-              width-type="xl"
+              width-type="lg"
               >
               <template v-slot:activator="{props}">
                 <v-btn-success v-if="createOnModal" v-bind="props" dark>
@@ -181,7 +180,7 @@
           ref="deleteModal"
           v-model="deleteModalActive"
           transition="dialog-bottom-transition"
-          width-type="md"
+          width-type="sm"
           >
           <template v-slot:body="props" >
             <v-card >
@@ -261,7 +260,7 @@
           <v-list-item
             v-for="(action, k) in rowActions"
             :key="k"
-            @click="$call(action.name + 'Item', item.raw)"
+            @click="$call(action.name + 'Item', item)"
             >
               <v-icon small :color="action.color" left>
                 {{ action.icon ? action.icon : '$' + action.name }}
@@ -278,7 +277,7 @@
           :key="k"
           small
           class="mr-2"
-          @click="$call(action.name + 'Item', elements.find((_item => _item.id == item.value)))"
+          @click="$call(action.name + 'Item', item)"
           :color="action.color"
           >
           <!-- {{ $log(item, elements.find((_item => _item.id == item.value))) }} -->
@@ -303,32 +302,32 @@
       v-for="(col, i) in formatterColumns"
       v-slot:[`item.${col.key}`]="{ item }"
       >
-        <template v-if="col.formatter == 'edit'">
-          <v-btn
-            :key="i"
-            class="pa-0 justify-start"
-            variant="plain"
-            :color="`primary darken-1`"
-            @click="editItem(item.raw)"
-            >
-            {{ item.raw[col.key] }}
-          </v-btn>
+      <template v-if="col.formatter == 'edit' || col.formatter == 'activate'">
+        <v-btn
+          :key="i"
+          class="pa-0 justify-start"
+          variant="plain"
+          :color="`primary darken-1`"
+          @click="$call(col.formatter + 'Item', item)"
+          >
+          {{ item[col.key] }}
+        </v-btn>
         </template>
         <template v-else-if="col.formatter == 'switch'">
-            <v-switch
-              :key="i"
-              :model-value="item.raw[col.key]"
-              color="success"
-              :true-value="1"
-              false-value="0"
-              hide-details
-              @update:modelValue="switchItem($event, col.key, item.raw)"
-              >
-              <template v-slot:label></template>
-            </v-switch>
+          <v-switch
+            :key="i"
+            :model-value="item[col.key]"
+            color="success"
+            :true-value="1"
+            false-value="0"
+            hide-details
+            @update:modelValue="switchItem($event, col.key, item)"
+            >
+            <template v-slot:label></template>
+          </v-switch>
         </template>
         <template v-else>
-          {{ handleFormatter(col.formatter, item.raw[col.key] ) }}
+          {{ handleFormatter(col.formatter, item[col.key] ) }}
         </template>
     </template>
 

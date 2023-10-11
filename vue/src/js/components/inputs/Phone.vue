@@ -1,14 +1,14 @@
 <template>
   <div :class="['vue-tel-input-vuetify', $lodash.pick(boundProps, ['wrapperClasses']) ?? getDefault('wrapperClasses')]">
-    <v-row>
-      <v-col cols="5" xl="4" style="padding-right: 1px;">
+    <div class="d-flex w-100">
+      <div style="width=52px;">
         <v-combobox
           :ref="makeReference('countryInput')"
           v-model="countryCode"
           :items="sortedCountries"
           item-title="iso2"
           item-value="iso2"
-
+          width="52px"
           v-bind="$lodash.pick(boundProps, ['variant', 'menuProps', 'selectClasses', 'selectLabel', 'dense', 'density'])"
           :label="$t('country')"
 
@@ -33,9 +33,8 @@
             <span>{{ item.name }} {{ `+${item.dialCode}` }}</span> -->
           </template>
         </v-combobox>
-      </v-col>
-      <v-col cols="7" xl="8" style="padding-left: 0px;">
-        <v-text-field
+      </div>
+      <v-text-field
           :ref="makeReference('phoneInput')"
           type="tel"
 
@@ -55,9 +54,7 @@
         >
 
         </v-text-field>
-
-      </v-col>
-    </v-row>
+    </div>
     <!-- <div class="country-code">
     </div> -->
   </div>
