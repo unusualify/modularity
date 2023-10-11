@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use OoBook\CRM\Base\Support\Decomposers\SchemaParser;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Nwidart\Modules\Support\Migrations\NameParser;
+use Nwidart\Modules\Support\Migrations\SchemaParser as NwidartSchemaParser;
 // use Nwidart\Modules\Support\Migrations\SchemaParser;
 
 use Nwidart\Modules\Support\Stub;
@@ -93,6 +94,23 @@ class MigrationMakeCommand extends BaseCommand
     {
         $parser = new NameParser($this->argument('name'));
 
+        // dd(
+        //     $this->option('fields'),
+        //     // $parser->getTableName()
+        //     // new SchemaParser(rtrim($this->option('fields'), ","))
+        // );
+        // dd(
+        //     $parser->isCreate(),
+        //     $parser->isAdd(),
+        //     $parser->isDelete(),
+        //     get_class($this->getSchemaParser()),
+        //     [
+        //         'class'         => $this->getClass(),
+        //         'table'         => $parser->getTableName(),
+        //         'fields_up'     => $this->getSchemaParser()->up(),
+        //         'fields_down'   => $this->getSchemaParser()->down(),
+        //     ]
+        // );
         if ($parser->isCreate()) {
             return Stub::create('/migration/create.stub', [
                 'class'         => $this->getClass(),
@@ -102,24 +120,27 @@ class MigrationMakeCommand extends BaseCommand
                 'down_schemas'  => ltrim($this->getExtraDownSchemaMethods()),
             ]);
         } elseif ($parser->isAdd()) {
+            $schemaParser = new NwidartSchemaParser($this->option('fields'));
             return Stub::create('/migration/add.stub', [
                 'class'         => $this->getClass(),
                 'table'         => $parser->getTableName(),
-                'fields_up'     => $this->getSchemaParser()->up(),
-                'fields_down'   => $this->getSchemaParser()->down(),
+                'fields_up'     => $schemaParser->up(),
+                'fields_down'   => $schemaParser->down(),
             ]);
         } elseif ($parser->isDelete()) {
+            $schemaParser = new NwidartSchemaParser($this->option('fields'));
             return Stub::create('/migration/delete.stub', [
                 'class'         => $this->getClass(),
                 'table'         => $parser->getTableName(),
-                'fields_down'   => $this->getSchemaParser()->up(),
-                'fields_up'     => $this->getSchemaParser()->down(),
+                'fields_down'   => $schemaParser->up(),
+                'fields_up'     => $schemaParser->down(),
             ]);
         } elseif ($parser->isDrop()) {
+            $schemaParser = new NwidartSchemaParser($this->option('fields'));
             return Stub::create('/migration/drop.stub', [
                 'class'         => $this->getClass(),
                 'table'         => $parser->getTableName(),
-                'fields'        => $this->getSchemaParser()->render(),
+                'fields'        => $schemaParser->render(),
             ]);
         }
 
