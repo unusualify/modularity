@@ -24,10 +24,10 @@ Route::put('profile/company', 'ProfileController@updateCompany')->name('profile.
 
 Route::unusualWebRoutes();
 
-Route::group(['prefix' => 'api/user', 'as' => 'api.user.', 'namespace' => 'API'], function(){
-    Route::apiResource('role', RoleController::class);
-    Route::apiResource('permission', PermissionController::class);
-});
+// Route::group(['prefix' => 'api/user', 'as' => 'api.user.', 'namespace' => 'API'], function(){
+//     Route::apiResource('role', RoleController::class);
+//     Route::apiResource('permission', PermissionController::class);
+// });
 
 // Route::group(['prefix' => 'api', 'as' => 'api.lang.', 'namespace' => 'API'], function(){
 //     Route::apiResource('languages', LanguageController::class);
