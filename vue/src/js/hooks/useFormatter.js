@@ -4,15 +4,22 @@
 import { useI18n } from 'vue-i18n'
 import _ from 'lodash'
 import { ref, reactive, toRefs, h } from 'vue'
-import { compile } from 'vue-template-compiler'
+import { propsFactory } from 'vuetify/lib/util/propsFactory.mjs'
 
+export const makeFormatterProps = propsFactory({
+  ignoreFormatters: {
+    type: [Array],
+    default: []
+  }
+})
 // by convention, composable function names start with "use"
-export default function useFormatter (headers) {
+export default function useFormatter (props, context, headers) {
   // state encapsulated and managed by the composable
   const { d } = useI18n({ useScope: 'global' })
-
   const formatterColumns = ref(headers.filter((h) =>
-    h.hasOwnProperty('formatter') && h.formatter.length > 0
+    Object.prototype.hasOwnProperty.call(h, 'formatter') &&
+    h.formatter.length > 0 &&
+    (!Object.prototype.hasOwnProperty.call(props, 'ignoreFormatters') || !props.ignoreFormatters.includes(h.formatter[0]))
   ))
 
   const methods = reactive({
