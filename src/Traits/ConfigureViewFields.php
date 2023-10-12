@@ -762,7 +762,7 @@ trait ConfigureViewFields {
 
             if(isset($context->type)){
                 if($context->type == 'formWrapper'){
-                    $context->elements = UWrapper::makeFormWrapper(Collection::make($context->elements)->map(function($element){
+                    $forms = Collection::make($context->elements)->map(function($element){
 
                         $schema = $this->getFormSchema(getInputDraft($element->draft));
 
@@ -780,7 +780,6 @@ trait ConfigureViewFields {
                             'title' => isset($element->title) ? ___($element->title) : '',
                             'buttonText' => 'update',
                             'hasSubmit' => true,
-
                             'modelValue' => "\${$modelValueAbstract}",
                             // 'modelValue' => [],
                             'schema' => $schema,
@@ -790,7 +789,9 @@ trait ConfigureViewFields {
                             })->toArray(),
                             'actionUrl' => route($element->route, $parameters),
                         ];
-                    })->toArray());
+                    })->toArray();
+
+                    $context->elements = UWrapper::makeFormWrapper($forms);
                 }
                 unset($context->type);
             }

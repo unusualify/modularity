@@ -29,24 +29,30 @@ class UWrapper
                 'class' => '',
                 // 'noGutters' => true
             ], $attributes));
-
         foreach ($elements as $key => $element) {
             $col = UComponent::makeVCol();
 
             $col_attributes = ['class' => 'd-flex', 'cols' => 12, 'lg' => 6];
 
             if(is_array($element)){
+                $contents = $element;
                 if(isset($element['content']) && is_array($element['content'])){
                     $col_attributes = array_merge_recursive_preserve($col_attributes, $element['parent_attributes']);
 
-                    foreach($element['content'] as $component){
-                        $col->addChildren($component);
-                    }
-                }else{
-                    foreach($element as $component){
-                        $col->addChildren($component);
-                    }
+                    $contents = $element['content'];
                 }
+
+                if(count($contents) > 1){
+                    $div = UComponent::makeDiv();
+                    foreach($contents as $component){
+                        $div->addChildren($component);
+                    }
+                    $col->addChildren($div);
+
+                }else {
+                    $col->addChildren($contents[0]);
+                }
+
             }else if(get_class($element) === 'OoBook\CRM\Base\Services\View\UComponent' ){
                 $col->addChildren($element);
             }
@@ -65,17 +71,8 @@ class UWrapper
 
     public static function makeFormWrapper($forms)
     {
-        // dd($forms);
-        // dd(
-        //     [
-        //         Collection::make($forms)->map(function($form){
-        //             return UComponent::makeUeForm()
-        //                 ->setAttributes($form);
-        //         })->toArray()
-        //     ]
-        // );
         return static::makeGridSection(
-            Collection::make($forms)->map(function($form){
+            Collection::make($forms)->map(function($form, $i){
                 return UComponent::makeUeForm()
                     ->setAttributes($form);
             })->toArray()
