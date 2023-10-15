@@ -256,6 +256,7 @@ abstract class Repository
 
             $object = $this->model->create(Arr::except($fields, $this->getReservedFields()));
 
+
             $this->beforeSave($object, $original_fields);
 
             $fields = $this->prepareFieldsBeforeSave($object, $fields);
