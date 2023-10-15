@@ -31,21 +31,6 @@ trait ConfigureViewFields {
      */
     protected $tableAttributes = [];
 
-
-    /**
-     * Relations to eager load for the form view.
-     *
-     * @var array
-     */
-    protected $formWith = [];
-
-    /**
-     * Relation count to eager load for the form view.
-     *
-     * @var array
-     */
-    protected $formWithCount = [];
-
     /**
      * @var array
      */
@@ -386,7 +371,7 @@ trait ConfigureViewFields {
         if (!$item && $id) {
             $item = $this->repository->getById(
                 $id,
-                $this->formWith +  $this->getSchemaWiths($schema),
+                $this->formWith,
                 $this->formWithCount
             );
         } elseif (! $item && ! $id) {
@@ -529,7 +514,7 @@ trait ConfigureViewFields {
         // dd($default_input, $input);
         $input = object2Array($input);
 
-        if($object = $this->hydrateCustomInput($input)){
+        if($object = $this->hydrateInput($input)){
             $input = $object;
         }
 
@@ -568,7 +553,7 @@ trait ConfigureViewFields {
      * @param Array|stdClass $input
      * @return Collection
      */
-    protected function hydrateCustomInput($input)
+    protected function hydrateInput($input)
     {
         $object = null;
 
@@ -706,7 +691,7 @@ trait ConfigureViewFields {
         if(isset($this->repository)){
 
             if(method_exists($this->repository->getModel(), 'getTranslatedAttributes') && in_array($input['name'], $this->repository->getTranslatedAttributes()) ){
-                $input['translated'] = true;
+                $input['translated'] ??= true;
                 // $input['locale_input'] = $input['type'];
                 // $input['type'] = 'custom-input-locale';
                 $object = $input;
@@ -719,10 +704,10 @@ trait ConfigureViewFields {
 
     protected function getHeader($header)
     {
-        return array_merge_recursive_preserve( unusualConfig('default_header'), $this->hydrateCustomHeader($header) );
+        return array_merge_recursive_preserve( unusualConfig('default_header'), $this->hydrateHeader($header) );
     }
 
-    protected function hydrateCustomHeader($header)
+    protected function hydrateHeader($header)
     {
         if($this->isRelationField($header['key']))
             $header['key'] .= '_relation';
@@ -803,7 +788,7 @@ trait ConfigureViewFields {
         return $result;
     }
 
-    protected function addIndexWithsSchema() : array
+    protected function addWithsSchema() : array
     {
         // $this->indexWith += collect($schema)->filter(function($item){
         return collect($this->getConfigFieldsByRoute('inputs'))->filter(function($item){

@@ -156,6 +156,20 @@ abstract class CoreController extends Controller
     protected $indexWith = [];
 
     /**
+     * Relations to eager load for the form view.
+     *
+     * @var array
+     */
+    protected $formWith = [];
+
+    /**
+     * Relation count to eager load for the form view.
+     *
+     * @var array
+     */
+    protected $formWithCount = [];
+
+    /**
      * List of permissions keyed by a request field. Can be used to prevent unauthorized field updates.
      *
      * @var array
@@ -173,6 +187,9 @@ abstract class CoreController extends Controller
      * @var string
      */
     protected $titleColumnKey = 'name';
+
+
+
 
     /**
      * @var array
@@ -805,6 +822,29 @@ abstract class CoreController extends Controller
 
         foreach ($methods as $key => $method) {
             $this->indexWith += $this->{$method}();
+        }
+    }
+
+    protected function addFormWiths()
+    {
+        $methods = array_filter(get_class_methods(static::class), function($method){
+            return preg_match('/addFormWiths[A-Z]{1}[A-Za-z]+/', $method);
+        });
+
+        foreach ($methods as $key => $method) {
+            $this->indexWith += $this->{$method}();
+        }
+    }
+
+    protected function addWiths()
+    {
+        $methods = array_filter(get_class_methods(static::class), function($method){
+            return preg_match('/addWiths[A-Z]{1}[A-Za-z]+/', $method);
+        });
+
+        foreach ($methods as $key => $method) {
+            $this->indexWith += $this->{$method}();
+            $this->formWith += $this->{$method}();
         }
     }
 }
