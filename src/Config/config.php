@@ -78,6 +78,9 @@ return [
                 "name" => "name",
                 "label" => "Name",
                 "default" => "",
+                'col' => [
+                    'sm' => 6,
+                ],
                 'rules' => [
                     ['min', 3]
                 ]
@@ -87,6 +90,9 @@ return [
                 "name" => "surname",
                 "label" => "Surname",
                 "default" => "",
+                'col' => [
+                    'sm' => 6,
+                ],
                 'rules' => [
                     ['min', 2]
                 ]
@@ -96,6 +102,9 @@ return [
                 "name" => "job_title",
                 "label" => "Job Title",
                 "default" => "",
+                'col' => [
+                    'sm' => 6,
+                ],
                 'rules' => [
                     ['min', 2]
                 ]
@@ -105,6 +114,9 @@ return [
                 "name" => "email",
                 "label" => "E-mail",
                 "default" => "",
+                'col' => [
+                    'sm' => 6,
+                ],
                 'rules' => [
                     ['email']
                 ]
@@ -114,6 +126,9 @@ return [
                 "name" => "phone",
                 "label" => "Phone Number",
                 "default" => "",
+                'col' => [
+                    'sm' => 6,
+                ],
                 'clearable' => false
             ],
             'country' => [
@@ -121,6 +136,9 @@ return [
                 "name" => "country",
                 "label" => "Country",
                 "default" => "",
+                'col' => [
+                    'sm' => 6,
+                ],
                 'rules' => [
                     ['min', 3]
                 ]
@@ -130,6 +148,9 @@ return [
                 "name" => "language",
                 "label" => "Preferred Language",
                 "default" => 0,
+                'col' => [
+                    'sm' => 6,
+                ],
                 'itemTitle' => 'label',
                 // 'itemValue' => 'value',
                 'items_' => [
@@ -154,6 +175,9 @@ return [
                 "name" => "timezone",
                 "label" => "Timezone",
                 "default" => 0,
+                'col' => [
+                    'sm' => 6,
+                ],
                 "returnObject" => false,
                 'itemTitle' => 'label',
                 'itemValue' => 'value',
@@ -172,6 +196,7 @@ return [
                 "name" => "password",
                 "label" => "Current Password",
                 "default" => "",
+                'col' => [ 'sm' => 6],
                 "appendInnerIcon" => '$non-visibility',
                 "slotHandlers" => [
                     'appendInner' => 'password',
@@ -193,6 +218,7 @@ return [
                 "name" => "new_password",
                 "label" => "New Password",
                 "default" => "",
+                'col' => [ 'sm' => 6],
                 "appendInnerIcon" => '$non-visibility',
                 "slotHandlers" => [
                     'appendInner' => 'password',
@@ -207,6 +233,7 @@ return [
                 "name" => "confirm_password",
                 "label" => "Confirm Password",
                 "default" => "",
+                'col' => [ 'sm' => 6],
                 "appendInnerIcon" => '$non-visibility',
                 "slotHandlers" => [
                     'appendInner' => 'password',
@@ -223,6 +250,7 @@ return [
                 "name" => "name",
                 "label" => "Company",
                 "default" => "",
+                'col' => [ 'sm' => 6],
                 'rules' => [
                     ['min', 3]
                 ]
@@ -245,6 +273,7 @@ return [
                 "name" => "city",
                 "label" => "City",
                 "default" => "",
+                'col' => [ 'sm' => 6],
 
                 'rules' => [
                     ['min', 3]
@@ -255,6 +284,7 @@ return [
                 "name" => "state",
                 "label" => "State/Province",
                 "default" => "",
+                'col' => [ 'sm' => 6],
                 'rules' => [
                     ['min', 3]
                 ]
@@ -264,6 +294,7 @@ return [
                 "name" => "country",
                 "label" => "Country",
                 "default" => "",
+                'col' => [ 'sm' => 6],
                 'rules' => [
                     ['min', 3]
                 ]
@@ -273,6 +304,7 @@ return [
                 "name" => "zip_code",
                 "label" => "ZIP/Postal Code",
                 "default" => "",
+                'col' => [ 'sm' => 6],
                 'rules' => [
                     ['min', 3]
                 ]
@@ -282,6 +314,7 @@ return [
                 "name" => "phone",
                 "label" => "Phone Number",
                 "default" => "",
+                'col' => [ 'sm' => 6],
                 'rules' => [
                     // ['email']
                 ],
@@ -292,6 +325,7 @@ return [
                 "name" => "vat_number",
                 "label" => "VAT Number",
                 "default" => "",
+                'col' => [ 'sm' => 6],
                 'rules' => [
                     ['min', 3]
                 ]
@@ -301,6 +335,7 @@ return [
                 "name" => "tax_id",
                 "label" => "Tax ID",
                 "default" => "",
+                'col' => [ 'sm' => 6],
                 'rules' => [
                     ['min', 3]
                 ]
