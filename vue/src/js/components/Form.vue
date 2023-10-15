@@ -17,7 +17,7 @@
           <!-- <div class="text-h8 pt-5 pb-10 text-primary font-weight-bold" v-if="formTitle && false">
             {{ ($te(formTitle) ? $t(formTitle).toLocaleUpperCase($i18n.locale.toUpperCase()) : formTitle.toLocaleUpperCase($i18n.locale.toUpperCase())) }}
           </div> -->
-          <ue-title v-if="title" :classes="['pl-0']">
+          <ue-title v-if="title" :classes="['px-0']">
             <div class="d-flex">
               <div class="me-auto">
                 {{ ($te(title)
@@ -114,6 +114,7 @@ import api from '@/store/api/form'
 import { useI18n } from 'vue-i18n'
 
 import logger from '@/utils/logger'
+import { getModel, getSubmitFormData } from '@/utils/getFormData.js'
 
 import { useInputHandlers, useValidation } from '@/hooks'
 
@@ -213,9 +214,13 @@ export default {
 
       loading: false,
       errors: {},
-      inputs: this.invokeRuleGenerator(this.schema)
+      inputs: this.invokeRuleGenerator(this.schema),
 
       // validForm: false
+
+      issetModel: Object.keys(this.modelValue).length > 0,
+      issetSchema: Object.keys(this.schema).length > 0,
+      hasStickyFrame: this.stickyFrame || this.stickyButton
     }
   },
 
@@ -235,16 +240,6 @@ export default {
   },
 
   computed: {
-    issetModel () {
-      return Object.keys(this.modelValue).length > 0
-    },
-    issetSchema () {
-      return Object.keys(this.schema).length > 0
-    },
-    hasStickyFrame () {
-      return this.stickyFrame || this.stickyButton
-    },
-
     inputSchema: {
       get () {
         return this.issetSchema
@@ -259,20 +254,22 @@ export default {
       }
     },
 
-    defaultItem: {
+    defaultItem () { return this.issetSchema ? getModel(this.inputSchema) : this.$store.getters.defaultItem },
+    // defaultItem: {
+    //   get () {
+    //     __log(this.issetModel)
+    //     return this.issetModel ? this.modelValue : this.$store.state.form.editedItem
+    //   },
+    //   set (value) {
+
+    //   }
+    // },
+    model: {
       get () {
         return this.issetModel ? this.modelValue : this.$store.state.form.editedItem
       },
       set (value) {
-        __log('defaultItem setter', value)
-      }
-    },
-    model: {
-      get () {
-        return this.defaultItem
-      },
-      set (value) {
-        // __log(value)
+        // __log('model setter', value)
         // this.resetValidation()
       }
     },
@@ -364,30 +361,16 @@ export default {
     handleBlur (v) {
       // __log('handleBlur', v)
     },
-
     saveForm (callback = null, errorCallback = null) {
-      const fields = {}
-      // __log(
-      //   this.defaultItem,
-      //   this.model,
-      //   this.editedItem
-      // )
-      Object.keys(this.defaultItem).forEach((key, i) => {
-        fields[key] = (this.model[key] == null || this.defaultItem[key] != '')
-          ? this.defaultItem[key]
-          : this.model[key]
-      })
-
-      if (this.model.id) { fields.id = this.model.id }
-
       if (this.actionUrl) {
         this._errors = {}
         this._loading = true
 
-        const method = Object.prototype.hasOwnProperty.call(fields, 'id') ? 'put' : 'post'
+        const formData = getSubmitFormData(this.inputSchema, this.model)
+        const method = Object.prototype.hasOwnProperty.call(formData, 'id') ? 'put' : 'post'
         const self = this
 
-        api[method](this.actionUrl, fields, function (response) {
+        api[method](this.actionUrl, formData, function (response) {
           self._loading = false
           if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
             self._errors = response.data.errors
@@ -418,11 +401,10 @@ export default {
           if (errorCallback && typeof errorCallback === 'function') errorCallback(response.data)
         })
       } else {
-        // __log(
-        //   fields
-        // )
-        this.$store.commit(FORM.SET_EDITED_ITEM, fields)
-        this.$store.dispatch(ACTIONS.SAVE_FORM, { item: null, callback, errorCallback })
+        const self = this
+        this.$nextTick(function () {
+          self.$store.dispatch(ACTIONS.SAVE_FORM, { item: null, callback, errorCallback })
+        })
       }
     },
 
@@ -430,6 +412,9 @@ export default {
       if (this.validForm) {
         if (this.async) {
           e.preventDefault() // don't perform submit action (i.e., `<form>.action`)
+          if (!this.actionUrl) {
+            this.$store.commit(FORM.SET_EDITED_ITEM, this.model)
+          }
           this.saveForm()
         }
       } else {

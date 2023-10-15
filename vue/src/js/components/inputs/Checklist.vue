@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ue-title v-if="label">
+    <ue-title v-if="label" :classes="['pl-0']">
       {{ label }}
     </ue-title>
     <v-row>
@@ -25,9 +25,6 @@ import { useInput } from '@/hooks'
 
 export default {
   setup (props, context) {
-    __log(
-      useInput(props, context)
-    )
     return {
       ...useInput(props, context)
     }
@@ -54,7 +51,7 @@ export default {
   },
 
   created () {
-    __log(this.input)
+
   }
 }
 </script>

@@ -9,7 +9,7 @@ import { DATATABLE, FORM } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
 
 import { mapGetters } from '@/utils/mapStore'
-import { getSchemaModel } from '@/utils/getFormData.js'
+import { getSubmitFormData } from '@/utils/getFormData.js'
 
 import { useFormatter } from '@/hooks'
 
@@ -190,15 +190,11 @@ export default function useTable (props, context) {
     },
     resetEditedItem: function () {
       nextTick(() => {
-        store.commit(FORM.SET_EDITED_ITEM, getters.defaultItem.value)
+        store.commit(FORM.RESET_EDITED_ITEM)
       })
     },
 
     editItem: function (item) {
-      __log(
-        props,
-        item
-      )
       if (props.editOnModal || props.embeddedForm) {
         methods.setEditedItem(item)
         methods.openForm()
@@ -253,12 +249,12 @@ export default function useTable (props, context) {
             const match = matches[1]
             // __log(item)
             if (state.snakeName === match) {
-              data[key] = getSchemaModel(data.schema, item)
+              data[key] = getSubmitFormData(data.schema, item)
               if (data.actionUrl) {
                 data.actionUrl = data.actionUrl.replace(`:${match}`, data[key].id)
               }
             } else if (item[match]) {
-              data[key] = getSchemaModel(data.schema, item[match])
+              data[key] = getSubmitFormData(data.schema, item[match])
               if (data.actionUrl) {
                 data.actionUrl = data.actionUrl.replace(`:${match}`, data[key].id)
               }

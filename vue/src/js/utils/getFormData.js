@@ -1,4 +1,5 @@
 import { isEmpty, find } from 'lodash'
+import input from '../mixins/input'
 
 /*
 * Gather selected items in a selected object (currently used for medias and browsers)
@@ -102,7 +103,7 @@ export const gatherBlocks = (rootState) => {
   }).flat()
 }
 
-export const getFormFields = (rootState) => {
+export const getFormFields_ = (rootState) => {
   const fields = rootState.form.fields.filter((field) => {
     // we start by filtering out blocks related form fields
     return !field.name.startsWith('blocks[') && !field.name.startsWith('mediaMeta[')
@@ -130,7 +131,7 @@ export const getModalFormFields = (rootState) => {
   return fields
 }
 
-export const getFormData = (rootState) => {
+export const getFormData_ = (rootState) => {
   const fields = getFormFields(rootState)
 
   // we can now create our submitted data object out of:
@@ -171,26 +172,26 @@ export const getSchemaModel = (inputs, item = null) => {
 
     if (__isObject(inputs[c])) {
       if (Object.prototype.hasOwnProperty.call(inputs[c], 'translated')) {
-        a[inputs[c].name] = window[process.env.VUE_APP_NAME].STORE.languages.all.reduce(function (map, language) {
-          if (submitting && Object.prototype.hasOwnProperty.call(item, 'translations')) {
-            // __log(item, submitting)
-            value = find(item.translations, { locale: language.value })[inputs[c].name]
-          }
-          map[language.value] = value
-          return map
-        }, {})
+        if (submitting || inputs[c].translated) {
+          a[inputs[c].name] = window[process.env.VUE_APP_NAME].STORE.languages.all.reduce(function (map, language) {
+            if (submitting) {
+              if (Object.prototype.hasOwnProperty.call(item, 'translations')) {
+                value = find(item.translations, { locale: language.value })[inputs[c].name]
+              }
+            }
+
+            map[language.value] = value
+            return map
+          }, {})
+        } else {
+          a[inputs[c].name] = value
+        }
       } else {
         a[inputs[c].name] = submitting ? item[inputs[c].name] : value
       }
     }
     return a
   }, {})
-
-  if (editing) {
-    values.id = item.id
-  }
-
-  // __log(values)
 
   return values
 
@@ -201,23 +202,90 @@ export const getSchemaModel = (inputs, item = null) => {
   // , {})
 }
 
-// export const getSchema = (inputs) => {
-//   // __log(inputs)
-//   const values = Object.keys(inputs).reduce((a, c) => {
-//     if (__isObject(inputs[c])) {
-//       Object.prototype.hasOwnProperty.call(inputs[c], 'default')
-//       a[inputs[c].name] = inputs[c].hasOwnProperty('default') ? inputs[c].default : ''
-//     } else if (Array.isArray(inputs[c])) {
-//       a[inputs[c].name] = []
-//     }
-//     return a
-//   }
-//   , {})
-//   return values
+export const getModel = (inputs, item = null) => {
+  const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist'
 
-//   Object.keys(inputs).reduce((a, c) => (
-//     a[inputs[c].name] = inputs[c].hasOwnProperty('default') ? inputs[c].default : '',
-//     a
-//   )
-//   , {})
-// }
+  const editing = __isset(item)
+
+  const values = Object.keys(inputs).reduce((fields, k) => {
+    const input = inputs[k]
+    const name = input.name
+    // default model value
+    let _default = Object.prototype.hasOwnProperty.call(input, 'default') ? input.default : ''
+    // let value = Object.prototype.hasOwnProperty.call(input, 'default') ? input.default : ''
+    if (isArrayable.includes(input.type)) {
+      _default = []
+    }
+
+    const value = editing ? item[name] : _default
+    if (__isObject(input)) {
+      if (Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated) { // translations
+        fields[name] = window[process.env.VUE_APP_NAME].STORE.languages.all.reduce(function (map, lang) {
+          if (editing) {
+            if (Object.prototype.hasOwnProperty.call(item, 'translations')) {
+              map[lang.value] = find(item.translations, { locale: lang.value })[name]
+            } else {
+              map[lang.value] = value[lang.value]
+            }
+          } else {
+            map[lang.value] = value
+          }
+          return map
+        }, {})
+      } else {
+        fields[name] = value
+      }
+    }
+    return fields
+  }, {})
+
+  if (editing) {
+    values.id = item.id
+  }
+
+  return values
+}
+
+export const getSubmitFormData = (inputs, item) => {
+  const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist'
+
+  const values = Object.keys(inputs).reduce((fields, k) => {
+    const input = inputs[k]
+    const name = input.name
+    // default model value
+    if (!__isset(item[name])) {
+      let value = input.default ?? ''
+      if (isArrayable.includes(input.type)) {
+        value = []
+      }
+
+      fields[name] = value
+
+      return fields
+    }
+    const value = item[name]
+
+    if (__isObject(input)) {
+      if (Object.prototype.hasOwnProperty.call(input, 'translated')) { // translations
+        fields[name] = window[process.env.VUE_APP_NAME].STORE.languages.all.reduce(function (map, lang) {
+          if (__isObject(value)) {
+            map[lang.value] = __isset(value[lang.value]) ? value[lang.value] : ''
+          } else {
+            map[lang.value] = value
+          }
+          return map
+        }, {})
+      } else {
+        fields[name] = item[name]
+      }
+    }
+
+    return fields
+  }, {})
+
+  if (item.id) {
+    values.id = item.id
+  }
+
+  return values
+}

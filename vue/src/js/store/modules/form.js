@@ -2,7 +2,7 @@ import api from '@/store/api/form'
 import { FORM, ALERT } from '@/store/mutations'
 import ACTIONS from '@/store/actions'
 
-import { getSchemaModel } from '@/utils/getFormData.js'
+import { getSubmitFormData, getFormFields, getModel, getSchemaModel } from '@/utils/getFormData.js'
 
 const getFieldIndex = (stateKey, field) => {
   return stateKey.findIndex(f => f.name === field.name)
@@ -12,7 +12,7 @@ const getFieldIndex = (stateKey, field) => {
 // )
 const state = {
   baseUrl: window[process.env.VUE_APP_NAME].STORE.form.baseUrl || '',
-  inputs: window[process.env.VUE_APP_NAME].STORE.form.inputs,
+  inputs: window[process.env.VUE_APP_NAME].STORE.form.inputs || {},
   saveUrl: window[process.env.VUE_APP_NAME].STORE.form.saveUrl || '',
 
   /**
@@ -31,7 +31,7 @@ const state = {
   // editedItem: window[process.env.VUE_APP_NAME].STORE.form.inputs.reduce( (a,c) => (a[c.name] = c.default ?? '', a), {}),
   // editedItem: Object.keys(window[process.env.VUE_APP_NAME].STORE.form.inputs).reduce( (a,c) => (a[window[process.env.VUE_APP_NAME].STORE.form.inputs[c].name] = window[process.env.VUE_APP_NAME].STORE.form.inputs[c].hasOwnProperty('default') ? window[process.env.VUE_APP_NAME].STORE.form.inputs[c].default : '', a), {}),
   editedItem: window[process.env.VUE_APP_NAME].STORE.form.inputs
-    ? getSchemaModel(window[process.env.VUE_APP_NAME].STORE.form.inputs)
+    ? getModel(window[process.env.VUE_APP_NAME].STORE.form.inputs)
     : {},
 
   /**
@@ -52,20 +52,16 @@ const state = {
 // getters
 const getters = {
   defaultItem: state => {
-    return getSchemaModel(window[process.env.VUE_APP_NAME].STORE.form.inputs)
+    return getModel(state.inputs)
   }
 }
 
 const mutations = {
   [FORM.SET_EDITED_ITEM] (state, item) {
-    // __log(
-    //   item, getSchemaModel(state.inputs, item)
-    // )
-    state.editedItem = getSchemaModel(state.inputs, item)
-    // state.editedItem = Object.assign({}, item)
+    state.editedItem = getModel(state.inputs, Object.assign({}, item))
   },
-  [FORM.RESET_EDITED_ITEM] (state, item) {
-    state.editedItem = getSchemaModel(state.inputs)
+  [FORM.RESET_EDITED_ITEM] (state) {
+    state.editedItem = getModel(state.inputs)
   },
   [FORM.PREVENT_SUBMIT] (state) {
     state.isSubmitPrevented = true
@@ -169,7 +165,8 @@ const actions = {
     // - created blocks and repeaters
 
     // const data = getFormData(rootState)
-    const data = item ?? state.editedItem
+    const data = getSubmitFormData(state.inputs, item ?? state.editedItem)
+
     // const method = rootState.publication.createWithoutModal ? 'post' : 'put'
     let method = 'post'
     let url = window[process.env.VUE_APP_NAME].ENDPOINTS.store

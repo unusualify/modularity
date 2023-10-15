@@ -112,6 +112,6 @@ Modularity System Base Module
 
 ## BUGS
 
-- [ ] $store.commit(FORM.SET_EDITED_ITEM, fields) working on standard but not translated fields in Form.vue [![Bug](https://img.shields.io/badge/bug-red.svg)](https://github.com/unusualify/modularity/blob/main/vue/src/js/components/Form.vue#L419)
+- [x] ~~$store.commit(FORM.SET_EDITED_ITEM, fields) working on standard but not translated fields in Form.vue [![Bug](https://img.shields.io/badge/bug-red.svg)](https://github.com/unusualify/modularity/blob/main/vue/src/js/components/Form.vue#L419)~~
 
 - [ ] ModalMedia fullscreen attributes [![Bug](https://img.shields.io/badge/bug-red.svg)](https://github.com/unusualify/modularity/blob/main/vue/src/js/components/modals/ModalMedia.vue)
