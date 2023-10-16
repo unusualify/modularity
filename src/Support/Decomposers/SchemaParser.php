@@ -63,19 +63,26 @@ class SchemaParser extends Parser
 
     protected $interfaceNamespaces = [];
 
+    protected $useDefaults = false;
 
     /**
      * Create new instance.
      *
      * @param string|null $schema
      */
-    public function __construct($schema = null)
+    public function __construct($schema = null, $useDefaults = true)
     {
         parent::__construct($schema);
 
-        $this->defaultInputs = Config::get(unusualBaseKey() . '.schemas.default_inputs',[]);
-        $this->defaultPreHeaders = Config::get(unusualBaseKey() . '.schemas.default_pre_headers',[]);
+        $this->useDefaults = $useDefaults;
+
+        if($this->useDefaults){
+            $this->defaultInputs = Config::get(unusualBaseKey() . '.schemas.default_inputs',[]);
+            $this->defaultPreHeaders = Config::get(unusualBaseKey() . '.schemas.default_pre_headers',[]);
+        }
+
         $this->defaultPostHeaders = Config::get(unusualBaseKey() . '.schemas.default_post_headers',[]);
+
         $this->defaultHeaderFormat = Config::get(unusualBaseKey() . '.default_header',[]);
 
         // $this->baseNamespace = Config::get(unusualBaseKey() . '.namespace')."\\".Config::get(unusualBaseKey() . '.name');
@@ -318,6 +325,8 @@ class SchemaParser extends Parser
 
         if($options[0] == 'timestamp'){
             $extra_options['ext'] = 'date';
+        } else if(in_array($options[0], ['text', 'mediumtext', 'longtext'])){
+            $type = 'textarea';
         }
 
         if(in_array($options[0], $this->relationshipKeys)){
@@ -336,6 +345,7 @@ class SchemaParser extends Parser
                 $extra_options['repository'] = $finder->getRepository(pluralize($column));
             }
         }
+
         return [
             'name' => $name,
             'label' => $label,

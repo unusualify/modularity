@@ -74,9 +74,9 @@ class ModelMakeCommand extends BaseCommand
             $this->responses[$_trait] = $this->checkOption($_trait);
         }
 
-        $schema =  implode(',', $this->baseConfig('schemas.default_fields') ?? []);
-
-        $this->defaultFillables += (new SchemaParser($schema))->getColumns();
+        if(!$this->option('no-defaults')){
+            $this->defaultFillables += (new SchemaParser(implode(',', $this->baseConfig('schemas.default_fields') ?? [])))->getColumns();
+        }
 
         if (parent::handle() === E_ERROR) {
             return E_ERROR;
@@ -117,6 +117,7 @@ class ModelMakeCommand extends BaseCommand
             ['relationships', null, InputOption::VALUE_OPTIONAL, 'The relationship attributes.', null],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
+            ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
             ['soft-delete', 's', InputOption::VALUE_NONE, 'Flag to add softDeletes trait to model.'],
             ['has-factory', null, InputOption::VALUE_NONE, 'Flag to add hasFactory to model.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
@@ -129,15 +130,7 @@ class ModelMakeCommand extends BaseCommand
     protected function getTemplateContents()
     {
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
-        // dd(
-        //     [
-        //         'TRAITS'                => $this->getTraits(),
-        //         'FILLABLE'              => ltrim($this->getFillable()),
-        //         'TRANSLATED_ATTRIBUTES' => ltrim($this->getTranslatedAttributes()),
-        //         'SLUG_ATTRIBUTES' => ltrim($this->getSlugAttributes()),
-        //         'METHODS'               => $this->getMethods()
-        //     ]
-        // );
+
         return  (new Stub( $this->getStubName(), [
             'BASE_MODEL'            => $this->baseConfig('base_model'),
             'NAMESPACE'             => $this->getClassNamespace($module),

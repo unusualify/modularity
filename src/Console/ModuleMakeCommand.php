@@ -62,8 +62,10 @@ class ModuleMakeCommand extends BaseCommand
             ]
             + ( $this->hasOption('schema') ?  ['--schema' => $this->option('schema')] : [])
             + ( $this->hasOption('rules') ?  ['--rules' => $this->option('rules')] : [])
+            + ( $this->hasOption('relationships') ?  ['--relationships' => $this->option('rules')] : [])
             + ( $this->hasOption('force') ?  ['--force' => true] : [])
             + ( $this->hasOption('no-migrate') ?  ['--no-migrate' => true] : [])
+            + ( $this->hasOption('no-defaults') ?  ['--no-defaults' => true] : [])
             + ( $this->option('plain') ?  ['-p' => true] : [])
             + $console_traits
             + ['--notAsk' => true]
@@ -93,9 +95,11 @@ class ModuleMakeCommand extends BaseCommand
         return array_merge([
             ['schema', null, InputOption::VALUE_OPTIONAL, 'The specified migration schema table.', null],
             ['rules', null, InputOption::VALUE_OPTIONAL, 'The specified validation rules for FormRequest.', null],
+            ['relationships', null, InputOption::VALUE_OPTIONAL, 'The many to many relationships.', null],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
             ['plain', null, InputOption::VALUE_NONE, 'Don\'t create route.'],
             ['no-migrate', null, InputOption::VALUE_NONE, 'don\'t migrate.'],
+            ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
         ], unusualTraitOptions());

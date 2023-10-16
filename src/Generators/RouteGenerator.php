@@ -16,6 +16,7 @@ use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Nwidart\Modules\Support\Config\GeneratorPath;
 use Nwidart\Modules\Support\Stub;
 use Illuminate\Container\Container;
+use Illuminate\Support\Facades\File;
 use OoBook\CRM\Base\Entities\Enums\Permission;
 use OoBook\CRM\Base\Repositories\PermissionRepository;
 
@@ -105,6 +106,20 @@ class RouteGenerator extends Generator
      * @var string
      */
     protected $rules;
+
+    /**
+     * Model relationships.
+     *
+     * @var string
+     */
+    protected $relationships;
+
+    /**
+     * use default inputs and headers
+     *
+     * @var string
+     */
+    protected $useDefaults;
 
     /**
      * set default api.
@@ -349,6 +364,20 @@ class RouteGenerator extends Generator
     }
 
     /**
+     * Set useDefault.
+     *
+     * @param bool|int $noDefault
+     *
+     * @return $this
+     */
+    public function setUseDefaults($noDefaults)
+    {
+        $this->useDefaults = !$noDefaults;
+
+        return $this;
+    }
+
+    /**
      * Set plain status.
      *
      * @param bool|int $force
@@ -367,6 +396,8 @@ class RouteGenerator extends Generator
      *
      * @param bool|int $force
      *
+     * @example name:string:unique,type:enum('type'\,['POS'\,'SERVICE'])
+     *
      * @return $this
      */
     public function setSchema($schema)
@@ -379,7 +410,9 @@ class RouteGenerator extends Generator
     /**
      * Set validation rules.
      *
-     * @param bool|int $force
+     * @param bool|int $rules
+     *
+     * @example name=required|min:3|unique:payment
      *
      * @return $this
      */
@@ -391,13 +424,27 @@ class RouteGenerator extends Generator
     }
 
     /**
+     * Set model relationships.
+     *
+     * @param string $relationships
+     *
+     * @return $this
+     */
+    public function setRelationships($relationships)
+    {
+        $this->relationships = $relationships;
+
+        return $this;
+    }
+
+    /**
      * Get schema parser.
      *
      * @return SchemaParser
      */
     public function getSchemaParser()
     {
-        return new SchemaParser($this->schema);
+        return new SchemaParser($this->schema, $this->useDefaults);
     }
 
     /**
@@ -469,9 +516,9 @@ class RouteGenerator extends Generator
         //     }
         // }
 
-        // $this->addLanguageVariable();
-
         $this->updateConfigFile();
+
+        $this->addLanguageVariable();
 
         $this->updateRoutesStatuses();
 
@@ -606,6 +653,7 @@ class RouteGenerator extends Generator
             + ( $this->hasSoftDelete() ?  ['--soft-delete' => true] : [])
             + $console_traits
             + ['--notAsk' => true]
+            + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
         );
 
         $this->console->call('unusual:make:migration', [
@@ -613,6 +661,7 @@ class RouteGenerator extends Generator
             'name' => "create_{$this->getDBTableName($this->name)}_table",
             ]
             + ( $this->schema ?  ['--fields' => $this->schema] : [])
+            + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
             + $console_traits
         );
 
@@ -704,6 +753,7 @@ class RouteGenerator extends Generator
         return $this->filesystem->put($configPath, phpArrayFileContent($config));
 
     }
+
     /**
      * addLanguageVariable
      *
@@ -714,11 +764,18 @@ class RouteGenerator extends Generator
         $headline = $this->getHeadline($this->getName());
         $plural = pluralize($headline);
 
-        foreach (glob(__DIR__ . "/../../lang/*.json") as $filename) {
-            $arr = json_decode( file_get_contents($filename), true );
-            $arr['modules'][$this->getSnakeCase($this->name)] = "{$headline} | {$plural} | {n} {$plural}";
-            file_put_contents($filename, collect($arr)->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        foreach(glob( base_path('lang') . "/**/modules.php") as $path) {
+            $lang = include($path);
+            $lang[$this->getSnakeCase($this->name)] = "{$headline} | {$plural} | {n} {$plural}";
+
+            $this->filesystem->put($path, phpArrayFileContent($lang));
         }
+
+        // foreach (glob(__DIR__ . "/../../lang/*.json") as $filename) {
+        //     $arr = json_decode( file_get_contents($filename), true );
+        //     $arr['modules'][$this->getSnakeCase($this->name)] = "{$headline} | {$plural} | {n} {$plural}";
+        //     file_put_contents($filename, collect($arr)->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        // }
         // \Illuminate\Support\Facades\File::get( __DIR__ . '/');
         return true;
     }

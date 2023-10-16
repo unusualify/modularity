@@ -39,7 +39,9 @@ class MigrationMakeCommand extends BaseCommand
      */
     public function handle() : int
     {
-        $this->defaultFieldSchemas = $this->baseConfig('schemas.default_fields') ?? [];
+        if(!$this->option('no-defaults')){
+            $this->defaultFieldSchemas = $this->baseConfig('schemas.default_fields') ?? [];
+        }
 
         if (parent::handle() === E_ERROR) {
             return E_ERROR;
@@ -81,6 +83,7 @@ class MigrationMakeCommand extends BaseCommand
             ['plain', null, InputOption::VALUE_NONE, 'Create plain migration.'],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
+            ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
         ], unusualTraitOptions());
     }
@@ -176,7 +179,8 @@ class MigrationMakeCommand extends BaseCommand
         }
 
         if(!$this->option('addTranslation')){
-            $fields .= implode(",", $this->defaultFieldSchemas).",";
+            if(count($this->defaultFieldSchemas))
+                $fields .= implode(",", $this->defaultFieldSchemas).",";
             $fields .= $this->option('fields');
         }
 
