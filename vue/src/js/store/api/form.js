@@ -19,27 +19,33 @@ export default {
     })
   },
   post (endpoint, data, callback, errorCallback) {
-    axios.post(endpoint, data).then(function (resp) {
+    axios.post(endpoint, data, {
+      validateStatus: status => (status >= 200 && status < 300) || status === 422
+    }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
-    }, function (resp) {
+    }).catch(function (err) {
       const error = {
         message: 'Post request error.',
-        value: resp
+        value: err.response
       }
+
       globalError(component, error)
-      if (errorCallback && typeof errorCallback === 'function') errorCallback(resp)
+
+      if (errorCallback && typeof errorCallback === 'function') errorCallback(err.response)
     })
   },
   put (endpoint, data, callback, errorCallback) {
-    axios.put(endpoint, data).then(function (resp) {
-      if (callback && typeof callback === 'function') callback(resp)
-    }, function (resp) {
-      const error = {
-        message: 'Put request error.',
-        value: resp
-      }
-      globalError(component, error)
-      if (errorCallback && typeof errorCallback === 'function') errorCallback(resp)
-    })
+    axios.put(endpoint, data)
+      .then(function (resp) {
+        if (callback && typeof callback === 'function') callback(resp)
+      }).catch(function (err) {
+        const error = {
+          message: 'Put request error.',
+          value: err.response
+        }
+        globalError(component, error)
+
+        if (errorCallback && typeof errorCallback === 'function') errorCallback(err.response)
+      })
   }
 }

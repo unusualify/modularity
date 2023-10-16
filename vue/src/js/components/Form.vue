@@ -212,8 +212,8 @@ export default {
     return {
       id: Math.ceil(Math.random() * 1000000) + '-form',
 
-      loading: false,
-      errors: {},
+      formLoading: false,
+      formErrors: {},
       inputs: this.invokeRuleGenerator(this.schema),
 
       // validForm: false
@@ -234,7 +234,6 @@ export default {
       // this.resetValidation()
     },
     errors (newValue, oldValue) {
-      // __log('errors')
       this.setSchemaErrors(newValue)
     }
   },
@@ -274,8 +273,8 @@ export default {
       }
     },
 
-    loading_ () {
-      return this.actionUrl ? this._loading : this.$store.state.form.loading
+    loading () {
+      return this.actionUrl ? this.formLoading : this.$store.state.form.loading
       // get () {
       //   return this.actionUrl ? this._loading : this.$store.state.form.loading
       // },
@@ -283,10 +282,10 @@ export default {
       //   __log('loading setter', value, this.loading)
       // }
     },
-    errors_ () {
-      return this.actionUrl ? this._errors : this.$store.state.form.errors
+    errors () {
+      return this.actionUrl ? this.formErrors : this.$store.state.form.errors
       // get () {
-      //   return this.actionUrl ? this._errors : this.$store.state.form.errors
+      //   return this.actionUrl ? this.formErrors : this.$store.state.form.errors
       // },
       // set (value) {
       //   for (const name in value) {
@@ -363,17 +362,17 @@ export default {
     },
     saveForm (callback = null, errorCallback = null) {
       if (this.actionUrl) {
-        this._errors = {}
-        this._loading = true
+        this.formErrors = {}
+        this.formLoading = true
 
         const formData = getSubmitFormData(this.inputSchema, this.model)
         const method = Object.prototype.hasOwnProperty.call(formData, 'id') ? 'put' : 'post'
         const self = this
 
         api[method](this.actionUrl, formData, function (response) {
-          self._loading = false
+          self.formLoading = false
           if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
-            self._errors = response.data.errors
+            self.formErrors = response.data.errors
           } else if (Object.prototype.hasOwnProperty.call(response.data, 'variant')) {
             self.$store.commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
           }
@@ -387,10 +386,8 @@ export default {
 
           if (callback && typeof callback === 'function') callback(response.data)
         }, function (response) {
-          self._loading = false
-          __log(
-            response
-          )
+          self.formLoading = false
+
           if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
             self.$store.commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
           } else {
@@ -407,7 +404,6 @@ export default {
         })
       }
     },
-
     submit (e) {
       if (this.validForm) {
         if (this.async) {
@@ -422,7 +418,6 @@ export default {
       }
       // this.$v.$touch()
     },
-
     handleClick (val) {
       // logger(val)
 
@@ -442,7 +437,6 @@ export default {
         // obj.schema.type = obj.schema.type === 'password' ? 'text' : 'password'
       }
     },
-
     setSchemaErrors (errors) {
       for (const name in errors) {
         this.inputSchema[name].errorMessages = errors[name]

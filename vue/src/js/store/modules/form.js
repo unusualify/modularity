@@ -175,9 +175,7 @@ const actions = {
       method = 'put'
       url = window[process.env.VUE_APP_NAME].ENDPOINTS.update.replace(':id', data.id)
     }
-    // __log(
-    //   'actions.save_form', data
-    // )
+
     api[method](url, data, function (response) {
       commit(FORM.UPDATE_FORM_LOADING, false)
 
@@ -189,6 +187,7 @@ const actions = {
         if (method === 'post') {
           commit(FORM.RESET_EDITED_ITEM)
         }
+
         try {
           dispatch(ACTIONS.GET_DATATABLE)
         } catch (error) {
@@ -200,8 +199,9 @@ const actions = {
       if (callback && typeof callback === 'function') callback(response.data)
     }, function (response) {
       commit(FORM.UPDATE_FORM_LOADING, false)
-      __log('400 response', response)
-      if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
+      if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
+        commit(FORM.SET_FORM_ERRORS, response.data.errors)
+      } else if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
         commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
       } else {
         dispatch(ACTIONS.HANDLE_ERRORS, response.data)
