@@ -469,7 +469,19 @@ class RouteServiceProvider extends ServiceProvider
                 $parent_url = $pr['url'] ?? $parent_kebab;
 
                 if( is_array( $routes = $config['routes'] ) ){
-                    foreach( array_reverse($routes) as $key => $item) {
+
+                    /**
+                     * the fix of route precedence
+                     * to define parent route the most lastly
+                     *
+                     *  */
+                    usort($routes, fn($i, $j) =>
+                        (isset($i['parent']) || isset($j['parent']))
+                            ? ((isset($i['parent']) && $i['parent']) ?: false)
+                            : false
+                    );
+
+                    foreach( $routes as $key => $item) {
                         $route_camel = camelCase( $item['name'] );
                         $route_studly = studlyName($item['name']);
                         $route_snake = studlyName($item['name']);
