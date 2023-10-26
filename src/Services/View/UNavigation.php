@@ -76,6 +76,7 @@ class UNavigation
     public function sidebarMenuFromConfigs($configs)
     {
         $arrays = [];
+
         foreach ( $configs as $moduleName => $config) {
             try {
                 $name = $config['name'];
@@ -88,6 +89,8 @@ class UNavigation
                     $configs,
                 );
             }
+
+
 
             $pr_name = $this->getSnakeCase($name);
             // $pr => parent route
@@ -146,12 +149,11 @@ class UNavigation
                         //     'route_name' => $route_name
                         // ];
                     }else{
-                        $array['items'] = [
-                            $this->getSnakeCase($config['name']) => [
-                                'name' => $item['headline'] ?? pluralize(headline($item['name'])),
-                                'icon' => $item['icon'] ?? '',
-                                'route_name' => $route_name
-                            ]
+
+                        $array['items'][$this->getSnakeCase($item['name'])] = [
+                            'name' => $item['headline'] ?? pluralize(headline($item['name'])),
+                            'icon' => $item['icon'] ?? '',
+                            'route_name' => $route_name
                         ];
                         // $array = [
                         //     'name' => $config['headline'] ?? pluralize(headline($config['name'])),
