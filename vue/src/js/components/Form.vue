@@ -36,7 +36,7 @@
             </div>
           </ue-title>
           <v-custom-form-base
-            id="treeview-slot"
+            id="ue-form-wrapper"
             class="pt-5"
 
             v-model="model"
@@ -49,7 +49,7 @@
             @blur="handleBlur"
             @click="handleClick"
             >
-            <template v-slot:[`slot-inject-prepend-key-treeview-slot-permissions`]="{open}" >
+            <!-- <template v-slot:[`slot-inject-prepend-key-treeview-slot-permissions`]="{open}" >
               <v-icon color="blue">
                   {{open ? 'mdi-folder-open' : 'mdi-folder'}}
               </v-icon>
@@ -58,7 +58,7 @@
               <span class="caption" >
                 {{item.name.toUpperCase()}}
               </span>
-            </template>
+            </template> -->
           </v-custom-form-base>
         </v-sheet>
         <div v-if="hasStickyFrame"

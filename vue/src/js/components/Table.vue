@@ -303,7 +303,8 @@
               @click="$call(col.formatter + 'Item', item)"
               >
 
-              {{ item[col.key].length > 40 ? item[col.key].substring(0,40) + '...' : item[col.key] }}
+              <!-- {{ item[col.key].length > 40 ? item[col.key].substring(0,40) + '...' : item[col.key] }} -->
+              {{ window.__shorten(item[col.key]) }}
             </v-btn>
           </template>
           <template v-else-if="col.formatter == 'switch'">

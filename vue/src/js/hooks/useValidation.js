@@ -25,7 +25,9 @@ export default function useValidation () {
       return (v && v.length >= l) || msg || `min. ${l} Characters`
     },
     maxRule: (l, msg) => v => (v && v.length <= l) || msg || `max. ${l} Characters`,
-    requiredRule: msg => v => !!v || msg || 'Required',
+    requiredRule: msg => v => {
+      return !!v || msg || 'Required'
+    },
     requiredArrayRule: (msg, l = 1) => v => (Array.isArray(v) && v.length > l) || msg || '',
     emailRule: (msg) => v => /.+@.+\..+/.test(v) || msg || 'E-mail must be valid',
     confirmationRule: (confirmationValue, msg) => v => {

@@ -143,8 +143,8 @@ export default function useTable (props, context) {
       return t('confirm-deletion', {
         // route: state.transName.toLowerCase(),
         route: state.transNameSingular,
-        name: (store.state.form.editedItem[props.titleKey]
-          ? (isObject(store.state.form.editedItem[props.titleKey]) ? store.state.form.editedItem[props.titleKey][store.state.currentUser.locale] : store.state.form.editedItem[props.titleKey])
+        name: (state.editedItem[props.titleKey]
+          ? (isObject(state.editedItem[props.titleKey]) ? state.editedItem[props.titleKey][store.state.currentUser.locale] : state.editedItem[props.titleKey])
           : '').toLocaleUpperCase()
       })
     }),
@@ -195,6 +195,7 @@ export default function useTable (props, context) {
     },
 
     editItem: function (item) {
+      __log(item)
       if (props.editOnModal || props.embeddedForm) {
         methods.setEditedItem(item)
         methods.openForm()

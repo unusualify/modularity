@@ -104,8 +104,9 @@
                     <slot :name="getArrayItemSlot(obj)" v-bind= "{ obj, id, index, idx, item}">
                       <v-custom-form-base
                         :id="`${id}-${obj.key}-${idx}`"
-                        :model="item"
-                        :schema="obj.schema.schema"
+                        :modelValue="item"
+                        @update:modelValue="item = $event"
+                        v-model:schema="obj.schema.schema"
                         :row="getRowGroupOrArray(obj)"
                         :col="getColGroupOrArray(obj)"
                         :class="`${id}-${obj.key}`"
@@ -163,7 +164,9 @@
                   @update:modelValue= "onInput($event, obj)"
                 >
                   <!-- works with #[s]="slotData" " -->
-                  <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]="slotData"><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index,  ...slotData}" /></template>
+                  <template v-for="s in getInjectedScopedSlots(id, obj)" v-slot:[s]="slotData">
+                    <slot :name="getKeyInjectSlot(obj, s)" v-bind="{ id, obj, index,  ...slotData}" />
+                  </template>
                 </component>
 
               <!-- END TREEVIEW -->
@@ -298,14 +301,8 @@
                 v-else-if="obj.schema.type === 'btn'"
                 v-bind="bindSchema(obj)"
                 @click="onEvent($event, obj, button)"
+                type="button"
               >
-                <v-icon
-                  v-if="obj.schema.iconLeft"
-                  left
-                  :dark="obj.schema.dark"
-                >
-                  {{ obj.schema.iconLeft }}
-                </v-icon>
                 {{ setValue(obj) }}
                 <v-icon
                   v-if="obj.schema.iconCenter"
@@ -314,13 +311,6 @@
                   {{ obj.schema.iconCenter }}
                 </v-icon>
                 {{ obj.schema.label }}
-                <v-icon
-                  v-if="obj.schema.iconRight"
-                  right
-                  :dark="obj.schema.dark"
-                >
-                  {{ obj.schema.iconRight }}
-                </v-icon>
               </v-btn>
               <!-- END BTN -->
               <v-custom-input-locale
@@ -382,7 +372,9 @@
                 @update:modelValue="onInput($event, obj)"
               >
                 <!-- component doesn't work with #[s]="slotData" " -->
-                <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]><slot :name= "getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index }"/></template>
+                <template v-for="s in getInjectedScopedSlots(id, obj)" v-slot:[s]="slotData">
+                  <slot :name= "getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, ...slotData }"/>
+                </template>
               </component>
               <!-- END DEFAULT -->
               </slot>
@@ -661,7 +653,7 @@ export default {
       return this.valueIntern
     },
     storeStateSchema () {
-      // __log('storeStateSchema computed', this.valueIntern, this.storeStateData)
+      // __log('storeStateSchema computed')
 
       this.updateArrayFromState(this.valueIntern, this.formSchema)
       for (const key in this.formSchema) {
@@ -681,6 +673,9 @@ export default {
       this.formSchema = newSchema
       this.schema = newSchema
     }
+    // valueIntern: function (newVal, oldVal) {
+    //   __log('valueIntern watch', newVal, oldVal)
+    // }
   },
   methods: {
     // MAP TYPE
@@ -945,6 +940,7 @@ export default {
       // <template #slot-inject-thumb-label-key-formbase-path-to-mykey />
       // extract the verb 'thumb-label' from Slots starting with 'slot-inject' and matching [component-id] and [key]
       const rx = new RegExp(`${injectSlotAppendix}-(.*?)-${keyClassAppendix}`)
+
       return Object.keys(this.$slots)
         .filter(s => (s.includes(`${id}${classKeyDelimiter}${obj.key.replace(/\./g, '-')}`) && s.includes(injectSlotAppendix)))
         .map(i => i.match(rx)[1])
@@ -1009,11 +1005,6 @@ export default {
     // Set Value
     setValue (obj, type) {
       // Use 'schema.toCtrl' Function for setting a modified Value
-      // __log(
-      //     obj.schema.name,
-      //     this.storeStateData,
-      //     // obj.value
-      // )
       return obj.schema.type === 'wrap'
         ? this.toCtrl({ value: this.storeStateData, obj, data: this.storeStateData, schema: this.storeStateSchema })
         : this.toCtrl({ value: obj.value, obj, data: this.storeStateData, schema: this.storeStateSchema })

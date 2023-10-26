@@ -6,7 +6,7 @@
           :ref="makeReference('countryInput')"
           v-model="countryCode"
           :items="sortedCountries"
-          item-title="iso2"
+          item-title="name"
           item-value="iso2"
           width="52px"
           v-bind="$lodash.pick(boundProps, ['variant', 'menuProps', 'selectClasses', 'selectLabel', 'dense', 'density'])"
@@ -21,7 +21,7 @@
               {{ activeCountry.iso2 }}
             </span> -->
           </template>
-          <template #item="itemSlot">
+          <template v-if="false" #item="itemSlot">
             <!-- {{  $log(itemSlot) }} -->
             {{ itemSlot.item.raw.name }}
             <!-- <v-list-item :title="`${itemSlot.item.raw.name} +${itemSlot.item.raw.dialCode}`" @click="itemSlot.props.onClick">
