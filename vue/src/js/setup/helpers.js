@@ -145,6 +145,11 @@ global.__printDefinition = (variable) => {
   return JSON.stringify(__convertArrayOrObject(variable))
 }
 
+global.__shorten = (string, maxLength = 40) => {
+  // return  __convertArrayOrObject(variable);
+  return string.length > maxLength ? string.substring(0, maxLength) + '...' : string
+}
+
 if (!Object.equals) {
   Object.equals = function (object1, object2) {
     // For the first loop, we only check for types
