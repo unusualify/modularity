@@ -1,7 +1,7 @@
 <template>
   <component
     :is="configuration.tag"
-    v-bind="{...configuration.attributes}"
+    v-bind="{...filteredAttributes, ...bindAttributes, ...castedAttributes}"
     >
     <template v-if="isArray(configuration.elements)">
       <ue-recursive-stuff
@@ -18,10 +18,10 @@
 </template>
 
 <script>
-import { withDirectives, h, resolveDirective } from 'vue'
+import { reduce, get, cloneDeep } from 'lodash'
+import { computed, ref } from 'vue'
 
 export default {
-
   props: {
     configuration: {
       type: Object,
@@ -32,6 +32,14 @@ export default {
     level: {
       type: Number,
       default: 0
+    },
+    bindData: {
+      type: Object,
+      default () {
+        return {
+
+        }
+      }
     }
   },
   setup (props, context) {
@@ -41,18 +49,71 @@ export default {
     // __log(directives)
 
     function isString (value) {
-      // __log('isString', value, __isString(value))
       return __isString(value)
     }
     function isArray (value) {
-      // __log('isArray', value, Array.isArray(value))
       return Array.isArray(value, (value))
     }
+
+    const castPattern = /\$([\w|.]+)/
+    const filteredAttributes = cloneDeep(props.configuration.attributes)
+
+    const castedAttributes = computed(() => {
+      const attrs = cloneDeep(props.configuration.attributes)
+      return reduce(attrs, (o, v, k) => {
+        if (!(isArray(v) || isString(v))) {
+          return o
+        }
+
+        let value = v
+        let funcs = []
+
+        if (isArray(v) && isString(v[0])) {
+          value = v.shift()
+          funcs = v
+        }
+
+        const matches = value.match(castPattern)
+
+        if (matches) {
+          let result = get(props.bindData, matches[1])
+          funcs.forEach((func) => {
+            result = global[func](result)
+          })
+
+          if (result) {
+            o[k] = result
+            delete filteredAttributes[k]
+          }
+        }
+
+        return o
+      }, {})
+    })
+
+    const bindAttributes = computed(() => {
+      const bindKey = props.configuration.bind
+      if (bindKey) {
+        const matches = bindKey.match(castPattern)
+
+        if (matches && !!props.bindData) {
+          const key = matches[1]
+          if (Object.prototype.hasOwnProperty.call(props.bindData, key)) {
+            return props.bindData[key]
+          }
+        }
+      }
+
+      return {}
+    })
 
     return {
       // directives: props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : [],
       isString,
-      isArray
+      isArray,
+      filteredAttributes,
+      castedAttributes,
+      bindAttributes
     }
   },
   data () {
