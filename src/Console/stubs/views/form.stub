@@ -8,15 +8,8 @@
 @endphp
 
 @section('content')
-    <ue-form-base
-        :has-submit="true"
-        :sticky-button="true"
-        :schema='@json($formSchema)'
-        @if($editable)
-            :value='@json($item)'
-        @endif
-        >
-    </ue-form-base>
+    <ue-form v-bind='@json($formAttributes)'/>
+
 @stop
 
 @push('head_last_js')
@@ -32,17 +25,8 @@
 @endpush
 
 @section('STORE')
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {
-        @if($editable)
-            update: '{{ $actionUrl }}',
-        @else
-            store:  '{{ $actionUrl }}',
-        @endif
-    }
-
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {
-        inputs: {!! json_encode($formSchema ?? new StdClass()) !!},
-    }
+    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
+    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {!! json_encode($formStore ?? new StdClass()) !!}
 @endsection
 
 

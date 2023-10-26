@@ -213,7 +213,7 @@ class ResourceServiceProvider extends ServiceProvider
             View::composer("$this->baseKey::layouts.master", FilesUploaderConfig::class);
         }
 
-        View::composer("$this->baseKey::partials.navigation.*", ActiveNavigation::class);
+        // View::composer("$this->baseKey::partials.navigation.*", ActiveNavigation::class);
 
         View::composer(['admin.*', 'templates.*', "$this->baseKey::*"], function ($view) {
             $with = array_merge([

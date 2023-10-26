@@ -425,7 +425,9 @@ abstract class BaseController extends CoreController
     {
         $translated = $this->routeHas('translations');
 
-        $paginator->getCollection()->transform(function ($item) use($translated) {
+        $schema = $this->getFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        $paginator->getCollection()->transform(function ($item) use($translated, $schema) {
 
             // $columnsData = [];
             // foreach ($this->indexTableColumns as $key => &$column) {
@@ -434,7 +436,6 @@ abstract class BaseController extends CoreController
             $columnsData = Collection::make($this->indexTableColumns)->mapWithKeys(function (&$column) use ($item) {
                 return $this->getItemColumnData($item, $column);
             })->toArray();
-
             $name = $columnsData[$this->titleColumnKey];
 
             if (empty($name)) {
@@ -457,7 +458,6 @@ abstract class BaseController extends CoreController
             $canDuplicate = $this->getIndexOption('duplicate');
 
             $itemId = $this->getItemIdentifier($item);
-
             return array_replace(
                 $item->toArray()
                 + [
@@ -468,7 +468,8 @@ abstract class BaseController extends CoreController
                     // 'edit' => $canEdit ? $this->getModuleRoute($itemId, 'edit') : null,
                     // 'duplicate' => $canDuplicate ? $this->getModuleRoute($itemId, 'duplicate') : null,
                     // 'delete' => $itemCanDelete ? $this->getModuleRoute($itemId, 'destroy') : null,
-                ]
+                ] +
+                $this->repository->getFormFields($item, $schema)
                 // + ($this->getIndexOption('editInModal') ? [
                 //     'editInModal' => $this->getModuleRoute($itemId, 'edit'),
                 //     'updateUrl' => $this->getModuleRoute($itemId, 'update'),
