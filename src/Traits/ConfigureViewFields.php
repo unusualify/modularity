@@ -42,6 +42,7 @@ trait ConfigureViewFields {
      */
     protected function getIndexData($prependScope = [])
     {
+        // dd($this->getFormSchema($this->getConfigFieldsByRoute('inputs')));
         $data = [
             // 'hiddenFilters' => array_keys(Arr::except($this->filters, array_keys($this->defaultFilters))),
             // 'filterLinks' => $this->filterLinks ?? [],
@@ -367,7 +368,6 @@ trait ConfigureViewFields {
     protected function getFormData($id, $item = null, $nested=null)
     {
         $schema = $this->getFormSchema($this->getConfigFieldsByRoute('inputs'));
-
         if (!$item && $id) {
             $item = $this->repository->getById(
                 $id,
@@ -377,8 +377,6 @@ trait ConfigureViewFields {
         } elseif (! $item && ! $id) {
             $item = $this->repository->newInstance();
         }
-
-        // dd($item);
 
         $fullRoutePrefix = 'admin.' . ($this->routePrefix ? $this->routePrefix . '.' : '') . $this->moduleName . '.';
         $previewRouteName = $fullRoutePrefix . 'preview';
@@ -390,12 +388,22 @@ trait ConfigureViewFields {
         // $localizedPermalinkBase = $this->getLocalizedPermalinkBase();
 
         $itemId = $this->getItemIdentifier($item);
-        // dd($item);
         $data = [
             'formAttributes' => [
                 'hasSubmit' => true,
                 'stickyButton' => false,
-                'modelValue' => $this->repository->getFormFields($item, $schema),
+                'modelValue' => array_merge($this->repository->getFormFields($item, $schema), [
+                    // 'packageFeatures' => [
+                    //     [
+                    //         'package_feature_id' => 1,
+                    //         'active' => true
+                    //     ],
+                    //     [
+                    //         'package_feature_id' => 2,
+                    //         'active' => false
+                    //     ]
+                    // ]
+                ]),
                 'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => $this->routeName]),
                 // 'schema'  => $schema, // input fields to be used in unusual datatable component
                 // 'defaultItem' => collect($schema)->mapWithKeys(function($item, $key){
@@ -518,6 +526,10 @@ trait ConfigureViewFields {
             $input = $object;
         }
 
+        // if(array_key_exists('schema', $input)){
+        //     $input['schema'] = $this->getFormSchema($input['schema']);
+        //     dd($input['schema']);
+        // }
         // dd(
         //     $default_input,
         //     $input,
@@ -607,11 +619,13 @@ trait ConfigureViewFields {
                 $input['itemTitle'] = $input['itemTitle'] ?? 'name';
                 $input['type'] = 'custom-input-checklist';
                 $input['default'] = [];
-
+                $items = [];
                 if(isset($input['repository'])){
-                    $relation_class = App::ma*ke($input['repository']);
+                    $relation_class = App::make($input['repository']);
+                    $items = $relation_class->list($input['itemTitle'])->toArray();
                 }else if(isset($input['model'])){
                     $relation_class = App::make($input['model']);
+                    $items = $relation_class->all([$input['itemValue'], $input['itemTitle']])->toArray();
                 }else if(isset($input['route'])){
                     $finder = new Finder();
                     $module = $this->app['unusual.repository']->find($this->moduleName);
@@ -621,14 +635,15 @@ trait ConfigureViewFields {
                             if($r->route_name == $input['route']){
                                 $table = Str::plural($input['route']);
                                 $relation_class = $finder->getRepository($table);
+                                $items = $relation_class->list($input['itemTitle'])->toArray();
+                                break;
                             }
                         }
                     }
                 }
 
-                // $object[$input['name']] =  Arr::except($input, ['route','model']) + [
                 $object =  Arr::except($input, ['route','model', 'repository']) + [
-                    'items' => $relation_class->all([$input['itemValue'], $input['itemTitle']])->toArray()
+                    'items' => $items
                 ];
 
             break;
@@ -636,42 +651,49 @@ trait ConfigureViewFields {
             case 'combobox':
                 // dd($input);
                 $relation_class= null;
-
-                if(isset($input['items'])) break;
-
                 $input['itemValue'] = $input['itemValue'] ?? 'id';
                 $input['itemTitle'] = $input['itemTitle'] ?? 'name';
-                $input['default'] = [];
+                $input['default'] ??= [];
                 // $input[] = 'multiple';
+                if(isset($input['items'])) break;
 
+                $items = [];
 
                 if(isset($input['repository'])){
                     $relation_class = App::make($input['repository']);
+                    $items = $relation_class->list($input['itemTitle'])->toArray();
+
                 }else if(isset($input['model'])){
                     $relation_class = App::make($input['model']);
+                    $items = $relation_class->all([$input['itemValue'], $input['itemTitle']])->toArray();
+
                 }else if(isset($input['route'])){
                     $finder = new Finder();
                     $module = $this->app['unusual.repository']->find($this->moduleName);
-
-                    if(!isset($module)){
-                        $input['items'] = [];
-                        break;
-                    }
 
                     if( $module->isEnabledRoute($input['route']) ){
                         foreach ($this->config->routes as $r) {
                             if($r->route_name == $input['route']){
                                 $table = Str::plural($input['route']);
                                 $relation_class = $finder->getRepository($table);
+                                $items = $relation_class->list($input['itemTitle'])->toArray();
+                                break;
                             }
                         }
                     }
                 }
 
-                // $object[$input['name']] =  Arr::except($input, ['route','model']) + [
+                if(count($items) && isset($items[0][$input['itemValue']]) && $items[0][$input['itemValue']]){
+                    array_unshift($items, [
+                        $input['itemValue'] => 0,
+                        $input['itemTitle'] => 'Please Select'
+                    ]);
+                }
+
                 $object =  Arr::except($input, ['route','model', 'repository']) + [
-                    'items' => $relation_class->all([$input['itemValue'], $input['itemTitle']])->toArray()
+                    'items' => $items
                 ];
+
             break;
             case 'switch':
             case 'checkbox':
@@ -680,6 +702,71 @@ trait ConfigureViewFields {
                 $input['falseValue'] ??= 0;
                 $input['hideDetails'] = true;
                 $input['default'] = 0;
+
+                $object = $input;
+            break;
+            case 'repeater':
+            case 'custom-input-repeater':
+                $relation_class= null;
+
+                $input['type'] = 'custom-input-repeater';
+                if( $input['orderable'] ?? false){
+                    $input['orderKey'] ??= 'position';
+                }
+                $input['col'] ??= [
+                    'cols' => 12,
+                    'sm' => 12,
+                    'md' => 12,
+                    'lg' => 12,
+                    'xl' => 12
+                ];
+
+                if(array_key_exists('schema', $input)){
+                    $inputStudlyName = '';
+                    $inputSnakeName = '';
+
+                    if($input['repository']){
+                        if( preg_match( '/(\w+)Repository/', get_class_short_name($input['repository']), $matches)){
+                            $relation_class = App::make($input['repository']);
+                            $inputStudlyName = $matches[1];
+                            $inputSnakeName = $this->getSnakeCase($inputStudlyName);
+                            $inputCamelName = $this->getCamelCase($inputStudlyName);
+                        }
+                    } else if($input['model']){
+                        if( preg_match( '/(\w+)/', get_class_short_name($input['model']), $matches)){
+                            dd($matches);
+                            $relation_class = App::make($input['model']);
+
+                            $inputStudlyName = $matches[1];
+                            $inputSnakeName = $this->getSnakeCase($inputStudlyName);
+                        }
+                    }
+                    foreach ($input['schema'] as $key => &$_input) {
+                        switch ($_input['type']) {
+                            case 'select':
+                            case 'combobox':
+                            case 'autocomplete':
+                                if($inputSnakeName){
+
+                                    if(preg_match("/{$inputSnakeName}_id/", $_input['name'])){ // it means foreign_id of pivot table
+                                        if(isset($input['repository'])){
+                                            $_input['repository'] ??= $input['repository'];
+                                        } else if(isset($input['model'])){
+                                            $_input['model'] ??= $input['model'];
+                                        }
+                                    }else {
+                                        $_input['items'] ??= [];
+                                    }
+                                    break;
+                                }
+                            default:
+                                # code...
+                                break;
+                        }
+                    }
+
+                    $input['schema'] = $this->getFormSchema($input['schema']);
+                }
 
                 $object = $input;
             break;

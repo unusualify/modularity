@@ -9,9 +9,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use OoBook\CRM\Base\Support\Finder;
 
-
-
-class RelationParser implements Arrayable
+class ModelRelationParser implements Arrayable
 {
     use ManageNames;
 
@@ -20,7 +18,8 @@ class RelationParser implements Arrayable
         'hasOne',
         'hasMany',
         'hasOneThrough',
-        'hasManyThrough'
+        'hasManyThrough',
+        'belongsToMany'
     ];
 
     protected $arguments = [
@@ -28,13 +27,16 @@ class RelationParser implements Arrayable
         'hasOne'            => ['table', 'foreign_key', 'local_key'],
         'hasMany'           => ['table', 'foreign_key', 'local_key'],
         'hasOneThrough'     => ['table', 'table', 'foreign_key', 'foreign_key', 'local_key', 'local_key'],
-        'hasManyThrough'    => ['table', 'table', 'foreign_key', 'foreign_key', 'local_key', 'local_key']
+        'hasManyThrough'    => ['table', 'table', 'foreign_key', 'foreign_key', 'local_key', 'local_key'],
+        'belongsToMany'    => ['table', 'table', 'foreign_pivot_key', 'related_pivot_key', 'parent_key', 'related_key', 'relation']
     ];
 
     /**
      * The model relation.
      *
      * @var string
+     *
+     * $example
      */
     protected $relations;
 
@@ -71,8 +73,8 @@ class RelationParser implements Arrayable
 
             if($parameters !== false )
                 $parsed[] = [
-                    'function_name'  => $function,
-                    'method'    => $method,
+                    'relationship_name'  => $function,
+                    'relationship_method'    => $method,
                     'parameters'=> $parameters
                 ];
         }
@@ -186,6 +188,13 @@ class RelationParser implements Arrayable
                                 $name .= '_'.$this->getPlural($param);
 
                             break;
+                        case 'belongsToMany':
+                            if($name !== '')
+                                $name .= $this->getSingular($param);
+                            else
+                                $name .= '_'.$this->getPlural($param);
+
+                            break;
                         default:
                             # code...
                             break;
@@ -242,16 +251,19 @@ class RelationParser implements Arrayable
 
         switch ($attr['method']) {
             case 'belongsTo':
-                // $comment = "/**\n\t* Get the {$attr['function_name']} of the {$model}.\n\t*/";
-                $comment = $this->commentStructure(["Get the {$attr['function_name']} of the {$model}."]);
+                // $comment = "/**\n\t* Get the {$attr['relationship_name']} of the {$model}.\n\t*/";
+                $comment = $this->commentStructure(["Get the {$attr['relationship_name']} that owns the {$model}."]);
                 break;
             case 'hasOne':
-                $comment = "/**\n\t* Get the {$attr['function_name']} associated with the {$model}.\n\t*/";
+                $comment = $this->commentStructure(["Get the {$attr['relationship_name']} associated with the {$model}."]);
 
                 break;
             case 'hasMany':
-                $comment = "/**\n\t* Get the {$attr['function_name']} for the {$model}.\n\t*/";
+                $comment =  $this->commentStructure(["Get the {$attr['relationship_name']} for the {$model}."]);
 
+                break;
+            case 'belongsToMany':
+                $comment =  $this->commentStructure(["The {$attr['relationship_name']} that belong to the {$model}."]);
                 break;
 
             default:
@@ -268,7 +280,7 @@ class RelationParser implements Arrayable
             $carry .= "{$text}\n\t* ";
             return $carry;
         }, '');
-        return "/**\n\t* {$message}\n\t*/";
+        return "\t/**\n\t* {$message}\n\t*/";
     }
 
     /**
@@ -285,7 +297,10 @@ class RelationParser implements Arrayable
 
             $comment = $this->generateMethodComment($attr);
 
-            $methods[] = $comment."\n\tpublic function {$attr['function_name']}()\n\t{\n\t\treturn \$this->{$attr['method']}({$args});\n\t}";
+            $relation = $this->getStudlyName($attr['relationship_name']);
+            $return_type = "\Illuminate\Database\Eloquent\Relations\{$relation}";
+
+            $methods[] = $comment."\n\tpublic function {$attr['relationship_name']}() : {$return_type}\n\t{\n\t\treturn \$this->{$attr['relationship_method']}({$args});\n\t}";
         }
 
         return $methods;

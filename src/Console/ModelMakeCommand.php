@@ -3,13 +3,14 @@
 namespace OoBook\CRM\Base\Console;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Nwidart\Modules\Support\Stub;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Support\Str;
-use OoBook\CRM\Base\Support\Decomposers\RelationParser;
+use OoBook\CRM\Base\Support\Decomposers\ModelRelationParser;
 use OoBook\CRM\Base\Support\Decomposers\SchemaParser;
 use Nwidart\Modules\Support\Config\GeneratorPath;
 
@@ -362,7 +363,10 @@ class ModelMakeCommand extends BaseCommand
 
         if( $this->option('relationships')){
 
-            $methods = $methods + with(new RelationParser( $this->argument('model'), $this->option('relationships')))->render();
+            $methods = array_merge($methods, App::makeWith(ModelRelationParser::class, [
+                'model' => $this->argument('model'),
+                'relations' => $this->option('relationships')
+            ])->render());
 
         }
 

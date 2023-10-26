@@ -16,10 +16,11 @@ use PDO;
 use ReflectionClass;
 
 use Nwidart\Modules\Facades\Module;
+use OoBook\CRM\Base\Repositories\Traits\RelationTrait;
+
 abstract class Repository
 {
-
-    use Traits\DatesTrait;
+    use Traits\DatesTrait, RelationTrait;
 
     /**
      * @var \OoBook\CRM\Base\Models\Model
@@ -210,6 +211,38 @@ abstract class Repository
     }
 
     /**
+     * @param string $column
+     * @param array $orders
+     * @param null $exceptId
+     * @return \Illuminate\Support\Collection
+     */
+    public function list($column = 'name', $orders = [], $exceptId = null)
+    {
+        $query = $this->model->newQuery();
+
+        if ($exceptId) {
+            $query = $query->where($this->model->getTable() . '.id', '<>', $exceptId);
+        }
+
+        if ($this->model instanceof Sortable) {
+            $query = $query->ordered();
+        } elseif (!empty($orders)) {
+            $query = $this->order($query, $orders);
+        }
+
+        if ( method_exists($this->getModel(), 'isTranslatable') && $this->model->isTranslatable()) {
+            $query = $query->withTranslation();
+
+            return $query->get()->map(fn($item) => [
+                'id' => $item->id,
+                $column => $item->{$column}
+            ]);
+        }
+
+        return $query->get(['id', $column]);
+    }
+
+    /**
      * @param $search
      * @param array $fields
      * @return \Illuminate\Database\Eloquent\Collection
@@ -255,7 +288,6 @@ abstract class Repository
             $fields = $this->prepareFieldsBeforeCreate($fields);
 
             $object = $this->model->create(Arr::except($fields, $this->getReservedFields()));
-
 
             $this->beforeSave($object, $original_fields);
 

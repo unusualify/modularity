@@ -464,6 +464,19 @@ class RouteGenerator extends Generator
      */
     public function getModelRelationships()
     {
+        $additional = [];
+        foreach(explode('|', $this->relationships) as $relationship){
+            $additional = array_merge($additional, App::makeWith(SchemaParser::class, [
+                'schema' => $relationship,
+                'useDefaults' => $this->useDefaults
+            ])->getRelationships());
+        }
+
+        return array_merge(
+            $this->getSchemaParser()->getRelationships(),
+            $additional
+        );
+
         return $this->getSchemaParser()->getRelationships();
     }
 
@@ -665,6 +678,8 @@ class RouteGenerator extends Generator
             + $console_traits
         );
 
+        $this->generateExtraMigrations();
+
         if($this->generatorConfig('repository')->generate()){
             // $this->console->call('module:make-repository', [
             $this->console->call('unusual:make:repository', [
@@ -728,12 +743,13 @@ class RouteGenerator extends Generator
 
         $configPath = $this->module->getPath().'/Config/config.php';
 
+
         if( $this->getModule()->getName() === $this->getName()){
-            $config['name'] = $studlyName;
-            $config['base_prefix'] = false;
-            $config['headline'] = pluralize($headline);
+            $config['name'] = $config['name'] ?? $studlyName;
+            $config['base_prefix'] = $config['base_prefix'] ?? false;
+            $config['headline'] = $config['headline'] ?? pluralize($headline);
             // $config['parent_route'] = $route_array;
-            $config['routes'] = [];
+            $config['routes'] = $config['routes'] ?? [];
         }
 
         if(!$this->plain){
@@ -766,9 +782,12 @@ class RouteGenerator extends Generator
 
         foreach(glob( base_path('lang') . "/**/modules.php") as $path) {
             $lang = include($path);
-            $lang[$this->getSnakeCase($this->name)] = "{$headline} | {$plural} | {n} {$plural}";
 
-            $this->filesystem->put($path, phpArrayFileContent($lang));
+            if(!isset($lang[$this->getSnakeCase($this->name)])){
+                $lang[$this->getSnakeCase($this->name)] = "{$headline} | {$plural} | {n} {$plural}";
+                $this->filesystem->put($path, phpArrayFileContent($lang));
+            }
+
         }
 
         // foreach (glob(__DIR__ . "/../../lang/*.json") as $filename) {
@@ -801,6 +820,61 @@ class RouteGenerator extends Generator
     }
 
     /**
+     *
+     *
+     * @return bool
+     */
+    public function generateExtraMigrations() :bool
+    {
+
+        if($this->relationships !== ''){
+
+            foreach(explode('|', $this->relationships) as $schema){
+                $parser = App::makeWith(SchemaParser::class, [
+                    'schema' => $schema
+                ]);
+
+                $migratable = false;
+                $route_name = '';
+
+                foreach($parser->getColumnTypes() as $column => $type){
+                    if(in_array($type, ['belongsToMany'])){
+                        $migratable = true;
+                        $route_name = $column;
+                        break;
+                    }
+                }
+
+                if($migratable){
+                    sleep(1);
+
+                    // dd($schema, $parser->toArray());
+                    // $route_name = $options[1]; // package_feature
+                    $pivot_table_name = $this->module->getSnakeName() . '_' . $route_name;
+
+                    $this->console->call('unusual:make:migration', [
+                        '--relational' => true,
+                        '--no-defaults' => true,
+                        'module' => $this->module->getStudlyName(),
+                        'name' => "create_{$pivot_table_name}_table",
+                        ]
+                        + ( $this->schema ?  ['--fields' => $schema] : [])
+                    );
+                }
+            }
+
+
+        }
+
+        return true;
+    }
+
+    public function generatorConfig($generator)
+    {
+        return (new GeneratorPath($this->config->get(unusualBaseKey() . '.paths.generator.'.$generator)));
+    }
+
+    /**
      * Get the contents of the specified stub file by given stub name.
      *
      * @param $stub
@@ -825,9 +899,23 @@ class RouteGenerator extends Generator
         return $this->config->get(unusualBaseKey() . '.stubs.replacements');
     }
 
-    public function generatorConfig($generator)
+    /**
+     * Generate the module.json file
+     */
+    private function generateRouteJsonFile()
     {
-        return (new GeneratorPath($this->config->get(unusualBaseKey() . '.paths.generator.'.$generator)));
+        // dd($this->module->getPath());
+
+        $path = $this->module->getPath(). '/module-routes.json';
+        // $path = $this->module->getModulePath($this->getName()) . 'module.json';
+
+        // if (!$this->filesystem->isDirectory($dir = dirname($path))) {
+        //     $this->filesystem->makeDirectory($dir, 0775, true);
+        // }
+        dd( $this->getStubContents('json') );
+        $this->filesystem->put($path, $this->getStubContents('json'));
+
+        $this->console->info("Created : {$path}");
     }
 
     /**
@@ -879,25 +967,6 @@ class RouteGenerator extends Generator
 
         return preg_replace( array_keys($patterns), array_values($patterns), $string);
 
-    }
-
-    /**
-     * Generate the module.json file
-     */
-    private function generateRouteJsonFile()
-    {
-        // dd($this->module->getPath());
-
-        $path = $this->module->getPath(). '/module-routes.json';
-        // $path = $this->module->getModulePath($this->getName()) . 'module.json';
-
-        // if (!$this->filesystem->isDirectory($dir = dirname($path))) {
-        //     $this->filesystem->makeDirectory($dir, 0775, true);
-        // }
-        dd( $this->getStubContents('json') );
-        $this->filesystem->put($path, $this->getStubContents('json'));
-
-        $this->console->info("Created : {$path}");
     }
 
     /**

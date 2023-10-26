@@ -51,7 +51,11 @@ class MigrationMakeCommand extends BaseCommand
             return 0;
         }
 
-        $this->info('Migration created successfully!');
+        if($this->option('relational')){
+            $this->info('Relational (Pivot) Migration created successfully!');
+        }else {
+            $this->info('Migration created successfully!');
+        }
 
 
         return 0;
@@ -82,6 +86,7 @@ class MigrationMakeCommand extends BaseCommand
             ['fields', null, InputOption::VALUE_OPTIONAL, 'The specified fields table.', null],
             ['plain', null, InputOption::VALUE_NONE, 'Create plain migration.'],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
+            ['relational', null, InputOption::VALUE_NONE, 'Create relational table for many-to-many and polymorphic relationships.'],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
@@ -97,24 +102,20 @@ class MigrationMakeCommand extends BaseCommand
     {
         $parser = new NameParser($this->argument('name'));
 
-        // dd(
-        //     $this->option('fields'),
-        //     // $parser->getTableName()
-        //     // new SchemaParser(rtrim($this->option('fields'), ","))
-        // );
-        // dd(
-        //     $parser->isCreate(),
-        //     $parser->isAdd(),
-        //     $parser->isDelete(),
-        //     get_class($this->getSchemaParser()),
-        //     [
-        //         'class'         => $this->getClass(),
-        //         'table'         => $parser->getTableName(),
-        //         'fields_up'     => $this->getSchemaParser()->up(),
-        //         'fields_down'   => $this->getSchemaParser()->down(),
-        //     ]
-        // );
-        if ($parser->isCreate()) {
+        if($this->option('relational')) {
+            $table_name = $parser->getTableName();
+            $table1 = $this->getSnakeCase($this->argument('module'));
+            $table2 = preg_replace("/^({$table1}_)(\w+)$/", '${2}', $table_name);
+
+            return Stub::create('/migration/pivot.stub', [
+                'class'         => $this->getClass(),
+                'table'         => $table_name,
+                'fields'        => ltrim($this->getSchemaParser()->render()),
+
+                'table1'        => $table1,
+                'table2'        => $table2,
+            ]);
+        } elseif ($parser->isCreate()) {
             return Stub::create('/migration/create.stub', [
                 'class'         => $this->getClass(),
                 'table'         => $parser->getTableName(),

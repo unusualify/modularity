@@ -2,6 +2,7 @@
 
 namespace OoBook\CRM\Base\Support\Decomposers;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Nwidart\Modules\Support\Migrations\SchemaParser as Parser;
@@ -110,6 +111,7 @@ class SchemaParser extends Parser
             }
         }
 
+        $this->relationshipKeys[] = 'belongsToMany';
         $this->relationshipKeys[] = 'hasMany';
     }
 
@@ -142,12 +144,35 @@ class SchemaParser extends Parser
         $parsed = [];
 
         foreach ($this->getSchemas() as $schema) {
+            $column =  $this->getColumn($schema);
+            $column_type = $this->getColumnType($schema);
 
-            $schemaArray = explode(':', $schema);
+            if(in_array($column_type, $this->relationshipKeys)){
+                if($column_type == 'belongsToMany' || $column_type == 'hasOne')
+                    continue;
 
-            $column = !in_array($this->getColumn($schema), $this->relationshipKeys) ? $this->getColumn($schema) : ($schemaArray[1]).'_id';
+                $column =  "{$column}_id";
+            }
 
             $parsed[] = $column;
+        }
+
+        return $parsed;
+    }
+
+    public function getColumnTypes($schema = null) : array
+    {
+        if(!!$schema){
+            $this->schema = $schema;
+        }
+
+        $parsed = [];
+
+        foreach ($this->getSchemas() as $schema) {
+            $column =  $this->getColumn($schema);
+            $column_type = $this->getColumnType($schema);
+
+            $parsed[$column] = $column_type;
         }
 
         return $parsed;
@@ -166,6 +191,11 @@ class SchemaParser extends Parser
         });
     }
 
+    public function getColumnType($schema)
+    {
+        return Arr::get(explode(':', $schema), 1);
+    }
+
     /**
      * Get relationships string.
      *
@@ -178,11 +208,23 @@ class SchemaParser extends Parser
         $relationships = [];
 
         foreach ($this->parse($this->schema) as $col_name => $methods) {
-            if (in_array($col_name, $this->relationshipKeys)) {
-                $foreign_key = $methods[0].'_id';
-                $owner_key = $methods[1] ?? 'id';
-                $table_name = $methods[2] ?? pluralize($methods[0]);
-                $relationships[] = "belongsTo:{$table_name}:{$foreign_key}:{$owner_key}";
+
+            if (in_array($methods[0], $this->relationshipKeys)) {
+                $relationship_name = $methods[0];
+                if($relationship_name  == 'belongsTo'){
+                    $foreign_key = $col_name.'_id';
+                    $owner_key = $methods[1] ?? 'id';
+                    $table_name = $methods[2] ?? pluralize($col_name);
+                    $relationships[] = "belongsTo:{$table_name}:{$foreign_key}:{$owner_key}";
+                } else if($relationship_name == 'belongsToMany'){
+                    // dd(
+                    //     $this
+                    // );
+                    // $foreign_key = $methods[0].'_id';
+                    // $owner_key = $methods[1] ?? 'id';
+                    $table_name = $methods[2] ?? pluralize($col_name);
+                    $relationships[] = "belongsToMany:{$table_name}";
+                }
 
             } else{
 

@@ -101,8 +101,10 @@ class SchemaParser implements Arrayable
     public function render()
     {
         $results = '';
+
         foreach ($this->toArray() as $column => $attributes) {
-            $results .= $this->createField($column, $attributes);
+            if(!in_array($attributes[0], ['belongsToMany', 'hasOne']))
+                $results .= $this->createField($column, $attributes);
         }
 
         return $results;
@@ -148,8 +150,10 @@ class SchemaParser implements Arrayable
     {
         $results = "\t\t\t" . '$table';
         foreach ($attributes as $key => $field) {
-            if (in_array($column, $this->relationshipKeys)) {
-                $results .= $this->addRelationColumn($key, $field, $column);
+            $type_method = $attributes[0];
+
+            if (in_array($type_method, $this->relationshipKeys)) {
+                $results .= $this->addRelationColumn($key, $column, $field);
             } else {
                 $results .= $this->{"{$type}Column"}($key, $field, $column);
             }
@@ -167,16 +171,16 @@ class SchemaParser implements Arrayable
      *
      * @return string
      */
-    protected function addRelationColumn($key, $field, $column)
+    protected function addRelationColumn($key, $column, $field)
     {
         if ($key === 0) {
-            $relatedColumn = Str::snake(class_basename($field)) . '_id';
+            $relatedColumn = Str::snake(class_basename($column)) . '_id';
 
             // return "->integer('{$relatedColumn}')->unsigned();" . PHP_EOL . "\t\t\t" . "\$table->foreignId('{$relatedColumn}')";
             return "->foreignId('{$relatedColumn}')->constrained()->onUpdate('cascade')->onDelete('cascade')";
         }
         if ($key === 1) {
-            return "->references(  '{$field}')";
+            return "->references('{$field}')";
         }
         if ($key === 2) {
             return "->on('{$field}')";

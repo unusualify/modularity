@@ -41,6 +41,7 @@ if (!function_exists('createDefaultFields')) {
         // $table->string('name');
     }
 }
+
 if (!function_exists('createDefaultExtraTableFields')) {
     /**
      * @param \Illuminate\Database\Schema\Blueprint $table
@@ -156,9 +157,23 @@ if (!function_exists('createDefaultRelationshipTableFields')) {
         $table->{unusualIntegerMethod()}("{$table1NameSingular}_id")->unsigned();
         $table->{unusualIntegerMethod()}("{$table2NameSingular}_id")->unsigned();
 
-        $table->foreign("{$table1NameSingular}_id")->references('id')->on($table1NamePlural)->onDelete('cascade');
-        $table->foreign("{$table2NameSingular}_id")->references('id')->on($table2NamePlural)->onDelete('cascade');
-        $table->index(["{$table2NameSingular}_id", "{$table1NameSingular}_id"], "idx_{$table1NameSingular}_{$table2NameSingular}_" . Str::random(5));
+        $table1IndexName = $table1NameSingular;
+        $table2IndexName = $table2NameSingular;
+
+        if( strlen($table1IndexName) > 12){
+            $shortcut = abbreviation($table1IndexName);
+            $table1IndexName = "{$shortcut}";
+        }
+
+        if( strlen($table2IndexName) > 12){
+            $shortcut = abbreviation($table2IndexName);
+            $table2IndexName= "{$shortcut}";
+        }
+
+        $table->foreign("{$table1NameSingular}_id", "fk_{$table1NameSingular}_{$table2NameSingular}_{$table1IndexName}_id")->references('id')->on($table1NamePlural)->onDelete('cascade');
+        $table->foreign("{$table2NameSingular}_id", "fk_{$table1NameSingular}_{$table2NameSingular}_{$table2IndexName}_id")->references('id')->on($table2NamePlural)->onDelete('cascade');
+
+        $table->index(["{$table2NameSingular}_id", "{$table1NameSingular}_id"], "idx_{$table1IndexName}_{$table2IndexName}_" . Str::random(5));
     }
 }
 
