@@ -1,9 +1,21 @@
 <template>
   <div>
-    <ue-title v-if="label" :classes="['pl-0']">
+    <ue-title v-if="label" :classes="['pl-0 pt-0']">
       {{ label }}
     </ue-title>
-    <v-row>
+    <v-row align="start" justify="start">
+      <v-checkbox
+        v-for="(item, index) in items"
+        :key="`checkbox-${index}`"
+        v-model="input"
+        :label="item[`${itemTitle}`]"
+        :value="item[`${itemValue}`]"
+        :color="checkboxColor"
+        hide-details
+        >
+      </v-checkbox>
+    </v-row>
+    <!-- <v-row>
       <v-col v-for="(item, index) in items"
           :key="`checkbox-${index}`" cols="4">
           <v-checkbox
@@ -15,7 +27,7 @@
             >
           </v-checkbox>
       </v-col>
-    </v-row>
+    </v-row> -->
   </div>
 </template>
 
@@ -42,11 +54,15 @@ export default {
     },
     itemTitle: {
       type: String,
-      default: 'title'
+      default: 'name'
     },
     items: {
       type: Array,
       default: () => []
+    },
+    checkboxColor: {
+      type: String,
+      default: 'success'
     }
   },
 
