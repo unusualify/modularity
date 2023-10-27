@@ -1,0 +1,11 @@
+<?php
+
+namespace $NAMESPACE$;
+
+use Illuminate\Database\Eloquent\Relations\Pivot;
+
+class $CLASS$ extends Pivot
+{
+$FILLABLE$
+$CASTS$
+}

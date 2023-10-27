@@ -12,5 +12,5 @@ class $CLASS$ extends Model $INTERFACES$
     $FILLABLE$
     $TRANSLATED_ATTRIBUTES$
     $SLUG_ATTRIBUTES$
-    $METHODS$
+$METHODS$
 }

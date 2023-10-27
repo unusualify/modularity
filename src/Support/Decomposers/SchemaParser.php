@@ -66,6 +66,13 @@ class SchemaParser extends Parser
 
     protected $useDefaults = false;
 
+    protected $chainableMethods = [
+        'string',
+        'integer',
+        'boolean',
+        // 'json'
+    ];
+
     /**
      * Create new instance.
      *
@@ -207,9 +214,14 @@ class SchemaParser extends Parser
     {
         $relationships = [];
 
-        foreach ($this->parse($this->schema) as $col_name => $methods) {
+        $parsed = $this->parse($this->schema);
 
-            if (in_array($methods[0], $this->relationshipKeys)) {
+        $methodChaining = false;
+        foreach ($parsed as $col_name => $methods) {
+
+            if($methodChaining && in_array($methods[0], $this->chainableMethods)){
+                $relationships[count($relationships)-1] .= ",{$col_name}:{$methods[0]}";
+            } else if (in_array($methods[0], $this->relationshipKeys)) {
                 $relationship_name = $methods[0];
                 if($relationship_name  == 'belongsTo'){
                     $foreign_key = $col_name.'_id';
@@ -217,11 +229,7 @@ class SchemaParser extends Parser
                     $table_name = $methods[2] ?? pluralize($col_name);
                     $relationships[] = "belongsTo:{$table_name}:{$foreign_key}:{$owner_key}";
                 } else if($relationship_name == 'belongsToMany'){
-                    // dd(
-                    //     $this
-                    // );
-                    // $foreign_key = $methods[0].'_id';
-                    // $owner_key = $methods[1] ?? 'id';
+                    $methodChaining = true;
                     $table_name = $methods[2] ?? pluralize($col_name);
                     $relationships[] = "belongsToMany:{$table_name}";
                 }

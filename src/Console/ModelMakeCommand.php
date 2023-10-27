@@ -64,6 +64,8 @@ class ModelMakeCommand extends BaseCommand
 
     protected $defaultFillables = [];
 
+    protected $modelRelationParser;
+
     public function handle() : int
     {
         // $this->traits = getTraits();
@@ -79,11 +81,18 @@ class ModelMakeCommand extends BaseCommand
             $this->defaultFillables += (new SchemaParser(implode(',', $this->baseConfig('schemas.default_fields') ?? [])))->getColumns();
         }
 
-        if (parent::handle() === E_ERROR) {
-            return E_ERROR;
+        if( $this->option('relationships')){
+            $this->modelRelationParser = App::makeWith(ModelRelationParser::class, [
+                'model' => $this->argument('model'),
+                'relations' => $this->option('relationships')
+            ]);
         }
 
         $this->createAdditionalModels();
+
+        if (parent::handle() === E_ERROR) {
+            return E_ERROR;
+        }
 
         // $this->handleOptionalMigrationOption();
         // $this->handleOptionalControllerOption();
@@ -226,15 +235,31 @@ class ModelMakeCommand extends BaseCommand
             $fields = array_merge( $fields, $fillable != "" ? explode(',', $fillable) : []);
         }
 
+        return $this->generateFillable($fields);
+    }
+
+    private function generateFillable($fields) {
         $fillable = "\t/**\n"
-            . "\t * The attributes that are mass assignable.\n"
-            . "\t * \n"
-            . "\t * @var array<int, string>\n"
-            . "\t */ \n";
+        . "\t * The attributes that are mass assignable.\n"
+        . "\t * \n"
+        . "\t * @var array<int, string>\n"
+        . "\t */ \n";
 
         $fillable .= "\tprotected \$fillable = [\n"
             . collect($fields)->map(function($field){
                 return "\t\t'{$field}'";
+            })->implode(",\n")."\n"
+            . "\t];\n";
+
+        return $fillable;
+    }
+
+    private function generateCasts($fields) {
+        $fillable = "";
+
+        $fillable .= "\tprotected \$casts = [\n"
+            . collect($fields)->map(function($type, $field){
+                return "\t\t'{$field}' => '{$type}'";
             })->implode(",\n")."\n"
             . "\t];\n";
 
@@ -362,12 +387,7 @@ class ModelMakeCommand extends BaseCommand
         }
 
         if( $this->option('relationships')){
-
-            $methods = array_merge($methods, App::makeWith(ModelRelationParser::class, [
-                'model' => $this->argument('model'),
-                'relations' => $this->option('relationships')
-            ])->render());
-
+            $methods = array_merge($methods, $this->modelRelationParser->render());
         }
 
         return count($methods) ? implode("\n", $methods) : '';
@@ -474,6 +494,27 @@ class ModelMakeCommand extends BaseCommand
         $path = $this->laravel['modules']->getModulePath($this->getModuleName());
 
         $modelPath = new GeneratorPath( $this->baseConfig('paths.generator.model') );
+
+        if($this->modelRelationParser->isCreatablePivotModel()) {
+            $pivot_models = $this->modelRelationParser->getPivotModels();
+
+            foreach ($pivot_models as $key => $pivot_model) {
+                $content = (new Stub( '/models/pivot_model.stub', [
+                    'NAMESPACE' => $this->getClassNamespace($module),
+                    'CLASS'     => $pivot_model['class'],
+                    'CASTS'     => $this->generateCasts($pivot_model['casts']),
+                    'FILLABLE'  => $this->generateFillable($pivot_model['fillables']),
+                ]))->render();
+
+                $fullPath = $path . $modelPath->getPath() . "" . '/' . $pivot_model['class'] . '.php';
+
+                if (!$this->laravel['files']->isDirectory($dir = dirname($fullPath))) {
+                    $this->laravel['files']->makeDirectory($dir, 0777, true);
+                }
+
+                (new FileGenerator($fullPath, $content))->withFileOverwrite($overwriteFile)->generate();
+            }
+        }
 
         if($this->getTraitResponse('addTranslation')){
             $content = (new Stub( '/models/translation_model.stub', [
