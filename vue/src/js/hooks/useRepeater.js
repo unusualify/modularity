@@ -5,6 +5,7 @@ import { reactive, toRefs, computed, watch } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 import { transform, cloneDeep, filter } from 'lodash'
 import { getModel } from '@/utils/getFormData'
+import { useI18n } from 'vue-i18n'
 
 import {
   useValidation,
@@ -33,6 +34,12 @@ export const makeRepeaterProps = propsFactory({
         // align:'center'
       }
     }
+  },
+  addButtonText: {
+    type: String,
+    default () {
+      return useI18n().t('ADD NEW')
+    }
   }
 })
 
@@ -40,6 +47,8 @@ export const makeRepeaterProps = propsFactory({
 export default function useRepeater (props, context) {
   const { invokeRuleGenerator } = useValidation(props, context)
   const inputHook = useInput(props, context)
+
+  const { modelValue } = toRefs(props)
 
   function namingRepeaterField (index, name) {
     return `repeater${inputHook.id.value}[${index}][${name}]`
@@ -72,33 +81,51 @@ export default function useRepeater (props, context) {
 
     return schemas
   }
-  function parseRepeaterInputs (model) {
+  function parseRepeaterInput (object, i) {
     // let pattern = /repeater${this.id}[(\w+)]/
     const pattern = /\[(.*?)\]/gi
 
+    const extraFields = {}
+
+    if (props.draggable) {
+      extraFields[props.orderKey] = i + 1
+    }
+
+    return {
+      ...transform(object, (o, v, k) => {
+        const matches = k.match(pattern)
+        if (matches) {
+          const keys = matches.map(match => match.replace(pattern, '$1'))
+          o[keys.pop()] = v
+        }
+      }),
+      ...extraFields
+    }
+  }
+  function parseRepeaterInputs (model) {
     return model.map((object, i) => {
-      const extraFields = {}
-
-      if (props.draggable) {
-        extraFields[props.orderKey] = i + 1
-      }
-
-      return {
-        ...transform(object, (o, v, k) => {
-          const matches = k.match(pattern)
-          if (matches) {
-            const keys = matches.map(match => match.replace(pattern, '$1'))
-            o[keys.pop()] = v
-          }
-        }),
-        ...extraFields
-      }
+      return parseRepeaterInput(object, i)
     })
   }
 
   const state = reactive({
-    repeaterInputs: hydrateRepeaterInputs(props.modelValue),
+    repeaterInputs_: hydrateRepeaterInputs(modelValue.value),
+    repeaterInputs__: computed(() => hydrateRepeaterInputs(modelValue.value)),
+    repeaterInputs: computed({
+      get: () => {
+        // __log('repeaterInputs getter')
+        return hydrateRepeaterInputs(modelValue.value)
+      },
+      set: (val, old) => {
+        __log(
+          'repeaterInputs setter',
+          val
+          // state.repeaterInputs
 
+        )
+        inputHook.updateModelValue.value(parseRepeaterInputs(val))
+      }
+    }),
     // repeaterSchemas_: computed({
     //   get: () => {
     //     // __log('repeaterSchemas getter', hydrateSchemas(state.repeaterInputs))
@@ -133,6 +160,11 @@ export default function useRepeater (props, context) {
   })
 
   const methods = reactive({
+    onUpdateRepeaterInput (value, index) {
+      modelValue.value[index] = parseRepeaterInput(value, index)
+      // __log('onUpdateRepeaterInput', value, index)
+    },
+
     onHoverContent (index) {
       // __log('onHoverContent', index)
     },
@@ -141,7 +173,7 @@ export default function useRepeater (props, context) {
 
       const repeaterCount = state.repeaterInputs.length
 
-      state.repeaterInputs.push(hydrateRepeaterInput(getModel(schema), repeaterCount))
+      modelValue.value.push(hydrateRepeaterInput(getModel(schema), repeaterCount))
     },
     deleteRepeaterBlock: function (index) {
       const newModel = parseRepeaterInputs(state.repeaterInputs)
@@ -159,10 +191,14 @@ export default function useRepeater (props, context) {
     }
   })
 
-  watch(() => state.repeaterInputs, (newValue, oldValue) => {
-    // __log('repeaterInputs watch', state.repeaterInputs, state.repeaterSchemas)
-    context.emit('update:modelValue', parseRepeaterInputs(newValue))
-  }, { deep: true })
+  // watch(() => state.repeaterInputs, (newValue, oldValue) => {
+  //   __log('repeaterInputs watch', newValue)
+  //   // inputHook.updateModelValue.value(parseRepeaterInputs(newValue))
+  // }, { deep: true })
+  // watch(() => props.modelValue, (newValue, oldValue) => {
+  //   __log('props.modelValue watch', props.modelValue, newValue)
+  //   state.repeaterInputs = hydrateRepeaterInputs(newValue)
+  // }, { deep: true })
 
   // expose managed state as return value
   return {

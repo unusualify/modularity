@@ -86,7 +86,8 @@
                     </div>
                     <v-custom-form-base
                       :id="`ue-repeater-form-${itemSlot.index}`"
-                      v-model="repeaterInputs[itemSlot.index]"
+                      :modelValue="itemSlot.element"
+                      @update:modelValue="onUpdateRepeaterInput($event, itemSlot.index)"
                       :schema="repeaterSchemas[itemSlot.index]"
                       :row="rowAttribute"
                     >
@@ -127,22 +128,22 @@
       </draggable>
     </div>
     <div class="repeater__bottom">
-      <div class="text-right py-theme">
+      <div class="d-flex">
+        <slot name="addButton" v-bind="{text: addButtonText, addRepeaterBlock}">
           <v-btn-secondary
             class=""
             @click="addRepeaterBlock"
+            appendIcon="$add"
             >
-            Ekle
-            <!-- <v-icon
-              size="small"
-              icon="$arrowLeft"
-            /> -->
+            {{ addButtonText }}
           </v-btn-secondary>
+        </slot>
+        <div class="ml-auto">
+          <slot name="addButtonRight" v-bind="{}">
 
-          <!-- <v-pagination
-            v-model="options.page"
-            :length="pageCount"
-          ></v-pagination> -->
+          </slot>
+        </div>
+
         </div>
     </div>
   </div>

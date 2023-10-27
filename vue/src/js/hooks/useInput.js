@@ -33,7 +33,6 @@ export default function useInput (props, context) {
   })
   const methods = reactive({
     updateModelValue: function (val) {
-      // __log(val)
       // __log(
       //   'useInput updateModelValue', val
       // )

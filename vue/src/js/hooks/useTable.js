@@ -195,7 +195,6 @@ export default function useTable (props, context) {
     },
 
     editItem: function (item) {
-      __log(item)
       if (props.editOnModal || props.embeddedForm) {
         methods.setEditedItem(item)
         methods.openForm()

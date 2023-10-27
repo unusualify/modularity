@@ -1,4 +1,5 @@
 export default {
+  add: 'mdi-plus',
   arrowLeft: 'mdi-arrow-left-thin',
   arrowRight: 'mdi-arrow-right-thin',
 

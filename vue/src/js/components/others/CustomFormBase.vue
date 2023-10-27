@@ -565,7 +565,7 @@ export default {
     }
   },
   name: 'VFormBase',
-  // emits: ['update:modelValue'],
+  emits: ['update:modelValue'],
   props: {
     id: {
       type: String,
@@ -1107,7 +1107,6 @@ export default {
 
       // const emitEvent = change.includes(event) ? 'change' : watch.includes(event) ? 'watch' : mouse.includes(event) ? 'mouse' : display.includes(event) ? 'display' : event
       // const listener = event
-
       const emitEvent = change.includes(event) ? 'onChange' : watch.includes(event) ? 'onWatch' : mouse.includes(event) ? 'onMouse' : display.includes(event) ? 'onDisplay' : event
       const listener = 'on' + this.$lodash.startCase(this.$lodash.camelCase(event)).replace(/ /g, '')
 
@@ -1123,12 +1122,12 @@ export default {
         this.deprecateEventCustomID(event)
         this.$emit(`${event}:${this.id}`, val) // listen to specific event only
       } else if (this.$attrs[`${listener}`]) {
-        // __log(event, listener, this.$attrs)
-        // __log(listener, event, val, this.storeStateData)
-        this.$emit(event, val) // listen to specific event only
-        this.$emit(listener, val) // listen to specific event only
+        // this.$emit(event, val) // listen to specific event only
+        // this.$emit(listener, val) // listen to specific event only
+        // this.$emit('update:schema', this.storeStateSchema) // listen to specific event only
         this.$emit('update:modelValue', this.storeStateData) // listen to specific event only
-        this.$emit('update:schema', this.storeStateSchema) // listen to specific event only
+      } else if (listener == 'onInput' && this[`${listener}`]) {
+        this.$emit('update:modelValue', this.storeStateData) // listen to specific event only
       }
     },
     deprecateEventCustomID (ev) {
