@@ -106,13 +106,13 @@ Modularity System Base Module
 ### FORM 
 
 #### Infinite scroll select,autocomplete,combobox
-    - [ ] create field input for search of related route
-        - [ ] on-intersect keep scrolling down
-        - [ ] get records from server with $page parameter
+- [ ] create field input for search of related route
+    - [ ] on-intersect keep scrolling down
+    - [ ] get records from server with $page parameter
 #### REPEATER
-    - [] create repeater input
-        - [ ] hover delete, duplicate, add
-        - [ ] adjust the add button position and create bottom slot, 
+- [x] create repeater input
+    - [x] hover delete, duplicate, add
+    - [x] adjust the add button position and create bottom slot, 
 
 ### Index Page
 
