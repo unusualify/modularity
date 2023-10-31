@@ -495,7 +495,7 @@ class ModelMakeCommand extends BaseCommand
 
         $modelPath = new GeneratorPath( $this->baseConfig('paths.generator.model') );
 
-        if($this->modelRelationParser->isCreatablePivotModel()) {
+        if(isset($this->modelRelationParser) && $this->modelRelationParser->isCreatablePivotModel()) {
             $pivot_models = $this->modelRelationParser->getPivotModels();
 
             foreach ($pivot_models as $key => $pivot_model) {
