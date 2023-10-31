@@ -634,7 +634,7 @@ abstract class CoreController extends Controller
             //code...
         } catch (\Throwable $th) {
             dd(
-                "repositoryClass not exists for {$this->moduleName}",
+                "repositoryClass not exists for {$this->routeName} in {$this->moduleName}",
             );
             throw $th;
         }

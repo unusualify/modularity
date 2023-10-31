@@ -117,9 +117,16 @@ class RouteGenerator extends Generator
     /**
      * use default inputs and headers
      *
-     * @var string
+     * @var boolean
      */
     protected $useDefaults;
+
+    /**
+     * The custom model is already defined in project directory or third party model
+     *
+     * @var boolean
+     */
+    protected $customModel;
 
     /**
      * set default api.
@@ -438,6 +445,21 @@ class RouteGenerator extends Generator
     }
 
     /**
+     * Set custom model.
+     *
+     * @param string class
+     *
+     * @return $this
+     */
+    public function setCustomModel($class)
+    {
+        if( @class_exists($class) )
+            $this->customModel = $class;
+
+        return $this;
+    }
+
+    /**
      * Get schema parser.
      *
      * @return SchemaParser
@@ -657,28 +679,31 @@ class RouteGenerator extends Generator
             return ["--{$key}" => $item];
         })->toArray();
 
-        $this->console->call('unusual:make:model', [
-            'module' => $this->module->getStudlyName(),
-                'model' => $this->getName()
-            ]
-            + ( count($this->getModelFillables()) ?  ['--fillable' => implode(",", $this->getModelFillables())] : [])
-            + ( count($this->getModelRelationships()) ?  ['--relationships' => implode(",", $this->getModelRelationships())] : [])
-            + ( $this->hasSoftDelete() ?  ['--soft-delete' => true] : [])
-            + $console_traits
-            + ['--notAsk' => true]
-            + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
-        );
+        if(!($this->customModel && @class_exists($this->customModel))) {
+            $this->console->call('unusual:make:model', [
+                'module' => $this->module->getStudlyName(),
+                    'model' => $this->getName()
+                ]
+                + ( count($this->getModelFillables()) ?  ['--fillable' => implode(",", $this->getModelFillables())] : [])
+                + ( count($this->getModelRelationships()) ?  ['--relationships' => implode(",", $this->getModelRelationships())] : [])
+                + ( $this->hasSoftDelete() ?  ['--soft-delete' => true] : [])
+                + $console_traits
+                + ['--notAsk' => true]
+                + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
+            );
 
-        $this->console->call('unusual:make:migration', [
-            'module' => $this->module->getStudlyName(),
-            'name' => "create_{$this->getDBTableName($this->name)}_table",
-            ]
-            + ( $this->schema ?  ['--fields' => $this->schema] : [])
-            + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
-            + $console_traits
-        );
+            $this->console->call('unusual:make:migration', [
+                'module' => $this->module->getStudlyName(),
+                'name' => "create_{$this->getDBTableName($this->name)}_table",
+                ]
+                + ( $this->schema ?  ['--fields' => $this->schema] : [])
+                + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
+                + $console_traits
+            );
 
-        $this->generateExtraMigrations();
+            $this->generateExtraMigrations();
+        }
+
 
         if($this->generatorConfig('repository')->generate()){
             // $this->console->call('module:make-repository', [

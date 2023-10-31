@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-class CreateTwillDefaultMediasTables extends Migration
+class CreateUnusualDefaultMediasTables extends Migration
 {
     /**
      * Run the migrations.
@@ -15,12 +15,12 @@ class CreateTwillDefaultMediasTables extends Migration
     {
 
 
-        $twillMediasTable = config(unusualBaseKey() . '.medias_table', 'unusual_medias');
-        $twillMediablesTable = config(unusualBaseKey() . '.mediables_table', 'unusual_mediables');
+        $unusualMediasTable = config(unusualBaseKey() . '.medias_table', 'unusual_medias');
+        $unusualMediablesTable = config(unusualBaseKey() . '.mediables_table', 'unusual_mediables');
 
-        if (!Schema::hasTable($twillMediasTable)) {
-            Schema::create($twillMediasTable, function (Blueprint $table) {
-                $table->{twillIncrementsMethod()}('id');
+        if (!Schema::hasTable($unusualMediasTable)) {
+            Schema::create($unusualMediasTable, function (Blueprint $table) {
+                $table->{unusualIncrementsMethod()}('id');
                 $table->timestamps();
                 $table->softDeletes();
                 $table->text('uuid');
@@ -32,14 +32,14 @@ class CreateTwillDefaultMediasTables extends Migration
             });
         }
 
-        if (!Schema::hasTable($twillMediablesTable)) {
-            Schema::create($twillMediablesTable, function (Blueprint $table) use ($twillMediasTable) {
-                $table->{twillIncrementsMethod()}('id');
+        if (!Schema::hasTable($unusualMediablesTable)) {
+            Schema::create($unusualMediablesTable, function (Blueprint $table) use ($unusualMediasTable) {
+                $table->{unusualIncrementsMethod()}('id');
                 $table->timestamps();
                 $table->softDeletes();
-                $table->{twillIntegerMethod()}('mediable_id')->nullable()->unsigned();
+                $table->{unusualIntegerMethod()}('mediable_id')->nullable()->unsigned();
                 $table->string('mediable_type')->nullable();
-                $table->{twillIntegerMethod()}('media_id')->unsigned();
+                $table->{unusualIntegerMethod()}('media_id')->unsigned();
                 $table->integer('crop_x')->nullable();
                 $table->integer('crop_y')->nullable();
                 $table->integer('crop_w')->nullable();
@@ -49,7 +49,7 @@ class CreateTwillDefaultMediasTables extends Migration
                 $table->text('lqip_data')->nullable();
                 $table->string('ratio')->nullable();
                 $table->json('metadatas');
-                $table->foreign('media_id', 'fk_mediables_media_id')->references('id')->on($twillMediasTable)->onDelete('cascade')->onUpdate('cascade');
+                $table->foreign('media_id', 'fk_mediables_media_id')->references('id')->on($unusualMediasTable)->onDelete('cascade')->onUpdate('cascade');
                 $table->index(['mediable_type', 'mediable_id']);
             });
         }
@@ -62,10 +62,10 @@ class CreateTwillDefaultMediasTables extends Migration
      */
     public function down()
     {
-        $twillMediasTable = config(unusualBaseKey() . '.medias_table', 'unusual_medias');
-        $twillMediablesTable = config(unusualBaseKey() . '.mediables_table', 'unusual_mediables');
+        $unusualMediasTable = config(unusualBaseKey() . '.medias_table', 'unusual_medias');
+        $unusualMediablesTable = config(unusualBaseKey() . '.mediables_table', 'unusual_mediables');
 
-        Schema::dropIfExists($twillMediablesTable);
-        Schema::dropIfExists($twillMediasTable);
+        Schema::dropIfExists($unusualMediablesTable);
+        Schema::dropIfExists($unusualMediasTable);
     }
 }

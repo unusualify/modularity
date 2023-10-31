@@ -113,6 +113,7 @@ class RouteMakeCommand extends BaseCommand
             ->setMigrate($this->option('no-migrate'))
             ->setUseDefaults($this->option('no-defaults'))
             ->setPlain($this->option('plain'))
+            ->setCustomModel($this->option('custom-model'))
             ->generate();
 
         if ($code === E_ERROR) {
@@ -145,6 +146,7 @@ class RouteMakeCommand extends BaseCommand
         return array_merge([
             ['schema', null, InputOption::VALUE_OPTIONAL, 'The specified migration schema table.', null],
             ['rules', null, InputOption::VALUE_OPTIONAL, 'The specified validation rules for FormRequest.', null],
+            ['custom-model', null, InputOption::VALUE_OPTIONAL, 'The model class for usage of a available model.', null],
             ['relationships', null, InputOption::VALUE_OPTIONAL, 'The many to many relationships.', null],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
             ['plain', '--p', InputOption::VALUE_NONE, 'Don\'t create route.'],

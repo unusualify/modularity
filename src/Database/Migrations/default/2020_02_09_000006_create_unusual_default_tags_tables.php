@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTwillDefaultTagsTables extends Migration
+class CreateUnusualDefaultTagsTables extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateTwillDefaultTagsTables extends Migration
      */
     public function up()
     {
-        $twillTaggedTable = config(unusualBaseKey() . '.tagged_table', 'tagged');
+        $unusualTaggedTable = config(unusualBaseKey() . '.tagged_table', 'tagged');
 
-        if (!Schema::hasTable($twillTaggedTable)) {
-            Schema::create($twillTaggedTable, function (Blueprint $table) {
-                $table->{twillIncrementsMethod()}('id');
+        if (!Schema::hasTable($unusualTaggedTable)) {
+            Schema::create($unusualTaggedTable, function (Blueprint $table) {
+                $table->{unusualIncrementsMethod()}('id');
                 $table->string('taggable_type');
                 $table->integer('taggable_id')->unsigned();
                 $table->integer('tag_id')->unsigned();
@@ -26,11 +26,11 @@ class CreateTwillDefaultTagsTables extends Migration
         }
 
 
-        $twillTagsTable = config(unusualBaseKey() . '.tags_table', 'tags');
+        $unusualTagsTable = config(unusualBaseKey() . '.tags_table', 'tags');
 
-        if (!Schema::hasTable($twillTagsTable)) {
-            Schema::create($twillTagsTable, function (Blueprint $table) {
-                $table->{twillIncrementsMethod()}('id');
+        if (!Schema::hasTable($unusualTagsTable)) {
+            Schema::create($unusualTagsTable, function (Blueprint $table) {
+                $table->{unusualIncrementsMethod()}('id');
                 $table->string('namespace');
                 $table->string('slug');
                 $table->string('name');

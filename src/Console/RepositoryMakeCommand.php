@@ -3,6 +3,7 @@
 namespace OoBook\CRM\Base\Console;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -99,6 +100,7 @@ class RepositoryMakeCommand extends BaseCommand
     {
         return array_merge([
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
+            ['custom-model', null, InputOption::VALUE_OPTIONAL, 'The model class for usage of a available model.', null],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
         ], unusualTraitOptions());
@@ -111,27 +113,19 @@ class RepositoryMakeCommand extends BaseCommand
     {
         $repository = $this->argument('repository');
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
-        // dd( $this->getClassNamespace($module), $this->getClass(), $this->getStubName(), get_class($module), $module->getPath(), Stub::getBasePath() );
-        // dd(
-        //     (new Stub($this->getStubName(), [
-        //         'BASE_REPOSITORY'       => $this->baseConfig('base_repository'),
-        //         'NAMESPACE'             => $this->getClassNamespace($module),
-        //         'CLASS'                 => $this->getClass().'Repository',
-        //         'STUDLY_NAME'           => $this->getStudlyName($repository),
-        //         'MODEL_CLASS'           => $this->getModelClass() ?? '',
-        //         'MODEL_NAME'           => $this->getFileName() ?? '',
-        //         'MODULE'                => $this->argument('module'),
-        //         'TRAITS'                => $this->getTraits(),
-        //         'TRAIT_NAMESPACES'      => $this->getTraitNamespaces(),
-        //     ]))->render()
-        // );
+
+        $modelName = $this->getFileName() ?? '';
+        if($this->option('custom-model') && @class_exists($this->option('custom-model'))){
+            $modelName = get_class_short_name(App::make($this->option('custom-model')));
+        }
+
         return (new Stub($this->getStubName(), [
             'BASE_REPOSITORY'       => $this->baseConfig('base_repository'),
             'NAMESPACE'             => $this->getClassNamespace($module),
             'CLASS'                 => $this->getClass().'Repository',
             'STUDLY_NAME'           => $this->getStudlyName($repository),
             'MODEL_CLASS'           => $this->getModelClass() ?? '',
-            'MODEL_NAME'            => $this->getFileName() ?? '',
+            'MODEL_NAME'            => $modelName,
             'MODULE'                => $this->argument('module'),
             'TRAITS'                => $this->getTraits(),
             'TRAIT_NAMESPACES'      => $this->getTraitNamespaces(),
@@ -163,9 +157,11 @@ class RepositoryMakeCommand extends BaseCommand
      */
     private function getFileName()
     {
+        if($this->option('custom-model') && @class_exists($this->option('custom-model'))){
+            return $this->option('custom-model');
+        }
         return Str::studly($this->argument('repository'));
     }
-
 
     /**
      * @return string
@@ -185,6 +181,10 @@ class RepositoryMakeCommand extends BaseCommand
         // dd( config('modules.namespace'), $module->getName(), get_class_methods($module));
         $module_name = $module->getStudlyName();
 
+        if($this->option('custom-model') && @class_exists($this->option('custom-model'))){
+            return $this->option('custom-model');
+        }
+
         $model_name = $this->getFileName();
 
         return config('modules.namespace')."\\{$module_name}\\Entities\\{$model_name}";
@@ -194,7 +194,7 @@ class RepositoryMakeCommand extends BaseCommand
      * @return string
      */
 
-     private function getTraits()
+    private function getTraits()
     {
         $traits = [];
 
