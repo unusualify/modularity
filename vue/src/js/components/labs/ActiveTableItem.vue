@@ -62,7 +62,8 @@
     </ue-modal>
     <template v-if="!!item && !modalActive && activeBlock">
       <ue-table
-        v-bind="$bindAttributes()"
+        v-bind="{...$bindAttributes(), tableClasses: $parent.tableClasses}"
+
         :custom-title="activeBlock.title"
         class="mb-theme"
         :is-row-editing="false"
@@ -134,7 +135,7 @@ export default {
   //   // },
   // }
   created () {
-    // __log(this.itemData)
+
   }
 }
 </script>
