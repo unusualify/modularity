@@ -11,7 +11,7 @@ if (!function_exists('unusualBaseMenu')) {
      */
     function unusualBaseMenu()
     {
-        return makeSidebarMenu(unusualConfig('internal_modules', []));
+        return makeSidebarMenu(unusualConfig('system_modules', []));
     }
 }
 if (!function_exists('unusualModulesMenu')) {

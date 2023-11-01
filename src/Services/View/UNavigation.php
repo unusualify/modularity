@@ -32,7 +32,7 @@ class UNavigation
 
     public function baseMenu()
     {
-        return $this->sidebarMenuFromConfigs(unusualConfig('internal_modules', []));
+        return $this->sidebarMenuFromConfigs(unusualConfig('system_modules', []));
     }
 
     public function modulesMenu()

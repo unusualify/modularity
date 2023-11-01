@@ -48,7 +48,8 @@ class ConfigServiceProvider extends ServiceProvider
 
         // $this->mergeConfigFrom(__DIR__ . '/../Config/config.php', 'unusual');
 
-        $this->mergeConfigFrom(__DIR__ . '/../Config/internal_modules.php', $this->baseKey . '.internal_modules');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/system_modules.php', $this->baseKey . '.system_modules');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/input_drafts.php', $this->baseKey . '.input_drafts');
         $this->mergeConfigFrom(__DIR__ . '/../Config/media-library.php', $this->baseKey . '.media_library');
         $this->mergeConfigFrom(__DIR__ . '/../Config/imgix.php', $this->baseKey . '.imgix');
         $this->mergeConfigFrom(__DIR__ . '/../Config/glide.php', $this->baseKey . '.glide');

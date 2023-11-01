@@ -637,8 +637,8 @@ class RouteServiceProvider extends ServiceProvider
         Route::macro('unusualWebRoutes', function ($middlewares = [], $options = []) {
             $base_config = config( unusualBaseKey());
 
-            if(isset($base_config['internal_modules'])){
-                foreach ($base_config['internal_modules'] as $name => $config) {
+            if(isset($base_config['system_modules'])){
+                foreach ($base_config['system_modules'] as $name => $config) {
                     // Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
                     // dd($_config);
                     // Route::configRoutes([

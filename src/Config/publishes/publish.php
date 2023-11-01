@@ -33,4 +33,33 @@ return [
         'variant' => 'outlined',
         'density' => 'comfortable', // default | comfortable | compact
     ],
+    'default_header' => [
+        'align' => 'start',
+        'sortable' => false,
+        'filterable' => false,
+        'groupable' => false,
+        'divider' => false,
+        'class' => 'text-primary', // || []
+        'cellClass' => '', // || []
+        'width' => 30, // || int
+
+        'noPadding' => true,
+        // vuetify datatable header fields end
+
+        // custom fields for ue-datatable start
+        'searchable' => false, //true,
+        'isRowEditable' => false,
+        'isColumnEditable' => false,
+        'formatter' => [],
+    ],
+    'default_table_attributes' => [
+        'embeddedForm' => true,
+        'createOnModal' => true,
+        'editOnModal' => true,
+        'formWidth' => '60%',
+        'isRowEditing' => false,
+        'rowActionsType' => 'inline',
+        'hideDefaultFooter' => false,
+    ],
+    'input_drafts' => []
 ];
