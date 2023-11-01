@@ -11,19 +11,19 @@ use OoBook\CRM\Base\Services\View\UWrapper;
 use OoBook\CRM\Base\Support\Finder;
 use stdClass;
 
-trait ConfigureViewFields {
+trait ManageUtilities {
 
     /**
      * @var array
      */
     protected $defaultTableAttributes = [
-        'embeddedForm' => true,
-        'createOnModal' => true,
-        'editOnModal' => true,
-        'formWidth' => '60%',
-        'isRowEditing' => false,
-        'rowActionsType' => 'inline',
-        'hideDefaultFooter' => false,
+        // 'embeddedForm' => true,
+        // 'createOnModal' => true,
+        // 'editOnModal' => true,
+        // 'formWidth' => '60%',
+        // 'isRowEditing' => false,
+        // 'rowActionsType' => 'inline',
+        // 'hideDefaultFooter' => false,
     ];
 
     /**
@@ -36,6 +36,12 @@ trait ConfigureViewFields {
      */
     protected $indexTableColumns;
 
+
+    protected function __afterConstructManageUtilities($app, $request) {
+        $this->defaultTableAttributes = (array) Config::get(unusualBaseKey() . '.default_table_attributes');
+
+        $this->tableAttributes = $this->getTableAttributes();
+    }
     /**
      * @param array $prependScope
      * @return array
@@ -213,7 +219,7 @@ trait ConfigureViewFields {
         if(!!$this->config) {
             try {
                 return Collection::make(
-                    $this->getConfigFieldsByRoute('table_options') ?? $this->defaultTableAttributes
+                    array_merge_recursive_preserve((array)$this->getConfigFieldsByRoute('table_options'), $this->defaultTableAttributes)
                 )->toArray();
             } catch (\Throwable $th) {
                 return [];

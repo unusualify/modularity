@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\View\Factory as ViewFactory;
-use OoBook\CRM\Base\Traits\ConfigureViewFields;
+use OoBook\CRM\Base\Traits\ManageUtilities;
 use PragmaRX\Google2FA\Google2FA;
 use Socialite;
 
@@ -33,7 +33,7 @@ class LoginController extends Controller
     |
      */
 
-    use AuthenticatesUsers, ConfigureViewFields;
+    use AuthenticatesUsers, ManageUtilities;
 
     /**
      * @var AuthManager

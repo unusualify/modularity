@@ -19,11 +19,12 @@ use Illuminate\Support\Str;
 use Illuminate\Routing\Controller;
 use Nwidart\Modules\Facades\Module;
 use OoBook\CRM\Base\Entities\Enums\Permission;
-use OoBook\CRM\Base\Traits\{MakesResponses, ManageNames, ManageScopes};
+use OoBook\CRM\Base\Traits\{MakesResponses, ManageNames, ManageScopes, ManageTraits};
 
 abstract class CoreController extends Controller
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests,
+        ManageTraits,
         ManageNames,
         MakesResponses,
         ManageScopes;
@@ -237,6 +238,7 @@ abstract class CoreController extends Controller
         Request $request
     )
     {
+        $this->__beforeConstruct($app, $request);
         // if (Config::get('twill.bind_exception_handler', true)) {
         //     App::singleton(ExceptionHandler::class, TwillHandler::class);
         // }
@@ -275,7 +277,6 @@ abstract class CoreController extends Controller
 
         $this->addIndexWiths();
         // $this->addFormWiths();
-
     }
 
     /**
@@ -573,12 +574,12 @@ abstract class CoreController extends Controller
         $snakeCase = $this->getSnakeCase($this->moduleName);
 
         return array2Object(
-            Config::get( unusualBaseKey() . '.internal_modules.' . $snakeCase)
+            Config::get( unusualBaseKey() . '.system_modules.' . $snakeCase)
             ?: Config::get( $snakeCase )
         );
 
         // return Collection::make(
-        //     Config::get( $this->getCamelCase( env('UNUSUAL_BASE_NAME', 'Unusual') ) . '.internal_modules.' . $kebabCase)
+        //     Config::get( $this->getCamelCase( env('UNUSUAL_BASE_NAME', 'Unusual') ) . '.system_modules.' . $kebabCase)
         //     ?: Config::get( $kebabCase )
         // )->recursive();
     }
@@ -741,25 +742,6 @@ abstract class CoreController extends Controller
         );
     }
 
-    /**
-     * @param array $input
-     * @return void
-     */
-    protected function fireEvent($input = [])
-    {
-        fireCmsEvent('cms-module.saved', $input);
-    }
-
-    /**
-     * @return Collection|Block[]
-     */
-    public function getRepeaterList()
-    {
-        return TwillBlocks::getBlockCollection()->getRepeaters()->mapWithKeys(function (Block $repeater) {
-            return [$repeater->name => $repeater->toList()];
-        });
-    }
-
     protected function getConfigFieldsByRoute($field_name, $default = null)
     {
         try {
@@ -846,5 +828,44 @@ abstract class CoreController extends Controller
             $this->indexWith += $this->{$method}();
             $this->formWith += $this->{$method}();
         }
+    }
+
+    /**
+     * @return void
+     */
+    public function __afterConstruct(...$args)
+    {
+        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
+            $this->$method(...$args);
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function __beforeConstruct(...$args)
+    {
+        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
+            $this->$method(...$args);
+        }
+    }
+
+    /**
+     * @param array $input
+     * @return void
+     */
+    protected function fireEvent__($input = [])
+    {
+        fireCmsEvent('cms-module.saved', $input);
+    }
+
+    /**
+     * @return Collection|Block[]
+     */
+    public function getRepeaterList__()
+    {
+        return TwillBlocks::getBlockCollection()->getRepeaters()->mapWithKeys(function (Block $repeater) {
+            return [$repeater->name => $repeater->toList()];
+        });
     }
 }

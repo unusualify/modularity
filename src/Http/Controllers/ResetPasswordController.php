@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\Factory as ViewFactory;
 use OoBook\CRM\Base\Entities\User;
-use OoBook\CRM\Base\Traits\ConfigureViewFields;
+use OoBook\CRM\Base\Traits\ManageUtilities;
 
 class ResetPasswordController extends Controller
 {
@@ -29,7 +29,7 @@ class ResetPasswordController extends Controller
     |
      */
 
-    use ResetsPasswords, ConfigureViewFields;
+    use ResetsPasswords, ManageUtilities;
 
     /**
      * @var Redirector

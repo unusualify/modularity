@@ -24,11 +24,11 @@ use OoBook\CRM\Base\Transformers\RoleResource;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Nwidart\Modules\Facades\Module;
-use OoBook\CRM\Base\Traits\ConfigureViewFields;
+use OoBook\CRM\Base\Traits\ManageUtilities;
 
 abstract class BaseController extends CoreController
 {
-    use ConfigureViewFields;
+    use ManageUtilities;
 
     /**
      * @var string
@@ -88,7 +88,8 @@ abstract class BaseController extends CoreController
             ];
         }
 
-        $this->tableAttributes = $this->getTableAttributes();
+        $this->__afterConstruct($app, $request);
+
     }
 
     public function index($parentId = null)

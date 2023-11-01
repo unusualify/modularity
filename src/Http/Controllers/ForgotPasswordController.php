@@ -7,7 +7,7 @@ use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\Factory as ViewFactory;
-use OoBook\CRM\Base\Traits\ConfigureViewFields;
+use OoBook\CRM\Base\Traits\ManageUtilities;
 
 class ForgotPasswordController extends Controller
 {
@@ -22,7 +22,7 @@ class ForgotPasswordController extends Controller
     |
      */
 
-    use SendsPasswordResetEmails, ConfigureViewFields;
+    use SendsPasswordResetEmails, ManageUtilities;
 
     /**
      * @var PasswordBrokerManager

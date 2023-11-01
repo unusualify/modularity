@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use OoBook\CRM\Base\Entities\Company;
 use OoBook\CRM\Base\Entities\User;
-use OoBook\CRM\Base\Traits\ConfigureViewFields;
+use OoBook\CRM\Base\Traits\ManageUtilities;
 
 class RegisterController extends Controller
 {
-    use ConfigureViewFields;
+    use ManageUtilities;
 
     public function __construct()
     {
