@@ -16,6 +16,10 @@ global.__isString = (obj) => {
   return (Object.prototype.toString.call(obj) === '[object String]')
 }
 
+global.__isNumber = (obj) => {
+  return !isNaN(obj)
+}
+
 global.__isObject = (obj) => {
   return Object.prototype.toString.call(obj) === '[object Object]'
 }

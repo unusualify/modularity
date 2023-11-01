@@ -53,6 +53,7 @@ module.exports = {
       globals: {
         __log: 'readable',
         __isString: 'readable',
+        __isNumber: 'readable',
         __isObject: 'readable',
         __isset: 'readable',
         __getMethods: 'readable',
