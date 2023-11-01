@@ -1,5 +1,9 @@
 <template>
+  <template v-if="!configuration.tag && isTextable(configuration.elements)">
+    {{ configuration.elements }}
+  </template>
   <component
+    v-else-if="configuration.tag"
     :is="configuration.tag"
     v-bind="{...filteredAttributes, ...bindAttributes, ...castedAttributes}"
     >
@@ -11,10 +15,11 @@
         :configuration="_configuration"
       />
     </template>
-    <template v-else-if="isString(configuration.elements)">
+    <template v-else-if="isTextable(configuration.elements)">
       {{ configuration.elements }}
     </template>
   </component>
+
 </template>
 
 <script>
@@ -48,27 +53,26 @@ export default {
     // const directives = props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : []
     // __log(directives)
 
-    function isString (value) {
-      return __isString(value)
+    function isTextable (value) {
+      return __isString(value) || __isNumber(value)
     }
     function isArray (value) {
       return Array.isArray(value, (value))
     }
-
     const castPattern = /\$([\w|.]+)/
     const filteredAttributes = cloneDeep(props.configuration.attributes)
 
     const castedAttributes = computed(() => {
       const attrs = cloneDeep(props.configuration.attributes)
       return reduce(attrs, (o, v, k) => {
-        if (!(isArray(v) || isString(v))) {
+        if (!(isArray(v) || __isString(v))) {
           return o
         }
 
         let value = v
         let funcs = []
 
-        if (isArray(v) && isString(v[0])) {
+        if (isArray(v) && __isString(v[0])) {
           value = v.shift()
           funcs = v
         }
@@ -90,7 +94,6 @@ export default {
         return o
       }, {})
     })
-
     const bindAttributes = computed(() => {
       const bindKey = props.configuration.bind
       if (bindKey) {
@@ -109,7 +112,7 @@ export default {
 
     return {
       // directives: props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : [],
-      isString,
+      isTextable,
       isArray,
       filteredAttributes,
       castedAttributes,
@@ -122,7 +125,7 @@ export default {
     }
   },
   created () {
-    // __log(this.configuration)
+
   }
 }
 </script>

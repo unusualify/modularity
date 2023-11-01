@@ -302,7 +302,6 @@
               :color="`primary darken-1`"
               @click="$call(col.formatter + 'Item', item)"
               >
-
               <!-- {{ item[col.key].length > 40 ? item[col.key].substring(0,40) + '...' : item[col.key] }} -->
               {{ window.__shorten(item[col.key]) }}
             </v-btn>
@@ -321,7 +320,10 @@
               </v-switch>
           </template>
           <template v-else>
-            {{ handleFormatter(col.formatter, item[col.key] ) }}
+            <ue-recursive-stuff
+              v-bind="handleFormatter(col.formatter, item[col.key])"
+              :key="item[col.key]"
+              />
           </template>
       </template>
 

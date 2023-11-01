@@ -24,7 +24,14 @@ export default function useFormatter (props, context, headers) {
 
   const methods = reactive({
     dateFormatter: function (value, datetimeFormat = 'long') {
-      return d(new Date(value), datetimeFormat)
+      return {
+        configuration: methods.makeText(d(new Date(value), datetimeFormat))
+      }
+    },
+    chipFormatter: function (value, color = '') {
+      return {
+        configuration: methods.makeChip(value, color)
+      }
     },
     editFormatter: function (value) {
       return `<span @click="editItem">
@@ -33,6 +40,20 @@ export default function useFormatter (props, context, headers) {
     },
     pascalFormatter: function (value) {
       return _.startCase(_.camelCase(value)).replace(/ /g, '')
+    },
+    makeChip: function (value, color = '') {
+      return {
+        tag: 'v-chip',
+        attributes: {
+          color
+        },
+        elements: value
+      }
+    },
+    makeText: function (value) {
+      return {
+        elements: value
+      }
     }
   })
 
