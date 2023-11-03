@@ -3,7 +3,7 @@
     <ue-title v-if="label" :classes="['pl-0 pt-0']">
       {{ label }}
     </ue-title>
-    <v-row align="start" justify="start">
+    <v-row align="start" justify="start" noGutters>
       <v-checkbox
         v-for="(item, index) in items"
         :key="`checkbox-${index}`"
