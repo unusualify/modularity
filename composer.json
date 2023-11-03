@@ -37,6 +37,9 @@
         "torann/geoip": "^3.0",
         "tymon/jwt-auth": "^1.0|^2.0"
     },
+    "require-dev": {
+
+    },
     "extra": {
         "laravel": {
             "providers": [
@@ -46,6 +49,9 @@
             "aliases": {
 
             }
+        },
+        "packages": {
+
         }
     },
     "autoload": {
