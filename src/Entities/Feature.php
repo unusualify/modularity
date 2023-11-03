@@ -28,7 +28,7 @@ class Feature extends BaseModel
 
     public function getTable()
     {
-        return config('twill.features_table', 'twill_features');
+        return config(unusualBaseKey() . '.features_table', 'twill_features');
     }
 
 }

@@ -81,6 +81,7 @@ trait TranslationsTrait
             foreach ($object->translations as $translation) {
                 foreach ($object->translatedAttributes as $attribute) {
                     unset($fields[$attribute]);
+
                     if (array_key_exists($attribute, $this->fieldsGroups) && is_array($translation->{$attribute})) {
                         foreach ($this->fieldsGroups[$attribute] as $field_name) {
                             if (isset($translation->{$attribute}[$field_name])) {

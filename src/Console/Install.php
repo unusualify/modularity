@@ -107,7 +107,7 @@ class Install extends BaseCommand
     private function publishConfig()
     {
         $this->call('vendor:publish', [
-            '--provider' => 'A17\Twill\TwillServiceProvider',
+            '--provider' => 'OoBook\CRM\Base\TwillServiceProvider',
             '--tag' => 'config',
         ]);
     }
@@ -120,7 +120,7 @@ class Install extends BaseCommand
     private function publishAssets()
     {
         $this->call('vendor:publish', [
-            '--provider' => 'A17\Twill\TwillServiceProvider',
+            '--provider' => 'OoBook\CRM\Base\TwillServiceProvider',
             '--tag' => 'assets',
         ]);
     }

@@ -50,9 +50,11 @@ class ConfigServiceProvider extends ServiceProvider
 
         $this->mergeConfigFrom(__DIR__ . '/../Config/system_modules.php', $this->baseKey . '.system_modules');
         $this->mergeConfigFrom(__DIR__ . '/../Config/input_drafts.php', $this->baseKey . '.input_drafts');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/file_library.php', $this->baseKey . '.file_library');
         $this->mergeConfigFrom(__DIR__ . '/../Config/media-library.php', $this->baseKey . '.media_library');
         $this->mergeConfigFrom(__DIR__ . '/../Config/imgix.php', $this->baseKey . '.imgix');
         $this->mergeConfigFrom(__DIR__ . '/../Config/glide.php', $this->baseKey . '.glide');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/disks.php', $this->baseKey . '.disks');
 
         if (config($this->baseKey . '.enabled.users-management')) {
             config(['auth.providers.unusual_users' => [
@@ -75,6 +77,12 @@ class ConfigServiceProvider extends ServiceProvider
             }
         }
 
+        if (config(unusualBaseKey() . '.file_library.endpoint_type') === 'local'
+            && config(unusualBaseKey() . '.file_library.disk') === unusualBaseKey() . '_file_library') {
+            $this->setLocalDiskUrl('file');
+        }
+
+
         $this->registerModuleConfigs();
     }
 
@@ -88,6 +96,17 @@ class ConfigServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             __DIR__ . '/../Config/config.php', $this->baseKey
         );
+    }
+
+    private function setLocalDiskUrl($type): void
+    {
+        config([
+            'filesystems.disks.' . unusualBaseKey() . '_' . $type . '_library.url' => request()->getScheme()
+            . '://'
+            . str_replace(['http://', 'https://'], '', config('app.url'))
+            . '/storage/'
+            . trim(config(unusualBaseKey() . '.' . $type . '_library.local_path'), '/ '),
+        ]);
     }
 
     public function registerModuleConfigs()

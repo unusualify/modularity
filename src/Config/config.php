@@ -269,8 +269,8 @@ return [
     'enabled' => [
         'media-library' => true,
         'users-management' => true,
+        'file-library' => true,
 
-        // 'file-library' => true,
         // 'block-editor' => true,
         // 'buckets' => true,
         // 'users-image' => false,

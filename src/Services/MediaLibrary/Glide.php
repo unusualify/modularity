@@ -64,7 +64,7 @@ class Glide implements ImageServiceInterface
 
         $baseUrl = join('/', [
             rtrim($baseUrlHost, '/'),
-            ltrim($this->config->get('twill.glide.base_path'), '/'),
+            ltrim($this->config->get(unusualBaseKey() . '.glide.base_path'), '/'),
         ]);
 
         if (!empty($baseUrlHost) && !Str::startsWith($baseUrl, ['http://', 'https://'])) {
@@ -73,17 +73,17 @@ class Glide implements ImageServiceInterface
 
         $this->server = ServerFactory::create([
             'response' => new LaravelResponseFactory($this->request),
-            'source' => $this->config->get('twill.glide.source'),
-            'cache' => $this->config->get('twill.glide.cache'),
-            'cache_path_prefix' => $this->config->get('twill.glide.cache_path_prefix'),
+            'source' => $this->config->get(unusualBaseKey() . '.glide.source'),
+            'cache' => $this->config->get(unusualBaseKey() . '.glide.cache'),
+            'cache_path_prefix' => $this->config->get(unusualBaseKey() . '.glide.cache_path_prefix'),
             'base_url' => $baseUrl,
-            'presets' => $this->config->get('twill.glide.presets', []),
-            'driver' => $this->config->get('twill.glide.driver')
+            'presets' => $this->config->get(unusualBaseKey() . '.glide.presets', []),
+            'driver' => $this->config->get(unusualBaseKey() . '.glide.driver')
         ]);
 
         $this->urlBuilder = UrlBuilderFactory::create(
             $baseUrl,
-            $this->config->get('twill.glide.use_signed_urls') ? $this->config->get('twill.glide.sign_key') : null
+            $this->config->get(unusualBaseKey() . '.glide.use_signed_urls') ? $this->config->get(unusualBaseKey() . '.glide.sign_key') : null
         );
     }
 
@@ -93,8 +93,8 @@ class Glide implements ImageServiceInterface
      */
     public function render($path)
     {
-        if ($this->config->get('twill.glide.use_signed_urls')) {
-            SignatureFactory::create($this->config->get('twill.glide.sign_key'))->validateRequest($this->config->get('twill.glide.base_path') . '/' . $path, $this->request->all());
+        if ($this->config->get(unusualBaseKey() . '.glide.use_signed_urls')) {
+            SignatureFactory::create($this->config->get(unusualBaseKey() . '.glide.sign_key'))->validateRequest($this->config->get(unusualBaseKey() . '.glide.base_path') . '/' . $path, $this->request->all());
         }
 
         return $this->server->getImageResponse($path, $this->request->all());
@@ -107,7 +107,7 @@ class Glide implements ImageServiceInterface
      */
     public function getUrl($id, array $params = [])
     {
-        $defaultParams = config('twill.glide.default_params');
+        $defaultParams = config(unusualBaseKey() . '.glide.default_params');
 
         return $this->getOriginalMediaUrl($id) ??
             $this->urlBuilder->getUrl($id, array_replace($defaultParams, $params));
@@ -144,7 +144,7 @@ class Glide implements ImageServiceInterface
      */
     public function getLQIPUrl($id, array $params = [])
     {
-        $defaultParams = config('twill.glide.lqip_default_params');
+        $defaultParams = config(unusualBaseKey() . '.glide.lqip_default_params');
 
         $cropParams = Arr::has($params, $this->cropParamsKeys) ? $this->getCrop($params) : [];
 
@@ -160,7 +160,7 @@ class Glide implements ImageServiceInterface
      */
     public function getSocialUrl($id, array $params = [])
     {
-        $defaultParams = config('twill.glide.social_default_params');
+        $defaultParams = config(unusualBaseKey() . '.glide.social_default_params');
 
         $cropParams = Arr::has($params, $this->cropParamsKeys) ? $this->getCrop($params) : [];
 
@@ -175,7 +175,7 @@ class Glide implements ImageServiceInterface
      */
     public function getCmsUrl($id, array $params = [])
     {
-        $defaultParams = config('twill.glide.cms_default_params');
+        $defaultParams = config(unusualBaseKey() . '.glide.cms_default_params');
 
         $cropParams = Arr::has($params, $this->cropParamsKeys) ? $this->getCrop($params) : [];
 
@@ -279,13 +279,13 @@ class Glide implements ImageServiceInterface
      */
     private function getOriginalMediaUrl($id)
     {
-        $originalMediaForExtensions = $this->config->get('twill.glide.original_media_for_extensions');
-        $addParamsToSvgs = $this->config->get('twill.glide.add_params_to_svgs', false);
+        $originalMediaForExtensions = $this->config->get(unusualBaseKey() . '.glide.original_media_for_extensions');
+        $addParamsToSvgs = $this->config->get(unusualBaseKey() . '.glide.add_params_to_svgs', false);
 
         if ((Str::endsWith($id, '.svg') && $addParamsToSvgs) || !Str::endsWith($id, $originalMediaForExtensions)) {
             return null;
         }
 
-        return Storage::disk(config('twill.media_library.disk'))->url($id);
+        return Storage::disk(config(unusualBaseKey() . '.media_library.disk'))->url($id);
     }
 }

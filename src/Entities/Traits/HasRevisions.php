@@ -48,7 +48,7 @@ trait HasRevisions
 
     protected function getRevisionModel()
     {
-        $revision = config('twill.namespace') . "\Models\Revisions\\" . class_basename($this) . "Revision";
+        $revision = config(unusualBaseKey() . '.namespace') . "\Models\Revisions\\" . class_basename($this) . "Revision";
 
         if (@class_exists($revision))
         {

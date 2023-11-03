@@ -73,7 +73,7 @@ abstract class Model extends BaseModel implements TaggableInterface
         return $this->morphToMany(
             static::$tagsModel,
             'taggable',
-            config('twill.tagged_table', 'tagged'),
+            config(unusualBaseKey() . '.tagged_table', 'tagged'),
             'taggable_id',
             'tag_id'
         );

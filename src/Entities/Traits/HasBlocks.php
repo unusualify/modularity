@@ -15,7 +15,7 @@ trait HasBlocks
     public function blocks()
     {
         return $this->morphMany(Block::class, 'blockable')->orderBy(
-            config('twill.blocks_table', 'twill_blocks') . '.position',
+            config(unusualBaseKey() . '.blocks_table', 'twill_blocks') . '.position',
             'asc'
         );
     }

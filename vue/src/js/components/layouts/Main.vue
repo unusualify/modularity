@@ -98,6 +98,10 @@
         v-model="showMediaLibrary"
         ref="mediaLibrary"
       ></ue-modal-media>
+      <ue-modal-file
+        v-model="showFileLibrary"
+        ref="fileLibrary"
+      ></ue-modal-file>
 
       <ue-alert ref='alert'></ue-alert>
 
@@ -286,6 +290,7 @@ export default {
       ],
 
       showMediaLibrary: false,
+      showFileLibrary: false,
       showImpersonateToolbar: false
     }
   },

@@ -44,15 +44,15 @@ class FilesUploaderConfig
      */
     public function compose(View $view)
     {
-        $libraryDisk = $this->config->get('twill.file_library.disk');
-        $endpointType = $this->config->get('twill.file_library.endpoint_type');
-        $allowedExtensions = $this->config->get('twill.file_library.allowed_extensions');
+        $libraryDisk = $this->config->get(unusualBaseKey() . '.file_library.disk');
+        $endpointType = $this->config->get(unusualBaseKey() . '.file_library.endpoint_type');
+        $allowedExtensions = $this->config->get(unusualBaseKey() . '.file_library.allowed_extensions');
 
         // anonymous functions are used to let configuration dictate
         // the execution of the appropriate implementation
         $endpointByType = [
             'local' => function () {
-                return $this->urlGenerator->route('admin.file-library.files.store');
+                return $this->urlGenerator->route('file-library.files.store');
             },
             's3' => function () use ($libraryDisk) {
                 return s3Endpoint($libraryDisk);
@@ -64,22 +64,22 @@ class FilesUploaderConfig
 
         $signatureEndpointByType = [
             'local' => null,
-            's3' => $this->urlGenerator->route('admin.file-library.sign-s3-upload'),
-            'azure' => $this->urlGenerator->route('admin.file-library.sign-azure-upload'),
+            's3' => $this->urlGenerator->route('file-library.sign-s3-upload'),
+            'azure' => $this->urlGenerator->route('file-library.sign-azure-upload'),
         ];
 
         $filesUploaderConfig = [
             'endpointType' => $endpointType,
             'endpoint' => $endpointByType[$endpointType](),
-            'successEndpoint' => $this->urlGenerator->route('admin.file-library.files.store'),
+            'successEndpoint' => $this->urlGenerator->route('file-library.files.store'),
             'signatureEndpoint' => $signatureEndpointByType[$endpointType],
             'endpointBucket' => $this->config->get('filesystems.disks.' . $libraryDisk . '.bucket', 'none'),
             'endpointRegion' => $this->config->get('filesystems.disks.' . $libraryDisk . '.region', 'none'),
             'endpointRoot' => $endpointType === 'local' ? '' : $this->config->get('filesystems.disks.' . $libraryDisk . '.root', ''),
             'accessKey' => $this->config->get('filesystems.disks.' . $libraryDisk . '.key', 'none'),
             'csrfToken' => $this->sessionStore->token(),
-            'acl' => $this->config->get('twill.file_library.acl'),
-            'filesizeLimit' => $this->config->get('twill.file_library.filesize_limit'),
+            'acl' => $this->config->get(unusualBaseKey() . '.file_library.acl'),
+            'filesizeLimit' => $this->config->get(unusualBaseKey() . '.file_library.filesize_limit'),
             'allowedExtensions' => $allowedExtensions,
         ];
 

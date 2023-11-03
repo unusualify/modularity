@@ -41,7 +41,7 @@ abstract class Repository
     /**
      * @var array
      */
-    // protected $fieldsGroups = [];
+    protected $fieldsGroups = [];
 
     /**
      * @var bool

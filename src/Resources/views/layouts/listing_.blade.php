@@ -19,7 +19,7 @@
     @if(app()->isProduction())
         <link href="{{ twillAsset('main-listing.css') }}" rel="preload" as="style" crossorigin/>
     @endif
-    @unless(config('twill.dev_mode', false))
+    @unless(config(unusualBaseKey() . '.dev_mode', false))
         <link href="{{ twillAsset('main-listing.css') }}" rel="stylesheet" crossorigin/>
     @endunless
 @endpush
@@ -166,7 +166,7 @@
 
 @section('initialStore')
 
-    window['{{ config('twill.js_namespace') }}'].CMS_URLS = {
+    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].CMS_URLS = {
         index: @if(isset($indexUrl)) '{{ $indexUrl }}' @else window.location.href.split('?')[0] @endif,
         publish: '{{ $publishUrl }}',
         bulkPublish: '{{ $bulkPublishUrl }}',
@@ -181,11 +181,11 @@
         bulkDelete: '{{ $bulkDeleteUrl }}'
     }
 
-    window['{{ config('twill.js_namespace') }}'].STORE.form = {
+    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {
         fields: []
     }
 
-    window['{{ config('twill.js_namespace') }}'].STORE.datatable = {
+    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.datatable = {
         data: {!! json_encode($tableData) !!},
         columns: {!! json_encode($tableColumns) !!},
         navigation: {!! json_encode($tableMainFilters) !!},
@@ -202,7 +202,7 @@
     }
 
     @if ($create && ($openCreate ?? false))
-        window['{{ config('twill.js_namespace') }}'].openCreate = {!! json_encode($openCreate) !!}
+        window['{{ config(unusualBaseKey() . '.js_namespace') }}'].openCreate = {!! json_encode($openCreate) !!}
     @endif
 @stop
 

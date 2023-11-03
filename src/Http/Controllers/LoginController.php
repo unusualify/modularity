@@ -322,8 +322,8 @@ class LoginController extends Controller
     public function redirectToProvider($provider, OauthRequest $request)
     {
         return Socialite::driver($provider)
-            ->scopes($this->config->get('twill.oauth.' . $provider . '.scopes', []))
-            ->with($this->config->get('twill.oauth.' . $provider . '.with', []))
+            ->scopes($this->config->get(unusualBaseKey() . '.oauth.' . $provider . '.scopes', []))
+            ->with($this->config->get(unusualBaseKey() . '.oauth.' . $provider . '.with', []))
             ->redirect();
     }
 

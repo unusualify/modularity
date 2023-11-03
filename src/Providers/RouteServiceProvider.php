@@ -94,7 +94,7 @@ class RouteServiceProvider extends ServiceProvider
                 // internal routes web.php
                 $router->group(
                     [
-                        // 'domain' => config('twill.admin_app_url'),
+                        // 'domain' => config(unusualBaseKey() . '.admin_app_url'),
                     ],
                     function ($router) use (
                         $middlewares,
@@ -116,7 +116,7 @@ class RouteServiceProvider extends ServiceProvider
                 // if ($supportSubdomainRouting) {
                 //     $router->group(
                 //         [
-                //             'domain' => config('twill.admin_app_subdomain', 'admin') .
+                //             'domain' => config(unusualBaseKey() . '.admin_app_subdomain', 'admin') .
                 //             '.{subdomain}.' .
                 //             config('app.url'),
                 //         ],
@@ -132,7 +132,7 @@ class RouteServiceProvider extends ServiceProvider
                     'namespace' => $this->namespace . '\Admin',
                     'domain' => config('app.url'),
                     'middleware' => [
-                        config('twill.admin_middleware_group', 'web'),
+                        config(unusualBaseKey() . '.admin_middleware_group', 'web'),
                     ],
                 ],
                 function ($router) {
@@ -712,7 +712,7 @@ class RouteServiceProvider extends ServiceProvider
     public static function shouldPrefixRouteName($groupPrefix, $lastRouteGroupName)
     {
         return ! empty($groupPrefix) && (blank($lastRouteGroupName) ||
-            config('twill.allow_duplicates_on_route_names', true) ||
+            config(unusualBaseKey() . '.allow_duplicates_on_route_names', true) ||
             (! Str::endsWith($lastRouteGroupName, ".{$groupPrefix}.")));
     }
 
@@ -734,10 +734,10 @@ class RouteServiceProvider extends ServiceProvider
             '.'
         );
 
-        if (! empty(config('twill.admin_app_path'))) {
+        if (! empty(config(unusualBaseKey() . '.admin_app_path'))) {
             $groupPrefix = ltrim(
                 str_replace(
-                    config('twill.admin_app_path'),
+                    config(unusualBaseKey() . '.admin_app_path'),
                     '',
                     $groupPrefix
                 ),

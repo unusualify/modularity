@@ -98,7 +98,7 @@
             @if (config(unusualBaseKey() . '.enabled.file-library'))
                 window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types.push({
                     value: 'file',
-                    text: '{{ twillTrans("twill::lang.media-library.files") }}',
+                    text: '{{ unusualTrans("{$BASE_KEY}::lang.media-library.files") }}',
                     total: {{ \OoBook\CRM\Base\Entities\File::count() }},
                     endpoint: '{{ route('file-library.files.index') }}',
                     tagsEndpoint: '{{ route('file-library.files.tags') }}',
@@ -112,6 +112,9 @@
 
             window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.datatable = {}
             window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {}
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.browser = {
+                selected: {}
+            }
 
 
             @yield('STORE')

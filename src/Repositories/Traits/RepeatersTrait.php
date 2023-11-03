@@ -304,7 +304,7 @@ trait RepeatersTrait
             }
 
             if (isset($relatedItemFormFields['medias'])) {
-                if (config('twill.media_library.translated_form_fields', false)) {
+                if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
                     Collection::make($relatedItemFormFields['medias'])->each(
                         function ($rolesWithMedias, $locale) use (&$repeatersMedias, $relation, $relationItem) {
                             $repeatersMedias[] = Collection::make($rolesWithMedias)->mapWithKeys(
@@ -376,7 +376,7 @@ trait RepeatersTrait
             }
         }
 
-        if (! empty($repeatersMedias) && config('twill.media_library.translated_form_fields', false)) {
+        if (! empty($repeatersMedias) && config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
             $repeatersMedias = call_user_func_array('array_merge', $repeatersMedias);
         }
 

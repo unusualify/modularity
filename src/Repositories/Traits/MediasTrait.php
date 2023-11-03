@@ -25,7 +25,7 @@ trait MediasTrait
 
         $mediasFromFields->each(function ($media) use ($object, $mediasCollection) {
             $newMedia = Media::withTrashed()->find(is_array($media['id']) ? Arr::first($media['id']) : $media['id']);
-            $pivot = $newMedia->newPivot($object, Arr::except($media, ['id']), config('twill.mediables_table', 'twill_mediables'), true);
+            $pivot = $newMedia->newPivot($object, Arr::except($media, ['id']), config(unusualBaseKey() . '.mediables_table', 'twill_mediables'), true);
             $newMedia->setRelation('pivot', $pivot);
             $mediasCollection->push($newMedia);
         });
@@ -63,7 +63,7 @@ trait MediasTrait
 
         if (isset($fields['medias'])) {
             foreach ($fields['medias'] as $role => $mediasForRole) {
-                if (config('twill.media_library.translated_form_fields', false)) {
+                if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
                     if (Str::contains($role, ['[', ']'])) {
                         $start = strpos($role, '[') + 1;
                         $finish = strpos($role, ']', $start);
@@ -75,8 +75,8 @@ trait MediasTrait
                 $locale = $locale ?? config('app.locale');
 
                 if (in_array($role, array_keys($this->model->mediasParams ?? []))
-                    || in_array($role, array_keys(config('twill.block_editor.crops', [])))
-                    || in_array($role, array_keys(config('twill.settings.crops', [])))) {
+                    || in_array($role, array_keys(config(unusualBaseKey() . '.block_editor.crops', [])))
+                    || in_array($role, array_keys(config(unusualBaseKey() . '.settings.crops', [])))) {
                     Collection::make($mediasForRole)->each(function ($media) use (&$medias, $role, $locale) {
                         $customMetadatas = $media['metadatas']['custom'] ?? [];
                         if (isset($media['crops']) && !empty($media['crops'])) {
@@ -129,7 +129,7 @@ trait MediasTrait
 
         if ($object->has('medias')) {
             foreach ($object->medias->groupBy('pivot.role') as $role => $mediasByRole) {
-                if (config('twill.media_library.translated_form_fields', false)) {
+                if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
                     foreach ($mediasByRole->groupBy('pivot.locale') as $locale => $mediasByLocale) {
                         foreach ($this->getMediaFormItems($mediasByLocale) as $item) {
                             $fields['medias'][$locale][$role][] = $item;

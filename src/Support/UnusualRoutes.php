@@ -77,9 +77,9 @@ class UnusualRoutes
     public function groupOptions(): array
     {
         return [
-            // 'as'            => config('twill.admin_route_name_prefix', 'admin.'),
+            // 'as'            => config(unusualBaseKey() . '.admin_route_name_prefix', 'admin.'),
             'middleware'    => [config(unusualBaseKey() . '.admin_middleware_group', 'web')],
-            // 'prefix'        => rtrim(ltrim(config('twill.admin_app_path'), '/'), '/'),
+            // 'prefix'        => rtrim(ltrim(config(unusualBaseKey() . '.admin_app_path'), '/'), '/'),
         ];
     }
 

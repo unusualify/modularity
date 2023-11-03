@@ -57,7 +57,7 @@ trait OauthTrait
         $user = $this->model->firstOrNew([
             'name' => $oauthUser->name,
             'email' => $oauthUser->email,
-            'role' => config('twill.oauth.default_role'),
+            'role' => config(unusualBaseKey() . '.oauth.default_role'),
             'published' => true,
         ]);
 

@@ -22,7 +22,7 @@ class TwicPics implements ImageServiceInterface
      */
     public function getUrl($id, array $params = [])
     {
-        $defaultParams = config('twill.twicpics.default_params');
+        $defaultParams = config(unusualBaseKey() . '.twicpics.default_params');
 
         return $this->createUrl($id, array_replace($defaultParams, $params));
     }
@@ -59,7 +59,7 @@ class TwicPics implements ImageServiceInterface
      */
     public function getLQIPUrl($id, array $params = [])
     {
-        $defaultParams = config('twill.twicpics.lqip_default_params');
+        $defaultParams = config(unusualBaseKey() . '.twicpics.lqip_default_params');
 
         return $this->getUrlWithDefaultParams($id, $params, $defaultParams);
     }
@@ -71,7 +71,7 @@ class TwicPics implements ImageServiceInterface
      */
     public function getSocialUrl($id, array $params = [])
     {
-        $defaultParams = config('twill.twicpics.social_default_params');
+        $defaultParams = config(unusualBaseKey() . '.twicpics.social_default_params');
 
         return $this->getUrlWithDefaultParams($id, $params, $defaultParams);
     }
@@ -83,7 +83,7 @@ class TwicPics implements ImageServiceInterface
      */
     public function getCmsUrl($id, array $params = [])
     {
-        $defaultParams = config('twill.twicpics.cms_default_params');
+        $defaultParams = config(unusualBaseKey() . '.twicpics.cms_default_params');
 
         return $this->getUrlWithDefaultParams($id, $params, $defaultParams);
     }
@@ -94,8 +94,8 @@ class TwicPics implements ImageServiceInterface
      */
     public function getRawUrl($id)
     {
-        $domain = config('twill.twicpics.domain');
-        $path = config('twill.twicpics.path');
+        $domain = config(unusualBaseKey() . '.twicpics.domain');
+        $path = config(unusualBaseKey() . '.twicpics.path');
 
         if (! empty($path)) {
             $path = "{$path}/";
@@ -122,7 +122,7 @@ class TwicPics implements ImageServiceInterface
     {
         $rawUrl = $this->getRawUrl($id);
 
-        $apiVersion = config('twill.twicpics.api_version');
+        $apiVersion = config(unusualBaseKey() . '.twicpics.api_version');
 
         $params = $this->paramsProcessor->process($params);
 

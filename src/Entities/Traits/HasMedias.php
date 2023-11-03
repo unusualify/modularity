@@ -37,7 +37,7 @@ trait HasMedias
         return $this->morphToMany(
             Media::class,
             'mediable',
-            config('twill.mediables_table', 'twill_mediables')
+            config(unusualBaseKey() . '.mediables_table', 'twill_mediables')
         )->withPivot(array_merge([
             'crop',
             'role',
@@ -48,21 +48,21 @@ trait HasMedias
             'lqip_data',
             'ratio',
             'metadatas',
-        ], config('twill.media_library.translated_form_fields', false) ? ['locale'] : []))
-            ->withTimestamps()->orderBy(config('twill.mediables_table', 'twill_mediables') . '.id', 'asc');
+        ], config(unusualBaseKey() . '.media_library.translated_form_fields', false) ? ['locale'] : []))
+            ->withTimestamps()->orderBy(config(unusualBaseKey() . '.mediables_table', 'twill_mediables') . '.id', 'asc');
     }
 
     private function findMedia($role, $crop = 'default')
     {
         $media = $this->medias->first(function ($media) use ($role, $crop) {
-            if (config('twill.media_library.translated_form_fields', false)) {
+            if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
                 $localeScope = $media->pivot->locale === app()->getLocale();
             }
 
             return $media->pivot->role === $role && $media->pivot->crop === $crop && ($localeScope ?? true);
         });
 
-        if (! $media && config('twill.media_library.translated_form_fields', false)) {
+        if (! $media && config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
             $media = $this->medias->first(function ($media) use ($role, $crop) {
                 return $media->pivot->role === $role && $media->pivot->crop === $crop;
             });
@@ -254,7 +254,7 @@ trait HasMedias
     {
         if (!$media) {
             $media = $this->medias->first(function ($media) use ($role) {
-                if (config('twill.media_library.translated_form_fields', false)) {
+                if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
                     $localeScope = $media->pivot->locale === app()->getLocale();
                 }
 
@@ -280,7 +280,7 @@ trait HasMedias
     {
         if (!$media) {
             $media = $this->medias->first(function ($media) use ($role) {
-                if (config('twill.media_library.translated_form_fields', false)) {
+                if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
                     $localeScope = $media->pivot->locale === app()->getLocale();
                 }
 
@@ -306,7 +306,7 @@ trait HasMedias
     {
         if (!$media) {
             $media = $this->medias->first(function ($media) use ($role) {
-                if (config('twill.media_library.translated_form_fields', false)) {
+                if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
                     $localeScope = $media->pivot->locale === app()->getLocale();
                 }
 

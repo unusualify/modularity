@@ -15,7 +15,7 @@ class SettingTranslation extends Model
 
     public function getTable()
     {
-        $twillSettingsTable = config('twill.settings_table', 'twill_settings');
+        $twillSettingsTable = config(unusualBaseKey() . '.settings_table', 'twill_settings');
 
         return Str::singular($twillSettingsTable) . '_translations';
     }

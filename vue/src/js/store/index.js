@@ -5,6 +5,7 @@ import alert from './modules/alert'
 import config from './modules/config'
 import currentUser from './modules/currentUser'
 import language from './modules/language'
+import browser from './modules/browser'
 
 export default createStore({
   modules: {
@@ -12,7 +13,9 @@ export default createStore({
     config,
     language,
     currentUser,
-    mediaLibrary
+    mediaLibrary,
+    browser
+
   }
 
 })

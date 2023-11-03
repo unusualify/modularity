@@ -3,7 +3,7 @@
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 
-// if (config('twill.enabled.users-management')) {
+// if (config(unusualBaseKey() . '.enabled.users-management')) {
 //     Route::module('users', ['except' => ['sort', 'feature']]);
 // }
 
@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 //     });
 // }
 
-// if (config('twill.enabled.file-library')) {
+// if (config(unusualBaseKey() . '.enabled.file-library')) {
 //     Route::group(['prefix' => 'file-library', 'as' => 'file-library.'], function () {
 //         Route::post('sign-s3-upload', ['as' => 'sign-s3-upload', 'uses' => 'FileLibraryController@signS3Upload']);
 //         Route::get('sign-azure-upload', ['as' => 'sign-azure-upload', 'uses' => 'FileLibraryController@signAzureUpload']);
@@ -31,12 +31,12 @@ use Illuminate\Support\Facades\Route;
 //     });
 // }
 
-// if (config('twill.enabled.block-editor')) {
+// if (config(unusualBaseKey() . '.enabled.block-editor')) {
 //     Route::post('blocks/preview', ['as' => 'blocks.preview', 'uses' => 'BlocksController@preview']);
 // }
 
-// if (config('twill.enabled.buckets')) {
-//     $bucketsRoutes = config('twill.bucketsRoutes') ?? Collection::make(config('twill.buckets'))->mapWithKeys(function ($bucketSection, $bucketSectionKey) {
+// if (config(unusualBaseKey() . '.enabled.buckets')) {
+//     $bucketsRoutes = config(unusualBaseKey() . '.bucketsRoutes') ?? Collection::make(config(unusualBaseKey() . '.buckets'))->mapWithKeys(function ($bucketSection, $bucketSectionKey) {
 //         return [$bucketSectionKey => 'featured'];
 //     })->toArray();
 
@@ -51,16 +51,16 @@ use Illuminate\Support\Facades\Route;
 //     }
 // }
 
-// if (config('twill.enabled.settings')) {
+// if (config(unusualBaseKey() . '.enabled.settings')) {
 //     Route::name('settings')->get('/settings/{section}', 'SettingController@index');
 //     Route::name('settings.update')->post('/settings/{section}', 'SettingController@update');
 // }
 
-// if (config('twill.enabled.dashboard')) {
+// if (config(unusualBaseKey() . '.enabled.dashboard')) {
 //     Route::name('dashboard')->get('/', 'DashboardController@index');
 // }
 
-// if (config('twill.enabled.search')) {
+// if (config(unusualBaseKey() . '.enabled.search')) {
 //     Route::name('search')->get('search', 'DashboardController@search');
 // }
 

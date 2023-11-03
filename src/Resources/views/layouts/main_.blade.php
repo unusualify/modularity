@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html dir="ltr" lang="{{ config('twill.locale', 'en') }}">
+<html dir="ltr" lang="{{ config(unusualBaseKey() . '.locale', 'en') }}">
     <head>
         {{-- @include('twill::partials.head') --}}
     </head>
     <body class="env env--{{ app()->environment() }} @yield('appTypeClass')">
         @include('partials.icons.svg-sprite')
-        @if(config('twill.enabled.search', false))
+        @if(config(unusualBaseKey() . '.enabled.search', false))
             @partialView(($moduleName ?? null), 'navigation._overlay_navigation', ['search' => true])
         @else
             @partialView(($moduleName ?? null), 'navigation._overlay_navigation')
@@ -18,7 +18,7 @@
                     <div class="header__user" id="headerUser" v-cloak>
                         @partialView(($moduleName ?? null), 'navigation._user')
                     </div>
-                    @if(config('twill.enabled.search', false) && !($isDashboard ?? false))
+                    @if(config(unusualBaseKey() . '.enabled.search', false) && !($isDashboard ?? false))
                       <div class="headerSearch" id="searchApp">
                         <a href="#" class="headerSearch__toggle" @click.prevent="toggleSearch">
                           <span v-svg symbol="search" v-show="!open"></span>
@@ -27,7 +27,7 @@
                         <transition name="fade_search-overlay" @after-enter="afterAnimate">
                           <div class="headerSearch__wrapper" :style="positionStyle" v-show="open" v-cloak>
                             <div class="headerSearch__overlay" :style="positionStyle" @click="toggleSearch"></div>
-                            <a17-search endpoint="{{ route(config('twill.dashboard.search_endpoint')) }}" :open="open" :opened="opened"></a17-search>
+                            <a17-search endpoint="{{ route(config(unusualBaseKey() . '.dashboard.search_endpoint')) }}" :open="open" :opened="opened"></a17-search>
                           </div>
                         </transition>
                       </div>
@@ -44,10 +44,10 @@
             <section class="main">
                 <div class="app" id="app" v-cloak>
                     @yield('content')
-                    @if (config('twill.enabled.media-library') || config('twill.enabled.file-library'))
+                    @if (config(unusualBaseKey() . '.enabled.media-library') || config(unusualBaseKey() . '.enabled.file-library'))
                         <a17-medialibrary ref="mediaLibrary"
-                                          :authorized="{{ json_encode(auth('twill_users')->user()->can('upload')) }}" :extra-metadatas="{{ json_encode(array_values(config('twill.media_library.extra_metadatas_fields', []))) }}"
-                                          :translatable-metadatas="{{ json_encode(array_values(config('twill.media_library.translatable_metadatas_fields', []))) }}"
+                                          :authorized="{{ json_encode(auth('twill_users')->user()->can('upload')) }}" :extra-metadatas="{{ json_encode(array_values(config(unusualBaseKey() . '.media_library.extra_metadatas_fields', []))) }}"
+                                          :translatable-metadatas="{{ json_encode(array_values(config(unusualBaseKey() . '.media_library.translatable_metadatas_fields', []))) }}"
                         ></a17-medialibrary>
                         <a17-dialog ref="deleteWarningMediaLibrary" modal-title="{{ twillTrans("twill::lang.media-library.dialogs.delete.delete-media-title") }}" confirm-label="{{ twillTrans("twill::lang.media-library.dialogs.delete.delete-media-confirm") }}">
                             <p class="modal--tiny-title"><strong>{{ twillTrans("twill::lang.media-library.dialogs.delete.delete-media-title") }}</strong></p>
@@ -77,24 +77,24 @@
         </form>
 
         <script>
-            window['{{ config('twill.js_namespace') }}'] = {};
-            window['{{ config('twill.js_namespace') }}'].version = '{{ config('twill.version') }}';
-            window['{{ config('twill.js_namespace') }}'].twillLocalization = {!! json_encode($twillLocalization) !!};
-            window['{{ config('twill.js_namespace') }}'].STORE = {};
-            window['{{ config('twill.js_namespace') }}'].STORE.form = {};
-            window['{{ config('twill.js_namespace') }}'].STORE.config = {
-                publishDateDisplayFormat: '{{config('twill.publish_date_display_format')}}',
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'] = {};
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].version = '{{ config(unusualBaseKey() . '.version') }}';
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].twillLocalization = {!! json_encode($twillLocalization) !!};
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE = {};
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {};
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.config = {
+                publishDateDisplayFormat: '{{config(unusualBaseKey() . '.publish_date_display_format')}}',
             };
-            window['{{ config('twill.js_namespace') }}'].STORE.medias = {};
-            window['{{ config('twill.js_namespace') }}'].STORE.medias.types = [];
-            window['{{ config('twill.js_namespace') }}'].STORE.medias.config = {
-                useWysiwyg: {{ config('twill.media_library.media_caption_use_wysiwyg') ? 'true' : 'false' }},
-                wysiwygOptions: {!! json_encode(config('twill.media_library.media_caption_wysiwyg_options')) !!}
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias = {};
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types = [];
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.config = {
+                useWysiwyg: {{ config(unusualBaseKey() . '.media_library.media_caption_use_wysiwyg') ? 'true' : 'false' }},
+                wysiwygOptions: {!! json_encode(config(unusualBaseKey() . '.media_library.media_caption_wysiwyg_options')) !!}
             };
-            window['{{ config('twill.js_namespace') }}'].STORE.languages = {!! json_encode(getLanguagesForVueStore($form_fields ?? [], $translate ?? false)) !!};
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.languages = {!! json_encode(getLanguagesForVueStore($form_fields ?? [], $translate ?? false)) !!};
 
-            @if (config('twill.enabled.media-library'))
-                window['{{ config('twill.js_namespace') }}'].STORE.medias.types.push({
+            @if (config(unusualBaseKey() . '.enabled.media-library'))
+                window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types.push({
                     value: 'image',
                     text: '{{ twillTrans("twill::lang.media-library.images") }}',
                     total: {{ \OoBook\CRM\Base\Models\Media::count() }},
@@ -102,11 +102,11 @@
                     tagsEndpoint: '{{ route('admin.media-library.medias.tags') }}',
                     uploaderConfig: {!! json_encode($mediasUploaderConfig) !!}
                 });
-                window['{{ config('twill.js_namespace') }}'].STORE.medias.showFileName = !!'{{ config('twill.media_library.show_file_name') }}';
+                window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.showFileName = !!'{{ config(unusualBaseKey() . '.media_library.show_file_name') }}';
             @endif
 
-            @if (config('twill.enabled.file-library'))
-                window['{{ config('twill.js_namespace') }}'].STORE.medias.types.push({
+            @if (config(unusualBaseKey() . '.enabled.file-library'))
+                window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types.push({
                     value: 'file',
                     text: '{{ twillTrans("twill::lang.media-library.files") }}',
                     total: {{ \OoBook\CRM\Base\Models\File::count() }},

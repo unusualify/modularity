@@ -3,7 +3,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=Edge">
 <meta name="robots" content="noindex,nofollow" />
 
-<title>{{ config('app.name') }} {{ config('twill.admin_app_title_suffix') }}</title>
+<title>{{ config('app.name') }} {{ config(unusualBaseKey() . '.admin_app_title_suffix') }}</title>
 
 <!-- Fonts -->
 @if(app()->isProduction())
@@ -17,7 +17,7 @@
     <link href="{{ twillAsset('chunk-vendors.css') }}" rel="preload" as="style" crossorigin/>
 @endif
 
-@unless(config('twill.dev_mode', false))
+@unless(config(unusualBaseKey() . '.dev_mode', false))
     <link href="{{ twillAsset('chunk-common.css') }}" rel="stylesheet" crossorigin/>
     <link href="{{ twillAsset('chunk-vendors.css' )}}" rel="stylesheet" crossorigin/>
 @endunless
