@@ -202,7 +202,6 @@ class MediaLibraryController extends BaseController implements SignUploadListene
 
     /**
      * @param Request $request
-     * @return Media
      */
     public function storeReference($request)
     {
@@ -342,5 +341,18 @@ class MediaLibraryController extends BaseController implements SignUploadListene
     private function shouldReplaceMedia($id)
     {
         return is_numeric($id) ? $this->repository->whereId($id)->exists() : false;
+    }
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function bulkDelete()
+    {
+        if ($this->repository->bulkDelete(explode(',', $this->request->get('ids')))) {
+            // $this->fireEvent();
+
+            return $this->respondWithSuccess(___('listing.bulk-delete.success', ['modelTitle' => $this->modelTitle]));
+        }
+
+        return $this->respondWithError(___('listing.bulk-delete.error', ['modelTitle' => $this->modelTitle]));
     }
 }

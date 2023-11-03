@@ -11,7 +11,7 @@
                   v-if="navType.total > 0" class="secondarynav__number">({{ navType.total }})</span></a>
               </li>
             </ul>
-
+            
             <div class="secondarynav secondarynav--mobile secondarynav--dropdown" slot="navigation">
               <a17-dropdown ref="secondaryNavDropdown" position="bottom-left" width="full" :offset="0">
                 <a17-button class="secondarynav__button" variant="dropdown-transparent" size="small"
@@ -237,8 +237,6 @@ export default {
       this.$refs.modal.hide()
     },
     opened: function () {
-
-      console.log('here');
       if (!this.gridLoaded) this.reloadGrid()
 
       this.listenScrollPosition()
@@ -505,6 +503,7 @@ export default {
     }
   }
 }
+
 </script>
 
 <style lang="scss" scoped>

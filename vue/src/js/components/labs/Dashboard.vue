@@ -19,6 +19,10 @@
          ></component>
       </v-sheet>
     </v-col>
+
+    <v-col>
+      <ue-media-input></ue-media-input>
+    </v-col>
     <!-- <v-col xxl="4" xl="4" lg="4" cols="12">
       <v-sheet class="h-100">
         <div class="text-h6 pa-4 text-primary font-weight-bold">Recent Revisions</div>
@@ -39,6 +43,7 @@
 </template>
 
 <script>
+import MediaInput from './../inputs/Media.vue'
 export default {
   props: {
     blocks: {
@@ -47,6 +52,9 @@ export default {
         return {}
       }
     }
+  },
+  components: {
+    'ue-media-input' : MediaInput,
   },
   data () {
     return {

@@ -11,7 +11,7 @@ $secondary-color: #FFFFFF;
 $tertiary-color: #DFEFF0;
 $cta-color: #F6A505;
 $cta-secondary-color: #FFFFFF;
-
+$color__white : #fff;
 $primary-hover-color: #11758D;
 $secondary-hover-color: #DFEFF0;;
 $tertiary-hover-color: #27A0B4;
@@ -64,3 +64,8 @@ $color__link: $color__action;
 $color__block-bg: #f4f9fd; //$color__translucentBlue;
 $color__translucentBlue: $color__block-bg;
 $color__error: #e61414; //$color__red;
+
+$color__black: $global-light-text-color;
+$color__background: $color__white;
+$color__lighter:#f6f6f6;
+$color__icons: #a6a6a6;
