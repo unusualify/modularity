@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import MediaInput from './../inputs/Media.vue'
 export default {
   props: {
     blocks: {
@@ -21,6 +22,9 @@ export default {
         return {}
       }
     }
+  },
+  components: {
+    'ue-media-input': MediaInput
   },
   data () {
     return {

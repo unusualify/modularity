@@ -1,30 +1,143 @@
 <template>
   <div class="mediasidebar">
-    <a17-mediasidebar-upload v-if="mediasLoading.length"/>
+    <a17-mediasidebar-upload v-if="mediasLoading.length" />
     <template v-else>
+      <div class="mediasidebar__inner" :class="containerClasses">
+        <p v-if="!hasMedia" class="f--note">{{ $trans('media-library.sidebar.empty-text', 'No file selected') }}</p>
+        <p v-if="hasMultipleMedias" class="mediasidebar__info">
+          {{ medias.length }} {{ $trans('media-library.sidebar.files-selected', 'files selected') }} <a href="#"
+            @click.prevent="clear">{{ $trans('media-library.sidebar.clear', 'Clear') }}</a>
+        </p>
 
+        <template v-if="hasSingleMedia">
+          <img v-if="isImage" :src="firstMedia.thumbnail" class="mediasidebar__img" :alt="firstMedia.original" />
+          <p class="mediasidebar__name">{{ firstMedia.name }}</p>
+          <ul class="mediasidebar__metadatas">
+            <li class="f--small" v-if="firstMedia.size">File size: {{ firstMedia.size | uppercase }}</li>
+            <li class="f--small" v-if="isImage && (firstMedia.width + firstMedia.height)">
+              {{ $trans('media-library.sidebar.dimensions', 'Dimensions') }}: {{ firstMedia.width }} &times; {{
+                firstMedia.height }}
+            </li>
+          </ul>
+        </template>
+
+        <a17-buttonbar class="mediasidebar__buttonbar" v-if="hasMedia">
+          <!-- Actions -->
+          <a v-if="hasSingleMedia" :href="firstMedia.original" download><span v-svg symbol="download"></span></a>
+          <button v-if="allowDelete && authorized" type="button" @click="deleteSelectedMediasValidation">
+            <span v-svg symbol="trash"></span>
+          </button>
+          <button v-else type="button" class="button--disabled" :data-tooltip-title="warningDeleteMessage" v-tooltip>
+            <span v-svg symbol="trash"></span></button>
+          <button v-if="hasSingleMedia" type="button" @click="replaceMedia">
+            <span v-svg symbol="replace"></span>
+          </button>
+        </a17-buttonbar>
+      </div>
+
+      <form v-if="hasMedia" ref="form" class="mediasidebar__inner mediasidebar__form" @submit="submit">
+        <span class="mediasidebar__loader" v-if="loading"><span class="loader loader--small"><span></span></span></span>
+        <a17-vselect v-if="!fieldsRemovedFromBulkEditing.includes('tags')" :label="$trans('media-library.sidebar.tags')"
+          :key="firstMedia.id + '-' + medias.length" name="tags" :multiple="true"
+          :selected="hasMultipleMedias ? sharedTags : firstMedia.tags" :searchable="true"
+          :emptyText="$trans('media-library.no-tags-found', 'Sorry, no tags found.')" :taggable="true" :pushTags="true"
+          size="small" :endpoint="type.tagsEndpoint" @change="save" maxHeight="175px" />
+        <span
+          v-if="extraMetadatas.length && isImage && hasMultipleMedias && !fieldsRemovedFromBulkEditing.includes('tags')"
+          class="f--tiny f--note f--underlined" @click="removeFieldFromBulkEditing('tags')"
+          data-tooltip-title="Remove this field if you do not want to update it on all selected medias"
+          data-tooltip-theme="default" data-tooltip-placement="top" v-tooltip>Remove from bulk edit</span>
+        <template v-if="hasMultipleMedias">
+          <input type="hidden" name="ids" :value="mediasIds" />
+        </template>
+        <template v-else>
+          <input type="hidden" name="id" :value="firstMedia.id" />
+          <div class="mediasidebar__langswitcher" v-if="translatableMetadatas.length > 0">
+            <a17-langswitcher :in-modal="true" :all-published="true" />
+          </div>
+
+          <a17-locale type="a17-textfield" v-if="isImage && translatableMetadatas.includes('alt_text')"
+            :attributes="{ label: $trans('media-library.sidebar.alt-text', 'Alt text'), name: 'alt_text', type: 'text', size: 'small' }"
+            :initialValues="altValues" @focus="focus" @blur="blur"></a17-locale>
+          <a17-textfield v-else-if="isImage" :label="$trans('media-library.sidebar.alt-text', 'Alt text')" name="alt_text"
+            :initialValue="firstMedia.metadatas.default.altText" size="small" @focus="focus" @blur="blur" />
+
+          <template v-if="useWysiwyg">
+            <a17-locale type="a17-wysiwyg" v-if="isImage && translatableMetadatas.includes('caption')"
+              :attributes="{ options: wysiwygOptions, label: $trans('media-library.sidebar.caption', 'Caption'), name: 'caption', size: 'small' }"
+              :initialValues="captionValues" @focus="focus" @blur="blur"></a17-locale>
+            <a17-wysiwyg v-else-if="isImage" type="textarea" :rows="1" size="small"
+              :label="$trans('media-library.sidebar.caption', 'Caption')" name="caption" :options="wysiwygOptions"
+              :initialValue="firstMedia.metadatas.default.caption" @focus="focus" @blur="blur" />
+          </template>
+          <template v-else>
+            <a17-locale type="a17-textfield" v-if="isImage && translatableMetadatas.includes('caption')"
+              :attributes="{ type: 'textarea', rows: 1, label: $trans('media-library.sidebar.caption', 'Caption'), name: 'caption', size: 'small' }"
+              :initialValues="captionValues" @focus="focus" @blur="blur"></a17-locale>
+            <a17-textfield v-else-if="isImage" type="textarea" :rows="1" size="small"
+              :label="$trans('media-library.sidebar.caption', 'Caption')" name="caption"
+              :initialValue="firstMedia.metadatas.default.caption" @focus="focus" @blur="blur" />
+          </template>
+
+          <template v-for="field in singleOnlyMetadatas">
+            <a17-locale type="a17-textfield" v-bind:key="field.name"
+              v-if="isImage && (field.type === 'text' || !field.type) && translatableMetadatas.includes(field.name)"
+              :attributes="{ label: field.label, name: field.name, type: 'textarea', rows: 1, size: 'small' }"
+              :initialValues="firstMedia.metadatas.default[field.name]" @focus="focus" @blur="blur" />
+            <a17-textfield v-bind:key="field.name" v-else-if="isImage && (field.type === 'text' || !field.type)"
+              :label="field.label" :name="field.name" size="small"
+              :initialValue="firstMedia.metadatas.default[field.name]" type="textarea" :rows="1" @focus="focus"
+              @blur="blur" />
+            <div class="mediasidebar__checkbox" v-if="isImage && (field.type === 'checkbox')" v-bind:key="field.name">
+              <a17-checkbox :label="field.label" :name="field.name"
+                :initialValue="firstMedia.metadatas.default[field.name]" :value="1" @change="blur" />
+            </div>
+          </template>
+        </template>
+        <template v-for="field in singleAndMultipleMetadatas">
+          <a17-locale type="a17-textfield" v-bind:key="field.name"
+            v-if="isImage && (field.type === 'text' || !field.type) && ((hasMultipleMedias && !fieldsRemovedFromBulkEditing.includes(field.name)) || hasSingleMedia) && translatableMetadatas.includes(field.name)"
+            :attributes="{ label: field.label, name: field.name, type: 'textarea', rows: 1, size: 'small' }"
+            :initialValues="sharedMetadata(field.name, 'object')" @focus="focus" @blur="blur" />
+          <a17-textfield v-bind:key="field.name"
+            v-else-if="isImage && (field.type === 'text' || !field.type) && ((hasMultipleMedias && !fieldsRemovedFromBulkEditing.includes(field.name)) || hasSingleMedia)"
+            :label="field.label" :name="field.name" size="small" :initialValue="sharedMetadata(field.name)"
+            type="textarea" :rows="1" @focus="focus" @blur="blur" />
+          <div class="mediasidebar__checkbox" v-bind:key="field.name"
+            v-if="isImage && (field.type === 'checkbox') && ((hasMultipleMedias && !fieldsRemovedFromBulkEditing.includes(field.name)) || hasSingleMedia)">
+            <a17-checkbox v-bind:key="field.name" :label="field.label" :name="field.name"
+              :initialValue="sharedMetadata(field.name, 'boolean')" :value="1" @change="blur" />
+          </div>
+          <span class="f--tiny f--note f--underlined" @click="removeFieldFromBulkEditing(field.name)"
+            v-if="isImage && hasMultipleMedias && !fieldsRemovedFromBulkEditing.includes(field.name)"
+            v-bind:key="field.name"
+            data-tooltip-title="Remove this field if you do not want to update it on all selected medias"
+            data-tooltip-theme="default" data-tooltip-placement="top" v-tooltip>Remove from bulk edit</span>
+        </template>
+      </form>
     </template>
-
-    <!-- <a17-modal class="modal--tiny modal--form modal--withintro" ref="warningDelete" title="Warning Delete">
-      <p class="modal--tiny-title"><strong>{{ $trans('media-library.dialogs.delete.title', 'Are you sure ?') }}</strong></p>
+    <ue-modal class="modal--tiny modal--form modal--withintro" ref="warningDelete" title="Warning Delete">
+      <p class="modal--tiny-title"><strong>{{ $trans('media-library.dialogs.delete.title', 'Are you sure ?') }}</strong>
+      </p>
       <p>{{ warningDeleteMessage }}</p>
       <a17-inputframe>
         <a17-button variant="validate" @click="deleteSelectedMedias">Delete ({{ mediasIdsToDelete.length }})
         </a17-button>
         <a17-button variant="aslink" @click="$refs.warningDelete.close()"><span>Cancel</span></a17-button>
       </a17-inputframe>
-    </a17-modal> -->
+    </ue-modal>
   </div>
 </template>
 
 <script>
   import { mapState } from 'vuex'
-  import api from '@/store/api/media-library'
+  import api from '../../store/api/media-library'
   // import { NOTIFICATION } from '@/store/mutations'
   import isEqual from 'lodash/isEqual'
-  import FormDataAsObj from '@/utils/formDataAsObj.js'
-  import a17VueFilters from '@/utils/filters.js'
-  import a17MediaSidebarUpload from '@/components/media-library/MediaSidebarUpload'
+  import FormDataAsObj from './../../utils/formDataAsObj.js'
+  import a17VueFilters from './../../utils/filters.js'
+  import a17MediaSidebarUpload from './MediaSidebarUpload.vue'
+  import { ALERT } from './../../store/mutations'
   // import a17Langswitcher from '@/components/LangSwitcher'
 
   export default {
@@ -128,6 +241,7 @@
         }))
       },
       warningDeleteMessage: function () {
+        console.log(this.allowDelete +'+ HEREEE')
         if (this.allowDelete) {
           if (this.hasMultipleMedias) {
             return this.$trans('media-library.dialogs.delete.allow-delete-multiple-medias', 'Some files are used and can\'t be deleted. Do you want to delete the others ?')
@@ -202,6 +316,7 @@
             this.loading = false
             this.$emit('delete', this.mediasIdsToDelete)
             this.$refs.warningDelete.close()
+            this.$store.commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
           }, (error) => {
             // this.$store.commit(NOTIFICATION.SET_NOTIF, {
             //   message: error.data.message,
@@ -212,7 +327,11 @@
           api.delete(this.firstMedia.deleteUrl, (resp) => {
             this.loading = false
             this.$emit('delete', this.mediasIdsToDelete)
+            console.log(this.$refs.warningDelete)
             this.$refs.warningDelete.close()
+            this.$store.commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
+            // this.$emit();
+            
           }, (error) => {
             // this.$store.commit(NOTIFICATION.SET_NOTIF, {
             //   message: error.data.message,

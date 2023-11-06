@@ -44,7 +44,7 @@ class ConfigServiceProvider extends ServiceProvider
         // dd(glob(__DIR__."/../Config/modules/*.php"));
         // $base_config_name = strtolower(config($this->baseKey . '.name'));
 
-        // $this->mergeConfigFrom(__DIR__ . '/../config/twill.php', 'twill');
+        // $this->mergeConfigFrom(__DIR__ . '/../config/unusual.php', 'unusual');
 
         // $this->mergeConfigFrom(__DIR__ . '/../Config/config.php', 'unusual');
 
@@ -52,6 +52,7 @@ class ConfigServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../Config/input_drafts.php', $this->baseKey . '.input_drafts');
         $this->mergeConfigFrom(__DIR__ . '/../Config/file_library.php', $this->baseKey . '.file_library');
         $this->mergeConfigFrom(__DIR__ . '/../Config/media-library.php', $this->baseKey . '.media_library');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/file-library.php', $this->baseKey . '.file_library');
         $this->mergeConfigFrom(__DIR__ . '/../Config/imgix.php', $this->baseKey . '.imgix');
         $this->mergeConfigFrom(__DIR__ . '/../Config/glide.php', $this->baseKey . '.glide');
         $this->mergeConfigFrom(__DIR__ . '/../Config/disks.php', $this->baseKey . '.disks');
@@ -75,6 +76,13 @@ class ConfigServiceProvider extends ServiceProvider
                     'throttle' => 60,
                 ]]);
             }
+        }
+
+        if (
+            config(unusualBaseKey() . '.media_library.endpoint_type') === 'local'
+            && config(unusualBaseKey() . '.media_library.disk') === unusualBaseKey() . '_media_library'
+        ) {
+            $this->setLocalDiskUrl('media');
         }
 
         if (config(unusualBaseKey() . '.file_library.endpoint_type') === 'local'

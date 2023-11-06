@@ -169,16 +169,13 @@
   .mediagrid__button {
     position: absolute;
     cursor:pointer;
-
     display: flex;
     justify-content: center; /* align horizontal */
     flex-direction: column;
     align-items: center; /* align vertical */
     @include font-regular;
-
     user-select: none;
     // background:$color__lighter;
-
     top: 10px;
     left: 10px;
     right: 10px;

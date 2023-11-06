@@ -179,7 +179,7 @@ if (!function_exists('moduleRoute')) {
         ) {
             $routeName .= "{$snakeName}";
         }
-
+        // dd($snakeName, $parameters);
         if(preg_match('/edit|show|update|destroy/', $action) && !array_key_exists($snakeName, $parameters) && !$singleton){
             $parameters[$snakeName] = ":id";
             // dd(

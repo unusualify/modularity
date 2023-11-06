@@ -5,7 +5,8 @@
     ref="modalMedia"
 
     fullscreen
-    content-class="bg-primary"
+    content-class=""
+    width=""
 
     >
     <template v-slot:activator="{props}">
@@ -18,7 +19,7 @@
     <template
         v-slot:body="{props}"
         v-bind="props"
-        >
+    >
 
         <div class="medialibrary">
           <div class="medialibrary__frame">
@@ -101,9 +102,18 @@
 
             <div class="medialibrary__inner">
               <div class="medialibrary__grid">
-                <aside class="medialibrary__sidebar">
-                  Side
-                </aside>
+              <aside class="medialibrary__sidebar">
+                <a17-mediasidebar :medias="selectedMedias"
+                  :authorized="authorized"  
+                  :extraMetadatas="extraMetadatas"
+                  @clear="clearSelectedMedias" 
+                  @delete="deleteSelectedMedias" 
+                  @tagUpdated="reloadTags"
+                  :type="currentTypeObject" 
+                  :translatableMetadatas="translatableMetadatas" 
+                  @triggerMediaReplace="replaceMedia"
+                  />
+              </aside>
                 <footer class="medialibrary__footer" v-if="selectedMedias.length && showInsert && connector">
                   <!-- <a17-button v-if="canInsert" variant="action" @click="saveAndClose">{{ btnLabel }}</a17-button>
                   <a17-button v-else variant="action" :disabled="true">{{ btnLabel }}</a17-button> -->
@@ -128,6 +138,16 @@
                     @clear="clearSelectedMedias"
                     :type="currentTypeObject"
                     />
+                    <!-- TEST START -->
+                      <div class="medialibrary__list-items">
+                        <a17-itemlist v-if="type === 'file'" :items="renderedMediaItems" :selected-items="selectedMedias"
+                                      :used-items="usedMedias" @change="updateSelectedMedias"
+                                      @shiftChange="updateSelectedMedias"/>
+                        <a17-mediagrid v-else :items="renderedMediaItems" :selected-items="selectedMedias" :used-items="usedMedias"
+                                      @change="updateSelectedMedias" @shiftChange="updateSelectedMedias"/>
+                        <a17-spinner v-if="loading" class="medialibrary__spinner">Loading&hellip;</a17-spinner>
+                      </div>
+                    <!-- TEST END -->
                 </div>
               </div>
             </div>
@@ -138,13 +158,14 @@
 </template>
 
 <script>
+
 import { getCurrentInstance } from 'vue'
 import { mapState } from 'vuex'
 import { MEDIA_LIBRARY } from '@/store/mutations'
 
 import api from '../../store/api/media-library'
 
-import ACTIONS from '@/store/actions'
+import ACTIONS from '../../store/actions'
 
 import UEModal from './Modal.vue'
 
@@ -154,10 +175,24 @@ import FormDataAsObj from '@/utils/formDataAsObj.js'
 
 import { ModalMixin } from '@/mixins'
 
+// TEST START
+
+import a17MediaGrid from './../../a17/media-library/MediaGrid.vue'
+import a17ItemList from './../../a17/ItemList_.vue'
+import a17Spinner from './../../a17/Spinner_.vue'
+import a17MediaSidebar from './../../a17/media-library/MediaSidebar.vue'
+// import a17Checkbox from '@/components/Checkbox.vue'
+
+// TEST END
 export default {
   mixins: [ModalMixin],
   components: {
-    'ue-modal': UEModal
+    'ue-modal': UEModal,
+    'a17-mediagrid': a17MediaGrid,
+    'a17-itemlist': a17ItemList,
+    'a17-mediasidebar' : a17MediaSidebar,
+    'a17-spinner': a17Spinner,
+    // 'a17-checkbox': a17Checkbox
   },
   setup (props, { attrs, slots, emit }) {
     // __log(props, attrs, slots, emit)
@@ -311,7 +346,25 @@ export default {
     }
   },
   methods: {
-
+      deleteSelectedMedias: function (mediasIds) {
+      let keepSelectedMedias = []
+      if (mediasIds && mediasIds.length !== this.selectedMedias.length) {
+        keepSelectedMedias = this.selectedMedias.filter((media) => !media.deleteUrl)
+      }
+      mediasIds.forEach(() => {
+        this.$store.commit(MEDIA_LIBRARY.DECREMENT_MEDIA_TYPE_TOTAL, this.type)
+      })
+      this.mediaItems = this.mediaItems.filter((media) => {
+        return !this.selectedMedias.includes(media) || keepSelectedMedias.includes(media)
+      })
+      this.selectedMedias = keepSelectedMedias
+      if (this.mediaItems.length <= 40) {
+        this.reloadGrid()
+      }
+    },
+    replaceMedia: function ({ id }) {
+      this.$refs.uploader.replaceMedia(id)
+    },
     // for ue-uploader
     addMedia: function (media) {
       const index = this.mediaItems.findIndex(function (item) {
@@ -357,6 +410,31 @@ export default {
         this.$store.commit(MEDIA_LIBRARY.INCREMENT_MEDIA_TYPE_TOTAL, this.type)
         // select it
         this.updateSelectedMedias(media.id)
+      }
+    },
+    open: function () {
+      this.$refs.modal.open()
+
+    },
+    close: function () {
+      this.$refs.modal.hide()
+    },
+    opened: function () {
+      if (!this.gridLoaded){
+        this.reloadGrid()
+      }
+
+      // this.listenScrollPosition()
+
+      // empty selected medias (to avoid gs when adding)
+      this.selectedMedias = []
+
+      // in replace mode : select the media to replace when opening
+      if (this.connector && this.indexToReplace > -1) {
+        const mediaInitSelect = this.selected[this.connector][this.indexToReplace]
+        if (mediaInitSelect) {
+          this.selectedMedias.push(mediaInitSelect)
+        }
       }
     },
     updateSelectedMedias: function (item, shift = false) {
@@ -413,7 +491,6 @@ export default {
     clearSelectedMedias: function () {
       this.selectedMedias.splice(0)
     },
-
     // for ue-filter
     clearFilters: function () {
       const self = this
@@ -460,7 +537,6 @@ export default {
     },
     reloadGrid: function () {
       this.loading = true
-
       const form = this.$refs.form
       const formdata = this.getFormData(form)
 
@@ -483,7 +559,7 @@ export default {
         this.tags = resp.data.tags || []
         this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_TYPE_TOTAL, { type: this.type, total: resp.data.total })
         this.loading = false
-        this.listenScrollPosition()
+        // this.listenScrollPosition()
         this.gridLoaded = true
       }, (error) => {
         // this.$store.commit(NOTIFICATION.SET_NOTIF, {
@@ -514,12 +590,61 @@ export default {
       }
 
       return data
+    },
+    listenScrollPosition: function () {
+      // re-listen for scroll position
+      this.$nextTick(function () {
+        if (!this.gridLoaded) return
+
+        const list = this.$refs.list
+        if (this.gridHeight !== list.scrollHeight) {
+          list.addEventListener('scroll', this.scrollToPaginate)
+        }
+      })
+    },
+    scrollToPaginate: function () {
+      if (!this.gridLoaded) return
+
+      const list = this.$refs.list
+      const offset = 10
+
+      if (list.scrollTop > this.lastScrollTop && list.scrollTop + list.offsetHeight > list.scrollHeight - offset) {
+        list.removeEventListener('scroll', this.scrollToPaginate)
+
+        if (this.maxPage > this.page) {
+          this.page = this.page + 1
+          this.reloadGrid()
+        } else {
+          this.gridHeight = list.scrollHeight
+        }
+      }
+
+      this.lastScrollTop = list.scrollTop
+    },
+    saveAndClose: function () {      
+      this.$store.commit(MEDIA_LIBRARY.SAVE_MEDIAS, this.selectedMedias)
+      this.close()
     }
 
   },
 
   created () {
+    // __log(this.type)
+    if (!this.gridLoaded) {
+      this.reloadGrid()
+    }
 
+
+    // empty selected medias (to avoid gs when adding)
+    this.selectedMedias = []
+
+    // in replace mode : select the media to replace when opening
+    if (this.connector && this.indexToReplace > -1) {
+      const mediaInitSelect = this.selected[this.connector][this.indexToReplace]
+      if (mediaInitSelect) {
+        this.selectedMedias.push(mediaInitSelect)
+      }
+    }
   }
 }
 </script>
@@ -628,6 +753,7 @@ export default {
     bottom: 0;
     overflow: auto;
     padding: 10px;
+    background:$color__border--light;
   }
 
   .medialibrary__list-items {

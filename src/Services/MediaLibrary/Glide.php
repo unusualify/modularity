@@ -54,7 +54,7 @@ class Glide implements ImageServiceInterface
         $this->request = $request;
 
         $baseUrlHost = $this->config->get(
-            'twill.glide.base_url',
+            unusualBaseKey() . '.glide.base_url',
             $this->request->getScheme() . '://' . str_replace(
                 ['http://', 'https://'],
                 '',
@@ -96,7 +96,6 @@ class Glide implements ImageServiceInterface
         if ($this->config->get(unusualBaseKey() . '.glide.use_signed_urls')) {
             SignatureFactory::create($this->config->get(unusualBaseKey() . '.glide.sign_key'))->validateRequest($this->config->get(unusualBaseKey() . '.glide.base_path') . '/' . $path, $this->request->all());
         }
-
         return $this->server->getImageResponse($path, $this->request->all());
     }
 

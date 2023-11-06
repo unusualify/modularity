@@ -77,7 +77,7 @@ class Media extends Model
             'tags' => $this->tags->map(function ($tag) {
                 return $tag->name;
             }),
-            'deleteUrl' => $this->canDeleteSafely() ? moduleRoute('medias', 'media-library', 'destroy', $this->id) : null,
+            'deleteUrl' => $this->canDeleteSafely() ? moduleRoute('medias', 'media-library', 'destroy', [$this->id]) : null,
             'updateUrl' => route('media-library.medias.single-update'),
             'updateBulkUrl' => route('media-library.medias.bulk-update'),
             'deleteBulkUrl' => route('media-library.medias.bulk-delete'),

@@ -35,7 +35,8 @@
         "spatie/once": "^2.0|^3.0",
         "timokoerber/laravel-one-time-operations": "^1.0",
         "torann/geoip": "^3.0",
-        "tymon/jwt-auth": "^1.0|^2.0"
+        "tymon/jwt-auth": "^1.0|^2.0",
+        "league/glide-laravel" : "^1.0"
     },
     "require-dev": {
 

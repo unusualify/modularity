@@ -2,7 +2,7 @@
 
 namespace OoBook\CRM\Base\Http\Controllers;
 
-use OoBook\CRM\Base\Http\Requests\Admin\MediaRequest;
+use OoBook\CRM\Base\Http\Requests\MediaRequest;
 use OoBook\CRM\Base\Models\Media;
 use OoBook\CRM\Base\Services\Uploader\SignAzureUpload;
 use OoBook\CRM\Base\Services\Uploader\SignS3Upload;
@@ -103,8 +103,10 @@ class MediaLibraryController extends BaseController implements SignUploadListene
      */
     public function getIndexData($prependScope = [])
     {
+        
         $scopes = $this->filterScope($prependScope);
-        $items = $this->getIndexItems($scopes);
+        // dd($this->getIndexItems($scopes));
+        $items = $this->getIndexItems([],$scopes,false);
 
         return [
             'items' => $items->map(function ($item) {
@@ -148,7 +150,6 @@ class MediaLibraryController extends BaseController implements SignUploadListene
         } else {
             $media = $this->storeReference($request);
         }
-
         return $this->responseFactory->json(['media' => $media->toCmsArray(), 'success' => true], 200);
     }
 
@@ -162,7 +163,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
 
         $filename = sanitizeFilename($originalFilename);
 
-        dd($filename);
+        // dd($filename);
 
         $fileDirectory = $request->input('unique_folder_name');
 
@@ -188,7 +189,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
             'width' => $w,
             'height' => $h,
         ];
-
+        
         if ($this->shouldReplaceMedia($id = $request->input('media_to_replace_id'))) {
             $media = $this->repository->whereId($id)->first();
             $this->repository->afterDelete($media);
@@ -201,7 +202,6 @@ class MediaLibraryController extends BaseController implements SignUploadListene
 
     /**
      * @param Request $request
-     * @return Media
      */
     public function storeReference($request)
     {
@@ -341,5 +341,18 @@ class MediaLibraryController extends BaseController implements SignUploadListene
     private function shouldReplaceMedia($id)
     {
         return is_numeric($id) ? $this->repository->whereId($id)->exists() : false;
+    }
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function bulkDelete()
+    {
+        if ($this->repository->bulkDelete(explode(',', $this->request->get('ids')))) {
+            // $this->fireEvent();
+
+            return $this->respondWithSuccess(___('listing.bulk-delete.success', ['modelTitle' => $this->modelTitle]));
+        }
+
+        return $this->respondWithError(___('listing.bulk-delete.error', ['modelTitle' => $this->modelTitle]));
     }
 }

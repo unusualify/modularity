@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Redirect;
-use OoBook\CRM\Base\Entities\Company;
 
 class CompanyRegistrationMiddleware{
 
