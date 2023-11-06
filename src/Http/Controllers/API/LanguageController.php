@@ -5,6 +5,7 @@ namespace OoBook\CRM\Base\Http\Controllers\API;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Arr;
 
 class LanguageController extends Controller
 {
@@ -24,8 +25,23 @@ class LanguageController extends Controller
 
         $translations = $languages->map(function($lang){
             $translation = $this->translation->allTranslationsFor($lang);
+            $translations = [];
+            foreach ($translation as $name => $value) {
+                $original = $value->toArray();
 
-            return array_merge_recursive_preserve($translation['group']->toArray(), isset($translation['single']['single']) ?  $translation['single']['single']->toArray() : []);
+                foreach ($original as $key => $array) {
+                    $multidimensional = [];
+                    foreach ($array as $notation => $item) {
+                        Arr::set($multidimensional, $notation, $item);
+                    }
+                    $original[$key] = $multidimensional;
+                }
+
+                $translations[$name] = $original;
+            }
+
+
+            return array_merge_recursive_preserve($translations['group'], isset($translations['single']['single']) ?  $translations['single']['single'] : []);
             return trans()->get('*', [], $lang);
         });
         // dd(
@@ -45,7 +61,6 @@ class LanguageController extends Controller
         //     $groups = $this->translation->getGroupsFor(config('app.locale'))->merge('single'),
         //     $translations = $this->translation->filterTranslationsFor('tr', $request->get('filter'))
         // );
-
         return response()->json($translations);
         // dd(
         //     $languages,

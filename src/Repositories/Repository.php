@@ -95,11 +95,12 @@ abstract class Repository
         } catch (\Throwable $th) {
             //throw $th;
             dd(
-                $th,
-                $with,
-                $scopes,
-                $orders,
-                $perPage
+                debug_backtrace()
+                // $th,
+                // $with,
+                // $scopes,
+                // $orders,
+                // $perPage
             );
         }
 

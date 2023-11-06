@@ -19,8 +19,8 @@ class UnusualProvider extends ServiceProvider
         \Camroncade\Timezone\TimezoneServiceProvider::class,
 
         // Unusual Providers
-        BaseServiceProvider::class,
         ConfigServiceProvider::class,
+        BaseServiceProvider::class,
         ResourceServiceProvider::class,
         RouteServiceProvider::class,
         AuthServiceProvider::class,

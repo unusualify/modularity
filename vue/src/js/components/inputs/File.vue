@@ -31,14 +31,14 @@
       </div>
       <table class="fileField__list" v-if="items.length">
         <draggable :tag="'tbody'" v-model="items">
-          <ue-fileitem v-for="(item, index) in items"
+          <FileItem v-for="(item, index) in items"
             :key="item.id"
             class="item__content"
             :name="`${name}_${item.id}`"
             :draggable="isDraggable"
             :item="item"
             @delete="deleteItem(index)">
-          </ue-fileitem>
+          </FileItem>
         </draggable>
       </table>
       <div class="fileField__trigger" v-if="!buttonOnTop && remainingItems">
@@ -53,7 +53,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import { MEDIA_LIBRARY } from '@/store/mutations'
-import fileItem from '@/components/files/FileItem.vue'
+import FileItem from '@/components/files/FileItem.vue'
 // import draggableMixin from '@/mixins/draggable'
 // import mediaLibraryMixin from '@/mixins/mediaLibrary/mediaLibrary'
 import localeMixin from '@/mixins/locale'
@@ -63,7 +63,7 @@ import draggable from 'vuedraggable'
 export default {
   name: 'UeFileField',
   components: {
-    'ue-fileitem': fileItem,
+    FileItem,
     draggable
   },
   mixins: [
@@ -73,7 +73,7 @@ export default {
     // inputframeMixin
   ],
   props: {
-    type: {
+    mediaType: {
       type: String,
       default: 'file'
     },
@@ -172,15 +172,15 @@ export default {
     },
     openMediaLibrary: function (max = 1, name = this.name, index = -1) {
       this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_CONNECTOR, name)
-      this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_TYPE, this.type)
+      this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_TYPE, this.mediaType)
       this.$store.commit(MEDIA_LIBRARY.UPDATE_REPLACE_INDEX, index)
       this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_MAX, max)
       this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_MODE, true)
       this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_FILESIZE_MAX, this.filesizeMax || 0)
       this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_WIDTH_MIN, this.widthMin || 0)
       this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_HEIGHT_MIN, this.heightMin || 0)
-      if (this.$root.$refs.main && this.$root.$refs.main.$refs.fileLibrary) {
-        this.$root.$refs.main.$refs.fileLibrary.openModal()
+      if (this.$root.$refs.main && this.$root.$refs.main.$refs.mediaLibrary) {
+        this.$root.$refs.main.$refs.mediaLibrary.openModal()
       }
     }
   }

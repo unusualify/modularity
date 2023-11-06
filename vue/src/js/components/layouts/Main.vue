@@ -98,10 +98,31 @@
         v-model="showMediaLibrary"
         ref="mediaLibrary"
       ></ue-modal-media>
-      <ue-modal-file
-        v-model="showFileLibrary"
-        ref="fileLibrary"
-      ></ue-modal-file>
+      <ue-modal
+        ref="deleteWarningMediaModal"
+        v-model="showDeleteWarning"
+        transition="dialog-bottom-transition"
+        width-type="sm"
+        :confirm-text="$t('media-library.dialogs.delete.delete-media-confirm')"
+        :cancel-text="`Cancel`"
+        >
+        <template v-slot:body.description>
+          <p class="modal--tiny-title"><strong>{{ $t("media-library.dialogs.delete.delete-media-title") }}</strong></p>
+          <p v-html="$t('media-library.dialogs.delete.delete-media-desc')"></p>
+        </template>
+      </ue-modal>
+
+      <!-- <a17-dialog
+        ref="deleteWarningMediaLibrary"
+        modal-title="{{ twillTrans("twill::lang.media-library.dialogs.delete.delete-media-title") }}"
+        confirm-label="{{ twillTrans("twill::lang.media-library.dialogs.delete.delete-media-confirm") }}">
+          <p class="modal--tiny-title"><strong>{{ twillTrans("twill::lang.media-library.dialogs.delete.delete-media-title") }}</strong></p>
+          <p>{!! twillTrans("twill::lang.media-library.dialogs.delete.delete-media-desc") !!}</p>
+      </a17-dialog>
+      <a17-dialog ref="replaceWarningMediaLibrary" modal-title="{{ twillTrans("twill::lang.media-library.dialogs.replace.replace-media-title") }}" confirm-label="{{ twillTrans("twill::lang.media-library.dialogs.replace.replace-media-confirm") }}">
+          <p class="modal--tiny-title"><strong>{{ twillTrans("twill::lang.media-library.dialogs.replace.replace-media-title") }}</strong></p>
+          <p>{!! twillTrans("twill::lang.media-library.dialogs.replace.replace-media-desc") !!}</p>
+      </a17-dialog> -->
 
       <ue-alert ref='alert'></ue-alert>
 
@@ -290,7 +311,7 @@ export default {
       ],
 
       showMediaLibrary: false,
-      showFileLibrary: false,
+      showDeleteWarning: false,
       showImpersonateToolbar: false
     }
   },

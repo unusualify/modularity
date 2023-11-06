@@ -18,7 +18,7 @@ return [
     | - 'OoBook\CRM\Base\Services\MediaLibrary\Local'
     |
      */
-    'disk' => 'unusual_media_library',
+    'disk' => unusualBaseKey() . '_media_library',
     'endpoint_type' => env('MEDIA_LIBRARY_ENDPOINT_TYPE', 'local'),
     'cascade_delete' => env('MEDIA_LIBRARY_CASCADE_DELETE', false),
     'local_path' => env('MEDIA_LIBRARY_LOCAL_PATH', 'uploads'),

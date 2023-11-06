@@ -2,7 +2,7 @@
 
 namespace OoBook\CRM\Base\Http\Controllers;
 
-use OoBook\CRM\Base\Http\Requests\Admin\FileRequest;
+use OoBook\CRM\Base\Http\Requests\FileRequest;
 use OoBook\CRM\Base\Services\Uploader\SignAzureUpload;
 use OoBook\CRM\Base\Services\Uploader\SignS3Upload;
 use OoBook\CRM\Base\Services\Uploader\SignUploadListener;
@@ -20,6 +20,11 @@ class FileLibraryController extends BaseController implements SignUploadListener
      * @var string
      */
     protected $moduleName = 'files';
+
+    /**
+     * @var string
+     */
+    protected $routePrefix = 'file-library';
 
     /**
      * @var string
@@ -80,8 +85,8 @@ class FileLibraryController extends BaseController implements SignUploadListener
         $this->responseFactory = $responseFactory;
         $this->config = $config;
 
-        $this->removeMiddleware('can:edit');
-        $this->middleware('can:edit', ['only' => ['signS3Upload', 'signAzureUpload', 'tags', 'store', 'singleUpdate', 'bulkUpdate']]);
+        // $this->removeMiddleware('can:edit');
+        // $this->middleware('can:edit', ['only' => ['signS3Upload', 'signAzureUpload', 'tags', 'store', 'singleUpdate', 'bulkUpdate']]);
         $this->endpointType = $this->config->get(unusualBaseKey() . '.file_library.endpoint_type');
     }
 
@@ -105,7 +110,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
     public function getIndexData($prependScope = [])
     {
         $scopes = $this->filterScope($prependScope);
-        $items = $this->getIndexItems($scopes);
+        $items = $this->getIndexItems(scopes: $scopes);
 
         return [
             'items' => $items->map(function ($item) {
@@ -127,7 +132,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
             'tags' => $item->tags->map(function ($tag) {
                 return $tag->name;
             }),
-            'deleteUrl' => $item->canDeleteSafely() ? moduleRoute($this->moduleName, $this->routePrefix, 'destroy', $item->id) : null,
+            'deleteUrl' => $item->canDeleteSafely() ? moduleRoute($this->moduleName, $this->routePrefix, 'destroy', [$item->id]) : null,
             'updateUrl' => $this->urlGenerator->route('file-library.files.single-update'),
             'updateBulkUrl' => $this->urlGenerator->route('file-library.files.bulk-update'),
             'deleteBulkUrl' => $this->urlGenerator->route('file-library.files.bulk-delete'),

@@ -23,6 +23,17 @@ class BaseServiceProvider extends ServiceProvider
     public function boot()
     {
 
+        if (config($this->baseKey . '.enabled.media-library')) {
+            $this->app->singleton('imageService', function () {
+                return $this->app->make(config($this->baseKey . '.media_library.image_service'));
+            });
+        }
+
+        if (config($this->baseKey . '.enabled.file-library')) {
+            $this->app->singleton('fileService', function () {
+                return $this->app->make(config($this->baseKey . '.file_library.file_service'));
+            });
+        }
     }
 
     /**
@@ -54,19 +65,6 @@ class BaseServiceProvider extends ServiceProvider
         // $this->app->singleton('unusual.ge', function ($app) {
         //     return new FileActivator($app);
         // });
-
-
-        if (config($this->baseKey . '.enabled.media-library')) {
-            $this->app->singleton('imageService', function () {
-                return $this->app->make(config($this->baseKey . '.media_library.image_service'));
-            });
-        }
-
-        if (config($this->baseKey . '.enabled.file-library')) {
-            $this->app->singleton('fileService', function () {
-                return $this->app->make(config($this->baseKey . '.file_library.file_service'));
-            });
-        }
 
         $this->app->singleton('unusual.navigation', UNavigation::class);
         // $this->app->alias(\OoBook\CRM\Base\Contracts\RepositoryInterface::class, 'ue_modules');

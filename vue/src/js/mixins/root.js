@@ -64,10 +64,10 @@ export default {
       return this[functionName](...val)
     },
     handleVmFunctionCall (functionName, ...val) {
-      __log(
-        functionName,
-        this
-      )
+      // __log(
+      //   functionName,
+      //   this
+      // )
       return this[functionName](...val)
       // return window.vm[functionName](...val)
     }

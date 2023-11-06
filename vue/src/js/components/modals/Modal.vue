@@ -52,6 +52,7 @@
         v-bind="{
             textCancel: this.textCancel,
             textConfirm: this.textConfirm,
+            textDescription: this.textDescription,
 
             onOpen: this.open,
             onClose: this.close,
@@ -59,6 +60,25 @@
         }"
         :closeDialog="close"
         >
+        <v-card >
+          <v-card-title class="text-h5 text-center" style="word-break: break-word;">
+            <!-- {{ textDescription }} -->
+          </v-card-title>
+          <v-card-text class="text-center" style="word-break: break-word;" >
+            <slot name="body.description" v-bind="{textDescription}">
+              {{ textDescription }}
+            </slot>
+          </v-card-text>
+          <v-divider/>
+          <v-card-actions>
+            <v-spacer/>
+            <slot name="body.options" v-bind="{textDescription}">
+              <v-btn ref="modalCancel" class="modal-cancel" color="red" text @click="cancel()"> {{ textCancel }}</v-btn>
+              <v-btn ref="modalConfirm" class="modal-confirm" color="green" text @click="confirm()"> {{ textConfirm }}</v-btn>
+            </slot>
+            <v-spacer/>
+          </v-card-actions>
+        </v-card>
     </slot>
   </v-dialog>
 </template>
@@ -68,7 +88,10 @@ import htmlClasses from '@/utils/htmlClasses'
 import { makeModalProps, useModal } from '@/hooks'
 
 export default {
-  emits: ['update:modelValue'],
+  emits: [
+    'update:modelValue',
+    'opened'
+  ],
   props: {
     ...makeModalProps()
   },
@@ -77,65 +100,22 @@ export default {
       ...useModal(props, context)
     }
   },
-  // data () {
-  //   return {
-  //     // dialog: this.value,
-  //     widths: {
-  //       sm: '300px',
-  //       md: '500px',
-  //       lg: '750px'
-  //     },
-  //     width: this.widthType,
-
-  //     modalClass: htmlClasses.modal,
-
-  //     full: this.fullscreen
-  //   }
-  // },
-
   computed: {
-    // dialog: {
-    //   get () {
-    //     return this.modelValue
-    //   },
-    //   set (value) {
-    //     this.$emit('update:modelValue', value)
-    //   }
-    // },
-    // full: {
-    //     get () {
-    //         return this.fullscreen
-    //         return this.fullScreen
-    //     },
-    //     set (value) {
-    //         // this.$emit('screenListener', this.full)
-    //     }
-    // },
-
-    // togglePersistent () {
-    //   return this.persistent
-    // },
-
-    // toggleScrollable () {
-    //   return this.scrollable
-    // },
-    // modalWidth () {
-    //   return this.width ? this.widths[this.width] : null
-    // },
-
     textCancel () {
       return this.cancelText !== '' ? this.cancelText : this.$t('cancel')
     },
     textConfirm () {
       return this.confirmText !== '' ? this.confirmText : this.$t('confirm')
+    },
+    textDescription () {
+      return this.descriptionText
     }
   },
 
   watch: {
-    // dialog (value, oldVal) {
-    //   __log('modal vue watcher dialog', value, oldVal)
-    //   this.$emit('update:modelValue', value)
-    // }
+    dialog (value) {
+      !value || this.emitOpened()
+    }
   },
 
   methods: {
@@ -143,23 +123,44 @@ export default {
       this.dialog = !this.dialog
     },
     close (callback = null) {
-      __log('model.vue close()', callback)
       if (callback) {
         callback()
       }
       this.dialog = false
     },
-    open (callback = null) {
+    open (callback = null, nextCallback = null) {
       if (callback) {
         callback()
       }
+
       this.dialog = true
+      if (nextCallback) {
+        const _this = this
+        this.$nextTick().then(() => {
+          _this.$refs.modalConfirm.$el.addEventListener('click', (e) => {
+            nextCallback()
+            _this.close()
+          })
+
+          _this.$refs.modalCancel.$el.addEventListener('click', (e) => {
+            _this.close()
+          })
+        })
+      }
     },
     confirm (callback = null) {
       if (callback) {
         callback()
       }
       this.dialog = false
+      this.$emit('confirm')
+    },
+    cancel (callback = null) {
+      if (callback) {
+        callback()
+      }
+      this.dialog = false
+      this.$emit('cancel')
     },
     // attrs (attrs) {
     //   return attrs

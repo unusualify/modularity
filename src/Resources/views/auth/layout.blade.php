@@ -78,6 +78,10 @@
                 window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
                 window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {!! json_encode($formStore ?? new StdClass()) !!}
             @stop
+
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.browser = {
+                selected: {}
+            }
             @yield('STORE')
         </script>
 

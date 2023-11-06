@@ -50,12 +50,12 @@ class ConfigServiceProvider extends ServiceProvider
 
         $this->mergeConfigFrom(__DIR__ . '/../Config/system_modules.php', $this->baseKey . '.system_modules');
         $this->mergeConfigFrom(__DIR__ . '/../Config/input_drafts.php', $this->baseKey . '.input_drafts');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/media_library.php', $this->baseKey . '.media_library');
         $this->mergeConfigFrom(__DIR__ . '/../Config/file_library.php', $this->baseKey . '.file_library');
-        $this->mergeConfigFrom(__DIR__ . '/../Config/media-library.php', $this->baseKey . '.media_library');
-        $this->mergeConfigFrom(__DIR__ . '/../Config/file-library.php', $this->baseKey . '.file_library');
         $this->mergeConfigFrom(__DIR__ . '/../Config/imgix.php', $this->baseKey . '.imgix');
         $this->mergeConfigFrom(__DIR__ . '/../Config/glide.php', $this->baseKey . '.glide');
-        $this->mergeConfigFrom(__DIR__ . '/../Config/disks.php', $this->baseKey . '.disks');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/disks.php', 'filesystems.disks');
+
 
         if (config($this->baseKey . '.enabled.users-management')) {
             config(['auth.providers.unusual_users' => [

@@ -1,4 +1,5 @@
 <template>
+  <div>
     <form class="filter" :class="{ 'filter--opened' : opened, 'filter--single' : !withNavigation, 'filter--withHiddenFilters' : withHiddenFilters }" @submit.prevent="submitFilter" ref="form">
       <div class="filter__inner">
         <div class="filter__navigation"><slot name="navigation"></slot></div>
@@ -41,6 +42,9 @@
         </div>
       </transition>
     </form>
+    <slot></slot>
+
+  </div>
   </template>
 
 <script>

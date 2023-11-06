@@ -2,8 +2,8 @@
 
 namespace OoBook\CRM\Base\Entities;
 
-use FileService;
 use Illuminate\Support\Facades\DB;
+use OoBook\CRM\Base\Services\FileLibrary\FileService;
 
 class File extends Model
 {

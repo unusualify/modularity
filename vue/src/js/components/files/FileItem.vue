@@ -7,14 +7,22 @@
       <a href="#" target="_blank"><span v-svg :symbol="getSvgIconName()"></span></a>
     </td>
     <td class="fileItem__cell fileItem__cell--name">
-      <span v-if="currentItem.hasOwnProperty('thumbnail')"><img :src="currentItem.thumbnail"/></span>
-      <a :href="currentItem.hasOwnProperty('original') ? currentItem.original : '#'" download><span class="f--link-underlined--o">{{ currentItem.name }}</span></a>
+      <span v-if="currentItem.hasOwnProperty('thumbnail')">
+        <img :src="currentItem.thumbnail"/>
+      </span>
+      <a :href="currentItem.hasOwnProperty('original') ? currentItem.original : '#'" download>
+        <span class="f--link-underlined--o">
+          {{ currentItem.name }}
+        </span>
+      </a>
       <input type="hidden" :name="name" :value="currentItem.id"/>
     </td>
     <td class=" fileItem__cell fileItem__cell--size" v-if="currentItem.hasOwnProperty('size')">{{ currentItem.size }}</td>
     <td class="fileItem__cell">
-      <a17-button class="bucket__action" icon="close" @click="deleteItem()"><span v-svg symbol="close_icon"></span>
-      </a17-button>
+      <v-btn icon="$close" @click="deleteItem"></v-btn>
+      <!-- <a17-button class="bucket__action" icon="close" @click="deleteItem()">
+        <span v-svg symbol="close_icon"></span>
+      </a17-button> -->
     </td>
   </tr>
 </template>

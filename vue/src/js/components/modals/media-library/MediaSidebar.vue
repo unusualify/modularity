@@ -1,6 +1,6 @@
 <template>
   <div class="mediasidebar">
-    <a17-mediasidebar-upload v-if="mediasLoading.length" />
+    <ue-mediasidebar-upload v-if="mediasLoading.length" />
     <template v-else>
       <div class="mediasidebar__inner" :class="containerClasses">
         <p v-if="!hasMedia" class="f--note">{{ $trans('media-library.sidebar.empty-text', 'No file selected') }}</p>
@@ -12,15 +12,20 @@
         <template v-if="hasSingleMedia">
           <img v-if="isImage" :src="firstMedia.thumbnail" class="mediasidebar__img" :alt="firstMedia.original" />
           <p class="mediasidebar__name">{{ firstMedia.name }}</p>
-          <ul class="mediasidebar__metadatas">
-            <li class="f--small" v-if="firstMedia.size">File size: {{ firstMedia.size | uppercase }}</li>
-            <li class="f--small" v-if="isImage && (firstMedia.width + firstMedia.height)">
-              {{ $trans('media-library.sidebar.dimensions', 'Dimensions') }}: {{ firstMedia.width }} &times; {{
+          <v-list density="compact" class="bg-transparent">
+            <v-list-item v-if="firstMedia.size" color="primary" variant="tonal">
+              <!-- <template v-slot:prepend><v-icon icon="mdi-folder"/></template> -->
+              <v-list-item-title>File size: {{ firstMedia.size | uppercase }}</v-list-item-title>
+            </v-list-item>
+            <v-list-item v-if="isImage && (firstMedia.width + firstMedia.height)" color="primary" variant="tonal">
+              <!-- <template v-slot:prepend><v-icon icon="mdi-relative-scale"/></template> -->
+              <v-list-item-title>{{ $t('media-library.sidebar.dimensions', 'Dimensions') }}: {{ firstMedia.width }} &times; {{
                 firstMedia.height }}
-            </li>
-          </ul>
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
         </template>
-        <v-row v-if="hasMedia" align="center" justify="space-around" >
+        <v-row v-if="hasMedia" align="center" justify="space-around" class="mt-theme">
           <v-btn v-if="hasSingleMedia" :href="firstMedia.original" download icon="mdi-download" size="small"/>
           <v-btn v-if="allowDelete && authorized" icon="$trash" size="small" type="button" @click="deleteSelectedMediasValidation" />
           <v-btn v-else icon="$trash" disabled size="small" type="button" />
@@ -35,27 +40,45 @@
           :selected="hasMultipleMedias ? sharedTags : firstMedia.tags" :searchable="true"
           :emptyText="$trans('media-library.no-tags-found', 'Sorry, no tags found.')" :taggable="true" :pushTags="true"
           size="small" :endpoint="type.tagsEndpoint" @change="save" maxHeight="175px" /> -->
-        <span
+        <v-tooltip
+          v-if="extraMetadatas.length && isImage && hasMultipleMedias && !fieldsRemovedFromBulkEditing.includes('tags')"
+          text="Remove this field if you do not want to update it on all selected medias"
+          location="top"
+          >
+          <template v-slot:activator="{ props }" >
+            <span
+              v-bind="props"
+              class="f--tiny f--note f--underlined" @click="removeFieldFromBulkEditing('tags')"
+              >
+              Remove from bulk edit
+            </span>
+          </template>
+        </v-tooltip>
+        <!-- <span
           v-if="extraMetadatas.length && isImage && hasMultipleMedias && !fieldsRemovedFromBulkEditing.includes('tags')"
           class="f--tiny f--note f--underlined" @click="removeFieldFromBulkEditing('tags')"
           data-tooltip-title="Remove this field if you do not want to update it on all selected medias"
-          data-tooltip-theme="default" data-tooltip-placement="top" v-tooltip>Remove from bulk edit</span>
+          data-tooltip-theme="default" data-tooltip-placement="top" v-tooltip>Remove from bulk edit
+        </span> -->
+
         <template v-if="hasMultipleMedias">
           <input type="hidden" name="ids" :value="mediasIds" />
         </template>
         <template v-else>
           <input type="hidden" name="id" :value="firstMedia.id" />
-          <div class="mediasidebar__langswitcher" v-if="translatableMetadatas.length > 0">
+          <!-- <div class="mediasidebar__langswitcher" v-if="translatableMetadatas.length > 0">
             <a17-langswitcher :in-modal="true" :all-published="true" />
-          </div>
+          </div> -->
 
-          <a17-locale type="a17-textfield" v-if="isImage && translatableMetadatas.includes('alt_text')"
+          <!-- <a17-locale type="a17-textfield" v-if="isImage && translatableMetadatas.includes('alt_text')"
             :attributes="{ label: $trans('media-library.sidebar.alt-text', 'Alt text'), name: 'alt_text', type: 'text', size: 'small' }"
-            :initialValues="altValues" @focus="focus" @blur="blur"></a17-locale>
+            :initialValues="altValues" @focus="focus" @blur="blur">
+          </a17-locale>
           <a17-textfield v-else-if="isImage" :label="$trans('media-library.sidebar.alt-text', 'Alt text')" name="alt_text"
-            :initialValue="firstMedia.metadatas.default.altText" size="small" @focus="focus" @blur="blur" />
+            :initialValue="firstMedia.metadatas.default.altText" size="small" @focus="focus" @blur="blur"
+            /> -->
 
-          <template v-if="useWysiwyg">
+          <!-- <template v-if="useWysiwyg">
             <a17-locale type="a17-wysiwyg" v-if="isImage && translatableMetadatas.includes('caption')"
               :attributes="{ options: wysiwygOptions, label: $trans('media-library.sidebar.caption', 'Caption'), name: 'caption', size: 'small' }"
               :initialValues="captionValues" @focus="focus" @blur="blur"></a17-locale>
@@ -70,9 +93,9 @@
             <a17-textfield v-else-if="isImage" type="textarea" :rows="1" size="small"
               :label="$trans('media-library.sidebar.caption', 'Caption')" name="caption"
               :initialValue="firstMedia.metadatas.default.caption" @focus="focus" @blur="blur" />
-          </template>
+          </template> -->
 
-          <template v-for="field in singleOnlyMetadatas">
+          <!-- <template v-for="field in singleOnlyMetadatas">
             <a17-locale type="a17-textfield" v-bind:key="field.name"
               v-if="isImage && (field.type === 'text' || !field.type) && translatableMetadatas.includes(field.name)"
               :attributes="{ label: field.label, name: field.name, type: 'textarea', rows: 1, size: 'small' }"
@@ -85,9 +108,9 @@
               <a17-checkbox :label="field.label" :name="field.name"
                 :initialValue="firstMedia.metadatas.default[field.name]" :value="1" @change="blur" />
             </div>
-          </template>
+          </template> -->
         </template>
-        <template v-for="field in singleAndMultipleMetadatas">
+        <!-- <template v-for="field in singleAndMultipleMetadatas">
           <a17-locale type="a17-textfield" v-bind:key="field.name"
             v-if="isImage && (field.type === 'text' || !field.type) && ((hasMultipleMedias && !fieldsRemovedFromBulkEditing.includes(field.name)) || hasSingleMedia) && translatableMetadatas.includes(field.name)"
             :attributes="{ label: field.label, name: field.name, type: 'textarea', rows: 1, size: 'small' }"
@@ -106,37 +129,42 @@
             v-bind:key="field.name"
             data-tooltip-title="Remove this field if you do not want to update it on all selected medias"
             data-tooltip-theme="default" data-tooltip-placement="top" v-tooltip>Remove from bulk edit</span>
-        </template>
+        </template> -->
       </form>
     </template>
-    <ue-modal class="modal--tiny modal--form modal--withintro" ref="warningDelete" title="Warning Delete">
-      <p class="modal--tiny-title"><strong>{{ $trans('media-library.dialogs.delete.title', 'Are you sure ?') }}</strong>
-      </p>
-      <p>{{ warningDeleteMessage }}</p>
-      <a17-inputframe>
-        <a17-button variant="validate" @click="deleteSelectedMedias">Delete ({{ mediasIdsToDelete.length }})
-        </a17-button>
-        <a17-button variant="aslink" @click="$refs.warningDelete.close()"><span>Cancel</span></a17-button>
-      </a17-inputframe>
+    <ue-modal
+      ref="warningDelete"
+      transition="dialog-bottom-transition"
+      v-model="deleteModalActive"
+      width-type="sm"
+      :confirm-text="`Delete ( ${mediasIdsToDelete.length} )`"
+      :cancel-text="`Cancel`"
+      >
+      <template v-slot:body.description>
+        <p class="modal--tiny-title">
+          <strong>{{ $trans('media-library.dialogs.delete.title', 'Are you sure ?') }}</strong>
+        </p>
+        <p> {{ warningDeleteMessage }} </p>
+      </template>
     </ue-modal>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-import api from '../../store/api/media-library'
+import api from '@/store/api/media-library'
 // import { NOTIFICATION } from '@/store/mutations'
 import isEqual from 'lodash/isEqual'
-import FormDataAsObj from './../../utils/formDataAsObj.js'
-import a17VueFilters from './../../utils/filters.js'
-import a17MediaSidebarUpload from './MediaSidebarUpload.vue'
-import { ALERT } from './../../store/mutations'
+import FormDataAsObj from '@/utils/formDataAsObj.js'
+import a17VueFilters from '@/utils/filters.js'
+import UeMediaSidebarUpload from './MediaSidebarUpload.vue'
+import { ALERT } from '@/store/mutations'
 // import a17Langswitcher from '@/components/LangSwitcher'
 
 export default {
   name: 'A17MediaSidebar',
   components: {
-    'a17-mediasidebar-upload': a17MediaSidebarUpload
+    'ue-mediasidebar-upload': UeMediaSidebarUpload
     // 'a17-langswitcher': a17Langswitcher
   },
   props: {
@@ -169,7 +197,9 @@ export default {
       loading: false,
       focused: false,
       previousSavedData: {},
-      fieldsRemovedFromBulkEditing: []
+      fieldsRemovedFromBulkEditing: [],
+
+      deleteModalActive: false
     }
   },
   filters: a17VueFilters,
@@ -292,8 +322,8 @@ export default {
       }
 
       // Open confirm dialog if any
-      if (this.$root.$refs.deleteWarningMediaLibrary) {
-        this.$root.$refs.deleteWarningMediaLibrary.open(() => {
+      if (this.$main().$refs.deleteWarningMediaModal) {
+        this.$main().$refs.deleteWarningMediaModal.open(null, () => {
           this.deleteSelectedMedias()
         })
       } else {

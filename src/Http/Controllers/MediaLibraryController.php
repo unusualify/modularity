@@ -103,7 +103,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
      */
     public function getIndexData($prependScope = [])
     {
-        
+
         $scopes = $this->filterScope($prependScope);
         // dd($this->getIndexItems($scopes));
         $items = $this->getIndexItems([],$scopes,false);
@@ -181,7 +181,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
 
         list($w, $h) = getimagesize($uploadedFile->path());
 
-        $uploadedFile->storeAs($fileDirectory, $filename, $disk);
+        $uploadedFile->storeAs($fileDirectory, $filename, ['disk' => $disk]);
 
         $fields = [
             'uuid' => $uuid,
@@ -189,7 +189,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
             'width' => $w,
             'height' => $h,
         ];
-        
+
         if ($this->shouldReplaceMedia($id = $request->input('media_to_replace_id'))) {
             $media = $this->repository->whereId($id)->first();
             $this->repository->afterDelete($media);

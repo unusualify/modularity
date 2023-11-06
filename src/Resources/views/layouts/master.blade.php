@@ -86,7 +86,7 @@
             @if (config(unusualBaseKey() . '.enabled.media-library'))
                 window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types.push({
                     value: 'image',
-                    text: '{{ unusualTrans("{$BASE_KEY}::lang.media-library.images") }}',
+                    text: '{{ unusualTrans("media-library.images") }}',
                     total: {{ \OoBook\CRM\Base\Entities\Media::count() }},
                     endpoint: '{{ route('media-library.medias.index') }}',
                     tagsEndpoint: '{{ route('media-library.medias.tags') }}',
@@ -98,7 +98,7 @@
             @if (config(unusualBaseKey() . '.enabled.file-library'))
                 window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types.push({
                     value: 'file',
-                    text: '{{ unusualTrans("{$BASE_KEY}::lang.media-library.files") }}',
+                    text: '{{ unusualTrans("media-library.files") }}',
                     total: {{ \OoBook\CRM\Base\Entities\File::count() }},
                     endpoint: '{{ route('file-library.files.index') }}',
                     tagsEndpoint: '{{ route('file-library.files.tags') }}',
@@ -115,8 +115,9 @@
             window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.browser = {
                 selected: {}
             }
-
-
+            // console.log(
+            //     window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types
+            // )
             @yield('STORE')
         </script>
 

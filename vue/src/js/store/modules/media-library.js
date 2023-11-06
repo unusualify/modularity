@@ -25,6 +25,7 @@ const state = {
    * @type {Array.<string>}
    */
   types: window[process.env.VUE_APP_NAME].STORE.medias.types || [],
+
   /**
    * Current type of media library
    * @type {string}

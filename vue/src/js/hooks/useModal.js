@@ -42,6 +42,10 @@ export const makeModalProps = propsFactory({
   confirmText: {
     type: String,
     default: ''
+  },
+  descriptionText: {
+    type: String,
+    default: ''
   }
 })
 
@@ -58,6 +62,7 @@ export default function useModal (props, context) {
         return modelValue.value
       },
       set: (value, old) => {
+        __log('modalOpened setter')
         methods.emitModelValue(value)
       }
     }),
@@ -69,6 +74,9 @@ export default function useModal (props, context) {
   const methods = reactive({
     emitModelValue: function (val) {
       context.emit('update:modelValue', val)
+    },
+    emitOpened: function (val) {
+      context.emit('opened', val)
     },
     clickOutside: function (event) {
       context.emit('click:outside', event)

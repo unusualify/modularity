@@ -3,156 +3,120 @@
     v-model="show"
     id="modalMedia"
     ref="modalMedia"
-
     fullscreen
     content-class=""
     width=""
-
+    @opened="opened"
     >
     <template v-slot:activator="{props}">
-      <slot
-          name="activator"
-          :props="{...props}"
-          >
-      </slot>
+      <slot name="activator" :props="{...props}"></slot>
     </template>
-    <template
-        v-slot:body="{props}"
-        v-bind="props"
-    >
+    <template v-slot:body="{props}" v-bind="props">
 
-        <div class="medialibrary">
-          <div class="medialibrary__frame">
+      <div class="medialibrary">
+        <div class="medialibrary__frame">
+          <v-toolbar
+            dark
+            color="primary"
+          >
+            <v-toolbar-title>{{ modalTitle }}</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-toolbar-items>
+              <v-btn
+                icon
+                dark
+                @click="closeModal"
+              >
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+            </v-toolbar-items>
+          </v-toolbar>
+          <div class="medialibrary__header" ref="form">
+            <ue-filter @submit="submitFilter" :clearOption="true" @clear="clearFilters">
+              <ul class="secondarynav secondarynav--desktop py" slot="navigation" v-if="types.length">
+                <v-chip
+                  v-for="navType in types"
+                  :key="navType.value"
+                  class="ma-2"
+                  @click.prevent="updateType(navType.value)"
+                  >
+                    {{  navType.text }}
+                    <span
+                      v-if="navType.total > 0" class="secondarynav__number"
+                      >
+                      ({{ navType.total }})
+                    </span>
+                </v-chip>
+              </ul>
 
-            <v-toolbar
-              dark
-              color="primary"
-            >
-              <v-toolbar-title>{{ modalTitle }}</v-toolbar-title>
-              <v-spacer></v-spacer>
-              <v-toolbar-items>
-                <v-btn
-                  icon
-                  dark
-                  @click="closeModal"
-                >
-                  <v-icon>mdi-close</v-icon>
-                </v-btn>
-              </v-toolbar-items>
-            </v-toolbar>
-            <div class="medialibrary__header" ref="form">
-              <ue-filter @submit="submitFilter" :clearOption="true" @clear="clearFilters">
-                <ul class="secondarynav secondarynav--desktop py" slot="navigation" v-if="types.length">
+              <!-- <div class="secondarynav secondarynav--mobile secondarynav--dropdown" slot="navigation">
+                <a17-dropdown ref="secondaryNavDropdown" position="bottom-left" width="full" :offset="0">
+                  <a17-button class="secondarynav__button" variant="dropdown-transparent" size="small"
+                              @click="$refs.secondaryNavDropdown.toggle()" v-if="selectedType">
+                    <span class="secondarynav__link">{{ selectedType.text }}</span><span class="secondarynav__number">{{ selectedType.total }}</span>
+                  </a17-button>
+                  <div slot="dropdown__content">
+                    <ul>
+                      <li v-for="navType in types" :key="navType.value" class="secondarynav__item">
+                        <a href="#" v-on:click.prevent="updateType(navType.value)"><span class="secondarynav__link">{{ navType.text }}</span><span
+                          class="secondarynav__number">{{ navType.total }}</span></a>
+                      </li>
+                    </ul>
+                  </div>
+                </a17-dropdown>
+              </div> -->
 
-                  <v-chip
+              <div slot="hidden-filters">
+                <!-- <a17-vselect class="medialibrary__filter-item" ref="filter" name="tag" :options="tags"
+                            :placeholder="$trans('media-library.filter-select-label', 'Filter by tag')" :searchable="true" maxHeight="175px"/>
+                <a17-checkbox class="medialibrary__filter-item" ref="unused" name="unused" :initial-value="0" :value="1" :label="$trans('media-library.unused-filter-label', 'Show unused only')"/> -->
+              </div>
+            </ue-filter>
+          </div>
 
-                    v-for="navType in types"
-                    :key="navType.value"
-                    class="ma-2"
-                    @click.prevent="updateType(navType.value)"
-                    >
-                      {{  navType.text }}
-                      <span
-                        v-if="navType.total > 0" class="secondarynav__number"
-                        >
-                        ({{ navType.total }})
-                      </span>
-                  </v-chip>
-                  <!-- <li
-                    class="secondarynav__item"
-                    v-for="navType in types"
-                    :key="navType.value"
-                    :class="{ 's--on': type === navType.value, 's--disabled' : type !== navType.value && strict }"
-                    >
-                    <a href="#" @click.prevent="updateType(navType.value)">
-                      <span class="secondarynav__link">{{ navType.text }}</span>
-                      <span
-                        v-if="navType.total > 0" class="secondarynav__number"
-                        >
-                        ({{ navType.total }})
-                      </span>
-                    </a>
-                  </li> -->
-                </ul>
-
-                <!-- <div class="secondarynav secondarynav--mobile secondarynav--dropdown" slot="navigation">
-                  <a17-dropdown ref="secondaryNavDropdown" position="bottom-left" width="full" :offset="0">
-                    <a17-button class="secondarynav__button" variant="dropdown-transparent" size="small"
-                                @click="$refs.secondaryNavDropdown.toggle()" v-if="selectedType">
-                      <span class="secondarynav__link">{{ selectedType.text }}</span><span class="secondarynav__number">{{ selectedType.total }}</span>
-                    </a17-button>
-                    <div slot="dropdown__content">
-                      <ul>
-                        <li v-for="navType in types" :key="navType.value" class="secondarynav__item">
-                          <a href="#" v-on:click.prevent="updateType(navType.value)"><span class="secondarynav__link">{{ navType.text }}</span><span
-                            class="secondarynav__number">{{ navType.total }}</span></a>
-                        </li>
-                      </ul>
-                    </div>
-                  </a17-dropdown>
-                </div> -->
-
-                <div slot="hidden-filters">
-                  <!-- <a17-vselect class="medialibrary__filter-item" ref="filter" name="tag" :options="tags"
-                              :placeholder="$trans('media-library.filter-select-label', 'Filter by tag')" :searchable="true" maxHeight="175px"/>
-                  <a17-checkbox class="medialibrary__filter-item" ref="unused" name="unused" :initial-value="0" :value="1" :label="$trans('media-library.unused-filter-label', 'Show unused only')"/> -->
-                </div>
-              </ue-filter>
-            </div>
-
-            <div class="medialibrary__inner">
-              <div class="medialibrary__grid">
+          <div class="medialibrary__inner">
+            <div class="medialibrary__grid">
               <aside class="medialibrary__sidebar">
-                <a17-mediasidebar :medias="selectedMedias"
-                  :authorized="authorized"  
+                <MediaSidebar :medias="selectedMedias"
+                  :authorized="authorized"
                   :extraMetadatas="extraMetadatas"
-                  @clear="clearSelectedMedias" 
-                  @delete="deleteSelectedMedias" 
+                  @clear="clearSelectedMedias"
+                  @delete="deleteSelectedMedias"
                   @tagUpdated="reloadTags"
-                  :type="currentTypeObject" 
-                  :translatableMetadatas="translatableMetadatas" 
+                  :type="currentTypeObject"
+                  :translatableMetadatas="translatableMetadatas"
                   @triggerMediaReplace="replaceMedia"
-                  />
+                >
+                </MediaSidebar>
               </aside>
-                <footer class="medialibrary__footer" v-if="selectedMedias.length && showInsert && connector">
-                  <!-- <a17-button v-if="canInsert" variant="action" @click="saveAndClose">{{ btnLabel }}</a17-button>
-                  <a17-button v-else variant="action" :disabled="true">{{ btnLabel }}</a17-button> -->
-                  <ue-btn
-                      v-if="canInsert" @click="saveAndClose"
-                      >
-                      {{ btnLabel }}
-                  </ue-btn>
-                  <ue-btn
-                      v-else
-                      :disabled="true"
-                      >
-                      {{ btnLabel }}
-                  </ue-btn>
-                </footer>
+              <footer class="medialibrary__footer" v-if="selectedMedias.length && showInsert && connector">
+                <ue-btn  v-if="canInsert" @click="saveAndClose">{{ btnLabel }} </ue-btn>
+                <ue-btn v-else :disabled="true" > {{ btnLabel }} </ue-btn>
+              </footer>
 
-                <div class="medialibrary__list" ref="list">
-                  <ue-uploader
-                    ref="uploader"
-                    v-if="authorized"
-                    @loaded="addMedia"
-                    @clear="clearSelectedMedias"
-                    :type="currentTypeObject"
-                    />
-                    <!-- TEST START -->
-                      <div class="medialibrary__list-items">
-                        <a17-itemlist v-if="type === 'file'" :items="renderedMediaItems" :selected-items="selectedMedias"
-                                      :used-items="usedMedias" @change="updateSelectedMedias"
-                                      @shiftChange="updateSelectedMedias"/>
-                        <a17-mediagrid v-else :items="renderedMediaItems" :selected-items="selectedMedias" :used-items="usedMedias"
-                                      @change="updateSelectedMedias" @shiftChange="updateSelectedMedias"/>
-                        <a17-spinner v-if="loading" class="medialibrary__spinner">Loading&hellip;</a17-spinner>
-                      </div>
-                    <!-- TEST END -->
+              <div class="medialibrary__list" ref="list">
+                <ue-uploader
+                  ref="uploader"
+                  v-if="authorized"
+                  @loaded="addMedia"
+                  @clear="clearSelectedMedias"
+                  :type="currentTypeObject"
+                />
+                <!-- TEST START -->
+                <div class="medialibrary__list-items">
+                  <ItemList v-if="type === 'file'" :items="renderedMediaItems" :selected-items="selectedMedias"
+                                :used-items="usedMedias" @change="updateSelectedMedias"
+                                @shiftChange="updateSelectedMedias"/>
+                  <MediaGrid v-else :items="renderedMediaItems" :selected-items="selectedMedias" :used-items="usedMedias"
+                                @change="updateSelectedMedias" @shiftChange="updateSelectedMedias"/>
+                  <!-- <a17-spinner v-if="loading" class="medialibrary__spinner">Loading&hellip;</a17-spinner> -->
                 </div>
+                <!-- TEST END -->
               </div>
             </div>
           </div>
         </div>
+      </div>
     </template>
   </ue-modal>
 </template>
@@ -163,35 +127,27 @@ import { getCurrentInstance } from 'vue'
 import { mapState } from 'vuex'
 import { MEDIA_LIBRARY } from '@/store/mutations'
 
-import api from '../../store/api/media-library'
-
-import ACTIONS from '../../store/actions'
-
-import UEModal from './Modal.vue'
-
-import scrollToY from '@/utils/scrollToY.js'
-
-import FormDataAsObj from '@/utils/formDataAsObj.js'
-
 import { ModalMixin } from '@/mixins'
 
-// TEST START
+import api from '@/store/api/media-library'
 
-import a17MediaGrid from './../../a17/media-library/MediaGrid.vue'
-import a17ItemList from './../../a17/ItemList_.vue'
-import a17Spinner from './../../a17/Spinner_.vue'
-import a17MediaSidebar from './../../a17/media-library/MediaSidebar.vue'
+import scrollToY from '@/utils/scrollToY.js'
+import FormDataAsObj from '@/utils/formDataAsObj.js'
+
+// TEST START
+import MediaGrid from './media-library/MediaGrid.vue'
+import ItemList from './media-library/ItemList.vue'
+import MediaSidebar from './media-library/MediaSidebar.vue'
 // import a17Checkbox from '@/components/Checkbox.vue'
 
 // TEST END
 export default {
   mixins: [ModalMixin],
   components: {
-    'ue-modal': UEModal,
-    'a17-mediagrid': a17MediaGrid,
-    'a17-itemlist': a17ItemList,
-    'a17-mediasidebar' : a17MediaSidebar,
-    'a17-spinner': a17Spinner,
+    MediaGrid,
+    ItemList,
+    MediaSidebar
+    // 'a17-spinner': a17Spinner
     // 'a17-checkbox': a17Checkbox
   },
   setup (props, { attrs, slots, emit }) {
@@ -258,7 +214,6 @@ export default {
       tags: [],
       lastScrollTop: 0,
       gridLoaded: false,
-
       full: true
     //   show: false
     }
@@ -346,7 +301,7 @@ export default {
     }
   },
   methods: {
-      deleteSelectedMedias: function (mediasIds) {
+    deleteSelectedMedias: function (mediasIds) {
       let keepSelectedMedias = []
       if (mediasIds && mediasIds.length !== this.selectedMedias.length) {
         keepSelectedMedias = this.selectedMedias.filter((media) => !media.deleteUrl)
@@ -414,13 +369,12 @@ export default {
     },
     open: function () {
       this.$refs.modal.open()
-
     },
     close: function () {
       this.$refs.modal.hide()
     },
     opened: function () {
-      if (!this.gridLoaded){
+      if (!this.gridLoaded) {
         this.reloadGrid()
       }
 
@@ -532,9 +486,6 @@ export default {
     clearMediaItems: function () {
       this.mediaItems.splice(0)
     },
-    clearSelectedMedias: function () {
-      this.selectedMedias.splice(0)
-    },
     reloadGrid: function () {
       this.loading = true
       const form = this.$refs.form
@@ -576,7 +527,6 @@ export default {
       this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_TYPE, newType)
       this.submitFilter()
     },
-
     getFormData: function (form) {
       let data = FormDataAsObj(form)
 
@@ -621,11 +571,14 @@ export default {
 
       this.lastScrollTop = list.scrollTop
     },
-    saveAndClose: function () {      
+    saveAndClose: function () {
       this.$store.commit(MEDIA_LIBRARY.SAVE_MEDIAS, this.selectedMedias)
       this.close()
-    }
+    },
 
+    reloadTags: function (tags = []) {
+      this.tags = tags
+    }
   },
 
   created () {
@@ -633,7 +586,6 @@ export default {
     if (!this.gridLoaded) {
       this.reloadGrid()
     }
-
 
     // empty selected medias (to avoid gs when adding)
     this.selectedMedias = []

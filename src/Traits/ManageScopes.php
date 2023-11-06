@@ -123,7 +123,6 @@ trait ManageScopes {
         foreach ($this->fixedFilters as $key => $value) {
             $scope[$key] = $value;
         }
-
         // dd(
         //     $requestFilters,
         //     $this->defaultFilters,

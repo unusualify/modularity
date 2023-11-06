@@ -8,7 +8,7 @@ $localRootPrefix = storage_path('app/public/');
 $mediaLocalConfig = [
     'driver' => 'local',
     'visibility' => 'public',
-    'root' => $localRootPrefix . trim(config(unusualBaseKey() . '.media_library.local_path'), '/ '),
+    'root' => $localRootPrefix . trim(config(unusualBaseKey() . '.media_library.local_path'), '/'),
 ];
 
 $fileLocalConfig = [
