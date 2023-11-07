@@ -215,8 +215,9 @@ export default function useTable (props, context) {
       // methods.setEditedItem(item)
 
       store.dispatch(ACTIONS.SAVE_FORM, {
+        plain: true,
         item: {
-          ...item,
+          id: item.id,
           ...{ [key]: value }
         },
         callback: function () {

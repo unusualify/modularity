@@ -149,7 +149,7 @@ const mutations = {
 }
 
 const actions = {
-  [ACTIONS.SAVE_FORM] ({ commit, state, getters, rootState, dispatch }, { item = null, callback = null, errorCallback = null }) {
+  [ACTIONS.SAVE_FORM] ({ commit, state, getters, rootState, dispatch }, { item = null, callback = null, errorCallback = null, plain = false }) {
     commit(FORM.CLEAR_FORM_ERRORS)
     commit(FORM.UPDATE_FORM_LOADING, true)
 
@@ -165,7 +165,7 @@ const actions = {
     // - created blocks and repeaters
 
     // const data = getFormData(rootState)
-    const data = getSubmitFormData(state.inputs, item ?? state.editedItem)
+    const data = plain ? item : getSubmitFormData(state.inputs, item ?? state.editedItem)
 
     // const method = rootState.publication.createWithoutModal ? 'post' : 'put'
     let method = 'post'
