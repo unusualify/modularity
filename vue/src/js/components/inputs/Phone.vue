@@ -62,7 +62,7 @@
 
 <script>
 import { InputMixin } from '@/mixins'
-import { useInput } from '@/hooks'
+import { useInput, makeInputProps } from '@/hooks'
 
 import PhoneNumber, { getExample } from 'awesome-phonenumber'
 import Phone, { getCountry, setCaretPosition } from '@/utils/phone'
@@ -85,6 +85,7 @@ export default {
   // name: 'VueTelInputVuetify',
   mixins: [InputMixin],
   emits: [
+    'update:modelValue',
     'country-changed',
     'validate',
     'onValidate',
@@ -142,6 +143,7 @@ export default {
     }
   },
   props: {
+    ...makeInputProps(),
     invalidMsg: {
       type: String,
       default: () => getDefault('invalidMsg')
@@ -339,6 +341,10 @@ export default {
   created () {
     if (this.modelValue) {
       this.phone = this.modelValue.trim()
+    }
+    __log(this.boundProps)
+    if (!__isset(this.boundProps.rules)) {
+      this.boundProps.rules = []
     }
     this.boundProps.rules.push(this.phoneRule)
   },
