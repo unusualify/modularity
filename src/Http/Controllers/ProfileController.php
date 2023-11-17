@@ -14,7 +14,7 @@ use Unusualify\Modularity\Services\View\UWrapper;
 class ProfileController extends BaseController
 {
 
-    protected $namespace = 'Unusualify\Modularity';
+    protected $namespace = 'Modules\SystemUser';
 
     /**
      * @var string
@@ -322,6 +322,7 @@ class ProfileController extends BaseController
         $params = $this->request->route()->parameters();
 
         $id = last($params) ?: $this->request->get('id');
+
         $item = $this->repository->getById($id);
         // $item = auth()->user();
         // dd($item);
