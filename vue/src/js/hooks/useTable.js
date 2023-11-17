@@ -251,12 +251,12 @@ export default function useTable (props, context) {
             const match = matches[1]
             // __log(item)
             if (state.snakeName === match) {
-              data[key] = getSubmitFormData(data.schema, item, this.$store._state.data)
+              data[key] = getSubmitFormData(data.schema, item, store.state)
               if (data.actionUrl) {
                 data.actionUrl = data.actionUrl.replace(`:${match}`, data[key].id)
               }
             } else if (item[match]) {
-              data[key] = getSubmitFormData(data.schema, item[match], this.$store._state.data)
+              data[key] = getSubmitFormData(data.schema, item[match], store.state)
               if (data.actionUrl) {
                 data.actionUrl = data.actionUrl.replace(`:${match}`, data[key].id)
               }
