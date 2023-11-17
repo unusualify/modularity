@@ -24,8 +24,15 @@ Modularity System Base Module
 
 ### Media Library
 
-- [ ] Media Traits and Repositories to be tested
-- [ ] Form custom media input to be developed
+- [x] Media Traits and Repositories to be tested
+- [ ] Form custom image input to be developed
+    - [ ] File input connection to media modal
+    - [ ] HasMedias & MediasTrait to be tested
+    - [ ] UI design (card with plus icon)
+- [ ] Form custom file input to be developed
+    - [x] File input connection to media modal
+    - [x] HasFiles & FilesTrait to be tested
+    - [ ] UI design (card with plus icon)
 
 ### Company
 
