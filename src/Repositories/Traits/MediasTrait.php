@@ -1,8 +1,8 @@
 <?php
 
-namespace OoBook\CRM\Base\Repositories\Traits;
+namespace Unusualify\Modularity\Repositories\Traits;
 
-use OoBook\CRM\Base\Entities\Media;
+use Unusualify\Modularity\Entities\Media;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -10,9 +10,9 @@ use Illuminate\Support\Str;
 trait MediasTrait
 {
     /**
-     * @param \OoBook\CRM\Base\Entities\Model $object
+     * @param \Unusualify\Modularity\Entities\Model $object
      * @param array $fields
-     * @return \OoBook\CRM\Base\Entities\Model
+     * @return \Unusualify\Modularity\Entities\Model
      */
     public function hydrateMediasTrait($object, $fields)
     {
@@ -36,7 +36,7 @@ trait MediasTrait
     }
 
     /**
-     * @param \OoBook\CRM\Base\Entities\Model $object
+     * @param \Unusualify\Modularity\Entities\Model $object
      * @param array $fields
      * @return void
      */
@@ -119,7 +119,7 @@ trait MediasTrait
     }
 
     /**
-     * @param \OoBook\CRM\Base\Entities\Model $object
+     * @param \Unusualify\Modularity\Entities\Model $object
      * @param array $fields
      * @return array
      */
@@ -157,7 +157,7 @@ trait MediasTrait
         foreach ($medias->groupBy('id') as $id => $mediasById) {
             $item = $mediasById->first();
 
-            $itemForForm = $item->toCmsArray();
+            $itemForForm = $item->mediableFormat();
 
             $itemForForm['metadatas']['custom'] = json_decode($item->pivot->metadatas, true);
 

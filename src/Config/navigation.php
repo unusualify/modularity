@@ -1,6 +1,6 @@
 <?php
 
-use OoBook\CRM\Base\Facades\UNavigation;
+use Unusualify\Modularity\Facades\UNavigation;
 
 // dd(
 //     UNavigation::baseMenu(),
@@ -28,7 +28,7 @@ return [
             '_system_settings' => [
                 'name' => 'System Settings',
             ],
-            ...UNavigation::baseMenu(),
+            ...UNavigation::systemMenu(),
             'system-settings' => [
                 'name' => 'System Settings',
                 'items' => [

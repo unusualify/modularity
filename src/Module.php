@@ -1,9 +1,9 @@
 <?php
 
-namespace OoBook\CRM\Base;
+namespace Unusualify\Modularity;
 
 use Illuminate\Container\Container;
-use Nwidart\Modules\Module as NwidartModule;
+use Nwidart\Modules\Laravel\Module as NwidartModule;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\ProviderRepository;
 use Illuminate\Filesystem\Filesystem;
@@ -18,58 +18,33 @@ class Module extends NwidartModule
     private $moduleActivator;
 
     /**
+     * @var ModuleActivatorInterface
+     */
+    private $config;
+
+    /**
      * The constructor.
      * @param Container $app
      * @param $name
      * @param $path
      */
-    public function __construct(Container $app, string $name, $path)
+    public function __construct(string $name, $path = null)
     {
         // dd($path);
+        $app = app();
+        $path ??= $app['config']->get('modules.paths.modules');
         parent::__construct($app, $name, $path);
 
         $this->moduleActivator = $app['unusual.activator'];
         $this->moduleActivator->setModule($name);
+
+        // $this->config =
         // dd($this->moduleActivator, $app);
     }
 
     public function setModuleActivator($name)
     {
         $this->moduleActivator->setModule($name);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCachedServicesPath(): string
-    {
-        // This checks if we are running on a Laravel Vapor managed instance
-        // and sets the path to a writable one (services path is not on a writable storage in Vapor).
-        if (!is_null(env('VAPOR_MAINTENANCE_MODE', null))) {
-            return Str::replaceLast('config.php', $this->getSnakeName() . '_module.php', $this->app->getCachedConfigPath());
-        }
-
-        return Str::replaceLast('services.php', $this->getSnakeName() . '_module.php', $this->app->getCachedServicesPath());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function registerProviders(): void
-    {
-        (new ProviderRepository($this->app, new Filesystem(), $this->getCachedServicesPath()))
-            ->load($this->get('providers', []));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function registerAliases(): void
-    {
-        $loader = AliasLoader::getInstance();
-        foreach ($this->get('aliases', []) as $aliasName => $aliasClass) {
-            $loader->alias($aliasName, $aliasClass);
-        }
     }
 
     /**
@@ -137,4 +112,34 @@ class Module extends NwidartModule
             $this->cache->store()->flush();
         }
     }
+
+    public function getRouteConfig($route_name){
+        return $this->getRouteConfigs( snakeCase($route_name) ) ;
+    }
+
+    public function getRouteConfigs($notation = null){
+        $notation = !$notation ? $notation : ".{$notation}";
+
+        return $this->getConfig('routes' . $notation);
+    }
+
+    public function getConfig($notation = null){
+        $notation = !$notation ? $notation : ".{$notation}";
+        return $this->app['config']->get("{$this->getSnakeName()}{$notation}");
+    }
+
+    public function getParentRoute() {
+        return array_values(array_filter($this->getRouteConfigs(), function($r){
+            return isset($r['parent']) && $r['parent'];
+        }))[0] ?? [];
+    }
+
+    public function hasParentRoute() {
+        return count($this->getParentRoute()) > 0;
+    }
+
+    public function hasSystemPrefix() {
+        return $this->getConfig('base_prefix', false);
+    }
+
 }

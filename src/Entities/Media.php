@@ -1,11 +1,11 @@
 <?php
 
-namespace OoBook\CRM\Base\Entities;
+namespace Unusualify\Modularity\Entities;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use OoBook\CRM\Base\Services\MediaLibrary\ImageService;
+use Unusualify\Modularity\Services\MediaLibrary\ImageService;
 
 class Media extends Model
 {
@@ -64,7 +64,7 @@ class Media extends Model
         return DB::table(config(unusualBaseKey() . '.mediables_table', 'unusual_mediables'))->where('media_id', $this->id)->count() > 0;
     }
 
-    public function toCmsArray()
+    public function mediableFormat()
     {
         return [
             'id' => $this->id,
