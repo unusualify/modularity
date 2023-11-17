@@ -16,3 +16,4 @@ yarn-error.log
 /.idea
 /.vscode
 vue/src/js/components/customs
+**/.DS_Store
