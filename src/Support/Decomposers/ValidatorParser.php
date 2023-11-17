@@ -1,8 +1,8 @@
 <?php
 
-namespace OoBook\CRM\Base\Support\Decomposers;
+namespace Unusualify\Modularity\Support\Decomposers;
 
-use OoBook\CRM\Base\Traits\ManageNames;
+use Unusualify\Modularity\Traits\ManageNames;
 use Illuminate\Contracts\Support\Arrayable;
 
 class ValidatorParser implements Arrayable

@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Providers;
+namespace Unusualify\Modularity\Providers;
 
 use Illuminate\Support\ServiceProvider as Provider;
 use Illuminate\Support\Str;

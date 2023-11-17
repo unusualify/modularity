@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Console;
+namespace Unusualify\Modularity\Console;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;

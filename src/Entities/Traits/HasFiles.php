@@ -1,9 +1,9 @@
 <?php
 
-namespace OoBook\CRM\Base\Entities\Traits;
+namespace Unusualify\Modularity\Entities\Traits;
 
-use OoBook\CRM\Base\Entities\File;
-use OoBook\CRM\Base\Services\FileLibrary\FileService;
+use Unusualify\Modularity\Entities\File;
+use Unusualify\Modularity\Services\FileLibrary\FileService;
 
 trait HasFiles
 {
@@ -17,9 +17,9 @@ trait HasFiles
         return $this->morphToMany(
             File::class,
             'fileable',
-            config(unusualBaseKey() . '.fileables_table', 'twill_fileables')
+            config(unusualBaseKey() . '.fileables_table', unusualBaseKey() . '_fileables')
         )->withPivot(['role', 'locale'])
-            ->withTimestamps()->orderBy(config(unusualBaseKey() . '.fileables_table', 'twill_fileables') . '.id', 'asc');
+            ->withTimestamps()->orderBy(config(unusualBaseKey() . '.fileables_table', unusualBaseKey() . '_fileables') . '.id', 'asc');
     }
 
     private function findFile($role, $locale)

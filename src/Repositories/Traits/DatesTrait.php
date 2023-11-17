@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Repositories\Traits;
+namespace Unusualify\Modularity\Repositories\Traits;
 
 use Carbon\Carbon;
 
@@ -16,7 +16,7 @@ trait DatesTrait
     }
 
     /**
-     * @param \OoBook\CRM\Base\Entities\Model|null $object
+     * @param \Unusualify\Modularity\Entities\Model|null $object
      * @param array $fields
      * @return array
      */

@@ -1,0 +1,6 @@
+{
+    "User": true,
+    "Role": true,
+    "Permission": true,
+    "Company": true
+}

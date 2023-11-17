@@ -1,8 +1,16 @@
 import { mapState } from 'vuex'
 
 export default {
-  props: ['modelValue', 'obj'],
-  emits: ['update:modelValue'],
+  // props: {
+  //   modelValue: null,
+  //   obj: {
+  //     type: Object,
+  //     default () {
+  //       return {}
+  //     }
+  //   }
+  // },
+  emits: ['update:modelValue', 'change'],
 
   computed: {
 

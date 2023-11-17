@@ -1,14 +1,14 @@
 <?php
 
-namespace OoBook\CRM\Base\Support\Decomposers;
+namespace Unusualify\Modularity\Support\Decomposers;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Nwidart\Modules\Support\Migrations\SchemaParser as Parser;
 use Illuminate\Support\Str;
-use OoBook\CRM\Base\Support\Finder;
-use OoBook\CRM\Base\Traits\ManageNames;
+use Unusualify\Modularity\Support\Finder;
+use Unusualify\Modularity\Traits\ManageNames;
 use phpDocumentor\Reflection\Types\Boolean;
 use PhpParser\Node\Expr\FuncCall;
 

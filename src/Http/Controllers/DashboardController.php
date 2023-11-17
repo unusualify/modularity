@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Controllers;
+namespace Unusualify\Modularity\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\View;
 use Modules\Package\Repositories\PackageContinentRepository;
 use Modules\PressRelease\Entities\PressRelease;
 use Modules\PressRelease\Repositories\PressReleaseRepository;
-use OoBook\CRM\Base\Entities\Enums\Permission;
+use Unusualify\Modularity\Entities\Enums\Permission;
 
 class DashboardController extends BaseController
 {

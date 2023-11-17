@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Controllers;
+namespace Unusualify\Modularity\Http\Controllers;
 
 use Illuminate\Config\Repository as Config;
 use Illuminate\Foundation\Auth\ResetsPasswords;
@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\Factory as ViewFactory;
-use OoBook\CRM\Base\Entities\User;
-use OoBook\CRM\Base\Traits\ManageUtilities;
+use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Traits\ManageUtilities;
 
 class ResetPasswordController extends Controller
 {
@@ -234,7 +234,7 @@ class ResetPasswordController extends Controller
      * https://github.com/laravel/framework/pull/16850
      *
      * @param string $token
-     * @return \OoBook\CRM\Base\Models\User|null
+     * @return \Unusualify\Modularity\Models\User|null
      */
     private function getUserFromToken($token)
     {

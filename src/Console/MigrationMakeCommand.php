@@ -1,10 +1,10 @@
 <?php
 
-namespace OoBook\CRM\Base\Console;
+namespace Unusualify\Modularity\Console;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
-use OoBook\CRM\Base\Support\Decomposers\SchemaParser;
+use Unusualify\Modularity\Support\Decomposers\SchemaParser;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Nwidart\Modules\Support\Migrations\NameParser;
 use Nwidart\Modules\Support\Migrations\SchemaParser as NwidartSchemaParser;

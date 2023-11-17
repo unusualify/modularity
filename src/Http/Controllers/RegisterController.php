@@ -1,14 +1,14 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Controllers;
+namespace Unusualify\Modularity\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use OoBook\CRM\Base\Entities\Company;
-use OoBook\CRM\Base\Entities\User;
-use OoBook\CRM\Base\Traits\ManageUtilities;
+use Unusualify\Modularity\Entities\Company;
+use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Traits\ManageUtilities;
 
 class RegisterController extends Controller
 {

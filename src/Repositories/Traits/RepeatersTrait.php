@@ -1,9 +1,9 @@
 <?php
 
-namespace OoBook\CRM\Base\Repositories\Traits;
+namespace Unusualify\Modularity\Repositories\Traits;
 
-use OoBook\CRM\Base\Facades\TwillBlocks;
-use OoBook\CRM\Base\Facades\TwillUtil;
+use Unusualify\Modularity\Facades\TwillBlocks;
+use Unusualify\Modularity\Facades\TwillUtil;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -33,7 +33,7 @@ trait RepeatersTrait
     protected $repeaters = [];
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
      * @return void
      */
@@ -51,7 +51,7 @@ trait RepeatersTrait
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
      * @return array
      */
@@ -71,11 +71,11 @@ trait RepeatersTrait
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
      * @param string $relation
      * @param bool $keepExisting
-     * @param \OoBook\CRM\Base\Models\Model|null $model
+     * @param \Unusualify\Modularity\Models\Model|null $model
      * @return void
      */
     public function updateRepeaterMany($object, $fields, $relation, $keepExisting = true, $model = null)
@@ -96,11 +96,11 @@ trait RepeatersTrait
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
      * @param string $relation
      * @param string|null $morph
-     * @param \OoBook\CRM\Base\Models\Model|null $model
+     * @param \Unusualify\Modularity\Models\Model|null $model
      * @param string|null $repeaterName
      * @return void
      */
@@ -171,10 +171,10 @@ trait RepeatersTrait
     /**
      * Given relation, model and repeaterName, retrieve the repeater data from request and update the database record.
      *
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
      * @param string $relation
-     * @param \OoBook\CRM\Base\Models\Model|\OoBook\CRM\Base\Repositories\ModuleRepository|null $modelOrRepository
+     * @param \Unusualify\Modularity\Models\Model|\Unusualify\Modularity\Repositories\ModuleRepository|null $modelOrRepository
      * @param string|null $repeaterName
      * @return void
      */
@@ -253,10 +253,10 @@ trait RepeatersTrait
     /**
      * Given relation, model and repeaterName, get the necessary fields for rendering a repeater.
      *
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
      * @param string $relation
-     * @param \OoBook\CRM\Base\Models\Model|\OoBook\CRM\Base\Repositories\ModuleRepository|null $modelOrRepository
+     * @param \Unusualify\Modularity\Models\Model|\Unusualify\Modularity\Repositories\ModuleRepository|null $modelOrRepository
      * @param string|null $repeaterName
      * @return array
      */

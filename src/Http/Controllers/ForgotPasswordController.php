@@ -1,13 +1,13 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Controllers;
+namespace Unusualify\Modularity\Http\Controllers;
 
 use Illuminate\Auth\Passwords\PasswordBrokerManager;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\Factory as ViewFactory;
-use OoBook\CRM\Base\Traits\ManageUtilities;
+use Unusualify\Modularity\Traits\ManageUtilities;
 
 class ForgotPasswordController extends Controller
 {

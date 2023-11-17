@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Entities\Traits;
+namespace Unusualify\Modularity\Entities\Traits;
 
 trait HasScopes
 {

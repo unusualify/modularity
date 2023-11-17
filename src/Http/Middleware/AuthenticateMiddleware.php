@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Middleware;
+namespace Unusualify\Modularity\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 

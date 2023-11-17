@@ -1,5 +1,5 @@
 ```
-    php artisan vendor:publish --provider="OoBook\CRM\Base\LaravelServiceProvider" --tag="config"
+    php artisan vendor:publish --provider="Unusualify\Modularity\LaravelServiceProvider" --tag="config"
     
     php artisan unusual:build --noInstall --hot
 

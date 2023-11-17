@@ -1,5 +1,5 @@
 <?php
-namespace OoBook\CRM\Base\Traits;
+namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
@@ -7,8 +7,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
-use OoBook\CRM\Base\Services\View\UWrapper;
-use OoBook\CRM\Base\Support\Finder;
+use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Services\View\UWrapper;
+use Unusualify\Modularity\Support\Finder;
 use stdClass;
 
 trait ManageUtilities {
@@ -115,7 +116,7 @@ trait ManageUtilities {
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $item
+     * @param \Unusualify\Modularity\Models\Model $item
      * @return array
      */
     public function indexItemData($item)
@@ -368,7 +369,7 @@ trait ManageUtilities {
 
     /**
      * @param int $id
-     * @param \OoBook\CRM\Base\Models\Model|null $item
+     * @param \Unusualify\Modularity\Models\Model|null $item
      * @return array
      */
     protected function getFormData($id, $item = null, $nested=null)
@@ -394,7 +395,9 @@ trait ManageUtilities {
         // $localizedPermalinkBase = $this->getLocalizedPermalinkBase();
 
         $itemId = $this->getItemIdentifier($item);
+
         $data = [
+            'translate' => $this->routeHas('translations'),
             'formAttributes' => [
                 'hasSubmit' => true,
                 'stickyButton' => false,
@@ -410,7 +413,8 @@ trait ManageUtilities {
                     //     ]
                     // ]
                 ]),
-                'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => $this->routeName]),
+                // 'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => $this->routeName]),
+                'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => trans_choice('modules.'. snakeCase($this->routeName), 0)]),
                 // 'schema'  => $schema, // input fields to be used in unusual datatable component
                 // 'defaultItem' => collect($schema)->mapWithKeys(function($item, $key){
                 //     return [ $item['name'] => $item['default'] ?? ''];
@@ -421,7 +425,6 @@ trait ManageUtilities {
             'endpoints' => [
                 (!!$itemId ? 'update' : 'store') => $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId])
             ],
-
             'formStore' => [
                 'inputs' => $schema,
                 // 'inputs' => $this->repository->getFormFields($item, $schema),
@@ -581,7 +584,7 @@ trait ManageUtilities {
                 $relation_class = null;
 
                 // dd(
-                //     $this->app['unusual.repository']->find($this->moduleName),
+                //     Modularity::find($this->moduleName),
                 //     // $this->config->parent_route,
                 //     // FacadesModule::find('Base')
                 // );
@@ -591,7 +594,7 @@ trait ManageUtilities {
                     $relation_class = App::make($input['model']);
                 }else if(isset($input['route'])){
                     $finder = new Finder();
-                    $module = $this->app['unusual.repository']->find($this->moduleName);
+                    $module = Modularity::find($this->moduleName);
 
                     if( $module->isEnabledRoute($input['route']) ){
                         foreach ($this->config->routes as $r) {
@@ -634,7 +637,7 @@ trait ManageUtilities {
                     $items = $relation_class->all([$input['itemValue'], $input['itemTitle']])->toArray();
                 }else if(isset($input['route'])){
                     $finder = new Finder();
-                    $module = $this->app['unusual.repository']->find($this->moduleName);
+                    $module = Modularity::find($this->moduleName);
 
                     if( $module->isEnabledRoute($input['route']) ){
                         foreach ($this->config->routes as $r) {
@@ -675,7 +678,7 @@ trait ManageUtilities {
 
                 }else if(isset($input['route'])){
                     $finder = new Finder();
-                    $module = $this->app['unusual.repository']->find($this->moduleName);
+                    $module = Modularity::find($this->moduleName);
 
                     if( $module->isEnabledRoute($input['route']) ){
                         foreach ($this->config->routes as $r) {
@@ -783,7 +786,9 @@ trait ManageUtilities {
 
         if(isset($this->repository)){
 
-            if(method_exists($this->repository->getModel(), 'getTranslatedAttributes') && in_array($input['name'], $this->repository->getTranslatedAttributes()) ){
+            if( method_exists($this->repository->getModel(), 'getTranslatedAttributes')
+                && in_array($input['name'], $this->repository->getTranslatedAttributes())
+            ){
                 $input['translated'] ??= true;
                 // $input['locale_input'] = $input['type'];
                 // $input['type'] = 'custom-input-locale';

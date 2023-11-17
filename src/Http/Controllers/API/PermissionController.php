@@ -1,12 +1,12 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Controllers\API;
+namespace Unusualify\Modularity\Http\Controllers\API;
 
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use OoBook\CRM\Base\Http\Requests\StorePermissionRequest;
-use OoBook\CRM\Base\Transformers\PermissionResource;
+use Unusualify\Modularity\Http\Requests\StorePermissionRequest;
+use Unusualify\Modularity\Transformers\PermissionResource;
 use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller

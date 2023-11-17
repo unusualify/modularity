@@ -1,8 +1,8 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Controllers;
+namespace Unusualify\Modularity\Http\Controllers;
 
-use OoBook\CRM\Base\Exceptions\Handler as TwillHandler;
+use Unusualify\Modularity\Exceptions\Handler as TwillHandler;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;

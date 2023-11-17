@@ -1,11 +1,11 @@
 <?php
-namespace OoBook\CRM\Base\Traits;
+namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
-use OoBook\CRM\Base\Services\MessageStage;
+use Unusualify\Modularity\Services\MessageStage;
 
 trait MakesResponses {
 

@@ -1,8 +1,9 @@
 <?php
 
-namespace OoBook\CRM\Base\Console;
+namespace Unusualify\Modularity\Console;
 
 use Illuminate\Console\Command;
+use Unusualify\Modularity\Facades\Modularity;
 use Symfony\Component\Console\Input\InputArgument;
 
 class DisableCommand extends Command
@@ -27,7 +28,8 @@ class DisableCommand extends Command
     public function handle() : int
     {
         /** @var Module $module */
-        $module = $this->laravel['unusual.repository']->findOrFail($this->argument('module'));
+        // $module = $this->laravel['unusual.modularity']->findOrFail($this->argument('module'));
+        $module = Modularity::findOrFail($this->argument('module'));
 
         $module->setModuleActivator($this->argument('module'));
 

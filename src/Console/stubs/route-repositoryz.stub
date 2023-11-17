@@ -2,9 +2,9 @@
 
 namespace $NAMESPACE$;
 
-use OoBook\CRM\Base\Repositories\BaseRepository;
+use Unusualify\Modularity\Repositories\BaseRepository;
 use Illuminate\Http\Request;
-use OoBook\CRM\Base\Traits\Tabulable;
+use Unusualify\Modularity\Traits\Tabulable;
 
 class $CLASS$ extends BaseRepository
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace OoBook\CRM\Base\Console;
+namespace Unusualify\Modularity\Console;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Factory as ValidatorFactory;
-use OoBook\CRM\Base\Entities\User;
+use Unusualify\Modularity\Entities\User;
 
 class CreateSuperAdminCommand extends BaseCommand
 {

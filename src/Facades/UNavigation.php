@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Facades;
+namespace Unusualify\Modularity\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
@@ -9,6 +9,6 @@ class UNavigation extends Facade
     protected static function getFacadeAccessor(): string
     {
         return 'unusual.navigation';
-        // return \OoBook\CRM\Base\Services\View\UNavigation::class;
+        // return \Unusualify\Modularity\Services\View\UNavigation::class;
     }
 }

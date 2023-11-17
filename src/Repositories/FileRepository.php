@@ -1,11 +1,11 @@
 <?php
 
-namespace OoBook\CRM\Base\Repositories;
+namespace Unusualify\Modularity\Repositories;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
-use OoBook\CRM\Base\Entities\File;
-use OoBook\CRM\Base\Repositories\Traits\TagsTrait;
+use Unusualify\Modularity\Entities\File;
+use Unusualify\Modularity\Repositories\Traits\TagsTrait;
 
 class FileRepository extends Repository
 {

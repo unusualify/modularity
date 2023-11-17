@@ -1,21 +1,21 @@
 <?php
 
-namespace OoBook\CRM\Base\Providers;
+namespace Unusualify\Modularity\Providers;
 
 use Illuminate\Container\Util;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
-use OoBook\CRM\Base\Http\Controllers\GlideController;
-use OoBook\CRM\Base\Facades\UnusualRoutes;
+use Unusualify\Modularity\Http\Controllers\GlideController;
+use Unusualify\Modularity\Facades\UnusualRoutes;
 use Nwidart\Modules\Facades\Module;
-use OoBook\CRM\Base\Http\Controllers\DashboardController;
-use OoBook\CRM\Base\Http\Middleware\{AuthenticateMiddleware, CompanyRegistrationMiddleware, LanguageMiddleware, ImpersonateMiddleware, NavigationMiddleware, RedirectIfAuthenticatedMiddleware, TeamsPermissionMiddleware};
+use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Http\Middleware\{AuthenticateMiddleware, CompanyRegistrationMiddleware, LanguageMiddleware, ImpersonateMiddleware, NavigationMiddleware, RedirectIfAuthenticatedMiddleware, TeamsPermissionMiddleware};
 
 class RouteServiceProvider extends ServiceProvider
 {
 
-    protected $namespace = 'OoBook\CRM\Base\Http\Controllers';
+    protected $namespace = 'Unusualify\Modularity\Http\Controllers';
 
     /**
      * Bootstraps the package services.
@@ -126,35 +126,9 @@ class RouteServiceProvider extends ServiceProvider
             }
         );
 
-        if (config(unusualBaseKey() . '.templates_on_frontend_domain')) {
-            $router->group(
-                [
-                    'namespace' => $this->namespace . '\Admin',
-                    'domain' => config('app.url'),
-                    'middleware' => [
-                        config(unusualBaseKey() . '.admin_middleware_group', 'web'),
-                    ],
-                ],
-                function ($router) {
-                    $router->group(
-                        [
-                            'middleware' => $this->app->environment(
-                                'production'
-                            )
-                            ? ['twill_auth:twill_users']
-                            : [],
-                        ],
-                        function ($router) {
-                            require __DIR__ . '/../routes/templates.php';
-                        }
-                    );
-                }
-            );
-        }
-
         if (
             config(unusualBaseKey() . '.media_library.image_service') ===
-            'OoBook\CRM\Base\Services\MediaLibrary\Glide'
+            'Unusualify\Modularity\Services\MediaLibrary\Glide'
         ) {
             $router
                 ->get(
@@ -170,12 +144,13 @@ class RouteServiceProvider extends ServiceProvider
         $groupOptions,
         $middlewares
     ) {
-        foreach(Module::allEnabled() as $module){
+        // foreach(Module::allEnabled() as $module){
+        foreach(Modularity::allEnabled() as $module){
             UnusualRoutes::registerRoutes(
                 $router,
                 $groupOptions,
                 $middlewares,
-                'Modules' . "\\" . $module->getStudlyName() . '\Http\Controllers',
+                config('modules.namespace', 'Modules') . "\\" . $module->getStudlyName() . '\Http\Controllers',
                 $module->getPath()."/Routes/web.php",
                 true
             );
@@ -201,7 +176,6 @@ class RouteServiceProvider extends ServiceProvider
             //     ValidateBackHistory::class
             // );
 
-
         Route::aliasMiddleware('unusual_auth', AuthenticateMiddleware::class);
         Route::aliasMiddleware('unusual_guest', RedirectIfAuthenticatedMiddleware::class);
 
@@ -209,7 +183,6 @@ class RouteServiceProvider extends ServiceProvider
         Route::aliasMiddleware('language', LanguageMiddleware::class);
         Route::aliasMiddleware('navigation', NavigationMiddleware::class);
         Route::aliasMiddleware('company_registration', CompanyRegistrationMiddleware::class);
-
 
         // Route::aliasMiddleware('role', \Spatie\Permission\Middlewares\RoleMiddleware::class);
         // Route::aliasMiddleware('permission', \Spatie\Permission\Middlewares\PermissionMiddleware::class);
@@ -226,187 +199,187 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function registerMacros()
     {
-        Route::macro('moduleShowWithPreview', function (
-            $moduleName,
-            $routePrefix = null,
-            $controllerName = null
-        ) {
-            if ($routePrefix === null) {
-                $routePrefix = $moduleName;
-            }
+        // Route::macro('moduleShowWithPreview', function (
+        //     $moduleName,
+        //     $routePrefix = null,
+        //     $controllerName = null
+        // ) {
+        //     if ($routePrefix === null) {
+        //         $routePrefix = $moduleName;
+        //     }
 
-            if ($controllerName === null) {
-                $controllerName = ucfirst(Str::plural($moduleName));
-            }
+        //     if ($controllerName === null) {
+        //         $controllerName = ucfirst(Str::plural($moduleName));
+        //     }
 
-            $routePrefix = empty($routePrefix)
-            ? '/'
-            : (Str::startsWith($routePrefix, '/')
-                ? $routePrefix
-                : '/' . $routePrefix);
-            $routePrefix = Str::endsWith($routePrefix, '/')
-            ? $routePrefix
-            : $routePrefix . '/';
+        //     $routePrefix = empty($routePrefix)
+        //     ? '/'
+        //     : (Str::startsWith($routePrefix, '/')
+        //         ? $routePrefix
+        //         : '/' . $routePrefix);
+        //     $routePrefix = Str::endsWith($routePrefix, '/')
+        //     ? $routePrefix
+        //     : $routePrefix . '/';
 
-            Route::name($moduleName . '.show')->get(
-                $routePrefix . '{slug}',
-                $controllerName . 'Controller@show'
-            );
-            Route::name($moduleName . '.preview')
-                ->get(
-                    '/admin-preview' . $routePrefix . '{slug}',
-                    $controllerName . 'Controller@show'
-                )
-                ->middleware(['web', 'twill_auth:twill_users', 'can:list']);
-        });
+        //     Route::name($moduleName . '.show')->get(
+        //         $routePrefix . '{slug}',
+        //         $controllerName . 'Controller@show'
+        //     );
+        //     Route::name($moduleName . '.preview')
+        //         ->get(
+        //             '/admin-preview' . $routePrefix . '{slug}',
+        //             $controllerName . 'Controller@show'
+        //         )
+        //         ->middleware(['web', 'twill_auth:twill_users', 'can:list']);
+        // });
 
-        Route::macro('module', function (
-            $slug,
-            $options = [],
-            $resource_options = [],
-            $resource = true
-        ) {
-            $slugs = explode('.', $slug);
-            $prefixSlug = str_replace('.', '/', $slug);
-            $_slug = Arr::last($slugs);
-            $className = implode(
-                '',
-                array_map(function ($s) {
-                    return ucfirst(Str::singular($s));
-                }, $slugs)
-            );
+        // Route::macro('module', function (
+        //     $slug,
+        //     $options = [],
+        //     $resource_options = [],
+        //     $resource = true
+        // ) {
+        //     $slugs = explode('.', $slug);
+        //     $prefixSlug = str_replace('.', '/', $slug);
+        //     $_slug = Arr::last($slugs);
+        //     $className = implode(
+        //         '',
+        //         array_map(function ($s) {
+        //             return ucfirst(Str::singular($s));
+        //         }, $slugs)
+        //     );
 
-            $customRoutes = $defaults = [
-                'reorder',
-                'publish',
-                'bulkPublish',
-                'browser',
-                'feature',
-                'bulkFeature',
-                'tags',
-                'preview',
-                'restore',
-                'bulkRestore',
-                'forceDelete',
-                'bulkForceDelete',
-                'bulkDelete',
-                'restoreRevision',
-                'duplicate',
-            ];
+        //     $customRoutes = $defaults = [
+        //         'reorder',
+        //         'publish',
+        //         'bulkPublish',
+        //         'browser',
+        //         'feature',
+        //         'bulkFeature',
+        //         'tags',
+        //         'preview',
+        //         'restore',
+        //         'bulkRestore',
+        //         'forceDelete',
+        //         'bulkForceDelete',
+        //         'bulkDelete',
+        //         'restoreRevision',
+        //         'duplicate',
+        //     ];
 
-            if (isset($options['only'])) {
-                $customRoutes = array_intersect(
-                    $defaults,
-                    (array) $options['only']
-                );
-            } elseif (isset($options['except'])) {
-                $customRoutes = array_diff(
-                    $defaults,
-                    (array) $options['except']
-                );
-            }
+        //     if (isset($options['only'])) {
+        //         $customRoutes = array_intersect(
+        //             $defaults,
+        //             (array) $options['only']
+        //         );
+        //     } elseif (isset($options['except'])) {
+        //         $customRoutes = array_diff(
+        //             $defaults,
+        //             (array) $options['except']
+        //         );
+        //     }
 
-            $lastRouteGroupName = RouteServiceProvider::getLastRouteGroupName();
+        //     $lastRouteGroupName = RouteServiceProvider::getLastRouteGroupName();
 
-            $groupPrefix = RouteServiceProvider::getGroupPrefix();
+        //     $groupPrefix = RouteServiceProvider::getGroupPrefix();
 
-            // Check if name will be a duplicate, and prevent if needed/allowed
-            if (RouteServiceProvider::shouldPrefixRouteName($groupPrefix, $lastRouteGroupName)) {
-                $customRoutePrefix = "{$groupPrefix}.{$slug}";
-                $resourceCustomGroupPrefix = "{$groupPrefix}.";
-            } else {
-                $customRoutePrefix = $slug;
+        //     // Check if name will be a duplicate, and prevent if needed/allowed
+        //     if (RouteServiceProvider::shouldPrefixRouteName($groupPrefix, $lastRouteGroupName)) {
+        //         $customRoutePrefix = "{$groupPrefix}.{$slug}";
+        //         $resourceCustomGroupPrefix = "{$groupPrefix}.";
+        //     } else {
+        //         $customRoutePrefix = $slug;
 
-                // Prevent Laravel from generating route names with duplication
-                $resourceCustomGroupPrefix = '';
-            }
-        
-            foreach ($customRoutes as $route) {
-                $routeSlug = "{$prefixSlug}/{$route}";
-                $mapping = [
-                    'as' => $customRoutePrefix . ".{$route}",
-                    'uses' => "{$className}Controller@{$route}",
-                ];
+        //         // Prevent Laravel from generating route names with duplication
+        //         $resourceCustomGroupPrefix = '';
+        //     }
 
-                if (in_array($route, ['browser', 'tags'])) {
-                    Route::get($routeSlug, $mapping);
-                }
+        //     foreach ($customRoutes as $route) {
+        //         $routeSlug = "{$prefixSlug}/{$route}";
+        //         $mapping = [
+        //             'as' => $customRoutePrefix . ".{$route}",
+        //             'uses' => "{$className}Controller@{$route}",
+        //         ];
 
-                if (in_array($route, ['restoreRevision'])) {
-                    Route::get($routeSlug . '/{id}', $mapping);
-                }
+        //         if (in_array($route, ['browser', 'tags'])) {
+        //             Route::get($routeSlug, $mapping);
+        //         }
 
-                if (
-                    in_array($route, [
-                        'publish',
-                        'feature',
-                        'restore',
-                        'forceDelete',
-                    ])
-                ) {
-                    Route::put($routeSlug, $mapping);
-                }
+        //         if (in_array($route, ['restoreRevision'])) {
+        //             Route::get($routeSlug . '/{id}', $mapping);
+        //         }
 
-                if (in_array($route, ['duplicate'])) {
-                    Route::put($routeSlug . '/{id}', $mapping);
-                }
+        //         if (
+        //             in_array($route, [
+        //                 'publish',
+        //                 'feature',
+        //                 'restore',
+        //                 'forceDelete',
+        //             ])
+        //         ) {
+        //             Route::put($routeSlug, $mapping);
+        //         }
 
-                if (in_array($route, ['preview'])) {
-                    Route::put($routeSlug . '/{id}', $mapping);
-                }
+        //         if (in_array($route, ['duplicate'])) {
+        //             Route::put($routeSlug . '/{id}', $mapping);
+        //         }
 
-                if (
-                    in_array($route, [
-                        'reorder',
-                        'bulkPublish',
-                        'bulkFeature',
-                        'bulkDelete',
-                        'bulkRestore',
-                        'bulkForceDelete',
-                    ])
-                ) {
-                    Route::post($routeSlug, $mapping);
-                }
-            }
+        //         if (in_array($route, ['preview'])) {
+        //             Route::put($routeSlug . '/{id}', $mapping);
+        //         }
 
-            if ($resource) {
-                Route::group(
-                    ['as' => $resourceCustomGroupPrefix],
-                    function () use ($slug, $className, $resource_options) {
-                        Route::resource(
-                            $slug,
-                            "{$className}Controller",
-                            $resource_options
-                        );
-                    }
-                );
-            }
-        });
+        //         if (
+        //             in_array($route, [
+        //                 'reorder',
+        //                 'bulkPublish',
+        //                 'bulkFeature',
+        //                 'bulkDelete',
+        //                 'bulkRestore',
+        //                 'bulkForceDelete',
+        //             ])
+        //         ) {
+        //             Route::post($routeSlug, $mapping);
+        //         }
+        //     }
 
-        Route::macro('singleton', function (
-            $slug,
-            $options = [],
-            $resource_options = [],
-            $resource = true
-        ) {
-            $pluralSlug = Str::plural($slug);
-            $modelName = Str::studly($slug);
+        //     if ($resource) {
+        //         Route::group(
+        //             ['as' => $resourceCustomGroupPrefix],
+        //             function () use ($slug, $className, $resource_options) {
+        //                 Route::resource(
+        //                     $slug,
+        //                     "{$className}Controller",
+        //                     $resource_options
+        //                 );
+        //             }
+        //         );
+        //     }
+        // });
 
-            Route::module($pluralSlug, $options, $resource_options, $resource);
+        // Route::macro('singleton', function (
+        //     $slug,
+        //     $options = [],
+        //     $resource_options = [],
+        //     $resource = true
+        // ) {
+        //     $pluralSlug = Str::plural($slug);
+        //     $modelName = Str::studly($slug);
 
-            $lastRouteGroupName = RouteServiceProvider::getLastRouteGroupName();
+        //     Route::module($pluralSlug, $options, $resource_options, $resource);
 
-            $groupPrefix = RouteServiceProvider::getGroupPrefix();
+        //     $lastRouteGroupName = RouteServiceProvider::getLastRouteGroupName();
 
-            // Check if name will be a duplicate, and prevent if needed/allowed
-            if (RouteServiceProvider::shouldPrefixRouteName($groupPrefix, $lastRouteGroupName)) {
-                $singletonRouteName = "{$groupPrefix}.{$slug}";
-            } else {
-                $singletonRouteName = $slug;
-            }
+        //     $groupPrefix = RouteServiceProvider::getGroupPrefix();
 
-            Route::get($slug, $modelName . 'Controller@editSingleton')->name($singletonRouteName);
-        });
+        //     // Check if name will be a duplicate, and prevent if needed/allowed
+        //     if (RouteServiceProvider::shouldPrefixRouteName($groupPrefix, $lastRouteGroupName)) {
+        //         $singletonRouteName = "{$groupPrefix}.{$slug}";
+        //     } else {
+        //         $singletonRouteName = $slug;
+        //     }
+
+        //     Route::get($slug, $modelName . 'Controller@editSingleton')->name($singletonRouteName);
+        // });
     }
 
     /**
@@ -417,7 +390,6 @@ class RouteServiceProvider extends ServiceProvider
     protected function bootMacros()
     {
         Route::macro('configRoutes', function($config, $middlewares = [], $options = []){
-            // dd($config, $middlewares, $options);
             Route::middleware($middlewares)->group( function() use($config, $options){
 
                 $customRoutes = $defaults = [
@@ -455,7 +427,11 @@ class RouteServiceProvider extends ServiceProvider
                 $groupPrefix = RouteServiceProvider::getGroupPrefix();
 
                 // dd($config, $lastRouteGroupName, $groupPrefix);
-
+                // dd(
+                //     $config,
+                //     findParentRoute($config),
+                //     config(),
+                // );
                 $pr = findParentRoute($config);
 
                 $system_prefix = (isset($config['base_prefix']) && $config['base_prefix']) ? unusualConfig('base_prefix', 'system-settings') . '/' : '';
@@ -499,7 +475,6 @@ class RouteServiceProvider extends ServiceProvider
                         // $resource_options = [
                         //     'names' => $item['route_name'] ?? $route_snake,
                         // ];
-
                         $resource_options_names = $item['route_name'] ?? $route_snake;
                         $resource_options_as = [];
 
@@ -622,7 +597,6 @@ class RouteServiceProvider extends ServiceProvider
             $snakeCase  = snakeCase(getCurrentModuleName($routeFile));
 
             $config = config( $snakeCase );
-
             if( !!$config )
                 Route::configRoutes($config, $middlewares, $options);
             else
@@ -631,32 +605,6 @@ class RouteServiceProvider extends ServiceProvider
                     $snakeCase,
                     $config
                 );
-
-        });
-
-        Route::macro('unusualWebRoutes', function ($middlewares = [], $options = []) {
-            $base_config = config( unusualBaseKey());
-
-            if(isset($base_config['system_modules'])){
-                foreach ($base_config['system_modules'] as $name => $config) {
-                    // Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-                    // dd($_config);
-                    // Route::configRoutes([
-                    //     "name" => "Dashboard",
-                    //     "headline" => "Dashboard",
-                    //     "routes" => [
-                    //         [
-                    //             "parent" => true,
-                    //             "name" => "Dashboard",
-                    //             "headline" => "Dashboard",
-                    //             "url" => "",
-                    //             "route_name" => "dashboard",
-                    //         ]
-                    //     ]
-                    // ], $middlewares, $options);
-                    Route::configRoutes($config, $middlewares, $options);
-                }
-            }
 
         });
 

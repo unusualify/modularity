@@ -7,7 +7,7 @@
       :border-color="color"
       elevation="2"
     >
-      <ue-row-format :elements="[
+      <RowFormat :elements="[
           {
             text: title,
             col: {'cols': 8, class: 'd-flex align-center'},
@@ -23,7 +23,7 @@
         :color="_textColor"
       >
 
-      </ue-row-format>
+      </RowFormat>
       <!-- <v-row>
         <v-col cols="12" sm="8" >
           <span :class="`text-${_textColor}`">
@@ -41,7 +41,12 @@
 </template>
 
 <script>
+import RowFormat from '__components/labs/RowFormat.vue'
+
 export default {
+  components: {
+    RowFormat
+  },
   props: {
     bgColor: {
       type: String,

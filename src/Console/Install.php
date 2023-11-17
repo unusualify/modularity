@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Console;
+namespace Unusualify\Modularity\Console;
 
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Filesystem\Filesystem;
@@ -107,7 +107,7 @@ class Install extends BaseCommand
     private function publishConfig()
     {
         $this->call('vendor:publish', [
-            '--provider' => 'OoBook\CRM\Base\TwillServiceProvider',
+            '--provider' => 'Unusualify\Modularity\TwillServiceProvider',
             '--tag' => 'config',
         ]);
     }
@@ -120,7 +120,7 @@ class Install extends BaseCommand
     private function publishAssets()
     {
         $this->call('vendor:publish', [
-            '--provider' => 'OoBook\CRM\Base\TwillServiceProvider',
+            '--provider' => 'Unusualify\Modularity\TwillServiceProvider',
             '--tag' => 'assets',
         ]);
     }

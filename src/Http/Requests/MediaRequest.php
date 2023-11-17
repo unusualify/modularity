@@ -1,8 +1,8 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Requests;
+namespace Unusualify\Modularity\Http\Requests;
 
-use OoBook\CRM\Base\Http\Requests\BaseFormRequest;
+use Unusualify\Modularity\Http\Requests\BaseFormRequest;
 
 class MediaRequest extends BaseFormRequest
 {

@@ -220,17 +220,31 @@ export default {
 
       issetModel: Object.keys(this.modelValue).length > 0,
       issetSchema: Object.keys(this.schema).length > 0,
-      hasStickyFrame: this.stickyFrame || this.stickyButton
+      hasStickyFrame: this.stickyFrame || this.stickyButton,
+
+      model: this.issetModel ? this.modelValue : this.editedItem
     }
   },
 
   created () {
-
+    this.model = getModel(
+      this.inputSchema,
+      this.issetModel ? this.modelValue : this.editedItem,
+      this.$store.state
+    )
   },
 
   watch: {
     model (newValue, oldValue) {
       // __log('model watcher', newValue, oldValue)
+      // this.resetValidation()
+    },
+    editedItem (newValue, oldValue) {
+      // __log('editedItem', newValue)
+      if (!this.issetModel) {
+        // __log('editedItem watcher', getModel(this.inputSchema, newValue, this.$store.state))
+        this.model = getModel(this.inputSchema, newValue, this.$store.state)
+      }
       // this.resetValidation()
     },
     errors (newValue, oldValue) {
@@ -249,7 +263,7 @@ export default {
       },
       set (value) {
         // this._schema = value
-        // __log('inputSchema setter', value, this.inputSchema)
+        __log('inputSchema setter', value, this.inputSchema)
       }
     },
 
@@ -263,16 +277,21 @@ export default {
 
     //   }
     // },
-    model: {
+    model_: {
       get () {
-        return this.issetModel ? this.modelValue : this.$store.state.form.editedItem
+        __log('model getter', this.modelValue, this.$store.state.form.editedItem)
+
+        return getModel(
+          this.inputSchema,
+          this.issetModel ? this.modelValue : this.$store.state.form.editedItem,
+          this.$store._state.data
+        )
       },
       set (value) {
-        // __log('model setter', value)
+        __log('model setter', value)
         // this.resetValidation()
       }
     },
-
     loading () {
       return this.actionUrl ? this.formLoading : this.$store.state.form.loading
       // get () {
@@ -326,6 +345,7 @@ export default {
       }
     },
     ...mapState({
+      editedItem: state => state.form.editedItem
       // loading: state => state.form.loading,
       // errors: state => state.form.errors
     })
@@ -365,7 +385,7 @@ export default {
         this.formErrors = {}
         this.formLoading = true
 
-        const formData = getSubmitFormData(this.inputSchema, this.model)
+        const formData = getSubmitFormData(this.inputSchema, this.model, this.$store._state.data)
         const method = Object.prototype.hasOwnProperty.call(formData, 'id') ? 'put' : 'post'
         const self = this
 
@@ -410,8 +430,13 @@ export default {
           e.preventDefault() // don't perform submit action (i.e., `<form>.action`)
           if (!this.actionUrl) {
             this.$store.commit(FORM.SET_EDITED_ITEM, this.model)
+            this.$nextTick(() => {
+              __log('saveForm')
+              this.saveForm()
+            })
+          } else {
+            this.saveForm()
           }
-          this.saveForm()
         }
       } else {
         e.preventDefault() // don't perform submit action (i.e., `<form>.action`)

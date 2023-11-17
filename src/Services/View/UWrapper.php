@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Services\View;
+namespace Unusualify\Modularity\Services\View;
 
 use BadMethodCallException;
 use Closure;
@@ -9,7 +9,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
-use OoBook\CRM\Base\Traits\ManageNames;
+use Unusualify\Modularity\Traits\ManageNames;
 use Stringable;
 
 class UWrapper
@@ -53,7 +53,7 @@ class UWrapper
                     $col->addChildren($contents[0]);
                 }
 
-            }else if(get_class($element) === 'OoBook\CRM\Base\Services\View\UComponent' ){
+            }else if(get_class($element) === 'Unusualify\Modularity\Services\View\UComponent' ){
                 $col->addChildren($element);
             }
 

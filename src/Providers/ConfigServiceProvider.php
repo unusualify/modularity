@@ -1,15 +1,12 @@
 <?php
 
-namespace OoBook\CRM\Base\Providers;
+namespace Unusualify\Modularity\Providers;
 
 use Illuminate\Database\Eloquent\Factory;
 
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Route;
-use OoBook\CRM\Base\View\Table;
 use Nwidart\Modules\Facades\Module;
-use Illuminate\Support\Str;
-use OoBook\CRM\Base\Entities\User;
+use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Facades\Modularity;
 
 class ConfigServiceProvider extends ServiceProvider
 {
@@ -48,7 +45,7 @@ class ConfigServiceProvider extends ServiceProvider
 
         // $this->mergeConfigFrom(__DIR__ . '/../Config/config.php', 'unusual');
 
-        $this->mergeConfigFrom(__DIR__ . '/../Config/system_modules.php', $this->baseKey . '.system_modules');
+        // $this->mergeConfigFrom(__DIR__ . '/../Config/system_modules.php', $this->baseKey . '.system_modules');
         $this->mergeConfigFrom(__DIR__ . '/../Config/input_drafts.php', $this->baseKey . '.input_drafts');
         $this->mergeConfigFrom(__DIR__ . '/../Config/media_library.php', $this->baseKey . '.media_library');
         $this->mergeConfigFrom(__DIR__ . '/../Config/file_library.php', $this->baseKey . '.file_library');
@@ -77,6 +74,20 @@ class ConfigServiceProvider extends ServiceProvider
                 ]]);
             }
         }
+
+        // Nwidart/laravel-modules scan enabled & scan path addition
+        $scan_paths = config('modules.scan.paths');
+        array_push($scan_paths, base_path( unusualConfig('vendor_path') . '/src/UModules'));
+        config([
+            'modules.scan.enabled' => true,
+            'modules.scan.paths' => $scan_paths
+        ]);
+        config([
+            'modules.cache.enabled' => true,
+            'modules.cache.key' => 'modularity',
+            'modules.cache.lifetime' => 600
+        ]);
+
 
         if (
             config(unusualBaseKey() . '.media_library.endpoint_type') === 'local'
@@ -119,16 +130,18 @@ class ConfigServiceProvider extends ServiceProvider
 
     public function registerModuleConfigs()
     {
+        // $module = Modularity::find('SystemUser');
 
-        foreach(Module::all() as $module){
-            if( $module->getName() != 'Base' && $module->isStatus(true)){
-                // $this->publishes([
-                //     module_path($module->getName(), 'Config/config.php') => config_path($module->getLowerName() . '.php'),
-                // ], 'config');
-                $this->mergeConfigFrom(
-                    module_path($module->getName(), 'Config/config.php'), snakeCase($module->getName())
-                );
-            }
+        foreach(Modularity::allEnabled() as $module){
+            $this->mergeConfigFrom(
+                module_path($module->getName(), 'Config/config.php'), $module->getSnakeName()
+            );
+            // if( $module->getName() != 'Base' && $module->isStatus(true)){
+            //     $this->mergeConfigFrom(
+            //         module_path($module->getName(), 'Config/config.php'), $module->getSnakeName()
+            //     );
+            // }
         }
+
     }
 }

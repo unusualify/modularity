@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Entities\Traits;
+namespace Unusualify\Modularity\Entities\Traits;
 
 trait IsTranslatable
 {
@@ -13,7 +13,7 @@ trait IsTranslatable
     public function isTranslatable($columns = null)
     {
         // Model must have the trait
-        if (!classHasTrait($this, 'OoBook\CRM\Base\Entities\Traits\HasTranslation')) {
+        if (!classHasTrait($this, 'Unusualify\Modularity\Entities\Traits\HasTranslation')) {
             return false;
         }
 

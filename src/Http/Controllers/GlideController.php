@@ -1,8 +1,8 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Controllers;
+namespace Unusualify\Modularity\Http\Controllers;
 
-use OoBook\CRM\Base\Services\MediaLibrary\Glide;
+use Unusualify\Modularity\Services\MediaLibrary\Glide;
 use Illuminate\Foundation\Application;
 
 class GlideController

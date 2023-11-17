@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\ViewComposers;
+namespace Unusualify\Modularity\Http\ViewComposers;
 
 use App;
 use Illuminate\Support\Facades\Lang;

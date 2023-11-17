@@ -1,9 +1,9 @@
 <?php
 
-namespace OoBook\CRM\Base\Entities;
+namespace Unusualify\Modularity\Entities;
 
 use Illuminate\Support\Facades\DB;
-use OoBook\CRM\Base\Services\FileLibrary\FileService;
+use Unusualify\Modularity\Services\FileLibrary\FileService;
 
 class File extends Model
 {
@@ -31,7 +31,7 @@ class File extends Model
         return $query->whereNotIn('id', $usedIds->toArray())->get();
     }
 
-    public function toCmsArray()
+    public function mediableFormat()
     {
         return [
             'id' => $this->id,

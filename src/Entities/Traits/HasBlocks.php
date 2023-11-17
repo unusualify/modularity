@@ -1,9 +1,9 @@
 <?php
 
-namespace OoBook\CRM\Base\Entities\Traits;
+namespace Unusualify\Modularity\Entities\Traits;
 
-use OoBook\CRM\Base\Entities\Block;
-use OoBook\CRM\Base\Services\Blocks\Block as BlockConfig;
+use Unusualify\Modularity\Entities\Block;
+use Unusualify\Modularity\Services\Blocks\Block as BlockConfig;
 
 trait HasBlocks
 {

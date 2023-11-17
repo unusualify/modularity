@@ -1,8 +1,8 @@
 <?php
 
-namespace OoBook\CRM\Base\Support;
+namespace Unusualify\Modularity\Support;
 
-use OoBook\CRM\Base\Facades\UnusualRoutes as FacadesUnusualRoutes;
+use Unusualify\Modularity\Facades\UnusualRoutes as FacadesUnusualRoutes;
 use Illuminate\Support\Facades\Route;
 
 class UnusualRoutes

@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Services\FileLibrary;
+namespace Unusualify\Modularity\Services\FileLibrary;
 
 interface FileServiceInterface
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Providers;
+namespace Unusualify\Modularity\Providers;
 
 use Illuminate\Database\Eloquent\Factory;
 use Illuminate\Support\Facades\Blade;
@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\Route;
 
 use Nwidart\Modules\Facades\Module;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
-use OoBook\CRM\Base\Facades\UNavigation;
-use OoBook\CRM\Base\View\Table;
+use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Facades\UNavigation;
+use Unusualify\Modularity\View\Table;
 
 class UnusualProvider extends ServiceProvider
 {
@@ -66,7 +67,7 @@ class UnusualProvider extends ServiceProvider
         //     unusualBaseKey() . '-navigation.sidebar' => UNavigation::formatSidebarMenus($this->app->config->get(unusualBaseKey() . '-navigation.sidebar'))
         // ]);
 
-        // load base module migrations
+        // load unusual migrations
         $this->loadMigrationsFrom(
             base_path( config( $this->baseKey . '.vendor_path') . '/src/Database/Migrations/default' )
         );
@@ -74,19 +75,11 @@ class UnusualProvider extends ServiceProvider
         // load each enable module migrations
         $modules_folder = base_path(config('modules.namespace'));
         $module_migration_folder = GenerateConfigReader::read('migration')->getPath();
-        foreach(Module::allEnabled() as $module){
+        foreach(Modularity::allEnabled() as $module){
             $this->loadMigrationsFrom(
                 $modules_folder . "/" . $module->getStudlyName() . "/" . $module_migration_folder
             );
         }
-
-        // dd(
-        //     Module::allEnabled(),
-        //     Module::allDisabled(),
-        //     Module::getPath(),
-        //     config('modules.namespace')
-        //     config('modules.namespace') . "/{$this->module->getStudlyName()}/Database/Migrations"
-        // );
     }
 
     /**

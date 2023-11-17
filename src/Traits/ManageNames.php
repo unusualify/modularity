@@ -1,5 +1,5 @@
 <?php
-namespace OoBook\CRM\Base\Traits;
+namespace Unusualify\Modularity\Traits;
 
 use Nwidart\Modules\Facades\Module;
 use Illuminate\Support\Str;

@@ -1,13 +1,13 @@
 <?php
 
-namespace OoBook\CRM\Base\Support\Decomposers;
+namespace Unusualify\Modularity\Support\Decomposers;
 
-use OoBook\CRM\Base\Traits\ManageNames;
+use Unusualify\Modularity\Traits\ManageNames;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
-use OoBook\CRM\Base\Support\Finder;
+use Unusualify\Modularity\Support\Finder;
 
 class ModelRelationParser implements Arrayable
 {

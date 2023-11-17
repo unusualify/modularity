@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Contracts;
+namespace Unusualify\Modularity\Contracts;
 
 use Nwidart\Modules\Exceptions\ModuleNotFoundException;
 use Nwidart\Modules\Module;

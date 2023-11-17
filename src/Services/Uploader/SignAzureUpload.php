@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Services\Uploader;
+namespace Unusualify\Modularity\Services\Uploader;
 
 use DateTime;
 use DateTimeZone;

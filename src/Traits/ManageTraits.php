@@ -1,5 +1,5 @@
 <?php
-namespace OoBook\CRM\Base\Traits;
+namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Collection;
 

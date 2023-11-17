@@ -1,9 +1,9 @@
 <?php
 
-namespace OoBook\CRM\Base\Entities;
+namespace Unusualify\Modularity\Entities;
 
-use OoBook\CRM\Base\Entities\Traits\HasMedias;
-use OoBook\CRM\Base\Entities\Traits\HasTranslation;
+use Unusualify\Modularity\Entities\Traits\HasMedias;
+use Unusualify\Modularity\Entities\Traits\HasTranslation;
 use Illuminate\Support\Str;
 
 class Setting extends Model
@@ -25,7 +25,7 @@ class Setting extends Model
 
     public function getTranslationModelNameDefault()
     {
-        return "OoBook\CRM\Base\Entities\Translations\SettingTranslation";
+        return "Unusualify\Modularity\Entities\Translations\SettingTranslation";
     }
 
     public function getTable()

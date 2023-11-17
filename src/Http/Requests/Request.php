@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Requests;
+namespace Unusualify\Modularity\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;

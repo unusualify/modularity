@@ -1,20 +1,20 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Controllers;
+namespace Unusualify\Modularity\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
-use OoBook\CRM\Base\Entities\Enums\Permission;
-use OoBook\CRM\Base\Entities\User;
-use OoBook\CRM\Base\Repositories\CompanyRepository;
-use OoBook\CRM\Base\Repositories\UserRepository;
-use OoBook\CRM\Base\Services\View\UComponent;
-use OoBook\CRM\Base\Services\View\UWrapper;
+use Unusualify\Modularity\Entities\Enums\Permission;
+use Unusualify\Modularity\Entities\User;
+use Modules\SystemUser\Repositories\CompanyRepository;
+use Modules\SystemUser\Repositories\UserRepository;
+use Unusualify\Modularity\Services\View\UComponent;
+use Unusualify\Modularity\Services\View\UWrapper;
 
 class ProfileController extends BaseController
 {
 
-    protected $namespace = 'OoBook\CRM\Base';
+    protected $namespace = 'Unusualify\Modularity';
 
     /**
      * @var string

@@ -429,20 +429,12 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import {
-  // VDataTable,
-  VDataTableServer
-} from 'vuetify/labs/VDataTable'
 import ACTIONS from '@/store/actions'
 
 import { useTable, makeTableProps } from '@/hooks'
 import { ALERT } from '@/store/mutations'
 
 export default {
-  components: {
-    // VDataTable,
-    VDataTableServer
-  },
   setup (props, context) {
     return {
       ...useTable(props, context)

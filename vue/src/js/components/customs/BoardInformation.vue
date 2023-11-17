@@ -10,7 +10,7 @@
                 <v-col v-fit-grid cols="12" xl="7" lg="6" md="8" sm="8" class="">
                     <v-list class="v-callout-list">
                         <v-list-item v-for="([title, number, color], index) in statuses" :key="index">
-                            <ue-callout
+                            <Callout
                                 :title="title"
                                 :value="number"
                                 :color="color"
@@ -55,7 +55,12 @@
 </template>
 
 <script>
+import Callout from '__components/labs/Callout.vue'
+
 export default {
+  components: {
+    Callout
+  },
   props: {
     title: {
         type: String,

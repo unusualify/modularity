@@ -32,7 +32,7 @@
                 v-for="(extraColumn, index) in extraColumns"
                 :key="index"
                 :class="rowClass(extraColumn)">
-              <template v-if="extraColumn === 'size'">{{ item[extraColumn] | uppercase}}</template>
+              <template v-if="extraColumn === 'size'">{{ item[extraColumn].toUpperCase() }}</template>
               <template v-else>{{ item[extraColumn] }}</template>
             </td>
           </template>

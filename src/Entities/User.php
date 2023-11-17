@@ -1,8 +1,7 @@
 <?php
 
-namespace OoBook\CRM\Base\Entities;
+namespace Unusualify\Modularity\Entities;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -12,8 +11,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 
 use Spatie\Permission\Traits\HasRoles;
-use OoBook\CRM\Base\Entities\Traits\{HasHelpers, HasScopes, IsTranslatable};
-use OoBook\CRM\Base\Entities\Model;
+use Unusualify\Modularity\Entities\Traits\{HasHelpers, HasScopes, IsTranslatable};
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, HasHelpers, HasScopes, IsTranslatable;

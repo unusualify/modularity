@@ -6,6 +6,9 @@ import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 import { transform, cloneDeep, filter } from 'lodash'
 import { getModel } from '@/utils/getFormData'
 import { useI18n } from 'vue-i18n'
+import { useStore } from 'vuex'
+
+import { makeInputProps } from '@/hooks/'
 
 import {
   useValidation,
@@ -13,6 +16,7 @@ import {
 } from '@/hooks'
 
 export const makeRepeaterProps = propsFactory({
+  ...makeInputProps(),
   modelValue: {
     type: Array
   },
@@ -45,6 +49,8 @@ export const makeRepeaterProps = propsFactory({
 
 // by convention, composable function names start with "use"
 export default function useRepeater (props, context) {
+  const store = useStore()
+
   const { invokeRuleGenerator } = useValidation(props, context)
   const inputHook = useInput(props, context)
 

@@ -1,9 +1,9 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Controllers;
+namespace Unusualify\Modularity\Http\Controllers;
 
 use Illuminate\Auth\AuthManager;
-use OoBook\CRM\Base\Repositories\UserRepository;
+use Modules\SystemUser\Repositories\UserRepository;
 
 class ImpersonateController extends Controller
 {

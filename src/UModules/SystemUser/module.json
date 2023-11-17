@@ -1,0 +1,11 @@
+{
+    "name": "SystemUser",
+    "alias": "system_user",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+
+    ],
+    "files": []
+}

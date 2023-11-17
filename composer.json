@@ -44,8 +44,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "OoBook\\CRM\\Base\\LaravelServiceProvider",
-                "OoBook\\CRM\\Base\\Providers\\UnusualProvider"
+                "Unusualify\\Modularity\\LaravelServiceProvider",
+                "Unusualify\\Modularity\\Providers\\UnusualProvider"
             ],
             "aliases": {
 
@@ -57,7 +57,8 @@
     },
     "autoload": {
         "psr-4": {
-            "OoBook\\CRM\\Base\\": "src"
+            "Unusualify\\Modularity\\": "src",
+            "Modules\\": "src/UModules"
         },
         "files": [
           "src/Support/Migrations/SchemaParser.php",

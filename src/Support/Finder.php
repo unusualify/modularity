@@ -1,9 +1,9 @@
 <?php
 
-namespace OoBook\CRM\Base\Support;
+namespace Unusualify\Modularity\Support;
 
 use Nwidart\Modules\Support\Migrations\SchemaParser as Parser;
-use OoBook\CRM\Base\Traits\ManageNames;
+use Unusualify\Modularity\Traits\ManageNames;
 
 use Composer\Autoload\ClassMapGenerator;
 

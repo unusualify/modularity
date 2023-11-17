@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Entities\Interfaces;
+namespace Unusualify\Modularity\Entities\Interfaces;
 
 interface Sortable
 {

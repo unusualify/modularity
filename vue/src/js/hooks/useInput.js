@@ -1,27 +1,31 @@
 // hooks/formatter .js
 
-// import { ref, watch, computed, nextTick } from 'vue'
 import { reactive, toRefs, computed } from 'vue'
+import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
+
+import { omit } from 'lodash'
+
+export const makeInputProps = propsFactory({
+  modelValue: null,
+  obj: {
+    type: Object,
+    default () {
+      return {}
+    }
+  }
+})
 
 // by convention, composable function names start with "use"
 export default function useInput (props, context) {
-  // const _props = {
-  //   modelValue: ref(''),
-  //   obj: ref({})
-  // }
-
-  // const { modelValue, obj } = toRefs(defineProps({
-  //   modelValue: String,
-  //   obj: Object
-  // }))
   const { modelValue, obj } = toRefs(props)
 
   const states = reactive({
     id: Math.ceil(Math.random() * 1000000) + '-input',
-    boundProps: _.omit(obj.value.schema ?? {}, ['offset', 'order', 'col']),
+    boundProps: omit(obj.value.schema ?? {}, ['offset', 'order', 'col']),
 
     input: computed({
       get: () => {
+        // __log('useInput', modelValue.value)
         return modelValue.value
       },
       set: (val, old) => {
@@ -31,29 +35,23 @@ export default function useInput (props, context) {
       }
     })
   })
+
   const methods = reactive({
     updateModelValue: function (val) {
-      // __log(
-      //   'useInput updateModelValue', val
-      // )
       context.emit('update:modelValue', val)
+      // __log('updateModelValue', val)
       // context.emit('input', val)
     },
-
     inputOnSet (newValue, oldValue) {
 
     },
-
     makeReference (key) {
       return `${key}-${states.id}`
     },
     getReference (key) {
       return methods.makeReference(key)
     }
-
   })
-
-  // const computed =
 
   // expose managed state as return value
   return {

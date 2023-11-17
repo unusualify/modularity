@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Repositories\Traits;
+namespace Unusualify\Modularity\Repositories\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -19,7 +19,7 @@ trait TranslationsTrait
     }
 
     /**
-     * @param \OoBook\CRM\Base\Entities\Model|null $object
+     * @param \Unusualify\Modularity\Entities\Model|null $object
      * @param array $fields
      * @return array
      */
@@ -69,7 +69,7 @@ trait TranslationsTrait
     }
 
     /**
-     * @param \OoBook\CRM\Base\Entities\Model $object
+     * @param \Unusualify\Modularity\Entities\Model $object
      * @param array $fields
      * @return array
      */

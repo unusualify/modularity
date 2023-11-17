@@ -2,7 +2,7 @@
 
 namespace Nwidart\Modules\Contracts;
 
-use OoBook\CRM\Base\Module;
+use Unusualify\Modularity\Module;
 
 interface ActivatorInterface
 {

@@ -33,17 +33,14 @@
 
 <script>
 import { InputMixin } from '@/mixins' // for props
-import { useInput } from '@/hooks'
+import { useInput, makeInputProps } from '@/hooks'
 
 export default {
-  setup (props, context) {
-    return {
-      ...useInput(props, context)
-    }
-  },
-  mixins: [InputMixin],
+
   name: 'v-custom-input-checklist',
+  mixins: [InputMixin],
   props: {
+    ...makeInputProps(),
     label: {
       type: String,
       default: ''
@@ -63,6 +60,11 @@ export default {
     checkboxColor: {
       type: String,
       default: 'success'
+    }
+  },
+  setup (props, context) {
+    return {
+      ...useInput(props, context)
     }
   },
 

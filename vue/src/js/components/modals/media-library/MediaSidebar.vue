@@ -15,7 +15,7 @@
           <v-list density="compact" class="bg-transparent">
             <v-list-item v-if="firstMedia.size" color="primary" variant="tonal">
               <!-- <template v-slot:prepend><v-icon icon="mdi-folder"/></template> -->
-              <v-list-item-title>File size: {{ firstMedia.size | uppercase }}</v-list-item-title>
+              <v-list-item-title>File size: {{ firstMedia.size.toUpperCase() }}</v-list-item-title>
             </v-list-item>
             <v-list-item v-if="isImage && (firstMedia.width + firstMedia.height)" color="primary" variant="tonal">
               <!-- <template v-slot:prepend><v-icon icon="mdi-relative-scale"/></template> -->

@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Controllers;
+namespace Unusualify\Modularity\Http\Controllers;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -18,8 +18,8 @@ use Illuminate\Support\Str;
 
 use Illuminate\Routing\Controller;
 use Nwidart\Modules\Facades\Module;
-use OoBook\CRM\Base\Entities\Enums\Permission;
-use OoBook\CRM\Base\Traits\{MakesResponses, ManageNames, ManageScopes, ManageTraits};
+use Unusualify\Modularity\Entities\Enums\Permission;
+use Unusualify\Modularity\Traits\{MakesResponses, ManageNames, ManageScopes, ManageTraits};
 
 abstract class CoreController extends Controller
 {
@@ -40,7 +40,7 @@ abstract class CoreController extends Controller
     protected $request;
 
     /**
-     * @var OoBook\CRM\Base\Entities\Model
+     * @var Unusualify\Modularity\Entities\Model
      */
     protected $user;
 
@@ -108,7 +108,7 @@ abstract class CoreController extends Controller
     protected $modelTitle;
 
     /**
-     * @var \OoBook\CRM\Base\Repositories\ModuleRepository
+     * @var \Unusualify\Modularity\Repositories\ModuleRepository
      */
     protected $repository;
 
@@ -452,7 +452,7 @@ abstract class CoreController extends Controller
     }
 
     /**
-     * @return \OoBook\CRM\Base\Http\Requests\Admin\Request
+     * @return \Unusualify\Modularity\Http\Requests\Admin\Request
      */
     protected function validateFormRequest()
     {
@@ -626,7 +626,7 @@ abstract class CoreController extends Controller
     }
 
     /**
-     * @return \OoBook\CRM\Base\Repositories\ModuleRepository
+     * @return \Unusualify\Modularity\Repositories\ModuleRepository
      */
     protected function getRepository()
     {
@@ -658,7 +658,7 @@ abstract class CoreController extends Controller
     }
 
     /**
-     * @return \OoBook\CRM\Base\Transformers\
+     * @return \Unusualify\Modularity\Transformers\
      */
     protected function getTransformer($data = [])
     {
@@ -670,7 +670,7 @@ abstract class CoreController extends Controller
     }
 
     /**
-     * @return \OoBook\CRM\Base\Transformers
+     * @return \Unusualify\Modularity\Transformers
      */
     protected function getTransformerClass()
     {

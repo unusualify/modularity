@@ -1,7 +1,6 @@
 import { ALERT } from '../store/mutations'
 
 export default {
-  // $main: this.$root.$refs.$main,
   $trans: function (key, defaultValue) {
     return this.$lodash.get(window[process.env.VUE_APP_NAME].unusualLocalization.lang, key, defaultValue)
     // return get(window[process.env.VUE_APP_NAME].unusualLocalization.lang, key, defaultValue)

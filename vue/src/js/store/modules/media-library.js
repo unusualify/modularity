@@ -36,6 +36,9 @@ const state = {
    * @type {string}
    */
   connector: null,
+
+  isInserted: false,
+
   /**
    * Define the max of medias that can be select from the media libray
    * @type {number}
@@ -131,6 +134,13 @@ const mutations = {
     // )
   },
   [MEDIA_LIBRARY.SAVE_MEDIAS] (state, medias) {
+    // __log(
+    //   medias,
+    //   state.connector,
+    //   state.indexToReplace,
+    //   state.selected
+    // )
+    // return
     if (state.connector) {
       const key = state.connector
       const existedSelectedConnector = state.selected[key] && state.selected[key].length
@@ -153,15 +163,19 @@ const mutations = {
     }
   },
   [MEDIA_LIBRARY.DESTROY_SPECIFIC_MEDIA] (state, media) {
-    if (state.selected[media.name]) {
-      state.selected[media.name].splice(media.index, 1)
-      if (state.selected[media.name].length === 0) Vue.delete(state.selected, media.name)
-    }
+    __log(
+      media.name,
+      state.selected
+    )
+    // if (state.selected[media.name]) {
+    //   state.selected[media.name].splice(media.index, 1)
+    //   if (state.selected[media.name].length === 0) delete state.selected[media.name]
+    // }
 
-    state.connector = null
+    // state.connector = null
   },
   [MEDIA_LIBRARY.DESTROY_MEDIAS] (state, connector) {
-    if (state.selected[connector]) Vue.delete(state.selected, connector)
+    if (state.selected[connector]) delete state.selected[connector]
 
     state.connector = null
   },
@@ -210,6 +224,10 @@ const mutations = {
     if (newValue && newValue !== '') state.connector = newValue
     else state.connector = null
   },
+  [MEDIA_LIBRARY.UPDATE_IS_INSERTED] (state, newValue) {
+    state.isInserted = newValue
+  },
+
   [MEDIA_LIBRARY.UPDATE_MEDIA_MODE] (state, newValue) {
     state.strict = newValue
   },

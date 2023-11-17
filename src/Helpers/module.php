@@ -4,21 +4,23 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
+// use Unusualify\Modularity\Facades\Module;
 use Symfony\Component\Console\Input\InputOption;
+use Unusualify\Modularity\Facades\Modularity;
+
 // use Module;
 
 
 if (! function_exists('unusualBaseKey')) {
-    function unusualBaseKey() {
-        return \Illuminate\Support\Str::snake(env('UNUSUAL_BASE_NAME', 'Unusual'));
+    function unusualBaseKey($notation = null) {
+        $notation = !$notation ? $notation : "." . $notation;
+        return \Illuminate\Support\Str::snake(env('UNUSUAL_BASE_NAME', 'Unusual')) . $notation;
     }
 }
 
 if (! function_exists('getModule')) {
     function getModule($name = "Base") {
-        // dd( app()['modules']->find( ucfirst( strtolower($name ) ) ) );
-        // return app()['modules']->find( ucfirst( strtolower($name ) ) );
-        return Module::find( studlyName($name )  );
+        return Modularity::find( studlyName($name )  );
     }
 }
 
@@ -42,7 +44,7 @@ if (! function_exists('getCurrentModuleName')) {
 
             $pattern = '/^((?![M|m]{1}odules\/Base).)*$/';
             $pattern = '/[M|m]{1}odules\/[A-Za-z]/';
-            // dd($pattern);
+
             $dir = fileTrace($pattern);
         }
 
@@ -87,13 +89,13 @@ if (! function_exists('getCurrentModuleUrlName')) {
 
 if (! function_exists('getModuleSubRoutes')) {
     function getModuleSubRoutes($file = null) {
-        return config(  getCurrentModule($file)->getLowerName().'.sub_routes' );
+        return config( getCurrentModule($file)->getLowerName().'.routes' );
     }
 }
 
 if (! function_exists('getModuleSubRoute')) {
     function getModuleSubRoute($key, $file = null ) {
-        return config(  getCurrentModule($file)->getLowerName().'.sub_routes.'.strtolower($key) );
+        return config( getCurrentModule($file)->getLowerName().'.routes.'.strtolower($key) );
     }
 }
 
@@ -315,12 +317,12 @@ if (! function_exists('unusualConfig')) {
     /**
      * @return string|array
      */
-    function unusualConfig($notation = '', $default = '')
+    function unusualConfig($notation = null, $default = '')
     {
-        if($notation == '')
+        if(!$notation)
             return config(unusualBaseKey());
         else
-            return config(unusualBaseKey() . '.' . $notation, $default);
+            return config(unusualBaseKey($notation), $default);
     }
 }
 

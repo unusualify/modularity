@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Console;
+namespace Unusualify\Modularity\Console;
 
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Filesystem\Filesystem;
@@ -78,7 +78,7 @@ class SetupCommand extends BaseCommand
     private function publishConfig()
     {
         $this->call('vendor:publish', [
-            '--provider' => 'OoBook\CRM\Base\Providers\UnusualProvider',
+            '--provider' => 'Unusualify\Modularity\Providers\UnusualProvider',
             '--tag' => 'config',
         ]);
     }
@@ -91,7 +91,7 @@ class SetupCommand extends BaseCommand
     private function publishAssets()
     {
         $this->call('vendor:publish', [
-            '--provider' => 'OoBook\CRM\Base\Providers\UnusualProvider',
+            '--provider' => 'Unusualify\Modularity\Providers\UnusualProvider',
             '--tag' => 'assets',
             '--force' => true,
         ]);

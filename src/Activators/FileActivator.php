@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Activators;
+namespace Unusualify\Modularity\Activators;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Config\Repository as Config;
@@ -65,7 +65,7 @@ class FileActivator extends ActivatorsFileActivator
         $this->cache = $app['cache'];
         $this->files = $app['files'];
         $this->config = $app['config'];
-        $this->cacheKey = $this->config('cache-key');
+        $this->cacheKey = 'module-activator.installed';
         $this->cacheLifetime = $this->config('cache-lifetime');
 
         // $this->statusesFile = $this->config('statuses-file');
@@ -76,7 +76,6 @@ class FileActivator extends ActivatorsFileActivator
     public function setModule($module)
     {
         $this->module = $module;
-
         $this->statusesFile = base_path( config('modules.namespace') . "/" . $this->module ."/" . $this->config('statuses-file')) ;
 
         $this->routesStatuses = $this->getRoutesStatuses();
@@ -188,7 +187,6 @@ class FileActivator extends ActivatorsFileActivator
      */
     private function writeRoutesJson(): void
     {
-        // dd($this->routesStatuses);
         $this->files->put($this->statusesFile, json_encode($this->routesStatuses, JSON_PRETTY_PRINT));
     }
 

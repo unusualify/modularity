@@ -1,11 +1,12 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Controllers\API;
+namespace Unusualify\Modularity\Http\Controllers\API;
 
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 
 class LanguageController extends Controller
 {
@@ -21,56 +22,40 @@ class LanguageController extends Controller
      */
     public function index(Request $request)
     {
-        $languages = $this->translation->allLanguages();
+        $cache_key = 'modularity-languages';
+        $cache = Cache::store('file');
 
-        $translations = $languages->map(function($lang){
-            $translation = $this->translation->allTranslationsFor($lang);
-            $translations = [];
-            foreach ($translation as $name => $value) {
-                $original = $value->toArray();
+        if($cache->has($cache_key)){
+            return response($cache->get($cache_key))->header('Content-Type', 'application/json');
+        }else{
+            $languages = $this->translation->allLanguages();
 
-                foreach ($original as $key => $array) {
-                    $multidimensional = [];
-                    foreach ($array as $notation => $item) {
-                        Arr::set($multidimensional, $notation, $item);
+            $translations = $languages->map(function($lang){
+                $translation = $this->translation->allTranslationsFor($lang);
+                $translations = [];
+                foreach ($translation as $name => $value) {
+                    $original = $value->toArray();
+
+                    foreach ($original as $key => $array) {
+                        $multidimensional = [];
+                        foreach ($array as $notation => $item) {
+                            Arr::set($multidimensional, $notation, $item);
+                        }
+                        $original[$key] = $multidimensional;
                     }
-                    $original[$key] = $multidimensional;
+
+                    $translations[$name] = $original;
                 }
 
-                $translations[$name] = $original;
-            }
 
+                return array_merge_recursive_preserve($translations['group'], isset($translations['single']['single']) ?  $translations['single']['single'] : []);
+                return trans()->get('*', [], $lang);
+            });
 
-            return array_merge_recursive_preserve($translations['group'], isset($translations['single']['single']) ?  $translations['single']['single'] : []);
-            return trans()->get('*', [], $lang);
-        });
-        // dd(
-        //     trans()->get('*', [], 'tr'),
-        //     \Lang::get('*'),
+            $cache->set($cache_key, json_encode($translations) , 600);
 
-        //     trans('auth'),
-        //     \Lang::get('auth'),
-        //     __('auth'),
-        //     ___('auth'),
-
-        //     trans('authentication'),
-        //     \Lang::get('authentication'),
-        //     __('authentication'),
-        //     ___('authentication'),
-
-        //     $groups = $this->translation->getGroupsFor(config('app.locale'))->merge('single'),
-        //     $translations = $this->translation->filterTranslationsFor('tr', $request->get('filter'))
-        // );
-        return response()->json($translations);
-        // dd(
-        //     $languages,
-        //     $this->translation->getSourceLanguageTranslationsWith('tr'),
-        //     $translations,
-        //     trans()->get('*', [], 'en'),
-        //     json_encode(trans()->get('*')),
-        //     trans('errors.key_exists')
-        // );
-        // return new RoleResource( Role::paginate( request()->query('itemsPerPage') ?? 10) );
+            return response()->json($translations);
+        }
     }
 
     /**

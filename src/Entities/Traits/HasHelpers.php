@@ -1,8 +1,8 @@
 <?php
 
-namespace OoBook\CRM\Base\Entities\Traits;
+namespace Unusualify\Modularity\Entities\Traits;
 
-use OoBook\CRM\Base\Entities\Tag;
+use Unusualify\Modularity\Entities\Tag;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 use ErrorException;

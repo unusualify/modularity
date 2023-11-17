@@ -71,7 +71,7 @@ return [
                         'name' => 'company_id',
                         'label' => 'Company',
                         'type' => 'select',
-                        'repository' => 'OoBook\\CRM\\Base\\Repositories\\CompanyRepository',
+                        'repository' => 'Unusualify\\Modularity\\Repositories\\CompanyRepository',
                     ],
                     [
                         'type' => 'text',
@@ -95,7 +95,7 @@ return [
                             'md' => 6,
                         ],
                         'route' => 'role',
-                        'repository' => \OoBook\CRM\Base\Repositories\RoleRepository::class,
+                        'repository' => \Unusualify\Modularity\Repositories\RoleRepository::class,
                     ],
                 ]
             ],

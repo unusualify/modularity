@@ -1,19 +1,19 @@
 <?php
 
-namespace OoBook\CRM\Base\Providers;
+namespace Unusualify\Modularity\Providers;
 
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Route;
-use OoBook\CRM\Base\Activators\FileActivator;
-use OoBook\CRM\Base\Services\View\UNavigation;
-use OoBook\CRM\Base\UnusualFileRepository;
+use Unusualify\Modularity\Activators\FileActivator;
+use Unusualify\Modularity\Modularity;
+use Unusualify\Modularity\Services\View\UNavigation;
 class BaseServiceProvider extends ServiceProvider
 {
     /**
      * Namespace of the terminal commands
      * @var string
      */
-    protected $terminalNamespace = "OoBook\\CRM\\Base\\Console";
+    protected $terminalNamespace = "Unusualify\\Modularity\\Console";
 
     /**
      * Boot the application events.
@@ -43,22 +43,22 @@ class BaseServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
         $this->registerHelpers();
 
         $this->macros();
 
         $this->commands($this->resolveCommands());
 
-        // $this->app->singleton(\OoBook\CRM\Base\Contracts\RepositoryInterface::class, function ($app) {
-        $this->app->singleton('unusual.repository', function ($app) {
+        // $this->app->singleton(\Unusualify\Modularity\Contracts\RepositoryInterface::class, function ($app) {
+        $this->app->singleton('unusual.modularity', function ($app) {
             $path = $app['config']->get('modules.paths.modules');
 
-            return new UnusualFileRepository($app, $path);
+            return new Modularity($app, $path);
         });
 
         // $this->app->singleton(FileActivator::class, function ($app) {
         $this->app->singleton('unusual.activator', function ($app) {
+            // echo 'unusual.activator' . "</br>";
             return new FileActivator($app);
         });
 
@@ -67,13 +67,12 @@ class BaseServiceProvider extends ServiceProvider
         // });
 
         $this->app->singleton('unusual.navigation', UNavigation::class);
-        // $this->app->alias(\OoBook\CRM\Base\Contracts\RepositoryInterface::class, 'ue_modules');
-        // $this->app->alias('unusual.repository', 'ue_modules');
+        // $this->app->alias(\Unusualify\Modularity\Contracts\RepositoryInterface::class, 'ue_modules');
+        $this->app->alias('unusual.modularity', 'modularity');
 
         // $this->app->alias(FileActivator::class, 'module_activator');
 
         $this->app->alias(\Torann\GeoIP\Facades\GeoIP::class, 'GeoIP');
-
     }
 
     /**
@@ -137,7 +136,7 @@ class BaseServiceProvider extends ServiceProvider
             preg_match("/[^\/]+(?=\.[^\/.]*$)/", $cmd, $match);
 
             if(count($match) == 1 && !preg_match('#(.*?)(BaseCommand)(.*?)#', $cmd)){
-                $cmds[] = preg_match("/{$this->terminalNamespace}/", $match[0])
+                $cmds[] = preg_match("|" . preg_quote($this->terminalNamespace, "|") . "|", $match[0])
                             ? $cmd
                             : "{$this->terminalNamespace}\\{$match[0]}";
             }

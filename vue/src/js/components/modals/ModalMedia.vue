@@ -90,8 +90,8 @@
                 </MediaSidebar>
               </aside>
               <footer class="medialibrary__footer" v-if="selectedMedias.length && showInsert && connector">
-                <ue-btn  v-if="canInsert" @click="saveAndClose">{{ btnLabel }} </ue-btn>
-                <ue-btn v-else :disabled="true" > {{ btnLabel }} </ue-btn>
+                <v-btn  v-if="canInsert" @click="saveAndClose">{{ btnLabel }} </v-btn>
+                <v-btn v-else :disabled="true" > {{ btnLabel }} </v-btn>
               </footer>
 
               <div class="medialibrary__list" ref="list">
@@ -215,7 +215,7 @@ export default {
       lastScrollTop: 0,
       gridLoaded: false,
       full: true
-    //   show: false
+      //   show: false
     }
   },
   computed: {
@@ -266,6 +266,10 @@ export default {
       return navItem[0]
     },
     canInsert: function () {
+      // __log(
+      //   this.selectedMedias,
+      //   this.usedMedias
+      // )
       return !this.selectedMedias.some(sMedia => !!this.usedMedias.find(uMedia => uMedia.id === sMedia.id))
     },
     ...mapState({
@@ -369,9 +373,6 @@ export default {
     },
     open: function () {
       this.$refs.modal.open()
-    },
-    close: function () {
-      this.$refs.modal.hide()
     },
     opened: function () {
       if (!this.gridLoaded) {
@@ -572,8 +573,11 @@ export default {
       this.lastScrollTop = list.scrollTop
     },
     saveAndClose: function () {
+      this.$store.commit(MEDIA_LIBRARY.UPDATE_IS_INSERTED, true)
       this.$store.commit(MEDIA_LIBRARY.SAVE_MEDIAS, this.selectedMedias)
-      this.close()
+      this.$nextTick(() => { this.closeModal() })
+
+      // this.closeModal()
     },
 
     reloadTags: function (tags = []) {

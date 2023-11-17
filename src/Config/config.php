@@ -1,10 +1,10 @@
 <?php
 
-use OoBook\CRM\Base\Activators\FileActivator;
+use Unusualify\Modularity\Activators\FileActivator;
 use Symfony\Component\Console\Input\InputOption;
 
 return [
-    'namespace' => env('BASE_NAMESPACE','OoBook\\CRM\\Base'),
+    'namespace' => env('BASE_NAMESPACE','Unusualify\\Modularity'),
     'name' => env('UNUSUAL_BASE_NAME','Unusual'),
 
     'version' => '1.0.0',
@@ -229,18 +229,18 @@ return [
                 'description' => 'Do you need to manage the position of records on this module?'
             ],
             'implementations' => [
-                \OoBook\CRM\Base\Entities\Interfaces\Sortable::class
+                \Unusualify\Modularity\Entities\Interfaces\Sortable::class
             ]
         ],
     ],
 
-    'base_model' => \OoBook\CRM\Base\Entities\Model::class,
+    'base_model' => \Unusualify\Modularity\Entities\Model::class,
 
-    'base_repository' => \OoBook\CRM\Base\Repositories\Repository::class,
+    'base_repository' => \Unusualify\Modularity\Repositories\Repository::class,
 
-    'base_controller' => \OoBook\CRM\Base\Http\Controllers\BaseController::class,
+    'base_controller' => \Unusualify\Modularity\Http\Controllers\BaseController::class,
 
-    'base_request' => \OoBook\CRM\Base\Http\Requests\Request::class,
+    'base_request' => \Unusualify\Modularity\Http\Requests\Request::class,
 
     'activators' => [
         'file' => [

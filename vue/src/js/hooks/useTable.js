@@ -186,6 +186,7 @@ export default function useTable (props, context) {
     //   store.dispatch(ACTIONS.GET_DATATABLE)
     // },
     setEditedItem: function (item) {
+      // store._modules.root.state
       store.commit(FORM.SET_EDITED_ITEM, item)
     },
     resetEditedItem: function () {
@@ -250,12 +251,12 @@ export default function useTable (props, context) {
             const match = matches[1]
             // __log(item)
             if (state.snakeName === match) {
-              data[key] = getSubmitFormData(data.schema, item)
+              data[key] = getSubmitFormData(data.schema, item, this.$store._state.data)
               if (data.actionUrl) {
                 data.actionUrl = data.actionUrl.replace(`:${match}`, data[key].id)
               }
             } else if (item[match]) {
-              data[key] = getSubmitFormData(data.schema, item[match])
+              data[key] = getSubmitFormData(data.schema, item[match], this.$store._state.data)
               if (data.actionUrl) {
                 data.actionUrl = data.actionUrl.replace(`:${match}`, data[key].id)
               }

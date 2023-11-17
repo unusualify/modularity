@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Services\MediaLibrary;
+namespace Unusualify\Modularity\Services\MediaLibrary;
 
 interface ImageServiceInterface
 {

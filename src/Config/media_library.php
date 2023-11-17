@@ -14,15 +14,15 @@ return [
     | deleting from the media library.
     | If using the 'local' endpoint type, define a 'local_path' to store files.
     | Supported image services:
-    | - 'OoBook\CRM\Base\Services\MediaLibrary\Imgix'
-    | - 'OoBook\CRM\Base\Services\MediaLibrary\Local'
+    | - 'Unusualify\Modularity\Services\MediaLibrary\Imgix'
+    | - 'Unusualify\Modularity\Services\MediaLibrary\Local'
     |
      */
     'disk' => unusualBaseKey() . '_media_library',
     'endpoint_type' => env('MEDIA_LIBRARY_ENDPOINT_TYPE', 'local'),
     'cascade_delete' => env('MEDIA_LIBRARY_CASCADE_DELETE', false),
     'local_path' => env('MEDIA_LIBRARY_LOCAL_PATH', 'uploads'),
-    'image_service' => env('MEDIA_LIBRARY_IMAGE_SERVICE', 'OoBook\CRM\Base\Services\MediaLibrary\Imgix'),
+    'image_service' => env('MEDIA_LIBRARY_IMAGE_SERVICE', 'Unusualify\Modularity\Services\MediaLibrary\Imgix'),
     'acl' => env('MEDIA_LIBRARY_ACL', 'private'),
     'filesize_limit' => env('MEDIA_LIBRARY_FILESIZE_LIMIT', 50),
     'allowed_extensions' => ['svg', 'jpg', 'gif', 'png', 'jpeg'],

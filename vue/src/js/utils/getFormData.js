@@ -1,5 +1,8 @@
 import { isEmpty, find } from 'lodash'
-import input from '../mixins/input'
+
+const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist'
+const isMediableTypes = 'custom-input-file|custom-input-image'
+const isMediableFields = 'files|medias'
 
 /*
 * Gather selected items in a selected object (currently used for medias and browsers)
@@ -21,6 +24,28 @@ const gatherSelected = (selected, block = null) => {
     }
     return null
   }).filter(x => x))
+}
+
+export const hydrateSelected = (item, rootState, block = null) => {
+  if (!__isset(item.id)) {
+    rootState.mediaLibrary.selected = {}
+  }
+  for (const name in item) {
+    if (isMediableFields.includes(name)) {
+      if (__isObject(item[name])) {
+        for (const lang in item[name]) {
+          for (const fieldName in item[name][lang]) {
+            const key = `${fieldName}[${lang}]`
+            rootState.mediaLibrary.selected[key] = item[name][lang][fieldName]
+          }
+        }
+      } else {
+        rootState.mediaLibrary.selected = {}
+      }
+    }
+  }
+
+  // __log('hydrated', item, rootState.mediaLibrary)
 }
 
 export const isBlockField = (name, id) => {
@@ -202,14 +227,15 @@ export const getSchemaModel = (inputs, item = null) => {
   // , {})
 }
 
-export const getModel = (inputs, item = null) => {
-  const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist'
-
+export const getModel = (inputs, item = null, rootState = null) => {
   const editing = __isset(item)
-
   const values = Object.keys(inputs).reduce((fields, k) => {
     const input = inputs[k]
     const name = input.name
+    // if (isMediableTypes.includes(input.type)) {
+    //   // if (editing) { __log(name, item, input) }
+    //   return fields
+    // }
     // default model value
     let _default = Object.prototype.hasOwnProperty.call(input, 'default') ? input.default : ''
     // let value = Object.prototype.hasOwnProperty.call(input, 'default') ? input.default : ''
@@ -219,11 +245,20 @@ export const getModel = (inputs, item = null) => {
 
     const value = editing ? item[name] : _default
     if (__isObject(input)) {
-      if (Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated) { // translations
+      if (isMediableTypes.includes(input.type)) {
+        if (editing && __isset(item[name])) {
+          // __log('mediable', name, item)
+          fields[name] = item[name]
+        } else {
+          fields[name] = { tr: [] }
+        }
+      } else if (Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated) { // translations
         fields[name] = window[process.env.VUE_APP_NAME].STORE.languages.all.reduce(function (map, lang) {
           if (editing) {
             if (Object.prototype.hasOwnProperty.call(item, 'translations')) {
-              map[lang.value] = find(item.translations, { locale: lang.value })[name]
+              map[lang.value] = find(item.translations, { locale: lang.value })
+                ? find(item.translations, { locale: lang.value })[name]
+                : item.translations[name][lang.value]
             } else {
               map[lang.value] = value[lang.value]
             }
@@ -233,9 +268,20 @@ export const getModel = (inputs, item = null) => {
           return map
         }, {})
       } else {
-        fields[name] = value
+        if (!value &&
+          editing &&
+          Object.prototype.hasOwnProperty.call(item, 'translations') &&
+          Object.prototype.hasOwnProperty.call(item.translations, name)
+        ) {
+          for (const locale in item.translations[name]) {
+            fields[name] = item.translations[name][locale]
+          }
+        } else {
+          fields[name] = value
+        }
       }
     }
+
     return fields
   }, {})
 
@@ -243,14 +289,27 @@ export const getModel = (inputs, item = null) => {
     values.id = item.id
   }
 
+  // if (rootState) {
+  //   return Object.assign(values, {
+  //     medias: gatherSelected(rootState.mediaLibrary.selected)
+  //   })
+  // }
+  if (rootState) {
+    // hydrateSelected(item, rootState)
+  }
+  // __log(item, values)
   return values
 }
 
-export const getSubmitFormData = (inputs, item) => {
+export const getSubmitFormData = (inputs, item = null, rootState = null) => {
   const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist'
 
   const values = Object.keys(inputs).reduce((fields, k) => {
     const input = inputs[k]
+    // if (isMediableTypes.includes(input.type)) {
+    //   return fields
+    // }
+
     const name = input.name
     // default model value
     if (!__isset(item[name])) {
@@ -285,6 +344,12 @@ export const getSubmitFormData = (inputs, item) => {
 
   if (item.id) {
     values.id = item.id
+  }
+
+  if (rootState) {
+    return Object.assign(values, {
+      // medias: gatherSelected(rootState.mediaLibrary.selected)
+    })
   }
 
   return values

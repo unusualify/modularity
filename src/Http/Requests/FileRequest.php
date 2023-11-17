@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Requests;
+namespace Unusualify\Modularity\Http\Requests;
 
 class FileRequest extends Request
 {

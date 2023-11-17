@@ -1,11 +1,11 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Controllers;
+namespace Unusualify\Modularity\Http\Controllers;
 
-use OoBook\CRM\Base\Http\Requests\FileRequest;
-use OoBook\CRM\Base\Services\Uploader\SignAzureUpload;
-use OoBook\CRM\Base\Services\Uploader\SignS3Upload;
-use OoBook\CRM\Base\Services\Uploader\SignUploadListener;
+use Unusualify\Modularity\Http\Requests\FileRequest;
+use Unusualify\Modularity\Services\Uploader\SignAzureUpload;
+use Unusualify\Modularity\Services\Uploader\SignS3Upload;
+use Unusualify\Modularity\Services\Uploader\SignUploadListener;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
@@ -29,8 +29,8 @@ class FileLibraryController extends BaseController implements SignUploadListener
     /**
      * @var string
      */
-    // protected $namespace = 'OoBook\CRM\Base';
-    protected $namespace = 'OoBook\CRM\Base';
+    // protected $namespace = 'Unusualify\Modularity';
+    protected $namespace = 'Unusualify\Modularity';
 
     /**
      * @var array
@@ -123,12 +123,12 @@ class FileLibraryController extends BaseController implements SignUploadListener
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\File $item
+     * @param \Unusualify\Modularity\Models\File $item
      * @return array
      */
     private function buildFile($item)
     {
-        return $item->toCmsArray() + [
+        return $item->mediableFormat() + [
             'tags' => $item->tags->map(function ($tag) {
                 return $tag->name;
             }),
@@ -179,7 +179,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
 
     /**
      * @param Request $request
-     * @return \OoBook\CRM\Base\Models\File
+     * @return \Unusualify\Modularity\Models\File
      */
     public function storeFile($request)
     {
@@ -219,7 +219,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
 
     /**
      * @param Request $request
-     * @return \OoBook\CRM\Base\Models\File
+     * @return \Unusualify\Modularity\Models\File
      */
     public function storeReference($request)
     {

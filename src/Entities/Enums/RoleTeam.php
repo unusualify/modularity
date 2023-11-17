@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Entities\Enums;
+namespace Unusualify\Modularity\Entities\Enums;
 
 enum RoleTeam:int {
   case CORPORATE = 1;

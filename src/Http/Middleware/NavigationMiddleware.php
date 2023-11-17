@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Middleware;
+namespace Unusualify\Modularity\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\View;
@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Menus\GetSidebarMenu;
 use App\Models\Menulist;
 use App\Models\RoleHierarchy;
-use OoBook\CRM\Base\Facades\UNavigation;
+use Unusualify\Modularity\Facades\UNavigation;
 use Spatie\Permission\Models\Role;
 
 class NavigationMiddleware

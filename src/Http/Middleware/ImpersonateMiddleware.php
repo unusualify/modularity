@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Middleware;
+namespace Unusualify\Modularity\Http\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
@@ -32,7 +32,7 @@ class ImpersonateMiddleware
 
         view()->composer(unusualBaseKey()."::layouts.master", function ($view)
         {
-            $userRepository = app()->make(\OoBook\CRM\Base\Repositories\UserRepository::class);
+            $userRepository = app()->make(\Modules\SystemUser\Repositories\UserRepository::class);
             $users = $userRepository->whereNot('id', 1)->get();
 
             $configuration = [

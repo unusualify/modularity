@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Repositories\Traits;
+namespace Unusualify\Modularity\Repositories\Traits;
 
 
 trait TreeviewTrait
@@ -15,7 +15,7 @@ trait TreeviewTrait
     }
 
     /**
-     * @param \OoBook\CRM\Base\Entities\Model|null $object
+     * @param \Unusualify\Modularity\Entities\Model|null $object
      * @param array $fields
      * @return array
      */
@@ -37,7 +37,7 @@ trait TreeviewTrait
     }
 
     /**
-     * @param \OoBook\CRM\Base\Entities\Model|null $object
+     * @param \Unusualify\Modularity\Entities\Model|null $object
      * @param array $fields
      * @return array
      */

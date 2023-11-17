@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Console;
+namespace Unusualify\Modularity\Console;
 
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\Console\Input\InputOption;
@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputArgument;
 
 use Nwidart\Modules\Support\Stub;
 use Illuminate\Support\Str;
-use OoBook\CRM\Base\Support\Decomposers\ValidatorParser;
+use Unusualify\Modularity\Support\Decomposers\ValidatorParser;
 use Nwidart\Modules\Support\Config\GeneratorPath;
 
 class RequestMakeCommand extends BaseCommand

@@ -1,8 +1,8 @@
 <?php
 
-namespace OoBook\CRM\Base\Entities\Translations;
+namespace Unusualify\Modularity\Entities\Translations;
 
-use OoBook\CRM\Base\Entities\Model;
+use Unusualify\Modularity\Entities\Model;
 use Illuminate\Support\Str;
 
 class SettingTranslation extends Model

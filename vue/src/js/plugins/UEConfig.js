@@ -19,7 +19,7 @@ import vuetify from '@/plugins/vuetify'
 import store from '@/store'
 
 // Config
-import i18n from '@/config/i18n'
+import i18n, { loadLocaleMessages, setI18nLocale } from '@/config/i18n'
 
 // Directives
 import { VueMaskDirective } from 'v-mask'
@@ -32,10 +32,16 @@ import commonMethods from '@/utils/common-methods'
 import { ALERT } from '../store/mutations'
 
 const includeGlobalComponents = require.context('__components', false, /[A-Za-z]*(?<!_)\.vue$/i)
-const includeLabComponents = require.context('__components/labs', false, /[A-Za-z]*(?<!_)\.vue$/i)
+// const includeLabComponents = require.context('__components/labs', false, /[A-Za-z]*(?<!_)\.vue$/i)
 const includeLayouts = require.context('__components/layouts/', false, /[A-Za-z]*(?<!_)\.vue$/i)
 // const includeFormInputs = require.context('__components/inputs', true, /\.vue$/i)
 const includeCustomFormInputs = require.context('__components/inputs', true, /\.vue$/i)
+
+// const getLanguages = async () => {
+//   const response = await axios.get('/api/languages')
+//   return response.data
+// }
+// const LANGUAGES = await getLanguages()
 
 export default {
   install: (app, opts) => {
@@ -56,22 +62,11 @@ export default {
 
     app.config.globalProperties.$app = app
 
-    app.config.errorHandler = (err) => {
-      // __log(err)
-    }
+    // app.config.errorHandler = (err) => {}
 
     // set locale wrt user profile preference
-    // __log(i18n.global)
-    i18n.global.locale.value = store._state.data.currentUser.locale
-    // i18n.global.locale = store._state.data.currentUser.locale
-
-    window.axios.get('/api/languages')
-      .then((response) => {
-        for (const language in response.data) {
-          i18n.global.setLocaleMessage(language, response.data[language])
-        }
-      })
-
+    setI18nLocale(i18n, store.state.currentUser.locale)
+    loadLocaleMessages(i18n)
     // i18n.global.setDateTimeFormat('tr', 'Europe/Istanbul')
 
     // add Global methods to all components
@@ -131,7 +126,7 @@ export default {
 
     // crm base package components
     app.config.globalProperties.registerComponents(includeGlobalComponents)
-    app.config.globalProperties.registerComponents(includeLabComponents, 'labs')
+    // app.config.globalProperties.registerComponents(includeLabComponents, 'labs')
     app.config.globalProperties.registerComponents(includeLayouts, 'layouts')
     app.config.globalProperties.registerComponents(includeCustomFormInputs, 'inputs', 'v-custom-input')
 

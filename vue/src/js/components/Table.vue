@@ -1,7 +1,7 @@
 <template>
   <div :class="['ue-datatable__container', noFullScreen ? '' : 'ue-datatable--full-screen' ]">
 
-    <ue-active-table-item
+    <ActiveTableItem
       class=""
       v-model="activeTableItem"
       v-bind="$lodash.pick(this.$props ?? {}, ['name', 'fullWidthWrapper'])"
@@ -9,7 +9,7 @@
       :item-data="activeItemConfiguration"
       @toggle="hideTable= $event"
     >
-    </ue-active-table-item>
+    </ActiveTableItem>
 
     <v-data-table-server
       v-if="!hideTable"
@@ -398,23 +398,14 @@
 </template>
 
 <script>
-// import { ref, onMounted, useSlots } from 'vue'
-import {
-  VDataTableServer
-  // VDataTable,
-  // VDataTableFooter
-} from 'vuetify/labs/VDataTable'
-
 import { makeTableProps, useTable, makeFormatterProps } from '@/hooks'
-
+import ActiveTableItem from '__components/labs/ActiveTableItem'
 const { ignoreFormatters } = makeFormatterProps()
 
 export default {
   // mixins: [TableMixin],
   components: {
-    // VDataTable,
-    // VDataTableFooter,
-    VDataTableServer
+    ActiveTableItem
   },
   props: {
     ...makeTableProps(),

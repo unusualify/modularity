@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Services\MediaLibrary;
+namespace Unusualify\Modularity\Services\MediaLibrary;
 
 use Illuminate\Config\Repository as Config;
 use Illuminate\Foundation\Application;

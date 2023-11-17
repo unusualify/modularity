@@ -50,7 +50,8 @@ $fileConfigByEndpointType = [
     'azure' => $azureConfig,
 ];
 
+
 return [
-    $media_library_key => $mediaConfigByEndpointType[config(unusualBaseKey() . '.media_library.endpoint_type')],
-    $file_library_key => $fileConfigByEndpointType[config(unusualBaseKey() . '.file_library.endpoint_type')],
+    $media_library_key => $mediaConfigByEndpointType[config(unusualBaseKey('media_library.endpoint_type') )],
+    $file_library_key => $fileConfigByEndpointType[config(unusualBaseKey('file_library.endpoint_type') )],
 ];

@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use OoBook\CRM\Base\Http\Controllers\DashboardController;
-use OoBook\CRM\Base\Http\Controllers\ProfileController;
+use Unusualify\Modularity\Http\Controllers\DashboardController;
+use Unusualify\Modularity\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,8 +21,6 @@ Route::resource('', 'DashboardController', ['as' => 'dashboard', 'names' => ['in
 // Route::resource('profile', 'ProfileController', ['names' => ['index' => 'profile']])->only(['index', 'update']);
 Route::singleton('profile', 'ProfileController', ['names' => ['edit' => 'profile']]);
 Route::put('profile/company', 'ProfileController@updateCompany')->name('profile.company');
-
-Route::unusualWebRoutes();
 
 // Route::group(['prefix' => 'api/user', 'as' => 'api.user.', 'namespace' => 'API'], function(){
 //     Route::apiResource('role', RoleController::class);

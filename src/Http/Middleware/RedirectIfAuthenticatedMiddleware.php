@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Middleware;
+namespace Unusualify\Modularity\Http\Middleware;
 
 use Closure;
 use Illuminate\Config\Repository as Config;

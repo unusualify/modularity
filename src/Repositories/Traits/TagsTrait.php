@@ -1,11 +1,11 @@
 <?php
 
-namespace OoBook\CRM\Base\Repositories\Traits;
+namespace Unusualify\Modularity\Repositories\Traits;
 
 trait TagsTrait
 {
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
      * @return void
      */

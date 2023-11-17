@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Generators;
+namespace Unusualify\Modularity\Generators;
 
 use Nwidart\Modules\Generators\Generator;
 use Illuminate\Config\Repository as Config;
@@ -8,8 +8,8 @@ use Illuminate\Console\Command as Console;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
-use OoBook\CRM\Base\Support\Decomposers\SchemaParser;
-use OoBook\CRM\Base\Traits\ManageNames;
+use Unusualify\Modularity\Support\Decomposers\SchemaParser;
+use Unusualify\Modularity\Traits\ManageNames;
 use Nwidart\Modules\Facades\Module;
 use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
@@ -17,8 +17,9 @@ use Nwidart\Modules\Support\Config\GeneratorPath;
 use Nwidart\Modules\Support\Stub;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\File;
-use OoBook\CRM\Base\Entities\Enums\Permission;
-use OoBook\CRM\Base\Repositories\PermissionRepository;
+use Unusualify\Modularity\Entities\Enums\Permission;
+use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Repositories\PermissionRepository;
 
 class RouteGenerator extends Generator
 {
@@ -293,7 +294,7 @@ class RouteGenerator extends Generator
      */
     public function setModule($module)
     {
-        $this->module = Module::find($module);
+        $this->module = Modularity::find($module);
 
         return $this;
     }
@@ -741,7 +742,8 @@ class RouteGenerator extends Generator
      */
     public function updateRoutesStatuses()
     {
-        $module = $this->app['unusual.repository']->findOrFail($this->module);
+        // $module = $this->app['unusual.modularity']->findOrFail($this->module);
+        $module = Modularity::findOrFail($this->module);
 
         $module->setModuleActivator($this->module);
 
@@ -785,8 +787,8 @@ class RouteGenerator extends Generator
                 'route_name' => $snakeCase,
                 'icon' => '', //'$modules',
                 'table_options' => static::$defaultTableOptions,
-                'headers' => $this->getHeaders(), //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
-                'inputs' => $this->getInputs() //in OoBook\CRM\Base\Support\Migrations\SchemaParser::class
+                'headers' => $this->getHeaders(), //in Unusualify\Modularity\Support\Migrations\SchemaParser::class
+                'inputs' => $this->getInputs() //in Unusualify\Modularity\Support\Migrations\SchemaParser::class
             ];
             $config['routes'][$this->getSnakeCase($this->getName())] = $route_array;
         }

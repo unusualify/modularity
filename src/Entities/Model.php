@@ -1,8 +1,8 @@
 <?php
 
-namespace OoBook\CRM\Base\Entities;
+namespace Unusualify\Modularity\Entities;
 
-use OoBook\CRM\Base\Entities\Traits\{HasPresenter,HasHelpers, HasScopes, IsTranslatable};
+use Unusualify\Modularity\Entities\Traits\{HasPresenter,HasHelpers, HasScopes, IsTranslatable};
 use Carbon\Carbon;
 use Cartalyst\Tags\TaggableInterface;
 use Cartalyst\Tags\TaggableTrait;

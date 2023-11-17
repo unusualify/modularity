@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Console;
+namespace Unusualify\Modularity\Console;
 
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputOption;

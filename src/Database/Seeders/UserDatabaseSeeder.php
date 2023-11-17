@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Database\Seeders;
+namespace Unusualify\Modularity\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;

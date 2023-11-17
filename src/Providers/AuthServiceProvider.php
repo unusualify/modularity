@@ -1,9 +1,9 @@
 <?php
 
-namespace OoBook\CRM\Base\Providers;
+namespace Unusualify\Modularity\Providers;
 
-// use OoBook\CRM\Base\Models\Enums\UserRole;
-use OoBook\CRM\Base\Entities\User;
+// use Unusualify\Modularity\Models\Enums\UserRole;
+use Unusualify\Modularity\Entities\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Permission;
@@ -38,12 +38,10 @@ class AuthServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        $_user = User::find(4);
+
         Gate::before(function (User $user, $ability) {
-            // dd($user, $user->roles);
-            // if($user->hasRole('superadmin')){
-            //     dd($user);
-            // }
-            return $user->hasRole(1) ? true : null;
+            return $user->hasRole(self::SUPERADMIN) ? true : null;
         });
 
         Gate::define('dashboard', function ($user) {

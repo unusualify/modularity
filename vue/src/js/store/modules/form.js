@@ -1,5 +1,5 @@
 import api from '@/store/api/form'
-import { FORM, ALERT } from '@/store/mutations'
+import { FORM, ALERT, MEDIA_LIBRARY } from '@/store/mutations'
 import ACTIONS from '@/store/actions'
 
 import { getSubmitFormData, getFormFields, getModel, getSchemaModel } from '@/utils/getFormData.js'
@@ -31,7 +31,7 @@ const state = {
   // editedItem: window[process.env.VUE_APP_NAME].STORE.form.inputs.reduce( (a,c) => (a[c.name] = c.default ?? '', a), {}),
   // editedItem: Object.keys(window[process.env.VUE_APP_NAME].STORE.form.inputs).reduce( (a,c) => (a[window[process.env.VUE_APP_NAME].STORE.form.inputs[c].name] = window[process.env.VUE_APP_NAME].STORE.form.inputs[c].hasOwnProperty('default') ? window[process.env.VUE_APP_NAME].STORE.form.inputs[c].default : '', a), {}),
   editedItem: window[process.env.VUE_APP_NAME].STORE.form.inputs
-    ? getModel(window[process.env.VUE_APP_NAME].STORE.form.inputs)
+    ? getModel(window[process.env.VUE_APP_NAME].STORE.form.inputs, null)
     : {},
 
   /**
@@ -58,7 +58,10 @@ const getters = {
 
 const mutations = {
   [FORM.SET_EDITED_ITEM] (state, item) {
-    state.editedItem = getModel(state.inputs, Object.assign({}, item))
+    // state.editedItem = getModel(state.inputs, Object.assign({}, item), this._state.data)
+    state.editedItem = Object.assign({}, item)
+    // store._modules.root.state
+    // commit(MEDIA_LIBRARY.ADD_MEDIAS, )
   },
   [FORM.RESET_EDITED_ITEM] (state) {
     state.editedItem = getModel(state.inputs)
@@ -165,7 +168,7 @@ const actions = {
     // - created blocks and repeaters
 
     // const data = getFormData(rootState)
-    const data = plain ? item : getSubmitFormData(state.inputs, item ?? state.editedItem)
+    const data = plain ? item : getSubmitFormData(state.inputs, item ?? state.editedItem, rootState)
 
     // const method = rootState.publication.createWithoutModal ? 'post' : 'put'
     let method = 'post'

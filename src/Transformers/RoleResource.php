@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Transformers;
+namespace Unusualify\Modularity\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 

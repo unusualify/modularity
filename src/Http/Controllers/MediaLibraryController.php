@@ -1,12 +1,12 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Controllers;
+namespace Unusualify\Modularity\Http\Controllers;
 
-use OoBook\CRM\Base\Http\Requests\MediaRequest;
-use OoBook\CRM\Base\Models\Media;
-use OoBook\CRM\Base\Services\Uploader\SignAzureUpload;
-use OoBook\CRM\Base\Services\Uploader\SignS3Upload;
-use OoBook\CRM\Base\Services\Uploader\SignUploadListener;
+use Unusualify\Modularity\Http\Requests\MediaRequest;
+use Unusualify\Modularity\Models\Media;
+use Unusualify\Modularity\Services\Uploader\SignAzureUpload;
+use Unusualify\Modularity\Services\Uploader\SignS3Upload;
+use Unusualify\Modularity\Services\Uploader\SignUploadListener;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\JsonResponse;
@@ -25,7 +25,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
     /**
      * @var string
      */
-    protected $namespace = 'OoBook\CRM\Base';
+    protected $namespace = 'Unusualify\Modularity';
 
     /**
      * @var array
@@ -110,7 +110,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
 
         return [
             'items' => $items->map(function ($item) {
-                return $item->toCmsArray();
+                return $item->mediableFormat();
             })->toArray(),
             'maxPage' => $items->lastPage(),
             'total' => $items->total(),
@@ -150,7 +150,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
         } else {
             $media = $this->storeReference($request);
         }
-        return $this->responseFactory->json(['media' => $media->toCmsArray(), 'success' => true], 200);
+        return $this->responseFactory->json(['media' => $media->mediableFormat(), 'success' => true], 200);
     }
 
     /**
@@ -273,7 +273,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
 
         return $this->responseFactory->json([
             'items' => $items->map(function ($item) {
-                return $item->toCmsArray();
+                return $item->mediableFormat();
             })->toArray(),
             'tags' => $this->repository->getTagsList(),
         ], 200);

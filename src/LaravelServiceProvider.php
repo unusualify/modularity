@@ -1,7 +1,7 @@
 <?php
 
 
-namespace OoBook\CRM\Base;
+namespace Unusualify\Modularity;
 
 use Illuminate\Support\ServiceProvider;
 

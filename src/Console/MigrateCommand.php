@@ -1,9 +1,10 @@
 <?php
 
-namespace OoBook\CRM\Base\Console;
+namespace Unusualify\Modularity\Console;
 
 use Illuminate\Console\Command;
 use Nwidart\Modules\Module;
+use Unusualify\Modularity\Facades\Modularity;
 use Symfony\Component\Console\Input\InputArgument;
 
 class MigrateCommand extends Command
@@ -28,7 +29,8 @@ class MigrateCommand extends Command
     public function handle() : int
     {
         /** @var Module $module */
-        $module = $this->laravel['unusual.repository']->findOrFail($this->argument('module'));
+        // $module = $this->laravel['unusual.modularity']->findOrFail($this->argument('module'));
+        $module = Modularity::findOrFail($this->argument('module'));
 
         $this->call('migrate', [
             '--path' => config('modules.namespace') . "/{$module->getStudlyName()}/Database/Migrations"

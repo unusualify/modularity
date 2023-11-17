@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Controllers;
+namespace Unusualify\Modularity\Http\Controllers;
 
 use Illuminate\Contracts\Support\Renderable;
 // use Modules\Payment\Repositories\PaymentRepository;
@@ -19,12 +19,12 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
-use OoBook\CRM\Base\Services\MessageStage;
-use OoBook\CRM\Base\Transformers\RoleResource;
+use Unusualify\Modularity\Services\MessageStage;
+use Unusualify\Modularity\Transformers\RoleResource;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Nwidart\Modules\Facades\Module;
-use OoBook\CRM\Base\Traits\ManageUtilities;
+use Unusualify\Modularity\Traits\ManageUtilities;
 
 abstract class BaseController extends CoreController
 {
@@ -505,7 +505,7 @@ abstract class BaseController extends CoreController
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $item
+     * @param \Unusualify\Modularity\Models\Model $item
      * @param array $column
      * @return array
      */
@@ -700,7 +700,7 @@ abstract class BaseController extends CoreController
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $item
+     * @param \Unusualify\Modularity\Models\Model $item
      * @return int|string
      */
     protected function getItemIdentifier($item)

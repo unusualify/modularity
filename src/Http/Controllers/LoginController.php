@@ -1,10 +1,10 @@
 <?php
 
-namespace OoBook\CRM\Base\Http\Controllers;
+namespace Unusualify\Modularity\Http\Controllers;
 
-use OoBook\CRM\Base\Http\Requests\Admin\OauthRequest;
-use OoBook\CRM\Base\Entities\User;
-use OoBook\CRM\Base\Repositories\UserRepository;
+use Unusualify\Modularity\Http\Requests\Admin\OauthRequest;
+use Unusualify\Modularity\Entities\User;
+use Modules\SystemUser\Repositories\UserRepository;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Encryption\Encrypter;
@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\View\Factory as ViewFactory;
-use OoBook\CRM\Base\Traits\ManageUtilities;
+use Unusualify\Modularity\Traits\ManageUtilities;
 use PragmaRX\Google2FA\Google2FA;
 use Socialite;
 

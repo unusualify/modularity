@@ -87,7 +87,7 @@
                 window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types.push({
                     value: 'image',
                     text: '{{ unusualTrans("media-library.images") }}',
-                    total: {{ \OoBook\CRM\Base\Entities\Media::count() }},
+                    total: {{ \Unusualify\Modularity\Entities\Media::count() }},
                     endpoint: '{{ route('media-library.medias.index') }}',
                     tagsEndpoint: '{{ route('media-library.medias.tags') }}',
                     uploaderConfig: {!! json_encode($mediasUploaderConfig) !!}
@@ -99,7 +99,7 @@
                 window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types.push({
                     value: 'file',
                     text: '{{ unusualTrans("media-library.files") }}',
-                    total: {{ \OoBook\CRM\Base\Entities\File::count() }},
+                    total: {{ \Unusualify\Modularity\Entities\File::count() }},
                     endpoint: '{{ route('file-library.files.index') }}',
                     tagsEndpoint: '{{ route('file-library.files.tags') }}',
                     uploaderConfig: {!! json_encode($filesUploaderConfig) !!}

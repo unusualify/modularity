@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Services\View;
+namespace Unusualify\Modularity\Services\View;
 
 use BadMethodCallException;
 use Closure;
@@ -8,7 +8,7 @@ use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
-use OoBook\CRM\Base\Traits\ManageNames;
+use Unusualify\Modularity\Traits\ManageNames;
 use Stringable;
 
 class UComponent extends Component

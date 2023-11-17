@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Entities\Enums;
+namespace Unusualify\Modularity\Entities\Enums;
 
 if ( version_compare(PHP_VERSION, '8.1.0', '<') ) {
   use MyCLabs\Enum\Enum;

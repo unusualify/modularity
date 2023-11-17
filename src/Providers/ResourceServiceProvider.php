@@ -1,16 +1,17 @@
 <?php
 
-namespace OoBook\CRM\Base\Providers;
+namespace Unusualify\Modularity\Providers;
 
 use Nwidart\Modules\Facades\Module;
 use Illuminate\Support\Facades\View;
-use OoBook\CRM\Base\Http\ViewComposers\ActiveNavigation;
-use OoBook\CRM\Base\Http\ViewComposers\CurrentUser;
-use OoBook\CRM\Base\Http\ViewComposers\FilesUploaderConfig;
-use OoBook\CRM\Base\Http\ViewComposers\Localization;
-use OoBook\CRM\Base\Http\ViewComposers\MediasUploaderConfig;
+use Unusualify\Modularity\Http\ViewComposers\ActiveNavigation;
+use Unusualify\Modularity\Http\ViewComposers\CurrentUser;
+use Unusualify\Modularity\Http\ViewComposers\FilesUploaderConfig;
+use Unusualify\Modularity\Http\ViewComposers\Localization;
+use Unusualify\Modularity\Http\ViewComposers\MediasUploaderConfig;
 
 use Illuminate\Support\Facades\Lang;
+use Unusualify\Modularity\Facades\Modularity;
 
 class ResourceServiceProvider extends ServiceProvider
 {
@@ -40,6 +41,7 @@ class ResourceServiceProvider extends ServiceProvider
      */
     public function register()
     {
+
     }
 
     /**
@@ -58,27 +60,23 @@ class ResourceServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths($this->baseKey), [$sourcePath]), $this->baseKey);
 
-        foreach(Module::all() as $module){
-            // if( $module->getName() != 'Base' && $module->isStatus(true)){
-            if( $module->isStatus(true)){
-                // $viewPath = resource_path('views/modules/' . $module->getLowerName());
+        foreach(Modularity::allEnabled() as $module){
+            $sourcePath = module_path($module->getName(), 'Resources/views');
 
-                $sourcePath = module_path($module->getName(), 'Resources/views');
-
-                // $this->publishes([
-                //     $sourcePath => $viewPath
-                // ], ['views', $module->getLowerName() . '-module-views']);
-                $this->loadViewsFrom(
-                    array_merge(
-                        $this->getPublishableViewPaths(
-                            snakeCase($module->getName())
-                        ),
-                        [$sourcePath]
+            // $this->publishes([
+            //     $sourcePath => $viewPath
+            // ], ['views', $module->getLowerName() . '-module-views']);
+            $this->loadViewsFrom(
+                array_merge(
+                    $this->getPublishableViewPaths(
+                        snakeCase($module->getName())
                     ),
-                    snakeCase($module->getName())
-                );
-            }
+                    [$sourcePath]
+                ),
+                snakeCase($module->getName())
+            );
         }
+
     }
 
     /**
@@ -91,20 +89,24 @@ class ResourceServiceProvider extends ServiceProvider
 
         $this->bootUnusualTranslation();
 
-        foreach(Module::all() as $module){
-            if(  $module->isStatus(true) && $module->getLowerName() != 'base' ){
-                $langPath = base_path('lang/modules/' . $module->getLowerName());
+        // $start = microtime(true);
+        // $modules = Modularity::allEnabled();
+        // $time_elapsed_secs = microtime(true) - $start;
+        // dd($time_elapsed_secs);
+        foreach(Modularity::allEnabled() as $module){
+            $langPath = base_path('lang/modules/' . $module->getLowerName());
 
-                if (is_dir($langPath)) {
-                    $this->loadTranslationsFrom($langPath, $module->getLowerName());
-                } else {
-                    $this->loadTranslationsFrom(
-                        module_path($module->getName(), 'Resources/lang'),
-                        $module->getLowerName()
-                    );
-                }
+            if (is_dir($langPath)) {
+                $this->loadTranslationsFrom($langPath, $module->getLowerName());
+            } else {
+                $this->loadTranslationsFrom(
+                    module_path($module->getName(), 'Resources/lang'),
+                    $module->getLowerName()
+                );
             }
         }
+
+
         // $langPath = resource_path('lang/modules/' . $this->baseKey);
 
         // if (is_dir($langPath)) {

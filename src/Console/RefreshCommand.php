@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Console;
+namespace Unusualify\Modularity\Console;
 
 class RefreshCommand extends BaseCommand
 {
@@ -41,7 +41,7 @@ class RefreshCommand extends BaseCommand
     private function publishAssets()
     {
         $this->call('vendor:publish', [
-            '--provider' => 'OoBook\CRM\Base\LaravelServiceProvider',
+            '--provider' => 'Unusualify\Modularity\LaravelServiceProvider',
             '--tag' => 'assets',
             '--force' => true,
         ]);

@@ -1,6 +1,6 @@
 <?php
 
-namespace OoBook\CRM\Base\Repositories;
+namespace Unusualify\Modularity\Repositories;
 
 use Exception;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -11,20 +11,20 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use OoBook\CRM\Base\Entities\Behaviors\Sortable;
+use Unusualify\Modularity\Entities\Behaviors\Sortable;
 use PDO;
 use ReflectionClass;
 
 use Nwidart\Modules\Facades\Module;
-use OoBook\CRM\Base\Repositories\Traits\RelationTrait;
-use OoBook\CRM\Base\Traits\ManageTraits;
+use Unusualify\Modularity\Repositories\Traits\RelationTrait;
+use Unusualify\Modularity\Traits\ManageTraits;
 
 abstract class Repository
 {
     use ManageTraits, Traits\DatesTrait, RelationTrait;
 
     /**
-     * @var \OoBook\CRM\Base\Models\Model
+     * @var \Unusualify\Modularity\Models\Model
      */
     protected $model;
 
@@ -175,7 +175,7 @@ abstract class Repository
      * @param $id
      * @param array $with
      * @param array $withCount
-     * @return \OoBook\CRM\Base\Models\Model
+     * @return \Unusualify\Modularity\Models\Model
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function getById($id, $with = [], $withCount = [])
@@ -271,7 +271,7 @@ abstract class Repository
     /**
      * @param $attributes
      * @param $fields
-     * @return \OoBook\CRM\Base\Models\Model
+     * @return \Unusualify\Modularity\Models\Model
      */
     public function firstOrCreate($attributes, $fields = [])
     {
@@ -280,7 +280,7 @@ abstract class Repository
 
     /**
      * @param string[] $fields
-     * @return \OoBook\CRM\Base\Models\Model
+     * @return \Unusualify\Modularity\Models\Model
      */
     public function create($fields)
     {
@@ -305,7 +305,7 @@ abstract class Repository
 
     /**
      * @param array $fields
-     * @return \OoBook\CRM\Base\Models\Model
+     * @return \Unusualify\Modularity\Models\Model
      */
     public function createForPreview($fields)
     {
@@ -319,7 +319,7 @@ abstract class Repository
     /**
      * @param array $attributes
      * @param array $fields
-     * @return \OoBook\CRM\Base\Models\Model|void
+     * @return \Unusualify\Modularity\Models\Model|void
      */
     public function updateOrCreate($attributes, $fields)
     {
@@ -570,7 +570,7 @@ abstract class Repository
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
      * @return array
      */
@@ -626,7 +626,7 @@ abstract class Repository
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
      * @return string[]
      */
@@ -642,7 +642,7 @@ abstract class Repository
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
      * @return void
      */
@@ -654,7 +654,7 @@ abstract class Repository
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
      * @return void
      */
@@ -666,7 +666,7 @@ abstract class Repository
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
      * @return void
      */
@@ -678,7 +678,7 @@ abstract class Repository
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @return void
      */
     public function afterDelete($object)
@@ -689,7 +689,7 @@ abstract class Repository
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @return void
      */
     public function afterRestore($object)
@@ -700,9 +700,9 @@ abstract class Repository
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
-     * @return \OoBook\CRM\Base\Models\Model
+     * @return \Unusualify\Modularity\Models\Model
      */
     public function hydrate($object, $fields)
     {
@@ -714,7 +714,7 @@ abstract class Repository
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @return array
      */
     public function getFormFields($object, $schema = [])
@@ -787,7 +787,7 @@ abstract class Repository
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
      * @param string $relationship
      * @param string $formField
@@ -812,7 +812,7 @@ abstract class Repository
     }
 
     /**
-     * @param \OoBook\CRM\Base\Models\Model $object
+     * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
      * @param string $relationship
      * @return void
@@ -920,7 +920,7 @@ abstract class Repository
 
     /**
      * @param string $relation
-     * @param \OoBook\CRM\Base\Models\Model|\OoBook\CRM\Base\Repositories\ModuleRepository|null $modelOrRepository
+     * @param \Unusualify\Modularity\Models\Model|\Unusualify\Modularity\Repositories\ModuleRepository|null $modelOrRepository
      * @return mixed
      */
     protected function getModelRepository($relation, $modelOrRepository = null)
@@ -989,7 +989,7 @@ abstract class Repository
      */
     public function hasBehavior($behavior)
     {
-        $hasBehavior = classHasTrait($this, 'OoBook\CRM\Base\Repositories\Traits\\' . ucfirst($behavior) . 'Trait');
+        $hasBehavior = classHasTrait($this, 'Unusualify\Modularity\Repositories\Traits\\' . ucfirst($behavior) . 'Trait');
         // dd($behavior, $hasBehavior, Str::startsWith($behavior, 'translation'));
         if (Str::startsWith($behavior, 'translation')) {
             $hasBehavior = $hasBehavior && $this->model->isTranslatable();

@@ -5,8 +5,9 @@
         <component
             v-bind:is="`${type}`"
             :class="[language.value === currentLocale.value || isCustomForm ? '' : 'd-none']"
-            v-model="input[language.value]"
             v-bind="attributesPerLang(language.value)"
+
+            @update:modelValue="modelUpdated($event, language.value)"
           >
           <template v-slot:append>
             <!-- <v-tooltip
@@ -54,7 +55,7 @@
 import { mapState } from 'vuex'
 import { LANGUAGE } from '@/store/mutations'
 import { InputMixin, LocaleMixin } from '@/mixins'
-import { useInput } from '@/hooks'
+import { useInput, makeInputProps } from '@/hooks'
 
 import cloneDeep from 'lodash/cloneDeep'
 
@@ -67,6 +68,7 @@ export default {
     }
   },
   props: {
+    ...makeInputProps(),
     type: {
       type: String,
       default: 'text'
@@ -84,13 +86,25 @@ export default {
       }
     }
   },
+  watch: {
+    modelValue (value) {
+      if (__isObject(value)) {
+        // this.input = value
+        // __log('locale modelValue', value)
+        for (const locale in value) {
+          this.input[locale] = value[locale]
+        }
+      }
+    }
+  },
   computed: {
     input: {
       get () {
+        // __log('Locale.vue inputget', this.modelValue)
         return this.modelValue
       },
       set (val, old) {
-        __log('Locale.vue input set', val, old)
+        // __log('Locale.vue input set', val, old)
         this.inputOnSet(val, old)
         this.updateModelValue(val)
         // context.emit('update:modelValue', val)
@@ -113,6 +127,9 @@ export default {
     this.isCustomForm = this.$root.$refs.customForm !== undefined
     this.isRequired = this.attributes.required ?? false
   },
+  created () {
+    // __log(this.currentLocale, this.languages)
+  },
   methods: {
     attributesPerLang: function (lang) {
       const language = this.languages.find(l => l.value === lang)
@@ -127,6 +144,10 @@ export default {
 
       attributes.required = !!language.published && this.isRequired
       attributes.name = `${attributes.name}[${lang}]`
+
+      if (this.input) {
+        attributes.modelValue = this.input[lang]
+      }
 
       return attributes
     },
@@ -151,16 +172,29 @@ export default {
       // this.$emit('localize', this.currentLocale)
     },
     updateValue: function (locale, newValue) {
-      if (locale) {
-        this.$emit('change', {
-          locale,
-          value: newValue
-        })
-      } else {
-        this.$emit('change', {
-          value: newValue
-        })
+      __log('updateValue', locale, newValue)
+      // if (locale) {
+      //   this.$emit('change', {
+      //     locale,
+      //     value: newValue
+      //   })
+      // } else {
+      //   this.$emit('change', {
+      //     value: newValue
+      //   })
+      // }
+    },
+    modelUpdated (value, lang) {
+      try {
+        if (this.input && __isset(this.input[lang])) {
+          this.input[lang] = value
+          this.updateModelValue(this.input)
+        }
+      } catch (error) {
+        __log('catch', this.input, lang, value)
       }
+
+      // this.updateValue(lang, value)
     }
   }
 }

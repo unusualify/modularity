@@ -1018,6 +1018,7 @@ export default {
       value = !value || value === '' ? null : value
       // if schema type is number convert to number
       value = obj.schema.type === 'number' ? Number(value) : value
+
       // update deep nested prop(key) with value
       this.setObjectByPath(this.storeStateData, obj.key, value)
       obj.value = obj.value !== value ? value : obj.value
@@ -1043,8 +1044,7 @@ export default {
       //   'v-custom-form-base onInput',
       //   type,
       //   value,
-      //   this.storeStateData.name,
-      //   this.model.name
+      //   emitObj
       // )
       // __log(
       //   'v-custom-form-base onInput',
@@ -1109,8 +1109,6 @@ export default {
       // const listener = event
       const emitEvent = change.includes(event) ? 'onChange' : watch.includes(event) ? 'onWatch' : mouse.includes(event) ? 'onMouse' : display.includes(event) ? 'onDisplay' : event
       const listener = 'on' + this.$lodash.startCase(this.$lodash.camelCase(event)).replace(/ /g, '')
-
-      // __log(event, emitEvent, listener, this.id, this.$attrs)
       if (this.$attrs[`${emitEvent}:${this.id}`]) {
         this.deprecateEventCustomID(emitEvent)
         this.deprecateCombinedEvents(emitEvent, event)
@@ -1125,6 +1123,8 @@ export default {
         // this.$emit(event, val) // listen to specific event only
         // this.$emit(listener, val) // listen to specific event only
         // this.$emit('update:schema', this.storeStateSchema) // listen to specific event only
+        // __log(listener, this.storeStateData)
+
         this.$emit('update:modelValue', this.storeStateData) // listen to specific event only
       } else if (listener == 'onInput' && this[`${listener}`]) {
         this.$emit('update:modelValue', this.storeStateData) // listen to specific event only
@@ -1224,7 +1224,6 @@ export default {
       // assign root props to avoid manipulating prop: schema
       Object.keys(schema).forEach(key => this.formSchema[key] = schema[key])
     },
-
     tryAutogenerateModelStructure (model, schema) {
       // generate or complete an empty model based on schema structure
 

@@ -82,25 +82,24 @@ if (! function_exists('fileTrace')) {
 
         foreach(debug_backtrace() as $i => $trace){
             // dd($trace);
-            if( !isset($trace['file']) ){
-                dd(
-                    $trace, $i, $regex, debug_backtrace()[0]
-                );
-            }
-            if( preg_match($regex, $trace['file']))
-            {
-                // dd($trace);
+            // if( !isset($trace['file']) ){
+            //     dd(
+            //         $trace, $i, $regex, debug_backtrace()[0]
+            //     );
+            // }
+            if( isset($trace['file']) && preg_match($regex, $trace['file'])){
                 $dir = $trace['file'];
                 break;
-            }else if( isset($trace['class']) && preg_match($regex, $trace['class']))
-            {
+            }else if( isset($trace['class']) && preg_match($regex, $trace['class'])){
 
                 $dir = $trace['class'];
                 // dd($dir, $trace, $regex);
                 break;
             }
         }
-
+        if(!$dir){
+            dd(debug_backtrace());
+        }
         return $dir;
     }
 }
