@@ -16,12 +16,12 @@ use PDO;
 use ReflectionClass;
 
 use Nwidart\Modules\Facades\Module;
-use Unusualify\Modularity\Repositories\Traits\RelationTrait;
-use Unusualify\Modularity\Traits\ManageTraits;
+use Unusualify\Modularity\Repositories\Traits\{DatesTrait, RelationTrait};
+use Unusualify\Modularity\Traits\{ManageTraits, ManageNames};
 
 abstract class Repository
 {
-    use ManageTraits, Traits\DatesTrait, RelationTrait;
+    use ManageTraits, ManageNames, DatesTrait, RelationTrait;
 
     /**
      * @var \Unusualify\Modularity\Models\Model
@@ -65,6 +65,8 @@ abstract class Repository
     {
         $query = $this->model->query();
 
+        // dd($with);
+
         $query = $query->with($this->formatWiths($query, $with));
 
         if( isset($scopes['searches']) && isset($scopes['search']) && is_array($scopes['searches']) ){
@@ -95,6 +97,7 @@ abstract class Repository
         } catch (\Throwable $th) {
             //throw $th;
             dd(
+                $th,
                 debug_backtrace()
                 // $th,
                 // $with,
@@ -218,9 +221,13 @@ abstract class Repository
      * @param null $exceptId
      * @return \Illuminate\Support\Collection
      */
-    public function list($column = 'name', $orders = [], $exceptId = null)
+    public function list($column = 'name', $with = [], $orders = [], $exceptId = null)
     {
         $query = $this->model->newQuery();
+
+        if(count($with) > 0)
+            $query = $query->with( $this->formatWiths($query, $with) );
+
 
         if ($exceptId) {
             $query = $query->where($this->model->getTable() . '.id', '<>', $exceptId);
@@ -1022,9 +1029,9 @@ abstract class Repository
         return array_map(function($item) {
             return is_array($item)
                     ? function($query) use($item){
+                        // dd($item);
                         // $db->table('roles')->pluck('id');
                         // $query->addSelect('id');
-
                         if(is_array($item[0])){
                             foreach ($item as $key => $args) {
                                 $query->{array_shift($args)}(...$args);
