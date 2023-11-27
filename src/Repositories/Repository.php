@@ -65,8 +65,6 @@ abstract class Repository
     {
         $query = $this->model->query();
 
-        // dd($with);
-
         $query = $query->with($this->formatWiths($query, $with));
 
         if( isset($scopes['searches']) && isset($scopes['search']) && is_array($scopes['searches']) ){

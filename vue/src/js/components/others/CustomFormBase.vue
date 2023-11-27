@@ -659,10 +659,11 @@ export default {
       for (const key in this.formSchema) {
         const sch = this.formSchema[key]
         if (sch.type === 'select' && Object.prototype.hasOwnProperty.call(sch, 'cascade')) {
-          this.formSchema[sch.cascade].items = find(sch.items, [sch.itemValue, this.valueIntern[sch.name]]).items ?? []
+          this.formSchema[sch.cascade].items = find(sch.items, [sch.itemValue, this.valueIntern[sch.name]])?.items ?? []
           // this.formSchema[key].items = find(this.formSchema[sch.parent].items, [this.formSchema[sch.parent].itemValue, this.valueIntern[sch.parent]]).items
         }
       }
+
       return this.formSchema
     }
   },
@@ -1285,7 +1286,7 @@ export default {
         const cascadedSelectName = obj.schema.cascade
         const selectItemValue = obj.schema.itemValue ?? 'id'
 
-        this.formSchema[cascadedSelectName].items = find(obj.schema.items, [selectItemValue, this.valueIntern[obj.key]]).items ?? []
+        this.formSchema[cascadedSelectName].items = find(obj.schema.items, [selectItemValue, this.valueIntern[obj.key]])?.items ?? []
 
         const sortIndex = findIndex(this.flatCombinedArraySorted, ['key', cascadedSelectName])
         // this.onInput(this.formSchema[obj.schema.cascade].items[0].value, this.flatCombinedArraySorted[sortedIndex], 'change')
