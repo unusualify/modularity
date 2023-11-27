@@ -37,19 +37,25 @@ trait ManageUtilities {
      */
     protected $indexTableColumns;
 
+    protected $formSchema;
+
 
     protected function __afterConstructManageUtilities($app, $request) {
         $this->defaultTableAttributes = (array) Config::get(unusualBaseKey() . '.default_table_attributes');
 
         $this->tableAttributes = $this->getTableAttributes();
     }
+
+    protected function __beforeConstructManageUtilities($app, $request) {
+        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+    }
+
     /**
      * @param array $prependScope
      * @return array
      */
     protected function getIndexData($prependScope = [])
     {
-        // dd($this->getFormSchema($this->getConfigFieldsByRoute('inputs')));
         $data = [
             // 'hiddenFilters' => array_keys(Arr::except($this->filters, array_keys($this->defaultFilters))),
             // 'filterLinks' => $this->filterLinks ?? [],
@@ -60,7 +66,7 @@ trait ManageUtilities {
             'searchText' =>  request()->has('search') ? request()->query('search') : "", // for current text of search parameter
 
             'headers' => $this->getIndexTableColumns(), // headers to be used in unusual datatable component
-            'formSchema'  => $this->getFormSchema($this->getConfigFieldsByRoute('inputs')), // input fields to be used in unusual datatable component
+            'formSchema'  => $this->formSchema, // input fields to be used in unusual datatable component
             /***
              * TODO variables to be assigned dynamically
              *
@@ -374,7 +380,7 @@ trait ManageUtilities {
      */
     protected function getFormData($id, $item = null, $nested=null)
     {
-        $schema = $this->getFormSchema($this->getConfigFieldsByRoute('inputs'));
+        $schema = $this->formSchema;
         if (!$item && $id) {
             $item = $this->repository->getById(
                 $id,
@@ -402,6 +408,7 @@ trait ManageUtilities {
                 'hasSubmit' => true,
                 'stickyButton' => false,
                 'modelValue' => array_merge($this->repository->getFormFields($item, $schema), [
+                    'package_continent_id' => 1,
                     // 'packageFeatures' => [
                     //     [
                     //         'package_feature_id' => 1,
@@ -516,39 +523,28 @@ trait ManageUtilities {
         return [];
     }
 
-    protected function getFormSchema($inputs)
+    protected function createFormSchema($inputs)
     {
-        return Collection::make( $inputs )->mapWithKeys(function($item, $key){
-            return $this->getInputSchema($item);
+        return Collection::make( $inputs )->mapWithKeys(function($input, $key){
+            return $this->getSchemaInput($input);
         })->toArray();
     }
 
-    protected function getInputSchema($input)
+    protected function getSchemaInput($input)
     {
         // $default_input = collect(Config::get(unusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
         // $default_input = $this->configureInput(array2Object(Config::get(unusualBaseKey() . '.default_input')));
         $default_input = (array) Config::get(unusualBaseKey() . '.default_input');
-        // dd($default_input, $input);
-        $input = object2Array($input);
 
-        if($object = $this->hydrateInput($input)){
-            $input = $object;
+        [$hydrated, $arrayable] = $this->hydrateInput(object2Array($input));
+
+        if($arrayable){
+            return $hydrated;
         }
-
-        // if(array_key_exists('schema', $input)){
-        //     $input['schema'] = $this->getFormSchema($input['schema']);
-        //     dd($input['schema']);
-        // }
-        // dd(
-        //     $default_input,
-        //     $input,
-        //     array_merge_recursive_preserve( $this->configureInput($input), $default_input )
-        // );
-
-        return isset($input['name'])
+        return isset($hydrated['name'])
             // ? [ $input->name => $default_input->union( $this->configureInput($input) ) ]
             // ? [ $input['name'] => array_merge_recursive_preserve( $default_input, $this->configureInput($input) ) ]
-            ? [ $input['name'] => $this->configureInput( array_merge_recursive_preserve( $default_input, $input )) ]
+            ? [ $hydrated['name'] => $this->configureInput( array_merge_recursive_preserve( $default_input, $hydrated )) ]
             : [];
     }
 
@@ -576,8 +572,8 @@ trait ManageUtilities {
      */
     protected function hydrateInput($input)
     {
-        $object = null;
-
+        $data = null;
+        $arrayable = false;
         switch ($input['type']) {
             case 'custom-input-treeview':
             case 'treeview':
@@ -606,10 +602,10 @@ trait ManageUtilities {
                     }
                 }
 
-                $object = [];
+                $data = [];
 
                 $_input = (array) $input;
-                $object[$input->name] =   Arr::except($_input, ['route','model']) + [
+                $data[$input->name] =   Arr::except($_input, ['route','model']) + [
                     'items' => [
                         [
                             'id' => -1,
@@ -651,7 +647,7 @@ trait ManageUtilities {
                     }
                 }
 
-                $object =  Arr::except($input, ['route','model', 'repository']) + [
+                $data=  Arr::except($input, ['route','model', 'repository']) + [
                     'items' => $items
                 ];
 
@@ -667,10 +663,37 @@ trait ManageUtilities {
                 if(isset($input['items'])) break;
 
                 $items = [];
+                $with = [];
+
+                if(isset($input['cascades'])){
+                    // [
+                    //     'packageRegions:id,package_continent_id,name',
+                    //     'packageRegions.packageCountries:id,package_region_id,name'
+                    // ]
+                    $with = $input['cascades'];
+                }
 
                 if(isset($input['repository'])){
                     $relation_class = App::make($input['repository']);
-                    $items = $relation_class->list($input['itemTitle'])->toArray();
+                    $items = $relation_class->list($input['itemTitle'], $with)->toArray();
+
+                    if(isset($input['cascades'])){
+                        $patterns = [];
+                        foreach ($input['cascades'] as $key => $cascade) {
+                            $explodes = explode('.', explode(':', $cascade)[0]);
+                            $patterns[] = "/{$this->getSnakeCase(
+                                $explodes[count($explodes)-1]
+                            )}/";
+                        }
+                        $flat = Arr::dot($items);
+                        $newArray = [];
+                        foreach ($flat as $key => $value) {
+                            $newKey = preg_replace($patterns, 'items', $key);
+                            Arr::set($newArray, $newKey, $value);
+                        }
+
+                        $items = $newArray;
+                    }
 
                 }else if(isset($input['model'])){
                     $relation_class = App::make($input['model']);
@@ -699,7 +722,8 @@ trait ManageUtilities {
                     ]);
                 }
 
-                $object =  Arr::except($input, ['route','model', 'repository']) + [
+
+                $data =  Arr::except($input, ['route','model', 'repository', 'cascades']) + [
                     'items' => $items
                 ];
 
@@ -712,7 +736,7 @@ trait ManageUtilities {
                 $input['hideDetails'] = true;
                 $input['default'] = 0;
 
-                $object = $input;
+                $data = $input;
             break;
             case 'repeater':
             case 'custom-input-repeater':
@@ -774,10 +798,56 @@ trait ManageUtilities {
                         }
                     }
 
-                    $input['schema'] = $this->getFormSchema($input['schema']);
+                    $input['schema'] = $this->createFormSchema($input['schema']);
                 }
 
-                $object = $input;
+                $data = $input;
+            break;
+            case 'morphTo':
+
+                if(isset($input['parents'])){
+                    $data = [];
+                    $arrayable = true;
+                    $length = count($input['parents']);
+
+                    $reversedParents = array_reverse($input['parents']);
+
+                    foreach ($reversedParents as $index => $attachable) {
+                        $attachable['ext'] = 'morphTo';
+
+                        if($index == ($length-1)){
+                            // 'packageRegions:id,package_continent_id,name',
+                            // 'packageRegions.packageCountries:id,package_region_id,name'
+                            $attachable['cascades'] = [];
+                            $selectables = array_values(array_reverse($data));
+                            $relationChain = '';
+                            foreach($selectables as $j => $item){
+                                $foreignKey = $item['name'];
+                                $relationshipName = pluralize($this->getCamelNameFromForeignKey($foreignKey));
+                                $relationChain .= !$relationChain ? $relationshipName : ".{$relationshipName}";
+                                $ownerKey = $j == 0 ? $attachable['name'] : $selectables[$j-1]['name'];
+                                $attachable['cascades'][] = $relationChain . ":{$item['itemValue']},{$ownerKey},{$item['itemTitle']}";
+                                // $attachable['cascades'][$relationChain . " as {$relationChain}_items"] = [
+                                //     ['select', $item['itemValue'] , $ownerKey, $item['itemTitle']]
+                                // ];
+                            }
+                            $attachable['cascade'] = $reversedParents[$index-1]['name'];
+
+                        }else if($index){
+                            $attachable['cascade'] = $reversedParents[$index-1]['name'];
+                        }
+
+                        if($index !== ($length-1)){
+                            $attachable['items'] = [];
+                        }
+
+                        $_input = $this->getSchemaInput($attachable);
+
+
+                        $data += $_input;
+                    }
+                    $data = array_reverse($data);
+                }
             break;
             default:
 
@@ -792,12 +862,15 @@ trait ManageUtilities {
                 $input['translated'] ??= true;
                 // $input['locale_input'] = $input['type'];
                 // $input['type'] = 'custom-input-locale';
-                $object = $input;
+                $data = $input;
             }
 
         }
 
-        return $object;
+        return [
+            $data ? $data : $input,
+            $arrayable
+        ];
     }
 
     protected function getHeader($header)
@@ -847,7 +920,7 @@ trait ManageUtilities {
                 if($context->type == 'formWrapper'){
                     $forms = Collection::make($context->elements)->map(function($element){
 
-                        $schema = $this->getFormSchema(getInputDraft($element->draft));
+                        $schema = $this->createFormSchema(getInputDraft($element->draft));
 
                         $parameters = Collection::make(Route::getRoutes()->getByName($element->route)->parameterNames())->mapWithKeys(function($parameter, $j){
                             return [ $parameter => ":{$parameter}"];
@@ -889,27 +962,31 @@ trait ManageUtilities {
     protected function addWithsSchema() : array
     {
         // $this->indexWith += collect($schema)->filter(function($item){
-        return collect($this->getConfigFieldsByRoute('inputs'))->filter(function($item){
+
+        return collect(array2Object($this->formSchema))->filter(function($input){
             // return $this->hasWithModel($item['type']);
-            return in_array($item->type, [
+            return in_array($input->type, [
                 'treeview',
                 'custom-input-treeview',
-                'checklist',
-                'custom-input-checklist',
+                // 'checklist',
+                // 'custom-input-checklist',
                 'select',
                 'combobox',
                 'autocomplete'
-            ]);
-        })->mapWithKeys(function($item){
-            $key = $item->name;
-            if(preg_match('/(.*)(_id)/', $key, $matches)){
-                $key = $this->getCamelCase($matches[1]);
-            }
+            ]) && !(isset($input->ext) && $input->ext == 'morphTo');
+        })->mapWithKeys(function($input){
+
+            $relationship = $this->getCamelNameFromForeignKey($input->name) ?: $input->name;
+
+            // dd($input, $relationship);
+            // return [
+            //     $relationship
+            // ];
             return [
-                $key => [
+                $relationship => [
                     // ['select', $item['itemValue'], $item['itemTitle']],
-                    ['addSelect', $item->itemValue ?? 'id'],
-                    ['addSelect', $item->itemTitle ?? 'name']
+                    ['addSelect', $input->itemValue ?? 'id'],
+                    ['addSelect', $input->itemTitle ?? 'name']
                 ]
             ];
         })->toArray();

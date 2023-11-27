@@ -2,6 +2,8 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\App;
 
 trait RelationTrait
 {
@@ -12,6 +14,41 @@ trait RelationTrait
      */
     public function afterSaveRelationTrait($object, $fields)
     {
+
+        foreach ($this->getMorphToRelations() as $relation => $types) {
+            foreach ($types as $key => $type) {
+                $name = $type['name'];
+                $repository = $type['repository'];
+                if(isset($fields[$name]) && $fields[$name]){
+                    // dd(
+                    //     $object->{$relation}(),
+                    //     get_class_methods(
+                    //         $object->{$relation}(),
+                    //     )
+                    // );
+                    // $object->files()->sync([]);
+                    // $this->getFiles($fields)->each(function ($file) use ($object) {
+                    //     $object->files()->attach($file['id'], Arr::except($file, ['id']));
+                    // });
+
+                    // $object->files()->sync([]);
+
+                    $morphOne = App::make($repository)->getById($fields[$name]);
+                    $object->{$relation . '_id'} = $morphOne->id;
+                    $object->{$relation . '_type'} = get_class($morphOne);
+                    $object->save();
+
+                    // $object->{$relation}()->save($attach);
+                    // $object->save();
+
+                    // $object->{$relation}()->saveMany([]);
+                    // $object->{$relation}()->saveMany($attach);
+
+                    // $object->{$relation}()->updateOrCreate([],[$attach]);
+                    break;
+                }
+            }
+        }
         foreach ($this->getBelongsToManyRelations() as $relation) {
             if (isset($fields[$relation])) {
                 try {
@@ -50,10 +87,34 @@ trait RelationTrait
 
     public function getFormFieldsRelationTrait($object, $fields, $schema = [])
     {
-        $relations = $this->getBelongsToManyRelations();
 
+        // dd(
+        //     $this->getMorphToRelations(),
+        //     $this->getBelongsToManyRelations(),
+        //     $schema
+        // );
+        $morphToRelations = $this->getMorphToRelations();
+        $belongsToManyRelations = $this->getBelongsToManyRelations();
+
+        foreach ($morphToRelations as $relation => $types) {
+            $morphTo = null;
+            foreach ($types as $index => $type) {
+                if($object->{$relation . '_type'} == $type['model']){
+                    $morphTo = App::make($type['repository'])->getById($object->{$relation . '_id'});
+                    $fields[$type['name']] = $morphTo->id;
+                }else if($morphTo){
+                    $fields[$type['name']] = $morphTo->{$type['name']};
+                    $morphTo = App::make($type['repository'])->getById($morphTo->{$type['name']});
+                }else{
+                    $fields[$type['name']] = null;
+                }
+                // dd($object, $fields, $index, $type);
+            }
+        }
+
+        // dd($fields);
         foreach ($schema as $key => $input) {
-            if(in_array($input['name'], $relations) ){
+            if(in_array($input['name'], $belongsToManyRelations) ){
 
                 if(preg_match('/repeater/', $input['type'])){
                     $query = $object->{$input['name']}();
@@ -84,10 +145,10 @@ trait RelationTrait
 
     public function getBelongsToManyRelations()
     {
-
         $reflector = new \ReflectionClass($this->model);
 
         $relations = [];
+
         foreach ($reflector->getMethods() as $reflectionMethod) {
             $returnType = $reflectionMethod->getReturnType();
             if ($returnType) {
@@ -101,5 +162,37 @@ trait RelationTrait
         return $relations;
 
         dd($relations);
+    }
+
+    public function getMorphToRelations()
+    {
+        // $reflector = new \ReflectionClass($this->model);
+
+        // $relations = [];
+
+        // foreach ($reflector->getMethods() as $reflectionMethod) {
+        //     $returnType = $reflectionMethod->getReturnType();
+        //     if ($returnType) {
+        //         // if (in_array(class_basename($returnType->getName()), ['HasOne', 'HasMany', 'BelongsTo', 'BelongsToMany', 'MorphToMany', 'MorphTo'])) {
+        //         if (in_array(class_basename($returnType->getName()), ['MorphOne'])) {
+        //             $relations[] = $reflectionMethod->name;
+        //         }
+        //     }
+        // }
+
+        return collect($this->getInputs())->reduce(function($acc, $curr){
+            if(preg_match('/morphTo/', $curr['type'])){
+                if(isset($curr['parents'])){
+                    $routeCamelCase = camelCase($this->getRouteName());
+                    $acc["{$routeCamelCase}able"] = Arr::map(array_reverse($curr['parents']), fn($item) => [
+                        'name' => $item['name'],
+                        'repository' => $item['repository'],
+                        'model' => get_class( App::make($item['repository'])->getModel()),
+                    ]);
+                }
+            }
+
+            return $acc;
+        }, []);
     }
 }
