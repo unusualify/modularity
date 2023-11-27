@@ -140,7 +140,7 @@ trait FilesTrait
         return $fields;
     }
 
-    public function getFileColumns(){
+    public function getFileColumns_(){
         $moduleName = null;
         $routeName = null;
         if( preg_match('/[M|m]{1}odules[\/\\\]([A-Za-z]+)[\/\\\]/', get_class($this), $matches)){
@@ -175,5 +175,18 @@ trait FilesTrait
         }
 
         return false;
+    }
+
+    public function getFileColumns(){
+
+        $file_inputs = collect($this->getInputs())->reduce(function($acc, $curr){
+            if(preg_match('/file/', $curr['type'])){
+                $acc[] = $curr['name'];
+            }
+
+            return $acc;
+        }, []);
+
+        return $file_inputs;
     }
 }
