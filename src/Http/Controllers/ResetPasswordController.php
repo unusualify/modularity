@@ -146,7 +146,7 @@ class ResetPasswordController extends Controller
                         'password' => '',
                         'password_confirmation' => '',
                     ],
-                    'schema' => ($schema = $this->getFormSchema([
+                    'schema' => ($schema = $this->createFormSchema([
                         'email' => [
                             "type" => "text",
                             "name" => "email",

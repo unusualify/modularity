@@ -82,10 +82,10 @@ class ProfileController extends BaseController
 
         $user = auth()->user();
 
-        $userSchema = $this->getFormSchema( getInputDraft('user') );
+        $userSchema = $this->createFormSchema( getInputDraft('user') );
         $userFields = $this->userRepository->getFormFields($user, $userSchema);
 
-        $userPasswordSchema = $this->getFormSchema( getInputDraft('user_password') );
+        $userPasswordSchema = $this->createFormSchema( getInputDraft('user_password') );
         $userPasswordFields = $this->userRepository->getFormFields($user, $userPasswordSchema, true);
 
         $sectionFields = [
@@ -126,7 +126,7 @@ class ProfileController extends BaseController
         ];
 
         if($user->company){
-            $companySchema = $this->getFormSchema([
+            $companySchema = $this->createFormSchema([
                 // 'country_id' => [
                 //     "type" => "select",
                 //     "name" => "country_id",
@@ -270,7 +270,7 @@ class ProfileController extends BaseController
                 //     ]
                 // ],
             ]);
-            $companySchema = $this->getFormSchema( getInputDraft('company') );
+            $companySchema = $this->createFormSchema( getInputDraft('company') );
             $companyFields = $this->companyRepository->getFormFields(auth()->user()->company, $companySchema);
 
             $companyFields['country_id'] = 1;

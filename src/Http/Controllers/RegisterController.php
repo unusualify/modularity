@@ -27,7 +27,7 @@ class RegisterController extends Controller
             'formAttributes' => [
                 'hasSubmit' => true,
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
-                'schema' => ($schema = $this->getFormSchema([
+                'schema' => ($schema = $this->createFormSchema([
                     'name' => [
                         "type" => "text",
                         "name" => "name",
