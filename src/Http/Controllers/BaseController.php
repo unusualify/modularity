@@ -426,7 +426,7 @@ abstract class BaseController extends CoreController
     {
         $translated = $this->routeHas('translations');
 
-        $schema = $this->getFormSchema($this->getConfigFieldsByRoute('inputs'));
+        $schema = $this->formSchema;
 
         $paginator->getCollection()->transform(function ($item) use($translated, $schema) {
 
