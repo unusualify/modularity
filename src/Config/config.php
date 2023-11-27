@@ -234,6 +234,17 @@ return [
         ],
     ],
 
+    'tables' => [
+        'users' => 'users',
+        'companies' => 'umod_companies',
+        'files' => 'umod_files',
+        'fileables' => 'umod_fileables',
+        'medias' => 'umod_medias',
+        'mediables' => 'umod_mediables',
+        'tagged' => 'umod_tagged',
+        'tags' => 'umod_tags',
+    ],
+
     'base_model' => \Unusualify\Modularity\Entities\Model::class,
 
     'base_repository' => \Unusualify\Modularity\Repositories\Repository::class,

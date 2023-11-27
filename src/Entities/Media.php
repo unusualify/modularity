@@ -35,7 +35,7 @@ class Media extends Model
 
     public function scopeUnused ($query)
     {
-        $usedIds = DB::table(config(unusualBaseKey() . '.mediables_table'))->get()->pluck('media_id');
+        $usedIds = DB::table(unusualConfig('tables.mediables'))->get()->pluck('media_id');
         return $query->whereNotIn('id', $usedIds->toArray())->get();
     }
 
@@ -56,12 +56,12 @@ class Media extends Model
 
     public function canDeleteSafely()
     {
-        return DB::table(config(unusualBaseKey() . '.mediables_table', 'unusual_mediables'))->where('media_id', $this->id)->count() === 0;
+        return DB::table(unusualConfig('tables.mediables', 'unusual_mediables'))->where('media_id', $this->id)->count() === 0;
     }
 
     public function isReferenced()
     {
-        return DB::table(config(unusualBaseKey() . '.mediables_table', 'unusual_mediables'))->where('media_id', $this->id)->count() > 0;
+        return DB::table(unusualConfig('tables.mediables', 'unusual_mediables'))->where('media_id', $this->id)->count() > 0;
     }
 
     public function mediableFormat()
@@ -141,7 +141,7 @@ class Media extends Model
 
         if ($this->update($fields) && $this->isReferenced())
         {
-            DB::table(config(unusualBaseKey() . '.mediables_table', 'unusual_mediables'))->where('media_id', $this->id)->get()->each(function ($mediable) use ($prevWidth, $prevHeight) {
+            DB::table(unusualConfig('tables.mediables', 'unusual_mediables'))->where('media_id', $this->id)->get()->each(function ($mediable) use ($prevWidth, $prevHeight) {
 
                 if ($prevWidth != $this->width) {
                     $mediable->crop_x = 0;
@@ -153,7 +153,7 @@ class Media extends Model
                     $mediable->crop_h = $this->height;
                 }
 
-                DB::table(config(unusualBaseKey() . '.mediables_table', 'unusual_mediables'))->where('id', $mediable->id)->update((array)$mediable);
+                DB::table(unusualConfig('tables.mediables', 'unusual_mediables'))->where('id', $mediable->id)->update((array)$mediable);
             });
         }
     }
@@ -168,6 +168,6 @@ class Media extends Model
 
     public function getTable()
     {
-        return config(unusualBaseKey() . '.medias_table', 'unusual_medias');
+        return unusualConfig('tables.medias', parent::getTable());
     }
 }

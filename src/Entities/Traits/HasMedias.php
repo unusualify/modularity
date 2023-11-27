@@ -37,7 +37,7 @@ trait HasMedias
         return $this->morphToMany(
             Media::class,
             'mediable',
-            config(unusualBaseKey() . '.mediables_table', 'twill_mediables')
+            unusualConfig('tables.mediables', 'twill_mediables')
         )->withPivot(array_merge([
             'crop',
             'role',
@@ -49,7 +49,7 @@ trait HasMedias
             'ratio',
             'metadatas',
         ], config(unusualBaseKey() . '.media_library.translated_form_fields', false) ? ['locale'] : []))
-            ->withTimestamps()->orderBy(config(unusualBaseKey() . '.mediables_table', 'twill_mediables') . '.id', 'asc');
+            ->withTimestamps()->orderBy(unusualConfig('tables.mediables', 'twill_mediables') . '.id', 'asc');
     }
 
     private function findMedia($role, $crop = 'default')

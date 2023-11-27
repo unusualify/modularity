@@ -15,8 +15,8 @@ class CreateUnusualDefaultMediasTables extends Migration
     {
 
 
-        $unusualMediasTable = config(unusualBaseKey() . '.medias_table', 'unusual_medias');
-        $unusualMediablesTable = config(unusualBaseKey() . '.mediables_table', 'unusual_mediables');
+        $unusualMediasTable = config(unusualBaseKey() . '.tables.medias', 'modularity_medias');
+        $unusualMediablesTable = config(unusualBaseKey() . '.tables.mediables', 'modularity_mediables');
 
         if (!Schema::hasTable($unusualMediasTable)) {
             Schema::create($unusualMediasTable, function (Blueprint $table) {
@@ -62,8 +62,8 @@ class CreateUnusualDefaultMediasTables extends Migration
      */
     public function down()
     {
-        $unusualMediasTable = config(unusualBaseKey() . '.medias_table', 'unusual_medias');
-        $unusualMediablesTable = config(unusualBaseKey() . '.mediables_table', 'unusual_mediables');
+        $unusualMediasTable = config(unusualBaseKey() . '.tables.medias', 'modularity_medias');
+        $unusualMediablesTable = config(unusualBaseKey() . '.tables.mediables', 'modularity_mediables');
 
         Schema::dropIfExists($unusualMediablesTable);
         Schema::dropIfExists($unusualMediasTable);

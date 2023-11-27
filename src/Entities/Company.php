@@ -25,4 +25,9 @@ class Company extends Model
         return $this->hasMany(User::class);
     }
 
+    public function getTable()
+    {
+        return unusualConfig('tables.companies', parent::getTable());
+    }
+
 }

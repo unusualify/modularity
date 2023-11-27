@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        $companyTableName = config(unusualBaseKey().'.tables.companies', 'companies');
+        Schema::table( config(unusualBaseKey().'.tables.users', 'users'), function (Blueprint $table) use($companyTableName) {
 
             $table->after('name', function ($table) {
                 $table->unsignedBigInteger('company_id')->nullable(); // Foreign key column
             });
             $table->foreign('company_id')
                 ->references('id')
-                ->on('unusual_companies')
+                ->on($companyTableName)
                 ->cascadeOnUpdate()
                 ->onDelete('set null');
 
@@ -30,7 +31,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table( config(unusualBaseKey().'.tables.users', 'users'), function (Blueprint $table) {
             // $table->dropConstrainedForeignId(['company_id']);
             $table->dropForeign(['company_id']);
             $table->dropColumn('company_id');

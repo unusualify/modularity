@@ -8,6 +8,6 @@ class Tagged extends IlluminateTagged
 {
     public function getTable()
     {
-        return config(unusualBaseKey() . '.tagged_table', 'tagged');
+        return unusualConfig('tables.tagged', parent::getTable());
     }
 }

@@ -8,7 +8,7 @@ class AddProfileFieldsToUsersTable extends Migration
 {
     public function up()
     {
-        Schema::table( config(unusualBaseKey().'.users_table_name', 'users'), function (Blueprint $table) {
+        Schema::table( config(unusualBaseKey().'tables.users', 'users'), function (Blueprint $table) {
             $table->after('name', function ($table) {
                 $table->string('surname',30)->nullable();
                 $table->string('job_title')->nullable();
@@ -27,7 +27,7 @@ class AddProfileFieldsToUsersTable extends Migration
 
     public function down()
     {
-        Schema::table( config(unusualBaseKey().'.users_table_name', 'users'), function (Blueprint $table) {
+        Schema::table( config(unusualBaseKey().'tables.users', 'users'), function (Blueprint $table) {
             $table->dropColumn('surname');
             $table->dropColumn('job_title');
             $table->dropColumn('language');

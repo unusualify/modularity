@@ -10,6 +10,6 @@ class Tag extends IlluminateTag
 
     public function getTable()
     {
-        return config(unusualBaseKey() . '.tags_table', 'tags');
+        return unusualConfig('tables.tags', parent::getTable());
     }
 }
