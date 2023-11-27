@@ -115,8 +115,11 @@ class RepositoryMakeCommand extends BaseCommand
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
 
         $modelName = $this->getFileName() ?? '';
+        $modelClass = $this->getModelClass() ?? '';
+
         if($this->option('custom-model') && @class_exists($this->option('custom-model'))){
             $modelName = get_class_short_name(App::make($this->option('custom-model')));
+            $modelClass = $this->option('custom-model');
         }
 
         return (new Stub($this->getStubName(), [
@@ -124,7 +127,7 @@ class RepositoryMakeCommand extends BaseCommand
             'NAMESPACE'             => $this->getClassNamespace($module),
             'CLASS'                 => $this->getClass().'Repository',
             'STUDLY_NAME'           => $this->getStudlyName($repository),
-            'MODEL_CLASS'           => $this->getModelClass() ?? '',
+            'MODEL_CLASS'           => $modelClass,
             'MODEL_NAME'            => $modelName,
             'MODULE'                => $this->argument('module'),
             'TRAITS'                => $this->getTraits(),
@@ -142,7 +145,6 @@ class RepositoryMakeCommand extends BaseCommand
         $repositoryPath = GenerateConfigReader::read('repository');
 
         // dd($path, $repositoryPath->getPath(), $this->laravel['modules']->getModulePath($this->getModuleName()) );
-
         return $path . $repositoryPath->getPath() . '/' . $this->getFileName() . 'Repository.php';
     }
 
@@ -157,9 +159,9 @@ class RepositoryMakeCommand extends BaseCommand
      */
     private function getFileName()
     {
-        if($this->option('custom-model') && @class_exists($this->option('custom-model'))){
-            return $this->option('custom-model');
-        }
+        // if($this->option('custom-model') && @class_exists($this->option('custom-model'))){
+        //     return $this->option('custom-model');
+        // }
         return Str::studly($this->argument('repository'));
     }
 
