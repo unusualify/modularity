@@ -238,7 +238,6 @@ abstract class CoreController extends Controller
         Request $request
     )
     {
-        $this->__beforeConstruct($app, $request);
         // if (Config::get('twill.bind_exception_handler', true)) {
         //     App::singleton(ExceptionHandler::class, TwillHandler::class);
         // }
@@ -270,13 +269,16 @@ abstract class CoreController extends Controller
         $this->repository = $this->getRepository();
         $this->modelTitle = $this->getModelTitle();
 
+        $this->__beforeConstruct($app, $request);
+
         /*
          * Apply any filters that are selected by default
          */
         $this->applyFiltersDefaultOptions();
 
+        $this->addWiths();
         $this->addIndexWiths();
-        // $this->addFormWiths();
+        $this->addFormWiths();
     }
 
     /**
@@ -814,7 +816,7 @@ abstract class CoreController extends Controller
         });
 
         foreach ($methods as $key => $method) {
-            $this->indexWith += $this->{$method}();
+            $this->formWith += $this->{$method}();
         }
     }
 
