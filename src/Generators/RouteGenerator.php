@@ -17,9 +17,9 @@ use Nwidart\Modules\Support\Config\GeneratorPath;
 use Nwidart\Modules\Support\Stub;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\File;
+use Modules\SystemUser\Repositories\PermissionRepository;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Repositories\PermissionRepository;
 
 class RouteGenerator extends Generator
 {
@@ -680,7 +680,9 @@ class RouteGenerator extends Generator
             return ["--{$key}" => $item];
         })->toArray();
 
-        if(!($this->customModel && @class_exists($this->customModel))) {
+        $hasCustomModel = $this->customModel && @class_exists($this->customModel);
+
+        if(!$hasCustomModel) {
             $this->console->call('unusual:make:model', [
                 'module' => $this->module->getStudlyName(),
                     'model' => $this->getName()
@@ -712,6 +714,7 @@ class RouteGenerator extends Generator
                 'module' => $this->module->getStudlyName(),
                 'repository' => $this->getName()
                 ]
+                + ($hasCustomModel ? [ '--custom-model' => $this->customModel] : [])
                 + $console_traits
                 + ['--notAsk' => true]
             );
