@@ -227,7 +227,7 @@
         "role": "Rol | Roller | {n} Rol",
         "user": "Kullanıcı | Kullanıcılar | {n} Kullanıcı",
         "press_release": "Haber Bülteni | Haber Bültenleri | {n} Haber Bülteni",
-        "package_distribution_language": "Dağıtım Dili | Dağıtım Dilleri | {n} Dağıtım Dili"
+        "package_language": "Dağıtım Dili | Dağıtım Dilleri | {n} Dağıtım Dili"
     },
     "new-item": "Yeni {item}",
     "No": "Hayır",

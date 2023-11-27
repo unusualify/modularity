@@ -12,5 +12,5 @@ return array (
     "role"=> "Rol | Roller | {n} Rol",
     "user"=> "Kullanıcı | Kullanıcılar | {n} Kullanıcı",
     "press_release"=> "Haber Bülteni | Haber Bültenleri | {n} Haber Bülteni",
-    "package_distribution_language"=> "Dağıtım Dili | Paket Dağıtım Dilleri | {n} Dağıtım Dili"
+    "package_language"=> "Dağıtım Dili | Paket Dağıtım Dilleri | {n} Dağıtım Dili"
 );

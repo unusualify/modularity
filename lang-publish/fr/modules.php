@@ -12,5 +12,5 @@ return array (
     "press_release"=> "Press Release | Press Releases | {n} Releases",
     "role"=> "Role | Roles | {n}  Roles",
     "user"=> "User | Users | {n} Users",
-    "package_distribution_language"=> "Distribution Language | Distribution Languages | {n} Distribution Languages"
+    "package_language"=> "Distribution Language | Distribution Languages | {n} Distribution Languages"
 );
