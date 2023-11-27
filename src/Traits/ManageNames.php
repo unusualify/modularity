@@ -56,4 +56,20 @@ trait ManageNames {
         return Str::studly($string);
     }
 
+    protected function getStudlyNameFromForeignKey($foreign_key){
+        if(preg_match('/(.*)(_id)/', $foreign_key, $matches)){
+            return $this->getStudlyName($matches[1]);
+        }
+
+        return null;
+    }
+
+    protected function getCamelNameFromForeignKey($foreign_key){
+        if(preg_match('/(.*)(_id)/', $foreign_key, $matches)){
+            return $this->getCamelCase($matches[1]);
+        }
+
+        return null;
+    }
+
 }
