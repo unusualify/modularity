@@ -555,6 +555,15 @@ const defaultPickerSchemaMenu = { closeOnContentClick: false, transition: 'scale
 // type wrap or group - if no typeInt defined take default
 const defaultInternGroupType = 'v-card'
 //
+
+const emits = [
+  'update:modelValue',
+  'input',
+  'update',
+  'resize',
+  'blur',
+  'click'
+]
 export default {
   setup () {
     const _instance = getCurrentInstance()
@@ -565,7 +574,7 @@ export default {
     }
   },
   name: 'VFormBase',
-  emits: ['update:modelValue'],
+  emits,
   props: {
     id: {
       type: String,
@@ -622,7 +631,6 @@ export default {
   computed: {
     valueIntern () {
       // use <formbase :model="myData" />  ->  legacy code <formbase :modelValue="myData" />
-      // __log('valueIntern computed', this.model, this.modelValue)
       const model = this.model || this.modelValue
       this.updateArrayFromState(model, this.formSchema)
       return model
@@ -648,13 +656,12 @@ export default {
       return orderBy(this.flatCombinedArray, ['schema.sort'], [orderDirection])
     },
     storeStateData () {
-      // __log('storeStateData computed', this.$lodash.pick(this.valueIntern, ['country_id', 'city_id', 'district_id']))
+      // __log('storeStateData computed', this.valueIntern)
       this.updateArrayFromState(this.valueIntern, this.formSchema)
       return this.valueIntern
     },
     storeStateSchema () {
-      // __log('storeStateSchema computed')
-
+      // __log('storeStateSchema computed', this.valueIntern)
       this.updateArrayFromState(this.valueIntern, this.formSchema)
       for (const key in this.formSchema) {
         const sch = this.formSchema[key]
@@ -663,7 +670,7 @@ export default {
           // this.formSchema[key].items = find(this.formSchema[sch.parent].items, [this.formSchema[sch.parent].itemValue, this.valueIntern[sch.parent]]).items
         }
       }
-
+      // __log('storeStateSchema computed')
       return this.formSchema
     }
   },
@@ -1107,28 +1114,42 @@ export default {
       // const display = 'resize|swipe|intersect' // event watch collects events 'resize|swipe|intersect'
 
       // const emitEvent = change.includes(event) ? 'change' : watch.includes(event) ? 'watch' : mouse.includes(event) ? 'mouse' : display.includes(event) ? 'display' : event
-      // const listener = event
-      const emitEvent = change.includes(event) ? 'onChange' : watch.includes(event) ? 'onWatch' : mouse.includes(event) ? 'onMouse' : display.includes(event) ? 'onDisplay' : event
+      const emitEvent = change.includes(event)
+        ? 'onChange'
+        : watch.includes(event)
+          ? 'onWatch'
+          : mouse.includes(event)
+            ? 'onMouse'
+            : display.includes(event)
+              ? 'onDisplay'
+              : event
       const listener = 'on' + this.$lodash.startCase(this.$lodash.camelCase(event)).replace(/ /g, '')
-      if (this.$attrs[`${emitEvent}:${this.id}`]) {
-        this.deprecateEventCustomID(emitEvent)
-        this.deprecateCombinedEvents(emitEvent, event)
-        this.$emit(`${emitEvent}:${this.id}`, val) // listen to specific event only
-      } else if (this.$attrs[`${emitEvent}`]) {
-        this.deprecateCombinedEvents(emitEvent, event)
-        this.$emit(emitEvent, val) // listen to specific event only
-      } else if (this.$attrs[`${listener}:${this.id}`]) {
-        this.deprecateEventCustomID(event)
-        this.$emit(`${event}:${this.id}`, val) // listen to specific event only
-      } else if (this.$attrs[`${listener}`]) {
-        // this.$emit(event, val) // listen to specific event only
-        // this.$emit(listener, val) // listen to specific event only
-        // this.$emit('update:schema', this.storeStateSchema) // listen to specific event only
-        // __log(listener, this.storeStateData)
+      // __log(emitEvent, listener, this)
+      // if (this.$attrs[`${emitEvent}:${this.id}`]) {
+      //   this.deprecateEventCustomID(emitEvent)
+      //   this.deprecateCombinedEvents(emitEvent, event)
+      //   this.$emit(`${emitEvent}:${this.id}`, val) // listen to specific event only
+      // } else if (this.$attrs[`${emitEvent}`]) {
+      //   // this.deprecateCombinedEvents(emitEvent, event)
+      //   __log(emitEvent, val)
+      //   this.$emit(emitEvent, val) // listen to specific event only
+      // } else if (this.$attrs[`${listener}:${this.id}`]) {
+      //   this.deprecateEventCustomID(event)
+      //   this.$emit(`${event}:${this.id}`, val) // listen to specific event only
+      // } else if (this.$attrs[`${listener}`]) {
+      //   // this.$emit(event, val) // listen to specific event only
+      //   // this.$emit(listener, val) // listen to specific event only
+      //   // this.$emit('update:schema', this.storeStateSchema) // listen to specific event only
+      //   // __log(listener, this.storeStateData)
+      //   this.$emit(`${event}`, val) // listen to specific event only
+      //   // this.$emit('update:modelValue', this.storeStateData) // listen to specific event only
+      // }
+      if (emits.includes(event)) {
+        this.$emit(`${event}`, val) // listen to specific event only
+      }
 
-        this.$emit('update:modelValue', this.storeStateData) // listen to specific event only
-      } else if (listener == 'onInput' && this[`${listener}`]) {
-        this.$emit('update:modelValue', this.storeStateData) // listen to specific event only
+      if (event === 'onInput' || emitEvent === 'onChange') {
+        this.$emit('update:modelValue', this.storeStateData)
       }
     },
     deprecateEventCustomID (ev) {
@@ -1160,6 +1181,13 @@ export default {
       // __log(this.flatCombinedArray)
 
       this.flatCombinedArray.forEach(obj => {
+        if (obj.key == 'name') {
+          // __log(
+          //   'updateArrayFromState',
+          //   get(data, obj.key, null),
+          //   get(schema, obj.key, null)
+          // )
+        }
         obj.value = get(data, obj.key, null) // get - lodash
         obj.schema = get(schema, obj.key, null) // get - lodash
       })
@@ -1272,12 +1300,6 @@ export default {
       if (isEmpty(schema)) this.autogenerateSchema(model)
 
       // create flatted working array from schema and value
-      // __log(
-      //   this.storeStateData,
-      //   this.storeStateSchema
-      //   // this.flattenAndCombineToArray(this.storeStateData, this.storeStateSchema)
-      // )
-      // __log(this.storeStateData, this.storeStateSchema)
       this.flatCombinedArray = this.flattenAndCombineToArray(this.storeStateData, this.storeStateSchema)
     },
 

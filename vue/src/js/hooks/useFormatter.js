@@ -24,6 +24,11 @@ export default function useFormatter (props, context, headers) {
 
   const methods = reactive({
     dateFormatter: function (value, datetimeFormat = 'long') {
+      // __log(
+      //   value
+      //   // new Date(value),
+      //   // d(new Date(value), datetimeFormat)
+      // )
       return {
         configuration: methods.makeText(d(new Date(value), datetimeFormat))
       }

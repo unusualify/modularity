@@ -25,8 +25,8 @@ export default {
     //   this.$emit('input', value)
     //   this.$emit('update:modelValue', value)
     // },
-    errorMessages (name) {
-      return this.errors[name]
-    }
+    // errorMessages (name) {
+    //   return this.errors[name]
+    // }
   }
 }

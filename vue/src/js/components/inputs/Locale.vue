@@ -5,8 +5,7 @@
         <component
             v-bind:is="`${type}`"
             :class="[language.value === currentLocale.value || isCustomForm ? '' : 'd-none']"
-            v-bind="attributesPerLang(language.value)"
-
+            v-bind="attributesPerLang[language.value]"
             @update:modelValue="modelUpdated($event, language.value)"
           >
           <template v-slot:append>
@@ -57,7 +56,7 @@ import { LANGUAGE } from '@/store/mutations'
 import { InputMixin, LocaleMixin } from '@/mixins'
 import { useInput, makeInputProps } from '@/hooks'
 
-import cloneDeep from 'lodash/cloneDeep'
+import { cloneDeep, omit } from 'lodash'
 
 export default {
   mixins: [InputMixin, LocaleMixin],
@@ -95,6 +94,12 @@ export default {
           this.input[locale] = value[locale]
         }
       }
+    },
+    attributes: {
+      handler (value, oldValue) {
+        // __log('attributes watch', value, oldValue)
+      },
+      deep: true
     }
   },
   computed: {
@@ -104,7 +109,7 @@ export default {
         return this.modelValue
       },
       set (val, old) {
-        // __log('Locale.vue input set', val, old)
+        __log('Locale.vue input set', val, old)
         this.inputOnSet(val, old)
         this.updateModelValue(val)
         // context.emit('update:modelValue', val)
@@ -113,7 +118,41 @@ export default {
     ...mapState({
       currentLocale: state => state.language.active,
       languages: state => state.language.all
-    })
+    }),
+    attributesPerLang: function () {
+      // const language = this.languages.find(l => l.value === lang)
+
+      const localeAttributes = {}
+      // const attributes = cloneDeep(this.attributes)
+      const errorMessages = this.attributes.errorMessages
+
+      this.languages.forEach((language) => {
+        const attributes = cloneDeep(omit(this.attributes, ['errorMessages']))
+        // __log(attributes)
+        // for textfields set initial values using the initialValues prop
+        // if (this.initialValues && typeof this.initialValues === 'object' && this.initialValues[lang]) {
+        //   attributes.initialValue = this.initialValues[lang]
+        // } else if (!attributes.initialValue) {
+        //   attributes.initialValue = ''
+        // }
+        attributes.required = !!language.published && this.isRequired
+        attributes.name = `${attributes.name}[${language.value}]`
+
+        if (__isset(errorMessages[language.value])) {
+          attributes.errorMessages = errorMessages[language.value]
+          attributes.error = false
+        }
+
+        if (this.input) {
+          // __log(this.input[language.value])
+          attributes.modelValue = this.input[language.value]
+        }
+
+        localeAttributes[language.value] = attributes
+      })
+      // this.attributes.errorMessages = new Proxy({})
+      return localeAttributes
+    }
   },
   data () {
     return {
@@ -121,6 +160,7 @@ export default {
       isRequired: this.attributes.required,
 
       inputObject: this.modelValue
+
     }
   },
   mounted () {
@@ -128,10 +168,10 @@ export default {
     this.isRequired = this.attributes.required ?? false
   },
   created () {
-    // __log(this.currentLocale, this.languages)
+
   },
   methods: {
-    attributesPerLang: function (lang) {
+    attributesPerLang_: function (lang) {
       const language = this.languages.find(l => l.value === lang)
 
       const attributes = cloneDeep(this.attributes)
@@ -141,7 +181,6 @@ export default {
       // } else if (!attributes.initialValue) {
       //   attributes.initialValue = ''
       // }
-
       attributes.required = !!language.published && this.isRequired
       attributes.name = `${attributes.name}[${lang}]`
 
@@ -197,6 +236,7 @@ export default {
       // this.updateValue(lang, value)
     }
   }
+
 }
 </script>
 
