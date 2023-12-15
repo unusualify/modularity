@@ -36,16 +36,18 @@
 
     </v-app-bar>
 
-    <ue-impersonate-toolbar
-      v-if="$root.isLgAndUp && impersonateConfiguration.active"
-      v-model="showImpersonateToolbar"
-      v-bind="impersonateConfiguration"
-    />
     <ue-sidebar
       :items="sidebarItems"
       ref="sidebar"
-
-    />
+    >
+      <template v-slot:bottom>
+        <ue-impersonate-toolbar
+          v-if="$root.isLgAndUp && impersonation.active"
+          v-model="showImpersonateToolbar"
+          v-bind="impersonation"
+        />
+      </template>
+    </ue-sidebar>
 
     <v-app-bar app v-if="false">
       <v-app-bar-nav-icon
@@ -95,6 +97,7 @@
       <slot></slot>
 
       <ue-modal-media
+        v-if="!authorization.isClient"
         v-model="showMediaLibrary"
         ref="mediaLibrary"
       ></ue-modal-media>
@@ -126,8 +129,8 @@
 
       <ue-alert ref='alert'></ue-alert>
 
-      <v-layout-item
-        v-if="impersonateConfiguration.active"
+      <!-- <v-layout-item
+        v-if="impersonation.active"
         class="text-end pointer-events-none"
         model-value
         position="bottom"
@@ -145,7 +148,7 @@
             />
           </v-fab-transition>
         </div>
-      </v-layout-item>
+      </v-layout-item> -->
     </v-main>
   </v-app>
 </template>
@@ -153,7 +156,7 @@
 <script>
 export default {
   props: {
-    configuration: {
+    navigation: {
       type: Object,
       default () {
         return {
@@ -225,7 +228,15 @@ export default {
         }
       }
     },
-    impersonateConfiguration: {
+    impersonation: {
+      type: Object,
+      default () {
+        return {
+
+        }
+      }
+    },
+    authorization: {
       type: Object,
       default () {
         return {
@@ -286,10 +297,10 @@ export default {
         }
       ],
 
-      sidebarItems: this.configuration.sidebar,
-      // activeItem: this.configuration.activeItem ?? 0,
-      // activeSubItem: this.configuration.activeSubItem ?? -1,
-      breadcrumbs: this.configuration.breadcrumbs ?? [],
+      sidebarItems: this.navigation.sidebar,
+      // activeItem: this.navigation.activeItem ?? 0,
+      // activeSubItem: this.navigation.activeSubItem ?? -1,
+      breadcrumbs: this.navigation.breadcrumbs ?? [],
 
       footerLinks: [
         {
@@ -317,6 +328,7 @@ export default {
   },
 
   created () {
+    // __log(this.authorization)
     // this.$vToastify.success("Kaydetme İşleminiz Başarılı!", 'Başarılı');
 
     // this.$toast.success('Info toast')

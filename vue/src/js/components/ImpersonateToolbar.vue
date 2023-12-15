@@ -50,12 +50,20 @@ const impersonateRoute = computed(() => {
 })
 </script>
 <template>
-    <!-- <v-icon v-if="active && !show" icon="$close" /> -->
-  <v-navigation-drawer
-      v-model="show"
-      location="right"
-    >
-    <div class="pa-3">
+  <v-bottom-sheet v-model="show">
+    <template v-slot:activator="{ props }">
+      <v-list-item
+            v-bind="props"
+            class="bg-red text-white font-weight-bold mt-2"
+            :ripple="false"
+            :append="false"
+            title="Impersonate Manager"
+            >
+        </v-list-item>
+
+    </template>
+
+    <div class="pa-3 bg-primary">
       <v-btn v-if="impersonated" color="red" :href="stopRoute">
           Stop Impersonating
       </v-btn>
@@ -69,7 +77,8 @@ const impersonateRoute = computed(() => {
       </v-select>
       <v-btn v-if="!impersonated" :href="impersonateRoute" :disabled="!selected">Impersonate</v-btn>
     </div>
-  </v-navigation-drawer>
+  </v-bottom-sheet>
+
 </template>
 
 <script>
