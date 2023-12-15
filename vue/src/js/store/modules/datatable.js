@@ -3,6 +3,7 @@ import { DATATABLE, ALERT } from '@/store/mutations'
 import ACTIONS from '@/store/actions'
 
 import { setStorage } from '@/utils/localeStorage'
+import { redirector } from '@/utils/response'
 
 /* NESTED functions */
 const getObject = (container, id, callback) => {
@@ -267,23 +268,6 @@ const activeOption = (option, key) => {
 }
 
 const actions = {
-  [ACTIONS.DELETE_ITEM] ({ commit, state, dispatch }, { id = null, callback = null, errorCallback = null } = {}) {
-    api.delete(id, function (resp) {
-      commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
-      if (resp.data.variant.toLowerCase() === 'success') {
-        dispatch(ACTIONS.GET_DATATABLE)
-        callback(resp.data)
-      } else { errorCallback(resp.data) }
-    }, function (response) {
-      __log('400 response', response)
-      if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
-        commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
-      } else {
-        dispatch(ACTIONS.HANDLE_ERRORS, response.data)
-        commit(ALERT.SET_ALERT, { message: 'Your submission could not be validated, please fix and retry', variant: 'error' })
-      }
-    })
-  },
   [ACTIONS.GET_DATATABLE] ({ commit, state, getters }, { payload = {}, callback = null, errorCallback = null } = {}) {
     // if (!state.loading) {
 
@@ -329,7 +313,6 @@ const actions = {
     }
     // }
   },
-
   [ACTIONS.SET_DATATABLE_NESTED] ({ commit, state, dispatch }) {
     // Get all ids and children ids if any
     const ids = deepRemoveFromObj(state.data)
@@ -352,32 +335,69 @@ const actions = {
       commit(NOTIFICATION.SET_NOTIF, { message: errorResp.data.error.message, variant: 'error' })
     })
   },
-  // [ACTIONS.DELETE_ROW] ({ commit, state, dispatch }, row) {
-  //   api.delete(row, function (resp) {
-  //     commit(NOTIFICATION.SET_NOTIF, { message: resp.data.message, variant: resp.data.variant })
-  //     dispatch(ACTIONS.GET_DATATABLE)
-  //   })
-  // },
-  [ACTIONS.DUPLICATE_ROW] ({ commit, state, dispatch }, row) {
-    api.duplicate(row, function (resp) {
-      commit(NOTIFICATION.SET_NOTIF, { message: resp.data.message, variant: resp.data.variant })
-      if (resp.data.hasOwnProperty('redirect')) {
-        window.location.replace(resp.data.redirect)
+
+  [ACTIONS.DELETE_ITEM] ({ commit, state, dispatch }, { id = null, callback = null, errorCallback = null } = {}) {
+    api.delete(id, function (resp) {
+      commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
+      if (resp.data.variant.toLowerCase() === 'success') {
+        dispatch(ACTIONS.GET_DATATABLE)
+        callback(resp.data)
+      } else { errorCallback(resp.data) }
+    }, function (response) {
+      __log('400 response', response)
+      if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
+        commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
+      } else {
+        dispatch(ACTIONS.HANDLE_ERRORS, response.data)
+        commit(ALERT.SET_ALERT, { message: 'Your submission could not be validated, please fix and retry', variant: 'error' })
       }
     })
   },
-  [ACTIONS.RESTORE_ROW] ({ commit, state, dispatch }, row) {
-    api.restore(row, function (resp) {
-      commit(NOTIFICATION.SET_NOTIF, { message: resp.data.message, variant: resp.data.variant })
+  [ACTIONS.DUPLICATE_ITEM] ({ commit, state, dispatch }, item) {
+    api.duplicate(item.id, function (resp) {
+      commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
       dispatch(ACTIONS.GET_DATATABLE)
+      redirector(resp.data)
     })
   },
-  [ACTIONS.DESTROY_ROW] ({ commit, state, dispatch }, row) {
-    api.destroy(row, function (resp) {
-      commit(NOTIFICATION.SET_NOTIF, { message: resp.data.message, variant: resp.data.variant })
+  [ACTIONS.RESTORE_ITEM] ({ commit, state, dispatch }, { id = null, callback = null, errorCallback = null }) {
+    api.restore(id, function (resp) {
+      commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
+      if (resp.data.variant.toLowerCase() === 'success') {
+        dispatch(ACTIONS.GET_DATATABLE)
+        callback(resp.data)
+      } else { errorCallback(resp.data) }
       dispatch(ACTIONS.GET_DATATABLE)
+    }, function (response) {
+      __log('400 response', response)
+      if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
+        commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
+      } else {
+        dispatch(ACTIONS.HANDLE_ERRORS, response.data)
+        commit(ALERT.SET_ALERT, { message: 'Your submission could not be validated, please fix and retry', variant: 'error' })
+      }
     })
   },
+  [ACTIONS.DESTROY_ITEM] ({ commit, state, dispatch }, { id = null, callback = null, errorCallback = null }) {
+    api.forceDelete(id, function (resp) {
+      __log(resp)
+      commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
+      if (resp.data.variant.toLowerCase() === 'success') {
+        dispatch(ACTIONS.GET_DATATABLE)
+        callback(resp.data)
+      } else { errorCallback(resp.data) }
+      dispatch(ACTIONS.GET_DATATABLE)
+    }, function (response) {
+      __log('400 response', response)
+      if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
+        commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
+      } else {
+        dispatch(ACTIONS.HANDLE_ERRORS, response.data)
+        commit(ALERT.SET_ALERT, { message: 'Your submission could not be validated, please fix and retry', variant: 'error' })
+      }
+    })
+  },
+
   [ACTIONS.BULK_PUBLISH] ({ commit, state, dispatch }, payload) {
     api.bulkPublish(
       {
