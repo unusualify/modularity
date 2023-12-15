@@ -110,7 +110,7 @@ return [
             'icon' => '$role',
             'table_options' => [
                 'createOnModal' => false,
-                'editOnModal' => false,
+                'editOnModal' => true,
                 'isRowEditing' => true,
                 'rowActionsType' => 'inline',
             ],
@@ -524,6 +524,7 @@ return [
                 ],
                 'permissions' => [
                     'type' => 'checklist',
+                    'isTreeview' => true,
                     // 'type' => 'custom-input-treeview',
                     'name' => 'permissions',
                     'label' => 'Permissions of the role',

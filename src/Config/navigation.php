@@ -6,6 +6,9 @@ use Unusualify\Modularity\Facades\UNavigation;
 //     UNavigation::baseMenu(),
 //     UNavigation::modulesMenu()
 // );
+// dd(
+//     phpArrayFileContent(UNavigation::modulesMenu()['package']),
+// );
 return [
     /*
     |--------------------------------------------------------------------------
