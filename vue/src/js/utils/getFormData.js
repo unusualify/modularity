@@ -242,9 +242,9 @@ export const getModel = (inputs, item = null, rootState = null) => {
     if (isArrayable.includes(input.type)) {
       _default = []
     }
-
     const value = editing ? item[name] : _default
     if (__isObject(input)) {
+      const languages = window[process.env.VUE_APP_NAME].STORE.languages.all
       if (isMediableTypes.includes(input.type)) {
         if (editing && __isset(item[name])) {
           // __log('mediable', name, item)
@@ -253,17 +253,19 @@ export const getModel = (inputs, item = null, rootState = null) => {
           fields[name] = { tr: [] }
         }
       } else if (Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated) { // translations
-        fields[name] = window[process.env.VUE_APP_NAME].STORE.languages.all.reduce(function (map, lang) {
+        fields[name] = languages.reduce(function (map, lang) {
           if (editing) {
             if (Object.prototype.hasOwnProperty.call(item, 'translations')) {
               map[lang.value] = find(item.translations, { locale: lang.value })
                 ? find(item.translations, { locale: lang.value })[name]
                 : item.translations[name][lang.value]
-            } else {
+            } else if (__isObject(value) && __isset(value[lang.value])) {
               map[lang.value] = value[lang.value]
+            } else {
+              map[lang.value] = value ?? ''
             }
           } else {
-            map[lang.value] = value
+            map[lang.value] = value ?? ''
           }
           return map
         }, {})
@@ -297,7 +299,6 @@ export const getModel = (inputs, item = null, rootState = null) => {
   if (rootState) {
     // hydrateSelected(item, rootState)
   }
-  // __log(item, values)
   return values
 }
 
