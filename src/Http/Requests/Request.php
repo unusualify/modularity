@@ -2,12 +2,18 @@
 
 namespace Unusualify\Modularity\Http\Requests;
 
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Unusualify\Modularity\Traits\ManageTraits;
 
 abstract class Request extends FormRequest
 {
+    use ManageTraits;
+
     /**
      * Determines if the user is authorized to make this request.
      *
@@ -26,14 +32,46 @@ abstract class Request extends FormRequest
     public function rules()
     {
         switch ($this->method()) {
-            case 'POST':{return array_merge( $this->rulesForAll(),$this->rulesForCreate() );}
-            case 'PUT':{return array_merge( $this->rulesForAll(),$this->rulesForUpdate() );}
+            case 'POST':{
+                return $this->hydrateRules(array_merge($this->rulesForAll(),$this->rulesForCreate()));
+            }
+            case 'PUT':{
+                return $this->hydrateRules(array_merge($this->rulesForAll(),$this->rulesForUpdate()));
+            }
             default:break;
         }
 
         return [];
     }
 
+    public function hydrateRules($rules) {
+        $locales = getLocales();
+        $localeActive = false;
+        $model = $this->model();
+
+        if($model){
+            $translatedAttributes = (method_exists($model, 'isTranslatable') && $model->isTranslatable()) ? $model->getTranslatedAttributes() : [];
+            $translatedRules = Arr::only($rules, $translatedAttributes);
+            $rules = Arr::except($rules, $translatedAttributes);
+
+            if(count($translatedAttributes) > 0){
+                foreach ($locales as $locale) {
+
+                    // $language = Collection::make($this->request->all('languages'))->where('value', $locale)->first();
+                    // $currentLocaleActive = $language['published'] ?? false;
+                    $currentLocaleActive = true;
+
+                    $rules = $this->updateRules( $rules, $translatedRules, $locale, $currentLocaleActive);
+
+                    if ($currentLocaleActive) {
+                        $localeActive = true;
+                    }
+                }
+            }
+        }
+        // dd($rules);
+        return $rules;
+    }
 
     /**
      * Gets the validation rules that apply to the translated fields.
@@ -74,6 +112,11 @@ abstract class Request extends FormRequest
     private function updateRules($rules, $fields, $locale, $localeActive = true)
     {
         $fieldNames = array_keys($fields);
+        // $table = $this->model()->getTable();
+        // $table = get_class($this->model());
+        // $translationTable =  App::make($this->model()->getTranslationModelName())->getTable();
+        $translationTableClass =  $this->model()->getTranslationModelName();
+        $request = $this->request;
 
         foreach ($fields as $field => $fieldRules) {
             if (is_string($fieldRules)) {
@@ -98,7 +141,8 @@ abstract class Request extends FormRequest
                 }
             }
 
-            $rules["{$field}.{$locale}"] = $fieldRules->map(function ($rule) use ($locale, $fieldNames) {
+
+            $rules["{$field}.{$locale}"] = $fieldRules->map(function ($rule) use ($locale, $fieldNames, $translationTableClass, $request) {
                 // allows using validation rule that references other fields even for translated fields
                 if ($this->ruleStartsWith($rule, 'required_') && Str::contains($rule, $fieldNames)) {
                     foreach ($fieldNames as $fieldName) {
@@ -106,10 +150,25 @@ abstract class Request extends FormRequest
                     }
                 }
 
+                if ($this->ruleStartsWith($rule, 'unique_translation') && Str::contains($rule, $fieldNames)) {
+                    // $unique_fields = explode(',', explode(':',$rule)[1]);
+
+                    $rule = function (string $attribute, mixed $value, Closure $fail) use($translationTableClass){
+                        [$_field, $_locale] = explode('.', $attribute);
+                        $records = $translationTableClass::query()
+                            ->where($_field, $value)
+                            ->where('locale', $_locale)
+                            ->get();
+                        if($records->count() > 0){
+                            $fail("The field exists on system, please enter an unique {$_field}.");
+                        }
+                    };
+                }
+
                 return $rule;
             })->toArray();
         }
-
+        // dd($rules);
         return $rules;
     }
 

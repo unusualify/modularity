@@ -35,8 +35,9 @@ class RoleRequest extends BaseFormRequest
 
     public function store()
     {
+        $table_name = config('permission.table_names.roles');
         return [
-            'name' => 'required|unique:roles|min:4',
+            'name' => "required|unique:$table_name|min:4",
             // 'name' => ''
             // 'email' => 'required|email|unique:users',
             // 'password' => 'required|confirmed|min:8',
@@ -47,8 +48,10 @@ class RoleRequest extends BaseFormRequest
 
     public function update()
     {
+        $table_name = config('permission.table_names.roles');
+
         return [
-            'name' => 'required|min:4|unique:roles,name,'.$this->id,
+            'name' => "required|min:4|unique:{$table_name},name,{$this->id}",
             // 'guard_name' => 'sometimes|min:4',
             // 'email' => 'required|email|unique:users,email,'.$this->user()->id,
             // 'logo' => 'nullable|image|max:1024',
