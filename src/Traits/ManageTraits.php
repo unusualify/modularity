@@ -2,7 +2,9 @@
 namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Facades\UFinder;
 
 trait ManageTraits {
 
@@ -27,15 +29,9 @@ trait ManageTraits {
         });
     }
 
-    public function getInputs() {
-        $moduleName = null;
-        $routeName = null;
-        if( preg_match('/[M|m]{1}odules[\/\\\]([A-Za-z]+)[\/\\\]/', get_class($this), $matches)){
-            $moduleName = $matches[1];
-        }
-        if( preg_match('/(\w+)Repository/', get_class_short_name($this), $matches)){
-            $routeName = snakeCase($matches[1]);
-        }
+    public function inputs() {
+        $moduleName = $this->moduleName();
+        $routeName = $this->routeName();
 
         if( $moduleName && $routeName){
             $module = Modularity::find($moduleName);
@@ -47,17 +43,33 @@ trait ManageTraits {
         return [];
     }
 
-    public function getRouteName() {
-        $moduleName = null;
+    public function routeName() {
+        $moduleName = $this->moduleName();
+
         $routeName = null;
-        if( preg_match('/[M|m]{1}odules[\/\\\]([A-Za-z]+)[\/\\\]/', get_class($this), $matches)){
-            $moduleName = $matches[1];
-        }
-        if( preg_match('/(\w+)Repository/', get_class_short_name($this), $matches)){
+
+        if(!$moduleName)
+            return $routeName;
+        if( preg_match('/(\w+)(?=(Request|Repository|Controller))/', get_class_short_name($this), $matches)){
             $routeName = studlyName($matches[1]);
         }
 
         return $routeName;
+    }
+
+    public function moduleName() {
+
+        if( preg_match('/[M|m]{1}odules[\/\\\]([A-Za-z]+)[\/\\\]/', get_class($this), $matches)){
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    public function model() {
+        $routeName = $this->routeName();
+
+        return $routeName  ? App::make(UFinder::getRouteRepository($routeName))?->getModel() : null;
     }
 
 
