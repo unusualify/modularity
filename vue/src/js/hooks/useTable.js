@@ -126,7 +126,13 @@ export default function useTable (props, context) {
     editedIndex: -1,
     selectedItems: [],
 
+    windowSize: {
+      x: 0,
+      y: 0
+    },
+
     snakeName: _.snakeCase(props.name),
+    permissionName: _.kebabCase(props.name),
     transNameSingular: computed(() => te('modules.' + state.snakeName, 0) ? t('modules.' + state.snakeName, 0) : props.name),
     transNamePlural: computed(() => t('modules.' + state.snakeName, 1)),
     transNameCountable: computed(() => t('modules.' + state.snakeName, getters.totalElements.value)),
@@ -140,13 +146,20 @@ export default function useTable (props, context) {
     }),
     deleteQuestion: computed(() => {
       // __log(store.state.form.editedItem, props.titleKey)
-      return t('confirm-deletion', {
+      const langKey = state.isSoftDeletableItem
+        ? 'confirm-soft-deletion'
+        : 'confirm-deletion'
+      return t(langKey, {
         // route: state.transName.toLowerCase(),
         route: state.transNameSingular,
         name: (state.editedItem[props.titleKey]
-          ? (isObject(state.editedItem[props.titleKey]) ? state.editedItem[props.titleKey][store.state.currentUser.locale] : state.editedItem[props.titleKey])
+          ? (isObject(state.editedItem[props.titleKey]) ? state.editedItem[props.titleKey][store.state.user.locale] : state.editedItem[props.titleKey])
           : '').toLocaleUpperCase()
       })
+    }),
+
+    isSoftDeletableItem: computed(() => {
+      return methods.isSoftDeletable(state.editedItem)
     }),
 
     activeItemConfiguration: null,
@@ -177,6 +190,9 @@ export default function useTable (props, context) {
   })
 
   const methods = reactive({
+    onResize () {
+      state.windowSize = { x: window.innerWidth, y: window.innerHeight }
+    },
     // initialize: function () {
     //   store.commit(DATATABLE.UPDATE_DATATABLE_SEARCH, '')
     //   store.commit(
@@ -195,6 +211,154 @@ export default function useTable (props, context) {
       })
     },
 
+    itemHasAction: function (item, action) {
+      let hasAction = true
+      switch (action.name) {
+        case 'edit':
+          if (methods.isSoftDeletable(item)) {
+            hasAction = false
+          } else {
+            hasAction = hasAction = methods.canItemAction(action)
+          }
+          break
+        case 'delete':
+          if (methods.isSoftDeletable(item)) {
+            hasAction = false
+          } else {
+            hasAction = methods.canItemAction(action)
+          }
+          break
+        case 'forceDelete':
+          if (methods.isSoftDeletable(item)) {
+            hasAction = methods.canItemAction(action)
+          } else {
+            hasAction = false
+          }
+          break
+        case 'restore':
+          if (methods.isSoftDeletable(item)) {
+            hasAction = methods.canItemAction(action)
+          } else {
+            hasAction = false
+          }
+          break
+        case 'duplicate':
+          if (methods.isSoftDeletable(item)) {
+            hasAction = false
+          }
+          break
+        case 'switch':
+          if (methods.isSoftDeletable(item)) {
+            hasAction = false
+          }
+          break
+        case 'activate':
+          if (methods.isSoftDeletable(item)) {
+            hasAction = false
+          }
+          break
+        default:
+          break
+      }
+
+      return hasAction
+    },
+    canItemAction: function (action) {
+      // __log(store.getters.userPermissions)
+      if (__isset(action.can) && action.can) {
+        // if (store.getters.isSuperAdmin) {
+        //   return true
+        // }
+        // __log(
+        //   action.can
+        // )
+        // __log(
+        //   permission,
+        //   this.$store.getters.isSuperAdmin,
+        //   this.$store.getters.userPermissions
+        // )
+        // if (this.$store.getters.isSuperAdmin) {
+        //   return true
+        // }
+
+        // return false
+      }
+
+      return true
+    },
+    itemAction: function (item, action, ...args) {
+      switch (action) {
+        case 'edit':
+          if (props.editOnModal || props.embeddedForm) {
+            methods.setEditedItem(item)
+            methods.openForm()
+            // this.$refs.formModal.openModal()
+          } else {
+            const route = state.editUrl.replace(':id', item.id)
+            window.open(route)
+          }
+          break
+        case 'delete':
+          methods.setEditedItem(item)
+          // this.$refs.dialog.openModal()
+          methods.openDeleteModal()
+          break
+        case 'forceDelete':
+          methods.setEditedItem(item)
+          // this.$refs.dialog.openModal()
+          methods.openDeleteModal()
+          break
+        case 'restore':
+          methods.setEditedItem(item)
+          methods.restoreRow(item.id)
+          // this.$refs.dialog.openModal()
+          break
+        case 'duplicate':
+          methods.setEditedItem(item)
+          methods.duplicateRow(item.id)
+          // this.$refs.dialog.openModal()
+          // methods.openDeleteModal()
+          break
+        case 'switch':
+          var value = args[0]
+          var key = args[1]
+          store.dispatch(ACTIONS.SAVE_FORM, {
+            plain: true,
+            item: {
+              id: item.id,
+              ...{ [key]: value }
+            },
+            callback: function () {
+              item[key] = value
+
+              if (state.editedItem.id === item.id) {
+                methods.setEditedItem({
+                  ...state.editedItem,
+                  ...{ [key]: value }
+                })
+              }
+            },
+            errorCallback: function () {}
+          })
+          break
+        case 'activate':
+          state.activeTableItem = find(state.elements, { id: item.id })
+          break
+        default:
+          break
+      }
+    },
+
+    can (permission) {
+      const name = state.permissionName + '_' + permission
+
+      if (store.getters.isSuperAdmin) {
+        return true
+      } else {
+        return store.getters.userPermissions[name]
+      }
+    },
+
     editItem: function (item) {
       if (props.editOnModal || props.embeddedForm) {
         methods.setEditedItem(item)
@@ -210,7 +374,11 @@ export default function useTable (props, context) {
       // this.$refs.dialog.openModal()
       methods.openDeleteModal()
     },
-    switchItem: function (value, key, item) {
+    duplicateItem: function (item) {
+      methods.setEditedItem(item)
+      methods.duplicateRow(item.id)
+    },
+    switchItem: function (item, value, key) {
       // __log(value, key)
       // item[key] = value
       // methods.setEditedItem(item)
@@ -271,10 +439,57 @@ export default function useTable (props, context) {
     },
 
     deleteRow: function () {
-      store.dispatch(ACTIONS.DELETE_ITEM, {
+      if (state.isSoftDeletableItem) {
+        store.dispatch(ACTIONS.DESTROY_ITEM, {
+          id: state.editedItem.id,
+          callback: () => {
+            methods.closeDeleteModal()
+          },
+          errorCallback: () => {
+
+          }
+        })
+      } else {
+        store.dispatch(ACTIONS.DELETE_ITEM, {
+          id: state.editedItem.id,
+          callback: () => {
+            methods.closeDeleteModal()
+          },
+          errorCallback: () => {
+
+          }
+        })
+      }
+    },
+    duplicateRow: function () {
+      // __log(state.editedItem)
+      store.dispatch(ACTIONS.DUPLICATE_ITEM, {
         id: state.editedItem.id,
         callback: () => {
-          methods.closeDeleteModal()
+
+        },
+        errorCallback: () => {
+
+        }
+      })
+    },
+    restoreRow: function () {
+      store.dispatch(ACTIONS.RESTORE_ITEM, {
+        id: state.editedItem.id,
+        callback: () => {
+
+        },
+        errorCallback: () => {
+
+        }
+      })
+    },
+    forceDeleteRow: function () {
+      // __log(state.editedItem)
+      store.dispatch(ACTIONS.DESTROY_ITEM, {
+        id: state.editedItem.id,
+        callback: () => {
+
         },
         errorCallback: () => {
 
@@ -298,6 +513,10 @@ export default function useTable (props, context) {
     },
     closeDeleteModal: function () {
       state.deleteModalActive = false
+    },
+
+    isSoftDeletable (item) {
+      return !!(__isset(item.deleted_at) && item.deleted_at)
     },
 
     goNextPage () {

@@ -30,6 +30,7 @@
       ref="datatable"
     >
       <template v-slot:top>
+
         <slot name="header" v-bind="{tableTitle}">
           <!-- <ue-title
             :text="tableTitle"
@@ -51,11 +52,12 @@
             </template>
           </ue-title>
         </slot>
+
         <div class="ue-table-top__wrapper">
 
           <div v-if="embeddedForm && !noForm" class="ue-table-form__embedded"
             :style="formStyles">
-            <v-btn @click="createForm" class="mb-theme">
+            <v-btn v-if="can('create')" @click="createForm" class="mb-theme">
               {{ $t('ADD NEW')}}
             </v-btn>
             <v-expand-transition>
@@ -130,7 +132,6 @@
               </v-card>
             </template>
           </ue-modal>
-
           <slot name="customModal">
             <ue-modal
               ref="customModal"
@@ -198,7 +199,37 @@
               </template>
             </ue-modal>
           </slot>
+
+          <v-toolbar
+              v-if="isSuperAdmin &&  mainFilters.length > 0"
+              flat
+            >
+            <!-- Custom Filters -->
+            <v-menu offset-y rounded="xs" open-on-hover>
+              <template v-slot:activator="{ props, isActive }">
+
+                <v-btn
+                  v-bind="props"
+                  variant="elevated"
+                >
+                  {{ `${filterActive.name} (${filterActive.number})` }}
+                  <v-spacer></v-spacer>
+                  <v-icon right :style="{ transform: isActive ? 'rotate(-180deg)' : 'rotate(0)' }">mdi-chevron-down</v-icon>
+                </v-btn>
+              </template>
+              <v-list>
+                <v-list-item
+                  v-for="(filter, index) in mainFilters"
+                  :key="index"
+                  v-on:click.prevent="filterStatus(filter.slug)"
+                >
+                  <v-list-item-title>{{ filter.name + '(' + filter.number+ ')'}} </v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-toolbar>
         </div>
+
       </template>
       <!-- <template v-slot:top>
         <v-data-table-footer
@@ -300,7 +331,7 @@
               class="pa-0 justify-start"
               variant="plain"
               :color="`primary darken-1`"
-              @click="$call(col.formatter + 'Item', item)"
+              @click="itemAction(item, ...col.formatter)"
               >
               <!-- {{ item[col.key].length > 40 ? item[col.key].substring(0,40) + '...' : item[col.key] }} -->
               {{ window.__shorten(item[col.key]) }}
@@ -314,7 +345,7 @@
                 :true-value="1"
                 false-value="0"
                 hide-details
-                @update:modelValue="switchItem($event, col.key, item)"
+                @update:modelValue="itemAction(item, action, $event, col.key )"
                 >
                 <template v-slot:label></template>
               </v-switch>
@@ -362,33 +393,32 @@
             </v-icon>
           </template>
           <v-list>
-
-            <v-list-item
-              v-for="(action, k) in rowActions"
-              :key="k"
-              @click="$call(action.name + 'Item', item)"
-              >
-                <v-icon small :color="action.color" left>
-                  {{ action.icon ? action.icon : '$' + action.name }}
-                </v-icon>
-                {{ $t(action.name) }}
-            </v-list-item>
-
+            <template v-for="(action, k) in rowActions" :key="k">
+              <v-list-item
+                v-if="itemHasAction(item, action)"
+                @click="itemAction(item, action.name)"
+                >
+                  <v-icon small :color="action.color" left>
+                    {{ action.icon ? action.icon : '$' + action.name }}
+                  </v-icon>
+                  {{ $t(action.name) }}
+              </v-list-item>
+            </template>
           </v-list>
         </v-menu>
 
         <div v-else>
-
-          <v-icon
-            v-for="(action, k) in rowActions"
-            :key="k"
-            small
-            class="mr-2"
-            @click="$call(action.name + 'Item', item)"
-            :color="action.color"
-            >
-            {{ action.icon ? action.icon : '$' + action.name }}
-          </v-icon>
+          <template v-for="(action, k) in rowActions" :key="k">
+            <v-icon
+              v-if="itemHasAction(item, action)"
+              small
+              class="mr-2"
+              @click="itemAction(item, action.name)"
+              :color="action.color"
+              >
+              {{ action.icon ? action.icon : '$' + action.name }}
+            </v-icon>
+          </template>
         </div>
       </template>
 
@@ -428,6 +458,9 @@ export default {
     //   // this.$lodash.pick(this.$props ?? {}, ['name', 'fullWidthWrapper']),
     //   Object.values(this.$lodash.omitBy(this.headers, 'actions'))
     // )
+  },
+  created () {
+    // this.$can(this.rowActions[0].can ?? '')
   }
 }
 </script>
