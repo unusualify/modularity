@@ -68,6 +68,8 @@ class MediaLibraryController extends BaseController implements SignUploadListene
      */
     protected $config;
 
+    protected $setDefaultPermissions = false;
+
     public function __construct(
         Application $app,
         Config $config,
@@ -78,7 +80,8 @@ class MediaLibraryController extends BaseController implements SignUploadListene
         $this->responseFactory = $responseFactory;
         $this->config = $config;
 
-        $this->removeMiddleware('can:edit');
+        // $this->removeMiddleware('can:edit');
+        // $this->removeMiddleware('can:_create');
         // $this->middleware('can:edit', ['only' => ['signS3Upload', 'signAzureUpload', 'tags', 'store', 'singleUpdate', 'bulkUpdate']]);
         $this->endpointType = $this->config->get(unusualBaseKey() . '.media_library.endpoint_type');
         $this->customFields = $this->config->get(unusualBaseKey() . '.media_library.extra_metadatas_fields');
