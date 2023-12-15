@@ -35,7 +35,7 @@ class ImpersonateMiddleware
             $userRepository = app()->make(\Modules\SystemUser\Repositories\UserRepository::class);
             $users = $userRepository->whereNot('id', 1)->get();
 
-            $configuration = [
+            $impersonation = [
                 'active' => auth()->user()->isSuperAdmin() || auth()->user()->isImpersonating(),
                 'users' =>  $users,
                 'impersonated' => auth()->user()->isImpersonating(),
@@ -43,7 +43,7 @@ class ImpersonateMiddleware
                 'route' => route('impersonate', ['id' => ':id'])
             ];
             // setActiveMenuItem($configuration['sidebar'], $configuration['current_url']);
-            $view->with('impersonateConfiguration', $configuration);
+            $view->with('impersonation', $impersonation);
         });
 
 

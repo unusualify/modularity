@@ -17,6 +17,13 @@
         {{-- @dd( auth()->user() ) --}}
         @php
             $isMiniSidebar = false;
+
+            $_mainConfiguration = [
+                'navigation' => $navigation,
+                'impersonation' => $impersonation,
+                'authorization' => $authorization
+            ];
+
         @endphp
         {{-- @dd($sideMenu) --}}
         {{-- @dd($currentUser->isImpersonating(), get_defined_vars()) --}}
@@ -24,8 +31,7 @@
         <div id="admin">
             <ue-main
                 ref='main'
-                :configuration='@json($configuration)'
-                :impersonate-configuration='@json($impersonateConfiguration)'
+                v-bind='@json($_mainConfiguration)'
 
                 >
                 @if(auth()->user()->invalidCompany)
@@ -66,6 +72,8 @@
             window['{{ config(unusualBaseKey() . '.js_namespace') }}'].version = '{{ config(unusualBaseKey() . '.version') }}';
             window['{{ config(unusualBaseKey() . '.js_namespace') }}'].LOCALE = '{{ config(unusualBaseKey() . '.locale') }}';
             window['{{ config(unusualBaseKey() . '.js_namespace') }}'].TIMEZONE = '{{ config(unusualBaseKey() . '.timezone') }}';
+            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].AUTHORIZATION = @json($authorization);
+
             window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {};
             window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE = {};
 

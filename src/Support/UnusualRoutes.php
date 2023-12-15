@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Support;
 
-use Unusualify\Modularity\Facades\UnusualRoutes as FacadesUnusualRoutes;
 use Illuminate\Support\Facades\Route;
 
 class UnusualRoutes
@@ -113,6 +112,7 @@ class UnusualRoutes
             'language',
             'navigation',
             'auth',
+            'authorization',
             'company_registration'
             // 'teams_permission',
         ];
