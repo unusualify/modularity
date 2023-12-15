@@ -3,13 +3,14 @@
         $defaultTableAttributes = [
             'hideDefaultFooter' => false,
             'createOnModal' => true,
-            'editOnModal' => true,
+            'editOnModal' => true
         ];
     @endphp
 @endonce
 
 @php
     $vBind = array_merge_recursive_preserve($defaultTableAttributes, $tableAttributes ?? []);
+    $vBind['embeddedForm'] = false
 @endphp
 
 <ue-datatable v-bind='@json($vBind)' />
