@@ -31,6 +31,7 @@
     "confirm-description": "Are you sure you want to do this?",
     "country": "Country",
     "delete": "Delete",
+    "duplicate": "Duplicate",
     "edit": "Edit",
     "edit-item": "Edit {item}",
     "errors": {

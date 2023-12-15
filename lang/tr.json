@@ -29,6 +29,7 @@
     "confirm-description": "Bu işlemi yapmak istediğinize emin misiniz?",
     "country": "Ülke",
     "delete": "Kaldır",
+    "duplicate": "Kopyala",
     "edit": "Düzenle",
     "edit-item": "{item} Düzenle",
     "errors": {
@@ -232,6 +233,7 @@
     "new-item": "Yeni {item}",
     "No": "Hayır",
     "Personal Information": "Kişisel Bilgiler",
+    "restore": "Geri Yükle",
     "save": "Kaydet",
     "saved": "Kaydedildi!|{0} kaydedildi!",
     "show": "Göster",
