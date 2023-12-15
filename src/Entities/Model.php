@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Entities;
 
-use Unusualify\Modularity\Entities\Traits\{HasPresenter,HasHelpers, HasScopes, IsTranslatable};
 use Carbon\Carbon;
 use Cartalyst\Tags\TaggableInterface;
 use Cartalyst\Tags\TaggableTrait;
@@ -10,10 +9,18 @@ use Illuminate\Database\Eloquent\Model as BaseModel;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Entities\Traits\{
+    HasPresenter,
+    HasHelpers,
+    HasScopes,
+    HasRelation,
+    IsTranslatable
+};
+
 
 abstract class Model extends BaseModel implements TaggableInterface
 {
-    use HasPresenter, HasHelpers, HasScopes, SoftDeletes, TaggableTrait, IsTranslatable;
+    use HasPresenter, HasHelpers, HasScopes, SoftDeletes, TaggableTrait, IsTranslatable, HasRelation;
 
     public $timestamps = true;
 
@@ -73,7 +80,7 @@ abstract class Model extends BaseModel implements TaggableInterface
         return $this->morphToMany(
             static::$tagsModel,
             'taggable',
-            config(unusualBaseKey() . '.tagged_table', 'tagged'),
+            unusualConfig('tables.tagged', 'tagged'),
             'taggable_id',
             'tag_id'
         );

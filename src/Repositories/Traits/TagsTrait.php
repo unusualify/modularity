@@ -56,7 +56,7 @@ trait TagsTrait
 
         if (!empty($ids)) {
             foreach ($ids as $id) {
-                $tagQuery->whereHas('tagged', function ($query) use ($id) {
+                $tagQuery->whereHas(unusualConfig('tables.tagged', 'tagged'), function ($query) use ($id) {
                     $query->where('taggable_id', $id);
                 });
             }
