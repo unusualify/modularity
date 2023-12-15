@@ -65,7 +65,7 @@ export default {
     // app.config.errorHandler = (err) => {}
 
     // set locale wrt user profile preference
-    setI18nLocale(i18n, store.state.currentUser.locale)
+    setI18nLocale(i18n, store.state.user.locale)
     loadLocaleMessages(i18n)
     // i18n.global.setDateTimeFormat('tr', 'Europe/Istanbul')
 
