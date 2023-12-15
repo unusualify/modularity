@@ -9,7 +9,8 @@ export default {
   creditCards: 'mdi-credit-card-search',
 
   delete: 'mdi-trash-can-outline',
-  trash: 'mdi-delete',
+  download: 'mdi-download',
+  duplicate: 'mdi-content-copy',
 
   edit: 'mdi-pencil',
 
@@ -28,9 +29,12 @@ export default {
   permission: 'mdi-account-arrow-right',
   product: 'mdi-dropbox',
 
+  restore: 'mdi-file-restore',
   role: 'mdi-account-key',
 
   support: 'mdi-lifebuoy',
+
+  trash: 'mdi-delete',
 
   // userAdd: 'fa-user-plus',
   userAdd: 'mdi-account-edit',
