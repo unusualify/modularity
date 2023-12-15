@@ -60,4 +60,19 @@ trait HasHelpers
             ->all();
     }
 
+    /**
+     * Checks if this model is soft deletable.
+     *
+     * @param array|string|null $columns Optionally limit the check to a set of columns.
+     * @return bool
+     */
+    public function isSoftDeletable()
+    {
+        // Model must have the trait
+        if (!classHasTrait($this, 'Illuminate\Database\Eloquent\SoftDeletes')) {
+            return false;
+        }
+
+        return true;
+    }
 }
