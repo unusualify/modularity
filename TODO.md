@@ -26,8 +26,8 @@ Modularity System Base Module
 
 - [x] Media Traits and Repositories to be tested
 - [ ] Form custom image input to be developed
-    - [ ] File input connection to media modal
-    - [ ] HasMedias & MediasTrait to be tested
+    - [ ] Media input connection to media modal
+    - [x] HasMedias & MediasTrait to be tested
     - [ ] UI design (card with plus icon)
 - [ ] Form custom file input to be developed
     - [x] File input connection to media modal
@@ -117,6 +117,10 @@ Modularity System Base Module
     - [ ] on-intersect keep scrolling down
     - [ ] get records from server with $page parameter
 #### REPEATER
+- [x] create repeater input
+    - [x] hover delete, duplicate, add
+    - [x] adjust the add button position and create bottom slot, 
+#### CHECKLIST LIKE A TREEVIEW
 - [x] create repeater input
     - [x] hover delete, duplicate, add
     - [x] adjust the add button position and create bottom slot, 
