@@ -15,6 +15,7 @@ const state = {
   inputs: window[process.env.VUE_APP_NAME].STORE.form.inputs || {},
   saveUrl: window[process.env.VUE_APP_NAME].STORE.form.saveUrl || '',
 
+  serverValid: true,
   /**
    * Form errors after submitting
    * @type {Object}
@@ -143,6 +144,9 @@ const mutations = {
   [FORM.SET_FORM_ERRORS] (state, errors) {
     state.errors = errors
   },
+  [FORM.SET_SERVER_VALID] (state, isValid) {
+    state.serverValid = isValid
+  },
   [FORM.CLEAR_FORM_ERRORS] (state) {
     state.errors = []
   },
@@ -183,9 +187,11 @@ const actions = {
       commit(FORM.UPDATE_FORM_LOADING, false)
 
       if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
+        commit(FORM.SET_SERVER_VALID, false)
         commit(FORM.SET_FORM_ERRORS, response.data.errors)
       } else if (Object.prototype.hasOwnProperty.call(response.data, 'variant') && response.data.variant.toLowerCase() === 'success') {
         commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
+        commit(FORM.SET_SERVER_VALID, true)
 
         if (method === 'post') {
           commit(FORM.RESET_EDITED_ITEM)
@@ -204,6 +210,7 @@ const actions = {
       commit(FORM.UPDATE_FORM_LOADING, false)
       if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
         commit(FORM.SET_FORM_ERRORS, response.data.errors)
+        commit(FORM.SET_SERVER_VALID, false)
       } else if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
         commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
       } else {

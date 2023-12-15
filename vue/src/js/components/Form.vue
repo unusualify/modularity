@@ -66,8 +66,13 @@
           style="position:sticky;"
           >
           <div class="d-flex flex-column align-items-center ml-auto mr-auto" style="position:sticky;top:100px;">
-            <slot v-if="hasSubmit && stickyButton" name="submit" v-bind="{validForm, buttonDefaultText}" >
-              <v-btn type="submit" :disabled="!validForm" class="ml-auto">
+            <slot v-if="hasSubmit && stickyButton" name="submit"
+              v-bind="{
+                validForm: validForm || !serverValid,
+                buttonDefaultText
+              }"
+              >
+              <v-btn type="submit" :disabled="!(validForm || !serverValid)" class="ml-auto">
                 {{ buttonDefaultText }}
               </v-btn>
             </slot>
@@ -85,8 +90,12 @@
       </v-sheet>
 
       <v-sheet class="d-flex pt-6" v-if="hasSubmit && !stickyButton">
-        <slot name="submit" v-bind="{validForm,buttonDefaultText}">
-          <v-btn type="submit" :disabled="!validForm" class="ml-auto mb-5">
+        <slot name="submit"
+          v-bind="{
+            validForm: validForm || !serverValid,
+            buttonDefaultText
+          }">
+          <v-btn type="submit" :disabled="!(validForm || !serverValid)" class="ml-auto mb-5">
             {{ buttonDefaultText }}
           </v-btn>
         </slot>
@@ -117,6 +126,8 @@ import logger from '@/utils/logger'
 import { getModel, getSubmitFormData } from '@/utils/getFormData.js'
 
 import { useInputHandlers, useValidation } from '@/hooks'
+import { redirector } from '@/utils/response'
+import cloneDeep from 'lodash/cloneDeep'
 
 // Helper & Partial Functions
 const minLen = l => v => (v && v.length >= l) || `min. ${l} Characters`
@@ -222,11 +233,21 @@ export default {
       issetSchema: Object.keys(this.schema).length > 0,
       hasStickyFrame: this.stickyFrame || this.stickyButton,
 
-      model: this.issetModel ? this.modelValue : this.editedItem
+      model: this.issetModel ? this.modelValue : this.editedItem,
+      inputSchema: null,
+      defaultItem: null
     }
   },
 
   created () {
+    this.inputSchema = this.issetSchema
+      ? this.inputs
+      : this.invokeRuleGenerator(
+        this.$store.state.form.inputs
+      )
+
+    this.defaultItem = this.issetSchema ? getModel(this.inputSchema) : this.$store.getters.defaultItem
+
     this.model = getModel(
       this.inputSchema,
       this.issetModel ? this.modelValue : this.editedItem,
@@ -235,9 +256,15 @@ export default {
   },
 
   watch: {
-    model (newValue, oldValue) {
-      // __log('model watcher', newValue, oldValue)
-      // this.resetValidation()
+    // model (newValue, oldValue) {
+    //   __log('model watcher', newValue, oldValue)
+    //   // this.resetValidation()
+    // },
+    model: {
+      handler (value, oldValue) {
+        __log('model watcher', value, oldValue)
+      },
+      deep: true
     },
     editedItem (newValue, oldValue) {
       // __log('editedItem', newValue)
@@ -253,8 +280,9 @@ export default {
   },
 
   computed: {
-    inputSchema: {
+    inputSchema_: {
       get () {
+        __log('inputSchema getter')
         return this.issetSchema
           ? this.inputs
           : this.invokeRuleGenerator(
@@ -266,8 +294,15 @@ export default {
         __log('inputSchema setter', value, this.inputSchema)
       }
     },
+    inputSchema__ () {
+      return this.issetSchema
+        ? this.inputs
+        : this.invokeRuleGenerator(
+          this.$store.state.form.inputs
+        )
+    },
 
-    defaultItem () { return this.issetSchema ? getModel(this.inputSchema) : this.$store.getters.defaultItem },
+    defaultItem_ () { return this.issetSchema ? getModel(this.inputSchema) : this.$store.getters.defaultItem },
     // defaultItem: {
     //   get () {
     //     __log(this.issetModel)
@@ -279,8 +314,6 @@ export default {
     // },
     model_: {
       get () {
-        __log('model getter', this.modelValue, this.$store.state.form.editedItem)
-
         return getModel(
           this.inputSchema,
           this.issetModel ? this.modelValue : this.$store.state.form.editedItem,
@@ -303,17 +336,19 @@ export default {
     },
     errors () {
       return this.actionUrl ? this.formErrors : this.$store.state.form.errors
-      // get () {
-      //   return this.actionUrl ? this.formErrors : this.$store.state.form.errors
-      // },
-      // set (value) {
-      //   for (const name in value) {
-      //     __log('errors setter', value[name][0], this.inputSchema)
-      //     this.inputSchema[name].errorMessages = value[name][0]
-      //   }
-      //   __log('errors setter', value, this.errors)
-      // }
     },
+    // errors_: {
+    //   get () {
+    //     return this.actionUrl ? this.formErrors : this.$store.state.form.errors
+    //   },
+    //   set (value) {
+    //     for (const name in value) {
+    //       __log('errors setter', value[name][0], this.inputSchema)
+    //       this.inputSchema[name].errorMessages = value[name][0]
+    //     }
+    //     __log('errors setter', value, this.errors)
+    //   }
+    // },
 
     reference () {
       return 'ref-' + this.id
@@ -345,7 +380,8 @@ export default {
       }
     },
     ...mapState({
-      editedItem: state => state.form.editedItem
+      editedItem: state => state.form.editedItem,
+      serverValid: state => state.form.serverValid
       // loading: state => state.form.loading,
       // errors: state => state.form.errors
     })
@@ -358,15 +394,16 @@ export default {
     resetValidation () {
       this.$refs[this.reference].resetValidation()
     },
-    handleInput (v) {
+    handleInput (v, s) {
       const { on, key, value, obj } = v
-      // __log(
-      //   'handleInput',
-      //   on,
-      //   v
-      // )
 
-      if (on === 'input' && !!key && !!value) {
+      if (on === 'input' && !!key && !!value && !this.serverValid) {
+        __log(
+          'handleInput',
+          on,
+          key
+        )
+        this.$store.commit(FORM.SET_SERVER_VALID, true)
         this.resetSchemaError(key)
         // __log(obj.schema, key)
       }
@@ -392,11 +429,15 @@ export default {
         api[method](this.actionUrl, formData, function (response) {
           self.formLoading = false
           if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
+            self.$store.commit(FORM.SET_SERVER_VALID, false)
+
             self.formErrors = response.data.errors
           } else if (Object.prototype.hasOwnProperty.call(response.data, 'variant')) {
+            self.$store.commit(FORM.SET_SERVER_VALID, false)
             self.$store.commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
           }
 
+          redirector(response.data)
           if (Object.prototype.hasOwnProperty.call(response.data, 'redirector')) {
             // self.$store.commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
             setTimeout(function (url) {
@@ -407,7 +448,6 @@ export default {
           if (callback && typeof callback === 'function') callback(response.data)
         }, function (response) {
           self.formLoading = false
-
           if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
             self.$store.commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
           } else {
@@ -418,30 +458,30 @@ export default {
           if (errorCallback && typeof errorCallback === 'function') errorCallback(response.data)
         })
       } else {
+        // this.$store.commit(FORM.SET_EDITEM_ITEM, getModel(this.inputSchema, cloneDeep(this.model)))
+        // __log(getModel(this.inputSchema, cloneDeep(this.model)))
         const self = this
         this.$nextTick(function () {
           self.$store.dispatch(ACTIONS.SAVE_FORM, { item: null, callback, errorCallback })
         })
       }
     },
-    submit (e) {
+    submit (e, callback = null, errorCallback = null) {
       if (this.validForm) {
         if (this.async) {
-          e.preventDefault() // don't perform submit action (i.e., `<form>.action`)
+          e && e.preventDefault() // don't perform submit action (i.e., `<form>.action`)
           if (!this.actionUrl) {
             this.$store.commit(FORM.SET_EDITED_ITEM, this.model)
             this.$nextTick(() => {
-              __log('saveForm')
-              this.saveForm()
+              this.saveForm(callback, errorCallback)
             })
           } else {
-            this.saveForm()
+            this.saveForm(callback, errorCallback)
           }
         }
       } else {
-        e.preventDefault() // don't perform submit action (i.e., `<form>.action`)
+        e && e.preventDefault() // don't perform submit action (i.e., `<form>.action`)
       }
-      // this.$v.$touch()
     },
     handleClick (val) {
       // logger(val)
@@ -463,8 +503,24 @@ export default {
       }
     },
     setSchemaErrors (errors) {
+      // __log(errors, this.inputSchema)
+      const _errors = {}
       for (const name in errors) {
-        this.inputSchema[name].errorMessages = errors[name]
+        const pattern = /(\w+)\.(\w+)/
+        const matches = name.match(pattern)
+        if (matches) {
+          const _name = matches[1]
+          const _locale = matches[2]
+          if (!__isset(_errors[_name])) {
+            _errors[_name] = []
+          }
+          _errors[_name][_locale] = errors[name]
+        } else {
+          _errors[name] = errors[name]
+        }
+      }
+      for (const name in _errors) {
+        this.inputSchema[name].errorMessages = _errors[name]
       }
     },
     resetSchemaError (key) {
