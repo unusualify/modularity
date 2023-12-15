@@ -31,8 +31,18 @@ export default {
     // __log(_props)
     return _attributes
   },
+  $can: function (permission) {
+    if (this.$store.getters.isSuperAdmin) {
+      return true
+    }
+
+    return false
+  },
   $log: function (...args) {
     window.__log(...args)
+  },
+  $isset: function (...args) {
+    return window.__isset(...args)
   },
   $notif: function (Obj) {
     this.$store.commit(ALERT.SET_ALERT, Obj)
