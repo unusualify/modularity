@@ -1,11 +1,13 @@
 <?php
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
 // use Unusualify\Modularity\Facades\Module;
 use Symfony\Component\Console\Input\InputOption;
+use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
 
 // use Module;
@@ -182,7 +184,7 @@ if (!function_exists('moduleRoute')) {
             $routeName .= "{$snakeName}";
         }
         // dd($snakeName, $parameters);
-        if(preg_match('/edit|show|update|destroy/', $action) && !array_key_exists($snakeName, $parameters) && !$singleton){
+        if(preg_match('/edit|show|update|destroy|duplicate|restoreRevision|preview/', $action) && !array_key_exists($snakeName, $parameters) && !$singleton){
             $parameters[$snakeName] = ":id";
             // dd(
             //     $routeName,
@@ -335,5 +337,60 @@ if (! function_exists('findParentRoute')) {
         return array_values(array_filter($config['routes'], function($r){
             return isset($r['parent']) && $r['parent'];
         }))[0] ?? [];
+    }
+}
+
+if (! function_exists('formatPermissionName')) {
+    /**
+     * @return string
+     */
+    function formatPermissionName($routeName, $permissionType)
+    {
+        // dd(
+        //     Permission::get($permissionType)
+        //     // Permission::cases(),
+        //     // get_class_methods(Permission::class)
+        //     // Permission::{$permissionType}->value
+        // );
+        return kebabCase($routeName) . "_" . Permission::get($permissionType);
+    }
+}
+
+if (! function_exists('formatPermissionRecord')) {
+    /**
+     * @return array
+     */
+    function formatPermissionRecord($routeName, $permissionType, $guardName)
+    {
+        return ['name' => formatPermissionName($routeName, $permissionType), 'guard_name' => $guardName];
+    }
+}
+
+if (! function_exists('routePermissionRecords')) {
+    /**
+     * @return array
+     */
+    function routePermissionRecords($routeName, $guardName, $cases = null)
+    {
+        return Arr::map($cases ?:Permission::cases(), function($item) use($routeName, $guardName){
+            return ['name' => kebabCase($routeName) . '_' . $item->value, 'guard_name' => $guardName];
+        });
+    }
+}
+
+if (! function_exists('permissionRecordsFromRoutes')) {
+    /**
+     * @return array
+     */
+    function permissionRecordsFromRoutes($routes, $guardName)
+    {
+        $cases = Permission::cases();
+        $records = [];
+
+        foreach ($routes as $routeName) {
+            $records = array_merge($records, routePermissionRecords($routeName, $guardName, $cases));
+        }
+
+        return $records;
     }
 }
