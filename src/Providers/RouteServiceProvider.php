@@ -25,24 +25,6 @@ class RouteServiceProvider extends ServiceProvider
 
     protected $namespace = 'Unusualify\Modularity\Http\Controllers';
 
-    protected static $additionalRoutes = [
-        // 'reorder',
-        // 'publish',
-        // 'bulkPublish',
-        // 'browser',
-        // 'feature',
-        // 'bulkFeature',
-        // 'tags',
-        // 'preview',
-        // 'restore',
-        // 'bulkRestore',
-        // 'forceDelete',
-        // 'bulkForceDelete',
-        // 'bulkDelete',
-        // 'restoreRevision',
-        'duplicate',
-    ];
-
     /**
      * Bootstraps the package services.
      *
