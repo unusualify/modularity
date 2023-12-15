@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\App;
 
 trait RelationTrait
 {
+    public $exceptRelations = [];
+
     /**
      * @param \Unusualify\Modularity\Entities\Model|null $object
      * @param array $fields
@@ -14,7 +16,6 @@ trait RelationTrait
      */
     public function afterSaveRelationTrait($object, $fields)
     {
-
         foreach ($this->getMorphToRelations() as $relation => $types) {
             foreach ($types as $key => $type) {
                 $name = $type['name'];
@@ -34,8 +35,10 @@ trait RelationTrait
                     // $object->files()->sync([]);
 
                     $morphOne = App::make($repository)->getById($fields[$name]);
-                    $object->{$relation . '_id'} = $morphOne->id;
-                    $object->{$relation . '_type'} = get_class($morphOne);
+
+                    $object->{$this->getSnakeCase($relation) . '_id'} = $morphOne->id;
+                    $object->{$this->getSnakeCase($relation) . '_type'} = get_class($morphOne);
+
                     $object->save();
 
                     // $object->{$relation}()->save($attach);
@@ -49,10 +52,23 @@ trait RelationTrait
                 }
             }
         }
+
         foreach ($this->getBelongsToManyRelations() as $relation) {
+            $relatedPivotKey = $object->{$relation}()->getRelatedPivotKeyName();
+
             if (isset($fields[$relation])) {
                 try {
+                    if(is_a($fields[$relation], 'Illuminate\Support\Collection')) {
+                        $fields[$relation] = $fields[$relation]->toArray();
+                    }
+
                     if(is_array($fields[$relation])){
+                        $fields[$relation] = Arr::mapWithKeys($fields[$relation], function($item, $key) use($relatedPivotKey){
+
+                            return is_array($item)
+                                    ? [ $item[$relatedPivotKey] => Arr::except($item, [$this->getForeignKey()])]
+                                    : [ $key => $item];
+                        });
 
                         foreach ($fields[$relation] as $key => $value) {
                             if(is_array($value)){
@@ -64,14 +80,19 @@ trait RelationTrait
                                 // $fields[$relation][$key] = $value['id'];
                             }
                         }
+
                     }
-                    // dd(
-                    //     $relation,
-                    //     $fields[$relation]
-                    // );
-                    $object->{$relation}()->sync($fields[$relation]);
+
+                    $object->{$relation}()->sync(
+                        $fields[$relation]
+                    );
                 } catch (\Throwable $th) {
-                    dd($relation, $fields[$relation], $th);
+                    dd(
+                        $relation,
+                        $fields[$relation],
+                        // $object->{$relation}(),
+                        $th
+                    );
                 }
                 // unset($fields[$relation]);
                 // if (!empty($fields[$f])) {
@@ -84,6 +105,19 @@ trait RelationTrait
 
         return $fields;
     }
+
+    /**
+     * @param
+     * @return void
+     */
+    public function afterForceDeleteRelationTrait($object)
+    {
+        foreach ($this->getBelongsToManyRelations() as $relation) {
+            // dd('afterForceDelete', $relation);
+            $object->{$relation}()->detach();
+        }
+    }
+
 
     public function getFormFieldsRelationTrait($object, $fields, $schema = [])
     {
@@ -99,8 +133,10 @@ trait RelationTrait
         foreach ($morphToRelations as $relation => $types) {
             $morphTo = null;
             foreach ($types as $index => $type) {
-                if($object->{$relation . '_type'} == $type['model']){
-                    $morphTo = App::make($type['repository'])->getById($object->{$relation . '_id'});
+
+                $column_name = snakeCase($relation);
+                if($object->{$column_name . '_type'} == $type['model']){
+                    $morphTo = App::make($type['repository'])->getById($object->{$column_name . '_id'});
                     $fields[$type['name']] = $morphTo->id;
                 }else if($morphTo){
                     $fields[$type['name']] = $morphTo->{$type['name']};
@@ -149,11 +185,12 @@ trait RelationTrait
 
         $relations = [];
 
+
         foreach ($reflector->getMethods() as $reflectionMethod) {
             $returnType = $reflectionMethod->getReturnType();
             if ($returnType) {
                 // if (in_array(class_basename($returnType->getName()), ['HasOne', 'HasMany', 'BelongsTo', 'BelongsToMany', 'MorphToMany', 'MorphTo'])) {
-                if (in_array(class_basename($returnType->getName()), ['BelongsToMany'])) {
+                if (in_array(class_basename($returnType->getName()), ['BelongsToMany']) && !in_array($reflectionMethod->name, $this->exceptRelations)) {
                     $relations[] = $reflectionMethod->name;
                 }
             }
@@ -180,10 +217,10 @@ trait RelationTrait
         //     }
         // }
 
-        return collect($this->getInputs())->reduce(function($acc, $curr){
+        return collect($this->inputs())->reduce(function($acc, $curr){
             if(preg_match('/morphTo/', $curr['type'])){
                 if(isset($curr['parents'])){
-                    $routeCamelCase = camelCase($this->getRouteName());
+                    $routeCamelCase = camelCase($this->routeName());
                     $acc["{$routeCamelCase}able"] = Arr::map(array_reverse($curr['parents']), fn($item) => [
                         'name' => $item['name'],
                         'repository' => $item['repository'],

@@ -179,7 +179,7 @@ trait FilesTrait
 
     public function getFileColumns(){
 
-        $file_inputs = collect($this->getInputs())->reduce(function($acc, $curr){
+        $file_inputs = collect($this->inputs())->reduce(function($acc, $curr){
             if(preg_match('/file/', $curr['type'])){
                 $acc[] = $curr['name'];
             }
