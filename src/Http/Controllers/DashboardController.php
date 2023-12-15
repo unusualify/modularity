@@ -104,7 +104,7 @@ class DashboardController extends BaseController
                                 'searchable' => true,
                                 'isRowEditable' => true,
                                 'isColumnEditable' => false,
-                                'formatter' => ['date', 'numeric'],
+                                // 'formatter' => ['date', 'numeric'],
                             ],
                             [
                                 'title' => 'Headline',
