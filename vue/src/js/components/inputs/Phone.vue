@@ -10,8 +10,7 @@
           item-value="iso2"
           width="52px"
           v-bind="$lodash.pick(boundProps, ['variant', 'menuProps', 'selectClasses', 'selectLabel', 'dense', 'density'])"
-          :label="$t('country')"
-
+          autocomplete="off"
           return-object
           >
           <template #selection="object">
@@ -290,7 +289,7 @@ export default {
       this.$emit('onValidate', this.phoneObject) // Deprecated
     },
     modelValue (val, oldValue) {
-      // __log('phone.vue modelValue watch', val, this.modelValue, this.phone)
+      __log('phone.vue modelValue watch', val, this.modelValue, this.phone)
       if (__isString(val)) { this.phone = this.modelValue }
     },
     open (isDropdownOpened) {
@@ -342,7 +341,7 @@ export default {
     if (this.modelValue) {
       this.phone = this.modelValue.trim()
     }
-    __log(this.boundProps)
+
     if (!__isset(this.boundProps.rules)) {
       this.boundProps.rules = []
     }
@@ -511,8 +510,9 @@ export default {
       // Returns response.number to assign it to v-model (if being used)
       // Returns full response for cases @input is used
       // and parent wants to return the whole response.
-      this.$emit('input', this.phoneText, this.phoneObject)
-      this.$emit('onInput', this.phoneObject) // Deprecated
+      __log(this.phoneText, this.phoneObject)
+      // this.$emit('input', this.phoneText, this.phoneObject)
+      // this.$emit('onInput', this.phoneObject) // Deprecated
       // Keep the current cursor position just in case the input reformatted
       // and it gets moved to the last character.
       if (e && e.target) {
