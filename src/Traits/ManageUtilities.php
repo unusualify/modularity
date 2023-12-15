@@ -1,11 +1,9 @@
 <?php
 namespace Unusualify\Modularity\Traits;
 
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Services\View\UWrapper;
@@ -14,40 +12,14 @@ use stdClass;
 
 trait ManageUtilities {
 
-    /**
-     * @var array
-     */
-    protected $defaultTableAttributes = [
-        // 'embeddedForm' => true,
-        // 'createOnModal' => true,
-        // 'editOnModal' => true,
-        // 'formWidth' => '60%',
-        // 'isRowEditing' => false,
-        // 'rowActionsType' => 'inline',
-        // 'hideDefaultFooter' => false,
-    ];
-
-    /**
-     * @var array
-     */
-    protected $tableAttributes = [];
-
-    /**
-     * @var array
-     */
-    protected $indexTableColumns;
-
-    protected $formSchema;
-
+    use ManageTable, ManageForm;
 
     protected function __afterConstructManageUtilities($app, $request) {
-        $this->defaultTableAttributes = (array) Config::get(unusualBaseKey() . '.default_table_attributes');
 
-        $this->tableAttributes = $this->getTableAttributes();
     }
 
     protected function __beforeConstructManageUtilities($app, $request) {
-        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+        // $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
     }
 
     /**
@@ -131,165 +103,6 @@ trait ManageUtilities {
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Collection $items
-     * @param array $scopes
-     * @return array
-     */
-    protected function getTableMainFilters($scopes = [])
-    {
-        $statusFilters = [];
-
-        $scope = ($this->isNested ? [
-            $this->getParentModuleForeignKey() => $this->parentId,
-        ] : []) + $scopes;
-
-        $statusFilters[] = [
-            // 'name' => unusualTrans("{$this->baseKey}::lang.listing.filter.all-items"),
-            'name' => ___("listing.filter.all-items"),
-            'slug' => 'all',
-            'number' => $this->repository->getCountByStatusSlug('all', $scope),
-        ];
-
-        // if ($this->routeHasTrait('revisions') && $this->getIndexOption('create')) {
-        //     $statusFilters[] = [
-        //         'name' => unusualTrans("$this->baseKey::lang.listing.filter.mine"),
-        //         'slug' => 'mine',
-        //         'number' => $this->repository->getCountByStatusSlug('mine', $scope),
-        //     ];
-        // }
-
-        $fillables = $this->repository->getFillable();
-
-        if(in_array('published', $fillables)){
-            $statusFilters[] = [
-                'name' => ___("listing.filter.published"),
-                'slug' => 'published',
-                'number' => $this->repository->getCountByStatusSlug('published', $scope),
-            ];
-        }
-
-        if ($this->getIndexOption('publish')) {
-            // $statusFilters[] = [
-            //     'name' => ___("listing.filter.published"),
-            //     'slug' => 'published',
-            //     'number' => $this->repository->getCountByStatusSlug('published', $scope),
-            // ];
-            // $statusFilters[] = [
-            //     'name' => ___("listing.filter.draft"),
-            //     'slug' => 'draft',
-            //     'number' => $this->repository->getCountByStatusSlug('draft', $scope),
-            // ];
-        }
-
-        // $statusFilters[] = [
-        //     'name' => ___("listing.filter.trash"),
-        //     'slug' => 'trash',
-        //     'number' => $this->repository->getCountByStatusSlug('trash', $scope),
-        // ];
-
-        if ($this->getIndexOption('restore')) {
-            $statusFilters[] = [
-                'name' => ___("listing.filter.trash"),
-                'slug' => 'trash',
-                'number' => $this->repository->getCountByStatusSlug('trash', $scope),
-            ];
-        }
-
-        return $statusFilters;
-    }
-
-    public function getIndexTableColumns()
-    {
-        if(!!$this->indexTableColumns)
-            return $this->indexTableColumns;
-        else if(!$this->config)
-            return [];
-        else{
-            return $this->indexTableColumns = Collection::make(
-                $this->getConfigFieldsByRoute('headers')
-            )->map(function($item){
-                // dd( (array) $item + unusualConfig('default_header'), $item);
-                return $this->getHeader((array) $item);
-            })
-            ->toArray();
-        }
-
-    }
-
-    /**
-     * getTableOptions
-     *
-     * @return void
-     */
-    public function getTableAttributes()
-    {
-        if(!!$this->config) {
-            try {
-                return Collection::make(
-                    array_merge_recursive_preserve($this->defaultTableAttributes, (array)$this->getConfigFieldsByRoute('table_options'))
-                )->toArray();
-            } catch (\Throwable $th) {
-                return [];
-            }
-        }
-
-        return [];
-    }
-
-    protected function getTableActions()
-    {
-        $actions = [];
-
-        if($this->getIndexOption('edit') ){
-            $actions[] = [
-                'name' => 'edit',
-                // 'color' => 'green darken-2',
-                'color' => 'primary darken-2',
-            ];
-        }
-        if($this->getIndexOption('delete')){
-            $actions[] = [
-                'name' => 'delete',
-                // 'color' => 'red darken-2',
-                'color' => 'primary',
-            ];
-        }
-
-        return $actions;
-    }
-
-    /**
-     * getTableOption
-     *
-     * @param  mixed $option
-     * @return void
-     */
-    public function getTableOption($option)
-    {
-        return $this->tableOptions[$option] ?? false;
-    }
-
-    /**
-     * getVuetifyDatatableOptions
-     *
-     * @return void
-     */
-    public function getVuetifyDatatableOptions()
-    {
-        return [
-            'page'          => request()->has('page') ? intval(request()->query('page')) : 1,
-            'itemsPerPage'  => request()->has('itemsPerPage') ? intval(request()->query('itemsPerPage')) : ($this->perPage ?? 10),
-            'sortBy'        => request()->has('sortBy') ? [request()->get('sortBy')] : [],
-            'groupBy'       => [],
-            'search'        => ''
-            // 'multiSort'     => true,
-            // 'mustSort'      => false,
-            // 'groupDesc'     => [],
-            // 'sortDesc'      => request()->has('sortDesc') ? [request()->get('sortDesc')] : [],
-        ];
-    }
-
-    /**
      * @param string $moduleName
      * @param string $routePrefix
      * @return array
@@ -312,15 +125,17 @@ trait ManageUtilities {
             'destroy',
             // 'delete',
 
+            'forceDelete',
+            'restore',
+            'duplicate'
+
             // 'show',
             // 'update',
             // 'destroy'
 
             // 'publish',
             // 'bulkPublish',
-            // 'restore',
             // 'bulkRestore',
-            // 'forceDelete',
             // 'bulkForceDelete',
             // 'reorder',
             // 'feature',
@@ -355,19 +170,34 @@ trait ManageUtilities {
             //             . ".index"
             //     )
             // );
-            if(!$optionIsActive){
+            if(!$optionIsActive && !preg_match('/edit|create|forceDelete|restore/', $action)){
                 dd($action);
             }
+
+            // if($action == 'duplicate'){
+            //     dd(
+            //         $this->routeName,
+            //         $this->routePrefix,
+            //         $action,
+            //         $parameters,
+            //         moduleRoute(
+            //             $this->routeName,
+            //             $this->routePrefix,
+            //             $action,
+            //             $parameters
+            //         )
+            //     );
+            // }
             return [
                 // $action . 'Endpoint' => $optionIsActive
                 $action => $optionIsActive
-                                            ?   moduleRoute(
-                                                    $this->routeName,
-                                                    $this->routePrefix,
-                                                    $action,
-                                                    $parameters
-                                                )
-                                            :   null
+                            ?   moduleRoute(
+                                    $this->routeName,
+                                    $this->routePrefix,
+                                    $action,
+                                    $parameters
+                                )
+                            :   null
             ];
 
         })->toArray();
@@ -388,7 +218,8 @@ trait ManageUtilities {
                 $this->formWithCount
             );
         } elseif (! $item && ! $id) {
-            $item = $this->repository->newInstance();
+            $item =
+            $this->repository->newInstance();
         }
 
         $fullRoutePrefix = 'admin.' . ($this->routePrefix ? $this->routePrefix . '.' : '') . $this->moduleName . '.';
@@ -401,6 +232,11 @@ trait ManageUtilities {
         // $localizedPermalinkBase = $this->getLocalizedPermalinkBase();
 
         $itemId = $this->getItemIdentifier($item);
+
+        // dd(
+        //     array_merge($this->repository->getFormFields($item, $schema)),
+        //     $schema
+        // );
 
         $data = [
             'translate' => $this->routeHas('translations'),
@@ -521,387 +357,6 @@ trait ManageUtilities {
     public function modalFormData($request)
     {
         return [];
-    }
-
-    protected function createFormSchema($inputs)
-    {
-        return Collection::make( $inputs )->mapWithKeys(function($input, $key){
-            return $this->getSchemaInput($input);
-        })->toArray();
-    }
-
-    protected function getSchemaInput($input)
-    {
-        // $default_input = collect(Config::get(unusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
-        // $default_input = $this->configureInput(array2Object(Config::get(unusualBaseKey() . '.default_input')));
-        $default_input = (array) Config::get(unusualBaseKey() . '.default_input');
-
-        [$hydrated, $arrayable] = $this->hydrateInput(object2Array($input));
-
-        if($arrayable){
-            return $hydrated;
-        }
-        return isset($hydrated['name'])
-            // ? [ $input->name => $default_input->union( $this->configureInput($input) ) ]
-            // ? [ $input['name'] => array_merge_recursive_preserve( $default_input, $this->configureInput($input) ) ]
-            ? [ $hydrated['name'] => $this->configureInput( array_merge_recursive_preserve( $default_input, $hydrated )) ]
-            : [];
-    }
-
-    /**
-     * @param Array|stdClass $input
-     * @return Collection
-     */
-    protected function configureInput($input)
-    {
-        return collect($input)
-            ->mapWithKeys(function($v, $k){
-                if($k == 'label' && ___("form-labels.{$v}") !== "form-labels.{$v}")
-                    $v = ___("form-labels.{$v}");
-                // if($k == 'label')
-                //     $v = ___("form-labels.{$v}");
-
-                return is_numeric($k) ? [$v => true] : [$k => $v];
-            })
-            ->toArray();
-    }
-
-    /**
-     * @param Array|stdClass $input
-     * @return Collection
-     */
-    protected function hydrateInput($input)
-    {
-        $data = null;
-        $arrayable = false;
-        switch ($input['type']) {
-            case 'custom-input-treeview':
-            case 'treeview':
-                $relation_class = null;
-
-                // dd(
-                //     Modularity::find($this->moduleName),
-                //     // $this->config->parent_route,
-                //     // FacadesModule::find('Base')
-                // );
-                if(isset($input['repository'])){
-                    $relation_class = App::make($input['repository']);
-                }else if(isset($input['model'])){
-                    $relation_class = App::make($input['model']);
-                }else if(isset($input['route'])){
-                    $finder = new Finder();
-                    $module = Modularity::find($this->moduleName);
-
-                    if( $module->isEnabledRoute($input['route']) ){
-                        foreach ($this->config->routes as $r) {
-                            if($r->route_name == $input['route']){
-                                $table = Str::plural($input['route']);
-                                $relation_class = $finder->getModel($table);
-                            }
-                        }
-                    }
-                }
-
-                $data = [];
-
-                $_input = (array) $input;
-                $data[$input->name] =   Arr::except($_input, ['route','model']) + [
-                    'items' => [
-                        [
-                            'id' => -1,
-                            'name' => 'Role Group',
-                            'children' => $relation_class->all(['id', 'name'])->toArray()
-                        ]
-                    ]
-                ];
-
-            break;
-            case 'checklist':
-                // dd($input);
-                $relation_class = null;
-
-                $input['itemValue'] = $input['itemValue'] ?? 'id';
-                $input['itemTitle'] = $input['itemTitle'] ?? 'name';
-                $input['type'] = 'custom-input-checklist';
-                $input['default'] = [];
-                $items = [];
-                if(isset($input['repository'])){
-                    $relation_class = App::make($input['repository']);
-                    $items = $relation_class->list($input['itemTitle'])->toArray();
-                }else if(isset($input['model'])){
-                    $relation_class = App::make($input['model']);
-                    $items = $relation_class->all([$input['itemValue'], $input['itemTitle']])->toArray();
-                }else if(isset($input['route'])){
-                    $finder = new Finder();
-                    $module = Modularity::find($this->moduleName);
-
-                    if( $module->isEnabledRoute($input['route']) ){
-                        foreach ($this->config->routes as $r) {
-                            if($r->route_name == $input['route']){
-                                $table = Str::plural($input['route']);
-                                $relation_class = $finder->getRepository($table);
-                                $items = $relation_class->list($input['itemTitle'])->toArray();
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                $data=  Arr::except($input, ['route','model', 'repository']) + [
-                    'items' => $items
-                ];
-
-            break;
-            case 'select':
-            case 'combobox':
-                // dd($input);
-                $relation_class= null;
-                $input['itemValue'] = $input['itemValue'] ?? 'id';
-                $input['itemTitle'] = $input['itemTitle'] ?? 'name';
-                $input['default'] ??= [];
-                // $input[] = 'multiple';
-                if(isset($input['items'])) break;
-
-                $items = [];
-                $with = [];
-
-                if(isset($input['cascades'])){
-                    // [
-                    //     'packageRegions:id,package_continent_id,name',
-                    //     'packageRegions.packageCountries:id,package_region_id,name'
-                    // ]
-                    $with = $input['cascades'];
-                }
-
-                if(isset($input['repository'])){
-                    $relation_class = App::make($input['repository']);
-                    $items = $relation_class->list($input['itemTitle'], $with)->toArray();
-
-                    if(isset($input['cascades'])){
-                        $patterns = [];
-                        foreach ($input['cascades'] as $key => $cascade) {
-                            $explodes = explode('.', explode(':', $cascade)[0]);
-                            $patterns[] = "/{$this->getSnakeCase(
-                                $explodes[count($explodes)-1]
-                            )}/";
-                        }
-                        $flat = Arr::dot($items);
-                        $newArray = [];
-                        foreach ($flat as $key => $value) {
-                            $newKey = preg_replace($patterns, 'items', $key);
-                            Arr::set($newArray, $newKey, $value);
-                        }
-
-                        $items = $newArray;
-                    }
-
-                }else if(isset($input['model'])){
-                    $relation_class = App::make($input['model']);
-                    $items = $relation_class->all([$input['itemValue'], $input['itemTitle']])->toArray();
-
-                }else if(isset($input['route'])){
-                    $finder = new Finder();
-                    $module = Modularity::find($this->moduleName);
-
-                    if( $module->isEnabledRoute($input['route']) ){
-                        foreach ($this->config->routes as $r) {
-                            if($r->route_name == $input['route']){
-                                $table = Str::plural($input['route']);
-                                $relation_class = $finder->getRepository($table);
-                                $items = $relation_class->list($input['itemTitle'])->toArray();
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if(count($items) && isset($items[0][$input['itemValue']]) && $items[0][$input['itemValue']]){
-                    array_unshift($items, [
-                        $input['itemValue'] => 0,
-                        $input['itemTitle'] => 'Please Select'
-                    ]);
-                }
-
-
-                $data =  Arr::except($input, ['route','model', 'repository', 'cascades']) + [
-                    'items' => $items
-                ];
-
-            break;
-            case 'switch':
-            case 'checkbox':
-                $input['color'] ??= 'success';
-                $input['trueValue'] ??= 1;
-                $input['falseValue'] ??= 0;
-                $input['hideDetails'] = true;
-                $input['default'] = 0;
-
-                $data = $input;
-            break;
-            case 'repeater':
-            case 'custom-input-repeater':
-                $relation_class= null;
-
-                $input['type'] = 'custom-input-repeater';
-                if( $input['orderable'] ?? false){
-                    $input['orderKey'] ??= 'position';
-                }
-                $input['col'] ??= [
-                    'cols' => 12,
-                    'sm' => 12,
-                    'md' => 12,
-                    'lg' => 12,
-                    'xl' => 12
-                ];
-
-                if(array_key_exists('schema', $input)){
-                    $inputStudlyName = '';
-                    $inputSnakeName = '';
-
-                    if($input['repository']){
-                        if( preg_match( '/(\w+)Repository/', get_class_short_name($input['repository']), $matches)){
-                            $relation_class = App::make($input['repository']);
-                            $inputStudlyName = $matches[1];
-                            $inputSnakeName = $this->getSnakeCase($inputStudlyName);
-                            $inputCamelName = $this->getCamelCase($inputStudlyName);
-                        }
-                    } else if($input['model']){
-                        if( preg_match( '/(\w+)/', get_class_short_name($input['model']), $matches)){
-                            dd($matches);
-                            $relation_class = App::make($input['model']);
-
-                            $inputStudlyName = $matches[1];
-                            $inputSnakeName = $this->getSnakeCase($inputStudlyName);
-                        }
-                    }
-                    foreach ($input['schema'] as $key => &$_input) {
-                        switch ($_input['type']) {
-                            case 'select':
-                            case 'combobox':
-                            case 'autocomplete':
-                                if($inputSnakeName){
-
-                                    if(preg_match("/{$inputSnakeName}_id/", $_input['name'])){ // it means foreign_id of pivot table
-                                        if(isset($input['repository'])){
-                                            $_input['repository'] ??= $input['repository'];
-                                        } else if(isset($input['model'])){
-                                            $_input['model'] ??= $input['model'];
-                                        }
-                                    }else {
-                                        $_input['items'] ??= [];
-                                    }
-                                    break;
-                                }
-                            default:
-                                # code...
-                                break;
-                        }
-                    }
-
-                    $input['schema'] = $this->createFormSchema($input['schema']);
-                }
-
-                $data = $input;
-            break;
-            case 'morphTo':
-
-                if(isset($input['parents'])){
-                    $data = [];
-                    $arrayable = true;
-                    $length = count($input['parents']);
-
-                    $reversedParents = array_reverse($input['parents']);
-
-                    foreach ($reversedParents as $index => $attachable) {
-                        $attachable['ext'] = 'morphTo';
-
-                        if($index == ($length-1)){
-                            // 'packageRegions:id,package_continent_id,name',
-                            // 'packageRegions.packageCountries:id,package_region_id,name'
-                            $attachable['cascades'] = [];
-                            $selectables = array_values(array_reverse($data));
-                            $relationChain = '';
-                            foreach($selectables as $j => $item){
-                                $foreignKey = $item['name'];
-                                $relationshipName = pluralize($this->getCamelNameFromForeignKey($foreignKey));
-                                $relationChain .= !$relationChain ? $relationshipName : ".{$relationshipName}";
-                                $ownerKey = $j == 0 ? $attachable['name'] : $selectables[$j-1]['name'];
-                                $attachable['cascades'][] = $relationChain . ":{$item['itemValue']},{$ownerKey},{$item['itemTitle']}";
-                                // $attachable['cascades'][$relationChain . " as {$relationChain}_items"] = [
-                                //     ['select', $item['itemValue'] , $ownerKey, $item['itemTitle']]
-                                // ];
-                            }
-                            $attachable['cascade'] = $reversedParents[$index-1]['name'];
-
-                        }else if($index){
-                            $attachable['cascade'] = $reversedParents[$index-1]['name'];
-                        }
-
-                        if($index !== ($length-1)){
-                            $attachable['items'] = [];
-                        }
-
-                        $_input = $this->getSchemaInput($attachable);
-
-
-                        $data += $_input;
-                    }
-                    $data = array_reverse($data);
-                }
-            break;
-            default:
-
-                break;
-        }
-
-        if(isset($this->repository)){
-
-            if( method_exists($this->repository->getModel(), 'getTranslatedAttributes')
-                && in_array($input['name'], $this->repository->getTranslatedAttributes())
-            ){
-                $input['translated'] ??= true;
-                // $input['locale_input'] = $input['type'];
-                // $input['type'] = 'custom-input-locale';
-                $data = $input;
-            }
-
-        }
-
-        return [
-            $data ? $data : $input,
-            $arrayable
-        ];
-    }
-
-    protected function getHeader($header)
-    {
-        return array_merge_recursive_preserve( unusualConfig('default_header'), $this->hydrateHeader($header) );
-    }
-
-    protected function hydrateHeader($header)
-    {
-        if($this->isRelationField($header['key']))
-            $header['key'] .= '_relation';
-
-        // add edit functionality to table title cell
-        if($this->titleColumnKey == $header['key'] && !isset($header['formatter']))
-            $header['formatter'] = [
-                'edit'
-            ];
-
-        // switch column
-        if(isset($header['formatter']) && count($header['formatter']) && $header['formatter'][0] == 'switch'){
-            $header['width'] = '20px';
-            // $header['align'] = 'center';
-        }
-
-        if($header['key'] == 'actions'){
-            $header['width'] ??= '20px';
-            $header['align'] ??= 'center';
-            $header['sortable'] ??= false;
-        }
-
-        return $header;
     }
 
     public function getViewLayoutVariables() {
