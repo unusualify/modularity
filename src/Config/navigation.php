@@ -32,16 +32,11 @@ return [
                 'name' => 'System Settings',
             ],
             ...UNavigation::systemMenu(),
-            'system-settings' => [
-                'name' => 'System Settings',
-                'items' => [
-                    'locales' => [
-                        'name' => 'Locales',
-                        'icon' => 'mdi-exit-to-app',
-                        'route_name' => 'languages.index',
-                        'target' => '_blank',
-                    ]
-                ]
+            'locales' => [
+                'name' => 'Locales',
+                'icon' => 'mdi-exit-to-app',
+                'route_name' => 'languages.index',
+                'target' => '_blank',
             ],
             '_modules' => [
                 'name' => 'Modules',

@@ -491,6 +491,7 @@ class RouteServiceProvider extends ServiceProvider
 
                         $resource_options_as[] = $route_snake;
 
+
                         Route::additionalRoutes($url, $route_studly, [
                             'as' => implode( '.', $resource_options_as)
                         ]);
@@ -498,6 +499,9 @@ class RouteServiceProvider extends ServiceProvider
                         Route::resource($url, $controller, $resource_options)->parameters([
                             // $url => $sub_studly,
                         ]);
+
+                        // dd(get_defined_vars(), Route::getRoutes());
+
 
                     }
                 }
@@ -511,11 +515,11 @@ class RouteServiceProvider extends ServiceProvider
                 $pattern = '/[M|m]odules\/[A-Za-z]*\/Routes\//';
                 $routeFile = fileTrace($pattern);
             }
-
             $kebabCase  = kebabCase(getCurrentModuleName($routeFile));
             $snakeCase  = snakeCase(getCurrentModuleName($routeFile));
 
             $config = config( $snakeCase );
+
             if( !!$config )
                 Route::configRoutes($config, $middlewares, $options);
             else

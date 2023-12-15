@@ -37,7 +37,7 @@ class UnusualRoutes
 
                 $router->group(
                     $groupOptions + [
-                        'domain' => config(unusualBaseKey() . '.app_url', env('APP_URL')),
+                        // 'domain' => config(unusualBaseKey() . '.app_url', env('APP_URL')),
                     ],
                     $hostRoutes
                 );
@@ -104,7 +104,6 @@ class UnusualRoutes
 
         $middleware = [
             // 'twill_auth:twill_users',
-            // 'impersonate',
             // 'validateBackHistory',
 
             'unusual_auth:unusual_users',

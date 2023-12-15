@@ -1,0 +1,11 @@
+{
+    "name": "SystemPricing",
+    "alias": "system_pricing",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+
+    ],
+    "files": []
+}

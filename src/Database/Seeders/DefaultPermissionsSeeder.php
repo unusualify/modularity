@@ -41,7 +41,7 @@ class DefaultPermissionsSeeder extends Seeder
                 // 'PackageContinent',
                 // 'PackageRegion',
                 // 'PackageCountry',
-                // 'PackageDistributionLanguage',
+                // 'PackageLanguage',
                 // 'PackageFeature',
                 // 'Package',
                 // 'VatRate',

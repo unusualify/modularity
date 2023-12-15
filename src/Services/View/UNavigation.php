@@ -198,6 +198,7 @@ class UNavigation
             // $pr => parent route
             // $sr => sub route
             $name = $module->getName();
+            $config = $module->getConfig();
             $pr_name = $module->getSnakeName();
 
             $pr = $module->getParentRoute()?:[
