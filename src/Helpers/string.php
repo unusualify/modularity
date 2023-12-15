@@ -43,6 +43,12 @@ if (! function_exists('headline')) {
         return Str::headline($string);
     }
 }
+if (! function_exists('tableName')) {
+    function tableName($string) {
+       return pluralize(snakeCase($string));
+    }
+}
+
 if (! function_exists('abbreviation')) {
     function abbreviation($string) {
         preg_match_all('/\b\w/', Str::headline($string), $matches);
