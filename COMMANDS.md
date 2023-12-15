@@ -41,6 +41,9 @@
     php artisan unusual:migrate:rollback Package
     php artisan unusual:migrate:refresh Package
 
+    php artisan iseed sp_roles
+    php artisan db:seed --class="\\Unusualify\\Modularity\\Database\\Seeders\\DefaultPermissionsSeeder"
+
 ```
 
 
