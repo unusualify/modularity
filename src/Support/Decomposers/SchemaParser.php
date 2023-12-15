@@ -119,7 +119,11 @@ class SchemaParser extends Parser
         }
 
         $this->relationshipKeys[] = 'belongsToMany';
+        $this->relationshipKeys[] = 'hasOne';
         $this->relationshipKeys[] = 'hasMany';
+        $this->relationshipKeys[] = 'morphTo';
+        $this->relationshipKeys[] = 'morphOne';
+        // dd($this->relationshipKeys);
     }
 
     // /**
@@ -155,7 +159,7 @@ class SchemaParser extends Parser
             $column_type = $this->getColumnType($schema);
 
             if(in_array($column_type, $this->relationshipKeys)){
-                if($column_type == 'belongsToMany' || $column_type == 'hasOne')
+                if(preg_match('/belongsToMany|hasMany|morphTo|morphOne/', $column_type))
                     continue;
 
                 $column =  "{$column}_id";
@@ -218,11 +222,11 @@ class SchemaParser extends Parser
 
         $methodChaining = false;
         foreach ($parsed as $col_name => $methods) {
-
             if($methodChaining && in_array($methods[0], $this->chainableMethods)){
                 $relationships[count($relationships)-1] .= ",{$col_name}:{$methods[0]}";
             } else if (in_array($methods[0], $this->relationshipKeys)) {
                 $relationship_name = $methods[0];
+                $methodChaining = false;
                 if($relationship_name  == 'belongsTo'){
                     $foreign_key = $col_name.'_id';
                     $owner_key = $methods[1] ?? 'id';
@@ -232,6 +236,10 @@ class SchemaParser extends Parser
                     $methodChaining = true;
                     $table_name = $methods[2] ?? pluralize($col_name);
                     $relationships[] = "belongsToMany:{$table_name}";
+                } else if($relationship_name == 'morphTo'){
+                    // $table_name = $col_name . 'able';
+                    $table_name = $col_name;
+                    $relationships[] = "morphTo";
                 }
 
             } else{
@@ -280,7 +288,7 @@ class SchemaParser extends Parser
 
             }
         }
-
+        // dd($relationships);
         return $relationships;
     }
 
@@ -292,17 +300,17 @@ class SchemaParser extends Parser
      */
     public function headerFormat(string $column_name, $options = []) : array
     {
-        // dd(
-        //     $column_name,
-        //     $options,
-        //     $this->relationshipKeys
-        // );
-        if(in_array($options[0], $this->relationshipKeys)){
+        $title = $this->getHeadline($column_name);
+
+        if(in_array($options[0], ['morphTo'])){
+            $title = $this->getHeadline($column_name) . ' Parent';
+            $column_name = $this->getCamelCase($column_name) . 'able';
+        } else if(in_array($options[0], $this->relationshipKeys)){
             $column_name = $this->getCamelCase($column_name);
         }
 
         return [
-            'title' => $this->getHeadline($column_name),
+            'title' => $title,
             'key' => $column_name,
             // 'align' => 'start',
             // 'sortable' => false,
@@ -368,7 +376,6 @@ class SchemaParser extends Parser
     public function inputFormat(string $column, $options = []) : array
     {
         $extra_options = [];
-
         $type = 'text';
         $name = $column;
         $label = $this->getHeadline($column);
@@ -393,6 +400,24 @@ class SchemaParser extends Parser
 
                 $finder = new Finder();
                 $extra_options['repository'] = $finder->getRepository(pluralize($column));
+            } else if($options[0] == 'morphTo'){
+                $type = 'morphTo';
+                $finder = new Finder();
+                $parents = [];
+
+                foreach (array_slice($options,1) as $key => $routeName) {
+                    $routeName = $this->getStudlyName($routeName);
+                    $foreign_id = $this->getSnakeCase($routeName) . '_id';
+                    if(( $repository = $finder->getRouteRepository($routeName))){
+                        array_push($parents, [
+                            'name' => $foreign_id,
+                            'label' => $this->getHeadline($routeName),
+                            'type' => 'select',
+                            'repository' => $repository
+                        ]);
+                    }
+                }
+                $extra_options['parents'] = $parents;
             }
         }
 

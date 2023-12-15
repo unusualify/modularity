@@ -19,7 +19,10 @@ class ModelRelationParser implements Arrayable
         'hasMany',
         'hasOneThrough',
         'hasManyThrough',
-        'belongsToMany'
+        'belongsToMany',
+        'morphTo',
+        'morphOne',
+        'morphToMany',
     ];
 
     protected $arguments = [
@@ -28,7 +31,13 @@ class ModelRelationParser implements Arrayable
         'hasMany'           => ['table', 'foreign_key', 'local_key'],
         'hasOneThrough'     => ['table', 'table', 'foreign_key', 'foreign_key', 'local_key', 'local_key'],
         'hasManyThrough'    => ['table', 'table', 'foreign_key', 'foreign_key', 'local_key', 'local_key'],
-        'belongsToMany'    => ['table', 'table', 'foreign_pivot_key', 'related_pivot_key', 'parent_key', 'related_key', 'relation']
+        'belongsToMany'     => ['table', 'table', 'foreign_pivot_key', 'related_pivot_key', 'parent_key', 'related_key', 'relation'],
+        'morphTo'           => ['name', 'type', 'id', 'owner_key']
+    ];
+
+    protected $pivotableRelationships = [
+        'belongsToMany',
+        // 'morphToMany'
     ];
 
     protected $model;
@@ -40,17 +49,17 @@ class ModelRelationParser implements Arrayable
      *
      * $example
      */
-    protected $relations;
+    protected $relationships;
 
     /**
      * Create new instance.
      *
      * @param string|null $schema
      */
-    public function __construct($model, $relations = null)
+    public function __construct($model, $relationships = null)
     {
         $this->model = $model;
-        $this->relations = $relations;
+        $this->relationships = $relationships;
     }
 
     /**
@@ -60,7 +69,7 @@ class ModelRelationParser implements Arrayable
      */
     public function toArray()
     {
-        return $this->parse($this->relations);
+        return $this->parse($this->relationships);
     }
 
     public function parse($relations)
@@ -68,13 +77,13 @@ class ModelRelationParser implements Arrayable
 
         $parsed = [];
 
-        foreach ($this->getRelations() as $relation) {
+        foreach ($this->getRelationships() as $relation) {
             $schemas = explode(',', $relation);
             foreach ($schemas as $index => $schema) {
                 if(!$index){
-                    $method = $this->getMethod($schema);
-                    $parameters = $this->getParameters($method, $schema);
-                    $function = $this->getFunctionName($method, $schema);
+                    $relationship_method = $this->getMethod($schema);
+                    $function = $this->getFunctionName($relationship_method, $schema);
+                    $parameters = $this->getParameters($relationship_method, $schema);
 
                     $chainMethods = [];
                     if(count($schemas) > 1){
@@ -93,7 +102,7 @@ class ModelRelationParser implements Arrayable
                     if($parameters !== false )
                         $parsed[] = [
                             'relationship_name'  => $function,
-                            'relationship_method'    => $method,
+                            'relationship_method'    => $relationship_method,
                             'parameters'=> $parameters,
                             'chain_methods' => $chainMethods
                         ];
@@ -105,6 +114,7 @@ class ModelRelationParser implements Arrayable
                 }
             }
         }
+
 
         return $parsed;
 
@@ -118,13 +128,19 @@ class ModelRelationParser implements Arrayable
         return $this->model . $this->getStudlyName($this->getSingular($relation_table));
     }
 
-    public function isCreatablePivotModel() {
+    public function hasCreatablePivotModel() {
         $creatable = false;
 
-        foreach ($this->getRelations() as $relation) {
-            $schemas = explode(',', $relation);
+        foreach ($this->getRelationships() as $relationship) {
+            // $schemas = explode(',', $relation);
+            // if( count($schemas) > 1){
+            //     $creatable = true;
+            //     break;
+            // }
+            $schemas = explode(',', $relationship);
+            $relationship_name = explode(':', $schemas[0])[0];
 
-            if(count($schemas) > 1){
+            if(in_array($relationship_name, $this->pivotableRelationships) && count($schemas) > 2){
                 $creatable = true;
                 break;
             }
@@ -136,9 +152,11 @@ class ModelRelationParser implements Arrayable
     public function getPivotModels() {
         $models = [];
 
-        foreach ($this->getRelations() as $relation) {
-            $schemas = explode(',', $relation);
-            if(count($schemas) > 1){
+        foreach ($this->getRelationships() as $relationship) {
+            // dd($relation);
+            $schemas = explode(',', $relationship);
+            $relationship_name = explode(':', $schemas[0])[0];
+            if(count($schemas) > 2 && in_array($relationship_name, $this->pivotableRelationships)){
                 foreach ($schemas as $index => $schema) {
                     if(!$index){ // relation_type:table_name
                         $method = $this->getMethod($schema);
@@ -169,13 +187,13 @@ class ModelRelationParser implements Arrayable
         return $models;
     }
 
-    public function getRelations()
+    public function getRelationships()
     {
-        if (is_null($this->relations)) {
+        if (is_null($this->relationships)) {
             return [];
         }
 
-        return explode('|', str_replace(' ', '', $this->relations));
+        return explode('|', str_replace(' ', '', $this->relationships));
     }
 
     public function castFieldType($type) {
@@ -240,7 +258,10 @@ class ModelRelationParser implements Arrayable
      */
     public function getFunctionName($method, $relation)
     {
-        $params = explode(':', str_replace($method . ':', '', $relation) );
+        $pattern = "/^({$method}:?)(.*)$/";
+        $replace = '${2}';
+
+        $params = explode(':',  preg_replace($pattern, $replace, $relation) );
 
         return $this->generateFunctionName($method, $params);
     }
@@ -258,10 +279,17 @@ class ModelRelationParser implements Arrayable
     {
         $name = '';
 
+        switch ($method) {
+            case 'morphTo':
+                $name = $this->getCamelCase($this->model) . 'able';
+            default:
+                # code...
+                break;
+        }
+
         foreach($params as $i => $param){
 
             $format = $this->arguments[$method][$i];
-
             switch ($format) {
                 case 'table':
                     switch ($method) {
@@ -289,6 +317,14 @@ class ModelRelationParser implements Arrayable
 
                             break;
                         case 'belongsToMany':
+                            if($name !== '')
+                                $name .= $this->getSingular($param);
+                            else
+                                $name .= '_'.$this->getPlural($param);
+
+                            break;
+                        case 'morphTo':
+                            dd($method, $param);
                             if($name !== '')
                                 $name .= $this->getSingular($param);
                             else
@@ -323,6 +359,7 @@ class ModelRelationParser implements Arrayable
     public function generateParameter($method, $index, $param)
     {
         $format = $this->arguments[$method][$index];
+
         switch ($format) {
             case 'table':
                 // dd(
@@ -334,8 +371,10 @@ class ModelRelationParser implements Arrayable
                 return  $this->findModel($param);
                 return  (new Finder())->getModel($param);
                 break;
-
+            case 'name':
+                return '__FUNCTION__';
             default:
+
                 return "'{$param}'";
 
                 break;
@@ -351,7 +390,7 @@ class ModelRelationParser implements Arrayable
     {
         $comment = '';
 
-        $model = $this->getLowerName($this->model);
+        $model = $this->getCamelCase($this->model);
 
         switch ($attr['relationship_method']) {
             case 'belongsTo':
@@ -368,6 +407,9 @@ class ModelRelationParser implements Arrayable
                 break;
             case 'belongsToMany':
                 $comment =  $this->commentStructure(["The {$attr['relationship_name']} that belong to the {$model}."]);
+                break;
+            case 'morphTo':
+                $comment =  $this->commentStructure(["Get the model that the {$model} belongs to"]);
                 break;
 
             default:

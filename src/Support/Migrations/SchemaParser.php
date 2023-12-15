@@ -56,7 +56,8 @@ class SchemaParser implements Arrayable
         $this->schema = $schema;
 
         $parsed = [];
-        foreach ($this->getSchemas() as $schemaArray) {
+
+        foreach ($this->getSchemas() as $i => $schemaArray) {
             $column = $this->getColumn($schemaArray);
 
             $attributes = $this->getAttributes($column, $schemaArray);
@@ -103,7 +104,14 @@ class SchemaParser implements Arrayable
         $results = '';
 
         foreach ($this->toArray() as $column => $attributes) {
-            if(!in_array($attributes[0], ['belongsToMany', 'hasOne']))
+            if(in_array($attributes[0], ['morphTo'])){
+                $morphable_id = snakeCase($column) . 'able_id';
+                $morphable_type = snakeCase($column) . 'able_type';
+
+                $results .= $this->createField($morphable_type, ['string', 'nullable']);
+                $results .= $this->createField($morphable_id, ['unsignedBigInteger', 'nullable']);
+            }
+            else if(!in_array($attributes[0], ['belongsToMany', 'hasOne']))
                 $results .= $this->createField($column, $attributes);
         }
 
@@ -137,6 +145,7 @@ class SchemaParser implements Arrayable
         return $results;
     }
 
+
     /**
      * Create field.
      *
@@ -149,12 +158,14 @@ class SchemaParser implements Arrayable
     public function createField($column, $attributes, $type = 'add')
     {
         $results = "\t\t\t" . '$table';
+
         foreach ($attributes as $key => $field) {
             $type_method = $attributes[0];
+            $studly_type = studlyName($type_method);
 
-            if (in_array($type_method, $this->relationshipKeys)) {
-                $results .= $this->addRelationColumn($key, $column, $field);
-            } else {
+            if (method_exists($this, "add{$studly_type}Column")) {
+                $results .= $this->{"add{$studly_type}Column"}($key, $column, $field);
+            }  else {
                 $results .= $this->{"{$type}Column"}($key, $field, $column);
             }
         }
@@ -163,7 +174,7 @@ class SchemaParser implements Arrayable
     }
 
     /**
-     * Add relation column.
+     * Add belongsTo column.
      *
      * @param int    $key
      * @param string $field
@@ -171,7 +182,7 @@ class SchemaParser implements Arrayable
      *
      * @return string
      */
-    protected function addRelationColumn($key, $column, $field)
+    protected function addBelongsToColumn($key, $column, $field)
     {
         if ($key === 0) {
             $relatedColumn = Str::snake(class_basename($column)) . '_id';
@@ -179,12 +190,15 @@ class SchemaParser implements Arrayable
             // return "->integer('{$relatedColumn}')->unsigned();" . PHP_EOL . "\t\t\t" . "\$table->foreignId('{$relatedColumn}')";
             return "->foreignId('{$relatedColumn}')->constrained()->onUpdate('cascade')->onDelete('cascade')";
         }
+
         if ($key === 1) {
             return "->references('{$field}')";
         }
+
         if ($key === 2) {
             return "->on('{$field}')";
         }
+
         if (Str::contains($field, '(')) {
             return '->' . $field;
         }

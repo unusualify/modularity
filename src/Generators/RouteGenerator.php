@@ -773,7 +773,6 @@ class RouteGenerator extends Generator
 
         $configPath = $this->module->getPath().'/Config/config.php';
 
-
         if( $this->getModule()->getName() === $this->getName()){
             $config['name'] = $config['name'] ?? $studlyName;
             $config['base_prefix'] = $config['base_prefix'] ?? false;
@@ -841,10 +840,18 @@ class RouteGenerator extends Generator
         $repository = App::make(PermissionRepository::class);
 
         // default permissions of a module
-        $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::VIEW->value, 'guard_name' => 'unusual_users']);
         $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::CREATE->value, 'guard_name' => 'unusual_users']);
+        $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::VIEW->value, 'guard_name' => 'unusual_users']);
         $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::EDIT->value, 'guard_name' => 'unusual_users']);
         $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::DELETE->value, 'guard_name' => 'unusual_users']);
+        $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::FORCEDELETE->value, 'guard_name' => 'unusual_users']);
+        $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::RESTORE->value, 'guard_name' => 'unusual_users']);
+        $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::DUPLICATE->value, 'guard_name' => 'unusual_users']);
+        $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::REORDER->value, 'guard_name' => 'unusual_users']);
+        $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::BULK->value, 'guard_name' => 'unusual_users']);
+        $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::BULKDELETE->value, 'guard_name' => 'unusual_users']);
+        $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::BULKFORCEDELETE->value, 'guard_name' => 'unusual_users']);
+        $repository->firstOrCreate(['name' => $kebabCase . "_" . Permission::BULKRESTORE->value, 'guard_name' => 'unusual_users']);
 
         return true;
     }

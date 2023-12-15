@@ -84,7 +84,7 @@ class ModelMakeCommand extends BaseCommand
         if( $this->option('relationships')){
             $this->modelRelationParser = App::makeWith(ModelRelationParser::class, [
                 'model' => $this->argument('model'),
-                'relations' => $this->option('relationships')
+                'relationships' => $this->option('relationships')
             ]);
         }
 
@@ -495,7 +495,8 @@ class ModelMakeCommand extends BaseCommand
 
         $modelPath = new GeneratorPath( $this->baseConfig('paths.generator.model') );
 
-        if(isset($this->modelRelationParser) && $this->modelRelationParser->isCreatablePivotModel()) {
+
+        if(isset($this->modelRelationParser) && $this->modelRelationParser->hasCreatablePivotModel()) {
             $pivot_models = $this->modelRelationParser->getPivotModels();
 
             foreach ($pivot_models as $key => $pivot_model) {
