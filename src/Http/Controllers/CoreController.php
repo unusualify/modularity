@@ -127,14 +127,14 @@ abstract class CoreController extends Controller
         'bulkPublish' => false,
         'feature' => false,
         'bulkFeature' => false,
-        'restore' => false,
+        'restore' => true,
         'bulkRestore' => false,
         'forceDelete' => true,
         'bulkForceDelete' => true,
         'delete' => true,
-        'duplicate' => false,
+        'duplicate' => true,
         'bulkDelete' => true,
-        'reorder' => false,
+        'reorder' => true,
         'permalink' => true,
         'bulkEdit' => true,
 
@@ -189,7 +189,7 @@ abstract class CoreController extends Controller
      */
     protected $titleColumnKey = 'name';
 
-
+    protected $setDefaultPermissions = true;
 
 
     /**
@@ -279,6 +279,7 @@ abstract class CoreController extends Controller
         $this->addWiths();
         $this->addIndexWiths();
         $this->addFormWiths();
+
     }
 
     /**
@@ -315,17 +316,20 @@ abstract class CoreController extends Controller
         // Permission::where('name', 'LIKE', "%{$this->getKebabCase($this->routeName)}%")->get(),
 
         $name = $this->getKebabCase($this->routeName);
-        foreach ( Permission::cases() as $permission) {
-            // $this->middleware("can:{$name}_{$permission->value}", ['only' => ['index', 'show']]);
-        }
+        // foreach ( Permission::cases() as $permission) {
+        //     // $this->middleware("can:{$name}_{$permission->value}", ['only' => ['index', 'show']]);
+        // }
 
         // dd(Permission::ACCESS->value, $name);
-        if($this->isGateable()){
+        if($this->isGateable() && $this->setDefaultPermissions){
             $this->middleware("can:{$this->permissionPrefix(Permission::VIEW->value)}", ['only' => ['index', 'show']]);
             $this->middleware("can:{$this->permissionPrefix(Permission::CREATE->value)}", ['only' => ['create', 'store']]);
             $this->middleware("can:{$this->permissionPrefix(Permission::EDIT->value)}", ['only' => ['edit', 'update']]);
             $this->middleware("can:{$this->permissionPrefix(Permission::DELETE->value)}", ['only' => ['delete']]);
-            $this->middleware("can:{$this->permissionPrefix(Permission::DESTROY->value)}", ['only' => ['destroy']]);
+            $this->middleware("can:{$this->permissionPrefix(Permission::FORCEDELETE->value)}", ['only' => ['forceDelete']]);
+            $this->middleware("can:{$this->permissionPrefix(Permission::RESTORE->value)}", ['only' => ['restore']]);
+            $this->middleware("can:{$this->permissionPrefix(Permission::DUPLICATE->value)}", ['only' => ['duplicate']]);
+            $this->middleware("can:{$this->permissionPrefix(Permission::REORDER->value)}", ['only' => ['reorder']]);
         }
 
         // $this->middleware('can:list', ['only' => ['index', 'show']]);
@@ -411,10 +415,22 @@ abstract class CoreController extends Controller
                 'delete' => $this->permissionPrefix(Permission::DELETE->value),
                 'destroy' => $this->permissionPrefix(Permission::DELETE->value),
 
+                // 'restore' => 'restore',
+                'restore' => $this->permissionPrefix(Permission::RESTORE->value),
+                'forceDelete' => $this->permissionPrefix(Permission::FORCEDELETE->value),
+                'duplicate' => $this->permissionPrefix(Permission::DUPLICATE->value),
+
+
+                /**
+                 * TODO #additionalRoutePermission
+                 *
+                 */
+                // 'duplicate' => $this->permissionPrefix(Permission::DUPLICATE->value),
+
                 // 'index' => 'access',
                 // 'create' => 'edit',
                 // 'edit' => 'edit',
-                'publish' => 'publish',
+                // 'publish' => 'publish',
                 // 'feature' => 'feature',
                 // 'reorder' => 'reorder',
                 // 'delete' => 'delete',
@@ -445,9 +461,6 @@ abstract class CoreController extends Controller
                 ? Auth::guard('unusual_users')->user()->can($authorizableOptions[$option])
                 : true;
             // $authorized = true;
-
-            if(!$authorized){
-            }
 
             return ($this->indexOptions[$option] ?? $this->defaultIndexOptions[$option] ?? false) && $authorized;
         });

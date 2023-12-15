@@ -10,12 +10,38 @@ use Unusualify\Modularity\Http\Controllers\GlideController;
 use Unusualify\Modularity\Facades\UnusualRoutes;
 use Nwidart\Modules\Facades\Module;
 use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Http\Middleware\{AuthenticateMiddleware, CompanyRegistrationMiddleware, LanguageMiddleware, ImpersonateMiddleware, NavigationMiddleware, RedirectIfAuthenticatedMiddleware, TeamsPermissionMiddleware};
+use Unusualify\Modularity\Http\Middleware\{
+    AuthenticateMiddleware,
+    CompanyRegistrationMiddleware,
+    LanguageMiddleware,
+    ImpersonateMiddleware,
+    NavigationMiddleware,
+    RedirectIfAuthenticatedMiddleware,
+    AuthorizationMiddleware
+};
 
 class RouteServiceProvider extends ServiceProvider
 {
 
     protected $namespace = 'Unusualify\Modularity\Http\Controllers';
+
+    protected static $additionalRoutes = [
+        // 'reorder',
+        // 'publish',
+        // 'bulkPublish',
+        // 'browser',
+        // 'feature',
+        // 'bulkFeature',
+        // 'tags',
+        // 'preview',
+        // 'restore',
+        // 'bulkRestore',
+        // 'forceDelete',
+        // 'bulkForceDelete',
+        // 'bulkDelete',
+        // 'restoreRevision',
+        'duplicate',
+    ];
 
     /**
      * Bootstraps the package services.
@@ -81,8 +107,10 @@ class RouteServiceProvider extends ServiceProvider
 
                 $router->group(
                     [
+                        'prefix' => 'api',
                         // 'middleware' => $supportSubdomainRouting ? ['supportSubdomainRouting'] : [],
                         'middleware' => [
+                            'unusual_auth:unusual_users',
                             'language',
                             ...($supportSubdomainRouting ? ['supportSubdomainRouting'] : [])
                         ],
@@ -183,6 +211,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::aliasMiddleware('language', LanguageMiddleware::class);
         Route::aliasMiddleware('navigation', NavigationMiddleware::class);
         Route::aliasMiddleware('company_registration', CompanyRegistrationMiddleware::class);
+        Route::aliasMiddleware('authorization', AuthorizationMiddleware::class);
 
         // Route::aliasMiddleware('role', \Spatie\Permission\Middlewares\RoleMiddleware::class);
         // Route::aliasMiddleware('permission', \Spatie\Permission\Middlewares\PermissionMiddleware::class);
@@ -392,46 +421,6 @@ class RouteServiceProvider extends ServiceProvider
         Route::macro('configRoutes', function($config, $middlewares = [], $options = []){
             Route::middleware($middlewares)->group( function() use($config, $options){
 
-                $customRoutes = $defaults = [
-                    'reorder',
-                    'publish',
-                    'bulkPublish',
-                    'browser',
-                    'feature',
-                    'bulkFeature',
-                    'tags',
-                    'preview',
-                    'restore',
-                    'bulkRestore',
-                    'forceDelete',
-                    'bulkForceDelete',
-                    'bulkDelete',
-                    'restoreRevision',
-                    'duplicate',
-                ];
-
-                if (isset($options['only'])) {
-                    $customRoutes = array_intersect(
-                        $defaults,
-                        (array) $options['only']
-                    );
-                } elseif (isset($options['except'])) {
-                    $customRoutes = array_diff(
-                        $defaults,
-                        (array) $options['except']
-                    );
-                }
-
-
-                $lastRouteGroupName = RouteServiceProvider::getLastRouteGroupName();
-                $groupPrefix = RouteServiceProvider::getGroupPrefix();
-
-                // dd($config, $lastRouteGroupName, $groupPrefix);
-                // dd(
-                //     $config,
-                //     findParentRoute($config),
-                //     config(),
-                // );
                 $pr = findParentRoute($config);
 
                 $system_prefix = (isset($config['base_prefix']) && $config['base_prefix']) ? unusualConfig('base_prefix', 'system-settings') . '/' : '';
@@ -460,21 +449,11 @@ class RouteServiceProvider extends ServiceProvider
                     foreach( $routes as $key => $item) {
                         $route_camel = camelCase( $item['name'] );
                         $route_studly = studlyName($item['name']);
-                        $route_snake = studlyName($item['name']);
+                        $route_snake = snakeCase($item['name']);
 
                         $url = $item['url'] ?? $route_camel;
                         $controller = $route_studly.'Controller';
 
-                        // $names = $item['route_name'] ?? $route_camel;
-                        // dd(
-                        //     $key,
-                        //     $item,
-                        //     $url,
-                        //     $item['route_name']
-                        // );
-                        // $resource_options = [
-                        //     'names' => $item['route_name'] ?? $route_snake,
-                        // ];
                         $resource_options_names = $item['route_name'] ?? $route_snake;
                         $resource_options_as = [];
 
@@ -510,79 +489,19 @@ class RouteServiceProvider extends ServiceProvider
                             'as' => implode( '.', $resource_options_as)
                         ];
 
+                        $resource_options_as[] = $route_snake;
 
-                        // if(isset($sub['nested']) && $item['nested']){
-                        //     Route::resource($url, $parent_studly.$route_studly.'Controller',[
-                        //         'names' => ($parent['route_name'] ?? $parent_camel) . "." . $names
-                        //     ])->parameters([
-                        //         // $parent_camel => $parent_studly,
-                        //         // $url => $sub_studly,
-                        //     ]);
-                        // }else{
-                        //     Route::resource($url, $route_studly.'Controller',[
-                        //         'as' => $parent_camel,
-                        //         'names' => $names
-                        //     ])->parameters([
-                        //         // $url => $sub_studly,
-                        //     ]);
-                        // }
-                        // dd($url, $controller, $resource_options);
-                        // if($key == 'user'){
-                        //     dd($url, $controller, $resource_options);
-                        // }
+                        Route::additionalRoutes($url, $route_studly, [
+                            'as' => implode( '.', $resource_options_as)
+                        ]);
+
                         Route::resource($url, $controller, $resource_options)->parameters([
                             // $url => $sub_studly,
                         ]);
 
-                        // inner nested for sub_route
-                        if(isset($sub['nested_routes'])){
-
-                            foreach ($sub['nested_routes'] as $nested) {
-                                if(isset($sub_routes[$nested])){
-                                    // dd(
-                                    //     $parent_camel,
-                                    //     $url,
-                                    //     $sub_studly,
-                                    //     $parent_camel.".".$url.".".$nested
-                                    // );
-                                    // Route::prefix("{$parent_camel}")->name("{$parent_camel}.")->group(function() use($url, $nested, $sub_studly){
-                                    //     Route::resource("{$url}.{$nested}", "{$sub_studly}Controller")->only([
-                                    //         'store'
-                                    //     ])->shallow();
-                                    // });
-
-
-                                    // Route::prefix("{$parent_camel}/{$url}/{{$url}}")->name("{$parent_camel}.{$url}.{$nested}.")->group(function() use($nested, $sub_studly){
-                                    //     Route::get("/{$nested}", $sub_studly.'Controller@editNested' )->name("edit");
-                                    //     Route::put("/{$nested}", $sub_studly.'Controller@updateNested' )->name("update");
-                                    // });
-                                }
-                            }
-
-                        }
                     }
                 }
 
-                // if( is_array( $pr ) ){
-
-                //     $url = $pr['url'] ?? $parent_kebab;
-                //     $name = $pr['route_name'] ?? $parent_snake;
-
-                //     if(preg_match('/press/', $url)){
-
-                //     }
-
-                //     Route::resource( $url, $parent_studly.'Controller', [
-                //         'names' => $name
-                //     ])->parameters([
-                //         // $url => $parent_studly
-                //     ]);
-                //     // Route::resource($url, $studlyName.'Controller', [
-                //     //     // 'parameters' => [
-                //     //     //     'payment' => 'payment'
-                //     //     // ]
-                //     // ]);
-                // }
             });
         });
 
@@ -605,6 +524,92 @@ class RouteServiceProvider extends ServiceProvider
                     $snakeCase,
                     $config
                 );
+
+        });
+
+        Route::macro('additionalRoutes', function ($url, $routeName, $options) {
+
+            $customRoutes = $defaults = [
+                // 'reorder',
+                // 'publish',
+                // 'bulkPublish',
+                // 'browser',
+                // 'feature',
+                // 'bulkFeature',
+                // 'tags',
+                // 'preview',
+                'restore',
+                // 'bulkRestore',
+                'forceDelete',
+                // 'bulkForceDelete',
+                // 'bulkDelete',
+                // 'restoreRevision',
+                'duplicate',
+            ];
+
+            $controllerClass = "{$routeName}Controller";
+            $snakeCase = snakeCase($routeName);
+            // if (isset($options['only'])) {
+            //     $customRoutes = array_intersect(
+            //         $defaults,
+            //         (array) $options['only']
+            //     );
+            // } elseif (isset($options['except'])) {
+            //     $customRoutes = array_diff(
+            //         $defaults,
+            //         (array) $options['except']
+            //     );
+            // }
+            foreach ($customRoutes as $customRoute) {
+                $routeSlug = "{$url}/{$customRoute}";
+
+                $mapping = [
+                    // 'as' => $customRoutePrefix . ".{$customRoute}",
+                    'as' => $options['as'] . ".{$customRoute}",
+                    'uses' => "{$controllerClass}@{$customRoute}",
+                ];
+
+                if (in_array($customRoute, ['browser', 'tags'])) {
+                    Route::get($routeSlug, $mapping);
+                }
+
+                if (in_array($customRoute, ['restoreRevision'])) {
+                    Route::get($routeSlug . "/{{$snakeCase}}", $mapping);
+                }
+
+                if (
+                    in_array($customRoute, [
+                        'publish',
+                        'feature',
+                        'restore',
+                        'forceDelete',
+                    ])
+                ) {
+                    Route::put($routeSlug, $mapping);
+                }
+
+                if (in_array($customRoute, ['duplicate'])) {
+                    Route::put($routeSlug . "/{{$snakeCase}}", $mapping);
+                }
+
+                if (in_array($customRoute, ['preview'])) {
+                    Route::put($routeSlug . "/{{$snakeCase}}", $mapping);
+                }
+
+                if (
+                    in_array($customRoute, [
+                        'reorder',
+                        'bulkPublish',
+                        'bulkFeature',
+                        'bulkDelete',
+                        'bulkRestore',
+                        'bulkForceDelete',
+                    ])
+                ) {
+                    Route::post($routeSlug, $mapping);
+                }
+            }
+
 
         });
 

@@ -15,7 +15,6 @@ use Unusualify\Modularity\Entities\Behaviors\Sortable;
 use PDO;
 use ReflectionClass;
 
-use Nwidart\Modules\Facades\Module;
 use Unusualify\Modularity\Repositories\Traits\{DatesTrait, RelationTrait};
 use Unusualify\Modularity\Traits\{ManageTraits, ManageNames};
 
@@ -65,14 +64,24 @@ abstract class Repository
     {
         $query = $this->model->query();
 
-        $query = $query->with($this->formatWiths($query, $with));
+        $query = $this->model->with($this->formatWiths($query, $with));
 
         if( isset($scopes['searches']) && isset($scopes['search']) && is_array($scopes['searches']) ){
 
             $this->searchIn($query, $scopes, 'search', $scopes['searches']);
             unset($scopes['searches']);
         }
+        // dd(
+        //     $scopes,
+        //     $query->toSql(),
+        //     $query1 = $this->filter($query, $scopes),
+        //     $query1->toSql(),
+        //     $query2 = $this->filterBack($query, $scopes),
+        //     $query2->toSql(),
+
+        // );
         $query = $this->filter($query, $scopes);
+        // $query = $this->filterBack($query, $scopes);
         $query = $this->order($query, $orders);
 
         if (!$forcePagination && $this->model instanceof Sortable) {
@@ -87,8 +96,8 @@ abstract class Repository
         try {
             //code...
             // dd(
-            //     $query,
-            //     $query->paginate($perPage)
+            //     $query->toSql(),
+
             // );
             return $query->paginate($perPage);
 
@@ -422,29 +431,50 @@ abstract class Repository
      * @param mixed $id
      * @return mixed
      */
-    public function duplicate($id, $titleColumnKey = 'title')
+    public function duplicate($id, $titleColumnKey = 'title', $schema)
     {
-
-        if (($object = $this->model->find($id)) === null) {
+        if (($duplicated = $this->model->find($id)) === null) {
             return false;
         }
 
-        if (($revision = $object->revisions()->orderBy('created_at', 'desc')->first()) === null) {
-            return false;
-        }
+        return DB::transaction(function () use ($duplicated, $schema) {
 
-        $revisionInput = json_decode($revision->payload, true);
-        $baseInput = collect($revisionInput)->only([
-            $titleColumnKey,
-            'slug',
-            'languages',
-        ])->filter()->toArray();
+            $fields = $this->getFormFields($duplicated, $schema);
 
-        $newObject = $this->create($baseInput);
+            $original_fields = $fields;
 
-        $this->update($newObject->id, $revisionInput);
+            $fields = $this->prepareFieldsBeforeCreate($fields);
 
-        return $newObject;
+            $object = $this->model->create(Arr::except($fields, $this->getReservedFields()));
+
+            $this->beforeSave($object, $original_fields);
+
+            $fields = $this->prepareFieldsBeforeSave($object, $fields);
+
+            $object->save();
+
+            $this->afterSave($object, $fields);
+
+            return $object;
+        }, 3);
+
+
+        // if (($revision = $object->revisions()->orderBy('created_at', 'desc')->first()) === null) {
+        //     return false;
+        // }
+
+        // $revisionInput = json_decode($revision->payload, true);
+        // $baseInput = collect($revisionInput)->only([
+        //     $titleColumnKey,
+        //     'slug',
+        //     'languages',
+        // ])->filter()->toArray();
+
+        // $newObject = $this->create($object);
+
+        // $this->update($newObject->id, $revisionInput);
+
+        // return $newObject;
     }
 
     /**
@@ -501,7 +531,7 @@ abstract class Repository
                 return false;
             } else {
                 $object->forceDelete();
-                $this->afterDelete($object);
+                $this->afterForceDelete($object);
                 return true;
             }
         }, 3);
@@ -521,7 +551,7 @@ abstract class Repository
                 $query->forceDelete();
 
                 $objects->each(function ($object) {
-                    $this->afterDelete($object);
+                    $this->afterForceDelete($object);
                 });
             } catch (Exception $e) {
                 Log::error($e);
@@ -697,6 +727,17 @@ abstract class Repository
      * @param \Unusualify\Modularity\Models\Model $object
      * @return void
      */
+    public function afterForceDelete($object)
+    {
+        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
+            $this->$method($object);
+        }
+    }
+
+    /**
+     * @param \Unusualify\Modularity\Models\Model $object
+     * @return void
+     */
     public function afterRestore($object)
     {
         foreach ($this->traitsMethods(__FUNCTION__) as $method) {
@@ -755,8 +796,57 @@ abstract class Repository
 
         foreach ($scopes as $column => $value) {
             $studlyColumn = studlyName($column);
+            // dd(
+            //     $column,
+            //     $studlyColumn,
+            //     method_exists($this->model, 'scope' . $studlyColumn)
+            // );
             if (method_exists($this->model, 'scope' . $studlyColumn)) {
-                $query->$studlyColumn();
+                $query->{$this->getCamelCase($column)}();
+            } else {
+                if (is_array($value)) {
+                    $query->whereIn($column, $value);
+                } elseif ($column[0] == '%') {
+                    $value && ($value[0] == '!') ? $query->where(substr($column, 1), "not $likeOperator", '%' . substr($value, 1) . '%') : $query->where(substr($column, 1), $likeOperator, '%' . $value . '%');
+                } elseif (isset($value[0]) && $value[0] == '!') {
+                    $query->where($column, '<>', substr($value, 1));
+                } elseif ($value !== '') {
+                    $query->where($column, $value);
+                }
+            }
+        }
+
+        return $query;
+    }
+
+    /**
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param array $scopes
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function filterBack($query, array $scopes = [])
+    {
+        $likeOperator = $this->getLikeOperator();
+
+        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
+            $this->$method($query, $scopes);
+        }
+
+        unset($scopes['search']);
+
+        if (isset($scopes['exceptIds'])) {
+            $query->whereNotIn($this->model->getTable() . '.id', $scopes['exceptIds']);
+            unset($scopes['exceptIds']);
+        }
+
+        foreach ($scopes as $column => $value) {
+            // dd(
+            //     $column,
+            //     ucfirst($column),
+            //     method_exists($this->model, 'scope' . ucfirst($column))
+            // );
+            if (method_exists($this->model, 'scope' . ucfirst($column))) {
+                $query->$column();
             } else {
                 if (is_array($value)) {
                     $query->whereIn($column, $value);
@@ -1008,7 +1098,14 @@ abstract class Repository
      */
     public function isTranslatable($column)
     {
-        return $this->model->isTranslatable($column);
+        return method_exists($this->model, 'isTranslatable') && $this->model->isTranslatable($column);
+    }
+    /**
+     * @return boolean
+     */
+    public function isSoftDeletable()
+    {
+        return method_exists($this->model, 'isSoftDeletable') && $this->model->isSoftDeletable();
     }
 
     /**

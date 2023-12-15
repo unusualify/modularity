@@ -59,35 +59,6 @@ abstract class BaseController extends CoreController
         // $this->setMiddlewarePermission();
         $this->viewPrefix = $this->getViewPrefix();
 
-        /*
-         * Available columns of the index view
-         */
-        $this->indexTableColumns = $this->getIndexTableColumns();
-
-        if (! isset($this->indexTableColumns) ) {
-            // $this->indexColumns = [
-            //     $this->titleColumnKey => [
-            //         'title' => ucfirst($this->titleColumnKey),
-            //         'field' => $this->titleColumnKey,
-            //         'sort' => true,
-            //     ],
-            // ];
-        }
-
-        /*
-         * Default filters for the index view
-         * By default, the search field will run a like query on the title field
-         */
-        if (! isset($this->defaultFilters)) {
-            $this->defaultFilters = [
-                'search' => collect( $this->indexTableColumns ?? [] )->filter(function ($item) {
-                    return isset($item['searchable']) ? $item['searchable'] : false;
-                })->map(function($item){
-                    return $item['key'];
-                })->implode('|')
-            ];
-        }
-
         $this->__afterConstruct($app, $request);
 
     }
@@ -408,12 +379,28 @@ abstract class BaseController extends CoreController
     public function forceDelete()
     {
         if ($this->repository->forceDelete($this->request->get('id'))) {
-            $this->fireEvent();
+            // $this->fireEvent();
 
-            return $this->respondWithSuccess(twillTrans('twill::lang.listing.force-delete.success', ['modelTitle' => $this->modelTitle]));
+            return $this->respondWithSuccess(__('listing.force-delete.success', ['modelTitle' => $this->modelTitle]));
         }
 
-        return $this->respondWithError(twillTrans('twill::lang.listing.force-delete.error', ['modelTitle' => $this->modelTitle]));
+        return $this->respondWithError(__('listing.force-delete.error', ['modelTitle' => $this->modelTitle]));
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function restore()
+    {
+
+        if ($this->repository->restore($this->request->get('id'))) {
+            // $this->fireEvent();
+            activity()->performedOn($this->repository->getById($this->request->get('id')))->log('restored');
+
+            return $this->respondWithSuccess(__('listing.restore.success', ['modelTitle' => $this->modelTitle]));
+        }
+
+        return $this->respondWithError(__('listing.restore.error', ['modelTitle' => $this->modelTitle]));
     }
 
     /**
@@ -430,11 +417,7 @@ abstract class BaseController extends CoreController
 
         $paginator->getCollection()->transform(function ($item) use($translated, $schema) {
 
-            // $columnsData = [];
-            // foreach ($this->indexTableColumns as $key => &$column) {
-            //     $columnsData = array_merge($columnsData, $this->getItemColumnData($item, $column));
-            // }
-            $columnsData = Collection::make($this->indexTableColumns)->mapWithKeys(function (&$column) use ($item) {
+            $columnsData = Collection::make($this->getIndexTableColumns())->mapWithKeys(function (&$column) use ($item) {
                 return $this->getItemColumnData($item, $column);
             })->toArray();
             $name = $columnsData[$this->titleColumnKey];
@@ -511,7 +494,6 @@ abstract class BaseController extends CoreController
      */
     protected function getItemColumnData($item, $column)
     {
-
         if (isset($column['thumb']) && $column['thumb']) {
             if (isset($column['present']) && $column['present']) {
                 return [
@@ -549,9 +531,15 @@ abstract class BaseController extends CoreController
             // $field = $column['key'];
             $relation = $item->{$matches[1]}();
             $itemTitle = $column['itemTitle'] ?? 'name';
-            $value = collect($relation->get())
-                ->pluck($itemTitle)
-                ->join(', ');
+
+            try {
+                //code...
+                $value = collect($relation->get())
+                    ->pluck($itemTitle)
+                    ->join(', ');
+            } catch (\Throwable $th) {
+                dd($relation, $column, $matches, $th);
+            }
         }
 
         if (isset($column['relationship'])) {
@@ -706,5 +694,39 @@ abstract class BaseController extends CoreController
     protected function getItemIdentifier($item)
     {
         return $item->{$this->identifierColumnKey};
+    }
+
+
+    /**
+     * @param int $id
+     * @param int|null $submoduleId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function duplicate($id, $submoduleId = null)
+    {
+        $params = $this->request->route()->parameters();
+
+        $id = last($params);
+
+        $item = $this->repository->getById($id);
+
+        if ($newItem = $this->repository->duplicate($id, $this->titleColumnKey, $this->formSchema)) {
+            // $this->fireEvent();
+            activity()->performedOn($item)->log('duplicated');
+
+            return Response::json([
+                'message' => __('listing.duplicate.success', ['modelTitle' => $this->modelTitle]),
+                'variant' => MessageStage::SUCCESS,
+                'target' => '_blank',
+                'redirector' => moduleRoute(
+                    $this->routeName,
+                    $this->routePrefix,
+                    'edit',
+                    array_filter([snakeCase($this->routeName) => $newItem->id])
+                ),
+            ]);
+        }
+
+        return $this->respondWithError(__('listing.duplicate.error', ['modelTitle' => $this->modelTitle]));
     }
 }
