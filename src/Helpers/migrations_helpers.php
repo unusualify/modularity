@@ -154,26 +154,28 @@ if (!function_exists('createDefaultRelationshipTableFields')) {
             $table2NamePlural = Str::plural($table2NameSingular);
         }
 
-        $table->{unusualIntegerMethod()}("{$table1NameSingular}_id")->unsigned();
-        $table->{unusualIntegerMethod()}("{$table2NameSingular}_id")->unsigned();
+        $table1ForeignKey = "{$table1NameSingular}_id";
+        $table2ForeignKey = "{$table2NameSingular}_id";
 
-        $table1IndexName = $table1NameSingular;
-        $table2IndexName = $table2NameSingular;
+        // $table->{unusualIntegerMethod()}("{$table1NameSingular}_id")->unsigned();
+        // $table->{unusualIntegerMethod()}("{$table2NameSingular}_id")->unsigned();
+        // $table1IndexName = $table1NameSingular;
+        // $table2IndexName = $table2NameSingular;
+        // if( strlen($table1IndexName) > 12){
+        //     $shortcut = abbreviation($table1IndexName);
+        //     $table1IndexName = "{$shortcut}";
+        // }
+        // if( strlen($table2IndexName) > 12){
+        //     $shortcut = abbreviation($table2IndexName);
+        //     $table2IndexName= "{$shortcut}";
+        // }
+        // $table->foreign("{$table1NameSingular}_id", "fk_{$table1NameSingular}_{$table2NameSingular}_{$table1IndexName}_id")->references('id')->on($table1NamePlural)->onDelete('cascade');
+        // $table->foreign("{$table2NameSingular}_id", "fk_{$table1NameSingular}_{$table2NameSingular}_{$table2IndexName}_id")->references('id')->on($table2NamePlural)->onDelete('cascade');
+        // $table->index(["{$table2NameSingular}_id", "{$table1NameSingular}_id"], "idx_{$table1IndexName}_{$table2IndexName}_" . Str::random(5));
 
-        if( strlen($table1IndexName) > 12){
-            $shortcut = abbreviation($table1IndexName);
-            $table1IndexName = "{$shortcut}";
-        }
-
-        if( strlen($table2IndexName) > 12){
-            $shortcut = abbreviation($table2IndexName);
-            $table2IndexName= "{$shortcut}";
-        }
-
-        $table->foreign("{$table1NameSingular}_id", "fk_{$table1NameSingular}_{$table2NameSingular}_{$table1IndexName}_id")->references('id')->on($table1NamePlural)->onDelete('cascade');
-        $table->foreign("{$table2NameSingular}_id", "fk_{$table1NameSingular}_{$table2NameSingular}_{$table2IndexName}_id")->references('id')->on($table2NamePlural)->onDelete('cascade');
-
-        $table->index(["{$table2NameSingular}_id", "{$table1NameSingular}_id"], "idx_{$table1IndexName}_{$table2IndexName}_" . Str::random(5));
+        $table->foreignId($table1ForeignKey);
+        $table->foreignId($table2ForeignKey);
+        $table->primary([$table1ForeignKey, $table2ForeignKey]);
     }
 }
 
