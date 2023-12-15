@@ -116,4 +116,8 @@ class User extends Authenticatable
         return $query->whereNotNull("{$this->getTable()}.company_id");
     }
 
+    public function isClient() {
+        return preg_match('/client-/', $this->roles[0]->name);
+    }
+
 }

@@ -29,23 +29,27 @@ class NavigationMiddleware
         view()->composer( [unusualBaseKey()."::layouts.master", 'translation::layout'], function ($view)
         {
 
-            $configuration = [
+            $navigation = [
                 'current_url' => url()->current(),
                 'sidebar' => [],
                 'breadcrumbs' => []
             ];
 
+            // dd(
+            //     config(unusualBaseKey() .'-navigation.sidebar')
+            // );
+
             $user = auth()->user();
 
-            if(count($user->roles) > 0 && preg_match('/client-/', $user->roles[0]->name)){
-                $configuration['sidebar'] = config(unusualBaseKey() .'-navigation.sidebar.client');
+            if(count($user->roles) > 0 && $user->isClient()){
+                $navigation['sidebar'] = config(unusualBaseKey() .'-navigation.sidebar.client');
             }else if($user->hasRole(1)) {
-                $configuration['sidebar'] = config(unusualBaseKey() .'-navigation.sidebar.superadmin');
+                $navigation['sidebar'] = config(unusualBaseKey() .'-navigation.sidebar.superadmin');
             }else{
-                $configuration['sidebar'] = config(unusualBaseKey() .'-navigation.sidebar.default');
+                $navigation['sidebar'] = config(unusualBaseKey() .'-navigation.sidebar.default');
             }
             // setActiveMenuItem($configuration['sidebar'], $configuration['current_url']);
-            $view->with('configuration', $configuration);
+            $view->with('navigation', $navigation);
         });
 
         return $next($request);
