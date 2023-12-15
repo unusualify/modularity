@@ -79,7 +79,6 @@ class Finder
     public function getRepository($table)
     {
         $class = '';
-        // dd( array_filter( glob( base_path( config('modules.namespace')).'/*'), 'is_dir') );
 
         foreach (array_filter( glob( base_path( config('modules.namespace')).'/*'), 'is_dir') as $module_path) {
 
@@ -106,6 +105,28 @@ class Finder
         }
 
         if($class !== '') return $class;
+
+        return false;
+    }
+
+    public function getRouteRepository($routeName)
+    {
+        $class = '';
+
+        foreach (array_filter( glob( base_path( config('modules.namespace')).'/*'), 'is_dir') as $module_path) {
+
+            if( !file_exists( $module_path.'/Repositories') ) continue;
+
+            foreach($this->getClasses( $module_path.'/Repositories' ) as $_class){
+                if(get_class_short_name(App::make($_class)) === $this->getStudlyName($routeName). 'Repository'){
+                    $class = $_class;
+                    break 2;
+                }
+            }
+        }
+
+        if($class !== '') return $class;
+
 
         return false;
     }
