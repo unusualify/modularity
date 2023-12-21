@@ -63,20 +63,41 @@ trait FilesTrait
     {
         $files = Collection::make();
 
+        $system_locales = getLocales();
+
         $files_roles = $this->getFileColumns();
 
-
         foreach($files_roles as $role){
-            if(isset($fields[$role])){
-                foreach($fields[$role] as $locale => $filesForRole){
-                    Collection::make($filesForRole)->each(function ($file) use (&$files, $role, $locale) {
-                        $files->push([
-                            'id' => $file['id'],
-                            'role' => $role,
-                            'locale' => $locale,
-                        ]);
-                    });
+            if(isset($fields[$role]) && count(array_keys($fields[$role])) > 0){
+                $default_locale = array_keys($fields[$role])[0];
+                foreach (getLocales() as $locale) {
+                    if(isset($fields[$role][$locale])){
+                        Collection::make($fields[$role][$locale])->each(function ($file) use (&$files, $role, $locale) {
+                            $files->push([
+                                'id' => $file['id'],
+                                'role' => $role,
+                                'locale' => $locale,
+                            ]);
+                        });
+                    }else {
+                        Collection::make($fields[$role][$default_locale])->each(function ($file) use (&$files, $role, $locale) {
+                            $files->push([
+                                'id' => $file['id'],
+                                'role' => $role,
+                                'locale' => $locale,
+                            ]);
+                        });
+                    }
                 }
+                // foreach($fields[$role] as $locale => $filesForRole){
+                //     Collection::make($filesForRole)->each(function ($file) use (&$files, $role, $locale) {
+                //         $files->push([
+                //             'id' => $file['id'],
+                //             'role' => $role,
+                //             'locale' => $locale,
+                //         ]);
+                //     });
+                // }
             }
         }
 
@@ -121,9 +142,7 @@ trait FilesTrait
         // dd($object, $fields, $this->getFileColumns());
         // $fields['files'] = null;
 
-        // dd(
-        //     $this->getFilesColumns()
-        // );
+        // dd($object, $this->getFileColumns(), $object->has('files'), $object->files->groupBy('pivot.role'));
         if ($object->has('files')) {
             foreach ($object->files->groupBy('pivot.role') as $role => $filesByRole) {
                 // dd($role, $filesByRole);
