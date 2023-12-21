@@ -42,7 +42,6 @@
     php artisan unusual:migrate:refresh Package
 
     php artisan iseed sp_roles
-    php artisan db:seed --class="\\Unusualify\\Modularity\\Database\\Seeders\\DefaultPermissionsSeeder"
 
 ```
 
@@ -55,3 +54,29 @@
     $1Handle$2
     ./crm_basic/Modules
 ```
+
+### REGEX FILTERS
+
+from
+    (?<=[Config::get\(|config\(])\s?'base\.
+    (?<=[Config::get\(|config\(])\s?\\Illuminate\\Support\\Str::snake\(env\('UNUSUAL_BASE_NAME',\s?'Base'\)\)\s?\.\s?'\.
+    (?<=[Config::get\(|config\(])\s?Str::snake\(env\('UNUSUAL_BASE_NAME',\s?'Base'\)\)\s?\.\s?'\.
+    (?<=[Config::get\(|config\(])\s?getUnusualBaseKey\(\)\s?\.\s?'\.
+to 
+    \Illuminate\Support\Str::snake(env('UNUSUAL_BASE_NAME', 'Base')) . '.
+    unusualBaseKey() . '.
+
+from 
+    ["'](base)(::[A-Za-z\$\->\.]*)["']
+    (?<=")(base)(?=::[A-Za-z\$\->\.]*")
+to
+    "$1$2"
+    "$BASE_KEY$2"
+    "{$this->baseKey}$2"
+
+for seeders
+([0-9]{0,3}\s=>[\s|\n|\r\n]+)?array[\s]?\((.*) [
+([\s|\n|\r\n]+)(\),)  $1],
+([\s|\n|\r\n]+)('id'\s=>\s[0-9]{0,3},?)
+([\s|\n|\r\n]+)('created_at'\s=>\s(.*),?)
+([\s|\n|\r\n]+)('updated_at'\s=>\s(.*),?)
