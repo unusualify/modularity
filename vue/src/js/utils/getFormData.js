@@ -182,7 +182,7 @@ export const getFormData_ = (rootState) => {
   return data
 }
 
-export const getSchemaModel = (inputs, item = null) => {
+export const getSchemaModel_ = (inputs, item = null) => {
   // __log(window[process.env.VUE_APP_NAME].STORE.languages.all)
   const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist'
   const editing = __isset(item) && !!item.id
@@ -250,7 +250,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
           // __log('mediable', name, item)
           fields[name] = item[name]
         } else {
-          fields[name] = { tr: [] }
+          fields[name] = { tr: [], en: [] }
         }
       } else if (Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated) { // translations
         fields[name] = languages.reduce(function (map, lang) {
