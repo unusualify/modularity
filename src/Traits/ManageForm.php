@@ -7,8 +7,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Arr;
 use Unusualify\Priceable\Models\Currency;
-use Unusualify\Priceable\Models\PriceType;
-use Unusualify\Priceable\Models\VatRate;
 
 trait ManageForm {
 
