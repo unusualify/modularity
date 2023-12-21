@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
-use Unusualify\Modularity\Facades\Modularity;
 
 class DefaultPermissionsSeeder extends Seeder
 {

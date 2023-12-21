@@ -4,7 +4,7 @@ namespace Unusualify\Modularity\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Support\Facades\Schema;
 class DefaultUsersSeeder extends Seeder
 {
     /**
@@ -18,7 +18,11 @@ class DefaultUsersSeeder extends Seeder
 
         $table = unusualConfig('tables.users');
 
+        Schema::disableForeignKeyConstraints();
+
         \DB::table($table)->truncate();
+
+        Schema::enableForeignKeyConstraints();
 
         \DB::table($table)->insert([
             [
@@ -31,7 +35,6 @@ class DefaultUsersSeeder extends Seeder
                 'language' => 'en',
                 'timezone' => 'Europe/London',
                 'password' => '$2y$10$./.YS6k9clh6IU1cOdJLcuqqnY1FkxzjAcJ5Wv8qoQj6nYGV.fjqy',
-                'published' => 1,
             ],
             [
                 'id' => 2,
@@ -43,7 +46,6 @@ class DefaultUsersSeeder extends Seeder
                 'language' => 'en',
                 'timezone' => 'Europe/London',
                 'password' => '$2y$10$ldyuNCY./iLsXQRxslQs0ex8Bryf3VAVDK3.826plGqjhGqAgPqwS',
-                'published' => 1,
             ],
             // [
             //     'id' => 5,
@@ -64,5 +66,6 @@ class DefaultUsersSeeder extends Seeder
             //     'published' => 0,
             // ],
         ]);
+
     }
 }

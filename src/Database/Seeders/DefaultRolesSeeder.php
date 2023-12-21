@@ -1,10 +1,11 @@
 <?php
 
-namespace Database\Seeders;
+namespace Unusualify\Modularity\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Unusualify\Modularity\Entities\User;
 
-class SpRolesTableSeeder extends Seeder
+class DefaultRolesSeeder extends Seeder
 {
 
     /**
@@ -16,7 +17,7 @@ class SpRolesTableSeeder extends Seeder
     {
         $table = config('permission.table_names.roles');
 
-        \DB::table($table)->truncate();
+        // \DB::table($table)->truncate();
 
         \DB::table($table)->insert([
             [
@@ -48,5 +49,8 @@ class SpRolesTableSeeder extends Seeder
                 'guard_name' => 'unusual_users',
             ],
         ]);
+
+        User::find(1)->roles()->attach(1);
+
     }
 }
