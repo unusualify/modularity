@@ -20,6 +20,11 @@ class ConfigServiceProvider extends ServiceProvider
     {
         $this->registerModuleConfigs();
 
+        config([
+            'modules.cache.enabled' => true,
+            'modules.cache.key' => 'modularity',
+            'modules.cache.lifetime' => 600
+        ]);
     }
     /**
      * Register the service provider.
@@ -32,6 +37,8 @@ class ConfigServiceProvider extends ServiceProvider
         $this->registerHelpers();
 
         $this->registerConfigs();
+
+
 
     }
 
@@ -87,11 +94,11 @@ class ConfigServiceProvider extends ServiceProvider
             'modules.scan.enabled' => true,
             'modules.scan.paths' => $scan_paths
         ]);
-        config([
-            'modules.cache.enabled' => true,
-            'modules.cache.key' => 'modularity',
-            'modules.cache.lifetime' => 600
-        ]);
+        // config([
+        //     'modules.cache.enabled' => true,
+        //     'modules.cache.key' => 'modularity',
+        //     'modules.cache.lifetime' => 600
+        // ]);
 
 
         if (
