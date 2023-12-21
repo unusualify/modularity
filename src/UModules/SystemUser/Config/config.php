@@ -522,7 +522,7 @@ return [
                     'hide-spin-buttons',
 
                 ],
-                'permissions' => [
+                [
                     'type' => 'checklist',
                     'isTreeview' => true,
                     // 'type' => 'custom-input-treeview',
@@ -1034,7 +1034,6 @@ return [
                     'hide-spin-buttons',
                     // 'full-width',
                 ],
-
                 // [
                 //     'title' => 'Permission',
                 //     'name' => 'permissions',

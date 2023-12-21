@@ -13,86 +13,89 @@ if (!function_exists('unusualTrans')) {
     }
 }
 
+if(!function_exists('___')) {
+    function ___($key = null, $replace = [], $locale = null)
+    {
+        // Default behavior
+        if (is_null($key)) return $key;
 
-function ___($key = null, $replace = [], $locale = null)
-{
-    // Default behavior
-    if (is_null($key)) return $key;
+        // dd(
+        //     $key,
+        //     \Lang::has($key),
+        //     trans()->has($key),
+        //     trans('auth'),
+        //     trans('authentication'),
+        //     __($key),
+        //     trans()->get('*', [], config('app.fallback_locale')),
+        // );
 
-    // dd(
-    //     $key,
-    //     \Lang::has($key),
-    //     trans()->has($key),
-    //     trans('auth'),
-    //     trans('authentication'),
-    //     __($key),
-    //     trans()->get('*', [], config('app.fallback_locale')),
-    // );
+        // dd(
+        //     app('translator')
+        // );
+        // Search in .json file
+        $search = Arr::get(trans()->get('*'), $key);
 
-    // dd(
-    //     app('translator')
-    // );
-    // Search in .json file
-    $search = Arr::get(trans()->get('*'), $key);
+        if ($search !== null)
+            return trans_replacements($search, $replace);
 
-    if ($search !== null)
-        return trans_replacements($search, $replace);
+        if (trans()->has($key))
+            return trans($key, $replace, $locale);
 
-    if (trans()->has($key))
-        return trans($key, $replace, $locale);
-
-    // Return .json fallback
-    $fallback = Arr::get(trans()->get('*', [], config('app.fallback_locale')), $key);
-    if ($fallback !== null)
-        return trans_replacements($fallback, $replace);
-    // Return key name if not found
-    else
-        return $key;
-}
-
-/**
- * Determine if a translation exists.
- *
- * @param  string  $key
- * @param  string|null  $locale
- * @param  bool  $fallback
- * @return bool
- */
-function hasUnusualTrans($key, $locale = null, $fallback = true)
-{
-    $locale = $locale ?: App::getLocale();
-
-    $line = ___($key, [], $locale, $fallback);
-
-    dd(
-        $key,
-        $line
-    );
-    // For JSON translations, the loaded files will contain the correct line.
-    // Otherwise, we must assume we are handling typical translation file
-    // and check if the returned line is not the same as the given key.
-    // if (! is_null($this->loaded['*']['*'][$locale][$key] ?? null)) {
-    //     return true;
-    // }
-
-    return $line !== $key;
-}
-
-function trans_replacements($line, array $replace)
-{
-    if (empty($replace)) return $line;
-
-    $shouldReplace = [];
-    foreach ($replace as $key => $value) {
-        $shouldReplace[':'.Str::ucfirst($key)] = Str::ucfirst($value);
-        $shouldReplace[':'.Str::upper($key)] = Str::upper($value);
-        $shouldReplace[':'.$key] = $value;
-        $shouldReplace['{'.Str::ucfirst($key).'}'] = Str::ucfirst($value);
-        $shouldReplace['{'.Str::upper($key).'}'] = Str::upper($value);
-        $shouldReplace['{'.$key.'}'] = $value;
+        // Return .json fallback
+        $fallback = Arr::get(trans()->get('*', [], config('app.fallback_locale')), $key);
+        if ($fallback !== null)
+            return trans_replacements($fallback, $replace);
+        // Return key name if not found
+        else
+            return $key;
     }
+}
+if(!function_exists('hasUnusualTrans')) {
+    /**
+     * Determine if a translation exists.
+     *
+     * @param  string  $key
+     * @param  string|null  $locale
+     * @param  bool  $fallback
+     * @return bool
+     */
+    function hasUnusualTrans($key, $locale = null, $fallback = true)
+    {
+        $locale = $locale ?: App::getLocale();
 
-    return strtr($line, $shouldReplace);
+        $line = ___($key, [], $locale, $fallback);
+
+        dd(
+            $key,
+            $line
+        );
+        // For JSON translations, the loaded files will contain the correct line.
+        // Otherwise, we must assume we are handling typical translation file
+        // and check if the returned line is not the same as the given key.
+        // if (! is_null($this->loaded['*']['*'][$locale][$key] ?? null)) {
+        //     return true;
+        // }
+
+        return $line !== $key;
+    }
+}
+if(!function_exists('trans_replacements')) {
+    function trans_replacements($line, array $replace)
+    {
+        if (empty($replace)) return $line;
+
+        $shouldReplace = [];
+        foreach ($replace as $key => $value) {
+            $shouldReplace[':'.Str::ucfirst($key)] = Str::ucfirst($value);
+            $shouldReplace[':'.Str::upper($key)] = Str::upper($value);
+            $shouldReplace[':'.$key] = $value;
+            $shouldReplace['{'.Str::ucfirst($key).'}'] = Str::ucfirst($value);
+            $shouldReplace['{'.Str::upper($key).'}'] = Str::upper($value);
+            $shouldReplace['{'.$key.'}'] = $value;
+        }
+
+        return strtr($line, $shouldReplace);
+    }
 }
 
 // function trans_choice($key, $number, array $replace = [], $locale = null)
@@ -305,7 +308,6 @@ if (!function_exists('getCode2LanguageTexts')) {
         ];
     }
 }
-
 
 if (!function_exists('getLanguagesForVueStore')) {
     /**
