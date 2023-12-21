@@ -66,11 +66,6 @@ export default function useFile (props, context) {
   const store = useStore()
   const inputHook = useInput(props, context)
   const { modelValue, obj } = toRefs(props)
-  // __log(inputHook)
-  // __log(
-  //   store._modules.root.state,
-  //   props
-  // )
   const getters = mapGetters()
   const { t } = useI18n({ useScope: 'global' })
 
@@ -109,7 +104,9 @@ export default function useFile (props, context) {
     }),
     input: modelValue.value ?? [],
     isDraggable: computed(() => props.draggable && states.input.length > 1),
-    remainingItems: computed(() => props.max - states.input.length),
+    remainingItems: computed(() => {
+      return props.max - states.input.length
+    }),
     itemsIds: computed(() => {
       // const arrayOfIds = []
 
