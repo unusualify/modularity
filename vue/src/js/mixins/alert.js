@@ -25,7 +25,8 @@ export default {
     },
     ...mapState({
       type: state => state.alert.type,
-      message: state => state.alert.message
+      message: state => state.alert.message,
+      location: state => state.alert.location
     }),
     ...mapGetters([
     //   'defaultItem',

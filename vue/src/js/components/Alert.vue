@@ -3,6 +3,7 @@
     v-model="show"
     :timeout="timeout"
     :color="type"
+    :location="location"
     >
     <template v-slot:actions>
       <!-- <v-icon
