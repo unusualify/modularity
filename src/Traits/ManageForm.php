@@ -6,6 +6,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Arr;
+use Unusualify\Priceable\Models\Currency;
+use Unusualify\Priceable\Models\PriceType;
+use Unusualify\Priceable\Models\VatRate;
 
 trait ManageForm {
 
@@ -139,7 +142,7 @@ trait ManageForm {
                     }
                 }
 
-                $data=  Arr::except($input, ['route','model', 'repository']) + [
+                $data =  Arr::except($input, ['route','model', 'repository']) + [
                     'items' => $items
                 ];
 
@@ -235,29 +238,31 @@ trait ManageForm {
                 $relation_class= null;
 
                 $input['type'] = 'custom-input-repeater';
-                if( $input['orderable'] ?? false){
+                if( $input['draggable'] ?? false){
                     $input['orderKey'] ??= 'position';
                 }
-                $input['col'] ??= [
+
+                $default_repeater_col = [
                     'cols' => 12,
                     'sm' => 12,
                     'md' => 12,
                     'lg' => 12,
                     'xl' => 12
                 ];
+                $input['col'] = array_merge_recursive_preserve($default_repeater_col, $input['col'] ?? []);
 
                 if(array_key_exists('schema', $input)){
                     $inputStudlyName = '';
                     $inputSnakeName = '';
 
-                    if($input['repository']){
+                    if(isset($input['repository'])){
                         if( preg_match( '/(\w+)Repository/', get_class_short_name($input['repository']), $matches)){
                             $relation_class = App::make($input['repository']);
                             $inputStudlyName = $matches[1];
                             $inputSnakeName = $this->getSnakeCase($inputStudlyName);
                             $inputCamelName = $this->getCamelCase($inputStudlyName);
                         }
-                    } else if($input['model']){
+                    } else if(isset($input['model'])){
                         if( preg_match( '/(\w+)/', get_class_short_name($input['model']), $matches)){
                             dd($matches);
                             $relation_class = App::make($input['model']);
@@ -340,6 +345,91 @@ trait ManageForm {
                     }
                     $data = array_reverse($data);
                 }
+            break;
+            case 'price1':
+                $input['name'] ??= 'prices';
+                $input['default'] ??= [];
+                                // $input['types'] = PriceType::all()->toArray();
+                // $input['vatRates'] = VatRate::all()->toArray();
+                // $input['currencies'] = Currency::all()->toArray();
+
+                $input['label'] ??= __('Prices');
+                $input['type'] = 'repeater';
+                $input['max'] = 2;
+                $input['min'] = 1;
+                $input['rowAttribute'] = [
+                    'noGutters' => true,
+                ];
+                $input['draggable'] = false;
+                $input['col'] = [
+                    'xl' => 3,
+                    'lg' => 4,
+                ];
+
+                $input['schema'] = [
+                    'display_price' => [
+                        'type' => 'text',
+                        'name' => 'display_price',
+                        'default' => '',
+                        'col' => [
+                            'cols' => 8,
+                            'lg' => 10,
+                            'class' => '',
+                        ],
+                        'variant' => 'solo',
+                        'hideDetails' => true,
+                        'rules' => [
+                            ['required'],
+                        ],
+                    ],
+                    'currency_id' => [
+                        'type' => 'select',
+                        'name' => 'currency_id',
+                        'class' => '',
+                        'default' => 1,
+                        'col' => [
+                            'cols' => 4,
+                            'lg' => 2,
+                            'class' => '',
+                        ],
+                        'menuIcon' => '',
+                        'variant' => 'solo',
+                        'hideDetails' => true,
+                        'returnObject' => false,
+                        'clearable' => false,
+                        'style' => 'border-radius: 0px;',
+                        'itemValue' => 'id',
+                        'itemTitle' => 'name',
+                        'items' => Currency::query()->select(['id', 'symbol as name'])->get()->toArray(),
+                    ],
+                ];
+
+                $data = $this->createFormSchema([$input])[$input['name']];
+                // dd($data);
+            break;
+            case 'price':
+                $input['name'] ??= 'prices';
+                $input['type'] = 'custom-input-price';
+                $input['default'] ??= [];
+                // $input['types'] = PriceType::all()->toArray();
+                // $input['vatRates'] = VatRate::all()->toArray();
+                $input['currencies'] = Currency::query()->select(['id', 'symbol as name'])->get()->toArray();
+
+                $input['label'] ??= __('Prices');
+
+                $data = $input;
+                // dd($data);
+            break;
+            case 'file':
+                $input['name'] ??= 'files';
+                $input['type'] = 'custom-input-file';
+                $input['translated'] = true;
+                $input['default'] ??= [];
+
+                $input['label'] ??= __('Files');
+
+                $data = $input;
+                // dd($data);
             break;
             default:
 
