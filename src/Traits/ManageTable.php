@@ -88,7 +88,7 @@ trait ManageTable {
 
         $fillables = $this->repository->getFillable();
 
-        if(in_array('published', $fillables)){
+        if(in_array('published', $fillables) && $this->repository->hasColumn('published')){
             $statusFilters[] = [
                 'name' => ___("listing.filter.published"),
                 'slug' => 'published',

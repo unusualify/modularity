@@ -75,4 +75,8 @@ trait HasHelpers
 
         return true;
     }
+
+    public function hasColumn($column){
+        return $this->getConnection()->getSchemaBuilder()->hasColumn($this->getTable(), $column);
+    }
 }
