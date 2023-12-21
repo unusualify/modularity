@@ -262,7 +262,7 @@ export default {
     // },
     model: {
       handler (value, oldValue) {
-        __log('model watcher', value, oldValue)
+        // __log('model watcher', value, oldValue)
       },
       deep: true
     },

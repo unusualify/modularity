@@ -3,10 +3,10 @@
     <template v-if="languages && languages.length && languages.length > 0">
       <template v-for="language in languages" :key="language.value">
         <component
-            v-bind:is="`${type}`"
-            :class="[language.value === currentLocale.value || isCustomForm ? '' : 'd-none']"
-            v-bind="attributesPerLang[language.value]"
-            @update:modelValue="modelUpdated($event, language.value)"
+          v-bind:is="`${type}`"
+          :class="[language.value === currentLocale.value || isCustomForm ? '' : 'd-none']"
+          v-bind="attributesPerLang[language.value]"
+          @update:modelValue="modelUpdated($event, language.value)"
           >
           <template v-slot:append>
             <!-- <v-tooltip
@@ -37,13 +37,14 @@
       </template>
     </template>
     <template v-else>
-      <component v-bind:is="`${type}`"
-                 :name="attributes.name"
-                 v-bind="attributesNoLang()"
-                 @change="updateValue(false, ...arguments)"
-                 @blur="$emit('blur')"
-                 @focus="$emit('focus')"
-      >
+      <component
+        v-bind:is="`${type}`"
+        :name="attributes.name"
+        v-bind="attributesNoLang()"
+        @change="updateValue(false, ...arguments)"
+        @blur="$emit('blur')"
+        @focus="$emit('focus')"
+        >
         <slot></slot>
       </component>
     </template>

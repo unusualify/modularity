@@ -230,7 +230,7 @@ export default {
   },
 
   created () {
-    __log(this.items)
+    // __log(this.items)
   }
 }
 </script>

@@ -22,9 +22,7 @@
   </div> -->
   <v-input
     hideDetails="auto"
-    :messages="['Messages']"
     appendIcon="mdi-close"
-    prependIcon="mdi-phone"
   >
     <div class="fileField">
       <div class="fileField__trigger" v-if="buttonOnTop && remainingItems">
@@ -101,7 +99,7 @@ export default {
     }
   },
   created () {
-    // __log(this.$root)
+    // __log(this.name)
   },
   methods: {
     openMediaLibrary: function (max = 1, name = this.name, index = -1) {
