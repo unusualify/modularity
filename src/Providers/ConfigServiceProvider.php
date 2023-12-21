@@ -18,7 +18,8 @@ class ConfigServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerConfigs();
+        $this->registerModuleConfigs();
+
     }
     /**
      * Register the service provider.
@@ -28,6 +29,10 @@ class ConfigServiceProvider extends ServiceProvider
     public function register()
     {
         // $this->publishConfigs();
+        $this->registerHelpers();
+
+        $this->registerConfigs();
+
     }
 
     /**
@@ -100,9 +105,16 @@ class ConfigServiceProvider extends ServiceProvider
             && config(unusualBaseKey() . '.file_library.disk') === unusualBaseKey() . '_file_library') {
             $this->setLocalDiskUrl('file');
         }
+    }
 
-
-        $this->registerModuleConfigs();
+    /**
+     * {@inheritdoc}
+     */
+    private function registerHelpers()
+    {
+        foreach (glob( __DIR__ . '/../Helpers/*.php') as $file) {
+            require_once $file;
+        }
     }
 
     /**

@@ -34,6 +34,10 @@ class BaseServiceProvider extends ServiceProvider
                 return $this->app->make(config($this->baseKey . '.file_library.file_service'));
             });
         }
+
+        $this->macros();
+
+        $this->commands($this->resolveCommands());
     }
 
     /**
@@ -43,12 +47,6 @@ class BaseServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->registerHelpers();
-
-        $this->macros();
-
-        $this->commands($this->resolveCommands());
-
         // $this->app->singleton(\Unusualify\Modularity\Contracts\RepositoryInterface::class, function ($app) {
         $this->app->singleton('unusual.modularity', function ($app) {
             $path = $app['config']->get('modules.paths.modules');
@@ -97,16 +95,6 @@ class BaseServiceProvider extends ServiceProvider
             }
         }
         return $paths;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    private function registerHelpers()
-    {
-        foreach (glob( __DIR__ . '/../Helpers/*.php') as $file) {
-            require_once $file;
-        }
     }
 
     /**
