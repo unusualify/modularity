@@ -15,10 +15,20 @@ import {
   useInput
 } from '@/hooks'
 
+import { ALERT } from '@/store/mutations'
+
 export const makeRepeaterProps = propsFactory({
   ...makeInputProps(),
   modelValue: {
     type: Array
+  },
+  max: {
+    type: Number,
+    default: -1
+  },
+  min: {
+    type: Number,
+    default: -1
   },
   label: {
     type: String,
@@ -115,12 +125,21 @@ export default function useRepeater (props, context) {
   }
 
   const state = reactive({
-    repeaterInputs_: hydrateRepeaterInputs(modelValue.value),
-    repeaterInputs__: computed(() => hydrateRepeaterInputs(modelValue.value)),
+    // repeaterInputs_: hydrateRepeaterInputs(modelValue.value),
+    // repeaterInputs__: computed(() => hydrateRepeaterInputs(modelValue.value)),
     repeaterInputs: computed({
       get: () => {
-        // __log('repeaterInputs getter')
-        return hydrateRepeaterInputs(modelValue.value)
+        // return hydrateRepeaterInputs(modelValue.value ?? [])
+
+        const initialRepeats = hydrateRepeaterInputs(modelValue.value ?? [])
+
+        if (props.min > 0 && initialRepeats.length < props.min) {
+          const schema = invokeRuleGenerator(cloneDeep(props.schema))
+
+          initialRepeats.push(hydrateRepeaterInput(getModel(schema), 1))
+        }
+
+        return initialRepeats
       },
       set: (val, old) => {
         __log(
@@ -132,6 +151,10 @@ export default function useRepeater (props, context) {
         inputHook.updateModelValue.value(parseRepeaterInputs(val))
       }
     }),
+
+    numberRepeats: computed(() => state.repeaterInputs.length),
+    isAddible: computed(() => (props.max < 1) || state.numberRepeats < props.max),
+    isDeletable: computed(() => (props.min < 1) || state.numberRepeats > props.min),
     // repeaterSchemas_: computed({
     //   get: () => {
     //     // __log('repeaterSchemas getter', hydrateSchemas(state.repeaterInputs))
@@ -166,6 +189,7 @@ export default function useRepeater (props, context) {
   })
 
   const methods = reactive({
+
     onUpdateRepeaterInput (value, index) {
       modelValue.value[index] = parseRepeaterInput(value, index)
       // __log('onUpdateRepeaterInput', value, index)
@@ -175,25 +199,35 @@ export default function useRepeater (props, context) {
       // __log('onHoverContent', index)
     },
     addRepeaterBlock: function () {
-      const schema = invokeRuleGenerator(cloneDeep(props.schema))
+      if (state.isAddible) {
+        const schema = invokeRuleGenerator(cloneDeep(props.schema))
 
-      const repeaterCount = state.repeaterInputs.length
-
-      modelValue.value.push(hydrateRepeaterInput(getModel(schema), repeaterCount))
+        modelValue.value.push(hydrateRepeaterInput(getModel(schema), state.numberRepeats))
+      } else {
+        store.commit(ALERT.SET_ALERT, { message: `You cannot add new item, because the number of elements should be at much ${props.max}`, variant: 'warning', location: 'top' })
+      }
     },
     deleteRepeaterBlock: function (index) {
-      const newModel = parseRepeaterInputs(state.repeaterInputs)
+      if (state.isDeletable) {
+        const newModel = parseRepeaterInputs(state.repeaterInputs)
 
-      newModel.splice(index, 1)
+        newModel.splice(index, 1)
 
-      state.repeaterInputs = hydrateRepeaterInputs(newModel)
+        state.repeaterInputs = hydrateRepeaterInputs(newModel)
+      } else {
+        store.commit(ALERT.SET_ALERT, { message: `You cannot delete, because the number of elements should be at least ${props.min}`, variant: 'warning', location: 'top' })
+      }
     },
     duplicateRepeaterBlock: function (index) {
-      const newModel = parseRepeaterInputs(state.repeaterInputs)
+      if (state.isAddible) {
+        const newModel = parseRepeaterInputs(state.repeaterInputs)
 
-      newModel.push(newModel[index])
+        newModel.push(newModel[index])
 
-      state.repeaterInputs = hydrateRepeaterInputs(newModel)
+        state.repeaterInputs = hydrateRepeaterInputs(newModel)
+      } else {
+        store.commit(ALERT.SET_ALERT, { message: `You cannot add new item, because the number of elements should be at much ${props.max}`, variant: 'warning', location: 'top' })
+      }
     }
   })
 
