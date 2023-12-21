@@ -6,9 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\View;
-use Modules\Package\Repositories\PackageContinentRepository;
-use Modules\PressRelease\Entities\PressRelease;
-use Modules\PressRelease\Repositories\PressReleaseRepository;
+// use Modules\Package\Repositories\PackageContinentRepository;
+// use Modules\PressRelease\Entities\PressRelease;
+// use Modules\PressRelease\Repositories\PressReleaseRepository;
 use Unusualify\Modularity\Entities\Enums\Permission;
 
 class DashboardController extends BaseController
@@ -70,156 +70,156 @@ class DashboardController extends BaseController
 
                     ],
                 ],
-                [
-                    'component' => 'table',
-                    'col' => [
-                        'cols' => 12,
-                        'xxl' => 3,
-                        'xl' => 4,
-                        'lg' => 4,
-                        'class' => 'pl-theme-semi pb-theme-semi'
-                    ],
-                    'attributes' => [
-                        'name' => 'pressRelease',
-                        'title-key' => '',
-                        'custom-header' => 'Recent Revisions',
-                        'hide-headers' => true,
-                        'fullWidthWrapper' => true,
-                        'style' => 'min-height: 100%',
-                        'items' =>  App::make(PackageContinentRepository::class)->get([], [], [
-                            'created_at' => 'desc'
-                        ], 2)->items(),
-                        'columns' => [
-                            [
-                                'title' => 'name',
-                                'key' => 'name',
-                                'align' => 'start',
-                                'sortable' => false,
-                                'filterable' => false,
-                                'groupable' => false,
-                                'divider' => false,
-                                'class' => '',
-                                'cellClass' => '',
-                                'width' => '',
-                                'searchable' => true,
-                                'isRowEditable' => true,
-                                'isColumnEditable' => false,
-                                // 'formatter' => ['date', 'numeric'],
-                            ],
-                            [
-                                'title' => 'Headline',
-                                'key' => 'headline',
-                                'align' => 'start',
-                                'sortable' => false,
-                                'filterable' => false,
-                                'groupable' => false,
-                                'divider' => false,
-                                'class' => '',
-                                'cellClass' => '',
-                                'width' => '',
-                                'searchable' => true,
-                                'isRowEditable' => true,
-                                'isColumnEditable' => false,
-                                'formatter' => [],
-                            ]
-                        ],
-                        'table-options' => [
-                            'page'          => 1,
-                            'itemsPerPage'  => 2,
-                            'sortBy'        => [],
-                            'multiSort'     => false,
-                            'mustSort'      => false,
-                            'groupBy'       => [],
-                        ],
-                        'slots' => [
-                            'bottom' => [
-                                'elements' => [
-                                    [
-                                        'tag' => 'div',
-                                        'attributes' => [
-                                            'class' => 'text-right pa-8',
-                                        ],
-                                        'elements' => [
-                                            [
-                                                'tag' => 'v-btn-tertiary',
-                                                'elements' => 'MANAGE RELEASES'
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                ],
-                [
-                    'component' => 'table',
-                    'col' => [
-                        'cols' => 12,
-                        'xxl' => 6,
-                        'xl' => 8,
-                        'lg' => 8,
-                        'class' => 'pr-theme-semi pt-theme-semi'
+                // [
+                //     'component' => 'table',
+                //     'col' => [
+                //         'cols' => 12,
+                //         'xxl' => 3,
+                //         'xl' => 4,
+                //         'lg' => 4,
+                //         'class' => 'pl-theme-semi pb-theme-semi'
+                //     ],
+                //     'attributes' => [
+                //         'name' => 'pressRelease',
+                //         'title-key' => '',
+                //         'custom-header' => 'Recent Revisions',
+                //         'hide-headers' => true,
+                //         'fullWidthWrapper' => true,
+                //         'style' => 'min-height: 100%',
+                //         'items' =>  App::make(PackageContinentRepository::class)->get([], [], [
+                //             'created_at' => 'desc'
+                //         ], 2)->items(),
+                //         'columns' => [
+                //             [
+                //                 'title' => 'name',
+                //                 'key' => 'name',
+                //                 'align' => 'start',
+                //                 'sortable' => false,
+                //                 'filterable' => false,
+                //                 'groupable' => false,
+                //                 'divider' => false,
+                //                 'class' => '',
+                //                 'cellClass' => '',
+                //                 'width' => '',
+                //                 'searchable' => true,
+                //                 'isRowEditable' => true,
+                //                 'isColumnEditable' => false,
+                //                 // 'formatter' => ['date', 'numeric'],
+                //             ],
+                //             [
+                //                 'title' => 'Headline',
+                //                 'key' => 'headline',
+                //                 'align' => 'start',
+                //                 'sortable' => false,
+                //                 'filterable' => false,
+                //                 'groupable' => false,
+                //                 'divider' => false,
+                //                 'class' => '',
+                //                 'cellClass' => '',
+                //                 'width' => '',
+                //                 'searchable' => true,
+                //                 'isRowEditable' => true,
+                //                 'isColumnEditable' => false,
+                //                 'formatter' => [],
+                //             ]
+                //         ],
+                //         'table-options' => [
+                //             'page'          => 1,
+                //             'itemsPerPage'  => 2,
+                //             'sortBy'        => [],
+                //             'multiSort'     => false,
+                //             'mustSort'      => false,
+                //             'groupBy'       => [],
+                //         ],
+                //         'slots' => [
+                //             'bottom' => [
+                //                 'elements' => [
+                //                     [
+                //                         'tag' => 'div',
+                //                         'attributes' => [
+                //                             'class' => 'text-right pa-8',
+                //                         ],
+                //                         'elements' => [
+                //                             [
+                //                                 'tag' => 'v-btn-tertiary',
+                //                                 'elements' => 'MANAGE RELEASES'
+                //                             ]
+                //                         ]
+                //                     ]
+                //                 ]
+                //             ]
+                //         ]
+                //     ],
+                // ],
+                // [
+                //     'component' => 'table',
+                //     'col' => [
+                //         'cols' => 12,
+                //         'xxl' => 6,
+                //         'xl' => 8,
+                //         'lg' => 8,
+                //         'class' => 'pr-theme-semi pt-theme-semi'
 
-                    ],
-                    'attributes' => [
-                        'name' => 'pressRelease',
-                        'title-key' => '',
-                        'custom-header' => 'Recently Published',
-                        'fullWidthWrapper' => true,
-                        'style' => 'min-height: 100%',
-                        'items' =>  App::make(PackageContinentRepository::class)->get([], [], [
-                            'created_at' => 'desc'
-                        ], 8)->items(),
-                        'columns' => [
-                            [
-                                'title' => 'Name',
-                                'key' => 'name',
-                                'align' => 'start',
-                                // 'formatter' => [
-                                //     'edit'
-                                // ]
-                            ],
-                            [
-                                'title' => 'PR Headline',
-                                'key' => 'headline',
-                                'align' => 'start',
-                            ]
-                        ],
-                        'table-options' => [
-                            'page'          => 1,
-                            'itemsPerPage'  => 8,
-                            'sortBy'        => [],
-                            'multiSort'     => false,
-                            'mustSort'      => false,
-                            'groupBy'       => [],
-                        ],
-                        'slots' => [
-                            'bottom' => [
-                                'elements' => [
-                                    [
-                                        'tag' => 'div',
-                                        'attributes' => [
-                                            'class' => 'text-right pa-8',
-                                        ],
-                                        'elements' => [
-                                            [
-                                                'tag' => 'v-btn-secondary',
-                                                'attributes' => [
-                                                    'class' => 'mr-5'
-                                                ],
-                                                'elements' => 'CONTINUE IN PROGRESS'
-                                            ],
-                                            [
-                                                'tag' => 'v-btn',
-                                                'elements' => 'CREATE PRESS RELEASE'
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                ],
+                //     ],
+                //     'attributes' => [
+                //         'name' => 'pressRelease',
+                //         'title-key' => '',
+                //         'custom-header' => 'Recently Published',
+                //         'fullWidthWrapper' => true,
+                //         'style' => 'min-height: 100%',
+                //         'items' =>  App::make(PackageContinentRepository::class)->get([], [], [
+                //             'created_at' => 'desc'
+                //         ], 8)->items(),
+                //         'columns' => [
+                //             [
+                //                 'title' => 'Name',
+                //                 'key' => 'name',
+                //                 'align' => 'start',
+                //                 // 'formatter' => [
+                //                 //     'edit'
+                //                 // ]
+                //             ],
+                //             [
+                //                 'title' => 'PR Headline',
+                //                 'key' => 'headline',
+                //                 'align' => 'start',
+                //             ]
+                //         ],
+                //         'table-options' => [
+                //             'page'          => 1,
+                //             'itemsPerPage'  => 8,
+                //             'sortBy'        => [],
+                //             'multiSort'     => false,
+                //             'mustSort'      => false,
+                //             'groupBy'       => [],
+                //         ],
+                //         'slots' => [
+                //             'bottom' => [
+                //                 'elements' => [
+                //                     [
+                //                         'tag' => 'div',
+                //                         'attributes' => [
+                //                             'class' => 'text-right pa-8',
+                //                         ],
+                //                         'elements' => [
+                //                             [
+                //                                 'tag' => 'v-btn-secondary',
+                //                                 'attributes' => [
+                //                                     'class' => 'mr-5'
+                //                                 ],
+                //                                 'elements' => 'CONTINUE IN PROGRESS'
+                //                             ],
+                //                             [
+                //                                 'tag' => 'v-btn',
+                //                                 'elements' => 'CREATE PRESS RELEASE'
+                //                             ]
+                //                         ]
+                //                     ]
+                //                 ]
+                //             ]
+                //         ]
+                //     ],
+                // ],
             ]
         ];
         // dd($data['blocks']);
