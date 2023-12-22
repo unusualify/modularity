@@ -1,10 +1,9 @@
 <template>
   <v-text-field
     v-bind="$attrs"
-    v-model="input[priceInputName]"
     >
     <template v-slot:append-inner="{isActive, isFocused, controlRef, focus, blur}">
-      <v-chip @click="changeCurrency($event, 1)">
+      <v-chip @click="changeCurrency($event,1)">
         {{ displayedCurrency }}
       </v-chip>
       <!-- <template @click="changeCurrency($event, 1)">
@@ -61,11 +60,10 @@ export default {
   methods: {
     changeCurrency (e, id) {
       const currentIndex = this.currencies.find(o => o.id === id)
-
       __log(
         id,
         currentIndex,
-        this.input
+        this.inputObject
       )
 
       // this.input[this.currencyInputName] = currentIndex === this.totalCurrencies - 1 ? this.currencies[currentIndex + 1].id : this.currencies[0].id
@@ -73,7 +71,7 @@ export default {
   },
 
   computed: {
-    input: {
+    inputObject: {
       get () {
         let model = this.modelValue
         // __log(model, this.defaultModel)
@@ -89,6 +87,7 @@ export default {
       }
     },
     displayedCurrency () {
+      return '$'
       const id = this.input ? this.input[this.currencyInputName] : 1
       __log(id, this.currencies.find(o => { return o.id === id }))
       return this.currencies.find(o => { return o.id === id }).name
@@ -99,7 +98,7 @@ export default {
   },
 
   created () {
-
+    __log(this.$attrs)
   }
 }
 </script>
