@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Nwidart\Modules\Support\Stub;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Facades\Modularity;
 
 class RepositoryMakeCommand extends BaseCommand
 {
@@ -112,7 +113,7 @@ class RepositoryMakeCommand extends BaseCommand
     protected function getTemplateContents()
     {
         $repository = $this->argument('repository');
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+        $module = Modularity::findOrFail($this->getModuleName());
 
         $modelName = $this->getFileName() ?? '';
         $modelClass = $this->getModelClass() ?? '';
@@ -140,11 +141,11 @@ class RepositoryMakeCommand extends BaseCommand
      */
     protected function getDestinationFilePath()
     {
-        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+        $path = Modularity::getModulePath($this->getModuleName());
 
         $repositoryPath = GenerateConfigReader::read('repository');
 
-        // dd($path, $repositoryPath->getPath(), $this->laravel['modules']->getModulePath($this->getModuleName()) );
+        // dd($path, $repositoryPath->getPath(), Modularity::getModulePath($this->getModuleName()) );
         return $path . $repositoryPath->getPath() . '/' . $this->getFileName() . 'Repository.php';
     }
 
@@ -178,7 +179,7 @@ class RepositoryMakeCommand extends BaseCommand
      */
     private function getModelClass()
     {
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+        $module = Modularity::findOrFail($this->getModuleName());
 
         // dd( config('modules.namespace'), $module->getName(), get_class_methods($module));
         $module_name = $module->getStudlyName();

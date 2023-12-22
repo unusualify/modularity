@@ -102,25 +102,34 @@ class UnusualRoutes
             return $middleware;
         }
 
-        $middleware = [
-            // 'twill_auth:twill_users',
-            // 'validateBackHistory',
-
+        // dd(
+        //     app()->runningInConsole(),
+        //     get_class_methods(app())
+        // );
+        $defaultMiddlewares = [
             'unusual_auth:unusual_users',
+            'auth',
+        ];
+
+        $webMiddlewares = [
             'impersonate',
             'language',
             'navigation',
-            'auth',
             'authorization',
             'company_registration'
-            // 'teams_permission',
         ];
+
+        $middlewares = array_merge($defaultMiddlewares, $webMiddlewares);
+
+        // if(!app()->runningInConsole()){
+        //     $middlewares = array_merge($middlewares, $webMiddlewares);
+        // }
 
         // if ($this->supportSubdomainRouting()) {
         //     array_unshift($middleware, 'supportSubdomainRouting');
         // }
 
-        return $middleware;
+        return $middlewares;
     }
 
 }

@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
 use Nwidart\Modules\Support\Stub;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Generators\RouteGenerator;
 
 class RouteMakeCommand extends BaseCommand

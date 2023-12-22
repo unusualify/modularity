@@ -37,9 +37,6 @@ class ConfigServiceProvider extends ServiceProvider
         $this->registerHelpers();
 
         $this->registerConfigs();
-
-
-
     }
 
     /**
@@ -152,9 +149,12 @@ class ConfigServiceProvider extends ServiceProvider
         // $module = Modularity::find('SystemUser');
 
         foreach(Modularity::allEnabled() as $module){
-            $this->mergeConfigFrom(
-                module_path($module->getName(), 'Config/config.php'), $module->getSnakeName()
-            );
+            if(file_exists(module_path($module->getName(), 'Config/config.php'))){
+                $this->mergeConfigFrom(
+                    module_path($module->getName(), 'Config/config.php'), $module->getSnakeName()
+                );
+
+            }
             // if( $module->getName() != 'Base' && $module->isStatus(true)){
             //     $this->mergeConfigFrom(
             //         module_path($module->getName(), 'Config/config.php'), $module->getSnakeName()

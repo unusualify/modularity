@@ -228,7 +228,4 @@ class ResourceServiceProvider extends ServiceProvider
 
         View::composer(["$this->baseKey::layouts.master", "$this->baseKey::auth.layout"], Localization::class);
     }
-
-
-
 }

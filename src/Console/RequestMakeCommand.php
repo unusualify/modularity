@@ -10,6 +10,7 @@ use Nwidart\Modules\Support\Stub;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Support\Decomposers\ValidatorParser;
 use Nwidart\Modules\Support\Config\GeneratorPath;
+use Unusualify\Modularity\Facades\Modularity;
 
 class RequestMakeCommand extends BaseCommand
 {
@@ -81,7 +82,7 @@ class RequestMakeCommand extends BaseCommand
     {
         $request = $this->argument('request');
 
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+        $module = Modularity::findOrFail($this->getModuleName());
 
         return (new Stub($this->getStubName(), [
             'BASE_REQUEST_CLASS'    => $this->baseConfig('base_request'),
@@ -98,7 +99,7 @@ class RequestMakeCommand extends BaseCommand
      */
     protected function getDestinationFilePath()
     {
-        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+        $path = Modularity::getModulePath($this->getModuleName());
 
         $prePath = new GeneratorPath( $this->baseConfig('paths.generator.route-request') );
 

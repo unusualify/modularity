@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Nwidart\Modules\Support\Stub;
 use Illuminate\Support\Str;
 use Nwidart\Modules\Support\Config\GeneratorPath;
+use Unusualify\Modularity\Facades\Modularity;
 
 class ControllerAPIMakeCommand extends BaseCommand
 {
@@ -69,7 +70,7 @@ class ControllerAPIMakeCommand extends BaseCommand
     {
         $name = $this->argument('name');
 
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+        $module = Modularity::findOrFail($this->getModuleName());
 
         return (new Stub($this->getStubName(), [
             'NAMESPACE'             => $this->getClassNamespace($module),
@@ -86,7 +87,7 @@ class ControllerAPIMakeCommand extends BaseCommand
      */
     protected function getDestinationFilePath()
     {
-        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+        $path = Modularity::getModulePath($this->getModuleName());
 
         $controllerPath = new GeneratorPath( $this->baseConfig('paths.generator.route-controller-api') );
 

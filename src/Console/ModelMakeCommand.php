@@ -15,6 +15,7 @@ use Unusualify\Modularity\Support\Decomposers\SchemaParser;
 use Nwidart\Modules\Support\Config\GeneratorPath;
 
 use Nwidart\Modules\Generators\FileGenerator;
+use Unusualify\Modularity\Facades\Modularity;
 
 class ModelMakeCommand extends BaseCommand
 {
@@ -139,7 +140,7 @@ class ModelMakeCommand extends BaseCommand
      */
     protected function getTemplateContents()
     {
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+        $module = Modularity::findOrFail($this->getModuleName());
 
         return  (new Stub( $this->getStubName(), [
             'BASE_MODEL'            => $this->baseConfig('base_model'),
@@ -162,7 +163,7 @@ class ModelMakeCommand extends BaseCommand
      */
     protected function getDestinationFilePath()
     {
-        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+        $path = Modularity::getModulePath($this->getModuleName());
 
         $modelPath = new GeneratorPath( $this->baseConfig('paths.generator.model') );
 
@@ -374,7 +375,7 @@ class ModelMakeCommand extends BaseCommand
         $methods = [];
 
         if( $this->option('has-factory') ){
-            $module_namespace = $this->laravel['modules']->config('namespace');
+            $module_namespace = Modularity::config('namespace');
             $module = $this->getModuleName();
             $name = $this->getModelName();
 
@@ -487,11 +488,11 @@ class ModelMakeCommand extends BaseCommand
 
     private function createAdditionalModels()
     {
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+        $module = Modularity::findOrFail($this->getModuleName());
 
         $overwriteFile = $this->hasOption('force') ? $this->option('force') : false;
 
-        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+        $path = Modularity::getModulePath($this->getModuleName());
 
         $modelPath = new GeneratorPath( $this->baseConfig('paths.generator.model') );
 

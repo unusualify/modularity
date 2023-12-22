@@ -14,6 +14,7 @@ use Nwidart\Modules\Support\Stub;
 use Nwidart\Modules\Traits\ModuleCommandTrait;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Unusualify\Modularity\Facades\Modularity;
 
 class MigrationMakeCommand extends BaseCommand
 {
@@ -158,7 +159,7 @@ class MigrationMakeCommand extends BaseCommand
      */
     protected function getDestinationFilePath()
     {
-        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+        $path = Modularity::getModulePath($this->getModuleName());
 
         $generatorPath = GenerateConfigReader::read('migration');
 

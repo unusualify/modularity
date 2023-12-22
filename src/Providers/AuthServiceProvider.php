@@ -3,13 +3,15 @@
 namespace Unusualify\Modularity\Providers;
 
 // use Unusualify\Modularity\Models\Enums\UserRole;
+
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Unusualify\Modularity\Entities\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Permission;
 
-class AuthServiceProvider extends ServiceProvider
+class AuthServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     const SUPERADMIN = 'superadmin';
 
@@ -39,7 +41,7 @@ class AuthServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        if(database_exists() && Schema::hasTable(config('permission.table_names.permissions'))){
+        if(!$this->app->runningInConsole() && database_exists() && Schema::hasTable(config('permission.table_names.permissions'))){
             Gate::before(function (User $user, $ability) {
                 return $user->hasRole(self::SUPERADMIN) ? true : null;
             });

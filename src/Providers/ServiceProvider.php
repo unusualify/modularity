@@ -20,6 +20,14 @@ class ServiceProvider extends Provider
     protected $baseKey;
 
     /**
+     * Namespace of the terminal commands
+     * @var string
+     */
+    protected $terminalNamespace = "Unusualify\\Modularity\\Console";
+
+    protected $viewSourcePath = __DIR__ .  '/../Resources/views';
+
+    /**
      * Create a new service provider instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -60,5 +68,19 @@ class ServiceProvider extends Provider
                 require $path, $config->get($key, [])
             ));
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPublishableViewPaths(): array
+    {
+        $paths = [];
+        foreach (\Config::get('view.paths') as $path) {
+            if (is_dir($path . '/modules/' . $this->baseKey)) {
+                $paths[] = $path . '/modules/' . $this->baseKey;
+            }
+        }
+        return $paths;
     }
 }

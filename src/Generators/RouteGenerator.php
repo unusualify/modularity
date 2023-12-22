@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Support\Decomposers\SchemaParser;
 use Unusualify\Modularity\Traits\ManageNames;
-use Nwidart\Modules\Facades\Module;
 use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Nwidart\Modules\Support\Config\GeneratorPath;
@@ -20,6 +19,8 @@ use Illuminate\Support\Facades\File;
 use Modules\SystemUser\Repositories\PermissionRepository;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
+// use Nwidart\Modules\Facades\Module;
+use Unusualify\Modularity\Module;
 
 class RouteGenerator extends Generator
 {
@@ -160,7 +161,7 @@ class RouteGenerator extends Generator
         Config $config = null,
         Filesystem $filesystem = null,
         Console $console = null,
-        Module  $module = null
+        Module $module = null
     ) {
         $this->name = $name;
         $this->app = Container::getInstance();
@@ -294,7 +295,17 @@ class RouteGenerator extends Generator
      */
     public function setModule($module)
     {
-        $this->module = Modularity::find($module);
+        $modularity = App::makeWith(\Unusualify\Modularity\Modularity::class, ['app' => app()]);
+
+        $this->module = $modularity->find($module);
+
+        // if($this->module == null){
+        //     dd(
+        //         $modularity->findNotCached($module),
+        //         array_keys($modularity->scan()),
+        //         array_keys($modularity->all()),
+        //     );
+        // }
 
         return $this;
     }
