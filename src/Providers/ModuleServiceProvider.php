@@ -45,38 +45,36 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
 
     public function bootModules()
     {
+        $migration_directory = GenerateConfigReader::read('migration')->getPath();
         foreach(Modularity::allEnabled() as $module){
+
+            $module_name = $module->getName();
 
             // LOAD MODULE CONFIG
             if(file_exists(module_path($module->getName(), 'Config/config.php'))){
                 $this->mergeConfigFrom(
-                    module_path($module->getName(), 'Config/config.php'), $module->getSnakeName()
+                    $module->getDirectoryPath('Config/config.php'), $module->getSnakeName()
                 );
 
             }
 
             // LOAD MODULE MIGRATIONS
-            $modules_folder = base_path(config('modules.namespace'));
-            $module_migration_folder = GenerateConfigReader::read('migration')->getPath();
-            foreach(Modularity::allEnabled() as $module){
-                $this->loadMigrationsFrom(
-                    $modules_folder . "/" . $module->getStudlyName() . "/" . $module_migration_folder
-                );
-            }
+            $this->loadMigrationsFrom(
+                $module->getDirectoryPath($migration_directory)
+            );
+
 
             // LOAD MODULE VIEWS
-            $this->viewSourcePath = module_path($module->getName(), 'Resources/views');
-            // $this->publishes([
-            //     $sourcePath => $viewPath
-            // ], ['views', $module->getLowerName() . '-module-views']);
+            $sourcePath = module_path($module->getName(), 'Resources/views');
+
             $this->loadViewsFrom(
                 array_merge(
                     $this->getPublishableViewPaths(
-                        snakeCase($module->getName())
+                        $module->getSnakeName()
                     ),
-                    [$this->viewSourcePath]
+                    [$sourcePath]
                 ),
-                snakeCase($module->getName())
+                $module->getSnakeName()
             );
 
             //LOAD MODULE TRANSLATION
@@ -85,11 +83,14 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
                 $this->loadTranslationsFrom($langPath, $module->getLowerName());
             } else {
                 $this->loadTranslationsFrom(
-                    module_path($module->getName(), 'Resources/lang'),
+                    $module->getDirectoryPath('Resources/lang'),
                     $module->getLowerName()
                 );
             }
         }
+
+        // dd('dsjafh');
+
     }
 
 }
