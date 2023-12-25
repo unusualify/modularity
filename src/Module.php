@@ -113,6 +113,16 @@ class Module extends NwidartModule
         }
     }
 
+    /**
+     * Get directory path.
+     *
+     * @return string
+     */
+    public function getDirectoryPath($directory = ''): string
+    {
+        return $this->getPath() . (empty($directory) ?: "/$directory");
+    }
+
     public function getRouteConfig($route_name){
         return $this->getRouteConfigs( snakeCase($route_name) ) ;
     }
