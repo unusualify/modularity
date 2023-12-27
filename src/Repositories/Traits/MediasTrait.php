@@ -16,6 +16,7 @@ trait MediasTrait
      */
     public function hydrateMediasTrait($object, $fields)
     {
+        // dd('hydrateMediasTrait', $object, $fields, $this->getMedias($fields));
         if ($this->shouldIgnoreFieldBeforeSave('medias')) {
             return $object;
         }
@@ -60,6 +61,40 @@ trait MediasTrait
     private function getMedias($fields)
     {
         $medias = Collection::make();
+
+        $system_locales = getLocales();
+
+        $medias_roles = $this->getMediaColumns();
+
+        foreach($medias_roles as $role){
+            if(isset($fields[$role]) && count(array_keys($fields[$role])) > 0){
+                $default_locale = array_keys($fields[$role])[0];
+                foreach (getLocales() as $locale) {
+                    if(isset($fields[$role][$locale])){
+
+                        Collection::make($fields[$role][$locale])->each(function ($media) use (&$medias, $role, $locale) {
+                            $medias->push([
+                                'id' => $media['id'],
+                                'role' => $role,
+                                'metadatas' => json_encode($media['metadatas']),
+                                'locale' => $locale,
+                            ]);
+                        });
+                    }else {
+                        Collection::make($fields[$role][$default_locale])->each(function ($media) use (&$medias, $role, $locale) {
+                            $medias->push([
+                                'id' => $media['id'],
+                                'role' => $role,
+                                'metadatas' => json_encode($media['metadatas']),
+                                'locale' => $locale,
+                            ]);
+                        });
+                    }
+                }
+            }
+        }
+        // dd($medias);
+        return $medias;
 
         if (isset($fields['medias'])) {
             foreach ($fields['medias'] as $role => $mediasForRole) {
@@ -125,21 +160,28 @@ trait MediasTrait
      */
     public function getFormFieldsMediasTrait($object, $fields)
     {
+        // dd('getFormFieldsMediasTrait', $object,$object->has('medias'), $fields, $this->getMedias($fields));
         $fields['medias'] = null;
 
         if ($object->has('medias')) {
             foreach ($object->medias->groupBy('pivot.role') as $role => $mediasByRole) {
-                if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
-                    foreach ($mediasByRole->groupBy('pivot.locale') as $locale => $mediasByLocale) {
-                        foreach ($this->getMediaFormItems($mediasByLocale) as $item) {
-                            $fields['medias'][$locale][$role][] = $item;
-                        }
-                    }
-                } else {
-                    foreach ($this->getMediaFormItems($mediasByRole) as $item) {
-                        $fields['medias'][$role][] = $item;
-                    }
-                }
+                foreach ($mediasByRole->groupBy('pivot.locale') as $locale => $mediasByLocale) {
+                    $fields[$role][$locale] = $mediasByLocale->map(function ($media) {
+                        return $media->mediableFormat();
+                    });
+            }
+
+                // if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
+                //     foreach ($mediasByRole->groupBy('pivot.locale') as $locale => $mediasByLocale) {
+                //         foreach ($this->getMediaFormItems($mediasByLocale) as $item) {
+                //             $fields[$role][$locale][] = $item;
+                //         }
+                //     }
+                // } else {
+                //     foreach ($this->getMediaFormItems($mediasByRole) as $item) {
+                //         $fields[$role][] = $item;
+                //     }
+                // }
             }
         }
 
@@ -185,5 +227,17 @@ trait MediasTrait
     public function getCrops($role)
     {
         return $this->model->mediasParams[$role];
+    }
+    public function getMediaColumns(){
+        // dd(collect($this->inputs()));
+        $media_inputs = collect($this->inputs())->reduce(function($acc, $curr){
+            if(preg_match('/image/', $curr['type'])){
+                $acc[] = $curr['name'];
+            }
+
+            return $acc;
+        }, []);
+
+        return $media_inputs;
     }
 }
