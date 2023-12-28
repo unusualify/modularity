@@ -408,7 +408,21 @@ trait ManageForm {
             case 'price':
                 $input['name'] ??= 'prices';
                 $input['type'] = 'custom-input-price';
-                $input['default'] ??= [];
+                $input['ext'] = 'number';
+                $input['clearable'] = false;
+
+                $input['col'] ??= [
+                    'cols' => 6,
+                    'sm' => 5,
+                    'md' => 4,
+                ];
+
+                $input['default'] ??= [
+                    [
+                        'display_price' => '',
+                        'currency_id' => 1
+                    ]
+                ];
                 // $input['types'] = PriceType::all()->toArray();
                 // $input['vatRates'] = VatRate::all()->toArray();
                 $input['currencies'] = Currency::query()->select(['id', 'symbol as name'])->get()->toArray();

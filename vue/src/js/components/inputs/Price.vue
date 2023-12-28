@@ -1,16 +1,19 @@
 <template>
-  <v-text-field
-    v-bind="$attrs"
-    >
-    <template v-slot:append-inner="{isActive, isFocused, controlRef, focus, blur}">
-      <v-chip @click="changeCurrency($event,1)">
-        {{ displayedCurrency }}
-      </v-chip>
-      <!-- <template @click="changeCurrency($event, 1)">
-        {{ displayedCurrency }}
-      </template> -->
+  <div>
+    <template v-for="(price,i) in deepModel" :key="`price-${i}`">
+      <v-text-field
+        v-bind="$attrs"
+        :name="`${$attrs['name']}-${i}`"
+        v-model="deepModel[i][priceInputName]"
+        >
+        <template v-slot:append-inner="{isActive, isFocused, controlRef, focus, blur}">
+          <v-chip @click="changeCurrency($event, i)">
+            {{ displayedCurrency[i] }}
+          </v-chip>
+        </template>
+      </v-text-field>
     </template>
-  </v-text-field>
+  </div>
 </template>
 
 <script>
@@ -23,6 +26,17 @@ export default {
   mixins: [InputMixin],
   props: {
     ...makeInputProps(),
+    modelValue: {
+      type: Array,
+      default () {
+        return [
+          {
+            display_price: '',
+            currency_id: 1
+          }
+        ]
+      }
+    },
     priceInputName: {
       type: String,
       default: 'display_price'
@@ -50,47 +64,49 @@ export default {
 
   data () {
     return {
-      defaultModel: {
-        [this.priceInputName]: '',
-        [this.currencyInputName]: 1
-      }
+      deepModel: this.modelValue
     }
   },
 
   methods: {
-    changeCurrency (e, id) {
-      const currentIndex = this.currencies.find(o => o.id === id)
-      __log(
-        id,
-        currentIndex,
-        this.inputObject
-      )
+    changeCurrency (e, index) {
+      const currentIndex = this.currencies.findIndex(o => o.id === this.deepModel[index][this.currencyInputName])
 
-      // this.input[this.currencyInputName] = currentIndex === this.totalCurrencies - 1 ? this.currencies[currentIndex + 1].id : this.currencies[0].id
+      this.deepModel[index][this.currencyInputName] = currentIndex === this.totalCurrencies - 1 ? this.currencies[0].id : this.currencies[currentIndex + 1].id
+    }
+  },
+
+  watch: {
+    modelValue: {
+      deep: true,
+      handler (newValue) {
+        console.log('watchedValue?', newValue)
+        if (newValue) {
+          this.deepModel = newValue
+        } else {
+          this.deepModel = [
+            {
+              display_price: '',
+              currency_id: 1
+            }
+          ]
+        }
+      }
+    },
+    deepModel: {
+      deep: true,
+      handler (newValue) {
+        // console.log('watchedDeepModel?', newValue)
+        this.$emit('update:modelValue', newValue)
+      }
     }
   },
 
   computed: {
-    inputObject: {
-      get () {
-        let model = this.modelValue
-        // __log(model, this.defaultModel)
-        if (!model) {
-          model = this.defaultModel
-        }
-        __log('input getter', model)
-        return model
-      },
-      set (val, old) {
-        __log('Price.vue input set', val, old)
-        // this.updateModelValue(val)
-      }
-    },
     displayedCurrency () {
-      return '$'
-      const id = this.input ? this.input[this.currencyInputName] : 1
-      __log(id, this.currencies.find(o => { return o.id === id }))
-      return this.currencies.find(o => { return o.id === id }).name
+      return this.deepModel.map((item, i) => {
+        return this.currencies.find(o => { return o.id === item[this.currencyInputName] }).name
+      })
     },
     totalCurrencies () {
       return this.currencies.length
@@ -98,7 +114,8 @@ export default {
   },
 
   created () {
-    __log(this.$attrs)
+    // __log(this.deepModel, this.modelValue)
+    // __log(this.$attrs)
   }
 }
 </script>
