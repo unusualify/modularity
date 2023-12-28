@@ -36,7 +36,7 @@
             </div>
           </ue-title>
           <v-custom-form-base
-            id="ue-form-wrapper"
+            :id="`ue-wrapper-${id}`"
             class="pt-5"
 
             v-model="model"
@@ -49,6 +49,36 @@
             @blur="handleBlur"
             @click="handleClick"
             >
+            <template
+              v-for="(_slot, key) in formSlots"
+              :key="key"
+              v-slot:[`slot-inject-${_slot.name}-key-ue-wrapper-${id}-${_slot.inputName}`]="_slotData"
+              >
+              <template v-if="_slot.type == 'form'">
+                <v-custom-form-base
+                  :id="`ue-wrapper-${id}-${_slot.name}`"
+
+                  v-model="model"
+                  v-model:schema="_slot.schema"
+                  :row="rowAttribute"
+
+                  >
+
+                </v-custom-form-base>
+              </template>
+              <template v-else-if="_slot.type == 'recursive-stuff'">
+                <ue-recursive-stuff
+                  v-for="(context, i) in _slot.context.elements"
+                  :key="i"
+                  :configuration="context"
+                  :bindData="_slotData">
+                </ue-recursive-stuff>
+              </template>
+              <!-- <div>
+                {{ $log(_slot, _slotData) }}
+                Hello
+              </div> -->
+            </template>
             <!-- <template v-slot:[`slot-inject-prepend-key-treeview-slot-permissions`]="{open}" >
               <v-icon color="blue">
                   {{open ? 'mdi-folder-open' : 'mdi-folder'}}
@@ -123,11 +153,11 @@ import api from '@/store/api/form'
 import { useI18n } from 'vue-i18n'
 
 import logger from '@/utils/logger'
-import { getModel, getSubmitFormData } from '@/utils/getFormData.js'
+import { getModel, getSubmitFormData, getSchema } from '@/utils/getFormData.js'
 
 import { useInputHandlers, useValidation } from '@/hooks'
 import { redirector } from '@/utils/response'
-import cloneDeep from 'lodash/cloneDeep'
+import { cloneDeep, filter } from 'lodash'
 
 // Helper & Partial Functions
 const minLen = l => v => (v && v.length >= l) || `min. ${l} Characters`
@@ -225,7 +255,7 @@ export default {
 
       formLoading: false,
       formErrors: {},
-      inputs: this.invokeRuleGenerator(this.schema),
+      // inputs: this.invokeRuleGenerator(this.schema),
 
       // validForm: false
 
@@ -234,22 +264,25 @@ export default {
       hasStickyFrame: this.stickyFrame || this.stickyButton,
 
       model: this.issetModel ? this.modelValue : this.editedItem,
+
+      rawSchema: null,
       inputSchema: null,
       defaultItem: null
     }
   },
 
   created () {
-    this.inputSchema = this.issetSchema
-      ? this.inputs
-      : this.invokeRuleGenerator(
-        this.$store.state.form.inputs
-      )
+    // this.inputSchema = this.issetSchema
+    //   ? this.inputs
+    //   : this.invokeRuleGenerator(this.$store.state.form.inputs)
+    this.rawSchema = this.issetSchema ? this.schema : this.$store.state.form.inputs
 
-    this.defaultItem = this.issetSchema ? getModel(this.inputSchema) : this.$store.getters.defaultItem
+    this.inputSchema = this.invokeRuleGenerator(getSchema(this.rawSchema))
+
+    this.defaultItem = this.issetSchema ? getModel(this.rawSchema) : this.$store.getters.defaultItem
 
     this.model = getModel(
-      this.inputSchema,
+      this.rawSchema,
       this.issetModel ? this.modelValue : this.editedItem,
       this.$store.state
     )
@@ -267,10 +300,8 @@ export default {
       deep: true
     },
     editedItem (newValue, oldValue) {
-      // __log('editedItem', newValue)
       if (!this.issetModel) {
-        // __log('editedItem watcher', getModel(this.inputSchema, newValue, this.$store.state))
-        this.model = getModel(this.inputSchema, newValue, this.$store.state)
+        this.model = getModel(this.rawSchema, newValue, this.$store.state)
       }
       // this.resetValidation()
     },
@@ -280,50 +311,32 @@ export default {
   },
 
   computed: {
-    inputSchema_: {
-      get () {
-        __log('inputSchema getter')
-        return this.issetSchema
-          ? this.inputs
-          : this.invokeRuleGenerator(
-            this.$store.state.form.inputs
-          )
-      },
-      set (value) {
-        // this._schema = value
-        __log('inputSchema setter', value, this.inputSchema)
-      }
-    },
-    inputSchema__ () {
-      return this.issetSchema
-        ? this.inputs
-        : this.invokeRuleGenerator(
-          this.$store.state.form.inputs
-        )
-    },
+    formSlots () {
+      const slots = []
 
-    defaultItem_ () { return this.issetSchema ? getModel(this.inputSchema) : this.$store.getters.defaultItem },
-    // defaultItem: {
-    //   get () {
-    //     __log(this.issetModel)
-    //     return this.issetModel ? this.modelValue : this.$store.state.form.editedItem
-    //   },
-    //   set (value) {
-
-    //   }
-    // },
-    model_: {
-      get () {
-        return getModel(
-          this.inputSchema,
-          this.issetModel ? this.modelValue : this.$store.state.form.editedItem,
-          this.$store._state.data
-        )
-      },
-      set (value) {
-        __log('model setter', value)
-        // this.resetValidation()
-      }
+      Object.values(this.issetSchema ? this.schema : this.$store.state.form.inputs).forEach((schema, index) => {
+        if (Object.prototype.hasOwnProperty.call(schema, 'slots') && Object.keys(schema.slots).length > 0) {
+          Object.keys(schema.slots).forEach((slotName) => {
+            slots.push({
+              name: slotName,
+              inputName: schema.name,
+              type: 'recursive-stuff',
+              context: schema.slots[slotName]
+            })
+          })
+        } else if (Object.prototype.hasOwnProperty.call(schema, 'slotable')) {
+          slots.push({
+            name: schema.slotable.name,
+            inputName: schema.slotable.slotTo,
+            selfName: schema.name,
+            type: 'form',
+            schema: cloneDeep(this.invokeRuleGenerator({
+              [schema.name]: this.$lodash.omit(schema, ['slotable'])
+            }))
+          })
+        }
+      })
+      return slots
     },
     loading () {
       return this.actionUrl ? this.formLoading : this.$store.state.form.loading
@@ -337,19 +350,6 @@ export default {
     errors () {
       return this.actionUrl ? this.formErrors : this.$store.state.form.errors
     },
-    // errors_: {
-    //   get () {
-    //     return this.actionUrl ? this.formErrors : this.$store.state.form.errors
-    //   },
-    //   set (value) {
-    //     for (const name in value) {
-    //       __log('errors setter', value[name][0], this.inputSchema)
-    //       this.inputSchema[name].errorMessages = value[name][0]
-    //     }
-    //     __log('errors setter', value, this.errors)
-    //   }
-    // },
-
     reference () {
       return 'ref-' + this.id
     },
@@ -408,6 +408,10 @@ export default {
         // __log(obj.schema, key)
       }
     },
+    handleInputSlot (v, s) {
+      const { on, key, value, obj } = v
+      __log('handleInputSlot', v, on, key, value, obj)
+    },
     handleUpdate (v) {
       // __log('handleUpdate', v)
     },
@@ -422,7 +426,7 @@ export default {
         this.formErrors = {}
         this.formLoading = true
 
-        const formData = getSubmitFormData(this.inputSchema, this.model, this.$store._state.data)
+        const formData = getSubmitFormData(this.rawSchema, this.model, this.$store._state.data)
         const method = Object.prototype.hasOwnProperty.call(formData, 'id') ? 'put' : 'post'
         const self = this
 
@@ -458,8 +462,6 @@ export default {
           if (errorCallback && typeof errorCallback === 'function') errorCallback(response.data)
         })
       } else {
-        // this.$store.commit(FORM.SET_EDITEM_ITEM, getModel(this.inputSchema, cloneDeep(this.model)))
-        // __log(getModel(this.inputSchema, cloneDeep(this.model)))
         const self = this
         this.$nextTick(function () {
           self.$store.dispatch(ACTIONS.SAVE_FORM, { item: null, callback, errorCallback })
@@ -503,7 +505,6 @@ export default {
       }
     },
     setSchemaErrors (errors) {
-      // __log(errors, this.inputSchema)
       const _errors = {}
       for (const name in errors) {
         const pattern = /(\w+)\.(\w+)/
@@ -525,6 +526,10 @@ export default {
     },
     resetSchemaError (key) {
       this.inputSchema[key].errorMessages = []
+    },
+
+    updatedSlotModel (value, inputName) {
+      __log(this.model, value, inputName)
     }
   }
 
