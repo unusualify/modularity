@@ -152,9 +152,9 @@ export default function useRepeater (props, context) {
       }
     }),
 
-    numberRepeats: computed(() => state.repeaterInputs.length),
-    isAddible: computed(() => (props.max < 1) || state.numberRepeats < props.max),
-    isDeletable: computed(() => (props.min < 1) || state.numberRepeats > props.min),
+    totalRepeats: computed(() => state.repeaterInputs.length),
+    isAddible: computed(() => (props.max < 1) || state.totalRepeats < props.max),
+    isDeletable: computed(() => (props.min < 1) || state.totalRepeats > props.min),
     // repeaterSchemas_: computed({
     //   get: () => {
     //     // __log('repeaterSchemas getter', hydrateSchemas(state.repeaterInputs))
@@ -202,7 +202,7 @@ export default function useRepeater (props, context) {
       if (state.isAddible) {
         const schema = invokeRuleGenerator(cloneDeep(props.schema))
 
-        modelValue.value.push(hydrateRepeaterInput(getModel(schema), state.numberRepeats))
+        modelValue.value.push(hydrateRepeaterInput(getModel(schema), state.totalRepeats))
       } else {
         store.commit(ALERT.SET_ALERT, { message: `You cannot add new item, because the number of elements should be at much ${props.max}`, variant: 'warning', location: 'top' })
       }

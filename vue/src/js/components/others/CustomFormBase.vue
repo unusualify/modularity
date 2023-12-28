@@ -41,8 +41,7 @@
               <!-- slot replaces complete item of defined KEY -> <div slot="slot-item-key-[propertyName]">-->
               <slot :name="getKeyItemSlot(obj)" v-bind= "{ obj, index, id }">
               <!-- RADIO -->
-                <v-radio-group
-                  v-if="obj.schema.type === 'radio'"
+                <v-radio-group v-if="obj.schema.type === 'radio'"
                   v-bind="bindSchema(obj)"
                   :modelValue="setValue(obj)"
                   @change="onInput($event, obj)"
@@ -59,8 +58,7 @@
               <!-- END RADIO -->
 
               <!-- DATE, TIME, COLOR TEXT-MENU -->
-                <v-menu
-                  v-else-if="isDateTimeColorTypeAndExtensionText(obj)"
+                <v-menu v-else-if="isDateTimeColorTypeAndExtensionText(obj)"
                   v-bind="bindSchemaMenu(obj)"
                 >
                   <template v-slot:activator="{ props }">
@@ -91,9 +89,7 @@
               <!-- END DATE, TIME, COLOR TEXT-MENU -->
 
               <!-- ARRAY -->
-                <template
-                  v-else-if="obj.schema.type === 'array'"
-                >
+                <template v-else-if="obj.schema.type === 'array'">
                   <div
                     v-for="(item, idx) in setValue(obj)"
                     :key="getKeyForArray(id, obj, item, idx)"
@@ -150,8 +146,7 @@
               <!-- END GROUP | WRAP -->
 
               <!-- TREEVIEW -->
-                <component
-                  v-else-if="obj.schema.type === treeview"
+                <component v-else-if="obj.schema.type === treeview"
                   v-bind:is="v-treeview"
 
                   v-model:open="obj.schema.open"
@@ -172,8 +167,7 @@
               <!-- END TREEVIEW -->
 
               <!-- LIST -->
-                <template
-                  v-else-if="obj.schema.type === list"
+                <template v-else-if="obj.schema.type === list"
                 >
                   <v-list>
                     <slot :name="getKeyInjectSlot(obj, 'label')" v-bind= "{ id, obj, index }" >
@@ -217,8 +211,7 @@
               <!-- END LIST -->
 
               <!-- CHECKBOX | SWITCH -->
-                <component
-                  v-else-if="/(switch|checkbox)/.test(obj.schema.type)"
+                <component v-else-if="/(switch|checkbox)/.test(obj.schema.type)"
                   :is="mapTypeToComponent(obj.schema.type)"
                   :modelValue="setValue(obj)"
                   @update:modelValue="onInput($event, obj)"
@@ -230,8 +223,7 @@
               <!-- END CHECKBOX | SWITCH -->
 
               <!-- FILE -->
-                <v-file-input
-                  v-else-if="obj.schema.type === 'file' "
+                <v-file-input v-else-if="obj.schema.type === 'file' "
                   v-bind="bindSchema(obj)"
                   :modelValue="setValue(obj)"
                   @focus="onEvent($event, obj)"
@@ -243,8 +235,7 @@
               <!-- END FILE -->
 
               <!-- ICON -->
-                <v-icon
-                  v-else-if="obj.schema.type === 'icon'"
+                <v-icon v-else-if="obj.schema.type === 'icon'"
                   v-bind="bindSchema(obj)"
                   v-text="getIconValue(obj)"
                   @click="onEvent($event, obj)"
@@ -252,8 +243,7 @@
               <!-- END ICON -->
 
               <!-- SLIDER -->
-                <v-slider
-                  v-else-if="obj.schema.type === 'slider'"
+                <v-slider v-else-if="obj.schema.type === 'slider'"
                   v-bind="bindSchema(obj)"
                   @update:modelValue="onInput($event, obj)"
                 >
@@ -264,8 +254,7 @@
               <!-- END SLIDER -->
 
               <!-- IMG -->
-                <v-img
-                  v-else-if="obj.schema.type === 'img'"
+                <v-img v-else-if="obj.schema.type === 'img'"
                   :src="getImageSource(obj)"
                   v-bind="bindSchema(obj)"
                   @click="onEvent($event, obj)"
@@ -276,8 +265,7 @@
               <!-- END IMG -->
 
               <!-- BTN-TOGGLE -->
-                <v-btn-toggle
-                  v-else-if="obj.schema.type === 'btn-toggle'"
+                <v-btn-toggle v-else-if="obj.schema.type === 'btn-toggle'"
                   v-bind="bindSchema(obj)"
                   :modelValue="setValue(obj)"
                   @change="onInput($event, obj)"
@@ -297,85 +285,83 @@
               <!-- END BTN-TOGGLE -->
 
               <!-- BTN -->
-              <v-btn
-                v-else-if="obj.schema.type === 'btn'"
-                v-bind="bindSchema(obj)"
-                @click="onEvent($event, obj, button)"
-                type="button"
-              >
-                {{ setValue(obj) }}
-                <v-icon
-                  v-if="obj.schema.iconCenter"
-                  :dark="obj.schema.dark"
+                <v-btn v-else-if="obj.schema.type === 'btn'"
+                  v-bind="bindSchema(obj)"
+                  @click="onEvent($event, obj, button)"
+                  type="button"
                 >
-                  {{ obj.schema.iconCenter }}
-                </v-icon>
-                {{ obj.schema.label }}
-              </v-btn>
+                  {{ setValue(obj) }}
+                  <v-icon
+                    v-if="obj.schema.iconCenter"
+                    :dark="obj.schema.dark"
+                  >
+                    {{ obj.schema.iconCenter }}
+                  </v-icon>
+                  {{ obj.schema.label }}
+                </v-btn>
               <!-- END BTN -->
-              <v-custom-input-locale
-                v-else-if="obj.schema.translated"
-                :type="mapTypeToComponent(obj.schema.type)"
-                :attributes="obj.schema"
-                :modelValue="setValue(obj)"
-                @update:modelValue="onInput($event, obj)"
-                >
 
-              </v-custom-input-locale>
+                <v-custom-input-locale v-else-if="obj.schema.translated"
+                  :type="mapTypeToComponent(obj.schema.type)"
+                  :attributes="obj.schema"
+                  :modelValue="setValue(obj)"
+                  @update:modelValue="onInput($event, obj)"
+                  >
+
+                </v-custom-input-locale>
+
               <!-- MASK  -->
-              <component
-                :is="mapTypeToComponent(obj.schema.type)"
-                v-else-if="obj.schema.mask"
-                v-bind="bindSchema(obj)"
-                v-mask="obj.schema.mask"
-                :type="checkExtensionType(obj)"
-                :modelValue="setValue(obj)"
-                :obj="obj"
-                v-model:[searchInputSync(obj)]="obj.schema.searchInput"
-                @focus= "onEvent($event, obj)"
-                @blur= "onEvent($event, obj)"
-                @[suspendClickAppend(obj)]="onEvent($event, obj, append)"
-                @click:append-inner="onEvent($event, obj, appendInner)"
-                @click:prepend="onEvent($event, obj, prepend )"
-                @click:prepend-inner="onEvent($event, obj, prependInner)"
-                @click:clear="onEvent($event, obj, clear )"
-                @click:hour="onEvent({type:'click'}, obj, hour)"
-                @click:minute="onEvent({type:'click'}, obj, minute)"
-                @click:second="onEvent({type:'click'}, obj, second)"
-                @update:modelValue="onInput($event, obj)"
-              >
-                <!-- component doesn't work with #[s]="slotData" " -->
-                <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index }"/></template>
-              </component>
+                <component v-else-if="obj.schema.mask"
+                  :is="mapTypeToComponent(obj.schema.type)"
+                  v-bind="bindSchema(obj)"
+                  v-mask="obj.schema.mask"
+                  :type="checkExtensionType(obj)"
+                  :modelValue="setValue(obj)"
+                  :obj="obj"
+                  v-model:[searchInputSync(obj)]="obj.schema.searchInput"
+                  @focus= "onEvent($event, obj)"
+                  @blur= "onEvent($event, obj)"
+                  @[suspendClickAppend(obj)]="onEvent($event, obj, append)"
+                  @click:append-inner="onEvent($event, obj, appendInner)"
+                  @click:prepend="onEvent($event, obj, prepend )"
+                  @click:prepend-inner="onEvent($event, obj, prependInner)"
+                  @click:clear="onEvent($event, obj, clear )"
+                  @click:hour="onEvent({type:'click'}, obj, hour)"
+                  @click:minute="onEvent({type:'click'}, obj, minute)"
+                  @click:second="onEvent({type:'click'}, obj, second)"
+                  @update:modelValue="onInput($event, obj)"
+                >
+                  <!-- component doesn't work with #[s]="slotData" " -->
+                  <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, model: valueIntern }"/></template>
+                </component>
               <!-- END MASK -->
 
               <!-- DEFAULT all other Types -> typeToComponent -->
-              <component
-                v-else
-                :is="mapTypeToComponent(obj.schema.type)"
-                v-bind="bindSchema(obj)"
-                :type="checkExtensionType(obj)"
-                :modelValue="setValue(obj)"
-                :obj="obj"
-                v-model:[searchInputSync(obj)]="obj.schema.searchInput"
-                @focus="onEvent($event, obj)"
-                @blur="onEvent($event, obj)"
-                @[suspendClickAppend(obj)]="onEvent($event, obj, append)"
-                @click:append-inner="onEvent($event, obj, appendInner)"
-                @click:prepend= "onEvent($event, obj, prepend )"
-                @click:prepend-inner= "onEvent($event, obj, prependInner)"
-                @click:clear= "onEvent($event, obj, clear )"
-                @click:hour= "onEvent({type:'click'}, obj, hour)"
-                @click:minute= "onEvent({type:'click'}, obj, minute)"
-                @click:second= "onEvent({type:'click'}, obj, second)"
+                <component v-else
+                  :is="mapTypeToComponent(obj.schema.type)"
+                  v-bind="bindSchema(obj)"
+                  :type="checkExtensionType(obj)"
+                  :modelValue="setValue(obj)"
+                  :obj="obj"
+                  v-model:[searchInputSync(obj)]="obj.schema.searchInput"
+                  @focus="onEvent($event, obj)"
+                  @blur="onEvent($event, obj)"
+                  @[suspendClickAppend(obj)]="onEvent($event, obj, append)"
+                  @click:append-inner="onEvent($event, obj, appendInner)"
+                  @click:prepend= "onEvent($event, obj, prepend )"
+                  @click:prepend-inner= "onEvent($event, obj, prependInner)"
+                  @click:clear= "onEvent($event, obj, clear )"
+                  @click:hour= "onEvent({type:'click'}, obj, hour)"
+                  @click:minute= "onEvent({type:'click'}, obj, minute)"
+                  @click:second= "onEvent({type:'click'}, obj, second)"
 
-                @update:modelValue="onInput($event, obj)"
-              >
-                <!-- component doesn't work with #[s]="slotData" " -->
-                <template v-for="s in getInjectedScopedSlots(id, obj)" v-slot:[s]="slotData">
-                  <slot :name= "getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, ...slotData }"/>
-                </template>
-              </component>
+                  @update:modelValue="onInput($event, obj)"
+                >
+                  <!-- component doesn't work with #[s]="slotData" " -->
+                  <template v-for="s in getInjectedScopedSlots(id, obj)" v-slot:[s]="slotData">
+                    <slot :name= "getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, ...slotData,  model: valueIntern }"/>
+                  </template>
+                </component>
               <!-- END DEFAULT -->
               </slot>
             </slot>
@@ -786,7 +772,7 @@ export default {
     // TOOLTIP
     getShorthandTooltip (schemaTooltip) {
       // check if tooltip is typeof string ->  shorthand { bottom:true, label: obj.schema.tooltip} otherwise take original object
-      return isString(schemaTooltip) ? { bottom: true, label: schemaTooltip } : schemaTooltip
+      return isString(schemaTooltip) ? { location: 'top', text: schemaTooltip } : schemaTooltip
     },
     getShorthandTooltipLabel (schemaTooltip) {
       // check if tooltip is typeof string ->  return Label
