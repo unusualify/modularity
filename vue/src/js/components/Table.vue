@@ -28,6 +28,8 @@
       :items-length="totalElements"
       :item-title="titleKey"
       ref="datatable"
+
+      :height="windowSize.y - 64 - 24 - 59 - 36"
     >
       <template v-slot:top>
 
