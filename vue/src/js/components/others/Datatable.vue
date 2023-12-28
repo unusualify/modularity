@@ -321,7 +321,10 @@
             </v-switch>
           </template>
           <template v-else>
-            {{ handleFormatter(col.formatter, item[col.key] ) }}
+            <ue-recursive-stuff
+              v-bind="handleFormatter(col.formatter, item[col.key])"
+              :key="item[col.key]"
+              />
           </template>
       </template>
 
