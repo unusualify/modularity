@@ -59,25 +59,26 @@ export default {
     function isArray (value) {
       return Array.isArray(value, (value))
     }
-    const castPattern = /\$([\w|.]+)/
-    const filteredAttributes = cloneDeep(props.configuration.attributes)
+    function isObject (value) {
+      return __isObject(value)
+    }
+    function castAttribute (object, key, value) {
+      let _value = value
 
-    const castedAttributes = computed(() => {
-      const attrs = cloneDeep(props.configuration.attributes)
-      return reduce(attrs, (o, v, k) => {
-        if (!(isArray(v) || __isString(v))) {
-          return o
-        }
+      let funcs = []
 
-        let value = v
-        let funcs = []
+      if (isArray(value) && __isString(value[0])) {
+        _value = value.shift()
+        funcs = value
+      }
 
-        if (isArray(v) && __isString(v[0])) {
-          value = v.shift()
-          funcs = v
-        }
+      if (isObject(value)
+      // || (isArray(value) && !__isString(value[0]))
+      ) {
 
-        const matches = value.match(castPattern)
+      } else {
+        // __log(_value, value)
+        const matches = _value.match(castPattern)
 
         if (matches) {
           let result = get(props.bindData, matches[1])
@@ -86,10 +87,23 @@ export default {
           })
 
           if (result) {
-            o[k] = result
-            delete filteredAttributes[k]
+            object[key] = result
+            delete filteredAttributes[key]
           }
         }
+      }
+    }
+    const castPattern = /\$([\w|.]+)/
+    const filteredAttributes = cloneDeep(props.configuration.attributes)
+
+    const castedAttributes = computed(() => {
+      const attrs = cloneDeep(props.configuration.attributes)
+      return reduce(attrs, (o, v, k) => {
+        if (!(isArray(v) || __isString(v) || __isObject(v))) {
+          return o
+        }
+
+        castAttribute(o, k, v)
 
         return o
       }, {})
