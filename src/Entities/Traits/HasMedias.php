@@ -48,7 +48,7 @@ trait HasMedias
             'lqip_data',
             'ratio',
             'metadatas',
-        ], config(unusualBaseKey() . '.media_library.translated_form_fields', false) ? ['locale'] : []))
+        ], unusualConfig('media_library.translated_form_fields', false) ? ['locale'] : []))
             ->withTimestamps()->orderBy(unusualConfig('tables.mediables', 'twill_mediables') . '.id', 'asc');
     }
 

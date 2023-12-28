@@ -213,7 +213,7 @@
 import { mergeProps as _mergeProps, createVNode as _createVNode } from 'vue'
 // import { VDataTableRows } from 'vuetify/labs/ VDataTableRows'
 
-import { VDataTableServer, VDataTableRows, VDataTableRow } from 'vuetify/labs/VDataTable'
+// import { VDataTableServer, VDataTableRows, VDataTableRow } from 'vuetify/labs/VDataTable'
 
 // import { TableMixin } from '@/mixins'
 import { useTable } from '@/hooks'
@@ -223,8 +223,6 @@ import draggable from 'vuedraggable'
 export default {
   // mixins: [TableMixin],
   components: {
-    VDataTableServer,
-    VDataTableRow,
     draggable,
     VNodes: {
       functional: true,

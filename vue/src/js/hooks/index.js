@@ -10,3 +10,4 @@ export { default as useModelValue, makeModelValueProps } from './useModelValue.j
 export { default as useDraggable, makeDraggableProps } from './useDraggable.js'
 export { default as useRepeater, makeRepeaterProps } from './useRepeater.js'
 export { default as useFile, makeFileProps } from './useFile.js'
+export { default as useImage, makeImageProps } from './useImage.js'

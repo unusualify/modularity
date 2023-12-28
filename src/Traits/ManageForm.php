@@ -443,6 +443,16 @@ trait ManageForm {
                 $data = $input;
                 // dd($data);
             break;
+            case 'image':
+                // dd($input);
+                $input['name'] ??= 'images';
+                $input['type'] = 'custom-input-image';
+                $input['translated'] = true;
+                $input['default'] ??= [];
+
+                $input['label'] ??= __('Images');
+
+                $data = $input;
             default:
 
                 break;
