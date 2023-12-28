@@ -1,4 +1,4 @@
-import { isEmpty, find } from 'lodash'
+import { isEmpty, find, filter, omitBy, forOwn, reduce } from 'lodash'
 
 const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist'
 const isMediableTypes = 'custom-input-file|custom-input-image'
@@ -354,4 +354,23 @@ export const getSubmitFormData = (inputs, item = null, rootState = null) => {
   }
 
   return values
+}
+
+export const getSchema = (inputs) => {
+  const _inputs = omitBy(inputs, (value, key) => {
+    return Object.prototype.hasOwnProperty.call(value, 'slotable')
+  })
+
+  if (find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'group'))) {
+    // reduce(_inputs, (acc, input, key) => {
+    //   if(Object.prototype.hasOwnProperty.call(input, 'group')){
+    //     if(acc[input.group])
+    //   }else{
+    //     acc[key] = input
+    //   }
+    //   return acc
+    // }, {})
+  }
+
+  return _inputs
 }
