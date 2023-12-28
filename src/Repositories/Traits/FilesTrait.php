@@ -63,14 +63,14 @@ trait FilesTrait
     {
         $files = Collection::make();
 
-        $system_locales = getLocales();
+        $systemLocales = getLocales();
 
-        $files_roles = $this->getFileColumns();
+        $fileRoles = $this->getFileColumns();
 
-        foreach($files_roles as $role){
+        foreach($fileRoles as $role){
             if(isset($fields[$role]) && count(array_keys($fields[$role])) > 0){
                 $default_locale = array_keys($fields[$role])[0];
-                foreach (getLocales() as $locale) {
+                foreach ($systemLocales as $locale) {
                     if(isset($fields[$role][$locale])){
                         Collection::make($fields[$role][$locale])->each(function ($file) use (&$files, $role, $locale) {
                             $files->push([
@@ -98,6 +98,8 @@ trait FilesTrait
                 //         ]);
                 //     });
                 // }
+            }else{
+                dd($role);
             }
         }
 
@@ -139,73 +141,42 @@ trait FilesTrait
      */
     public function getFormFieldsFilesTrait($object, $fields)
     {
-        // dd($object, $fields, $this->getFileColumns());
-        // $fields['files'] = null;
-
-        // dd($object, $this->getFileColumns(), $object->has('files'), $object->files->groupBy('pivot.role'));
         if ($object->has('files')) {
-            foreach ($object->files->groupBy('pivot.role') as $role => $filesByRole) {
-                // dd($role, $filesByRole);
-                foreach ($filesByRole->groupBy('pivot.locale') as $locale => $filesByLocale) {
-                    // $fields['files'][$locale][$role] = $filesByLocale->map(function ($file) {
-                    //     return $file->mediableFormat();
-                    // });
-                    $fields[$role][$locale] = $filesByLocale->map(function ($file) {
-                        return $file->mediableFormat();
-                    });
+            // foreach ($object->files->groupBy('pivot.role') as $role => $filesByRole) {
+            //     foreach ($filesByRole->groupBy('pivot.locale') as $locale => $filesByLocale) {
+            //         // $fields['files'][$locale][$role] = $filesByLocale->map(function ($file) {
+            //         //     return $file->mediableFormat();
+            //         // });
+            //         $fields[$role][$locale] = $filesByLocale->map(function ($file) {
+            //             return $file->mediableFormat();
+            //         });
+            //     }
+            // }
+            $systemLocales = getLocales();
+            $filesByRole = $object->files->groupBy('pivot.role');
+            foreach ($this->getFileColumns() as $role) {
+                if(isset($filesByRole[$role])){
+                    foreach ($filesByRole->groupBy('pivot.locale') as $locale => $filesByLocale) {
+                        $fields[$role][$locale] = $filesByLocale->map(function ($file) {
+                            return $file->mediableFormat();
+                        });
+                    }
+                }else {
+                    foreach ($systemLocales as $locale) {
+                        $fields[$role][$locale] = [];
+                    }
                 }
             }
         }
         return $fields;
     }
 
-    public function getFileColumns_(){
-        $moduleName = null;
-        $routeName = null;
-        if( preg_match('/[M|m]{1}odules[\/\\\]([A-Za-z]+)[\/\\\]/', get_class($this), $matches)){
-            $moduleName = $matches[1];
-        }
-        if( preg_match('/(\w+)Repository/', get_class_short_name($this), $matches)){
-            $routeName = snakeCase($matches[1]);
-        }
-
-        if( $moduleName && $routeName){
-            $module = Modularity::find($moduleName);
-            $route_config = $module->getRouteConfig($routeName);
-
-            $file_inputs = collect($route_config['inputs'])->reduce(function($acc, $curr){
-                if(preg_match('/file/', $curr['type'])){
-                    $acc[] = $curr['name'];
-                }
-
-                return $acc;
-            }, []);
-
-            return $file_inputs;
-            //     // $module->getRouteConfig($routeName),
-            //     // Module::disable('Testify'),
-            //     // config('modules'),
-            //     // $module->getParentRoute(),
-            //     // $module->allEnabledRoutes(),
-            //     // $module->disableRoute('Currency'),
-            //     // $module_config,
-            //     // $route_config
-            // );
-        }
-
-        return false;
-    }
-
-    public function getFileColumns(){
-
-        $file_inputs = collect($this->inputs())->reduce(function($acc, $curr){
+    public function getFileColumns() {
+        return collect($this->inputs())->reduce(function($acc, $curr){
             if(preg_match('/file/', $curr['type'])){
                 $acc[] = $curr['name'];
             }
-
             return $acc;
         }, []);
-
-        return $file_inputs;
     }
 }
