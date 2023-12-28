@@ -12,6 +12,10 @@ export const makeInputProps = propsFactory({
     default () {
       return {}
     }
+  },
+  label: {
+    type: String,
+    default: ''
   }
 })
 
