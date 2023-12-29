@@ -2,7 +2,7 @@
   <div>
     <template v-for="(price,i) in deepModel" :key="`price-${i}`">
       <v-text-field
-        v-bind="$attrs"
+        v-bind="{label, ...$attrs}"
         :name="`${$attrs['name']}-${i}`"
         v-model="deepModel[i][priceInputName]"
         >
