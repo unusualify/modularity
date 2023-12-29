@@ -1,4 +1,4 @@
-import { isEmpty, find, filter, omitBy, forOwn, reduce } from 'lodash'
+import { isEmpty, find, filter, omitBy, forOwn, reduce, cloneDeep } from 'lodash'
 
 const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist'
 const isMediableTypes = 'custom-input-file|custom-input-image'
@@ -24,6 +24,23 @@ const gatherSelected = (selected, block = null) => {
     }
     return null
   }).filter(x => x))
+}
+
+const chunkInputs = (inputs) => {
+  const _inputs = cloneDeep(inputs)
+
+  inputs = {}
+  for (const key in _inputs) {
+    if (_inputs[key].type === 'group' && _inputs[key].schema) {
+      Object.keys(_inputs[key].schema).forEach((name, i) => {
+        inputs[name] = _inputs[key].schema[name]
+      })
+    } else {
+      inputs[key] = _inputs[key]
+    }
+  }
+
+  return inputs
 }
 
 export const hydrateSelected = (item, rootState, block = null) => {
@@ -228,6 +245,8 @@ export const getSchemaModel_ = (inputs, item = null) => {
 }
 
 export const getModel = (inputs, item = null, rootState = null) => {
+  inputs = chunkInputs(inputs)
+
   const editing = __isset(item)
   const values = Object.keys(inputs).reduce((fields, k) => {
     const input = inputs[k]
@@ -303,6 +322,8 @@ export const getModel = (inputs, item = null, rootState = null) => {
 }
 
 export const getSubmitFormData = (inputs, item = null, rootState = null) => {
+  inputs = chunkInputs(inputs)
+
   const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist'
 
   const values = Object.keys(inputs).reduce((fields, k) => {

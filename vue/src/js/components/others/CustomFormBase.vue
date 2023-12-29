@@ -120,17 +120,12 @@
 
               <!-- GROUP | WRAP-->
                 <template v-else-if="/(wrap|group)/.test(obj.schema.type)">
-                  <component
-                    :is="checkInternGroupType(obj)"
-                    v-bind="bindSchema(obj)"
-                    @click="onEvent($event, obj)"
-                  >
-                    <v-card-title v-if="obj.schema.title">{{obj.schema.title}}</v-card-title>
+                    <!-- <v-card-title v-if="obj.schema.title">{{obj.schema.title}}</v-card-title>
                     <v-card-subtitle v-if="obj.schema.subtitle">{{obj.schema.subtitle}}</v-card-subtitle>
-
+                    <ue-title class="text-overline mb-1"  v-if="obj.schema.title">{{obj.schema.title}}t</ue-title> -->
                     <v-custom-form-base
                       :id="`${id}-${obj.key}`"
-                      :model="setValue(obj)"
+                      :modelValue="setValue(obj)"
                       :schema="obj.schema.schema"
                       :row="getRowGroupOrArray(obj)"
                       :col="getColGroupOrArray(obj)"
@@ -139,9 +134,20 @@
                       >
                       <!-- Based on https://gist.github.com/loilo/73c55ed04917ecf5d682ec70a2a1b8e2 -->
                       <template v-for="(_, name) in $slots" #[name]="slotData"><slot :name="name" v-bind= "{ id, obj, index,  ...slotData}" /></template>
-
                     </v-custom-form-base>
-                  </component>
+                  <!-- <v-card>
+                    <v-card-item class="pa-0">
+                      <div>
+                      </div>
+                    </v-card-item>
+
+                  </v-card> -->
+                  <!-- <component
+                    :is="checkInternGroupType(obj)"
+                    v-bind="bindSchema(obj)"
+                    @click="onEvent($event, obj)"
+                  >
+                  </component> -->
                 </template>
               <!-- END GROUP | WRAP -->
 
@@ -716,7 +722,6 @@ export default {
       // schema.searchInput ->   bind 'search-input'
       return (typeof obj.schema.searchInput !== 'undefined') ? 'search-input' : ''
     },
-
     // EXT TYPE
     checkExtensionType (obj) {
       // For native <INPUT> type use prop 'ext'
@@ -733,6 +738,7 @@ export default {
     checkInternGroupType (obj) {
       //  in type 'wrap|group' you can define with typeInt: a component as group - schema: { group1: { type:'wrap', typeInt:'v-card', ... } ...}
       const typeInt = obj.schema.typeInt || defaultInternGroupType
+
       return typeInt.startsWith('v-') ? typeInt : `v-${typeInt}`
     },
     // GET ITERATION KEY FOR TYPE ARRAY
@@ -999,7 +1005,7 @@ export default {
     // Set Value
     setValue (obj, type) {
       // Use 'schema.toCtrl' Function for setting a modified Value
-      return obj.schema.type === 'wrap'
+      return (obj.schema.type === 'wrap' || obj.schema.type === 'group')
         ? this.toCtrl({ value: this.storeStateData, obj, data: this.storeStateData, schema: this.storeStateSchema })
         : this.toCtrl({ value: obj.value, obj, data: this.storeStateData, schema: this.storeStateSchema })
     },

@@ -1,6 +1,7 @@
 <?php
 namespace Unusualify\Modularity\Traits;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Unusualify\Modularity\Facades\Modularity;
@@ -37,10 +38,35 @@ trait ManageTraits {
             $module = Modularity::find($moduleName);
             $route_config = $module->getRouteConfig($routeName);
 
-            return $route_config['inputs'];
+            return $this->chunkInputs($route_config['inputs']);
+            // return $route_config['inputs'];
         }
 
         return [];
+    }
+
+    public function chunkInputs($schema) {
+        return Arr::mapWithKeys($schema, function($input, $key){
+            if(isset($input['type'])){
+                switch ($input['type']) {
+                    case 'group':
+                    case 'wrap':
+                        return $this->chunkInputs($input['schema'] ?? []);
+                    break;
+                    case 'morphTo':
+                        return [ uniqid() => $input];
+                    break;
+                    default:
+
+                        break;
+                }
+
+                if(isset($input['name'])){
+                    return [ $input['name'] => $input ];
+                }
+            }
+            return [];
+        });
     }
 
     public function routeName() {

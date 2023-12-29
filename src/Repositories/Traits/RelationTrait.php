@@ -125,7 +125,8 @@ trait RelationTrait
         // dd(
         //     $this->getMorphToRelations(),
         //     $this->getBelongsToManyRelations(),
-        //     $schema
+        //     $schema,
+        //     $this->inputs()
         // );
         $morphToRelations = $this->getMorphToRelations();
         $belongsToManyRelations = $this->getBelongsToManyRelations();
@@ -149,8 +150,9 @@ trait RelationTrait
         }
 
         // dd($fields);
-        foreach ($schema as $key => $input) {
-            if(in_array($input['name'], $belongsToManyRelations) ){
+        foreach ($this->inputs() as $key => $input) {
+
+            if(isset($input['name']) && in_array($input['name'], $belongsToManyRelations) ){
 
                 if(preg_match('/repeater/', $input['type'])){
                     $query = $object->{$input['name']}();
