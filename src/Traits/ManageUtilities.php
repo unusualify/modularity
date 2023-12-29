@@ -234,7 +234,7 @@ trait ManageUtilities {
         $itemId = $this->getItemIdentifier($item);
 
         // dd(
-        //     array_merge($this->repository->getFormFields($item, $schema)),
+        //     $this->repository->getFormFields($item, $schema),
         //     $schema
         // );
 
@@ -243,19 +243,7 @@ trait ManageUtilities {
             'formAttributes' => [
                 'hasSubmit' => true,
                 'stickyButton' => false,
-                'modelValue' => array_merge($this->repository->getFormFields($item, $schema), [
-                    'package_continent_id' => 1,
-                    // 'packageFeatures' => [
-                    //     [
-                    //         'package_feature_id' => 1,
-                    //         'active' => true
-                    //     ],
-                    //     [
-                    //         'package_feature_id' => 2,
-                    //         'active' => false
-                    //     ]
-                    // ]
-                ]),
+                'modelValue' => $this->repository->getFormFields($item, $schema),
                 // 'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => $this->routeName]),
                 'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => trans_choice('modules.'. snakeCase($this->routeName), 0)]),
                 // 'schema'  => $schema, // input fields to be used in unusual datatable component
