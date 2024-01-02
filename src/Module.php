@@ -123,6 +123,27 @@ class Module extends NwidartModule
         return $this->getPath() . (empty($directory) ?: "/$directory");
     }
 
+    /**
+     * Get specific class namespace of module.
+     *
+     * @return string
+     */
+    public function getClassNamespace($class): string
+    {
+        return  $this->getBaseNamespace() . "\\"  . $class;
+    }
+
+    /**
+     * Get base namespace of the module.
+     *
+     * @return string
+     */
+    public function getBaseNamespace(): string
+    {
+        return  config('modules.namespace', 'Modules') . "\\" . $this->getStudlyName();
+    }
+
+
     public function getRouteConfig($route_name){
         return $this->getRouteConfigs( snakeCase($route_name) ) ;
     }
