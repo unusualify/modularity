@@ -42,11 +42,11 @@ class NavigationMiddleware
             $user = auth()->user();
 
             if(count($user->roles) > 0 && $user->isClient()){
-                $navigation['sidebar'] = config(unusualBaseKey() .'-navigation.sidebar.client');
+                $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.client') );
             }else if($user->hasRole(1)) {
-                $navigation['sidebar'] = config(unusualBaseKey() .'-navigation.sidebar.superadmin');
+                $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.superadmin') );
             }else{
-                $navigation['sidebar'] = config(unusualBaseKey() .'-navigation.sidebar.default');
+                $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.default') );
             }
             // setActiveMenuItem($configuration['sidebar'], $configuration['current_url']);
             $view->with('navigation', $navigation);
