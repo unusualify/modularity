@@ -687,6 +687,13 @@ class RouteGenerator extends Generator
             ]);
         }
 
+        if($this->generatorConfig('route-controller-front')->generate()){
+            $this->console->call('unusual:make:controller:front', [
+                'module' => $this->module->getStudlyName(),
+                'name' => $this->getName(),
+            ]);
+        }
+
         $console_traits =  $this->traits->mapWithKeys(function ($item, $key) {
             return ["--{$key}" => $item];
         })->toArray();
