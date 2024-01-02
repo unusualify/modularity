@@ -3,11 +3,28 @@
 namespace Unusualify\Modularity\Support;
 
 use Illuminate\Support\Facades\Route;
-
+use Unusualify\Modularity\Http\Middleware\{
+    AuthenticateMiddleware,
+    CompanyRegistrationMiddleware,
+    LanguageMiddleware,
+    ImpersonateMiddleware,
+    NavigationMiddleware,
+    RedirectIfAuthenticatedMiddleware,
+    AuthorizationMiddleware
+};
 class UnusualRoutes
 {
 
     public $counter = 1;
+
+    private $defaultMiddlewares = [
+        'unusual.core'
+        // 'language',
+        // 'impersonate',
+
+        // 'unusual_auth:unusual_users',
+        // 'auth',
+    ];
 
     public function registerRoutes(
         $router,
@@ -18,6 +35,9 @@ class UnusualRoutes
         $instant = false
     ): void {
         $callback = function () use ($router, $groupOptions, $middlewares, $namespace, $routesFile) {
+            // dd(
+            //     $router, $groupOptions, $middlewares, $namespace, $routesFile
+            // );
             if (file_exists($routesFile)) {
                 $hostRoutes = function ($router) use (
                     $middlewares,
@@ -42,7 +62,7 @@ class UnusualRoutes
                     $hostRoutes
                 );
 
-            }else{
+            } else{
                 $routesFile;
             }
         };
@@ -61,7 +81,7 @@ class UnusualRoutes
 
     public function configureRoutePatterns(): void
     {
-        if (($patterns = config(unusualBaseKey() . '.route_patterns')) != null) {
+        if (($patterns = unusualConfig('route_patterns')) != null) {
             if (is_array($patterns)) {
                 foreach ($patterns as $label => $pattern) {
                     Route::pattern($label, $pattern);
@@ -76,60 +96,64 @@ class UnusualRoutes
     public function groupOptions(): array
     {
         return [
-            // 'as'            => config(unusualBaseKey() . '.admin_route_name_prefix', 'admin.'),
-            'middleware'    => [config(unusualBaseKey() . '.admin_middleware_group', 'web')],
-            // 'prefix'        => rtrim(ltrim(config(unusualBaseKey() . '.admin_app_path'), '/'), '/'),
+            'as'            => rtrim(ltrim(unusualConfig('admin_route_name_prefix', 'admin'), '.'), '.') . '.',
+            'prefix'        => rtrim(ltrim(unusualConfig('admin_app_path'), '/'), '/'),
         ];
     }
 
-    public function moduleGroupOptions(): array
+    public function webMiddlewares(): array
     {
-        return array_merge([
-
-        ], $this->groupOptions());
+        return [
+            ...['web.auth'],
+            ...$this->defaultMiddlewares,
+            ...['unusual.panel']
+        ];
     }
 
-    public function internalGroupOptions(): array
+    public function apiMiddlewares(): array
     {
-        return array_merge([
-            // 'as' => strtolower( config(unusualBaseKey() . '.name') ).".",
-        ], $this->groupOptions());
+        return [
+            ...['api.auth'],
+            ...$this->defaultMiddlewares,
+        ];
     }
 
-    public function middlewares($middleware = null): array
+    public function defaultMiddlewares(): array
     {
-        if (is_array($middleware)) {
-            return $middleware;
-        }
+        return $this->defaultMiddlewares;
+    }
 
-        // dd(
-        //     app()->runningInConsole(),
-        //     get_class_methods(app())
-        // );
-        $defaultMiddlewares = [
+    function generateRouteMiddlewares()  {
+
+        Route::aliasMiddleware('unusual_auth', AuthenticateMiddleware::class);
+        Route::aliasMiddleware('unusual_guest', RedirectIfAuthenticatedMiddleware::class);
+
+        Route::middlewareGroup('web.auth', [
+            'web',
             'unusual_auth:unusual_users',
             'auth',
-        ];
+        ]);
+        Route::middlewareGroup('api.auth', [
+            'api',
+            'unusual_auth:unusual_users',
+            'auth',
+        ]);
 
-        $webMiddlewares = [
-            'impersonate',
+        Route::aliasMiddleware('language', LanguageMiddleware::class);
+        Route::aliasMiddleware('impersonate', ImpersonateMiddleware::class);
+        Route::middlewareGroup('unusual.core', [
             'language',
+            'impersonate'
+        ]);
+
+        Route::aliasMiddleware('navigation', NavigationMiddleware::class);
+        Route::aliasMiddleware('authorization', AuthorizationMiddleware::class);
+        Route::aliasMiddleware('company_registration', CompanyRegistrationMiddleware::class);
+        Route::middlewareGroup('unusual.panel', [
             'navigation',
             'authorization',
             'company_registration'
-        ];
-
-        $middlewares = array_merge($defaultMiddlewares, $webMiddlewares);
-
-        // if(!app()->runningInConsole()){
-        //     $middlewares = array_merge($middlewares, $webMiddlewares);
-        // }
-
-        // if ($this->supportSubdomainRouting()) {
-        //     array_unshift($middleware, 'supportSubdomainRouting');
-        // }
-
-        return $middlewares;
+        ]);
     }
 
 }
