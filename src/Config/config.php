@@ -7,6 +7,10 @@ return [
     'namespace' => env('BASE_NAMESPACE','Unusualify\\Modularity'),
     'name' => env('UNUSUAL_BASE_NAME','Unusual'),
 
+    'admin_app_url' => env('ADMIN_APP_URL', 'admin.' . env('APP_URL')),
+    'admin_app_path' => env('ADMIN_APP_PATH', ''),
+    'admin_route_name_prefix' => env('ADMIN_ROUTE_NAME_PREFIX', 'admin'),
+
     'version' => '1.0.0',
     'auth_login_redirect_path' => '/',
     'is_development' => env('UNUSUAL_DEV', false),
@@ -108,6 +112,7 @@ return [
             'repository' => ['path' => 'Repositories', 'generate' => true],
             'route-controller' => ['path' => 'Http/Controllers', 'generate' => true],
             'route-controller-api' => ['path' => 'Http/Controllers/API', 'generate' => true],
+            'route-controller-front' => ['path' => 'Http/Controllers/Front', 'generate' => true],
             'route-request' => ['path' => 'Http/Requests', 'generate' => true],
             // 'view' => ['path' => 'Resources/views/$SNAKE_NAME$', 'generate' => true],
         ]
@@ -124,6 +129,7 @@ return [
         'files' => [
             'routes/web' => 'Routes/web.php',
             'routes/api' => 'Routes/api.php',
+            'routes/front' => 'Routes/front.php',
             'views/index' => 'Resources/views/$SNAKE_CASE$/index.blade.php',
             'views/form' => 'Resources/views/$SNAKE_CASE$/form.blade.php',
             // 'repository' => 'Repositories/$STUDLY_NAME$Repository.php',
@@ -133,6 +139,7 @@ return [
         'replacements' => [
             'routes/web' => ['LOWER_NAME', 'STUDLY_NAME'],
             'routes/api' => ['LOWER_NAME'],
+            'routes/front' => ['LOWER_NAME'],
             'views/index' => ['STUDLY_NAME'],
             'views/form' => ['STUDLY_NAME'],
             // 'route-controller' => ['NAMESPACE', 'MODULE', 'MODULE_NAMESPACE', 'CLASS', 'STUDLY_NAME', 'LOWER_NAME'],
