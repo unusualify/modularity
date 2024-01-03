@@ -2,13 +2,6 @@
 
 use Unusualify\Modularity\Facades\UNavigation;
 
-// dd(
-//     UNavigation::baseMenu(),
-//     UNavigation::modulesMenu()
-// );
-// dd(
-//     phpArrayFileContent(UNavigation::modulesMenu()['package']),
-// );
 return [
     /*
     |--------------------------------------------------------------------------
@@ -20,13 +13,13 @@ return [
         'default' => [
             'dashboard' => [
                 'name' => 'Dashboard',
-                'route_name' => 'dashboard',
+                'route_name' => 'admin.dashboard',
             ],
         ],
         'superadmin' => [
             'dashboard' => [
                 'name' => 'Dashboard',
-                'route_name' => 'dashboard',
+                'route_name' => 'admin.dashboard',
             ],
             '_system_settings' => [
                 'name' => 'System Settings',
@@ -35,7 +28,7 @@ return [
             'locales' => [
                 'name' => 'Locales',
                 'icon' => 'mdi-exit-to-app',
-                'route_name' => 'languages.index',
+                'route_name' => 'admin.languages.index',
                 'target' => '_blank',
             ],
             '_modules' => [
@@ -51,7 +44,7 @@ return [
             ],
             'profile' => [
                 'name' => 'Profile Settings',
-                'route_name' => 'profile',
+                'route_name' => 'admin.profile',
             ],
 
         ],
@@ -61,11 +54,11 @@ return [
                 'items' => [
                     'dashboard' => [
                         'name' => 'Dashboard',
-                        'route_name' => 'dashboard',
+                        'route_name' => 'admin.dashboard',
                     ],
                     'profile' => [
                         'name' => 'Profile',
-                        'route_name' => 'profile',
+                        'route_name' => 'admin.profile',
                     ]
                 ]
             ],
