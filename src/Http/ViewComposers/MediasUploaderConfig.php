@@ -6,6 +6,7 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\View\View;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\Store as SessionStore;
+use Illuminate\Support\Facades\Route;
 
 class MediasUploaderConfig
 {
@@ -52,7 +53,7 @@ class MediasUploaderConfig
         // the execution of the appropriate  implementation
         $endpointByType = [
             'local' => function () {
-                return $this->urlGenerator->route('media-library.medias.store');
+                return $this->urlGenerator->route(Route::hasAdmin('media-library.medias.store'));
             },
             's3' => function () use ($libraryDisk) {
                 return s3Endpoint($libraryDisk);
@@ -64,14 +65,14 @@ class MediasUploaderConfig
 
         $signatureEndpointByType = [
             'local' => null,
-            's3' => $this->urlGenerator->route('media-library.sign-s3-upload'),
-            'azure' => $this->urlGenerator->route('media-library.sign-azure-upload'),
+            's3' => $this->urlGenerator->route(Route::hasAdmin('media-library.sign-s3-upload')),
+            'azure' => $this->urlGenerator->route(Route::hasAdmin('media-library.sign-azure-upload')),
         ];
 
         $mediasUploaderConfig = [
             'endpointType' => $endpointType,
             'endpoint' => $endpointByType[$endpointType](),
-            'successEndpoint' => $this->urlGenerator->route('media-library.medias.store'),
+            'successEndpoint' => $this->urlGenerator->route(Route::hasAdmin('media-library.medias.store')),
             'signatureEndpoint' => $signatureEndpointByType[$endpointType],
             'endpointBucket' => $this->config->get('filesystems.disks.' . $libraryDisk . '.bucket', 'none'),
             'endpointRegion' => $this->config->get('filesystems.disks.' . $libraryDisk . '.region', 'none'),

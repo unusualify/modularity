@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\Factory as ViewFactory;
 use Unusualify\Modularity\Entities\User;
@@ -192,7 +193,7 @@ class ResetPasswordController extends Controller
                         ],
                     ])),
 
-                    'actionUrl' => route('password.reset.update'),
+                    'actionUrl' => route(Route::hasAdmin('password.reset.update')),
                     'buttonText' => 'authentication.reset-password',
                     'formClass' => 'px-5',
                 ],

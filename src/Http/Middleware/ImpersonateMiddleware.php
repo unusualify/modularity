@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Http\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Support\Facades\Route;
 
 class ImpersonateMiddleware
 {
@@ -39,8 +40,8 @@ class ImpersonateMiddleware
                 'active' => auth()->user()->isSuperAdmin() || auth()->user()->isImpersonating(),
                 'users' =>  $users,
                 'impersonated' => auth()->user()->isImpersonating(),
-                'stopRoute' => route('impersonate.stop'),
-                'route' => route('impersonate', ['id' => ':id'])
+                'stopRoute' => route(Route::hasAdmin('impersonate.stop')),
+                'route' => route(Route::hasAdmin('impersonate'), ['id' => ':id'])
             ];
             // setActiveMenuItem($configuration['sidebar'], $configuration['current_url']);
             $view->with('impersonation', $impersonation);

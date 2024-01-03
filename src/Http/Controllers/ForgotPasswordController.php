@@ -6,6 +6,7 @@ use Illuminate\Auth\Passwords\PasswordBrokerManager;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\Factory as ViewFactory;
 use Unusualify\Modularity\Traits\ManageUtilities;
 
@@ -72,7 +73,7 @@ class ForgotPasswordController extends Controller
                     ],
                 ])),
 
-                'actionUrl' => route('password.reset.email'),
+                'actionUrl' => route(Route::hasAdmin('password.reset.email')),
                 'buttonText' => 'authentication.reset-send',
 
                 'formClass' => 'px-5',
@@ -91,7 +92,7 @@ class ForgotPasswordController extends Controller
                             'elements' => ___('authentication.back-to-login'),
                             "attributes" => [
                                 'variant' => 'plain',
-                                'href' => route('login.form'),
+                                'href' => route(Route::hasAdmin('login.form')),
                                 'class' => ''
                             ],
                         ]

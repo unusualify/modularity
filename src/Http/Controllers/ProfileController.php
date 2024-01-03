@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Entities\User;
@@ -294,7 +295,7 @@ class ProfileController extends BaseController
                                 return [ $item['name'] => $item['default'] ?? ''];
                                 $carry[$key] = $item->default ?? '';
                             })->toArray(),
-                            'actionUrl' => route('profile.company'),
+                            'actionUrl' => route(Route::hasAdmin('profile.company')),
                         ])
                 ]
             ];

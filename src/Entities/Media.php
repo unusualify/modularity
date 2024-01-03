@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Entities;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Services\MediaLibrary\ImageService;
 
@@ -66,6 +67,7 @@ class Media extends Model
 
     public function mediableFormat()
     {
+        $routeNamePrefix = adminRouteNamePrefix() ? adminRouteNamePrefix() . '.' : '';
         return [
             'id' => $this->id,
             'name' => $this->filename,
@@ -77,10 +79,10 @@ class Media extends Model
             'tags' => $this->tags->map(function ($tag) {
                 return $tag->name;
             }),
-            'deleteUrl' => $this->canDeleteSafely() ? moduleRoute('medias', 'media-library', 'destroy', [$this->id]) : null,
-            'updateUrl' => route('media-library.medias.single-update'),
-            'updateBulkUrl' => route('media-library.medias.bulk-update'),
-            'deleteBulkUrl' => route('media-library.medias.bulk-delete'),
+            'deleteUrl' => $this->canDeleteSafely() ? moduleRoute('medias', $routeNamePrefix . 'media-library', 'destroy', [$this->id]) : null,
+            'updateUrl' => route(Route::hasAdmin('media-library.medias.single-update')),
+            'updateBulkUrl' => route(Route::hasAdmin('media-library.medias.bulk-update')),
+            'deleteBulkUrl' => route(Route::hasAdmin('media-library.medias.bulk-delete')),
             'metadatas' => [
                 'default' => [
                     'caption' => $this->caption,

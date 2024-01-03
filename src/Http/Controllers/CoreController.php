@@ -609,6 +609,11 @@ abstract class CoreController extends Controller
 
         $routePrefixes = [];
 
+        $admin_route_prefix = adminRouteNamePrefix();
+
+        if( $admin_route_prefix )
+            $routePrefixes[] = $admin_route_prefix;
+
         if( isset($this->config->base_prefix) && $this->config->base_prefix)
             $routePrefixes[] = snakeCase(studlyName(unusualConfig('base_prefix', 'system-settings')));
 

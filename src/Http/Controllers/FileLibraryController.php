@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Support\Facades\Route;
 
 class FileLibraryController extends BaseController implements SignUploadListener
 {
@@ -128,14 +129,16 @@ class FileLibraryController extends BaseController implements SignUploadListener
      */
     private function buildFile($item)
     {
+        $routeNamePrefix = adminRouteNamePrefix() ? adminRouteNamePrefix() . '.' : '';
+
         return $item->mediableFormat() + [
             'tags' => $item->tags->map(function ($tag) {
                 return $tag->name;
             }),
-            'deleteUrl' => $item->canDeleteSafely() ? moduleRoute($this->moduleName, $this->routePrefix, 'destroy', [$item->id]) : null,
-            'updateUrl' => $this->urlGenerator->route('file-library.files.single-update'),
-            'updateBulkUrl' => $this->urlGenerator->route('file-library.files.bulk-update'),
-            'deleteBulkUrl' => $this->urlGenerator->route('file-library.files.bulk-delete'),
+            'deleteUrl' => $item->canDeleteSafely() ? moduleRoute($this->moduleName, $routeNamePrefix .  $this->routePrefix, 'destroy', [$item->id]) : null,
+            'updateUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.files.single-update')),
+            'updateBulkUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.files.bulk-update')),
+            'deleteBulkUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.files.bulk-delete')),
         ];
     }
 

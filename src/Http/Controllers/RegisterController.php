@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Unusualify\Modularity\Entities\Company;
 use Unusualify\Modularity\Entities\User;
@@ -83,7 +84,7 @@ class RegisterController extends Controller
                     ],
                 ])),
 
-                'actionUrl' => route('register'),
+                'actionUrl' => route(Route::hasAdmin('register')),
                 'buttonText' => 'authentication.register',
                 'formClass' => 'px-5',
             ],
@@ -99,7 +100,7 @@ class RegisterController extends Controller
                             'elements' => ___('authentication.back-to-login'),
                             "attributes" => [
                                 'variant' => 'plain',
-                                'href' => route('login.form'),
+                                'href' => route(Route::hasAdmin('login.form')),
                                 'class' => ''
                             ],
                         ]
@@ -165,7 +166,7 @@ class RegisterController extends Controller
 
         return $request->wantsJson()
         ?   new JsonResponse([
-                'redirector' => route('login.form')
+                'redirector' => route(Route::hasAdmin('login.form'))
             ], 200)
         :   $this->sendLoginResponse($request);
     }

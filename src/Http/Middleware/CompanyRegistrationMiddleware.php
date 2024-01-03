@@ -25,7 +25,7 @@ class CompanyRegistrationMiddleware{
         // dd(auth()->user()->invalidCompany);
         if (!($request->routeIs('profile.*') || $request->routeIs('profile'))) {
             if (auth()->user()->invalidCompany) {
-                return redirect()->route('profile');
+                return redirect()->route(Route::hasAdmin('profile'));
             }
         }
         return $next($request);

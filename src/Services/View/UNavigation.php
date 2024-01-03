@@ -28,31 +28,16 @@ class UNavigation
     public function __construct(Request $request)
     {
         $this->request = $request;
-
     }
 
     public function systemMenu()
     {
         return $this->sidebarMenuFromModules(Modularity::getSystemModules());
-        return $this->sidebarMenuFromConfigs(array_map(
-            function($item){
-                return $item->getConfig();
-            },
-            Modularity::getSystemModules()
-        ));
     }
 
     public function modulesMenu()
     {
         return $this->sidebarMenuFromModules(Modularity::getModules());
-
-        return $this->sidebarMenuFromConfigs(array_map(
-            function($item){
-                return $item->getConfig();
-                // return config(snakeCase($item->getName()));
-            },
-            Modularity::getModules()
-        ));
     }
 
     public function sidebarMenuItem($array)
@@ -64,8 +49,9 @@ class UNavigation
             }, $array['items']);
 
         if(isset($array['route_name'])){
-            if(Route::has($array['route_name'])){
-                $array['route'] = route($array['route_name']);
+            $routeName = Route::hasAdmin($array['route_name']);
+            if($routeName){
+                $array['route'] = route($routeName);
                 if($array['route'] == $this->request->url()){
                     $is_active = 1;
                 }
@@ -79,115 +65,6 @@ class UNavigation
             'is_active' => $is_active,
             'icon' => ''
         ], $array);
-    }
-
-    public function sidebarMenuFromConfigs($configs)
-    {
-        $arrays = [];
-
-        foreach ( $configs as $moduleName => $config) {
-            try {
-                $name = $config['name'];
-                //code...
-            } catch (\Throwable $th) {
-                // continue;
-                dd(
-                    $moduleName,
-                    $config,
-                    $configs,
-                );
-            }
-
-
-
-            $pr_name = $this->getSnakeCase($name);
-            // $pr => parent route
-            // $sr => sub route
-            $pr = findParentRoute($config)?:[
-                'url' => pluralize(kebabCase($config['name'])),
-                'route_name' => snakeCase($config['name'])
-            ]; //  parent_route array|object
-
-            if( !array_key_exists('url', $pr) && !array_key_exists('route_name', $pr) ){
-                $pr['url'] = pluralize(kebabCase($config['name']));
-                $pr['route_name'] = snakeCase($config['name']);
-            }
-            $number_route = count($config['routes']);
-
-            $array = [];
-            if($number_route > 0){
-                $array = [
-                    'name' => $config['headline'] ?? pluralize(headline($config['name'])),
-                    'icon' => $config['icon'] ?? '',
-                ];
-            }
-
-            $system_route_prefix = (isset($config['base_prefix']) && $config['base_prefix']) ? snakeCase(studlyName(unusualConfig('base_prefix', 'system-settings'))) . '.' : '';
-
-            foreach( $config['routes'] as $item){
-                // $sr sub route array|object
-                $route_name = $item['route_name'] . ".index";
-                // dd($route_name);
-
-                if( !(isset($item['parent']) && $item['parent']) ){
-                    try {
-
-                        $route_name = $pr_name . '.' . $route_name;
-                    } catch (\Throwable $th) {
-                        dd(
-                            $pr,
-                            findParentRoute($config),
-                            $config
-                        );
-                    }
-                    // $route_name = $pr['route_name'] . '.' . $route_name;
-
-                }
-
-                $route_name = $system_route_prefix . $route_name;
-
-                if( isset($item['parent']) && $item['parent'] ){
-
-                    // only one link for module
-                    if($number_route < 2 && Route::has($route_name)){
-                        $array['route_name'] = $route_name;
-                        // $array = [
-                        //     'name' => $item['headline'] ?? pluralize(headline($item['name'])),
-                        //     'icon' => $item['icon'] ?? '',
-                        //     'route_name' => $route_name
-                        // ];
-                    }else{
-
-                        $array['items'][$this->getSnakeCase($item['name'])] = [
-                            'name' => $item['headline'] ?? pluralize(headline($item['name'])),
-                            'icon' => $item['icon'] ?? '',
-                            'route_name' => $route_name
-                        ];
-                        // $array = [
-                        //     'name' => $config['headline'] ?? pluralize(headline($config['name'])),
-                        //     'icon' => $config['icon'] ?? '',
-                        //     'items' => [
-                        //         snakeCase($config['name']) => [
-                        //             'name' => $item['headline'] ?? pluralize(headline($item['name'])),
-                        //             'icon' => $item['icon'] ?? '',
-                        //             'route_name' => $route_name
-                        //         ]
-                        //     ]
-                        // ];
-                    }
-                }else{
-                    $array['items'][$this->getSnakeCase($item['name'])] = [
-                        'name' => $item['headline'] ?? pluralize($item['name']),
-                        'icon' => $item['icon'] ?? '',
-                        'route_name' => $route_name
-                    ];
-                }
-            }
-
-            // dd($array);
-            $arrays[snakeCase($config['name'])] = $array;
-        }
-        return $arrays;
     }
 
     public function sidebarMenuFromModules($modules)
@@ -221,7 +98,9 @@ class UNavigation
                 ];
             }
 
-            $system_route_prefix = $module->hasSystemPrefix()
+            $route_prefix = adminRouteNamePrefix() ? adminRouteNamePrefix() . '.' :  '';
+
+            $route_prefix .= $module->hasSystemPrefix()
                 ? snakeCase(studlyName(unusualConfig('base_prefix', 'system-settings'))) . '.'
                 : '';
 
@@ -242,7 +121,7 @@ class UNavigation
                     }
                 }
 
-                $route_name = $system_route_prefix . $route_name;
+                $route_name = $route_prefix . $route_name;
 
                 if( isset($item['parent']) && $item['parent'] ){
                     // only one link for module
@@ -267,6 +146,7 @@ class UNavigation
             // dd($array);
             $arrays[$module->getSnakeName()] = $array;
         }
+
         return $arrays;
     }
 

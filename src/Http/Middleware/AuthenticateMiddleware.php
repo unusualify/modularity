@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Illuminate\Support\Facades\Route;
 
 class AuthenticateMiddleware extends Middleware
 {
@@ -14,6 +15,6 @@ class AuthenticateMiddleware extends Middleware
      */
     protected function redirectTo($request)
     {
-        return route('login.form');
+        return route(Route::hasAdmin('login.form'));
     }
 }

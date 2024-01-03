@@ -96,7 +96,7 @@ class UnusualRoutes
     public function groupOptions(): array
     {
         return [
-            'as'            => rtrim(ltrim(unusualConfig('admin_route_name_prefix', 'admin'), '.'), '.') . '.',
+            'as'            => adminRouteNamePrefix() . '.',
             'prefix'        => rtrim(ltrim(unusualConfig('admin_app_path'), '/'), '/'),
         ];
     }

@@ -363,11 +363,18 @@ trait ManageUtilities {
                 if($context->type == 'formWrapper'){
                     $forms = Collection::make($context->elements)->map(function($element){
 
+                        $routeName = Route::hasAdmin($element->route);
+
+                        if(!$routeName){
+                            return false;
+                        }
+
                         $schema = $this->createFormSchema(getInputDraft($element->draft));
 
-                        $parameters = Collection::make(Route::getRoutes()->getByName($element->route)->parameterNames())->mapWithKeys(function($parameter, $j){
+                        $parameters = Collection::make(Route::getRoutes()->getByName($routeName)->parameterNames())->mapWithKeys(function($parameter, $j){
                             return [ $parameter => ":{$parameter}"];
                         })->toArray();
+
 
                         // $modelValueAbstract = $this->getSnakeCase($this->routeName);
                         // if(isset($element->relation)){
@@ -386,7 +393,7 @@ trait ManageUtilities {
                                 return [ $item['name'] => $item['default'] ?? ''];
                                 $carry[$key] = $item->default ?? '';
                             })->toArray(),
-                            'actionUrl' => route($element->route, $parameters),
+                            'actionUrl' => route($routeName, $parameters),
                         ];
                     })->toArray();
 

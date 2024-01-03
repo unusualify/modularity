@@ -418,7 +418,7 @@ class RouteServiceProvider extends ServiceProvider
                 return $routeName;
             }
 
-            $admin_route_prefix = rtrim(ltrim(unusualConfig('admin_route_name_prefix', 'admin'), '.'), '.');
+            $admin_route_prefix = adminRouteNamePrefix();
 
             if( explode('.', $routeName)[0] !== $admin_route_prefix && Route::has($admin_route_prefix . '.' . $routeName)){
                 return $admin_route_prefix . '.' . $routeName;

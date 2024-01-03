@@ -15,6 +15,7 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\Factory as ViewFactory;
 use Unusualify\Modularity\Traits\ManageUtilities;
 use PragmaRX\Google2FA\Google2FA;
@@ -194,7 +195,7 @@ class LoginController extends Controller
                     ]
                 ])),
 
-                'actionUrl' => route('login'),
+                'actionUrl' => route(Route::hasAdmin('login')),
                 'buttonText' => 'authentication.login',
                 'formClass' => 'px-5',
             ],
@@ -210,7 +211,7 @@ class LoginController extends Controller
                             'elements' => ___('authentication.forgot-password'),
                             "attributes" => [
                                 'variant' => 'plain',
-                                'href' => route('password.reset.link'),
+                                'href' => route(Route::hasAdmin('password.reset.link')),
                                 'class' => 'float-right'
                             ],
                         ],
@@ -219,7 +220,7 @@ class LoginController extends Controller
                             'elements' => ___('authentication.register'),
                             "attributes" => [
                                 'variant' => 'plain',
-                                'href' => route('register.form'),
+                                'href' => route(Route::hasAdmin('register.form')),
                                 'class' => 'float-right'
                             ],
                         ]
@@ -249,7 +250,7 @@ class LoginController extends Controller
 
         $request->session()->regenerateToken();
 
-        return $this->redirector->to(route('login.form'));
+        return $this->redirector->to(route(Route::hasAdmin('login.form')));
     }
 
     /**
@@ -272,9 +273,9 @@ class LoginController extends Controller
 
             return $request->wantsJson()
                 ?   new JsonResponse([
-                        'redirector' => $this->redirector->to(route('admin.login-2fa.form'))->getTargetUrl(),
+                        'redirector' => $this->redirector->to(route(Route::hasAdmin('admin.login-2fa.form')))->getTargetUrl(),
                     ])
-                :   $this->redirector->to(route('admin.login-2fa.form'));
+                :   $this->redirector->to(route(Route::hasAdmin('admin.login-2fa.form')));
         }
 
         return $request->wantsJson()
@@ -310,7 +311,7 @@ class LoginController extends Controller
             return $this->redirector->intended($this->redirectTo);
         }
 
-        return $this->redirector->to(route('admin.login-2fa.form'))->withErrors([
+        return $this->redirector->to(route(Route::hasAdmin('admin.login-2fa.form')))->withErrors([
             'error' => 'Your one time password is invalid.',
         ]);
     }
@@ -355,7 +356,7 @@ class LoginController extends Controller
                     $request->session()->put('oauth:user_id', $user->id);
                     $request->session()->put('oauth:user', $oauthUser);
                     $request->session()->put('oauth:provider', $provider);
-                    return $this->redirector->to(route('admin.login.oauth.showPasswordForm'));
+                    return $this->redirector->to(route(Route::hasAdmin('admin.login.oauth.showPasswordForm')));
                 } else {
                     $user->linkProvider($oauthUser, $provider);
 
@@ -419,6 +420,6 @@ class LoginController extends Controller
 
     public function redirectTo()
     {
-        return route('dashboard');
+        return route(Route::hasAdmin('dashboard'));
     }
 }

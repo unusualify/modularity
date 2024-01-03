@@ -146,12 +146,16 @@ export async function loadLocaleMessages (i18n) {
   //   loadLocaleMessage(i18n, locale, response.data[locale])
   // }
 
-  axios.get('/api/languages')
-    .then((response) => {
-      for (const locale in response.data) {
-        loadLocaleMessage(i18n, locale, response.data[locale])
-      }
-    })
+  try {
+    axios.get('/admin/api/languages')
+      .then((response) => {
+        for (const locale in response.data) {
+          loadLocaleMessage(i18n, locale, response.data[locale])
+        }
+      })
+  } catch (error) {
+    __log('api.languages error', error)
+  }
 }
 export function loadLocaleMessage (i18n, locale, messages) {
   // set locale and locale message
