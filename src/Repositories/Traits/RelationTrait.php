@@ -64,7 +64,9 @@ trait RelationTrait
 
                     if(is_array($fields[$relation])){
                         $fields[$relation] = Arr::mapWithKeys($fields[$relation], function($item, $key) use($relatedPivotKey){
-
+                            if( isset($item['pivot']) && isset($item['pivot'][$relatedPivotKey])){
+                                return [$key => $item['pivot'][$relatedPivotKey]];
+                            }
                             return is_array($item)
                                     ? [ $item[$relatedPivotKey] => Arr::except($item, [$this->getForeignKey()])]
                                     : [ $key => $item];
@@ -153,7 +155,6 @@ trait RelationTrait
         foreach ($this->inputs() as $key => $input) {
 
             if(isset($input['name']) && in_array($input['name'], $belongsToManyRelations) ){
-
                 if(preg_match('/repeater/', $input['type'])){
                     $query = $object->{$input['name']}();
 
