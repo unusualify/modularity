@@ -57,11 +57,20 @@ if (!function_exists('getInputDraft')) {
         return $draft;
     }
 }
+
 if (!function_exists('adminRouteNamePrefix')) {
 
     function adminRouteNamePrefix()
     {
         return rtrim(ltrim(unusualConfig('admin_route_name_prefix', 'admin'), '.'), '.');
+    }
+}
+
+if (!function_exists('adminRoutePrefix')) {
+
+    function adminRoutePrefix()
+    {
+        return rtrim(ltrim(unusualConfig('admin_app_path', 'admin'), '/'), '/');
     }
 }
 
