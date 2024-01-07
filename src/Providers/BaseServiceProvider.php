@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Providers;
 
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Route;
 use Unusualify\Modularity\Activators\FileActivator;
 use Unusualify\Modularity\Entities\User;
@@ -226,6 +227,12 @@ class BaseServiceProvider extends ServiceProvider
                 return $value;
             });
         });
+
+        // Lang::handleMissingKeysUsing(function (string $key, array $replacements, string $locale) {
+        //     info("Missing translation key [$key] detected.");
+
+        //     return $key;
+        // });
     }
 
     /**

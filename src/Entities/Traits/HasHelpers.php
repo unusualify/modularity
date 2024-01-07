@@ -42,9 +42,6 @@ trait HasHelpers
 
         $reflector = new \ReflectionClass(get_called_class());
 
-        dd(
-            $this->getRelations()
-        );
         foreach ($reflector->getMethods() as $method) {
            dd($method->getReturnType());
         }
