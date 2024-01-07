@@ -398,12 +398,12 @@
             <template v-for="(action, k) in rowActions" :key="k">
               <v-list-item
                 v-if="itemHasAction(item, action)"
-                @click="itemAction(item, action.name)"
+                @click="itemAction(item, action)"
                 >
                   <v-icon small :color="action.color" left>
                     {{ action.icon ? action.icon : '$' + action.name }}
                   </v-icon>
-                  {{ $t(action.name) }}
+                  {{ $t( action.label ??action.name) }}
               </v-list-item>
             </template>
           </v-list>
@@ -415,7 +415,7 @@
               v-if="itemHasAction(item, action)"
               small
               class="mr-2"
-              @click="itemAction(item, action.name)"
+              @click="itemAction(item, action)"
               :color="action.color"
               >
               {{ action.icon ? action.icon : '$' + action.name }}

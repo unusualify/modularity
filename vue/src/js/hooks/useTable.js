@@ -20,6 +20,10 @@ export const makeTableProps = propsFactory({
   customTitle: {
     type: String
   },
+  titlePrefix: {
+    type: String,
+    default: ''
+  },
   titleKey: {
     type: String,
     default: 'name'
@@ -137,7 +141,8 @@ export default function useTable (props, context) {
     transNamePlural: computed(() => t('modules.' + state.snakeName, 1)),
     transNameCountable: computed(() => t('modules.' + state.snakeName, getters.totalElements.value)),
     tableTitle: computed(() => {
-      return __isset(props.customTitle) ? props.customTitle : state.transNamePlural
+      const prefix = props.titlePrefix ? props.titlePrefix : ''
+      return prefix + (__isset(props.customTitle) ? props.customTitle : state.transNamePlural)
     }),
     formTitle: computed(() => {
       return t((state.editedIndex === -1 ? 'new-item' : 'edit-item'), {
@@ -287,7 +292,10 @@ export default function useTable (props, context) {
       return true
     },
     itemAction: function (item, action, ...args) {
-      switch (action) {
+      let _action = {}
+      if (__isString(action)) { _action.name = action } else { _action = action }
+
+      switch (_action.name) {
         case 'edit':
           if (props.editOnModal || props.embeddedForm) {
             methods.setEditedItem(item)
@@ -318,6 +326,12 @@ export default function useTable (props, context) {
           methods.duplicateRow(item.id)
           // this.$refs.dialog.openModal()
           // methods.openDeleteModal()
+          break
+        case 'link':
+          window.open(
+            _action.url.replace(':id', item.id),
+            '_blank'
+          )
           break
         case 'switch':
           var value = args[0]
