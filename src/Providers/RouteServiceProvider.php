@@ -54,10 +54,10 @@ class RouteServiceProvider extends ServiceProvider
         $groupOptions = UnusualRoutes::groupOptions();
 
         $router->group(
-            $groupOptions + [
+            [
                 'namespace' => $this->namespace,
             ],
-            function ($router) use ($supportSubdomainRouting) {
+            function ($router) use ($groupOptions, $supportSubdomainRouting) {
 
                 $router->group(
                     [
@@ -73,49 +73,56 @@ class RouteServiceProvider extends ServiceProvider
                 );
 
                 $router->group(
-                    [
-                        'prefix' => 'api',
-                        'middleware' => [
-                            ...UnusualRoutes::webMiddlewares(),
-                            ...($supportSubdomainRouting ? ['supportSubdomainRouting'] : [])
-                        ],
-                    ],
-                    function ($router) {
-                        require __DIR__ . '/../Routes/api.php';
-                    }
-                );
-
-                // internal routes web.php
-                $router->group(
-                    [
-                        // 'domain' => config(unusualBaseKey() . '.admin_app_url'),
-                    ],
-                    function ($router) use (
-                        $supportSubdomainRouting
-                    ) {
-
+                    $groupOptions,
+                    function ($router)  use($supportSubdomainRouting){
                         $router->group(
                             [
-                                'middleware' => UnusualRoutes::webMiddlewares()
+                                'prefix' => 'api',
+                                'middleware' => [
+                                    ...UnusualRoutes::webMiddlewares(),
+                                    ...($supportSubdomainRouting ? ['supportSubdomainRouting'] : [])
+                                ],
                             ],
                             function ($router) {
-                                require __DIR__ . '/../Routes/web.php';
+                                require __DIR__ . '/../Routes/api.php';
                             }
                         );
 
+                        // internal routes web.php
+                        $router->group(
+                            [
+                                // 'domain' => config(unusualBaseKey() . '.admin_app_url'),
+                            ],
+                            function ($router) use (
+                                $supportSubdomainRouting
+                            ) {
+
+                                $router->group(
+                                    [
+                                        'middleware' => UnusualRoutes::webMiddlewares()
+                                    ],
+                                    function ($router) {
+                                        require __DIR__ . '/../Routes/web.php';
+                                    }
+                                );
+
+                            }
+                        );
+
+                        // if ($supportSubdomainRouting) {
+                        //     $router->group(
+                        //         [
+                        //             'domain' => config(unusualBaseKey() . '.admin_app_subdomain', 'admin') .
+                        //             '.{subdomain}.' .
+                        //             config('app.url'),
+                        //         ],
+                        //         $internalRoutes
+                        //     );
+                        // }
                     }
                 );
 
-                // if ($supportSubdomainRouting) {
-                //     $router->group(
-                //         [
-                //             'domain' => config(unusualBaseKey() . '.admin_app_subdomain', 'admin') .
-                //             '.{subdomain}.' .
-                //             config('app.url'),
-                //         ],
-                //         $internalRoutes
-                //     );
-                // }
+
             }
         );
 
@@ -157,8 +164,14 @@ class RouteServiceProvider extends ServiceProvider
             $system_route_name = $has_system_prefix ? snakeCase(studlyName(unusualConfig('base_prefix', 'system-settings'))) . '.' : '';
 
             $_groupOptions = [];
-            $_groupOptions['prefix'] = $system_prefix . kebabCase( $module->getName() );
-            $_groupOptions['as'] = $system_route_name . snakeCase( $module->getName() ) . '.';
+
+            $_groupOptions['prefix'] = (adminRoutePrefix() ? adminRoutePrefix() . '/' : '')
+                . $system_prefix
+                . kebabCase( $module->getName() );
+
+            $_groupOptions['as'] = (adminRouteNamePrefix() ? adminRouteNamePrefix() . '.' : '')
+                . $system_route_name
+                . snakeCase( $module->getName() ) . '.';
 
             UnusualRoutes::registerRoutes(
                 $router,
@@ -436,12 +449,12 @@ class RouteServiceProvider extends ServiceProvider
             $system_prefix = $has_system_prefix ? unusualConfig('base_prefix', 'system-settings') . '/' : '';
             $system_route_name = $has_system_prefix ? snakeCase(studlyName(unusualConfig('base_prefix', 'system-settings'))) : '';
 
-            $parent_studly = studlyName( $config['name'] ); // UserCompany
-            $parent_camel = camelCase( $config['name'] ); // userCompany
-            $parent_kebab = kebabCase( $config['name'] ); // user-company
-            $parent_snake = snakeCase( $config['name'] );  // user_company
+            $parentStudlyName = studlyName( $config['name'] ); // UserCompany
+            $parentCamelName = camelCase( $config['name'] ); // userCompany
+            $parentKebabName = kebabCase( $config['name'] ); // user-company
+            $parentSnakeName = snakeCase( $config['name'] );  // user_company
 
-            $parent_url = $pr['url'] ?? $parent_kebab;
+            $parentUrlSegment = $pr['url'] ?? pluralize($parentKebabName);
 
             if( is_array( $routes = $module->getRouteConfigs() ) ){
 
@@ -457,58 +470,75 @@ class RouteServiceProvider extends ServiceProvider
                 );
 
                 foreach( $routes as $key => $item) {
-                    $route_camel = camelCase( $item['name'] );
-                    $route_kebab = kebabCase( $item['name'] );
-                    $route_studly = studlyName($item['name']);
-                    $route_snake = snakeCase($item['name']);
+                    $routeKebabName = kebabCase( $item['name'] );
+                    $routeStudlyName = studlyName($item['name']);
+                    $routeSnakeName = snakeCase($item['name']);
 
-                    $url = $item['url'] ?? $route_kebab;
-                    $controller = $route_studly.'Controller';
+                    $routeUrlSegment = $item['url'] ?? pluralize($routeKebabName);
+                    $url = $routeUrlSegment;
+                    $controllerName = $routeStudlyName.'Controller';
 
-                    $resource_options_names = $item['route_name'] ?? $route_snake;
-                    $resource_options_as = [];
+                    $resourceOptionsNames = $item['route_name'] ?? $routeSnakeName;
+                    $resourceOptionsAs = [];
 
                     if( $system_route_name ){
-                        $resource_options_as[] = $system_route_name;
+                        $resourceOptionsAs[] = $system_route_name;
                     }
 
-                    if(isset($sub['nested']) && $item['nested']){
-                        $url =  $parent_camel . "." . $url;
 
-                        $controller = $parent_studly . $controller;
+                    if(isset($item['belongs']) && $item['belongs']){
 
-                        $resource_options_names = ($parent['route_name'] ?? $parent_snake) . "." . $resource_options_names;
+                        foreach ($item['belongs'] as $key => $belong) {
+                            $belongRoute = $module->getRouteConfigs($belong);
+                            if($belongRoute){
+                                $belongRouteName = $belongRoute['route_name'] ?? snakeCase($belongRoute['name']); // package_region
+                                $belongRouteUrl = $belongRoute['url'] ?? pluralize(kebabCase($belongRoute['name'])); // package-regions
+                                // Route::prefix('packages')->group(function(){
+                                //     Route::resource('package-regions.package-countries', 'PackageCountryController', [
+                                //         'as' => 'package_region',
+                                //         'names' => 'package_region.nested.package_country',
+                                //     ]);
+                                // });
+                                Route::prefix($parentUrlSegment)->group(function() use($parentSnakeName, $routeUrlSegment, $routeSnakeName, $controllerName, $belongRouteUrl, $belongRouteName){
+                                    $resourceRegistrar = Route::resource("{$belongRouteUrl}.{$routeUrlSegment}", $controllerName, [
+                                        'as' => $parentSnakeName,
+                                        'names' => "{$belongRouteName}.nested.{$routeSnakeName}",
+                                    ]);
+                                    $resourceRegistrar->only([
+                                        'index',
+                                        'create',
+                                        'store'
+                                    ]);
+                                });
+                            }
+                        }
 
-                    }else if( isset($item['parent']) && $item['parent'] ){
-                        // dd(
-                        //     $url,
-                        //     $system_prefix,
-                        //     $system_route_name,
-                        //     $resource_options_as,
-                        //     $resource_options_names,
-                        // );
-                    }else{
-                        $url = $parent_url . "/" . $url;
+                    }
 
-                        $resource_options_as[] = $parent_snake;
+                    if( !(isset($item['parent']) && $item['parent']) ){ // unless parent route
+                        $url = $parentUrlSegment . "/" . $url;
+                        $resourceOptionsAs[] = $parentSnakeName;
+
+                    }else{ // if parent route
+
                     }
 
                     $url = $system_prefix . $url;
-
-                    $resource_options = [
-                        'names' => $resource_options_names,
-                        'as' => implode( '.', $resource_options_as)
+                    $resourceOptions = [
+                        'as' => implode( '.', $resourceOptionsAs),
+                        'names' => $resourceOptionsNames,
                     ];
 
-                    $resource_options_as[] = $route_snake;
+                    $resourceOptionsAs[] = $routeSnakeName;
 
-                    Route::additionalRoutes($url, $route_studly, [
-                        'as' => implode( '.', $resource_options_as)
+                    Route::additionalRoutes($url, $routeStudlyName, [
+                        'as' => implode( '.', $resourceOptionsAs)
                     ]);
 
-                    Route::resource($url, $controller, $resource_options)->parameters([
-                        // $url => $sub_studly,
-                    ]);
+                    Route::resource($url, $controllerName, $resourceOptions)
+                        ->parameters([
+                            // $url => $sub_studly,
+                        ]);
                 }
             }
             // Route::group($options, function() use($module, $options){

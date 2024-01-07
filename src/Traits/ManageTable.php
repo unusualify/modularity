@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Traits;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Collection;
 use Unusualify\Modularity\Entities\Enums\Permission;
+use Unusualify\Modularity\Facades\Modularity;
 
 trait ManageTable {
 
@@ -67,9 +68,7 @@ trait ManageTable {
     {
         $statusFilters = [];
 
-        $scope = ($this->isNested ? [
-            $this->getParentModuleForeignKey() => $this->parentId,
-        ] : []) + $scopes;
+        $scope = $this->nestedParentScopes() + $scopes;
 
         $statusFilters[] = [
             // 'name' => unusualTrans("{$this->baseKey}::lang.listing.filter.all-items"),
@@ -228,6 +227,24 @@ trait ManageTable {
         }
 
 
+        $routeSnake = snakeCase($this->routeName);
+        foreach (Modularity::find($this->moduleName)->getRouteConfigs() as $key => $routeConfig) {
+            if(isset($routeConfig['belongs']) && in_array($routeSnake, $routeConfig['belongs'])){
+                $childRouteSnake = snakeCase($routeConfig['name']);
+                $actions[] = [
+                    'name' => 'link',
+                    'url' => moduleRoute($routeConfig['name'], $this->routePrefix . '.' . $routeSnake . '.nested', 'index', [
+                        $routeSnake => ':id',
+                    ]),
+                    'label' => 'modules.' . $childRouteSnake,
+                    'icon' => '$modules',
+                    'color' => 'green',
+                ];
+            }
+            # code...
+        }
+
+        // dd($actions);
         return $actions;
     }
 

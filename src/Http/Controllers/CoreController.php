@@ -19,6 +19,8 @@ use Illuminate\Support\Str;
 use Illuminate\Routing\Controller;
 use Nwidart\Modules\Facades\Module;
 use Unusualify\Modularity\Entities\Enums\Permission;
+use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Traits\{MakesResponses, ManageNames, ManageScopes, ManageTraits};
 
 abstract class CoreController extends Controller
@@ -79,18 +81,32 @@ abstract class CoreController extends Controller
     protected $isParent;
 
     /**
-     * whether route is nested or not
-     *
-     * @var string
-     */
-    protected $isNested;
-
-    /**
      * integer if route is nested, or null
      *
      * @var integer
      */
-    protected $parentId;
+    protected $nested;
+
+    /**
+     * integer if route is nested, nestedParentId
+     *
+     * @var integer
+     */
+    protected $nestedParentId;
+
+    /**
+     * snake_case if route is nested, nestedParentRouteName
+     *
+     * @var string
+     */
+    protected $nestedParentName;
+
+    /**
+     * Model record if route is nested
+     *
+     * @var \Unusualify\Modularity\Entities\Model
+     */
+    protected $nestedParentModel;
 
     /**
      * @var object
@@ -260,8 +276,7 @@ abstract class CoreController extends Controller
         $this->config = $this->getModuleConfig();
 
         $this->isParent = $this->isParentRoute();
-        $this->isNested = $this->isNestedRoute();
-        $this->parentId = $this->getParentId();
+        $this->checkNestedAttributes();
 
         $this->modelName = $this->getModelName();
         $this->routePrefix = $this->getRoutePrefix();
@@ -340,15 +355,34 @@ abstract class CoreController extends Controller
         // $this->middleware('can:delete', ['only' => ['destroy', 'bulkDelete', 'restore', 'bulkRestore', 'forceDelete', 'bulkForceDelete', 'restoreRevision']]);
     }
 
-    protected function getParentId()
+    protected function checkNestedAttributes()
     {
-        if( $this->moduleName !== $this->routeName && $this->isNested ){
-            $param = $this->getSnakeCase( Str::singular($this->moduleName) );
+        [$this->nested, $this->nestedParentId, $this->nestedParentName, $this->nestedParentModel] = $this->getNestedAttributes();
+    }
 
-            return $this->request->route()->parameters()[$param];
+    protected function getNestedAttributes()
+    {
+        $params = $this->request->route() ? $this->request->route()->parameters() : [];
+
+        $parentParams = array_diff_key($params, array_flip([snakeCase($this->routeName)]));
+
+        if(count($parentParams)){
+            $nestedParentName = array_key_last($parentParams); // snakecase;
+            $nestedParentId = last($parentParams);
+            $nestedParentModel = UFinder::getRouteModel($nestedParentName)::find($nestedParentId);
+
+            return [true, $nestedParentId, $nestedParentName, $nestedParentModel];
         }
 
-        return null;
+        return [false, null, null, null];
+        // if( $this->moduleName !== $this->routeName && $this->nested ){
+
+        //     $param = $this->getSnakeCase( Str::singular($this->moduleName) );
+
+        //     return $this->request->route()->parameters()[$param];
+        // }
+
+        // return null;
     }
 
     /**
@@ -381,13 +415,13 @@ abstract class CoreController extends Controller
         return $this->isParent ?? $this->getConfigFieldsByRoute('parent') ?: $this->moduleName == $this->routeName;
     }
 
-    /**
-     * @return bool
-     */
-    protected function isNestedRoute()
-    {
-        return $this->config->sub_routes->{$this->routeName}->nested ?? false;
-    }
+    // /**
+    //  * @return bool
+    //  */
+    // protected function nestedRoute()
+    // {
+    //     return $this->config->sub_routes->{$this->routeName}->nested ?? false;
+    // }
 
     /**
      * @param string $option
@@ -514,9 +548,7 @@ abstract class CoreController extends Controller
      */
     protected function getJSONData($with = []){
 
-        $scopes = $this->filterScope($this->isNested ? [
-            $this->getParentModuleForeignKey() => $this->parentId,
-        ] : []);
+        $scopes = $this->filterScope($this->nestedParentScopes());
 
         $paginator = $this->getIndexItems($with, $scopes);
 
@@ -607,20 +639,7 @@ abstract class CoreController extends Controller
         if( $this->routePrefix !== null )
             return $this->routePrefix;
 
-        $routePrefixes = [];
-
-        $admin_route_prefix = adminRouteNamePrefix();
-
-        if( $admin_route_prefix )
-            $routePrefixes[] = $admin_route_prefix;
-
-        if( isset($this->config->base_prefix) && $this->config->base_prefix)
-            $routePrefixes[] = snakeCase(studlyName(unusualConfig('base_prefix', 'system-settings')));
-
-        if( !$this->isParent )
-            $routePrefixes[] = Str::snake($this->moduleName);
-
-        return implode('.', $routePrefixes);
+        return $this->generateRoutePrefix();
 
         if ($this->request->route() != null) {
             $routePrefix = ltrim(
@@ -635,6 +654,29 @@ abstract class CoreController extends Controller
         }
 
         return '';
+    }
+
+    protected function generateRoutePrefix($noNested = false)
+    {
+        $routePrefixes = [];
+
+        $admin_route_prefix = adminRouteNamePrefix();
+
+        if( $admin_route_prefix )
+            $routePrefixes[] = $admin_route_prefix;
+
+        if( isset($this->config->base_prefix) && $this->config->base_prefix)
+            $routePrefixes[] = snakeCase(studlyName(unusualConfig('base_prefix', 'system-settings')));
+
+        if( !$this->isParent || ($this->nested && !$noNested) )
+            $routePrefixes[] = Str::snake($this->moduleName);
+
+        if($this->nested && !$noNested){
+            $routePrefixes[] = $this->nestedParentName;
+            $routePrefixes[] = 'nested';
+        }
+
+        return implode('.', $routePrefixes);
     }
 
     /**
@@ -714,7 +756,43 @@ abstract class CoreController extends Controller
      */
     protected function getParentModuleForeignKey()
     {
-        return Str::singular( $this->getCamelCase(($this->moduleName)) ) . '_id';
+        return Str::singular( $this->nestedParentName ) . '_id';
+
+        $moduleParts = explode('.', $this->moduleName);
+
+        return Str::singular($moduleParts[count($moduleParts) - 2]) . '_id';
+    }
+
+    /**
+     * @return string
+     */
+    protected function nestedParentScopes()
+    {
+        if(!$this->nested)
+            return [];
+
+        // for belongsTo relationship
+        if($this->repository->hasColumn($this->getParentModuleForeignKey()))
+            return [
+                $this->getParentModuleForeignKey() => $this->nestedParentId
+            ];
+
+        // for morphTo relationship
+        if(method_exists($this->repository->getModel(), ($morphToName = camelCase($this->routeName).'able') ))
+            return [
+                $morphToName . '_id' => $this->nestedParentId,
+                $morphToName . '_type' => get_class($this->nestedParentModel),
+            ];
+
+        dd(
+            $this->nestedParentName,
+            $this->nestedParentModel,
+            $this->repository->getModel(),
+            // get_class_methods($this->repository->getModel()),
+
+        );
+
+        return Str::singular( $this->nestedParentName ) . '_id';
 
         $moduleParts = explode('.', $this->moduleName);
 
@@ -728,19 +806,19 @@ abstract class CoreController extends Controller
      */
     protected function getModuleRoute($id, $action, $singleton = false)
     {
-        // dd(
-        //     $id,
-        //     $action,
-        //     // strtolower($this->moduleName),
-        //     $this->routeName,
-        //     $this->routePrefix,
-        //     moduleRoute($this->routeName, $this->routePrefix, $action, [$id])
-        //     // moduleRoute(strtolower($this->moduleName), $this->routePrefix, $action, [$id])
-        //     // moduleRoute($this->moduleName, $this->routePrefix, $action, [$id])
-        // );
-        $parameters = $singleton ? [] : [ camelCase($this->routeName) => $id];
+        $parameters = $singleton ? [] : [ snakeCase($this->routeName) => $id];
 
-        return moduleRoute($this->routeName, $this->routePrefix, $action, $parameters, singleton: $singleton);
+        if($this->nested ){
+            $parameters[$this->nestedParentName] ??= $this->nestedParentId;
+        }
+
+        $prefix = $this->routePrefix;
+
+        if(!in_array($action, ['index', 'create', 'store'])){
+            $prefix = $this->generateRoutePrefix(noNested: true);
+        }
+
+        return moduleRoute($this->routeName, $prefix, $action, $parameters, singleton: $singleton);
     }
 
     /**

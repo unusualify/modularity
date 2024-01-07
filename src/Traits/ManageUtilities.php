@@ -60,6 +60,7 @@ trait ManageUtilities {
                 ],
                 $this->tableAttributes,
             )
+            + ($this->nested ? ['titlePrefix' => $this->nestedParentModel->{$this->titleColumnKey ?? 'name'} . ' \ ' ] : [])
             + ['nestedData' => $this->getNestedData()]
             + ['rowActions' => $this->getTableActions()],
 
@@ -80,7 +81,7 @@ trait ManageUtilities {
             // 'permalinkPrefix' => $this->getPermalinkPrefix($baseUrl),
             // 'additionalTableActions' => $this->additionalTableActions(),
         ];
-        // dd($this->getVuetifyDatatableOptions());
+
         return array_replace_recursive($data + $options, $this->indexData($this->request));
     }
 
@@ -146,54 +147,31 @@ trait ManageUtilities {
             // $parameters = $this->submodule ? [$this->submoduleParentId] : [];
             $parameters = [];
 
-            if($this->isNested){
-                $parameters[Str::camel($this->moduleName)] = $this->parentId;
+            if($this->nested){
+                // $parameters[Str::camel($this->moduleName)] = $this->parentId;
+                $parameters[$this->nestedParentName] = $this->nestedParentId;
+
             }
             $optionIsActive = $this->getIndexOption($action);
-            // dd($this->defaultIndexOptions);
-            // if($optionIsActive){
-            //     $boundEndpoints =
-            // }
-            // dd(
-            //     $action,
-            //     $optionIsActive,
 
-            //     moduleRoute(
-            //         $this->routeName,
-            //         $this->routePrefix,
-            //         $action,
-            //         $parameters
-            //     ),
-            //     route(
-            //         ($this->isParentRoute() ? '' : $this->getSnakeCase($this->moduleName) . '.')
-            //             . $this->getSnakeCase($this->routeName)
-            //             . ".index"
-            //     )
-            // );
             if(!$optionIsActive && !preg_match('/edit|create|forceDelete|restore/', $action)){
                 dd($action);
             }
 
-            // if($action == 'duplicate'){
-            //     dd(
-            //         $this->routeName,
-            //         $this->routePrefix,
-            //         $action,
-            //         $parameters,
-            //         moduleRoute(
-            //             $this->routeName,
-            //             $this->routePrefix,
-            //             $action,
-            //             $parameters
-            //         )
-            //     );
-            // }
+            $prefix = $this->routePrefix;
+
+            if(!in_array($action, ['index', 'create', 'store'])){
+                $prefix = $this->generateRoutePrefix(noNested: true);
+            }
+
+            // dd($this->routeName, $prefix, $action, $parameters);
+
             return [
                 // $action . 'Endpoint' => $optionIsActive
                 $action => $optionIsActive
                             ?   moduleRoute(
                                     $this->routeName,
-                                    $this->routePrefix,
+                                    $prefix,
                                     $action,
                                     $parameters
                                 )
@@ -208,16 +186,17 @@ trait ManageUtilities {
      * @param \Unusualify\Modularity\Models\Model|null $item
      * @return array
      */
-    protected function getFormData($id, $item = null, $nested=null)
+    protected function getFormData($id)
     {
         $schema = $this->formSchema;
-        if (!$item && $id) {
+
+        if ($id) {
             $item = $this->repository->getById(
                 $id,
                 $this->formWith,
                 $this->formWithCount
             );
-        } elseif (! $item && ! $id) {
+        } elseif ( $id) {
             $item =
             $this->repository->newInstance();
         }
@@ -234,8 +213,11 @@ trait ManageUtilities {
         $itemId = $this->getItemIdentifier($item);
 
         // dd(
-        //     $this->repository->getFormFields($item, $schema),
-        //     $schema
+        //     $this->moduleName,
+        //     $this->routeName,
+        //     $this->routePrefix,
+        //     $itemId,
+        //     $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId])
         // );
 
         $data = [
@@ -254,7 +236,9 @@ trait ManageUtilities {
                 // 'actionUrl' => $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]),
             ],
             'endpoints' => [
-                (!!$itemId ? 'update' : 'store') => $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId])
+                (!!$itemId ? 'update' : 'store') => $itemId
+                    ? $this->getModuleRoute($itemId, 'update')
+                    : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId])
             ],
             'formStore' => [
                 'inputs' => $schema,
@@ -293,6 +277,7 @@ trait ManageUtilities {
             'restoreUrl' => moduleRoute($this->moduleName, $this->routePrefix, 'restoreRevision', [$itemId]),
         ] : []);
 
+        // dd($data);
         return array_replace_recursive($data, $this->formData($this->request));
     }
 

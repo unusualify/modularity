@@ -18,8 +18,16 @@ trait MakesResponses {
     {
         if (! isset($back_link)) {
             if (($back_link = Session::get($this->getBackLinkSessionKey())) == null) {
+                if($this->nested){
+                    // dd(
+                    //     $this->routeName,
+                    //     $this->routePrefix,
+                    //     $params
+                    // );
+                    $params[$this->nestedParentName] ??= $this->nestedParentId;
+                }
                 $back_link = $this->request->headers->get('referer') ?? moduleRoute(
-                    $this->moduleName,
+                    $this->routeName,
                     $this->routePrefix,
                     'index',
                     $params
@@ -27,10 +35,10 @@ trait MakesResponses {
             }
         }
 
-        if (! Session::get($this->moduleName . '_retain')) {
+        if (! Session::get($this->routeName . '_retain')) {
             Session::put($this->getBackLinkSessionKey(), $back_link);
         } else {
-            Session::put($this->moduleName . '_retain', false);
+            Session::put($this->routeName . '_retain', false);
         }
     }
 
@@ -51,8 +59,8 @@ trait MakesResponses {
      */
     protected function getBackLinkSessionKey()
     {
-        return $this->moduleName . ($this->isNested ? $this->submoduleParentId ?? '' : '') . '_back_link';
-        return $this->moduleName . ($this->submodule ? $this->submoduleParentId ?? '' : '') . '_back_link';
+        return $this->moduleName . "." . $this->routeName . ($this->nested ? $this->nestedParentId ?? '' : '') . '_back_link';
+        return $this->moduleName . "." . $this->routeName . ($this->submodule ? $this->submoduleParentId ?? '' : '') . '_back_link';
     }
 
     /**

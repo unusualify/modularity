@@ -65,11 +65,6 @@ abstract class BaseController extends CoreController
 
     public function index($parentId = null)
     {
-        $parentId = $this->getParentId() ?? $parentId;
-
-        // $this->submodule = isset($parentId);
-        // $this->nested = isset($parentId);
-        // $this->submoduleParentId = $parentId;
 
         if ($this->request->ajax()) {
             return [
@@ -80,9 +75,7 @@ abstract class BaseController extends CoreController
             // return $indexData + ['replaceUrl' => true];
         }
 
-        $indexData = $this->getIndexData($this->isNested ? [
-            $this->getParentModuleForeignKey() => $parentId,
-        ] : []);
+        $indexData = $this->getIndexData($this->nestedParentScopes());
 
         if ($this->request->has('openCreate') && $this->request->get('openCreate')) {
             $indexData += ['openCreate' => true];
@@ -138,11 +131,12 @@ abstract class BaseController extends CoreController
      */
     public function store($parentId = null)
     {
-        $parentId = $this->parentId ?? $parentId;
+        // $parentId = $this->parentId ?? $parentId;
 
         $input = $this->validateFormRequest()->all();
 
-        $optionalParent = $parentId ? [$this->getParentModuleForeignKey() => $parentId] : [];
+        // $optionalParent = $parentId ? [$this->getParentModuleForeignKey() => $parentId] : [];
+        $optionalParent = $this->nestedParentScopes();
 
         // if (isset($input['cmsSaveType']) && $input['cmsSaveType'] === 'cancel') {
         //     return $this->respondWithRedirect(moduleRoute(
@@ -208,44 +202,9 @@ abstract class BaseController extends CoreController
      * @param int|null $submoduleId
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
-    public function edit($id, $submoduleId = null)
+    public function edit($id)
     {
         $params = $this->request->route()->parameters();
-
-        $this->submodule = count($params) > 1;
-        $this->submoduleParentId = $this->isNested
-            ? $this->parentId ?? $id
-            : head($params);
-
-        $id = last($params);
-
-        if ($this->getIndexOption('editInModal')) {
-            return $this->request->ajax()
-            ? Response::json($this->modalFormData($id))
-            : Redirect::to(moduleRoute($this->routeName, $this->routePrefix, 'index'));
-        }
-
-        $this->setBackLink();
-
-        $view = Collection::make([
-            "$this->viewPrefix.form",
-            "$this->baseKey::$this->routeName.form",
-            "$this->baseKey::layouts.form",
-        ])->first(function ($view) {
-            return View::exists($view);
-        });
-
-        return View::make($view, $this->getFormData($id));
-    }
-
-    public function editNested($id)
-    {
-        $params = $this->request->route()->parameters();
-
-        $this->submodule = count($params) > 1;
-        $this->submoduleParentId = $this->submodule
-        ? $this->getParentModuleIdFromRequest($this->request) ?? $id
-        : head($params);
 
         $id = last($params);
 
@@ -277,10 +236,6 @@ abstract class BaseController extends CoreController
     {
         $params = $this->request->route()->parameters();
 
-        $submoduleParentId = $this->getParentModuleIdFromRequest($this->request) ?? $id;
-        $this->submodule = isset($submoduleParentId);
-        $this->submoduleParentId = $submoduleParentId;
-
         $id = last($params);
 
         $item = $this->repository->getById($id);
@@ -294,14 +249,7 @@ abstract class BaseController extends CoreController
             ));
         } else {
             $formRequest = $this->validateFormRequest();
-            // dd(
-            //     $this->submodule,
-            //     $this->submoduleParentId,
-            //     $params,
-            //     $item,
-            //     $input,
-            //     $formRequest->all()
-            // );
+
             $this->repository->update($id, $formRequest->all());
 
             activity()->performedOn($item)->log('updated');
@@ -695,7 +643,6 @@ abstract class BaseController extends CoreController
     {
         return $item->{$this->identifierColumnKey};
     }
-
 
     /**
      * @param int $id
