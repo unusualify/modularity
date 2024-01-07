@@ -2,16 +2,11 @@
 
 namespace Unusualify\Modularity\Support;
 
-use Nwidart\Modules\Support\Migrations\SchemaParser as Parser;
 use Unusualify\Modularity\Traits\ManageNames;
-
 use Composer\Autoload\ClassMapGenerator;
-
-use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\File;
+use Unusualify\Modularity\Facades\Modularity;
 
 class Finder
 {
@@ -71,6 +66,35 @@ class Finder
         }
 
         if($model_class !== '') return $model_class;
+
+
+        return false;
+    }
+
+    public function getRouteModel($routeName)
+    {
+        $class = '';
+
+        // dd(
+        //     Modularity::allEnabled(),
+        //     glob( base_path( config('modules.namespace')).'/*'),
+        //     config('modules.scan')
+        // );
+
+        foreach ( Modularity::allEnabled() as $key => $module) {
+            $entityPath =  $module->getDirectoryPath('Entities');
+            if( !file_exists( $entityPath ) ) continue;
+
+            foreach($this->getClasses( $entityPath ) as $_class){
+                if(get_class_short_name(App::make($_class)) === $this->getStudlyName($routeName)){
+                    $class = $_class;
+                    break 2;
+                }
+            }
+        }
+
+
+        if($class !== '') return $class;
 
 
         return false;
