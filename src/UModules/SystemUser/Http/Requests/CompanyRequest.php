@@ -3,9 +3,9 @@
 namespace Modules\SystemUser\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Unusualify\Modularity\Http\Requests\BaseFormRequest;
+use Unusualify\Modularity\Http\Requests\Request;
 
-class CompanyRequest extends BaseFormRequest
+class CompanyRequest extends Request
 {
 
     /**

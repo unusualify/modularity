@@ -3,47 +3,37 @@
 namespace Modules\SystemUser\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Unusualify\Modularity\Http\Requests\BaseFormRequest;
+use Unusualify\Modularity\Http\Requests\Request;
 
-class PermissionRequest extends BaseFormRequest
+class PermissionRequest extends Request
 {
 
     /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
+     * Get the default validation rules that apply to the request.
      *
      * @return array
      */
-    public function rules()
+    public function rulesForAll()
     {
-        $rules = [
-
-        ];
-
-        return $rules + parent::rules();
+        return [
+		];
     }
 
 
-    public function store()
+
+    public function rulesForStore()
     {
+        $table_name = $this->model()->getTable();
         return [
-            'name' => 'required|unique:permissions,name|min:4',
+            'name' => "required|unique:{$table_name},name|min:4",
         ];
     }
 
-    public function update()
+    public function rulesForUpdate()
     {
+        $table_name = $this->model()->getTable();
         return [
-            'name' => 'required|min:4|unique:permissions,name,'.$this->id,
+            'name' => "required|min:4|unique:{$table_name},name,".$this->id,
             // 'guard_name' => 'sometimes|min:4',
             // 'email' => 'required|email|unique:users,email,'.$this->user()->id,
             // 'logo' => 'nullable|image|max:1024',
