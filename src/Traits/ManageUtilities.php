@@ -44,7 +44,7 @@ trait ManageUtilities {
              *
              * */
             // 'actions' => $this->getTableActions(),
-            'endpoints' => $this->getIndexUrls(),
+            'endpoints' => $this->getIndexUrls() + $this->getUrls(),
         ] + $this->getViewLayoutVariables();
         // $baseUrl = $this->getPermalinkBaseUrl();
         // dd($this->tableAttributes, $this->getViewLayoutVariables());
@@ -178,7 +178,21 @@ trait ManageUtilities {
                             :   null
             ];
 
-        })->toArray();
+        })->toArray()
+        // + ['languages' => route(Route::hasAdminRoute(''))]
+        ;
+    }
+
+    /**
+     * @param string $moduleName
+     * @param string $routePrefix
+     * @return array
+     */
+    protected function getUrls()
+    {
+        return [
+            'languages' => route(Route::hasAdmin('api.languages.index'))
+        ];
     }
 
     /**
@@ -239,7 +253,7 @@ trait ManageUtilities {
                 (!!$itemId ? 'update' : 'store') => $itemId
                     ? $this->getModuleRoute($itemId, 'update')
                     : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId])
-            ],
+            ] + $this->getUrls(),
             'formStore' => [
                 'inputs' => $schema,
                 // 'inputs' => $this->repository->getFormFields($item, $schema),
