@@ -66,11 +66,29 @@ if (!function_exists('adminRouteNamePrefix')) {
     }
 }
 
-if (!function_exists('adminRoutePrefix')) {
+if (!function_exists('adminUrlPrefix')) {
 
-    function adminRoutePrefix()
+    function adminUrlPrefix()
     {
-        return rtrim(ltrim(unusualConfig('admin_app_path', 'admin'), '/'), '/');
+        return unusualConfig('admin_app_url')
+            ? false
+            : rtrim(ltrim(unusualConfig('admin_app_path', 'admin'), '/'), '/');
+    }
+}
+
+if (!function_exists('systemUrlPrefix')) {
+
+    function systemUrlPrefix()
+    {
+        return unusualConfig('system_prefix', 'system-settings');
+    }
+}
+
+if (!function_exists('systemRouteNamePrefix')) {
+
+    function systemRouteNamePrefix()
+    {
+        return snakeCase(studlyName(systemUrlPrefix()));
     }
 }
 

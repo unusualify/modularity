@@ -3,15 +3,17 @@
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
-// use Unusualify\Modularity\Facades\Module;
 use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
 
-// use Module;
-
+/*
+|--------------------------------------------------------------------------
+| #curt is abbreviation of current
+| #umod is abbreviation of unusualify/modularity
+|--------------------------------------------------------------------------
+*/
 
 if (! function_exists('unusualBaseKey')) {
     function unusualBaseKey($notation = null) {
@@ -20,25 +22,16 @@ if (! function_exists('unusualBaseKey')) {
     }
 }
 
-if (! function_exists('getModule')) {
-    function getModule($name = "Base") {
-        return Modularity::find( studlyName($name )  );
+if (! function_exists('curtModule')) {
+    function curtModule($file = null) {
+        $name = curtModuleName($file);
+
+        return Modularity::find( studlyName($name ));
     }
 }
 
-if (! function_exists('getCurrentModule')) {
-    function getCurrentModule($file = null) {
-
-        $module_name = getCurrentModuleName($file);
-
-        $module = getModule($module_name);
-
-        return $module;
-    }
-}
-
-if (! function_exists('getCurrentModuleName')) {
-    function getCurrentModuleName($file = null) {
+if (! function_exists('curtModuleName')) {
+    function curtModuleName($file = null) {
 
         $dir = $file;
 
@@ -63,41 +56,39 @@ if (! function_exists('getCurrentModuleName')) {
     }
 }
 
-if (! function_exists('getCurrentModuleStudlyName')) {
-    function getCurrentModuleStudlyName($file = null) {
-        // dd( getCurrentModule() );
-        return getCurrentModule($file)->getStudlyName();
-
+if (! function_exists('curtModuleUrlPrefix')) {
+    function curtModuleUrlPrefix($file = null) {
+        // dd(
+        //     curtModule($file)->prefix(),
+        //     curtModule($file)->fullPrefix()
+        // );
+        return curtModule($file)->prefix();
+        // return pluralize( kebabCase(curtModule($file)->getName()));
     }
 }
 
-if (! function_exists('getCurrentModuleLowerName')) {
-    function getCurrentModuleLowerName($file = null) {
-        return getCurrentModule($file)->getLowerName();
+if (! function_exists('curtModuleRouteNamePrefix')) {
+    function curtModuleRouteNamePrefix($file = null) {
+        return curtModule($file)->routeNamePrefix();
     }
 }
 
-if (! function_exists('getCurrentModuleSnakeName')) {
-    function getCurrentModuleSnakeName($file = null) {
-        return getCurrentModule($file)->getSnakeName();
+
+if (! function_exists('curtModuleStudlyName')) {
+    function curtModuleStudlyName($file = null) {
+        // dd( curtModule() );
+        return curtModule($file)->getStudlyName();
+
     }
 }
-
-if (! function_exists('getCurrentModuleUrlName')) {
-    function getCurrentModuleUrlName($file = null) {
-        return pluralize( kebabCase(getCurrentModule($file)->getName()));
+if (! function_exists('curtModuleLowerName')) {
+    function curtModuleLowerName($file = null) {
+        return curtModule($file)->getLowerName();
     }
 }
-
-if (! function_exists('getModuleSubRoutes')) {
-    function getModuleSubRoutes($file = null) {
-        return config( getCurrentModule($file)->getLowerName().'.routes' );
-    }
-}
-
-if (! function_exists('getModuleSubRoute')) {
-    function getModuleSubRoute($key, $file = null ) {
-        return config( getCurrentModule($file)->getLowerName().'.routes.'.strtolower($key) );
+if (! function_exists('curtModuleSnakeName')) {
+    function curtModuleSnakeName($file = null) {
+        return curtModule($file)->getSnakeName();
     }
 }
 
