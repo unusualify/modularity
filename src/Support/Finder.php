@@ -137,11 +137,10 @@ class Finder
     {
         $class = '';
 
-        foreach (array_filter( glob( base_path( config('modules.namespace')).'/*'), 'is_dir') as $module_path) {
-
-            if( !file_exists( $module_path.'/Repositories') ) continue;
-
-            foreach($this->getClasses( $module_path.'/Repositories' ) as $_class){
+        foreach ( Modularity::allEnabled() as $key => $module) {
+            $path =  $module->getDirectoryPath('Repositories');
+            if( !file_exists( $path ) ) continue;
+            foreach($this->getClasses( $path ) as $_class){
                 if(get_class_short_name(App::make($_class)) === $this->getStudlyName($routeName). 'Repository'){
                     $class = $_class;
                     break 2;
