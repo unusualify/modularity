@@ -143,7 +143,6 @@ class Module extends NwidartModule
         return  config('modules.namespace', 'Modules') . "\\" . $this->getStudlyName();
     }
 
-
     public function getRouteConfig($route_name){
         return $this->getRouteConfigs( snakeCase($route_name) ) ;
     }
@@ -170,7 +169,59 @@ class Module extends NwidartModule
     }
 
     public function hasSystemPrefix() {
-        return $this->getConfig('base_prefix', false);
+        return $this->getConfig('system_prefix') ?? $this->getConfig('base_prefix', false);
+    }
+
+    public function systemPrefix() {
+        return systemUrlPrefix();
+    }
+
+    public function systemRouteNamePrefix() {
+        return systemRouteNamePrefix();
+    }
+
+    public function prefix() {
+        return $this->hasParentRoute()
+            ? $this->getParentRoute()['url']
+            : pluralize( kebabCase($this->getConfig('name')) );
+    }
+
+    public function fullPrefix() {
+        $prefixes = [];
+
+        $adminUrlPrefix = adminUrlPrefix();
+
+        if($adminUrlPrefix)
+            $prefixes[] = $adminUrlPrefix;
+
+        if($this->hasSystemPrefix())
+            $prefixes[] = $this->systemPrefix();
+
+        $prefixes[] = $this->prefix();
+
+        return implode('/', $prefixes);
+    }
+
+    public function routeNamePrefix() {
+        return $this->hasParentRoute()
+            ? $this->getParentRoute()['route_name']
+            : snakeCase($this->getConfig('name'));
+    }
+
+    public function fullRouteNamePrefix() {
+        $prefixes = [];
+
+        $adminRouteNamePrefix = adminRouteNamePrefix();
+
+        if($adminRouteNamePrefix)
+            $prefixes[] = $adminRouteNamePrefix;
+
+        // if($this->hasSystemPrefix())
+        //     $prefixes[] = $this->systemRouteNamePrefix();
+
+        $prefixes[] = $this->routeNameprefix();
+
+        return implode('.', $prefixes);
     }
 
 }

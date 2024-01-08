@@ -794,6 +794,7 @@ class RouteGenerator extends Generator
         if( $this->getModule()->getName() === $this->getName()){
             $config['name'] = $config['name'] ?? $studlyName;
             $config['base_prefix'] = $config['base_prefix'] ?? false;
+            $config['system_prefix'] = $config['system_prefix'] ?? $config['base_prefix'] ?? false;
             $config['headline'] = $config['headline'] ?? pluralize($headline);
             // $config['parent_route'] = $route_array;
             $config['routes'] = $config['routes'] ?? [];

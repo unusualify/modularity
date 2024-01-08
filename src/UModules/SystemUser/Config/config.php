@@ -5,7 +5,7 @@ use Unusualify\Modularity\Services\View\UWrapper;
 
 return [
     'name' => 'SystemUser',
-    'base_prefix' => true,
+    'system_prefix' => true,
     'group' => 'system',
     'headline' => 'User Management',
     'routes' => [

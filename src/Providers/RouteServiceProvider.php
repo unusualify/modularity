@@ -58,23 +58,25 @@ class RouteServiceProvider extends ServiceProvider
                 'namespace' => $this->namespace,
             ],
             function ($router) use ($groupOptions, $supportSubdomainRouting) {
-
-                $router->group(
-                    [
-                        'middleware' => [
-                            'web',
-                            ...UnusualRoutes::defaultMiddlewares(),
-                            ...($supportSubdomainRouting ? ['supportSubdomainRouting'] : [])
-                        ],
-                    ],
-                    function ($router) {
-                        require __DIR__ . '/../Routes/auth.php';
-                    }
-                );
-
                 $router->group(
                     $groupOptions,
                     function ($router)  use($supportSubdomainRouting){
+                        //auth routes (login,register,forgot-password etc.)
+                        $router->group(
+                            [
+                                'middleware' => [
+                                    'web',
+                                    ...UnusualRoutes::defaultMiddlewares(),
+                                    ...($supportSubdomainRouting ? ['supportSubdomainRouting'] : [])
+                                ],
+                            ],
+                            function ($router) {
+                                require __DIR__ . '/../Routes/auth.php';
+                            }
+                        );
+                        // dd(
+                        //    $groupOptions
+                        // );
                         $router->group(
                             [
                                 'prefix' => 'api',
@@ -160,19 +162,21 @@ class RouteServiceProvider extends ServiceProvider
             );
 
             $has_system_prefix = $module->hasSystemPrefix();
-            $system_prefix = $has_system_prefix ? unusualConfig('base_prefix', 'system-settings') . '/' : '';
-            $system_route_name = $has_system_prefix ? snakeCase(studlyName(unusualConfig('base_prefix', 'system-settings'))) . '.' : '';
+            $system_prefix = $has_system_prefix ? systemUrlPrefix() . '/' : '';
+            $system_route_name = $has_system_prefix ? systemRouteNamePrefix() . '.' : '';
 
             $_groupOptions = [];
 
-            $_groupOptions['prefix'] = (adminRoutePrefix() ? adminRoutePrefix() . '/' : '')
-                . $system_prefix
-                . kebabCase( $module->getName() );
+            // $_groupOptions['prefix'] = (adminUrlPrefix() ? adminUrlPrefix() . '/' : '')
+            //     . $system_prefix
+            //     . kebabCase( $module->getName() );
+            $_groupOptions['prefix'] = $module->fullPrefix();
 
-            $_groupOptions['as'] = (adminRouteNamePrefix() ? adminRouteNamePrefix() . '.' : '')
-                . $system_route_name
-                . snakeCase( $module->getName() ) . '.';
-
+            // $_groupOptions['as'] = (adminRouteNamePrefix() ? adminRouteNamePrefix() . '.' : '')
+            //     . $system_route_name
+            //     . snakeCase( $module->getName() ) . '.';
+            $_groupOptions['as'] = $module->fullRouteNamePrefix() . '.';
+            // dd($_groupOptions);
             UnusualRoutes::registerRoutes(
                 $router,
                 $_groupOptions,
@@ -446,8 +450,8 @@ class RouteServiceProvider extends ServiceProvider
             $pr = $module->getParentRoute();
 
             $has_system_prefix = $module->hasSystemPrefix();
-            $system_prefix = $has_system_prefix ? unusualConfig('base_prefix', 'system-settings') . '/' : '';
-            $system_route_name = $has_system_prefix ? snakeCase(studlyName(unusualConfig('base_prefix', 'system-settings'))) : '';
+            $system_prefix = $has_system_prefix ? systemUrlPrefix() . '/' : '';
+            $system_route_name = $has_system_prefix ? systemRouteNamePrefix() : '';
 
             $parentStudlyName = studlyName( $config['name'] ); // UserCompany
             $parentCamelName = camelCase( $config['name'] ); // userCompany
@@ -632,8 +636,8 @@ class RouteServiceProvider extends ServiceProvider
         //         $routeFile = fileTrace($pattern);
         //     }
 
-        //     $lowerModule  = getCurrentModuleLowerName($routeFile);
-        //     $studlyModule = getCurrentModuleStudlyName($routeFile);
+        //     $lowerModule  = curtModuleLowerName($routeFile);
+        //     $studlyModule = curtModuleStudlyName($routeFile);
 
         //     if( empty($middlewares) )
         //         $middlewares = ['auth'];

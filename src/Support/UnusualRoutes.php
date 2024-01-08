@@ -97,7 +97,11 @@ class UnusualRoutes
     {
         return [
             'as'            => adminRouteNamePrefix() . '.',
-            'prefix'        => rtrim(ltrim(unusualConfig('admin_app_path'), '/'), '/'),
+            ... ( unusualConfig('admin_app_url')
+                ? ['domain' => unusualConfig('admin_app_url')]
+                : ['prefix' => systemUrlPrefix() ]
+            ),
+
         ];
     }
 
@@ -123,7 +127,7 @@ class UnusualRoutes
         return $this->defaultMiddlewares;
     }
 
-    function generateRouteMiddlewares()  {
+    public function generateRouteMiddlewares()  {
 
         Route::aliasMiddleware('unusual_auth', AuthenticateMiddleware::class);
         Route::aliasMiddleware('unusual_guest', RedirectIfAuthenticatedMiddleware::class);

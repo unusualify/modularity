@@ -101,7 +101,7 @@ class UNavigation
             $route_prefix = adminRouteNamePrefix() ? adminRouteNamePrefix() . '.' :  '';
 
             $route_prefix .= $module->hasSystemPrefix()
-                ? snakeCase(studlyName(unusualConfig('base_prefix', 'system-settings'))) . '.'
+                ? systemRouteNamePrefix() . '.'
                 : '';
 
             foreach( $routes as $item){

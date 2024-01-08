@@ -600,7 +600,7 @@ abstract class CoreController extends Controller
      */
     protected function getModuleName()
     {
-        return $this->moduleName ?? getCurrentModuleName();
+        return $this->moduleName ?? curtModuleName();
     }
 
     /**
@@ -665,8 +665,12 @@ abstract class CoreController extends Controller
         if( $admin_route_prefix )
             $routePrefixes[] = $admin_route_prefix;
 
-        if( isset($this->config->base_prefix) && $this->config->base_prefix)
-            $routePrefixes[] = snakeCase(studlyName(unusualConfig('base_prefix', 'system-settings')));
+        if(isset($this->config->system_prefix)){
+            if( $this->config->system_prefix)
+                $routePrefixes[] = systemRouteNamePrefix();
+
+        }else if( isset($this->config->base_prefix) && $this->config->base_prefix)
+            $routePrefixes[] = systemRouteNamePrefix();
 
         if( !$this->isParent || ($this->nested && !$noNested) )
             $routePrefixes[] = Str::snake($this->moduleName);
