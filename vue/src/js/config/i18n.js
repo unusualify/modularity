@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { nextTick } from 'vue'
 import { createI18n } from 'vue-i18n'
+import { useStore } from 'vuex'
 
 // import messages from "@intlify/unplugin-vue-i18n/messages";
 
@@ -140,14 +141,13 @@ export function setI18nLocale (i18n, locale) {
   document.querySelector('html').setAttribute('lang', locale)
 }
 
-export async function loadLocaleMessages (i18n) {
+export async function loadLocaleMessages (i18n, endpoint) {
   // const response = await axios.get('/api/languages')
   // for (const locale in response.data) {
   //   loadLocaleMessage(i18n, locale, response.data[locale])
   // }
-
   try {
-    axios.get('/admin/api/languages')
+    axios.get(endpoint ?? '/api/languages')
       .then((response) => {
         for (const locale in response.data) {
           loadLocaleMessage(i18n, locale, response.data[locale])

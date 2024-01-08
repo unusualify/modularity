@@ -66,7 +66,7 @@ export default {
 
     // set locale wrt user profile preference
     setI18nLocale(i18n, store.state.user.locale)
-    loadLocaleMessages(i18n)
+    loadLocaleMessages(i18n, window[process.env.VUE_APP_NAME].ENDPOINTS.languages ?? '')
     // i18n.global.setDateTimeFormat('tr', 'Europe/Istanbul')
 
     // add Global methods to all components

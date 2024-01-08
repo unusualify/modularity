@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['as' => 'api.lang.', 'namespace' => 'API'], function(){
+Route::group(['as' => 'api.', 'namespace' => 'API'], function(){
     Route::apiResource('languages', LanguageController::class);
 });
 
