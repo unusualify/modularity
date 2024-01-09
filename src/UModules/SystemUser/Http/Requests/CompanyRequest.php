@@ -9,40 +9,28 @@ class CompanyRequest extends Request
 {
 
     /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
+     * Get the default validation rules that apply to the request.
      *
      * @return array
      */
-    public function rules()
-    {
-        $rules = [
-
-        ];
-
-        return $rules + parent::rules();
-    }
-
-
-    public function store()
+    public function rulesForAll()
     {
         return [
-            'name' => 'required|min:3',
 
+		];
+    }
+
+    public function rulesForStore()
+    {
+        $table_name = $this->model()->getTable();
+        return [
+            'name' => 'required|min:3',
         ];
     }
 
-    public function update()
+    public function rulesForUpdate()
     {
+        $table_name = $this->model()->getTable();
         return [
             'name' => 'required|min:3',
         ];
