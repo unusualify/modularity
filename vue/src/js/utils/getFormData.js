@@ -261,7 +261,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
     if (isArrayable.includes(input.type)) {
       _default = []
     }
-    const value = editing ? item[name] : _default
+    const value = editing ? (item[name] ? item[name] : _default) : _default
     if (__isObject(input)) {
       const languages = window[process.env.VUE_APP_NAME].STORE.languages.all
       if (isMediableTypes.includes(input.type)) {
@@ -318,6 +318,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
   if (rootState) {
     // hydrateSelected(item, rootState)
   }
+
   return values
 }
 
