@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use PhpParser\Node\Expr\Cast\Array_;
 
 if (! function_exists('lowerName')) {
     function lowerName($string) {
@@ -122,6 +124,27 @@ if (!function_exists('camelCaseToWords')) {
         $a = preg_split($re, $camelCaseString);
         $words = join(" ", $a);
         return ucfirst(strtolower($words));
+    }
+}
+
+if (! function_exists('parseRulesSchema')) {
+    function parseRulesSchema(array $schema) {
+        return Arr::map($schema, function($rulesSchema, $input_name){
+            return Arr::mapWithKeys(explode('|', $rulesSchema), function($ruleSchema){
+                $ruleSchemaExplode = explode(':',$ruleSchema);
+                return [ array_shift($ruleSchemaExplode) => implode(':', $ruleSchemaExplode)];
+            });
+        });
+    }
+}
+
+if (! function_exists('formatRulesSchema')) {
+    function formatRulesSchema(array $parsedSchema) {
+        return Arr::map($parsedSchema, function($parsedRulesSchema){
+            return implode('|', Arr::map($parsedRulesSchema, function($ruleParams, $ruleName){
+                return implode(':', array_merge([$ruleName], ($ruleParams ? [$ruleParams] : [])));
+            }));
+        });
     }
 }
 
