@@ -360,7 +360,7 @@
           </template>
       </template>
 
-      <template v-slot:column.actions="_obj">
+      <template v-slot:header.actions="_obj">
         <v-menu
           :close-on-content-click="false"
           open-on-hover
