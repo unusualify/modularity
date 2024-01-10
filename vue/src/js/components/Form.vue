@@ -396,14 +396,13 @@ export default {
     },
     handleInput (v, s) {
       const { on, key, value, obj } = v
-
       if (on === 'input' && !!key && !!value && !this.serverValid) {
         __log(
           'handleInput',
           on,
           key
         )
-        this.$store.commit(FORM.SET_SERVER_VALID, true)
+        // this.$store.commit(FORM.SET_SERVER_VALID, true)
         this.resetSchemaError(key)
         // __log(obj.schema, key)
       }
