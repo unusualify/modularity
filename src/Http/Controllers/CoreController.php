@@ -503,7 +503,7 @@ abstract class CoreController extends Controller
     /**
      * @return \Unusualify\Modularity\Http\Requests\Admin\Request
      */
-    protected function validateFormRequest()
+    protected function validateFormRequest($schema = [])
     {
         $unauthorizedFields = Collection::make($this->fieldsPermissions)->filter(function ($permission, $field) {
             return Auth::guard('unusual_users')->user()->cannot($permission);
@@ -513,7 +513,7 @@ abstract class CoreController extends Controller
             $this->request->offsetUnset($field);
         });
 
-        return $this->getFormRequestClass();
+        return $this->getFormRequestClass($schema);
     }
 
     /**
@@ -572,12 +572,24 @@ abstract class CoreController extends Controller
      *
      * @return void
      */
-    public function getFormRequestClass()
+    public function getFormRequestClass($schema = null)
     {
         $formRequest = "$this->namespace\Http\Requests\\" . $this->modelName . 'Request';
 
+        $chunkInputs = $this->chunkInputs(
+            $schema ? $this->createFormSchema($schema) : $this->formSchema,
+            true
+        );
+
         if (@class_exists($formRequest)) {
-            return App::make( $formRequest );
+            return App::makeWith( $formRequest, [
+                'rules' => Arr::mapWithKeys($chunkInputs, function( $input, $key){
+
+                    return isset($input['name']) && isset($input['rules']) && is_string($input['rules'])
+                        ? [$input['name'] => $input['rules'] ?? []]
+                        : [];
+                })
+            ]);
         }
         return $this->request;
         // return TwillCapsules::getCapsuleForModel($this->modelName)->getFormRequestClass();

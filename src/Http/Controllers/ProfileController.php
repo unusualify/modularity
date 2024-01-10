@@ -329,7 +329,9 @@ class ProfileController extends BaseController
         // dd($item);
         // $input = $this->request->all();
 
-        $formRequest = $this->validateFormRequest();
+        $formRequest = $this->validateFormRequest(
+            getInputDraft('user') + getInputDraft('user_password')
+        );
 
         // dd($formRequest);
 

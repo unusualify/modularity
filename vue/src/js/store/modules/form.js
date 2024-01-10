@@ -185,7 +185,6 @@ const actions = {
 
     api[method](url, data, function (response) {
       commit(FORM.UPDATE_FORM_LOADING, false)
-
       if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
         commit(FORM.SET_SERVER_VALID, false)
         commit(FORM.SET_FORM_ERRORS, response.data.errors)
@@ -207,6 +206,8 @@ const actions = {
 
       if (callback && typeof callback === 'function') callback(response.data)
     }, function (response) {
+      __log(response)
+
       commit(FORM.UPDATE_FORM_LOADING, false)
       if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
         commit(FORM.SET_FORM_ERRORS, response.data.errors)

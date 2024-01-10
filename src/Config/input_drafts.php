@@ -10,9 +10,7 @@ return [
             'col' => [
                 'sm' => 6,
             ],
-            'rules' => [
-                ['min', 3]
-            ]
+            'rules' => 'min:3|unique_table'
         ],
         'surname' => [
             "type" => "text",
@@ -22,9 +20,7 @@ return [
             'col' => [
                 'sm' => 6,
             ],
-            'rules' => [
-                ['min', 2]
-            ]
+            'rules' => 'min:2'
         ],
         'job_title' => [
             "type" => "text",
@@ -34,9 +30,7 @@ return [
             'col' => [
                 'sm' => 6,
             ],
-            'rules' => [
-                ['min', 2]
-            ]
+            'rules' => 'min:2'
         ],
         'email' => [
             "type" => "text",
@@ -46,9 +40,7 @@ return [
             'col' => [
                 'sm' => 6,
             ],
-            'rules' => [
-                ['email']
-            ]
+            'rules' => 'email'
         ],
         'phone' => [
             "type" => "custom-input-phone",
@@ -68,9 +60,7 @@ return [
             'col' => [
                 'sm' => 6,
             ],
-            'rules' => [
-                ['min', 3]
-            ]
+            'rules' => 'min:3'
         ],
         'language' => [
             "type" => "select",
@@ -119,10 +109,10 @@ return [
         ],
     ],
     'user_password' => [
-        'password' => [
+        'current_password' => [
             "type" => "password",
             // "ext" => "password",
-            "name" => "password",
+            "name" => "current_password",
             "label" => "Current Password",
             "default" => "",
             'col' => [ 'sm' => 6],
@@ -130,6 +120,7 @@ return [
             "slotHandlers" => [
                 'appendInner' => 'password',
             ],
+            "rules" => "sometimes|required|current_password",
         ],
         'gap-1' => [
             'type' => 'v-sheet',
@@ -141,10 +132,10 @@ return [
                 'class' => 'd-none d-sm-block',
             ]
         ],
-        'new-password' => [
+        'password_confirmation' => [
             "type" => "password",
             // "ext" => "password",
-            "name" => "new_password",
+            "name" => "password_confirmation",
             "label" => "New Password",
             "default" => "",
             'col' => [ 'sm' => 6],
@@ -152,14 +143,12 @@ return [
             "slotHandlers" => [
                 'appendInner' => 'password',
             ],
-            'rules' => [
-                ['min', 6]
-            ]
+            'rules' => 'sometimes|min:6'
         ],
-        'confirm-password' => [
+        'password' => [
             "type" => "password",
             // "ext" => "password",
-            "name" => "confirm_password",
+            "name" => "password",
             "label" => "Confirm Password",
             "default" => "",
             'col' => [ 'sm' => 6],
@@ -167,10 +156,11 @@ return [
             "slotHandlers" => [
                 'appendInner' => 'password',
             ],
-            'rules' => [
-                ['min', 6],
-                ['confirmation', 'new_password'],
-            ]
+            'rules' => 'sometimes|min:6|confirmed'
+            // 'rules' => [
+            //     'min:6',
+            //     ['confirmation', 'new_password'],
+            // ]
         ],
     ],
     'company' => [
@@ -244,9 +234,7 @@ return [
             "label" => "Phone Number",
             "default" => "",
             'col' => [ 'sm' => 6],
-            'rules' => [
-                // ['email']
-            ],
+            'rules' => 'min:20',
             'clearable' => false
         ],
         'vat_number' => [

@@ -35,17 +35,18 @@ export default {
     })
   },
   put (endpoint, data, callback, errorCallback) {
-    axios.put(endpoint, data)
-      .then(function (resp) {
-        if (callback && typeof callback === 'function') callback(resp)
-      }).catch(function (err) {
-        const error = {
-          message: 'Put request error.',
-          value: err.response
-        }
-        globalError(component, error)
+    axios.put(endpoint, data, {
+      validateStatus: status => (status >= 200 && status < 300) || status === 422
+    }).then(function (resp) {
+      if (callback && typeof callback === 'function') callback(resp)
+    }).catch(function (err) {
+      const error = {
+        message: 'Put request error.',
+        value: err.response
+      }
+      globalError(component, error)
 
-        if (errorCallback && typeof errorCallback === 'function') errorCallback(err.response)
-      })
+      if (errorCallback && typeof errorCallback === 'function') errorCallback(err.response)
+    })
   }
 }

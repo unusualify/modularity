@@ -14,6 +14,12 @@ abstract class Request extends FormRequest
 {
     use ManageTraits;
 
+    protected $model;
+
+    public function __construct(protected $rules = []){
+        $this->model = $this->model();
+    }
+
     /**
      * Determines if the user is authorized to make this request.
      *
@@ -33,10 +39,10 @@ abstract class Request extends FormRequest
     {
         switch ($this->method()) {
             case 'POST':{
-                return $this->hydrateRules(array_merge($this->rulesForAll(),$this->rulesForCreate()));
+                return $this->mergeRules(array_merge($this->rulesForAll(),$this->rulesForCreate()));
             }
             case 'PUT':{
-                return $this->hydrateRules(array_merge($this->rulesForAll(),$this->rulesForUpdate()));
+                return $this->mergeRules(array_merge($this->rulesForAll(),$this->rulesForUpdate()));
             }
             default:break;
         }
@@ -44,13 +50,15 @@ abstract class Request extends FormRequest
         return [];
     }
 
-    public function hydrateRules($rules) {
+    public function mergeRules($rules) {
         $locales = getLocales();
-        $localeActive = false;
-        $model = $this->model();
 
-        if($model){
-            $translatedAttributes = (method_exists($model, 'isTranslatable') && $model->isTranslatable()) ? $model->getTranslatedAttributes() : [];
+        $localeActive = false;
+
+        $rules = $this->mergeSchemaRules($rules);
+
+        if($this->model){
+            $translatedAttributes = (method_exists($this->model, 'isTranslatable') && $this->model->isTranslatable()) ? $this->model->getTranslatedAttributes() : [];
             $translatedRules = Arr::only($rules, $translatedAttributes);
             $rules = Arr::except($rules, $translatedAttributes);
 
@@ -69,8 +77,26 @@ abstract class Request extends FormRequest
                 }
             }
         }
-        // dd($rules);
-        return $rules;
+        // dd($this->hydrateRules($rules));
+        return $this->hydrateRules($rules);
+    }
+
+    public function hydrateRules($rules) {
+
+        return Arr::map($rules, function($ruleSchema, $name){
+            if(preg_match('/unique_table/', $ruleSchema)){
+                $ruleSchema = preg_replace('/unique_table/', "unique:{$this->model->getTable()},{$name}" . ($this->id ? ",{$this->id}" : ''), $ruleSchema);
+                $ruleSchema = preg_replace('/\|?(unique:[A-Za-z,\d]*)(\|?|$)/', "$2", $ruleSchema);
+
+                return $ruleSchema;
+                dd(
+                    // preg_replace('/unique_table/', "unique:{$this->model->getTable()},{$name}", $ruleSchema),
+                    preg_replace('/\|?(unique:[A-Za-z,\d]*)(\|?|$)/', "$2", $ruleSchema)
+                );
+            }
+
+            return $ruleSchema;
+        });
     }
 
     /**
@@ -215,5 +241,15 @@ abstract class Request extends FormRequest
         }
 
         return $messages;
+    }
+
+    protected function mergeSchemaRules($rules) {
+        return formatRulesSchema(
+            array_merge_recursive_preserve(
+                parseRulesSchema($this->rules),
+                parseRulesSchema($rules),
+            ),
+        );
+
     }
 }

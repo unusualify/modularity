@@ -22,7 +22,7 @@ class RoleRequest extends Request
 
     public function rulesForStore()
     {
-        $table_name = $this->model()->getTable();
+        $table_name = $this->model->getTable();
         return [
             'name' => "required|unique:$table_name|min:4",
         ];
@@ -30,7 +30,7 @@ class RoleRequest extends Request
 
     public function rulesForUpdate()
     {
-        $table_name = $this->model()->getTable();
+        $table_name = $this->model->getTable();
         return [
             'name' => "required|min:4|unique:{$table_name},name,".$this->id,
         ];
