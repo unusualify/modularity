@@ -4,10 +4,12 @@ namespace Unusualify\Modularity\Traits;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Hash;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\UFinder;
 
 trait ManageTraits {
+
 
     /**
      * @param string|null $method
@@ -45,8 +47,8 @@ trait ManageTraits {
         return [];
     }
 
-    public function chunkInputs($schema) {
-        return Arr::mapWithKeys($schema, function($input, $key){
+    public function chunkInputs($schema, $all = false) {
+        return Arr::mapWithKeys($schema, function($input, $key) use($all){
             if(isset($input['type'])){
                 switch ($input['type']) {
                     case 'group':
@@ -54,7 +56,7 @@ trait ManageTraits {
                         return $this->chunkInputs($input['schema'] ?? []);
                     break;
                     case 'morphTo':
-                        return [ uniqid() => $input];
+                        return [ uniqid() => $all ? $this->chunkInputs($input['schema']) :$input];
                     break;
                     default:
 
@@ -96,6 +98,15 @@ trait ManageTraits {
         $routeName = $this->routeName();
 
         return $routeName  ? App::make(UFinder::getRouteRepository($routeName))?->getModel() : null;
+    }
+
+    public function prepareFieldsBeforeSaveManageTraits($object, $fields) {
+
+        if(isset($fields['password'])){
+            $fields['password'] = Hash::make($fields['password']);
+        }
+
+        return $fields;
     }
 
 
