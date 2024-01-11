@@ -5,14 +5,17 @@ const path = require('path')
 const dotenv = require('dotenv')
 
 const env = dotenv.config({ path: path.resolve(__dirname, '../../../.env') }).parsed
-
+const CD_PARENT_STRING = Array(process.env.UNUSUAL_VENDOR_PATH.split('/').length + 1).fill('..').join('/') // 2 or 3 => '../../../
 const isProd = process.env.NODE_ENV === 'production'
 const APP_THEME = process.env.VUE_APP_THEME || 'unusual'
 const URL = process.env.UNUSUAL_DEV_URL
 
 const srcDirectory = 'src'
+
 // const partialsDirectory = '../../src/Resources/views/partials'
-const svgIconsDirectory = '../../src/Resources/views/partials/icons'
+// const svgIconsDirectory = '../../src/Resources/views/partials/icons'
+const svgIconsDirectory = `${CD_PARENT_STRING}/resources/views/vendor/modularity/partials/icons`
+
 const outputDir = isProd ? 'dist' : (process.env.VUE_DEV_ASSETS_PATH || 'dist')
 const assetsDir = process.env.UNUSUAL_ASSETS_DIR || 'unusual'
 
