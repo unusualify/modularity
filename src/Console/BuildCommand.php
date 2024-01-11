@@ -116,10 +116,9 @@ class BuildCommand extends BaseCommand
         // $resource_path = base_path($this->baseConfig('vendor_path') . '/vue/src/**');
 
         if ($this->option('hot')) {
-            $mode = env('NODE_ENV');
             $this->startWatcher( $resource_path, 'php artisan unusual:build --copyOnly');
             // $this->runUnusualProcess(['npm', 'run', 'serve', '--', "--mode={$mode}", "--port={$this->getDevPort()}"], true);
-            $this->runUnusualProcess(['npm', 'run', 'serve', '--', "--mode={$mode}", '--source-map', '--inspect-loader ',"--port={$this->getDevPort()}"], true);
+            $this->runUnusualProcess(['npm', 'run', 'serve', '--','--source-map', '--inspect-loader ',"--port={$this->getDevPort()}"], true);
         } elseif ($this->option('watch')) {
             $this->startWatcher( $resource_path, 'php artisan unusual:build --copyOnly');
             $this->runUnusualProcess(['npm', 'run', 'watch'], true);

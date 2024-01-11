@@ -12,6 +12,9 @@
         @stack('head_last_js')
     </head>
     <body>
+        {{-- @if(!unusualConfig('is_development', false))
+            @include("{$BASE_KEY}::partials.icons.svg-sprite")
+        @endif --}}
         @include("{$BASE_KEY}::partials.icons.svg-sprite")
 
         {{-- @dd( auth()->user() ) --}}
