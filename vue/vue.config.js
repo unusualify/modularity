@@ -5,7 +5,7 @@ const path = require('path')
 const dotenv = require('dotenv')
 
 const env = dotenv.config({ path: path.resolve(__dirname, '../../../.env') }).parsed
-const CD_PARENT_STRING = Array(process.env.UNUSUAL_VENDOR_PATH.split('/').length + 1).fill('..').join('/') // 2 or 3 => '../../../
+const CD_PARENT_STRING = Array(process.env.UNUSUAL_VENDOR_PATH.split('/').length + 2).fill('..').join('/') // 2 or 3 => '../../../
 const isProd = process.env.NODE_ENV === 'production'
 const APP_THEME = process.env.VUE_APP_THEME || 'unusual'
 const URL = process.env.UNUSUAL_DEV_URL
