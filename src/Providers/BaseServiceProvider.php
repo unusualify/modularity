@@ -248,13 +248,15 @@ class BaseServiceProvider extends ServiceProvider
     /**
      * {@inheritdoc}
      */
-    private function bootBaseViews(){
+    private function bootBaseViews()
+    {
 
         // LOAD BASE VIEWS
         $this->loadViewsFrom(
             array_merge(
                 $this->getPublishableViewPaths($this->baseKey),
-                [$this->viewSourcePath]
+                [resource_path('views/vendor/modularity')],
+                [$this->viewSourcePath],
             ),
             $this->baseKey
         );

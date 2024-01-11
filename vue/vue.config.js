@@ -5,14 +5,19 @@ const path = require('path')
 const dotenv = require('dotenv')
 
 const env = dotenv.config({ path: path.resolve(__dirname, '../../../.env') }).parsed
-const isProd = env.NODE_ENV === 'production'
+const CD_PARENT_STRING = Array(process.env.UNUSUAL_VENDOR_PATH.split('/').length + 1).fill('..').join('/') // 2 or 3 => '../../../
+const isProd = process.env.NODE_ENV === 'production'
 const APP_THEME = process.env.VUE_APP_THEME || 'unusual'
-const URL = env.UNUSUAL_DEV_URL
+const URL = process.env.UNUSUAL_DEV_URL
 
 const srcDirectory = 'src'
-const partialsDirectory = '../../src/Resources/views/partials'
-const outputDir = isProd ? 'dist' : (env.VUE_DEV_ASSETS_PATH || 'dist')
-const assetsDir = env.UNUSUAL_ASSETS_DIR || 'unusual'
+
+// const partialsDirectory = '../../src/Resources/views/partials'
+// const svgIconsDirectory = '../../src/Resources/views/partials/icons'
+const svgIconsDirectory = `${CD_PARENT_STRING}/resources/views/vendor/modularity/partials/icons`
+
+const outputDir = isProd ? 'dist' : (process.env.VUE_DEV_ASSETS_PATH || 'dist')
+const assetsDir = process.env.UNUSUAL_ASSETS_DIR || 'unusual'
 
 // eslint-disable-next-line no-console
 console.log('\x1b[32m', `\n🔥 Building Unusual assets in ${isProd ? 'production' : 'dev'} mode.`)
@@ -55,7 +60,7 @@ const svgConfig = (suffix = null) => {
 
   return {
     output: {
-      filename: `${partialsDirectory}/icons/icons${suffix}-svg.blade.php`,
+      filename: `${svgIconsDirectory}/icons${suffix}-svg.blade.php`,
       chunk: {
         name: `icons${suffix}`
       }
@@ -140,7 +145,7 @@ const devServer = {
       poll: 1000
     }
   },
-  proxy: env.VUE_DEV_PROXY,
+  proxy: process.env.VUE_DEV_PROXY,
   client: {
     webSocketURL: `ws://${URL}/ws`
   }

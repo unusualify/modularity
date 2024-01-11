@@ -19,7 +19,7 @@
     {{-- <link href="{{ unusualMix('chunk-vendors.css') }}" rel="preload" as="style" crossorigin/> --}}
 @endif
 
-@unless(config(unusualBaseKey() . '.is_development', false))
+@unless(unusualConfig('is_development', false))
     {{-- <link href="{{ unusualMix('chunk-common.css') }}" rel="stylesheet" crossorigin/> --}}
     {{-- <link href="{{ unusualMix('chunk-vendors.css' )}}" rel="stylesheet" crossorigin/> --}}
 @endunless
