@@ -205,6 +205,15 @@ class MigrationMakeCommand extends BaseCommand
                 ."\t\t});\n\n";
         }
 
+        if($this->option('addSlug')){
+            // Schema::create('blog_slugs', function (Blueprint $table) {
+            //     createDefaultSlugsTableFields($table, 'blog');
+            // });
+            $schemas .= "\t\t\tSchema::create('{$singular_table}_slugs', function(Blueprint \$table) {\n"
+                ."\t\t\tcreateDefaultSlugsTableFields(\$table, '{$singular_table}');\n"
+                ."\t\t});\n\n";
+        }
+
         return $schemas;
     }
 
@@ -219,6 +228,10 @@ class MigrationMakeCommand extends BaseCommand
         if($this->option('addTranslation')){
             // $results = "\t\t\t" . '$table';
             $schemas .= "\t\t\tSchema::dropIfExists('{$singular_table}_translations');\n";
+        }
+
+        if($this->option('addSlug')){
+            $schemas .= "\t\t\tSchema::dropIfExists('{$singular_table}_slugs');\n";
         }
 
         $schemas .= "\t\tSchema::dropIfExists('{$table}');";

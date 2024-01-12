@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Arr;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Priceable\Models\Currency;
 
 trait ManageForm {
@@ -410,7 +411,34 @@ trait ManageForm {
 
                 break;
         }
+        if(isset($input['ext'])){
+            switch ($input['ext']) {
+                case 'permalink':
+                    # code...
+                    $data = [];
+                    $arrayable = true;
+                    $data += $this->getSchemaInput([
+                        'type' => 'text',
+                        'name' => 'slug',
+                        'ref' => 'permalink'
+                    ]);
+                    unset($input['ext']);
+                    $data += $this->getSchemaInput(
+                        $input + [
+                            'event' => 'formatPermalink:slug',
+                            // 'v-on:change' => 'formatPermalink',
+                            // 'onChange' => 'formatPermalink'
+                        ]
+                    );
+                    // dd($data);
+                    break;
 
+
+                default:
+                    // unset($input['ext']);
+                    break;
+            }
+        }
         if(isset($this->repository)){
 
             if( method_exists($this->repository->getModel(), 'getTranslatedAttributes')
