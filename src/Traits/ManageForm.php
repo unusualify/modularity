@@ -417,10 +417,13 @@ trait ManageForm {
                     # code...
                     $data = [];
                     $arrayable = true;
-                    $data += $this->getSchemaInput([
+                    $permalinkInput = $this->getSchemaInput([
                         'type' => 'text',
                         'name' => 'slug',
-                        'ref' => 'permalink'
+                        'ref' => 'permalink',
+                        'label' => 'Permalink',
+                        'prefix' => getHost() . '/',
+                        'readonly' => true
                     ]);
                     unset($input['ext']);
                     $data += $this->getSchemaInput(
@@ -430,6 +433,7 @@ trait ManageForm {
                             // 'onChange' => 'formatPermalink'
                         ]
                     );
+                    $data += $permalinkInput;
                     // dd($data);
                     break;
 

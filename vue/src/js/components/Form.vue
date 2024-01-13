@@ -149,31 +149,15 @@ import { mapState } from 'vuex'
 import { FORM, ALERT } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
 import api from '@/store/api/form'
+import { useFormatPermalink, useInputHandlers, useValidation } from '@/hooks'
 
 import { useI18n } from 'vue-i18n'
 
 import logger from '@/utils/logger'
 import { getModel, getSubmitFormData, getSchema } from '@/utils/getFormData.js'
 
-import { useInputHandlers, useValidation } from '@/hooks'
 import { redirector } from '@/utils/response'
 import { cloneDeep, filter } from 'lodash'
-
-// Helper & Partial Functions
-const minLen = l => v => (v && v.length >= l) || `min. ${l} Characters`
-const maxLen = l => v => (v && v.length <= l) || `max. ${l} Characters`
-const required = msg => v => !!v || msg
-const requiredArray = (msg, l = 1) => v => (Array.isArray(v) && v.length > l) || msg
-
-// Rules
-const rules = {
-  requiredEmail: required('E-mail is required'),
-  requiredSel: required('Selection is required'),
-  requiredSelMult: requiredArray('2 Selections are required'),
-  max12: maxLen(12),
-  min6: minLen(6),
-  validEmail: v => /.+@.+\..+/.test(v) || 'E-mail must be valid'
-}
 
 export default {
   name: 'ue-form',
@@ -244,6 +228,7 @@ export default {
 
     const buttonDefaultText = computed(() => props.buttonText ? (te(props.buttonText) ? t(props.buttonText) : props.buttonText) : t('submit'))
     return {
+      ...useFormatPermalink(props, context),
       ...inputHandlers,
       ...validations,
       buttonDefaultText
@@ -396,15 +381,32 @@ export default {
     },
     handleInput (v, s) {
       const { on, key, value, obj } = v
-      if (on === 'input' && !!key && !!value && !this.serverValid) {
-        __log(
-          'handleInput',
-          on,
-          key
-        )
-        // this.$store.commit(FORM.SET_SERVER_VALID, true)
-        this.resetSchemaError(key)
-        // __log(obj.schema, key)
+
+      if (on === 'input' && !!key && !!value) {
+        if (!this.serverValid) {
+          this.resetSchemaError(key)
+        }
+
+        if (__isset(obj.schema.event)) {
+          // let methodName, args;
+          const [methodName, ...args] = obj.schema.event.split(':')
+
+          // this[methodName](value)
+          if (typeof this[methodName] === 'function') {
+            // safe to use the function
+            switch (methodName) {
+              case 'formatPermalink':
+                // args[0] permalink input name
+                this.model[args[0]] = this[methodName](value)
+
+                break
+
+              default:
+                break
+            }
+          }
+        }
+        // __log(on, key, value, obj)
       }
     },
     handleInputSlot (v, s) {
