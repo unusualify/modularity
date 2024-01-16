@@ -286,6 +286,7 @@ export default {
     },
     editedItem (newValue, oldValue) {
       if (!this.issetModel) {
+        this.regenerateInputSchema(newValue)
         this.model = getModel(this.rawSchema, newValue, this.$store.state)
       }
       // this.resetValidation()
@@ -390,21 +391,32 @@ export default {
         if (__isset(obj.schema.event)) {
           // let methodName, args;
           const [methodName, ...args] = obj.schema.event.split(':')
+          let newValue
+          switch (methodName) {
+            case 'formatPermalink':
+              // args[0] permalink input name
+              this.model[args[0]] = this[methodName](value)
 
-          // this[methodName](value)
-          if (typeof this[methodName] === 'function') {
-            // safe to use the function
-            switch (methodName) {
-              case 'formatPermalink':
-                // args[0] permalink input name
-                this.model[args[0]] = this[methodName](value)
+              break
+            case 'formatPermalinkPrefix':
+              // args[0] permalink input name
+              // args[1] regex slug
+              // args[2] itemTitle
+              newValue = this.formatPermalink(obj.schema.items.find((item) => item[obj.schema.itemValue] === value)[obj.schema.itemTitle])
+              if (['select', 'combobox'].includes(obj.schema.type)) {
+                this.inputSchema[args[0] ?? 'slug'].prefix = this.inputSchema[args[0] ?? 'slug'].prefixFormat.replace(':' + args[1], newValue)
+              }
 
-                break
+              break
 
-              default:
-                break
-            }
+            default:
+              break
           }
+          // this[methodName](value)
+          // if (typeof this[methodName] === 'function') {
+          //   // safe to use the function
+
+          // }
         }
         // __log(on, key, value, obj)
       }
@@ -531,6 +543,15 @@ export default {
 
     updatedSlotModel (value, inputName) {
       __log(this.model, value, inputName)
+    },
+
+    regenerateInputSchema (newItem) {
+      // #TODO regenerate inputschema for prefix regex pattern
+      // for (const key in this.rawSchema) {
+      //   if (__isset(this.rawSchema[key].event)) {
+
+      //   }
+      // }
     }
   }
 
