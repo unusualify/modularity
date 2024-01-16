@@ -143,14 +143,20 @@ class Module extends NwidartModule
         return  config('modules.namespace', 'Modules') . "\\" . $this->getStudlyName();
     }
 
-    public function getRouteConfig($route_name){
-        return $this->getRouteConfigs( snakeCase($route_name) ) ;
-    }
-
     public function getRouteConfigs($notation = null){
         $notation = !$notation ? $notation : ".{$notation}";
 
         return $this->getConfig('routes' . $notation);
+    }
+
+    public function getRouteConfig($route_name){
+        return $this->getRouteConfigs( snakeCase($route_name) ) ;
+    }
+
+    public function getRouteInput($route_name, $input_name = null){
+        $inputs = $this->getRouteConfig($route_name)['inputs'];
+        dd($inputs);
+        return $this->getRouteConfig($route_name)['inputs'];
     }
 
     public function getConfig($notation = null){

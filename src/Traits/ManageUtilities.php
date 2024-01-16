@@ -1,6 +1,7 @@
 <?php
 namespace Unusualify\Modularity\Traits;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -191,7 +192,17 @@ trait ManageUtilities {
     protected function getUrls()
     {
         return [
-            'languages' => route(Route::hasAdmin('api.languages.index'))
+            'languages' => route(Route::hasAdmin('api.languages.index')),
+            'base_permalinks' => Arr::mapWithKeys(getLocales(), function($locale, $key){
+                extract(parse_url(config('app.url'))); // $scheme, $host
+                return [$locale => $host ];
+                dd(
+                    parse_url(config('app.url')),
+                    // config('app.url'),
+                    // request()->getHost(),
+                    // $locale, $key, getLocales()
+                );
+            }),
         ];
     }
 
@@ -210,11 +221,9 @@ trait ManageUtilities {
                 $this->formWith,
                 $this->formWithCount
             );
-        } elseif ( $id) {
-            $item =
-            $this->repository->newInstance();
+        } else {
+            $item = $this->repository->newInstance();
         }
-
         $fullRoutePrefix = 'admin.' . ($this->routePrefix ? $this->routePrefix . '.' : '') . $this->moduleName . '.';
         $previewRouteName = $fullRoutePrefix . 'preview';
         $restoreRouteName = $fullRoutePrefix . 'restoreRevision';
@@ -225,7 +234,6 @@ trait ManageUtilities {
         // $localizedPermalinkBase = $this->getLocalizedPermalinkBase();
 
         $itemId = $this->getItemIdentifier($item);
-
         // dd(
         //     $this->moduleName,
         //     $this->routeName,
@@ -233,7 +241,6 @@ trait ManageUtilities {
         //     $itemId,
         //     $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId])
         // );
-
         $data = [
             'translate' => $this->routeHas('translations'),
             'formAttributes' => [
@@ -411,7 +418,6 @@ trait ManageUtilities {
     protected function addWithsSchema() : array
     {
         // $this->indexWith += collect($schema)->filter(function($item){
-
         return collect(array2Object($this->formSchema))->filter(function($input){
             // return $this->hasWithModel($item['type']);
             return in_array($input->type, [

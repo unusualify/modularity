@@ -6,7 +6,7 @@ use Unusualify\Modularity\Entities\Media;
 use Unusualify\Modularity\Repositories\Traits\TagsTrait;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
-use ImageService;
+use Unusualify\Modularity\Services\MediaLibrary\ImageService;
 
 class MediaRepository extends Repository
 {

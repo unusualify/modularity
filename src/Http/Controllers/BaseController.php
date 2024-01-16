@@ -2,31 +2,19 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
-// use Modules\Payment\Repositories\PaymentRepository;
-// use Modules\Payment\Http\Requests\PaymentRequest;
-
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Services\MessageStage;
-use Unusualify\Modularity\Transformers\RoleResource;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-
-use Nwidart\Modules\Facades\Module;
 use Unusualify\Modularity\Traits\ManageUtilities;
 
-abstract class BaseController extends CoreController
+abstract class BaseController extends PanelController
 {
     use ManageUtilities;
 

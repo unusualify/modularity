@@ -46,11 +46,13 @@ class CreateUnusualDefaultMediasTables extends Migration
                 $table->integer('crop_h')->nullable();
                 $table->string('role')->nullable();
                 $table->string('crop')->nullable();
+                $table->string('locale', 6)->index();
                 $table->text('lqip_data')->nullable();
                 $table->string('ratio')->nullable();
                 $table->json('metadatas');
                 $table->foreign('media_id', 'fk_mediables_media_id')->references('id')->on($unusualMediasTable)->onDelete('cascade')->onUpdate('cascade');
                 $table->index(['mediable_type', 'mediable_id']);
+
             });
         }
     }

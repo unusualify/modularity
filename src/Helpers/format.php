@@ -106,7 +106,7 @@ if (! function_exists('fileTrace')) {
             }
         }
         if(!$dir){
-            dd(debug_backtrace());
+            dd($regex, debug_backtrace());
         }
         return $dir;
     }

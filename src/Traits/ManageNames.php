@@ -72,4 +72,12 @@ trait ManageNames {
         return null;
     }
 
+    protected function getSnakeNameFromForeignKey($foreign_key){
+        if(preg_match('/(.*)(_id)/', $foreign_key, $matches)){
+            return $this->getSnakeCase($matches[1]);
+        }
+
+        return null;
+    }
+
 }

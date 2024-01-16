@@ -767,10 +767,37 @@ abstract class Repository
     {
         $fields = $object->attributesToArray();
 
+        // $fields = $this->castFormFields($fields);
+
         foreach ($this->traitsMethods(__FUNCTION__) as $method) {
             $fields = $this->$method($object, $fields, $schema);
         }
-        // dd($fields);
+
+        return $fields;
+    }
+
+    /**
+     * @param \Unusualify\Modularity\Models\Model $object
+     * @return array
+     */
+    public function castFormFields($fields)
+    {
+        foreach ($this->chunkInputs($this->inputs()) as $input) {
+            if(isset($input['ext'])){
+                switch ($input['ext']) {
+                    case 'date':
+                        # code...
+                        $fields[$input['name']] = '';
+                        break;
+
+                    default:
+                        # code...
+                        break;
+                }
+            }
+        }
+
+
         return $fields;
     }
 

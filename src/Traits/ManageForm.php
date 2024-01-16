@@ -216,8 +216,14 @@ trait ManageForm {
                     ]);
                 }
 
-
-                $data =  Arr::except($input, ['route','model', 'repository', 'cascades']) + [
+                foreach ($this->getConfigFieldsByRoute('inputs') as $key => $_input) {
+                    if( isset($_input->ext)
+                        && in_array($_input->ext, ['permalink'])
+                    ){
+                        $input['event'] = 'formatPermalinkPrefix:slug:' . $this->getSnakeNameFromForeignKey($input['name']);
+                    }
+                }
+                $data = Arr::except($input, ['route','model', 'repository', 'cascades']) + [
                     'items' => $items
                 ];
 
@@ -415,14 +421,29 @@ trait ManageForm {
             switch ($input['ext']) {
                 case 'permalink':
                     # code...
-                    $data = [];
+                    $data = $data ?? [];
                     $arrayable = true;
+
+                    $permalinkPrefix = getHost() . '/';
+                    $permalinkPrefixFormat = getHost() . '/';
+
+                    foreach ($this->getConfigFieldsByRoute('inputs') as $key => $_input) {
+                        if( isset($_input->type)
+                            && in_array($_input->type, ['select', 'combobox'])
+                            && isset($_input->repository)
+
+                        ){
+                            $permalinkPrefixFormat .= ":{$this->getSnakeNameFromForeignKey($_input->name)}" . '/';
+                        }
+                    }
+
                     $permalinkInput = $this->getSchemaInput([
                         'type' => 'text',
                         'name' => 'slug',
                         'ref' => 'permalink',
                         'label' => 'Permalink',
-                        'prefix' => getHost() . '/',
+                        'prefix' => $permalinkPrefix,
+                        'prefixFormat' => $permalinkPrefixFormat,
                         'readonly' => true
                     ]);
                     unset($input['ext']);
@@ -443,6 +464,17 @@ trait ManageForm {
                     break;
             }
         }
+
+        if(isset($input['rules']) && is_string($input['rules']) && !$arrayable){
+            if(preg_match('/required/', $input['rules'])){
+                $data = $data ?? $input;
+                if(isset($data['class']))
+                    $data['class'] .= " required";
+                else
+                    $data['class'] = 'required';
+            }
+        }
+
         if(isset($this->repository)){
 
             if( method_exists($this->repository->getModel(), 'getTranslatedAttributes')

@@ -89,11 +89,11 @@ class ModelMakeCommand extends BaseCommand
             ]);
         }
 
-        $this->createAdditionalModels();
-
         if (parent::handle() === E_ERROR) {
             return E_ERROR;
         }
+
+        $this->createAdditionalModels();
 
         // $this->handleOptionalMigrationOption();
         // $this->handleOptionalControllerOption();
@@ -153,7 +153,8 @@ class ModelMakeCommand extends BaseCommand
             'TRAITS'                => $this->getTraits(),
             'FILLABLE'              => ltrim($this->getFillable()),
             'TRANSLATED_ATTRIBUTES' => ltrim($this->getTranslatedAttributes()),
-            'SLUG_ATTRIBUTES' => ltrim($this->getSlugAttributes()),
+            // 'CASTS'                 => ltrim($this->getCasts()),
+            'SLUG_ATTRIBUTES'       => ltrim($this->getSlugAttributes()),
             'METHODS'               => $this->getMethods()
         ]))->render();
     }
@@ -226,6 +227,29 @@ class ModelMakeCommand extends BaseCommand
     private function getFillable() : string
     {
         $defaultFillableSchema = implode(',',$this->baseConfig('schemas.fillables'));
+
+        $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
+
+        if(!$this->getTraitResponse('addTranslation')){
+            $fields = array_merge($this->defaultFillables, $fields);
+
+            $fillable = $this->option('fillable');
+            $fields = array_merge( $fields, $fillable != "" ? explode(',', $fillable) : []);
+        }
+
+        return $this->generateFillable($fields);
+    }
+
+    private function getCasts() : string
+    {
+        $defaultFillableSchema = implode(',',$this->baseConfig('schemas.fillables'));
+
+        dd(
+            $defaultFillableSchema,
+            $this->defaultFillables,
+            $this->option('fillable'),
+            (new SchemaParser($defaultFillableSchema))->getCasts()
+        );
 
         $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
 

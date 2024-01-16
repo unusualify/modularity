@@ -9,8 +9,6 @@ use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\UFinder;
 
 trait ManageTraits {
-
-
     /**
      * @param string|null $method
      * @return array
@@ -108,6 +106,4 @@ trait ManageTraits {
 
         return $fields;
     }
-
-
 }

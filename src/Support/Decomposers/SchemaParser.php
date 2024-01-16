@@ -379,11 +379,18 @@ class SchemaParser extends Parser
         $type = 'text';
         $name = $column;
         $label = $this->getHeadline($column);
+        $rules = [];
 
         if($options[0] == 'timestamp'){
             $extra_options['ext'] = 'date';
+        } else if($options[0] == 'time'){
+            $extra_options['ext'] = 'time';
         } else if(in_array($options[0], ['text', 'mediumtext', 'longtext'])){
             $type = 'textarea';
+        }
+
+        if(!in_array('nullable', $options)){
+            $rules[] = 'required';
         }
 
         if(in_array($options[0], $this->relationshipKeys)){
@@ -421,6 +428,9 @@ class SchemaParser extends Parser
             }
         }
 
+        if(count($rules) > 0){
+            $extra_options['rules'] = implode(':', $rules);
+        }
         return [
             'name' => $name,
             'label' => $label,

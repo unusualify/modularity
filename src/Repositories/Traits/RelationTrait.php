@@ -184,10 +184,13 @@ trait RelationTrait
 
     public function getBelongsToManyRelations()
     {
+        if(method_exists($this->getModel(), 'definedRelations')){
+            return $this->definedRelations('BelongsToMany');
+        }
+
         $reflector = new \ReflectionClass($this->model);
 
         $relations = [];
-
 
         foreach ($reflector->getMethods() as $reflectionMethod) {
             $returnType = $reflectionMethod->getReturnType();

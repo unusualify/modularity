@@ -347,7 +347,7 @@
                 :true-value="1"
                 false-value="0"
                 hide-details
-                @update:modelValue="itemAction(item, action, $event, col.key )"
+                @update:modelValue="itemAction(item, 'switch', $event, col.key )"
                 >
                 <template v-slot:label></template>
               </v-switch>
