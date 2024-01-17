@@ -5,7 +5,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 return [
     'namespace' => env('BASE_NAMESPACE','Unusualify\\Modularity'),
-    'name' => env('UNUSUAL_BASE_NAME','Unusual'),
+    'name' => env('UNUSUAL_BASE_NAME','Modularity'),
 
     'system_prefix' => 'system',
 

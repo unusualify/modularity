@@ -18,7 +18,7 @@ use Unusualify\Modularity\Facades\Modularity;
 if (! function_exists('unusualBaseKey')) {
     function unusualBaseKey($notation = null) {
         $notation = !$notation ? $notation : "." . $notation;
-        return \Illuminate\Support\Str::snake(env('UNUSUAL_BASE_NAME', 'Unusual')) . $notation;
+        return \Illuminate\Support\Str::snake(env('UNUSUAL_BASE_NAME', 'Modularity')) . $notation;
     }
 }
 
