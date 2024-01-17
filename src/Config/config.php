@@ -26,8 +26,6 @@ return [
     'build_timeout' => 300,
     'use_big_integers_on_migrations' => true,
 
-    'users_table_name' => 'users',
-
     'locale' => 'en',
     'fallback_locale' => 'en',
     'timezone' => 'Europe/London',
@@ -197,6 +195,17 @@ return [
         ],
     ],
 
+    'tables' => [
+        'users' => 'admin_users',
+        'companies' => 'umod_companies',
+        'files' => 'umod_files',
+        'fileables' => 'umod_fileables',
+        'medias' => 'umod_medias',
+        'mediables' => 'umod_mediables',
+        'tagged' => 'umod_tagged',
+        'tags' => 'umod_tags',
+    ],
+
     'traits' => [
         'addTranslation' => [
             'model' => 'HasTranslation',
@@ -260,17 +269,6 @@ return [
                 'description' => 'Whether model has pricing trait or not'
             ]
         ],
-    ],
-
-    'tables' => [
-        'users' => 'users',
-        'companies' => 'umod_companies',
-        'files' => 'umod_files',
-        'fileables' => 'umod_fileables',
-        'medias' => 'umod_medias',
-        'mediables' => 'umod_mediables',
-        'tagged' => 'umod_tagged',
-        'tags' => 'umod_tags',
     ],
 
     'base_model' => \Unusualify\Modularity\Entities\Model::class,

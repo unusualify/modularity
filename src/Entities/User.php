@@ -120,4 +120,9 @@ class User extends Authenticatable
         return preg_match('/client-/', $this->roles[0]->name);
     }
 
+    public function getTable()
+    {
+        return unusualConfig('tables.users', parent::getTable());
+    }
+
 }
