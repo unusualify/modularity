@@ -2,14 +2,14 @@
 
 namespace Unusualify\Modularity\Providers;
 
+use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Database\Eloquent\Factory;
-use Illuminate\Support\Facades\Config;
-use Nwidart\Modules\Facades\Module;
-use Unusualify\Modularity\Entities\User;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Route;
 use Unusualify\Modularity\Facades\Modularity;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 
+use Modules\Webinar\Http\Middleware\WebinarAuthMiddleware;
 class ModuleServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
@@ -40,6 +40,13 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
 
     public function registerModules()
     {
+        // $migration_directory = GenerateConfigReader::read('migration')->getPath();
+        // dd(Modularity::allEnabled());
+        // foreach(Modularity::allEnabled() as $module){
+
+        //     $module_name = $module->getName();
+
+        // }
 
     }
 
@@ -50,8 +57,28 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
 
             $module_name = $module->getName();
 
+            // REGISTER MODULE MIDDLEWARES
+            if(file_exists($module->getDirectoryPath('Http/Middleware'))){
+                foreach ( ClassFinder::getClassesInNamespace($module->getClassNamespace('Http\Middleware')) as $key => $middleware) {
+
+                    if(@class_exists($middleware)){
+                        $class = app($middleware);
+
+                        $shortName = get_class_short_name($class);
+                        $namespace = get_class($class);
+
+                        $aliasName = implode('.', Arr::where(explode('_', snakeCase($shortName)), function($value){
+                            return $value !== 'middleware';
+                        }));
+
+                        Route::aliasMiddleware($aliasName, $namespace);
+                    }
+                }
+            }
+
             // LOAD MODULE CONFIG
-            if(file_exists(module_path($module->getName(), 'Config/config.php'))){
+            // if(file_exists(module_path($module->getName(), 'Config/config.php'))){
+            if(file_exists($module->getDirectoryPath('Config/config.php'))){
                 $this->mergeConfigFrom(
                     $module->getDirectoryPath('Config/config.php'), $module->getSnakeName()
                 );
