@@ -204,6 +204,11 @@ class BaseServiceProvider extends ServiceProvider
             'modules.scan.paths' => $scan_paths
         ]);
 
+        // timokoerber/laravel-one-time-operations directory set
+        config([
+            'one-time-operations.directory' => unusualConfig('vendor_path'). '/src/Operations',
+        ]);
+
         if (!app()->runningInConsole()) {
             config([
                 'modules.cache.enabled' => true,
