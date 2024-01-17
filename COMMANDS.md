@@ -84,3 +84,8 @@ for seeders
 ([\s|\n|\r\n]+)('id'\s=>\s[0-9]{0,3},?)
 ([\s|\n|\r\n]+)('created_at'\s=>\s(.*),?)
 ([\s|\n|\r\n]+)('updated_at'\s=>\s(.*),?)
+
+/**
+    [$CONTROLLER_NAME::class, '$METHOD_NAME'] => '$CONTROLLER_NAME@$METHOD_NAME'
+    \[([a-zA-Z]*)::class,\s'(.*)'\] => '$1@$2'
+ */
