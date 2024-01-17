@@ -135,12 +135,12 @@ class UnusualRoutes
         Route::middlewareGroup('web.auth', [
             'web',
             'unusual_auth:unusual_users',
-            'auth',
+            // 'auth',
         ]);
         Route::middlewareGroup('api.auth', [
             'api',
             'unusual_auth:unusual_users',
-            'auth',
+            // 'auth',
         ]);
 
         Route::aliasMiddleware('language', LanguageMiddleware::class);

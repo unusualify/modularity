@@ -16,5 +16,6 @@ class AuthenticateMiddleware extends Middleware
     protected function redirectTo($request)
     {
         return route(Route::hasAdmin('login.form'));
+        // return $request->expectsJson() ? null : route('login.create');
     }
 }
