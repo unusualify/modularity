@@ -52,8 +52,8 @@ class ForgotPasswordController extends Controller
      */
     public function showLinkRequestForm(ViewFactory $viewFactory)
     {
-        // return $viewFactory->make('unusual::auth.passwords.email');
-        return $viewFactory->make('unusual::auth.passwords.email', [
+        // return $viewFactory->make(unusualBaseKey().'::auth.passwords.email');
+        return $viewFactory->make(unusualBaseKey().'::auth.passwords.email', [
             'formAttributes' => [
                 'hasSubmit' => true,
 

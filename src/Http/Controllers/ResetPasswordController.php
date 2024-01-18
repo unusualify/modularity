@@ -133,7 +133,7 @@ class ResetPasswordController extends Controller
         // call exists on the Password repository to check for token expiration (default 1 hour)
         // otherwise redirect to the ask reset link form with error message
         if ($user && Password::broker('users')->getRepository()->exists($user, $token)) {
-            return $this->viewFactory->make('unusual::auth.passwords.reset')->with([
+            return $this->viewFactory->make(unusualBaseKey().'::auth.passwords.reset')->with([
                 'token' => $token,
                 'email' => $user->email,
 
@@ -216,7 +216,7 @@ class ResetPasswordController extends Controller
 
         // we don't call exists on the Password repository here because we don't want to expire the token for welcome emails
         if ($user) {
-            return $this->viewFactory->make('unusual::auth.passwords.reset')->with([
+            return $this->viewFactory->make(unusualBaseKey().'::auth.passwords.reset')->with([
                 'token' => $token,
                 'email' => $user->email,
                 'welcome' => true,

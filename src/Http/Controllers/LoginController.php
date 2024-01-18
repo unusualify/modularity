@@ -161,7 +161,7 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-        return $this->viewFactory->make('unusual::auth.login', [
+        return $this->viewFactory->make(unusualBaseKey().'::auth.login', [
             'formAttributes' => [
                 'hasSubmit' => true,
 
@@ -235,7 +235,7 @@ class LoginController extends Controller
      */
     public function showLogin2FaForm()
     {
-        return $this->viewFactory->make('unusual::auth.2fa');
+        return $this->viewFactory->make(unusualBaseKey().'::auth.2fa');
     }
 
     /**

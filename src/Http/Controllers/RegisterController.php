@@ -24,7 +24,7 @@ class RegisterController extends Controller
 
     public function showLoginForm()
     {
-        return view('unusual::auth.register', [
+        return view(unusualBaseKey().'::auth.register', [
             'formAttributes' => [
                 'hasSubmit' => true,
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
