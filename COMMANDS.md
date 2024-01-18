@@ -45,6 +45,14 @@
 
 ```
 
+### OPERATIONS COMMANDS
+```
+    php artisan operations:make AdminUserTableOperation
+    php artisan operations:show
+    php artisan operations:process --test
+    php artisan operations:process
+```
+
 
 ### REGEX
 
