@@ -95,7 +95,7 @@ trait ManageTraits {
     public function model() {
         $routeName = $this->routeName();
 
-        return $routeName  ? App::make(UFinder::getRouteRepository($routeName))?->getModel() : null;
+        return ($routeName && $repositoryClass = UFinder::getRouteRepository($routeName)) ? App::make($repositoryClass)?->getModel() : null;
     }
 
     public function prepareFieldsBeforeSaveManageTraits($object, $fields) {
