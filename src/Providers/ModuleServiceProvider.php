@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Providers;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Unusualify\Modularity\Facades\Modularity;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
@@ -103,6 +104,15 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
                 ),
                 $module->getSnakeName()
             );
+
+            // LOAD MODULE VIEW COMPONENTS
+            $namespace = $module->getClassNamespace('View\\Components');
+            // if($module_name == 'Webinar')
+            //     dd(
+            //         $namespace,
+            //         ClassFinder::getClassesInNamespace($namespace)
+            //     );
+            Blade::componentNamespace($namespace, snakeCase($module_name));
 
             //LOAD MODULE TRANSLATION
             $langPath = base_path('lang/modules/' . $module->getLowerName());
