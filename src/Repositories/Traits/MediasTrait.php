@@ -78,6 +78,7 @@ trait MediasTrait
                                 'role' => $role,
                                 'metadatas' => json_encode($media['metadatas']),
                                 'locale' => $locale,
+                                'crop' => 'default',
                             ]);
                         });
                     }else {
@@ -87,6 +88,7 @@ trait MediasTrait
                                 'role' => $role,
                                 'metadatas' => json_encode($media['metadatas']),
                                 'locale' => $locale,
+                                'crop' => 'default',
                             ]);
                         });
                     }
