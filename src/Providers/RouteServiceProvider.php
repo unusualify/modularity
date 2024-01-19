@@ -8,6 +8,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Unusualify\Modularity\Http\Controllers\GlideController;
 use Unusualify\Modularity\Facades\UnusualRoutes;
 use Unusualify\Modularity\Facades\Modularity;
+use Illuminate\Support\Str;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -157,6 +158,12 @@ class RouteServiceProvider extends ServiceProvider
                 ],
                 function ($router) use ($module) {
                     // $router->moduleRoutes($module);
+                    // Route::prefix('prrrrr')->group(function(){
+                    //     Route::name('test.bilmem')->resource('regions.continents', 'UserController')->parameters([
+                    //         'regions' => 'package_region',
+                    //         'continents' => 'package_continent'
+                    //     ]);
+                    // });
                     Route::moduleRoutes($module);
                 }
             );
@@ -458,7 +465,7 @@ class RouteServiceProvider extends ServiceProvider
             $parentKebabName = kebabCase( $config['name'] ); // user-company
             $parentSnakeName = snakeCase( $config['name'] );  // user_company
 
-            $parentUrlSegment = $pr['url'] ?? pluralize($parentKebabName);
+            $parentUrlSegment = $config['url'] ?? $pr['url'] ?? pluralize($parentKebabName);
 
             if( is_array( $routes = $module->getRouteConfigs() ) ){
 
@@ -473,22 +480,30 @@ class RouteServiceProvider extends ServiceProvider
                         : false
                 );
 
+
                 foreach( $routes as $key => $item) {
                     $routeKebabName = kebabCase( $item['name'] );
                     $routeStudlyName = studlyName($item['name']);
                     $routeSnakeName = snakeCase($item['name']);
-
                     $routeUrlSegment = $item['url'] ?? pluralize($routeKebabName);
                     $url = $routeUrlSegment;
+
                     $controllerName = $routeStudlyName.'Controller';
 
                     $resourceOptionsNames = $item['route_name'] ?? $routeSnakeName;
                     $resourceOptionsAs = [];
+                    $parameters = [];
+                    $prefixes = [];
+
+                    if($system_prefix){
+                        $prefixes[] = rtrim($system_prefix, '//');
+                    }
 
                     if( $system_route_name ){
                         $resourceOptionsAs[] = $system_route_name;
                     }
 
+                    $parameters[$routeUrlSegment] = $routeSnakeName;
 
                     if(isset($item['belongs']) && $item['belongs']){
 
@@ -503,10 +518,20 @@ class RouteServiceProvider extends ServiceProvider
                                 //         'names' => 'package_region.nested.package_country',
                                 //     ]);
                                 // });
-                                Route::prefix($parentUrlSegment)->group(function() use($parentSnakeName, $routeUrlSegment, $routeSnakeName, $controllerName, $belongRouteUrl, $belongRouteName){
+                                Route::prefix($parentUrlSegment)->group(function() use(
+                                    $parentSnakeName,
+                                    $routeUrlSegment,
+                                    $routeSnakeName,
+                                    $controllerName,
+                                    $belongRouteUrl,
+                                    $belongRouteName,
+                                    $parameters
+                                ){
                                     $resourceRegistrar = Route::resource("{$belongRouteUrl}.{$routeUrlSegment}", $controllerName, [
                                         'as' => $parentSnakeName,
                                         'names' => "{$belongRouteName}.nested.{$routeSnakeName}",
+                                    ])->parameters($parameters + [
+                                        $belongRouteUrl => $belongRouteName
                                     ]);
                                     $resourceRegistrar->only([
                                         'index',
@@ -520,29 +545,49 @@ class RouteServiceProvider extends ServiceProvider
                     }
 
                     if( !(isset($item['parent']) && $item['parent']) ){ // unless parent route
-                        $url = $parentUrlSegment . "/" . $url;
+                        // $url = $parentUrlSegment . "/" . $url;
+                        $prefixes[] = $parentUrlSegment;
                         $resourceOptionsAs[] = $parentSnakeName;
 
                     }else{ // if parent route
 
                     }
 
-                    $url = $system_prefix . $url;
+                    // $url = $system_prefix . $url;
                     $resourceOptions = [
                         'as' => implode( '.', $resourceOptionsAs),
                         'names' => $resourceOptionsNames,
                     ];
 
                     $resourceOptionsAs[] = $routeSnakeName;
+                    // dd(
+                    //     $url,
+                    //     $prefixes,
+                    //     get_defined_vars()
+                    // );
 
-                    Route::additionalRoutes($url, $routeStudlyName, [
-                        'as' => implode( '.', $resourceOptionsAs)
-                    ]);
+                    Route::prefix(implode('/', $prefixes))->group(function() use(
+                        $controllerName,
+                        $routeUrlSegment,
+                        $routeStudlyName,
+                        $resourceOptionsAs,
+                        $resourceOptions,
+                        $parameters,
+                    ){
+                        // dd(
+                        //     get_defined_vars()
+                        // );
 
-                    Route::resource($url, $controllerName, $resourceOptions)
-                        ->parameters([
-                            // $url => $sub_studly,
+                        Route::additionalRoutes($routeUrlSegment, $routeStudlyName, [
+                            'as' => implode( '.', $resourceOptionsAs)
                         ]);
+
+
+                        Route::resource($routeUrlSegment, $controllerName, $resourceOptions)
+                            // ->scoped($scoped)
+                            ->parameters($parameters);
+                    });
+
                 }
             }
             // Route::group($options, function() use($module, $options){
