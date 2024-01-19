@@ -553,15 +553,16 @@ class RouteGenerator extends Generator
 
         // dd( get_class($this->module), $name );
 
-        // if ($this->module->has($name)) {
-        //     if ($this->force) {
-        //         $this->module->delete($name);
-        //     } else {
-        //         $this->console->error("Module [{$name}] already exist!");
+        if ($this->module->getRouteConfig($name)) {
+            // dd($this->force);
+            if ($this->force) {
+                // $this->module->delete($name);
+            } else {
+                $this->console->error("Module Route [{$name}] already exist!");
 
-        //         return E_ERROR;
-        //     }
-        // }
+                return E_ERROR;
+            }
+        }
 
         $this->updateConfigFile();
 
