@@ -544,12 +544,13 @@ class RouteServiceProvider extends ServiceProvider
 
                     }
 
-                    if( !(isset($item['parent']) && $item['parent']) ){ // unless parent route
+                    if( ($isNotParent = !(isset($item['parent']) && $item['parent'])) || $parentUrlSegment !== $routeUrlSegment ){ // unless parent route
                         // $url = $parentUrlSegment . "/" . $url;
                         $prefixes[] = $parentUrlSegment;
-                        $resourceOptionsAs[] = $parentSnakeName;
 
-                    }else{ // if parent route
+                        if($isNotParent){
+                            $resourceOptionsAs[] = $parentSnakeName;
+                        }
 
                     }
 
