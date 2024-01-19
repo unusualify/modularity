@@ -226,22 +226,23 @@ trait ManageTable {
             ];
         }
 
-
-        $routeSnake = snakeCase($this->routeName);
-        foreach (Modularity::find($this->moduleName)->getRouteConfigs() as $key => $routeConfig) {
-            if(isset($routeConfig['belongs']) && in_array($routeSnake, $routeConfig['belongs'])){
-                $childRouteSnake = snakeCase($routeConfig['name']);
-                $actions[] = [
-                    'name' => 'link',
-                    'url' => moduleRoute($routeConfig['name'], $this->routePrefix . '.' . $routeSnake . '.nested', 'index', [
-                        $routeSnake => ':id',
-                    ]),
-                    'label' => 'modules.' . $childRouteSnake,
-                    'icon' => '$modules',
-                    'color' => 'green',
-                ];
+        if(!$this->nested){
+            $routeSnake = snakeCase($this->routeName);
+            foreach (Modularity::find($this->moduleName)->getRouteConfigs() as $key => $routeConfig) {
+                if(isset($routeConfig['belongs']) && in_array($routeSnake, $routeConfig['belongs'])){
+                    $childRouteSnake = snakeCase($routeConfig['name']);
+                    $actions[] = [
+                        'name' => 'link',
+                        'url' => moduleRoute($routeConfig['name'], $this->routePrefix . '.' . $routeSnake . '.nested', 'index', [
+                            $routeSnake => ':id',
+                        ]),
+                        'label' => 'modules.' . $childRouteSnake,
+                        'icon' => '$modules',
+                        'color' => 'green',
+                    ];
+                }
+                # code...
             }
-            # code...
         }
 
         // dd($actions);
