@@ -86,7 +86,7 @@ const plugins = [
       // '**/*',
       // '!static-files*',
       // '!directoryToExclude/**'
-      '!.keep'
+      '!.gitkeep'
     ]
   }),
   new WebpackAssetsManifest({
