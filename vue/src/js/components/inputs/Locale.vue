@@ -90,7 +90,6 @@ export default {
     modelValue (value) {
       if (__isObject(value)) {
         // this.input = value
-        // __log('locale modelValue', value)
         for (const locale in value) {
           this.input[locale] = value[locale]
         }
@@ -106,7 +105,7 @@ export default {
   computed: {
     input: {
       get () {
-        // __log('Locale.vue inputget', this.modelValue)
+        __log('Locale.vue inputget', this.modelValue)
         return this.modelValue
       },
       set (val, old) {
@@ -143,10 +142,11 @@ export default {
           attributes.errorMessages = errorMessages[language.value]
           attributes.error = false
         }
-
         if (this.input) {
           // __log(this.input[language.value])
           attributes.modelValue = this.input[language.value]
+        } else if ( attributes.default) {
+          // attributes.modelValue = attributes.default
         }
 
         localeAttributes[language.value] = attributes
@@ -229,6 +229,12 @@ export default {
         if (this.input && __isset(this.input[lang])) {
           this.input[lang] = value
           this.updateModelValue(this.input)
+        } else if (!this.input && value) {
+          this.input = {}
+          // __log(this.input, value)
+          // this.input[lang] = value
+          // this.updateModelValue(this.input)
+          // __log('model NOT updated', this.input, lang, value)
         }
       } catch (error) {
         __log('catch', this.input, lang, value)

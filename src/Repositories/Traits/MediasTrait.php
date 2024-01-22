@@ -49,9 +49,13 @@ trait MediasTrait
 
         $object->medias()->sync([]);
 
+        // dd($this->getMedias($fields));
+
+        // dd($fields);
         $this->getMedias($fields)->each(function ($media) use ($object) {
             $object->medias()->attach($media['id'], Arr::except($media, ['id']));
         });
+        // dd($object->medias()->get());
     }
 
     /**
@@ -65,32 +69,75 @@ trait MediasTrait
         $system_locales = getLocales();
 
         $medias_roles = $this->getMediaColumns();
-
+        // dd($fields, $medias_roles);
         foreach($medias_roles as $role){
-            if(isset($fields[$role]) && count(array_keys($fields[$role])) > 0){
-                $default_locale = array_keys($fields[$role])[0];
-                foreach (getLocales() as $locale) {
-                    if(isset($fields[$role][$locale])){
-
-                        Collection::make($fields[$role][$locale])->each(function ($media) use (&$medias, $role, $locale) {
-                            $medias->push([
-                                'id' => $media['id'],
-                                'role' => $role,
-                                'metadatas' => json_encode($media['metadatas']),
-                                'locale' => $locale,
-                            ]);
-                        });
-                    }else {
-                        Collection::make($fields[$role][$default_locale])->each(function ($media) use (&$medias, $role, $locale) {
-                            $medias->push([
-                                'id' => $media['id'],
-                                'role' => $role,
-                                'metadatas' => json_encode($media['metadatas']),
-                                'locale' => $locale,
-                            ]);
-                        });
+            if(Arr::get($fields, $role) != null && count(array_keys(Arr::get($fields, $role))) > 0){
+                $default_locale  = unusualConfig('locale');
+                $role_ = $role;
+                $item_is_translated = true;
+                $parent_is_translated = false;
+                $parent_locale = $default_locale;
+                if(Str::contains($role_, '.')) {
+                    $item_is_translated = false;
+                    $parent_key = Str::before($role_, '.');
+                    $parent = $this->inputs()[$parent_key];
+                    $schema =$parent['schema'];
+                    $item_key = Str::afterLast($role_, '.');
+                    $parent_is_translated = $parent['translated'] ?? false;
+                    $parent_locale =  Str::before(Str::after($role_, $parent_key.'.'),'.');
+                    // dd($parent_locale);
+                    if($parent_is_translated) {
+                        $item_is_translated = false;
+                    } else {
+                        $item_is_translated = $schema[$item_key]['translated'];
                     }
                 }
+                // continue;
+                // dd($item_is_translated, $role, $role_, $fields);
+                if($item_is_translated) {
+                    // continue;
+                    foreach ($system_locales as $locale) {
+                        // dd($this->inputs(), $this->chunkInputs($this->inputs()), $fields);
+                        if(isset(Arr::get($fields, $role)[$locale])){
+                            if(empty(Arr::get($fields, $role)[$locale])) {
+                                continue;
+                            }
+                            Collection::make(Arr::get($fields, $role)[$locale])->each(function ($media) use (&$medias, $role, $locale) {
+                                $medias->push([
+                                    'id' => $media['id'],
+                                    'role' => $role,
+                                    'metadatas' => json_encode($media['metadatas']),
+                                    'locale' => $locale,
+                                ]);
+                            });
+                        }else {
+                            Collection::make($fields[$role][$default_locale])->each(function ($media) use (&$medias, $role, $locale) {
+                                $medias->push([
+                                    'id' => $media['id'],
+                                    'role' => $role,
+                                    'metadatas' => json_encode($media['metadatas']),
+                                    'locale' => $locale,
+                                ]);
+                            });
+                        }
+                    }
+                } else {
+                    // dd($fields);
+                    // dd(Arr::get($fields, $role), $role, $fields);
+                    Collection::make(Arr::get($fields, $role))->each(function ($media) use (&$medias, $role, $parent_locale) {
+                        // dd($media, $medias);
+                        $medias->push([
+                            'id' => $media['id'],
+                            'role' => $role,
+                            'metadatas' => json_encode($media['metadatas']),
+                            'locale' => $parent_locale,
+                        ]);
+                    });
+                }
+
+            }
+            else {
+                dd('no media for role: ' . $role);
             }
         }
         // dd($medias);
@@ -158,17 +205,55 @@ trait MediasTrait
      * @param array $fields
      * @return array
      */
-    public function getFormFieldsMediasTrait($object, $fields)
+    public function getFormFieldsMediasTrait($object, $fields, $schema)
     {
-        // dd('getFormFieldsMediasTrait', $object,$object->has('medias'), $fields, $this->getMedias($fields));
-        $fields['medias'] = null;
+        // dd($object->medias->groupBy('pivot.role'));
 
+        $t = [];
         if ($object->has('medias')) {
+            // dd($object->medias->groupBy('pivot.role'));
             foreach ($object->medias->groupBy('pivot.role') as $role => $mediasByRole) {
+                // dd($mediasByRole);
+                // dd($role, $mediasByRole, $mediasByRole->groupBy('pivot.locale'));
                 foreach ($mediasByRole->groupBy('pivot.locale') as $locale => $mediasByLocale) {
-                    $fields[$role][$locale] = $mediasByLocale->map(function ($media) {
+                    $role_ = $role;
+                    // $fields[$role][$locale] = $mediasByLocale->map(function ($media) {
+                    //     return $media->mediableFormat();
+                    // });
+                    if(Str::contains($role_, '.')) {
+                        $parent = Str::before($role_, '.');
+                        if( $schema[$parent]['translated'] ?? false) {
+                            $after = Str::after($role_, '.');
+                            $role_ = $parent .'.' . $locale . '.' . $after;
+                        }
+                        // dd($role);
+                    }
+                    $role_ = $role_ . '.' . $locale;
+
+                    $t[] = $role_;
+                    Arr::set($fields, "{$role_}", $mediasByLocale->map(function ($media) {
                         return $media->mediableFormat();
-                    });
+                    }));
+
+                    // dd($fields);
+                    // $mediasByLocale->each(function ($media) use (&$fields, $role, $locale, $schema) {
+                    //     // dd($media);
+                    //     if(Str::contains($role, '.')) {
+                    //         $parent = Str::before($role, '.');
+                    //         if($schema[$parent]['translated']) {
+                    //             $after = Str::after($role, '.');
+                    //             $role = $parent .'.' . $locale . '.' . $after;
+                    //         }
+                    //     }
+                    //     $role = $role . '.' . $locale;
+                    //     // dd( $media->mediableFormat());
+                    //     // dd($role);
+                    //     Arr::set($fields, "{$role}", $media->mediableFormat());
+                    // });
+                    // $fields[$role][$locale] = $mediasByLocale->map(function ($media) {
+                    //     Arr::set($fields, "{$role}.{$locale}", $media->mediableFormat());
+                    //     return $media->mediableFormat();
+                    // });
             }
 
                 // if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
@@ -184,7 +269,18 @@ trait MediasTrait
                 // }
             }
         }
+        // $fields['medias'] = null;
 
+        // if ($object->has('medias')) {
+        //     foreach ($object->medias->groupBy('pivot.role') as $role => $mediasByRole) {
+        //         foreach ($mediasByRole->groupBy('pivot.locale') as $locale => $mediasByLocale) {
+        //             $fields[$role][$locale] = $mediasByLocale->map(function ($media) {
+        //                 return $media->mediableFormat();
+        //             });
+        //         }
+        //     }
+        // }
+        // dd($fields, $t);
         return $fields;
     }
 
@@ -233,10 +329,13 @@ trait MediasTrait
         $media_inputs = collect($this->inputs())->reduce(function($acc, $curr){
             if(preg_match('/image/', $curr['type'])){
                 $acc[] = $curr['name'];
+            } else if (preg_match('/repeater/', $curr['type']) && isset($this->pivotedRepeatersTrait)) {
+                // dd($this->pivotedRepeatersTrait); // to get the image and file names
+                $acc = array_merge($acc, $this->pivotedRepeatersTrait);
             }
-
             return $acc;
         }, []);
+        // dd($media_inputs);
 
         return $media_inputs;
     }

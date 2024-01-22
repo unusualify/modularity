@@ -78,6 +78,7 @@ export default function useRepeater (props, context) {
     }
   }
   function hydrateRepeaterInputs (model) {
+    // return model; // Burayı açman gerekebilir.
     return model.map((item, i) => {
       return hydrateRepeaterInput(item, i)
     })
@@ -191,6 +192,7 @@ export default function useRepeater (props, context) {
   const methods = reactive({
 
     onUpdateRepeaterInput (value, index) {
+      __log('onUpdateRepeaterInput', value, index)
       modelValue.value[index] = parseRepeaterInput(value, index)
       // __log('onUpdateRepeaterInput', value, index)
     },

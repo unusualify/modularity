@@ -8,7 +8,10 @@ use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\UFinder;
 
 trait ManageTraits {
-
+    private $saveToPivotTable = [
+        'image',
+        'file',
+    ];
     /**
      * @param string|null $method
      * @return array
@@ -45,8 +48,9 @@ trait ManageTraits {
         return [];
     }
 
-    public function chunkInputs($schema) {
-        return Arr::mapWithKeys($schema, function($input, $key){
+    public function chunkInputs($schema, $pre = null) {
+
+        return Arr::mapWithKeys($schema, function($input, $key) use ($pre){
             if(isset($input['type'])){
                 switch ($input['type']) {
                     case 'group':
@@ -56,13 +60,22 @@ trait ManageTraits {
                     case 'morphTo':
                         return [ uniqid() => $input];
                     break;
+                    // case 'repeater':
+                    // case 'custom-input-repeater':
+
+                    //     return [ $input['name'] =>  $this->chunkInputs($input['schema'] ?? []) ];
                     default:
 
                         break;
                 }
 
                 if(isset($input['name'])){
-                    return [ $input['name'] => $input ];
+                    $_key = $input['name'];
+                    if(isset($pre)) {
+                        $_key = $pre . $_key;
+                        $input['name'] = $_key;
+                    }
+                    return [ $_key => $input ];
                 }
             }
             return [];
