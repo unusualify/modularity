@@ -81,7 +81,14 @@ const svgConfig = (suffix = null) => {
 }
 
 const plugins = [
-  new CleanWebpackPlugin(),
+  new CleanWebpackPlugin({
+    cleanOnceBeforeBuildPatterns: [
+      // '**/*',
+      // '!static-files*',
+      // '!directoryToExclude/**'
+      '!.keep'
+    ]
+  }),
   new WebpackAssetsManifest({
     output: `${assetsDir}/unusual-manifest.json`,
     publicPath: true,
