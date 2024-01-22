@@ -277,6 +277,7 @@ trait ManageForm {
                         }
                     }
                     foreach ($input['schema'] as $key => &$_input) {
+                        $_input['translated'] = false;
                         switch ($_input['type']) {
                             case 'select':
                             case 'combobox':
@@ -393,7 +394,7 @@ trait ManageForm {
                 // dd($input);
                 $input['name'] ??= 'images';
                 $input['type'] = 'custom-input-image';
-                $input['translated'] = true;
+                $input['translated'] ??= true;
                 $input['default'] ??= [];
 
                 $input['label'] ??= __('Images');

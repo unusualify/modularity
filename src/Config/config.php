@@ -204,6 +204,7 @@ return [
         'mediables' => 'umod_mediables',
         'tagged' => 'umod_tagged',
         'tags' => 'umod_tags',
+        'repeaters' => 'umod_repeaters',
     ],
 
     'traits' => [

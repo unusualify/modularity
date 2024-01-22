@@ -145,7 +145,6 @@ export default function useImage (props, context) {
     input: modelValue.value ?? [],
     isDraggable: computed(() => props.draggable && states.input.length > 1),
     remainingItems: computed(() => {
-      __log('remainingItems', props.max, states.input.length, props.max - states.input.length)
       return props.max - states.input.length
     }),
     itemsIds: computed(() => {
@@ -186,9 +185,9 @@ export default function useImage (props, context) {
       // })
     }
   })
-
+  // __log(props.name)
   watch(() => store.state.mediaLibrary.selected[props.name], (newValue, oldValue) => {
-    if (store.state.mediaLibrary.isInserted && states.mediableActive) {
+    if (window.__isset(store.state.mediaLibrary.selected[props.name]) && store.state.mediaLibrary.isInserted && states.mediableActive) {
       // __log('mediaLibrary.selected changed', newValue, states.input)
       states.mediableActive = false
       store.commit(MEDIA_LIBRARY.UPDATE_IS_INSERTED, false)

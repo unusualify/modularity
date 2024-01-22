@@ -230,7 +230,6 @@ export default {
     },
     hasMedia: function () {
       return this.input.length > 0
-      // console.log('hasMedia', this.media, Object.keys(this.media).length > 0)
       // return Object.keys(this.media).length > 0
     },
     cropperKey: function () {
@@ -249,7 +248,6 @@ export default {
   },
   watch: {
     media: function (val, oldVal) {
-      console.log('watch media', val, oldVal)
       this.hasMediaChanged = val !== oldVal
 
       if (Object.prototype.hasOwnProperty.call(this.selectedMedias, this.mediaKey)) {
@@ -290,7 +288,6 @@ export default {
 
       // in case of a 0x0 crop : let's display the full image in the preview
       if (data.width + data.height === 0) {
-        __log('canvascrop showDefaultThumbnail')
         this.showDefaultThumbnail()
         return
       }
@@ -310,7 +307,6 @@ export default {
 
           // show data url in the background
           if (this.cropSrc !== src) {
-            __log(' show data url in the background')
             this.showImg = false
             this.cropSrc = src
           }
@@ -319,7 +315,6 @@ export default {
 
           // fallback on displaying the thumbnail
           if (this.cropSrc !== src) {
-            __log('canvasCrop fallback showimg is TRUE', this.cropSrc !== src)
             this.showImg = true
             this.cropSrc = src
           }
@@ -327,7 +322,6 @@ export default {
       })
     },
     setDefaultCrops: function () {
-      __log('setDefaultCrops', this.allCrops, this.cropContext)
       const defaultCrops = {}
       const smarcrops = []
 
@@ -400,19 +394,16 @@ export default {
           // this.cropMedia({
           //   values: defaultCrops
           // })
-          __log('here1')
         }, (error) => {
           console.error(error)
           // this.cropMedia({
           //   values: defaultCrops
           // })
-          __log('here2')
         })
       } else {
         // this.cropMedia({
         //   values: defaultCrops
         // })
-        __log('here3')
       }
     },
     cropMedia: function (crop) {
@@ -434,32 +425,26 @@ export default {
       }
     },
     init: function () {
-      __log('INIT', this.hasMedia)
-      __log(this.media)
-      __log(this.input)
       // this.showImg = false
       const imgLoaded = () => {
-        __log('imgLoaded')
+        // __log('imgLoaded')
         this.setNaturalDimensions()
         this.setOriginalDimensions()
 
         if (!this.mediaHasCrop) {
           this.setDefaultCrops()
         } else {
-          __log('initImg imgLoaded canvasCrop')
           this.canvasCrop()
         }
       }
 
       if (this.hasMedia) {
-        __log('init hasMedia')
         this.cropSrc = this.media.thumbnail
 
         this.initImg().then(() => {
           imgLoaded()
         }, (error) => {
           console.error(error)
-          __log('initImg error showDefaultThumbnail')
           this.showDefaultThumbnail()
 
           // lets try to load to image tag now
@@ -478,11 +463,9 @@ export default {
 
               imgTag.addEventListener('error', (e) => {
                 console.error(e)
-                __log('imgTag error showDefaultThumbnail')
                 this.showDefaultThumbnail()
               })
             } else {
-              __log('imgTag error', this.$refs.mediaImg)
               this.showImg = false
               this.cropSrc = this.media.thumbnail
             }
@@ -522,7 +505,6 @@ export default {
       })
     },
     showDefaultThumbnail: function () {
-      __log('showDefaultThumbnail showimg is TRUE')
       this.showImg = true
       if (this.hasMedia) this.cropSrc = this.media.thumbnail
     },
@@ -556,13 +538,10 @@ export default {
     }
   },
   beforeMount: function () {
-    __log('beforeMount')
     this.init()
   },
   beforeUpdate: function () {
-    console.log('beforeUpdate', this.hasMediaChanged, this.hasMedia)
     if (this.hasMediaChanged) {
-      __log('beforeUpdate hasMediaChanged is TRUE')
       this.init()
     }
   }

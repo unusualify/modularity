@@ -9,6 +9,10 @@ use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\UFinder;
 
 trait ManageTraits {
+    private $saveToPivotTable = [
+        'image',
+        'file',
+    ];
     /**
      * @param string|null $method
      * @return array
@@ -56,13 +60,22 @@ trait ManageTraits {
                     case 'morphTo':
                         return [ uniqid() => $all ? $this->chunkInputs($input['schema']) :$input];
                     break;
+                    // case 'repeater':
+                    // case 'custom-input-repeater':
+
+                    //     return [ $input['name'] =>  $this->chunkInputs($input['schema'] ?? []) ];
                     default:
 
                         break;
                 }
 
                 if(isset($input['name'])){
-                    return [ $input['name'] => $input ];
+                    $_key = $input['name'];
+                    if(isset($pre)) {
+                        $_key = $pre . $_key;
+                        $input['name'] = $_key;
+                    }
+                    return [ $_key => $input ];
                 }
             }
             return [];
