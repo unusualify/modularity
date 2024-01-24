@@ -375,7 +375,8 @@ class BaseServiceProvider extends ServiceProvider
         config([
             'filesystems.disks.' . unusualBaseKey() . '_' . $type . '_library.url' => request()->getScheme()
             . '://'
-            . str_replace(['http://', 'https://'], '', config('app.url'))
+            // . str_replace(['http://', 'https://'], '', config('app.url'))
+            . request()->getHttpHost()
             . '/storage/'
             . trim(config(unusualBaseKey() . '.' . $type . '_library.local_path'), '/ '),
         ]);
