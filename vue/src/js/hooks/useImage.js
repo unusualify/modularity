@@ -195,11 +195,11 @@ export default function useImage (props, context) {
       // __log(states.input)
     }
   }, { deep: true })
-  watch(() => states.input, (value, oldValue) => {
-    inputHook.updateModelValue.value(value)
+  watch(() => states.input, (newValue, oldValue) => {
+    inputHook.updateModelValue.value(newValue)
   }, { deep: true })
-  watch(() => modelValue.value, (value, oldValue) => {
-    states.input = value
+  watch(() => modelValue.value, (newValue, oldValue) => {
+    states.input = newValue
   }, { deep: true })
   // expose managed state as return value
   return {

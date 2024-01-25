@@ -145,7 +145,7 @@ export default {
         if (this.input) {
           // __log(this.input[language.value])
           attributes.modelValue = this.input[language.value]
-        } else if ( attributes.default) {
+        } else if (attributes.default) {
           // attributes.modelValue = attributes.default
         }
 
