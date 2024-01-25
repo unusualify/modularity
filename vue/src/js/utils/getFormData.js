@@ -1,6 +1,6 @@
 import { isEmpty, find, filter, omitBy, forOwn, reduce, cloneDeep } from 'lodash'
 
-const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist'
+const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist|custom-input-repeater|custom-input-file|custom-input-image'
 const isMediableTypes = 'custom-input-file|custom-input-image'
 const isMediableFields = 'files|medias'
 
@@ -245,12 +245,16 @@ export const getSchemaModel_ = (inputs, item = null) => {
 }
 
 export const getModel = (inputs, item = null, rootState = null) => {
-  inputs = chunkInputs(inputs)
+  const languages = window[process.env.VUE_APP_NAME].STORE.languages.all
 
+  inputs = chunkInputs(inputs)
   const editing = __isset(item)
+
   const values = Object.keys(inputs).reduce((fields, k) => {
     const input = inputs[k]
     const name = input.name
+    const isTranslated = Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated
+
     // if (isMediableTypes.includes(input.type)) {
     //   // if (editing) { __log(name, item, input) }
     //   return fields
@@ -261,42 +265,39 @@ export const getModel = (inputs, item = null, rootState = null) => {
     if (isArrayable.includes(input.type)) {
       _default = []
     }
+
+    if (isTranslated) {
+      _default = reduce(languages, function (acc, language, k) {
+        acc[language.value] = _default
+        return acc
+      }, {})
+    }
+
     const value = editing ? (item[name] ? item[name] : _default) : _default
     if (__isObject(input)) {
-      const languages = window[process.env.VUE_APP_NAME].STORE.languages.all
-      if (isMediableTypes.includes(input.type)) {
-        if (editing && __isset(item[name])) {
-          // __log('mediable', name, item)
-          fields[name] = item[name]
-        } else {
-          fields[name] = { tr: [], en: [] }
-        }
-      } else if (Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated) { // translations
-        fields[name] = languages.reduce(function (map, lang) {
-          if (editing) {
-            if (Object.prototype.hasOwnProperty.call(item, 'translations')) {
+      if (isTranslated) { // translations
+        if (editing) {
+          const hasTranslations = Object.prototype.hasOwnProperty.call(item, 'translations') && __isset(item.translations[name])
+
+          if (hasTranslations) {
+            fields[name] = languages.reduce(function (map, lang) {
               map[lang.value] = find(item.translations, { locale: lang.value })
                 ? find(item.translations, { locale: lang.value })[name]
                 : item.translations[name][lang.value]
-            } else if (__isObject(value) && __isset(value[lang.value])) {
-              map[lang.value] = value[lang.value]
-            } else {
-              map[lang.value] = value ?? ''
-            }
+              return map
+            }, {})
           } else {
-            map[lang.value] = value ?? ''
+            fields[name] = value
           }
-          return map
-        }, {})
+        }
       } else {
         if (!value &&
           editing &&
           Object.prototype.hasOwnProperty.call(item, 'translations') &&
           Object.prototype.hasOwnProperty.call(item.translations, name)
         ) {
-          for (const locale in item.translations[name]) {
-            fields[name] = item.translations[name][locale]
-          }
+          const locale = Object.keys(item.translations[name])[0]
+          fields[name] = item.translations[name][locale]
         } else {
           fields[name] = value
         }
@@ -348,7 +349,7 @@ export const getSubmitFormData = (inputs, item = null, rootState = null) => {
     const value = item[name]
 
     if (__isObject(input)) {
-      if (Object.prototype.hasOwnProperty.call(input, 'translated')) { // translations
+      if (Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated) { // translations
         fields[name] = window[process.env.VUE_APP_NAME].STORE.languages.all.reduce(function (map, lang) {
           if (__isObject(value)) {
             map[lang.value] = __isset(value[lang.value]) ? value[lang.value] : ''
@@ -369,11 +370,11 @@ export const getSubmitFormData = (inputs, item = null, rootState = null) => {
     values.id = item.id
   }
 
-  if (rootState) {
-    return Object.assign(values, {
-      // medias: gatherSelected(rootState.mediaLibrary.selected)
-    })
-  }
+  // if (rootState) {
+  //   return Object.assign(values, {
+  //     // medias: gatherSelected(rootState.mediaLibrary.selected)
+  //   })
+  // }
 
   return values
 }
