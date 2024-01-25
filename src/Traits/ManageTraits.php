@@ -69,7 +69,11 @@ trait ManageTraits {
                         return $this->chunkInputs($input['schema'] ?? []);
                     break;
                     case 'morphTo':
-                        return [ uniqid() => $all ? $this->chunkInputs($input['schema']) :$input];
+                        if($all){
+                            return $this->chunkInputs($input['parents']);
+                        }
+
+                        return [ uniqid() => $input];
                     break;
                     case 'repeater':
                     case 'custom-input-repeater':

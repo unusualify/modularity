@@ -67,7 +67,7 @@ class User extends Authenticatable
         });
     }
 
-    public function company()
+    public function company(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
