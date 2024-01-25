@@ -25,30 +25,20 @@ trait PricesTrait
         'price_type_id' => 1
     ];
 
-    /**
-     * @param \Unusualify\Modularity\Entities\Model $object
-     * @param array $fields
-     * @return \Unusualify\Modularity\Entities\Model
-     */
-    public function hydratePricesTrait($object, $fields)
+
+    public function setColumnsPricesTrait($columns, $inputs)
     {
-        // if ($this->shouldIgnoreFieldBeforeSave('files')) {
-        //     return $object;
-        // }
+        $traitName = get_class_short_name(__TRAIT__);
 
-        // $filesCollection = Collection::make();
-        // $filesFromFields = $this->getPrices($fields);
+        $columns[$traitName] = collect($inputs)->reduce(function($acc, $curr){
+            if(preg_match('/price/', $curr['type'])){
+                $acc[] = $curr['name'];
+            }
 
-        // $filesFromFields->each(function ($file) use ($object, $filesCollection) {
-        //     $newFile = File::withTrashed()->find($file['id']);
-        //     $pivot = $newFile->newPivot($object, Arr::except($file, ['id']), 'fileables', true);
-        //     $newFile->setRelation('pivot', $pivot);
-        //     $filesCollection->push($newFile);
-        // });
+            return $acc;
+        }, []);
 
-        // $object->setRelation('files', $filesCollection);
-
-        return $object;
+        return $columns;
     }
 
     /**
@@ -62,12 +52,7 @@ trait PricesTrait
             return;
         }
 
-        // dd(
-        //     $object->prices,
-        //     $this->getPriceColumns()
-        // );
-
-        foreach( $this->getPriceColumns() as $name ) {
+        foreach( $this->getColumns(__TRAIT__) as $name ) {
             if(isset($fields[$name])){
                 $existingPrices = $object->prices()->where('role', $name)->get();
 
@@ -104,7 +89,7 @@ trait PricesTrait
         if ($object->has('prices')) {
             $pricesByRole = $object->prices->groupBy('role');
 
-            foreach ($this->getPriceColumns() as $role) {
+            foreach ($this->getColumns(__TRAIT__) as $role) {
                 if(isset($pricesByRole[$role])){
                     $fields[$role] = $pricesByRole[$role]->map(function ($price) {
                         return Arr::only($price->toArray(), $this->formatableColumns);
@@ -128,16 +113,5 @@ trait PricesTrait
             // }
         }
         return $fields;
-    }
-
-    public function getPriceColumns()
-    {
-        return collect($this->inputs())->reduce(function($acc, $curr){
-            if(preg_match('/price/', $curr['type'])){
-                $acc[] = $curr['name'];
-            }
-
-            return $acc;
-        }, []);
     }
 }
