@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Unusualify\Modularity\Entities\Repeater;
+use Unusualify\Priceable\Traits\HasPriceable;
 
 /**
  * @author Hazarcan Doğa
@@ -13,6 +14,7 @@ use Unusualify\Modularity\Entities\Repeater;
  */
 trait HasRepeaters
 {
+    use HasImages, HasFiles, HasPriceable;
     /**
      * Defines the one-to-many relationship between the module and Repeater.
      * Get all repeaters belonging to a module.

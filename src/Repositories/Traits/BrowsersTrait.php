@@ -2,7 +2,7 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
-use Unusualify\Modularity\Models\Behaviors\HasMedias;
+use Unusualify\Modularity\Models\Behaviors\HasImages;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -159,7 +159,7 @@ trait BrowsersTrait
                     'name' => $relatedElement->titleInBrowser ?? $relatedElement->$titleKey,
                     'edit' => moduleRoute($moduleName ?? $relation, $routePrefix ?? '', 'edit', $relatedElement->id),
                     'endpointType' => $relatedElement->getMorphClass(),
-                ] + (classHasTrait($relatedElement, HasMedias::class) ? [
+                ] + (classHasTrait($relatedElement, HasImages::class) ? [
                     'thumbnail' => $relatedElement->defaultCmsImage(['w' => 100, 'h' => 100]),
                 ] : []);
             })->toArray();
@@ -182,7 +182,7 @@ trait BrowsersTrait
                 'endpointType' => $relatedElement->getMorphClass(),
             ] + (empty($relatedElement->adminEditUrl) ? [] : [
                 'edit' => $relatedElement->adminEditUrl,
-            ]) + (classHasTrait($relatedElement, HasMedias::class) ? [
+            ]) + (classHasTrait($relatedElement, HasImages::class) ? [
                 'thumbnail' => $relatedElement->defaultCmsImage(['w' => 100, 'h' => 100]),
             ] : []) : [];
         })->reject(function ($item) {

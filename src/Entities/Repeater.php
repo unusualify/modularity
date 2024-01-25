@@ -4,7 +4,7 @@ namespace Unusualify\Modularity\Entities;
 
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Unusualify\Modularity\Entities\Traits\HasFiles;
-use Unusualify\Modularity\Entities\Traits\HasMedias;
+use Unusualify\Modularity\Entities\Traits\HasImages;
 use Unusualify\Modularity\Entities\Traits\HasPresenter;
 use Unusualify\Modularity\Entities\Traits\HasRelated;
 
