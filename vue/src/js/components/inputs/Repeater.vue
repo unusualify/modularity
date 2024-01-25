@@ -3,10 +3,13 @@
     hideDetails="auto"
   >
     <div class="w-100">
-      <ue-title v-if="label" :classes="['pl-0 pt-0']">
-        {{ label }}
-      </ue-title>
-      <div class="repeater__block">
+      <div class="d-flex">
+        <ue-title v-if="label" :classes="['pl-0 pt-0']">
+          {{ label }}
+        </ue-title>
+        <slot name="append"></slot>
+      </div>
+      <div :class="['repeater__block', {gutter: withGutter}]">
         <draggable
           class="content__content"
           v-model="repeaterInputs"
@@ -129,7 +132,6 @@ export default {
   methods: {},
   watch: {},
   created () {
-
   }
 }
 </script>
@@ -162,6 +164,7 @@ export default {
           z-index: 3
           .content__item--body
             border: $border-width solid $border-color
+
             // border-color: red
           .content__item--navigation
             display: block
@@ -191,5 +194,9 @@ export default {
           align-items: center
           padding: 0
           overflow: hidden
-
+    &.gutter
+      .content__content
+        .content__item
+          .content__item--body
+            padding: 1.3vw !important
 </style>
