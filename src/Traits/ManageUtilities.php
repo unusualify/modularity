@@ -52,7 +52,7 @@ trait ManageUtilities {
 
         $options = [
             'moduleName' => $this->getHeadline($this->moduleName),
-            'translate' => $this->routeHas('translations'),
+            'translate' => $this->routeHas('translations') || $this->hasTranslatedInput(),
 
             'tableAttributes' => array_merge_recursive_preserve(
                 [
@@ -234,15 +234,9 @@ trait ManageUtilities {
         // $localizedPermalinkBase = $this->getLocalizedPermalinkBase();
 
         $itemId = $this->getItemIdentifier($item);
-        // dd(
-        //     $this->moduleName,
-        //     $this->routeName,
-        //     $this->routePrefix,
-        //     $itemId,
-        //     $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId])
-        // );
+
         $data = [
-            'translate' => $this->routeHas('translations'),
+            'translate' => $this->routeHas('translations') || $this->hasTranslatedInput(),
             'formAttributes' => [
                 'hasSubmit' => true,
                 'stickyButton' => false,
