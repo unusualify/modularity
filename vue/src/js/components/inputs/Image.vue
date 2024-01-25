@@ -1,113 +1,134 @@
 <template>
-  <div class="media" :class="{ 'media--hoverable' : hover, 'media--slide' : isSlide }">
-    <div class="media__field">
-      <div class="media__info" v-if="hasMedia">
-        <div class="media__img">
-          <div class="media__imgFrame">
-            <div class="media__imgCentered" :style="cropThumbnailStyle">
-              <!--
-                <img v-if="cropSrc && showImg" :src="cropSrc" ref="mediaImg" :class="cropThumbnailClass"/>
-                {{ cropSrc }}
-                {{ input_[0].thumbnail }}
-                {{ showImg }}
-              -->
-              <img v-if="showImg" :src="media.thumbnail" ref="mediaImg" :class="cropThumbnailClass"/>
-            </div>
-            <div class="media__edit" @click="openMediaLibrary(1, mediaKey, index)" v-if="!disabled">
-              <span class="media__edit--button"><span v-svg symbol="edit"><v-icon icon="$edit"/></span></span>
-            </div>
-          </div>
-        </div>
+    <v-input
+    hideDetails="auto"
+    appendIcon="mdi-close"
+    :variant="boundProps.variant"
+  >
+    <template v-slot:default="defaultSlot">
+      <div class="v-field v-field--active v-field--center-affix v-field--dirty v-field--variant-outlined v-theme--jakomeet v-locale--is-ltr">
+        <div class="v-field__field" data-no-activator="">
+          <div class="media" :class="{ 'media--hoverable' : hover, 'media--slide' : isSlide }">
+            <div class="media__field">
+              <div class="media__info" v-if="hasMedia">
+                <div class="media__img">
+                  <div class="media__imgFrame">
+                    <div class="media__imgCentered" :style="cropThumbnailStyle">
+                      <!--
+                        <img v-if="cropSrc && showImg" :src="cropSrc" ref="mediaImg" :class="cropThumbnailClass"/>
+                        {{ cropSrc }}
+                        {{ input_[0].thumbnail }}
+                        {{ showImg }}
+                      -->
+                      <img v-if="showImg" :src="media.thumbnail" ref="mediaImg" :class="cropThumbnailClass"/>
+                    </div>
+                    <div class="media__edit" @click="openMediaLibrary(1, mediaKey, index)" v-if="!disabled">
+                      <span class="media__edit--button"><span v-svg symbol="edit"><v-icon icon="$edit"/></span></span>
+                    </div>
+                  </div>
+                </div>
 
-        <ul class="media__metadatas" v-if="!disabled">
-          <li class="media__name" @click="openMediaLibrary(1, mediaKey, index)"><strong :title="media.name">{{ media.name }}</strong></li>
-          <li class="f--small" v-if="media.size">File size: {{ media.size }}</li>
-          <li class="f--small" v-if="media.width + media.height">{{ $trans('fields.medias.original-dimensions') }}: {{ media.width }}&nbsp;&times;&nbsp;{{
-            media.height }}
-          </li>
-          <!--
-            <li class="f--small media__crop-link" v-if="cropInfos && activeCrop" @click="openCropMedia">
-                <p class="f--small f--note hide--xsmall"
-                   v-for="(cropInfo, index) in cropInfos"
-                   :key="index">
-                  <span v-html="cropInfo"></span>
-                </p>
-            </li>
-            <li class="f--small">
-              <a href="#" @click.prevent="metadatasInfos" v-if="withAddInfo" class="f--link-underlined--o">{{ metadatas.text }}</a>
-            </li>
-          -->
-        </ul>
+                <ul class="media__metadatas" v-if="!disabled">
+                  <li class="media__name" @click="openMediaLibrary(1, mediaKey, index)"><strong :title="media.name">{{ media.name }}</strong></li>
+                  <li class="f--small" v-if="media.size">File size: {{ media.size }}</li>
+                  <li class="f--small" v-if="media.width + media.height">{{ $trans('fields.medias.original-dimensions') }}: {{ media.width }}&nbsp;&times;&nbsp;{{
+                    media.height }}
+                  </li>
+                  <!--
+                    <li class="f--small media__crop-link" v-if="cropInfos && activeCrop" @click="openCropMedia">
+                        <p class="f--small f--note hide--xsmall"
+                          v-for="(cropInfo, index) in cropInfos"
+                          :key="index">
+                          <span v-html="cropInfo"></span>
+                        </p>
+                    </li>
+                    <li class="f--small">
+                      <a href="#" @click.prevent="metadatasInfos" v-if="withAddInfo" class="f--link-underlined--o">{{ metadatas.text }}</a>
+                    </li>
+                  -->
+                </ul>
 
-        <!--Actions-->
-        <!--
-          <a17-buttonbar class="media__actions" v-if="!disabled">
-            <a :href="media.original" download><span v-svg symbol="download"></span></a>
-            <button type="button" @click="openCropMedia" v-if="activeCrop"><span v-svg symbol="crop"></span></button>
-            <button type="button" @click="deleteMediaClick"><span v-svg symbol="trash"></span></button>
-          </a17-buttonbar>
-        -->
-        <!--
-          <div class="media__actions-dropDown">
-            <a17-dropdown ref="dropDown" position="right">
-              <a17-button size="icon" variant="icon" @click="$refs.dropDown.toggle()">
-                <span v-svg symbol="more-dots"></span></a17-button>
-              <div slot="dropdown__content">
-                <a :href="media.original" download><span v-svg symbol="download"></span>{{ $trans('fields.medias.download') }}</a>
-                <button type="button" @click="openCropMedia" v-if="activeCrop"><span v-svg symbol="crop"></span>{{ $trans('fields.medias.crop') }}
-                </button>
-                <button type="button" @click="deleteMediaClick"><span v-svg symbol="trash"></span>{{ $trans('fields.medias.delete') }}</button>
+                <!--Actions-->
+                <!--
+                  <a17-buttonbar class="media__actions" v-if="!disabled">
+                    <a :href="media.original" download><span v-svg symbol="download"></span></a>
+                    <button type="button" @click="openCropMedia" v-if="activeCrop"><span v-svg symbol="crop"></span></button>
+                    <button type="button" @click="deleteMediaClick"><span v-svg symbol="trash"></span></button>
+                  </a17-buttonbar>
+                -->
+                <!--
+                  <div class="media__actions-dropDown">
+                    <a17-dropdown ref="dropDown" position="right">
+                      <a17-button size="icon" variant="icon" @click="$refs.dropDown.toggle()">
+                        <span v-svg symbol="more-dots"></span></a17-button>
+                      <div slot="dropdown__content">
+                        <a :href="media.original" download><span v-svg symbol="download"></span>{{ $trans('fields.medias.download') }}</a>
+                        <button type="button" @click="openCropMedia" v-if="activeCrop"><span v-svg symbol="crop"></span>{{ $trans('fields.medias.crop') }}
+                        </button>
+                        <button type="button" @click="deleteMediaClick"><span v-svg symbol="trash"></span>{{ $trans('fields.medias.delete') }}</button>
+                      </div>
+                    </a17-dropdown>
+                  </div>
+                -->
               </div>
-            </a17-dropdown>
+
+              <!--Add media button-->
+              <v-btn v-if="remainingItems" type="button" @click="openMediaLibrary(remainingItems)">{{ addLabel }}</v-btn>
+              <!--
+                <a17-button variant="ghost" @click="openMediaLibrary" :disabled="disabled" v-if="!hasMedia">{{ btnLabel }}</a17-button>
+              -->
+              <p class="media__note f--small" v-if="!!this.$slots.default">
+                <slot/>
+              </p>
+
+              <!-- Metadatas options -->
+              <!--
+                <div class="media__metadatas--options" :class="{ 's--active' : metadatas.active }" v-if="hasMedia && withAddInfo">
+                  <a17-mediametadata :name='metadataName' :label="$trans('fields.medias.alt-text', 'Alt Text')" id="altText" :media="media" :maxlength="altTextMaxLength" @change="updateMetadata"/>
+
+                  <a17-mediametadata v-if="withCaption" :wysiwyg="useWysiwyg" :wysiwyg-options="wysiwygOptions" type='text' :name='metadataName' :label="$trans('fields.medias.caption', 'Caption')" id="caption" :media="media" :maxlength="captionMaxLength" @change="updateMetadata"/>
+
+                  <a17-mediametadata v-if="withVideoUrl" :name='metadataName' :label="$trans('fields.medias.video-url', 'Video URL (optional)')" id="video" :media="media" @change="updateMetadata"/>
+
+                  <template v-for="field in extraMetadatas">
+                    <a17-mediametadata v-if="extraMetadatas.length > 0"
+                                      :key="field.name"
+                                      :type="field.type"
+                                      :name='metadataName'
+                                      :wysiwyg='field.wysiwyg || false'
+                                      :wysiwyg-options='field.wysiwygOptions || wysiwygOptions'
+                                      :label="field.label"
+                                      :id="field.name"
+                                      :media="media"
+                                      :maxlength="field.maxlength || 0"
+                                      @change="updateMetadata"/>
+                  </template>
+                </div>
+              -->
+            </div>
+
+            <!-- Crop modal -->
+            <!--
+              <a17-modal class="modal--cropper" :ref="cropModalName" :forceClose="true" :title="$trans('fields.medias.crop-edit')" mode="medium" v-if="hasMedia && activeCrop">
+                <a17-cropper :media="media" v-on:crop-end="cropMedia" :aspectRatio="16 / 9" :context="cropContext" :key="cropperKey">
+                  <a17-button class="cropper__button" variant="action" @click="$refs[cropModalName].close()">{{ $trans('fields.medias.crop-save') }}</a17-button>
+                </a17-cropper>
+              </a17-modal>
+            -->
+            <input :name="this.name" type="hidden" :value="JSON.stringify(media)" />
           </div>
-        -->
-      </div>
-
-      <!--Add media button-->
-      <v-btn v-if="remainingItems" type="button" @click="openMediaLibrary(remainingItems)">{{ addLabel }}</v-btn>
-      <!--
-        <a17-button variant="ghost" @click="openMediaLibrary" :disabled="disabled" v-if="!hasMedia">{{ btnLabel }}</a17-button>
-      -->
-      <p class="media__note f--small" v-if="!!this.$slots.default">
-        <slot/>
-      </p>
-
-      <!-- Metadatas options -->
-      <!--
-        <div class="media__metadatas--options" :class="{ 's--active' : metadatas.active }" v-if="hasMedia && withAddInfo">
-          <a17-mediametadata :name='metadataName' :label="$trans('fields.medias.alt-text', 'Alt Text')" id="altText" :media="media" :maxlength="altTextMaxLength" @change="updateMetadata"/>
-
-          <a17-mediametadata v-if="withCaption" :wysiwyg="useWysiwyg" :wysiwyg-options="wysiwygOptions" type='text' :name='metadataName' :label="$trans('fields.medias.caption', 'Caption')" id="caption" :media="media" :maxlength="captionMaxLength" @change="updateMetadata"/>
-
-          <a17-mediametadata v-if="withVideoUrl" :name='metadataName' :label="$trans('fields.medias.video-url', 'Video URL (optional)')" id="video" :media="media" @change="updateMetadata"/>
-
-          <template v-for="field in extraMetadatas">
-            <a17-mediametadata v-if="extraMetadatas.length > 0"
-                               :key="field.name"
-                               :type="field.type"
-                               :name='metadataName'
-                               :wysiwyg='field.wysiwyg || false'
-                               :wysiwyg-options='field.wysiwygOptions || wysiwygOptions'
-                               :label="field.label"
-                               :id="field.name"
-                               :media="media"
-                               :maxlength="field.maxlength || 0"
-                               @change="updateMetadata"/>
-          </template>
         </div>
-      -->
-    </div>
-
-    <!-- Crop modal -->
-    <!--
-      <a17-modal class="modal--cropper" :ref="cropModalName" :forceClose="true" :title="$trans('fields.medias.crop-edit')" mode="medium" v-if="hasMedia && activeCrop">
-        <a17-cropper :media="media" v-on:crop-end="cropMedia" :aspectRatio="16 / 9" :context="cropContext" :key="cropperKey">
-          <a17-button class="cropper__button" variant="action" @click="$refs[cropModalName].close()">{{ $trans('fields.medias.crop-save') }}</a17-button>
-        </a17-cropper>
-      </a17-modal>
-    -->
-    <input :name="this.name" type="hidden" :value="JSON.stringify(media)" />
-  </div>
+        <div class="v-field__outline">
+          <div class="v-field__outline__start"></div>
+          <div class="v-field__outline__notch">
+            <label class="v-label v-field-label v-field-label--floating" aria-hidden="true" for="input-29">
+              {{ boundProps.label }}
+            </label>
+          </div>
+          <div class="v-field__outline__end"></div>
+        </div>
+      </div>
+    </template>
+  </v-input>
 </template>
 
 <script>
@@ -555,8 +576,9 @@ export default {
   $height_input: 45px;
 
   .media {
+    width: 100%;
     border-radius: 2px;
-    border: 1px solid $color__border;
+    // border: 1px solid $color__border;
     background:$color__background;
   }
 
