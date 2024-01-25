@@ -3,14 +3,14 @@
 namespace Unusualify\Modularity\Entities;
 
 use Unusualify\Modularity\Entities\Traits\HasFiles;
-use Unusualify\Modularity\Entities\Traits\HasMedias;
+use Unusualify\Modularity\Entities\Traits\HasImages;
 use Unusualify\Modularity\Entities\Traits\HasPresenter;
 use Unusualify\Modularity\Entities\Traits\HasRelated;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 
 class Block extends BaseModel
 {
-    use HasMedias, HasFiles, HasPresenter, HasRelated;
+    use HasImages, HasFiles, HasPresenter, HasRelated;
 
     public $timestamps = false;
 

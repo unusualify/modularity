@@ -29,7 +29,6 @@ trait ManageForm {
         // $default_input = collect(Config::get(unusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
         // $default_input = $this->configureInput(array2Object(Config::get(unusualBaseKey() . '.default_input')));
         $default_input = (array) Config::get(unusualBaseKey() . '.default_input');
-
         [$hydrated, $arrayable] = $this->hydrateInput(object2Array($input));
 
         if($arrayable){
@@ -240,6 +239,7 @@ trait ManageForm {
             break;
             case 'repeater':
             case 'custom-input-repeater':
+            case 'json-repeater':
                 $relation_class= null;
 
                 $input['type'] = 'custom-input-repeater';
@@ -254,6 +254,8 @@ trait ManageForm {
                     'lg' => 12,
                     'xl' => 12
                 ];
+
+
                 $input['col'] = array_merge_recursive_preserve($default_repeater_col, $input['col'] ?? []);
 
                 if(array_key_exists('schema', $input)){
@@ -277,6 +279,7 @@ trait ManageForm {
                         }
                     }
                     foreach ($input['schema'] as $key => &$_input) {
+                        $_input['translated'] = false;
                         switch ($_input['type']) {
                             case 'select':
                             case 'combobox':
@@ -381,7 +384,7 @@ trait ManageForm {
             case 'file':
                 $input['name'] ??= 'files';
                 $input['type'] = 'custom-input-file';
-                $input['translated'] = true;
+                $input['translated'] ??= false;
                 $input['default'] ??= [];
 
                 $input['label'] ??= __('Files');
@@ -393,7 +396,7 @@ trait ManageForm {
                 // dd($input);
                 $input['name'] ??= 'images';
                 $input['type'] = 'custom-input-image';
-                $input['translated'] = true;
+                $input['translated'] ??= false;
                 $input['default'] ??= [];
 
                 $input['label'] ??= __('Images');

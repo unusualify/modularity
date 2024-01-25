@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Unusualify\Modularity\Services\MediaLibrary\ImageService;
 
-trait HasMedias
+trait HasImages
 {
     protected $cropParamsKeys = [
         'crop_x',
@@ -17,11 +17,11 @@ trait HasMedias
         'crop_h',
     ];
 
-    public static function bootHasMedias(): void
+    public static function bootHasImages(): void
     {
         self::deleted(static function (Model $model) {
             if (!method_exists($model, 'isForceDeleting') || $model->isForceDeleting()) {
-                /** @var \Unusualify\Modularity\Entities\Traits\HasMedias $model */
+                /** @var \Unusualify\Modularity\Entities\Traits\HasImages $model */
                 $model->medias()->detach();
             }
         });

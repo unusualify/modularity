@@ -35,7 +35,7 @@ class RouteMakeCommand extends BaseCommand
     //     {--B|hasBlocks}
     //     {--T|hasTranslation}
     //     {--S|hasSlug}
-    //     {--M|hasMedias}
+    //     {--M|HasImages}
     //     {--F|hasFiles}
     //     {--P|hasPosition}
     //     {--R|hasRevisions}

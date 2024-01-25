@@ -43,6 +43,12 @@ abstract class Repository
     protected $fieldsGroups = [];
 
     /**
+     * @var array
+     */
+    protected $traitColumns = [];
+
+
+    /**
      * @var bool
      */
     // public $fieldsGroupsFormFieldNamesAutoPrefix = false;
@@ -298,6 +304,8 @@ abstract class Repository
      */
     public function create($fields)
     {
+        $this->traitColumns = $this->setColumns($this->traitColumns, $this->chunkInputs(all:true));
+
         return DB::transaction(function () use ($fields) {
             $original_fields = $fields;
 
@@ -353,6 +361,8 @@ abstract class Repository
      */
     public function update($id, $fields)
     {
+        $this->traitColumns = $this->setColumns($this->traitColumns, $this->chunkInputs(all:true));
+
         DB::transaction(function () use ($id, $fields) {
             $object = $this->model->findOrFail($id);
 
@@ -436,6 +446,9 @@ abstract class Repository
         if (($duplicated = $this->model->find($id)) === null) {
             return false;
         }
+
+        $this->traitColumns = $this->setColumns($this->traitColumns, $this->chunkInputs(all:true));
+
 
         return DB::transaction(function () use ($duplicated, $schema) {
 
@@ -765,6 +778,10 @@ abstract class Repository
      */
     public function getFormFields($object, $schema = [])
     {
+        $this->traitColumns = $this->setColumns($this->traitColumns, $this->chunkInputs(all:true));
+
+        // dd($this->traitColumns);
+
         $fields = $object->attributesToArray();
 
         // $fields = $this->castFormFields($fields);
@@ -774,6 +791,35 @@ abstract class Repository
         }
 
         return $fields;
+    }
+
+    /**
+     * @param array $columns
+     * @param array $inputs
+     *
+     * @return array
+     */
+    public function setColumns($columns, $inputs)
+    {
+        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
+            $columns = $this->$method($columns, $inputs);
+        }
+
+        return $columns;
+    }
+
+    /**
+     * @param string $trait
+     *
+     * @return array
+     */
+    public function getColumns(string $trait = null)
+    {
+        preg_match('/\/([A-Za-z]*)\.php/', debug_backtrace()[0]['file'], $matches);
+
+        $traitName = $trait ? get_class_short_name($trait) : $matches[1];
+
+        return $this->traitColumns[$traitName] ?? [];
     }
 
     /**

@@ -9,6 +9,7 @@ use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\UFinder;
 
 trait ManageTraits {
+
     /**
      * @param string|null $method
      * @return array
@@ -32,6 +33,7 @@ trait ManageTraits {
 
     public function inputs() {
         $moduleName = $this->moduleName();
+
         $routeName = $this->routeName();
 
         if( $moduleName && $routeName){
@@ -45,8 +47,21 @@ trait ManageTraits {
         return [];
     }
 
-    public function chunkInputs($schema, $all = false) {
-        return Arr::mapWithKeys($schema, function($input, $key) use($all){
+    public function hasTranslatedInput($schema = []) {
+        $hasTranslated = false;
+
+        foreach ((count($schema) ? $schema : $this->inputs()) as $input) {
+            if(isset($input['translated']) && $input['translated']){
+                $hasTranslated = true;
+                break;
+            }
+        }
+
+        return $hasTranslated;
+    }
+
+    public function chunkInputs($schema = null, $all = false) {
+        return Arr::mapWithKeys($schema ?? $this->inputs(), function($input, $key) use($all){
             if(isset($input['type'])){
                 switch ($input['type']) {
                     case 'group':
@@ -56,13 +71,34 @@ trait ManageTraits {
                     case 'morphTo':
                         return [ uniqid() => $all ? $this->chunkInputs($input['schema']) :$input];
                     break;
+                    case 'repeater':
+                    case 'custom-input-repeater':
+                    case 'json-repeater':
+                        if($all){
+                            return Arr::mapWithKeys($this->chunkInputs($input['schema']), function($item) use($input){
+                                if(isset($input['translated']) && $input['translated'])
+                                    return Arr::mapWithKeys(getLocales(), function($locale) use($item, $input){
+                                        $repeater_input_name = "{$input['name']}.{$locale}.*.{$item['name']}";
+                                        return [ $repeater_input_name =>  array_merge($item, ['name' => $repeater_input_name])];
+                                    });
+                                $repeater_input_name =  $input['name'] . ".*." .$item['name'];
+                                return [ $repeater_input_name =>  array_merge($item, ['name' => $repeater_input_name])];
+                            });
+                        }
+                    break;
+                    // case 'repeater':
+                    // case 'custom-input-repeater':
+
+                    //     return [ $input['name'] =>  $this->chunkInputs($input['schema'] ?? []) ];
                     default:
 
                         break;
                 }
 
                 if(isset($input['name'])){
-                    return [ $input['name'] => $input ];
+                    $_key = $input['name'];
+
+                    return [ $_key => $input ];
                 }
             }
             return [];

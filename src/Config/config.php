@@ -52,7 +52,7 @@ return [
             'offset-xl' => 0,
         ],
         'order' => [
-            // 'order' => 0,
+            'order' => 0,
             // 'order-sm' => 0,
             // 'order-md' => 0,
             // 'order-lg' => 0,
@@ -204,6 +204,7 @@ return [
         'mediables' => 'umod_mediables',
         'tagged' => 'umod_tagged',
         'tags' => 'umod_tags',
+        'repeaters' => 'umod_repeaters',
     ],
 
     'traits' => [
@@ -218,8 +219,8 @@ return [
             ]
         ],
         'addMedia' => [
-            'model' => 'HasMedias',
-            'repository' => 'MediasTrait',
+            'model' => 'HasImages',
+            'repository' => 'ImagesTrait',
             'question' => 'Do you need to attach images on this module?',
             'command_option' => [
                 'shortcut' => '--M',

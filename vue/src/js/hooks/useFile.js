@@ -26,7 +26,7 @@ export const makeFileProps = propsFactory({
   itemLabel: {
     type: String,
     default () {
-      return useI18n().t('Item')
+      return useI18n().t('File')
     }
   },
   endpoint: {

@@ -37,7 +37,7 @@ class ServiceProvider extends Provider
     {
         parent::__construct($app);
 
-        $this->baseName = env('UNUSUAL_BASE_NAME', 'Modularity');
+        $this->baseName = env('UNUSUAL_BASE_NAME', 'Unusual');
 
         $this->baseKey = Str::snake($this->baseName);
     }

@@ -80,8 +80,11 @@ const svgConfig = (suffix = null) => {
   }
 }
 
+const cleanOnceBeforeBuildPatterns = isProd ? ['**/*', '!.gitkeep'] : ['!.gitkeep']
 const plugins = [
-  new CleanWebpackPlugin(),
+  new CleanWebpackPlugin({
+    cleanOnceBeforeBuildPatterns
+  }),
   new WebpackAssetsManifest({
     output: `${assetsDir}/unusual-manifest.json`,
     publicPath: true,
