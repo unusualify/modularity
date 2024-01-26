@@ -19,6 +19,7 @@ use Unusualify\Modularity\Entities\Traits\HasRelated;
 class Repeater extends Model
 {
     public $table = 'umod_repeaters';
+
     protected $fillable = [
         'repatable_id',
         'content',
@@ -26,6 +27,7 @@ class Repeater extends Model
         'role',
         'locale'
     ];
+
     protected $casts = [
         'content' => 'array',
     ];
