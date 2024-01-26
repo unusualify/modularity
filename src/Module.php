@@ -200,12 +200,13 @@ class Module extends NwidartModule
      * getConfig
      *
      * @param  mixed $notation
-     * @return array
+     * @return mixed
      */
-    public function getConfig($notation = null): array
+    public function getConfig($notation = null): mixed
     {
-        $notation = !$notation ? $notation : ".{$notation}";
-        return $this->app['config']->get("{$this->getSnakeName()}{$notation}");
+        $notation = !$notation ? '' : ".{$notation}";
+
+        return $this->app['config']->get("{$this->getSnakeName()}{$notation}", []);
     }
 
     /**
