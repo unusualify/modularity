@@ -41,6 +41,8 @@ class ModuleMakeCommand extends BaseCommand
 
         // $console = new Console();
 
+
+
         $traits = activeUnusualTraits($this->options());
 
         // foreach(getUnusualTraits() as $_trait){
@@ -63,9 +65,9 @@ class ModuleMakeCommand extends BaseCommand
             + ( $this->hasOption('schema') ?  ['--schema' => $this->option('schema')] : [])
             + ( $this->hasOption('rules') ?  ['--rules' => $this->option('rules')] : [])
             + ( $this->hasOption('relationships') ?  ['--relationships' => $this->option('rules')] : [])
-            + ( $this->hasOption('force') ?  ['--force' => true] : [])
-            + ( $this->hasOption('no-migrate') ?  ['--no-migrate' => true] : [])
-            + ( $this->hasOption('no-defaults') ?  ['--no-defaults' => true] : [])
+            + ( $this->option('force') ?  ['--force' => true] : [])
+            + ( $this->option('no-migrate') ?  ['--no-migrate' => true] : [])
+            + ( $this->option('no-defaults') ?  ['--no-defaults' => true] : [])
             + ( $this->option('plain') ?  ['-p' => true] : [])
             + $console_traits
             + ['--notAsk' => true]
