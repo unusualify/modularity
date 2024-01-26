@@ -6,11 +6,24 @@ use Unusualify\Modularity\Entities\File;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
-use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Module;
 
 trait FilesTrait
 {
+
+    public function setColumnsFilesTrait($columns, $inputs) {
+
+        $traitName = get_class_short_name(__TRAIT__);
+
+        $columns[$traitName] = collect($inputs)->reduce(function($acc, $curr){
+            if(preg_match('/file/', $curr['type'])){
+                $acc[] = $curr['name'];
+            }
+            return $acc;
+        }, []);
+
+        return $columns;
+    }
+
     /**
      * @param \Unusualify\Modularity\Entities\Model $object
      * @param array $fields
@@ -56,6 +69,62 @@ trait FilesTrait
     }
 
     /**
+     * @param \Unusualify\Modularity\Entities\Model $object
+     * @param array $fields
+     * @return array
+     */
+    public function getFormFieldsFilesTrait($object, $fields)
+    {
+        if ($object->has('files')) {
+            // foreach ($object->files->groupBy('pivot.role') as $role => $filesByRole) {
+            //     foreach ($filesByRole->groupBy('pivot.locale') as $locale => $filesByLocale) {
+            //         // $fields['files'][$locale][$role] = $filesByLocale->map(function ($file) {
+            //         //     return $file->mediableFormat();
+            //         // });
+            //         $fields[$role][$locale] = $filesByLocale->map(function ($file) {
+            //             return $file->mediableFormat();
+            //         });
+            //     } d
+            // }
+            $systemLocales = getLocales();
+            $default_locale = config('app.locale');
+            $filesByRole = $object->files->groupBy('pivot.role');
+
+
+            foreach ($this->getColumns(__TRAIT__) as $role) {
+                if(isset($filesByRole[$role])){
+                    $input = $this->inputs()[$role];
+                    if($input['translated'] ?? false){
+                        foreach ($filesByRole[$role]->groupBy('pivot.locale') as $locale => $filesByLocale) {
+                            $fields[$role][$locale] = $filesByLocale->map(function ($file) {
+                                return $file->mediableFormat();
+                            });
+                        }
+                    }else{
+                        $fields[$role] = $filesByRole[$role]->groupBy('pivot.locale')[$default_locale]->map(function($file){
+                            return $file->mediableFormat();
+                        });
+                    }
+                }else {
+                    $input = $this->inputs()[$role] ?? null;
+
+                    if($input)
+                        $fields += [
+                            $input['name'] => ($input['translated']) ?? false ? Arr::mapWithKeys(getLocales(), function($locale){
+                                return [ $locale => [] ];
+                            }): []
+                        ];
+
+                    // foreach ($systemLocales as $locale) {
+                    //     $fields[$role][$locale] = [];
+                    // }
+                }
+            }
+        }
+        return $fields;
+    }
+
+    /**
      * @param array $fields
      * @return \Illuminate\Support\Collection
      */
@@ -65,7 +134,7 @@ trait FilesTrait
 
         $systemLocales = getLocales();
 
-        $fileRoles = $this->getFileColumns();
+        $fileRoles = $this->getColumns(__TRAIT__);
 
         foreach($fileRoles as $role){
             if(isset($fields[$role]) && count(array_keys($fields[$role])) > 0){
@@ -80,7 +149,7 @@ trait FilesTrait
                             ]);
                         });
                     }else {
-                        Collection::make($fields[$role][$default_locale])->each(function ($file) use (&$files, $role, $locale) {
+                        Collection::make($fields[$role])->each(function ($file) use (&$files, $role, $locale) {
                             $files->push([
                                 'id' => $file['id'],
                                 'role' => $role,
@@ -99,7 +168,7 @@ trait FilesTrait
                 //     });
                 // }
             }else{
-                dd($role);
+                // dd($role);
             }
         }
 
@@ -117,7 +186,7 @@ trait FilesTrait
                 $locale = $locale ?? config('app.locale');
 
                 if (in_array($role, $this->model->filesColumns ?? [])
-                    || in_array($role, $this->getFileColumns() ?: [])
+                    || in_array($role, $this->setColumnsFilesTrait() ?: [])
                     || in_array($role, config(unusualBaseKey() . '.block_editor.files', []))) {
 
                     Collection::make($filesForRole)->each(function ($file) use (&$files, $role, $locale) {
@@ -134,49 +203,5 @@ trait FilesTrait
         return $files;
     }
 
-    /**
-     * @param \Unusualify\Modularity\Entities\Model $object
-     * @param array $fields
-     * @return array
-     */
-    public function getFormFieldsFilesTrait($object, $fields)
-    {
-        if ($object->has('files')) {
-            // foreach ($object->files->groupBy('pivot.role') as $role => $filesByRole) {
-            //     foreach ($filesByRole->groupBy('pivot.locale') as $locale => $filesByLocale) {
-            //         // $fields['files'][$locale][$role] = $filesByLocale->map(function ($file) {
-            //         //     return $file->mediableFormat();
-            //         // });
-            //         $fields[$role][$locale] = $filesByLocale->map(function ($file) {
-            //             return $file->mediableFormat();
-            //         });
-            //     }
-            // }
-            $systemLocales = getLocales();
-            $filesByRole = $object->files->groupBy('pivot.role');
-            foreach ($this->getFileColumns() as $role) {
-                if(isset($filesByRole[$role])){
-                    foreach ($filesByRole->groupBy('pivot.locale') as $locale => $filesByLocale) {
-                        $fields[$role][$locale] = $filesByLocale->map(function ($file) {
-                            return $file->mediableFormat();
-                        });
-                    }
-                }else {
-                    foreach ($systemLocales as $locale) {
-                        $fields[$role][$locale] = [];
-                    }
-                }
-            }
-        }
-        return $fields;
-    }
 
-    public function getFileColumns() {
-        return collect($this->inputs())->reduce(function($acc, $curr){
-            if(preg_match('/file/', $curr['type'])){
-                $acc[] = $curr['name'];
-            }
-            return $acc;
-        }, []);
-    }
 }

@@ -2,13 +2,13 @@
 
 namespace Unusualify\Modularity\Entities;
 
-use Unusualify\Modularity\Entities\Traits\HasMedias;
+use Unusualify\Modularity\Entities\Traits\HasImages;
 use Unusualify\Modularity\Entities\Traits\HasTranslation;
 use Illuminate\Support\Str;
 
 class Setting extends Model
 {
-    use HasTranslation, HasMedias;
+    use HasTranslation, HasImages;
 
     public $useTranslationFallback = true;
 

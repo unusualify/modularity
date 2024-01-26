@@ -1,440 +1,248 @@
 <?php
 
 namespace Unusualify\Modularity\Repositories\Traits;
-
-use Unusualify\Modularity\Facades\TwillBlocks;
-use Unusualify\Modularity\Facades\TwillUtil;
-use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\App;
+/**
+ * This trait is used for repeaters that may or may not have files or images in them.
+ * If there is a file or image in the repeater, it should be removed from the repeater object, to be able to get detected by the FilesTrait and/or ImagesTrait.
+ * as of @version 1.0.0, this trait onl manages Medias.
+ * @uses name::function Name
+ * @author Hazarcan Doğa
+ * @version ${1:1.0.0}
+ * @since 08 Jan 2024
+ */
 
 trait RepeatersTrait
 {
-    /**
-     * All repeaters used in the model, as an array of repeater names:
-     * [
-     *     'article_repeater',
-     *     'page_repeater'
-     * ].
-     *
-     * When only the repeater name is given, the model and relation are inferred from the name.
-     * The parameters can also be overridden with an array:
-     * [
-     *     'article_repeater',
-     *     'page_repeater' => [
-     *         'model' => 'Page',
-     *         'relation' => 'pages'
-     *     ]
-     * ]
-     *
-     * @var array
-     */
-    protected $repeaters = [];
+    use ImagesTrait, FilesTrait, PricesTrait;
 
-    /**
-     * @param \Unusualify\Modularity\Models\Model $object
-     * @param array $fields
-     * @return void
-     */
-    public function afterSaveRepeatersTrait($object, $fields)
-    {
-        foreach ($this->getRepeaters() as $repeater) {
-            $this->updateRepeater(
-                $object,
-                $fields,
-                $repeater['relation'],
-                $repeater['model'],
-                $repeater['repeaterName']
-            );
-        }
+
+    public function setColumnsRepeatersTrait($columns, $inputs) {
+
+        $traitName = get_class_short_name(__TRAIT__);
+
+        $columns[$traitName] = collect($this->inputs())->reduce(function($acc, $curr){
+            if(preg_match('/json-repeater/', $curr['type'])){
+                $acc[] = $curr['name'];
+            }
+            return $acc;
+        }, []);
+
+        return $columns;
     }
 
     /**
-     * @param \Unusualify\Modularity\Models\Model $object
+     * @param \Unusualify\Modularity\Entities\Model $object
      * @param array $fields
-     * @return array
+     * @return \Unusualify\Modularity\Entities\Model
      */
-    public function getFormFieldsRepeatersTrait($object, $fields)
-    {
-        foreach ($this->getRepeaters() as $repeater) {
-            $fields = $this->getFormFieldsForRepeater(
-                $object,
-                $fields,
-                $repeater['relation'],
-                $repeater['model'],
-                $repeater['repeaterName']
-            );
+    public function afterSaveRepeatersTrait($object, $fields) {
+
+        if ($this->shouldIgnoreFieldBeforeSave('repeaters')) {
+            return $object;
         }
+        // $defaultLocale = unusualConfig('locale');
+        $defaultLocale = config('app.locale');
+        // $locales = getLocales();
+        $system_locales = getLocales();
 
-        return $fields;
-    }
+        foreach ($this->getColumns(__TRAIT__) as $name) {
+            $input = $this->inputs()[$name];
+            $isTranslated = $input['translated'] ?? false;
 
-    /**
-     * @param \Unusualify\Modularity\Models\Model $object
-     * @param array $fields
-     * @param string $relation
-     * @param bool $keepExisting
-     * @param \Unusualify\Modularity\Models\Model|null $model
-     * @return void
-     */
-    public function updateRepeaterMany($object, $fields, $relation, $keepExisting = true, $model = null)
-    {
-        $relationFields = $fields['repeaters'][$relation] ?? [];
-        $relationRepository = $this->getModelRepository($relation, $model);
+            if(isset($fields[$name])) {
+                $unsetColumns = [];
+                Collection::make($this->traitColumns)->each(function($columns, $traitName) use(&$unsetColumns){
 
-        if (! $keepExisting) {
-            $object->$relation()->each(function ($repeaterElement) {
-                $repeaterElement->forceDelete();
-            });
-        }
-
-        foreach ($relationFields as $relationField) {
-            $newRelation = $relationRepository->create($relationField);
-            $object->$relation()->attach($newRelation->id);
-        }
-    }
-
-    /**
-     * @param \Unusualify\Modularity\Models\Model $object
-     * @param array $fields
-     * @param string $relation
-     * @param string|null $morph
-     * @param \Unusualify\Modularity\Models\Model|null $model
-     * @param string|null $repeaterName
-     * @return void
-     */
-    public function updateRepeaterMorphMany(
-        $object,
-        $fields,
-        $relation,
-        $morph = null,
-        $model = null,
-        $repeaterName = null
-    ) {
-        if (! $repeaterName) {
-            $repeaterName = $relation;
-        }
-
-        $relationFields = $fields['repeaters'][$repeaterName] ?? [];
-        $relationRepository = $this->getModelRepository($relation, $model);
-
-        $morph = $morph ?: $relation;
-
-        $morphFieldType = $morph . '_type';
-        $morphFieldId = $morph . '_id';
-
-        // if no relation field submitted, soft deletes all associated rows
-        if (! $relationFields) {
-            $relationRepository->updateBasic(null, [
-                'deleted_at' => Carbon::now(),
-            ], [
-                $morphFieldType => $object->getMorphClass(),
-                $morphFieldId => $object->id,
-            ]);
-        }
-
-        // keep a list of updated and new rows to delete (soft delete?) old rows that were deleted from the frontend
-        $currentIdList = [];
-
-        // @todo: This needs refactoring in 3.x
-        foreach ($relationFields as $index => $relationField) {
-            $relationField['position'] = $index + 1;
-            $relationField[$morphFieldId] = $object->id;
-            $relationField[$morphFieldType] = $object->getMorphClass();
-
-            if (isset($relationField['id']) && Str::startsWith($relationField['id'], $relation)) {
-                // row already exists, let's update
-                $id = str_replace($relation . '-', '', $relationField['id']);
-                $relationRepository->update($id, $relationField);
-                $currentIdList[] = $id;
-            } else {
-                // new row, let's attach to our object and create
-                unset($relationField['id']);
-                $newRelation = $relationRepository->create($relationField);
-                $object->$relation()->save($newRelation);
-                $currentIdList[] = $newRelation['id'];
-            }
-        }
-
-        foreach ($object->$relation()->pluck('id') as $id) {
-            if (!in_array($id, $currentIdList)) {
-                $relationRepository->updateBasic(null, [
-                    'deleted_at' => Carbon::now(),
-                ], [
-                    'id' => $id,
-                ]);
-            }
-        }
-    }
-
-    /**
-     * Given relation, model and repeaterName, retrieve the repeater data from request and update the database record.
-     *
-     * @param \Unusualify\Modularity\Models\Model $object
-     * @param array $fields
-     * @param string $relation
-     * @param \Unusualify\Modularity\Models\Model|\Unusualify\Modularity\Repositories\ModuleRepository|null $modelOrRepository
-     * @param string|null $repeaterName
-     * @return void
-     */
-    public function updateRepeater($object, $fields, $relation, $modelOrRepository = null, $repeaterName = null)
-    {
-        if (! $repeaterName) {
-            $repeaterName = $relation;
-        }
-
-        $relationFields = $fields['repeaters'][$repeaterName] ?? [];
-
-        $relationRepository = $this->getModelRepository($relation, $modelOrRepository);
-
-        // if no relation field submitted, soft deletes all associated rows
-        if (! $relationFields) {
-            $relationRepository->updateBasic(null, [
-                'deleted_at' => Carbon::now(),
-            ], [
-                $this->model->getForeignKey() => $object->id,
-            ]);
-        }
-
-        // keep a list of updated and new rows to delete (soft delete?) old rows that were deleted from the frontend
-        $currentIdList = [];
-
-        foreach ($relationFields as $index => $relationField) {
-            $relationField['position'] = $index + 1;
-            // If the relation is not an "existing" one try to match it with our session.
-            if (
-                ! Str::startsWith($relationField['id'], $relation) &&
-                $id = TwillUtil::hasRepeaterIdFor($relationField['id'])
-            ) {
-                $relationField['id'] = $relation . '-' . $id;
-            }
-
-            // Set the active data based on the parent.
-            if (! isset($relationField['languages']) && isset($relationField['active'])) {
-                foreach ($relationField['active'] as $langCode => $active) {
-                    // Add the languages field.
-                    $relationField['languages'][] = [
-                        'value' => $langCode,
-                        'published' => $fields[$langCode]['active'],
-                    ];
-                }
-            }
-
-            // Finally store the data.
-            if (isset($relationField['id']) && Str::startsWith($relationField['id'], $relation)) {
-                // row already exists, let's update
-                $id = str_replace($relation . '-', '', $relationField['id']);
-                $relationRepository->update($id, $relationField);
-                $currentIdList[] = $id;
-            } else {
-                // new row, let's attach to our object and create
-                $relationField[$this->model->getForeignKey()] = $object->id;
-                $frontEndId = $relationField['id'];
-                unset($relationField['id']);
-                $newRelation = $relationRepository->create($relationField);
-                $currentIdList[] = $newRelation['id'];
-
-                TwillUtil::registerRepeaterId($frontEndId, $newRelation->id);
-            }
-        }
-
-        foreach ($object->$relation->pluck('id') as $id) {
-            if (! in_array($id, $currentIdList)) {
-                $relationRepository->updateBasic(null, [
-                    'deleted_at' => Carbon::now(),
-                ], [
-                    'id' => $id,
-                ]);
-            }
-        }
-    }
-
-    /**
-     * Given relation, model and repeaterName, get the necessary fields for rendering a repeater.
-     *
-     * @param \Unusualify\Modularity\Models\Model $object
-     * @param array $fields
-     * @param string $relation
-     * @param \Unusualify\Modularity\Models\Model|\Unusualify\Modularity\Repositories\ModuleRepository|null $modelOrRepository
-     * @param string|null $repeaterName
-     * @return array
-     */
-    public function getFormFieldsForRepeater(
-        $object,
-        $fields,
-        $relation,
-        $modelOrRepository = null,
-        $repeaterName = null
-    ) {
-        if (! $repeaterName) {
-            $repeaterName = $relation;
-        }
-
-        $repeaters = [];
-        $repeatersFields = [];
-        $repeatersBrowsers = [];
-        $repeatersMedias = [];
-        $repeatersFiles = [];
-        $relationRepository = $this->getModelRepository($relation, $modelOrRepository);
-
-        $repeaterType = TwillBlocks::findRepeaterByName($repeaterName);
-
-        foreach ($object->$relation as $relationItem) {
-            $repeaters[] = [
-                'id' => $relation . '-' . $relationItem->id,
-                'type' => $repeaterType->component,
-                'title' => $repeaterType->title,
-                'titleField' => $repeaterType->titleField,
-                'hideTitlePrefix' => $repeaterType->hideTitlePrefix,
-            ];
-
-            $relatedItemFormFields = $relationRepository->getFormFields($relationItem);
-            $translatedFields = [];
-
-            if (isset($relatedItemFormFields['translations'])) {
-                foreach ($relatedItemFormFields['translations'] as $key => $values) {
-                    $repeatersFields[] = [
-                        'name' => "blocks[$relation-$relationItem->id][$key]",
-                        'value' => $values,
-                    ];
-
-                    $translatedFields[] = $key;
-                }
-            }
-
-            if (isset($relatedItemFormFields['medias'])) {
-                if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
-                    Collection::make($relatedItemFormFields['medias'])->each(
-                        function ($rolesWithMedias, $locale) use (&$repeatersMedias, $relation, $relationItem) {
-                            $repeatersMedias[] = Collection::make($rolesWithMedias)->mapWithKeys(
-                                function ($medias, $role) use ($locale, $relation, $relationItem) {
-                                    return [
-                                        "blocks[$relation-$relationItem->id][$role][$locale]" => $medias,
-                                    ];
-                                }
-                            )->toArray();
+                    $unsetColumns = Collection::make($columns)->reduce(function($unsetColumns, $column){
+                        if(preg_match('/([A-Za-z-_\.]+)\.\*\.([A-Za-z-_\.]+)/', $column, $matches)){
+                            if(!in_array($matches[2], $unsetColumns))
+                                $unsetColumns[] = $matches[2];
                         }
-                    );
-                } else {
-                    foreach ($relatedItemFormFields['medias'] as $key => $values) {
-                        $repeatersMedias["blocks[$relation-$relationItem->id][$key]"] = $values;
+
+                        return $unsetColumns;
+                    }, $unsetColumns);
+
+
+                });
+
+                $intersect_locales = array_intersect(array_keys($fields[$name]), $system_locales);
+                $localized = false;
+                $exist_locale = null;
+
+                $existingRepeaters = isset($object->id) ? $object->repeaters()
+                    ->where('repeatable_id', $object->id)
+                    ->where('role', $name)
+                    ->get() : null;
+                // dd($object->id, $existingRepeaters, $existingRepeaters->where('repeatable_id', $object->id));
+                // $repeaterModels = isset($object->id) ? $existingRepeaters->where('repeatable_id', $object->id) : null;
+
+                if(count($intersect_locales) > 1){
+                    $localized = true;
+                    $exist_locale = $intersect_locales[0];
+                }
+
+                foreach($system_locales as $system_locale) {
+                    $content = $fields[$name];
+
+                    if($localized)
+                        $content = isset($fields[$name][$system_locale]) ? $fields[$name][$system_locale] : $fields[$name][$exist_locale];
+
+                    foreach($unsetColumns as $unsetColumn){
+                        foreach ($content as &$item) {
+                            # code...
+                            unset($item[$unsetColumn]);
+                        }
                     }
+
+                    $data = [
+                        'role' => $name,
+                        'content' => $content,
+                        'locale' => $system_locale,
+                    ];
+
+                    $existingRepeater = $existingRepeaters ? $existingRepeaters->where('locale', $system_locale)->first() : null;
+
+                    $existingRepeater
+                        ? $existingRepeater->update($data)
+                        : $object->repeaters()->create($data);
+
                 }
             }
+        }
 
-            if (isset($relatedItemFormFields['files'])) {
-                Collection::make($relatedItemFormFields['files'])->each(
-                    function ($rolesWithFiles, $locale) use (&$repeatersFiles, $relation, $relationItem) {
-                        $repeatersFiles[] = Collection::make($rolesWithFiles)->mapWithKeys(
-                            function ($files, $role) use ($locale, $relation, $relationItem) {
-                                return [
-                                    "blocks[$relation-$relationItem->id][$role][$locale]" => $files,
-                                ];
-                            }
-                        )->toArray();
+        return;
+        foreach($this->getRepeaterInputs() as $repeaterInput) {
+            $repeaterName = $repeaterInput['name'] ?? $repeaterInput;
+
+            $repeaterTranslated = $repeaterInput['translated'] ?? false;
+
+            if(isset($fields[$repeaterName])) {
+                $repeater = $fields[$repeaterName];
+
+                $existingRepeaters = $object->repeaters()->where('role', $repeaterName)->get();
+                // dd($object->id, $existingRepeaters, $existingRepeaters->where('repeatable_id', $object->id));
+                $repeaterModels = isset($object->id) ? $existingRepeaters->where('repeatable_id', $object->id) : null;
+
+                // dd($repeater, $repeaterModel, $existingRepeaters);
+                // dd($locales, $defaultLocale);
+                foreach($locales as $locale) {
+                    $saveFormat = [
+                        'role' => $repeaterName,
+                        'locale' => $locale,
+                    ];
+                    // dd($repeater, $saveFormat);
+                    if($repeaterTranslated) {
+                        if(isset($repeater[$locale])) {
+                            $saveFormat['content'] = $repeater[$locale];
+                        } else {
+                            $saveFormat['content'] = $repeater[$defaultLocale];
+                            // dd($repeater, $saveFormat, $locale, $defaultLocale);
+                        }
                     }
-                );
-            }
+                    else {
+                        $saveFormat['content'] = $repeater;
+                    }
 
-            if (isset($relatedItemFormFields['browsers'])) {
-                foreach ($relatedItemFormFields['browsers'] as $key => $values) {
-                    $repeatersBrowsers["blocks[$relation-$relationItem->id][$key]"] = $values;
+                    // dd($repeaterModels);
+                    $repeaterModel = $repeaterModels ? $repeaterModels->where('locale', $locale)->first() : null;
+                    if($repeaterModel) {
+                        // dd($repeaterModel, $saveFormat);
+                        $repeaterModel->update($saveFormat);
+                    } else {
+                        // dd($saveFormat);
+                        $object->repeaters()->create($saveFormat);
+                    }
                 }
+                /**
+                 * these are not correc, keepin em for reference
+                 // $repeaterModel = isset($repeaterData['id']) ? $existingRepeaters->where('id', $repeaterData['id'])->first() : null;
+                 // $repeater = $fields[$repeaterName];
+                 // if($repeaterModel) {
+                 //     $repeaterModel->update($repeater);
+                 // } else {
+                 //     $repeaterModel = $object->repeaters()->create($repeater);
+                 // }
+                 // foreach($fields[$name] as $index => $repeaterData) {
+                     // foreach($repeaterData as $index => $repeater) {
+                     // }
+                         // dd($repeater, $repeaterData, $index);
+                     // dd($existingRepeaters, $repeaterModel, $repeaterData);
+
+                     // Here, we establish the releationship between the repeater and the parent aka object,
+                     // the [repeater] fields should be saved as json.
+                     // dd($repeaterData, $object->repeaters());
+                     // $object->repeaters()->attach($repeaterData);
+                     // $object->save();
+                     // dd($object, $repeaterData, $object->repeaters);
+                 // }
+                 */
+            }
+        }
+
+        return $object;
+    }
+
+    /**
+     * Clear the relationship between the repeater and the parent(module) aka object.
+     *
+     * @param \Unusualify\Modularity\Entities\Model $object
+     *
+     * @return void
+     */
+    public function afterDelete($object){
+
+    }
+
+    /**
+     * From objects input
+     */
+    public function getRepeaterInputs() {
+        return collect($this->inputs())->reduce(function($acc, $curr){
+            if(isset($curr['name']) && preg_match('/json-repeater/', $curr['type'])){
+                $acc[] = $curr + ['translated' => $curr['translated'] ?? false ];
             }
 
-            $itemFields = method_exists($relationItem, 'toRepeaterArray') ? $relationItem->toRepeaterArray(
-            ) : Arr::except($relationItem->attributesToArray(), $translatedFields);
+            return $acc;
+        }, []);
+    }
 
-            foreach ($itemFields as $key => $value) {
-                $repeatersFields[] = [
-                    'name' => "blocks[$relation-$relationItem->id][$key]",
-                    'value' => $value,
+    public function getFormFieldsRepeatersTrait($object, $fields, $schema)
+    {
+        // not possess any repeater data
+        if($object->repeaters->isEmpty()){
+            $fields += Arr::mapWithKeys($this->getRepeaterInputs(), function($input){
+                return [
+                    $input['name'] => ($input['translated'] ?? false) ? Arr::mapWithKeys(getLocales(), function($locale){
+                        return [ $locale => [] ];
+                    }): []
                 ];
-            }
+            });
+        }else{
 
-            if (isset($relatedItemFormFields['repeaters'])) {
-                foreach ($relatedItemFormFields['repeaters'] as $childRepeaterName => $childRepeaterItems) {
-                    $fields['repeaters']["blocks-$relation-{$relationItem->id}_$childRepeaterName"] = $childRepeaterItems;
-                    $repeatersFields = array_merge(
-                        $repeatersFields,
-                        $relatedItemFormFields['repeaterFields'][$childRepeaterName]
-                    );
-                    $repeatersMedias = array_merge(
-                        $repeatersMedias,
-                        $relatedItemFormFields['repeaterMedias'][$childRepeaterName]
-                    );
-                    $repeatersFiles = array_merge(
-                        $repeatersFiles,
-                        $relatedItemFormFields['repeaterFiles'][$childRepeaterName]
-                    );
-                    $repeatersBrowsers = array_merge(
-                        $repeatersBrowsers,
-                        $relatedItemFormFields['repeaterBrowsers'][$childRepeaterName]
-                    );
+            foreach($object->repeaters->groupBy('locale') as $repeatersByLocale) {
+
+                foreach($repeatersByLocale as $repeater) {
+                    // dd($repeater->content);
+                    if($this->inputs()[$repeater->role]['translated'] ?? false) {
+                        $name = $repeater->role . '.' . $repeater->locale;
+
+                        foreach (Arr::dot($repeater->content) as $notation => $value) {
+                            Arr::set($fields, "{$name}.{$notation}", $value);
+                        }
+
+                    } else {
+                        $name = $repeater->role;
+                        foreach (Arr::dot($repeater->content) as $notation => $value) {
+                            Arr::set($fields, "{$name}.{$notation}", $value);
+                        }
+                    }
                 }
+                // $fields[$repeater->role] = $repeater->content;
             }
         }
-
-        if (! empty($repeatersMedias) && config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
-            $repeatersMedias = call_user_func_array('array_merge', $repeatersMedias);
-        }
-
-        if (! empty($repeatersFiles)) {
-            $repeatersFiles = call_user_func_array('array_merge', $repeatersFiles);
-        }
-
-        $fields['repeaters'][$repeaterName] = $repeaters;
-        $fields['repeaterFields'][$repeaterName] = $repeatersFields;
-        $fields['repeaterMedias'][$repeaterName] = $repeatersMedias;
-        $fields['repeaterFiles'][$repeaterName] = $repeatersFiles;
-        $fields['repeaterBrowsers'][$repeaterName] = $repeatersBrowsers;
-
         return $fields;
-    }
-
-    /**
-     * Get all repeaters' model and relation from the $repeaters attribute.
-     * The missing information will be inferred by convention of Twill.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function getRepeaters()
-    {
-        return collect($this->repeaters)->map(function ($repeater, $key) {
-            $repeaterName = is_string($repeater) ? $repeater : $key;
-
-            return [
-                'relation' => ! empty($repeater['relation']) ? $repeater['relation'] : $this->inferRelationFromRepeaterName(
-                    $repeaterName
-                ),
-                'model' => ! empty($repeater['model']) ? $repeater['model'] : $this->inferModelFromRepeaterName(
-                    $repeaterName
-                ),
-                'repeaterName' => $repeaterName,
-            ];
-        })->values();
-    }
-
-    /**
-     * Guess the relation name (shoud be lower camel case, ex. userGroup, contactOffice).
-     *
-     * @param string $repeaterName
-     * @return string
-     */
-    protected function inferRelationFromRepeaterName(string $repeaterName): string
-    {
-        return Str::camel($repeaterName);
-    }
-
-    /**
-     * Guess the model name (should be singular upper camel case, ex. User, ArticleType).
-     *
-     * @param string $repeaterName
-     * @return string
-     */
-    protected function inferModelFromRepeaterName(string $repeaterName): string
-    {
-        return Str::studly(Str::singular($repeaterName));
     }
 }

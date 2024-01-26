@@ -27,7 +27,7 @@ Modularity System Base Module
 - [x] Media Traits and Repositories to be tested
 - [ ] Form custom image input to be developed
     - [ ] Media input connection to media modal
-    - [x] HasMedias & MediasTrait to be tested
+    - [x] HasImages & ImagesTrait to be tested
     - [ ] UI design (card with plus icon)
 - [ ] Form custom file input to be developed
     - [x] File input connection to media modal

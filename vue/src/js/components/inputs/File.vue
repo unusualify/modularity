@@ -1,67 +1,61 @@
 <template>
-  <!-- <div v-if="false">
-    <a17-inputframe :error="error" :label="label" :locale="locale" @localize="updateLocale" :size="size" :name="name" :note="fieldNote" v-if="false">
-      <div class="fileField">
-        <div class="fileField__trigger" v-if="buttonOnTop && remainingItems">
-          <input type="hidden" :name="name" :value="itemsIds"/>
-          <a17-button type="button" variant="ghost" @click="openMediaLibrary(remainingItems)">{{ addLabel }}</a17-button>
-          <span class="fileField__note f--small">{{ note }}</span>
-        </div>
-        <table class="fileField__list" v-if="items.length">
-          <draggable :tag="'tbody'" v-model="items">
-            <ue-fileitem v-for="(item, index) in items" :key="item.id" class="item__content" :name="`${name}_${item.id}`" :draggable="isDraggable" :item="item" @delete="deleteItem(index)"></ue-fileitem>
-          </draggable>
-        </table>
-        <div class="fileField__trigger" v-if="!buttonOnTop && remainingItems">
-          <input type="hidden" :name="name" :value="itemsIds"/>
-          <a17-button type="button" variant="ghost" @click="openMediaLibrary(remainingItems)">{{ addLabel }}</a17-button>
-          <span class="fileField__note f--small">{{ note }}</span>
-        </div>
-      </div>
-    </a17-inputframe>
-  </div> -->
   <v-input
     hideDetails="auto"
     appendIcon="mdi-close"
+    :variant="boundProps.variant"
   >
-    <div class="fileField">
-      <div class="fileField__trigger" v-if="buttonOnTop && remainingItems">
-        <input type="hidden" :name="name" :value="itemsIds"/>
-        <v-btn type="button" @click="openMediaLibrary(remainingItems)">{{ addLabel }}</v-btn>
-        <span class="fileField__note f--small">{{ note }}</span>
+    <template v-slot:default="defaultSlot">
+      <div class="v-field v-field--active v-field--center-affix v-field--dirty v-field--variant-outlined v-theme--jakomeet v-locale--is-ltr">
+        <div class="v-field__field" data-no-activator="">
+          <div class="fileField">
+            <div class="fileField__trigger" v-if="buttonOnTop && remainingItems">
+              <input type="hidden" :name="name" :value="itemsIds"/>
+              <v-btn type="button" @click="openMediaLibrary(remainingItems)">{{ addLabel }}</v-btn>
+              <span class="fileField__note f--small">{{ note }}</span>
+            </div>
+            <table class="fileField__list" v-if="input.length">
+              <!-- <draggable :tag="'tbody'" v-model="items" itemKey="id"> -->
+              <draggable :tag="'tbody'" v-model="input" itemKey="id">
+                <!-- <FileItem
+                  v-for="(item, index) in items"
+                  :key="item.id"
+                  class="item__content"
+                  :name="`${name}_${item.id}`"
+                  :draggable="isDraggable"
+                  :item="item"
+                  @delete="deleteItem(index)">
+                </FileItem> -->
+                <template #item="itemSlot">
+                  <FileItem
+                    class="item__content"
+                    :name="`${name}_${itemSlot.index}`"
+                    :item-label="$t('form-labels.File')"
+                    :item="input[itemSlot.index]"
+                    @delete="deleteItem(itemSlot.index)"
+                    >
+                  </FileItem>
+                </template>
+              </draggable>
+            </table>
+            <div class="fileField__trigger" v-if="!buttonOnTop && remainingItems">
+              <input type="hidden" :name="name" :value="itemsIds"/>
+              <v-btn type="button" @click="openMediaLibrary(remainingItems)">{{ addLabel }}</v-btn>
+              <span class="fileField__note f--small">{{ note }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="v-field__outline">
+          <div class="v-field__outline__start"></div>
+          <div class="v-field__outline__notch">
+            <label class="v-label v-field-label v-field-label--floating" aria-hidden="true" for="input-29">
+              {{ boundProps.label }}
+            </label>
+          </div>
+          <div class="v-field__outline__end"></div>
+        </div>
       </div>
-      <table class="fileField__list" v-if="input.length">
-        <!-- <draggable :tag="'tbody'" v-model="items" itemKey="id"> -->
-        <draggable :tag="'tbody'" v-model="input" itemKey="id">
-          <!-- <FileItem
-            v-for="(item, index) in items"
-            :key="item.id"
-            class="item__content"
-            :name="`${name}_${item.id}`"
-            :draggable="isDraggable"
-            :item="item"
-            @delete="deleteItem(index)">
-          </FileItem> -->
-          <template #item="itemSlot">
-            <FileItem
-              class="item__content"
-              :name="`${name}_${itemSlot.index}`"
-              :item-label="$t('form-labels.File')"
-              :item="input[itemSlot.index]"
-              @delete="deleteItem(itemSlot.index)"
-              >
-            </FileItem>
-          </template>
-        </draggable>
-      </table>
-      <div class="fileField__trigger" v-if="!buttonOnTop && remainingItems">
-        <input type="hidden" :name="name" :value="itemsIds"/>
-        <v-btn type="button" @click="openMediaLibrary(remainingItems)">{{ addLabel }}</v-btn>
-        <span class="fileField__note f--small">{{ note }}</span>
-      </div>
-    </div>
+    </template>
   </v-input>
-
 </template>
 <script>
 import { MEDIA_LIBRARY } from '@/store/mutations'
@@ -99,7 +93,7 @@ export default {
     }
   },
   created () {
-    // __log(this.name)
+    __log(this)
   },
   methods: {
     openMediaLibrary: function (max = 1, name = this.name, index = -1) {
@@ -133,10 +127,10 @@ export default {
 <style lang="scss" scoped>
 
   .fileField {
-    // width: 100%;
+    width: 100%;
     display: block;
     border-radius: 2px;
-    border: 1px solid $color__border;
+    // border: 1px solid $color__border;
     overflow-x: hidden;
   }
 

@@ -54,6 +54,10 @@ export const makeRepeaterProps = propsFactory({
     default () {
       return useI18n().t('ADD NEW')
     }
+  },
+  withGutter: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -69,6 +73,7 @@ export default function useRepeater (props, context) {
   function namingRepeaterField (index, name) {
     return `repeater${inputHook.id.value}[${index}][${name}]`
   }
+
   function hydrateRepeaterInput (item, index) {
     return {
       id: index,
@@ -77,11 +82,14 @@ export default function useRepeater (props, context) {
       })
     }
   }
+
   function hydrateRepeaterInputs (model) {
+    // return model; // Burayı açman gerekebilir.
     return model.map((item, i) => {
       return hydrateRepeaterInput(item, i)
     })
   }
+
   function hydrateSchemas (inputs) {
     const schemas = []
 
@@ -97,6 +105,7 @@ export default function useRepeater (props, context) {
 
     return schemas
   }
+
   function parseRepeaterInput (object, i) {
     // let pattern = /repeater${this.id}[(\w+)]/
     const pattern = /\[(.*?)\]/gi
@@ -189,12 +198,10 @@ export default function useRepeater (props, context) {
   })
 
   const methods = reactive({
-
     onUpdateRepeaterInput (value, index) {
       modelValue.value[index] = parseRepeaterInput(value, index)
       // __log('onUpdateRepeaterInput', value, index)
     },
-
     onHoverContent (index) {
       // __log('onHoverContent', index)
     },

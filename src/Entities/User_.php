@@ -2,7 +2,7 @@
 
 namespace Unusual\CRM\Base\Entities;
 
-use Unusual\CRM\Base\Entities\Traits\HasMedias;
+use Unusual\CRM\Base\Entities\Traits\HasImages;
 use Unusual\CRM\Base\Entities\Traits\HasPresenter;
 use Unusual\CRM\Base\Entities\Traits\HasOauth;
 use Unusual\CRM\Base\Entities\Enums\UserRole;
@@ -19,7 +19,7 @@ use PragmaRX\Google2FAQRCode\Google2FA;
 
 class User extends AuthenticatableContract
 {
-    use Authenticatable, Authorizable, HasMedias, Notifiable, HasPresenter, HasOauth, SoftDeletes, IsTranslatable;
+    use Authenticatable, Authorizable, HasImages, Notifiable, HasPresenter, HasOauth, SoftDeletes, IsTranslatable;
 
     public $timestamps = true;
 
