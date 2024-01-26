@@ -77,7 +77,6 @@ class Module extends NwidartModule
         $this->fireModuleEvent('disabled', $route);
     }
 
-
     /**
      *
      */
@@ -116,6 +115,11 @@ class Module extends NwidartModule
         return !$this->isEnabledRoute($route);
     }
 
+    /**
+     * flushModuleCache
+     *
+     * @return void
+     */
     private function flushModuleCache(): void
     {
 
@@ -154,56 +158,127 @@ class Module extends NwidartModule
         return  config('modules.namespace', 'Modules') . "\\" . $this->getStudlyName();
     }
 
-    public function getRouteConfigs($notation = null){
+    /**
+     * getRouteConfigs
+     *
+     * @param  mixed $notation
+     * @return array
+     */
+    public function getRouteConfigs($notation = null): array
+    {
         $notation = !$notation ? $notation : ".{$notation}";
 
         return $this->getConfig('routes' . $notation);
     }
 
-    public function getRouteConfig($route_name){
+    /**
+     * getRouteConfig
+     *
+     * @param  mixed $route_name
+     * @return array
+     */
+    public function getRouteConfig($route_name): array
+    {
         return $this->getRouteConfigs( snakeCase($route_name) ) ;
     }
 
-    public function getRouteInput($route_name, $input_name = null){
+    /**
+     * getRouteInput
+     *
+     * @param  mixed $route_name
+     * @param  mixed $input_name
+     * @return array
+     */
+    public function getRouteInput($route_name, $input_name = null): array
+    {
         $inputs = $this->getRouteConfig($route_name)['inputs'];
         dd($inputs);
         return $this->getRouteConfig($route_name)['inputs'];
     }
 
-    public function getConfig($notation = null){
+    /**
+     * getConfig
+     *
+     * @param  mixed $notation
+     * @return array
+     */
+    public function getConfig($notation = null): array
+    {
         $notation = !$notation ? $notation : ".{$notation}";
         return $this->app['config']->get("{$this->getSnakeName()}{$notation}");
     }
 
-    public function getParentRoute() {
+    /**
+     * getParentRoute
+     *
+     * @return array
+     */
+    public function getParentRoute(): array
+    {
         return array_values(array_filter($this->getRouteConfigs(), function($r){
             return isset($r['parent']) && $r['parent'];
         }))[0] ?? [];
     }
 
-    public function hasParentRoute() {
+    /**
+     * hasParentRoute
+     *
+     * @return bool
+     */
+    public function hasParentRoute(): bool
+    {
         return count($this->getParentRoute()) > 0;
     }
 
-    public function hasSystemPrefix() {
+    /**
+     * hasSystemPrefix
+     *
+     * @return mixed
+     */
+    public function hasSystemPrefix(): mixed
+    {
         return $this->getConfig('system_prefix') ?? $this->getConfig('base_prefix', false);
     }
 
-    public function systemPrefix() {
+    /**
+     * systemPrefix
+     *
+     * @return string
+     */
+    public function systemPrefix(): string
+    {
         return systemUrlPrefix();
     }
 
-    public function systemRouteNamePrefix() {
+    /**
+     * systemRouteNamePrefix
+     *
+     * @return string
+     */
+    public function systemRouteNamePrefix(): string
+    {
         return systemRouteNamePrefix();
     }
 
-    public function prefix() {
+    /**
+     * prefix
+     *
+     * @return string
+     */
+    public function prefix(): string
+    {
         return $this->hasParentRoute()
             ? $this->getParentRoute()['url']
             : pluralize( kebabCase($this->getConfig('name')) );
     }
 
-    public function fullPrefix() {
+    /**
+     * fullPrefix
+     *
+     * @return string
+     */
+    public function fullPrefix(): string
+    {
         $prefixes = [];
 
         $adminUrlPrefix = adminUrlPrefix();
@@ -219,13 +294,25 @@ class Module extends NwidartModule
         return implode('/', $prefixes);
     }
 
-    public function routeNamePrefix() {
+    /**
+     * routeNamePrefix
+     *
+     * @return string
+     */
+    public function routeNamePrefix(): string
+    {
         return $this->hasParentRoute()
             ? $this->getParentRoute()['route_name']
             : snakeCase($this->getConfig('name'));
     }
 
-    public function fullRouteNamePrefix() {
+    /**
+     * fullRouteNamePrefix
+     *
+     * @return string
+     */
+    public function fullRouteNamePrefix(): string
+    {
         $prefixes = [];
 
         $adminRouteNamePrefix = adminRouteNamePrefix();
