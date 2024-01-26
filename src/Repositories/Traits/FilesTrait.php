@@ -87,13 +87,21 @@ trait FilesTrait
             //     } d
             // }
             $systemLocales = getLocales();
+            $default_locale = config('app.locale');
             $filesByRole = $object->files->groupBy('pivot.role');
 
 
             foreach ($this->getColumns(__TRAIT__) as $role) {
                 if(isset($filesByRole[$role])){
-                    foreach ($filesByRole->groupBy('pivot.locale') as $locale => $filesByLocale) {
-                        $fields[$role][$locale] = $filesByLocale->map(function ($file) {
+                    $input = $this->inputs()[$role];
+                    if($input['translated'] ?? false){
+                        foreach ($filesByRole[$role]->groupBy('pivot.locale') as $locale => $filesByLocale) {
+                            $fields[$role][$locale] = $filesByLocale->map(function ($file) {
+                                return $file->mediableFormat();
+                            });
+                        }
+                    }else{
+                        $fields[$role] = $filesByRole[$role]->groupBy('pivot.locale')[$default_locale]->map(function($file){
                             return $file->mediableFormat();
                         });
                     }
@@ -141,7 +149,7 @@ trait FilesTrait
                             ]);
                         });
                     }else {
-                        Collection::make($fields[$role][$default_locale])->each(function ($file) use (&$files, $role, $locale) {
+                        Collection::make($fields[$role])->each(function ($file) use (&$files, $role, $locale) {
                             $files->push([
                                 'id' => $file['id'],
                                 'role' => $role,

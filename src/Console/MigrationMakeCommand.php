@@ -111,7 +111,7 @@ class MigrationMakeCommand extends BaseCommand
             return Stub::create('/migration/pivot.stub', [
                 'class'         => $this->getClass(),
                 'table'         => $table_name,
-                'fields'        => ltrim($this->getSchemaParser()->render()),
+                'fields'        => ltrim((new SchemaParser(useDefaults:false))->render()),
 
                 'table1'        => $table1,
                 'table2'        => $table2,

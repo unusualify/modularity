@@ -660,10 +660,12 @@ class RouteGenerator extends Generator
                 $this->filesystem->makeDirectory($dir, 0775, true);
             }
 
+            if(!file_exists($path)){
 
-            $this->filesystem->put($path, $this->getStubContents($stub));
+                $this->filesystem->put($path, $this->getStubContents($stub));
 
-            $this->console->info("Created : {$path}");
+                $this->console->info("Created : {$path}");
+            }
         }
     }
 
@@ -904,10 +906,9 @@ class RouteGenerator extends Generator
 
                 if($migratable){
                     sleep(1);
-
                     // dd($schema, $parser->toArray());
                     // $route_name = $options[1]; // package_feature
-                    $pivot_table_name = $this->module->getSnakeName() . '_' . $route_name;
+                    $pivot_table_name = snakeCase($this->name) . '_' . $route_name;
 
                     $this->console->call('unusual:make:migration', [
                         '--relational' => true,
