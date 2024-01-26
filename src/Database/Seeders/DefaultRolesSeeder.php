@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Unusualify\Modularity\Entities\User;
+use Illuminate\Support\Facades\DB;
 
 class DefaultRolesSeeder extends Seeder
 {
@@ -17,9 +18,9 @@ class DefaultRolesSeeder extends Seeder
     {
         $table = config('permission.table_names.roles');
 
-        // \DB::table($table)->truncate();
+        // DB::table($table)->truncate();
 
-        \DB::table($table)->insert([
+        DB::table($table)->insert([
             [
                 'name' => 'superadmin',
                 'guard_name' => 'unusual_users',
@@ -50,7 +51,7 @@ class DefaultRolesSeeder extends Seeder
             ],
         ]);
 
-        User::find(1)->roles()->attach(1);
+
 
     }
 }

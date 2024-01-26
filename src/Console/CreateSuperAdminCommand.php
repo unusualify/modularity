@@ -15,14 +15,14 @@ class CreateSuperAdminCommand extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'unusual:superadmin {email?} {password?}';
+    protected $signature = 'unusual:superadmin {email?} {password?} {--default}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = "Create the superadmin account";
+    protected $description = "Creates the superadmin account";
 
     /**
      * @var ValidatorFactory
@@ -53,9 +53,10 @@ class CreateSuperAdminCommand extends BaseCommand
      */
     public function handle() :int
     {
-        $this->info("Let's create a superadmin account!");
-        $email = $this->setEmail();
-        $password = $this->setPassword();
+
+
+        $email = $this->setEmail($this->argument('email'));
+        $password = $this->setPassword($this->argument('password'));
 
         DB::beginTransaction();
 
@@ -66,7 +67,7 @@ class CreateSuperAdminCommand extends BaseCommand
                 // 'published' => true,
             ]);
 
-            $user->roles()->sync('superadmin');
+            $user->roles()->sync(1);
             $user->password = Hash::make($password);
 
             if ($user->save()) {
@@ -74,12 +75,17 @@ class CreateSuperAdminCommand extends BaseCommand
                 $this->info('Your account has been created');
                 return 0;
             }
+
+
+
         } catch (\Throwable $th) {
+            $this->error($th);
             DB::rollback();
         }
 
-        $this->error('Failed creating user. Things you can check: Database permissions, run migrations');
 
+
+        $this->error('Failed creating user. Things you can check: Database permissions, run migrations');
         return -1;
     }
 
@@ -88,18 +94,45 @@ class CreateSuperAdminCommand extends BaseCommand
      *
      * @return string $email
      */
-    private function setEmail()
+    private function setEmail(String $email=null)
     {
-        if (filled($email = $this->argument('email'))) {
+
+        if($this->option('default')){
+            $email = env('UNUSUAL_ADMIN_EMAIL', 'oguzhan@unusualgrowth.com');
+            $this->info('Email configured for super-admin as '.$email);
             return $email;
         }
-        $email = $this->ask('Enter an email');
-        if ($this->validateEmail($email)) {
-            return $email;
-        } else {
-            $this->error("Your email is not valid");
-            return $this->setEmail();
+
+
+        while (!$this->validateEmail($email)) {
+
+            if (!filled($email)) {
+                $this->info('You can use default configuration for super-admin e-mail address. You can change/ set it in .env file.');
+                if ($this->confirm('Do you want to use default configuration for super-admin e-mail? Y/N')) {
+                    $email = env('UNUSUAL_ADMIN_EMAIL', 'oguzhan@unusualgrowth.com');
+                    $this->info('Email configured for super-admin as '.$email);
+                }else {
+                    $email = $this->ask('Please enter a valid e-mail address for super-admin:\t');
+                };
+            }
         }
+
+        return $email;
+
+
+
+
+
+        // if (filled($email = $this->argument('email'))) {
+        //     return $email;
+        // }
+        // $email = $this->ask('Enter an email');
+        // if ($this->validateEmail($email)) {
+        //     return $email;
+        // } else {
+        //     $this->error("Your email is not valid");
+        //     return $this->setEmail();
+        // }
     }
 
     /**
@@ -107,24 +140,52 @@ class CreateSuperAdminCommand extends BaseCommand
      *
      * @return string $password
      */
-    private function setPassword()
+    private function setPassword(String $password = null)
     {
-        if (filled($email = $this->argument('password'))) {
-            return $email;
+
+        if($this->option('default')){
+            $password = env('UNUSUAL_ADMIN_PASSWORD', '');
+            $this->info('Password configured for super-admin as '.$password);
+            return $password;
         }
-        $password = $this->secret('Enter a password');
-        if ($this->validatePassword($password)) {
-            $confirmPassword = $this->secret('Confirm the password');
-            if ($password === $confirmPassword) {
-                return $password;
-            } else {
-                $this->error('Password does not match the confirm password');
-                return $this->setPassword();
+
+        while(!$this->validatePassword($password)){
+            if(!filled($password)){
+                $this->info('You can use default configuration for super-admin password. You can change/ set it in .env file.');
+                if ($this->confirm('Do you want to use default configuration for super-admin password? Y/N') && filled(env('UNUSUAL_ADMIN_PASSWORD', ''))) {
+                    $password = env('UNUSUAL_ADMIN_PASSWORD', '');
+                }else {
+                    $password = $this->secret('Please enter a valid password address for super-admin with minimum 6 characters:\t');
+                };
             }
-        } else {
-            $this->error("Your password is not valid, at least 6 characters");
-            return $this->setPassword();
         }
+
+        $confirmPassword= $this->secret('Confirm the given password');
+        if ($confirmPassword == $password) {
+            return $password;
+        }else{
+            $this->error('Passwords do not match.');
+            $this->setPassword();
+        }
+
+
+        // if (filled($email = $this->argument('password'))) {
+        //     return $email;
+        // }
+
+        // $password = $this->secret('Enter a password');
+        // if ($this->validatePassword($password)) {
+        //     $confirmPassword = $this->secret('Confirm the password');
+        //     if ($password === $confirmPassword) {
+        //         return $password;
+        //     } else {
+        //         $this->error('Password does not match the confirm password');
+        //         return $this->setPassword();
+        //     }
+        // } else {
+        //     $this->error("Your password is not valid, at least 6 characters");
+        //     return $this->setPassword();
+        // }
     }
 
     /**

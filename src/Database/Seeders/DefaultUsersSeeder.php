@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 class DefaultUsersSeeder extends Seeder
 {
     /**
@@ -20,11 +21,11 @@ class DefaultUsersSeeder extends Seeder
 
         Schema::disableForeignKeyConstraints();
 
-        \DB::table($table)->truncate();
+        DB::table($table)->truncate();
 
         Schema::enableForeignKeyConstraints();
 
-        \DB::table($table)->insert([
+        DB::table($table)->insert([
             [
                 'id' => 1,
                 'name' => 'unusualify',
