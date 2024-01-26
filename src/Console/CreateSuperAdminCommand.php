@@ -98,7 +98,7 @@ class CreateSuperAdminCommand extends BaseCommand
     {
 
         if($this->option('default')){
-            $email = env('UNUSUAL_ADMIN_EMAIL', 'oguzhan@unusualgrowth.com');
+            $email = env('UNUSUAL_ADMIN_EMAIL', 'software-dev@unusualgrowth.com');
             $this->info('Email configured for super-admin as '.$email);
             return $email;
         }
@@ -143,8 +143,7 @@ class CreateSuperAdminCommand extends BaseCommand
     private function setPassword(String $password = null)
     {
 
-        if($this->option('default')){
-            $password = env('UNUSUAL_ADMIN_PASSWORD', '');
+        if($this->option('default') && $password = getStringOrFalse(env('UNUSUAL_ADMIN_PASSWORD', '')) ){
             $this->info('Password configured for super-admin as '.$password);
             return $password;
         }
@@ -152,8 +151,9 @@ class CreateSuperAdminCommand extends BaseCommand
         while(!$this->validatePassword($password)){
             if(!filled($password)){
                 $this->info('You can use default configuration for super-admin password. You can change/ set it in .env file.');
-                if ($this->confirm('Do you want to use default configuration for super-admin password? Y/N') && filled(env('UNUSUAL_ADMIN_PASSWORD', ''))) {
-                    $password = env('UNUSUAL_ADMIN_PASSWORD', '');
+                if ($this->confirm('Do you want to use default configuration for super-admin password? Y/N') && $password = getStringOrFalse(env('UNUSUAL_ADMIN_PASSWORD', ''))) {
+                    $this->info('Password configured for super-admin as '.$password);
+                    return $password;
                 }else {
                     $password = $this->secret('Please enter a valid password address for super-admin with minimum 6 characters:\t');
                 };

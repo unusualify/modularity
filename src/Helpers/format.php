@@ -149,8 +149,8 @@ if (! function_exists('formatRulesSchema')) {
 }
 
 
-if(! function_exists('checkEmptyString')){
-    function checkEmptyString(mixed $val): mixed {
+if(! function_exists('stringExists')){
+    function getStringOrFalse(mixed $val): mixed {
         return !empty($val) ? $val : null;
     }
 }
