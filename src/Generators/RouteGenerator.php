@@ -63,9 +63,16 @@ class RouteGenerator extends Generator
     /**
      * The module instance.
      *
-     * @var \Nwidart\Modules\Facades\Module
+     * @var \Unusualify\Modularity\Module
      */
     protected $module;
+
+    /**
+     * The route name.
+     *
+     * @var string
+     */
+    protected $route;
 
     /**
      * Force status.
@@ -137,6 +144,14 @@ class RouteGenerator extends Generator
      */
     protected $api = true;
 
+
+
+    protected $fix = false;
+
+
+
+
+
     protected $traits = [
 
     ];
@@ -172,6 +187,29 @@ class RouteGenerator extends Generator
 
         // Stub::setBasePath( config('modules.paths.modules').'/Base/Console/stubs');
     }
+
+    /**
+     * Set the fix attribute
+     *
+     * @param boolean|int $fix
+     *
+     * @return $this
+     */
+    public function setFix($fix){
+        $this->fix = $fix;
+
+        return $this;
+    }
+
+    /**
+     * Get if the configuration is set as fix or not
+     *
+     * @return boolean|int
+     */
+    public function getFix(){
+        return $this->fix;
+    }
+
 
     /**
      * Set type.
@@ -313,7 +351,7 @@ class RouteGenerator extends Generator
     /**
      * Get the module instance.
      *
-     * @return \Nwidart\Modules\Module
+     * @return string
      */
     public function getRoute()
     {
@@ -551,13 +589,12 @@ class RouteGenerator extends Generator
     {
         $name = $this->getName();
 
-        // dd( get_class($this->module), $name );
 
         if ($this->module->getRouteConfig($name)) {
             // dd($this->force);
             if ($this->force) {
                 // $this->module->delete($name);
-            } else {
+            } else if(!$this->fix){
                 $this->console->error("Module Route [{$name}] already exist!");
 
                 return E_ERROR;
@@ -581,6 +618,7 @@ class RouteGenerator extends Generator
             $this->createRoutePermissions();
 
             if($this->migrate){
+
                 $this->console->call('unusual:migrate', [
                     'module' => $this->module->getStudlyName()
                 ]);
@@ -610,6 +648,7 @@ class RouteGenerator extends Generator
      */
     public function generateFolders()
     {
+
 
         foreach ($this->getFolders() as $key => $folder) {
 
@@ -714,6 +753,8 @@ class RouteGenerator extends Generator
                 + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
             );
 
+
+
             $this->console->call('unusual:make:migration', [
                 'module' => $this->module->getStudlyName(),
                 'name' => "create_{$this->getDBTableName($this->name)}_table",
@@ -722,6 +763,7 @@ class RouteGenerator extends Generator
                 + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
                 + $console_traits
             );
+
 
             $this->generateExtraMigrations();
         }
@@ -758,7 +800,7 @@ class RouteGenerator extends Generator
     }
 
     /**
-     * updateConfigFile
+     * updateRoutesStatuses
      *
      * @return bool
      */
@@ -782,7 +824,11 @@ class RouteGenerator extends Generator
      */
     public function updateConfigFile() :bool
     {
+
         $config = $this->getConfig()->get( $this->getModule()->getSnakeName() ) ?? [];
+
+
+
 
         // $lowerName = $this->getLowerNameReplacement();
         $headline = $this->getHeadline($this->getName());
@@ -792,8 +838,11 @@ class RouteGenerator extends Generator
 
         $configPath = $this->module->getPath().'/Config/config.php';
 
+
         if( $this->getModule()->getName() === $this->getName()){
-            $config['name'] = $config['name'] ?? $studlyName;
+
+            $config['name'] =  $config['name'] ?? $studlyName;
+
             $config['base_prefix'] = $config['base_prefix'] ?? false;
             $config['system_prefix'] = $config['system_prefix'] ?? $config['base_prefix'] ?? false;
             $config['headline'] = $config['headline'] ?? pluralize($headline);
@@ -801,9 +850,12 @@ class RouteGenerator extends Generator
             $config['routes'] = $config['routes'] ?? [];
         }
 
-        if(!$this->plain){
+
+
+     if( !$this->plain){
+
             $route_array = ($this->getModule()->getName() === $this->getName() ? ['parent' => true] : []) + [
-                'name' => $studlyName,
+                'name' =>   $studlyName,
                 'headline' => pluralize($headline),
                 'url' => pluralize($kebabCase),
                 'route_name' => $snakeCase,
@@ -812,8 +864,12 @@ class RouteGenerator extends Generator
                 'headers' => $this->getHeaders(), //in Unusualify\Modularity\Support\Migrations\SchemaParser::class
                 'inputs' => $this->getInputs() //in Unusualify\Modularity\Support\Migrations\SchemaParser::class
             ];
+
+
             $config['routes'][$this->getSnakeCase($this->getName())] = $route_array;
         }
+
+
 
         return $this->filesystem->put($configPath, phpArrayFileContent($config));
 
@@ -1104,5 +1160,26 @@ class RouteGenerator extends Generator
     {
         return config('modules.composer.author.email');
     }
+
+    /**
+     * Check whether the file is presents
+     *
+     * @param string fileName
+     *
+     * @return bool
+     */
+
+    protected function checkFilePresents($fileName){
+        dd(
+            $this->module->getDirectoryPath('**/*/*' . $fileName . '*')
+        );
+        $pattern = base_path('Modules/'.$this->module->getStudlyName().'/**/*/*'.$fileName.'*');
+
+        $search = glob($pattern);
+
+        return empty($search);
+
+    }
+
 
 }

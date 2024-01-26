@@ -3,19 +3,20 @@
 
 namespace Unusualify\Modularity;
 
+
 use Illuminate\Support\ServiceProvider;
 
 final class LaravelServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+
+        // $this->publishMigrations();
+        // $this->mergeMigrations();
         $this->publishConfigs();
-
-        $this->publishMigrations();
-
         $this->publishAssets();
-
         $this->publishViews();
+
     }
 
     /**
@@ -42,10 +43,12 @@ final class LaravelServiceProvider extends ServiceProvider
 
     }
 
+
+
     private function publishAssets(): void
     {
         $this->publishes([
-            __DIR__ . '/../vue/dist' => public_path(),
+            __DIR__ . '/../vue/dist' => public_path(''),
         ], 'assets');
     }
 
@@ -56,6 +59,7 @@ final class LaravelServiceProvider extends ServiceProvider
             __DIR__ . '/config/publishes/translation.php' => config_path('translation.php'),
             __DIR__ . '/config/publishes/publish.php' => config_path('unusual.php'),
             __DIR__ . '/config/publishes/navigation-publish.php' => config_path('unusual-navigation.php'),
+            __DIR__ . '/config/publishes/one-time-operations.php' => config_path('one-time-operations.php'),
             base_path('vendor/torann/geoip/config/geoip.php') => config_path('geoip.php'),
         ], 'config');
 
@@ -67,6 +71,8 @@ final class LaravelServiceProvider extends ServiceProvider
             __DIR__ . '/resources/views/vendor/translation' => resource_path('views/vendor/translation')
         ], 'views');
     }
+
+
 
 
 }

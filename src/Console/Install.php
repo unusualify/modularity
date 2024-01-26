@@ -12,14 +12,14 @@ class Install extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'twill:install';
+    protected $signature = 'unusual:install {--default}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Install Twill into your Laravel application';
+    protected $description = 'Install unusual-modularity into your Laravel application';
 
     /**
      * @var Filesystem
@@ -51,41 +51,36 @@ class Install extends BaseCommand
      */
     public function handle():int
     {
-        //check the database connection before installing
-        try {
-            $this->db->connection()->getPdo();
-        } catch (\Exception $e) {
-            $this->error('Could not connect to the database, please check your configuration:' . "\n" . $e);
-            return 0;
+
+        $operations = [
+            'checkDbConnection',
+            'makeMigrations',
+            'seedingData',
+            'publishConfig',
+            'publishAssets',
+            'publishViews',
+            'createSuperAdmin',
+        ];
+
+
+        $bar = $this->output->createProgressBar(count($operations));
+
+        $bar->start();
+
+        foreach ($operations as $process) {
+            $this->$process();
+            $this->newLine();
+            $bar->advance();
         }
 
-        $this->addRoutesFile();
-        $this->call('migrate');
-        $this->publishConfig();
-        $this->publishAssets();
-        $this->createSuperAdmin();
-        $this->info('All good!');
+        $bar->finish();
+
+        $this->info('Installation is done.');
+
+        return 0;
     }
 
-    /**
-     * Creates the default `admin.php` route configuration file.
-     *
-     * @return void
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     */
-    private function addRoutesFile()
-    {
-        $routesPath = base_path('routes');
 
-        if (!$this->files->exists($routesPath)) {
-            $this->files->makeDirectory($routesPath, 0755, true);
-        }
-
-        if (!$this->files->exists($routesPath . '/admin.php')) {
-            $stub = $this->files->get(__DIR__ . '/stubs/admin.stub');
-            $this->files->put($routesPath . '/admin.php', $stub);
-        }
-    }
 
     /**
      * Calls the command responsible for creation of the default superadmin user.
@@ -94,8 +89,12 @@ class Install extends BaseCommand
      */
     private function createSuperAdmin()
     {
+        $this->info("\t Creating super-admin account");
+
         if (!$this->option('no-interaction')) {
-            $this->call('twill:superadmin');
+            $this->call('unusual:superadmin', [
+                '--default' => $this->option('default'),
+            ]);
         }
     }
 
@@ -106,8 +105,10 @@ class Install extends BaseCommand
      */
     private function publishConfig()
     {
+        $this->info("\t Publishing config files");
+
         $this->call('vendor:publish', [
-            '--provider' => 'Unusualify\Modularity\TwillServiceProvider',
+            '--provider' => 'Unusualify\Modularity\LaravelServiceProvider',
             '--tag' => 'config',
         ]);
     }
@@ -119,10 +120,54 @@ class Install extends BaseCommand
      */
     private function publishAssets()
     {
+        $this->info("\t Publishing default assets");
+
         $this->call('vendor:publish', [
-            '--provider' => 'Unusualify\Modularity\TwillServiceProvider',
+            '--provider' => 'Unusualify\Modularity\LaravelServiceProvider',
             '--tag' => 'assets',
         ]);
     }
 
+    private function publishViews(){
+
+        $this->info("\t Publishing default views");
+
+
+        $this->call('vendor:publish', [
+            '--provider' => 'Unusualify\Modularity\LaravelServiceProvider',
+            '--tag' => 'views'
+        ]);
+    }
+
+    private function checkDbConnection(){
+        $this->newLine();
+        $this->info("\t Checking database connection");
+
+        if(!database_exists()){
+            $this->error('Could not connect to the database, please check your configuration:' . "\n" . $e);
+            return 0;
+        }
+        $this->line('Database connection is fine.');
+    }
+
+    private function makeMigrations(){
+        $this->info("\t Making required migrations");
+        $this->call('migrate');
+
+    }
+
+    /**
+     *
+     * Defined Seeders are
+     *
+     *  - DefaultRolesSeeder
+     *  - DefaultPermissionsSeeder
+     * */
+
+    private function seedingData(){
+        $this->info("\tSeeding required data");
+        $this->call('db:seed', [
+            '--class' => 'Unusualify\Modularity\Database\Seeders\DefaultDatabaseSeeder',
+        ]);
+    }
 }

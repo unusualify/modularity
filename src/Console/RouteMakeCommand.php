@@ -89,9 +89,11 @@ class RouteMakeCommand extends BaseCommand
      */
     public function handle() : int
     {
+
         $route = $this->argument('route');
 
         $module = $this->argument('module');
+
 
         $traits = activeUnusualTraits($this->options());
 
@@ -115,6 +117,7 @@ class RouteMakeCommand extends BaseCommand
             ->setUseDefaults($this->option('no-defaults'))
             ->setPlain($this->option('plain'))
             ->setCustomModel($this->option('custom-model'))
+            ->setFix($this->option('fix'))
             ->generate();
 
         if ($code === E_ERROR) {
@@ -155,6 +158,7 @@ class RouteMakeCommand extends BaseCommand
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
             ['no-migrate', null, InputOption::VALUE_NONE, 'don\'t migrate.'],
             ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
+            ['fix', null, InputOption::VALUE_NONE, 'Fixes the model config errors'],
         ], unusualTraitOptions());
     }
 
