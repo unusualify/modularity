@@ -1,7 +1,6 @@
 <?php
 
 namespace Unusualify\Modularity\Entities;
-
 class Company extends Model
 {
     protected $table = 'unusual_companies';
@@ -20,7 +19,7 @@ class Company extends Model
         'tax_id',
     ];
 
-    public function users()
+    public function users(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(User::class);
     }
