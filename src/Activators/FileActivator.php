@@ -77,8 +77,9 @@ class FileActivator extends ActivatorsFileActivator
     {
         $this->module = $module;
         $this->statusesFile = base_path( config('modules.namespace') . "/" . $this->module ."/" . $this->config('statuses-file')) ;
-
         $this->routesStatuses = $this->getRoutesStatuses();
+
+return $this;
     }
 
     /**
@@ -99,7 +100,7 @@ class FileActivator extends ActivatorsFileActivator
      * @return array
      * @throws FileNotFoundException
      */
-    private function getRoutesStatuses(): array
+    public function getRoutesStatuses(): array
     {
         if (!$this->config->get(unusualBaseKey() . '.cache.enabled')) {
             return $this->readRoutesJson();
@@ -174,7 +175,7 @@ class FileActivator extends ActivatorsFileActivator
      * @return array
      * @throws FileNotFoundException
      */
-    private function readRoutesJson(): array
+    public function readRoutesJson(): array
     {
         if (!$this->files->exists($this->statusesFile)) {
             return [];
@@ -197,5 +198,10 @@ class FileActivator extends ActivatorsFileActivator
     {
         $this->cache->forget($this->cacheKey);
     }
+
+    public function getRoutes(){
+        return array_keys(json_decode($this->files->get($this->statusesFile), true));
+    }
+
 
 }

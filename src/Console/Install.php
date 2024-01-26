@@ -75,6 +75,7 @@ class Install extends BaseCommand
 
 
         $bar->finish();
+        $this->newLine();
         $this->info('Installation is done.');
         return 0;
     }

@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Foundation\ProviderRepository;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\AliasLoader;
+use Unusualify\Modularity\Activators\FileActivator;
 
 class Module extends NwidartModule
 {
@@ -35,8 +36,9 @@ class Module extends NwidartModule
         $path ??= $app['config']->get('modules.paths.modules');
         parent::__construct($app, $name, $path);
 
-        $this->moduleActivator = $app['unusual.activator'];
-        $this->moduleActivator->setModule($name);
+        // $this->moduleActivator = $app['unusual.activator'];
+        $this->moduleActivator = (new FileActivator($app))->setModule($this->getName());
+        // $this->moduleActivator->setModule($name);
 
         // $this->config =
         // dd($this->moduleActivator, $app);
@@ -73,6 +75,15 @@ class Module extends NwidartModule
         $this->flushModuleCache();
 
         $this->fireModuleEvent('disabled', $route);
+    }
+
+
+    /**
+     *
+     */
+    public function getRoutes()
+    {
+        return $this->moduleActivator->getRoutes();
     }
 
     /**
