@@ -14,7 +14,7 @@ return new class extends Migration
         $companyTableName = config(unusualBaseKey().'.tables.companies', 'companies');
         Schema::table( config(unusualBaseKey().'.tables.users', 'users'), function (Blueprint $table) use($companyTableName) {
 
-            $table->after('name', function ($table) {
+            $table->after('id', function ($table) {
                 $table->unsignedBigInteger('company_id')->nullable(); // Foreign key column
             });
             $table->foreign('company_id')
@@ -22,8 +22,8 @@ return new class extends Migration
                 ->on($companyTableName)
                 ->cascadeOnUpdate()
                 ->onDelete('set null');
-
         });
+
     }
 
     /**

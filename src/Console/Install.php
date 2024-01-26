@@ -73,10 +73,9 @@ class Install extends BaseCommand
             $bar->advance();
         }
 
+
         $bar->finish();
-
         $this->info('Installation is done.');
-
         return 0;
     }
 
@@ -144,7 +143,7 @@ class Install extends BaseCommand
         $this->info("\t Checking database connection");
 
         if(!database_exists()){
-            $this->error('Could not connect to the database, please check your configuration:' . "\n" . $e);
+            $this->error('Could not connect to the database, please check your configuration:' . "\n");
             return 0;
         }
         $this->line('Database connection is fine.');
@@ -170,4 +169,5 @@ class Install extends BaseCommand
             '--class' => 'Unusualify\Modularity\Database\Seeders\DefaultDatabaseSeeder',
         ]);
     }
+
 }
