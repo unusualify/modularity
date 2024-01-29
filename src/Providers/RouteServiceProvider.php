@@ -23,7 +23,7 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {
         // $this->registerMacros();
-        echo "\n RouteServiceProvider boot";
+
         $this->bootMacros();
 
         $this->bootRouteMiddlewares($this->app->get('router'));
@@ -37,7 +37,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map(Router $router)
     {
-        echo "\n RouteServiceProvider map";
+
 
         UnusualRoutes::configureRoutePatterns();
 

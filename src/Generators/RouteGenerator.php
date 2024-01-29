@@ -185,6 +185,7 @@ class RouteGenerator extends Generator
         $this->console = $console;
         $this->module = $module;
 
+
         // Stub::setBasePath( config('modules.paths.modules').'/Base/Console/stubs');
     }
 
@@ -587,6 +588,7 @@ class RouteGenerator extends Generator
      */
     public function generate() : int
     {
+
         $name = $this->getName();
 
 
@@ -601,7 +603,12 @@ class RouteGenerator extends Generator
             }
         }
 
-        $this->updateConfigFile();
+        if($this->fix){
+            $this->fixConfigFiles();
+        }else{
+            $this->updateConfigFile();
+        }
+
 
         $this->addLanguageVariable();
 
@@ -617,7 +624,7 @@ class RouteGenerator extends Generator
 
             $this->createRoutePermissions();
 
-            if($this->migrate){
+            if($this->migrate && !$this->fix){
 
                 $this->console->call('unusual:migrate', [
                     'module' => $this->module->getStudlyName()
@@ -638,7 +645,7 @@ class RouteGenerator extends Generator
         // }
         // $this->activator->setActiveByName($name, $this->isActive);
 
-        $this->console->info("Route [{$name}] created successfully.");
+        $this->console->info("Route [{$name}] " .($this->fix ? 'fixed' : 'created'). " successfully.");
 
         return 0;
     }
@@ -756,15 +763,17 @@ class RouteGenerator extends Generator
             );
 
 
+            if(!$this->checkFileExists("create_{$this->getDBTableName($this->name)}_table") && !$this->fix){
+                $this->console->call('unusual:make:migration', [
+                    'module' => $this->module->getStudlyName(),
+                    'name' => "create_{$this->getDBTableName($this->name)}_table",
+                    ]
+                    + ( $this->schema ?  ['--fields' => $this->schema] : [])
+                    + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
+                    + $console_traits
+                );
+            }
 
-            $this->console->call('unusual:make:migration', [
-                'module' => $this->module->getStudlyName(),
-                'name' => "create_{$this->getDBTableName($this->name)}_table",
-                ]
-                + ( $this->schema ?  ['--fields' => $this->schema] : [])
-                + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
-                + $console_traits
-            );
 
 
             $this->generateExtraMigrations();
@@ -827,37 +836,36 @@ class RouteGenerator extends Generator
     public function updateConfigFile() :bool
     {
 
-        $config = $this->getConfig()->get( $this->getModule()->getSnakeName() ) ?? [];
+
+        $config = $this->getConfig()->get( $this->getModule()->getSnakeName()) ?? [];
 
 
-
-
-        // $lowerName = $this->getLowerNameReplacement();
         $headline = $this->getHeadline($this->getName());
         $studlyName = $this->getStudlyNameReplacement();
         $kebabCase = $this->getKebabCase($this->getName());
         $snakeCase = $this->getSnakeCase($this->getName());
-
+        $lowerCase = lowerName($this->getName());
         $configPath = $this->module->getPath().'/Config/config.php';
 
 
-        if( $this->getModule()->getName() === $this->getName()){
+        if($this->getModule()->getName() === $this->getName()){
 
             $config['name'] =  $config['name'] ?? $studlyName;
-
             $config['base_prefix'] = $config['base_prefix'] ?? false;
             $config['system_prefix'] = $config['system_prefix'] ?? $config['base_prefix'] ?? false;
             $config['headline'] = $config['headline'] ?? pluralize($headline);
             // $config['parent_route'] = $route_array;
             $config['routes'] = $config['routes'] ?? [];
+
         }
 
 
 
-     if( !$this->plain){
+
+        if(!$this->plain){
 
             $route_array = ($this->getModule()->getName() === $this->getName() ? ['parent' => true] : []) + [
-                'name' =>   $studlyName,
+                'name' =>  $studlyName,
                 'headline' => pluralize($headline),
                 'url' => pluralize($kebabCase),
                 'route_name' => $snakeCase,
@@ -873,9 +881,58 @@ class RouteGenerator extends Generator
 
 
 
+
         return $this->filesystem->put($configPath, phpArrayFileContent($config));
 
     }
+
+    public function fixConfigFiles(){
+        if($this->fix){
+            $config = $this->getConfig()->get( $this->getModule()->getSnakeName()) ?? [];
+
+            $headline = $this->getHeadline($this->getName());
+            $studlyName = $this->getStudlyNameReplacement();
+            $kebabCase = $this->getKebabCase($this->getName());
+            $snakeCase = $this->getSnakeCase($this->getName());
+            $lowerCase = lowerName($this->getName());
+            $configPath = $this->module->getPath().'/Config/config.php';
+
+            if($this->getModule()->getName() === $this->getName()){
+
+                $config['name'] =  $config['name'] ?? $studlyName;
+                $config['base_prefix'] = $config['base_prefix'] ?? false;
+                $config['system_prefix'] = $config['system_prefix'] ?? $config['base_prefix'] ?? false;
+                $config['headline'] = $config['headline'] ?? pluralize($headline);
+                // $config['parent_route'] = $route_array;
+                $config['routes'] = $config['routes'] ?? [];
+
+            }
+
+            $route_array = ($this->getModule()->getName() === $this->getName() ? ['parent' => true] : []) + [
+                'name' =>  $studlyName,
+                'headline' => pluralize($headline),
+                'url' => pluralize($kebabCase),
+                'route_name' => $snakeCase,
+                'icon' => '', //'$modules',
+                'table_options' => static::$defaultTableOptions,
+                'headers' => $this->getHeaders(), //in Unusualify\Modularity\Support\Migrations\SchemaParser::class
+                'inputs' => $this->getInputs() //in Unusualify\Modularity\Support\Migrations\SchemaParser::class
+            ];
+
+
+            $config['routes'][$this->getSnakeCase($this->getName())] = $route_array;
+            $this->module->setConfig($config);
+
+            return $this->filesystem->put($configPath, phpArrayFileContent($config));
+
+        }
+
+
+
+    }
+
+
+
 
     /**
      * addLanguageVariable
@@ -966,14 +1023,18 @@ class RouteGenerator extends Generator
                     // $route_name = $options[1]; // package_feature
                     $pivot_table_name = snakeCase($this->name) . '_' . $route_name;
 
-                    $this->console->call('unusual:make:migration', [
-                        '--relational' => true,
-                        '--no-defaults' => true,
-                        'module' => $this->module->getStudlyName(),
-                        'name' => "create_{$pivot_table_name}_table",
-                        ]
-                        + ( $this->schema ?  ['--fields' => $schema] : [])
-                    );
+                    if(!$this->checkFileExists("create_{$pivot_table_name}_table")){
+
+                        $this->console->call('unusual:make:migration', [
+                            '--relational' => true,
+                            '--no-defaults' => true,
+                            'module' => $this->module->getStudlyName(),
+                            'name' => "create_{$pivot_table_name}_table",
+                            ]
+                            + ( $this->schema ?  ['--fields' => $schema] : [])
+                        );
+                    }
+
                 }
             }
 
@@ -1170,15 +1231,13 @@ class RouteGenerator extends Generator
      * @return bool
      */
 
-    protected function checkFilePresents($fileName){
-        dd(
-            $this->module->getDirectoryPath('**/*/*' . $fileName . '*')
-        );
-        $pattern = base_path('Modules/'.$this->module->getStudlyName().'/**/*/*'.$fileName.'*');
+    protected function checkFileExists($fileName){
 
+        $pattern = $this->module->getDirectoryPath('**/*/*' . $fileName . '*');
+        // $pattern = base_path('Modules/'.$this->module->getStudlyName().'/**/*/*'.$fileName.'*');
         $search = glob($pattern);
 
-        return empty($search);
+        return !empty($search);
 
     }
 

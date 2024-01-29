@@ -149,9 +149,12 @@ if (! function_exists('formatRulesSchema')) {
 }
 
 
-if(! function_exists('stringExists')){
-    function getStringOrFalse(mixed $val): mixed {
-        return !empty($val) ? $val : null;
+if(! function_exists('getValueOrFalse')){
+
+    function getValueOrFalse(mixed $val = null): mixed {
+
+
+        return isset($val) ? (!empty($val) ? $val : null) : false;
     }
 }
 

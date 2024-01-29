@@ -209,6 +209,12 @@ class Module extends NwidartModule
         return $this->app['config']->get("{$this->getSnakeName()}{$notation}", []);
     }
 
+    public function setConfig($newConfig,$notation = null, ): mixed{
+        $notation = !$notation ? '' : ".{$notation}";
+
+        return $this->app['config']->set("{$this->getSnakeName()}{$notation}", $newConfig);
+    }
+
     /**
      * getParentRoute
      *
