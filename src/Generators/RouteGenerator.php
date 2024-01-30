@@ -612,9 +612,9 @@ class RouteGenerator extends Generator
 
         $this->addLanguageVariable();
 
-        $this->updateRoutesStatuses();
-
         if(!$this->plain){
+
+            $this->updateRoutesStatuses();
 
             $this->generateFolders();
 
@@ -836,9 +836,7 @@ class RouteGenerator extends Generator
     public function updateConfigFile() :bool
     {
 
-
         $config = $this->getConfig()->get( $this->getModule()->getSnakeName()) ?? [];
-
 
         $headline = $this->getHeadline($this->getName());
         $studlyName = $this->getStudlyNameReplacement();
@@ -846,7 +844,6 @@ class RouteGenerator extends Generator
         $snakeCase = $this->getSnakeCase($this->getName());
         $lowerCase = lowerName($this->getName());
         $configPath = $this->module->getPath().'/Config/config.php';
-
 
         if($this->getModule()->getName() === $this->getName()){
 
@@ -858,9 +855,6 @@ class RouteGenerator extends Generator
             $config['routes'] = $config['routes'] ?? [];
 
         }
-
-
-
 
         if(!$this->plain){
 
@@ -879,15 +873,14 @@ class RouteGenerator extends Generator
             $config['routes'][$this->getSnakeCase($this->getName())] = $route_array;
         }
 
-
-
-
         return $this->filesystem->put($configPath, phpArrayFileContent($config));
 
     }
 
     public function fixConfigFiles(){
+
         if($this->fix){
+
             $config = $this->getConfig()->get( $this->getModule()->getSnakeName()) ?? [];
 
             $headline = $this->getHeadline($this->getName());
@@ -921,6 +914,7 @@ class RouteGenerator extends Generator
 
 
             $config['routes'][$this->getSnakeCase($this->getName())] = $route_array;
+
             $this->module->setConfig($config);
 
             return $this->filesystem->put($configPath, phpArrayFileContent($config));
