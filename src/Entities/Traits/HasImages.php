@@ -55,14 +55,14 @@ trait HasImages
     private function findMedia($role, $crop = 'default')
     {
         $media = $this->medias->first(function ($media) use ($role, $crop) {
-            if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
+            if (unusualConfig('media_library.translated_form_fields', false)) {
                 $localeScope = $media->pivot->locale === app()->getLocale();
             }
 
             return $media->pivot->role === $role && $media->pivot->crop === $crop && ($localeScope ?? true);
         });
 
-        if (! $media && config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
+        if (! $media && unusualConfig('media_library.translated_form_fields', false)) {
             $media = $this->medias->first(function ($media) use ($role, $crop) {
                 return $media->pivot->role === $role && $media->pivot->crop === $crop;
             });
@@ -254,7 +254,7 @@ trait HasImages
     {
         if (!$media) {
             $media = $this->medias->first(function ($media) use ($role) {
-                if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
+                if (unusualConfig('media_library.translated_form_fields', false)) {
                     $localeScope = $media->pivot->locale === app()->getLocale();
                 }
 
@@ -280,7 +280,7 @@ trait HasImages
     {
         if (!$media) {
             $media = $this->medias->first(function ($media) use ($role) {
-                if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
+                if (unusualConfig('media_library.translated_form_fields', false)) {
                     $localeScope = $media->pivot->locale === app()->getLocale();
                 }
 
@@ -306,7 +306,7 @@ trait HasImages
     {
         if (!$media) {
             $media = $this->medias->first(function ($media) use ($role) {
-                if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
+                if (unusualConfig('media_library.translated_form_fields', false)) {
                     $localeScope = $media->pivot->locale === app()->getLocale();
                 }
 

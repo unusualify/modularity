@@ -57,7 +57,7 @@ class UnusualRoutes
 
                 $router->group(
                     $groupOptions + [
-                        // 'domain' => config(unusualBaseKey() . '.app_url', env('APP_URL')),
+                        // 'domain' => unusualConfig('app_url', env('APP_URL')),
                     ],
                     $hostRoutes
                 );

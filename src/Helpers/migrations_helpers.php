@@ -8,7 +8,7 @@ if (!function_exists('unusualIncrementsMethod')) {
      */
     function unusualIncrementsMethod()
     {
-        return config(unusualBaseKey().'.use_big_integers_on_migrations')
+        return unusualConfig('use_big_integers_on_migrations')
             ? 'bigIncrements'
             : 'increments';
     }
@@ -20,7 +20,7 @@ if (!function_exists('unusualIntegerMethod')) {
      */
     function unusualIntegerMethod()
     {
-        return config(unusualBaseKey().'.use_big_integers_on_migrations')
+        return unusualConfig('use_big_integers_on_migrations')
             ? 'bigInteger'
             : 'integer';
     }
@@ -199,6 +199,6 @@ if (!function_exists('createDefaultRevisionsTableFields')) {
         $table->timestamps();
         $table->json('payload');
         $table->foreign("{$tableNameSingular}_id")->references('id')->on("{$tableNamePlural}")->onDelete('cascade');
-        $table->foreign('user_id')->references('id')->on(config(unusualBaseKey().'.tables.users', 'admin_users'))->onDelete('set null');
+        $table->foreign('user_id')->references('id')->on(unusualConfig('tables.users', 'admin_users'))->onDelete('set null');
     }
 }

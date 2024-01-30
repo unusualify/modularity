@@ -23,7 +23,7 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {
         // $this->registerMacros();
-        echo "\n RouteServiceProvider boot";
+
         $this->bootMacros();
 
         $this->bootRouteMiddlewares($this->app->get('router'));
@@ -37,8 +37,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map(Router $router)
     {
-        echo "\n RouteServiceProvider map";
-
         UnusualRoutes::configureRoutePatterns();
 
         $this->mapSystemRoutes(
@@ -96,7 +94,7 @@ class RouteServiceProvider extends ServiceProvider
                         // internal routes web.php
                         $router->group(
                             [
-                                // 'domain' => config(unusualBaseKey() . '.admin_app_url'),
+                                // 'domain' => unusualConfig('admin_app_url'),
                             ],
                             function ($router) use (
                                 $supportSubdomainRouting
@@ -117,7 +115,7 @@ class RouteServiceProvider extends ServiceProvider
                         // if ($supportSubdomainRouting) {
                         //     $router->group(
                         //         [
-                        //             'domain' => config(unusualBaseKey() . '.admin_app_subdomain', 'admin') .
+                        //             'domain' => unusualConfig('admin_app_subdomain', 'admin') .
                         //             '.{subdomain}.' .
                         //             config('app.url'),
                         //         ],
@@ -132,12 +130,12 @@ class RouteServiceProvider extends ServiceProvider
         );
 
         if (
-            config(unusualBaseKey() . '.media_library.image_service') ===
+            unusualConfig('media_library.image_service') ===
             'Unusualify\Modularity\Services\MediaLibrary\Glide'
         ) {
             $router
                 ->get(
-                    '/' . config(unusualBaseKey() . '.glide.base_path') . '/{path}',
+                    '/' . unusualConfig('glide.base_path') . '/{path}',
                     GlideController::class
                 )
                 ->where('path', '.*');
@@ -150,7 +148,6 @@ class RouteServiceProvider extends ServiceProvider
     ) {
         $groupOptions = UnusualRoutes::groupOptions();
 
-        // foreach(Module::allEnabled() as $module){
         foreach(Modularity::allEnabled() as $module){
             $router->group([
                     ...$groupOptions,
@@ -743,7 +740,7 @@ class RouteServiceProvider extends ServiceProvider
     public static function shouldPrefixRouteName($groupPrefix, $lastRouteGroupName)
     {
         return ! empty($groupPrefix) && (blank($lastRouteGroupName) ||
-            config(unusualBaseKey() . '.allow_duplicates_on_route_names', true) ||
+            unusualConfig('allow_duplicates_on_route_names', true) ||
             (! Str::endsWith($lastRouteGroupName, ".{$groupPrefix}.")));
     }
 
@@ -765,10 +762,10 @@ class RouteServiceProvider extends ServiceProvider
             '.'
         );
 
-        if (! empty(config(unusualBaseKey() . '.admin_app_path'))) {
+        if (! empty(unusualConfig('admin_app_path'))) {
             $groupPrefix = ltrim(
                 str_replace(
-                    config(unusualBaseKey() . '.admin_app_path'),
+                    unusualConfig('admin_app_path'),
                     '',
                     $groupPrefix
                 ),

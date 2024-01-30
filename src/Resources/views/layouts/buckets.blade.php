@@ -32,7 +32,7 @@
 @stop
 
 @section('initialStore')
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.buckets = {
+    window['{{ unusualConfig('js_namespace') }}'].STORE.buckets = {
         saveUrl: {!! json_encode($saveUrl) !!},
         items: {!! json_encode($items) !!},
         source: {!! json_encode($source) !!},

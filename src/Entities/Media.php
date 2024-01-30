@@ -23,11 +23,11 @@ class Media extends Model
 
     public function __construct(array $attributes = [])
     {
-        $this->fillable(array_merge($this->fillable, Collection::make(config(unusualBaseKey() . '.media_library.extra_metadatas_fields'))->map(function ($field) {
+        $this->fillable(array_merge($this->fillable, Collection::make(unusualConfig('media_library.extra_metadatas_fields', []))->map(function ($field) {
             return $field['name'];
         })->toArray()));
 
-        Collection::make(config(unusualBaseKey() . '.media_library.translatable_metadatas_fields'))->each(function ($field) {
+        Collection::make(unusualConfig('media_library.translatable_metadatas_fields', []))->each(function ($field) {
             $this->casts[$field] = 'json';
         });
 
@@ -88,7 +88,7 @@ class Media extends Model
                     'caption' => $this->caption,
                     'altText' => $this->alt_text,
                     'video' => null,
-                ] + Collection::make(config(unusualBaseKey() . '.media_library.extra_metadatas_fields'))->mapWithKeys(function ($field) {
+                ] + Collection::make(unusualConfig('media_library.extra_metadatas_fields', []))->mapWithKeys(function ($field) {
                     return [
                         $field['name'] => $this->{$field['name']},
                     ];
@@ -113,7 +113,7 @@ class Media extends Model
 
         $fallbackLocale = config('translatable.fallback_locale');
 
-        if (in_array($name, config(unusualBaseKey() . '.media_library.translatable_metadatas_fields', [])) && config('translatable.use_property_fallback', false) && ($metadatas->$name->$fallbackLocale ?? false)) {
+        if (in_array($name, unusualConfig('media_library.translatable_metadatas_fields', [])) && config('translatable.use_property_fallback', false) && ($metadatas->$name->$fallbackLocale ?? false)) {
             return $metadatas->$name->$fallbackLocale;
         }
 
@@ -121,7 +121,7 @@ class Media extends Model
 
         $fallback = $fallback ?? $name;
 
-        if (in_array($fallback, config(unusualBaseKey() . '.media_library.translatable_metadatas_fields', []))) {
+        if (in_array($fallback, unusualConfig('media_library.translatable_metadatas_fields', []))) {
             $fallbackValue = $fallbackValue[$language] ?? '';
 
             if ($fallbackValue === '' && config('translatable.use_property_fallback', false)) {

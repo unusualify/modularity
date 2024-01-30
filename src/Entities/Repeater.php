@@ -2,12 +2,6 @@
 
 namespace Unusualify\Modularity\Entities;
 
-use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Unusualify\Modularity\Entities\Traits\HasFiles;
-use Unusualify\Modularity\Entities\Traits\HasImages;
-use Unusualify\Modularity\Entities\Traits\HasPresenter;
-use Unusualify\Modularity\Entities\Traits\HasRelated;
-
 /**
  * No reverse relationship needed.
  * Repeater has one way access from the module it belongs to, (MorphTo).
@@ -18,8 +12,6 @@ use Unusualify\Modularity\Entities\Traits\HasRelated;
  */
 class Repeater extends Model
 {
-    public $table = 'umod_repeaters';
-
     protected $fillable = [
         'repatable_id',
         'content',
@@ -31,4 +23,9 @@ class Repeater extends Model
     protected $casts = [
         'content' => 'array',
     ];
+
+    public function getTable()
+    {
+        return unusualConfig('tables.repeaters', parent::getTable());
+    }
 }

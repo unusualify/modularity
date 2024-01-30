@@ -11,7 +11,7 @@ return [
     |
      */
 
-    'source' => env('GLIDE_SOURCE', storage_path('app/public/' . config(unusualBaseKey() . '.media_library.local_path'))),
+    'source' => env('GLIDE_SOURCE', storage_path('app/public/' . unusualConfig('media_library.local_path'))),
     'cache' => env('GLIDE_CACHE', storage_path('app')),
     'cache_path_prefix' => env('GLIDE_CACHE_PATH_PREFIX', 'glide_cache'),
     'base_url' => env('GLIDE_BASE_URL', config('app.url')),

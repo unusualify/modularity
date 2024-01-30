@@ -168,7 +168,7 @@ if (!function_exists('moduleRoute')) {
 
         // Prefix it with module name only if prefix doesn't contains it already
         if (
-            config(unusualBaseKey() . '.allow_duplicates_on_route_names', false) ||
+            unusualConfig('allow_duplicates_on_route_names', false) ||
             ($prefix !== $moduleName &&
                 !Str::endsWith($prefix, '.' . $moduleName))
         ) {
@@ -238,7 +238,7 @@ if (!function_exists('unusualRoute')) {
 
         // Prefix it with module name only if prefix doesn't contains it already
         if (
-            config(unusualBaseKey() . '.allow_duplicates_on_route_names', false) ||
+            unusualConfig('allow_duplicates_on_route_names', false) ||
             ($prefix !== $route &&
                 !Str::endsWith($prefix, '.' . $route))
         ) {

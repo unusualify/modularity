@@ -30,11 +30,11 @@ class Setting extends Model
 
     public function getTable()
     {
-        return config(unusualBaseKey() . '.settings_table', 'twill_settings');
+        return unusualConfig('settings_table', 'twill_settings');
     }
 
     protected function getTranslationRelationKey(): string
     {
-        return Str::singular(config(unusualBaseKey() . '.settings_table', 'twill_settings')) . '_id';
+        return Str::singular(unusualConfig('settings_table', 'twill_settings')) . '_id';
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\App;
 if (!function_exists('unusualTrans')) {
     function unusualTrans($key, $replace = [])
     {
-        $locale = config(unusualBaseKey() . '.locale', config(unusualBaseKey() . '.fallback_locale', 'en'));
+        $locale = unusualConfig('locale', unusualConfig('fallback_locale', 'en'));
         return trans($key, $replace, $locale);
     }
 }

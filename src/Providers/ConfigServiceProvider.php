@@ -99,14 +99,14 @@ class ConfigServiceProvider extends ServiceProvider
 
 
         if (
-            config(unusualBaseKey() . '.media_library.endpoint_type') === 'local'
-            && config(unusualBaseKey() . '.media_library.disk') === unusualBaseKey() . '_media_library'
+            unusualConfig('media_library.endpoint_type') === 'local'
+            && unusualConfig('media_library.disk') === unusualBaseKey() . '_media_library'
         ) {
             $this->setLocalDiskUrl('media');
         }
 
-        if (config(unusualBaseKey() . '.file_library.endpoint_type') === 'local'
-            && config(unusualBaseKey() . '.file_library.disk') === unusualBaseKey() . '_file_library') {
+        if (unusualConfig('file_library.endpoint_type') === 'local'
+            && unusualConfig('file_library.disk') === unusualBaseKey() . '_file_library') {
             $this->setLocalDiskUrl('file');
         }
     }
@@ -140,7 +140,7 @@ class ConfigServiceProvider extends ServiceProvider
             . '://'
             . str_replace(['http://', 'https://'], '', config('app.url'))
             . '/storage/'
-            . trim(config(unusualBaseKey() . '.' . $type . '_library.local_path'), '/ '),
+            . trim(unusualConfig('' . $type . '_library.local_path'), '/ '),
         ]);
     }
 

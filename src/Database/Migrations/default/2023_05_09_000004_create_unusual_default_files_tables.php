@@ -13,8 +13,8 @@ class CreateUnusualDefaultFilesTables extends Migration
      */
     public function up()
     {
-        $unusualFilesTable = config(unusualBaseKey() . '.tables.files', 'modularity_files');
-        $unusualFileablesTable = config(unusualBaseKey() . '.tables.fileables', 'modularity_fileables');
+        $unusualFilesTable = unusualConfig('tables.files', 'modularity_files');
+        $unusualFileablesTable = unusualConfig('tables.fileables', 'modularity_fileables');
 
         if (!Schema::hasTable($unusualFilesTable)) {
             Schema::create($unusualFilesTable, function (Blueprint $table) {
@@ -50,8 +50,8 @@ class CreateUnusualDefaultFilesTables extends Migration
      */
     public function down()
     {
-        $unusualFilesTable = config(unusualBaseKey() . '.tables.files', 'modularity_files');
-        $unusualFileablesTable = config(unusualBaseKey() . '.tables.fileables', 'modularity_fileables');
+        $unusualFilesTable = unusualConfig('tables.files', 'modularity_files');
+        $unusualFileablesTable = unusualConfig('tables.fileables', 'modularity_fileables');
 
         Schema::dropIfExists($unusualFileablesTable);
         Schema::dropIfExists($unusualFilesTable);

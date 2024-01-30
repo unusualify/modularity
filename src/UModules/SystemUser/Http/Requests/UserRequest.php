@@ -24,7 +24,7 @@ class UserRequest extends Request
     {
         $table_name = $this->model()->getTable();
         return [
-            'name' => "sometimes|required|unique:$table_name|min:4",
+            // 'name' => "sometimes|required|unique:$table_name|min:4",
         ];
     }
 
@@ -32,7 +32,7 @@ class UserRequest extends Request
     {
         $table_name = $this->model()->getTable();
         return [
-            'name' => "sometimes|required|min:3|unique:{$table_name},name,".$this->id,
+            // 'name' => "sometimes|required|min:3|unique:{$table_name},name,".$this->id,
         ];
     }
 

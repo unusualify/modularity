@@ -123,7 +123,7 @@ class Module extends NwidartModule
     private function flushModuleCache(): void
     {
 
-        if (config(unusualBaseKey() . '.cache.enabled')) {
+        if (unusualConfig('cache.enabled')) {
             $this->cache->store()->flush();
         }
     }

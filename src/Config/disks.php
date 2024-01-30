@@ -8,13 +8,13 @@ $localRootPrefix = storage_path('app/public/');
 $mediaLocalConfig = [
     'driver' => 'local',
     'visibility' => 'public',
-    'root' => $localRootPrefix . trim(config(unusualBaseKey() . '.media_library.local_path'), '/'),
+    'root' => $localRootPrefix . trim(unusualConfig('media_library.local_path'), '/'),
 ];
 
 $fileLocalConfig = [
     'driver' => 'local',
     'visibility' => 'public',
-    'root' => $localRootPrefix . trim(config(unusualBaseKey() . '.file_library.local_path'), '/ '),
+    'root' => $localRootPrefix . trim(unusualConfig('file_library.local_path'), '/ '),
 ];
 
 $s3Config = [
