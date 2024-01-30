@@ -57,7 +57,7 @@ class User extends AuthenticatableContract
 
     public function __construct(array $attributes = [])
     {
-        $this->table = config(unusualBaseKey() . '.users_table', 'twill_users');
+        $this->table = unusualConfig('users_table', 'twill_users');
 
         parent::__construct($attributes);
     }

@@ -378,7 +378,7 @@ class BaseServiceProvider extends ServiceProvider
             // . str_replace(['http://', 'https://'], '', config('app.url'))
             . request()->getHttpHost()
             . '/storage/'
-            . trim(config(unusualBaseKey() . '.' . $type . '_library.local_path'), '/ '),
+            . trim( unusualConfig($type . '_library.local_path'), '/ '),
         ]);
     }
 }

@@ -47,11 +47,11 @@
 @stop
 
 @section('initialStore')
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.crops = {!! json_encode(config('unusual.settings.crops') ?? []) !!}
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.selected = {}
+    window['{{ unusualConfig('js_namespace') }}'].STORE.medias.crops = {!! json_encode(config('unusual.settings.crops') ?? []) !!}
+    window['{{ unusualConfig('js_namespace') }}'].STORE.medias.selected = {}
 
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.browser = {}
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.browser.selected = {}
+    window['{{ unusualConfig('js_namespace') }}'].STORE.browser = {}
+    window['{{ unusualConfig('js_namespace') }}'].STORE.browser.selected = {}
 @stop
 
 @push('post_js')

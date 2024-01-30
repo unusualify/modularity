@@ -78,7 +78,7 @@ class Block extends BaseModel
 
     public function getPresenterAttribute()
     {
-        if (($presenter = config(unusualBaseKey() . '.block_editor.block_presenter_path')) != null) {
+        if (($presenter = unusualConfig('block_editor.block_presenter_path')) != null) {
             return $presenter;
         }
 
@@ -87,6 +87,6 @@ class Block extends BaseModel
 
     public function getTable()
     {
-        return config(unusualBaseKey() . '.blocks_table', 'twill_blocks');
+        return unusualConfig('blocks_table', 'twill_blocks');
     }
 }

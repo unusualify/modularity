@@ -31,13 +31,13 @@
 @endpush
 
 @section('STORE')
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {
+    window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
+    window['{{ unusualConfig('js_namespace') }}'].STORE.form = {
         inputs: {!! json_encode($formSchema) !!},
         fields: []
     }
 
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.datatable = {
+    window['{{ unusualConfig('js_namespace') }}'].STORE.datatable = {
         baseUrl: '{{ rtrim(config('app.url'), '/') . '/' }}',
         headers: {!! json_encode($headers) !!},
         searchText: '{{ $searchText ?? '' }}',

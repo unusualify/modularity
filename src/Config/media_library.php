@@ -27,7 +27,7 @@ return [
     'filesize_limit' => env('MEDIA_LIBRARY_FILESIZE_LIMIT', 50),
     'allowed_extensions' => ['svg', 'jpg', 'gif', 'png', 'jpeg'],
     'init_alt_text_from_filename' => true,
-    'prefix_uuid_with_local_path' => config(unusualBaseKey() . '.file_library.prefix_uuid_with_local_path', false),
+    'prefix_uuid_with_local_path' => unusualConfig('file_library.prefix_uuid_with_local_path', false),
     'translated_form_fields' => true,
     'show_file_name' => false,
     /*

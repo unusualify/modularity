@@ -13,7 +13,7 @@ class CreateUnusualDefaultTagsTables extends Migration
      */
     public function up()
     {
-        $unusualTaggedTable = config(unusualBaseKey() . '.tables.tagged', 'tagged');
+        $unusualTaggedTable = unusualConfig('tables.tagged', 'modularity_tagged');
 
         if (!Schema::hasTable($unusualTaggedTable)) {
             Schema::create($unusualTaggedTable, function (Blueprint $table) {
@@ -26,7 +26,7 @@ class CreateUnusualDefaultTagsTables extends Migration
         }
 
 
-        $unusualTagsTable = config(unusualBaseKey() . '.tables.tags', 'tags');
+        $unusualTagsTable = unusualConfig('tables.tags', 'modularity_tags');
 
         if (!Schema::hasTable($unusualTagsTable)) {
             Schema::create($unusualTagsTable, function (Blueprint $table) {
@@ -46,7 +46,7 @@ class CreateUnusualDefaultTagsTables extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(config(unusualBaseKey() . '.tables.tags', 'tags'));
-        Schema::dropIfExists(config(unusualBaseKey() . '.tables.tagged', 'tagged'));
+        Schema::dropIfExists(unusualConfig('tables.tags', 'modularity_tags'));
+        Schema::dropIfExists(unusualConfig('tables.tagged', 'modularity_tagged'));
     }
 }

@@ -27,19 +27,19 @@ class Localization
     public function compose(View $view)
     {
 
-        $name = snakeCase( config(unusualBaseKey() . '.name') );
+        $name = snakeCase( unusualConfig('name') );
 
-        // $currentLang = Lang::get("{$name}::lang", [], config(unusualBaseKey() . '.locale'));
-        $currentLang = Lang::get('*', [], config(unusualBaseKey() . '.locale'));
+        // $currentLang = Lang::get("{$name}::lang", [], unusualConfig('locale'));
+        $currentLang = Lang::get('*', [], unusualConfig('locale'));
 
-        // $fallbackLang = Lang::get("{$name}::lang", [], config(unusualBaseKey() . '.fallback_locale', 'en'));
-        $fallbackLang = Lang::get('*', [], config(unusualBaseKey() . '.fallback_locale', 'en'));
+        // $fallbackLang = Lang::get("{$name}::lang", [], unusualConfig('fallback_locale', 'en'));
+        $fallbackLang = Lang::get('*', [], unusualConfig('fallback_locale', 'en'));
 
         $lang = array_replace_recursive($fallbackLang, $currentLang);
 
         $unusualLocalization = [
-            'locale' => config(unusualBaseKey() . '.locale'),
-            'fallback_locale' => config(unusualBaseKey() . '.fallback_locale', 'en'),
+            'locale' => unusualConfig('locale'),
+            'fallback_locale' => unusualConfig('fallback_locale', 'en'),
             'lang' => $lang
         ];
 

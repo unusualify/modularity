@@ -17,7 +17,7 @@ Route::group(['as' => 'api.', 'namespace' => 'API'], function(){
     Route::apiResource('languages', LanguageController::class);
 });
 
-if (config(unusualBaseKey() . '.enabled.media-library')) {
+if (unusualConfig('enabled.media-library')) {
     Route::group(['prefix' => 'media-library', 'as' => 'media-library.'], function () {
         Route::post('sign-s3-upload', ['as' => 'sign-s3-upload', 'uses' => 'MediaLibraryController@signS3Upload']);
         Route::get('sign-azure-upload', ['as' => 'sign-azure-upload', 'uses' => 'MediaLibraryController@signAzureUpload']);
@@ -29,7 +29,7 @@ if (config(unusualBaseKey() . '.enabled.media-library')) {
     });
 }
 
-if (config(unusualBaseKey() . '.enabled.file-library')) {
+if (unusualConfig('enabled.file-library')) {
     Route::group(['prefix' => 'file-library', 'as' => 'file-library.'], function () {
         Route::post('sign-s3-upload', ['as' => 'sign-s3-upload', 'uses' => 'FileLibraryController@signS3Upload']);
         Route::get('sign-azure-upload', ['as' => 'sign-azure-upload', 'uses' => 'FileLibraryController@signAzureUpload']);

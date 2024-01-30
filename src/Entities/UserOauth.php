@@ -18,7 +18,7 @@ class UserOauth extends BaseModel
 
     public function __construct(array $attributes = [])
     {
-        $this->table = config(unusualBaseKey() . '.users_oauth_table', 'twill_users_oauth');
+        $this->table = unusualConfig('users_oauth_table', 'twill_users_oauth');
 
         parent::__construct($attributes);
     }

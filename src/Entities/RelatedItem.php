@@ -26,6 +26,6 @@ class RelatedItem extends BaseModel
 
     public function getTable()
     {
-        return config(unusualBaseKey() . '.related_table', 'twill_related');
+        return unusualConfig('related_table', 'twill_related');
     }
 }

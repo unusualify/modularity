@@ -3,11 +3,11 @@
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 
-// if (config(unusualBaseKey() . '.enabled.users-management')) {
+// if (unusualConfig('enabled.users-management')) {
 //     Route::module('users', ['except' => ['sort', 'feature']]);
 // }
 
-// if (config(unusualBaseKey() . '.enabled.media-library')) {
+// if (unusualConfig('enabled.media-library')) {
 //     Route::group(['prefix' => 'media-library', 'as' => 'media-library.'], function () {
 //         // Route::post('sign-s3-upload', ['as' => 'sign-s3-upload', 'uses' => 'MediaLibraryController@signS3Upload']);
 //         // Route::get('sign-azure-upload', ['as' => 'sign-azure-upload', 'uses' => 'MediaLibraryController@signAzureUpload']);
@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 //     });
 // }
 
-// if (config(unusualBaseKey() . '.enabled.file-library')) {
+// if (unusualConfig('enabled.file-library')) {
 //     Route::group(['prefix' => 'file-library', 'as' => 'file-library.'], function () {
 //         Route::post('sign-s3-upload', ['as' => 'sign-s3-upload', 'uses' => 'FileLibraryController@signS3Upload']);
 //         Route::get('sign-azure-upload', ['as' => 'sign-azure-upload', 'uses' => 'FileLibraryController@signAzureUpload']);
@@ -31,12 +31,12 @@ use Illuminate\Support\Facades\Route;
 //     });
 // }
 
-// if (config(unusualBaseKey() . '.enabled.block-editor')) {
+// if (unusualConfig('enabled.block-editor')) {
 //     Route::post('blocks/preview', ['as' => 'blocks.preview', 'uses' => 'BlocksController@preview']);
 // }
 
-// if (config(unusualBaseKey() . '.enabled.buckets')) {
-//     $bucketsRoutes = config(unusualBaseKey() . '.bucketsRoutes') ?? Collection::make(config(unusualBaseKey() . '.buckets'))->mapWithKeys(function ($bucketSection, $bucketSectionKey) {
+// if (unusualConfig('enabled.buckets')) {
+//     $bucketsRoutes = unusualConfig('bucketsRoutes') ?? Collection::make(unusualConfig('buckets'))->mapWithKeys(function ($bucketSection, $bucketSectionKey) {
 //         return [$bucketSectionKey => 'featured'];
 //     })->toArray();
 
@@ -51,16 +51,16 @@ use Illuminate\Support\Facades\Route;
 //     }
 // }
 
-// if (config(unusualBaseKey() . '.enabled.settings')) {
+// if (unusualConfig('enabled.settings')) {
 //     Route::name('settings')->get('/settings/{section}', 'SettingController@index');
 //     Route::name('settings.update')->post('/settings/{section}', 'SettingController@update');
 // }
 
-// if (config(unusualBaseKey() . '.enabled.dashboard')) {
+// if (unusualConfig('enabled.dashboard')) {
 //     Route::name('dashboard')->get('/', 'DashboardController@index');
 // }
 
-// if (config(unusualBaseKey() . '.enabled.search')) {
+// if (unusualConfig('enabled.search')) {
 //     Route::name('search')->get('search', 'DashboardController@search');
 // }
 

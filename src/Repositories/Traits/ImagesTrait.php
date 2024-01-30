@@ -161,7 +161,7 @@ trait ImagesTrait
 
         if (isset($fields['medias'])) {
             foreach ($fields['medias'] as $role => $mediasForRole) {
-                if (config(unusualBaseKey() . '.media_library.translated_form_fields', false)) {
+                if (unusualConfig('media_library.translated_form_fields', false)) {
                     if (Str::contains($role, ['[', ']'])) {
                         $start = strpos($role, '[') + 1;
                         $finish = strpos($role, ']', $start);
@@ -173,8 +173,8 @@ trait ImagesTrait
                 $locale = $locale ?? config('app.locale');
 
                 if (in_array($role, array_keys($this->model->mediasParams ?? []))
-                    || in_array($role, array_keys(config(unusualBaseKey() . '.block_editor.crops', [])))
-                    || in_array($role, array_keys(config(unusualBaseKey() . '.settings.crops', [])))) {
+                    || in_array($role, array_keys(unusualConfig('block_editor.crops', [])))
+                    || in_array($role, array_keys(unusualConfig('settings.crops', [])))) {
                     Collection::make($mediasForRole)->each(function ($media) use (&$medias, $role, $locale) {
                         $customMetadatas = $media['metadatas']['custom'] ?? [];
                         if (isset($media['crops']) && !empty($media['crops'])) {

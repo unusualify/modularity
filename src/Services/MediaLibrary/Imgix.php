@@ -50,7 +50,7 @@ class Imgix implements ImageServiceInterface
     public function getUrl($id, array $params = [])
     {
         $defaultParams = $this->config->get(unusualBaseKey() . '.imgix.default_params');
-        $addParamsToSvgs = config(unusualBaseKey() . '.imgix.add_params_to_svgs', false);
+        $addParamsToSvgs = unusualConfig('imgix.add_params_to_svgs', false);
 
         if (!$addParamsToSvgs && Str::endsWith($id, '.svg')) {
             return $this->urlBuilder->createURL($id);
