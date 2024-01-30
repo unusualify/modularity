@@ -8,7 +8,10 @@ use Illuminate\Support\Str;
 use Illuminate\Foundation\ProviderRepository;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\AliasLoader;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularity\Activators\FileActivator;
+use Unusualify\Modularity\Support\Finder;
 
 class Module extends NwidartModule
 {
@@ -309,7 +312,7 @@ class Module extends NwidartModule
     public function routeNamePrefix(): string
     {
         return $this->hasParentRoute()
-            ? $this->getParentRoute()['route_name']
+            ? ($this->getParentRoute()['route_name'] ?? $this->getSnakeName())
             : snakeCase($this->getConfig('name'));
     }
 
@@ -333,6 +336,23 @@ class Module extends NwidartModule
         $prefixes[] = $this->routeNameprefix();
 
         return implode('.', $prefixes);
+    }
+
+
+    public function getRepositoryName($routeName){
+        return (new Finder)->getRouteRepository($routeName);
+    }
+
+    public function getRepository($routeName){
+        return App::make($this->getRepositoryName($routeName));
+    }
+
+
+
+    public function isRouteTableExists($routeName = null){
+        $tableName = $this->getRepository($routeName ?? $this->getStudlyName())->getModel()->getTable();
+
+        return Schema::hasTable($tableName);
     }
 
 }
