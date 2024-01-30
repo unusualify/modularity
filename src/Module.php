@@ -8,7 +8,11 @@ use Illuminate\Support\Str;
 use Illuminate\Foundation\ProviderRepository;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\AliasLoader;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularity\Activators\FileActivator;
+use Unusualify\Modularity\Support\Finder;
 
 class Module extends NwidartModule
 {
@@ -164,11 +168,13 @@ class Module extends NwidartModule
      * @param  mixed $notation
      * @return array
      */
-    public function getRouteConfigs($notation = null): array
+    public function getRouteConfigs($notation = null, $valid = false): array
     {
         $notation = !$notation ? $notation : ".{$notation}";
 
-        return $this->getConfig('routes' . $notation);
+        return ($valid && !$notation) ? Arr::where($this->getConfig('routes' . $notation), function($item){
+            return !(!isset($item['name']) || !$this->isRouteTableExists($item['name']));
+        }) : $this->getConfig('routes' . $notation);
     }
 
     /**
@@ -309,7 +315,7 @@ class Module extends NwidartModule
     public function routeNamePrefix(): string
     {
         return $this->hasParentRoute()
-            ? $this->getParentRoute()['route_name']
+            ? ($this->getParentRoute()['route_name'] ?? $this->getSnakeName())
             : snakeCase($this->getConfig('name'));
     }
 
@@ -333,6 +339,17 @@ class Module extends NwidartModule
         $prefixes[] = $this->routeNameprefix();
 
         return implode('.', $prefixes);
+    }
+
+
+    public function getRepository($routeName, $asClass = true){
+        return (new Finder)->getRouteRepository($routeName,$asClass);
+    }
+
+
+    public function isRouteTableExists($routeName = null){
+        $tableName = $this->getRepository($routeName ?? $this->getStudlyName())->getModel()->getTable();
+        return Schema::hasTable($tableName);
     }
 
 }

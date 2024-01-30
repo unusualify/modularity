@@ -462,22 +462,22 @@ class RouteServiceProvider extends ServiceProvider
 
 
             $config = $module->getConfig();
-
-            if(isset($config['name'] )){ //&& getStringOrFalse($config['name'])
+            $moduleName = $config['name'] ?? $module->getName();
+            if($moduleName ){ //&& getStringOrFalse($config['name'])
                 $pr = $module->getParentRoute();
 
                 $has_system_prefix = $module->hasSystemPrefix();
                 $system_prefix = $has_system_prefix ? systemUrlPrefix() . '/' : '';
                 $system_route_name = $has_system_prefix ? systemRouteNamePrefix() : '';
 
-                $parentStudlyName = studlyName( $config['name'] ); // UserCompany
-                $parentCamelName = camelCase( $config['name'] ); // userCompany
-                $parentKebabName = kebabCase( $config['name'] ); // user-company
-                $parentSnakeName = snakeCase( $config['name'] );  // user_company
+                $parentStudlyName = studlyName( $moduleName ); // UserCompany
+                $parentCamelName = camelCase( $moduleName ); // userCompany
+                $parentKebabName = kebabCase( $moduleName ); // user-company
+                $parentSnakeName = snakeCase( $moduleName );  // user_company
 
                 $parentUrlSegment = $config['url'] ?? $pr['url'] ?? pluralize($parentKebabName);
 
-                if( is_array( $routes = $module->getRouteConfigs() ) ){
+                if( is_array( $routes = $module->getRouteConfigs(valid: true) ) ){
 
                     /**
                      * the fix of route precedence

@@ -145,7 +145,7 @@ abstract class CoreController extends LaravelController
     protected function getModelName()
     {
         try {
-            return $this->modelName ?? ucfirst(Str::singular($this->routeName));
+            return $this->modelName ?? ucfirst($this->routeName);
         } catch (\Throwable $th) {
             dd(
                 $this
