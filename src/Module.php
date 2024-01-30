@@ -19,7 +19,7 @@ class Module extends NwidartModule
     private $moduleActivator;
 
     /**
-     * @var ModuleActivatorInterface
+     * @var
      */
     private $config;
 
@@ -206,11 +206,20 @@ class Module extends NwidartModule
     {
         $notation = !$notation ? '' : ".{$notation}";
 
+        if(!$this->app['config']->has($this->getSnakeName()) && $this->app->runningInConsole() && file_exists($this->getDirectoryPath('Config/config.php'))){
+            $this->app['config']->set("{$this->getSnakeName()}", include($this->getDirectoryPath('Config/config.php')));
+        }
+
         return $this->app['config']->get("{$this->getSnakeName()}{$notation}", []);
     }
 
     public function setConfig($newConfig,$notation = null, ): mixed{
+
         $notation = !$notation ? '' : ".{$notation}";
+
+        if(!$this->app['config']->has($this->getSnakeName()) && $this->app->runningInConsole() && file_exists($this->getDirectoryPath('Config/config.php'))){
+            $this->app['config']->set("{$this->getSnakeName()}", include($this->getDirectoryPath('Config/config.php')));
+        }
 
         return $this->app['config']->set("{$this->getSnakeName()}{$notation}", $newConfig);
     }
