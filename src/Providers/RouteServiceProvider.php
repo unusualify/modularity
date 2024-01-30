@@ -478,7 +478,7 @@ class RouteServiceProvider extends ServiceProvider
 
                 $parentUrlSegment = $config['url'] ?? $pr['url'] ?? pluralize($parentKebabName);
 
-                if( is_array( $routes = $module->getRouteConfigs() ) ){
+                if( is_array( $routes = $module->getRouteConfigs(valid: true) ) ){
 
                     /**
                      * the fix of route precedence

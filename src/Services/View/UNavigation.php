@@ -90,7 +90,7 @@ class UNavigation
             //     $pr['url'] = pluralize(kebabCase($config['name']));
             //     $pr['route_name'] = snakeCase($config['name']);
             // }
-            $routes = $module->getRouteConfigs();
+            $routes =$module->getRouteConfigs(valid: true);
             $number_route = count($routes);
 
             $array = [];
@@ -109,9 +109,6 @@ class UNavigation
 
             foreach( $routes as $item){
 
-                if(!isset($item['name']) || !$module->isRouteTableExists($item['name'])){
-                    continue;
-                }
                 // if(!isset($item['name']) ){
                 //     continue;
                 // }

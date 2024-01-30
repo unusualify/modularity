@@ -79,10 +79,10 @@ class Media extends Model
             'tags' => $this->tags->map(function ($tag) {
                 return $tag->name;
             }),
-            'deleteUrl' => $this->canDeleteSafely() ? moduleRoute('medias', $routeNamePrefix . 'media-library', 'destroy', [$this->id]) : null,
-            'updateUrl' => route(Route::hasAdmin('media-library.medias.single-update')),
-            'updateBulkUrl' => route(Route::hasAdmin('media-library.medias.bulk-update')),
-            'deleteBulkUrl' => route(Route::hasAdmin('media-library.medias.bulk-delete')),
+            'deleteUrl' => $this->canDeleteSafely() ? moduleRoute('media', $routeNamePrefix . 'media-library', 'destroy', [$this->id]) : null,
+            'updateUrl' => route(Route::hasAdmin('media-library.media.single-update')),
+            'updateBulkUrl' => route(Route::hasAdmin('media-library.media.bulk-update')),
+            'deleteBulkUrl' => route(Route::hasAdmin('media-library.media.bulk-delete')),
             'metadatas' => [
                 'default' => [
                     'caption' => $this->caption,

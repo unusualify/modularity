@@ -99,8 +99,8 @@
                     value: 'image',
                     text: '{{ unusualTrans("media-library.images") }}',
                     total: {{ \Unusualify\Modularity\Entities\Media::count() }},
-                    endpoint: '{{ route(Route::hasAdmin('media-library.medias.index')) }}',
-                    tagsEndpoint: '{{ route(Route::hasAdmin('media-library.medias.tags')) }}',
+                    endpoint: '{{ route(Route::hasAdmin('media-library.media.index')) }}',
+                    tagsEndpoint: '{{ route(Route::hasAdmin('media-library.media.tags')) }}',
                     uploaderConfig: {!! json_encode($mediasUploaderConfig) !!}
                 });
                 window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.showFileName = !!'{{ config(unusualBaseKey() . '.media_library.show_file_name') }}';
@@ -111,8 +111,8 @@
                     value: 'file',
                     text: '{{ unusualTrans("media-library.files") }}',
                     total: {{ \Unusualify\Modularity\Entities\File::count() }},
-                    endpoint: '{{ route(Route::hasAdmin('file-library.files.index')) }}',
-                    tagsEndpoint: '{{ route(Route::hasAdmin('file-library.files.tags')) }}',
+                    endpoint: '{{ route(Route::hasAdmin('file-library.file.index')) }}',
+                    tagsEndpoint: '{{ route(Route::hasAdmin('file-library.file.tags')) }}',
                     uploaderConfig: {!! json_encode($filesUploaderConfig) !!}
                 });
             @endif
