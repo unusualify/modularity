@@ -71,7 +71,7 @@ class Finder
         return false;
     }
 
-    public function getRouteModel($routeName)
+    public function getRouteModel($routeName, $asClass = false)
     {
         $class = '';
 
@@ -94,7 +94,7 @@ class Finder
         }
 
 
-        if($class !== '') return $class;
+        if($class !== '') return $asClass ? App::make($class) :  $class;
 
 
         return false;
@@ -133,7 +133,7 @@ class Finder
         return false;
     }
 
-    public function getRouteRepository($routeName)
+    public function getRouteRepository($routeName, $asClass = false)
     {
         $class = '';
 
@@ -148,7 +148,7 @@ class Finder
             }
         }
 
-        if($class !== '') return $class;
+        if($class !== '') return $asClass ? App::make($class) : $class;
 
 
         return false;

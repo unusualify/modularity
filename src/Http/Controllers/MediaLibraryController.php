@@ -20,7 +20,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
     /**
      * @var string
      */
-    protected $moduleName = 'medias';
+    protected $moduleName = 'Media';
 
     /**
      * @var string

@@ -33,6 +33,8 @@ class UNavigation
     public function systemMenu()
     {
         return $this->sidebarMenuFromModules(Modularity::getSystemModules());
+        // return [];
+
     }
 
     public function modulesMenu()
@@ -74,6 +76,7 @@ class UNavigation
         foreach ( $modules as $moduleName => $module) {
             // $pr => parent route
             // $sr => sub route
+
             $name = $module->getName();
             $config = $module->getConfig();
             $pr_name = $module->getSnakeName();
@@ -87,7 +90,7 @@ class UNavigation
             //     $pr['url'] = pluralize(kebabCase($config['name']));
             //     $pr['route_name'] = snakeCase($config['name']);
             // }
-            $routes = $module->getRouteConfigs();
+            $routes =$module->getRouteConfigs(valid: true);
             $number_route = count($routes);
 
             $array = [];
@@ -105,8 +108,14 @@ class UNavigation
                 : '';
 
             foreach( $routes as $item){
+
+                // if(!isset($item['name']) ){
+                //     continue;
+                // }
+
+
                 // $sr sub route array|object
-                $route_name = $item['route_name'] . ".index";
+                $route_name = ($item['route_name'] ?? snakeCase($item['name']))  . ".index";
                 // dd($route_name);
 
                 if( !(isset($item['parent']) && $item['parent']) ){
@@ -143,11 +152,18 @@ class UNavigation
                     ];
                 }
             }
-            // dd($array);
-            $arrays[$module->getSnakeName()] = $array;
+
+            if(count($array) > 0 ){
+                $arrays[$module->getSnakeName()] = $array;
+            }
+
         }
 
+
+
+
         return $arrays;
+
     }
 
     public function formatSidebarMenus(&$array)
@@ -171,7 +187,7 @@ class UNavigation
             // this checking is important for not mischoosing keys of array and sidebar array configuration
             if(array_key_exists('name', $item) && is_string($item['name']) ){
                 if(($res = $this->sidebarMenuItem($item))){
-                    $array[$key] = $res ;
+                    $array[$key] = $res;
                 }else{
                     unset($array[$key]);
                 }

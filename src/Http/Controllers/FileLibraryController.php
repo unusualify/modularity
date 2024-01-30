@@ -20,7 +20,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
     /**
      * @var string
      */
-    protected $moduleName = 'files';
+    protected $moduleName = 'File';
 
     /**
      * @var string
@@ -136,9 +136,9 @@ class FileLibraryController extends BaseController implements SignUploadListener
                 return $tag->name;
             }),
             'deleteUrl' => $item->canDeleteSafely() ? moduleRoute($this->moduleName, $routeNamePrefix .  $this->routePrefix, 'destroy', [$item->id]) : null,
-            'updateUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.files.single-update')),
-            'updateBulkUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.files.bulk-update')),
-            'deleteBulkUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.files.bulk-delete')),
+            'updateUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.file.single-update')),
+            'updateBulkUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.file.bulk-update')),
+            'deleteBulkUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.file.bulk-delete')),
         ];
     }
 
