@@ -22,11 +22,6 @@ class UnusualProvider extends ServiceProvider
         // Unusual Providers
         BaseServiceProvider::class,
         ModuleServiceProvider::class,
-
-        // ConfigServiceProvider::class,
-        // BaseServiceProvider::class,
-        // ResourceServiceProvider::class,
-
         RouteServiceProvider::class,
         AuthServiceProvider::class,
 
