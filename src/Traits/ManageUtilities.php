@@ -369,7 +369,7 @@ trait ManageUtilities {
                             return false;
                         }
 
-                        $schema = $this->createFormSchema(getInputDraft($element->draft));
+                        $schema = $this->createFormSchema(getFormDraft($element->draft));
 
                         $parameters = Collection::make(Route::getRoutes()->getByName($routeName)->parameterNames())->mapWithKeys(function($parameter, $j){
                             return [ $parameter => ":{$parameter}"];

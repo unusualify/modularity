@@ -133,7 +133,7 @@ class BaseServiceProvider extends ServiceProvider
             __DIR__ . '/../Config/config.php', $this->baseKey
         );
 
-        $this->mergeConfigFrom(__DIR__ . '/../Config/input_drafts.php', $this->baseKey . '.input_drafts');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/form_drafts.php', $this->baseKey . '.form_drafts');
         $this->mergeConfigFrom(__DIR__ . '/../Config/media_library.php', $this->baseKey . '.media_library');
         $this->mergeConfigFrom(__DIR__ . '/../Config/file_library.php', $this->baseKey . '.file_library');
         $this->mergeConfigFrom(__DIR__ . '/../Config/imgix.php', $this->baseKey . '.imgix');
