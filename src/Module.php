@@ -206,8 +206,8 @@ class Module extends NwidartModule
     {
         $notation = !$notation ? $notation : ".{$notation}";
 
-        return ($valid && !$notation) ? Arr::where($this->getConfig('routes' . $notation), function($item){
-            return !(!isset($item['name']) || !$this->isRouteTableExists($item['name']));
+        return ($valid && !$notation) ? Arr::where($this->getConfig('routes' . $notation), function($item,$key) use($notation){
+            return !(!isset($item['name']) || !$this->isRouteTableExists($item['name'], $key));
         }) : $this->getConfig('routes' . $notation);
     }
 
@@ -391,8 +391,8 @@ class Module extends NwidartModule
     }
 
 
-    public function isRouteTableExists($routeName = null){
-        $tableName = $this->getRepository($routeName ?? $this->getStudlyName())->getModel()->getTable();
+    public function isRouteTableExists($routeName = null, $notation = null){
+        $tableName = $this->getRepository($routeName ?? $this->getStudlyName(), false) ? $this->getRepository($routeName ?? $this->getStudlyName())->getModel()->getTable() : $this->getRepository($notation)->getModel()->getTable();
         return Schema::hasTable($tableName);
     }
 
