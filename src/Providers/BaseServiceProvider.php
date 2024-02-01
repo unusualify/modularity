@@ -133,11 +133,11 @@ class BaseServiceProvider extends ServiceProvider
             __DIR__ . '/../Config/config.php', $this->baseKey
         );
 
-        $this->mergeConfigFrom(__DIR__ . '/../Config/input_drafts.php', $this->baseKey . '.input_drafts');
-        $this->mergeConfigFrom(__DIR__ . '/../Config/media_library.php', $this->baseKey . '.media_library');
-        $this->mergeConfigFrom(__DIR__ . '/../Config/file_library.php', $this->baseKey . '.file_library');
-        $this->mergeConfigFrom(__DIR__ . '/../Config/imgix.php', $this->baseKey . '.imgix');
-        $this->mergeConfigFrom(__DIR__ . '/../Config/glide.php', $this->baseKey . '.glide');
+        foreach (glob(__DIR__ . '/../Config/merges/*.php') as $path) {
+            extract(pathinfo($path)); // $filename
+            $this->mergeConfigFrom($path, $this->baseKey . ".{$filename}");
+        }
+
         $this->mergeConfigFrom(__DIR__ . '/../Config/disks.php', 'filesystems.disks');
     }
 
@@ -378,7 +378,16 @@ class BaseServiceProvider extends ServiceProvider
             // . str_replace(['http://', 'https://'], '', config('app.url'))
             . request()->getHttpHost()
             . '/storage/'
-            . trim(config(unusualBaseKey() . '.' . $type . '_library.local_path'), '/ '),
+            . trim( unusualConfig($type . '_library.local_path'), '/ '),
         ]);
+    }
+
+    public function mergeKeysFromConfig(array $mergeKeys = []) {
+        foreach (config($this->baseKey) as $name => $array) {
+            if(in_array($name, $mergeKeys)){
+
+                $this->app['files']->put(__DIR__ . "/../Config/merges/{$name}.php", phpArrayFileContent($array));
+            }
+        }
     }
 }

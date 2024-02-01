@@ -51,12 +51,12 @@
                     @yield('content')
 
                     <div id="ue-bottom-content">
-                        @if (config(unusualBaseKey() . '.enabled.media-library') || config(unusualBaseKey() . '.enabled.file-library'))
+                        @if (unusualConfig('enabled.media-library') || unusualConfig('enabled.file-library'))
                             {{-- <ue-media
                                 ref="mediaLibra"
                                 :authorized="{{ json_encode(auth('twill_users')->user()->can('upload')) }}"
-                                :extra-metadatas="{{ json_encode(array_values(config(unusualBaseKey() . '.media_library.extra_metadatas_fields', []))) }}"
-                                :translatable-metadatas="{{ json_encode(array_values(config(unusualBaseKey() . '.media_library.translatable_metadatas_fields', []))) }}"
+                                :extra-metadatas="{{ json_encode(array_values(unusualConfig('media_library.extra_metadatas_fields', []))) }}"
+                                :translatable-metadatas="{{ json_encode(array_values(unusualConfig('media_library.translatable_metadatas_fields', []))) }}"
                             ></ue-media> --}}
 
                         @endif
@@ -71,31 +71,31 @@
 
         {{-- @yield('initial-scripts') --}}
         <script>
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'] = {};
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].version = '{{ config(unusualBaseKey() . '.version') }}';
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].LOCALE = '{{ config(unusualBaseKey() . '.locale') }}';
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].TIMEZONE = '{{ config(unusualBaseKey() . '.timezone') }}';
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].AUTHORIZATION = @json($authorization);
+            window['{{ unusualConfig('js_namespace') }}'] = {};
+            window['{{ unusualConfig('js_namespace') }}'].version = '{{ unusualConfig('version') }}';
+            window['{{ unusualConfig('js_namespace') }}'].LOCALE = '{{ unusualConfig('locale') }}';
+            window['{{ unusualConfig('js_namespace') }}'].TIMEZONE = '{{ unusualConfig('timezone') }}';
+            window['{{ unusualConfig('js_namespace') }}'].AUTHORIZATION = @json($authorization);
 
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {};
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE = {};
+            window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {};
+            window['{{ unusualConfig('js_namespace') }}'].STORE = {};
 
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.config = {
+            window['{{ unusualConfig('js_namespace') }}'].STORE.config = {
                 // isMiniSidebar:  '{{ $isMiniSidebar ?? true }}',
                 isMiniSidebar:  {!! json_encode($isMiniSidebar ?? true) !!},
             },
 
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias = {};
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types = [];
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.config = {
-                useWysiwyg: {{ config(unusualBaseKey() . '.media_library.media_caption_use_wysiwyg') ? 'true' : 'false' }},
-                wysiwygOptions: {!! json_encode(config(unusualBaseKey() . '.media_library.media_caption_wysiwyg_options')) !!}
+            window['{{ unusualConfig('js_namespace') }}'].STORE.medias = {};
+            window['{{ unusualConfig('js_namespace') }}'].STORE.medias.types = [];
+            window['{{ unusualConfig('js_namespace') }}'].STORE.medias.config = {
+                useWysiwyg: {{ unusualConfig('media_library.media_caption_use_wysiwyg') ? 'true' : 'false' }},
+                wysiwygOptions: {!! json_encode(unusualConfig('media_library.media_caption_wysiwyg_options')) !!}
             };
 
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.languages = {!! json_encode(getLanguagesForVueStore($form_fields ?? [], $translate ?? false)) !!};
+            window['{{ unusualConfig('js_namespace') }}'].STORE.languages = {!! json_encode(getLanguagesForVueStore($form_fields ?? [], $translate ?? false)) !!};
 
-            @if (config(unusualBaseKey() . '.enabled.media-library'))
-                window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types.push({
+            @if (unusualConfig('enabled.media-library'))
+                window['{{ unusualConfig('js_namespace') }}'].STORE.medias.types.push({
                     value: 'image',
                     text: '{{ unusualTrans("media-library.images") }}',
                     total: {{ \Unusualify\Modularity\Entities\Media::count() }},
@@ -103,11 +103,11 @@
                     tagsEndpoint: '{{ route(Route::hasAdmin('media-library.media.tags')) }}',
                     uploaderConfig: {!! json_encode($mediasUploaderConfig) !!}
                 });
-                window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.showFileName = !!'{{ config(unusualBaseKey() . '.media_library.show_file_name') }}';
+                window['{{ unusualConfig('js_namespace') }}'].STORE.medias.showFileName = !!'{{ unusualConfig('media_library.show_file_name') }}';
             @endif
 
-            @if (config(unusualBaseKey() . '.enabled.file-library'))
-                window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types.push({
+            @if (unusualConfig('enabled.file-library'))
+                window['{{ unusualConfig('js_namespace') }}'].STORE.medias.types.push({
                     value: 'file',
                     text: '{{ unusualTrans("media-library.files") }}',
                     total: {{ \Unusualify\Modularity\Entities\File::count() }},
@@ -116,18 +116,18 @@
                     uploaderConfig: {!! json_encode($filesUploaderConfig) !!}
                 });
             @endif
-            // window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.crops = {!! json_encode(([]) + config(unusualBaseKey() . '.block_editor.crops', []) + (config(unusualBaseKey() . '.settings.crops') ?? [])) !!}
-            // window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.selected = {}
+            // window['{{ unusualConfig('js_namespace') }}'].STORE.medias.crops = {!! json_encode(([]) + unusualConfig('block_editor.crops', []) + (unusualConfig('settings.crops', []) ?? [])) !!}
+            // window['{{ unusualConfig('js_namespace') }}'].STORE.medias.selected = {}
 
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].unusualLocalization = {!! json_encode($unusualLocalization) !!};
+            window['{{ unusualConfig('js_namespace') }}'].unusualLocalization = {!! json_encode($unusualLocalization) !!};
 
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.datatable = {}
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {}
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.browser = {
+            window['{{ unusualConfig('js_namespace') }}'].STORE.datatable = {}
+            window['{{ unusualConfig('js_namespace') }}'].STORE.form = {}
+            window['{{ unusualConfig('js_namespace') }}'].STORE.browser = {
                 selected: {}
             }
             // console.log(
-            //     window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types
+            //     window['{{ unusualConfig('js_namespace') }}'].STORE.medias.types
             // )
             @yield('STORE')
         </script>

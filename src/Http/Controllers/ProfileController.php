@@ -83,10 +83,10 @@ class ProfileController extends BaseController
 
         $user = auth()->user();
 
-        $userSchema = $this->createFormSchema( getInputDraft('user') );
+        $userSchema = $this->createFormSchema( getFormDraft('user') );
         $userFields = $this->userRepository->getFormFields($user, $userSchema);
 
-        $userPasswordSchema = $this->createFormSchema( getInputDraft('user_password') );
+        $userPasswordSchema = $this->createFormSchema( getFormDraft('user_password') );
         $userPasswordFields = $this->userRepository->getFormFields($user, $userPasswordSchema, true);
 
         $sectionFields = [
@@ -271,7 +271,7 @@ class ProfileController extends BaseController
                 //     ]
                 // ],
             ]);
-            $companySchema = $this->createFormSchema( getInputDraft('company') );
+            $companySchema = $this->createFormSchema( getFormDraft('company') );
             $companyFields = $this->companyRepository->getFormFields(auth()->user()->company, $companySchema);
 
             $companyFields['country_id'] = 1;
@@ -330,7 +330,7 @@ class ProfileController extends BaseController
         // $input = $this->request->all();
 
         $formRequest = $this->validateFormRequest(
-            getInputDraft('user') + getInputDraft('user_password')
+            getFormDraft('user') + getFormDraft('user_password')
         );
 
         // dd($formRequest);

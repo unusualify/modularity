@@ -77,16 +77,16 @@ abstract class Request extends FormRequest
                 }
             }
         }
-        // dd($this->hydrateRules($rules));
+        // dd($rules, $this->hydrateRules($rules), get_class($this));
         return $this->hydrateRules($rules);
     }
 
     public function hydrateRules($rules) {
-
+        // dd($rules);
         return Arr::map($rules, function($ruleSchema, $name){
             if(preg_match('/unique_table/', $ruleSchema)){
+                $ruleSchema = preg_replace('/\|?(unique:[A-Za-z,_\d]*)(\|?|$)/', "", $ruleSchema);
                 $ruleSchema = preg_replace('/unique_table/', "unique:{$this->model->getTable()},{$name}" . ($this->id ? ",{$this->id}" : ''), $ruleSchema);
-                $ruleSchema = preg_replace('/\|?(unique:[A-Za-z,\d]*)(\|?|$)/', "$2", $ruleSchema);
 
                 return $ruleSchema;
                 dd(

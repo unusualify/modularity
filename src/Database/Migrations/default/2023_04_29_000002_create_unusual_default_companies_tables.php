@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create( config(unusualBaseKey().'.tables.companies', 'modularity_companies'), function (Blueprint $table) {
+        Schema::create( unusualConfig('tables.companies', 'modularity_companies'), function (Blueprint $table) {
             // this will create an id, a "published" column, and soft delete and timestamps columns
             createDefaultTableFields($table);
             // $table->{unusualIntegerMethod()}("_id")->unsigned();
@@ -32,6 +32,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists( config(unusualBaseKey().'.tables.companies', 'modularity_companies'));
+        Schema::dropIfExists( unusualConfig('tables.companies', 'modularity_companies'));
     }
 };

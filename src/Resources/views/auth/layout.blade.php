@@ -47,39 +47,39 @@
             </ue-auth>
         </div>
         <script>
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'] = {};
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].LOCALE = '{{ config(unusualBaseKey() . '.locale') }}';
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].version = '{{ config(unusualBaseKey() . '.version') }}';
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {};
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE = {};
+            window['{{ unusualConfig('js_namespace') }}'] = {};
+            window['{{ unusualConfig('js_namespace') }}'].LOCALE = '{{ unusualConfig('locale') }}';
+            window['{{ unusualConfig('js_namespace') }}'].version = '{{ unusualConfig('version') }}';
+            window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {};
+            window['{{ unusualConfig('js_namespace') }}'].STORE = {};
 
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.config = {
+            window['{{ unusualConfig('js_namespace') }}'].STORE.config = {
                 // isMiniSidebar:  '{{ $isMiniSidebar ?? true }}',
                 isMiniSidebar:  {!! json_encode($isMiniSidebar ?? true) !!},
             },
 
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.languages = {!! json_encode(getLanguagesForVueStore($form_fields ?? [], $translate ?? false)) !!};
+            window['{{ unusualConfig('js_namespace') }}'].STORE.languages = {!! json_encode(getLanguagesForVueStore($form_fields ?? [], $translate ?? false)) !!};
 
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias = {};
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.types = [];
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.config = {
-                useWysiwyg: {{ config(unusualBaseKey() . '.media_library.media_caption_use_wysiwyg') ? 'true' : 'false' }},
-                wysiwygOptions: {!! json_encode(config(unusualBaseKey() . '.media_library.media_caption_wysiwyg_options')) !!}
+            window['{{ unusualConfig('js_namespace') }}'].STORE.medias = {};
+            window['{{ unusualConfig('js_namespace') }}'].STORE.medias.types = [];
+            window['{{ unusualConfig('js_namespace') }}'].STORE.medias.config = {
+                useWysiwyg: {{ unusualConfig('media_library.media_caption_use_wysiwyg') ? 'true' : 'false' }},
+                wysiwygOptions: {!! json_encode(unusualConfig('media_library.media_caption_wysiwyg_options')) !!}
             };
 
 
 
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].unusualLocalization = {!! json_encode($unusualLocalization) !!};
+            window['{{ unusualConfig('js_namespace') }}'].unusualLocalization = {!! json_encode($unusualLocalization) !!};
 
-            // window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.datatable = {}
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {}
+            // window['{{ unusualConfig('js_namespace') }}'].STORE.datatable = {}
+            window['{{ unusualConfig('js_namespace') }}'].STORE.form = {}
 
             @section('STORE')
-                window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
-                window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {!! json_encode($formStore ?? new StdClass()) !!}
+                window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
+                window['{{ unusualConfig('js_namespace') }}'].STORE.form = {!! json_encode($formStore ?? new StdClass()) !!}
             @stop
 
-            window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.browser = {
+            window['{{ unusualConfig('js_namespace') }}'].STORE.browser = {
                 selected: {}
             }
             @yield('STORE')

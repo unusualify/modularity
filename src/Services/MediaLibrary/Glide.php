@@ -106,7 +106,7 @@ class Glide implements ImageServiceInterface
      */
     public function getUrl($id, array $params = [])
     {
-        $defaultParams = config(unusualBaseKey() . '.glide.default_params');
+        $defaultParams = unusualConfig('glide.default_params');
 
         return $this->getOriginalMediaUrl($id) ??
             $this->urlBuilder->getUrl($id, array_replace($defaultParams, $params));
@@ -143,7 +143,7 @@ class Glide implements ImageServiceInterface
      */
     public function getLQIPUrl($id, array $params = [])
     {
-        $defaultParams = config(unusualBaseKey() . '.glide.lqip_default_params');
+        $defaultParams = unusualConfig('glide.lqip_default_params');
 
         $cropParams = Arr::has($params, $this->cropParamsKeys) ? $this->getCrop($params) : [];
 
@@ -159,7 +159,7 @@ class Glide implements ImageServiceInterface
      */
     public function getSocialUrl($id, array $params = [])
     {
-        $defaultParams = config(unusualBaseKey() . '.glide.social_default_params');
+        $defaultParams = unusualConfig('glide.social_default_params');
 
         $cropParams = Arr::has($params, $this->cropParamsKeys) ? $this->getCrop($params) : [];
 
@@ -174,7 +174,7 @@ class Glide implements ImageServiceInterface
      */
     public function getCmsUrl($id, array $params = [])
     {
-        $defaultParams = config(unusualBaseKey() . '.glide.cms_default_params');
+        $defaultParams = unusualConfig('glide.cms_default_params');
 
         $cropParams = Arr::has($params, $this->cropParamsKeys) ? $this->getCrop($params) : [];
 
@@ -285,6 +285,6 @@ class Glide implements ImageServiceInterface
             return null;
         }
 
-        return Storage::disk(config(unusualBaseKey() . '.media_library.disk'))->url($id);
+        return Storage::disk(unusualConfig('media_library.disk'))->url($id);
     }
 }

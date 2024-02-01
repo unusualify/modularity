@@ -38,14 +38,14 @@ if (!function_exists('getTimezoneList')) {
     }
 }
 
-if (!function_exists('getInputDraft')) {
+if (!function_exists('getFormDraft')) {
 
-    function getInputDraft($name, $overwrites = [], $excludes = [], $preserve = true)
+    function getFormDraft($name, $overwrites = [], $excludes = [], $preserve = true)
     {
 
         $draft = $preserve
-            ? array_merge_recursive_preserve( unusualConfig("input_drafts.{$name}", []), $overwrites)
-            : array_merge( unusualConfig("input_drafts.{$name}", []), $overwrites);
+            ? array_merge_recursive_preserve( unusualConfig("form_drafts.{$name}", []), $overwrites)
+            : array_merge( unusualConfig("form_drafts.{$name}", []), $overwrites);
 
         if(count($excludes)){
 

@@ -75,7 +75,7 @@
 @stop
 
 @section('STORE')
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].ENDPOINTS = {
+    window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {
         {{-- @if($editable)
             update: '{{ $actionUrl }}',
         @else
@@ -83,7 +83,7 @@
         @endif --}}
 
     }
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {
+    window['{{ unusualConfig('js_namespace') }}'].STORE.form = {
         {{-- inputs: {!! json_encode($formSchema ?? new StdClass()) !!}, --}}
     }
 @stop

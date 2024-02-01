@@ -34,7 +34,7 @@ class LanguageMiddleware
         config([unusualBaseKey() . '.locale' => $locale]);
         config([unusualBaseKey() . '.timezone' => auth()->user()->timezone ?? 'Europe/London']);
         App::setLocale($locale);
-        App::setFallbackLocale(config(unusualBaseKey() . '.fallback_locale'));
+        App::setFallbackLocale(unusualConfig('fallback_locale'));
 
         return $next($request);
     }

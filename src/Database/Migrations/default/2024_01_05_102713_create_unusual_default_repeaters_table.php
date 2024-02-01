@@ -13,21 +13,7 @@ class CreateUnusualDefaultRepeatersTable extends Migration
      */
     public function up()
     {
-        // dd(unusualBaseKey() . '.tables.repeaters', config(unusualBaseKey() . '.tables.repeaters'));
-        $unusualRepeatersTable = 'umod_repeaters'; // config(unusualBaseKey() . '.tables.repeaters', 'modularity_files');
-        // dd($unusualRepeatersTable);
-        // $unusualRepeatersTable = config($base_key . '.tables.fileables', 'modularity_fileables');
-
-        // if (!Schema::hasTable($unusualFilesTable)) {
-        //     Schema::create($unusualFilesTable, function (Blueprint $table) {
-        //         $table->{unusualIncrementsMethod()}('id');
-        //         $table->timestamps();
-        //         $table->softDeletes();
-        //         $table->text('uuid');
-        //         $table->text('filename')->nullable();
-        //         $table->integer('size')->unsigned();
-        //     });
-        // }
+        $unusualRepeatersTable = unusualConfig('tables.repeaters', 'modularity_repeaters');
 
         if (!Schema::hasTable($unusualRepeatersTable)) {
             Schema::create($unusualRepeatersTable, function (Blueprint $table) use ($unusualRepeatersTable) {
@@ -51,10 +37,8 @@ class CreateUnusualDefaultRepeatersTable extends Migration
      */
     public function down()
     {
-        // $unusualFilesTable = config(unusualBaseKey() . '.tables.files', 'modularity_files');
-        $unusualRepeatersTable = config(unusualBaseKey() . '.tables.repeaters', 'modularity_fileables');
+        $unusualRepeatersTable = unusualConfig('tables.repeaters', 'modularity_repeaters');
 
         Schema::dropIfExists($unusualRepeatersTable);
-        // Schema::dropIfExists($unusualFilesTable);
     }
 }

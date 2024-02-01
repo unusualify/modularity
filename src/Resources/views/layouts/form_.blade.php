@@ -7,7 +7,7 @@
         <link href="{{ twillAsset('main-form.css') }}" rel="preload" as="style" crossorigin/>
     @endif
 
-    @unless(config(unusualBaseKey() . '.dev_mode', false))
+    @unless(unusualConfig('dev_mode', false))
         <link href="{{ twillAsset('main-form.css') }}" rel="stylesheet" crossorigin/>
     @endunless
 @endpush
@@ -113,7 +113,7 @@
     <a17-modal class="modal--browser" ref="browserWide" mode="wide" :force-close="true">
         <a17-browser></a17-browser>
     </a17-modal>
-    <a17-editor v-if="editor" ref="editor" bg-color="{{ config(unusualBaseKey() . '.block_editor.background_color') ?? '#FFFFFF' }}"></a17-editor>
+    <a17-editor v-if="editor" ref="editor" bg-color="{{ unusualConfig('block_editor.background_color') ?? '#FFFFFF' }}"></a17-editor>
     <a17-previewer ref="preview"></a17-previewer>
         <a17-dialog ref="warningContentEditor" modal-title="{{ twillTrans('twill::lang.form.dialogs.delete.title') }}" confirm-label="{{ twillTrans('twill::lang.form.dialogs.delete.confirm') }}">
         <p class="modal--tiny-title"><strong>{{ twillTrans('twill::lang.form.dialogs.delete.delete-content') }}</strong></p>
@@ -122,7 +122,7 @@
 @stop
 
 @section('initialStore')
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.form = {
+    window['{{ unusualConfig('js_namespace') }}'].STORE.form = {
         baseUrl: '{{ $baseUrl ?? '' }}',
         saveUrl: '{{ $saveUrl }}',
         previewUrl: '{{ $previewUrl ?? '' }}',
@@ -139,7 +139,7 @@
         editorNames: []
     }
 
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.publication = {
+    window['{{ unusualConfig('js_namespace') }}'].STORE.publication = {
         withPublicationToggle: {{ json_encode(($publish ?? true) && isset($item) && $item->isFillable('published')) }},
         published: {{ isset($item) && $item->published ? 'true' : 'false' }},
         createWithoutModal: {{ isset($createWithoutModal) && $createWithoutModal ? 'true' : 'false' }},
@@ -211,23 +211,23 @@
         } @else null @endif
     }
 
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.revisions = {!! json_encode($revisions ?? []) !!}
+    window['{{ unusualConfig('js_namespace') }}'].STORE.revisions = {!! json_encode($revisions ?? []) !!}
 
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.parentId = {{ $item->parent_id ?? 0 }}
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.parents = {!! json_encode($parents ?? [])  !!}
+    window['{{ unusualConfig('js_namespace') }}'].STORE.parentId = {{ $item->parent_id ?? 0 }}
+    window['{{ unusualConfig('js_namespace') }}'].STORE.parents = {!! json_encode($parents ?? [])  !!}
 
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.crops = {!! json_encode(($item->mediasParams ?? []) + config(unusualBaseKey() . '.block_editor.crops') + (config(unusualBaseKey() . '.settings.crops') ?? [])) !!}
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.medias.selected = {}
+    window['{{ unusualConfig('js_namespace') }}'].STORE.medias.crops = {!! json_encode(($item->mediasParams ?? []) + unusualConfig('block_editor.crops') + (unusualConfig('settings.crops') ?? [])) !!}
+    window['{{ unusualConfig('js_namespace') }}'].STORE.medias.selected = {}
 
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.browser = {}
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].STORE.browser.selected = {}
+    window['{{ unusualConfig('js_namespace') }}'].STORE.browser = {}
+    window['{{ unusualConfig('js_namespace') }}'].STORE.browser.selected = {}
 
-    window['{{ config(unusualBaseKey() . '.js_namespace') }}'].APIKEYS = {
-        'googleMapApi': '{{ config(unusualBaseKey() . '.google_maps_api_key') }}'
+    window['{{ unusualConfig('js_namespace') }}'].APIKEYS = {
+        'googleMapApi': '{{ unusualConfig('google_maps_api_key') }}'
     }
 @stop
 
 @prepend('extra_js')
-    @includeWhen(config(unusualBaseKey() . '.block_editor.inline_blocks_templates', true), 'twill::partials.form.utils._blocks_templates')
+    @includeWhen(unusualConfig('block_editor.inline_blocks_templates', true), 'twill::partials.form.utils._blocks_templates')
     <script src="{{ twillAsset('main-form.js') }}" crossorigin></script>
 @endprepend

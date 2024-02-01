@@ -61,5 +61,5 @@ return [
         'rowActionsType' => 'inline',
         'hideDefaultFooter' => false,
     ],
-    'input_drafts' => []
+    'form_drafts' => []
 ];

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create(config(unusualBaseKey().'.tables.users', 'users'), function (Blueprint $table) {
+        Schema::create(unusualConfig('tables.users', 'admin_users'), function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists(config(unusualBaseKey().'.tables.users', 'users'));
+        Schema::dropIfExists(unusualConfig('tables.users', 'admin_users'));
     }
 };
