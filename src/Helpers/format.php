@@ -154,7 +154,21 @@ if(! function_exists('getValueOrFalse')){
     function getValueOrFalse(mixed $val = null): mixed {
 
 
-        return isset($val) ? (!empty($val) ? $val : null) : false;
+        return  !empty($val) ? $val : false;
+    }
+}
+/**
+ * Checks if the given parameter is empty array or empty string
+ * returns value or null whether it is.
+ *
+ * @param mixed variable
+ *
+ * @return mixed|null based on variable
+ */
+if(! function_exists('getValueOrNull')){
+    function getValueOrNull(mixed $val = null): mixed {
+
+        return  !empty($val) ? $val : null;
     }
 }
 

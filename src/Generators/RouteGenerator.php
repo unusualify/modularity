@@ -604,7 +604,7 @@ class RouteGenerator extends Generator
         }
 
         if($this->fix){
-            $this->fixConfigFiles();
+            $this->fixConfigFile();
         }else{
             $this->updateConfigFile();
         }
@@ -886,45 +886,40 @@ class RouteGenerator extends Generator
 
     }
 
-    public function fixConfigFiles(){
+    public function fixConfigFile(){
+
         if($this->fix){
+            $configPath = $this->module->getConfigPath();
+            $keyOrders = ['name','base_prefix','system_prefix','headline','routes'];
             $config = $this->getConfig()->get( $this->getModule()->getSnakeName()) ?? [];
+            $moduleName = $this->getModule()->getName();
+            $routeName = $this->getName(); // studlyName
 
-            $headline = $this->getHeadline($this->getName());
-            $studlyName = $this->getStudlyNameReplacement();
-            $kebabCase = $this->getKebabCase($this->getName());
-            $snakeCase = $this->getSnakeCase($this->getName());
-            $lowerCase = lowerName($this->getName());
-            $configPath = $this->module->getPath().'/Config/config.php';
-
-            if($this->getModule()->getName() === $this->getName()){
-
-                $config['name'] =  $config['name'] ?? $studlyName;
-                $config['base_prefix'] = $config['base_prefix'] ?? false;
-                $config['system_prefix'] = $config['system_prefix'] ?? $config['base_prefix'] ?? false;
-                $config['headline'] = $config['headline'] ?? pluralize($headline);
-                // $config['parent_route'] = $route_array;
-                $config['routes'] = $config['routes'] ?? [];
-
+            if($this->plain){
+                empty($config['name']) ?   $config['name'] = $this->getHeadline($moduleName) : null;
+                empty($config['base_prefix']) ?   $config['base_prefix'] = false : null;
+                empty($config['system_prefix']) ?   $config['system_prefix'] = $config['base_prefix'] ?? false : null;
+                empty($config['headline']) ?   $config['headline'] =  pluralize($this->getHeadline($moduleName)) : null;
             }
 
             $route_array = ($this->getModule()->getName() === $this->getName() ? ['parent' => true] : []) + [
-                'name' =>  $studlyName,
-                'headline' => pluralize($headline),
-                'url' => pluralize($kebabCase),
-                'route_name' => $snakeCase,
-                'icon' => '', //'$modules',
+                'name' =>  $routeName,
+                'headline' => pluralize($this->getHeadline($routeName)),
+                'url' => pluralize($this->getKebabCase($routeName)),
+                'route_name' => $this->getSnakeCase($routeName),
+                'icon' => '',
                 'table_options' => static::$defaultTableOptions,
-                'headers' => $this->getHeaders(), //in Unusualify\Modularity\Support\Migrations\SchemaParser::class
-                'inputs' => $this->getInputs() //in Unusualify\Modularity\Support\Migrations\SchemaParser::class
+                'headers' => $this->getHeaders(),
+                'inputs' => $this->getInputs()
             ];
-
-
             $config['routes'][$this->getSnakeCase($this->getName())] = $route_array;
+
             $this->module->setConfig($config);
+            uksort($config, function($a, $b) use($keyOrders){
+                return (array_search($a, $keyOrders) - array_search($b, $keyOrders));
+            });
 
             return $this->filesystem->put($configPath, phpArrayFileContent($config));
-
         }
 
 

@@ -198,7 +198,6 @@ class Module extends NwidartModule
     public function getRouteInput($route_name, $input_name = null): array
     {
         $inputs = $this->getRouteConfig($route_name)['inputs'];
-        dd($inputs);
         return $this->getRouteConfig($route_name)['inputs'];
     }
 
@@ -280,9 +279,11 @@ class Module extends NwidartModule
      */
     public function prefix(): string
     {
-        return $this->hasParentRoute()
-            ? $this->getParentRoute()['url']
-            : pluralize( kebabCase($this->getConfig('name')) );
+        $pr = $this->getParentRoute();
+        $name = getValueOrNull($this->getConfig('name')) ?? $this->getName();
+        return $this->hasParentRoute() && (isset($pr['url'])  || isset($pr['name']))
+            ? ($pr['url'] ?? pluralize( kebabCase($pr['name'])))
+            : pluralize(kebabCase($name));
     }
 
     /**
@@ -316,7 +317,7 @@ class Module extends NwidartModule
     {
         return $this->hasParentRoute()
             ? ($this->getParentRoute()['route_name'] ?? $this->getSnakeName())
-            : snakeCase($this->getConfig('name'));
+            : snakeCase(getValueOrNull($this->getConfig('name')) ?? $this->getName());
     }
 
     /**
@@ -352,4 +353,7 @@ class Module extends NwidartModule
         return Schema::hasTable($tableName);
     }
 
+    public function getConfigPath(){
+        return $this->getPath().'/Config/config.php';
+    }
 }
