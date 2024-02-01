@@ -158,17 +158,23 @@ if(! function_exists('getValueOrFalse')){
     }
 }
 /**
- * Checks if the given parameter is empty array or empty string
+ * Checks if the given parameter is an empty array or empty string
  * returns value or null whether it is.
+ *
+ * Can be used for nested arrays
  *
  * @param mixed variable
  *
  * @return mixed|null based on variable
  */
 if(! function_exists('getValueOrNull')){
-    function getValueOrNull(mixed $val = null): mixed {
+    function getValueOrNull(mixed $val = null, $key=null): mixed {
+        if(is_array($val) && isset($key)){
 
-        return  !empty($val) ? $val : null;
+            $val = array_key_exists($key,$val) ? getValueOrNull($val[$key]) : null;
+
+        }
+        return  empty($val) ? null : $val ;
     }
 }
 
