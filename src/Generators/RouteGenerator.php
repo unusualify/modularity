@@ -624,7 +624,7 @@ class RouteGenerator extends Generator
 
             $this->createRoutePermissions();
 
-            if($this->migrate && !$this->fix){
+            if($this->migrate && !$this->fix){ //!$this->module->isRouteTableExists($name)
 
                 $this->console->call('unusual:migrate', [
                     'module' => $this->module->getStudlyName()
@@ -884,27 +884,26 @@ class RouteGenerator extends Generator
             $keyOrders = ['name','base_prefix','system_prefix','headline','routes'];
             $config = $this->getConfig()->get( $this->getModule()->getSnakeName()) ?? [];
             $moduleName = $this->getModule()->getName();
-            $routeName = $this->getName(); // studlyName
+            $routeName = $this->getName();
+            $routeArray = $config['routes'][$this->getSnakeCase($routeName)] ?? [];
 
-            if($this->plain){
-                empty($config['name']) ?   $config['name'] = $this->getHeadline($moduleName) : null;
-                empty($config['base_prefix']) ?   $config['base_prefix'] = false : null;
-                empty($config['system_prefix']) ?   $config['system_prefix'] = $config['base_prefix'] ?? false : null;
-                empty($config['headline']) ?   $config['headline'] =  pluralize($this->getHeadline($moduleName)) : null;
-            }
+            empty($config['name']) ? ($config['name'] = $this->getHeadline($moduleName)) : null;
+            empty($config['base_prefix']) ? $config['base_prefix'] = false : null;
+            empty($config['system_prefix']) ? $config['system_prefix'] = $config['base_prefix'] ?? false : null;
+            empty($config['headline']) ? $config['headline'] =  pluralize($this->getHeadline($moduleName)) : null;
 
             $route_array = ($this->getModule()->getName() === $this->getName() ? ['parent' => true] : []) + [
-                'name' =>  $routeName,
-                'headline' => pluralize($this->getHeadline($routeName)),
-                'url' => pluralize($this->getKebabCase($routeName)),
-                'route_name' => $this->getSnakeCase($routeName),
-                'icon' => '',
-                'table_options' => static::$defaultTableOptions,
-                'headers' => $this->getHeaders(),
-                'inputs' => $this->getInputs()
+                'name' => getValueOrNull($routeArray,key:'name') ?? $routeName,
+                'headline' => getValueOrNull($routeArray,key:'headline') ??  pluralize($this->getHeadline($routeName)),
+                'url' => getValueOrNull($routeArray,key:'url') ??  pluralize($this->getKebabCase($routeName)),
+                'route_name' => getValueOrNull($routeArray,key:'route_name') ?? $this->getSnakeCase($routeName),
+                'icon' => getValueOrNull($routeArray,key:'icon') ?? '',
             ];
-            $config['routes'][$this->getSnakeCase($this->getName())] = $route_array;
-
+            $config['routes'][$this->getSnakeCase($this->getName())] = array_merge($route_array,$routeArray)+[
+                'table_options' => getValueOrNull($routeArray,key:'table_options') ?? static::$defaultTableOptions,
+                'headers' => getValueOrNull($routeArray,key:'headers') ?? $this->getHeaders(),
+                'inputs' => getValueOrNull($routeArray,key:'inputs') ?? $this->getInputs(),
+            ];
 
             $this->module->setConfig($config);
             uksort($config, function($a, $b) use($keyOrders){
