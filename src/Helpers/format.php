@@ -148,33 +148,25 @@ if (! function_exists('formatRulesSchema')) {
     }
 }
 
-
-if(! function_exists('getValueOrFalse')){
-
-    function getValueOrFalse(mixed $val = null): mixed {
-
-
-        return  !empty($val) ? $val : false;
-    }
-}
 /**
  * Checks if the given parameter is an empty array or empty string
- * returns value or null whether it is.
+ * returns value or null|false whether it is.
+ *
+ * Return type can be controlled by  @param $bool
  *
  * Can be used for nested arrays
  *
  * @param mixed variable
+ * @param string $key
+ * @param boolean $bool to control return type
  *
  * @return mixed|null based on variable
  */
 if(! function_exists('getValueOrNull')){
-    function getValueOrNull(mixed $val = null, $key=null): mixed {
+    function getValueOrNull(mixed $val = null, $key=null, $bool = true): mixed {
         if(is_array($val) && isset($key)){
-
             $val = array_key_exists($key,$val) ? getValueOrNull($val[$key]) : null;
-
         }
-        return  empty($val) ? null : $val ;
+        return  empty($val) ? ($bool ? false : null) : $val ;
     }
 }
-
