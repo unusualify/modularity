@@ -1144,13 +1144,33 @@ class RouteGenerator extends Generator
     }
 
     /**
-     * Get the module name in lower case.
+     * Get the route name in lower case.
      *
      * @return string
      */
     protected function getLowerNameReplacement()
     {
         return $this->getLowerName($this->getName());
+    }
+
+    /**
+     * Get the module name in lower case.
+     *
+     * @return string
+     */
+    protected function getModuleLowerNameReplacement()
+    {
+        return $this->getLowerName($this->module->getName());
+    }
+
+    /**
+     * Get the module name in studly case.
+     *
+     * @return string
+     */
+    protected function getModuleStudlyNameReplacement()
+    {
+        return $this->module->getName();
     }
 
     /**
