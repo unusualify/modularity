@@ -38,7 +38,8 @@
         "torann/geoip": "^3.0",
         "tymon/jwt-auth": "^1.0|^2.0",
         "league/glide-laravel" : "^1.0",
-        "orangehill/iseed": "^3.0"
+        "orangehill/iseed": "^3.0",
+        "wikimedia/composer-merge-plugin": "^2.1"
     },
     "require-dev": {
 
@@ -76,6 +77,9 @@
     "config": {
         "sort-packages": true,
         "preferred-install": "dist",
-        "optimize-autoloader": true
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "wikimedia/composer-merge-plugin": true
+        }
     }
 }
