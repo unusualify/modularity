@@ -163,7 +163,7 @@ if (! function_exists('formatRulesSchema')) {
  * @return mixed|null based on variable
  */
 if(! function_exists('getValueOrNull')){
-    function getValueOrNull(mixed $val = null, $key=null, $bool = true): mixed {
+    function getValueOrNull(mixed $val = null, $key=null, $bool = false): mixed {
         if(is_array($val) && isset($key)){
             $val = array_key_exists($key,$val) ? getValueOrNull($val[$key]) : null;
         }
