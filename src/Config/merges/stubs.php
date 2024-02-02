@@ -12,6 +12,8 @@ return [
         // 'repository' => 'Repositories/$STUDLY_NAME$Repository.php',
         // 'route-controller' => 'Http/Controllers/$STUDLY_NAME$Controller.php',
         // 'route-controller-api' => 'Http/Controllers/API/$STUDLY_NAME$Controller.php',
+        'composer' => 'composer.json',
+
     ],
     'replacements' => [
         'routes/web' => ['LOWER_NAME', 'STUDLY_NAME'],
@@ -21,7 +23,16 @@ return [
         'views/form' => ['STUDLY_NAME'],
         // 'route-controller' => ['NAMESPACE', 'MODULE', 'MODULE_NAMESPACE', 'CLASS', 'STUDLY_NAME', 'LOWER_NAME'],
         // 'route-controller-api' => ['NAMESPACE', 'MODULE', 'CLASS', 'STUDLY_NAME', 'LOWER_NAME'],
-        // 'repository' => ['NAMESPACE', 'CLASS', 'MODULE','STUDLY_NAME', 'MODEL']
+        // 'repository' => ['NAMESPACE', 'CLASS', 'MODULE','STUDLY_NAME', 'MODEL'],
+        'composer' => [
+            'LOWER_NAME',
+            'STUDLY_NAME',
+            'VENDOR',
+            'AUTHOR_NAME',
+            'AUTHOR_EMAIL',
+            'MODULE_NAMESPACE',
+            'PROVIDER_NAMESPACE',
+        ],
     ],
     'gitkeep' => true
 ];
