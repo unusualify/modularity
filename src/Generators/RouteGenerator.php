@@ -848,7 +848,6 @@ class RouteGenerator extends Generator
         if($this->getModule()->getName() === $this->getName()){
 
             $config['name'] =  $config['name'] ?? $studlyName;
-            $config['base_prefix'] = $config['base_prefix'] ?? false;
             $config['system_prefix'] = $config['system_prefix'] ?? $config['base_prefix'] ?? false;
             $config['headline'] = $config['headline'] ?? pluralize($headline);
             // $config['parent_route'] = $route_array;
@@ -1171,7 +1170,7 @@ class RouteGenerator extends Generator
      */
     protected function getVendorReplacement()
     {
-        return config('modules.composer.vendor');
+        return unusualConfig('composer.vendor');
     }
 
     /**
@@ -1191,7 +1190,7 @@ class RouteGenerator extends Generator
      */
     protected function getAuthorNameReplacement()
     {
-        return config('modules.composer.author.name');
+        return unusualConfig('composer.author.name');
     }
 
     /**
@@ -1201,7 +1200,7 @@ class RouteGenerator extends Generator
      */
     protected function getAuthorEmailReplacement()
     {
-        return config('modules.composer.author.email');
+        return unusualConfig('composer.author.email');
     }
 
     /**
