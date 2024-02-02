@@ -1,6 +1,5 @@
 <?php
 
-
 if (!function_exists('array_merge_recursive_distinct')) {
     /**
      * array_merge_recursive does indeed merge arrays, but it converts values with duplicate
@@ -111,4 +110,17 @@ function array2Object($arr)
 function object2Array($object)
 {
     return json_decode( json_encode($object), true);
+}
+
+function nested_array_merge ( array $array1, array $array2 )
+{
+    $merged = $array1;
+    foreach ($array2 as $key => $value) {
+        if(is_array($value) && array_key_exists($key, $array1)){
+            $merged[$key] = nested_array_merge($array1[$key], $value);
+        }else{
+            $merged[$key] = getValueOrNull($value, bool: false) ?? $merged[$key];
+        }
+    }
+    return $merged;
 }
