@@ -881,7 +881,6 @@ class RouteGenerator extends Generator
 
         if($this->fix){
             $configPath = $this->module->getConfigPath();
-            $keyOrders = ['name','base_prefix','system_prefix','headline','routes'];
             $config = $this->getConfig()->get( $this->getModule()->getSnakeName()) ?? [];
             $moduleName = $this->getModule()->getName();
             $routeName = $this->getName();
@@ -898,18 +897,14 @@ class RouteGenerator extends Generator
                 'url' => getValueOrNull($routeArray,key:'url') ??  pluralize($this->getKebabCase($routeName)),
                 'route_name' => getValueOrNull($routeArray,key:'route_name') ?? $this->getSnakeCase($routeName),
                 'icon' => getValueOrNull($routeArray,key:'icon') ?? '',
-            ];
-            $config['routes'][$this->getSnakeCase($this->getName())] = array_merge($route_array,$routeArray)+[
                 'table_options' => getValueOrNull($routeArray,key:'table_options') ?? static::$defaultTableOptions,
-                'headers' => getValueOrNull($routeArray,key:'headers') ?? $this->getHeaders(),
-                'inputs' => getValueOrNull($routeArray,key:'inputs') ?? $this->getInputs(),
+                'headers' => nested_array_merge($this->getHeaders(),$routeArray['headers']),
+                'inputs' => nested_array_merge($this->getInputs(),$routeArray['inputs']),
             ];
+            $config['routes'][$this->getSnakeCase($this->getName())] = $route_array;
 
+            uksort($config, fn($a) => is_string($config[$a]) ?  -1 : (is_bool($config[$a]) ?  0 : 1));
             $this->module->setConfig($config);
-            uksort($config, function($a, $b) use($keyOrders){
-                return (array_search($a, $keyOrders) - array_search($b, $keyOrders));
-            });
-
             return $this->filesystem->put($configPath, phpArrayFileContent($config));
         }
 
