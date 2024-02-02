@@ -898,8 +898,8 @@ class RouteGenerator extends Generator
                 'route_name' => getValueOrNull($routeArray,key:'route_name') ?? $this->getSnakeCase($routeName),
                 'icon' => getValueOrNull($routeArray,key:'icon') ?? '',
                 'table_options' => getValueOrNull($routeArray,key:'table_options') ?? static::$defaultTableOptions,
-                'headers' => nested_array_merge($this->getHeaders(),$routeArray['headers']),
-                'inputs' => nested_array_merge($this->getInputs(),$routeArray['inputs']),
+                'headers' => $routeArray['headers'] ?? $this->getHeaders(),
+                'inputs' => $routeArray['inputs'] ?? $this->getInputs(),
             ];
             $config['routes'][$this->getSnakeCase($this->getName())] = $route_array;
 
