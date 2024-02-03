@@ -399,4 +399,22 @@ class Module extends NwidartModule
     public function getConfigPath(){
         return $this->getPath().'/Config/config.php';
     }
+
+
+    /**
+     * Check whether the file is presents
+     *
+     * @param string fileName
+     *
+     * @return bool
+     */
+    public function isFileExists($fileName){
+        $pattern = $this->getDirectoryPath('**/*/*' . $fileName . '*');
+        // $pattern = base_path('Modules/'.$this->module->getStudlyName().'/**/*/*'.$fileName.'*');
+        $search = glob($pattern);
+
+        return !empty($search);
+    }
+
+
 }

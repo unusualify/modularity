@@ -763,7 +763,7 @@ class RouteGenerator extends Generator
             );
 
 
-            if(!$this->checkFileExists("create_{$this->getDBTableName($this->name)}_table") && !$this->fix){
+            if(!$this->module->isFileExists("create_{$this->getDBTableName($this->name)}_table") && !$this->fix){
                 $this->console->call('unusual:make:migration', [
                     'module' => $this->module->getStudlyName(),
                     'name' => "create_{$this->getDBTableName($this->name)}_table",
@@ -1003,7 +1003,7 @@ class RouteGenerator extends Generator
                     // $route_name = $options[1]; // package_feature
                     $pivot_table_name = snakeCase($this->name) . '_' . $route_name;
 
-                    if(!$this->checkFileExists("create_{$pivot_table_name}_table")){
+                    if(!$this->module->isFileExists("create_{$pivot_table_name}_table")){
 
                         $this->console->call('unusual:make:migration', [
                             '--relational' => true,
@@ -1203,23 +1203,7 @@ class RouteGenerator extends Generator
         return unusualConfig('composer.author.email');
     }
 
-    /**
-     * Check whether the file is presents
-     *
-     * @param string fileName
-     *
-     * @return bool
-     */
 
-    protected function checkFileExists($fileName){
-
-        $pattern = $this->module->getDirectoryPath('**/*/*' . $fileName . '*');
-        // $pattern = base_path('Modules/'.$this->module->getStudlyName().'/**/*/*'.$fileName.'*');
-        $search = glob($pattern);
-
-        return !empty($search);
-
-    }
 
 
 }
