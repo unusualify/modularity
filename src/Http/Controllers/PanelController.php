@@ -142,6 +142,14 @@ abstract class PanelController extends CoreController
     protected $formWithCount = [];
 
     /**
+     * formSchema
+     *
+     * @var array
+     */
+    protected $formSchema;
+
+
+    /**
      * List of permissions keyed by a request field. Can be used to prevent unauthorized field updates.
      *
      * @var array
