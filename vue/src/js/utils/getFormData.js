@@ -31,7 +31,7 @@ const chunkInputs = (inputs) => {
 
   inputs = {}
   for (const key in _inputs) {
-    if (_inputs[key].type === 'group' && _inputs[key].schema) {
+    if (_inputs[key].type === 'wrap' && _inputs[key].schema) {
       Object.keys(_inputs[key].schema).forEach((name, i) => {
         inputs[name] = _inputs[key].schema[name]
       })
@@ -319,7 +319,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
   if (rootState) {
     // hydrateSelected(item, rootState)
   }
-
+  __log(inputs, values)
   return values
 }
 
@@ -384,7 +384,7 @@ export const getSchema = (inputs) => {
     return Object.prototype.hasOwnProperty.call(value, 'slotable')
   })
 
-  if (find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'group'))) {
+  if (find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'wrap'))) {
     // reduce(_inputs, (acc, input, key) => {
     //   if(Object.prototype.hasOwnProperty.call(input, 'group')){
     //     if(acc[input.group])

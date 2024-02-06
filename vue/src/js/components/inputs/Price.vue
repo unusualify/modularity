@@ -80,7 +80,7 @@ export default {
     modelValue: {
       deep: true,
       handler (newValue) {
-        console.log('watchedValue?', newValue)
+        // console.log('watchedValue?', newValue)
         if (newValue) {
           this.deepModel = newValue
         } else {
