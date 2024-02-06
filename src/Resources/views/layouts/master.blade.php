@@ -19,8 +19,6 @@
 
         {{-- @dd( auth()->user() ) --}}
         @php
-            $isMiniSidebar = false;
-
             $_mainConfiguration = [
                 'navigation' => $navigation,
                 'impersonation' => $impersonation,
@@ -81,8 +79,7 @@
             window['{{ unusualConfig('js_namespace') }}'].STORE = {};
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.config = {
-                // isMiniSidebar:  '{{ $isMiniSidebar ?? true }}',
-                isMiniSidebar:  {!! json_encode($isMiniSidebar ?? true) !!},
+                sideBarOpt: {!! json_encode(unusualConfig('ui_components.sidebar')) !!},
             },
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.medias = {};

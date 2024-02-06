@@ -1,12 +1,14 @@
 const state = {
-  isMiniSidebar: window[process.env.VUE_APP_NAME].STORE.config.isMiniSidebar
+  sideBarOpt : window[process.env.VUE_APP_NAME].STORE.config.sideBarOpt,
 }
+
+
 
 // getters
 const getters = {
-  isMiniSidebar: state => {
-    return state.isMiniSidebar
-  }
+  sideBarOpt: state => {
+    return state.sideBarOpt;
+  },
 }
 
 const mutations = {

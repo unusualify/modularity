@@ -1,5 +1,6 @@
 export default {
   add: 'mdi-plus',
+  accountSettings : 'mdi mdi-account-cog',
   arrowLeft: 'mdi-arrow-left-thin',
   arrowRight: 'mdi-arrow-right-thin',
 
@@ -8,6 +9,7 @@ export default {
   company: 'mdi-office-building-cog',
   creditCards: 'mdi-credit-card-search',
 
+  dashboard: 'mdi-view-dashboard',
   delete: 'mdi-trash-can-outline',
   download: 'mdi-download',
   duplicate: 'mdi-content-copy',

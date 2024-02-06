@@ -6,8 +6,12 @@
     :mini-variant="$root.isMini"
     v-model:mini-variant="$root.miniStatus"
     @update:mini-variant="miniChanging"
+    :rail="rail"
     :width="width"
+    @update:rail="toggled($event)"
     >
+    <!-- @update:rail="toggled('asdddddd')" -->
+    <!-- @update:rail="console.log($event)" -->
 
     <!-- <v-avatar class="d-block text-center mx-auto mt-2">
       <v-icon color="green darken-2" large icon="fa:fab fa-atlassian"/>
@@ -26,7 +30,9 @@
     </ue-list-element> -->
 
     <ue-list-group
-      :items="items">
+      :items="items"
+      :expanded="expanded"
+      >
     </ue-list-group>
 
     <!-- <template v-slot:append>
@@ -63,6 +69,7 @@
 
       <div class="d-flex justify-center">
         <v-btn
+          v-if="expanded"
           v-for="[_icon, _link] in socialMediaLinks"
           class="ma-1"
           :key="_icon"
@@ -127,20 +134,21 @@ export default {
   data () {
     return {
       dialog: false,
-      logo: '@/sass/themes/template/main-logo.svg'
-
-      // isMini: this.mini,
+      logo: '@/sass/themes/template/main-logo.svg',
+      isExpanded: !this.$root.railMode,
     }
   },
 
   created () {
+
   },
 
   beforeCreate () {
-    // __log('beforeCreate mini', this.mini)
+
   },
 
   mounted () {
+
 
   },
   watch: {
@@ -150,22 +158,40 @@ export default {
   computed: {
     width () {
       return this.$root.isXlAndUp ? 320 : 256
-    }
+    },
+    rail:{
+      get(){
+        return this.$root.railMode;
+      }
+    },
+    expanded: {
+      get(){
+        return this.isExpanded;
+      },
+      set(val){
+        this.isExpanded = val;
+      }
+    },
   },
   methods: {
     onChange (event) {
       console.log('sidebar onChange', event.target.value)
+
     },
     addItem (item) {
       // console.log(this.items)
       this.items.push(item)
     },
-
     miniChanging (val) {
       // __log(
       //     'mini changing',
       //     val
       // )
+    },
+    toggled(val){
+      if(this.rail){
+        this.expanded = !val;
+      }
     }
   }
 }

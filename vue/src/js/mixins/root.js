@@ -6,31 +6,37 @@ import openMediaLibrary from '@/behaviors/openMediaLibrary'
 
 export default {
   props: {
-
   },
   data () {
     return {
       csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
       sidebarToggle: false,
-      miniStatus: false
-
+      miniStatus: false,
+      hasRailMode : true,
     }
   },
   computed: {
     isHoverable () {
-      return this.$store.state.config.isMiniSidebar && this.isLgAndUp
+      return (this.$store.state.config.sideBarOpt.isMini && this.isLgAndUp) || this.railMode
     },
     isMini: {
       get () {
-        return this.miniStatus = this.$store.state.config.isMiniSidebar && this.isLgAndUp
+        return this.miniStatus = this.$store.state.config.sideBarOpt.isMini && this.isLgAndUp
       },
       set (val) {
         this.miniStatus = val
-        // __log('miniStatus form isMini setter', val, this.miniStatus)
       }
     },
+    railMode: {
+      get(){
+        return this.hasRailMode = this.$vuetify.display.lgAndUp && this.$store.state.config.sideBarOpt.rail;;
+      },
+      // set(miniStatus){
+      //   this.hasRailMode = miniStatus && this.$store.state.config.sideBarOpt.rail;
+      // }
+    },
     showToggleButton () {
-      return !this.isLgAndUp || (!this.$store.state.config.isMiniSidebar)
+      return !this.isLgAndUp || (!this.$store.state.config.sideBarOpt.isMini)
     },
     isLgAndUp () {
       return this.$vuetify.display.lgAndUp
@@ -42,17 +48,13 @@ export default {
       return this.$vuetify.display.smAndDown
     },
     ...mapState({
-      isMiniSidebar: state => state.config.isMiniSidebar
+      isMiniSidebar: state => state.config.sideBarOpt.isMini
     })
 
   },
   watch: {
     isLgAndUp (val) {
-      // __log(
-      //     this.isMiniSidebar
-      // )
       this.isMini = this.isMiniSidebar && val
-      // this.sidebarToggle = false;
     }
   },
   methods: {
@@ -60,16 +62,10 @@ export default {
       this.sidebarToggle = !this.sidebarToggle
     },
     handleMethodCall (functionName, ...val) {
-      // __log(functionName)
       return this[functionName](...val)
     },
     handleVmFunctionCall (functionName, ...val) {
-      // __log(
-      //   functionName,
-      //   this
-      // )
       return this[functionName](...val)
-      // return window.vm[functionName](...val)
     }
     // openMediaLibrary () {
 
@@ -78,14 +74,9 @@ export default {
   mounted () {
     if (this.isMiniSidebar && this.isLgAndUp) {
       this.sidebarToggle = true
-    } else if (!this.$store.state.config.isMiniSidebar) {
+    } else if (!this.$store.state.config.sideBarOpt.isMini) {
       this.sidebarToggle = true
     }
-    // __log(
-    //     'root mixin mounted',
-    //     this.miniStatus,
-    //     this.sidebarToggle
-    // )
   },
   created () {
     openMediaLibrary()

@@ -20,6 +20,7 @@ return [
             'dashboard' => [
                 'name' => 'Dashboard',
                 'route_name' => 'admin.dashboard',
+                'icon' => '$dashboard',
             ],
             '_system_settings' => [
                 'name' => 'System Settings',
@@ -37,7 +38,7 @@ return [
             ...UNavigation::modulesMenu(),
             'media_library' => [
                 'name' => 'Media Library',
-                // 'icon' => '$media',
+                'icon' => '$media',
                 'attr' => 'data-medialib-btn',
                 // 'event' => '_triggerOpenMediaLibrary',
                 'event' => 'openFreeMediaLibrary',
@@ -45,6 +46,7 @@ return [
             'profile' => [
                 'name' => 'Profile Settings',
                 'route_name' => 'admin.profile',
+                'icon' => '$accountSettings',
             ],
 
         ],

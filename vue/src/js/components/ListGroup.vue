@@ -5,6 +5,8 @@
         :style="style"
         :active-class="`sidebar-item-active sidebar-item-active-${level}`"
         class="mb-2 py-0"
+        density="compact"
+
         >
         <template
             v-for="(item, i) in items"
@@ -18,6 +20,7 @@
                 :sub-group="false"
                 :active-class="`sidebar-item-active sidebar-item-active-${level}`"
                 :value="item.name"
+
                 >
                 <template v-slot:activator="{ props }">
                     <v-list-item
@@ -39,11 +42,11 @@
                 :ripple="false"
                 :href="item.route"
                 :append="false"
-                :prepend-icon="item.icon"
+                :prepend-icon="expanded ? null : item.icon"
                 :title="item.name"
                 :active="activeIndex === i"
-                :active-class="`sidebar-item-active sidebar-item-active-${level}`"
                 v-bind="$bindAttributes(item)"
+
                 >
             </v-list-item>
 
@@ -54,7 +57,7 @@
                 :ripple="false"
                 :append="false"
                 @click="$root.handleVmFunctionCall(item.event)"
-                :prepend-icon="item.icon"
+                :prepend-icon="expanded ? null : item.icon"
                 :title="item.name"
                 :active="activeIndex === i"
                 :active-class="`sidebar-item-active sidebar-item-active-${level}`"
@@ -81,14 +84,15 @@
 
                 <v-list-item
                     :key="i + 'subheader'"
+                    :title="expanded ? item.name : null"
                     :index="i"
                     :ripple="false"
                     :inactive="true"
                     :append="false"
                     disabled
-                    :prepend-icon="item.icon"
-                    :title="item.name"
+                    :prepend-icon="expanded ? null : item.icon"
                     >
+                    <!-- :title="item.name" -->
 
                     <!-- <v-list-item-icon v-if="!!item.icon">
                         <v-icon> {{item.icon}} </v-icon>
@@ -139,6 +143,10 @@ export default {
     level: {
       type: Number,
       default: 0
+    },
+    expanded:{
+      type: Boolean,
+      default: true
     }
   },
   data: () => ({
@@ -159,7 +167,6 @@ export default {
     //   }
 
     // },
-
     activeIndex: {
       get () {
         return this.items.findIndex(item => item.is_active == 1)
@@ -177,14 +184,24 @@ export default {
       //     this.$root.isMini
       // )
       return {
-        marginLeft: ((!this.$root.miniStatus || !this.$root.isMini) ? this.level * 20 : 0) + 'px'
+        marginLeft: ((!this.$root.miniStatus || !this.$root.isMini) ? this.level * 20 : 0) + 'px',
       }
     }
 
   },
+
   created () {
     this.opened = this.getListGroupOpens([], this.items)
   },
+  watch:{
+    expanded(n,o){
+      if(o){
+        __log(document.querySelector('v-list'))
+        document.querySelector('.v-list').querySelector('.v-list-item').style.paddingLeft = 1;
+
+      }
+  },
+},
   methods: {
     isSubgroup (item) {
       return !!item.items
@@ -197,12 +214,19 @@ export default {
     },
     isHeader (item) {
       return !item.route && !item.items && !!item.name
-    }
+    },
+
   }
 }
 </script>
 
 <style>
+
+  .newPadding{
+    padding: 4 16;
+    background-color: red;
+  }
+
     /* .sidebar-item-active{
         background: #11758D;
         text-decoration: none;
