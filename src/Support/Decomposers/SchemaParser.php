@@ -73,6 +73,10 @@ class SchemaParser extends Parser
         // 'json'
     ];
 
+    protected $exceptHeaderMethods = [
+        'json'
+    ];
+
     /**
      * Create new instance.
      *
@@ -300,6 +304,10 @@ class SchemaParser extends Parser
      */
     public function headerFormat(string $column_name, $options = []) : array
     {
+        if(in_array($options[0], ['json'])){
+            return [];
+        }
+
         $title = $this->getHeadline($column_name);
 
         if(in_array($options[0], ['morphTo'])){
@@ -341,20 +349,9 @@ class SchemaParser extends Parser
     {
 
         $filter = array_filter($this->parse($this->schema), function($v,$k){
-            return !array_key_exists($k, $this->customAttributes);
+            return !(array_key_exists($k, $this->customAttributes) || in_array($v[0], $this->exceptHeaderMethods));
         }, ARRAY_FILTER_USE_BOTH );
-        // dd(
-        //     array_merge(
-        //         array_merge($this->defaultPreHeaders, array_map(function($k, $options){
-        //             if(in_array($k, $this->relationshipKeys)){
-        //                 // $options[0] => 'relation_name'
-        //                 return $this->headerFormat($options[0], [$k]);
-        //             }
-        //             return $this->headerFormat($k, $options);
-        //         }, array_keys($filter), $filter  )),
-        //         $this->defaultPostHeaders
-        //     )
-        // );
+
         return array_merge(
             array_merge($this->defaultPreHeaders, array_map(function($k, $options){
                 if(in_array($k, $this->relationshipKeys)){
@@ -387,9 +384,11 @@ class SchemaParser extends Parser
             $extra_options['ext'] = 'time';
         } else if(in_array($options[0], ['text', 'mediumtext', 'longtext'])){
             $type = 'textarea';
+        } else if($options[0] == 'json'){
+            $type = 'json';
         }
 
-        if(!in_array('nullable', $options)){
+        if(!in_array('nullable', $options) && !in_array($type, ['json'])){
             $rules[] = 'required';
         }
 
@@ -424,7 +423,7 @@ class SchemaParser extends Parser
                         ]);
                     }
                 }
-                $extra_options['parents'] = $parents;
+                $extra_options['schema'] = $parents;
             }
         }
 
@@ -433,9 +432,9 @@ class SchemaParser extends Parser
             $extra_options['rules'] = implode(':', $rules);
         }
         return [
+            'type' => $type,
             'name' => $name,
             'label' => $label,
-            'type' => $type,
             ...$extra_options,
             // 'placeholder' => "{$this->getHeadline($column)} Value",
 
@@ -461,6 +460,7 @@ class SchemaParser extends Parser
         $filter = array_filter($this->parse($this->schema), function($v,$k){
             return !array_key_exists($k, $this->customAttributes);
         }, ARRAY_FILTER_USE_BOTH );
+
 
         return array_merge( $this->defaultInputs, array_map(function($k, $options){
             if(in_array($k, $this->relationshipKeys)){

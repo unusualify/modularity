@@ -21,6 +21,16 @@ class SchemaParser implements Arrayable
     /**
      * The migration schema.
      *
+     * format => $columnName1:$attributeName1,$columnName2:$attribute2
+     * name:string,
+     * company:belongsTo
+     * description:text
+     * stream_code:string:nullable
+     * url:string:nullable
+     * start_date:timestamp
+     * start_time:time
+     * settings:json
+     *
      * @var string
      */
     protected $schema;
@@ -276,7 +286,9 @@ class SchemaParser implements Arrayable
     {
         $fields = str_replace($column . ':', '', $schema);
 
-        return $this->hasCustomAttribute($column) ? $this->getCustomAttribute($column) : explode(':', $fields);
+        return $this->hasCustomAttribute($column) ? $this->getCustomAttribute($column) : array_map(function($field){
+            return $field;
+        }, explode(':', $fields));
     }
 
     /**

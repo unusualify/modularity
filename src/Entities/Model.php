@@ -18,7 +18,7 @@ use Unusualify\Modularity\Entities\Traits\{
 };
 
 
-abstract class Model extends BaseModel implements TaggableInterface
+class Model extends BaseModel implements TaggableInterface
 {
     use HasPresenter, HasHelpers, HasScopes, SoftDeletes, TaggableTrait, IsTranslatable, HasRelation;
 

@@ -70,7 +70,7 @@ trait ManageTraits {
                     break;
                     case 'morphTo':
                         if($all){
-                            return $this->chunkInputs($input['parents']);
+                            return $this->chunkInputs($input['schema']);
                         }
 
                         return [ uniqid() => $input];

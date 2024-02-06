@@ -265,9 +265,9 @@ trait RelationTrait
 
         return collect($this->inputs())->reduce(function($acc, $curr){
             if(preg_match('/morphTo/', $curr['type'])){
-                if(isset($curr['parents'])){
+                if(isset($curr['schema'])){
                     $routeCamelCase = camelCase($this->routeName());
-                    $acc["{$routeCamelCase}able"] = Arr::map(array_reverse($curr['parents']), fn($item) => [
+                    $acc["{$routeCamelCase}able"] = Arr::map(array_reverse($curr['schema']), fn($item) => [
                         'name' => $item['name'],
                         'repository' => $item['repository'],
                         'model' => get_class( App::make($item['repository'])->getModel()),

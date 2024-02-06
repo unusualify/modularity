@@ -310,12 +310,12 @@ trait ManageForm {
             break;
             case 'morphTo':
 
-                if(isset($input['parents'])){
+                if(isset($input['schema'])){
                     $data = [];
                     $arrayable = true;
-                    $length = count($input['parents']);
+                    $length = count($input['schema']);
 
-                    $reversedParents = array_reverse($input['parents']);
+                    $reversedParents = array_reverse($input['schema']);
 
                     foreach ($reversedParents as $index => $attachable) {
                         $attachable['ext'] = 'morphTo';
@@ -411,19 +411,14 @@ trait ManageForm {
                 $input['col'] = array_merge_recursive_preserve($default_repeater_col, $input['col'] ?? []);
 
                 $input['schema'] = $this->createFormSchema($input['schema']);
-                $input['name'] = "group-" . uniqid();
+
+                if($input['type'] == 'wrap')
+                    $input['name'] = "wrap-" . uniqid();
 
                 $data = $input;
 
             break;
             case 'relationship':
-                // dd(
-                //     $this->getForeignKeyFromName('vimeoWebinar'),
-                //     $this->getForeignKeyFromName('VimeoWebinar'),
-                //     $this->getForeignKeyFromName('vimeo-webinar'),
-                //     // $this->app['modularity']->find($this->moduleName)->getRouteConfig(studlyName($input['name'])),
-                //     // studlyName($input['name'])
-                // );
                 $foreignKey = $this->getForeignKeyFromName($this->routeName);
                 $relationshipInputs = $this->app['modularity']
                     ->find($this->moduleName)
@@ -443,6 +438,15 @@ trait ManageForm {
                 $input['name'] = $relationshipName;
                 $input['ext'] = 'relationship';
                 $input[] = 'withGutter';
+
+            break;
+            case 'json':
+                $default_repeater_col = [
+                    'cols' => 12,
+                ];
+                $input['col'] = array_merge_recursive_preserve($default_repeater_col, $input['col'] ?? []);
+                $input['schema'] = $this->createFormSchema($input['schema']);
+
 
             break;
             default:
