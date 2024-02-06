@@ -209,7 +209,14 @@ class BaseServiceProvider extends ServiceProvider
             'one-time-operations.directory' => unusualConfig('vendor_path'). '/src/Operations',
         ]);
 
-        if (!app()->runningInConsole()) {
+        $modularityIsCacheable = !($this->app->runningInConsole() && $this->app->runningConsoleCommand([
+            'unusual:make:module',
+            'unusual:fix:module',
+            'unusual:make:route',
+            'unusual:dev'
+        ]));
+
+        if ($modularityIsCacheable) {
             config([
                 'modules.cache.enabled' => true,
                 'modules.cache.key' => 'modularity',
