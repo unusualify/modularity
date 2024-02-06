@@ -319,7 +319,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
   if (rootState) {
     // hydrateSelected(item, rootState)
   }
-  __log(inputs, values)
+
   return values
 }
 
