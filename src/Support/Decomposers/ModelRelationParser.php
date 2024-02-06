@@ -103,6 +103,7 @@ class ModelRelationParser implements Arrayable
                         $parsed[] = [
                             'relationship_name'  => $function,
                             'relationship_method'    => $relationship_method,
+                            'return_type' => "\Illuminate\Database\Eloquent\Relations\\{$this->getStudlyName($relationship_method)}",
                             'parameters'=> $parameters,
                             'chain_methods' => $chainMethods
                         ];
@@ -442,10 +443,6 @@ class ModelRelationParser implements Arrayable
 
             $comment = $this->generateMethodComment($attr);
 
-            $relation = $this->getStudlyName($attr['relationship_method']);
-
-            $return_type = "\Illuminate\Database\Eloquent\Relations\\$relation";
-
             $method_chain = "\$this->{$attr['relationship_method']}({$args})";
             if(count($attr['chain_methods'])){
                 foreach ($attr['chain_methods'] as $key => $chain) {
@@ -456,7 +453,7 @@ class ModelRelationParser implements Arrayable
             }
             $method_chain .= ";";
 
-            $methods[] = $comment."\n\tpublic function {$attr['relationship_name']}() : {$return_type}\n\t{\n\t\treturn {$method_chain}\n\t}\n";
+            $methods[] = $comment."\n\tpublic function {$attr['relationship_name']}() : {$attr['return_type']}\n\t{\n\t\treturn {$method_chain}\n\t}\n";
         }
 
         return $methods;

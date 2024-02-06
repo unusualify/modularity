@@ -19,17 +19,17 @@ trait ManageForm {
 
     protected function createFormSchema($inputs)
     {
-        return Collection::make( $inputs )->mapWithKeys(function($input, $key){
-            return $this->getSchemaInput($input);
+        return Collection::make( $inputs )->mapWithKeys(function($input, $key) use($inputs){
+            return $this->getSchemaInput($input, $inputs);
         })->toArray();
     }
 
-    protected function getSchemaInput($input)
+    protected function getSchemaInput($input, $inputs = [])
     {
         // $default_input = collect(Config::get(unusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
         // $default_input = $this->configureInput(array2Object(Config::get(unusualBaseKey() . '.default_input')));
         $default_input = (array) Config::get(unusualBaseKey() . '.default_input');
-        [$hydrated, $arrayable] = $this->hydrateInput(object2Array($input));
+        [$hydrated, $arrayable] = $this->hydrateInput(object2Array($input), $inputs);
 
         if($arrayable){
             return $hydrated;
@@ -63,7 +63,7 @@ trait ManageForm {
      * @param Array|stdClass $input
      * @return Collection
      */
-    protected function hydrateInput($input)
+    protected function hydrateInput($input, $inputs = [])
     {
         $data = null;
         $arrayable = false;
@@ -416,10 +416,40 @@ trait ManageForm {
                 $data = $input;
 
             break;
+            case 'relationship':
+                // dd(
+                //     $this->getForeignKeyFromName('vimeoWebinar'),
+                //     $this->getForeignKeyFromName('VimeoWebinar'),
+                //     $this->getForeignKeyFromName('vimeo-webinar'),
+                //     // $this->app['modularity']->find($this->moduleName)->getRouteConfig(studlyName($input['name'])),
+                //     // studlyName($input['name'])
+                // );
+                $foreignKey = $this->getForeignKeyFromName($this->routeName);
+                $relationshipInputs = $this->app['modularity']
+                    ->find($this->moduleName)
+                    ->getRouteConfig(studlyName($input['name']) . '.inputs');
+
+                $input['type'] = 'custom-input-repeater';
+                $input['label'] = pluralize($this->getHeadline($input['name']));
+                $input['schema'] = $this->createFormSchema(Collection::make($relationshipInputs)->map(function($input) use($foreignKey){
+                    if($foreignKey == $input['name']){
+                        $input['type'] = 'hidden';
+                    }
+
+                    return $input;
+                })->toArray());
+
+                $relationshipName = pluralize($this->getCamelCase($input['name']));
+                $input['name'] = $relationshipName;
+                $input['ext'] = 'relationship';
+                $input[] = 'withGutter';
+
+            break;
             default:
 
                 break;
         }
+
         if(isset($input['ext'])){
             switch ($input['ext']) {
                 case 'permalink':
@@ -429,12 +459,10 @@ trait ManageForm {
 
                     $permalinkPrefix = getHost() . '/';
                     $permalinkPrefixFormat = getHost() . '/';
-
-                    foreach ($this->getConfigFieldsByRoute('inputs') as $key => $_input) {
+                    foreach ($inputs as $key => $_input) {
                         if( isset($_input->type)
-                            && in_array($_input->type, ['select', 'combobox'])
+                            && in_array($_input->type, ['select', 'combobox', 'hidden'])
                             && isset($_input->repository)
-
                         ){
                             $permalinkPrefixFormat .= ":{$this->getSnakeNameFromForeignKey($_input->name)}" . '/';
                         }
@@ -458,7 +486,6 @@ trait ManageForm {
                         ]
                     );
                     $data += $permalinkInput;
-                    // dd($data);
                     break;
 
 
