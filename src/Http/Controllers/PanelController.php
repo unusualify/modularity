@@ -235,6 +235,8 @@ abstract class PanelController extends CoreController
 
         $this->config = $this->getModuleConfig();
 
+        $this->titleColumnKey = $this->getConfigFieldsByRoute('title_column_key', 'name');
+
         $this->isParent = $this->isParentRoute();
 
         $this->checkNestedAttributes();
