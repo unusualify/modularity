@@ -64,6 +64,10 @@ trait ManageNames {
         return null;
     }
 
+    protected function getForeignKeyFromName($name){
+        return $this->getSnakeCase($name) . '_id';
+    }
+
     protected function getCamelNameFromForeignKey($foreign_key){
         if(preg_match('/(.*)(_id)/', $foreign_key, $matches)){
             return $this->getCamelCase($matches[1]);

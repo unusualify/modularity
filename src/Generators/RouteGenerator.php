@@ -591,7 +591,6 @@ class RouteGenerator extends Generator
 
         $name = $this->getName();
 
-
         if ($this->module->getRouteConfig($name)) {
             // dd($this->force);
             if ($this->force) {
@@ -857,14 +856,21 @@ class RouteGenerator extends Generator
 
         if(!$this->plain){
 
+            $headers = $this->getHeaders();
+
+            $titleColumnKey = count($filtered = array_filter($headers, fn($i) => $i['key'] === 'name' || $i['key'] === 'title')) > 0
+                ? $filtered[0]['key']
+                : $headers[0]['key'];
+
             $route_array = ($this->getModule()->getName() === $this->getName() ? ['parent' => true] : []) + [
                 'name' =>  $studlyName,
                 'headline' => pluralize($headline),
                 'url' => pluralize($kebabCase),
                 'route_name' => $snakeCase,
                 'icon' => '', //'$modules',
+                'title_column_key' => $titleColumnKey,
                 'table_options' => static::$defaultTableOptions,
-                'headers' => $this->getHeaders(), //in Unusualify\Modularity\Support\Migrations\SchemaParser::class
+                'headers' => $headers, //in Unusualify\Modularity\Support\Migrations\SchemaParser::class
                 'inputs' => $this->getInputs() //in Unusualify\Modularity\Support\Migrations\SchemaParser::class
             ];
 
@@ -1144,13 +1150,33 @@ class RouteGenerator extends Generator
     }
 
     /**
-     * Get the module name in lower case.
+     * Get the route name in lower case.
      *
      * @return string
      */
     protected function getLowerNameReplacement()
     {
         return $this->getLowerName($this->getName());
+    }
+
+    /**
+     * Get the module name in lower case.
+     *
+     * @return string
+     */
+    protected function getModuleLowerNameReplacement()
+    {
+        return $this->getLowerName($this->module->getName());
+    }
+
+    /**
+     * Get the module name in studly case.
+     *
+     * @return string
+     */
+    protected function getModuleStudlyNameReplacement()
+    {
+        return $this->module->getName();
     }
 
     /**

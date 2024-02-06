@@ -3,7 +3,9 @@
 namespace Unusualify\Modularity\Repositories\Traits;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\App;
+use Unusualify\Modularity\Facades\UFinder;
 
 trait RelationTrait
 {
@@ -105,6 +107,26 @@ trait RelationTrait
             }
         }
 
+        foreach ($this->getHasManyRelations() as $relationName) {
+
+            if (isset($fields[$relationName])) {
+                $relation = $object->{$relationName}();
+                $relatedLocalKey = $relation->getLocalKeyName(); //id
+                $foreignKey = $relation->getForeignKeyName(); // parent_name_id
+
+                $repository = UFinder::getRouteRepository( Str::singular($relationName), asClass: true);
+
+                foreach ($fields[$relationName] as $key => $data) {
+                    if(isset($data[$relatedLocalKey])){
+                        $repository->update($data['id'], $data + [$foreignKey => $object->id]);
+                    }else{
+                        $repository->create($data + [$foreignKey => $object->id]);
+                        // $object->{$relation}()->create($data);
+                    }
+                }
+            }
+        }
+
         return $fields;
     }
 
@@ -178,6 +200,16 @@ trait RelationTrait
             }
         }
 
+        foreach ($schema as $key => $input) {
+            if($input['type'] == 'custom-input-repeater' && isset($input['ext']) && $input['ext'] == 'relationship'){
+                $repository = UFinder::getRouteRepository(Str::singular($input['name']), asClass:true);
+                $records = $object->{$input['name']};
+                $fields[$input['name']] = !$records->isEmpty() ? $object->{$input['name']}->map(function($model) use($input, $repository){
+                    return $repository->getFormFields($model, $input['schema']);
+                }) : [$repository->getFormFields($repository->newInstance(), $input['schema'])];
+            }
+        }
+
         return $fields;
     }
 
@@ -204,6 +236,15 @@ trait RelationTrait
         return $relations;
 
         dd($relations);
+    }
+
+    public function getHasManyRelations()
+    {
+        if(method_exists($this->getModel(), 'definedRelations')){
+            return $this->definedRelations('HasMany');
+        }
+
+        return [];
     }
 
     public function getMorphToRelations()

@@ -11,59 +11,83 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use ReflectionClass;
 use ReflectionMethod;
+use Unusualify\Modularity\Facades\Modularity;
 
 trait HasHelpers
 {
+    protected $isModuleModel = false;
+
+    protected $moduleName;
+
+    protected $routeName;
+
+    protected $definedRelationships = [];
+
+
+    public function initializeHasHelpers()
+    {
+        if(!app()->runningInConsole())
+            $this->scanModuleModel();
+    }
+
+    public function scanModuleModel()
+    {
+        $pattern = "/" . preg_quote( trim(config('modules.namespace', 'Modules'), '\\') . "\\", "|") . "/";
+
+        if($this->isModuleModel = preg_match($pattern, static::class, $matches)){
+            $moduleNamePattern = '/Modules\\\([A-Za-z]+)+\\\Entities/';
+
+            preg_match($moduleNamePattern, static::class, $matches);
+
+            $this->moduleName = $matches[1];
+
+            $this->routeName = get_class_short_name(static::class);
+
+            $this->definedRelationships = Modularity::find($this->moduleName)->getRouteConfigs(snakeCase($this->routeName) . '.relationships', []);
+            // $this->definedRelationships = app()['unusual.modularity']->find($this->moduleName)->getRouteConfigs(snakeCase($this->routeName) . '.relationships', []);
+        }
+    }
+
+    public function __call($method, $arguments)
+    {
+        $definedRelationships = $this->definedRelationships ?? [];
+
+        if (array_key_exists($method, $definedRelationships)) {
+
+            $relationship = $definedRelationships[$method];
+            $methods = $this->{$relationship['method']}(...$relationship['parameters']);
+
+            if(isset($relationship['chain_methods']) && count($relationship['chain_methods']) > 0){
+                foreach ($relationship['chain_methods'] as $chain_method) {
+                    isset($chain_method['method_name'])
+                        ? $methods = $methods->{$chain_method['method_name']}(...($chain_method['parameters'] ?? []))
+                        : null;
+                }
+            }
+
+            return $methods;
+        }
+
+        return parent::__call($method, $arguments);
+    }
+
     public function definedRelations($relations = null): array
     {
         $relationNamespace = "Illuminate\Database\Eloquent\Relations";
+
         $relationClassesPattern = "|" . preg_quote($relationNamespace, "|") . "|";
+
         if($relations){
             if(is_array($relations)){
                 $relationNamespaces = implode('|', Arr::map($relations, function($relationName) use($relationNamespace){
-                    return $relationNamespace . "\\{$relationName}";
+                    return $relationNamespace . "\\" . $relationName;
                 }));
                 $relationClassesPattern = "|" . preg_quote($relationNamespaces, "|") . "|";
 
             }else if(is_string($relations)){
-                $relationClassesPattern = "|" . preg_quote($relationNamespace . "\{$relations}", "|") . "|";
+                $relationClassesPattern = "|" . preg_quote($relationNamespace . "\\" . $relations, "|") . "|";
             }
         }
-
-        // dd($relationClassesPattern);
-        // $relationNamespace = "Illuminate\Database\Eloquent\Relations"
-        //     . ($relationName ? "\{$relationName}" : null);
-
-
-        // $model = new static;
-        // $relationships = [];
-        // foreach((new ReflectionClass($model))->getMethods(ReflectionMethod::IS_PUBLIC) as $method)
-        // {
-        //     if ($method->class != get_class($model) ||
-        //         !empty($method->getParameters()) ||
-        //         $method->getName() == __FUNCTION__) {
-        //         continue;
-        //     }
-        //     try {
-        //         $return = $method->invoke($model);
-        //         if ($return instanceof Relation) {
-        //             $relationships[$method->getName()] = [
-        //                 'type' => (new ReflectionClass($return))->getShortName(),
-        //                 'model' => (new ReflectionClass($return->getRelated()))->getName()
-        //             ];
-        //         }
-        //     } catch(ErrorException $e) {
-        //         dd(
-        //             $model, $method, $e
-        //         );
-        //     }
-        // }
-        // return array_keys($relationships);
-
-
-        // $namespace = 'Illuminate\Database\Eloquent\Relations';
-        // $relationClassesPattern = implode('|', ClassFinder::getClassesInNamespace($namespace));
-        // $relationClassesPattern = "|" . preg_quote($relationClassesPattern, "|") . "|";
 
         $reflector = new \ReflectionClass(get_called_class());
 
@@ -99,4 +123,5 @@ trait HasHelpers
     public function hasColumn($column){
         return $this->getConnection()->getSchemaBuilder()->hasColumn($this->getTable(), $column);
     }
+
 }

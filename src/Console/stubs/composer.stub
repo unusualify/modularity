@@ -1,5 +1,5 @@
 {
-    "name": "$VENDOR$/$LOWER_NAME$",
+    "name": "$VENDOR$/$MODULE_LOWER_NAME$",
     "description": "",
     "authors": [
         {
@@ -22,7 +22,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "$MODULE_NAMESPACE$\\$STUDLY_NAME$\\Tests\\": "tests/"
+            "$MODULE_NAMESPACE$\\$MODULE_STUDLY_NAME$\\Tests\\": "tests/"
         }
     }
 }

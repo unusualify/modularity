@@ -25,6 +25,8 @@ return [
         // 'route-controller-api' => ['NAMESPACE', 'MODULE', 'CLASS', 'STUDLY_NAME', 'LOWER_NAME'],
         // 'repository' => ['NAMESPACE', 'CLASS', 'MODULE','STUDLY_NAME', 'MODEL'],
         'composer' => [
+            'MODULE_LOWER_NAME',
+            'MODULE_STUDLY_NAME',
             'LOWER_NAME',
             'STUDLY_NAME',
             'VENDOR',

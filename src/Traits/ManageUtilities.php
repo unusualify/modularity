@@ -224,12 +224,10 @@ trait ManageUtilities {
         } else {
             $item = $this->repository->newInstance();
         }
+
         $fullRoutePrefix = 'admin.' . ($this->routePrefix ? $this->routePrefix . '.' : '') . $this->moduleName . '.';
         $previewRouteName = $fullRoutePrefix . 'preview';
         $restoreRouteName = $fullRoutePrefix . 'restoreRevision';
-        // dd(
-        //     $item
-        // );
         // $baseUrl = $item->urlWithoutSlug ?? $this->getPermalinkBaseUrl();
         // $localizedPermalinkBase = $this->getLocalizedPermalinkBase();
 
@@ -421,11 +419,23 @@ trait ManageUtilities {
                 // 'custom-input-checklist',
                 'select',
                 'combobox',
-                'autocomplete'
+                'autocomplete',
+                'custom-input-repeater'
             ]) && !(isset($input->ext) && $input->ext == 'morphTo');
         })->mapWithKeys(function($input){
 
-            $relationship = $this->getCamelNameFromForeignKey($input->name) ?: $input->name;
+            if($input->type == 'custom-input-repeater'){
+
+                if(isset($input->ext) && $input->ext == 'relationship'){
+
+                    return [$input->name];
+                    $relationship = $input->name;
+                }else{
+                    return [];
+                }
+            }else{
+                $relationship = $this->getCamelNameFromForeignKey($input->name) ?: $input->name;
+            }
 
             // dd($input, $relationship);
             // return [
