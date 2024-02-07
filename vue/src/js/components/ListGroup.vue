@@ -42,22 +42,22 @@
                 :ripple="false"
                 :href="item.route"
                 :append="false"
-                :prepend-icon="expanded ? null : item.icon"
+                :prepend-icon="showIcon ? item.icon : null"
                 :title="item.name"
                 :active="activeIndex === i"
                 v-bind="$bindAttributes(item)"
-
                 >
             </v-list-item>
 
             <v-list-item
                 v-else-if="isEvent(item)"
                 :key="i + 'event'"
+
                 :index="i"
                 :ripple="false"
                 :append="false"
                 @click="$root.handleVmFunctionCall(item.event)"
-                :prepend-icon="expanded ? null : item.icon"
+                :prepend-icon="showIcon ? item.icon : null"
                 :title="item.name"
                 :active="activeIndex === i"
                 :active-class="`sidebar-item-active sidebar-item-active-${level}`"
@@ -146,7 +146,11 @@ export default {
     },
     expanded:{
       type: Boolean,
-      default: true
+      default: true,
+    },
+    showIcon:{
+      type: Boolean,
+      default: true,
     }
   },
   data: () => ({
@@ -188,19 +192,21 @@ export default {
       }
     }
 
+
+
   },
 
   created () {
     this.opened = this.getListGroupOpens([], this.items)
   },
   watch:{
-    expanded(n,o){
-      if(o){
-        __log(document.querySelector('v-list'))
-        document.querySelector('.v-list').querySelector('.v-list-item').style.paddingLeft = 1;
+  //   expanded(n,o){
+  //     if(o){
+  //       __log(document.querySelector('v-list'))
+  //       document.querySelector('.v-list').querySelector('.v-list-item').style.paddingLeft = 1;
 
-      }
-  },
+  //     }
+  // },
 },
   methods: {
     isSubgroup (item) {
@@ -220,12 +226,11 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+  /* .rail-padding{
+    padding: 4px 12px !important;
+  } */
 
-  .newPadding{
-    padding: 4 16;
-    background-color: red;
-  }
 
     /* .sidebar-item-active{
         background: #11758D;

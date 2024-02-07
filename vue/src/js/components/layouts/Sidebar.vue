@@ -32,6 +32,7 @@
     <ue-list-group
       :items="items"
       :expanded="expanded"
+      :showIcon="showIcon"
       >
     </ue-list-group>
 
@@ -53,6 +54,7 @@
       <ue-logout-modal :csrf="$root.csrf">
         <template v-slot:activator="{props}">
           <v-btn
+              v-if="expanded"
               class="v-button--logout my-3"
               variant="plain"
               v-bind="props"
@@ -64,6 +66,13 @@
               </template> -->
               {{$t('authentication.logout')}}
           </v-btn>
+          <v-list-item
+          v-else
+          prepend-icon="mdi-power"
+          >
+
+          </v-list-item>
+
         </template>
       </ue-logout-modal>
 
@@ -135,7 +144,7 @@ export default {
     return {
       dialog: false,
       logo: '@/sass/themes/template/main-logo.svg',
-      isExpanded: !this.$root.railMode,
+      isExpanded: true,
     }
   },
 
@@ -148,11 +157,13 @@ export default {
   },
 
   mounted () {
-
+    this.expanded = this.rail ? false : true; // !
 
   },
   watch: {
-
+    rail(newVal){
+      this.expanded = !newVal;
+    }
   },
 
   computed: {
@@ -172,6 +183,11 @@ export default {
         this.isExpanded = val;
       }
     },
+    showIcon: {
+      get(){
+        return this.rail ? (this.expanded ? this.$root.doShowIcon: true ) : this.$root.doShowIcon;
+      }
+    }
   },
   methods: {
     onChange (event) {

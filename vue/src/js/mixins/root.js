@@ -13,6 +13,7 @@ export default {
       sidebarToggle: false,
       miniStatus: false,
       hasRailMode : true,
+      showIcon: true,
     }
   },
   computed: {
@@ -34,6 +35,11 @@ export default {
       // set(miniStatus){
       //   this.hasRailMode = miniStatus && this.$store.state.config.sideBarOpt.rail;
       // }
+    },
+    doShowIcon:{
+      get(){
+        return this.showIcon = this.$store.state.config.sideBarOpt.showIcon;
+      }
     },
     showToggleButton () {
       return !this.isLgAndUp || (!this.$store.state.config.sideBarOpt.isMini)

@@ -6,7 +6,7 @@
             'rail' => true,
             'location' => 'right',
             'permanent' => true,
-            'showIcon' => true,
+            'showIcon' => false,
             'isMini' => true,
         ],
     ];
