@@ -79,7 +79,7 @@
             window['{{ unusualConfig('js_namespace') }}'].STORE = {};
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.config = {
-                sideBarOpt: {!! json_encode(unusualConfig('ui_components.sidebar')) !!},
+                sideBarOpt: {!! json_encode(unusualConfig('ui_settings.sidebar')) !!},
             },
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.medias = {};
