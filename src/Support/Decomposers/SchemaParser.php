@@ -7,10 +7,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Nwidart\Modules\Support\Migrations\SchemaParser as Parser;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Support\Finder;
 use Unusualify\Modularity\Traits\ManageNames;
-use phpDocumentor\Reflection\Types\Boolean;
-use PhpParser\Node\Expr\FuncCall;
 
 class SchemaParser extends Parser
 {
@@ -166,7 +165,7 @@ class SchemaParser extends Parser
                 if(preg_match('/belongsToMany|hasMany|morphTo|morphOne/', $column_type))
                     continue;
 
-                $column =  "{$column}_id";
+                $column =  "{$this->getForeignKeyFromName($column)}";
             }
 
             $parsed[] = $column;
@@ -232,13 +231,13 @@ class SchemaParser extends Parser
                 $relationship_name = $methods[0];
                 $methodChaining = false;
                 if($relationship_name  == 'belongsTo'){
-                    $foreign_key = $col_name.'_id';
+                    $foreign_key = $this->getForeignKeyFromName($col_name); //$col_name.'_id';
                     $owner_key = $methods[1] ?? 'id';
-                    $table_name = $methods[2] ?? pluralize($col_name);
+                    $table_name = $methods[2] ?? $this->getTableNameFromName($col_name); //pluralize($col_name);
                     $relationships[] = "belongsTo:{$table_name}:{$foreign_key}:{$owner_key}";
                 } else if($relationship_name == 'belongsToMany'){
                     $methodChaining = true;
-                    $table_name = $methods[2] ?? pluralize($col_name);
+                    $table_name = $methods[2] ?? $this->getTableNameFromName($col_name);
                     $relationships[] = "belongsToMany:{$table_name}";
                 } else if($relationship_name == 'morphTo'){
                     // $table_name = $col_name . 'able';
@@ -385,7 +384,18 @@ class SchemaParser extends Parser
         } else if(in_array($options[0], ['text', 'mediumtext', 'longtext'])){
             $type = 'textarea';
         } else if($options[0] == 'json'){
-            $type = 'json';
+            $type = 'group';
+            $extra_options['schema'] = [];
+        }
+
+        if(count($options) > 1){
+
+            foreach($options as $option){
+                // default value perception from options
+                if(preg_match('/default\(\'?([A-Za-z\d]+)\'?\)/', $option, $matches)){
+                    $extra_options['default'] = $matches[1];
+                }
+            }
         }
 
         if(!in_array('nullable', $options) && !in_array($type, ['json'])){
@@ -395,17 +405,16 @@ class SchemaParser extends Parser
         if(in_array($options[0], $this->relationshipKeys)){
             if($options[0] == 'belongsTo'){
                 $type = 'select';
-                $name .= '_id';
+                // $name .= '_id';
+                $name = $this->getForeignKeyFromName($name);
 
-                $finder = new Finder();
-                $extra_options['repository'] = $finder->getRepository(pluralize($column));
+                $extra_options['repository'] = UFinder::getRouteRepository($column);
             } else if($options[0] == 'hasMany'){
                 $type = 'checklist';
                 $name = pluralize($name);
                 $label = pluralize($label);
 
-                $finder = new Finder();
-                $extra_options['repository'] = $finder->getRepository(pluralize($column));
+                $extra_options['repository'] = UFinder::getRouteRepository($column);
             } else if($options[0] == 'morphTo'){
                 $type = 'morphTo';
                 $finder = new Finder();
@@ -413,7 +422,7 @@ class SchemaParser extends Parser
 
                 foreach (array_slice($options,1) as $key => $routeName) {
                     $routeName = $this->getStudlyName($routeName);
-                    $foreign_id = $this->getSnakeCase($routeName) . '_id';
+                    $foreign_id = $this->getForeignKeyFromName($routeName); //$this->getSnakeCase($routeName) . '_id';
                     if(( $repository = $finder->getRouteRepository($routeName))){
                         array_push($parents, [
                             'name' => $foreign_id,
@@ -431,6 +440,7 @@ class SchemaParser extends Parser
             array_unshift($rules, 'sometimes');
             $extra_options['rules'] = implode(':', $rules);
         }
+
         return [
             'type' => $type,
             'name' => $name,
@@ -460,7 +470,6 @@ class SchemaParser extends Parser
         $filter = array_filter($this->parse($this->schema), function($v,$k){
             return !array_key_exists($k, $this->customAttributes);
         }, ARRAY_FILTER_USE_BOTH );
-
 
         return array_merge( $this->defaultInputs, array_map(function($k, $options){
             if(in_array($k, $this->relationshipKeys)){

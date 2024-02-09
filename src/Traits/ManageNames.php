@@ -68,6 +68,10 @@ trait ManageNames {
         return $this->getSnakeCase($name) . '_id';
     }
 
+    protected function getTableNameFromName($name){
+        return $this->getPlural($this->getSnakeCase($name));
+    }
+
     protected function getCamelNameFromForeignKey($foreign_key){
         if(preg_match('/(.*)(_id)/', $foreign_key, $matches)){
             return $this->getCamelCase($matches[1]);
