@@ -119,11 +119,15 @@ class Finder
 
         if($class !== '') return $class;
 
-        foreach($this->getClasses( app_path('Repositories')) as $_class){
-            if( method_exists($_class,'getTable') ){
-                if( with(new $_class())->getTable() == $table ){
-                    $class = $class;
-                    break;
+        $repositoryPath = app_path('Repositories');
+
+        if(file_exists($repositoryPath)){
+            foreach($this->getClasses( app_path('Repositories')) as $_class){
+                if( method_exists($_class,'getTable') ){
+                    if( with(new $_class())->getTable() == $table ){
+                        $class = $class;
+                        break;
+                    }
                 }
             }
         }
