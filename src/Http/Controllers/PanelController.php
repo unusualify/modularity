@@ -719,8 +719,8 @@ abstract class PanelController extends CoreController
     public function isRelationField($key) {
         $model_relations = [];
 
-        if(@method_exists($this->repository->getModel(), 'definedRelations')){
-            $model_relations = $this->repository->definedRelations();
+        if(@method_exists($this->repository->getModel(), 'getDefinedRelations')){
+            $model_relations = $this->repository->getDefinedRelations();
         }
 
         if(preg_match('/(.*)(_id)/', $key, $matches)){

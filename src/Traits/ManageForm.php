@@ -17,6 +17,67 @@ trait ManageForm {
         $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
     }
 
+    protected function addWithsManageForm() : array
+    {
+        // $this->indexWith += collect($schema)->filter(function($item){
+        return collect(array2Object($this->formSchema))->filter(function($input){
+            // return $this->hasWithModel($item['type']);
+            return in_array($input->type, [
+                'treeview',
+                'custom-input-treeview',
+                // 'checklist',
+                // 'custom-input-checklist',
+                'select',
+                'combobox',
+                'autocomplete',
+                'custom-input-repeater'
+            ]) && !(isset($input->ext) && $input->ext == 'morphTo');
+        })->mapWithKeys(function($input){
+
+            if($input->type == 'custom-input-repeater'){
+                if(isset($input->ext) && $input->ext == 'relationship'){
+                    $relationshipName = $input->relationship ?? $input->name;
+
+                    return [$relationshipName];
+
+                    try {
+                        $relationships =  method_exists($this->repository->getModel(), 'getDefinedRelations')
+                            ? $this->repository->getDefinedRelations()
+                            : $this->repository->modelRelations();
+
+
+                        return in_array($relationshipName, $relationships)
+                            ? [$relationshipName]
+                            : [];
+                    } catch (\Throwable $th) {
+                        dd(
+                            $th,
+                            $this->repository,
+                            $relationshipName
+                        );
+                    }
+
+                }else{
+                    return [];
+                }
+            }else{
+                $relationship = $this->getCamelNameFromForeignKey($input->name) ?: $input->name;
+            }
+
+            // dd($input, $relationship);
+            // return [
+            //     $relationship
+            // ];
+            return [
+                $relationship => [
+                    // ['select', $item['itemValue'], $item['itemTitle']],
+                    ['addSelect', $input->itemValue ?? 'id'],
+                    ['addSelect', $input->itemTitle ?? 'name']
+                ]
+            ];
+        })->toArray();
+    }
+
     protected function createFormSchema($inputs)
     {
         return Collection::make( $inputs )->mapWithKeys(function($input, $key) use($inputs){
@@ -168,6 +229,7 @@ trait ManageForm {
 
                 if(isset($input['repository'])){
                     $relation_class = App::make($input['repository']);
+
                     $items = $relation_class->list($input['itemTitle'], $with)->toArray();
 
                     if(isset($input['cascades'])){
@@ -410,10 +472,20 @@ trait ManageForm {
                 ];
                 $input['col'] = array_merge_recursive_preserve($default_repeater_col, $input['col'] ?? []);
 
-                $input['schema'] = $this->createFormSchema($input['schema']);
+                $schema = $this->createFormSchema($input['schema']);
 
-                if($input['type'] == 'wrap')
+                if($input['type'] == 'wrap'){
                     $input['name'] = "wrap-" . uniqid();
+                }
+
+                if($input['type'] == 'group'){
+                    $input['title'] = $input['label'] ?? headline($input['name']);
+
+                    $input['default'] = Arr::map($schema, fn($i) => $i['default'] ?? '');
+                }
+
+                $input['schema'] = Arr::mapWithKeys($schema, fn($i) => ["{$input['name']}.{$i['name']}" => array_merge($i,['name' => "{$input['name']}.{$i['name']}"])]);
+
 
                 $data = $input;
 
@@ -439,14 +511,26 @@ trait ManageForm {
                 $input['ext'] = 'relationship';
                 $input[] = 'withGutter';
 
+                $relationshipName = $input['relationship'] ?? $input['name'];
+
+                $relationships =  method_exists($this->repository->getModel(), 'getDefinedRelations')
+                    ? $this->repository->getDefinedRelations()
+                    : $this->repository->modelRelations();
+
+                $data = $input;
+
+                if(!array_key_exists($relationshipName, $relationships)){
+                    unset($data['name']);
+                }
+
             break;
             case 'json':
                 $default_repeater_col = [
                     'cols' => 12,
                 ];
                 $input['col'] = array_merge_recursive_preserve($default_repeater_col, $input['col'] ?? []);
+                $input['type'] = 'group';
                 $input['schema'] = $this->createFormSchema($input['schema']);
-
 
             break;
             default:

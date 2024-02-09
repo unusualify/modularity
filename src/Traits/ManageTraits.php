@@ -65,6 +65,7 @@ trait ManageTraits {
             if(isset($input['type'])){
                 switch ($input['type']) {
                     case 'group':
+                        return $this->chunkInputs($input['schema'] ?? []);
                     case 'wrap':
                         return $this->chunkInputs($input['schema'] ?? []);
                     break;

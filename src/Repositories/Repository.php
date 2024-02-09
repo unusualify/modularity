@@ -1212,4 +1212,104 @@ abstract class Repository
                     : $item;
         }, $with);
     }
+
+    public function modelRelations($relations = null): array
+    {
+
+        $relationNamespace = app('model.relation.namespace');
+
+        $relationClassesPattern = app('model.relation.pattern');
+
+        if($relations){
+            if(is_array($relations)){
+                $relationNamespaces = implode('|', Arr::map($relations, function($relationName) use($relationNamespace){
+                    return $relationNamespace . "\\" . $relationName;
+                }));
+                $relationClassesPattern = "|" . preg_quote($relationNamespaces, "|") . "|";
+
+            }else if(is_string($relations)){
+                $relationClassesPattern = "|" . preg_quote($relationNamespace . "\\" . $relations, "|") . "|";
+            }
+        }
+
+        $builtInMethods = app('model.builtin.methods');
+
+        $reflector = new \ReflectionClass($this->getModel());
+
+        if(get_class_short_name($this->getModel()) == 'Surveyx')
+            dd(
+                $builtInMethods,
+                collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))->reduce(function($carry, $method) use($relationClassesPattern, $builtInMethods){
+
+                    if(!in_array($method->name, $builtInMethods) && $method->getNumberOfParameters() < 1){
+                        if($method->hasReturnType()){
+                            if(preg_match($relationClassesPattern, ($returnType = $method->getReturnType()))){
+                                $carry[$method->name] = get_class_short_name((string) $returnType);
+                            }
+                        }else {
+                            try {
+                                $return = $method->invoke($this->getModel());
+
+                                if( $return instanceof Relation){
+                                    $carry[$method->name] = get_class_short_name($return);
+                                }
+                            } catch (\Throwable $th) {
+                                //throw $th;
+                            }
+                        }
+                    }
+
+                    return $carry;
+                }, [])
+            );
+
+
+        return collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))->reduce(function($carry, $method) use($relationClassesPattern, $builtInMethods){
+
+            if(!in_array($method->name, $builtInMethods) && $method->getNumberOfParameters() < 1){
+                if($method->hasReturnType()){
+                    if(preg_match($relationClassesPattern, ($returnType = $method->getReturnType()))){
+                        $carry[$method->name] = get_class_short_name((string) $returnType);
+                    }
+                }else {
+                    try {
+                        $return = $method->invoke($this->getModel());
+
+                        if( $return instanceof Relation){
+                            $carry[$method->name] = get_class_short_name($return);
+                        }
+                    } catch (\Throwable $th) {
+                        //throw $th;
+                    }
+                }
+            }
+
+            return $carry;
+        }, []);
+
+        // dd(collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC)));
+        return collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))
+            ->filter(function($method) use($relationClassesPattern){
+                return !empty($returnType = $method->getReturnType())
+                    ? preg_match("{$relationClassesPattern}", $returnType)
+                    : tryOperation(fn() => $this->{$method->name}()) instanceof Relation;
+                // if(!empty($returnType = $method->getReturnType())){
+                //     return preg_match("{$relationClassesPattern}", $returnType);
+                // }else{
+                //     return tryOperation(fn() => $this->{$method->name}()) instanceof Relation;
+                // }
+
+            })
+            ->pluck('name')
+            ->all();
+
+        return collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))
+            ->filter(fn($method) => !empty( $returnType = $method->getReturnType())
+                ? preg_match("{$relationClassesPattern}", $returnType)
+                : tryOperation(fn() => $this->{$method->name}()) instanceof Relation
+                // : ( ($return = tryOperation(fn() => $this->{$method->name}())) != false ?  $return instanceof Relation : false )
+            )
+            ->pluck('name')
+            ->all();
+    }
 }
