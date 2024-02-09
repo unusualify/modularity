@@ -121,17 +121,17 @@
               <!-- GROUP | WRAP-->
                 <template v-else-if="/(wrap|group)/.test(obj.schema.type)">
                     <!-- <v-card-title v-if="obj.schema.title">{{obj.schema.title}}</v-card-title>
-                    <v-card-subtitle v-if="obj.schema.subtitle">{{obj.schema.subtitle}}</v-card-subtitle>
-                    <ue-title class="text-overline mb-1"  v-if="obj.schema.title">{{obj.schema.title}}t</ue-title> -->
+                    <v-card-subtitle v-if="obj.schema.subtitle">{{obj.schema.subtitle}}</v-card-subtitle>  -->
+                    <ue-title class="text-overline mb-1 pa-0" v-if="obj.schema.title">{{obj.schema.title}}</ue-title>
                     <v-custom-form-base
                       :id="`${id}-${obj.key}`"
                       :modelValue="setValue(obj)"
-                      :schema="obj.schema.schema"
+                      v-model:schema="obj.schema.schema"
                       :row="getRowGroupOrArray(obj)"
                       :col="getColGroupOrArray(obj)"
                       :class="`${id}-${obj.key}`"
-                      v-bind="$attrs"
                       >
+                      <!-- v-bind="$lodash.omit($attrs, 'onUpdate:schema')" -->
                       <!-- Based on https://gist.github.com/loilo/73c55ed04917ecf5d682ec70a2a1b8e2 -->
                       <template v-for="(_, name) in $slots" #[name]="slotData"><slot :name="name" v-bind= "{ id, obj, index,  ...slotData}" /></template>
                     </v-custom-form-base>
@@ -648,7 +648,6 @@ export default {
       return orderBy(this.flatCombinedArray, ['schema.sort'], [orderDirection])
     },
     storeStateData () {
-      // __log('storeStateData computed', this.valueIntern)
       this.updateArrayFromState(this.valueIntern, this.formSchema)
       return this.valueIntern
     },
@@ -1022,8 +1021,6 @@ export default {
       // update deep nested prop(key) with value
       this.setObjectByPath(this.storeStateData, obj.key, value)
       obj.value = obj.value !== value ? value : obj.value
-      // __log(value, obj.key)
-
       // when cascade select changed
       this.setCascadeSelect(obj)
 
@@ -1040,17 +1037,6 @@ export default {
         parent: this.parent
       }
 
-      // __log(
-      //   'v-custom-form-base onInput',
-      //   type,
-      //   value,
-      //   emitObj
-      // )
-      // __log(
-      //   'v-custom-form-base onInput',
-      //   obj
-      // )
-      // __log('onInput', type, emitObj)
       this.emitValue(type, emitObj)
 
       return emitObj
@@ -1173,13 +1159,6 @@ export default {
       // __log(this.flatCombinedArray)
 
       this.flatCombinedArray.forEach(obj => {
-        if (obj.key == 'name') {
-          // __log(
-          //   'updateArrayFromState',
-          //   get(data, obj.key, null),
-          //   get(schema, obj.key, null)
-          // )
-        }
         obj.value = get(data, obj.key, null) // get - lodash
         obj.schema = get(schema, obj.key, null) // get - lodash
       })
