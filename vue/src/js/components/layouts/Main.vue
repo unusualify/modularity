@@ -5,8 +5,13 @@
 
     <v-app-bar app v-if="$vuetify.display.mdAndDown">
       <v-app-bar-nav-icon
-        v-if="$root.showToggleButton"
-        @click="$root.toggleSidebar">
+        v-if="sideBar.showToggleBtn.value && !sideBar.sidebarToggle.value"
+        @click="sideBar.methods.toggleSideBar">
+      </v-app-bar-nav-icon>
+      <v-app-bar-nav-icon
+        v-else-if="sideBar.showToggleBtn.value && sideBar.sidebarToggle.value"
+        icon="mdi-window-close"
+        @click="sideBar.methods.toggleSideBar">
       </v-app-bar-nav-icon>
 
       <v-toolbar-title>CRM</v-toolbar-title>
@@ -42,12 +47,13 @@
     >
       <template v-slot:bottom>
         <ue-impersonate-toolbar
-          v-if="$root.isLgAndUp && impersonation.active"
+          v-if="sideBar.root.isLgAndUp.value && impersonation.active"
           v-model="showImpersonateToolbar"
           v-bind="impersonation"
         />
       </template>
     </ue-sidebar>
+
 
     <v-app-bar app v-if="false">
       <v-app-bar-nav-icon
@@ -154,7 +160,17 @@
 </template>
 
 <script>
+  import { useSidebar, useRoot } from '@/hooks';
+  import { provide } from 'vue';
+
 export default {
+  setup(){
+    const sideBar = useSidebar();
+    provide('hooks',sideBar);
+    return {
+      sideBar,
+    }
+  },
   props: {
     navigation: {
       type: Object,

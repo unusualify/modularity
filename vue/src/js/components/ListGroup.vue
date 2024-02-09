@@ -20,7 +20,6 @@
                 :sub-group="false"
                 :active-class="`sidebar-item-active sidebar-item-active-${level}`"
                 :value="item.name"
-
                 >
                 <template v-slot:activator="{ props }">
                     <v-list-item
@@ -46,21 +45,22 @@
                 :title="item.name"
                 :active="activeIndex === i"
                 v-bind="$bindAttributes(item)"
+                class="px-4"
                 >
             </v-list-item>
 
             <v-list-item
                 v-else-if="isEvent(item)"
                 :key="i + 'event'"
-
                 :index="i"
                 :ripple="false"
                 :append="false"
-                @click="$root.handleVmFunctionCall(item.event)"
+                @click="sideBar.methods.handleVmFunctionCall(item.event)"
                 :prepend-icon="showIcon ? item.icon : null"
                 :title="item.name"
                 :active="activeIndex === i"
                 :active-class="`sidebar-item-active sidebar-item-active-${level}`"
+                class="px-4"
                 >
 
                 <!-- <v-list-item-icon v-if="!!item.icon">
@@ -80,6 +80,7 @@
                     v-if="i != 0"
                     :key="i + 'subdivider'"
                     :index="i"
+                    class="px-4"
                 ></v-divider>
 
                 <v-list-item
@@ -91,6 +92,7 @@
                     :append="false"
                     disabled
                     :prepend-icon="expanded ? null : item.icon"
+                    class="px-4"
                     >
                     <!-- :title="item.name" -->
 
@@ -108,13 +110,13 @@
 </template>
 
 <script>
-import { toRef } from 'vue'
+import { inject } from 'vue'
+// import { useRoot } from '@/hooks'
+
 
 export default {
   setup (props, context) {
-    // const items = toRef(props, 'items')
-    // const opened = getListGroupOpens([], items.value)
-    // const opened = []
+    const sideBar = inject('hooks');
 
     const getListGroupOpens = (matches, items) => {
       if (!Array.isArray(items)) return matches
@@ -131,6 +133,7 @@ export default {
 
     return {
       // opened,
+      sideBar,
       getListGroupOpens
     }
   },
@@ -188,7 +191,8 @@ export default {
       //     this.$root.isMini
       // )
       return {
-        marginLeft: ((!this.$root.miniStatus || !this.$root.isMini) ? this.level * 20 : 0) + 'px',
+        marginLeft: ((!this.sideBar.isMini.value) ? this.level * 20 : 0) + 'px',
+
       }
     }
 
@@ -200,13 +204,6 @@ export default {
     this.opened = this.getListGroupOpens([], this.items)
   },
   watch:{
-  //   expanded(n,o){
-  //     if(o){
-  //       __log(document.querySelector('v-list'))
-  //       document.querySelector('.v-list').querySelector('.v-list-item').style.paddingLeft = 1;
-
-  //     }
-  // },
 },
   methods: {
     isSubgroup (item) {

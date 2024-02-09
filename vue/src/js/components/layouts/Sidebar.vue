@@ -1,17 +1,14 @@
 <template>
   <v-navigation-drawer
-    v-model="$root.sidebarToggle"
+    v-model="sideBar.sidebarToggle.value"
     id="navigation-drawer"
-    :expand-on-hover="$root.isHoverable"
-    :mini-variant="$root.isMini"
-    v-model:mini-variant="$root.miniStatus"
-    @update:mini-variant="miniChanging"
-    :rail="rail"
-    :width="width"
-    @update:rail="toggled($event)"
+    :expand-on-hover="sideBar.isHoverable.value"
+    :mini-variant="sideBar.isMini.value"
+    v-model:mini-variant="sideBar.isMini.value"
+    :rail="sideBar.rail.value"
+    :width="sideBar.width.value"
+    @update:rail="sideBar.methods.handleExpanding($event)"
     >
-    <!-- @update:rail="toggled('asdddddd')" -->
-    <!-- @update:rail="console.log($event)" -->
 
     <!-- <v-avatar class="d-block text-center mx-auto mt-2">
       <v-icon color="green darken-2" large icon="fa:fab fa-atlassian"/>
@@ -31,8 +28,8 @@
 
     <ue-list-group
       :items="items"
-      :expanded="expanded"
-      :showIcon="showIcon"
+      :expanded="sideBar.expanded.value"
+      :showIcon="sideBar.showIcon.value"
       >
     </ue-list-group>
 
@@ -51,10 +48,10 @@
         </div>
     </template> -->
     <template v-slot:append>
-      <ue-logout-modal :csrf="$root.csrf">
+      <ue-logout-modal :csrf="sideBar.csrf.value">
         <template v-slot:activator="{props}">
           <v-btn
-              v-if="expanded"
+              v-if="sideBar.expanded.value"
               class="v-button--logout my-3"
               variant="plain"
               v-bind="props"
@@ -78,8 +75,8 @@
 
       <div class="d-flex justify-center">
         <v-btn
-          v-if="expanded"
-          v-for="[_icon, _link] in socialMediaLinks"
+          v-if="sideBar.expanded.value"
+          v-for="[_icon, _link] in sideBar.socialMediaLinks.value"
           class="ma-1"
           :key="_icon"
           :icon="_icon"
@@ -105,7 +102,15 @@
 </template>
 
 <script>
+import { inject } from 'vue'
+
 export default {
+  setup(){
+    const sideBar = inject('hooks')
+    return {
+      sideBar,
+    }
+  },
   props: {
     items: {
       type: Array,
@@ -115,29 +120,6 @@ export default {
       type: Number,
       default: 0
     },
-    socialMediaLinks: {
-      type: Array,
-      default: () => {
-        return [
-          [
-            'mdi-twitter',
-            ''
-          ],
-          [
-            'mdi-linkedin',
-            ''
-          ],
-          [
-            'mdi-facebook',
-            ''
-          ],
-          [
-            'mdi-instagram',
-            ''
-          ]
-        ]
-      }
-    }
 
   },
   data () {
@@ -147,69 +129,6 @@ export default {
       isExpanded: true,
     }
   },
-
-  created () {
-
-  },
-
-  beforeCreate () {
-
-  },
-
-  mounted () {
-    this.expanded = this.rail ? false : true; // !
-
-  },
-  watch: {
-    rail(newVal){
-      this.expanded = !newVal;
-    }
-  },
-
-  computed: {
-    width () {
-      return this.$root.isXlAndUp ? 320 : 256
-    },
-    rail:{
-      get(){
-        return this.$root.railMode;
-      }
-    },
-    expanded: {
-      get(){
-        return this.isExpanded;
-      },
-      set(val){
-        this.isExpanded = val;
-      }
-    },
-    showIcon: {
-      get(){
-        return this.rail ? (this.expanded ? this.$root.doShowIcon: true ) : this.$root.doShowIcon;
-      }
-    }
-  },
-  methods: {
-    onChange (event) {
-      console.log('sidebar onChange', event.target.value)
-
-    },
-    addItem (item) {
-      // console.log(this.items)
-      this.items.push(item)
-    },
-    miniChanging (val) {
-      // __log(
-      //     'mini changing',
-      //     val
-      // )
-    },
-    toggled(val){
-      if(this.rail){
-        this.expanded = !val;
-      }
-    }
-  }
 }
 </script>
 
@@ -217,12 +136,6 @@ export default {
   // @use 'styles/themes/b2press/settings' with(
   //   $button-text-transform: 'capitalize'
   // );
-  .border
-    padding-left: 12px
-    /* margin-right: 12px; */
-    background: #97ffff
-    border-radius: 10%
-    text-decoration: none
 </style>
 
 <style>
