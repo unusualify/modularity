@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use PhpParser\Node\Expr\Cast\Array_;
 
 if (! function_exists('lowerName')) {
     function lowerName($string) {
@@ -168,5 +167,32 @@ if(! function_exists('getValueOrNull')){
             $val = array_key_exists($key,$val) ? getValueOrNull($val[$key]) : null;
         }
         return  empty($val) ? ($bool ? false : null) : $val ;
+    }
+}
+
+/**
+ * Checks if the given parameter is an empty array or empty string
+ * returns value or null|false whether it is.
+ *
+ * Return type can be controlled by  @param $bool
+ *
+ * Can be used for nested arrays
+ *
+ * @param mixed variable
+ * @param string $key
+ * @param boolean $bool to control return type
+ *
+ * @return mixed|null based on variable
+ */
+if(! function_exists('tryOperation')){
+    function tryOperation(callable $callback, $returnValue = false): mixed {
+        try {
+            // if($callback() instanceof Relation){
+            //     dd($callback, $callback());
+            // }
+            return $callback();
+        } catch (\Throwable $th) {
+            return $returnValue;
+        }
     }
 }
