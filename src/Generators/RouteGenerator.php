@@ -11,15 +11,12 @@ use Illuminate\Support\Str;
 use Unusualify\Modularity\Support\Decomposers\SchemaParser;
 use Unusualify\Modularity\Traits\ManageNames;
 use Nwidart\Modules\FileRepository;
-use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Nwidart\Modules\Support\Config\GeneratorPath;
 use Nwidart\Modules\Support\Stub;
 use Illuminate\Container\Container;
-use Illuminate\Support\Facades\File;
 use Modules\SystemUser\Repositories\PermissionRepository;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
-// use Nwidart\Modules\Facades\Module;
 use Unusualify\Modularity\Module;
 
 class RouteGenerator extends Generator
@@ -750,7 +747,7 @@ class RouteGenerator extends Generator
 
         if(!$hasCustomModel) {
             $this->console->call('unusual:make:model', [
-                'module' => $this->module->getStudlyName(),
+                    'module' => $this->module->getStudlyName(),
                     'model' => $this->getName()
                 ]
                 + ( count($this->getModelFillables()) ?  ['--fillable' => implode(",", $this->getModelFillables())] : [])
@@ -764,8 +761,8 @@ class RouteGenerator extends Generator
 
             if(!$this->checkFileExists("create_{$this->getDBTableName($this->name)}_table") && !$this->fix){
                 $this->console->call('unusual:make:migration', [
-                    'module' => $this->module->getStudlyName(),
-                    'name' => "create_{$this->getDBTableName($this->name)}_table",
+                        'module' => $this->module->getStudlyName(),
+                        'name' => "create_{$this->getDBTableName($this->name)}_table",
                     ]
                     + ( $this->schema ?  ['--fields' => $this->schema] : [])
                     + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
