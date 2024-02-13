@@ -383,6 +383,10 @@ class ModelMakeCommand extends BaseCommand
             $traits[] = $this->getTrait('has_factory');
         }
 
+        if( $this->overrideModel ){
+            $traits[] = $this->getTrait('model_helpers');
+        }
+
         foreach ($this->responses as $trait => $status) {
             if($status)
                 $traits[] = $this->getTrait($trait);
@@ -404,6 +408,10 @@ class ModelMakeCommand extends BaseCommand
 
         if( $this->option('has-factory') ){
             $namespaces[] = $this->getTraitNamespace('has_factory');
+        }
+
+        if( $this->overrideModel ){
+            $namespaces[] = $this->getTraitNamespace('model_helpers');
         }
 
         foreach ($this->responses as $trait => $status) {

@@ -49,11 +49,13 @@ class SchemaParser extends Parser
     protected $traitNamespaces = [
         'soft_delete' => 'Illuminate\Database\Eloquent\SoftDeletes',
         'has_factory'    => 'Illuminate\Database\Eloquent\Factories\HasFactory',
+        'model_helpers' => 'Unusualify\Modularity\Entities\Traits\ModelHelpers',
     ];
 
     protected $traits = [
         'soft_delete' => 'SoftDeletes',
         'has_factory'    => 'HasFactory',
+        'model_helpers' => 'ModelHelpers',
     ];
 
     protected $repositoryTraits = [];
@@ -103,6 +105,8 @@ class SchemaParser extends Parser
         $this->baseNamespace = unusualConfig('namespace');
 
         $traits = unusualConfig('traits', []);
+
+
 
         foreach ($traits as $key => $object) {
             $this->traits[$key] = $object['model'];
