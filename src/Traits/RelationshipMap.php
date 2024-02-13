@@ -121,7 +121,7 @@ trait RelationshipMap {
                 //     dd($methodName ,$arguments);
 
                 if($arguments !== false )
-                    $data = $this->relationshipFormat($methodName, $relationshipName, $arguments, $chainMethods);
+                    $data = $this->relationshipFormat($this->model, $methodName, $relationshipName, $arguments, $chainMethods);
                     // $data = [
                     //     'relationship_name'  => $methodName,
                     //     'relationship_method'    => $relationshipName,
@@ -192,7 +192,7 @@ trait RelationshipMap {
                                         "\\" . $related . "::class",
                                         $this->getMorphToMethodName($this->model)
                                     ];
-                                    $data[$this->getStudlyName($targetName)] = $this->relationshipFormat($methodName, $reverseRelationshipName, $arguments);
+                                    $data[$this->getStudlyName($targetName)] = $this->relationshipFormat($targetName, $methodName, $reverseRelationshipName, $arguments);
 
                                 }
                             }
@@ -231,7 +231,7 @@ trait RelationshipMap {
                             // $methodName = $this->getPlural($this->getCamelCase($this->model));
                             $lastModel = $this->getStudlyName($targetName);
 
-                            $data[$this->getStudlyName($targetName)] = $this->relationshipFormat($methodName, $reverseRelationshipName, $arguments, $chainMethods);
+                            $data[$this->getStudlyName($targetName)] = $this->relationshipFormat($$targetName, $methodName, $reverseRelationshipName, $arguments, $chainMethods);
 
                             break;
 
@@ -244,7 +244,7 @@ trait RelationshipMap {
                             $arguments = $this->getRelationshipArguments($relationshipName, $reverseSchema);
                             $chainMethods = [];
 
-                            $data[$this->getStudlyName($targetName)] = $this->relationshipFormat($methodName, $reverseRelationshipName, $arguments, $chainMethods);
+                            $data[$this->getStudlyName($targetName)] = $this->relationshipFormat($targetName, $methodName, $reverseRelationshipName, $arguments, $chainMethods);
 
                             break;
                     }
@@ -261,9 +261,10 @@ trait RelationshipMap {
         return $data;
     }
 
-    public function relationshipFormat($methodName, $relationshipName, $arguments, $chainMethods = []) :mixed
+    public function relationshipFormat($modelName, $methodName, $relationshipName, $arguments, $chainMethods = []) :mixed
     {
         return [
+            'model_name' => $this->getStudlyName($modelName),
             'relationship_name'  => $methodName,
             'relationship_method'    => $relationshipName,
             'return_type' => "\Illuminate\Database\Eloquent\Relations\\{$this->getStudlyName($relationshipName)}",
@@ -505,7 +506,7 @@ trait RelationshipMap {
     {
         $comment = '';
 
-        $model = $this->getCamelCase($this->model);
+        $model = $this->getStudlyName($attr['model_name']);
 
         switch ($attr['relationship_method']) {
             case 'belongsTo':
