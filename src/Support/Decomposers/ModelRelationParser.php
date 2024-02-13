@@ -172,6 +172,13 @@ class ModelRelationParser implements Arrayable
         foreach ($this->getReverseRelationships() as $modelName => $format) {
             $modelClass = UFinder::getRouteRepository($modelName, asClass: true)->getModel();
             $reflector = new \ReflectionClass($modelClass);
+            // search ModuleRoute Relationships trait
+            // foreach ($reflector->getTraits() as $traitNamespace => $trait) {
+            //     if($trait->getShortName() == $reflector->getShortName() . 'Relationships'){
+            //         $reflector = new \ReflectionClass($traitNamespace);
+            //         break;
+            //     }
+            // }
 
             if(!$reflector->hasMethod($format['relationship_name'])){
 
