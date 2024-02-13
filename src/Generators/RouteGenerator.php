@@ -1231,22 +1231,4 @@ class RouteGenerator extends Generator
         return unusualConfig('composer.author.email');
     }
 
-    /**
-     * Check whether the file is presents
-     *
-     * @param string fileName
-     *
-     * @return bool
-     */
-
-    protected function checkFileExists($fileName){
-
-        $pattern = $this->module->getDirectoryPath('**/*/*' . $fileName . '*');
-        // $pattern = base_path('Modules/'.$this->module->getStudlyName().'/**/*/*'.$fileName.'*');
-        $search = glob($pattern);
-
-        return !empty($search);
-    }
-
-
 }
