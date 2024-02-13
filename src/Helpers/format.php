@@ -171,18 +171,7 @@ if(! function_exists('getValueOrNull')){
 }
 
 /**
- * Checks if the given parameter is an empty array or empty string
- * returns value or null|false whether it is.
  *
- * Return type can be controlled by  @param $bool
- *
- * Can be used for nested arrays
- *
- * @param mixed variable
- * @param string $key
- * @param boolean $bool to control return type
- *
- * @return mixed|null based on variable
  */
 if(! function_exists('tryOperation')){
     function tryOperation(callable $callback, $returnValue = false): mixed {
@@ -196,3 +185,39 @@ if(! function_exists('tryOperation')){
         }
     }
 }
+
+/**
+ *
+ */
+if(! function_exists('laravelRelationshipMap')){
+    function laravelRelationshipMap(): array {
+        $hasRelationshipsClass = \Illuminate\Database\Eloquent\Concerns\HasRelationships::class;
+
+        return collect((new \ReflectionClass($hasRelationshipsClass ))->getMethods(\ReflectionMethod::IS_PUBLIC))->reduce(function($carry, \ReflectionMethod $method){
+            if($method->getNumberOfParameters() > 2){
+                $carry[$method->name] = collect($method->getParameters())->mapWithKeys(function(\ReflectionParameter $parameter){
+                    return [$parameter->name => [
+                        'required' => ($required = !$parameter->isOptional()),
+                        'position' => $parameter->getPosition(),
+                        ...(!$required ? ['default' => $parameter->getDefaultValue()] : [])
+                    ]];
+                })->toArray();
+            }
+
+            return $carry;
+        }, []);
+    }
+}
+
+/**
+ *
+ */
+if(! function_exists('saveLaravelRelationshipMap')){
+    function saveLaravelRelationshipMap() {
+        file_put_contents(
+            config_path('laravel-relationship-map.php'),
+            phpArrayFileContent(laravelRelationshipMap())
+        );
+    }
+}
+

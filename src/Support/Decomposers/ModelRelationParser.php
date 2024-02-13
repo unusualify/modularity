@@ -7,11 +7,13 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Support\Finder;
+use Unusualify\Modularity\Traits\RelationshipMap;
 
 class ModelRelationParser implements Arrayable
 {
-    use ManageNames;
+    use ManageNames, RelationshipMap;
 
     protected $methods = [
         'belongsTo',
@@ -33,6 +35,22 @@ class ModelRelationParser implements Arrayable
         'hasManyThrough'    => ['table', 'table', 'foreign_key', 'foreign_key', 'local_key', 'local_key'],
         'belongsToMany'     => ['table', 'table', 'foreign_pivot_key', 'related_pivot_key', 'parent_key', 'related_key', 'relation'],
         'morphTo'           => ['name', 'type', 'id', 'owner_key']
+    ];
+
+    protected $_argumentsMap = [
+        'hasOne'            => ['related', 'foreignKey', 'localKey'],
+        'hasOneThrough'     => ['related', 'through', 'firstKey', 'secondKey', 'localKey', 'secondLocalKey'],
+        'morphOne'          => ['related', 'name', 'type', 'id', 'localKey'],
+        'belongsTo'         => ['related', 'foreignKey', 'ownerKey', 'relation'],
+        'morphTo'           => ['name', 'type', 'id', 'ownerKey'],
+        'morphEagerTo'      => ['name', 'type', 'id', 'ownerKey'],
+        'morphInstanceTo'   => ['name', 'type', 'id', 'ownerKey'],
+        'hasMany'           => ['table', 'foreignKey', 'localKey'],
+        'hasManyThrough'    => ['related', 'throught', 'firstKey', 'secondKey', 'localKey', 'secondLocalKey'],
+        'morphMany'         => ['related', 'name', 'type', 'id', 'localKey'],
+        'belongsToMany'     => ['related', 'table', 'foreignPivotKey', 'relatedPivotKey', 'parentKey', 'relatedKey', 'relation'],
+        'morphToMany'       => ['related', 'name', 'table', 'foreignPivotKey', 'relatedPivotKey', 'parentKey', 'relatedKey', 'relation', 'inverse'],
+        'morphedByMany'     => ['related', 'name', 'table', 'foreignPivotKey', 'relatedPivotKey', 'parentKey', 'relatedKey', 'relation'],
     ];
 
     protected $pivotableRelationships = [
@@ -59,7 +77,10 @@ class ModelRelationParser implements Arrayable
     public function __construct($model, $relationships = null)
     {
         $this->model = $model;
+
         $this->relationships = $relationships;
+
+        $this->relationshipMap = unusualConfig('laravel-relationship-map', []);
     }
 
     /**
@@ -72,7 +93,7 @@ class ModelRelationParser implements Arrayable
         return $this->parse($this->relationships);
     }
 
-    public function parse($relations)
+    public function parse_($relations)
     {
 
         $parsed = [];
@@ -121,12 +142,57 @@ class ModelRelationParser implements Arrayable
 
     }
 
-    public function getPivotTableName($relation_table)  {
-        return $this->getSnakeCase($this->getPivotModelName($relation_table));
+    public function parse($relations)
+    {
+
+        $parsed = [];
+
+        foreach ($this->getRelationships() as $relationship) {
+            ($resp = $this->parseRelationshipSchema($relationship)) ? array_push($parsed, $resp) : null;
+        }
+
+        return $parsed;
+
     }
 
-    public function getPivotModelName($relation_table)  {
-        return $this->model . $this->getStudlyName($this->getSingular($relation_table));
+    public function getReverseRelationships()
+    {
+        $parsed = [];
+        foreach ($this->getRelationships() as $relationship) {
+            if(($resp = $this->parseReverseRelationshipSchema($relationship))){
+                $parsed = $parsed + $resp;
+            }
+        }
+
+        return $parsed;
+    }
+
+    public function writeReverseRelationships()
+    {
+        foreach ($this->getReverseRelationships() as $modelName => $format) {
+            $modelClass = UFinder::getRouteRepository($modelName, asClass: true)->getModel();
+            $reflector = new \ReflectionClass($modelClass);
+
+            if(!$reflector->hasMethod($format['relationship_name'])){
+
+                $filePath = $reflector->getFileName();
+                $lines = file($filePath);
+                $count = 0;
+                $content = "";
+
+                foreach($lines as $line) {
+                    $count += 1;
+                    // $content .= str_pad($count, 2, 0, STR_PAD_LEFT).". ".$line . "\n";
+                    $content .= $line;
+                }
+
+                $pattern = "/(\})[^\}]*$/";
+
+                $newContent = preg_replace($pattern, $this->renderFormat($format) . "\n}\n", $content);
+
+                app('files')->put($filePath, $newContent);
+            }
+        }
     }
 
     public function hasCreatablePivotModel() {
@@ -212,13 +278,73 @@ class ModelRelationParser implements Arrayable
     }
 
     /**
+     * Render the migration to formatted script.
+     *
+     * @return string
+     */
+    public function render()
+    {
+        $methods = [];
+        foreach ($this->toArray() as $attr) {
+            $methods[] = $this->renderFormat($attr);
+            // $args = implode(', ', array_map(function($v){ return "{$v}";}, $attr['parameters']) );
+
+            // $comment = $this->generateMethodComment($attr);
+
+            // $method_chain = "\$this->{$attr['relationship_method']}({$args})";
+            // if(count($attr['chain_methods'])){
+            //     foreach ($attr['chain_methods'] as $key => $chain) {
+            //         $chain_args = implode(', ', array_map(function($v){ return "{$v}";}, $chain['parameters']) );
+            //         $method_chain .= "\n\t\t\t->{$chain['method_name']}({$chain_args})";
+            //         # code...
+            //     }
+            // }
+            // $method_chain .= ";";
+
+            // $methods[] = $comment."\n\tpublic function {$attr['relationship_name']}() : {$attr['return_type']}\n\t{\n\t\treturn {$method_chain}\n\t}\n";
+        }
+
+        return $methods;
+    }
+
+    public function renderFormat($attr) : string {
+
+        $args = implode(', ', array_map(function($v){ return "{$v}";}, $attr['parameters']) );
+
+        $comment = $this->generateMethodComment($attr);
+
+        $method_chain = "\$this->{$attr['relationship_method']}({$args})";
+        if(count($attr['chain_methods'])){
+            foreach ($attr['chain_methods'] as $key => $chain) {
+                $chain_args = implode(', ', array_map(function($v){ return "{$v}";}, $chain['parameters']) );
+                $method_chain .= "\n\t\t\t->{$chain['method_name']}({$chain_args})";
+                # code...
+            }
+        }
+        $method_chain .= ";";
+
+        return $comment."\n\tpublic function {$attr['relationship_name']}() : {$attr['return_type']}\n\t{\n\t\treturn {$method_chain}\n\t}\n";
+    }
+
+
+
+
+
+    // public function getPivotTableName($relation_table)  {
+    //     return $this->getSnakeCase($this->getPivotModelName($relation_table));
+    // }
+
+    public function getPivotModelName_($relation_table)  {
+        return $this->model . $this->getStudlyName($this->getSingular($relation_table));
+    }
+    /**
      * Get method name from relation.
      *
      * @param string $relation
      *
      * @return string
      */
-    public function getMethod($relation)
+    public function getMethod_($relation)
     {
         return Arr::get(explode(':', $relation), 0);
     }
@@ -231,7 +357,7 @@ class ModelRelationParser implements Arrayable
      *
      * @return array
      */
-    public function getParameters($method, $relation)
+    public function getParameters_($method, $relation)
     {
         $params = explode(':', str_replace($method . ':', '', $relation) );
 
@@ -257,7 +383,7 @@ class ModelRelationParser implements Arrayable
      *
      * @return string
      */
-    public function getFunctionName($method, $relation)
+    public function getFunctionName_($method, $relation)
     {
         $pattern = "/^({$method}:?)(.*)$/";
         $replace = '${2}';
@@ -276,7 +402,7 @@ class ModelRelationParser implements Arrayable
      *
      * @return array
      */
-    public function generateFunctionName($method, $params)
+    public function generateFunctionName_($method, $params)
     {
         $name = '';
 
@@ -357,7 +483,7 @@ class ModelRelationParser implements Arrayable
      *
      * @return array
      */
-    public function generateParameter($method, $index, $param)
+    public function generateParameter_($method, $index, $param)
     {
         $format = $this->arguments[$method][$index];
 
@@ -383,79 +509,8 @@ class ModelRelationParser implements Arrayable
 
     }
 
-    public function findModel($table) {
+    public function findModel_($table) {
         return  "\\". (new Finder())->getModel($table) . "::class";
     }
 
-    public function generateMethodComment($attr)
-    {
-        $comment = '';
-
-        $model = $this->getCamelCase($this->model);
-
-        switch ($attr['relationship_method']) {
-            case 'belongsTo':
-                // $comment = "/**\n\t* Get the {$attr['relationship_name']} of the {$model}.\n\t*/";
-                $comment = $this->commentStructure(["Get the {$attr['relationship_name']} that owns the {$model}."]);
-                break;
-            case 'hasOne':
-                $comment = $this->commentStructure(["Get the {$attr['relationship_name']} associated with the {$model}."]);
-
-                break;
-            case 'hasMany':
-                $comment =  $this->commentStructure(["Get the {$attr['relationship_name']} for the {$model}."]);
-
-                break;
-            case 'belongsToMany':
-                $comment =  $this->commentStructure(["The {$attr['relationship_name']} that belong to the {$model}."]);
-                break;
-            case 'morphTo':
-                $comment =  $this->commentStructure(["Get the model that the {$model} belongs to"]);
-                break;
-
-            default:
-                $comment = "/**\n\t* Get .\n\t*/";
-                break;
-        }
-
-        return $comment;
-    }
-
-    public function commentStructure($array)
-    {
-        $message = array_reduce($array, function($carry, $text){
-            $carry .= "{$text}\n\t * ";
-            return $carry;
-        }, '');
-        return "\t/**\n\t * {$message}\n\t */";
-    }
-
-    /**
-     * Render the migration to formatted script.
-     *
-     * @return string
-     */
-    public function render()
-    {
-        $methods = [];
-        foreach ($this->toArray() as $attr) {
-            $args = implode(', ', array_map(function($v){ return "{$v}";}, $attr['parameters']) );
-
-            $comment = $this->generateMethodComment($attr);
-
-            $method_chain = "\$this->{$attr['relationship_method']}({$args})";
-            if(count($attr['chain_methods'])){
-                foreach ($attr['chain_methods'] as $key => $chain) {
-                    $chain_args = implode(', ', array_map(function($v){ return "{$v}";}, $chain['parameters']) );
-                    $method_chain .= "\n\t\t\t->{$chain['method_name']}({$chain_args})";
-                    # code...
-                }
-            }
-            $method_chain .= ";";
-
-            $methods[] = $comment."\n\tpublic function {$attr['relationship_name']}() : {$attr['return_type']}\n\t{\n\t\treturn {$method_chain}\n\t}\n";
-        }
-
-        return $methods;
-    }
 }

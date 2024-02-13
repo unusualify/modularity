@@ -10,10 +10,11 @@ use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Support\Finder;
 use Unusualify\Modularity\Traits\ManageNames;
+use Unusualify\Modularity\Traits\RelationshipMap;
 
 class SchemaParser extends Parser
 {
-    use ManageNames;
+    use ManageNames, RelationshipMap;
 
     /**
      * Starting header formats to add to headerFormats
@@ -87,19 +88,21 @@ class SchemaParser extends Parser
 
         $this->useDefaults = $useDefaults;
 
+        $this->relationshipMap = unusualConfig('laravel-relationship-map', []);
+
         if($this->useDefaults){
-            $this->defaultInputs = Config::get(unusualBaseKey() . '.schemas.default_inputs',[]);
-            $this->defaultPreHeaders = Config::get(unusualBaseKey() . '.schemas.default_pre_headers',[]);
+            $this->defaultInputs = unusualConfig('schemas.default_inputs',[]);
+            $this->defaultPreHeaders = unusualConfig('schemas.default_pre_headers',[]);
         }
 
-        $this->defaultPostHeaders = Config::get(unusualBaseKey() . '.schemas.default_post_headers',[]);
+        $this->defaultPostHeaders = unusualConfig('schemas.default_post_headers',[]);
 
-        $this->defaultHeaderFormat = Config::get(unusualBaseKey() . '.default_header',[]);
+        $this->defaultHeaderFormat = unusualConfig('default_header',[]);
 
         // $this->baseNamespace = Config::get(unusualBaseKey() . '.namespace')."\\".Config::get(unusualBaseKey() . '.name');
-        $this->baseNamespace = Config::get(unusualBaseKey() . '.namespace');
+        $this->baseNamespace = unusualConfig('namespace');
 
-        $traits = Config::get(unusualBaseKey() . '.traits',[]);
+        $traits = unusualConfig('traits', []);
 
         foreach ($traits as $key => $object) {
             $this->traits[$key] = $object['model'];
@@ -120,7 +123,6 @@ class SchemaParser extends Parser
                 $this->interfaceNamespaces[$key] = [];
             }
         }
-
         $this->relationshipKeys[] = 'belongsToMany';
         $this->relationshipKeys[] = 'hasOne';
         $this->relationshipKeys[] = 'hasMany';
@@ -224,22 +226,46 @@ class SchemaParser extends Parser
         $parsed = $this->parse($this->schema);
 
         $methodChaining = false;
+
         foreach ($parsed as $col_name => $methods) {
+            $methodName = $this->getCamelCase($methods[0]); // belongsTo, belongsToMany,....
             if($methodChaining && in_array($methods[0], $this->chainableMethods)){
                 $relationships[count($relationships)-1] .= ",{$col_name}:{$methods[0]}";
-            } else if (in_array($methods[0], $this->relationshipKeys)) {
-                $relationship_name = $methods[0];
+            } else if (array_key_exists($methodName, $this->relationshipMap)) {
                 $methodChaining = false;
-                if($relationship_name  == 'belongsTo'){
-                    $foreign_key = $this->getForeignKeyFromName($col_name); //$col_name.'_id';
+                $relatedName = $this->getStudlyName($col_name);
+                $arguments = $methods;
+                array_shift($arguments);
+
+                // if($methodName == 'morphTo'){
+                //     dd(
+                //         $relatedName,
+                //         $arguments
+                //     );
+                // }
+
+                $relationships[] = $this->createRelationshipSchema($relatedName, $methodName, $arguments);
+
+                if($methodName == 'belongsToMany'){
+                    $methodChaining = true;
+                }
+                continue;
+
+                $studlyName = $this->getStudlyName($methods[2] ?? $col_name); // StudlyName
+                $relationship_method = $this->getCamelCase($methods[0]); // belongsTo|belongsToMany|morphTo
+                $methodChaining = false;
+                if($relationship_method  == 'belongsTo'){
+                    $foreign_key = $this->getForeignKeyFromName($studlyName); //$col_name.'_id';
                     $owner_key = $methods[1] ?? 'id';
-                    $table_name = $methods[2] ?? $this->getTableNameFromName($col_name); //pluralize($col_name);
-                    $relationships[] = "belongsTo:{$table_name}:{$foreign_key}:{$owner_key}";
-                } else if($relationship_name == 'belongsToMany'){
+                    // $table_name = $methods[2] ?? $this->getTableNameFromName($col_name); //pluralize($col_name);
+                    // $relationships[] = "belongsTo:{$table_name}:{$foreign_key}:{$owner_key}";
+                    $routeName = $this->getStudlyName($methods[2] ?? $col_name);
+                    $relationships[] = "belongsTo:{$routeName}:{$foreign_key}:{$owner_key}";
+                } else if($relationship_method == 'belongsToMany'){
                     $methodChaining = true;
                     $table_name = $methods[2] ?? $this->getTableNameFromName($col_name);
                     $relationships[] = "belongsToMany:{$table_name}";
-                } else if($relationship_name == 'morphTo'){
+                } else if($relationship_method == 'morphTo'){
                     // $table_name = $col_name . 'able';
                     $table_name = $col_name;
                     $relationships[] = "morphTo";
@@ -291,9 +317,11 @@ class SchemaParser extends Parser
 
             }
         }
+
         // dd($relationships);
         return $relationships;
     }
+
 
     /**
      * headerFormat
