@@ -5,7 +5,7 @@ namespace Unusualify\Modularity\Entities;
 use Carbon\Carbon;
 use Cartalyst\Tags\TaggableInterface;
 use Cartalyst\Tags\TaggableTrait;
-use Illuminate\Database\Eloquent\Model as BaseModel;
+use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -19,12 +19,12 @@ use Unusualify\Modularity\Entities\Traits\{
 };
 
 
-class Model extends BaseModel implements TaggableInterface
+class Model extends LaravelModel implements TaggableInterface
 {
     use HasHelpers,
         HasPresenter,
         HasRelation,
-        HasScanModule,
+        // HasScanModule,
         HasScopes,
         IsTranslatable,
         SoftDeletes,
