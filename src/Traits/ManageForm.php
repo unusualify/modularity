@@ -37,7 +37,6 @@ trait ManageForm {
             if($input->type == 'custom-input-repeater'){
                 if(isset($input->ext) && $input->ext == 'relationship'){
                     $relationshipName = $input->relationship ?? $input->name;
-
                     return [$relationshipName];
 
                     try {
@@ -64,10 +63,15 @@ trait ManageForm {
                 $relationship = $this->getCamelNameFromForeignKey($input->name) ?: $input->name;
             }
 
+            if(in_array($input->type, ['select', 'combobox', 'autocomplete']) && !isset($input->repository)){
+                return [];
+            }
+
             // dd($input, $relationship);
             // return [
             //     $relationship
             // ];
+
             return [
                 $relationship => [
                     // ['select', $item['itemValue'], $item['itemTitle']],
@@ -284,7 +288,7 @@ trait ManageForm {
                         $input['event'] = 'formatPermalinkPrefix:slug:' . $this->getSnakeNameFromForeignKey($input['name']);
                     }
                 }
-                $data = Arr::except($input, ['route','model', 'repository', 'cascades']) + [
+                $data = Arr::except($input, ['route','model', 'cascades']) + [
                     'items' => $items
                 ];
 
@@ -513,15 +517,15 @@ trait ManageForm {
 
                 $relationshipName = $input['relationship'] ?? $input['name'];
 
-                $relationships =  method_exists($this->repository->getModel(), 'getDefinedRelations')
-                    ? $this->repository->getDefinedRelations()
-                    : $this->repository->modelRelations();
+                // $relationships =  method_exists($this->repository->getModel(), 'getDefinedRelations')
+                //     ? $this->repository->getDefinedRelations()
+                //     : $this->repository->modelRelations();
 
                 $data = $input;
 
-                if(!array_key_exists($relationshipName, $relationships)){
-                    unset($data['name']);
-                }
+                // if(!array_key_exists($relationshipName, $relationships)){
+                //     unset($data['name']);
+                // }
 
             break;
             case 'json':

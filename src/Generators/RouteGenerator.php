@@ -1246,7 +1246,6 @@ class RouteGenerator extends Generator
         $search = glob($pattern);
 
         return !empty($search);
-
     }
 
 

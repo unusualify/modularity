@@ -144,7 +144,6 @@ trait RelationTrait
 
     public function getFormFieldsRelationTrait($object, $fields, $schema = [])
     {
-
         // dd(
         //     $this->getMorphToRelations(),
         //     $this->getBelongsToManyRelations(),
@@ -152,6 +151,7 @@ trait RelationTrait
         //     $this->inputs()
         // );
         $morphToRelations = $this->getMorphToRelations();
+        // $hasManyRelations = $this->getHasManyRelations();
         $belongsToManyRelations = $this->getBelongsToManyRelations();
 
         foreach ($morphToRelations as $relation => $types) {
@@ -236,8 +236,7 @@ trait RelationTrait
 
     public function getBelongsToManyRelations()
     {
-
-        // return $this->definedRelations('BelongsToMany');
+        return $this->definedRelations('BelongsToMany');
 
         if(method_exists($this->getModel(), 'getDefinedRelations')){
             return $this->getDefinedRelations('BelongsToMany');
@@ -248,7 +247,7 @@ trait RelationTrait
 
     public function getHasManyRelations()
     {
-        // return $this->definedRelations('HasMany');
+        return $this->definedRelations('HasMany');
 
         if(method_exists($this->getModel(), 'getDefinedRelations')){
             return $this->getDefinedRelations('HasMany');

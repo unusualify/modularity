@@ -104,23 +104,23 @@ class BaseServiceProvider extends ServiceProvider
             return "|" . preg_quote($relationNamespace, "|") . "|";
         });
 
-        $this->app->singleton('model.builtin.methods', function () {
-            $relationClassesPattern = app('model.relation.pattern');
+        // $this->app->singleton('model.builtin.methods', function () {
+        //     $relationClassesPattern = app('model.relation.pattern');
 
-            $reflector = new \ReflectionClass(app(\Unusualify\Modularity\Entities\Model::class));
-            // $reflector = new \ReflectionClass(app(\Illuminate\Database\Eloquent\Model::class));
+        //     $reflector = new \ReflectionClass(app(\Unusualify\Modularity\Entities\Model::class));
+        //     // $reflector = new \ReflectionClass(app(\Illuminate\Database\Eloquent\Model::class));
 
-            return collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))->reduce(function($carry, $method) use($relationClassesPattern) {
-                if($method->getNumberOfParameters() < 1){
+        //     return collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))->reduce(function($carry, $method) use($relationClassesPattern) {
+        //         if($method->getNumberOfParameters() < 1){
 
-                    if(!preg_match($relationClassesPattern, ($returnType = $method->getReturnType()))){
-                        $carry[] = $method->name;
-                    }
-                }
+        //             if(!preg_match($relationClassesPattern, ($returnType = $method->getReturnType()))){
+        //                 $carry[] = $method->name;
+        //             }
+        //         }
 
-                return $carry;
-            }, []);
-        });
+        //         return $carry;
+        //     }, []);
+        // });
 
         // $this->app->alias(FileActivator::class, 'module_activator');
 

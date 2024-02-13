@@ -14,7 +14,7 @@ use Unusualify\Modularity\Entities\Traits\{
     ModelHelpers,
     HasScopes,
     HasRelation,
-    HasScanModule,
+    // HasScanModule,
     IsTranslatable
 };
 
