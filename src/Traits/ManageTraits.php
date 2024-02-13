@@ -65,12 +65,13 @@ trait ManageTraits {
             if(isset($input['type'])){
                 switch ($input['type']) {
                     case 'group':
+                        return $this->chunkInputs($input['schema'] ?? []);
                     case 'wrap':
                         return $this->chunkInputs($input['schema'] ?? []);
                     break;
                     case 'morphTo':
                         if($all){
-                            return $this->chunkInputs($input['parents']);
+                            return $this->chunkInputs($input['schema']);
                         }
 
                         return [ uniqid() => $input];

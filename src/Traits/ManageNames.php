@@ -68,6 +68,18 @@ trait ManageNames {
         return $this->getSnakeCase($name) . '_id';
     }
 
+    protected function getTableNameFromName($name){
+        return $this->getPlural($this->getSnakeCase($name));
+    }
+
+    protected function getMorphToMethodName($name){
+        return $this->getCamelCase($name) . 'able';
+    }
+
+    protected function getPivotTableName($modelName1, $modelName2){
+        return $this->getSnakeCase($this->getStudlyName($modelName1).$this->getStudlyName($modelName2));
+    }
+
     protected function getCamelNameFromForeignKey($foreign_key){
         if(preg_match('/(.*)(_id)/', $foreign_key, $matches)){
             return $this->getCamelCase($matches[1]);

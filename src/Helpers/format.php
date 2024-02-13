@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use PhpParser\Node\Expr\Cast\Array_;
 
 if (! function_exists('lowerName')) {
     function lowerName($string) {
@@ -170,3 +169,55 @@ if(! function_exists('getValueOrNull')){
         return  empty($val) ? ($bool ? false : null) : $val ;
     }
 }
+
+/**
+ *
+ */
+if(! function_exists('tryOperation')){
+    function tryOperation(callable $callback, $returnValue = false): mixed {
+        try {
+            // if($callback() instanceof Relation){
+            //     dd($callback, $callback());
+            // }
+            return $callback();
+        } catch (\Throwable $th) {
+            return $returnValue;
+        }
+    }
+}
+
+/**
+ *
+ */
+if(! function_exists('laravelRelationshipMap')){
+    function laravelRelationshipMap(): array {
+        $hasRelationshipsClass = \Illuminate\Database\Eloquent\Concerns\HasRelationships::class;
+
+        return collect((new \ReflectionClass($hasRelationshipsClass ))->getMethods(\ReflectionMethod::IS_PUBLIC))->reduce(function($carry, \ReflectionMethod $method){
+            if($method->getNumberOfParameters() > 2){
+                $carry[$method->name] = collect($method->getParameters())->mapWithKeys(function(\ReflectionParameter $parameter){
+                    return [$parameter->name => [
+                        'required' => ($required = !$parameter->isOptional()),
+                        'position' => $parameter->getPosition(),
+                        ...(!$required ? ['default' => $parameter->getDefaultValue()] : [])
+                    ]];
+                })->toArray();
+            }
+
+            return $carry;
+        }, []);
+    }
+}
+
+/**
+ *
+ */
+if(! function_exists('saveLaravelRelationshipMap')){
+    function saveLaravelRelationshipMap() {
+        file_put_contents(
+            config_path('laravel-relationship-map.php'),
+            phpArrayFileContent(laravelRelationshipMap())
+        );
+    }
+}
+

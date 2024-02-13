@@ -407,50 +407,6 @@ trait ManageUtilities {
         return $result;
     }
 
-    protected function addWithsSchema() : array
-    {
-        // $this->indexWith += collect($schema)->filter(function($item){
-        return collect(array2Object($this->formSchema))->filter(function($input){
-            // return $this->hasWithModel($item['type']);
-            return in_array($input->type, [
-                'treeview',
-                'custom-input-treeview',
-                // 'checklist',
-                // 'custom-input-checklist',
-                'select',
-                'combobox',
-                'autocomplete',
-                'custom-input-repeater'
-            ]) && !(isset($input->ext) && $input->ext == 'morphTo');
-        })->mapWithKeys(function($input){
-
-            if($input->type == 'custom-input-repeater'){
-
-                if(isset($input->ext) && $input->ext == 'relationship'){
-
-                    return [$input->name];
-                    $relationship = $input->name;
-                }else{
-                    return [];
-                }
-            }else{
-                $relationship = $this->getCamelNameFromForeignKey($input->name) ?: $input->name;
-            }
-
-            // dd($input, $relationship);
-            // return [
-            //     $relationship
-            // ];
-            return [
-                $relationship => [
-                    // ['select', $item['itemValue'], $item['itemTitle']],
-                    ['addSelect', $input->itemValue ?? 'id'],
-                    ['addSelect', $input->itemTitle ?? 'name']
-                ]
-            ];
-        })->toArray();
-    }
-
     protected function addIndexWithsNestedData() : array
     {
         $withs = [];

@@ -56,16 +56,17 @@ class Finder
 
         if($model_class !== '') return $model_class;
 
-        foreach($this->getAllModels() as $class){
-            if( method_exists($class,'getTable') ){
-                if( with(new $class())->getTable() == $table ){
-                    $model_class = $class;
-                    break;
-                }
-            }
-        }
+        // foreach($this->getAllModels() as $class){
+        //     dd($class);
+        //     if( method_exists($class,'getTable') ){
+        //         if( with(new $class())->getTable() == $table ){
+        //             $model_class = $class;
+        //             break;
+        //         }
+        //     }
+        // }
 
-        if($model_class !== '') return $model_class;
+        // if($model_class !== '') return $model_class;
 
 
         return false;
@@ -119,11 +120,15 @@ class Finder
 
         if($class !== '') return $class;
 
-        foreach($this->getClasses( app_path('Repositories')) as $_class){
-            if( method_exists($_class,'getTable') ){
-                if( with(new $_class())->getTable() == $table ){
-                    $class = $class;
-                    break;
+        $repositoryPath = app_path('Repositories');
+
+        if(file_exists($repositoryPath)){
+            foreach($this->getClasses( app_path('Repositories')) as $_class){
+                if( method_exists($_class,'getTable') ){
+                    if( with(new $_class())->getTable() == $table ){
+                        $class = $class;
+                        break;
+                    }
                 }
             }
         }
@@ -174,7 +179,7 @@ class Finder
         // load classes composer knows about
         $autoload = include base_path('/vendor/composer/autoload_classmap.php');
         $models = [];
-
+        dd($autoload);
         foreach ($autoload as $className => $path) {
             // skip if we are not in the root namespace, ie App\, to ignore other vendor packages, of which there are a lot (dd($autoload) to see)
             try {

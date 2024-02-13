@@ -5,6 +5,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\VarDumper\VarDumper;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
 
@@ -385,3 +386,25 @@ if (! function_exists('permissionRecordsFromRoutes')) {
         return $records;
     }
 }
+
+if (! function_exists('ifdd')) {
+    function ifdd($condition, mixed ...$vars)
+    {
+        if($condition){
+            if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) && !headers_sent()) {
+                header('HTTP/1.1 500 Internal Server Error');
+            }
+
+            if (array_key_exists(0, $vars) && 1 === count($vars)) {
+                VarDumper::dump($vars[0]);
+            } else {
+                foreach ($vars as $k => $v) {
+                    VarDumper::dump($v, is_int($k) ? 1 + $k : $k);
+                }
+            }
+
+            exit(1);
+        }
+    }
+}
+

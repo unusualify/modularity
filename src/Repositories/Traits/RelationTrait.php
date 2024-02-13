@@ -144,7 +144,6 @@ trait RelationTrait
 
     public function getFormFieldsRelationTrait($object, $fields, $schema = [])
     {
-
         // dd(
         //     $this->getMorphToRelations(),
         //     $this->getBelongsToManyRelations(),
@@ -152,6 +151,7 @@ trait RelationTrait
         //     $this->inputs()
         // );
         $morphToRelations = $this->getMorphToRelations();
+        // $hasManyRelations = $this->getHasManyRelations();
         $belongsToManyRelations = $this->getBelongsToManyRelations();
 
         foreach ($morphToRelations as $relation => $types) {
@@ -195,7 +195,16 @@ trait RelationTrait
                     });
 
                 }else {
-                    $fields[$input['name']] = $object->{$input['name']}->map(function($item){ return $item->id; });
+                    try {
+                        //code...
+                        $fields[$input['name']] = $object->{$input['name']}->map(function($item){ return $item->id; });
+                    } catch (\Throwable $th) {
+                        dd(
+                            $object,
+                            $object->permissions,
+                            $input['name']
+                        );
+                    }
                 }
             }
         }
@@ -203,10 +212,22 @@ trait RelationTrait
         foreach ($schema as $key => $input) {
             if($input['type'] == 'custom-input-repeater' && isset($input['ext']) && $input['ext'] == 'relationship'){
                 $repository = UFinder::getRouteRepository(Str::singular($input['name']), asClass:true);
-                $records = $object->{$input['name']};
-                $fields[$input['name']] = !$records->isEmpty() ? $object->{$input['name']}->map(function($model) use($input, $repository){
-                    return $repository->getFormFields($model, $input['schema']);
-                }) : [$repository->getFormFields($repository->newInstance(), $input['schema'])];
+                $relationshipName = $input['relationship'] ?? $input['name'];
+                $records = $object->{$relationshipName};
+                // dd($records);
+                try {
+                    $fields[$relationshipName] = (!!$records && !$records->isEmpty()) ? $object->{$input['name']}->map(function($model) use($input, $repository){
+                        return $repository->getFormFields($model, $input['schema']);
+                    }) : [$repository->getFormFields($repository->newInstance(), $input['schema'])];
+
+                } catch (\Throwable $th) {
+
+                    dd(
+                        $object,
+                        $relationshipName,
+                        $object->{$relationshipName},
+                    );
+                }
             }
         }
 
@@ -215,33 +236,21 @@ trait RelationTrait
 
     public function getBelongsToManyRelations()
     {
-        if(method_exists($this->getModel(), 'definedRelations')){
-            return $this->definedRelations('BelongsToMany');
+        return $this->definedRelations('BelongsToMany');
+
+        if(method_exists($this->getModel(), 'getDefinedRelations')){
+            return $this->getDefinedRelations('BelongsToMany');
         }
 
-        $reflector = new \ReflectionClass($this->model);
-
-        $relations = [];
-
-        foreach ($reflector->getMethods() as $reflectionMethod) {
-            $returnType = $reflectionMethod->getReturnType();
-            if ($returnType) {
-                // if (in_array(class_basename($returnType->getName()), ['HasOne', 'HasMany', 'BelongsTo', 'BelongsToMany', 'MorphToMany', 'MorphTo'])) {
-                if (in_array(class_basename($returnType->getName()), ['BelongsToMany']) && !in_array($reflectionMethod->name, $this->exceptRelations)) {
-                    $relations[] = $reflectionMethod->name;
-                }
-            }
-        }
-
-        return $relations;
-
-        dd($relations);
+        return [];
     }
 
     public function getHasManyRelations()
     {
-        if(method_exists($this->getModel(), 'definedRelations')){
-            return $this->definedRelations('HasMany');
+        return $this->definedRelations('HasMany');
+
+        if(method_exists($this->getModel(), 'getDefinedRelations')){
+            return $this->getDefinedRelations('HasMany');
         }
 
         return [];
@@ -265,9 +274,9 @@ trait RelationTrait
 
         return collect($this->inputs())->reduce(function($acc, $curr){
             if(preg_match('/morphTo/', $curr['type'])){
-                if(isset($curr['parents'])){
+                if(isset($curr['schema'])){
                     $routeCamelCase = camelCase($this->routeName());
-                    $acc["{$routeCamelCase}able"] = Arr::map(array_reverse($curr['parents']), fn($item) => [
+                    $acc["{$routeCamelCase}able"] = Arr::map(array_reverse($curr['schema']), fn($item) => [
                         'name' => $item['name'],
                         'repository' => $item['repository'],
                         'model' => get_class( App::make($item['repository'])->getModel()),

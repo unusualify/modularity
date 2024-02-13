@@ -5,36 +5,44 @@ namespace Unusualify\Modularity\Entities;
 use Carbon\Carbon;
 use Cartalyst\Tags\TaggableInterface;
 use Cartalyst\Tags\TaggableTrait;
-use Illuminate\Database\Eloquent\Model as BaseModel;
+use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Traits\{
     HasPresenter,
-    HasHelpers,
+    ModelHelpers,
     HasScopes,
     HasRelation,
+    // HasScanModule,
     IsTranslatable
 };
 
 
-abstract class Model extends BaseModel implements TaggableInterface
+class Model extends LaravelModel implements TaggableInterface
 {
-    use HasPresenter, HasHelpers, HasScopes, SoftDeletes, TaggableTrait, IsTranslatable, HasRelation;
+    use ModelHelpers,
+        HasPresenter,
+        HasRelation,
+        // HasScanModule,
+        HasScopes,
+        IsTranslatable,
+        SoftDeletes,
+        TaggableTrait;
 
     public $timestamps = true;
 
-    protected function isTranslationModel()
+    protected function isTranslationModel(): bool
     {
         return Str::endsWith(get_class($this), 'Translation');
     }
 
-    public function setPublishStartDateAttribute($value)
+    public function setPublishStartDateAttribute($value): void
     {
         $this->attributes['publish_start_date'] = $value ?? Carbon::now();
     }
 
-    public function getFillable()
+    public function getFillable(): array
     {
         // If the fillable attribute is filled, just use it
         $fillable = $this->fillable;

@@ -67,12 +67,18 @@ class ModelMakeCommand extends BaseCommand
 
     protected $modelRelationParser;
 
+    protected $overrideModel = null;
+
     public function handle() : int
     {
         // $this->traits = getTraits();
         $this->setAskability();
 
         // $this->defaultConsent = false;
+
+        $this->overrideModel = ($this->option('override-model') && @class_exists($this->option('override-model')))
+            ? $this->option('override-model')
+            : null;
 
         foreach(getUnusualTraits() as $_trait){
             $this->responses[$_trait] = $this->checkOption($_trait);
@@ -126,6 +132,7 @@ class ModelMakeCommand extends BaseCommand
         return array_merge([
             ['fillable', null, InputOption::VALUE_OPTIONAL, 'The fillable attributes.', null],
             ['relationships', null, InputOption::VALUE_OPTIONAL, 'The relationship attributes.', null],
+            ['override-model', null, InputOption::VALUE_OPTIONAL, 'The override model for extension.', null],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
@@ -143,7 +150,9 @@ class ModelMakeCommand extends BaseCommand
         $module = Modularity::findOrFail($this->getModuleName());
 
         return  (new Stub( $this->getStubName(), [
-            'BASE_MODEL'            => $this->baseConfig('base_model'),
+            // 'BASE_MODEL'            => $this->baseConfig('base_model'),
+            'EXTEND_MODEL'          => $this->getExtendModel(),
+            'EXTEND_MODEL_NAMESPACE'=> $this->getExtendModelNamespace(),
             'NAMESPACE'             => $this->getClassNamespace($module),
             'TRAIT_NAMESPACES'      => $this->getTraitNamespaces(),
             'INTERFACE_NAMESPACES'  => $this->getInterfaceNamespaces(),
@@ -191,6 +200,16 @@ class ModelMakeCommand extends BaseCommand
 
     }
 
+    public function getExtendModel()
+    {
+        return $this->overrideModel ? "\\". $this->overrideModel :get_class_short_name($this->baseConfig('base_model'));
+    }
+
+    public function getExtendModelNamespace()
+    {
+        return $this->overrideModel ? '' : "use " .$this->baseConfig('base_model') . ";";
+    }
+
     public function getInterfaces()
     {
         $interfaces = [];
@@ -218,26 +237,30 @@ class ModelMakeCommand extends BaseCommand
         $interfaces = call_user_func_array('array_merge', $interfaces);
 
         $namespaces = array_map(function($v){
-            return "use $v;\n";
+            return "use $v;";
         }, $interfaces );
 
-        return count($namespaces) ? implode('', $namespaces) : '';
+        return count($namespaces) ? implode('\n', $namespaces) : '';
     }
 
     private function getFillable() : string
     {
-        $defaultFillableSchema = implode(',',$this->baseConfig('schemas.fillables'));
+        if(!$this->overrideModel){
+            $defaultFillableSchema = implode(',',$this->baseConfig('schemas.fillables'));
 
-        $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
+            $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
 
-        if(!$this->getTraitResponse('addTranslation')){
-            $fields = array_merge($this->defaultFillables, $fields);
+            if(!$this->getTraitResponse('addTranslation')){
+                $fields = array_merge($this->defaultFillables, $fields);
 
-            $fillable = $this->option('fillable');
-            $fields = array_merge( $fields, $fillable != "" ? explode(',', $fillable) : []);
+                $fillable = $this->option('fillable');
+                $fields = array_merge( $fields, $fillable != "" ? explode(',', $fillable) : []);
+            }
+
+            return $this->generateFillable($fields);
         }
 
-        return $this->generateFillable($fields);
+        return  '';
     }
 
     private function getCasts() : string
@@ -360,6 +383,10 @@ class ModelMakeCommand extends BaseCommand
             $traits[] = $this->getTrait('has_factory');
         }
 
+        if( $this->overrideModel ){
+            $traits[] = $this->getTrait('model_helpers');
+        }
+
         foreach ($this->responses as $trait => $status) {
             if($status)
                 $traits[] = $this->getTrait($trait);
@@ -383,15 +410,20 @@ class ModelMakeCommand extends BaseCommand
             $namespaces[] = $this->getTraitNamespace('has_factory');
         }
 
+        if( $this->overrideModel ){
+            $namespaces[] = $this->getTraitNamespace('model_helpers');
+        }
+
         foreach ($this->responses as $trait => $status) {
             if($status)
                 $namespaces[] = $this->getTraitNamespace($trait);
         }
 
         $namespaces = array_map(function($v){
-            return "use $v;\n";
+            return "use $v;";
         }, $namespaces );
-        return count($namespaces) ? implode('', $namespaces) : '';
+
+        return count($namespaces) ? implode("\n", $namespaces) : null;
     }
 
     private function getMethods()
@@ -520,7 +552,6 @@ class ModelMakeCommand extends BaseCommand
 
         $modelPath = new GeneratorPath( $this->baseConfig('paths.generator.model') );
 
-
         if(isset($this->modelRelationParser) && $this->modelRelationParser->hasCreatablePivotModel()) {
             $pivot_models = $this->modelRelationParser->getPivotModels();
 
@@ -541,6 +572,9 @@ class ModelMakeCommand extends BaseCommand
                 (new FileGenerator($fullPath, $content))->withFileOverwrite($overwriteFile)->generate();
             }
         }
+
+        $this->modelRelationParser->writeReverseRelationships();
+
 
         if($this->getTraitResponse('addTranslation')){
             $content = (new Stub( '/models/translation_model.stub', [

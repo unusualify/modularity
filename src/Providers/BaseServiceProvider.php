@@ -2,9 +2,6 @@
 
 namespace Unusualify\Modularity\Providers;
 
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\Facades\Route;
 use Unusualify\Modularity\Activators\FileActivator;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Modularity;
@@ -96,6 +93,34 @@ class BaseServiceProvider extends ServiceProvider
         $this->app->singleton('unusual.navigation', UNavigation::class);
         // $this->app->alias(\Unusualify\Modularity\Contracts\RepositoryInterface::class, 'ue_modules');
         $this->app->alias('unusual.modularity', 'modularity');
+
+        $this->app->singleton('model.relation.namespace', function () {
+            return  "Illuminate\Database\Eloquent\Relations";
+        });
+
+        $this->app->singleton('model.relation.pattern', function () {
+            $relationNamespace = app('model.relation.namespace');
+
+            return "|" . preg_quote($relationNamespace, "|") . "|";
+        });
+
+        // $this->app->singleton('model.builtin.methods', function () {
+        //     $relationClassesPattern = app('model.relation.pattern');
+
+        //     $reflector = new \ReflectionClass(app(\Unusualify\Modularity\Entities\Model::class));
+        //     // $reflector = new \ReflectionClass(app(\Illuminate\Database\Eloquent\Model::class));
+
+        //     return collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))->reduce(function($carry, $method) use($relationClassesPattern) {
+        //         if($method->getNumberOfParameters() < 1){
+
+        //             if(!preg_match($relationClassesPattern, ($returnType = $method->getReturnType()))){
+        //                 $carry[] = $method->name;
+        //             }
+        //         }
+
+        //         return $carry;
+        //     }, []);
+        // });
 
         // $this->app->alias(FileActivator::class, 'module_activator');
 

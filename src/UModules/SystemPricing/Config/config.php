@@ -2,7 +2,7 @@
 
 return [
     'name' => 'SystemPricing',
-    'base_prefix' => true,
+    'system_prefix' => true,
     'group' => 'system',
     'headline' => 'Price Management',
     'routes' => [

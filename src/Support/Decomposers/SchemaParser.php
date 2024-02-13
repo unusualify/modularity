@@ -7,14 +7,14 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Nwidart\Modules\Support\Migrations\SchemaParser as Parser;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Support\Finder;
 use Unusualify\Modularity\Traits\ManageNames;
-use phpDocumentor\Reflection\Types\Boolean;
-use PhpParser\Node\Expr\FuncCall;
+use Unusualify\Modularity\Traits\RelationshipMap;
 
 class SchemaParser extends Parser
 {
-    use ManageNames;
+    use ManageNames, RelationshipMap;
 
     /**
      * Starting header formats to add to headerFormats
@@ -49,11 +49,13 @@ class SchemaParser extends Parser
     protected $traitNamespaces = [
         'soft_delete' => 'Illuminate\Database\Eloquent\SoftDeletes',
         'has_factory'    => 'Illuminate\Database\Eloquent\Factories\HasFactory',
+        'model_helpers' => 'Unusualify\Modularity\Entities\Traits\ModelHelpers',
     ];
 
     protected $traits = [
         'soft_delete' => 'SoftDeletes',
         'has_factory'    => 'HasFactory',
+        'model_helpers' => 'ModelHelpers',
     ];
 
     protected $repositoryTraits = [];
@@ -73,6 +75,10 @@ class SchemaParser extends Parser
         // 'json'
     ];
 
+    protected $exceptHeaderMethods = [
+        'json'
+    ];
+
     /**
      * Create new instance.
      *
@@ -84,19 +90,23 @@ class SchemaParser extends Parser
 
         $this->useDefaults = $useDefaults;
 
+        $this->relationshipMap = unusualConfig('laravel-relationship-map', []);
+
         if($this->useDefaults){
-            $this->defaultInputs = Config::get(unusualBaseKey() . '.schemas.default_inputs',[]);
-            $this->defaultPreHeaders = Config::get(unusualBaseKey() . '.schemas.default_pre_headers',[]);
+            $this->defaultInputs = unusualConfig('schemas.default_inputs',[]);
+            $this->defaultPreHeaders = unusualConfig('schemas.default_pre_headers',[]);
         }
 
-        $this->defaultPostHeaders = Config::get(unusualBaseKey() . '.schemas.default_post_headers',[]);
+        $this->defaultPostHeaders = unusualConfig('schemas.default_post_headers',[]);
 
-        $this->defaultHeaderFormat = Config::get(unusualBaseKey() . '.default_header',[]);
+        $this->defaultHeaderFormat = unusualConfig('default_header',[]);
 
         // $this->baseNamespace = Config::get(unusualBaseKey() . '.namespace')."\\".Config::get(unusualBaseKey() . '.name');
-        $this->baseNamespace = Config::get(unusualBaseKey() . '.namespace');
+        $this->baseNamespace = unusualConfig('namespace');
 
-        $traits = Config::get(unusualBaseKey() . '.traits',[]);
+        $traits = unusualConfig('traits', []);
+
+
 
         foreach ($traits as $key => $object) {
             $this->traits[$key] = $object['model'];
@@ -117,7 +127,6 @@ class SchemaParser extends Parser
                 $this->interfaceNamespaces[$key] = [];
             }
         }
-
         $this->relationshipKeys[] = 'belongsToMany';
         $this->relationshipKeys[] = 'hasOne';
         $this->relationshipKeys[] = 'hasMany';
@@ -162,7 +171,7 @@ class SchemaParser extends Parser
                 if(preg_match('/belongsToMany|hasMany|morphTo|morphOne/', $column_type))
                     continue;
 
-                $column =  "{$column}_id";
+                $column =  "{$this->getForeignKeyFromName($column)}";
             }
 
             $parsed[] = $column;
@@ -221,22 +230,46 @@ class SchemaParser extends Parser
         $parsed = $this->parse($this->schema);
 
         $methodChaining = false;
+
         foreach ($parsed as $col_name => $methods) {
+            $methodName = $this->getCamelCase($methods[0]); // belongsTo, belongsToMany,....
             if($methodChaining && in_array($methods[0], $this->chainableMethods)){
                 $relationships[count($relationships)-1] .= ",{$col_name}:{$methods[0]}";
-            } else if (in_array($methods[0], $this->relationshipKeys)) {
-                $relationship_name = $methods[0];
+            } else if (array_key_exists($methodName, $this->relationshipMap)) {
                 $methodChaining = false;
-                if($relationship_name  == 'belongsTo'){
-                    $foreign_key = $col_name.'_id';
-                    $owner_key = $methods[1] ?? 'id';
-                    $table_name = $methods[2] ?? pluralize($col_name);
-                    $relationships[] = "belongsTo:{$table_name}:{$foreign_key}:{$owner_key}";
-                } else if($relationship_name == 'belongsToMany'){
+                $relatedName = $this->getStudlyName($col_name);
+                $arguments = $methods;
+                array_shift($arguments);
+
+                // if($methodName == 'morphTo'){
+                //     dd(
+                //         $relatedName,
+                //         $arguments
+                //     );
+                // }
+
+                $relationships[] = $this->createRelationshipSchema($relatedName, $methodName, $arguments);
+
+                if($methodName == 'belongsToMany'){
                     $methodChaining = true;
-                    $table_name = $methods[2] ?? pluralize($col_name);
+                }
+                continue;
+
+                $studlyName = $this->getStudlyName($methods[2] ?? $col_name); // StudlyName
+                $relationship_method = $this->getCamelCase($methods[0]); // belongsTo|belongsToMany|morphTo
+                $methodChaining = false;
+                if($relationship_method  == 'belongsTo'){
+                    $foreign_key = $this->getForeignKeyFromName($studlyName); //$col_name.'_id';
+                    $owner_key = $methods[1] ?? 'id';
+                    // $table_name = $methods[2] ?? $this->getTableNameFromName($col_name); //pluralize($col_name);
+                    // $relationships[] = "belongsTo:{$table_name}:{$foreign_key}:{$owner_key}";
+                    $routeName = $this->getStudlyName($methods[2] ?? $col_name);
+                    $relationships[] = "belongsTo:{$routeName}:{$foreign_key}:{$owner_key}";
+                } else if($relationship_method == 'belongsToMany'){
+                    $methodChaining = true;
+                    $table_name = $methods[2] ?? $this->getTableNameFromName($col_name);
                     $relationships[] = "belongsToMany:{$table_name}";
-                } else if($relationship_name == 'morphTo'){
+                } else if($relationship_method == 'morphTo'){
                     // $table_name = $col_name . 'able';
                     $table_name = $col_name;
                     $relationships[] = "morphTo";
@@ -288,9 +321,11 @@ class SchemaParser extends Parser
 
             }
         }
+
         // dd($relationships);
         return $relationships;
     }
+
 
     /**
      * headerFormat
@@ -300,6 +335,10 @@ class SchemaParser extends Parser
      */
     public function headerFormat(string $column_name, $options = []) : array
     {
+        if(in_array($options[0], ['json'])){
+            return [];
+        }
+
         $title = $this->getHeadline($column_name);
 
         if(in_array($options[0], ['morphTo'])){
@@ -341,20 +380,9 @@ class SchemaParser extends Parser
     {
 
         $filter = array_filter($this->parse($this->schema), function($v,$k){
-            return !array_key_exists($k, $this->customAttributes);
+            return !(array_key_exists($k, $this->customAttributes) || in_array($v[0], $this->exceptHeaderMethods));
         }, ARRAY_FILTER_USE_BOTH );
-        // dd(
-        //     array_merge(
-        //         array_merge($this->defaultPreHeaders, array_map(function($k, $options){
-        //             if(in_array($k, $this->relationshipKeys)){
-        //                 // $options[0] => 'relation_name'
-        //                 return $this->headerFormat($options[0], [$k]);
-        //             }
-        //             return $this->headerFormat($k, $options);
-        //         }, array_keys($filter), $filter  )),
-        //         $this->defaultPostHeaders
-        //     )
-        // );
+
         return array_merge(
             array_merge($this->defaultPreHeaders, array_map(function($k, $options){
                 if(in_array($k, $this->relationshipKeys)){
@@ -387,26 +415,38 @@ class SchemaParser extends Parser
             $extra_options['ext'] = 'time';
         } else if(in_array($options[0], ['text', 'mediumtext', 'longtext'])){
             $type = 'textarea';
+        } else if($options[0] == 'json'){
+            $type = 'group';
+            $extra_options['schema'] = [];
         }
 
-        if(!in_array('nullable', $options)){
+        if(count($options) > 1){
+
+            foreach($options as $option){
+                // default value perception from options
+                if(preg_match('/default\(\'?([A-Za-z\d]+)\'?\)/', $option, $matches)){
+                    $extra_options['default'] = $matches[1];
+                }
+            }
+        }
+
+        if(!in_array('nullable', $options) && !in_array($type, ['json'])){
             $rules[] = 'required';
         }
 
         if(in_array($options[0], $this->relationshipKeys)){
             if($options[0] == 'belongsTo'){
                 $type = 'select';
-                $name .= '_id';
+                // $name .= '_id';
+                $name = $this->getForeignKeyFromName($name);
 
-                $finder = new Finder();
-                $extra_options['repository'] = $finder->getRepository(pluralize($column));
+                $extra_options['repository'] = UFinder::getRouteRepository($column);
             } else if($options[0] == 'hasMany'){
                 $type = 'checklist';
                 $name = pluralize($name);
                 $label = pluralize($label);
 
-                $finder = new Finder();
-                $extra_options['repository'] = $finder->getRepository(pluralize($column));
+                $extra_options['repository'] = UFinder::getRouteRepository($column);
             } else if($options[0] == 'morphTo'){
                 $type = 'morphTo';
                 $finder = new Finder();
@@ -414,7 +454,7 @@ class SchemaParser extends Parser
 
                 foreach (array_slice($options,1) as $key => $routeName) {
                     $routeName = $this->getStudlyName($routeName);
-                    $foreign_id = $this->getSnakeCase($routeName) . '_id';
+                    $foreign_id = $this->getForeignKeyFromName($routeName); //$this->getSnakeCase($routeName) . '_id';
                     if(( $repository = $finder->getRouteRepository($routeName))){
                         array_push($parents, [
                             'name' => $foreign_id,
@@ -424,7 +464,7 @@ class SchemaParser extends Parser
                         ]);
                     }
                 }
-                $extra_options['parents'] = $parents;
+                $extra_options['schema'] = $parents;
             }
         }
 
@@ -432,10 +472,11 @@ class SchemaParser extends Parser
             array_unshift($rules, 'sometimes');
             $extra_options['rules'] = implode(':', $rules);
         }
+
         return [
+            'type' => $type,
             'name' => $name,
             'label' => $label,
-            'type' => $type,
             ...$extra_options,
             // 'placeholder' => "{$this->getHeadline($column)} Value",
 

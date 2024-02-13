@@ -11,15 +11,12 @@ use Illuminate\Support\Str;
 use Unusualify\Modularity\Support\Decomposers\SchemaParser;
 use Unusualify\Modularity\Traits\ManageNames;
 use Nwidart\Modules\FileRepository;
-use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Nwidart\Modules\Support\Config\GeneratorPath;
 use Nwidart\Modules\Support\Stub;
 use Illuminate\Container\Container;
-use Illuminate\Support\Facades\File;
 use Modules\SystemUser\Repositories\PermissionRepository;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
-// use Nwidart\Modules\Facades\Module;
 use Unusualify\Modularity\Module;
 
 class RouteGenerator extends Generator
@@ -149,7 +146,12 @@ class RouteGenerator extends Generator
     protected $fix = false;
 
 
-
+    /**
+     * modelRelationParser
+     *
+     * @var Unusualify\Modularity\Support\Decomposers\ModelRelationParser::class
+     */
+    protected $modelRelationParser;
 
 
     protected $traits = [
@@ -184,6 +186,7 @@ class RouteGenerator extends Generator
         $this->filesystem = $filesystem;
         $this->console = $console;
         $this->module = $module;
+
 
 
         // Stub::setBasePath( config('modules.paths.modules').'/Base/Console/stubs');
@@ -591,6 +594,7 @@ class RouteGenerator extends Generator
 
         $name = $this->getName();
 
+
         if ($this->module->getRouteConfig($name)) {
             // dd($this->force);
             if ($this->force) {
@@ -654,8 +658,6 @@ class RouteGenerator extends Generator
      */
     public function generateFolders()
     {
-
-
         foreach ($this->getFolders() as $key => $folder) {
 
             $folder = $this->generatorConfig($key);
@@ -748,24 +750,25 @@ class RouteGenerator extends Generator
 
         $hasCustomModel = $this->customModel && @class_exists($this->customModel);
 
-        if(!$hasCustomModel) {
-            $this->console->call('unusual:make:model', [
+        $this->console->call('unusual:make:model', [
                 'module' => $this->module->getStudlyName(),
-                    'model' => $this->getName()
-                ]
-                + ( count($this->getModelFillables()) ?  ['--fillable' => implode(",", $this->getModelFillables())] : [])
-                + ( count($this->getModelRelationships()) ?  ['--relationships' => implode(",", $this->getModelRelationships())] : [])
-                + ( $this->hasSoftDelete() ?  ['--soft-delete' => true] : [])
-                + $console_traits
-                + ['--notAsk' => true]
-                + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
-            );
+                'model' => $this->getName()
+            ]
+            + ( count($this->getModelFillables()) ?  ['--fillable' => implode(",", $this->getModelFillables())] : [])
+            + ( count($this->getModelRelationships()) ?  ['--relationships' => implode("|", $this->getModelRelationships())] : [])
+            + ( $this->hasSoftDelete() ?  ['--soft-delete' => true] : [])
+            + ( $hasCustomModel ?  ['--override-model' => $this->customModel] : [])
+            + $console_traits
+            + ['--notAsk' => true]
+            + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
+        );
 
+        if(!$hasCustomModel) {
 
             if(!$this->module->isFileExists("create_{$this->getDBTableName($this->name)}_table") && !$this->fix){
                 $this->console->call('unusual:make:migration', [
-                    'module' => $this->module->getStudlyName(),
-                    'name' => "create_{$this->getDBTableName($this->name)}_table",
+                        'module' => $this->module->getStudlyName(),
+                        'name' => "create_{$this->getDBTableName($this->name)}_table",
                     ]
                     + ( $this->schema ?  ['--fields' => $this->schema] : [])
                     + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
@@ -773,11 +776,9 @@ class RouteGenerator extends Generator
                 );
             }
 
-
-
-            $this->generateExtraMigrations();
         }
 
+        $this->generateExtraMigrations();
 
         if($this->generatorConfig('repository')->generate()){
             // $this->console->call('module:make-repository', [
@@ -785,7 +786,7 @@ class RouteGenerator extends Generator
                 'module' => $this->module->getStudlyName(),
                 'repository' => $this->getName()
                 ]
-                + ($hasCustomModel ? [ '--custom-model' => $this->customModel] : [])
+                // + ($hasCustomModel ? [ '--custom-model' => $this->customModel] : [])
                 + $console_traits
                 + ['--notAsk' => true]
             );
@@ -882,7 +883,8 @@ class RouteGenerator extends Generator
 
     }
 
-    public function fixConfigFile(){
+    public function fixConfigFile()
+    {
 
         if($this->fix){
             $configPath = $this->module->getConfigPath();
@@ -1229,7 +1231,22 @@ class RouteGenerator extends Generator
         return unusualConfig('composer.author.email');
     }
 
+    /**
+     * Check whether the file is presents
+     *
+     * @param string fileName
+     *
+     * @return bool
+     */
 
+    protected function checkFileExists($fileName){
+
+        $pattern = $this->module->getDirectoryPath('**/*/*' . $fileName . '*');
+        // $pattern = base_path('Modules/'.$this->module->getStudlyName().'/**/*/*'.$fileName.'*');
+        $search = glob($pattern);
+
+        return !empty($search);
+    }
 
 
 }

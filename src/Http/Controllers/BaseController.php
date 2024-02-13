@@ -458,7 +458,6 @@ abstract class BaseController extends PanelController
             $value .= '">' . $nestedCount . ' ' . (strtolower(Str::plural($column['title'], $nestedCount))) . '</a>';
         } else {
             $field = $column['key'];
-            // dd($item->$field);
             $value = $item->$field;
         }
 

@@ -11,11 +11,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 
 use Spatie\Permission\Traits\HasRoles;
-use Unusualify\Modularity\Entities\Traits\{HasHelpers, HasScopes, IsTranslatable};
+use Unusualify\Modularity\Entities\Traits\{ModelHelpers, HasScopes, IsTranslatable};
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, HasHelpers, HasScopes, IsTranslatable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, ModelHelpers, HasScopes, IsTranslatable;
 
     /**
      * The attributes that are mass assignable.
