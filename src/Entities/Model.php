@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Traits\{
     HasPresenter,
-    HasHelpers,
+    ModelHelpers,
     HasScopes,
     HasRelation,
     HasScanModule,
@@ -21,7 +21,7 @@ use Unusualify\Modularity\Entities\Traits\{
 
 class Model extends LaravelModel implements TaggableInterface
 {
-    use HasHelpers,
+    use ModelHelpers,
         HasPresenter,
         HasRelation,
         // HasScanModule,
