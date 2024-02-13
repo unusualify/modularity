@@ -1,54 +1,52 @@
-import { reactive, computed, onUpdated, onMounted, toRefs, getCurrentInstance } from 'vue'
-import { useStore } from 'vuex'
-import openMediaLibrary from '@/behaviors/openMediaLibrary'
+import { reactive, computed, onMounted, toRefs, getCurrentInstance } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/propsFactory.mjs'
 
 export const props = propsFactory({
-  isLgAndUp:{
-    type:Boolean,
-    default:false,
+  isLgAndUp: {
+    type: Boolean,
+    default: false
   },
-  isXlAndUp:{
-    type:Boolean,
-    default:false,
+  isXlAndUp: {
+    type: Boolean,
+    default: false
   },
-  isSmAndDown:{
-    type:Boolean,
-    default:false,
-  },
+  isSmAndDown: {
+    type: Boolean,
+    default: false
+  }
 })
 
-export default function useRoot(){
-  let vuetifyInstance;
-  let rootInstance;
+export default function useRoot () {
+  let vuetifyInstance
+  let rootInstance
 
-  onMounted(()=> {
-    vuetifyInstance = getCurrentInstance().proxy.$vuetify;
-    rootInstance = getCurrentInstance().root;
-    methods.initializeStates();
+  onMounted(() => {
+    vuetifyInstance = getCurrentInstance().proxy.$vuetify
+    rootInstance = getCurrentInstance().root
+    methods.initializeStates()
   })
 
   const state = reactive({
     root: null,
     isLgAndUp: false,
     isXlAndUp: false,
-    isSmAndDown: false,
+    isSmAndDown: false
   })
 
   const methods = reactive({
-    initializeStates: () => {
-      state.isLgAndUp = computed(() => vuetifyInstance.display.lgAndUp),
-      state.isXlAndUp = computed(() => vuetifyInstance.display.xlAndUp),
-      state.isSmAndDown = computed(() => vuetifyInstance.display.smAndDown),
-      state.root =  rootInstance;
+    initializeStates: function () {
+      state.isLgAndUp = computed(() => vuetifyInstance.display.lgAndUp)
+      state.isXlAndUp = computed(() => vuetifyInstance.display.xlAndUp)
+      state.isSmAndDown = computed(() => vuetifyInstance.display.smAndDown)
+      state.root = rootInstance
     },
     openMediaLibrary: () => {
-      state.root.ctx.openFreeMediaLibrary();
+      state.root.ctx.openFreeMediaLibrary()
     }
   })
 
   return {
     ...toRefs(state),
-    ...methods,
+    ...methods
   }
 }
