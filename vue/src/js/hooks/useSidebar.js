@@ -41,7 +41,7 @@ export default function useSidebar() {
     isMini: computed(() => state.mainSidebar.isMini && root.isLgAndUp),
     isHoverable: computed(() => ((state.isMini && root.isLgAndUp) || state.rail) && state.mainSidebar.expandOnHover),
     showToggleBtn: computed(() => !state.isMini.value),
-    width: computed(() => root.isXlAndUp ? 320 : 256),
+    width: computed(() => root.isXlAndUp.value ? 320 : 256),
     expanded: computed({
       get(){
         return isExpanded.value;
