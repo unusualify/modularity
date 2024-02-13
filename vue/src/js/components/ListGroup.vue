@@ -25,7 +25,8 @@
                     <v-list-item
                         v-bind="props"
                         :title="item.name"
-                        :prepend-icon="item.icon"
+                        :prepend-icon="showIcon ? item.icon : null"
+                        :class="{'px-4':showIcon}"
                     ></v-list-item>
                 </template>
                 <ue-list-group
@@ -45,7 +46,7 @@
                 :title="item.name"
                 :active="activeIndex === i"
                 v-bind="$bindAttributes(item)"
-                class="px-4"
+                :class="{'px-4':showIcon}"
                 >
             </v-list-item>
 
@@ -60,7 +61,7 @@
                 :title="item.name"
                 :active="activeIndex === i"
                 :active-class="`sidebar-item-active sidebar-item-active-${level}`"
-                class="px-4"
+                :class="{'px-4':showIcon}"
                 >
 
                 <!-- <v-list-item-icon v-if="!!item.icon">
@@ -80,7 +81,6 @@
                     v-if="i != 0"
                     :key="i + 'subdivider'"
                     :index="i"
-                    class="px-4"
                 ></v-divider>
 
                 <v-list-item
@@ -92,7 +92,7 @@
                     :append="false"
                     disabled
                     :prepend-icon="expanded ? null : item.icon"
-                    class="px-4"
+                    :class="{'px-4':showIcon}"
                     >
                     <!-- :title="item.name" -->
 
@@ -204,7 +204,7 @@ export default {
     this.opened = this.getListGroupOpens([], this.items)
   },
   watch:{
-},
+  },
   methods: {
     isSubgroup (item) {
       return !!item.items

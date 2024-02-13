@@ -1,5 +1,6 @@
 const state = {
   sideBarOpt : window[process.env.VUE_APP_NAME].STORE.config.sideBarOpt,
+  secondarySideBar : window[process.env.VUE_APP_NAME].STORE.config.secondarySideBar,
 }
 
 
@@ -9,6 +10,9 @@ const getters = {
   sideBarOpt: state => {
     return state.sideBarOpt;
   },
+  secondarySidebarOpt: state => {
+    return state.secondarySideBar;
+  }
 }
 
 const mutations = {

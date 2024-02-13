@@ -20,13 +20,16 @@ export const props = propsFactory({
 
 export default function useRoot(){
   let vuetifyInstance;
+  let rootInstance;
 
   onMounted(()=> {
     vuetifyInstance = getCurrentInstance().proxy.$vuetify;
+    rootInstance = getCurrentInstance().root;
     methods.initializeStates();
   })
 
   const state = reactive({
+    root: null,
     isLgAndUp: false,
     isXlAndUp: false,
     isSmAndDown: false,
@@ -36,12 +39,16 @@ export default function useRoot(){
     initializeStates: () => {
       state.isLgAndUp = computed(() => vuetifyInstance.display.lgAndUp),
       state.isXlAndUp = computed(() => vuetifyInstance.display.xlAndUp),
-      state.isSmAndDown = computed(() => vuetifyInstance.display.smAndDown)
+      state.isSmAndDown = computed(() => vuetifyInstance.display.smAndDown),
+      state.root =  rootInstance;
+    },
+    openMediaLibrary: () => {
+      state.root.ctx.openFreeMediaLibrary();
     }
   })
 
   return {
     ...toRefs(state),
-    methods,
+    ...methods,
   }
 }

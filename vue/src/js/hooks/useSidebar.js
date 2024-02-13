@@ -1,6 +1,6 @@
-import { reactive, computed, onMounted, toRefs, ref, watch } from 'vue'
+import { reactive, computed, onMounted, toRefs, ref, watch, getCurrentInstance } from 'vue'
 import { useStore } from 'vuex'
-import openMediaLibrary from '@/behaviors/openMediaLibrary'
+// import openMediaLibrary from '@/behaviors/openMediaLibrary'
 import { propsFactory } from 'vuetify/lib/util/propsFactory.mjs'
 import { useRoot } from '@/hooks'
 
@@ -31,10 +31,15 @@ export default function useSidebar() {
   const state = reactive({
     csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
     sidebarToggle: props.sidebarToggle,
-    sideBarOpt: store.state.config.sideBarOpt,
-    rail: computed(() => state.sideBarOpt.rail && root.isLgAndUp),
-    isMini: computed(() => state.sideBarOpt.isMini && root.isLgAndUp),
-    isHoverable: computed(() => ((state.isMini && root.isLgAndUp) || state.rail) && state.sideBarOpt.expandOnHover),
+    mainSidebar: store.state.config.sideBarOpt,
+    secondarySidebar : store.state.config.secondarySideBar,
+    mainLocation : computed(() => state.mainSidebar.mainLocation),
+    secondarySidebarExists: computed(() => state.secondarySidebar.exists),
+    secondaryLocation : computed(() => state.secondarySidebar.location),
+    contentDrawer : computed(() => state.mainSidebar.contentDrawer.exists),
+    rail: computed(() => state.mainSidebar.rail && root.isLgAndUp),
+    isMini: computed(() => state.mainSidebar.isMini && root.isLgAndUp),
+    isHoverable: computed(() => ((state.isMini && root.isLgAndUp) || state.rail) && state.mainSidebar.expandOnHover),
     showToggleBtn: computed(() => !state.isMini.value),
     width: computed(() => root.isXlAndUp ? 320 : 256),
     expanded: computed({
@@ -45,7 +50,7 @@ export default function useSidebar() {
         isExpanded.value = val;
       }
     }),
-    showIcon: computed(() => state.rail.value ? (state.expanded ? state.sideBarOpt.showIcon : true) : state.sideBarOpt.showIcon),
+    showIcon: computed(() => state.rail.value ? (state.expanded ? state.mainSidebar.showIcon : true) : state.mainSidebar.showIcon),
     socialMediaLinks:[
       [
         'mdi-twitter',
@@ -88,6 +93,9 @@ export default function useSidebar() {
         state.expanded = !event;
       }
     },
+    openFreeMediaLibrary: function(){
+      root.openMediaLibrary();
+    }
   });
 
   watch(root.isLgAndUp,()=>{
@@ -95,7 +103,6 @@ export default function useSidebar() {
   })
   onMounted(() => {
     methods.initializeSidebar()
-    openMediaLibrary()
     state.expanded = !state.rail.value;
   });
 
