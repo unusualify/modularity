@@ -488,8 +488,8 @@ trait ManageForm {
                     $input['default'] = Arr::map($schema, fn($i) => $i['default'] ?? '');
                 }
 
-                $input['schema'] = Arr::mapWithKeys($schema, fn($i) => ["{$input['name']}.{$i['name']}" => array_merge($i,['name' => "{$input['name']}.{$i['name']}"])]);
 
+                $input['schema'] = $input['type'] == 'wrap' ? $schema :Arr::mapWithKeys($schema, fn($i) => ["{$input['name']}.{$i['name']}" => array_merge($i,['name' => "{$input['name']}.{$i['name']}"])]);
 
                 $data = $input;
 
