@@ -5,9 +5,8 @@
         :style="style"
         :active-class="`sidebar-item-active sidebar-item-active-${level}`"
         class="mb-2 py-0"
-        density="compact"
-
         >
+        <!-- :class="{'mb-2 py-0 d-flex flex-column align-center' : !expanded} " -->
         <template
             v-for="(item, i) in items"
             >
@@ -113,7 +112,6 @@
 import { inject } from 'vue'
 // import { useRoot } from '@/hooks'
 
-
 export default {
   setup (props, context) {
     const sideBar = inject('hooks');
@@ -185,14 +183,8 @@ export default {
     },
 
     style () {
-      // __log(
-      //     'listGroup Style',
-      //     this.$root.miniStatus,
-      //     this.$root.isMini
-      // )
       return {
-        marginLeft: ((!this.sideBar.isMini.value) ? this.level * 20 : 0) + 'px',
-
+        marginLeft: ((this.expanded) ? this.level * 20 : 0) + 'px',
       }
     }
 

@@ -83,8 +83,6 @@
         </slot>
       </div>
     </template>
-
-
   </v-navigation-drawer>
   <v-navigation-drawer v-if="contentDrawer"
   :width="width"
