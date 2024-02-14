@@ -82,17 +82,22 @@ abstract class Request extends FormRequest
     }
 
     public function hydrateRules($rules) {
-        // dd($rules);
         return Arr::map($rules, function($ruleSchema, $name){
-            if(preg_match('/unique_table/', $ruleSchema)){
-                $ruleSchema = preg_replace('/\|?(unique:[A-Za-z,_\d]*)(\|?|$)/', "", $ruleSchema);
-                $ruleSchema = preg_replace('/unique_table/', "unique:{$this->model->getTable()},{$name}" . ($this->id ? ",{$this->id}" : ''), $ruleSchema);
 
-                return $ruleSchema;
-                dd(
-                    // preg_replace('/unique_table/', "unique:{$this->model->getTable()},{$name}", $ruleSchema),
-                    preg_replace('/\|?(unique:[A-Za-z,\d]*)(\|?|$)/', "$2", $ruleSchema)
-                );
+            if(is_string($ruleSchema)){
+                if(preg_match('/unique_table/', $ruleSchema)){
+                    $ruleSchema = preg_replace('/\|?(unique:[A-Za-z,_\d]*)(\|?|$)/', "", $ruleSchema);
+                    $ruleSchema = preg_replace('/unique_table/', "unique:{$this->model->getTable()},{$name}" . ($this->id ? ",{$this->id}" : ''), $ruleSchema);
+
+                    return $ruleSchema;
+                    dd(
+                        // preg_replace('/unique_table/', "unique:{$this->model->getTable()},{$name}", $ruleSchema),
+                        preg_replace('/\|?(unique:[A-Za-z,\d]*)(\|?|$)/', "$2", $ruleSchema)
+                    );
+                }
+            }else {
+                // dd($ruleSchema);
+
             }
 
             return $ruleSchema;
@@ -124,7 +129,7 @@ abstract class Request extends FormRequest
         if (! $localeActive) {
             $rules = $this->updateRules($rules, $fields, reset($locales));
         }
-
+        dd($rules);
         return $rules;
     }
 
@@ -179,9 +184,17 @@ abstract class Request extends FormRequest
                 if ($this->ruleStartsWith($rule, 'unique_translation') && Str::contains($rule, $fieldNames)) {
                     // $unique_fields = explode(',', explode(':',$rule)[1]);
 
-                    $rule = function (string $attribute, mixed $value, Closure $fail) use($translationTableClass){
+                    $id = $request->has('id') ? $request->get('id') : null;
+                    $translationRelationKey = $this->model()->getTranslationRelationKey();
+
+                    $rule = function (string $attribute, mixed $value, Closure $fail) use($translationTableClass, $request, $id, $translationRelationKey){
                         [$_field, $_locale] = explode('.', $attribute);
-                        $records = $translationTableClass::query()
+                        $query = $translationTableClass::query();
+
+                        if($id){
+                            $query = $query->whereNot($translationRelationKey, $id);
+                        }
+                        $records = $query
                             ->where($_field, $value)
                             ->where('locale', $_locale)
                             ->get();
