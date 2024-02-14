@@ -87,7 +87,6 @@ export const getModel = (inputs, item = null, rootState = null) => {
                 : item.translations[name][lang.value]
               return map
             }, {})
-            __log(fields[name])
           } else {
             fields[name] = value
           }
