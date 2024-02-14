@@ -77,7 +77,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
     if (__isObject(input)) {
       if (isTranslated) { // translations
         if (editing) {
-          const hasTranslations = Object.prototype.hasOwnProperty.call(item, 'translations') && __isset(item.translations[name])
+          const hasTranslations = Object.prototype.hasOwnProperty.call(item, 'translations')
 
           if (hasTranslations) {
             fields[name] = languages.reduce(function (map, lang) {
@@ -86,6 +86,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
                 : item.translations[name][lang.value]
               return map
             }, {})
+            __log(fields[name])
           } else {
             fields[name] = value
           }
@@ -93,8 +94,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
       } else {
         if (!value &&
           editing &&
-          Object.prototype.hasOwnProperty.call(item, 'translations') &&
-          Object.prototype.hasOwnProperty.call(item.translations, name)
+          Object.prototype.hasOwnProperty.call(item, 'translations')
         ) {
           const locale = Object.keys(item.translations[name])[0]
           fields[name] = item.translations[name][locale]
@@ -119,7 +119,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
   if (rootState) {
     // hydrateSelected(item, rootState)
   }
-
+  __log(values)
   return values
 }
 
