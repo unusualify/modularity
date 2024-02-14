@@ -86,7 +86,7 @@ trait HasTranslation
         return $query
             ->join($translationTable, function (JoinClause $join) use ($translationTable, $localeKey, $table, $keyName) {
                 $join
-                    ->on($translationTable.'.'.$this->getRelationKey(), '=', $table.'.'.$keyName)
+                    ->on($translationTable.'.'.$this->getTranslationRelationKey(), '=', $table.'.'.$keyName)
                     ->where($translationTable.'.'.$localeKey, $this->locale());
             })
             ->where($translationTable.'.'.$this->getLocaleKey(), $locale)
@@ -108,7 +108,7 @@ trait HasTranslation
         $table = $this->getTable();
         $locale = $locale == null ? app()->getLocale() : $locale;
 
-        return $query->join("{$translationTable} as t", "t.{$this->getRelationKey()}", "=", "{$table}.id")
+        return $query->join("{$translationTable} as t", "t.{$this->getTranslationRelationKey()}", "=", "{$table}.id")
             ->where($this->getLocaleKey(), $locale)
             ->groupBy("{$table}.id")
             ->groupBy("t.{$groupByField}")

@@ -57,7 +57,8 @@ trait TranslationsTrait
                     }
 
                     return [
-                        $attribute => ($attributeValue[$locale] ?? null),
+                        // $attribute => ($attributeValue[$locale] ?? null),
+                        $attribute => ($attributeValue[$locale] ?? $attributeValue ?? null),
                     ];
                 })->toArray();
             }

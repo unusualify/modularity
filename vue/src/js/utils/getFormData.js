@@ -73,11 +73,12 @@ export const getModel = (inputs, item = null, rootState = null) => {
     //   return fields
     // }
     // __log(name, _default, item)
-    const value = editing ? (item[name] ? item[name] : _default) : _default
+    const value = editing ? (__isset(item[name]) ? item[name] : _default) : _default
+
     if (__isObject(input)) {
       if (isTranslated) { // translations
         if (editing) {
-          const hasTranslations = Object.prototype.hasOwnProperty.call(item, 'translations') && __isset(item.translations[name])
+          const hasTranslations = Object.prototype.hasOwnProperty.call(item, 'translations')
 
           if (hasTranslations) {
             fields[name] = languages.reduce(function (map, lang) {
@@ -93,8 +94,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
       } else {
         if (!value &&
           editing &&
-          Object.prototype.hasOwnProperty.call(item, 'translations') &&
-          Object.prototype.hasOwnProperty.call(item.translations, name)
+          Object.prototype.hasOwnProperty.call(item, 'translations')
         ) {
           const locale = Object.keys(item.translations[name])[0]
           fields[name] = item.translations[name][locale]
