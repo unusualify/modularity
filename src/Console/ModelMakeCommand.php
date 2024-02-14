@@ -573,7 +573,8 @@ class ModelMakeCommand extends BaseCommand
             }
         }
 
-        $this->modelRelationParser->writeReverseRelationships();
+        if($this->modelRelationParser)
+            $this->modelRelationParser->writeReverseRelationships();
 
 
         if($this->getTraitResponse('addTranslation')){
