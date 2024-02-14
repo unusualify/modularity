@@ -57,7 +57,9 @@ trait PricesTrait
                 $existingPrices = $object->prices()->where('role', $name)->get();
 
                 foreach ($fields[$name] as $priceData) {
-                    $priceModel = isset($priceData['id']) ? $existingPrices->where('id', $priceData['id'])->first() : null;
+                    $priceModel = isset($priceData['id'])
+                        ? $existingPrices->where('id', $priceData['id'])->first()
+                        : null;
 
                     $data = array_merge_recursive_preserve($this->defaultPriceData, $priceData + ['role' => $name]);
 
@@ -66,7 +68,7 @@ trait PricesTrait
                         $priceModel->update($data);
                     } else {
                         // Create a new price
-                        $object->prices()->create($data);
+                        $object->prices()->create(Arr::except($data, ['id']));
                     }
                 }
 
