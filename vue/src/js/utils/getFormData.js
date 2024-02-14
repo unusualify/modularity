@@ -73,7 +73,8 @@ export const getModel = (inputs, item = null, rootState = null) => {
     //   return fields
     // }
     // __log(name, _default, item)
-    const value = editing ? (item[name] ? item[name] : _default) : _default
+    const value = editing ? (__isset(item[name]) ? item[name] : _default) : _default
+
     if (__isObject(input)) {
       if (isTranslated) { // translations
         if (editing) {
@@ -119,7 +120,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
   if (rootState) {
     // hydrateSelected(item, rootState)
   }
-  __log(values)
+
   return values
 }
 
