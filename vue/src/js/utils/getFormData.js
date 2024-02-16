@@ -79,8 +79,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
       if (isTranslated) { // translations
         if (editing) {
           const hasTranslations = Object.prototype.hasOwnProperty.call(item, 'translations')
-
-          if (hasTranslations) {
+          if (hasTranslations && item.translations[name]) {
             fields[name] = languages.reduce(function (map, lang) {
               map[lang.value] = find(item.translations, { locale: lang.value })
                 ? find(item.translations, { locale: lang.value })[name]
@@ -94,7 +93,8 @@ export const getModel = (inputs, item = null, rootState = null) => {
       } else {
         if (!value &&
           editing &&
-          Object.prototype.hasOwnProperty.call(item, 'translations')
+          Object.prototype.hasOwnProperty.call(item, 'translations') &&
+          Object.prototype.hasOwnProperty.call(item.translations, name)
         ) {
           const locale = Object.keys(item.translations[name])[0]
           fields[name] = item.translations[name][locale]
