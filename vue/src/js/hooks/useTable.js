@@ -3,7 +3,7 @@ import { watch, computed, nextTick, reactive, toRefs } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
-import _, { isObject, find } from 'lodash'
+import { isObject, find, omit, snakeCase, kebabCase } from 'lodash'
 
 import { DATATABLE, FORM } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
@@ -135,8 +135,8 @@ export default function useTable (props, context) {
       y: 0
     },
 
-    snakeName: _.snakeCase(props.name),
-    permissionName: _.kebabCase(props.name),
+    snakeName: snakeCase(props.name),
+    permissionName: kebabCase(props.name),
     transNameSingular: computed(() => te('modules.' + state.snakeName, 0) ? t('modules.' + state.snakeName, 0) : props.name),
     transNamePlural: computed(() => t('modules.' + state.snakeName, 1)),
     transNameCountable: computed(() => t('modules.' + state.snakeName, getters.totalElements.value)),
@@ -322,8 +322,10 @@ export default function useTable (props, context) {
           // this.$refs.dialog.openModal()
           break
         case 'duplicate':
-          methods.setEditedItem(item)
-          methods.duplicateRow(item.id)
+          methods.setEditedItem(omit(item, 'id'))
+          methods.openForm()
+
+          // methods.duplicateRow(item.id)
           // this.$refs.dialog.openModal()
           // methods.openDeleteModal()
           break

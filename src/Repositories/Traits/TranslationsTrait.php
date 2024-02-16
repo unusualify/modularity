@@ -29,6 +29,7 @@ trait TranslationsTrait
             $locales = getLocales();
             $localesCount = count($locales);
             $attributes = Collection::make($this->model->translatedAttributes);
+            $translationsFields = $fields['translations'] ?? [];
 
             $submittedLanguages = Collection::make($fields['languages'] ?? []);
 
@@ -47,8 +48,8 @@ trait TranslationsTrait
 
                 $fields[$locale] = [
                     'active' => $activeField,
-                ] + $attributes->mapWithKeys(function ($attribute) use (&$fields, $locale, $localesCount, $index) {
-                    $attributeValue = $fields[$attribute] ?? null;
+                ] + $attributes->mapWithKeys(function ($attribute) use (&$fields, $locale, $localesCount, $index, $translationsFields) {
+                    $attributeValue = $fields[$attribute] ?? $translationsFields[$attribute] ?? null;
 
                     // if we are at the last locale,
                     // let's unset this field as it is now managed by this trait

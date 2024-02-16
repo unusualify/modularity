@@ -359,7 +359,7 @@ abstract class BaseController extends PanelController
             $name = $columnsData[$this->titleColumnKey];
 
             if (empty($name)) {
-                if ($this->routeHas('translations')) {
+                if ($translated) {
                     $fallBackTranslation = $item->translations()->where('active', true)->first();
 
                     if (isset($fallBackTranslation->{$this->titleColumnKey})) {
@@ -378,38 +378,42 @@ abstract class BaseController extends PanelController
             $canDuplicate = $this->getIndexOption('duplicate');
 
             $itemId = $this->getItemIdentifier($item);
+
             return array_replace(
-                $item->toArray()
-                + [
-                    // 'id' => $itemId,
-                    $this->titleColumnKey => $name,
-                    // 'publish_start_date' => $item->publish_start_date,
-                    // 'publish_end_date' => $item->publish_end_date,
-                    // 'edit' => $canEdit ? $this->getModuleRoute($itemId, 'edit') : null,
-                    // 'duplicate' => $canDuplicate ? $this->getModuleRoute($itemId, 'duplicate') : null,
-                    // 'delete' => $itemCanDelete ? $this->getModuleRoute($itemId, 'destroy') : null,
-                ] +
-                $this->repository->getFormFields($item, $schema)
-                // + ($this->getIndexOption('editInModal') ? [
-                //     'editInModal' => $this->getModuleRoute($itemId, 'edit'),
-                //     'updateUrl' => $this->getModuleRoute($itemId, 'update'),
-                // ] : [])
-                // + ($this->getIndexOption('publish') && ($item->canPublish ?? true) ? [
-                //     'published' => $item->published,
-                // ] : [])
-                // + ($this->getIndexOption('feature') && ($item->canFeature ?? true) ? [
-                //     'featured' => $item->{$this->featureField},
-                // ] : [])
-                // + (($this->getIndexOption('restore') && $itemIsTrashed) ? [
-                //     'deleted' => true,
-                // ] : [])
-                // + (($this->getIndexOption('forceDelete') && $itemIsTrashed) ? [
-                //     'destroyable' => true,
-                // ] : [])
-                // + ($translated ? [
-                //     'languages' => $item->getActiveLanguages(),
-                // ] : [])
-                + $columnsData
+                array_merge(
+                    $item->toArray(),
+                    [
+                        // 'id' => $itemId,
+                        $this->titleColumnKey => $name,
+                        // 'publish_start_date' => $item->publish_start_date,
+                        // 'publish_end_date' => $item->publish_end_date,
+                        // 'edit' => $canEdit ? $this->getModuleRoute($itemId, 'edit') : null,
+                        // 'duplicate' => $canDuplicate ? $this->getModuleRoute($itemId, 'duplicate') : null,
+                        // 'delete' => $itemCanDelete ? $this->getModuleRoute($itemId, 'destroy') : null,
+                    ],
+                    $this->repository->getFormFields($item, $schema),
+                    $columnsData
+                    // + ($this->getIndexOption('editInModal') ? [
+                    //     'editInModal' => $this->getModuleRoute($itemId, 'edit'),
+                    //     'updateUrl' => $this->getModuleRoute($itemId, 'update'),
+                    // ] : [])
+                    // + ($this->getIndexOption('publish') && ($item->canPublish ?? true) ? [
+                    //     'published' => $item->published,
+                    // ] : [])
+                    // + ($this->getIndexOption('feature') && ($item->canFeature ?? true) ? [
+                    //     'featured' => $item->{$this->featureField},
+                    // ] : [])
+                    // + (($this->getIndexOption('restore') && $itemIsTrashed) ? [
+                    //     'deleted' => true,
+                    // ] : [])
+                    // + (($this->getIndexOption('forceDelete') && $itemIsTrashed) ? [
+                    //     'destroyable' => true,
+                    // ] : [])
+                    // + ($translated ? [
+                    //     'languages' => $item->getActiveLanguages(),
+                    // ] : [])
+
+                )
                 , $this->indexItemData($item)
             );
         });
