@@ -93,7 +93,7 @@ export default {
     }
   },
   created () {
-    __log(this)
+
   },
   methods: {
     openMediaLibrary: function (max = 1, name = this.name, index = -1) {

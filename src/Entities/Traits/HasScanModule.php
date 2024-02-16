@@ -17,7 +17,7 @@ trait HasScanModule
 
     protected $moduleRelationships = [];
 
-    protected $definedRelationships = [];
+    protected static $definedRelationships = [];
 
 
     public function initializeHasScanModule()

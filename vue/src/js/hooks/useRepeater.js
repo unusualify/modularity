@@ -3,7 +3,7 @@
 // import { ref, watch, computed, nextTick } from 'vue'
 import { reactive, toRefs, computed, watch } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
-import { transform, cloneDeep, filter } from 'lodash'
+import { transform, cloneDeep, filter, omit } from 'lodash'
 import { getModel } from '@/utils/getFormData'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
@@ -20,7 +20,8 @@ import { ALERT } from '@/store/mutations'
 export const makeRepeaterProps = propsFactory({
   ...makeInputProps(),
   modelValue: {
-    type: Array
+    type: Array,
+    default: []
   },
   max: {
     type: Number,
@@ -33,6 +34,9 @@ export const makeRepeaterProps = propsFactory({
   label: {
     type: String,
     default: ''
+  },
+  singularLabel: {
+    type: String
   },
   schema: {
     type: Object,
@@ -55,9 +59,17 @@ export const makeRepeaterProps = propsFactory({
       return useI18n().t('ADD NEW')
     }
   },
+  buttonHasLabel: {
+    type: Boolean,
+    default: false
+  },
   withGutter: {
     type: Boolean,
     default: false
+  },
+  autoIdGenerator: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -75,6 +87,13 @@ export default function useRepeater (props, context) {
   }
 
   function hydrateRepeaterInput (item, index) {
+    const model = getModel(props.schema, item)
+    return {
+      ...(props.autoIdGenerator ? { id: index } : {}),
+      ...transform(omit(model, []), (o, v, k) => {
+        o[namingRepeaterField(index, k)] = v
+      })
+    }
     return {
       id: index,
       ...transform(item, (o, v, k) => {
@@ -139,8 +158,7 @@ export default function useRepeater (props, context) {
     repeaterInputs: computed({
       get: () => {
         // return hydrateRepeaterInputs(modelValue.value ?? [])
-
-        const initialRepeats = hydrateRepeaterInputs(modelValue.value ?? [])
+        const initialRepeats = hydrateRepeaterInputs(Array.isArray(modelValue.value) ? modelValue.value : [])
 
         if (props.min > 0 && initialRepeats.length < props.min) {
           const schema = invokeRuleGenerator(cloneDeep(props.schema))
@@ -194,6 +212,10 @@ export default function useRepeater (props, context) {
         })
       })
       return slotableSchemas
+    }),
+
+    addButtonContent: computed(() => {
+      return props.addButtonText + (props.buttonHasLabel && __isset(props.singularLabel) ? ` ${props.singularLabel}` : '')
     })
   })
 
@@ -208,7 +230,6 @@ export default function useRepeater (props, context) {
     addRepeaterBlock: function () {
       if (state.isAddible) {
         const schema = invokeRuleGenerator(cloneDeep(props.schema))
-
         modelValue.value.push(hydrateRepeaterInput(getModel(schema), state.totalRepeats))
       } else {
         store.commit(ALERT.SET_ALERT, { message: `You cannot add new item, because the number of elements should be at much ${props.max}`, variant: 'warning', location: 'top' })

@@ -9,7 +9,7 @@
         </ue-title>
         <slot name="append"></slot>
       </div>
-      <div :class="['repeater__block', {gutter: withGutter}]">
+      <div :class="['repeater__block']">
         <draggable
           class="content__content"
           v-model="repeaterInputs"
@@ -20,8 +20,8 @@
             <div>
               <v-hover>
                 <template v-slot:default="{ isHovering, props }">
-                  <div :class="['content__item', isHovering ? 'active' :'']" v-bind="props">
-                    <div class="content__item--body">
+                  <div :class="['content__item', isHovering ? 'active' :'', draggable ? 'draggable': '']" v-bind="props">
+                    <div :class="['content__item--body', {gutter: withGutter}]">
                       <div class="content__item--toolbar">
                         <v-btn @click="addRepeaterBlock()" color="success" variant="text" density="compact" class="" icon="">
                           <v-icon size="x-small" icon="mdi-plus" />
@@ -78,13 +78,13 @@
       </div>
       <div class="repeater__bottom mb-theme">
         <div class="d-flex">
-          <slot name="addButton" v-bind="{text: addButtonText, addRepeaterBlock}">
+          <slot name="addButton" v-bind="{text: addButtonContent, addRepeaterBlock}">
             <v-btn-secondary
               class=""
               @click="addRepeaterBlock"
               appendIcon="$add"
               >
-              {{ addButtonText }}
+              {{ addButtonContent }}
             </v-btn-secondary>
           </slot>
           <div class="ml-auto">
@@ -152,27 +152,27 @@ export default {
       .content__item
         z-index: 1
         padding-left: $theme-space
-        cursor: all-scroll
         // border: 1px solid $color__border
         // border-top: 0 none
         position: relative
         box-sizing: border-box
+        &.draggable
+          cursor: all-scroll
         &.sortable-ghost
           opacity: 0.5
 
         &.active
           z-index: 3
-          .content__item--body
+          >.content__item--body
             border: $border-width solid $border-color
-
+            >.content__item--toolbar
+              display: flex
+              border-top: $border-width solid $border-color
+              border-left: $border-width solid $border-color
+              border-right: $border-width solid $border-color
             // border-color: red
           .content__item--navigation
             display: block
-          .content__item--toolbar
-            display: flex
-            border-top: $border-width solid $border-color
-            border-left: $border-width solid $border-color
-            border-right: $border-width solid $border-color
 
         .content__item--body
           position: relative
@@ -194,9 +194,8 @@ export default {
           align-items: center
           padding: 0
           overflow: hidden
-    &.gutter
-      .content__content
-        .content__item
-          .content__item--body
-            padding: 1.3vw !important
+
+    .content__item--body
+      &.gutter
+        padding: 1.3vw !important
 </style>

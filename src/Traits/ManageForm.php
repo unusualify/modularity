@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Priceable\Models\Currency;
 
@@ -36,25 +37,24 @@ trait ManageForm {
 
             if($input->type == 'custom-input-repeater'){
                 if(isset($input->ext) && $input->ext == 'relationship'){
-                    $relationshipName = $input->relationship ?? $input->name;
-                    return [$relationshipName];
+                    return [$input->name];
 
-                    try {
-                        $relationships =  method_exists($this->repository->getModel(), 'getDefinedRelations')
-                            ? $this->repository->getDefinedRelations()
-                            : $this->repository->modelRelations();
+                    // try {
+                    //     $relationships =  method_exists($this->repository->getModel(), 'getDefinedRelations')
+                    //         ? $this->repository->getDefinedRelations()
+                    //         : $this->repository->modelRelations();
 
 
-                        return in_array($relationshipName, $relationships)
-                            ? [$relationshipName]
-                            : [];
-                    } catch (\Throwable $th) {
-                        dd(
-                            $th,
-                            $this->repository,
-                            $relationshipName
-                        );
-                    }
+                    //     return in_array($relationshipName, $relationships)
+                    //         ? [$relationshipName]
+                    //         : [];
+                    // } catch (\Throwable $th) {
+                    //     dd(
+                    //         $th,
+                    //         $this->repository,
+                    //         $relationshipName
+                    //     );
+                    // }
 
                 }else{
                     return [];
@@ -67,10 +67,6 @@ trait ManageForm {
                 return [];
             }
 
-            // dd($input, $relationship);
-            // return [
-            //     $relationship
-            // ];
 
             return [
                 $relationship => [
@@ -281,6 +277,9 @@ trait ManageForm {
                     ]);
                 }
 
+                // if($input['name'] == 'surveys')
+                //     dd($input);
+
                 foreach ($this->getConfigFieldsByRoute('inputs') as $key => $_input) {
                     if( isset($_input->ext)
                         && in_array($_input->ext, ['permalink'])
@@ -291,7 +290,8 @@ trait ManageForm {
                 $data = Arr::except($input, ['route','model', 'cascades']) + [
                     'items' => $items
                 ];
-
+                // if($input['name'] == 'surveys')
+                //     dd($data);
             break;
             case 'switch':
             case 'checkbox':
@@ -313,12 +313,16 @@ trait ManageForm {
                     $input['orderKey'] ??= 'position';
                 }
 
+                $input['autoIdGenetaror'] ??= true;
+
+                $input['singularLabel'] = isset($input['label']) ? Str::singular($input['label']) : null;
+
                 $default_repeater_col = [
                     'cols' => 12,
-                    'sm' => 12,
-                    'md' => 12,
-                    'lg' => 12,
-                    'xl' => 12
+                    // 'sm' => 12,
+                    // 'md' => 12,
+                    // 'lg' => 12,
+                    // 'xl' => 12
                 ];
 
 
@@ -495,6 +499,13 @@ trait ManageForm {
 
             break;
             case 'relationship':
+                $relationshipName = $input['relationship'] ?? $input['name'] ?? null;
+
+                if(!$relationshipName){
+                    $data = [];
+                    break;
+                }
+
                 $foreignKey = $this->getForeignKeyFromName($this->routeName);
                 $relationshipInputs = $this->app['modularity']
                     ->find($this->moduleName)
@@ -502,26 +513,44 @@ trait ManageForm {
 
                 $input['type'] = 'custom-input-repeater';
                 $input['label'] = pluralize($this->getHeadline($input['name']));
-                $input['schema'] = $this->createFormSchema(Collection::make($relationshipInputs)->map(function($input) use($foreignKey){
-                    if($foreignKey == $input['name']){
-                        $input['type'] = 'hidden';
-                    }
+                $input['autoIdGenerator'] = false;
 
-                    return $input;
-                })->toArray());
 
-                $relationshipName = pluralize($this->getCamelCase($input['name']));
-                $input['name'] = $relationshipName;
-                $input['ext'] = 'relationship';
-                $input[] = 'withGutter';
+                $singularRelationshipName = $this->getCamelCase($this->getSingular($relationshipName));
+                $pluralRelationshipName = pluralize($singularRelationshipName);
 
-                $relationshipName = $input['relationship'] ?? $input['name'];
+                if(($relationType = $this->repository->getRelationType($singularRelationshipName))){
+                    $relationshipName = $singularRelationshipName;
+                } else if(($relationType = $this->repository->getRelationType($pluralRelationshipName))){
+                    $relationshipName = $pluralRelationshipName;
+                } else {
 
-                // $relationships =  method_exists($this->repository->getModel(), 'getDefinedRelations')
-                //     ? $this->repository->getDefinedRelations()
-                //     : $this->repository->modelRelations();
+                }
 
-                $data = $input;
+                if($relationType){
+
+                    $input['schema'] = $this->createFormSchema(Collection::make($relationshipInputs)->map(function($input) use($foreignKey){
+                        if($foreignKey == $input['name']){
+                            $input['type'] = 'hidden';
+                        }
+
+                        return $input;
+                    })->toArray());
+
+                    $input['name'] = $relationshipName;
+                    $input['ext'] = 'relationship';
+                    $input[] = 'withGutter';
+
+                    $relationshipName = $input['relationship'] ?? $input['name'];
+
+                    // $relationships =  method_exists($this->repository->getModel(), 'getDefinedRelations')
+                    //     ? $this->repository->getDefinedRelations()
+                    //     : $this->repository->modelRelations();
+                    $data = $input;
+
+                }else{
+                    $data = [];
+                }
 
                 // if(!array_key_exists($relationshipName, $relationships)){
                 //     unset($data['name']);
