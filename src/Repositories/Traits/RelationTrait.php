@@ -106,7 +106,6 @@ trait RelationTrait
                 // }
             }
         }
-
         foreach ($this->getHasManyRelations() as $relationName) {
 
             if (isset($fields[$relationName])) {
@@ -116,14 +115,21 @@ trait RelationTrait
 
                 $repository = UFinder::getRouteRepository( Str::singular($relationName), asClass: true);
 
+                $idsDeleted = $relation->get()->pluck($relatedLocalKey)->toArray();
+
                 foreach ($fields[$relationName] as $key => $data) {
                     if(isset($data[$relatedLocalKey])){
-                        $repository->update($data['id'], $data + [$foreignKey => $object->id]);
+
+                        array_splice($idsDeleted, array_search($data[$relatedLocalKey], $idsDeleted), 1);
+
+                        $repository->update($data[$relatedLocalKey], $data + [$foreignKey => $object->id]);
                     }else{
-                        $repository->create($data + [$foreignKey => $object->id]);
-                        // $object->{$relation}()->create($data);
+                        $repository->create(array_merge($data, [$foreignKey => $object->id]));
                     }
                 }
+
+                if(count($idsDeleted))
+                    $repository->bulkDelete($idsDeleted);
             }
         }
 
@@ -144,12 +150,7 @@ trait RelationTrait
 
     public function getFormFieldsRelationTrait($object, $fields, $schema = [])
     {
-        // dd(
-        //     $this->getMorphToRelations(),
-        //     $this->getBelongsToManyRelations(),
-        //     $schema,
-        //     $this->inputs()
-        // );
+
         $morphToRelations = $this->getMorphToRelations();
         // $hasManyRelations = $this->getHasManyRelations();
         $belongsToManyRelations = $this->getBelongsToManyRelations();
@@ -214,11 +215,10 @@ trait RelationTrait
                 $repository = UFinder::getRouteRepository(Str::singular($input['name']), asClass:true);
                 $relationshipName = $input['relationship'] ?? $input['name'];
                 $records = $object->{$relationshipName};
-                // dd($records);
                 try {
                     $fields[$relationshipName] = (!!$records && !$records->isEmpty()) ? $object->{$input['name']}->map(function($model) use($input, $repository){
                         return $repository->getFormFields($model, $input['schema']);
-                    }) : [$repository->getFormFields($repository->newInstance(), $input['schema'])];
+                    }) : $repository->getFormFields($repository->newInstance(), $input['schema']);
 
                 } catch (\Throwable $th) {
 
