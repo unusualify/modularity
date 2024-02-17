@@ -481,6 +481,10 @@ abstract class BaseController extends PanelController
             }
         }
 
+        if(preg_match('/(.*)(_timestamp)/', $column['key'], $matches)){
+            $value = $item->{$matches[1]};
+        }
+
         if (isset($column['relationship'])) {
             $field = $column['relationship'] . ucfirst($column['field']);
 

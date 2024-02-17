@@ -290,6 +290,11 @@ trait ManageTable {
         if($this->isRelationField($header['key']))
             $header['key'] .= '_relation';
 
+
+        if(method_exists($this->repository->getModel(), 'isTimestampColumn') && $this->repository->isTimestampColumn($header['key'])){
+            $header['key'] .= '_timestamp';
+        }
+
         // add edit functionality to table title cell
         if($this->titleColumnKey == $header['key'] && !isset($header['formatter']))
             $header['formatter'] = [
