@@ -3,10 +3,17 @@
 namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 
 trait ModelHelpers
 {
     protected static $definedRelationships = [];
+
+    protected $columnTypes;
+
+    protected $modelCacheKeys = [
+        'column_types',
+    ];
 
     public static function bootModelHelpers()
     {
@@ -26,6 +33,7 @@ trait ModelHelpers
                 return $carry;
             });
     }
+
     /**
      * Checks if this model is soft deletable.
      *
@@ -45,6 +53,36 @@ trait ModelHelpers
     public function hasColumn($column): bool
     {
         return $this->getConnection()->getSchemaBuilder()->hasColumn($this->getTable(), $column);
+    }
+
+    public function getTimestampColumns(): array
+    {
+        return array_keys(array_filter($this->getColumnTypes(), fn($val) => $val === 'timestamp'));
+    }
+
+    public function isTimestampColumn($column): bool
+    {
+        return in_array($column, $this->getTimestampColumns());
+    }
+
+    public function getColumnTypes(): array
+    {
+        $columnsKey = get_class($this) . "_column_types";
+
+        if (Cache::has($columnsKey)) {
+            return Cache::get($columnsKey);
+        }else{
+            $builder = $this->getConnection()->getSchemaBuilder();
+
+            $columnTypes = Arr::mapWithKeys(
+                $builder->getColumnListing($this->getTable()),
+                fn($column) => [$column => $builder->getColumnType($this->getTable(), $column)]
+            );
+
+            Cache::put($columnsKey, $columnTypes);
+
+            return $columnTypes;
+        }
     }
 
 
