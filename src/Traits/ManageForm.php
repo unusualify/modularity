@@ -208,6 +208,7 @@ trait ManageForm {
             break;
             case 'select':
             case 'combobox':
+            case 'autocomplete':
                 // dd($input);
                 $relation_class= null;
                 $input['itemValue'] = $input['itemValue'] ?? 'id';
@@ -277,16 +278,16 @@ trait ManageForm {
                     ]);
                 }
 
-                // if($input['name'] == 'surveys')
-                //     dd($input);
-
-                foreach ($this->getConfigFieldsByRoute('inputs') as $key => $_input) {
-                    if( isset($_input->ext)
-                        && in_array($_input->ext, ['permalink'])
-                    ){
-                        $input['event'] = 'formatPermalinkPrefix:slug:' . $this->getSnakeNameFromForeignKey($input['name']);
+                if(isset($input['permalinkable']) && $input['permalinkable']){
+                    foreach ($this->getConfigFieldsByRoute('inputs') as $key => $_input) {
+                        if( isset($_input->ext)
+                            && in_array($_input->ext, ['permalink'])
+                        ){
+                            $input['event'] = 'formatPermalinkPrefix:slug:' . $this->getSnakeNameFromForeignKey($input['name']);
+                        }
                     }
                 }
+
                 $data = Arr::except($input, ['route','model', 'cascades']) + [
                     'items' => $items
                 ];
@@ -324,7 +325,6 @@ trait ManageForm {
                     // 'lg' => 12,
                     // 'xl' => 12
                 ];
-
 
                 $input['col'] = array_merge_recursive_preserve($default_repeater_col, $input['col'] ?? []);
 
