@@ -17,5 +17,6 @@ return array (
     "reset-send"=> "Send password reset link",
     "surname"=> "Surname",
     "verify-login"=> "Verify login",
-    "logout"=> "Logout"
+    "logout"=> "Logout",
+    "login-success-message" => "Login Successful!"
 );
