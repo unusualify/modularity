@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\Factory as ViewFactory;
 use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Traits\ManageUtilities;
 
 class ResetPasswordController extends Controller
@@ -97,7 +98,7 @@ class ResetPasswordController extends Controller
                 ? new JsonResponse([
                     'errors' => $validator->errors(),
                     'message' => $validator->messages()->first(),
-                    'variant' => 'warning',
+                    'variant' => MessageStage::WARNING,
                 ], 200)
                 : $request->validate($this->rules(), $this->validationErrorMessages());
         }
@@ -266,7 +267,7 @@ class ResetPasswordController extends Controller
         if ($request->wantsJson()) {
             return new JsonResponse([
                 'message' => trans($response),
-                'variant' => 'success',
+                'variant' => MessageStage::SUCCESS,
                 'redirector' => $this->redirectPath()
             ], 200);
         }
@@ -288,7 +289,7 @@ class ResetPasswordController extends Controller
             return new JsonResponse([
                 'email' => [trans($response)],
                 'message' => trans($response),
-                'variant' => 'warning'
+                'variant' => MessageStage::WARNING
             ], 200);
             // throw ValidationException::withMessages([
             //     'email' => [trans($response)],

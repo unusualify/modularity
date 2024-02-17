@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Factory as ViewFactory;
+use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Traits\ManageUtilities;
 
 class ForgotPasswordController extends Controller
@@ -116,7 +117,7 @@ class ForgotPasswordController extends Controller
         return $request->wantsJson()
                     ? new JsonResponse([
                         'message' => ___($response),
-                        'variant' => 'success'
+                        'variant' => MessageStage::SUCCESS
                     ], 200)
                     : back()->with('status', ___($response));
     }
@@ -137,7 +138,7 @@ class ForgotPasswordController extends Controller
             return new JsonResponse([
                 'email' => [___($response)],
                 'message' => ___($response),
-                'variant' => 'warning'
+                'variant' => MessageStage::WARNING
             ]);
             // throw ValidationException::withMessages([
             //     'email' => [trans($response)],
