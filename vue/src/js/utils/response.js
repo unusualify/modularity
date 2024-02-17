@@ -5,12 +5,13 @@
 */
 export const redirector = (data, timeout = 1000) => {
   if (Object.prototype.hasOwnProperty.call(data, 'redirector')) {
+    timeout = Object.prototype.hasOwnProperty.call(data, 'timeout') ? data.timeout : timeout
     setTimeout(function (data) {
       window.open(
         data.redirector,
         Object.prototype.hasOwnProperty.call(data, 'target') ? data.target : '_self'
       )
-    }, Object.prototype.hasOwnProperty.call(data, 'timeout') ? data.timeout : timeout, data)
+    }, timeout, data)
     // window.location.replace(resp.data.redirect)
   }
 }
