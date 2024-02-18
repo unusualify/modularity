@@ -11,7 +11,7 @@ import ACTIONS from '@/store/actions'
 import { mapGetters } from '@/utils/mapStore'
 import { getSubmitFormData } from '@/utils/getFormData.js'
 
-import { useFormatter } from '@/hooks'
+import { useFormatter, useRoot } from '@/hooks'
 
 export const makeTableProps = propsFactory({
   name: {
@@ -106,6 +106,8 @@ export default function useTable (props, context) {
   // lifecycle to setup and teardown side effects.
 
   const store = useStore()
+
+  const { isSmAndDown } = useRoot()
 
   const { t, te } = useI18n({ useScope: 'global' })
 
@@ -569,7 +571,6 @@ export default function useTable (props, context) {
   })
   watch(() => state.options, (newValue, oldValue) => {
     // state.options.page = newValue
-    __log('options watch', newValue, oldValue)
     store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue } })
   }, { deep: true })
   watch(() => state.elements, (newValue, oldValue) => {
@@ -583,6 +584,8 @@ export default function useTable (props, context) {
     ...toRefs(state),
     ...getters,
     ...toRefs(methods),
-    ...formatter
+    ...formatter,
+
+    isSmAndDown
   }
 }
