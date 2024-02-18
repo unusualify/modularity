@@ -28,6 +28,14 @@ const datetimeFormats = {
       month: 'numeric',
       day: 'numeric'
     },
+    'numeric-full': {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric'
+    },
     short: {
       year: '2-digit',
       month: 'short',
@@ -55,6 +63,14 @@ const datetimeFormats = {
       year: 'numeric',
       month: 'numeric',
       day: 'numeric'
+    },
+    'numeric-full': {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric'
     },
     short: {
       year: '2-digit',
