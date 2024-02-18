@@ -11,16 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create(unusualConfig('tables.users', 'admin_users'), function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->boolean('published')->default(false);
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
-        });
+        $adminUserTable = unusualConfig('tables.users', 'admin_users');
+
+        if(!Schema::hasTable($adminUserTable)){
+            Schema::create(unusualConfig('tables.users', 'admin_users'), function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->boolean('published')->default(false);
+                $table->string('email')->unique();
+                $table->timestamp('email_verified_at')->nullable();
+                $table->string('password');
+                $table->rememberToken();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -28,6 +32,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists(unusualConfig('tables.users', 'admin_users'));
+
+        $adminUserTable = unusualConfig('tables.users', 'admin_users');
+
+        if(Schema::hasTable($adminUserTable)){
+            Schema::dropIfExists(unusualConfig('tables.users', 'admin_users'));
+        }
     }
 };
