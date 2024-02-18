@@ -138,15 +138,15 @@ trait ManageTable {
             return $this->indexTableColumns;
         else if(!$this->config)
             return [];
-        else{
+        else
             return $this->indexTableColumns = Collection::make(
                 $this->getConfigFieldsByRoute('headers')
-            )->map(function($item){
-                // dd( (array) $item + unusualConfig('default_header'), $item);
-                return $this->getHeader((array) $item);
-            })
-            ->toArray();
-        }
+            )->reduce(function($carry, $item){
+                if(isset($item->key)){
+                    $carry[] = $this->getHeader((array) $item);
+                }
+                return $carry;
+            }, []);
 
     }
 
@@ -226,23 +226,25 @@ trait ManageTable {
             ];
         }
 
-        if(!$this->nested){
-            $routeSnake = snakeCase($this->routeName);
-            foreach (Modularity::find($this->moduleName)->getRouteConfigs() as $key => $routeConfig) {
-                if(isset($routeConfig['belongs']) && in_array($routeSnake, $routeConfig['belongs'])){
-                    $childRouteSnake = snakeCase($routeConfig['name']);
-                    $actions[] = [
-                        'name' => 'link',
-                        'url' => moduleRoute($routeConfig['name'], $this->routePrefix . '.' . $routeSnake . '.nested', 'index', [
-                            $routeSnake => ':id',
-                        ]),
-                        'label' => 'modules.' . $childRouteSnake,
-                        'icon' => '$modules',
-                        'color' => 'green',
-                    ];
-                }
-                # code...
+        $routeSnake = snakeCase($this->routeName);
+        foreach (Modularity::find($this->moduleName)->getRouteConfigs() as $key => $routeConfig) {
+            if(isset($routeConfig['belongs']) && in_array($routeSnake, $routeConfig['belongs'])){
+                $childRouteSnake = snakeCase($routeConfig['name']);
+                $actions[] = [
+                    'name' => 'link',
+                    'url' => moduleRoute($routeConfig['name'],  $this->generateRoutePrefix(noNested:true) . '.' . $routeSnake . '.nested', 'index', [
+                        $routeSnake => ':id',
+                    ]),
+                    'label' => 'modules.' . $childRouteSnake,
+                    'icon' => '$modules',
+                    'color' => 'green',
+                ];
+
             }
+            # code...
+        }
+        if(!$this->nested){
+        }else{
         }
 
         // dd($actions);
