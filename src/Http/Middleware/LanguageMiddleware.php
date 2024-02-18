@@ -36,6 +36,9 @@ class LanguageMiddleware
         App::setLocale($locale);
         App::setFallbackLocale(unusualConfig('fallback_locale'));
 
+        \Carbon\CarbonInterval::setLocale(config('app.locale'));
+        \Carbon\Carbon::setLocale(config('app.locale'));
+
         return $next($request);
     }
 }
