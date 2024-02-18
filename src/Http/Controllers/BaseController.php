@@ -356,7 +356,8 @@ abstract class BaseController extends PanelController
             $columnsData = Collection::make($this->getIndexTableColumns())->mapWithKeys(function (&$column) use ($item) {
                 return $this->getItemColumnData($item, $column);
             })->toArray();
-            $name = $columnsData[$this->titleColumnKey];
+
+            $name = $columnsData[$this->titleColumnKey] ?? $this->searchTitleKeyValue($columnsData);
 
             if (empty($name)) {
                 if ($translated) {
@@ -670,5 +671,23 @@ abstract class BaseController extends PanelController
         }
 
         return $this->respondWithError(__('listing.duplicate.error', ['modelTitle' => $this->modelTitle]));
+    }
+
+    public function searchTitleKeyValue($columnsData){
+        $value = null;
+
+        if(isset($columnsData[($newKey = $this->titleColumnKey . '_relation')])){
+            $this->titleColumnKey = $newKey;
+            $value = $columnsData[$newKey];
+        } else if(isset($columnsData[($newKey = $this->titleColumnKey . '_timestamp')])){
+            $this->titleColumnKey = $newKey;
+            $value = $columnsData[$newKey];
+        } else{
+            $newKey = array_keys($columnsData)[0];
+            $this->titleColumnKey = $newKey;
+            $value = $columnsData[$newKey];
+        }
+
+        return $value;
     }
 }
