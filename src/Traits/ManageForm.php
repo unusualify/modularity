@@ -530,7 +530,7 @@ trait ManageForm {
                 if($relationType){
 
                     $input['schema'] = $this->createFormSchema(Collection::make($relationshipInputs)->map(function($input) use($foreignKey){
-                        if($foreignKey == $input['name']){
+                        if(isset($input['name']) && $foreignKey == $input['name']){
                             $input['type'] = 'hidden';
                         }
 
