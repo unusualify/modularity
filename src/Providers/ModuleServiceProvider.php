@@ -35,25 +35,13 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
      */
     public function register()
     {
-        $this->registerModules();
-    }
-
-
-    public function registerModules()
-    {
-        // $migration_directory = GenerateConfigReader::read('migration')->getPath();
-        // dd(Modularity::allEnabled());
-        // foreach(Modularity::allEnabled() as $module){
-
-        //     $module_name = $module->getName();
-
-        // }
 
     }
 
     public function bootModules()
     {
         $migration_directory = GenerateConfigReader::read('migration')->getPath();
+
         foreach(Modularity::allEnabled() as $module){
 
             $module_name = $module->getName();
@@ -107,11 +95,6 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
 
             // LOAD MODULE VIEW COMPONENTS
             $namespace = $module->getClassNamespace('View\\Components');
-            // if($module_name == 'Webinar')
-            //     dd(
-            //         $namespace,
-            //         ClassFinder::getClassesInNamespace($namespace)
-            //     );
             Blade::componentNamespace($namespace, snakeCase($module_name));
 
             //LOAD MODULE TRANSLATION
@@ -125,9 +108,6 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
                 );
             }
         }
-
-        // dd('dsjafh');
-
     }
 
 }

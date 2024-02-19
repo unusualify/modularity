@@ -159,42 +159,21 @@ class RouteServiceProvider extends ServiceProvider
                     ]
                 ],
                 function ($router) use ($module) {
-                    // $router->moduleRoutes($module);
-                    // Route::prefix('prrrrr')->group(function(){
-                    //     Route::name('test.bilmem')->resource('regions.continents', 'UserController')->parameters([
-                    //         'regions' => 'package_region',
-                    //         'continents' => 'package_continent'
-                    //     ]);
-                    // });
-
-                        Route::moduleRoutes($module);
-
-
-
-
+                    Route::moduleRoutes($module);
                 }
             );
 
-            $has_system_prefix = $module->hasSystemPrefix();
-            $system_prefix = $has_system_prefix ? systemUrlPrefix() . '/' : '';
-            $system_route_name = $has_system_prefix ? systemRouteNamePrefix() . '.' : '';
+            $_groupOptions = [
+                'prefix' => $module->fullPrefix(),
+                'as' => $module->fullRouteNamePrefix() . '.'
+            ];
+            // $_groupOptions['prefix'] = $module->fullPrefix();
+            // $_groupOptions['as'] = $module->fullRouteNamePrefix() . '.';
 
-            $_groupOptions = [];
-
-            // $_groupOptions['prefix'] = (adminUrlPrefix() ? adminUrlPrefix() . '/' : '')
-            //     . $system_prefix
-            //     . kebabCase( $module->getName() );
-            $_groupOptions['prefix'] = $module->fullPrefix();
-
-            // $_groupOptions['as'] = (adminRouteNamePrefix() ? adminRouteNamePrefix() . '.' : '')
-            //     . $system_route_name
-            //     . snakeCase( $module->getName() ) . '.';
-            $_groupOptions['as'] = $module->fullRouteNamePrefix() . '.';
-            // dd($_groupOptions);
             UnusualRoutes::registerRoutes(
                 $router,
                 $_groupOptions,
-                ['web'],//$middlewares,
+                ['web'], //$middlewares,
                 $module->getClassNamespace('Http\Controllers'), //config('modules.namespace', 'Modules') . "\\" . $module->getStudlyName() . '\Http\Controllers',
                 $module->getDirectoryPath('Routes/web.php'), //$module->getPath()."/Routes/web.php",
                 true
@@ -202,7 +181,7 @@ class RouteServiceProvider extends ServiceProvider
             UnusualRoutes::registerRoutes(
                 $router,
                 $_groupOptions,
-                ['api'],//$middlewares,
+                ['api'], //$middlewares,
                 $module->getClassNamespace('Http\Controllers\API'), //config('modules.namespace', 'Modules') . "\\" . $module->getStudlyName() . '\Http\Controllers',
                 $module->getDirectoryPath('Routes/api.php'), //$module->getPath()."/Routes/web.php",
                 true
@@ -210,7 +189,7 @@ class RouteServiceProvider extends ServiceProvider
             UnusualRoutes::registerRoutes(
                 $router,
                 [],
-                ['web'],//$middlewares,
+                ['web'], //$middlewares,
                 $module->getClassNamespace('Http\Controllers\Front'), //config('modules.namespace', 'Modules') . "\\" . $module->getStudlyName() . '\Http\Controllers',
                 $module->getDirectoryPath('Routes/front.php'), //$module->getPath()."/Routes/web.php",
                 true
@@ -239,12 +218,6 @@ class RouteServiceProvider extends ServiceProvider
 
         UnusualRoutes::generateRouteMiddlewares();
 
-        // Route::aliasMiddleware('role', \Spatie\Permission\Middlewares\RoleMiddleware::class);
-        // Route::aliasMiddleware('permission', \Spatie\Permission\Middlewares\PermissionMiddleware::class);
-        // Route::aliasMiddleware('role_or_permission', \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class);
-
-        // Route::aliasMiddleware('teams_permission', TeamsPermissionMiddleware::class);
-
     }
 
     /**
@@ -254,187 +227,64 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function registerMacros()
     {
-        // Route::macro('moduleShowWithPreview', function (
-        //     $moduleName,
-        //     $routePrefix = null,
-        //     $controllerName = null
-        // ) {
-        //     if ($routePrefix === null) {
-        //         $routePrefix = $moduleName;
-        //     }
+        Route::macro('moduleShowWithPreview', function (
+            $moduleName,
+            $routePrefix = null,
+            $controllerName = null
+        ) {
+            // if ($routePrefix === null) {
+            //     $routePrefix = $moduleName;
+            // }
 
-        //     if ($controllerName === null) {
-        //         $controllerName = ucfirst(Str::plural($moduleName));
-        //     }
+            // if ($controllerName === null) {
+            //     $controllerName = ucfirst(Str::plural($moduleName));
+            // }
 
-        //     $routePrefix = empty($routePrefix)
-        //     ? '/'
-        //     : (Str::startsWith($routePrefix, '/')
-        //         ? $routePrefix
-        //         : '/' . $routePrefix);
-        //     $routePrefix = Str::endsWith($routePrefix, '/')
-        //     ? $routePrefix
-        //     : $routePrefix . '/';
+            // $routePrefix = empty($routePrefix)
+            // ? '/'
+            // : (Str::startsWith($routePrefix, '/')
+            //     ? $routePrefix
+            //     : '/' . $routePrefix);
+            // $routePrefix = Str::endsWith($routePrefix, '/')
+            // ? $routePrefix
+            // : $routePrefix . '/';
 
-        //     Route::name($moduleName . '.show')->get(
-        //         $routePrefix . '{slug}',
-        //         $controllerName . 'Controller@show'
-        //     );
-        //     Route::name($moduleName . '.preview')
-        //         ->get(
-        //             '/admin-preview' . $routePrefix . '{slug}',
-        //             $controllerName . 'Controller@show'
-        //         )
-        //         ->middleware(['web', 'twill_auth:twill_users', 'can:list']);
-        // });
+            // Route::name($moduleName . '.show')->get(
+            //     $routePrefix . '{slug}',
+            //     $controllerName . 'Controller@show'
+            // );
+            // Route::name($moduleName . '.preview')
+            //     ->get(
+            //         '/admin-preview' . $routePrefix . '{slug}',
+            //         $controllerName . 'Controller@show'
+            //     )
+            //     ->middleware(['web', 'twill_auth:twill_users', 'can:list']);
+        });
 
-        // Route::macro('module', function (
-        //     $slug,
-        //     $options = [],
-        //     $resource_options = [],
-        //     $resource = true
-        // ) {
-        //     $slugs = explode('.', $slug);
-        //     $prefixSlug = str_replace('.', '/', $slug);
-        //     $_slug = Arr::last($slugs);
-        //     $className = implode(
-        //         '',
-        //         array_map(function ($s) {
-        //             return ucfirst(Str::singular($s));
-        //         }, $slugs)
-        //     );
+        Route::macro('singleton', function (
+            $slug,
+            $options = [],
+            $resource_options = [],
+            $resource = true
+        ) {
+            // $pluralSlug = Str::plural($slug);
+            // $modelName = Str::studly($slug);
 
-        //     $customRoutes = $defaults = [
-        //         'reorder',
-        //         'publish',
-        //         'bulkPublish',
-        //         'browser',
-        //         'feature',
-        //         'bulkFeature',
-        //         'tags',
-        //         'preview',
-        //         'restore',
-        //         'bulkRestore',
-        //         'forceDelete',
-        //         'bulkForceDelete',
-        //         'bulkDelete',
-        //         'restoreRevision',
-        //         'duplicate',
-        //     ];
+            // Route::module($pluralSlug, $options, $resource_options, $resource);
 
-        //     if (isset($options['only'])) {
-        //         $customRoutes = array_intersect(
-        //             $defaults,
-        //             (array) $options['only']
-        //         );
-        //     } elseif (isset($options['except'])) {
-        //         $customRoutes = array_diff(
-        //             $defaults,
-        //             (array) $options['except']
-        //         );
-        //     }
+            // $lastRouteGroupName = RouteServiceProvider::getLastRouteGroupName();
 
-        //     $lastRouteGroupName = RouteServiceProvider::getLastRouteGroupName();
+            // $groupPrefix = RouteServiceProvider::getGroupPrefix();
 
-        //     $groupPrefix = RouteServiceProvider::getGroupPrefix();
+            // // Check if name will be a duplicate, and prevent if needed/allowed
+            // if (RouteServiceProvider::shouldPrefixRouteName($groupPrefix, $lastRouteGroupName)) {
+            //     $singletonRouteName = "{$groupPrefix}.{$slug}";
+            // } else {
+            //     $singletonRouteName = $slug;
+            // }
 
-        //     // Check if name will be a duplicate, and prevent if needed/allowed
-        //     if (RouteServiceProvider::shouldPrefixRouteName($groupPrefix, $lastRouteGroupName)) {
-        //         $customRoutePrefix = "{$groupPrefix}.{$slug}";
-        //         $resourceCustomGroupPrefix = "{$groupPrefix}.";
-        //     } else {
-        //         $customRoutePrefix = $slug;
-
-        //         // Prevent Laravel from generating route names with duplication
-        //         $resourceCustomGroupPrefix = '';
-        //     }
-
-        //     foreach ($customRoutes as $route) {
-        //         $routeSlug = "{$prefixSlug}/{$route}";
-        //         $mapping = [
-        //             'as' => $customRoutePrefix . ".{$route}",
-        //             'uses' => "{$className}Controller@{$route}",
-        //         ];
-
-        //         if (in_array($route, ['browser', 'tags'])) {
-        //             Route::get($routeSlug, $mapping);
-        //         }
-
-        //         if (in_array($route, ['restoreRevision'])) {
-        //             Route::get($routeSlug . '/{id}', $mapping);
-        //         }
-
-        //         if (
-        //             in_array($route, [
-        //                 'publish',
-        //                 'feature',
-        //                 'restore',
-        //                 'forceDelete',
-        //             ])
-        //         ) {
-        //             Route::put($routeSlug, $mapping);
-        //         }
-
-        //         if (in_array($route, ['duplicate'])) {
-        //             Route::put($routeSlug . '/{id}', $mapping);
-        //         }
-
-        //         if (in_array($route, ['preview'])) {
-        //             Route::put($routeSlug . '/{id}', $mapping);
-        //         }
-
-        //         if (
-        //             in_array($route, [
-        //                 'reorder',
-        //                 'bulkPublish',
-        //                 'bulkFeature',
-        //                 'bulkDelete',
-        //                 'bulkRestore',
-        //                 'bulkForceDelete',
-        //             ])
-        //         ) {
-        //             Route::post($routeSlug, $mapping);
-        //         }
-        //     }
-
-        //     if ($resource) {
-        //         Route::group(
-        //             ['as' => $resourceCustomGroupPrefix],
-        //             function () use ($slug, $className, $resource_options) {
-        //                 Route::resource(
-        //                     $slug,
-        //                     "{$className}Controller",
-        //                     $resource_options
-        //                 );
-        //             }
-        //         );
-        //     }
-        // });
-
-        // Route::macro('singleton', function (
-        //     $slug,
-        //     $options = [],
-        //     $resource_options = [],
-        //     $resource = true
-        // ) {
-        //     $pluralSlug = Str::plural($slug);
-        //     $modelName = Str::studly($slug);
-
-        //     Route::module($pluralSlug, $options, $resource_options, $resource);
-
-        //     $lastRouteGroupName = RouteServiceProvider::getLastRouteGroupName();
-
-        //     $groupPrefix = RouteServiceProvider::getGroupPrefix();
-
-        //     // Check if name will be a duplicate, and prevent if needed/allowed
-        //     if (RouteServiceProvider::shouldPrefixRouteName($groupPrefix, $lastRouteGroupName)) {
-        //         $singletonRouteName = "{$groupPrefix}.{$slug}";
-        //     } else {
-        //         $singletonRouteName = $slug;
-        //     }
-
-        //     Route::get($slug, $modelName . 'Controller@editSingleton')->name($singletonRouteName);
-        // });
+            // Route::get($slug, $modelName . 'Controller@editSingleton')->name($singletonRouteName);
+        });
     }
 
     /**
@@ -611,6 +461,7 @@ class RouteServiceProvider extends ServiceProvider
             // });
 
         });
+
         Route::macro('additionalRoutes', function ($url, $routeName, $options) {
 
             $customRoutes = $defaults = [
@@ -690,53 +541,54 @@ class RouteServiceProvider extends ServiceProvider
 
 
         });
-        // Route::macro('internalApiRoutes', function ($routeFile = null, $middlewares = []) {
 
-        //     if(!$routeFile){
-        //         $pattern = '/[M|m]odules\/[A-Za-z]*\/Routes\//';
+        Route::macro('internalApiRoutes', function ($routeFile = null, $middlewares = [])
+        {
+            // if(!$routeFile){
+            //     $pattern = '/[M|m]odules\/[A-Za-z]*\/Routes\//';
 
-        //         $routeFile = fileTrace($pattern);
-        //     }
+            //     $routeFile = fileTrace($pattern);
+            // }
 
-        //     $lowerModule  = curtModuleLowerName($routeFile);
-        //     $studlyModule = curtModuleStudlyName($routeFile);
+            // $lowerModule  = curtModuleLowerName($routeFile);
+            // $studlyModule = curtModuleStudlyName($routeFile);
 
-        //     if( empty($middlewares) )
-        //         $middlewares = ['auth'];
+            // if( empty($middlewares) )
+            //     $middlewares = ['auth'];
 
-        //     Route::middleware($middlewares)->group( function() use($lowerModule, $studlyModule){
+            // Route::middleware($middlewares)->group( function() use($lowerModule, $studlyModule){
 
-        //         Route::prefix('api')
-        //             ->name('api.')
-        //             ->namespace('API')
-        //             ->group(function() use($lowerModule, $studlyModule){
+            //     Route::prefix('api')
+            //         ->name('api.')
+            //         ->namespace('API')
+            //         ->group(function() use($lowerModule, $studlyModule){
 
-        //             Route::apiResource( $lowerModule ,$studlyModule.'Controller');
-        //             if( is_array( $parent = config( $lowerModule.'.parent_route' ) ) ){
-        //                 $url = $parent['url'] ?? lowerName($parent['name']);
-        //                 $studlyName = studlyName($parent['name']);
+            //         Route::apiResource( $lowerModule ,$studlyModule.'Controller');
+            //         if( is_array( $parent = config( $lowerModule.'.parent_route' ) ) ){
+            //             $url = $parent['url'] ?? lowerName($parent['name']);
+            //             $studlyName = studlyName($parent['name']);
 
-        //                 Route::apiResource($url, $studlyName.'Controller');
-        //             }
-        //             Route::prefix( $lowerModule )
-        //                 ->name( $lowerModule.'.' )
-        //                 ->group(function() use($lowerModule, $studlyModule){
+            //             Route::apiResource($url, $studlyName.'Controller');
+            //         }
+            //         Route::prefix( $lowerModule )
+            //             ->name( $lowerModule.'.' )
+            //             ->group(function() use($lowerModule, $studlyModule){
 
-        //                 if( is_array( config( $lowerModule . '.sub_routes' ))){
-        //                     foreach( config( $lowerModule . '.sub_routes' ) as $value) {
-        //                         $url = $value['url'] ?? lowerName($value['name']);
-        //                         $studlyName = studlyName($value['name']);
-        //                         $names = $value['route_name'] ?? $url;
+            //             if( is_array( config( $lowerModule . '.sub_routes' ))){
+            //                 foreach( config( $lowerModule . '.sub_routes' ) as $value) {
+            //                     $url = $value['url'] ?? lowerName($value['name']);
+            //                     $studlyName = studlyName($value['name']);
+            //                     $names = $value['route_name'] ?? $url;
 
-        //                         Route::apiResource($url, $studlyName.'Controller', ['names' => $names]);
-        //                     }
-        //                 }
-        //             });
+            //                     Route::apiResource($url, $studlyName.'Controller', ['names' => $names]);
+            //                 }
+            //             }
+            //         });
 
-        //         });
+            //     });
 
-        //     });
-        // });
+            // });
+        });
     }
 
     public static function shouldPrefixRouteName($groupPrefix, $lastRouteGroupName)
