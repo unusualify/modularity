@@ -3,7 +3,7 @@
 // import { ref, watch, computed, nextTick } from 'vue'
 import { reactive, toRefs, computed, watch } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
-import { transform, cloneDeep, filter, omit } from 'lodash'
+import { transform, cloneDeep, filter, omit, find } from 'lodash'
 import { getModel } from '@/utils/getFormData'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
@@ -88,39 +88,52 @@ export default function useRepeater (props, context) {
 
   function hydrateRepeaterInput (item, index) {
     const model = getModel(props.schema, item)
+    // __log(props.schema, 'props.schema')
+    // __log(item, 'item')
+
     return {
       ...(props.autoIdGenerator ? { id: index } : {}),
       ...transform(omit(model, []), (o, v, k) => {
         o[namingRepeaterField(index, k)] = v
       })
     }
-    return {
-      id: index,
-      ...transform(item, (o, v, k) => {
-        o[namingRepeaterField(index, k)] = v
-      })
-    }
+    // return {
+    //   id: index,
+    //   ...transform(item, (o, v, k) => {
+    //     o[namingRepeaterField(index, k)] = v
+    //   })
+    // }
   }
 
   function hydrateRepeaterInputs (model) {
     // return model; // Burayı açman gerekebilir.
+// __log(model, 'model hydrateRepeaterInputs')
     return model.map((item, i) => {
+
       return hydrateRepeaterInput(item, i)
     })
   }
 
   function hydrateSchemas (inputs) {
     const schemas = []
-
     inputs.forEach((item, i) => {
-      // const schema = JSON.parse(JSON.stringify(this.schema))
       const schema = invokeRuleGenerator(cloneDeep(props.schema))
-      schemas[i] = transform(schema, (o, v, k) => {
-        const name = namingRepeaterField(i, v.name)
-        v.name = name
-        o[name] = v
+      schemas[i] = transform(schema, (schema, input, key) => {
+        let _input = cloneDeep(input);
+        const newName = namingRepeaterField(i, input.name)
+        _input.name = newName
+        schema[newName] = _input
+      })
+
+      Object.keys(schemas[i]).forEach(inputName => {
+        let input = schemas[i][inputName];
+        if(input.hasOwnProperty('cascade')){
+          const cascadedName = namingRepeaterField(i, input.cascade);
+          schemas[i][cascadedName][input.cascadeKey] = find(input.items, [input.itemValue, item[inputName]])?.schema ?? []
+        }
       })
     })
+
 
     return schemas
   }
@@ -153,16 +166,12 @@ export default function useRepeater (props, context) {
   }
 
   const state = reactive({
-    // repeaterInputs_: hydrateRepeaterInputs(modelValue.value),
-    // repeaterInputs__: computed(() => hydrateRepeaterInputs(modelValue.value)),
     repeaterInputs: computed({
       get: () => {
         // return hydrateRepeaterInputs(modelValue.value ?? [])
         const initialRepeats = hydrateRepeaterInputs(Array.isArray(modelValue.value) ? modelValue.value : [])
-
         if (props.min > 0 && initialRepeats.length < props.min) {
           const schema = invokeRuleGenerator(cloneDeep(props.schema))
-
           initialRepeats.push(hydrateRepeaterInput(getModel(schema), 1))
         }
 
@@ -193,6 +202,7 @@ export default function useRepeater (props, context) {
     // }),
     repeaterSchemas: computed(() => hydrateSchemas(state.repeaterInputs)),
     selectFieldSlots: computed(() => {
+
       const slotableSchemas = []
       filter(props.schema, function (schema, key) {
         return Object.prototype.hasOwnProperty.call(schema, 'slots') && Object.keys(schema.slots).length > 0
@@ -238,9 +248,7 @@ export default function useRepeater (props, context) {
     deleteRepeaterBlock: function (index) {
       if (state.isDeletable) {
         const newModel = parseRepeaterInputs(state.repeaterInputs)
-
         newModel.splice(index, 1)
-
         state.repeaterInputs = hydrateRepeaterInputs(newModel)
       } else {
         store.commit(ALERT.SET_ALERT, { message: `You cannot delete, because the number of elements should be at least ${props.min}`, variant: 'warning', location: 'top' })
@@ -249,9 +257,7 @@ export default function useRepeater (props, context) {
     duplicateRepeaterBlock: function (index) {
       if (state.isAddible) {
         const newModel = parseRepeaterInputs(state.repeaterInputs)
-
         newModel.push(newModel[index])
-
         state.repeaterInputs = hydrateRepeaterInputs(newModel)
       } else {
         store.commit(ALERT.SET_ALERT, { message: `You cannot add new item, because the number of elements should be at much ${props.max}`, variant: 'warning', location: 'top' })

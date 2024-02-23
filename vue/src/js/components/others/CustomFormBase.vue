@@ -192,7 +192,6 @@
                     >
                       <template v-for="(item, idx) in setValue(obj)" :key="idx">
                         <v-list-item
-
                           @click="onEvent($event, obj, list )"
                         >
                         <slot :name="getArrayItemSlot(obj)" v-bind= "{ obj, id, index, idx, item}">
@@ -401,7 +400,6 @@
 // import Vue from 'vue'
 import { getCurrentInstance } from 'vue'
 import { get, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex } from 'lodash'
-
 // import VueMask from 'v-mask'
 // Vue.use(VueMask, {
 //   placeholders: {
@@ -550,6 +548,7 @@ const defaultInternGroupType = 'v-card'
 
 const emits = [
   'update:modelValue',
+  'update:schema',
   'input',
   'update',
   'resize',
@@ -617,7 +616,6 @@ export default {
       minute,
       second,
 
-      formSchema: this.schema
     }
   },
   computed: {
@@ -654,24 +652,43 @@ export default {
     storeStateSchema () {
       // __log('storeStateSchema computed', this.valueIntern)
       this.updateArrayFromState(this.valueIntern, this.formSchema)
+
+
       for (const key in this.formSchema) {
+
         const sch = this.formSchema[key]
-        if (sch.type === 'select' && Object.prototype.hasOwnProperty.call(sch, 'cascade')) {
+        const cascadeKey = sch.cascadeKey; //schema
+        if(key.includes('repeater') && Object.prototype.hasOwnProperty.call(sch, 'cascade') && sch.type === 'select'){
+          return this.formSchema;
+        }else if (sch.type === 'select' && Object.prototype.hasOwnProperty.call(sch, 'cascade')) {
+
           this.formSchema[sch.cascade].items = find(sch.items, [sch.itemValue, this.valueIntern[sch.name]])?.items ?? []
           // this.formSchema[key].items = find(this.formSchema[sch.parent].items, [this.formSchema[sch.parent].itemValue, this.valueIntern[sch.parent]]).items
         }
       }
       // __log('storeStateSchema computed')
       return this.formSchema
+    },
+    formSchema:{
+      get(){
+        return this.schema;
+      },
+      set(val){
+        this.$emit('update:schema', val)
+        this.schema.value = val;
+      }
     }
   },
   watch: {
-    formSchema: function (newSchema) {
-      __log('formSchema watch', newSchema)
-      this.rebuildArrays(this.valueIntern, newSchema)
-      this.formSchema = newSchema
-      this.schema = newSchema
-    }
+    // formSchema: function (newSchema, oldSchema) {
+    //   // __log('formSchema watch', newSchema)
+
+    //   this.rebuildArrays(this.valueIntern, newSchema)
+
+    //   this.formSchema = newSchema
+    //   this.schema = newSchema
+
+    // }
     // valueIntern: function (newVal, oldVal) {
     //   __log('valueIntern watch', newVal, oldVal)
     // }
@@ -1275,30 +1292,22 @@ export default {
     },
 
     setCascadeSelect (obj) {
-      if (obj.schema.type === 'select' && obj.schema.hasOwnProperty('cascade')) {
-        const cascadedSelectName = obj.schema.cascade
-        const selectItemValue = obj.schema.itemValue ?? 'id'
+      if(obj.schema.type === 'select' && obj.schema.hasOwnProperty('cascade')){
 
-        this.formSchema[cascadedSelectName].items = find(obj.schema.items, [selectItemValue, this.valueIntern[obj.key]])?.items ?? []
+        const cascadedSelectName = obj.schema.name.includes('repeater') ? obj.schema.name.match(new RegExp('repeater\\d+-input\\[\\d+\\]'))+`[${obj.schema.cascade}]` : obj.schema.cascade;
+        const cascadeKey = obj.schema.cascadeKey;
+        const selectItemValue = obj.schema.itemValue ?? 'id';
+
+        // ACTIONS
+        this.formSchema[cascadedSelectName][cascadeKey] = find(obj.schema.items, [selectItemValue, this.valueIntern[obj.key]]).schema ?? []
 
         const sortIndex = findIndex(this.flatCombinedArraySorted, ['key', cascadedSelectName])
-        // this.onInput(this.formSchema[obj.schema.cascade].items[0].value, this.flatCombinedArraySorted[sortedIndex], 'change')
-
-        this.storeStateData[cascadedSelectName] = this.formSchema[cascadedSelectName].items.length > 0 ? this.formSchema[cascadedSelectName].items[0].value : null
+        this.storeStateData[cascadedSelectName] = this.formSchema[cascadedSelectName][cascadeKey].length > 0 ? this.formSchema[cascadedSelectName][cascadeKey][0].value : []
         this.flatCombinedArraySorted[sortIndex].value = this.valueIntern[cascadedSelectName]
 
-        // __log(
-        //   'setCascadeSelect()',
-        //   this.$lodash.pick(this.storeStateData, ['country_id', 'city_id', 'district_id']),
-        //   this.$lodash.pick(this.valueIntern, ['country_id', 'city_id', 'district_id']),
-        //   this.$lodash.pick(this.model, ['country_id', 'city_id', 'district_id']),
-        //   this.$lodash.pick(this.modelValue, ['country_id', 'city_id', 'district_id'])
-        // )
-        this.setCascadeSelect(this.flatCombinedArraySorted[sortIndex])
+        this.setCascadeSelect(this.flatCombinedArraySorted[sortIndex]);
       }
     }
-
-    //
   },
   created () {
     // setInterval((self) => {
