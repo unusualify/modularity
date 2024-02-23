@@ -207,7 +207,8 @@ class Module extends NwidartModule
         $notation = !$notation ? $notation : ".{$notation}";
 
         return ($valid && !$notation) ? Arr::where($this->getConfig('routes' . $notation), function($item,$key) use($notation){
-            return !(!isset($item['name']) || !$this->routeHasTable($item['name'], $key));
+            // return !(!isset($item['name']) || !$this->routeHasTable($item['name'], $key));
+            return !(!isset($item['name']));
         }) : $this->getConfig('routes' . $notation);
     }
 

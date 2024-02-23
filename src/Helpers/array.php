@@ -84,7 +84,7 @@ function arrayExport($expression, $return=FALSE, $tab=0 ){
     $array = preg_split("/\r\n|\n|\r/", $export);
     $array = preg_replace(["/\s*array\s\($/", "/\)(,)?$/", "/\s=>\s$/"], [NULL, ']$1', ' => ['], $array);
 
-    $array = preg_replace('/\d\s\=\>\s(?=\[)/', '', $array); // removing index numbers of array.
+    $array = preg_replace('/\d+\s\=\>\s(?=\[|(\'[A-Za-z_\-]+\'))/', '', $array); // removing index numbers of array.
 
     $export = join(PHP_EOL, array_filter(["["] + $array));
 

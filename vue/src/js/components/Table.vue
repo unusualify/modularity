@@ -379,7 +379,7 @@
       <template v-slot:item.actions="{ item }">
         <!-- @click's editItem|deleteItem -->
         <!-- #actions -->
-        <v-menu v-if="rowActionsType == 'dropdown' || $root.isSmAndDown"
+        <v-menu v-if="rowActionsType == 'dropdown' || isSmAndDown"
           :close-on-content-click="false"
           open-on-hover
           left
@@ -403,7 +403,7 @@
                   <v-icon small :color="action.color" left>
                     {{ action.icon ? action.icon : '$' + action.name }}
                   </v-icon>
-                  {{ $t( action.label ??action.name) }}
+                  {{ $t( action.label ??action.name ) }}
               </v-list-item>
             </template>
           </v-list>
@@ -411,15 +411,24 @@
 
         <div v-else>
           <template v-for="(action, k) in rowActions" :key="k">
-            <v-icon
+            <v-tooltip
               v-if="itemHasAction(item, action)"
-              small
-              class="mr-2"
-              @click="itemAction(item, action)"
-              :color="action.color"
+              :text="$t( action.label ?? action.name )"
+              location="top"
               >
-              {{ action.icon ? action.icon : '$' + action.name }}
-            </v-icon>
+              <template v-slot:activator="{ props }">
+                <v-icon
+                  small
+                  class="mr-2"
+                  @click="itemAction(item, action)"
+                  :color="action.color"
+                  v-bind="props"
+                  >
+                  {{ action.icon ? action.icon : '$' + action.name }}
+                </v-icon>
+              </template>
+            </v-tooltip>
+
           </template>
         </div>
       </template>

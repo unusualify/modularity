@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Unusualify\Modularity\Entities\Company;
 use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Traits\ManageUtilities;
 
 class RegisterController extends Controller
@@ -147,7 +148,7 @@ class RegisterController extends Controller
                 ? new JsonResponse([
                     'errors' => $validator->errors(),
                     'message' => $validator->messages()->first(),
-                    'variant' => 'warning',
+                    'variant' => MessageStage::WARNING,
                 ], 200)
                 : $request->validate($this->rules());
         }

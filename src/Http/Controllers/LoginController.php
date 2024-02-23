@@ -20,6 +20,7 @@ use Illuminate\View\Factory as ViewFactory;
 use Unusualify\Modularity\Traits\ManageUtilities;
 use PragmaRX\Google2FA\Google2FA;
 use Socialite;
+use Unusualify\Modularity\Services\MessageStage;
 
 class LoginController extends Controller
 {
@@ -134,6 +135,9 @@ class LoginController extends Controller
 
             return $request->wantsJson()
                 ?   new JsonResponse([
+                        'variant' => MessageStage::SUCCESS,
+                        'timeout' => 6000,
+                        'message' => __('authentication.login-success-message'),
                         'redirector' => $this->redirectPath()
                     ], 200)
                 :   $this->sendLoginResponse($request);
@@ -151,7 +155,7 @@ class LoginController extends Controller
             ?   new JsonResponse([
                     $this->username() => [trans('auth.failed')],
                     'message' => __('auth.failed'),
-                    'variant' => 'warning'
+                    'variant' =>  MessageStage::WARNING
                 ])
             :   $this->sendFailedLoginResponse($request);
     }
@@ -280,6 +284,10 @@ class LoginController extends Controller
 
         return $request->wantsJson()
             ?   new JsonResponse([
+                    'variant' => MessageStage::SUCCESS,
+                    'timeout' => 1500,
+                    'message' => __('authentication.login-success-message'),
+                    // 'redirector' => $this->redirectPath()
                     'redirector' => $this->redirector->intended($this->redirectPath())->getTargetUrl(),
                 ])
             :   $this->redirector->intended($this->redirectPath());

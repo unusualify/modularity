@@ -22,7 +22,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "$MODULE_NAMESPACE$\\$MODULE_STUDLY_NAME$\\Tests\\": "tests/"
+            "$MODULE_NAMESPACE$\\$MODULE_STUDLY_NAME$\\Tests\\": "Tests/"
         }
     }
 }

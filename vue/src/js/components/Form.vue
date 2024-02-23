@@ -455,12 +455,6 @@ export default {
           }
 
           redirector(response.data)
-          if (Object.prototype.hasOwnProperty.call(response.data, 'redirector')) {
-            // self.$store.commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
-            setTimeout(function (url) {
-              window.location.href = url
-            }, 2000, response.data.redirector)
-          }
 
           if (callback && typeof callback === 'function') callback(response.data)
         }, function (response) {

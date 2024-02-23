@@ -2,16 +2,6 @@
 
 namespace Unusualify\Modularity\Providers;
 
-use Illuminate\Database\Eloquent\Factory;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Route;
-
-use Nwidart\Modules\Facades\Module;
-use Nwidart\Modules\Support\Config\GenerateConfigReader;
-use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Facades\UNavigation;
-use Unusualify\Modularity\View\Table;
-
 class UnusualProvider extends ServiceProvider
 {
     protected $providers = [
