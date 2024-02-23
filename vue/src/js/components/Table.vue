@@ -472,6 +472,15 @@ export default {
   },
   created () {
     // this.$can(this.rowActions[0].can ?? '')
+  },
+  methods: {
+    confirmFormModal () {
+      const self = this
+
+      this.$refs[this.formRef].submit(null, (res) => {
+        if (Object.prototype.hasOwnProperty.call(res, 'variant') && res.variant.toLowerCase() === 'success') { self.closeForm() }
+      })
+    }
   }
 }
 </script>
