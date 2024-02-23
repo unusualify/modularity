@@ -214,6 +214,7 @@ trait ManageForm {
                 $input['itemValue'] = $input['itemValue'] ?? 'id';
                 $input['itemTitle'] = $input['itemTitle'] ?? 'name';
                 $input['default'] ??= [];
+                $input['cascadeKey'] ??= 'items';
                 // $input[] = 'multiple';
                 if(isset($input['items'])) break;
 

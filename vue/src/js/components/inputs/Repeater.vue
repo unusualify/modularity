@@ -4,7 +4,7 @@
   >
     <div class="w-100">
       <div class="d-flex">
-        <ue-title v-if="label" :classes="['pl-0 pt-0']">
+        <ue-title v-if="label && (schema.length || Object.keys(schema).length) " :classes="['pl-0 pt-0']">
           {{ label }}
         </ue-title>
         <slot name="append"></slot>
@@ -38,6 +38,7 @@
                         :modelValue="itemSlot.element"
                         @update:modelValue="onUpdateRepeaterInput($event, itemSlot.index)"
                         :schema="repeaterSchemas[itemSlot.index]"
+                        @update:schema="console.log(repeaterSchemas[itemSlot.index])"
                         :row="rowAttribute"
                       >
                         <!-- <template v-slot:[`slot-top-ue-repeater-form-${itemSlot.index}`]>
@@ -83,6 +84,7 @@
               class=""
               @click="addRepeaterBlock"
               appendIcon="$add"
+              v-if="schema.length || Object.keys(schema).length"
               >
               {{ addButtonContent }}
             </v-btn-secondary>
