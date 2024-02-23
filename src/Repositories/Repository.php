@@ -1326,7 +1326,7 @@ abstract class Repository
             return $this->model->definedRelations($relations);
         }
 
-        return [];
+        // return [];
 
         $relationNamespace = "Illuminate\Database\Eloquent\Relations";
 
@@ -1346,12 +1346,12 @@ abstract class Repository
 
         $reflector = new \ReflectionClass($this->model());
 
-        dd(
-            $this->model,
-            $this->model->getRelations(),
-            $reflector->isUserDefined(),
-            get_class_methods($reflector)
-        );
+        // dd(
+        //     $this->model,
+        //     $this->model->getRelations(),
+        //     $reflector->isUserDefined(),
+        //     get_class_methods($reflector)
+        // );
 
         return collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))->reduce(function($carry, $method) use($relationClassesPattern){
 
@@ -1362,20 +1362,20 @@ abstract class Repository
                         $carry[] = $method->name;
                     }
                 }else {
-                    try {
-                        $return = $method->invoke($this->getModel());
+                    // try {
+                    //     $return = $method->invoke($this->getModel());
 
-                        if( $return instanceof Relation){
-                            // dd( $return, $relationClassesPattern );
-                            if(preg_match($relationClassesPattern, ($returnType = $method->getReturnType()))){
-                                // $carry[$method->name] = get_class_short_name((string) $returnType);
-                                $carry[] = $method->name;
-                            }
-                            // $carry[$method->name] = get_class_short_name($return);
-                        }
-                    } catch (\Throwable $th) {
-                        //throw $th;
-                    }
+                    //     if( $return instanceof Relation){
+                    //         // dd( $return, $relationClassesPattern );
+                    //         if(preg_match($relationClassesPattern, ($returnType = $method->getReturnType()))){
+                    //             // $carry[$method->name] = get_class_short_name((string) $returnType);
+                    //             $carry[] = $method->name;
+                    //         }
+                    //         // $carry[$method->name] = get_class_short_name($return);
+                    //     }
+                    // } catch (\Throwable $th) {
+                    //     //throw $th;
+                    // }
                 }
             }
 
