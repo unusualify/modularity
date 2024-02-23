@@ -3,7 +3,7 @@
 // import { ref, watch, computed, nextTick } from 'vue'
 import { reactive, toRefs, computed, watch } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
-import { transform, cloneDeep, filter, omit, find } from 'lodash'
+import { transform, cloneDeep, filter, omit, find, isEmpty } from 'lodash'
 import { getModel } from '@/utils/getFormData'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
@@ -88,7 +88,6 @@ export default function useRepeater (props, context) {
 
   function hydrateRepeaterInput (item, index) {
     const model = getModel(props.schema, item)
-    // __log(props.schema, 'props.schema')
     // __log(item, 'item')
 
     return {
@@ -107,9 +106,8 @@ export default function useRepeater (props, context) {
 
   function hydrateRepeaterInputs (model) {
     // return model; // Burayı açman gerekebilir.
-// __log(model, 'model hydrateRepeaterInputs')
+    // __log(model, 'model hydrateRepeaterInputs')
     return model.map((item, i) => {
-
       return hydrateRepeaterInput(item, i)
     })
   }
@@ -119,21 +117,20 @@ export default function useRepeater (props, context) {
     inputs.forEach((item, i) => {
       const schema = invokeRuleGenerator(cloneDeep(props.schema))
       schemas[i] = transform(schema, (schema, input, key) => {
-        let _input = cloneDeep(input);
+        const _input = cloneDeep(input)
         const newName = namingRepeaterField(i, input.name)
         _input.name = newName
         schema[newName] = _input
       })
 
       Object.keys(schemas[i]).forEach(inputName => {
-        let input = schemas[i][inputName];
-        if(input.hasOwnProperty('cascade')){
-          const cascadedName = namingRepeaterField(i, input.cascade);
+        const input = schemas[i][inputName]
+        if (input.hasOwnProperty('cascade')) {
+          const cascadedName = namingRepeaterField(i, input.cascade)
           schemas[i][cascadedName][input.cascadeKey] = find(input.items, [input.itemValue, item[inputName]])?.schema ?? []
         }
       })
     })
-
 
     return schemas
   }
@@ -169,6 +166,9 @@ export default function useRepeater (props, context) {
     repeaterInputs: computed({
       get: () => {
         // return hydrateRepeaterInputs(modelValue.value ?? [])
+        if (isEmpty(props.schema)) {
+          return []
+        }
         const initialRepeats = hydrateRepeaterInputs(Array.isArray(modelValue.value) ? modelValue.value : [])
         if (props.min > 0 && initialRepeats.length < props.min) {
           const schema = invokeRuleGenerator(cloneDeep(props.schema))
@@ -202,7 +202,6 @@ export default function useRepeater (props, context) {
     // }),
     repeaterSchemas: computed(() => hydrateSchemas(state.repeaterInputs)),
     selectFieldSlots: computed(() => {
-
       const slotableSchemas = []
       filter(props.schema, function (schema, key) {
         return Object.prototype.hasOwnProperty.call(schema, 'slots') && Object.keys(schema.slots).length > 0
