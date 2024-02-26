@@ -388,9 +388,10 @@ abstract class PanelController extends CoreController
                 // 'show' => Permission::EDIT->value,
                 // 'delete' => Permission::DELETE->value,
             ];
-            // dd($option, $customOptionNamesMapping);
 
-            $option = array_key_exists($option, $customOptionNamesMapping) ? $customOptionNamesMapping[$option] : $option;
+            $option = array_key_exists($option, $customOptionNamesMapping)
+                ? $customOptionNamesMapping[$option]
+                : $option;
 
             $authorizableOptions = [
                 'index' => $this->permissionPrefix(Permission::VIEW->value),
@@ -640,13 +641,20 @@ abstract class PanelController extends CoreController
             ];
 
         // for morphTo relationship
-        if(method_exists($this->repository->getModel(), ($morphToName = camelCase($this->routeName).'able') ))
+        if(method_exists($this->repository->getModel(), ($morphToName = $this->getMorphToMethodName($this->routeName)) ))
             return [
                 $morphToName . '_id' => $this->nestedParentId,
                 $morphToName . '_type' => get_class($this->nestedParentModel),
             ];
 
+        //for hasOneThrough relationship
+        if(method_exists($this->repository->getModel(), $this->getCamelCase($this->nestedParentName) ))
+            return [
+                'addRelation' . $this->getStudlyName($this->nestedParentName) => $this->nestedParentId
+            ];
+
         dd(
+
             $this->nestedParentName,
             $this->nestedParentModel,
             $this->repository->getModel(),

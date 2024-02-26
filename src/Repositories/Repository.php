@@ -867,13 +867,26 @@ abstract class Repository
             unset($scopes['exceptIds']);
         }
 
+        $_scopes = $scopes;
+        foreach ($_scopes as $column => $value) {
+            $studlyColumn = studlyName($column);
+            if (preg_match('/addRelation([A-Za-z]+)/', $column, $matches)) {
+                $relationName = $this->getCamelCase($matches[1]);
+
+                if(method_exists($this->getModel(), $relationName)){
+                    $foreignKey = $this->getForeignKeyFromName($relationName);
+                    // $tableName = $this->getTableNameFromName($relationName);
+
+                    $scopes[$foreignKey] = $value;
+                    $this->addRelationFilterScope($query, $scopes, $foreignKey, $relationName);
+                }
+
+                unset($scopes[$column]);
+            }
+        }
         foreach ($scopes as $column => $value) {
             $studlyColumn = studlyName($column);
-            // dd(
-            //     $column,
-            //     $studlyColumn,
-            //     method_exists($this->model, 'scope' . $studlyColumn)
-            // );
+
             if (method_exists($this->model, 'scope' . $studlyColumn)) {
                 $query->{$this->getCamelCase($column)}();
             } else {
