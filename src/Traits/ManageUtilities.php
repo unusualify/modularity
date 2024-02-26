@@ -155,9 +155,9 @@ trait ManageUtilities {
             }
             $optionIsActive = $this->getIndexOption($action);
 
-            if(!$optionIsActive && !preg_match('/edit|create|forceDelete|restore/', $action)){
-                dd($action);
-            }
+            // if(!$optionIsActive && !preg_match('/edit|create|forceDelete|restore/', $action)){
+            //     dd($action);
+            // }
 
             $prefix = $this->routePrefix;
 

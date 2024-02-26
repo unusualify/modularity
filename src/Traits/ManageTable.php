@@ -229,6 +229,7 @@ trait ManageTable {
         $routeSnake = snakeCase($this->routeName);
         foreach (Modularity::find($this->moduleName)->getRouteConfigs() as $key => $routeConfig) {
             if(isset($routeConfig['belongs']) && in_array($routeSnake, $routeConfig['belongs'])){
+                // echo $routeConfig['name'] . "\r\n";
                 $childRouteSnake = snakeCase($routeConfig['name']);
                 $actions[] = [
                     'name' => 'link',
@@ -243,6 +244,7 @@ trait ManageTable {
             }
             # code...
         }
+        // dd($actions);
         if(!$this->nested){
         }else{
         }

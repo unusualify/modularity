@@ -46,7 +46,7 @@ trait HasScanModule
         }
     }
 
-    public function __call($method, $arguments)
+    public function ___call($method, $arguments)
     {
         $moduleRelationships = $this->moduleRelationships ?? [];
 
