@@ -1176,7 +1176,8 @@ export default {
       // __log(this.flatCombinedArray)
 
       this.flatCombinedArray.forEach(obj => {
-        obj.value = get(data, obj.key, null) // get - lodash
+        obj.value = get(schema, [obj.key, 'type']) === 'select' ? get(data, obj.key, null) || get(schema, [obj.key, 'default'],null) : get(data, obj.key,null);
+// obj.value = get(data, obj.key, null) // get - lodash
         obj.schema = get(schema, obj.key, null) // get - lodash
       })
     },
@@ -1285,6 +1286,7 @@ export default {
       this.tryAutogenerateModelStructure(model, schema)
 
       // no schema defined or empty -> autogenerate basic schema
+      __log(schema)
       if (isEmpty(schema)) this.autogenerateSchema(model)
 
       // create flatted working array from schema and value
@@ -1299,7 +1301,7 @@ export default {
         const selectItemValue = obj.schema.itemValue ?? 'id';
 
         // ACTIONS
-        this.formSchema[cascadedSelectName][cascadeKey] = find(obj.schema.items, [selectItemValue, this.valueIntern[obj.key]]).schema ?? []
+        this.formSchema[cascadedSelectName][cascadeKey] = find(obj.schema.items, [selectItemValue, this.valueIntern[obj.key]])?.schema ?? []
 
         const sortIndex = findIndex(this.flatCombinedArraySorted, ['key', cascadedSelectName])
         this.storeStateData[cascadedSelectName] = this.formSchema[cascadedSelectName][cascadeKey].length > 0 ? this.formSchema[cascadedSelectName][cascadeKey][0].value : []
