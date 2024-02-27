@@ -104,8 +104,12 @@ trait RelationTrait
                 // } else {
                 //     $fields[$f] = null;
                 // }
+            }else if(array_key_exists($relation, $fields)){
+
+                $object->{$relation}()->sync([]);
             }
         }
+
         foreach ($this->getHasManyRelations() as $relationName) {
 
             if (isset($fields[$relationName])) {
