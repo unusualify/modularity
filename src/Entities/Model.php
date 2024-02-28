@@ -14,7 +14,6 @@ use Unusualify\Modularity\Entities\Traits\{
     ModelHelpers,
     HasScopes,
     HasRelation,
-    // HasScanModule,
     IsTranslatable
 };
 
@@ -24,11 +23,11 @@ class Model extends LaravelModel implements TaggableInterface
     use ModelHelpers,
         HasPresenter,
         HasRelation,
-        // HasScanModule,
         HasScopes,
         IsTranslatable,
         SoftDeletes,
         TaggableTrait;
+
 
     public $timestamps = true;
 
@@ -92,6 +91,31 @@ class Model extends LaravelModel implements TaggableInterface
             'taggable_id',
             'tag_id'
         );
+    }
+
+    /**
+     * Retrieve the model for a bound value.
+     *
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveRouteBinding_($value, $field = null)
+    {
+        return $this->where('name', $value)->firstOrFail();
+    }
+
+    /**
+     * Retrieve the child model for a bound value.
+     *
+     * @param  string  $childType
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveChildRouteBinding_($childType, $value, $field)
+    {
+        return parent::resolveChildRouteBinding($childType, $value, $field);
     }
 
 }
