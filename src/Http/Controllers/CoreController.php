@@ -213,7 +213,7 @@ abstract class CoreController extends LaravelController
         return $filtered[$this->getSnakeCase($this->routeName)] ?? null;
     }
 
-    protected function routeParentModuleParameters(){
+    protected function parentRouteParameters(){
         $filtered =  Arr::where($this->routeParameters(), function ($value, $snakeName) {
             return $this->getStudlyName($snakeName) !== $this->routeName;
         });
