@@ -470,7 +470,7 @@ class SchemaParser extends Parser
 
         if(count($rules) > 0){
             array_unshift($rules, 'sometimes');
-            $extra_options['rules'] = implode(':', $rules);
+            $extra_options['rules'] = implode('|', $rules);
         }
 
         return [
