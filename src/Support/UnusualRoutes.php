@@ -10,7 +10,8 @@ use Unusualify\Modularity\Http\Middleware\{
     ImpersonateMiddleware,
     NavigationMiddleware,
     RedirectIfAuthenticatedMiddleware,
-    AuthorizationMiddleware
+    AuthorizationMiddleware,
+    HostableMiddleware
 };
 class UnusualRoutes
 {
@@ -158,6 +159,10 @@ class UnusualRoutes
             'authorization',
             'company_registration'
         ]);
+
+        // Optional Middlewares for features
+        Route::aliasMiddleware('hostable', HostableMiddleware::class);
+
     }
 
 }

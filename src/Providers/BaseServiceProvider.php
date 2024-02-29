@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularity\Providers;
 
+use Illuminate\Foundation\Application;
 use Unusualify\Modularity\Activators\FileActivator;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Modularity;
@@ -12,6 +13,7 @@ use Unusualify\Modularity\Http\ViewComposers\CurrentUser;
 use Unusualify\Modularity\Http\ViewComposers\FilesUploaderConfig;
 use Unusualify\Modularity\Http\ViewComposers\Localization;
 use Unusualify\Modularity\Http\ViewComposers\MediasUploaderConfig;
+
 class BaseServiceProvider extends ServiceProvider
 {
     /**
@@ -78,14 +80,14 @@ class BaseServiceProvider extends ServiceProvider
         $this->registerCommands();
 
         // $this->app->singleton(\Unusualify\Modularity\Contracts\RepositoryInterface::class, function ($app) {
-        $this->app->singleton('unusual.modularity', function ($app) {
+        $this->app->singleton('unusual.modularity', function (Application $app) {
             $path = $app['config']->get('modules.paths.modules');
 
             return new Modularity($app, $path);
         });
 
         // $this->app->singleton(FileActivator::class, function ($app) {
-        $this->app->singleton('unusual.activator', function ($app) {
+        $this->app->singleton('unusual.activator', function (Application $app) {
             // echo 'unusual.activator' . "</br>";
             return new FileActivator($app);
         });
@@ -102,6 +104,10 @@ class BaseServiceProvider extends ServiceProvider
             $relationNamespace = app('model.relation.namespace');
 
             return "|" . preg_quote($relationNamespace, "|") . "|";
+        });
+
+        $this->app->singleton('unusualify.hosting', function (Application $app) {
+            return new \Unusualify\Modularity\Support\HostRouting($app, unusualConfig('app_url'));
         });
 
         // $this->app->alias(FileActivator::class, 'module_activator');
