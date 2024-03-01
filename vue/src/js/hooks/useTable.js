@@ -1,5 +1,5 @@
 // hooks/useTable.js
-import { watch, computed, nextTick, reactive, toRefs } from 'vue'
+import { watch, computed, nextTick, reactive, toRefs, ref, watchEffect } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
@@ -113,6 +113,8 @@ export default function useTable (props, context) {
 
   const getters = mapGetters()
 
+  const form = ref(null)
+
   const state = reactive({
     id: Math.ceil(Math.random() * 1000000) + '-table',
     formRef: computed(() => {
@@ -192,27 +194,32 @@ export default function useTable (props, context) {
     filterActive: computed(() => find(store.state.datatable.mainFilters, { slug: state.filterActiveStatus })),
     // form store
     editedItem: computed(() => store.state.form.editedItem ?? {}),
-    formLoading: computed(() => store.state.form.formLoading ?? false),
-    formErrors: computed(() => store.state.form.formErrors ?? {})
+    formLoading: computed(() => store.state.form.loading ?? false),
+    formErrors: computed(() => store.state.form.errors ?? {}),
+
+    formIsValid: computed(function () {
+      // __log(form?.value?.valid, form?.value)
+      return form?.value?.valid ?? null
+    })
   })
 
   const methods = reactive({
     onResize () {
       state.windowSize = { x: window.innerWidth, y: window.innerHeight }
     },
-    // initialize: function () {
-    //   store.commit(DATATABLE.UPDATE_DATATABLE_SEARCH, '')
-    //   store.commit(
-    //     DATATABLE.UPDATE_DATATABLE_OPTIONS,
-    //     window[process.env.VUE_APP_NAME].STORE.datatable.options
-    //   )
-    //   store.dispatch(ACTIONS.GET_DATATABLE)
-    // },
+    initialize: function () {
+      store.commit(DATATABLE.UPDATE_DATATABLE_SEARCH, '')
+      store.commit(
+        DATATABLE.UPDATE_DATATABLE_OPTIONS,
+        window[process.env.VUE_APP_NAME].STORE.datatable.options
+      )
+      store.dispatch(ACTIONS.GET_DATATABLE)
+    },
     setEditedItem: function (item) {
-      // store._modules.root.state
       store.commit(FORM.SET_EDITED_ITEM, item)
     },
     resetEditedItem: function () {
+      // __log('resetEditedItem')
       nextTick(() => {
         store.commit(FORM.RESET_EDITED_ITEM)
       })
@@ -525,6 +532,11 @@ export default function useTable (props, context) {
     closeForm: function () {
       state.formActive = false
     },
+    confirmFormModal () {
+      form.value.submit(null, (res) => {
+        if (Object.prototype.hasOwnProperty.call(res, 'variant') && res.variant.toLowerCase() === 'success') { methods.closeForm() }
+      })
+    },
 
     openDeleteModal: function () {
       state.deleteModalActive = true
@@ -564,7 +576,7 @@ export default function useTable (props, context) {
     }
   }, { deep: true })
   watch(() => state.formActive, (newValue, oldValue) => {
-    newValue || methods.resetEditedItem()
+    newValue || form.value.resetValidation() || methods.resetEditedItem()
   })
   watch(() => state.deleteModalActive, (newValue, oldValue) => {
     newValue || methods.resetEditedItem()
@@ -581,6 +593,7 @@ export default function useTable (props, context) {
 
   // expose managed state as return value
   return {
+    form,
     ...toRefs(state),
     ...getters,
     ...toRefs(methods),

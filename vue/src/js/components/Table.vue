@@ -63,8 +63,8 @@
               {{ $t('ADD NEW')}}
             </v-btn>
             <v-expand-transition>
-              <v-card class="mb-theme" elevation="4" v-show="formActive">
-                <ue-form has-submit button-text="save" :title="formTitle">
+              <v-card class="mb-theme" elevation="4" v-if="formActive">
+                <ue-form has-submit button-text="save" :title="formTitle" ref="form">
                   <template v-slot:headerRight>
                     <v-btn class="" variant="text" icon="$close" density="compact"
                       @click="closeForm()"
@@ -91,19 +91,26 @@
                 <v-card >
                   <v-card-title class="text-h5 grey lighten-2"> </v-card-title>
                   <v-card-text>
-                    <ue-form :title="formTitle" :ref="formRef"/>
+                    <ue-form
+                      ref="form"
+                      :title="formTitle"
+                      />
                   </v-card-text>
                   <v-divider/>
                   <v-card-actions>
                       <v-spacer></v-spacer>
                       <v-btn color="error darken-1" text @click="closeForm()">
-                          {{ props.textCancel }}
+                        {{ props.textCancel }}
                       </v-btn>
-                      <v-btn color="teal darken-1" text @click="confirmFormModal()">
-                          {{ $t('save') }}
+                      <v-btn color="teal darken-1"
+                        text
+                        @click="confirmFormModal()"
+                        :disabled="!formIsValid"
+                        :loading="formLoading"
+                        >
+                        {{ $t('save') }}
                       </v-btn>
                   </v-card-actions>
-
                 </v-card>
               </template>
             </ue-modal>
@@ -474,13 +481,7 @@ export default {
     // this.$can(this.rowActions[0].can ?? '')
   },
   methods: {
-    confirmFormModal () {
-      const self = this
 
-      this.$refs[this.formRef].submit(null, (res) => {
-        if (Object.prototype.hasOwnProperty.call(res, 'variant') && res.variant.toLowerCase() === 'success') { self.closeForm() }
-      })
-    }
   }
 }
 </script>

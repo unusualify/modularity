@@ -147,7 +147,10 @@
                     <v-card-title class="text-h5 grey lighten-2"> </v-card-title>
 
                     <v-card-text>
-                      <ue-form :title="formTitle" :ref="formRef"/>
+                      <ue-form
+                        ref="form"
+                        :title="formTitle"
+                        />
                     </v-card-text>
 
                     <v-divider/>
@@ -157,8 +160,13 @@
                         <v-btn color="error darken-1" text @click="closeForm()">
                             {{ props.textCancel }}
                         </v-btn>
-                        <v-btn color="teal darken-1" text @click="confirmFormModal()">
-                            {{ $t('save') }}
+                        <v-btn color="teal darken-1"
+                          text
+                          @click="confirmFormModal()"
+                          :disabled="!formIsValid"
+                          :loading="formLoading"
+                          >
+                          {{ $t('save') }}
                         </v-btn>
                     </v-card-actions>
 
@@ -288,7 +296,7 @@
         </div>
       </template>
 
-      <template v-slot:no-data>
+      <template v-slot:no-data v-if="search != ''">
         <div class="w-100 d-flex justify-center my-5">
           <v-btn
             color="primary"
@@ -507,16 +515,6 @@ export default {
 
         this.$store.dispatch(ACTIONS.SAVE_FORM, { item: data })
       }
-    },
-    confirmFormModal () {
-      const self = this
-
-      this.$refs[this.formRef].submit(null, (res) => {
-        if (Object.prototype.hasOwnProperty.call(res, 'variant') && res.variant.toLowerCase() === 'success') { self.closeForm() }
-      })
-      // this.$refs[this.formRef].saveForm((res) => {
-      //   if (Object.prototype.hasOwnProperty.call(res, 'variant') && res.variant.toLowerCase() === 'success') { self.closeForm() }
-      // })
     }
   }
 }

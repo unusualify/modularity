@@ -5,10 +5,8 @@
       :ref="reference"
       :action="actionUrl"
       method="POST"
-
       :class="formClass"
-
-      v-model="validForm"
+      v-model="valid"
       @submit="submit"
       >
       <v-sheet class="d-flex">
@@ -98,11 +96,11 @@
           <div class="d-flex flex-column align-items-center ml-auto mr-auto" style="position:sticky;top:100px;">
             <slot v-if="hasSubmit && stickyButton" name="submit"
               v-bind="{
-                validForm: validForm || !serverValid,
+                validForm: valid || !serverValid,
                 buttonDefaultText
               }"
               >
-              <v-btn type="submit" :disabled="!(validForm || !serverValid)" class="ml-auto">
+              <v-btn type="submit" :disabled="!(valid || !serverValid)" class="ml-auto">
                 {{ buttonDefaultText }}
               </v-btn>
             </slot>
@@ -118,14 +116,13 @@
           <!-- <v-spacer></v-spacer> -->
         </div>
       </v-sheet>
-
       <v-sheet class="d-flex pt-6" v-if="hasSubmit && !stickyButton">
         <slot name="submit"
           v-bind="{
-            validForm: validForm || !serverValid,
+            validForm: valid || !serverValid,
             buttonDefaultText
           }">
-          <v-btn type="submit" :disabled="!(validForm || !serverValid)" class="ml-auto mb-5">
+          <v-btn type="submit" :disabled="!(valid || !serverValid) || loading" class="ml-auto mb-5">
             {{ buttonDefaultText }}
           </v-btn>
         </slot>
@@ -153,14 +150,16 @@ import { useFormatPermalink, useInputHandlers, useValidation } from '@/hooks'
 
 import { useI18n } from 'vue-i18n'
 
-import logger from '@/utils/logger'
 import { getModel, getSubmitFormData, getSchema } from '@/utils/getFormData.js'
 
 import { redirector } from '@/utils/response'
-import { cloneDeep, filter } from 'lodash'
+import { cloneDeep } from 'lodash'
 
 export default {
   name: 'ue-form',
+  emits: [
+    'update:valid'
+  ],
   props: {
     modelValue: {
       type: Object,
@@ -242,8 +241,6 @@ export default {
       formErrors: {},
       // inputs: this.invokeRuleGenerator(this.schema),
 
-      // validForm: false
-
       issetModel: Object.keys(this.modelValue).length > 0,
       issetSchema: Object.keys(this.schema).length > 0,
       hasStickyFrame: this.stickyFrame || this.stickyButton,
@@ -271,6 +268,8 @@ export default {
       this.issetModel ? this.modelValue : this.editedItem,
       this.$store.state
     )
+
+    this.resetSchemaErrors()
   },
 
   watch: {
@@ -379,6 +378,10 @@ export default {
     },
     resetValidation () {
       this.$refs[this.reference].resetValidation()
+      // this.valid = null
+    },
+    reset () {
+      this.$refs[this.reference].reset()
     },
     handleInput (v, s) {
       const { on, key, value, obj } = v
@@ -476,7 +479,7 @@ export default {
       }
     },
     submit (e, callback = null, errorCallback = null) {
-      if (this.validForm) {
+      if (this.valid) {
         if (this.async) {
           e && e.preventDefault() // don't perform submit action (i.e., `<form>.action`)
           if (!this.actionUrl) {
@@ -533,6 +536,11 @@ export default {
     },
     resetSchemaError (key) {
       this.inputSchema[key].errorMessages = []
+    },
+    resetSchemaErrors () {
+      for (const key in this.inputSchema) {
+        this.resetSchemaError(key)
+      }
     },
 
     updatedSlotModel (value, inputName) {
