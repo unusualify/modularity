@@ -196,25 +196,37 @@ abstract class CoreController extends LaravelController
 
     protected function routeParameters()
     {
-        return $this->request->route() ? $this->request->route()->parameters() : [];
+        return $this->request->route()
+            ? $this->request->route()->parameters()
+            : [];
     }
 
-    protected function routeModuleParameters(){
-        return Arr::mapWithKeys($this->routeParameters(), function($value, $snakeName){
+    protected function routeArguments()
+    {
+        $hostRoutingArguments = @class_exists('Unusualify\Modularity\Facades\HostRouting')
+            ? \Unusualify\Modularity\Facades\HostRouting::getRouteArguments()
+            : [];
+        return $this->request->route()
+            ? array_merge($this->request->route()->parameters(), $hostRoutingArguments)
+            : [];
+    }
+
+    protected function routeModuleArguments(){
+        return Arr::mapWithKeys($this->routeArguments(), function($value, $snakeName){
             return [ $this->getStudlyName($snakeName) => $value];
         });
     }
 
-    protected function routeParameter(){
-        $filtered =  Arr::where($this->routeParameters(), function ($value, $snakeName) {
+    protected function routeArgument(){
+        $filtered =  Arr::where($this->routeArguments(), function ($value, $snakeName) {
             return $this->getStudlyName($snakeName) == $this->routeName;
         });
 
         return $filtered[$this->getSnakeCase($this->routeName)] ?? null;
     }
 
-    protected function parentRouteParameters(){
-        $filtered =  Arr::where($this->routeParameters(), function ($value, $snakeName) {
+    protected function parentRouteArguments(){
+        $filtered =  Arr::where($this->routeArguments(), function ($value, $snakeName) {
             return $this->getStudlyName($snakeName) !== $this->routeName;
         });
 

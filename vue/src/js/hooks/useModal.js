@@ -62,7 +62,7 @@ export default function useModal (props, context) {
         return modelValue.value
       },
       set: (value, old) => {
-        __log('modalOpened setter')
+        // __log('modalOpened setter')
         methods.emitModelValue(value)
       }
     }),

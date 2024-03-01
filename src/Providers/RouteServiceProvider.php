@@ -9,6 +9,7 @@ use Unusualify\Modularity\Http\Controllers\GlideController;
 use Unusualify\Modularity\Facades\UnusualRoutes;
 use Unusualify\Modularity\Facades\Modularity;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Facades\HostRouting;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -306,6 +307,10 @@ class RouteServiceProvider extends ServiceProvider
             }else{
                 return false;
             }
+        });
+
+        Route::macro('hosting', function($callback, $options = []){
+            HostRouting::group($callback, $options);
         });
 
         Route::macro('moduleRoutes', function($module, $options = []){

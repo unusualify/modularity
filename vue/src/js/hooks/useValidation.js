@@ -17,7 +17,7 @@ export default function useValidation () {
   // const model = toRefs()
 
   const state = reactive({
-    validForm: true
+    valid: null
   })
 
   const ruleMethods = reactive({
@@ -53,16 +53,20 @@ export default function useValidation () {
     if (__isObject(_inputs)) {
       Object.keys(_inputs).forEach((name) => {
         if (Object.prototype.hasOwnProperty.call(_inputs[name], 'rules')) {
-          if (window.__isString(_inputs[name].rules)) {
-            _inputs[name].rules = _inputs[name].rules.split('|')
+          inputs[name].rawRules = !__isset(inputs[name].rawRules)
+            ? _inputs[name].rules
+            : inputs[name].rawRules
+
+          if (window.__isString(inputs[name].rawRules)) {
+            _inputs[name].rules = inputs[name].rawRules.split('|')
+          } else {
+            _inputs[name].rules = inputs[name].rawRules
           }
           inputs[name].rules = []
           _inputs[name].rules.forEach((rule, index) => {
-            // if(window.__isString(rule))
             if (window.__isString(rule)) {
               rule = rule.split(':')
             }
-            // __log(name, rule)
             const method = rule[0] + 'Rule'
             if (Object.prototype.hasOwnProperty.call(ruleMethods, method)) {
               // __log(name, method, rule.slice(1))
@@ -89,7 +93,7 @@ export default function useValidation () {
     return inputs
   }
 
-  watch(() => state.validForm, (newValue, oldValue) => {
+  watch(() => state.valid, (newValue, oldValue) => {
     // __log('validForm watch', newValue, oldValue)
   })
   // expose managed state as return value

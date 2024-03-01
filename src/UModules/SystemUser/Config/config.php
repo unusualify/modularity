@@ -62,6 +62,7 @@ return [
                     'label' => 'Name',
                     'name' => 'name',
                     'type' => 'text',
+                    'rules' => 'sometimes|required',
                     'col' => [
                         'cols' => 12,
                         'sm' => 8,
@@ -74,12 +75,14 @@ return [
                     'name' => 'company_id',
                     'label' => 'Company',
                     'type' => 'select',
+                    'rules' => 'sometimes|required',
                     'repository' => 'Modules\\SystemUser\\Repositories\\CompanyRepository',
                 ],
                 [
                     'type' => 'text',
                     'label' => 'Email',
                     'name' => 'email',
+                    'rules' => 'sometimes|required',
                     'col' => [
                         'cols' => 12,
                         'sm' => 8,
@@ -92,6 +95,7 @@ return [
                     'type' => 'select',
                     'label' => 'Roles',
                     'name' => 'roles',
+                    'rules' => 'sometimes|required',
                     'col' => [
                         'cols' => 12,
                         'sm' => 8,
@@ -494,9 +498,7 @@ return [
                         'lg' => 6,
                         'xl' => 6
                     ],
-                    'rules' => [
-                        ['min', 3]
-                    ]
+                    'rules' => 'sometimes|required|min:3',
                     // 'prepend-icon' => 'mdi-card-text-outline',
                 ],
                 [
@@ -506,7 +508,6 @@ return [
                     'placeholder' => 'unusual_users',
                     // 'tooltip' => 'Enter the guard name',
                     'default' => 'unusual_users',
-
                     'col' => [
                         'cols' => 10,
                         'sm' => 10,
@@ -1010,9 +1011,7 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'rules' => [
-                        ['min', 3]
-                    ]
+                    'rules' => 'sometimes|required|min:3',
                     // 'prepend-icon' => 'mdi-card-text-outline',
                 ],
                 [
@@ -1304,9 +1303,7 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'rules' => [
-                        ['min', 3]
-                    ]
+                    'rules' => 'sometimes|required|min:3',
                 ],
                 [
                     'type' => 'text',
@@ -1320,9 +1317,7 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'rules' => [
-                        ['min', 3]
-                    ]
+                    'rules' => 'sometimes|required|min:5',
                 ],
                 [
                     'type' => 'text',
@@ -1336,9 +1331,7 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'rules' => [
-                        ['min', 3]
-                    ]
+                    'rules' => 'sometimes|required|min:3',
                 ],
                 [
                     'type' => 'text',
@@ -1352,9 +1345,7 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'rules' => [
-                        ['min', 3]
-                    ]
+                    'rules' => 'sometimes|required|min:3',
                 ],
                 [
                     'type' => 'text',
@@ -1368,9 +1359,7 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'rules' => [
-                        ['min', 3]
-                    ]
+                    'rules' => 'sometimes|required|min:3',
                 ],
                 [
                     'type' => 'text',
@@ -1384,9 +1373,7 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'rules' => [
-                        ['min', 3]
-                    ]
+                    'rules' => 'sometimes|required|min:3',
                 ],
                 [
                     'type' => 'custom-input-phone',
@@ -1411,9 +1398,7 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'rules' => [
-                        ['min', 3]
-                    ]
+                    'rules' => 'sometimes|required|min:5',
                 ],
                 [
                     'type' => 'text',
@@ -1427,29 +1412,27 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'rules' => [
-                        ['min', 3]
-                    ]
+                    'rules' => 'sometimes|required|min:5',
                 ],
-                // [
-                //     'type' => 'text',
-                //     'title' => 'Guard Name',
-                //     'name' => 'guard_name',
-                //     'label' => 'Guard Name',
-                //     'placeholder' => 'web',
-                //     'default' => 'unusual_users',
-                //     'col' => [
-                //         'cols' => 12,
-                //         'sm' => 8,
-                //         'md' => 6,
-                //     ],
-                //     // 'prepend-icon' => 'mdi-account-child',
-                //     'readonly',
-                //     'disabled',
-                //     'flat',
-                //     'hide-spin-buttons',
-                //     // 'full-width',
-                // ],
+                [
+                    'type' => 'text',
+                    'title' => 'Guard Name',
+                    '_name' => 'guard_name',
+                    'label' => 'Guard Name',
+                    'placeholder' => 'web',
+                    'default' => 'unusual_users',
+                    'col' => [
+                        'cols' => 12,
+                        'sm' => 8,
+                        'md' => 6,
+                    ],
+                    // 'prepend-icon' => 'mdi-account-child',
+                    'readonly',
+                    'disabled',
+                    'flat',
+                    'hide-spin-buttons',
+                    // 'full-width',
+                ],
             ],
         ]
     ],
