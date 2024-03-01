@@ -250,6 +250,8 @@ trait ManageForm {
                         }
 
                         $items = $newArray;
+                    }else if(isset($input['autofill'])){
+                        $items = $relation_class->list([$input['itemTitle'],...$input['autofill']], $with, )->toArray();
                     }
 
                 }else if(isset($input['model'])){
@@ -537,6 +539,18 @@ trait ManageForm {
 
                         return $input;
                     })->toArray());
+// $input['prefillabes'] = [];
+// foreach ($input['schema'] as $key => $value) {
+
+//     if(isset($value['autofillable'])){
+//         $input['prefillabes'][] = array_combine([$value['name']],[$value['autofillable']]);
+//     }
+// }
+
+
+
+
+                    // $input['autofillables'] = $input['schema']->map();
 
                     $input['name'] = $relationshipName;
                     $input['ext'] = 'relationship';

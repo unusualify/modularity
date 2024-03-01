@@ -57,6 +57,8 @@ export const getModel = (inputs, item = null, rootState = null) => {
 
     // default model value
     let _default = Object.prototype.hasOwnProperty.call(input, 'default') ? input.default : ''
+    let _prefillAvaliable = Object.prototype.hasOwnProperty.call(input, 'autofillable') && Object.prototype.hasOwnProperty.call(input, 'prefillValue');
+    let _prefillValue = _prefillAvaliable ? input.prefillValue : _default;
     if (isArrayable.includes(input.type)) {
       _default = []
     }
@@ -73,7 +75,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
     //   return fields
     // }
     // __log(name, _default, item)
-    const value = editing ? (__isset(item[name]) ? item[name] : _default) : _default
+    const value = editing ? (__isset(item[name]) ? item[name] : _prefillValue) : _prefillValue;
 
     if (__isObject(input)) {
       if (isTranslated) { // translations
