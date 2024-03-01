@@ -539,18 +539,7 @@ trait ManageForm {
 
                         return $input;
                     })->toArray());
-// $input['prefillabes'] = [];
-// foreach ($input['schema'] as $key => $value) {
 
-//     if(isset($value['autofillable'])){
-//         $input['prefillabes'][] = array_combine([$value['name']],[$value['autofillable']]);
-//     }
-// }
-
-
-
-
-                    // $input['autofillables'] = $input['schema']->map();
 
                     $input['name'] = $relationshipName;
                     $input['ext'] = 'relationship';
