@@ -266,7 +266,7 @@ class BaseServiceProvider extends ServiceProvider
     private function bootBaseMigrations(){
         // LOAD BASE MIGRATIONS
         $this->loadMigrationsFrom(
-            base_path( config( $this->baseKey . '.vendor_path') . '/src/Database/Migrations/default' )
+            base_path( unusualConfig('vendor_path') . '/src/Database/Migrations/default' )
         );
     }
 
