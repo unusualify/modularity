@@ -115,7 +115,6 @@
               </template>
             </ue-modal>
           </slot>
-
           <!-- #deletemodal-->
           <ue-modal
             ref="deleteModal"
