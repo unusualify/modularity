@@ -7,7 +7,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularity\Traits\ManageNames;
 
 class HostRouting
@@ -122,6 +124,11 @@ class HostRouting
 
     public function combineHostModels() : Collection
     {
+
+        if(!$this->classesIsHostable()){
+            return Collection::make([]);
+        }
+
         return array_reduce($this->hostableClasses, function($carry, $class){
             $carry = $carry->merge($class::hostables());
 
@@ -155,6 +162,24 @@ class HostRouting
             throw new BadMethodCallException(sprintf(
                 'Call to undefined method %s->%s()', static::class, $method
             ));
-        }	}
+        }
+    }
 
+    public function classesIsHostable()
+    {
+        $isHostable = true;
+
+        foreach ($this->hostableClasses as $key => $model) {
+            if(!Schema::hasTable(App::make($model)->getTable())){
+                $isHostable = false;
+                break;
+            }
+        }
+
+        return $isHostable;
+
+        return Collection::make($this->hostableClasses)->reduce(function($carry, $item){
+            dd($item);
+        }, Collection::make());
+    }
 }
