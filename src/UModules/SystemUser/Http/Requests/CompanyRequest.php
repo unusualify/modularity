@@ -20,7 +20,7 @@ class CompanyRequest extends Request
 		];
     }
 
-    public function rulesForStore()
+    public function rulesForCreate()
     {
         $table_name = $this->model()->getTable();
         return [
