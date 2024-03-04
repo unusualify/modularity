@@ -481,67 +481,9 @@ return [
                 ],
             ],
 
-            'inputs' => [
-                [
-                    'type' => 'text',
-                    'name' => 'name',
-                    'label' => 'Name',
-                    'hint' => '',
-                    'placeholder' => '',
-                    'default' => '',
-                    // 'tooltip' => 'Enter a usual name',
-                    'col' => [
-                        'cols' => 10,
-                        'sm' => 10,
-                        'md' => 6,
-                        'lg' => 6,
-                        'xl' => 6
-                    ],
-                    'rules' => 'sometimes|required|min:3',
-                    // 'prepend-icon' => 'mdi-card-text-outline',
-                ],
-                [
-                    'type' => 'text',
-                    'name' => 'guard_name',
-                    'label' => 'Guard Name',
-                    'placeholder' => 'unusual_users',
-                    '_tooltip' => 'Enter the guard name',
-                    'default' => 'unusual_users',
-                    'col' => [
-                        'cols' => 10,
-                        'sm' => 10,
-                        'md' => 6,
-                        'lg' => 6,
-                        'xl' => 6
-                    ],
-                    // 'prepend-icon' => 'mdi-account-child',
-                    'readonly',
-                    'disabled',
-                    'flat',
-                    // 'full-width',
-                    'hide-spin-buttons',
-
-                ],
-                [
-                    'type' => 'checklist',
-                    'isTreeview' => true,
-                    '_type' => 'custom-input-treeview',
-                    'name' => 'permissions',
-                    'label' => 'Permissions of the role',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 12,
-                        'md' => 12,
-                        'lg' => 12,
-                        'xl' => 12
-                    ],
-
-                    'route' => 'permission',
-                    'model' => Spatie\Permission\Models\Permission::class,
-                ],
-
+            'test_inputs' => [
                 'permissions' => [
-                    'type' => 'treeview',
+                    '_type' => 'treeview',
                     // 'type' => 'custom-input-treeview',
                     '_name' => 'permissions',
                     'label' => 'Permissions of the role',
@@ -955,6 +897,66 @@ return [
                     'outlined',
                     'prepend-icon' => 'mdi-card-text-outline',
                 ]
+            ],
+
+            'inputs' => [
+                [
+                    'type' => 'text',
+                    'name' => 'name',
+                    'label' => 'Name',
+                    'hint' => '',
+                    'placeholder' => '',
+                    'default' => '',
+                    // 'tooltip' => 'Enter a usual name',
+                    'col' => [
+                        'cols' => 10,
+                        'sm' => 10,
+                        'md' => 6,
+                        'lg' => 6,
+                        'xl' => 6
+                    ],
+                    'rules' => 'sometimes|required|min:3',
+                    // 'prepend-icon' => 'mdi-card-text-outline',
+                ],
+                [
+                    'type' => 'text',
+                    'name' => 'guard_name',
+                    'label' => 'Guard Name',
+                    'placeholder' => 'unusual_users',
+                    '_tooltip' => 'Enter the guard name',
+                    'default' => 'unusual_users',
+                    'col' => [
+                        'cols' => 10,
+                        'sm' => 10,
+                        'md' => 6,
+                        'lg' => 6,
+                        'xl' => 6
+                    ],
+                    // 'prepend-icon' => 'mdi-account-child',
+                    'readonly',
+                    'disabled',
+                    'flat',
+                    // 'full-width',
+                    'hide-spin-buttons',
+
+                ],
+                [
+                    'type' => 'checklist',
+                    'isTreeview' => true,
+                    '_type' => 'custom-input-treeview',
+                    'name' => 'permissions',
+                    'label' => 'Permissions of the role',
+                    'col' => [
+                        'cols' => 12,
+                        'sm' => 12,
+                        'md' => 12,
+                        'lg' => 12,
+                        'xl' => 12
+                    ],
+
+                    'route' => 'permission',
+                    'model' => Spatie\Permission\Models\Permission::class,
+                ],
             ],
             'rules' => [
                 'view' => [],
