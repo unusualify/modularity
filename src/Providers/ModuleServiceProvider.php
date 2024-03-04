@@ -47,22 +47,30 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
             $module_name = $module->getName();
 
             // REGISTER MODULE MIDDLEWARES
-            if(file_exists($module->getDirectoryPath('Http/Middleware'))){
-                foreach ( ClassFinder::getClassesInNamespace($module->getClassNamespace('Http\Middleware')) as $key => $middleware) {
+            if(file_exists(($middlewareDir = $module->getDirectoryPath('Http/Middleware')))){
+                foreach (glob($middlewareDir . '/*Middleware.php') as $middlewareFile) {
+                    $middlewareFileName = pathinfo($middlewareFile)['filename']; // $filename
+                    $middlewareClass = $module->getClassNamespace("Http\Middleware\\" . $middlewareFileName);
+                    if(@class_exists($middlewareClass)){
 
-                    if(@class_exists($middleware)){
-                        $class = app($middleware);
-
-                        $shortName = get_class_short_name($class);
-                        $namespace = get_class($class);
-
-                        $aliasName = implode('.', Arr::where(explode('_', snakeCase($shortName)), function($value){
+                        $aliasName = implode('.', Arr::where(explode('_', snakeCase($middlewareFileName)), function($value){
                             return $value !== 'middleware';
                         }));
 
-                        Route::aliasMiddleware($aliasName, $namespace);
+                        Route::aliasMiddleware($aliasName, $middlewareClass);
                     }
                 }
+                // foreach ( ClassFinder::getClassesInNamespace($module->getClassNamespace('Http\Middleware')) as $key => $middleware) {
+                //     if(@class_exists($middleware)){
+                //         $class = app($middleware);
+                //         $shortName = get_class_short_name($class);
+                //         $namespace = get_class($class);
+                //         $aliasName = implode('.', Arr::where(explode('_', snakeCase($shortName)), function($value){
+                //             return $value !== 'middleware';
+                //         }));
+                //         Route::aliasMiddleware($aliasName, $namespace);
+                //     }
+                // }
             }
 
             // LOAD MODULE CONFIG
