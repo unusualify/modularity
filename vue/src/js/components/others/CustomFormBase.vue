@@ -1173,10 +1173,20 @@ export default {
       // __log(object)
     },
     updateArrayFromState (data, schema) {
-      // __log(this.flatCombinedArray)
-
       this.flatCombinedArray.forEach(obj => {
-        obj.value = get(data, obj.key, null) // get - lodash
+        if(obj.schema.ext && obj.schema.ext === 'relationship'){
+          Object.values(obj.schema.schema).forEach(
+            e => {
+                  if(e.autofillable && get(data, e.autofillable, null) !== ''){
+                    e['prefillValue'] = get(data, e.autofillable, null);
+                }
+              }
+          )
+        }
+        // ## CHECK WHY IS THAT NOT WORKING
+        obj.value = get(schema, [obj.key, 'autofillable']) ? get(schema, [obj.key, 'prefillValue'], null) || get(schema, [obj.key, 'default'], null) :  get(schema, [obj.key, 'default'], null);
+        obj.value = get(schema, [obj.key, 'type']) === 'select' ? get(data, obj.key, null) || get(schema, [obj.key, 'default'],null) : get(data, obj.key,null);
+// obj.value = get(data, obj.key, null) // get - lodash
         obj.schema = get(schema, obj.key, null) // get - lodash
       })
     },
@@ -1249,7 +1259,6 @@ export default {
         // Autogeneration from Schema works only if model is an empty Object
         // if model is NOT an empty Object, no action is applied, otherwise data in model could be changed or modified
         if (!isEmpty(model[key])) return
-
         const val = schema[key]
         if (val.type === 'group') {
           model[key] = {}
@@ -1299,13 +1308,21 @@ export default {
         const selectItemValue = obj.schema.itemValue ?? 'id';
 
         // ACTIONS
-        this.formSchema[cascadedSelectName][cascadeKey] = find(obj.schema.items, [selectItemValue, this.valueIntern[obj.key]]).schema ?? []
+        this.formSchema[cascadedSelectName][cascadeKey] = find(obj.schema.items, [selectItemValue, this.valueIntern[obj.key]])?.schema ?? []
 
         const sortIndex = findIndex(this.flatCombinedArraySorted, ['key', cascadedSelectName])
         this.storeStateData[cascadedSelectName] = this.formSchema[cascadedSelectName][cascadeKey].length > 0 ? this.formSchema[cascadedSelectName][cascadeKey][0].value : []
         this.flatCombinedArraySorted[sortIndex].value = this.valueIntern[cascadedSelectName]
 
         this.setCascadeSelect(this.flatCombinedArraySorted[sortIndex]);
+      }
+      else if((obj.schema.type === 'select') && obj.schema.hasOwnProperty('autofill')){
+        obj.schema.autofill.forEach(element => {
+            if(this.formSchema[element].autofillable){
+              this.storeStateData[element] = find(obj.schema.items, ['id', this.valueIntern[obj.key]])?.[element] ?? 'facebook';
+              // ## TODO type conditional default value
+            }
+        });
       }
     }
   },

@@ -241,7 +241,6 @@ abstract class Repository
         if(count($with) > 0)
             $query = $query->with( $this->formatWiths($query, $with) );
 
-
         if ($exceptId) {
             $query = $query->where($this->model->getTable() . '.id', '<>', $exceptId);
         }
@@ -260,7 +259,10 @@ abstract class Repository
                 $column => $item->{$column}
             ]);
         }
+        if(is_array($column)){
 
+            return $query->get(['id', ...$column]);
+        }
         return $query->get(['id', $column]);
     }
 

@@ -88,7 +88,6 @@ export default function useRepeater (props, context) {
 
   function hydrateRepeaterInput (item, index) {
     const model = getModel(props.schema, item)
-    // __log(item, 'item')
 
     return {
       ...(props.autoIdGenerator ? { id: index } : {}),
@@ -106,7 +105,6 @@ export default function useRepeater (props, context) {
 
   function hydrateRepeaterInputs (model) {
     // return model; // Burayı açman gerekebilir.
-    // __log(model, 'model hydrateRepeaterInputs')
     return model.map((item, i) => {
       return hydrateRepeaterInput(item, i)
     })
