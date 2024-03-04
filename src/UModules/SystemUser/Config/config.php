@@ -75,7 +75,6 @@ return [
                     'name' => 'company_id',
                     'label' => 'Company',
                     'type' => 'select',
-                    'rules' => 'sometimes|required',
                     'repository' => 'Modules\\SystemUser\\Repositories\\CompanyRepository',
                 ],
                 [
@@ -506,7 +505,7 @@ return [
                     'name' => 'guard_name',
                     'label' => 'Guard Name',
                     'placeholder' => 'unusual_users',
-                    // 'tooltip' => 'Enter the guard name',
+                    '_tooltip' => 'Enter the guard name',
                     'default' => 'unusual_users',
                     'col' => [
                         'cols' => 10,
@@ -526,7 +525,7 @@ return [
                 [
                     'type' => 'checklist',
                     'isTreeview' => true,
-                    // 'type' => 'custom-input-treeview',
+                    '_type' => 'custom-input-treeview',
                     'name' => 'permissions',
                     'label' => 'Permissions of the role',
                     'col' => [
@@ -540,421 +539,422 @@ return [
                     'route' => 'permission',
                     'model' => Spatie\Permission\Models\Permission::class,
                 ],
-                // 'permissions' => [
-                //     'type' => 'treeview',
-                //     // 'type' => 'custom-input-treeview',
-                //     'name' => 'permissions',
-                //     'label' => 'Permissions of the role',
-                //     'col' => [
-                //         'cols' => 12,
-                //         'sm' => 12,
-                //         'md' => 12,
-                //         'lg' => 12,
-                //         'xl' => 12
-                //     ],
-                //     'offset' => [
-                //         'offset' => 0,
-                //         'offset-sm' => 2,
-                //         'offset-md' => 0,
-                //         'offset-lg' => 0,
-                //         'offset-xl' => 0,
-                //     ],
-                //     'order' => [
-                //         'order' => 0,
-                //         'order-sm' => 1,
-                //         'order-md' => 1,
-                //         'order-lg' => 1,
-                //         'order-xl' => 1,
-                //     ],
 
-                //     "activatable" => true,
-                //     "selectable" => true,
-                //     "multipleActive" => false,
-                //     "slot" => [
-                //         "prepend",
-                //         "label"
-                //     ],
+                'permissions' => [
+                    'type' => 'treeview',
+                    // 'type' => 'custom-input-treeview',
+                    '_name' => 'permissions',
+                    'label' => 'Permissions of the role',
+                    'col' => [
+                        'cols' => 12,
+                        'sm' => 12,
+                        'md' => 12,
+                        'lg' => 12,
+                        'xl' => 12
+                    ],
+                    'offset' => [
+                        'offset' => 0,
+                        'offset-sm' => 2,
+                        'offset-md' => 0,
+                        'offset-lg' => 0,
+                        'offset-xl' => 0,
+                    ],
+                    'order' => [
+                        'order' => 0,
+                        'order-sm' => 1,
+                        'order-md' => 1,
+                        'order-lg' => 1,
+                        'order-xl' => 1,
+                    ],
 
-                //     'route' => 'permission',
-                //     'model' => Spatie\Permission\Models\Permission::class,
-                // ],
-                // 'permissions_' => [
-                //     'type' => 'autocomplete',
-                //     'name' => 'permissions_',
-                //     'label' => 'Permission',
-                //     'default' => 0,
-                //     'items' => [
-                //         [
-                //             'text' => 'Edit Role',
-                //             'value' => 1,
-                //             // 'disabled' => false,
-                //         ],
-                //         [
-                //             'text' => 'Create Role',
-                //             'value' => 2
-                //         ],
-                //         [
-                //             'text' => 'Delete Role',
-                //             'value' => 3
-                //         ],
-                //     ],
-                //     'col' => [
-                //         'cols' => 10,
-                //         'sm' => 10,
-                //         'md' => 6,
-                //         'lg' => 6,
-                //         'xl' => 4
-                //     ],
-                //     'offset' => [
-                //         'offset' => 0,
-                //         'offset-sm' => 2,
-                //         'offset-md' => 0,
-                //         'offset-lg' => 0
-                //     ],
-                //     'order' => [
-                //         'order' => 2,
-                //         'order-sm' => 2,
-                //         'order-md' => 2,
-                //         'order-lg' => 2,
-                //         'order-xl' => 2,
-                //     ],
-                //     'prepend-icon' => 'mdi-account-arrow-right',
-                //     'color' => 'success',
-                //     'mandatory',
-                //     'row',
-                //     'outlined',
-                //     'dense',
-                //     'menu-props' => [
-                //         'closeOnClick' => true,
-                //         'closeOnContentClick' => false,
-                //         'disableKeys' => true,
-                //         'openOnClick' => false,
-                //         'maxHeight' => 304
-                //     ],
+                    "activatable" => true,
+                    "selectable" => true,
+                    "multipleActive" => false,
+                    "slot" => [
+                        "prepend",
+                        "label"
+                    ],
 
-                // ],
-                // 'is_active' => [
-                //     'type' => 'checkbox',
-                //     'name' => 'is_active',
-                //     'label' => 'Activity of Permission',
-                //     'default' => true,
-                //     'col' => [
-                //         'cols' => 10,
-                //         'sm' => 10,
-                //         'md' => 6,
-                //         'lg' => 6,
-                //         'xl' => 4
-                //     ],
-                //     'offset' => [
-                //         'offset' => 0,
-                //         'offset-sm' => 2,
-                //         'offset-md' => 0,
-                //         'offset-lg' => 0
-                //     ],
-                //     'order' => [
-                //         'order' => 3,
-                //         'order-sm' => 3,
-                //         'order-md' => 3,
-                //         'order-lg' => 3,
-                //         'order-xl' => 3,
-                //     ],
+                    'route' => 'permission',
+                    'model' => Spatie\Permission\Models\Permission::class,
+                ],
+                'permissions_' => [
+                    'type' => 'autocomplete',
+                    '_name' => 'permissions_',
+                    'label' => 'Permission',
+                    'default' => 0,
+                    'items' => [
+                        [
+                            'text' => 'Edit Role',
+                            'value' => 1,
+                            // 'disabled' => false,
+                        ],
+                        [
+                            'text' => 'Create Role',
+                            'value' => 2
+                        ],
+                        [
+                            'text' => 'Delete Role',
+                            'value' => 3
+                        ],
+                    ],
+                    'col' => [
+                        'cols' => 10,
+                        'sm' => 10,
+                        'md' => 6,
+                        'lg' => 6,
+                        'xl' => 4
+                    ],
+                    'offset' => [
+                        'offset' => 0,
+                        'offset-sm' => 2,
+                        'offset-md' => 0,
+                        'offset-lg' => 0
+                    ],
+                    'order' => [
+                        'order' => 2,
+                        'order-sm' => 2,
+                        'order-md' => 2,
+                        'order-lg' => 2,
+                        'order-xl' => 2,
+                    ],
+                    'prepend-icon' => 'mdi-account-arrow-right',
+                    'color' => 'success',
+                    'mandatory',
+                    'row',
+                    'outlined',
+                    'dense',
+                    'menu-props' => [
+                        'closeOnClick' => true,
+                        'closeOnContentClick' => false,
+                        'disableKeys' => true,
+                        'openOnClick' => false,
+                        'maxHeight' => 304
+                    ],
 
-                //     'prepend-icon' => 'mdi-glass-stange',
-                //     'color' => 'success',
-                //     // 'readonly',
-                //     'dense',
-                //     // 'disabled',
-                //     // 'error',
-                //     'flat',
-                //     // 'full-width',
-                //     'hide-spin-buttons',
-                //     // 'false-value' => false,
-                //     // 'false-value' => true,
-                //     // 'true-value' => false,
-                //     // 'appendIcon' => 'mdi-dropbox',
-                //     // 'prependIcon' => 'mdi-radioactive',
-                //     // 'offIcon' => 'mdi-inactive',
-                //     // 'onIcon' => 'mdi-radioactive',
+                ],
+                'is_active' => [
+                    'type' => 'checkbox',
+                    '_name' => 'is_active',
+                    'label' => 'Activity of Permission',
+                    'default' => true,
+                    'col' => [
+                        'cols' => 10,
+                        'sm' => 10,
+                        'md' => 6,
+                        'lg' => 6,
+                        'xl' => 4
+                    ],
+                    'offset' => [
+                        'offset' => 0,
+                        'offset-sm' => 2,
+                        'offset-md' => 0,
+                        'offset-lg' => 0
+                    ],
+                    'order' => [
+                        'order' => 3,
+                        'order-sm' => 3,
+                        'order-md' => 3,
+                        'order-lg' => 3,
+                        'order-xl' => 3,
+                    ],
 
-                // ],
-                // 'status' => [
-                //     // 'label' => 'Status',
-                //     'name' => 'status',
-                //     'type' => 'radio',
-                //     'default' => 1,
-                //     'options' => [
-                //         [
-                //             'label' => 'WAITING',
-                //             'value' => 1
-                //         ],
-                //         [
-                //             'label' => 'FAILURE',
-                //             'value' => 2
-                //         ],
-                //         [
-                //             'label' => 'COMPLETED',
-                //             'value' => 3
-                //         ],
-                //     ],
-                //     'col' => [
-                //         'cols' => 10,
-                //         'sm' => 10,
-                //         'md' => 6,
-                //         'lg' => 6,
-                //         'xl' => 4
-                //     ],
-                //     'offset' => [
-                //         'offset' => 0,
-                //         'offset-sm' => 2,
-                //         'offset-md' => 0,
-                //         'offset-lg' => 0
-                //     ],
-                //     'order' => [
-                //         'order' => 4,
-                //         'order-sm' => 4,
-                //         'order-md' => 4,
-                //         'order-lg' => 4,
-                //         'order-xl' => 4,
-                //     ],
-                //     'prepend-icon' => 'mdi-chart-arc',
-                //     'activeClass' => '',
-                //     'color' => 'success',
-                //     'mandatory',
-                //     'row',
-                //     'color' => 'error',
-                //     'on-icon' => '$radioOn',
-                //     'off-icon' => '$radioOff',
+                    'prepend-icon' => 'mdi-glass-stange',
+                    'color' => 'success',
+                    // 'readonly',
+                    'dense',
+                    // 'disabled',
+                    // 'error',
+                    'flat',
+                    // 'full-width',
+                    'hide-spin-buttons',
+                    // 'false-value' => false,
+                    // 'false-value' => true,
+                    // 'true-value' => false,
+                    // 'appendIcon' => 'mdi-dropbox',
+                    // 'prependIcon' => 'mdi-radioactive',
+                    // 'offIcon' => 'mdi-inactive',
+                    // 'onIcon' => 'mdi-radioactive',
 
-                // ],
-                // 'reports' => [
-                //     'type' => 'file',
-                //     'name' => 'reports',
-                //     'label' => 'Reports',
-                //     'default' => [],
-                //     // 'accept' => "image/*,.doc,.docx,.pdf",
-                //     'showSize' => true,
-                //     'counter' => true,
-                //     'col' => [
-                //         'cols' => 10,
-                //         'sm' => 10,
-                //         'md' => 6,
-                //         'lg' => 6,
-                //         'xl' => 4
-                //     ],
-                //     'offset' => [
-                //         'offset' => 0,
-                //         'offset-sm' => 2,
-                //         'offset-md' => 0,
-                //         'offset-lg' => 0
-                //     ],
-                //     'order' => [
-                //         'order' => 5,
-                //         'order-sm' => 5,
-                //         'order-md' => 5,
-                //         'order-lg' => 5,
-                //         'order-xl' => 5,
-                //     ],
-                //     'small-chips',
-                //     'prependIcon' => 'mdi-camera',
-                //     'prependInnerIcon' => '',
-                //     'outlined',
-                //     'dense'
-                // ],
-                // 'day_interval' => [
-                //     // 'type' => 'text',
-                //     // 'ext' => 'custom-input-range',
-                //     'type' => 'custom-input-range',
-                //     'name' => 'day_interval',
-                //     'label' => 'Day Interval:0',
-                //     'hint' => 'Day Interval Hint',
-                //     'default' => [0,100],
-                //     // 'default' => 0,
-                //     'col' => [
-                //         'cols' => 10,
-                //         'sm' => 10,
-                //         'md' => 6,
-                //         'lg' => 6,
-                //         'xl' => 4
-                //     ],
-                //     'offset' => [
-                //         'offset' => 0,
-                //         'offset-sm' => 2,
-                //         'offset-md' => 0,
-                //         'offset-lg' => 0
-                //     ],
-                //     'order' => [
-                //         'order' => 6,
-                //         'order-sm' => 6,
-                //         'order-md' => 6,
-                //         'order-lg' => 6,
-                //         'order-xl' => 6,
-                //     ],
+                ],
+                'status' => [
+                    // 'label' => 'Status',
+                    '_name' => 'status',
+                    'type' => 'radio',
+                    'default' => 1,
+                    'options' => [
+                        [
+                            'label' => 'WAITING',
+                            'value' => 1
+                        ],
+                        [
+                            'label' => 'FAILURE',
+                            'value' => 2
+                        ],
+                        [
+                            'label' => 'COMPLETED',
+                            'value' => 3
+                        ],
+                    ],
+                    'col' => [
+                        'cols' => 10,
+                        'sm' => 10,
+                        'md' => 6,
+                        'lg' => 6,
+                        'xl' => 4
+                    ],
+                    'offset' => [
+                        'offset' => 0,
+                        'offset-sm' => 2,
+                        'offset-md' => 0,
+                        'offset-lg' => 0
+                    ],
+                    'order' => [
+                        'order' => 4,
+                        'order-sm' => 4,
+                        'order-md' => 4,
+                        'order-lg' => 4,
+                        'order-xl' => 4,
+                    ],
+                    'prepend-icon' => 'mdi-chart-arc',
+                    'activeClass' => '',
+                    'color' => 'success',
+                    'mandatory',
+                    'row',
+                    'color' => 'error',
+                    'on-icon' => '$radioOn',
+                    'off-icon' => '$radioOff',
 
-                //     'max' => 100,
-                //     'min' => 0,
-                //     'tick-size' => 1,
-                //     'thumb-label' => 'always'
-                //     // 'background-color' => 'success',
-                // ],
-                // 'color' => [
-                //     // 'type' => 'text',
-                //     // 'ext' => 'color',
-                //     'type' => 'custom-input-color',
-                //     'label' => 'Color',
-                //     'name' => 'color',
-                //     'default' => '#32010121',
+                ],
+                'reports' => [
+                    'type' => 'file',
+                    '_name' => 'reports',
+                    'label' => 'Reports',
+                    'default' => [],
+                    // 'accept' => "image/*,.doc,.docx,.pdf",
+                    'showSize' => true,
+                    'counter' => true,
+                    'col' => [
+                        'cols' => 10,
+                        'sm' => 10,
+                        'md' => 6,
+                        'lg' => 6,
+                        'xl' => 4
+                    ],
+                    'offset' => [
+                        'offset' => 0,
+                        'offset-sm' => 2,
+                        'offset-md' => 0,
+                        'offset-lg' => 0
+                    ],
+                    'order' => [
+                        'order' => 5,
+                        'order-sm' => 5,
+                        'order-md' => 5,
+                        'order-lg' => 5,
+                        'order-xl' => 5,
+                    ],
+                    'small-chips',
+                    'prependIcon' => 'mdi-camera',
+                    'prependInnerIcon' => '',
+                    'outlined',
+                    'dense'
+                ],
+                'day_interval' => [
+                    // 'type' => 'text',
+                    // 'ext' => 'custom-input-range',
+                    'type' => 'custom-input-range',
+                    '_name' => 'day_interval',
+                    'label' => 'Day Interval:0',
+                    'hint' => 'Day Interval Hint',
+                    'default' => [0,100],
+                    // 'default' => 0,
+                    'col' => [
+                        'cols' => 10,
+                        'sm' => 10,
+                        'md' => 6,
+                        'lg' => 6,
+                        'xl' => 4
+                    ],
+                    'offset' => [
+                        'offset' => 0,
+                        'offset-sm' => 2,
+                        'offset-md' => 0,
+                        'offset-lg' => 0
+                    ],
+                    'order' => [
+                        'order' => 6,
+                        'order-sm' => 6,
+                        'order-md' => 6,
+                        'order-lg' => 6,
+                        'order-xl' => 6,
+                    ],
 
-                //     'col' => [
-                //         'cols' => 10,
-                //         'sm' => 10,
-                //         'md' => 6,
-                //         'lg' => 6,
-                //         'xl' => 4
-                //     ],
-                //     'offset' => [
-                //         'offset' => 0,
-                //         'offset-sm' => 2,
-                //         'offset-md' => 0,
-                //         'offset-lg' => 0,
-                //         'offset-xl' => 0,
-                //     ],
-                //     'order' => [
-                //         'order' => 7,
-                //         'order-sm' => 7,
-                //         'order-md' => 7,
-                //         'order-lg' => 7,
-                //         'order-xl' => 7,
-                //     ],
+                    'max' => 100,
+                    'min' => 0,
+                    'tick-size' => 1,
+                    'thumb-label' => 'always'
+                    // 'background-color' => 'success',
+                ],
+                'color' => [
+                    // 'type' => 'text',
+                    // 'ext' => 'color',
+                    'type' => 'custom-input-color',
+                    'label' => 'Color',
+                    '_name' => 'color',
+                    'default' => '#32010121',
 
-                //     'placeholder' => '#FFDD11FF',
-                //     // 'dotSize' => 'rgba',
-                //     'prepend-icon' => 'mdi-palette',
-                //     'props' => [
-                //         'dotSize' => 25,
-                //         'maxHeight' => 200,
-                //     ]
-                // ],
-                // 'start_date' => [
-                //     'type' => 'custom-input-date',
-                //     'label' => 'Start Date',
-                //     'name' => 'start_date',
-                //     'default' => '',
-                //     'col' => [
-                //         'cols' => 10,
-                //         'sm' => 10,
-                //         'md' => 6,
-                //         'lg' => 6,
-                //         'xl' => 4
-                //     ],
-                //     'offset' => [
-                //         'offset' => 0,
-                //         'offset-sm' => 2,
-                //         'offset-md' => 0,
-                //         'offset-lg' => 0,
-                //         'offset-xl' => 0,
-                //     ],
-                //     'order' => [
-                //         'order' => 8,
-                //         'order-sm' => 8,
-                //         'order-md' => 8,
-                //         'order-lg' => 8,
-                //         'order-xl' => 8,
-                //     ],
-                //     'color' => "red lighten-1",
-                //     'prepend-icon' => 'mdi-calendar',
-                //     // 'prepend-inner-icon' => 'mdi-calendar',
-                //     'dense',
-                //     'outlined',
+                    'col' => [
+                        'cols' => 10,
+                        'sm' => 10,
+                        'md' => 6,
+                        'lg' => 6,
+                        'xl' => 4
+                    ],
+                    'offset' => [
+                        'offset' => 0,
+                        'offset-sm' => 2,
+                        'offset-md' => 0,
+                        'offset-lg' => 0,
+                        'offset-xl' => 0,
+                    ],
+                    'order' => [
+                        'order' => 7,
+                        'order-sm' => 7,
+                        'order-md' => 7,
+                        'order-lg' => 7,
+                        'order-xl' => 7,
+                    ],
 
-                //     'picker_props' => [
-                //         // 'type' => 'month',
-                //         'color' => 'success',
-                //         'header-color' => 'info',
-                //         'min' => "2022-01-01",
-                //         'max' => "2025-12-31",
-                //         'first-day-of-week' => '1',
-                //         // 'show-adjacent-months',
-                //         // 'range',
-                //     ]
-                // ],
-                // 'start_time' => [
-                //     'type' => 'custom-input-time',
-                //     'label' => 'Start Time',
-                //     'name' => 'start_time',
-                //     'default' => '',
-                //     'col' => [
-                //         'cols' => 10,
-                //         'sm' => 10,
-                //         'md' => 6,
-                //         'lg' => 6,
-                //         'xl' => 4
-                //     ],
-                //     'offset' => [
-                //         'offset' => 0,
-                //         'offset-sm' => 2,
-                //         'offset-md' => 0,
-                //         'offset-lg' => 0,
-                //         'offset-xl' => 0,
-                //     ],
-                //     'order' => [
-                //         'order' => 8,
-                //         'order-sm' => 8,
-                //         'order-md' => 8,
-                //         'order-lg' => 8,
-                //         'order-xl' => 8,
-                //     ],
-                //     'color' => "red lighten-1",
-                //     'prepend-icon' => 'mdi-timer',
-                //     'prepend-inner-icon' => '',
-                //     'dense',
-                //     'outlined',
-                //     'picker_props' => [
-                //         'color' => 'success',
-                //         'header-color' => 'info',
-                //         'scrollable',
+                    'placeholder' => '#FFDD11FF',
+                    // 'dotSize' => 'rgba',
+                    'prepend-icon' => 'mdi-palette',
+                    'props' => [
+                        'dotSize' => 25,
+                        'maxHeight' => 200,
+                    ]
+                ],
+                'start_date' => [
+                    'type' => 'custom-input-date',
+                    'label' => 'Start Date',
+                    '_name' => 'start_date',
+                    'default' => '',
+                    'col' => [
+                        'cols' => 10,
+                        'sm' => 10,
+                        'md' => 6,
+                        'lg' => 6,
+                        'xl' => 4
+                    ],
+                    'offset' => [
+                        'offset' => 0,
+                        'offset-sm' => 2,
+                        'offset-md' => 0,
+                        'offset-lg' => 0,
+                        'offset-xl' => 0,
+                    ],
+                    'order' => [
+                        'order' => 8,
+                        'order-sm' => 8,
+                        'order-md' => 8,
+                        'order-lg' => 8,
+                        'order-xl' => 8,
+                    ],
+                    'color' => "red lighten-1",
+                    'prepend-icon' => 'mdi-calendar',
+                    // 'prepend-inner-icon' => 'mdi-calendar',
+                    'dense',
+                    'outlined',
 
-                //         // 'format' => '24hr',
-                //         // 'min' => "8:00",
-                //         // 'max' => "19:00",
-                //         // 'width' => '500px',
+                    'picker_props' => [
+                        // 'type' => 'month',
+                        'color' => 'success',
+                        'header-color' => 'info',
+                        'min' => "2022-01-01",
+                        'max' => "2025-12-31",
+                        'first-day-of-week' => '1',
+                        // 'show-adjacent-months',
+                        // 'range',
+                    ]
+                ],
+                'start_time' => [
+                    'type' => 'custom-input-time',
+                    'label' => 'Start Time',
+                    '_name' => 'start_time',
+                    'default' => '',
+                    'col' => [
+                        'cols' => 10,
+                        'sm' => 10,
+                        'md' => 6,
+                        'lg' => 6,
+                        'xl' => 4
+                    ],
+                    'offset' => [
+                        'offset' => 0,
+                        'offset-sm' => 2,
+                        'offset-md' => 0,
+                        'offset-lg' => 0,
+                        'offset-xl' => 0,
+                    ],
+                    'order' => [
+                        'order' => 8,
+                        'order-sm' => 8,
+                        'order-md' => 8,
+                        'order-lg' => 8,
+                        'order-xl' => 8,
+                    ],
+                    'color' => "red lighten-1",
+                    'prepend-icon' => 'mdi-timer',
+                    'prepend-inner-icon' => '',
+                    'dense',
+                    'outlined',
+                    'picker_props' => [
+                        'color' => 'success',
+                        'header-color' => 'info',
+                        'scrollable',
 
-                //         // 'landscape' => '$vuetify.breakpoint.smAndUp',
+                        // 'format' => '24hr',
+                        // 'min' => "8:00",
+                        // 'max' => "19:00",
+                        // 'width' => '500px',
 
-                //         // 'ampm-in-title'
-                //         // 'no-title',
-                //         // 'use-seconds',
-                //         // 'landscape',
-                //     ]
-                // ],
-                // 'icon' => [
-                //     'type' => 'custom-input-icon',
-                //     'name' => 'icon',
-                //     'label' => 'Icon Selector',
-                //     'col' => [
-                //         'cols' => 10,
-                //         'sm' => 10,
-                //         'md' => 6,
-                //         'lg' => 6,
-                //         'xl' => 4
-                //     ],
-                //     'offset' => [
-                //         'offset' => 0,
-                //         'offset-sm' => 2,
-                //         'offset-md' => 0,
-                //         'offset-lg' => 0,
-                //         'offset-xl' => 0,
-                //     ],
-                //     'order' => [
-                //         'order' => 9,
-                //         'order-sm' => 9,
-                //         'order-md' => 9,
-                //         'order-lg' => 9,
-                //         'order-xl' => 9,
-                //     ],
-                //     'dense',
-                //     'outlined',
-                //     'prepend-icon' => 'mdi-card-text-outline',
-                // ]
+                        // 'landscape' => '$vuetify.breakpoint.smAndUp',
+
+                        // 'ampm-in-title'
+                        // 'no-title',
+                        // 'use-seconds',
+                        // 'landscape',
+                    ]
+                ],
+                'icon' => [
+                    'type' => 'custom-input-icon',
+                    '_name' => 'icon',
+                    'label' => 'Icon Selector',
+                    'col' => [
+                        'cols' => 10,
+                        'sm' => 10,
+                        'md' => 6,
+                        'lg' => 6,
+                        'xl' => 4
+                    ],
+                    'offset' => [
+                        'offset' => 0,
+                        'offset-sm' => 2,
+                        'offset-md' => 0,
+                        'offset-lg' => 0,
+                        'offset-xl' => 0,
+                    ],
+                    'order' => [
+                        'order' => 9,
+                        'order-sm' => 9,
+                        'order-md' => 9,
+                        'order-lg' => 9,
+                        'order-xl' => 9,
+                    ],
+                    'dense',
+                    'outlined',
+                    'prepend-icon' => 'mdi-card-text-outline',
+                ]
             ],
             'rules' => [
                 'view' => [],
