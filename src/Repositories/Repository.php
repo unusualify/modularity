@@ -876,9 +876,14 @@ abstract class Repository
                 $relationName = $this->getCamelCase($matches[1]);
 
                 if(method_exists($this->getModel(), $relationName)){
-                    $foreignKey = $this->getForeignKeyFromName($relationName);
-                    // $tableName = $this->getTableNameFromName($relationName);
+                    $related = $this->getModel()->{$relationName}();
 
+                    $foreignKey = $related->getForeignKeyName();
+
+                    if(method_exists($related, 'getSecondLocalKeyName')){ // for hasOneThrough relationship
+                        $foreignKey = $related->getSecondLocalKeyName();
+                    }
+                    // $tableName = $this->getTableNameFromName($relationName);
                     $scopes[$foreignKey] = $value;
                     $this->addRelationFilterScope($query, $scopes, $foreignKey, $relationName);
                 }
@@ -903,7 +908,10 @@ abstract class Repository
                 }
             }
         }
-
+        // dd(
+        //     $scopes,
+        //     $query->toSql()
+        // );
         return $query;
     }
 
