@@ -49,12 +49,12 @@ trait ManageUtilities {
         ] + $this->getViewLayoutVariables();
         // $baseUrl = $this->getPermalinkBaseUrl();
         // dd($this->tableAttributes, $this->getViewLayoutVariables());
-
         $options = [
             'moduleName' => $this->getHeadline($this->moduleName),
             'translate' => $this->routeHas('translations') || $this->hasTranslatedInput(),
 
-            'tableAttributes' => array_merge_recursive_preserve(
+            'tableAttributes' => ['rowActions' => $this->getTableActions()]
+            + array_merge_recursive_preserve(
                 [
                     'name' => $this->getHeadline($this->routeName),
                     'titleKey' => $this->titleColumnKey,
@@ -65,8 +65,7 @@ trait ManageUtilities {
                 ? ['titlePrefix' => $this->nestedParentModel->{'name'} . ' \ ' ]
                 : []
             )
-            + ['nestedData' => $this->getNestedData()]
-            + ['rowActions' => $this->getTableActions()],
+            + ['nestedData' => $this->getNestedData()],
 
             'listOptions' => $this->getVuetifyDatatableOptions(), // options to be used in unusual table components in datatable store
 

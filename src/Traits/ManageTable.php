@@ -249,6 +249,10 @@ trait ManageTable {
         }else{
         }
 
+        if(count($actions) > 3){
+            $this->tableAttributes['rowActionsType'] = 'dropdown';
+        }
+
         // dd($actions);
         return $actions;
     }
