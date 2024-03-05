@@ -908,7 +908,11 @@ class RouteGenerator extends Generator
                 'headers' => $routeArray['headers'] ?? $this->getHeaders(),
                 'inputs' => $routeArray['inputs'] ?? $this->getInputs(),
             ];
-            $config['routes'][$this->getSnakeCase($this->getName())] = $route_array;
+
+
+
+            $config['routes'][$this->getSnakeCase($this->getName())] = array_merge($config['routes'][$this->getSnakeCase($this->getName())], $route_array);
+
 
             uksort($config, fn($a) => is_string($config[$a]) ?  -1 : (is_bool($config[$a]) ?  0 : 1));
             $this->module->setConfig($config);
