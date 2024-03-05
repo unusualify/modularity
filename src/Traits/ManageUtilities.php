@@ -61,7 +61,10 @@ trait ManageUtilities {
                 ],
                 $this->tableAttributes,
             )
-            + ($this->nested ? ['titlePrefix' => $this->nestedParentModel->{$this->titleColumnKey ?? 'name'} . ' \ ' ] : [])
+            + ($this->nested
+                ? ['titlePrefix' => $this->nestedParentModel->{'name'} . ' \ ' ]
+                : []
+            )
             + ['nestedData' => $this->getNestedData()]
             + ['rowActions' => $this->getTableActions()],
 
