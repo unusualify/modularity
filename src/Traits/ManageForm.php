@@ -20,7 +20,7 @@ trait ManageForm {
 
     protected function addWithsManageForm() : array
     {
-        // $this->indexWith += collect($schema)->filter(function($item){
+               // $this->indexWith += collect($schema)->filter(function($item){
         return collect(array2Object($this->formSchema))->filter(function($input){
             // return $this->hasWithModel($item['type']);
             return in_array($input->type, [
@@ -87,10 +87,12 @@ trait ManageForm {
 
     protected function getSchemaInput($input, $inputs = [])
     {
+
         // $default_input = collect(Config::get(unusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
         // $default_input = $this->configureInput(array2Object(Config::get(unusualBaseKey() . '.default_input')));
         $default_input = (array) Config::get(unusualBaseKey() . '.default_input');
         [$hydrated, $arrayable] = $this->hydrateInput(object2Array($input), $inputs);
+
 
         if($arrayable){
             return $hydrated;
@@ -273,6 +275,12 @@ trait ManageForm {
                         }
                     }
                 }
+                if(isset($input['ext'])){
+                    //FIXME: carry it to up repository (switch case)
+                    $extensionMethods = explode('|',$input['ext']);
+                    $extensionColumnNames = collect($extensionMethods)->filter(fn($method) => in_array(explode(':', $method)[0], ['lock']))->map(fn($method) => explode(':',$method)[1])->toArray();
+                    $items = $relation_class->list([$input['itemTitle'], ...$extensionColumnNames],$with)->toArray();
+                }
 
                 if(count($items) && isset($items[0][$input['itemValue']]) && $items[0][$input['itemValue']]){
                     array_unshift($items, [
@@ -281,19 +289,12 @@ trait ManageForm {
                     ]);
                 }
 
-                if(isset($input['permalinkable']) && $input['permalinkable']){
-                    foreach ($this->getConfigFieldsByRoute('inputs') as $key => $_input) {
-                        if( isset($_input->ext)
-                            && in_array($_input->ext, ['permalink'])
-                        ){
-                            $input['event'] = 'formatPermalinkPrefix:slug:' . $this->getSnakeNameFromForeignKey($input['name']);
-                        }
-                    }
-                }
+
 
                 $data = Arr::except($input, ['route','model', 'cascades']) + [
                     'items' => $items
                 ];
+
                 // if($input['name'] == 'surveys')
                 //     dd($data);
             break;
@@ -574,49 +575,67 @@ trait ManageForm {
 
                 break;
         }
-
         if(isset($input['ext'])){
-            switch ($input['ext']) {
-                case 'permalink':
-                    # code...
-                    $data = $data ?? [];
-                    $arrayable = true;
-
-                    $permalinkPrefix = getHost() . '/';
-                    $permalinkPrefixFormat = getHost() . '/';
-                    foreach ($inputs as $key => $_input) {
-                        if( isset($_input->type)
-                            && in_array($_input->type, ['select', 'combobox', 'hidden'])
-                            && isset($_input->repository)
-                        ){
-                            $permalinkPrefixFormat .= ":{$this->getSnakeNameFromForeignKey($_input->name)}" . '/';
+            $patterns = explode('|', $input['ext']);
+            $events = [];
+            $extraInputs = [];
+            foreach ($patterns as $key => $pattern) {
+                [$methodName, $formattedInput, $parentColumnName] = array_pad(explode(':',$pattern), 3, null);
+                switch ($methodName) {
+                    case 'permalinkPrefix':
+                        foreach ($this->getConfigFieldsByRoute('inputs') as $key => $_input) {
+                            if(
+                                isset($_input->ext)
+                                && in_array(explode(':', $_input->ext)[0], ['permalink']
+                            )
+                            ){
+                                $events[] = 'formatPermalinkPrefix:'.$formattedInput.':' . $this->getSnakeNameFromForeignKey($input['name']);
+                            }
                         }
-                    }
+                        // dd($data);
+                        break;
+                    case 'lock':
+                        $events[] = 'formatLock:'. $formattedInput .':' . $parentColumnName;
+                        break;
+                    case 'permalink':
+                        $permalinkPrefix = getHost() . '/';
+                        $permalinkPrefixFormat = getHost() . '/';
+                        foreach ($inputs as $key => $_input) {
+                            if( isset($_input->type)
+                                && in_array($_input->type, ['select', 'combobox', 'hidden'])
+                                && isset($_input->repository)
+                                && isset($_input->ext)
+                            ){
+                                $permalinkPrefixFormat .= ":{$this->getSnakeNameFromForeignKey($_input->name)}" . '/';
+                            }
+                        }
+                        $extraInputs += $this->getSchemaInput([
+                            'type' => 'text',
+                            'name' => 'slug',
+                            'ref' => 'permalink',
+                            'label' => 'Permalink',
+                            'prefix' => $permalinkPrefix,
+                            'prefixFormat' => $permalinkPrefixFormat,
+                            'readonly' => true
+                        ]);
+                        unset($input['ext']);
+                        $events[] = 'formatPermalink:'.$formattedInput;
+                        break;
 
-                    $permalinkInput = $this->getSchemaInput([
-                        'type' => 'text',
-                        'name' => 'slug',
-                        'ref' => 'permalink',
-                        'label' => 'Permalink',
-                        'prefix' => $permalinkPrefix,
-                        'prefixFormat' => $permalinkPrefixFormat,
-                        'readonly' => true
-                    ]);
-                    unset($input['ext']);
-                    $data += $this->getSchemaInput(
-                        $input + [
-                            'event' => 'formatPermalink:slug',
-                            // 'v-on:change' => 'formatPermalink',
-                            // 'onChange' => 'formatPermalink'
-                        ]
-                    );
-                    $data += $permalinkInput;
-                    break;
-
-
-                default:
-                    // unset($input['ext']);
-                    break;
+                    default:
+                        # code...
+                        break;
+                }
+            }
+            if(!empty($events)){
+                $data = (array)($data ?? $input);
+                $data['event'] = implode('|',$events);
+            }
+            if(!empty($extraInputs)){
+                $arrayable = true;
+                $_input = (array)($data ?? $input);
+                $data = [];
+                $data = $this->getSchemaInput($_input)+$extraInputs;
             }
         }
 

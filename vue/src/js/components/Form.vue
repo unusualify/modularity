@@ -386,6 +386,7 @@ export default {
     handleInput (v, s) {
       const { on, key, value, obj } = v
 
+
       if (on === 'input' && !!key && !!value) {
         if (!this.serverValid) {
           this.resetSchemaError(key)
@@ -393,33 +394,38 @@ export default {
 
         if (__isset(obj.schema.event)) {
           // let methodName, args;
-          const [methodName, ...args] = obj.schema.event.split(':')
-          let newValue
-          switch (methodName) {
-            case 'formatPermalink':
-              // args[0] permalink input name
-              this.model[args[0]] = this[methodName](value)
+          const formatEvents = obj.schema.event.split('|');
+          formatEvents.forEach(element => {
+            const [methodName, formattedInput, parentColumnName] = element.split(':');
+            switch (methodName) {
+              case 'formatPermalink':
+                 this.model[formattedInput] = this.formatPermalink(value);
+                break;
 
-              break
-            case 'formatPermalinkPrefix':
-              // args[0] permalink input name
-              // args[1] regex slug
-              // args[2] itemTitle
-              newValue = this.formatPermalink(obj.schema.items.find((item) => item[obj.schema.itemValue] === value)[obj.schema.itemTitle])
-              if (['select', 'combobox'].includes(obj.schema.type)) {
-                this.inputSchema[args[0] ?? 'slug'].prefix = this.inputSchema[args[0] ?? 'slug'].prefixFormat.replace(':' + args[1], newValue)
-              }
+              case 'formatPermalinkPrefix':
+                let newValue = this.formatPermalink(obj.schema.items.find((item) => item[obj.schema.itemValue] === value)[obj.schema.itemTitle])
+                if(['select', 'combobox'].includes(obj.schema.type)){
+                  this.inputSchema[formattedInput ?? 'slug'].prefix = this.inputSchema[formattedInput ?? 'slug'].prefixFormat.replace(':' + parentColumnName, newValue)
+                }
+                break;
+              case 'formatLock':
+                const lockInput = obj.schema.items.find((item) => item[obj.schema.itemValue] === value)[parentColumnName];
+                if(lockInput){
+                  this.inputSchema[formattedInput].disabled = true;
+                  this.inputSchema[formattedInput].focused = true;
+                  this.inputSchema[formattedInput].placeHolder = lockInput;
+                }else{
+                  this.inputSchema[formattedInput].disabled = false;
+                  this.inputSchema[formattedInput].focused = false;
+                  this.inputSchema[formattedInput].placeHolder = '';
+                }
+                break;
 
-              break
+              default:
+                break;
+            }
 
-            default:
-              break
-          }
-          // this[methodName](value)
-          // if (typeof this[methodName] === 'function') {
-          //   // safe to use the function
-
-          // }
+          });
         }
         // __log(on, key, value, obj)
       }
