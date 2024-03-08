@@ -55,7 +55,6 @@
               <template v-if="_slot.type == 'form'">
                 <v-custom-form-base
                   :id="`ue-wrapper-${id}-${_slot.name}`"
-
                   v-model="model"
                   v-model:schema="_slot.schema"
                   :row="rowAttribute"
@@ -386,24 +385,38 @@ export default {
     handleInput (v, s) {
       const { on, key, value, obj } = v
 
-
       if (on === 'input' && !!key && !!value) {
         if (!this.serverValid) {
           this.resetSchemaError(key)
         }
 
+
+
+
+
+
+
+        if(obj.schema.type === 'custom-input-repeater'){
+
+
+        }
+
         if (__isset(obj.schema.event)) {
           // let methodName, args;
           const formatEvents = obj.schema.event.split('|');
+          __log(formatEvents);
           formatEvents.forEach(element => {
             const [methodName, formattedInput, parentColumnName] = element.split(':');
+
             switch (methodName) {
               case 'formatPermalink':
                  this.model[formattedInput] = this.formatPermalink(value);
                 break;
 
               case 'formatPermalinkPrefix':
+
                 let newValue = this.formatPermalink(obj.schema.items.find((item) => item[obj.schema.itemValue] === value)[obj.schema.itemTitle])
+
                 if(['select', 'combobox'].includes(obj.schema.type)){
                   this.inputSchema[formattedInput ?? 'slug'].prefix = this.inputSchema[formattedInput ?? 'slug'].prefixFormat.replace(':' + parentColumnName, newValue)
                 }

@@ -36,7 +36,7 @@
                       <v-custom-form-base
                         :id="`ue-repeater-form-${itemSlot.index}`"
                         :modelValue="itemSlot.element"
-                        @update:modelValue="onUpdateRepeaterInput($event, itemSlot.index)"
+                        @update:modelValue="onUpdateModel($event, itemSlot.index)"
                         :schema="repeaterSchemas[itemSlot.index]"
                         @update:schema="console.log(repeaterSchemas[itemSlot.index])"
                         :row="rowAttribute"
@@ -113,6 +113,7 @@ export default {
   components: {
     draggable
   },
+  emits: ['update:modelValue'],
   setup (props, context) {
     return {
       ...useDraggable(props, context),
@@ -131,7 +132,12 @@ export default {
     }
   },
   computed: {},
-  methods: {},
+  methods: {
+    onUpdateModel(event, index){
+      this.onUpdateRepeaterInput(event, index);
+      this.$emit('update:modelValue', this.modelValue);
+    }
+  },
   watch: {},
   created () {
   }

@@ -533,13 +533,23 @@ trait ManageForm {
 
                 if($relationType){
 
-                    $input['schema'] = $this->createFormSchema(Collection::make($relationshipInputs)->map(function($input) use($foreignKey){
-                        if(isset($input['name']) && $foreignKey == $input['name']){
-                            $input['type'] = 'hidden';
+                    $input['schema'] = $this->createFormSchema(Collection::make($relationshipInputs)->map(function($_input) use($foreignKey, $pluralRelationshipName){
+                        if(isset($_input['name']) && $foreignKey == $_input['name']){
+                            $_input['type'] = 'hidden';
                         }
+                        $newExt = '';
+                         if(isset($_input['ext'])){
+                                foreach (explode('|',$_input['ext']) as $pattern) {
+                                    [$methodName, $formattedInput, $parentColumnName] = array_pad(explode(':', $pattern),3, null);
+                                    $newFormattedInput = $methodName .':'. $pluralRelationshipName .'.'. $formattedInput .':'.$parentColumnName;
+                                     $newExt .= !empty($newExt) ? '|'.$newFormattedInput : $newFormattedInput;
+                                }
+                                $_input['ext'] = $newExt;
 
-                        return $input;
-                    })->toArray());
+                            }
+                            return $_input;
+                        })->toArray());
+
 
 
                     $input['name'] = $relationshipName;
@@ -591,6 +601,7 @@ trait ManageForm {
                             ){
                                 $events[] = 'formatPermalinkPrefix:'.$formattedInput.':' . $this->getSnakeNameFromForeignKey($input['name']);
                             }
+
                         }
                         // dd($data);
                         break;
@@ -601,6 +612,7 @@ trait ManageForm {
                         $permalinkPrefix = getHost() . '/';
                         $permalinkPrefixFormat = getHost() . '/';
                         foreach ($inputs as $key => $_input) {
+
                             if( isset($_input->type)
                                 && in_array($_input->type, ['select', 'combobox', 'hidden'])
                                 && isset($_input->repository)
@@ -608,7 +620,17 @@ trait ManageForm {
                             ){
                                 $permalinkPrefixFormat .= ":{$this->getSnakeNameFromForeignKey($_input->name)}" . '/';
                             }
+
+                            if( isset($_input->type)
+                              &&in_array($_input->type, ['relationship'])
+                            ){
+                                $events[] = 'formatPermalinkPrefix:'. pluralize($this->getCamelCase($_input->name)) .'.'. $formattedInput;
+                            }
+
+
                         }
+
+
                         $extraInputs += $this->getSchemaInput([
                             'type' => 'text',
                             'name' => 'slug',
