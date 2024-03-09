@@ -391,20 +391,11 @@ export default {
         }
 
 
-
-
-
-
-
-        if(obj.schema.type === 'custom-input-repeater'){
-
-
-        }
+        // TODO: Repeaterda name değiştirince permalink dolması olayı obj.schema.schema ilgili inputta
+        // event olup olmaması ile ilgili ne yapacağuk bilmiyorum.
 
         if (__isset(obj.schema.event)) {
-          // let methodName, args;
           const formatEvents = obj.schema.event.split('|');
-          __log(formatEvents);
           formatEvents.forEach(element => {
             const [methodName, formattedInput, parentColumnName] = element.split(':');
 
@@ -414,11 +405,14 @@ export default {
                 break;
 
               case 'formatPermalinkPrefix':
-
-                let newValue = this.formatPermalink(obj.schema.items.find((item) => item[obj.schema.itemValue] === value)[obj.schema.itemTitle])
-
                 if(['select', 'combobox'].includes(obj.schema.type)){
+                  let newValue = this.formatPermalink(obj.schema.items.find((item) => item[obj.schema.itemValue] === value)[obj.schema.itemTitle])
                   this.inputSchema[formattedInput ?? 'slug'].prefix = this.inputSchema[formattedInput ?? 'slug'].prefixFormat.replace(':' + parentColumnName, newValue)
+                }else{
+                  // FIXME: I think its not robust -ilker (the condition part)
+                  let newValue = this.formatPermalink(value);
+                  const [firstLevelName , secondLevelName] = formattedInput.split('.');
+                  this.inputSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefix = this.inputSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefixFormat.replace(':' + parentColumnName, newValue)
                 }
                 break;
               case 'formatLock':
