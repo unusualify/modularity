@@ -65,5 +65,15 @@ return [
             'description' => 'Whether model has pricing trait or not'
         ]
     ],
+    'addAuthorized' => [
+        'model' => 'IsAuthorizedable',
+        'repository' => 'AuthorizedTrait',
+        'question' => 'Do you need to add authorized feature on this module?',
+        'command_option' => [
+            'shortcut' => '--A',
+            'input_type' => InputOption::VALUE_NONE,
+            'description' => 'Authorized models to indicate scopes'
+        ]
+    ],
 ];
 

@@ -96,7 +96,7 @@
                 window['{{ unusualConfig('js_namespace') }}'].STORE.medias.types.push({
                     value: 'image',
                     text: '{{ unusualTrans("media-library.images") }}',
-                    total: {{ \Unusualify\Modularity\Entities\Media::count() }},
+                    total: {{ \Unusualify\Modularity\Entities\Media::query()->authorized()->count() }},
                     endpoint: '{{ route(Route::hasAdmin('media-library.media.index')) }}',
                     tagsEndpoint: '{{ route(Route::hasAdmin('media-library.media.tags')) }}',
                     uploaderConfig: {!! json_encode($mediasUploaderConfig) !!}
@@ -108,7 +108,7 @@
                 window['{{ unusualConfig('js_namespace') }}'].STORE.medias.types.push({
                     value: 'file',
                     text: '{{ unusualTrans("media-library.files") }}',
-                    total: {{ \Unusualify\Modularity\Entities\File::count() }},
+                    total: {{ \Unusualify\Modularity\Entities\File::query()->authorized()->count() }},
                     endpoint: '{{ route(Route::hasAdmin('file-library.file.index')) }}',
                     tagsEndpoint: '{{ route(Route::hasAdmin('file-library.file.tags')) }}',
                     uploaderConfig: {!! json_encode($filesUploaderConfig) !!}

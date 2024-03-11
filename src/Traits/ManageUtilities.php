@@ -30,16 +30,16 @@ trait ManageUtilities {
     protected function getIndexData($prependScope = [])
     {
         $data = [
-            // 'hiddenFilters' => array_keys(Arr::except($this->filters, array_keys($this->defaultFilters))),
-            // 'filterLinks' => $this->filterLinks ?? [],
             'initialResource' => $this->getJSONData(), //
             'tableMainFilters' => $this->getTableMainFilters(),
             'filters' => json_decode($this->request->get('filter'), true) ?? [],
             'requestFilter' => json_decode(request()->get('filter'), true) ?? [],
             'searchText' =>  request()->has('search') ? request()->query('search') : "", // for current text of search parameter
-
             'headers' => $this->getIndexTableColumns(), // headers to be used in unusual datatable component
             'formSchema'  => $this->formSchema, // input fields to be used in unusual datatable component
+
+            // 'hiddenFilters' => array_keys(Arr::except($this->filters, array_keys($this->defaultFilters))),
+            // 'filterLinks' => $this->filterLinks ?? [],
             /***
              * TODO variables to be assigned dynamically
              *
@@ -71,7 +71,6 @@ trait ManageUtilities {
 
             // 'routeName' => $this->getHeadline($this->routeName),
             // 'translateTitle' => $this->titleIsTranslatable(),
-
 
             // 'skipCreateModal' => $this->getIndexOption('skipCreateModal'),
             // 'reorder' => $this->getIndexOption('reorder'),
