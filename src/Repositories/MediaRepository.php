@@ -6,11 +6,12 @@ use Unusualify\Modularity\Entities\Media;
 use Unusualify\Modularity\Repositories\Traits\TagsTrait;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
+use Unusualify\Modularity\Repositories\Traits\AuthorizedTrait;
 use Unusualify\Modularity\Services\MediaLibrary\ImageService;
 
 class MediaRepository extends Repository
 {
-    use TagsTrait;
+    use TagsTrait, AuthorizedTrait;
 
     /**
      * @param Media $model
