@@ -233,9 +233,15 @@ trait ManageForm {
 
                 if(isset($input['repository'])){
                     $relation_class = App::make($input['repository']);
+                    if(isset($input['ext'])){
 
-                    $items = $relation_class->list($input['itemTitle'], $with)->toArray();
+                        $extensionMethods = explode('|',$input['ext']);
+                        $extensionColumnNames = collect($extensionMethods)->filter(fn($method) => in_array(explode(':', $method)[0], ['lock']))->map(fn($method) => explode(':',$method)[1])->toArray();
+                        $items = $relation_class->list([$input['itemTitle'], ...$extensionColumnNames],$with)->toArray();
+                    }else{
+                        $items = $relation_class->list($input['itemTitle'], $with)->toArray();
 
+                    }
                     if(isset($input['cascades'])){
                         $patterns = [];
                         foreach ($input['cascades'] as $key => $cascade) {
@@ -252,8 +258,6 @@ trait ManageForm {
                         }
 
                         $items = $newArray;
-                    }else if(isset($input['autofill'])){
-                        $items = $relation_class->list([$input['itemTitle'],...$input['autofill']], $with, )->toArray();
                     }
 
                 }else if(isset($input['model'])){
@@ -274,12 +278,6 @@ trait ManageForm {
                             }
                         }
                     }
-                }
-                if(isset($input['ext'])){
-                    //FIXME: carry it to up repository (switch case)
-                    $extensionMethods = explode('|',$input['ext']);
-                    $extensionColumnNames = collect($extensionMethods)->filter(fn($method) => in_array(explode(':', $method)[0], ['lock']))->map(fn($method) => explode(':',$method)[1])->toArray();
-                    $items = $relation_class->list([$input['itemTitle'], ...$extensionColumnNames],$with)->toArray();
                 }
 
                 if(count($items) && isset($items[0][$input['itemValue']]) && $items[0][$input['itemValue']]){
@@ -576,6 +574,48 @@ trait ManageForm {
 
                 break;
         }
+
+        foreach ($inputs as  $_input) {
+            if(isset($_input->type) &&  $_input->type === 'relationship' ){
+                $additionalExt = [];
+
+                $foreignKeyExt = collect($this->app['modularity']
+                ->find($this->moduleName)
+                ->getRouteConfig(studlyName($_input->name) . '.inputs'))->filter(fn($_i) =>
+
+                 $this->getCamelCase($_i['name']) === $this->getCamelCase($this->routeName) . 'Id'
+                )->toArray()[1]['ext'] ?? [];
+
+                foreach (explode('|', $foreignKeyExt) as  $pattern) {
+                    [$methodName, $formattedInput, $parentColumnName] = array_pad(explode(':',$pattern), 3, null);
+
+                    switch($methodName){
+                        case 'lock':
+                            if(isset($input['name']) && $parentColumnName === $input['name']){
+                                $additionalExt += [$methodName . ':' . pluralize($this->getCamelCase($_input->name)) . '.' . $formattedInput . ':' . $parentColumnName];
+                            }
+                            break;
+                        case 'permalinkPrefix':
+                            if(isset($input['name']) && $input['name'] === 'name'){
+                                $additionalExt += [$methodName . ':' . pluralize($this->getCamelCase($_input->name)) . '.' . $formattedInput];
+                            }
+                        default:
+
+                            break;
+                    }
+                }
+
+                if(isset($input['ext'])){
+                    $additionalExtString = wrapImplode(seperator:'|', array: $additionalExt, prepend: '|', append:'');
+                    $input['ext'] .= $additionalExtString;
+
+                }else{
+                    $input['ext'] = implode('|', $additionalExt);
+                }
+
+            }
+        }
+
         if(isset($input['ext'])){
             $patterns = explode('|', $input['ext']);
             $events = [];
@@ -584,17 +624,19 @@ trait ManageForm {
                 [$methodName, $formattedInput, $parentColumnName] = array_pad(explode(':',$pattern), 3, null);
                 switch ($methodName) {
                     case 'permalinkPrefix':
-                        foreach ($this->getConfigFieldsByRoute('inputs') as $key => $_input) {
-                            if(
-                                isset($_input->ext)
-                                && in_array(explode(':', $_input->ext)[0], ['permalink']
-                            )
-                            ){
-                                $events[] = 'formatPermalinkPrefix:'.$formattedInput.':' . $this->getSnakeNameFromForeignKey($input['name']);
+                        if(isset($input['repository'])){
+                            foreach ($this->getConfigFieldsByRoute('inputs') as $key => $_input) {
+                                if(
+                                    isset($_input->ext)
+                                    && in_array(explode(':', $_input->ext)[0], ['permalink']
+                                )
+                                ){
+                                    $events[] = 'formatPermalinkPrefix:'.$formattedInput.':' . $this->getSnakeNameFromForeignKey($input['name']);
+                                }
                             }
-
+                        }else{
+                            $events[] = 'formatPermalinkPrefix:'.$formattedInput.':' . $this->getSnakeCase($this->routeName());
                         }
-                        // dd($data);
                         break;
                     case 'lock':
                         $events[] = 'formatLock:'. $formattedInput .':' . $parentColumnName;
@@ -621,14 +663,6 @@ trait ManageForm {
                             ){
                                 $permalinkPrefixFormat .= ":{$this->getSnakeNameFromForeignKey($_input->name)}" . '/';
                             }
-
-                            if( isset($_input->type)
-                              &&in_array($_input->type, ['relationship'])
-                            ){
-                                $events[] = 'formatPermalinkPrefix:'. pluralize($this->getCamelCase($_input->name)) .'.'. $formattedInput . ':' . $this->getSnakeCase($this->getRouteName());
-                            }
-
-
                         }
 
 
@@ -673,7 +707,6 @@ trait ManageForm {
         }
 
         if(isset($this->repository)){
-
             if( method_exists($this->repository->getModel(), 'getTranslatedAttributes')
                 && in_array($input['name'], $this->repository->getTranslatedAttributes())
             ){

@@ -385,14 +385,15 @@ export default {
     handleInput (v, s) {
       const { on, key, value, obj } = v
 
-      if (on === 'input' && !!key && !!value) {
+      if (on === 'input' && !!key) {
         if (!this.serverValid) {
           this.resetSchemaError(key)
         }
 
-
         // TODO: Repeaterda name değiştirince permalink dolması olayı obj.schema.schema ilgili inputta
         // event olup olmaması ile ilgili ne yapacağuk bilmiyorum.
+
+        // TODO: value backspace ile silindiğinde value boşa düşüyor ve :433 çalışmıyor sıfırlayamıyorum
 
         if (__isset(obj.schema.event)) {
           const formatEvents = obj.schema.event.split('|');
@@ -401,7 +402,7 @@ export default {
 
             switch (methodName) {
               case 'formatPermalink':
-                 this.model[formattedInput] = this.formatPermalink(value);
+                 this.model[formattedInput] = this.formatPermalink(value ?? '');
                 break;
 
               case 'formatPermalinkPrefix':
@@ -409,22 +410,38 @@ export default {
                   let newValue = this.formatPermalink(obj.schema.items.find((item) => item[obj.schema.itemValue] === value)[obj.schema.itemTitle])
                   this.inputSchema[formattedInput ?? 'slug'].prefix = this.inputSchema[formattedInput ?? 'slug'].prefixFormat.replace(':' + parentColumnName, newValue)
                 }else{
-                  // FIXME: I think its not robust -ilker (the condition part)
+
                   let newValue = this.formatPermalink(value);
+
+                  // __log(this.inputSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefixFormat);
                   const [firstLevelName , secondLevelName] = formattedInput.split('.');
                   this.inputSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefix = this.inputSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefixFormat.replace(':' + parentColumnName, newValue)
                 }
                 break;
               case 'formatLock':
-                const lockInput = obj.schema.items.find((item) => item[obj.schema.itemValue] === value)[parentColumnName];
-                if(lockInput){
-                  this.inputSchema[formattedInput].disabled = true;
-                  this.inputSchema[formattedInput].focused = true;
-                  this.inputSchema[formattedInput].placeHolder = lockInput;
+                if(['select', 'combobox'].includes(obj.schema.type)){
+                  const lockInput = obj.schema.items.find((item) => item[obj.schema.itemValue] === value)[parentColumnName];
+                  if(lockInput){
+                    this.inputSchema[formattedInput].disabled = true;
+                    this.inputSchema[formattedInput].focused = true;
+                    this.inputSchema[formattedInput].placeHolder = lockInput;
+                  }else{
+                    this.inputSchema[formattedInput].disabled = false;
+                    this.inputSchema[formattedInput].focused = false;
+                    this.inputSchema[formattedInput].placeHolder = '';
+                  }
                 }else{
-                  this.inputSchema[formattedInput].disabled = false;
-                  this.inputSchema[formattedInput].focused = false;
-                  this.inputSchema[formattedInput].placeHolder = '';
+                  const lockInput = value;
+                  const [firstLevelName , secondLevelName] = formattedInput.split('.');
+                  if(value){
+                    this.inputSchema[firstLevelName].schema[secondLevelName].disabled = true;
+                    this.inputSchema[firstLevelName].schema[secondLevelName].focused = true;
+                    this.inputSchema[firstLevelName].schema[secondLevelName].placeHolder = lockInput;
+                  }else if(value === null || value === undefined){
+                    this.inputSchema[firstLevelName].schema[secondLevelName].disabled = false;
+                    this.inputSchema[firstLevelName].schema[secondLevelName].focused = false;
+                    this.inputSchema[firstLevelName].schema[secondLevelName].placeHolder = null;
+                  }
                 }
                 break;
 
