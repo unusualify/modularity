@@ -149,7 +149,7 @@ import { useFormatPermalink, useInputHandlers, useValidation } from '@/hooks'
 
 import { useI18n } from 'vue-i18n'
 
-import { getModel, getSubmitFormData, getSchema } from '@/utils/getFormData.js'
+import { getModel, getSubmitFormData, getSchema, handleInputEvents } from '@/utils/getFormData.js'
 
 import { redirector } from '@/utils/response'
 import { cloneDeep } from 'lodash'
@@ -258,8 +258,6 @@ export default {
     //   : this.invokeRuleGenerator(this.$store.state.form.inputs)
     this.rawSchema = this.issetSchema ? this.schema : this.$store.state.form.inputs
 
-    this.inputSchema = this.invokeRuleGenerator(getSchema(this.rawSchema))
-
     this.defaultItem = this.issetSchema ? getModel(this.rawSchema) : this.$store.getters.defaultItem
 
     this.model = getModel(
@@ -267,6 +265,8 @@ export default {
       this.issetModel ? this.modelValue : this.editedItem,
       this.$store.state
     )
+
+    this.inputSchema = this.invokeRuleGenerator(getSchema(this.rawSchema, this.model))
 
     this.resetSchemaErrors()
   },
@@ -278,7 +278,7 @@ export default {
     // },
     model: {
       handler (value, oldValue) {
-        // __log('model watcher', value, oldValue)
+
       },
       deep: true
     },
@@ -389,70 +389,13 @@ export default {
         if (!this.serverValid) {
           this.resetSchemaError(key)
         }
-
-        // TODO: Repeaterda name değiştirince permalink dolması olayı obj.schema.schema ilgili inputta
-        // event olup olmaması ile ilgili ne yapacağuk bilmiyorum.
-
-        // TODO: value backspace ile silindiğinde value boşa düşüyor ve :433 çalışmıyor sıfırlayamıyorum
-
-        if (__isset(obj.schema.event)) {
-          const formatEvents = obj.schema.event.split('|');
-          formatEvents.forEach(element => {
-            const [methodName, formattedInput, parentColumnName] = element.split(':');
-
-            switch (methodName) {
-              case 'formatPermalink':
-                 this.model[formattedInput] = this.formatPermalink(value ?? '');
-                break;
-
-              case 'formatPermalinkPrefix':
-                if(['select', 'combobox'].includes(obj.schema.type)){
-                  let newValue = this.formatPermalink(obj.schema.items.find((item) => item[obj.schema.itemValue] === value)[obj.schema.itemTitle])
-                  this.inputSchema[formattedInput ?? 'slug'].prefix = this.inputSchema[formattedInput ?? 'slug'].prefixFormat.replace(':' + parentColumnName, newValue)
-                }else{
-
-                  let newValue = this.formatPermalink(value);
-
-                  // __log(this.inputSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefixFormat);
-                  const [firstLevelName , secondLevelName] = formattedInput.split('.');
-                  this.inputSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefix = this.inputSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefixFormat.replace(':' + parentColumnName, newValue)
-                }
-                break;
-              case 'formatLock':
-                if(['select', 'combobox'].includes(obj.schema.type)){
-                  const lockInput = obj.schema.items.find((item) => item[obj.schema.itemValue] === value)[parentColumnName];
-                  if(lockInput){
-                    this.inputSchema[formattedInput].disabled = true;
-                    this.inputSchema[formattedInput].focused = true;
-                    this.inputSchema[formattedInput].placeHolder = lockInput;
-                  }else{
-                    this.inputSchema[formattedInput].disabled = false;
-                    this.inputSchema[formattedInput].focused = false;
-                    this.inputSchema[formattedInput].placeHolder = '';
-                  }
-                }else{
-                  const lockInput = value;
-                  const [firstLevelName , secondLevelName] = formattedInput.split('.');
-                  if(value){
-                    this.inputSchema[firstLevelName].schema[secondLevelName].disabled = true;
-                    this.inputSchema[firstLevelName].schema[secondLevelName].focused = true;
-                    this.inputSchema[firstLevelName].schema[secondLevelName].placeHolder = lockInput;
-                  }else if(value === null || value === undefined){
-                    this.inputSchema[firstLevelName].schema[secondLevelName].disabled = false;
-                    this.inputSchema[firstLevelName].schema[secondLevelName].focused = false;
-                    this.inputSchema[firstLevelName].schema[secondLevelName].placeHolder = null;
-                  }
-                }
-                break;
-
-              default:
-                break;
-            }
-
-          });
-        }
-        // __log(on, key, value, obj)
+        this.handleEvent(obj)
       }
+    },
+    handleEvent(obj){
+      const {_fields: newModel, moduleSchema: newSchema } = handleInputEvents(obj.schema.event, this.model, this.inputSchema, obj.key)
+      this.model = newModel;
+      this.inputSchema = newSchema;
     },
     handleInputSlot (v, s) {
       const { on, key, value, obj } = v
