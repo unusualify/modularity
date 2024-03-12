@@ -74,6 +74,9 @@ class FileLibraryController extends BaseController implements SignUploadListener
      */
     protected $config;
 
+    protected $setDefaultPermissions = false;
+
+
     public function __construct(
         Application $app,
         Request $request,
@@ -135,7 +138,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
             'tags' => $item->tags->map(function ($tag) {
                 return $tag->name;
             }),
-            'deleteUrl' => $item->canDeleteSafely() ? moduleRoute($this->moduleName, $routeNamePrefix .  $this->routePrefix, 'destroy', [$item->id]) : null,
+            'deleteUrl' => $item->canDeleteSafely() ? moduleRoute($this->moduleName, $routeNamePrefix .  $this->routePrefix, 'destroy', ['file' => $item->id]) : null,
             'updateUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.file.single-update')),
             'updateBulkUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.file.bulk-update')),
             'deleteBulkUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.file.bulk-delete')),

@@ -10,6 +10,6 @@ return [
     'tagged' => 'umod_tagged',
     'tags' => 'umod_tags',
     'repeaters' => 'umod_repeaters',
+    'authorizeds' => 'umod_authorizeds',
 ];
 
-    

@@ -6,10 +6,13 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Entities\Traits\IsAuthorizedable;
 use Unusualify\Modularity\Services\MediaLibrary\ImageService;
 
 class Media extends Model
 {
+    use IsAuthorizedable;
+
     public $timestamps = true;
 
     protected $fillable = [
@@ -68,6 +71,7 @@ class Media extends Model
     public function mediableFormat()
     {
         $routeNamePrefix = adminRouteNamePrefix() ? adminRouteNamePrefix() . '.' : '';
+
         return [
             'id' => $this->id,
             'name' => $this->filename,
@@ -79,7 +83,7 @@ class Media extends Model
             'tags' => $this->tags->map(function ($tag) {
                 return $tag->name;
             }),
-            'deleteUrl' => $this->canDeleteSafely() ? moduleRoute('media', $routeNamePrefix . 'media-library', 'destroy', [$this->id]) : null,
+            'deleteUrl' => $this->canDeleteSafely() ? moduleRoute('media', $routeNamePrefix . 'media-library', 'destroy', ['media' => $this->id]) : null,
             'updateUrl' => route(Route::hasAdmin('media-library.media.single-update')),
             'updateBulkUrl' => route(Route::hasAdmin('media-library.media.bulk-update')),
             'deleteBulkUrl' => route(Route::hasAdmin('media-library.media.bulk-delete')),

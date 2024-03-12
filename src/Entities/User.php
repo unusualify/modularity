@@ -93,6 +93,11 @@ class User extends Authenticatable
         return $this->roles === 'SUPERADMIN';
     }
 
+    public function isAdmin()
+    {
+        return $this->hasRole('admin');
+    }
+
     protected function invalidCompany():Attribute
     {
         $inValid = false;

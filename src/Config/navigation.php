@@ -15,6 +15,13 @@ return [
                 'name' => 'Dashboard',
                 'route_name' => 'admin.dashboard',
             ],
+            'media_library' => [
+                'name' => 'Media Library',
+                'icon' => '$media',
+                'attr' => 'data-medialib-btn',
+                // 'event' => '_triggerOpenMediaLibrary',
+                'event' => 'openFreeMediaLibrary',
+            ],
         ],
         'superadmin' => [
             'dashboard' => [
@@ -63,6 +70,13 @@ return [
                         'route_name' => 'admin.profile',
                     ]
                 ]
+            ],
+            'media_library' => [
+                'name' => 'Media Library',
+                'icon' => '$media',
+                'attr' => 'data-medialib-btn',
+                // 'event' => '_triggerOpenMediaLibrary',
+                'event' => 'openFreeMediaLibrary',
             ],
         ],
     ]

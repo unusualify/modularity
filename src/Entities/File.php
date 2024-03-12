@@ -3,10 +3,13 @@
 namespace Unusualify\Modularity\Entities;
 
 use Illuminate\Support\Facades\DB;
+use Unusualify\Modularity\Entities\Traits\IsAuthorizedable;
 use Unusualify\Modularity\Services\FileLibrary\FileService;
 
 class File extends Model
 {
+    use IsAuthorizedable;
+
     public $timestamps = true;
 
     protected $fillable = [
