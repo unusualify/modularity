@@ -1,4 +1,5 @@
-import { isEmpty, find, filter, omitBy, forOwn, reduce, cloneDeep } from 'lodash'
+import { isEmpty, find, filter, omitBy, forOwn, reduce, cloneDeep, method, map } from 'lodash'
+import filters from '@/utils/filters'
 
 const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist|custom-input-repeater|custom-input-file|custom-input-image'
 // const isMediableTypes = 'custom-input-file|custom-input-image'
@@ -25,10 +26,77 @@ const chunkInputs = (inputs) => {
   return inputs
 }
 
-export const getSchema = (inputs) => {
+const formatPermalink = (newValue) => {
+
+  let text = ''
+  if (newValue.value && typeof newValue.value === 'string') {
+    text = newValue.value
+  } else if (typeof newValue === 'string') {
+    text = newValue
+  }
+
+  return filters.slugify(text)
+}
+
+export const handleInputEvents = (events = null, fields, moduleSchema, name = null) => {
+  const _fields = fields;
+  const _field = fields[name];
+  const _schema = moduleSchema[name];
+
+  const isFieldFalsy = (Array.isArray(_field) && _field.length > 0) || (!Array.isArray(_field) && !!_field) ;
+
+  if(!!events){
+    const formatEvents = events.split('|');
+    formatEvents.forEach(e =>{
+        const [methodName, formattedInputName, formatingInputName] = e.split(':');
+        switch (methodName) {
+          case 'formatPermalink':
+              if(isFieldFalsy){
+                _fields[formattedInputName] = formatPermalink(_field)
+              }
+            break;
+          case 'formatPermalinkPrefix':
+              if(['select', 'combobox'].includes(_schema.type) && _field && isFieldFalsy){
+                let newValue = formatPermalink(_schema.items.find((item) => item[_schema.itemValue] === _field)[_schema.itemTitle])
+                moduleSchema[formattedInputName ?? slug].prefix = moduleSchema[formattedInputName ?? 'slug'].prefixFormat.replace(':'+formatingInputName, newValue)
+              }else if(_schema.type !== 'hidden'  && isFieldFalsy){
+                let newValue = formatPermalink(_field);
+                const [firstLevelName , secondLevelName] = formattedInputName.split('.');
+                moduleSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefix = moduleSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefixFormat.replace(':' + formatingInputName, newValue)
+              }
+            break;
+          case 'formatLock':
+            if(['select', 'combobox'].includes(_schema.type) && _field){
+              const lockInput = _schema.items.find((item) => item[_schema.itemValue] === _field)[formatingInputName];
+              moduleSchema[formattedInputName].disabled = !!lockInput ;
+              moduleSchema[formattedInputName].focused = !!lockInput;
+              moduleSchema[formattedInputName].placeHolder = lockInput;
+            }else if('hidden' !== _schema.type){
+              const lockInput = _field;
+              const [firstLevelName , secondLevelName] = formattedInputName.split('.');
+                moduleSchema[firstLevelName].schema[secondLevelName].disabled = !!lockInput;
+                moduleSchema[firstLevelName].schema[secondLevelName].focused = !!lockInput;
+                moduleSchema[firstLevelName].schema[secondLevelName].placeHolder = lockInput;
+
+            }
+            break;
+          default:
+            break;
+        }
+
+    })
+  }
+  return {
+    _fields,
+    moduleSchema,
+  };
+}
+
+export const getSchema = (inputs, model = null) => {
   const _inputs = omitBy(inputs, (value, key) => {
     return Object.prototype.hasOwnProperty.call(value, 'slotable')
   })
+
 
   if (find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'wrap'))) {
     // reduce(_inputs, (acc, input, key) => {
@@ -40,7 +108,9 @@ export const getSchema = (inputs) => {
     //   return acc
     // }, {})
   }
-
+  map(_inputs, (value, key) => {
+    handleInputEvents(value.event, model, inputs, key)
+  })
   return _inputs
 }
 
@@ -57,8 +127,6 @@ export const getModel = (inputs, item = null, rootState = null) => {
 
     // default model value
     let _default = Object.prototype.hasOwnProperty.call(input, 'default') ? input.default : ''
-    let _prefillAvaliable = Object.prototype.hasOwnProperty.call(input, 'autofillable') && Object.prototype.hasOwnProperty.call(input, 'prefillValue');
-    let _prefillValue = _prefillAvaliable && (input.prefillValue && input.prefillValue.length !== 0 ) ? input.prefillValue : null;
 
     if (isArrayable.includes(input.type)) {
       _default = []
@@ -76,7 +144,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
     //   return fields
     // }
     // __log(name, _default, item)
-    const value = editing ? (__isset(item[name]) ? item[name] : _prefillValue) : _prefillValue || _default;
+    const value = editing ? (__isset(item[name]) ? item[name] : _default) : _default;
 
     if (__isObject(input)) {
       if (isTranslated) { // translations
@@ -107,7 +175,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
       }
     }
 
-    return fields
+    return handleInputEvents(input.event, fields, inputs, name)._fields; // return fields;
   }, {})
 
   if (editing) {
