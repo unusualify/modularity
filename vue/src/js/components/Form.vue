@@ -55,7 +55,6 @@
               <template v-if="_slot.type == 'form'">
                 <v-custom-form-base
                   :id="`ue-wrapper-${id}-${_slot.name}`"
-
                   v-model="model"
                   v-model:schema="_slot.schema"
                   :row="rowAttribute"
@@ -386,40 +385,71 @@ export default {
     handleInput (v, s) {
       const { on, key, value, obj } = v
 
-      if (on === 'input' && !!key && !!value) {
+      if (on === 'input' && !!key) {
         if (!this.serverValid) {
           this.resetSchemaError(key)
         }
 
+        // TODO: Repeaterda name değiştirince permalink dolması olayı obj.schema.schema ilgili inputta
+        // event olup olmaması ile ilgili ne yapacağuk bilmiyorum.
+
+        // TODO: value backspace ile silindiğinde value boşa düşüyor ve :433 çalışmıyor sıfırlayamıyorum
+
         if (__isset(obj.schema.event)) {
-          // let methodName, args;
-          const [methodName, ...args] = obj.schema.event.split(':')
-          let newValue
-          switch (methodName) {
-            case 'formatPermalink':
-              // args[0] permalink input name
-              this.model[args[0]] = this[methodName](value)
+          const formatEvents = obj.schema.event.split('|');
+          formatEvents.forEach(element => {
+            const [methodName, formattedInput, parentColumnName] = element.split(':');
 
-              break
-            case 'formatPermalinkPrefix':
-              // args[0] permalink input name
-              // args[1] regex slug
-              // args[2] itemTitle
-              newValue = this.formatPermalink(obj.schema.items.find((item) => item[obj.schema.itemValue] === value)[obj.schema.itemTitle])
-              if (['select', 'combobox'].includes(obj.schema.type)) {
-                this.inputSchema[args[0] ?? 'slug'].prefix = this.inputSchema[args[0] ?? 'slug'].prefixFormat.replace(':' + args[1], newValue)
-              }
+            switch (methodName) {
+              case 'formatPermalink':
+                 this.model[formattedInput] = this.formatPermalink(value ?? '');
+                break;
 
-              break
+              case 'formatPermalinkPrefix':
+                if(['select', 'combobox'].includes(obj.schema.type)){
+                  let newValue = this.formatPermalink(obj.schema.items.find((item) => item[obj.schema.itemValue] === value)[obj.schema.itemTitle])
+                  this.inputSchema[formattedInput ?? 'slug'].prefix = this.inputSchema[formattedInput ?? 'slug'].prefixFormat.replace(':' + parentColumnName, newValue)
+                }else{
 
-            default:
-              break
-          }
-          // this[methodName](value)
-          // if (typeof this[methodName] === 'function') {
-          //   // safe to use the function
+                  let newValue = this.formatPermalink(value);
 
-          // }
+                  // __log(this.inputSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefixFormat);
+                  const [firstLevelName , secondLevelName] = formattedInput.split('.');
+                  this.inputSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefix = this.inputSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefixFormat.replace(':' + parentColumnName, newValue)
+                }
+                break;
+              case 'formatLock':
+                if(['select', 'combobox'].includes(obj.schema.type)){
+                  const lockInput = obj.schema.items.find((item) => item[obj.schema.itemValue] === value)[parentColumnName];
+                  if(lockInput){
+                    this.inputSchema[formattedInput].disabled = true;
+                    this.inputSchema[formattedInput].focused = true;
+                    this.inputSchema[formattedInput].placeHolder = lockInput;
+                  }else{
+                    this.inputSchema[formattedInput].disabled = false;
+                    this.inputSchema[formattedInput].focused = false;
+                    this.inputSchema[formattedInput].placeHolder = '';
+                  }
+                }else{
+                  const lockInput = value;
+                  const [firstLevelName , secondLevelName] = formattedInput.split('.');
+                  if(value){
+                    this.inputSchema[firstLevelName].schema[secondLevelName].disabled = true;
+                    this.inputSchema[firstLevelName].schema[secondLevelName].focused = true;
+                    this.inputSchema[firstLevelName].schema[secondLevelName].placeHolder = lockInput;
+                  }else if(value === null || value === undefined){
+                    this.inputSchema[firstLevelName].schema[secondLevelName].disabled = false;
+                    this.inputSchema[firstLevelName].schema[secondLevelName].focused = false;
+                    this.inputSchema[firstLevelName].schema[secondLevelName].placeHolder = null;
+                  }
+                }
+                break;
+
+              default:
+                break;
+            }
+
+          });
         }
         // __log(on, key, value, obj)
       }

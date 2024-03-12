@@ -221,3 +221,12 @@ if(! function_exists('saveLaravelRelationshipMap')){
     }
 }
 
+
+if( !function_exists('wrapImplode') ){
+    function wrapImplode(string $seperator = '|', array $array, string $prepend, string $append = '') : string {
+        if(!$array) return '';
+
+        return $prepend . implode($seperator, $array) . $append;
+    }
+}
+

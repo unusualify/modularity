@@ -359,14 +359,13 @@
                   @click:hour= "onEvent({type:'click'}, obj, hour)"
                   @click:minute= "onEvent({type:'click'}, obj, minute)"
                   @click:second= "onEvent({type:'click'}, obj, second)"
-
                   @update:modelValue="onInput($event, obj)"
-                >
-                  <!-- component doesn't work with #[s]="slotData" " -->
-                  <template v-for="s in getInjectedScopedSlots(id, obj)" v-slot:[s]="slotData">
-                    <slot :name= "getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, ...slotData,  model: valueIntern }"/>
-                  </template>
-                </component>
+                  >
+                <!-- component doesn't work with #[s]="slotData" " -->
+                <template v-for="s in getInjectedScopedSlots(id, obj)" v-slot:[s]="slotData">
+                  <slot :name= "getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, ...slotData,  model: valueIntern }"/>
+                </template>
+              </component>
               <!-- END DEFAULT -->
               </slot>
             </slot>
@@ -553,7 +552,7 @@ const emits = [
   'update',
   'resize',
   'blur',
-  'click'
+  'click',
 ]
 export default {
   setup () {
@@ -1118,7 +1117,7 @@ export default {
             : display.includes(event)
               ? 'onDisplay'
               : event
-      const listener = 'on' + this.$lodash.startCase(this.$lodash.camelCase(event)).replace(/ /g, '')
+      // const listener = 'on' + this.$lodash.startCase(this.$lodash.camelCase(event)).replace(/ /g, '')
       // __log(emitEvent, listener, this)
       // if (this.$attrs[`${emitEvent}:${this.id}`]) {
       //   this.deprecateEventCustomID(emitEvent)
