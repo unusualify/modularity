@@ -253,11 +253,7 @@ export default {
   },
 
   created () {
-    // this.inputSchema = this.issetSchema
-    //   ? this.inputs
-    //   : this.invokeRuleGenerator(this.$store.state.form.inputs)
     this.rawSchema = this.issetSchema ? this.schema : this.$store.state.form.inputs
-
     this.defaultItem = this.issetSchema ? getModel(this.rawSchema) : this.$store.getters.defaultItem
 
     this.model = getModel(
@@ -276,9 +272,10 @@ export default {
     //   __log('model watcher', newValue, oldValue)
     //   // this.resetValidation()
     // },
+
     model: {
       handler (value, oldValue) {
-
+        console.log(value)
       },
       deep: true
     },
@@ -383,7 +380,7 @@ export default {
       this.$refs[this.reference].reset()
     },
     handleInput (v, s) {
-      const { on, key, value, obj } = v
+      const { on, key, obj } = v
 
       if (on === 'input' && !!key) {
         if (!this.serverValid) {
@@ -392,10 +389,10 @@ export default {
         this.handleEvent(obj)
       }
     },
-    handleEvent(obj){
-      const {_fields: newModel, moduleSchema: newSchema } = handleInputEvents(obj.schema.event, this.model, this.inputSchema, obj.key)
-      this.model = newModel;
-      this.inputSchema = newSchema;
+    handleEvent (obj) {
+      const { _fields: newModel, moduleSchema: newSchema } = handleInputEvents(obj.schema.event, this.model, this.inputSchema, obj.key)
+      this.model = newModel
+      this.inputSchema = newSchema
     },
     handleInputSlot (v, s) {
       const { on, key, value, obj } = v
@@ -471,7 +468,7 @@ export default {
     handleClick (val) {
       // logger(val)
 
-      const { on, key, obj, params } = val
+      const { on, obj, params } = val
       // check 'click' is from prependInner Icon (Print) at key 'subgroups.content'
       // if (on === 'click' && key === 'subgroups.content' && (params && params.tag) === 'prepend-inner') {
       //   window.print()
