@@ -59,7 +59,7 @@ export const handleInputEvents = (events = null, fields, moduleSchema, name = nu
               if(['select', 'combobox'].includes(_schema.type) && _field && isFieldFalsy){
                 let newValue = formatPermalink(_schema.items.find((item) => item[_schema.itemValue] === _field)[_schema.itemTitle])
                 moduleSchema[formattedInputName ?? slug].prefix = moduleSchema[formattedInputName ?? 'slug'].prefixFormat.replace(':'+formatingInputName, newValue)
-              }else if(_schema.type !== 'hidden'  && isFieldFalsy){
+              }else if(['text'].includes(_schema.type)  && isFieldFalsy){
                 let newValue = formatPermalink(_field);
                 const [firstLevelName , secondLevelName] = formattedInputName.split('.');
                 moduleSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefix = moduleSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefixFormat.replace(':' + formatingInputName, newValue)
@@ -67,11 +67,11 @@ export const handleInputEvents = (events = null, fields, moduleSchema, name = nu
             break;
           case 'formatLock':
             if(['select', 'combobox'].includes(_schema.type) && _field){
-              const lockInput = _schema.items.find((item) => item[_schema.itemValue] === _field)[formatingInputName];
+              const lockInput = _schema.items.find((item) => item[_schema.itemValue] === _field)?.[formatingInputName];
               moduleSchema[formattedInputName].disabled = !!lockInput ;
               moduleSchema[formattedInputName].focused = !!lockInput;
               moduleSchema[formattedInputName].placeHolder = lockInput;
-            }else if('hidden' !== _schema.type){
+            }else if(['text'].includes(_schema.type) && _field){
               const lockInput = _field;
               const [firstLevelName , secondLevelName] = formattedInputName.split('.');
                 moduleSchema[firstLevelName].schema[secondLevelName].disabled = !!lockInput;
