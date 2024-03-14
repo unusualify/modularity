@@ -584,8 +584,8 @@ trait ManageForm {
                 ->find($this->moduleName)
                 ->getRouteConfig(studlyName($_input->name) . '.inputs'))->filter(fn($_i) =>
 
-                 $this->getCamelCase($_i['name']) === $this->getCamelCase($this->routeName) . 'Id'
-                )->toArray()[1]['ext'] ?? [];
+                 $this->getCamelCase($_i['name'] ?? '') === $this->getCamelCase($this->routeName) . 'Id'
+                )->toArray()[1]['ext'] ?? '';
 
                 foreach (explode('|', $foreignKeyExt) as  $pattern) {
                     [$methodName, $formattedInput, $parentColumnName] = array_pad(explode(':',$pattern), 3, null);
