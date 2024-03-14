@@ -275,7 +275,6 @@ export default {
 
     model: {
       handler (value, oldValue) {
-        console.log(value)
       },
       deep: true
     },
@@ -381,7 +380,6 @@ export default {
     },
     handleInput (v, s) {
       const { on, key, obj } = v
-
       if (on === 'input' && !!key) {
         if (!this.serverValid) {
           this.resetSchemaError(key)

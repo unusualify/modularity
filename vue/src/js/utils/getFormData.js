@@ -140,7 +140,8 @@ export const getModel = (inputs, item = null, rootState = null) => {
     //   return fields
     // }
     // __log(name, _default, item)
-    const value = editing ? (__isset(item[name]) ? item[name] : _default) : _default
+    const value = editing ? (__isset(fields[name]) ? fields[name] : (__isset(item[name]) ? item[name] : _default)) : _default
+    // const value = editing ? (__isset(item[name]) ? item[name] : _default) : _default
 
     if (__isObject(input)) {
       if (isTranslated) { // translations
@@ -170,8 +171,8 @@ export const getModel = (inputs, item = null, rootState = null) => {
         }
       }
     }
-
-    return handleInputEvents(input.event, fields, inputs, name)._fields // return fields;
+    const newFields = handleInputEvents(input.event, fields, inputs, name)._fields // return fields;
+    return newFields
   }, {})
 
   if (editing) {

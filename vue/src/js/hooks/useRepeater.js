@@ -1,7 +1,7 @@
 // hooks/formatter .js
 
 // import { ref, watch, computed, nextTick } from 'vue'
-import { reactive, toRefs, computed, watch } from 'vue'
+import { reactive, toRefs, computed } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 import { transform, cloneDeep, filter, omit, find, isEmpty } from 'lodash'
 import { getModel } from '@/utils/getFormData'
@@ -95,12 +95,6 @@ export default function useRepeater (props, context) {
         o[namingRepeaterField(index, k)] = v
       })
     }
-    // return {
-    //   id: index,
-    //   ...transform(item, (o, v, k) => {
-    //     o[namingRepeaterField(index, k)] = v
-    //   })
-    // }
   }
 
   function hydrateRepeaterInputs (model) {
@@ -123,7 +117,7 @@ export default function useRepeater (props, context) {
 
       Object.keys(schemas[i]).forEach(inputName => {
         const input = schemas[i][inputName]
-        if (input.hasOwnProperty('cascade')) {
+        if (Object.prototype.hasOwnProperty.call(input, 'cascade')) {
           const cascadedName = namingRepeaterField(i, input.cascade)
           schemas[i][cascadedName][input.cascadeKey] = find(input.items, [input.itemValue, item[inputName]])?.schema ?? []
         }
@@ -229,7 +223,6 @@ export default function useRepeater (props, context) {
   const methods = reactive({
     onUpdateRepeaterInput (value, index) {
       modelValue.value[index] = parseRepeaterInput(value, index)
-      // __log('onUpdateRepeaterInput', value, index)
     },
     onHoverContent (index) {
       // __log('onHoverContent', index)

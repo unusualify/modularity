@@ -36,7 +36,7 @@
                       <v-custom-form-base
                         :id="`ue-repeater-form-${itemSlot.index}`"
                         :modelValue="itemSlot.element"
-                        @update:modelValue="onUpdateModel($event, itemSlot.index)"
+                        @update:modelValue="onUpdateRepeaterInput($event, itemSlot.index)"
                         :schema="repeaterSchemas[itemSlot.index]"
                         @update:schema="console.log(repeaterSchemas[itemSlot.index])"
                         :row="rowAttribute"
@@ -132,12 +132,7 @@ export default {
     }
   },
   computed: {},
-  methods: {
-    onUpdateModel(event, index){
-      this.onUpdateRepeaterInput(event, index);
-      this.$emit('update:modelValue', this.modelValue);
-    }
-  },
+  methods: {},
   watch: {},
   created () {
   }

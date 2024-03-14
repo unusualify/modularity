@@ -1,3 +1,5 @@
+<!-- eslint-disable vue/no-mutating-props -->
+<!-- eslint-disable vue/no-side-effects-in-computed-properties -->
 <template>
   <v-row
     :id="id"
@@ -503,7 +505,7 @@ const arrayClassAppendix = 'array'
 const propertyClassAppendix = 'prop'
 
 const injectSlotAppendix = `${slotAppendix}-${injectAppendix}`
-const arraySlotAppendix = `${slotAppendix}-${arrayClassAppendix}`
+// const arraySlotAppendix = `${slotAppendix}-${arrayClassAppendix}`
 const topSlotAppendix = `${slotAppendix}-${topAppendix}`
 const itemSlotAppendix = `${slotAppendix}-${itemClassAppendix}`
 const bottomSlotAppendix = `${slotAppendix}-${bottomAppendix}`
@@ -552,7 +554,7 @@ const emits = [
   'update',
   'resize',
   'blur',
-  'click',
+  'click'
 ]
 export default {
   setup () {
@@ -613,7 +615,7 @@ export default {
 
       hour,
       minute,
-      second,
+      second
 
     }
   },
@@ -652,15 +654,13 @@ export default {
       // __log('storeStateSchema computed', this.valueIntern)
       this.updateArrayFromState(this.valueIntern, this.formSchema)
 
-
       for (const key in this.formSchema) {
-
         const sch = this.formSchema[key]
-        const cascadeKey = sch.cascadeKey; //schema
-        if(key.includes('repeater') && Object.prototype.hasOwnProperty.call(sch, 'cascade') && sch.type === 'select'){
-          return this.formSchema;
-        }else if (sch.type === 'select' && Object.prototype.hasOwnProperty.call(sch, 'cascade')) {
-
+        // const cascadeKey = sch.cascadeKey //schema
+        if (key.includes('repeater') && Object.prototype.hasOwnProperty.call(sch, 'cascade') && sch.type === 'select') {
+          return this.formSchema
+        } else if (sch.type === 'select' && Object.prototype.hasOwnProperty.call(sch, 'cascade')) {
+          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           this.formSchema[sch.cascade].items = find(sch.items, [sch.itemValue, this.valueIntern[sch.name]])?.items ?? []
           // this.formSchema[key].items = find(this.formSchema[sch.parent].items, [this.formSchema[sch.parent].itemValue, this.valueIntern[sch.parent]]).items
         }
@@ -668,13 +668,14 @@ export default {
       // __log('storeStateSchema computed')
       return this.formSchema
     },
-    formSchema:{
-      get(){
-        return this.schema;
+    formSchema: {
+      get () {
+        return this.schema
       },
-      set(val){
+      set (val) {
         this.$emit('update:schema', val)
-        this.schema.value = val;
+        // eslint-disable-next-line vue/no-mutating-props
+        this.schema.value = val
       }
     }
   },
@@ -1033,13 +1034,11 @@ export default {
       value = !value || value === '' ? null : value
       // if schema type is number convert to number
       value = obj.schema.type === 'number' ? Number(value) : value
-
       // update deep nested prop(key) with value
       this.setObjectByPath(this.storeStateData, obj.key, value)
       obj.value = obj.value !== value ? value : obj.value
       // when cascade select changed
       this.setCascadeSelect(obj)
-
       const emitObj = {
         on: type,
         id: this.id,
@@ -1054,7 +1053,6 @@ export default {
       }
 
       this.emitValue(type, emitObj)
-
       return emitObj
     },
     onEvent (event = {}, obj, tag) {
@@ -1173,19 +1171,9 @@ export default {
     },
     updateArrayFromState (data, schema) {
       this.flatCombinedArray.forEach(obj => {
-        if(obj.schema.ext && obj.schema.ext === 'relationship'){
-          Object.values(obj.schema.schema).forEach(
-            e => {
-                  if(e.autofillable && get(data, e.autofillable, null) !== ''){
-                    e['prefillValue'] = get(data, e.autofillable, null);
-                }
-              }
-          )
-        }
         // ## CHECK WHY IS THAT NOT WORKING
-        obj.value = get(schema, [obj.key, 'autofillable']) ? get(schema, [obj.key, 'prefillValue'], null) || get(schema, [obj.key, 'default'], null) :  get(schema, [obj.key, 'default'], null);
-        obj.value = get(schema, [obj.key, 'type']) === 'select' ? get(data, obj.key, null) || get(schema, [obj.key, 'default'],null) : get(data, obj.key,null);
-// obj.value = get(data, obj.key, null) // get - lodash
+        obj.value = get(schema, [obj.key, 'type']) === 'select' ? get(data, obj.key, null) || get(schema, [obj.key, 'default'], null) : get(data, obj.key, null)
+        // obj.value = get(data, obj.key, null) // get - lodash
         obj.schema = get(schema, obj.key, null) // get - lodash
       })
     },
@@ -1300,11 +1288,10 @@ export default {
     },
 
     setCascadeSelect (obj) {
-      if(obj.schema.type === 'select' && obj.schema.hasOwnProperty('cascade')){
-
-        const cascadedSelectName = obj.schema.name.includes('repeater') ? obj.schema.name.match(new RegExp('repeater\\d+-input\\[\\d+\\]'))+`[${obj.schema.cascade}]` : obj.schema.cascade;
-        const cascadeKey = obj.schema.cascadeKey;
-        const selectItemValue = obj.schema.itemValue ?? 'id';
+      if (obj.schema.type === 'select' && obj.schema.hasOwnProperty('cascade')) {
+        const cascadedSelectName = obj.schema.name.includes('repeater') ? obj.schema.name.match(/repeater\d+-input\[\d+\]/) + `[${obj.schema.cascade}]` : obj.schema.cascade
+        const cascadeKey = obj.schema.cascadeKey
+        const selectItemValue = obj.schema.itemValue ?? 'id'
 
         // ACTIONS
         this.formSchema[cascadedSelectName][cascadeKey] = find(obj.schema.items, [selectItemValue, this.valueIntern[obj.key]])?.schema ?? []
@@ -1313,15 +1300,14 @@ export default {
         this.storeStateData[cascadedSelectName] = this.formSchema[cascadedSelectName][cascadeKey].length > 0 ? this.formSchema[cascadedSelectName][cascadeKey][0].value : []
         this.flatCombinedArraySorted[sortIndex].value = this.valueIntern[cascadedSelectName]
 
-        this.setCascadeSelect(this.flatCombinedArraySorted[sortIndex]);
-      }
-      else if((obj.schema.type === 'select') && obj.schema.hasOwnProperty('autofill')){
+        this.setCascadeSelect(this.flatCombinedArraySorted[sortIndex])
+      } else if ((obj.schema.type === 'select') && obj.schema.hasOwnProperty('autofill')) {
         obj.schema.autofill.forEach(element => {
-            if(this.formSchema[element].autofillable){
-              this.storeStateData[element] = find(obj.schema.items, ['id', this.valueIntern[obj.key]])?.[element] ?? 'facebook';
-              // ## TODO type conditional default value
-            }
-        });
+          if (this.formSchema[element].autofillable) {
+            this.storeStateData[element] = find(obj.schema.items, ['id', this.valueIntern[obj.key]])?.[element] ?? ''
+            // ## TODO type conditional default value
+          }
+        })
       }
     }
   },
