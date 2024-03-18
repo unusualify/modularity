@@ -15,6 +15,9 @@ class DefaultDatabaseSeeder extends Seeder
         $this->call([
             DefaultRolesSeeder::class,
             DefaultPermissionsSeeder::class,
+            DefaultCurrencySeeder::class,
+            DefaultVatRateSeeder::class,
+            DefaultPriceTypeSeeder::class,
         ]);
     }
 }
