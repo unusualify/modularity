@@ -92,7 +92,7 @@ class Install extends BaseCommand
         $this->info("\t Creating super-admin account");
 
         if (!$this->option('no-interaction')) {
-            $this->call('unusual:superadmin', [
+            $this->call('unusual:create:superadmin', [
                 '--default' => $this->option('default'),
             ]);
         }

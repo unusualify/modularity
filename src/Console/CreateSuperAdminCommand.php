@@ -6,7 +6,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Factory as ValidatorFactory;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Entities\User;
+
+use function Laravel\Prompts\{text,note,confirm,error,info,password,warning};
 
 class CreateSuperAdminCommand extends BaseCommand
 {
@@ -15,7 +19,9 @@ class CreateSuperAdminCommand extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'unusual:superadmin {email?} {password?} {--default}';
+    protected $name = 'unusual:create:superadmin';
+
+
 
     /**
      * The console command description.
@@ -47,13 +53,32 @@ class CreateSuperAdminCommand extends BaseCommand
     }
 
     /**
+     * Get Console Command Options
+     *
+     * @return array
+     */
+    protected function getOptions(): array
+    {
+        return array_merge([
+            ['default', '--d', InputOption::VALUE_NONE, 'Use default options for super-admin auth. information'],
+        ], unusualTraitOptions());
+    }
+
+    protected function getArguments(): array
+    {
+        return [
+            ['email', InputArgument::OPTIONAL, 'A valid e-mail for super-admin', null],
+            ['password', InputArgument::OPTIONAL, 'A valid password for super-admin', null],
+        ];
+    }
+
+    /**
      * Create super admin account.
      *
      * @return void
      */
     public function handle() :int
     {
-
 
         $email = $this->setEmail($this->argument('email'));
         $password = $this->setPassword($this->argument('password'));
@@ -72,7 +97,7 @@ class CreateSuperAdminCommand extends BaseCommand
 
             if ($user->save()) {
                 DB::commit();
-                $this->info('Your account has been created');
+                info('Your account has been created');
                 return 0;
             }
 
@@ -85,7 +110,7 @@ class CreateSuperAdminCommand extends BaseCommand
 
 
 
-        $this->error('Failed creating user. Things you can check: Database permissions, run migrations');
+        error('Failed creating user. Things you can check: Database permissions, run migrations');
         return -1;
     }
 
@@ -98,41 +123,48 @@ class CreateSuperAdminCommand extends BaseCommand
     {
 
         if($this->option('default')){
-            $email = env('UNUSUAL_ADMIN_EMAIL', 'software-dev@unusualgrowth.com');
+            $email = getValueOrNull(env('UNUSUAL_ADMIN_EMAIL', 'software-dev@unusualgrowth.com')) ?? 'software-dev@unusualgrowth.com';
             $this->info('Email configured for super-admin as '.$email);
             return $email;
         }
 
+        warning('E-mail configuration for super-admin account');
 
-        while (!$this->validateEmail($email)) {
+        $useDefault = confirm(
+            label: 'Do you want to use default configuration for super-admin e-mail?',
+            default: true,
+            yes: 'YES',
+            no: 'No, enter custom e-mail',
+            hint: 'Default e-mail address: software-dev@unusualgrowth.com',
+        );
 
-            if (!filled($email)) {
-                $this->info('You can use default configuration for super-admin e-mail address. You can change/ set it in .env file.');
-                if ($this->confirm('Do you want to use default configuration for super-admin e-mail? Y/N')) {
-                    $email = env('UNUSUAL_ADMIN_EMAIL', 'software-dev@unusualgrowth.com');
-                    $this->info('Email configured for super-admin as '.$email);
-                }else {
-                    $email = $this->ask('Please enter a valid e-mail address for super-admin:\t');
-                };
-            }
+        if($useDefault){
+            $email = env('UNUSUAL_ADMIN_EMAIL', 'software-dev@unusualgrowth.com');
+        }else{
+            $email = text(
+                label:'Please enter a valid e-mail address for super-admin',
+                placeholder: 'E.g. example@exampleHost.com',
+                hint: '',
+                required:true,
+                validate: fn($value) => match(true){
+                    DB::table(unusualConfig('tables.users', 'admin_users'))->where('email', $value)->exists() => $value. ' is already in use. Please use an unique e-mail',
+                    strlen($value) > 255 => 'Please enter maximum 255 characters',
+                    !filter_var($value, FILTER_VALIDATE_EMAIL) => 'Please enter a valid email pattern',
+                    default => null,
+                }
+            );
         }
 
-        return $email;
+        if($this->validateEmail($email)){
+            info('Email configured for super-admin as '.$email);
+            return $email;
+        }else{
+            error('Enter a valid e-mail address');
+            $this->setEmail();
+        }
 
 
 
-
-
-        // if (filled($email = $this->argument('email'))) {
-        //     return $email;
-        // }
-        // $email = $this->ask('Enter an email');
-        // if ($this->validateEmail($email)) {
-        //     return $email;
-        // } else {
-        //     $this->error("Your email is not valid");
-        //     return $this->setEmail();
-        // }
     }
 
     /**
@@ -143,49 +175,35 @@ class CreateSuperAdminCommand extends BaseCommand
     private function setPassword(String $password = null)
     {
 
-        if($this->option('default') && $password = getValueOrNull(env('UNUSUAL_ADMIN_PASSWORD', 'w@123456')) ){
-            $this->info('Password configured for super-admin as '.$password);
+        if($this->option('default')){
+            $password = env('UNUSUAL_ADMIN_PASSWORD', 'w@123456');
+            info('Password configured for super-admin as '.$password);
             return $password;
         }
 
-        while(!$this->validatePassword($password)){
-            if(!filled($password)){
-                $this->info('You can use default configuration for super-admin password. You can change/ set it in .env file.');
-                if ($this->confirm('Do you want to use default configuration for super-admin password? Y/N') && $password = getValueOrNull(env('UNUSUAL_ADMIN_PASSWORD', 'w@123456'))) {
-                    $this->info('Password configured for super-admin as '.$password);
-                    return $password;
-                }else {
-                    $password = $this->secret('Please enter a valid password address for super-admin with minimum 6 characters:\t');
-                };
-            }
-        }
+        warning('Password configuration for super-admin account');
+        $useDefault = confirm(
+            label: 'Do you want to use default configuration for super-admin password?',
+            default: true,
+            yes: 'YES',
+            no: 'No, enter custom password',
+            hint: 'Default password is w@123456'
+        );
 
-        $confirmPassword= $this->secret('Confirm the given password');
-        if ($confirmPassword == $password) {
-            return $password;
+        if($useDefault){
+            $password = getValueOrNull(env('UNUSUAL_ADMIN_PASSWORD', 'w@123456'),bool:false);
         }else{
-            $this->error('Passwords do not match.');
-            $this->setPassword();
+            $password = password(
+                label: 'Please enter valid password',
+                hint: 'Please use at least 6 characters',
+                validate: fn(string $value) => match(true){
+                    strlen($value) < 6 => 'The password must be at least 6 characters',
+                    default => null,
+                }
+            );
         }
-
-
-        // if (filled($email = $this->argument('password'))) {
-        //     return $email;
-        // }
-
-        // $password = $this->secret('Enter a password');
-        // if ($this->validatePassword($password)) {
-        //     $confirmPassword = $this->secret('Confirm the password');
-        //     if ($password === $confirmPassword) {
-        //         return $password;
-        //     } else {
-        //         $this->error('Password does not match the confirm password');
-        //         return $this->setPassword();
-        //     }
-        // } else {
-        //     $this->error("Your password is not valid, at least 6 characters");
-        //     return $this->setPassword();
-        // }
+        info('Password configured for '.$this->argument('email').'is '.$password);
+        return $password;
     }
 
     /**
