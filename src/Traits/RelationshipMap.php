@@ -21,6 +21,7 @@ trait RelationshipMap {
         'belongsTo' => 'hasMany',
         'morphTo' => 'morphMany',
         'belongsToMany' => 'belongsToMany',
+        'hasManyThrough' => 'hasOneThrough',
     ];
 
 
@@ -46,25 +47,48 @@ trait RelationshipMap {
         }
 
         foreach ($parameters as $n => $p) {
+            $param1 = $param2 = $param3 = null;
             $parameter = (object) $p;
-            $methodName = "getRelationshipArgument" . $this->getStudlyName($n);
+            switch ($n) {
+                case 'firstKey':
+                    $param1 = $this->model;
+                    $param2 = $relationshipName;
+                    $methodName = "getRelationshipArgument". $this->getStudlyName('foreignKey');
+                    break;
+                case 'secondKey':
+                    $param1 = $arguments[0];
+                    $param2 = $relationshipName;
+                    $methodName = "getRelationshipArgument". $this->getStudlyName('foreignKey');
+                    break;
+                case 'localKey':
+                    $param1 = $name;
+                    $param2 = $relationshipName;
+                    $methodName = "getRelationshipArgument". $this->getStudlyName('ownerKey');
+                    break;
+                case 'secondLocalKey':
+                    $param1 = $name;
+                    $param2 = $relationshipName;
+                    $methodName = "getRelationshipArgument". $this->getStudlyName('ownerKey');
+                    break;
+                default:
+                    $param1 = $name;
+                    $param2 = $relationshipName;
+                    $param3 = $arguments;
+                    $methodName = "getRelationshipArgument". $this->getStudlyName($n);
+                    break;
+            }
 
             if(method_exists($this, $methodName)){
-                ($v = $this->{$methodName}($name, $relationshipName, $arguments)) != false
+                ($v = $this->{$methodName}($param1, $param2, $param3)) != false
                     ? array_push($parts, $v)
                     : null;
 
             }else if($parameter->required){
-                dd($n, $parameter, $name, $relationshipName);
+                dd($n, $parameter, $name, $relationshipName, $parameters);
             }else{
                 break;
             }
         }
-
-        // if($relationshipName == 'belongsTo'){
-        //     dd( $parts);
-        // }
-
         return implode(':', $parts) . $props;
     }
 
@@ -163,7 +187,6 @@ trait RelationshipMap {
             if(count($schematic) > 0){
                 $props = explode($this->propsIndicator, $schematic[0]);
             }
-
             if(!$index){
 
                 /**
@@ -171,14 +194,23 @@ trait RelationshipMap {
                  */
                 // public function packages(): MorphMany
                 // {
-                //     return $this->morphMany(Package::class, 'packageable');
-                // }
+                    //     return $this->morphMany(Package::class, 'packageable');
+                    // }
 
                 $relationshipName = $this->getRelationshipName($schema);
+                dd($index,$schematic, $schema,$props,$relationshipName);
 
                 if(isset($this->reverseMapping[$relationshipName])){
                     $reverseRelationshipName = $this->reverseMapping[$relationshipName];
                     switch ($reverseRelationshipName) {
+                        case 'hasOneThrough':
+                            $methodName = $this->getSingular($this->getCamelCase($this->model));
+                            $related = ($related = UFinder::getRouteModel($this->model))
+                                ? $related
+                                : get_class(UFinder::getRouteRepository($this->model, asClass: true)->getModel());
+
+                            dd();
+
                         case 'morphMany':
                             $methodName = $this->getPlural($this->getCamelCase($this->model));
                             $related = ($related = UFinder::getRouteModel($this->model))
@@ -348,10 +380,10 @@ trait RelationshipMap {
                 $relatedMethodName = $this->getSingular($arguments[$position]);
                 // dd('belongsTo & hasOne', $parameters['related'], $arguments, $relatedMethodName);
                 break;
+            case 'hasManyThrough':
             case 'hasMany':
                 $position = $parameters['related']['position'];
                 $relatedMethodName = $this->getPlural($arguments[$position]);
-
                 break;
             case 'belongsToMany':
                 // dd('belongsToMany', $parameters, $arguments, $this->model);
@@ -491,13 +523,18 @@ trait RelationshipMap {
                 $formattedArgument = "\\" . $related . "::class";
 
                 break;
+            case 'through':
+                $through = ($through = UFinder::getRouteModel($argument))
+                    ? $through
+                    : get_class(UFinder::getRouteRepository($argument, asClass: true)->getModel());
+                $formattedArgument = "\\" . $through . "::class";
+                break;
             case 'name':
                 return '__FUNCTION__';
             default:
 
                 break;
         }
-
         return $formattedArgument;
 
     }
@@ -527,7 +564,9 @@ trait RelationshipMap {
             case 'morphTo':
                 $comment =  $this->commentStructure(["Get the model that the {$model} belongs to"]);
                 break;
-
+            case 'hasManyThrough':
+                $comment = $this->commentStructure(["The {$attr['relationship_name']} that belong to the {$model}."]);
+                break;
             default:
                 $comment = "/**\n\t* Get .\n\t*/";
                 break;

@@ -6,12 +6,14 @@ use Illuminate\Support\Arr;
 use Unusualify\Modularity\Facades\UFinder;
 
 trait RelationshipArguments {
+    use ManageNames;
 
     public function getRelationshipArgumentRelated($name, $relationshipName, $arguments)
     {
         $value = "";
 
         switch ($relationshipName) {
+            case 'hasManyThrough':
             case 'belongsToMany':
             case 'belongsTo':
                 $value = $this->getStudlyName($name);
@@ -34,6 +36,7 @@ trait RelationshipArguments {
         $value = "";
 
         switch ($relationshipName) {
+            case 'hasManyThrough':
             case 'belongsTo':
                 $value = $arguments[0] ?? $this->getForeignKeyFromName($name);
                 break;
@@ -52,6 +55,7 @@ trait RelationshipArguments {
         $value = "";
 
         switch ($relationshipName) {
+            case 'hasManyThrough':
             case 'belongsTo':
                 $value = $arguments[1] ?? 'id';
                 break;
@@ -85,6 +89,24 @@ trait RelationshipArguments {
 
         return $value;
 
+    }
+
+
+    public function getRelationshipArgumentThrough($name, $relationshipName, $arguments)
+    {
+        $value = "";
+
+        switch ($relationshipName) {
+            case 'hasManyThrough':
+
+                $value = $this->getStudlyName($arguments[0]);
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        return $value;
     }
 
 }

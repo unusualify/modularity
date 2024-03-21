@@ -69,9 +69,7 @@ class SchemaParser implements Arrayable
 
         foreach ($this->getSchemas() as $i => $schemaArray) {
             $column = $this->getColumn($schemaArray);
-
             $attributes = $this->getAttributes($column, $schemaArray);
-
             $parsed[$column] = $attributes;
         }
 

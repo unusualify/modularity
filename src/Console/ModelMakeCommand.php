@@ -98,8 +98,8 @@ class ModelMakeCommand extends BaseCommand
         if (parent::handle() === E_ERROR) {
             return E_ERROR;
         }
-
         $this->createAdditionalModels();
+        dd('ASDAS');
 
         // $this->handleOptionalMigrationOption();
         // $this->handleOptionalControllerOption();
