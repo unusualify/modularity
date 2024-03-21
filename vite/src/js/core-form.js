@@ -3,33 +3,15 @@
  * includes Vue and other libraries. It is a great starting point when
  * building robust, powerful web applications using Vue and Laravel.
 */
-
-// import VueRouter from 'vue-router';
-import core from '@/core'
+import * as exports from '@/imports'
 
 // styles
-import 'styles/form.scss'
-
-// Plugins
-import UEConfig from '@/plugins/UEConfig'
-
-import store from '@/store'
+// import 'styles/form.scss'
 
 // Store modules
 import form from '@/store/modules/form'
 
-import { RootMixin } from './mixins'
-
- /**
-  * The following block of code may be used to automatically register your
-  * Vue components. It will recursively scan this directory for the Vue
-  * components and automatically register them with their "basename".
-  *
-  * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
-*/
-
-// const files = require.context('./', true, /\.vue$/i)
-// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
+const store = exports.store
 
 store.registerModule('form', form)
 
@@ -38,14 +20,13 @@ store.registerModule('form', form)
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
-const app = createApp({
-    store,
-    mixins: [RootMixin],
-});
-UEConfig(app)
+const app = exports.createApp({
+  store,
+  mixins: [exports.RootMixin]
+})
+
+app.use(exports.UEConfig)
 
 app.mount('#admin')
-
-window[process.env.JS_APP_NAME].vm = window.vm = app;
 
 // document.addEventListener('DOMContentLoaded', core)

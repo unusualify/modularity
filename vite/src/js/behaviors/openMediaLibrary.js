@@ -5,8 +5,8 @@ const openMediaLibrary = function () {
   const bts = document.querySelectorAll('[data-medialib-btn]')
 
   function _triggerOpenMediaLibrary () {
-    if (window[process.env.JS_APP_NAME].vm) {
-      window[process.env.JS_APP_NAME].vm.openFreeMediaLibrary()
+    if (window.vm) {
+      window.vm.openFreeMediaLibrary()
     }
   }
 

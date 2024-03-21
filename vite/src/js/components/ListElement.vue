@@ -1,98 +1,84 @@
 <template>
-    
-    <v-list-item 
-        v-if="!item.items" 
-        active-class="sidebar-item-active" 
-        :ripple="false" 
-        :href="item.link" 
-        :append="false"
-        > 
 
-        <v-list-item-icon>
+    <v-list v-model:opened="open">
+      <v-list-item prepend-icon="mdi-home" title="Home"></v-list-item>
 
-            <!-- <v-icon v-text="item.icon"> </v-icon> -->
-            <v-icon> {{item.icon}} </v-icon>
-
-        </v-list-item-icon>
-
-        <v-list-item-content>
-            <v-list-item-title v-text="item.text"></v-list-item-title>
-        </v-list-item-content>
-        
-    </v-list-item>
-
-    <v-list-group
-        v-else
-        :value="false"
-        :ripple="true"
-        :sub-group="false"
-        :prepend-icon="item.icon"
-        v-model="activeItem"
-        active-class="sidebar-item-active" 
-      >
-        <template v-slot:activator>
-
-            <v-list-item-content>
-                <v-list-item-title v-text="item.text"></v-list-item-title>
-            </v-list-item-content>
-                
+      <v-list-group value="Users">
+        <template v-slot:activator="{ props }">
+          <v-list-item
+            v-bind="props"
+            prepend-icon="mdi-account-circle"
+            title="Users"
+          ></v-list-item>
         </template>
 
-        <v-list-item-group v-model="activeSubItem">
-
+        <v-list-group value="Admin">
+          <template v-slot:activator="{ props }">
             <v-list-item
-                v-for="(subItem, k) in item.items"
-                :key="k"
-                :href="subItem.link"
-                link
-                active-class="sidebar-sub-item-active"
-                style="margin-left:40px;"
-            >
-                <v-list-item-icon>
+              v-bind="props"
+              title="Admin"
+            ></v-list-item>
+          </template>
 
-                    <!-- <v-icon v-text="item.icon"> </v-icon> -->
-                    <v-icon> {{subItem.icon}} </v-icon>
+          <v-list-item
+            v-for="([title, icon], i) in admins"
+            :key="i"
+            :title="title"
+            :prepend-icon="icon"
+            :value="title"
+          ></v-list-item>
+        </v-list-group>
 
-                </v-list-item-icon>
+        <v-list-group value="Actions">
+          <template v-slot:activator="{ props }">
+            <v-list-item
+              v-bind="props"
+              title="Actions"
+            ></v-list-item>
+          </template>
 
-                <v-list-item-content>
-                    <!-- <router-link :to="subItem.action"> {{ subItem.text }}</router-link> -->
-                    <v-list-item-title v-text="subItem.text" ></v-list-item-title>
-                </v-list-item-content>
-            </v-list-item>
-
-        </v-list-item-group>
-    </v-list-group>
+          <v-list-item
+            v-for="([title, icon], i) in cruds"
+            :key="i"
+            :value="title"
+            :title="title"
+            :prepend-icon="icon"
+          ></v-list-item>
+        </v-list-group>
+      </v-list-group>
+    </v-list>
 </template>
 
 <script>
 export default {
-    name: "ue-list-element",
-    props: {
-        item: {
-            type: Object,
-            required: true,
-        },
-        selectItem: {
-            type: Number,
-            default: 0,
-        },
-        selectedSubItem: {
-            type: Number,
-            default: 0
-        }
+  name: 'ue-list-element',
+  props: {
+    item: {
+      type: Object,
+      required: true
     },
-    data: function() {
-        return {
-            // selectItem: 0,
-            activeSubItem: this.selectedSubItem,
-            activeItem: this.selectedItem,
-        }
+    selectItem: {
+      type: Number,
+      default: 0
     },
-
-    created() {
-
+    selectedSubItem: {
+      type: Number,
+      default: 0
     }
+  },
+  data: () => ({
+    open: ['Users'],
+    admins: [
+      ['Management', 'mdi-account-multiple-outline'],
+      ['Settings', 'mdi-cog-outline']
+    ],
+    cruds: [
+      ['Create', 'mdi-plus-outline'],
+      ['Read', 'mdi-file-outline'],
+      ['Update', 'mdi-update'],
+      ['Delete', 'mdi-delete']
+    ]
+  })
 
 }
 </script>

@@ -1,198 +1,185 @@
 <template>
-
-    <v-dialog
-        v-model="dialog"
-        v-on="{
-            toggleFullScreen: toggleFullScreen
-        }"
-
-        v-bind="bindProps()"
-        :fullscreen="full"
-        :width="modalWidth"
+  <v-dialog
+    v-model="dialog"
+    v-bind="$bindAttributes()"
+    transition="dialog-bottom-transition"
+    :fullscreen="full"
+    :width="modalWidth"
     >
+    <template v-for="(_, name) in $slots" v-slot:[name]="slotProps">
+      <slot :name="name" v-bind="slotProps || {}"></slot>
+    </template>
 
-        <template v-slot:activator="{ on, attrs }">
-            <slot 
-                name="activator"
-                :attrs="{
-                    ...attrs
-                }"
-                :on="{
-                    ...on
-                }"
-                >
-                <!-- <v-btn
-                    color="primary"
-                    dark
-                    class="mb-2"
-                    v-bind="{attrs}"
-                    v-on="on"
-                    >
-                    {{ $tc('show') }}
-                </v-btn> -->
-            </slot>
-        </template>
+    <!-- <template v-slot:activator="{ props }">
+      <slot name="activator" :props="{...props}"></slot>
+    </template> -->
 
-        <v-card>
-            <slot
-                v-if="systembar"
-                name="systembar"
-    
-                >
-                <v-system-bar
-                        window
-                        dark
-                    >
-                        <v-spacer></v-spacer>
-                        
-                        <v-icon 
-                            @click="toggleFullScreen()" 
-                            :x-small="full"
-                            >
-                            mdi-checkbox-blank-outline
-                        </v-icon>
-                        <!-- <v-icon @click="cancelModal(on.closeDialog)" >mdi-close</v-icon> -->
-                        <v-icon @click="close()" >mdi-close</v-icon>
-                </v-system-bar>
+    <!-- <v-card>
+      <slot v-if="systembar" name="systembar">
+        <v-layout style="height: 40px">
+          <v-system-bar dark>
+            <v-icon @click="toggleFullScreen()" :x-small="full">
+              mdi-checkbox-blank-outline
+            </v-icon>
+            <v-icon @click="close()">mdi-close</v-icon>
+          </v-system-bar>
+        </v-layout>
+      </slot>
+      <slot name="body"
+        v-bind="{
+            onOpen: this.open,
+            onClose: this.close,
+            onConfirm: this.confirm
+        }"
+        :closeDialog="close"
+        >
+      </slot>
+    </v-card> -->
+
+    <slot v-if="systembar" name="systembar">
+      <v-layout style="height: 40px">
+        <v-col>
+          <v-system-bar dark>
+            <v-icon @click="toggleFullScreen()" :x-small="full">
+              mdi-checkbox-blank-outline
+            </v-icon>
+            <v-icon @click="close()">mdi-close</v-icon>
+          </v-system-bar>
+        </v-col>
+      </v-layout>
+    </slot>
+    <slot name="body"
+        v-bind="{
+            textCancel: this.textCancel,
+            textConfirm: this.textConfirm,
+            textDescription: this.textDescription,
+
+            onOpen: this.open,
+            onClose: this.close,
+            onConfirm: this.confirm,
+        }"
+        :closeDialog="close"
+        >
+        <v-card >
+          <v-card-title class="text-h5 text-center" style="word-break: break-word;">
+            <!-- {{ textDescription }} -->
+          </v-card-title>
+          <v-card-text class="text-center" style="word-break: break-word;" >
+            <slot name="body.description" v-bind="{textDescription}">
+              {{ textDescription }}
             </slot>
-            
-            <slot 
-                name="body"
-                :attrs="{
-                }"
-                :on="{
-                    openDialog: this.open,
-                    closeDialog: this.close,
-                    confirmDialog: this.confirm
-                }"
-                :closeDialog="close"
-                >
-            
+          </v-card-text>
+          <v-divider/>
+          <v-card-actions>
+            <v-spacer/>
+            <slot name="body.options" v-bind="{textDescription}">
+              <v-btn ref="modalCancel" class="modal-cancel" color="red" text @click="cancel()"> {{ textCancel }}</v-btn>
+              <v-btn ref="modalConfirm" class="modal-confirm" color="green" text @click="confirm()"> {{ textConfirm }}</v-btn>
             </slot>
+            <v-spacer/>
+          </v-card-actions>
         </v-card>
-    </v-dialog>
+    </slot>
+  </v-dialog>
 </template>
 
 <script>
 import htmlClasses from '@/utils/htmlClasses'
+import { makeModalProps, useModal } from '@/hooks'
 
 export default {
-    props: {
-        value: {
-            type: Boolean
-        },
-        name: {
-            type: String,
-            default: "Item"
-        },
-        transition: {
-            type: String,
-            default: "bottom"
-        },
-
-        widthType: {
-            type: String,
-        },
-        systembar: {
-            type: Boolean,
-            default: false
-        },
-        fullscreen: {
-            type: Boolean,
-            default: false
-        }
-
-    },
-    data() {
-        return {
-            // dialog: this.value,
-            widths: {
-                sm: "300px",
-                md: "500px",
-                lg: "750px",
-            },
-            width: this.widthType,
-
-            modalClass: htmlClasses.modal,
-            firstFocusableEl: null,
-            lastFocusableEl: null,
-            
-            full: this.fullscreen,
-        }
-    },
-
-    computed: {
-        dialog: {
-            get () {
-                return this.value
-            },
-            set (value) {
-                __log('modal->dialog->setter', value)
-                this.$emit('input', value)
-            }
-        },
-        // full: {
-        //     get () {
-        //         return this.fullscreen
-        //         return this.fullScreen
-        //     },
-        //     set (value) {
-        //         // this.$emit('screenListener', this.full)
-        //     }
-        // },
-        togglePersistent() {
-            return this.persistent;
-        },
-
-        toggleScrollable() {
-            return this.scrollable;
-        },
-        modalWidth() {
-            return !!this.width ? this.widths[this.width] : null;
-        },
-    },
-
-    watch: {
-
-    },
-
-    methods: {
-        toggle() {
-            this.dialog = !this.dialog
-        },
-        close() {
-            this.dialog = false
-        },
-        open() {
-            this.dialog = true
-        },
-        confirm() {
-            this.dialog = false
-        },
-
-        attrs(attrs) {
-            __log(attrs)
-            return attrs;
-        },
-
-        toggleFullScreen() {
-            __log(this.full)
-            return this.full = !this.full;
-        },
-
-        screenListener(e){
-            // __log(e.target);
-            this.full = e.target.fullScreen
-        },
-    },
-    beforeDestroy: function () {
-
-    },
-    created() {
-        // setInterval((self) => {
-        //     __log(self.dialog)
-        // }, 1000, this)
+  emits: [
+    'update:modelValue',
+    'opened'
+  ],
+  props: {
+    ...makeModalProps()
+  },
+  setup (props, context) {
+    return {
+      ...useModal(props, context)
     }
+  },
+  computed: {
+    textCancel () {
+      return this.cancelText !== '' ? this.cancelText : this.$t('cancel')
+    },
+    textConfirm () {
+      return this.confirmText !== '' ? this.confirmText : this.$t('confirm')
+    },
+    textDescription () {
+      return this.descriptionText
+    }
+  },
+
+  watch: {
+    dialog (value) {
+      !value || this.emitOpened()
+    }
+  },
+
+  methods: {
+    toggle () {
+      this.dialog = !this.dialog
+    },
+    close (callback = null) {
+      if (callback) {
+        callback()
+      }
+      this.dialog = false
+    },
+    open (callback = null, nextCallback = null) {
+      if (callback) {
+        callback()
+      }
+
+      this.dialog = true
+      if (nextCallback) {
+        const _this = this
+        this.$nextTick().then(() => {
+          _this.$refs.modalConfirm.$el.addEventListener('click', (e) => {
+            nextCallback()
+            _this.close()
+          })
+
+          _this.$refs.modalCancel.$el.addEventListener('click', (e) => {
+            _this.close()
+          })
+        })
+      }
+    },
+    confirm (callback = null) {
+      if (callback) {
+        callback()
+      }
+      this.dialog = false
+      this.$emit('confirm')
+    },
+    cancel (callback = null) {
+      if (callback) {
+        callback()
+      }
+      this.dialog = false
+      this.$emit('cancel')
+    },
+    // attrs (attrs) {
+    //   return attrs
+    // },
+    toggleFullScreen () {
+      this.full = !this.full
+    },
+    screenListener (e) {
+      this.full = e.target.fullScreen
+    }
+  },
+  beforeUnmount: function () {
+
+  },
+  created () {
+    // setInterval((self) => {
+    //   __log('dialog', self.dialog)
+    // }, 5000, this)
+  }
 }
 </script>
 

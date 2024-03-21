@@ -1,0 +1,71 @@
+
+$global-light-text-color: #000000;
+$global-dark-text-color: #FFFFFF;
+
+// $calc(100% * 320/1920)
+
+$primary-color: #27A0B4;
+$primary-2-color: #178DA0;
+$primary-light-color: #63C0C4;
+$secondary-color: #FFFFFF;
+$tertiary-color: #DFEFF0;
+$cta-color: #F6A505;
+$cta-secondary-color: #FFFFFF;
+$color__white : #fff;
+$primary-hover-color: #11758D;
+$secondary-hover-color: #DFEFF0;;
+$tertiary-hover-color: #27A0B4;
+$cta-hover-color: #F08712;
+$cta-secondary-hover-color: #F6A505;
+
+$primary-text-color: #FFFFFF;
+$secondary-text-color: #27A0B4;
+$tertiary-text-color: #27A0B4;
+$cta-text-color: #FFFFFF;
+$cta-secondary-text-color: #F6A505;
+
+$sidebar-background: $primary-2-color;
+
+/* BUTTONS */
+$button-primary: $primary-color;
+$button-secondary: $secondary-color;
+$button-tertiary: $tertiary-color;
+$button-cta: $cta-color;
+$button-cta-secondary: $cta-secondary-color;
+
+$button-primary-text-color: $primary-text-color;
+$button-secondary-text-color: $secondary-text-color;
+$button-tertiary-text-color: $tertiary-text-color;
+$button-cta-text-color: $cta-text-color;
+$button-cta-secondary-text-color: $cta-secondary-text-color;
+
+$button-primary-hover: $primary-hover-color;
+$button-secondary-hover: $secondary-hover-color;
+$button-tertiary-hover: $tertiary-hover-color;
+$button-cta-hover: $cta-hover-color;
+$button-cta-secondary-hover: $cta-secondary-hover-color;
+
+$button-secondary-border-color: $primary-color;
+$button-cta-secondary-border-color: $cta-color;
+
+$button-tertiary-hover-text-color: $primary-text-color;
+
+//Media Modal variables
+$color__border: #e5e5e5;//$color__black--10;
+$color__border--hover: #d9d9d9;
+$color__border--light: #f2f2f2;
+$color__text: #262626; //$color__black--85;
+$color__text--light: #8c8c8c; //$color__black--45;
+$color__f--bg: #fbfbfb; //$color__black--2;
+$color__button_greyed--bg: #ccc; //$color__black--20;
+$color__border--focus: $color__button_greyed--bg; //$color__black--20;
+$color__action: #3278B8; //$color__darkBlue;
+$color__link: $color__action;
+$color__block-bg: #f4f9fd; //$color__translucentBlue;
+$color__translucentBlue: $color__block-bg;
+$color__error: #e61414; //$color__red;
+
+$color__black: $global-light-text-color;
+$color__background: $color__white;
+$color__lighter:#f6f6f6;
+$color__icons: #a6a6a6;

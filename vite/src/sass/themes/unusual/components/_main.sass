@@ -1,0 +1,30 @@
+@use '../abstract' as *
+// @use 'vuetify/' as *
+@use 'vuetify/settings' as v-settings
+
+// @debug v-settings.$colors
+
+.ue-main-container
+  // min-height: 100vh
+
+.v-main
+  .ue--main-container
+    padding: $theme-space
+
+/* width */
+::-webkit-scrollbar
+  width: 8px
+
+/* Track */
+::-webkit-scrollbar-track
+  background: transparent
+
+/* Handle */
+::-webkit-scrollbar-thumb
+  background: #BB86FC
+  border-radius: 8px
+
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover
+  background: #3700B3

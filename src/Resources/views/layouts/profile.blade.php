@@ -8,15 +8,18 @@
 @endphp
 
 @push('head_last_js')
-    @if( app()->isProduction() )
+    {{
+        ModularityVite::useHotFile(public_path('modularity.hot'))->withEntryPoints(['src/js/core-free.js'])
+    }}
+    {{-- @if( app()->isProduction() )
         <link href="{{ unusualMix('core-free.js') }}" rel="preload" as="script" crossorigin />
     @else
 
 
-    @endif
+    @endif --}}
 @endpush
 @push('post_js')
-    <script src="{{ unusualMix('core-free.js') }}"></script>
+    {{-- <script src="{{ unusualMix('core-free.js') }}"></script> --}}
 @endpush
 
 {{-- @dd($elements) --}}

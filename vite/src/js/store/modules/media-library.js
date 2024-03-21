@@ -4,8 +4,8 @@
  * Set options for the Media Library and all the medias attached into the form
  */
 
-import Vue from 'vue'
-import cloneDeep from 'lodash/cloneDeep'
+// import Vue from 'vue'
+import cloneDeep from 'lodash-es/cloneDeep'
 import { MEDIA_LIBRARY } from '../mutations'
 import ACTIONS from '@/store/actions'
 
@@ -14,17 +14,18 @@ const state = {
    * An object of all crops available for cropper component configuration
    * @type {Object}
    */
-  crops: window[process.env.JS_APP_NAME].STORE.medias.crops || {},
+  crops: window[import.meta.env.VUE_APP_NAME].STORE.medias.crops || {},
   /**
    * Display the file name of images
    * @type {Object}
    */
-  showFileName: window[process.env.JS_APP_NAME].STORE.medias.showFileName || false,
+  showFileName: window[import.meta.env.VUE_APP_NAME].STORE.medias.showFileName || false,
   /**
    * Define types available in medias library
    * @type {Array.<string>}
    */
-  types: window[process.env.JS_APP_NAME].STORE.medias.types || [],
+  types: window[import.meta.env.VUE_APP_NAME].STORE.medias.types || [],
+
   /**
    * Current type of media library
    * @type {string}
@@ -35,6 +36,9 @@ const state = {
    * @type {string}
    */
   connector: null,
+
+  isInserted: false,
+
   /**
    * Define the max of medias that can be select from the media libray
    * @type {number}
@@ -64,12 +68,12 @@ const state = {
    * An object of selected medias by usage (connector)
    * @type {Object.<string,Object>}
    */
-  selected: window[process.env.JS_APP_NAME].STORE.medias.selected || {},
+  selected: window[import.meta.env.VUE_APP_NAME].STORE.medias.selected || {},
   /**
    * An object of configs
    * @type {Object.<string,Object>}
    */
-  config: window[process.env.JS_APP_NAME].STORE.medias.config || { useWysiwyg: false, wysiwygOptions: {} },
+  config: window[import.meta.env.VUE_APP_NAME].STORE.medias.config || { useWysiwyg: false, wysiwygOptions: {} },
   /**
    * An array of current uploading medias. When upload is ended, array is reset
    * @type {Array}
@@ -86,7 +90,7 @@ const state = {
    */
   indexToReplace: -1,
 
-  showModal: window[process.env.JS_APP_NAME].STORE.medias.openModal || false
+  showModal: window[import.meta.env.VUE_APP_NAME].STORE.medias.openModal || false
 }
 
 // getters
@@ -122,13 +126,21 @@ const mutations = {
     })
   },
   [MEDIA_LIBRARY.UPDATE_MEDIAS] (state, { mediaRole, index, media }) {
-    Vue.set(
-      state.selected[mediaRole],
-      index,
-      media
-    )
+    state.selected[mediaRole][index] = media
+    // Vue.set(
+    //   state.selected[mediaRole],
+    //   index,
+    //   media
+    // )
   },
   [MEDIA_LIBRARY.SAVE_MEDIAS] (state, medias) {
+    // __log(
+    //   medias,
+    //   state.connector,
+    //   state.indexToReplace,
+    //   state.selected
+    // )
+    // return
     if (state.connector) {
       const key = state.connector
       const existedSelectedConnector = state.selected[key] && state.selected[key].length
@@ -151,15 +163,19 @@ const mutations = {
     }
   },
   [MEDIA_LIBRARY.DESTROY_SPECIFIC_MEDIA] (state, media) {
-    if (state.selected[media.name]) {
-      state.selected[media.name].splice(media.index, 1)
-      if (state.selected[media.name].length === 0) Vue.delete(state.selected, media.name)
-    }
+    __log(
+      media.name,
+      state.selected
+    )
+    // if (state.selected[media.name]) {
+    //   state.selected[media.name].splice(media.index, 1)
+    //   if (state.selected[media.name].length === 0) delete state.selected[media.name]
+    // }
 
-    state.connector = null
+    // state.connector = null
   },
   [MEDIA_LIBRARY.DESTROY_MEDIAS] (state, connector) {
-    if (state.selected[connector]) Vue.delete(state.selected, connector)
+    if (state.selected[connector]) delete state.selected[connector]
 
     state.connector = null
   },
@@ -195,9 +211,12 @@ const mutations = {
   [MEDIA_LIBRARY.ERROR_UPLOAD_MEDIA] (state, media) {
     state.loading.forEach(function (m, index) {
       if (m.id === media.id) {
-        Vue.set(state.loading[index], 'progress', 0)
-        Vue.set(state.loading[index], 'error', true)
-        Vue.set(state.loading[index], 'errorMessage', media.errorMessage)
+        state.loading[index].progress = 0
+        state.loading[index].error = true
+        state.loading[index].errorMessage = media.errorMessage
+        // Vue.set(state.loading[index], 'progress', 0)
+        // Vue.set(state.loading[index], 'error', true)
+        // Vue.set(state.loading[index], 'errorMessage', media.errorMessage)
       }
     })
   },
@@ -205,6 +224,10 @@ const mutations = {
     if (newValue && newValue !== '') state.connector = newValue
     else state.connector = null
   },
+  [MEDIA_LIBRARY.UPDATE_IS_INSERTED] (state, newValue) {
+    state.isInserted = newValue
+  },
+
   [MEDIA_LIBRARY.UPDATE_MEDIA_MODE] (state, newValue) {
     state.strict = newValue
   },
@@ -250,7 +273,8 @@ const mutations = {
 
     if (metadatas.media.hasOwnProperty('index')) {
       const media = setMetatadas(cloneDeep(medias[metadatas.media.index]))
-      Vue.set(medias, metadatas.media.index, media)
+      medias[metadatas.media.index] = media
+    //   Vue.set(medias, metadatas.media.index, media)
     }
   },
   [MEDIA_LIBRARY.DESTROY_MEDIA_CONNECTOR] (state) {
@@ -280,7 +304,9 @@ const mutations = {
     }
 
     const newMedia = addCrop(cloneDeep(media))
-    Vue.set(state.selected[key], index, newMedia)
+
+    state.selected[key][index] = newMedia
+    // Vue.set(state.selected[key], index, newMedia)
   },
   [MEDIA_LIBRARY.ADD_MEDIAS] (state, { medias }) {
     state.selected = Object.assign({}, state.selected, medias)
@@ -296,7 +322,7 @@ const actions = {
     mediaIds.forEach(mediaId => (duplicates[mediaId.replace(block.id, id)] = [...medias[mediaId]]))
 
     commit(MEDIA_LIBRARY.ADD_MEDIAS, { medias: duplicates })
-  },
+  }
 
 }
 

@@ -13,6 +13,7 @@ export const ADD_REPEATERS = 'duplicateBlockRepeaters'
 export const REORDER_FORM_BLOCKS = 'reorderFormBlocks'
 export const UPDATE_FORM_LOADING = 'updateFormLoading'
 export const SET_FORM_ERRORS = 'setFormErrors'
+export const SET_SERVER_VALID = 'setServerValid'
 export const CLEAR_FORM_ERRORS = 'clearFormErrors'
 export const UPDATE_FORM_SAVE_TYPE = 'updateFormSaveType'
 export const REPLACE_FORM_FIELDS = 'replaceFormField'
@@ -20,6 +21,7 @@ export const ADD_FORM_FIELDS = 'addFormField'
 export const EMPTY_FORM_FIELDS = 'emptyFormField'
 
 export const SET_EDITED_ITEM = 'setEditedItem'
+export const RESET_EDITED_ITEM = 'resetEditedItem'
 
 /* Modal forms */
 export const EMPTY_MODAL_FIELDS = 'emptyModalField'
@@ -29,7 +31,9 @@ export const REPLACE_MODAL_FIELDS = 'replaceModalField'
 
 export default {
   SET_EDITED_ITEM,
-  
+  RESET_EDITED_ITEM,
+  SET_SERVER_VALID,
+
   PREVENT_SUBMIT,
   ALLOW_SUBMIT,
   UPDATE_FORM_PERMALINK,

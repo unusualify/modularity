@@ -1,6 +1,6 @@
 // Show / Hide the env colored line when scrolling after the header
 
-import debounce from 'lodash/debounce'
+import debounce from 'lodash-es/debounce'
 
 const showEnvLine = function () {
   let lastScrollPos = 0

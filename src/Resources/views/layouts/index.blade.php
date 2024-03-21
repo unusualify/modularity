@@ -22,18 +22,18 @@
 @stop
 
 @push('head_last_js')
-    {{-- <script src="{{ unusualMix('runtime.js') }}"></script>
-    <script src="{{ unusualMix('vendor.js') }}"></script>
-    <script src="{{ unusualMix('core-index.js') }}"></script> --}}
-    @if( app()->isProduction() )
+    {{
+        ModularityVite::useHotFile(public_path('modularity.hot'))->withEntryPoints(['src/js/core-index.js'])
+    }}
+    {{-- @if( app()->isProduction() )
         <link href="{{ unusualMix('core-index.js') }}" rel="preload" as="script" crossorigin />
     @else
 
 
-    @endif
+    @endif --}}
 @endpush
 @push('post_js')
-    <script src="{{ unusualMix('core-index.js') }}"></script>
+    {{-- <script src="{{ unusualMix('core-index.js') }}"></script> --}}
 @endpush
 
 @section('STORE')

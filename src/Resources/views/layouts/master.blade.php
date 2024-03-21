@@ -75,7 +75,7 @@
             window['{{ unusualConfig('js_namespace') }}'].TIMEZONE = '{{ unusualConfig('timezone') }}';
             window['{{ unusualConfig('js_namespace') }}'].AUTHORIZATION = @json($authorization);
 
-            window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {};
+            window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
             window['{{ unusualConfig('js_namespace') }}'].STORE = {};
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.config = {
@@ -130,8 +130,8 @@
             @yield('STORE')
         </script>
 
-        <script src="{{ unusualMix('chunk-common.js')}}" > </script>
-        <script src="{{ unusualMix('chunk-vendors.js') }}"> </script>
+        {{-- <script src="{{ unusualMix('chunk-common.js')}}" > </script>
+        <script src="{{ unusualMix('chunk-vendors.js') }}"> </script> --}}
 
         @stack('post_js')
 

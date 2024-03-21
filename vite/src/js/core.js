@@ -1,10 +1,8 @@
 // General includes
-import '__setup/setup.js';
+import setup from '__setup/setup.js'
 
-const UECompose = function (app) {
-    window.Vue = app;
-    app.config.globalProperties.$ = $
-    app.config.globalProperties.axios = axios
+const UECompose = function () {
+  setup()
 }
 
 export default UECompose

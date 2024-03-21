@@ -1,123 +1,142 @@
 <template>
-    <v-navigation-drawer 
-        v-model="$root.sidebarToggle" 
-        app 
-        color="white"
 
-        :expand-on-hover="$root.isHoverable"
-        :mini-variant="$root.isMini"
-        
-        :mini-variant.sync="$root.miniStatus"
-        @update:mini-variant="miniChanging"
+  <v-navigation-drawer
+    v-model="sidebarToggle"
+    id="navigation-drawer"
+    :expand-on-hover="isHoverable"
+    :mini-variant="isMini"
+    v-model:mini-variant="isMini"
+    :rail="rail"
+    :width="width"
+    @update:rail="methods.handleExpanding($event)"
+    :location="mainLocation"
+    >
+
+    <!-- <v-avatar class="d-block text-center mx-auto mt-2">
+      <v-icon color="green darken-2" large icon="fa:fab fa-atlassian"/>
+    </v-avatar> -->
+
+    <template v-slot:prepend>
+      <div>
+        <span v-svg symbol="main-logo"></span>
+      </div>
+    </template>
+
+    <v-divider class=""></v-divider>
+
+    <!-- <ue-list-element>
+
+    </ue-list-element> -->
+
+    <ue-list-group
+      :items="items"
+      :expanded="expanded"
+      :showIcon="showIcon"
+      >
+    </ue-list-group>
+
+    <template v-slot:append>
+      <ue-logout-modal :csrf="csrf">
+        <template v-slot:activator="{props}">
+          <v-btn
+              v-if="expanded"
+              class="v-button--logout my-3"
+              variant="plain"
+              v-bind="props"
+              color="white"
+              prepend-icon="mdi-power"
+              >
+              <!-- <template v-slot:prepend>
+                <v-icon color="success"></v-icon>
+              </template> -->
+              {{$t('authentication.logout')}}
+          </v-btn>
+          <v-btn v-else
+          variant="plain"
+          v-bind="props"
+          icon="mdi-power"
+          color="white"
+          class="px-6"
+          >
+          </v-btn>
+        </template>
+      </ue-logout-modal>
+
+      <div class="d-flex justify-center">
+        <v-btn
+          v-if="expanded"
+          v-for="[_icon, _link] in socialMediaLinks"
+          class="ma-1"
+          :key="_icon"
+          :icon="_icon"
+          :href="_link"
+          target="_blank"
+          color="white"
+          size="x-small"
         >
+          <v-icon size="medium" color="primary"></v-icon>
+        </v-btn>
+      </div>
+      <div>
+        <slot name="bottom">
 
-        <v-avatar class="d-block text-center mx-auto mt-5">
-            <v-icon color="green darken-2" large>
-                fab fa-atlassian
-            </v-icon>
-        </v-avatar>
-        
-        <v-divider class="mx-3 my-5"></v-divider>
-
-        <v-list dense class="mt-5 d" nav shaped>
-            
-            <ue-list-group
-                :items="items"
-                >
-            </ue-list-group>
-
-        </v-list>
-
-        
-
-        <div style="position:absolute; bottom: 80px; margin-left: auto; margin-right: auto; left:0; right:0; text-align:center;">
-            <v-btn icon :ripple="false">
-                <v-badge bordered overlap color="green" dot>
-                    <v-icon>far fa-belief </v-icon>
-                </v-badge>
-                <br>
-                <v-avatar size="30">
-                    <v-img src="https://cdn.vuetifyjs.com/images/lists/2.jpg">
-
-                    </v-img>
-                </v-avatar>
-            </v-btn>
-        </div>
-
-        <div style="position:absolute; bottom: 20px; margin-left: auto; margin-right: auto; left:0; right:0; text-align:center;">
-            <ue-logout-dialog :csrf="$root.csrf" />
-        </div>
-
-
-    </v-navigation-drawer>
+        </slot>
+      </div>
+    </template>
+  </v-navigation-drawer>
+  <v-navigation-drawer v-if="contentDrawer"
+  :width="width"
+  :location="mainLocation"
+  style="max-width: 15%;"
+  >
+  </v-navigation-drawer>
+  <v-navigation-drawer v-if="secondarySidebarExists"
+  :location="secondaryLocation"
+  :width="width"
+  >
+  </v-navigation-drawer>
 </template>
 
 <script>
+import { inject } from 'vue'
+
 export default {
-    props: {
-        items: {
-            type: Array,
-            required: true,
-        },
-        rating: {
-            type: Number,
-            default: 0,
-        }
-    },
-    data() {
-        return {
-            dialog: false,
-
-            // isMini: this.mini,
-        }
-    },
-
-    created() {
-    },
-
-    beforeCreate(){
-        // __log('beforeCreate mini', this.mini)
-    },
-    
-    mounted() {
-
-    },
-    watch: {
-        
-    },
-
-    computed: {
-
-    },  
-    methods: {
-        onChange(event) {
-            console.log('sidebar onChange', event.target.value)
-        },
-        addItem(item){
-            // console.log(this.items)
-            this.items.push(item);
-        },
-
-        miniChanging(val){
-            // __log(
-            //     'mini changing', 
-            //     val
-            // )
-        },
+  setup(){
+    const sideBar = inject('hooks')
+    return {
+      ...sideBar
     }
+  },
+  props: {
+    items: {
+      type: Array,
+      required: true
+    },
+    rating: {
+      type: Number,
+      default: 0
+    },
+
+  },
+  data () {
+    return {
+      dialog: false,
+      logo: '@/sass/themes/template/main-logo.svg',
+      isExpanded: true,
+    }
+  },
 }
 </script>
 
-<style>
-    .border{
-        padding-left: 12px;
-        /* margin-right: 12px; */
-        background: #97ffff;
-        border-radius: 10%;
-        text-decoration: none;
-    }
+<style lang="sass">
+  // @use 'styles/themes/b2press/settings' with(
+  //   $button-text-transform: 'capitalize'
+  // );
+</style>
 
-    .v-list-item-group .v-list-item-active {
-        color: grey;
-    }
+<style>
+
+    /* .v-list-item-group .v-list-item-active {
+      color: grey;
+    } */
 </style>

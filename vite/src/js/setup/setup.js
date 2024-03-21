@@ -1,9 +1,12 @@
-import * as changeCase from "change-case";
+import * as changeCase from 'change-case'
+import init from './init.js'
 
-require('./helpers');
-require('./init')
+// require('./helpers.js')
+// require('./init.js')
 
-__globalizeMethods([
+export default function setup() {
+  init()
+  window.__globalizeMethods([
     changeCase
-]);
-
+  ])
+}

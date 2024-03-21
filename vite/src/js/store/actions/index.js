@@ -14,10 +14,10 @@ export const SET_DATATABLE_NESTED = 'setDatatableNestedDatas'
 export const SET_DATATABLE = 'setDatatableDatas'
 export const TOGGLE_PUBLISH = 'togglePublishedData'
 export const DELETE_ITEM = 'deleteData'
-// export const DELETE_ROW = 'deleteData'
-export const DUPLICATE_ROW = 'duplicateData'
-export const RESTORE_ROW = 'restoreData'
-export const DESTROY_ROW = 'destroyData'
+// export const DELETE_ITEM = 'deleteData'
+export const DUPLICATE_ITEM = 'duplicateData'
+export const RESTORE_ITEM = 'restoreData'
+export const DESTROY_ITEM = 'destroyData'
 export const TOGGLE_FEATURE = 'toggleFeaturedData'
 export const BULK_PUBLISH = 'bulkPublishData'
 export const BULK_FEATURE = 'bulkFeatureData'
@@ -52,10 +52,10 @@ export default {
   SET_DATATABLE,
   TOGGLE_PUBLISH,
   DELETE_ITEM,
-  // DELETE_ROW,
-  DUPLICATE_ROW,
-  RESTORE_ROW,
-  DESTROY_ROW,
+  // DELETE_ITEM,
+  DUPLICATE_ITEM,
+  RESTORE_ITEM,
+  DESTROY_ITEM,
   TOGGLE_FEATURE,
   BULK_PUBLISH,
   BULK_FEATURE,

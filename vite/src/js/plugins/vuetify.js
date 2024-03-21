@@ -1,74 +1,118 @@
-
 import { createVuetify } from 'vuetify'
+import { aliases, mdi } from 'vuetify/iconsets/mdi'
+import { fa } from 'vuetify/iconsets/fa'
 
-import 'vuetify/styles'
-// import '@fortawesome/fontawesome-free/css/all.min.css' // Ensure you are using css-loader
-// import '@mdi/font/css/materialdesignicons.css' // Ensure you are using css-loader
+// Stylesheets
+import '@fortawesome/fontawesome-free/css/all.min.css' // Ensure you are using css-loader
+import '@mdi/font/css/materialdesignicons.css' // Ensure you are using css-loader
+// import '@mdi/font/scss/materialdesignicons.scss'
 
-function loadIcons($font){
-    const locales = require.context('../config/icons', true, /[A-Za-z0-9-_,\s]+.json$/i);
-    const messages = {};
+// import 'styles/themes/b2press/main.scss'
+// import 'vuetify/styles'
 
-    locales.keys().forEach(key => {
-        const matched = key.match(/([A-Za-z0-9-_]+)\./i);
-        if(matched && matched.length > 1){
-            const locale = matched[1];
-            messages[locale] = locales(key);
-        }
-    })
+// Vuetify
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+// import { VTreeview } from 'vuetify/lib/components/VTreeview'
+// import { VBtn } from 'vuetify/lib/components'
 
-    return messages;
+import customMdiIcons from '@/config/icons/mdi'
+// import { md2 } from 'vuetify/blueprints'
+
+import * as themes from '@/config/themes'
+
+// import 'vuetify/lib/styles/main.sass'
+
+const APP_THEME = import.meta.env.VUE_APP_THEME || 'unusual'
+// console.log(APP_THEME)
+// require('styles/themes/' + APP_THEME + '/main.scss')
+// import 'styles/themes/' + APP_THEME + '/main.scss'
+// import('./../../sass/themes/' + APP_THEME + '/main.scss')
+
+function loadIcons ($font) {
+  const locales = require.context('../config/icons', true, /[A-Za-z0-9-_,\s]+.json$/i)
+  const messages = {}
+
+  locales.keys().forEach(key => {
+    const matched = key.match(/([A-Za-z0-9-_]+)\./i)
+    if (matched && matched.length > 1) {
+      const locale = matched[1]
+      messages[locale] = locales(key)
+    }
+  })
+
+  return messages
 }
 
 const opts = {
-    theme: {
-        themes: {
-            light: {
-                primary: '#3f51b5',
-                secondary: '#696969',
-                accent: '#8c9eff',
-                error: '#b71c1c',
-            },
-            dark: {
-                background: '#ddd'
-            }
-        },
+//   blueprint: md2,
+  aliases: {
+    VBtnSecondary: components.VBtn,
+    VBtnTertiary: components.VBtn,
+    VBtnCta: components.VBtn,
+    VBtnCtaSecondary: components.VBtn,
+    VBtnSuccess: components.VBtn
+  },
+  defaults: {
+    global: {
+      ripple: false
     },
-    icons: {
-        // component: VIcon,
-        iconfont: 'mdi' || 'fa', // 'mdi' || 'mdiSvg' || 'md' || 'fa' || 'fa4' || 'faSvg'
-        values: {
-
-            check: 'mdi-check',
-
-            creditCards : 'mdi-credit-card-search',
-
-            delete: 'mdi-delete',
-
-            edit: 'mdi-pencil',
-
-            filter_list: 'mdi-filter',
-
-            info: 'mdi-information',
-
-            list: 'mdi-dots-vertical-circle-outline',
-
-            media: 'mdi-image-album',
-            modules: 'mdi-view-module',
-
-            package: 'mdi-package',
-            permission: 'mdi-account-arrow-right',
-            product: 'mdi-dropbox',
-
-            role: 'mdi-account-key',
-
-            support: 'mdi-lifebuoy',
-
-            // userAdd: 'fa-user-plus',
-            userAdd: 'mdi-account-edit',
-            users: 'mdi-account-multiple',
-        },
+    VSheet: {
+      class: 'rounded'
+    //   elevation: 4
     },
+    VBtn: {
+      color: 'primary',
+      style: { textTransform: 'none' }
+    },
+    VBtnSecondary: {
+      color: 'primary',
+      variant: 'outlined'
+    },
+    VBtnTertiary: {
+      color: 'tertiary'
+      // variant: 'plain'
+    },
+    VBtnCta: {
+      color: 'cta'
+      // variant: 'plain'
+    },
+    VBtnCtaSecondary: {
+      color: 'cta-secondary'
+      // variant: 'plain'
+    },
+    VBtnSuccess: {
+      color: 'success',
+      variant: 'elevated'
+    }
+
+  },
+  theme: {
+    defaultTheme: APP_THEME,
+    themes
+  },
+  icons: {
+    defaultSet: 'mdi',
+    // iconfont: 'mdi',
+    aliases: {
+      ...aliases,
+      ...customMdiIcons
+    },
+    sets: {
+      mdi,
+      fa
+    }
+    // component: VIcon,
+    // iconfont: 'mdi' || 'fa', // 'mdi' || 'mdiSvg' || 'md' || 'fa' || 'fa4' || 'faSvg'
+    // values: {
+
+    // }
+  },
+  directives,
+  components: {
+    ...components
+    // VTreeview
+  }
 }
 
-export default createVuetify(opts);
+export default createVuetify(opts)

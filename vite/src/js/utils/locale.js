@@ -46,7 +46,7 @@ export const locales = {
 }
 
 export function getCurrentLocale () {
-  return window[process.env.JS_APP_NAME].twillLocalization.locale
+  return window[import.meta.env.VUE_APP_NAME].LOCALE
 }
 
 export function isCurrentLocale24HrFormatted () {

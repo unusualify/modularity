@@ -7,8 +7,9 @@ const state = {
   error: null,
 
   show: false,
-  type: "info",
-  message: null
+  type: 'info',
+  message: null,
+  location: 'bottom'
 }
 
 // getters
@@ -27,12 +28,14 @@ const mutations = {
   },
   [ALERT.SET_ALERT] (state, alert) {
     state.type = alert.variant ?? state.type
+    state.location = alert.location ?? state.location
     state.message = alert.message ?? null
+
     state.show = true
   },
   [ALERT.CLEAR_ALERT] (state, variant) {
     state.show = false
-    state.type = "info"
+    state.type = 'info'
     state.message = null
   }
 }

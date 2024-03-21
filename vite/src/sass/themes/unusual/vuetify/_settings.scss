@@ -1,0 +1,7 @@
+// themes/${theme}/vuetify/_settings.scss
+@use '../abstract' as *;
+
+@forward 'vuetify/settings' with (
+  $table-row-height: 49px, // var(--v-table-row-height, 52px) !default
+  $table-header-height: 49px, // 56px !default;
+);

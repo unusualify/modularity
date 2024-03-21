@@ -148,7 +148,7 @@ const devServer = {
       poll: 1000
     }
   },
-  proxy: process.env.VUE_DEV_PROXY,
+  proxy: process.env.VUE_DEV_PROXY ?? 'http://nginx',
   client: {
     webSocketURL: `ws://${URL}/ws`
   }

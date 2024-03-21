@@ -1,44 +1,45 @@
 import api from '@/store/api/form'
-import { FORM, ALERT } from '@/store/mutations'
+import { FORM, ALERT, MEDIA_LIBRARY } from '@/store/mutations'
 import ACTIONS from '@/store/actions'
 
-import { getFormData, getFormFields, getModalFormFields, getSchemaModel } from '@/utils/getFormData.js'
-
+import { getSubmitFormData, getModel } from '@/utils/getFormData.js'
 
 const getFieldIndex = (stateKey, field) => {
-    return stateKey.findIndex(f => f.name === field.name)
+  return stateKey.findIndex(f => f.name === field.name)
 }
-
+// __log(
+//   window[import.meta.env.VUE_APP_NAME].STORE.form
+// )
 const state = {
-    
-  baseUrl: window[process.env.JS_APP_NAME].STORE.form.baseUrl || '',
-  
-  inputs: window[process.env.JS_APP_NAME].STORE.form.inputs,
+  baseUrl: window[import.meta.env.VUE_APP_NAME].STORE.form.baseUrl || '',
+  inputs: window[import.meta.env.VUE_APP_NAME].STORE.form.inputs || {},
+  saveUrl: window[import.meta.env.VUE_APP_NAME].STORE.form.saveUrl || '',
 
-  saveUrl: window[process.env.JS_APP_NAME].STORE.form.saveUrl || '',
-
+  serverValid: true,
   /**
    * Form errors after submitting
    * @type {Object}
    */
   errors: {},
 
-  // fields: window[process.env.JS_APP_NAME].STORE.form.inputs.forEach(function(el ){
+  // fields: window[import.meta.env.VUE_APP_NAME].STORE.form.inputs.forEach(function(el ){
   //     return {
   //       name: el.name,
   //       value: null
   //     };
   // }),
 
-  // editedItem: window[process.env.JS_APP_NAME].STORE.form.inputs.reduce( (a,c) => (a[c.name] = c.default ?? '', a), {}),
-  // editedItem: Object.keys(window[process.env.JS_APP_NAME].STORE.form.inputs).reduce( (a,c) => (a[window[process.env.JS_APP_NAME].STORE.form.inputs[c].name] = window[process.env.JS_APP_NAME].STORE.form.inputs[c].hasOwnProperty('default') ? window[process.env.JS_APP_NAME].STORE.form.inputs[c].default : '', a), {}),
-  editedItem: getSchemaModel(window[process.env.JS_APP_NAME].STORE.form.inputs),
+  // editedItem: window[import.meta.env.VUE_APP_NAME].STORE.form.inputs.reduce( (a,c) => (a[c.name] = c.default ?? '', a), {}),
+  // editedItem: Object.keys(window[import.meta.env.VUE_APP_NAME].STORE.form.inputs).reduce( (a,c) => (a[window[import.meta.env.VUE_APP_NAME].STORE.form.inputs[c].name] = window[import.meta.env.VUE_APP_NAME].STORE.form.inputs[c].hasOwnProperty('default') ? window[import.meta.env.VUE_APP_NAME].STORE.form.inputs[c].default : '', a), {}),
+  editedItem: window[import.meta.env.VUE_APP_NAME].STORE.form.inputs
+    ? getModel(window[import.meta.env.VUE_APP_NAME].STORE.form.inputs, null)
+    : {},
 
   /**
    * Force reload on successful submit
    * @type {Boolean}
    */
-  reloadOnSuccess: window[process.env.JS_APP_NAME].STORE.form.reloadOnSuccess || false,
+  reloadOnSuccess: window[import.meta.env.VUE_APP_NAME].STORE.form.reloadOnSuccess || false,
 
   /**
    * Determines if the form should prevent submitting before an input value is pushed into the store
@@ -46,23 +47,26 @@ const state = {
    */
   isSubmitPrevented: false,
 
-  loading: false,
+  loading: false
 }
-  
+
 // getters
 const getters = {
   defaultItem: state => {
-    // __log(state.editedItem)
-    return state.editedItem
-    // return state.inputs.reduce( (a,c) => (a[c.name] = c.hasOwnProperty('default') ? c.default : '', a), {})
+    return getModel(state.inputs)
   }
 }
-  
+
 const mutations = {
   [FORM.SET_EDITED_ITEM] (state, item) {
+    // state.editedItem = getModel(state.inputs, Object.assign({}, item), this._state.data)
     state.editedItem = Object.assign({}, item)
+    // store._modules.root.state
+    // commit(MEDIA_LIBRARY.ADD_MEDIAS, )
   },
-  
+  [FORM.RESET_EDITED_ITEM] (state) {
+    state.editedItem = getModel(state.inputs)
+  },
   [FORM.PREVENT_SUBMIT] (state) {
     state.isSubmitPrevented = true
   },
@@ -140,6 +144,9 @@ const mutations = {
   [FORM.SET_FORM_ERRORS] (state, errors) {
     state.errors = errors
   },
+  [FORM.SET_SERVER_VALID] (state, isValid) {
+    state.serverValid = isValid
+  },
   [FORM.CLEAR_FORM_ERRORS] (state) {
     state.errors = []
   },
@@ -147,9 +154,9 @@ const mutations = {
     state.type = type
   }
 }
-  
+
 const actions = {
-  [ACTIONS.SAVE_FORM] ({ commit, state, getters, rootState, dispatch }, {item=null, callback=null, errorCallback=null}) {
+  [ACTIONS.SAVE_FORM] ({ commit, state, getters, rootState, dispatch }, { item = null, callback = null, errorCallback = null, plain = false }) {
     commit(FORM.CLEAR_FORM_ERRORS)
     commit(FORM.UPDATE_FORM_LOADING, true)
 
@@ -163,68 +170,61 @@ const actions = {
     // - publication properties
     // - selected medias and browsers
     // - created blocks and repeaters
-    
+
     // const data = getFormData(rootState)
-    const data = item ?? state.editedItem;
+    const data = plain ? item : getSubmitFormData(state.inputs, item ?? state.editedItem, rootState)
 
     // const method = rootState.publication.createWithoutModal ? 'post' : 'put'
-    let method = 'post';
-    let url = window[process.env.JS_APP_NAME].ENDPOINTS.store;
+    let method = 'post'
+    let url = window[import.meta.env.VUE_APP_NAME].ENDPOINTS.store
 
-    if(data.hasOwnProperty('id')){
-      method = 'put';
-      url = window[process.env.JS_APP_NAME].ENDPOINTS.update.replace(':id', data.id);
+    if (Object.prototype.hasOwnProperty.call(data, 'id')) {
+      method = 'put'
+      url = window[import.meta.env.VUE_APP_NAME].ENDPOINTS.update.replace(':id', data.id)
     }
-    
 
     api[method](url, data, function (response) {
       commit(FORM.UPDATE_FORM_LOADING, false)
-      // __log(
-      //   response
-      // )
-      // if (successResponse.data.hasOwnProperty('redirect')) {
-      //   window.location.replace(successResponse.data.redirect)
-      // }
-
-      // if (state.reloadOnSuccess) {
-      //   window.location.reload()
-      // }
-
-      
-      // commit(PUBLICATION.UPDATE_PUBLISH_SUBMIT)
-      // if (successResponse.data.hasOwnProperty('revisions')) {
-      //   commit(REVISION.UPDATE_REV_ALL, successResponse.data.revisions)
-      // }
-      // __log(reload)
-      if(response.data.hasOwnProperty('errors')){
+      if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
+        commit(FORM.SET_SERVER_VALID, false)
         commit(FORM.SET_FORM_ERRORS, response.data.errors)
-
-      }else if(response.data.hasOwnProperty('variant') && response.data.variant == 'success' ){
-
+      } else if (Object.prototype.hasOwnProperty.call(response.data, 'variant') && response.data.variant.toLowerCase() === 'success') {
         commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
-        
-        if( !data.hasOwnProperty('reload') || data.reload)
+        commit(FORM.SET_SERVER_VALID, true)
+
+        if (method === 'post') {
+          commit(FORM.RESET_EDITED_ITEM)
+        }
+
+        try {
           dispatch(ACTIONS.GET_DATATABLE)
+        } catch (error) {
+
+        }
+        // if (!data.hasOwnProperty('reload') || data.reload) { dispatch(ACTIONS.GET_DATATABLE) }
       }
 
       if (callback && typeof callback === 'function') callback(response.data)
+    }, function (response) {
+      __log(response)
 
-    }, function (errorResponse) {
       commit(FORM.UPDATE_FORM_LOADING, false)
-
-      if (errorResponse.response.data.hasOwnProperty('exception')) {
+      if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
+        commit(FORM.SET_FORM_ERRORS, response.data.errors)
+        commit(FORM.SET_SERVER_VALID, false)
+      } else if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
         commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
       } else {
-        dispatch(ACTIONS.HANDLE_ERRORS, errorResponse.response.data)
+        dispatch(ACTIONS.HANDLE_ERRORS, response.data)
         commit(ALERT.SET_ALERT, { message: 'Your submission could not be validated, please fix and retry', variant: 'error' })
       }
 
-      if (errorCallback && typeof errorCallback === 'function') errorCallback(errorResponse.data)
+      if (errorCallback && typeof errorCallback === 'function') errorCallback(response.data)
     })
   },
 
   [ACTIONS.HANDLE_ERRORS] ({ commit, state, getters, rootState }, errors) {
-    const repeaters = rootState.repeaters;
+    const repeaters = rootState.repeaters
     // Translate the errors to their respective fields.
     Object.keys(errors).forEach((errorKey) => {
       const splitted = errorKey.split('.')
@@ -244,12 +244,12 @@ const actions = {
     })
 
     commit(FORM.SET_FORM_ERRORS, errors)
-  },
+  }
 }
-  
+
 export default {
-    state,
-    getters,
-    actions,
-    mutations
+  state,
+  getters,
+  actions,
+  mutations
 }
