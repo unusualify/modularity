@@ -40,46 +40,18 @@ trait RelationshipMap {
 
         $props = '';
 
-        if($relationshipName == 'morphTo'){
+        if($relationshipName === 'morphTo'){
             if(count($arguments) > 0){
                 $props = $this->propsDelimeter . implode($this->propsIndicator, $arguments);
             }
         }
 
         foreach ($parameters as $n => $p) {
-            $param1 = $param2 = $param3 = null;
             $parameter = (object) $p;
-            switch ($n) {
-                case 'firstKey':
-                    $param1 = $this->model;
-                    $param2 = $relationshipName;
-                    $methodName = "getRelationshipArgument". $this->getStudlyName('foreignKey');
-                    break;
-                case 'secondKey':
-                    $param1 = $arguments[0];
-                    $param2 = $relationshipName;
-                    $methodName = "getRelationshipArgument". $this->getStudlyName('foreignKey');
-                    break;
-                case 'localKey':
-                    $param1 = $name;
-                    $param2 = $relationshipName;
-                    $methodName = "getRelationshipArgument". $this->getStudlyName('ownerKey');
-                    break;
-                case 'secondLocalKey':
-                    $param1 = $name;
-                    $param2 = $relationshipName;
-                    $methodName = "getRelationshipArgument". $this->getStudlyName('ownerKey');
-                    break;
-                default:
-                    $param1 = $name;
-                    $param2 = $relationshipName;
-                    $param3 = $arguments;
-                    $methodName = "getRelationshipArgument". $this->getStudlyName($n);
-                    break;
-            }
+            $methodName = "getRelationshipArgument". $this->getStudlyName($n);
 
             if(method_exists($this, $methodName)){
-                ($v = $this->{$methodName}($param1, $param2, $param3)) != false
+                ($v = $this->{$methodName}($name, $relationshipName, $arguments, $this->model)) != false
                     ? array_push($parts, $v)
                     : null;
 

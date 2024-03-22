@@ -99,7 +99,6 @@ class ModelMakeCommand extends BaseCommand
             return E_ERROR;
         }
         $this->createAdditionalModels();
-        dd('ASDAS');
 
         // $this->handleOptionalMigrationOption();
         // $this->handleOptionalControllerOption();

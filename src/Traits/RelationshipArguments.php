@@ -109,4 +109,58 @@ trait RelationshipArguments {
         return $value;
     }
 
+    public function getRelationshipArgumentFirstKey($name, $relationshipName, $arguments, $modelName){
+        switch ($relationshipName) {
+            case 'hasManyThrough':
+            // case 'hasOneThrough':
+                $value =  $this->getForeignKeyFromName($modelName);
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        return $value ?? '';
+    }
+
+    public function getRelationshipArgumentSecondKey($name, $relationshipName, $arguments){
+        switch ($relationshipName) {
+            case 'hasManyThrough':
+                $value =  $this->getForeignKeyFromName($arguments[0]);
+                break;
+            default:
+                # code...
+                break;
+        }
+        return $value ?? '';
+    }
+
+    public function getRelationshipArgumentLocalKey($name, $relationshipName, $arguments){
+        switch ($relationshipName) {
+            case 'hasManyThrough':
+                $value = $arguments[1] ?? 'id';
+                break;
+
+            default:
+                # code...
+                break;
+        }
+        return $value ?? '';
+    }
+
+    public function getRelationshipArgumentSecondLocalKey($name, $relationshipName, $arguments){
+        switch ($relationshipName) {
+            case 'hasManyThrough':
+                $value = $arguments[1] ?? 'id';
+                break;
+
+            default:
+                # code...
+                break;
+        }
+        return $value ?? '';
+    }
+
+
+
 }
