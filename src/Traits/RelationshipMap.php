@@ -198,18 +198,34 @@ trait RelationshipMap {
                     // }
 
                 $relationshipName = $this->getRelationshipName($schema);
-                dd($index,$schematic, $schema,$props,$relationshipName);
 
                 if(isset($this->reverseMapping[$relationshipName])){
                     $reverseRelationshipName = $this->reverseMapping[$relationshipName];
                     switch ($reverseRelationshipName) {
                         case 'hasOneThrough':
                             $methodName = $this->getSingular($this->getCamelCase($this->model));
-                            $related = ($related = UFinder::getRouteModel($this->model))
-                                ? $related
-                                : get_class(UFinder::getRouteRepository($this->model, asClass: true)->getModel());
+                            [$modelName, $intermediateName, $localKey, $secondLocalKey, $firstKey, $secondKey] = array_slice(explode(':', $schema),1);
+                            $targetModel = ($targetModel = UFinder::getRouteModel($this->model))
+                            ? $targetModel
+                            : get_class(UFinder::getRouteRepository($this->model, asClass: true)->getModel());
+                            $intermediateModel = ($intermediateModel = UFinder::getRouteModel($intermediateName))
+                            ? $intermediateModel
+                            : get_class(UFinder::getRouteRepository($intermediateName, asClass: true)->getModel());
 
-                            dd();
+                            $data[$this->getStudlyName($modelName)] = $this->relationshipFormat(
+                                modelName: $modelName,
+                                methodName: $methodName,
+                                relationshipName: $reverseRelationshipName,
+                                arguments: [
+                                    "\\".$targetModel."::class",
+                                    "\\".$intermediateModel."::class",
+                                    "'id'",
+                                    "'id'",
+                                    "'{$this->getCamelCase($intermediateName)}_id'",
+                                    "'{$this->getCamelCase($this->model)}_id'",
+                                ]
+                            );
+                            break;
 
                         case 'morphMany':
                             $methodName = $this->getPlural($this->getCamelCase($this->model));

@@ -175,7 +175,6 @@ class ModelRelationParser implements Arrayable
 
             $modelClass = UFinder::getRouteRepository($modelName, asClass: true)->getModel();
             $reflector = new \ReflectionClass($modelClass);
-            dd($modelClass, $reflector);
             // search ModuleRoute Relationships trait
             // foreach ($reflector->getTraits() as $traitNamespace => $trait) {
             //     if($trait->getShortName() == $reflector->getShortName() . 'Relationships'){
