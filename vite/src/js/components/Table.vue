@@ -445,7 +445,9 @@
 </template>
 
 <script>
-import { makeTableProps, useTable, makeFormatterProps } from '@/hooks'
+import { makeFormatterProps } from '@/hooks/useFormatter'
+import useTable, { makeTableProps } from '@/hooks/useTable'
+
 import ActiveTableItem from '__components/labs/ActiveTableItem.vue'
 const { ignoreFormatters } = makeFormatterProps()
 
