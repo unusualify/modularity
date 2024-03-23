@@ -4,6 +4,9 @@ import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import Vue from '@vitejs/plugin-vue'
 import Inspect from 'vite-plugin-inspect'
 import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
+
+import VitePluginSvgSpritemap from '@spiriit/vite-plugin-svg-spritemap'
+
 import Modularity from './vite-plugin-modularity'
 
 // Test Plugins
@@ -15,40 +18,47 @@ import Modularity from './vite-plugin-modularity'
 
 // Utilities
 import { defineConfig, loadEnv, splitVendorChunkPlugin } from 'vite'
-import { resolve, dirname } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 import path from 'path'
 import { globSync } from 'glob'
 
 import dotenv from 'dotenv'
 import dotenvExpand from 'dotenv-expand'
-// const dotenv = require('dotenv')
-// const dotenvExpand = require('dotenv-expand')
 
-const myEnv = dotenv.config({ path: path.resolve(__dirname, '../../../.env') }).parsed // prevent writing to `process.env`
-dotenvExpand.expand(myEnv)
+const laravelRootUpperLevel = (dir) => {
+  return Array(dir.split('/').length + 1).fill('..').join('/')
+}
+
+const env = dotenv.config({ path: path.resolve(__dirname, '../../../.env') }).parsed // prevent writing to `process.env`
+dotenvExpand.expand(env)
+
+const partialsDirectory = path.resolve(__dirname, './views/partials')
 
 const svgConfig = (suffix = null) => {
   suffix = suffix !== null ? `-${suffix}` : ''
 
   return {
+    injectSVGOnDev: true,
+    prefix: 'icon--',
     output: {
-      filename: `${partialsDirectory}/icons/icons${suffix}-svg.blade.php`,
-      chunk: {
-        name: `icons${suffix}`
-      }
-    },
-    sprite: {
-      prefix: 'icon--'
+      filename: `icons/icons${suffix}-svg.blade.php`,
+      // filename: `dist/icons/icons${suffix}-svg[extname]`,
+      // filename: `${svgIconsDirectory}/icons/icons${suffix}-svg.blade.php`,
+      // filename: `dist/icons/icons${suffix}-svg.blade.php,`
+
+      name: `icons${suffix}.svg`,
+      // view: false,
+      use: true
+
     },
     styles: {
-      filename: `~svg-sprite-icons${suffix}.scss`,
-      variables: {
-        sprites: `icons${suffix}-sprites`,
-        sizes: `icons${suffix}-sizes`,
-        variables: `icons${suffix}-variables`,
-        mixin: `icons${suffix}-sprites-mixin`
-      }
+      filename: `~svg-sprite-icons${suffix}.scss`
+      // variables: {
+      //   sprites: `icons${suffix}-sprites`,
+      //   sizes: `icons${suffix}-sizes`,
+      //   variables: `icons${suffix}-variables`,
+      //   mixin: `icons${suffix}-sprites-mixin`
+      // }
     }
   }
 }
@@ -58,7 +68,9 @@ export default defineConfig(({ command, mode }) => {
   const envPrefix = 'VUE'
 
   const vendorPath = ENV.MODULARITY_VENDOR_PATH || ENV.UNUSUAL_VENDOR_PATH || 'vendor/unusualify/modularity'
-  const CD_PARENT_STRING = Array(vendorPath.split('/').length + 1).fill('..').join('/') // 2 or 3 => '../../../
+
+  // const CD_PARENT_STRING = Array(vendorPath.split('/').length + 1).fill('..').join('/') // 2 or 3 => '../../../
+  const CD_PARENT_STRING = laravelRootUpperLevel(vendorPath)
 
   const APP_THEME = ENV.VUE_APP_THEME || 'unusual'
   const VUE_DEV_PROXY = ENV.VUE_DEV_PROXY || 'http://nginx'
@@ -67,17 +79,14 @@ export default defineConfig(({ command, mode }) => {
   const inputDir = fileURLToPath(new URL(`${srcDir}/js`, import.meta.url))
   const inputPattern = fileURLToPath(new URL(`${inputDir}/core-*.js`, import.meta.url))
 
-  const base = 'vendor/modularity'
+  const base = '/vendor/modularity'
+  const assetsDir = 'assets'
 
   // const outDir = 'dist/modularity'
-  const outDir = fileURLToPath(new URL(`${CD_PARENT_STRING}/public/${base}`, import.meta.url))
+  const outDir = fileURLToPath(new URL(`${CD_PARENT_STRING}/public${base}`, import.meta.url))
   const targetDir = fileURLToPath(new URL(`${CD_PARENT_STRING}/public`, import.meta.url))
 
-  const assetsDir = 'assets'
   const publicDir = 'public'
-
-  const partialsDirectory = path.resolve(__dirname, './views/partials')
-  const svgIconsDirectory = path.resolve(__dirname, `${CD_PARENT_STRING}/resources/views/vendor/modularity/partials/icons`)
 
   return {
     // envDir: path.resolve(__dirname, '../../../.env'),
@@ -101,7 +110,10 @@ export default defineConfig(({ command, mode }) => {
       }),
       Components(),
       splitVendorChunkPlugin(),
-      viteCommonjs()
+      viteCommonjs(),
+
+      VitePluginSvgSpritemap('./src/icons/**/*.svg', svgConfig()),
+      VitePluginSvgSpritemap(`./src/sass/themes/${APP_THEME}/icons/**/*.svg`, svgConfig('theme'))
     ],
     resolve: {
       extensions: [
@@ -188,7 +200,6 @@ export default defineConfig(({ command, mode }) => {
           },
 
           // dir: 'js',
-          makeAbsoluteExternalsRelative: true,
 
           chunkFileNames: 'js/[name].[hash].js',
           entryFileNames: 'entries/[name].[hash].js'
