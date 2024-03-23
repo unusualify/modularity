@@ -14,13 +14,12 @@ function loadStaticMessages () {
   Object.keys(locales).forEach(path => {
     const extFile = path.split('/').pop()
     const key = extFile.match(/([A-Za-z0-9-_]+)\.json/i)[1]
-    const matched = key.match(/([A-Za-z0-9-_]+)\./i)
+    const matched = key.match(/([A-Za-z0-9-_]+)/i)
     if (matched && matched.length > 1) {
       const locale = matched[1]
       messages[locale] = locales[path]
     }
   })
-
   return messages
 }
 
