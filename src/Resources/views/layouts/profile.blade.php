@@ -1,4 +1,4 @@
-@extends("{$BASE_KEY}::layouts.master")
+@extends("{$MODULARITY_VIEW_NAMESPACE}::layouts.master")
 
 @php
     // $emptyMessage = $emptyMessage ?? twillTrans('twill::lang.dashboard.empty-message');
@@ -78,14 +78,7 @@
 @stop
 
 @section('STORE')
-    window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {
-        {{-- @if($editable)
-            update: '{{ $actionUrl }}',
-        @else
-            store:  '{{ $actionUrl }}',
-        @endif --}}
-
-    }
+    window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {}
     window['{{ unusualConfig('js_namespace') }}'].STORE.form = {
         {{-- inputs: {!! json_encode($formSchema ?? new StdClass()) !!}, --}}
     }

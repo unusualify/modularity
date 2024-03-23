@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="{{ unusualConfig('locale', 'en') }}">
     <head>
-        @include("{$BASE_KEY}::partials.head")
+        @include("{$MODULARITY_VIEW_NAMESPACE}::partials.head")
     </head>
     <body class="env env--{{ app()->environment() }}">
         <div class="a17 a17--login">
@@ -15,7 +15,7 @@
                 </form>
             </section>
 
-            @include("{$BASE_KEY}::partials.toaster")
+            @include("{$MODULARITY_VIEW_NAMESPACE}::partials.toaster")
 
             <div class="login__copyright f--small">
                 <a href="https://twill.io/" target="_blank" rel="noopener">Made with

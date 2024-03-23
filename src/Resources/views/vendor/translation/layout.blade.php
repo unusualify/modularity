@@ -23,7 +23,7 @@
 </body>
 </html>
 
-{{-- @extends("{$BASE_KEY}::layouts.master")
+{{-- @extends("{$MODULARITY_VIEW_NAMESPACE}::layouts.master")
 
 @push('head_css')
     <link rel="stylesheet" href="{{ asset('/vendor/translation/css/main.css') }}">

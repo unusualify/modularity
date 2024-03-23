@@ -7,15 +7,15 @@
         <title> {{ $title ?? 'Module Template' }}</title>
         <meta name="csrf-token" content="{{ csrf_token() }}">
         @yield('pre-scripts') --}}
-        @include("{$BASE_KEY}::partials.head")
+        @include("{$MODULARITY_VIEW_NAMESPACE}::partials.head")
 
         @stack('head_last_js')
     </head>
     <body>
         {{-- @if(!unusualConfig('is_development', false))
-            @include("{$BASE_KEY}::partials.icons.svg-sprite")
+            @include("{$MODULARITY_VIEW_NAMESPACE}::partials.icons.svg-sprite")
         @endif --}}
-        @include("{$BASE_KEY}::partials.icons.svg-sprite")
+        @include("{$MODULARITY_VIEW_NAMESPACE}::partials.icons.svg-sprite")
 
         {{-- @dd( auth()->user() ) --}}
         @php

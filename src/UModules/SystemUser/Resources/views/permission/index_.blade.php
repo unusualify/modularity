@@ -1,4 +1,4 @@
-@extends("{$BASE_KEY}::layouts.master", [
+@extends("{$MODULARITY_VIEW_NAMESPACE}::layouts.master", [
     'title' => 'Module User'
 ])
 

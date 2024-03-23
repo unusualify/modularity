@@ -1,4 +1,4 @@
-@extends("{$BASE_KEY}::layouts.master", [
+@extends("{$MODULARITY_VIEW_NAMESPACE}::layouts.master", [
     'title' => 'Role Management'
 ])
 
@@ -15,7 +15,7 @@
                 :inputs="$inputs">
 
             </x-table> --}}
-            {{-- @include("{$BASE_KEY}::components.table",[
+            {{-- @include("{$MODULARITY_VIEW_NAMESPACE}::components.table",[
                 'headers' => $headers,
                 'inputs' => $inputs
             ]) --}}
