@@ -332,6 +332,7 @@ class BaseServiceProvider extends ServiceProvider
     {
         view()->composer('*',function($view) {
             $view->with('BASE_KEY', $this->baseKey);
+            $view->with('MODULARITY_VIEW_NAMESPACE', $this->baseKey);
         });
 
         if (config($this->baseKey . '.enabled.users-management')) {
