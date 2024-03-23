@@ -5,7 +5,7 @@ namespace $NAMESPACE$;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Modules\$MODULE_STUDLY_NAME$\Repositories\$STUDLY_NAME$Repository;
+use Modules\$STUDLY_MODULE_NAME$\Repositories\$STUDLY_NAME$Repository;
 
 class $CLASS$ extends Controller
 {

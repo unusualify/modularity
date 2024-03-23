@@ -5,8 +5,8 @@ namespace $NAMESPACE$;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Modules\$MODULE_STUDLY_NAME$\Repositories\$STUDLY_NAME$Repository;
-use Modules\$MODULE_STUDLY_NAME$\Transformers\$STUDLY_NAME$Resource;
+use Modules\$STUDLY_MODULE_NAME$\Repositories\$STUDLY_NAME$Repository;
+use Modules\$STUDLY_MODULE_NAME$\Transformers\$STUDLY_NAME$Resource;
 
 class $CLASS$ extends Controller
 {
@@ -15,7 +15,7 @@ class $CLASS$ extends Controller
      * This resource repository
      */
     private $repository;
-    
+
 
     /**
      * @param $STUDLY_NAME$Repository $repository
@@ -34,7 +34,7 @@ class $CLASS$ extends Controller
     {
         return new $STUDLY_NAME$Resource( $this->repository->paginate($request) );
     }
-    
+
 
     /**
      * Store a newly created resource in storage.
@@ -45,7 +45,7 @@ class $CLASS$ extends Controller
     {
         //
     }
-    
+
 
     /**
      * Show the specified resource.

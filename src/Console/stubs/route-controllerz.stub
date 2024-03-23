@@ -5,8 +5,8 @@ namespace $NAMESPACE$;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Modules\$MODULE_STUDLY_NAME$\Repositories\$STUDLY_NAME$Repository;
-use Modules\$MODULE_STUDLY_NAME$\Http\Requests\$STUDLY_NAME$Request;
+use Modules\$STUDLY_MODULE_NAME$\Repositories\$STUDLY_NAME$Repository;
+use Modules\$STUDLY_MODULE_NAME$\Http\Requests\$STUDLY_NAME$Request;
 
 class $CLASS$ extends Controller
 {
@@ -15,7 +15,7 @@ class $CLASS$ extends Controller
      * This resource repository
      */
     private $repository;
-    
+
 
     /**
      * @param $STUDLY_NAME$Repository $repository
@@ -34,7 +34,7 @@ class $CLASS$ extends Controller
     {
         $repository = $this->repository;
 
-        return view('$MODULE_LOWER_NAME$::$LOWER_NAME$.index', compact('repository'));
+        return view('$LOWER_MODULE_NAME$::$LOWER_NAME$.index', compact('repository'));
     }
 
 
@@ -44,9 +44,9 @@ class $CLASS$ extends Controller
      */
     public function create()
     {
-        return view('$MODULE_LOWER_NAME$::$LOWER_NAME$.create');
+        return view('$LOWER_MODULE_NAME$::$LOWER_NAME$.create');
     }
-    
+
 
     /**
      * Store a newly created resource in storage.
@@ -57,7 +57,7 @@ class $CLASS$ extends Controller
     {
         //
     }
-    
+
 
     /**
      * Show the specified resource.
@@ -66,7 +66,7 @@ class $CLASS$ extends Controller
      */
     public function show($id)
     {
-        return view('$MODULE_LOWER_NAME$::$LOWER_NAME$.show');
+        return view('$LOWER_MODULE_NAME$::$LOWER_NAME$.show');
     }
 
 
@@ -77,7 +77,7 @@ class $CLASS$ extends Controller
      */
     public function edit($id)
     {
-        return view('$MODULE_LOWER_NAME$::$LOWER_NAME$.edit');
+        return view('$LOWER_MODULE_NAME$::$LOWER_NAME$.edit');
     }
 
 

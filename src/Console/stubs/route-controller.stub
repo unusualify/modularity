@@ -11,7 +11,7 @@ class $CLASS$ extends $BASE_CONTROLLER$
     /**
      * @var string
      */
-     protected $moduleName = '$MODULE_STUDLY_NAME$';
+     protected $moduleName = '$STUDLY_MODULE_NAME$';
 
     /**
      * @var string
