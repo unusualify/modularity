@@ -10,6 +10,8 @@ use Illuminate\Support\Str;
 
 // use Illuminate\Console\Command as Console;
 use Illuminate\Support\Collection;
+use Nwidart\Modules\Facades\Module;
+use Unusualify\Modularity\Facades\Modularity;
 
 class ModuleMakeCommand extends BaseCommand
 {
@@ -41,7 +43,22 @@ class ModuleMakeCommand extends BaseCommand
 
         // $console = new Console();
 
+        if($this->option('just-stubs')){
+            $module = Modularity::find($this->argument('module'));
 
+            foreach ($module->getRoutes() as $key => $routeName) {
+                $this->call('unusual:make:stubs',[
+                    'module' => $module->getName(),
+                    'route' => $routeName,
+                    '--fix' => true,
+                    '--only' => $this->option('stubs-only'),
+                    '--except' => $this->option('stubs-except'),
+                ]);
+            }
+
+            return 0;
+
+        }
 
         $traits = activeUnusualTraits($this->options());
 
@@ -104,6 +121,9 @@ class ModuleMakeCommand extends BaseCommand
             ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
+            ['just-stubs', null, InputOption::VALUE_NONE, 'only stubs fix'],
+            ['stubs-only', null, InputOption::VALUE_OPTIONAL, 'Get only stubs'],
+            ['stubs-except', null, InputOption::VALUE_OPTIONAL, 'Get except stubs'],
         ], unusualTraitOptions());
     }
 

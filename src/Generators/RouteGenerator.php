@@ -24,7 +24,7 @@ class RouteGenerator extends Generator
     use ManageNames;
 
     /**
-     * The route name will created.
+     * The route name to be created
      *
      * @var string
      */
@@ -63,6 +63,13 @@ class RouteGenerator extends Generator
      * @var \Unusualify\Modularity\Module
      */
     protected $module;
+
+    /**
+     * The module name
+     *
+     * @var string
+     */
+    protected $moduleName;
 
     /**
      * The route name.
@@ -187,6 +194,7 @@ class RouteGenerator extends Generator
         $this->console = $console;
         $this->module = $module;
 
+        $this->moduleName = $this->module->getName();
 
 
         // Stub::setBasePath( config('modules.paths.modules').'/Base/Console/stubs');
@@ -1050,7 +1058,6 @@ class RouteGenerator extends Generator
      */
     protected function getStubContents($stub)
     {
-        // dd( $stub, $this->getReplacement($stub) );
         return (new Stub(
             '/' . $stub . '.stub',
             $this->getReplacement($stub)
@@ -1059,7 +1066,7 @@ class RouteGenerator extends Generator
     }
 
     /**
-     * get the list for the replacements.
+     * Get the list for the replacements.
      */
     public function getReplacements()
     {
@@ -1125,7 +1132,6 @@ class RouteGenerator extends Generator
         $patterns = [
             '/\$LOWER_NAME\$/' => $this->getLowerNameReplacement(),
             '/\$STUDLY_NAME\$/' => $this->getStudlyNameReplacement(),
-
             '/\$KEBAB_CASE\$/' => $this->getKebabCase($this->getName()),
             '/\$PASCAL_CASE\$/' => $this->getPascalCase($this->getName()),
             '/\$SNAKE_CASE\$/' => $this->getSnakeCase($this->getName()),
@@ -1174,6 +1180,10 @@ class RouteGenerator extends Generator
     {
         return $this->getLowerName($this->module->getName());
     }
+    protected function getLowerModuleNameReplacement()
+    {
+        return $this->getLowerName($this->module->getName());
+    }
 
     /**
      * Get the module name in studly case.
@@ -1181,6 +1191,11 @@ class RouteGenerator extends Generator
      * @return string
      */
     protected function getModuleStudlyNameReplacement()
+    {
+        return $this->module->getName();
+    }
+
+    protected function getStudlyModuleNameReplacement()
     {
         return $this->module->getName();
     }
@@ -1216,11 +1231,11 @@ class RouteGenerator extends Generator
     }
 
     /**
-     * Get replacement for $AUTHOR_NAME$.
+     * Get replacement for $AUTHOR$.
      *
      * @return string
      */
-    protected function getAuthorNameReplacement()
+    protected function getAuthorReplacement()
     {
         return unusualConfig('composer.author.name');
     }
