@@ -159,7 +159,7 @@ trait RelationshipArguments {
     public function getRelationshipArgumentSecondLocalKey($name, $relationshipName, $arguments, $modelName){
         switch ($relationshipName) {
             case 'hasOneThrough':
-                $value = $arguments[5] ?? $this->getForeignKeyFromName($modelName);
+                $value = $arguments[5] ?? $this->getForeignKeyFromName($name);
                 break;
             case 'hasManyThrough':
                 $value = $arguments[1] ?? 'id';
