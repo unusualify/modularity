@@ -22,6 +22,7 @@ trait RelationshipMap {
         'morphTo' => 'morphMany',
         'belongsToMany' => 'belongsToMany',
         'hasManyThrough' => 'hasOneThrough',
+        'hasOneThrough' => 'hasManyThrough',
     ];
 
 
@@ -174,6 +175,31 @@ trait RelationshipMap {
                 if(isset($this->reverseMapping[$relationshipName])){
                     $reverseRelationshipName = $this->reverseMapping[$relationshipName];
                     switch ($reverseRelationshipName) {
+                        case 'hasManyThrough':
+                            [$modelName, $intermediateName, $localKey, $secondLocalKey, $firstKey, $secondKey] = array_slice(explode(':', $schema),1);
+                            $methodName = $this->getPlural($this->getCamelCase($this->model));
+                            $targetModel = ($targetModel = UFinder::getRouteModel($this->model))
+                            ? $targetModel
+                            : get_class(UFinder::getRouteRepository($this->model, asClass: true)->getModel());
+                            $intermediateModel = ($intermediateModel = UFinder::getRouteModel($intermediateName))
+                            ? $intermediateModel
+                            : get_class(UFinder::getRouteRepository($intermediateName, asClass: true)->getModel());
+
+                            $data[$this->getStudlyName($modelName)] = $this->relationshipFormat(
+                                modelName:$modelName,
+                                methodName: $methodName,
+                                relationshipName: $reverseRelationshipName,
+                                arguments: [
+                                    "\\" . $targetModel . "::class",
+                                    "\\".$intermediateModel."::class",
+                                    "'{$this->getCamelCase($modelName)}_id'",
+                                    "'{$this->getCamelCase($intermediateName)}_id'",
+                                    "'id'",
+                                    "'id'",
+                                ]
+                                );
+                            break;
+
                         case 'hasOneThrough':
                             $methodName = $this->getSingular($this->getCamelCase($this->model));
                             [$modelName, $intermediateName, $localKey, $secondLocalKey, $firstKey, $secondKey] = array_slice(explode(':', $schema),1);
@@ -363,6 +389,7 @@ trait RelationshipMap {
                 break;
             case 'belongsTo':
             case 'hasOne':
+            case 'hasOneThrough':
                 // dd($parameters, $relationshipName, $arguments);
                 $position = $parameters['related']['position'];
                 $relatedMethodName = $this->getSingular($arguments[$position]);
@@ -554,6 +581,9 @@ trait RelationshipMap {
                 break;
             case 'hasManyThrough':
                 $comment = $this->commentStructure(["The {$attr['relationship_name']} that belong to the {$model}."]);
+                break;
+            case 'hasOneThrough':
+                $comment = $this->commentStructure(["The {$attr['relationship_name']} that owns the {$model}."]);
                 break;
             default:
                 $comment = "/**\n\t* Get .\n\t*/";

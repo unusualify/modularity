@@ -13,6 +13,7 @@ trait RelationshipArguments {
         $value = "";
 
         switch ($relationshipName) {
+            case 'hasOneThrough':
             case 'hasManyThrough':
             case 'belongsToMany':
             case 'belongsTo':
@@ -55,7 +56,6 @@ trait RelationshipArguments {
         $value = "";
 
         switch ($relationshipName) {
-            case 'hasManyThrough':
             case 'belongsTo':
                 $value = $arguments[1] ?? 'id';
                 break;
@@ -98,7 +98,7 @@ trait RelationshipArguments {
 
         switch ($relationshipName) {
             case 'hasManyThrough':
-
+            case 'hasOneThrough':
                 $value = $this->getStudlyName($arguments[0]);
                 break;
             default:
@@ -111,8 +111,10 @@ trait RelationshipArguments {
 
     public function getRelationshipArgumentFirstKey($name, $relationshipName, $arguments, $modelName){
         switch ($relationshipName) {
+            case 'hasOneThrough':
+                $value = $arguments[2] ?? 'id';
+                break;
             case 'hasManyThrough':
-            // case 'hasOneThrough':
                 $value =  $this->getForeignKeyFromName($modelName);
                 break;
             default:
@@ -125,6 +127,9 @@ trait RelationshipArguments {
 
     public function getRelationshipArgumentSecondKey($name, $relationshipName, $arguments){
         switch ($relationshipName) {
+            case 'hasOneThrough':
+                $value = $arguments[3] ?? 'id';
+                break;
             case 'hasManyThrough':
                 $value =  $this->getForeignKeyFromName($arguments[0]);
                 break;
@@ -137,6 +142,9 @@ trait RelationshipArguments {
 
     public function getRelationshipArgumentLocalKey($name, $relationshipName, $arguments){
         switch ($relationshipName) {
+            case 'hasOneThrough':
+                $value = $arguments[4] ?? $this->getForeignKeyFromName($arguments[0]);
+                break;
             case 'hasManyThrough':
                 $value = $arguments[1] ?? 'id';
                 break;
@@ -148,8 +156,11 @@ trait RelationshipArguments {
         return $value ?? '';
     }
 
-    public function getRelationshipArgumentSecondLocalKey($name, $relationshipName, $arguments){
+    public function getRelationshipArgumentSecondLocalKey($name, $relationshipName, $arguments, $modelName){
         switch ($relationshipName) {
+            case 'hasOneThrough':
+                $value = $arguments[5] ?? $this->getForeignKeyFromName($modelName);
+                break;
             case 'hasManyThrough':
                 $value = $arguments[1] ?? 'id';
                 break;
