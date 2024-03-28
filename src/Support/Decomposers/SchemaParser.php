@@ -84,13 +84,14 @@ class SchemaParser extends Parser
      *
      * @param string|null $schema
      */
-    public function __construct($schema = null, $useDefaults = true)
+    public function __construct($schema = null, $useDefaults = true, $model = null)
     {
         parent::__construct($schema);
 
         $this->useDefaults = $useDefaults;
 
         $this->relationshipMap = unusualConfig('laravel-relationship-map', []);
+        $this->model = $model;
 
         if($this->useDefaults){
             $this->defaultInputs = unusualConfig('schemas.default_inputs',[]);
@@ -228,7 +229,6 @@ class SchemaParser extends Parser
         $relationships = [];
 
         $parsed = $this->parse($this->schema);
-
         $methodChaining = false;
 
         foreach ($parsed as $col_name => $methods) {
@@ -247,7 +247,6 @@ class SchemaParser extends Parser
                 //         $arguments
                 //     );
                 // }
-
                 $relationships[] = $this->createRelationshipSchema($relatedName, $methodName, $arguments);
 
                 if($methodName == 'belongsToMany'){
@@ -322,7 +321,6 @@ class SchemaParser extends Parser
             }
         }
 
-        // dd($relationships);
         return $relationships;
     }
 

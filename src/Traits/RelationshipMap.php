@@ -21,6 +21,8 @@ trait RelationshipMap {
         'belongsTo' => 'hasMany',
         'morphTo' => 'morphMany',
         'belongsToMany' => 'belongsToMany',
+        'hasManyThrough' => 'hasOneThrough',
+        'hasOneThrough' => 'hasManyThrough',
     ];
 
 
@@ -39,7 +41,7 @@ trait RelationshipMap {
 
         $props = '';
 
-        if($relationshipName == 'morphTo'){
+        if($relationshipName === 'morphTo'){
             if(count($arguments) > 0){
                 $props = $this->propsDelimeter . implode($this->propsIndicator, $arguments);
             }
@@ -47,24 +49,19 @@ trait RelationshipMap {
 
         foreach ($parameters as $n => $p) {
             $parameter = (object) $p;
-            $methodName = "getRelationshipArgument" . $this->getStudlyName($n);
+            $methodName = "getRelationshipArgument". $this->getStudlyName($n);
 
             if(method_exists($this, $methodName)){
-                ($v = $this->{$methodName}($name, $relationshipName, $arguments)) != false
+                ($v = $this->{$methodName}($name, $relationshipName, $arguments, $this->model)) != false
                     ? array_push($parts, $v)
                     : null;
 
             }else if($parameter->required){
-                dd($n, $parameter, $name, $relationshipName);
+                dd($n, $parameter, $name, $relationshipName, $parameters);
             }else{
                 break;
             }
         }
-
-        // if($relationshipName == 'belongsTo'){
-        //     dd( $parts);
-        // }
-
         return implode(':', $parts) . $props;
     }
 
@@ -163,7 +160,6 @@ trait RelationshipMap {
             if(count($schematic) > 0){
                 $props = explode($this->propsIndicator, $schematic[0]);
             }
-
             if(!$index){
 
                 /**
@@ -171,14 +167,64 @@ trait RelationshipMap {
                  */
                 // public function packages(): MorphMany
                 // {
-                //     return $this->morphMany(Package::class, 'packageable');
-                // }
+                    //     return $this->morphMany(Package::class, 'packageable');
+                    // }
 
                 $relationshipName = $this->getRelationshipName($schema);
 
                 if(isset($this->reverseMapping[$relationshipName])){
                     $reverseRelationshipName = $this->reverseMapping[$relationshipName];
                     switch ($reverseRelationshipName) {
+                        case 'hasManyThrough':
+                            [$modelName, $intermediateName, $localKey, $secondLocalKey, $firstKey, $secondKey] = array_slice(explode(':', $schema),1);
+                            $methodName = $this->getPlural($this->getCamelCase($this->model));
+                            $targetModel = ($targetModel = UFinder::getRouteModel($this->model))
+                            ? $targetModel
+                            : get_class(UFinder::getRouteRepository($this->model, asClass: true)->getModel());
+                            $intermediateModel = ($intermediateModel = UFinder::getRouteModel($intermediateName))
+                            ? $intermediateModel
+                            : get_class(UFinder::getRouteRepository($intermediateName, asClass: true)->getModel());
+
+                            $data[$this->getStudlyName($modelName)] = $this->relationshipFormat(
+                                modelName:$modelName,
+                                methodName: $methodName,
+                                relationshipName: $reverseRelationshipName,
+                                arguments: [
+                                    "\\" . $targetModel . "::class",
+                                    "\\".$intermediateModel."::class",
+                                    "'{$this->getCamelCase($modelName)}_id'",
+                                    "'{$this->getCamelCase($intermediateName)}_id'",
+                                    "'id'",
+                                    "'id'",
+                                ]
+                                );
+                            break;
+
+                        case 'hasOneThrough':
+                            $methodName = $this->getSingular($this->getCamelCase($this->model));
+                            [$modelName, $intermediateName, $localKey, $secondLocalKey, $firstKey, $secondKey] = array_slice(explode(':', $schema),1);
+                            $targetModel = ($targetModel = UFinder::getRouteModel($this->model))
+                            ? $targetModel
+                            : get_class(UFinder::getRouteRepository($this->model, asClass: true)->getModel());
+                            $intermediateModel = ($intermediateModel = UFinder::getRouteModel($intermediateName))
+                            ? $intermediateModel
+                            : get_class(UFinder::getRouteRepository($intermediateName, asClass: true)->getModel());
+
+                            $data[$this->getStudlyName($modelName)] = $this->relationshipFormat(
+                                modelName: $modelName,
+                                methodName: $methodName,
+                                relationshipName: $reverseRelationshipName,
+                                arguments: [
+                                    "\\".$targetModel."::class",
+                                    "\\".$intermediateModel."::class",
+                                    "'id'",
+                                    "'id'",
+                                    "'{$this->getCamelCase($intermediateName)}_id'",
+                                    "'{$this->getCamelCase($this->model)}_id'",
+                                ]
+                            );
+                            break;
+
                         case 'morphMany':
                             $methodName = $this->getPlural($this->getCamelCase($this->model));
                             $related = ($related = UFinder::getRouteModel($this->model))
@@ -343,15 +389,16 @@ trait RelationshipMap {
                 break;
             case 'belongsTo':
             case 'hasOne':
+            case 'hasOneThrough':
                 // dd($parameters, $relationshipName, $arguments);
                 $position = $parameters['related']['position'];
                 $relatedMethodName = $this->getSingular($arguments[$position]);
                 // dd('belongsTo & hasOne', $parameters['related'], $arguments, $relatedMethodName);
                 break;
+            case 'hasManyThrough':
             case 'hasMany':
                 $position = $parameters['related']['position'];
                 $relatedMethodName = $this->getPlural($arguments[$position]);
-
                 break;
             case 'belongsToMany':
                 // dd('belongsToMany', $parameters, $arguments, $this->model);
@@ -491,13 +538,18 @@ trait RelationshipMap {
                 $formattedArgument = "\\" . $related . "::class";
 
                 break;
+            case 'through':
+                $through = ($through = UFinder::getRouteModel($argument))
+                    ? $through
+                    : get_class(UFinder::getRouteRepository($argument, asClass: true)->getModel());
+                $formattedArgument = "\\" . $through . "::class";
+                break;
             case 'name':
                 return '__FUNCTION__';
             default:
 
                 break;
         }
-
         return $formattedArgument;
 
     }
@@ -527,7 +579,12 @@ trait RelationshipMap {
             case 'morphTo':
                 $comment =  $this->commentStructure(["Get the model that the {$model} belongs to"]);
                 break;
-
+            case 'hasManyThrough':
+                $comment = $this->commentStructure(["The {$attr['relationship_name']} that belong to the {$model}."]);
+                break;
+            case 'hasOneThrough':
+                $comment = $this->commentStructure(["The {$attr['relationship_name']} that owns the {$model}."]);
+                break;
             default:
                 $comment = "/**\n\t* Get .\n\t*/";
                 break;

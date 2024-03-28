@@ -552,10 +552,10 @@ class RouteGenerator extends Generator
         foreach(explode('|', $this->relationships) as $relationship){
             $additional = array_merge($additional, App::makeWith(SchemaParser::class, [
                 'schema' => $relationship,
-                'useDefaults' => $this->useDefaults
+                'useDefaults' => $this->useDefaults,
+                'model' => $this->getName(),
             ])->getRelationships());
         }
-
         return array_merge(
             $this->getSchemaParser()->getRelationships(),
             $additional

@@ -158,7 +158,9 @@ class ModelRelationParser implements Arrayable
     public function getReverseRelationships()
     {
         $parsed = [];
+
         foreach ($this->getRelationships() as $relationship) {
+
             if(($resp = $this->parseReverseRelationshipSchema($relationship))){
                 $parsed = $parsed + $resp;
             }
@@ -170,6 +172,7 @@ class ModelRelationParser implements Arrayable
     public function writeReverseRelationships()
     {
         foreach ($this->getReverseRelationships() as $modelName => $format) {
+
             $modelClass = UFinder::getRouteRepository($modelName, asClass: true)->getModel();
             $reflector = new \ReflectionClass($modelClass);
             // search ModuleRoute Relationships trait
@@ -293,6 +296,7 @@ class ModelRelationParser implements Arrayable
     {
         $methods = [];
         foreach ($this->toArray() as $attr) {
+
             $methods[] = $this->renderFormat($attr);
             // $args = implode(', ', array_map(function($v){ return "{$v}";}, $attr['parameters']) );
 
@@ -321,6 +325,7 @@ class ModelRelationParser implements Arrayable
         $comment = $this->generateMethodComment($attr);
 
         $method_chain = "\$this->{$attr['relationship_method']}({$args})";
+
         if(count($attr['chain_methods'])){
             foreach ($attr['chain_methods'] as $key => $chain) {
                 $chain_args = implode(', ', array_map(function($v){ return "{$v}";}, $chain['parameters']) );
