@@ -112,7 +112,15 @@ class BuildCommand extends BaseCommand
         $progressBar->setMessage("Building assets started...\n\n");
         $progressBar->advance();
 
-        $resource_path = resource_path('js/unusual/*.vue');
+        $resource_path = resource_path('js/modularity/components/*.vue');
+
+        if(!file_exists(resource_path('js/modularity/components'))){
+            $this->call('vendor:publish', [
+                '--provider' => 'Unusualify\Modularity\LaravelServiceProvider',
+                '--tag' => 'custom-components',
+                '--force' => true,
+            ]);
+        }
 
         if ($this->option('hot')) {
             $this->startWatcher( $resource_path, 'php artisan unusual:build --copyOnly');

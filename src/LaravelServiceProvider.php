@@ -16,6 +16,7 @@ final class LaravelServiceProvider extends ServiceProvider
         $this->publishConfigs();
         $this->publishAssets();
         $this->publishViews();
+        $this->publishResources();
 
     }
 
@@ -79,7 +80,11 @@ final class LaravelServiceProvider extends ServiceProvider
         ], 'assets');
     }
 
-
-
+    private function publishResources(): void
+    {
+        $this->publishes([
+            __DIR__ . '/../vue/drafts/components' => resource_path('js/modularity/components')
+        ], 'custom-components');
+    }
 
 }
