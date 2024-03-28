@@ -3,7 +3,7 @@
 // import { ref, watch, computed, nextTick } from 'vue'
 import { reactive, toRefs, computed, watch } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
-import { transform, cloneDeep, filter, omit, find, isEmpty } from 'lodash'
+import { transform, cloneDeep, filter, omit, find, isEmpty } from 'lodash-es'
 import { getModel } from '@/utils/getFormData'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'

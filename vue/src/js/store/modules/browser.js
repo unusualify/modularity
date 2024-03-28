@@ -1,4 +1,4 @@
-import Vue from 'vue'
+// import Vue from 'vue'
 import { BROWSER } from '../mutations'
 import ACTIONS from '@/store/actions'
 
@@ -10,7 +10,7 @@ const state = {
   endpointName: '',
   endpoints: [],
   max: 0,
-  selected: window[process.env.VUE_APP_NAME].STORE.browser.selected || {}
+  selected: window[import.meta.env.VUE_APP_NAME].STORE.browser.selected || {}
 }
 
 // getters
@@ -49,14 +49,14 @@ const mutations = {
   },
   [BROWSER.DESTROY_ITEMS] (state, itemToDestroy) {
     if (state.selected[itemToDestroy.name]) {
-      Vue.delete(state.selected, itemToDestroy.name)
+      // Vue.delete(state.selected, itemToDestroy.name)
     }
   },
   [BROWSER.DESTROY_ITEM] (state, itemToDestroy) {
     if (state.selected[itemToDestroy.name]) {
       state.selected[itemToDestroy.name].splice(itemToDestroy.index, 1)
 
-      if (state.selected[itemToDestroy.name].length === 0) Vue.delete(state.selected, itemToDestroy.name)
+      // if (state.selected[itemToDestroy.name].length === 0) Vue.delete(state.selected, itemToDestroy.name)
 
       state.connector = null
     }

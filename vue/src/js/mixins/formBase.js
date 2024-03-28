@@ -1,4 +1,4 @@
-import { get, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex } from 'lodash'
+import { get, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex } from 'lodash-es'
 
 const typeToComponent = {
   // maps schema.type to prop 'type' in v-text-field  - https://www.wufoo.com/html5/

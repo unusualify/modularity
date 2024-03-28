@@ -1,6 +1,5 @@
 // themes/${theme}/vuetify/_settings.scss
 @use '../abstract' as *;
-
 @forward 'vuetify/settings' with (
   // $body-font-family: map-get(c.$vuetify, 'body-font-family'),
   // $utilities: '',

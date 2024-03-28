@@ -2,7 +2,7 @@
 
 // import { ref, watch, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import _ from 'lodash'
+import _ from 'lodash-es'
 import { ref, reactive, toRefs, h } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/propsFactory.mjs'
 

@@ -127,9 +127,9 @@ class BuildCommand extends BaseCommand
             $this->runUnusualProcess(['npm', 'run', 'build']);
 
             $this->info('');
-            // $progressBar->setMessage("Publishing assets...\n\n");
-            // $progressBar->advance();
-            // $this->call('unusual:refresh');
+            $progressBar->setMessage("Publishing assets...\n\n");
+            $progressBar->advance();
+            $this->call('unusual:refresh');
 
             $this->info('');
             $progressBar->setMessage("Done. \n\n");
@@ -159,7 +159,7 @@ class BuildCommand extends BaseCommand
             return;
         }
 
-        $chokidarPath = base_path($this->baseConfig('vendor_path') . '/vite') . '/node_modules/.bin/chokidar';
+        $chokidarPath = base_path($this->baseConfig('vendor_path') . '/vue') . '/node_modules/.bin/chokidar';
         $chokidarCommand = [$chokidarPath, $pattern, "-c", $command];
 
 
@@ -186,7 +186,7 @@ class BuildCommand extends BaseCommand
      */
     private function runUnusualProcess(array $command, $disableTimeout = false)
     {
-        $process = new Process($command, base_path($this->baseConfig('vendor_path')) . '/vite' );
+        $process = new Process($command, base_path($this->baseConfig('vendor_path')) . '/vue' );
         $process->setTty(Process::isTtySupported());
 
         if ($disableTimeout) {
@@ -216,7 +216,7 @@ class BuildCommand extends BaseCommand
     private function copyComponents()
     {
         $localCustomComponentsPath = resource_path($this->baseConfig('custom_components_resource_path', 'js/unusual'));
-        $unusualCustomComponentsPath = base_path($this->baseConfig('vendor_path')) . '/vite/src/js/components/customs';
+        $unusualCustomComponentsPath = base_path($this->baseConfig('vendor_path')) . '/vue/src/js/components/customs';
 
         if (!$this->filesystem->exists($unusualCustomComponentsPath)) {
             $this->filesystem->makeDirectory($unusualCustomComponentsPath, 0755, true);

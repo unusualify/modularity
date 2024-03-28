@@ -1,7 +1,7 @@
 import * as exports from '@/imports'
 
 // import 'styles/datatable.scss'
-// import `styles/themes/${process.env.VUE_APP_THEME}/pages/index.scss`
+// import `styles/themes/${import.meta.env.VUE_APP_THEME}/pages/index.scss`
 
 // Component Imports
 import UEDatatable from '__components/others/Datatable.vue'
@@ -33,7 +33,8 @@ app.use(exports.UEConfig)
 app.component('ue-datatable', UEDatatable)
 // app.component('ue-modal-form', UEModalForm)
 
-const includeClientComponents = require.context('__components/customs', true, /\.vue$/i)
+// const includeClientComponents = require.context('__components/customs', true, /\.vue$/i)
+const includeClientComponents = import.meta.glob('__components/customs/*.vue', { eager: true })
 app.config.globalProperties.registerComponents(includeClientComponents, 'customs', 'ue-custom')
 
 app.mount('#admin')

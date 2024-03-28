@@ -30,27 +30,27 @@ const deepRemoveFromObj = (items, keys = ['id', 'children'], deep = 'children') 
 }
 
 const state = {
-  baseUrl: window[process.env.VUE_APP_NAME].STORE.datatable.baseUrl || '',
-  // name: window[process.env.VUE_APP_NAME].STORE.datatable.name,
-  headers: window[process.env.VUE_APP_NAME].STORE.datatable.headers,
-  // inputs: window[process.env.VUE_APP_NAME].STORE.datatable.inputs,
-  search: window[process.env.VUE_APP_NAME].STORE.datatable.searchText,
-  options: window[process.env.VUE_APP_NAME].STORE.datatable.options,
-  data: window[process.env.VUE_APP_NAME].STORE.datatable.data || [],
-  total: parseInt(window[process.env.VUE_APP_NAME].STORE.datatable.total),
+  baseUrl: window[import.meta.env.VUE_APP_NAME].STORE.datatable.baseUrl || '',
+  // name: window[import.meta.env.VUE_APP_NAME].STORE.datatable.name,
+  headers: window[import.meta.env.VUE_APP_NAME].STORE.datatable.headers,
+  // inputs: window[import.meta.env.VUE_APP_NAME].STORE.datatable.inputs,
+  search: window[import.meta.env.VUE_APP_NAME].STORE.datatable.searchText,
+  options: window[import.meta.env.VUE_APP_NAME].STORE.datatable.options,
+  data: window[import.meta.env.VUE_APP_NAME].STORE.datatable.data || [],
+  total: parseInt(window[import.meta.env.VUE_APP_NAME].STORE.datatable.total),
 
-  filter: window[process.env.VUE_APP_NAME].STORE.datatable.filter || {},
-  mainFilters: window[process.env.VUE_APP_NAME].STORE.datatable.mainFilters || [],
+  filter: window[import.meta.env.VUE_APP_NAME].STORE.datatable.filter || {},
+  mainFilters: window[import.meta.env.VUE_APP_NAME].STORE.datatable.mainFilters || [],
 
   bulk: [],
-  // localStorageKey: window[process.env.VUE_APP_NAME].STORE.datatable.localStorageKey || window.location.pathname,
+  // localStorageKey: window[import.meta.env.VUE_APP_NAME].STORE.datatable.localStorageKey || window.location.pathname,
   loading: false,
   updateTracker: 0
 
-  // columns: window[process.env.VUE_APP_NAME].STORE.datatable.columns || [],
+  // columns: window[import.meta.env.VUE_APP_NAME].STORE.datatable.columns || [],
   // dialog: false
-  // actions: window[process.env.VUE_APP_NAME].STORE.datatable.actions,
-  // actionsType: window[process.env.VUE_APP_NAME].STORE.datatable.actionsType,
+  // actions: window[import.meta.env.VUE_APP_NAME].STORE.datatable.actions,
+  // actionsType: window[import.meta.env.VUE_APP_NAME].STORE.datatable.actionsType,
 
 }
 

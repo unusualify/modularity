@@ -18,7 +18,7 @@ export default {
     *
     */
   get (params, callback) {
-    const url = window[process.env.VUE_APP_NAME].ENDPOINTS.index
+    const url = window[import.meta.env.VUE_APP_NAME].ENDPOINTS.index
 
     axios.get(url, { params })
       .then(function (resp) {
@@ -47,8 +47,8 @@ export default {
 
   // delete (item, callback) {
   delete (id, callback) {
-    const url = window[process.env.VUE_APP_NAME].ENDPOINTS.destroy.replace(':id', id)
-    // var url = window[process.env.VUE_APP_NAME].ENDPOINTS.index.replace(':id', item.id);
+    const url = window[import.meta.env.VUE_APP_NAME].ENDPOINTS.destroy.replace(':id', id)
+    // var url = window[import.meta.env.VUE_APP_NAME].ENDPOINTS.index.replace(':id', item.id);
 
     axios.delete(url).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
@@ -61,7 +61,7 @@ export default {
     })
   },
   forceDelete (id, callback) {
-    const url = window[process.env.VUE_APP_NAME].ENDPOINTS.forceDelete
+    const url = window[import.meta.env.VUE_APP_NAME].ENDPOINTS.forceDelete
 
     axios.put(url, { id }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
@@ -74,7 +74,7 @@ export default {
     })
   },
   restore (id, callback) {
-    const url = window[process.env.VUE_APP_NAME].ENDPOINTS.restore
+    const url = window[import.meta.env.VUE_APP_NAME].ENDPOINTS.restore
 
     axios.put(url, { id }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
@@ -87,7 +87,7 @@ export default {
     })
   },
   duplicate (id, callback) {
-    const url = window[process.env.VUE_APP_NAME].ENDPOINTS.duplicate.replace(':id', id)
+    const url = window[import.meta.env.VUE_APP_NAME].ENDPOINTS.duplicate.replace(':id', id)
 
     axios.put(url).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
@@ -101,7 +101,7 @@ export default {
   },
 
   reorder (ids, callback) {
-    axios.post(window[process.env.VUE_APP_NAME].CMS_URLS.reorder, { ids }).then(function (resp) {
+    axios.post(window[import.meta.env.VUE_APP_NAME].CMS_URLS.reorder, { ids }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
       const error = {
@@ -113,7 +113,7 @@ export default {
   },
 
   bulkPublish (params, callback) {
-    axios.post(window[process.env.VUE_APP_NAME].CMS_URLS.bulkPublish, { ids: params.ids, publish: params.toPublish }).then(function (resp) {
+    axios.post(window[import.meta.env.VUE_APP_NAME].CMS_URLS.bulkPublish, { ids: params.ids, publish: params.toPublish }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
       const error = {
@@ -125,7 +125,7 @@ export default {
   },
 
   bulkFeature (params, callback) {
-    axios.post(window[process.env.VUE_APP_NAME].CMS_URLS.bulkFeature, { ids: params.ids, feature: params.toFeature }).then(function (resp) {
+    axios.post(window[import.meta.env.VUE_APP_NAME].CMS_URLS.bulkFeature, { ids: params.ids, feature: params.toFeature }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
       const error = {
@@ -137,7 +137,7 @@ export default {
   },
 
   bulkDelete (ids, callback) {
-    axios.post(window[process.env.VUE_APP_NAME].CMS_URLS.bulkDelete, { ids }).then(function (resp) {
+    axios.post(window[import.meta.env.VUE_APP_NAME].CMS_URLS.bulkDelete, { ids }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
       const error = {
@@ -149,7 +149,7 @@ export default {
   },
 
   bulkRestore (ids, callback) {
-    axios.post(window[process.env.VUE_APP_NAME].CMS_URLS.bulkRestore, { ids }).then(function (resp) {
+    axios.post(window[import.meta.env.VUE_APP_NAME].CMS_URLS.bulkRestore, { ids }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
       const error = {
@@ -161,7 +161,7 @@ export default {
   },
 
   bulkDestroy (ids, callback) {
-    axios.post(window[process.env.VUE_APP_NAME].CMS_URLS.bulkForceDelete, { ids }).then(function (resp) {
+    axios.post(window[import.meta.env.VUE_APP_NAME].CMS_URLS.bulkForceDelete, { ids }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
       const error = {

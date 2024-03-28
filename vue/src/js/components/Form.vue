@@ -153,7 +153,7 @@ import { useI18n } from 'vue-i18n'
 import { getModel, getSubmitFormData, getSchema } from '@/utils/getFormData.js'
 
 import { redirector } from '@/utils/response'
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash-es'
 
 export default {
   name: 'ue-form',

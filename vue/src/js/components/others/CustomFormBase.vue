@@ -399,7 +399,7 @@
 // Import
 // import Vue from 'vue'
 import { getCurrentInstance } from 'vue'
-import { get, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex } from 'lodash'
+import { get, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex } from 'lodash-es'
 // import VueMask from 'v-mask'
 // Vue.use(VueMask, {
 //   placeholders: {

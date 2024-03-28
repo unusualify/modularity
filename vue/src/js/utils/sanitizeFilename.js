@@ -1,4 +1,5 @@
-const truncate = require('truncate-utf8-bytes')
+// const truncate = require('truncate-utf8-bytes')
+import { truncate } from 'lodash'
 
 /**
  * Replaces characters in strings that are illegal/unsafe for filenames.
@@ -159,7 +160,8 @@ function sanitize (input, replacement) {
 
   sanitized = sanitized.replace(cleanCharacters, '')
 
-  return truncate(sanitized, 255)
+  // return truncate(sanitized, 255)
+  return truncate(sanitized, {length: 255})
 }
 
 export default function (input, options) {

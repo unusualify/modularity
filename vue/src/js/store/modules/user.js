@@ -1,7 +1,7 @@
 const state = {
-  locale: window[process.env.VUE_APP_NAME].LOCALE ?? 'en',
-  timezone: window[process.env.VUE_APP_NAME].TIMEZONE ?? '',
-  authorization: window[process.env.VUE_APP_NAME].AUTHORIZATION ?? {}
+  locale: window[import.meta.env.VUE_APP_NAME].LOCALE ?? 'en',
+  timezone: window[import.meta.env.VUE_APP_NAME].TIMEZONE ?? '',
+  authorization: window[import.meta.env.VUE_APP_NAME].AUTHORIZATION ?? {}
 }
 
 const getters = {

@@ -1,19 +1,5 @@
 import config from '@/store/modules/config'
 import dateFormat from 'date-fns/format'
-// import { locales, getCurrentLocale, getTimeFormatForCurrentLocale } from '@/utils/locale'
-
-// import { useI18n } from 'vue-i18n'
-
-
-// function dateFormatLocale (date, format) {
-//   // const locale = locales[getCurrentLocale()]
-  
-//   return d(new Date(value), datetimeFormat);
-
-//   // return dateFormat(date, format, {
-//   //   locale: locale !== undefined && locale.hasOwnProperty('date-fns') ? locale['date-fns'] : require('date-fns/locale/en')
-//   // })
-// }
 
 const filters = {
   slugify: function (value) {

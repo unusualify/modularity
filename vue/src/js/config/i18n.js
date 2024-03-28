@@ -6,17 +6,20 @@ import { useStore } from 'vuex'
 // import messages from "@intlify/unplugin-vue-i18n/messages";
 
 function loadStaticMessages () {
-  const locales = require.context('./../../../../lang', true, /[A-Za-z0-9-_,\s]+.json$/i)
+  // const locales = require.context('./../../../../lang', true, /[A-Za-z0-9-_,\s]+.json$/i)
+  const locales = import.meta.glob('./../../../../lang/*.json', { eager: true })
+
   const messages = {}
 
-  locales.keys().forEach(key => {
-    const matched = key.match(/([A-Za-z0-9-_]+)\./i)
+  Object.keys(locales).forEach(path => {
+    const extFile = path.split('/').pop()
+    const key = extFile.match(/([A-Za-z0-9-_]+)\.json/i)[1]
+    const matched = key.match(/([A-Za-z0-9-_]+)/i)
     if (matched && matched.length > 1) {
       const locale = matched[1]
-      messages[locale] = locales(key)
+      messages[locale] = locales[path]
     }
   })
-
   return messages
 }
 
@@ -116,9 +119,9 @@ const numberFormats = {
 
 const setupOptions = {
 //   locale: import.meta.env.UNUSUAL_DEFAULT_LOCALE || 'tr',
-  locale: process.env.VUE_APP_LOCALE || 'en',
+  locale: import.meta.env.VUE_APP_LOCALE || 'en',
   //   fallbackLocale: import.meta.env.UNUSUAL_FALLBACK_LOCALE || 'tr',
-  fallbackLocale: process.env.VUE_APP_FALLBACK_LOCALE || 'en',
+  fallbackLocale: import.meta.env.VUE_APP_FALLBACK_LOCALE || 'en',
   legacy: false,
   // silentFallbackWarn: true,
   missingWarn: false,

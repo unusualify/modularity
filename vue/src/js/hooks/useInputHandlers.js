@@ -1,6 +1,6 @@
 // hooks/formatter .js
 
-import _ from 'lodash'
+import _ from 'lodash-es'
 import { reactive, toRefs } from 'vue'
 
 // by convention, composable function names start with "use"

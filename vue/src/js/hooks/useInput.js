@@ -3,7 +3,7 @@
 import { reactive, toRefs, computed } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
-import { omit } from 'lodash'
+import { omit } from 'lodash-es'
 
 export const makeInputProps = propsFactory({
   modelValue: null,

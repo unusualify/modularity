@@ -104,7 +104,7 @@
 </template>
 
 <script>
-import { makeActiveTableItemProps, useActiveTableItem } from '@/hooks'
+import { makeActiveTableItemProps, useActiveTableItem } from '__hooks'
 
 export default {
   props: {

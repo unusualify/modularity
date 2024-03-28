@@ -1,6 +1,6 @@
 // hooks/useFormbase.js
 
-import { get, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex } from 'lodash'
+import { get, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex } from 'lodash-es'
 import { ref, reactive, toRefs, computed, shallowReactive } from 'vue'
 
 // by convention, composable function names start with "use"
