@@ -6,7 +6,6 @@
 import * as exports from '@/imports'
 
 // styles
-// import 'styles/form.scss'
 
 // Store modules
 import form from '@/store/modules/form'
@@ -28,5 +27,3 @@ const app = exports.createApp({
 app.use(exports.UEConfig)
 
 app.mount('#admin')
-
-// document.addEventListener('DOMContentLoaded', core)

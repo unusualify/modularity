@@ -141,7 +141,7 @@ export default function modularity (config) {
     transform: (code, id) => {
       let transformedCode
 
-      if (/modularity\/vite\/src\/js\/plugins\/vuetify.js$/g.test(id)) {
+      if (/modularity\/vue\/src\/js\/plugins\/vuetify.js$/g.test(id)) {
         const importThemeStatement = `import 'styles/themes/${pluginConfig.theme}/main.scss'`
         transformedCode = code.replaceAll('@/config/themes\'', `@/config/themes'\r\n${importThemeStatement}`)
       }

@@ -25,14 +25,16 @@ dotenvExpand.expand(env)
 
 const partialsDirectory = path.resolve(__dirname, './views/partials')
 
-const svgConfig = (suffix = null) => {
+const svgConfig = (suffix = null, isProduction = true) => {
   suffix = suffix !== null ? `-${suffix}` : ''
 
   return {
     injectSVGOnDev: true,
     prefix: 'icon--',
     output: {
-      filename: `icons/icons${suffix}-svg.blade.php`,
+      // filename: isProduction ? `icons/icons${suffix}-svg.blade.php` : `icons/icons${suffix}.svg`,
+      filename: `icons/svg${suffix}.blade.php`,
+
       // filename: `dist/icons/icons${suffix}-svg[extname]`,
       // filename: `${svgIconsDirectory}/icons/icons${suffix}-svg.blade.php`,
       // filename: `dist/icons/icons${suffix}-svg.blade.php,`
@@ -64,7 +66,7 @@ export default defineConfig(({ command, mode }) => {
   const LARAVEL_ROOT_LEVEL = laravelRootUpperLevel(vendorPath)
 
   const APP_THEME = ENV.VUE_APP_THEME || 'unusual'
-  const VUE_DEV_PORT = ENV.VUE_DEV_PORT || 8080
+  const VUE_DEV_PORT = ENV.VUE_DEV_PORT || 5173
   const VUE_DEV_HOST = ENV.VUE_DEV_HOST || 'crm.template' // jakomeet.test
   const VUE_DEV_PROXY = ENV.VUE_DEV_PROXY || 'http://nginx'
 
@@ -75,8 +77,8 @@ export default defineConfig(({ command, mode }) => {
   const base = '/vendor/modularity'
   const assetsDir = 'assets'
 
-  // const outDir = 'dist/modularity'
-  const outDir = fileURLToPath(new URL(`${LARAVEL_ROOT_LEVEL}/public${base}`, import.meta.url))
+  const outDir = 'dist/modularity'
+  // const outDir = fileURLToPath(new URL(`${LARAVEL_ROOT_LEVEL}/public${base}`, import.meta.url))
   const targetDir = fileURLToPath(new URL(`${LARAVEL_ROOT_LEVEL}/public`, import.meta.url))
 
   const publicDir = 'public'
@@ -92,7 +94,7 @@ export default defineConfig(({ command, mode }) => {
       usePolling: true
       // aggregateTimeout: 1000,
       // poll: 1000
-    },
+    }
   }
 
   if (!isProduction) {
@@ -136,8 +138,13 @@ export default defineConfig(({ command, mode }) => {
       splitVendorChunkPlugin(),
       viteCommonjs(),
 
-      VitePluginSvgSpritemap('./src/icons/**/*.svg', svgConfig()),
-      VitePluginSvgSpritemap(`./src/sass/themes/${APP_THEME}/icons/**/*.svg`, svgConfig('theme'))
+      VitePluginSvgSpritemap([
+        `./src/sass/themes/${APP_THEME}/icons/**/*.svg`,
+        './src/icons/**/*.svg'
+      ], svgConfig('theme')),
+
+      // VitePluginSvgSpritemap(`./src/sass/themes/${APP_THEME}/icons/**/*.svg`, svgConfig('theme')),
+      // VitePluginSvgSpritemap('./src/icons/**/*.svg', svgConfig()),
     ],
     resolve: {
       extensions: [
@@ -244,7 +251,7 @@ export default defineConfig(({ command, mode }) => {
           `,
 
           sassOptions: {
-            outputStyle: 'expanded'
+            outputStyle: isProduction ? 'compressed' : 'expanded'
           }
         },
         sass: {
@@ -252,7 +259,7 @@ export default defineConfig(({ command, mode }) => {
             @use "styles/themes/${APP_THEME}/_additional.scss" as *
           `,
           sassOptions: {
-            outputStyle: 'expanded'
+            outputStyle: isProduction ? 'compressed' : 'expanded'
           }
         }
       }

@@ -47,8 +47,11 @@ final class LaravelServiceProvider extends ServiceProvider
 
     private function publishAssets(): void
     {
+        // $this->publishes([
+        //     __DIR__ . '/../vue/dist' => public_path(''),
+        // ], 'assets');
         $this->publishes([
-            __DIR__ . '/../vue/dist' => public_path(''),
+            __DIR__ . '/../vue/dist' => public_path('vendor'),
         ], 'assets');
     }
 
@@ -68,8 +71,12 @@ final class LaravelServiceProvider extends ServiceProvider
     private function publishViews(): void
     {
         $this->publishes([
-            __DIR__ . '/resources/views/vendor/translation' => resource_path('views/vendor/translation')
+            __DIR__ . '/Resources/views/vendor/translation' => resource_path('views/vendor/translation')
         ], 'views');
+
+        $this->publishes([
+            __DIR__ . '/../vue/dist/modularity/assets/icons' => resource_path('views/vendor/modularity/partials/icons')
+        ], 'assets');
     }
 
 

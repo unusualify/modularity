@@ -15,9 +15,10 @@
         {{-- @if(!unusualConfig('is_development', false))
             @include("{$MODULARITY_VIEW_NAMESPACE}::partials.icons.svg-sprite")
         @endif --}}
-        @include("{$MODULARITY_VIEW_NAMESPACE}::partials.icons.svg-sprite")
+        @if(!ModularityVite::useHotFile(public_path('modularity.hot'))->isRunningHot())
+            @include("{$MODULARITY_VIEW_NAMESPACE}::partials.icons.svg-sprite")
+        @endif
 
-        {{-- @dd( auth()->user() ) --}}
         @php
             $_mainConfiguration = [
                 'navigation' => $navigation,
