@@ -1,9 +1,9 @@
-@extends("{$BASE_KEY}::layouts.master")
+@extends("{$MODULARITY_VIEW_NAMESPACE}::layouts.master")
 
 @push('extra_js_head')
-    @if(app()->isProduction())
-        <link href="{{ unusualAsset('core-free.js')}}" rel="preload" as="script" crossorigin/>
-    @endif
+    {{
+        ModularityVite::useHotFile(public_path('modularity.hot'))->withEntryPoints(['src/js/core-free.js'])
+    }}
 @endpush
 
 @section('content')

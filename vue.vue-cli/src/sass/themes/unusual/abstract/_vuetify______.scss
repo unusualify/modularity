@@ -1,0 +1,50 @@
+@use '../abstract' as *;
+
+// @warn $body-font-family;
+
+// Vuetify Variables
+$vuetify: (
+  // body-font-family: $body-font-family,
+
+  color-pack: false,
+  utilities: '',
+  font-weights: $font-weights,
+
+  button-height: $button-height,
+  button-max-width: $button-max-width,
+  button-font-weight:  map-get($font-weights, 'semiBold'),
+  button-font-size: $button-font-size,
+
+  field-font-size: $input-font-size,
+  field-control-height: $field-control-height,
+  field-label-floating-scale: $field-label-floating-scale,
+
+  input-line-height: $input-line-height,
+  input-control-height: $input-control-height,
+
+  navigation-drawer-background: $sidebar-background,
+  navigation-drawer-color: $global-dark-text-color,
+
+  line-height-root: $line-height-root,
+  // list-background: $sidebar-background,
+  // list-color: #DFEFF0,//rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)),
+  list-padding: 8px 0px,
+  list-nav-padding: 1px,
+  list-item-one-line-padding: 8px 13px,
+  list-item-padding: 4px $theme-space,
+
+  // table-background: rgb(var(--v-theme-surface)),
+  // table-border: thin solid $table-border-color,
+  table-border-color: #E0E0E0, //rgba(var(--v-border-color), var(--v-border-opacity)),
+  // table-color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)),
+  // table-column-padding: 0 16px,
+  // table-density: ('default': 0, 'comfortable': -2, 'compact': -4),
+  // table-header-font-size: tools.map-deep-get(settings.$typography, 'caption', 'size'),
+  // table-header-font-weight: 500,
+  // table-header-height: 56px,
+  // table-hover-color: (rgba(var(--v-border-color), var(--v-hover-opacity)),
+  // table-line-height: 1.5,
+  // table-row-font-size: tools.map-deep-get(settings.$typography, 'subtitle-2', 'size'),
+  // table-row-height: var(--v-table-row-height, 52px),
+  // table-them: ($table-background, $table-color),
+);

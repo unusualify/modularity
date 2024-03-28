@@ -78,7 +78,7 @@ class ControllerMakeCommand extends BaseCommand
             'CLASS'                     => $this->getControllerNameWithoutNamespace(),
             'BASE_CONTROLLER'           => get_class_short_name( $this->baseConfig('base_controller') ),
             'MODULE'                    => $module->getStudlyName(),
-            'MODULE_STUDLY_NAME'        => $module->getStudlyName(),
+            'STUDLY_MODULE_NAME'        => $module->getStudlyName(),
             'ROUTE_NAME'                => $this->getStudlyName($name),
         ]))->render();
     }

@@ -113,12 +113,13 @@ class BuildCommand extends BaseCommand
         $progressBar->advance();
 
         $resource_path = resource_path('js/unusual/*.vue');
-        // $resource_path = base_path($this->baseConfig('vendor_path') . '/vue/src/**');
 
         if ($this->option('hot')) {
             $this->startWatcher( $resource_path, 'php artisan unusual:build --copyOnly');
             // $this->runUnusualProcess(['npm', 'run', 'serve', '--', "--mode={$mode}", "--port={$this->getDevPort()}"], true);
-            $this->runUnusualProcess(['npm', 'run', 'serve', '--','--source-map', '--inspect-loader ',"--port={$this->getDevPort()}"], true);
+
+            // $this->runUnusualProcess(['npm', 'run', 'serve', '--','--source-map', '--inspect-loader ',"--port={$this->getDevPort()}"], true);
+            $this->runUnusualProcess(['npm', 'run', 'dev'], true);
         } elseif ($this->option('watch')) {
             $this->startWatcher( $resource_path, 'php artisan unusual:build --copyOnly');
             $this->runUnusualProcess(['npm', 'run', 'watch'], true);

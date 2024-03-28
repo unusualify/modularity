@@ -1,8 +1,5 @@
 import * as exports from '@/imports'
 
-// import 'styles/datatable.scss'
-// import `styles/themes/${process.env.VUE_APP_THEME}/pages/index.scss`
-
 // Component Imports
 import UEDatatable from '__components/others/Datatable.vue'
 
@@ -33,5 +30,3 @@ app.component('ue-datatable', UEDatatable)
 // app.component('ue-modal-form', UEModalForm)
 
 app.mount('#admin')
-
-// document.addEventListener('DOMContentLoaded', core(app))

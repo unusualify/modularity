@@ -1,0 +1,96 @@
+@use "sass:math";
+@use 'sass:map';
+@use 'sass:meta';
+@use './variables' as variables;
+
+$_spaces: (
+  'theme': variables.$theme-space,
+  'theme-semi': math.div(variables.$theme-space, 2)
+);
+
+$utilities: (
+  "margin": (
+    responsive: true,
+    property: margin,
+    class: ma,
+    values: $_spaces
+  ),
+  "margin-x": (
+    responsive: true,
+    property: margin-right margin-left,
+    class: mx,
+    values: $_spaces
+  ),
+  "margin-y": (
+    responsive: true,
+    property: margin-top margin-bottom,
+    class: my,
+    values: $_spaces
+  ),
+  "margin-top": (
+    responsive: true,
+    property: margin-top,
+    class: mt,
+    values: $_spaces
+  ),
+  "margin-right": (
+    responsive: true,
+    property: margin-right,
+    class: mr,
+    values: $_spaces
+  ),
+  "margin-bottom": (
+    responsive: true,
+    property: margin-bottom,
+    class: mb,
+    values: $_spaces
+  ),
+  "margin-left": (
+    responsive: true,
+    property: margin-left,
+    class: ml,
+    values: $_spaces
+  ),
+  "padding": (
+    responsive: true,
+    property: padding,
+    class: pa,
+    values: $_spaces
+  ),
+  "padding-x": (
+    responsive: true,
+    property: padding-right padding-left,
+    class: px,
+    values: $_spaces
+  ),
+  "padding-y": (
+    responsive: true,
+    property: padding-top padding-bottom,
+    class: py,
+    values: $_spaces
+  ),
+  "padding-top": (
+    responsive: true,
+    property: padding-top,
+    class: pt,
+    values: $_spaces
+  ),
+  "padding-right": (
+    responsive: true,
+    property: padding-right,
+    class: pr,
+    values: $_spaces
+  ),
+  "padding-bottom": (
+    responsive: true,
+    property: padding-bottom,
+    class: pb,
+    values: $_spaces
+  ),
+  "padding-left": (
+    responsive: true,
+    property: padding-left,
+    class: pl,
+    values: $_spaces
+  ),
+);

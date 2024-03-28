@@ -1,4 +1,4 @@
-@extends("{$BASE_KEY}::auth.layout", [
+@extends("{$MODULARITY_VIEW_NAMESPACE}::auth.layout", [
     'pageTitle' => ___('authentication.register')
 ])
 

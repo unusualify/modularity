@@ -1,0 +1,82 @@
+@use 'sass:list';
+@use 'sass:map';
+@use 'sass:math';
+@use 'sass:meta';
+
+// @function map-deep-set($map, $keys, $value)
+//   $maps: ($map,)
+//   $result: null
+
+//   // If the last key is a map already
+//   // Warn the user we will be overriding it with $value
+//   @if meta.type-of(list.nth($keys, -1)) == "map"
+//     @warn "The last key you specified is a map; it will be overrided with `#{$value}`."
+
+//   // If $keys is a single key
+//   // Just merge and return
+//   @if list.length($keys) == 1
+//     @return map.merge($map, ( $keys: $value ))
+
+//   // Loop from the first to the second to last key from $keys
+//   // Store the associated map to this key in the $maps list
+//   // If the key doesn't exist, throw an error
+//   @for $i from 1 through list.length($keys) - 1
+//     $current-key: list.nth($keys, $i)
+//     $current-map: list.nth($maps, -1)
+//     $current-get: map.get($current-map, $current-key)
+
+//     @if $current-get == null
+//       @error "Key `#{$current-key}` doesn't exist at current level in map."
+
+//     $maps: list.append($maps, $current-get)
+
+//   // Loop from the last map to the first one
+//   // Merge it with the previous one
+//   @for $i from list.length($maps) through 1
+//     $current-map: list.nth($maps, $i)
+//     $current-key: list.nth($keys, $i)
+//     $current-val: if($i == list.length($maps), $value, $result)
+//     $result: map.merge($current-map, ($current-key: $current-val))
+
+//   // Return result
+//   @return $result
+
+// @function map-deep-get($map, $keys...)
+//   @each $key in $keys
+//     $map: map.get($map, $key)
+
+//   @return $map
+
+// @function use-with($list, $module) {
+//   // Convert the list variable into a string of key-value pairs
+//   $mapped-list: '';
+//   @each $key, $value in $list {
+//     $mapped-list: map-merge($mapped-list, ($key: $value));
+//   }
+//   // Remove the leading comma from the string
+//   $mapped-list: str-slice($mapped-list, 2);
+//   // Use the @use directive with the "with" keyword and the mapped list variable
+//   @use #{$module} with ($mapped-list);
+// }
+
+@function map-list-to-map($list) {
+  $map: ();
+  @for $i from 1 through length($list) {
+    $item: nth($list, $i);
+    $key: nth($item, 1);
+    $value: nth($item, 2);
+    $map: map-merge($map, ($key: $value));
+  }
+  // @warn($map);
+  @return $map;
+}
+
+@function map-to-withClause($map) {
+  $withClause: ('$utilities': 'false');
+  @for $i from 1 through length($list) {
+
+  }
+  // @warn($map);
+  @return $withClause;
+}
+

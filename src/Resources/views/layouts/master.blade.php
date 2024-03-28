@@ -7,17 +7,18 @@
         <title> {{ $title ?? 'Module Template' }}</title>
         <meta name="csrf-token" content="{{ csrf_token() }}">
         @yield('pre-scripts') --}}
-        @include("{$BASE_KEY}::partials.head")
+        @include("{$MODULARITY_VIEW_NAMESPACE}::partials.head")
 
         @stack('head_last_js')
     </head>
     <body>
         {{-- @if(!unusualConfig('is_development', false))
-            @include("{$BASE_KEY}::partials.icons.svg-sprite")
+            @include("{$MODULARITY_VIEW_NAMESPACE}::partials.icons.svg-sprite")
         @endif --}}
-        @include("{$BASE_KEY}::partials.icons.svg-sprite")
+        @if(!ModularityVite::useHotFile(public_path('modularity.hot'))->isRunningHot())
+            @include("{$MODULARITY_VIEW_NAMESPACE}::partials.icons.svg-sprite")
+        @endif
 
-        {{-- @dd( auth()->user() ) --}}
         @php
             $_mainConfiguration = [
                 'navigation' => $navigation,
@@ -75,7 +76,7 @@
             window['{{ unusualConfig('js_namespace') }}'].TIMEZONE = '{{ unusualConfig('timezone') }}';
             window['{{ unusualConfig('js_namespace') }}'].AUTHORIZATION = @json($authorization);
 
-            window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {};
+            window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
             window['{{ unusualConfig('js_namespace') }}'].STORE = {};
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.config = {
@@ -130,8 +131,8 @@
             @yield('STORE')
         </script>
 
-        <script src="{{ unusualMix('chunk-common.js')}}" > </script>
-        <script src="{{ unusualMix('chunk-vendors.js') }}"> </script>
+        {{-- <script src="{{ unusualMix('chunk-common.js')}}" > </script>
+        <script src="{{ unusualMix('chunk-vendors.js') }}"> </script> --}}
 
         @stack('post_js')
 

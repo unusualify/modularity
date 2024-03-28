@@ -1,0 +1,12 @@
+// abstract/_variables.scss
+
+// Breakpoint information, where each starts and stops
+// if a breakpoint is not fluid, then the start value is equal to the main col value plus 2x the gutter at this breakpoint
+/* 1540 = $max-width + 50 + 50 */
+$breakpoints: (
+  xsmall: (start: null, end: 599),
+  small: (start: 600, end: 849),
+  medium: (start: 850, end: 1039),
+  large: (start: 1040, end: 1539),
+  xlarge: (start: 1540, end: null),
+);

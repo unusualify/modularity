@@ -445,7 +445,7 @@
 import { mapState, mapGetters } from 'vuex'
 import ACTIONS from '@/store/actions'
 
-import { useTable, makeTableProps } from '@/hooks'
+import useTable, { makeTableProps } from '@/hooks/useTable'
 import { ALERT } from '@/store/mutations'
 
 export default {

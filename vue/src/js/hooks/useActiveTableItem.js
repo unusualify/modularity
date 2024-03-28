@@ -3,7 +3,7 @@ import { reactive, toRefs, computed, watch } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 import { useProxiedModel } from 'vuetify/lib/composables/proxiedModel.mjs'
 
-import { makeModelValueProps, useModelValue } from './useModelValue'
+import { makeModelValueProps } from '__hooks/useModelValue'
 
 export const makeActiveTableItemProps = propsFactory({
   ...makeModelValueProps(),

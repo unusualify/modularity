@@ -56,7 +56,7 @@
                 "Unusualify\\Modularity\\Providers\\UnusualProvider"
             ],
             "aliases": {
-
+                "ModularityVite": "Unusualify\\Modularity\\Facades\\ModularityVite"
             }
         },
         "packages": {

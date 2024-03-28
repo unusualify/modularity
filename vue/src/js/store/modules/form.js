@@ -2,18 +2,18 @@ import api from '@/store/api/form'
 import { FORM, ALERT, MEDIA_LIBRARY } from '@/store/mutations'
 import ACTIONS from '@/store/actions'
 
-import { getSubmitFormData, getFormFields, getModel, getSchemaModel } from '@/utils/getFormData.js'
+import { getSubmitFormData, getModel } from '@/utils/getFormData.js'
 
 const getFieldIndex = (stateKey, field) => {
   return stateKey.findIndex(f => f.name === field.name)
 }
 // __log(
-//   window[process.env.VUE_APP_NAME].STORE.form
+//   window[import.meta.env.VUE_APP_NAME].STORE.form
 // )
 const state = {
-  baseUrl: window[process.env.VUE_APP_NAME].STORE.form.baseUrl || '',
-  inputs: window[process.env.VUE_APP_NAME].STORE.form.inputs || {},
-  saveUrl: window[process.env.VUE_APP_NAME].STORE.form.saveUrl || '',
+  baseUrl: window[import.meta.env.VUE_APP_NAME].STORE.form.baseUrl || '',
+  inputs: window[import.meta.env.VUE_APP_NAME].STORE.form.inputs || {},
+  saveUrl: window[import.meta.env.VUE_APP_NAME].STORE.form.saveUrl || '',
 
   serverValid: true,
   /**
@@ -22,24 +22,24 @@ const state = {
    */
   errors: {},
 
-  // fields: window[process.env.VUE_APP_NAME].STORE.form.inputs.forEach(function(el ){
+  // fields: window[import.meta.env.VUE_APP_NAME].STORE.form.inputs.forEach(function(el ){
   //     return {
   //       name: el.name,
   //       value: null
   //     };
   // }),
 
-  // editedItem: window[process.env.VUE_APP_NAME].STORE.form.inputs.reduce( (a,c) => (a[c.name] = c.default ?? '', a), {}),
-  // editedItem: Object.keys(window[process.env.VUE_APP_NAME].STORE.form.inputs).reduce( (a,c) => (a[window[process.env.VUE_APP_NAME].STORE.form.inputs[c].name] = window[process.env.VUE_APP_NAME].STORE.form.inputs[c].hasOwnProperty('default') ? window[process.env.VUE_APP_NAME].STORE.form.inputs[c].default : '', a), {}),
-  editedItem: window[process.env.VUE_APP_NAME].STORE.form.inputs
-    ? getModel(window[process.env.VUE_APP_NAME].STORE.form.inputs, null)
+  // editedItem: window[import.meta.env.VUE_APP_NAME].STORE.form.inputs.reduce( (a,c) => (a[c.name] = c.default ?? '', a), {}),
+  // editedItem: Object.keys(window[import.meta.env.VUE_APP_NAME].STORE.form.inputs).reduce( (a,c) => (a[window[import.meta.env.VUE_APP_NAME].STORE.form.inputs[c].name] = window[import.meta.env.VUE_APP_NAME].STORE.form.inputs[c].hasOwnProperty('default') ? window[import.meta.env.VUE_APP_NAME].STORE.form.inputs[c].default : '', a), {}),
+  editedItem: window[import.meta.env.VUE_APP_NAME].STORE.form.inputs
+    ? getModel(window[import.meta.env.VUE_APP_NAME].STORE.form.inputs, null)
     : {},
 
   /**
    * Force reload on successful submit
    * @type {Boolean}
    */
-  reloadOnSuccess: window[process.env.VUE_APP_NAME].STORE.form.reloadOnSuccess || false,
+  reloadOnSuccess: window[import.meta.env.VUE_APP_NAME].STORE.form.reloadOnSuccess || false,
 
   /**
    * Determines if the form should prevent submitting before an input value is pushed into the store
@@ -176,11 +176,11 @@ const actions = {
 
     // const method = rootState.publication.createWithoutModal ? 'post' : 'put'
     let method = 'post'
-    let url = window[process.env.VUE_APP_NAME].ENDPOINTS.store
+    let url = window[import.meta.env.VUE_APP_NAME].ENDPOINTS.store
 
     if (Object.prototype.hasOwnProperty.call(data, 'id')) {
       method = 'put'
-      url = window[process.env.VUE_APP_NAME].ENDPOINTS.update.replace(':id', data.id)
+      url = window[import.meta.env.VUE_APP_NAME].ENDPOINTS.update.replace(':id', data.id)
     }
 
     api[method](url, data, function (response) {

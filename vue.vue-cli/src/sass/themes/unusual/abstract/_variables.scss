@@ -1,0 +1,30 @@
+// themes/${theme_name}/abstract/_variables.scss
+@import url('https://fonts.googleapis.com/css?family=Montserrat:200,400,500,600,700,800,900');
+
+$body-font-family: 'Montserrat';
+$theme-space: 1.56vw; //1.56%;
+
+$font-weights: (
+  // 'thin': 100,
+  // 'light': 300,
+  // 'regular': 400,
+  // 'medium': 500,
+  'bold': 700,
+  // 'black': 900
+);
+// $line-height-root: 1.5; // default 1.5
+
+
+/* BUTTONS */
+$button-height: 2.5rem; //2.5rem
+$button-min-width: 7.5rem;
+// $button-max-width: 300px;
+// $button-font-weight: 700;
+// $button-font-size: 0.75rem;
+
+$input-font-size: .8rem;
+// $input-control-height: 36px;
+// $input-line-height: 1.1; // default 1.5
+
+// $field-control-height: 36px;
+// $field-label-floating-scale: 0.81;

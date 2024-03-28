@@ -2,7 +2,7 @@
 
 // import { ref, watch, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import _, { cloneDeep } from 'lodash'
+import _, { cloneDeep } from 'lodash-es'
 import { reactive, toRefs, toRef, watch } from 'vue'
 
 // by convention, composable function names start with "use"

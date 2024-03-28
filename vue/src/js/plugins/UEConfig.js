@@ -31,21 +31,24 @@ import FitGrid from '@/directives/fit-grid'
 import commonMethods from '@/utils/common-methods'
 import { ALERT } from '../store/mutations'
 
-const includeGlobalComponents = require.context('__components', false, /[A-Za-z]*(?<!_)\.vue$/i)
-// const includeLabComponents = require.context('__components/labs', false, /[A-Za-z]*(?<!_)\.vue$/i)
-const includeLayouts = require.context('__components/layouts/', false, /[A-Za-z]*(?<!_)\.vue$/i)
-// const includeFormInputs = require.context('__components/inputs', true, /\.vue$/i)
-const includeCustomFormInputs = require.context('__components/inputs', true, /\.vue$/i)
+// const includeGlobalComponents = require.context('__components', false, /[A-Za-z]*(?<!_)\.vue$/i)
 
-// const getLanguages = async () => {
-//   const response = await axios.get('/api/languages')
-//   return response.data
-// }
-// const LANGUAGES = await getLanguages()
+
+// const includeLabComponents = require.context('__components/labs', false, /[A-Za-z]*(?<!_)\.vue$/i)
+// const includeLayouts = require.context('__components/layouts/', false, /[A-Za-z]*(?<!_)\.vue$/i)
+// const includeFormInputs = require.context('__components/inputs', true, /\.vue$/i)
+// const includeCustomFormInputs = require.context('__components/inputs', true, /\.vue$/i)
+
+const includeGlobalComponents = import.meta.glob('__components/*.vue', {eager: true})
+const includeLayouts = import.meta.glob('__components/layouts/*.vue', {eager:true})
+const includeCustomFormInputs = import.meta.glob('__components/inputs/*.vue', {eager: true})
+
+core()
 
 export default {
   install: (app, opts) => {
-    document.addEventListener('DOMContentLoaded', core(app))
+    window.vm = app
+    // document.addEventListener('DOMContentLoaded', core(app))
     // treat all tags starting with 'ue-' as custom elements
     // app.config.compilerOptions.isCustomElement = (tag) => {
     //   return tag.startsWith('ue-')
@@ -63,10 +66,9 @@ export default {
     app.config.globalProperties.$app = app
 
     // app.config.errorHandler = (err) => {}
-
     // set locale wrt user profile preference
     setI18nLocale(i18n, store.state.user.locale)
-    loadLocaleMessages(i18n, window[process.env.VUE_APP_NAME].ENDPOINTS.languages ?? '')
+    loadLocaleMessages(i18n, window[import.meta.env.VUE_APP_NAME].ENDPOINTS.languages ?? '')
     // i18n.global.setDateTimeFormat('tr', 'Europe/Istanbul')
 
     // add Global methods to all components
@@ -77,7 +79,7 @@ export default {
         const func = i18n.global.te
         return func(key, locale) ?? false
       },
-      registerComponents: function (components, folder = '', prefix = 'ue') {
+      registerComponentsV1: function (components, folder = '', prefix = 'ue') {
         folder = folder !== '' ? folder + '/' : ''
         components.keys().forEach((path) => {
           const fileName = path.split('/').pop().split('.')[0]
@@ -85,6 +87,24 @@ export default {
           // __log(componentName, fileName, folder)
           app.component(componentName, require(`__components/${folder}${fileName}.vue`).default)
         })
+      },
+      registerComponents: function (components, folder = '', prefix = 'ue') {
+        folder = folder !== '' ? folder + '/' : ''
+
+        Object.keys(components).forEach(path => {
+          const extFile = path.split('/').pop()
+          const fileName = path.split('/').pop().split('.')[0]
+          const module = components[path]
+          const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
+
+          app.component(componentName, module.default)
+        })
+        // components.keys().forEach((path) => {
+        //   const fileName = path.split('/').pop().split('.')[0]
+        //   const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
+        //   // __log(componentName, fileName, folder)
+        //   app.component(componentName, require(`__components/${folder}${fileName}.vue`).default)
+        // })
       }
     }
 
@@ -146,7 +166,7 @@ export default {
     // // Plugins
     // Vue.use(VueTimeago, {
     //     name: 'timeago', // component name
-    //     locale: window[process.env.VUE_APP_NAME].twillLocalization.locale,
+    //     locale: window[import.meta.env.VUE_APP_NAME].twillLocalization.locale,
     //     locales: mapValues(locales, 'date-fns')
     // })
 

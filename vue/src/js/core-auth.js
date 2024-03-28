@@ -1,8 +1,5 @@
 import * as exports from '@/imports'
 
-// import 'styles/datatable.scss'
-// import `styles/themes/${process.env.VUE_APP_THEME}/pages/index.scss`
-
 // Component Imports
 
 // Store modules
@@ -29,5 +26,3 @@ app.use(exports.UEConfig)
 // Component Includes
 
 app.mount('#auth')
-
-// document.addEventListener('DOMContentLoaded', core(app))

@@ -57,7 +57,7 @@ import { LANGUAGE } from '@/store/mutations'
 import { InputMixin, LocaleMixin } from '@/mixins'
 import { useInput, makeInputProps } from '@/hooks'
 
-import { cloneDeep, omit } from 'lodash'
+import { cloneDeep, omit } from 'lodash-es'
 
 export default {
   mixins: [InputMixin, LocaleMixin],

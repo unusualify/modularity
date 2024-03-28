@@ -1,8 +1,0 @@
-export { default as DatatableMixin } from './datatable'
-export { default as AlertMixin } from './alert'
-export { default as ModalMixin } from './modal'
-export { default as InputMixin } from './input'
-export { default as CustomInputMixin } from './custom-input'
-export { default as RootMixin } from './root'
-export { default as MediaLibraryMixin } from './mediaLibrary/mediaLibrary'
-export { default as PropsMixin } from './props'

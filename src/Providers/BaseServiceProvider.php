@@ -110,6 +110,8 @@ class BaseServiceProvider extends ServiceProvider
             return new \Unusualify\Modularity\Support\HostRouting($app, unusualConfig('app_url'));
         });
 
+        $this->app->alias(\Unusualify\Modularity\Facades\ModularityVite::class, 'ModularityVite');
+
         // $this->app->alias(FileActivator::class, 'module_activator');
 
         $this->app->alias(\Torann\GeoIP\Facades\GeoIP::class, 'GeoIP');
@@ -330,6 +332,7 @@ class BaseServiceProvider extends ServiceProvider
     {
         view()->composer('*',function($view) {
             $view->with('BASE_KEY', $this->baseKey);
+            $view->with('MODULARITY_VIEW_NAMESPACE', $this->baseKey);
         });
 
         if (config($this->baseKey . '.enabled.users-management')) {

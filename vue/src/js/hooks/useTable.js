@@ -3,7 +3,7 @@ import { watch, computed, nextTick, reactive, toRefs, ref, watchEffect } from 'v
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
-import { isObject, find, omit, snakeCase, kebabCase } from 'lodash'
+import { isObject, find, omit, snakeCase, kebabCase } from 'lodash-es'
 
 import { DATATABLE, FORM } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
@@ -129,8 +129,8 @@ export default function useTable (props, context) {
     activeTableItem: null,
     hideTable: false,
 
-    createUrl: window[process.env.VUE_APP_NAME].ENDPOINTS.create ?? '',
-    editUrl: window[process.env.VUE_APP_NAME].ENDPOINTS.edit ?? '',
+    createUrl: window[import.meta.env.VUE_APP_NAME].ENDPOINTS.create ?? '',
+    editUrl: window[import.meta.env.VUE_APP_NAME].ENDPOINTS.edit ?? '',
     editedIndex: -1,
     selectedItems: [],
 
@@ -211,7 +211,7 @@ export default function useTable (props, context) {
       store.commit(DATATABLE.UPDATE_DATATABLE_SEARCH, '')
       store.commit(
         DATATABLE.UPDATE_DATATABLE_OPTIONS,
-        window[process.env.VUE_APP_NAME].STORE.datatable.options
+        window[import.meta.env.VUE_APP_NAME].STORE.datatable.options
       )
       store.dispatch(ACTIONS.GET_DATATABLE)
     },

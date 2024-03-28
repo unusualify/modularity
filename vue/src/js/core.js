@@ -1,8 +1,8 @@
 // General includes
-import '__setup/setup.js'
+import setup from '__setup/setup.js'
 
-const UECompose = function (app) {
-  window.vm = app
+const UECompose = function () {
+  setup()
 }
 
 export default UECompose

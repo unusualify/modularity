@@ -1,4 +1,4 @@
-@extends("{$BASE_KEY}::auth.layout", [
+@extends("{$MODULARITY_VIEW_NAMESPACE}::auth.layout", [
     'route' => route('login.form'),
     'screenTitle' => ___('authentication.login-title')
 ])
@@ -20,7 +20,7 @@
     @if (unusualConfig('enabled.users-oauth', false))
         @foreach(unusualConfig('oauth.providers', []) as $index => $provider)
             <a href="{!! route('admin.login.redirect', $provider) !!}" class="login__socialite login__{{$provider}}" tabindex="{{ 4 + $index }}">
-                @includeIf("{$BASE_KEY}::auth.icons." . $provider)
+                @includeIf("{$MODULARITY_VIEW_NAMESPACE}::auth.icons." . $provider)
                 <span>Sign in with {{ ucfirst($provider)}}</span>
             </a>
         @endforeach

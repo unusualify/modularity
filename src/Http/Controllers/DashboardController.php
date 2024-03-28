@@ -222,9 +222,13 @@ class DashboardController extends BaseController
                 // ],
             ]
         ];
+
+        $options = [
+            'endpoints' => $this->getUrls()
+        ];
         // dd($data['blocks']);
         $view = "$this->baseKey::layouts.dashboard";
 
-        return View::make($view, $data);
+        return View::make($view, $data + $options);
     }
 }

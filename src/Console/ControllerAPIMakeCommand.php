@@ -74,8 +74,8 @@ class ControllerAPIMakeCommand extends BaseCommand
 
         return (new Stub($this->getStubName(), [
             'NAMESPACE'             => $this->getClassNamespace($module),
-            'MODULE_STUDLY_NAME'    => $module->getStudlyName(),
-            'MODULE_LOWER_NAME'     => $module->getLowerName(),
+            'STUDLY_MODULE_NAME'    => $module->getStudlyName(),
+            'LOWER_MODULE_NAME'     => $module->getLowerName(),
             'STUDLY_NAME'           => $this->getStudlyName($name),
             'LOWER_NAME'            => $this->getLowerName($name),
             'CLASS'                 => $this->getControllerNameWithoutNamespace(),

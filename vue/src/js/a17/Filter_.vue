@@ -24,7 +24,7 @@
 </template>
 
 <script>
-  import debounce from 'lodash/debounce'
+  import debounce from 'lodash-es/debounce'
   import FormDataAsObj from '@/utils/formDataAsObj.js'
 
   export default {

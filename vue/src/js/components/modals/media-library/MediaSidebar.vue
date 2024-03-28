@@ -154,7 +154,7 @@
 import { mapState } from 'vuex'
 import api from '@/store/api/media-library'
 // import { NOTIFICATION } from '@/store/mutations'
-import isEqual from 'lodash/isEqual'
+import isEqual from 'lodash-es/isEqual'
 import FormDataAsObj from '@/utils/formDataAsObj.js'
 import a17VueFilters from '@/utils/filters.js'
 import UeMediaSidebarUpload from './MediaSidebarUpload.vue'

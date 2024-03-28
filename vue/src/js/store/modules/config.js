@@ -1,17 +1,15 @@
 const state = {
-  sideBarOpt : window[process.env.VUE_APP_NAME].STORE.config.sideBarOpt,
-  secondarySideBar : window[process.env.VUE_APP_NAME].STORE.config.secondarySideBar,
+  sideBarOpt: window[import.meta.env.VUE_APP_NAME].STORE.config.sideBarOpt,
+  secondarySideBar: window[import.meta.env.VUE_APP_NAME].STORE.config.secondarySideBar
 }
-
-
 
 // getters
 const getters = {
   sideBarOpt: state => {
-    return state.sideBarOpt;
+    return state.sideBarOpt
   },
   secondarySidebarOpt: state => {
-    return state.secondarySideBar;
+    return state.secondarySideBar
   }
 }
 

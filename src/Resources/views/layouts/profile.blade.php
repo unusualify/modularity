@@ -1,4 +1,4 @@
-@extends("{$BASE_KEY}::layouts.master")
+@extends("{$MODULARITY_VIEW_NAMESPACE}::layouts.master")
 
 @php
     // $emptyMessage = $emptyMessage ?? twillTrans('twill::lang.dashboard.empty-message');
@@ -8,15 +8,18 @@
 @endphp
 
 @push('head_last_js')
-    @if( app()->isProduction() )
+    {{
+        ModularityVite::useHotFile(public_path('modularity.hot'))->withEntryPoints(['src/js/core-free.js'])
+    }}
+    {{-- @if( app()->isProduction() )
         <link href="{{ unusualMix('core-free.js') }}" rel="preload" as="script" crossorigin />
     @else
 
 
-    @endif
+    @endif --}}
 @endpush
 @push('post_js')
-    <script src="{{ unusualMix('core-free.js') }}"></script>
+    {{-- <script src="{{ unusualMix('core-free.js') }}"></script> --}}
 @endpush
 
 {{-- @dd($elements) --}}
@@ -75,14 +78,7 @@
 @stop
 
 @section('STORE')
-    window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {
-        {{-- @if($editable)
-            update: '{{ $actionUrl }}',
-        @else
-            store:  '{{ $actionUrl }}',
-        @endif --}}
-
-    }
+    window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {}
     window['{{ unusualConfig('js_namespace') }}'].STORE.form = {
         {{-- inputs: {!! json_encode($formSchema ?? new StdClass()) !!}, --}}
     }

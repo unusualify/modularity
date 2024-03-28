@@ -1,0 +1,26 @@
+@use '../abstract' as *
+
+// .v-avatar
+//   &.v-theme--b2press
+//     height: calc(150/1080*100%)
+
+.v-navigation-drawer--left
+  padding-bottom: $theme-space
+  .v-list
+    background: $sidebar-background
+    color: $tertiary-color
+    .v-list-item
+      &:hover
+        background-color: #35ABB8
+      .v-list-item__overlay
+        opacity: 0 //calc(var(--v-activated-opacity) * var(--v-theme-overlay-multiplier))
+
+    .v-list-item--active
+      background: #11758D
+
+
+    .v-list-item[aria-haspopup=menu][aria-expanded=true]
+      .v-list-item__overlay
+        opacity: calc(var(--v-activated-opacity) * var(--v-theme-overlay-multiplier))
+  .v-button--logout
+    padding-left: $theme-space

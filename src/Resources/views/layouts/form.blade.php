@@ -1,4 +1,4 @@
-@extends("{$BASE_KEY}::layouts.master")
+@extends("{$MODULARITY_VIEW_NAMESPACE}::layouts.master")
 
 @section('appTypeClass', 'body--form')
 
@@ -44,17 +44,18 @@
 @stop
 
 @push('head_last_js')
-    @if( app()->isProduction() )
+    {{
+        ModularityVite::useHotFile(public_path('modularity.hot'))->withEntryPoints(['src/js/core-index.js'])
+    }}
+    {{-- @if( app()->isProduction() )
         <link href="{{ unusualMix('core-form.js') }}" rel="preload" as="script" crossorigin />
     @else
 
-    @endif
+    @endif --}}
 @endpush
 
 @push('post_js')
-    {{-- <script src="{{ unusualMix('runtime.js') }}"></script>
-    <script src="{{ unusualMix('vendor.js') }}"></script> --}}
-    <script src="{{ unusualMix('core-form.js') }}"></script>
+    {{-- <script src="{{ unusualMix('core-form.js') }}"></script> --}}
 @endpush
 
 @section('STORE')

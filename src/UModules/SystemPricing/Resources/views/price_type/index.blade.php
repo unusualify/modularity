@@ -1,4 +1,4 @@
-@extends("$BASE_KEY::layouts.master")
+@extends("$MODULARITY_VIEW_NAMESPACE::layouts.master")
 
 @section('appTypeClass', 'body--listing')
 
@@ -15,19 +15,16 @@
 
 
 @section('content')
-    @include("$BASE_KEY::components.table", $tableAttributes ?? [])
+    @include("$MODULARITY_VIEW_NAMESPACE::components.table", $tableAttributes ?? [])
 @stop
 
 @push('head_last_js')
-    @if( app()->isProduction() )
-        <link href="{{ unusualMix('core-index.js') }}" rel="preload" as="script" crossorigin />
-    @else
-
-
-    @endif
+    {{
+        ModularityVite::useHotFile(public_path('modularity.hot'))->withEntryPoints(['src/js/core-index.js'])
+    }}
 @endpush
 @push('post_js')
-    <script src="{{ unusualMix('core-index.js') }}"></script>
+
 @endpush
 
 @section('STORE')

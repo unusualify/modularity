@@ -41,7 +41,8 @@ class Module extends NwidartModule
         parent::__construct($app, $name, $path);
 
         // $this->moduleActivator = $app['unusual.activator'];
-        $this->moduleActivator = (new FileActivator($app))->setModule($this->getName());
+        $this->moduleActivator = (new FileActivator($app))->setModule($this->getName(), $path);
+
         // $this->moduleActivator->setModule($name);
 
         // $this->config =

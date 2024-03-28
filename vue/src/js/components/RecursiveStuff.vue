@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { reduce, get, cloneDeep } from 'lodash'
+import { reduce, get, cloneDeep } from 'lodash-es'
 import { computed, ref } from 'vue'
 
 export default {
