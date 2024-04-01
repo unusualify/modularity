@@ -310,7 +310,7 @@ class RouteServiceProvider extends ServiceProvider
             }
         });
 
-        Route::macro('hosting', function(...$models){
+        Route::macro('host', function(...$models){
             return HostRoutingRegistrar::host(...$models);
         });
 
