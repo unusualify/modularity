@@ -10,6 +10,7 @@ use Unusualify\Modularity\Facades\UnusualRoutes;
 use Unusualify\Modularity\Facades\Modularity;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\HostRouting;
+use Unusualify\Modularity\Facades\HostRoutingRegistrar;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -309,8 +310,8 @@ class RouteServiceProvider extends ServiceProvider
             }
         });
 
-        Route::macro('hosting', function($callback, $options = []){
-            HostRouting::group($callback, $options);
+        Route::macro('hosting', function(...$models){
+            return HostRoutingRegistrar::host(...$models);
         });
 
         Route::macro('moduleRoutes', function($module, $options = []){
