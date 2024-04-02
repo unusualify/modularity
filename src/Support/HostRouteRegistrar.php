@@ -3,14 +3,13 @@
 namespace Unusualify\Modularity\Support;
 
 use Illuminate\Foundation\Application;
-use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularity\Traits\ManageNames;
-
+use BadMethodCallException;
 class HostRouteRegistrar{
     use ManageNames;
 
@@ -42,9 +41,6 @@ class HostRouteRegistrar{
         private string $baseHostName,
     )
     {
-        // $this->setModel($models)->setOptions();
-        // $this->router = $app->make(Router::class);
-
     }
 
     public function group($callback){
@@ -96,7 +92,6 @@ class HostRouteRegistrar{
                 $value[$index] = $middleware;
             }
         }
-
         $attributeKey = Arr::get($this->aliases, $key, $key);
 
         $this->options[$attributeKey] = is_array($value) ? $value[0] : $value;
@@ -166,11 +161,16 @@ class HostRouteRegistrar{
 
     public function __call($method, $arguments)
     {
-        if(!in_array($method, $this->callables)){
 
-              return  $this->attributes($method, $arguments);
 
+        if(in_array($method, $this->allowedAttributes)){
+            return  $this->attributes($method, $arguments);
         };
-        return $this->{$method}($arguments);
+        if(in_array($method, $this->callables)){
+            return $this->{$method}($arguments);
+        }
+        throw new BadMethodCallException(
+            sprintf('Method %s::%s does not exists in callable methods or allowed attributes list', static::class, $method)
+        );
     }
 }
