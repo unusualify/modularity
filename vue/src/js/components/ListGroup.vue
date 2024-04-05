@@ -72,6 +72,45 @@
                 </v-list-item-content> -->
 
             </v-list-item>
+            <template v-else-if="isMenu(item)">
+              <v-list-item
+                nav
+                :prepend-icon="item.icon"
+                append-icon="mdi-menu-right"
+                :id="item.menuActivator"
+                :title="item.name"
+                :class="{'px-4':showIcon,'ml-2':true}"
+                density="compact"
+                :slim="true"
+                @click="sideBar.methods.handleMenu(item.menuActivator)"
+                >
+            </v-list-item>
+            <v-menu v-if="sideBar.activeMenu.value === `#${item.menuActivator}`"  :activator="sideBar.activeMenu.value" location="end">
+              <v-list>
+                <ue-list-group
+                :items="Object.values(item.menuItems)"
+                >
+                </ue-list-group>
+              </v-list>
+            </v-menu>
+            </template>
+
+            <template v-else-if="isMenuRoute(item)">
+              <v-list-item
+              nav
+              density="compact"
+              :slim="true"
+              :prepend-icon="item.icon"
+              :ripple="false"
+              :href="item.route"
+              :append="false"
+              :title="item.name"
+              :active="activeIndex === i"
+              :v-bind="$bindAttributes(item)"
+              :class="{'px-4':showIcon,'ml-2':true}"
+              >
+              </v-list-item>
+            </template>
 
             <template
                 v-else-if="isHeader(item)"
@@ -109,6 +148,7 @@
 </template>
 
 <script>
+import { compact } from 'lodash-es';
 import { inject } from 'vue'
 // import { useRoot } from '@/hooks'
 
@@ -152,6 +192,10 @@ export default {
     showIcon:{
       type: Boolean,
       default: true,
+    },
+    profileMenu:{
+      type: Boolean,
+      default: false,
     }
   },
   data: () => ({
@@ -174,7 +218,11 @@ export default {
     // },
     activeIndex: {
       get () {
-        return this.items.findIndex(item => item.is_active == 1)
+        try {
+          return this.items.findIndex(item => item.is_active == 1)
+        } catch (error) {
+          return 0;
+        }
       },
       set (value) {
         // __log('setter selectIndex', value)
@@ -202,7 +250,7 @@ export default {
       return !!item.items
     },
     isRoute (item) {
-      return !item.items && !!item.route
+      return !item.items && !!item.route && !this.profileMenu
     },
     isEvent (item) {
       return !!item.attr
@@ -210,6 +258,12 @@ export default {
     isHeader (item) {
       return !item.route && !item.items && !!item.name
     },
+    isMenu (item){
+      return !!item.menuItems
+    },
+    isMenuRoute(item){
+      return !item.menuItems && this.profileMenu && !!item.route
+    }
 
   }
 }

@@ -36,7 +36,62 @@
     </ue-list-group>
 
     <template v-slot:append>
-      <ue-logout-modal :csrf="csrf">
+      <slot name="profileMenu">
+      <v-list v-model:opened="open" v-if="profileMenu.length" bg-color="grey-lighten-3">
+        <v-list-group value="User" expand-icon="mdi-menu-up" collapse-icon="mdi-menu-down" >
+          <template v-slot:activator="{props}">
+            <v-list-item
+            v-bind="props"
+            prepend-avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKjNTobklLhC-OZ7sH94RPOZj2jtkS4KWfv9Q7z8von0qzIKe3kgUepfs7kpyI2Gnp0rQ&usqp=CAU"
+            title="USER"
+            subtitle="eu@eu.com"
+            lines="one"
+            @mouseenter="methods.handleProfile"
+            >
+            </v-list-item>
+          </template>
+          <ue-list-group
+          :items="profileMenu"
+          :showIcon="showIcon"
+          :expanded="expanded"
+          :profileMenu="true"
+          >
+          </ue-list-group>
+          <!-- <v-list-item
+          nav
+          prepend-icon="mdi-cog"
+          append-icon="mdi-menu-right"
+          id="Settings"
+          title="Settings"
+          @click="methods.handleMenu('Settings')"></v-list-item>
+          <v-menu v-bind:activator="activeMenu" location="end">
+              <v-list>
+                <v-list-item
+                  v-for="(message, index) in messages['Settings']"
+                  :key="index"
+                  href="https://www.facebook.com"
+                >
+                  <v-list-item-title>{{message}}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu> -->
+
+          <ue-logout-modal :csrf="csrf">
+            <template v-slot:activator="{props}">
+              <v-list-item
+              prepend-icon="mdi-logout"
+              v-bind="props"
+              >
+              {{ $t('authentication.logout') }}
+              </v-list-item>
+            </template>
+          </ue-logout-modal>
+
+        </v-list-group>
+      </v-list>
+      <!-- DEFAULT IF NO PROFILE MENU -->
+      <div v-else>
+        <ue-logout-modal :csrf="csrf">
         <template v-slot:activator="{props}">
           <v-btn
               v-if="expanded"
@@ -46,9 +101,9 @@
               color="white"
               prepend-icon="mdi-power"
               >
-              <!-- <template v-slot:prepend>
-                <v-icon color="success"></v-icon>
-              </template> -->
+<!-- <template v-slot:prepend>
+  <v-icon color="success"></v-icon>
+</template> -->
               {{$t('authentication.logout')}}
           </v-btn>
           <v-btn v-else
@@ -82,7 +137,14 @@
 
         </slot>
       </div>
+      </div>
+
+    </slot>
     </template>
+
+    <!-- <template v-slot:append>
+
+    </template> -->
   </v-navigation-drawer>
   <v-navigation-drawer v-if="contentDrawer"
   :width="width"
