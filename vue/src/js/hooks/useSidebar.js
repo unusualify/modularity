@@ -44,6 +44,7 @@ export default function useSidebar () {
     mainSidebar: store.state.config.sideBarOpt,
     secondarySidebar: store.state.config.secondarySideBar,
     profileMenu: store.state.config.profileMenu,
+    currentUser: store.state.config.currentUser,
     mainLocation: computed(() => state.mainSidebar.mainLocation),
     secondarySidebarExists: computed(() => state.secondarySidebar.exists),
     secondaryLocation: computed(() => state.secondarySidebar.location),
@@ -108,7 +109,8 @@ export default function useSidebar () {
       root.openMediaLibrary()
     },
     handleProfile(event){
-      if(event.type === 'mouseenter') state.open.push('User')
+      if(event.type === 'mouseenter' && state.profileMenu.expandOnHover) state.open.push('User')
+      console.log(event, state.profileMenu)
     },
     handleMenu(title){
       state.activeMenu = `#${title}`

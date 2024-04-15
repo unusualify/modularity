@@ -39,12 +39,12 @@
       <slot name="profileMenu">
       <v-list v-model:opened="open" v-if="profileMenu.length" bg-color="grey-lighten-3">
         <v-list-group value="User" expand-icon="mdi-menu-up" collapse-icon="mdi-menu-down" >
+          <!-- prepend-avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKjNTobklLhC-OZ7sH94RPOZj2jtkS4KWfv9Q7z8von0qzIKe3kgUepfs7kpyI2Gnp0rQ&usqp=CAU" -->
           <template v-slot:activator="{props}">
             <v-list-item
             v-bind="props"
-            prepend-avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKjNTobklLhC-OZ7sH94RPOZj2jtkS4KWfv9Q7z8von0qzIKe3kgUepfs7kpyI2Gnp0rQ&usqp=CAU"
-            title="USER"
-            subtitle="eu@eu.com"
+            :title="currentUser.name"
+            :subtitle="currentUser.email"
             lines="one"
             @mouseenter="methods.handleProfile"
             >

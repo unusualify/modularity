@@ -102,7 +102,7 @@
               :slim="true"
               :prepend-icon="item.icon"
               :ripple="false"
-              :href="item.route"
+              :href="item.route || item.href"
               :append="false"
               :title="item.name"
               :active="activeIndex === i"
@@ -250,19 +250,19 @@ export default {
       return !!item.items
     },
     isRoute (item) {
-      return !item.items && !!item.route && !this.profileMenu
+      return !item.items && (!!item.route || !!item.href) && !this.profileMenu
     },
     isEvent (item) {
       return !!item.attr
     },
     isHeader (item) {
-      return !item.route && !item.items && !!item.name
+      return !item.href && !item.route && !item.items && !!item.name
     },
     isMenu (item){
       return !!item.menuItems
     },
     isMenuRoute(item){
-      return !item.menuItems && this.profileMenu && !!item.route
+      return !item.menuItems && this.profileMenu && (!!item.route || !!item.href)
     }
 
   }

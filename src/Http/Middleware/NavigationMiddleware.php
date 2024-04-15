@@ -28,7 +28,6 @@ class NavigationMiddleware
         app()->config->set([
             unusualBaseKey().'.ui_settings.profileMenu' => UNavigation::formatSidebarMenus(app()->config->get(unusualBaseKey().'.ui_settings.profileMenu'))
         ]);
-
         view()->composer( [unusualBaseKey()."::layouts.master", 'translation::layout'], function ($view)
         {
 

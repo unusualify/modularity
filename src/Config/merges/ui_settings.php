@@ -44,6 +44,11 @@ return [
                 'menuActivator' => 'dashboard',
                 'icon' => '$dashboard',
                 'menuItems' => [
+                    'facebook' => [
+                        'name' => 'Facebook',
+                        'href' => 'https://www.facebook.com',
+                        'icon' => 'mdi-facebook'
+                    ],
                     'dashboard' => [
                         'name' => 'Dashboard',
                         'route_name' => 'admin.dashboard',
