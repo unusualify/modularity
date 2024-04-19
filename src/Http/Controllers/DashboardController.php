@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\View;
 // use Modules\PressRelease\Entities\PressRelease;
 // use Modules\PressRelease\Repositories\PressReleaseRepository;
 use Unusualify\Modularity\Entities\Enums\Permission;
+use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Traits\ManageUtilities;
 
 class DashboardController extends BaseController
@@ -64,18 +65,20 @@ class DashboardController extends BaseController
                     case 'board-information-plus':
                         $cards = $block['cards'] ?? [];
                         foreach ($cards as $key => $card) {
-                            $repository = App::make($card['repository']);
-                            $data = array_reduce(explode('|', $card['method']),function($s, $a) use($repository){
-                                [$methodName, $args] = array_pad(explode(':',$a,2),2,null);
-                                if($args){
-                                    $s = empty($s) ? $repository->{$methodName}(...explode(':',$args))->get() : $s->{$methodName}(...explode(':',$args))->get();
-                                }else{
-                                    $s = empty($s) ? $repository->{$methodName}() : $s->$methodName();
-                                }
-
-                                return $s;
-
-                            });
+                            try {
+                                $repository = App::make($card['repository']);
+                                $data = array_reduce(explode('|', $card['method']),function($s, $a) use($repository){
+                                    [$methodName, $args] = array_pad(explode(':',$a,2),2,null);
+                                    if($args){
+                                        $s = empty($s) ? $repository->{$methodName}(...explode(':',$args))->get() : $s->{$methodName}(...explode(':',$args))->get();
+                                    }else{
+                                        $s = empty($s) ? $repository->{$methodName}() : $s->$methodName();
+                                    }
+                                    return $s;
+                                });
+                            } catch (\Throwable $th) {
+                                $data = '-';
+                            }
                             $card['data'] = $data;
                             $cards[$key] = $card;
                         }
