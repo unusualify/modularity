@@ -13,7 +13,7 @@
             <v-card-title align="center" :class="cardAttribute.titleClass" :style="{'color' : cardAttribute.titleColor}">
               {{ $t(card.title) }}
             </v-card-title>
-            <v-card-item align="center" :class="cardAttribute.infoClass" :style="{'color' : cardAttribute.infoColor}">{{ $t(card.info) }}</v-card-item>
+            <v-card-item align="center" :class="cardAttribute.infoClass" :style="{'color' : cardAttribute.infoColor}">{{ card.data }}</v-card-item>
           </v-card>
         </v-col>
       </v-row>
@@ -29,22 +29,22 @@ export default {
       default: [
       {
         title: 'Active Webinar',
-        info: '12',
+        data: '12',
         flex: 6,
       },
       {
         title: 'Speaker Moderators',
-        info: '3',
+        data: '3',
         flex: 6,
       },
       {
         title: 'Company',
-        info: '5',
+        data: '5',
         flex: 6,
       },
       {
         title: 'Published Webinars',
-        info: '7',
+        data: '7',
         flex: 6,
       },
       ],

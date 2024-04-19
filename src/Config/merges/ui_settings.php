@@ -98,15 +98,36 @@ return [
                     ]
                 ],
                 'cards' => [
-                    'title' => 'Web Companies',
-                    'repository' => 'Modules\\Webinar\\Repositories\\WebCompanyRepository',
-                    'info' => 'count',
+                    [
+                    'title' => 'Active Webinar',
+                    'repository' => 'Modules\\Webinar\\Repositories\\VimeoWebinarRepository2',
+                    'method' => 'count',
                     'flex' => 6,
+                    ],
+                    [
+                    'title' => 'Speaker & Moderators',
+                    'repository' => 'Modules\\Webinar\\Repositories\\ModeratorRepository',
+                    'method' => 'count',
+                    'flex' => 6,
+                    ],
+                    [
+                    'title' => 'Company',
+                    'repository' => 'Modules\\Webinar\\Repositories\\WebCompanyRepository',
+                    'method' => 'count',
+                    'flex' => 6,
+                    ],
+                    [
+                    'title' => 'Published Webinars',
+                    'repository' => 'Modules\\Webinar\\Repositories\\VimeoWebinarRepository',
+                    'method' => 'where:web_company_id:3|count',
+                    'flex' => 6,
+                    ],
                 ]
             ],
             [
                 'component' => 'board-information-plus',
-
+                'cards' => [
+                ],
                 'col' => [
                     'cols' => 6,
                     'xxl' => 6,

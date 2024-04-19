@@ -57,14 +57,42 @@ class DashboardController extends BaseController
         //     // $this->getIndexItems([])
 
         // );
-            $blocks = app()->config->get( unusualBaseKey().'.ui_settings.dashboard');
+            $blocks = app()->config->get( unusualBaseKey().'.ui_settings.dashboard.blocks');
+
+            foreach ($blocks as $index => $block) {
+                switch ($block['component']) {
+                    case 'board-information-plus':
+                        $cards = $block['cards'] ?? [];
+                        foreach ($cards as $key => $card) {
+                            $repository = App::make($card['repository']);
+                            $data = array_reduce(explode('|', $card['method']),function($s, $a) use($repository){
+                                [$methodName, $args] = array_pad(explode(':',$a,2),2,null);
+                                if($args){
+                                    $s = empty($s) ? $repository->{$methodName}(...explode(':',$args))->get() : $s->{$methodName}(...explode(':',$args))->get();
+                                }else{
+                                    $s = empty($s) ? $repository->{$methodName}() : $s->$methodName();
+                                }
+
+                                return $s;
+
+                            });
+                            $card['data'] = $data;
+                            $cards[$key] = $card;
+                        }
+                        $blocks[$index]['attributes']['cards'] = $cards;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
 
         $options = [
             'endpoints' => $this->getUrls()
-        ];
+        ]+['blocks' => $blocks];
         // dd($data['blocks']);
         $view = "$this->baseKey::layouts.dashboard";
 
-        return View::make($view, $blocks + $options);
+        return View::make($view, $options);
     }
 }
