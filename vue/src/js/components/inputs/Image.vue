@@ -3,6 +3,8 @@
     hideDetails="auto"
     appendIcon="mdi-close"
     :variant="boundProps.variant"
+    :modelValue="modelValue"
+    v-bind:error="error"
   >
     <template v-slot:default="defaultSlot">
       <div class="v-field v-field--active v-field--center-affix v-field--dirty v-field--variant-outlined v-theme--jakomeet v-locale--is-ltr">
@@ -114,7 +116,7 @@
                 </a17-cropper>
               </a17-modal>
             -->
-            <input :name="this.name" type="hidden" :value="JSON.stringify(media)" />
+            <input :name="this.name" :value="JSON.stringify(media)" type="hidden">
           </div>
         </div>
         <div class="v-field__outline">
