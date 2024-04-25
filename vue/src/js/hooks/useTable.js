@@ -20,6 +20,14 @@ export const makeTableProps = propsFactory({
   customTitle: {
     type: String
   },
+  tableSubtitle: {
+    type: String,
+    default: ""
+  },
+  tableType: {
+    type: String,
+    default: "index"
+  },
   titlePrefix: {
     type: String,
     default: ''
@@ -38,6 +46,10 @@ export const makeTableProps = propsFactory({
   hideFooter: {
     type: Boolean,
     default: false
+  },
+  hideSearchField: {
+    type: Boolean,
+    default: false,
   },
   columns: {
     type: Array
@@ -148,6 +160,11 @@ export default function useTable (props, context) {
       const prefix = props.titlePrefix ? props.titlePrefix : ''
       return prefix + (__isset(props.customTitle) ? props.customTitle : state.transNamePlural)
     }),
+    tableSubtitle: computed(() => {
+      return (__isset(props.tableSubtitle) ? props.tableSubtitle : "")
+    }),
+    hideSearchField: computed(()=> {return props.hideSearchField}),
+    searchText: computed(() => t("Type to Search")),
     formTitle: computed(() => {
       return t((state.editedIndex === -1 ? 'new-item' : 'edit-item'), {
         item: te(`modules.${state.snakeName}`) ? t(`modules.${state.snakeName}`, 0) : props.name

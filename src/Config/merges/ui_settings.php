@@ -100,7 +100,7 @@ return [
                 'cards' => [
                     [
                     'title' => 'Active Webinar',
-                    'repository' => 'Modules\\Webinar\\Repositories\\VimeoWebinarRepository2',
+                    'repository' => 'Modules\\Webinar\\Repositories\\VimeoWebinarRepository',
                     'method' => 'count',
                     'flex' => 6,
                     ],
@@ -124,34 +124,8 @@ return [
                     ],
                 ]
             ],
-            [
-                'component' => 'board-information-plus',
-                'cards' => [
-                ],
-                'col' => [
-                    'cols' => 6,
-                    'xxl' => 6,
-                    'xl' => 6,
-                    'lg' => 6,
-                    'class' => 'pr-theme-semi pb-theme-semi'
-                ],
-                'attributes' => [
-                    'container' => [
-                        'color' => '#F8F8FF',
-                        'elevation' => '10',
-                        'class' => 'px-5 py-5',
-                    ],
-                    'cardAttribute' => [
-                        'variant' => 'outlined',
-                        'class' => 'rounded-xl',
-                        'border' => 'md',
-                        'titleClass' => 'pt-3 pb-3 text-subtitle-2',
-                        'titleColor' => 'grey',
-                        'infoClass' => 'text-h4 pt-0 pb-5',
-                        'infoColor' => '#000000',
-                    ]
-                ],
-            ],
+
+
         ]
     ]
 

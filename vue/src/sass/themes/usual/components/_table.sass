@@ -1,0 +1,65 @@
+@use '../abstract' as *
+
+#ue-main-body
+  > .v-table
+    min-height: calc(100vh - (2*$theme-space))
+    width: min-content
+    // min-width: 60%
+
+
+.v-table
+  &.ue-table--narrow-wrapper
+    .v-table__wrapper
+      > table
+        background-color: #f8f8ff
+        // border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity))
+        border-right: 1px solid #E0E0E0
+        border-left: 1px solid rgba(var(--v-border-color), var(--v-border-opacity))
+  &.ue-table
+    > .v-table__wrapper
+      > table
+        // width: min-content
+
+
+
+  &.v-table--has-wrapper-space > .v-table__wrapper, .ue-table-top__wrapper ~ .v-table__wrapper
+      // padding-left: $theme-space !important
+      // padding-right: $theme-space !important
+
+  > .ue-table-top__wrapper
+
+    // margin-bottom: $theme-space !important
+    .ue-table-header, .ue-table-form__embedded
+      // padding-top: $theme-space
+
+  > .v-table__wrapper
+    > table
+      background-color: #f8f8ff
+      // border-top: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
+      .v-data-table-header__content
+        font-weight: map-get($font-weights, 'thin') !important
+      &,tbody
+        tr
+          td,th
+            border-bottom: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
+            padding-left: 2px !important
+            // padding-left: $theme-space !important
+      > tbody
+        > tr
+          &:is(:nth-of-type(2n))
+            // background-color: #f0eeee
+            background-color: #eceaea
+
+          > td
+            font-size: 0.8rem
+            padding-left: 1px
+
+            &:is(:first-child)
+              margin-right: 2px
+              color: $primary-color
+            &:not(:last-child)
+
+
+
+
+// .v-table.v-table--has-wrapper-space

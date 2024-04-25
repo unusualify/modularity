@@ -1,0 +1,113 @@
+/*
+  settings_vuetify_variables
+
+  /* GLOBAL
+  body-padding: 30px;
+  text-color: #000000
+
+  primary: #27A0B4
+  primary-hover: #11758D
+  primary-light: #63C0C4
+
+  primary-text-color: #FFFFFF
+  secondary-text-color: $primary
+  tertiary-text-color: #F6A505
+
+  secondary: #F08712
+  secondary-light: #F6A505
+  secondary-hover: #E65100
+
+  sidebar-item-hover: #35ABB8
+  sidebar-item-active: $primary-hover //#11758D
+
+  /* BUTTONS
+  button-primary: $primary
+  button-primary-text-color: $primary-text-color
+  button-primary-hover: #178DA0
+
+  button-secondary: #FFFFFF
+  button-secondary-text-color: #27A0B4
+  button-secondary-border-color: #27A0B4
+  button-secondary-hover: #DFEFF0
+
+  button-tertiary: #DFEFF0
+  button-tertiary-text-color: #27A0B4
+  button-tertiary-hover: #F08712
+  button-tertiary-hover-text-color: $primary-text-color
+
+  button-cta: #F6A505
+  button-cta-text-color: $primary-text-color
+  button-cta-hover: #F08712
+
+  button-cta-secondary: $primary-text-color
+  button-cta-secondary-text-color: #F6A505
+  button-cta-secondary-border-color: #F6A505
+  button-cta-secondary-hover: #F6A505
+  button-cta-secondary-text-color: $primary-text-color
+
+  anchor-cta-text-color: #F6A505
+
+  button-success: #7CB749
+  button-success-text-color: #FFFFFF
+  button-success-hover: #5A9527
+
+  /* TEXT FIELDS
+  input-text-color: $text-color
+
+  input-focus-border-color: $primary-color
+  input-focus-label-color: $primary-color
+
+  input-hover-background-color: $primary-color
+  input-hover-label-color: $primary-color
+
+  /** FONT SIZES 1920 x 1080
+  sidebar list-font-size-1: 22px
+  sidebar list-font-size-2: 20px
+  sidebar font-size-logout: 20px
+
+  card-font-size-header: 22px bold
+  card-font-size-label: 20px semibold
+  card-font-size-value: 25px
+
+  card-font-size-button: 15px semibold
+
+  table-font-size-column: 20px semibold
+  table-font-size-cell: 18px regular
+
+*/
+@import url('https://fonts.googleapis.com/css?family=Montserrat:200,400,500,600,700,800,900');
+
+$body-font-family: 'Montserrat';
+
+$font-weights: (
+  // 'regular': 400,
+  'semi-bold': 600,
+  'bold': 800
+
+  // 'thin': 100,
+  // 'light': 300,
+  // 'regular': 400,
+  // 'medium': 500,
+  // 'bold': 700,
+  // 'black': 900
+);
+$line-height-root: 1.5; // default 1.5
+
+$spacer: 0.26vw;
+$theme-space: 6 * $spacer; //1.56%;æ
+
+/* BUTTONS */
+$button-height: 2.5rem; //2.5rem
+$button-min-width: 7.5rem;
+$button-max-width: 300px;
+$button-font-weight: 700;
+$button-font-size: 0.75rem;
+
+$input-font-size: .8rem;
+$input-control-height: 36px;
+$input-line-height: 1.2; // default 1.5
+
+$field-control-height: 56px;
+$field-label-floating-scale: 0.81;
+
+$zindex__loadingTable: 4;
