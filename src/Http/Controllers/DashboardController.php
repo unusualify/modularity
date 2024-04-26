@@ -120,7 +120,7 @@ class DashboardController extends BaseController
                                 'isRowEditable' => true,
                                 'isColumnEditable' => true,
                                 'formatter' => [
-                                    'edit'
+
                                 ],
                             ],
                             [
@@ -130,9 +130,9 @@ class DashboardController extends BaseController
 
                             ],
                         ],
-                        'table-options' => [
+                        'tableOptions' => [
                             'page'          => 1,
-                            'itemsPerPage'  => 2,
+                            'itemsPerPage'  => 1,
                             'sortBy'        => [],
                             'multiSort'     => false,
                             'mustSort'      => false,
@@ -243,9 +243,9 @@ class DashboardController extends BaseController
 
                             ],
                         ],
-                        'table-options' => [
+                        'tableOptions' => [
                             'page'          => 1,
-                            'itemsPerPage'  => 2,
+                            'itemsPerPage'  => 1,
                             'sortBy'        => [],
                             'multiSort'     => false,
                             'mustSort'      => false,

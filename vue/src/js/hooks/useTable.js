@@ -20,10 +20,6 @@ export const makeTableProps = propsFactory({
   customTitle: {
     type: String
   },
-  customCardClasses: {
-    type: [String],
-    default: [],
-  },
   fillHeight: {
     type: Boolean,
     default: false,
@@ -575,20 +571,12 @@ export default function useTable (props, context) {
     isSoftDeletable (item) {
       return !!(__isset(item.deleted_at) && item.deleted_at)
     },
-
     goNextPage () {
       if (state.options.page < store.getters.totalPage) { state.options.page += 1 }
     },
     goPreviousPage () {
       if (state.options.page > 1) { state.options.page -= 1 }
     },
-
-    filterStatus: function (slug) {
-      if (this.navActive === slug) return
-      store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
-      store.commit(DATATABLE.UPDATE_DATATABLE_FILTER_STATUS, slug)
-      store.dispatch(ACTIONS.GET_DATATABLE)
-    }
   })
 
   watch(() => state.editedItem, (newValue, oldValue) => {

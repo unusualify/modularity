@@ -13,10 +13,58 @@
       density="compact"
       single-line
       style="max-width: 30%;"
+      v-model="search"
       >
 
       </v-text-field>
       <slot name="headerBtn">
+        <div v-if="embeddedForm && !noForm" class=""
+            >
+            <v-btn  rounded="lg"  elevation="0" v-if="can('create')" @click="createForm" class="mb-1">
+              <p class="font-weight-bold">{{ $t('ADD NEW')}}</p>
+            </v-btn>
+          </div>
+          <slot v-else-if="(createOnModal || editOnModal) && !noForm" name="formDialog" >
+            <ue-modal
+              ref="formModal"
+              v-model="formActive"
+              scrollable
+              transition="dialog-bottom-transition"
+              width-type="lg"
+              >
+              <template v-slot:activator="{props}">
+                <v-btn-success v-if="createOnModal" v-bind="props" dark class="mb-1">
+                    {{ $t('add-item', {'item': transNameSingular} ) }}
+                </v-btn-success>
+              </template>
+              <template v-slot:body="props">
+                <v-card >
+                  <v-card-title class="text-h5 grey lighten-2"> </v-card-title>
+                  <v-card-text>
+                    <ue-form
+                      ref="form"
+                      :title="formTitle"
+                      />
+                  </v-card-text>
+                  <v-divider/>
+                  <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="error darken-1" text @click="closeForm()">
+                        {{ props.textCancel }}
+                      </v-btn>
+                      <v-btn color="teal darken-1"
+                        text
+                        @click="confirmFormModal()"
+                        :disabled="!formIsValid"
+                        :loading="formLoading"
+                        >
+                        {{ $t('save') }}
+                      </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </template>
+            </ue-modal>
+          </slot>
         <v-btn
         v-if="false"
       variant="outlined"
@@ -33,14 +81,130 @@
 
 
     <v-card-item>
+
+          <!-- MARK - EMBEDDED CU FORM -->
+      <v-expand-transition>
+              <v-card class="mb-theme" elevation="4" v-if="formActive && embeddedForm">
+                <ue-form has-submit button-text="save" :title="formTitle" ref="form">
+                  <template v-slot:headerRight>
+                    <v-btn class="" variant="text" icon="$close" density="compact"
+                      @click="closeForm()"
+                    ></v-btn>
+                  </template>
+                </ue-form>
+              </v-card>
+        </v-expand-transition>
+
+          <!-- MARK - DELETE MODAL -->
+      <ue-modal
+        ref="deleteModal"
+        v-model="deleteModalActive"
+        transition="dialog-bottom-transition"
+        width-type="sm"
+        >
+        <template v-slot:body="props" >
+          <v-card >
+            <v-card-title class="text-h5 text-center" style="word-break: break-word;">
+              <!-- {{ textDescription }} -->
+            </v-card-title>
+            <v-card-text class="text-center" style="word-break: break-word;" >
+              {{ deleteQuestion }}
+            </v-card-text>
+            <v-divider/>
+            <v-card-actions>
+              <v-spacer/>
+              <v-btn color="blue" text @click="closeDeleteModal()"> {{ props.textCancel }}</v-btn>
+              <v-btn color="blue" text @click="deleteRow()"> {{ props.textConfirm }}</v-btn>
+              <v-spacer></v-spacer>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </ue-modal>
+          <!-- MARK - CUSTOM MODAL -->
+      <slot name="customModal">
+        <ue-modal
+          ref="customModal"
+          v-model="customModalActive"
+          scrollable
+          transition="dialog-bottom-transition"
+          width-type="md"
+          >
+          <template v-slot:activator="{props}">
+            <!-- <v-btn-cta v-bind="props" dark class="mb-theme">
+                CUSTOM MODAL
+            </v-btn-cta> -->
+          </template>
+          <template v-slot:body="props">
+            <v-card class="pa-theme">
+              <v-item-group selected-class="bg-primary">
+                <v-container>
+                  <v-row>
+                    <!-- <v-col
+                      v-for="n in 3"
+                      :key="n"
+                      cols="12"
+                      md="6"
+                      >
+                        <v-item v-slot="{ isSelected, selectedClass, toggle }">
+                          <v-card
+                            :class="['d-flex align-center', selectedClass]"
+                            dark
+                            height="200"
+                            @click="toggle"
+                          >
+                            <div
+                              class="text-h3 flex-grow-1 text-center"
+                            >
+                              {{ isSelected ? 'Selected' : 'Click Me!' }}
+                            </div>
+                        </v-card>
+                      </v-item>
+                    </v-col> -->
+                    <v-col cols="12" md="6" class="pa-4">
+                      <v-item v-slot="{ isSelected, selectedClass, toggle }">
+                        <v-card :class="['d-flex align-center bg-primary ue-card-button px-4', selectedClass]" dark height="200" @click="toggle" >
+                          <div class="text-h6 font-weight-bold flex-grow-1 text-center" > COMPANY INFORMATION</div>
+                        </v-card>
+                      </v-item>
+                    </v-col>
+                    <v-col cols="12" md="6" class="pa-4">
+                      <v-item v-slot="{ isSelected, selectedClass, toggle }">
+                        <v-card :class="['d-flex align-center bg-cta ue-card-button px-4', selectedClass]" dark height="200" @click="toggle" >
+                          <div class="text-h6 font-weight-bold flex-grow-1 text-center" > PRESS RELEASES </div>
+                        </v-card>
+                      </v-item>
+                    </v-col>
+                    <v-col cols="12" md="12" class="pa-4">
+                      <v-item v-slot="{ isSelected, selectedClass, toggle }">
+                        <v-card :class="['d-flex align-center bg-success ue-card-button px-4', selectedClass]" dark height="80" @click="toggle" >
+                          <div class="text-h6 font-weight-bold flex-grow-1 text-center"> CREDITS & INVOICES </div>
+                        </v-card>
+                      </v-item>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-item-group>
+            </v-card>
+          </template>
+        </ue-modal>
+      </slot>
+
       <v-divider v-if="!!tableSubtitle"></v-divider>
         <v-data-table-server
+
         :items="elements"
         :headers="headers"
         :items-length="elements.length"
         :item-title="titleKey"
         density="comfortable"
+        :search="search"
+        :page="options.page"
+        :items-per-page="options.itemsPerPage"
+        :item-value="name"
+        @update:options="console.log(search)"
         >
+
+
         <template v-slot:headers v-if="hideHeaders">
 
         </template>

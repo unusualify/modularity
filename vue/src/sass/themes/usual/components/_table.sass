@@ -63,9 +63,6 @@
               color: #bfc8d5 !important
 
 
-
-
-
 .v-card
   &.custom-table-card
     &:is(.data-table-full-height)
@@ -74,8 +71,12 @@
   &.custom-table-card
     &:is(.data-table-dashboard)
     &:is(.data-table-full-height)
-      min-height: calc(60vh - (2*$theme-space))
+      min-height: calc(55vh - (2*$theme-space))
 
+  &.custom-table-card
+    >.v-card-title
+        .v-btn
+          background-color: #F6A505 !important
 
   &.custom-table-card
     &:not(.data-table-dashboard)
