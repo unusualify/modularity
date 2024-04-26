@@ -1,5 +1,5 @@
 <template>
-  <v-card color="#F8F8FF" :elevation=10 class="px-5 py-5">
+  <v-card color="#F8F8FF" :elevation=10 :class="['px-5 py-5 custom-table-card', {'data-table-dashboard' : isDashboard}, {'data-table-full-height' : fillHeight} ]">
     <v-card-title style="font-weight: bolder" class="d-flex align-center my-0 py-0 ga-2">
       {{ $t(tableTitle) }}
       <v-spacer></v-spacer>
@@ -25,7 +25,6 @@
       ripple="true"
       icon="mdi-filter-outline"
       width = "6%"
-
     ></v-btn>
       </slot>
     </v-card-title>
@@ -94,14 +93,14 @@
           open-on-hover
           left
           >
-          <template v-slot:activator="{ props }">
+          <!-- <template v-slot:activator="{ props }">
             <v-icon
-              size="large"
+              size="small"
               icon="mdi-cog-outline"
               v-bind="props"
               >
             </v-icon>
-          </template>
+          </template> -->
         </v-menu>
       </template>
       <template v-slot:item.actions="{ item }">
@@ -115,9 +114,9 @@
           >
           <template v-slot:activator="{ props }">
             <v-icon
-              size="large"
+              size="small"
               color="primary"
-              icon="$list"
+              icon="mdi-cog-outline"
               v-bind="props"
               >
             </v-icon>

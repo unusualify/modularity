@@ -1,9 +1,10 @@
 @use '../abstract' as *
 
 #ue-main-body
+
   > .v-table
-    min-height: calc(100vh - (2*$theme-space))
-    width: min-content
+    // min-height: calc(100vh - (2*$theme-space))
+    // width: min-content
     // min-width: 60%
 
 
@@ -44,11 +45,11 @@
             border-bottom: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
             padding-left: 2px !important
             // padding-left: $theme-space !important
+            &:is(:last-child)
+              text-align: end !important
       > tbody
         > tr
-          &:is(:nth-of-type(2n))
-            // background-color: #f0eeee
-            background-color: #eceaea
+
 
           > td
             font-size: 0.8rem
@@ -57,9 +58,51 @@
             &:is(:first-child)
               margin-right: 2px
               color: $primary-color
-            &:not(:last-child)
+            > i
+              &:is(.v-icon)
+              color: #bfc8d5 !important
 
 
 
 
-// .v-table.v-table--has-wrapper-space
+
+.v-card
+  &.custom-table-card
+    &:is(.data-table-full-height)
+      min-height: calc(100vh - (2*$theme-space))
+
+  &.custom-table-card
+    &:is(.data-table-dashboard)
+    &:is(.data-table-full-height)
+      min-height: calc(60vh - (2*$theme-space))
+
+
+  &.custom-table-card
+    &:not(.data-table-dashboard)
+      min-height: calc(100vh - (2*$theme-space))
+      .v-table__wrapper
+
+        > table
+          background-color: #f8f8ff
+          // border-top: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
+          .v-data-table-header__content
+            font-weight: map-get($font-weights, 'thin') !important
+          &,tbody
+            tr
+              td,th
+                border-bottom: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
+                padding-left: 2px !important
+                // padding-left: $theme-space !important
+          > tbody
+            > tr
+              &:is(:nth-of-type(2n))
+                background-color: #eceaea !important
+
+              > td
+                font-size: 0.8rem
+                padding-left: 1px
+
+                &:is(:first-child)
+                  margin-right: 2px
+                  color: $primary-color
+                &:not(:last-child)

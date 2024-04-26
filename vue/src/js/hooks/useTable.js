@@ -20,6 +20,14 @@ export const makeTableProps = propsFactory({
   customTitle: {
     type: String
   },
+  customCardClasses: {
+    type: [String],
+    default: [],
+  },
+  fillHeight: {
+    type: Boolean,
+    default: false,
+  },
   tableSubtitle: {
     type: String,
     default: ""
@@ -140,7 +148,7 @@ export default function useTable (props, context) {
 
     activeTableItem: null,
     hideTable: false,
-
+    fillHeight: computed(() => props.fillHeight),
     createUrl: window[import.meta.env.VUE_APP_NAME].ENDPOINTS.create ?? '',
     editUrl: window[import.meta.env.VUE_APP_NAME].ENDPOINTS.edit ?? '',
     editedIndex: -1,
@@ -150,7 +158,9 @@ export default function useTable (props, context) {
       x: 0,
       y: 0
     },
-
+    isDashboard: computed(() => {
+      return  (props.tableType === 'dashboard')
+    }),
     snakeName: snakeCase(props.name),
     permissionName: kebabCase(props.name),
     transNameSingular: computed(() => te('modules.' + state.snakeName, 0) ? t('modules.' + state.snakeName, 0) : props.name),

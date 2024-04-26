@@ -168,12 +168,14 @@ class DashboardController extends BaseController
                         'class' => ''
                     ],
                     'attributes' => [
+
                         'customTitle' => 'Vimeo Webinars',
                         'tableSubtitle' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lobortis.',
                         'tableType' => 'dashboard',
                         'hide-headers' => false,
                         'fullWidthWrapper' => true,
                         'hideSearchField' => true,
+                        'fillHeight' => true,
                         'style' => '',
                         'items' =>  App::make(VimeoWebinarRepository::class)->get([], [], [
                             'created_at' => 'desc'
