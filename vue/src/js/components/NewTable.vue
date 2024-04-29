@@ -20,7 +20,7 @@
       <slot name="headerBtn">
         <div v-if="embeddedForm && !noForm" class=""
             >
-            <v-btn  rounded="lg"  elevation="0" v-if="can('create')" @click="createForm" class="mb-1">
+            <v-btn  rounded="lg"  elevation="0" v-if="can('create')" @click="createForm" class="mb-1" :ripple="true">
               <p class="font-weight-bold">{{ $t('ADD NEW')}}</p>
             </v-btn>
           </div>
@@ -33,7 +33,7 @@
               width-type="lg"
               >
               <template v-slot:activator="{props}">
-                <v-btn-success v-if="createOnModal" v-bind="props" dark class="mb-1">
+                <v-btn-success :ripple="true" v-if="createOnModal" v-bind="props" dark class="mb-1">
                     {{ $t('add-item', {'item': transNameSingular} ) }}
                 </v-btn-success>
               </template>
@@ -81,6 +81,9 @@
 
 
     <v-card-item>
+
+
+
 
           <!-- MARK - EMBEDDED CU FORM -->
       <v-expand-transition>
@@ -191,7 +194,7 @@
 
       <v-divider v-if="!!tableSubtitle"></v-divider>
         <v-data-table-server
-
+        v-if="listDataTable || isDashboard"
         :items="elements"
         :headers="headers"
         :items-length="elements.length"
@@ -329,6 +332,38 @@
         </v-data-table-server>
 
 
+        <v-data-iterator
+        v-else-if="listDataIterators"
+        :items="elements"
+        :page="options.page"
+        :search="options.search"
+        :items-per-page="options.itemsPerPage"
+        :item-value="name"
+        >
+
+          <template v-slot:default="{items}">
+
+            <v-row>
+              <v-col
+              v-for="(element, i) in items"
+              :key="element.raw.id"
+              cols="12"
+              sm="6"
+              xl="6"
+              >
+              <!-- // TODO - check if its empty -->
+              <component
+                :is="`ue-${iteratorType ?? ''}`"
+                :key="element.raw.id"
+                :item="element.raw"
+                :headers="headers"
+              >
+              </component>
+              </v-col>
+            </v-row>
+
+          </template>
+        </v-data-iterator>
 
     </v-card-item>
   </v-card>

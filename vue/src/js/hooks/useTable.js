@@ -80,6 +80,10 @@ export const makeTableProps = propsFactory({
     type: String,
     default: 'inline'
   },
+  iteratorType: {
+    type: String,
+    default: '',
+  },
   slots: {
     type: Object,
     default () {
@@ -223,6 +227,15 @@ export default function useTable (props, context) {
     formIsValid: computed(function () {
       // __log(form?.value?.valid, form?.value)
       return form?.value?.valid ?? null
+    }),
+    listDataIterators: computed(()=>{
+      return props.tableType === 'dataIterator'
+    }),
+    listDataTable: computed(() => {
+      return props.tableType === 'dataTable'
+    }),
+    iteratorType: computed(() => {
+      return __isset(props.iteratorType) ? props.iteratorType : ''
     })
   })
 
