@@ -348,15 +348,19 @@
               v-for="(element, i) in items"
               :key="element.raw.id"
               cols="12"
-              sm="6"
-              xl="6"
+              sm="12"
+              xl="12"
               >
+              {{ console.log(headersWithKeys) }}
               <!-- // TODO - check if its empty -->
               <component
                 :is="`ue-${iteratorType ?? ''}`"
                 :key="element.raw.id"
                 :item="element.raw"
-                :headers="headers"
+                :headers="headersWithKeys"
+                :iteratorOptions="iteratorOptions"
+                :rowActions = "rowActions"
+                @click-action="itemAction"
               >
               </component>
               </v-col>
@@ -388,6 +392,7 @@ export default{
       ...useTable(props, context)
     }
   }
+
 }
 
 </script>

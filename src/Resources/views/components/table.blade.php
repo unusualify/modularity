@@ -21,6 +21,7 @@
 {{-- <div class="rounded">
 </div> --}}
 {{-- <v-sheet class="h-screen"> --}}
+
     <ue-new-table v-bind='@json($vBind)' />
     {{-- <ue-table-draggable v-bind='@json($vBind)'/> --}}
 {{-- </v-sheet> --}}

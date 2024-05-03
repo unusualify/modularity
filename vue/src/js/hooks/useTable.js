@@ -116,6 +116,10 @@ export const makeTableProps = propsFactory({
   noFooter: {
     type: Boolean,
     default: false
+  },
+  iteratorOptions:{
+    type: Object,
+    default: {},
   }
 })
 
@@ -202,6 +206,17 @@ export default function useTable (props, context) {
 
     options: props.tableOptions ?? store.state.datatable.options ?? {},
     headers: props.columns ?? store.state.datatable.headers ?? [],
+    headersWithKeys: computed(() => {
+      let collection = {};
+       Object.values(state.headers).forEach((header, i) => {
+        // let k =
+
+        // let newObject = Object.create({ })
+         collection[header['key']] = header
+       })
+
+       return collection
+    }),
     inputs: props.inputFields ?? store.state.datatable.inputs ?? [],
 
     elements: computed(() => props.items ?? store.state.datatable.data ?? []),
@@ -236,6 +251,9 @@ export default function useTable (props, context) {
     }),
     iteratorType: computed(() => {
       return __isset(props.iteratorType) ? props.iteratorType : ''
+    }),
+    iteratorOptions: computed(() => {
+      return __isset(props.iteratorOptions) ? props.iteratorOptions : {}
     })
   })
 

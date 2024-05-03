@@ -66,6 +66,49 @@
 
 
 .v-card
+
+  .v-card-subtitle
+    opacity: 1
+  &.data-iterable-rich-row
+    background-color: transparent
+    height: 25vh
+    font-size: 0.8em
+    .v-card-title
+      color: $primary-color
+      font-size: x-large
+      font-weight: bold
+    .header
+      font-weight: bold
+      &::after
+        content: ": "
+    .v-col
+
+      &.action-area
+        display: flex
+        justify-content: end
+        gap: 0.3rem
+        padding-right: 1rem
+      &.featured
+        display: flex
+        align-items: center
+        justify-content: center
+      &.last-column
+        display: flex
+        align-items: center
+        justify-content: center
+      p
+        &.featured
+          font-weight: 600
+          font-size: large
+      .v-btn
+        background-color: #FFFFFF !important
+        min-width: min-content !important
+        border-radius: 0.6rem
+        .v-icon
+          color: #F6A505
+          width: min-content
+
+
   &.custom-table-card
     &:is(.data-table-full-height)
       min-height: calc(100vh - (2*$theme-space))
