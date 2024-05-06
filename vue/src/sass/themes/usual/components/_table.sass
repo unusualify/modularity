@@ -73,16 +73,22 @@
     background-color: transparent
     height: 25vh
     font-size: 0.8em
+    .v-card-subtitle
+      height: 100%
+      .v-col
+        min-height: 25vh
     .v-card-title
       color: $primary-color
       font-size: x-large
-      font-weight: bold
+      font-weight: 700
     .header
       font-weight: bold
       &::after
-        content: ": "
+        content: ":\00a0\00a0"
     .v-col
-
+      &.first-column
+        div
+          flex-wrap: wrap
       &.action-area
         display: flex
         justify-content: end
@@ -95,11 +101,20 @@
       &.last-column
         display: flex
         align-items: center
-        justify-content: center
+        justify-content: space-between
+        gap: 0.5rem
+        .v-btn
+          flex: auto
+
       p
         &.featured
           font-weight: 600
           font-size: large
+        &.value
+          font-weight: 500
+          opacity: .6
+          text-wrap: pretty
+          text-overflow: ellipsis
       .v-btn
         background-color: #FFFFFF !important
         min-width: min-content !important
