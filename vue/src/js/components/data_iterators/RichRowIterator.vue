@@ -20,18 +20,36 @@
       <v-col cols="3" class="first-column">
         <div v-for="(key,i) in iteratorOptions.firstColumn" class="d-flex">
           <p class="header">{{ headersWithKeys[key]['title'] }}</p>
-          <p class="value">{{ item[key] }}</p>
+          <p v-if="!(headersWithKeys[key].formatter.length)" class="value">{{ item[key] }}</p>
+          <ue-recursive-stuff
+          v-else
+          v-bind="handleFormatter(headersWithKeys[key].formatter, item[key])"
+          :key="key"
+          />
         </div>
       </v-col>
       <v-col cols="3">
-        {{ console.log(iteratorOptions.secondColumn, headersWithKeys) }}
+
         <div v-for="(key,i) in iteratorOptions.secondColumn" class="d-flex">
+
           <p class="header">{{ headersWithKeys[key]?.['title'] ?? key }}</p>
-          <p class="value">{{ item[key] ?? '' }}</p>
+          <p v-if="!headersWithKeys[key]?.formatter.length" class="value">{{ item[key] ?? '' }}</p>
+          <ue-recursive-stuff
+          v-else
+          v-bind="handleFormatter(headersWithKeys[key].formatter, item[key])"
+          :key="key"
+          />
         </div>
       </v-col>
       <v-col cols="3" class="featured">
-        <p class="featured">{{item[iteratorOptions.featured]}}</p>
+        <p v-if="!headersWithKeys[iteratorOptions.featured].formatter.length" class="featured">{{item[iteratorOptions.featured]}}</p>
+        <!-- <p v-if="!item[iteratorOptions.featured].formatter.length" class="featured">{{item[iteratorOptions.featured]}}</p> -->
+        <ue-recursive-stuff
+          v-else
+          v-bind="handleFormatter(headersWithKeys[iteratorOptions.featured].formatter, item[iteratorOptions.featured])"
+          :key="key"
+
+          />
       </v-col>
       <v-col cols="3" class="last-column">
 
@@ -50,11 +68,15 @@
 <script>
 
 import useIterator, { makeIteratorProps, iterableEmits } from '@/hooks/useIterator'
+import { makeFormatterProps } from '@/hooks/useFormatter';
+
+const { ignoreFormatters } = makeFormatterProps()
 
 export default{
   emits: iterableEmits,
   props: {
-    ...makeIteratorProps()
+    ...makeIteratorProps(),
+    ignoreFormatters
   },
   setup(props, context){
     return {

@@ -46,6 +46,11 @@ export default function useFormatter (props, context, headers) {
     pascalFormatter: function (value) {
       return _.startCase(_.camelCase(value)).replace(/ /g, '')
     },
+    priceFormatter:(value) => {
+      return {
+        configuration: methods.makeText(`${value}+VAT`)
+      }
+    },
     makeChip: function (value, color = '') {
       return {
         tag: 'v-chip',
@@ -66,8 +71,12 @@ export default function useFormatter (props, context, headers) {
     const name = formatter[0]
     // const pascalCase = methods.(name)
     const func = `${name}Formatter`
+    try {
+      return methods[func](value, ..._(formatter.slice(1)))
+    } catch (error) {
+      console.error(`${error}: ${func}`);
+    }
 
-    return methods[func](value, ..._(formatter.slice(1)))
   }
 
   // expose managed state as return value

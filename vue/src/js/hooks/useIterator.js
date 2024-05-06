@@ -43,6 +43,9 @@ export default function useIterators(props, context){
     })
   })
 
+
+  const formatter = useFormatter(props, context, props.headers)
+
   const methods = reactive({
     canItemAction: function (action) {
       if (__isset(action.can) && action.can) {
@@ -117,6 +120,7 @@ export default function useIterators(props, context){
   return {
     ...toRefs(methods),
     ...toRefs(state),
+    ...formatter
   }
 
 }
