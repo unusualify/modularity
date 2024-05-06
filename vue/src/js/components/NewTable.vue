@@ -351,13 +351,12 @@
               sm="12"
               xl="12"
               >
-              {{ console.log(headersWithKeys) }}
               <!-- // TODO - check if its empty -->
               <component
                 :is="`ue-${iteratorType ?? ''}`"
                 :key="element.raw.id"
                 :item="element.raw"
-                :headers="headersWithKeys"
+                :headers="headers"
                 :iteratorOptions="iteratorOptions"
                 :rowActions = "rowActions"
                 @click-action="itemAction"

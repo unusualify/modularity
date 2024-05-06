@@ -33,8 +33,14 @@ export default function useIterators(props, context){
 
   const state = reactive({
     id: Math.ceil(Math.random() * 1000000 ) + ' -iterator',
-    emittedList: ['click-action']
+    headersWithKeys: computed(() => {
 
+      let collection = {};
+      Object.values(props.headers).forEach((header, index) => {
+        collection[header['key']] = header
+      })
+      return collection
+    })
   })
 
   const methods = reactive({
