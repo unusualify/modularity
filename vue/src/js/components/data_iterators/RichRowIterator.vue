@@ -52,8 +52,13 @@
           />
       </v-col>
       <v-col cols="3" class="last-column">
+        <ue-recursive-stuff
+          v-if="headersWithKeys['published'].formatter.length"
+          v-bind="handleFormatter(headersWithKeys['published'].formatter, item['published'])"
+          :key="key"
 
-            <p>{{item['published'] ? 'Published' : 'Not Published'}}</p>
+          />
+            <p v-else >{{item['published'] ? 'Published' : 'Not Published'}}</p>
             <v-btn variant="outlined" :ripple="true">Report</v-btn>
 
       </v-col>

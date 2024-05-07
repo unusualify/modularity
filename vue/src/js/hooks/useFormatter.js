@@ -23,12 +23,13 @@ export default function useFormatter (props, context, headers) {
   ))
 
   const methods = reactive({
-    dateFormatter: function (value, datetimeFormat = 'long') {
+    dateFormatter: function (value, datetimeFormat = 'long', seperator = null) {
       // __log(
       //   value
       //   // new Date(value),
       //   // d(new Date(value), datetimeFormat)
       // )
+
       return {
         configuration: methods.makeText(d(new Date(value), datetimeFormat))
       }
@@ -46,9 +47,39 @@ export default function useFormatter (props, context, headers) {
     pascalFormatter: function (value) {
       return _.startCase(_.camelCase(value)).replace(/ /g, '')
     },
-    priceFormatter:(value) => {
+    priceFormatter:(value, unit = '₺', taxContent= null) => {
       return {
-        configuration: methods.makeText(`${value}+VAT`)
+        configuration:{
+          elements : [{
+            tag:'p',
+            attributes:{
+              class: 'featured',
+            },
+            elements: `${unit}${value}`
+          },
+          {
+            tag:'p',
+            attributes:{
+              class: 'value'
+            },
+            elements: `${taxContent ? `+${taxContent}` : ''}`
+          },
+        ]
+        }
+      }
+    },
+    statusFormatter:(value, placeHolders, colors = null) => {
+      return {
+        configuration : {
+          tag: 'p',
+          attributes : {
+            style: {
+              color: colors?.[value] ?? 'red'
+            },
+          },
+          elements: placeHolders?.[value] ?? value
+        }
+
       }
     },
     makeChip: function (value, color = '') {
