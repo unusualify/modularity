@@ -68,7 +68,7 @@ export default function useFormatter (props, context, headers) {
         }
       }
     },
-    statusFormatter:(value, placeHolders, colors = null) => {
+    statusFormatter:(value, placeHolders = null, colors = null) => {
       return {
         configuration : {
           tag: 'p',

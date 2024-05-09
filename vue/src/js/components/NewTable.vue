@@ -204,7 +204,6 @@
         :page="options.page"
         :items-per-page="options.itemsPerPage"
         :item-value="name"
-        @update:options="console.log(search)"
         >
 
 

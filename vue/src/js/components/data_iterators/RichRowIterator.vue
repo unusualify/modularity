@@ -43,22 +43,21 @@
       </v-col>
       <v-col cols="3" class="featured">
         <p v-if="!headersWithKeys[iteratorOptions.featured].formatter.length" class="featured">{{item[iteratorOptions.featured]}}</p>
-        <!-- <p v-if="!item[iteratorOptions.featured].formatter.length" class="featured">{{item[iteratorOptions.featured]}}</p> -->
         <ue-recursive-stuff
           v-else
           v-bind="handleFormatter(headersWithKeys[iteratorOptions.featured].formatter, item[iteratorOptions.featured])"
           :key="key"
-
           />
       </v-col>
       <v-col cols="3" class="last-column">
+
         <ue-recursive-stuff
           v-if="headersWithKeys['published'].formatter.length"
-          v-bind="handleFormatter(headersWithKeys['published'].formatter, item['published'])"
+          v-bind="handleFormatter(headersWithKeys[iteratorOptions.lastColumn].formatter, item[iteratorOptions.lastColumn])"
           :key="key"
 
           />
-            <p v-else >{{item['published'] ? 'Published' : 'Not Published'}}</p>
+            <p v-else >{{item[iteratorOptions.lastColumn] }}</p>
             <v-btn variant="outlined" :ripple="true">Report</v-btn>
 
       </v-col>
