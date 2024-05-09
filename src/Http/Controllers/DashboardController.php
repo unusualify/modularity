@@ -67,9 +67,10 @@ class DashboardController extends BaseController
                     'component' => 'new-table',
                     'col' => [
                         'cols' => 12,
-                        'xxl' => 6,
-                        'xl' => 6,
-                        'lg' => 6,
+                        'xxl' => 12,
+                        'xl' => 12,
+                        'lg' => 12,
+                        's' => 12,
                         'class' => 'pl-theme-semi pb-theme-semi'
                     ],
                     'attributes' => [

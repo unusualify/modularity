@@ -204,6 +204,7 @@
         :page="options.page"
         :items-per-page="options.itemsPerPage"
         :item-value="name"
+        :loading="loading"
         >
 
 
@@ -338,17 +339,17 @@
         :search="options.search"
         :items-per-page="options.itemsPerPage"
         :item-value="name"
+
         >
 
-          <template v-slot:default="{items}">
+          <template  v-slot:default="{items}">
 
             <v-row>
               <v-col
               v-for="(element, i) in items"
               :key="element.raw.id"
-              cols="12"
-              sm="12"
-              xl="12"
+              v-bind="iteratorOptions.col"
+
               >
               <!-- // TODO - check if its empty -->
               <component
@@ -365,6 +366,7 @@
             </v-row>
 
           </template>
+
         </v-data-iterator>
 
     </v-card-item>
