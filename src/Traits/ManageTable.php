@@ -268,6 +268,21 @@ trait ManageTable {
         return $this->tableOptions[$option] ?? false;
     }
 
+
+
+    /**
+     * method that checks whether the attribute configured on table_options
+     * and returns its value or false if not.
+     *
+     *
+     * @param mixed $attribute
+     * @return boolean|mixed returns referenced value or false if it's not defined at module config->table_options
+     */
+    public function getTableAttribute($attribute)
+    {
+        return $this->tableAttributes[$attribute] ?? false;
+    }
+
     /**
      * getVuetifyDatatableOptions
      *
@@ -277,7 +292,7 @@ trait ManageTable {
     {
         return [
             'page'          => request()->has('page') ? intval(request()->query('page')) : 1,
-            'itemsPerPage'  => request()->has('itemsPerPage') ? intval(request()->query('itemsPerPage')) : ($this->perPage ?? 10),
+            'itemsPerPage'  => request()->has('itemsPerPage') ? intval(request()->query('itemsPerPage')) : ($this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10),
             'sortBy'        => request()->has('sortBy') ? [request()->get('sortBy')] : [],
             'groupBy'       => [],
             'search'        => ''

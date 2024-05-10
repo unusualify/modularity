@@ -86,7 +86,7 @@ abstract class CoreController extends LaravelController
             $this->indexWith + $with,
             $scopes,
             $this->orderScope(),
-            $this->request->get('itemsPerPage') ?? $this->perPage ?? 50,
+            $this->request->get('itemsPerPage') ?? $this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 50,
             $forcePagination
         ));
     }
