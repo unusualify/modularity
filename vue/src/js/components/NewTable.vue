@@ -78,13 +78,7 @@
     </v-card-title>
 
     <v-card-subtitle v-if=!!tableSubtitle >{{$t(tableSubtitle)}}</v-card-subtitle>
-
-
     <v-card-item>
-
-
-
-
           <!-- MARK - EMBEDDED CU FORM -->
       <v-expand-transition>
               <v-card class="mb-theme" elevation="4" v-if="formActive && embeddedForm">
@@ -331,7 +325,7 @@
 
         </v-data-table-server>
 
-
+        <!-- MARK - DATA ITERATOR -->
         <v-data-iterator
         v-else-if="listDataIterators"
         :items="elements"

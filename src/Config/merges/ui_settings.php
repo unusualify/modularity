@@ -75,10 +75,11 @@ return [
                 'component' => 'board-information-plus',
 
                 'col' => [
-                    'cols' => 6,
+                    'cols' => 12,
                     'xxl' => 6,
                     'xl' => 6,
                     'lg' => 6,
+                    's' => 12,
                     'class' => 'pr-theme-semi pb-theme-semi'
                 ],
                 'attributes' => [
