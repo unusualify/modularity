@@ -61,226 +61,241 @@ class DashboardController extends BaseController
 
         // );
             $blocks = app()->config->get( unusualBaseKey().'.ui_settings.dashboard.blocks');
-            $blocks = $blocks +
-            [
-                1 => [
-                    'component' => 'new-table',
-                    'col' => [
-                        'cols' => 12,
-                        'xxl' => 6,
-                        'xl' => 6,
-                        'lg' => 6,
-                        's' => 12,
-                        'class' => 'pl-theme-semi pb-theme-semi'
-                    ],
-                    'attributes' => [
-                        'customTitle' => 'ANNOUNCEMENTS',
-                        'tableSubtitle' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lobortis.',
-                        'hide-headers' => true,
-                        'fullWidthWrapper' => false,
-                        'hideSearchField' => true,
-                        'tableType' => 'dashboard',
-                        'style' => '',
-                        'items' =>  App::make(SurveyRepository::class)->get([], [], [
-                            'created_at' => 'desc'
-                        ], 2)->items(),
-                        'columns' => [
-                            [
-                                'title' => 'name',
-                                'key' => 'created_at',
-                                'align' => 'start',
-                                'sortable' => true,
-                                'filterable' => false,
-                                'groupable' => false,
-                                'divider' => false,
-                                'class' => '',
-                                'cellClass' => '',
-                                'width' => '',
-                                // 'max-width' => 'max-content',
-                                'searchable' => true,
-                                'isRowEditable' => true,
-                                'isColumnEditable' => false,
-                                'formatter' => [
-                                    'date',
-                                    'numeric'
-                                ]
-                                // 'formatter' => ['date', 'numeric'],
-                            ],
-                            [
-                                'title' => 'Name',
-                                'key' => 'name',
-                                'align' => 'start',
-                                'sortable' => false,
-                                'filterable' => false,
-                                'groupable' => false,
-                                'divider' => false,
-                                'class' => '',
-                                'cellClass' => '',
-                                'width' => '',
-                                'searchable' => true,
-                                'isRowEditable' => true,
-                                'isColumnEditable' => true,
-                                'formatter' => [
+            // $blocks = $blocks +
+            // [
+            //     1 => [
+            //         'component' => 'new-table',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'xxl' => 6,
+            //             'xl' => 6,
+            //             'lg' => 6,
+            //             's' => 12,
+            //             'class' => 'pl-theme-semi pb-theme-semi'
+            //         ],
+            //         'attributes' => [
+            //             'customTitle' => 'ANNOUNCEMENTS',
+            //             'tableSubtitle' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lobortis.',
+            //             'hide-headers' => true,
+            //             'fullWidthWrapper' => false,
+            //             'hideSearchField' => true,
+            //             'tableType' => 'dashboard',
+            //             'style' => '',
+            //             'items' =>  App::make(SurveyRepository::class)->get([], [], [
+            //                 'created_at' => 'desc'
+            //             ], 2)->items(),
+            //             'columns' => [
+            //                 [
+            //                     'title' => 'name',
+            //                     'key' => 'created_at',
+            //                     'align' => 'start',
+            //                     'sortable' => true,
+            //                     'filterable' => false,
+            //                     'groupable' => false,
+            //                     'divider' => false,
+            //                     'class' => '',
+            //                     'cellClass' => '',
+            //                     'width' => '',
+            //                     // 'max-width' => 'max-content',
+            //                     'searchable' => true,
+            //                     'isRowEditable' => true,
+            //                     'isColumnEditable' => false,
+            //                     'formatter' => [
+            //                         'date',
+            //                         'numeric'
+            //                     ]
+            //                     // 'formatter' => ['date', 'numeric'],
+            //                 ],
+            //                 [
+            //                     'title' => 'Name',
+            //                     'key' => 'name',
+            //                     'align' => 'start',
+            //                     'sortable' => false,
+            //                     'filterable' => false,
+            //                     'groupable' => false,
+            //                     'divider' => false,
+            //                     'class' => '',
+            //                     'cellClass' => '',
+            //                     'width' => '',
+            //                     'searchable' => true,
+            //                     'isRowEditable' => true,
+            //                     'isColumnEditable' => true,
+            //                     'formatter' => [
 
-                                ],
-                            ],
-                            [
-                                'title' => 'Actions',
-                                'key' => 'actions',
-                                'sortable' => false,
+            //                     ],
+            //                 ],
+            //                 [
+            //                     'title' => 'Actions',
+            //                     'key' => 'actions',
+            //                     'sortable' => false,
 
-                            ],
-                        ],
-                        'tableOptions' => [
-                            'page'          => 1,
-                            'itemsPerPage'  => 1,
-                            'sortBy'        => [],
-                            'multiSort'     => false,
-                            'mustSort'      => false,
-                            'groupBy'       => [],
-                        ],
-                        'slots' => [
-                            'headerBtn' => [
-                                'elements' => [
-                                    [
-                                        'tag' => 'div',
-                                        'attributes' => [
-                                            'class' => 'text-right pa-8',
-                                        ],
-                                        'elements' => [
-                                            [
-                                                'tag' => 'v-btn-tertiary',
-                                                'elements' => 'MANAGE RELEASES',
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                ],
-                2 => [
-                    'component' => 'new-table',
-                    'col' => [
-                        'cols' => 12,
-                        'xxl' => 12,
-                        'xl' => 12,
-                        'lg' => 12,
-                        'class' => ''
-                    ],
-                    'attributes' => [
+            //                 ],
+            //             ],
+            //             'tableOptions' => [
+            //                 'page'          => 1,
+            //                 'itemsPerPage'  => 1,
+            //                 'sortBy'        => [],
+            //                 'multiSort'     => false,
+            //                 'mustSort'      => false,
+            //                 'groupBy'       => [],
+            //             ],
+            //             'slots' => [
+            //                 'headerBtn' => [
+            //                     'elements' => [
+            //                         [
+            //                             'tag' => 'div',
+            //                             'attributes' => [
+            //                                 'class' => 'text-right pa-8',
+            //                             ],
+            //                             'elements' => [
+            //                                 [
+            //                                     'tag' => 'v-btn-tertiary',
+            //                                     'elements' => 'MANAGE RELEASES',
+            //                                 ]
+            //                             ]
+            //                         ]
+            //                     ]
+            //                 ]
+            //             ]
+            //         ],
+            //     ],
+            //     2 => [
+            //         'component' => 'new-table',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'xxl' => 12,
+            //             'xl' => 12,
+            //             'lg' => 12,
+            //             'class' => ''
+            //         ],
+            //         'attributes' => [
 
-                        'customTitle' => 'Vimeo Webinars',
-                        'tableSubtitle' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lobortis.',
-                        'tableType' => 'dashboard',
-                        'hide-headers' => false,
-                        'fullWidthWrapper' => true,
-                        'hideSearchField' => true,
-                        'fillHeight' => true,
-                        'style' => '',
-                        'items' =>  App::make(VimeoWebinarRepository::class)->get([], [], [
-                            'created_at' => 'desc'
-                        ], 2)->items(),
-                        'columns' => [
-                            [
-                                'title' => 'Date',
-                                'key' => 'start_date',
-                                'align' => 'start',
-                                'sortable' => true,
-                                'filterable' => false,
-                                'groupable' => false,
-                                'divider' => false,
-                                'class' => '',
-                                'cellClass' => '',
-                                'width' => '',
-                                // 'max-width' => 'max-content',
-                                'searchable' => true,
-                                'isRowEditable' => true,
-                                'isColumnEditable' => false,
-                                'formatter' => [
-                                    'date',
-                                    'numeric'
-                                ]
-                                // 'formatter' => ['date', 'numeric'],
-                            ],
-                            [
-                                'title' => 'Name',
-                                'key' => 'name',
-                                'align' => 'start',
-                                'sortable' => false,
-                                'filterable' => false,
-                                'groupable' => false,
-                                'divider' => false,
-                                'class' => '',
-                                'cellClass' => '',
-                                'width' => '',
-                                'searchable' => true,
-                                'isRowEditable' => true,
-                                'isColumnEditable' => true,
-                                'formatter' => [
-                                ],
-                            ],
-                            [
-                                'title' => 'Published',
-                                'key' => 'published',
-                                'align' => 'start',
-                                'sortable' => false,
-                                'filterable' => false,
-                                'groupable' => false,
-                                'divider' => false,
-                                'class' => '',
-                                'cellClass' => '',
-                                'width' => '',
-                                'searchable' => true,
-                                'isRowEditable' => true,
-                                'isColumnEditable' => true,
-                                'formatter' => [
-                                ],
-                            ],
-                            [
-                                'title' => 'Actions',
-                                'key' => 'actions',
-                                'sortable' => false,
+            //             'customTitle' => 'Vimeo Webinars',
+            //             'tableSubtitle' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lobortis.',
+            //             'tableType' => 'dashboard',
+            //             'hide-headers' => false,
+            //             'fullWidthWrapper' => true,
+            //             'hideSearchField' => true,
+            //             'fillHeight' => true,
+            //             'style' => '',
+            //             'items' =>  App::make(VimeoWebinarRepository::class)->get([], [], [
+            //                 'created_at' => 'desc'
+            //             ], 2)->items(),
+            //             'columns' => [
+            //                 [
+            //                     'title' => 'Date',
+            //                     'key' => 'start_date',
+            //                     'align' => 'start',
+            //                     'sortable' => true,
+            //                     'filterable' => false,
+            //                     'groupable' => false,
+            //                     'divider' => false,
+            //                     'class' => '',
+            //                     'cellClass' => '',
+            //                     'width' => '',
+            //                     // 'max-width' => 'max-content',
+            //                     'searchable' => true,
+            //                     'isRowEditable' => true,
+            //                     'isColumnEditable' => false,
+            //                     'formatter' => [
+            //                         'date',
+            //                         'numeric'
+            //                     ]
+            //                     // 'formatter' => ['date', 'numeric'],
+            //                 ],
+            //                 [
+            //                     'title' => 'Name',
+            //                     'key' => 'name',
+            //                     'align' => 'start',
+            //                     'sortable' => false,
+            //                     'filterable' => false,
+            //                     'groupable' => false,
+            //                     'divider' => false,
+            //                     'class' => '',
+            //                     'cellClass' => '',
+            //                     'width' => '',
+            //                     'searchable' => true,
+            //                     'isRowEditable' => true,
+            //                     'isColumnEditable' => true,
+            //                     'formatter' => [
+            //                     ],
+            //                 ],
+            //                 [
+            //                     'title' => 'Published',
+            //                     'key' => 'published',
+            //                     'align' => 'start',
+            //                     'sortable' => false,
+            //                     'filterable' => false,
+            //                     'groupable' => false,
+            //                     'divider' => false,
+            //                     'class' => '',
+            //                     'cellClass' => '',
+            //                     'width' => '',
+            //                     'searchable' => true,
+            //                     'isRowEditable' => true,
+            //                     'isColumnEditable' => true,
+            //                     'formatter' => [
+            //                         'status',
+            //                         [
+            //                             'Not Published',
+            //                             'Published'
+            //                         ],
+            //                         [
+            //                             'blue',
+            //                             'red',
+            //                         ]
+            //                     ],
+            //                 ],
+            //                 [
+            //                     'title' => 'Actions',
+            //                     'key' => 'actions',
+            //                     'sortable' => false,
 
-                            ],
-                        ],
-                        'tableOptions' => [
-                            'page'          => 1,
-                            'itemsPerPage'  => 1,
-                            'sortBy'        => [],
-                            'multiSort'     => false,
-                            'mustSort'      => false,
-                            'groupBy'       => [],
-                        ],
-                        'slots' => [
-                            'bottom' => [
-                                'elements' => [
-                                    [
-                                        'tag' => 'div',
-                                        'attributes' => [
-                                            'class' => 'text-right pa-8',
-                                        ],
-                                        'elements' => [
-                                            [
-                                                'tag' => 'v-btn-tertiary',
-                                                'elements' => 'MANAGE RELEASES',
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                ],
-            ] ;
-
+            //                 ],
+            //             ],
+            //             'tableOptions' => [
+            //                 'page'          => 1,
+            //                 'itemsPerPage'  => 1,
+            //                 'sortBy'        => [],
+            //                 'multiSort'     => false,
+            //                 'mustSort'      => false,
+            //                 'groupBy'       => [],
+            //             ],
+            //             'slots' => [
+            //                 'bottom' => [
+            //                     'elements' => [
+            //                         [
+            //                             'tag' => 'div',
+            //                             'attributes' => [
+            //                                 'class' => 'text-right pa-8',
+            //                             ],
+            //                             'elements' => [
+            //                                 [
+            //                                     'tag' => 'v-btn-tertiary',
+            //                                     'elements' => 'MANAGE RELEASES',
+            //                                 ]
+            //                             ]
+            //                         ]
+            //                     ]
+            //                 ]
+            //             ]
+            //         ],
+            //     ],
+            // ] ;
 
 
             foreach ($blocks as $index => $block) {
                 switch ($block['component']) {
-                    case 'table':
-                        $this->moduleName = 'Webinar';
-                        $this->routeName = 'Survey';
+                    case 'new-table':
+                        $controller = App::make($block['controller'])->setTableAttributes(tableOptions:
+                            $block['attributes']['tableOptions'],
+                        );
+                        $block['attributes']['items'] = $controller->getIndexData()['initialResource']->resource['data'];
+                        $block['attributes']['endpoints'] = $controller->getIndexData()['endpoints'];
+
+                        $blocks[$index] = $block;
+
+                        break;
                     case 'board-information-plus':
                         $cards = $block['cards'] ?? [];
                         foreach ($cards as $key => $card) {
@@ -306,12 +321,12 @@ class DashboardController extends BaseController
                     default:
                         break;
                 }
+
             }
 
 
-        $options = [
-            'endpoints' => $this->getUrls()
-        ]+['blocks' => $blocks];
+        $options = ['blocks' => $blocks];
+
         // dd($data['blocks']);
         $view = "$this->baseKey::layouts.dashboard";
 
