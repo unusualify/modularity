@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 if (!function_exists('getLocales')) {
     /**
@@ -89,6 +91,33 @@ if (!function_exists('systemRouteNamePrefix')) {
     function systemRouteNamePrefix()
     {
         return snakeCase(studlyName(systemUrlPrefix()));
+    }
+}
+
+if (!function_exists('builtInModularityThemes')) {
+
+    function builtInModularityThemes()
+    {
+        return collect(array_filter(
+            glob(base_path(unusualConfig('vendor_path') . '/vue/src/sass/themes/*', GLOB_ONLYDIR)),
+            fn($dir) => File::isDirectory($dir) && !preg_match('/customs/', $dir)
+        ))->mapWithKeys(function($dir) {
+            $info = pathinfo($dir);
+            return [ $info['filename'] => Str::headline($info['filename'])];
+        });
+    }
+}
+if (!function_exists('customModularityThemes')) {
+
+    function customModularityThemes()
+    {
+        return collect(array_filter(
+            glob(resource_path('vendor/modularity/themes/*', GLOB_ONLYDIR)),
+            fn($dir) => File::isDirectory($dir)
+        ))->mapWithKeys(function($dir) {
+            $info = pathinfo($dir);
+            return [ $info['filename'] => Str::headline($info['filename'])];
+        });
     }
 }
 
