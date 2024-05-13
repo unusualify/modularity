@@ -56,7 +56,7 @@ trait ManageTable {
 
         $this->defaultTableAttributes = (array) Config::get(unusualBaseKey() . '.default_table_attributes');
 
-        $this->tableAttributes = $this->getTableAttributes();
+        $this->tableAttributes = array_merge_recursive_preserve($this->getTableAttributes(), $this->tableAttributes);
     }
 
     /**
@@ -337,6 +337,20 @@ trait ManageTable {
         }
 
         return $header;
+    }
+
+    protected function setTableAttributes($tableOptions = null)
+    {
+        if($tableOptions){
+            $this->tableAttributes = array_merge_recursive_preserve(
+                $this->defaultTableAttributes,
+                $tableOptions,
+            );
+
+        }
+
+        return $this;
+
     }
 
 }
