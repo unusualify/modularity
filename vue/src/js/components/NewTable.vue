@@ -333,7 +333,7 @@
         :search="options.search"
         :items-per-page="options.itemsPerPage"
         :item-value="name"
-
+        :loading="loading"
         >
 
           <template  v-slot:default="{items}">
@@ -359,6 +359,35 @@
               </v-col>
             </v-row>
 
+          </template>
+
+          <template v-slot:footer = "{page, pageCount}">
+            <div class="text-right py-theme">
+          <v-btn
+            class="v-btn--icon bg-tertiary rounded px-8 py-2 mr-theme"
+            :disabled="options.page < 2"
+            @click="goPreviousPage"
+            >
+            <v-icon
+              size="small"
+              icon="$arrowLeft"
+            />
+          </v-btn>
+          <v-btn
+            class="v-btn--icon bg-tertiary rounded px-8 py-2 mr-theme"
+            :disabled="options.page >= totalPage"
+            @click="goNextPage"
+            >
+            <v-icon
+              size="small"
+              icon="$arrowRight"
+            />
+          </v-btn>
+          </div>
+          </template>
+
+          <template v-slot:loader="{isActive, color}">
+            <p>ASDASDADASDASDAS</p>
           </template>
 
         </v-data-iterator>
