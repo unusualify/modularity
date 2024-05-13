@@ -292,7 +292,7 @@ class DashboardController extends BaseController
                         );
                         $block['attributes']['items'] = $controller->getIndexData()['initialResource']->resource['data'];
                         $block['attributes']['endpoints'] = $controller->getIndexData()['endpoints'];
-
+                        $block['attributes']['rowActions'] = $controller->getTableActions();
                         $blocks[$index] = $block;
 
                         break;

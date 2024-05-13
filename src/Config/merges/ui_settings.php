@@ -140,7 +140,7 @@ return [
                     'tableSubtitle' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lobortis.',
                     'tableType' => 'dashboard',
 
-                    'hideHeaders' => false,
+                    'hideHeaders' => true,
                     'fullWidthWrapper' => true,
                     'hideSearchField' => true,
                     'fillHeight' => true,
@@ -255,8 +255,9 @@ return [
                     'customTitle' => 'Vimeo Webinars',
                     'tableSubtitle' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lobortis.',
                     'tableType' => 'dashboard',
-
                     'hideHeaders' => false,
+                    'rowActionsType' => 'dropdown',
+                    'rowActionsIcon' => 'mdi-dots-vertical',
                     'fullWidthWrapper' => true,
                     'hideSearchField' => true,
                     'fillHeight' => true,
@@ -344,6 +345,11 @@ return [
                                 ]
                             ],
                         ],
+                        [
+                            'title' => 'Actions',
+                            'key' => 'actions',
+                            'sortable' => false,
+                        ]
                     ],
                     'tableOptions' => [
                         'page'          => 1,
@@ -352,7 +358,8 @@ return [
                         'mustSort'      => false,
                         'groupBy'       => [],
                         'itemsPerPage'  => 10,
-                        'tableType' => 'dashboard', // !!!!!!
+                        'tableType' => 'dashboard',
+                         // !!!!!!
                     ],
                     'slots' => [
                         'bottom' => [
@@ -373,7 +380,8 @@ return [
                         ]
                     ]
                 ],
-            ]
+            ],
+
 
         ]
     ]

@@ -80,6 +80,10 @@ export const makeTableProps = propsFactory({
     type: String,
     default: 'inline'
   },
+  rowActionsIcon:{
+    type: String,
+    default: 'mdi-cog-outline'
+  },
   iteratorType: {
     type: String,
     default: '',
@@ -157,7 +161,7 @@ export default function useTable (props, context) {
     activeTableItem: null,
     hideTable: false,
     fillHeight: computed(() => props.fillHeight),
-    createUrl: window[import.meta.env.VUE_APP_NAME].ENDPOINTS.create ?? '',
+    createUrl: window[import.meta.env.VUE_APP_NAME].ENDPOINTS.create ?? props.endpoints.create ?? '',
     editUrl: computed(()=> {
       return window[import.meta.env.VUE_APP_NAME].ENDPOINTS.edit ?? props.endpoints.edit ?? ''
     }),

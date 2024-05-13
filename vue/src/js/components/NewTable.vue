@@ -277,7 +277,7 @@
             <v-icon
               size="small"
               color="primary"
-              icon="mdi-cog-outline"
+              :icon="rowActionsIcon"
               v-bind="props"
               >
             </v-icon>
