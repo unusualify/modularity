@@ -120,6 +120,10 @@ export const makeTableProps = propsFactory({
   iteratorOptions:{
     type: Object,
     default: {},
+  },
+  endpoints:{
+    type: Object,
+    default: {},
   }
 })
 
@@ -154,7 +158,9 @@ export default function useTable (props, context) {
     hideTable: false,
     fillHeight: computed(() => props.fillHeight),
     createUrl: window[import.meta.env.VUE_APP_NAME].ENDPOINTS.create ?? '',
-    editUrl: window[import.meta.env.VUE_APP_NAME].ENDPOINTS.edit ?? '',
+    editUrl: computed(()=> {
+      return window[import.meta.env.VUE_APP_NAME].ENDPOINTS.edit ?? props.endpoints.edit ?? ''
+    }),
     editedIndex: -1,
     selectedItems: [],
 
@@ -219,7 +225,12 @@ export default function useTable (props, context) {
     }),
     inputs: props.inputFields ?? store.state.datatable.inputs ?? [],
 
-    elements: computed(() => props.items ?? store.state.datatable.data ?? []),
+    // elements: computed(() => props.items ?? store.state.datatable.data ?? []),
+    elements: computed(() => {
+      console.log(props.items)
+      return props.items ?? store.state.datatable.data ?? []
+
+    }),
     search: computed({
       get () {
         return store.state.datatable.search
