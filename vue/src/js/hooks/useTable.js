@@ -231,7 +231,6 @@ export default function useTable (props, context) {
 
     // elements: computed(() => props.items ?? store.state.datatable.data ?? []),
     elements: computed(() => {
-      console.log(props.items)
       return props.items ?? store.state.datatable.data ?? []
 
     }),
@@ -269,7 +268,7 @@ export default function useTable (props, context) {
     }),
     iteratorOptions: computed(() => {
       return __isset(props.iteratorOptions) ? props.iteratorOptions : {}
-    })
+    }),
   })
 
   const methods = reactive({
@@ -644,6 +643,7 @@ export default function useTable (props, context) {
   })
   watch(() => state.options, (newValue, oldValue) => {
     // state.options.page = newValue
+
     store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue } })
   }, { deep: true })
   watch(() => state.elements, (newValue, oldValue) => {
