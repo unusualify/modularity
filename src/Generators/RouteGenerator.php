@@ -194,7 +194,7 @@ class RouteGenerator extends Generator
         $this->console = $console;
         $this->module = $module;
 
-        $this->moduleName = $this->module->getName();
+        $this->moduleName = $this->module ? $this->module->getName() : null;
 
 
         // Stub::setBasePath( config('modules.paths.modules').'/Base/Console/stubs');
@@ -348,6 +348,8 @@ class RouteGenerator extends Generator
         $modularity = App::makeWith(\Unusualify\Modularity\Modularity::class, ['app' => app()]);
 
         $this->module = $modularity->find($module);
+
+        $this->moduleName = $this->module->getName();
 
         // if($this->module == null){
         //     dd(

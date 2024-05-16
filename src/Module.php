@@ -29,13 +29,11 @@ class Module extends NwidartModule
 
     /**
      * The constructor.
-     * @param Container $app
      * @param $name
      * @param $path
      */
     public function __construct(string $name, $path = null)
     {
-        // dd($path);
         $app = app();
         $path ??= $app['config']->get('modules.paths.modules');
         parent::__construct($app, $name, $path);
@@ -44,9 +42,6 @@ class Module extends NwidartModule
         $this->moduleActivator = (new FileActivator($app))->setModule($this->getName(), $path);
 
         // $this->moduleActivator->setModule($name);
-
-        // $this->config =
-        // dd($this->moduleActivator, $app);
     }
 
     /**
@@ -85,7 +80,7 @@ class Module extends NwidartModule
 
     public function setModuleActivator($name)
     {
-        $this->moduleActivator->setModule($name);
+        $this->moduleActivator->setModule($name, $this->app['config']->get('modules.paths.modules'));
     }
 
     /**
