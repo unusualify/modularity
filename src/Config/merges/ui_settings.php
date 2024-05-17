@@ -182,6 +182,7 @@ return [
                             'isRowEditable' => true,
                             'isColumnEditable' => true,
                             'formatter' => [
+                                'edit'
                             ],
                         ],
                         [

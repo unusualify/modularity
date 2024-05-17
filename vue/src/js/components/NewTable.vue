@@ -354,6 +354,7 @@
                 :iteratorOptions="iteratorOptions"
                 :rowActions = "rowActions"
                 @click-action="itemAction"
+                @edit-item = "editItem"
               >
               </component>
               </v-col>

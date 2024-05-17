@@ -42,11 +42,11 @@
         </div>
       </v-col>
       <v-col cols="3" class="featured">
-        <p v-if="!headersWithKeys[iteratorOptions.featured].formatter.length" class="featured">{{item[iteratorOptions.featured]}}</p>
+        <p v-if="!headersWithKeys[iteratorOptions.featured]?.formatter.length" class="featured">{{item[iteratorOptions.featured]}}</p>
         <ue-recursive-stuff
           v-else
           v-bind="handleFormatter(headersWithKeys[iteratorOptions.featured].formatter, item[iteratorOptions.featured])"
-          :key="key"
+          :key="item[iteratorOptions.featured].key"
           />
       </v-col>
       <v-col cols="3" class="last-column">
@@ -54,7 +54,7 @@
         <ue-recursive-stuff
           v-if="headersWithKeys['published'].formatter.length"
           v-bind="handleFormatter(headersWithKeys[iteratorOptions.lastColumn].formatter, item[iteratorOptions.lastColumn])"
-          :key="key"
+          :key="item[iteratorOptions.lastColumn].key"
 
           />
             <p v-else >{{item[iteratorOptions.lastColumn] }}</p>

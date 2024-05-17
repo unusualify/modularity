@@ -40,6 +40,16 @@ export default function useFormatter (props, context, headers) {
       }
     },
     editFormatter: function (value) {
+      return {
+        configuration : {
+          elements: `${value}`,
+          tag: 'span',
+          attributes : {
+            onClick: 'editItem'
+          }
+
+        }
+      }
       return `<span @click="editItem">
         ${value}
       </span>`

@@ -24,7 +24,8 @@ export const makeIteratorProps = propsFactory({
 })
 
 export const iterableEmits = [
-  'click-action'
+  'click-action',
+  'edit-item'
 ]
 
 export default function useIterators(props, context){
@@ -111,8 +112,10 @@ export default function useIterators(props, context){
     },
     itemAction: (item, action) => {
       return context.emit('click-action',item,action)
+    },
+    editItem: (item) => {
+      context.emit('edit-item', item)
     }
-
   })
 
 
