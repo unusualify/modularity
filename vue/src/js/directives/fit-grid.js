@@ -13,7 +13,8 @@ export default {
         //   el
         // )
         el.classList.add('d-flex')
-        el.firstChild.classList.add('h-100', 'w-100')
+
+        el.firstElementChild.classList.add('h-100', 'w-100')
       },
       // called when the bound element's parent component
       // and all its children are mounted.
