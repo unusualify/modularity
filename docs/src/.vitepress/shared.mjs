@@ -3,7 +3,9 @@ import { defineConfig } from "vitepress";
 
 export const shared = defineConfig({
     title: "Modularity",
-
+    srcDir: 'pages',
+    cleanUrls: true,
+    lastUpdated: true,
     vite: {
         server: {
             host: '0.0.0.0',
@@ -13,14 +15,7 @@ export const shared = defineConfig({
             watch: {
               usePolling: true
             },
-            // proxy:{
-            //     '/docs': {
-            //         target: 'http://crm.template:8080',
-            //         changeOrigin: true,
-            //         rewrite: (path) => path.replace(/^\/docs/, '')
-            //     }
-            // }
-            // proxy: 'http://nginx'
+
         }
       },
 

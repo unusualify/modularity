@@ -1,27 +1,24 @@
 import { defineConfig } from 'vitepress'
-
+import  userSidebarConfigs   from '../pages/user-guide/sidebar-generator.mjs'
 
 export const sidebarConfig = defineConfig({
-    sidebar: {
-        '/lib/user-guide/' : [
-            {
-              text: 'Examples',
-              collapsed: true,
-              items: [
-                {
-                    items : [
-                    { text: 'Runtime API Examples', link: 'lib/developer-guide/api-examples' },
-                    { text: 'Markdown Examples', link: 'lib/user-guide/markdown-examples' }
 
-                    ]
-            }
-              ]
-            }
-          ],
+
+    sidebar: {
+        '/user-guide/': {
+            base: '/user-guide/', items: userSidebarConfigs()
+        },
+        '/developer-guide/' : {
+            base: '/developer-guide/', items : []
+        }
+
+
     },
 })
 
 
-function userGuide(){
 
-}
+
+
+
+
