@@ -4,6 +4,9 @@ namespace Unusualify\Modularity\Console;
 
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Filesystem\Filesystem;
+use function Laravel\Prompts\{text,note,confirm,error,info,password,warning, alert, select};
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class Install extends BaseCommand
 {
@@ -12,7 +15,7 @@ class Install extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'unusual:install {--default}';
+    protected $name = 'unusual:install';
 
     /**
      * The console command description.
@@ -43,6 +46,19 @@ class Install extends BaseCommand
         $this->db = $db;
     }
 
+    protected function getOptions(): array
+    {
+
+        return array_merge([
+            ['default', '--d', InputOption::VALUE_NONE, 'Use default options for super-admin authentication configuration'],
+            // ['vendor-publish', '--vp', InputOption::VALUE_NONE, 'Only publish vendor assets, configurations and views'],
+            ['db-process', '--db', InputOption::VALUE_NONE, 'Only handle database configuration processes'],
+            // ['complete installment', '--complete', InputOption::VALUE_NONE, 'Complete default installment options'],
+        ], unusualTraitOptions());
+    }
+
+
+
     /**
      * Executes the console command.
      *
@@ -51,16 +67,48 @@ class Install extends BaseCommand
      */
     public function handle():int
     {
+        if($this->option('db-process') == null){
+            info(
+                'Installment process consists of two(2) main operations.
+                1. Publishing Config Files: Modularity Config files manages heavily table names, jwt configurations and etc.User should customize them after publishing in order to customize table names and other opeartions
+                2. Database Operations and Creating Super Admin. DO NOT select this option if you have not published vendor files to theproject. This option will only dealing with db operations
+                3. Complete Installment with default configurations (√ suggested)
+                ');
+                $operationType = select(
+                    label: 'Select Operation',
 
-        $operations = [
+                    options: [
+                        'vp' => 'Only Vendor Publish (Config Files, Assets and Views)',
+                        'db' => 'Only Database Operations',
+                        'complete' => 'Complete Installment with defaults'
+                    ],
+                    default: 'complete',
+
+                );
+        }else{
+            $operationType = 'db';
+        }
+
+        $dbOperations = [
             'checkDbConnection',
             'makeMigrations',
-            'seedingData',
+            'seedData',
+            'createSuperAdmin',
+        ];
+        $vendorOperations = [
             'publishConfig',
             'publishAssets',
             'publishViews',
-            'createSuperAdmin',
         ];
+
+
+
+        $operations = array_merge_conditional(
+            [],
+            [$vendorOperations, $dbOperations,],
+            $operationType === 'complete' || $operationType === 'vp',
+            $operationType === 'complete' || $operationType === 'db',
+        );
 
 
         $bar = $this->output->createProgressBar(count($operations));
@@ -70,13 +118,21 @@ class Install extends BaseCommand
         foreach ($operations as $process) {
             $this->$process();
             $this->newLine();
-            $bar->advance();
+
         }
+
 
 
         $bar->finish();
         $this->newLine();
-        $this->info('Installation is done.');
+
+
+        if($operationType == 'vp'){
+            $this->newLine();
+            info('Vendor publish is done √. Config files can be customized now');
+            warning('Run php artisan unusual:install --db to run installation with db operations');
+        }
+        info('Process is done.');
         return 0;
     }
 
@@ -89,7 +145,7 @@ class Install extends BaseCommand
      */
     private function createSuperAdmin()
     {
-        $this->info("\t Creating super-admin account");
+        info("\t Creating super-admin account");
 
         if (!$this->option('no-interaction')) {
             $this->call('unusual:create:superadmin', [
@@ -105,7 +161,7 @@ class Install extends BaseCommand
      */
     private function publishConfig()
     {
-        $this->info("\t Publishing config files");
+        info("\t Publishing config files");
 
         $this->call('vendor:publish', [
             '--provider' => 'Unusualify\Modularity\LaravelServiceProvider',
@@ -120,7 +176,7 @@ class Install extends BaseCommand
      */
     private function publishAssets()
     {
-        $this->info("\t Publishing default assets");
+        info("\t Publishing default assets");
 
         $this->call('vendor:publish', [
             '--provider' => 'Unusualify\Modularity\LaravelServiceProvider',
@@ -130,7 +186,7 @@ class Install extends BaseCommand
 
     private function publishViews(){
 
-        $this->info("\t Publishing default views");
+        info("\t Publishing default views");
 
 
         $this->call('vendor:publish', [
@@ -141,17 +197,17 @@ class Install extends BaseCommand
 
     private function checkDbConnection(){
         $this->newLine();
-        $this->info("\t Checking database connection");
+        info("\t Checking database connection");
 
         if(!database_exists()){
-            $this->error('Could not connect to the database, please check your configuration:' . "\n");
+            warning('Could not connect to the database, please check your configuration:' . "\n");
             return 0;
         }
-        $this->line('Database connection is fine.');
+        info('Database connection is fine.');
     }
 
     private function makeMigrations(){
-        $this->info("\t Making required migrations");
+        info("\t Making required migrations");
         $this->call('migrate');
 
     }
@@ -164,11 +220,13 @@ class Install extends BaseCommand
      *  - DefaultPermissionsSeeder
      * */
 
-    private function seedingData(){
-        $this->info("\tSeeding required data");
+    private function seedData(){
+        info("\tSeeding required data");
         $this->call('db:seed', [
             '--class' => 'Unusualify\Modularity\Database\Seeders\DefaultDatabaseSeeder',
         ]);
     }
+
+
 
 }
