@@ -1,6 +1,6 @@
 export default {
   add: 'mdi-plus',
-  accountSettings : 'mdi mdi-account-cog',
+  accountSettings: 'mdi mdi-account-cog',
   arrowLeft: 'mdi-arrow-left-thin',
   arrowRight: 'mdi-arrow-right-thin',
 

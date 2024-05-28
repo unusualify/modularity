@@ -16,5 +16,9 @@ yarn-error.log
 /.idea
 /.vscode
 vue/src/js/components/customs
+vue/src/js/config/themes/customs/**
+!vue/src/js/config/themes/customs/**/.gitkeep
+vue/src/sass/themes/customs/**
+!vue/src/sass/themes/customs/**/.gitkeep
 **/.DS_Store
 **/test.*

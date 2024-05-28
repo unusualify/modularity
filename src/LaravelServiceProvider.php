@@ -83,7 +83,7 @@ final class LaravelServiceProvider extends ServiceProvider
     private function publishResources(): void
     {
         $this->publishes([
-            __DIR__ . '/../vue/drafts/components' => resource_path('js/modularity/components')
+            __DIR__ . '/../vue/drafts/components' => resource_path(unusualConfig('custom_components_resource_path', 'vendor/modularity/js/components'))
         ], 'custom-components');
     }
 
