@@ -13,15 +13,13 @@
 @stop
 
 @push('head_last_js')
-    @if( app()->isProduction() )
-        <link href="{{ unusualMix('core-form.js') }}" rel="preload" as="script" crossorigin />
-    @else
-
-    @endif
+    {{
+        ModularityVite::useHotFile(public_path('modularity.hot'))->withEntryPoints(['src/js/core-index.js'])
+    }}
 @endpush
 
 @push('post_js')
-    <script src="{{ unusualMix('core-form.js') }}"></script>
+
 @endpush
 
 @section('STORE')

@@ -10,7 +10,7 @@ const state = {
   endpointName: '',
   endpoints: [],
   max: 0,
-  selected: window[import.meta.env.VUE_APP_NAME].STORE.browser.selected || {}
+  selected: window[import.meta.env.VUE_APP_NAME]?.STORE.browser.selected || {}
 }
 
 // getters

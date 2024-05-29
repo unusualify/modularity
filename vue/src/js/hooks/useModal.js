@@ -4,6 +4,7 @@
 import { reactive, toRefs, computed } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 import htmlClasses from '@/utils/htmlClasses'
+import { useI18n } from 'vue-i18n'
 
 const defaultWidths = {
   xs: '320px',
@@ -47,6 +48,33 @@ export const makeModalProps = propsFactory({
     type: String,
     default: ''
   }
+})
+
+export const makeModalMediaProps = propsFactory({
+  modalTitlePrefix: {
+    type: String,
+    default: function (props) {
+      return useI18n().t('media-library.title', 'Media Library')
+    }
+  },
+  btnLabelSingle: {
+    type: String,
+    default: function () {
+      return useI18n().t('media-library.insert', 'Insert')
+    }
+  },
+  btnLabelUpdate: {
+    type: String,
+    default: function () {
+      return useI18n().t('media-library.update', 'Update')
+    }
+  },
+  btnLabelMulti: {
+    type: String,
+    default: function () {
+      return useI18n().t('media-library.insert', 'Insert')
+    }
+  },
 })
 
 // by convention, composable function names start with "use"

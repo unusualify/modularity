@@ -4,18 +4,17 @@ import { reactive, toRefs, computed } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
 import { omit } from 'lodash-es'
-import { error } from 'jquery'
 
 export const makeInputProps = propsFactory({
   modelValue: null,
-  error: {
-    type: Boolean,
-    default: null
-  },
-  errorMessages: {
-    type: [Array, String],
-    default: () => []
-  },
+  // error: {
+  //   type: Boolean,
+  //   default: false
+  // },
+  // errorMessages: {
+  //   type: [Array, String],
+  //   default: () => []
+  // },
 
   obj: {
     type: Object,
@@ -40,14 +39,18 @@ export default function useInput (props, context) {
     input: computed({
       get: () => {
         // __log('useInput', modelValue.value)
-        return modelValue.value
+        return modelValue.value ?? []
       },
       set: (val, old) => {
         methods.inputOnSet(val, old)
         methods.updateModelValue(val)
         // context.emit('update:modelValue', val)
       }
-    })
+    }),
+
+    // error: false,
+    // errorMessages: ''
+
   })
 
   const methods = reactive({

@@ -8,7 +8,6 @@ export const makeModelValueProps = propsFactory({
 
 // by convention, composable function names start with "use"
 export default function useModelValue (props, context, name = 'activeItem') {
-  __log(props)
   const state = reactive({
     [name]: computed({
       get () {

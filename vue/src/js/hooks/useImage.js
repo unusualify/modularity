@@ -113,7 +113,7 @@ export default function useImage (props, context) {
     mediableActive: true,
 
     handle: '.item__handle',
-    addLabel: computed(() => t('ADD') + ' ' + props.itemLabel),
+    addLabel: computed(() => t('ADD', {item: props.itemLabel})),
     items: computed({
       get: () => {
         if (store.state.mediaLibrary.selected.hasOwnProperty(props.name)) {
@@ -201,6 +201,10 @@ export default function useImage (props, context) {
   watch(() => modelValue.value, (newValue, oldValue) => {
     states.input = newValue
   }, { deep: true })
+
+  watch(() => states.error, (newValue, oldValue) => {
+    __log('error watch', newValue, oldValue)
+  })
   // expose managed state as return value
   return {
     ...inputHook,

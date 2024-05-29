@@ -7,7 +7,6 @@ use Illuminate\Console\Command as Console;
 use Illuminate\Filesystem\Filesystem;
 use Nwidart\Modules\FileRepository;
 use Unusualify\Modularity\Module;
-use Unusualify\Modularity\Traits\ReplacementTrait;
 
 class StubsGenerator extends Generator
 {
@@ -53,17 +52,17 @@ class StubsGenerator extends Generator
     {
         $name = $this->getName();
 
-        if ($this->module->getRouteConfig($name)) {
-            if ($this->force) {
+        // if ($this->module->getRouteConfig($name)) {
+        //     if ($this->force) {
 
-            } else if(!$this->fix){
-                $this->console->error("Module Route [{$name}] files already exist!");
+        //     } else if(!$this->fix){
+        //         $this->console->error("Module Route [{$name}] files already exist!");
 
-                return E_ERROR;
-            }
-        }
+        //         return E_ERROR;
+        //     }
+        // }
 
-        $this->generateFiles();
+        // $this->generateFiles();
 
         $this->console->info("Route [{$name}] stubs " .($this->fix ? 'fixed' : 'created'). " successfully.");
 

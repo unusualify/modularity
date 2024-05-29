@@ -1,0 +1,60 @@
+// $NAMESPACE$
+import { describe, expect, test, vi } from 'vitest'
+import { mount } from '@vue/test-utils'
+
+import { defineComponent } from 'vue'
+
+import $CAMEL_CASE$ from '../../src/js/$IMPORT$'
+
+// plugin import example
+// import i18n from '../../src/js/config/i18n'
+
+const TestComponent = defineComponent({
+    template: `
+    <div>
+        Test
+    </div>
+    `,
+    props: {
+
+    },
+    setup (props, context) {
+        let hook = $CAMEL_CASE$(props, context)
+
+        // add a falsy test method
+        hook.testMethod = () => true
+
+        return {
+            // Call the composable and expose all return values into our
+            // component instance so we can access them with wrapper.vm
+            ...hook
+        }
+    }
+})
+
+async function factory(props = {}, options = {}) {
+
+  return await mount(TestComponent, {
+    global: {
+        plugins: [
+            //i18n // adding plugin example
+        ],
+    },
+    ...options,
+    props: {
+      ...props
+    }
+  })
+}
+
+describe('$STUDLY_NAME$ composable test', () => {
+
+  test('check test state', async () => {
+    const wrapper = await factory()
+
+    expect(wrapper.vm.testMethod()).toBe(false)
+
+  })
+
+})
+

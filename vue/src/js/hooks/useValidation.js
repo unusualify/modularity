@@ -46,14 +46,16 @@ export default function useValidation () {
           return !!v || msg || 'Required';
         case 'array':
         case 'object':
-          max = (max == undefined) ? minOrExact : max;
-          let $msg = ((minOrExact == max) ? `Requires exactly ${minOrExact} items` : `Requires at least ${minOrExact}${((max != Infinity  && max != undefined) ? ', and maximum of:' + max : '')}) elements`);
+          max = (max == undefined) ? -1 : max;
+          let $msg = ((minOrExact == max || max < 0) ? `Requires exactly ${minOrExact} items` : `Requires at least ${minOrExact}${((max != Infinity  && max != undefined) ? ', and maximum of:' + max : '')}) elements`);
           // let $msg = ((max != Infinity) ? ', maximum:' + max : '');
+          // __log(v.length, minOrExact, max )
+
           if(Array.isArray(v)) {
-            return v.length >= minOrExact &&  v.length <= max || msg || $msg;
+            return v.length >= minOrExact && ( max < 0 || v.length <= max) || msg || $msg;
           }
           else if(__isObject(v)) {
-            return  Object.keys(v).length >= minOrExact &&  Object.keys(v).length <= max || msg || $msg;
+            return  Object.keys(v).length >= minOrExact &&  (max < 0 || Object.keys(v).length <= max) || msg || $msg;
           }
           return 'dev error: nsupported value type';
         default:
@@ -103,7 +105,7 @@ export default function useValidation () {
             }
             const method = rule[0] + 'Rule'
             if (Object.prototype.hasOwnProperty.call(ruleMethods, method)) {
-              __log(name, method, rule.slice(1))
+              // __log(name, method, rule.slice(1))
               inputs[name].rules.push(ruleMethods[method](...(rule.slice(1))))
               // try {
               //

@@ -291,6 +291,15 @@ abstract class Generator extends NwidartGenerator
         return Str::studly($this->name);
     }
 
+    /**
+     * Get Path to be written
+     *
+     * @return void
+     */
+    public function getTargetPath() {
+        return $this->module?->getPath() ?? false;
+    }
+
     public function generatorConfig($generator)
     {
         return (new GeneratorPath($this->config->get(unusualBaseKey() . '.paths.generator.'.$generator)));
