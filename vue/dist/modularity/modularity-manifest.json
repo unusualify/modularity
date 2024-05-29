@@ -2,11 +2,11 @@
   "_awesome-phonenumber.C8KclVch.js": {
     "file": "js/awesome-phonenumber.C8KclVch.js"
   },
-  "_datatable.D1Zljhpn.js": {
-    "file": "js/datatable.D1Zljhpn.js",
+  "_datatable.DDH_oea7.js": {
+    "file": "js/datatable.DDH_oea7.js",
     "imports": [
       "_vendor.DMXVB7UE.js",
-      "_form.D2fxSfix.js",
+      "_form.Ci1uBlrv.js",
       "_vuetify.Bo3hDh75.js"
     ]
   },
@@ -17,11 +17,11 @@
     ]
   },
   "_form.!~{00a}~.js": {
-    "file": "css/form.B_t5BCYT.css",
+    "file": "css/form.BKCgRH4s.css",
     "src": "_form.!~{00a}~.js"
   },
-  "_form.D2fxSfix.js": {
-    "file": "js/form.D2fxSfix.js",
+  "_form.Ci1uBlrv.js": {
+    "file": "js/form.Ci1uBlrv.js",
     "imports": [
       "_vendor.DMXVB7UE.js",
       "_vuetify.Bo3hDh75.js",
@@ -29,7 +29,7 @@
       "_awesome-phonenumber.C8KclVch.js"
     ],
     "css": [
-      "css/form.B_t5BCYT.css"
+      "css/form.BKCgRH4s.css"
     ],
     "assets": [
       "fonts/fa-brands-400.C99Yv4gD.woff2",
@@ -119,51 +119,51 @@
     "src": "node_modules/@mdi/font/fonts/materialdesignicons-webfont.woff2"
   },
   "src/js/core-auth.js": {
-    "file": "entries/core-auth.T4vcCDql.js",
+    "file": "entries/core-auth.CAx7AHZg.js",
     "src": "src/js/core-auth.js",
     "isEntry": true,
     "imports": [
       "_vendor.DMXVB7UE.js",
-      "_form.D2fxSfix.js",
+      "_form.Ci1uBlrv.js",
       "_awesome-phonenumber.C8KclVch.js",
       "_fine-uploader.C_FDpdrq.js",
       "_vuetify.Bo3hDh75.js"
     ]
   },
   "src/js/core-dashboard.js": {
-    "file": "entries/core-dashboard.CQTlZIlb.js",
+    "file": "entries/core-dashboard.Bw3ykLbg.js",
     "src": "src/js/core-dashboard.js",
     "isEntry": true,
     "imports": [
       "_vendor.DMXVB7UE.js",
-      "_form.D2fxSfix.js",
-      "_datatable.D1Zljhpn.js",
+      "_form.Ci1uBlrv.js",
+      "_datatable.DDH_oea7.js",
       "_awesome-phonenumber.C8KclVch.js",
       "_fine-uploader.C_FDpdrq.js",
       "_vuetify.Bo3hDh75.js"
     ]
   },
   "src/js/core-form.js": {
-    "file": "entries/core-form.BBBNTT4f.js",
+    "file": "entries/core-form.5OQ4-Frj.js",
     "src": "src/js/core-form.js",
     "isEntry": true,
     "imports": [
       "_vendor.DMXVB7UE.js",
-      "_form.D2fxSfix.js",
+      "_form.Ci1uBlrv.js",
       "_awesome-phonenumber.C8KclVch.js",
       "_fine-uploader.C_FDpdrq.js",
       "_vuetify.Bo3hDh75.js"
     ]
   },
   "src/js/core-free.js": {
-    "file": "entries/core-free.BflK_T0o.js",
+    "file": "entries/core-free.C798jbGD.js",
     "src": "src/js/core-free.js",
     "isEntry": true,
     "imports": [
       "_vendor.DMXVB7UE.js",
-      "_form.D2fxSfix.js",
+      "_form.Ci1uBlrv.js",
       "_vuetify.Bo3hDh75.js",
-      "_datatable.D1Zljhpn.js",
+      "_datatable.DDH_oea7.js",
       "_awesome-phonenumber.C8KclVch.js",
       "_fine-uploader.C_FDpdrq.js"
     ],
@@ -172,13 +172,13 @@
     ]
   },
   "src/js/core-index.js": {
-    "file": "entries/core-index.CQTlZIlb.js",
+    "file": "entries/core-index.Bw3ykLbg.js",
     "src": "src/js/core-index.js",
     "isEntry": true,
     "imports": [
       "_vendor.DMXVB7UE.js",
-      "_form.D2fxSfix.js",
-      "_datatable.D1Zljhpn.js",
+      "_form.Ci1uBlrv.js",
+      "_datatable.DDH_oea7.js",
       "_awesome-phonenumber.C8KclVch.js",
       "_fine-uploader.C_FDpdrq.js",
       "_vuetify.Bo3hDh75.js"
