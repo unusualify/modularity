@@ -25,6 +25,7 @@ export default function useFormatter (props, context, headers) {
 
   const methods = reactive({
     dateFormatter: function (value, datetimeFormat = 'long') {
+
       return {
         configuration: methods.makeText(d(new Date(value), datetimeFormat))
       }
@@ -35,12 +36,57 @@ export default function useFormatter (props, context, headers) {
       }
     },
     editFormatter: function (value) {
+      return {
+        configuration : {
+          elements: `${value}`,
+          tag: 'span',
+          attributes : {
+            onClick: 'editItem'
+          }
+
+        }
+      }
       return `<span @click="editItem">
         ${value}
       </span>`
     },
     pascalFormatter: function (value) {
       return _.startCase(_.camelCase(value)).replace(/ /g, '')
+    },
+    priceFormatter:(value, unit = '₺', taxContent= null) => {
+      return {
+        configuration:{
+          elements : [{
+            tag:'p',
+            attributes:{
+              class: 'featured',
+            },
+            elements: `${unit}${value}`
+          },
+          {
+            tag:'p',
+            attributes:{
+              class: 'value'
+            },
+            elements: `${taxContent ? `+${taxContent}` : ''}`
+          },
+        ]
+        }
+      }
+    },
+    statusFormatter:(value, placeHolders = null, colors = null) => {
+      return {
+        configuration : {
+          tag: 'p',
+          attributes : {
+            style: {
+              color: colors?.[value] ?? 'red'
+            },
+          },
+          elements: placeHolders?.[value] ?? value
+        }
+
+      }
     },
     makeChip: function (value, color = '') {
       return {
@@ -62,8 +108,12 @@ export default function useFormatter (props, context, headers) {
     const name = formatter[0]
     // const pascalCase = methods.(name)
     const func = `${name}Formatter`
+    try {
+      return methods[func](value, ..._(formatter.slice(1)))
+    } catch (error) {
+      console.error(`${error}: ${func}`);
+    }
 
-    return methods[func](value, ..._(formatter.slice(1)))
   }
 
   // expose managed state as return value

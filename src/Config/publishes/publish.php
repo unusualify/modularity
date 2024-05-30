@@ -46,6 +46,9 @@ return [
         'noPadding' => true,
         // vuetify datatable header fields end
 
+        // vuetify dataiterable fields related
+        'featured' => false,
+
         // custom fields for ue-datatable start
         'searchable' => false, //true,
         'isRowEditable' => false,

@@ -40,6 +40,7 @@ import { ALERT } from '../store/mutations'
 // const includeCustomFormInputs = require.context('__components/inputs', true, /\.vue$/i)
 
 const includeGlobalComponents = import.meta.glob('__components/*.vue', {eager: true})
+const includeIteratorComponents = import.meta.glob('__components/data_iterators/*.vue', {eager: true})
 const includeLayouts = import.meta.glob('__components/layouts/*.vue', {eager:true})
 const includeCustomFormInputs = import.meta.glob('__components/inputs/*.vue', {eager: true})
 
@@ -90,13 +91,11 @@ export default {
       },
       registerComponents: function (components, folder = '', prefix = 'ue') {
         folder = folder !== '' ? folder + '/' : ''
-
         Object.keys(components).forEach(path => {
           const extFile = path.split('/').pop()
           const fileName = path.split('/').pop().split('.')[0]
           const module = components[path]
           const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
-
           app.component(componentName, module.default)
         })
         // components.keys().forEach((path) => {
@@ -146,6 +145,7 @@ export default {
 
     // crm base package components
     app.config.globalProperties.registerComponents(includeGlobalComponents)
+    app.config.globalProperties.registerComponents(includeIteratorComponents)
     // app.config.globalProperties.registerComponents(includeLabComponents, 'labs')
     app.config.globalProperties.registerComponents(includeLayouts, 'layouts')
     app.config.globalProperties.registerComponents(includeCustomFormInputs, 'inputs', 'v-custom-input')

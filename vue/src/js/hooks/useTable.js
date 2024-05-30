@@ -20,6 +20,18 @@ export const makeTableProps = propsFactory({
   customTitle: {
     type: String
   },
+  fillHeight: {
+    type: Boolean,
+    default: false,
+  },
+  tableSubtitle: {
+    type: String,
+    default: ""
+  },
+  tableType: {
+    type: String,
+    default: "index"
+  },
   titlePrefix: {
     type: String,
     default: ''
@@ -38,6 +50,10 @@ export const makeTableProps = propsFactory({
   hideFooter: {
     type: Boolean,
     default: false
+  },
+  hideSearchField: {
+    type: Boolean,
+    default: false,
   },
   columns: {
     type: Array
@@ -63,6 +79,14 @@ export const makeTableProps = propsFactory({
   rowActionsType: {
     type: String,
     default: 'inline'
+  },
+  rowActionsIcon:{
+    type: String,
+    default: 'mdi-cog-outline'
+  },
+  iteratorType: {
+    type: String,
+    default: '',
   },
   slots: {
     type: Object,
@@ -96,6 +120,14 @@ export const makeTableProps = propsFactory({
   noFooter: {
     type: Boolean,
     default: false
+  },
+  iteratorOptions:{
+    type: Object,
+    default: {},
+  },
+  endpoints:{
+    type: Object,
+    default: {},
   }
 })
 
@@ -128,9 +160,11 @@ export default function useTable (props, context) {
 
     activeTableItem: null,
     hideTable: false,
-
-    createUrl: window[import.meta.env.VUE_APP_NAME].ENDPOINTS.create ?? '',
-    editUrl: window[import.meta.env.VUE_APP_NAME].ENDPOINTS.edit ?? '',
+    fillHeight: computed(() => props.fillHeight),
+    createUrl: window[import.meta.env.VUE_APP_NAME].ENDPOINTS.create ?? props.endpoints.create ?? '',
+    editUrl: computed(()=> {
+      return window[import.meta.env.VUE_APP_NAME].ENDPOINTS.edit ?? props.endpoints.edit ?? ''
+    }),
     editedIndex: -1,
     selectedItems: [],
 
@@ -138,7 +172,9 @@ export default function useTable (props, context) {
       x: 0,
       y: 0
     },
-
+    isDashboard: computed(() => {
+      return  (props.tableType === 'dashboard')
+    }),
     snakeName: snakeCase(props.name),
     permissionName: kebabCase(props.name),
     transNameSingular: computed(() => te('modules.' + state.snakeName, 0) ? t('modules.' + state.snakeName, 0) : props.name),
@@ -148,6 +184,11 @@ export default function useTable (props, context) {
       const prefix = props.titlePrefix ? props.titlePrefix : ''
       return prefix + (__isset(props.customTitle) ? props.customTitle : state.transNamePlural)
     }),
+    tableSubtitle: computed(() => {
+      return (__isset(props.tableSubtitle) ? props.tableSubtitle : "")
+    }),
+    hideSearchField: computed(()=> {return props.hideSearchField}),
+    searchText: computed(() => t("Type to Search")),
     formTitle: computed(() => {
       return t((state.editedIndex === -1 ? 'new-item' : 'edit-item'), {
         item: te(`modules.${state.snakeName}`) ? t(`modules.${state.snakeName}`, 0) : props.name
@@ -175,9 +216,24 @@ export default function useTable (props, context) {
 
     options: props.tableOptions ?? store.state.datatable.options ?? {},
     headers: props.columns ?? store.state.datatable.headers ?? [],
+    headersWithKeys: computed(() => {
+      let collection = {};
+       Object.values(state.headers).forEach((header, i) => {
+        // let k =
+
+        // let newObject = Object.create({ })
+         collection[header['key']] = header
+       })
+
+       return collection
+    }),
     inputs: props.inputFields ?? store.state.datatable.inputs ?? [],
 
-    elements: computed(() => props.items ?? store.state.datatable.data ?? []),
+    // elements: computed(() => props.items ?? store.state.datatable.data ?? []),
+    elements: computed(() => {
+      return props.items ?? store.state.datatable.data ?? []
+
+    }),
     search: computed({
       get () {
         return store.state.datatable.search
@@ -200,7 +256,19 @@ export default function useTable (props, context) {
     formIsValid: computed(function () {
       // __log(form?.value?.valid, form?.value)
       return form?.value?.valid ?? null
-    })
+    }),
+    listDataIterators: computed(()=>{
+      return props.tableType === 'dataIterator'
+    }),
+    listDataTable: computed(() => {
+      return props.tableType === 'dataTable'
+    }),
+    iteratorType: computed(() => {
+      return __isset(props.iteratorType) ? props.iteratorType : ''
+    }),
+    iteratorOptions: computed(() => {
+      return __isset(props.iteratorOptions) ? props.iteratorOptions : {}
+    }),
   })
 
   const methods = reactive({
@@ -548,20 +616,12 @@ export default function useTable (props, context) {
     isSoftDeletable (item) {
       return !!(__isset(item.deleted_at) && item.deleted_at)
     },
-
     goNextPage () {
       if (state.options.page < store.getters.totalPage) { state.options.page += 1 }
     },
     goPreviousPage () {
       if (state.options.page > 1) { state.options.page -= 1 }
     },
-
-    filterStatus: function (slug) {
-      if (this.navActive === slug) return
-      store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
-      store.commit(DATATABLE.UPDATE_DATATABLE_FILTER_STATUS, slug)
-      store.dispatch(ACTIONS.GET_DATATABLE)
-    }
   })
 
   watch(() => state.editedItem, (newValue, oldValue) => {
@@ -583,6 +643,7 @@ export default function useTable (props, context) {
   })
   watch(() => state.options, (newValue, oldValue) => {
     // state.options.page = newValue
+
     store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue } })
   }, { deep: true })
   watch(() => state.elements, (newValue, oldValue) => {
