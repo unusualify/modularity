@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Providers;
 
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Console\AboutCommand;
 use Unusualify\Modularity\Activators\FileActivator;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Modularity;
@@ -58,10 +59,25 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->bootBaseViewComponents();
 
-        // if(!empty(env('DEEPLY_API_KEY',''))){
-            // $deepLy = new \ChrisKonnertz\DeepLy\DeepLy(env('DEEPLY_API_KEY'));
-            // $translatedText = $deepLy->translate('Korku', 'EN');
-        // }
+
+        AboutCommand::add('Modularity', function () {
+            $composer = base_path('composer.lock');
+
+            if($this->app['files']->isFile( ($composer_path = base_path('composer-dev.lock')) )){
+                $composer = $composer_path;
+            }
+
+            $package = collect(json_decode(file_get_contents($composer))->packages)
+                ->filter(fn($p) => $p->name == 'unusualify/modularity')
+                ->first();
+
+            return [
+                'Vendor'  => unusualConfig('vendor_path'),
+                'Theme'  => unusualConfig('app_theme'),
+                'Version' => $package->version,
+            ];
+        });
+
     }
 
     /**

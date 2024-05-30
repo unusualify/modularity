@@ -9,8 +9,8 @@
 <!-- Fonts -->
 
 @if(app()->isProduction())
-    <link href="{{ unusualMix('Inter-Regular.woff2') }}" rel="preload" as="font" type="font/woff2" crossorigin>
-    <link href="{{ unusualMix('Inter-Medium.woff2') }}" rel="preload" as="font" type="font/woff2" crossorigin>
+    {{-- <link href="{{ unusualMix('Inter-Regular.woff2') }}" rel="preload" as="font" type="font/woff2" crossorigin>
+    <link href="{{ unusualMix('Inter-Medium.woff2') }}" rel="preload" as="font" type="font/woff2" crossorigin> --}}
 @endif
 
 <!-- CSS -->
