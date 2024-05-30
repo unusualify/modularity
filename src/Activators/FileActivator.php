@@ -73,11 +73,10 @@ class FileActivator extends ActivatorsFileActivator
 
     }
 
-    public function setModule($module, $path = null)
+    public function setModule($module, $path)
     {
         $this->module = $module;
-        $path ??= base_path( config('modules.namespace') . "/" . $this->module);
-        // $this->statusesFile = base_path( config('modules.namespace') . "/" . $this->module ."/" . $this->config('statuses-file')) ;
+
         $this->statusesFile = $path . '/' .  $this->config('statuses-file');
 
         $this->routesStatuses = $this->getRoutesStatuses();
