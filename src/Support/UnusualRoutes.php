@@ -100,7 +100,7 @@ class UnusualRoutes
             'as'            => adminRouteNamePrefix() . '.',
             ... ( unusualConfig('admin_app_url')
                 ? ['domain' => unusualConfig('admin_app_url')]
-                : ['prefix' => systemUrlPrefix() ]
+                : ['prefix' => adminUrlPrefix() ]
             ),
 
         ];
