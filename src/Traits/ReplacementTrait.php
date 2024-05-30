@@ -90,9 +90,6 @@ trait ReplacementTrait {
             '/\$CAMEL_CASE\$/' => $this->getCamelCase($this->getName()),
         ];
 
-        dd(
-            $string, $patterns
-        );
         return preg_replace( array_keys($patterns), array_values($patterns), $string);
 
     }
