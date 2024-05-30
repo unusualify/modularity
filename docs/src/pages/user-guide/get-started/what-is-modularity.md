@@ -33,12 +33,28 @@ A module in Modularity project is like a Laravel Project, it has some views, con
 import { VPTeamMembers } from 'vitepress/theme'
 const members = [
     {
+      avatar: 'https://avatars.githubusercontent.com/u/47870922',
+      name: 'Oguzhan BUKCUOGLU',
+      title: 'Creator / Full Stack Developer',
+      links: [
+        { icon: 'github', link: 'https://github.com/OoBook' },
+      ]
+    },
+    {
       avatar: 'https://avatars.githubusercontent.com/u/80110747',
       name: 'Ilker CIBLAK',
       title: 'Full Stack Developer',
       links: [
         { icon: 'github', link: 'https://github.com/ilkerciblak' },
         { icon: 'twitter', link: 'https://twitter.com/ilker_exe' }
+      ]
+    },
+    {
+      avatar: 'https://avatars.githubusercontent.com/u/37237628',
+      name: 'Gunes BIZIM',
+      title: 'Full Stack Developer',
+      links: [
+        { icon: 'github', link: 'https://github.com/gunesbizim' },
       ]
     },
 
