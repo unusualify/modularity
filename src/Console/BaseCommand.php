@@ -3,9 +3,8 @@
 namespace Unusualify\Modularity\Console;
 
 use Illuminate\Support\Facades\Config;
+use Nwidart\Modules\Commands\Make\GeneratorCommand;
 use Unusualify\Modularity\Support\Decomposers\SchemaParser;
-use Nwidart\Modules\Commands\GeneratorCommand;
-use Nwidart\Modules\Facades\Module;
 use Nwidart\Modules\Support\Stub;
 use Nwidart\Modules\Traits\ModuleCommandTrait;
 use Unusualify\Modularity\Traits\ManageNames;

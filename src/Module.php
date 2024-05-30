@@ -35,7 +35,6 @@ class Module extends NwidartModule
      */
     public function __construct(string $name, $path = null)
     {
-        // dd($path);
         $app = app();
         $path ??= $app['config']->get('modules.paths.modules');
         parent::__construct($app, $name, $path);
