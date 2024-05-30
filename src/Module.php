@@ -32,10 +32,10 @@ class Module extends NwidartModule
      * @param $name
      * @param $path
      */
-    public function __construct(string $name, $path = null)
+    public function __construct(string $name, $path)
     {
         $app = app();
-        $path ??= $app['config']->get('modules.paths.modules');
+
         parent::__construct($app, $name, $path);
 
         // $this->moduleActivator = $app['unusual.activator'];
@@ -80,7 +80,8 @@ class Module extends NwidartModule
 
     public function setModuleActivator($name)
     {
-        $this->moduleActivator->setModule($name, $this->app['config']->get('modules.paths.modules'));
+        $modulesPath = $this->app['config']->get('modules.paths.modules');
+        $this->moduleActivator->setModule($name, "{$modulesPath}/{$this->getName()}");
     }
 
     /**

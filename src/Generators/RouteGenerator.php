@@ -827,7 +827,6 @@ class RouteGenerator extends Generator
      */
     public function updateRoutesStatuses()
     {
-        // $module = $this->app['unusual.modularity']->findOrFail($this->module);
         $module = Modularity::findOrFail($this->module);
 
         $module->setModuleActivator($this->module);
