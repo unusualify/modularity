@@ -7,7 +7,6 @@ use Unusualify\Modularity\Activators\FileActivator;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Modularity;
 use Unusualify\Modularity\Services\View\UNavigation;
-
 use Illuminate\Support\Facades\View;
 use Unusualify\Modularity\Http\ViewComposers\CurrentUser;
 use Unusualify\Modularity\Http\ViewComposers\FilesUploaderConfig;
@@ -108,6 +107,10 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->app->singleton('unusualify.hosting', function (Application $app) {
             return new \Unusualify\Modularity\Support\HostRouting($app, unusualConfig('app_url'));
+        });
+
+        $this->app->singleton('unusualify.hostRouting', function(Application $app){
+            return new \Unusualify\Modularity\Support\HostRouteRegistrar($app, unusualConfig('app_url'));
         });
 
         $this->app->alias(\Unusualify\Modularity\Facades\ModularityVite::class, 'ModularityVite');

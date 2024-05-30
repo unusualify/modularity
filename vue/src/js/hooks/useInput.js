@@ -4,9 +4,19 @@ import { reactive, toRefs, computed } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
 import { omit } from 'lodash-es'
+import { error } from 'jquery'
 
 export const makeInputProps = propsFactory({
   modelValue: null,
+  error: {
+    type: Boolean,
+    default: null
+  },
+  errorMessages: {
+    type: [Array, String],
+    default: () => []
+  },
+
   obj: {
     type: Object,
     default () {
