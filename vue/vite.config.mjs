@@ -67,8 +67,8 @@ export default defineConfig(({ command, mode }) => {
 
   const APP_THEME = ENV.VUE_APP_THEME || 'unusual'
   const VUE_DEV_PORT = ENV.VUE_DEV_PORT || 5173
-  const VUE_DEV_HOST = ENV.VUE_DEV_HOST || 'crm.template' // jakomeet.test
-  const VUE_DEV_PROXY = ENV.VUE_DEV_PROXY || 'http://nginx'
+  const VUE_DEV_HOST = ENV.VUE_DEV_HOST || 'localhost' // jakomeet.test
+  const VUE_DEV_PROXY = ENV.VUE_DEV_PROXY || null
 
   const srcDir = fileURLToPath(new URL('src', import.meta.url))
   const inputDir = fileURLToPath(new URL(`${srcDir}/js`, import.meta.url))
@@ -105,7 +105,8 @@ export default defineConfig(({ command, mode }) => {
       host: VUE_DEV_HOST
     }
 
-    server.proxy = VUE_DEV_PROXY
+    if(VUE_DEV_PROXY)
+      server.proxy = VUE_DEV_PROXY
     // server.proxy = {
     //   target: "nginx", // replace with your web server container
     //   proxyReq: [

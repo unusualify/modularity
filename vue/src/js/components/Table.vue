@@ -285,6 +285,7 @@
           ></v-text-field>
         </div>
       </template> -->
+      <!-- MARK PAGINATION BUTTONS -->
       <template v-if="!noFooter" v-slot:bottom="{page, pageCount}">
         <div class="text-right py-theme">
           <v-btn

@@ -9,9 +9,10 @@ return [
     'system_prefix' => 'system',
 
     'app_url' => parse_url(env('APP_URL'))['host'] ?? parse_url(env('APP_URL'))['path'],
-    'admin_app_url' => env('ADMIN_APP_URL', 'admin.' . env('APP_URL')),
+    'admin_app_url' => env('ADMIN_APP_URL', env('ADMIN_APP_PATH') ? null : 'admin.' . env('APP_URL')),
     'admin_app_path' => env('ADMIN_APP_PATH', ''),
     'admin_route_name_prefix' => env('ADMIN_ROUTE_NAME_PREFIX', 'admin'),
+    'app_theme' => env('VUE_APP_THEME', 'unusual'),
 
     'version' => '1.0.0',
     'auth_login_redirect_path' => '/',

@@ -2,24 +2,34 @@
   <template v-if="!configuration.tag && isTextable(configuration.elements)">
     {{ configuration.elements }}
   </template>
+  <template v-else-if="!configuration.tag && isArray(configuration.elements)">
+
+    <component
+    v-for="(element, index) in configuration.elements"
+    :is="element.tag"
+    v-bind="element.attributes"
+    >{{ element.elements }}</component>
+  </template>
   <component
     v-else-if="configuration.tag"
     :is="configuration.tag"
     v-bind="{...filteredAttributes, ...bindAttributes, ...castedAttributes}"
     >
+
     <template v-if="isArray(configuration.elements)">
+
       <ue-recursive-stuff
         v-for="(_configuration, i) in configuration.elements"
         :key="`tag-${level}-${i}`"
         :level="level+1"
         :configuration="_configuration"
       />
+
     </template>
     <template v-else-if="isTextable(configuration.elements)">
       {{ configuration.elements }}
     </template>
   </component>
-
 </template>
 
 <script>

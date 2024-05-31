@@ -194,7 +194,8 @@ class VueTestGenerator extends Generator
 
     public function getTestFileName()
     {
-        $file = $this->getStubFile($this->stub);
+        // $file = $this->getStubFile($this->stub);
+        $file = '$TEST_NAME$.test.js';
 
         $patterns = [
             '/\$TEST_NAME\$/' => $this->getKebabCase($this->name),
@@ -210,8 +211,14 @@ class VueTestGenerator extends Generator
     {
         $path = "{$this->getTargetPath()}/{$this->getTypeTargetDir()}/{$this->getTestFileName()}";
 
-        $content = (new Stub("/{$this->getTypeStubFile()}.stub",$this->getReplacement($this->stub)))->render();
-
+        // $content = (new Stub("/{$this->getTypeStubFile()}.stub",$this->getReplacement($this->stub)))->render();
+        $content = (new Stub("/{$this->getTypeStubFile()}.stub", $this->makeReplaces([
+            'STUDLY_NAME',
+            'CAMEL_CASE',
+            'NAMESPACE',
+            'IMPORT',
+        ])))->render();
+        dd($content, $path);
         if (!$this->filesystem->isDirectory($dir = dirname($path))) {
             $this->filesystem->makeDirectory($dir, 0775, true);
         }

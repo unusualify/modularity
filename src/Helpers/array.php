@@ -124,3 +124,27 @@ function nested_array_merge ( array $array1, array $array2 )
     }
     return $merged;
 }
+
+
+/**
+ * @param array1, baseArray
+ * @param arrays, Array going to be merged with
+ * @param Conditions, The condition will be checked
+ *
+ *
+ * @return array
+ */
+if(!function_exists('array_merge_conditional'))
+{
+    function array_merge_conditional(array $array1 = null, array $arrays, ...$conditions): array
+    {
+        $result = $array1 ?? [];
+
+        foreach ($arrays as $key => $array) {
+            if(isset($conditions[$key]) ? $conditions[$key] : true){
+                $result = array_merge($result, $array);
+            }
+        }
+        return $result;
+    }
+}

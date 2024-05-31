@@ -1,0 +1,170 @@
+@use '../abstract' as *
+
+#ue-main-body
+
+  > .v-table
+    // min-height: calc(100vh - (2*$theme-space))
+    // width: min-content
+    // min-width: 60%
+
+
+.v-table
+
+
+  &.ue-table--narrow-wrapper
+    .v-table__wrapper
+      > table
+        background-color: #f8f8ff
+        // border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity))
+        border-right: 1px solid #E0E0E0
+        border-left: 1px solid rgba(var(--v-border-color), var(--v-border-opacity))
+  &.ue-table
+    > .v-table__wrapper
+      > table
+        // width: min-content
+
+
+
+  &.v-table--has-wrapper-space > .v-table__wrapper, .ue-table-top__wrapper ~ .v-table__wrapper
+      // padding-left: $theme-space !important
+      // padding-right: $theme-space !important
+
+  > .ue-table-top__wrapper
+
+    // margin-bottom: $theme-space !important
+    .ue-table-header, .ue-table-form__embedded
+      // padding-top: $theme-space
+
+  > .v-table__wrapper
+    > table
+      background-color: #f8f8ff
+      // border-top: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
+      .v-data-table-header__content
+        font-weight: map-get($font-weights, 'thin') !important
+      &,tbody
+        tr
+          td,th
+            border-bottom: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
+            padding-left: 2px !important
+            // padding-left: $theme-space !important
+            &:is(:last-child)
+              text-align: end !important
+      > tbody
+        > tr
+
+
+          > td
+            font-size: 0.8rem
+            padding-left: 1px
+
+            &:is(:first-child)
+              margin-right: 2px
+              color: $primary-color
+            > i
+              &:is(.v-icon)
+              color: #bfc8d5 !important
+
+
+.v-card
+
+  .v-card-subtitle
+    opacity: 1
+  &.data-iterable-rich-row
+    background-color: transparent
+    height: 25vh
+    font-size: 0.8em
+    .v-card-subtitle
+      height: 100%
+      .v-col
+        min-height: 25vh
+    .v-card-title
+      color: $primary-color
+      font-size: x-large
+      font-weight: 700
+    .header
+      font-weight: bold
+      &::after
+        content: ":\00a0\00a0"
+    .v-col
+      &.first-column
+        div
+          flex-wrap: wrap
+      &.action-area
+        display: flex
+        justify-content: end
+        gap: 0.3rem
+        padding-right: 1rem
+      &.featured
+        display: flex
+        align-items: center
+        justify-content: center
+      &.last-column
+        display: flex
+        align-items: center
+        justify-content: space-between
+        gap: 0.5rem
+        .v-btn
+          flex: auto
+
+      p
+        &.featured
+          font-weight: 600
+          font-size: large
+        &.value
+          font-weight: 500
+          opacity: .6
+          text-wrap: pretty
+          text-overflow: ellipsis
+      .v-btn
+        background-color: #FFFFFF !important
+        min-width: min-content !important
+        border-radius: 0.6rem
+        .v-icon
+          color: #F6A505
+          width: min-content
+
+
+  &.custom-table-card
+    &:is(.data-table-full-height)
+      min-height: calc(100vh - (2*$theme-space))
+
+  &.custom-table-card
+    &:is(.data-table-dashboard)
+    &:is(.data-table-full-height)
+      min-height: calc(55vh - (2*$theme-space))
+
+  &.custom-table-card
+    >.v-card-title
+        .v-btn
+          background-color: #F6A505 !important
+
+  &.custom-table-card
+    &:not(.data-table-dashboard)
+      min-height: calc(100vh - (2*$theme-space))
+      .v-table__wrapper
+
+        > table
+
+          background-color: #f8f8ff
+          // border-top: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
+          .v-data-table-header__content
+            font-weight: map-get($font-weights, 'thin') !important
+          &,tbody
+            tr
+              td,th
+                border-bottom: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
+                padding-left: 2px !important
+                // padding-left: $theme-space !important
+          > tbody
+            > tr
+              &:is(:nth-of-type(2n))
+                background-color: #eceaea !important
+
+              > td
+                font-size: 0.8rem
+                padding-left: 1px
+
+                &:is(:first-child)
+                  margin-right: 2px
+                  color: $primary-color
+                &:not(:last-child)
