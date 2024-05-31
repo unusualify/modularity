@@ -421,5 +421,9 @@ class Module extends NwidartModule
         return !empty($search);
     }
 
+    public function move($sourcePath, $destination){
+        
+    }
+
 
 }
