@@ -93,16 +93,11 @@ class StubsMakeCommand extends BaseCommand
      */
     protected function getOptions()
     {
-        return array_merge([
+        return [
             ['only', null, InputOption::VALUE_OPTIONAL, 'get only stubs'],
             ['except', null, InputOption::VALUE_OPTIONAL, 'get except stubs'],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
-            ['plain', '--p', InputOption::VALUE_NONE, 'Don\'t create route.'],
-            ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
-            ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
-            ['no-migrate', null, InputOption::VALUE_NONE, 'don\'t migrate.'],
-            ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
             ['fix', null, InputOption::VALUE_NONE, 'Fixes the model config errors']
-        ], unusualTraitOptions());
+        ];
     }
 }

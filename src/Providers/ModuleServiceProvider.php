@@ -40,17 +40,23 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
 
     public function bootModules()
     {
-        $migration_directory = GenerateConfigReader::read('migration')->getPath();
+        $migration_folder = GenerateConfigReader::read('migration')->getPath();
+        $config_folder = GenerateConfigReader::read('config')->getPath();
+        $middleware_folder = GenerateConfigReader::read('filter')->getPath();
+        $middleware_namespace = GenerateConfigReader::read('filter')->getNamespace();
+        $views_folder = GenerateConfigReader::read('views')->getPath();
+        $component_class_namespace = GenerateConfigReader::read('component-class')->getNamespace();
 
+        // dd(config('modularity'));
         foreach(Modularity::allEnabled() as $module){
 
             $module_name = $module->getName();
 
             // REGISTER MODULE MIDDLEWARES
-            if(file_exists(($middlewareDir = $module->getDirectoryPath('Http/Middleware')))){
+            if(file_exists(($middlewareDir = $module->getDirectoryPath($middleware_folder)))){
                 foreach (glob($middlewareDir . '/*Middleware.php') as $middlewareFile) {
                     $middlewareFileName = pathinfo($middlewareFile)['filename']; // $filename
-                    $middlewareClass = $module->getClassNamespace("Http\Middleware\\" . $middlewareFileName);
+                    $middlewareClass = $module->getClassNamespace("{$middleware_namespace}\\" . $middlewareFileName);
                     if(@class_exists($middlewareClass)){
 
                         $aliasName = implode('.', Arr::where(explode('_', snakeCase($middlewareFileName)), function($value){
@@ -75,21 +81,21 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
 
             // LOAD MODULE CONFIG
             // if(file_exists(module_path($module->getName(), 'Config/config.php'))){
-            if(file_exists($module->getDirectoryPath('Config/config.php'))){
+            if(file_exists($module->getDirectoryPath("{$config_folder}/config.php"))){
                 $this->mergeConfigFrom(
-                    $module->getDirectoryPath('Config/config.php'), $module->getSnakeName()
+                    $module->getDirectoryPath("{$config_folder}/config.php"), $module->getSnakeName()
                 );
 
             }
 
             // LOAD MODULE MIGRATIONS
             $this->loadMigrationsFrom(
-                $module->getDirectoryPath($migration_directory)
+                $module->getDirectoryPath($migration_folder)
             );
 
 
             // LOAD MODULE VIEWS
-            $sourcePath = module_path($module->getName(), 'Resources/views');
+            $sourcePath = module_path($module->getName(), $views_folder);
 
             $this->loadViewsFrom(
                 array_merge(
@@ -102,7 +108,7 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
             );
 
             // LOAD MODULE VIEW COMPONENTS
-            $namespace = $module->getClassNamespace('View\\Components');
+            $namespace = $module->getClassNamespace($component_class_namespace);
             Blade::componentNamespace($namespace, snakeCase($module_name));
 
             //LOAD MODULE TRANSLATION

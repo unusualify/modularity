@@ -59,11 +59,12 @@ final class LaravelServiceProvider extends ServiceProvider
     private function publishConfigs(): void
     {
         $this->publishes([
-            __DIR__ . '/Config/publishes/translatable.php' => config_path('translatable.php'),
-            __DIR__ . '/Config/publishes/translation.php' => config_path('translation.php'),
-            __DIR__ . '/Config/publishes/publish.php' => config_path(unusualBaseKey() . '.php'),
-            __DIR__ . '/Config/publishes/navigation-publish.php' => config_path( unusualBaseKey() . '-navigation.php'),
-            __DIR__ . '/Config/publishes/one-time-operations.php' => config_path('one-time-operations.php'),
+            __DIR__ . '/../config/publishes/translatable.php' => config_path('translatable.php'),
+            __DIR__ . '/../config/publishes/translation.php' => config_path('translation.php'),
+            __DIR__ . '/../config/publishes/publish.php' => config_path(unusualBaseKey() . '.php'),
+            __DIR__ . '/../config/publishes/navigation-publish.php' => config_path( unusualBaseKey() . '-navigation.php'),
+            __DIR__ . '/../config/publishes/one-time-operations.php' => config_path('one-time-operations.php'),
+            __DIR__ . '/../config/publishes/modules.php' => config_path('modules.php'),
             base_path('vendor/torann/geoip/config/geoip.php') => config_path('geoip.php'),
         ], 'config');
 
@@ -72,7 +73,7 @@ final class LaravelServiceProvider extends ServiceProvider
     private function publishViews(): void
     {
         $this->publishes([
-            __DIR__ . '/Resources/views/vendor/translation' => resource_path('views/vendor/translation')
+            __DIR__ . '/../resources/views/vendor/translation' => resource_path('views/vendor/translation')
         ], 'views');
 
         $this->publishes([

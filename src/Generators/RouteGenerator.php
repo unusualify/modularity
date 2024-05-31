@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Generators;
 
-use Nwidart\Modules\Generators\Generator;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Console\Command as Console;
 use Illuminate\Filesystem\Filesystem;
@@ -852,7 +851,8 @@ class RouteGenerator extends Generator
         $kebabCase = $this->getKebabCase($this->getName());
         $snakeCase = $this->getSnakeCase($this->getName());
         $lowerCase = lowerName($this->getName());
-        $configPath = $this->module->getPath().'/Config/config.php';
+        // $configPath = $this->module->getPath().'/Config/config.php';
+        $configPath = $this->module->getConfigPath();
 
         if($this->getModule()->getName() === $this->getName()){
 

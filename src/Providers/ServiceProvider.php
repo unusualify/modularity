@@ -25,7 +25,7 @@ class ServiceProvider extends Provider
      */
     protected $terminalNamespace = "Unusualify\\Modularity\\Console";
 
-    protected $viewSourcePath = __DIR__ .  '/../Resources/views';
+    protected $viewSourcePath = __DIR__ .  '/../../resources/views';
 
     /**
      * Create a new service provider instance.
