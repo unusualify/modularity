@@ -25,7 +25,6 @@
                 'impersonation' => $impersonation,
                 'authorization' => $authorization
             ];
-
         @endphp
         {{-- @dd($sideMenu) --}}
         {{-- @dd($currentUser->isImpersonating(), get_defined_vars()) --}}
@@ -80,8 +79,11 @@
             window['{{ unusualConfig('js_namespace') }}'].STORE = {};
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.config = {
+                test: false,
                 sideBarOpt: {!! json_encode(unusualConfig('ui_settings.sidebar')) !!},
                 secondarySideBar : {!! json_encode(unusualConfig('ui_settings.secondarySidebar')) !!},
+                profileMenu: {!! json_encode($navigation['profileMenu']) !!},
+                currentUser: {!! json_encode($currentUser->only(['name', 'email'])) !!}
             },
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.medias = {};

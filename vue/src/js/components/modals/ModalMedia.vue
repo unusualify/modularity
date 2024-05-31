@@ -138,6 +138,7 @@ import FormDataAsObj from '@/utils/formDataAsObj.js'
 import MediaGrid from './media-library/MediaGrid.vue'
 import ItemList from './media-library/ItemList.vue'
 import MediaSidebar from './media-library/MediaSidebar.vue'
+import { makeModalMediaProps } from '@/hooks/useModal'
 // import a17Checkbox from '@/components/Checkbox.vue'
 
 // TEST END
@@ -154,30 +155,7 @@ export default {
     // __log(props, attrs, slots, emit)
   },
   props: {
-    modalTitlePrefix: {
-      type: String,
-      default: function (props) {
-        return getCurrentInstance().appContext.config.globalProperties.$trans('media-library.title', 'Media Library')
-      }
-    },
-    btnLabelSingle: {
-      type: String,
-      default: function () {
-        return getCurrentInstance().appContext.config.globalProperties.$trans('media-library.insert', 'Insert')
-      }
-    },
-    btnLabelUpdate: {
-      type: String,
-      default: function () {
-        return getCurrentInstance().appContext.config.globalProperties.$trans('media-library.update', 'Update')
-      }
-    },
-    btnLabelMulti: {
-      type: String,
-      default: function () {
-        return getCurrentInstance().appContext.config.globalProperties.$trans('media-library.insert', 'Insert')
-      }
-    },
+    ...makeModalMediaProps(),
     initialPage: {
       type: Number,
       default: 1

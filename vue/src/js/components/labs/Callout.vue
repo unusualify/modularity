@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import RowFormat from '__components/labs/RowFormat.vue'
+import RowFormat from './RowFormat.vue'
 
 export default {
   components: {

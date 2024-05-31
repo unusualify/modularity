@@ -2,7 +2,7 @@ import { ALERT } from '../store/mutations'
 
 export default {
   $trans: function (key, defaultValue) {
-    return this.$lodash.get(window[import.meta.env.VUE_APP_NAME].unusualLocalization.lang, key, defaultValue)
+    return this.$lodash.get(window[import.meta.env.VUE_APP_NAME]?.unusualLocalization.lang, key, defaultValue)
     // return get(window[import.meta.env.VUE_APP_NAME].unusualLocalization.lang, key, defaultValue)
   },
   $changeLocale: function (locale) {

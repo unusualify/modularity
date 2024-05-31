@@ -49,6 +49,10 @@ class UNavigation
             $array['items'] = array_map(function($item){
                 return $this->sidebarMenuItem($item);
             }, $array['items']);
+        if(isset($array['menuItems']))
+            $array['menuItems'] = array_map(function($item){
+                return $this->sidebarMenuItem($item);
+            }, $array['menuItems']);
 
         if(isset($array['route_name'])){
             $routeName = Route::hasAdmin($array['route_name']);
@@ -221,6 +225,11 @@ class UNavigation
                 return true;
             }else if(isset($item['items'])){
                 if( $this->setActiveSidebarItems($item['items'])){
+                    $item['is_active'] = 1;
+                    return true;
+                }
+            }else if(isset($item['menuItems'])){
+                if( $this->setActiveSidebarItems($item['menuItems'])){
                     $item['is_active'] = 1;
                     return true;
                 }

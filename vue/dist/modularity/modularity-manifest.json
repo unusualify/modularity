@@ -1,0 +1,187 @@
+{
+  "_awesome-phonenumber.C8KclVch.js": {
+    "file": "js/awesome-phonenumber.C8KclVch.js"
+  },
+  "_datatable.DDH_oea7.js": {
+    "file": "js/datatable.DDH_oea7.js",
+    "imports": [
+      "_vendor.DMXVB7UE.js",
+      "_form.Ci1uBlrv.js",
+      "_vuetify.Bo3hDh75.js"
+    ]
+  },
+  "_fine-uploader.C_FDpdrq.js": {
+    "file": "js/fine-uploader.C_FDpdrq.js",
+    "imports": [
+      "_awesome-phonenumber.C8KclVch.js"
+    ]
+  },
+  "_form.!~{00a}~.js": {
+    "file": "css/form.BKCgRH4s.css",
+    "src": "_form.!~{00a}~.js"
+  },
+  "_form.Ci1uBlrv.js": {
+    "file": "js/form.Ci1uBlrv.js",
+    "imports": [
+      "_vendor.DMXVB7UE.js",
+      "_vuetify.Bo3hDh75.js",
+      "_fine-uploader.C_FDpdrq.js",
+      "_awesome-phonenumber.C8KclVch.js"
+    ],
+    "css": [
+      "css/form.BKCgRH4s.css"
+    ],
+    "assets": [
+      "fonts/fa-brands-400.C99Yv4gD.woff2",
+      "fonts/fa-brands-400.DtZKBM2a.ttf",
+      "fonts/fa-regular-400.OOsPf1xj.woff2",
+      "fonts/fa-regular-400.BMFokQJ2.ttf",
+      "fonts/fa-solid-900.DAI24fNt.woff2",
+      "fonts/fa-solid-900.DM0teJdg.ttf",
+      "fonts/fa-v4compatibility.aR9vOKaP.woff2",
+      "fonts/fa-v4compatibility.F0dlVTLQ.ttf",
+      "fonts/materialdesignicons-webfont.ltXzaLmB.eot",
+      "fonts/materialdesignicons-webfont.B4kKRV84.woff2",
+      "fonts/materialdesignicons-webfont.a0GcWJ7o.woff",
+      "fonts/materialdesignicons-webfont.jCYKvYgh.ttf"
+    ]
+  },
+  "_vendor.DMXVB7UE.js": {
+    "file": "js/vendor.DMXVB7UE.js",
+    "imports": [
+      "_awesome-phonenumber.C8KclVch.js",
+      "_fine-uploader.C_FDpdrq.js"
+    ]
+  },
+  "_vuetify.!~{009}~.js": {
+    "file": "css/vuetify.BdIiTMC_.css",
+    "src": "_vuetify.!~{009}~.js"
+  },
+  "_vuetify.Bo3hDh75.js": {
+    "file": "js/vuetify.Bo3hDh75.js",
+    "imports": [
+      "_vendor.DMXVB7UE.js"
+    ],
+    "css": [
+      "css/vuetify.BdIiTMC_.css"
+    ]
+  },
+  "icons-theme.svg": {
+    "file": "assets/icons/svg-theme.blade.php",
+    "src": "icons-theme.svg"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.ttf": {
+    "file": "fonts/fa-brands-400.DtZKBM2a.ttf",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.ttf"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2": {
+    "file": "fonts/fa-brands-400.C99Yv4gD.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.ttf": {
+    "file": "fonts/fa-regular-400.BMFokQJ2.ttf",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.ttf"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2": {
+    "file": "fonts/fa-regular-400.OOsPf1xj.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.ttf": {
+    "file": "fonts/fa-solid-900.DM0teJdg.ttf",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.ttf"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2": {
+    "file": "fonts/fa-solid-900.DAI24fNt.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.ttf": {
+    "file": "fonts/fa-v4compatibility.F0dlVTLQ.ttf",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.ttf"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2": {
+    "file": "fonts/fa-v4compatibility.aR9vOKaP.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
+  },
+  "node_modules/@mdi/font/fonts/materialdesignicons-webfont.eot": {
+    "file": "fonts/materialdesignicons-webfont.ltXzaLmB.eot",
+    "src": "node_modules/@mdi/font/fonts/materialdesignicons-webfont.eot"
+  },
+  "node_modules/@mdi/font/fonts/materialdesignicons-webfont.ttf": {
+    "file": "fonts/materialdesignicons-webfont.jCYKvYgh.ttf",
+    "src": "node_modules/@mdi/font/fonts/materialdesignicons-webfont.ttf"
+  },
+  "node_modules/@mdi/font/fonts/materialdesignicons-webfont.woff": {
+    "file": "fonts/materialdesignicons-webfont.a0GcWJ7o.woff",
+    "src": "node_modules/@mdi/font/fonts/materialdesignicons-webfont.woff"
+  },
+  "node_modules/@mdi/font/fonts/materialdesignicons-webfont.woff2": {
+    "file": "fonts/materialdesignicons-webfont.B4kKRV84.woff2",
+    "src": "node_modules/@mdi/font/fonts/materialdesignicons-webfont.woff2"
+  },
+  "src/js/core-auth.js": {
+    "file": "entries/core-auth.CAx7AHZg.js",
+    "src": "src/js/core-auth.js",
+    "isEntry": true,
+    "imports": [
+      "_vendor.DMXVB7UE.js",
+      "_form.Ci1uBlrv.js",
+      "_awesome-phonenumber.C8KclVch.js",
+      "_fine-uploader.C_FDpdrq.js",
+      "_vuetify.Bo3hDh75.js"
+    ]
+  },
+  "src/js/core-dashboard.js": {
+    "file": "entries/core-dashboard.Bw3ykLbg.js",
+    "src": "src/js/core-dashboard.js",
+    "isEntry": true,
+    "imports": [
+      "_vendor.DMXVB7UE.js",
+      "_form.Ci1uBlrv.js",
+      "_datatable.DDH_oea7.js",
+      "_awesome-phonenumber.C8KclVch.js",
+      "_fine-uploader.C_FDpdrq.js",
+      "_vuetify.Bo3hDh75.js"
+    ]
+  },
+  "src/js/core-form.js": {
+    "file": "entries/core-form.5OQ4-Frj.js",
+    "src": "src/js/core-form.js",
+    "isEntry": true,
+    "imports": [
+      "_vendor.DMXVB7UE.js",
+      "_form.Ci1uBlrv.js",
+      "_awesome-phonenumber.C8KclVch.js",
+      "_fine-uploader.C_FDpdrq.js",
+      "_vuetify.Bo3hDh75.js"
+    ]
+  },
+  "src/js/core-free.js": {
+    "file": "entries/core-free.C798jbGD.js",
+    "src": "src/js/core-free.js",
+    "isEntry": true,
+    "imports": [
+      "_vendor.DMXVB7UE.js",
+      "_form.Ci1uBlrv.js",
+      "_vuetify.Bo3hDh75.js",
+      "_datatable.DDH_oea7.js",
+      "_awesome-phonenumber.C8KclVch.js",
+      "_fine-uploader.C_FDpdrq.js"
+    ],
+    "css": [
+      "css/core-free.DyN2bi43.css"
+    ]
+  },
+  "src/js/core-index.js": {
+    "file": "entries/core-index.Bw3ykLbg.js",
+    "src": "src/js/core-index.js",
+    "isEntry": true,
+    "imports": [
+      "_vendor.DMXVB7UE.js",
+      "_form.Ci1uBlrv.js",
+      "_datatable.DDH_oea7.js",
+      "_awesome-phonenumber.C8KclVch.js",
+      "_fine-uploader.C_FDpdrq.js",
+      "_vuetify.Bo3hDh75.js"
+    ]
+  }
+}

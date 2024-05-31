@@ -1,0 +1,30 @@
+// $NAMESPACE$
+import { describe, expect, test, vi } from 'vitest'
+import { mount } from '@vue/test-utils'
+
+import $STUDLY_NAME$ from '../../src/js/$IMPORT$'
+
+// mock example, delete this code phrase while testing
+vi.mock('../../src/js/$IMPORT$', async(importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    // your mocked methods
+  }
+})
+
+// method example, delete this code phrase while testing
+$STUDLY_NAME$.overwriteMethod = () => false
+
+describe('$CAMEL_CASE$ util tests', () => {
+
+  // mock method test example
+  test('test a method of $STUDLY_NAME$ util', async () => {
+    const result = $STUDLY_NAME$.overwriteMethod()
+
+    expect(result).toEqual(true)
+
+  })
+
+})
+

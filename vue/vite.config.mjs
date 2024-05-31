@@ -5,7 +5,7 @@ import Vue from '@vitejs/plugin-vue'
 import Inspect from 'vite-plugin-inspect'
 import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
 import VitePluginSvgSpritemap from '@spiriit/vite-plugin-svg-spritemap'
-import Modularity from './vite-plugin-modularity'
+import Modularity, {isCustomTheme} from './vite-plugin-modularity'
 
 // Utilities
 import { defineConfig, loadEnv, splitVendorChunkPlugin } from 'vite'
@@ -97,6 +97,8 @@ export default defineConfig(({ command, mode }) => {
     }
   }
 
+  const APP_THEME_FOLDER = isCustomTheme(APP_THEME) ? `customs/${APP_THEME}` : `${APP_THEME}`
+
   if (!isProduction) {
     server.hmr = {
       protocol: 'ws',
@@ -131,7 +133,7 @@ export default defineConfig(({ command, mode }) => {
       }),
       Vuetify({
         styles: {
-          configFile: 'src/sass/themes/' + APP_THEME + '/vuetify/_settings.scss'
+          configFile: 'src/sass/themes/' + APP_THEME_FOLDER + '/vuetify/_settings.scss'
         }
       }),
       Components(),
@@ -139,7 +141,7 @@ export default defineConfig(({ command, mode }) => {
       viteCommonjs(),
 
       VitePluginSvgSpritemap([
-        `./src/sass/themes/${APP_THEME}/icons/**/*.svg`,
+        `./src/sass/themes/${APP_THEME_FOLDER}/icons/**/*.svg`,
         './src/icons/**/*.svg'
       ], svgConfig('theme')),
 
@@ -247,7 +249,7 @@ export default defineConfig(({ command, mode }) => {
       preprocessorOptions: {
         scss: {
           additionalData: `
-            @use "styles/themes/${APP_THEME}/_additional.scss" as *;
+            @use "styles/themes/${APP_THEME_FOLDER}/_additional.scss" as *;
           `,
 
           sassOptions: {
@@ -256,7 +258,7 @@ export default defineConfig(({ command, mode }) => {
         },
         sass: {
           additionalData: `
-            @use "styles/themes/${APP_THEME}/_additional.scss" as *
+            @use "styles/themes/${APP_THEME_FOLDER}/_additional.scss" as *
           `,
           sassOptions: {
             outputStyle: isProduction ? 'compressed' : 'expanded'

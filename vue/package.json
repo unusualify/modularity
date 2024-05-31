@@ -8,6 +8,10 @@
     "preview": "vite preview",
     "watch": "vite build --watch",
     "hmr-debug": "vite --debug hmr",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "madge": "madge"
   },
   "dependencies": {
@@ -45,8 +49,11 @@
     "@popperjs/core": "^2.10.2",
     "@spiriit/vite-plugin-svg-spritemap": "^2.2.4",
     "@vitejs/plugin-vue": "^4.0.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/ui": "^1.6.0",
     "@vue/compiler-sfc": "^3.2.47",
     "@vue/eslint-config-standard": "^8.0.1",
+    "@vue/test-utils": "^2.4.6",
     "bootstrap": "^5.2.3",
     "change-case": "^4.1.2",
     "chokidar-cli": "^3.0.0",
@@ -60,6 +67,8 @@
     "eslint-plugin-standard": "^5.0.0",
     "eslint-plugin-vue": "^9.9.0",
     "glob": "^10.3.10",
+    "happy-dom": "^14.11.0",
+    "jsdom": "^24.0.0",
     "rollup-plugin-output-manifest": "^2.0.0",
     "sass": "^1.60.0",
     "sass-loader": "^14.1.1",
@@ -68,7 +77,10 @@
     "vite-plugin-clean": "^1.0.0",
     "vite-plugin-inspect": "^0.8.3",
     "vite-plugin-mp": "^2.2.3",
-    "vite-plugin-vuetify": "^2.0.3"
+    "vite-plugin-vuetify": "^2.0.3",
+    "vitest": "^1.6.0",
+    "vue-intellisense": "^1.0.3",
+    "vue-server-renderer": "^2.7.16"
   },
   "madge": {
     "fontSize": "10px",

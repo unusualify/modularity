@@ -16,6 +16,7 @@ export const makeFormatterProps = propsFactory({
 export default function useFormatter (props, context, headers) {
   // state encapsulated and managed by the composable
   const { d } = useI18n({ useScope: 'global' })
+
   const formatterColumns = ref(headers.filter((h) =>
     Object.prototype.hasOwnProperty.call(h, 'formatter') &&
     h.formatter.length > 0 &&
@@ -24,11 +25,6 @@ export default function useFormatter (props, context, headers) {
 
   const methods = reactive({
     dateFormatter: function (value, datetimeFormat = 'long') {
-      // __log(
-      //   value
-      //   // new Date(value),
-      //   // d(new Date(value), datetimeFormat)
-      // )
       return {
         configuration: methods.makeText(d(new Date(value), datetimeFormat))
       }

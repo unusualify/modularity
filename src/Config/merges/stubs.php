@@ -14,6 +14,8 @@ return [
         // 'route-controller-api' => 'Http/Controllers/API/$STUDLY_NAME$Controller.php',
         'composer' => 'composer.json',
 
+        'tests/vue-test' => '$TEST_NAME$.test.js'
+
     ],
     'replacements' => [
         'routes/web' => ['LOWER_NAME', 'STUDLY_NAME'],
@@ -35,6 +37,12 @@ return [
             'MODULE_NAMESPACE',
             'PROVIDER_NAMESPACE',
         ],
+        'tests/vue-test' => [
+            'STUDLY_NAME',
+            'CAMEL_CASE',
+            'NAMESPACE',
+            'IMPORT',
+        ]
     ],
     'gitkeep' => true
 ];

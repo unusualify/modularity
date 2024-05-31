@@ -28,7 +28,7 @@ import { VueMaskDirective } from 'v-mask'
 import SvgSprite from '@/directives/svg'
 import Column from '@/directives/column'
 import FitGrid from '@/directives/fit-grid'
-import commonMethods from '@/utils/common-methods'
+import commonMethods from '@/utils/commonMethods'
 import { ALERT } from '../store/mutations'
 
 // const includeGlobalComponents = require.context('__components', false, /[A-Za-z]*(?<!_)\.vue$/i)
@@ -68,7 +68,7 @@ export default {
     // app.config.errorHandler = (err) => {}
     // set locale wrt user profile preference
     setI18nLocale(i18n, store.state.user.locale)
-    loadLocaleMessages(i18n, window[import.meta.env.VUE_APP_NAME].ENDPOINTS.languages ?? '')
+    loadLocaleMessages(i18n, window[import.meta.env.VUE_APP_NAME]?.ENDPOINTS.languages ?? '')
     // i18n.global.setDateTimeFormat('tr', 'Europe/Istanbul')
 
     // add Global methods to all components

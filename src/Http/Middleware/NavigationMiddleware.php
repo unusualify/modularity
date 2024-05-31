@@ -25,14 +25,17 @@ class NavigationMiddleware
         app()->config->set([
             unusualBaseKey() . '-navigation.sidebar' => UNavigation::formatSidebarMenus(app()->config->get(unusualBaseKey() . '-navigation.sidebar'))
         ]);
-
+        app()->config->set([
+            unusualBaseKey().'.ui_settings.profileMenu' => UNavigation::formatSidebarMenus(app()->config->get(unusualBaseKey().'.ui_settings.profileMenu'))
+        ]);
         view()->composer( [unusualBaseKey()."::layouts.master", 'translation::layout'], function ($view)
         {
 
             $navigation = [
                 'current_url' => url()->current(),
                 'sidebar' => [],
-                'breadcrumbs' => []
+                'breadcrumbs' => [],
+                'profileMenu' => []
             ];
 
             // dd(
@@ -43,10 +46,14 @@ class NavigationMiddleware
 
             if(count($user->roles) > 0 && $user->isClient()){
                 $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.client') );
+                $navigation['profileMenu'] = array_values( app()->config->get(unusualBaseKey(). '.ui_settings.profileMenu.client' ,default: []));
+
             }else if($user->hasRole(1)) {
                 $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.superadmin') );
+                $navigation['profileMenu'] = array_values( app()->config->get(unusualBaseKey(). '.ui_settings.profileMenu.superadmin',default: []));
             }else{
                 $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.default') );
+                $navigation['profileMenu'] = array_values( app()->config->get(unusualBaseKey(). '.ui_settings.profileMenu.default',default: []));
             }
             // setActiveMenuItem($configuration['sidebar'], $configuration['current_url']);
             $view->with('navigation', $navigation);

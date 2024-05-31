@@ -1,0 +1,52 @@
+// $NAMESPACE$
+import { describe, expect, test, vi } from 'vitest'
+import { mount } from '@vue/test-utils'
+
+import { createApp } from '~/vue/dist/vue.esm-bundler.js'
+import { createStore } from 'vuex'
+
+import $CAMEL_CASE$ from '../../src/js/$IMPORT$'
+
+$CAMEL_CASE$.state._testData = ''
+
+const App = {
+  template: `
+    <div>
+      <button @click="handleClick" />
+      TEST: {{ testData }}
+    </div>
+  `,
+  computed: {
+    testData() {
+      return this.$store.state?.$CAMEL_CASE$?._testData ?? 'test'
+    }
+  },
+  methods: {
+    handleClick() {
+      // this.$store.commit('commitMutation')
+    }
+  }
+}
+
+const factory = () => mount(App, {
+  global: {
+    plugins: [store]
+  }
+})
+
+const store = createStore()
+
+store.registerModule('$CAMEL_CASE$', $CAMEL_CASE$)
+
+const app = createApp(App)
+
+app.use(store)
+
+describe('Vuex $STUDLY_NAME$ Module', () => {
+  test('show test state', async () => {
+    const wrapper = factory()
+
+    expect(wrapper.html()).toContain('TEST: test')
+  })
+})
+

@@ -1,0 +1,21 @@
+{
+  "isSuperAdmin": false,
+  "isClient": 0,
+  "roles": ["admin"],
+  "permissions": {
+    "dashboard": true,
+    "mediaLibrary": true,
+    "user_create": true,
+    "user_view": true,
+    "user_edit": true,
+    "user_delete": true,
+    "user_forceDelete": true,
+    "user_restore": true,
+    "user_duplicate": true,
+    "user_reorder": true,
+    "user_bulk": true,
+    "user_bulkDelete": true,
+    "user_bulkForceDelete": true,
+    "user_bulkRestore": true
+  }
+}

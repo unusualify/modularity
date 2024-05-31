@@ -20,18 +20,31 @@ const props = propsFactory({
   isExpanded: {
     type: Boolean,
     default: true
-  }
+  },
 })
 
 export default function useSidebar () {
   const isExpanded = ref(false)
+  const activeMenuItem = ref('#profile')
   const store = useStore()
   const root = useRoot()
   const state = reactive({
+    open: [],
+    activeMenu: computed({
+      get () {
+        return activeMenuItem.value
+      },
+      set (val) {
+        activeMenuItem.value = val
+      }
+    }),
+
     csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
     sidebarToggle: props.sidebarToggle,
     mainSidebar: store.state.config.sideBarOpt,
     secondarySidebar: store.state.config.secondarySideBar,
+    profileMenu: store.state.config.profileMenu,
+    currentUser: store.state.config.currentUser,
     mainLocation: computed(() => state.mainSidebar.mainLocation),
     secondarySidebarExists: computed(() => state.secondarySidebar.exists),
     secondaryLocation: computed(() => state.secondarySidebar.location),
@@ -67,7 +80,7 @@ export default function useSidebar () {
         'mdi-instagram',
         ''
       ]
-    ]
+    ],
   })
 
   const methods = reactive({
@@ -94,6 +107,13 @@ export default function useSidebar () {
     },
     openFreeMediaLibrary: function () {
       root.openMediaLibrary()
+    },
+    handleProfile(event){
+      if(event.type === 'mouseenter' && state.profileMenu.expandOnHover) state.open.push('User')
+      console.log(event, state.profileMenu)
+    },
+    handleMenu(title){
+      state.activeMenu = `#${title}`
     }
   })
 

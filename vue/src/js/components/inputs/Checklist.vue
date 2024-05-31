@@ -1,8 +1,8 @@
 <template>
   <div class="ue-checklist">
-    <ue-title v-if="label" :classes="['pl-0 pt-0']">
+    <Title v-if="label" :classes="['pl-0 pt-0']" data-test="title">
       {{ label }}
-    </ue-title>
+    </Title>
     <v-row v-if="isTreeview">
       <v-col lg="6" md="8" sm="12">
         <v-list >
@@ -87,11 +87,14 @@
       <v-checkbox
         v-for="(item, index) in items"
         :key="`checkbox-${index}`"
+        data-test="checkbox"
         v-model="input"
         :label="item[`${itemTitle}`]"
         :value="item[`${itemValue}`]"
         :color="checkboxColor"
         hide-details
+
+        :class="[ ( Array.isArray(input) && input.includes(item[`${itemValue}`]) ) ? 'checked' : '']"
         >
       </v-checkbox>
     </v-row>
@@ -101,10 +104,14 @@
 <script>
 import { InputMixin } from '@/mixins' // for props
 import { useInput, makeInputProps } from '@/hooks'
+import Title from '__components/Title.vue'
 
 export default {
 
   name: 'v-custom-input-checklist',
+  components: {
+    Title
+  },
   mixins: [InputMixin],
   props: {
     ...makeInputProps(),

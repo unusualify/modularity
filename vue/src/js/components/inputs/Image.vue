@@ -1,122 +1,184 @@
 <template>
-    <v-input
+  <v-input
+    v-model="input"
     hideDetails="auto"
     appendIcon="mdi-close"
     :variant="boundProps.variant"
-  >
+    >
     <template v-slot:default="defaultSlot">
       <div class="v-field v-field--active v-field--center-affix v-field--dirty v-field--variant-outlined v-theme--jakomeet v-locale--is-ltr">
         <div class="v-field__field" data-no-activator="">
-          <div class="media" :class="{ 'media--hoverable' : hover, 'media--slide' : isSlide }">
-            <div class="media__field">
-              <div class="media__info" v-if="hasMedia">
-                <div class="media__img">
-                  <div class="media__imgFrame">
-                    <div class="media__imgCentered" :style="cropThumbnailStyle">
-                      <!--
-                        <img v-if="cropSrc && showImg" :src="cropSrc" ref="mediaImg" :class="cropThumbnailClass"/>
-                        {{ cropSrc }}
-                        {{ input_[0].thumbnail }}
-                        {{ showImg }}
-                      -->
-                      <img v-if="showImg" :src="media.thumbnail" ref="mediaImg" :class="cropThumbnailClass"/>
-                    </div>
-                    <div class="media__edit" @click="openMediaLibrary(1, mediaKey, index)" v-if="!disabled">
-                      <span class="media__edit--button"><span v-svg symbol="edit"><v-icon icon="$edit"/></span></span>
-                    </div>
-                  </div>
-                </div>
 
-                <ul class="media__metadatas" v-if="!disabled">
-                  <li class="media__name" @click="openMediaLibrary(1, mediaKey, index)"><strong :title="media.name">{{ media.name }}</strong></li>
-                  <li class="f--small" v-if="media.size">File size: {{ media.size }}</li>
-                  <li class="f--small" v-if="media.width + media.height">{{ $trans('fields.medias.original-dimensions') }}: {{ media.width }}&nbsp;&times;&nbsp;{{
-                    media.height }}
-                  </li>
-                  <!--
-                    <li class="f--small media__crop-link" v-if="cropInfos && activeCrop" @click="openCropMedia">
-                        <p class="f--small f--note hide--xsmall"
-                          v-for="(cropInfo, index) in cropInfos"
-                          :key="index">
-                          <span v-html="cropInfo"></span>
-                        </p>
-                    </li>
-                    <li class="f--small">
-                      <a href="#" @click.prevent="metadatasInfos" v-if="withAddInfo" class="f--link-underlined--o">{{ metadatas.text }}</a>
-                    </li>
-                  -->
-                </ul>
+          <v-hover v-slot="{ isHovering, props }">
+            <div class="media w-100" :class="{ 'media--slide' : isSlide }" v-bind="props">
+              <div class="_media__field ">
+                <v-row dense class="" no-gutters>
+                  <v-col v-for="(index) in totalElementCount" :key="index"
+                    cols="12"
+                    md="6"
+                    lg="4"
+                    v-fit-grid
+                    >
+                    <v-card color="" class="w-100 d-flex flex-column justify-end" style="box-shadow: unset;">
+                      <v-hover v-slot="{ isHovering, props }">
+                        <div v-if="input[index] !== undefined" class="d-flex flex-no-wrap" v-bind="props" data-test="imageCard">
+                          <div class="media__img px-2 py-2">
+                            <v-hover v-slot="{ isHovering, props }">
+                              <div class="media__imgFrame" v-bind="props">
+                                <div class="media__imgCentered" :style="cropThumbnailStyle">
+                                  <v-img v-if="showImg" :src="input[index].thumbnail" ref="mediaImg" :class="[cropThumbnailClass]" max-width="240"/>
+                                </div>
+                                <v-overlay
+                                  v-if="!disabled"
+                                  :model-value="isHovering"
+                                  class="align-end justify-end"
+                                  contained
+                                  @click="openMediaLibrary(1, mediaKey, index)"
+                                  :elevation="isHovering ? 12 : 2"
+                                >
+                                  <v-btn icon="$edit" size="small" class="mb-2 mr-2" color="blue-lighten-5"></v-btn>
+                                </v-overlay>
+                              </div>
+                            </v-hover>
+                          </div>
+                          <v-list lines="one" :class="[ (!hover || isHovering ) ? 'opacity-100' : 'opacity-70' ,'w-50']" class="w-50" style="min-width: 50px;transition: opacity 250ms ease-in;">
+                            <v-hover>
+                              <template v-slot:default="{ isHovering, props }">
+                                <v-list-item
+                                  v-bind="props"
+                                  :class="{'text-blue': isHovering }"
+                                  :title="input[index].name"
+                                  @click="openMediaLibrary(1, mediaKey, index)"
+                                ></v-list-item>
+                              </template>
+                            </v-hover>
+                            <v-list-item v-if="input[index].size" :subtitle="`File size: {{ input[index].size }}`"></v-list-item>
+                            <v-list-item v-if="input[index].width + input[index].height"
+                              :subtitle="`${$t('fields.medias.original-dimensions')}: ${input[index].width}&nbsp;&times;&nbsp;${input[index].height}`"
+                              ></v-list-item>
+                          </v-list>
 
-                <!--Actions-->
-                <!--
-                  <a17-buttonbar class="media__actions" v-if="!disabled">
-                    <a :href="media.original" download><span v-svg symbol="download"></span></a>
-                    <button type="button" @click="openCropMedia" v-if="activeCrop"><span v-svg symbol="crop"></span></button>
-                    <button type="button" @click="deleteMediaClick"><span v-svg symbol="trash"></span></button>
-                  </a17-buttonbar>
-                -->
-                <!--
-                  <div class="media__actions-dropDown">
-                    <a17-dropdown ref="dropDown" position="right">
-                      <a17-button size="icon" variant="icon" @click="$refs.dropDown.toggle()">
-                        <span v-svg symbol="more-dots"></span></a17-button>
-                      <div slot="dropdown__content">
-                        <a :href="media.original" download><span v-svg symbol="download"></span>{{ $trans('fields.medias.download') }}</a>
-                        <button type="button" @click="openCropMedia" v-if="activeCrop"><span v-svg symbol="crop"></span>{{ $trans('fields.medias.crop') }}
-                        </button>
-                        <button type="button" @click="deleteMediaClick"><span v-svg symbol="trash"></span>{{ $trans('fields.medias.delete') }}</button>
+                          <div style="min-width: 50px;transition: opacity 250ms ease-in;" :class="[ (!hover || isHovering ) ? 'opacity-100' : 'opacity-10' ,'d-flex justify-end ma-2']" v-if="!disabled" >
+                            <v-btn data-test="downloadButton" icon="$download" color="blue-lighten-5" rounded="0" size="small" :href="input[index].original" download />
+                            <v-btn data-test="cropButton" icon="mdi-crop" color="blue-lighten-5" rounded="0" size="small"/>
+                            <v-btn data-test="deleteButton" icon="$delete" color="blue-lighten-5" rounded="0" size="small"  @click="deleteMediaClick(index, defaultSlot.validate)"/>
+                          </div>
+                        </div>
+                      </v-hover>
+                      <template v-if="input[index] === undefined" v-slot:actions>
+                          <v-btn
+                            data-test="addButton"
+                            append-icon="$add"
+                            variant="outlined"
+                            block
+                            @click="openMediaLibrary(remainingItems)"
+                            >
+                            {{ addLabel }}
+                          </v-btn>
+                      </template>
+                    </v-card>
+                  </v-col>
+                  <!-- <v-col v-for="(media, index) in input" :key="index"
+                    cols="12"
+                    md="6"
+                    lg="4"
+                    v-fit-grid
+                    >
+                    <v-card color="" class="d-flex flex-no-wrap w-100" >
+                      <div class="media__img px-2 py-2">
+                        <v-hover v-slot="{ isHovering, props }">
+                          <div class="media__imgFrame" v-bind="props">
+                            <div class="media__imgCentered" :style="cropThumbnailStyle">
+                              <v-img v-if="showImg" :src="media.thumbnail" ref="mediaImg" :class="[cropThumbnailClass]" max-width="240"/>
+                            </div>
+                            <v-overlay
+                              v-if="!disabled"
+                              :model-value="isHovering"
+                              class="align-end justify-end"
+                              contained
+                              @click="openMediaLibrary(1, mediaKey, index)"
+                              :elevation="isHovering ? 12 : 2"
+                            >
+                              <v-btn icon="$edit" size="small" class="mb-2 mr-2" color="blue-lighten-5"></v-btn>
+                            </v-overlay>
+                          </div>
+                        </v-hover>
                       </div>
-                    </a17-dropdown>
+                      <v-list lines="one" class="w-50">
+                        <v-hover>
+                          <template v-slot:default="{ isHovering, props }">
+                            <v-list-item
+                              v-bind="props"
+                              :class="{'text-blue': isHovering }"
+                              :title="media.name"
+                              @click="openMediaLibrary(1, mediaKey, index)"
+                            ></v-list-item>
+                          </template>
+                        </v-hover>
+                        <v-list-item v-if="media.size" :subtitle="`File size: {{ media.size }}`"></v-list-item>
+                        <v-list-item v-if="media.width + media.height"
+                          :subtitle="`${$t('fields.medias.original-dimensions')}: ${media.width}&nbsp;&times;&nbsp;${media.height}`"
+                          ></v-list-item>
+                      </v-list>
+                      <div style="min-width: 50px;" :class="[ (!hover || isHovering ) ? 'opacity-1' : 'opacity-0' ,'d-flex justify-end ma-2']" v-if="!disabled" >
+                        <v-btn icon="$download" color="blue-lighten-5" rounded="0" size="small" :href="media.original" download/>
+                        <v-btn icon="mdi-crop" color="blue-lighten-5" rounded="0" size="small"/>
+                        <v-btn icon="$delete" color="blue-lighten-5" rounded="0" size="small"  @click="deleteMediaClick(index, defaultSlot.validate)"/>
+                      </div>
+                    </v-card>
+                  </v-col> -->
+
+                </v-row>
+
+                <!--Add media button-->
+                <!-- <v-btn v-if="remainingItems" type="button" class="ml-2 my-2" @click="openMediaLibrary(remainingItems)">{{ addLabel }}</v-btn> -->
+                <!--
+                  <a17-button variant="ghost" @click="openMediaLibrary" :disabled="disabled" v-if="!hasMedia">{{ btnLabel }}</a17-button>
+                -->
+                <p class="media__note f--small" v-if="!!this.$slots.default">
+                  <slot/>
+                </p>
+
+                <!-- Metadatas options -->
+                <!--
+                  <div class="media__metadatas--options" :class="{ 's--active' : metadatas.active }" v-if="hasMedia && withAddInfo">
+                    <a17-mediametadata :name='metadataName' :label="$trans('fields.medias.alt-text', 'Alt Text')" id="altText" :media="media" :maxlength="altTextMaxLength" @change="updateMetadata"/>
+
+                    <a17-mediametadata v-if="withCaption" :wysiwyg="useWysiwyg" :wysiwyg-options="wysiwygOptions" type='text' :name='metadataName' :label="$trans('fields.medias.caption', 'Caption')" id="caption" :media="media" :maxlength="captionMaxLength" @change="updateMetadata"/>
+
+                    <a17-mediametadata v-if="withVideoUrl" :name='metadataName' :label="$trans('fields.medias.video-url', 'Video URL (optional)')" id="video" :media="media" @change="updateMetadata"/>
+
+                    <template v-for="field in extraMetadatas">
+                      <a17-mediametadata v-if="extraMetadatas.length > 0"
+                                        :key="field.name"
+                                        :type="field.type"
+                                        :name='metadataName'
+                                        :wysiwyg='field.wysiwyg || false'
+                                        :wysiwyg-options='field.wysiwygOptions || wysiwygOptions'
+                                        :label="field.label"
+                                        :id="field.name"
+                                        :media="media"
+                                        :maxlength="field.maxlength || 0"
+                                        @change="updateMetadata"/>
+                    </template>
                   </div>
                 -->
               </div>
 
-              <!--Add media button-->
-              <v-btn v-if="remainingItems" type="button" @click="openMediaLibrary(remainingItems)">{{ addLabel }}</v-btn>
+              <!-- Crop modal -->
               <!--
-                <a17-button variant="ghost" @click="openMediaLibrary" :disabled="disabled" v-if="!hasMedia">{{ btnLabel }}</a17-button>
+                <a17-modal class="modal--cropper" :ref="cropModalName" :forceClose="true" :title="$trans('fields.medias.crop-edit')" mode="medium" v-if="hasMedia && activeCrop">
+                  <a17-cropper :media="media" v-on:crop-end="cropMedia" :aspectRatio="16 / 9" :context="cropContext" :key="cropperKey">
+                    <a17-button class="cropper__button" variant="action" @click="$refs[cropModalName].close()">{{ $trans('fields.medias.crop-save') }}</a17-button>
+                  </a17-cropper>
+                </a17-modal>
               -->
-              <p class="media__note f--small" v-if="!!this.$slots.default">
-                <slot/>
-              </p>
-
-              <!-- Metadatas options -->
-              <!--
-                <div class="media__metadatas--options" :class="{ 's--active' : metadatas.active }" v-if="hasMedia && withAddInfo">
-                  <a17-mediametadata :name='metadataName' :label="$trans('fields.medias.alt-text', 'Alt Text')" id="altText" :media="media" :maxlength="altTextMaxLength" @change="updateMetadata"/>
-
-                  <a17-mediametadata v-if="withCaption" :wysiwyg="useWysiwyg" :wysiwyg-options="wysiwygOptions" type='text' :name='metadataName' :label="$trans('fields.medias.caption', 'Caption')" id="caption" :media="media" :maxlength="captionMaxLength" @change="updateMetadata"/>
-
-                  <a17-mediametadata v-if="withVideoUrl" :name='metadataName' :label="$trans('fields.medias.video-url', 'Video URL (optional)')" id="video" :media="media" @change="updateMetadata"/>
-
-                  <template v-for="field in extraMetadatas">
-                    <a17-mediametadata v-if="extraMetadatas.length > 0"
-                                      :key="field.name"
-                                      :type="field.type"
-                                      :name='metadataName'
-                                      :wysiwyg='field.wysiwyg || false'
-                                      :wysiwyg-options='field.wysiwygOptions || wysiwygOptions'
-                                      :label="field.label"
-                                      :id="field.name"
-                                      :media="media"
-                                      :maxlength="field.maxlength || 0"
-                                      @change="updateMetadata"/>
-                  </template>
-                </div>
-              -->
+              <input :name="this.name" :value="JSON.stringify(media)" type="hidden">
             </div>
+          </v-hover>
 
-            <!-- Crop modal -->
-            <!--
-              <a17-modal class="modal--cropper" :ref="cropModalName" :forceClose="true" :title="$trans('fields.medias.crop-edit')" mode="medium" v-if="hasMedia && activeCrop">
-                <a17-cropper :media="media" v-on:crop-end="cropMedia" :aspectRatio="16 / 9" :context="cropContext" :key="cropperKey">
-                  <a17-button class="cropper__button" variant="action" @click="$refs[cropModalName].close()">{{ $trans('fields.medias.crop-save') }}</a17-button>
-                </a17-cropper>
-              </a17-modal>
-            -->
-            <input :name="this.name" type="hidden" :value="JSON.stringify(media)" />
-          </div>
         </div>
+
         <div class="v-field__outline">
           <div class="v-field__outline__start"></div>
           <div class="v-field__outline__notch">
@@ -148,6 +210,7 @@ import a17VueFilters from '@/utils/filters.js'
 import {
   cropConversion
 } from '@/utils/cropper'
+import { range } from 'lodash-es'
 // import smartCrop from 'smartcrop'
 
 const IS_SAFARI = navigator.userAgent.indexOf('Safari') !== -1 && navigator.userAgent.indexOf('Chrome') === -1
@@ -187,11 +250,12 @@ export default {
       },
       hasMediaChanged: false,
       metadatas: {
-        text: this.$trans('fields.medias.edit-info'),
-        textOpen: this.$trans('fields.medias.edit-info'),
-        textClose: this.$trans('fields.medias.edit-close'),
+        text: this?.$t('fields.medias.edit-info') ?? '',
+        textOpen: this?.$t('fields.medias.edit-info') ?? '',
+        textClose: this?.$t('fields.medias.edit-close') ?? '',
         active: false
-      }
+      },
+      totalElementCount: range(0, this.max)
     }
   },
   filters: a17VueFilters,
@@ -532,16 +596,24 @@ export default {
     openCropMedia: function () {
       this.$refs[this.cropModalName].open()
     },
-    deleteMediaClick: function () {
-      this.isDestroyed = true
-      this.deleteMedia()
+    deleteMediaClick: function (index, callback) {
+      // this.isDestroyed = true
+      this.deleteMedia(index)
+
+      this.$nextTick(() => callback())
     },
     // delete the media
-    deleteMedia: function () {
-      this.$store.commit(MEDIA_LIBRARY.DESTROY_SPECIFIC_MEDIA, {
-        name: this.mediaKey,
-        index: this.index
-      })
+    deleteMedia: function (index) {
+      let newInput = this.input
+
+      newInput.splice(index, 1)
+
+      this.input = newInput
+
+      // this.$store.commit(MEDIA_LIBRARY.DESTROY_SPECIFIC_MEDIA, {
+      //   name: this.mediaKey,
+      //   index: this.index
+      // })
     },
     // metadatas
     updateMetadata: function (newValue) {
@@ -574,20 +646,6 @@ export default {
   $input-bg: #FCFCFC;
   $input-border: #DFDFDF;
   $height_input: 45px;
-
-  .media {
-    width: 100%;
-    border-radius: 2px;
-    // border: 1px solid $color__border;
-    background:$color__background;
-  }
-
-  .media__field {
-    // height:$height_input + 2px;
-    padding: 10px;
-    position: relative;
-    /*overflow-x: hidden;*/
-  }
 
   .media--slide {
     border: 0 none;
@@ -622,17 +680,6 @@ export default {
     user-select: none;
     position:relative;
     min-width: 100px;
-
-    &:before {
-      content: "";
-      position: absolute;
-      display:block;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border:1px solid rgba(0,0,0,0.05);
-    }
 
     img {
       display:block;
@@ -706,42 +753,6 @@ export default {
     }
   }
 
-  .media__edit {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: block;
-    opacity:0;
-    background-color: rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    transition: opacity 0.3s ease;
-
-    .media__edit--button {
-      display: block;
-      position: absolute;
-      right: 10px;
-      bottom: 10px;
-      height: 26px;
-      width: 26px;
-      line-height: 26px;
-      text-align: center;
-      border-radius: 50%;
-      background: $color__background;
-      color: $color__icons;
-
-      .icon {
-        color: $color__icons;
-        transition: color .25s linear;
-      }
-    }
-
-    .media__imgFrame:hover & {
-      opacity:1;
-    }
-  }
-
   .media__info {
     display: flex;
     flex-direction: row;
@@ -765,25 +776,6 @@ export default {
     }
   }
 
-  .media__name {
-    strong {
-      font-weight: normal;
-      color: $color__text;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      display:block;
-      margin-bottom:5px;
-      // white-space: nowrap;
-    }
-
-    &:hover {
-      cursor: pointer;
-
-      strong {
-        color: $color__link;
-      }
-    }
-  }
 
   .media__metadatas--options {
     display: none;
@@ -794,17 +786,6 @@ export default {
     display: block;
   }
 
-  .media__actions {
-    min-width:45px * 3;
-
-    @media screen and (max-width: 1140px) {
-      display: none !important;
-    }
-
-    .s--in-editor &{
-      display: none!important;
-    }
-  }
 
   .media__actions-dropDown {
     @media screen and (min-width: 1139px) {
@@ -816,16 +797,16 @@ export default {
     }
   }
 
-  .media.media--hoverable {
-    .media__actions {
-      opacity: 0;
-      transition: opacity 250ms ease;
-    }
+  // .media.media--hoverable {
+  //   .media__actions {
+  //     opacity: 0;
+  //     transition: opacity 250ms ease;
+  //   }
 
-    :hover .media__actions {
-      opacity: 1;
-    }
-  }
+  //   :hover .media__actions {
+  //     opacity: 1;
+  //   }
+  // }
 
   /* Modal with cropper */
   .modal--cropper .cropper__button {

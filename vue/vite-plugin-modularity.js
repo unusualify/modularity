@@ -1,6 +1,18 @@
 import path from 'path'
 import fs from 'fs'
 
+export function getCustomThemes() {
+  return fs.readdirSync(path.join(__dirname, 'src/js/config/themes/customs'), {withFileTypes: true})
+    .filter(dirent => dirent.name.includes('.js'))
+    .map(function(dirent){
+      return dirent.name.substring(0, dirent.name.lastIndexOf('.')) || dirent.name
+    })
+}
+
+export function isCustomTheme(themeName) {
+  return getCustomThemes().includes(themeName)
+}
+
 const refreshPaths = [
   '../../../../lang/**/*',
   './../../../.env'
@@ -141,8 +153,17 @@ export default function modularity (config) {
     transform: (code, id) => {
       let transformedCode
 
+      if (/modularity\/vue\/src\/js\/config\/themes\/index.js$/g.test(id)) {
+        transformedCode = code
+        getCustomThemes().forEach(function(themeName){
+          transformedCode += `\r\nexport {default as ${themeName}} from './customs/${themeName}'`
+        })
+      }
+
       if (/modularity\/vue\/src\/js\/plugins\/vuetify.js$/g.test(id)) {
-        const importThemeStatement = `import 'styles/themes/${pluginConfig.theme}/main.scss'`
+        const appThemeFolder = isCustomTheme(pluginConfig.theme) ? `customs/${pluginConfig.theme}` : `${pluginConfig.theme}`
+        const importThemeStatement = `import 'styles/themes/${appThemeFolder}/main.scss'`
+
         transformedCode = code.replaceAll('@/config/themes\'', `@/config/themes'\r\n${importThemeStatement}`)
       }
 

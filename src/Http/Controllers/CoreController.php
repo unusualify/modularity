@@ -203,9 +203,16 @@ abstract class CoreController extends LaravelController
 
     protected function routeArguments()
     {
-        $hostRoutingArguments = @class_exists('Unusualify\Modularity\Facades\HostRouting')
-            ? \Unusualify\Modularity\Facades\HostRouting::getRouteArguments()
-            : [];
+        // $hostRoutingArguments = @class_exists('Unusualify\Modularity\Facades\HostRouting')
+        //     ? \Unusualify\Modularity\Facades\HostRouting::getRouteArguments()
+        //     : [];
+        // return $this->request->route()
+        //     ? array_merge($this->request->route()->parameters(), $hostRoutingArguments)
+        //     : [];
+        $hostRoutingArguments = @class_exists('Unusualify\Modularity\Facades\HostRoutingRegistrar')
+                                ?  \Unusualify\Modularity\Facades\HostRoutingRegistrar::getRouteArguments()
+                                : [];
+
         return $this->request->route()
             ? array_merge($this->request->route()->parameters(), $hostRoutingArguments)
             : [];

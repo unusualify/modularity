@@ -19,8 +19,10 @@ return [
     'development_url' => "http://" . env('UNUSUAL_DEV_URL', 'localhost:8080'),
     'public_dir' => env('UNUSUAL_ASSETS_DIR', 'unusual'),
     'vendor_path' => env('UNUSUAL_VENDOR_PATH', 'vendor/unusualify/modularity'),
-    'custom_components_resource_path' => 'js/unusual',
+
+    'custom_components_resource_path' => 'vendor/modularity/js/components',
     // 'vendor_components_resource_path' => 'assets/vendor/js/components',
+
     'manifest' => 'unusual-manifest.json',
     'js_namespace' => env('VUE_APP_NAME','UNUSUAL'),
     'build_timeout' => 300,
