@@ -11,6 +11,7 @@ use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Schema;
+use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Unusualify\Modularity\Activators\FileActivator;
 use Unusualify\Modularity\Support\Finder;
 
@@ -402,7 +403,9 @@ class Module extends NwidartModule
     }
 
     public function getConfigPath(){
-        return $this->getPath().'/Config/config.php';
+        $config_folder = GenerateConfigReader::read('config')->getPath();
+
+        return "{$this->getPath()}/{$config_folder}/config.php";
     }
 
 

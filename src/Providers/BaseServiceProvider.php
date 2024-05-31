@@ -164,15 +164,15 @@ class BaseServiceProvider extends ServiceProvider
     private function registerBaseConfigs()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../Config/config.php', $this->baseKey
+            __DIR__ . '/../../config/config.php', $this->baseKey
         );
 
-        foreach (glob(__DIR__ . '/../Config/merges/*.php') as $path) {
+        foreach (glob(__DIR__ . '/../../config/merges/*.php') as $path) {
             extract(pathinfo($path)); // $filename
             $this->mergeConfigFrom($path, $this->baseKey . ".{$filename}");
         }
 
-        $this->mergeConfigFrom(__DIR__ . '/../Config/disks.php', 'filesystems.disks');
+        $this->mergeConfigFrom(__DIR__ . '/../../config/disks.php', 'filesystems.disks');
     }
 
     /**
@@ -398,7 +398,7 @@ class BaseServiceProvider extends ServiceProvider
     private function resolveCommands(): array
     {
         $cmds = [];
-        // dd(glob(__DIR__."/../Console/*.php"));
+
         foreach (glob(__DIR__."/../Console/*.php") as $cmd) {
             preg_match("/[^\/]+(?=\.[^\/.]*$)/", $cmd, $match);
 
@@ -427,8 +427,7 @@ class BaseServiceProvider extends ServiceProvider
     public function mergeKeysFromConfig(array $mergeKeys = []) {
         foreach (config($this->baseKey) as $name => $array) {
             if(in_array($name, $mergeKeys)){
-
-                $this->app['files']->put(__DIR__ . "/../Config/merges/{$name}.php", phpArrayFileContent($array));
+                $this->app['files']->put(__DIR__ . "/../../config/merges/{$name}.php", phpArrayFileContent($array));
             }
         }
     }

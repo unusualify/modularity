@@ -13,35 +13,6 @@ use Unusualify\Modularity\Generators\RouteGenerator;
 
 class RouteMakeCommand extends BaseCommand
 {
-
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    // protected $signature = 'unusual:make:route
-    //     {route : the route name in module}
-    //     {module : the module name}
-    //     {--schema=}
-    //     {--rules=}
-    //     {--notAsk}
-    //     {--f|force}
-    //     {--T|translationTrait}
-    //     {--M|mediaTrait}
-    //     {--F|fileTrait}
-    //     {--P|positionTrait}
-    //     {--all}';
-    // protected $signature = 'unusual:make:route {name} {module}
-    //     {--B|hasBlocks}
-    //     {--T|hasTranslation}
-    //     {--S|hasSlug}
-    //     {--M|HasImages}
-    //     {--F|hasFiles}
-    //     {--P|hasPosition}
-    //     {--R|hasRevisions}
-    //     {--N|hasNesting}
-    //     {--all}';
-
     /**
      * The name and signature of the console command.
      *
