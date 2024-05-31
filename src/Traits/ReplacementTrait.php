@@ -61,13 +61,20 @@ trait ReplacementTrait {
 
         $keys = $replacements[$stub];
 
-        $replaces = [];
-
         if ($stub === 'json' || $stub === 'composer') {
             if (in_array('PROVIDER_NAMESPACE', $keys, true) === false) {
                 $keys[] = 'PROVIDER_NAMESPACE';
             }
         }
+
+        return $this->makeReplaces($keys);
+
+    }
+
+    public function makeReplaces($keys)
+    {
+        $replaces = [];
+
         foreach ($keys as $key) {
             if (method_exists($this, $method = 'get' . ucfirst(Str::studly(strtolower($key))) . 'Replacement')) {
                 $replaces[$key] = $this->$method();
