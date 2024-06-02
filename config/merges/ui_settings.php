@@ -99,28 +99,28 @@ return [
                 ],
                 'cards' => [
                     [
-                    'title' => 'Active Webinar',
-                    'repository' => 'Modules\\Webinar\\Repositories\\VimeoWebinarRepository',
-                    'method' => 'count',
-                    'flex' => 6,
+                        'title' => 'Users',
+                        'repository' => 'Modules\\SystemUser\\Repositories\\UserRepository',
+                        'method' => 'count',
+                        'flex' => 6,
                     ],
                     [
-                    'title' => 'Speaker & Moderators',
-                    'repository' => 'Modules\\Webinar\\Repositories\\ModeratorRepository',
-                    'method' => 'count',
-                    'flex' => 6,
+                        'title' => 'Companies',
+                        'repository' => 'Modules\\SystemUser\\Repositories\\CompanyRepository',
+                        'method' => 'count',
+                        'flex' => 6,
                     ],
                     [
-                    'title' => 'Company',
-                    'repository' => 'Modules\\Webinar\\Repositories\\WebCompanyRepository',
-                    'method' => 'count',
-                    'flex' => 6,
+                        'title' => 'User Roles',
+                        'repository' => 'Modules\\SystemUser\\Repositories\\RoleRepository',
+                        'method' => 'count',
+                        'flex' => 6,
                     ],
                     [
-                    'title' => 'Published Webinars',
-                    'repository' => 'Modules\\Webinar\\Repositories\\VimeoWebinarRepository',
-                    'method' => 'where:web_company_id:3|count',
-                    'flex' => 6,
+                        'title' => 'User Permissions',
+                        'repository' => 'Modules\\SystemUser\\Repositories\\PermissionRepository',
+                        'method' => 'where:company_id:1|count',
+                        'flex' => 6,
                     ],
                 ]
             ],
@@ -134,9 +134,9 @@ return [
                     's' => 12,
                     'class' => 'pl-theme-semi pb-theme-semi',
                 ],
-                'controller' => 'Modules\\Webinar\\Http\\Controllers\\VimeoWebinarController',
+                'controller' => 'Modules\\SystemUser\\Http\\Controllers\\UserController',
                 'attributes' => [
-                    'customTitle' => 'Vimeo Webinars',
+                    'customTitle' => 'System Users',
                     'tableSubtitle' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lobortis.',
                     'tableType' => 'dashboard',
 
@@ -146,27 +146,6 @@ return [
                     'fillHeight' => true,
                     'style' => '',
                     'columns' => [
-                        [
-                            'title' => 'Date',
-                            'key' => 'start_date',
-                            'align' => 'start',
-                            'sortable' => true,
-                            'filterable' => false,
-                            'groupable' => false,
-                            'divider' => false,
-                            'class' => '',
-                            'cellClass' => '',
-                            'width' => '',
-                            // 'max-width' => 'max-content',
-                            'searchable' => true,
-                            'isRowEditable' => true,
-                            'isColumnEditable' => false,
-                            'formatter' => [
-                                // 'date',
-                                // 'numeric'
-                            ]
-                            // 'formatter' => ['date', 'numeric'],
-                        ],
                         [
                             'title' => 'Name',
                             'key' => 'name',
@@ -232,7 +211,7 @@ return [
                                     'elements' => [
                                         [
                                             'tag' => 'v-btn-tertiary',
-                                            'elements' => 'MANAGE RELEASES',
+                                            'elements' => 'MANAGE USERS',
                                         ]
                                     ]
                                 ]
@@ -251,7 +230,7 @@ return [
                     's' => 12,
                     'class' => 'pl-theme-semi pb-theme-semi',
                 ],
-                'controller' => 'Modules\\Webinar\\Http\\Controllers\\VimeoWebinarController',
+                'controller' => 'Modules\SystemUser\\Http\\Controllers\\UserController',
                 'attributes' => [
                     'customTitle' => 'Vimeo Webinars',
                     'tableSubtitle' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lobortis.',
@@ -264,27 +243,6 @@ return [
                     'fillHeight' => true,
                     'style' => '',
                     'columns' => [
-                        [
-                            'title' => 'Date',
-                            'key' => 'start_date',
-                            'align' => 'start',
-                            'sortable' => true,
-                            'filterable' => false,
-                            'groupable' => false,
-                            'divider' => false,
-                            'class' => '',
-                            'cellClass' => '',
-                            'width' => '',
-                            // 'max-width' => 'max-content',
-                            'searchable' => true,
-                            'isRowEditable' => true,
-                            'isColumnEditable' => false,
-                            'formatter' => [
-                                // 'date',
-                                // 'numeric'
-                            ]
-                            // 'formatter' => ['date', 'numeric'],
-                        ],
                         [
                             'title' => 'Name',
                             'key' => 'name',
@@ -305,7 +263,7 @@ return [
                         ],
                         [
                             'title' => 'Company',
-                            'key' => 'webCompany_relation',
+                            'key' => 'company_relation',
                             'align' => 'start',
                             'sortable' => false,
                             'filterable' => false,
@@ -373,7 +331,7 @@ return [
                                     'elements' => [
                                         [
                                             'tag' => 'v-btn-tertiary',
-                                            'elements' => 'MANAGE RELEASES',
+                                            'elements' => 'MANAGE USERS',
                                         ]
                                     ]
                                 ]
