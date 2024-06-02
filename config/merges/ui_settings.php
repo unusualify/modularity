@@ -232,7 +232,7 @@ return [
                 ],
                 'controller' => 'Modules\SystemUser\\Http\\Controllers\\UserController',
                 'attributes' => [
-                    'customTitle' => 'Vimeo Webinars',
+                    'customTitle' => 'System Users',
                     'tableSubtitle' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lobortis.',
                     'tableType' => 'dashboard',
                     'hideHeaders' => false,
