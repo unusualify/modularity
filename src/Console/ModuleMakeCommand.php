@@ -38,6 +38,14 @@ class ModuleMakeCommand extends BaseCommand
      */
     protected $console;
 
+    private function getPlainOption(){
+        return !(
+            $this->option('relationships')
+            || $this->option('schema')
+            || $this->option('rules')
+        );
+    }
+
     public function handle() : int
     {
 
@@ -85,7 +93,7 @@ class ModuleMakeCommand extends BaseCommand
             + ( $this->option('force') ?  ['--force' => true] : [])
             + ( $this->option('no-migrate') ?  ['--no-migrate' => true] : [])
             + ( $this->option('no-defaults') ?  ['--no-defaults' => true] : [])
-            + ( $this->option('plain') ?  ['-p' => true] : [])
+            + ( ['-p' => $this->getPlainOption()])
             + $console_traits
             + ['--notAsk' => true]
         );
@@ -116,7 +124,7 @@ class ModuleMakeCommand extends BaseCommand
             ['rules', null, InputOption::VALUE_OPTIONAL, 'The specified validation rules for FormRequest.', null],
             ['relationships', null, InputOption::VALUE_OPTIONAL, 'The many to many relationships.', null],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
-            ['plain', null, InputOption::VALUE_NONE, 'Don\'t create route.'],
+            // ['plain', null, InputOption::VALUE_NONE, 'Don\'t create route.'],
             ['no-migrate', null, InputOption::VALUE_NONE, 'don\'t migrate.'],
             ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
