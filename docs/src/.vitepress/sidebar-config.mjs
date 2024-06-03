@@ -1,19 +1,9 @@
 import { defineConfig } from 'vitepress'
-import  sideBarGenerate   from '../pages/user-guide/sidebar-generator.mjs'
 
+import sideBarV2 from './sidebar-generator.mjs'
+// sideBarV2('./src/pages')
 export const sidebarConfig = defineConfig({
-
-
-    sidebar: {
-        '/user-guide/': {
-            base: '/user-guide/', items: sideBarGenerate('user-guide')
-        },
-        '/developer-guide/' : {
-            base: '/developer-guide/', items : sideBarGenerate('developer-guide')
-        }
-
-
-    },
+    sidebar: await sideBarV2('./src/pages')
 })
 
 
