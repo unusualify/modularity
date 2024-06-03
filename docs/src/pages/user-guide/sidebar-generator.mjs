@@ -1,8 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 
-export default function(){
-        const dirs = fs.readdirSync('./src/pages/user-guide/', {
+export default function(path){
+        const dirs = fs.readdirSync(`./src/pages/${path}/`, {
             recursive: true,
             withFileTypes: true,
 
