@@ -68,7 +68,8 @@ final class LaravelServiceProvider extends ServiceProvider
             __DIR__ . '/../config/publishes/priceable.php' => config_path('priceable.php'),
             __DIR__ . '/../config/publishes/permission.php' => config_path('permission.php'),
             __DIR__ . '/../config/publishes/activitylog.php' => config_path('activitylog.php'),
-            base_path('vendor/torann/geoip/config/geoip.php') => config_path('geoip.php'),
+            __DIR__ . '/../config/publishes/geoip.php' => config_path('geoip.php'),
+            // base_path('vendor/torann/geoip/config/geoip.php') => config_path('geoip.php'),
         ], 'config');
 
     }
