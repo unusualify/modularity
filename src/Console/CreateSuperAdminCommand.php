@@ -214,7 +214,7 @@ class CreateSuperAdminCommand extends BaseCommand
      */
     private function validateEmail($email)
     {
-        $admin_user_table = $this->config->get(env('UNUSUAL_BASE_NAME', 'modularity') . '.table.users', 'admin_users');
+        $admin_user_table = $this->config->get(env('MODULARITY_BASE_NAME', 'modularity') . '.table.users', 'admin_users');
         return $this->validatorFactory->make(['email' => $email], [
             'email' => 'required|email|max:255|unique:' . $admin_user_table,
         ])->passes();

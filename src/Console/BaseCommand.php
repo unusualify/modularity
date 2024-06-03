@@ -40,7 +40,7 @@ class BaseCommand extends GeneratorCommand
     {
         parent::__construct();
 
-        $this->configBaseKey = \Illuminate\Support\Str::snake(env('UNUSUAL_BASE_NAME', 'Modularity'));
+        $this->configBaseKey = \Illuminate\Support\Str::snake(env('MODULARITY_BASE_NAME', 'Modularity'));
 
         Stub::setBasePath( $this->baseConfig('stubs.path', dirname(__FILE__).'/stubs') );
     }
