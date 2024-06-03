@@ -52,7 +52,7 @@ final class LaravelServiceProvider extends ServiceProvider
         //     __DIR__ . '/../vue/dist' => public_path(''),
         // ], 'assets');
         $this->publishes([
-            __DIR__ . '/../vue/dist' => public_path('vendor'),
+            __DIR__ . '/../vue/dist/modularity' => public_path('vendor/modularity'),
         ], 'assets');
     }
 

@@ -2,6 +2,8 @@
 
 namespace Unusualify\Modularity\Console;
 
+use Illuminate\Support\Facades\File;
+
 class RefreshCommand extends BaseCommand
 {
 
@@ -26,6 +28,8 @@ class RefreshCommand extends BaseCommand
      */
     public function handle() :int
     {
+        File::deleteDirectory(public_path('vendor/modularity'));
+
         $this->publishAssets();
         $this->call('cache:clear');
         $this->call('view:clear');
