@@ -1,4 +1,4 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="./modularity.jpeg" width="200" alt="Laravel Logo"></a></p>
+<p align="center"><a href="https://unusualify.com/modularity" target="_blank"><img src="./modularity.jpeg" width="200" alt="Modulariy Logo"></a></p>
 
 <p align="center">
 <a href="https://packagist.org/packages/unusualify/modularity"><img src="https://img.shields.io/packagist/dt/unusualify/modularity" alt="Total Downloads"></a>
