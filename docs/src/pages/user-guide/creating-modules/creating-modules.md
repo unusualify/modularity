@@ -83,4 +83,106 @@ Default route generation automatically runs migrations. You can skip migration w
 Force the operation to run when the route files already exist. Use this option to override the route files with new options.
 
 ## Defining Model Schema
+Model schema is where you define your enties' attributes (columns) and these attributes' types and modifiers. Modularity schema builder contains all availiable column types and column modifiers in Laravel Framework
+
+( See [Availiable Laravel Column Types](https://laravel.com/docs/11.x/migrations#available-column-types){target="_self"} -  [Available Laravel Column Modifiers](https://laravel.com/docs/11.x/migrations#column-modifiers){target="_self"} )
+
+::: danger Relationships
+
+Defining relation type attributes are different in Unusualify/Modularity.
+
+:::
+
+### Usage
+
+**Defining a series of attributes**
+
+When defining a series of entity attributes, desired schema should be typed between double quotes `"`, columnTypes should be seperated by colons `:` and lastly attributes should be seperated by commas `,` if exist.
+
+```sh
+$ php artisan unusual:make:route ModuleName RouteName --schema="attributeName:columnType#1:columnType#2,attributeName#2:...columnType#:..columnModifiers#"
+```
+Running this command will generate your model's 
+ - `controller`, with source methods
+ - `migration` files with defined columns
+ - `routes`,
+ - `entity` with fillable array,
+ - `request` with default methods
+ - `repository`
+ - `index` and `form` blade components with default configuration
+ - also module config file will be overriden with route properties 
+  
+::: tip Module Config.php
+Module config file is where user interface, CRUD form schema and etc. can be customized. Please see [Module Config]()
+:::
+
+For an example, assume building a user entity with string name and string, unique email address underneath the Authentication module:
+```sh
+$ php artisan unusual:make:route Authentication User --schema="name:string,email:string:unique"
+```
+
+
+<br/>
+
+## **Defining relations between routes**
+
+In Laravel migrations, only `foreignId` and `morphs` column types can be used to define relationsips between models. In Modularity, `reverse relationship method names` can be used as an attribute while creating route. 
+
+::: warning Reverse Relations
+Since creating route command will automatically create all of the required files and running migrations, it is suggested to follow `reverse relationship` path to define relation between models
+:::
+
+**Presentation**
+
+Assume database schema as follows, for a Module `Citizens`, with recorded citizens and their cars. A citizen can have many cars,
+
+```sh
+#Module Name : Citizens
+
+citizen
+    id - integer
+    name - string
+    citizen_id - integer (unique)
+
+cars
+    id - integer
+    model - string
+    user_id - integer
+```
+
+Following the given example, creating user route:
+```sh
+$ php artisan unusual:make:route Aparment Citizen --schema="name:string,citizen_id:integer:unique"
+```
+`Citizen` route is now generated with all required files. Next, we can create `Car` route with `belongsTo` relationship related column(s) and model method(s) with the following artisan command:
+```sh
+$ php artisan unusual:make:route Aparment Car --schema="model:string,plate:string:unique,citizen:belongsTo"
+```
+Runnings these couple of commands, will also create relationship related model methods as:
+```php
+
+// Citizen.php
+public function cars() : \Illuminate\Database\Eloquent\Relations\HasMany
+	{
+		return $this->hasMany(\Modules\Testify\Entities\Car::class);
+	}
+
+// Car.php
+public function citizen(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsto(\Modules\Testify\Entities\Citizen::class, 'citizen_id', 'id')
+    }
+```
+
+Also migration of the Car route will be generated with the line:
+```php
+$table->foreignId('testify_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
+```
+
+
+::: tip Relationship Summary
+While defining direct relationships that will affect migration and database tables, `--schema` option should be used. On the other hand, with un-direct relations like `many-to-many` and `through` relations you need to use `--relationships` option
+:::
+
+### Available Relationship Methods
 
