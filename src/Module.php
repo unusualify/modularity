@@ -417,8 +417,9 @@ class Module extends NwidartModule
      * @return bool
      */
     public function isFileExists($fileName){
+
         $pattern = $this->getDirectoryPath('**/*/*' . $fileName . '*');
-        // $pattern = base_path('Modules/'.$this->module->getStudlyName().'/**/*/*'.$fileName.'*');
+
         $search = glob($pattern);
 
         return !empty($search);

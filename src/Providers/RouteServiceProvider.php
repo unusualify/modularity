@@ -179,24 +179,24 @@ class RouteServiceProvider extends ServiceProvider
                 $router,
                 $_groupOptions,
                 ['web'], //$middlewares,
-                $module->getClassNamespace("{$controller_namespace}"), //config('modules.namespace', 'Modules') . "\\" . $module->getStudlyName() . '\Http\Controllers',
-                $module->getDirectoryPath("{$routes_folder}/web.php"), //$module->getPath()."/Routes/web.php",
+                $module->getClassNamespace("{$controller_namespace}"),
+                $module->getDirectoryPath("{$routes_folder}/web.php"),
                 true
             );
             UnusualRoutes::registerRoutes(
                 $router,
                 $_groupOptions,
                 ['api'], //$middlewares,
-                $module->getClassNamespace("{$controller_namespace}\API"), //config('modules.namespace', 'Modules') . "\\" . $module->getStudlyName() . '\Http\Controllers',
-                $module->getDirectoryPath("{$routes_folder}/api.php"), //$module->getPath()."/Routes/web.php",
+                $module->getClassNamespace("{$controller_namespace}\API"),
+                $module->getDirectoryPath("{$routes_folder}/api.php"),
                 true
             );
             UnusualRoutes::registerRoutes(
                 $router,
                 [],
                 ['web'], //$middlewares,
-                $module->getClassNamespace("{$controller_namespace}\Front"), //config('modules.namespace', 'Modules') . "\\" . $module->getStudlyName() . '\Http\Controllers',
-                $module->getDirectoryPath("{$routes_folder}/front.php"), //$module->getPath()."/Routes/web.php",
+                $module->getClassNamespace("{$controller_namespace}\Front"),
+                $module->getDirectoryPath("{$routes_folder}/front.php"),
                 true
             );
         }
