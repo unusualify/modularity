@@ -99,6 +99,7 @@ class Install extends BaseCommand
             'publishConfig',
             'publishAssets',
             'publishViews',
+            'publishLang',
         ];
 
 
@@ -192,6 +193,17 @@ class Install extends BaseCommand
         $this->call('vendor:publish', [
             '--provider' => 'Unusualify\Modularity\LaravelServiceProvider',
             '--tag' => 'views'
+        ]);
+    }
+
+    private function publishLang(){
+
+        info("\t Publishing default langs");
+
+
+        $this->call('vendor:publish', [
+            '--provider' => 'Unusualify\Modularity\LaravelServiceProvider',
+            '--tag' => 'lang'
         ]);
     }
 

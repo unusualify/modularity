@@ -71,11 +71,11 @@ IF #locale column not found on imageables table
 
 from
     (?<=[Config::get\(|config\(])\s?'base\.
-    (?<=[Config::get\(|config\(])\s?\\Illuminate\\Support\\Str::snake\(env\('UNUSUAL_BASE_NAME',\s?'Base'\)\)\s?\.\s?'\.
-    (?<=[Config::get\(|config\(])\s?Str::snake\(env\('UNUSUAL_BASE_NAME',\s?'Base'\)\)\s?\.\s?'\.
+    (?<=[Config::get\(|config\(])\s?\\Illuminate\\Support\\Str::snake\(env\('MODULARITY_BASE_NAME',\s?'Base'\)\)\s?\.\s?'\.
+    (?<=[Config::get\(|config\(])\s?Str::snake\(env\('MODULARITY_BASE_NAME',\s?'Base'\)\)\s?\.\s?'\.
     (?<=[Config::get\(|config\(])\s?getUnusualBaseKey\(\)\s?\.\s?'\.
 to 
-    \Illuminate\Support\Str::snake(env('UNUSUAL_BASE_NAME', 'Base')) . '.
+    \Illuminate\Support\Str::snake(env('MODULARITY_BASE_NAME', 'Base')) . '.
     unusualBaseKey() . '.
 
 from 
