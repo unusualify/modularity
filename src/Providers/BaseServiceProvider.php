@@ -240,7 +240,7 @@ class BaseServiceProvider extends ServiceProvider
 
         // timokoerber/laravel-one-time-operations directory set
         config([
-            'one-time-operations.directory' => unusualConfig('vendor_path'). '/src/Operations',
+            'one-time-operations.directory' => unusualConfig('vendor_path'). '/operations',
         ]);
 
         $modularityIsCacheable = !($this->app->runningInConsole() && $this->app->runningConsoleCommand([
