@@ -2,7 +2,7 @@
     "name": "unusualify/modularity",
     "type": "library",
     "license": "MIT",
-    "description": "Unusual CRM Base for module development",
+    "description": "Modularity infrastructure for module development",
     "keywords": [
         "unusual",
         "unusualify",
@@ -68,7 +68,7 @@
     "autoload": {
         "psr-4": {
             "Unusualify\\Modularity\\": "src",
-            "Modules\\": "src/UModules"
+            "Modules\\": "umodules"
         },
         "files": [
           "src/Support/Migrations/SchemaParser.php",

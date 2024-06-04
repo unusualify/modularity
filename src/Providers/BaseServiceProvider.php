@@ -232,7 +232,7 @@ class BaseServiceProvider extends ServiceProvider
 
         // Nwidart/laravel-modules scan enabled & scan path addition
         $scan_paths = config('modules.scan.paths');
-        array_push($scan_paths, base_path( unusualConfig('vendor_path') . '/src/UModules'));
+        array_push($scan_paths, base_path( unusualConfig('vendor_path') . '/umodules'));
         config([
             'modules.scan.enabled' => true,
             'modules.scan.paths' => $scan_paths
