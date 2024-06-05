@@ -28,7 +28,7 @@ class ComposerMergeCommand extends BaseCommand
     public function handle() :int
     {
         $composerPath = base_path( $this->option('production') ? 'composer.json' : 'composer-dev.json');
-        $modulesFolderName = trim(config('modules.namespace', 'Modules'), '\/');
+        $modulesFolderName = trim(config('modules.paths.modules', 'modules'), '\/');
         $modulesPattern = "$modulesFolderName/*/composer.json";
 
         $composer = $this->laravel['files']->json($composerPath);
