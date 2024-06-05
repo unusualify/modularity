@@ -168,7 +168,7 @@ You can either select the default settings or type your custom e-mail and passwo
 :::
 
 ::: details Creating Super Admin
-Creating one or more super-admin account with custom e-mail and password is avaliable. See [Creating Super Admin]('\')
+Creating one or more super-admin account with custom e-mail and password is avaliable. See [Creating Super Admin](./)
 :::
 
 ## File Structure

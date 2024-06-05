@@ -73,5 +73,5 @@ Since authorization will be dealt with the User model itself, and capabilities o
 |    └─ routes_statuses.json*
 ``` 
 ::: tip
-In many use-cases user is suggested to use --plain module constructing option. Please see [Creating a Module](../creating-modules/creating-modules)
+In many use-cases user is suggested to use --plain module constructing option. Please see [Creating a Module](./creating-modules.md)
 :::
