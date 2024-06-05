@@ -1,4 +1,4 @@
-<p align="center"><a href="https://unusualify.com/modularity" target="_blank"><img src="./modularity.png" width="200" alt="Modulariy Logo"></a></p>
+<p align="center"><a href="https://modularity.unusualify.com" target="_blank"><img src="./modularity.png" width="200" alt="Modulariy Logo"></a></p>
 
 <p align="center">
 <a href="https://packagist.org/packages/unusualify/modularity"><img src="https://img.shields.io/packagist/dt/unusualify/modularity" alt="Total Downloads"></a>
@@ -37,11 +37,11 @@ Modularity is a Laravel and Vuetify powered, developer toolkit that aims to impr
 
 ## Learning Modularity
 
-Modularity has the most extensive and thorough [documentation](https://unusualify.com/modularity).
+Modularity has the most extensive and thorough [documentation](https://modularity.unusualify.com).
 
 ## Contributing
 
-Thank you for considering contributing to the Modularity toolkit! The contribution guide can be found in the [Modularity documentation](https://unusualify.com/modularity/contributions).
+Thank you for considering contributing to the Modularity toolkit! The contribution guide can be found in the [Modularity documentation](https://modularity.unusualify.com/contributions).
 
 <!-- ## Code of Conduct
 
