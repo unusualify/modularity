@@ -60,12 +60,12 @@ $ php artisan unusual:make:route YourModuleName YourRouteName --options*
 ```
 This will automatically create route with its `Controllers` `Entity` `Migration File` `Repository` `Request` `Resource` and also its route files like `web.php` and default ``index`` and ``form`` blade components.
 ::: tip Customization and Config File
-As mentioned, config.php file underneath the module folder can and should be used to customize forms, user interfaces and etc. (See [Module Config]()). You do not need to customize generated files to reach your goals mostly.
+As mentioned, config.php file underneath the module folder can and should be used to customize forms, user interfaces and etc. (See [Module Config]). You do not need to customize generated files to reach your goals mostly.
 :::
 
 
 ::: tip IMPORTANT
-This documentation will include brief explanation of the technical information about create route command. For further presentation about Modularity Know-how please see [Examples]()
+This documentation will include brief explanation of the technical information about create route command. For further presentation about Modularity Know-how please see [Examples]
 :::
 
 ## Artisan Command Options
@@ -74,7 +74,7 @@ This documentation will include brief explanation of the technical information a
 #### `--schema`
 Use this option to define your model's database schema. It will automatically configure your migration files. 
 #### `--relationships`
-Relationships option should not be confict with migration relationships. Database migrations should be set on the `--schema` option. On the other hand, `--relationship` options will be used to define model relationship methods like `Polymorphic Relationships` where you need a pivot or any other external database table to define relationships. See [Example Page]()
+Relationships option should not be confict with migration relationships. Database migrations should be set on the `--schema` option. On the other hand, `--relationship` options will be used to define model relationship methods like `Polymorphic Relationships` where you need a pivot or any other external database table to define relationships. See [Example Page]
 #### `--rules`
 Rules options will be used to define CRUD form validations for both backend and front-end validation scripts. 
 #### `--no-migrate`
@@ -113,7 +113,7 @@ Running this command will generate your model's
  - also module config file will be overriden with route properties 
   
 ::: tip Module Config.php
-Module config file is where user interface, CRUD form schema and etc. can be customized. Please see [Module Config]()
+Module config file is where user interface, CRUD form schema and etc. can be customized. Please see [Module Config]
 :::
 
 For an example, assume building a user entity with string name and string, unique email address underneath the Authentication module:
@@ -162,13 +162,13 @@ Runnings these couple of commands, will also create relationship related model m
 ```php
 
 // Citizen.php
-public function cars() : \Illuminate\Database\Eloquent\Relations\HasMany
+public function cars : \Illuminate\Database\Eloquent\Relations\HasMany
 	{
 		return $this->hasMany(\Modules\Testify\Entities\Car::class);
 	}
 
 // Car.php
-public function citizen(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+public function citizen: \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsto(\Modules\Testify\Entities\Citizen::class, 'citizen_id', 'id')
     }
@@ -176,7 +176,7 @@ public function citizen(): \Illuminate\Database\Eloquent\Relations\BelongsTo
 
 Also migration of the Car route will be generated with the line:
 ```php
-$table->foreignId('testify_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
+$table->foreignId('testify_id')->constrained->onUpdate('cascade')->onDelete('cascade');
 ```
 
 

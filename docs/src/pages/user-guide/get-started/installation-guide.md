@@ -97,7 +97,7 @@ VUE_DEV_PORT=5173
 VUE_DEV_HOST=localhost
 VUE_DEV_PROXY=
 ```
-Admin panel application user interface is highly customizable through module configs. Also you can create your own custom `Vue` components in order to use in user interface. For further information see [Vue Component Sayfası](). In summary,
+Admin panel application user interface is highly customizable through module configs. Also you can create your own custom `Vue` components in order to use in user interface. For further information see [Vue Component Sayfası] . In summary,
 * A custom theme can be constructed, its name should be defined with `VUE_APP_THEME`
 * Vue app locale language and fallback language should be setted
 * Vue dev port should be setted, can be same as the locale port
@@ -106,7 +106,7 @@ Admin panel application user interface is highly customizable through module con
   
 
 ::: tip
-You can do further custom configuration through ``config`` files which are stored in the `config` directory. See [Configs]()
+You can do further custom configuration through ``config`` files which are stored in the `config` directory. See [Configs] 
 :::
 
 
@@ -135,7 +135,7 @@ A Modularity Project heavily depends on the configration files that will be publ
 :::
 
 ::: tip Customization
-This page will be continue with the complete installment option with the default configrations. See [Config Customization](./) to inspect other options 
+This page will be continue with the complete installment option with the default configrations. See [Config Customization] to inspect other options 
 :::
 
 Starting installation with the `Complete Installment` option will,
@@ -168,7 +168,7 @@ You can either select the default settings or type your custom e-mail and passwo
 :::
 
 ::: details Creating Super Admin
-Creating one or more super-admin account with custom e-mail and password is avaliable. See [Creating Super Admin](./)
+Creating one or more super-admin account with custom e-mail and password is avaliable. See [Creating Super Admin]
 :::
 
 ## File Structure

@@ -17,8 +17,7 @@ export default defineConfig({
     ],
 
   },
-
-  rewrites: {
-    ':smt/:pkg/(.*)' : ':smt/(.*)'
-  }
+  // rewrites: {
+  //   ':smt/:pkg/(.*)' : ':smt/(.*)'
+  // }
 })
