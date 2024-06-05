@@ -4,7 +4,7 @@ use Unusualify\Modularity\Activators\FileActivator;
 
 return [
     'namespace' => env('BASE_NAMESPACE','Unusualify\\Modularity'),
-    'name' => env('UNUSUAL_BASE_NAME','Modularity'),
+    'name' => env('MODULARITY_BASE_NAME','Modularity'),
 
     'system_prefix' => 'system',
 
@@ -19,13 +19,13 @@ return [
     'is_development' => env('UNUSUAL_DEV', false),
     'development_url' => "http://" . env('UNUSUAL_DEV_URL', 'localhost:8080'),
     'public_dir' => env('UNUSUAL_ASSETS_DIR', 'unusual'),
-    'vendor_path' => env('UNUSUAL_VENDOR_PATH', 'vendor/unusualify/modularity'),
+    'vendor_path' => env('MODULARITY_VENDOR_PATH', 'vendor/unusualify/modularity'),
 
     'custom_components_resource_path' => 'vendor/modularity/js/components',
     // 'vendor_components_resource_path' => 'assets/vendor/js/components',
 
     'manifest' => 'unusual-manifest.json',
-    'js_namespace' => env('VUE_APP_NAME','UNUSUAL'),
+    'js_namespace' => env('VUE_APP_NAME','MODULARITY'),
     'build_timeout' => 300,
     'use_big_integers_on_migrations' => true,
 

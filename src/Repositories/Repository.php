@@ -1367,7 +1367,7 @@ abstract class Repository
             }
         }
 
-        $reflector = new \ReflectionClass($this->model());
+        $reflector = new \ReflectionClass($this->getModel());
 
         // dd(
         //     $this->model,
