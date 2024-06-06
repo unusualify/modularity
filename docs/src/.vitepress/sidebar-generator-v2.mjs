@@ -1,79 +1,89 @@
 import fs from 'fs'
-import path from 'path'
-import {glob} from 'glob'
+import  matter  from 'gray-matter'
+
+const readFrontMatterSync = (fname) => {
+  try {
+    const readFile = fs.readFileSync(`${fname}`, 'utf-8')
+    const data = matter(readFile).data
+    return {
+      sidebarPos: data?.sidebarPos ?? 99,
+      text: data?.sidebarTitle ?? '',
+    }
+  } catch (error) {
+    return {
+      sidebarPos: 99,
+    }
+  }
+}
 
 const generateFileName = (fname = '') => {
-    return fname.split('-').map(word => word.charAt(0).toUpperCase().concat(word.slice(1))).join(' ').replace('.md','')
+  return fname.split('-').map(word => word.charAt(0).toUpperCase().concat(word.slice(1))).join(' ').replace('.md','')
 }
 
 const generateLinkToFile = (fname = '') => {
-    return fname
+  return fname
 }
 
-const generateMdItem = (fname) => {
-
-    return {
-        text: generateFileName(fname),
-        link: generateLinkToFile(fname)
-    }
+const generateMdItem = (fname, sidebarPos) => {
+  return {
+    text: generateFileName(fname),
+    link: generateLinkToFile(fname),
+    sidebarPos: sidebarPos,
+  }
 }
 
-const readLevel = (srcDir, to) => {
+const readLevel =  (srcDir, to) => {
+  let itemList = []
 
-    let itemList = []
+  const dirs = fs.readdirSync(`${srcDir}/${to}/`,{
+    recursive: true,
+    withFileTypes: true,
+  })
 
-    const dirs = fs.readdirSync(`${srcDir}/${to}/`,{
-        recursive: true,
-        withFileTypes: true,
-    })
+  dirs.forEach(
+    dir =>  {
+      if(dir.isFile() && !dir.name.includes('index')){
 
-
-    dirs.forEach(
-        dir => {
-            if(dir.isFile() && !dir.name.includes('index')){
-                itemList.push(generateMdItem(dir.name))
-            }else if(dir.isDirectory()){
-                itemList.push({
-                    text: generateFileName(dir.name),
-                    base: `/${to}/${dir.name}/`,
-                    collapsed: false,
-                    items: readLevel(`${srcDir}`,`${to}/${dir.name}`)
-                })
-            }
+        const filematter = readFrontMatterSync(`${srcDir}/${to}/${dir.name}`)
+        itemList.push(generateMdItem(dir.name, filematter.sidebarPos))
+        }else if(dir.isDirectory()){
+          itemList.push({
+            text: generateFileName(dir.name),
+            base: `/${to}/${dir.name}/`,
+            collapsed: true,
+            sidebarPos: readFrontMatterSync(`${srcDir}/${to}/${dir.name}/index.md`)?.sidebarPos,
+            items: readLevel(`${srcDir}`,`${to}/${dir.name}`),
+          })
         }
-    )
+    }
+  )
+  itemList.sort((a,b) => a.sidebarPos - b.sidebarPos)
 
-
-    return itemList
+  return itemList
 }
 
 
 export default async function(srcDir = 'src/pages/'){
 
-    let sidebarConfig = []
+  let sidebarConfig = []
 
-    // Gathering first level of sidebar headers
-    let rawDirNames = fs.readdirSync(`${srcDir}`, {
-        withFileTypes: true,
-    })
-    .filter(dir => dir.isDirectory())
+  // Gathering first level of sidebar headers
+  let rawDirNames = fs.readdirSync(`${srcDir}`, {
+    withFileTypes: true,
+  })
+  .filter(dir => dir.isDirectory())
+  .map(dir => dir.name)
 
-    .map(dir => dir.name)
-    .sort().reverse()
-
-
-    console.log(rawDirNames)
-
-    for(const index in rawDirNames){
-        const dir = rawDirNames[index]
-        const dirName = generateFileName(dir)
-        sidebarConfig.push(
-            {
-                text: dirName,
-                collapsed: false,
-                base: `/${dir}/`,
-                items: readLevel(srcDir, dir),
-            })
-    }
-    return sidebarConfig
+  for(const index in rawDirNames){
+    const dir = rawDirNames[index]
+    const dirName = generateFileName(dir)
+    sidebarConfig.push(
+      {
+        text: dirName,
+        collapsed: false,
+        base: `/${dir}/`,
+        items: readLevel(srcDir, dir),
+      })
+  }
+  return sidebarConfig
 }

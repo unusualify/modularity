@@ -7,7 +7,6 @@ import { sidebarConfig } from './sidebar-config.mjs'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   ...shared,
-
   description: "Modularity Docs",
   themeConfig: {
     ...navConfig,

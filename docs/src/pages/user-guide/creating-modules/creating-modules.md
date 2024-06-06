@@ -1,12 +1,6 @@
 ---
 # https://vitepress.dev/reference/default-theme-home-page
-layout: doc
-
-prev:
-  text: 'Introduction'
-  link: '../creating-modules/introduction'
-
-
+sidebarPos: 2
 
 ---
 # Creating a Module

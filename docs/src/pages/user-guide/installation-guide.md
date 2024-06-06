@@ -1,3 +1,8 @@
+---
+sidebarPos: 2
+---
+
+
 # Modularity Setup
 This document will discuss about installation and required configurations for installation of the package.
 

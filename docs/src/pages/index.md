@@ -9,9 +9,12 @@ hero:
   actions:
     - theme: brand
       text: What is Modularity?
-      link: user-guide/get-started/what-is-modularity
+      link: user-guide/what-is-modularity
     - theme: alt
-      text: Developer Guide
+      text: Get Started
+      link: user-guide/installation-guide
+    - theme: alt
+      text: Contribution Guide
       link: developer-guide/api-examples
     - theme: alt
       text: GitHub

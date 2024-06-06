@@ -1,3 +1,8 @@
+---
+sidebarPos: 1
+
+---
+
 # What is Modularity
 [Unusualify/Modularity](https://github.com/unusualify/modularity) is a Laravel and Vuetify.js powered, developer tool that aims to improve developer experience on conducting full stack development process. On Laravel side, Modularity manages your large scale projects using modules, where a module similar to a single Laravel project, having some views, controllers or models. With the abilities of Vuetify.js, Modularity presents various of dynamic, configurable UI components to auto-construct a CRM for your project.
 
