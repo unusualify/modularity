@@ -18,11 +18,6 @@ const generateMdItem = (fname) => {
     }
 }
 
-
-const generatedHeader = (fname) => {
-
-}
-
 const readLevel = (srcDir, to) => {
 
     let itemList = []
@@ -35,27 +30,22 @@ const readLevel = (srcDir, to) => {
 
     dirs.forEach(
         dir => {
-            if(dir.isFile()){
+            if(dir.isFile() && !dir.name.includes('index')){
                 itemList.push(generateMdItem(dir.name))
-                // console.log(generateMdItem(dir.name))
             }else if(dir.isDirectory()){
-
                 itemList.push({
-                    text: dir.name,
+                    text: generateFileName(dir.name),
+                    base: `/${to}/${dir.name}/`,
                     collapsed: false,
-                    items: readLevel(`${srcDir}/${to}`,dir.name)
+                    items: readLevel(`${srcDir}`,`${to}/${dir.name}`)
                 })
             }
         }
     )
 
-    console.log(itemList)
+
     return itemList
 }
-
-
-
-
 
 
 export default async function(srcDir = 'src/pages/'){
@@ -63,20 +53,20 @@ export default async function(srcDir = 'src/pages/'){
     let sidebarConfig = []
 
     // Gathering first level of sidebar headers
-    let rawDirNames = await glob(`${srcDir}/**`, {
-        maxDepth: 3,
-        ignore: '**/index.md'
-
+    let rawDirNames = fs.readdirSync(`${srcDir}`, {
+        withFileTypes: true,
     })
-    .then(dirs => dirs.map(dir => path.relative(srcDir, dir))
-    .filter(dir => dir.length)) // filtered ''(srcDir itself) with string pattern usage
+    .filter(dir => dir.isDirectory())
+
+    .map(dir => dir.name)
+    .sort().reverse()
+
+
+    console.log(rawDirNames)
 
     for(const index in rawDirNames){
         const dir = rawDirNames[index]
         const dirName = generateFileName(dir)
-        let dirMdFiles = []
-
-
         sidebarConfig.push(
             {
                 text: dirName,
@@ -85,7 +75,5 @@ export default async function(srcDir = 'src/pages/'){
                 items: readLevel(srcDir, dir),
             })
     }
-    // console.log(sidebarConfig)c
-    console.log(sidebarConfig)
     return sidebarConfig
 }
