@@ -83,7 +83,7 @@ Model schema is where you define your enties' attributes (columns) and these att
 
 ::: danger Relationships
 
-Defining relation type attributes are different in Unusualify/Modularity.
+Defining relation type attributes are different in Unusualify/Modularity. Please see [Defining Relationships](#defining-relations-between-routes)
 
 :::
 
@@ -156,13 +156,13 @@ Runnings these couple of commands, will also create relationship related model m
 ```php
 
 // Citizen.php
-public function cars : \Illuminate\Database\Eloquent\Relations\HasMany
+public function cars() : \Illuminate\Database\Eloquent\Relations\HasMany
 	{
 		return $this->hasMany(\Modules\Testify\Entities\Car::class);
 	}
 
 // Car.php
-public function citizen: \Illuminate\Database\Eloquent\Relations\BelongsTo
+public function citizen(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsto(\Modules\Testify\Entities\Citizen::class, 'citizen_id', 'id')
     }
@@ -175,8 +175,21 @@ $table->foreignId('testify_id')->constrained->onUpdate('cascade')->onDelete('cas
 
 
 ::: tip Relationship Summary
-While defining direct relationships that will affect migration and database tables, `--schema` option should be used. On the other hand, with un-direct relations like `many-to-many` and `through` relations you need to use `--relationships` option
+While defining direct relationships that will affect migration and database tables, `--schema` option should be used. On the other hand, with un-direct relations like `many-to-many` and `through` relations you need to use `--relationships` option. This option will set required pivot table and required model methods without altering migration files.
 :::
 
 ### Available Relationship Methods
+For this version of `Unusualify/Modularity`, available relationship methods can be defined are:
+| Reverse Relationship| Relationship|
+|:--------------------|------------:|
+| belongsTo           | hasMany     |
+| morphTo            | morphMany      |
+| belongsToMany           | belongsToMany      |
+| hasOneThrough           | hasOneThrough      |
+
+::: info ToMany Relationship Usage
+Since * to many relations provides the same functionality with the * to one relations, `Unusualify/Modularity` serves only * to many relationship methods and migrations. Cases with * to one relationship usage, it can be supplied with request validations.
+:::
+
+
 
