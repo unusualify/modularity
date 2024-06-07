@@ -117,7 +117,7 @@ abstract class CoreController extends LaravelController
     protected function getNamespace()
     {
         try {
-            return $this->namespace ?? 'Modules'."\\{$this->moduleName}";
+            return $this->namespace ?? config('modules.namespace', 'Modules')."\\{$this->moduleName}";
         } catch (\Throwable $th) {
             dd($th);
         }

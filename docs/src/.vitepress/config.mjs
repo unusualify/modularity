@@ -14,6 +14,10 @@ export default defineConfig({
     ...sidebarConfig,
     socialLinks: [
       { icon: 'github', link: 'https://github.com/unusualify/modularity' },
-    ]
-  }
+    ],
+
+  },
+  // rewrites: {
+  //   ':smt/:pkg/(.*)' : ':smt/(.*)'
+  // }
 })

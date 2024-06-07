@@ -4,6 +4,7 @@ import { defineConfig } from "vitepress";
 export const shared = defineConfig({
     title: "Modularity",
     srcDir: 'pages',
+    outDir: '../build',
     cleanUrls: true,
     lastUpdated: true,
     vite: {
