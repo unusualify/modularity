@@ -425,5 +425,4 @@ class Module extends NwidartModule
         return !empty($search);
     }
 
-
 }

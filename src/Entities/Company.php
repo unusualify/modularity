@@ -1,13 +1,18 @@
 <?php
 
 namespace Unusualify\Modularity\Entities;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Unusualify\Modularity\Database\Factories\CompanyFactory;
+
 class Company extends Model
 {
     protected $table = 'unusual_companies';
 
+    use HasFactory;
+
     protected $fillable = [
         'id',
-        'public',
         'name',
         'address',
         'city',
@@ -28,5 +33,4 @@ class Company extends Model
     {
         return unusualConfig('tables.companies', parent::getTable());
     }
-
 }
