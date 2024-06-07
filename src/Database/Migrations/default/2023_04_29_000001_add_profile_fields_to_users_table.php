@@ -18,7 +18,7 @@ class AddProfileFieldsToUsersTable extends Migration
                 $table->string('language')->default('en');
                 $table->string('timezone')->default('Europe/London');
                 $table->string('phone',20)->nullable();
-                $table->string('country',30)->nullable();
+                $table->string('country',50)->nullable();
             });
 
         });
