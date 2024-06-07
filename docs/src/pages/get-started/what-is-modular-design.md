@@ -1,3 +1,9 @@
+---
+sidebarPos: 3
+
+---
+
+
 # Introduction to Modular Design
 Modular design or `modularity design` is a design princible that subdivides a system into smaller parts called `modules`. Modular design aims modules to created, modified, replaced or exchanged with other modules or between different systems.
 

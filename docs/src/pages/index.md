@@ -9,10 +9,13 @@ hero:
   actions:
     - theme: brand
       text: What is Modularity?
-      link: user-guide/get-started/what-is-modularity
+      link: get-started/what-is-modularity
     - theme: alt
-      text: Developer Guide
-      link: developer-guide/api-examples
+      text: Get Started
+      link: get-started/installation-guide
+    - theme: alt
+      text: Contribution Guide
+      link: advanced-guide/api-examples
     - theme: alt
       text: GitHub
       link: https://www.github.com/unusualify/modularity
@@ -20,7 +23,7 @@ hero:
 features:
   - title: Fast Backend Development
     details: Develop Your Backend Application with Simple Commands
-    link: user-guide/get-started/what-is-modularity
+    link: get-started/get-started/what-is-modularity
   - title: Admin Panel
     details: While you consturct your backend application, let administration panel construct itself
   - title: Easy Customization
