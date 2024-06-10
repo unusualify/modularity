@@ -1,0 +1,25 @@
+{
+    "name": "unusualify/modularity-dev",
+    "type": "project",
+    "description": "The Laravel Framework powered with Modularity in development mode.",
+    "keywords": [
+        "framework",
+        "laravel",
+        "toolkit",
+        "modularity",
+        "unusualify",
+    ],
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./packages/*",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "require": {
+        "unusualify/modularity": "*",
+    },
+    "minimum-stability": "dev",
+}
