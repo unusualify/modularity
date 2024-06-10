@@ -190,6 +190,3 @@ For this version of `Unusualify/Modularity`, available relationship methods can 
 ::: info ToMany Relationship Usage
 Since * to many relations provides the same functionality with the * to one relations, `Unusualify/Modularity` serves only * to many relationship methods and migrations. Cases with * to one relationship usage, it can be supplied with request validations.
 :::
-
-
-
