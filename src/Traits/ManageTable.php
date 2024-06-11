@@ -280,7 +280,7 @@ trait ManageTable {
      */
     public function getTableAttribute($attribute)
     {
-        return $this->tableAttributes[$attribute] ?? false;
+        return $this->tableAttributes[$attribute] ?? null;
     }
 
     /**
