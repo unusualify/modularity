@@ -24,14 +24,10 @@ export const makeTableProps = propsFactory({
     type: Boolean,
     default: false,
   },
-  tableSubtitle: {
-    type: String,
-    default: ""
-  },
-  tableType: {
-    type: String,
-    default: "index"
-  },
+  // tableType: {
+  //   type: String,
+  //   default: "index"
+  // },
   titlePrefix: {
     type: String,
     default: ''
@@ -128,6 +124,26 @@ export const makeTableProps = propsFactory({
   endpoints:{
     type: Object,
     default: {},
+  },
+  tableDensity:{
+    type:String,
+    default: 'comfortable',
+  },
+  tableSubtitle:{
+    type:String,
+    default: '',
+  },
+  toolbarOptions:{
+    type: Object,
+    default: {},
+  },
+  addBtnOptions:{
+    type: Object,
+    default: {},
+  },
+  filterBtnOptions:{
+    type:Object,
+    default: {},
   }
 })
 
@@ -148,16 +164,15 @@ export default function useTable (props, context) {
   const form = ref(null)
 
   const state = reactive({
+
     id: Math.ceil(Math.random() * 1000000) + '-table',
     formRef: computed(() => {
       return state.id + '-form'
     }),
     formStyles: { width: props.formWidth },
-
     formActive: false,
     deleteModalActive: false,
     customModalActive: false,
-
     activeTableItem: null,
     hideTable: false,
     fillHeight: computed(() => props.fillHeight),
@@ -167,14 +182,10 @@ export default function useTable (props, context) {
     }),
     editedIndex: -1,
     selectedItems: [],
-
     windowSize: {
       x: 0,
       y: 0
     },
-    isDashboard: computed(() => {
-      return  (props.tableType === 'dashboard')
-    }),
     snakeName: snakeCase(props.name),
     permissionName: kebabCase(props.name),
     transNameSingular: computed(() => te('modules.' + state.snakeName, 0) ? t('modules.' + state.snakeName, 0) : props.name),
@@ -184,11 +195,7 @@ export default function useTable (props, context) {
       const prefix = props.titlePrefix ? props.titlePrefix : ''
       return prefix + (__isset(props.customTitle) ? props.customTitle : state.transNamePlural)
     }),
-    tableSubtitle: computed(() => {
-      return (__isset(props.tableSubtitle) ? props.tableSubtitle : "")
-    }),
-    hideSearchField: computed(()=> {return props.hideSearchField}),
-    searchText: computed(() => t("Type to Search")),
+
     formTitle: computed(() => {
       return t((state.editedIndex === -1 ? 'new-item' : 'edit-item'), {
         item: te(`modules.${state.snakeName}`) ? t(`modules.${state.snakeName}`, 0) : props.name
@@ -207,14 +214,11 @@ export default function useTable (props, context) {
           : '').toLocaleUpperCase()
       })
     }),
-
     isSoftDeletableItem: computed(() => {
       return methods.isSoftDeletable(state.editedItem)
     }),
-
     activeItemConfiguration: null,
-
-    options: props.tableOptions ?? store.state.datatable.options ?? {},
+    options:  props.tableOptions ?? store.state.datatable.options ?? {},
     headers: props.columns ?? store.state.datatable.headers ?? [],
     headersWithKeys: computed(() => {
       let collection = {};
@@ -228,7 +232,6 @@ export default function useTable (props, context) {
        return collection
     }),
     inputs: props.inputFields ?? store.state.datatable.inputs ?? [],
-
     // elements: computed(() => props.items ?? store.state.datatable.data ?? []),
     elements: computed(() => {
       return props.items ?? store.state.datatable.data ?? []
@@ -244,6 +247,8 @@ export default function useTable (props, context) {
       }
     }),
 
+
+
     // datatable store
     loading: computed(() => store.state.datatable.loading ?? false),
     filterActiveStatus: computed(() => store.state.datatable.filter.status ?? 'all'),
@@ -257,18 +262,14 @@ export default function useTable (props, context) {
       // __log(form?.value?.valid, form?.value)
       return form?.value?.valid ?? null
     }),
-    listDataIterators: computed(()=>{
-      return props.tableType === 'dataIterator'
+    mobileTableLayout: computed(() => {
+      return isSmAndDown
     }),
-    listDataTable: computed(() => {
-      return props.tableType === 'dataTable'
+    hideSearchField: computed(()=> {return props.hideSearchField}),
+    tableSubtitle: computed(() => {
+      return __isset(props.tableSubtitle) ? t(props.tableSubtitle) : ''
     }),
-    iteratorType: computed(() => {
-      return __isset(props.iteratorType) ? props.iteratorType : ''
-    }),
-    iteratorOptions: computed(() => {
-      return __isset(props.iteratorOptions) ? props.iteratorOptions : {}
-    }),
+    searchText: computed(() => t("Type to Search")),
   })
 
   const methods = reactive({
@@ -622,6 +623,10 @@ export default function useTable (props, context) {
     goPreviousPage () {
       if (state.options.page > 1) { state.options.page -= 1 }
     },
+    filterStatus(slug){
+      store.commit(DATATABLE.UPDATE_DATATABLE_FILTER_STATUS, slug)
+      store.dispatch(ACTIONS.GET_DATATABLE)
+    }
   })
 
   watch(() => state.editedItem, (newValue, oldValue) => {

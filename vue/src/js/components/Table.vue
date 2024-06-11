@@ -1,4 +1,5 @@
 <template>
+  <v-layout fluid v-resize="onResize">
   <div :class="['ue-datatable__container', noFullScreen ? '' : 'ue-datatable--full-screen' ]">
 
     <ActiveTableItem
@@ -30,50 +31,71 @@
       ref="datatable"
 
       :height="windowSize.y - 64 - 24 - 59 - 36"
-    >
-      <template v-slot:top>
 
-        <slot name="header" v-bind="{tableTitle}">
-          <!-- <ue-title
-            :text="tableTitle"
-            :classes="[]"
-            padding-reset
-          /> -->
+      :hide-default-header="hideHeaders"
+      :multi-sort="multiSort"
+      :must-sort="mustSort"
+      :density="tableDensity ?? 'comfortable'"
+      :disable-sort="disableSort"
+      :disable-pagination="disablePagination"
+      :loading="loading"
+      :loading-text="$t('loading-text')"
+      :mobile="isSmAndDown"
+
+      :hide-default-footer="hideFooter"
+    >
+    <!-- v-model:options="options" -->
+      <template v-slot:top>
+        <v-toolbar
+          v-bind="toolbarOptions"
+        >
+
           <ue-title
             :text="tableTitle"
+            :subTitle="tableSubtitle"
             :classes="[]"
             padding-reset
-            >
-            <template v-slot:default="{ text }">
-              <div class="d-flex">
-                <div class="me-auto">
-                  {{ text }}
-                </div>
-                <slot name="headerRight"></slot>
-              </div>
+            class="w-50 h-100"
+          />
+          <v-text-field
+            v-if="!hideSearchField"
+            class="px-3"
+            variant ="outlined"
+            append-inner-icon="mdi-magnify"
+            :placeholder="searchText"
+            hide-details
+            density="compact"
+            single-line
+            style="max-width: 30%; display: inline;"
+            v-model="search"
+          />
+          <v-spacer v-else-if="hideSearchField"></v-spacer>
+          <v-menu>
+
+            <template v-slot:activator=" { props, isActive }">
+              <v-btn
+                v-bind="props"
+                variant="elevated"
+              >
+                {{ `${filterActive.name} (${filterActive.number})` }}
+                <v-icon right :style="{ transform: isActive ? 'rotate(-180deg)' : 'rotate(0)' }">mdi-chevron-down</v-icon>
+              </v-btn>
             </template>
-          </ue-title>
-        </slot>
-
-        <div class="ue-table-top__wrapper">
-
-          <div v-if="embeddedForm && !noForm" class="ue-table-form__embedded"
-            :style="formStyles">
-            <v-btn v-if="can('create')" @click="createForm" class="mb-theme">
-              {{ $t('ADD NEW')}}
-            </v-btn>
-            <v-expand-transition>
-              <v-card class="mb-theme" elevation="4" v-if="formActive">
-                <ue-form has-submit button-text="save" :title="formTitle" ref="form">
-                  <template v-slot:headerRight>
-                    <v-btn class="" variant="text" icon="$close" density="compact"
-                      @click="closeForm()"
-                    ></v-btn>
-                  </template>
-                </ue-form>
-              </v-card>
-            </v-expand-transition>
-          </div>
+            <template v-slot:default= "{ isActive }">
+              <v-list>
+                <v-list-item
+                  v-for="(filter, index) in mainFilters"
+                  :key="index"
+                  v-on:click.prevent="filterStatus(filter.slug)"
+                >
+                  <v-list-item-title>{{ filter.name + '(' + filter.number+ ')'}} </v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </template>
+          </v-menu>
+          <v-btn v-if="can('create') && embeddedForm" @click="createForm" v-bind="addBtnOptions">
+            {{  addBtnOptions.text ? $t(addBtnOptions.text) : $t('ADD NEW') }}
+          </v-btn>
           <slot v-else-if="(createOnModal || editOnModal) && !noForm" name="formDialog" >
             <ue-modal
               ref="formModal"
@@ -83,7 +105,7 @@
               width-type="lg"
               >
               <template v-slot:activator="{props}">
-                <v-btn-success v-if="createOnModal" v-bind="props" dark class="mb-theme">
+                <v-btn-success v-if="createOnModal" v-bind="props" dark class="mx-2">
                     {{ $t('add-item', {'item': transNameSingular} ) }}
                 </v-btn-success>
               </template>
@@ -115,6 +137,24 @@
               </template>
             </ue-modal>
           </slot>
+        </v-toolbar>
+
+        <div class="ue-table-top__wrapper">
+          <div v-if="embeddedForm && !noForm" class=""
+            :style="formStyles">
+            <v-expand-transition>
+              <v-card class="mb-theme" elevation="4" v-if="formActive">
+                <ue-form has-submit button-text="save" :title="formTitle" ref="form">
+                  <template v-slot:headerRight>
+                    <v-btn class="" variant="text" icon="$close" density="compact"
+                      @click="closeForm()"
+                    ></v-btn>
+                  </template>
+                </ue-form>
+              </v-card>
+            </v-expand-transition>
+          </div>
+
           <!-- #deletemodal-->
           <ue-modal
             ref="deleteModal"
@@ -158,27 +198,7 @@
                   <v-item-group selected-class="bg-primary">
                     <v-container>
                       <v-row>
-                        <!-- <v-col
-                          v-for="n in 3"
-                          :key="n"
-                          cols="12"
-                          md="6"
-                          >
-                            <v-item v-slot="{ isSelected, selectedClass, toggle }">
-                              <v-card
-                                :class="['d-flex align-center', selectedClass]"
-                                dark
-                                height="200"
-                                @click="toggle"
-                              >
-                                <div
-                                  class="text-h3 flex-grow-1 text-center"
-                                >
-                                  {{ isSelected ? 'Selected' : 'Click Me!' }}
-                                </div>
-                            </v-card>
-                          </v-item>
-                        </v-col> -->
+
                         <v-col cols="12" md="6" class="pa-4">
                           <v-item v-slot="{ isSelected, selectedClass, toggle }">
                             <v-card :class="['d-flex align-center bg-primary ue-card-button px-4', selectedClass]" dark height="200" @click="toggle" >
@@ -208,83 +228,11 @@
             </ue-modal>
           </slot>
 
-          <v-toolbar
-              v-if="isSuperAdmin &&  mainFilters.length > 0"
-              flat
-            >
-            <!-- Custom Filters -->
-            <v-menu offset-y rounded="xs" open-on-hover>
-              <template v-slot:activator="{ props, isActive }">
 
-                <v-btn
-                  v-bind="props"
-                  variant="elevated"
-                >
-                  {{ `${filterActive.name} (${filterActive.number})` }}
-                  <v-spacer></v-spacer>
-                  <v-icon right :style="{ transform: isActive ? 'rotate(-180deg)' : 'rotate(0)' }">mdi-chevron-down</v-icon>
-                </v-btn>
-              </template>
-              <v-list>
-                <v-list-item
-                  v-for="(filter, index) in mainFilters"
-                  :key="index"
-                  v-on:click.prevent="filterStatus(filter.slug)"
-                >
-                  <v-list-item-title>{{ filter.name + '(' + filter.number+ ')'}} </v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
-          </v-toolbar>
         </div>
 
       </template>
-      <!-- <template v-slot:top>
-        <v-data-table-footer
-          :pagination="pagination"
-          :options="options"
-          @update:options="updateOptions"
-          items-per-page-text="$vuetify.dataTable.itemsPerPageText"
-        />
-      </template> -->
 
-      <template v-if="hideHeaders" v-slot:headers="{ columns, isSorted, getSortIcon, toggleSort }">
-        <!-- <tr>
-          <template v-for="column in columns" :key="column.key">
-            <td>
-              <span class="mr-2 cursor-pointer" @click="() => toggleSort(column)">{{ column.title }}</span>
-              <template v-if="isSorted(column)">
-                <v-icon :icon="getSortIcon(column)"></v-icon>
-              </template>
-              <v-icon v-if="column.removable" icon="$close" @click="() => remove(column.key)"></v-icon>
-            </td>
-          </template>
-        </tr> -->
-      </template>
-
-      <!-- <template v-slot:bottom>
-        <div class="text-right pa-10">
-          <v-btn-tertiary>
-            MANAGE RELEASES
-          </v-btn-tertiary>
-
-          <v-pagination
-            v-model="options.page"
-            :length="totalElements"
-          ></v-pagination>
-
-          <v-text-field
-            :model-value="options.itemsPerPage"
-            class="pa-2"
-            label="Items per page"
-            type="number"
-            min="-1"
-            max="15"
-            hide-details
-            @update:model-value="itemsPerPage = parseInt($event, 10)"
-          ></v-text-field>
-        </div>
-      </template> -->
       <!-- MARK PAGINATION BUTTONS -->
       <template v-if="!noFooter" v-slot:bottom="{page, pageCount}">
         <div class="text-right py-theme">
@@ -314,7 +262,7 @@
           ></v-pagination> -->
         </div>
       </template>
-      <template v-else-if="hideFooter" v-slot:bottom></template>
+
 
       <template
         v-for="(context, slotName) in slots" v-slot:[slotName]=""
@@ -443,6 +391,7 @@
     </v-data-table-server>
 
   </div>
+  </v-layout>
 </template>
 
 <script>
