@@ -21,13 +21,13 @@ trait ModelHelpers
 
         $reflector = new \ReflectionClass(get_called_class());
 
-        $modelName = get_class_short_name(get_called_class());
+        $modelName = $reflector->getShortName();
 
         static::$definedRelationships[$modelName] = collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))
             // ->filter(fn(\ReflectionMethod $method) =>  $method->hasReturnType() && preg_match("{$relationClassesPattern}", $method->getReturnType()) )
             ->reduce(function($carry, \ReflectionMethod $method) use($relationClassesPattern) {
                 if($method->hasReturnType() && preg_match("{$relationClassesPattern}", ($returnType = $method->getReturnType()) )){
-                    $carry[$method->name] = get_class_short_name((string) $returnType);
+                    $carry[$method->name] = (new \ReflectionClass(get_called_class()));
                 }
 
                 return $carry;
@@ -100,7 +100,7 @@ trait ModelHelpers
                 return array_keys(Arr::where($definedRelationships, fn($val, $key) => $val == studlyName($relations)));
             }
         }
-
+      
         return array_keys($definedRelationships);
     }
 

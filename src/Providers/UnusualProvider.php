@@ -42,7 +42,7 @@ class UnusualProvider extends ServiceProvider
     {
         // dd(__FUNCTION__, __CLASS__);
         // Has to be merged after routeServiceProvider registered
-        if(!$this->app->runningInConsole()){
+        if(exceptionalRunningInConsole()){
             $this->mergeConfigFrom(__DIR__ . '/../../config/navigation.php', unusualBaseKey() . '-navigation');
         }
         // dd($this->app->config->get(unusualBaseKey() . '-navigation'), require __DIR__ . '/../../config/navigation.php');
