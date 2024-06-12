@@ -9,7 +9,7 @@ return [
     'rowActionsType' => 'inline',
     'hideDefaultFooter' => false,
     'tableClasses' => 'elevation-2',
-    'noFooter' => true,
+    // 'noFooter' => true,
     'hideHeaders' => false,
     'hideSearchField' => false,
     'multiSort' => false,
@@ -28,7 +28,7 @@ return [
     ],
     'filterBtnOptions' => [
         'variant' => 'elevated', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
-        'color' => 'orange', // rgb(255,255,255,1) or utility colors like white, purple
+        'color' => 'green', // rgb(255,255,255,1) or utility colors like white, purple
         // 'elevation' => null, // string or number refers to elevation
         'prepend-icon' => 'mdi-plus', // material design icon name,
         'readonly' => false, // boolean to set the button readonly mode, can be used to disable button

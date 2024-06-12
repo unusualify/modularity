@@ -60,7 +60,7 @@
           <v-text-field
             v-if="!hideSearchField"
             class="px-3"
-            variant ="outlined"
+            variant="outlined"
             append-inner-icon="mdi-magnify"
             :placeholder="searchText"
             hide-details
@@ -73,7 +73,7 @@
           <v-menu>
             <template v-slot:activator=" { props, isActive }">
               <v-btn
-                v-bind="props"
+                v-bind="{...props, ...filterBtnOptions}"
                 variant="elevated"
               >
                 {{ `${filterActive.name} (${filterActive.number})` }}

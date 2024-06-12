@@ -24,10 +24,6 @@ export const makeTableProps = propsFactory({
     type: Boolean,
     default: false,
   },
-  // tableType: {
-  //   type: String,
-  //   default: "index"
-  // },
   titlePrefix: {
     type: String,
     default: ''
@@ -75,10 +71,6 @@ export const makeTableProps = propsFactory({
   rowActionsType: {
     type: String,
     default: 'inline'
-  },
-  rowActionsIcon:{
-    type: String,
-    default: 'mdi-cog-outline'
   },
   iteratorType: {
     type: String,
@@ -137,6 +129,11 @@ export const makeTableProps = propsFactory({
     type: Object,
     default: {},
   },
+  rowActionsIcon:{
+    type: String,
+    default: 'mdi-cog-outline'
+  },
+
   addBtnOptions:{
     type: Object,
     default: {},
@@ -144,7 +141,8 @@ export const makeTableProps = propsFactory({
   filterBtnOptions:{
     type:Object,
     default: {},
-  }
+  },
+
 })
 
 // by convention, composable function names start with "use"
