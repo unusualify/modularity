@@ -195,7 +195,6 @@ export default function useTable (props, context) {
       const prefix = props.titlePrefix ? props.titlePrefix : ''
       return prefix + (__isset(props.customTitle) ? props.customTitle : state.transNamePlural)
     }),
-
     formTitle: computed(() => {
       return t((state.editedIndex === -1 ? 'new-item' : 'edit-item'), {
         item: te(`modules.${state.snakeName}`) ? t(`modules.${state.snakeName}`, 0) : props.name
@@ -246,9 +245,6 @@ export default function useTable (props, context) {
         store.dispatch(ACTIONS.GET_DATATABLE)
       }
     }),
-
-
-
     // datatable store
     loading: computed(() => store.state.datatable.loading ?? false),
     filterActiveStatus: computed(() => store.state.datatable.filter.status ?? 'all'),
@@ -270,6 +266,13 @@ export default function useTable (props, context) {
       return __isset(props.tableSubtitle) ? t(props.tableSubtitle) : ''
     }),
     searchText: computed(() => t("Type to Search")),
+    addBtnTitle: computed(() => {
+      if(props.createOnModal || props.editOnModal){
+        return props.addBtnOptions.text ? t(props.addBtnOptions.text) : t('add-item', {'item' : state.transNameSingular})
+      }else{
+        return props.addBtnOptions.text ?? t('ADD NEW')
+      }
+    })
   })
 
   const methods = reactive({

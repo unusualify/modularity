@@ -20,7 +20,6 @@
     $tableComponent = $vBind['tableComponent']
 @endphp
 
-
-
-<ue-table-binder component-name="{{$tableComponent}}" :table-attributes='@json($vBind)'/>
+<ue-table v-bind='@json($vBind)' />
+{{-- <ue-table-binder component-name="{{$tableComponent}}" :table-attributes='@json($vBind)'/> --}}
 
