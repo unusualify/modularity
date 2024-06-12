@@ -211,13 +211,23 @@ trait ManageForm {
             case 'select':
             case 'combobox':
             case 'autocomplete':
+            case 'select-scroll':
                 // dd($input);
                 $relation_class= null;
                 $input['itemValue'] = $input['itemValue'] ?? 'id';
                 $input['itemTitle'] = $input['itemTitle'] ?? 'name';
                 $input['default'] ??= [];
-                $input['cascadeKey'] ??= 'items';
+                // $input['cascadeKey'] ??= 'items';
                 // $input[] = 'multiple';
+
+                if(($input['type'] == 'select-scroll' || (isset($input['ext']) && $input['ext'] == 'scroll') )
+                    && (isset($input['endpoint']) || isset($input['connector']))
+                ){
+                    $input['componentType'] = (isset($input['ext']) && $input['ext'] == 'scroll') ? 'v-'. $input['type'] : 'v-autocomplete';
+                    $input['type'] = 'custom-input-select-scroll';
+                    unset($input['ext']);
+                }
+
                 if(isset($input['items'])) break;
 
                 $items = [];
@@ -231,8 +241,32 @@ trait ManageForm {
                     $with = $input['cascades'];
                 }
 
+                if(isset($input['connector'])){
+                    // 'moduleName:routeName|uri:edit'
+                    $targetType = 'uri';
+
+                    $parts = explode('|', $input['connector']);
+
+                    $names = explode(':', array_shift($parts)); // moduleName:routeName
+                    $routeName = $this->getStudlyName(array_pop($names));
+                    $targetModuleName = $this->getStudlyName( !empty($names) ? array_pop($names) : $this->moduleName );
+                    $targetModule = Modularity::find($targetModuleName);
+
+                    $types = !empty($parts) ? explode(':', array_shift($parts)) : ['uri', 'index']; //uri:edit
+                    // controller,repository,uri
+                    $targetType = array_shift($types); //
+
+                    if($targetType == 'uri'){
+                        $input['endpoint'] = $targetModule->getRouteActionUri($routeName, empty($types) ?  'index' : array_shift($types));
+                    }else {
+                        unset($input['connector']);
+                        $input[kebabCase($targetType)] = $targetModule->getRouteClass($routeName, $targetType);
+                    }
+                }
+
                 if(isset($input['repository'])){
                     $relation_class = App::make($input['repository']);
+
                     if(isset($input['ext'])){
 
                         $extensionMethods = explode('|',$input['ext']);
@@ -242,7 +276,9 @@ trait ManageForm {
                         $items = $relation_class->list($input['itemTitle'], $with)->toArray();
 
                     }
+
                     if(isset($input['cascades'])){
+                        $input['cascadeKey'] ??= 'items';
                         $patterns = [];
                         foreach ($input['cascades'] as $key => $cascade) {
                             $explodes = explode('.', explode(':', $cascade)[0]);
@@ -287,14 +323,21 @@ trait ManageForm {
                     ]);
                 }
 
+                if(isset($input['connector'])){
+                    $data = Arr::except($input, ['connector']);
 
+                    // dd($data);
+                }else{
+                    $data = Arr::except($input, ['route','model', 'cascades']) + [
+                        'items' => $items
+                    ];
+                    // dd($data);
+                }
 
-                $data = Arr::except($input, ['route','model', 'cascades']) + [
-                    'items' => $items
-                ];
+                // dd(
+                //     $data
+                // );
 
-                // if($input['name'] == 'surveys')
-                //     dd($data);
             break;
             case 'switch':
             case 'checkbox':

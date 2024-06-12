@@ -38,29 +38,17 @@ export default function useInput (props, context) {
 
     input: computed({
       get: () => {
-        // __log('useInput', modelValue.value)
         return modelValue.value ?? []
       },
       set: (val, old) => {
-        methods.inputOnSet(val, old)
         methods.updateModelValue(val)
-        // context.emit('update:modelValue', val)
       }
     }),
-
-    // error: false,
-    // errorMessages: ''
-
   })
 
   const methods = reactive({
     updateModelValue: function (val) {
       context.emit('update:modelValue', val)
-      // __log('updateModelValue', val)
-      // context.emit('input', val)
-    },
-    inputOnSet (newValue, oldValue) {
-
     },
     makeReference (key) {
       return `${key}-${states.id}`

@@ -50,7 +50,7 @@ export default function useValidation () {
           let $msg = ((minOrExact == max || max < 0) ? `Requires exactly ${minOrExact} items` : `Requires at least ${minOrExact}${((max != Infinity  && max != undefined) ? ', and maximum of:' + max : '')}) elements`);
           // let $msg = ((max != Infinity) ? ', maximum:' + max : '');
           // __log(v.length, minOrExact, max )
-
+          __log(v)
           if(Array.isArray(v)) {
             return v.length >= minOrExact && ( max < 0 || v.length <= max) || msg || $msg;
           }
