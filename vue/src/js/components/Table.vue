@@ -71,7 +71,6 @@
           />
           <v-spacer v-else-if="hideSearchField"></v-spacer>
           <v-menu>
-
             <template v-slot:activator=" { props, isActive }">
               <v-btn
                 v-bind="props"
@@ -93,51 +92,45 @@
               </v-list>
             </template>
           </v-menu>
-          <v-btn v-if="can('create') && embeddedForm" @click="createForm" v-bind="addBtnOptions">
-            {{  addBtnOptions.text ? $t(addBtnOptions.text) : $t('ADD NEW') }}
-          </v-btn>
-          <slot v-else-if="(createOnModal || editOnModal) && !noForm" name="formDialog" >
-            <ue-modal
-              ref="formModal"
-              v-model="formActive"
-              scrollable
-              transition="dialog-bottom-transition"
-              width-type="lg"
-              >
-              <template v-slot:activator="{props}">
-                <v-btn-success v-if="createOnModal" v-bind="props" dark class="mx-2">
-                    {{ $t('add-item', {'item': transNameSingular} ) }}
-                </v-btn-success>
-              </template>
-              <template v-slot:body="props">
-                <v-card >
-                  <v-card-title class="text-h5 grey lighten-2"> </v-card-title>
-                  <v-card-text>
-                    <ue-form
-                      ref="form"
-                      :title="formTitle"
-                      />
-                  </v-card-text>
-                  <v-divider/>
-                  <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn color="error darken-1" text @click="closeForm()">
-                        {{ props.textCancel }}
-                      </v-btn>
-                      <v-btn color="teal darken-1"
-                        text
-                        @click="confirmFormModal()"
-                        :disabled="!formIsValid"
-                        :loading="formLoading"
-                        >
-                        {{ $t('save') }}
-                      </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </template>
-            </ue-modal>
-          </slot>
+          <v-btn v-if="can('create') && !noForm" v-bind="addBtnOptions" @click="createForm" :text="addBtnTitle"/>
+
         </v-toolbar>
+
+        <ue-modal
+          ref="formModal"
+          v-model="formActive"
+          scrollable
+          transition="dialog-bottom-transition"
+          width-type="lg"
+          v-if="!embeddedForm"
+        >
+          <template v-slot:body="props">
+            <v-card >
+              <v-card-title class="text-h5 grey lighten-2"> </v-card-title>
+              <v-card-text>
+                <ue-form
+                  ref="form"
+                  :title="formTitle"
+                />
+              </v-card-text>
+              <v-divider/>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="error darken-1" text @click="closeForm()">
+                  {{ props.textCancel }}
+                </v-btn>
+                <v-btn color="teal darken-1"
+                  text
+                  @click="confirmFormModal()"
+                  :disabled="!formIsValid"
+                  :loading="formLoading"
+                >
+                  {{ $t('save') }}
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </template>
+        </ue-modal>
 
         <div class="ue-table-top__wrapper">
           <div v-if="embeddedForm && !noForm" class=""
