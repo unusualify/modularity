@@ -172,7 +172,7 @@ trait ManageUtilities {
                 // $action . 'Endpoint' => $optionIsActive
                 $action => $optionIsActive
                             ?   moduleRoute(
-                                    $this->routeName,
+                                    $this->getConfigFieldsByRoute('route_name'),
                                     $prefix,
                                     $action,
                                     $parameters
