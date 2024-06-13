@@ -15,7 +15,7 @@ You can consider as standard select input, add input attributes to config as fol
     'ext' => 'scroll',
     'connector' => '{ModuleName}:{RouteName}|uri',
     ...
-  ],
+  ],x
 ```
 or
 ```
