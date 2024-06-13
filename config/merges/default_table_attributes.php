@@ -27,15 +27,17 @@ return [
         'image' => '', // image link for the background of the toolbar
     ],
     'filterBtnOptions' => [
-        'variant' => 'elevated', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
-        'color' => 'green', // rgb(255,255,255,1) or utility colors like white, purple
+        'variant' => 'outlined', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
+        'color' => 'orange', // rgb(255,255,255,1) or utility colors like white, purple
         // 'elevation' => null, // string or number refers to elevation
-        'prepend-icon' => 'mdi-plus', // material design icon name,
+        // 'prepend-icon' => 'mdi-chevron-down', // material design icon name,
         'readonly' => false, // boolean to set the button readonly mode, can be used to disable button
         'ripple' => true, // boolean
-        'rounded' => 'md', // string | number | boolean - 0, xs, sm, true, lg, xl, pill, circle, and shaped.
-        'class' => 'mx-2 text-white text-capitialize',
-        'size' => 'default' //sizes: x-small, small, default, large, and x-large.
+        // 'rounded' => 'md', // string | number | boolean - 0, xs, sm, true, lg, xl, pill, circle, and shaped.
+        'class' => 'mx-2 text-white text-capitialize rounded  px-8',
+        'size' => 'small', //sizes: x-small, small, default, large, and x-large.
+        'icon' => 'mdi-filter-outline',
+        'slim' => false,
         // 'loading' => true,
     ],
     'addBtnOptions' => [

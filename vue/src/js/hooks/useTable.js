@@ -270,6 +270,11 @@ export default function useTable (props, context) {
       }else{
         return props.addBtnOptions.text ?? t('ADD NEW')
       }
+    }),
+    filterBtnTitle: computed(() => {
+      return {
+        text: `${state.filterActive.name} (${state.filterActive.number})`,
+      }
     })
   })
 

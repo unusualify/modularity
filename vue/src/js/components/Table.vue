@@ -70,31 +70,29 @@
             v-model="search"
           />
           <v-spacer v-else-if="hideSearchField"></v-spacer>
-          <v-menu>
-            <template v-slot:activator=" { props, isActive }">
-              <v-btn
-                v-bind="{...props, ...filterBtnOptions}"
-                variant="elevated"
-              >
-                {{ `${filterActive.name} (${filterActive.number})` }}
-                <v-icon right :style="{ transform: isActive ? 'rotate(-180deg)' : 'rotate(0)' }">mdi-chevron-down</v-icon>
-              </v-btn>
-            </template>
-            <template v-slot:default= "{ isActive }">
-              <v-list>
-                <v-list-item
-                  v-for="(filter, index) in mainFilters"
-                  :key="index"
-                  v-on:click.prevent="filterStatus(filter.slug)"
-                >
-                  <v-list-item-title>{{ filter.name + '(' + filter.number+ ')'}} </v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </template>
-          </v-menu>
+
+          <v-btn
+          id="filter-btn-activator"
+          v-bind="{...filterBtnOptions, ...filterBtnTitle}"
+          />
+
           <v-btn v-if="can('create') && !noForm" v-bind="addBtnOptions" @click="createForm" :text="addBtnTitle"/>
 
         </v-toolbar>
+
+        <v-menu
+          activator="#filter-btn-activator"
+          >
+            <v-list>
+              <v-list-item
+                v-for="(filter, index) in mainFilters"
+                :key="index"
+                v-on:click.prevent="filterStatus(filter.slug)"
+              >
+                <v-list-item-title>{{ filter.name + '(' + filter.number+ ')' }} </v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
 
         <ue-modal
           ref="formModal"
