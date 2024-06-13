@@ -41,7 +41,7 @@ class AuthServiceProvider extends ServiceProvider implements DeferrableProvider
 
     public function boot()
     {
-        if(!$this->app->runningInConsole() && database_exists() && Schema::hasTable(config('permission.table_names.permissions'))){
+        if(exceptionalRunningInConsole() && database_exists() && Schema::hasTable(config('permission.table_names.permissions'))){
             Gate::before(function (User $user, $ability) {
                 return $user->hasRole(self::SUPERADMIN) ? true : null;
             });

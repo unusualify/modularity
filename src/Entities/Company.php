@@ -5,9 +5,15 @@ namespace Unusualify\Modularity\Entities;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Unusualify\Modularity\Database\Factories\CompanyFactory;
 
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Unusualify\Modularity\Database\Factories\CompanyFactory;
+
 class Company extends Model
 {
     protected $table = 'unusual_companies';
+
+    use HasFactory;
 
     use HasFactory;
 
@@ -33,4 +39,9 @@ class Company extends Model
     {
         return unusualConfig('tables.companies', parent::getTable());
     }
+    protected static function newFactory()
+    {
+        return new CompanyFactory();
+    }
+
 }
