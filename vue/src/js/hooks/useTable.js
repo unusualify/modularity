@@ -109,14 +109,7 @@ export const makeTableProps = propsFactory({
     type: Boolean,
     default: false
   },
-  iteratorOptions:{
-    type: Object,
-    default: {},
-  },
-  endpoints:{
-    type: Object,
-    default: {},
-  },
+
   tableDensity:{
     type:String,
     default: 'comfortable',
@@ -142,7 +135,10 @@ export const makeTableProps = propsFactory({
     type:Object,
     default: {},
   },
-
+  customRowComponent: {
+    type: Object,
+    default: {}
+  },
 })
 
 // by convention, composable function names start with "use"
@@ -275,7 +271,11 @@ export default function useTable (props, context) {
       return {
         text: `${state.filterActive.name} (${state.filterActive.number})`,
       }
-    })
+    }),
+    enableIterators: computed(() => Object.keys(props.customRowComponent).length),
+    hideHeaders: computed(() => {
+      return props.hideHeaders || state.enableIterators
+    }),
   })
 
   const methods = reactive({
