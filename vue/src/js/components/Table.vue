@@ -43,20 +43,38 @@
       :mobile="isSmAndDown"
 
       :hide-default-footer="hideFooter"
+
+      :show-select="true"
+      item-value="id"
+      v-model="selectedItems"
     >
     <!-- v-model:options="options" -->
-      <template v-slot:top>
+      <template v-slot:top = "{ someSelected }">
         <v-toolbar
           v-bind="toolbarOptions"
         >
-
           <ue-title
             :text="tableTitle"
             :subTitle="tableSubtitle"
             :classes="[]"
             padding-reset
-            class="w-50 h-100"
+            :class="[someSelected ? 'w-50 h-100' : 'w-50 h-100']"
           />
+          <v-slide-x-transition mode="out-in" :group="true">
+
+              <v-btn
+              v-if="someSelected"
+              icon="mdi-delete"
+              />
+              <v-btn
+              v-if="someSelected"
+                icon="mdi-restore"
+              />
+          </v-slide-x-transition>
+
+          <v-sheet v-if="someSelected" >
+
+          </v-sheet>
           <v-text-field
             v-if="!hideSearchField"
             class="px-3"
@@ -76,7 +94,7 @@
           v-bind="{...filterBtnOptions, ...filterBtnTitle}"
           />
 
-          <v-btn v-if="can('create') && !noForm" v-bind="addBtnOptions" @click="createForm" :text="addBtnTitle"/>
+          <v-btn v-if="can('create') && !noForm && !someSelected" v-bind="addBtnOptions" @click="createForm" :text="addBtnTitle"/>
 
         </v-toolbar>
 
@@ -224,6 +242,30 @@
 
       </template>
 
+
+      <!-- MARK: DATA-ITERATOR BODY -->
+      <template v-slot:body=" { items }" v-if="enableIterators" class="ue-datatable__container">
+          <v-row>
+            <v-col
+            v-for="(element, i) in items"
+            :key="element.id"
+            v-bind="customRowComponent.col"
+            >
+            <!-- // TODO - check if its empty -->
+              <component
+                :is="`ue-${customRowComponent.iteratorComponent}`"
+                :key="element.id"
+                :item="element"
+                :headers="headers"
+                :rowActions = "rowActions"
+                @click-action="itemAction"
+                @edit-item = "editItem"
+              >
+              </component>
+            </v-col>
+          </v-row>
+      </template>
+
       <!-- MARK PAGINATION BUTTONS -->
       <template v-if="!noFooter" v-slot:bottom="{page, pageCount}">
         <div class="text-right py-theme">
@@ -237,6 +279,7 @@
               icon="$arrowLeft"
             />
           </v-btn>
+
           <v-btn
             class="v-btn--icon bg-tertiary rounded px-8 py-2 mr-theme"
             :disabled="options.page >= totalPage"
@@ -254,7 +297,7 @@
         </div>
       </template>
 
-
+      <!-- Custom Slots -->
       <template
         v-for="(context, slotName) in slots" v-slot:[slotName]=""
         :key="`customSlot-${slotName}`"
@@ -325,7 +368,8 @@
       <template v-slot:item.actions="{ item }">
         <!-- @click's editItem|deleteItem -->
         <!-- #actions -->
-        <v-menu v-if="rowActionsType == 'dropdown' || isSmAndDown"
+
+        <v-menu v-if="rowActionsType === 'dropdown' || isSmAndDown"
           :close-on-content-click="false"
           open-on-hover
           left
@@ -380,6 +424,7 @@
       </template>
 
     </v-data-table-server>
+    {{ console.log(selectedItems) }}
 
   </div>
   </v-layout>
