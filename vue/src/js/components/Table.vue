@@ -276,8 +276,6 @@
           v-bind="customFooterProps"
         />
         </div>
-
-
       </template>
 
 
