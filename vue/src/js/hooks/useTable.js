@@ -301,26 +301,32 @@ export default function useTable (props, context) {
       }
     }),
     customFooterProps: computed(() => {
-      const footerProps = props.paginationOptions.vuePagination
+      const customComponent = props.paginationOptions.footerComponent
+
       if(state.enableCustomFooter){
-        return {
-          'variant' : footerProps.variant, //'flat' | 'elevated' | 'tonal' | 'outlined' | 'text' | 'plain' -- 'text' in default
-          'border' : footerProps.border,
-          'active-color' : footerProps.activeColor,
-          'color' : footerProps.color, // utility colors or rgba(x,x,x,a),
-          'density' : footerProps.density, // default | comfortable | compact
-          'elevation' : footerProps.elevation, // string | number or undefined in default
-          'ellipsis': footerProps.ellipsis, // string '...' in default
-          'first-icon' : footerProps.firstIcon,
-          'last-icon' : footerProps.lastIcon,
-          'next-icon' : footerProps.nextIcon,
-          'prev-icon' : footerProps.prevIcon,
-          'rounded' : footerProps.rounded, // string|number or boolean 0.xs.sm.true,lg,xl,pill, circle, and shaped
-          'show-first-last-page' : footerProps.showFirstLastPage, // boolean,
-          'size' : footerProps.size, // string | number  Sets the height and width of the component. Default unit is px. Can also use the following predefined sizes: x-small, small, default, large, and x-large.
-          'total-visible' : footerProps.totalVisible === 'auto' ? store.getters.totalPage : footerProps.totalVisible,
+        const footerProps = props.paginationOptions[customComponent]
+        if(customComponent === 'vuePagination'){
+          return {
+            'variant' : footerProps.variant, //'flat' | 'elevated' | 'tonal' | 'outlined' | 'text' | 'plain' -- 'text' in default
+            'border' : footerProps.border,
+            'active-color' : footerProps.activeColor,
+            'color' : footerProps.color, // utility colors or rgba(x,x,x,a),
+            'density' : footerProps.density, // default | comfortable | compact
+            'elevation' : footerProps.elevation, // string | number or undefined in default
+            'ellipsis': footerProps.ellipsis, // string '...' in default
+            'first-icon' : footerProps.firstIcon,
+            'last-icon' : footerProps.lastIcon,
+            'next-icon' : footerProps.nextIcon,
+            'prev-icon' : footerProps.prevIcon,
+            'rounded' : footerProps.rounded, // string|number or boolean 0.xs.sm.true,lg,xl,pill, circle, and shaped
+            'show-first-last-page' : footerProps.showFirstLastPage, // boolean,
+            'size' : footerProps.size, // string | number  Sets the height and width of the component. Default unit is px. Can also use the following predefined sizes: x-small, small, default, large, and x-large.
+            'total-visible' : footerProps.totalVisible === 'auto' ? store.getters.totalPage : footerProps.totalVisible,
+          }
         }
       }
+
+
     })
   })
 
