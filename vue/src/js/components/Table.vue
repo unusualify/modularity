@@ -14,7 +14,7 @@
 
     <v-data-table-server
       v-if="!hideTable"
-      v-bind="$bindAttributes()"
+      v-bind="{...$bindAttributes(),...defaultFooterProps}"
       :class="[tableClasses, fullWidthWrapper ? '' : 'ue-table--narrow-wrapper']"
       id="ue-table"
 
@@ -37,16 +37,17 @@
       :must-sort="mustSort"
       :density="tableDensity ?? 'comfortable'"
       :disable-sort="disableSort"
-      :disable-pagination="disablePagination"
       :loading="loading"
       :loading-text="$t('loading-text')"
       :mobile="isSmAndDown"
 
-      :hide-default-footer="hideFooter"
-
       :show-select="true"
       item-value="id"
       v-model="selectedItems"
+
+
+
+      @update:options="changeOptions($event)"
     >
     <!-- v-model:options="options" -->
       <template v-slot:top = "{ someSelected }">
@@ -60,16 +61,15 @@
             padding-reset
             :class="[someSelected ? 'w-50 h-100' : 'w-50 h-100']"
           />
-          <v-slide-x-transition mode="out-in" :group="true">
-
-              <v-btn
-              v-if="someSelected"
-              icon="mdi-delete"
-              />
-              <v-btn
-              v-if="someSelected"
-                icon="mdi-restore"
-              />
+          <v-slide-x-transition :group="true">
+              <template v-for="(actions, k) in bulkActions" :key="k">
+                <v-btn
+                  v-if="someSelected"
+                  :icon="(action.icon ? action.icon : `$${action.name}`)"
+                  small
+                  left
+                />
+              </template>
           </v-slide-x-transition>
 
           <v-sheet v-if="someSelected" >
@@ -267,35 +267,19 @@
       </template>
 
       <!-- MARK PAGINATION BUTTONS -->
-      <template v-if="!noFooter" v-slot:bottom="{page, pageCount}">
-        <div class="text-right py-theme">
-          <v-btn
-            class="v-btn--icon bg-tertiary rounded px-8 py-2 mr-theme"
-            :disabled="options.page < 2"
-            @click="goPreviousPage"
-            >
-            <v-icon
-              size="small"
-              icon="$arrowLeft"
-            />
-          </v-btn>
 
-          <v-btn
-            class="v-btn--icon bg-tertiary rounded px-8 py-2 mr-theme"
-            :disabled="options.page >= totalPage"
-            @click="goNextPage"
-            >
-            <v-icon
-              size="small"
-              icon="$arrowRight"
-            />
-          </v-btn>
-          <!-- <v-pagination
-            v-model="options.page"
-            :length="pageCount"
-          ></v-pagination> -->
+      <template v-if="enableCustomFooter" v-slot:bottom="{page, pageCount}">
+        <div class="d-flex justify-end">
+          <v-pagination
+          v-model="options.page"
+          :length="pageCount"
+          v-bind="customFooterProps"
+        />
         </div>
+
+
       </template>
+
 
       <!-- Custom Slots -->
       <template
@@ -393,7 +377,7 @@
                   <v-icon small :color="action.color" left>
                     {{ action.icon ? action.icon : '$' + action.name }}
                   </v-icon>
-                  {{ $t( action.label ??action.name ) }}
+                  {{ $t( action.label ?? action.name ) }}
               </v-list-item>
             </template>
           </v-list>
@@ -424,7 +408,7 @@
       </template>
 
     </v-data-table-server>
-    {{ console.log(selectedItems) }}
+
 
   </div>
   </v-layout>

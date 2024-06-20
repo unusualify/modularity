@@ -105,11 +105,6 @@ export const makeTableProps = propsFactory({
     type: Boolean,
     default: false
   },
-  noFooter: {
-    type: Boolean,
-    default: false
-  },
-
   tableDensity:{
     type:String,
     default: 'comfortable',
@@ -139,6 +134,14 @@ export const makeTableProps = propsFactory({
     type: Object,
     default: {}
   },
+  bulkActions: {
+    type: [Array, Object],
+    default: []
+  },
+  paginationOptions: {
+    type: [Array, Object],
+    default: {}
+  } ,
 })
 
 // by convention, composable function names start with "use"
@@ -276,6 +279,49 @@ export default function useTable (props, context) {
     hideHeaders: computed(() => {
       return props.hideHeaders || state.enableIterators
     }),
+    enableCustomFooter: computed(() => props.paginationOptions.footerComponent !== 'default'),
+    defaultFooterProps: computed(() => {
+
+      const footerProps = props.paginationOptions.footerProps
+      if(!state.enableCustomFooter){
+        return {
+          'items-per-page-options': footerProps.itemsPerPageOptions,
+          'items-per-page-text': footerProps.itemsPerPageText,
+          'items-per-page': footerProps.itemsPerPage,
+          'first-icon' : footerProps.firstIcon,
+          'last-icon': footerProps.lastIcon,
+          'next-icon' : footerProps.nextIcon,
+          'prev-icon' : footerProps.prevIcon,
+          'show-current-page': footerProps.showCurrentPage,
+        }
+      }else{
+        return {
+          'hide-default-footer' : true
+        }
+      }
+    }),
+    customFooterProps: computed(() => {
+      const footerProps = props.paginationOptions.vuePagination
+      if(state.enableCustomFooter){
+        return {
+          'variant' : footerProps.variant, //'flat' | 'elevated' | 'tonal' | 'outlined' | 'text' | 'plain' -- 'text' in default
+          'border' : footerProps.border,
+          'active-color' : footerProps.activeColor,
+          'color' : footerProps.color, // utility colors or rgba(x,x,x,a),
+          'density' : footerProps.density, // default | comfortable | compact
+          'elevation' : footerProps.elevation, // string | number or undefined in default
+          'ellipsis': footerProps.ellipsis, // string '...' in default
+          'first-icon' : footerProps.firstIcon,
+          'last-icon' : footerProps.lastIcon,
+          'next-icon' : footerProps.nextIcon,
+          'prev-icon' : footerProps.prevIcon,
+          'rounded' : footerProps.rounded, // string|number or boolean 0.xs.sm.true,lg,xl,pill, circle, and shaped
+          'show-first-last-page' : footerProps.showFirstLastPage, // boolean,
+          'size' : footerProps.size, // string | number  Sets the height and width of the component. Default unit is px. Can also use the following predefined sizes: x-small, small, default, large, and x-large.
+          'total-visible' : footerProps.totalVisible === 'auto' ? store.getters.totalPage : footerProps.totalVisible,
+        }
+      }
+    })
   })
 
   const methods = reactive({
@@ -630,8 +676,13 @@ export default function useTable (props, context) {
       if (state.options.page > 1) { state.options.page -= 1 }
     },
     filterStatus(slug){
+      if (this.navActive === slug) return
+      store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
       store.commit(DATATABLE.UPDATE_DATATABLE_FILTER_STATUS, slug)
       store.dispatch(ACTIONS.GET_DATATABLE)
+    },
+    changeOptions(options){
+      state.options = options
     }
   })
 
