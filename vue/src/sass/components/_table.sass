@@ -1,0 +1,28 @@
+@use '../abstract' as *
+
+#ue-main-body
+
+.v-table
+  &#ue-table
+    &.zebra-stripes
+      tr
+        &:nth-of-type(2n)
+          background-color: #f1f2f6
+    &.horizontal-lines
+      tr
+        td
+          border-bottom: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
+
+    &.free-form
+      tr
+        td
+          border: none !important
+
+    &.grid-form
+      tr
+        th,td
+          border-bottom: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
+          border-right: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
+          &:is(:first-of-type)
+            border-left: thin solid rgba(var(--v-border-color), var(--v-border-opacity))
+
