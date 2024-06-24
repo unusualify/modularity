@@ -170,18 +170,6 @@ trait ManageUtilities {
 
             }
 
-// if($action === 'edit'){
-
-//     dd(moduleRoute(
-//         $this->routeName,
-//         $prefix,
-//         'bulkDelete',
-//         $parameters
-//     ));
-// }
-
-
-
             return [
                 // $action . 'Endpoint' => $optionIsActive
                 $action => $optionIsActive
@@ -194,9 +182,9 @@ trait ManageUtilities {
                             :   null
             ];
 
-        })->toArray()
+        })->toArray();
         // + ['languages' => route(Route::hasAdminRoute(''))]
-        ;
+
     }
 
     /**

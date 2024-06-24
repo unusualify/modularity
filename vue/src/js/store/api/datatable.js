@@ -137,7 +137,7 @@ export default {
   },
 
   bulkDelete (ids, callback) {
-    axios.post(window[import.meta.env.VUE_APP_NAME].CMS_URLS.bulkDelete, { ids }).then(function (resp) {
+    axios.post(window[import.meta.env.VUE_APP_NAME].ENDPOINTS.bulkDelete, { ids }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
       const error = {

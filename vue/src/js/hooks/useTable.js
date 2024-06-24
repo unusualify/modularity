@@ -279,11 +279,10 @@ export default function useTable (props, context) {
     hideHeaders: computed(() => {
       return props.hideHeaders || state.enableIterators
     }),
-    enableCustomFooter: computed(() => props.paginationOptions.footerComponent !== 'default'),
+    enableCustomFooter: computed(() =>  props.paginationOptions.footerComponent === 'vuePagination'),
     defaultFooterProps: computed(() => {
-
       const footerProps = props.paginationOptions.footerProps
-      if(!state.enableCustomFooter){
+      if(props.paginationOptions.footerComponent === 'default'){
         return {
           'items-per-page-options': footerProps.itemsPerPageOptions,
           'items-per-page-text': footerProps.itemsPerPageText,
@@ -327,7 +326,8 @@ export default function useTable (props, context) {
       }
 
 
-    })
+    }),
+
   })
 
   const methods = reactive({
@@ -351,7 +351,6 @@ export default function useTable (props, context) {
         store.commit(FORM.RESET_EDITED_ITEM)
       })
     },
-
     itemHasAction: function (item, action) {
       let hasAction = true
       switch (action.name) {
@@ -557,7 +556,6 @@ export default function useTable (props, context) {
       // // this.$refs.dialog.openModal()
       // methods.openDeleteModal()
     },
-
     activateItem: function (item) {
       state.activeTableItem = find(state.elements, { id: item.id })
     },
@@ -689,6 +687,27 @@ export default function useTable (props, context) {
     },
     changeOptions(options){
       state.options = options
+    },
+    setBulkItems(){
+      store.commit(DATATABLE.REPLACE_DATATABLE_BULK, state.selectedItems)
+    },
+    bulkAction(action){
+      methods.setBulkItems()
+      switch (action.name) {
+        case 'delete':
+          methods.bulkDelete()
+          break;
+        case 'forceDelete':
+          break
+        case 'restore':
+
+        default:
+          break;
+      }
+
+    },
+    bulkDelete(){
+      store.dispatch(ACTIONS.BULK_DELETE)
     }
   })
 

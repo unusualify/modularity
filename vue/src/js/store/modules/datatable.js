@@ -436,19 +436,19 @@ const actions = {
   },
   [ACTIONS.BULK_DELETE] ({ commit, state, dispatch }) {
     api.bulkDelete(state.bulk.join(), function (resp) {
-      commit(NOTIFICATION.SET_NOTIF, { message: resp.data.message, variant: resp.data.variant })
+      commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
       dispatch(ACTIONS.GET_DATATABLE)
     })
   },
   [ACTIONS.BULK_RESTORE] ({ commit, state, dispatch }) {
     api.bulkRestore(state.bulk.join(), function (resp) {
-      commit(NOTIFICATION.SET_NOTIF, { message: resp.data.message, variant: resp.data.variant })
+      commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
       dispatch(ACTIONS.GET_DATATABLE)
     })
   },
   [ACTIONS.BULK_DESTROY] ({ commit, state, dispatch }) {
     api.bulkDestroy(state.bulk.join(), function (resp) {
-      commit(NOTIFICATION.SET_NOTIF, { message: resp.data.message, variant: resp.data.variant })
+      commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
       dispatch(ACTIONS.GET_DATATABLE)
     })
   }
