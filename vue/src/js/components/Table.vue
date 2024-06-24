@@ -46,7 +46,6 @@
       v-model="selectedItems"
 
 
-
       @update:options="changeOptions($event)"
     >
     <!-- v-model:options="options" -->
@@ -62,10 +61,11 @@
             :class="[someSelected ? 'w-50 h-100' : 'w-50 h-100']"
           />
           <v-slide-x-transition :group="true">
-              <template v-for="(actions, k) in bulkActions" :key="k">
+              <template v-for="(action, k) in bulkActions" :key="k">
                 <v-btn
                   v-if="someSelected"
                   :icon="(action.icon ? action.icon : `$${action.name}`)"
+                  @click.prevent="bulkAction(action)"
                   small
                   left
                 />
