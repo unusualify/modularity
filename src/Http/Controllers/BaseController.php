@@ -690,4 +690,14 @@ abstract class BaseController extends PanelController
 
         return $value;
     }
+
+    public function bulkDelete(){
+        if($this->repository->bulkDelete(explode(',', $this->request->get('ids'))))
+        {
+            return $this->respondWithSuccess(___('listing.bulk-delete.success', ['modelTitle' => $this->modelTitle]));
+        }
+
+        return $this->respondWithError(___('listing.bulk-delete.success', ['modelTitle' => $this->modelTitle]));
+
+    }
 }

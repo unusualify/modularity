@@ -53,7 +53,8 @@ trait ManageUtilities {
             'moduleName' => $this->getHeadline($this->moduleName),
             'translate' => $this->routeHas('translations') || $this->hasTranslatedInput(),
 
-            'tableAttributes' => ['rowActions' => $this->getTableActions()]
+            'tableAttributes' => ['rowActions' => $this->getTableActions(),
+                                 'bulkActions' => $this->getTableBulkActions()]
             + array_merge_recursive_preserve(
                 [
                     'name' => $this->getHeadline($this->routeName),
@@ -129,8 +130,9 @@ trait ManageUtilities {
             // 'delete',
 
             'forceDelete',
+
             'restore',
-            'duplicate'
+            'duplicate',
 
             // 'show',
             // 'update',
@@ -143,7 +145,7 @@ trait ManageUtilities {
             // 'reorder',
             // 'feature',
             // 'bulkFeature',
-            // 'bulkDelete',
+            'bulkDelete',
         ])->mapWithKeys(function ($action) {
 
             // $parameters = $this->submodule ? [$this->submoduleParentId] : [];
@@ -162,11 +164,23 @@ trait ManageUtilities {
 
             $prefix = $this->routePrefix;
 
+
             if(!in_array($action, ['index', 'create', 'store'])){
                 $prefix = $this->generateRoutePrefix(noNested: true);
+
             }
 
-            // dd($this->routeName, $prefix, $action, $parameters);
+// if($action === 'edit'){
+
+//     dd(moduleRoute(
+//         $this->routeName,
+//         $prefix,
+//         'bulkDelete',
+//         $parameters
+//     ));
+// }
+
+
 
             return [
                 // $action . 'Endpoint' => $optionIsActive

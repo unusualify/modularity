@@ -353,4 +353,43 @@ trait ManageTable {
 
     }
 
+    protected function getTableBulkActions(): Array
+    {
+        $actions = [];
+
+
+        if($this->getIndexOption('delete'))
+        {
+            $actions[] = [
+                'name' => 'delete',
+                'can' => $this->permissionPrefix(Permission::DELETE->value),
+                // 'color' => 'red darken-2',
+                'color' => 'primary',
+            ];
+        }
+
+        if($this->getIndexOption('forceDelete')){
+            $actions[] = [
+                'name' => 'forceDelete',
+                'icon' => '$delete',
+                'can' => 'forceDelete',
+                // 'color' => 'red darken-2',
+                'color' => 'red',
+            ];
+        }
+
+        if($this->getIndexOption('restore')){
+            $actions[] = [
+                'name' => 'restore',
+                // 'icon' => '$',
+                'can' => 'restore',
+                // 'color' => 'red darken-2',
+                'color' => 'green',
+            ];
+        }
+
+
+        return $actions;
+    }
+
 }

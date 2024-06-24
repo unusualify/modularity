@@ -10,14 +10,12 @@
             'embeddedForm' => true,
             'formWidth' => '60%',
             // 'showSelect' => true,
-            'tableComponent' => 'table'
         ];
     @endphp
 @endonce
 
 @php
     $vBind = array_merge_recursive_preserve($defaultTableAttributes, $tableAttributes ?? []);
-    $tableComponent = $vBind['tableComponent']
 @endphp
 
 <ue-table v-bind='@json($vBind)' />
