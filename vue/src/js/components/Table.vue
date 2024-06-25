@@ -63,7 +63,7 @@
           <v-slide-x-transition :group="true">
               <template v-for="(action, k) in bulkActions" :key="k">
                 <v-btn
-                  v-if="someSelected"
+                  v-if="someSelected && canBulkAction(action)"
                   :icon="(action.icon ? action.icon : `$${action.name}`)"
                   @click.prevent="bulkAction(action)"
                   small

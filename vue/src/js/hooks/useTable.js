@@ -1,5 +1,5 @@
 // hooks/useTable.js
-import { watch, computed, nextTick, reactive, toRefs, ref, watchEffect } from 'vue'
+import { watch, computed, nextTick, reactive, toRefs, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
@@ -142,6 +142,10 @@ export const makeTableProps = propsFactory({
     type: [Array, Object],
     default: {}
   } ,
+  navActive: {
+    type: String,
+    default: 'all'
+  }
 })
 
 // by convention, composable function names start with "use"
@@ -324,10 +328,10 @@ export default function useTable (props, context) {
           }
         }
       }
-
-
     }),
-
+    navActive: computed(() => {
+      return state.filterActive.slug
+    })
   })
 
   const methods = reactive({
@@ -646,7 +650,6 @@ export default function useTable (props, context) {
         }
       })
     },
-
     createForm () {
       methods.resetEditedItem()
       methods.openForm()
@@ -662,14 +665,12 @@ export default function useTable (props, context) {
         if (Object.prototype.hasOwnProperty.call(res, 'variant') && res.variant.toLowerCase() === 'success') { methods.closeForm() }
       })
     },
-
     openDeleteModal: function () {
       state.deleteModalActive = true
     },
     closeDeleteModal: function () {
       state.deleteModalActive = false
     },
-
     isSoftDeletable (item) {
       return !!(__isset(item.deleted_at) && item.deleted_at)
     },
@@ -680,13 +681,31 @@ export default function useTable (props, context) {
       if (state.options.page > 1) { state.options.page -= 1 }
     },
     filterStatus(slug){
-      if (this.navActive === slug) return
+      if (state.navActive === slug) return
       store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
       store.commit(DATATABLE.UPDATE_DATATABLE_FILTER_STATUS, slug)
       store.dispatch(ACTIONS.GET_DATATABLE)
     },
     changeOptions(options){
       state.options = options
+    },
+    canBulkAction(action){
+      if(methods.canItemAction(action)){
+        console.log(action, state.navActive)
+        switch (action.name) {
+          case 'forceDelete':
+            return state.navActive === 'trash'
+          case 'restore':
+            return state.navActive === 'trash'
+          case 'delete':
+            return state.navActive !== 'trash'
+          default:
+            console.log('Action not defined in conditional pipe line - useTable:709')
+            return false
+        }
+      }
+
+      return false
     },
     setBulkItems(){
       store.commit(DATATABLE.REPLACE_DATATABLE_BULK, state.selectedItems)
@@ -698,9 +717,11 @@ export default function useTable (props, context) {
           methods.bulkDelete()
           break;
         case 'forceDelete':
+          methods.bulkForceDelete()
           break
         case 'restore':
-
+          methods.bulkRestore()
+          break
         default:
           break;
       }
@@ -708,6 +729,12 @@ export default function useTable (props, context) {
     },
     bulkDelete(){
       store.dispatch(ACTIONS.BULK_DELETE)
+    },
+    bulkRestore(){
+      store.dispatch(ACTIONS.BULK_RESTORE)
+    },
+    bulkForceDelete(){
+      store.dispatch(ACTIONS.BULK_DESTROY)
     }
   })
 
@@ -736,7 +763,6 @@ export default function useTable (props, context) {
   watch(() => state.elements, (newValue, oldValue) => {
     // __log('elements watch', newValue, oldValue)
   }, { deep: true })
-
   const formatter = useFormatter(props, context, state.headers)
 
   // expose managed state as return value

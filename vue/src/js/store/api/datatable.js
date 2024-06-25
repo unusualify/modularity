@@ -149,7 +149,7 @@ export default {
   },
 
   bulkRestore (ids, callback) {
-    axios.post(window[import.meta.env.VUE_APP_NAME].CMS_URLS.bulkRestore, { ids }).then(function (resp) {
+    axios.post(window[import.meta.env.VUE_APP_NAME].ENDPOINTS.bulkRestore, { ids }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
       const error = {
@@ -161,7 +161,7 @@ export default {
   },
 
   bulkDestroy (ids, callback) {
-    axios.post(window[import.meta.env.VUE_APP_NAME].CMS_URLS.bulkForceDelete, { ids }).then(function (resp) {
+    axios.post(window[import.meta.env.VUE_APP_NAME].ENDPOINTS.bulkForceDelete, { ids }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
       const error = {

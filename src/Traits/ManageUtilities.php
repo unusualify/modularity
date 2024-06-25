@@ -140,11 +140,12 @@ trait ManageUtilities {
 
             // 'publish',
             // 'bulkPublish',
-            // 'bulkRestore',
-            // 'bulkForceDelete',
+
             // 'reorder',
             // 'feature',
             // 'bulkFeature',
+            'bulkForceDelete',
+            'bulkRestore',
             'bulkDelete',
         ])->mapWithKeys(function ($action) {
 
@@ -167,7 +168,6 @@ trait ManageUtilities {
 
             if(!in_array($action, ['index', 'create', 'store'])){
                 $prefix = $this->generateRoutePrefix(noNested: true);
-
             }
 
             return [

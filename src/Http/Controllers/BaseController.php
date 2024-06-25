@@ -697,7 +697,26 @@ abstract class BaseController extends PanelController
             return $this->respondWithSuccess(___('listing.bulk-delete.success', ['modelTitle' => $this->modelTitle]));
         }
 
-        return $this->respondWithError(___('listing.bulk-delete.success', ['modelTitle' => $this->modelTitle]));
+        return $this->respondWithError(___('listing.bulk-delete.error', ['modelTitle' => $this->modelTitle]));
 
+    }
+
+    public function bulkForceDelete()
+    {
+        if($this->repository->bulkForceDelete(explode(',', $this->request->get('ids'))))
+        {
+            return $this->respondWithSuccess(___('listing.bulk-force-delete.success', ['modelTitle' => $this->modelTitle]));
+        }
+
+        return $this->respondWithError(___('listing.bulk-force-delete.error', ['modelTitle' => $this->modelTitle]));
+    }
+
+    public function bulkRestore()
+    {
+        if($this->repository->bulkRestore(explode(',', $this->request->get('ids'))))
+        {
+            return $this->respondWithSuccess(___('listing.bulk-restore.success', ['modelTitle' => $this->modelTitle]));
+        }
+        return $this->respondWithError(___('listing.bulk-restore.error', ['modelTitle' => $this->modelTitle]));
     }
 }

@@ -147,8 +147,13 @@ trait RelationTrait
     public function afterForceDeleteRelationTrait($object)
     {
         foreach ($this->getBelongsToManyRelations() as $relation) {
-            // dd('afterForceDelete', $relation);
-            $object->{$relation}()->detach();
+            // dd('afterForceDelete', $relation, );
+            try {
+                $object->{$relation}()->detach();
+            } catch (\Throwable $th) {
+                // TODO - check if relation is realy exists
+                continue;
+            }
         }
     }
 

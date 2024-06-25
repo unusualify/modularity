@@ -100,7 +100,7 @@ abstract class PanelController extends CoreController
         'feature' => false,
         'bulkFeature' => false,
         'restore' => true,
-        'bulkRestore' => false,
+        'bulkRestore' => true,
         'forceDelete' => true,
         'bulkForceDelete' => true,
         'delete' => true,
