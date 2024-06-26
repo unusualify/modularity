@@ -784,6 +784,13 @@ abstract class PanelController extends CoreController
         }
     }
 
+    protected function getReplaceUrl(){
+        if($this->request->has('replaceUrl')){
+            return $this->request->get('replaceUrl') === 'true';
+        }
+        return true;
+    }
+
     /**
      * @return void
      */

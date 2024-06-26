@@ -293,6 +293,8 @@ class DashboardController extends BaseController
                         $block['attributes']['items'] = $controller->getIndexData()['initialResource']->resource['data'];
                         $block['attributes']['endpoints'] = $controller->getIndexData()['endpoints'];
                         $block['attributes']['rowActions'] = $controller->getTableActions();
+                        // in order to keep url as default home url
+                        $block['attributes']['tableOptions']['replaceUrl'] = false;
                         $blocks[$index] = $block;
                         break;
                     case 'board-information-plus':

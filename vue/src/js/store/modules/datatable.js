@@ -255,7 +255,7 @@ const activeOption = (option, key) => {
 
   if (key.match(/sortBy|sortDesc/)) {
     if (option.length > 0) { value = option } else { exist = false }
-  } else if (key.match(/page|itemsPerPage/)) {
+  } else if (key.match(/page|itemsPerPage|replaceUrl/)) {
     value = option
   } else {
     exist = false
@@ -285,11 +285,10 @@ const actions = {
 
     if (_changed) {
       commit(DATATABLE.UPDATE_DATATABLE_LOADING, true)
-
       const parameters = {
         ...(Object.keys(state.options).reduce(function (filtered, key) {
           const { active, value } = activeOption(
-            __isset(payload.options) ? payload.options[key] : state.options[key],
+            __isset(payload.options?.[key]) ? payload?.options[key] : state?.options[key],
             key
           )
 

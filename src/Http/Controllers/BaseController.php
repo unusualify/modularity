@@ -58,7 +58,7 @@ abstract class BaseController extends PanelController
             return [
                 'resource' => $this->getJSONData(),
                 'mainFilters' => $this->getTableMainFilters(),
-                'replaceUrl' => true
+                'replaceUrl' => $this->getReplaceUrl(),
             ];
             // return $indexData + ['replaceUrl' => true];
         }
