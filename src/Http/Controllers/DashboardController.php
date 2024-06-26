@@ -286,7 +286,7 @@ class DashboardController extends BaseController
 
             foreach ($blocks as $index => $block) {
                 switch ($block['component']) {
-                    case 'new-table':
+                    case 'table':
                         $controller = App::make($block['controller'])->setTableAttributes(tableOptions:
                             $block['attributes']['tableOptions'],
                         );
@@ -294,7 +294,6 @@ class DashboardController extends BaseController
                         $block['attributes']['endpoints'] = $controller->getIndexData()['endpoints'];
                         $block['attributes']['rowActions'] = $controller->getTableActions();
                         $blocks[$index] = $block;
-
                         break;
                     case 'board-information-plus':
                         $cards = $block['cards'] ?? [];

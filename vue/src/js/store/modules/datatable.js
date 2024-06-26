@@ -268,7 +268,7 @@ const activeOption = (option, key) => {
 }
 
 const actions = {
-  [ACTIONS.GET_DATATABLE] ({ commit, state, getters }, { payload = {}, callback = null, errorCallback = null } = {}) {
+  [ACTIONS.GET_DATATABLE] ({ commit, state, getters }, { payload = {}, callback = null, errorCallback = null, endpoint = null } = {}) {
     // if (!state.loading) {
 
     const keys = Object.keys(payload)
@@ -285,6 +285,7 @@ const actions = {
 
     if (_changed) {
       commit(DATATABLE.UPDATE_DATATABLE_LOADING, true)
+
       const parameters = {
         ...(Object.keys(state.options).reduce(function (filtered, key) {
           const { active, value } = activeOption(
@@ -300,8 +301,10 @@ const actions = {
         ...(state.filter.status !== 'all' ? { filter: state.filter } : {})
       }
 
+      const url = endpoint ?? window[import.meta.env.VUE_APP_NAME].ENDPOINTS.index
+
       // __log(parameters)
-      api.get(parameters, function (resp) {
+      api.get(url,parameters, function (resp) {
         commit(DATATABLE.UPDATE_DATATABLE_DATA, resp.resource.data)
         commit(DATATABLE.UPDATE_DATATABLE_TOTAL, resp.resource.total)
         commit(DATATABLE.UPDATE_DATATABLE_NAV, resp.mainFilters)

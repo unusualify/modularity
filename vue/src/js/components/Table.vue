@@ -12,6 +12,7 @@
     >
     </ActiveTableItem>
 
+
     <v-data-table-server
       v-if="!hideTable"
       v-bind="{...$bindAttributes(),...defaultFooterProps}"
@@ -83,14 +84,16 @@
             :placeholder="searchText"
             hide-details
             density="compact"
-            single-line
+
             style="max-width: 30%; display: inline;"
+            single-line
             v-model="search"
           />
           <v-spacer v-else-if="hideSearchField"></v-spacer>
 
           <v-btn
           id="filter-btn-activator"
+          v-if="mainFilters.length > 0"
           v-bind="{...filterBtnOptions, ...filterBtnTitle}"
           />
 
@@ -429,6 +432,7 @@ export default {
     ignoreFormatters
   },
   setup (props, context) {
+
     return {
       ...useTable(props, context)
     }
@@ -439,6 +443,7 @@ export default {
     }
   },
   mounted () {
+
     // __log(
     //   // this.$props,
     //   // _.omit(this.$props ?? {}, ['columns']),

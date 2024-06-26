@@ -17,8 +17,7 @@ export default {
     * filter: the current navigation ("all", "mine", "published", "draft", "trash")
     *
     */
-  get (params, callback) {
-    const url = window[import.meta.env.VUE_APP_NAME].ENDPOINTS.index
+  get (url,params, callback) {
 
     axios.get(url, { params })
       .then(function (resp) {

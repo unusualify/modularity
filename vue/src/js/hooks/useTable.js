@@ -3,7 +3,7 @@ import { watch, computed, nextTick, reactive, toRefs, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
-import { isObject, find, omit, snakeCase, kebabCase } from 'lodash-es'
+import { isObject, find, omit, snakeCase, kebabCase, isEqual } from 'lodash-es'
 
 import { DATATABLE, FORM } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
@@ -145,6 +145,10 @@ export const makeTableProps = propsFactory({
   navActive: {
     type: String,
     default: 'all'
+  },
+  endpoints: {
+    type: Object,
+    default : {}
   }
 })
 
@@ -177,9 +181,9 @@ export default function useTable (props, context) {
     activeTableItem: null,
     hideTable: false,
     fillHeight: computed(() => props.fillHeight),
-    createUrl: window[import.meta.env.VUE_APP_NAME].ENDPOINTS.create ?? props.endpoints.create ?? '',
+    createUrl: computed(() => props.endpoints.edit ?? window[import.meta.env.VUE_APP_NAME].ENDPOINTS.create ?? ''),
     editUrl: computed(()=> {
-      return window[import.meta.env.VUE_APP_NAME].ENDPOINTS.edit ?? props.endpoints.edit ?? ''
+      return props.endpoints.edit ?? window[import.meta.env.VUE_APP_NAME].ENDPOINTS.edit ??  ''
     }),
     editedIndex: -1,
     selectedItems: [],
@@ -276,7 +280,7 @@ export default function useTable (props, context) {
     }),
     filterBtnTitle: computed(() => {
       return {
-        text: `${state.filterActive.name} (${state.filterActive.number})`,
+        text: `${state.filterActive?.name} (${state.filterActive?.number})`,
       }
     }),
     enableIterators: computed(() => Object.keys(props.customRowComponent).length),
@@ -329,9 +333,8 @@ export default function useTable (props, context) {
         }
       }
     }),
-    navActive: computed(() => {
-      return state.filterActive.slug
-    })
+    navActive: computed(() => state.filterActive?.slug ?? 'all'),
+    mainFilters: computed(() => store.state.datatable.mainFilters ?? null),
   })
 
   const methods = reactive({
@@ -687,7 +690,9 @@ export default function useTable (props, context) {
       store.dispatch(ACTIONS.GET_DATATABLE)
     },
     changeOptions(options){
-      state.options = options
+      if(!isEqual(options, state.options)){
+        state.options = options
+      }
     },
     canBulkAction(action){
       if(methods.canItemAction(action)){
@@ -735,6 +740,15 @@ export default function useTable (props, context) {
     },
     bulkForceDelete(){
       store.dispatch(ACTIONS.BULK_DESTROY)
+    },
+    initializeStoreOptions(){
+      if(!store.state.datatable.options?.length){
+        store.commit(DATATABLE.UPDATE_DATATABLE_SEARCH, '')
+        store.commit(
+          DATATABLE.UPDATE_DATATABLE_OPTIONS,
+          state.options
+        )
+      }
     }
   })
 
@@ -756,16 +770,17 @@ export default function useTable (props, context) {
     newValue || methods.resetEditedItem()
   })
   watch(() => state.options, (newValue, oldValue) => {
-    // state.options.page = newValue
-
-    store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue } })
-  }, { deep: true })
+      store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue }, endpoint : props.endpoints.index ?? null })
+  }, { deep: true  })
   watch(() => state.elements, (newValue, oldValue) => {
     // __log('elements watch', newValue, oldValue)
   }, { deep: true })
+
   const formatter = useFormatter(props, context, state.headers)
 
   // expose managed state as return value
+  methods.initializeStoreOptions()
+
   return {
     form,
     ...toRefs(state),
