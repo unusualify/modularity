@@ -20,6 +20,7 @@
       id="ue-table"
 
       :headers="headers"
+      :sticky="sticky"
       :items="elements"
       :hover="true"
 
@@ -42,7 +43,7 @@
       :loading-text="$t('loading-text')"
       :mobile="isSmAndDown"
 
-      :show-select="true"
+      :show-select="showSelect"
       item-value="id"
       v-model="selectedItems"
 

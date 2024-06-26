@@ -149,7 +149,15 @@ export const makeTableProps = propsFactory({
   endpoints: {
     type: Object,
     default : {}
-  }
+  },
+  showSelect: {
+    type: Boolean,
+    default: true,
+  },
+  sticky:{
+    type: Boolean,
+    default: true,
+  },
 })
 
 // by convention, composable function names start with "use"
@@ -770,8 +778,8 @@ export default function useTable (props, context) {
     newValue || methods.resetEditedItem()
   })
   watch(() => state.options, (newValue, oldValue) => {
-      store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue }, endpoint : props.endpoints.index ?? null })
-  }, { deep: true  })
+      store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue }, endpoint : props.endpoints.index ?? null})
+  }, { deep: true })
   watch(() => state.elements, (newValue, oldValue) => {
     // __log('elements watch', newValue, oldValue)
   }, { deep: true })
