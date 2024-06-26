@@ -9,15 +9,15 @@ return [
     'rowActionsType' => 'inline',
     'hideDefaultFooter' => false,
     'tableClasses' => 'elevation-2 zebra-stripes free-form',
-    // 'noFooter' => true,
 
     'hideHeaders' => false,
     'hideSearchField' => false,
     'multiSort' => false,
     'mustSort' => false,
-    'tableDensity' => 'comfortable', // compact, comfortable, null
-    'tableSubtitle' => '',
-
+    'tableDensity' => 'compact', // compact, comfortable, null
+    // 'tableSubtitle' => '',
+    'sticky' => true,
+    'showSelect' => true,
 
     'toolbarOptions' => [
         'color' => 'transparent', // rgb(255,255,255,1) or utility colors like white, purple
@@ -58,7 +58,7 @@ return [
         // 'loading' => true,
     ],
     'paginationOptions' => [
-        'footerComponent' => 'vuePagination', // default|vuePagination|null:
+        'footerComponent' => 'default', // default|vuePagination|null:
         'footerProps' => [
             'itemsPerPageOptions' => [
                 ['value' => 1, 'title' => '1'],
