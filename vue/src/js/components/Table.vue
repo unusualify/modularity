@@ -409,6 +409,14 @@
         </div>
       </template>
 
+      <!-- MARK: Infinite Scroll Triggering Component -->
+      <template v-slot:body.append>
+          <v-card v-intersect="onIntersect" v-if="enableInfiniteScroll"/>
+          <v-progress-circular :indeterminate="loading" v-if="enableInfiniteScroll && loading"></v-progress-circular>
+      </template>
+
+
+
     </v-data-table-server>
 
 

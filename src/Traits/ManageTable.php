@@ -361,8 +361,9 @@ trait ManageTable {
         if($this->getIndexOption('delete'))
         {
             $actions[] = [
-                'name' => 'delete',
+                'name' => 'bulkDelete',
                 'can' => $this->permissionPrefix(Permission::DELETE->value),
+                'icon' => '$delete',
                 // 'color' => 'red darken-2',
                 'color' => 'primary',
             ];
@@ -370,7 +371,7 @@ trait ManageTable {
 
         if($this->getIndexOption('forceDelete')){
             $actions[] = [
-                'name' => 'forceDelete',
+                'name' => 'bulkForceDelete',
                 'icon' => '$delete',
                 'can' => 'forceDelete',
                 // 'color' => 'red darken-2',
@@ -380,8 +381,8 @@ trait ManageTable {
 
         if($this->getIndexOption('restore')){
             $actions[] = [
-                'name' => 'restore',
-                // 'icon' => '$',
+                'name' => 'bulkRestore',
+                'icon' => '$restore',
                 'can' => 'restore',
                 // 'color' => 'red darken-2',
                 'color' => 'green',

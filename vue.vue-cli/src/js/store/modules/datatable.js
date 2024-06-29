@@ -44,7 +44,7 @@ const state = {
 
   bulk: [],
   // localStorageKey: window[process.env.VUE_APP_NAME].STORE.datatable.localStorageKey || window.location.pathname,
-  loading: false,
+  loading: window[process.env.VUE_APP_NAME].ENDPOINTS.index ?? null,
   updateTracker: 0
 
   // columns: window[process.env.VUE_APP_NAME].STORE.datatable.columns || [],

@@ -4,6 +4,7 @@ import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 import { isObject, find, omit, snakeCase, kebabCase, isEqual } from 'lodash-es'
+import api from '@/store/api/datatable'
 
 import { DATATABLE, FORM } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
@@ -175,6 +176,8 @@ export default function useTable (props, context) {
   const getters = mapGetters()
 
   const form = ref(null)
+  let loading = ref(false)
+  let items = ref([])
 
   const state = reactive({
 
@@ -189,10 +192,8 @@ export default function useTable (props, context) {
     activeTableItem: null,
     hideTable: false,
     fillHeight: computed(() => props.fillHeight),
-    createUrl: computed(() => props.endpoints.edit ?? window[import.meta.env.VUE_APP_NAME].ENDPOINTS.create ?? ''),
-    editUrl: computed(()=> {
-      return props.endpoints.edit ?? window[import.meta.env.VUE_APP_NAME].ENDPOINTS.edit ??  ''
-    }),
+    createUrl: computed(() => props.endpoints.create ?? null),
+    editUrl: computed(() => props.endpoints.edit ??  null ),
     editedIndex: -1,
     selectedItems: [],
     windowSize: {
@@ -245,9 +246,14 @@ export default function useTable (props, context) {
     }),
     inputs: props.inputFields ?? store.state.datatable.inputs ?? [],
     // elements: computed(() => props.items ?? store.state.datatable.data ?? []),
-    elements: computed(() => {
-      return props.items ?? store.state.datatable.data ?? []
-
+    elements: computed({
+      get(){
+        // console.log(state.elements)
+        return props.endpoints.index ? items.value : props.items ?? store.state.datatable.data
+      },
+      set(val){
+        items.value = val
+      }
     }),
     search: computed({
       get () {
@@ -259,7 +265,14 @@ export default function useTable (props, context) {
       }
     }),
     // datatable store
-    loading: computed(() => store.state.datatable.loading ?? false),
+    loading: computed({
+      get() {
+        return props.endpoints.index ? loading.value : store.state.datatable.loading
+      },
+      set(val) {
+        loading.value = val
+      }
+    }),
     filterActiveStatus: computed(() => store.state.datatable.filter.status ?? 'all'),
     filterActive: computed(() => find(store.state.datatable.mainFilters, { slug: state.filterActiveStatus })),
     // form store
@@ -341,8 +354,10 @@ export default function useTable (props, context) {
         }
       }
     }),
+    enableInfiniteScroll: computed(() => props.paginationOptions.footerComponent === 'null' && getters.totalElements.value > state.elements.length),
     navActive: computed(() => state.filterActive?.slug ?? 'all'),
     mainFilters: computed(() => store.state.datatable.mainFilters ?? null),
+    indexUrl: computed(() => props.endpoints.index ?? null)
   })
 
   const methods = reactive({
@@ -695,6 +710,7 @@ export default function useTable (props, context) {
       if (state.navActive === slug) return
       store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
       store.commit(DATATABLE.UPDATE_DATATABLE_FILTER_STATUS, slug)
+      state.selectedItems = []
       store.dispatch(ACTIONS.GET_DATATABLE)
     },
     changeOptions(options){
@@ -703,42 +719,32 @@ export default function useTable (props, context) {
       }
     },
     canBulkAction(action){
-      if(methods.canItemAction(action)){
-        console.log(action, state.navActive)
-        switch (action.name) {
-          case 'forceDelete':
-            return state.navActive === 'trash'
-          case 'restore':
-            return state.navActive === 'trash'
-          case 'delete':
-            return state.navActive !== 'trash'
-          default:
-            console.log('Action not defined in conditional pipe line - useTable:709')
-            return false
-        }
-      }
+      // if(methods.canItemAction(action)){
+      //   switch (action.name) {
+      //     case 'forceDelete':
+      //       return state.navActive === 'trash'
+      //     case 'restore':
+      //       return state.navActive === 'trash'
+      //     case 'delete':
+      //       return state.navActive !== 'trash'
+      //     default:
+      //       console.error('Action not defined in conditional pipe line - useTable:709')
+      //       return false
+      //   }
+      // }
 
-      return false
+      return true
     },
     setBulkItems(){
       store.commit(DATATABLE.REPLACE_DATATABLE_BULK, state.selectedItems)
     },
     bulkAction(action){
       methods.setBulkItems()
-      switch (action.name) {
-        case 'delete':
-          methods.bulkDelete()
-          break;
-        case 'forceDelete':
-          methods.bulkForceDelete()
-          break
-        case 'restore':
-          methods.bulkRestore()
-          break
-        default:
-          break;
+      try {
+        methods[action.name]()
+      } catch (error) {
+        console.error(`${action.name} have not implemented yet on useTable.js hook`)
       }
-
     },
     bulkDelete(){
       store.dispatch(ACTIONS.BULK_DELETE)
@@ -749,14 +755,25 @@ export default function useTable (props, context) {
     bulkForceDelete(){
       store.dispatch(ACTIONS.BULK_DESTROY)
     },
-    initializeStoreOptions(){
-      if(!store.state.datatable.options?.length){
-        store.commit(DATATABLE.UPDATE_DATATABLE_SEARCH, '')
-        store.commit(
-          DATATABLE.UPDATE_DATATABLE_OPTIONS,
-          state.options
-        )
+    onIntersect(isIntersecting, entries, observer){
+      if(isIntersecting && entries[0].intersectionRatio === 1){
+        methods.goNextPage()
       }
+    },
+    loadItems(options = null){
+      state.loading = true
+      api.get(
+        state.indexUrl, options ?? state.options, function(response){
+          const incomingDataArray = response.resource.data
+          if(state.enableInfiniteScroll){
+            state.elements = state.elements.push(incomingDataArray)
+          }else{
+            state.elements = incomingDataArray
+            console.log(state.elements)
+          }
+          state.loading = false
+        }
+      )
     }
   })
 
@@ -778,16 +795,19 @@ export default function useTable (props, context) {
     newValue || methods.resetEditedItem()
   })
   watch(() => state.options, (newValue, oldValue) => {
-      store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue }, endpoint : props.endpoints.index ?? null})
+      if(state.indexUrl){
+        newValue.replaceUrl = false
+        methods.loadItems(newValue)
+      }else{
+        store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue, infiniteScroll: state.enableInfiniteScroll }, endpoint : props.endpoints.index ?? null})
+      }
   }, { deep: true })
   watch(() => state.elements, (newValue, oldValue) => {
-    // __log('elements watch', newValue, oldValue)
   }, { deep: true })
 
   const formatter = useFormatter(props, context, state.headers)
 
   // expose managed state as return value
-  methods.initializeStoreOptions()
 
   return {
     form,

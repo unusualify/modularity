@@ -291,7 +291,6 @@ const actions = {
             __isset(payload.options?.[key]) ? payload?.options[key] : state?.options[key],
             key
           )
-
           if (active) { filtered[key] = value }
 
           return filtered
@@ -301,10 +300,11 @@ const actions = {
       }
 
       const url = endpoint ?? window[import.meta.env.VUE_APP_NAME].ENDPOINTS.index
-
       // __log(parameters)
       api.get(url,parameters, function (resp) {
-        commit(DATATABLE.UPDATE_DATATABLE_DATA, resp.resource.data)
+        const tableData = payload.infiniteScroll ? state.data.concat(resp.resource.data) : resp.resource.data
+
+        commit(DATATABLE.UPDATE_DATATABLE_DATA, tableData)
         commit(DATATABLE.UPDATE_DATATABLE_TOTAL, resp.resource.total)
         commit(DATATABLE.UPDATE_DATATABLE_NAV, resp.mainFilters)
         commit(DATATABLE.UPDATE_DATATABLE_LOADING, false)
