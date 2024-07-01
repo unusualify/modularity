@@ -356,7 +356,16 @@ export default function useTable (props, context) {
     enableInfiniteScroll: computed(() => props.paginationOptions.footerComponent === 'infiniteScroll' && getters.totalElements.value > state.elements.length),
     navActive: computed(() => state.filterActive?.slug ?? 'all'),
     mainFilters: computed(() => store.state.datatable.mainFilters ?? null),
-    indexUrl: computed(() => props.endpoints.index ?? null)
+    indexUrl: computed(() => props.endpoints.index ?? null),
+    actionModalActive: false,
+    selectedAction: null,
+    actionDialogQuestion: computed(() => {
+      return t('confirm-action', {
+        // route: state.transName.toLowerCase(),
+        route: state.transNameSingular,
+        action: t(state.selectedAction?.name ?? ''),
+      })
+    })
   })
 
   const methods = reactive({
@@ -743,7 +752,7 @@ export default function useTable (props, context) {
         methods[action.name]()
       } catch (error) {
         console.error(`${error}`)
-        console.error(`${action.name} have not implemented yet on useTable.js hook`)
+        console.warn(`${action.name} may have not implemented yet on useTable.js hook`)
       }
     },
     bulkDelete(){
@@ -773,7 +782,19 @@ export default function useTable (props, context) {
           state.loading = false
         }
       )
+    },
+    closeActionModal(){
+      state.actionModalActive = false
+    },
+    openActionModal(action){
+      state.actionModalActive = true
+      state.selectedAction = action
+    },
+    confirmAction(){
+      methods.bulkAction(state.selectedAction)
+      state.actionModalActive = false
     }
+
   })
 
   watch(() => state.editedItem, (newValue, oldValue) => {
