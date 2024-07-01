@@ -58,7 +58,7 @@ return [
         // 'loading' => true,
     ],
     'paginationOptions' => [
-        'footerComponent' => 'default', // default|vuePagination|null:
+        'footerComponent' => 'vuePagination', // default|vuePagination|null:
         'footerProps' => [
             'itemsPerPageOptions' => [
                 ['value' => 1, 'title' => '1'],

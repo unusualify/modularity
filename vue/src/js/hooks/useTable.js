@@ -177,7 +177,7 @@ export default function useTable (props, context) {
 
   const form = ref(null)
   let loading = ref(false)
-  let items = ref([])
+  let items = ref(props.items)
 
   const state = reactive({
 
@@ -248,7 +248,6 @@ export default function useTable (props, context) {
     // elements: computed(() => props.items ?? store.state.datatable.data ?? []),
     elements: computed({
       get(){
-        // console.log(state.elements)
         return props.endpoints.index ? items.value : props.items ?? store.state.datatable.data
       },
       set(val){
@@ -354,7 +353,7 @@ export default function useTable (props, context) {
         }
       }
     }),
-    enableInfiniteScroll: computed(() => props.paginationOptions.footerComponent === 'null' && getters.totalElements.value > state.elements.length),
+    enableInfiniteScroll: computed(() => props.paginationOptions.footerComponent === 'infiniteScroll' && getters.totalElements.value > state.elements.length),
     navActive: computed(() => state.filterActive?.slug ?? 'all'),
     mainFilters: computed(() => store.state.datatable.mainFilters ?? null),
     indexUrl: computed(() => props.endpoints.index ?? null)
@@ -743,6 +742,7 @@ export default function useTable (props, context) {
       try {
         methods[action.name]()
       } catch (error) {
+        console.error(`${error}`)
         console.error(`${action.name} have not implemented yet on useTable.js hook`)
       }
     },
@@ -769,7 +769,6 @@ export default function useTable (props, context) {
             state.elements = state.elements.push(incomingDataArray)
           }else{
             state.elements = incomingDataArray
-            console.log(state.elements)
           }
           state.loading = false
         }
@@ -795,12 +794,12 @@ export default function useTable (props, context) {
     newValue || methods.resetEditedItem()
   })
   watch(() => state.options, (newValue, oldValue) => {
-      if(state.indexUrl){
-        newValue.replaceUrl = false
-        methods.loadItems(newValue)
-      }else{
-        store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue, infiniteScroll: state.enableInfiniteScroll }, endpoint : props.endpoints.index ?? null})
-      }
+    if(state.indexUrl){
+      newValue.replaceUrl = false
+      methods.loadItems(newValue)
+    }else{
+      store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue, infiniteScroll: state.enableInfiniteScroll }, endpoint : props.endpoints.index ?? null})
+    }
   }, { deep: true })
   watch(() => state.elements, (newValue, oldValue) => {
   }, { deep: true })
