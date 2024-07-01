@@ -67,7 +67,8 @@
                 <v-btn
                   v-if="someSelected && canBulkAction(action)"
                   :icon="(action.icon ? action.icon : `$${action.name}`)"
-                  @click.prevent="bulkAction(action)"
+                  :color="action.color ?? 'primary'"
+                  @click="openActionModal(action)"
                   small
                   left
                 />
@@ -167,6 +168,32 @@
               </v-card>
             </v-expand-transition>
           </div>
+
+          <ue-modal
+            v-model="actionModalActive"
+            transition="dialog-bottom-transition"
+            width-type="sm"
+            persistant
+          >
+          <template v-slot:body="props" >
+              <v-card >
+                <v-card-title class="text-h5 text-center" style="word-break: break-word;">
+                  <!-- {{ textDescription }} -->
+                </v-card-title>
+                <v-card-text class="text-center" style="word-break: break-word;" >
+                  {{ actionDialogQuestion }}
+                </v-card-text>
+                <v-divider/>
+                <v-card-actions>
+                  <v-spacer/>
+                  <v-btn color="blue" text @click="closeActionModal()"> {{ props.textCancel }}</v-btn>
+                  <v-btn color="blue" text @click="confirmAction()"> {{ props.textConfirm }}</v-btn>
+                  <v-spacer></v-spacer>
+                </v-card-actions>
+              </v-card>
+            </template>
+
+          </ue-modal>
 
           <!-- #deletemodal-->
           <ue-modal
