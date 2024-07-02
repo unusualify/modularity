@@ -180,6 +180,15 @@ All props served under [Vuetify.js Button API Page](https://vuetifyjs.com/en/api
 
 <br/>
 
+#### `itemsPerPage`
+
+Controls the number of items to display on each page. 
+
+- `Input Type:` `Number|String`
+- `default:` `20`
+
+<br/>
+
 #### `paginationOptions`
 
 Pagination options controls pagination functionalities and pagination user-interface placed on the table footer. This version of modularity serves three different pagination options which are, `default`, `vuePagination`, and `infiniteScroll`.

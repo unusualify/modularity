@@ -9,7 +9,7 @@ return [
     'rowActionsType' => 'inline',
     'hideDefaultFooter' => false,
     'tableClasses' => 'elevation-2 zebra-stripes free-form',
-
+    'itemsPerPage' => 20,
     'hideHeaders' => false,
     'hideSearchField' => false,
     'multiSort' => false,
@@ -58,7 +58,7 @@ return [
         // 'loading' => true,
     ],
     'paginationOptions' => [
-        'footerComponent' => 'vuePagination', // default|vuePagination|infiniteScroll:
+        'footerComponent' => 'default', // default|vuePagination|infiniteScroll:
         'footerProps' => [
             'items-per-page-options' => [
                 ['value' => 10, 'title' => '10'],
