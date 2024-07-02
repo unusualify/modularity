@@ -58,7 +58,7 @@ return [
         // 'loading' => true,
     ],
     'paginationOptions' => [
-        'footerComponent' => 'vuePagination', // default|vuePagination|null:
+        'footerComponent' => 'default', // default|vuePagination|infiniteScroll:
         'footerProps' => [
             'itemsPerPageOptions' => [
                 ['value' => 1, 'title' => '1'],
@@ -79,7 +79,7 @@ return [
         'vuePagination' => [ //v-pagination
             'activeColor' => 'black',
             'border' => false, // string|number|boolean xs, sm, md, lg, xl. -- false in default
-            'color' => 'tertiary', // utility colors or rgba(x,x,x,a),
+            'color' => 'primary', // utility colors or rgba(x,x,x,a),
             'density' => 'default', // default | comfortable | compact
             'elevation' => 3,// string | number or undefined in default
             // 'ellipsis'=> '---', // string '...' in default
@@ -104,7 +104,5 @@ return [
         //     'xl' => 6,
         // ],
     ],
-
-
 ];
 

@@ -23,7 +23,6 @@ hero:
 features:
   - title: Fast Backend Development
     details: Develop Your Backend Application with Simple Commands
-    link: get-started/get-started/what-is-modularity
   - title: Admin Panel
     details: While you consturct your backend application, let administration panel construct itself
   - title: Easy Customization
