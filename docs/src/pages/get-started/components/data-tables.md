@@ -214,26 +214,26 @@ Pagination options controls pagination functionalities and pagination user-inter
 
 - `default: with vuePagination Option`
   ```php
-  [ 
-    'activeColor' => 'black',
-    'border' => false, // string|number|boolean xs, sm, md, lg, xl. -- false in default
-    'color' => 'primary', // utility colors or rgba(x,x,x,a),
-    'density' => 'default', // default | comfortable | compact
-    'elevation' => 3,// string | number or undefined in default
-    'rounded' => 'default', // string|number or boolean 0.xs.sm.true,lg,xl,pill, circle, and shaped
-    'showFirstLastPage' => false, // boolean,
-    'size' => 'default', // string | number  Sets the height and width of the component. Default unit is px. Can also use the following predefined sizes: x-small, small, default, large, and x-large.
-    'variant' => 'flat', //'flat' | 'elevated' | 'tonal' | 'outlined' | 'text' | 'plain' -- 'text' in default
-    'totalVisible' => 0 // 'auto' | number  - if 0 is given numbers totally not be shown
-  ]
-
+  'footerProps' => 
+    [ 
+      'variant' => 'flat', //'flat' | 'elevated' | 'tonal' | 'outlined' | 'text' | 'plain' -- 'text' in default
+      'active-color' => 'black', // utility colors or rgba(x,x,x,a),
+      'color' => 'primary', // utility colors or rgba(x,x,x,a),
+      'density' => 'default', // default | comfortable | compact
+      'border' => false, // string|number|boolean xs, sm, md, lg, xl. -- false in default
+      'elevation' => 3,// string | number or undefined in default
+      'rounded' => 'default', // string|number or boolean 0.xs.sm.true,lg,xl,pill, circle, and shaped
+      'show-first-last-page' => false, // boolean,
+      'size' => 'default', // string | number  Sets the height and width of the component. Default unit is px. Can also use the following predefined sizes: x-small, small, default, large, and x-large.
+      'total-visible' => 0 //| number  - if 0 is given numbers totally not be shown
+    ]
   ```
 
   ::: tip Vue Pagination Component
   For this option [Vuetify.js Pagination Component](https://vuetifyjs.com/en/components/paginations/) is used. Please see the API Reference page for further customization options.
   :::
-  ::: warning Extra Props Present
-  In default, there are page number buttons presents in pagination component. However, they will not shown if `totalVisible` assign as 0(zero). Also `showFirstLastPage` option can be set as `false` to control whether last page and first page pagination buttons shown or not.
+  ::: warning Pagination Number Buttons
+  `total-visible` key assignment is optional. Assigning a number will control number of button shown on user-interface. `Not assigning` it will let table to construct it automatically. Lastly, assigning `0`(zero) as an input, only next and previous page buttons will be shown on the footer.
   :::
 
 
