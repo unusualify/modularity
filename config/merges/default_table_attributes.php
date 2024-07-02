@@ -58,41 +58,41 @@ return [
         // 'loading' => true,
     ],
     'paginationOptions' => [
-        'footerComponent' => 'default', // default|vuePagination|infiniteScroll:
+        'footerComponent' => 'vuePagination', // default|vuePagination|infiniteScroll:
         'footerProps' => [
-            'itemsPerPageOptions' => [
-                ['value' => 1, 'title' => '1'],
+            'items-per-page-options' => [
                 ['value' => 10, 'title' => '10'],
                 ['value' => 20, 'title' => '20'],
                 ['value' => 30, 'title' => '30'],
                 ['value' => 40, 'title' => '40'],
                 ['value' => 50, 'title' => '50'],
             ],
-            'itemsPerPageText' => 'Items per page:',
-            'itemsPerPage' => 10,
-            // 'first-icon' => '',
-            // 'lastIcon' => '',
-            // 'nextIcon' => '',
-            // 'prevIcon' => '',
-            'showCurrentPage' => true,
+            'items-per-page' => 20,
+            'show-current-page' => true,
         ],
-        'vuePagination' => [ //v-pagination
-            'activeColor' => 'black',
-            'border' => false, // string|number|boolean xs, sm, md, lg, xl. -- false in default
-            'color' => 'primary', // utility colors or rgba(x,x,x,a),
-            'density' => 'default', // default | comfortable | compact
-            'elevation' => 3,// string | number or undefined in default
-            // 'ellipsis'=> '---', // string '...' in default
-            // 'firstIcon' => '',
-            // 'lastIcon' => '',
-            // 'nextIcon' => '',
-            // 'prevIcon' => '',
-            'rounded' => 'default', // string|number or boolean 0.xs.sm.true,lg,xl,pill, circle, and shaped
-            'showFirstLastPage' => false, // boolean,
-            'size' => 'default', // string | number  Sets the height and width of the component. Default unit is px. Can also use the following predefined sizes: x-small, small, default, large, and x-large.
-            'variant' => 'flat', //'flat' | 'elevated' | 'tonal' | 'outlined' | 'text' | 'plain' -- 'text' in default
-            'totalVisible' => 0 // 'auto' | number  - if 0 is given numbers totally not be shown
-        ]
+        '_footerProps' => [
+            'variant' => '',
+            'border' => false,
+            'active-color' => 'black',
+            'color' => 'purple',
+            'density' => 'default',
+            'elevation' => 3,
+            'rounded' => 'default',
+            'show-first-last-page' => false,
+            'size' => 'default',
+            // 'total-visible' => 0,
+        ],
+        '_defaultPaginationOptions' => [
+            'items-per-page-options' => [
+                ['value' => 10, 'title' => '10'],
+                ['value' => 20, 'title' => '20'],
+                ['value' => 30, 'title' => '30'],
+                ['value' => 40, 'title' => '40'],
+                ['value' => 50, 'title' => '50'],
+            ],
+            'items-per-page' => 20,
+            'show-current-page' => true,
+        ],
     ],
     'customRowComponent' => [
         // 'iteratorComponent' => 'card-iterator',

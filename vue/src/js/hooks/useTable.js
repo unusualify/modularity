@@ -307,52 +307,6 @@ export default function useTable (props, context) {
     hideHeaders: computed(() => {
       return props.hideHeaders || state.enableIterators
     }),
-    enableCustomFooter: computed(() =>  props.paginationOptions.footerComponent === 'vuePagination'),
-    defaultFooterProps: computed(() => {
-      const footerProps = props.paginationOptions.footerProps
-      if(props.paginationOptions.footerComponent === 'default'){
-        return {
-          'items-per-page-options': footerProps.itemsPerPageOptions,
-          'items-per-page-text': footerProps.itemsPerPageText,
-          'items-per-page': footerProps.itemsPerPage,
-          'first-icon' : footerProps.firstIcon,
-          'last-icon': footerProps.lastIcon,
-          'next-icon' : footerProps.nextIcon,
-          'prev-icon' : footerProps.prevIcon,
-          'show-current-page': footerProps.showCurrentPage,
-        }
-      }else{
-        return {
-          'hide-default-footer' : true
-        }
-      }
-    }),
-    customFooterProps: computed(() => {
-      const customComponent = props.paginationOptions.footerComponent
-
-      if(state.enableCustomFooter){
-        const footerProps = props.paginationOptions[customComponent]
-        if(customComponent === 'vuePagination'){
-          return {
-            'variant' : footerProps.variant, //'flat' | 'elevated' | 'tonal' | 'outlined' | 'text' | 'plain' -- 'text' in default
-            'border' : footerProps.border,
-            'active-color' : footerProps.activeColor,
-            'color' : footerProps.color, // utility colors or rgba(x,x,x,a),
-            'density' : footerProps.density, // default | comfortable | compact
-            'elevation' : footerProps.elevation, // string | number or undefined in default
-            'ellipsis': footerProps.ellipsis, // string '...' in default
-            'first-icon' : footerProps.firstIcon,
-            'last-icon' : footerProps.lastIcon,
-            'next-icon' : footerProps.nextIcon,
-            'prev-icon' : footerProps.prevIcon,
-            'rounded' : footerProps.rounded, // string|number or boolean 0.xs.sm.true,lg,xl,pill, circle, and shaped
-            'show-first-last-page' : footerProps.showFirstLastPage, // boolean,
-            'size' : footerProps.size, // string | number  Sets the height and width of the component. Default unit is px. Can also use the following predefined sizes: x-small, small, default, large, and x-large.
-            'total-visible' : footerProps.totalVisible === 'auto' ? store.getters.totalPage : footerProps.totalVisible,
-          }
-        }
-      }
-    }),
     enableInfiniteScroll: computed(() => props.paginationOptions.footerComponent === 'infiniteScroll' && getters.totalElements.value > state.elements.length),
     navActive: computed(() => state.filterActive?.slug ?? 'all'),
     mainFilters: computed(() => store.state.datatable.mainFilters ?? null),
@@ -365,6 +319,17 @@ export default function useTable (props, context) {
         route: state.transNameSingular,
         action: t(state.selectedAction?.name ?? ''),
       })
+    }),
+    enableCustomFooter: computed(() =>  props.paginationOptions.footerComponent === 'vuePagination'),
+    footerProps: computed(() => {
+      const footerProps = props.paginationOptions.footerProps
+      if(state.enableInfiniteScroll){
+        return {
+          'hide-default-footer' : true,
+        }
+      }
+
+      return footerProps
     })
   })
 

@@ -15,7 +15,7 @@
 
     <v-data-table-server
       v-if="!hideTable"
-      v-bind="{...$bindAttributes(),...defaultFooterProps}"
+      v-bind="{...$bindAttributes(), ...footerProps}"
       :class="[tableClasses, fullWidthWrapper ? '' : 'ue-table--narrow-wrapper']"
       id="ue-table"
 
@@ -304,7 +304,7 @@
           <v-pagination
           v-model="options.page"
           :length="pageCount"
-          v-bind="customFooterProps"
+          v-bind="footerProps"
         />
         </div>
       </template>
