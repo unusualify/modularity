@@ -21,6 +21,7 @@ trait ManageForm {
     protected function addWithsManageForm() : array
     {
                // $this->indexWith += collect($schema)->filter(function($item){
+
         return collect(array2Object($this->formSchema))->filter(function($input){
             // return $this->hasWithModel($item['type']);
             return in_array($input->type, [
@@ -130,6 +131,9 @@ trait ManageForm {
     {
         $data = null;
         $arrayable = false;
+
+        $this->hydrateInputConnector($input);
+
         switch ($input['type']) {
             case 'custom-input-treeview':
             case 'treeview':
@@ -180,10 +184,31 @@ trait ManageForm {
                 $input['itemTitle'] = $input['itemTitle'] ?? 'name';
                 $input['type'] = 'custom-input-checklist';
                 $input['default'] = [];
-                $items = [];
+                $items = $input['items'] ?? [];
                 if(isset($input['repository'])){
-                    $relation_class = App::make($input['repository']);
-                    $items = $relation_class->list($input['itemTitle'])->toArray();
+                    $args = explode(':', $input['repository']);
+
+                    $className = array_shift($args);
+                    $methodName = array_shift($args) ?? 'list';
+
+                    $relation_class = App::make($className);
+
+                    $params = Collection::make($args)->mapWithKeys(function($arg){
+                        [$name, $value] = explode('=', $arg);
+
+                        return [$name => [$value]];
+                    })->toArray();
+
+                    $items =  call_user_func_array(array($relation_class, $methodName), [
+                        ...($methodName == 'list'? ['column' => $input['itemTitle']] : []),
+                        ...$params
+                    ])->toArray();
+
+                    if(get_class_short_name($relation_class) == 'PackageRegion'){
+                        dd($items);
+                    }
+
+                    // $items = $relation_class->{$methodName}($input['itemTitle'], $parameter: ['hasPackage']  )->toArray();
                 }else if(isset($input['model'])){
                     $relation_class = App::make($input['model']);
                     $items = $relation_class->all([$input['itemValue'], $input['itemTitle']])->toArray();
@@ -217,7 +242,7 @@ trait ManageForm {
                 $input['itemValue'] = $input['itemValue'] ?? 'id';
                 $input['itemTitle'] = $input['itemTitle'] ?? 'name';
                 $input['default'] ??= [];
-                // $input['cascadeKey'] ??= 'items';
+                $input['cascadeKey'] ??= 'items';
                 // $input[] = 'multiple';
 
                 if(($input['type'] == 'select-scroll' || (isset($input['ext']) && $input['ext'] == 'scroll') )
@@ -241,28 +266,7 @@ trait ManageForm {
                     $with = $input['cascades'];
                 }
 
-                if(isset($input['connector'])){
-                    // 'moduleName:routeName|uri:edit'
-                    $targetType = 'uri';
 
-                    $parts = explode('|', $input['connector']);
-
-                    $names = explode(':', array_shift($parts)); // moduleName:routeName
-                    $routeName = $this->getStudlyName(array_pop($names));
-                    $targetModuleName = $this->getStudlyName( !empty($names) ? array_pop($names) : $this->moduleName );
-                    $targetModule = Modularity::find($targetModuleName);
-
-                    $types = !empty($parts) ? explode(':', array_shift($parts)) : ['uri', 'index']; //uri:edit
-                    // controller,repository,uri
-                    $targetType = array_shift($types); //
-
-                    if($targetType == 'uri'){
-                        $input['endpoint'] = $targetModule->getRouteActionUri($routeName, empty($types) ?  'index' : array_shift($types));
-                    }else {
-                        unset($input['connector']);
-                        $input[kebabCase($targetType)] = $targetModule->getRouteClass($routeName, $targetType);
-                    }
-                }
 
                 if(isset($input['repository'])){
                     $relation_class = App::make($input['repository']);
@@ -472,7 +476,7 @@ trait ManageForm {
             case 'price':
                 $input['name'] ??= 'prices';
                 $input['type'] = 'custom-input-price';
-                $input['ext'] = 'number';
+                // $input['ext'] = 'number';
                 $input['clearable'] = false;
 
                 $input['col'] ??= [
@@ -614,21 +618,121 @@ trait ManageForm {
                 $input['schema'] = $this->createFormSchema($input['schema']);
 
             break;
+            case 'radio-group':
+                // $default_repeater_col = [
+                //     'cols' => 12,
+                // ];
+                // $input['col'] = array_merge_recursive_preserve($default_repeater_col, $input['col'] ?? []);
+                $input['type'] = 'custom-input-radio-group';
+                // dd($input, debug_backtrace());
+                $input['schema'] = array_filter($this->createFormSchema($input['schema']), function($_input){
+                    return isset($_input['items']) && !empty($_input['items']);
+                });
+
+
+                // foreach ($input['schema'] as $key => &$val) {
+                //     $val['id'] = $val['name'];
+                //     $id++;
+                // }
+
+            break;
+            case 'tab-group':
+                $input['type'] = 'custom-input-tab-group';
+                $input['schema'] = $this->createFormSchema($input['schema']);
+                $eagers = [];
+                foreach ($input['schema'] as $key => $_input) {
+                    if($_input['type'] == 'custom-input-comparison-table' && isset($_input['comparators'])){
+                        foreach ($_input['comparators'] as $relation => $conf) {
+                            $eagers[] = $input['name'] . "." . $relation;
+                        }
+                    }
+                    if(in_array($_input['type'], ['custom-input-checklist', 'select', 'combobox', 'autocomplete'])){
+                        $eagers[] = $input['name'] . "." . $_input['name'];
+                    }
+                }
+                $input['eagers'] = $eagers;
+            break;
+            case 'comparison-table':
+                $input['type'] = 'custom-input-comparison-table';
+
+            break;
             default:
 
                 break;
         }
 
+        $this->hydrateInputExtension($input, $data, $arrayable, $inputs);
+
+        if(isset($input['rules']) && is_string($input['rules']) && !$arrayable){
+            if(preg_match('/required/', $input['rules'])){
+                $data = $data ?? $input;
+                if(isset($data['class']))
+                    $data['class'] .= " required";
+                else
+                    $data['class'] = 'required';
+            }
+        }
+
+        if(isset($this->repository)){
+            if( method_exists($this->repository->getModel(), 'getTranslatedAttributes')
+                && in_array($input['name'], $this->repository->getTranslatedAttributes())
+            ){
+                $input['translated'] ??= true;
+                // $input['locale_input'] = $input['type'];
+                // $input['type'] = 'custom-input-locale';
+                $data = $input;
+            }
+
+        }
+
+        return [
+            $data ? $data : $input,
+            $arrayable
+        ];
+    }
+
+    public function hydrateInputConnector(&$input)
+    {
+        if(isset($input['connector'])){
+            // 'moduleName:routeName|uri:edit'
+            $targetType = 'uri';
+
+            $parts = explode('|', $input['connector']);
+
+            $names = explode(':', array_shift($parts)); // moduleName:routeName
+            $routeName = $this->getStudlyName(array_pop($names));
+            $targetModuleName = $this->getStudlyName( !empty($names) ? array_pop($names) : $this->moduleName );
+            $targetModule = Modularity::find($targetModuleName);
+
+            $types = !empty($parts) ? explode(':', array_shift($parts)) : ['uri', 'index']; //uri:edit
+            // controller,repository,uri
+            $targetType = array_shift($types) ?? $targetType; //
+
+            $input['_moduleName'] = $targetModuleName;
+            $input['_routeName'] = $routeName;
+
+            switch($targetType) {
+                case 'uri':
+                    $input['endpoint'] = $targetModule->getRouteActionUri($routeName, empty($types) ?  'index' : array_shift($types));
+                break;
+                default:
+                    $input[kebabCase($targetType)] = implode(':', [$targetModule->getRouteClass($routeName, $targetType), ...$types]);
+                    unset($input['connector']);
+                break;
+            }
+        }
+    }
+
+
+    public function hydrateInputExtension(&$input, &$data, &$arrayable, $inputs)
+    {
         foreach ($inputs as  $_input) {
             if(isset($_input->type) &&  $_input->type === 'relationship' ){
                 $additionalExt = [];
 
-                $foreignKeyExt = collect($this->app['modularity']
-                ->find($this->moduleName)
-                ->getRouteConfig(studlyName($_input->name) . '.inputs'))->filter(fn($_i) =>
-
-                 $this->getCamelCase($_i['name'] ?? '') === $this->getCamelCase($this->routeName) . 'Id'
-                )->toArray()[1]['ext'] ?? '';
+                $foreignKeyExt = collect(Modularity::find($this->moduleName)->getRouteConfig(studlyName($_input->name) . '.inputs'))
+                    ->filter(fn($_i) => $this->getCamelCase($_i['name'] ?? '') === $this->getCamelCase($this->routeName) . 'Id')
+                    ->toArray()[1]['ext'] ?? '';
 
                 foreach (explode('|', $foreignKeyExt) as  $pattern) {
                     [$methodName, $formattedInput, $parentColumnName] = array_pad(explode(':',$pattern), 3, null);
@@ -661,40 +765,49 @@ trait ManageForm {
         }
 
         if(isset($input['ext'])){
+            //  pattern examples
+            // 'permalink:slug'
+            // 'permalinkPrefix:slug',
+            // 'permalinkPrefix:slug|lock:url:url',
             $patterns = explode('|', $input['ext']);
+
             $events = [];
             $extraInputs = [];
-            foreach ($patterns as $key => $pattern) {
-                [$methodName, $formattedInput, $parentColumnName] = array_pad(explode(':',$pattern), 3, null);
+
+            foreach ($patterns as $pattern) {
+                $args = explode(':',$pattern);
+
+                $methodName = array_shift($args);
+                // [$methodName, $formattedInput, $parentColumnName] = array_pad(explode(':',$pattern), 3, null);
+
                 switch ($methodName) {
-                    case 'permalinkPrefix':
+                    case 'permalinkPrefix': //'permalinkPrefix:slug',
+                        $inputToFormat = array_shift($args);
                         if(isset($input['repository'])){
                             foreach ($this->getConfigFieldsByRoute('inputs') as $key => $_input) {
-                                if(
-                                    isset($_input->ext)
-                                    && in_array(explode(':', $_input->ext)[0], ['permalink']
-                                )
-                                ){
-                                    $events[] = 'formatPermalinkPrefix:'.$formattedInput.':' . $this->getSnakeNameFromForeignKey($input['name']);
+                                if( isset($_input->ext) && in_array(explode(':', $_input->ext)[0], ['permalink']) ){
+                                    $events[] = 'formatPermalinkPrefix:'.$inputToFormat.':' . $this->getSnakeNameFromForeignKey($input['name']);
                                 }
                             }
                         }else{
-                            $events[] = 'formatPermalinkPrefix:'.$formattedInput.':' . $this->getSnakeCase($this->routeName());
+                            $events[] = 'formatPermalinkPrefix:'.$inputToFormat.':' . $this->getSnakeCase($this->routeName());
                         }
                         break;
-                    case 'lock':
-                        $events[] = 'formatLock:'. $formattedInput .':' . $parentColumnName;
+                    case 'lock': //'lock:url:url'
+                        $inputToFormat = array_shift($args);
+                        $parentColumnName = array_shift($args);
+                        $events[] = "formatLock:{$inputToFormat}:{$parentColumnName}";
                         break;
-                    case 'permalink':
+                    case 'permalink': //'permalink:slug',
+                        $inputToFormat = array_shift($args);
                         $permalinkPrefix = getHost() . '/';
                         $permalinkPrefixFormat = getHost() . '/';
-                        foreach ($inputs as $key => $_input) {
+                        foreach ($inputs as $_input) {
                             if(is_array($_input)){
-                                if(
-                                    isset($_input['type'])
-                                && in_array($_input['type'], ['select', 'combobox', 'hidden'])
-                                && isset($_input['repository'])
-                                && isset($_input['ext'])
+                                if( isset($_input['type'])
+                                    && in_array($_input['type'], ['select', 'combobox', 'hidden'])
+                                    && isset($_input['repository'])
+                                    && isset($_input['ext'])
                                 ){
                                     $permalinkPrefixFormat .= ":{$this->getSnakeNameFromForeignKey($_input['name'])}" . '/';
                                 }
@@ -720,51 +833,49 @@ trait ManageForm {
                             'readonly' => true
                         ]);
                         unset($input['ext']);
-                        $events[] = 'formatPermalink:'.$formattedInput;
+                        $events[] = 'formatPermalink:'.$inputToFormat;
                         break;
+                    case 'filter': //'filter:{target_input_name}:{target_prop_name}:{followed_key_name}'
+                        $inputToFormat = array_shift($args);
+                        $targetPropName = array_shift($args) ?? 'inputs';
 
+
+                        $filterEndpoints = Collection::make($input['schema'])->mapWithKeys(function($r){
+
+                            $routeName = $this->getStudlyName($r['_routeName'] ?? $r['name']);
+                            $targetModuleName = $this->getStudlyName( $r['_moduleName'] ?? $this->moduleName );
+                            $targetModule = Modularity::find($targetModuleName);
+
+                            $routeName = $this->getStudlyName($r['name']);
+
+                            return [$r['name'] => $targetModule->getRouteActionUri($routeName, 'show')];
+                        });
+
+                        if($data){
+                            $data['filterEndpoints'] = $filterEndpoints;
+                        }else{
+                            $input['filterEndpoints'] = $filterEndpoints;
+                        }
+
+                        $events[] = 'formatFilter:' . implode(':', [$inputToFormat, $targetPropName, ...$args]);
+                        break;
                     default:
                         # code...
                         break;
                 }
             }
+
             if(!empty($events)){
                 $data = (array)($data ?? $input);
                 $data['event'] = implode('|',$events);
             }
+
             if(!empty($extraInputs)){
                 $arrayable = true;
                 $_input = (array)($data ?? $input);
                 $data = [];
-                $data = $this->getSchemaInput($_input)+$extraInputs;
+                $data = $this->getSchemaInput($_input) + $extraInputs;
             }
         }
-
-        if(isset($input['rules']) && is_string($input['rules']) && !$arrayable){
-            if(preg_match('/required/', $input['rules'])){
-                $data = $data ?? $input;
-                if(isset($data['class']))
-                    $data['class'] .= " required";
-                else
-                    $data['class'] = 'required';
-            }
-        }
-
-        if(isset($this->repository)){
-            if( method_exists($this->repository->getModel(), 'getTranslatedAttributes')
-                && in_array($input['name'], $this->repository->getTranslatedAttributes())
-            ){
-                $input['translated'] ??= true;
-                // $input['locale_input'] = $input['type'];
-                // $input['type'] = 'custom-input-locale';
-                $data = $input;
-            }
-
-        }
-
-        return [
-            $data ? $data : $input,
-            $arrayable
-        ];
     }
 }
