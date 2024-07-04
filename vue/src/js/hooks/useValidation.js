@@ -26,21 +26,6 @@ export default function useValidation () {
     // requiredRule: msg => v => !!v || msg || 'Required',
     emailRule: (msg) => v => (/.+@.+\..+/.test(v)) || msg || 'E-mail must be valid',
     requiredRule: (type ='classic',  minOrExact = 1, max, msg) => v => {
-      /**
-       * Doga:
-       * if type is 'classic' then we checj existence of the value
-       * if type is 'array' then we check the length of the array
-       * if type is 'object' then we check the length of the object
-       * I though hierachically
-       *  1. We need exact number of items
-       *  2. We need at least number of items
-       *  3. We need at least number of items and/or at most number of items
-       *  so secod parameter in requiret:TYPE:MINEOREXACT:MAX
-       *  works as lower limit for the number of items
-       *  or exact number of items
-       *  depending of the existence of the third parameter, max, which is optional
-       *  (I ould set max to Infinity however programitaclly upper boundry bening infinity is not a good idea.)
-       */
       switch(type) {
         case 'classic':
           return !!v || msg || 'Required';
