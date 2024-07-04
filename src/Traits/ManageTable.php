@@ -226,28 +226,10 @@ trait ManageTable {
             ];
         }
 
-        $routeSnake = snakeCase($this->routeName);
-        foreach (Modularity::find($this->moduleName)->getRouteConfigs() as $key => $routeConfig) {
-            if(isset($routeConfig['belongs']) && in_array($routeSnake, $routeConfig['belongs'])){
-                // echo $routeConfig['name'] . "\r\n";
-                $childRouteSnake = snakeCase($routeConfig['name']);
-                $actions[] = [
-                    'name' => 'link',
-                    'url' => moduleRoute($routeConfig['name'],  $this->generateRoutePrefix(noNested:true) . '.' . $routeSnake . '.nested', 'index', [
-                        $routeSnake => ':id',
-                    ]),
-                    'label' => 'modules.' . $childRouteSnake,
-                    'icon' => '$modules',
-                    'color' => 'green',
-                ];
-
-            }
-            # code...
-        }
-        // dd($actions);
-        if(!$this->nested){
-        }else{
-        }
+        $actions = array_merge(
+            $actions,
+            Modularity::find($this->moduleName)->getNavigationActions($this->routeName)
+        );
 
         if(count($actions) > 3){
             $this->tableAttributes['rowActionsType'] = 'dropdown';
@@ -280,7 +262,7 @@ trait ManageTable {
      */
     public function getTableAttribute($attribute)
     {
-        return $this->tableAttributes[$attribute] ?? false;
+        return $this->tableAttributes[$attribute] ?? null;
     }
 
     /**
