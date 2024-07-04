@@ -12,7 +12,7 @@ trait HasFiles
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
-    public function files()
+    public function files() : \Illuminate\Database\Eloquent\Relations\MorphToMany
     {
         return $this->morphToMany(
             File::class,
