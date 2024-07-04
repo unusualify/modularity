@@ -10,6 +10,8 @@ use Unusualify\Modularity\Facades\UFinder;
 
 trait ManageTraits {
 
+    use ManageModuleRoute;
+
     /**
      * @param string|null $method
      * @return array
@@ -43,8 +45,9 @@ trait ManageTraits {
             return $this->chunkInputs($route_config['inputs']);
             // return $route_config['inputs'];
         }
-
         return [];
+
+        return !empty($conf = $this->routeConfig()) ? $conf['inputs'] : [];
     }
 
     public function hasTranslatedInput($schema = []) {
@@ -108,29 +111,6 @@ trait ManageTraits {
             }
             return [];
         });
-    }
-
-    public function routeName() {
-        $moduleName = $this->moduleName();
-
-        $routeName = null;
-
-        if(!$moduleName)
-            return $routeName;
-        if( preg_match('/(\w+)(?=(Request|Repository|Controller))/', get_class_short_name($this), $matches)){
-            $routeName = studlyName($matches[1]);
-        }
-
-        return $routeName;
-    }
-
-    public function moduleName() {
-
-        if( preg_match('/[M|m]{1}odules[\/\\\]([A-Za-z]+)[\/\\\]/', get_class($this), $matches)){
-            return $matches[1];
-        }
-
-        return null;
     }
 
     public function model() {
