@@ -7,15 +7,6 @@ import { omit } from 'lodash-es'
 
 export const makeInputProps = propsFactory({
   modelValue: null,
-  // error: {
-  //   type: Boolean,
-  //   default: false
-  // },
-  // errorMessages: {
-  //   type: [Array, String],
-  //   default: () => []
-  // },
-
   obj: {
     type: Object,
     default () {
@@ -27,6 +18,7 @@ export const makeInputProps = propsFactory({
     default: ''
   }
 })
+export const makeInputEmits = ['update:modelValue', 'change', 'update:preview']
 
 // by convention, composable function names start with "use"
 export default function useInput (props, context) {
