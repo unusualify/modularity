@@ -4,9 +4,12 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
+use Unusualify\Modularity\Traits\ManageModuleRoute;
 
 trait ModelHelpers
 {
+    use ManageModuleRoute;
+
     protected static $definedRelationships = [];
 
     protected $columnTypes;
@@ -27,7 +30,7 @@ trait ModelHelpers
             // ->filter(fn(\ReflectionMethod $method) =>  $method->hasReturnType() && preg_match("{$relationClassesPattern}", $method->getReturnType()) )
             ->reduce(function($carry, \ReflectionMethod $method) use($relationClassesPattern) {
                 if($method->hasReturnType() && preg_match("{$relationClassesPattern}", ($returnType = $method->getReturnType()) )){
-                    $carry[$method->name] = (new \ReflectionClass(get_called_class()));
+                    $carry[$method->name] = get_class_short_name((string) $returnType);
                 }
 
                 return $carry;
@@ -85,6 +88,41 @@ trait ModelHelpers
         }
     }
 
+    public function getShowFormat()
+    {
+        return $this->{$this->getRouteTitleColumnKey()};
+    }
+
+    public function setRelationsShowFormat()
+    {
+        foreach ($this->getRelations() as $relationName => $relation) {
+
+            if ($relation instanceof \Illuminate\Database\Eloquent\Collection) {
+                // dd($this, $relationName, $this->getRelations());
+                $this->{$relationName} = $relation->map(function($related) use($relationName){
+
+                    if(method_exists($related, 'setRelationsShowFormat'))
+                        $related->setRelationsShowFormat();
+
+
+                    return $related;
+                });
+
+                $this["{$relationName}_show"] ??= $this->{$relationName}->map(fn($model) => modelShowFormat($model))->implode(', ');;
+
+            }else if($relation){
+
+                if(method_exists($relation, 'setRelationsShowFormat'))
+                    $relation->setRelationsShowFormat();
+
+                // $this->{$relationName} = $relation;
+
+                $this["{$relationName}_show"] ??= modelShowFormat($relation);
+
+            }
+        }
+    }
+
 
     public function definedRelations($relations = null): array
     {
@@ -100,8 +138,26 @@ trait ModelHelpers
                 return array_keys(Arr::where($definedRelationships, fn($val, $key) => $val == studlyName($relations)));
             }
         }
-      
+
         return array_keys($definedRelationships);
+    }
+
+    public function definedRelationsTypes($relations = null): array
+    {
+        $modelName = get_class_short_name(get_called_class());
+
+        $definedRelationships = static::$definedRelationships[$modelName];
+
+        if($relations){
+            if(is_array($relations)){
+                return Arr::where($definedRelationships, fn($val, $key) => in_array($val, $relations));
+
+            }else if(is_string($relations)){
+                return Arr::where($definedRelationships, fn($val, $key) => $val == studlyName($relations));
+            }
+        }
+
+        return $definedRelationships;
     }
 
     public function hasRelation($relationName): bool

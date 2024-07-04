@@ -178,11 +178,63 @@ abstract class BaseController extends PanelController
      */
     public function show($id, $submoduleId = null)
     {
-        if ($this->getIndexOption('editInModal')) {
-            return Redirect::to(moduleRoute($this->routeName, $this->routePrefix, 'index'));
+        $params = $this->request->route()->parameters();
+
+        $id = last($params);
+        $item = $this->repository->getById(
+            $id,
+            $this->request->get('eagers') ?? [],
+            // $this->formWithCount
+        );
+
+
+
+        $data = array_merge(
+            $item->attributesToArray(),
+            $this->repository->getShowFields($item),
+            // $this->repository->getFormFields($item, $this->formSchema),
+        );
+
+
+        // dd(
+        //     $this->formSchema,
+        //     $item->attributesToArray(),
+        //     $this->repository->getShowFields($item, $this->formSchema),
+        //     $this->repository->getFormFields($item, $this->formSchema),
+        //     array_merge(
+        //         $item->attributesToArray(),
+        //         $this->repository->getShowFields($item),
+        //         $this->repository->getFormFields($item, $this->formSchema),
+        //     )
+        // );
+        if ($this->request->ajax()) {
+            return $data;
+            // return $indexData + ['replaceUrl' => true];
         }
 
-        return $this->redirectToForm($this->getParentModuleIdFromRequest($this->request) ?? $submoduleId ?? $id);
+        // if ($this->getIndexOption('editInModal')) {
+        //     return $this->request->ajax()
+        //     ? Response::json($this->modalFormData($id))
+        //     : Redirect::to(moduleRoute($this->routeName, $this->routePrefix, 'index'));
+        // }
+
+        $this->setBackLink();
+
+        $view = Collection::make([
+            "$this->viewPrefix.form",
+            "$this->baseKey::$this->routeName.form",
+            "$this->baseKey::layouts.form",
+        ])->first(function ($view) {
+            return View::exists($view);
+        });
+
+        return View::make($view, $this->getFormData($id));
+
+        // if ($this->getIndexOption('editInModal')) {
+        //     return Redirect::to(moduleRoute($this->routeName, $this->routePrefix, 'index'));
+        // }
+
+        // return $this->redirectToForm($this->getParentModuleIdFromRequest($this->request) ?? $submoduleId ?? $id);
     }
 
     /**
@@ -382,6 +434,8 @@ abstract class BaseController extends PanelController
 
             return array_replace(
                 array_merge(
+                    $this->repository->getShowFields($item, $schema),
+
                     $item->toArray(),
                     [
                         // 'id' => $itemId,
