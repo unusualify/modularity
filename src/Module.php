@@ -175,9 +175,11 @@ class Module extends NwidartModule
      *
      * @return string
      */
-    public function getDirectoryPath($directory = ''): string
+    public function getDirectoryPath($directory = '', $relative = false): string
     {
-        return $this->getPath() . (empty($directory) ?: "/$directory");
+        $path = $this->getPath();
+
+        return $path . (empty($directory) ?'/': "/$directory");
     }
 
     /**
@@ -472,8 +474,33 @@ class Module extends NwidartModule
 
     public function getRouteUris($routeName): array
     {
-        $quote = $this->fullRouteNamePrefix($this->isParentRoute($routeName)) . '.' . snakeCase($routeName);
+        $actions = [
+            'restore',
+            'forceDelete',
+            'duplicate',
+            'index',
+            'create',
+            'store',
+            'show',
+            'edit',
+            'update',
+            'destroy',
+            'bulkDelete',
+            'bulkForceDelete',
+            'bulkRestore'
+        ];
 
+        $isParentRoute = $this->isParentRoute($routeName);
+
+        $midQuote = "(.nested.[a-z|_]+)?.(";
+        $quote = $this->fullRouteNamePrefix($isParentRoute) . '.' . snakeCase($routeName) . $midQuote . implode('|', $actions) . ")$";
+
+        // dd(
+        //     $quote,
+        //     $this->isParentRoute($routeName),
+        //     $this->fullRouteNamePrefix($this->isParentRoute($routeName)),
+        //     Collection::make($this->getModuleUris())->filter(fn($uri, $name) => preg_match('/' . $quote .'/', $name))->toArray()
+        // );
         return Collection::make($this->getModuleUris())->filter(fn($uri, $name) => preg_match('/' . $quote .'/', $name))->toArray();
     }
 
@@ -497,6 +524,39 @@ class Module extends NwidartModule
             $className .= studlyName($target);
         }
        return $this->getParentNamespace($target) . "\\" . $className;
+    }
+
+    public function getNavigationActions(string $routeName)
+    {
+        $routeName = snakeCase($routeName); // snake case
+
+        $navigationActions = [];
+
+        foreach ($this->getRouteConfigs() as $key => $routeConfig) {
+            if(isset($routeConfig['belongs']) && in_array($routeName, $routeConfig['belongs'])){
+                $nestedRouteSnake = snakeCase($routeConfig['name']);
+                $routeSnake = snakeCase($routeName);
+
+                $uri = $this->getRouteActionUri( nestedRouteNameFormat($routeName, $routeConfig['name']), 'index');
+
+                $pattern = "\{$routeSnake\}";
+
+                $navigationActions[] = [
+                    'name' => 'link',
+                    // 'url' => moduleRoute($routeConfig['name'],  $this->fullRouteNamePrefix() . '.' . $routeName . '.nested', 'index', [
+                    //     $routeName => ':id',
+                    // ]),
+                    'url' => preg_replace("/(". $pattern .")/", ':id', $uri),
+                    'label' => 'modules.' . $nestedRouteSnake,
+                    'icon' => '$modules',
+                    'color' => 'green',
+                ];
+
+            }
+            # code...
+        }
+
+        return $navigationActions;
     }
 
 }
