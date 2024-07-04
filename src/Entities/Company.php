@@ -5,10 +5,6 @@ namespace Unusualify\Modularity\Entities;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Unusualify\Modularity\Database\Factories\CompanyFactory;
 
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Unusualify\Modularity\Database\Factories\CompanyFactory;
-
 class Company extends Model
 {
     protected $table = 'unusual_companies';
