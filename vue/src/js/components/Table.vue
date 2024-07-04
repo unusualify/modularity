@@ -51,7 +51,7 @@
       @update:options="changeOptions($event)"
     >
     <!-- v-model:options="options" -->
-      <template v-slot:top = "{ someSelected }">
+      <template v-slot:top="{ someSelected }">
         <v-toolbar
           v-bind="toolbarOptions"
         >
@@ -75,9 +75,6 @@
               </template>
           </v-slide-x-transition>
 
-          <v-sheet v-if="someSelected" >
-
-          </v-sheet>
           <v-text-field
             v-if="!hideSearchField"
             class="px-3"
@@ -99,6 +96,12 @@
           v-bind="{...filterBtnOptions, ...filterBtnTitle}"
           />
 
+          <v-btn
+            id="advanced-filter-btn"
+            v-bind="{...filterBtnOptions, ...filterBtnTitle}"
+            text="Advanced Filter"
+          />
+
           <v-btn v-if="can('create') && !noForm && !someSelected" v-bind="addBtnOptions" @click="createForm" :text="addBtnTitle"/>
 
         </v-toolbar>
@@ -115,7 +118,52 @@
                 <v-list-item-title>{{ filter.name + '(' + filter.number+ ')' }} </v-list-item-title>
               </v-list-item>
             </v-list>
-          </v-menu>
+        </v-menu>
+
+        <v-menu
+          activator="#advanced-filter-btn"
+          :close-on-content-click="false"
+          :location="end"
+
+        >
+          <v-card
+            title="Advanced Filter"
+            min-width="40vw"
+            max-width="50vw"
+          >
+            <v-row  class="justify-center" no-gutters>
+              <v-col
+                cols="11"
+                v-for="(filter, index) in advancedFilters"
+                :key="index"
+              >
+                <component
+                  :is="`v-${filter.type}`"
+                  multiple
+                  :items="filter.items"
+                  v-model="advancedFilters[index]['selecteds']"
+                />
+
+              </v-col>
+            </v-row>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+
+              <v-btn
+                text="Clear"
+                variant="plain"
+                @click="clearAdvancedFilter"
+              ></v-btn>
+
+              <v-btn
+                color="primary"
+                text="Save"
+                variant="tonal"
+                @click="submitAdvancedFilter"
+              ></v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-menu>
 
         <ue-modal
           ref="formModal"
@@ -275,7 +323,7 @@
 
 
       <!-- MARK: DATA-ITERATOR BODY -->
-      <template v-slot:body=" { items }" v-if="enableIterators" class="ue-datatable__container">
+      <template v-slot:body="{ items }" v-if="enableIterators" class="ue-datatable__container">
           <v-row>
             <v-col
             v-for="(element, i) in items"

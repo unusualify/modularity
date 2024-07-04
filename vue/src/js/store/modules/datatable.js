@@ -4,6 +4,7 @@ import ACTIONS from '@/store/actions'
 
 import { setStorage } from '@/utils/localeStorage'
 import { redirector } from '@/utils/response'
+import { isArray, isEmpty } from 'lodash'
 
 /* NESTED functions */
 const getObject = (container, id, callback) => {
@@ -41,6 +42,10 @@ const state = {
 
   filter: window[import.meta.env.VUE_APP_NAME].STORE.datatable.filter || {},
   mainFilters: window[import.meta.env.VUE_APP_NAME].STORE.datatable.mainFilters || [],
+  advancedFilters: window[import.meta.env.VUE_APP_NAME].STORE.datatable.advancedFilters || [
+    {name: "web company", slug:"webCompanies", items: [1,2,3,4,5,6], type: "select", selecteds : []},
+    {name: "web company", slug:"vimeoWebinars", items: [1,2,3,4,5,6], type: "select", selecteds : []}
+  ],
 
   bulk: [],
   // localStorageKey: window[import.meta.env.VUE_APP_NAME].STORE.datatable.localStorageKey || window.location.pathname,
@@ -79,6 +84,9 @@ const getters = {
   },
   mainFilters: state => {
     return state.mainFilters
+  },
+  advancedFilters : state => {
+    return state.advancedFilters
   }
 
 }
@@ -105,6 +113,7 @@ const mutations = {
 
   [DATATABLE.UPDATE_DATATABLE_FILTER] (state, filter) {
     state.filter = Object.assign({}, state.filter, filter)
+
   },
   [DATATABLE.CLEAR_DATATABLE_FILTER] (state) {
     state.filter = Object.assign({}, {
@@ -114,6 +123,21 @@ const mutations = {
   },
   [DATATABLE.UPDATE_DATATABLE_FILTER_STATUS] (state, slug) {
     state.filter.status = slug
+  },
+
+  [DATATABLE.UPDATE_DATATABLE_ADVANCED_FILTER] (state, val){
+      state.filter.relations = {}
+      val.filter((adv,index) => adv.selecteds.length > 0).forEach(function(adv, index){
+        state.filter.relations[adv.slug] = adv.selecteds
+      })
+  },
+
+  [DATATABLE.RESET_DATATABLE_ADVANCED_FILTER] (state){
+    state.advancedFilters =  state.advancedFilters.map((filter,index) => {
+      filter.selecteds = []
+      state.filter.relations = []
+      return filter
+    })
   },
 
   [DATATABLE.UPDATE_DATATABLE_BULK] (state, id) {
@@ -296,7 +320,19 @@ const actions = {
           return filtered
         }, {})),
         ...(state.search !== '' ? { search: state.search } : {}),
-        ...(state.filter.status !== 'all' ? { filter: state.filter } : {})
+        ...( { filter : Object.fromEntries(
+          Object.entries(state.filter).reduce((result ,[key, value]) => {
+
+            if(key === 'status' && value === 'all') return result
+            if(key === 'relations' && isEmpty(value)) return result
+
+            result.push([key, value])
+            return result
+          }, [])
+        ) }),
+        // ...(state.filter.status !== 'all' ? { filter: state.filter } : {})
+
+
       }
 
       const url = endpoint ?? window[import.meta.env.VUE_APP_NAME].ENDPOINTS.index

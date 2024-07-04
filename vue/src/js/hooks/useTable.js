@@ -330,7 +330,8 @@ export default function useTable (props, context) {
       }
 
       return footerProps
-    })
+    }),
+    advancedFilters: computed(() => store.state.datatable.advancedFilters ?? null)
   })
 
   const methods = reactive({
@@ -758,12 +759,21 @@ export default function useTable (props, context) {
     confirmAction(){
       methods.bulkAction(state.selectedAction)
       state.actionModalActive = false
+    },
+    submitAdvancedFilter(){
+      store.commit(DATATABLE.UPDATE_DATATABLE_ADVANCED_FILTER, state.advancedFilters)
+      store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
+      store.dispatch(ACTIONS.GET_DATATABLE)
+    },
+    clearAdvancedFilter(){
+      store.commit(DATATABLE.RESET_DATATABLE_ADVANCED_FILTER)
+      store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
+      store.dispatch(ACTIONS.GET_DATATABLE)
     }
 
   })
 
   watch(() => state.editedItem, (newValue, oldValue) => {
-    // __log('editedItem watch', newValue, oldValue, state.elements.findIndex(o => { return o.id === newValue.id }))
     state.editedIndex = state.elements.findIndex(o => { return o.id === newValue.id })
   })
   watch(() => state.activeTableItem, (newValue, oldValue) => {
