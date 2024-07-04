@@ -73,7 +73,11 @@ trait ManageNames {
     }
 
     protected function getMorphToMethodName($name){
-        return $this->getCamelCase($name) . 'able';
+        return makeMorphToMethodName($name);
+    }
+
+    protected function getMorphPivotTableName($name){
+        return makeMorphPivotTableName($name);
     }
 
     protected function getPivotTableName($modelName1, $modelName2){
