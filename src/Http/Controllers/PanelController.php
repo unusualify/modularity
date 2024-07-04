@@ -52,7 +52,7 @@ abstract class PanelController extends CoreController
      *
      * @var integer
      */
-    protected $nested;
+    protected $isNested;
 
     /**
      * integer if route is nested, nestedParentId
@@ -252,6 +252,8 @@ abstract class PanelController extends CoreController
          */
         $this->applyFiltersDefaultOptions();
 
+        $this->fixedFilters = array_merge( (array) $this->getConfigFieldsByRoute('filters.fixed', []), $this->fixedFilters ?? []);
+
         $this->addWiths();
 
         $this->addIndexWiths();
@@ -318,7 +320,7 @@ abstract class PanelController extends CoreController
 
     protected function checkNestedAttributes()
     {
-        [$this->nested, $this->nestedParentId, $this->nestedParentName, $this->nestedParentModel] = $this->getNestedAttributes();
+        [$this->isNested, $this->nestedParentId, $this->nestedParentName, $this->nestedParentModel] = $this->getNestedAttributes();
     }
 
     protected function getNestedAttributes()
@@ -336,7 +338,7 @@ abstract class PanelController extends CoreController
         }
 
         return [false, null, null, null];
-        // if( $this->moduleName !== $this->routeName && $this->nested ){
+        // if( $this->moduleName !== $this->routeName && $this->isNested ){
 
         //     $param = $this->getSnakeCase( Str::singular($this->moduleName) );
 
@@ -571,10 +573,10 @@ abstract class PanelController extends CoreController
         }else if( isset($this->config->base_prefix) && $this->config->base_prefix)
             $routePrefixes[] = systemRouteNamePrefix();
 
-        if( !$this->isParent || ($this->nested && !$noNested) )
+        if( !$this->isParent || ($this->isNested && !$noNested) )
             $routePrefixes[] = Str::snake($this->moduleName);
 
-        if($this->nested && !$noNested){
+        if($this->isNested && !$noNested){
             $routePrefixes[] = $this->nestedParentName;
             $routePrefixes[] = 'nested';
         }
@@ -631,7 +633,7 @@ abstract class PanelController extends CoreController
      */
     protected function nestedParentScopes()
     {
-        if(!$this->nested)
+        if(!$this->isNested)
             return [];
 
         // for belongsTo relationship
@@ -678,7 +680,7 @@ abstract class PanelController extends CoreController
     {
         $parameters = $singleton ? [] : [ snakeCase($this->routeName) => $id];
 
-        if($this->nested ){
+        if($this->isNested ){
             $parameters[$this->nestedParentName] ??= $this->nestedParentId;
         }
 
@@ -704,6 +706,7 @@ abstract class PanelController extends CoreController
     protected function getConfigFieldsByRoute($field_name, $default = null)
     {
         try {
+            return data_get( $this->config->routes->{$this->getSnakeCase($this->routeName)} , $field_name) ?? $default;
             return $this->config->routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
         } catch (\Throwable $th) {
             return $default;
