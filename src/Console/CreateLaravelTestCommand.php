@@ -18,7 +18,7 @@ use Unusualify\Modularity\Module;
 use function Laravel\Prompts\{text, select, confirm, warning};
 
 
-class CreateTestCommand extends BaseCommand
+class CreateLaravelTestCommand extends BaseCommand
 {
     /**
      * The name of the console command.
