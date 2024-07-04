@@ -33,12 +33,12 @@ trait ManageUtilities {
             'initialResource' => $this->getJSONData(), //
             'tableMainFilters' => $this->getTableMainFilters(),
             'filters' => json_decode($this->request->get('filter'), true) ?? [],
-            'requestFilter' => json_decode(request()->get('filter'), true) ?? [],
+            // 'requestFilter' => json_decode(request()->get('filter'), true) ?? [],
             'searchText' =>  request()->has('search') ? request()->query('search') : "", // for current text of search parameter
             'headers' => $this->getIndexTableColumns(), // headers to be used in unusual datatable component
             'formSchema'  => $this->formSchema, // input fields to be used in unusual datatable component
 
-            // 'hiddenFilters' => array_keys(Arr::except($this->filters, array_keys($this->defaultFilters))),
+            // 'hiddenFilters' => $this->filters(),
             // 'filterLinks' => $this->filterLinks ?? [],
             /***
              * TODO variables to be assigned dynamically
@@ -62,7 +62,7 @@ trait ManageUtilities {
                 ],
                 $this->tableAttributes,
             )
-            + ($this->nested
+            + ($this->isNested
                 ? ['titlePrefix' => $this->nestedParentModel->{'name'} . ' \ ' ]
                 : []
             )
@@ -152,7 +152,7 @@ trait ManageUtilities {
             // $parameters = $this->submodule ? [$this->submoduleParentId] : [];
             $parameters = [];
 
-            if($this->nested){
+            if($this->isNested){
                 // $parameters[Str::camel($this->moduleName)] = $this->parentId;
                 $parameters[$this->nestedParentName] = $this->nestedParentId;
 
@@ -174,7 +174,7 @@ trait ManageUtilities {
                 // $action . 'Endpoint' => $optionIsActive
                 $action => $optionIsActive
                             ?   moduleRoute(
-                                    $this->routeName,
+                                    $this->getConfigFieldsByRoute('route_name'),
                                     $prefix,
                                     $action,
                                     $parameters
@@ -293,7 +293,6 @@ trait ManageUtilities {
             'restoreUrl' => moduleRoute($this->moduleName, $this->routePrefix, 'restoreRevision', [$itemId]),
         ] : []);
 
-        // dd($data);
         return array_replace_recursive($data, $this->formData($this->request));
     }
 

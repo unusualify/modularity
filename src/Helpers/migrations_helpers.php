@@ -179,6 +179,36 @@ if (!function_exists('createDefaultRelationshipTableFields')) {
     }
 }
 
+if (!function_exists('createDefaultMorphPivotTableFields')) {
+    /**
+     * @param \Illuminate\Database\Schema\Blueprint $table
+     * @param string $tableName
+     * @return void
+     */
+    function createDefaultMorphPivotTableFields($table, $tableName)
+    {
+        $table->{unusualIncrementsMethod()}('id');
+        // $tableName => package_languageables
+
+        $modelName = getMorphModelNameFromTableName($tableName); //*ables
+
+        $foreignKey = makeForeignKey($modelName); // *_id
+        $morphTableName = tableName($modelName);
+
+        $morphForeignKey = makeMorphForeignKey($modelName); //*able_id
+        $morphForeignType = makeMorphForeignType($modelName); // *able_type
+
+        $table->{unusualIntegerMethod()}($foreignKey)->unsigned();
+        $table->foreign($foreignKey, "fk_{$morphTableName}_{$foreignKey}")->references('id')->on($tableName)->onDelete('cascade')->onUpdate('cascade');
+        $table->{unusualIntegerMethod()}($morphForeignKey)->nullable()->unsigned();
+        $table->string($morphForeignType)->nullable();
+
+        $table->timestamps();
+        $table->softDeletes();
+        $table->index([$morphForeignType, $morphForeignKey], "{$tableName}_type_id_index");
+    }
+}
+
 if (!function_exists('createDefaultRevisionsTableFields')) {
     /**
      * @param \Illuminate\Database\Schema\Blueprint $table

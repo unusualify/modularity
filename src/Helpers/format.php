@@ -38,17 +38,74 @@ if (! function_exists('pluralize')) {
         return Str::plural($string);
     }
 }
+if (! function_exists('singularize')) {
+    function singularize($string) {
+        return Str::singular($string);
+    }
+}
 
 if (! function_exists('headline')) {
     function headline($string) {
         return Str::headline($string);
     }
 }
+
 if (! function_exists('tableName')) {
     function tableName($string) {
        return pluralize(snakeCase($string));
     }
 }
+
+if (! function_exists('makeForeignKey')) {
+    function makeForeignKey($string) {
+       return singularize( trim(snakeCase($string), '_-') ) . '_id';
+    }
+}
+
+if (! function_exists('makeMorphName')) {
+    function makeMorphName($string) {
+       return Str::singular($string) . 'able';
+    }
+}
+
+if (! function_exists('makeMorphForeignKey')) {
+    function makeMorphForeignKey($string) {
+       return makeForeignKey(makeMorphName($string));
+    }
+}
+
+if (! function_exists('makeMorphForeignType')) {
+    function makeMorphForeignType($string) {
+       return snakeCase(makeMorphName($string)) . '_type';
+    }
+}
+
+if (! function_exists('makeMorphToMethodName')) {
+    function makeMorphToMethodName($string) {
+       return makeMorphName(camelCase($string));
+    }
+}
+
+if (! function_exists('makeMorphToMethodName')) {
+    function makeMorphToMethodName($string) {
+        return makeMorphName(camelCase($string));
+    }
+}
+
+if (! function_exists('makeMorphPivotTableName')) {
+    function makeMorphPivotTableName($string) {
+        return pluralize(makeMorphName(snakeCase($string)));
+    }
+}
+
+if (! function_exists('getMorphModelNameFromTableName')) {
+    function getMorphModelNameFromTableName($string) {
+        preg_match("/^(\w+)(ables)$/", $string, $matches);
+
+        return studlyName($matches[1]);
+    }
+}
+
 
 if (! function_exists('abbreviation')) {
     function abbreviation($string) {
@@ -66,6 +123,12 @@ if (! function_exists('abbreviation')) {
 if (! function_exists('get_class_short_name')) {
     function get_class_short_name($class) {
         return (new \ReflectionClass($class))->getShortName();
+    }
+}
+
+if (! function_exists('class_resolution')) {
+    function class_resolution($class) {
+        return "\\" . $class ."::class";
     }
 }
 
@@ -227,6 +290,30 @@ if( !function_exists('wrapImplode') ){
         if(!$array) return '';
 
         return $prepend . implode($seperator, $array) . $append;
+    }
+}
+
+if( !function_exists('modelShowFormat') ){
+    function modelShowFormat(&$model){
+
+        // if( get_class_short_name($model) == 'Package'){
+        //     dd(class_uses_recursive($model));
+        // }
+        if(in_array('Unusualify\Priceable\Traits\HasPriceable', class_uses_recursive($model))){
+            $model['prices_show'] = $model->price_formatted;
+            // $model['prices_show'] = "<span class='text-success font-weight-bold'> {$model->price_formatted} </span>";
+        }
+
+        if( method_exists($model, 'getShowFormat') )
+            return $model->getShowFormat();
+
+        return $model->name;
+    }
+}
+
+if( !function_exists('nestedRouteNameFormat')) {
+    function nestedRouteNameFormat($routeName, $nestedRouteName){
+        return snakeCase($routeName) . ".nested." . snakeCase($nestedRouteName);
     }
 }
 

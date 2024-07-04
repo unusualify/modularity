@@ -18,7 +18,7 @@ trait MakesResponses {
     {
         if (! isset($back_link)) {
             if (($back_link = Session::get($this->getBackLinkSessionKey())) == null) {
-                if($this->nested){
+                if($this->isNested){
                     // dd(
                     //     $this->routeName,
                     //     $this->routePrefix,
@@ -59,7 +59,7 @@ trait MakesResponses {
      */
     protected function getBackLinkSessionKey()
     {
-        return $this->moduleName . "." . $this->routeName . ($this->nested ? $this->nestedParentId ?? '' : '') . '_back_link';
+        return $this->moduleName . "." . $this->routeName . ($this->isNested ? $this->nestedParentId ?? '' : '') . '_back_link';
         return $this->moduleName . "." . $this->routeName . ($this->submodule ? $this->submoduleParentId ?? '' : '') . '_back_link';
     }
 

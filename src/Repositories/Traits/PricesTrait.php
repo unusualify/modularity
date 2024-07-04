@@ -94,11 +94,17 @@ trait PricesTrait
             foreach ($this->getColumns(__TRAIT__) as $role) {
                 if(isset($pricesByRole[$role])){
                     $fields[$role] = $pricesByRole[$role]->map(function ($price) {
-                        return Arr::only($price->toArray(), $this->formatableColumns);
+                        return Arr::mapWithKeys(Arr::only($price->toArray(), $this->formatableColumns) , function($val, $key){
+                            if(preg_match('/display_price|price_excluding|price_including/', $key)){
+                                return [$key => (double) $val / 100];
+                            }
+
+                            return [$key => $val];
+                        });
                     });
                 }else {
                     $fields[$role] = [
-                        array_merge_recursive_preserve($this->defaultPriceData, ['display_price' => ''])
+                        array_merge_recursive_preserve($this->defaultPriceData, ['display_price' => 0.00])
                     ];
                 }
             }
@@ -116,4 +122,16 @@ trait PricesTrait
         }
         return $fields;
     }
+
+    public function getShowFieldsPricesTrait($object, $fields, $schema = [])
+    {
+        if ($object->has('prices')) {
+            foreach ($this->getColumns(__TRAIT__) as $fieldName) {
+                $fields[$fieldName.'_show'] = $object->price_formatted;
+            }
+        }
+
+        return $fields;
+    }
+
 }

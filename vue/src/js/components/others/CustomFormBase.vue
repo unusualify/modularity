@@ -121,7 +121,7 @@
               <!-- END ARRAY -->
 
               <!-- GROUP | WRAP-->
-                <template v-else-if="/(wrap|group)/.test(obj.schema.type)">
+                <template v-else-if="/^(wrap|group)$/.test(obj.schema.type)">
                     <!-- <v-card-title v-if="obj.schema.title">{{obj.schema.title}}</v-card-title>
                     <v-card-subtitle v-if="obj.schema.subtitle">{{obj.schema.subtitle}}</v-card-subtitle>  -->
                     <ue-title class="text-overline mb-1 pa-0" v-if="obj.schema.title">{{obj.schema.title}}</ue-title>

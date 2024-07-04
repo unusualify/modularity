@@ -85,7 +85,6 @@ class StubsGenerator extends Generator
             }
 
             if(!file_exists($path) || $this->forcibleStub($stub)){
-                dd($path, $stub, $this->getStubContents($stub));
                 $this->filesystem->put($path, $this->getStubContents($stub));
 
                 $this->console->info("Created : {$path}");

@@ -13,7 +13,7 @@ return [
             'parent' => true,
             'name' => 'User',
             'headline' => 'Users',
-            'url' => 'users',
+            'url' => 'system-users',
             'route_name' => 'user',
             'icon' => '$users',
             'table_options' => [
@@ -100,8 +100,9 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'route' => 'role',
-                    'repository' => \Modules\SystemUser\Repositories\RoleRepository::class,
+                    // 'repository' => \Modules\SystemUser\Repositories\RoleRepository::class,
+                    'ext' => 'scroll',
+                    'connector' => 'Role|uri',
                 ],
             ]
         ],

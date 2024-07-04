@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 
 use Spatie\Permission\Traits\HasRoles;
+use Unusualify\Modularity\Database\Factories\UserFactory;
 use Unusualify\Modularity\Entities\Traits\{ModelHelpers, HasScopes, IsTranslatable};
 
 class User extends Authenticatable
@@ -128,6 +129,11 @@ class User extends Authenticatable
     public function getTable()
     {
         return unusualConfig('tables.users', parent::getTable());
+    }
+
+    protected static function newFactory()
+    {
+        return new UserFactory();
     }
 
 }

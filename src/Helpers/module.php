@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
@@ -405,6 +406,17 @@ if (! function_exists('ifdd')) {
 
             exit(1);
         }
+    }
+}
+
+if(! function_exists('exceptionalRunningInConsole')){
+    function exceptionalRunningInConsole(){
+        return !(App::runningInConsole() && App::runningConsoleCommand([
+            'unusual:make:module',
+            'unusual:fix:module',
+            'unusual:make:route',
+            'unusual:dev'
+        ]));
     }
 }
 

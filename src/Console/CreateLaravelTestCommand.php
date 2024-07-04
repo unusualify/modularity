@@ -15,14 +15,17 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Unusualify\Modularity\Module;
 
-class CreateTestCommand extends BaseCommand
+use function Laravel\Prompts\{text, select, confirm, warning};
+
+
+class CreateLaravelTestCommand extends BaseCommand
 {
     /**
      * The name of the console command.
      *
      * @var string
      */
-    protected $name = 'unusual:make:test';
+    protected $name = 'unusual:create:test:laravel';
 
     /**
      * The signature of the console command.
@@ -30,14 +33,14 @@ class CreateTestCommand extends BaseCommand
      * @var string
      */
 
-    protected $signature = 'unusual:make:test {module} {test} {--unit}';
+    protected $signature = 'unusual:create:test:laravel {module} {test} {--unit}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a test';
+    protected $description = 'Create a test file for laravel features or components';
 
     // protected $argumentName = 'request';
 
@@ -51,72 +54,16 @@ class CreateTestCommand extends BaseCommand
     public function handle() : int
     {
 
-        // $console = new Console();
+        $success = true;
 
-        // Locate the module based on the name and find it's relative path
-        $moduleName = $this->argument('module');
-        $testName = $this->argument('test');
-        $unit = $this->option('unit');
-        $module = new Module($this->getModuleName());
+        $test_name = $this->argument('name') ? $this->getStudlyName($this->argument('name')) : '';
 
-        // Create test in the project folder
-        // $this->call('make:test', [
-        //     'name' => $testName,
-        //     '--pest' => true,
-        //     ]
-        //     + ($this->hasOption('unit') ?  ['--unit' => $unit] : [])
-        // );
+        $test_type = $this->argument('type') ? $this->getSnakeCase($this->argument('type')) : '';
 
-        if($unit){
-            $defaultPath = '/tests/'.'Unit/' . $testName . '.php';
-            // $destination = 'Modules/' . $moduleName . '/Tests/' . 'Unit/' . $testName . '.php';
-            $destination = $module->getDirectoryPath('Tests/Unit') . $testName . '.php';
-        }else{
-            $defaultPath = '/tests/' . 'Feature/' . $testName . '.php';
-            $destination = 'Modules/' . $moduleName.'/Tests/' . 'Feature/' . $testName . '.php';
-        }
-           dd($destination);
-        // dd(File::directories('.'));
-        // dd(Storage::disk('root')->exists($defaultPath), $defaultPath);
-        // File::move();
-        if(File::exists($defaultPath)){
-            dd(File::move($defaultPath, $destination), $destination, $defaultPath);
-        }
-        
+        if (!$test_name)
+            $test_name = $this->getStudlyName(text('What is the test name?'));
 
-
-
-        // dd($arguments, $options);
-        // foreach(getUnusualTraits() as $_trait){
-        //     $this->responses[$_trait] = $this->checkOption($_trait);
-        // }
-
-        // $console_traits = collect($traits)->mapWithKeys(function ($item, $key) {
-        //     return ["--{$key}" => $item];
-        // })->toArray();
-
-        // dd($console_traits);
-
-        // $this->call('module:make',[
-        //     'name' => [$this->argument('module')],
-        //     '--plain' => true
-        // ]);
-
-        // $this->call('unusual:make:route', [
-        //         'module' => $this->argument('module'),
-        //         'route' => $this->argument('module'),
-        //     ]
-        //     + ( $this->hasOption('schema') ?  ['--schema' => $this->option('schema')] : [])
-        //     + ( $this->hasOption('rules') ?  ['--rules' => $this->option('rules')] : [])
-        //     + ( $this->hasOption('relationships') ?  ['--relationships' => $this->option('rules')] : [])
-        //     + ( $this->hasOption('force') ?  ['--force' => true] : [])
-        //     + ( $this->hasOption('no-migrate') ?  ['--no-migrate' => true] : [])
-        //     + ( $this->hasOption('no-defaults') ?  ['--no-defaults' => true] : [])
-        //     + ( $this->option('plain') ?  ['-p' => true] : [])
-        //     + $console_traits
-        //     + ['--notAsk' => true]
-        // );
-
+        $testGenerator = $this->laravel->make('Unusualify\Modularity\Generators\LaravelTestGenerator', ['name' => $test_name]);
 
         return 0;
     }

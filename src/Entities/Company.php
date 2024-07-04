@@ -11,6 +11,8 @@ class Company extends Model
 
     use HasFactory;
 
+    use HasFactory;
+
     protected $fillable = [
         'id',
         'name',
@@ -33,4 +35,9 @@ class Company extends Model
     {
         return unusualConfig('tables.companies', parent::getTable());
     }
+    protected static function newFactory()
+    {
+        return new CompanyFactory();
+    }
+
 }

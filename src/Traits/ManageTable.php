@@ -49,7 +49,7 @@ trait ManageTable {
                 'search' => collect( $this->indexTableColumns ?? [] )->filter(function ($item) {
                     return isset($item['searchable']) ? $item['searchable'] : false;
                 })->map(function($item){
-                    return $item['key'];
+                    return $this->dehydrateHeaderSuffix($item) ? $item['key']: $item['key'];
                 })->implode('|')
             ];
         }
@@ -310,13 +310,7 @@ trait ManageTable {
 
     protected function hydrateHeader($header)
     {
-        if($this->isRelationField($header['key']))
-            $header['key'] .= '_relation';
-
-
-        if(method_exists($this->repository->getModel(), 'isTimestampColumn') && $this->repository->isTimestampColumn($header['key'])){
-            $header['key'] .= '_timestamp';
-        }
+        $this->hydrateHeaderSuffix($header);
 
         // add edit functionality to table title cell
         if($this->titleColumnKey == $header['key'] && !isset($header['formatter']))
@@ -391,6 +385,22 @@ trait ManageTable {
 
 
         return $actions;
+    }
+
+    protected function hydrateHeaderSuffix(&$header)
+    {
+        if($this->isRelationField($header['key']))
+            $header['key'] .= '_relation';
+
+
+        if(method_exists($this->repository->getModel(), 'isTimestampColumn') && $this->repository->isTimestampColumn($header['key'])){
+            $header['key'] .= '_timestamp';
+        }
+    }
+
+    protected function dehydrateHeaderSuffix(&$header)
+    {
+        $header['key'] = preg_replace('/_relation|_timestamp/', '' ,$header['key']);
     }
 
 }

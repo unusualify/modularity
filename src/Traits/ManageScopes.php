@@ -120,18 +120,19 @@ trait ManageScopes {
                 }
             }
         }
+
         foreach ($this->fixedFilters as $key => $value) {
             $scope[$key] = $value;
         }
-        // dd(
-        //     $requestFilters,
-        //     $this->defaultFilters,
-        //     $this->filters,
-        //     $this->concreteFilters,
 
-        //     $prepend,
-        //     $scope
-        // );
+        if (array_key_exists('relations', $requestFilters)) {
+
+            foreach ($requestFilters['relations'] as $relationship => $value) {
+                $scope['addRelation' . $this->getStudlyName($relationship)] = $value;
+            }
+
+            // unset($requestFilters['relations']);
+        }
 
         return $prepend + $scope;
     }

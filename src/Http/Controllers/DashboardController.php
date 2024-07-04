@@ -43,7 +43,7 @@ class DashboardController extends BaseController
     {
         // $parentId = $this->getParentId() ?? $parentId;
 
-        // $data = $this->getIndexData($this->nested ? [
+        // $data = $this->getIndexData($this->isNested ? [
         //     $this->getParentModuleForeignKey() => $parentId,
         // ] : []);
 

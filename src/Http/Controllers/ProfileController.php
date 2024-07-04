@@ -65,7 +65,7 @@ class ProfileController extends BaseController
     public function edit($id = null, $submoduleId = null)
     {
         // $parentId = $this->getParentId() ?? $parentId;
-        // $data = $this->getIndexData($this->nested ? [
+        // $data = $this->getIndexData($this->isNested ? [
         //     $this->getParentModuleForeignKey() => $parentId,
         // ] : []);
 
