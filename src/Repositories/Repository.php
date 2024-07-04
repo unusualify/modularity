@@ -234,7 +234,7 @@ abstract class Repository
      * @param null $exceptId
      * @return \Illuminate\Support\Collection
      */
-    public function list($column = 'name', $with = [], $orders = [], $exceptId = null)
+    public function list($column = 'name', $with = [], $scopes = [], $orders = [], $exceptId = null)
     {
         $query = $this->model->newQuery();
 
@@ -244,6 +244,8 @@ abstract class Repository
         if ($exceptId) {
             $query = $query->where($this->model->getTable() . '.id', '<>', $exceptId);
         }
+
+        $query = $this->filter($query, $scopes);
 
         if ($this->model instanceof Sortable) {
             $query = $query->ordered();
@@ -260,7 +262,6 @@ abstract class Repository
             ]);
         }
         if(is_array($column)){
-
             return $query->get(['id', ...$column]);
         }
         return $query->get(['id', $column]);
@@ -795,6 +796,21 @@ abstract class Repository
         return $fields;
     }
 
+    public function getShowFields($object, $schema = [])
+    {
+        $this->traitColumns = $this->setColumns($this->traitColumns, $this->chunkInputs(all:true));
+
+        $object->setRelationsShowFormat();
+
+        $fields = $object->attributesToArray();
+
+        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
+            $fields = $this->$method($object, $fields, $schema);
+        }
+
+        return $fields;
+    }
+
     /**
      * @param array $columns
      * @param array $inputs
@@ -874,7 +890,6 @@ abstract class Repository
             $studlyColumn = studlyName($column);
             if (preg_match('/addRelation([A-Za-z]+)/', $column, $matches)) {
                 $relationName = $this->getCamelCase($matches[1]);
-
                 if(method_exists($this->getModel(), $relationName)){
                     $related = $this->getModel()->{$relationName}();
 
@@ -893,9 +908,18 @@ abstract class Repository
         }
         foreach ($scopes as $column => $value) {
             $studlyColumn = studlyName($column);
-
+            $studlyValue = studlyName($value);
+            // dd(
+            //     is_bool($value),
+            //     method_exists($this->model, 'scope' . $studlyColumn),
+            //     $studlyColumn,
+            //     $scopes
+            // );
             if (method_exists($this->model, 'scope' . $studlyColumn)) {
                 $query->{$this->getCamelCase($column)}();
+            } else if( is_string($value) && method_exists($this->model, 'scope' . studlyName($value))){
+                $query->{$this->getCamelCase($value)}();
+
             } else {
                 if (is_array($value)) {
                     $query->whereIn($column, $value);
@@ -1023,9 +1047,15 @@ abstract class Repository
     public function addRelationFilterScope($query, &$scopes, $scopeField, $scopeRelation)
     {
         if (isset($scopes[$scopeField])) {
-            $id = $scopes[$scopeField];
-            $query->whereHas($scopeRelation, function ($query) use ($id, $scopeField) {
-                $query->where($scopeField, $id);
+            // $value
+            // '1' or '1,7' or [1,7,9,11]
+            $value = $scopes[$scopeField];
+            if(is_string($value)){
+                $value = explode(',', $value);
+            }
+
+            $query->whereHas($scopeRelation, function ($query) use ($value, $scopeField) {
+                $query->whereIn($scopeField, $value);
             });
             unset($scopes[$scopeField]);
         }
