@@ -53,7 +53,7 @@ class MigrationMakeCommand extends BaseCommand
         }
 
         if($this->option('relational')){
-            $this->info('Relational (Pivot) Migration created successfully!');
+            $this->info('(Pivot) Migration created successfully!');
         }else {
             $this->info('Migration created successfully!');
         }
@@ -85,12 +85,14 @@ class MigrationMakeCommand extends BaseCommand
 
         return array_merge([
             ['fields', null, InputOption::VALUE_OPTIONAL, 'The specified fields table.', null],
+            ['route', null, InputOption::VALUE_OPTIONAL, 'The route name for pivot table.', null],
             ['plain', null, InputOption::VALUE_NONE, 'Create plain migration.'],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
             ['relational', null, InputOption::VALUE_NONE, 'Create relational table for many-to-many and polymorphic relationships.'],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
+            ['test', null, InputOption::VALUE_NONE, 'Test the Route Generator'],
         ], unusualTraitOptions());
     }
 
@@ -103,19 +105,31 @@ class MigrationMakeCommand extends BaseCommand
     {
         $parser = new NameParser($this->argument('name'));
 
-        if($this->option('relational')) {
-            $table_name = $parser->getTableName();
-            $table1 = $this->getSnakeCase($this->argument('module'));
-            $table2 = preg_replace("/^({$table1}_)(\w+)$/", '${2}', $table_name);
+        if(($relational = $this->option('relational'))) {
+            if($relational == 'BelongsToMany'){
+                $tableName = $parser->getTableName();
 
-            return Stub::create('/migration/pivot.stub', [
-                'class'         => $this->getClass(),
-                'table'         => $table_name,
-                'fields'        => ltrim((new SchemaParser(useDefaults:false))->render()),
+                $table1 = $this->getSnakeCase($this->option('route'));
+                $table2 = preg_replace("/^({$table1}_)(\w+)$/", '${2}', $tableName);
 
-                'table1'        => $table1,
-                'table2'        => $table2,
-            ]);
+                return Stub::create('/migration/pivot.stub', [
+                    'class'         => $this->getClass(),
+                    'table'         => $tableName,
+                    'fields'        => ltrim((new SchemaParser(schema: $this->option('fields'), useDefaults:false))->render()),
+                    // 'fields'        => ltrim($this->getSchemaParser()->render()),
+
+                    'table1'        => $table1,
+                    'table2'        => $table2,
+                ]);
+            }else if($relational == 'MorphedByMany'){
+                $tableName = $parser->getTableName();
+
+                return Stub::create('/migration/morphPivot.stub', [
+                    'class'         => $this->getClass(),
+                    'table'         => $tableName,
+                    'fields'        => ltrim((new SchemaParser(useDefaults:false))->render()),
+                ]);
+            }
         } elseif ($parser->isCreate()) {
             return Stub::create('/migration/create.stub', [
                 'class'         => $this->getClass(),
