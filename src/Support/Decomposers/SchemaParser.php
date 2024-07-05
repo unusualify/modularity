@@ -90,7 +90,7 @@ class SchemaParser extends Parser
 
         $this->useDefaults = $useDefaults;
 
-        $this->relationshipMap = unusualConfig('laravel-relationship-map', []);
+        $this->relationshipParametersMap = unusualConfig('laravel-relationship-map', []);
         $this->model = $model;
 
         if($this->useDefaults){
@@ -235,7 +235,7 @@ class SchemaParser extends Parser
             $methodName = $this->getCamelCase($methods[0]); // belongsTo, belongsToMany,....
             if($methodChaining && in_array($methods[0], $this->chainableMethods)){
                 $relationships[count($relationships)-1] .= ",{$col_name}:{$methods[0]}";
-            } else if (array_key_exists($methodName, $this->relationshipMap)) {
+            } else if (array_key_exists($methodName, $this->relationshipParametersMap)) {
                 $methodChaining = false;
                 $relatedName = $this->getStudlyName($col_name);
                 $arguments = $methods;
@@ -252,44 +252,28 @@ class SchemaParser extends Parser
                 if($methodName == 'belongsToMany'){
                     $methodChaining = true;
                 }
-                continue;
-
-                $studlyName = $this->getStudlyName($methods[2] ?? $col_name); // StudlyName
-                $relationship_method = $this->getCamelCase($methods[0]); // belongsTo|belongsToMany|morphTo
-                $methodChaining = false;
-                if($relationship_method  == 'belongsTo'){
-                    $foreign_key = $this->getForeignKeyFromName($studlyName); //$col_name.'_id';
-                    $owner_key = $methods[1] ?? 'id';
-                    // $table_name = $methods[2] ?? $this->getTableNameFromName($col_name); //pluralize($col_name);
-                    // $relationships[] = "belongsTo:{$table_name}:{$foreign_key}:{$owner_key}";
-                    $routeName = $this->getStudlyName($methods[2] ?? $col_name);
-                    $relationships[] = "belongsTo:{$routeName}:{$foreign_key}:{$owner_key}";
-                } else if($relationship_method == 'belongsToMany'){
-                    $methodChaining = true;
-                    $table_name = $methods[2] ?? $this->getTableNameFromName($col_name);
-                    $relationships[] = "belongsToMany:{$table_name}";
-                } else if($relationship_method == 'morphTo'){
-                    // $table_name = $col_name . 'able';
-                    $table_name = $col_name;
-                    $relationships[] = "morphTo";
-                }
 
             } else{
 
                 foreach ($methods as $i => $method) {
-
                     switch ($method) {
                         case 'foreignId':
-                            $table_name = $this->getDBTableName(preg_replace('/_id/', '', $col_name));
+                        case (preg_match('/(?<=foreignId[For])/', $method, $matches) ? true : false):
 
-                            $relationships[] = "belongsTo:{$table_name}:{$col_name}:id";
+                            // $table_name = $this->getDBTableName(preg_replace('/_id/', '', $col_name));
+                            if(!preg_match('/(\w)+_id$/', $col_name, $matches)){
+                                $col_name = makeForeignKey($col_name);
+                            }
+                            $relatedName = $this->getStudlyName(preg_replace('/_id/', '', $col_name));
+                            // $relationships[] = "belongsTo:{$table_name}:{$col_name}:id";
+                            $relationships[] = "belongsTo:{$relatedName}:{$col_name}:id";
 
                             break;
                         case (preg_match('/(?<=foreign\(\').*?(?=\'\))/', $method, $matches) ? true :false):
                             $foreign_key = $matches[0];
                             $owner_key = '';
                             $table_name = '';
-
+                            dd($foreign_key);
                             foreach ($methods as $i => $_method) {
                                 if(preg_match('/(?<=on\(\').*?(?=\'\))/', $_method, $matches)){
                                     $table_name = $matches[0];
@@ -406,6 +390,26 @@ class SchemaParser extends Parser
         $name = $column;
         $label = $this->getHeadline($column);
         $rules = [];
+
+        switch ($options[0]) {
+            case 'timestamp':
+                $extra_options['ext'] = 'date';
+                break;
+            case 'time':
+                $extra_options['ext'] = 'time';
+                break;
+            case 'json':
+                $type = 'group';
+                $extra_options['schema'] = [];
+                break;
+            case (in_array($options[0], ['text', 'mediumtext', 'longtext']) ? true : false):
+                $type = 'textarea';
+                break;
+
+            default:
+                # code...
+                break;
+        }
 
         if($options[0] == 'timestamp'){
             $extra_options['ext'] = 'date';
