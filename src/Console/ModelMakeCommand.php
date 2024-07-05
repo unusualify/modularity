@@ -17,6 +17,8 @@ use Nwidart\Modules\Support\Config\GeneratorPath;
 use Nwidart\Modules\Generators\FileGenerator;
 use Unusualify\Modularity\Facades\Modularity;
 
+use function Laravel\Prompts\confirm;
+
 class ModelMakeCommand extends BaseCommand
 {
 
@@ -98,6 +100,7 @@ class ModelMakeCommand extends BaseCommand
         if (parent::handle() === E_ERROR) {
             return E_ERROR;
         }
+
         $this->createAdditionalModels();
 
         // $this->handleOptionalMigrationOption();
@@ -138,6 +141,7 @@ class ModelMakeCommand extends BaseCommand
             ['soft-delete', 's', InputOption::VALUE_NONE, 'Flag to add softDeletes trait to model.'],
             ['has-factory', null, InputOption::VALUE_NONE, 'Flag to add hasFactory to model.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
+            ['test', null, InputOption::VALUE_NONE, 'Test the Route Generator'],
         ], unusualTraitOptions());
     }
 
@@ -543,6 +547,8 @@ class ModelMakeCommand extends BaseCommand
 
     private function createAdditionalModels()
     {
+        Modularity::scan();
+
         $module = Modularity::findOrFail($this->getModuleName());
 
         $overwriteFile = $this->hasOption('force') ? $this->option('force') : false;
@@ -555,25 +561,34 @@ class ModelMakeCommand extends BaseCommand
             $pivot_models = $this->modelRelationParser->getPivotModels();
 
             foreach ($pivot_models as $key => $pivot_model) {
-                $content = (new Stub( '/models/pivot_model.stub', [
-                    'NAMESPACE' => $this->getClassNamespace($module),
-                    'CLASS'     => $pivot_model['class'],
-                    'CASTS'     => $this->generateCasts($pivot_model['casts']),
-                    'FILLABLE'  => $this->generateFillable($pivot_model['fillables']),
-                ]))->render();
 
-                $fullPath = $path . $modelPath->getPath() . "" . '/' . $pivot_model['class'] . '.php';
+                $runnable = (!$this->option('test') || confirm(label: "Do you want to see content of {$pivot_model['class']} pivot model in the test mode?", default: false) );
 
-                if (!$this->laravel['files']->isDirectory($dir = dirname($fullPath))) {
-                    $this->laravel['files']->makeDirectory($dir, 0777, true);
+                if($runnable){
+                    $content = (new Stub( '/models/pivot_model.stub', [
+                        'NAMESPACE' => $this->getClassNamespace($module),
+                        'CLASS'     => $pivot_model['class'],
+                        'CASTS'     => $this->generateCasts($pivot_model['casts']),
+                        'FILLABLE'  => $this->generateFillable($pivot_model['fillables']),
+                    ]))->render();
+
+                    if($this->option('test')){
+                        $this->info($content);
+                    }else{
+                        $fullPath = $path . $modelPath->getPath() . "" . '/' . $pivot_model['class'] . '.php';
+
+                        if (!$this->laravel['files']->isDirectory($dir = dirname($fullPath))) {
+                            $this->laravel['files']->makeDirectory($dir, 0777, true);
+                        }
+
+                        (new FileGenerator($fullPath, $content))->withFileOverwrite($overwriteFile)->generate();
+                    }
                 }
-
-                (new FileGenerator($fullPath, $content))->withFileOverwrite($overwriteFile)->generate();
             }
         }
 
         if($this->modelRelationParser)
-            $this->modelRelationParser->writeReverseRelationships();
+            $this->modelRelationParser->writeReverseRelationships($this->option('test') ? true : false);
 
 
         if($this->getTraitResponse('addTranslation')){
@@ -587,11 +602,21 @@ class ModelMakeCommand extends BaseCommand
 
             $fullPath = $path . $modelPath->getPath() . "/Translations" . '/' . $this->getModelName() . 'Translation.php';
 
-            if (!$this->laravel['files']->isDirectory($dir = dirname($fullPath))) {
-                $this->laravel['files']->makeDirectory($dir, 0777, true);
+            $runnable = (!$this->option('test') || confirm(label: "Do you want to see the content of translation model in the test mode?", default: false) );
+
+            if($runnable){
+
+                if($this->option('test')){
+                    $this->info($content);
+                }else{
+                    if (!$this->laravel['files']->isDirectory($dir = dirname($fullPath))) {
+                        $this->laravel['files']->makeDirectory($dir, 0777, true);
+                    }
+
+                    (new FileGenerator($fullPath, $content))->withFileOverwrite($overwriteFile)->generate();
+                }
             }
 
-            (new FileGenerator($fullPath, $content))->withFileOverwrite($overwriteFile)->generate();
         }
 
         if( $this->getTraitResponse('addSlug') ){
@@ -605,11 +630,20 @@ class ModelMakeCommand extends BaseCommand
 
             $fullPath = $path . $modelPath->getPath() . "/Slugs" . '/' . $this->getModelName() . 'Slug.php';
 
-            if (!$this->laravel['files']->isDirectory($dir = dirname($fullPath))) {
-                $this->laravel['files']->makeDirectory($dir, 0777, true);
-            }
+            $runnable = (!$this->option('test') || confirm(label: "Do you want to see the content of translation model in the test mode?", default: false) );
 
-            (new FileGenerator($fullPath, $content))->withFileOverwrite($overwriteFile)->generate();
+            if($runnable){
+
+                if($this->option('test')){
+                    $this->info($content);
+                }else{
+                    if (!$this->laravel['files']->isDirectory($dir = dirname($fullPath))) {
+                        $this->laravel['files']->makeDirectory($dir, 0777, true);
+                    }
+
+                    (new FileGenerator($fullPath, $content))->withFileOverwrite($overwriteFile)->generate();
+                }
+            }
         }
     }
 

@@ -91,6 +91,8 @@ abstract class Generator extends NwidartGenerator
 
     protected $fix = false;
 
+    protected $test = false;
+
 
     /**
      * The constructor.
@@ -273,12 +275,34 @@ abstract class Generator extends NwidartGenerator
     }
 
     /**
-     * Get if the configuration is set as fix or not
+     * Get if the configuration is set as istest or not
      *
      * @return boolean|int
      */
     public function getFix(){
         return $this->fix;
+    }
+
+    /**
+     * Set the test attribute
+     *
+     * @param boolean|int $test
+     *
+     * @return $this
+     */
+    public function setTest($test){
+        $this->test = $test;
+
+        return $this;
+    }
+
+    /**
+     * Get if the configuration is set as isTest or not
+     *
+     * @return boolean|int
+     */
+    public function getTest(){
+        return $this->test;
     }
 
     /**

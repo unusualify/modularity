@@ -3,12 +3,10 @@
 namespace Unusualify\Modularity\Console;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Config;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
 use Nwidart\Modules\Support\Stub;
-use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Generators\RouteGenerator;
 
 class RouteMakeCommand extends BaseCommand
@@ -26,6 +24,11 @@ class RouteMakeCommand extends BaseCommand
      * @var string
      */
     protected $description = 'Create files for routes.';
+
+    protected $aliases= [
+        'u:m:r',
+        'modularity:make:route',
+    ];
 
     protected $responses = [];
 
@@ -89,6 +92,7 @@ class RouteMakeCommand extends BaseCommand
             ->setPlain($this->option('plain'))
             ->setCustomModel($this->option('custom-model'))
             ->setFix($this->option('fix'))
+            ->setTest($this->option('test'))
             ->generate();
 
         if ($code === E_ERROR) {
@@ -130,6 +134,7 @@ class RouteMakeCommand extends BaseCommand
             ['no-migrate', null, InputOption::VALUE_NONE, 'don\'t migrate.'],
             ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
             ['fix', null, InputOption::VALUE_NONE, 'Fixes the model config errors'],
+            ['test', null, InputOption::VALUE_NONE, 'Test the Route Generator'],
         ], unusualTraitOptions());
     }
 

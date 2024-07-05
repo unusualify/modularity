@@ -18,6 +18,9 @@ use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Module;
 
+use function Laravel\Prompts\{confirm};
+
+
 class RouteGenerator extends Generator
 {
     use ManageNames;
@@ -557,6 +560,7 @@ class RouteGenerator extends Generator
                 'model' => $this->getName(),
             ])->getRelationships());
         }
+
         return array_merge(
             $this->getSchemaParser()->getRelationships(),
             $additional
@@ -603,46 +607,51 @@ class RouteGenerator extends Generator
 
         $name = $this->getName();
 
+        if($this->getTest()){
+            $this->runTest();
 
-        if ($this->module->getRouteConfig($name)) {
-            // dd($this->force);
-            if ($this->force) {
-                // $this->module->delete($name);
-            } else if(!$this->fix){
-                $this->console->error("Module Route [{$name}] already exist!");
+            return 0;
+        }else {
+            if ($this->module->getRouteConfig($name)) {
+                // dd($this->force);
+                if ($this->force) {
+                    // $this->module->delete($name);
+                } else if(!$this->fix){
+                    $this->console->error("Module Route [{$name}] already exist!");
 
-                return E_ERROR;
+                    return E_ERROR;
+                }
             }
-        }
 
-        if($this->fix){
-            $this->fixConfigFile();
-        }else{
-            $this->updateConfigFile();
-        }
+            if($this->fix){
+                $this->fixConfigFile();
+            }else{
+                $this->updateConfigFile();
+            }
 
 
-        $this->addLanguageVariable();
+            $this->addLanguageVariable();
 
-        if(!$this->plain){
+            if(!$this->plain){
 
-            $this->updateRoutesStatuses();
+                $this->updateRoutesStatuses();
 
-            $this->generateFolders();
+                $this->generateFolders();
 
-            $this->generateResources();
+                $this->generateResources();
 
-            $this->generateFiles();
+                $this->generateFiles();
 
-            $this->createRoutePermissions();
+                $this->createRoutePermissions();
 
-            if($this->migrate && !$this->fix){ //!$this->module->isRouteTableExists($name)
+                if($this->migrate && !$this->fix){ //!$this->module->isRouteTableExists($name)
 
-                $this->console->call('unusual:migrate', [
-                    'module' => $this->module->getStudlyName()
-                ]);
+                    $this->console->call('unusual:migrate', [
+                        'module' => $this->module->getStudlyName()
+                    ]);
 
-                $this->console->info("Migration of [{$name}] run.");
+                    $this->console->info("Migration of [{$name}] run.");
+                }
             }
         }
 
@@ -667,26 +676,35 @@ class RouteGenerator extends Generator
      */
     public function generateFolders()
     {
-        foreach ($this->getFolders() as $key => $folder) {
+        $runnable = (!$this->getTest() || ($confirmed = confirm(label: 'Do you want to test the folders to be created?', default: false)) );
 
-            $folder = $this->generatorConfig($key);
+        if( $runnable ){
+            foreach ($this->getFolders() as $key => $folder) {
 
-            if ($folder->generate() === false) {
-                continue;
-            }
+                $folder = $this->generatorConfig($key);
 
-            $path = $this->module->getPath() . '/' . $folder->getPath();
+                if ($folder->generate() === false) {
+                    continue;
+                }
 
-            $path = $this->replaceString($path);
+                $path = $this->module->getPath() . '/' . $folder->getPath();
 
-            if ($this->filesystem->exists($path) === true) {
-                continue;
-            }
+                $path = $this->replaceString($path);
 
-            $this->filesystem->makeDirectory($path, 0755, true);
+                if ($this->filesystem->exists($path) === true) {
+                    continue;
+                }
 
-            if ( $this->config->get(unusualBaseKey() . '.stubs.gitkeep')) {
-                $this->generateGitKeep($path);
+                if($this->getTest()){
+                    $this->console->info("It's going to create {$path} directory!");
+                }else{
+                    $this->filesystem->makeDirectory($path, 0755, true);
+
+                    if ( $this->config->get(unusualBaseKey() . '.stubs.gitkeep')) {
+                        $this->generateGitKeep($path);
+                    }
+                }
+
             }
         }
     }
@@ -784,7 +802,6 @@ class RouteGenerator extends Generator
                     + $console_traits
                 );
             }
-
         }
 
         $this->generateExtraMigrations();
@@ -864,6 +881,9 @@ class RouteGenerator extends Generator
 
         }
 
+
+        $runnable = (!$this->getTest() || ($confirmed = confirm(label: 'Do you want to test the config file?', default: false)) );
+
         if(!$this->plain){
 
             $headers = $this->getHeaders();
@@ -885,10 +905,16 @@ class RouteGenerator extends Generator
             ];
 
 
+            if($runnable && $this->getTest()){
+                dump($route_array);
+            }
+
+
             $config['routes'][$this->getSnakeCase($this->getName())] = $route_array;
         }
 
-        return $this->filesystem->put($configPath, phpArrayFileContent($config));
+
+        return $this->getTest() ? 1 : $this->filesystem->put($configPath, phpArrayFileContent($config));
 
     }
 
@@ -1007,36 +1033,51 @@ class RouteGenerator extends Generator
                     'schema' => $schema
                 ]);
 
-                $migratable = false;
                 $route_name = '';
 
                 foreach($parser->getColumnTypes() as $column => $type){
                     if(in_array($type, ['belongsToMany'])){
-                        $migratable = true;
+                        // dd(explode('|', $this->relationships), $parser->getColumnTypes());
                         $route_name = $column;
+                        sleep(1);
+
+                        $pivot_table_name = snakeCase($this->name) . '_' . snakeCase($route_name);
+                        if(!$this->module->isFileExists("create_{$pivot_table_name}_table")){
+                            $this->console->call('unusual:make:migration', [
+                                '--relational' => 'BelongsToMany',
+                                '--no-defaults' => true,
+                                '--route' => $this->name,
+                                'module' => $this->module->getStudlyName(),
+                                'name' => "create_{$pivot_table_name}_table",
+                                ]
+                                + ( $schema ?  ['--fields' => $schema] : [])
+                            );
+                        }
+                        continue;
+                    }
+
+                    if(in_array($type, ['morphedByMany']) || in_array($column, ['morphedByMany'])){
+                        // $migratable = true;
+                        $route_name = in_array($column, ['morphedByMany']) ? $this->name : $column;
+
+                        sleep(1);
+                        $pivot_table_name = $this->getMorphPivotTableName($route_name);
+
+                        if(!$this->module->isFileExists("create_{$pivot_table_name}_table")){
+
+                            $this->console->call('unusual:make:migration', [
+                                '--relational' => 'MorphedByMany',
+                                '--no-defaults' => true,
+                                'module' => $this->module->getStudlyName(),
+                                'name' => "create_{$pivot_table_name}_table",
+                                ]
+                                + ( $this->schema ?  ['--fields' => $schema] : [])
+                            );
+                        }
                         break;
                     }
                 }
 
-                if($migratable){
-                    sleep(1);
-                    // dd($schema, $parser->toArray());
-                    // $route_name = $options[1]; // package_feature
-                    $pivot_table_name = snakeCase($this->name) . '_' . $route_name;
-
-                    if(!$this->module->isFileExists("create_{$pivot_table_name}_table")){
-
-                        $this->console->call('unusual:make:migration', [
-                            '--relational' => true,
-                            '--no-defaults' => true,
-                            'module' => $this->module->getStudlyName(),
-                            'name' => "create_{$pivot_table_name}_table",
-                            ]
-                            + ( $this->schema ?  ['--fields' => $schema] : [])
-                        );
-                    }
-
-                }
             }
 
 
@@ -1249,6 +1290,58 @@ class RouteGenerator extends Generator
     protected function getAuthorEmailReplacement()
     {
         return unusualConfig('composer.author.email');
+    }
+
+    protected function runTest()
+    {
+
+        if(!$this->plain){
+
+            $this->updateConfigFile();
+
+            // $this->generateFolders();
+
+            $console_traits =  $this->traits->mapWithKeys(function ($item, $key) {
+                return ["--{$key}" => $item];
+            })->toArray();
+
+            $hasCustomModel = $this->customModel && @class_exists($this->customModel);
+
+            $this->console->call('unusual:make:model', [
+                    'module' => $this->module->getStudlyName(),
+                    'model' => $this->getName()
+                ]
+                + ( count($this->getModelFillables()) ?  ['--fillable' => implode(",", $this->getModelFillables())] : [])
+                + ( count($this->getModelRelationships()) ?  ['--relationships' => implode("|", $this->getModelRelationships())] : [])
+                + ( $this->hasSoftDelete() ?  ['--soft-delete' => true] : [])
+                + ( $hasCustomModel ?  ['--override-model' => $this->customModel] : [])
+                + $console_traits
+                + ['--notAsk' => true]
+                + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
+                + ['--test' => $this->getTest()]
+            );
+
+            if(!$hasCustomModel) {
+
+                if(!$this->module->isFileExists("create_{$this->getDBTableName($this->name)}_table") && !$this->fix){
+                    $this->console->call('unusual:make:migration', [
+                            'module' => $this->module->getStudlyName(),
+                            'name' => "create_{$this->getDBTableName($this->name)}_table",
+                        ]
+                        + ( $this->schema ?  ['--fields' => $this->schema] : [])
+                        + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
+                        + $console_traits
+                        + ['--test' => $this->getTest()]
+                    );
+                }
+            }
+
+            // $this->generateFiles();
+        }
+
+        $this->console->info('Route generator test is completed successfully!');
+
+        return 0;
     }
 
 }
