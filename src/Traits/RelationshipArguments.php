@@ -17,9 +17,18 @@ trait RelationshipArguments {
             case 'hasManyThrough':
             case 'belongsToMany':
             case 'belongsTo':
+            case 'hasOne':
+            case 'hasMany':
                 $value = $this->getStudlyName($name);
                 break;
             case 'morphMany':
+                $value = $this->getStudlyName($name);
+                dd(
+                    __FUNCTION__,
+                    $value
+                );
+                break;
+            case 'morphToMany':
                 $value = $this->getStudlyName($name);
                 break;
 
@@ -78,8 +87,14 @@ trait RelationshipArguments {
                 $value = $arguments[1] ?? 'id';
                 break;
             case 'morphMany':
-                dd($name, $relationshipName, $arguments);
+                dd(__FUNCTION__, $name, $relationshipName, $arguments);
                 $value = '';
+                break;
+            case 'morphToMany':
+                $value = $arguments[1] ?? makeMorphName(snakeCase($name));
+                break;
+            case 'morphedByMany':
+                $value = $arguments[1] ?? makeMorphName(snakeCase($name));
                 break;
 
             default:
@@ -90,7 +105,6 @@ trait RelationshipArguments {
         return $value;
 
     }
-
 
     public function getRelationshipArgumentThrough($name, $relationshipName, $arguments)
     {
