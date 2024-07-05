@@ -43,8 +43,7 @@ const state = {
   filter: window[import.meta.env.VUE_APP_NAME].STORE.datatable.filter || {},
   mainFilters: window[import.meta.env.VUE_APP_NAME].STORE.datatable.mainFilters || [],
   advancedFilters: window[import.meta.env.VUE_APP_NAME].STORE.datatable.advancedFilters || [
-    {name: "web company", slug:"webCompanies", items: [1,2,3,4,5,6], type: "select", selecteds : []},
-    {name: "web company", slug:"vimeoWebinars", items: [1,2,3,4,5,6], type: "select", selecteds : []}
+    // {type: 'select', slug: 'webCompany', items: [1,2,3,4,5,6], selecteds: []}
   ],
 
   bulk: [],
@@ -294,7 +293,7 @@ const activeOption = (option, key) => {
 const actions = {
   [ACTIONS.GET_DATATABLE] ({ commit, state, getters }, { payload = {}, callback = null, errorCallback = null, endpoint = null } = {}) {
     // if (!state.loading) {
-
+    console.log(state.advancedFilters);
     const keys = Object.keys(payload)
     let _changed = keys.length === 0
 

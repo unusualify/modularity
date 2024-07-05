@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
 
@@ -384,5 +385,32 @@ trait ManageTable {
     {
         $header['key'] = preg_replace('/_relation|_timestamp/', '' ,$header['key']);
     }
+
+    protected function getTableAdvancedFilters(){
+
+       return Collection::make($this->getConfigFieldsByRoute('filters.relations'))->map(
+            function($filter){
+                $repository = App::make($filter->repository);
+                $items =  $repository->list()->map(function($value, $key){
+
+                    return $value;
+                });
+
+                $filter->componentOptions->items = $items->toArray();
+                $filter->componentOptions->itemValue ??= 'id';
+                $filter->componentOptions->itemTitle ??= 'name';
+
+
+                // dd($filter);
+                // TODO: generate slug from given model name or something else
+                // check if relationship is presents
+                // check for fallback and error cases
+
+                return $filter;
+            }
+        )->toArray();
+
+    }
+
 
 }

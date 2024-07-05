@@ -46,6 +46,7 @@ trait ManageUtilities {
              * */
             // 'actions' => $this->getTableActions(),
             'endpoints' => $this->getIndexUrls() + $this->getUrls(),
+            'advancedFilters' => $this->getTableAdvancedFilters(),
         ] + $this->getViewLayoutVariables();
         // $baseUrl = $this->getPermalinkBaseUrl();
         // dd($this->tableAttributes, $this->getViewLayoutVariables());

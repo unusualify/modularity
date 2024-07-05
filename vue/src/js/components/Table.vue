@@ -100,6 +100,7 @@
             id="advanced-filter-btn"
             v-bind="{...filterBtnOptions, ...filterBtnTitle}"
             text="Advanced Filter"
+            v-if="advancedFilters.length > 0"
           />
 
           <v-btn v-if="can('create') && !noForm && !someSelected" v-bind="addBtnOptions" @click="createForm" :text="addBtnTitle"/>
@@ -139,8 +140,9 @@
               >
                 <component
                   :is="`v-${filter.type}`"
-                  multiple
-                  :items="filter.items"
+                  v-bind="filter.componentOptions"
+                  v-bind:item-value="filter.componentOptions.itemValue"
+                  v-bind:item-title="filter.componentOptions.itemTitle"
                   v-model="advancedFilters[index]['selecteds']"
                 />
 
