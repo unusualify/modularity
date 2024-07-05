@@ -1,0 +1,46 @@
+{
+    "modularity-create-test-module": [
+        "@php artisan u:m:m ModTest"
+    ],
+    "modularity-remove-test-module": [
+        "@php artisan u:r:m ModTest"
+    ],
+    "modularity-test-route-belongsTo": [
+        "@php artisan u:m:m ModTest --schema='description:text' --no-defaults",
+        "@php artisan u:m:r ModTest ModRoute --schema='ModTest:belongsTo' --test",
+        "@php artisan unusual:remove:module ModTest"
+    ],
+    "modularity-test-route-hasOneThrough": [
+        "@php artisan u:m:m ModTest --schema='description:text' --no-defaults",
+        "@php artisan u:m:r ModTest ModRoute --schema='ModTest:belongsTo'",
+        "@php artisan u:m:r ModTest ModRouteParameter --schema='ModRoute:belongsTo' --relationships='ModTest:hasOneThrough:ModRoute' --test",
+        "@php artisan unusual:remove:module ModTest"
+    ],
+    "modularity-test-route-morphTo": [
+        "@php artisan u:m:m ModTest",
+        "@php artisan u:m:r ModTest ModOne --no-defaults",
+        "@php artisan u:m:r ModTest ModTwo --no-defaults",
+        "@php artisan u:m:r ModTest ModTest --relationships='ModTest:morphTo:ModOne:ModTwo' --no-defaults --test",
+        "@php artisan unusual:remove:module ModTest"
+    ],
+    "modularity-test-route-morphToMany": [
+        "@php artisan u:m:m ModTest --relationships='morphedByMany' --no-migrate",
+        "@php artisan u:m:r ModTest ModOne --relationships='ModTest:morphToMany'",
+        "@php artisan u:m:r ModTest ModTwo --relationships='ModTest:morphToMany' --test",
+        "@php artisan unusual:remove:module ModTest"
+    ],
+    "modularity-test-route-belongsToMany": [
+        "@php artisan u:m:m ModTest",
+        "@php artisan u:m:r ModTest ModOne",
+        "@php artisan u:m:r ModTest ModTwo",
+        "@php artisan u:m:r ModTest ModTest --relationships='ModOne:belongsToMany,position:integer:unsigned:index,active:string:default(true)|ModTwo:belongsToMany,text:string'",
+        "@php artisan unusual:remove:module ModTest"
+    ],
+    "modularity-test-route-cross-relationships": [
+        "@php artisan u:m:m ModTest",
+        "@php artisan u:m:r ModTest ModOne --relationships='ModOne:morphedByMany'",
+        "@php artisan u:m:r ModTest ModTwo --relationships='ModOne:morphToMany'",
+        "@php artisan u:m:r ModTest ModThree --relationships='ModOne:morphToMany'",
+        "@php artisan u:m:r ModTest ModFour --relationships='ModTwo:belongsToMany,position:integer:unsigned:index,active:string:default(true)|ModThree:belongsToMany,text:string|ModOne:morphToMany|ModTest:morphTo:ModTwo:ModThree'"
+    ]
+}
