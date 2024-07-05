@@ -62,7 +62,6 @@ class Modularity extends FileRepository
             $manifests = $this->getFiles()->glob("{$path}/module.json");
 
             is_array($manifests) || $manifests = [];
-
             foreach ($manifests as $manifest) {
                 $name = Json::make($manifest)->get('name');
                 if(preg_match('/oguzhan/', $manifest)){
@@ -139,4 +138,25 @@ class Modularity extends FileRepository
             return !isset($module_config['group']) || !$module_config['group'];
         });
     }
+
+    public function deleteModule(string $name): bool
+    {
+        $module = null;
+
+        $this->scan();
+
+        foreach ($this->all() as $moduleInstance) {
+            if ($moduleInstance->getStudlyName() === studlyName($name)) {
+                $module = $moduleInstance;
+                break;
+            }
+        }
+
+        if($module){
+            return $module->delete();
+        }
+
+        return false;
+    }
+
 }
