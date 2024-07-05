@@ -27,13 +27,11 @@ class Finder
         $model_class = '';
         // dd( array_filter( glob( base_path( config('modules.namespace')).'/*'), 'is_dir') );
 
-        foreach (array_filter( glob( base_path( config('modules.namespace')).'/*'), 'is_dir') as $module_path) {
+        foreach (array_filter( glob( config('modules.paths.modules').'/*'), 'is_dir') as $module_path) {
 
             if( !file_exists( $module_path.'/Entities') ) continue;
 
             foreach($this->getClasses( $module_path.'/Entities' ) as $class){
-                // dd($module_path, $class);
-
                 if( method_exists($class,'getTable') ){
                     if( with(new $class())->getTable() == $table ){
                         $model_class = $class;
@@ -105,7 +103,7 @@ class Finder
     {
         $class = '';
 
-        foreach (array_filter( glob( base_path( config('modules.namespace')).'/*'), 'is_dir') as $module_path) {
+        foreach (array_filter( glob( config('modules.paths.modules').'/*'), 'is_dir') as $module_path) {
 
             if( !file_exists( $module_path.'/Repositories') ) continue;
 
