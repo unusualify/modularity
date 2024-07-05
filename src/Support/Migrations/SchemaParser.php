@@ -5,6 +5,7 @@ namespace Nwidart\Modules\Support\Migrations;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Facades\UFinder;
 
 class SchemaParser implements Arrayable
 {
@@ -193,10 +194,12 @@ class SchemaParser implements Arrayable
     protected function addBelongsToColumn($key, $column, $field)
     {
         if ($key === 0) {
-            $relatedColumn = Str::snake(class_basename($column)) . '_id';
+            // $relatedColumn = Str::snake(class_basename($column)) . '_id';
+            $relatedColumn = makeForeignKey($column);
 
             // return "->integer('{$relatedColumn}')->unsigned();" . PHP_EOL . "\t\t\t" . "\$table->foreignId('{$relatedColumn}')";
             return "->foreignId('{$relatedColumn}')->constrained()->onUpdate('cascade')->onDelete('cascade')";
+            return "->foreignFor()";
         }
 
         if ($key === 1) {
@@ -214,6 +217,21 @@ class SchemaParser implements Arrayable
         return '->' . $field . '()';
     }
 
+    protected function addForeignIdForColumn($key, $column, $field)
+    {
+
+        if ($key === 0) {
+            $class = get_class(UFinder::getRouteRepository($column, asClass: true)->getModel());
+            $classNameResolution = class_resolution($class);
+            // return "->integer('{$relatedColumn}')->unsigned();" . PHP_EOL . "\t\t\t" . "\$table->foreignId('{$relatedColumn}')";
+            return "->foreignFor({$classNameResolution})";
+        }
+
+        return;
+
+        return '->' . $field . '()';
+    }
+
     /**
      * Format field to script.
      *
@@ -225,7 +243,6 @@ class SchemaParser implements Arrayable
      */
     protected function addColumn($key, $field, $column)
     {
-        // dd($key, $field, $column);
         if ($this->hasCustomAttribute($column)) {
             return '->' . $field;
         }
