@@ -800,7 +800,9 @@ abstract class Repository
     {
         $this->traitColumns = $this->setColumns($this->traitColumns, $this->chunkInputs(all:true));
 
-        $object->setRelationsShowFormat();
+        if(method_exists($object, 'setRelationsShowFormat')){
+            $object->setRelationsShowFormat();
+        }
 
         $fields = $object->attributesToArray();
 

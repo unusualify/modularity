@@ -243,69 +243,71 @@ trait RelationTrait
         // dd(
         //     $this->definedRelationsTypes()
         // );
-        foreach( $this->definedRelationsTypes() as $relationship => $relationshipType){
-            if($relationship == 'prices'){
-                dd(
-                    'prices',
-                    $relationshipType,
-                    $object->{$relationship}
-                );
-            }
-            switch ($relationshipType) {
-                case 'BelongsTos':
-                    $fields["{$relationship}_show"] = $object->{$relationship}->getShowFormat();
+        if(method_exists($this->model, 'definedRelationsTypes')){
+            foreach( $this->model->definedRelationsTypes() as $relationship => $relationshipType){
+                if($relationship == 'prices'){
+                    dd(
+                        'prices',
+                        $relationshipType,
+                        $object->{$relationship}
+                    );
+                }
+                switch ($relationshipType) {
+                    case 'BelongsTos':
+                        $fields["{$relationship}_show"] = $object->{$relationship}->getShowFormat();
 
-                    break;
-                case 'MorphManys':
-                    $fields["{$relationship}_show"] = $object->{$relationship}->map(fn($model) => method_exists($model, 'getShowFormat') ?  $model->getShowFormat() : $model->name)->implode(', ');
+                        break;
+                    case 'MorphManys':
+                        $fields["{$relationship}_show"] = $object->{$relationship}->map(fn($model) => method_exists($model, 'getShowFormat') ?  $model->getShowFormat() : $model->name)->implode(', ');
 
-                    break;
-                case 'MorphToManys':
-                    $fields["{$relationship}_show"] = $object->{$relationship}->map(fn($model) => method_exists($model, 'getShowFormat') ?  $model->getShowFormat() : $model->name)->implode(', ');
+                        break;
+                    case 'MorphToManys':
+                        $fields["{$relationship}_show"] = $object->{$relationship}->map(fn($model) => method_exists($model, 'getShowFormat') ?  $model->getShowFormat() : $model->name)->implode(', ');
 
-                    break;
-                case 'BelongsToMany':
+                        break;
+                    case 'BelongsToMany':
 
-                    break;
+                        break;
 
-                default:
-                    try {
-                        //code...
-                        $record = $object->{$relationship};
+                    default:
+                        try {
+                            //code...
+                            $record = $object->{$relationship};
 
-                        if ($record instanceof \Illuminate\Database\Eloquent\Collection) {
-                            $record->map(function($model){
-                                if(get_class_short_name($model) == 'Price'){
-                                    dd($model, modelShowFormat($model));
-                                }
-                            });
-                            $fields["{$relationship}_show"] = $record->map(fn($model) => modelShowFormat($model))->implode(', ');
-                        } else if($record) {
-                            $fields["{$relationship}_show"] = modelShowFormat($record);
+                            if ($record instanceof \Illuminate\Database\Eloquent\Collection) {
+                                $record->map(function($model){
+                                    if(get_class_short_name($model) == 'Price'){
+                                        dd($model, modelShowFormat($model));
+                                    }
+                                });
+                                $fields["{$relationship}_show"] = $record->map(fn($model) => modelShowFormat($model))->implode(', ');
+                            } else if($record) {
+                                $fields["{$relationship}_show"] = modelShowFormat($record);
+                            }
+                        } catch (\Throwable $th) {
+                            dd(
+                                $object,
+                                $relationship,
+                                $this->definedRelationsTypes()
+                            );
+                            //throw $th;
                         }
-                    } catch (\Throwable $th) {
-                        dd(
-                            $object,
-                            $relationship,
-                            $this->definedRelationsTypes()
-                        );
-                        //throw $th;
-                    }
 
-                    // if($relationship == 'packages'){
-                    //     $record->map(function($model){
-                    //         dd(
-                    //             $model,
-                    //             $model->price(),
-                    //             $model->price_formatted,
-                    //             $model->price,
-                    //         );
-                    //     })->implode(', ');
+                        // if($relationship == 'packages'){
+                        //     $record->map(function($model){
+                        //         dd(
+                        //             $model,
+                        //             $model->price(),
+                        //             $model->price_formatted,
+                        //             $model->price,
+                        //         );
+                        //     })->implode(', ');
 
-                    // }
+                        // }
 
 
-                    break;
+                        break;
+                }
             }
         }
 
