@@ -245,24 +245,32 @@ class BaseServiceProvider extends ServiceProvider
 
         $modularityIsCacheable = !($this->app->runningInConsole() && $this->app->runningConsoleCommand([
             'unusual:make:module',
+            'u:m:m',
+            'modularity:make:module',
             'unusual:fix:module',
             'unusual:make:route',
-            'unusual:dev'
+            'u:m:r',
+            'modularity:make:route',
+            'unusual:dev',
+            'unusual:remove:module',
+            'modularity:remove:module',
+            'u:r:m',
         ]));
 
         if ($modularityIsCacheable) {
-            // config([
-            //     'modules.cache.enabled' => true,
-            //     'modules.cache.key' => 'modularity',
-            //     'modules.cache.lifetime' => 600
-            // ]);
+            config([
+                'modules.cache.enabled' => true,
+                'modules.cache.key' => 'modularity',
+                'modules.cache.lifetime' => 600
+            ]);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    private function bootMacros(){
+    private function bootMacros()
+    {
 
         \Illuminate\Support\Collection::macro('recursive', function () {
             return $this->map(function ($value) {
@@ -284,7 +292,8 @@ class BaseServiceProvider extends ServiceProvider
     /**
      * {@inheritdoc}
      */
-    private function bootBaseMigrations(){
+    private function bootBaseMigrations()
+    {
         // LOAD BASE MIGRATIONS
         $this->loadMigrationsFrom(
             base_path( unusualConfig('vendor_path') . '/src/Database/Migrations/default' )
