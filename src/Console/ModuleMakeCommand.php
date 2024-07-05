@@ -29,7 +29,10 @@ class ModuleMakeCommand extends BaseCommand
      */
     protected $description = 'Create a module';
 
-    // protected $argumentName = 'request';
+    protected $aliases= [
+        'u:m:m',
+        'modularity:make:module',
+    ];
 
     /**
      * The laravel console instance.
@@ -96,6 +99,7 @@ class ModuleMakeCommand extends BaseCommand
             + ( ['-p' => $this->getPlainOption()])
             + $console_traits
             + ['--notAsk' => true]
+            + ['--test' => false]
         );
 
 
@@ -112,6 +116,7 @@ class ModuleMakeCommand extends BaseCommand
             ['module', InputArgument::REQUIRED, 'The name of the module.'],
         ];
     }
+
     /**
      * Get the console command options.
      *

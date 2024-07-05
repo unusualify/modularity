@@ -15,14 +15,22 @@ class BuildCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:build';
+    protected $signature = 'unusual:build
+        {--noInstall : No install npm packages}
+        {--hot : Hot Reload}
+        {--w|watch : Watcher for dev}
+        {--c|copyOnly : Only copy assets}
+        {--cc|copyComponents : Only copy custom components}
+        {--ct|copyTheme : Only copy custom theme}
+        {--cts|copyThemeScript : Only copy custom theme script}
+        {--theme= : Custom theme name if was worked on}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = "Build Unusual assets with custom Vue components";
+    protected $description = "Build the Modularity assets with custom Vue components";
 
     /**
      * @var Filesystem
@@ -65,38 +73,6 @@ class BuildCommand extends BaseCommand
         }
 
         return $this->fullBuild();
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['noInstall', '--noInstall', InputOption::VALUE_NONE, 'No install npm packages'],
-            ['hot', '--hot', InputOption::VALUE_NONE, 'Hot Reload'],
-            ['watch', '--w', InputOption::VALUE_NONE, 'Watcher for dev'],
-            ['copyOnly', '--c', InputOption::VALUE_NONE, 'Only copy assets'],
-            ['copyComponents', '--cc', InputOption::VALUE_NONE, 'Only copy custom components'],
-            ['copyTheme', '--ct', InputOption::VALUE_NONE, 'Only copy custom theme'],
-            ['copyThemeScript', '--cts', InputOption::VALUE_NONE, 'Only copy custom theme script'],
-            ['theme', null, InputOption::VALUE_OPTIONAL, 'Theme name'],
-
-        ];
     }
 
     /*
