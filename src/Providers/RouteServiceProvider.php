@@ -400,7 +400,7 @@ class RouteServiceProvider extends ServiceProvider
                                         ){
                                             $resourceRegistrar = Route::resource("{$belongRouteUrl}.{$routeUrlSegment}", $controllerName, [
                                                 'as' => $parentSnakeName,
-                                                'names' => "{$belongRouteName}.nested.{$itemSnakeName}",
+                                                'names' => nestedRouteNameFormat($belongRouteName, $itemSnakeName),
                                             ])->parameters($parameters + [
                                                 $belongRouteUrl => $belongRouteName
                                             ]);
