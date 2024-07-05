@@ -93,7 +93,7 @@ export default {
         if (matches) {
           let result = get(props.bindData, matches[1])
           funcs.forEach((func) => {
-            result = global[func](result)
+            result = window[func](result)
           })
 
           if (result) {
