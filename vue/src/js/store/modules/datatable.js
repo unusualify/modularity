@@ -83,6 +83,11 @@ const getters = {
     return state.mainFilters
   },
   advancedFilters : state => {
+    if(state.filter.relations){
+      Object.values(state.advancedFilters).forEach((filter) => {
+        filter['selecteds'] = state.filter.relations[filter.slug]
+      })
+    }
     return state.advancedFilters
   }
 
@@ -291,7 +296,6 @@ const activeOption = (option, key) => {
 const actions = {
   [ACTIONS.GET_DATATABLE] ({ commit, state, getters }, { payload = {}, callback = null, errorCallback = null, endpoint = null } = {}) {
     // if (!state.loading) {
-    console.log(state.advancedFilters);
     const keys = Object.keys(payload)
     let _changed = keys.length === 0
 
