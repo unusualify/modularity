@@ -387,29 +387,37 @@ trait ManageTable {
     }
 
     protected function getTableAdvancedFilters(){
-
        return Collection::make($this->getConfigFieldsByRoute('filters.relations'))->map(
-            function($filter){
-                $repository = App::make($filter->repository);
-                $items =  $repository->list()->map(function($value, $key){
 
-                    return $value;
-                });
-
-                $filter->componentOptions->items = $items->toArray();
-                $filter->componentOptions->itemValue ??= 'id';
-                $filter->componentOptions->itemTitle ??= 'name';
-
-
-                // dd($filter);
                 // TODO: generate slug from given model name or something else
                 // check if relationship is presents
                 // check for fallback and error cases
+
+            function($filter){
+                if(method_exists(__TRAIT__, $methodName = 'getTableAdvancedFilters'.$filter->type)){
+                    $filter = $this->$methodName($filter);
+                }
 
                 return $filter;
             }
         )->toArray();
 
+    }
+
+
+    protected function getTableAdvancedFiltersSelect($filter){
+
+        $repository = App::make($filter->repository);
+        $items =  $repository->list()->map(function($value, $key){
+            return $value;
+        });
+
+        $filter->componentOptions->items = $items->toArray();
+        $filter->componentOptions->itemValue ??= 'id';
+        $filter->componentOptions->itemTitle ??= 'name';
+
+
+        return $filter;
     }
 
 

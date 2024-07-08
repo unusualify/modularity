@@ -890,16 +890,17 @@ abstract class Repository
             $studlyColumn = studlyName($column);
             if (preg_match('/addRelation([A-Za-z]+)/', $column, $matches)) {
                 $relationName = $this->getCamelCase($matches[1]);
+
                 if(method_exists($this->getModel(), $relationName)){
                     $related = $this->getModel()->{$relationName}();
 
-                    $foreignKey = $related->getForeignKeyName();
-
-                    if(method_exists($related, 'getSecondLocalKeyName')){ // for hasOneThrough relationship
-                        $foreignKey = $related->getSecondLocalKeyName();
+                    if(method_exists(__CLASS__, $method = 'getForeignKey'. get_class_short_name($related))){
+                        $foreignKey = $this->$method($related,$scopes,$value);
                     }
                     // $tableName = $this->getTableNameFromName($relationName);
+
                     $scopes[$foreignKey] = $value;
+
                     $this->addRelationFilterScope($query, $scopes, $foreignKey, $relationName);
                 }
 
@@ -1440,4 +1441,28 @@ abstract class Repository
             ->pluck('name')
             ->all();
     }
+
+    private function getForeignKeyBelongsToMany($related){
+        if(method_exists($related, 'getRelatedPivotKeyName')){
+            $foreignKey = $related->getRelatedPivotKeyName();
+            // $scopes[$foreignKey] = $value;
+        }
+
+        return $foreignKey;
+    }
+
+    private function getForeignKeyBelongsTo($related){
+        $foreignKey = $related->getForeignKeyName();
+
+        return $foreignKey;
+    }
+
+    private function getForeignKeyHasManyThrough($related){
+        $foreignKey = $related->getSecondLocalKeyName();
+
+        return $foreignKey;
+    }
+
+
 }
+

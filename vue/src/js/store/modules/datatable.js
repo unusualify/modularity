@@ -42,9 +42,7 @@ const state = {
 
   filter: window[import.meta.env.VUE_APP_NAME].STORE.datatable.filter || {},
   mainFilters: window[import.meta.env.VUE_APP_NAME].STORE.datatable.mainFilters || [],
-  advancedFilters: window[import.meta.env.VUE_APP_NAME].STORE.datatable.advancedFilters || [
-    // {type: 'select', slug: 'webCompany', items: [1,2,3,4,5,6], selecteds: []}
-  ],
+  advancedFilters: window[import.meta.env.VUE_APP_NAME].STORE.datatable.advancedFilters || [],
 
   bulk: [],
   // localStorageKey: window[import.meta.env.VUE_APP_NAME].STORE.datatable.localStorageKey || window.location.pathname,
@@ -126,7 +124,7 @@ const mutations = {
 
   [DATATABLE.UPDATE_DATATABLE_ADVANCED_FILTER] (state, val){
       state.filter.relations = {}
-      val.filter((adv,index) => adv.selecteds.length > 0).forEach(function(adv, index){
+      val.filter((adv,index) => adv.selecteds?.length > 0).forEach(function(adv, index){
         state.filter.relations[adv.slug] = adv.selecteds
       })
   },
