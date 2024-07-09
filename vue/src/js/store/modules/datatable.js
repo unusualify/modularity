@@ -135,7 +135,6 @@ const mutations = {
   },
 
   [DATATABLE.RESET_DATATABLE_ADVANCED_FILTER] (state){
-    console.log(state.advancedFilters)
     state.advancedFilters = Object.fromEntries(Object.entries(state.advancedFilters).map(([key, val]) => {
       state.filter[key] = []
       val.map((filter) => filter.selecteds = [])
