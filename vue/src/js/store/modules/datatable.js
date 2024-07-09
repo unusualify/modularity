@@ -83,11 +83,6 @@ const getters = {
     return state.mainFilters
   },
   advancedFilters : state => {
-    if(state.filter.relations){
-      Object.values(state.advancedFilters).forEach((filter) => {
-        filter['selecteds'] = state.filter.relations[filter.slug]
-      })
-    }
     return state.advancedFilters
   }
 
@@ -128,18 +123,24 @@ const mutations = {
   },
 
   [DATATABLE.UPDATE_DATATABLE_ADVANCED_FILTER] (state, val){
-      state.filter.relations = {}
-      val.filter((adv,index) => adv.selecteds?.length > 0).forEach(function(adv, index){
-        state.filter.relations[adv.slug] = adv.selecteds
+
+      Object.keys(state.advancedFilters).forEach(function(key,index){
+        state.filter[key] = state.advancedFilters[key].reduce((collection,filter) => {
+          if(filter.selecteds?.length > 0){
+            collection[filter.slug] = filter.selecteds
+          }
+          return collection
+        }, {})
       })
   },
 
   [DATATABLE.RESET_DATATABLE_ADVANCED_FILTER] (state){
-    state.advancedFilters =  state.advancedFilters.map((filter,index) => {
-      filter.selecteds = []
-      state.filter.relations = []
-      return filter
-    })
+    console.log(state.advancedFilters)
+    state.advancedFilters = Object.fromEntries(Object.entries(state.advancedFilters).map(([key, val]) => {
+      state.filter[key] = []
+      val.map((filter) => filter.selecteds = [])
+      return [key, val]
+    }))
   },
 
   [DATATABLE.UPDATE_DATATABLE_BULK] (state, id) {
@@ -325,7 +326,7 @@ const actions = {
           Object.entries(state.filter).reduce((result ,[key, value]) => {
 
             if(key === 'status' && value === 'all') return result
-            if(key === 'relations' && isEmpty(value)) return result
+            if(isEmpty(value)) return result
 
             result.push([key, value])
             return result

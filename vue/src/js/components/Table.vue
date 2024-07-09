@@ -100,7 +100,7 @@
             id="advanced-filter-btn"
             v-bind="{...filterBtnOptions, ...filterBtnTitle}"
             text="Advanced Filter"
-            v-if="advancedFilters.length > 0"
+            v-if="advancedFilters"
           />
 
           <v-btn v-if="can('create') && !noForm && !someSelected" v-bind="addBtnOptions" @click="createForm" :text="addBtnTitle"/>
@@ -135,17 +135,15 @@
             <v-row  class="justify-center" no-gutters>
               <v-col
                 cols="11"
-                v-for="(filter, index) in advancedFilters"
+                v-for="(filters, index) in advancedFilters"
                 :key="index"
               >
                 <component
+                  v-for = "(filter, ind) in filters"
                   :is="`v-${filter.type}`"
                   v-bind="filter.componentOptions"
-                  v-bind:item-value="filter.componentOptions.itemValue"
-                  v-bind:item-title="filter.componentOptions.itemTitle"
-                  v-model="advancedFilters[index]['selecteds']"
+                  v-model="filter['selecteds']"
                 />
-
               </v-col>
             </v-row>
             <v-card-actions>

@@ -387,34 +387,58 @@ trait ManageTable {
     }
 
     protected function getTableAdvancedFilters(){
-       return Collection::make($this->getConfigFieldsByRoute('filters.relations'))->map(
 
-                // TODO: generate slug from given model name or something else
-                // check if relationship is presents
-                // check for fallback and error cases
+       $advancedFilters = [];
 
-            function($filter){
-                if(method_exists(__TRAIT__, $methodName = 'getTableAdvancedFilters'.$filter->type)){
-                    $filter = $this->$methodName($filter);
+       $advancedFilters = Collection::make($this->getConfigFieldsByRoute('filters'))
+            ->mapWithKeys(function($filter, $key) {
+                if(method_exists(__TRAIT__, $key.'FilterConfiguration')){
+                    return [$key => array_map([$this, $key.'FilterConfiguration'], object2Array($filter))];
                 }
 
-                return $filter;
-            }
-        )->toArray();
+                return [$key => $filter];
+            })
+            ->toArray();
+        return $advancedFilters;
+    }
 
+    protected function relationsFilterConfiguration($filter){
+        if(method_exists(__TRAIT__, $methodName = 'getTableAdvancedFilters'. $this->getStudlyName($filter['type']))){
+            $filter = $this->$methodName($filter);
+        }
+
+        return $filter;
+    }
+
+    protected function detailFilterConfiguration($filter){
+        if(method_exists(__TRAIT__, $methodName = 'getTableAdvancedFilters'. $this->getStudlyName($filter['type']))){
+            $filter = $this->$methodName($filter);
+        }
+
+        return $filter;
     }
 
 
     protected function getTableAdvancedFiltersSelect($filter){
 
-        $repository = App::make($filter->repository);
+        $repository = App::make($filter['repository']);
         $items =  $repository->list()->map(function($value, $key){
             return $value;
         });
 
-        $filter->componentOptions->items = $items->toArray();
-        $filter->componentOptions->itemValue ??= 'id';
-        $filter->componentOptions->itemTitle ??= 'name';
+        $filter['componentOptions']['items'] = $items->toArray();
+        $filter['componentOptions']['item-value'] ??= 'id';
+        $filter['componentOptions']['item-title'] ??= 'name';
+
+
+        return $filter;
+    }
+
+    protected function getTableAdvancedFiltersDatePicker($filter){
+
+
+        $filter['componentOptions']['title'] ??= $this->getHeadline($filter['slug']);
+        $filter['componentOptions']['multiple'] ??= 'range';
 
 
         return $filter;
