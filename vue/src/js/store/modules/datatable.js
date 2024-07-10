@@ -83,6 +83,11 @@ const getters = {
     return state.mainFilters
   },
   advancedFilters : state => {
+      Object.entries(state.advancedFilters).forEach(( [key, filters] )=> {
+        filters.map(filter => {
+          filter['selecteds'] ??= state.filter[key]?.[filter.slug]
+        })
+      })
     return state.advancedFilters
   }
 
