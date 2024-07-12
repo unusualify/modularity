@@ -15,12 +15,12 @@ use Unusualify\Modularity\Entities\Behaviors\Sortable;
 use PDO;
 use ReflectionClass;
 
-use Unusualify\Modularity\Repositories\Traits\{DatesTrait, RelationTrait};
+use Unusualify\Modularity\Repositories\Traits\{DatesTrait, PaymentTrait, RelationTrait};
 use Unusualify\Modularity\Traits\{ManageTraits, ManageNames};
 
 abstract class Repository
 {
-    use ManageTraits, ManageNames, DatesTrait, RelationTrait;
+    use ManageTraits, ManageNames, DatesTrait, RelationTrait, PaymentTrait;
 
     /**
      * @var \Unusualify\Modularity\Models\Model

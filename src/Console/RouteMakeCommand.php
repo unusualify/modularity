@@ -76,7 +76,6 @@ class RouteMakeCommand extends BaseCommand
         }
 
         $success = true;
-
         $code = with(new RouteGenerator($route))
             ->setFilesystem($this->laravel['files'])
             ->setConfig($this->laravel['config'])
@@ -93,6 +92,7 @@ class RouteMakeCommand extends BaseCommand
             ->setCustomModel($this->option('custom-model'))
             ->setFix($this->option('fix'))
             ->setTest($this->option('test'))
+            ->setTableName($this->option('table-name'))
             ->generate();
 
         if ($code === E_ERROR) {
@@ -134,6 +134,7 @@ class RouteMakeCommand extends BaseCommand
             ['no-migrate', null, InputOption::VALUE_NONE, 'don\'t migrate.'],
             ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
             ['fix', null, InputOption::VALUE_NONE, 'Fixes the model config errors'],
+            ['table-name', null, InputOption::VALUE_OPTIONAL, 'Sets table  name for custom model'],
             ['test', null, InputOption::VALUE_NONE, 'Test the Route Generator'],
         ], unusualTraitOptions());
     }

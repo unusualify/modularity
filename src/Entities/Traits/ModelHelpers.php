@@ -104,7 +104,6 @@ trait ModelHelpers
                     if(method_exists($related, 'setRelationsShowFormat'))
                         $related->setRelationsShowFormat();
 
-
                     return $related;
                 });
 
