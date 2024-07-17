@@ -1,4 +1,4 @@
-import { find, omitBy, reduce, cloneDeep, map, findIndex, snakeCase, orderBy } from 'lodash-es'
+import { find, omitBy, reduce, cloneDeep, map, findIndex, snakeCase, orderBy, get, filter, includes, set, each, isEmpty, unset } from 'lodash-es'
 import filters from '@/utils/filters'
 import axios from 'axios'
 
@@ -260,10 +260,10 @@ export const handleInputEvents = (events = null, fields, moduleSchema, name = nu
           }
           break
         case 'formatFilter':
-          __log(
-            methodName,
-            e
-          )
+          // __log(
+          //   methodName,
+          //   e
+          // )
           break
         default:
           break
@@ -296,7 +296,7 @@ export const handleEvents = ( model, schema, input) => {
   }
 }
 
-export const handleMultiFormEvents = ( models, schemas, input, index) => {
+export const handleMultiFormEvents = ( models, schemas, input, index, preview = []) => {
   const handlerName = input.name
   const handlerSchema = schemas[index][handlerName]
   const handlerValue = models[index][handlerName]
@@ -309,10 +309,21 @@ export const handleMultiFormEvents = ( models, schemas, input, index) => {
       let methodName = args.shift()
 
       if(typeof FormatFuncs[methodName] !== 'undefined')
-        FormatFuncs?.[methodName](args, models, schemas, input, index)
+        FormatFuncs?.[methodName](args, models, schemas, input, index, preview)
 
     })
   }
+}
+
+export default {
+  getSchema,
+  getModel,
+  getSubmitFormData,
+  setSchemaInputField,
+  onInputEventFormData,
+  handleInputEvents,
+  handleEvents,
+  handleMultiFormEvents
 }
 
 const chunkInputs = (inputs) => {
@@ -401,6 +412,9 @@ const FormatFuncs = {
       schema[firstLevelName].schema[secondLevelName].placeHolder = lockInput
     }
   },
+
+  // UPPER FORM | BELOW STEPPERFORM
+
   formatFilter: async function(args, model, schema, input, index) {
 
     if(Array.isArray(model)){
@@ -463,6 +477,197 @@ const FormatFuncs = {
 
       //   })
     }
+  },
+
+  formatPreview: async function(args, model, schema, input, index, preview = []) {
+    if(Array.isArray(model)){
+      const handlerName = input.name
+      const handlerSchema = input // schema[index][handlerName]
+      const handlerValue = model[index][handlerName]
+      /*
+      *handlerValue
+        {
+          $key1 : {package_id: int, packageLanguages: array}
+          $key2 : {package_id: int, packageLanguages: array}
+        }
+      *handlerSchema
+        {
+          ...,
+          items: [ // packageRegion or packageCountry
+            {
+              id: int,
+              name: string,
+              packages: [
+                {
+                  id: int,
+                  name: string,
+                  packageLanguages: [
+                    {
+                      id: int,
+                      name: string
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              id: == $key1,
+              name: 'France',
+              packages: [
+                {
+                  id: == handlerValue[$key1].package_id
+                  name: 'Premium',
+                  packageLanguages: [
+                    {
+                      id: == handlerValue[$key1].packageLanguages.*,
+                      name: 'English'
+                    }
+                  ]
+                }
+              ]
+            },
+            ...
+          ]
+        }
+      */
+      // ['United States', 'Wire (English, German, Turkish)'],
+      // ['France', 'Premium (English, French)']
+      //
+      // handlerSchema.items // region or country parent names to get with  handlerValue Object keys wrt id
+      // United States => Object.keys() $key =  handlerSchema.items.find($key)
+      // Wire|Premium =>  items.find(id:$key).packages.find(id:handlerValue[$key].package_id).*.name
+      // English, German, Turkish... =>  items.find(id:$key).packages.find(id:handlerValue[$key].package_id)
+      //
+
+      /*
+        schema.$group.items.*.name:items
+        items.*key.name,items.*key.packages.*.name,items.*key.packages.$package_id.packageLanguages.*.name:*key,*.package_id,*.packageLanguages
+      */
+      let inputToFormats = args.shift().split(',')
+      let targetValueKeys = (args.shift() ?? '').split(',') // *key,package_id,packageLanguages
+
+      let patternValues = {}
+      let previewValue = []
+
+      let isMultiple = inputToFormats.length > 1
+      let clear = false
+
+      for(const _index in inputToFormats){
+        let inputToFormat = inputToFormats[_index]
+        let targetValueKey = targetValueKeys[_index] ?? null
+        let stages = inputToFormat.split('.')
+
+        stages = map(stages, function(stage, i){
+          let found
+          let convertedStage = stage
+
+          if( (found = stage.match(/\$(\w+)/)) ){
+            if(__isset(handlerValue[found[1]])){
+              convertedStage = handlerValue[found[1]]
+            }
+          }
+
+          return convertedStage
+        })
+
+        inputToFormat = stages.join('.')
+
+        let targetValue
+
+        let matches = targetValueKey.match(/\*\.?(\w+)/)
+
+        if(targetValueKey == '*key'){
+          targetValue = Object.keys(handlerValue).map(function(item){
+            return parseInt(item)
+          })
+        }else if(matches){
+          let matches = targetValueKey.match(/\*\.?(\w+)/)
+
+          let key = matches[1]
+          targetValue = map( handlerValue, function(el, i){
+            return el[key]
+            return {id: el[key]}
+          })
+        }else{
+          targetValue = targetValueKey ? handlerValue[targetValueKey] : handlerValue
+        }
+        /**
+        __data_get(handlerSchema, 'items.*id=1,5.name'),
+        __data_get(handlerSchema, 'items.*id=1,5.packages.*id=1,26.name'),
+        __data_get(handlerSchema, 'items.*id=1,5.packageLanguages.*id=1,2,3.name'),
+        __data_get(handlerSchema, 'items.*id=1,5.packageLanguages.*id=1,2.name'),
+        __data_get(handlerSchema, 'items.*id=1,5.packageLanguages.*id=1.name'),
+         *
+         */
+        if(Array.isArray(targetValue)){
+
+          if(_index == 0){
+            clear = targetValue.length < 1
+
+            let parentPattern = inputToFormat.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*')
+            patternValues[parentPattern] = map(targetValue, (val) => inputToFormat.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*' + `id=${val}`))
+
+            let data = __data_get(handlerSchema, inputToFormat.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*' + `id=${targetValue.join(',')}` + '$3'))
+            each(data, (val,i) => clear
+              ? unset(previewValue, isMultiple ? `[${i}][${_index}]` : `[${i}]`)
+              : set(previewValue, isMultiple ? `[${i}][${_index}]` : `[${i}]`, val)  )
+            // set(previewValue, )
+          }else{
+            let parentPatterns
+
+            Object.keys(patternValues).forEach((prev) => {
+              let quotedPattern = __preg_quote(prev)
+              let pattern = new RegExp( String.raw`^(${quotedPattern}).([\w\$\.\*]+)`)
+              let matches = inputToFormat.match(pattern)
+
+              if(matches){
+                parentPatterns = patternValues[prev]
+                inputToFormat = matches[2]
+                return false
+              }
+            })
+
+            each(targetValue, (val, i) => {
+              if(val){
+
+                if(Array.isArray(val) && isEmpty(val)) return
+
+                let parentPattern = parentPatterns[i];
+
+                let ids = Array.isArray(val) ? val.join(',') : val
+
+                let getter = [parentPattern, inputToFormat.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*' + `id=${ids}` + '$3')].join('.')
+                let data = __data_get(handlerSchema, getter).shift()
+                let formattedData = data[0] ?? ''
+                if(data.length > 1){
+                  formattedData = `(${data.join(',')})`
+                }
+
+                set(previewValue, isMultiple ? `[${i}][${_index}]` : `[${_index}]`, formattedData)
+              }
+            })
+          }
+        }else{
+          // value = targetValue
+        }
+      }
+
+      if(!preview[index])
+        preview[index] = {}
+
+      if(clear)
+        unset(preview[index], handlerName)
+      else
+        preview[index][handlerName] = previewValue
+
+      return
+    }
+  },
+  formatValidDisability: async function(args, model, schema, input, index, preview = []) {
+    if(Array.isArray(model)){
+
+    }
+
   },
 }
 
