@@ -1,6 +1,6 @@
 // hooks/formatter .js
 
-import { reactive, toRefs, computed } from 'vue'
+import { reactive, toRefs, computed, ref, inject } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
 import { omit } from 'lodash-es'
@@ -19,12 +19,15 @@ export const makeInputProps = propsFactory({
   }
 })
 export const makeInputEmits = ['update:modelValue', 'change', 'update:preview']
+export const makeInputInjects = ['manualValidation', 'tester']
 
 // by convention, composable function names start with "use"
 export default function useInput (props, context) {
   const { modelValue, obj } = toRefs(props)
+  const VInput = ref(null)
 
   const states = reactive({
+    VInput,
     id: Math.ceil(Math.random() * 1000000) + '-input',
     boundProps: omit(obj.value.schema ?? {}, ['offset', 'order', 'col']),
 
