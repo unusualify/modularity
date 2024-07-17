@@ -1,22 +1,27 @@
 <template>
-  <div class="ue-checklist">
-    <Title v-if="label" :classes="['pl-0 pt-0']" data-test="title">
-      {{ label }}
-    </Title>
-    <v-row v-if="isTreeview">
-      <v-col lg="6" md="8" sm="12">
-        <v-list >
-          <template
-            v-for="(group, key) in groupedItems"
-            :key="`checkbox-${key}`">
-            <template v-if="$isset(group.items) && group.items.length > 0">
-              <v-list-group
-                class="pl-0"
-                collapse-icon=""
-                expand-icon=""
-                >
-                <template v-slot:activator="{ props, isOpen }">
-                  <v-checkbox
+  <v-input
+    v-model="input"
+    hideDetails="auto"
+    >
+    <template v-slot:default="defaultSlot">
+      <div class="ue-checklist">
+        <Title v-if="label" :classes="['pl-0 pt-0']" data-test="title">
+          {{ label }}
+        </Title>
+        <v-row v-if="isTreeview">
+          <v-col lg="6" md="8" sm="12">
+            <v-list >
+              <template
+                v-for="(group, key) in groupedItems"
+                :key="`checkbox-${key}`">
+                <template v-if="$isset(group.items) && group.items.length > 0">
+                  <v-list-group
+                    class="pl-0"
+                    collapse-icon=""
+                    expand-icon=""
+                    >
+                    <template v-slot:activator="{ props, isOpen }">
+                      <v-checkbox
                         class="ue-checklist-checkbox"
                         :label="group[`${itemTitle}`]"
                         color="success"
@@ -34,85 +39,90 @@
                           </v-icon>
                         </template>
                       </v-checkbox>
-                  <!-- <v-list-item
-                    class="pl-0"
-                  >
-                    <template v-slot:default="{isActive, isSelected, isIndeterminate, select}">
+                      <!-- <v-list-item
+                        class="pl-0"
+                      >
+                        <template v-slot:default="{isActive, isSelected, isIndeterminate, select}">
 
+                        </template>
+                      </v-list-item> -->
                     </template>
-                  </v-list-item> -->
-                </template>
 
-                <v-list-item
-                  v-for="(item, i) in group.items"
-                  :key="`checkbox-${i}`"
-                  class="pl-0"
-                >
-                  <v-checkbox
-                    class="ue-checklist-checkbox"
+                    <v-list-item
+                      v-for="(item, i) in group.items"
+                      :key="`checkbox-${i}`"
+                      class="pl-0"
+                    >
+                      <v-checkbox
+                        class="ue-checklist-checkbox"
+                        v-model="input"
+                        :label="item[`${itemTitle}`]"
+                        :value="item[`${itemValue}`]"
+                        color="success"
+                        hide-details
+                        density="compact"
+                        >
+                      </v-checkbox>
+                    </v-list-item>
+
+                  </v-list-group>
+                </template>
+                <template v-else>
+                  <v-list-item
+                    class="pl-0"
+                    >
+                    <v-checkbox
                     v-model="input"
-                    :label="item[`${itemTitle}`]"
-                    :value="item[`${itemValue}`]"
+                    :label="group[`${itemTitle}`]"
+                    :value="group[`${itemValue}`]"
                     color="success"
                     hide-details
                     density="compact"
-                    >
-                  </v-checkbox>
-                </v-list-item>
+                    />
+                    <!-- <template v-slot:default="{isActive, isSelected, isIndeterminate, select}">
+                    </template> -->
+                  </v-list-item>
 
-              </v-list-group>
-            </template>
-            <template v-else>
-              <v-list-item
-                class="pl-0"
-                >
+                </template>
+              </template>
+            </v-list>
+          </v-col>
+        </v-row>
+        <v-row v-else>
+          <template v-for="(item, index) in items"
+              :key="`checkbox-${index}`">
+              <v-col>
                 <v-checkbox
-                v-model="input"
-                :label="group[`${itemTitle}`]"
-                :value="group[`${itemValue}`]"
-                color="success"
-                hide-details
-                density="compact"
-                />
-                <!-- <template v-slot:default="{isActive, isSelected, isIndeterminate, select}">
-                </template> -->
-              </v-list-item>
+                  data-test="checkbox"
+                  v-model="input"
+                  :label="item[`${itemTitle}`]"
+                  :value="item[`${itemValue}`]"
+                  :color="checkboxColor"
+                  hide-details
 
-            </template>
+                  :class="[ ( Array.isArray(input) && input.includes(item[`${itemValue}`]) ) ? 'checked' : '']"
+                  >
+                </v-checkbox>
+              </v-col>
+              <!-- <v-spacer></v-spacer> -->
+              <v-responsive v-if="index % 4 == 3"width="100%"></v-responsive>
           </template>
-        </v-list>
-      </v-col>
-    </v-row>
-    <v-row v-else align="start" justify="start" noGutters>
-      <v-checkbox
-        v-for="(item, index) in items"
-        :key="`checkbox-${index}`"
-        data-test="checkbox"
-        v-model="input"
-        :label="item[`${itemTitle}`]"
-        :value="item[`${itemValue}`]"
-        :color="checkboxColor"
-        hide-details
-
-        :class="[ ( Array.isArray(input) && input.includes(item[`${itemValue}`]) ) ? 'checked' : '']"
-        >
-      </v-checkbox>
-    </v-row>
-  </div>
+        </v-row>
+      </div>
+    </template>
+  </v-input>
 </template>
 
 <script>
-import { InputMixin } from '@/mixins' // for props
-import { useInput, makeInputProps } from '@/hooks'
+import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 import Title from '__components/Title.vue'
 
 export default {
-
   name: 'v-custom-input-checklist',
+  emits: [...makeInputEmits],
   components: {
     Title
   },
-  mixins: [InputMixin],
   props: {
     ...makeInputProps(),
     label: {
