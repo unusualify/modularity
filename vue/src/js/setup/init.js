@@ -2,7 +2,7 @@
 
 import axios from 'axios'
 import jquery from 'jquery'
-import lodash from 'lodash-es'
+import lodash, { snakeCase } from 'lodash-es'
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
  * to our Laravel back-end. This library automatically handles sending the
@@ -163,6 +163,170 @@ import lodash from 'lodash-es'
     // return  __convertArrayOrObject(variable);
     return string.length > maxLength ? string.substring(0, maxLength) + '...' : string
   }
+
+  window.__preg_quote = (str, delimeter = '') => {
+    return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + '-]', 'g'), '\\$&');
+  }
+
+  window.__data_get = (data, path, defaultValue) => {
+    if (!data || typeof path !== 'string') {
+      return defaultValue;
+    }
+
+    const parts = tokenizePath(path);
+    let current = data;
+
+    for (const index in parts) {
+      let part = parts[index]
+      if (current === undefined || current === null) {
+        return defaultValue;
+      }
+
+      if (typeof current === 'object') {
+        let matches = part.match(/^\*(.*)/)
+        if (matches) {
+          // if part is *id=1,2,3, current will be filtered wrt values splitted ',' comma
+          let filterMatches
+          if(matches[1] && (filterMatches = matches[1].match(/^(\w+)\=([\w\d\,]+)/))){
+            let filterKey = filterMatches[1]
+            let filterValues = filterMatches[2].split(',')
+            current = lodash.filter(current, (el) => filterValues.includes( lodash.isNumber(el[filterKey]) ? el[filterKey].toString() : el[filterKey] ))
+          }
+          // Handle wildcard (modified for array case):
+          if (Array.isArray(current)) {
+            let _index = parseInt(index)
+            // return current.map(item => window.__data_get(item, parts.slice(1).join('.'), defaultValue)); // Recursively get desired property from each object
+            return current.map(item => __data_get(item, parts.slice(_index+1).join('.'), defaultValue)); // Recursively get desired property from each object
+          } else {
+            return Object.assign({}, current); // Shallow copy for single object
+          }
+        } else if (part.indexOf('[') !== -1) {
+          // Handle brackets for array access
+          const key = extractKeyFromBracket(part);
+          if (key !== undefined) {
+            current = current[key];
+          } else {
+            return defaultValue; // Invalid bracket syntax
+          }
+        } else {
+          current = current[part];
+        }
+      } else {
+        return defaultValue; // Path points to a non-object
+      }
+    }
+
+    return current;
+  }
+
+  // TODO: inputs/TabGroup.vue
+  window.__cast_value_match = (value, ownerItem ) => {
+    let matches
+
+    let returnValue = value
+
+    if(__isString(value) && (matches = value.match(/\$([\w\.\*]+)/))){
+      let notation = matches[1]
+      let quoted = __preg_quote(matches[0])
+      let parts = notation.split('.')
+      // __log(parts)
+
+      let newParts = []
+      for(const j in parts){
+        let part = parts[j]
+        if(part === '*'){
+          // let searchedValue =
+          let _id = ownerItem.id
+          // parts[j] = `*id=${_id}`
+        }else{
+          newParts.push(part)
+        }
+      }
+
+      notation = newParts.join('.')
+
+      let newValue = __data_get(ownerItem, notation)
+
+      if(newValue){
+        let _value
+        if(Array.isArray(newValue) && newValue.length > 0){
+          _value = newValue.join(',')
+        }else if(__isString(newValue)){
+          _value = newValue
+        }
+
+        if(_value){
+          let remainingQuote = '\\w\\s' + __preg_quote('çşıİğüö.,;?')
+          let pattern = new RegExp( String.raw`^([${remainingQuote}]+)?(${quoted})([${remainingQuote}]+)?$`)
+
+          if(value.match(pattern)){
+            returnValue = value.replace(pattern, '$1' + _value + '$3')
+          }else{
+            __log(
+              'Not matched sentence',
+              remainingQuote,
+              pattern,
+              value,
+              value.match(pattern)
+            )
+          }
+        }
+      }
+    }
+
+    return returnValue
+  }
+}
+
+function tokenizePath(path) {
+  // Improved path tokenization handling brackets and escaping
+  const tokens = [];
+  let currentToken = '';
+  let inBracket = false;
+  let escaped = false;
+
+  for (let i = 0; i < path.length; i++) {
+    const char = path[i];
+    if (escaped) {
+      currentToken += char;
+      escaped = false;
+    } else if (char === '\\') {
+      escaped = true;
+    } else if (char === '[') {
+      if (currentToken.length > 0) {
+        tokens.push(currentToken);
+        currentToken = '';
+      }
+      inBracket = true;
+    } else if (char === ']') {
+      if (!inBracket) {
+        return; // Mismatched brackets
+      }
+      tokens.push(extractKeyFromBracket(currentToken));
+      currentToken = '';
+      inBracket = false;
+    } else if (char === '.') {
+      if (inBracket) {
+        currentToken += char;
+      } else {
+        tokens.push(currentToken);
+        currentToken = '';
+      }
+    } else {
+      currentToken += char;
+    }
+  }
+
+  if (currentToken.length > 0) {
+    tokens.push(currentToken);
+  }
+
+  return tokens;
+}
+
+function extractKeyFromBracket(part) {
+  const match = part.match(/\[([^\]]*)\]/);
+  return match ? match[1] : undefined;
 }
 
 function assignObjectHelpers(){
