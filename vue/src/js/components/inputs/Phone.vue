@@ -60,8 +60,7 @@
 </template>
 
 <script>
-import { InputMixin } from '@/mixins'
-import { useInput, makeInputProps } from '@/hooks'
+import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 
 import PhoneNumber, { getExample } from 'awesome-phonenumber'
 import Phone, { getCountry, setCaretPosition } from '@/utils/phone'
@@ -82,9 +81,8 @@ function getParents (node, memo) {
 
 export default {
   // name: 'VueTelInputVuetify',
-  mixins: [InputMixin],
   emits: [
-    'update:modelValue',
+    ...makeInputEmits,
     'country-changed',
     'validate',
     'onValidate',

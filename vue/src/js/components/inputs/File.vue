@@ -30,8 +30,8 @@
                     class="item__content"
                     :name="`${name}_${itemSlot.index}`"
                     :item-label="$t('form-labels.File')"
-                    :item="input[itemSlot.index]"
-                    @delete="deleteItem(itemSlot.index)"
+                    :item="input[`${itemSlot.index}`]"
+                    @delete='deleteItem(itemSlot.index)'
                     >
                   </FileItem>
                 </template>
@@ -61,8 +61,7 @@
 import { MEDIA_LIBRARY } from '@/store/mutations'
 import draggable from 'vuedraggable'
 import { makeFileProps, useFile } from '@/hooks'
-
-import { InputMixin } from '@/mixins'
+import { makeInputEmits } from '@/hooks'
 
 import localeMixin from '@/mixins/locale'
 // import draggableMixin from '@/mixins/draggable'
@@ -72,13 +71,14 @@ import localeMixin from '@/mixins/locale'
 import FileItem from '@/components/files/FileItem.vue'
 
 export default {
-  name: 'ue-custom-input-file',
+  name: 'v-custom-input-file',
+  emits: [...makeInputEmits],
+
   components: {
     FileItem,
     draggable
   },
   mixins: [
-    InputMixin,
     localeMixin
     // mediaLibraryMixin,
     // draggableMixin,

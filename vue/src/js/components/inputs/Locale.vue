@@ -5,7 +5,7 @@
         <component
           v-bind:is="`${type}`"
           :class="[language.value === currentLocale.value || isCustomForm ? '' : 'd-none']"
-          v-bind="attributesPerLang[language.value]"
+          v-bind="attributesPerLang[`${language.value}`]"
           @update:modelValue="modelUpdated($event, language.value)"
           >
           <template v-slot:append>
@@ -54,14 +54,15 @@
 <script>
 import { mapState } from 'vuex'
 import { LANGUAGE } from '@/store/mutations'
-import { InputMixin, LocaleMixin } from '@/mixins'
-import { useInput, makeInputProps } from '@/hooks'
+import {  LocaleMixin } from '@/mixins'
+import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 
 import { cloneDeep, omit } from 'lodash-es'
 
 export default {
-  mixins: [InputMixin, LocaleMixin],
-  name: 'UELocale',
+  name: 'v-custom-input-locale',
+  emits: [...makeInputEmits],
+  mixins: [LocaleMixin],
   setup (props, context) {
     return {
       ...useInput(props, context)

@@ -101,31 +101,31 @@
 <script>
 import draggable from 'vuedraggable'
 
-import { InputMixin } from '@/mixins' // for props
 import {
   useDraggable,
   makeDraggableProps,
   useRepeater,
-  makeRepeaterProps
+  makeRepeaterProps,
+  makeInputEmits
 } from '@/hooks'
 
 export default {
+  name: 'v-custom-input-repeater',
+  emits: [...makeInputEmits],
   components: {
     draggable
   },
-  emits: ['update:modelValue'],
+  props: {
+    ...makeDraggableProps(),
+    ...makeRepeaterProps()
+  },
   setup (props, context) {
     return {
       ...useDraggable(props, context),
       ...useRepeater(props, context)
     }
   },
-  mixins: [InputMixin],
-  name: 'v-custom-input-repeater',
-  props: {
-    ...makeDraggableProps(),
-    ...makeRepeaterProps()
-  },
+
   data () {
     return {
 

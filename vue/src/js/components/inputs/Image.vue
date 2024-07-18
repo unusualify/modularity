@@ -199,6 +199,7 @@ import {
 } from 'vuex'
 
 import { MEDIA_LIBRARY } from '@/store/mutations'
+import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 import { makeImageProps, useImage } from '@/hooks'
 
 // import a17Cropper from '@/components/Cropper.vue'
@@ -217,7 +218,8 @@ const IS_SAFARI = navigator.userAgent.indexOf('Safari') !== -1 && navigator.user
 // const { t } = useI18n({ useScope: 'global' })
 
 export default {
-  name: 'ue-custom-input-image',
+  name: 'v-custom-input-image',
+  emits: [...makeInputEmits],
   components: {
     // 'a17-cropper': a17Cropper,
     // 'a17-mediametadata': a17MediaMetadata

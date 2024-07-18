@@ -19,12 +19,12 @@
 </template>
 
 <script>
-import { InputMixin } from '@/mixins' // for props
-import { useInput, makeInputProps } from '@/hooks'
+import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 
 export default {
   name: 'v-custom-input-select-scroll',
-  mixins: [InputMixin],
+  emits: [...makeInputEmits],
+
   props: {
     ...makeInputProps(),
     componentType: {
@@ -167,12 +167,7 @@ export default {
     this.getItemsFromApi()
   },
   watch: {
-    input: {
-      deep: true,
-      handler (newValue) {
-        // console.log('watchedValue?', newValue)
-      }
-    },
+
   }
 }
 </script>
