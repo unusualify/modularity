@@ -3,12 +3,18 @@
     <slot v-bind="{text}">
       {{ text }}
     </slot>
+    <slot name="description" v-bind="{subTitle}">
+      <div :class="[(!paddingReset ? paddingClasses: []), descriptionClasses]">
+        {{ subTitle ?? ''}}
+      </div>
+    </slot>
   </div>
 </template>
 
 <script setup>
 const props = defineProps({
   text: String,
+  subTitle: String,
   defaultClasses: {
     type: [String, Array],
     default: 'text-h8 text-primary font-weight-bold ue-title'
@@ -23,6 +29,10 @@ const props = defineProps({
   paddingReset: {
     type: Boolean,
     default: false
+  },
+  descriptionClasses: {
+    type: [String, Array],
+    default: 'font-weight-light text-subtitle-2 text-truncate'
   }
 })
 </script>

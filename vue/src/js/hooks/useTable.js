@@ -1,9 +1,10 @@
 // hooks/useTable.js
-import { watch, computed, nextTick, reactive, toRefs, ref, watchEffect } from 'vue'
+import { watch, computed, nextTick, reactive, toRefs, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
-import { isObject, find, omit, snakeCase, kebabCase } from 'lodash-es'
+import { isObject, find, omit, snakeCase, kebabCase, isEqual } from 'lodash-es'
+import api from '@/store/api/datatable'
 
 import { DATATABLE, FORM } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
@@ -23,14 +24,6 @@ export const makeTableProps = propsFactory({
   fillHeight: {
     type: Boolean,
     default: false,
-  },
-  tableSubtitle: {
-    type: String,
-    default: ""
-  },
-  tableType: {
-    type: String,
-    default: "index"
   },
   titlePrefix: {
     type: String,
@@ -80,10 +73,6 @@ export const makeTableProps = propsFactory({
     type: String,
     default: 'inline'
   },
-  rowActionsIcon:{
-    type: String,
-    default: 'mdi-cog-outline'
-  },
   iteratorType: {
     type: String,
     default: '',
@@ -117,18 +106,59 @@ export const makeTableProps = propsFactory({
     type: Boolean,
     default: false
   },
-  noFooter: {
+  tableDensity:{
+    type:String,
+    default: 'comfortable',
+  },
+  tableSubtitle:{
+    type:String,
+    default: '',
+  },
+  toolbarOptions:{
+    type: Object,
+    default: {},
+  },
+  rowActionsIcon:{
+    type: String,
+    default: 'mdi-cog-outline'
+  },
+
+  addBtnOptions:{
+    type: Object,
+    default: {},
+  },
+  filterBtnOptions:{
+    type:Object,
+    default: {},
+  },
+  customRowComponent: {
+    type: Object,
+    default: {}
+  },
+  bulkActions: {
+    type: [Array, Object],
+    default: []
+  },
+  paginationOptions: {
+    type: [Array, Object],
+    default: {}
+  } ,
+  navActive: {
+    type: String,
+    default: 'all'
+  },
+  endpoints: {
+    type: Object,
+    default : {}
+  },
+  showSelect: {
     type: Boolean,
-    default: false
+    default: true,
   },
-  iteratorOptions:{
-    type: Object,
-    default: {},
+  sticky:{
+    type: Boolean,
+    default: true,
   },
-  endpoints:{
-    type: Object,
-    default: {},
-  }
 })
 
 // by convention, composable function names start with "use"
@@ -146,35 +176,30 @@ export default function useTable (props, context) {
   const getters = mapGetters()
 
   const form = ref(null)
+  let loading = ref(false)
+  let items = ref(props.items)
 
   const state = reactive({
+
     id: Math.ceil(Math.random() * 1000000) + '-table',
     formRef: computed(() => {
       return state.id + '-form'
     }),
     formStyles: { width: props.formWidth },
-
     formActive: false,
     deleteModalActive: false,
     customModalActive: false,
-
     activeTableItem: null,
     hideTable: false,
     fillHeight: computed(() => props.fillHeight),
-    createUrl: window[import.meta.env.VUE_APP_NAME].ENDPOINTS.create ?? props.endpoints.create ?? '',
-    editUrl: computed(()=> {
-      return window[import.meta.env.VUE_APP_NAME].ENDPOINTS.edit ?? props.endpoints.edit ?? ''
-    }),
+    createUrl: computed(() => props.endpoints.create ?? null),
+    editUrl: computed(() => props.endpoints.edit ??  null ),
     editedIndex: -1,
     selectedItems: [],
-
     windowSize: {
       x: 0,
       y: 0
     },
-    isDashboard: computed(() => {
-      return  (props.tableType === 'dashboard')
-    }),
     snakeName: snakeCase(props.name),
     permissionName: kebabCase(props.name),
     transNameSingular: computed(() => te('modules.' + state.snakeName, 0) ? t('modules.' + state.snakeName, 0) : props.name),
@@ -184,11 +209,6 @@ export default function useTable (props, context) {
       const prefix = props.titlePrefix ? props.titlePrefix : ''
       return prefix + (__isset(props.customTitle) ? props.customTitle : state.transNamePlural)
     }),
-    tableSubtitle: computed(() => {
-      return (__isset(props.tableSubtitle) ? props.tableSubtitle : "")
-    }),
-    hideSearchField: computed(()=> {return props.hideSearchField}),
-    searchText: computed(() => t("Type to Search")),
     formTitle: computed(() => {
       return t((state.editedIndex === -1 ? 'new-item' : 'edit-item'), {
         item: te(`modules.${state.snakeName}`) ? t(`modules.${state.snakeName}`, 0) : props.name
@@ -207,14 +227,11 @@ export default function useTable (props, context) {
           : '').toLocaleUpperCase()
       })
     }),
-
     isSoftDeletableItem: computed(() => {
       return methods.isSoftDeletable(state.editedItem)
     }),
-
     activeItemConfiguration: null,
-
-    options: props.tableOptions ?? store.state.datatable.options ?? {},
+    options:  props.tableOptions ?? store.state.datatable.options ?? {},
     headers: props.columns ?? store.state.datatable.headers ?? [],
     headersWithKeys: computed(() => {
       let collection = {};
@@ -228,11 +245,14 @@ export default function useTable (props, context) {
        return collection
     }),
     inputs: props.inputFields ?? store.state.datatable.inputs ?? [],
-
     // elements: computed(() => props.items ?? store.state.datatable.data ?? []),
-    elements: computed(() => {
-      return props.items ?? store.state.datatable.data ?? []
-
+    elements: computed({
+      get(){
+        return props.endpoints.index ? items.value : props.items ?? store.state.datatable.data
+      },
+      set(val){
+        items.value = val
+      }
     }),
     search: computed({
       get () {
@@ -243,9 +263,15 @@ export default function useTable (props, context) {
         store.dispatch(ACTIONS.GET_DATATABLE)
       }
     }),
-
     // datatable store
-    loading: computed(() => store.state.datatable.loading ?? false),
+    loading: computed({
+      get() {
+        return props.endpoints.index ? loading.value : store.state.datatable.loading
+      },
+      set(val) {
+        loading.value = val
+      }
+    }),
     filterActiveStatus: computed(() => store.state.datatable.filter.status ?? 'all'),
     filterActive: computed(() => find(store.state.datatable.mainFilters, { slug: state.filterActiveStatus })),
     // form store
@@ -257,18 +283,55 @@ export default function useTable (props, context) {
       // __log(form?.value?.valid, form?.value)
       return form?.value?.valid ?? null
     }),
-    listDataIterators: computed(()=>{
-      return props.tableType === 'dataIterator'
+    mobileTableLayout: computed(() => {
+      return isSmAndDown
     }),
-    listDataTable: computed(() => {
-      return props.tableType === 'dataTable'
+    hideSearchField: computed(()=> {return props.hideSearchField}),
+    tableSubtitle: computed(() => {
+      return __isset(props.tableSubtitle) ? t(props.tableSubtitle) : ''
     }),
-    iteratorType: computed(() => {
-      return __isset(props.iteratorType) ? props.iteratorType : ''
+    searchText: computed(() => t("Type to Search")),
+    addBtnTitle: computed(() => {
+      if(props.createOnModal || props.editOnModal){
+        return props.addBtnOptions.text ? t(props.addBtnOptions.text) : t('add-item', {'item' : state.transNameSingular})
+      }else{
+        return props.addBtnOptions.text ?? t('ADD NEW')
+      }
     }),
-    iteratorOptions: computed(() => {
-      return __isset(props.iteratorOptions) ? props.iteratorOptions : {}
+    filterBtnTitle: computed(() => {
+      return {
+        text: `${state.filterActive?.name} (${state.filterActive?.number})`,
+      }
     }),
+    enableIterators: computed(() => Object.keys(props.customRowComponent).length),
+    hideHeaders: computed(() => {
+      return props.hideHeaders || state.enableIterators
+    }),
+    enableInfiniteScroll: computed(() => props.paginationOptions.footerComponent === 'infiniteScroll' && getters.totalElements.value > state.elements.length),
+    navActive: computed(() => state.filterActive?.slug ?? 'all'),
+    mainFilters: computed(() => store.state.datatable.mainFilters ?? null),
+    indexUrl: computed(() => props.endpoints.index ?? null),
+    actionModalActive: false,
+    selectedAction: null,
+    actionDialogQuestion: computed(() => {
+      return t('confirm-action', {
+        // route: state.transName.toLowerCase(),
+        route: state.transNameSingular,
+        action: t(state.selectedAction?.name ?? ''),
+      })
+    }),
+    enableCustomFooter: computed(() =>  props.paginationOptions.footerComponent === 'vuePagination'),
+    footerProps: computed(() => {
+      const footerProps = props.paginationOptions.footerProps
+      if(state.enableInfiniteScroll){
+        return {
+          'hide-default-footer' : true,
+        }
+      }
+
+      return footerProps
+    }),
+    advancedFilters: computed(() => store.state.datatable.advancedFilters ?? null)
   })
 
   const methods = reactive({
@@ -292,7 +355,6 @@ export default function useTable (props, context) {
         store.commit(FORM.RESET_EDITED_ITEM)
       })
     },
-
     itemHasAction: function (item, action) {
       let hasAction = true
       switch (action.name) {
@@ -498,7 +560,6 @@ export default function useTable (props, context) {
       // // this.$refs.dialog.openModal()
       // methods.openDeleteModal()
     },
-
     activateItem: function (item) {
       state.activeTableItem = find(state.elements, { id: item.id })
     },
@@ -589,7 +650,6 @@ export default function useTable (props, context) {
         }
       })
     },
-
     createForm () {
       methods.resetEditedItem()
       methods.openForm()
@@ -605,14 +665,12 @@ export default function useTable (props, context) {
         if (Object.prototype.hasOwnProperty.call(res, 'variant') && res.variant.toLowerCase() === 'success') { methods.closeForm() }
       })
     },
-
     openDeleteModal: function () {
       state.deleteModalActive = true
     },
     closeDeleteModal: function () {
       state.deleteModalActive = false
     },
-
     isSoftDeletable (item) {
       return !!(__isset(item.deleted_at) && item.deleted_at)
     },
@@ -622,10 +680,100 @@ export default function useTable (props, context) {
     goPreviousPage () {
       if (state.options.page > 1) { state.options.page -= 1 }
     },
+    filterStatus(slug){
+      if (state.navActive === slug) return
+      store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
+      store.commit(DATATABLE.UPDATE_DATATABLE_FILTER_STATUS, slug)
+      state.selectedItems = []
+      store.dispatch(ACTIONS.GET_DATATABLE)
+    },
+    changeOptions(options){
+      if(!isEqual(options, state.options)){
+        state.options = options
+      }
+    },
+    canBulkAction(action){
+      // if(methods.canItemAction(action)){
+      //   switch (action.name) {
+      //     case 'forceDelete':
+      //       return state.navActive === 'trash'
+      //     case 'restore':
+      //       return state.navActive === 'trash'
+      //     case 'delete':
+      //       return state.navActive !== 'trash'
+      //     default:
+      //       console.error('Action not defined in conditional pipe line - useTable:709')
+      //       return false
+      //   }
+      // }
+
+      return true
+    },
+    setBulkItems(){
+      store.commit(DATATABLE.REPLACE_DATATABLE_BULK, state.selectedItems)
+    },
+    bulkAction(action){
+      methods.setBulkItems()
+      try {
+        methods[action.name]()
+      } catch (error) {
+        console.error(`${error}`)
+        console.warn(`${action.name} may have not implemented yet on useTable.js hook`)
+      }
+    },
+    bulkDelete(){
+      store.dispatch(ACTIONS.BULK_DELETE)
+    },
+    bulkRestore(){
+      store.dispatch(ACTIONS.BULK_RESTORE)
+    },
+    bulkForceDelete(){
+      store.dispatch(ACTIONS.BULK_DESTROY)
+    },
+    onIntersect(isIntersecting, entries, observer){
+      if(isIntersecting && entries[0].intersectionRatio === 1){
+        methods.goNextPage()
+      }
+    },
+    loadItems(options = null){
+      state.loading = true
+      api.get(
+        state.indexUrl, options ?? state.options, function(response){
+          const incomingDataArray = response.resource.data
+          if(state.enableInfiniteScroll){
+            state.elements = state.elements.push(incomingDataArray)
+          }else{
+            state.elements = incomingDataArray
+          }
+          state.loading = false
+        }
+      )
+    },
+    closeActionModal(){
+      state.actionModalActive = false
+    },
+    openActionModal(action){
+      state.actionModalActive = true
+      state.selectedAction = action
+    },
+    confirmAction(){
+      methods.bulkAction(state.selectedAction)
+      state.actionModalActive = false
+    },
+    submitAdvancedFilter(){
+      store.commit(DATATABLE.UPDATE_DATATABLE_ADVANCED_FILTER, state.advancedFilters)
+      store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
+      store.dispatch(ACTIONS.GET_DATATABLE)
+    },
+    clearAdvancedFilter(){
+      store.commit(DATATABLE.RESET_DATATABLE_ADVANCED_FILTER)
+      store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
+      store.dispatch(ACTIONS.GET_DATATABLE)
+    }
+
   })
 
   watch(() => state.editedItem, (newValue, oldValue) => {
-    // __log('editedItem watch', newValue, oldValue, state.elements.findIndex(o => { return o.id === newValue.id }))
     state.editedIndex = state.elements.findIndex(o => { return o.id === newValue.id })
   })
   watch(() => state.activeTableItem, (newValue, oldValue) => {
@@ -642,17 +790,20 @@ export default function useTable (props, context) {
     newValue || methods.resetEditedItem()
   })
   watch(() => state.options, (newValue, oldValue) => {
-    // state.options.page = newValue
-
-    store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue } })
+    if(state.indexUrl){
+      newValue.replaceUrl = false
+      methods.loadItems(newValue)
+    }else{
+      store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue, infiniteScroll: state.enableInfiniteScroll }, endpoint : props.endpoints.index ?? null})
+    }
   }, { deep: true })
   watch(() => state.elements, (newValue, oldValue) => {
-    // __log('elements watch', newValue, oldValue)
   }, { deep: true })
 
   const formatter = useFormatter(props, context, state.headers)
 
   // expose managed state as return value
+
   return {
     form,
     ...toRefs(state),

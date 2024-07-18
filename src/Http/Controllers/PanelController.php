@@ -100,7 +100,7 @@ abstract class PanelController extends CoreController
         'feature' => false,
         'bulkFeature' => false,
         'restore' => true,
-        'bulkRestore' => false,
+        'bulkRestore' => true,
         'forceDelete' => true,
         'bulkForceDelete' => true,
         'delete' => true,
@@ -785,6 +785,13 @@ abstract class PanelController extends CoreController
             $this->indexWith += $this->{$method}();
             $this->formWith += $this->{$method}();
         }
+    }
+
+    protected function getReplaceUrl(){
+        if($this->request->has('replaceUrl')){
+            return $this->request->get('replaceUrl') === 'true';
+        }
+        return true;
     }
 
     /**

@@ -27,6 +27,7 @@
     "confirm": "Onayla",
     "confirm-deletion": "{name} {route} kaydını silmek istediğinize emin misiniz?",
     "confirm-description": "Bu işlemi yapmak istediğinize emin misiniz?",
+    "confirm-action" : "Seçili {route} üzerinde {action} yapmak istediğinize emin misiniz?",
     "country": "Ülke",
     "delete": "Kaldır",
     "duplicate": "Kopyala",

@@ -486,10 +486,10 @@ class RouteServiceProvider extends ServiceProvider
                 // 'tags',
                 // 'preview',
                 'restore',
-                // 'bulkRestore',
+                'bulkRestore',
                 'forceDelete',
-                // 'bulkForceDelete',
-                // 'bulkDelete',
+                'bulkForceDelete',
+                'bulkDelete',
                 // 'restoreRevision',
                 'duplicate',
             ];
@@ -536,7 +536,6 @@ class RouteServiceProvider extends ServiceProvider
 
 
                 if (in_array($customRoute, ['preview'])) Route::put($routeSlug . "/{{$snakeCase}}", $mapping);
-
 
                 if (
                     in_array($customRoute, [

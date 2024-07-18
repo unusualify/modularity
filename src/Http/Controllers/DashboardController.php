@@ -286,15 +286,17 @@ class DashboardController extends BaseController
 
             foreach ($blocks as $index => $block) {
                 switch ($block['component']) {
-                    case 'new-table':
+                    case 'table':
                         $controller = App::make($block['controller'])->setTableAttributes(tableOptions:
                             $block['attributes']['tableOptions'],
                         );
                         $block['attributes']['items'] = $controller->getIndexData()['initialResource']->resource['data'];
                         $block['attributes']['endpoints'] = $controller->getIndexData()['endpoints'];
                         $block['attributes']['rowActions'] = $controller->getTableActions();
-                        $blocks[$index] = $block;
+                        // in order to keep url as default home url
 
+                        $block['attributes']['tableOptions']['search'] = null;
+                        $blocks[$index] = $block;
                         break;
                     case 'board-information-plus':
                         $cards = $block['cards'] ?? [];

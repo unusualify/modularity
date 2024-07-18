@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
 
@@ -329,6 +330,46 @@ trait ManageTable {
 
     }
 
+    protected function getTableBulkActions(): Array
+    {
+        $actions = [];
+
+
+        if($this->getIndexOption('delete'))
+        {
+            $actions[] = [
+                'name' => 'bulkDelete',
+                'can' => $this->permissionPrefix(Permission::DELETE->value),
+                'icon' => '$delete',
+                // 'color' => 'red darken-2',
+                'color' => 'primary',
+            ];
+        }
+
+        if($this->getIndexOption('forceDelete')){
+            $actions[] = [
+                'name' => 'bulkForceDelete',
+                'icon' => '$delete',
+                'can' => 'forceDelete',
+                // 'color' => 'red darken-2',
+                'color' => 'red',
+            ];
+        }
+
+        if($this->getIndexOption('restore')){
+            $actions[] = [
+                'name' => 'bulkRestore',
+                'icon' => '$restore',
+                'can' => 'restore',
+                // 'color' => 'red darken-2',
+                'color' => 'green',
+            ];
+        }
+
+
+        return $actions;
+    }
+
     protected function hydrateHeaderSuffix(&$header)
     {
         if($this->isRelationField($header['key']))
@@ -344,5 +385,64 @@ trait ManageTable {
     {
         $header['key'] = preg_replace('/_relation|_timestamp/', '' ,$header['key']);
     }
+
+    protected function getTableAdvancedFilters(){
+
+       $advancedFilters = [];
+
+       $advancedFilters = Collection::make($this->getConfigFieldsByRoute('filters'))
+            ->mapWithKeys(function($filter, $key) {
+                if(method_exists(__TRAIT__, $key.'FilterConfiguration')){
+                    return [$key => array_map([$this, $key.'FilterConfiguration'], object2Array($filter))];
+                }
+
+                return [$key => $filter];
+            })
+            ->toArray();
+        return $advancedFilters;
+    }
+
+    protected function relationsFilterConfiguration($filter){
+        if(method_exists(__TRAIT__, $methodName = 'getTableAdvancedFilters'. $this->getStudlyName($filter['type']))){
+            $filter = $this->$methodName($filter);
+        }
+
+        return $filter;
+    }
+
+    protected function detailFilterConfiguration($filter){
+        if(method_exists(__TRAIT__, $methodName = 'getTableAdvancedFilters'. $this->getStudlyName($filter['type']))){
+            $filter = $this->$methodName($filter);
+        }
+
+        return $filter;
+    }
+
+
+    protected function getTableAdvancedFiltersSelect($filter){
+
+        $repository = App::make($filter['repository']);
+        $items =  $repository->list()->map(function($value, $key){
+            return $value;
+        });
+
+        $filter['componentOptions']['items'] = $items->toArray();
+        $filter['componentOptions']['item-value'] ??= 'id';
+        $filter['componentOptions']['item-title'] ??= 'name';
+
+
+        return $filter;
+    }
+
+    protected function getTableAdvancedFiltersDatePicker($filter){
+
+
+        $filter['componentOptions']['title'] ??= $this->getHeadline($filter['slug']);
+        $filter['componentOptions']['multiple'] ??= 'range';
+
+
+        return $filter;
+    }
+
 
 }

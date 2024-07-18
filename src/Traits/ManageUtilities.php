@@ -46,6 +46,7 @@ trait ManageUtilities {
              * */
             // 'actions' => $this->getTableActions(),
             'endpoints' => $this->getIndexUrls() + $this->getUrls(),
+            'advancedFilters' => $this->getTableAdvancedFilters(),
         ] + $this->getViewLayoutVariables();
         // $baseUrl = $this->getPermalinkBaseUrl();
         // dd($this->tableAttributes, $this->getViewLayoutVariables());
@@ -53,7 +54,8 @@ trait ManageUtilities {
             'moduleName' => $this->getHeadline($this->moduleName),
             'translate' => $this->routeHas('translations') || $this->hasTranslatedInput(),
 
-            'tableAttributes' => ['rowActions' => $this->getTableActions()]
+            'tableAttributes' => ['rowActions' => $this->getTableActions(),
+                                 'bulkActions' => $this->getTableBulkActions()]
             + array_merge_recursive_preserve(
                 [
                     'name' => $this->getHeadline($this->routeName),
@@ -129,8 +131,9 @@ trait ManageUtilities {
             // 'delete',
 
             'forceDelete',
+
             'restore',
-            'duplicate'
+            'duplicate',
 
             // 'show',
             // 'update',
@@ -138,12 +141,13 @@ trait ManageUtilities {
 
             // 'publish',
             // 'bulkPublish',
-            // 'bulkRestore',
-            // 'bulkForceDelete',
+
             // 'reorder',
             // 'feature',
             // 'bulkFeature',
-            // 'bulkDelete',
+            'bulkForceDelete',
+            'bulkRestore',
+            'bulkDelete',
         ])->mapWithKeys(function ($action) {
 
             // $parameters = $this->submodule ? [$this->submoduleParentId] : [];
@@ -162,11 +166,10 @@ trait ManageUtilities {
 
             $prefix = $this->routePrefix;
 
+
             if(!in_array($action, ['index', 'create', 'store'])){
                 $prefix = $this->generateRoutePrefix(noNested: true);
             }
-
-            // dd($this->routeName, $prefix, $action, $parameters);
 
             return [
                 // $action . 'Endpoint' => $optionIsActive
@@ -180,9 +183,9 @@ trait ManageUtilities {
                             :   null
             ];
 
-        })->toArray()
+        })->toArray();
         // + ['languages' => route(Route::hasAdminRoute(''))]
-        ;
+
     }
 
     /**

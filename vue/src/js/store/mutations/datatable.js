@@ -24,6 +24,8 @@ export const UPDATE_DATATABLE_OPTIONS = 'updateDatableOptions'
 export const UPDATE_DATATABLE_SEARCH = 'updateDatableSearch'
 export const UPDATE_DATATABLE_TOTAL = 'updateDatableTotal'
 export const SET_DATATABLE_DIALOG = 'setDatableDialog'
+export const UPDATE_DATATABLE_ADVANCED_FILTER = "updateDatatableAdvancedFilter"
+export const RESET_DATATABLE_ADVANCED_FILTER = "resetDatatableAdvancedFilter"
 
 
 export default {
@@ -52,5 +54,7 @@ export default {
   UPDATE_DATATABLE_MESSAGE,
   UPDATE_DATATABLE_LOADING,
   UPDATE_DATATABLE_NESTED,
-  UPDATE_DATATABLE_TRACKER
+  UPDATE_DATATABLE_TRACKER,
+  UPDATE_DATATABLE_ADVANCED_FILTER,
+  RESET_DATATABLE_ADVANCED_FILTER
 }

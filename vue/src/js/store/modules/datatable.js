@@ -4,6 +4,7 @@ import ACTIONS from '@/store/actions'
 
 import { setStorage } from '@/utils/localeStorage'
 import { redirector } from '@/utils/response'
+import { isArray, isEmpty } from 'lodash'
 
 /* NESTED functions */
 const getObject = (container, id, callback) => {
@@ -41,6 +42,7 @@ const state = {
 
   filter: window[import.meta.env.VUE_APP_NAME].STORE.datatable.filter || {},
   mainFilters: window[import.meta.env.VUE_APP_NAME].STORE.datatable.mainFilters || [],
+  advancedFilters: window[import.meta.env.VUE_APP_NAME].STORE.datatable.advancedFilters || [],
 
   bulk: [],
   // localStorageKey: window[import.meta.env.VUE_APP_NAME].STORE.datatable.localStorageKey || window.location.pathname,
@@ -79,6 +81,14 @@ const getters = {
   },
   mainFilters: state => {
     return state.mainFilters
+  },
+  advancedFilters : state => {
+      Object.entries(state.advancedFilters).forEach(( [key, filters] )=> {
+        filters.map(filter => {
+          filter['selecteds'] ??= state.filter[key]?.[filter.slug]
+        })
+      })
+    return state.advancedFilters
   }
 
 }
@@ -105,6 +115,7 @@ const mutations = {
 
   [DATATABLE.UPDATE_DATATABLE_FILTER] (state, filter) {
     state.filter = Object.assign({}, state.filter, filter)
+
   },
   [DATATABLE.CLEAR_DATATABLE_FILTER] (state) {
     state.filter = Object.assign({}, {
@@ -114,6 +125,26 @@ const mutations = {
   },
   [DATATABLE.UPDATE_DATATABLE_FILTER_STATUS] (state, slug) {
     state.filter.status = slug
+  },
+
+  [DATATABLE.UPDATE_DATATABLE_ADVANCED_FILTER] (state, val){
+
+      Object.keys(state.advancedFilters).forEach(function(key,index){
+        state.filter[key] = state.advancedFilters[key].reduce((collection,filter) => {
+          if(filter.selecteds?.length > 0){
+            collection[filter.slug] = filter.selecteds
+          }
+          return collection
+        }, {})
+      })
+  },
+
+  [DATATABLE.RESET_DATATABLE_ADVANCED_FILTER] (state){
+    state.advancedFilters = Object.fromEntries(Object.entries(state.advancedFilters).map(([key, val]) => {
+      state.filter[key] = []
+      val.map((filter) => filter.selecteds = [])
+      return [key, val]
+    }))
   },
 
   [DATATABLE.UPDATE_DATATABLE_BULK] (state, id) {
@@ -255,7 +286,7 @@ const activeOption = (option, key) => {
 
   if (key.match(/sortBy|sortDesc/)) {
     if (option.length > 0) { value = option } else { exist = false }
-  } else if (key.match(/page|itemsPerPage/)) {
+  } else if (key.match(/page|itemsPerPage|replaceUrl/)) {
     value = option
   } else {
     exist = false
@@ -268,9 +299,8 @@ const activeOption = (option, key) => {
 }
 
 const actions = {
-  [ACTIONS.GET_DATATABLE] ({ commit, state, getters }, { payload = {}, callback = null, errorCallback = null } = {}) {
+  [ACTIONS.GET_DATATABLE] ({ commit, state, getters }, { payload = {}, callback = null, errorCallback = null, endpoint = null } = {}) {
     // if (!state.loading) {
-
     const keys = Object.keys(payload)
     let _changed = keys.length === 0
 
@@ -288,21 +318,35 @@ const actions = {
       const parameters = {
         ...(Object.keys(state.options).reduce(function (filtered, key) {
           const { active, value } = activeOption(
-            __isset(payload.options) ? payload.options[key] : state.options[key],
+            __isset(payload.options?.[key]) ? payload?.options[key] : state?.options[key],
             key
           )
-
           if (active) { filtered[key] = value }
 
           return filtered
         }, {})),
         ...(state.search !== '' ? { search: state.search } : {}),
-        ...(state.filter.status !== 'all' ? { filter: state.filter } : {})
+        ...( { filter : Object.fromEntries(
+          Object.entries(state.filter).reduce((result ,[key, value]) => {
+
+            if(key === 'status' && value === 'all') return result
+            if(isEmpty(value)) return result
+
+            result.push([key, value])
+            return result
+          }, [])
+        ) }),
+        // ...(state.filter.status !== 'all' ? { filter: state.filter } : {})
+
+
       }
 
+      const url = endpoint ?? window[import.meta.env.VUE_APP_NAME].ENDPOINTS.index
       // __log(parameters)
-      api.get(parameters, function (resp) {
-        commit(DATATABLE.UPDATE_DATATABLE_DATA, resp.resource.data)
+      api.get(url,parameters, function (resp) {
+        const tableData = payload.infiniteScroll ? state.data.concat(resp.resource.data) : resp.resource.data
+
+        commit(DATATABLE.UPDATE_DATATABLE_DATA, tableData)
         commit(DATATABLE.UPDATE_DATATABLE_TOTAL, resp.resource.total)
         commit(DATATABLE.UPDATE_DATATABLE_NAV, resp.mainFilters)
         commit(DATATABLE.UPDATE_DATATABLE_LOADING, false)
@@ -436,19 +480,19 @@ const actions = {
   },
   [ACTIONS.BULK_DELETE] ({ commit, state, dispatch }) {
     api.bulkDelete(state.bulk.join(), function (resp) {
-      commit(NOTIFICATION.SET_NOTIF, { message: resp.data.message, variant: resp.data.variant })
+      commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
       dispatch(ACTIONS.GET_DATATABLE)
     })
   },
   [ACTIONS.BULK_RESTORE] ({ commit, state, dispatch }) {
     api.bulkRestore(state.bulk.join(), function (resp) {
-      commit(NOTIFICATION.SET_NOTIF, { message: resp.data.message, variant: resp.data.variant })
+      commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
       dispatch(ACTIONS.GET_DATATABLE)
     })
   },
   [ACTIONS.BULK_DESTROY] ({ commit, state, dispatch }) {
     api.bulkDestroy(state.bulk.join(), function (resp) {
-      commit(NOTIFICATION.SET_NOTIF, { message: resp.data.message, variant: resp.data.variant })
+      commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
       dispatch(ACTIONS.GET_DATATABLE)
     })
   }
