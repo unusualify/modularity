@@ -161,7 +161,7 @@ trait ManageTable {
         if(!!$this->config) {
             try {
                 return Collection::make(
-                    array_merge_recursive_preserve($this->defaultTableAttributes, (array)$this->getConfigFieldsByRoute('table_options'))
+                    array_merge_recursive_preserve($this->defaultTableAttributes, object2Array($this->getConfigFieldsByRoute('table_options')))
                 )->toArray();
             } catch (\Throwable $th) {
                 return [];
