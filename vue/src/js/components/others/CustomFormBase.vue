@@ -400,7 +400,9 @@
 // Import
 // import Vue from 'vue'
 import { getCurrentInstance } from 'vue'
-import { get, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex } from 'lodash-es'
+import { get, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex, omit } from 'lodash-es'
+import getFormData from '@/utils/getFormData.js'
+
 // import VueMask from 'v-mask'
 // Vue.use(VueMask, {
 //   placeholders: {
@@ -651,25 +653,16 @@ export default {
       return this.valueIntern
     },
     storeStateSchema () {
-      // __log('storeStateSchema computed', this.valueIntern)
+
       this.updateArrayFromState(this.valueIntern, this.formSchema)
 
-      for (const key in this.formSchema) {
-        const sch = this.formSchema[key]
-        // const cascadeKey = sch.cascadeKey //schema
-        if (key.includes('repeater') && Object.prototype.hasOwnProperty.call(sch, 'cascade') && sch.type === 'select') {
-          return this.formSchema
-        } else if (sch.type === 'select' && Object.prototype.hasOwnProperty.call(sch, 'cascade')) {
-          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-          this.formSchema[sch.cascade].items = find(sch.items, [sch.itemValue, this.valueIntern[sch.name]])?.items ?? []
-          // this.formSchema[key].items = find(this.formSchema[sch.parent].items, [this.formSchema[sch.parent].itemValue, this.valueIntern[sch.parent]]).items
-        }
-      }
-      // __log('storeStateSchema computed')
+      getFormData.setSchemaInputField(this.formSchema, this.valueIntern)
+
       return this.formSchema
     },
     formSchema: {
       get () {
+        // __log('formSchema getter', this.schema)
         return this.schema
       },
       set (val) {
@@ -728,6 +721,9 @@ export default {
       // if (Object.prototype.hasOwnProperty.call(obj.schema, 'falseValue') && obj.schema.falseValue == 1) {
       //   obj.schema.falseValue = '0'
       // }
+      // __log(obj.schema)
+
+      return omit(obj.schema, ['type', 'col', 'order', 'offset', 'ext', 'event'] )
       return obj.schema
     },
     suspendClickAppend (obj) {
@@ -743,7 +739,12 @@ export default {
       // For native <INPUT> type use prop 'ext'
       // { type:'text', ext:'range', ... } -> use native Input Type 'range' instead of slider
       // { type:'text', ext:'number', ...} -> use native Input Type 'number'
-      return obj.schema.ext || obj.schema.type
+
+      let ext
+      if(['number', 'range', 'date', 'time', 'color'].includes(obj.schema.ext))
+        ext = obj.schema.ext
+
+      return ext || obj.schema.type
     },
     // V-INTERN TYPE
     checkInternType (obj) {
@@ -1037,8 +1038,17 @@ export default {
       // update deep nested prop(key) with value
       this.setObjectByPath(this.storeStateData, obj.key, value)
       obj.value = obj.value !== value ? value : obj.value
+
       // when cascade select changed
-      this.setCascadeSelect(obj)
+      // this.setCascadeSelect(obj)
+      getFormData.onInputEventFormData(
+        obj,
+        this.formSchema,
+        this.storeStateData,
+        this.flatCombinedArraySorted,
+        this.valueIntern
+      )
+
       const emitObj = {
         on: type,
         id: this.id,
@@ -1053,6 +1063,7 @@ export default {
       }
 
       this.emitValue(type, emitObj)
+
       return emitObj
     },
     onEvent (event = {}, obj, tag) {
@@ -1290,18 +1301,20 @@ export default {
     setCascadeSelect (obj) {
       if (obj.schema.type === 'select' && obj.schema.hasOwnProperty('cascade')) {
         const cascadedSelectName = obj.schema.name.includes('repeater') ? obj.schema.name.match(/repeater\d+-input\[\d+\]/) + `[${obj.schema.cascade}]` : obj.schema.cascade
-        const cascadeKey = obj.schema.cascadeKey
+        const cascadeKey = obj.schema.cascadeKey ?? 'items'
         const selectItemValue = obj.schema.itemValue ?? 'id'
 
         // ACTIONS
-        this.formSchema[cascadedSelectName][cascadeKey] = find(obj.schema.items, [selectItemValue, this.valueIntern[obj.key]])?.schema ?? []
-
+        this.formSchema[cascadedSelectName][cascadeKey] = find(obj.schema[cascadeKey], [selectItemValue, this.valueIntern[obj.key]])?.schema ?? []
         const sortIndex = findIndex(this.flatCombinedArraySorted, ['key', cascadedSelectName])
+        __log(
+          this.formSchema[cascadedSelectName][cascadeKey]
+        )
         this.storeStateData[cascadedSelectName] = this.formSchema[cascadedSelectName][cascadeKey].length > 0 ? this.formSchema[cascadedSelectName][cascadeKey][0].value : []
         this.flatCombinedArraySorted[sortIndex].value = this.valueIntern[cascadedSelectName]
-
         this.setCascadeSelect(this.flatCombinedArraySorted[sortIndex])
       } else if ((obj.schema.type === 'select') && obj.schema.hasOwnProperty('autofill')) {
+        __log('autofill')
         obj.schema.autofill.forEach(element => {
           if (this.formSchema[element].autofillable) {
             this.storeStateData[element] = find(obj.schema.items, ['id', this.valueIntern[obj.key]])?.[element] ?? ''
