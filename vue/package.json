@@ -31,6 +31,7 @@
     "v-mask": "^2.3.0",
     "vite-plugin-commonjs": "^0.10.1",
     "vue": "^3.3.4",
+    "vue-currency-input": "^3.1.0",
     "vue-i18n": "^9.0.*",
     "vuedraggable": "^4.1.0",
     "vuetify": "^3.5.0",
