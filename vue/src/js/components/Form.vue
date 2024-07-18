@@ -6,12 +6,11 @@
       :action="actionUrl"
       method="POST"
       :class="formClass"
-      v-model="valid"
+      v-model="validModel"
       @submit="submit"
       >
       <v-sheet class="d-flex">
-
-        <v-sheet class=" w-100">
+        <v-sheet class="w-100">
           <!-- <div class="text-h8 pt-5 pb-10 text-primary font-weight-bold" v-if="formTitle && false">
             {{ ($te(formTitle) ? $t(formTitle).toLocaleUpperCase($i18n.locale.toUpperCase()) : formTitle.toLocaleUpperCase($i18n.locale.toUpperCase())) }}
           </div> -->
@@ -95,11 +94,11 @@
           <div class="d-flex flex-column align-items-center ml-auto mr-auto" style="position:sticky;top:100px;">
             <slot v-if="hasSubmit && stickyButton" name="submit"
               v-bind="{
-                validForm: valid || !serverValid,
+                validForm: validModel || !serverValid,
                 buttonDefaultText
               }"
               >
-              <v-btn type="submit" :disabled="!(valid || !serverValid)" class="ml-auto">
+              <v-btn type="submit" :disabled="!(validModel || !serverValid)" class="ml-auto">
                 {{ buttonDefaultText }}
               </v-btn>
             </slot>
@@ -118,10 +117,10 @@
       <v-sheet class="d-flex pt-6" v-if="hasSubmit && !stickyButton">
         <slot name="submit"
           v-bind="{
-            validForm: valid || !serverValid,
+            validForm: validModel || !serverValid,
             buttonDefaultText
           }">
-          <v-btn type="submit" :disabled="!(valid || !serverValid) || loading" class="ml-auto mb-5">
+          <v-btn type="submit" :disabled="!(validModel || !serverValid) || loading" class="ml-auto mb-5">
             {{ buttonDefaultText }}
           </v-btn>
         </slot>
@@ -145,11 +144,11 @@ import { mapState } from 'vuex'
 import { FORM, ALERT } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
 import api from '@/store/api/form'
-import { useFormatPermalink, useInputHandlers, useValidation } from '@/hooks'
+import { useInputHandlers, useValidation } from '@/hooks'
 
 import { useI18n } from 'vue-i18n'
 
-import { getModel, getSubmitFormData, getSchema, handleInputEvents } from '@/utils/getFormData.js'
+import { getModel, getSubmitFormData, getSchema, handleInputEvents, handleEvents } from '@/utils/getFormData.js'
 
 import { redirector } from '@/utils/response'
 import { cloneDeep } from 'lodash-es'
@@ -157,7 +156,9 @@ import { cloneDeep } from 'lodash-es'
 export default {
   name: 'ue-form',
   emits: [
-    'update:valid'
+    'update:valid',
+    'update:modelValue',
+    'input'
   ],
   props: {
     modelValue: {
@@ -216,17 +217,17 @@ export default {
       default () {
         return {}
       }
-    }
+    },
+    valid: null
   },
   setup (props, context) {
     const inputHandlers = useInputHandlers()
-    const validations = useValidation()
+    const validations = useValidation(props)
 
     const { t, te } = useI18n({ useScope: 'global' })
 
     const buttonDefaultText = computed(() => props.buttonText ? (te(props.buttonText) ? t(props.buttonText) : props.buttonText) : t('submit'))
     return {
-      ...useFormatPermalink(props, context),
       ...inputHandlers,
       ...validations,
       buttonDefaultText
@@ -248,7 +249,15 @@ export default {
 
       rawSchema: null,
       inputSchema: null,
-      defaultItem: null
+      defaultItem: null,
+      manualValidation: false
+    }
+  },
+
+  provide() {
+    // use function syntax so that we can access `this`
+    return {
+      manualValidation: computed(() => this.manualValidation)
     }
   },
 
@@ -275,6 +284,7 @@ export default {
 
     model: {
       handler (value, oldValue) {
+        this.$emit('update:modelValue', value)
       },
       deep: true
     },
@@ -287,6 +297,9 @@ export default {
     },
     errors (newValue, oldValue) {
       this.setSchemaErrors(newValue)
+    },
+    validModel(newValue, oldValue) {
+      this.$emit('update:valid', newValue)
     }
   },
 
@@ -368,8 +381,10 @@ export default {
   },
 
   methods: {
-    validate () {
-      return this.$refs[this.reference].validate()
+    async validate () {
+      const result = await this.$refs[this.reference].validate()
+
+      return result
     },
     resetValidation () {
       this.$refs[this.reference].resetValidation()
@@ -386,16 +401,19 @@ export default {
         }
         this.handleEvent(obj)
       }
+
+      this.$emit('input', v)
     },
     handleEvent (obj) {
-      const { _fields: newModel, moduleSchema: newSchema } = handleInputEvents(obj.schema.event, this.model, this.inputSchema, obj.key)
-      this.model = newModel
-      this.inputSchema = newSchema
+      handleEvents(this.model, this.inputSchema, obj.schema)
+      // const { _fields: newModel, moduleSchema: newSchema } = handleInputEvents(obj.schema.event, this.model, this.inputSchema, obj.key)
+      // this.model = newModel
+      // this.inputSchema = newSchema
     },
-    handleInputSlot (v, s) {
-      const { on, key, value, obj } = v
-      __log('handleInputSlot', v, on, key, value, obj)
-    },
+    // handleInputSlot (v, s) {
+    //   const { on, key, value, obj } = v
+    //   __log('handleInputSlot', v, on, key, value, obj)
+    // },
     handleUpdate (v) {
       // __log('handleUpdate', v)
     },
@@ -447,7 +465,7 @@ export default {
       }
     },
     submit (e, callback = null, errorCallback = null) {
-      if (this.valid) {
+      if (this.validModel) {
         if (this.async) {
           e && e.preventDefault() // don't perform submit action (i.e., `<form>.action`)
           if (!this.actionUrl) {
