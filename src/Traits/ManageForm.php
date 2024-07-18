@@ -6,6 +6,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Priceable\Models\Currency;
@@ -522,6 +524,27 @@ trait ManageForm {
 
                 $data = $input;
             break;
+            case 'filepond':
+
+                $input['type'] = 'custom-input-filepond';
+                $input['inputName'] = $input['name'] ?? 'filepond';
+
+                $input['endPoints'] = [
+                    'process' => route('admin.filepond.process'),
+                    // 'remove' => route('admin.filepond.delete'),
+                    'revert' => route('admin.filepond.delete'),
+                    'load' => 'http://' . unusualConfig('admin_app_url') . '/' . Storage::url('fileponds') . '/',
+                ];
+                $input['accepted-file-types'] ??= [
+                    'image/* ,file/*'
+                ];
+                $input['label-idle'] ??= __('filepond-upload-label');
+                $input['allow-multiple'] ??= true;
+                $input['credits'] = false;
+
+                // $data = $input;
+
+                break;
             case 'group':
             case 'wrap':
                 $default_repeater_col = [

@@ -15,7 +15,7 @@ trait FilesTrait
         $traitName = get_class_short_name(__TRAIT__);
 
         $columns[$traitName] = collect($inputs)->reduce(function($acc, $curr){
-            if(preg_match('/file/', $curr['type'])){
+            if(preg_match('/\bfile\b/', $curr['type'])){
                 $acc[] = $curr['name'];
             }
             return $acc;
@@ -89,6 +89,7 @@ trait FilesTrait
             $systemLocales = getLocales();
             $default_locale = config('app.locale');
             $filesByRole = $object->files->groupBy('pivot.role');
+
 
 
             foreach ($this->getColumns(__TRAIT__) as $role) {
