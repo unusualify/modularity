@@ -68,6 +68,23 @@ trait ManageForm {
                 return [];
             }
 
+            $relationshipsTypes = [];
+
+            if(method_exists($this->repository->getModel(), 'definedRelationsTypes')){
+                $relationshipsTypes = $this->repository->definedRelationsTypes();
+            }
+
+            $relationType = null;
+
+            if(array_key_exists($relationship, $relationshipsTypes)){
+                $relationType = $relationshipsTypes[$relationship];
+            }
+
+            if($relationType  == 'MorphToMany'){
+                return [
+                    $relationship
+                ];
+            }
 
             return [
                 $relationship => [
