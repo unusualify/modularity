@@ -1,42 +1,38 @@
 <template>
-  <div :class="['vue-tel-input-vuetify', $lodash.pick(boundProps, ['wrapperClasses']) ?? getDefault('wrapperClasses')]">
-    <div class="d-flex w-100">
-      <div style="width=52px;">
-        <v-combobox
-          :ref="makeReference('countryInput')"
-          v-model="countryCode"
-          :items="sortedCountries"
-          item-title="name"
-          item-value="iso2"
-          width="52px"
-          v-bind="$lodash.pick(boundProps, ['variant', 'menuProps', 'selectClasses', 'selectLabel', 'dense', 'density'])"
-          autocomplete="off"
-          return-object
-          >
-          <template #selection="object">
-            <!-- {{ $log(object) }} -->
-            <div :class="activeCountry.iso2.toLowerCase()" class="vti__flag" />
-            <!-- <span class="v-select__selection-text">
-              {{ activeCountry.iso2 }}
-            </span> -->
-          </template>
-          <template v-if="false" #item="itemSlot">
-            <!-- {{  $log(itemSlot) }} -->
-            {{ itemSlot.item.raw.name }}
-            <!-- <v-list-item :title="`${itemSlot.item.raw.name} +${itemSlot.item.raw.dialCode}`" @click="itemSlot.props.onClick">
-              <template #prepend>
-                <span :class="itemSlot.raw.iso2.toLowerCase()" class="vti__flag" />
-              </template>
-            </v-list-item> -->
-            <!-- <span :class="item.iso2.toLowerCase()" class="vti__flag" />
-            <span>{{ item.name }} {{ `+${item.dialCode}` }}</span> -->
-          </template>
-        </v-combobox>
-      </div>
+    <v-row no-gutters  :class="['vue-tel-input-vuetify flex-nowrap', $lodash.pick(boundProps, ['wrapperClasses']) ?? getDefault('wrapperClasses')]">
+      <v-autocomplete
+        class="flex-grow-0 flex-shrink-1"
+        :ref="makeReference('countryInput')"
+        v-model="countryCode"
+        :items="sortedCountries"
+        item-title="name"
+        item-value="iso2"
+        v-bind="$lodash.pick(boundProps, ['variant', 'menuProps', 'selectClasses', 'selectLabel', 'dense', 'density'])"
+        autocomplete="off"
+        return-object
+        >
+        <template #selection="object">
+          <div :class="activeCountry.iso2.toLowerCase()" class="vti__flag" />
+          <!-- <span class="v-select__selection-text">
+            {{ activeCountry.iso2 }}
+          </span> -->
+        </template>
+        <template v-if="false" #item="itemSlot">
+          <!-- {{  $log(itemSlot) }} -->
+          {{ itemSlot.item.raw.name }}
+          <!-- <v-list-item :title="`${itemSlot.item.raw.name} +${itemSlot.item.raw.dialCode}`" @click="itemSlot.props.onClick">
+            <template #prepend>
+              <span :class="itemSlot.raw.iso2.toLowerCase()" class="vti__flag" />
+            </template>
+          </v-list-item> -->
+          <!-- <span :class="item.iso2.toLowerCase()" class="vti__flag" />
+          <span>{{ item.name }} {{ `+${item.dialCode}` }}</span> -->
+        </template>
+      </v-autocomplete>
       <v-text-field
           :ref="makeReference('phoneInput')"
           type="tel"
-
+          class="flex-grow-1 flex-shrink-0"
           v-model="phone"
           v-bind="boundProps"
 
@@ -52,11 +48,9 @@
           @keyup.space="onSpace"
         >
 
-        </v-text-field>
-    </div>
-    <!-- <div class="country-code">
-    </div> -->
-  </div>
+      </v-text-field>
+    </v-row>
+
 </template>
 
 <script>
