@@ -636,42 +636,64 @@ trait ManageForm {
 
             break;
             case 'radio-group':
-                // $default_repeater_col = [
-                //     'cols' => 12,
-                // ];
-                // $input['col'] = array_merge_recursive_preserve($default_repeater_col, $input['col'] ?? []);
                 $input['type'] = 'custom-input-radio-group';
-                // dd($input, debug_backtrace());
+                $input['default'] ??= [];
+
                 $input['schema'] = array_filter($this->createFormSchema($input['schema']), function($_input){
                     return isset($_input['items']) && !empty($_input['items']);
                 });
-
-
-                // foreach ($input['schema'] as $key => &$val) {
-                //     $val['id'] = $val['name'];
-                //     $id++;
-                // }
 
             break;
             case 'tab-group':
                 $input['type'] = 'custom-input-tab-group';
                 $input['schema'] = $this->createFormSchema($input['schema']);
+                $input['default'] ??= [];
+
                 $eagers = [];
                 foreach ($input['schema'] as $key => $_input) {
                     if($_input['type'] == 'custom-input-comparison-table' && isset($_input['comparators'])){
                         foreach ($_input['comparators'] as $relation => $conf) {
-                            $eagers[] = $input['name'] . "." . $relation;
+                            $eagers[] = isset($conf['eager']) ? $conf['eager'] : $input['name'] . "." . $relation;
                         }
                     }
-                    if(in_array($_input['type'], ['custom-input-checklist', 'select', 'combobox', 'autocomplete'])){
-                        $eagers[] = $input['name'] . "." . $_input['name'];
+                    if(in_array($_input['type'], ['checklist', 'custom-input-checklist', 'select', 'combobox', 'autocomplete'])){
+                        $eagers[] = isset($_input['eager']) ? $_input['eager'] : $input['name'] . "." . $_input['name'];
                     }
                 }
                 $input['eagers'] = $eagers;
             break;
             case 'comparison-table':
                 $input['type'] = 'custom-input-comparison-table';
+                $items = $input['items'] ?? [];
 
+                if(isset($input['repository'])){
+                    $with = array_keys($input['comparators']);
+
+                    $args = explode(':', $input['repository']);
+
+                    $className = array_shift($args);
+                    $methodName = array_shift($args) ?? 'list';
+
+                    $relation_class = App::make($className);
+                    $params = Collection::make($args)->mapWithKeys(function($arg){
+                        [$name, $value] = explode('=', $arg);
+
+                        return [$name => explode(',', $value)];
+                    })->toArray();
+
+
+                    $params = array_merge_recursive($params, ['with' => $with]);
+
+                    $items =  call_user_func_array(array($relation_class, $methodName), [
+                        ...($methodName == 'list'? ['column' => $input['itemTitle'] ?? 'name'] : []),
+                        ...$params
+                    ])->toArray();
+
+                }
+
+                $data =  Arr::except($input, ['route', 'model']) + [
+                    'items' => $items
+                ];
             break;
             default:
 
