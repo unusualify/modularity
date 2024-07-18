@@ -878,7 +878,6 @@ trait ManageForm {
                         $inputToFormat = array_shift($args);
                         $targetPropName = array_shift($args) ?? 'inputs';
 
-
                         $filterEndpoints = Collection::make($input['schema'])->mapWithKeys(function($r){
 
                             $routeName = $this->getStudlyName($r['_routeName'] ?? $r['name']);
@@ -898,6 +897,13 @@ trait ManageForm {
 
                         $events[] = 'formatFilter:' . implode(':', [$inputToFormat, $targetPropName, ...$args]);
                         break;
+                    case 'preview': //'lock:url:url'
+                        $inputToFormat = array_shift($args) ?? '';
+                        $previewFieldPatterns = array_shift($args) ?? null;
+
+                        if($inputToFormat)
+                            $events[] = "formatPreview:{$inputToFormat}:{$previewFieldPatterns}";
+                        break;
                     default:
                         # code...
                         break;
@@ -906,7 +912,12 @@ trait ManageForm {
 
             if(!empty($events)){
                 $data = (array)($data ?? $input);
-                $data['event'] = implode('|',$events);
+                try {
+                    //code...
+                    $data['event'] = implode('|', array_merge($events, explode('|', $data['event'] ?? '')) );
+                } catch (\Throwable $th) {
+                    dd($events, $data, $th,  $this->config);
+                }
             }
 
             if(!empty($extraInputs)){
