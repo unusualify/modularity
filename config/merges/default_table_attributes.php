@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'embeddedForm' => true,
+    'embeddedForm' => false,
     'createOnModal' => true,
     'editOnModal' => true,
     'formWidth' => '60%',
