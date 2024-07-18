@@ -18,6 +18,13 @@ trait RelationTrait
      */
     public function afterSaveRelationTrait($object, $fields)
     {
+        // dd($this->getMorphToManyRelations(), $fields);
+        foreach ($this->getMorphToManyRelations() as $relationName) {
+            if(isset($fields[$relationName]) && $fields[$relationName]){
+                $object->{$relationName}()->sync($fields[$relationName]);
+            }
+
+        }
         foreach ($this->getMorphToRelations() as $relation => $types) {
             foreach ($types as $key => $type) {
                 $name = $type['name'];
@@ -154,10 +161,16 @@ trait RelationTrait
 
     public function getFormFieldsRelationTrait($object, $fields, $schema = [])
     {
-
+        $inputs = $this->inputs();
         $morphToRelations = $this->getMorphToRelations();
         // $hasManyRelations = $this->getHasManyRelations();
         $belongsToManyRelations = $this->getBelongsToManyRelations();
+
+        foreach ($this->getMorphToManyRelations() as $relationName) {
+            if(array_key_exists($relationName, $inputs)){
+                $fields[$relationName] = $object->{$relationName}->map(fn($rel) => $rel->id)->toArray();
+            }
+        }
 
         foreach ($morphToRelations as $relation => $types) {
             $morphTo = null;
@@ -178,7 +191,7 @@ trait RelationTrait
         }
 
         // dd($fields);
-        foreach ($this->inputs() as $key => $input) {
+        foreach ($inputs as $key => $input) {
 
             if(isset($input['name']) && in_array($input['name'], $belongsToManyRelations) ){
                 if(preg_match('/repeater/', $input['type'])){
@@ -371,6 +384,11 @@ trait RelationTrait
     public function getMorphManyRelations()
     {
         return $this->definedRelations('MorphMany');
+    }
+
+    public function getMorphToManyRelations()
+    {
+        return $this->definedRelations('MorphToMany');
     }
 
 }
