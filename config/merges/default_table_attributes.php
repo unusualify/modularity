@@ -53,7 +53,7 @@ return [
         'rounded' => 'md', // string | number | boolean - 0, xs, sm, true, lg, xl, pill, circle, and shaped.
         'class' => 'ml-2 text-white text-capitialize text-bold',
         'size' => 'default', //sizes: x-small, small, default, large, and x-large.
-        'text' => 'CREATE NEW',
+        // 'text' => 'CREATE NEW',
         // 'icon' => 'mdi-abacus'
         // 'loading' => true,
     ],
