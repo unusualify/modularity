@@ -1,0 +1,245 @@
+<template>
+  <v-input
+    ref="VInput"
+    v-model="models"
+    hide-details
+    multiple
+    :rules="tabGroupRules"
+    class="v-input-tab-group"
+    >
+    <!-- <template v-slot:message="messageScope">
+      {{ messageScope.message }}
+    </template> -->
+    <template v-slot:default="defaultSlot">
+      <v-tabs
+        v-model="activeTab"
+        align-tabs="center"
+      >
+        <v-tab v-for="(item, i) in elements" :key="item.id" :value="item.id">
+          {{ item.name }}
+        </v-tab>
+      </v-tabs>
+      <v-window v-model="activeTab">
+        <v-window-item v-for="(item, i) in elements" :key="item.id" :value="item.id">
+          <!-- :hasSubmit="true" -->
+          <ue-form
+            :ref="formRefs[item.id]"
+            v-model="models[item.id]"
+            :schema="schemas[item.id]"
+            v-model:valid="valids[i]"
+            />
+        </v-window-item>
+      </v-window>
+    </template>
+  </v-input>
+</template>
+
+<script>
+import { toRefs, reactive, ref, computed } from 'vue';
+import { cloneDeep, each, map } from 'lodash-es';
+
+import { useInput,
+  makeInputProps,
+  makeInputEmits,
+  makeInputInjects,
+  useInputHandlers,
+  useValidation
+} from '@/hooks'
+
+import { getModel, getSchema } from '@/utils/getFormData.js'
+
+// __log([...makeInputInjects])
+export default {
+  name: 'v-custom-input-tab-group',
+  emits: [...makeInputEmits],
+  inject: [...makeInputInjects],
+  props: {
+    ...makeInputProps(),
+    modelValue: {
+      type: Object,
+      default: () => {}
+    },
+    schema: {
+      type: Object,
+      default: () => {}
+    },
+    tabFields: {
+      type: Object,
+      default: () => {}
+    },
+    items: {
+      type: Object,
+      default: () => []
+    },
+  },
+  setup (props, context) {
+    const inputHandlers = useInputHandlers()
+    const validations = useValidation(props)
+
+    const state = reactive({
+      activeTab: 1,
+      models: {},
+      schemas: {},
+      valids: {},
+    })
+
+    const formRefs = computed(() => props.items.reduce((acc,item,i) => {
+      acc[item.id] = ref(null)
+
+      return acc
+    }, {}))
+
+    return {
+      ...useInput(props, context),
+      ...inputHandlers,
+      ...validations,
+      ...toRefs(state),
+      formRefs,
+    }
+  },
+  data: function () {
+    return {
+      elements: this.items,
+
+      tabGroupRules: [
+        (v) =>  {
+          let isValid = true
+
+          let inValidGroupIndex
+          let inValidInputName
+
+          loopValues:
+          for(const id in v){
+            let model = v[id]
+            for(const name in this.schema){
+              let value = model[name]
+              let input = this.schema[name]
+
+              // let item = this.elements.find((el) => el.id == id)
+              isValid = this.validateInput(input, value)
+              // __log(this.manualValidation)
+              if(isValid !== true && this.manualValidation){
+                this.activeTab = parseInt(id)
+                let formRef = this.formRefs[id]
+                __log(formRef)
+                formRef.value[0].validate()
+                break loopValues;
+              }
+
+              // if(Array.isArray(value)){
+              //   if(value.length < 1){
+              //     isValid = false
+              //     message = `Please select one of items of ${name} field for ${item.name} tab`
+              //   }
+              // }else {
+              //   if(value == ''){
+              //     isValid = false
+              //     message = `Please fill ${name} field for ${item.name} tab`
+              //   }
+              // }
+
+              // if(!isValid){
+              //   inValidGroupIndex = id
+              //   inValidInputName = name
+              //   break
+              // }
+
+            }
+          }
+
+          // if(!v.package)
+          //   return ''
+          // __log(isValid)
+          return isValid
+        },
+      ]
+    }
+  },
+  computed: {
+
+  },
+  watch: {
+    activeTab: {
+      handler (value, oldValue) {
+
+      }
+    },
+    models: {
+      handler (value, oldValue) {
+        this.validate()
+        this.$emit('update:modelValue', value)
+      },
+      deep: true
+    },
+    valids: {
+      handler (value, oldValue) {
+
+      },
+      deep: true
+    },
+  },
+  methods: {
+    async validate() {
+      if(this.$refs.VInput){
+        const result = await this.$refs.VInput.validate()
+      }
+    },
+    async validateForm(i) {
+      const formRef = this.formRefs[i]
+
+      const result = await formRef.value[0].validate()
+
+      return result
+    },
+
+  },
+  created() {
+
+    this.models = this.elements.reduce((acc, item) => {
+      if(!__isset(acc[item.id])){
+        acc[item.id] = this.input?.[item.id] ?? {}
+      }
+
+      return acc
+    }, {})
+
+    this.schemas = this.elements.reduce((acc, item, index) => {
+      if(!__isset(acc[item.id])){
+        const baseSchema = cloneDeep(this.schema)
+        for(const inputName in this.tabFields){
+          if(__isset(baseSchema[inputName])){
+            baseSchema[inputName]['items'] = item[this.tabFields[inputName]]
+          }
+          // #TODO: __cast_value_match in init.js
+          each(baseSchema[inputName], (value, key) => {
+            baseSchema[inputName][key] = this.$castValueMatch(value, this.elements[index])
+          })
+        }
+        // acc[item.id] = this.invokeRuleGenerator(getSchema(baseSchema, this.models?.[item.id] ?? {}))
+        acc[item.id] = getSchema(baseSchema, this.models?.[item.id] ?? {})
+      }
+
+      return acc
+    }, {})
+
+    this.valids = this.elements.reduce((acc, item,i ) => {
+      acc[i] = null
+
+      return acc
+    }, {})
+
+  }
+}
+</script>
+
+<style lang="sass">
+  .v-input-tab-group
+    .v-input__control
+      display: block
+
+
+</style>
+
+<style lang="scss">
+
+</style>
