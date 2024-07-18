@@ -9,16 +9,16 @@ Default input type is **v-autocomplete**.
 
 ## Usage
 You can consider as standard select input, add input attributes to config as following:
-```
+``` php
   [
     'type' => 'autocomplete', // or 'select', 'combobox'
     'ext' => 'scroll',
     'connector' => '{ModuleName}:{RouteName}|uri',
     ...
-  ],x
+  ],
 ```
 or
-```
+``` php
   [
     'type' => 'select-scroll',
     'connector' => '{ModuleName}:{RouteName}|uri',
