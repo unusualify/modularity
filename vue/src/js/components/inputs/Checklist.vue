@@ -91,7 +91,7 @@
         <v-row v-else>
           <template v-for="(item, index) in items"
               :key="`checkbox-${index}`">
-              <v-col>
+              <v-col cols="3">
                 <v-checkbox
                   data-test="checkbox"
                   v-model="input"
@@ -105,7 +105,7 @@
                 </v-checkbox>
               </v-col>
               <!-- <v-spacer></v-spacer> -->
-              <v-responsive v-if="index % 4 == 3"width="100%"></v-responsive>
+              <v-responsive v-if="index % 4 == 3" width="100%"></v-responsive>
           </template>
         </v-row>
       </div>
@@ -253,7 +253,8 @@ export default {
 </script>
 
 <style lang="sass">
-.ue-checklist
+  .ue-checklist
+    width: 100%
     .v-input--horizontal .v-input__prepend
         margin-inline-end: 0px
 
