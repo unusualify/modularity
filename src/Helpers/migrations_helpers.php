@@ -187,7 +187,7 @@ if (!function_exists('createDefaultMorphPivotTableFields')) {
      */
     function createDefaultMorphPivotTableFields($table, $tableName)
     {
-        $table->{unusualIncrementsMethod()}('id');
+        // $table->{unusualIncrementsMethod()}('id');
         // $tableName => package_languageables
 
         $modelName = getMorphModelNameFromTableName($tableName); //*ables
@@ -198,13 +198,14 @@ if (!function_exists('createDefaultMorphPivotTableFields')) {
         $morphForeignKey = makeMorphForeignKey($modelName); //*able_id
         $morphForeignType = makeMorphForeignType($modelName); // *able_type
 
-        $table->{unusualIntegerMethod()}($foreignKey)->unsigned();
-        $table->foreign($foreignKey, "fk_{$morphTableName}_{$foreignKey}")->references('id')->on($tableName)->onDelete('cascade')->onUpdate('cascade');
+        // $table->{unusualIntegerMethod()}($foreignKey)->unsigned();
+        // $table->foreign($foreignKey, "fk_{$morphTableName}_{$foreignKey}")->references('id')->on($tableName)->onDelete('cascade')->onUpdate('cascade');
+        $table->foreignId($foreignKey)->constrained()->onUpdate('cascade')->onDelete('cascade');
         $table->{unusualIntegerMethod()}($morphForeignKey)->nullable()->unsigned();
         $table->string($morphForeignType)->nullable();
 
-        $table->timestamps();
-        $table->softDeletes();
+        // $table->timestamps();
+        // $table->softDeletes();
         $table->index([$morphForeignType, $morphForeignKey], "{$tableName}_type_id_index");
     }
 }
