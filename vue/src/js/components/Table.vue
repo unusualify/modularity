@@ -360,7 +360,7 @@
 
         <!-- Custom Slots -->
         <template
-          v-for="(context, slotName) in slots" v-slot:[slotName]=""
+          v-for="(context, slotName) in slots" v-slot:[slotName]
           :key="`customSlot-${slotName}`"
           >
           <div>
