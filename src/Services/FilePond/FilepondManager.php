@@ -165,14 +165,15 @@ class FilepondManager
             // );
 
 
-            if(!!$object->assets()->get()->select('uuid', $folder['folderName']) && Storage::exists($folder['folderName'])) return;
+            if(!!$object->assets()->get()->select('uuid', $folder['folderName']) && Storage::exists($this->file_path .$folder['folderName'])){
+                continue;
+            };
 
 
             $tmp_file = TemporaryAsset::where('folder_name', $folder['folderName'])->first();
 
-
             if(!!$tmp_file){
-                return $this->persistFile($tmp_file, $object);
+                $this->persistFile($tmp_file, $object);
             }
 
         }
