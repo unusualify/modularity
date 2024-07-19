@@ -5,6 +5,8 @@
         <div class="fileField">
           <file-pond
             ref="pond"
+            :key="key"
+            :id="key"
             v-bind:files="files"
             v-on:init="handleFilePondInit"
             v-bind="$bindAttributes()"
@@ -22,19 +24,22 @@ import vueFilePond, { setOptions } from "vue-filepond";
 import { useInput, makeInputProps } from '@/hooks';
 import "filepond/dist/filepond.min.css";
 
+
+// Preview related plugins and imports
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
+
+// Import image preview and file type validation plugins
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+
 // Create component
 const FilePond = vueFilePond(
-
+  FilePondPluginImagePreview
 );
 
 export default {
   name: "ue-custom-input-filepond",
   props: {
     ...makeInputProps(),
-    files: {
-      type: Array,
-      default: () => [],
-    },
     endPoints: {
       type: Object,
       default: () => ({}),
@@ -48,26 +53,23 @@ export default {
   },
   methods:{
     postProcess : function(error, file){
-      console.log(file)
       this.input = this.input.concat({
         folderName: file.serverId,
-        fileName: file.filename
+        fileName: file.filename,
+        source: '/tmp/' + file.serverId + '/' + file.filename
       });
-
-      // this.input = this.files
     },
     removeFile: function(error, file) {
       const uuid = file.serverId.replace(`/${file.filename}`, '')
       this.input = this.input.filter((asset) => asset.folderName != uuid)
     },
     handleFilePondInit : function() {
-
       setOptions({
         files: this.modelValue.map(function (file) {
             return {
-              source: `${file.folderName}/${file.fileName}`,
+              source:  file.source ?? `${file.folderName}/${file.fileName}`,
               options: {
-                type : 'local',
+                type : `${file.type ?? 'local'}`,
               }
             }
         }),
@@ -91,7 +93,13 @@ export default {
       set(val){
         this.updateModalValue(val)
       }
+    },
+    key: {
+      get(){
+        return Math.ceil(Math.random()* this.modelValue.length) + '-pod'
+      }
     }
+
   },
 
   components: {

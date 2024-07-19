@@ -29,6 +29,7 @@ class Asset extends Model{
             // 'source' => route('admin.filepond.preview', $this->uuid),
             'folderName' => $this->uuid,
             'fileName' => $this->file_name,
+            'source' => $this->uuid . '/' .  $this->file_name,
         ];
     }
 }
