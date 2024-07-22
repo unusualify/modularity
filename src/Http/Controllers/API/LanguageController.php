@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Lang;
 
 class LanguageController extends Controller
 {
@@ -16,6 +17,7 @@ class LanguageController extends Controller
     {
         $this->translation = $translation;
     }
+
     /**
      * Display a listing of the resource.
      * @return Renderable
@@ -25,32 +27,35 @@ class LanguageController extends Controller
         $cache_key = 'modularity-languages';
         $cache = Cache::store('file');
 
-        if($cache->has($cache_key)){
+        if($cache->has($cache_key) && false){
             return response($cache->get($cache_key))->header('Content-Type', 'application/json');
         }else{
-            $languages = $this->translation->allLanguages();
 
-            $translations = $languages->map(function($lang){
-                $translation = $this->translation->allTranslationsFor($lang);
-                $translations = [];
-                foreach ($translation as $name => $value) {
-                    $original = $value->toArray();
+            // $languages = $this->translation->allLanguages();
 
-                    foreach ($original as $key => $array) {
-                        $multidimensional = [];
-                        foreach ($array as $notation => $item) {
-                            Arr::set($multidimensional, $notation, $item);
-                        }
-                        $original[$key] = $multidimensional;
-                    }
+            // $translations = $languages->map(function($lang){
+            //     $translation = $this->translation->allTranslationsFor($lang);
+            //     $translations = [];
+            //     foreach ($translation as $name => $value) {
+            //         $original = $value->toArray();
 
-                    $translations[$name] = $original;
-                }
+            //         foreach ($original as $key => $array) {
+            //             $multidimensional = [];
+            //             foreach ($array as $notation => $item) {
+            //                 Arr::set($multidimensional, $notation, $item);
+            //             }
+            //             $original[$key] = $multidimensional;
+            //         }
+
+            //         $translations[$name] = $original;
+            //     }
 
 
-                return array_merge_recursive_preserve($translations['group'], isset($translations['single']['single']) ?  $translations['single']['single'] : []);
-                return trans()->get('*', [], $lang);
-            });
+            //     return array_merge_recursive_preserve($translations['group'], isset($translations['single']['single']) ?  $translations['single']['single'] : []);
+            //     return trans()->get('*', [], $lang);
+            // });
+
+            $translations = app('translator')->getTranslations();
 
             $cache->set($cache_key, json_encode($translations) , 600);
 

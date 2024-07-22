@@ -14,6 +14,7 @@ use Nwidart\Modules\Support\Config\GeneratorPath;
 use Nwidart\Modules\Support\Stub;
 use Illuminate\Container\Container;
 use Modules\SystemUser\Repositories\PermissionRepository;
+use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Module;
@@ -971,15 +972,40 @@ class RouteGenerator extends Generator
         $headline = $this->getHeadline($this->getName());
         $plural = pluralize($headline);
 
-        foreach(glob( base_path('lang') . "/**/modules.php") as $path) {
-            $lang = include($path);
+        $langDir = $this->module->getDirectoryPath(GenerateConfigReader::read('lang')->getPath());
 
-            if(!isset($lang[$this->getSnakeCase($this->name)])){
-                $lang[$this->getSnakeCase($this->name)] = "{$headline} | {$plural} | {n} {$plural}";
-                $this->filesystem->put($path, phpArrayFileContent($lang));
+        foreach (getLocales() as $locale) {
+            $file = $langDir . "/{$locale}/modules.php";
+
+            if($this->filesystem->exists($file)){
+                $lang = include($file);
+
+                if(!isset($lang[$this->getSnakeCase($this->name)])){
+                    $lang[$this->getSnakeCase($this->name)] = "{$headline} | {$plural} | {n} {$plural}";
+                    $this->filesystem->put($file, phpArrayFileContent($lang));
+                }
+            }else{
+                $lang = [
+                    $this->getSnakeCase($this->name) => "{$headline} | {$plural} | {n} {$plural}"
+                ];
+
+                if (!$this->filesystem->isDirectory($dir = dirname($file))) {
+                    $this->filesystem->makeDirectory($dir, 0777, true);
+                }
+
+                $this->filesystem->put($file, phpArrayFileContent($lang));
             }
-
         }
+
+        // foreach(glob( base_path('lang') . "/**/modules.php") as $path) {
+        //     $lang = include($path);
+
+        //     if(!isset($lang[$this->getSnakeCase($this->name)])){
+        //         $lang[$this->getSnakeCase($this->name)] = "{$headline} | {$plural} | {n} {$plural}";
+        //         $this->filesystem->put($path, phpArrayFileContent($lang));
+        //     }
+
+        // }
 
         // foreach (glob(__DIR__ . "/../../lang/*.json") as $filename) {
         //     $arr = json_decode( file_get_contents($filename), true );
@@ -1294,7 +1320,8 @@ class RouteGenerator extends Generator
 
     protected function runTest()
     {
-
+        $this->addLanguageVariable();
+        dd();
         if(!$this->plain){
 
             $this->updateConfigFile();

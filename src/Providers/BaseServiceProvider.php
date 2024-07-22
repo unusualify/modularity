@@ -13,6 +13,8 @@ use Unusualify\Modularity\Http\ViewComposers\CurrentUser;
 use Unusualify\Modularity\Http\ViewComposers\FilesUploaderConfig;
 use Unusualify\Modularity\Http\ViewComposers\Localization;
 use Unusualify\Modularity\Http\ViewComposers\MediasUploaderConfig;
+use Unusualify\Modularity\Support\FileLoader;
+use Unusualify\Modularity\Support\Translator;
 
 class BaseServiceProvider extends ServiceProvider
 {
@@ -185,19 +187,21 @@ class BaseServiceProvider extends ServiceProvider
 
     public function registerTranslationService()
     {
-        $this->app->singleton('translation.loader', function ($app) {
-            return new \Illuminate\Translation\FileLoader($app['files'], [__DIR__.'/../../lang',  $app['path.lang']]);
-            // return new \Illuminate\Translation\FileLoader($app['files'], [__DIR__.'/../../laravel-lang',  $app['path.lang']]);
+        $this->app->extend('translation.loader', function ($service, $app) {
+            return new FileLoader($app['files'], [base_path('vendor/laravel/framework/src/Illuminate/Translation/lang'), realpath(__DIR__.'/../../lang'),  $app['path.lang']]);
+            // return new \Illuminate\Translation\FileLoader($app['files'], [base_path('vendor/laravel/framework/src/Illuminate/Translation/lang'), realpath(__DIR__.'/../../lang'),  $app['path.lang']]);
         });
 
-        $this->app->singleton('translator', function ($app) {
+        $this->app->extend('translator', function ($service, $app) {
             $loader = $app['translation.loader'];
 
             // When registering the translator component, we'll need to set the default
             // locale as well as the fallback locale. So, we'll grab the application
             // configuration so we can easily get both of these values from there.
             $locale = $app['config']['app.locale'];
-            $trans = new \Illuminate\Translation\Translator($loader, $locale);
+            // $trans = new \Illuminate\Translation\Translator($loader, $locale);
+            $trans = new Translator($loader, $locale);
+
             $trans->setFallback($app['config']['app.fallback_locale']);
 
             return $trans;

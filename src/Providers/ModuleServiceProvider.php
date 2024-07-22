@@ -45,6 +45,7 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
         $middleware_folder = GenerateConfigReader::read('filter')->getPath();
         $middleware_namespace = GenerateConfigReader::read('filter')->getNamespace();
         $views_folder = GenerateConfigReader::read('views')->getPath();
+        $lang_folder = GenerateConfigReader::read('lang')->getPath();
         $component_class_namespace = GenerateConfigReader::read('component-class')->getNamespace();
 
         // dd(config('modularity'));
@@ -113,6 +114,10 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
 
             //LOAD MODULE TRANSLATION
             $langPath = base_path('lang/modules/' . $module->getLowerName());
+
+            //Add lang paths to merge with laravel translations
+            $this->app['translator']->addPath($module->getDirectoryPath($lang_folder));
+
             if (is_dir($langPath)) {
                 $this->loadTranslationsFrom($langPath, $module->getLowerName());
             } else {
