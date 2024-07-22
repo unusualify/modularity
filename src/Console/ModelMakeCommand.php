@@ -261,6 +261,12 @@ class ModelMakeCommand extends BaseCommand
             }
 
             return $this->generateFillable($fields);
+        }else{
+            $defaultFillableSchema = implode(',',$this->baseConfig('schemas.fillables'));
+
+            $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
+
+            return $this->generateFillable($fields);
         }
 
         return  '';
