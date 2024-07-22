@@ -526,21 +526,52 @@ trait ManageForm {
             break;
             case 'filepond':
 
+                // Input type casting
                 $input['type'] = 'custom-input-filepond';
+                // In order to toggle of credits
+                $input['credits'] = false;
+
+
                 $input['inputName'] = $input['name'] ?? 'filepond';
 
                 $input['endPoints'] = [
                     'process' => route('admin.filepond.process'),
-                    // 'remove' => route('admin.filepond.delete'),
                     'revert' => route('admin.filepond.delete'),
                     'load' => 'http://' . unusualConfig('admin_app_url') . '/' . Storage::url('fileponds') . '/',
                 ];
+
+                // Acceptable file types - however not working well for now
                 $input['accepted-file-types'] ??= [
-                    'image/* ,file/*'
+                    'image/*'
                 ];
-                $input['label-idle'] ??= __('filepond-upload-label');
+
+
+                // Multiple file upload functionalities
                 $input['allow-multiple'] ??= true;
-                $input['credits'] = false;
+                $input['max-files'] ??= null;
+
+
+                // Other Functionalities
+                $input['allow-drop'] ??= true;
+                $input['allow-replace'] ??= true; //only works when allowMultiple is false
+                $input['allow-remove'] ??= true;
+                $input['allow-reorder'] ??= false;
+                $input['allow-process'] ??= true;
+
+
+                // Drag-Drop Properties
+                $input['drop-on-page'] ??= false; //FilePond will catch all files dropped on the webpage
+                $input['drop-on-element'] ??= true; //Require drop on the FilePond element itself to catch the file.
+                $input['drop-validation'] ??= false; //When enabled, files are validated before they are dropped. A file is not added when it's invalid.
+
+
+
+
+                // Custom Labels
+                $input['label-invalid-field'] = __('filepon-invalid-field-label');
+                $input['label-idle'] ??= __('filepond-upload-label');
+
+
 
                 // $data = $input;
 
