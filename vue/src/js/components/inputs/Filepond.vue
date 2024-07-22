@@ -22,15 +22,12 @@
 <script>
 import vueFilePond, { setOptions } from "vue-filepond";
 import { useInput, makeInputProps } from '@/hooks';
-import "filepond/dist/filepond.min.css";
-
-
-// Preview related plugins and imports
-import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
-
+import { isArray } from "lodash-es";
 // Import image preview and file type validation plugins
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import "filepond/dist/filepond.min.css";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
 
 // Create component
 const FilePond = vueFilePond(
@@ -66,15 +63,16 @@ export default {
       this.input = this.input.filter((asset) => asset.folderName != uuid)
     },
     handleFilePondInit : function() {
-      setOptions({
-        files: this.modelValue.map(function (file) {
+      const files = isArray(this.modelValue) ? this.modelValue.map(function (file) {
             return {
               source:  file.source ?? `${file.folderName}/${file.fileName}`,
               options: {
                 type : `${file.type ?? 'local'}`,
               }
             }
-        }),
+        }) : [];
+      setOptions({
+        files: files,
         server: {
           process: this.endPoints.process,
           revert: this.endPoints.revert,

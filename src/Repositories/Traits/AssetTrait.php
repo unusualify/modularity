@@ -2,8 +2,6 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
-use Unusualify\Modularity\Entities\TemporaryAsset;
-use Unusualify\Modularity\Entities\Asset;
 use Unusualify\Modularity\Services\Filepond\Filepond;
 
 trait AssetTrait{
@@ -38,6 +36,7 @@ trait AssetTrait{
     {
 
         $columns = $this->getColumns(__TRAIT__);
+
         foreach ($columns as $role) {
             if(!isset($fields[$role]))
             {
@@ -46,9 +45,7 @@ trait AssetTrait{
                         'id' => $object->id,
                     ];
                 });
-
             }
-
         }
 
 

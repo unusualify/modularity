@@ -23,26 +23,22 @@ class FilepondManager
 
     public function createTemporaryAsset(Request $request)
     {
-
-
-        $model = $request->model;
         foreach (Arr::dot($request->allFiles()) as $name => $file) {
+
             # code...
 
             $file_name = $file->getClientOriginalName();
             $folder = uniqid('', true);
-            // dd($name, $folder);
 
-
-    // $this->addFilePondToSession($model . "." . $name , $folder);
             $file->storeAs( $this->tmp_file_path . $folder, $file_name);
 
-            TemporaryAsset::create([
+            $tmp_file = TemporaryAsset::create([
                 'folder_name' => $folder,
                 'file_name' => $file_name,
                 'input_role' => $name,
             ]);
 
+            $this->addFilePondToSession($tmp_file);
 
             return $folder;
         }
@@ -62,7 +58,7 @@ class FilepondManager
 
             Storage::deleteDirectory( $this->tmp_file_path . $tmp_file->folder_name);
 
-            // $this->deleteFilePondFromSession($table . '.' . $tmp_file->input_name);
+            $this->deleteFilePondFromSession($tmp_file);
 
             $tmp_file->delete();
 
@@ -116,9 +112,9 @@ class FilepondManager
 
 
             $this->createAsset($model, $temp_asset);
+            $this->deleteFilePondFromSession($temp_asset);
             $temp_asset->delete();
 
-            // $this->deleteFilePondFromSession( $table . '.' . $temp_asset->input_name);
             return $new_folder;
         }
 
@@ -156,14 +152,7 @@ class FilepondManager
             }
         }
 
-
         foreach ($files as $folder) {
-
-            // dd(
-            //     'asdsad',
-            //     Storage::exists($folder)
-            // );
-
 
             if(!!$object->assets()->get()->select('uuid', $folder['folderName']) && Storage::exists($this->file_path .$folder['folderName'])){
                 continue;
@@ -192,7 +181,7 @@ class FilepondManager
 
     }
 
-    public function getCachedFolders($table, $notations)
+    public function getCachedFolders($object, $role)
     {
         $folders = [];
 
@@ -211,17 +200,9 @@ class FilepondManager
      *
      * @return void
      */
-    public function addFilePondToSession(string $key, string $folder)
+    public function addFilePondToSession(TemporaryAsset $tmp_file)
     {
-        // $folders = Session::get('folders', []);
-
-        // array_push($folders, $folder);
-
-        // Session::put('folders', $folders);
-        // Session::push('folders', $folder);
-
-        // Session::push('folders', 'beli');
-        Session::put("{$this->session_prefix}." . auth()->user()->id . "." . $key  , $folder);
+        Session::put("{$this->session_prefix}." . auth()->user()->id . "." . $tmp_file->input_role , $tmp_file->folder_name);
     }
     /**
      * addToSession
@@ -231,9 +212,9 @@ class FilepondManager
      *
      * @return void
      */
-    public function deleteFilePondFromSession(string $key)
+    public function deleteFilePondFromSession(TemporaryAsset $tmp_file)
     {
-        Session::forget("{$this->session_prefix}." . auth()->user()->id . "." . $key  );
+        Session::forget("{$this->session_prefix}." . auth()->user()->id . $tmp_file->input_role , $tmp_file->folder_name);
     }
 
     /**
@@ -243,24 +224,15 @@ class FilepondManager
      *
      * @return string $folder uniqid for filepond
      */
-    public function getFilePondsFromSession($table, $notation)
+    public function getFilePondsFromSession($role)
     {
         // $notations = Arr::dot(Session::get("{$this->session_prefix}"));
+        $cacheFiles = Session::get("{$this->session_prefix}." . auth()->user()->id . "." . $role);
 
-        $cache = data_get(Session::get("{$this->session_prefix}." . (auth()->user()->id ?? 0) . ".{$table}"), $notation);
+        dd($cacheFiles);
+        // $cache = data_get(Session::get("{$this->session_prefix}." . (auth()->user()->id ?? 0) . ".{$table}"), $notation);
 
-        $mapped = [];
 
-        if(is_array($cache)){
-            array_walk( $cache, function($value, $i) use(&$mapped,$notation){
-                $mapped[str_replace('*', $i, $notation)] = $value;
-            });
-
-        }else if(!!$cache){
-            $mapped[$notation] = $cache;
-        }
-
-        return $mapped;
 
         // $mapped = collect( data_get(Session::get("{$this->session_prefix}.{$table}"), $notation) )
         //     ->mapWithKeys(function($item,$i) use($notation){
