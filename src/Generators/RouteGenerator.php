@@ -1320,8 +1320,7 @@ class RouteGenerator extends Generator
 
     protected function runTest()
     {
-        $this->addLanguageVariable();
-        dd();
+
         if(!$this->plain){
 
             $this->updateConfigFile();
