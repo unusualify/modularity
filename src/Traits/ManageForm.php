@@ -542,7 +542,7 @@ trait ManageForm {
 
                 // Acceptable file types - however not working well for now
                 $input['accepted-file-types'] ??= [
-                    'image/*'
+                    'image/*, file/*'
                 ];
 
 
@@ -563,8 +563,6 @@ trait ManageForm {
                 $input['drop-on-page'] ??= false; //FilePond will catch all files dropped on the webpage
                 $input['drop-on-element'] ??= true; //Require drop on the FilePond element itself to catch the file.
                 $input['drop-validation'] ??= false; //When enabled, files are validated before they are dropped. A file is not added when it's invalid.
-
-
 
 
                 // Custom Labels
