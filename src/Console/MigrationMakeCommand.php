@@ -105,7 +105,8 @@ class MigrationMakeCommand extends BaseCommand
     protected function getTemplateContents()
     {
         $parser = new NameParser($this->argument('name'));
-        $tableName = $this->option('table-name') != null ? $this->option('table-name') : $parser->getTableName();
+        //Table name option added. If table name option is not set get from parser.
+        $tableName = $this->option('table-name') ? $this->option('table-name') : $parser->getTableName();
         
         if(($relational = $this->option('relational'))) {
             if($relational == 'BelongsToMany'){
