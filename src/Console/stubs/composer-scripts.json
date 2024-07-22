@@ -42,5 +42,10 @@
         "@php artisan u:m:r ModTest ModTwo --relationships='ModOne:morphToMany'",
         "@php artisan u:m:r ModTest ModThree --relationships='ModOne:morphToMany'",
         "@php artisan u:m:r ModTest ModFour --relationships='ModTwo:belongsToMany,position:integer:unsigned:index,active:string:default(true)|ModThree:belongsToMany,text:string|ModOne:morphToMany|ModTest:morphTo:ModTwo:ModThree'"
+    ],
+    "modularity-test-route-custom-model": [
+        "@php artisan u:m:m ModTest",
+        "@php artisan u:m:r ModTest ModRoute --custom-model='Unusualify\\Modularity\\Entities\\User' --test",
+        "@php artisan unusual:remove:module ModTest"
     ]
 }
