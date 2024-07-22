@@ -930,7 +930,6 @@ class RouteGenerator extends Generator
             $routeArray = $config['routes'][$this->getSnakeCase($routeName)] ?? [];
 
             empty($config['name']) ? ($config['name'] = $this->getHeadline($moduleName)) : null;
-            empty($config['base_prefix']) ? $config['base_prefix'] = false : null;
             empty($config['system_prefix']) ? $config['system_prefix'] = $config['base_prefix'] ?? false : null;
             empty($config['headline']) ? $config['headline'] =  pluralize($this->getHeadline($moduleName)) : null;
 
