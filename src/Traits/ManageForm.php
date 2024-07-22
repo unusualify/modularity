@@ -557,6 +557,7 @@ trait ManageForm {
                 $input['allow-remove'] ??= true;
                 $input['allow-reorder'] ??= false;
                 $input['allow-process'] ??= true;
+                $input['allow-image-preview'] ??= false;
 
 
                 // Drag-Drop Properties
@@ -566,10 +567,12 @@ trait ManageForm {
 
 
                 // Custom Labels
-                $input['label-invalid-field'] = __('filepon-invalid-field-label');
                 $input['label-idle'] ??= __('filepond-upload-label');
-
-
+                $input['label-invalid-field'] ??= __('filepon-invalid-field-label');
+                $input['label-file-loading'] ??= __('filepond-loading-lable');
+                $input['label-file-load-error'] ??= __('filepond-loading-error-lable');
+                $input['label-file-processing'] ??= __('filepond-processing-lable');
+                $input['label-file-remove-error'] ??= __('filepond-removing-error-lable');
 
                 // $data = $input;
 
