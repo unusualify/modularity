@@ -41,17 +41,12 @@ trait AssetTrait{
         foreach ($columns as $role) {
             if(!isset($fields[$role]))
             {
-
-                // $fields[$role] = $object->assets()->get()->map(function($asset){
-                //     return  $asset->uuid;
-                //     // return $asset->file_name;
-                // });
-
-
-
-                $fields[$role] = $object->assets()->get()->map(function($asset){
-                    return $asset->mediableFormat();
+                $fields[$role] = $object->assets()->get()->map(function($asset) use ($object){
+                    return $asset->mediableFormat() + [
+                        'id' => $object->id,
+                    ];
                 });
+
             }
 
         }

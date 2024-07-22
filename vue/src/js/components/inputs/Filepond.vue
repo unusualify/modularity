@@ -5,8 +5,8 @@
         <div class="fileField">
           <file-pond
             ref="pond"
-            :key="key"
             :id="key"
+            :key="key"
             v-bind:files="files"
             v-on:init="handleFilePondInit"
             v-bind="$bindAttributes()"
@@ -46,7 +46,6 @@ export default {
     },
   },
   setup(props, context) {
-
     return {
       ...useInput(props,context),
     };
@@ -56,11 +55,11 @@ export default {
       this.input = this.input.concat({
         folderName: file.serverId,
         fileName: file.filename,
-        source: '/tmp/' + file.serverId + '/' + file.filename
       });
     },
     removeFile: function(error, file) {
-      const uuid = file.serverId.replace(`/${file.filename}`, '')
+      const uuid = file.serverId?.replace(`/${file.filename}`, '') ?? file.folderName;
+
       this.input = this.input.filter((asset) => asset.folderName != uuid)
     },
     handleFilePondInit : function() {
@@ -96,10 +95,9 @@ export default {
     },
     key: {
       get(){
-        return Math.ceil(Math.random()* this.modelValue.length) + '-pod'
+        return this.modelValue?.[0]?.id + '-pod'
       }
     }
-
   },
 
   components: {
