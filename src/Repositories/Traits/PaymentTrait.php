@@ -7,12 +7,10 @@ use Unusualify\Priceable\Traits\HasPriceable;
 
 trait PaymentTrait
 {
-  // use PricesTrait;
-  
   public $paymentTraitRelationName = null;
   public $paymentTraitDefaultCurrencyId = 2;
 
-  protected function beforeSavePaymentTrait($object, $fields)
+  protected function afterSavePaymentTrait($object, $fields)
   {
       $currencyId =  isset($fields['currency_id']) ? $fields['currency_id'] : $this->paymentTraitDefaultCurrencyId;
 
