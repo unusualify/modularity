@@ -19,4 +19,5 @@ return array (
     "verify-login"=> "Verify login",
     "logout"=> "Logout",
     "login-success-message" => "Login Successful!"
+
 );

@@ -2,25 +2,7 @@
     "ADD NEW": "ADD NEW",
     "Are you sure logout?": "Are you sure logout?",
     "AT A GLANCE": "AT A GLANCE",
-    "authentication": {
-        "back-to-login": "Back to Login",
-        "choose-password": "Choose password",
-        "email": "Email",
-        "forgot-password": "Forgot password",
-        "login": "Login",
-        "name": "Name",
-        "login-title": "Login",
-        "oauth-link-title": "Re-enter your password to link :provider to your account",
-        "otp": "One-time password",
-        "password": "Password",
-        "password-confirmation": "Confirm password",
-        "register": "Register",
-        "reset-password": "Reset password",
-        "reset-send": "Send password reset link",
-        "surname": "Surname",
-        "verify-login": "Verify login",
-        "logout": "Logout"
-    },
+
     "cancel": "Cancel",
     "close": "Close",
     "city": "City",
@@ -35,203 +17,15 @@
     "duplicate": "Duplicate",
     "edit": "Edit",
     "edit-item": "Edit {item}",
-    "errors": {
-        "missingMessage": "Please provide @.lower:message."
-    },
-    "fields": {
-        "switch-language": "Switch language"
-    },
-    "form-labels": {
-        "Address": "Address",
-        "City": "City",
-        "Code": "Code",
-        "Company": "Company",
-        "Country": "Country",
-        "Description": "Description",
-        "Email": "Email",
-        "Guard Name": "Guard Name",
-        "Name": "Name",
-        "State": "State",
-        "Tax ID": "Tax ID",
-        "Vat Number": "Vat Number",
-        "Zip Code": "Zip Code"
-    },
+
     "language-select": "Lang Select",
     "list": "no list | one list | {count} list",
     "list-of-item": "{0} List",
-    "listing": {
-        "add-new-button": "Add new",
-        "bulk-actions": "Bulk actions",
-        "bulk-clear": "Clear",
-        "columns": {
-            "featured": "Featured",
-            "name": "Name",
-            "published": "Published",
-            "show": "Show",
-            "thumbnail": "Thumbnail"
-        },
-        "dialogs": {
-            "delete": {
-                "confirm": "Delete",
-                "disclaimer": "The item won\"t be deleted but moved to trash.",
-                "move-to-trash": "Move to trash",
-                "title": "Delete item"
-            },
-            "destroy": {
-                "confirm": "Destroy",
-                "destroy-permanently": "Destroy permanently",
-                "disclaimer": "The item won\"t be able to be restored anymore.",
-                "title": "Destroy item"
-            }
-        },
-        "dropdown": {
-            "delete": "Delete",
-            "destroy": "Destroy",
-            "duplicate": "Duplicate",
-            "edit": "Edit",
-            "publish": "Publish",
-            "feature": "Feature",
-            "restore": "Restore",
-            "unfeature": "Unfeature",
-            "unpublish": "Unpublish"
-        },
-        "filter": {
-            "all-items": "All items",
-            "draft": "Draft",
-            "mine": "Mine",
-            "published": "Published",
-            "trash": "Trash"
-        },
-        "languages": "Languages",
-        "listing-empty-message": "There is no item here yet.",
-        "paginate": {
-            "rows-per-page": "Rows per page:"
-        },
-        "bulk-selected-item": "item selected",
-        "bulk-selected-items": "items selected",
-        "reorder": {
-            "success": ":modelTitle order changed!",
-            "error": ":modelTitle order was not changed. Something wrong happened!"
-        },
-        "restore": {
-            "success": ":modelTitle restored!",
-            "error": ":modelTitle was not restored. Something wrong happened!"
-        },
-        "bulk-restore": {
-            "success": ":modelTitle items restored!",
-            "error": ":modelTitle items were not restored. Something wrong happened!"
-        },
-        "force-delete": {
-            "success": ":modelTitle destroyed!",
-            "error": ":modelTitle was not destroyed. Something wrong happened!"
-        },
-        "bulk-force-delete": {
-            "success": ":modelTitle items destroyed!",
-            "error": ":modelTitle items were not destroyed. Something wrong happened!"
-        },
-        "delete": {
-            "success": ":modelTitle moved to trash!",
-            "error": ":modelTitle was not moved to trash. Something wrong happened!"
-        },
-        "bulk-delete": {
-            "success": ":modelTitle items moved to trash!",
-            "error": ":modelTitle items were not moved to trash. Something wrong happened!"
-        },
-        "duplicate": {
-            "success": ":modelTitle duplicated with Success!",
-            "error": ":modelTitle was not duplicated. Something wrong happened!"
-        },
-        "publish": {
-            "unpublished": ":modelTitle unpublished!",
-            "published": ":modelTitle published!",
-            "error": ":modelTitle was not published. Something wrong happened!"
-        },
-        "featured": {
-            "unfeatured": ":modelTitle unfeatured!",
-            "featured": ":modelTitle featured!",
-            "error": ":modelTitle was not featured. Something wrong happened!"
-        },
-        "bulk-featured": {
-            "unfeatured": ":modelTitle items unfeatured!",
-            "featured": ":modelTitle items featured!",
-            "error": ":modelTitle items were not featured. Something wrong happened!"
-        },
-        "bulk-publish": {
-            "unpublished": ":modelTitle items unpublished!",
-            "published": ":modelTitle items published!",
-            "error": ":modelTitle items were not published. Something wrong happened!"
-        }
-    },
+
     "loading-text": "Loading... Please wait",
-    "media-library": {
-        "files": "Files",
-        "filter-select-label": "Filter by tag",
-        "images": "Images",
-        "insert": "Insert",
-        "sidebar": {
-            "alt-text": "Alt text",
-            "caption": "Caption",
-            "clear": "Clear",
-            "dimensions": "Dimensions",
-            "empty-text": "No file selected",
-            "files-selected": "files selected",
-            "tags": "Tags"
-        },
-        "title": "Media Library",
-        "update": "Update",
-        "unused-filter-label": "Show unused only",
-        "no-tags-found": "Sorry, no tags found.",
-        "dialogs": {
-            "delete": {
-                "delete-media-title": "Delete media",
-                "delete-media-desc": "Are you sure ?<br />This change can\"t be undone.",
-                "delete-media-confirm": "Delete",
-                "title": "Are you sure ?",
-                "allow-delete-multiple-medias": "Some files are used and can\"t be deleted. Do you want to delete the others ?",
-                "allow-delete-one-media": "This file is used and can\"t be deleted. Do you want to delete the others ?",
-                "dont-allow-delete-multiple-medias": "This files are used and can\"t be deleted.",
-                "dont-allow-delete-one-media": "This file is used and can\"t be deleted."
-            },
-            "replace": {
-                "replace-media-title": "Replace media",
-                "replace-media-desc": "Are you sure ?<br />This change can\"t be undone.",
-                "replace-media-confirm": "Replace"
-            }
-        },
-        "types": {
-            "single": {
-                "image": "image",
-                "video": "video",
-                "file": "file"
-            },
-            "multiple": {
-                "image": "images",
-                "video": "videos",
-                "file": "files"
-            }
-        }
-    },
+
     "message": "message",
-    "messages": {
-        "success": "Completed Successfully!",
-        "info": "Completed!",
-        "warning": "There is a warning!",
-        "error": "There is an error!"
-    },
-    "modules": {
-        "company": "Company | Companies | {n} Companies",
-        "invoice": "Invoice | Invoices | {n} Invoices",
-        "package": "Package | Packages",
-        "package_continent": "Continent | Continents",
-        "package_region": "Region | Regions",
-        "package_country": "Country | Countries",
-        "payment": "Payment | Payments",
-        "permission": "Permission | Permissions | {n}  Permissions",
-        "press_release": "Press Release | Press Releases | {n} Releases",
-        "role": "Role | Roles | {n}  Roles",
-        "user": "User | Users | {n} Users",
-        "package_language": "Distribution Language | Distribution Languages | {n} Distribution Languages"
-    },
+
     "neighbourhood": "Neighbourhood",
     "new-item": "New {item}",
     "Personal Information": "Personal Information",
@@ -245,8 +39,5 @@
     "success-update": "Updated Successfully.",
     "success-delete": "Removed Successfully.",
     "update": "Update",
-    "Update Password": "Update Password",
-    "user": {
-        "invalidCompany": "Company fields must be filled!"
-    }
+    "Update Password": "Update Password"
   }

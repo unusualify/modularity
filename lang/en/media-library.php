@@ -21,17 +21,17 @@ return array (
     "dialogs"=> [
         "delete"=> [
             "delete-media-title"=> "Delete media",
-            "delete-media-desc"=> "Are you sure ?<br \/>This change can\"t be undone.",
+            "delete-media-desc"=> "Are you sure ?<br \/>This change can't be undone.",
             "delete-media-confirm"=> "Delete",
             "title"=> "Are you sure ?",
-            "allow-delete-multiple-medias"=> "Some files are used and can\"t be deleted. Do you want to delete the others ?",
-            "allow-delete-one-media"=> "This file is used and can\"t be deleted. Do you want to delete the others ?",
-            "dont-allow-delete-multiple-medias"=> "This files are used and can\"t be deleted.",
-            "dont-allow-delete-one-media"=> "This file is used and can\"t be deleted."
+            "allow-delete-multiple-medias"=> "Some files are used and can't be deleted. Do you want to delete the others ?",
+            "allow-delete-one-media"=> "This file is used and can't be deleted. Do you want to delete the others ?",
+            "dont-allow-delete-multiple-medias"=> "This files are used and can't be deleted.",
+            "dont-allow-delete-one-media"=> "This file is used and can't be deleted."
         ],
         "replace"=> [
             "replace-media-title"=> "Replace media",
-            "replace-media-desc"=> "Are you sure ?<br \/>This change can\"t be undone.",
+            "replace-media-desc"=> "Are you sure ?<br \/>This change can't be undone.",
             "replace-media-confirm"=> "Replace"
         ]
     ],
