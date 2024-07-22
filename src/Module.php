@@ -87,8 +87,8 @@ class Module extends NwidartModule
 
     public function setModuleActivator($name)
     {
-        $modulesPath = $this->app['config']->get('modules.paths.modules');
-        $this->moduleActivator->setModule($name, "{$modulesPath}/{$this->getName()}");
+        //Directory path fix for System Modules
+        $this->moduleActivator->setModule($name, "{$this->getDirectoryPath()}");
     }
 
     /**
