@@ -529,7 +529,7 @@ abstract class PanelController extends CoreController
     {
         $snakeCase = $this->getSnakeCase($this->moduleName);
 
-        return array2Object(Config::get( unusualBaseKey() . '.system_modules.' . $snakeCase)?: Config::get( $snakeCase ));
+        return array_to_object(Config::get( unusualBaseKey() . '.system_modules.' . $snakeCase)?: Config::get( $snakeCase ));
     }
 
     /**

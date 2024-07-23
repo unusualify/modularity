@@ -161,7 +161,7 @@ trait ManageTable {
         if(!!$this->config) {
             try {
                 return Collection::make(
-                    array_merge_recursive_preserve($this->defaultTableAttributes, object2Array($this->getConfigFieldsByRoute('table_options')))
+                    array_merge_recursive_preserve($this->defaultTableAttributes, object_to_array($this->getConfigFieldsByRoute('table_options')))
                 )->toArray();
             } catch (\Throwable $th) {
                 return [];
@@ -393,7 +393,7 @@ trait ManageTable {
        $advancedFilters = Collection::make($this->getConfigFieldsByRoute('filters'))
             ->mapWithKeys(function($filter, $key) {
                 if(method_exists(__TRAIT__, $key.'FilterConfiguration')){
-                    return [$key => array_map([$this, $key.'FilterConfiguration'], object2Array($filter))];
+                    return [$key => array_map([$this, $key.'FilterConfiguration'], object_to_array($filter))];
                 }
 
                 return [$key => $filter];

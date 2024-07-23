@@ -22,7 +22,7 @@ trait ManageForm {
     {
                // $this->indexWith += collect($schema)->filter(function($item){
 
-        return collect(array2Object($this->formSchema))->filter(function($input){
+        return collect(array_to_object($this->formSchema))->filter(function($input){
             // return $this->hasWithModel($item['type']);
             return in_array($input->type, [
                 'treeview',
@@ -107,9 +107,9 @@ trait ManageForm {
     {
 
         // $default_input = collect(Config::get(unusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
-        // $default_input = $this->configureInput(array2Object(Config::get(unusualBaseKey() . '.default_input')));
+        // $default_input = $this->configureInput(array_to_object(Config::get(unusualBaseKey() . '.default_input')));
         $default_input = (array) Config::get(unusualBaseKey() . '.default_input');
-        [$hydrated, $arrayable] = $this->hydrateInput(object2Array($input), $inputs);
+        [$hydrated, $arrayable] = $this->hydrateInput(object_to_array($input), $inputs);
 
 
         if($arrayable){

@@ -88,7 +88,7 @@ class ValidatorParser implements Arrayable
      */
     public function toReplacement()
     {
-        return str_replace("\n", "\n\t\t", arrayExport($this->toArray(),true));
+        return str_replace("\n", "\n\t\t", array_export($this->toArray(),true));
     }
 
 

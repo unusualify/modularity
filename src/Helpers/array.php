@@ -46,54 +46,60 @@ if (!function_exists('array_merge_recursive_distinct')) {
     }
 }
 
-function array_merge_recursive_preserve($array1, $array2)
-{
-    foreach ($array1 as $key => $value) {
-        if (array_key_exists($key, $array2)) {
-            if (is_array($value) && is_array($array2[$key])) {
-                // dd(
-                //     $value,
-                //     $array2[$key],
-                //     array_merge_recursive_preserve($value, $array2[$key])
-                // );
-                $array2[$key] = array_merge_recursive_preserve($value, $array2[$key]);
-            } else {
-                $array1[$key] = $array2[$key];
+if (!function_exists('array_merge_recursive_preserve')) {
+
+    function array_merge_recursive_preserve($array1, $array2)
+    {
+        foreach ($array1 as $key => $value) {
+            if (array_key_exists($key, $array2)) {
+                if (is_array($value) && is_array($array2[$key])) {
+                    // dd(
+                    //     $value,
+                    //     $array2[$key],
+                    //     array_merge_recursive_preserve($value, $array2[$key])
+                    // );
+                    $array2[$key] = array_merge_recursive_preserve($value, $array2[$key]);
+                } else {
+                    $array1[$key] = $array2[$key];
+                }
             }
         }
+
+        // return $array2;
+        return array_merge($array1, $array2);
     }
-
-    // return $array2;
-    return array_merge($array1, $array2);
 }
 
-/**
- *
- * @param $expression
- * @param $return type
- *
- * @return boolean
- */
-function arrayExport($expression, $return=FALSE, $tab=0 ){
-    if (!is_array($expression)) return var_export($expression, $return);
+if (!function_exists('array_export')) {
+    /**
+     *
+     * @param $expression
+     * @param $return type
+     *
+     * @return boolean
+     */
+    function array_export($expression, $return=FALSE, $tab=0 ){
+        if (!is_array($expression)) return var_export($expression, $return);
 
-    $export = var_export($expression, TRUE);
+        $export = var_export($expression, TRUE);
 
-    $export = preg_replace("/^([ ]*)(.*)/m", '$1$1$2', $export);
+        $export = preg_replace("/^([ ]*)(.*)/m", '$1$1$2', $export);
 
-    $array = preg_split("/\r\n|\n|\r/", $export);
-    $array = preg_replace(["/\s*array\s\($/", "/\)(,)?$/", "/\s=>\s$/"], [NULL, ']$1', ' => ['], $array);
+        $array = preg_split("/\r\n|\n|\r/", $export);
+        $array = preg_replace(["/\s*array\s\($/", "/\)(,)?$/", "/\s=>\s$/"], [NULL, ']$1', ' => ['], $array);
 
-    $array = preg_replace('/\d+\s\=\>\s(?=\[|(\'[A-Za-z_\-]+\'))/', '', $array); // removing index numbers of array.
+        $array = preg_replace('/\d+\s\=\>\s(?=\[|(\'[A-Za-z_\-]+\'))/', '', $array); // removing index numbers of array.
 
-    $export = join(PHP_EOL, array_filter(["["] + $array));
+        $export = join(PHP_EOL, array_filter(["["] + $array));
 
-    if ((bool)$return) return $export; else echo $export;
+        if ((bool)$return) return $export; else echo $export;
+    }
 }
 
-function phpArrayFileContent($expression){
+if (!function_exists('php_array_file_content')) {
+function php_array_file_content($expression){
 
-    $export = arrayExport($expression, true);
+    $export = array_export($expression, true);
 
     return "<?php
 
@@ -101,30 +107,36 @@ return {$export};
 
     ";
 }
-
-function array2Object($arr)
-{
-    return json_decode( json_encode($arr) );
 }
 
-function object2Array($object)
-{
-    return json_decode( json_encode($object), true);
-}
-
-function nested_array_merge ( array $array1, array $array2 )
-{
-    $merged = $array1;
-    foreach ($array2 as $key => $value) {
-        if(is_array($value) && array_key_exists($key, $array1)){
-            $merged[$key] = nested_array_merge($array1[$key], $value);
-        }else{
-            $merged[$key] = getValueOrNull($value, bool: false) ?? $merged[$key];
-        }
+if (!function_exists('array_to_object')) {
+    function array_to_object($arr)
+    {
+        return json_decode( json_encode($arr) );
     }
-    return $merged;
 }
 
+if (!function_exists('object_to_array')) {
+    function object_to_array($object)
+    {
+        return json_decode( json_encode($object), true);
+    }
+}
+
+if (!function_exists('nested_array_merge')) {
+    function nested_array_merge ( array $array1, array $array2 )
+    {
+        $merged = $array1;
+        foreach ($array2 as $key => $value) {
+            if(is_array($value) && array_key_exists($key, $array1)){
+                $merged[$key] = nested_array_merge($array1[$key], $value);
+            }else{
+                $merged[$key] = getValueOrNull($value, bool: false) ?? $merged[$key];
+            }
+        }
+        return $merged;
+    }
+}
 
 /**
  * @param array1, baseArray

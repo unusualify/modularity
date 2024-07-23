@@ -279,7 +279,7 @@ if(! function_exists('saveLaravelRelationshipMap')){
     function saveLaravelRelationshipMap() {
         file_put_contents(
             config_path('laravel-relationship-map.php'),
-            phpArrayFileContent(laravelRelationshipMap())
+            php_array_file_content(laravelRelationshipMap())
         );
     }
 }

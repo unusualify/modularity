@@ -440,7 +440,7 @@ class BaseServiceProvider extends ServiceProvider
     public function mergeKeysFromConfig(array $mergeKeys = []) {
         foreach (config($this->baseKey) as $name => $array) {
             if(in_array($name, $mergeKeys)){
-                $this->app['files']->put(__DIR__ . "/../../config/merges/{$name}.php", phpArrayFileContent($array));
+                $this->app['files']->put(__DIR__ . "/../../config/merges/{$name}.php", php_array_file_content($array));
             }
         }
     }
