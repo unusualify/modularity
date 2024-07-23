@@ -10,7 +10,7 @@
         <slot name="append"></slot>
       </div>
       <div :class="['repeater__block']">
-        <draggable
+        <Draggable
           class="content__content"
           v-model="repeaterInputs"
           item-key="id"
@@ -75,7 +75,7 @@
               </v-hover>
             </div>
           </template>
-        </draggable>
+        </Draggable>
       </div>
       <div class="repeater__bottom mb-theme">
         <div class="d-flex">
@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import draggable from 'vuedraggable'
+import Draggable from 'vuedraggable'
 
 import {
   useDraggable,
@@ -113,7 +113,7 @@ export default {
   name: 'v-custom-input-repeater',
   emits: [...makeInputEmits],
   components: {
-    draggable
+    Draggable
   },
   props: {
     ...makeDraggableProps(),
