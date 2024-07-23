@@ -57,7 +57,7 @@ class Payment extends \Unusualify\Payable\Models\Payment
 	 */
 	public function currencyServices() : \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	{
-		return $this->belongsToMany(\Modules\SystemPayment\Entities\CurrencyService::class);
+		return $this->belongsToMany(\Modules\SystemPayment\Entities\Currency::class);
 	}
 
 	/**
