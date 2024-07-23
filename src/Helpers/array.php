@@ -160,3 +160,58 @@ if(!function_exists('array_merge_conditional'))
         return $result;
     }
 }
+
+/**
+ * @param $path, path for file content
+ * @param $array, replacement array
+ *
+ *
+ * @return string
+ */
+if(!function_exists('change_array_file_array'))
+{
+    function change_array_file_array(string $path, array $array): string
+    {
+        $content = get_file_string($path);
+
+        $export = array_export($array, true);
+        // $pattern = "/(\})[^\}]*$/";
+        // $pattern = "/^(return\s)\[(\*)/";
+        // $pattern = '/(?<=return\s+\[)((.|\n)+)(?=;)/';
+        $pattern = '/(return\s+)(\[)[^\}]*$/';
+
+        return preg_replace($pattern, '$1' . $export . ";\n\n", $content);
+    }
+}
+
+/**
+ * @param $path, path for file content
+ * @param $routeName, route name
+ * @param $array, replacement array
+ *
+ *
+ * @return string
+ */
+if(!function_exists('add_route_to_config'))
+{
+    function add_route_to_config(string $path, string $routeName, array $array): string
+    {
+        $content = get_file_string($path);
+
+        $routeName = snakeCase($routeName);
+        $export = array_export(['routes' => [ $routeName => $array] ], true);
+
+        $parts = explode("\n", $export);
+        array_shift($parts);
+        array_shift($parts);
+        array_pop($parts);
+        array_pop($parts);
+        $export = implode("\n", $parts);
+
+        $pattern = "/(?<='routes'\s\=\>\s\[)([^\}]*)(\s{4}\],)/";
+
+        return preg_replace($pattern,  "$1" . $export . "\n" . '$2', $content);
+    }
+}
+
+
