@@ -17,8 +17,6 @@ This trait, defines a relationship between a model and it's price information by
 
 ```php
 <?php
-
-
 namespace Modules\Package\Entities;
 
 
