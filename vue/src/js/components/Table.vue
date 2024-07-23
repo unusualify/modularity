@@ -490,8 +490,22 @@
             <v-progress-circular :indeterminate="loading" v-if="enableInfiniteScroll && loading"></v-progress-circular>
         </template>
 
-
-
+        <template v-slot:bodyx="bodySlotScope">
+          <tbody>
+            {{ $log(bodySlotScope.items) }}
+            <Draggable
+              :modelValue="elements"
+              item-key="position"
+              v-bind="dragOptions"
+              @update:modelValue="$log"
+              >
+              <template #item="itemSlot">
+                <VDataTableRow :index="itemSlot.index" :item="bodySlotScope.items[index]" :cellProps="$refs.datatable.cellProps"/>
+              </template>
+              <!-- <tr><td>{{ bodySlotScope.items[itemSlot.index].name }}</td></tr> -->
+            </Draggable>
+          </tbody>
+        </template>
       </v-data-table-server>
 
     </div>
@@ -499,8 +513,17 @@
 </template>
 
 <script>
-import { makeFormatterProps } from '@/hooks/useFormatter'
-import useTable, { makeTableProps } from '@/hooks/useTable'
+import Draggable from 'vuedraggable'
+import { VDataTableRows } from 'vuetify/lib/components/VDataTable/index.mjs'
+import { VDataTableRow } from 'vuetify/lib/components/VDataTable/index.mjs'
+
+import {
+  useTable,
+  makeTableProps,
+  useDraggable,
+  makeDraggableProps,
+  makeFormatterProps,
+} from '@/hooks'
 
 import ActiveTableItem from '__components/labs/ActiveTableItem.vue'
 const { ignoreFormatters } = makeFormatterProps()
@@ -508,16 +531,20 @@ const { ignoreFormatters } = makeFormatterProps()
 export default {
   // mixins: [TableMixin],
   components: {
-    ActiveTableItem
+    ActiveTableItem,
+    Draggable,
+    VDataTableRow
   },
   props: {
+    ...makeDraggableProps(),
     ...makeTableProps(),
-    ignoreFormatters
+    ...ignoreFormatters
   },
   setup (props, context) {
 
     return {
-      ...useTable(props, context)
+      ...useDraggable(props, context),
+      ...useTable(props, context),
     }
   },
   data () {
