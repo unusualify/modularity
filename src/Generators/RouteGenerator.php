@@ -905,17 +905,20 @@ class RouteGenerator extends Generator
                 'inputs' => $this->getInputs() //in Unusualify\Modularity\Support\Migrations\SchemaParser::class
             ];
 
-
             if($runnable && $this->getTest()){
                 dump($route_array);
             }
 
-
             $config['routes'][$this->getSnakeCase($this->getName())] = $route_array;
         }
 
+        $content = $this->filesystem->exists($configPath)
+            ? add_route_to_config($configPath, $this->getName(), $route_array)
+            : php_array_file_content($config);
 
-        return $this->getTest() ? 1 : $this->filesystem->put($configPath, phpArrayFileContent($config));
+        return $this->getTest()
+            ? 1
+            : $this->filesystem->put( $configPath, $content);
 
     }
 
@@ -951,15 +954,12 @@ class RouteGenerator extends Generator
 
             uksort($config, fn($a) => is_string($config[$a]) ?  -1 : (is_bool($config[$a]) ?  0 : 1));
             $this->module->setConfig($config);
-            return $this->filesystem->put($configPath, phpArrayFileContent($config));
+            return $this->filesystem->put($configPath, php_array_file_content($config));
         }
 
 
 
     }
-
-
-
 
     /**
      * addLanguageVariable
@@ -981,7 +981,7 @@ class RouteGenerator extends Generator
 
                 if(!isset($lang[$this->getSnakeCase($this->name)])){
                     $lang[$this->getSnakeCase($this->name)] = "{$headline} | {$plural} | {n} {$plural}";
-                    $this->filesystem->put($file, phpArrayFileContent($lang));
+                    $this->filesystem->put($file, php_array_file_content($lang));
                 }
             }else{
                 $lang = [
@@ -992,7 +992,7 @@ class RouteGenerator extends Generator
                     $this->filesystem->makeDirectory($dir, 0777, true);
                 }
 
-                $this->filesystem->put($file, phpArrayFileContent($lang));
+                $this->filesystem->put($file, php_array_file_content($lang));
             }
         }
 
@@ -1001,7 +1001,7 @@ class RouteGenerator extends Generator
 
         //     if(!isset($lang[$this->getSnakeCase($this->name)])){
         //         $lang[$this->getSnakeCase($this->name)] = "{$headline} | {$plural} | {n} {$plural}";
-        //         $this->filesystem->put($path, phpArrayFileContent($lang));
+        //         $this->filesystem->put($path, php_array_file_content($lang));
         //     }
 
         // }
