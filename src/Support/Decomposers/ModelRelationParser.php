@@ -145,15 +145,8 @@ class ModelRelationParser implements Arrayable
             if(!$reflector->hasMethod($format['relationship_name'])){
 
                 $filePath = $reflector->getFileName();
-                $lines = file($filePath);
-                $count = 0;
-                $content = "";
 
-                foreach($lines as $line) {
-                    $count += 1;
-                    // $content .= str_pad($count, 2, 0, STR_PAD_LEFT).". ".$line . "\n";
-                    $content .= $line;
-                }
+                $content = get_file_string($filePath);
 
                 $pattern = "/(\})[^\}]*$/";
 

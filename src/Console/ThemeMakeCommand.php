@@ -126,14 +126,8 @@ class ThemeMakeCommand extends BaseCommand
     {
         $filePath = base_path(unusualConfig('vendor_path') . "/vue/src/js/config/themes/index.js");
 
-        $lines = file($filePath);
-        $count = 0;
-        $content = "";
+        $content = get_file_string($filePath);
 
-        foreach($lines as $line) {
-            $count += 1;
-            $content .= $line;
-        }
         $content .= "export { default as {$themeName} } from './{$themeName}'\n";
 
         app('files')->put($filePath, $content);

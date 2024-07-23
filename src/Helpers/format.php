@@ -317,3 +317,21 @@ if( !function_exists('nestedRouteNameFormat')) {
     }
 }
 
+if( !function_exists('get_file_string')) {
+    function get_file_string($path){
+        $lines = file($path);
+        $count = 0;
+        $content = "";
+
+        foreach($lines as $line) {
+            $count += 1;
+            // $content .= str_pad($count, 2, 0, STR_PAD_LEFT).". ".$line . "\n";
+            $content .= $line;
+        }
+
+        return $content;
+    }
+}
+
+
+
