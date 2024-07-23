@@ -9,7 +9,7 @@ sidebarPos: 5
 
 `FilePond` is a JavaScript library that provides smooth drag-and-drop file uploading. By implementing the FilePond Vue component for image and file uploads, `Modularity` offers users easily implementable, configurable, and versatile file processing functionality.
 
-::: tip One to Many Bounding
+::: tip One to Many Polymorphic Bounding
 
 There is another way to process files/ medias with modularity, that is using file/media libraries. Unlike using file/media library, `FilePond with Modularity` offers `one to many` bounding between models and files.
 
