@@ -114,8 +114,8 @@ class SchemaParser implements Arrayable
 
         foreach ($this->toArray() as $column => $attributes) {
             if(in_array($attributes[0], ['morphTo'])){
-                $morphable_id = snakeCase($column) . 'able_id';
-                $morphable_type = snakeCase($column) . 'able_type';
+                $morphable_id = makeMorphForeignKey($column);
+                $morphable_type = makeMorphForeignType($column);
 
                 $results .= $this->createField($morphable_type, ['string', 'nullable']);
                 $results .= $this->createField($morphable_id, ['unsignedBigInteger', 'nullable']);
@@ -147,8 +147,15 @@ class SchemaParser implements Arrayable
         $results = '';
 
         foreach ($this->toArray() as $column => $attributes) {
-            $attributes = [head($attributes)];
-            $results .= $this->createField($column, $attributes, 'remove');
+            if (in_array($attributes[0], ['morphTo'])) {
+                $morphable_id = makeMorphForeignKey($column);
+                $morphable_type = makeMorphForeignType($column);
+                $results .= $this->createField($morphable_type, ['morphTo'], 'remove');
+                $results .= $this->createField($morphable_id, ['morphTo'], 'remove');
+            } else if (!in_array($attributes[0], ['belongsToMany', 'hasOne'])){
+                $attributes = [head($attributes)];
+                $results .= $this->createField($column, $attributes, 'remove');
+            }
         }
 
         return $results;
@@ -172,8 +179,8 @@ class SchemaParser implements Arrayable
             $type_method = $attributes[0];
             $studly_type = studlyName($type_method);
 
-            if (method_exists($this, "add{$studly_type}Column")) {
-                $results .= $this->{"add{$studly_type}Column"}($key, $column, $field);
+            if (method_exists($this, "{$type}{$studly_type}Column")) {
+                $results .= $this->{"{$type}{$studly_type}Column"}($key, $field, $column);
             }  else {
                 $results .= $this->{"{$type}Column"}($key, $field, $column);
             }
@@ -191,7 +198,7 @@ class SchemaParser implements Arrayable
      *
      * @return string
      */
-    protected function addBelongsToColumn($key, $column, $field)
+    protected function addBelongsToColumn($key, $field, $column)
     {
         if ($key === 0) {
             // $relatedColumn = Str::snake(class_basename($column)) . '_id';
@@ -217,7 +224,13 @@ class SchemaParser implements Arrayable
         return '->' . $field . '()';
     }
 
-    protected function addForeignIdForColumn($key, $column, $field)
+    protected function removeBelongsToColumn($key, $field, $column)
+    {
+        $column = makeForeignKey($column);
+        return '->dropColumn(' . "'" . $column . "')";
+    }
+
+    protected function addForeignIdForColumn($key, $field, $column)
     {
 
         if ($key === 0) {
@@ -273,7 +286,6 @@ class SchemaParser implements Arrayable
         if ($this->hasCustomAttribute($column)) {
             return '->' . $field;
         }
-
         return '->dropColumn(' . "'" . $column . "')";
     }
 

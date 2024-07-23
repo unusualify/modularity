@@ -92,6 +92,7 @@ class MigrationMakeCommand extends BaseCommand
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
+            ['table-name', null, InputOption::VALUE_OPTIONAL, 'set table name'],
             ['test', null, InputOption::VALUE_NONE, 'Test the Route Generator'],
         ], unusualTraitOptions());
     }
@@ -104,11 +105,11 @@ class MigrationMakeCommand extends BaseCommand
     protected function getTemplateContents()
     {
         $parser = new NameParser($this->argument('name'));
-
+        //Table name option added. If table name option is not set get from parser.
+        $tableName = $this->option('table-name') ? $this->option('table-name') : $parser->getTableName();
+        
         if(($relational = $this->option('relational'))) {
             if($relational == 'BelongsToMany'){
-                $tableName = $parser->getTableName();
-
                 $table1 = $this->getSnakeCase($this->option('route'));
                 $table2 = preg_replace("/^({$table1}_)(\w+)$/", '${2}', $tableName);
 
@@ -122,8 +123,7 @@ class MigrationMakeCommand extends BaseCommand
                     'table2'        => $table2,
                 ]);
             }else if($relational == 'MorphedByMany'){
-                $tableName = $parser->getTableName();
-
+                
                 return Stub::create('/migration/morphPivot.stub', [
                     'class'         => $this->getClass(),
                     'table'         => $tableName,
@@ -133,7 +133,7 @@ class MigrationMakeCommand extends BaseCommand
         } elseif ($parser->isCreate()) {
             return Stub::create('/migration/create.stub', [
                 'class'         => $this->getClass(),
-                'table'         => $parser->getTableName(),
+                'table'         => $tableName,
                 'fields'        => ltrim($this->getSchemaParser()->render()),
                 'up_schemas'    => ltrim($this->getExtraUpSchemaMethods()),
                 'down_schemas'  => ltrim($this->getExtraDownSchemaMethods()),
@@ -142,15 +142,15 @@ class MigrationMakeCommand extends BaseCommand
             $schemaParser = new NwidartSchemaParser($this->option('fields'));
             return Stub::create('/migration/add.stub', [
                 'class'         => $this->getClass(),
-                'table'         => $parser->getTableName(),
-                'fields_up'     => ltrim(rtrim($schemaParser->up())),
-                'fields_down'   => ltrim(rtrim($schemaParser->down())),
+                'table'         => $tableName,
+                'fields_up'     => ltrim(rtrim($this->getSchemaParser()->up())),
+                'fields_down'   => ltrim(rtrim($this->getSchemaParser()->down())),
             ]);
         } elseif ($parser->isDelete()) {
             $schemaParser = new NwidartSchemaParser($this->option('fields'));
             return Stub::create('/migration/delete.stub', [
                 'class'         => $this->getClass(),
-                'table'         => $parser->getTableName(),
+                'table'         => $tableName,
                 'fields_down'   => $schemaParser->up(),
                 'fields_up'     => $schemaParser->down(),
             ]);
@@ -158,7 +158,7 @@ class MigrationMakeCommand extends BaseCommand
             $schemaParser = new NwidartSchemaParser($this->option('fields'));
             return Stub::create('/migration/drop.stub', [
                 'class'         => $this->getClass(),
-                'table'         => $parser->getTableName(),
+                'table'         => $tableName,
                 'fields'        => $schemaParser->render(),
             ]);
         }

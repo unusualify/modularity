@@ -175,6 +175,8 @@ class RouteGenerator extends Generator
         'rowActionsType' => 'inline',
     ];
 
+    protected $tableName;
+
     /**
      * The constructor.
      * @param $name
@@ -791,16 +793,34 @@ class RouteGenerator extends Generator
             + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
         );
 
-        if(!$hasCustomModel) {
+        $tableName = $this->getTableName() ? $this->getTableName() : $this->getDBTableName($this->name);
 
-            if(!$this->module->isFileExists("create_{$this->getDBTableName($this->name)}_table") && !$this->fix){
-                $this->console->call('unusual:make:migration', [
+        if (!$hasCustomModel) {
+            if (!$this->module->isFileExists("create_{$tableName}_table") && !$this->fix) {
+                $this->console->call(
+                    'unusual:make:migration',
+                    [
                         'module' => $this->module->getStudlyName(),
-                        'name' => "create_{$this->getDBTableName($this->name)}_table",
+                        'name' => "create_{$tableName}_table",
                     ]
-                    + ( $this->schema ?  ['--fields' => $this->schema] : [])
-                    + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
-                    + $console_traits
+                        + ($this->schema ?  ['--fields' => $this->schema] : [])
+                        + (!$this->useDefaults ?  ['--no-defaults' => true] : [])
+                        + $console_traits
+                        + ['--test' => $this->getTest()]
+                );
+            }
+        } else {
+            if (!$this->module->isFileExists("add_{$tableName}_table")) {
+                $this->console->call(
+                    'unusual:make:migration',
+                    [
+                        'module' => $this->module->getStudlyName(),
+                        'name' => "add_{$tableName}_table",
+                    ]
+                        + ($this->schema ?  ['--fields' => $this->schema] : [])
+                        + (!$this->useDefaults ?  ['--no-defaults' => true] : [])
+                        + $console_traits
+                        + ['--test' => $this->getTest()]
                 );
             }
         }
@@ -1319,6 +1339,9 @@ class RouteGenerator extends Generator
 
     protected function runTest()
     {
+        // dd(@class_exists($this->customModel));
+
+
 
         if(!$this->plain){
 
@@ -1331,7 +1354,6 @@ class RouteGenerator extends Generator
             })->toArray();
 
             $hasCustomModel = $this->customModel && @class_exists($this->customModel);
-
             $this->console->call('unusual:make:model', [
                     'module' => $this->module->getStudlyName(),
                     'model' => $this->getName()
@@ -1346,20 +1368,38 @@ class RouteGenerator extends Generator
                 + ['--test' => $this->getTest()]
             );
 
-            if(!$hasCustomModel) {
+            $tableName = $this->getTableName() ? $this->getTableName() : $this->getDBTableName($this->name);
 
-                if(!$this->module->isFileExists("create_{$this->getDBTableName($this->name)}_table") && !$this->fix){
+            if(!$hasCustomModel) {
+                if(!$this->module->isFileExists("create_{$tableName}_table") && !$this->fix){
                     $this->console->call('unusual:make:migration', [
                             'module' => $this->module->getStudlyName(),
-                            'name' => "create_{$this->getDBTableName($this->name)}_table",
+                            'name' => "create_{$tableName}_table",
                         ]
                         + ( $this->schema ?  ['--fields' => $this->schema] : [])
                         + ( !$this->useDefaults ?  ['--no-defaults' => true] : [])
                         + $console_traits
+                        + ['--table-name' => $tableName]
+                        + ['--test' => $this->getTest()]
+                    );
+                }
+            }else{
+                if (!$this->module->isFileExists("add_{$tableName}_table") && !$this->fix) {
+                    $this->console->call(
+                        'unusual:make:migration',
+                        [
+                            'module' => $this->module->getStudlyName(),
+                            'name' => "add_{$tableName}_table",
+                        ]
+                        + ($this->schema ?  ['--fields' => $this->schema] : [])
+                        + (!$this->useDefaults ?  ['--no-defaults' => true] : [])
+                        + $console_traits
+                        + ['--table-name' => $tableName]
                         + ['--test' => $this->getTest()]
                     );
                 }
             }
+            // dd( 'end of test');
 
             // $this->generateFiles();
         }
@@ -1367,6 +1407,18 @@ class RouteGenerator extends Generator
         $this->console->info('Route generator test is completed successfully!');
 
         return 0;
+    }
+
+    public function setTableName($tableName)
+    {
+        $this->tableName = $tableName;
+
+        return $this;
+    }
+
+    public function getTableName()
+    {
+        return $this->tableName;
     }
 
 }
