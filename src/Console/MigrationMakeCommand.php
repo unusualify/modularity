@@ -107,7 +107,7 @@ class MigrationMakeCommand extends BaseCommand
         $parser = new NameParser($this->argument('name'));
         //Table name option added. If table name option is not set get from parser.
         $tableName = $this->option('table-name') ? $this->option('table-name') : $parser->getTableName();
-        
+
         if(($relational = $this->option('relational'))) {
             if($relational == 'BelongsToMany'){
                 $table1 = $this->getSnakeCase($this->option('route'));
@@ -123,7 +123,7 @@ class MigrationMakeCommand extends BaseCommand
                     'table2'        => $table2,
                 ]);
             }else if($relational == 'MorphedByMany'){
-                
+
                 return Stub::create('/migration/morphPivot.stub', [
                     'class'         => $this->getClass(),
                     'table'         => $tableName,
@@ -209,8 +209,8 @@ class MigrationMakeCommand extends BaseCommand
         $singular_table = Str::singular( (new NameParser($this->argument('name')))->getTableName() );
 
         if($this->option('addTranslation')){
-            $fields = implode(",", $this->defaultFieldSchemas).","
-                .$this->option('fields');
+
+            $fields = implode(',', array_merge($this->defaultFieldSchemas, $this->option('fields') ? explode(',', $this->option('fields')) : []));
 
             $schemas .= "\t\t\tSchema::create('{$singular_table}_translations', function(Blueprint \$table) {\n"
                 ."\t\t\tcreateDefaultTranslationsTableFields(\$table, '{$singular_table}');\n"

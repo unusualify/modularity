@@ -330,7 +330,7 @@ class ModelMakeCommand extends BaseCommand
         if($this->getTraitResponse('addTranslation')){
             $fillable = $this->option('fillable');
 
-            $fields = array_merge( $this->defaultFillables, explode(',', $fillable));
+            $fields = array_merge( $this->defaultFillables, $fillable != "" ? explode(',', $fillable) : []);
 
             $attributes = "\t/**\n"
                 . "\t * The translated attributes that are assignable for hasTranslation Trait.\n"

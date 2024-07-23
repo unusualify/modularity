@@ -1337,12 +1337,20 @@ class RouteGenerator extends Generator
         return unusualConfig('composer.author.email');
     }
 
+    public function setTableName($tableName)
+    {
+        $this->tableName = $tableName;
+
+        return $this;
+    }
+
+    public function getTableName()
+    {
+        return $this->tableName;
+    }
+
     protected function runTest()
     {
-        // dd(@class_exists($this->customModel));
-
-
-
         if(!$this->plain){
 
             $this->updateConfigFile();
@@ -1354,6 +1362,7 @@ class RouteGenerator extends Generator
             })->toArray();
 
             $hasCustomModel = $this->customModel && @class_exists($this->customModel);
+
             $this->console->call('unusual:make:model', [
                     'module' => $this->module->getStudlyName(),
                     'model' => $this->getName()
@@ -1407,18 +1416,6 @@ class RouteGenerator extends Generator
         $this->console->info('Route generator test is completed successfully!');
 
         return 0;
-    }
-
-    public function setTableName($tableName)
-    {
-        $this->tableName = $tableName;
-
-        return $this;
-    }
-
-    public function getTableName()
-    {
-        return $this->tableName;
     }
 
 }
