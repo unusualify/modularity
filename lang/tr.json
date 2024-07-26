@@ -2,7 +2,7 @@
     "ADD NEW": "EKLE",
     "Are you sure logout?": "Çıkış yapmak istediğinize emin misiniz?",
     "AT A GLANCE": "GENEL BAKIŞ",
-
+    "All": "Hepsi",
     "cancel": "İptal",
     "close": "Kapat",
     "Company Information": "Şirket Bilgileri",
@@ -39,6 +39,7 @@
     "Personal Information": "Kişisel Bilgiler",
     "Update Password": "Şifreyi Güncelle",
     "Yes": "Evet",
+    "Frequently Asked Questions": "Sıkça Sorulan Sorular",
     "Reset Password Notification" : "Yeni Şifre Oluşturma Bildirimi",
     "You are receiving this email because we received a password reset request for your account.": "Hesabınızın şifresini sıfırlamak için bu maili alıyorsunuz",
     "Reset Password": "Yeni Şifre Oluştur",
