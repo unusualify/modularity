@@ -1,6 +1,6 @@
 <template>
-  <v-layout fluid v-resize="onResize">
-    <div :class="['ue-datatable__container', noFullScreen ? '' : 'ue-datatable--full-screen' ]">
+  <!-- <v-layout fluid v-resize="onResize"> -->
+    <div :class="['ue-datatable__container', noFullScreen ? '' : 'fill-height ue-datatable--full-screen_' ]">
 
       <ActiveTableItem
         class=""
@@ -15,7 +15,7 @@
       <v-data-table-server
         v-if="!hideTable"
         v-bind="{...$bindAttributes(), ...footerProps}"
-        :class="[tableClasses, fullWidthWrapper ? '' : 'ue-table--narrow-wrapper']"
+        :class="[noFullScreen ? '' : 'h-100', tableClasses, fullWidthWrapper ? '' : 'ue-table--narrow-wrapper']"
         id="ue-table"
 
         :headers="headers"
@@ -509,7 +509,7 @@
       </v-data-table-server>
 
     </div>
-  </v-layout>
+  <!-- </v-layout> -->
 </template>
 
 <script>
