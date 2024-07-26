@@ -109,13 +109,27 @@ trait TranslationsTrait
     {
         if ($this->model->isTranslatable()) {
             $attributes = $this->model->translatedAttributes;
+
             $query->whereHas('translations', function ($q) use ($scopes, $attributes) {
                 foreach ($attributes as $attribute) {
                     if (isset($scopes[$attribute]) && is_string($scopes[$attribute])) {
-                        $q->where($attribute, $this->getLikeOperator(), '%' . $scopes[$attribute] . '%');
+                        if(!(isset($scopes['searches']) && in_array($attribute, $scopes['searches']))){
+                            $q->where($attribute, $this->getLikeOperator(), '%' . $scopes[$attribute] . '%');
+                        }
                     }
                 }
+
+                if(isset($scopes['searches'])){
+                    $q->where(function ($query) use (&$scopes) {
+                        foreach ($scopes['searches'] as $field) {
+                            $query->orWhere($field, $this->getLikeOperator(), '%' . $scopes[$field] . '%');
+                        }
+                    });
+                }
             });
+
+            // if(get_class_short_name($this) == 'FaqRepository')
+            //     dd($scopes, $attributes, $query->toSql(), $query->get());
 
             foreach ($attributes as $attribute) {
                 if (isset($scopes[$attribute])) {
