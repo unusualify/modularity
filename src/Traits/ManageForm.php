@@ -80,7 +80,7 @@ trait ManageForm {
                 $relationType = $relationshipsTypes[$relationship];
             }
 
-            if($relationType  == 'MorphToMany'){
+            if(in_array($relationType, ['MorphToMany', 'BelongsToMany'])){
                 return [
                     $relationship
                 ];
