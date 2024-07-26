@@ -15,15 +15,15 @@ class FilepondController extends Controller
     }
 
 
-    public function uploadTempFile(Request $request)
+    public function upload(Request $request)
     {
-        return response($this->filepondManager->createTemporaryAsset($request));
+        return response($this->filepondManager->createTemporaryFilepond($request));
     }
 
 
-    public function deleteTempFile(Request $request)
+    public function delete(Request $request)
     {
-        return $this->filepondManager->deleteTemporaryAsset($request,);
+        return $this->filepondManager->deleteTemporaryFilepond($request);
     }
 
 

@@ -4,9 +4,10 @@ namespace Unusualify\Modularity\Repositories\Traits;
 
 use Unusualify\Modularity\Services\Filepond\Filepond;
 
-trait AssetTrait{
+trait FilepondsTrait
+{
 
-    public function setColumnsAssetTrait($columns, $inputs)
+    public function setColumnsFilepondsTrait($columns, $inputs)
     {
         $traitName = get_class_short_name(__TRAIT__);
 
@@ -21,27 +22,25 @@ trait AssetTrait{
     }
 
 
-    public function afterSaveAssetTrait($object,$fields)
+    public function afterSaveFilepondsTrait($object,$fields)
     {
         $columns = $this->getColumns(__TRAIT__);
+
         foreach ($columns as $role) {
             $this->saveFilePond($fields[$role], $object, $fields);
         }
-
-
     }
 
 
-    public function getFormFieldsAssetTrait($object, $fields, $schema)
+    public function getFormFieldsFilepondsTrait($object, $fields, $schema)
     {
 
         $columns = $this->getColumns(__TRAIT__);
 
         foreach ($columns as $role) {
-            if(!isset($fields[$role]))
-            {
-                $fields[$role] = $object->assets()->get()->map(function($asset) use ($object){
-                    return $asset->mediableFormat() + [
+            if(!isset($fields[$role])){
+                $fields[$role] = $object->fileponds()->get()->map(function($filepond) use ($object){
+                    return $filepond->mediableFormat() + [
                         'id' => $object->id,
                     ];
                 });

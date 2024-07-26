@@ -305,8 +305,10 @@ trait RelationTrait
                         } catch (\Throwable $th) {
                             dd(
                                 $object,
+                                $record,
                                 $relationship,
-                                $this->definedRelationsTypes()
+                                $this->definedRelationsTypes(),
+                                $th
                             );
                             //throw $th;
                         }

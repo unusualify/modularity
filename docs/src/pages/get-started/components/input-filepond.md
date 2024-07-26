@@ -19,11 +19,11 @@ There is another way to process files/ medias with modularity, that is using fil
 
 ::: tip 
 
-  Add `HasAsset` and `AssetTrait` to your route's model and repository respectively to implement file processing mechanism.
+  Add `HasFileponds` and `FilepondsTrait` to your route's model and repository respectively to implement file processing mechanism.
 
 :::
 
-In order to effectively use the FilePond component and its functionalities on the desired model, you need to add two traits: `AssetTrait and HasAsset`. The `AssetTrait` should be implemented in the `repository`, interacting with the module's data storage mechanism and handling the file storage process. Conversely, the `HasAsset` trait should be implemented in the `model`, introducing relationship and casting methods to the parent model to bind files.
+In order to effectively use the FilePond component and its functionalities on the desired model, you need to add two traits: `FilepondsTrait and HasFileponds`. The `FilepondsTrait` should be implemented in the `repository`, interacting with the module's data storage mechanism and handling the file storage process. Conversely, the `HasFileponds` trait should be implemented in the `model`, introducing relationship and casting methods to the parent model to bind files.
 
 ::: info
 

@@ -3,6 +3,8 @@
 return [
     'users' => 'admin_users',
     'companies' => 'umod_companies',
+    'fileponds' => 'umod_fileponds',
+    'temporary_fileponds' => 'umod_temporary_fileponds',
     'files' => 'umod_files',
     'fileables' => 'umod_fileables',
     'medias' => 'umod_medias',

@@ -3,14 +3,14 @@
 namespace Unusualify\Modularity\Services\Filepond;
 
 
-use Unusualify\Modularity\Entities\TemporaryAsset;
+use Unusualify\Modularity\Entities\TemporaryFilepond;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Image;
-use Unusualify\Modularity\Entities\Asset;
+use Unusualify\Modularity\Entities\Filepond;
 
 class FilepondManager
 {
@@ -21,7 +21,7 @@ class FilepondManager
 
     protected $session_prefix = "filepond";
 
-    public function createTemporaryAsset(Request $request)
+    public function createTemporaryFilepond(Request $request)
     {
         foreach (Arr::dot($request->allFiles()) as $name => $file) {
 
@@ -32,7 +32,7 @@ class FilepondManager
 
             $file->storeAs( $this->tmp_file_path . $folder, $file_name);
 
-            $tmp_file = TemporaryAsset::create([
+            $tmp_file = TemporaryFilepond::create([
                 'folder_name' => $folder,
                 'file_name' => $file_name,
                 'input_role' => $name,
@@ -46,13 +46,10 @@ class FilepondManager
         return '';
     }
 
-
-
-
-    public function deleteTemporaryAsset(Request $request)
+    public function deleteTemporaryFilepond(Request $request)
     {
 
-        $tmp_file = TemporaryAsset::where('folder_name', trim(request()->getContent()) )->first();
+        $tmp_file = TemporaryFilepond::where('folder_name', trim(request()->getContent()) )->first();
 
         if($tmp_file){
 
@@ -73,7 +70,7 @@ class FilepondManager
         if(Storage::exists($this->file_path . '/' . $folder)){
             $path = Storage::files($this->file_path . '/' . $folder)[0] ;
         }else{
-            $tmp_file = TemporaryAsset::where('folder', $folder)->first();
+            $tmp_file = TemporaryFilepond::where('folder', $folder)->first();
             $path= $this->tmp_file_path . $tmp_file->folder . '/' .$tmp_file->file;
         }
 
@@ -88,17 +85,15 @@ class FilepondManager
             ->response('jpg', 70);
     }
 
-
-
-    public function persistFile(TemporaryAsset $temp_asset, Model $model)
+    public function persistFile(TemporaryFilepond $temp_filepond, Model $model)
     {
-        $temporary_path = $this->tmp_file_path . $temp_asset->folder_name . '/' . $temp_asset->file_name;
+        $temporary_path = $this->tmp_file_path . $temp_filepond->folder_name . '/' . $temp_filepond->file_name;
 
-        $new_folder = $temp_asset->folder_name;
+        $new_folder = $temp_filepond->folder_name;
 
         if( Storage::exists($temporary_path) ){
 
-            $new_path = $this->file_path . $temp_asset->folder_name . '/'. $temp_asset->file_name;
+            $new_path = $this->file_path . $temp_filepond->folder_name . '/'. $temp_filepond->file_name;
 
             if( Storage::exists($new_path)){
                 Storage::delete($new_path);
@@ -108,12 +103,12 @@ class FilepondManager
 
             Storage::deleteDirectory( $temporary_path );
 
-            rmdir( Storage::path( $this->tmp_file_path . $temp_asset->folder_name ) );
+            rmdir( Storage::path( $this->tmp_file_path . $temp_filepond->folder_name ) );
 
 
-            $this->createAsset($model, $temp_asset);
-            $this->deleteFilePondFromSession($temp_asset);
-            $temp_asset->delete();
+            $this->createFilepond($model, $temp_filepond);
+            $this->deleteFilePondFromSession($temp_filepond);
+            $temp_filepond->delete();
 
             return $new_folder;
         }
@@ -122,30 +117,30 @@ class FilepondManager
 
     }
 
-    public function createAsset($object, $temp_asset)
+    public function createFilepond($object, $temp_filepond)
     {
-        $assetable_id = $object->id;
-        $assetable_type = get_class($object);
+        $filepondable_id = $object->id;
+        $filepondable_type = get_class($object);
 
-        Asset::create(
+        Filepond::create(
             [
-                'assetable_id' => $assetable_id,
-                'assetable_type' => $assetable_type,
-                'file_name' => $temp_asset->file_name,
-                'role' => $temp_asset->input_role,
-                'uuid' => $temp_asset->folder_name,
+                'filepondable_id' => $filepondable_id,
+                'filepondable_type' => $filepondable_type,
+                'file_name' => $temp_filepond->file_name,
+                'role' => $temp_filepond->input_role,
+                'uuid' => $temp_filepond->folder_name,
                 'locale' => 'tr',
             ]
         );
     }
 
-
-    public function saveFile($files, $object){
+    public function saveFile($files, $object)
+    {
 
         $fileFolderNames = array_column($files, 'folderName');
 
-        // files listesinde gelmeyip object->assets listesinde olanlari assets tablosundan ve storage'tan sil
-        foreach ($object->getAssets() as $file) {
+        // files listesinde gelmeyip object->fileponds listesinde olanlari fileponds tablosundan ve storage'tan sil
+        foreach ($object->fileponds as $file) {
             if (!in_array($file->uuid, $fileFolderNames)) {
                 $file->delete();
                 unset($files[array_search($file->uuid, $fileFolderNames)]);
@@ -154,12 +149,12 @@ class FilepondManager
 
         foreach ($files as $folder) {
 
-            if(!!$object->assets()->get()->select('uuid', $folder['folderName']) && Storage::exists($this->file_path .$folder['folderName'])){
+            if(!!$object->fileponds()->get()->select('uuid', $folder['folderName']) && Storage::exists($this->file_path .$folder['folderName'])){
                 continue;
             };
 
 
-            $tmp_file = TemporaryAsset::where('folder_name', $folder['folderName'])->first();
+            $tmp_file = TemporaryFilepond::where('folder_name', $folder['folderName'])->first();
 
             if(!!$tmp_file){
                 $this->persistFile($tmp_file, $object);
@@ -169,11 +164,12 @@ class FilepondManager
 
     }
 
-    public function deleteFile($folder){
+    public function deleteFile($folder)
+    {
         try {
             if( count( Storage::files($this->file_path . '/' . $folder)) > 0 ){
                 Storage::deleteDirectory($this->file_path . '/' . $folder);
-                Asset::where('uuid', $folder)->first()->delete();
+                Filepond::where('uuid', $folder)->first()->delete();
             }
         } catch (\Throwable $th) {
             dd( $folder, $this->file_path, $th, debug_backtrace() );
@@ -200,7 +196,7 @@ class FilepondManager
      *
      * @return void
      */
-    public function addFilePondToSession(TemporaryAsset $tmp_file)
+    public function addFilePondToSession(TemporaryFilepond $tmp_file)
     {
         Session::put("{$this->session_prefix}." . auth()->user()->id . "." . $tmp_file->input_role , $tmp_file->folder_name);
     }
@@ -212,7 +208,7 @@ class FilepondManager
      *
      * @return void
      */
-    public function deleteFilePondFromSession(TemporaryAsset $tmp_file)
+    public function deleteFilePondFromSession(TemporaryFilepond $tmp_file)
     {
         Session::forget("{$this->session_prefix}." . auth()->user()->id . $tmp_file->input_role , $tmp_file->folder_name);
     }
@@ -240,7 +236,8 @@ class FilepondManager
         //     })->toArray();
     }
 
-    public function getEncodedFile($folder){
+    public function getEncodedFile($folder)
+    {
 
         try {
             $path = Storage::files($this->file_path . '/' . $folder)[0];

@@ -2,9 +2,8 @@
 
 namespace Unusualify\Modularity\Entities;
 
-
-
-class TemporaryAsset extends Model{
+class TemporaryFilepond extends Model
+{
 
     protected $fillable = [
         'file_name',
@@ -20,7 +19,7 @@ class TemporaryAsset extends Model{
 
     public function getTable()
     {
-        return unusualConfig('tables.temporary_assets', parent::getTable());
+        return unusualConfig('tables.temporary_fileponds', parent::getTable());
     }
 }
 
