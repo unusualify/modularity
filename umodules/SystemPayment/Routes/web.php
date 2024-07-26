@@ -23,10 +23,7 @@ Route::middleware(['web.auth', 'unusual.core'])->group(function(){
     });
     Route::controller(PaymentController::class)->group(function(){
 
-        Route::get('/pay/package-country/{payment_service_id}/{price}', 'pay')->name('payment');
+        Route::get('/pay/{price}', 'pay')->name('payment');
     });
 
 });
-
-
-
