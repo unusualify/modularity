@@ -1,6 +1,5 @@
 {
     "PaymentService": true,
-    "Payment": true,
     "Payments": true,
     "Currency": true
 }

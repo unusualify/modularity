@@ -61,6 +61,11 @@ return [
                     'label' => 'Payment Service Slug',
                     'type' => 'text',
                 ],
+                [
+                    'name' => 'custom-input-credit-card-form',
+                    'label' => 'Credit Card',
+                    'type' => 'custom-input-credit-card-form'
+                ]
             ],
         ],
         'payment' => [
@@ -123,74 +128,6 @@ return [
                 ],
             ],
         ],
-        'payment_test' => [
-            'name' => 'PaymentTest',
-            'headline' => 'Payment Tests',
-            'url' => 'payment-tests',
-            'route_name' => 'payment_test',
-            'icon' => '',
-            'title_column_key' => 'name',
-            'table_options' => [
-                'createOnModal' => true,
-                'editOnModal' => true,
-                'isRowEditing' => false,
-                'rowActionsType' => 'inline',
-            ],
-            'headers' => [
-                [
-                    'title' => 'Name',
-                    'key' => 'name',
-                    'formatter' => [
-                        'edit',
-                    ],
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Payment Service',
-                    'key' => 'paymentService',
-                ],
-                [
-                    'title' => 'System Payment Parent',
-                    'key' => 'systemPaymentable',
-                ],
-                [
-                    'title' => 'Created Time',
-                    'key' => 'created_at',
-                    'formatter' => [
-                        'date',
-                        'long',
-                    ],
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Actions',
-                    'key' => 'actions',
-                    'sortable' => false,
-                ],
-            ],
-            'inputs' => [
-                [
-                    'name' => 'name',
-                    'label' => 'Name',
-                    'type' => 'text',
-                ],
-                [
-                    'type' => 'select',
-                    'name' => 'payment_service_id',
-                    'label' => 'Payment Service',
-                    'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentServiceRepository',
-                    'rules' => 'sometimes|required',
-                ],
-                [
-                    'type' => 'morphTo',
-                    'name' => 'SystemPayment',
-                    'label' => 'System Payment',
-                    'schema' => [
-                    ],
-                    'rules' => 'sometimes|required',
-                ],
-            ],
-        ],
         'currency' => [
             'name' => 'Currency',
             'headline' => 'Currencies',
@@ -248,4 +185,3 @@ return [
     ],
 ];
 
-    
