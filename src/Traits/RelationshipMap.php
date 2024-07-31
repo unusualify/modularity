@@ -3,11 +3,13 @@ namespace Unusualify\Modularity\Traits;
 
 use Astrotomic\Translatable\Traits\Relationship;
 use Illuminate\Support\Arr;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\UFinder;
 
 use function Laravel\Prompts\select;
 
-trait RelationshipMap {
+trait RelationshipMap
+{
 
     use ManageNames, RelationshipArguments;
 
@@ -31,6 +33,8 @@ trait RelationshipMap {
         'hasManyThrough' => 'hasOneThrough',
     ];
 
+
+    protected $modelClasses = [];
 
     /**
      *
@@ -168,6 +172,7 @@ trait RelationshipMap {
 
         $schemas = explode(',', $relationship);
         $lastModel = null;
+        $lastIndex = null;
 
         foreach ($schemas as $index => $schema) {
             $schematic = explode($this->propsDelimeter, $schema);
@@ -192,6 +197,12 @@ trait RelationshipMap {
                             label: "Select reverse relationship of belongsTo on '{$modelName}' model?",
                             options: ['hasMany', 'hasOne']
                         );
+                    }else if($relationshipName == 'morphTo'){
+                        $modelName = studlyName($this->getRelatedMethodName($relationshipName, $schema));
+                        $reverseRelationshipName = select(
+                            label: "Select reverse relationship of morphTo on '{$modelName}' model?",
+                            options: ['morphMany', 'morphOne']
+                        );
                     }
 
                     switch ($reverseRelationshipName) {
@@ -199,133 +210,72 @@ trait RelationshipMap {
                             [$modelName, $intermediateName, $localKey, $secondLocalKey, $firstKey, $secondKey] = array_slice(explode(':', $schema),1);
                             $methodName = $this->getPlural($this->getCamelCase($this->model));
 
-                            $targetModel = '';
-                            $intermediateModel = '';
+                            $targetModelClass = $this->getModelClass($this->model, $relationshipName);
+                            $intermediateModelClass = $this->getModelClass($intermediateName, $relationshipName);
 
-                            try {
-                                //code...
-                                $targetModel = ($targetModel = UFinder::getRouteModel($this->model))
-                                    ? $targetModel
-                                    : get_class(UFinder::getRouteRepository($this->model, asClass: true)->getModel());
-                            } catch (\Throwable $th) {
-                                if($test){
-                                    $targetModel = $this->getStudlyName($this->model) . '_Sample';
-                                }else{
-                                    throw $th;
-                                }
-                            }
-
-                            try {
-                                //code...
-                                $intermediateModel = ($intermediateModel = UFinder::getRouteModel($intermediateName))
-                                    ? $intermediateModel
-                                    : get_class(UFinder::getRouteRepository($intermediateName, asClass: true)->getModel());
-                            } catch (\Throwable $th) {
-                                if($test){
-                                    $intermediateModel = $this->getStudlyName($intermediateName) . '_Sample';
-                                }else{
-                                    throw $th;
-                                }
-                            }
-
-
-
-                            $data[$this->getStudlyName($modelName)] = $this->relationshipFormat(
-                                modelName:$modelName,
+                            $data[] = $this->relationshipFormat(
+                                modelName: $modelName,
                                 methodName: $methodName,
                                 relationshipName: $reverseRelationshipName,
                                 arguments: [
-                                    "\\" . $targetModel . "::class",
-                                    "\\".$intermediateModel."::class",
+                                    "\\" . $targetModelClass . "::class",
+                                    "\\".$intermediateModelClass ."::class",
                                     "'{$this->getSnakeCase($modelName)}_id'",
                                     "'{$this->getSnakeCase($intermediateName)}_id'",
                                     "'id'",
                                     "'id'",
                                 ]
-                                );
-                            break;
+                            ) + [ 'model_class' => $targetModelClass];
 
+                        break;
                         case 'hasOneThrough':
                             $methodName = $this->getSingular($this->getCamelCase($this->model));
                             [$modelName, $intermediateName, $localKey, $secondLocalKey, $firstKey, $secondKey] = array_slice(explode(':', $schema),1);
 
-                            $targetModel = '';
-                            $intermediateModel = '';
-                            try {
-                                //code...
-                                $targetModel = ($targetModel = UFinder::getRouteModel($this->model))
-                                    ? $targetModel
-                                    : get_class(UFinder::getRouteRepository($this->model, asClass: true)->getModel());
-                            } catch (\Throwable $th) {
-                                if($test){
-                                    $targetModel = $this->getStudlyName($this->model) . '_Sample';
-                                }else{
-                                    throw $th;
-                                }
-                            }
+                            $targetModelClass = $this->getModelClass($this->model, $relationshipName);
+                            $intermediateModelClass = $this->getModelClass($intermediateName, $relationshipName);
 
-                            try {
-                                //code...
-                                $intermediateModel = ($intermediateModel = UFinder::getRouteModel($intermediateName))
-                                    ? $intermediateModel
-                                    : get_class(UFinder::getRouteRepository($intermediateName, asClass: true)->getModel());
-                            } catch (\Throwable $th) {
-                                if($test){
-                                    $intermediateModel = $this->getStudlyName($intermediateName) . '_Sample';
-                                }else{
-                                    throw $th;
-                                }
-                            }
 
-                            $data[$this->getStudlyName($modelName)] = $this->relationshipFormat(
+                            $data[] = $this->relationshipFormat(
                                 modelName: $modelName,
                                 methodName: $methodName,
                                 relationshipName: $reverseRelationshipName,
                                 arguments: [
-                                    "\\".$targetModel."::class",
-                                    "\\".$intermediateModel."::class",
+                                    "\\".$targetModelClass."::class",
+                                    "\\".$intermediateModelClass."::class",
                                     "'id'",
                                     "'id'",
                                     "'{$this->getSnakeCase($intermediateName)}_id'",
                                     "'{$this->getSnakeCase($this->model)}_id'",
                                 ]
-                            );
-                            break;
-
+                            ) + [ 'model_class' => $targetModelClass];
+                        break;
                         case 'morphMany':
-                            $relatedMethodName = $this->getPlural($this->getCamelCase($this->model));
-                            $targetModelClass = '';
-
-                            try {
-                                //code...
-                                $targetModelClass = ($targetModelClass = UFinder::getRouteModel($this->model))
-                                    ? $targetModelClass
-                                    : get_class(UFinder::getRouteRepository($this->model, asClass: true)->getModel());
-                            } catch (\Throwable $th) {
-                                if($test){
-                                    $targetModelClass = $this->getStudlyName($this->model) . '_Sample';
-                                }else{
-                                    throw $th;
-                                }
-                            }
+                        case 'morphOne':
+                            $relatedMethodName = $this->getRelatedMethodName($reverseRelationshipName, $schema);
+                            $parentModelClass = $this->getModelClass($this->model);
 
                             $nameArgument = snakeCase(singularize($relatedMethodName));
-
-                            if($targetModelClass){
+                            if($parentModelClass){
                                 foreach ($props as $key => $targetName) {
                                     // $targetName = $this->getRelatedMethodName($relationshipName, $schema);
                                     $targetModelName = $this->getStudlyName(singularize($targetName));
+                                    $targetModelClass = $this->getModelClass($targetModelName, $relationshipName);
+
                                     $reverseSchema = "{$reverseRelationshipName}:{$this->getStudlyName($this->model)}:{$nameArgument}";
                                     $arguments = $this->getRelationshipArguments($reverseRelationshipName, $reverseSchema);
 
-                                    $data[$targetModelName] = $this->relationshipFormat($targetModelName, $relatedMethodName, $reverseRelationshipName, $arguments);
+                                    $data[] = ['model_class' => $targetModelClass]
+                                        + $this->relationshipFormat($targetModelName, $relatedMethodName, $reverseRelationshipName, $arguments);
                                 }
                             }
 
-                            break;
+                        break;
                         case 'morphedByMany':
                             $targetName = $this->getRelatedMethodName($relationshipName, $schema);
                             $targetModelName = $this->getStudlyName( singularize($targetName) );
+
+                            $targetModelClass = $this->getModelClass($targetModelName, $relationshipName);
 
                             $nameArgument = snakeCase($targetName);
                             $reverseSchema = "{$reverseRelationshipName}:{$this->getStudlyName($this->model)}:{$nameArgument}";
@@ -334,13 +284,15 @@ trait RelationshipMap {
                             $arguments = $this->getRelationshipArguments($relationshipName, $reverseSchema);
                             $chainMethods = [];
 
-                            $data[$targetModelName] = $this->relationshipFormat($targetName, $relatedMethodName, $reverseRelationshipName, $arguments, $chainMethods);
+                            $data[] = ['model_class' => $targetModelClass]
+                                + $this->relationshipFormat($targetName, $relatedMethodName, $reverseRelationshipName, $arguments, $chainMethods);
 
-                            break;
+                        break;
                         case 'belongsToMany':
                             // $targetName = $this->getRelatedMethodName($relationshipName, $schema);
                             $targetName = $this->getSingular($this->getRelatedMethodName($relationshipName, $schema));
                             $targetModelName = $this->getStudlyName(singularize($targetName));
+                            $targetModelClass = $this->getModelClass($targetModelName, $relationshipName);
 
                             $chainMethods = [];
                             // dd(
@@ -375,23 +327,27 @@ trait RelationshipMap {
                             // $methodName = $this->getPlural($this->getCamelCase($this->model));
                             $lastModel = $targetModelName;
 
-                            $data[$targetModelName] = $this->relationshipFormat($targetModelName, $relatedMethodName, $reverseRelationshipName, $arguments, $chainMethods);
+                            $data[] = ['model_class' => $targetModelClass]
+                                + $this->relationshipFormat($targetModelName, $relatedMethodName, $reverseRelationshipName, $arguments, $chainMethods);
 
-                            break;
+                            $lastIndex = count($data) - 1;
 
+                        break;
                         default:
                             $targetName = $this->getRelatedMethodName($relationshipName, $schema);
                             $targetModelName = $this->getStudlyName(singularize($targetName));
 
+                            $targetModelClass = $this->getModelClass($targetModelName, $relationshipName);
+
+                            // dd($this->modelClasses, $targetName, $targetModelName, $relationshipName, $reverseRelationshipName);
                             $reverseSchema = "{$reverseRelationshipName}:{$this->getStudlyName($this->model)}";
                             $relationshipName = $reverseRelationshipName;
                             $relatedMethodName = $this->getRelatedMethodName($relationshipName, $reverseSchema);
                             $arguments = $this->getRelationshipArguments($relationshipName, $reverseSchema);
                             $chainMethods = [];
+                            $data[] = $this->relationshipFormat($targetModelName, $relatedMethodName, $reverseRelationshipName, $arguments, $chainMethods) + ['model_class' => $targetModelClass];
 
-                            $data[$targetModelName] = $this->relationshipFormat($targetModelName, $relatedMethodName, $reverseRelationshipName, $arguments, $chainMethods);
-
-                            break;
+                        break;
                     }
                 }
 
@@ -403,7 +359,7 @@ trait RelationshipMap {
                 // );
                 if($data[$lastModel]['relationship_method'] == 'belongsToMany' && count($data[$lastModel]['chain_methods']) > 0){
                     $chainIndex = count($data[$lastModel]['chain_methods'])-1;
-                    $data[$lastModel]['chain_methods'][$chainIndex]['arguments'][] = "'{$this->getMethodName($schema)}'";
+                    $data[$lastIndex]['chain_methods'][$chainIndex]['arguments'][] = "'{$this->getMethodName($schema)}'";
                 }
             }
         }
@@ -415,8 +371,7 @@ trait RelationshipMap {
     {
         $relationshipType = $relationshipName;
 
-        if($relationshipType == 'morphedByMany')
-            $relationshipType = 'morphToMany';
+        if($relationshipType == 'morphedByMany') $relationshipType = 'morphToMany';
 
         return [
             'model_name' => $this->getStudlyName( singularize($modelName) ),
@@ -489,16 +444,12 @@ trait RelationshipMap {
             case 'morphTo':
                 $relatedMethodName = $this->getMorphToMethodName($this->model);
                 break;
+            case 'morphOne':
+                $relatedMethodName = $this->getSingular($this->getCamelCase($this->model));
+                break;
             case 'morphMany':
-                $position = $parameters['related']['position'];
-                // dd(
-                //     $relationshipName,
-                //     $arguments,
-                //     $this->model,
-                //     $this->getSingular($arguments[$position])
-
-                // );
-                $relatedMethodName = $this->getPlural($arguments[$position]);
+                // $relatedMethodName = $this->getPlural($arguments[$position]);
+                $relatedMethodName = $this->getPlural($this->getCamelCase($this->model));
                 break;
             case 'belongsTo':
             case 'hasOne':
@@ -593,22 +544,14 @@ trait RelationshipMap {
 
         switch ($parameterName) {
             case 'related':
-                try {
-                    $related = ($related = UFinder::getRouteModel($argument))
-                        ? $related
-                        : get_class(UFinder::getRouteRepository($argument, asClass: true)->getModel());
-                } catch (\Throwable $th) {
-                    $related = $this->getStudlyName($argument);
-                }
-
+                $related = $this->getModelClass($argument, $relationshipName);
                 $formattedArgument = "\\" . $related . "::class";
 
                 break;
             case 'through':
-                $through = ($through = UFinder::getRouteModel($argument))
-                    ? $through
-                    : get_class(UFinder::getRouteRepository($argument, asClass: true)->getModel());
+                $through = $this->getModelClass($argument, $relationshipName);
                 $formattedArgument = "\\" . $through . "::class";
+
                 break;
             case 'name':
                 switch ($relationshipName) {
@@ -620,6 +563,7 @@ trait RelationshipMap {
                         break;
                     case 'morphedByMany':
                     case 'morphMany':
+                    case 'morphOne':
                         $argument = makeMorphName($argument);
                         $formattedArgument = "'{$argument}'";
                         break;
@@ -671,6 +615,9 @@ trait RelationshipMap {
             case 'morphMany':
                 $comment =  $this->commentStructure(["Get the all of the {$model}'s {$attr['relationship_name']}"]);
                 break;
+            case 'morphOne':
+                $comment =  $this->commentStructure(["Get the {$model}'s {$attr['relationship_name']}"]);
+                break;
             case 'morphToMany':
                 $comment =  $this->commentStructure(["Get the all of {$attr['relationship_name']} for the {$model}"]);
                 break;
@@ -703,6 +650,28 @@ trait RelationshipMap {
             return $carry;
         }, '');
         return "\t/**\n\t * {$message}\n\t */";
+    }
+
+    public function getModelClass(string $str, $relationship = null)
+    {
+        $possibles = array_unique(array_merge(UFinder::getPossibleModels($str),Modularity::getModels($str)), SORT_REGULAR);
+
+        $class = $this->getStudlyName($str);
+
+        if($relationship && isset($this->modelClasses[$relationship]) && isset($this->modelClasses[$relationship][$str])){
+            $class = $this->modelClasses[$relationship][$str];
+        }else if(count($possibles) == 1){
+            $class = array_shift($possibles);
+            $this->modelClasses[$relationship][$str] = $class;
+        }else if( count($possibles) > 1 ){
+            $class = select(
+                label: "We found multiple classes for the {$str} model, please select a model from possible model classes",
+                options: $possibles
+            );
+            $this->modelClasses[$relationship][$str] = $class;
+        }
+
+        return $class;
     }
 
 }
