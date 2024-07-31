@@ -33,7 +33,8 @@ trait ManageTraits {
         });
     }
 
-    public function inputs() {
+    public function inputs()
+    {
         $moduleName = $this->moduleName();
 
         $routeName = $this->routeName();
@@ -50,7 +51,8 @@ trait ManageTraits {
         return !empty($conf = $this->routeConfig()) ? $conf['inputs'] : [];
     }
 
-    public function hasTranslatedInput($schema = []) {
+    public function hasTranslatedInput($schema = [])
+    {
         $hasTranslated = false;
 
         foreach ((count($schema) ? $schema : $this->inputs()) as $input) {
@@ -63,7 +65,8 @@ trait ManageTraits {
         return $hasTranslated;
     }
 
-    public function chunkInputs($schema = null, $all = false) {
+    public function chunkInputs($schema = null, $all = false)
+    {
         return Arr::mapWithKeys($schema ?? $this->inputs(), function($input, $key) use($all){
             if(isset($input['type'])){
                 switch ($input['type']) {
@@ -113,13 +116,15 @@ trait ManageTraits {
         });
     }
 
-    public function model() {
+    public function model()
+    {
         $routeName = $this->routeName();
 
         return ($routeName && $repositoryClass = UFinder::getRouteRepository($routeName)) ? App::make($repositoryClass)?->getModel() : null;
     }
 
-    public function prepareFieldsBeforeSaveManageTraits($object, $fields) {
+    public function prepareFieldsBeforeSaveManageTraits($object, $fields)
+    {
 
         if(isset($fields['password'])){
             $fields['password'] = Hash::make($fields['password']);

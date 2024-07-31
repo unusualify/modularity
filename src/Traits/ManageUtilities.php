@@ -15,11 +15,13 @@ trait ManageUtilities {
 
     use ManageTable, ManageForm;
 
-    protected function __afterConstructManageUtilities($app, $request) {
+    protected function __afterConstructManageUtilities($app, $request)
+    {
 
     }
 
-    protected function __beforeConstructManageUtilities($app, $request) {
+    protected function __beforeConstructManageUtilities($app, $request)
+    {
         // $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
     }
 
@@ -366,13 +368,15 @@ trait ManageUtilities {
         return [];
     }
 
-    public function getViewLayoutVariables() {
+    public function getViewLayoutVariables()
+    {
         return [
             'pageTitle' => $this->getHeadline($this->routeName) . " Module"
         ];
     }
 
-    public function getNestedData() {
+    public function getNestedData()
+    {
 
         $result = Collection::make($this->getConfigFieldsByRoute('modules', []))->map(function($context, $key){
 

@@ -16,7 +16,8 @@ trait ManageForm {
 
     protected $formSchema;
 
-    protected function __beforeConstructManageForm($app, $request) {
+    protected function __beforeConstructManageForm($app, $request)
+    {
         $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
     }
 

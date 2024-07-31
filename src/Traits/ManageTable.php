@@ -34,7 +34,8 @@ trait ManageTable {
      */
     protected $tableAttributes = [];
 
-    protected function __afterConstructManageTable($app, $request) {
+    protected function __afterConstructManageTable($app, $request)
+    {
 
         /*
          * Available columns of the index view
