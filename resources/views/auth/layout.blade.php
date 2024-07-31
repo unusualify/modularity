@@ -52,7 +52,9 @@
             window['{{ unusualConfig('js_namespace') }}'] = {};
             window['{{ unusualConfig('js_namespace') }}'].LOCALE = '{{ unusualConfig('locale') }}';
             window['{{ unusualConfig('js_namespace') }}'].version = '{{ unusualConfig('version') }}';
-            window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {};
+            window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {
+                languages: @json(route('admin.api.languages.index'))
+            };
             window['{{ unusualConfig('js_namespace') }}'].STORE = {};
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.config = {
