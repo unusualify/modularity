@@ -261,14 +261,16 @@ trait ManageUtilities {
                 'hasSubmit' => true,
                 'stickyButton' => false,
                 'modelValue' => $this->repository->getFormFields($item, $schema),
-                // 'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => $this->routeName]),
                 'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => trans_choice('modules.'. snakeCase($this->routeName), 0)]),
-                // 'schema'  => $schema, // input fields to be used in unusual datatable component
-                // 'defaultItem' => collect($schema)->mapWithKeys(function($item, $key){
-                //     return [ $item['name'] => $item['default'] ?? ''];
-                //     $carry[$key] = $item->default ?? '';
-                // })->toArray(),
-                // 'actionUrl' => $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]),
+                '__removed' => [
+                    // 'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => $this->routeName]),
+                    // 'schema'  => $schema, // input fields to be used in unusual datatable component
+                    // 'defaultItem' => collect($schema)->mapWithKeys(function($item, $key){
+                    //     return [ $item['name'] => $item['default'] ?? ''];
+                    //     $carry[$key] = $item->default ?? '';
+                    // })->toArray(),
+                    // 'actionUrl' => $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]),
+                ]
             ],
             'endpoints' => [
                 (!!$itemId ? 'update' : 'store') => $itemId
@@ -277,34 +279,32 @@ trait ManageUtilities {
             ] + $this->getUrls(),
             'formStore' => [
                 'inputs' => $schema,
-                // 'inputs' => $this->repository->getFormFields($item, $schema),
-            ]
+            ],
 
-            // 'editable' => !!$itemId,
+            '__old' => [
+                // 'editable' => !!$itemId,
+                // 'moduleName' => $this->moduleName,
+                // 'routeName' => $this->routeName,
+                // 'routePrefix' => $this->routePrefix,
+                // 'titleFormKey' => $this->titleFormKey ?? $this->titleColumnKey,
+                // 'publish' => $item->canPublish ?? true,
+                // 'publishDate24Hr' => Config::get('twill.publish_date_24h') ?? false,
+                // 'publishDateFormat' => Config::get('twill.publish_date_format') ?? null,
+                // 'publishDateDisplayFormat' => Config::get('twill.publish_date_display_format') ?? null,
+                // 'translate' => $this->routeHasTrait('translations'),
+                // 'translateTitle' => $this->titleIsTranslatable(),
+                // 'permalink' => $this->getIndexOption('permalink'),
+                // 'createWithoutModal' => ! $itemId && $this->getIndexOption('skipCreateModal'),
+                // 'form_fields' => $this->repository->getFormFields($item),
+                // 'baseUrl' => $baseUrl ?? '',
+                // 'localizedPermalinkBase'=>$localizedPermalinkBase ?? '',
+                // 'permalinkPrefix' => $this->getPermalinkPrefix($baseUrl ?? ''),
+                // 'editor' => Config::get('twill.enabled.block-editor') && $this->routeHasTrait('blocks') && ! $this->disableEditor,
+                // 'blockPreviewUrl' => Route::has('admin.blocks.preview') ? URL::route('admin.blocks.preview') : '#',
+                // 'availableRepeaters' => $this->getRepeaterList()->toJson(),
+                // 'revisions' => $this->routeHasTrait('revisions') ? $item->revisionsArray() : null,
+            ],
 
-            // 'moduleName' => $this->moduleName,
-            // 'routeName' => $this->routeName,
-            // 'routePrefix' => $this->routePrefix,
-            // 'titleFormKey' => $this->titleFormKey ?? $this->titleColumnKey,
-
-
-            // 'publish' => $item->canPublish ?? true,
-            // 'publishDate24Hr' => Config::get('twill.publish_date_24h') ?? false,
-            // 'publishDateFormat' => Config::get('twill.publish_date_format') ?? null,
-            // 'publishDateDisplayFormat' => Config::get('twill.publish_date_display_format') ?? null,
-            // 'translate' => $this->routeHasTrait('translations'),
-            // 'translateTitle' => $this->titleIsTranslatable(),
-            // 'permalink' => $this->getIndexOption('permalink'),
-            // 'createWithoutModal' => ! $itemId && $this->getIndexOption('skipCreateModal'),
-            // 'form_fields' => $this->repository->getFormFields($item),
-            // 'baseUrl' => $baseUrl ?? '',
-            // 'localizedPermalinkBase'=>$localizedPermalinkBase ?? '',
-            // 'permalinkPrefix' => $this->getPermalinkPrefix($baseUrl ?? ''),
-
-            // 'editor' => Config::get('twill.enabled.block-editor') && $this->routeHasTrait('blocks') && ! $this->disableEditor,
-            // 'blockPreviewUrl' => Route::has('admin.blocks.preview') ? URL::route('admin.blocks.preview') : '#',
-            // 'availableRepeaters' => $this->getRepeaterList()->toJson(),
-            // 'revisions' => $this->routeHasTrait('revisions') ? $item->revisionsArray() : null,
         ] + (Route::has($previewRouteName) && $itemId ? [
             'previewUrl' => moduleRoute($this->moduleName, $this->routePrefix, 'preview', [$itemId]),
         ] : [])
