@@ -91,16 +91,16 @@
             <v-spacer v-else-if="hideSearchField"></v-spacer>
 
             <v-btn
-              id="filter-btn-activator"
               v-if="mainFilters.length > 0"
+              id="filter-btn-activator"
               v-bind="{...filterBtnOptions, ...filterBtnTitle}"
               />
 
             <v-btn
+              v-if="Object.keys(advancedFilters).length > 0"
               id="advanced-filter-btn"
               v-bind="{...filterBtnOptions, ...filterBtnTitle}"
               text="Advanced Filter"
-              v-if="advancedFilters.length > 0"
             />
 
             <v-btn v-if="can('create') && !noForm && !someSelected" v-bind="addBtnOptions" @click="createForm" :text="addBtnTitle"/>
