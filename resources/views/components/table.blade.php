@@ -7,7 +7,7 @@
             'hideDefaultFooter' => false,
             'createOnModal' => true,
             'editOnModal' => true,
-            'embeddedForm' => true,
+            'embeddedForm' => false,
             'formWidth' => '60%',
             // 'showSelect' => true,
         ];
