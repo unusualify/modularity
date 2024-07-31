@@ -157,6 +157,11 @@ class Finder
         return false;
     }
 
+    public function getPossibleModels($routeName) :array
+    {
+        return $this->getAllModels()->filter(fn($model) => get_class_short_name($model) == $routeName)->values()->toArray();
+    }
+
     public function getClasses($path)
     {
         $classes = [];
@@ -177,7 +182,7 @@ class Finder
         // load classes composer knows about
         $autoload = include base_path('/vendor/composer/autoload_classmap.php');
         $models = [];
-        dd($autoload);
+        // dd($autoload);
         foreach ($autoload as $className => $path) {
             // skip if we are not in the root namespace, ie App\, to ignore other vendor packages, of which there are a lot (dd($autoload) to see)
             try {
@@ -185,9 +190,31 @@ class Finder
                     continue;
                 }
                 // check if class is extending Model
-                if (is_subclass_of($className, "Illuminate\Database\Eloquent\Model")) {
+                if( !preg_match('/vendor\/unusualify\//', $path) && preg_match('/vendor\//', $path))
+                    continue;
+
+                $reflection = new \ReflectionClass($className);
+                // dd(
+                //     // get_class_methods($reflection),
+
+                //     $reflection->getName(),
+                //     $reflection->isUserDefined(),
+                //     $reflection->isTrait(),
+                //     $reflection->isAbstract(),
+                //     $reflection->isSubclassOf("Illuminate\Database\Eloquent\Model"),
+                //     // $reflection->getParentClass(),
+                // );
+                if(
+                    $reflection->isUserDefined()
+                    && !$reflection->isTrait()
+                    && !$reflection->isAbstract()
+                    && $reflection->isSubclassOf("Illuminate\Database\Eloquent\Model")
+                ){
+                    // dd($reflection->getName());
                     $models[] = $className;
                 }
+                // if (is_subclass_of($className, "Illuminate\Database\Eloquent\Model")) {
+                // }
             } catch (\Throwable $th) {
                 //throw $th;
             }
