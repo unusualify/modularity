@@ -20,7 +20,7 @@
         "@php artisan u:m:m ModTest",
         "@php artisan u:m:r ModTest ModOne --no-defaults",
         "@php artisan u:m:r ModTest ModTwo --no-defaults",
-        "@php artisan u:m:r ModTest ModTest --relationships='ModTest:morphTo:ModOne:ModTwo' --no-defaults --test",
+        "@php artisan u:m:r ModTest ModTest --schema='ModTest:morphTo:ModOne:ModTwo' --no-defaults --test",
         "@php artisan unusual:remove:module ModTest"
     ],
     "modularity-test-route-morphToMany": [
