@@ -11,11 +11,11 @@ class $CLASS$ extends $BASE_CONTROLLER$
     /**
      * @var string
      */
-     protected $moduleName = '$STUDLY_MODULE_NAME$';
+    protected $moduleName = '$STUDLY_MODULE_NAME$';
 
     /**
      * @var string
      */
-     protected $routeName = '$ROUTE_NAME$';
+    protected $routeName = '$ROUTE_NAME$';
 
 }
