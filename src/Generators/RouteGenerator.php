@@ -96,6 +96,13 @@ class RouteGenerator extends Generator
     protected $migrate = true;
 
     /**
+     * Migration status.
+     *
+     * @var bool
+     */
+    protected $migration = true;
+
+    /**
      * Plain Status.
      *
      * @var bool
@@ -435,6 +442,20 @@ class RouteGenerator extends Generator
     public function setMigrate($notMigrate)
     {
         $this->migrate = !$notMigrate;
+
+        return $this;
+    }
+
+    /**
+     * Set migrate status.
+     *
+     * @param bool|int $notMigrate
+     *
+     * @return $this
+     */
+    public function setMigration($notMigration)
+    {
+        $this->migration = !$notMigration;
 
         return $this;
     }
@@ -809,18 +830,19 @@ class RouteGenerator extends Generator
                         + ['--test' => $this->getTest()]
                 );
             }
-        } else {
-            if (!$this->module->isFileExists("add_{$tableName}_table")) {
+        } else if($this->migration){
+            if (!$this->module->isFileExists("add_{$tableName}_table") && !$this->fix) {
                 $this->console->call(
                     'unusual:make:migration',
                     [
                         'module' => $this->module->getStudlyName(),
                         'name' => "add_{$tableName}_table",
                     ]
-                        + ($this->schema ?  ['--fields' => $this->schema] : [])
-                        + (!$this->useDefaults ?  ['--no-defaults' => true] : [])
-                        + $console_traits
-                        + ['--test' => $this->getTest()]
+                    + ($this->schema ?  ['--fields' => $this->schema] : [])
+                    + (!$this->useDefaults ?  ['--no-defaults' => true] : [])
+                    + $console_traits
+                    + ['--table-name' => $tableName]
+                    + ['--test' => $this->getTest()]
                 );
             }
         }
@@ -1392,7 +1414,7 @@ class RouteGenerator extends Generator
                         + ['--test' => $this->getTest()]
                     );
                 }
-            }else{
+            }else if($this->migration){
                 if (!$this->module->isFileExists("add_{$tableName}_table") && !$this->fix) {
                     $this->console->call(
                         'unusual:make:migration',
