@@ -42,7 +42,7 @@
             <slot :name="getTypeItemSlot(obj)" v-bind= "{ obj, index, id }">
               <!-- slot replaces complete item of defined KEY -> <div slot="slot-item-key-[propertyName]">-->
               <slot :name="getKeyItemSlot(obj)" v-bind= "{ obj, index, id }">
-              <!-- RADIO -->
+                <!-- RADIO -->
                 <v-radio-group v-if="obj.schema.type === 'radio'"
                   v-bind="bindSchema(obj)"
                   :modelValue="setValue(obj)"
@@ -57,9 +57,9 @@
                     <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]><slot :name= "getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, idx, option }"/></template>
                   </v-radio>
                 </v-radio-group>
-              <!-- END RADIO -->
+                <!-- END RADIO -->
 
-              <!-- DATE, TIME, COLOR TEXT-MENU -->
+                <!-- DATE, TIME, COLOR TEXT-MENU -->
                 <v-menu v-else-if="isDateTimeColorTypeAndExtensionText(obj)"
                   v-bind="bindSchemaMenu(obj)"
                 >
@@ -88,9 +88,9 @@
                     @click:second="onEvent({type:'click'}, obj, second)"
                   />
                 </v-menu>
-              <!-- END DATE, TIME, COLOR TEXT-MENU -->
+                <!-- END DATE, TIME, COLOR TEXT-MENU -->
 
-              <!-- ARRAY -->
+                <!-- ARRAY -->
                 <template v-else-if="obj.schema.type === 'array'">
                   <div
                     v-for="(item, idx) in setValue(obj)"
@@ -118,13 +118,18 @@
                     <slot :name="getArrayBottomSlot(obj)" v-bind= "{ obj, id, index, idx, item}"/>
                   </div>
                 </template>
-              <!-- END ARRAY -->
+                <!-- END ARRAY -->
 
-              <!-- GROUP | WRAP-->
+                <!-- GROUP | WRAP-->
                 <template v-else-if="/^(wrap|group)$/.test(obj.schema.type)">
+                  <component
+                    :is="checkInternGroupType(obj)"
+                    v-bind="bindSchema(obj)"
+                    @click="onEvent($event, obj)"
+                  >
                     <!-- <v-card-title v-if="obj.schema.title">{{obj.schema.title}}</v-card-title>
                     <v-card-subtitle v-if="obj.schema.subtitle">{{obj.schema.subtitle}}</v-card-subtitle>  -->
-                    <ue-title class="text-overline mb-1 pa-0" v-if="obj.schema.title">{{obj.schema.title}}</ue-title>
+                    <ue-title no-upper-case no-bold class="text-overline mb-theme-semi pa-0" v-if="obj.schema.title">{{obj.schema.title}}</ue-title>
                     <v-custom-form-base
                       :id="`${id}-${obj.key}`"
                       :modelValue="setValue(obj)"
@@ -137,23 +142,11 @@
                       <!-- Based on https://gist.github.com/loilo/73c55ed04917ecf5d682ec70a2a1b8e2 -->
                       <template v-for="(_, name) in $slots" #[name]="slotData"><slot :name="name" v-bind= "{ id, obj, index,  ...slotData}" /></template>
                     </v-custom-form-base>
-                  <!-- <v-card>
-                    <v-card-item class="pa-0">
-                      <div>
-                      </div>
-                    </v-card-item>
-
-                  </v-card> -->
-                  <!-- <component
-                    :is="checkInternGroupType(obj)"
-                    v-bind="bindSchema(obj)"
-                    @click="onEvent($event, obj)"
-                  >
-                  </component> -->
+                  </component>
                 </template>
-              <!-- END GROUP | WRAP -->
+                <!-- END GROUP | WRAP -->
 
-              <!-- TREEVIEW -->
+                <!-- TREEVIEW -->
                 <component v-else-if="obj.schema.type === treeview"
                   v-bind:is="v-treeview"
 
@@ -171,10 +164,9 @@
                     <slot :name="getKeyInjectSlot(obj, s)" v-bind="{ id, obj, index,  ...slotData}" />
                   </template>
                 </component>
+                <!-- END TREEVIEW -->
 
-              <!-- END TREEVIEW -->
-
-              <!-- LIST -->
+                <!-- LIST -->
                 <template v-else-if="obj.schema.type === list"
                 >
                   <v-list>
@@ -215,9 +207,9 @@
                     </v-list>
                   </v-list>
                 </template>
-              <!-- END LIST -->
+                <!-- END LIST -->
 
-              <!-- CHECKBOX | SWITCH -->
+                <!-- CHECKBOX | SWITCH -->
                 <component v-else-if="/(switch|checkbox)/.test(obj.schema.type)"
                   :is="mapTypeToComponent(obj.schema.type)"
                   :modelValue="setValue(obj)"
@@ -227,9 +219,9 @@
                   <!-- component doesn't work with #[s]="slotData" " -->
                   <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index }"/></template>
                 </component>
-              <!-- END CHECKBOX | SWITCH -->
+                <!-- END CHECKBOX | SWITCH -->
 
-              <!-- FILE -->
+                <!-- FILE -->
                 <v-file-input v-else-if="obj.schema.type === 'file' "
                   v-bind="bindSchema(obj)"
                   :modelValue="setValue(obj)"
@@ -239,17 +231,17 @@
                 >
                   <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]="scopeData"><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, ...scopeData}" /></template>
                 </v-file-input>
-              <!-- END FILE -->
+                <!-- END FILE -->
 
-              <!-- ICON -->
+                <!-- ICON -->
                 <v-icon v-else-if="obj.schema.type === 'icon'"
                   v-bind="bindSchema(obj)"
                   v-text="getIconValue(obj)"
                   @click="onEvent($event, obj)"
                 />
-              <!-- END ICON -->
+                <!-- END ICON -->
 
-              <!-- SLIDER -->
+                <!-- SLIDER -->
                 <v-slider v-else-if="obj.schema.type === 'slider'"
                   v-bind="bindSchema(obj)"
                   @update:modelValue="onInput($event, obj)"
@@ -258,9 +250,9 @@
                   <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index }" /></template>
                   <!-- <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]="scopeData"><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, ...scopeData}" /></template> -->
                 </v-slider>
-              <!-- END SLIDER -->
+                <!-- END SLIDER -->
 
-              <!-- IMG -->
+                <!-- IMG -->
                 <v-img v-else-if="obj.schema.type === 'img'"
                   :src="getImageSource(obj)"
                   v-bind="bindSchema(obj)"
@@ -269,9 +261,9 @@
                   <!-- component doesn't work with #[s]="slotData" " -->
                   <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index }"/></template>
                 </v-img>
-              <!-- END IMG -->
+                <!-- END IMG -->
 
-              <!-- BTN-TOGGLE -->
+                <!-- BTN-TOGGLE -->
                 <v-btn-toggle v-else-if="obj.schema.type === 'btn-toggle'"
                   v-bind="bindSchema(obj)"
                   :modelValue="setValue(obj)"
@@ -289,9 +281,9 @@
                     {{ bindOptions(option).label }}
                   </v-btn>
                 </v-btn-toggle>
-              <!-- END BTN-TOGGLE -->
+                <!-- END BTN-TOGGLE -->
 
-              <!-- BTN -->
+                <!-- BTN -->
                 <v-btn v-else-if="obj.schema.type === 'btn'"
                   v-bind="bindSchema(obj)"
                   @click="onEvent($event, obj, button)"
@@ -306,7 +298,7 @@
                   </v-icon>
                   {{ obj.schema.label }}
                 </v-btn>
-              <!-- END BTN -->
+                <!-- END BTN -->
 
                 <v-custom-input-locale v-else-if="obj.schema.translated"
                   :type="mapTypeToComponent(obj.schema.type)"
@@ -317,7 +309,7 @@
 
                 </v-custom-input-locale>
 
-              <!-- MASK  -->
+                <!-- MASK  -->
                 <component v-else-if="obj.schema.mask"
                   :is="mapTypeToComponent(obj.schema.type)"
                   v-bind="bindSchema(obj)"
@@ -341,9 +333,9 @@
                   <!-- component doesn't work with #[s]="slotData" " -->
                   <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, model: valueIntern }"/></template>
                 </component>
-              <!-- END MASK -->
+                <!-- END MASK -->
 
-              <!-- DEFAULT all other Types -> typeToComponent -->
+                <!-- DEFAULT all other Types -> typeToComponent -->
                 <component v-else
                   :is="mapTypeToComponent(obj.schema.type)"
                   v-bind="bindSchema(obj)"
@@ -367,8 +359,8 @@
                 <template v-for="s in getInjectedScopedSlots(id, obj)" v-slot:[s]="slotData">
                   <slot :name= "getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, ...slotData,  model: valueIntern }"/>
                 </template>
-              </component>
-              <!-- END DEFAULT -->
+                </component>
+                <!-- END DEFAULT -->
               </slot>
             </slot>
 
@@ -625,7 +617,9 @@ export default {
     valueIntern () {
       // use <formbase :model="myData" />  ->  legacy code <formbase :modelValue="myData" />
       const model = this.model || this.modelValue
+
       this.updateArrayFromState(model, this.formSchema)
+
       return model
     },
     parent () {
@@ -662,7 +656,6 @@ export default {
     },
     formSchema: {
       get () {
-        // __log('formSchema getter', this.schema)
         return this.schema
       },
       set (val) {
@@ -673,6 +666,20 @@ export default {
     }
   },
   watch: {
+    schema: {
+      handler (value, oldValue) {
+        // __log('schema watch', value, oldValue)
+      },
+      deep: true
+    },
+    modelValue: {
+      handler (value, oldValue) {
+        if(JSON.stringify(Object.keys(value)) !== JSON.stringify(Object.keys(oldValue)) ){
+          this.rebuildArrays(this.valueIntern, this.formSchema)
+        }
+      },
+      deep: true
+    },
     // formSchema: function (newSchema, oldSchema) {
     //   // __log('formSchema watch', newSchema)
 
@@ -681,7 +688,7 @@ export default {
     //   this.formSchema = newSchema
     //   this.schema = newSchema
 
-    // }
+    // },
     // valueIntern: function (newVal, oldVal) {
     //   __log('valueIntern watch', newVal, oldVal)
     // }
@@ -1022,7 +1029,7 @@ export default {
     // Set Value
     setValue (obj, type) {
       // Use 'schema.toCtrl' Function for setting a modified Value
-      return (obj.schema.type === 'wrap' || obj.schema.type === 'group')
+      return (obj.schema.type === 'wrap')
         ? this.toCtrl({ value: this.storeStateData, obj, data: this.storeStateData, schema: this.storeStateSchema })
         : this.toCtrl({ value: obj.value, obj, data: this.storeStateData, schema: this.storeStateSchema })
     },
@@ -1325,10 +1332,6 @@ export default {
     }
   },
   created () {
-    // setInterval((self) => {
-    //   __log(self.flatCombinedArray)
-    // }, 5000, this)
-    // __log(this.formSchema)
     this.rebuildArrays(this.valueIntern, this.formSchema)
   }
 }
