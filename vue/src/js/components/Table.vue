@@ -490,22 +490,53 @@
             <v-progress-circular :indeterminate="loading" v-if="enableInfiniteScroll && loading"></v-progress-circular>
         </template>
 
-        <template v-slot:bodyx="bodySlotScope">
-          <tbody>
-            {{ $log(bodySlotScope.items) }}
-            <Draggable
-              :modelValue="elements"
-              item-key="position"
-              v-bind="dragOptions"
-              @update:modelValue="$log"
-              >
-              <template #item="itemSlot">
-                <VDataTableRow :index="itemSlot.index" :item="bodySlotScope.items[index]" :cellProps="$refs.datatable.cellProps"/>
-              </template>
-              <!-- <tr><td>{{ bodySlotScope.items[itemSlot.index].name }}</td></tr> -->
-            </Draggable>
-          </tbody>
+
+        <template v-slot:default v-if="draggable">
+          <thead>
+            <slot :name="headers">
+              <VDataTableHeaders :mobile="this.datatable.mobile">
+                <template v-for="(_, name) in this.datatable.$slots" v-slot:[name]="slotData">
+                  <slot :name="name" v-bind="slotData">
+                    <component
+                      :is="this.datatable.$slots[name]"
+                      v-bind="slotData"
+                    />
+                  </slot>
+
+                </template>
+              </VDataTableHeaders>
+            </slot>
+          </thead>
+
+          <Draggable
+            :model-value="elements"
+            item-key="position"
+            v-bind="dragOptions"
+            tag="tbody"
+            class="v-data-table__tbody"
+            @update:modelValue="sortElements"
+          >
+            <template #item="itemSlot">
+              <VDataTableRow :item="draggableItems[itemSlot.index]" :mobile="this.datatable.mobile">
+                <template v-for="(_, name) in this.datatable.$slots" v-slot:[name]="slotData">
+                  <slot :name="name" v-bind="slotData">
+                    <component
+                      :is="this.datatable.$slots[name]",
+                      v-bind="Object.assign(
+                        slotData,
+                        {
+                          item: elements[itemSlot.index]
+                        }
+                      )"
+                    />
+                  </slot>
+                </template>
+              </VDataTableRow>
+            </template>
+          </Draggable>
         </template>
+
+
       </v-data-table-server>
 
     </div>
@@ -533,7 +564,8 @@ export default {
   components: {
     ActiveTableItem,
     Draggable,
-    VDataTableRow
+    VDataTableRow,
+
   },
   props: {
     ...makeDraggableProps(),
@@ -541,7 +573,6 @@ export default {
     ...ignoreFormatters
   },
   setup (props, context) {
-
     return {
       ...useDraggable(props, context),
       ...useTable(props, context),
@@ -549,11 +580,16 @@ export default {
   },
   data () {
     return {
-
+      datatable: {},
     }
   },
   mounted () {
 
+    this.$nextTick(() => {
+      if (this.$refs.datatable) {
+        this.datatable = this.$refs.datatable;
+      }
+    });
     // __log(
     //   // this.$props,
     //   // _.omit(this.$props ?? {}, ['columns']),
@@ -566,7 +602,8 @@ export default {
   },
   methods: {
 
-  }
+  },
+
 }
 </script>
 
