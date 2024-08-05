@@ -2,12 +2,12 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
-use Kalnoy\Nestedset\NodeTrait;
+// use Kalnoy\Nestedset\NodeTrait;
 use Unusualify\Modularity\Entities\NestedsetCollection;
 
 trait HasNesting
 {
-    use NodeTrait;
+    // use NodeTrait;
 
     /**
      * Returns the combined slug for this item including all ancestors.

@@ -73,9 +73,18 @@ abstract class Repository
         $query = $this->model->with($this->formatWiths($query, $with));
 
         if( isset($scopes['searches']) && isset($scopes['search']) && is_array($scopes['searches']) ){
+            $translatedAttributes = $this->model->translatedAttributes ?? [];
 
-            $this->searchIn($query, $scopes, 'search', $scopes['searches']);
-            unset($scopes['searches']);
+            $searches = Arr::where($scopes['searches'], function (string|int $value, int $key) use($translatedAttributes){
+                return !in_array($value, $translatedAttributes);
+            });
+
+            $this->searchIn($query, $scopes, 'search', $searches);
+
+            $scope['searches'] = Arr::where($scopes['searches'], function (string|int $value, int $key) use($translatedAttributes){
+                return in_array($value, $translatedAttributes);
+            });
+            // unset($scopes['searches']);
         }
         // dd(
         //     $scopes,
@@ -87,6 +96,7 @@ abstract class Repository
 
         // );
         $query = $this->filter($query, $scopes);
+
         // $query = $this->filterBack($query, $scopes);
         $query = $this->order($query, $orders);
 
@@ -105,11 +115,14 @@ abstract class Repository
             //     $query->toSql(),
 
             // );
+
             return $query->paginate($perPage);
 
         } catch (\Throwable $th) {
             //throw $th;
             dd(
+
+                $query->toSql(),
                 $th,
                 debug_backtrace()
                 // $th,
@@ -880,6 +893,7 @@ abstract class Repository
             $this->$method($query, $scopes);
         }
 
+        unset($scopes['searches']);
         unset($scopes['search']);
 
         if (isset($scopes['exceptIds'])) {
@@ -1086,6 +1100,7 @@ abstract class Repository
      */
     public function searchIn($query, &$scopes, $scopeField, $orFields = [])
     {
+
         if (isset($scopes[$scopeField]) && is_string($scopes[$scopeField])) {
             $query->where(function ($query) use (&$scopes, $scopeField, $orFields) {
                 foreach ($orFields as $field) {

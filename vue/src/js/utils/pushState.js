@@ -57,3 +57,55 @@ export function replaceState (url) {
 export function getURLWithoutQuery () {
   return location.protocol + '//' + location.host + location.pathname
 }
+
+export function getParameters (url = window.location) {
+
+	// Create a params object
+	let params = {};
+
+	new URL(url).searchParams.forEach(function (val, key) {
+		if (params[key] !== undefined) {
+			if (!Array.isArray(params[key])) {
+				params[key] = [params[key]];
+			}
+			params[key].push(val);
+		} else {
+			params[key] = val;
+		}
+	});
+
+	return params;
+}
+
+export function serializeParameters(params, prefix) {
+  const query = Object.keys(params).map((key) => {
+    const value  = params[key];
+
+    if (params.constructor === Array)
+      key = `${prefix}[]`;
+    else if (params.constructor === Object)
+      key = (prefix ? `${prefix}[${key}]` : key);
+
+    if (typeof value === 'object')
+      return serializeQuery(value, key);
+    else
+      return `${key}=${encodeURIComponent(value)}`;
+  });
+
+  return [].concat.apply([], query).join('&');
+}
+
+export function addParametersToUrl(url, params, prefix) {
+  let string = ''
+  if(__isString(params)){
+    string = params
+  }else{
+    string = serializeParameters(params, prefix)
+  }
+
+  if(string.length > 0)
+      string = '?' + string
+
+  return url + string
+}
+

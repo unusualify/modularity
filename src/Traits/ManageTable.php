@@ -34,7 +34,8 @@ trait ManageTable {
      */
     protected $tableAttributes = [];
 
-    protected function __afterConstructManageTable($app, $request) {
+    protected function __afterConstructManageTable($app, $request)
+    {
 
         /*
          * Available columns of the index view
@@ -386,7 +387,8 @@ trait ManageTable {
         $header['key'] = preg_replace('/_relation|_timestamp/', '' ,$header['key']);
     }
 
-    protected function getTableAdvancedFilters(){
+    protected function getTableAdvancedFilters()
+    {
 
        $advancedFilters = [];
 
@@ -397,12 +399,13 @@ trait ManageTable {
                 }
 
                 return [$key => $filter];
-            })
-            ->toArray();
+            })->toArray();
+
         return $advancedFilters;
     }
 
-    protected function relationsFilterConfiguration($filter){
+    protected function relationsFilterConfiguration($filter)
+    {
         if(method_exists(__TRAIT__, $methodName = 'getTableAdvancedFilters'. $this->getStudlyName($filter['type']))){
             $filter = $this->$methodName($filter);
         }
@@ -410,7 +413,8 @@ trait ManageTable {
         return $filter;
     }
 
-    protected function detailFilterConfiguration($filter){
+    protected function detailFilterConfiguration($filter)
+    {
         if(method_exists(__TRAIT__, $methodName = 'getTableAdvancedFilters'. $this->getStudlyName($filter['type']))){
             $filter = $this->$methodName($filter);
         }
@@ -419,7 +423,8 @@ trait ManageTable {
     }
 
 
-    protected function getTableAdvancedFiltersSelect($filter){
+    protected function getTableAdvancedFiltersSelect($filter)
+    {
 
         $repository = App::make($filter['repository']);
         $items =  $repository->list()->map(function($value, $key){
@@ -434,7 +439,8 @@ trait ManageTable {
         return $filter;
     }
 
-    protected function getTableAdvancedFiltersDatePicker($filter){
+    protected function getTableAdvancedFiltersDatePicker($filter)
+    {
 
 
         $filter['componentOptions']['title'] ??= $this->getHeadline($filter['slug']);

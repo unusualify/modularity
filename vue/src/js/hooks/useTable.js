@@ -281,7 +281,7 @@ export default function useTable (props, context) {
 
     formIsValid: computed(function () {
       // __log(form?.value?.valid, form?.value)
-      return form?.value?.valid ?? null
+      return form?.value?.validModel ?? null
     }),
     mobileTableLayout: computed(() => {
       return isSmAndDown

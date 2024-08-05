@@ -2,7 +2,9 @@
 
 namespace Unusualify\Modularity;
 
+use Composer\ClassMapGenerator\ClassMapGenerator;
 use Illuminate\Container\Container;
+use Illuminate\Support\Facades\App;
 use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Json;
 use Illuminate\Support\Str;
@@ -157,6 +159,36 @@ class Modularity extends FileRepository
         }
 
         return false;
+    }
+
+    public function getModels($routeName)
+    {
+        $models = [];
+
+        foreach ($this->allEnabled() as $key => $module) {
+            $entityPath =  $module->getDirectoryPath('Entities');
+            if( !file_exists( $entityPath ) ) continue;
+
+            foreach($this->getClasses( $entityPath ) as $_class){
+                if(get_class_short_name(App::make($_class)) === studlyName($routeName)){
+                    $models[] = $_class;
+                }
+            }
+        }
+
+        return $models;
+    }
+
+    public function getClasses($path)
+    {
+        $classes = [];
+
+        foreach (ClassMapGenerator::createMap($path) as $class => $file)
+        {
+            $classes[] = $class;
+        }
+
+        return $classes;
     }
 
 }

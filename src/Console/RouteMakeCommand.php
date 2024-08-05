@@ -87,6 +87,7 @@ class RouteMakeCommand extends BaseCommand
             ->setRules($this->option('rules'))
             ->setRelationships($this->option('relationships'))
             ->setMigrate($this->option('no-migrate'))
+            ->setMigration($this->option('no-migration'))
             ->setUseDefaults($this->option('no-defaults'))
             ->setPlain($this->option('plain'))
             ->setCustomModel($this->option('custom-model'))
@@ -135,6 +136,7 @@ class RouteMakeCommand extends BaseCommand
             ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
             ['fix', null, InputOption::VALUE_NONE, 'Fixes the model config errors'],
             ['table-name', null, InputOption::VALUE_OPTIONAL, 'Sets table  name for custom model'],
+            ['no-migration', null, InputOption::VALUE_NONE, 'don\'t create migration file.'],
             ['test', null, InputOption::VALUE_NONE, 'Test the Route Generator'],
         ], unusualTraitOptions());
     }

@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Providers;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\Arr;
 use Unusualify\Modularity\Http\Controllers\GlideController;
 use Unusualify\Modularity\Facades\UnusualRoutes;
 use Unusualify\Modularity\Facades\Modularity;
@@ -156,28 +157,15 @@ class RouteServiceProvider extends ServiceProvider
         $routes_folder = GenerateConfigReader::read('routes')->getPath();
 
         foreach(Modularity::allEnabled() as $module){
-            $router->group([
-                    ...$groupOptions,
-                    ...[
-                        'middleware' => UnusualRoutes::webMiddlewares(),
-                        'namespace' => $module->getClassNamespace("{$controller_namespace}"),
-                    ]
-                ],
-                function ($router) use ($module) {
-                    Route::moduleRoutes($module);
-                }
-            );
-
             $_groupOptions = [
                 'prefix' => $module->fullPrefix(),
                 'as' => $module->fullRouteNamePrefix() . '.'
             ];
             // $_groupOptions['prefix'] = $module->fullPrefix();
             // $_groupOptions['as'] = $module->fullRouteNamePrefix() . '.';
-
             UnusualRoutes::registerRoutes(
                 $router,
-                $_groupOptions,
+                [ ...$_groupOptions, ...(Arr::only($groupOptions, ['domain'])) ],
                 ['web'], //$middlewares,
                 $module->getClassNamespace("{$controller_namespace}"),
                 $module->getDirectoryPath("{$routes_folder}/web.php"),
@@ -199,6 +187,20 @@ class RouteServiceProvider extends ServiceProvider
                 $module->getDirectoryPath("{$routes_folder}/front.php"),
                 true
             );
+
+            $router->group([
+                    ...$groupOptions,
+                    ...[
+                        'middleware' => UnusualRoutes::webMiddlewares(),
+                        'namespace' => $module->getClassNamespace("{$controller_namespace}"),
+                    ]
+                ],
+                function ($router) use ($module) {
+                    Route::moduleRoutes($module);
+                }
+            );
+
+
         }
     }
 

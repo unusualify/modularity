@@ -15,11 +15,13 @@ trait ManageUtilities {
 
     use ManageTable, ManageForm;
 
-    protected function __afterConstructManageUtilities($app, $request) {
+    protected function __afterConstructManageUtilities($app, $request)
+    {
 
     }
 
-    protected function __beforeConstructManageUtilities($app, $request) {
+    protected function __beforeConstructManageUtilities($app, $request)
+    {
         // $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
     }
 
@@ -29,61 +31,79 @@ trait ManageUtilities {
      */
     protected function getIndexData($prependScope = [])
     {
-        $data = [
-            'initialResource' => $this->getJSONData(), //
+        $initialResource = $this->getJSONData();
+        $filters = json_decode($this->request->get('filter'), true) ?? [];
+
+        $_deprecated = [
+            'initialResource' => $initialResource, //
             'tableMainFilters' => $this->getTableMainFilters(),
-            'filters' => json_decode($this->request->get('filter'), true) ?? [],
-            // 'requestFilter' => json_decode(request()->get('filter'), true) ?? [],
+            'filters' => $filters,
+            'requestFilter' => json_decode(request()->get('filter'), true) ?? [],
             'searchText' =>  request()->has('search') ? request()->query('search') : "", // for current text of search parameter
             'headers' => $this->getIndexTableColumns(), // headers to be used in unusual datatable component
             'formSchema'  => $this->formSchema, // input fields to be used in unusual datatable component
+        ];
 
-            // 'hiddenFilters' => $this->filters(),
-            // 'filterLinks' => $this->filterLinks ?? [],
-            /***
-             * TODO variables to be assigned dynamically
-             *
-             * */
-            // 'actions' => $this->getTableActions(),
+        $data = [
+            ...$_deprecated,
             'endpoints' => $this->getIndexUrls() + $this->getUrls(),
-            'advancedFilters' => $this->getTableAdvancedFilters(),
         ] + $this->getViewLayoutVariables();
-        // $baseUrl = $this->getPermalinkBaseUrl();
-        // dd($this->tableAttributes, $this->getViewLayoutVariables());
+
         $options = [
             'moduleName' => $this->getHeadline($this->moduleName),
             'translate' => $this->routeHas('translations') || $this->hasTranslatedInput(),
-
-            'tableAttributes' => ['rowActions' => $this->getTableActions(),
-                                 'bulkActions' => $this->getTableBulkActions()]
-            + array_merge_recursive_preserve(
-                [
-                    'name' => $this->getHeadline($this->routeName),
-                    'titleKey' => $this->titleColumnKey,
-                ],
-                $this->tableAttributes,
-            )
-            + ($this->isNested
-                ? ['titlePrefix' => $this->nestedParentModel->{'name'} . ' \ ' ]
-                : []
-            )
-            + ['nestedData' => $this->getNestedData()],
-
             'listOptions' => $this->getVuetifyDatatableOptions(), // options to be used in unusual table components in datatable store
+            'tableAttributes' => array_merge(
+                [
+                    'rowActions' => $this->getTableActions(),
+                    'bulkActions' => $this->getTableBulkActions(),
+                    'nestedData' => $this->getNestedData()
+                ],
+                ($this->isNested ? ['titlePrefix' => $this->nestedParentModel->{'name'} . ' \ ' ] : []),
+                array_merge_recursive_preserve(
+                    [
+                        'name' => $this->getHeadline($this->routeName),
+                        'titleKey' => $this->titleColumnKey,
+                    ],
+                    $this->tableAttributes,
+                )
+            ),
+            'formStore' => [
+                'inputs' => $this->formSchema,
+                'fields' => []
+            ],
+            'tableStore' => [
+                'baseUrl' => rtrim(config('app.url'), '/') . '/',
+                'headers' => $this->getIndexTableColumns(),
+                'searchText' => request()->has('search') ? request()->query('search') : "",
+                'options' => $this->getVuetifyDatatableOptions(),
+                'data' => $initialResource['data'],
+                'total' => $initialResource['total'] ?? 0,
+                'mainFilters' => $this->getTableMainFilters(),
+                'filter' => ['status' =>  $filters['status'] ?? $defaultFilterSlug ?? 'all'],
+                'advancedFilters' => $this->getTableAdvancedFilters(),
+                // {{-- inputs: {!! json_encode($inputs) !!}, --}}
+                // {{-- initialAsync: '{{ count($tableData['data']) ? true : false }}', --}}
+                // {{-- name: '{{ $routeName}}', --}}
+                // {{-- columns: {!! json_encode($tableColumns) !!}, --}}
+            ],
+            '__old' => [
+                // 'hiddenFilters' => $this->filters(),
+                // 'filterLinks' => $this->filterLinks ?? [],
 
-            // 'routeName' => $this->getHeadline($this->routeName),
-            // 'translateTitle' => $this->titleIsTranslatable(),
+                // 'routeName' => $this->getHeadline($this->routeName),
+                // 'translateTitle' => $this->titleIsTranslatable(),
+                // 'skipCreateModal' => $this->getIndexOption('skipCreateModal'),
+                // 'reorder' => $this->getIndexOption('reorder'),
+                // 'permalink' => $this->getIndexOption('permalink'),
+                // 'bulkEdit' => $this->getIndexOption('bulkEdit'),
+                // 'titleFormKey' => $this->titleFormKey ?? $this->titleColumnKey,
+                // 'baseUrl' => $baseUrl,
+                // 'permalinkPrefix' => $this->getPermalinkPrefix($baseUrl),
+                // 'additionalTableActions' => $this->additionalTableActions(),
+            ]
 
-            // 'skipCreateModal' => $this->getIndexOption('skipCreateModal'),
-            // 'reorder' => $this->getIndexOption('reorder'),
-            // 'create' => $this->getIndexOption('create'),
-            // 'duplicate' => $this->getIndexOption('duplicate'),
-            // 'permalink' => $this->getIndexOption('permalink'),
-            // 'bulkEdit' => $this->getIndexOption('bulkEdit'),
-            // 'titleFormKey' => $this->titleFormKey ?? $this->titleColumnKey,
-            // 'baseUrl' => $baseUrl,
-            // 'permalinkPrefix' => $this->getPermalinkPrefix($baseUrl),
-            // 'additionalTableActions' => $this->additionalTableActions(),
+
         ];
 
         return array_replace_recursive($data + $options, $this->indexData($this->request));
@@ -243,14 +263,16 @@ trait ManageUtilities {
                 'hasSubmit' => true,
                 'stickyButton' => false,
                 'modelValue' => $this->repository->getFormFields($item, $schema),
-                // 'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => $this->routeName]),
                 'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => trans_choice('modules.'. snakeCase($this->routeName), 0)]),
-                // 'schema'  => $schema, // input fields to be used in unusual datatable component
-                // 'defaultItem' => collect($schema)->mapWithKeys(function($item, $key){
-                //     return [ $item['name'] => $item['default'] ?? ''];
-                //     $carry[$key] = $item->default ?? '';
-                // })->toArray(),
-                // 'actionUrl' => $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]),
+                '__removed' => [
+                    // 'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => $this->routeName]),
+                    // 'schema'  => $schema, // input fields to be used in unusual datatable component
+                    // 'defaultItem' => collect($schema)->mapWithKeys(function($item, $key){
+                    //     return [ $item['name'] => $item['default'] ?? ''];
+                    //     $carry[$key] = $item->default ?? '';
+                    // })->toArray(),
+                    // 'actionUrl' => $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]),
+                ]
             ],
             'endpoints' => [
                 (!!$itemId ? 'update' : 'store') => $itemId
@@ -259,34 +281,32 @@ trait ManageUtilities {
             ] + $this->getUrls(),
             'formStore' => [
                 'inputs' => $schema,
-                // 'inputs' => $this->repository->getFormFields($item, $schema),
-            ]
+            ],
 
-            // 'editable' => !!$itemId,
+            '__old' => [
+                // 'editable' => !!$itemId,
+                // 'moduleName' => $this->moduleName,
+                // 'routeName' => $this->routeName,
+                // 'routePrefix' => $this->routePrefix,
+                // 'titleFormKey' => $this->titleFormKey ?? $this->titleColumnKey,
+                // 'publish' => $item->canPublish ?? true,
+                // 'publishDate24Hr' => Config::get('twill.publish_date_24h') ?? false,
+                // 'publishDateFormat' => Config::get('twill.publish_date_format') ?? null,
+                // 'publishDateDisplayFormat' => Config::get('twill.publish_date_display_format') ?? null,
+                // 'translate' => $this->routeHasTrait('translations'),
+                // 'translateTitle' => $this->titleIsTranslatable(),
+                // 'permalink' => $this->getIndexOption('permalink'),
+                // 'createWithoutModal' => ! $itemId && $this->getIndexOption('skipCreateModal'),
+                // 'form_fields' => $this->repository->getFormFields($item),
+                // 'baseUrl' => $baseUrl ?? '',
+                // 'localizedPermalinkBase'=>$localizedPermalinkBase ?? '',
+                // 'permalinkPrefix' => $this->getPermalinkPrefix($baseUrl ?? ''),
+                // 'editor' => Config::get('twill.enabled.block-editor') && $this->routeHasTrait('blocks') && ! $this->disableEditor,
+                // 'blockPreviewUrl' => Route::has('admin.blocks.preview') ? URL::route('admin.blocks.preview') : '#',
+                // 'availableRepeaters' => $this->getRepeaterList()->toJson(),
+                // 'revisions' => $this->routeHasTrait('revisions') ? $item->revisionsArray() : null,
+            ],
 
-            // 'moduleName' => $this->moduleName,
-            // 'routeName' => $this->routeName,
-            // 'routePrefix' => $this->routePrefix,
-            // 'titleFormKey' => $this->titleFormKey ?? $this->titleColumnKey,
-
-
-            // 'publish' => $item->canPublish ?? true,
-            // 'publishDate24Hr' => Config::get('twill.publish_date_24h') ?? false,
-            // 'publishDateFormat' => Config::get('twill.publish_date_format') ?? null,
-            // 'publishDateDisplayFormat' => Config::get('twill.publish_date_display_format') ?? null,
-            // 'translate' => $this->routeHasTrait('translations'),
-            // 'translateTitle' => $this->titleIsTranslatable(),
-            // 'permalink' => $this->getIndexOption('permalink'),
-            // 'createWithoutModal' => ! $itemId && $this->getIndexOption('skipCreateModal'),
-            // 'form_fields' => $this->repository->getFormFields($item),
-            // 'baseUrl' => $baseUrl ?? '',
-            // 'localizedPermalinkBase'=>$localizedPermalinkBase ?? '',
-            // 'permalinkPrefix' => $this->getPermalinkPrefix($baseUrl ?? ''),
-
-            // 'editor' => Config::get('twill.enabled.block-editor') && $this->routeHasTrait('blocks') && ! $this->disableEditor,
-            // 'blockPreviewUrl' => Route::has('admin.blocks.preview') ? URL::route('admin.blocks.preview') : '#',
-            // 'availableRepeaters' => $this->getRepeaterList()->toJson(),
-            // 'revisions' => $this->routeHasTrait('revisions') ? $item->revisionsArray() : null,
         ] + (Route::has($previewRouteName) && $itemId ? [
             'previewUrl' => moduleRoute($this->moduleName, $this->routePrefix, 'preview', [$itemId]),
         ] : [])
@@ -348,13 +368,15 @@ trait ManageUtilities {
         return [];
     }
 
-    public function getViewLayoutVariables() {
+    public function getViewLayoutVariables()
+    {
         return [
             'pageTitle' => $this->getHeadline($this->routeName) . " Module"
         ];
     }
 
-    public function getNestedData() {
+    public function getNestedData()
+    {
 
         $result = Collection::make($this->getConfigFieldsByRoute('modules', []))->map(function($context, $key){
 

@@ -152,13 +152,20 @@ class ModelMakeCommand extends BaseCommand
     {
         $module = Modularity::findOrFail($this->getModuleName());
 
+        $class_namespaces = implode("\n", [
+            $this->getExtendModelNamespace(),
+            $this->getInterfaceNamespaces(),
+            $this->getTraitNamespaces()
+        ]);
+
         return  (new Stub( $this->getStubName(), [
             // 'BASE_MODEL'            => $this->baseConfig('base_model'),
-            'EXTEND_MODEL'          => $this->getExtendModel(),
-            'EXTEND_MODEL_NAMESPACE'=> $this->getExtendModelNamespace(),
             'NAMESPACE'             => $this->getClassNamespace($module),
-            'TRAIT_NAMESPACES'      => $this->getTraitNamespaces(),
-            'INTERFACE_NAMESPACES'  => $this->getInterfaceNamespaces(),
+            'EXTEND_MODEL'          => $this->getExtendModel(),
+            'NAMESPACES'            => $class_namespaces,
+            // 'EXTEND_MODEL_NAMESPACE'=> $this->getExtendModelNamespace(),
+            // 'TRAIT_NAMESPACES'      => $this->getTraitNamespaces(),
+            // 'INTERFACE_NAMESPACES'  => $this->getInterfaceNamespaces(),
             'NAME'                  => $this->getModelName(),
             'CLASS'                 => $this->getClass(),
             'INTERFACES'            => $this->getInterfaces(),

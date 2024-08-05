@@ -96,6 +96,8 @@ class ModuleMakeCommand extends BaseCommand
             + ( $this->option('force') ?  ['--force' => true] : [])
             + ( $this->option('no-migrate') ?  ['--no-migrate' => true] : [])
             + ( $this->option('no-defaults') ?  ['--no-defaults' => true] : [])
+            + ( $this->option('no-migration') ?  ['--no-migration' => true] : [])
+            + ( $this->option('table-name') ?  ['--table-name' => $this->option('table-name')] : [])
             + ( ['-p' => $this->getPlainOption()])
             + $console_traits
             + ['--notAsk' => true]
@@ -132,6 +134,9 @@ class ModuleMakeCommand extends BaseCommand
             // ['plain', null, InputOption::VALUE_NONE, 'Don\'t create route.'],
             ['no-migrate', null, InputOption::VALUE_NONE, 'don\'t migrate.'],
             ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
+            ['no-migration', null, InputOption::VALUE_NONE, 'don\'t create migration file.'],
+            ['custom-model', null, InputOption::VALUE_OPTIONAL, 'The model class for usage of a available model.', null],
+            ['table-name', null, InputOption::VALUE_OPTIONAL, 'Sets table  name for custom model'],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
             ['just-stubs', null, InputOption::VALUE_NONE, 'only stubs fix'],

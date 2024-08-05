@@ -40,3 +40,9 @@ if (unusualConfig('enabled.file-library')) {
         Route::resource('files', 'FileLibraryController', ['names' => 'file','only' => ['index', 'store', 'destroy']]);
     });
 }
+
+Route::group([ 'prefix' => 'filepond'], function(){
+    Route::post('process', ['as' => 'filepond.process', 'uses' => 'FilepondController@upload'],);
+    Route::delete('delete', ['as' => 'filepond.delete', 'uses' => 'FilepondController@delete'],);
+    Route::get('preview/{id}', ['as' => 'filepond.preview', 'uses' => 'FilepondController@previewAsset'],);
+});

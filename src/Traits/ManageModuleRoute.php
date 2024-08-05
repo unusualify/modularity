@@ -53,22 +53,26 @@ trait ManageModuleRoute {
     }
 
 
-    public function getRouteTitleColumnKey() {
+    public function getRouteTitleColumnKey()
+    {
 
         return !empty($conf = $this->routeConfig()) ? ($conf['title_column_key'] ?? 'name') : 'name';
     }
 
-    public function getRouteInputs() {
+    public function getRouteInputs()
+    {
 
         return !empty($conf = $this->routeConfig()) ? ($conf['inputs'] ?? []) : [];
     }
 
-    public function getRouteHeaders() {
+    public function getRouteHeaders()
+    {
 
         return !empty($conf = $this->routeConfig()) ? ($conf['headers'] ?? []) : [];
     }
 
-    public function getRouteTableOptions() {
+    public function getRouteTableOptions()
+    {
 
         return !empty($conf = $this->routeConfig()) ? ($conf['table_options'] ?? []) : [];
     }

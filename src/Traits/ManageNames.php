@@ -56,7 +56,8 @@ trait ManageNames {
         return Str::studly($string);
     }
 
-    protected function getStudlyNameFromForeignKey($foreign_key){
+    protected function getStudlyNameFromForeignKey($foreign_key)
+    {
         if(preg_match('/(.*)(_id)/', $foreign_key, $matches)){
             return $this->getStudlyName($matches[1]);
         }
@@ -64,27 +65,33 @@ trait ManageNames {
         return null;
     }
 
-    protected function getForeignKeyFromName($name){
+    protected function getForeignKeyFromName($name)
+    {
         return $this->getSnakeCase($name) . '_id';
     }
 
-    protected function getTableNameFromName($name){
+    protected function getTableNameFromName($name)
+    {
         return $this->getPlural($this->getSnakeCase($name));
     }
 
-    protected function getMorphToMethodName($name){
+    protected function getMorphToMethodName($name)
+    {
         return makeMorphToMethodName($name);
     }
 
-    protected function getMorphPivotTableName($name){
+    protected function getMorphPivotTableName($name)
+    {
         return makeMorphPivotTableName($name);
     }
 
-    protected function getPivotTableName($modelName1, $modelName2){
+    protected function getPivotTableName($modelName1, $modelName2)
+    {
         return $this->getSnakeCase($this->getStudlyName($modelName1).$this->getStudlyName($modelName2));
     }
 
-    protected function getCamelNameFromForeignKey($foreign_key){
+    protected function getCamelNameFromForeignKey($foreign_key)
+    {
         if(preg_match('/(.*)(_id)/', $foreign_key, $matches)){
             return $this->getCamelCase($matches[1]);
         }
@@ -92,7 +99,8 @@ trait ManageNames {
         return null;
     }
 
-    protected function getSnakeNameFromForeignKey($foreign_key){
+    protected function getSnakeNameFromForeignKey($foreign_key)
+    {
         if(preg_match('/(.*)(_id)/', $foreign_key, $matches)){
             return $this->getSnakeCase($matches[1]);
         }
