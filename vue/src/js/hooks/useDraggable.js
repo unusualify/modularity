@@ -12,7 +12,7 @@ export const makeDraggableProps = propsFactory({
    */
   draggable: {
     type: Boolean,
-    default: true
+    default: false
   },
   orderKey: {
     type: String,

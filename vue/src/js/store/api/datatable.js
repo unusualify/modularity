@@ -99,8 +99,11 @@ export default {
     })
   },
 
-  reorder (ids, callback) {
-    axios.post(window[import.meta.env.VUE_APP_NAME].CMS_URLS.reorder, { ids }).then(function (resp) {
+  reorder (url = null ,ids, callback) {
+    const requestUrl = url ?? window[import.meta.env.VUE_APP_NAME].ENDPOINTS.reorder;
+    axios.post(requestUrl, {
+      ids: ids
+    }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
       const error = {

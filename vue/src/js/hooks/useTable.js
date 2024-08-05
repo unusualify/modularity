@@ -194,6 +194,7 @@ export default function useTable (props, context) {
     fillHeight: computed(() => props.fillHeight),
     createUrl: computed(() => props.endpoints.create ?? null),
     editUrl: computed(() => props.endpoints.edit ??  null ),
+    reorderUrl: computed(() => props.endpoints.reorder ?? null),
     editedIndex: -1,
     selectedItems: [],
     windowSize: {
@@ -793,7 +794,20 @@ export default function useTable (props, context) {
       store.dispatch(ACTIONS.GET_DATATABLE)
     },
     sortElements(list){
-      state.elements = list;
+      // state.elements = list;
+
+      api.reorder(
+        state.reorderUrl,
+        // For Optimistic UI approach, did not query for new list,
+        // used response.status and new modelValue
+        list.map((element) => element.id), function(response){
+          if(response.status === 200){
+            list.forEach((element, index) => element.position = index+1)
+            state.elements = list
+          }
+        }
+      )
+
     }
   })
 
