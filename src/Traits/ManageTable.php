@@ -37,6 +37,7 @@ trait ManageTable {
     protected function __afterConstructManageTable($app, $request)
     {
 
+        $this->getTableDraggableOptions();
         /*
          * Available columns of the index view
          */
@@ -448,6 +449,22 @@ trait ManageTable {
 
 
         return $filter;
+    }
+
+    protected function getTableDraggableOptions()
+    {
+        if($this->repository)
+        {
+            return [
+                'draggable' => classHasTrait($this->repository->getModel(), \Unusualify\Modularity\Entities\Traits\HasPosition::class),
+                'orderKey' => 'position'
+            ];
+        }
+
+        return [
+            'draggable' => false,
+        ];
+
     }
 
 

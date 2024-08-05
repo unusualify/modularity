@@ -48,5 +48,7 @@ trait HasPosition
             $model->position = $startOrder++;
             $model->save();
         }
+
+        return 1;
     }
 }
