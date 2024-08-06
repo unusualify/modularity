@@ -6,7 +6,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
@@ -16,8 +15,11 @@ trait ManageForm {
 
     protected $formSchema;
 
+    protected $inputTypes = [];
+
     protected function __beforeConstructManageForm($app, $request)
     {
+        $this->inputTypes = unusualConfig('input_types', []);
         $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
     }
 
@@ -145,12 +147,26 @@ trait ManageForm {
 
     /**
      * @param Array|stdClass $input
+     * @return void
+     */
+    protected function hydrateInputType(&$input)
+    {
+        if(array_key_exists($input['type'], $this->inputTypes)){
+            $input = array_merge($this->inputTypes[$input['type']], Arr::except($input, ['type']));
+        }
+    }
+
+
+    /**
+     * @param Array|stdClass $input
      * @return Collection
      */
     protected function hydrateInput($input, $inputs = [])
     {
         $data = null;
         $arrayable = false;
+
+        $this->hydrateInputType($input);
 
         $this->hydrateInputConnector($input);
 
