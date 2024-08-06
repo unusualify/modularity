@@ -207,25 +207,52 @@ abstract class Repository
      * @param null $exceptId
      * @return \Illuminate\Support\Collection
      */
-    public function listAll($column = 'name', $orders = [], $exceptId = null)
+    public function listAll($with = [], $scopes = [], $orders = [],  $exceptId = null)
     {
-        $query = $this->model->newQuery();
+        $query = $this->model->query();
 
-        if ($exceptId) {
-            $query = $query->where($this->model->getTable() . '.id', '<>', $exceptId);
+        $query = $this->model->with($this->formatWiths($query, $with));
+
+        if (isset($scopes['searches']) && isset($scopes['search']) && is_array($scopes['searches'])) {
+
+            $this->searchIn($query, $scopes, 'search', $scopes['searches']);
+            unset($scopes['searches']);
+        }
+        // dd(
+        //     $scopes,
+        //     $query->toSql(),
+        //     $query1 = $this->filter($query, $scopes),
+        //     $query1->toSql(),
+        //     $query2 = $this->filterBack($query, $scopes),
+        //     $query2->toSql(),
+
+        // );
+        $query = $this->filter($query, $scopes);
+        // $query = $this->filterBack($query, $scopes);
+        $query = $this->order($query, $orders);
+
+
+
+        try {
+            //code...
+            // dd(
+            //     $query->toSql(),
+
+            // );
+            return $query->get();
+        } catch (\Throwable $th) {
+            //throw $th;
+            dd(
+                $th,
+                debug_backtrace()
+                // $th,
+                // $with,
+                // $scopes,
+                // $orders,
+                // $perPage
+            );
         }
 
-        if ($this->model instanceof Sortable) {
-            $query = $query->ordered();
-        } elseif (!empty($orders)) {
-            $query = $this->order($query, $orders);
-        }
-
-        if ($this->model->isTranslatable()) {
-            $query = $query->withTranslation();
-        }
-
-        return $query->get()->pluck($column, 'id');
     }
 
     /**

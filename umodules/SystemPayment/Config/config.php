@@ -62,9 +62,27 @@ return [
                     'type' => 'text',
                 ],
                 [
-                    'name' => 'custom-input-credit-card-form',
-                    'label' => 'Credit Card',
-                    'type' => 'custom-input-credit-card-form'
+                    'name' => 'payment-service',
+                    'label' => 'Payment',
+                    'type' => 'payment-service',
+                    'connector' => 'SystemPayment:PaymentService|repository:listAll'
+                ],
+                [
+                    'name' => 'is_external',
+                    'label' => 'Is an external service ?',
+                    'type' => 'checkbox',
+                ],
+                [
+                    'name' => 'is_internal',
+                    'label' => 'Is an internal service ?',
+                    'type' => 'checkbox',
+                ],
+                [
+                    'label' => 'Images',
+                    'type' => 'image',
+                    'name' => 'images',
+                    'rules' => 'sometimes|required:array',
+                    'isIcon' => true,
                 ]
             ],
         ],
@@ -125,7 +143,7 @@ return [
                     'label' => 'Payment Service',
                     'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentServiceRepository',
                     'rules' => 'sometimes|required',
-                ],
+                ]
             ],
         ],
         'currency' => [
@@ -180,6 +198,51 @@ return [
                     'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentServiceRepository',
                     'itemTitle' => 'title',
                 ]
+            ],
+        ],
+        'payment_price' => [
+            'name' => 'PaymentPrice',
+            'headline' => 'Payment Prices',
+            'url' => 'payment-prices',
+            'route_name' => 'payment_price',
+            'icon' => '',
+            'title_column_key' => 'name',
+            'table_options' => [
+                'createOnModal' => true,
+                'editOnModal' => true,
+                'isRowEditing' => false,
+                'rowActionsType' => 'inline',
+            ],
+            'headers' => [
+                [
+                    'title' => 'Name',
+                    'key' => 'name',
+                    'formatter' => [
+                        'edit',
+                    ],
+                    'searchable' => true,
+                ],
+                [
+                    'title' => 'Created Time',
+                    'key' => 'created_at',
+                    'formatter' => [
+                        'date',
+                        'long',
+                    ],
+                    'searchable' => true,
+                ],
+                [
+                    'title' => 'Actions',
+                    'key' => 'actions',
+                    'sortable' => false,
+                ],
+            ],
+            'inputs' => [
+                [
+                    'name' => 'name',
+                    'label' => 'Name',
+                    'type' => 'text',
+                ],
             ],
         ],
     ],

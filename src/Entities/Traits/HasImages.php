@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Unusualify\Modularity\Exceptions\MediaCropNotFoundException;
 use Unusualify\Modularity\Entities\Media;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +18,7 @@ trait HasImages
         'crop_h',
     ];
 
+
     public static function bootHasImages(): void
     {
         self::deleted(static function (Model $model) {
@@ -25,6 +27,62 @@ trait HasImages
                 $model->medias()->detach();
             }
         });
+        self::retrieved(static function (Model $model) {
+            $inputs = $model->getRouteInputs();
+
+            $iconInput = collect($inputs)->first(function ($input) {
+                return isset($input['type']) && ($input['type'] == 'image') && isset($input['isIcon']) && $input['isIcon'];
+            });
+
+            if ($iconInput) {
+                if (($media = $model->findMedia('images')))
+                    $model->setAttribute('_icon', ImageService::getRawUrl($media->uuid));
+                else
+                    $model->setAttribute('_icon', null);
+
+
+            }
+        });
+
+        // self::creating(static function (Model $model) {
+        //     $inputs = $model->getRouteInputs();
+
+        //     $iconInput = collect($inputs)->first(function ($input) {
+        //         return isset($input['type']) && ($input['type'] == 'image') && isset($input['isIcon']) && $input['isIcon'];
+        //     });
+
+        //     if ($iconInput) {
+        //             $model->offsetUnset('_icon');
+        //     }
+        // });
+        self::updating(static function (Model $model) {
+            $inputs = $model->getRouteInputs();
+
+            $iconInput = collect($inputs)->first(function ($input) {
+                return isset($input['type']) && ($input['type'] == 'image') && isset($input['isIcon']) && $input['isIcon'];
+            });
+
+            if ($iconInput) {
+                $model->offsetUnset('_icon');
+            }
+        });
+        self::saving(static function (Model $model) {
+            $inputs = $model->getRouteInputs();
+
+            $iconInput = collect($inputs)->first(function ($input) {
+                return isset($input['type']) && ($input['type'] == 'image') && isset($input['isIcon']) && $input['isIcon'];
+            });
+
+            if ($iconInput) {
+                $model->offsetUnset('_icon');
+            }
+        });
+    }
+
+    public function initializeHasImages(): void
+    {
+
+
     }
 
     /**
