@@ -11,7 +11,21 @@
       {{ messageScope.message }}
     </template> -->
     <template v-slot:default="defaultSlot">
-      <v-tabs
+      <ue-tabs v-model="activeTab" :items="items" tab-value="id" tab-title="name">
+        <template v-slot:windows="{active}">
+          <v-window v-model="activeTab">
+            <v-window-item v-for="(item, i) in elements" :key="item.id" :value="item.id">
+              <ue-form
+                :ref="formRefs[item.id]"
+                v-model="models[item.id]"
+                :schema="schemas[item.id]"
+                v-model:valid="valids[i]"
+                />
+            </v-window-item>
+          </v-window>
+        </template>
+      </ue-tabs>
+      <!-- <v-tabs
         v-model="activeTab"
         align-tabs="center"
       >
@@ -21,7 +35,6 @@
       </v-tabs>
       <v-window v-model="activeTab">
         <v-window-item v-for="(item, i) in elements" :key="item.id" :value="item.id">
-          <!-- :hasSubmit="true" -->
           <ue-form
             :ref="formRefs[item.id]"
             v-model="models[item.id]"
@@ -29,7 +42,7 @@
             v-model:valid="valids[i]"
             />
         </v-window-item>
-      </v-window>
+      </v-window> -->
     </template>
   </v-input>
 </template>
@@ -111,6 +124,7 @@ export default {
           loopValues:
           for(const id in v){
             let model = v[id]
+            __log(v)
             for(const name in this.schema){
               let value = model[name]
               let input = this.schema[name]
@@ -161,7 +175,7 @@ export default {
   watch: {
     activeTab: {
       handler (value, oldValue) {
-
+        __log('activeTab', value)
       }
     },
     models: {
