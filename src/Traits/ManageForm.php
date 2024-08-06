@@ -610,9 +610,17 @@ trait ManageForm {
 
                 // $data = $input;
 
-                break;
+            break;
             case 'group':
             case 'wrap':
+                $input['typeInt'] ??= 'sheet';
+                if(isset($input['noLabel']) && $input['noLabel']){
+                    unset($input['label']);
+                    unset($input['title']);
+                    unset($input['noLabel']);
+                }else{
+                    $input['title'] ??= $input['label'] ?? (isset($input['name']) ? headline($input['name']) : '');
+                }
                 $default_repeater_col = [
                     'cols' => 12,
                 ];
@@ -621,18 +629,30 @@ trait ManageForm {
                 $schema = $this->createFormSchema($input['schema']);
 
                 if($input['type'] == 'wrap'){
-                    $input['name'] = "wrap-" . uniqid();
+                    $input['name'] ??= "wrap-" . uniqid();
                 }
+
+                $input['schema'] = $input['type'] == 'wrap'
+                    ? $schema
+                    : Arr::mapWithKeys($schema, fn($i) => ["{$input['name']}.{$i['name']}" => array_merge($i,['name' => "{$input['name']}.{$i['name']}"])]);
 
                 if($input['type'] == 'group'){
-                    $input['title'] = $input['label'] ?? headline($input['name']);
+                    $input['default'] = Collection::make($schema)->reduce(function($acc, $item, $key){
+                        if($item['type'] == 'wrap'){
+                            $acc += Arr::map($item['schema'], fn($i) => $i['default'] ?? '');
+                        }else{
+                            $acc[$key] = $item['default'] ?? '';
+                        }
 
-                    $input['default'] = Arr::map($schema, fn($i) => $i['default'] ?? '');
+                        return $acc;
+                    }, []);
+
+                    // dd($input);
                 }
 
-
-                $input['schema'] = $input['type'] == 'wrap' ? $schema :Arr::mapWithKeys($schema, fn($i) => ["{$input['name']}.{$i['name']}" => array_merge($i,['name' => "{$input['name']}.{$i['name']}"])]);
-
+                if($input['type'] == 'wrap'){
+                    $input['default'] = Arr::map($schema, fn($i) => $i['default'] ?? '');
+                }
                 $data = $input;
 
             break;
