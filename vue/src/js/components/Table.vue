@@ -522,12 +522,12 @@
                   <slot :name="name" v-bind="slotData">
                     <component
                       :is="this.datatable.$slots[name]",
-                      v-bind="Object.assign(
-                        slotData,
-                        {
+                      v-bind="{
+                        ...slotData,
+                        ...{
                           item: elements[itemSlot.index]
                         }
-                      )"
+                      }"
                     />
                   </slot>
                 </template>

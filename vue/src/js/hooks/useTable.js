@@ -338,7 +338,7 @@ export default function useTable (props, context) {
         const newItem = {
           "type": "item",
           "key": currentIndex+1,
-          "value": curr.id,
+          "value": curr.id, // Todo datatable ref item-key prop instead of static.id
           "index" : currentIndex,
           "selectable": props.showSelect,
           "columns": state.headers.reduce((headersPrev, header) => {
