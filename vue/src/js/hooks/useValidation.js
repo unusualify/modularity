@@ -145,6 +145,9 @@ export default function useValidation (props) {
             }
           })
         }
+        if(__isset(inputs[name].schema)){
+          inputs[name].schema = invokeRuleGenerator(inputs[name].schema)
+        }
       })
     }
     // __log(methods, obj.schema, methods.hasOwnProperty('passwordHandler'))
