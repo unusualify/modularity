@@ -61,6 +61,29 @@ return [
                     'label' => 'Payment Service Slug',
                     'type' => 'text',
                 ],
+                [
+                    'name' => 'payment-service',
+                    'label' => 'Payment',
+                    'type' => 'payment-service',
+                    'connector' => 'SystemPayment:PaymentService|repository:listAll'
+                ],
+                [
+                    'name' => 'is_external',
+                    'label' => 'Is an external service ?',
+                    'type' => 'checkbox',
+                ],
+                [
+                    'name' => 'is_internal',
+                    'label' => 'Is an internal service ?',
+                    'type' => 'checkbox',
+                ],
+                [
+                    'label' => 'Images',
+                    'type' => 'image',
+                    'name' => 'images',
+                    'rules' => 'sometimes|required:array',
+                    'isIcon' => true,
+                ]
             ],
         ],
         'payment' => [
@@ -120,75 +143,7 @@ return [
                     'label' => 'Payment Service',
                     'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentServiceRepository',
                     'rules' => 'sometimes|required',
-                ],
-            ],
-        ],
-        'payment_test' => [
-            'name' => 'PaymentTest',
-            'headline' => 'Payment Tests',
-            'url' => 'payment-tests',
-            'route_name' => 'payment_test',
-            'icon' => '',
-            'title_column_key' => 'name',
-            'table_options' => [
-                'createOnModal' => true,
-                'editOnModal' => true,
-                'isRowEditing' => false,
-                'rowActionsType' => 'inline',
-            ],
-            'headers' => [
-                [
-                    'title' => 'Name',
-                    'key' => 'name',
-                    'formatter' => [
-                        'edit',
-                    ],
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Payment Service',
-                    'key' => 'paymentService',
-                ],
-                [
-                    'title' => 'System Payment Parent',
-                    'key' => 'systemPaymentable',
-                ],
-                [
-                    'title' => 'Created Time',
-                    'key' => 'created_at',
-                    'formatter' => [
-                        'date',
-                        'long',
-                    ],
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Actions',
-                    'key' => 'actions',
-                    'sortable' => false,
-                ],
-            ],
-            'inputs' => [
-                [
-                    'name' => 'name',
-                    'label' => 'Name',
-                    'type' => 'text',
-                ],
-                [
-                    'type' => 'select',
-                    'name' => 'payment_service_id',
-                    'label' => 'Payment Service',
-                    'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentServiceRepository',
-                    'rules' => 'sometimes|required',
-                ],
-                [
-                    'type' => 'morphTo',
-                    'name' => 'SystemPayment',
-                    'label' => 'System Payment',
-                    'schema' => [
-                    ],
-                    'rules' => 'sometimes|required',
-                ],
+                ]
             ],
         ],
         'currency' => [
@@ -245,7 +200,51 @@ return [
                 ]
             ],
         ],
+        'payment_price' => [
+            'name' => 'PaymentPrice',
+            'headline' => 'Payment Prices',
+            'url' => 'payment-prices',
+            'route_name' => 'payment_price',
+            'icon' => '',
+            'title_column_key' => 'name',
+            'table_options' => [
+                'createOnModal' => true,
+                'editOnModal' => true,
+                'isRowEditing' => false,
+                'rowActionsType' => 'inline',
+            ],
+            'headers' => [
+                [
+                    'title' => 'Name',
+                    'key' => 'name',
+                    'formatter' => [
+                        'edit',
+                    ],
+                    'searchable' => true,
+                ],
+                [
+                    'title' => 'Created Time',
+                    'key' => 'created_at',
+                    'formatter' => [
+                        'date',
+                        'long',
+                    ],
+                    'searchable' => true,
+                ],
+                [
+                    'title' => 'Actions',
+                    'key' => 'actions',
+                    'sortable' => false,
+                ],
+            ],
+            'inputs' => [
+                [
+                    'name' => 'name',
+                    'label' => 'Name',
+                    'type' => 'text',
+                ],
+            ],
+        ],
     ],
 ];
 
-    

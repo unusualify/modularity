@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Support\Finder;
 use Unusualify\Priceable\Models\Currency;
 
 trait ManageForm {
@@ -791,6 +792,69 @@ trait ManageForm {
                 $data =  Arr::except($input, ['route', 'model']) + [
                     'items' => $items
                 ];
+            break;
+            case 'payment-service':
+                $relation_class = null;
+
+                $input['itemValue'] = $input['itemValue'] ?? 'id';
+                $input['itemTitle'] = $input['itemTitle'] ?? 'name';
+                $input['type'] = 'custom-input-payment-service';
+                $input['default'] = [];
+                $items = $input['items'] ?? [];
+                if (isset($input['repository'])) {
+                    $items = $input['items'] ?? [];
+
+                    if (isset($input['repository'])) {
+
+                        $args = explode(':', $input['repository']);
+
+                        $className = array_shift($args);
+                        $methodName = array_shift($args) ?? 'list';
+
+                        $relation_class = App::make($className);
+                        $params = Collection::make($args)->mapWithKeys(function ($arg) {
+                            [$name, $value] = explode('=', $arg);
+
+                            return [$name => explode(',', $value)];
+                        })->toArray();
+
+
+                        // $params = array_merge_recursive($params);
+
+                        $items =  call_user_func_array(array($relation_class, $methodName), [
+                            ...($methodName == 'list' ? ['column' => $input['itemTitle'] ?? 'name'] : []),
+                            ...$params
+                        ])->toArray();
+                        // dd($items);
+                    }
+
+                    $data =  Arr::except($input, ['route', 'model']) + [
+                        'items' => $items
+                    ];
+
+                    // $items = $relation_class->{$methodName}($input['itemTitle'], $parameter: ['hasPackage']  )->toArray();
+                } else if (isset($input['model'])) {
+                    $relation_class = App::make($input['model']);
+                    $items = $relation_class->all([$input['itemValue'], $input['itemTitle']])->toArray();
+                } else if (isset($input['route'])) {
+                    $finder = new Finder();
+                    $module = Modularity::find($this->moduleName);
+
+                    if ($module->isEnabledRoute($input['route'])) {
+                        foreach ($this->config->routes as $r) {
+                            if ($r->route_name == $input['route']) {
+                                $table = Str::plural($input['route']);
+                                $relation_class = $finder->getRepository($table);
+                                $items = $relation_class->list($input['itemTitle'])->toArray();
+                                break;
+                            }
+                        }
+                    }
+                }
+                $data =  Arr::except($input, ['route', 'model', 'repository']) + [
+                    'items' => $items
+                ];
+
             break;
             default:
 

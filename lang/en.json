@@ -39,5 +39,14 @@
     "success-update": "Updated Successfully.",
     "success-delete": "Removed Successfully.",
     "update": "Update",
-    "Update Password": "Update Password"
+    "Update Password": "Update Password",
+    "Card Holder": "Card Holder",
+    "Expire Date": "Expire Date",
+    "MM": "MM",
+    "YY": "YY",
+    "Card Number": "Card Number",
+    "CVV": "CVV",
+    "PAY": "PAY",
+    "Month": "Month",
+    "Year": "Year"
   }

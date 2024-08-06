@@ -47,7 +47,9 @@ const opts = {
     VBtnTertiary: components.VBtn,
     VBtnCta: components.VBtn,
     VBtnCtaSecondary: components.VBtn,
-    VBtnSuccess: components.VBtn
+    VBtnSuccess: components.VBtn,
+    VImgIcon: components.VImg
+
   },
   defaults: {
     global: {
@@ -80,6 +82,9 @@ const opts = {
     VBtnSuccess: {
       color: 'success',
       variant: 'elevated'
+    },
+    VImgIcon: {
+      height: '2.5rem',
     }
 
   },

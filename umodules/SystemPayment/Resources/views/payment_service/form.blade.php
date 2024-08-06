@@ -6,7 +6,7 @@
     $titleFormKey = $titleFormKey ?? 'name';
     $disableContentFieldset = $disableContentFieldset ?? false;
 @endphp
-
+{{-- @dd($formStore) --}}
 @section('content')
     <ue-form v-bind='@json($formAttributes)'/>
 
