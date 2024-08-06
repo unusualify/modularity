@@ -115,10 +115,10 @@ trait ManageForm {
         // $default_input = collect(Config::get(unusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
         // $default_input = $this->configureInput(array_to_object(Config::get(unusualBaseKey() . '.default_input')));
         $default_input = (array) Config::get(unusualBaseKey() . '.default_input');
-        [$hydrated, $arrayable] = $this->hydrateInput(object_to_array($input), $inputs);
+        [$hydrated, $spreaded] = $this->hydrateInput(object_to_array($input), $inputs);
 
 
-        if($arrayable){
+        if($spreaded){
             return $hydrated;
         }
         return isset($hydrated['name'])
@@ -466,6 +466,8 @@ trait ManageForm {
             break;
             case 'morphTo':
 
+                $data = [];
+
                 if(isset($input['schema'])){
                     $data = [];
                     $arrayable = true;
@@ -508,6 +510,10 @@ trait ManageForm {
                         $data += $_input;
                     }
                     $data = array_reverse($data);
+                }
+
+                if(empty($data)){
+                    $input = $data;
                 }
             break;
             case 'price':
@@ -858,7 +864,7 @@ trait ManageForm {
             break;
             default:
 
-                break;
+            break;
         }
 
         $this->hydrateInputExtension($input, $data, $arrayable, $inputs);
