@@ -8,13 +8,10 @@
       </div>
       <div class="card-item__wrapper">
         <div class="card-item__top">
-          <img src="https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/chip.png"
-            class="card-item__chip" />
+          <img src="http://localhost:5173/vendor/modularity/public/png/cardtypes/chip.png" class="card-item__chip" />
           <div class="card-item__type">
             <Transition name="slide-fade-up">
-              <img
-                :src="'https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/' + cardType + '.png'"
-                v-if="cardType" :key="cardType" alt class="card-item__typeImg" />
+              <img :src="cardType" v-if="cardType" :key="cardType" alt class="card-item__typeImg" />
             </Transition>
           </div>
         </div>
@@ -31,7 +28,7 @@
         </label>
         <div class="card-item__content">
           <label :for="fields.cardName" class="card-item__info" :ref="fields.cardName">
-            <div class="card-item__holder">{{ $t('card.cardHolder') }}</div>
+            <div class="card-item__holder">{{ $t('Card Holder') }}</div>
             <Transition name="slide-fade-up">
               <div class="card-item__name" v-if="labels.cardName.length" key="1">
                 <TransitionGroup name="slide-fade-right">
@@ -39,22 +36,22 @@
                     :key="$index + 1">{{ n }}</span>
                 </TransitionGroup>
               </div>
-              <div class="card-item__name" v-else key="2">{{ $t('card.fullName') }}</div>
+              <div class="card-item__name" v-else key="2">{{ $t('Full Name') }}</div>
             </Transition>
           </label>
           <div class="card-item__date" ref="cardDate">
-            <label :for="fields.cardMonth" class="card-item__dateTitle">{{ $t('card.expires') }}</label>
+            <label :for="fields.cardMonth" class="card-item__dateTitle">{{ $t('Expire Date') }}</label>
             <label :for="fields.cardMonth" class="card-item__dateItem">
               <Transition name="slide-fade-up">
                 <span v-if="labels.cardMonth" :key="labels.cardMonth">{{ labels.cardMonth }}</span>
-                <span v-else key="2">{{ $t('card.MM') }}</span>
+                <span v-else key="2">{{ $t('MM') }}</span>
               </Transition>
             </label>
             /
             <label :for="fields.cardYear" class="card-item__dateItem">
               <Transition name="slide-fade-up">
                 <span v-if="labels.cardYear" :key="labels.cardYear">{{ String(labels.cardYear).slice(2, 4) }}</span>
-                <span v-else key="2">{{ $t('card.YY') }}</span>
+                <span v-else key="2">{{ $t('YY') }}</span>
               </Transition>
             </label>
           </div>
@@ -72,9 +69,7 @@
           <span v-for="(n, $index) in labels.cardCvv" :key="$index">*</span>
         </div>
         <div class="card-item__type">
-          <img
-            :src="'https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/' + cardType + '.png'"
-            v-if="cardType" class="card-item__typeImg" />
+          <img :src="cardType" v-if="cardType" class="card-item__typeImg" />
         </div>
       </div>
     </div>
@@ -106,23 +101,51 @@ export default {
     const defaultCardPlaceholder = '#### #### #### ####';
     const currentPlaceholder = ref('');
 
-    const cardType = computed(() => {
-      let number = props.labels.cardNumber;
-      if (/^4/.test(number)) return 'visa';
-      if (/^(34|37)/.test(number)) return 'amex';
-      if (/^5[1-5]/.test(number)) return 'mastercard';
-      if (/^6011/.test(number)) return 'discover';
-      if (/^62/.test(number)) return 'unionpay';
-      if (/^9792/.test(number)) return 'troy';
-      if (/^3(?:0([0-5]|9)|[689]\d?)\d{0,11}/.test(number)) return 'dinersclub';
-      if (/^35(2[89]|[3-8])/.test(number)) return 'jcb';
-      return ''; // default type
+    const baseUrl = computed(() => {
+      let url = new URL(import.meta.url);
+      return `${url.protocol}//${url.hostname}${url.port ? ':' + url.port : ''}`;
     });
 
+    const cardType = computed(() => {
+      let number = props.labels.cardNumber;
+      let img = `.${import.meta.env.BASE_URL}/public/png/cardtypes/`;
+      switch (true) {
+        case /^4/.test(number):
+          img = img + 'visa.png';
+          break;
+        case /^(34|37)/.test(number):
+          img = img + 'amex.png';
+          break;
+        case /^5[1-5]/.test(number):
+          img = img + 'mastercard.png';
+          break;
+        case /^6011/.test(number):
+          img = img + 'discover.png';
+          break;
+        case /^62/.test(number):
+          img = img + 'unionpay.png';
+          break;
+        case /^9792/.test(number):
+          img = img + 'troy.png';
+          break;
+        case /^3(?:0([0-5]|9)|[689]\d?)\d{0,11}/.test(number):
+          img = img + 'dinersclub.png';
+          break;
+        case /^35(2[89]|[3-8])/.test(number):
+          img = img + 'jcb.png';
+          break;
+        default:
+          img = img + 'visa.png';
+          break;
+      }
+      return new URL(img, baseUrl.value).href;
+    });
     const currentCardBackground = computed(() => {
       if (props.randomBackgrounds && !props.backgroundImage) {
         let random = Math.floor(Math.random() * 25 + 1);
-        return `https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/${random}.jpeg`;
+        let img = `.${import.meta.env.BASE_URL}/public/jpg/payment/${random}.jpeg`;
+        let cardBg = new URL(img, baseUrl.value).href;
+        return cardBg;
       } else if (props.backgroundImage) {
         return props.backgroundImage;
       } else {
@@ -201,6 +224,7 @@ export default {
       currentFocus,
       isFocused,
       isCardFlipped,
+      baseUrl,
       currentPlaceholder,
       cardType,
       currentCardBackground,

@@ -6,37 +6,40 @@
     </div>
     <div class="card-form__inner">
       <div class="card-input">
-        <label for="cardNumber" class="card-input__label">{{ $t('cardForm.cardNumber') }}</label>
+        <label for="cardNumber" class="card-input__label">{{ $t('Card Number') }}</label>
         <v-text-field :id="fields.cardNumber" v-model="formData.cardNumber" @input="changeNumber"
-          @focus="focusCardNumber" @blur="blurCardNumber" data-card-field type="tel" >
+          @focus="focusCardNumber" @blur="blurCardNumber" data-card-field type="tel" variant="outlined">
         </v-text-field>
       </div>
       <div class="card-input">
-        <label for="cardName" class="card-input__label">{{ $t('cardForm.cardName') }}</label>
-        <v-text-field :id="fields.cardName" v-model="formData.cardName" @input="changeName" data-card-field>
+        <label for="cardName" class="card-input__label">{{ $t('Card Holder') }}</label>
+        <v-text-field :id="fields.cardName" v-model="formData.cardName" @input="changeName" data-card-field
+          variant="outlined">
         </v-text-field>
       </div>
       <div class="card-form__row">
         <div class="card-form__col">
           <div class="card-form__group">
-            <label for="cardMonth" class="card-input__label">{{ $t('cardForm.expirationDate') }}</label>
-            <v-select :id="fields.cardMonth" :items="months" label="{{ $t('cardForm.month') }}"
-              v-model="formData.cardMonth" @change="changeMonth" :disabled-item="month => month < minCardMonth"
-              data-card-field></v-select>
-            <v-select :id="fields.cardYear" :items="years" label="{{ $t('cardForm.year') }}" v-model="formData.cardYear"
-              @change="changeYear" data-card-field></v-select>
+            <label for="cardMonth" class="card-input__label">{{ $t('Expire Date') }}</label>
+            <v-select :id="fields.cardMonth" :items="months" :label="$t('Month')" v-model="formData.cardMonth"
+              @change="changeMonth" :disabled-item="month => month < minCardMonth" data-card-field
+              variant="outlined"></v-select>
+            <v-select :id="fields.cardYear" :items="years" :label="$t('Year')" v-model="formData.cardYear"
+              @change="changeYear" data-card-field variant="outlined"></v-select>
           </div>
         </div>
         <div class="card-form__col -cvv">
           <div class="card-input">
-            <label for="cardCvv" class="card-input__label">{{ $t('cardForm.CVV') }}</label>
+            <label for="cardCvv" class="card-input__label">{{ $t('CVV') }}</label>
             <v-text-field type="tel" v-model="formData.cardCvv" v-number-only :id="fields.cardCvv" maxlength="4"
-              @input="changeCvv" data-card-field autocomplete="off">
+              @input="changeCvv" data-card-field autocomplete="off" variant="outlined">
             </v-text-field>
           </div>
         </div>
       </div>
-      <button class="card-form__button" @click="invaildCard">{{ $t('cardForm.submit') }}</button>
+      <v-btn class="card-form__button" @click="invaildCard">
+        {{ $t('PAY') }}
+      </v-btn>
     </div>
   </div>
 </template>
@@ -356,7 +359,7 @@ export default {
     background: #2364d2;
     border: none;
     border-radius: 5px;
-    font-size: 22px;
+    font-size: 1.25rem;
     font-weight: 500;
     font-family: "Source Sans Pro", sans-serif;
     box-shadow: 3px 10px 20px 0px rgba(35, 100, 210, 0.3);
@@ -563,11 +566,11 @@ export default {
 
   &__holder {
     opacity: 0.7;
-    font-size: 13px;
+    font-size: .8rem;
     margin-bottom: 6px;
 
     @media screen and (max-width: 480px) {
-      font-size: 12px;
+      font-size: .75rem;
       margin-bottom: 5px;
     }
   }
@@ -587,7 +590,7 @@ export default {
   }
 
   &__name {
-    font-size: 18px;
+    font-size: 1rem;
     line-height: 1;
     white-space: nowrap;
     max-width: 100%;
@@ -596,7 +599,7 @@ export default {
     text-transform: uppercase;
 
     @media screen and (max-width: 480px) {
-      font-size: 16px;
+      font-size: 1rem;
     }
   }
 
@@ -617,13 +620,13 @@ export default {
     cursor: pointer;
 
     @media screen and (max-width: 480px) {
-      font-size: 21px;
+      font-size: 1.25rem;
       margin-bottom: 15px;
       padding: 10px 10px;
     }
 
     @media screen and (max-width: 360px) {
-      font-size: 19px;
+      font-size: 1rem;
       margin-bottom: 10px;
       padding: 10px 10px;
     }
@@ -638,18 +641,18 @@ export default {
     }
 
     @media screen and (max-width: 480px) {
-      width: 13px;
+      width: .75rem;
 
       &.-active {
-        width: 16px;
+        width: 1rem;
       }
     }
 
     @media screen and (max-width: 360px) {
-      width: 12px;
+      width: .75rem;
 
       &.-active {
-        width: 8px;
+        width: .5rem;
       }
     }
   }
@@ -662,7 +665,7 @@ export default {
 
   &__date {
     flex-wrap: wrap;
-    font-size: 18px;
+    font-size: 1rem;
     margin-left: auto;
     padding: 10px;
     display: inline-flex;
@@ -672,7 +675,7 @@ export default {
     cursor: pointer;
 
     @media screen and (max-width: 480px) {
-      font-size: 16px;
+      font-size: 1rem;
     }
   }
 
@@ -680,19 +683,19 @@ export default {
     position: relative;
 
     span {
-      width: 22px;
+      width: 1.5rem;
       display: inline-block;
     }
   }
 
   &__dateTitle {
     opacity: 0.7;
-    font-size: 13px;
+    font-size: .75rem;
     padding-bottom: 6px;
     width: 100%;
 
     @media screen and (max-width: 480px) {
-      font-size: 12px;
+      font-size: .75rem;
       padding-bottom: 5px;
     }
   }
@@ -706,7 +709,7 @@ export default {
     z-index: 2;
 
     @media screen and (max-width: 480px) {
-      margin-top: 20px;
+      margin-top: 1.3rem;
     }
 
     @media screen and (max-width: 360px) {
@@ -732,7 +735,7 @@ export default {
 
   &__cvvTitle {
     padding-right: 10px;
-    font-size: 15px;
+    font-size: 1rem;
     font-weight: 500;
     color: #fff;
     margin-bottom: 5px;
@@ -748,7 +751,7 @@ export default {
     justify-content: flex-end;
     padding-right: 10px;
     color: #1a3b5d;
-    font-size: 18px;
+    font-size: 1.2rem;
     border-radius: 4px;
     box-shadow: 0px 10px 20px -7px rgba(32, 56, 117, 0.35);
 
@@ -776,115 +779,13 @@ export default {
   position: relative;
 
   &__label {
-    font-size: 14px;
+    font-size: .8rem;
     margin-bottom: 5px;
     font-weight: 500;
     color: #1a3b5d;
     width: 100%;
     display: block;
     user-select: none;
-  }
-
-  &__input {
-    width: 100%;
-    height: 50px;
-    border-radius: 5px;
-    box-shadow: none;
-    border: 1px solid #ced6e0;
-    transition: all 0.3s ease-in-out;
-    font-size: 18px;
-    padding: 5px 15px;
-    background: none;
-    color: #1a3b5d;
-    font-family: "Source Sans Pro", sans-serif;
-
-    &:hover,
-    &:focus {
-      border-color: #3d9cff;
-    }
-
-    &:focus {
-      box-shadow: 0px 10px 20px -13px rgba(32, 56, 117, 0.35);
-    }
-
-    &.-select {
-      -webkit-appearance: none;
-      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAeCAYAAABuUU38AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAUxJREFUeNrM1sEJwkAQBdCsngXPHsQO9O5FS7AAMVYgdqAd2IGCDWgFnryLFQiCZ8EGnJUNimiyM/tnk4HNEAg/8y6ZmMRVqz9eUJvRaSbvutCZ347bXVJy/ZnvTmdJ862Me+hAbZCTs6GHpyUi1tTSvPnqTpoWZPUa7W7ncT3vK4h4zVejy8QzM3WhVUO8ykI6jOxoGA4ig3BLHcNFSCGqGAkig2yqgpEiMsjSfY9LxYQg7L6r0X6wS29YJiYQYecemY+wHrXD1+bklGhpAhBDeu/JfIVGxaAQ9sb8CI+CQSJ+QmJg0Ii/EE2MBiIXooHRQhRCkBhNhBcEhLkwf05ZCG8ICCOpk0MULmvDSY2M8UawIRExLIQIEgHDRoghihgRIgiigBEjgiFATBACAgFgghEwSAAGgoBCBBgYAg5hYKAIFYgHBo6w9RRgAFfy160QuV8NAAAAAElFTkSuQmCC');
-      background-size: 12px;
-      background-position: 90% center;
-      background-repeat: no-repeat;
-      padding-right: 30px;
-    }
-  }
-
-  &__eye {
-    display: inline-flex;
-    position: absolute;
-    width: 1em;
-    height: 1em;
-    font-size: 24px;
-    border-radius: 50%;
-    top: 35px;
-    right: 10px;
-    opacity: .75;
-    color: #8c9cae;
-    cursor: pointer;
-    padding: 0;
-    background: none;
-    display: inline-flex;
-    border: 2px solid currentColor;
-    box-shadow: none;
-    transition: all .3s ease-in-out;
-
-    &:before {
-      content: '';
-      position: absolute;
-      background: white;
-      width: 0.35em;
-      height: 0.35em;
-      top: 6px;
-      left: 6px;
-      z-index: 2;
-      border-radius: 50%;
-      transform: scale(.1);
-      opacity: 0;
-      transition: all .3s ease-in-out;
-      transition-delay: .1s;
-    }
-
-    &:after {
-      content: '';
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      background: currentColor;
-      width: 0.6em;
-      height: 0.6em;
-      border-radius: 50%;
-      transform: scale(.1);
-      opacity: 0;
-      transition: all .3s ease-in-out;
-    }
-
-    &:hover:not(:disabled),
-    &.-active:not(:disabled) {
-      color: #2364d2;
-      opacity: 1;
-    }
-
-    &.-active {
-
-      &::before,
-      &::after {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    &:disabled {
-      cursor: not-allowed;
-      opacity: .4;
-    }
   }
 }
 </style>
