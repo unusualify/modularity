@@ -901,6 +901,27 @@ trait ManageForm {
         }
 
         if(isset($input['ext'])){
+
+            $continue = false;
+            switch($input['ext']){
+                case 'date':
+                    # code...
+                    $input['default'] ??= date('Y-m-d');
+                    $continue = true;
+                    break;
+                case 'time':
+                    $input['default'] ??= date('H:i');
+                    $continue = true;
+                    break;
+
+                default:
+                    # code...
+                    break;
+
+            }
+
+            if($continue) return;
+
             //  pattern examples
             // 'permalink:slug'
             // 'permalinkPrefix:slug',
@@ -928,12 +949,12 @@ trait ManageForm {
                         }else{
                             $events[] = 'formatPermalinkPrefix:'.$inputToFormat.':' . $this->getSnakeCase($this->routeName());
                         }
-                        break;
+                    break;
                     case 'lock': //'lock:url:url'
                         $inputToFormat = array_shift($args);
                         $parentColumnName = array_shift($args);
                         $events[] = "formatLock:{$inputToFormat}:{$parentColumnName}";
-                        break;
+                    break;
                     case 'permalink': //'permalink:slug',
                         $inputToFormat = array_shift($args);
                         $permalinkPrefix = getHost() . '/';
@@ -970,37 +991,57 @@ trait ManageForm {
                         ]);
                         unset($input['ext']);
                         $events[] = 'formatPermalink:'.$inputToFormat;
-                        break;
+                    break;
                     case 'filter': //'filter:{target_input_name}:{target_prop_name}:{followed_key_name}'
                         $inputToFormat = array_shift($args);
                         $targetPropName = array_shift($args) ?? 'inputs';
 
-                        $filterEndpoints = Collection::make($input['schema'])->mapWithKeys(function($r){
+                        $filterEndpoint ??= null;
 
-                            $routeName = $this->getStudlyName($r['_routeName'] ?? $r['name']);
-                            $targetModuleName = $this->getStudlyName( $r['_moduleName'] ?? $this->moduleName );
-                            $targetModule = Modularity::find($targetModuleName);
+                        if(!$filterEndpoint && isset($input['schema'])){
+                            $filterEndpoint = Collection::make($input['schema'])->mapWithKeys(function($r){
 
-                            $routeName = $this->getStudlyName($r['name']);
+                                $routeName = $this->getStudlyName($r['_routeName'] ?? $r['name']);
+                                $targetModuleName = $this->getStudlyName( $r['_moduleName'] ?? $this->moduleName );
+                                $targetModule = Modularity::find($targetModuleName);
 
-                            return [$r['name'] => $targetModule->getRouteActionUri($routeName, 'show')];
-                        });
+                                $routeName = $this->getStudlyName($r['name']);
 
-                        if($data){
-                            $data['filterEndpoints'] = $filterEndpoints;
-                        }else{
-                            $input['filterEndpoints'] = $filterEndpoints;
+                                return [$r['name'] => $targetModule->getRouteActionUri($routeName, 'show')];
+                            });
                         }
 
-                        $events[] = 'formatFilter:' . implode(':', [$inputToFormat, $targetPropName, ...$args]);
-                        break;
-                    case 'preview': //'lock:url:url'
+                        if(!$filterEndpoint && isset($input['_routeName'])){
+                            $routeName = $this->getStudlyName($input['_routeName']);
+                            $targetModuleName = $this->getStudlyName( $input['_moduleName'] ?? $this->moduleName );
+                            $targetModule = Modularity::find($targetModuleName);
+
+                            if($targetModule) $filterEndpoint = $targetModule->getRouteActionUri($routeName, 'show');
+                        }
+
+                        if($filterEndpoint){
+                            if($data) $data['filterEndpoint'] = $filterEndpoint;
+                            else $input['filterEndpoint'] = $filterEndpoint;
+
+                            $events[] = 'formatFilter:' . implode(':', [$inputToFormat, $targetPropName, ...$args]);
+                        }
+
+                    break;
+                    case 'preview': //
                         $inputToFormat = array_shift($args) ?? '';
                         $previewFieldPatterns = array_shift($args) ?? null;
 
                         if($inputToFormat)
                             $events[] = "formatPreview:{$inputToFormat}:{$previewFieldPatterns}";
-                        break;
+                    break;
+                    case 'set': //
+                        $inputToFormat = array_shift($args) ?? '';
+                        $inputPropToFormat = array_shift($args) ?? null;
+                        $setProp = array_shift($args) ?? "items.*.{$inputPropToFormat}";
+
+                        if($inputToFormat && $inputPropToFormat)
+                            $events[] = "formatSet:{$inputToFormat}:{$inputPropToFormat}:{$setProp}";
+                    break;
                     default:
                         # code...
                         break;
@@ -1011,6 +1052,9 @@ trait ManageForm {
                 $data = (array)($data ?? $input);
                 try {
                     //code...
+                    // if($input['name'] == 'packageCountry'){
+                    //     dd($data, $events, explode('|', $data['event'] ?? ''));
+                    // }
                     $data['event'] = implode('|', array_merge($events, explode('|', $data['event'] ?? '')) );
                 } catch (\Throwable $th) {
                     dd($events, $data, $th,  $this->config);
