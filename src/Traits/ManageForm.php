@@ -729,6 +729,11 @@ trait ManageForm {
             break;
             case 'radio-group':
                 $input['type'] = 'custom-input-radio-group';
+                // $input['default'] ??= [];
+
+            break;
+            case 'checklist-group':
+                $input['type'] = 'custom-input-checklist-group';
                 $input['default'] ??= [];
 
                 $input['schema'] = array_filter($this->createFormSchema($input['schema']), function($_input){
