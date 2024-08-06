@@ -21,7 +21,7 @@
         </slot>
       </div>
     </ue-title>
-    <ue-tabs :items="groupedItems">
+    <ue-tabs :items="groupedItems" v-model="activeTab">
       <template v-for="(_, name) in $slots" v-slot:[name]="slotData"><slot :name="name" v-bind="slotData"></slot></template>
     </ue-tabs>
   </v-sheet>
@@ -85,7 +85,8 @@
     },
     data () {
       return {
-        searchInput: this.search
+        searchInput: this.search,
+        activeTab: Object.keys(this.groupedItems ?? {})[0] ?? 0
       }
     },
     computed: {
