@@ -23,7 +23,19 @@ export const getSchema = (inputs, model = null) => {
   }
 
   map(_inputs, (value, key) => {
+    if(__isset(value.type) && value.type == 'group'){
+      let _name = value.name
+      let _schema = cloneDeep(value.schema)
+      let schema = {}
+      for(const key in _schema){
+        let newKey = key.split('.').filter((part) => part !== _name).join('.')
+        schema[newKey] = _schema[key]
+      }
+      value.schema = schema
+    }
     handleInputEvents(value.event, model, inputs, key)
+
+    return value
   })
 
   return _inputs
@@ -41,11 +53,13 @@ export const getModel = (inputs, item = null, rootState = null) => {
     const isTranslated = Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated
 
     // default model value
-    let _default = Object.prototype.hasOwnProperty.call(input, 'default') ? input.default : ''
+    let _default = ''
 
-    if (isArrayable.includes(input.type)) {
-      _default = []
-    }
+    if (isArrayable.includes(input.type)) _default = []
+
+    _default = Object.prototype.hasOwnProperty.call(input, 'default') ? input.default : _default
+
+    if (input.type == 'group') _default = getModel(input.schema, input.default)
 
     if (isTranslated) {
       _default = reduce(languages, function (acc, language, k) {
@@ -59,8 +73,18 @@ export const getModel = (inputs, item = null, rootState = null) => {
     //   return fields
     // }
     // __log(name, _default, item)
-    const value = editing ? (__isset(fields[name]) ? fields[name] : (__isset(item[name]) ? item[name] : _default)) : _default
+    let value = editing ? (__isset(fields[name]) ? fields[name] : (__isset(item[name]) ? item[name] : _default)) : _default
     // const value = editing ? (__isset(item[name]) ? item[name] : _default) : _default
+
+    if(editing){
+      if(input.type == 'group' && __isset(item[name])){
+        if(JSON.stringify(Object.keys(__dot(_default))) !== JSON.stringify(Object.keys(__dot(item[name])))){
+          value = {
+            ..._default,
+          }
+        }
+      }
+    }
 
     if (__isObject(input)) {
       if (isTranslated) { // translations
