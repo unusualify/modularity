@@ -108,8 +108,6 @@
                         :row="getRowGroupOrArray(obj)"
                         :col="getColGroupOrArray(obj)"
                         :class="`${id}-${obj.key}`"
-
-                        v-bind="$attrs"
                       >
                         <!-- Based on https://gist.github.com/loilo/73c55ed04917ecf5d682ec70a2a1b8e2 -->
                         <template v-for="(_, name) in $slots" #[name]="slotData"><slot :name="name" v-bind= "{ id, obj, index, idx, item, ...slotData}" /></template>
@@ -137,6 +135,7 @@
                       :row="getRowGroupOrArray(obj)"
                       :col="getColGroupOrArray(obj)"
                       :class="`${id}-${obj.key}`"
+                      @input="onInputWrapper($event, obj)"
                       >
                       <!-- v-bind="$lodash.omit($attrs, 'onUpdate:schema')" -->
                       <!-- Based on https://gist.github.com/loilo/73c55ed04917ecf5d682ec70a2a1b8e2 -->
@@ -392,7 +391,7 @@
 // Import
 // import Vue from 'vue'
 import { getCurrentInstance } from 'vue'
-import { get, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex, omit } from 'lodash-es'
+import { get, set, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex, omit } from 'lodash-es'
 import getFormData from '@/utils/getFormData.js'
 
 // import VueMask from 'v-mask'
@@ -1046,6 +1045,7 @@ export default {
       this.setObjectByPath(this.storeStateData, obj.key, value)
       obj.value = obj.value !== value ? value : obj.value
 
+      let key = obj.key
       // when cascade select changed
       // this.setCascadeSelect(obj)
       getFormData.onInputEventFormData(
@@ -1061,7 +1061,7 @@ export default {
         id: this.id,
         index: this.index,
         params: { index: this.index, lastValue: obj.value },
-        key: obj.key,
+        key: key,
         value,
         obj,
         data: this.storeStateData,
@@ -1072,6 +1072,17 @@ export default {
       this.emitValue(type, emitObj)
 
       return emitObj
+    },
+    onInputWrapper (emitObj, wrapperObj) {
+      if(wrapperObj.schema.type == 'wrap'){
+        const newKey = `${wrapperObj.key}.schema.${emitObj.key}`
+        // set(emitObj, 'schema', emitObj.schema[emitObj.key])
+        // set(emitObj, 'key', newKey)
+        // set(emitObj, 'obj.key', newKey)
+        // set(emitObj, 'obj.schema.key', newKey)
+        // set(emitObj, 'schema.key', newKey)
+      }
+      this.emitValue('input', emitObj)
     },
     onEvent (event = {}, obj, tag) {
       const text = event && event.srcElement && event.srcElement.innerText
