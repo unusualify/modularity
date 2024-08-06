@@ -548,7 +548,7 @@ trait ManageForm {
                 $input['type'] = 'custom-input-filepond';
                 // In order to toggle of credits
                 $input['credits'] = false;
-
+                $input['default'] ??= [];
 
                 $input['inputName'] = $input['name'] ?? 'filepond';
 
