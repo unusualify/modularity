@@ -300,7 +300,30 @@ export default {
     },
     validModel(newValue, oldValue) {
       this.$emit('update:valid', newValue)
-    }
+    },
+    schema: {
+      handler (value, oldValue) {
+        // __log('schema watcher', value, JSON.stringify(value) !== JSON.stringify(oldValue))
+      },
+      deep: true
+    },
+    inputSchema: {
+      handler (value, oldValue) {
+        // __log('inputSchema watch', value)
+      },
+      deep: true
+    },
+    rawSchema: {
+      handler (value, oldValue, ...other) {
+        let oldModel = cloneDeep(this.model)
+        let model = getModel(value, this.model, this.$store.state)
+        if(JSON.stringify(Object.keys(__dot(model)) )!== JSON.stringify(Object.keys(__dot(oldModel)))){
+          this.model = model
+          this.inputSchema = this.invokeRuleGenerator(getSchema(value, this.model))
+        }
+      },
+      deep: true
+    },
   },
 
   computed: {
