@@ -437,77 +437,93 @@ const FormatFuncs = {
     }
   },
 
-  // UPPER FORM | BELOW STEPPERFORM
+  formatSet: async function(args, model, schema, input, index = null, preview = []) {
+    const inputNotation = this.getInputToFormat(args, model, schema, index )
 
-  formatFilter: async function(args, model, schema, input, index) {
+    if(!inputNotation)
+      return
 
-    if(Array.isArray(model)){
-      const handlerName = input.name
-      const handlerSchema = schema[index][handlerName]
-      const handlerValue = model[index][handlerName]
+    const inputPropToFormat = args.shift() //
+    const setterNotation = `${inputNotation}.${inputPropToFormat}`
+    const setPropFormat = args.shift() // items.*.schema
 
-      let inputToFormat = args.shift() // 2.packages
-      let targetFormIndex;
+    let {handlerName, handlerSchema, handlerValue} = this.handlers(input, model, index)
 
-      if(Array.isArray(model)){
-        let stages = inputToFormat.split('.')
+    if(Array.isArray(handlerValue) && handlerValue.length < 1)
+      return
 
-        inputToFormat = stages.pop()
-        targetFormIndex = (stages.pop() ?? 0) - 1
-      }
+    if(handlerValue){
+      let notation = __wildcard_change(setPropFormat, handlerValue)
+      let dataSet = __data_get(handlerSchema, notation, null)
 
-      const inputPropToFormat = args.shift() // items
-      const inputReadValue = args.shift() // group
-
-      // __log(
-      //   'formatFilter',
-      //   inputToFormat,
-      //   targetFormIndex
-
-      // )
-      const modelName = handlerValue[inputReadValue]
-      const endpoint = input.filterEndpoints[modelName]
-      const filterValues = handlerValue['items']
-      let eagers = schema[targetFormIndex][inputToFormat]?.eagers ?? [];
-
-      if( !schema[targetFormIndex][inputToFormat][inputPropToFormat])
-        schema[targetFormIndex][inputToFormat][inputPropToFormat] = []
-
-      let newItems = cloneDeep( schema[targetFormIndex][inputToFormat][inputPropToFormat] );
-
-      for(const i in newItems){
-        if(!filterValues.includes(newItems[i].id)){
-          newItems.splice(i, 1)
+      if(dataSet){
+        const newValue = dataSet.shift()
+        set(schema, setterNotation, newValue)
+        if(inputPropToFormat.match(/schema/)){
+          set(schema, `${inputNotation}.default`, getModel(newValue))
         }
       }
-      for(const i in filterValues){
-        const id = filterValues[i]
-
-        if( !newItems.find((el) => el.id == id) ) {
-          let res = await axios.get(endpoint.replace(`{${snakeCase(modelName)}}`, id), {
-            params: {
-              eagers: eagers
-            }
-          })
-          newItems.push(res.data)
-        }
-      }
-
-      schema[targetFormIndex][inputToFormat][inputPropToFormat] = orderBy(newItems, ['id'], ['asc'])
-
-      // axios.get(endpoint)
-      //   .then((res) => {
-      //     schema[targetFormIndex][inputToFormat][inputPropToFormat] = res.data.resource.data
-
-      //   })
     }
+  },
+  formatFilter: async function(args, model, schema, input, index) {
+    const inputNotation = this.getInputToFormat(args, model, schema, index )
+
+    if(!inputNotation)
+      return
+
+    let {handlerName, handlerModelName, handlerSchema, handlerValue} = this.handlers(input, model, index)
+
+    const inputPropToFormat = args.shift() // items
+    const inputReadValue = args.shift() // group
+
+    let endpoint
+    let filterValues
+    let modelValue
+
+    if(!!handlerValue[inputReadValue]){
+      modelValue = handlerValue[inputReadValue]
+      endpoint = input.filterEndpoint[modelValue]
+      filterValues = handlerValue[inputPropToFormat]
+    }else{
+      modelValue = handlerModelName
+      endpoint = input.filterEndpoint
+      filterValues = handlerValue
+    }
+
+    let setterNotation = `${inputNotation}.${inputPropToFormat}`
+    let eagers = get(schema, `${inputNotation}.eagers`) ?? [];
+
+    if( !get(schema, setterNotation))
+      set(schema, setterNotation, [])
+
+    let newItems = cloneDeep( get(schema, setterNotation) );
+
+    for(const i in newItems){
+      if(!filterValues.includes(newItems[i].id)){
+        newItems.splice(i, 1)
+      }
+    }
+
+    for(const i in filterValues){
+      const id = filterValues[i]
+
+      if( !newItems.find((el) => el.id == id) ) {
+        let res = await axios.get(endpoint.replace(`{${snakeCase(modelValue)}}`, id), {
+          params: {
+            eagers: eagers
+          }
+        })
+        newItems.push(res.data)
+      }
+    }
+
+    set(schema, setterNotation, orderBy(newItems, ['id'], ['asc']))
   },
 
   formatPreview: async function(args, model, schema, input, index, preview = []) {
     if(Array.isArray(model)){
-      const handlerName = input.name
-      const handlerSchema = input // schema[index][handlerName]
-      const handlerValue = model[index][handlerName]
+      let {handlerName, handlerSchema, handlerValue} = this.handlers(input, model, index)
+
       /*
       *handlerValue
         {
@@ -631,7 +647,7 @@ const FormatFuncs = {
             let parentPattern = inputToFormat.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*')
             patternValues[parentPattern] = map(targetValue, (val) => inputToFormat.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*' + `id=${val}`))
 
-            let data = __data_get(handlerSchema, inputToFormat.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*' + `id=${targetValue.join(',')}` + '$3'))
+            let data = __data_get(handlerSchema, __wildcard_change(inputToFormat, targetValue))
             each(data, (val,i) => clear
               ? unset(previewValue, isMultiple ? `[${i}][${_index}]` : `[${i}]`)
               : set(previewValue, isMultiple ? `[${i}][${_index}]` : `[${i}]`, val)  )
@@ -660,7 +676,8 @@ const FormatFuncs = {
 
                 let ids = Array.isArray(val) ? val.join(',') : val
 
-                let getter = [parentPattern, inputToFormat.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*' + `id=${ids}` + '$3')].join('.')
+                // let getter = [parentPattern, inputToFormat.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*' + `id=${ids}` + '$3')].join('.')
+                let getter = [parentPattern, __wildcard_change(inputToFormat, val)].join('.')
                 let data = __data_get(handlerSchema, getter).shift()
                 let formattedData = data[0] ?? ''
                 if(data.length > 1){
@@ -687,12 +704,53 @@ const FormatFuncs = {
       return
     }
   },
-  formatValidDisability: async function(args, model, schema, input, index, preview = []) {
-    if(Array.isArray(model)){
 
+  handlers: (input, model, index = null) => {
+    const handlerName = input.name
+    const handlerModelName = input.name
+    const handlerSchemaName = input.key ?? input.name
+
+    const handlerSchema = input // schema[index][handlerName]
+    const handlerValue = __data_get(model, !isNaN(index) ? `${index}.${handlerModelName}` : handlerModelName)
+
+    // const handlerSchema = get(schema, `${index}.${handlerSchemaName}`)
+    // const handlerValue = get(model, `${index}.${handlerModelName}`)
+    return {
+      handlerName,
+      handlerModelName,
+      handlerSchemaName,
+      handlerSchema,
+      handlerValue
+    }
+  },
+  getInputToFormat(args, model, schema, input, index){
+
+    let inputToFormat = args.shift() // 2.packages || package
+    let inputNotationParts = []
+
+    let stages = inputToFormat.split('.')
+    let targetFormIndex = parseInt(stages[0])
+
+    if(isNaN(targetFormIndex)){
+      targetFormIndex = index
+    }else if(!Array.isArray(model)){
+      return false
     }
 
-  },
+    if(Array.isArray(model)){
+      if(!isNaN(targetFormIndex)){
+        targetFormIndex -= 1
+        stages.shift()
+      }
+      inputNotationParts.push(`[${targetFormIndex}]`)
+    }
+
+    inputToFormat = stages.join('.')
+    inputNotationParts.push(inputToFormat)
+
+    return inputNotationParts.join('.')
+  }
+
 }
 
 
