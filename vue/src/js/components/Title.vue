@@ -1,5 +1,5 @@
 <template>
-  <div :class="[defaultClasses, (!paddingReset ? paddingClasses: []), classes]">
+  <div :class="[defaultClasses, (!paddingReset ? paddingClasses: []), classes, (noUpperCase ? '' :'ue-title__uppercase'), (noBold ? '' :'font-weight-bold')]">
     <slot v-bind="{text}">
       {{ text }}
     </slot>
@@ -17,7 +17,15 @@ const props = defineProps({
   subTitle: String,
   defaultClasses: {
     type: [String, Array],
-    default: 'text-h8 text-primary font-weight-bold ue-title'
+    default: 'text-h8 text-primary ue-title'
+  },
+  noUpperCase: {
+    type: Boolean,
+    default: false
+  },
+  noBold: {
+    type: Boolean,
+    default: false
   },
   paddingClasses: {
     type: [String, Array],
@@ -33,7 +41,7 @@ const props = defineProps({
   descriptionClasses: {
     type: [String, Array],
     default: 'font-weight-light text-subtitle-2 text-truncate'
-  }
+  },
 })
 </script>
 
@@ -51,6 +59,7 @@ export default {
     padding-bottom: .75rem
     padding-left: $theme-space
     padding-right: $theme-space
-    text-transform: uppercase!important
+    .ue-title__uppercase
+      text-transform: uppercase!important
 
 </style>
