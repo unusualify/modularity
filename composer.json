@@ -46,7 +46,8 @@
         "league/glide-laravel" : "^1.0",
         "orangehill/iseed": "^3.0",
         "wikimedia/composer-merge-plugin": "^2.1",
-        "unusualify/priceable": "^1.0"
+        "unusualify/priceable": "^1.0",
+        "unusualify/payable": "*"
     },
     "require-dev": {
 
