@@ -291,9 +291,24 @@ export default {
   },
   watch: {
     schemas: {
-      handler (value, oldValue, ...args) {
-
-        // __log('schemas watch', value, oldValue, ...args)
+      handler (value, oldValue) {
+        // __log(value[0].wrap_location, oldValue[0].wrap_location)
+        // __log('schemas watch', value, oldValue)
+      },
+      deep: true
+    },
+    models: {
+      handler (value, oldValue) {
+        // __log(value[0].wrap_location, oldValue[0].wrap_location)
+        this.models.forEach((model, index) => {
+          if(!!this.previewModel[index]){
+            Object.keys(this.previewModel[index]).forEach((key) => {
+              if(!this.models[index][key]){
+                delete this.previewModel[index][key]
+              }
+            })
+          }
+        })
       },
       deep: true
     }
