@@ -309,6 +309,13 @@ trait ManageTable {
             // $header['align'] = 'center';
         }
 
+        if(isset($header['sortable']) && $header['sortable']){
+            if(preg_match('/(.*)(_relation)/', $header['key'], $matches)){
+                $header['sortable'] = false;
+            }
+
+        }
+
         if($header['key'] == 'actions'){
             $header['width'] ??= '100px';
             $header['align'] ??= 'center';
