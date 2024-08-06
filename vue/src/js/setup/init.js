@@ -168,6 +168,25 @@ import lodash, { snakeCase } from 'lodash-es'
     return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + '-]', 'g'), '\\$&');
   }
 
+  window.__dot = (obj, prefix = '') => {
+    return Object.keys(obj).reduce((acc, key) => {
+      const newKey = prefix ? `${prefix}.${key}` : key;
+
+      if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+        Object.assign(acc, __dot(obj[key], newKey));
+      } else {
+        acc[newKey] = obj[key];
+      }
+
+      return acc;
+    }, {});
+  }
+  window.__wildcard_change = (string, val, search_key = 'id') => {
+    let values = Array.isArray(val) ? val.join(',') : val
+    // __log('wildcard_change', string, val)
+    return string.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*' + `${search_key}=${values}` + '$3')
+  }
+
   window.__data_get = (data, path, defaultValue) => {
     if (!data || typeof path !== 'string') {
       return defaultValue;
@@ -191,6 +210,7 @@ import lodash, { snakeCase } from 'lodash-es'
             let filterKey = filterMatches[1]
             let filterValues = filterMatches[2].split(',')
             current = lodash.filter(current, (el) => filterValues.includes( lodash.isNumber(el[filterKey]) ? el[filterKey].toString() : el[filterKey] ))
+            // __log(filterValues, current)
           }
           // Handle wildcard (modified for array case):
           if (Array.isArray(current)) {
