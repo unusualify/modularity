@@ -33,7 +33,7 @@ class MigrateCommand extends Command
         $module = Modularity::findOrFail($this->argument('module'));
 
         $this->call('migrate', [
-            '--path' => config('modules.namespace') . "/{$module->getStudlyName()}/Database/Migrations"
+            '--path' => $module->getDirectoryPath('Database/Migrations', true)
         ]);
         try {
 
