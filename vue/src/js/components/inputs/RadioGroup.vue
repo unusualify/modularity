@@ -1,5 +1,19 @@
 <template>
-  <v-input
+  <v-radio-group v-model="input" direction="horizontal"  class="v-input-radio-group">
+    <v-row>
+      <v-col v-for="(item, i) in items" :key="`col-${item[itemValue]}`">
+        <v-btn
+          block class="v-input-radio-group__btn"
+          :variant="input == item[itemValue] ? 'elevated' : 'outlined'"
+          @click="input=item[itemValue]"
+        >
+          <template #prepend><v-radio :value="item[itemValue]"></v-radio></template>
+          {{ item[itemTitle].toUpperCase() }}
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-radio-group>
+  <!-- <v-input
     v-model="selectedItems"
     hideDetails="auto"
     appendIcon="mdi-close"
@@ -7,21 +21,8 @@
     class="v-input-radio-group"
     >
     <template v-slot:default="defaultSlot">
-      <v-radio-group v-model="selectedGroup" direction="horizontal">
-        <v-row>
-          <v-col v-for="(details, name) in schema" :key="name">
-            <v-btn block class="v-input-radio-group__btn" :variant="selectedGroup == name ? 'elevated' : 'outlined'" @click="selectedGroup=name">
-              <template #prepend><v-radio :value="name"></v-radio></template>
-              {{ details.label.toUpperCase() }}
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-radio-group>
-      <div>
-        <Checklist v-model="selectedItems" :items="schema[selectedGroup ?? 0]?.items ?? []" />
-      </div>
     </template>
-  </v-input>
+  </v-input> -->
 </template>
 
 <script>
@@ -38,11 +39,19 @@ export default {
     ...makeInputProps(),
     modelValue: {
       type: Object,
-      default: () => {}
+      default: () => ''
     },
-    schema: {
+    items: {
       type: Object,
-      default: () => {}
+      default: () => []
+    },
+    itemTitle: {
+      type: String,
+      default: 'name'
+    },
+    itemValue: {
+      type: String,
+      default: 'id'
     },
   },
   setup (props, context) {
@@ -52,33 +61,20 @@ export default {
   },
   data: function () {
     return {
-      selectedGroup: Object.keys(this.schema)[0] ?? 1,
-      selectedItems: []
+
     }
   },
   computed: {
 
   },
   watch: {
-    selectedGroup: {
-      handler (value, oldValue) {
-        this.selectedItems = []
-      }
-    },
-    selectedItems: {
-      handler (value, oldValue) {
-        this.$emit('update:modelValue', {
-          group: this.selectedGroup,
-          items: this.selectedItems
-        })
-      }
-    }
+
   },
   methods: {
 
   },
   created() {
-
+    // __log(this.schema)
   }
 }
 </script>
