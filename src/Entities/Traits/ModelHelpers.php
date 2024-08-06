@@ -68,6 +68,11 @@ trait ModelHelpers
         return in_array($column, $this->getTimestampColumns());
     }
 
+    public function getTitleField()
+    {
+        return $this->{$this->getRouteTitleColumnKey()};
+    }
+
     public function getColumnTypes(): array
     {
         $columnsKey = get_class($this) . "_column_types";
