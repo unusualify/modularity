@@ -179,6 +179,10 @@ class Module extends NwidartModule
     {
         $path = $this->getPath();
 
+        if($relative){
+            $path = str_replace(base_path('/'), '', $path);
+        }
+
         return $path . (empty($directory) ?'/': "/$directory");
     }
 
