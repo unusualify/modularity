@@ -63,49 +63,17 @@ return [
             'rules' => 'min:3'
         ],
         'language' => [
-            "type" => "select",
+            "type" => "language",
             "name" => "language",
             "label" => "Preferred Language",
-            "default" => 0,
-            'col' => [
-                'sm' => 6,
-            ],
-            'itemTitle' => 'label',
-            'itemValue' => 'value',
-            'items_' => [
-                [
-                    'text' => 'TR',
-                    'value' => 1,
-                ],
-                [
-                    'text' => 'EN',
-                    'value' => 2
-                ]
-            ],
-            'items' => array_map(function($locale) {
-                return [
-                    'value' => $locale,
-                    'label' => getLabelFromLocale($locale, true)
-                ];
-            }, unusualConfig('available_user_locales', ['en', 'tr']))
+            'col' => [ 'sm' => 6]
         ],
         'timezone' => [
-            "type" => "combobox",
+            "type" => "timezone",
             "name" => "timezone",
-            "label" => "Timezone",
-            "default" => 0,
-            'col' => [
-                'sm' => 6,
-            ],
-            "returnObject" => false,
-            'itemTitle' => 'label',
-            'itemValue' => 'value',
-            'items' => collect((new \Camroncade\Timezone\Timezone())->timezoneList)->map(function($value,$key){
-                return [
-                    'label' => $key,
-                    'value' => $value
-                ];
-            })->values()->toArray(),
+            'col' => ['sm' => 6],
+            'name' => 'time',
+            'rules' => 'sometimes|required',
         ],
     ],
     'user_password' => [
