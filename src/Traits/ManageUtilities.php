@@ -43,7 +43,6 @@ trait ManageUtilities {
             'headers' => $this->getIndexTableColumns(), // headers to be used in unusual datatable component
             'formSchema'  => $this->formSchema, // input fields to be used in unusual datatable component
         ];
-
         $data = [
             ...$_deprecated,
             'endpoints' => $this->getIndexUrls() + $this->getUrls(),
@@ -66,7 +65,9 @@ trait ManageUtilities {
                         'titleKey' => $this->titleColumnKey,
                     ],
                     $this->tableAttributes,
-                )
+                ),
+                $this->getTableDraggableOptions(),
+
             ),
             'formStore' => [
                 'inputs' => $this->formSchema,
@@ -154,7 +155,7 @@ trait ManageUtilities {
 
             'restore',
             'duplicate',
-
+            'reorder',
             // 'show',
             // 'update',
             // 'destroy'
@@ -185,7 +186,14 @@ trait ManageUtilities {
             // }
 
             $prefix = $this->routePrefix;
-
+            // dd(moduleRoute(
+            //     $this->getConfigFieldsByRoute('route_name'),
+            //     $prefix,
+            //     'store',
+            //     $parameters),
+            //     $this->getConfigFieldsByRoute('route_name'),
+            //     $action,
+            //     );
 
             if(!in_array($action, ['index', 'create', 'store'])){
                 $prefix = $this->generateRoutePrefix(noNested: true);

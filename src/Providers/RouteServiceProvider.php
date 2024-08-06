@@ -479,7 +479,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::macro('additionalRoutes', function ($url, $routeName, $options) {
 
             $customRoutes = $defaults = [
-                // 'reorder',
+                'reorder',
                 // 'publish',
                 // 'bulkPublish',
                 // 'browser',

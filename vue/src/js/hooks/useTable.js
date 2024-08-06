@@ -177,7 +177,7 @@ export default function useTable (props, context) {
 
   const form = ref(null)
   let loading = ref(false)
-  let items = ref(props.items)
+  let items = ref(props.items ?? store.state.datatable.data)
 
   const state = reactive({
 
@@ -194,6 +194,7 @@ export default function useTable (props, context) {
     fillHeight: computed(() => props.fillHeight),
     createUrl: computed(() => props.endpoints.create ?? null),
     editUrl: computed(() => props.endpoints.edit ??  null ),
+    reorderUrl: computed(() => props.endpoints.reorder ?? null),
     editedIndex: -1,
     selectedItems: [],
     windowSize: {
@@ -248,7 +249,7 @@ export default function useTable (props, context) {
     // elements: computed(() => props.items ?? store.state.datatable.data ?? []),
     elements: computed({
       get(){
-        return props.endpoints.index ? items.value : props.items ?? store.state.datatable.data
+        return items.value;
       },
       set(val){
         items.value = val
@@ -331,7 +332,29 @@ export default function useTable (props, context) {
 
       return footerProps
     }),
-    advancedFilters: computed(() => store.state.datatable.advancedFilters ?? null)
+    advancedFilters: computed(() => store.state.datatable.advancedFilters ?? null),
+    draggableItems: computed(() => {
+      const items = state.elements.reduce((prev, curr, currentIndex) => {
+        const newItem = {
+          "type": "item",
+          "key": currentIndex+1,
+          "value": curr.id,
+          "index" : currentIndex,
+          "selectable": props.showSelect,
+          "columns": state.headers.reduce((headersPrev, header) => {
+            headersPrev[header.key] = curr[header.key]
+
+            return headersPrev
+          }, {})
+        };
+
+        // prev.push(newItem);
+        prev[currentIndex] = newItem
+        return prev;
+      }, []); // Array of Objects
+
+      return items;
+    })
   })
 
   const methods = reactive({
@@ -769,9 +792,25 @@ export default function useTable (props, context) {
       store.commit(DATATABLE.RESET_DATATABLE_ADVANCED_FILTER)
       store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
       store.dispatch(ACTIONS.GET_DATATABLE)
-    }
+    },
+    sortElements(list){
+      // state.elements = list;
 
+      api.reorder(
+        state.reorderUrl,
+        // For Optimistic UI approach, did not query for new list,
+        // used response.status and new modelValue
+        list.map((element) => element.id), function(response){
+          if(response.status === 200){
+            list.forEach((element, index) => element.position = index+1)
+            state.elements = list
+          }
+        }
+      )
+
+    }
   })
+
 
   watch(() => state.editedItem, (newValue, oldValue) => {
     state.editedIndex = state.elements.findIndex(o => { return o.id === newValue.id })
@@ -794,11 +833,15 @@ export default function useTable (props, context) {
       newValue.replaceUrl = false
       methods.loadItems(newValue)
     }else{
+
       store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue, infiniteScroll: state.enableInfiniteScroll }, endpoint : props.endpoints.index ?? null})
     }
   }, { deep: true })
   watch(() => state.elements, (newValue, oldValue) => {
   }, { deep: true })
+  watch(() => store.state.datatable.data, (newValue, oldValue) => {
+    state.elements = newValue;
+  })
 
   const formatter = useFormatter(props, context, state.headers)
 

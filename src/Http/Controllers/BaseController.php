@@ -773,4 +773,15 @@ abstract class BaseController extends PanelController
         }
         return $this->respondWithError(___('listing.bulk-restore.error', ['modelTitle' => $this->modelTitle]));
     }
+
+    public function reorder()
+    {
+        $ids = is_array($this->request->get('ids')) ? $this->request->get('ids') : explode(',', $this->request->get('ids'));
+        if($this->repository->getModel()->setNewOrder($ids))
+        {
+
+            return $this->respondWithSuccess(___('listing.reorder.success', ['modelTitle' => $this->modelTitle]));
+        }
+        return $this->respondWithError(___('listing.reorder.error', ['modelTitle' => $this->modelTitle]));
+    }
 }
