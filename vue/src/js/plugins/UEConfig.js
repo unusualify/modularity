@@ -148,7 +148,7 @@ export default {
     app.config.globalProperties.registerComponents(includeIteratorComponents)
     // app.config.globalProperties.registerComponents(includeLabComponents, 'labs')
     app.config.globalProperties.registerComponents(includeLayouts, 'layouts')
-    app.config.globalProperties.registerComponents(includeCustomFormInputs, 'inputs', 'v-custom-input')
+    app.config.globalProperties.registerComponents(includeCustomFormInputs, 'inputs', 'v-input')
 
     // // Configurations
     // Vue.config.productionTip = isProd

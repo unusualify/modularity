@@ -37,7 +37,7 @@ const FilePond = vueFilePond(
 );
 
 export default {
-  name: "ue-custom-input-filepond",
+  name: "v-input-filepond",
   props: {
     ...makeInputProps(),
     endPoints: {

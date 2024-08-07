@@ -63,7 +63,7 @@ import { getModel, getSchema } from '@/utils/getFormData.js'
 
 // __log([...makeInputInjects])
 export default {
-  name: 'v-custom-input-tab-group',
+  name: 'v-input-tab-group',
   emits: [...makeInputEmits],
   inject: [...makeInputInjects],
   props: {

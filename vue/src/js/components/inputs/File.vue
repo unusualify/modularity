@@ -71,7 +71,7 @@ import localeMixin from '@/mixins/locale'
 import FileItem from '@/components/files/FileItem.vue'
 
 export default {
-  name: 'v-custom-input-file',
+  name: 'v-input-file',
   emits: [...makeInputEmits],
 
   components: {

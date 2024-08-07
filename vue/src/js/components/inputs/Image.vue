@@ -218,7 +218,7 @@ const IS_SAFARI = navigator.userAgent.indexOf('Safari') !== -1 && navigator.user
 // const { t } = useI18n({ useScope: 'global' })
 
 export default {
-  name: 'v-custom-input-image',
+  name: 'v-input-image',
   emits: [...makeInputEmits],
   components: {
     // 'a17-cropper': a17Cropper,

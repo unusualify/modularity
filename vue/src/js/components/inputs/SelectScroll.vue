@@ -22,7 +22,7 @@
 import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 
 export default {
-  name: 'v-custom-input-select-scroll',
+  name: 'v-input-select-scroll',
   emits: [...makeInputEmits],
 
   props: {

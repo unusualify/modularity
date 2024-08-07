@@ -118,7 +118,7 @@ import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 import Title from '__components/Title.vue'
 
 export default {
-  name: 'v-custom-input-checklist',
+  name: 'v-input-checklist',
   emits: [...makeInputEmits],
   components: {
     Title

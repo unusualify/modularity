@@ -2,8 +2,8 @@ import { find, omitBy, reduce, cloneDeep, map, findIndex, snakeCase, orderBy, ge
 import filters from '@/utils/filters'
 import axios from 'axios'
 
-const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist|custom-input-repeater|custom-input-file|custom-input-image'
-// const isMediableTypes = 'custom-input-file|custom-input-image'
+const isArrayable = 'input-treeview|treeview|input-checklist|input-repeater|input-file|input-image'
+// const isMediableTypes = 'input-file|input-image'
 // const isMediableFields = 'files|medias'
 
 export const getSchema = (inputs, model = null) => {
@@ -142,7 +142,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
 export const getSubmitFormData = (inputs, item = null, rootState = null) => {
   inputs = chunkInputs(inputs)
 
-  const isArrayable = 'custom-input-treeview|treeview|custom-input-checklist'
+  const isArrayable = 'input-treeview|treeview|input-checklist'
 
   const values = Object.keys(inputs).reduce((fields, k) => {
     const input = inputs[k]

@@ -37,7 +37,7 @@ import Table from '../Table.vue'
 import { find, toUpper } from 'lodash-es';
 
 export default {
-  name: 'v-custom-input-comparison-table',
+  name: 'v-input-comparison-table',
   emits: [...makeInputEmits],
   components: {
     Table

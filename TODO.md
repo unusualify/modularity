@@ -17,7 +17,7 @@ Modularity System Base Module
       - [x] prepareSave
       - [x] afterSave
 - [ ] Translation Form
-  - [x] add v-custom-input-locale
+  - [x] add v-input-locale
   - [ ] vuetify form-base 
     - [x] CustomFormBase.vue component to be updated
     - [ ] create localization switch for all locales at top of the form

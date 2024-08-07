@@ -83,7 +83,7 @@ trait ManageTraits {
                         return [ uniqid() => $input];
                     break;
                     case 'repeater':
-                    case 'custom-input-repeater':
+                    case 'input-repeater':
                     case 'json-repeater':
                         if($all){
                             return Arr::mapWithKeys($this->chunkInputs($input['schema']), function($item) use($input){
@@ -98,7 +98,7 @@ trait ManageTraits {
                         }
                     break;
                     // case 'repeater':
-                    // case 'custom-input-repeater':
+                    // case 'input-repeater':
 
                     //     return [ $input['name'] =>  $this->chunkInputs($input['schema'] ?? []) ];
                     default:

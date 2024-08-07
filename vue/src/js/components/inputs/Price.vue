@@ -27,7 +27,7 @@ import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 import CurrencyNumber from '__components/others/CurrencyNumber'
 
 export default {
-  name: 'v-custom-input-price',
+  name: 'v-input-price',
   emits: [...makeInputEmits],
   components: {
     CurrencyNumber

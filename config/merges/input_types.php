@@ -42,7 +42,7 @@ return [
         'label' => 'Description',
     ],
     '_phone' => [
-        'type' => 'custom-input-phone',
+        'type' => 'input-phone',
         'name' => 'phone',
         'label' => 'Phone Number',
         'default' => '',

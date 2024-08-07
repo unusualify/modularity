@@ -299,14 +299,14 @@
                 </v-btn>
                 <!-- END BTN -->
 
-                <v-custom-input-locale v-else-if="obj.schema.translated"
+                <v-input-locale v-else-if="obj.schema.translated"
                   :type="mapTypeToComponent(obj.schema.type)"
                   :attributes="obj.schema"
                   :modelValue="setValue(obj)"
                   @update:modelValue="onInput($event, obj)"
                   >
 
-                </v-custom-input-locale>
+                </v-input-locale>
 
                 <!-- MASK  -->
                 <component v-else-if="obj.schema.mask"
