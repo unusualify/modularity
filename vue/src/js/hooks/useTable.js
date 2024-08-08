@@ -189,6 +189,7 @@ export default function useTable (props, context) {
     formActive: false,
     deleteModalActive: false,
     customModalActive: false,
+    activeModal: 'delete',
     activeTableItem: null,
     hideTable: false,
     fillHeight: computed(() => props.fillHeight),
@@ -354,7 +355,57 @@ export default function useTable (props, context) {
       }, []); // Array of Objects
 
       return items;
-    })
+    }),
+    deleteModal: ref(null),
+    modals: {
+      'delete': {
+        // title: computed(() => t('confirm-deletion')),
+        content: computed(() => state.deleteQuestion),
+        confirmAction () {
+
+          if (state.isSoftDeletableItem) {
+            store.dispatch(ACTIONS.DESTROY_ITEM, {
+              id: state.editedItem.id,
+              callback: () => {
+                state.customModalActive = false
+              },
+              errorCallback: () => {
+
+              }
+            })
+          } else {
+            store.dispatch(ACTIONS.DELETE_ITEM, {
+              id: state.editedItem.id,
+              callback: () => {
+                state.customModalActive = false
+              },
+              errorCallback: () => {
+
+              }
+            })
+          }
+        },
+        closeAction () {
+          state.customModalActive = false
+          // this.active = false
+        }
+      },
+      'action': {
+        content: computed(() => state.actionDialogQuestion),
+        confirmAction() {
+          methods.bulkAction(state.selectedAction)
+          state.customModalActive = false;
+        },
+        openAction(action) {
+          // state.actionModalActive = true
+          state.selectedAction = action
+          state.customModalActive = true;
+        },
+        closeAction() {
+          state.customModalActive = false;
+        }
+      }
+    }
   })
 
   const methods = reactive({
@@ -396,6 +447,7 @@ export default function useTable (props, context) {
           }
           break
         case 'forceDelete':
+          __log(methods.isSoftDeletable(item), action)
           if (methods.isSoftDeletable(item)) {
             hasAction = methods.canItemAction(action)
           } else {
@@ -433,6 +485,7 @@ export default function useTable (props, context) {
     canItemAction: function (action) {
       // __log(store.getters.userPermissions)
       if (__isset(action.can) && action.can) {
+        __log(action, action.can)
         // if (store.getters.isSuperAdmin) {
         //   return true
         // }
@@ -453,9 +506,14 @@ export default function useTable (props, context) {
 
       return true
     },
-    itemAction: function (item, action, ...args) {
+    itemAction: function (item = null, action = null, name ,...args) {
+
       let _action = {}
-      if (__isString(action)) { _action.name = action } else { _action = action }
+
+      if (__isString(action)) {
+        _action.name = action
+        // if (_action.name.includes('bulk')) { store.commit(DATATABLE.REPLACE_DATATABLE_BULK, state.selectedItems) }
+      } else { _action = action }
 
       switch (_action.name) {
         case 'edit':
@@ -469,14 +527,16 @@ export default function useTable (props, context) {
           }
           break
         case 'delete':
-          methods.setEditedItem(item)
           // this.$refs.dialog.openModal()
-          methods.openDeleteModal()
+          // methods.openDeleteModal()
+          methods.setEditedItem(item)
+          state.activeModal = 'delete';
+          state.customModalActive = true;
           break
         case 'forceDelete':
           methods.setEditedItem(item)
-          // this.$refs.dialog.openModal()
-          methods.openDeleteModal()
+          state.activeModal = 'delete';
+          state.customModalActive = true;
           break
         case 'restore':
           methods.setEditedItem(item)
@@ -521,6 +581,21 @@ export default function useTable (props, context) {
           break
         case 'activate':
           state.activeTableItem = find(state.elements, { id: item.id })
+          break
+        case 'bulkDelete':
+          state.activeModal = 'action';
+          state.customModalActive = true;
+          state.selectedAction = _action;
+          break
+        case 'bulkForceDelete':
+          state.activeModal = 'action';
+          state.customModalActive = true;
+          state.selectedAction = _action;
+          break
+        case 'bulkRestore':
+          state.activeModal = 'action';
+          state.customModalActive = true;
+          state.selectedAction = _action;
           break
         default:
           break
@@ -679,6 +754,7 @@ export default function useTable (props, context) {
     },
     openForm: function () {
       state.formActive = true
+      // state.modals.form.active = true;
     },
     closeForm: function () {
       state.formActive = false
@@ -688,11 +764,15 @@ export default function useTable (props, context) {
         if (Object.prototype.hasOwnProperty.call(res, 'variant') && res.variant.toLowerCase() === 'success') { methods.closeForm() }
       })
     },
-    openDeleteModal: function () {
-      state.deleteModalActive = true
+    _openDeleteModal: function (modal) {
+      modal.open()
+      // state.deleteModal.open()
+      // state.deleteModalActive = true
     },
-    closeDeleteModal: function () {
-      state.deleteModalActive = false
+    _closeDeleteModal: function () {
+      state.modals[0].active.value = false
+      // state.modals[0].ref.close()
+      // state.deleteModalActive = false
     },
     isSoftDeletable (item) {
       return !!(__isset(item.deleted_at) && item.deleted_at)
@@ -744,14 +824,18 @@ export default function useTable (props, context) {
         console.warn(`${action.name} may have not implemented yet on useTable.js hook`)
       }
     },
-    bulkDelete(){
-      store.dispatch(ACTIONS.BULK_DELETE)
+    async bulkDelete(){
+      await store.dispatch(ACTIONS.BULK_DELETE)
+      state.selectedItems = []
     },
-    bulkRestore(){
-      store.dispatch(ACTIONS.BULK_RESTORE)
+    async bulkRestore(){
+      await store.dispatch(ACTIONS.BULK_RESTORE)
+      state.selectedItems = []
+
     },
-    bulkForceDelete(){
-      store.dispatch(ACTIONS.BULK_DESTROY)
+    async bulkForceDelete(){
+      await store.dispatch(ACTIONS.BULK_DESTROY)
+      state.selectedItems = []
     },
     onIntersect(isIntersecting, entries, observer){
       if(isIntersecting && entries[0].intersectionRatio === 1){
@@ -775,9 +859,12 @@ export default function useTable (props, context) {
     closeActionModal(){
       state.actionModalActive = false
     },
-    openActionModal(action){
-      state.actionModalActive = true
-      state.selectedAction = action
+    _openActionModal(action, name){
+      return;
+      state.customModalActive = true;
+      openAction=true;
+      // state.actionModalActive = true
+      // state.selectedAction = action
     },
     confirmAction(){
       methods.bulkAction(state.selectedAction)
