@@ -83,7 +83,7 @@ export default {
               if(!!this.input){
                 let searchContinue = false;
                 let self = this
-                if(!self.elements.find((o) => o.id == this.input)){
+                if(this.input && this.input.length > 0 && !self.elements.find((o) => o.id == this.input)){
                   searchContinue = true
                 }
 
