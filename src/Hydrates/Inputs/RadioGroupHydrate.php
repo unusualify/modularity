@@ -11,7 +11,8 @@ class RadioGroupHydrate extends InputHydrate
      * @var array
      */
     public $requirements = [
-
+        'itemValue' => 'id',
+        'itemTitle' => 'name',
     ];
 
     /**
@@ -24,6 +25,10 @@ class RadioGroupHydrate extends InputHydrate
         $input = $this->input;
 
         $input['type'] = 'input-radio-group';
+
+        if(count($input['items']) > 0){
+            $input['default'] = $input['items'][0][$input['itemValue']];
+        }
 
         return $input;
     }
