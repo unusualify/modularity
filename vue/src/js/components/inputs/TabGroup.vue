@@ -124,7 +124,7 @@ export default {
           loopValues:
           for(const id in v){
             let model = v[id]
-            __log(v)
+            // __log(v)
             for(const name in this.schema){
               let value = model[name]
               let input = this.schema[name]
@@ -135,7 +135,7 @@ export default {
               if(isValid !== true && this.manualValidation){
                 this.activeTab = parseInt(id)
                 let formRef = this.formRefs[id]
-                __log(formRef)
+                // __log(formRef)
                 formRef.value[0].validate()
                 break loopValues;
               }
