@@ -102,10 +102,10 @@ export default {
   },
   computed: {
     textCancel () {
-      return this.cancelText !== '' ? this.cancelText : this.$t('cancel')
+      return this.cancelText !== '' ? this.cancelText : this.$t('fields.cancel')
     },
     textConfirm () {
-      return this.confirmText !== '' ? this.confirmText : this.$t('confirm')
+      return this.confirmText !== '' ? this.confirmText : this.$t('fields.confirm')
     },
     textDescription () {
       return this.descriptionText

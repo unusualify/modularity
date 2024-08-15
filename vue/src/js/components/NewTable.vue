@@ -58,7 +58,7 @@
                         :disabled="!formIsValid"
                         :loading="formLoading"
                         >
-                        {{ $t('save') }}
+                        {{ $t('fields.save') }}
                       </v-btn>
                   </v-card-actions>
                 </v-card>

@@ -27,7 +27,7 @@
 
       :disable-pagination="false"
       :disable-sort="false"
-      :loading-text="$t('loading-text')"
+      :loading-text="$t('fields.loading-text')"
 
       v-model="selectedItems"
       show-selected
@@ -45,7 +45,7 @@
         >
           <!-- #title.left-top -->
           <v-toolbar-title>
-            <!-- {{ $t('list-of-item', [name, $t('modules.' + $lodash.snakeCase(name) )] ) }} -->
+            <!-- {{ $t('fields.list-of-item', [name, $t('modules.' + $lodash.snakeCase(name) )] ) }} -->
             <slot name="header" v-bind="{tableTitle}">
               <ue-title
                 :text="tableTitle"
@@ -73,9 +73,9 @@
 
           <!-- #language selector -->
           <v-toolbar-title v-show="false">
-            <!-- {{ $t('list') }}
+            <!-- {{ $t('fields.list') }}
             {{ $n(100.77, 'currency') }} -->
-            {{ $t('language-select') }}
+            {{ $t('fields.language-select') }}
             <select v-model="$i18n.locale">
               <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">
                 {{ lang }}
@@ -166,7 +166,7 @@
                           :disabled="!formIsValid"
                           :loading="formLoading"
                           >
-                          {{ $t('save') }}
+                          {{ $t('fields.save') }}
                         </v-btn>
                     </v-card-actions>
 
@@ -302,7 +302,7 @@
             color="primary"
             @click="initialize"
           >
-            {{ $t('reset') }}
+            {{ $t('fields.reset') }}
           </v-btn>
         </div>
       </template>
@@ -352,7 +352,7 @@
         >
           <v-edit-dialog
             v-model:return-value="props.item[header.value]"
-            :save-text="$t('save')"
+            :save-text="$t('fields.save')"
             @open="setEditedItem(props.item)"
             @cancel="resetEditedItem()"
             @close="resetEditedItem()"

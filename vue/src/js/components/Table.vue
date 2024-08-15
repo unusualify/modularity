@@ -39,7 +39,7 @@
         :density="tableDensity ?? 'comfortable'"
         :disable-sort="disableSort"
         :loading="loading"
-        :loading-text="$t('loading-text')"
+        :loading-text="$t('fields.loading-text')"
         :mobile="isSmAndDown"
 
         :show-select="showSelect"
@@ -194,7 +194,7 @@
                     :disabled="!formIsValid"
                     :loading="formLoading"
                   >
-                    {{ $t('save') }}
+                    {{ $t('fields.save') }}
                   </v-btn>
                 </v-card-actions>
               </v-card>
