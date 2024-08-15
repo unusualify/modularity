@@ -650,6 +650,15 @@ trait ManageForm {
                         if($inputToFormat && $inputPropToFormat)
                             $events[] = "formatSet:{$inputToFormat}:{$inputPropToFormat}:{$setProp}";
                     break;
+                    case 'prependSchema': //
+                        $inputToFormat = array_shift($args) ?? '';
+                        $prependKey = array_shift($args) ?? null;
+                        $setterSchemaKey = array_shift($args) ?? null;
+
+                        if($inputToFormat && $prependKey && $setterSchemaKey )
+                            $events[] = "formatPrependSchema:{$inputToFormat}:{$prependKey}:{$setterSchemaKey}";
+                        // dd($events);
+                    break;
                     default:
                         # code...
                         break;
