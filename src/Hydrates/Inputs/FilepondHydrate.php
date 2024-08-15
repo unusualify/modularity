@@ -51,6 +51,7 @@ class FilepondHydrate extends InputHydrate
         $input['credits'] = false;
 
         $input['inputName'] = $input['name'] ?? 'filepond';
+        // $input['label'] ??= 'filepond';
 
         $input['endPoints'] = [
             'process' => route('admin.filepond.process'),
@@ -59,7 +60,8 @@ class FilepondHydrate extends InputHydrate
         ];
 
         // Custom Labels
-        $input['label-idle'] ??= __('filepond-upload-label');
+        $input['label-idle'] ??= __('Drag & Drop your files or Browse');
+
         $input['label-invalid-field'] ??= __('filepon-invalid-field-label');
         $input['label-file-loading'] ??= __('filepond-loading-lable');
         $input['label-file-load-error'] ??= __('filepond-loading-error-lable');
