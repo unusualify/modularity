@@ -308,6 +308,13 @@ import lodash, { snakeCase } from 'lodash-es'
     }
 
     return returnValue
+  },
+
+  window.__snakeToHeadline = (str) => {
+    return str
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
   }
 }
 
