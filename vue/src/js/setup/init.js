@@ -202,7 +202,10 @@ import lodash, { snakeCase } from 'lodash-es'
       }
 
       if (typeof current === 'object') {
-        let matches = part.match(/^\*(.*)/)
+        let _tmp
+
+        let matches = part ? part.match(/^\*(.*)/) : false
+
         if (matches) {
           // if part is *id=1,2,3, current will be filtered wrt values splitted ',' comma
           let filterMatches
@@ -212,6 +215,7 @@ import lodash, { snakeCase } from 'lodash-es'
             current = lodash.filter(current, (el) => filterValues.includes( lodash.isNumber(el[filterKey]) ? el[filterKey].toString() : el[filterKey] ))
             // __log(filterValues, current)
           }
+
           // Handle wildcard (modified for array case):
           if (Array.isArray(current)) {
             let _index = parseInt(index)
@@ -229,8 +233,17 @@ import lodash, { snakeCase } from 'lodash-es'
             return defaultValue; // Invalid bracket syntax
           }
         } else {
-          current = current[part];
+          _tmp = current[part];
         }
+
+        if(!_tmp){
+          current = lodash.get(current, parts.slice(index).join('.'))
+          if(current)
+            break;
+        }else{
+          current = _tmp
+        }
+
       } else {
         return defaultValue; // Path points to a non-object
       }
