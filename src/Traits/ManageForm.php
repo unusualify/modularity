@@ -229,7 +229,14 @@ trait ManageForm {
 
                 $input['schema'] = $input['type'] == 'wrap'
                     ? $schema
-                    : Arr::mapWithKeys($schema, fn($i) => ["{$input['name']}.{$i['name']}" => array_merge($i,['name' => "{$input['name']}.{$i['name']}"])]);
+                    // : Arr::mapWithKeys($schema, fn($i) => ["{$input['name']}.{$i['name']}" => array_merge($i,['name' => "{$input['name']}.{$i['name']}"])]);
+                    : Arr::mapWithKeys($schema, function($_input) use($input) {
+                        if($input['type'] == 'group'){
+                            $_input['parentName'] = $input['name'];
+                        }
+                        $name = $_input['type'] == 'wrap' ? "{$input['name']}.{$_input['name']}" : $_input['name'];
+                        return [$name => array_merge($_input,['name' => $name])];
+                    });
 
                 if($input['type'] == 'group'){
                     $input['default'] = Collection::make($schema)->reduce(function($acc, $item, $key){
@@ -532,6 +539,7 @@ trait ManageForm {
             $extraInputs = [];
 
             foreach ($patterns as $pattern) {
+                $pattern = trim($pattern);
                 $args = explode(':',$pattern);
 
                 $methodName = array_shift($args);
