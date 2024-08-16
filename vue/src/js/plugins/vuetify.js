@@ -48,7 +48,8 @@ const opts = {
     VBtnCta: components.VBtn,
     VBtnCtaSecondary: components.VBtn,
     VBtnSuccess: components.VBtn,
-    VImgIcon: components.VImg
+    VImgIcon: components.VImg,
+    VSheetRounded: components.VSheet
 
   },
   defaults: {
@@ -56,8 +57,11 @@ const opts = {
       ripple: false
     },
     VSheet: {
+      // class: 'rounded'
+      //   elevation: 4
+    },
+    VSheetRounded: {
       class: 'rounded'
-    //   elevation: 4
     },
     VBtn: {
       color: 'primary',

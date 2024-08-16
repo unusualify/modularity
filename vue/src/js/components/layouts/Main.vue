@@ -29,9 +29,9 @@
 
       <!-- #language selector -->
       <v-toolbar-title v-if="false">
-        <!-- {{ $t('list') }}
+        <!-- {{ $t('fields.list') }}
         {{ $n(100.77, 'currency') }} -->
-        {{ $t('language-select') }}
+        {{ $t('fields.language-select') }}
         <select v-model="$i18n.locale">
           <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">
             {{ lang }}
@@ -76,9 +76,9 @@
 
       <!-- #language selector -->
       <v-toolbar-title v-if="false">
-        <!-- {{ $t('list') }}
+        <!-- {{ $t('fields.list') }}
         {{ $n(100.77, 'currency') }} -->
-        {{ $t('language-select') }}
+        {{ $t('fields.language-select') }}
         <select v-model="$i18n.locale">
           <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">
             {{ lang }}

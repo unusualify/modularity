@@ -954,9 +954,9 @@ return [
                         'lg' => 12,
                         'xl' => 12
                     ],
-
-                    'route' => 'permission',
-                    'model' => Spatie\Permission\Models\Permission::class,
+                    'connector' => 'SystemUser:Permission|repository',
+                    // 'route' => 'permission',
+                    // 'model' => Spatie\Permission\Models\Permission::class,
                 ],
             ],
             'rules' => [

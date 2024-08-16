@@ -510,7 +510,7 @@ class Module extends NwidartModule
 
     public function getRouteActionUri($routeName, $action): string
     {
-        $quote = '.' . $action;
+        $quote = preg_quote('.' . $action);
 
         return '/' . Collection::make($this->getRouteUris($routeName))->filter(fn($uri, $name) => preg_match('/' . $quote .'/', $name))->first();
     }

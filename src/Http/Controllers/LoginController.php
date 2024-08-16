@@ -200,7 +200,7 @@ class LoginController extends Controller
                 ])),
 
                 'actionUrl' => route(Route::hasAdmin('login')),
-                'buttonText' => 'authentication.login',
+                'buttonText' => __('authentication.login'),
                 'formClass' => 'px-5',
             ],
             'slots' => [

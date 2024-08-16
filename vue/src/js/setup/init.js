@@ -202,7 +202,10 @@ import lodash, { snakeCase } from 'lodash-es'
       }
 
       if (typeof current === 'object') {
-        let matches = part.match(/^\*(.*)/)
+        let _tmp
+
+        let matches = part ? part.match(/^\*(.*)/) : false
+
         if (matches) {
           // if part is *id=1,2,3, current will be filtered wrt values splitted ',' comma
           let filterMatches
@@ -212,6 +215,7 @@ import lodash, { snakeCase } from 'lodash-es'
             current = lodash.filter(current, (el) => filterValues.includes( lodash.isNumber(el[filterKey]) ? el[filterKey].toString() : el[filterKey] ))
             // __log(filterValues, current)
           }
+
           // Handle wildcard (modified for array case):
           if (Array.isArray(current)) {
             let _index = parseInt(index)
@@ -229,8 +233,17 @@ import lodash, { snakeCase } from 'lodash-es'
             return defaultValue; // Invalid bracket syntax
           }
         } else {
-          current = current[part];
+          _tmp = current[part];
         }
+
+        if(!_tmp){
+          current = lodash.get(current, parts.slice(index).join('.'))
+          if(current)
+            break;
+        }else{
+          current = _tmp
+        }
+
       } else {
         return defaultValue; // Path points to a non-object
       }
@@ -295,11 +308,17 @@ import lodash, { snakeCase } from 'lodash-es'
     }
 
     return returnValue
+  },
+
+  window.__snakeToHeadline = (str) => {
+    return str
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
   }
 }
 
 function tokenizePath(path) {
-  // Improved path tokenization handling brackets and escaping
   const tokens = [];
   let currentToken = '';
   let inBracket = false;
@@ -307,28 +326,29 @@ function tokenizePath(path) {
 
   for (let i = 0; i < path.length; i++) {
     const char = path[i];
+
     if (escaped) {
       currentToken += char;
       escaped = false;
     } else if (char === '\\') {
       escaped = true;
     } else if (char === '[') {
-      if (currentToken.length > 0) {
+      if (currentToken) {
         tokens.push(currentToken);
         currentToken = '';
       }
       inBracket = true;
+      currentToken += char;
     } else if (char === ']') {
       if (!inBracket) {
-        return; // Mismatched brackets
+        throw new Error('Mismatched brackets in path');
       }
-      tokens.push(extractKeyFromBracket(currentToken));
+      currentToken += char;
+      tokens.push(extractBracketContent(currentToken));
       currentToken = '';
       inBracket = false;
-    } else if (char === '.') {
-      if (inBracket) {
-        currentToken += char;
-      } else {
+    } else if (char === '.' && !inBracket) {
+      if (currentToken) {
         tokens.push(currentToken);
         currentToken = '';
       }
@@ -337,11 +357,24 @@ function tokenizePath(path) {
     }
   }
 
-  if (currentToken.length > 0) {
+  if (currentToken) {
     tokens.push(currentToken);
   }
 
   return tokens;
+}
+
+function extractBracketContent(bracketToken) {
+  // Remove brackets and trim whitespace
+  const content = bracketToken.slice(1, -1).trim();
+
+  // If it's a number, return as a number
+  if (/^\d+$/.test(content)) {
+    return content;
+  }
+
+  // Otherwise, return as a string
+  return content;
 }
 
 function extractKeyFromBracket(part) {

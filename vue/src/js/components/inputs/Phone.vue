@@ -281,7 +281,7 @@ export default {
       this.$emit('onValidate', this.phoneObject) // Deprecated
     },
     modelValue (val, oldValue) {
-      __log('phone.vue modelValue watch', val, this.modelValue, this.phone)
+      // __log('phone.vue modelValue watch', val, this.modelValue, this.phone)
       if (__isString(val)) { this.phone = this.modelValue }
     },
     open (isDropdownOpened) {
@@ -292,25 +292,28 @@ export default {
         this.$emit('close')
       }
     },
-    phone (newValue, oldValue) {
-      // __log('phone watch', newValue, oldValue)
-      if (newValue || __isString(newValue)) {
-        if (newValue[0] === '+') {
-          const code = PhoneNumber(newValue).getRegionCode()
-          if (code) {
-            this.activeCountry = this.findCountry(code) || this.activeCountry
+    phone: {
+      handler(newValue, oldValue) {
+        if (newValue || __isString(newValue)) {
+          if (newValue[0] === '+') {
+            const code = PhoneNumber(newValue).getRegionCode()
+            if (code) {
+              this.activeCountry = this.findCountry(code) || this.activeCountry
+            }
           }
         }
-      }
-      // Reset the cursor to current position if it's not the last character.
-      if (oldValue && this.cursorPosition < oldValue.length) {
-        this.$nextTick(() => {
-          setCaretPosition(this.$refs[this.getReference('phoneInput')], this.cursorPosition)
-        })
-      }
-
-      // this.$emit('input', this.phoneText, this.phoneObject)
-      this.updateModelValue(this.phoneText)
+        // Reset the cursor to current position if it's not the last character.
+        if (oldValue && this.cursorPosition < oldValue.length) {
+          this.$nextTick(() => {
+            // __log(this.cursorPosition)
+            setCaretPosition(this.$refs[this.getReference('phoneInput')], newValue.length)
+          })
+        }
+        // this.$emit('input', this.phoneText, this.phoneObject)
+        this.updateModelValue(this.phoneText)
+      },
+      // flush: 'post'
+      // once: true
     },
     activeCountry (value) {
       // __log('activeCountry watch', value)
@@ -502,7 +505,7 @@ export default {
       // Returns response.number to assign it to v-model (if being used)
       // Returns full response for cases @input is used
       // and parent wants to return the whole response.
-      __log(this.phoneText, this.phoneObject)
+      // __log(this.phoneText, this.phoneObject, e, e.target)
       // this.$emit('input', this.phoneText, this.phoneObject)
       // this.$emit('onInput', this.phoneObject) // Deprecated
       // Keep the current cursor position just in case the input reformatted

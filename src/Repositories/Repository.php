@@ -295,6 +295,7 @@ abstract class Repository
 
         if ( method_exists($this->getModel(), 'isTranslatable') && $this->model->isTranslatable()) {
             $query = $query->withTranslation();
+            $column = is_array($column) ? array_shift($column) : $column;
 
             return $query->get()->map(fn($item) => [
                 'id' => $item->id,
