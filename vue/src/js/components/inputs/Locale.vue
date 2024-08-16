@@ -60,7 +60,7 @@ import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 import { cloneDeep, omit } from 'lodash-es'
 
 export default {
-  name: 'v-custom-input-locale',
+  name: 'v-input-locale',
   emits: [...makeInputEmits],
   mixins: [LocaleMixin],
   setup (props, context) {

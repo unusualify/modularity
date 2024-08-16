@@ -27,7 +27,7 @@ export default {
     // VTreeview
   },
   mixins: [InputMixin],
-  name: 'ue-custom-input-range',
+  name: 'v-input-range',
 
   created () {
     // __log(this)

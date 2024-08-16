@@ -485,7 +485,7 @@ return [
             'test_inputs' => [
                 'permissions' => [
                     '_type' => 'treeview',
-                    // 'type' => 'custom-input-treeview',
+                    // 'type' => 'input-treeview',
                     '_name' => 'permissions',
                     'label' => 'Permissions of the role',
                     'col' => [
@@ -705,8 +705,8 @@ return [
                 ],
                 'day_interval' => [
                     // 'type' => 'text',
-                    // 'ext' => 'custom-input-range',
-                    'type' => 'custom-input-range',
+                    // 'ext' => 'input-range',
+                    'type' => 'input-range',
                     '_name' => 'day_interval',
                     'label' => 'Day Interval:0',
                     'hint' => 'Day Interval Hint',
@@ -742,7 +742,7 @@ return [
                 'color' => [
                     // 'type' => 'text',
                     // 'ext' => 'color',
-                    'type' => 'custom-input-color',
+                    'type' => 'input-color',
                     'label' => 'Color',
                     '_name' => 'color',
                     'default' => '#32010121',
@@ -778,7 +778,7 @@ return [
                     ]
                 ],
                 'start_date' => [
-                    'type' => 'custom-input-date',
+                    'type' => 'input-date',
                     'label' => 'Start Date',
                     '_name' => 'start_date',
                     'default' => '',
@@ -821,7 +821,7 @@ return [
                     ]
                 ],
                 'start_time' => [
-                    'type' => 'custom-input-time',
+                    'type' => 'input-time',
                     'label' => 'Start Time',
                     '_name' => 'start_time',
                     'default' => '',
@@ -870,7 +870,7 @@ return [
                     ]
                 ],
                 'icon' => [
-                    'type' => 'custom-input-icon',
+                    'type' => 'input-icon',
                     '_name' => 'icon',
                     'label' => 'Icon Selector',
                     'col' => [
@@ -944,7 +944,7 @@ return [
                 [
                     'type' => 'checklist',
                     'isTreeview' => true,
-                    '_type' => 'custom-input-treeview',
+                    '_type' => 'input-treeview',
                     'name' => 'permissions',
                     'label' => 'Permissions of the role',
                     'col' => [
@@ -1379,7 +1379,7 @@ return [
                     'rules' => 'sometimes|required|min:3',
                 ],
                 [
-                    'type' => 'custom-input-phone',
+                    'type' => 'input-phone',
                     'title' => 'Phone',
                     'name' => 'phone',
                     'label' => 'Company Phone',

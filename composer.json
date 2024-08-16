@@ -47,7 +47,7 @@
         "orangehill/iseed": "^3.0",
         "wikimedia/composer-merge-plugin": "^2.1",
         "unusualify/priceable": "^1.0",
-        "unusualify/payable": "*"
+        "unusualify/payable": "^0"
     },
     "require-dev": {
 

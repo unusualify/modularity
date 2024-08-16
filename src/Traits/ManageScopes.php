@@ -180,6 +180,17 @@ trait ManageScopes {
 
             foreach( $this->request->get('sortBy') as $str ){
                 $sort = json_decode($str);
+                // dd($sort);
+
+                if(preg_match('/(.*)(_timestamp)/', $sort->key, $matches)){
+                    $sort->key = $matches[1];
+                }
+
+                if(preg_match('/(.*)(_relation)/', $sort->key, $matches)){
+                    continue;
+                    // dd($sort);
+                    $sort->key = $matches[1];
+                }
 
                 if ( $sort->key == 'name') {
                     $sortBy = $this->titleColumnKey;

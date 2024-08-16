@@ -58,7 +58,7 @@ trait ManageUtilities {
                     'bulkActions' => $this->getTableBulkActions(),
                     'nestedData' => $this->getNestedData()
                 ],
-                ($this->isNested ? ['titlePrefix' => $this->nestedParentModel->{'name'} . ' \ ' ] : []),
+                ($this->isNested ? ['titlePrefix' => $this->nestedParentModel->getTitleField() . ' \ ' ] : []),
                 array_merge_recursive_preserve(
                     [
                         'name' => $this->getHeadline($this->routeName),

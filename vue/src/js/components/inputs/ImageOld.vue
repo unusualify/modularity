@@ -182,7 +182,7 @@ const IS_SAFARI = navigator.userAgent.indexOf('Safari') !== -1 && navigator.user
 // const { t } = useI18n({ useScope: 'global' })
 
 export default {
-  name: 'ue-custom-input-image',
+  name: 'v-input-image',
   components: {
     // 'a17-cropper': a17Cropper,
     // 'a17-mediametadata': a17MediaMetadata

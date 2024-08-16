@@ -64,7 +64,7 @@ import { useInput, makeInputProps } from '@/hooks'
 
 export default {
   mixins: [InputMixin],
-  name: 'ue-custom-input-icon',
+  name: 'v-input-icon',
   props: {
     ...makeInputProps(),
     label: {

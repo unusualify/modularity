@@ -136,7 +136,7 @@ class FilepondManager
 
     public function saveFile($files, $object)
     {
-
+        $files ??= [];
         $fileFolderNames = array_column($files, 'folderName');
 
         // files listesinde gelmeyip object->fileponds listesinde olanlari fileponds tablosundan ve storage'tan sil

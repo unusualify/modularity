@@ -44,7 +44,7 @@ import { useInput } from '@/hooks'
 
 export default {
   mixins: [InputMixin],
-  name: 'ue-custom-input-color',
+  name: 'v-input-color',
   setup (props, context) {
     return {
       ...useInput(props, context)

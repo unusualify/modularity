@@ -31,7 +31,7 @@ import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 import Checklist from './Checklist.vue'
 
 export default {
-  name: 'v-custom-input-checklist-group',
+  name: 'v-input-checklist-group',
   emits: [...makeInputEmits],
   components: {
     Checklist

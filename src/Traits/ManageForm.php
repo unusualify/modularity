@@ -32,17 +32,17 @@ trait ManageForm {
             // return $this->hasWithModel($item['type']);
             return in_array($input->type, [
                 'treeview',
-                'custom-input-treeview',
+                'input-treeview',
                 // 'checklist',
-                // 'custom-input-checklist',
+                // 'input-checklist',
                 'select',
                 'combobox',
                 'autocomplete',
-                'custom-input-repeater'
+                'input-repeater'
             ]) && !(isset($input->ext) && $input->ext == 'morphTo');
         })->mapWithKeys(function($input){
 
-            if($input->type == 'custom-input-repeater'){
+            if($input->type == 'input-repeater'){
                 if(isset($input->ext) && $input->ext == 'relationship'){
                     return [$input->name];
 
@@ -115,10 +115,10 @@ trait ManageForm {
         // $default_input = collect(Config::get(unusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
         // $default_input = $this->configureInput(array_to_object(Config::get(unusualBaseKey() . '.default_input')));
         $default_input = (array) Config::get(unusualBaseKey() . '.default_input');
-        [$hydrated, $arrayable] = $this->hydrateInput(object_to_array($input), $inputs);
+        [$hydrated, $spreaded] = $this->hydrateInput(object_to_array($input), $inputs);
 
 
-        if($arrayable){
+        if($spreaded){
             return $hydrated;
         }
         return isset($hydrated['name'])
@@ -172,7 +172,7 @@ trait ManageForm {
         $this->hydrateInputConnector($input);
 
         switch ($input['type']) {
-            case 'custom-input-treeview':
+            case 'input-treeview':
             case 'treeview':
                 $relation_class = null;
 
@@ -219,7 +219,7 @@ trait ManageForm {
 
                 $input['itemValue'] = $input['itemValue'] ?? 'id';
                 $input['itemTitle'] = $input['itemTitle'] ?? 'name';
-                $input['type'] = 'custom-input-checklist';
+                $input['type'] = 'input-checklist';
                 $input['default'] = [];
                 $items = $input['items'] ?? [];
                 if(isset($input['repository'])){
@@ -286,7 +286,7 @@ trait ManageForm {
                     && (isset($input['endpoint']) || isset($input['connector']))
                 ){
                     $input['componentType'] = (isset($input['ext']) && $input['ext'] == 'scroll') ? 'v-'. $input['type'] : 'v-autocomplete';
-                    $input['type'] = 'custom-input-select-scroll';
+                    $input['type'] = 'input-select-scroll';
                     unset($input['ext']);
                 }
 
@@ -391,11 +391,11 @@ trait ManageForm {
                 $data = $input;
             break;
             case 'repeater':
-            case 'custom-input-repeater':
+            case 'input-repeater':
             case 'json-repeater':
                 $relation_class= null;
 
-                $input['type'] = 'custom-input-repeater';
+                $input['type'] = 'input-repeater';
                 if( $input['draggable'] ?? false){
                     $input['orderKey'] ??= 'position';
                 }
@@ -466,6 +466,8 @@ trait ManageForm {
             break;
             case 'morphTo':
 
+                $data = [];
+
                 if(isset($input['schema'])){
                     $data = [];
                     $arrayable = true;
@@ -509,10 +511,14 @@ trait ManageForm {
                     }
                     $data = array_reverse($data);
                 }
+
+                if(empty($data)){
+                    $input = $data;
+                }
             break;
             case 'price':
                 $input['name'] ??= 'prices';
-                $input['type'] = 'custom-input-price';
+                $input['type'] = 'input-price';
                 // $input['ext'] = 'number';
                 $input['clearable'] = false;
 
@@ -539,7 +545,7 @@ trait ManageForm {
             break;
             case 'file':
                 $input['name'] ??= 'files';
-                $input['type'] = 'custom-input-file';
+                $input['type'] = 'input-file';
                 $input['translated'] ??= false;
                 $input['default'] ??= [];
 
@@ -551,7 +557,7 @@ trait ManageForm {
             case 'image':
                 // dd($input);
                 $input['name'] ??= 'images';
-                $input['type'] = 'custom-input-image';
+                $input['type'] = 'input-image';
                 $input['translated'] ??= false;
                 $input['default'] ??= [];
 
@@ -562,10 +568,10 @@ trait ManageForm {
             case 'filepond':
 
                 // Input type casting
-                $input['type'] = 'custom-input-filepond';
+                $input['type'] = 'input-filepond';
                 // In order to toggle of credits
                 $input['credits'] = false;
-
+                $input['default'] ??= [];
 
                 $input['inputName'] = $input['name'] ?? 'filepond';
 
@@ -670,7 +676,7 @@ trait ManageForm {
                     ->find($this->moduleName)
                     ->getRouteConfig(studlyName($input['name']) . '.inputs');
 
-                $input['type'] = 'custom-input-repeater';
+                $input['type'] = 'input-repeater';
                 $input['label'] = pluralize($this->getHeadline($input['name']));
                 $input['autoIdGenerator'] = false;
 
@@ -729,12 +735,12 @@ trait ManageForm {
 
             break;
             case 'radio-group':
-                $input['type'] = 'custom-input-radio-group';
+                $input['type'] = 'input-radio-group';
                 // $input['default'] ??= [];
 
             break;
             case 'checklist-group':
-                $input['type'] = 'custom-input-checklist-group';
+                $input['type'] = 'input-checklist-group';
                 $input['default'] ??= [];
 
                 $input['schema'] = array_filter($this->createFormSchema($input['schema']), function($_input){
@@ -743,25 +749,25 @@ trait ManageForm {
 
             break;
             case 'tab-group':
-                $input['type'] = 'custom-input-tab-group';
+                $input['type'] = 'input-tab-group';
                 $input['schema'] = $this->createFormSchema($input['schema']);
                 $input['default'] ??= [];
 
                 $eagers = [];
                 foreach ($input['schema'] as $key => $_input) {
-                    if($_input['type'] == 'custom-input-comparison-table' && isset($_input['comparators'])){
+                    if($_input['type'] == 'input-comparison-table' && isset($_input['comparators'])){
                         foreach ($_input['comparators'] as $relation => $conf) {
                             $eagers[] = isset($conf['eager']) ? $conf['eager'] : $input['name'] . "." . $relation;
                         }
                     }
-                    if(in_array($_input['type'], ['checklist', 'custom-input-checklist', 'select', 'combobox', 'autocomplete'])){
+                    if(in_array($_input['type'], ['checklist', 'input-checklist', 'select', 'combobox', 'autocomplete'])){
                         $eagers[] = isset($_input['eager']) ? $_input['eager'] : $input['name'] . "." . $_input['name'];
                     }
                 }
                 $input['eagers'] = $eagers;
             break;
             case 'comparison-table':
-                $input['type'] = 'custom-input-comparison-table';
+                $input['type'] = 'input-comparison-table';
                 $items = $input['items'] ?? [];
 
                 if(isset($input['repository'])){
@@ -798,7 +804,7 @@ trait ManageForm {
 
                 $input['itemValue'] = $input['itemValue'] ?? 'id';
                 $input['itemTitle'] = $input['itemTitle'] ?? 'name';
-                $input['type'] = 'custom-input-payment-service';
+                $input['type'] = 'input-payment-service';
                 $input['default'] = [];
                 $items = $input['items'] ?? [];
                 if (isset($input['repository'])) {
@@ -858,7 +864,7 @@ trait ManageForm {
             break;
             default:
 
-                break;
+            break;
         }
 
         $this->hydrateInputExtension($input, $data, $arrayable, $inputs);
@@ -879,7 +885,7 @@ trait ManageForm {
             ){
                 $input['translated'] ??= true;
                 // $input['locale_input'] = $input['type'];
-                // $input['type'] = 'custom-input-locale';
+                // $input['type'] = 'input-locale';
                 $data = $input;
             }
 

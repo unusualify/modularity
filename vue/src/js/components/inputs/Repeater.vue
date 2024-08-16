@@ -110,7 +110,7 @@ import {
 } from '@/hooks'
 
 export default {
-  name: 'v-custom-input-repeater',
+  name: 'v-input-repeater',
   emits: [...makeInputEmits],
   components: {
     Draggable

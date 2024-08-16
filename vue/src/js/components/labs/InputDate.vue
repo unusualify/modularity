@@ -18,7 +18,7 @@ import { useInput } from '@/hooks'
 
 export default {
   mixins: [InputMixin],
-  name: 'ue-custom-input-date',
+  name: 'v-input-date',
   setup (props, context) {
     return {
       ...useInput(props, context)

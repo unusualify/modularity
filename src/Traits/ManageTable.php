@@ -334,6 +334,13 @@ trait ManageTable {
             // $header['align'] = 'center';
         }
 
+        if(isset($header['sortable']) && $header['sortable']){
+            if(preg_match('/(.*)(_relation)/', $header['key'], $matches)){
+                $header['sortable'] = false;
+            }
+
+        }
+
         if($header['key'] == 'actions'){
             $header['width'] ??= '100px';
             $header['align'] ??= 'center';
@@ -416,18 +423,17 @@ trait ManageTable {
     protected function getTableAdvancedFilters()
     {
 
-       $advancedFilters = [];
+        $filters = Collection::make($this->getConfigFieldsByRoute('filters'))->filter(function($f, $key){
+            return in_array($key, ['relations']);
+        });
 
-       $advancedFilters = Collection::make($this->getConfigFieldsByRoute('filters'))
-            ->mapWithKeys(function($filter, $key) {
-                if(method_exists(__TRAIT__, $key.'FilterConfiguration')){
-                    return [$key => array_map([$this, $key.'FilterConfiguration'], object_to_array($filter))];
-                }
+        return $filters->mapWithKeys(function($filter, $key) {
+            if(method_exists(__TRAIT__, $key.'FilterConfiguration')){
+                return [$key => array_map([$this, $key.'FilterConfiguration'], object_to_array($filter))];
+            }
 
-                return [$key => $filter];
-            })->toArray();
-
-        return $advancedFilters;
+            return [$key => $filter];
+        })->toArray();
     }
 
     protected function relationsFilterConfiguration($filter)
@@ -478,8 +484,7 @@ trait ManageTable {
 
     protected function getTableDraggableOptions()
     {
-        if($this->repository)
-        {
+        if($this->repository){
             return [
                 'draggable' => classHasTrait($this->repository->getModel(), \Unusualify\Modularity\Entities\Traits\HasPosition::class),
                 'orderKey' => 'position'

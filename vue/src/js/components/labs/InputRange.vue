@@ -12,7 +12,7 @@ import { useInput } from '@/hooks'
 
 export default {
   mixins: [InputMixin],
-  name: 'ue-custom-input-range',
+  name: 'v-input-range',
 
   created () {
 

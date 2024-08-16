@@ -233,7 +233,7 @@ trait RelationTrait
         }
 
         foreach ($schema as $key => $input) {
-            if($input['type'] == 'custom-input-repeater' && isset($input['ext']) && $input['ext'] == 'relationship'){
+            if($input['type'] == 'input-repeater' && isset($input['ext']) && $input['ext'] == 'relationship'){
                 $repository = UFinder::getRouteRepository(Str::singular($input['name']), asClass:true);
                 $relationshipName = $input['relationship'] ?? $input['name'];
                 $records = $object->{$relationshipName};

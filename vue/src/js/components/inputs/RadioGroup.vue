@@ -30,7 +30,7 @@ import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 import Checklist from './Checklist.vue'
 
 export default {
-  name: 'v-custom-input-radio-group',
+  name: 'v-input-radio-group',
   emits: [...makeInputEmits],
   components: {
     Checklist
