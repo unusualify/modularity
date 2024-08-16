@@ -1,63 +1,61 @@
 <template>
-  <v-row>
-    <v-col>
-      <v-card class="pa-4 payment-container" elevation="2">
-        <v-card-title class="headline">
-          <p class="total">
-            Total Pay:
-          </p>
-          <p class="amount">
-            ${{ totalPay }}
-          </p>
-
-        </v-card-title>
-        <v-card-text>
-          <p class="select-title">
-            How would you like to pay?
-          </p>
-        </v-card-text>
-
-        <v-radio-group v-model="input" column>
-          <div v-for="(service, key) in this.items" :key="`service-${key}`" class="service-container">
-            <v-radio :label="service.title" :value="service.name" class="service-label">
-            </v-radio>
-            <v-row align="center">
-              <v-col class="d-flex justify-content-end">
-                {{ service.label }}
-                <div class="service-icon-container">
-                  <v-img-icon :src="service._icon" contain class="v-img__img--relative"></v-img-icon>
-
-                </div>
-
-              </v-col>
-            </v-row>
-          </div>
-        </v-radio-group>
-        <!-- <v-card-actions>
-          <v-btn @click="goBack">Back</v-btn>
-        </v-card-actions> -->
-      </v-card>
-    </v-col>
-    <v-col>
-      <CreditCardForm />
-    </v-col>
-  </v-row>
+  <v-input v-model="input">
+    <v-row>
+      <v-col class="d-flex flex-column justify-center">
+        <v-card class="pa-4 payment-container" elevation="2">
+          <v-card-title class="headline">
+            <p class="total">Total Pay:</p>
+            <p class="amount">{{ price }}</p>
+          </v-card-title>
+          <v-card-text>
+            <p class="select-title">How would you like to pay?</p>
+          </v-card-text>
+          <v-radio-group v-model="localPaymentMethod" column>
+            <div v-for="(service, key) in items" :key="`service-${key}`" class="service-container">
+              <v-radio :label="service.title" :value="service[itemValue]" class="service-label">
+              </v-radio>
+              <v-row align="center">
+                <v-col class="d-flex justify-content-end">
+                  <div class="service-icon-container">
+                    <v-img-icon :src="service[iconKey]" contain class="v-img__img--relative"></v-img-icon>
+                  </div>
+                </v-col>
+              </v-row>
+            </div>
+          </v-radio-group>
+        </v-card>
+      </v-col>
+      <v-col>
+        <CreditCardForm
+          v-model:cardName="localCreditCard.cardName"
+          v-model:cardNumber="localCreditCard.cardNumber"
+          v-model:cardMonth="localCreditCard.cardMonth"
+          v-model:cardYear="localCreditCard.cardYear"
+          v-model:cardCvv="localCreditCard.cardCvv"
+        />
+      </v-col>
+    </v-row>
+  </v-input>
 </template>
 
-
 <script>
-import {computed} from 'vue';
-import { useInput, makeInputProps, makeInputEmits } from '@/hooks';
+import { computed, ref, reactive, watch } from 'vue';
+import { makeInputProps, makeInputEmits } from '@/hooks';
 import CreditCardForm from '@/components/inputs/CreditCardForm';
+import useValidation from '@/hooks/useValidation';
 
 export default {
   name: 'PaymentService',
-  emits: [...makeInputEmits],
+  emits: [
+    ...makeInputEmits,
+    'update:modelValue',
+    'update:price'
+  ],
   props: {
     ...makeInputProps(),
-    label: {
-      type: String,
-      default: ''
+    modelValue: {
+      type: Object,
+      default: () => ({})
     },
     itemValue: {
       type: String,
@@ -67,44 +65,92 @@ export default {
       type: String,
       default: 'name'
     },
-    totalPay: {
+    price: {
       type: String,
-      default: '1500'
     },
     items: {
       type: Array,
       default: () => []
+    },
+    item: {
+      type: [Object, Proxy, Array],
+      default () {
+        return {}
+      }
+    },
+    iconKey: {
+      default: '_icon'
     }
   },
   components: {
     CreditCardForm
   },
-  data() {
-
-  },
-  setup(props, context) {
-    const serviceItems = computed(() => {
-      const services = [];
-      for (const i in props.items) {
-        services[i] = props.items[i];
-      }
-      return services;
+  setup(props, { emit }) {
+    const localPaymentMethod = ref('');
+    const localCreditCard = reactive({
+      cardName: '',
+      cardNumber: '',
+      cardMonth: '',
+      cardYear: '',
+      cardCvv: ''
     });
 
-    console.log(serviceItems.value);
+    const input = computed({
+      get: () => props.modelValue,
+      set: (newValue) => {
+        emit('update:modelValue', newValue);
+      }
+    });
+
+    watch(() => props.modelValue, (newValue) => {
+      if (newValue && typeof newValue === 'object') {
+        localPaymentMethod.value = newValue.paymentMethod || '';
+        Object.assign(localCreditCard, newValue.creditCard || {});
+      }
+    }, { immediate: true, deep: true });
+
+    watch([localPaymentMethod, localCreditCard], () => {
+      input.value = {
+        paymentMethod: localPaymentMethod.value,
+        creditCard: { ...localCreditCard }
+      };
+    }, { deep: true });
+
+    const serviceItems = computed(() => {
+      return props.items.slice();
+    });
+
+    const computedPrice = computed({
+      get: () => props.price,
+      set: (price) => emit('update:price', price)
+    });
+
+    const updatePrice = (price) => {
+      emit('update:price', price);
+    };
+
+    const validatePaymentService = () => {
+      const isValid = useValidation(
+        { rules: 'required' },
+        localPaymentMethod.value
+      );
+      return isValid === true ? true : 'Please select a payment service';
+    };
 
     return {
-      ...useInput(props, context),
-      serviceItems
-    }
+      input,
+      localPaymentMethod,
+      localCreditCard,
+      serviceItems,
+      computedPrice,
+      updatePrice,
+      validatePaymentService
+    };
   },
-  methods:{
-
-  }
 };
-
 </script>
 
+<!-- Styles remain unchanged -->
 <style lang="scss" scoped>
 .payment-container {
   padding: 0 !important;

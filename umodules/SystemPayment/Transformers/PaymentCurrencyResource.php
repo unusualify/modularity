@@ -4,7 +4,7 @@ namespace Modules\SystemPayment\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CurrencyResource extends JsonResource
+class PaymentCurrencyResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

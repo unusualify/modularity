@@ -299,11 +299,22 @@
               </v-card>
             </template>
           </ue-modal>
+          <ue-modal
+            ref="customFormModal"
+            v-model="customFormModalActive"
+            :width-type="'lg'"
+          >
+            <ue-form
+              ref="customForm"
+              v-model="customFormModel"
+              v-bind="customFormAttributes"
+            >
+            </ue-form>
+          </ue-modal>
 
           </div>
 
         </template>
-
 
         <!-- MARK: DATA-ITERATOR BODY -->
         <template v-slot:body="{ items }" v-if="enableIterators" class="ue-datatable__container">
@@ -540,6 +551,8 @@ import {
 } from '@/hooks'
 
 import ActiveTableItem from '__components/labs/ActiveTableItem.vue'
+import PaymentService from './inputs/PaymentService.vue'
+
 const { ignoreFormatters } = makeFormatterProps()
 
 export default {
@@ -548,6 +561,7 @@ export default {
     ActiveTableItem,
     Draggable,
     VDataTableRow,
+    PaymentService
 
   },
   props: {
@@ -595,4 +609,4 @@ export default {
   width: 100%
   &.ue-datatable--full-screen
     min-height: calc(100vh - (2*$theme-space))
-</style>z
+</style>

@@ -1,9 +1,9 @@
 // hooks/useTable.js
-import { watch, computed, nextTick, reactive, toRefs, ref } from 'vue'
+import { watch, computed, nextTick, reactive, toRefs, ref, toRef } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
-import { isObject, find, omit, snakeCase, kebabCase, isEqual } from 'lodash-es'
+import { isObject, find, omit, snakeCase, kebabCase, isEqual, cloneDeep } from 'lodash-es'
 import api from '@/store/api/datatable'
 
 import { DATATABLE, FORM } from '@/store/mutations/index'
@@ -13,6 +13,7 @@ import { mapGetters } from '@/utils/mapStore'
 import { getSubmitFormData } from '@/utils/getFormData.js'
 
 import { useFormatter, useRoot } from '@/hooks'
+import _ from 'lodash'
 
 export const makeTableProps = propsFactory({
   name: {
@@ -190,6 +191,10 @@ export default function useTable (props, context) {
     deleteModalActive: false,
     customModalActive: false,
     activeModal: 'delete',
+    customFormModalActive : false,
+    customFormAttributes: {},
+    customFormSchema: {},
+    customFormModel: {},
     activeTableItem: null,
     hideTable: false,
     fillHeight: computed(() => props.fillHeight),
@@ -238,9 +243,6 @@ export default function useTable (props, context) {
     headersWithKeys: computed(() => {
       let collection = {};
        Object.values(state.headers).forEach((header, i) => {
-        // let k =
-
-        // let newObject = Object.create({ })
          collection[header['key']] = header
        })
 
@@ -447,7 +449,7 @@ export default function useTable (props, context) {
           }
           break
         case 'forceDelete':
-          __log(methods.isSoftDeletable(item), action)
+          // __log(methods.isSoftDeletable(item), action)
           if (methods.isSoftDeletable(item)) {
             hasAction = methods.canItemAction(action)
           } else {
@@ -485,7 +487,7 @@ export default function useTable (props, context) {
     canItemAction: function (action) {
       // __log(store.getters.userPermissions)
       if (__isset(action.can) && action.can) {
-        __log(action, action.can)
+        // __log(action, action.can)
         // if (store.getters.isSuperAdmin) {
         //   return true
         // }
@@ -597,8 +599,52 @@ export default function useTable (props, context) {
           state.customModalActive = true;
           state.selectedAction = _action;
           break
+        // case 'pay':
+        //   methods.setEditedItem(item);
+        //   // state.payModalData.schema['payment-service'].price = item._price;
+        //   // state.payModalData.schema = methods.preparePaySchema(_action.schema,item);
+        //   // state.payModalData.active = true
+        //   // console.log(_action, action);
+        //   // return;
+        //   state.customFormModalSchema = _action.schema;
+        //   state.customFormModalActive = true;
+
+
+
+        //   // state.payModalData.active = true;
+        //   // state.payModalData.schema = _action.schema;
+
+        //   break;
         default:
           break
+      }
+      if(_action.form){
+        //use clone_dip
+        // console.log(_action.form)
+        state.customFormSchema = cloneDeep(_action.form.attributes.schema);
+        state.customFormAttributes = cloneDeep(_action.form.attributes);
+
+        // console.log(state.customFormSchema);
+        if(_action.form.hasOwnProperty('model_formatter')){
+          for(let key in _action.form.model_formatter){
+            let attr = _.get(item,_action.form.model_formatter[key], '')
+            _.set(state.customFormModel,key, attr);
+          }
+        }
+        if(_action.form.hasOwnProperty('schema_formatter')){
+          for(let key in _action.form.schema_formatter){
+            let attr = _.get(item,_action.form.schema_formatter[key], '');
+            _.set(state.customFormAttributes.schema,key, attr)
+          }
+        }
+        // console.log(state.customFormModel, state.customFormAttributes)
+        // state.customFormAttributes.actionUrl = state.customFormAttributes.actionUrl.replace(':id', item.price.id);
+        // console.log(item)
+
+        // console.log( state.customFormAttributes)
+        // console.log(state.customFormActionUrl);
+        state.customFormModalActive = true;
+        return;
       }
     },
 
@@ -895,7 +941,7 @@ export default function useTable (props, context) {
         }
       )
 
-    }
+    },
   })
 
 
@@ -940,7 +986,6 @@ export default function useTable (props, context) {
     ...getters,
     ...toRefs(methods),
     ...formatter,
-
-    isSmAndDown
+    isSmAndDown,
   }
 }

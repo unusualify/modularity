@@ -13,9 +13,9 @@ class CreateCurrencyPaymentServiceTable extends Migration
      */
     public function up()
     {
-        Schema::create('currency_payment_service', function (Blueprint $table) {
-            createDefaultRelationshipTableFields($table, 'currency', 'payment_service');
-            
+        Schema::create('payment_currency_payment_service', function (Blueprint $table) {
+            createDefaultRelationshipTableFields($table, 'payment_currency', 'payment_service');
+
         });
     }
 
@@ -26,6 +26,6 @@ class CreateCurrencyPaymentServiceTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('currency_payment_service');
+        Schema::dropIfExists('payment_currency_payment_service');
     }
 }

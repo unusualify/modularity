@@ -1,14 +1,13 @@
 <?php
 
-namespace Modules\SystemPayment\Http\Controllers\API;
+namespace Modules\SystemPayment\Http\Controllers\Front;
 
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Modules\SystemPayment\Repositories\CurrencyRepository;
-use Modules\SystemPayment\Transformers\CurrencyResource;
+use Modules\SystemPayment\Repositories\PaymentCurrencyRepository;
 
-class CurrencyController extends Controller
+class PaymentCurrencyController extends Controller
 {
 
     /**
@@ -20,7 +19,7 @@ class CurrencyController extends Controller
     /**
      * @param CurrencyRepository $repository
      */
-    public function __construct(CurrencyRepository $repository)
+    public function __construct(PaymentCurrencyRepository $repository)
     {
         $this->repository = $repository;
     }
@@ -32,7 +31,7 @@ class CurrencyController extends Controller
      */
     public function index(Request $request)
     {
-        return new CurrencyResource( $this->repository->paginate($request) );
+
     }
 
 

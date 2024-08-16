@@ -139,7 +139,7 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, provide } from 'vue'
 import { mapState } from 'vuex'
 import { FORM, ALERT } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
@@ -227,6 +227,8 @@ export default {
     const { t, te } = useI18n({ useScope: 'global' })
 
     const buttonDefaultText = computed(() => props.buttonText ? (te(props.buttonText) ? t(props.buttonText) : props.buttonText) : t('submit'))
+
+
     return {
       ...inputHandlers,
       ...validations,
@@ -257,7 +259,8 @@ export default {
   provide() {
     // use function syntax so that we can access `this`
     return {
-      manualValidation: computed(() => this.manualValidation)
+      manualValidation: computed(() => this.manualValidation),
+      submitForm: computed(() => this.submit)
     }
   },
 
@@ -452,6 +455,7 @@ export default {
         this.formLoading = true
 
         const formData = getSubmitFormData(this.rawSchema, this.model, this.$store._state.data)
+        // console.log(formData)
         const method = Object.prototype.hasOwnProperty.call(formData, 'id') ? 'put' : 'post'
         const self = this
 

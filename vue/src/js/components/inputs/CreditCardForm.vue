@@ -8,7 +8,7 @@
       <div class="card-input">
         <label for="cardNumber" class="card-input__label">{{ $t('Card Number') }}</label>
         <v-text-field :id="fields.cardNumber" v-model="formData.cardNumber" @input="changeNumber"
-          @focus="focusCardNumber" @blur="blurCardNumber" data-card-field type="tel" variant="outlined">
+          @focus="focusCardNumber" @blur="blurCardNumber" data-card-field type="tel" variant="outlined" v-number-only>
         </v-text-field>
       </div>
       <div class="card-input">
@@ -37,7 +37,7 @@
           </div>
         </div>
       </div>
-      <v-btn class="card-form__button" @click="invaildCard">
+      <v-btn class="card-form__button" @click="submitForm">
         {{ $t('PAY') }}
       </v-btn>
     </div>
@@ -45,8 +45,10 @@
 </template>
 
 <script>
-import { ref, reactive, computed, watch, onMounted } from 'vue';
+import { ref, reactive, computed, watch, onMounted, inject } from 'vue';
 import CreditCard from '@/components/inputs/CreditCard';
+import useValidation from '@/hooks/useValidation';
+
 
 export default {
   name: 'CreditCardForm',
@@ -54,8 +56,8 @@ export default {
     'number-only': {
       beforeMount(el) {
         function checkValue(event) {
-          event.target.value = event.target.value.replace(/[^0-9]/g, '');
-          if (event.charCode >= 48 && event.charCode <= 57) {
+          event.target.value = event.target.value.replace(/[^0-9 ]/g, '');
+          if (event.charCode >= 48 && event.charCode <= 57 || event.charCode === 32) {
             return true;
           }
           event.preventDefault();
@@ -104,6 +106,8 @@ export default {
       cardYear: 'v-card-year',
       cardCvv: 'v-card-cvv'
     });
+    const submitForm = inject('submitForm')
+
     const minCardYear = new Date().getFullYear();
     const isCardNumberMasked = ref(true);
     const mainCardNumber = ref(props.formData.cardNumber);
@@ -135,8 +139,18 @@ export default {
       return n < 10 ? `0${n}` : n;
     };
 
+    const formData = reactive({
+      cardName: '',
+      cardNumber: '',
+      cardNumberNotMask: '',
+      cardMonth: '',
+      cardYear: '',
+      cardCvv: ''
+    });
+
     const changeName = () => {
       emit('v-card-name', props.formData.cardName);
+      emit('update:cardName', formData.cardName);
     };
 
     const changeNumber = (e) => {
@@ -160,18 +174,26 @@ export default {
         }
       }
       emit('input-card-number', props.formData.cardNumber);
+      emit('update:cardNumber', formData.cardNumber);
+
     };
 
     const changeMonth = () => {
       emit('input-card-month', props.formData.cardMonth);
+      emit('update:cardMonth', formData.cardMonth);
+
     };
 
     const changeYear = () => {
       emit('input-card-year', props.formData.cardYear);
+      emit('update:cardYear', formData.cardYear);
+
     };
 
     const changeCvv = () => {
       emit('input-card-cvv', props.formData.cardCvv);
+      emit('update:cardCvv', formData.cardCvv);
+
     };
 
     const invaildCard = () => {
@@ -227,6 +249,58 @@ export default {
       }
     };
 
+
+  const validateCardNumber = (value) => {
+
+    return useValidation(
+      {
+        rules: 'required|min:16|max:19|regex:/^[0-9]+$/'
+      },
+      value
+    );
+  };
+
+    const validateCardName = (value) => {
+      return useValidation(
+        { rules: 'required' },
+        value
+      );
+    };
+
+    const validateExpiryDate = (month, year) => {
+      const currentDate = new Date();
+      const expiryDate = new Date(year, month - 1);
+      if (expiryDate < currentDate) {
+        return 'Card has expired';
+      }
+      return true;
+    };
+
+  const validateCVV = (value) => {
+    return useValidation(
+      { rules: 'required|min:3|max:4' },
+      value
+    );
+  };
+
+    watch(() => props.formData.cardNumber, validateCardNumber);
+    watch(() => props.formData.cardName, validateCardName);
+    watch([() => props.formData.cardMonth, () => props.formData.cardYear],
+      ([month, year]) => validateExpiryDate(month, year)
+    );
+    watch(() => props.formData.cardCvv, validateCVV);
+
+    // ... other existing code ...
+
+    // Add watchers to emit form data changes
+    watch(() => formData.cardName, (newValue) => emit('update:cardName', newValue));
+    watch(() => formData.cardNumber, (newValue) => emit('update:cardNumber', newValue));
+    watch(() => formData.cardMonth, (newValue) => emit('update:cardMonth', newValue));
+    watch(() => formData.cardYear, (newValue) => emit('update:cardYear', newValue));
+    watch(() => formData.cardCvv, (newValue) => emit('update:cardCvv', newValue));
+
+
+
     return {
       fields,
       minCardYear,
@@ -247,8 +321,24 @@ export default {
       maskCardNumber,
       unMaskCardNumber,
       focusCardNumber,
-      toggleMask
+      toggleMask,
+      submitForm,
+      validateCardNumber,
+      validateCardName,
+      validateExpiryDate,
+      validateCVV,
+      formData,
     };
+  },
+  methods: {
+    handleSubmit(e) {
+      if (this.submitForm) {
+        // Call the injected submitForm function
+        this.submitForm(e)
+      } else {
+        console.error('submitForm is not available')
+      }
+    }
   }
 };
 </script>

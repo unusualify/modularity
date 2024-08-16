@@ -4,7 +4,7 @@ namespace Modules\SystemPayment\Http\Requests;
 
 use Unusualify\Modularity\Http\Requests\Request;
 
-class CurrencyRequest extends Request
+class PaymentCurrencyRequest extends Request
 {
     /**
      * Get the default validation rules that apply to the request.

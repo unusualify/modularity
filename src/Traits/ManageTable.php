@@ -228,6 +228,31 @@ trait ManageTable {
                 'color' => 'red',
             ];
         }
+        // if $this->repository has hasPayment
+        if(classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasPayment')){
+            $actions[] = [
+                'name' => 'pay',
+                'icon' => '$pay',
+                // 'can' => 'pay',
+                // 'color' => 'red darken-2',
+                'color' => 'red',
+                'form' => [
+                    'attributes' => [
+                        'schema' => $this->createFormSchema($this->repository->getPaymentFormSchema()),
+                        'actionUrl' => route('admin.system.system_payment.payment'),
+                    ],
+                    'model_formatter' => [
+                        'price_id' => 'price.id', //lodash get method
+                    ],
+                    'schema_formatter' => [
+                        'payment_service.price' => '_price', //lodash set method
+                    ]
+                ],
+                //  admin.system.system_payment.payment routeName
+                //  admin.crm.template/system/system-payments/pay/{price}
+            ];
+        }
+
 
         $actions = array_merge(
             $actions,

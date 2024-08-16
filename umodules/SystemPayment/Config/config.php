@@ -61,11 +61,18 @@ return [
                     'label' => 'Payment Service Slug',
                     'type' => 'text',
                 ],
+                // [
+                //     'name' => 'payment-service',
+                //     'label' => 'Payment',
+                //     'type' => 'payment-service',
+                //     'connector' => 'SystemPayment:PaymentService|repository:listAll'
+                // ],
                 [
-                    'name' => 'payment-service',
-                    'label' => 'Payment',
-                    'type' => 'payment-service',
-                    'connector' => 'SystemPayment:PaymentService|repository:listAll'
+                    'name' => 'paymentCurrencies',
+                    'label' => 'Payment Currencies',
+                    'type' => 'select',
+                    'multiple',
+                    'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentCurrencyRepository',
                 ],
                 [
                     'name' => 'is_external',
@@ -146,11 +153,11 @@ return [
                 ]
             ],
         ],
-        'currency' => [
-            'name' => 'Currency',
-            'headline' => 'Currencies',
-            'url' => 'currencies',
-            'route_name' => 'currency',
+        'payment_currency' => [
+            'name' => 'PaymentCurrency',
+            'headline' => 'Payment Currencies',
+            'url' => 'payment-currencies',
+            'route_name' => 'payment_currency',
             'icon' => '',
             'title_column_key' => 'name',
             'table_options' => [
@@ -196,53 +203,9 @@ return [
                     'label' => 'Payment Service',
                     'type' => 'select',
                     'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentServiceRepository',
+                    'multiple',
                     'itemTitle' => 'title',
                 ]
-            ],
-        ],
-        'payment_price' => [
-            'name' => 'PaymentPrice',
-            'headline' => 'Payment Prices',
-            'url' => 'payment-prices',
-            'route_name' => 'payment_price',
-            'icon' => '',
-            'title_column_key' => 'name',
-            'table_options' => [
-                'createOnModal' => true,
-                'editOnModal' => true,
-                'isRowEditing' => false,
-                'rowActionsType' => 'inline',
-            ],
-            'headers' => [
-                [
-                    'title' => 'Name',
-                    'key' => 'name',
-                    'formatter' => [
-                        'edit',
-                    ],
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Created Time',
-                    'key' => 'created_at',
-                    'formatter' => [
-                        'date',
-                        'long',
-                    ],
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Actions',
-                    'key' => 'actions',
-                    'sortable' => false,
-                ],
-            ],
-            'inputs' => [
-                [
-                    'name' => 'name',
-                    'label' => 'Name',
-                    'type' => 'text',
-                ],
             ],
         ],
     ],

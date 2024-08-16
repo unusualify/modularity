@@ -6,7 +6,7 @@ namespace Modules\SystemPayment\Entities;
 
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 
-class Currency extends \Modules\SystemPricing\Entities\Currency
+class PaymentCurrency extends \Modules\SystemPricing\Entities\Currency
 {
 
 	protected $fillable = [
@@ -14,7 +14,7 @@ class Currency extends \Modules\SystemPricing\Entities\Currency
 	];
 	/**
 	 * The paymentServices that belong to the Currency.
-	 * 
+	 *
 	 */
 	public function paymentServices() : \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	{

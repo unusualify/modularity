@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
+use Unusualify\Payable\Payable;
 use Unusualify\Priceable\Models\Price;
 use Unusualify\Priceable\Traits\HasPriceable;
 
@@ -40,5 +41,22 @@ trait PaymentTrait
                 }
             }
         }
+    }
+
+    public function getPaymentFormSchema()
+    {
+        return [
+            [
+                'name' => 'price_id',
+                'label' => 'price_id',
+                'type' => 'hidden'
+            ],
+            [
+                'name' => 'payment_service',
+                'label' => 'Payment',
+                'type' => 'payment-service',
+                'connector' => 'SystemPayment:PaymentService|repository:listAll',
+            ]
+        ];
     }
 }
