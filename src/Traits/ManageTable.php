@@ -240,12 +240,14 @@ trait ManageTable {
                     'attributes' => [
                         'schema' => $this->createFormSchema($this->repository->getPaymentFormSchema()),
                         'actionUrl' => route('admin.system.system_payment.payment'),
+                        'async' => false,
                     ],
                     'model_formatter' => [
                         'price_id' => 'price.id', //lodash get method
                     ],
                     'schema_formatter' => [
                         'payment_service.price' => '_price', //lodash set method
+                        'payment_service.currency' => 'price.currency.id'
                     ]
                 ],
                 //  admin.system.system_payment.payment routeName

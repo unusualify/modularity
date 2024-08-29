@@ -23,8 +23,15 @@ Route::middleware(['web.auth', 'unusual.core'])->group(function(){
 
     });
     Route::controller(PriceController::class)->group(function(){
-
         Route::post('/pay', 'pay')->name('payment');
+    });
+
+});
+Route::controller(PriceController::class)->group(function(){
+    Route::group([
+        'excluded_middleware' => ['web']
+    ],function(){
+        Route::post('/response', 'response')->name('payment.response');
     });
 
 });
