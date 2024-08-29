@@ -23,20 +23,20 @@
         <!-- <v-card-title class="text-h5 grey lighten-2">
           Logout Form
         </v-card-title> -->
-        <v-card-text class="pt-2">
+        <v-card-text class="pt-2 text-center">
           {{ $t('Are you sure logout?') }}
         </v-card-text>
 
         <v-divider></v-divider>
 
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="secondary" text @click="dialog=false">
+        <v-card-actions class="justify-center">
+          <!-- <v-spacer></v-spacer> -->
+          <v-btn class="mr-theme" variant="tonal" @click="dialog=false">
             {{ $t('No') }}
           </v-btn>
           <v-form method="post" action="/logout">
             <input type="hidden" name="_token" :value="csrf">
-            <v-btn color="error" type="submit">
+            <v-btn variant="tonal" color="warning" type="submit">
               {{ $t('Yes') }}
             </v-btn>
           </v-form>
