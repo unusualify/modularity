@@ -121,6 +121,7 @@
                 <!-- GROUP | WRAP-->
                 <template v-else-if="/^(wrap|group)$/.test(obj.schema.type)">
                   <component
+                    v-if="obj.schema && obj.schema.schema"
                     :is="checkInternGroupType(obj)"
                     v-bind="bindSchema(obj)"
                     @click="onEvent($event, obj)"
@@ -673,7 +674,7 @@ export default {
     },
     modelValue: {
       handler (value, oldValue) {
-        if(JSON.stringify(Object.keys(value)) !== JSON.stringify(Object.keys(oldValue)) ){
+        if(JSON.stringify(Object.keys(__dot(value)) )!== JSON.stringify(Object.keys(__dot(oldValue)))){
           this.rebuildArrays(this.valueIntern, this.formSchema)
         }
       },
@@ -1165,12 +1166,12 @@ export default {
       //   this.$emit(`${event}`, val) // listen to specific event only
       //   // this.$emit('update:modelValue', this.storeStateData) // listen to specific event only
       // }
-      if (emits.includes(event)) {
-        this.$emit(`${event}`, val) // listen to specific event only
-      }
-
       if (event === 'onInput' || emitEvent === 'onChange') {
         this.$emit('update:modelValue', this.storeStateData)
+      }
+
+      if (emits.includes(event)) {
+        this.$emit(`${event}`, val) // listen to specific event only
       }
     },
     deprecateEventCustomID (ev) {
@@ -1325,14 +1326,10 @@ export default {
         // ACTIONS
         this.formSchema[cascadedSelectName][cascadeKey] = find(obj.schema[cascadeKey], [selectItemValue, this.valueIntern[obj.key]])?.schema ?? []
         const sortIndex = findIndex(this.flatCombinedArraySorted, ['key', cascadedSelectName])
-        __log(
-          this.formSchema[cascadedSelectName][cascadeKey]
-        )
         this.storeStateData[cascadedSelectName] = this.formSchema[cascadedSelectName][cascadeKey].length > 0 ? this.formSchema[cascadedSelectName][cascadeKey][0].value : []
         this.flatCombinedArraySorted[sortIndex].value = this.valueIntern[cascadedSelectName]
         this.setCascadeSelect(this.flatCombinedArraySorted[sortIndex])
       } else if ((obj.schema.type === 'select') && obj.schema.hasOwnProperty('autofill')) {
-        __log('autofill')
         obj.schema.autofill.forEach(element => {
           if (this.formSchema[element].autofillable) {
             this.storeStateData[element] = find(obj.schema.items, ['id', this.valueIntern[obj.key]])?.[element] ?? ''
