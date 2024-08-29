@@ -20,6 +20,15 @@
         @endif
 
         @php
+
+        @endphp
+
+        @php
+            $navigation ??= [];
+            $impersonation ??= [];
+            $authorization ??= [];
+            $currentUser = $currentUser ? $currentUser->only(['name', 'email']) : [];
+
             $_mainConfiguration = [
                 'navigation' => $navigation,
                 'impersonation' => $impersonation,
@@ -35,7 +44,7 @@
                 v-bind='@json($_mainConfiguration)'
 
                 >
-                @if(auth()->user()->invalidCompany)
+                @if(auth()->check() && auth()->user()->invalidCompany)
                     <template v-slot:main-top>
                         <v-alert
                             density="compact"
@@ -83,7 +92,7 @@
                 sideBarOpt: {!! json_encode(unusualConfig('ui_settings.sidebar')) !!},
                 secondarySideBar : {!! json_encode(unusualConfig('ui_settings.secondarySidebar')) !!},
                 profileMenu: {!! json_encode($navigation['profileMenu']) !!},
-                currentUser: {!! json_encode($currentUser->only(['name', 'email'])) !!}
+                currentUser: {!! json_encode($currentUser) !!}
             },
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.medias = {};
