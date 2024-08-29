@@ -728,6 +728,107 @@ const FormatFuncs = {
     }
   },
 
+  formatPrependSchema: async function(args, model, schema, input, index = null, preview = []) {
+    const inputNotation = this.getInputToFormat(args, model, schema, index )
+
+    if(!inputNotation)
+      return
+
+    // const inputPropToFormat = args.shift() //
+    // const setterNotation = `${inputNotation}.${inputPropToFormat}`
+    const prepend = args.shift() // *.packageLanguages
+    const setterSchemaKey = args.shift() // schema.packageLanguages
+
+    let {handlerName, handlerSchema, handlerValue} = this.handlers(input, model, index)
+
+    if(__isObject(handlerValue))
+      handlerValue = Object.values(handlerValue)
+
+    if(Array.isArray(handlerValue) && handlerValue.length < 1)
+      return
+
+    if(handlerValue){
+      if(prepend){
+        handlerValue = __data_get(handlerValue, prepend)
+        if(prepend.match(/^\*(.*)/)){
+          handlerValue = reduce(handlerValue, function(acc, array){
+            acc = [...(array ?? []), ...acc];
+
+            return [...new Set(acc)]
+          }, [])
+        }
+      }
+
+      let inputToPrepended = get(schema, inputNotation)
+      // __log(inputNotation, inputToPrepended, schema)
+      if(!inputToPrepended || !inputToPrepended.schema)
+          return
+
+      let oldSchema = cloneDeep(inputToPrepended.schema);
+
+      let prependerInput =  __data_get(handlerSchema, setterSchemaKey)
+      // __log(inputNotation, prependerInput)
+      if(prependerInput && __isset(prependerInput.schema)){
+
+        if(Array.isArray(handlerValue)){
+          if(!prependerInput.items)
+            return
+          // __log(handlerValue)
+          handlerValue = reduce(handlerValue, (acc, id) => {
+            acc[id] = {
+              label_prefix: __data_get(prependerInput.items, `*id=${id}.${prependerInput.itemTitle}`)?.shift(),
+            }
+            return acc
+          }, {})
+        }
+
+        let newSchema = cloneDeep({})
+
+        for(const prependKey in prependerInput.schema){ // prependKey _content
+
+          let quotedPattern = __preg_quote(prependKey)
+          let pattern = new RegExp( String.raw`^(\d+)(${quotedPattern})`)
+          for(const name in oldSchema){
+            let matches = name.match(pattern)
+            if(matches){
+              let searchId = matches[1]
+              // __log( inputNotation, setterSchemaKey, handlerValue)
+              if(!__isset(handlerValue[searchId])){
+                delete oldSchema[matches[0]]
+                // __log('delete this', matches[0])
+              }
+            }
+          }
+          for(const val in handlerValue){
+            // __log(id, handlerValue, prependKey)
+            let draftSchema = cloneDeep(prependerInput.schema[prependKey])
+
+            let pattern = /(\$[\w]+\$)/
+            let _inputName = prependKey.replace(pattern, val)
+            if(!oldSchema[_inputName]){
+              newSchema[_inputName] = {
+                ...draftSchema,
+                name: _inputName,
+                label: draftSchema.label ? `${handlerValue[val].label_prefix} ${draftSchema.label}` : __snakeToHeadline(handlerValue.label_prefix + draftSchema.name)
+              }
+              // __log(newSchema[_inputName])
+            }
+          }
+        }
+
+        let updatedSchema =  Object.assign(newSchema, oldSchema)
+        if(JSON.stringify(inputToPrepended.schema) !== JSON.stringify(updatedSchema)){
+          // __log(inputNotation, '[2].content-merge.schema.["content-merge.wrap-files"].schema')
+          set(schema, inputNotation + '.schema', updatedSchema)
+          // __log(inputNotation)
+          // set(schema, '[2].content-merge.schema.["content-merge.wrap-files"].schema', newSchema)
+          // __log(inputNotation + '.schema', get(schema, inputNotation + '.schema'))
+        }
+
+      }
+    }
+  },
+
   handlers: (input, model, index = null) => {
     const handlerName = input.name
     const handlerModelName = input.name
