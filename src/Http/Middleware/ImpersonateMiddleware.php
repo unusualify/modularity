@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Http\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 class ImpersonateMiddleware
@@ -36,10 +37,15 @@ class ImpersonateMiddleware
             $userRepository = app()->make(\Modules\SystemUser\Repositories\UserRepository::class);
             $users = $userRepository->whereNot('id', 1)->get();
 
+            $activeUser = null;
+            if(Auth::check()){
+                $activeUser = Auth::user();
+            }
+
             $impersonation = [
-                'active' => auth()->user()->isSuperAdmin() || auth()->user()->isImpersonating(),
+                'active' => $activeUser ? $activeUser->isSuperAdmin() || $activeUser->isImpersonating() : false,
                 'users' =>  $users,
-                'impersonated' => auth()->user()->isImpersonating(),
+                'impersonated' => $activeUser ?  $activeUser->isImpersonating() : false,
                 'stopRoute' => route(Route::hasAdmin('impersonate.stop')),
                 'route' => route(Route::hasAdmin('impersonate'), ['id' => ':id'])
             ];

@@ -2,6 +2,8 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
+use Illuminate\Support\Facades\Auth;
+
 trait IsAuthorizedable
 {
 
@@ -63,6 +65,9 @@ trait IsAuthorizedable
      */
     public function scopeAuthorized($query)
     {
+        if(!Auth::check())
+            return $query;
+
         $user = auth($this->authorizedGuardName)->user();
 
         if($user->isSuperAdmin() || $user->hasRole($this->allAuthorizedRoles))

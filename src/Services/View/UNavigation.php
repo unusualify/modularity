@@ -18,6 +18,7 @@ class UNavigation
         'default',
         'superadmin',
         'client',
+        'guest'
     ];
 
     /**

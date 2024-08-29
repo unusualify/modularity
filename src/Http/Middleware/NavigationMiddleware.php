@@ -41,20 +41,26 @@ class NavigationMiddleware
             // dd(
             //     config(unusualBaseKey() .'-navigation.sidebar')
             // );
+            if(Auth::guest()){
+                $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.guest') );
+                // $navigation['profileMenu'] = array_values( app()->config->get(unusualBaseKey(). '.ui_settings.profileMenu.client' ,default: []));
 
-            $user = auth()->user();
-
-            if(count($user->roles) > 0 && $user->isClient()){
-                $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.client') );
-                $navigation['profileMenu'] = array_values( app()->config->get(unusualBaseKey(). '.ui_settings.profileMenu.client' ,default: []));
-
-            }else if($user->hasRole(1)) {
-                $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.superadmin') );
-                $navigation['profileMenu'] = array_values( app()->config->get(unusualBaseKey(). '.ui_settings.profileMenu.superadmin',default: []));
             }else{
-                $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.default') );
-                $navigation['profileMenu'] = array_values( app()->config->get(unusualBaseKey(). '.ui_settings.profileMenu.default',default: []));
+                $user = auth()->user();
+                if(count($user->roles) > 0 && $user->isClient()){
+                    $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.client') );
+                    $navigation['profileMenu'] = array_values( app()->config->get(unusualBaseKey(). '.ui_settings.profileMenu.client' ,default: []));
+
+                }else if($user->hasRole(1)) {
+                    $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.superadmin') );
+                    $navigation['profileMenu'] = array_values( app()->config->get(unusualBaseKey(). '.ui_settings.profileMenu.superadmin',default: []));
+                }else{
+                    $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.default') );
+                    $navigation['profileMenu'] = array_values( app()->config->get(unusualBaseKey(). '.ui_settings.profileMenu.default',default: []));
+                }
+
             }
+
             // setActiveMenuItem($configuration['sidebar'], $configuration['current_url']);
             $view->with('navigation', $navigation);
         });
