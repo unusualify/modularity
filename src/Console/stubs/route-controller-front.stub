@@ -2,79 +2,35 @@
 
 namespace $NAMESPACE$;
 
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
-use Modules\$STUDLY_MODULE_NAME$\Repositories\$STUDLY_NAME$Repository;
+use Unusualify\Modularity\Http\Controllers\BaseController;
+use Illuminate\Contracts\Foundation\Application;
 
-class $CLASS$ extends Controller
+class $CLASS$ extends BaseController
 {
+    /**
+     * @var string
+     */
+    protected $moduleName = '$STUDLY_MODULE_NAME$';
 
     /**
-     * This resource repository
+     * @var string
      */
-    private $repository;
-
+    protected $routeName = '$ROUTE_NAME$';
 
     /**
-     * @param $STUDLY_NAME$Repository $repository
+     * Use default authorization permissions
+     *
+     * @var bool
      */
-    public function __construct($STUDLY_NAME$Repository $repository)
+    protected $setDefaultPermissions = false;
+
+
+    public function __construct(
+        Application $app,
+        Request $request
+    )
     {
-        $this->repository = $repository;
-    }
-
-
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index(Request $request)
-    {
-
-    }
-
-
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
-    {
-
-    }
-
-
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
+        parent::__construct($app,$request);
     }
 }

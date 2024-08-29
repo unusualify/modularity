@@ -79,6 +79,7 @@ class ControllerFrontMakeCommand extends BaseCommand
             'STUDLY_NAME'           => $this->getStudlyName($name),
             'LOWER_NAME'            => $this->getLowerName($name),
             'CLASS'                 => $this->getControllerNameWithoutNamespace(),
+            'ROUTE_NAME'            => $this->getStudlyName($name),
         ]))->render();
     }
 
