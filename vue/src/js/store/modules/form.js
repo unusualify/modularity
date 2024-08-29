@@ -206,8 +206,6 @@ const actions = {
 
       if (callback && typeof callback === 'function') callback(response.data)
     }, function (response) {
-      __log(response)
-
       commit(FORM.UPDATE_FORM_LOADING, false)
       if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
         commit(FORM.SET_FORM_ERRORS, response.data.errors)
