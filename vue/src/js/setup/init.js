@@ -184,7 +184,7 @@ import lodash, { snakeCase } from 'lodash-es'
   window.__wildcard_change = (string, val, search_key = 'id') => {
     let values = Array.isArray(val) ? val.join(',') : val
     // __log('wildcard_change', string, val)
-    return string.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*' + `${search_key}=${values}` + '$3')
+    return string.replace(/^([\w\.]+)?(\*)([\w\.\*]+)$/, '$1*' + `${search_key}=${values}` + '$3')
   }
 
   window.__data_get = (data, path, defaultValue) => {
