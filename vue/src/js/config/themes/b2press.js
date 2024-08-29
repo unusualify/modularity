@@ -14,7 +14,7 @@ export default {
     'secondary-darken-1': '#018786',
     error: '#E65100',
     info: '#178DA0',
-    success: '#5A9527',
+    success: '#54AF4C',
     warning: '#F08712',
 
     // unusualify colors
