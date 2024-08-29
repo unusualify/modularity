@@ -9,6 +9,8 @@
       v-model="validModel"
       @submit="submit"
       >
+      <input v-if="!async" type="hidden" name="_token" :value="csrf"/>
+
       <v-sheet class="d-flex">
         <v-sheet class="w-100">
           <!-- <div class="text-h8 pt-5 pb-10 text-primary font-weight-bold" v-if="formTitle && false">
@@ -491,6 +493,66 @@ export default {
         })
       }
     },
+    sendSync (e){
+      e && e.preventDefault()
+      // console.log(this.modelValue);
+      // console.log(this.convertToNestedFormData(this.modelValue).values)
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = this.actionUrl;
+      form.enctype = 'multipart/form-data';
+
+      let formData = this.convertToNestedFormData(this.modelValue);
+
+      for (const [key, value] of formData.entries()) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
+      }
+
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = '_token';
+      input.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+      form.appendChild(input);
+
+      document.body.appendChild(form);
+      form.submit();
+    },
+    convertToNestedFormData(obj, parentKey = '') {
+      const formData = new FormData();
+      for (const [key, value] of Object.entries(obj)) {
+        const formKey = parentKey ? `${parentKey}[${key}]` : key;
+
+        if (value === null || value === undefined) {
+          continue;
+        } else if (typeof value === 'object') {
+          if (Array.isArray(value)) {
+            value.forEach((item, index) => {
+              if (typeof item === 'object' && item !== null) {
+                const nestedFormData = this.convertToNestedFormData(item, `${formKey}[${index}]`);
+                for (const [nestedKey, nestedValue] of nestedFormData.entries()) {
+                  formData.append(nestedKey, nestedValue);
+                }
+              } else {
+                formData.append(`${formKey}[${index}]`, item);
+              }
+            });
+          } else {
+            const nestedFormData = this.convertToNestedFormData(value, formKey);
+            for (const [nestedKey, nestedValue] of nestedFormData.entries()) {
+              formData.append(nestedKey, nestedValue);
+            }
+          }
+        } else {
+          formData.append(formKey, value);
+        }
+      }
+      return formData;
+    },
     submit (e, callback = null, errorCallback = null) {
       if (this.validModel) {
         if (this.async) {
@@ -503,6 +565,9 @@ export default {
           } else {
             this.saveForm(callback, errorCallback)
           }
+        }else{
+          this.sendSync(e);
+
         }
       } else {
         e && e.preventDefault() // don't perform submit action (i.e., `<form>.action`)

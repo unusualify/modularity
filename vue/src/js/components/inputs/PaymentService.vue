@@ -11,7 +11,18 @@
             <p class="select-title">How would you like to pay?</p>
           </v-card-text>
           <v-radio-group v-model="localPaymentMethod" column>
-            <div v-for="(service, key) in items" :key="`service-${key}`" class="service-container">
+            <div class="service-container">
+              <v-radio :label="$t('Credit Card')" :value="-1" class="service-label">
+              </v-radio>
+              <v-row align="center">
+                <v-col class="d-flex justify-content-end">
+                  <div class="service-icon-container">
+                    <v-img-icon src="/storage/uploads/38fd5286-5643-48fc-8a5c-b6f1452f1276/group-25287.png" contain class="v-img__img--relative"></v-img-icon>
+                  </div>
+                </v-col>
+              </v-row>
+            </div>
+            <div v-for="(service, key) in serviceItems" :key="`service-${key}`" class="service-container">
               <v-radio :label="service.title" :value="service[itemValue]" class="service-label">
               </v-radio>
               <v-row align="center">
@@ -27,19 +38,27 @@
       </v-col>
       <v-col>
         <CreditCardForm
-          v-model:cardName="localCreditCard.cardName"
-          v-model:cardNumber="localCreditCard.cardNumber"
-          v-model:cardMonth="localCreditCard.cardMonth"
-          v-model:cardYear="localCreditCard.cardYear"
-          v-model:cardCvv="localCreditCard.cardCvv"
+          v-if="showCreditCardForm"
+          v-model:cardName="localCreditCard.card_name"
+          v-model:cardNumber="localCreditCard.card_number"
+          v-model:cardMonth="localCreditCard.card_month"
+          v-model:cardYear="localCreditCard.card_year"
+          v-model:cardCvv="localCreditCard.card_cvv"
         />
+        <v-btn
+          v-if="!showCreditCardForm"
+          color="primary"
+          @click="submitForm"
+        >
+          Pay with {{ selectedService?.title || 'External Service' }}
+        </v-btn>
       </v-col>
     </v-row>
   </v-input>
 </template>
 
 <script>
-import { computed, ref, reactive, watch } from 'vue';
+import { computed, ref, reactive, watch, inject } from 'vue';
 import { makeInputProps, makeInputEmits } from '@/hooks';
 import CreditCardForm from '@/components/inputs/CreditCardForm';
 import useValidation from '@/hooks/useValidation';
@@ -49,7 +68,6 @@ export default {
   emits: [
     ...makeInputEmits,
     'update:modelValue',
-    'update:price'
   ],
   props: {
     ...makeInputProps(),
@@ -68,7 +86,14 @@ export default {
     price: {
       type: String,
     },
+    currency:{
+      type: Number,
+    },
     items: {
+      type: Array,
+      default: () => []
+    },
+    serviceItems: {
       type: Array,
       default: () => []
     },
@@ -80,19 +105,27 @@ export default {
     },
     iconKey: {
       default: '_icon'
+    },
+    showCreditCardForm : {
+      type: Boolean,
+      default: true
     }
   },
   components: {
     CreditCardForm
   },
   setup(props, { emit }) {
+
+    const submitForm = inject('submitForm')
+
+
     const localPaymentMethod = ref('');
     const localCreditCard = reactive({
-      cardName: '',
-      cardNumber: '',
-      cardMonth: '',
-      cardYear: '',
-      cardCvv: ''
+      card_name: '',
+      card_number: '',
+      card_month: '',
+      card_year: '',
+      card_cvv: ''
     });
 
     const input = computed({
@@ -101,33 +134,47 @@ export default {
         emit('update:modelValue', newValue);
       }
     });
-
     watch(() => props.modelValue, (newValue) => {
       if (newValue && typeof newValue === 'object') {
-        localPaymentMethod.value = newValue.paymentMethod || '';
-        Object.assign(localCreditCard, newValue.creditCard || {});
+        localPaymentMethod.value = newValue.payment_method || '';
+        Object.assign(localCreditCard, newValue.credit_card || {});
       }
     }, { immediate: true, deep: true });
 
     watch([localPaymentMethod, localCreditCard], () => {
       input.value = {
-        paymentMethod: localPaymentMethod.value,
-        creditCard: { ...localCreditCard }
+        payment_method: localPaymentMethod.value,
+        credit_card: { ...localCreditCard }
       };
     }, { deep: true });
 
-    const serviceItems = computed(() => {
-      return props.items.slice();
-    });
-
-    const computedPrice = computed({
-      get: () => props.price,
-      set: (price) => emit('update:price', price)
-    });
-
-    const updatePrice = (price) => {
-      emit('update:price', price);
+    const filterItemsByCurrencyId = (items, currencyId) => {
+      return items.filter(item => {
+        // Check if payment_currencies exists and is an array
+        if (Array.isArray(item.payment_currencies)) {
+          // Check if any currency in payment_currencies has the specified id
+          return item.payment_currencies.some(currency => currency.id === currencyId);
+        }
+        // If payment_currencies doesn't exist or isn't an array, keep the item
+        // (adjust this logic if you want to remove such items instead)
+        return true;
+      });
     };
+
+    const serviceItems = computed(() => {
+      return filterItemsByCurrencyId(props.items, props.currency);
+    });
+
+    props.serviceItems = serviceItems;
+
+    const selectedService = computed(() => {
+      return serviceItems.value.find(service => service[props.itemValue] === localPaymentMethod.value);
+    });
+
+    const showCreditCardForm = computed(() => {
+      return !selectedService.value || !selectedService.value.is_external;
+    });
+
 
     const validatePaymentService = () => {
       const isValid = useValidation(
@@ -142,11 +189,11 @@ export default {
       localPaymentMethod,
       localCreditCard,
       serviceItems,
-      computedPrice,
-      updatePrice,
-      validatePaymentService
+      validatePaymentService,
+      showCreditCardForm,
+      submitForm
     };
-  },
+  }
 };
 </script>
 
