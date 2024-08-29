@@ -2,10 +2,6 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -13,9 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
-
 use Illuminate\Support\Str;
-
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Traits\{MakesResponses, ManageScopes};
@@ -168,6 +162,11 @@ abstract class PanelController extends CoreController
      */
     protected $titleColumnKey = 'name';
 
+    /**
+     * Use default authorization permissions
+     *
+     * @var bool
+     */
     protected $setDefaultPermissions = true;
 
     /**
@@ -268,7 +267,8 @@ abstract class PanelController extends CoreController
      * @param string $middleware
      * @return void
      */
-    public function removeMiddleware($middleware){
+    public function removeMiddleware($middleware)
+    {
         if (($key = array_search($middleware, Arr::pluck($this->middleware, 'middleware'))) !== false) {
             $order = false;
             foreach($this->middleware as $i => $array){
@@ -284,11 +284,13 @@ abstract class PanelController extends CoreController
         }
     }
 
-    protected function permissionPrefix($permission = '') {
+    protected function permissionPrefix($permission = '')
+    {
         return $this->getKebabCase($this->routeName) . ($permission != '' ? "_{$permission}" : '') ;
     }
 
-    protected function setMiddlewarePermission() {
+    protected function setMiddlewarePermission()
+    {
 
         // dd('setMiddlewarePermission', $this->getSnakeCase($this->routeName), $this->user );
         // Permission::where('name', 'LIKE', "%{$this->getKebabCase($this->routeName)}%")->get(),
@@ -352,7 +354,8 @@ abstract class PanelController extends CoreController
      * @param Request $request
      * @return string|int|null
      */
-    protected function getParentModuleIdFromRequest(Request $request){
+    protected function getParentModuleIdFromRequest(Request $request)
+    {
 
         return null;
 
@@ -457,7 +460,8 @@ abstract class PanelController extends CoreController
      * @param array $schema
      * @return \Unusualify\Modularity\Http\Requests\Admin\Request::class
      */
-    protected function validateFormRequest($schema = []){
+    protected function validateFormRequest($schema = [])
+    {
 
         $unauthorizedFields = Collection::make($this->fieldsPermissions)->filter(function ($permission, $field) {
             return Auth::guard('unusual_users')->user()->cannot($permission);
@@ -475,7 +479,8 @@ abstract class PanelController extends CoreController
      *
      * @return
      */
-    protected function getJSONData($with = []){
+    protected function getJSONData($with = [])
+    {
 
         $scopes = $this->filterScope($this->nestedParentScopes());
 
@@ -727,7 +732,8 @@ abstract class PanelController extends CoreController
         return !env('PERMISSION_GATES_DEACTIVATE', false);
     }
 
-    public function isRelationField($key) {
+    public function isRelationField($key)
+    {
         $model_relations = [];
 
         // if(@method_exists($this->repository->getModel(), 'getDefinedRelations')){
@@ -787,7 +793,8 @@ abstract class PanelController extends CoreController
         }
     }
 
-    protected function getReplaceUrl(){
+    protected function getReplaceUrl()
+    {
         if($this->request->has('replaceUrl')){
             return $this->request->get('replaceUrl') === 'true';
         }
