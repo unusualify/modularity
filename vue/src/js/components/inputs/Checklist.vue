@@ -95,6 +95,7 @@
                 <v-checkbox
                   data-test="checkbox"
                   v-model="input"
+                  :disabled="$attrs.disabled ?? false"
                   :label="item[`${itemTitle}`]"
                   :value="item[`${itemValue}`]"
                   :color="checkboxColor"

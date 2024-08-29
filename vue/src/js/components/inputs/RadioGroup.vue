@@ -6,8 +6,11 @@
           block class="v-input-radio-group__btn"
           :variant="input == item[itemValue] ? 'elevated' : 'outlined'"
           @click="input=item[itemValue]"
+          :disabled="$attrs.disabled ?? false"
         >
-          <template #prepend><v-radio :value="item[itemValue]"></v-radio></template>
+          <template #prepend>
+            <v-radio :value="item[itemValue]" :disabled="$attrs.disabled ?? false"></v-radio>
+          </template>
           {{ item[itemTitle].toUpperCase() }}
         </v-btn>
       </v-col>
