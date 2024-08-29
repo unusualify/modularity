@@ -39,7 +39,7 @@
         :density="tableDensity ?? 'comfortable'"
         :disable-sort="disableSort"
         :loading="loading"
-        :loading-text="$t('fields.loading-text')"
+        :loading-text="$t('Loading... Please wait')"
         :mobile="isSmAndDown"
 
         :show-select="showSelect"
