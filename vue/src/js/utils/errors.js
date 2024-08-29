@@ -11,16 +11,21 @@ export function globalError (component = null, error = { message: '', value: nul
 
   console.error(errorMessage)
 
-  if (error?.value && error.value?.response) {
-    console.error(error.value.response?.data)
+  if (error?.value && error.value?.response && error.value.response?.data) {
+    console.error(error.value.response.data)
   }
 
   // Error 401 = session expired / not authenticated
   // Error 419 = CSRF token mismatched
   if (statusCode === 401 || statusCode === 419) {
-    window.vm.config.globalProperties.$notif({
-      message: 'Your session has expired, please <a href="' + document.location + '" target="_blank">login in another tab</a>. You can then continue working here.',
-      variant: 'warning'
+    // window.vm.config.globalProperties.$notif({
+    //   message: 'Your session has expired, please <a href="' + document.location + '" target="_blank">login in another tab</a>. You can then continue working here.',
+    //   variant: 'warning'
+    // })
+    window.vm.config.globalProperties.$dialog({
+      message: 'Your session has expired, please <a class="v-btn v-btn--slim text-primary v-btn--density-default v-btn--size-default mr-theme" href="'
+        + document.location
+        + '" target="_blank">login in another tab</a>',
     })
   } else {
     window.vm.config.globalProperties.$notif({

@@ -508,12 +508,35 @@ const FormatFuncs = {
       const id = filterValues[i]
 
       if( !newItems.find((el) => el.id == id) ) {
-        let res = await axios.get(endpoint.replace(`{${snakeCase(modelValue)}}`, id), {
-          params: {
-            eagers: eagers
+        try {
+          let res = await axios.get(endpoint.replace(`{${snakeCase(modelValue)}}`, id), {
+            params: {
+              eagers: eagers
+            }
+          })
+          newItems.push(res.data)
+        } catch (error) {
+          // Handle the error here
+          console.error('An error occurred:', error);
+          // You can also check for specific error types or status codes
+          if (error.response) {
+            globalError('', {
+              message: 'formatFilter error',
+              value: error
+            })
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            // console.error('Error status:', error.response.status);
+            // console.error('Error data:', error.response.data);
+          } else if (error.request) {
+            // The request was made but no response was received
+            console.error('No response received:', error.request);
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            console.error('Error message:', error.message);
           }
-        })
-        newItems.push(res.data)
+        }
+
       }
     }
 

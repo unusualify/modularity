@@ -26,7 +26,7 @@ export default {
     }).catch(function (err) {
       const error = {
         message: 'Post request error.',
-        value: err.response
+        value: err
       }
 
       globalError(component, error)
@@ -42,7 +42,7 @@ export default {
     }).catch(function (err) {
       const error = {
         message: 'Put request error.',
-        value: err.response
+        value: err
       }
       globalError(component, error)
 
