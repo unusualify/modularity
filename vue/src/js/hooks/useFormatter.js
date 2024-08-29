@@ -105,11 +105,12 @@ export default function useFormatter (props, context, headers) {
   })
 
   function handleFormatter (formatter, value) {
-    const name = formatter[0]
+    let args = _.cloneDeep(formatter)
+    const name = args.shift()
     // const pascalCase = methods.(name)
     const func = `${name}Formatter`
     try {
-      return methods[func](value, ..._(formatter.slice(1)))
+      return methods[func](value, ..._(args))
     } catch (error) {
       console.error(`${error}: ${func}`);
     }
