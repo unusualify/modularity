@@ -9,7 +9,11 @@ const state = {
   show: false,
   type: 'info',
   message: null,
-  location: 'bottom'
+  location: 'bottom',
+
+  dialog: false,
+  dialogMessage: null,
+
 }
 
 // getters
@@ -37,7 +41,19 @@ const mutations = {
     state.show = false
     state.type = 'info'
     state.message = null
-  }
+  },
+
+  [ALERT.SET_DIALOG_SHOW] (state, show) {
+    state.dialog = show
+  },
+  [ALERT.SET_DIALOG] (state, dialog) {
+    state.dialogMessage = dialog.message ?? null
+    state.dialog = true
+  },
+  [ALERT.CLEAR_DIALOG] (state) {
+    state.dialog = false
+    state.dialogMessage = null
+  },
 }
 
 export default {

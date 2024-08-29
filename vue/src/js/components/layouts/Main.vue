@@ -103,7 +103,7 @@
       <slot></slot>
 
       <ue-modal-media
-        v-if="!authorization.isClient"
+        v-if="authorization && !$lodash.isEmpty(authorization) && !authorization.isClient"
         v-model="showMediaLibrary"
         ref="mediaLibrary"
       ></ue-modal-media>
@@ -134,6 +134,28 @@
       </a17-dialog> -->
 
       <ue-alert ref='alert'></ue-alert>
+      <ue-modal
+        ref='dialog'
+        v-model="alertDialog"
+        scrollable
+        transition="dialog-bottom-transition"
+        width-type="lg"
+        persistent
+        >
+        <template v-slot:body="props">
+          <v-card >
+            <v-card-text class="text-center" style="word-break: break-word;" >
+              <div v-html="alertDialogMessage"></div>
+            </v-card-text>
+            <v-divider/>
+            <v-card-actions class="justify-center">
+                <v-btn-cta  @click="closeAlertDialog">
+                  {{ $t('fields.close') }}
+                </v-btn-cta>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </ue-modal>
 
       <!-- <v-layout-item
         v-if="impersonation.active"
@@ -162,227 +184,244 @@
 <script>
   import { useSidebar, useRoot } from '@/hooks';
   import { provide } from 'vue';
+  import { ALERT } from '@/store/mutations/index'
 
-export default {
-  setup(){
-    const sideBar = useSidebar();
-    provide('hooks',sideBar);
-    return {
-      sideBar,
-    }
-  },
-  props: {
-    navigation: {
-      type: Object,
-      default () {
-        return {
-          sidebar: [
-            {
-              icon: '$package',
-              text: 'Packages',
-              action: '',
-              is_active: false
-            },
-            {
-              icon: '$creditCards',
-              text: 'Payments',
-              action: '',
-              is_active: false
-            },
-            {
-              icon: '$product',
-              text: 'Customers',
-              action: '',
-              is_active: false
-            },
-            {
-              icon: '$users',
-              text: 'Users',
-              is_active: true,
-              items: [
-                {
-                  icon: '$users',
-                  text: 'Show Users',
-                  action: '',
-                  is_active: false
-                },
-                {
-                  icon: '$userAdd',
-                  text: 'Add User',
-                  action: '',
-                  is_active: false
-                },
-                {
-                  icon: '$role',
-                  text: 'Roles',
-                  is_active: true,
-                  items: [
-                    {
-                      icon: '$permission',
-                      text: 'Add Permission',
-                      action: '',
-                      is_active: true
-                    }
-                  ]
-                }
-              ]
-            },
+  export default {
+    setup(){
+      const sideBar = useSidebar();
+      provide('hooks',sideBar);
+      return {
+        sideBar,
+      }
+    },
+    props: {
+      navigation: {
+        type: Object,
+        default () {
+          return {
+            sidebar: [
+              {
+                icon: '$package',
+                text: 'Packages',
+                action: '',
+                is_active: false
+              },
+              {
+                icon: '$creditCards',
+                text: 'Payments',
+                action: '',
+                is_active: false
+              },
+              {
+                icon: '$product',
+                text: 'Customers',
+                action: '',
+                is_active: false
+              },
+              {
+                icon: '$users',
+                text: 'Users',
+                is_active: true,
+                items: [
+                  {
+                    icon: '$users',
+                    text: 'Show Users',
+                    action: '',
+                    is_active: false
+                  },
+                  {
+                    icon: '$userAdd',
+                    text: 'Add User',
+                    action: '',
+                    is_active: false
+                  },
+                  {
+                    icon: '$role',
+                    text: 'Roles',
+                    is_active: true,
+                    items: [
+                      {
+                        icon: '$permission',
+                        text: 'Add Permission',
+                        action: '',
+                        is_active: true
+                      }
+                    ]
+                  }
+                ]
+              },
 
-            {
-              icon: '$check',
-              text: 'Settings',
-              action: '',
-              is_active: false
-            },
-            {
-              icon: 'fas fa-plus',
-              text: 'Others',
-              action: '',
-              is_active: false
-            }
-          ]
+              {
+                icon: '$check',
+                text: 'Settings',
+                action: '',
+                is_active: false
+              },
+              {
+                icon: 'fas fa-plus',
+                text: 'Others',
+                action: '',
+                is_active: false
+              }
+            ]
+          }
+        }
+      },
+      impersonation: {
+        type: Object,
+        default () {
+          return {
+
+          }
+        }
+      },
+      authorization: {
+        type: Object,
+        default () {
+          return {
+
+          }
         }
       }
     },
-    impersonation: {
-      type: Object,
-      default () {
-        return {
+    data () {
+      return {
+        loader: null,
+        loading: false,
+        langs: ['tr', 'en'],
 
-        }
+        footerDisplay: false,
+        sidebarItem: [
+          {
+            icon: '$package',
+            text: 'Packages',
+            action: ''
+          },
+          {
+            icon: '$creditCards',
+            text: 'Payments',
+            action: ''
+          },
+          {
+            icon: '$product',
+            text: 'Customers',
+            action: ''
+          },
+          {
+            icon: '$users',
+            text: 'Users',
+            items: [
+              {
+                icon: '$users',
+                text: 'Show Users',
+                action: ''
+              },
+              {
+                icon: '$userAdd',
+                text: 'Add User',
+                action: ''
+              }
+            ]
+          },
+
+          {
+            icon: '$check',
+            text: 'Settings',
+            action: ''
+          },
+          {
+            icon: 'fas fa-plus',
+            text: 'Others',
+            action: ''
+          }
+        ],
+
+        sidebarItems: this.navigation.sidebar,
+        // activeItem: this.navigation.activeItem ?? 0,
+        // activeSubItem: this.navigation.activeSubItem ?? -1,
+        breadcrumbs: this.navigation.breadcrumbs ?? [],
+
+        footerLinks: [
+          {
+            icon: 'mdi-facebook',
+            url: 'facebook.com'
+          },
+          {
+            icon: 'mdi-twitter',
+            url: 'twitter.com'
+          },
+          {
+            icon: 'mdi-linkedin',
+            url: 'linkedin.com'
+          },
+          {
+            icon: 'mdi-instagram',
+            url: 'instagram.com'
+          }
+        ],
+
+        showMediaLibrary: false,
+        showDeleteWarning: false,
+        showImpersonateToolbar: false
       }
     },
-    authorization: {
-      type: Object,
-      default () {
-        return {
-
+    computed: {
+      alertDialog: {
+        get () {
+          return this.$store.state.alert.dialog
+        },
+        set (val) {
+          this.$store.commit(ALERT.SET_DIALOG_SHOW, val)
         }
+      },
+      alertDialogMessage() {
+        __log('alertDialogMessage computed', this.$store.state.alert)
+        return this.$store.state.alert.dialogMessage
       }
-    }
-  },
-  data () {
-    return {
-      loader: null,
-      loading: false,
-      langs: ['tr', 'en'],
+    },
+    created () {
+      // __log(this.authorization)
+      // this.$vToastify.success("Kaydetme İşleminiz Başarılı!", 'Başarılı');
 
-      footerDisplay: false,
-      sidebarItem: [
-        {
-          icon: '$package',
-          text: 'Packages',
-          action: ''
-        },
-        {
-          icon: '$creditCards',
-          text: 'Payments',
-          action: ''
-        },
-        {
-          icon: '$product',
-          text: 'Customers',
-          action: ''
-        },
-        {
-          icon: '$users',
-          text: 'Users',
-          items: [
-            {
-              icon: '$users',
-              text: 'Show Users',
-              action: ''
-            },
-            {
-              icon: '$userAdd',
-              text: 'Add User',
-              action: ''
-            }
-          ]
-        },
+      // this.$toast.success('Info toast')
 
-        {
-          icon: '$check',
-          text: 'Settings',
-          action: ''
-        },
-        {
-          icon: 'fas fa-plus',
-          text: 'Others',
-          action: ''
-        }
-      ],
+      // this.$notification.success("hello world", {  timer: 5 });
 
-      sidebarItems: this.navigation.sidebar,
-      // activeItem: this.navigation.activeItem ?? 0,
-      // activeSubItem: this.navigation.activeSubItem ?? -1,
-      breadcrumbs: this.navigation.breadcrumbs ?? [],
+      // console.log( this.$vuetify.icons );
 
-      footerLinks: [
-        {
-          icon: 'mdi-facebook',
-          url: 'facebook.com'
-        },
-        {
-          icon: 'mdi-twitter',
-          url: 'twitter.com'
-        },
-        {
-          icon: 'mdi-linkedin',
-          url: 'linkedin.com'
-        },
-        {
-          icon: 'mdi-instagram',
-          url: 'instagram.com'
-        }
-      ],
-
-      showMediaLibrary: false,
-      showDeleteWarning: false,
-      showImpersonateToolbar: false
-    }
-  },
-
-  created () {
-    // __log(this.authorization)
-    // this.$vToastify.success("Kaydetme İşleminiz Başarılı!", 'Başarılı');
-
-    // this.$toast.success('Info toast')
-
-    // this.$notification.success("hello world", {  timer: 5 });
-
-    // console.log( this.$vuetify.icons );
-
-    // console.log('mounted items', this.$refs)
-  },
-
-  mounted () {
-
-  },
-
-  methods: {
-    addSidebarItem: function (event) {
-      // drawer = !drawer
-      // this.loading = true;
-      // const l = this.loader;
-      // this[l] = !this[l];
-
-      // this.sidebarItem.push( {
-      //   icon: "fas fa-circle-question",
-      //   text: "New"
-      // });
-
-      this.$refs.sidebar.addItem({ icon: 'fa-regular fa-circle-question', text: 'New' })
-
-      // setTimeout(() => (this[l] = false), 3000)
-
-      // this.loader = null;
+      // console.log('mounted items', this.$refs)
     },
 
-    submit () {
-      alert('Submit Form')
-    }
+    mounted () {
 
+    },
+
+    methods: {
+      addSidebarItem: function (event) {
+        // drawer = !drawer
+        // this.loading = true;
+        // const l = this.loader;
+        // this[l] = !this[l];
+
+        // this.sidebarItem.push( {
+        //   icon: "fas fa-circle-question",
+        //   text: "New"
+        // });
+
+        this.$refs.sidebar.addItem({ icon: 'fa-regular fa-circle-question', text: 'New' })
+
+        // setTimeout(() => (this[l] = false), 3000)
+
+        // this.loader = null;
+      },
+
+      submit () {
+        alert('Submit Form')
+      },
+      closeAlertDialog(){
+        this.$store.commit(ALERT.CLEAR_DIALOG)
+      }
+
+    }
   }
-}
 </script>

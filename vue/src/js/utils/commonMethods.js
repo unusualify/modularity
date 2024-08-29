@@ -106,7 +106,10 @@ export default {
   $isset: function (...args) {
     return window.__isset(...args)
   },
-  $notif: function (Obj) {
-    this.$store.commit(ALERT.SET_ALERT, Obj)
+  $notif: function (payload) {
+    this.$store.commit(ALERT.SET_ALERT, payload)
+  },
+  $dialog: function (payload) {
+    this.$store.commit(ALERT.SET_DIALOG, payload)
   }
 }
