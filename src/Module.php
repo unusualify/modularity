@@ -508,11 +508,13 @@ class Module extends NwidartModule
         return Collection::make($this->getModuleUris())->filter(fn($uri, $name) => preg_match('/' . $quote .'/', $name))->toArray();
     }
 
-    public function getRouteActionUri($routeName, $action): string
+    public function getRouteActionUri($routeName, $action, $replacements = []): string
     {
         $quote = preg_quote('.' . $action);
 
-        return '/' . Collection::make($this->getRouteUris($routeName))->filter(fn($uri, $name) => preg_match('/' . $quote .'/', $name))->first();
+        $endpoint = '/' . Collection::make($this->getRouteUris($routeName))->filter(fn($uri, $name) => preg_match('/' . $quote .'/', $name))->first();
+
+        return replace_curly_braces($endpoint, $replacements);
     }
 
     public function getParentNamespace(string $target): string

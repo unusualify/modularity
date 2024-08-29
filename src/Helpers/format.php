@@ -300,9 +300,16 @@ if( !function_exists('modelShowFormat') ){
         //     dd(class_uses_recursive($model));
         // }
         if(in_array('Unusualify\Priceable\Traits\HasPriceable', class_uses_recursive($model))){
+            // dd($model->priceFormatted);
             $model['prices_show'] = $model->price_formatted;
             // $model['prices_show'] = "<span class='text-success font-weight-bold'> {$model->price_formatted} </span>";
         }
+
+        // if(get_class($model) == 'Unusualify\Priceable\Models\Price'){
+        //     dd($model->price(), $model->pricePrependingCurrencyString());
+        //     $model['prices_show'] = $model->price_formatted;
+        //     // $model['prices_show'] = "<span class='text-success font-weight-bold'> {$model->price_formatted} </span>";
+        // }
 
         if( method_exists($model, 'getShowFormat') )
             return $model->getShowFormat();
@@ -333,5 +340,30 @@ if( !function_exists('get_file_string')) {
     }
 }
 
+if( !function_exists('replace_curly_braces')) {
+    function replace_curly_braces($string, $replacements) {
+        $is_object = is_object($replacements);
+        $is_indexed_array = is_array($replacements) && array_keys($replacements) === range(0, count($replacements) - 1);
+        // dd($is_indexed_array);
+        // Use preg_replace_callback for recursive replacement
+        $index = 0;
+
+        return preg_replace_callback('/\{([^}]*)\}/', function($match) use ($replacements, $is_object, $is_indexed_array, &$index) {
+            $key = $match[1];
+
+            if ($is_object) {
+                // Replace recursively using key-value matching
+                // dd($replacements, $key, $match);
+                return isset($replacements->$key) ? replace_curly_braces($replacements->$key, $replacements) : $match[0];
+            } else if($is_indexed_array) {
+                // Replace subsequently using array indexes
+                return isset($replacements[$index]) ? $replacements[$index++] : $match[0];
+            } else{
+                // Replace subsequently using array indexes
+                return isset($replacements[$key]) ? $replacements[$key] : $match[0];
+            }
+        }, $string);
+    }
+}
 
 
