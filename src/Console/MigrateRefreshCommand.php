@@ -33,8 +33,11 @@ class MigrateRefreshCommand extends Command
         $module = Modularity::findOrFail($this->argument('module'));
 
         try {
-            $this->call('migrate:refresh', [
-                '--path' => config('modules.namespace') . "/{$module->getStudlyName()}/Database/Migrations"
+            $this->call('unusual:migrate:rollback', [
+                'module' => $module->getName(),
+            ]);
+            $this->call('unusual:migrate', [
+                'module' => $module->getName(),
             ]);
 
         } catch (\Throwable $th) {
