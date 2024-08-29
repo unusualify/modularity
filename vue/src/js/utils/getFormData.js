@@ -1,6 +1,7 @@
 import { find, omitBy, reduce, cloneDeep, map, findIndex, snakeCase, orderBy, get, filter, includes, set, each, isEmpty, unset, omit, pick } from 'lodash-es'
 import filters from '@/utils/filters'
 import axios from 'axios'
+import { globalError } from './errors'
 
 const isArrayable = 'input-treeview|treeview|input-checklist|input-repeater|input-file|input-image'
 // const isMediableTypes = 'input-file|input-image'
@@ -12,26 +13,19 @@ export const getSchema = (inputs, model = null) => {
   })
 
   if (find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'wrap'))) {
-    // reduce(_inputs, (acc, input, key) => {
-    //   if(Object.prototype.hasOwnProperty.call(input, 'group')){
-    //     if(acc[input.group])
-    //   }else{
-    //     acc[key] = input
-    //   }
-    //   return acc
-    // }, {})
+    reduce(_inputs, (acc, input, key) => {
+      if(Object.prototype.hasOwnProperty.call(input, 'group')){
+
+      }else{
+        acc[key] = input
+      }
+      return acc
+    }, {})
   }
 
   map(_inputs, (value, key) => {
     if(__isset(value.type) && value.type == 'group'){
-      let _name = value.name
-      let _schema = cloneDeep(value.schema)
-      let schema = {}
-      for(const key in _schema){
-        let newKey = key.split('.').filter((part) => part !== _name).join('.')
-        schema[newKey] = _schema[key]
-      }
-      value.schema = schema
+      value.schema = flattenGroupSchema(value.schema, value.name);
     }
     handleInputEvents(value.event, model, inputs, key)
 
@@ -45,8 +39,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
   const languages = window[import.meta.env.VUE_APP_NAME].STORE.languages.all
   const editing = __isset(item)
 
-  inputs = chunkInputs(inputs)
-
+  inputs = processInputs(inputs)
   const values = Object.keys(inputs).reduce((fields, k) => {
     const input = inputs[k]
     const name = input.name
@@ -59,7 +52,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
 
     _default = Object.prototype.hasOwnProperty.call(input, 'default') ? input.default : _default
 
-    if (input.type == 'group') _default = getModel(input.schema, input.default)
+    if (input.type == 'group') _default = getModel(input.schema, item ?? input.default)
 
     if (isTranslated) {
       _default = reduce(languages, function (acc, language, k) {
@@ -75,7 +68,6 @@ export const getModel = (inputs, item = null, rootState = null) => {
     // __log(name, _default, item)
     let value = editing ? (__isset(fields[name]) ? fields[name] : (__isset(item[name]) ? item[name] : _default)) : _default
     // const value = editing ? (__isset(item[name]) ? item[name] : _default) : _default
-
     if(editing){
       if(input.type == 'group' && __isset(item[name])){
         let defaultGroupKeys = Object.keys(omit(__dot(_default), ['id']));
@@ -143,7 +135,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
 }
 
 export const getSubmitFormData = (inputs, item = null, rootState = null) => {
-  inputs = chunkInputs(inputs)
+  inputs = processInputs(inputs)
 
   const isArrayable = 'input-treeview|treeview|input-checklist'
 
@@ -325,8 +317,8 @@ export const handleEvents = ( model, schema, input) => {
 
 export const handleMultiFormEvents = ( models, schemas, input, index, preview = []) => {
   const handlerName = input.name
-  const handlerSchema = schemas[index][handlerName]
-  const handlerValue = models[index][handlerName]
+  const handlerSchema = schemas[index][handlerName] ?? get(schemas, `[${index}].${handlerName}`)
+  const handlerValue = models[index][handlerName] ?? get(models, `[${index}].${handlerName}`)
 
   const isFieldFalsy = (Array.isArray(handlerValue) && handlerValue.length > 0) || (!Array.isArray(handlerValue) && !!handlerValue)
 
@@ -339,6 +331,18 @@ export const handleMultiFormEvents = ( models, schemas, input, index, preview = 
         FormatFuncs?.[methodName](args, models, schemas, input, index, preview)
 
     })
+  }
+  if(false && input.schema){
+    for(const name in input.schema){
+
+      const _input = cloneDeep(input.schema[name])
+      _input.name = `${input.name}.${input.schema[name].name}`
+      _input.key = `${input.name}.schema.${input.schema[name].name}`
+      // __log(
+      //   // get(schemas, `[${index}].${_input.key}`),
+      //   // get(models, `[${index}].${_input.name}`),
+      // )
+    }
   }
 }
 
@@ -353,26 +357,29 @@ export default {
   handleMultiFormEvents
 }
 
-const chunkInputs = (inputs) => {
-  const _inputs = cloneDeep(inputs)
-
-  inputs = {}
-  for (const key in _inputs) {
-    if (_inputs[key].type === 'wrap' && _inputs[key].schema) {
-      Object.keys(_inputs[key].schema).forEach((name, i) => {
-        inputs[name] = _inputs[key].schema[name]
-      })
-    } else if (_inputs[key].type === 'groupx' && _inputs[key].name && _inputs[key].schema) {
-      // inputs[_inputs[key].name] = reduce(_inputs[key].schema, function (acc, item) {
-      //   acc[item.name] = item.default ?? ''
-      //   return acc
-      // }, {})
-    } else {
-      inputs[key] = _inputs[key]
+const processInputs = (inputObj) => {
+  return reduce(inputObj, (acc, value, key) => {
+    if (value.type === 'wrap' && value.schema) {
+      Object.assign(acc, processInputs(value.schema));
+    } else if (value.type === 'groupz' && value.schema) {
+      // acc[key] = {
+      //   ...value,
+      //   schema: processInputs(value.schema)
+      // };
+    } else if (!value.slotable) {
+      acc[key] = value;
     }
-  }
-  return inputs
-}
+    return acc;
+  }, {});
+};
+
+const flattenGroupSchema = (schema, groupName) => {
+  return reduce(schema, (acc, value, key) => {
+    const newKey = key.split('.').filter(part => part !== groupName).join('.');
+    acc[newKey] = value;
+    return acc;
+  }, {});
+};
 
 const slugify = (newValue) => {
   let text = ''
@@ -456,10 +463,11 @@ const FormatFuncs = {
       return
 
     if(handlerValue){
+      let dataSet = []
       let notation = __wildcard_change(setPropFormat, handlerValue)
-      let dataSet = __data_get(handlerSchema, notation, null)
+      dataSet = __data_get(handlerSchema, notation, null)
 
-      if(dataSet){
+      if(dataSet && dataSet.length > 0){
         const newValue = dataSet.shift()
         set(schema, setterNotation, newValue)
         if(inputPropToFormat.match(/schema/)){
@@ -836,10 +844,12 @@ const FormatFuncs = {
     const handlerName = input.name
     const handlerModelName = input.name
     const handlerSchemaName = input.key ?? input.name
-
     const handlerSchema = input // schema[index][handlerName]
-    const handlerValue = __data_get(model, !isNaN(index) ? `${index}.${handlerModelName}` : handlerModelName)
-
+    let handlerValue = __data_get(model, !isNaN(parseInt(index)) ? `${index}.${handlerModelName}` : handlerModelName)
+    // __log(handlerName, handlerValue)
+    if(!handlerValue && __isset(handlerSchema.parentName)){
+      handlerValue = __data_get(model, !isNaN(index) ? `${index}.${handlerSchema.parentName}.${handlerModelName}` : `${handlerSchema.parentName}.${handlerModelName}`)
+    }
     // const handlerSchema = get(schema, `${index}.${handlerSchemaName}`)
     // const handlerValue = get(model, `${index}.${handlerModelName}`)
     return {
