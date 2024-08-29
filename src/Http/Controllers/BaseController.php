@@ -12,11 +12,12 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Services\MessageStage;
+use Unusualify\Modularity\Traits\ManagePrevious;
 use Unusualify\Modularity\Traits\ManageUtilities;
 
 abstract class BaseController extends PanelController
 {
-    use ManageUtilities;
+    use ManageUtilities, ManagePrevious;
 
     /**
      * @var string
@@ -133,8 +134,8 @@ abstract class BaseController extends PanelController
         //         'create'
         //     ));
         // }
-
-        $item = $this->repository->create($input + $optionalParent);
+        // dd();
+        $item = $this->repository->create($input + $optionalParent, $this->getPreviousRouteSchema());
 
         activity()->performedOn($item)->log('created');
 
@@ -290,7 +291,7 @@ abstract class BaseController extends PanelController
         } else {
             $formRequest = $this->validateFormRequest();
 
-            $this->repository->update($id, $formRequest->all());
+            $this->repository->update($id, $formRequest->all(), $this->getPreviousRouteSchema());
 
             activity()->performedOn($item)->log('updated');
 
