@@ -1,4 +1,4 @@
-import { find, omitBy, reduce, cloneDeep, map, findIndex, snakeCase, orderBy, get, filter, includes, set, each, isEmpty, unset } from 'lodash-es'
+import { find, omitBy, reduce, cloneDeep, map, findIndex, snakeCase, orderBy, get, filter, includes, set, each, isEmpty, unset, omit, pick } from 'lodash-es'
 import filters from '@/utils/filters'
 import axios from 'axios'
 
@@ -78,9 +78,12 @@ export const getModel = (inputs, item = null, rootState = null) => {
 
     if(editing){
       if(input.type == 'group' && __isset(item[name])){
-        if(JSON.stringify(Object.keys(__dot(_default))) !== JSON.stringify(Object.keys(__dot(item[name])))){
+        let defaultGroupKeys = Object.keys(omit(__dot(_default), ['id']));
+        if(JSON.stringify(defaultGroupKeys) !== JSON.stringify(Object.keys(omit(__dot(item[name]), ['id'])))){
+
           value = {
             ..._default,
+            ...pick(item[name], defaultGroupKeys)
           }
         }
       }
