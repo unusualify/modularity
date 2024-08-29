@@ -93,6 +93,11 @@ trait ModelHelpers
         }
     }
 
+    public function getColumns(): array
+    {
+        return array_keys($this->getColumnTypes());
+    }
+
     public function getShowFormat()
     {
         return $this->{$this->getRouteTitleColumnKey()};
