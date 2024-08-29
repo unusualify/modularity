@@ -18,6 +18,8 @@ trait ManageForm {
 
     protected $inputTypes = [];
 
+    protected $schemaChangers = [];
+
     protected function __beforeConstructManageForm($app, $request)
     {
         $this->inputTypes = unusualConfig('input_types', []);
@@ -265,7 +267,8 @@ trait ManageForm {
                     }
                 }
 
-
+                // dump($input);
+                // if($input['name'] == 'wrap-content')
                 $data = $input;
 
             break;
@@ -510,21 +513,23 @@ trait ManageForm {
         if(isset($input['ext'])){
 
             $continue = false;
-            switch($input['ext']){
-                case 'date':
-                    # code...
-                    $input['default'] ??= date('Y-m-d');
-                    $continue = true;
-                    break;
-                case 'time':
-                    $input['default'] ??= date('H:i');
-                    $continue = true;
-                    break;
+            if(is_string($input['ext'])){
+                switch($input['ext']){
+                    case 'date':
+                        # code...
+                        $input['default'] ??= date('Y-m-d');
+                        $continue = true;
+                        break;
+                    case 'time':
+                        $input['default'] ??= date('H:i');
+                        $continue = true;
+                        break;
 
-                default:
-                    # code...
-                    break;
+                    default:
+                        # code...
+                        break;
 
+                }
             }
 
             if($continue) return;
@@ -533,18 +538,24 @@ trait ManageForm {
             // 'permalink:slug'
             // 'permalinkPrefix:slug',
             // 'permalinkPrefix:slug|lock:url:url',
-            $patterns = explode('|', $input['ext']);
+            $patterns = $input['ext'];
+            if(is_string($input['ext'])){
+                $patterns = explode('|', $input['ext']);
+            }
 
             $events = [];
             $extraInputs = [];
 
             foreach ($patterns as $pattern) {
-                $pattern = trim($pattern);
-                $args = explode(':',$pattern);
+                $args = $pattern;
+                if(is_string($pattern)){
+                    $pattern = trim($pattern);
+                    $args = explode(':',$pattern);
+                }
 
                 $methodName = array_shift($args);
                 // [$methodName, $formattedInput, $parentColumnName] = array_pad(explode(':',$pattern), 3, null);
-
+                $changers = [];
                 switch ($methodName) {
                     case 'permalinkPrefix': //'permalinkPrefix:slug',
                         $inputToFormat = array_shift($args);
@@ -626,8 +637,23 @@ trait ManageForm {
 
                             if($targetModule) $filterEndpoint = $targetModule->getRouteActionUri($routeName, 'show');
                         }
-
                         if($filterEndpoint){
+                            // schemaChangers set
+                            // if(isset($input['toChange'])){
+                            //     $changerName = $inputToFormat;
+                            //     $inputToFormatParts = explode('.', $inputToFormat);
+                            //     if(count($inputToFormatParts) > 1 && ctype_digit($inputToFormatParts[0])){
+                            //         $changerName = implode('.', array_slice($inputToFormatParts, 1));
+                            //     }
+                            //     $this->schemaChangers[] = [
+                            //         'changer' => $changerName,
+                            //         'toChange' => $input['toChange'],
+                            //     ];
+                            // }
+                            // dd(
+                            //     get_defined_vars(),
+                            //     $this->schemaChangers
+                            // );
                             if($data) $data['filterEndpoint'] = $filterEndpoint;
                             else $input['filterEndpoint'] = $filterEndpoint;
 
@@ -639,14 +665,27 @@ trait ManageForm {
                         $inputToFormat = array_shift($args) ?? '';
                         $previewFieldPatterns = array_shift($args) ?? null;
 
+                        if($previewFieldPatterns) $previewFieldPatterns = ":" . $previewFieldPatterns;
+
                         if($inputToFormat)
-                            $events[] = "formatPreview:{$inputToFormat}:{$previewFieldPatterns}";
+                            $events[] = "formatPreview:{$inputToFormat}{$previewFieldPatterns}";
                     break;
                     case 'set': //
                         $inputToFormat = array_shift($args) ?? '';
                         $inputPropToFormat = array_shift($args) ?? null;
                         $setProp = array_shift($args) ?? "items.*.{$inputPropToFormat}";
-
+                        // dd(
+                        //     $inputToFormat,
+                        //     $inputPropToFormat,
+                        //     $setProp,
+                        //     $inputs
+                        // );
+                        $changers = [
+                            'wrap_location' => [
+                                'default',
+                                $inputPropToFormat // schema
+                            ]
+                        ];
                         if($inputToFormat && $inputPropToFormat)
                             $events[] = "formatSet:{$inputToFormat}:{$inputPropToFormat}:{$setProp}";
                     break;
@@ -657,7 +696,7 @@ trait ManageForm {
 
                         if($inputToFormat && $prependKey && $setterSchemaKey )
                             $events[] = "formatPrependSchema:{$inputToFormat}:{$prependKey}:{$setterSchemaKey}";
-                        // dd($events);
+                        // dd($input, $patterns, $events);
                     break;
                     default:
                         # code...
@@ -672,7 +711,7 @@ trait ManageForm {
                     // if($input['name'] == 'packageCountry'){
                     //     dd($data, $events, explode('|', $data['event'] ?? ''));
                     // }
-                    $data['event'] = implode('|', array_merge($events, explode('|', $data['event'] ?? '')) );
+                    $data['event'] = implode('|', array_merge($events, isset($data['event']) ? explode('|', $data['event']) : []) );
                 } catch (\Throwable $th) {
                     dd($events, $data, $th,  $this->config);
                 }
