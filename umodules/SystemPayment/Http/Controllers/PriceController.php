@@ -103,12 +103,7 @@ class PriceController extends Controller
         // dd(session('_previous.url'));
         $resp = $payment->service->pay($payload);
 
-        $redirectionUrl = $resp->links[1]->href;
-        if($redirectionUrl)
-            print(
-            "<script>window.open('" . $redirectionUrl . "', '_self')</script>"
-            );
-        exit;
+        return $resp;
     }
 
     public function response(Request $request){
