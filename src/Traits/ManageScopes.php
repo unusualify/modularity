@@ -186,6 +186,10 @@ trait ManageScopes {
                     $sort->key = $matches[1];
                 }
 
+                if(preg_match('/(.*)(_uuid)/', $sort->key, $matches)){
+                    $sort->key = $matches[1];
+                }
+
                 if(preg_match('/(.*)(_relation)/', $sort->key, $matches)){
                     continue;
                     // dd($sort);

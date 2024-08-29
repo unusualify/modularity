@@ -388,11 +388,18 @@ trait ManageTable {
         if(method_exists($this->repository->getModel(), 'isTimestampColumn') && $this->repository->isTimestampColumn($header['key'])){
             $header['key'] .= '_timestamp';
         }
+
+        // add uuid suffix for formatting on view
+        if($header['key'] == 'id' && $this->repository->hasModelTrait('Unusualify\Modularity\Entities\Traits\HasUuid')){
+            $header['key'] .= '_uuid';
+            $header['formatter'] ??= ['edit'];
+        }
+
     }
 
     protected function dehydrateHeaderSuffix(&$header)
     {
-        $header['key'] = preg_replace('/_relation|_timestamp/', '' ,$header['key']);
+        $header['key'] = preg_replace('/_relation|_timestamp|_uuid/', '' ,$header['key']);
     }
 
     protected function getTableAdvancedFilters()

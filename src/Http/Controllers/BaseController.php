@@ -540,6 +540,12 @@ abstract class BaseController extends PanelController
             $value = $item->{$matches[1]};
         }
 
+        if(preg_match('/(.*)(_uuid)/', $column['key'], $matches)){
+            // $value = $item->{$matches[1]};
+            $value = substr($item->{$matches[1]}, 0, 6);
+            // $value = "<span>" . substr($item->{$matches[1]}, 0, 6) . "</span>";
+        }
+
         if (isset($column['relationship'])) {
             $field = $column['relationship'] . ucfirst($column['field']);
 
@@ -727,13 +733,17 @@ abstract class BaseController extends PanelController
         return $this->respondWithError(__('listing.duplicate.error', ['modelTitle' => $this->modelTitle]));
     }
 
-    public function searchTitleKeyValue($columnsData){
+    public function searchTitleKeyValue($columnsData)
+    {
         $value = null;
 
         if(isset($columnsData[($newKey = $this->titleColumnKey . '_relation')])){
             $this->titleColumnKey = $newKey;
             $value = $columnsData[$newKey];
         } else if(isset($columnsData[($newKey = $this->titleColumnKey . '_timestamp')])){
+            $this->titleColumnKey = $newKey;
+            $value = $columnsData[$newKey];
+        } else if(isset($columnsData[($newKey = $this->titleColumnKey . '_uuid')])){
             $this->titleColumnKey = $newKey;
             $value = $columnsData[$newKey];
         } else{
