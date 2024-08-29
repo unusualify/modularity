@@ -96,7 +96,7 @@ final class LaravelServiceProvider extends ServiceProvider
     private function publishLang(): void
     {
         $this->publishes([
-            __DIR__ . '/../lang-publish' => base_path('lang'),
+            __DIR__ . '/../lang' => base_path('lang'),
         ], 'lang');
     }
 

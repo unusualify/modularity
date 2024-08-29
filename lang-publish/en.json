@@ -16,7 +16,7 @@
     "language-select": "Lang Select",
     "list": "no list | one list | {count} list",
     "list-of-item": "{0} List",
-    "loading-text": "Loading... Please wait",
+    "Loading... Please wait": "Loading... Please wait",
     "message": "message",
     "neighbourhood": "Neighbourhood",
     "next": "Next",

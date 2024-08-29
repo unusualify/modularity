@@ -15,7 +15,7 @@
     "language-select": "Dil Seçimi",
     "list": "liste | {n} liste | {count} liste",
     "list-of-item": "{0} Listesi",
-    "loading-text": "Yükleniyor, lütfen bekleyin...",
+    "Loading... Please wait": "Yükleniyor, lütfen bekleyin...",
     "message": "Mesaj",
     "neighbourhood": "Mahalle",
     "next": "Devam Et",
