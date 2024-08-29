@@ -540,7 +540,7 @@ export default {
         }
       }
       for (const name in _errors) {
-        this.inputSchema[name].errorMessages = _errors[name]
+        if( this.inputSchema[name]) this.inputSchema[name].errorMessages = _errors[name]
       }
     },
     resetSchemaError (key) {
