@@ -334,4 +334,40 @@ if( !function_exists('get_file_string')) {
 }
 
 
+if( !function_exists('merge_url_query')){
+    function merge_url_query(string $url, object|array $data): string
+    {
+        if(gettype($data) == 'object'){
+            $data = object_to_array($data);
+        }
+        // Parse the URL
+        $parsedUrl = parse_url($url);
+
+        // Get the main URL without query parameters
+        $mainUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . ($parsedUrl['path'] ?? '');
+
+        // Parse the query string into an array
+        $queryParams = [];
+        if (isset($parsedUrl['query'])) {
+            parse_str($parsedUrl['query'], $queryParams);
+        }
+
+        if(array_key_exists(array_key_first($data), $queryParams)){
+            unset($queryParams[array_key_first($data)]);
+        }
+
+        // Update the query parameters with new ones
+        $queryParams = array_merge($queryParams, $data);
+
+        // Convert the updated query parameters back to a string
+        $newQueryString = http_build_query($queryParams);
+
+        // Combine the main URL with the new query string
+        $finalUrl = $newQueryString ? $mainUrl . '?' . $newQueryString : $mainUrl;
+
+        return $finalUrl;
+    }
+}
+
+
 

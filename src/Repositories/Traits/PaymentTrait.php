@@ -55,7 +55,7 @@ trait PaymentTrait
                 'name' => 'payment_service',
                 'label' => 'Payment',
                 'type' => 'payment-service',
-                'connector' => 'SystemPayment:PaymentService|repository:listAll',
+                // 'connector' => 'SystemPayment:PaymentService|repository:listAll',
             ]
         ];
     }
