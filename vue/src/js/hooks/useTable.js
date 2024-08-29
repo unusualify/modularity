@@ -179,7 +179,6 @@ export default function useTable (props, context) {
   const form = ref(null)
   let loading = ref(false)
   let items = ref(props.items ?? store.state.datatable.data)
-
   const state = reactive({
 
     id: Math.ceil(Math.random() * 1000000) + '-table',
@@ -189,8 +188,8 @@ export default function useTable (props, context) {
     formStyles: { width: props.formWidth },
     formActive: false,
     deleteModalActive: false,
-    customModalActive: false,
-    activeModal: 'delete',
+    customModalActive: !(_.isEmpty(store._state.data.datatable.customModal)),
+    activeModal: 'custom',
     customFormModalActive : false,
     customFormAttributes: {},
     customFormSchema: {},
@@ -406,6 +405,22 @@ export default function useTable (props, context) {
         closeAction() {
           state.customModalActive = false;
         }
+      },
+      'custom': {
+        content: computed(() => store._state.data.datatable.customModal.description),
+        closeAction() {
+          state.customModalActive = false;
+        },
+        confirmAction() {
+          state.customModalActive = false;
+        },
+        confirmText: 'Done',
+        cancelText: ' ',
+        img: 'https://cdn2.iconfinder.com/data/icons/greenline/512/check-1024.png',
+        icon: '$check',
+        iconSize: 72,
+        title: 'Payment Complete',
+        color: 'success'
       }
     }
   })
@@ -975,7 +990,6 @@ export default function useTable (props, context) {
   watch(() => store.state.datatable.data, (newValue, oldValue) => {
     state.elements = newValue;
   })
-
   const formatter = useFormatter(props, context, state.headers)
 
   // expose managed state as return value
