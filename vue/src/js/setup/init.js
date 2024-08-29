@@ -316,6 +316,24 @@ import lodash, { snakeCase } from 'lodash-es'
       .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
   }
+  window.__removeQueryParams = (paramsToRemove) => {
+
+    // Get the current URL
+    const currentUrl = new URL(window.location.href);
+    // Get the search params
+    const searchParams = currentUrl.searchParams;
+    // Remove specified parameters
+    paramsToRemove.forEach(param => {
+      searchParams.delete(param);
+    });
+    // Construct the new URL
+    const newUrl = currentUrl.origin + currentUrl.pathname + searchParams.toString();
+    console.log(newUrl);
+    // Update the URL without refreshing the page
+    window.history.pushState({}, '', newUrl);
+
+    // window.history.replaceState({}, '', newUrl);
+  }
 }
 
 function tokenizePath(path) {
@@ -457,6 +475,7 @@ function assignArrayHelpers(){
     }
   }
 }
+
 
 export default function init(){
 
