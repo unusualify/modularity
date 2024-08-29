@@ -53,7 +53,7 @@
             window['{{ unusualConfig('js_namespace') }}'].LOCALE = '{{ unusualConfig('locale') }}';
             window['{{ unusualConfig('js_namespace') }}'].version = '{{ unusualConfig('version') }}';
             window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {
-                languages: @json(route('admin.api.languages.index'))
+                languages: @json(route('api.languages.index'))
             };
             window['{{ unusualConfig('js_namespace') }}'].STORE = {};
 

@@ -53,10 +53,12 @@ class FilepondHydrate extends InputHydrate
         $input['inputName'] = $input['name'] ?? 'filepond';
         // $input['label'] ??= 'filepond';
 
+        $input['max-files'] = $input['max'] ?? $input['max-files'];
+
         $input['endPoints'] = [
-            'process' => route('admin.filepond.process'),
-            'revert' => route('admin.filepond.delete'),
-            'load' => 'http://' . unusualConfig('admin_app_url') . '/' . Storage::url('fileponds') . '/',
+            'process' => route('filepond.process'),
+            'revert' => route('filepond.revert'), // for deleting temp files
+            'load' =>  str_replace(':id', '', route('filepond.preview', ['folder' => ':id']) ) ,
         ];
 
         // Custom Labels

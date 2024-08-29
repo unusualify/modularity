@@ -109,6 +109,14 @@ class UnusualRoutes
     public function webMiddlewares(): array
     {
         return [
+            ...['web'],
+            ...$this->defaultMiddlewares,
+        ];
+    }
+
+    public function webPanelMiddlewares(): array
+    {
+        return [
             ...['web.auth'],
             ...$this->defaultMiddlewares,
             ...['unusual.panel']
@@ -116,6 +124,14 @@ class UnusualRoutes
     }
 
     public function apiMiddlewares(): array
+    {
+        return [
+            ...['api'],
+            ...$this->defaultMiddlewares,
+        ];
+    }
+
+    public function apiPanelMiddlewares(): array
     {
         return [
             ...['api.auth'],
@@ -128,7 +144,8 @@ class UnusualRoutes
         return $this->defaultMiddlewares;
     }
 
-    public function generateRouteMiddlewares()  {
+    public function generateRouteMiddlewares()
+    {
 
         Route::aliasMiddleware('unusual_auth', AuthenticateMiddleware::class);
         Route::aliasMiddleware('unusual_guest', RedirectIfAuthenticatedMiddleware::class);
@@ -146,16 +163,16 @@ class UnusualRoutes
 
         Route::aliasMiddleware('language', LanguageMiddleware::class);
         Route::aliasMiddleware('impersonate', ImpersonateMiddleware::class);
+        Route::aliasMiddleware('navigation', NavigationMiddleware::class);
         Route::middlewareGroup('unusual.core', [
             'language',
-            'impersonate'
+            'impersonate',
+            'navigation',
         ]);
 
-        Route::aliasMiddleware('navigation', NavigationMiddleware::class);
         Route::aliasMiddleware('authorization', AuthorizationMiddleware::class);
         Route::aliasMiddleware('company_registration', CompanyRegistrationMiddleware::class);
         Route::middlewareGroup('unusual.panel', [
-            'navigation',
             'authorization',
             'company_registration'
         ]);

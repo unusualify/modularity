@@ -68,7 +68,7 @@ class RouteServiceProvider extends ServiceProvider
                 $router->group(
                     $groupOptions,
                     function ($router)  use($supportSubdomainRouting){
-                        //auth routes (login,register,forgot-password etc.)
+                        //internal authentication routes (login,register,forgot-password etc.)
                         $router->group(
                             [
                                 'middleware' => [
@@ -81,23 +81,8 @@ class RouteServiceProvider extends ServiceProvider
                                 require __DIR__ . '/../../routes/auth.php';
                             }
                         );
-                        // dd(
-                        //    $groupOptions
-                        // );
-                        $router->group(
-                            [
-                                'prefix' => 'api',
-                                'middleware' => [
-                                    ...UnusualRoutes::webMiddlewares(),
-                                    ...($supportSubdomainRouting ? ['supportSubdomainRouting'] : [])
-                                ],
-                            ],
-                            function ($router) {
-                                require __DIR__ . '/../../routes/api.php';
-                            }
-                        );
 
-                        // internal routes web.php
+                        // internal auth web routes
                         $router->group(
                             [
                                 // 'domain' => unusualConfig('admin_app_url'),
@@ -108,13 +93,27 @@ class RouteServiceProvider extends ServiceProvider
 
                                 $router->group(
                                     [
-                                        'middleware' => UnusualRoutes::webMiddlewares()
+                                        'middleware' => UnusualRoutes::webPanelMiddlewares()
                                     ],
                                     function ($router) {
                                         require __DIR__ . '/../../routes/web.php';
                                     }
                                 );
 
+                            }
+                        );
+
+                        // internal auth api routes
+                        $router->group(
+                            [
+                                'prefix' => 'api',
+                                'middleware' => [
+                                    ...UnusualRoutes::webPanelMiddlewares(),
+                                    ...($supportSubdomainRouting ? ['supportSubdomainRouting'] : [])
+                                ],
+                            ],
+                            function ($router) {
+                                require __DIR__ . '/../../routes/api.php';
                             }
                         );
 
@@ -132,6 +131,16 @@ class RouteServiceProvider extends ServiceProvider
                 );
 
 
+            }
+        );
+
+        $router->group(
+            [
+                'middleware' => ['web']
+                // 'namespace' => $this->namespace,
+            ],
+            function($router) {
+                require __DIR__ . '/../../routes/front.php';
             }
         );
 
@@ -154,6 +163,7 @@ class RouteServiceProvider extends ServiceProvider
     ) {
         $groupOptions = UnusualRoutes::groupOptions();
         $controller_namespace = GenerateConfigReader::read('controller')->getNamespace();
+        $front_controller_namespace = $controller_namespace . '\\Front';
         $routes_folder = GenerateConfigReader::read('routes')->getPath();
 
         foreach(Modularity::allEnabled() as $module){
@@ -191,12 +201,28 @@ class RouteServiceProvider extends ServiceProvider
             $router->group([
                     ...$groupOptions,
                     ...[
-                        'middleware' => UnusualRoutes::webMiddlewares(),
+                        'middleware' => UnusualRoutes::webPanelMiddlewares(),
                         'namespace' => $module->getClassNamespace("{$controller_namespace}"),
                     ]
                 ],
                 function ($router) use ($module) {
                     Route::moduleRoutes($module);
+                }
+            );
+            // dd(
+            //     UnusualRoutes::webMiddlewares(),
+            //     $groupOptions,
+            //     $_groupOptions
+            // );
+            $router->group([
+                    ...[
+                        // 'middleware' => UnusualRoutes::webPanelMiddlewares(),
+                        'middleware' => UnusualRoutes::webMiddlewares(),
+                        'namespace' => $module->getClassNamespace("{$front_controller_namespace}"),
+                    ]
+                ],
+                function ($router) use ($module) {
+                    Route::moduleFrontRoutes($module);
                 }
             );
 
@@ -701,54 +727,6 @@ class RouteServiceProvider extends ServiceProvider
             }
 
 
-        });
-
-        Route::macro('internalApiRoutes', function ($routeFile = null, $middlewares = [])
-        {
-            // if(!$routeFile){
-            //     $pattern = '/[M|m]odules\/[A-Za-z]*\/Routes\//';
-
-            //     $routeFile = fileTrace($pattern);
-            // }
-
-            // $lowerModule  = curtModuleLowerName($routeFile);
-            // $studlyModule = curtModuleStudlyName($routeFile);
-
-            // if( empty($middlewares) )
-            //     $middlewares = ['auth'];
-
-            // Route::middleware($middlewares)->group( function() use($lowerModule, $studlyModule){
-
-            //     Route::prefix('api')
-            //         ->name('api.')
-            //         ->namespace('API')
-            //         ->group(function() use($lowerModule, $studlyModule){
-
-            //         Route::apiResource( $lowerModule ,$studlyModule.'Controller');
-            //         if( is_array( $parent = config( $lowerModule.'.parent_route' ) ) ){
-            //             $url = $parent['url'] ?? lowerName($parent['name']);
-            //             $studlyName = studlyName($parent['name']);
-
-            //             Route::apiResource($url, $studlyName.'Controller');
-            //         }
-            //         Route::prefix( $lowerModule )
-            //             ->name( $lowerModule.'.' )
-            //             ->group(function() use($lowerModule, $studlyModule){
-
-            //             if( is_array( config( $lowerModule . '.sub_routes' ))){
-            //                 foreach( config( $lowerModule . '.sub_routes' ) as $value) {
-            //                     $url = $value['url'] ?? lowerName($value['name']);
-            //                     $studlyName = studlyName($value['name']);
-            //                     $names = $value['route_name'] ?? $url;
-
-            //                     Route::apiResource($url, $studlyName.'Controller', ['names' => $names]);
-            //                 }
-            //             }
-            //         });
-
-            //     });
-
-            // });
         });
     }
 
