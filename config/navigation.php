@@ -79,6 +79,12 @@ return [
                 'event' => 'openFreeMediaLibrary',
             ],
         ],
+        'guest' => [
+            'register' => [
+                'name' => 'Register',
+                'route_name' => 'register.form',
+            ],
+        ],
     ]
 
 ];
