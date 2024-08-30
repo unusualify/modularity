@@ -322,14 +322,14 @@ trait ManageUtilities {
             'restoreUrl' => moduleRoute($this->moduleName, $this->routePrefix, 'restoreRevision', [$itemId]),
         ] : []);
 
-        return array_replace_recursive($data, $this->formData($this->request));
+        return array_replace_recursive($data, $this->formData($this->request, $item));
     }
 
     /**
      * @param Request $request
      * @return array
      */
-    public function formData($request)
+    public function formData($request, $item = null)
     {
         return [];
     }
