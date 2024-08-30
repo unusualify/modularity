@@ -130,7 +130,6 @@ trait RelationTrait
 
                 foreach ($fields[$relationName] as $key => $data) {
                     if(isset($data[$relatedLocalKey])){
-
                         array_splice($idsDeleted, array_search($data[$relatedLocalKey], $idsDeleted), 1);
 
                         $repository->update($data[$relatedLocalKey], $data + [$foreignKey => $object->id]);
@@ -270,13 +269,13 @@ trait RelationTrait
         // );
         if(method_exists($this->model, 'definedRelationsTypes')){
             foreach( $this->model->definedRelationsTypes() as $relationship => $relationshipType){
-                if($relationship == 'prices'){
-                    dd(
-                        'prices',
-                        $relationshipType,
-                        $object->{$relationship}
-                    );
-                }
+                // if($relationship == 'prices'){
+                //     dd(
+                //         'prices',
+                //         $relationshipType,
+                //         $object->{$relationship}
+                //     );
+                // }
                 switch ($relationshipType) {
                     case 'BelongsTos':
                         $fields["{$relationship}_show"] = $object->{$relationship}->getShowFormat();
@@ -300,11 +299,11 @@ trait RelationTrait
                             $record = $object->{$relationship};
 
                             if ($record instanceof \Illuminate\Database\Eloquent\Collection) {
-                                $record->map(function($model){
-                                    if(get_class_short_name($model) == 'Price'){
-                                        dd($model, modelShowFormat($model));
-                                    }
-                                });
+                                // $record->map(function($model){
+                                //     if(get_class_short_name($model) == 'Price'){
+                                //         dd($model, modelShowFormat($model));
+                                //     }
+                                // });
                                 $fields["{$relationship}_show"] = $record->map(fn($model) => modelShowFormat($model))->implode(', ');
                             } else if($record) {
                                 $fields["{$relationship}_show"] = modelShowFormat($record);
