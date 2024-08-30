@@ -129,9 +129,17 @@ abstract class InputHydrate
             // $input =  Arr::except($input, ['route', 'model', 'repository']) + [
             //     'items' => $items
             // ];
+            if(count($input['items']) > 0){
+                // if(!isset($input['itemTitle'])){
+                //     dd($input);
+                // }
+                if(!isset($input['items'][0][$input['itemTitle']])){
+                    $input['itemTitle'] = array_keys(Arr::except($input['items'][0], [$input['itemValue']]))[0];
+                }
+            }
+            $this->afterHydrateRecords($input);
         }
 
-        $this->afterHydrateRecords($input);
 
         return $input;
     }
@@ -186,20 +194,27 @@ abstract class InputHydrate
         $columns = [];
 
         if(isset($input['ext'])){
-            $extensionMethods = explode('|',$input['ext']);
+            $extensionMethods = $input['ext'];
+            if(is_string($input['ext'])){
+                $extensionMethods = explode('|', $input['ext']);
+            }
 
-            $cols = collect($extensionMethods)->filter(fn($method) => in_array(explode(':', $method)[0], ['lock']))
-                ->map(fn($method) => explode(':',$method)[1])
-                ->toArray();
-
-            // if(!empty($cols)){
-            //     dd(
-            //         $cols,
-            //         array_merge($cols, $columns)
-            //     );
-            // }
-            $columns = array_merge(collect($extensionMethods)->filter(fn($method) => in_array(explode(':', $method)[0], ['lock']))
-                ->map(fn($method) => explode(':',$method)[1])
+            $columns = array_merge(collect($extensionMethods)->filter(function($pattern) {
+                    $args = $pattern;
+                    if(is_string($pattern)){
+                        $pattern = trim($pattern);
+                        $args = explode(':',$pattern);
+                    }
+                    return in_array($args[0], ['lock']);
+                })
+                ->map(function($pattern) {
+                    $args = $pattern;
+                    if(is_string($pattern)){
+                        $pattern = trim($pattern);
+                        $args = explode(':',$pattern);
+                    }
+                    return $args[1];
+                })
                 ->toArray(), $columns);
             // $items = $relation_class->list([$input['itemTitle'], ...$extensionColumnNames], $with)->toArray();
         }
