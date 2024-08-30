@@ -195,6 +195,13 @@ trait RelationTrait
             }
         }
 
+        foreach ($this->getHasManyRelations() as $relation) {
+            if(isset($schema[$relation])){
+                // dd($object, $relation, $object->{$relation});
+                $fields[$relation] = $object->{$relation};
+            }
+        }
+
         // dd($fields);
         foreach ($inputs as $key => $input) {
 
