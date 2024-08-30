@@ -71,9 +71,22 @@ trait ManageTraits {
             if(isset($input['type'])){
                 switch ($input['type']) {
                     case 'group':
+
+                        return Arr::mapWithKeys($this->chunkInputs($input['schema'] ?? []), function($_input) use($input){
+                            $name = "{$input['name']}.{$_input['name']}";
+                            if(isset($input['name'])){
+                                $_input['parentName'] = $input['name'];
+                            }
+                            return [$name => array_merge($_input,['name' => $name])];
+                        });
                         return $this->chunkInputs($input['schema'] ?? []);
                     case 'wrap':
-                        return $this->chunkInputs($input['schema'] ?? []);
+                        return Arr::map($this->chunkInputs($input['schema'] ?? []), function($_input) use($input){
+                            if(isset($input['name'])){
+                                // $_input['parentName'] = $input['name'];
+                            }
+                            return $_input;
+                        });
                     break;
                     case 'morphTo':
                         if($all){
@@ -97,10 +110,6 @@ trait ManageTraits {
                             });
                         }
                     break;
-                    // case 'repeater':
-                    // case 'input-repeater':
-
-                    //     return [ $input['name'] =>  $this->chunkInputs($input['schema'] ?? []) ];
                     default:
 
                         break;
