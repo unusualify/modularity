@@ -29,6 +29,10 @@ class SelectHydrate extends InputHydrate
     {
         $input = $this->input;
 
+        if((!isset($input['multiple']) || !in_array('multiple', $input)) && is_array($input['default'])){
+            $input['default'] = null;
+        }
+
         if(isset($input['items']) && !empty($input['items'])) return $input;
 
         if(($input['type'] == 'select-scroll' || (isset($input['ext']) && $input['ext'] == 'scroll') )
