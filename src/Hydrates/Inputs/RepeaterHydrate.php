@@ -13,7 +13,9 @@ class RepeaterHydrate extends InputHydrate
      * @var array
      */
     public $requirements = [
-        'autoIdGenerator' => true
+        'autoIdGenerator' => true,
+        'itemValue' => 'id',
+        'itemTitle' => 'name',
     ];
 
     /**
