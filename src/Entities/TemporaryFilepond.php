@@ -2,6 +2,8 @@
 
 namespace Unusualify\Modularity\Entities;
 
+use Illuminate\Database\Eloquent\Model;
+
 class TemporaryFilepond extends Model
 {
 
@@ -19,7 +21,7 @@ class TemporaryFilepond extends Model
 
     public function getTable()
     {
-        return unusualConfig('tables.temporary_fileponds', parent::getTable());
+        return unusualConfig('tables.filepond_temporaries', parent::getTable());
     }
 }
 

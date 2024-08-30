@@ -14,9 +14,7 @@ return new class extends Migration
         if(!Schema::hasTable($filepondsTable)){
             Schema::create($filepondsTable, function(Blueprint $table){
                 $table->{unusualIncrementsMethod()}('id');
-                $table->unsignedBigInteger('filepondable_id');
-                $table->string('filepondable_type');
-                $table->index(['filepondable_id', 'filepondable_type']);
+                $table->uuidMorphs('filepondable');
                 $table->text('uuid');
                 $table->text('file_name');
                 $table->string('role');
@@ -26,7 +24,7 @@ return new class extends Migration
             });
         }
 
-        $temporariesTable = unusualConfig('tables.temporary_fileponds', 'modularity_temporary_fileponds');
+        $temporariesTable = unusualConfig('tables.filepond_temporaries', 'modularity_filepond_temporaries');
 
         if(!Schema::hasTable($temporariesTable))
         {
@@ -36,7 +34,6 @@ return new class extends Migration
                 $table->string('folder_name');
                 $table->string('input_role');
                 $table->timestamps();
-                $table->softDeletes();
             });
         }
     }
@@ -45,7 +42,7 @@ return new class extends Migration
     public function down()
     {
         $filepondsTable = unusualConfig('tables.fileponds', 'modularity_fileponds');
-        $temporariesTable = unusualConfig('tables.temporary_fileponds', 'modularity_temporary_fileponds');
+        $temporariesTable = unusualConfig('tables.filepond_temporaries', 'modularity_filepond_temporaries');
 
         Schema::dropIfExists($filepondsTable);
         Schema::dropIfExists($temporariesTable);
