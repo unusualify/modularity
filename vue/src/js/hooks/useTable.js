@@ -1,5 +1,5 @@
 // hooks/useTable.js
-import { watch, computed, nextTick, reactive, toRefs, ref, toRef } from 'vue'
+import { watch, computed, nextTick, reactive, toRefs, ref, toRef, onMounted} from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
@@ -410,14 +410,30 @@ export default function useTable (props, context) {
         content: computed(() => store._state.data.datatable.customModal.description),
         closeAction() {
           state.customModalActive = false;
+          state.modals.custom.confirmText = '';
+          state.modals.custom.cancelText = '';
+          state.modals.custom.img = '';
+          state.modals.custom.icon = '';
+          state.modals.custom.iconSize = null;
+          state.modals.custom.title = '';
+          state.modals.custom.color = '';
+          console.log(state.modals.custom)
         },
         confirmAction() {
           state.customModalActive = false;
+          state.modals.custom.confirmText = '';
+          state.modals.custom.cancelText = '';
+          state.modals.custom.img = '';
+          state.modals.custom.icon = '';
+          state.modals.custom.iconSize = null;
+          state.modals.custom.title = '';
+          state.modals.custom.color = '';
+          console.log(state.modals.custom)
         },
         confirmText: 'Done',
         cancelText: ' ',
         img: 'https://cdn2.iconfinder.com/data/icons/greenline/512/check-1024.png',
-        icon: '$check',
+        icon: store._state.data.datatable.customModal.icon,
         iconSize: 72,
         title: 'Payment Complete',
         color: 'success'
@@ -959,7 +975,6 @@ export default function useTable (props, context) {
     },
   })
 
-
   watch(() => state.editedItem, (newValue, oldValue) => {
     state.editedIndex = state.elements.findIndex(o => { return o.id === newValue.id })
   })
@@ -993,6 +1008,14 @@ export default function useTable (props, context) {
   const formatter = useFormatter(props, context, state.headers)
 
   // expose managed state as return value
+
+  onMounted(() => {
+    console.log('Component using useTable is mounted')
+    methods.initialize()
+    if(store._state.data.datatable.customModal){
+      __removeQueryParams(['customModal[description]', 'customModal[color]', 'customModal[icon]']);
+    }
+  })
 
   return {
     form,
