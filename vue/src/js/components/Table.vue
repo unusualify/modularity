@@ -605,10 +605,10 @@ export default {
   created () {
     // this.$can(this.rowActions[0].can ?? '')
 
-    const store = useStore();
-    if(store._state.data.datatable.customModal){
-      __removeQueryParams(['customModal[description]']);
-    }
+    // const store = useStore();
+    // if(store._state.data.datatable.customModal){
+    //   __removeQueryParams(['customModal[description]', 'customModal[color]']);
+    // }
   },
   methods: {
   },
