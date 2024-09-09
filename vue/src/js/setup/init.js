@@ -181,6 +181,28 @@ import lodash, { snakeCase } from 'lodash-es'
       return acc;
     }, {});
   }
+
+  window.__reverseDot = (flatObj) => {
+    const result = {};
+
+    for (const [key, value] of Object.entries(flatObj)) {
+      const keys = key.split('.');
+      let current = result;
+
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        if (i === keys.length - 1) {
+          current[k] = value;
+        } else {
+          current[k] = current[k] || {};
+          current = current[k];
+        }
+      }
+    }
+
+    return result;
+  };
+
   window.__wildcard_change = (string, val, search_key = 'id') => {
     let values = Array.isArray(val) ? val.join(',') : val
     // __log('wildcard_change', string, val)
@@ -317,22 +339,36 @@ import lodash, { snakeCase } from 'lodash-es'
       .join(' ');
   }
   window.__removeQueryParams = (paramsToRemove) => {
-
     // Get the current URL
     const currentUrl = new URL(window.location.href);
-    // Get the search params
-    const searchParams = currentUrl.searchParams;
-    // Remove specified parameters
-    paramsToRemove.forEach(param => {
-      searchParams.delete(param);
-    });
-    // Construct the new URL
-    const newUrl = currentUrl.origin + currentUrl.pathname + searchParams.toString();
-    console.log(newUrl);
-    // Update the URL without refreshing the page
-    window.history.pushState({}, '', newUrl);
 
-    // window.history.replaceState({}, '', newUrl);
+    // Convert the search params to an object
+    let queryObject = {};
+    for (const [key, value] of currentUrl.searchParams.entries()) {
+      queryObject[key] = value;
+    }
+
+    // Remove specified parameters and clean the object
+    paramsToRemove.forEach(param => {
+      delete queryObject[param];
+    });
+
+    // Clean the object by removing undefined or null values
+    Object.keys(queryObject).forEach(key =>
+      (queryObject[key] === undefined || queryObject[key] === null) && delete queryObject[key]
+    );
+
+    // Reconstruct the URL with the cleaned query parameters
+    const newSearchParams = new URLSearchParams();
+    Object.keys(queryObject).forEach(key => {
+      newSearchParams.append(key, queryObject[key]);
+    });
+
+    // Construct the new URL
+    const newUrl = currentUrl.origin + currentUrl.pathname + (newSearchParams.toString() ? '?' + newSearchParams.toString() : '');
+
+    // Update the URL without refreshing the page using replaceState
+    window.history.replaceState({}, '', newUrl);
   }
 }
 
