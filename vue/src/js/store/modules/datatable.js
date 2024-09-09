@@ -53,7 +53,6 @@ const state = {
   // dialog: false
   // actions: window[import.meta.env.VUE_APP_NAME].STORE.datatable.actions,
   // actionsType: window[import.meta.env.VUE_APP_NAME].STORE.datatable.actionsType,
-  payment : window[import.meta.env.VUE_APP_NAME].STORE.datatable.payment,
   customModal: _.isEmpty(window[import.meta.env.VUE_APP_NAME].STORE.datatable.customModal )?  false : window[import.meta.env.VUE_APP_NAME].STORE.datatable.customModal,
 }
 // console.log(window[import.meta.env.VUE_APP_NAME].STORE.datatable)
