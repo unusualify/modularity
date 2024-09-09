@@ -18,9 +18,6 @@ use Unusualify\Priceable\Models\Price;
 
 class PriceController extends Controller
 {
-
-
-
     /**
      *
      */
@@ -40,24 +37,16 @@ class PriceController extends Controller
             $payment = new Payable($paymentServiceName);
             $paymentService = PaymentService::where('name', $paymentServiceName)->first();
             Session::put('payable_payment_service', $paymentServiceName );
-
-
         }else{
             $paymentService = PaymentService::find($params['payment_service']['payment_method']);
             $payment = new Payable($paymentService->name);
             Session::put('payable_payment_service', $paymentService->name );
-
         }
-        // dd(Cookie::get('payable_payment_service'));
-        // dd($paymentService->id);
-        // dd($payment);
         $user = Auth::user();
         $company = $user->company;
         // dd($company);
-        // dd($params);
         $payload = $payment->getPayloadSchema();
         // dd($payload);
-        // dd($price);
         $payload["locale"] = app()->getLocale();
         $payload["payment_service_id"] = $paymentService->id;
         $payload["order_id"] = uniqid("ORD-");
@@ -106,7 +95,8 @@ class PriceController extends Controller
         return $resp;
     }
 
-    public function response(Request $request){
+    public function response(Request $request)
+    {
         // Left the variables separete incase we need data to display.
         // $payment = Payment::find($request->id);
         // $price = $payment->price;
@@ -114,12 +104,13 @@ class PriceController extends Controller
         // dd($price,$priceable);
         if($request->status == 'success')
             return redirect(merge_url_query($request->custom_fields['previous_url'],
-        [
-            'customModal' => [
-                'color' => 'success',
-                'description' => 'Your payment has been successfully completed. Thank you for your purchase.',
-            ]
-        ]));
+                [
+                    'customModal' => [
+                        'color' => 'success',
+                        'description' => 'Your payment has been successfully completed. Thank you for your purchase.',
+                        'icon' => '$check',
+                    ]
+                ]));
         else{
             // dd($request->custom_fields['previous_url']);
             return redirect(merge_url_query($request->custom_fields['previous_url'], ['payment' => 'error']));
