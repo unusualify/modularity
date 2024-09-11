@@ -13,7 +13,5 @@ return [
     'tags' => 'umod_tags',
     'repeaters' => 'umod_repeaters',
     'authorizeds' => 'umod_authorizeds',
-    'temporary_assets' => 'umod_temp_assets',
-    'assets' => 'umod_assets'
 ];
 
