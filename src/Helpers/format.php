@@ -366,4 +366,88 @@ if( !function_exists('replace_curly_braces')) {
     }
 }
 
+if( !function_exists('comment_string')) {
+    /**
+     * comment_string
+     *
+     * @param  mixed $descriptions
+     * @param  mixed $parameters
+     * @param  mixed $return_type
+     * @param  mixed $asArray
+     * @return array|string
+     */
+    function comment_string(array|string $descriptions, $parameters = [], string $return_type = null, $asArray = false): array|string {
+        $lines = ["\t/**"];
+
+        if(is_string($descriptions)){
+            $descriptions = [$descriptions];
+        }
+        $lines = array_reduce($descriptions, function($carry, $line){
+            $carry[] = " * {$line}";
+
+            return $carry;
+        }, $lines);
+        $lines[] = ' *';
+        // dd($lines);
+
+        $lines = array_reduce($parameters, function($carry, $line){
+            [$name, $value] = explode('=', $line);
+            $parts = explode(' ', $name);
+            $type = 'mixin';
+            if(count($parts) > 1){
+                $type = array_shift($parts);
+                $line = array_shift($parts);
+            }
+            $carry[] = " * @param {$type} {$line}";
+
+            return $carry;
+        }, $lines);
+
+        if($return_type){
+            $lines[] = " * @return {$return_type}";
+        }
+
+        $lines[] = ' */';
+
+        if($asArray)
+            return $lines;
+
+        return implode("\n\t", $lines);
+    }
+}
+
+if( !function_exists('method_string')) {
+    /**
+     * method_string
+     *
+     * @param  mixed $method_name
+     * @param  mixed $content
+     * @param  mixed $modifier
+     * @param  mixed $comment
+     * @param  mixed $parameters
+     * @param  mixed $return_type
+     * @return string
+     */
+    function method_string($method_name, $content, $modifier = 'public', $comment = null, $parameters = [], $return_type = null): string {
+        $lines = comment_string($comment, $parameters, $return_type, asArray: true);
+
+        $parameters = implode(',', $parameters);
+        $return_type = $return_type ? ": {$return_type}" : '';
+        $lines[] = "{$modifier} function {$method_name}($parameters){$return_type}\n\t{\n\t\t";
+
+        if(is_string($content)){
+            $content = [$content];
+        }
+        $lines = array_reduce($content, function($carry, $line){
+            $carry[] = "\t{$line}";
+
+            return $carry;
+        }, $lines);
+
+        $lines[] = "}";
+
+        return implode("\n\t", $lines);
+    }
+}
+
 
