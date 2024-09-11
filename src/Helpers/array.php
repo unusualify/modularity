@@ -214,4 +214,11 @@ if(!function_exists('add_route_to_config'))
     }
 }
 
+if (!function_exists('array_except')) {
+    function array_except(array $array, array $excepts): array
+    {
+        return array_filter($array,fn($key) => !in_array($key, $excepts),ARRAY_FILTER_USE_KEY);
+    }
+}
+
 
