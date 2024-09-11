@@ -110,8 +110,14 @@ class SchemaParser extends Parser
 
 
         foreach ($traits as $key => $object) {
-            $this->traits[$key] = $object['model'];
-            $this->traitNamespaces[$key] = "{$this->baseNamespace}\\Entities\\Traits\\{$object['model']}";
+            $modelTrait = $object['model'];
+            if(@trait_exists($modelTrait)){
+                $this->traits[$key] = get_class_short_name($modelTrait);
+                $this->traitNamespaces[$key] = $modelTrait;
+            }else{
+                $this->traits[$key] = $modelTrait;
+                $this->traitNamespaces[$key] = "{$this->baseNamespace}\\Entities\\Traits\\{$modelTrait}";
+            }
 
             $this->repositoryTraits[$key] = isset($object['repository']) ? $object['repository'] : '';
             $this->repositoryTraitNamespaces[$key] = isset($object['repository']) ?  "{$this->baseNamespace}\\Repositories\\Traits\\{$object['repository']}" : '';
