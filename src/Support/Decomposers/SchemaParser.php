@@ -169,8 +169,16 @@ class SchemaParser extends Parser
             $column_type = $this->getColumnType($schema);
 
             if(in_array($column_type, $this->relationshipKeys)){
-                if(preg_match('/belongsToMany|hasMany|morphTo|morphOne/', $column_type))
+                if(preg_match('/belongsToMany|hasMany|morphOne/', $column_type))
                     continue;
+
+                if(preg_match('/morphTo/', $column_type)){
+                    $morphable_id = makeMorphForeignKey($column);
+                    $morphable_type = makeMorphForeignType($column);
+                    $parsed[] = $morphable_id;
+                    $parsed[] = $morphable_type;
+                    continue;
+                }
 
                 $column =  "{$this->getForeignKeyFromName($column)}";
             }
