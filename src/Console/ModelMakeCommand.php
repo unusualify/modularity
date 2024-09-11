@@ -459,6 +459,19 @@ class ModelMakeCommand extends BaseCommand
             // dd($str, class_exists($str), $methods);
         }
 
+        if( $this->option('addClone') ){
+            $methods[] = method_string(
+                method_name: 'getCloneSourceFillable',
+                content: [
+                    "\$class = \$this->getSourceModel();",
+                    "\$instance = new \$class;",
+                    "return \$instance->getColumns();"
+                ],
+                comment: 'Gets the clone source model fillable attributes.',
+                return_type: 'array'
+            );
+        }
+
         if( $this->option('relationships')){
             $methods = array_merge($methods, $this->modelRelationParser->render());
         }
