@@ -10,6 +10,8 @@ use function Laravel\Prompts\{text, select, confirm, warning};
 
 class CreateVueTestCommand extends BaseCommand
 {
+    protected $hidden = true;
+
     /**
      * The name of the console command.
      *

@@ -10,6 +10,7 @@ use function Laravel\Prompts\{text, info, alert, warn};
 
 class SetupModularityDevelopmentCommand extends BaseCommand
 {
+    protected $hidden = true;
     /**
      * The name and signature of the console command.
      *

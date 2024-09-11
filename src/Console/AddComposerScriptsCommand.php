@@ -7,6 +7,8 @@ use Symfony\Component\Console\Input\InputOption;
 
 class AddComposerScriptsCommand extends BaseCommand
 {
+    protected $hidden = true;
+
     /**
      * The name and signature of the console command.
      *
