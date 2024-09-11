@@ -159,8 +159,8 @@ abstract class CoreController extends LaravelController
      */
     protected function getRepository()
     {
+        return $this->getRepositoryClass($this->modelName) ? App::make($this->getRepositoryClass($this->modelName)) : null;
         try {
-            return $this->getRepositoryClass($this->modelName) ? App::make($this->getRepositoryClass($this->modelName)) : null;
             //code...
         } catch (\Throwable $th) {
             dd(
