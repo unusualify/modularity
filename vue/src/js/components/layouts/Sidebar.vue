@@ -14,11 +14,12 @@
       <v-icon color="green darken-2" large icon="fa:fab fa-atlassian"/>
     </v-avatar> -->
 
-    <template v-slot:prepend>
+    <!-- <template v-slot:prepend>
       <div>
         <span v-svg symbol="main-logo"></span>
       </div>
-    </template>
+    </template> -->
+    <ue-svg-icon symbol="main-logo"></ue-svg-icon>
 
     <v-divider class=""></v-divider>
 
