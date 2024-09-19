@@ -31,13 +31,20 @@ trait PaymentTrait
                     }
                 }
 
-                if (!$object->price) {
+                if (!$object->price && !empty($records)) {
+
                     $object->price()->create([
                         'price_type_id' => 1,
                         'vat_rate_id' => 1,
-                        'currency_id' => 1,
+                        'currency_id' => $currencyId,
                         'display_price' => ($totalPrice / 100)
                     ]);
+                }else if ($object->price->display_price != $totalPrice) {
+
+                    $object->price->display_price = $totalPrice;
+                    $object->price->currency_id = $currencyId;
+                    // dd($object->price, $totalPrice, $currencyId);
+                    $object->price()->save($object->price);
                 }
             }
         }
