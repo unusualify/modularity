@@ -1011,7 +1011,7 @@ export default function useTable (props, context) {
 
   onMounted(() => {
     console.log('Component using useTable is mounted')
-    methods.initialize()
+    // methods.initialize()
     if(store._state.data.datatable.customModal){
       __removeQueryParams(['customModal[description]', 'customModal[color]', 'customModal[icon]']);
     }
