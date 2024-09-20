@@ -393,7 +393,7 @@ trait ManageForm {
             if(@class_exists($hydrateClass)){
                 $input = App::make($hydrateClass, [
                     'input' => $input,
-                    'module' => $this->module
+                    'module' => $this->module ?? null
                 ])->render();
             }
 
