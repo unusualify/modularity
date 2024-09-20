@@ -27,7 +27,6 @@ class RegisterController extends Controller
     {
         return view(unusualBaseKey().'::auth.register', [
             'formAttributes' => [
-                'hasSubmit' => true,
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
                 'schema' => ($schema = $this->createFormSchema([
                     'name' => [
@@ -36,8 +35,8 @@ class RegisterController extends Controller
                         "label" => ___('authentication.name'),
                         "default" => "",
                         'col' => [
-                            'cols' => 12,
-                            'lg' => 12
+                            'cols' => 6,
+                            'lg' => 6,
                         ],
                         'rules' => [
                             ['min', 3]
@@ -49,8 +48,21 @@ class RegisterController extends Controller
                         "label" => ___('authentication.surname'),
                         "default" => "",
                         'col' => [
-                            'cols' => 12,
-                            'lg' => 12
+                            'cols' => 6,
+                            'lg' => 6
+                        ],
+                        'rules' => [
+                            ['min', 2]
+                        ]
+                    ],
+                    'company' => [
+                        "type" => "text",
+                        "name" => "company",
+                        "label" => ___('authentication.company'),
+                        "default" => "",
+                        'col' => [
+                            'cols' => 6,
+                            'lg' => 6
                         ],
                         'rules' => [
                             ['min', 2]
@@ -62,8 +74,8 @@ class RegisterController extends Controller
                         "label" => ___('authentication.email'),
                         "default" => "",
                         'col' => [
-                            'cols' => 12,
-                            'lg' => 12
+                            'cols' => 6,
+                            'lg' => 6,
                         ],
                         'rules' => [
                             ['email']
@@ -79,32 +91,116 @@ class RegisterController extends Controller
                             'appendInner' => 'password',
                         ],
                         'col' => [
-                            'cols' => 12,
-                            'lg' => 12
+                            'cols' => 6,
+                            'lg' => 6,
                         ]
                     ],
+                    're_password' => [
+                        "type" => "password",
+                        "name" => "re-password",
+                        "label" => ___('authentication.repeat_password'),
+                        "default" => "",
+                        "appendInnerIcon" => '$non-visibility',
+                        "slotHandlers" => [
+                            'appendInner' => 'password',
+                        ],
+                        'col' => [
+                            'cols' => 6,
+                            'lg' => 6,
+                        ]
+                    ],
+                    'tos' => [
+                        "type" => "checkbox",
+                        "name" => "tos",
+                        "label" => __('authentication.tos'),
+                        "default" => "",
+                        "col" => [
+                            "cols" => 12,
+                            "lg" => 12,
+                        ]
+                    ]
                 ])),
 
                 'actionUrl' => route(Route::hasAdmin('register')),
                 'buttonText' => 'authentication.register',
-                'formClass' => 'px-5',
+                'formClass' => 'mw-24em',
+            ],
+            'formSlots' => [
+                'bottom' => [
+                    'tag' => 'v-sheet',
+                    'attributes' => [
+                        'class' => 'd-flex pb-5 justify-space-around w-100 text-black my-5',
+                    ],
+                    'elements' => [
+                        [
+                            'tag' => 'v-btn',
+                            'elements' => __('authentication.have-an-account'),
+                            'attributes' => [
+                                'variant' => 'text',
+                                'href' => '',
+                                'class' => 'v-col-5',
+                            ]
+                        ],
+                        [
+                            'tag' => 'v-btn',
+                            'elements' => __('authentication.login'),
+                            'attributes' => [
+                                'variant' => 'elevated',
+                                'href' => '',
+                                'class' => 'v-col-5',
+                                'type' => 'submit'
+
+                            ]
+                        ]
+                    ]
+                ]
             ],
             'slots' => [
                 'bottom' => [
                     'tag' => 'v-sheet',
                     'attributes' => [
-                        'class' => 'd-flex pb-5 mx-8 justify-end',
+                        'class' => 'd-flex pb-5 justify-end flex-column w-100 text-black',
                     ],
                     'elements' => [
                         [
                             "tag" => "v-btn",
-                            'elements' => ___('authentication.back-to-login'),
+                            'elements' => ___('authentication.sign-in-google'),
                             "attributes" => [
-                                'variant' => 'plain',
+                                'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
-                                'class' => ''
+                                'class' => 'my-5 custom-auth-button',
                             ],
-                        ]
+                            'slots' => [
+                                'prepend' => [
+                                    'tag' => 'ue-svg-icon',
+                                    'attributes' => [
+                                        'symbol' => 'google',
+                                        'width' => '25',
+                                        'height' => '25',
+                                    ]
+                                ]
+                            ]
+                        ],
+                        [
+                            "tag" => "v-btn",
+                            'elements' => ___('authentication.sign-in-apple'),
+                            "attributes" => [
+                                'variant' => 'outlined',
+                                'href' => route(Route::hasAdmin('login.form')),
+                                'class' => 'my-5 custom-auth-button',
+                            ],
+                            'slots' => [
+                                'prepend' => [
+                                    'tag' => 'ue-svg-icon',
+                                    'attributes' => [
+                                        'symbol' => 'apple',
+                                        'width' => '25',
+                                        'height' => '25',
+                                    ]
+                                ]
+                            ]
+                        ],
+
                     ]
 
                 ]

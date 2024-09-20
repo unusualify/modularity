@@ -136,6 +136,10 @@
         />
       </v-sheet>
 
+      <v-sheet class="testclass">
+        <slot name="bottom" v-bind="{}"></slot>
+      </v-sheet>
+
     </v-form>
   </v-sheet>
 </template>
