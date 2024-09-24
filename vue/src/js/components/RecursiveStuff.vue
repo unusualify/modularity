@@ -17,18 +17,36 @@
     >
 
     <template v-if="isArray(configuration.elements)">
-
       <ue-recursive-stuff
         v-for="(_configuration, i) in configuration.elements"
         :key="`tag-${level}-${i}`"
         :level="level+1"
         :configuration="_configuration"
       />
-
     </template>
+
     <template v-else-if="isTextable(configuration.elements)">
       {{ configuration.elements }}
     </template>
+
+
+      <template v-for="(slotConf,slotName) in slots"
+        :key="`tag-${level}-slot-${slotName}`"
+        v-slot:[`${slotName}`]>
+        <!-- {{ $log(slotName, slotConf) }} -->
+          <ue-recursive-stuff
+            :level="level+1"
+            :configuration="slotConf"
+          />
+      </template>
+      <!-- <ue-recursive-stuff
+        v-for="(_configuration, i) in configuration.slots"
+        :key="`tag-${level}-${i}`"
+        :level="level+1"
+        :configuration="_configuration"
+      /> -->
+
+
   </component>
 </template>
 
@@ -55,19 +73,28 @@ export default {
 
         }
       }
-    }
+    },
   },
   setup (props, context) {
     // const vFitGrid = resolveDirective('fit-grid')
     // const directives = [vFitGrid];
     // const directives = props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : []
     // __log(directives)
-
+    const slots = computed(() => {
+      // console.log(props.configuration);
+      if(props.configuration.hasOwnProperty('slots'))
+        return props.configuration.slots
+      else
+        return {}
+      })
     function isTextable (value) {
       return __isString(value) || __isNumber(value)
     }
     function isArray (value) {
       return Array.isArray(value, (value))
+    }
+    function hasSlot(value) {
+      return value.hasOwnProperty('slots');
     }
     function isObject (value) {
       return __isObject(value)
@@ -85,7 +112,6 @@ export default {
       if (isObject(value)
       // || (isArray(value) && !__isString(value[0]))
       ) {
-
       } else {
         // __log(_value, value)
         const matches = _value.match(castPattern)
@@ -105,7 +131,6 @@ export default {
     }
     const castPattern = /\$([\w|.]+)/
     const filteredAttributes = cloneDeep(props.configuration.attributes)
-
     const castedAttributes = computed(() => {
       const attrs = cloneDeep(props.configuration.attributes)
       return reduce(attrs, (o, v, k) => {
@@ -138,9 +163,11 @@ export default {
       // directives: props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : [],
       isTextable,
       isArray,
+      hasSlot,
       filteredAttributes,
       castedAttributes,
-      bindAttributes
+      bindAttributes,
+      slots
     }
   },
   data () {
