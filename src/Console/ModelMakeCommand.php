@@ -461,13 +461,23 @@ class ModelMakeCommand extends BaseCommand
 
         if( $this->option('addClone') ){
             $methods[] = method_string(
-                method_name: 'getCloneSourceFillable',
+                method_name: 'getSnapshotSourceModelFillable',
                 content: [
                     "\$class = \$this->getSourceModel();",
                     "\$instance = new \$class;",
                     "return \$instance->getColumns();"
                 ],
-                comment: 'Gets the clone source model fillable attributes.',
+                comment: 'Gets the snaphot source model fillable attributes.',
+                return_type: 'array'
+            );
+            $methods[] = method_string(
+                method_name: 'getSnapshotSourceModelRelationships',
+                content: [
+                    "\$class = \$this->getSourceModel();",
+                    "\$instance = new \$class;",
+                    "return array_diff(\$instance->definedRelations(), \$this->snapshotSourceRelationshipsExcepts ?? []);"
+                ],
+                comment: 'Gets all defined relationships of the snapshot source model.',
                 return_type: 'array'
             );
         }
