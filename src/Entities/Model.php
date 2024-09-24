@@ -6,23 +6,19 @@ use Carbon\Carbon;
 use Cartalyst\Tags\TaggableInterface;
 use Cartalyst\Tags\TaggableTrait;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Traits\{
     HasPresenter,
     ModelHelpers,
     HasScopes,
-    HasRelation,
     IsTranslatable
 };
-
 
 class Model extends LaravelModel implements TaggableInterface
 {
     use ModelHelpers,
         HasPresenter,
-        HasRelation,
         HasScopes,
         IsTranslatable,
         SoftDeletes,
@@ -82,7 +78,7 @@ class Model extends LaravelModel implements TaggableInterface
     /**
      * {@inheritdoc}
      */
-    public function tags(): MorphToMany
+    public function tags(): \Illuminate\Database\Eloquent\Relations\MorphToMany
     {
         return $this->morphToMany(
             static::$tagsModel,

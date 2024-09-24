@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Unusualify\Priceable\Models\Price;
+use Oobook\Priceable\Models\Price;
 
 
 return new class extends Migration
@@ -23,7 +23,7 @@ return new class extends Migration
 			$table->foreignId('price_id')->after('payment_service_id')->constrained($priceTableName);
             $table->integer('currency_id')->nullable()->change();
         });
-        
+
         Schema::enableForeignKeyConstraints();
 
     }

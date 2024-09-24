@@ -31,22 +31,6 @@ final class LaravelServiceProvider extends ServiceProvider
 
     }
 
-    private function publishMigrations(): void
-    {
-        // $this->loadMigrationsFrom(__DIR__ . '/Database/Migrations');
-
-        if (config('unusual.load_default_migrations', true)) {
-
-        }
-
-        $this->publishes([
-            __DIR__ . '/Database/Migrations' => database_path('migrations/default'),
-        ], 'migrations');
-
-    }
-
-
-
     private function publishAssets(): void
     {
         // $this->publishes([
