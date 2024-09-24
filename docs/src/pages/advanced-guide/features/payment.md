@@ -12,7 +12,7 @@
 ## HasPayment (Trait)
 
 
-This trait, defines a relationship between a model and it's price information by leveraging from the Unusualify\Priceable package. See below :
+This trait, defines a relationship between a model and it's price information by leveraging from the oobook/priceable package. See below :
 
 
 ```php
