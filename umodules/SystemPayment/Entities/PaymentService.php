@@ -38,9 +38,9 @@ class PaymentService extends Model
 	 * The currencies that belong to the PaymentService.
 	 *
 	 */
-	public function currencies() : \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	public function paymentCurrencies() : \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	{
-		return $this->belongsToMany(\Modules\SystemPayment\Entities\Currency::class);
+		return $this->belongsToMany(\Modules\SystemPayment\Entities\PaymentCurrency::class);
 	}
 
 }

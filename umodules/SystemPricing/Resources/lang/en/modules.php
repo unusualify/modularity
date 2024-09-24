@@ -6,4 +6,3 @@ return [
     'price_type' => 'Price Type | Price Types | {n} Price Types',
 ];
 
-    

@@ -47,14 +47,15 @@ const state = {
   bulk: [],
   // localStorageKey: window[import.meta.env.VUE_APP_NAME].STORE.datatable.localStorageKey || window.location.pathname,
   loading: false,
-  updateTracker: 0
+  updateTracker: 0,
 
   // columns: window[import.meta.env.VUE_APP_NAME].STORE.datatable.columns || [],
   // dialog: false
   // actions: window[import.meta.env.VUE_APP_NAME].STORE.datatable.actions,
   // actionsType: window[import.meta.env.VUE_APP_NAME].STORE.datatable.actionsType,
-
+  customModal: _.isEmpty(window[import.meta.env.VUE_APP_NAME].STORE.datatable.customModal )?  false : window[import.meta.env.VUE_APP_NAME].STORE.datatable.customModal,
 }
+// console.log(window[import.meta.env.VUE_APP_NAME].STORE.datatable)
 
 // getters
 const getters = {
@@ -90,7 +91,6 @@ const getters = {
       })
     return state.advancedFilters
   }
-
 }
 
 const mutations = {
@@ -112,7 +112,6 @@ const mutations = {
   [DATATABLE.SET_DATATABLE_DIALOG] (state, val) {
     state.dialog = val
   },
-
   [DATATABLE.UPDATE_DATATABLE_FILTER] (state, filter) {
     state.filter = Object.assign({}, state.filter, filter)
 
@@ -126,7 +125,6 @@ const mutations = {
   [DATATABLE.UPDATE_DATATABLE_FILTER_STATUS] (state, slug) {
     state.filter.status = slug
   },
-
   [DATATABLE.UPDATE_DATATABLE_ADVANCED_FILTER] (state, val){
 
       Object.keys(state.advancedFilters).forEach(function(key,index){
@@ -138,7 +136,6 @@ const mutations = {
         }, {})
       })
   },
-
   [DATATABLE.RESET_DATATABLE_ADVANCED_FILTER] (state){
     state.advancedFilters = Object.fromEntries(Object.entries(state.advancedFilters).map(([key, val]) => {
       state.filter[key] = []
@@ -146,7 +143,6 @@ const mutations = {
       return [key, val]
     }))
   },
-
   [DATATABLE.UPDATE_DATATABLE_BULK] (state, id) {
     if (state.bulk.indexOf(id) > -1) {
       state.bulk = state.bulk.filter(function (item) {
@@ -379,7 +375,6 @@ const actions = {
       commit(NOTIFICATION.SET_NOTIF, { message: errorResp.data.error.message, variant: 'error' })
     })
   },
-
   [ACTIONS.DELETE_ITEM] ({ commit, state, dispatch }, { id = null, callback = null, errorCallback = null } = {}) {
     api.delete(id, function (resp) {
       commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
@@ -441,7 +436,6 @@ const actions = {
       }
     })
   },
-
   [ACTIONS.BULK_PUBLISH] ({ commit, state, dispatch }, payload) {
     api.bulkPublish(
       {
@@ -495,7 +489,14 @@ const actions = {
       commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
       dispatch(ACTIONS.GET_DATATABLE)
     })
-  }
+  },
+  [ACTIONS.CHECK_MODAL_STATUS]({ commit, state }) {
+    if (state.customModalInitialState) {
+      // Assuming you have a way to activate the modal, e.g., through a global event bus or a plugin
+      // For this example, we'll just update the state, but you might need to emit an event or call a method
+      commit(DATATABLE.UPDATE_MODAL_ACTIVE, true);
+    }
+  },
 }
 
 export default {

@@ -1,9 +1,9 @@
 // hooks/useTable.js
-import { watch, computed, nextTick, reactive, toRefs, ref } from 'vue'
+import { watch, computed, nextTick, reactive, toRefs, ref, toRef, onMounted} from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
-import { isObject, find, omit, snakeCase, kebabCase, isEqual } from 'lodash-es'
+import { isObject, find, omit, snakeCase, kebabCase, isEqual, cloneDeep } from 'lodash-es'
 import api from '@/store/api/datatable'
 
 import { DATATABLE, FORM } from '@/store/mutations/index'
@@ -13,6 +13,7 @@ import { mapGetters } from '@/utils/mapStore'
 import { getSubmitFormData } from '@/utils/getFormData.js'
 
 import { useFormatter, useRoot } from '@/hooks'
+import _ from 'lodash'
 
 export const makeTableProps = propsFactory({
   name: {
@@ -178,7 +179,6 @@ export default function useTable (props, context) {
   const form = ref(null)
   let loading = ref(false)
   let items = ref(props.items ?? store.state.datatable.data)
-
   const state = reactive({
 
     id: Math.ceil(Math.random() * 1000000) + '-table',
@@ -188,8 +188,12 @@ export default function useTable (props, context) {
     formStyles: { width: props.formWidth },
     formActive: false,
     deleteModalActive: false,
-    customModalActive: false,
-    activeModal: 'delete',
+    customModalActive: !(_.isEmpty(store._state.data.datatable.customModal)),
+    activeModal: 'custom',
+    customFormModalActive : false,
+    customFormAttributes: {},
+    customFormSchema: {},
+    customFormModel: {},
     activeTableItem: null,
     hideTable: false,
     fillHeight: computed(() => props.fillHeight),
@@ -238,9 +242,6 @@ export default function useTable (props, context) {
     headersWithKeys: computed(() => {
       let collection = {};
        Object.values(state.headers).forEach((header, i) => {
-        // let k =
-
-        // let newObject = Object.create({ })
          collection[header['key']] = header
        })
 
@@ -404,6 +405,38 @@ export default function useTable (props, context) {
         closeAction() {
           state.customModalActive = false;
         }
+      },
+      'custom': {
+        content: computed(() => store._state.data.datatable.customModal.description),
+        closeAction() {
+          state.customModalActive = false;
+          state.modals.custom.confirmText = '';
+          state.modals.custom.cancelText = '';
+          state.modals.custom.img = '';
+          state.modals.custom.icon = '';
+          state.modals.custom.iconSize = null;
+          state.modals.custom.title = '';
+          state.modals.custom.color = '';
+          console.log(state.modals.custom)
+        },
+        confirmAction() {
+          state.customModalActive = false;
+          state.modals.custom.confirmText = '';
+          state.modals.custom.cancelText = '';
+          state.modals.custom.img = '';
+          state.modals.custom.icon = '';
+          state.modals.custom.iconSize = null;
+          state.modals.custom.title = '';
+          state.modals.custom.color = '';
+          console.log(state.modals.custom)
+        },
+        confirmText: 'Done',
+        cancelText: ' ',
+        img: 'https://cdn2.iconfinder.com/data/icons/greenline/512/check-1024.png',
+        icon: store._state.data.datatable.customModal.icon,
+        iconSize: 72,
+        title: 'Payment Complete',
+        color: 'success'
       }
     }
   })
@@ -447,7 +480,7 @@ export default function useTable (props, context) {
           }
           break
         case 'forceDelete':
-          __log(methods.isSoftDeletable(item), action)
+          // __log(methods.isSoftDeletable(item), action)
           if (methods.isSoftDeletable(item)) {
             hasAction = methods.canItemAction(action)
           } else {
@@ -485,7 +518,7 @@ export default function useTable (props, context) {
     canItemAction: function (action) {
       // __log(store.getters.userPermissions)
       if (__isset(action.can) && action.can) {
-        __log(action, action.can)
+        // __log(action, action.can)
         // if (store.getters.isSuperAdmin) {
         //   return true
         // }
@@ -597,8 +630,52 @@ export default function useTable (props, context) {
           state.customModalActive = true;
           state.selectedAction = _action;
           break
+        // case 'pay':
+        //   methods.setEditedItem(item);
+        //   // state.payModalData.schema['payment-service'].price = item._price;
+        //   // state.payModalData.schema = methods.preparePaySchema(_action.schema,item);
+        //   // state.payModalData.active = true
+        //   // console.log(_action, action);
+        //   // return;
+        //   state.customFormModalSchema = _action.schema;
+        //   state.customFormModalActive = true;
+
+
+
+        //   // state.payModalData.active = true;
+        //   // state.payModalData.schema = _action.schema;
+
+        //   break;
         default:
           break
+      }
+      if(_action.form){
+        //use clone_dip
+        // console.log(_action.form)
+        state.customFormSchema = cloneDeep(_action.form.attributes.schema);
+        state.customFormAttributes = cloneDeep(_action.form.attributes);
+
+        // console.log(state.customFormSchema);
+        if(_action.form.hasOwnProperty('model_formatter')){
+          for(let key in _action.form.model_formatter){
+            let attr = _.get(item,_action.form.model_formatter[key], '')
+            _.set(state.customFormModel,key, attr);
+          }
+        }
+        if(_action.form.hasOwnProperty('schema_formatter')){
+          for(let key in _action.form.schema_formatter){
+            let attr = _.get(item,_action.form.schema_formatter[key], '');
+            _.set(state.customFormAttributes.schema,key, attr)
+          }
+        }
+        // console.log(state.customFormModel, state.customFormAttributes)
+        // state.customFormAttributes.actionUrl = state.customFormAttributes.actionUrl.replace(':id', item.price.id);
+        // console.log(item)
+
+        // console.log( state.customFormAttributes)
+        // console.log(state.customFormActionUrl);
+        state.customFormModalActive = true;
+        return;
       }
     },
 
@@ -895,9 +972,8 @@ export default function useTable (props, context) {
         }
       )
 
-    }
+    },
   })
-
 
   watch(() => state.editedItem, (newValue, oldValue) => {
     state.editedIndex = state.elements.findIndex(o => { return o.id === newValue.id })
@@ -929,10 +1005,17 @@ export default function useTable (props, context) {
   watch(() => store.state.datatable.data, (newValue, oldValue) => {
     state.elements = newValue;
   })
-
   const formatter = useFormatter(props, context, state.headers)
 
   // expose managed state as return value
+
+  onMounted(() => {
+    console.log('Component using useTable is mounted')
+    methods.initialize()
+    if(store._state.data.datatable.customModal){
+      __removeQueryParams(['customModal[description]', 'customModal[color]', 'customModal[icon]']);
+    }
+  })
 
   return {
     form,
@@ -940,7 +1023,6 @@ export default function useTable (props, context) {
     ...getters,
     ...toRefs(methods),
     ...formatter,
-
-    isSmAndDown
+    isSmAndDown,
   }
 }

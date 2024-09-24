@@ -1,8 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\SystemPayment\Http\Controllers\PaymentController;
-
+use Modules\SystemPayment\Http\Controllers\PriceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,9 +20,16 @@ Route::middleware(['web.auth', 'unusual.core'])->group(function(){
     Route::middleware(('unusual.panel'))->group(function(){
 
     });
-    Route::controller(PaymentController::class)->group(function(){
+    Route::controller(PriceController::class)->group(function(){
+        Route::post('/pay', 'pay')->name('payment');
+    });
 
-        Route::get('/pay/{price}', 'pay')->name('payment');
+});
+Route::controller(PriceController::class)->group(function(){
+    Route::group([
+        'excluded_middleware' => ['web']
+    ],function(){
+        Route::post('/response', 'response')->name('payment.response');
     });
 
 });

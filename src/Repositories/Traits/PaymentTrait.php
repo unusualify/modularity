@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
-
 trait PaymentTrait
 {
     public $paymentTraitRelationName = null;
@@ -38,5 +37,22 @@ trait PaymentTrait
                 }
             }
         }
+    }
+
+    public function getPaymentFormSchema()
+    {
+        return [
+            [
+                'name' => 'price_id',
+                'label' => 'price_id',
+                'type' => 'hidden'
+            ],
+            [
+                'name' => 'payment_service',
+                'label' => 'Payment',
+                'type' => 'payment-service',
+                // 'connector' => 'SystemPayment:PaymentService|repository:listAll',
+            ]
+        ];
     }
 }

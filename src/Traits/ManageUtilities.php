@@ -83,6 +83,8 @@ trait ManageUtilities {
                 'mainFilters' => $this->getTableMainFilters(),
                 'filter' => ['status' =>  $filters['status'] ?? $defaultFilterSlug ?? 'all'],
                 'advancedFilters' => $this->getTableAdvancedFilters(),
+                'customModal' => request()->has('customModal') ? request()->query('customModal') : '',
+
                 // {{-- inputs: {!! json_encode($inputs) !!}, --}}
                 // {{-- initialAsync: '{{ count($tableData['data']) ? true : false }}', --}}
                 // {{-- name: '{{ $routeName}}', --}}
@@ -106,10 +108,9 @@ trait ManageUtilities {
 
 
         ];
-
+        // dd($options['tableStore']);
         return array_replace_recursive($data + $options, $this->indexData($this->request));
     }
-
     /**
      * @param Request $request
      * @return array
