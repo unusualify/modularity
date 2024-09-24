@@ -2,33 +2,69 @@
   <v-app>
     <v-layout class="rounded rounded-md bg-tertiary h-100">
       <v-main class="d-flex align-center justify-center" >
-        <v-card class="mx-auto elevation-3">
-          <div class="bg-primary darken-3">
-            <span v-svg symbol="main-logo"></span>
-          </div>
-          <slot name="cardTop"></slot>
+        <v-row class="h-100">
+          <v-col
+            cols="6"
+            class="pa-0 d-flex flex-column align-center justify-center bg-white">
+            <!-- <v-card class="mx-auto"> -->
+              <v-row width="85%" class="d-flex flex-column justify-center align-center">
+                <h1 class="text-primary">{{ title }}</h1>
+                <div class="bg-primary darken-3">
+                  <!-- <span v-svg symbol="main-logo"></span> -->
+                </div>
+                <slot name="cardTop"></slot>
 
-          <v-sheet class="px-6 py-8" :width="width">
-              <slot v-bind="{}"
-                >
-                <!-- <ue-form
-                  :model="model"
-                  :schema="schema"
-                  action-url="/login"
-                  :async="true"
-                  :hasSubmit="true"
-                  buttonText="auth.login"
-                  >
-                  <template #submit="{validForm, buttonDefaultText}">
-                    <v-btn block dense type="submit" :disabled="!validForm">
-                      {{ buttonDefaultText.toUpperCase() }}
-                    </v-btn>
-                  </template>
-                </ue-form> -->
-              </slot>
-          </v-sheet>
-          <slot name="bottom" v-bind="{}"></slot>
-        </v-card>
+                <v-sheet class="" :width="width">
+                    <slot v-bind="{}"
+                      >
+                      <ue-form
+                        :model="model"
+                        :schema="schema"
+                        action-url="/login"
+                        :async="true"
+                        :hasSubmit="true"
+                        buttonText="auth.login"
+                        >
+                        <template #submit="{validForm, buttonDefaultText}">
+                          <v-btn block dense type="submit" :disabled="!validForm">
+                            {{ buttonDefaultText.toUpperCase() }}
+                          </v-btn>
+                        </template>
+                      </ue-form>
+                    </slot>
+                </v-sheet>
+
+                  <div class="d-flex w-100 align-center justify-center">
+                    <v-divider />
+                    <div class="text-no-wrap px-3">or</div>
+                    <v-divider />
+                  </div>
+
+                <slot name="bottom" v-bind="{}"></slot>
+              </v-row>
+
+            <!-- </v-card> -->
+          </v-col>
+          <v-col cols="6" class="pa-0 col-r d-flex flex-column align-center justify-center">
+            <div class="mw-420">
+              <ue-svg-icon symbol="main-logo" class="mx-0"></ue-svg-icon>
+
+              <h2 class="text-white my-5">
+                {{ description }}
+              </h2>
+              <span class="text-white">
+                <v-img :href="adImg">
+
+                </v-img>
+                {{ ad }}
+              </span>
+              <v-btn variant="outlined" class="text-white custom-right-auth-button my-5">
+                {{ rightBtnText }}
+              </v-btn>
+            </div>
+          </v-col>
+        </v-row>
+
       </v-main>
     </v-layout>
     <ue-alert ref='alert'></ue-alert>
@@ -45,6 +81,25 @@ export default {
       default () {
         return {}
       }
+    },
+    title: {
+      type: String,
+    },
+    description: {
+      type: String,
+      default: 'Lorem ipsum dolor sit amet,consetetur sadipscing elitr.'
+    },
+    ad: {
+      type: String,
+      default: '3k+ people joined us, now it’s your turn'
+    },
+    adImg: {
+      type: String,
+      default: '',
+    },
+    rightBtnText: {
+      type: String,
+      default: 'CONTINUE WITHOUT LOGIN'
     }
   },
   data: () => ({
@@ -74,7 +129,7 @@ export default {
     }
 
   }),
-  setup () {
+  setup (props) {
     const { name } = useDisplay()
 
     const width = computed(() => {
@@ -88,10 +143,73 @@ export default {
       }
     })
 
-    return { width }
+    const title = computed(() => {
+      // Use the title prop if it's provided
+      if (props.title) {
+        return props.title
+      }
+    })
+
+    const description = computed(() => {
+      // Use the description prop if it's provided
+      if (props.description) {
+        return props.description
+      }
+    })
+
+    const ad = computed(() => {
+      // Use the ad prop if it's provided
+      if (props.ad) {
+        return props.ad
+      }
+    })
+
+    const rightBtnText = computed(() => {
+      // Use the ad rightBtnText if it's provided
+      if (props.rightBtnText) {
+        return props.rightBtnText
+      }
+    })
+    return {
+      width,
+      title,
+      description,
+      ad,
+      rightBtnText
+    }
   },
   methods: {
 
   }
 }
 </script>
+
+<style>
+  .col-r{
+    background:#40AABB;
+  }
+  .mw-24em{
+    max-width: 24rem;
+    width: 24rem;
+  }
+  .custom-auth-button{
+    width: 100%;
+    min-width: 100% !important;
+    color:black !important;
+  }
+  .custom-auth-button.text-primary{
+    color:black !important;
+    height:3.2rem !important;
+  }
+  .mw-420{
+    max-width: 420px;
+  }
+  .mx-0 svg{
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+  }
+  .custom-right-auth-button.text-white{
+    color: #fff !important;
+    height: 3.2rem !important;
+  }
+</style>

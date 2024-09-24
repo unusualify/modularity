@@ -90,7 +90,7 @@ class PriceController extends Controller
         ];
         // dd($payload,$params);
         // dd(session('_previous.url'));
-        $resp = $payment->service->pay($payload);
+        $resp = $payment->pay($payload);
 
         return $resp;
     }
@@ -102,6 +102,7 @@ class PriceController extends Controller
         // $price = $payment->price;
         // $priceable = $price->priceable;
         // dd($price,$priceable);
+        // dd($request);
         if($request->status == 'success')
             return redirect(merge_url_query($request->custom_fields['previous_url'],
                 [

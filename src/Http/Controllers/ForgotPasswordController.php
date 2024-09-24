@@ -56,8 +56,6 @@ class ForgotPasswordController extends Controller
         // return $viewFactory->make(unusualBaseKey().'::auth.passwords.email');
         return $viewFactory->make(unusualBaseKey().'::auth.passwords.email', [
             'formAttributes' => [
-                'hasSubmit' => true,
-
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
                 'schema' => ($schema = $this->createFormSchema([
                     'email' => [
@@ -80,23 +78,92 @@ class ForgotPasswordController extends Controller
                 'formClass' => 'px-5',
 
             ],
+            'formSlots' => [
+                'bottom' => [
+                    'tag' => 'v-sheet',
+                    'attributes' => [
+                        'class' => 'd-flex pb-5 justify-space-around w-100 text-black my-5',
+                    ],
+                    'elements' => [
+                        [
+                            'tag' => 'v-btn',
+                            'elements' => __('authentication.login'),
+                            'attributes' => [
+                                'variant' => 'text',
+                                'href' => '',
+                                'class' => 'v-col-5',
+                            ]
+                        ],
+                        [
+                            'tag' => 'v-btn',
+                            'elements' => __('authentication.reset-password'),
+                            'attributes' => [
+                                'variant' => 'elevated',
+                                'href' => '',
+                                'class' => 'v-col-5',
+                                'type' => 'submit'
+
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             'slots' => [
                 'bottom' => [
                     'tag' => 'v-sheet',
                     'attributes' => [
-                        'class' => 'd-flex pb-5 mx-8 justify-end',
-
+                        'class' => 'd-flex pb-5 justify-end flex-column w-100 text-black',
                     ],
                     'elements' => [
                         [
                             "tag" => "v-btn",
-                            'elements' => ___('authentication.back-to-login'),
+                            'elements' => ___('authentication.sign-in-google'),
                             "attributes" => [
-                                'variant' => 'plain',
+                                'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
-                                'class' => ''
+                                'class' => 'my-5 custom-auth-button',
                             ],
-                        ]
+                            'slots' => [
+                                'prepend' => [
+                                    'tag' => 'ue-svg-icon',
+                                    'attributes' => [
+                                        'symbol' => 'google',
+                                        'width' => '25',
+                                        'height' => '25',
+                                    ]
+                                ]
+                            ]
+                        ],
+                        [
+                            "tag" => "v-btn",
+                            'elements' => ___('authentication.sign-in-apple'),
+                            "attributes" => [
+                                'variant' => 'outlined',
+                                'href' => route(Route::hasAdmin('login.form')),
+                                'class' => 'my-5 custom-auth-button',
+                            ],
+                            'slots' => [
+                                'prepend' => [
+                                    'tag' => 'ue-svg-icon',
+                                    'attributes' => [
+                                        'symbol' => 'apple',
+                                        'width' => '25',
+                                        'height' => '25',
+                                    ]
+                                ]
+                            ]
+                        ],
+                        [
+                            "tag" => "v-btn",
+                            'elements' => ___('authentication.create-an-account'),
+                            "attributes" => [
+                                'variant' => 'outlined',
+                                'href' => route(Route::hasAdmin('login.form')),
+                                'class' => 'my-5 custom-auth-button',
+                            ],
+
+                        ],
+
                     ]
 
                 ]

@@ -19,17 +19,27 @@
         @include("{$MODULARITY_VIEW_NAMESPACE}::partials.icons.svg-sprite")
         {{-- @dd(get_defined_vars()) --}}
         <div id="auth">
-            <ue-auth>
+            {{-- @dd(__('authentication.create-an-account')) --}}
+            <ue-auth :title="'{{ __('authentication.create-an-account') ?? 'CREATE AN ACCOUNT' }}'">
                 @section('content')
-                    <v-sheet>
-                        <ue-form v-bind='@json($formAttributes)'>
-                            <template v-slot:submit="object">
-                                <v-btn block dense type="submit" :disabled="!object.validForm">
-                                @{{ object.buttonDefaultText.toUpperCase() }}
-                                </v-btn>
+
+                    <ue-form v-bind='@json($formAttributes)'>
+                        <template v-slot:submit="object">
+                            <v-btn block dense type="submit" :disabled="!object.validForm">
+                            @{{ object.buttonDefaultText.toUpperCase() }}
+                            </v-btn>
+                        </template>
+                        {{-- @dd($formSlots) --}}
+                        @foreach( ($formSlots ?? []) as $slotTestName => $testconf)
+                        {{-- @dd($slotName, $configuration) --}}
+                            <template v-slot:{{ $slotTestName }} >
+                                <ue-recursive-stuff
+                                    :configuration='@json($testconf)'
+                                />
                             </template>
-                        </ue-form>
-                    </v-sheet>
+                        @endforeach
+                    </ue-form>
+
 
                     @foreach( ($slots ?? []) as $slotName => $configuration)
                         <template v-slot:{{ $slotName }} >
