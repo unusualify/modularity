@@ -4,10 +4,6 @@ namespace Unusualify\Modularity\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\App;
-use JoeDixon\Translation\TranslationManager;
-use Torann\GeoIP\Facades\GeoIP;
-use JoeDixon\Translation\Drivers\Translation;
-use JoeDixon\Translation\Scanner;
 
 class LanguageMiddleware
 {
