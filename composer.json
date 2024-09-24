@@ -35,7 +35,7 @@
         "cartalyst/tags": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
         "haydenpierce/class-finder": "^0.5.3",
         "imgix/imgix-php": "^3.0|^4.0",
-        "joedixon/laravel-translation": "*",
+        "joedixon/laravel-translation": "^2.0",
         "nwidart/laravel-modules": "^8.0|^9.0|^10.0",
         "spatie/laravel-activitylog": "^3.0|^4.0",
         "spatie/laravel-permission": "^5.0",
@@ -44,13 +44,17 @@
         "torann/geoip": "^3.0",
         "tymon/jwt-auth": "^1.0|^2.0",
         "league/glide-laravel" : "^1.0",
+        "oobook/manage-eloquent": "^1.0",
+        "oobook/post-redirector": "^1.0",
+        "oobook/priceable": "^1.0",
+        "oobook/snapshot": "^1.0",
         "orangehill/iseed": "^3.0",
         "wikimedia/composer-merge-plugin": "^2.1",
-        "unusualify/priceable": "^1.0",
         "unusualify/payable": "^0"
     },
     "require-dev": {
-
+        "fakerphp/faker": "^1.9.1",
+        "phpunit/phpunit": "^10.1"
     },
     "extra": {
         "laravel": {
