@@ -75,5 +75,35 @@ return [
             'description' => 'Authorized models to indicate scopes'
         ]
     ],
+    'addFilepond' => [
+        'model' => 'HasFileponds',
+        'repository' => 'FilepondsTrait',
+        'question' => 'Do you need to attach fileponds on this module?',
+        'command_option' => [
+            'shortcut' => '--FP',
+            'input_type' => InputOption::VALUE_NONE,
+            'description' => 'Do you need to attach fileponds on this module?'
+        ]
+    ],
+    'addUuid' => [
+        'model' => 'HasUuid',
+        'repository' => null,
+        'question' => 'Do you need to attach uuid on this module route?',
+        'command_option' => [
+            'shortcut' => null,
+            'input_type' => InputOption::VALUE_NONE,
+            'description' => 'Do you need to attach uuid on this module route?'
+        ]
+    ],
+    'addSnapshot' => [
+        'model' =>  \Oobook\Snapshot\Traits\HasSnapshot::class,
+        'repository' => null,
+        'question' => 'Do you need to attach snapshot feature on this module route?',
+        'command_option' => [
+            'shortcut' => '--SS',
+            'input_type' => InputOption::VALUE_NONE,
+            'description' => 'Do you need to attach snapshot feature on this module route?'
+        ]
+    ],
 ];
 
