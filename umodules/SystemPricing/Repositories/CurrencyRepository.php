@@ -3,7 +3,7 @@
 namespace Modules\SystemPricing\Repositories;
 
 use Unusualify\Modularity\Repositories\Repository;
-use Unusualify\Priceable\Models\Currency;
+use Oobook\Priceable\Models\Currency;
 
 class CurrencyRepository extends Repository
 {

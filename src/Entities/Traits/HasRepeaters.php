@@ -4,7 +4,7 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Unusualify\Modularity\Entities\Repeater;
-use Unusualify\Priceable\Traits\HasPriceable;
+use Oobook\Priceable\Traits\HasPriceable;
 
 /**
  * @author Hazarcan Doğa

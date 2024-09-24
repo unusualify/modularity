@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\SystemPayment\Http\Controllers\PaymentController;
-use Unusualify\Priceable\Models\Price;
+
 
 /*
 |--------------------------------------------------------------------------

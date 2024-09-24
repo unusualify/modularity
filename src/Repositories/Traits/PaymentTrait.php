@@ -2,14 +2,12 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
-use Unusualify\Priceable\Models\Price;
-use Unusualify\Priceable\Traits\HasPriceable;
 
 trait PaymentTrait
 {
     public $paymentTraitRelationName = null;
     public $paymentTraitDefaultCurrencyId = 2;
-    protected $requiredTrait = 'Unusualify\Priceable\Traits\HasPriceable';
+    protected $requiredTrait = 'Oobook\Priceable\Traits\HasPriceable';
 
     protected function afterSavePaymentTrait($object, $fields)
     {

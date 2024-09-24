@@ -6,7 +6,7 @@ namespace Modules\SystemPricing\Entities;
 
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 
-class Currency extends \Unusualify\Priceable\Models\Currency
+class Currency extends \Oobook\Priceable\Models\Currency
 {
 
 }

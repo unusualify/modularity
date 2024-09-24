@@ -299,13 +299,13 @@ if( !function_exists('modelShowFormat') ){
         // if( get_class_short_name($model) == 'Package'){
         //     dd(class_uses_recursive($model));
         // }
-        if(in_array('Unusualify\Priceable\Traits\HasPriceable', class_uses_recursive($model))){
+        if(in_array('Oobook\Priceable\Traits\HasPriceable', class_uses_recursive($model))){
             // dd($model->priceFormatted);
             $model['prices_show'] = $model->price_formatted;
             // $model['prices_show'] = "<span class='text-success font-weight-bold'> {$model->price_formatted} </span>";
         }
 
-        // if(get_class($model) == 'Unusualify\Priceable\Models\Price'){
+        // if(get_class($model) == 'Oobook\Priceable\Models\Price'){
         //     dd($model->price(), $model->pricePrependingCurrencyString());
         //     $model['prices_show'] = $model->price_formatted;
         //     // $model['prices_show'] = "<span class='text-success font-weight-bold'> {$model->price_formatted} </span>";

@@ -8,7 +8,7 @@ class VatRateRepository extends Repository
 {
 
 
-    public function __construct(\Unusualify\Priceable\Models\VatRate $model)
+    public function __construct(\Oobook\Priceable\Models\VatRate $model)
     {
         $this->model = $model;
     }

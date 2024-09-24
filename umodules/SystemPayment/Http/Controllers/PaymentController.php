@@ -8,7 +8,7 @@ use Modules\SystemPayment\Entities\PaymentService;
 use Unusualify\Modularity\Http\Controllers\BaseController;
 use Unusualify\Payable\Payable;
 use Unusualify\Payable\Services\TebCommonPosService;
-use Unusualify\Priceable\Models\Price;
+use Oobook\Priceable\Models\Price;
 
 class PaymentController extends BaseController
 {
