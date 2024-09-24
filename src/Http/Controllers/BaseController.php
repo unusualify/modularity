@@ -566,6 +566,12 @@ abstract class BaseController extends PanelController
                 ->join(', ');
         }
 
+        if(is_array($value)
+            && (isset($value['title']) || isset($value['name']))
+        ){
+            $value = $value['title'] ?? $value['name'];
+        }
+
         return [
             "$field" => $value,
         ];
