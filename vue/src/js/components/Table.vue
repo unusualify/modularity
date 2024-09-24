@@ -59,7 +59,7 @@
               :subTitle="tableSubtitle"
               :classes="[]"
               padding-reset
-              :class="[someSelected ? 'w-50 h-100' : 'w-50 h-100']"
+              :class="[someSelected ? 'w-33 h-100' : 'w-33 h-100']"
             />
             <v-slide-x-transition :group="true">
                 <template v-for="(action, k) in bulkActions" :key="k">
@@ -67,7 +67,7 @@
                     v-if="someSelected && canBulkAction(action)"
                     :icon="(action.icon ? action.icon : `$${action.name}`)"
                     :color="action.color ?? 'primary'"
-                    @click="openActionModal(action)"
+                    @click="itemAction(action, action.name)"
                     v-tooltip="$lodash.startCase(action.name)"
                     small
                     left
@@ -95,7 +95,6 @@
               id="filter-btn-activator"
               v-bind="{...filterBtnOptions, ...filterBtnTitle}"
               />
-
             <v-btn
               v-if="Object.keys(advancedFilters).length > 0"
               id="advanced-filter-btn"
@@ -138,8 +137,7 @@
                   v-for="(filters, index) in advancedFilters"
                   :key="index"
                 >
-                  <component
-                    v-for = "(filter, ind) in filters"
+                  <component v-for="(filter, ind) in filters"
                     :is="`v-${filter.type}`"
                     v-bind="filter.componentOptions"
                     v-model="filter['selecteds']"
@@ -217,7 +215,7 @@
               </v-expand-transition>
             </div>
 
-            <ue-modal
+            <!-- <ue-modal
               v-model="actionModalActive"
               transition="dialog-bottom-transition"
               width-type="sm"
@@ -226,7 +224,7 @@
             <template v-slot:body="props" >
                 <v-card >
                   <v-card-title class="text-h5 text-center" style="word-break: break-word;">
-                    <!-- {{ textDescription }} -->
+                    {{ textDescription }}
                   </v-card-title>
                   <v-card-text class="text-center" style="word-break: break-word;" >
                     {{ actionDialogQuestion }}
@@ -241,10 +239,10 @@
                 </v-card>
               </template>
 
-            </ue-modal>
+            </ue-modal> -->
 
             <!-- #deletemodal-->
-            <ue-modal
+            <!-- <ue-modal
               ref="deleteModal"
               v-model="deleteModalActive"
               transition="dialog-bottom-transition"
@@ -253,7 +251,7 @@
               <template v-slot:body="props" >
                 <v-card >
                   <v-card-title class="text-h5 text-center" style="word-break: break-word;">
-                    <!-- {{ textDescription }} -->
+                    {{ textDescription }}
                   </v-card-title>
                   <v-card-text class="text-center" style="word-break: break-word;" >
                     {{ deleteQuestion }}
@@ -267,55 +265,40 @@
                   </v-card-actions>
                 </v-card>
               </template>
-            </ue-modal>
-            <slot name="customModal">
-              <ue-modal
-                ref="customModal"
-                v-model="customModalActive"
-                scrollable
-                transition="dialog-bottom-transition"
-                width-type="md"
-                >
-                <template v-slot:activator="{props}">
-                  <!-- <v-btn-cta v-bind="props" dark class="mb-theme">
-                      CUSTOM MODAL
-                  </v-btn-cta> -->
-                </template>
-                <template v-slot:body="props">
-                  <v-card class="pa-theme">
-                    <v-item-group selected-class="bg-primary">
-                      <v-container>
-                        <v-row>
-
-                          <v-col cols="12" md="6" class="pa-4">
-                            <v-item v-slot="{ isSelected, selectedClass, toggle }">
-                              <v-card :class="['d-flex align-center bg-primary ue-card-button px-4', selectedClass]" dark height="200" @click="toggle" >
-                                <div class="text-h6 font-weight-bold flex-grow-1 text-center" > COMPANY INFORMATION</div>
-                              </v-card>
-                            </v-item>
-                          </v-col>
-                          <v-col cols="12" md="6" class="pa-4">
-                            <v-item v-slot="{ isSelected, selectedClass, toggle }">
-                              <v-card :class="['d-flex align-center bg-cta ue-card-button px-4', selectedClass]" dark height="200" @click="toggle" >
-                                <div class="text-h6 font-weight-bold flex-grow-1 text-center" > PRESS RELEASES </div>
-                              </v-card>
-                            </v-item>
-                          </v-col>
-                          <v-col cols="12" md="12" class="pa-4">
-                            <v-item v-slot="{ isSelected, selectedClass, toggle }">
-                              <v-card :class="['d-flex align-center bg-success ue-card-button px-4', selectedClass]" dark height="80" @click="toggle" >
-                                <div class="text-h6 font-weight-bold flex-grow-1 text-center"> CREDITS & INVOICES </div>
-                              </v-card>
-                            </v-item>
-                          </v-col>
-                        </v-row>
-                      </v-container>
-                    </v-item-group>
-                  </v-card>
-                </template>
-              </ue-modal>
-            </slot>
-
+            </ue-modal> -->
+            <!-- custom modal -->
+            <ue-modal
+              ref="customModal"
+              v-model="customModalActive"
+              :transition="modals[activeModal] || 'dialog-bottom-transition'"
+              :width-type="modals[activeModal].widthType || 'sm'"
+              :persistent="modals[activeModal].persistent"
+              :description-text="modals[activeModal].content"
+            >
+            <template #body="props">
+              <v-card>
+                <v-card-title class="text-h5 text-center" style="word-break: break-word;"
+                  v-if="modals[activeModal].title">
+                  <!-- {{ modal.title }} -->
+                </v-card-title>
+                <v-card-text class="text-center" style="word-break: break-word;">
+                  {{ modals[activeModal].content }}
+                </v-card-text>
+                <v-divider />
+                <v-card-actions>
+                  <v-spacer />
+                  <v-btn color="blue" text @click="modals[activeModal].closeAction()">
+                    {{ modals[activeModal].cancelText || props.textCancel }}
+                  </v-btn>
+                  <!-- <v-btn color="blue" text @click="handleModal('confirm', modal.ref, props.onConfirm)"></v-btn> -->
+                  <v-btn color="blue" text @click="modals[activeModal].confirmAction()">
+                    {{ modals[activeModal].confirmText || props.textConfirm }}
+                  </v-btn>
+                  <v-spacer />
+                </v-card-actions>
+              </v-card>
+            </template>
+          </ue-modal>
 
           </div>
 
@@ -612,4 +595,4 @@ export default {
   width: 100%
   &.ue-datatable--full-screen
     min-height: calc(100vh - (2*$theme-space))
-</style>
+</style>z

@@ -29,22 +29,22 @@ return [
         'image' => '', // image link for the background of the toolbar
     ],
     'filterBtnOptions' => [
-        'variant' => 'elevated', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
+        'variant' => 'flat', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
         'color' => 'purple', // rgb(255,255,255,1) or utility colors like white, purple
         // 'elevation' => null, // string or number refers to elevation
         // 'prepend-icon' => 'mdi-chevron-down', // material design icon name,
         'readonly' => false, // boolean to set the button readonly mode, can be used to disable button
         'ripple' => true, // boolean
         // 'rounded' => 'md', // string | number | boolean - 0, xs, sm, true, lg, xl, pill, circle, and shaped.
-        'class' => 'mx-2 text-white text-capitialize rounded px-8 h-75',
-        'size' => 'small', //sizes: x-small, small, default, large, and x-large.
+        'class' => 'mx-2 text-white text-capitialize rounded px-8',
+        'size' => 'default', //sizes: x-small, small, default, large, and x-large.
         // 'icon' => 'mdi-filter-outline',
         'prepend-icon' => 'mdi-chevron-down',
         'slim' => false,
         // 'loading' => true,
     ],
     'addBtnOptions' => [
-        'variant' => 'elevated', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
+        'variant' => 'flat', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
         'color' => 'orange', // rgb(255,255,255,1) or utility colors like white, purple
         // 'elevation' => null, // string or number refers to elevation
         'prepend-icon' => 'mdi-plus', // material design icon name,
