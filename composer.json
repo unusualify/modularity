@@ -69,6 +69,7 @@
     "autoload": {
         "psr-4": {
             "Unusualify\\Modularity\\": "src",
+            "Unusualify\\Modularity\\Database\\": "database",
             "Modules\\": "umodules"
         },
         "files": [

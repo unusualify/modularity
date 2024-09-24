@@ -304,7 +304,7 @@ class BaseServiceProvider extends ServiceProvider
     {
         // LOAD BASE MIGRATIONS
         $this->loadMigrationsFrom(
-            base_path( unusualConfig('vendor_path') . '/src/Database/Migrations/default' )
+            base_path( unusualConfig('vendor_path') . '/database/migrations/default' )
         );
     }
 
