@@ -239,8 +239,9 @@ class BaseServiceProvider extends ServiceProvider
         }
 
         // Nwidart/laravel-modules scan enabled & scan path addition
-        $scan_paths = config('modules.scan.paths');
-        array_push($scan_paths, base_path( unusualConfig('vendor_path') . '/umodules'));
+        $scan_paths = config('modules.scan.paths', []);
+        // array_push($scan_paths, base_path( unusualConfig('vendor_path') . '/umodules'));
+        array_push($scan_paths, realpath( __DIR__ . '/../../umodules'));
         config([
             'modules.scan.enabled' => true,
             'modules.scan.paths' => $scan_paths
