@@ -29,6 +29,7 @@
         }
     ],
     "require": {
+        "php": "^8.0|^8.1|^8.2|^8.3",
         "astrotomic/laravel-translatable": "^11.5",
         "camroncade/timezone": "0.1",
         "chriskonnertz/deeply": "^2.2",
@@ -36,26 +37,27 @@
         "haydenpierce/class-finder": "^0.5.3",
         "imgix/imgix-php": "^3.0|^4.0",
         "joedixon/laravel-translation": "^2.0",
+        "league/glide-laravel" : "^1.0",
         "nwidart/laravel-modules": "^8.0|^9.0|^10.0",
+        "oobook/manage-eloquent": "^1.0",
+        "oobook/post-redirector": "^1.0",
+        "oobook/priceable": "^1.0",
+        "oobook/snapshot": "^1.0",
+        "orangehill/iseed": "^3.0",
         "spatie/laravel-activitylog": "^3.0|^4.0",
         "spatie/laravel-permission": "^5.0",
         "spatie/once": "^2.0|^3.0",
         "timokoerber/laravel-one-time-operations": "^1.0",
         "torann/geoip": "^3.0",
         "tymon/jwt-auth": "^1.0|^2.0",
-        "league/glide-laravel" : "^1.0",
-        "oobook/manage-eloquent": "^1.0",
-        "oobook/post-redirector": "^1.0",
-        "oobook/priceable": "^1.0",
-        "oobook/snapshot": "^1.0",
-        "orangehill/iseed": "^3.0",
-        "wikimedia/composer-merge-plugin": "^2.1",
-        "unusualify/payable": "^0"
+        "unusualify/payable": "^0",
+        "wikimedia/composer-merge-plugin": "^2.1"
     },
     "require-dev": {
+        "doctrine/dbal": "^3.9",
         "fakerphp/faker": "^1.9.1",
-        "phpunit/phpunit": "^10.1"
-    },
+        "orchestra/testbench": "^7.0|^8.23.4|^9.0",
+        "phpunit/phpunit": "^9.0|^10.0.7|^11.0"    },
     "extra": {
         "laravel": {
             "providers": [
@@ -84,6 +86,15 @@
           "../../../vendor/nwidart/laravel-modules/src/Support/Migrations/SchemaParser.php",
           "../../../vendor/joedixon/laravel-translation/src/Drivers/Translation.php"
         ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Unusualify\\Modularity\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
