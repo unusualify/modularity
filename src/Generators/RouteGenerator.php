@@ -357,7 +357,7 @@ class RouteGenerator extends Generator
      */
     public function setModule($module)
     {
-        $modularity = App::makeWith(\Unusualify\Modularity\Modularity::class, ['app' => app()]);
+        $modularity = App::makeWith(\Unusualify\Modularity\Modularity::class, ['app' => $this->app]);
 
         $this->module = $modularity->find($module);
 
