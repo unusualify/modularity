@@ -18,6 +18,13 @@ return array (
     "surname"=> "Surname",
     "verify-login"=> "Verify login",
     "logout"=> "Logout",
-    "login-success-message" => "Login Successful!"
+    "login-success-message" => "Login Successful!",
+    'company' => 'Company Name',
+    'repeat_password' => 'Repeat Password',
+    'tos' => 'I agree with Terms and Conditions.',
+    'create-an-account' => 'CREATE AN ACCOUNT',
+    'sign-in-apple' => 'Sign in with Apple',
+    'sign-in-google' => 'Sign in with Google',
+    'have-an-account' => 'Already have an account?'
 
 );

@@ -18,5 +18,10 @@ return array (
   'reset-send' => 'Şifre Sıfırlama Bağlantısı Gönder',
   'surname' => 'Soyadınız',
   'verify-login' => 'Girişi Doğrula',
-  "login-success-message" => "Giriş İşleminiz Başarılı!"
+  "login-success-message" => "Giriş İşleminiz Başarılı!",
+  'tos' => 'I agree with Terms and Conditions.',
+  'create-an-account' => 'HESAP OLUŞTUR',
+  'sign-in-apple' => 'Apple hesabıyla giriş yap',
+  'sign-in-google' => 'Google hesabıyla giriş yap',
+  'have-an-account' => 'Zaten hesabın var mı?'
 );
