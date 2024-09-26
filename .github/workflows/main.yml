@@ -6,7 +6,7 @@ name: Main
 on:
   push:
     branches:
-      - release/*
+      - dev
   pull_request:
     branches:
       - main
