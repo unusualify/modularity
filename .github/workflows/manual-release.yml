@@ -1,0 +1,24 @@
+name: Manual Release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: The semantic tag name
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: oobook/automated-release@v1
+        with:
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.event.inputs.tag }}
+          prerelease: 'true'
+
