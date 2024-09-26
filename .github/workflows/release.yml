@@ -1,0 +1,120 @@
+name: Test & Main Release
+
+on:
+  push:
+    branches:
+      - 'release/**'
+
+permissions:
+  contents: write
+
+jobs:
+  # vue:
+  #   name: Vue Tests
+  #   runs-on: ubuntu-latest
+
+  #   strategy:
+  #     matrix:
+  #       node-version: [18.x]
+  #       # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Use Node.js ${{ matrix.node-version }}
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
+  #         cache: "npm"
+  #     #- run: npm run build --if-present
+  #     - name: Execute Tests
+  #       run: |
+  #         npm ci
+  #         npm run test:run
+  # laravel:
+  #   needs: vue
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #       os: [ ubuntu-latest ]
+  #       php: [8.0, 8.1, 8.2, 8.3]
+  #       laravel: [ 9.*, 10.*, 11.* ]
+  #       stability: [ prefer-stable ]
+  #       include:
+  #         - laravel: 9.*
+  #           testbench: ^7.0
+  #         - laravel: 10.*
+  #           testbench: 8.*
+  #         - laravel: 11.*
+  #           testbench: ^9.0
+  #       exclude:
+  #         - laravel: 9.*
+  #           php: 8.3
+  #         - laravel: 10.*
+  #           php: 8.0
+  #         - laravel: 11.*
+  #           php: 8.0
+  #         - laravel: 11.*
+  #           php: 8.1
+
+  #   name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Setup PHP
+  #       uses: shivammathur/setup-php@v2
+  #       with:
+  #         php-version: ${{ matrix.php }}
+  #         extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+  #         coverage: none
+
+  #     - name: Setup problem matchers
+  #       run: |
+  #           echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+  #           echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+  #     - name: Install dependencies
+  #       run: |
+  #           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+  #           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
+  #     - name: Execute Laravel tests
+  #       run: vendor/bin/phpunit
+
+  release:
+    name: Release
+    # needs: laravel
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract tag name
+        run: echo "TAG_NAME=${GITHUB_REF#refs/heads/release/}" >> $GITHUB_ENV
+
+      - name: Merge to main
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git checkout main
+          git merge --no-ff ${{ github.ref }}
+          git tag ${{ env.TAG_NAME }}
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          # branch: ${{ github.event.inputs.major_version }}
+          branch: 'main'
+          force: true
+      - uses: oobook/automated-tag@v1
+        id: tag-generation
+        with:
+          gh_token: ${{ github.token }}
+
+      - name: Create Release
+        uses: oobook/automated-release@v1
+        id: release-generation
+        with:
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: "${{ steps.tag-generation.outputs.tag }}"
+          prerelease: true
