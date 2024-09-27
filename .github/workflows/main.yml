@@ -38,7 +38,7 @@ jobs:
           npm ci
           npm run test:run
   laravel:
-    needs: vue
+    # needs: vue
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
