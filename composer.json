@@ -57,7 +57,8 @@
         "doctrine/dbal": "^3.9",
         "fakerphp/faker": "^1.9.1",
         "orchestra/testbench": "^7.0|^8.23.4|^9.0",
-        "phpunit/phpunit": "^9.0|^10.0.7|^11.0"    },
+        "phpunit/phpunit": "^9.0|^10.0.7|^11.0"
+    },
     "extra": {
         "laravel": {
             "providers": [
@@ -75,7 +76,8 @@
     "autoload": {
         "psr-4": {
             "Unusualify\\Modularity\\": "src",
-            "Unusualify\\Modularity\\Database\\": "database",
+            "Unusualify\\Modularity\\Database\\Seeders\\": "database/seeders",
+            "Unusualify\\Modularity\\Database\\Factories\\": "database/factories",
             "Modules\\": "umodules"
         },
         "files": [

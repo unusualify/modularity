@@ -29,8 +29,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
+          cache-dependency-path: "vue/package-lock.json"
+
       #- run: npm run build --if-present
       - name: Execute Tests
+        working-directory: 'vue'
         run: |
           npm ci
           npm run test:run
@@ -41,25 +44,13 @@ jobs:
       fail-fast: true
       matrix:
         os: [ ubuntu-latest ]
-        php: [8.0, 8.1, 8.2, 8.3]
-        laravel: [ 9.*, 10.*, 11.* ]
+        php: [8.1, 8.2, 8.3]
+        laravel: [ 10.x ]
         stability: [ prefer-stable ]
+        dependency-version: [ prefer-stable ]
         include:
-          - laravel: 9.*
-            testbench: ^7.0
           - laravel: 10.*
-            testbench: 8.*
-          - laravel: 11.*
-            testbench: ^9.0
-        exclude:
-          - laravel: 9.*
-            php: 8.3
-          - laravel: 10.*
-            php: 8.0
-          - laravel: 11.*
-            php: 8.0
-          - laravel: 11.*
-            php: 8.1
+            testbench: ^8.0
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
     steps:
@@ -79,8 +70,9 @@ jobs:
             echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
       - name: Install dependencies
         run: |
-            composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+            # composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+            composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
             composer update --${{ matrix.stability }} --prefer-dist --no-interaction
       - name: Execute Laravel tests
-        run: vendor/bin/phpunit
+        run: composer test
 
