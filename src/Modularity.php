@@ -66,14 +66,14 @@ class Modularity extends FileRepository
             is_array($manifests) || $manifests = [];
             foreach ($manifests as $manifest) {
                 $name = Json::make($manifest)->get('name');
-                if(preg_match('/oguzhan/', $manifest)){
-                    dd(
-                        $manifest,
-                        dirname($manifest),
-                        $name,
-                        $manifests,
-                    );
-                }
+                // if(preg_match('/oguzhanbukcuoglu/', $manifest)){
+                //     dd(
+                //         $manifest,
+                //         dirname($manifest),
+                //         $name,
+                //         $manifests,
+                //     );
+                // }
                 $modules[$name] = $this->createModule($this->app, $name, dirname($manifest));
 
                 // dd($path, $manifests, $paths,  Json::make($manifest), $modules);
