@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCurrencyPaymentServiceTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -28,4 +28,4 @@ class CreateCurrencyPaymentServiceTable extends Migration
     {
         Schema::dropIfExists('payment_currency_payment_service');
     }
-}
+};
