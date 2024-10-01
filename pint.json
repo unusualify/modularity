@@ -1,0 +1,24 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "array_syntax": {
+            "syntax": "short"
+        },
+        "blank_line_before_statement": {
+            "statements": ["continue", "break", "return"]
+        },
+        "combine_consecutive_unsets": true,
+        "concat_space": {
+            "spacing": "one"
+        },
+        "trim_array_spaces": true,
+        "mb_str_functions": true,
+        "modernize_strpos": true,
+        "no_multiline_whitespace_around_double_arrow": true,
+        "normalize_index_brace": true,
+        "phpdoc_align": {
+            "align": "left"
+        },
+        "whitespace_after_comma_in_array": true
+    }
+}
