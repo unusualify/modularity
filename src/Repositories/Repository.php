@@ -273,6 +273,12 @@ abstract class Repository
                 $column => $item->{$column}
             ]);
         }
+
+        // DB::listen(fn($e) => dump($e->sql, $e->bindings));
+        if(get_class_short_name($this) == 'PackageRepository'){
+            $column = array_merge($column, ['packageable_type', 'packageable_id']);
+        }
+
         if(is_array($column)){
             return $query->get(['id', ...$column]);
         }
