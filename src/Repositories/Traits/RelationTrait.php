@@ -18,9 +18,9 @@ trait RelationTrait
      */
     public function afterSaveRelationTrait($object, $fields)
     {
-        // dd($this->getMorphToManyRelations(), $fields);
+
         foreach ($this->getMorphToManyRelations() as $relationName) {
-            if(isset($fields[$relationName]) && $fields[$relationName]){
+            if(isset($fields[$relationName]) && $fields[$relationName] && $relationName != 'tags' && !classHasTrait(get_class($this), 'Unusualify\Modularity\Repositories\Traits\TagsTrait')){
                 $object->{$relationName}()->sync($fields[$relationName]);
             }
 

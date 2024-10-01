@@ -46,6 +46,12 @@ class PaymentServiceSeeder extends Seeder
                 'is_external' => false,
                 'is_internal' => true,
             ],
+            [
+                'name' => 'ideal',
+                'title' => 'iDEAL',
+                'is_external' => true,
+                'is_internal' => false,
+            ],
         ];
 
         foreach ($paymentServices as $service) {

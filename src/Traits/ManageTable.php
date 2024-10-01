@@ -232,7 +232,7 @@ trait ManageTable {
         if(classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasPayment')){
             $actions[] = [
                 'name' => 'pay',
-                'icon' => '$pay',
+                'icon' => 'mdi-contactless-payment',
                 // 'can' => 'pay',
                 // 'color' => 'red darken-2',
                 'color' => 'red',

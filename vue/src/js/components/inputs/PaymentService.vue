@@ -49,6 +49,7 @@
           v-if="!showCreditCardForm"
           color="primary"
           @click="submitForm"
+          block
         >
           Pay with {{ selectedService?.title || 'External Service' }}
         </v-btn>

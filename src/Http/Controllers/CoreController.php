@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Routing\Controller as LaravelController;
 use Illuminate\Support\Arr;
 use Unusualify\Modularity\Traits\{ManageNames, ManageTraits};
+use Illuminate\Support\Facades\Response;
 
 abstract class CoreController extends LaravelController
 {
@@ -278,5 +279,32 @@ abstract class CoreController extends LaravelController
         foreach ($this->traitsMethods(__FUNCTION__) as $method) {
             $this->$method(...$args);
         }
+    }
+
+    /**
+     * tags
+     *
+     * @return Illuminate\Support\Facades\Response
+     */
+    public function tags()
+    {
+        $query = $this->request->input('q');
+        if(is_null($query)){
+            $query = '';
+        }
+        // dd($query, $this->repository);
+
+        $tags = $this->repository->getTags($query);
+
+        return Response::json(
+            [
+                'resource' => [
+                    'last_page' => 1,
+                    'data' => $tags->map(function ($tag) {
+                        return $tag->name;
+                        }
+                    ),
+                ]
+            ], 200);
     }
 }
