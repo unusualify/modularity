@@ -342,6 +342,18 @@ return [
             ]
         ]
     ],
+    'payment' => [
+        'currency_services' => [
+            'USD' => 'garanti-pos',
+            'EUR' => 'garanti-pos',
+            'TRY' => 'garanti-pos',
+        ],
+        'default_currency' => 'EUR',
+        'locale_currencies' => [
+            'tr' => 'TRY',
+            'en' => 'EUR',
+        ]
+    ],
     'default_payment_service' => [
         'USD' => 'garanti-pos',
         'EUR' => 'garanti-pos',

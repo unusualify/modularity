@@ -33,7 +33,8 @@ class PriceController extends Controller
         if($params['payment_service']['payment_method'] == -1){
             //TODO: find price with currency based on the currency get default payment service
             $currency = $price->currency->iso_4217;
-            $paymentServiceName = config("modularity.default_payment_service" . ".{$currency}");
+            // $paymentServiceName = config("modularity.default_payment_service" . ".{$currency}");
+            $paymentServiceName = unusualConfig("payment_service.currency_services" . ".{$currency}");
             $payment = new Payable($paymentServiceName);
             $paymentService = PaymentService::where('name', $paymentServiceName)->first();
             Session::put('payable_payment_service', $paymentServiceName );
