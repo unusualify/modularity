@@ -12,11 +12,10 @@ All major requirements of Modularity listed as following:
 
 <div class="overflow-auto">
 
-| Version    | PHP (*)   | Laravel | Node | Vuetify |
-| ---        | ---       | ---     | ---  | ---     |
-| 0          | 8.1 - 8.2 | 10      | >=18 | 3       |
-| 1          | 8.1 - 8.2 | 10      | >=18 | 3       |
-| 2 (future) | 8.2 - 8.3 | 11      | >=18 | 3       |
+| Version    | PHP (*)          | Laravel | Node | Vuetify |
+| ---        | ---              | ---     | ---  | ---     |
+| 1          | 8.1 - 8.2 - 8.3  | 10      | >=18 | 3       |
+| 2 (future) | 8.2 - 8.3        | 11      | >=18 | 3       |
 
 </div>
 
