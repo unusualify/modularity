@@ -11,7 +11,7 @@
             <img src="http://localhost:5173/vendor/modularity/public/png/cardtypes/chip.png" class="card-item__chip" />
             <div class="card-item__type">
               <Transition name="slide-fade-up">
-                <img :src="cardType" v-if="cardType" :key="cardType" alt class="card-item__typeImg" />
+                <img :src="cardImage" v-if="cardImage" :key="cardImage" alt class="card-item__typeImg" />
               </Transition>
             </div>
           </div>
@@ -69,7 +69,7 @@
             <span v-for="(n, $index) in labels.cardCvv" :key="$index">*</span>
           </div>
           <div class="card-item__type">
-            <img :src="cardType" v-if="cardType" class="card-item__typeImg" />
+            <img :src="cardImage" v-if="cardImage" class="card-item__typeImg" />
           </div>
         </div>
       </div>
@@ -106,7 +106,7 @@ export default {
       return `${url.protocol}//${url.hostname}${url.port ? ':' + url.port : ''}`;
     });
 
-    const cardType = computed(() => {
+    const cardImage = computed(() => {
       let number = props.labels.cardNumber;
       let img = `.${import.meta.env.BASE_URL}/public/png/cardtypes/`;
       switch (true) {
@@ -136,6 +136,41 @@ export default {
           break;
         default:
           img = img + 'visa.png';
+          break;
+      }
+      return new URL(img, baseUrl.value).href;
+    });
+
+    const cardType = computed(() => {
+      let number = props.labels.cardNumber;
+      let img = `.${import.meta.env.BASE_URL}/public/png/cardtypes/`;
+      switch (true) {
+        case /^4/.test(number):
+          return 'visa';
+          break;
+        case /^(34|37)/.test(number):
+          return 'amex';
+          break;
+        case /^5[1-5]/.test(number):
+          return 'mastercard';
+          break;
+        case /^6011/.test(number):
+          return 'discover';
+          break;
+        case /^62/.test(number):
+          return 'unionpay';
+          break;
+        case /^9792/.test(number):
+          return 'troy';
+          break;
+        case /^3(?:0([0-5]|9)|[689]\d?)\d{0,11}/.test(number):
+          return 'dinersclub';
+          break;
+        case /^35(2[89]|[3-8])/.test(number):
+          return 'jcb';
+          break;
+        default:
+          return 'visa';
           break;
       }
       return new URL(img, baseUrl.value).href;
@@ -226,6 +261,7 @@ export default {
       baseUrl,
       currentPlaceholder,
       cardType,
+      cardImage,
       currentCardBackground,
       changeFocus,
       getIsNumberMasked,

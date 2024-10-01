@@ -8,7 +8,7 @@
       <div class="card-input">
         <label for="cardNumber" class="card-input__label">{{ $t('Card Number') }}</label>
         <v-text-field :id="fields.cardNumber" v-model="formData.cardNumber" @input="changeNumber"
-          @focus="focusCardNumber" @blur="blurCardNumber" data-card-field type="tel" variant="outlined" v-number-only>
+          @focus="focusCardNumber" @blur="blurCardNumber" data-card-field type="tel" variant="outlined" v-number-only :maxlength="cardNumberMaxLength">
         </v-text-field>
       </div>
       <div class="card-input">
@@ -37,7 +37,7 @@
           </div>
         </div>
       </div>
-      <v-btn class="card-form__button" @click="submitForm">
+      <v-btn class="card-form__button" @click="submitForm" block>
         {{ $t('PAY') }}
       </v-btn>
     </div>
@@ -167,12 +167,15 @@ export default {
         props.formData.cardNumber = value.replace(/(\d{4})/, '$1 ').replace(/(\d{4}) (\d{4})/, '$1 $2 ').replace(/(\d{4}) (\d{4}) (\d{4})/, '$1 $2 $3 ');
         cardNumberMaxLength.value = 19;
       }
+
       if (e.inputType === 'deleteContentBackward') {
         let lastChar = props.formData.cardNumber.substring(props.formData.cardNumber.length - 1);
         if (lastChar === ' ') {
           props.formData.cardNumber = props.formData.cardNumber.substring(0, props.formData.cardNumber.length - 1);
         }
       }
+      formData.cardNumber = props.formData.cardNumber;
+
       emit('input-card-number', props.formData.cardNumber);
       emit('update:cardNumber', formData.cardNumber);
 
