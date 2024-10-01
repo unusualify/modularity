@@ -43,6 +43,52 @@ class Modularity extends FileRepository
     }
 
     /**
+     * Get all modules.
+     *
+     * @return array
+     */
+    public function all(): array
+    {
+        if (!$this->config('cache.enabled')) {
+            return $this->scan();
+        }
+
+        return $this->formatCached($this->getCached());
+    }
+
+    /**
+     * Format the cached data as array of modules.
+     *
+     * @param array $cached
+     *
+     * @return array
+     */
+    protected function formatCached($cached)
+    {
+        $modules = [];
+
+        $resetCache = false;
+        $basePath = base_path();
+        $pathPattern = preg_quote("{$basePath}", '/');
+
+        foreach ($cached as $name => $module) {
+            $path = $module['path'];
+
+            if( !preg_match("/{$pathPattern}/", $path) ){
+                $resetCache = true;
+                break;
+            }
+            $modules[$name] = $this->createModule($this->app, $name, $path);
+        }
+
+        if( $resetCache )
+            return $this->scan();
+
+        return $modules;
+    }
+
+
+    /**
      * Get & scan all modules.
      *
      * @return array
@@ -190,5 +236,7 @@ class Modularity extends FileRepository
 
         return $classes;
     }
+
+
 
 }
