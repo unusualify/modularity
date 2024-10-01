@@ -26,11 +26,15 @@ class LanguageMiddleware
             }
         }
 
-
         config([unusualBaseKey() . '.locale' => $locale]);
         config([unusualBaseKey() . '.timezone' => auth()->user()->timezone ?? 'Europe/London']);
         App::setLocale($locale);
         App::setFallbackLocale(unusualConfig('fallback_locale'));
+
+        $currency = unusualConfig("payment.locale_currencies.{$locale}", null)
+            ?? unusualConfig("payment.currency", 'EUR');
+        config([unusualBaseKey() . '.payment.currency' => $currency]);
+        $request->session()->put('currency', $currency);
 
         \Carbon\CarbonInterval::setLocale(config('app.locale'));
         \Carbon\Carbon::setLocale(config('app.locale'));
