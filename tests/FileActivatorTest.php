@@ -2,10 +2,6 @@
 
 namespace Unusualify\Modularity\Tests;
 
-use Illuminate\Container\Container;
-use Illuminate\Cache\CacheManager;
-use Illuminate\Config\Repository as Config;
-use Illuminate\Filesystem\Filesystem;
 use Nwidart\Modules\Activators\FileActivator as ActivatorsFileActivator;
 use Unusualify\Modularity\Activators\FileActivator;
 

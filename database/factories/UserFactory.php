@@ -1,11 +1,12 @@
 <?php
 
-namespace  Unusualify\Modularity\Database\Factories;
+namespace Unusualify\Modularity\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\User;
+
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
  */
@@ -16,7 +17,6 @@ class UserFactory extends Factory
      *
      * @return array<string, mixed>
      */
-
     protected $model = User::class;
 
     public function definition(): array
@@ -28,7 +28,7 @@ class UserFactory extends Factory
             'job_title' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'language' => fake()->languageCode(),
-            'timezone' => fake()->timezone() ,
+            'timezone' => fake()->timezone(),
             'phone' => fake()->phoneNumber(),
             'country' => fake()->country(),
             'email_verified_at' => now(),

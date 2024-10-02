@@ -14,4 +14,3 @@ return [
     'repeaters' => 'umod_repeaters',
     'authorizeds' => 'umod_authorizeds',
 ];
-

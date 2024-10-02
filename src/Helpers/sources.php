@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
-if (!function_exists('getLocales')) {
+if (! function_exists('getLocales')) {
     /**
      * @return string[]
      */
@@ -25,7 +25,7 @@ if (!function_exists('getLocales')) {
     }
 }
 
-if (!function_exists('getTimezoneList')) {
+if (! function_exists('getTimezoneList')) {
 
     function getTimeZoneList()
     {
@@ -35,24 +35,25 @@ if (!function_exists('getTimezoneList')) {
                 date_default_timezone_set($value);
                 $timezone[$value] = $value . ' (UTC ' . date('P', $timestamp) . ')';
             }
+
             return collect($timezone)->sortKeys();
         });
     }
 }
 
-if (!function_exists('getFormDraft')) {
+if (! function_exists('getFormDraft')) {
 
     function getFormDraft($name, $overwrites = [], $excludes = [], $preserve = true)
     {
 
         $draft = $preserve
-            ? array_merge_recursive_preserve( unusualConfig("form_drafts.{$name}", []), $overwrites)
-            : array_merge( unusualConfig("form_drafts.{$name}", []), $overwrites);
+            ? array_merge_recursive_preserve(unusualConfig("form_drafts.{$name}", []), $overwrites)
+            : array_merge(unusualConfig("form_drafts.{$name}", []), $overwrites);
 
-        if(count($excludes)){
+        if (count($excludes)) {
 
-            $draft = array_filter($draft, function($value, $key) use($excludes){
-                return !in_array($key, $excludes);
+            $draft = array_filter($draft, function ($value, $key) use ($excludes) {
+                return ! in_array($key, $excludes);
             }, ARRAY_FILTER_USE_BOTH);
         }
 
@@ -60,7 +61,7 @@ if (!function_exists('getFormDraft')) {
     }
 }
 
-if (!function_exists('adminRouteNamePrefix')) {
+if (! function_exists('adminRouteNamePrefix')) {
 
     function adminRouteNamePrefix()
     {
@@ -68,7 +69,7 @@ if (!function_exists('adminRouteNamePrefix')) {
     }
 }
 
-if (!function_exists('adminUrlPrefix')) {
+if (! function_exists('adminUrlPrefix')) {
 
     function adminUrlPrefix()
     {
@@ -78,7 +79,7 @@ if (!function_exists('adminUrlPrefix')) {
     }
 }
 
-if (!function_exists('systemUrlPrefix')) {
+if (! function_exists('systemUrlPrefix')) {
 
     function systemUrlPrefix()
     {
@@ -86,7 +87,7 @@ if (!function_exists('systemUrlPrefix')) {
     }
 }
 
-if (!function_exists('systemRouteNamePrefix')) {
+if (! function_exists('systemRouteNamePrefix')) {
 
     function systemRouteNamePrefix()
     {
@@ -94,30 +95,31 @@ if (!function_exists('systemRouteNamePrefix')) {
     }
 }
 
-if (!function_exists('builtInModularityThemes')) {
+if (! function_exists('builtInModularityThemes')) {
 
     function builtInModularityThemes()
     {
         return collect(array_filter(
             glob(base_path(unusualConfig('vendor_path') . '/vue/src/sass/themes/*', GLOB_ONLYDIR)),
-            fn($dir) => File::isDirectory($dir) && !preg_match('/customs/', $dir)
-        ))->mapWithKeys(function($dir) {
+            fn ($dir) => File::isDirectory($dir) && ! preg_match('/customs/', $dir)
+        ))->mapWithKeys(function ($dir) {
             $info = pathinfo($dir);
-            return [ $info['filename'] => Str::headline($info['filename'])];
+
+            return [$info['filename'] => Str::headline($info['filename'])];
         });
     }
 }
-if (!function_exists('customModularityThemes')) {
+if (! function_exists('customModularityThemes')) {
 
     function customModularityThemes()
     {
         return collect(array_filter(
             glob(resource_path('vendor/modularity/themes/*', GLOB_ONLYDIR)),
-            fn($dir) => File::isDirectory($dir)
-        ))->mapWithKeys(function($dir) {
+            fn ($dir) => File::isDirectory($dir)
+        ))->mapWithKeys(function ($dir) {
             $info = pathinfo($dir);
-            return [ $info['filename'] => Str::headline($info['filename'])];
+
+            return [$info['filename'] => Str::headline($info['filename'])];
         });
     }
 }
-

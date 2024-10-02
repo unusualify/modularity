@@ -2,7 +2,6 @@
 
 namespace Modules\SystemUser\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Unusualify\Modularity\Http\Controllers\BaseController;
 
@@ -23,12 +22,9 @@ class CompanyController extends BaseController
      */
     protected $routeName = 'Company';
 
-
     protected $titleColumnKey = 'name';
 
-
     // protected $perPage = 2;
-
 
     /**
      * @var string
@@ -38,10 +34,9 @@ class CompanyController extends BaseController
     /**
      * @var string
      */
-    protected $modelName = "Company";
+    protected $modelName = 'Company';
 
-
-    public function __construct(\Illuminate\Foundation\Application $app,Request $request)
+    public function __construct(\Illuminate\Foundation\Application $app, Request $request)
     {
         parent::__construct(
             $app,

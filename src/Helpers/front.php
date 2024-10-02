@@ -2,7 +2,7 @@
 
 use Unusualify\Modularity\Services\Assets;
 
-if (!function_exists('unusualMix')) {
+if (! function_exists('unusualMix')) {
     /**
      * @param string $file
      * @return string
@@ -13,7 +13,7 @@ if (!function_exists('unusualMix')) {
     }
 }
 
-if (!function_exists('getHost')) {
+if (! function_exists('getHost')) {
     /**
      * @param string $file
      * @return string
@@ -23,4 +23,3 @@ if (!function_exists('getHost')) {
         return parse_url(config('app.url'))['host'];
     }
 }
-

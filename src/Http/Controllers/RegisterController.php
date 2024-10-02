@@ -25,100 +25,100 @@ class RegisterController extends Controller
 
     public function showLoginForm()
     {
-        return view(unusualBaseKey().'::auth.register', [
+        return view(unusualBaseKey() . '::auth.register', [
             'formAttributes' => [
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
                 'schema' => ($schema = $this->createFormSchema([
                     'name' => [
-                        "type" => "text",
-                        "name" => "name",
-                        "label" => ___('authentication.name'),
-                        "default" => "",
+                        'type' => 'text',
+                        'name' => 'name',
+                        'label' => ___('authentication.name'),
+                        'default' => '',
                         'col' => [
                             'cols' => 6,
                             'lg' => 6,
                         ],
                         'rules' => [
-                            ['min', 3]
-                        ]
+                            ['min', 3],
+                        ],
                     ],
                     'surname' => [
-                        "type" => "text",
-                        "name" => "surname",
-                        "label" => ___('authentication.surname'),
-                        "default" => "",
+                        'type' => 'text',
+                        'name' => 'surname',
+                        'label' => ___('authentication.surname'),
+                        'default' => '',
                         'col' => [
                             'cols' => 6,
-                            'lg' => 6
+                            'lg' => 6,
                         ],
                         'rules' => [
-                            ['min', 2]
-                        ]
+                            ['min', 2],
+                        ],
                     ],
                     'company' => [
-                        "type" => "text",
-                        "name" => "company",
-                        "label" => ___('authentication.company'),
-                        "default" => "",
+                        'type' => 'text',
+                        'name' => 'company',
+                        'label' => ___('authentication.company'),
+                        'default' => '',
                         'col' => [
                             'cols' => 6,
-                            'lg' => 6
+                            'lg' => 6,
                         ],
                         'rules' => [
-                            ['min', 2]
-                        ]
+                            ['min', 2],
+                        ],
                     ],
                     'email' => [
-                        "type" => "text",
-                        "name" => "email",
-                        "label" => ___('authentication.email'),
-                        "default" => "",
+                        'type' => 'text',
+                        'name' => 'email',
+                        'label' => ___('authentication.email'),
+                        'default' => '',
                         'col' => [
                             'cols' => 6,
                             'lg' => 6,
                         ],
                         'rules' => [
-                            ['email']
-                        ]
+                            ['email'],
+                        ],
                     ],
                     'password' => [
-                        "type" => "password",
-                        "name" => "password",
-                        "label" => ___('authentication.password'),
-                        "default" => "",
-                        "appendInnerIcon" => '$non-visibility',
-                        "slotHandlers" => [
+                        'type' => 'password',
+                        'name' => 'password',
+                        'label' => ___('authentication.password'),
+                        'default' => '',
+                        'appendInnerIcon' => '$non-visibility',
+                        'slotHandlers' => [
                             'appendInner' => 'password',
                         ],
                         'col' => [
                             'cols' => 6,
                             'lg' => 6,
-                        ]
+                        ],
                     ],
                     're_password' => [
-                        "type" => "password",
-                        "name" => "re-password",
-                        "label" => ___('authentication.repeat_password'),
-                        "default" => "",
-                        "appendInnerIcon" => '$non-visibility',
-                        "slotHandlers" => [
+                        'type' => 'password',
+                        'name' => 're-password',
+                        'label' => ___('authentication.repeat_password'),
+                        'default' => '',
+                        'appendInnerIcon' => '$non-visibility',
+                        'slotHandlers' => [
                             'appendInner' => 'password',
                         ],
                         'col' => [
                             'cols' => 6,
                             'lg' => 6,
-                        ]
+                        ],
                     ],
                     'tos' => [
-                        "type" => "checkbox",
-                        "name" => "tos",
-                        "label" => __('authentication.tos'),
-                        "default" => "",
-                        "col" => [
-                            "cols" => 12,
-                            "lg" => 12,
-                        ]
-                    ]
+                        'type' => 'checkbox',
+                        'name' => 'tos',
+                        'label' => __('authentication.tos'),
+                        'default' => '',
+                        'col' => [
+                            'cols' => 12,
+                            'lg' => 12,
+                        ],
+                    ],
                 ])),
 
                 'actionUrl' => route(Route::hasAdmin('register')),
@@ -139,7 +139,7 @@ class RegisterController extends Controller
                                 'variant' => 'text',
                                 'href' => '',
                                 'class' => 'v-col-5',
-                            ]
+                            ],
                         ],
                         [
                             'tag' => 'v-btn',
@@ -148,12 +148,12 @@ class RegisterController extends Controller
                                 'variant' => 'elevated',
                                 'href' => '',
                                 'class' => 'v-col-5',
-                                'type' => 'submit'
+                                'type' => 'submit',
 
-                            ]
-                        ]
-                    ]
-                ]
+                            ],
+                        ],
+                    ],
+                ],
             ],
             'slots' => [
                 'bottom' => [
@@ -163,9 +163,9 @@ class RegisterController extends Controller
                     ],
                     'elements' => [
                         [
-                            "tag" => "v-btn",
+                            'tag' => 'v-btn',
                             'elements' => ___('authentication.sign-in-google'),
-                            "attributes" => [
+                            'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
@@ -177,14 +177,14 @@ class RegisterController extends Controller
                                         'symbol' => 'google',
                                         'width' => '25',
                                         'height' => '25',
-                                    ]
-                                ]
-                            ]
+                                    ],
+                                ],
+                            ],
                         ],
                         [
-                            "tag" => "v-btn",
+                            'tag' => 'v-btn',
                             'elements' => ___('authentication.sign-in-apple'),
-                            "attributes" => [
+                            'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
@@ -196,15 +196,15 @@ class RegisterController extends Controller
                                         'symbol' => 'apple',
                                         'width' => '25',
                                         'height' => '25',
-                                    ]
-                                ]
-                            ]
+                                    ],
+                                ],
+                            ],
                         ],
 
-                    ]
+                    ],
 
-                ]
-            ]
+                ],
+            ],
             // 'defaultItem' => collect($schema)->mapWithKeys(function($item, $key){
             //     return [ $item['name'] => $item['default'] ?? ''];
             //     $carry[$key] = $item->default ?? '';
@@ -216,7 +216,6 @@ class RegisterController extends Controller
     /**
      * Get a validator for an incoming registration request.
      *
-     * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
     protected function validator(array $data)
@@ -232,14 +231,14 @@ class RegisterController extends Controller
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param  array  $data
+     * @param array $data
      * @return \App\Models\User
      */
     protected function register(Request $request)
     {
         $validator = $this->validator($request->all());
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $request->wantsJson()
                 ? new JsonResponse([
                     'errors' => $validator->errors(),
@@ -262,13 +261,14 @@ class RegisterController extends Controller
         $user->assignRole('client-manager');
 
         return $request->wantsJson()
-        ?   new JsonResponse([
-                'redirector' => route(Route::hasAdmin('login.form'))
-            ], 200)
-        :   $this->sendLoginResponse($request);
+        ? new JsonResponse([
+            'redirector' => route(Route::hasAdmin('login.form')),
+        ], 200)
+        : $this->sendLoginResponse($request);
     }
 
-    public function rules() {
+    public function rules()
+    {
         return [
             'name' => ['required', 'string', 'max:255'],
             'surname' => ['required', 'string', 'max:255'],
@@ -295,16 +295,3 @@ class RegisterController extends Controller
     //     return redirect()->to('login.form');
     // }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

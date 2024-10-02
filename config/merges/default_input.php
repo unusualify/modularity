@@ -37,4 +37,3 @@ return [
     'variant' => 'outlined',
     'clearable',
 ];
-

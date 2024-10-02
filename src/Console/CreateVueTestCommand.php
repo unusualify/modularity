@@ -2,11 +2,11 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Nwidart\Modules\Support\Stub;
+use Symfony\Component\Console\Input\InputOption;
 
-use function Laravel\Prompts\{text, select, confirm, warning};
+use function Laravel\Prompts\select;
+use function Laravel\Prompts\text;
 
 class CreateVueTestCommand extends BaseCommand
 {
@@ -24,14 +24,14 @@ class CreateVueTestCommand extends BaseCommand
      *
      * @var string
      */
-    protected $description = "Create a test file for vue features or components";
+    protected $description = 'Create a test file for vue features or components';
 
     /*
      * Executes the console command.
      *
      * @return mixed
      */
-    public function handle() :int
+    public function handle(): int
     {
         $success = true;
 
@@ -39,17 +39,18 @@ class CreateVueTestCommand extends BaseCommand
 
         $test_type = $this->argument('type') ? $this->getSnakeCase($this->argument('type')) : '';
 
-        if( !$test_name )
+        if (! $test_name) {
             $test_name = $this->getStudlyName(text('What is the test name?'));
+        }
 
         $vueTestGenerator = $this->laravel->make('Unusualify\Modularity\Generators\VueTestGenerator', ['name' => $test_name]);
 
-        if( !$test_type )
+        if (! $test_type) {
             $test_type = select(
                 label: 'What is type of the test?',
                 options: array_keys($vueTestGenerator->getTypes())
             );
-
+        }
 
         $vueTestGenerator = $vueTestGenerator->setType($test_type)
             ->setFilesystem($this->laravel['files'])
@@ -58,8 +59,9 @@ class CreateVueTestCommand extends BaseCommand
 
         $subImportDir = $this->option('importDir');
 
-        if($subImportDir)
+        if ($subImportDir) {
             $vueTestGenerator = $vueTestGenerator->setSubImportDir($subImportDir);
+        }
 
         $code = $vueTestGenerator->generate();
 

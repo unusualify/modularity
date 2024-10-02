@@ -8,7 +8,6 @@ use Unusualify\Modularity\Http\Controllers\BaseController;
 
 class RoleController extends BaseController
 {
-
     protected $namespace = 'Modules\SystemUser';
 
     protected $moduleName = 'SystemUser';
@@ -17,17 +16,17 @@ class RoleController extends BaseController
 
     // protected $routePrefix = 'User';
 
-    protected $modelName = "Role";
+    protected $modelName = 'Role';
 
-    protected $titleColumnKey = "name";
+    protected $titleColumnKey = 'name';
 
     protected $perPage = 15;
 
     protected $childrenTree = [
-        'permission'
+        'permission',
     ];
 
-    public function __construct(\Illuminate\Foundation\Application $app,Request $request)
+    public function __construct(\Illuminate\Foundation\Application $app, Request $request)
     {
         parent::__construct(
             $app,
@@ -38,19 +37,19 @@ class RoleController extends BaseController
     public function childrenForTree()
     {
         foreach ($this->childrenTree as $child) {
-            # code...
+            // code...
         }
     }
 
     public function treeActions()
     {
 
-        return Collection::make($this->childrenTree)->map(function($name){
+        return Collection::make($this->childrenTree)->map(function ($name) {
 
             return [
                 'name' => '',
                 'color' => '',
-                'link' => '/user/role/:id/permission'
+                'link' => '/user/role/:id/permission',
             ];
         });
     }
@@ -58,15 +57,13 @@ class RoleController extends BaseController
     public function getAllTreeElements()
     {
 
-        return Collection::make($this->childrenTree)->map(function($name){
+        return Collection::make($this->childrenTree)->map(function ($name) {
 
             return [
                 'name' => '',
                 'color' => '',
-                'link' => '/user/role/:id/permission'
+                'link' => '/user/role/:id/permission',
             ];
         });
     }
-
-
 }

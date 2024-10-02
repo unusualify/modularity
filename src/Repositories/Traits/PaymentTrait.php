@@ -47,17 +47,16 @@ trait PaymentTrait
             ? $fields['currency_id']
             : $session_currency ?? $this->paymentTraitDefaultCurrencyId;
 
-
-        if ( $this->paymentTraitRelationName ) {
+        if ($this->paymentTraitRelationName) {
             $relatedClass = $object->{$this->paymentTraitRelationName}()->getRelated();
 
             $requirementMet = false;
 
-            if ( classHasTrait($relatedClass, $this->requiredTrait) ) {
+            if (classHasTrait($relatedClass, $this->requiredTrait)) {
                 $requirementMet = true;
-            } else if( classHasTrait($relatedClass, $this->snapshotTrait)
+            } elseif (classHasTrait($relatedClass, $this->snapshotTrait)
                 && classHasTrait($relatedClass->source()->getRelated(), $this->requiredTrait)
-            ){
+            ) {
                 $requirementMet = true;
             }
 
@@ -70,20 +69,21 @@ trait PaymentTrait
                     foreach ($records as $record) {
                         $price = $record->prices()->where('currency_id', $currencyId)->first();
 
-                        if (!is_null($price))
+                        if (! is_null($price)) {
                             $totalPrice += $price->display_price;
+                        }
                     }
                 }
 
-                if (!$object->price && !empty($records)) {
+                if (! $object->price && ! empty($records)) {
 
                     $object->price()->create([
                         'price_type_id' => 1,
                         'vat_rate_id' => 1,
                         'currency_id' => $currencyId,
-                        'display_price' => ($totalPrice / 100)
+                        'display_price' => ($totalPrice / 100),
                     ]);
-                }else if ($object->price->display_price != $totalPrice) {
+                } elseif ($object->price->display_price != $totalPrice) {
 
                     $object->price->display_price = $totalPrice;
                     $object->price->currency_id = $currencyId;
@@ -105,14 +105,14 @@ trait PaymentTrait
             [
                 'name' => 'price_id',
                 'label' => 'price_id',
-                'type' => 'hidden'
+                'type' => 'hidden',
             ],
             [
                 'name' => 'payment_service',
                 'label' => 'Payment',
                 'type' => 'payment-service',
                 // 'connector' => 'SystemPayment:PaymentService|repository:listAll',
-            ]
+            ],
         ];
     }
 }

@@ -4,24 +4,20 @@ namespace Unusualify\Modularity\Console;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Config;
-use Nwidart\Modules\Support\Config\GenerateConfigReader;
-use Nwidart\Modules\Support\Stub;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Support\Str;
+use Nwidart\Modules\Generators\FileGenerator;
+use Nwidart\Modules\Support\Config\GeneratorPath;
+use Nwidart\Modules\Support\Stub;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Support\Decomposers\ModelRelationParser;
 use Unusualify\Modularity\Support\Decomposers\SchemaParser;
-use Nwidart\Modules\Support\Config\GeneratorPath;
-
-use Nwidart\Modules\Generators\FileGenerator;
-use Unusualify\Modularity\Facades\Modularity;
 
 use function Laravel\Prompts\confirm;
 
 class ModelMakeCommand extends BaseCommand
 {
-
     protected $name = 'unusual:make:model';
 
     /**
@@ -71,7 +67,7 @@ class ModelMakeCommand extends BaseCommand
 
     protected $overrideModel = null;
 
-    public function handle() : int
+    public function handle(): int
     {
         // $this->traits = getTraits();
         $this->setAskability();
@@ -82,18 +78,18 @@ class ModelMakeCommand extends BaseCommand
             ? $this->option('override-model')
             : null;
 
-        foreach(getUnusualTraits() as $_trait){
+        foreach (getUnusualTraits() as $_trait) {
             $this->responses[$_trait] = $this->checkOption($_trait);
         }
 
-        if(!$this->option('no-defaults')){
+        if (! $this->option('no-defaults')) {
             $this->defaultFillables += (new SchemaParser(implode(',', $this->baseConfig('schemas.default_fields') ?? [])))->getColumns();
         }
 
-        if( $this->option('relationships')){
+        if ($this->option('relationships')) {
             $this->modelRelationParser = App::makeWith(ModelRelationParser::class, [
                 'model' => $this->argument('model'),
-                'relationships' => $this->option('relationships')
+                'relationships' => $this->option('relationships'),
             ]);
         }
 
@@ -155,26 +151,26 @@ class ModelMakeCommand extends BaseCommand
         $class_namespaces = implode("\n", [
             $this->getExtendModelNamespace(),
             $this->getInterfaceNamespaces(),
-            $this->getTraitNamespaces()
+            $this->getTraitNamespaces(),
         ]);
 
-        return  (new Stub( $this->getStubName(), [
+        return (new Stub($this->getStubName(), [
             // 'BASE_MODEL'            => $this->baseConfig('base_model'),
-            'NAMESPACE'             => $this->getClassNamespace($module),
-            'EXTEND_MODEL'          => $this->getExtendModel(),
-            'NAMESPACES'            => $class_namespaces,
+            'NAMESPACE' => $this->getClassNamespace($module),
+            'EXTEND_MODEL' => $this->getExtendModel(),
+            'NAMESPACES' => $class_namespaces,
             // 'EXTEND_MODEL_NAMESPACE'=> $this->getExtendModelNamespace(),
             // 'TRAIT_NAMESPACES'      => $this->getTraitNamespaces(),
             // 'INTERFACE_NAMESPACES'  => $this->getInterfaceNamespaces(),
-            'NAME'                  => $this->getModelName(),
-            'CLASS'                 => $this->getClass(),
-            'INTERFACES'            => $this->getInterfaces(),
-            'TRAITS'                => $this->getTraits(),
-            'FILLABLE'              => ltrim($this->getFillable()),
+            'NAME' => $this->getModelName(),
+            'CLASS' => $this->getClass(),
+            'INTERFACES' => $this->getInterfaces(),
+            'TRAITS' => $this->getTraits(),
+            'FILLABLE' => ltrim($this->getFillable()),
             'TRANSLATED_ATTRIBUTES' => ltrim($this->getTranslatedAttributes()),
             // 'CASTS'                 => ltrim($this->getCasts()),
-            'SLUG_ATTRIBUTES'       => ltrim($this->getSlugAttributes()),
-            'METHODS'               => $this->getMethods()
+            'SLUG_ATTRIBUTES' => ltrim($this->getSlugAttributes()),
+            'METHODS' => $this->getMethods(),
         ]))->render();
     }
 
@@ -185,7 +181,7 @@ class ModelMakeCommand extends BaseCommand
     {
         $path = Modularity::getModulePath($this->getModuleName());
 
-        $modelPath = new GeneratorPath( $this->baseConfig('paths.generator.model') );
+        $modelPath = new GeneratorPath($this->baseConfig('paths.generator.model'));
 
         return $path . $modelPath->getPath() . '/' . $this->getModelName() . '.php';
     }
@@ -200,10 +196,8 @@ class ModelMakeCommand extends BaseCommand
 
     /**
      * Get default namespace.
-     *
-     * @return string
      */
-    public function getDefaultNamespace() : string
+    public function getDefaultNamespace(): string
     {
         return $this->baseConfig('paths.generator.model.namespace') ?:
             $this->baseConfig('paths.generator.model.path', 'Entities');
@@ -212,12 +206,12 @@ class ModelMakeCommand extends BaseCommand
 
     public function getExtendModel()
     {
-        return $this->overrideModel ? "\\". $this->overrideModel :get_class_short_name($this->baseConfig('base_model'));
+        return $this->overrideModel ? '\\' . $this->overrideModel : get_class_short_name($this->baseConfig('base_model'));
     }
 
     public function getExtendModelNamespace()
     {
-        return $this->overrideModel ? '' : "use " .$this->baseConfig('base_model') . ";";
+        return $this->overrideModel ? '' : 'use ' . $this->baseConfig('base_model') . ';';
     }
 
     public function getInterfaces()
@@ -225,13 +219,14 @@ class ModelMakeCommand extends BaseCommand
         $interfaces = [];
 
         foreach ($this->responses as $trait => $status) {
-            if($status)
+            if ($status) {
                 $interfaces[] = $this->getInterface($trait);
+            }
         }
 
         $interfaces = call_user_func_array('array_merge', $interfaces);
 
-        return count($interfaces) ? "implements ".implode(',',$interfaces) : '';
+        return count($interfaces) ? 'implements ' . implode(',', $interfaces) : '';
     }
 
     public function getInterfaceNamespaces()
@@ -240,48 +235,49 @@ class ModelMakeCommand extends BaseCommand
 
         foreach ($this->responses as $trait => $status) {
 
-            if($status)
+            if ($status) {
                 $interfaces[] = $this->getInterfaceNamespace($trait);
+            }
         }
 
         $interfaces = call_user_func_array('array_merge', $interfaces);
 
-        $namespaces = array_map(function($v){
+        $namespaces = array_map(function ($v) {
             return "use $v;";
-        }, $interfaces );
+        }, $interfaces);
 
         return count($namespaces) ? implode('\n', $namespaces) : '';
     }
 
-    private function getFillable() : string
+    private function getFillable(): string
     {
-        if(!$this->overrideModel){
-            $defaultFillableSchema = implode(',',$this->baseConfig('schemas.fillables'));
+        if (! $this->overrideModel) {
+            $defaultFillableSchema = implode(',', $this->baseConfig('schemas.fillables'));
 
             $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
 
-            if(!$this->getTraitResponse('addTranslation')){
+            if (! $this->getTraitResponse('addTranslation')) {
                 $fields = array_merge($this->defaultFillables, $fields);
 
                 $fillable = $this->option('fillable');
-                $fields = array_merge( $fields, $fillable != "" ? explode(',', $fillable) : []);
+                $fields = array_merge($fields, $fillable != '' ? explode(',', $fillable) : []);
             }
 
             return $this->generateFillable($fields);
-        }else{
-            $defaultFillableSchema = implode(',',$this->baseConfig('schemas.fillables'));
+        } else {
+            $defaultFillableSchema = implode(',', $this->baseConfig('schemas.fillables'));
 
             $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
 
             return $this->generateFillable($fields);
         }
 
-        return  '';
+        return '';
     }
 
-    private function getCasts() : string
+    private function getCasts(): string
     {
-        $defaultFillableSchema = implode(',',$this->baseConfig('schemas.fillables'));
+        $defaultFillableSchema = implode(',', $this->baseConfig('schemas.fillables'));
 
         dd(
             $defaultFillableSchema,
@@ -292,17 +288,18 @@ class ModelMakeCommand extends BaseCommand
 
         $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
 
-        if(!$this->getTraitResponse('addTranslation')){
+        if (! $this->getTraitResponse('addTranslation')) {
             $fields = array_merge($this->defaultFillables, $fields);
 
             $fillable = $this->option('fillable');
-            $fields = array_merge( $fields, $fillable != "" ? explode(',', $fillable) : []);
+            $fields = array_merge($fields, $fillable != '' ? explode(',', $fillable) : []);
         }
 
         return $this->generateFillable($fields);
     }
 
-    private function generateFillable($fields) {
+    private function generateFillable($fields)
+    {
         $fillable = "\t/**\n"
         . "\t * The attributes that are mass assignable.\n"
         . "\t * \n"
@@ -310,34 +307,35 @@ class ModelMakeCommand extends BaseCommand
         . "\t */ \n";
 
         $fillable .= "\tprotected \$fillable = [\n"
-            . collect($fields)->map(function($field){
+            . collect($fields)->map(function ($field) {
                 return "\t\t'{$field}'";
-            })->implode(",\n")."\n"
+            })->implode(",\n") . "\n"
             . "\t];\n";
 
         return $fillable;
     }
 
-    private function generateCasts($fields) {
-        $fillable = "";
+    private function generateCasts($fields)
+    {
+        $fillable = '';
 
         $fillable .= "\tprotected \$casts = [\n"
-            . collect($fields)->map(function($type, $field){
+            . collect($fields)->map(function ($type, $field) {
                 return "\t\t'{$field}' => '{$type}'";
-            })->implode(",\n")."\n"
+            })->implode(",\n") . "\n"
             . "\t];\n";
 
         return $fillable;
     }
 
-    private function getTranslatedAttributes() : string
+    private function getTranslatedAttributes(): string
     {
-        $attributes = "";
+        $attributes = '';
 
-        if($this->getTraitResponse('addTranslation')){
+        if ($this->getTraitResponse('addTranslation')) {
             $fillable = $this->option('fillable');
 
-            $fields = array_merge( $this->defaultFillables, $fillable != "" ? explode(',', $fillable) : []);
+            $fields = array_merge($this->defaultFillables, $fillable != '' ? explode(',', $fillable) : []);
 
             $attributes = "\t/**\n"
                 . "\t * The translated attributes that are assignable for hasTranslation Trait.\n"
@@ -345,25 +343,25 @@ class ModelMakeCommand extends BaseCommand
                 . "\t * @var array<int, string>\n"
                 . "\t */ \n";
 
-            $defaultTranslatedSchema = implode(',',$this->baseConfig('schemas.translated_attributes'));
+            $defaultTranslatedSchema = implode(',', $this->baseConfig('schemas.translated_attributes'));
 
-            $fields = array_merge( $fields, (new SchemaParser($defaultTranslatedSchema))->getColumns() );
+            $fields = array_merge($fields, (new SchemaParser($defaultTranslatedSchema))->getColumns());
 
             $attributes .= "\tpublic \$translatedAttributes = [\n"
-                . collect($fields )->map(function($field){
+                . collect($fields)->map(function ($field) {
                     return "\t\t'{$field}'";
-                })->implode(",\n")."\n"
+                })->implode(",\n") . "\n"
                 . "\t]; \n";
         }
 
         return $attributes;
     }
 
-    private function getSlugAttributes() : string
+    private function getSlugAttributes(): string
     {
-        $attributes = "";
+        $attributes = '';
 
-        if($this->getTraitResponse('addSlug')){
+        if ($this->getTraitResponse('addSlug')) {
 
             $fields[] = $this->defaultFillables[0];
 
@@ -373,11 +371,10 @@ class ModelMakeCommand extends BaseCommand
                 . "\t * @var array<int, string>\n"
                 . "\t */ \n";
 
-
             $attributes .= "\tprotected \$slugAttributes = [\n"
-                . collect($fields )->map(function($field){
+                . collect($fields)->map(function ($field) {
                     return "\t\t'{$field}'";
-                })->implode(",\n")."\n"
+                })->implode(",\n") . "\n"
                 . "\t]; \n";
         }
 
@@ -391,24 +388,25 @@ class ModelMakeCommand extends BaseCommand
     {
         $traits = [];
 
-        if( $this->option('soft-delete') ){
+        if ($this->option('soft-delete')) {
             $traits[] = $this->getTrait('soft_delete');
         }
 
-        if( $this->option('has-factory') ){
+        if ($this->option('has-factory')) {
             $traits[] = $this->getTrait('has_factory');
         }
 
-        if( $this->overrideModel ){
+        if ($this->overrideModel) {
             $traits[] = $this->getTrait('model_helpers');
         }
 
         foreach ($this->responses as $trait => $status) {
-            if($status)
+            if ($status) {
                 $traits[] = $this->getTrait($trait);
+            }
         }
 
-        return count($traits) ? "use ".implode(', ',$traits).";\n" : '';
+        return count($traits) ? 'use ' . implode(', ', $traits) . ";\n" : '';
     }
 
     /**
@@ -418,26 +416,27 @@ class ModelMakeCommand extends BaseCommand
     {
         $namespaces = [];
 
-        if( $this->option('soft-delete') ){
+        if ($this->option('soft-delete')) {
             $namespaces[] = $this->getTraitNamespace('soft_delete');
         }
 
-        if( $this->option('has-factory') ){
+        if ($this->option('has-factory')) {
             $namespaces[] = $this->getTraitNamespace('has_factory');
         }
 
-        if( $this->overrideModel ){
+        if ($this->overrideModel) {
             $namespaces[] = $this->getTraitNamespace('model_helpers');
         }
 
         foreach ($this->responses as $trait => $status) {
-            if($status)
+            if ($status) {
                 $namespaces[] = $this->getTraitNamespace($trait);
+            }
         }
 
-        $namespaces = array_map(function($v){
+        $namespaces = array_map(function ($v) {
             return "use $v;";
-        }, $namespaces );
+        }, $namespaces);
 
         return count($namespaces) ? implode("\n", $namespaces) : null;
     }
@@ -446,26 +445,26 @@ class ModelMakeCommand extends BaseCommand
     {
         $methods = [];
 
-        if( $this->option('has-factory') ){
+        if ($this->option('has-factory')) {
             $module_namespace = Modularity::config('namespace');
             $module = $this->getModuleName();
             $name = $this->getModelName();
 
             $str = "\\{$module_namespace}\\{$module}\\Database\\factories\\{$name}Factory";
 
-            if( @class_exists($str) ){
+            if (@class_exists($str)) {
                 $methods[] = "\tprotected static function newFactory()\n\t{\n\t\treturn {$str}::new();\n\t}";
             }
             // dd($str, class_exists($str), $methods);
         }
 
-        if( $this->option('addClone') ){
+        if ($this->option('addClone')) {
             $methods[] = method_string(
                 method_name: 'getSnapshotSourceModelFillable',
                 content: [
-                    "\$class = \$this->getSourceModel();",
-                    "\$instance = new \$class;",
-                    "return \$instance->getColumns();"
+                    '$class = $this->getSourceModel();',
+                    '$instance = new $class;',
+                    'return $instance->getColumns();',
                 ],
                 comment: 'Gets the snaphot source model fillable attributes.',
                 return_type: 'array'
@@ -473,16 +472,16 @@ class ModelMakeCommand extends BaseCommand
             $methods[] = method_string(
                 method_name: 'getSnapshotSourceModelRelationships',
                 content: [
-                    "\$class = \$this->getSourceModel();",
-                    "\$instance = new \$class;",
-                    "return array_diff(\$instance->definedRelations(), \$this->snapshotSourceRelationshipsExcepts ?? []);"
+                    '$class = $this->getSourceModel();',
+                    '$instance = new $class;',
+                    'return array_diff($instance->definedRelations(), $this->snapshotSourceRelationshipsExcepts ?? []);',
                 ],
                 comment: 'Gets all defined relationships of the snapshot source model.',
                 return_type: 'array'
             );
         }
 
-        if( $this->option('relationships')){
+        if ($this->option('relationships')) {
             $methods = array_merge($methods, $this->modelRelationParser->render());
         }
 
@@ -498,6 +497,7 @@ class ModelMakeCommand extends BaseCommand
     {
         return $this->getSchemaParser()->getInterfaceNamespaces($trait);
     }
+
     /**
      * Get Name of Interface.
      *
@@ -507,6 +507,7 @@ class ModelMakeCommand extends BaseCommand
     {
         return $this->getSchemaParser()->getInterfaces($trait);
     }
+
     /**
      * Get Namespace of Trait.
      *
@@ -527,9 +528,6 @@ class ModelMakeCommand extends BaseCommand
         return $this->getSchemaParser()->getTrait($trait);
     }
 
-    /**
-     * @return string
-     */
     protected function getStubName(): string
     {
         return '/models/model.stub';
@@ -551,8 +549,9 @@ class ModelMakeCommand extends BaseCommand
             return true;
         }
 
-        if(!$this->isAskable())
+        if (! $this->isAskable()) {
             return false;
+        }
 
         $questions = [
             // 'hasBlocks' => 'Do you need to use the block editor on this module?',
@@ -565,8 +564,8 @@ class ModelMakeCommand extends BaseCommand
             // 'nestingTrait' => 'Do you need to enable nesting on this module?',
         ];
 
-        $questions = Collection::make($this->baseConfig('traits'))->mapWithKeys(function($object, $key){
-            return [ $key => $object['question']];
+        $questions = Collection::make($this->baseConfig('traits'))->mapWithKeys(function ($object, $key) {
+            return [$key => $object['question']];
         })->toArray();
 
         $defaultAnswers = [
@@ -578,7 +577,7 @@ class ModelMakeCommand extends BaseCommand
         // dd(
         //     $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer)
         // );
-        return 'yes' === $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer);
+        return $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer) === 'yes';
     }
 
     private function createAdditionalModels()
@@ -591,29 +590,29 @@ class ModelMakeCommand extends BaseCommand
 
         $path = Modularity::getModulePath($this->getModuleName());
 
-        $modelPath = new GeneratorPath( $this->baseConfig('paths.generator.model') );
+        $modelPath = new GeneratorPath($this->baseConfig('paths.generator.model'));
 
-        if(isset($this->modelRelationParser) && $this->modelRelationParser->hasCreatablePivotModel()) {
+        if (isset($this->modelRelationParser) && $this->modelRelationParser->hasCreatablePivotModel()) {
             $pivot_models = $this->modelRelationParser->getPivotModels();
 
             foreach ($pivot_models as $key => $pivot_model) {
 
-                $runnable = (!$this->option('test') || confirm(label: "Do you want to see content of {$pivot_model['class']} pivot model in the test mode?", default: false) );
+                $runnable = (! $this->option('test') || confirm(label: "Do you want to see content of {$pivot_model['class']} pivot model in the test mode?", default: false));
 
-                if($runnable){
-                    $content = (new Stub( '/models/pivot_model.stub', [
+                if ($runnable) {
+                    $content = (new Stub('/models/pivot_model.stub', [
                         'NAMESPACE' => $this->getClassNamespace($module),
-                        'CLASS'     => $pivot_model['class'],
-                        'CASTS'     => $this->generateCasts($pivot_model['casts']),
-                        'FILLABLE'  => $this->generateFillable($pivot_model['fillables']),
+                        'CLASS' => $pivot_model['class'],
+                        'CASTS' => $this->generateCasts($pivot_model['casts']),
+                        'FILLABLE' => $this->generateFillable($pivot_model['fillables']),
                     ]))->render();
 
-                    if($this->option('test')){
+                    if ($this->option('test')) {
                         $this->info($content);
-                    }else{
-                        $fullPath = $path . $modelPath->getPath() . "" . '/' . $pivot_model['class'] . '.php';
+                    } else {
+                        $fullPath = $path . $modelPath->getPath() . '' . '/' . $pivot_model['class'] . '.php';
 
-                        if (!$this->laravel['files']->isDirectory($dir = dirname($fullPath))) {
+                        if (! $this->laravel['files']->isDirectory($dir = dirname($fullPath))) {
                             $this->laravel['files']->makeDirectory($dir, 0777, true);
                         }
 
@@ -623,29 +622,29 @@ class ModelMakeCommand extends BaseCommand
             }
         }
 
-        if($this->modelRelationParser)
+        if ($this->modelRelationParser) {
             $this->modelRelationParser->writeReverseRelationships($this->option('test') ? true : false);
+        }
 
-
-        if($this->getTraitResponse('addTranslation')){
-            $content = (new Stub( '/models/translation_model.stub', [
-                'NAMESPACE'         => $this->getClassNamespace($module)."\\Translations",
-                'BASE_MODEL'        => $this->baseConfig('base_model'),
-                'MODEL_NAMESPACE'   => $this->getClassNamespace($module)."\\".$this->getModelName(),
-                'TRANSLATION_CLASS' => $this->getModelName()."Translation",
-                'MODEL_CLASS'       => $this->getClass(),
+        if ($this->getTraitResponse('addTranslation')) {
+            $content = (new Stub('/models/translation_model.stub', [
+                'NAMESPACE' => $this->getClassNamespace($module) . '\\Translations',
+                'BASE_MODEL' => $this->baseConfig('base_model'),
+                'MODEL_NAMESPACE' => $this->getClassNamespace($module) . '\\' . $this->getModelName(),
+                'TRANSLATION_CLASS' => $this->getModelName() . 'Translation',
+                'MODEL_CLASS' => $this->getClass(),
             ]))->render();
 
-            $fullPath = $path . $modelPath->getPath() . "/Translations" . '/' . $this->getModelName() . 'Translation.php';
+            $fullPath = $path . $modelPath->getPath() . '/Translations' . '/' . $this->getModelName() . 'Translation.php';
 
-            $runnable = (!$this->option('test') || confirm(label: "Do you want to see the content of translation model in the test mode?", default: false) );
+            $runnable = (! $this->option('test') || confirm(label: 'Do you want to see the content of translation model in the test mode?', default: false));
 
-            if($runnable){
+            if ($runnable) {
 
-                if($this->option('test')){
+                if ($this->option('test')) {
                     $this->info($content);
-                }else{
-                    if (!$this->laravel['files']->isDirectory($dir = dirname($fullPath))) {
+                } else {
+                    if (! $this->laravel['files']->isDirectory($dir = dirname($fullPath))) {
                         $this->laravel['files']->makeDirectory($dir, 0777, true);
                     }
 
@@ -655,25 +654,25 @@ class ModelMakeCommand extends BaseCommand
 
         }
 
-        if( $this->getTraitResponse('addSlug') ){
+        if ($this->getTraitResponse('addSlug')) {
 
-            $content = (new Stub( '/models/slug_model.stub', [
-                'NAMESPACE'         => $this->getClassNamespace($module)."\\Slugs",
-                'BASE_MODEL'        => $this->baseConfig('base_model'),
-                'SLUG_CLASS'        => $this->getModelName()."Slug",
-                'MODEL_SNAKE'       => Str::snake($this->getClass()),
+            $content = (new Stub('/models/slug_model.stub', [
+                'NAMESPACE' => $this->getClassNamespace($module) . '\\Slugs',
+                'BASE_MODEL' => $this->baseConfig('base_model'),
+                'SLUG_CLASS' => $this->getModelName() . 'Slug',
+                'MODEL_SNAKE' => Str::snake($this->getClass()),
             ]))->render();
 
-            $fullPath = $path . $modelPath->getPath() . "/Slugs" . '/' . $this->getModelName() . 'Slug.php';
+            $fullPath = $path . $modelPath->getPath() . '/Slugs' . '/' . $this->getModelName() . 'Slug.php';
 
-            $runnable = (!$this->option('test') || confirm(label: "Do you want to see the content of translation model in the test mode?", default: false) );
+            $runnable = (! $this->option('test') || confirm(label: 'Do you want to see the content of translation model in the test mode?', default: false));
 
-            if($runnable){
+            if ($runnable) {
 
-                if($this->option('test')){
+                if ($this->option('test')) {
                     $this->info($content);
-                }else{
-                    if (!$this->laravel['files']->isDirectory($dir = dirname($fullPath))) {
+                } else {
+                    if (! $this->laravel['files']->isDirectory($dir = dirname($fullPath))) {
                         $this->laravel['files']->makeDirectory($dir, 0777, true);
                     }
 
@@ -682,5 +681,4 @@ class ModelMakeCommand extends BaseCommand
             }
         }
     }
-
 }

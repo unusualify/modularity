@@ -2,16 +2,10 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Illuminate\Support\Facades\Config;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-
-use Nwidart\Modules\Support\Stub;
-use Illuminate\Support\Str;
-use Unusualify\Modularity\Support\Decomposers\ValidatorParser;
-use Nwidart\Modules\Support\Config\GeneratorPath;
-use Unusualify\Modularity\Facades\Modularity;
+use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Generators\RouteGenerator;
+use Unusualify\Modularity\Support\Decomposers\ValidatorParser;
 
 class RoutePermissionCommand extends BaseCommand
 {
@@ -41,7 +35,7 @@ class RoutePermissionCommand extends BaseCommand
         parent::__construct();
     }
 
-    public function handle() : int
+    public function handle(): int
     {
 
         // if (parent::handle() === E_ERROR) {
@@ -56,6 +50,7 @@ class RoutePermissionCommand extends BaseCommand
 
         return 0;
     }
+
     /**
      * Get the console command arguments.
      *
@@ -67,6 +62,7 @@ class RoutePermissionCommand extends BaseCommand
             ['route', InputArgument::REQUIRED, 'The name of the route.'],
         ];
     }
+
     /**
      * Get the console command options.
      *
@@ -79,8 +75,6 @@ class RoutePermissionCommand extends BaseCommand
         ];
     }
 
-
-
     /**
      * @return string
      */
@@ -91,9 +85,4 @@ class RoutePermissionCommand extends BaseCommand
         return (new ValidatorParser($rule_schema))->toReplacement();
 
     }
-
-
-
-
-
 }

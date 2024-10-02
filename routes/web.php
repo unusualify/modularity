@@ -33,7 +33,7 @@ Route::put('profile/company', 'ProfileController@updateCompany')->name('profile.
 // });
 
 // system internal api routes (for ajax web routes)
-Route::prefix('api')->group(function(){
+Route::prefix('api')->group(function () {
     if (unusualConfig('enabled.media-library')) {
         Route::group(['prefix' => 'media-library', 'as' => 'media-library.'], function () {
             Route::post('sign-s3-upload', ['as' => 'sign-s3-upload', 'uses' => 'MediaLibraryController@signS3Upload']);
@@ -42,7 +42,7 @@ Route::prefix('api')->group(function(){
             Route::put('medias/bulk-update', ['as' => 'media.bulk-update', 'uses' => 'MediaLibraryController@bulkUpdate']);
             Route::put('medias/bulk-delete', ['as' => 'media.bulk-delete', 'uses' => 'MediaLibraryController@bulkDelete']);
             Route::get('medias/tags', ['as' => 'media.tags', 'uses' => 'MediaLibraryController@tags']);
-            Route::resource('medias', 'MediaLibraryController',  ['names' => 'media' ,'only' => ['index', 'store', 'destroy']]);
+            Route::resource('medias', 'MediaLibraryController', ['names' => 'media', 'only' => ['index', 'store', 'destroy']]);
         });
     }
 
@@ -54,7 +54,7 @@ Route::prefix('api')->group(function(){
             Route::put('files/bulk-update', ['as' => 'file.bulk-update', 'uses' => 'FileLibraryController@bulkUpdate']);
             Route::put('files/bulk-delete', ['as' => 'file.bulk-delete', 'uses' => 'FileLibraryController@bulkDelete']);
             Route::get('files/tags', ['as' => 'file.tags', 'uses' => 'FileLibraryController@tags']);
-            Route::resource('files', 'FileLibraryController', ['names' => 'file','only' => ['index', 'store', 'destroy']]);
+            Route::resource('files', 'FileLibraryController', ['names' => 'file', 'only' => ['index', 'store', 'destroy']]);
         });
     }
 });

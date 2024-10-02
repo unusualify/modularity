@@ -3,10 +3,9 @@
 namespace Unusualify\Modularity\Console;
 
 use Illuminate\Support\Collection;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
-
 use Nwidart\Modules\Support\Stub;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Generators\RouteGenerator;
 
 class RouteMakeCommand extends BaseCommand
@@ -25,7 +24,7 @@ class RouteMakeCommand extends BaseCommand
      */
     protected $description = 'Create files for routes.';
 
-    protected $aliases= [
+    protected $aliases = [
         'u:m:r',
         'modularity:make:route',
     ];
@@ -55,23 +54,22 @@ class RouteMakeCommand extends BaseCommand
     {
         parent::__construct();
 
-        Stub::setBasePath(dirname(__FILE__).'/stubs');
+        Stub::setBasePath(dirname(__FILE__) . '/stubs');
     }
 
     /**
      * Execute the console command.
      */
-    public function handle() : int
+    public function handle(): int
     {
 
         $route = $this->argument('route');
 
         $module = $this->argument('module');
 
-
         $traits = activeUnusualTraits($this->options());
 
-        foreach(getUnusualTraits() as $_trait){
+        foreach (getUnusualTraits() as $_trait) {
             $this->responses[$_trait] = $this->checkOption($_trait);
         }
 
@@ -157,11 +155,12 @@ class RouteMakeCommand extends BaseCommand
             return true;
         }
 
-        if ( !$this->isAskable() )
+        if (! $this->isAskable()) {
             return false;
+        }
 
-        $questions = Collection::make($this->baseConfig('traits'))->mapWithKeys(function($object, $key){
-            return [ $key => $object['question']];
+        $questions = Collection::make($this->baseConfig('traits'))->mapWithKeys(function ($object, $key) {
+            return [$key => $object['question']];
         })->toArray();
 
         $defaultAnswers = [
@@ -169,9 +168,10 @@ class RouteMakeCommand extends BaseCommand
         ];
 
         $currentDefaultAnswer = $this->defaultReject ? 0 : ($defaultAnswers[$option] ?? 1);
+
         // dd(
         //     $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer)
         // );
-        return 'yes' === $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer);
+        return $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer) === 'yes';
     }
 }

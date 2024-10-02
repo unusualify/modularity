@@ -22,7 +22,7 @@ abstract class Revision extends BaseModel
         // Remember to update this if you had fields to the fillable array here
         // this is to allow child classes to provide a custom foreign key in fillable
         if (count($this->fillable) == 2) {
-            $this->fillable[] = strtolower(str_replace('Revision', '', get_called_class())) . '_id';
+            $this->fillable[] = mb_strtolower(str_replace('Revision', '', get_called_class())) . '_id';
         }
     }
 

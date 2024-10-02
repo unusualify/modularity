@@ -35,7 +35,6 @@ class RedirectIfAuthenticatedMiddleware
      * Handles an incoming request.
      *
      * @param \Illuminate\Http\Request $request
-     * @param Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next, $guard = 'unusual_users')

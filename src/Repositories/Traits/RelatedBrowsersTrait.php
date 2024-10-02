@@ -69,11 +69,11 @@ trait RelatedBrowsersTrait
     {
         return collect($this->relatedBrowsers)->map(function ($browser, $key) {
             $browserName = is_string($browser) ? $browser : $key;
-            $moduleName = !empty($browser['moduleName']) ? $browser['moduleName'] : $this->inferModuleNameFromBrowserName($browserName);
+            $moduleName = ! empty($browser['moduleName']) ? $browser['moduleName'] : $this->inferModuleNameFromBrowserName($browserName);
 
             return [
-                'relation' => !empty($browser['relation']) ? $browser['relation'] : $this->inferRelationFromBrowserName($browserName),
-                'model' => !empty($browser['model']) ? $browser['model'] : $this->inferModelFromModuleName($moduleName),
+                'relation' => ! empty($browser['relation']) ? $browser['relation'] : $this->inferRelationFromBrowserName($browserName),
+                'model' => ! empty($browser['model']) ? $browser['model'] : $this->inferModelFromModuleName($moduleName),
                 'browserName' => $browserName,
                 'titleKey' => $browser['titleKey'] ?? 'title',
             ];

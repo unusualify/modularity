@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 trait HasRelation
 {
-
     protected static function bootHasRelation()
     {
         static::forceDeleting(function ($model) {
@@ -14,5 +13,4 @@ trait HasRelation
             // $model->
         });
     }
-
 }

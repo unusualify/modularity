@@ -21,7 +21,6 @@ class ImpersonateController extends Controller
 
     /**
      * @param int $id
-     * @param UserRepository $users
      * @return \Illuminate\Http\RedirectResponse
      */
     public function impersonate($id, UserRepository $users)
@@ -40,6 +39,7 @@ class ImpersonateController extends Controller
     public function stopImpersonate()
     {
         $this->authManager->guard('unusual_users')->user()->stopImpersonating();
+
         return back();
     }
 }

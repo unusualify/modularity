@@ -2,8 +2,6 @@
 
 namespace Unusualify\Modularity\Http\Requests;
 
-use Unusualify\Modularity\Http\Requests\BaseFormRequest;
-
 class MediaRequest extends BaseFormRequest
 {
     /**

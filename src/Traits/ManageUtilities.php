@@ -1,24 +1,19 @@
 <?php
+
 namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Config;
-use Unusualify\Modularity\Facades\Modularity;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Unusualify\Modularity\Services\View\UWrapper;
-use Unusualify\Modularity\Support\Finder;
-use stdClass;
 
-trait ManageUtilities {
+trait ManageUtilities
+{
+    use ManageForm, ManageTable;
 
-    use ManageTable, ManageForm;
-
-    protected function __afterConstructManageUtilities($app, $request)
-    {
-
-    }
+    protected function __afterConstructManageUtilities($app, $request) {}
 
     protected function __beforeConstructManageUtilities($app, $request)
     {
@@ -39,9 +34,9 @@ trait ManageUtilities {
             'tableMainFilters' => $this->getTableMainFilters(),
             'filters' => $filters,
             'requestFilter' => json_decode(request()->get('filter'), true) ?? [],
-            'searchText' =>  request()->has('search') ? request()->query('search') : "", // for current text of search parameter
+            'searchText' => request()->has('search') ? request()->query('search') : '', // for current text of search parameter
             'headers' => $this->getIndexTableColumns(), // headers to be used in unusual datatable component
-            'formSchema'  => $this->formSchema, // input fields to be used in unusual datatable component
+            'formSchema' => $this->formSchema, // input fields to be used in unusual datatable component
         ];
         $data = [
             ...$_deprecated,
@@ -56,9 +51,9 @@ trait ManageUtilities {
                 [
                     'rowActions' => $this->getTableActions(),
                     'bulkActions' => $this->getTableBulkActions(),
-                    'nestedData' => $this->getNestedData()
+                    'nestedData' => $this->getNestedData(),
                 ],
-                ($this->isNested ? ['titlePrefix' => $this->nestedParentModel->getTitleField() . ' \ ' ] : []),
+                ($this->isNested ? ['titlePrefix' => $this->nestedParentModel->getTitleField() . ' \ '] : []),
                 array_merge_recursive_preserve(
                     [
                         'name' => $this->getHeadline($this->routeName),
@@ -71,17 +66,17 @@ trait ManageUtilities {
             ),
             'formStore' => [
                 'inputs' => $this->formSchema,
-                'fields' => []
+                'fields' => [],
             ],
             'tableStore' => [
                 'baseUrl' => rtrim(config('app.url'), '/') . '/',
                 'headers' => $this->getIndexTableColumns(),
-                'searchText' => request()->has('search') ? request()->query('search') : "",
+                'searchText' => request()->has('search') ? request()->query('search') : '',
                 'options' => $this->getVuetifyDatatableOptions(),
                 'data' => $initialResource['data'],
                 'total' => $initialResource['total'] ?? 0,
                 'mainFilters' => $this->getTableMainFilters(),
-                'filter' => ['status' =>  $filters['status'] ?? $defaultFilterSlug ?? 'all'],
+                'filter' => ['status' => $filters['status'] ?? $defaultFilterSlug ?? 'all'],
                 'advancedFilters' => $this->getTableAdvancedFilters(),
                 'customModal' => request()->has('customModal') ? request()->query('customModal') : '',
 
@@ -104,13 +99,14 @@ trait ManageUtilities {
                 // 'baseUrl' => $baseUrl,
                 // 'permalinkPrefix' => $this->getPermalinkPrefix($baseUrl),
                 // 'additionalTableActions' => $this->additionalTableActions(),
-            ]
-
+            ],
 
         ];
+
         // dd($options['tableStore']);
         return array_replace_recursive($data + $options, $this->indexData($this->request));
     }
+
     /**
      * @param Request $request
      * @return array
@@ -175,7 +171,7 @@ trait ManageUtilities {
             // $parameters = $this->submodule ? [$this->submoduleParentId] : [];
             $parameters = [];
 
-            if($this->isNested){
+            if ($this->isNested) {
                 // $parameters[Str::camel($this->moduleName)] = $this->parentId;
                 $parameters[$this->nestedParentName] = $this->nestedParentId;
 
@@ -196,20 +192,20 @@ trait ManageUtilities {
             //     $action,
             //     );
 
-            if(!in_array($action, ['index', 'create', 'store'])){
+            if (! in_array($action, ['index', 'create', 'store'])) {
                 $prefix = $this->generateRoutePrefix(noNested: true);
             }
 
             return [
                 // $action . 'Endpoint' => $optionIsActive
                 $action => $optionIsActive
-                            ?   moduleRoute(
-                                    $this->getConfigFieldsByRoute('route_name'),
-                                    $prefix,
-                                    $action,
-                                    $parameters
-                                )
-                            :   null
+                            ? moduleRoute(
+                                $this->getConfigFieldsByRoute('route_name'),
+                                $prefix,
+                                $action,
+                                $parameters
+                            )
+                            : null,
             ];
 
         })->toArray();
@@ -226,9 +222,10 @@ trait ManageUtilities {
     {
         return [
             'languages' => route(Route::hasAdmin('api.languages.index')),
-            'base_permalinks' => Arr::mapWithKeys(getLocales(), function($locale, $key){
+            'base_permalinks' => Arr::mapWithKeys(getLocales(), function ($locale, $key) {
                 extract(parse_url(config('app.url'))); // $scheme, $host
-                return [$locale => $host ];
+
+                return [$locale => $host];
                 dd(
                     parse_url(config('app.url')),
                     // config('app.url'),
@@ -272,7 +269,7 @@ trait ManageUtilities {
                 'hasSubmit' => true,
                 'stickyButton' => false,
                 'modelValue' => $this->repository->getFormFields($item, $schema),
-                'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => trans_choice('modules.'. snakeCase($this->routeName), 0)]),
+                'title' => ___(((bool) $itemId ? 'edit-item' : 'new-item'), ['item' => trans_choice('modules.' . snakeCase($this->routeName), 0)]),
                 '__removed' => [
                     // 'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => $this->routeName]),
                     // 'schema'  => $schema, // input fields to be used in unusual datatable component
@@ -281,12 +278,12 @@ trait ManageUtilities {
                     //     $carry[$key] = $item->default ?? '';
                     // })->toArray(),
                     // 'actionUrl' => $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]),
-                ]
+                ],
             ],
             'endpoints' => [
-                (!!$itemId ? 'update' : 'store') => $itemId
+                ((bool) $itemId ? 'update' : 'store') => $itemId
                     ? $this->getModuleRoute($itemId, 'update')
-                    : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId])
+                    : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]),
             ] + $this->getUrls(),
             'formStore' => [
                 'inputs' => $schema,
@@ -320,8 +317,8 @@ trait ManageUtilities {
             'previewUrl' => moduleRoute($this->moduleName, $this->routePrefix, 'preview', [$itemId]),
         ] : [])
              + (Route::has($restoreRouteName) && $itemId ? [
-            'restoreUrl' => moduleRoute($this->moduleName, $this->routePrefix, 'restoreRevision', [$itemId]),
-        ] : []);
+                 'restoreUrl' => moduleRoute($this->moduleName, $this->routePrefix, 'restoreRevision', [$itemId]),
+             ] : []);
 
         return array_replace_recursive($data, $this->formData($this->request, $item));
     }
@@ -380,33 +377,32 @@ trait ManageUtilities {
     public function getViewLayoutVariables()
     {
         return [
-            'pageTitle' => $this->getHeadline($this->routeName) . " Module"
+            'pageTitle' => $this->getHeadline($this->routeName) . ' Module',
         ];
     }
 
     public function getNestedData()
     {
 
-        $result = Collection::make($this->getConfigFieldsByRoute('modules', []))->map(function($context, $key){
+        $result = Collection::make($this->getConfigFieldsByRoute('modules', []))->map(function ($context, $key) {
 
             $context->title = isset($context->title) ? ___($context->title) : headline($context->title);
 
-            if(isset($context->type)){
-                if($context->type == 'formWrapper'){
-                    $forms = Collection::make($context->elements)->map(function($element){
+            if (isset($context->type)) {
+                if ($context->type == 'formWrapper') {
+                    $forms = Collection::make($context->elements)->map(function ($element) {
 
                         $routeName = Route::hasAdmin($element->route);
 
-                        if(!$routeName){
+                        if (! $routeName) {
                             return false;
                         }
 
                         $schema = $this->createFormSchema(getFormDraft($element->draft));
 
-                        $parameters = Collection::make(Route::getRoutes()->getByName($routeName)->parameterNames())->mapWithKeys(function($parameter, $j){
-                            return [ $parameter => ":{$parameter}"];
+                        $parameters = Collection::make(Route::getRoutes()->getByName($routeName)->parameterNames())->mapWithKeys(function ($parameter, $j) {
+                            return [$parameter => ":{$parameter}"];
                         })->toArray();
-
 
                         // $modelValueAbstract = $this->getSnakeCase($this->routeName);
                         // if(isset($element->relation)){
@@ -414,6 +410,7 @@ trait ManageUtilities {
                         //     // $this->indexWith[] = $element->relation;
                         // }
                         $modelValueAbstract = isset($element->relation) ? $element->relation : $this->getSnakeCase($this->routeName);
+
                         return [
                             'title' => isset($element->title) ? ___($element->title) : '',
                             'buttonText' => 'update',
@@ -421,8 +418,8 @@ trait ManageUtilities {
                             'modelValue' => "\${$modelValueAbstract}",
                             // 'modelValue' => [],
                             'schema' => $schema,
-                            'defaultItem' => collect($schema)->mapWithKeys(function($item, $key){
-                                return [ $item['name'] => $item['default'] ?? ''];
+                            'defaultItem' => collect($schema)->mapWithKeys(function ($item, $key) {
+                                return [$item['name'] => $item['default'] ?? ''];
                                 $carry[$key] = $item->default ?? '';
                             })->toArray(),
                             'actionUrl' => route($routeName, $parameters),
@@ -434,22 +431,22 @@ trait ManageUtilities {
                 unset($context->type);
             }
 
-
             return $context;
         })->toArray();
 
         return $result;
     }
 
-    protected function addIndexWithsNestedData() : array
+    protected function addIndexWithsNestedData(): array
     {
         $withs = [];
 
         foreach ($this->getConfigFieldsByRoute('modules', []) as $key => $item) {
-            if(isset($item->type) && $item->type == 'formWrapper'){
-                foreach($item->elements as $element){
-                    if(isset($element->relation))
+            if (isset($item->type) && $item->type == 'formWrapper') {
+                foreach ($item->elements as $element) {
+                    if (isset($element->relation)) {
                         $withs[] = $element->relation;
+                    }
                 }
             }
         }

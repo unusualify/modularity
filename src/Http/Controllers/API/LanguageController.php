@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Lang;
 
 class LanguageController extends Controller
 {
@@ -20,6 +19,7 @@ class LanguageController extends Controller
 
     /**
      * Display a listing of the resource.
+     *
      * @return Renderable
      */
     public function index(Request $request)
@@ -27,9 +27,9 @@ class LanguageController extends Controller
         $cache_key = 'modularity-languages';
         $cache = Cache::store('file');
 
-        if($cache->has($cache_key) && false){
+        if ($cache->has($cache_key) && false) {
             return response($cache->get($cache_key))->header('Content-Type', 'application/json');
-        }else{
+        } else {
 
             // $languages = $this->translation->allLanguages();
 
@@ -50,14 +50,13 @@ class LanguageController extends Controller
             //         $translations[$name] = $original;
             //     }
 
-
             //     return array_merge_recursive_preserve($translations['group'], isset($translations['single']['single']) ?  $translations['single']['single'] : []);
             //     return trans()->get('*', [], $lang);
             // });
 
             $translations = app('translator')->getTranslations();
 
-            $cache->set($cache_key, json_encode($translations) , 600);
+            $cache->set($cache_key, json_encode($translations), 600);
 
             return response()->json($translations);
         }
@@ -66,18 +65,15 @@ class LanguageController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store()
-    {
-
-    }
+    public function store() {}
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -88,23 +84,17 @@ class LanguageController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(RoleRequest $request, $id)
-    {
-
-    }
+    public function update(RoleRequest $request, $id) {}
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-
-    }
+    public function destroy($id) {}
 }

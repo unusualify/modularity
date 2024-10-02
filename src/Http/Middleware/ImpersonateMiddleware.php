@@ -23,7 +23,6 @@ class ImpersonateMiddleware
      * Handles an incoming request.
      *
      * @param \Illuminate\Http\Request $request
-     * @param Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -32,27 +31,25 @@ class ImpersonateMiddleware
             $this->authFactory->guard('unusual_users')->onceUsingId($request->session()->get('impersonate'));
         }
 
-        view()->composer(unusualBaseKey()."::layouts.master", function ($view)
-        {
+        view()->composer(unusualBaseKey() . '::layouts.master', function ($view) {
             $userRepository = app()->make(\Modules\SystemUser\Repositories\UserRepository::class);
             $users = $userRepository->whereNot('id', 1)->get();
 
             $activeUser = null;
-            if(Auth::check()){
+            if (Auth::check()) {
                 $activeUser = Auth::user();
             }
 
             $impersonation = [
                 'active' => $activeUser ? $activeUser->isSuperAdmin() || $activeUser->isImpersonating() : false,
-                'users' =>  $users,
-                'impersonated' => $activeUser ?  $activeUser->isImpersonating() : false,
+                'users' => $users,
+                'impersonated' => $activeUser ? $activeUser->isImpersonating() : false,
                 'stopRoute' => route(Route::hasAdmin('impersonate.stop')),
-                'route' => route(Route::hasAdmin('impersonate'), ['id' => ':id'])
+                'route' => route(Route::hasAdmin('impersonate'), ['id' => ':id']),
             ];
             // setActiveMenuItem($configuration['sidebar'], $configuration['current_url']);
             $view->with('impersonation', $impersonation);
         });
-
 
         return $next($request);
     }

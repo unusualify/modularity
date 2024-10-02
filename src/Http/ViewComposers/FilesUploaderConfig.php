@@ -25,11 +25,6 @@ class FilesUploaderConfig
      */
     protected $sessionStore;
 
-    /**
-     * @param UrlGenerator $urlGenerator
-     * @param Config $config
-     * @param SessionStore $sessionStore
-     */
     public function __construct(UrlGenerator $urlGenerator, Config $config, SessionStore $sessionStore)
     {
         $this->urlGenerator = $urlGenerator;
@@ -40,7 +35,6 @@ class FilesUploaderConfig
     /**
      * Binds data to the view.
      *
-     * @param View $view
      * @return void
      */
     public function compose(View $view)

@@ -46,7 +46,7 @@ class PintCommand extends BaseCommand
 
         $path = config('modules.paths.modules');
 
-        if( $this->option('self') ){
+        if ($this->option('self')) {
             $path = unusualConfig('vendor_path');
 
             $path .= " --config {$path}/pint.json";
@@ -67,7 +67,7 @@ class PintCommand extends BaseCommand
             $command .= ' --repair';
         }
         // Run the command and log output
-        $this->info('Pint '.$path.'...');
+        $this->info('Pint ' . $path . '...');
 
         // $exitCode = shell_exec($command);
         exec($command, $output, $exitCode);

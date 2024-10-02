@@ -3,13 +3,10 @@
 namespace Unusualify\Modularity\Console;
 
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Process;
-
 
 class BuildCommand extends BaseCommand
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -30,16 +27,13 @@ class BuildCommand extends BaseCommand
      *
      * @var string
      */
-    protected $description = "Build the Modularity assets with custom Vue components";
+    protected $description = 'Build the Modularity assets with custom Vue components';
 
     /**
      * @var Filesystem
      */
     protected $filesystem;
 
-    /**
-     * @param Filesystem $filesystem
-     */
     public function __construct(Filesystem $filesystem)
     {
         parent::__construct();
@@ -52,23 +46,25 @@ class BuildCommand extends BaseCommand
      *
      * @return mixed
      */
-    public function handle() :int
+    public function handle(): int
     {
-        if ($this->option("copyOnly")) {
+        if ($this->option('copyOnly')) {
             return $this->copyCustoms();
         }
 
-        if ($this->option("copyTheme")) {
+        if ($this->option('copyTheme')) {
             $theme = $this->option('theme');
+
             return $theme ? $this->copyTheme($theme) : 1;
         }
 
-        if ($this->option("copyThemeScript")) {
+        if ($this->option('copyThemeScript')) {
             $theme = $this->option('theme');
+
             return $theme ? $this->copyThemeScript($theme) : 1;
         }
 
-        if ($this->option("copyComponents")) {
+        if ($this->option('copyComponents')) {
             return $this->copyVueComponents();
         }
 
@@ -81,11 +77,11 @@ class BuildCommand extends BaseCommand
     private function fullBuild()
     {
         $progressBar = $this->output->createProgressBar(4);
-        $progressBar->setFormat("%current%/%max% [%bar%] %message%");
+        $progressBar->setFormat('%current%/%max% [%bar%] %message%');
         // dd( $this->option('noInstall') );
-        $npmInstall = !$this->option('noInstall');
+        $npmInstall = ! $this->option('noInstall');
 
-        $progressBar->setMessage(($npmInstall ? "Installing" : "Reusing") . " npm dependencies...\n\n");
+        $progressBar->setMessage(($npmInstall ? 'Installing' : 'Reusing') . " npm dependencies...\n\n");
 
         $progressBar->start();
 
@@ -95,7 +91,7 @@ class BuildCommand extends BaseCommand
             sleep(1);
         }
 
-        if(!file_exists(resource_path( unusualConfig('custom_components_resource_path', 'vendor/modularity/js/components') ))){
+        if (! file_exists(resource_path(unusualConfig('custom_components_resource_path', 'vendor/modularity/js/components')))) {
             $this->call('vendor:publish', [
                 '--provider' => 'Unusualify\Modularity\LaravelServiceProvider',
                 '--tag' => 'custom-components',
@@ -103,15 +99,14 @@ class BuildCommand extends BaseCommand
             ]);
         }
 
-        if(!file_exists(resource_path('vendor/modularity/js/entries'))){
+        if (! file_exists(resource_path('vendor/modularity/js/entries'))) {
             $this->filesystem->makeDirectory(resource_path('vendor/modularity/js/entries'));
         }
 
-        if(!file_exists(resource_path('vendor/modularity/themes'))){
+        if (! file_exists(resource_path('vendor/modularity/themes'))) {
             $this->filesystem->makeDirectory(resource_path('vendor/modularity/themes'));
             $this->filesystem->put(resource_path('vendor/modularity/themes/.keep'), '');
         }
-
 
         $this->info('');
         $progressBar->setMessage("Copying custom components...\n\n");
@@ -136,7 +131,6 @@ class BuildCommand extends BaseCommand
         } elseif ($this->option('watch')) {
             // $this->startWatcher( $resource_path, 'php artisan unusual:build --copyOnly');
             $this->startWatchers();
-
 
             $this->runVueProcess(['npm', 'run', 'watch'], true);
         } else {
@@ -176,7 +170,7 @@ class BuildCommand extends BaseCommand
         }
 
         $chokidarPath = base_path($this->baseConfig('vendor_path') . '/vue') . '/node_modules/.bin/chokidar';
-        $chokidarCommand = [$chokidarPath, $pattern, "-c", $command];
+        $chokidarCommand = [$chokidarPath, $pattern, '-c', $command];
 
         if ($this->filesystem->exists($chokidarPath)) {
             $process = new Process($chokidarCommand, base_path());
@@ -185,7 +179,7 @@ class BuildCommand extends BaseCommand
 
             try {
                 $process->start();
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 $this->warn("Could not start the chokidar watcher ({$e->getMessage()})\n");
             }
         } else {
@@ -199,18 +193,18 @@ class BuildCommand extends BaseCommand
     private function startWatchers()
     {
         $resource_path = resource_path('vendor/modularity/js/components/*.vue');
-        $this->startWatcher( $resource_path, 'php artisan unusual:build --copyComponents');
+        $this->startWatcher($resource_path, 'php artisan unusual:build --copyComponents');
 
         $builtinThemes = builtInModularityThemes();
         $customThemes = customModularityThemes();
         $theme = env('VUE_APP_THEME', 'unusual');
 
-        if(!array_key_exists($theme, $builtinThemes->toArray()) && array_key_exists($theme, $customThemes->toArray())){
+        if (! array_key_exists($theme, $builtinThemes->toArray()) && array_key_exists($theme, $customThemes->toArray())) {
             $path = resource_path('vendor/modularity/themes/' . $theme . '/sass/*');
-            $this->startWatcher( $path, "php artisan unusual:build --copyTheme --theme='{$theme}'");
+            $this->startWatcher($path, "php artisan unusual:build --copyTheme --theme='{$theme}'");
 
             $path = resource_path('vendor/modularity/themes/' . "$theme/$theme.js");
-            $this->startWatcher( $path, "php artisan unusual:build --copyThemeScript --theme='{$theme}'");
+            $this->startWatcher($path, "php artisan unusual:build --copyThemeScript --theme='{$theme}'");
         }
 
     }
@@ -220,7 +214,7 @@ class BuildCommand extends BaseCommand
      */
     private function runVueProcess(array $command, $disableTimeout = false)
     {
-        $process = new Process($command, base_path($this->baseConfig('vendor_path')) . '/vue' );
+        $process = new Process($command, base_path($this->baseConfig('vendor_path')) . '/vue');
         $process->setTty(Process::isTtySupported());
 
         if ($disableTimeout) {
@@ -243,11 +237,10 @@ class BuildCommand extends BaseCommand
         $customThemes = customModularityThemes();
         $theme = env('VUE_APP_THEME', 'unusual');
 
-        if(array_key_exists($theme, $customThemes->toArray())){
+        if (array_key_exists($theme, $customThemes->toArray())) {
             $this->copyTheme($theme);
             $this->copyThemeScript($theme);
         }
-
 
         return 1;
     }
@@ -257,14 +250,14 @@ class BuildCommand extends BaseCommand
      */
     private function copyVueComponents()
     {
-        $this->info("Copying custom components...");
+        $this->info('Copying custom components...');
 
         $localCustomComponentsPath = resource_path(unusualConfig('custom_components_resource_path', 'vendor/modularity/js/components'));
         $vueCustomComponentsPath = base_path(unusualConfig('vendor_path')) . '/vue/src/js/components/customs';
 
         $this->copyDirectory($localCustomComponentsPath, $vueCustomComponentsPath, clean: true);
 
-        $this->info("Done.");
+        $this->info('Done.');
 
         return 1;
         // if (!$this->filesystem->exists($unusualCustomComponentsPath)) {
@@ -284,14 +277,14 @@ class BuildCommand extends BaseCommand
      */
     private function copyTheme($theme)
     {
-        $this->info("Copying custom theme files...");
+        $this->info('Copying custom theme files...');
 
-        $sources = resource_path('vendor/modularity/themes/' . $theme . '/sass' );
-        $targetPath = base_path(unusualConfig('vendor_path')) . '/vue/src/sass/themes/customs/' . $theme ;
+        $sources = resource_path('vendor/modularity/themes/' . $theme . '/sass');
+        $targetPath = base_path(unusualConfig('vendor_path')) . '/vue/src/sass/themes/customs/' . $theme;
 
         $this->copyDirectory($sources, $targetPath);
 
-        $this->info("Done.");
+        $this->info('Done.');
 
         return 1;
     }
@@ -301,29 +294,28 @@ class BuildCommand extends BaseCommand
      */
     private function copyThemeScript($theme)
     {
-        $this->info("Copying custom theme script...");
+        $this->info('Copying custom theme script...');
 
-        $source = resource_path('vendor/modularity/themes/' . "{$theme}/{$theme}.js" );
+        $source = resource_path('vendor/modularity/themes/' . "{$theme}/{$theme}.js");
         $targetPath = base_path(unusualConfig('vendor_path')) . '/vue/src/js/config/themes/customs/' . $theme . '.js';
 
         $this->copyFile($source, $targetPath);
 
-        $this->info("Done.");
+        $this->info('Done.');
 
         return 1;
     }
 
     private function copyDirectory($files, $target, $clean = false)
     {
-        if (!$this->filesystem->exists($target)) {
+        if (! $this->filesystem->exists($target)) {
             $this->filesystem->makeDirectory($target, 0755, true);
         }
 
-        if($clean){
+        if ($clean) {
             $this->filesystem->cleanDirectory($target);
             $this->filesystem->put($target . '/.keep', '');
         }
-
 
         if ($this->filesystem->exists($files)) {
             $this->filesystem->copyDirectory($files, $target);
@@ -341,11 +333,8 @@ class BuildCommand extends BaseCommand
         //     $this->filesystem->put($target . '/.keep', '');
         // }
 
-
         if ($this->filesystem->exists($file)) {
             $this->filesystem->copy($file, $target);
         }
     }
-
-
 }

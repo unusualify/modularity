@@ -2,35 +2,35 @@
 
 namespace Unusualify\Modularity\Providers;
 
+use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Support\ServiceProvider as Provider;
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Foundation\CachesConfiguration;
-
 
 class ServiceProvider extends Provider
 {
     /**
-     * @var string $moduleName
+     * @var string
      */
     protected $baseName;
 
     /**
-     * @var string $moduleNameLower
+     * @var string
      */
     protected $baseKey;
 
     /**
      * Namespace of the terminal commands
+     *
      * @var string
      */
-    protected $terminalNamespace = "Unusualify\\Modularity\\Console";
+    protected $terminalNamespace = 'Unusualify\\Modularity\\Console';
 
-    protected $viewSourcePath = __DIR__ .  '/../../resources/views';
+    protected $viewSourcePath = __DIR__ . '/../../resources/views';
 
     /**
      * Create a new service provider instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param \Illuminate\Contracts\Foundation\Application $app
      * @return void
      */
     public function __construct($app)
@@ -43,12 +43,10 @@ class ServiceProvider extends Provider
     }
 
     /**
-     *
-     *
      * Merge the given configuration with the existing configuration.
      *
-     * @param  string  $path
-     * @param  string  $key
+     * @param string $path
+     * @param string $key
      * @return void
      */
     protected function mergeConfigFrom($path, $key)
@@ -81,6 +79,7 @@ class ServiceProvider extends Provider
                 $paths[] = $path . '/modules/' . $this->baseKey;
             }
         }
+
         return $paths;
     }
 }

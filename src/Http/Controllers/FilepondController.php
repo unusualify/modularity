@@ -15,13 +15,12 @@ class FilepondController extends Controller
         $this->filepondManager = $fpm;
     }
 
-
     public function upload(Request $request)
     {
         return $this->filepondManager->createTemporaryFilepond($request);
+
         return response($this->filepondManager->createTemporaryFilepond($request));
     }
-
 
     public function revert(Request $request)
     {
@@ -33,6 +32,4 @@ class FilepondController extends Controller
         // dd($folder);
         return $this->filepondManager->previewFile($folder);
     }
-
-
 }

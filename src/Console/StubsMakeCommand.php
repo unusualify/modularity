@@ -2,16 +2,10 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\File;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
-
 use Nwidart\Modules\Support\Stub;
-use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Generators\RouteGenerator;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Generators\StubsGenerator;
-use Unusualify\Modularity\Traits\ReplacementTrait;
 
 class StubsMakeCommand extends BaseCommand
 {
@@ -42,13 +36,13 @@ class StubsMakeCommand extends BaseCommand
     {
         parent::__construct();
 
-        Stub::setBasePath(dirname(__FILE__).'/stubs');
+        Stub::setBasePath(dirname(__FILE__) . '/stubs');
     }
 
     /**
      * Execute the console command.
      */
-    public function handle() : int
+    public function handle(): int
     {
         $module = $this->argument('module');
         $route = $this->argument('route');
@@ -63,7 +57,7 @@ class StubsMakeCommand extends BaseCommand
             ->setModule($module)
             ->setFix($this->option('fix'))
             ->setOnly($this->option('only') ? explode(',', $this->option('only')) : [])
-            ->setExcept($this->option('except') ?  explode(',', $this->option('except')) : [])
+            ->setExcept($this->option('except') ? explode(',', $this->option('except')) : [])
             ->generate();
 
         if ($code === E_ERROR) {
@@ -97,7 +91,7 @@ class StubsMakeCommand extends BaseCommand
             ['only', null, InputOption::VALUE_OPTIONAL, 'get only stubs'],
             ['except', null, InputOption::VALUE_OPTIONAL, 'get except stubs'],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
-            ['fix', null, InputOption::VALUE_NONE, 'Fixes the model config errors']
+            ['fix', null, InputOption::VALUE_NONE, 'Fixes the model config errors'],
         ];
     }
 }

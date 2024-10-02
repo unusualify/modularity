@@ -14,13 +14,8 @@ use Illuminate\Support\Facades\Route;
 | Now create something great!
 |
 */
-Route::middleware(['web.auth', 'unusual.core'])->group(function(){
+Route::middleware(['web.auth', 'unusual.core'])->group(function () {
 
-    Route::middleware(('unusual.panel'))->group(function(){
-
-    });
+    Route::middleware(('unusual.panel'))->group(function () {});
 
 });
-
-
-

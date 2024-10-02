@@ -9,12 +9,10 @@ use Modules\SystemPayment\Repositories\PaymentCurrencyRepository;
 
 class PaymentCurrencyController extends Controller
 {
-
     /**
      * This resource repository
      */
     private $repository;
-
 
     /**
      * @param CurrencyRepository $repository
@@ -24,20 +22,16 @@ class PaymentCurrencyController extends Controller
         $this->repository = $repository;
     }
 
-
     /**
      * Display a listing of the resource.
+     *
      * @return Renderable
      */
-    public function index(Request $request)
-    {
-
-    }
-
+    public function index(Request $request) {}
 
     /**
      * Store a newly created resource in storage.
-     * @param Request $request
+     *
      * @return Renderable
      */
     public function store(Request $request)
@@ -45,21 +39,17 @@ class PaymentCurrencyController extends Controller
         //
     }
 
-
     /**
      * Show the specified resource.
+     *
      * @param int $id
      * @return Renderable
      */
-    public function show($id)
-    {
-
-    }
-
+    public function show($id) {}
 
     /**
      * Update the specified resource in storage.
-     * @param Request $request
+     *
      * @param int $id
      * @return Renderable
      */
@@ -70,6 +60,7 @@ class PaymentCurrencyController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
      * @param int $id
      * @return Renderable
      */

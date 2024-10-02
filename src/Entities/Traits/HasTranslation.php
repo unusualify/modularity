@@ -2,10 +2,10 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
-use Unusualify\Modularity\Facades\TwillCapsules;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
+use Unusualify\Modularity\Facades\TwillCapsules;
 
 trait HasTranslation
 {
@@ -35,6 +35,7 @@ trait HasTranslation
 
             get_class($this)
         );
+
         return TwillCapsules::getCapsuleForModel(class_basename($this))->getTranslationModel();
     }
 
@@ -86,12 +87,12 @@ trait HasTranslation
         return $query
             ->join($translationTable, function (JoinClause $join) use ($translationTable, $localeKey, $table, $keyName) {
                 $join
-                    ->on($translationTable.'.'.$this->getTranslationRelationKey(), '=', $table.'.'.$keyName)
-                    ->where($translationTable.'.'.$localeKey, $this->locale());
+                    ->on($translationTable . '.' . $this->getTranslationRelationKey(), '=', $table . '.' . $keyName)
+                    ->where($translationTable . '.' . $localeKey, $this->locale());
             })
-            ->where($translationTable.'.'.$this->getLocaleKey(), $locale)
-            ->orderBy($translationTable.'.'.$orderField, $orderType)
-            ->select($table.'.*')
+            ->where($translationTable . '.' . $this->getLocaleKey(), $locale)
+            ->orderBy($translationTable . '.' . $orderField, $orderType)
+            ->select($table . '.*')
             ->with('translations');
     }
 
@@ -108,7 +109,7 @@ trait HasTranslation
         $table = $this->getTable();
         $locale = $locale == null ? app()->getLocale() : $locale;
 
-        return $query->join("{$translationTable} as t", "t.{$this->getTranslationRelationKey()}", "=", "{$table}.id")
+        return $query->join("{$translationTable} as t", "t.{$this->getTranslationRelationKey()}", '=', "{$table}.id")
             ->where($this->getLocaleKey(), $locale)
             ->groupBy("{$table}.id")
             ->groupBy("t.{$groupByField}")
@@ -147,7 +148,7 @@ trait HasTranslation
             $translation = $this->translations->firstWhere('locale', $locale);
 
             return [
-                'shortlabel' => strtoupper($locale),
+                'shortlabel' => mb_strtoupper($locale),
                 'label' => getLabelFromLocale($locale),
                 'value' => $locale,
                 'published' => $translation->active ?? false,
@@ -168,8 +169,8 @@ trait HasTranslation
         });
     }
 
-    public function getTranslatedAttributes() {
+    public function getTranslatedAttributes()
+    {
         return $this->translatedAttributes ?? [];
     }
-
 }

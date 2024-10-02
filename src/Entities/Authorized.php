@@ -17,10 +17,8 @@ class Authorized extends Model
 
     /**
      * get the parent authorizedable model
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function authorizedable() : \Illuminate\Database\Eloquent\Relations\MorphTo
+    public function authorizedable(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
         return $this->morphTo();
     }
@@ -34,5 +32,4 @@ class Authorized extends Model
     {
         return unusualConfig('tables.authorizeds', 'modularity_authorizeds');
     }
-
 }

@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 class DefaultCurrencySeeder extends Seeder
 {
-    public function run(){
+    public function run()
+    {
         $table = config('priceable.tables.currencies');
 
         $seedArray = [
@@ -114,8 +115,7 @@ class DefaultCurrencySeeder extends Seeder
             ],
         ];
         $now = Carbon::now()->format('Y-m-d H:i:s');
-        $currencyTypes = array_map(fn($currencyType)=> $currencyType += ['created_at' =>$now], $seedArray);
+        $currencyTypes = array_map(fn ($currencyType) => $currencyType += ['created_at' => $now], $seedArray);
         DB::table($table)->insert($currencyTypes);
     }
-
 }

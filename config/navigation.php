@@ -68,8 +68,8 @@ return [
                     'profile' => [
                         'name' => 'Profile',
                         'route_name' => 'admin.profile',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'media_library' => [
                 'name' => 'Media Library',
@@ -85,6 +85,6 @@ return [
                 'route_name' => 'register.form',
             ],
         ],
-    ]
+    ],
 
 ];

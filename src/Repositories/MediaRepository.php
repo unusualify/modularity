@@ -2,20 +2,17 @@
 
 namespace Unusualify\Modularity\Repositories;
 
-use Unusualify\Modularity\Entities\Media;
-use Unusualify\Modularity\Repositories\Traits\TagsTrait;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
+use Unusualify\Modularity\Entities\Media;
 use Unusualify\Modularity\Repositories\Traits\AuthorizedTrait;
+use Unusualify\Modularity\Repositories\Traits\TagsTrait;
 use Unusualify\Modularity\Services\MediaLibrary\ImageService;
 
 class MediaRepository extends Repository
 {
-    use TagsTrait, AuthorizedTrait;
+    use AuthorizedTrait, TagsTrait;
 
-    /**
-     * @param Media $model
-     */
     public function __construct(Media $model)
     {
         $this->model = $model;
@@ -24,6 +21,7 @@ class MediaRepository extends Repository
     public function filter($query, array $scopes = [])
     {
         $this->searchIn($query, $scopes, 'search', ['alt_text', 'filename', 'caption']);
+
         return parent::filter($query, $scopes);
     }
 
@@ -42,7 +40,7 @@ class MediaRepository extends Repository
         }
 
         // if we were not able to determine dimensions with the browser File API, let's ask the Image service
-        if (!isset($fields['width']) || !isset($fields['height'])) {
+        if (! isset($fields['width']) || ! isset($fields['height'])) {
             $dimensions = ImageService::getDimensions($fields['uuid']);
             $fields['width'] = $dimensions['width'] ?? 0;
             $fields['height'] = $dimensions['height'] ?? 0;
@@ -50,5 +48,4 @@ class MediaRepository extends Repository
 
         return $fields;
     }
-
 }

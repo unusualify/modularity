@@ -2,10 +2,6 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
-use Unusualify\Modularity\Http\Requests\FileRequest;
-use Unusualify\Modularity\Services\Uploader\SignAzureUpload;
-use Unusualify\Modularity\Services\Uploader\SignS3Upload;
-use Unusualify\Modularity\Services\Uploader\SignUploadListener;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
@@ -14,6 +10,10 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Route;
+use Unusualify\Modularity\Http\Requests\FileRequest;
+use Unusualify\Modularity\Services\Uploader\SignAzureUpload;
+use Unusualify\Modularity\Services\Uploader\SignS3Upload;
+use Unusualify\Modularity\Services\Uploader\SignUploadListener;
 
 class FileLibraryController extends BaseController implements SignUploadListener
 {
@@ -76,7 +76,6 @@ class FileLibraryController extends BaseController implements SignUploadListener
 
     protected $setDefaultPermissions = false;
 
-
     public function __construct(
         Application $app,
         Request $request,
@@ -138,7 +137,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
             'tags' => $item->tags->map(function ($tag) {
                 return $tag->name;
             }),
-            'deleteUrl' => $item->canDeleteSafely() ? moduleRoute($this->moduleName, $routeNamePrefix .  $this->routePrefix, 'destroy', ['file' => $item->id]) : null,
+            'deleteUrl' => $item->canDeleteSafely() ? moduleRoute($this->moduleName, $routeNamePrefix . $this->routePrefix, 'destroy', ['file' => $item->id]) : null,
             'updateUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.file.single-update')),
             'updateBulkUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.file.bulk-update')),
             'deleteBulkUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.file.bulk-delete')),
@@ -168,6 +167,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
     /**
      * @param int|null $parentModuleId
      * @return JsonResponse
+     *
      * @throws BindingResolutionException
      */
     public function store($parentModuleId = null)
@@ -191,7 +191,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
     {
         $filename = $request->input('qqfilename');
 
-        $cleanFilename = preg_replace("/\s+/i", "-", $filename);
+        $cleanFilename = preg_replace("/\s+/i", '-', $filename);
 
         $fileDirectory = $request->input('unique_folder_name');
 
@@ -217,6 +217,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
             $file = $this->repository->whereId($id)->first();
             $this->repository->afterDelete($file);
             $file->update($fields);
+
             return $file->fresh();
         } else {
             return $this->repository->create($fields);
@@ -238,6 +239,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
             $file = $this->repository->whereId($id)->first();
             $this->repository->afterDelete($file);
             $file->update($fields);
+
             return $file->fresh();
         } else {
             return $this->repository->create($fields);
@@ -283,8 +285,6 @@ class FileLibraryController extends BaseController implements SignUploadListener
     }
 
     /**
-     * @param Request $request
-     * @param SignS3Upload $signS3Upload
      * @return mixed
      */
     public function signS3Upload(Request $request, SignS3Upload $signS3Upload)
@@ -293,8 +293,6 @@ class FileLibraryController extends BaseController implements SignUploadListener
     }
 
     /**
-     * @param Request $request
-     * @param SignAzureUpload $signAzureUpload
      * @return mixed
      */
     public function signAzureUpload(Request $request, SignAzureUpload $signAzureUpload)
@@ -303,7 +301,6 @@ class FileLibraryController extends BaseController implements SignUploadListener
     }
 
     /**
-     * @param $signature
      * @param bool $isJsonResponse
      * @return mixed
      */
@@ -319,7 +316,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
      */
     public function uploadIsNotValid()
     {
-        return $this->responseFactory->json(["invalid" => true], 500);
+        return $this->responseFactory->json(['invalid' => true], 500);
     }
 
     /**

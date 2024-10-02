@@ -2,21 +2,13 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Exception;
-use Illuminate\Support\Facades\Config;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
-
-use Illuminate\Support\Str;
-
-// use Illuminate\Console\Command as Console;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
-use Unusualify\Modularity\Module;
+use Illuminate\Support\Str;
+use Symfony\Component\Console\Input\InputArgument;
+// use Illuminate\Console\Command as Console;
+use Symfony\Component\Console\Input\InputOption;
 
-use function Laravel\Prompts\{text, select, confirm, warning};
-
+use function Laravel\Prompts\text;
 
 class CreateLaravelTestCommand extends BaseCommand
 {
@@ -34,7 +26,6 @@ class CreateLaravelTestCommand extends BaseCommand
      *
      * @var string
      */
-
     protected $signature = 'unusual:create:test:laravel {module} {test} {--unit}';
 
     /**
@@ -53,7 +44,7 @@ class CreateLaravelTestCommand extends BaseCommand
      */
     protected $console;
 
-    public function handle() : int
+    public function handle(): int
     {
 
         $success = true;
@@ -62,13 +53,15 @@ class CreateLaravelTestCommand extends BaseCommand
 
         $test_type = $this->argument('type') ? $this->getSnakeCase($this->argument('type')) : '';
 
-        if (!$test_name)
+        if (! $test_name) {
             $test_name = $this->getStudlyName(text('What is the test name?'));
+        }
 
         $testGenerator = $this->laravel->make('Unusualify\Modularity\Generators\LaravelTestGenerator', ['name' => $test_name]);
 
         return 0;
     }
+
     /**
      * Get the console command arguments.
      *
@@ -80,6 +73,7 @@ class CreateLaravelTestCommand extends BaseCommand
             ['module', InputArgument::REQUIRED, 'The name of the module.'],
         ];
     }
+
     /**
      * Get the console command options.
      *
@@ -102,12 +96,9 @@ class CreateLaravelTestCommand extends BaseCommand
     }
 
     /**
-     *
      * Get head string of path for namespace
-     *
-     * @return string
      */
-    public function getDefaultNamespace() : string
+    public function getDefaultNamespace(): string
     {
         // dd($this->baseConfig('paths.generator.controller-api.namespace'), $this->baseConfig('paths.generator.controller-api.path', 'Https\Controllers\API'));
         return $this->baseConfig('paths.generator.route-request.namespace') ?:
@@ -133,11 +124,12 @@ class CreateLaravelTestCommand extends BaseCommand
             return true;
         }
 
-        if ( !$this->isAskable() )
+        if (! $this->isAskable()) {
             return false;
+        }
 
-        $questions = Collection::make($this->baseConfig('traits'))->mapWithKeys(function($object, $key){
-            return [ $key => $object['question']];
+        $questions = Collection::make($this->baseConfig('traits'))->mapWithKeys(function ($object, $key) {
+            return [$key => $object['question']];
         })->toArray();
 
         $defaultAnswers = [
@@ -145,10 +137,10 @@ class CreateLaravelTestCommand extends BaseCommand
         ];
 
         $currentDefaultAnswer = $this->defaultReject ? 0 : ($defaultAnswers[$option] ?? 1);
+
         // dd(
         //     $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer)
         // );
-        return 'yes' === $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer);
+        return $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer) === 'yes';
     }
-
 }

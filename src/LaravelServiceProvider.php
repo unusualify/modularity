@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Unusualify\Modularity;
-
 
 use Illuminate\Support\ServiceProvider;
 
@@ -26,10 +24,7 @@ final class LaravelServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
-    {
-
-    }
+    public function register() {}
 
     private function publishAssets(): void
     {
@@ -45,7 +40,7 @@ final class LaravelServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__ . '/../config/publishes/publish.php' => config_path(unusualBaseKey() . '.php'),
-            __DIR__ . '/../config/publishes/navigation-publish.php' => config_path( unusualBaseKey() . '-navigation.php'),
+            __DIR__ . '/../config/publishes/navigation-publish.php' => config_path(unusualBaseKey() . '-navigation.php'),
             __DIR__ . '/../config/publishes/translatable.php' => config_path('translatable.php'),
             __DIR__ . '/../config/publishes/translation.php' => config_path('translation.php'),
             __DIR__ . '/../config/publishes/one-time-operations.php' => config_path('one-time-operations.php'),
@@ -62,18 +57,18 @@ final class LaravelServiceProvider extends ServiceProvider
     private function publishViews(): void
     {
         $this->publishes([
-            __DIR__ . '/../resources/views/vendor/translation' => resource_path('views/vendor/translation')
+            __DIR__ . '/../resources/views/vendor/translation' => resource_path('views/vendor/translation'),
         ], 'views');
 
         $this->publishes([
-            __DIR__ . '/../vue/dist/modularity/assets/icons' => resource_path('views/vendor/modularity/partials/icons')
+            __DIR__ . '/../vue/dist/modularity/assets/icons' => resource_path('views/vendor/modularity/partials/icons'),
         ], 'assets');
     }
 
     private function publishResources(): void
     {
         $this->publishes([
-            __DIR__ . '/../vue/drafts/components' => resource_path(unusualConfig('custom_components_resource_path', 'vendor/modularity/js/components'))
+            __DIR__ . '/../vue/drafts/components' => resource_path(unusualConfig('custom_components_resource_path', 'vendor/modularity/js/components')),
         ], 'custom-components');
     }
 
@@ -83,5 +78,4 @@ final class LaravelServiceProvider extends ServiceProvider
             __DIR__ . '/../lang' => base_path('lang'),
         ], 'lang');
     }
-
 }

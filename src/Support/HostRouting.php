@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Support;
 
 use BadMethodCallException;
 use Illuminate\Foundation\Application;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
@@ -30,21 +29,20 @@ class HostRouting
         protected string $baseHostName,
         public $hostableClasses = [],
         $options = [],
-    )
-    {
+    ) {
         $this->setOptions($options);
 
         $this->setHostModel();
     }
 
-    public function getBaseHostName() : string
+    public function getBaseHostName(): string
     {
         return $this->baseHostName;
     }
 
     public function setOptions($options = [])
     {
-        if(isset($options['model'])){
+        if (isset($options['model'])) {
             $this->model($options['model']);
         }
 
@@ -54,14 +52,14 @@ class HostRouting
         $prefixes = [];
         $middleware = [];
 
-        if($model){
+        if ($model) {
             $groupOptions['domain'] = $model->url;
 
             $prefixes = $model->hostableChildRouteParameters();
-        }else{
+        } else {
             $groupOptions['domain'] = $this->getBaseHostName();
 
-            $prefixes = array_map(function($class) {
+            $prefixes = array_map(function ($class) {
                 return $class::hostableRouteBindingParameter();
             }, $this->hostableClasses);
         }
@@ -70,7 +68,7 @@ class HostRouting
 
         $groupOptions['middleware'] = ['hostable'];
 
-        if(isset($options['middleware']) && ($middleware = $options['middleware'])){
+        if (isset($options['middleware']) && ($middleware = $options['middleware'])) {
             unset($options['middleware']);
 
             $groupOptions['middleware'] = array_merge($groupOptions['middleware'], Arr::except($middleware, ['hostable']));
@@ -91,7 +89,7 @@ class HostRouting
     public function setHostModel()
     {
         $this->hostClass = $this->combineHostModels()
-            ->where(fn($hostable) => $hostable->url == $this->app['request']->getHost())
+            ->where(fn ($hostable) => $hostable->url == $this->app['request']->getHost())
             ->first();
 
         return $this;
@@ -104,9 +102,9 @@ class HostRouting
 
     public function setModel(array|string $model)
     {
-        if(is_string($model)){
+        if (is_string($model)) {
             $this->hostableClasses = [$model];
-        }else{
+        } else {
             $this->hostableClasses = $model;
         }
 
@@ -117,19 +115,19 @@ class HostRouting
 
     public function group(callable $callback)
     {
-        Route::group($this->getOptions(), function () use($callback){
+        Route::group($this->getOptions(), function () use ($callback) {
             $callback();
         });
     }
 
-    public function combineHostModels() : Collection
+    public function combineHostModels(): Collection
     {
 
-        if(!$this->classesIsHostable()){
+        if (! $this->classesIsHostable()) {
             return Collection::make([]);
         }
 
-        return array_reduce($this->hostableClasses, function($carry, $class){
+        return array_reduce($this->hostableClasses, function ($carry, $class) {
             $carry = $carry->merge($class::hostables());
 
             return $carry;
@@ -149,16 +147,16 @@ class HostRouting
     }
 
     public function __call($method, $args)
-	{
-		if ($method == 'options') {
-			return $this->setOptions(...$args);
-		}
+    {
+        if ($method == 'options') {
+            return $this->setOptions(...$args);
+        }
 
         if ($method == 'model') {
-			return $this->setModel(...$args);
-		}
+            return $this->setModel(...$args);
+        }
 
-        if (!in_array($method, get_class_methods($this))) {
+        if (! in_array($method, get_class_methods($this))) {
             throw new BadMethodCallException(sprintf(
                 'Call to undefined method %s->%s()', static::class, $method
             ));
@@ -170,15 +168,16 @@ class HostRouting
         $isHostable = true;
 
         foreach ($this->hostableClasses as $key => $model) {
-            if(!Schema::hasTable(App::make($model)->getTable())){
+            if (! Schema::hasTable(App::make($model)->getTable())) {
                 $isHostable = false;
+
                 break;
             }
         }
 
         return $isHostable;
 
-        return Collection::make($this->hostableClasses)->reduce(function($carry, $item){
+        return Collection::make($this->hostableClasses)->reduce(function ($carry, $item) {
             dd($item);
         }, Collection::make());
     }

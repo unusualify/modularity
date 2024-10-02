@@ -33,10 +33,15 @@ abstract class AbstractParamsProcessor
     ];
 
     protected $params;
+
     protected $width;
+
     protected $height;
+
     protected $format;
+
     protected $quality;
+
     protected $fit;
 
     /**

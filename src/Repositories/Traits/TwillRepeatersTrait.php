@@ -2,12 +2,12 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
-use Unusualify\Modularity\Facades\TwillBlocks;
-use Unusualify\Modularity\Facades\TwillUtil;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Facades\TwillBlocks;
+use Unusualify\Modularity\Facades\TwillUtil;
 
 trait TwillRepeatersTrait
 {
@@ -158,7 +158,7 @@ trait TwillRepeatersTrait
         }
 
         foreach ($object->$relation()->pluck('id') as $id) {
-            if (!in_array($id, $currentIdList)) {
+            if (! in_array($id, $currentIdList)) {
                 $relationRepository->updateBasic(null, [
                     'deleted_at' => Carbon::now(),
                 ], [
@@ -418,9 +418,6 @@ trait TwillRepeatersTrait
 
     /**
      * Guess the relation name (shoud be lower camel case, ex. userGroup, contactOffice).
-     *
-     * @param string $repeaterName
-     * @return string
      */
     protected function inferRelationFromRepeaterName(string $repeaterName): string
     {
@@ -429,9 +426,6 @@ trait TwillRepeatersTrait
 
     /**
      * Guess the model name (should be singular upper camel case, ex. User, ArticleType).
-     *
-     * @param string $repeaterName
-     * @return string
      */
     protected function inferModelFromRepeaterName(string $repeaterName): string
     {

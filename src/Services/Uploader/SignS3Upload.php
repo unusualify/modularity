@@ -15,9 +15,6 @@ class SignS3Upload
      */
     protected $config;
 
-    /**
-     * @param Config $config
-     */
     public function __construct(Config $config)
     {
         $this->config = $config;
@@ -46,10 +43,11 @@ class SignS3Upload
 
         if ($this->isValid($policyObject)) {
             $encodedPolicy = base64_encode($policyJson);
-            $signedPolicy = array(
+            $signedPolicy = [
                 'policy' => $encodedPolicy,
                 'signature' => $this->signV4Policy($policyObject, $encodedPolicy),
-            );
+            ];
+
             return $signedPolicy;
         }
 
@@ -59,15 +57,15 @@ class SignS3Upload
     private function isValid($policy)
     {
         $expectedMaxSize = null;
-        $conditions = $policy["conditions"];
+        $conditions = $policy['conditions'];
         $bucket = null;
         $parsedMaxSize = null;
 
-        for ($i = 0; $i < count($conditions); ++$i) {
+        for ($i = 0; $i < count($conditions); $i++) {
             $condition = $conditions[$i];
-            if (isset($condition["bucket"])) {
-                $bucket = $condition["bucket"];
-            } else if (isset($condition[0]) && $condition[0] == "content-length-range") {
+            if (isset($condition['bucket'])) {
+                $bucket = $condition['bucket'];
+            } elseif (isset($condition[0]) && $condition[0] == 'content-length-range') {
                 $parsedMaxSize = $condition[2];
             }
         }
@@ -77,9 +75,9 @@ class SignS3Upload
 
     private function signV4Policy($policy, $encodedPolicy)
     {
-        foreach ($policy["conditions"] as $condition) {
-            if (isset($condition["x-amz-credential"])) {
-                $credentialCondition = $condition["x-amz-credential"];
+        foreach ($policy['conditions'] as $condition) {
+            if (isset($condition['x-amz-credential'])) {
+                $credentialCondition = $condition['x-amz-credential'];
             }
         }
 

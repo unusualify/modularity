@@ -2,8 +2,6 @@
 
 namespace Unusualify\Modularity\Hydrates\Inputs;
 
-use Illuminate\Support\Facades\Storage;
-
 class FilepondHydrate extends InputHydrate
 {
     /**
@@ -15,7 +13,7 @@ class FilepondHydrate extends InputHydrate
     public $requirements = [
         'default' => [],
         'accepted-file-types' => [ // Acceptable file types - however not working well for now
-            'image/*, file/*'
+            'image/*, file/*',
         ],
 
         // Multiple file upload functionalities
@@ -58,7 +56,7 @@ class FilepondHydrate extends InputHydrate
         $input['endPoints'] = [
             'process' => route('filepond.process'),
             'revert' => route('filepond.revert'), // for deleting temp files
-            'load' =>  str_replace(':id', '', route('filepond.preview', ['folder' => ':id']) ) ,
+            'load' => str_replace(':id', '', route('filepond.preview', ['folder' => ':id'])),
         ];
 
         // Custom Labels

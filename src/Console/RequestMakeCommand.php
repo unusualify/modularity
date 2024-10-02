@@ -2,15 +2,13 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Illuminate\Support\Facades\Config;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
-
-use Nwidart\Modules\Support\Stub;
 use Illuminate\Support\Str;
-use Unusualify\Modularity\Support\Decomposers\ValidatorParser;
 use Nwidart\Modules\Support\Config\GeneratorPath;
+use Nwidart\Modules\Support\Stub;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Support\Decomposers\ValidatorParser;
 
 class RequestMakeCommand extends BaseCommand
 {
@@ -40,7 +38,7 @@ class RequestMakeCommand extends BaseCommand
         parent::__construct();
     }
 
-    public function handle() : int
+    public function handle(): int
     {
 
         if (parent::handle() === E_ERROR) {
@@ -51,6 +49,7 @@ class RequestMakeCommand extends BaseCommand
 
         return 0;
     }
+
     /**
      * Get the console command arguments.
      *
@@ -63,6 +62,7 @@ class RequestMakeCommand extends BaseCommand
             ['request', InputArgument::REQUIRED, 'The name of the request class.'],
         ];
     }
+
     /**
      * Get the console command options.
      *
@@ -85,11 +85,11 @@ class RequestMakeCommand extends BaseCommand
         $module = Modularity::findOrFail($this->getModuleName());
 
         return (new Stub($this->getStubName(), [
-            'BASE_REQUEST_CLASS'    => $this->baseConfig('base_request'),
-            'BASE_REQUEST_NAME'     => get_class_short_name( $this->baseConfig('base_request') ),
-            'NAMESPACE'             => $this->getClassNamespace($module),
-            'CLASS'                 => $this->getClass()."Request",
-            'RULES'                 => $this->getRules(),
+            'BASE_REQUEST_CLASS' => $this->baseConfig('base_request'),
+            'BASE_REQUEST_NAME' => get_class_short_name($this->baseConfig('base_request')),
+            'NAMESPACE' => $this->getClassNamespace($module),
+            'CLASS' => $this->getClass() . 'Request',
+            'RULES' => $this->getRules(),
         ]))->render();
 
     }
@@ -101,7 +101,7 @@ class RequestMakeCommand extends BaseCommand
     {
         $path = Modularity::getModulePath($this->getModuleName());
 
-        $prePath = new GeneratorPath( $this->baseConfig('paths.generator.route-request') );
+        $prePath = new GeneratorPath($this->baseConfig('paths.generator.route-request'));
 
         // dd($prePath, $path . $prePath->getPath() . '/' . $this->getFileName() . 'Request.php' );
 
@@ -120,12 +120,9 @@ class RequestMakeCommand extends BaseCommand
     }
 
     /**
-     *
      * Get head string of path for namespace
-     *
-     * @return string
      */
-    public function getDefaultNamespace() : string
+    public function getDefaultNamespace(): string
     {
         // dd($this->baseConfig('paths.generator.controller-api.namespace'), $this->baseConfig('paths.generator.controller-api.path', 'Https\Controllers\API'));
         return $this->baseConfig('paths.generator.route-request.namespace') ?:
@@ -140,14 +137,8 @@ class RequestMakeCommand extends BaseCommand
         return Str::studly($this->argument('request'));
     }
 
-
-    /**
-     * @return string
-     */
     protected function getStubName(): string
     {
         return '/route-request.stub';
     }
-
-
 }

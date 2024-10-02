@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\UFinder;
-use Unusualify\Modularity\Traits\{MakesResponses, ManageScopes};
-
+use Unusualify\Modularity\Traits\MakesResponses;
+use Unusualify\Modularity\Traits\ManageScopes;
 
 abstract class PanelController extends CoreController
 {
@@ -44,14 +44,14 @@ abstract class PanelController extends CoreController
     /**
      * integer if route is nested, or null
      *
-     * @var integer
+     * @var int
      */
     protected $isNested;
 
     /**
      * integer if route is nested, nestedParentId
      *
-     * @var integer
+     * @var int
      */
     protected $nestedParentId;
 
@@ -142,7 +142,6 @@ abstract class PanelController extends CoreController
      */
     protected $formSchema;
 
-
     /**
      * List of permissions keyed by a request field. Can be used to prevent unauthorized field updates.
      *
@@ -213,8 +212,7 @@ abstract class PanelController extends CoreController
     public function __construct(
         Application $app,
         Request $request
-    )
-    {
+    ) {
         // if (unusualConfig('bind_exception_handler', true)) {
         //     App::singleton(ExceptionHandler::class, ModularityHandler::class);
         // }
@@ -251,7 +249,7 @@ abstract class PanelController extends CoreController
          */
         $this->applyFiltersDefaultOptions();
 
-        $this->fixedFilters = array_merge( (array) $this->getConfigFieldsByRoute('filters.fixed', []), $this->fixedFilters ?? []);
+        $this->fixedFilters = array_merge((array) $this->getConfigFieldsByRoute('filters.fixed', []), $this->fixedFilters ?? []);
 
         $this->addWiths();
 
@@ -271,13 +269,14 @@ abstract class PanelController extends CoreController
     {
         if (($key = array_search($middleware, Arr::pluck($this->middleware, 'middleware'))) !== false) {
             $order = false;
-            foreach($this->middleware as $i => $array){
-                if($array['middleware'] == $middleware){
+            foreach ($this->middleware as $i => $array) {
+                if ($array['middleware'] == $middleware) {
                     $order = $i;
+
                     break;
                 }
             }
-            if($order !== false){
+            if ($order !== false) {
                 unset($this->middleware[$order]);
             }
             // unset($this->middleware[$key]);
@@ -286,7 +285,7 @@ abstract class PanelController extends CoreController
 
     protected function permissionPrefix($permission = '')
     {
-        return $this->getKebabCase($this->routeName) . ($permission != '' ? "_{$permission}" : '') ;
+        return $this->getKebabCase($this->routeName) . ($permission != '' ? "_{$permission}" : '');
     }
 
     protected function setMiddlewarePermission()
@@ -301,7 +300,7 @@ abstract class PanelController extends CoreController
         // }
 
         // dd(Permission::ACCESS->value, $name);
-        if($this->isGateable() && $this->setDefaultPermissions){
+        if ($this->isGateable() && $this->setDefaultPermissions) {
             $this->middleware("can:{$this->permissionPrefix(Permission::VIEW->value)}", ['only' => ['index', 'show']]);
             $this->middleware("can:{$this->permissionPrefix(Permission::CREATE->value)}", ['only' => ['create', 'store']]);
             $this->middleware("can:{$this->permissionPrefix(Permission::EDIT->value)}", ['only' => ['edit', 'update']]);
@@ -331,7 +330,7 @@ abstract class PanelController extends CoreController
 
         $parentParams = array_diff_key($params, array_flip([snakeCase($this->routeName)]));
 
-        if(count($parentParams)){
+        if (count($parentParams)) {
             $nestedParentName = array_key_last($parentParams); // snakecase;
             $nestedParentId = last($parentParams);
             $nestedParentModel = UFinder::getRouteModel($nestedParentName)::find($nestedParentId);
@@ -351,7 +350,6 @@ abstract class PanelController extends CoreController
     }
 
     /**
-     * @param Request $request
      * @return string|int|null
      */
     protected function getParentModuleIdFromRequest(Request $request)
@@ -410,11 +408,9 @@ abstract class PanelController extends CoreController
                 'forceDelete' => $this->permissionPrefix(Permission::FORCEDELETE->value),
                 'duplicate' => $this->permissionPrefix(Permission::DUPLICATE->value),
 
-
-                /**
-                 * TODO #additionalRoutePermission
-                 *
-                 */
+            /**
+             * TODO #additionalRoutePermission
+             */
                 // 'duplicate' => $this->permissionPrefix(Permission::DUPLICATE->value),
 
                 // 'index' => 'access',
@@ -439,7 +435,6 @@ abstract class PanelController extends CoreController
 
             /**
              * TODO #guard
-             *
              */
             // dd(
             //     $authorizableOptions,
@@ -447,7 +442,7 @@ abstract class PanelController extends CoreController
             //     Auth::guard('unusual_users')->user(),
             //     debug_backtrace(),
             // );
-            $authorized = ( $this->isGateable() && array_key_exists($option, $authorizableOptions))
+            $authorized = ($this->isGateable() && array_key_exists($option, $authorizableOptions))
                 ? Auth::guard('unusual_users')->user()->can($authorizableOptions[$option])
                 : true;
             // $authorized = true;
@@ -474,11 +469,6 @@ abstract class PanelController extends CoreController
         return $this->getFormRequestClass($schema);
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     protected function getJSONData($with = [])
     {
 
@@ -486,7 +476,7 @@ abstract class PanelController extends CoreController
 
         $paginator = $this->getIndexItems($with, $scopes);
 
-        return $this->getTransformer( $this->getFormattedIndexItems($paginator) );
+        return $this->getTransformer($this->getFormattedIndexItems($paginator));
         // return $this->getTransformer( $paginator->toArray() );
     }
 
@@ -512,15 +502,16 @@ abstract class PanelController extends CoreController
             //             : [];
             //     })
             // );
-            return App::makeWith( $formRequest, [
-                'rules' => Arr::mapWithKeys($chunkInputs, function( $input, $key){
+            return App::makeWith($formRequest, [
+                'rules' => Arr::mapWithKeys($chunkInputs, function ($input, $key) {
 
                     return isset($input['name']) && isset($input['rules']) && is_string($input['rules'])
                         ? [$input['name'] => $input['rules'] ?? []]
                         : [];
-                })
+                }),
             ]);
         }
+
         return $this->request;
         // return TwillCapsules::getCapsuleForModel($this->modelName)->getFormRequestClass();
     }
@@ -534,7 +525,7 @@ abstract class PanelController extends CoreController
     {
         $snakeCase = $this->getSnakeCase($this->moduleName);
 
-        return array_to_object(Config::get( unusualBaseKey() . '.system_modules.' . $snakeCase)?: Config::get( $snakeCase ));
+        return array_to_object(Config::get(unusualBaseKey() . '.system_modules.' . $snakeCase) ?: Config::get($snakeCase));
     }
 
     /**
@@ -542,8 +533,9 @@ abstract class PanelController extends CoreController
      */
     protected function getRoutePrefix()
     {
-        if( $this->routePrefix !== null )
+        if ($this->routePrefix !== null) {
             return $this->routePrefix;
+        }
 
         return $this->generateRoutePrefix();
 
@@ -556,6 +548,7 @@ abstract class PanelController extends CoreController
                 ),
                 '/'
             );
+
             return str_replace('/', '.', $routePrefix);
         }
 
@@ -568,20 +561,24 @@ abstract class PanelController extends CoreController
 
         $admin_route_prefix = adminRouteNamePrefix();
 
-        if( $admin_route_prefix )
+        if ($admin_route_prefix) {
             $routePrefixes[] = $admin_route_prefix;
+        }
 
-        if(isset($this->config->system_prefix)){
-            if( $this->config->system_prefix)
+        if (isset($this->config->system_prefix)) {
+            if ($this->config->system_prefix) {
                 $routePrefixes[] = systemRouteNamePrefix();
+            }
 
-        }else if( isset($this->config->base_prefix) && $this->config->base_prefix)
+        } elseif (isset($this->config->base_prefix) && $this->config->base_prefix) {
             $routePrefixes[] = systemRouteNamePrefix();
+        }
 
-        if( !$this->isParent || ($this->isNested && !$noNested) )
+        if (! $this->isParent || ($this->isNested && ! $noNested)) {
             $routePrefixes[] = Str::snake($this->moduleName);
+        }
 
-        if($this->isNested && !$noNested){
+        if ($this->isNested && ! $noNested) {
             $routePrefixes[] = $this->nestedParentName;
             $routePrefixes[] = 'nested';
         }
@@ -595,10 +592,11 @@ abstract class PanelController extends CoreController
     protected function getTransformer($data = [])
     {
 
-        if( !($concrete = $this->getTransformerClass()))
+        if (! ($concrete = $this->getTransformerClass())) {
             return $data;
+        }
 
-        return App::makeWith( $concrete, ['resource' => $data] );
+        return App::makeWith($concrete, ['resource' => $data]);
     }
 
     /**
@@ -626,7 +624,7 @@ abstract class PanelController extends CoreController
      */
     protected function getParentModuleForeignKey()
     {
-        return Str::singular( $this->nestedParentName ) . '_id';
+        return Str::singular($this->nestedParentName) . '_id';
 
         $moduleParts = explode('.', $this->moduleName);
 
@@ -638,27 +636,31 @@ abstract class PanelController extends CoreController
      */
     protected function nestedParentScopes()
     {
-        if(!$this->isNested)
+        if (! $this->isNested) {
             return [];
+        }
 
         // for belongsTo relationship
-        if($this->repository->hasColumn($this->getParentModuleForeignKey()))
+        if ($this->repository->hasColumn($this->getParentModuleForeignKey())) {
             return [
-                $this->getParentModuleForeignKey() => $this->nestedParentId
+                $this->getParentModuleForeignKey() => $this->nestedParentId,
             ];
+        }
 
         // for morphTo relationship
-        if(method_exists($this->repository->getModel(), ($morphToName = $this->getMorphToMethodName($this->routeName)) ))
+        if (method_exists($this->repository->getModel(), ($morphToName = $this->getMorphToMethodName($this->routeName)))) {
             return [
                 $morphToName . '_id' => $this->nestedParentId,
                 $morphToName . '_type' => get_class($this->nestedParentModel),
             ];
+        }
 
         //for hasOneThrough relationship
-        if(method_exists($this->repository->getModel(), $this->getCamelCase($this->nestedParentName) ))
+        if (method_exists($this->repository->getModel(), $this->getCamelCase($this->nestedParentName))) {
             return [
-                'addRelation' . $this->getStudlyName($this->nestedParentName) => $this->nestedParentId
+                'addRelation' . $this->getStudlyName($this->nestedParentName) => $this->nestedParentId,
             ];
+        }
 
         dd(
 
@@ -669,7 +671,7 @@ abstract class PanelController extends CoreController
 
         );
 
-        return Str::singular( $this->nestedParentName ) . '_id';
+        return Str::singular($this->nestedParentName) . '_id';
 
         $moduleParts = explode('.', $this->moduleName);
 
@@ -683,15 +685,15 @@ abstract class PanelController extends CoreController
      */
     protected function getModuleRoute($id, $action, $singleton = false)
     {
-        $parameters = $singleton ? [] : [ snakeCase($this->routeName) => $id];
+        $parameters = $singleton ? [] : [snakeCase($this->routeName) => $id];
 
-        if($this->isNested ){
+        if ($this->isNested) {
             $parameters[$this->nestedParentName] ??= $this->nestedParentId;
         }
 
         $prefix = $this->routePrefix;
 
-        if(!in_array($action, ['index', 'create', 'store'])){
+        if (! in_array($action, ['index', 'create', 'store'])) {
             $prefix = $this->generateRoutePrefix(noNested: true);
         }
 
@@ -711,7 +713,8 @@ abstract class PanelController extends CoreController
     protected function getConfigFieldsByRoute($field_name, $default = null)
     {
         try {
-            return data_get( $this->config->routes->{$this->getSnakeCase($this->routeName)} , $field_name) ?? $default;
+            return data_get($this->config->routes->{$this->getSnakeCase($this->routeName)}, $field_name) ?? $default;
+
             return $this->config->routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
         } catch (\Throwable $th) {
             return $default;
@@ -721,6 +724,7 @@ abstract class PanelController extends CoreController
                 debug_backtrace()
             );
         }
+
         return $this->config->routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
         // return $this->isParentRoute()
         //     ? $this->config->parent_route->{$field_name}
@@ -729,7 +733,7 @@ abstract class PanelController extends CoreController
 
     public function isGateable()
     {
-        return !env('PERMISSION_GATES_DEACTIVATE', false);
+        return ! env('PERMISSION_GATES_DEACTIVATE', false);
     }
 
     public function isRelationField($key)
@@ -740,20 +744,18 @@ abstract class PanelController extends CoreController
         //     $model_relations = $this->repository->getDefinedRelations();
         // }
 
-        if(@method_exists($this->repository->getModel(), 'definedRelations')){
+        if (@method_exists($this->repository->getModel(), 'definedRelations')) {
             $model_relations = $this->repository->definedRelations();
         }
 
-        if(preg_match('/(.*)(_id)/', $key, $matches)){
+        if (preg_match('/(.*)(_id)/', $key, $matches)) {
             $key = pluralize($matches[1]);
         }
-
 
         return in_array($key, $model_relations);
         // if(in_array($key, $model_relations)){
 
         // }
-
 
         // return false;
         // return in_array($key, $model_relations);
@@ -761,7 +763,7 @@ abstract class PanelController extends CoreController
 
     protected function addIndexWiths()
     {
-        $methods = array_filter(get_class_methods(static::class), function($method){
+        $methods = array_filter(get_class_methods(static::class), function ($method) {
             return preg_match('/addIndexWiths[A-Z]{1}[A-Za-z]+/', $method);
         });
 
@@ -772,7 +774,7 @@ abstract class PanelController extends CoreController
 
     protected function addFormWiths()
     {
-        $methods = array_filter(get_class_methods(static::class), function($method){
+        $methods = array_filter(get_class_methods(static::class), function ($method) {
             return preg_match('/addFormWiths[A-Z]{1}[A-Za-z]+/', $method);
         });
 
@@ -783,7 +785,7 @@ abstract class PanelController extends CoreController
 
     protected function addWiths()
     {
-        $methods = array_filter(get_class_methods(static::class), function($method){
+        $methods = array_filter(get_class_methods(static::class), function ($method) {
             return preg_match('/addWiths[A-Z]{1}[A-Za-z]+/', $method);
         });
 
@@ -795,9 +797,10 @@ abstract class PanelController extends CoreController
 
     protected function getReplaceUrl()
     {
-        if($this->request->has('replaceUrl')){
+        if ($this->request->has('replaceUrl')) {
             return $this->request->get('replaceUrl') === 'true';
         }
+
         return true;
     }
 

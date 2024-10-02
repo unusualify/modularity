@@ -16,7 +16,7 @@ class CreateUnusualDefaultFilesTables extends Migration
         $unusualFilesTable = unusualConfig('tables.files', 'modularity_files');
         $unusualFileablesTable = unusualConfig('tables.fileables', 'modularity_fileables');
 
-        if (!Schema::hasTable($unusualFilesTable)) {
+        if (! Schema::hasTable($unusualFilesTable)) {
             Schema::create($unusualFilesTable, function (Blueprint $table) {
                 $table->{unusualIncrementsMethod()}('id');
                 $table->timestamps();
@@ -27,7 +27,7 @@ class CreateUnusualDefaultFilesTables extends Migration
             });
         }
 
-        if (!Schema::hasTable($unusualFileablesTable)) {
+        if (! Schema::hasTable($unusualFileablesTable)) {
             Schema::create($unusualFileablesTable, function (Blueprint $table) use ($unusualFilesTable) {
                 $table->{unusualIncrementsMethod()}('id');
                 $table->timestamps();

@@ -1,8 +1,5 @@
 <?php
 
-use Unusualify\Modularity\Services\View\UComponent;
-use Unusualify\Modularity\Services\View\UWrapper;
-
 return [
     'name' => 'SystemUser',
     'system_prefix' => true,
@@ -38,7 +35,7 @@ return [
                 ],
                 [
                     'title' => 'Company',
-                    'key' => 'company'
+                    'key' => 'company',
                 ],
                 [
                     'title' => 'Roles',
@@ -48,8 +45,8 @@ return [
                     'title' => 'Status',
                     'key' => 'published',
                     'formatter' => [
-                        'switch'
-                    ]
+                        'switch',
+                    ],
                 ],
                 [
                     'title' => 'Actions',
@@ -69,7 +66,7 @@ return [
                         'md' => 6,
                     ],
                     // 'prepend-icon' => 'mdi-card-text-outline',
-                    'dense'
+                    'dense',
                 ],
                 [
                     'name' => 'company_id',
@@ -88,7 +85,7 @@ return [
                         'md' => 6,
                     ],
                     // 'prepend-icon' => 'mdi-card-text-outline',
-                    'dense'
+                    'dense',
                 ],
                 [
                     'type' => 'select',
@@ -104,7 +101,7 @@ return [
                     'ext' => 'scroll',
                     'connector' => 'Role|uri',
                 ],
-            ]
+            ],
         ],
         'role' => [
             'name' => 'Role',
@@ -186,7 +183,7 @@ return [
                     'title' => 'Actions',
                     'key' => 'actions',
                     'width' => 50,
-                    'sortable' => false
+                    'sortable' => false,
                 ],
             ],
             'inputs_old' => [
@@ -205,7 +202,7 @@ return [
                         'outlined',
                         'prepend-icon' => 'mdi-card-text-outline',
                         // 'dense' => true
-                    ]
+                    ],
                 ],
                 [
                     'title' => 'Guard Name',
@@ -227,8 +224,8 @@ return [
                         'flat',
                         // 'full-width',
                         'hide-spin-buttons',
-                        'outlined'
-                    ]
+                        'outlined',
+                    ],
                 ],
                 [
                     'title' => 'Permission',
@@ -244,11 +241,11 @@ return [
                         ],
                         [
                             'text' => 'Create Role',
-                            'value' => 2
+                            'value' => 2,
                         ],
                         [
                             'text' => 'Delete Role',
-                            'value' => 3
+                            'value' => 3,
                         ],
                     ],
                     'cols' => 10,
@@ -268,8 +265,8 @@ return [
                             'closeOnContentClick' => false,
                             'disableKeys' => true,
                             'openOnClick' => false,
-                            'maxHeight' => 304
-                        ]
+                            'maxHeight' => 304,
+                        ],
                     ],
                 ],
                 [
@@ -312,15 +309,15 @@ return [
                     'options' => [
                         [
                             'label' => 'WAITING',
-                            'value' => 1
+                            'value' => 1,
                         ],
                         [
                             'label' => 'FAILURE',
-                            'value' => 2
+                            'value' => 2,
                         ],
                         [
                             'label' => 'COMPLETED',
-                            'value' => 3
+                            'value' => 3,
                         ],
                     ],
                     'default' => 1,
@@ -340,8 +337,8 @@ return [
                         'props' => [
                             'color' => 'error',
                             'on-icon' => '$radioOn',
-                            'off-icon' => '$radioOff'
-                        ]
+                            'off-icon' => '$radioOff',
+                        ],
 
                         // 'appendIcon' => 'mdi-dropbox',
                         // 'prependIcon' => 'mdi-radioactive',
@@ -365,13 +362,13 @@ return [
                         'prependIcon' => 'mdi-camera',
                         'prependInnerIcon' => '',
 
-                    ]
+                    ],
                 ],
                 [
                     'title' => 'Day Interval',
                     'name' => 'day_interval',
                     'type' => 'range',
-                    'default' => [0,100],
+                    'default' => [0, 100],
                     // 'default' => [],
                     'cols' => 10,
                     'sm' => 10,
@@ -385,7 +382,7 @@ return [
                         // 'background-color' => 'success',
                         'hint' => '',
                         // 'vertical',
-                    ]
+                    ],
                 ],
                 [
                     'title' => 'Color',
@@ -405,10 +402,9 @@ return [
                         'props' => [
                             'dotSize' => 25,
                             'maxHeight' => 200,
-                        ]
+                        ],
 
-
-                    ]
+                    ],
                 ],
                 [
                     'title' => 'Start Date',
@@ -421,22 +417,22 @@ return [
                     'lg' => 6,
                     'xl' => 4,
                     'props' => [
-                        'color' => "red lighten-1",
+                        'color' => 'red lighten-1',
                         'prepend-icon' => 'mdi-calendar',
                         // 'prepend-inner-icon' => 'mdi-calendar',
                         'dense',
-                        'outlined'
+                        'outlined',
                     ],
                     'picker_props' => [
                         'color' => 'success',
                         'header-color' => 'info',
-                        'min' => "2016-06-15",
-                        'max' => "2018-03-20",
+                        'min' => '2016-06-15',
+                        'max' => '2018-03-20',
                         // 'type' => "month",
                         // 'range',
 
                         // 'show-adjacent-months',
-                    ]
+                    ],
                 ],
                 [
                     'title' => 'Start Time',
@@ -449,11 +445,11 @@ return [
                     'lg' => 6,
                     'xl' => 4,
                     'props' => [
-                        'color' => "red lighten-1",
+                        'color' => 'red lighten-1',
                         'prepend-icon' => 'mdi-timer',
                         // 'prepend-inner-icon' => 'mdi-calendar',
                         'dense',
-                        'outlined'
+                        'outlined',
                     ],
                     'picker_props' => [
                         'color' => 'success',
@@ -461,7 +457,7 @@ return [
                         // 'type' => "month",
                         // 'range',
                         // 'show-adjacent-months',
-                    ]
+                    ],
                 ],
                 [
                     'title' => 'Icon',
@@ -478,7 +474,7 @@ return [
                         'outlined',
                         'prepend-icon' => 'mdi-card-text-outline',
                         // 'dense' => true
-                    ]
+                    ],
                 ],
             ],
 
@@ -493,7 +489,7 @@ return [
                         'sm' => 12,
                         'md' => 12,
                         'lg' => 12,
-                        'xl' => 12
+                        'xl' => 12,
                     ],
                     'offset' => [
                         'offset' => 0,
@@ -510,12 +506,12 @@ return [
                         'order-xl' => 1,
                     ],
 
-                    "activatable" => true,
-                    "selectable" => true,
-                    "multipleActive" => false,
-                    "slot" => [
-                        "prepend",
-                        "label"
+                    'activatable' => true,
+                    'selectable' => true,
+                    'multipleActive' => false,
+                    'slot' => [
+                        'prepend',
+                        'label',
                     ],
 
                     'route' => 'permission',
@@ -534,11 +530,11 @@ return [
                         ],
                         [
                             'text' => 'Create Role',
-                            'value' => 2
+                            'value' => 2,
                         ],
                         [
                             'text' => 'Delete Role',
-                            'value' => 3
+                            'value' => 3,
                         ],
                     ],
                     'col' => [
@@ -546,13 +542,13 @@ return [
                         'sm' => 10,
                         'md' => 6,
                         'lg' => 6,
-                        'xl' => 4
+                        'xl' => 4,
                     ],
                     'offset' => [
                         'offset' => 0,
                         'offset-sm' => 2,
                         'offset-md' => 0,
-                        'offset-lg' => 0
+                        'offset-lg' => 0,
                     ],
                     'order' => [
                         'order' => 2,
@@ -572,7 +568,7 @@ return [
                         'closeOnContentClick' => false,
                         'disableKeys' => true,
                         'openOnClick' => false,
-                        'maxHeight' => 304
+                        'maxHeight' => 304,
                     ],
 
                 ],
@@ -586,13 +582,13 @@ return [
                         'sm' => 10,
                         'md' => 6,
                         'lg' => 6,
-                        'xl' => 4
+                        'xl' => 4,
                     ],
                     'offset' => [
                         'offset' => 0,
                         'offset-sm' => 2,
                         'offset-md' => 0,
-                        'offset-lg' => 0
+                        'offset-lg' => 0,
                     ],
                     'order' => [
                         'order' => 3,
@@ -628,15 +624,15 @@ return [
                     'options' => [
                         [
                             'label' => 'WAITING',
-                            'value' => 1
+                            'value' => 1,
                         ],
                         [
                             'label' => 'FAILURE',
-                            'value' => 2
+                            'value' => 2,
                         ],
                         [
                             'label' => 'COMPLETED',
-                            'value' => 3
+                            'value' => 3,
                         ],
                     ],
                     'col' => [
@@ -644,13 +640,13 @@ return [
                         'sm' => 10,
                         'md' => 6,
                         'lg' => 6,
-                        'xl' => 4
+                        'xl' => 4,
                     ],
                     'offset' => [
                         'offset' => 0,
                         'offset-sm' => 2,
                         'offset-md' => 0,
-                        'offset-lg' => 0
+                        'offset-lg' => 0,
                     ],
                     'order' => [
                         'order' => 4,
@@ -682,13 +678,13 @@ return [
                         'sm' => 10,
                         'md' => 6,
                         'lg' => 6,
-                        'xl' => 4
+                        'xl' => 4,
                     ],
                     'offset' => [
                         'offset' => 0,
                         'offset-sm' => 2,
                         'offset-md' => 0,
-                        'offset-lg' => 0
+                        'offset-lg' => 0,
                     ],
                     'order' => [
                         'order' => 5,
@@ -701,7 +697,7 @@ return [
                     'prependIcon' => 'mdi-camera',
                     'prependInnerIcon' => '',
                     'outlined',
-                    'dense'
+                    'dense',
                 ],
                 'day_interval' => [
                     // 'type' => 'text',
@@ -710,20 +706,20 @@ return [
                     '_name' => 'day_interval',
                     'label' => 'Day Interval:0',
                     'hint' => 'Day Interval Hint',
-                    'default' => [0,100],
+                    'default' => [0, 100],
                     // 'default' => 0,
                     'col' => [
                         'cols' => 10,
                         'sm' => 10,
                         'md' => 6,
                         'lg' => 6,
-                        'xl' => 4
+                        'xl' => 4,
                     ],
                     'offset' => [
                         'offset' => 0,
                         'offset-sm' => 2,
                         'offset-md' => 0,
-                        'offset-lg' => 0
+                        'offset-lg' => 0,
                     ],
                     'order' => [
                         'order' => 6,
@@ -736,7 +732,7 @@ return [
                     'max' => 100,
                     'min' => 0,
                     'tick-size' => 1,
-                    'thumb-label' => 'always'
+                    'thumb-label' => 'always',
                     // 'background-color' => 'success',
                 ],
                 'color' => [
@@ -752,7 +748,7 @@ return [
                         'sm' => 10,
                         'md' => 6,
                         'lg' => 6,
-                        'xl' => 4
+                        'xl' => 4,
                     ],
                     'offset' => [
                         'offset' => 0,
@@ -775,7 +771,7 @@ return [
                     'props' => [
                         'dotSize' => 25,
                         'maxHeight' => 200,
-                    ]
+                    ],
                 ],
                 'start_date' => [
                     'type' => 'input-date',
@@ -787,7 +783,7 @@ return [
                         'sm' => 10,
                         'md' => 6,
                         'lg' => 6,
-                        'xl' => 4
+                        'xl' => 4,
                     ],
                     'offset' => [
                         'offset' => 0,
@@ -803,7 +799,7 @@ return [
                         'order-lg' => 8,
                         'order-xl' => 8,
                     ],
-                    'color' => "red lighten-1",
+                    'color' => 'red lighten-1',
                     'prepend-icon' => 'mdi-calendar',
                     // 'prepend-inner-icon' => 'mdi-calendar',
                     'dense',
@@ -813,12 +809,12 @@ return [
                         // 'type' => 'month',
                         'color' => 'success',
                         'header-color' => 'info',
-                        'min' => "2022-01-01",
-                        'max' => "2025-12-31",
+                        'min' => '2022-01-01',
+                        'max' => '2025-12-31',
                         'first-day-of-week' => '1',
                         // 'show-adjacent-months',
                         // 'range',
-                    ]
+                    ],
                 ],
                 'start_time' => [
                     'type' => 'input-time',
@@ -830,7 +826,7 @@ return [
                         'sm' => 10,
                         'md' => 6,
                         'lg' => 6,
-                        'xl' => 4
+                        'xl' => 4,
                     ],
                     'offset' => [
                         'offset' => 0,
@@ -846,7 +842,7 @@ return [
                         'order-lg' => 8,
                         'order-xl' => 8,
                     ],
-                    'color' => "red lighten-1",
+                    'color' => 'red lighten-1',
                     'prepend-icon' => 'mdi-timer',
                     'prepend-inner-icon' => '',
                     'dense',
@@ -867,7 +863,7 @@ return [
                         // 'no-title',
                         // 'use-seconds',
                         // 'landscape',
-                    ]
+                    ],
                 ],
                 'icon' => [
                     'type' => 'input-icon',
@@ -878,7 +874,7 @@ return [
                         'sm' => 10,
                         'md' => 6,
                         'lg' => 6,
-                        'xl' => 4
+                        'xl' => 4,
                     ],
                     'offset' => [
                         'offset' => 0,
@@ -897,7 +893,7 @@ return [
                     'dense',
                     'outlined',
                     'prepend-icon' => 'mdi-card-text-outline',
-                ]
+                ],
             ],
 
             'inputs' => [
@@ -914,7 +910,7 @@ return [
                         'sm' => 10,
                         'md' => 6,
                         'lg' => 6,
-                        'xl' => 6
+                        'xl' => 6,
                     ],
                     'rules' => 'sometimes|required|min:3',
                     // 'prepend-icon' => 'mdi-card-text-outline',
@@ -931,7 +927,7 @@ return [
                         'sm' => 10,
                         'md' => 6,
                         'lg' => 6,
-                        'xl' => 6
+                        'xl' => 6,
                     ],
                     // 'prepend-icon' => 'mdi-account-child',
                     'readonly',
@@ -952,7 +948,7 @@ return [
                         'sm' => 12,
                         'md' => 12,
                         'lg' => 12,
-                        'xl' => 12
+                        'xl' => 12,
                     ],
                     'connector' => 'SystemUser:Permission|repository',
                     // 'route' => 'permission',
@@ -963,10 +959,10 @@ return [
                 'view' => [],
                 'store' => [],
                 'update' => [],
-                'destroy' => []
+                'destroy' => [],
             ],
         ],
-        'permission' =>  [
+        'permission' => [
             'name' => 'Permission',
             'headline' => 'Permissions',
             'url' => 'permissions',
@@ -998,7 +994,7 @@ return [
                 [
                     'title' => 'Actions',
                     'key' => 'actions',
-                    'sortable' => false
+                    'sortable' => false,
                 ],
             ],
             'inputs' => [
@@ -1197,7 +1193,6 @@ return [
                 //             'maxHeight' => 200,
                 //         ]
 
-
                 //     ]
                 // ],
                 // [
@@ -1255,10 +1250,10 @@ return [
                 'view' => [],
                 'store' => [],
                 'update' => [],
-                'destroy' => []
+                'destroy' => [],
             ],
         ],
-        'company' =>  [
+        'company' => [
             'name' => 'Company',
             'headline' => 'Companies',
             'icon' => 'company',
@@ -1290,7 +1285,7 @@ return [
                     'sortable' => false,
                     'width' => '15%',
 
-                    'class' => 'actions-extra'
+                    'class' => 'actions-extra',
                 ],
             ],
             'inputs' => [
@@ -1387,7 +1382,7 @@ return [
                         'cols' => 12,
                         'sm' => 8,
                         'md' => 6,
-                    ]
+                    ],
                 ],
                 [
                     'type' => 'text',
@@ -1437,7 +1432,6 @@ return [
                     // 'full-width',
                 ],
             ],
-        ]
+        ],
     ],
 ];
-

@@ -3,12 +3,10 @@
 namespace Unusualify\Modularity\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Unusualify\Modularity\Entities\User;
 use Illuminate\Support\Facades\DB;
 
 class DefaultRolesSeeder extends Seeder
 {
-
     /**
      * Auto generated seed file
      *
@@ -50,8 +48,6 @@ class DefaultRolesSeeder extends Seeder
                 'guard_name' => 'unusual_users',
             ],
         ]);
-
-
 
     }
 }

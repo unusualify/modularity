@@ -31,7 +31,7 @@ class ResetPasswordController extends Controller
     |
      */
 
-    use ResetsPasswords, ManageUtilities;
+    use ManageUtilities, ResetsPasswords;
 
     /**
      * @var Redirector
@@ -63,7 +63,7 @@ class ResetPasswordController extends Controller
         $this->viewFactory = $viewFactory;
         $this->config = $config;
 
-        $this->redirectTo = $this->config->get(unusualBaseKey().'.auth_login_redirect_path', '/');
+        $this->redirectTo = $this->config->get(unusualBaseKey() . '.auth_login_redirect_path', '/');
         $this->middleware('unusual_guest');
     }
 
@@ -83,17 +83,16 @@ class ResetPasswordController extends Controller
         return Password::broker('users');
     }
 
-        /**
+    /**
      * Reset the given user's password.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function reset(Request $request)
     {
         $validator = Validator::make($request->all(), $this->rules(), $this->validationErrorMessages());
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $request->wantsJson()
                 ? new JsonResponse([
                     'errors' => $validator->errors(),
@@ -123,7 +122,6 @@ class ResetPasswordController extends Controller
     }
 
     /**
-     * @param Request $request
      * @param string|null $token
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
@@ -134,7 +132,7 @@ class ResetPasswordController extends Controller
         // call exists on the Password repository to check for token expiration (default 1 hour)
         // otherwise redirect to the ask reset link form with error message
         if ($user && Password::broker('users')->getRepository()->exists($user, $token)) {
-            return $this->viewFactory->make(unusualBaseKey().'::auth.passwords.reset')->with([
+            return $this->viewFactory->make(unusualBaseKey() . '::auth.passwords.reset')->with([
                 'token' => $token,
                 'email' => $user->email,
 
@@ -150,47 +148,47 @@ class ResetPasswordController extends Controller
                     ],
                     'schema' => ($schema = $this->createFormSchema([
                         'email' => [
-                            "type" => "text",
-                            "name" => "email",
-                            "label" => ___('authentication.email'),
-                            "default" => "",
+                            'type' => 'text',
+                            'name' => 'email',
+                            'label' => ___('authentication.email'),
+                            'default' => '',
                             'col' => [
                                 'cols' => 12,
                             ],
                             'rules' => [
-                                ['email']
-                            ]
+                                ['email'],
+                            ],
                         ],
                         'password' => [
-                            "type" => "password",
-                            "name" => "password",
-                            "label" => ___('authentication.password'),
-                            "default" => "",
-                            "appendInnerIcon" => '$non-visibility',
-                            "slotHandlers" => [
+                            'type' => 'password',
+                            'name' => 'password',
+                            'label' => ___('authentication.password'),
+                            'default' => '',
+                            'appendInnerIcon' => '$non-visibility',
+                            'slotHandlers' => [
                                 'appendInner' => 'password',
                             ],
                             'col' => [
-                                'cols' => 12
-                            ]
+                                'cols' => 12,
+                            ],
                         ],
                         'password_confirmation' => [
-                            "type" => "password",
-                            "name" => "password_confirmation",
-                            "label" => ___('authentication.password-confirmation'),
-                            "default" => "",
-                            "appendInnerIcon" => '$non-visibility',
-                            "slotHandlers" => [
+                            'type' => 'password',
+                            'name' => 'password_confirmation',
+                            'label' => ___('authentication.password-confirmation'),
+                            'default' => '',
+                            'appendInnerIcon' => '$non-visibility',
+                            'slotHandlers' => [
                                 'appendInner' => 'password',
                             ],
                             'col' => [
-                                'cols' => 12
-                            ]
+                                'cols' => 12,
+                            ],
                         ],
                         'token' => [
-                            "type" => "hidden",
+                            'type' => 'hidden',
                             // "ext" => "hidden",
-                            "name" => "token",
+                            'name' => 'token',
                         ],
                     ])),
 
@@ -207,7 +205,6 @@ class ResetPasswordController extends Controller
     }
 
     /**
-     * @param Request $request
      * @param string|null $token
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
@@ -217,7 +214,7 @@ class ResetPasswordController extends Controller
 
         // we don't call exists on the Password repository here because we don't want to expire the token for welcome emails
         if ($user) {
-            return $this->viewFactory->make(unusualBaseKey().'::auth.passwords.reset')->with([
+            return $this->viewFactory->make(unusualBaseKey() . '::auth.passwords.reset')->with([
                 'token' => $token,
                 'email' => $user->email,
                 'welcome' => true,
@@ -255,11 +252,10 @@ class ResetPasswordController extends Controller
         return null;
     }
 
-        /**
+    /**
      * Get the response for a successful password reset.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $response
+     * @param string $response
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     protected function sendResetResponse(Request $request, $response)
@@ -268,19 +264,18 @@ class ResetPasswordController extends Controller
             return new JsonResponse([
                 'message' => trans($response),
                 'variant' => MessageStage::SUCCESS,
-                'redirector' => $this->redirectPath()
+                'redirector' => $this->redirectPath(),
             ], 200);
         }
 
         return redirect($this->redirectPath())
-                            ->with('status', trans($response));
+            ->with('status', trans($response));
     }
 
     /**
      * Get the response for a failed password reset.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $response
+     * @param string $response
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     protected function sendResetFailedResponse(Request $request, $response)
@@ -289,7 +284,7 @@ class ResetPasswordController extends Controller
             return new JsonResponse([
                 'email' => [trans($response)],
                 'message' => trans($response),
-                'variant' => MessageStage::WARNING
+                'variant' => MessageStage::WARNING,
             ], 200);
             // throw ValidationException::withMessages([
             //     'email' => [trans($response)],
@@ -297,8 +292,7 @@ class ResetPasswordController extends Controller
         }
 
         return redirect()->back()
-                    ->withInput($request->only('email'))
-                    ->withErrors(['email' => trans($response)]);
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => trans($response)]);
     }
-
 }

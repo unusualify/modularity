@@ -11,8 +11,9 @@ return new class extends OneTimeOperation
 
     public function __construct()
     {
-        $this->output = new ConsoleOutput();
+        $this->output = new ConsoleOutput;
     }
+
     /**
      * Determine if the operation is being processed asynchronously.
      */
@@ -34,7 +35,7 @@ return new class extends OneTimeOperation
     public function process(): void
     {
 
-        if (!Schema::hasTable(unusualConfig('tables.users'))) {
+        if (! Schema::hasTable(unusualConfig('tables.users'))) {
 
             Schema::rename('users', unusualConfig('tables.users'));
 

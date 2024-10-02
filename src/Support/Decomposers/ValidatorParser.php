@@ -2,8 +2,8 @@
 
 namespace Unusualify\Modularity\Support\Decomposers;
 
-use Unusualify\Modularity\Traits\ManageNames;
 use Illuminate\Contracts\Support\Arrayable;
+use Unusualify\Modularity\Traits\ManageNames;
 
 class ValidatorParser implements Arrayable
 {
@@ -14,9 +14,8 @@ class ValidatorParser implements Arrayable
     ];
 
     protected $arguments = [
-        'belongsTo'         => ['table', 'foreign_key', 'owner_key'],
+        'belongsTo' => ['table', 'foreign_key', 'owner_key'],
     ];
-
 
     /**
      * The rule.
@@ -48,7 +47,7 @@ class ValidatorParser implements Arrayable
     /**
      * parse
      *
-     * @param  mixed $rules
+     * @param mixed $rules
      * @return void
      */
     public function parse($rules)
@@ -88,20 +87,13 @@ class ValidatorParser implements Arrayable
      */
     public function toReplacement()
     {
-        return str_replace("\n", "\n\t\t", array_export($this->toArray(),true));
+        return str_replace("\n", "\n\t\t", array_export($this->toArray(), true));
     }
-
 
     /**
      * Render the migration to formatted script.
      *
      * @return string
      */
-    public function render()
-    {
-
-    }
-
-
-
+    public function render() {}
 }

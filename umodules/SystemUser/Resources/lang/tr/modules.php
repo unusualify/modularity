@@ -6,5 +6,3 @@ return [
     'permission' => 'Permission | Permissions | {n} Permissions',
     'company' => 'Company | Companies | {n} Companies',
 ];
-
-    

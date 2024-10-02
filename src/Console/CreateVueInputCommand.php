@@ -2,13 +2,9 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Storage;
 use Nwidart\Modules\Support\Stub;
-
-use function Laravel\Prompts\{select, confirm, warning};
+use Symfony\Component\Console\Input\InputArgument;
 
 class CreateVueInputCommand extends BaseCommand
 {
@@ -46,7 +42,7 @@ class CreateVueInputCommand extends BaseCommand
     /**
      * Execute the console command.
      */
-    public function handle() : int
+    public function handle(): int
     {
         $name = $this->argument('name');
 
@@ -55,23 +51,21 @@ class CreateVueInputCommand extends BaseCommand
         $success = true;
 
         $componentName = studlyName($name);
-        $componentKebabName = "v-input-" . kebabCase($name);
+        $componentKebabName = 'v-input-' . kebabCase($name);
 
         $path = base_path(unusualConfig('vendor_path') . '/vue/src/js/components/inputs/') . "{$componentName}.vue";
 
-        if(!file_exists($path)){
+        if (! file_exists($path)) {
             $content = (string) new Stub('/input-component.vue', ['name' => $componentKebabName]);
 
             $this->filesystem->put($path, $content);
 
             $this->info("{$componentName} component created.");
-        }else{
+        } else {
             $success = false;
 
             $this->warn("{$componentName} component already exists!");
         }
-
-
 
         return $success ? 0 : E_ERROR;
     }

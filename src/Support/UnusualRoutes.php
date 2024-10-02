@@ -3,23 +3,21 @@
 namespace Unusualify\Modularity\Support;
 
 use Illuminate\Support\Facades\Route;
-use Unusualify\Modularity\Http\Middleware\{
-    AuthenticateMiddleware,
-    CompanyRegistrationMiddleware,
-    LanguageMiddleware,
-    ImpersonateMiddleware,
-    NavigationMiddleware,
-    RedirectIfAuthenticatedMiddleware,
-    AuthorizationMiddleware,
-    HostableMiddleware
-};
+use Unusualify\Modularity\Http\Middleware\AuthenticateMiddleware;
+use Unusualify\Modularity\Http\Middleware\AuthorizationMiddleware;
+use Unusualify\Modularity\Http\Middleware\CompanyRegistrationMiddleware;
+use Unusualify\Modularity\Http\Middleware\HostableMiddleware;
+use Unusualify\Modularity\Http\Middleware\ImpersonateMiddleware;
+use Unusualify\Modularity\Http\Middleware\LanguageMiddleware;
+use Unusualify\Modularity\Http\Middleware\NavigationMiddleware;
+use Unusualify\Modularity\Http\Middleware\RedirectIfAuthenticatedMiddleware;
+
 class UnusualRoutes
 {
-
     public $counter = 1;
 
     private $defaultMiddlewares = [
-        'unusual.core'
+        'unusual.core',
         // 'language',
         // 'impersonate',
 
@@ -63,8 +61,8 @@ class UnusualRoutes
                     $hostRoutes
                 );
 
-            } else{
-                $routesFile;
+            } else {
+
             }
         };
 
@@ -91,16 +89,13 @@ class UnusualRoutes
         }
     }
 
-    /**
-     * @return array
-     */
     public function groupOptions(): array
     {
         return [
-            'as'            => adminRouteNamePrefix() . '.',
-            ... ( unusualConfig('admin_app_url')
+            'as' => adminRouteNamePrefix() . '.',
+            ...(unusualConfig('admin_app_url')
                 ? ['domain' => unusualConfig('admin_app_url')]
-                : ['prefix' => adminUrlPrefix() ]
+                : ['prefix' => adminUrlPrefix()]
             ),
 
         ];
@@ -119,7 +114,7 @@ class UnusualRoutes
         return [
             ...['web.auth'],
             ...$this->defaultMiddlewares,
-            ...['unusual.panel']
+            ...['unusual.panel'],
         ];
     }
 
@@ -174,12 +169,11 @@ class UnusualRoutes
         Route::aliasMiddleware('company_registration', CompanyRegistrationMiddleware::class);
         Route::middlewareGroup('unusual.panel', [
             'authorization',
-            'company_registration'
+            'company_registration',
         ]);
 
         // Optional Middlewares for features
         Route::aliasMiddleware('hostable', HostableMiddleware::class);
 
     }
-
 }

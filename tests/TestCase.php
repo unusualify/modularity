@@ -2,9 +2,9 @@
 
 namespace Unusualify\Modularity\Tests;
 
+use Nwidart\Modules\LaravelModulesServiceProvider;
 use Unusualify\Modularity\LaravelServiceProvider;
 use Unusualify\Modularity\Providers\UnusualProvider;
-use Nwidart\Modules\LaravelModulesServiceProvider;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -19,7 +19,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         // Note: this also flushes the cache from within the migration
         $this->setUpDatabase($this->app);
 
-        $this->path = realpath(__DIR__. '/..');
+        $this->path = realpath(__DIR__ . '/..');
 
         $this->umodulesPath = realpath($this->path . '/umodules');
 
@@ -55,7 +55,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     /**
      * Set up the database.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Foundation\Application $app
      */
     protected function setUpDatabase($app)
     {
@@ -86,6 +86,4 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         return realpath("{$this->umodulesPath}/{$moduleName}");
     }
-
-
 }

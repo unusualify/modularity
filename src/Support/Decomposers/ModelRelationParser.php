@@ -2,16 +2,15 @@
 
 namespace Unusualify\Modularity\Support\Decomposers;
 
-use Unusualify\Modularity\Traits\ManageNames;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Support\Finder;
+use Unusualify\Modularity\Traits\ManageNames;
 use Unusualify\Modularity\Traits\RelationshipMap;
 
-use function Laravel\Prompts\{confirm, info};
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\info;
 
 class ModelRelationParser implements Arrayable
 {
@@ -30,29 +29,29 @@ class ModelRelationParser implements Arrayable
     ];
 
     protected $arguments = [
-        'belongsTo'         => ['table', 'foreign_key', 'owner_key'],
-        'hasOne'            => ['table', 'foreign_key', 'local_key'],
-        'hasMany'           => ['table', 'foreign_key', 'local_key'],
-        'hasOneThrough'     => ['table', 'table', 'foreign_key', 'foreign_key', 'local_key', 'local_key'],
-        'hasManyThrough'    => ['table', 'table', 'foreign_key', 'foreign_key', 'local_key', 'local_key'],
-        'belongsToMany'     => ['table', 'table', 'foreign_pivot_key', 'related_pivot_key', 'parent_key', 'related_key', 'relation'],
-        'morphTo'           => ['name', 'type', 'id', 'owner_key']
+        'belongsTo' => ['table', 'foreign_key', 'owner_key'],
+        'hasOne' => ['table', 'foreign_key', 'local_key'],
+        'hasMany' => ['table', 'foreign_key', 'local_key'],
+        'hasOneThrough' => ['table', 'table', 'foreign_key', 'foreign_key', 'local_key', 'local_key'],
+        'hasManyThrough' => ['table', 'table', 'foreign_key', 'foreign_key', 'local_key', 'local_key'],
+        'belongsToMany' => ['table', 'table', 'foreign_pivot_key', 'related_pivot_key', 'parent_key', 'related_key', 'relation'],
+        'morphTo' => ['name', 'type', 'id', 'owner_key'],
     ];
 
     protected $_argumentsMap = [
-        'hasOne'            => ['related', 'foreignKey', 'localKey'],
-        'hasOneThrough'     => ['related', 'through', 'firstKey', 'secondKey', 'localKey', 'secondLocalKey'],
-        'morphOne'          => ['related', 'name', 'type', 'id', 'localKey'],
-        'belongsTo'         => ['related', 'foreignKey', 'ownerKey', 'relation'],
-        'morphTo'           => ['name', 'type', 'id', 'ownerKey'],
-        'morphEagerTo'      => ['name', 'type', 'id', 'ownerKey'],
-        'morphInstanceTo'   => ['name', 'type', 'id', 'ownerKey'],
-        'hasMany'           => ['table', 'foreignKey', 'localKey'],
-        'hasManyThrough'    => ['related', 'throught', 'firstKey', 'secondKey', 'localKey', 'secondLocalKey'],
-        'morphMany'         => ['related', 'name', 'type', 'id', 'localKey'],
-        'belongsToMany'     => ['related', 'table', 'foreignPivotKey', 'relatedPivotKey', 'parentKey', 'relatedKey', 'relation'],
-        'morphToMany'       => ['related', 'name', 'table', 'foreignPivotKey', 'relatedPivotKey', 'parentKey', 'relatedKey', 'relation', 'inverse'],
-        'morphedByMany'     => ['related', 'name', 'table', 'foreignPivotKey', 'relatedPivotKey', 'parentKey', 'relatedKey', 'relation'],
+        'hasOne' => ['related', 'foreignKey', 'localKey'],
+        'hasOneThrough' => ['related', 'through', 'firstKey', 'secondKey', 'localKey', 'secondLocalKey'],
+        'morphOne' => ['related', 'name', 'type', 'id', 'localKey'],
+        'belongsTo' => ['related', 'foreignKey', 'ownerKey', 'relation'],
+        'morphTo' => ['name', 'type', 'id', 'ownerKey'],
+        'morphEagerTo' => ['name', 'type', 'id', 'ownerKey'],
+        'morphInstanceTo' => ['name', 'type', 'id', 'ownerKey'],
+        'hasMany' => ['table', 'foreignKey', 'localKey'],
+        'hasManyThrough' => ['related', 'throught', 'firstKey', 'secondKey', 'localKey', 'secondLocalKey'],
+        'morphMany' => ['related', 'name', 'type', 'id', 'localKey'],
+        'belongsToMany' => ['related', 'table', 'foreignPivotKey', 'relatedPivotKey', 'parentKey', 'relatedKey', 'relation'],
+        'morphToMany' => ['related', 'name', 'table', 'foreignPivotKey', 'relatedPivotKey', 'parentKey', 'relatedKey', 'relation', 'inverse'],
+        'morphedByMany' => ['related', 'name', 'table', 'foreignPivotKey', 'relatedPivotKey', 'parentKey', 'relatedKey', 'relation'],
     ];
 
     protected $pivotableRelationships = [
@@ -112,13 +111,14 @@ class ModelRelationParser implements Arrayable
         $parsed = [];
 
         foreach ($this->getRelationships() as $relationship) {
-            if(preg_match('/,/', $relationship)){
+            if (preg_match('/,/', $relationship)) {
                 // dump($relationship);
             }
-            if(($resp = $this->parseReverseRelationshipSchema($relationship, $test))){
+            if (($resp = $this->parseReverseRelationshipSchema($relationship, $test))) {
                 $parsed = array_merge($parsed, $resp);
             }
         }
+
         return $parsed;
     }
 
@@ -131,7 +131,9 @@ class ModelRelationParser implements Arrayable
             //     continue;
 
             // $modelClass = $repository->getModel();
-            if(!@class_exists($modelClass)) continue;
+            if (! @class_exists($modelClass)) {
+                continue;
+            }
 
             $reflector = new \ReflectionClass($modelClass);
 
@@ -146,7 +148,7 @@ class ModelRelationParser implements Arrayable
             //     $format,
             //     $this->renderFormat($format)
             // );
-            if(!$reflector->hasMethod($format['relationship_name'])){
+            if (! $reflector->hasMethod($format['relationship_name'])) {
 
                 $filePath = $reflector->getFileName();
 
@@ -155,12 +157,12 @@ class ModelRelationParser implements Arrayable
                 $pattern = "/(\})[^\}]*$/";
 
                 $newContent = preg_replace($pattern, $this->renderFormat($format) . "\n}\n", $content);
-                $runnable = (!$test || confirm(label: "Do you want to see  content of {$format['model_name']} in result of writing reverse relationship in the test mode?", default: false) );
+                $runnable = (! $test || confirm(label: "Do you want to see  content of {$format['model_name']} in result of writing reverse relationship in the test mode?", default: false));
 
-                if($runnable){
-                    if($test){
+                if ($runnable) {
+                    if ($test) {
                         info($newContent);
-                    }else{
+                    } else {
                         app('files')->put($filePath, $newContent);
                     }
                 }
@@ -181,8 +183,9 @@ class ModelRelationParser implements Arrayable
             $schemas = explode(',', $relationship);
             $relationship_name = explode(':', $schemas[0])[0];
 
-            if(in_array($relationship_name, $this->pivotableRelationships) && count($schemas) > 2){
+            if (in_array($relationship_name, $this->pivotableRelationships) && count($schemas) > 2) {
                 $creatable = true;
+
                 break;
             }
         }
@@ -199,29 +202,28 @@ class ModelRelationParser implements Arrayable
             $schemas = explode(',', $relationship);
 
             $relationship_name = explode(':', $schemas[0])[0];
-            if(count($schemas) > 1 && in_array($relationship_name, $this->pivotableRelationships)){
+            if (count($schemas) > 1 && in_array($relationship_name, $this->pivotableRelationships)) {
                 foreach ($schemas as $index => $schema) {
-                    if(!$index){ // relation_type:table_name
+                    if (! $index) { // relation_type:table_name
                         $relationshipName = $this->getRelationshipName($schema);
                         $relatedMethodName = $this->getRelatedMethodName($relationshipName, $schema);
-
 
                         $models[] = [
                             'class' => $this->getPivotModelName($relatedMethodName),
                             'fillables' => [
                                 makeForeignKey($this->model),
-                                makeForeignKey($relatedMethodName)
+                                makeForeignKey($relatedMethodName),
                             ],
-                            'casts' => []
+                            'casts' => [],
                         ];
                     } else { // other fields
                         $explodes = explode(':', $schema);
                         $field = Arr::get($explodes, 0);
 
-                        $models[count($models)-1]['fillables'][] = $field;
-                        if( count($explodes) > 1){
+                        $models[count($models) - 1]['fillables'][] = $field;
+                        if (count($explodes) > 1) {
                             $type = Arr::get($explodes, 1);
-                            $models[count($models)-1]['casts'][$field] = $this->castFieldType($type);
+                            $models[count($models) - 1]['casts'][$field] = $this->castFieldType($type);
                         }
                     }
                 }
@@ -245,10 +247,10 @@ class ModelRelationParser implements Arrayable
         $casted = $type;
 
         $castings = [
-            'boolean' => 'string'
+            'boolean' => 'string',
         ];
 
-        if(array_key_exists($type, $castings)){
+        if (array_key_exists($type, $castings)) {
             $casted = $castings[$type];
         }
 
@@ -271,35 +273,38 @@ class ModelRelationParser implements Arrayable
         return $methods;
     }
 
-    public function renderFormat($attr) : string
+    public function renderFormat($attr): string
     {
 
-        $args = implode(', ', array_map(function($v){ return "{$v}";}, $attr['arguments']) );
+        $args = implode(', ', array_map(function ($v) {
+            return "{$v}";
+        }, $attr['arguments']));
 
         $comment = $this->generateMethodComment($attr);
 
         $method_chain = "\$this->{$attr['relationship_method']}({$args})";
 
-        if(count($attr['chain_methods'])){
+        if (count($attr['chain_methods'])) {
             foreach ($attr['chain_methods'] as $key => $chain) {
-                $chain_args = implode(', ', array_map(function($v){ return "{$v}";}, $chain['arguments']) );
+                $chain_args = implode(', ', array_map(function ($v) {
+                    return "{$v}";
+                }, $chain['arguments']));
                 $method_chain .= "\n\t\t\t->{$chain['method_name']}({$chain_args})";
-                # code...
+                // code...
             }
         }
-        $method_chain .= ";";
+        $method_chain .= ';';
 
-        return $comment."\n\tpublic function {$attr['relationship_name']}() : {$attr['return_type']}\n\t{\n\t\treturn {$method_chain}\n\t}\n";
+        return $comment . "\n\tpublic function {$attr['relationship_name']}() : {$attr['return_type']}\n\t{\n\t\treturn {$method_chain}\n\t}\n";
     }
 
-
-    public function getPivotModelName($relatedModel)  {
+    public function getPivotModelName($relatedModel)
+    {
         return $this->model . $this->getStudlyName($this->getSingular($relatedModel));
     }
 
     public function findModel_($table)
     {
-        return  "\\". (new Finder())->getModel($table) . "::class";
+        return '\\' . (new Finder)->getModel($table) . '::class';
     }
-
 }

@@ -2,61 +2,58 @@
 
 namespace Unusualify\Modularity\Http\Middleware;
 
-use Closure;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Menus\GetSidebarMenu;
 use App\Models\Menulist;
 use App\Models\RoleHierarchy;
-use Unusualify\Modularity\Facades\UNavigation;
+use Closure;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
+use Unusualify\Modularity\Facades\UNavigation;
 
 class NavigationMiddleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param \Illuminate\Http\Request $request
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
         app()->config->set([
-            unusualBaseKey() . '-navigation.sidebar' => UNavigation::formatSidebarMenus(app()->config->get(unusualBaseKey() . '-navigation.sidebar'))
+            unusualBaseKey() . '-navigation.sidebar' => UNavigation::formatSidebarMenus(app()->config->get(unusualBaseKey() . '-navigation.sidebar')),
         ]);
         app()->config->set([
-            unusualBaseKey().'.ui_settings.profileMenu' => UNavigation::formatSidebarMenus(app()->config->get(unusualBaseKey().'.ui_settings.profileMenu'))
+            unusualBaseKey() . '.ui_settings.profileMenu' => UNavigation::formatSidebarMenus(app()->config->get(unusualBaseKey() . '.ui_settings.profileMenu')),
         ]);
-        view()->composer( [unusualBaseKey()."::layouts.master", 'translation::layout'], function ($view)
-        {
+        view()->composer([unusualBaseKey() . '::layouts.master', 'translation::layout'], function ($view) {
 
             $navigation = [
                 'current_url' => url()->current(),
                 'sidebar' => [],
                 'breadcrumbs' => [],
-                'profileMenu' => []
+                'profileMenu' => [],
             ];
 
             // dd(
             //     config(unusualBaseKey() .'-navigation.sidebar')
             // );
-            if(Auth::guest()){
-                $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.guest') );
+            if (Auth::guest()) {
+                $navigation['sidebar'] = array_values(config(unusualBaseKey() . '-navigation.sidebar.guest'));
                 // $navigation['profileMenu'] = array_values( app()->config->get(unusualBaseKey(). '.ui_settings.profileMenu.client' ,default: []));
 
-            }else{
+            } else {
                 $user = auth()->user();
-                if(count($user->roles) > 0 && $user->isClient()){
-                    $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.client') );
-                    $navigation['profileMenu'] = array_values( app()->config->get(unusualBaseKey(). '.ui_settings.profileMenu.client' ,default: []));
+                if (count($user->roles) > 0 && $user->isClient()) {
+                    $navigation['sidebar'] = array_values(config(unusualBaseKey() . '-navigation.sidebar.client'));
+                    $navigation['profileMenu'] = array_values(app()->config->get(unusualBaseKey() . '.ui_settings.profileMenu.client', default: []));
 
-                }else if($user->hasRole(1)) {
-                    $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.superadmin') );
-                    $navigation['profileMenu'] = array_values( app()->config->get(unusualBaseKey(). '.ui_settings.profileMenu.superadmin',default: []));
-                }else{
-                    $navigation['sidebar'] = array_values( config(unusualBaseKey() .'-navigation.sidebar.default') );
-                    $navigation['profileMenu'] = array_values( app()->config->get(unusualBaseKey(). '.ui_settings.profileMenu.default',default: []));
+                } elseif ($user->hasRole(1)) {
+                    $navigation['sidebar'] = array_values(config(unusualBaseKey() . '-navigation.sidebar.superadmin'));
+                    $navigation['profileMenu'] = array_values(app()->config->get(unusualBaseKey() . '.ui_settings.profileMenu.superadmin', default: []));
+                } else {
+                    $navigation['sidebar'] = array_values(config(unusualBaseKey() . '-navigation.sidebar.default'));
+                    $navigation['profileMenu'] = array_values(app()->config->get(unusualBaseKey() . '.ui_settings.profileMenu.default', default: []));
                 }
 
             }
@@ -67,39 +64,41 @@ class NavigationMiddleware
 
         return $next($request);
 
-        if (Auth::check() && false){
+        if (Auth::check() && false) {
             $role = 'guest';
             //$role =  Auth::user()->menuroles;
             $userRoles = Auth::user()->getRoleNames();
             //$userRoles = $userRoles['items'];
             $roleHierarchy = RoleHierarchy::select('role_hierarchy.role_id', 'roles.name')
-            ->join('roles', 'roles.id', '=', 'role_hierarchy.role_id')
-            ->orderBy('role_hierarchy.hierarchy', 'asc')->get();
+                ->join('roles', 'roles.id', '=', 'role_hierarchy.role_id')
+                ->orderBy('role_hierarchy.hierarchy', 'asc')->get();
             $flag = false;
-            foreach($roleHierarchy as $roleHier){
-                foreach($userRoles as $userRole){
-                    if($userRole == $roleHier['name']){
+            foreach ($roleHierarchy as $roleHier) {
+                foreach ($userRoles as $userRole) {
+                    if ($userRole == $roleHier['name']) {
                         $role = $userRole;
                         $flag = true;
+
                         break;
                     }
                 }
-                if($flag === true){
+                if ($flag === true) {
                     break;
                 }
             }
-        }else{
+        } else {
             $role = 'guest';
         }
         //session(['prime_user_role' => $role]);
-        $menus = new GetSidebarMenu();
+        $menus = new GetSidebarMenu;
         $menulists = Menulist::all();
-        $result = array();
-        foreach($menulists as $menulist){
+        $result = [];
+        foreach ($menulists as $menulist) {
             // dd($role, $menulist->id);
-            $result[ $menulist->name ] = $menus->get( $role, $menulist->id );
+            $result[$menulist->name] = $menus->get($role, $menulist->id);
         }
-        view()->share('appMenus', $result );
+        view()->share('appMenus', $result);
+
         return $next($request);
     }
 }

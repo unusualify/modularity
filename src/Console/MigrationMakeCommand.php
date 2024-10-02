@@ -2,19 +2,17 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
-use Unusualify\Modularity\Support\Decomposers\SchemaParser;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Nwidart\Modules\Support\Migrations\NameParser;
 use Nwidart\Modules\Support\Migrations\SchemaParser as NwidartSchemaParser;
+use Nwidart\Modules\Support\Stub;
 // use Nwidart\Modules\Support\Migrations\SchemaParser;
 
-use Nwidart\Modules\Support\Stub;
-use Nwidart\Modules\Traits\ModuleCommandTrait;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Support\Decomposers\SchemaParser;
 
 class MigrationMakeCommand extends BaseCommand
 {
@@ -34,13 +32,12 @@ class MigrationMakeCommand extends BaseCommand
 
     protected $defaultFieldSchemas = [];
 
-
     /**
      * Run the command.
      */
-    public function handle() : int
+    public function handle(): int
     {
-        if(!$this->option('no-defaults')){
+        if (! $this->option('no-defaults')) {
             $this->defaultFieldSchemas = $this->baseConfig('schemas.default_fields') ?? [];
         }
 
@@ -52,12 +49,11 @@ class MigrationMakeCommand extends BaseCommand
             return 0;
         }
 
-        if($this->option('relational')){
+        if ($this->option('relational')) {
             $this->info('(Pivot) Migration created successfully!');
-        }else {
+        } else {
             $this->info('Migration created successfully!');
         }
-
 
         return 0;
     }
@@ -98,9 +94,9 @@ class MigrationMakeCommand extends BaseCommand
     }
 
     /**
-     * @throws \InvalidArgumentException
-     *
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getTemplateContents()
     {
@@ -108,58 +104,61 @@ class MigrationMakeCommand extends BaseCommand
         //Table name option added. If table name option is not set get from parser.
         $tableName = $this->option('table-name') ? $this->option('table-name') : $parser->getTableName();
 
-        if(($relational = $this->option('relational'))) {
-            if($relational == 'BelongsToMany'){
+        if (($relational = $this->option('relational'))) {
+            if ($relational == 'BelongsToMany') {
                 $table1 = $this->getSnakeCase($this->option('route'));
                 $table2 = preg_replace("/^({$table1}_)(\w+)$/", '${2}', $tableName);
 
                 return Stub::create('/migration/pivot.stub', [
-                    'class'         => $this->getClass(),
-                    'table'         => $tableName,
-                    'fields'        => ltrim((new SchemaParser(schema: $this->option('fields'), useDefaults:false))->render()),
+                    'class' => $this->getClass(),
+                    'table' => $tableName,
+                    'fields' => ltrim((new SchemaParser(schema: $this->option('fields'), useDefaults: false))->render()),
                     // 'fields'        => ltrim($this->getSchemaParser()->render()),
 
-                    'table1'        => $table1,
-                    'table2'        => $table2,
+                    'table1' => $table1,
+                    'table2' => $table2,
                 ]);
-            }else if($relational == 'MorphedByMany'){
+            } elseif ($relational == 'MorphedByMany') {
 
                 return Stub::create('/migration/morphPivot.stub', [
-                    'class'         => $this->getClass(),
-                    'table'         => $tableName,
-                    'fields'        => ltrim((new SchemaParser(useDefaults:false))->render()),
+                    'class' => $this->getClass(),
+                    'table' => $tableName,
+                    'fields' => ltrim((new SchemaParser(useDefaults: false))->render()),
                 ]);
             }
         } elseif ($parser->isCreate()) {
             return Stub::create('/migration/create.stub', [
-                'class'         => $this->getClass(),
-                'table'         => $tableName,
-                'fields'        => ltrim($this->getSchemaParser()->render()),
-                'up_schemas'    => ltrim($this->getExtraUpSchemaMethods()),
-                'down_schemas'  => ltrim($this->getExtraDownSchemaMethods()),
+                'class' => $this->getClass(),
+                'table' => $tableName,
+                'fields' => ltrim($this->getSchemaParser()->render()),
+                'up_schemas' => ltrim($this->getExtraUpSchemaMethods()),
+                'down_schemas' => ltrim($this->getExtraDownSchemaMethods()),
             ]);
         } elseif ($parser->isAdd()) {
             $schemaParser = new NwidartSchemaParser($this->option('fields'));
+
             return Stub::create('/migration/add.stub', [
-                'class'         => $this->getClass(),
-                'table'         => $tableName,
-                'fields_up'     => ltrim(rtrim($this->getSchemaParser()->up())),
-                'fields_down'   => ltrim(rtrim($this->getSchemaParser()->down())),
+                'class' => $this->getClass(),
+                'table' => $tableName,
+                'fields_up' => ltrim(rtrim($this->getSchemaParser()->up())),
+                'fields_down' => ltrim(rtrim($this->getSchemaParser()->down())),
             ]);
         } elseif ($parser->isDelete()) {
             $schemaParser = new NwidartSchemaParser($this->option('fields'));
+
             return Stub::create('/migration/delete.stub', [
-                'class'         => $this->getClass(),
-                'table'         => $tableName,
-                'fields_down'   => $schemaParser->up(),
-                'fields_up'     => $schemaParser->down(),
+                'class' => $this->getClass(),
+                'table' => $tableName,
+                'fields_down' => $schemaParser->up(),
+                'fields_up' => $schemaParser->down(),
             ]);
         } elseif ($parser->isDrop()) {
             $schemaParser = new NwidartSchemaParser($this->option('fields'));
+
             return Stub::create('/migration/drop.stub', [
-                'class'         => $this->getClass(),
-                'table'         => $tableName,
-                'fields'        => $schemaParser->render(),
+                'class' => $this->getClass(),
+                'table' => $tableName,
+                'fields' => $schemaParser->render(),
             ]);
         }
 
@@ -190,42 +189,43 @@ class MigrationMakeCommand extends BaseCommand
 
         $fields = '';
 
-        if($this->option('addPosition')){
-            $fields .= "position:integer:unsigned:nullable,";
+        if ($this->option('addPosition')) {
+            $fields .= 'position:integer:unsigned:nullable,';
         }
 
-        if(!$this->option('addTranslation')){
-            if(count($this->defaultFieldSchemas))
-                $fields .= implode(",", $this->defaultFieldSchemas).",";
+        if (! $this->option('addTranslation')) {
+            if (count($this->defaultFieldSchemas)) {
+                $fields .= implode(',', $this->defaultFieldSchemas) . ',';
+            }
             $fields .= $this->option('fields');
         }
 
-        return new SchemaParser(rtrim($fields, ","));
+        return new SchemaParser(rtrim($fields, ','));
     }
 
     public function getExtraUpSchemaMethods()
     {
-        $schemas = "";
-        $singular_table = Str::singular( (new NameParser($this->argument('name')))->getTableName() );
+        $schemas = '';
+        $singular_table = Str::singular((new NameParser($this->argument('name')))->getTableName());
 
-        if($this->option('addTranslation')){
+        if ($this->option('addTranslation')) {
 
             $fields = implode(',', array_merge($this->defaultFieldSchemas, $this->option('fields') ? explode(',', $this->option('fields')) : []));
 
             $schemas .= "\t\t\tSchema::create('{$singular_table}_translations', function(Blueprint \$table) {\n"
-                ."\t\t\tcreateDefaultTranslationsTableFields(\$table, '{$singular_table}');\n"
+                . "\t\t\tcreateDefaultTranslationsTableFields(\$table, '{$singular_table}');\n"
                 // . (new SchemaParser(implode(",", $this->defaultFieldSchemas)))->render()
                 . (new SchemaParser(rtrim($fields)))->render()
-                ."\t\t});\n\n";
+                . "\t\t});\n\n";
         }
 
-        if($this->option('addSlug')){
+        if ($this->option('addSlug')) {
             // Schema::create('blog_slugs', function (Blueprint $table) {
             //     createDefaultSlugsTableFields($table, 'blog');
             // });
             $schemas .= "\t\t\tSchema::create('{$singular_table}_slugs', function(Blueprint \$table) {\n"
-                ."\t\t\tcreateDefaultSlugsTableFields(\$table, '{$singular_table}');\n"
-                ."\t\t});\n\n";
+                . "\t\t\tcreateDefaultSlugsTableFields(\$table, '{$singular_table}');\n"
+                . "\t\t});\n\n";
         }
 
         return $schemas;
@@ -233,18 +233,18 @@ class MigrationMakeCommand extends BaseCommand
 
     public function getExtraDownSchemaMethods()
     {
-        $schemas = "";
+        $schemas = '';
 
         $table = (new NameParser($this->argument('name')))->getTableName();
 
-        $singular_table = Str::singular( $table );
+        $singular_table = Str::singular($table);
 
-        if($this->option('addTranslation')){
+        if ($this->option('addTranslation')) {
             // $results = "\t\t\t" . '$table';
             $schemas .= "\t\t\tSchema::dropIfExists('{$singular_table}_translations');\n";
         }
 
-        if($this->option('addSlug')){
+        if ($this->option('addSlug')) {
             $schemas .= "\t\t\tSchema::dropIfExists('{$singular_table}_slugs');\n";
         }
 
@@ -281,6 +281,4 @@ class MigrationMakeCommand extends BaseCommand
     {
         return $this->getClassName();
     }
-
-
 }

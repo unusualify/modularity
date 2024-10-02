@@ -41,11 +41,10 @@ abstract class InputHydrate
      */
     public $requirements = [];
 
-
     /**
      * Create a new HydrateInput instance.
      */
-    public function __construct(array $input, Module $module = null)
+    public function __construct(array $input, ?Module $module = null)
     {
         $this->input = $input;
 
@@ -71,10 +70,8 @@ abstract class InputHydrate
 
     /**
      * return hydrated input
-     *
-     * @return array
      */
-    public function render() : array
+    public function render(): array
     {
         $this->setDefaults();
 
@@ -84,13 +81,12 @@ abstract class InputHydrate
 
         $this->input = $this->hydrateRules();
 
-        $this->input = Arr::except($this->input, ['route','model', 'repository', 'cascades', 'connector']);
+        $this->input = Arr::except($this->input, ['route', 'model', 'repository', 'cascades', 'connector']);
 
         return $this->input;
     }
 
     /**
-     *
      *  Set records wrt repository
      *
      * @return array
@@ -99,19 +95,19 @@ abstract class InputHydrate
     {
         $input = $this->input;
 
-        if(isset($input['repository'])){
+        if (isset($input['repository'])) {
             $args = explode(':', $input['repository']);
 
             $className = array_shift($args);
             $methodName = array_shift($args) ?? 'list';
 
-            if(!@class_exists($className)){
+            if (! @class_exists($className)) {
                 return $input;
             }
 
             $repository = App::make($className);
 
-            $params = Collection::make($args)->mapWithKeys(function($arg){
+            $params = Collection::make($args)->mapWithKeys(function ($arg) {
                 [$name, $value] = explode('=', $arg);
 
                 // return [$name => [$value]];
@@ -120,42 +116,36 @@ abstract class InputHydrate
 
             $params = array_merge_recursive($params, ['with' => $this->getWiths()]);
             // dd($params, [$input['itemTitle'] ?? 'name', ...$this->getItemColumns()]);
-            $items =  call_user_func_array(array($repository, $methodName), [
-                ...($methodName == 'list'? ['column' => [$input['itemTitle'] ?? 'name', ...$this->getItemColumns()]] : []),
-                ...$params
+            $items = call_user_func_array([$repository, $methodName], [
+                ...($methodName == 'list' ? ['column' => [$input['itemTitle'] ?? 'name', ...$this->getItemColumns()]] : []),
+                ...$params,
             ])->toArray();
 
             $input['items'] = $items;
             // $input =  Arr::except($input, ['route', 'model', 'repository']) + [
             //     'items' => $items
             // ];
-            if(count($input['items']) > 0){
+            if (count($input['items']) > 0) {
                 // if(!isset($input['itemTitle'])){
                 //     dd($input);
                 // }
-                if(!isset($input['items'][0][$input['itemTitle']])){
+                if (! isset($input['items'][0][$input['itemTitle']])) {
                     $input['itemTitle'] = array_keys(Arr::except($input['items'][0], [$input['itemValue']]))[0];
                 }
             }
             $this->afterHydrateRecords($input);
         }
 
-
         return $input;
     }
 
     /**
-     *
      *  Handle input after records set
      *
-     *  @param array &$input
-     *
-     *  @return void
+     * @param array &$input
+     * @return void
      */
-    public function afterHydrateRecords(&$input)
-    {
-
-    }
+    public function afterHydrateRecords(&$input) {}
 
     /**
      * Get withs to add to model's withs
@@ -168,7 +158,7 @@ abstract class InputHydrate
 
         $withs = [];
 
-        if(isset($input['cascades'])){
+        if (isset($input['cascades'])) {
             $withs = $input['cascades'];
         }
 
@@ -179,10 +169,8 @@ abstract class InputHydrate
 
     /**
      *  Withs defined on the input to add to model's withs
-     *
-     * @return array
      */
-    public function withs() :array
+    public function withs(): array
     {
         return [];
     }
@@ -193,26 +181,28 @@ abstract class InputHydrate
 
         $columns = [];
 
-        if(isset($input['ext'])){
+        if (isset($input['ext'])) {
             $extensionMethods = $input['ext'];
-            if(is_string($input['ext'])){
+            if (is_string($input['ext'])) {
                 $extensionMethods = explode('|', $input['ext']);
             }
 
-            $columns = array_merge(collect($extensionMethods)->filter(function($pattern) {
+            $columns = array_merge(collect($extensionMethods)->filter(function ($pattern) {
+                $args = $pattern;
+                if (is_string($pattern)) {
+                    $pattern = trim($pattern);
+                    $args = explode(':', $pattern);
+                }
+
+                return in_array($args[0], ['lock']);
+            })
+                ->map(function ($pattern) {
                     $args = $pattern;
-                    if(is_string($pattern)){
+                    if (is_string($pattern)) {
                         $pattern = trim($pattern);
-                        $args = explode(':',$pattern);
+                        $args = explode(':', $pattern);
                     }
-                    return in_array($args[0], ['lock']);
-                })
-                ->map(function($pattern) {
-                    $args = $pattern;
-                    if(is_string($pattern)){
-                        $pattern = trim($pattern);
-                        $args = explode(':',$pattern);
-                    }
+
                     return $args[1];
                 })
                 ->toArray(), $columns);
@@ -223,7 +213,7 @@ abstract class InputHydrate
         return $columns;
     }
 
-    public function itemColumns() :array
+    public function itemColumns(): array
     {
         return [];
     }
@@ -232,12 +222,13 @@ abstract class InputHydrate
     {
         $input = $this->input;
 
-        if(isset($input['rules']) && is_string($input['rules'])){
-            if(preg_match('/required/', $input['rules'])){
-                if(isset($input['class']))
-                    $input['class'] .= " required";
-                else
+        if (isset($input['rules']) && is_string($input['rules'])) {
+            if (preg_match('/required/', $input['rules'])) {
+                if (isset($input['class'])) {
+                    $input['class'] .= ' required';
+                } else {
                     $input['class'] = 'required';
+                }
             }
         }
 

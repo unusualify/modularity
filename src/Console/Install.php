@@ -4,9 +4,11 @@ namespace Unusualify\Modularity\Console;
 
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Filesystem\Filesystem;
-use function Laravel\Prompts\{text,note,confirm,error,info,password,warning, alert, select};
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+
+use function Laravel\Prompts\info;
+use function Laravel\Prompts\select;
+use function Laravel\Prompts\warning;
 
 class Install extends BaseCommand
 {
@@ -34,10 +36,6 @@ class Install extends BaseCommand
      */
     protected $db;
 
-    /**
-     * @param Filesystem $files
-     * @param DatabaseManager $db
-     */
     public function __construct(Filesystem $files, DatabaseManager $db)
     {
         parent::__construct();
@@ -57,35 +55,34 @@ class Install extends BaseCommand
         ], unusualTraitOptions());
     }
 
-
-
     /**
      * Executes the console command.
      *
      * @return void
+     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    public function handle():int
+    public function handle(): int
     {
-        if($this->option('db-process') == null){
+        if ($this->option('db-process') == null) {
             info(
                 'Installment process consists of two(2) main operations.
                 1. Publishing Config Files: Modularity Config files manages heavily table names, jwt configurations and etc.User should customize them after publishing in order to customize table names and other opeartions
                 2. Database Operations and Creating Super Admin. DO NOT select this option if you have not published vendor files to theproject. This option will only dealing with db operations
                 3. Complete Installment with default configurations (√ suggested)
                 ');
-                $operationType = select(
-                    label: 'Select Operation',
+            $operationType = select(
+                label: 'Select Operation',
 
-                    options: [
-                        'vp' => 'Only Vendor Publish (Config Files, Assets and Views)',
-                        'db' => 'Only Database Operations',
-                        'complete' => 'Complete Installment with defaults'
-                    ],
-                    default: 'complete',
+                options: [
+                    'vp' => 'Only Vendor Publish (Config Files, Assets and Views)',
+                    'db' => 'Only Database Operations',
+                    'complete' => 'Complete Installment with defaults',
+                ],
+                default: 'complete',
 
-                );
-        }else{
+            );
+        } else {
             $operationType = 'db';
         }
 
@@ -102,15 +99,12 @@ class Install extends BaseCommand
             'publishLang',
         ];
 
-
-
         $operations = array_merge_conditional(
             [],
-            [$vendorOperations, $dbOperations,],
+            [$vendorOperations, $dbOperations],
             $operationType === 'complete' || $operationType === 'vp',
             $operationType === 'complete' || $operationType === 'db',
         );
-
 
         $bar = $this->output->createProgressBar(count($operations));
 
@@ -122,22 +116,18 @@ class Install extends BaseCommand
 
         }
 
-
-
         $bar->finish();
         $this->newLine();
 
-
-        if($operationType == 'vp'){
+        if ($operationType == 'vp') {
             $this->newLine();
             info('Vendor publish is done √. Config files can be customized now');
             warning('Run php artisan unusual:install --db to run installation with db operations');
         }
         info('Process is done.');
+
         return 0;
     }
-
-
 
     /**
      * Calls the command responsible for creation of the default superadmin user.
@@ -148,7 +138,7 @@ class Install extends BaseCommand
     {
         info("\t Creating super-admin account");
 
-        if (!$this->option('no-interaction')) {
+        if (! $this->option('no-interaction')) {
             $this->call('unusual:create:superadmin', [
                 '--default' => $this->option('default'),
             ]);
@@ -185,60 +175,59 @@ class Install extends BaseCommand
         ]);
     }
 
-    private function publishViews(){
+    private function publishViews()
+    {
 
         info("\t Publishing default views");
 
-
         $this->call('vendor:publish', [
             '--provider' => 'Unusualify\Modularity\LaravelServiceProvider',
-            '--tag' => 'views'
+            '--tag' => 'views',
         ]);
     }
 
-    private function publishLang(){
+    private function publishLang()
+    {
 
         info("\t Publishing default langs");
 
-
         $this->call('vendor:publish', [
             '--provider' => 'Unusualify\Modularity\LaravelServiceProvider',
-            '--tag' => 'lang'
+            '--tag' => 'lang',
         ]);
     }
 
-    private function checkDbConnection(){
+    private function checkDbConnection()
+    {
         $this->newLine();
         info("\t Checking database connection");
 
-        if(!database_exists()){
+        if (! database_exists()) {
             warning('Could not connect to the database, please check your configuration:' . "\n");
+
             return 0;
         }
         info('Database connection is fine.');
     }
 
-    private function makeMigrations(){
+    private function makeMigrations()
+    {
         info("\t Making required migrations");
         $this->call('migrate');
 
     }
 
     /**
-     *
      * Defined Seeders are
      *
      *  - DefaultRolesSeeder
      *  - DefaultPermissionsSeeder
      * */
-
-    private function seedData(){
+    private function seedData()
+    {
         info("\tSeeding required data");
         $this->call('db:seed', [
             '--class' => 'Unusualify\Modularity\Database\Seeders\DefaultDatabaseSeeder',
         ]);
     }
-
-
-
 }

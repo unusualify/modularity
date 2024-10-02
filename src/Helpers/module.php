@@ -18,26 +18,30 @@ use Unusualify\Modularity\Facades\Modularity;
 */
 
 if (! function_exists('unusualBaseKey')) {
-    function unusualBaseKey($notation = null) {
-        $notation = !$notation ? $notation : "." . $notation;
+    function unusualBaseKey($notation = null)
+    {
+        $notation = ! $notation ? $notation : '.' . $notation;
+
         return \Illuminate\Support\Str::snake(env('MODULARITY_BASE_NAME', 'Modularity')) . $notation;
     }
 }
 
 if (! function_exists('curtModule')) {
-    function curtModule($file = null) {
+    function curtModule($file = null)
+    {
         $name = curtModuleName($file);
 
-        return Modularity::find( studlyName($name ));
+        return Modularity::find(studlyName($name));
     }
 }
 
 if (! function_exists('curtModuleName')) {
-    function curtModuleName($file = null) {
+    function curtModuleName($file = null)
+    {
 
         $dir = $file;
 
-        if(!$file){
+        if (! $file) {
 
             $pattern = '/^((?![M|m]{1}odules\/Base).)*$/';
             $pattern = '/[M|m]{1}odules\/[A-Za-z]/';
@@ -49,7 +53,7 @@ if (! function_exists('curtModuleName')) {
         $pattern = '/(?<=[M|m]{1}odules[\/|\\\]).*?(?=(\/|\\\|$))/';
 
         preg_match($pattern, $dir, $matches);
-        if(!count($matches)){
+        if (! count($matches)) {
             dd($file, $matches, $dir, debug_backtrace());
         }
 
@@ -59,7 +63,8 @@ if (! function_exists('curtModuleName')) {
 }
 
 if (! function_exists('curtModuleUrlPrefix')) {
-    function curtModuleUrlPrefix($file = null) {
+    function curtModuleUrlPrefix($file = null)
+    {
         // dd(
         //     curtModule($file)->prefix(),
         //     curtModule($file)->fullPrefix()
@@ -70,26 +75,29 @@ if (! function_exists('curtModuleUrlPrefix')) {
 }
 
 if (! function_exists('curtModuleRouteNamePrefix')) {
-    function curtModuleRouteNamePrefix($file = null) {
+    function curtModuleRouteNamePrefix($file = null)
+    {
         return curtModule($file)->routeNamePrefix();
     }
 }
 
-
 if (! function_exists('curtModuleStudlyName')) {
-    function curtModuleStudlyName($file = null) {
+    function curtModuleStudlyName($file = null)
+    {
         // dd( curtModule() );
         return curtModule($file)->getStudlyName();
 
     }
 }
 if (! function_exists('curtModuleLowerName')) {
-    function curtModuleLowerName($file = null) {
+    function curtModuleLowerName($file = null)
+    {
         return curtModule($file)->getLowerName();
     }
 }
 if (! function_exists('curtModuleSnakeName')) {
-    function curtModuleSnakeName($file = null) {
+    function curtModuleSnakeName($file = null)
+    {
         return curtModule($file)->getSnakeName();
     }
 }
@@ -143,7 +151,7 @@ if (! function_exists('classHasTrait')) {
     }
 }
 
-if (!function_exists('moduleRoute')) {
+if (! function_exists('moduleRoute')) {
     /**
      * @param string $moduleName
      * @param string $prefix
@@ -166,19 +174,19 @@ if (!function_exists('moduleRoute')) {
 
         // Create base route name
         // $routeName = 'admin.' . ($prefix ? $prefix . '.' : '');
-        $routeName = (!!$prefix ? $prefix . '.' : '');
+        $routeName = ((bool) $prefix ? $prefix . '.' : '');
 
         // Prefix it with module name only if prefix doesn't contains it already
         if (
             unusualConfig('allow_duplicates_on_route_names', false) ||
             ($prefix !== $moduleName &&
-                !Str::endsWith($prefix, '.' . $moduleName))
+                ! Str::endsWith($prefix, '.' . $moduleName))
         ) {
             $routeName .= "{$snakeName}";
         }
         // dd($snakeName, $parameters);
-        if(preg_match('/edit|show|update|destroy|duplicate|restoreRevision|preview/', $action) && !array_key_exists($snakeName, $parameters) && !$singleton){
-            $parameters[$snakeName] = ":id";
+        if (preg_match('/edit|show|update|destroy|duplicate|restoreRevision|preview/', $action) && ! array_key_exists($snakeName, $parameters) && ! $singleton) {
+            $parameters[$snakeName] = ':id';
             // dd(
             //     $routeName,
             //     $parameters
@@ -195,7 +203,7 @@ if (!function_exists('moduleRoute')) {
         //     route($routeName, $parameters, $absolute),
         //     $singleton
         // );
-       // Build the route
+        // Build the route
         try {
             //code...
             return route($routeName, $parameters, $absolute);
@@ -208,17 +216,18 @@ if (!function_exists('moduleRoute')) {
                     'prefix' => $prefix,
                     'action' => $action,
                     'parameters' => $parameters,
-                    'absolute' => $absolute
+                    'absolute' => $absolute,
                 ],
                 debug_backtrace()
             );
             //throw $th;
         }
+
         return route($routeName, $parameters, $absolute);
     }
 }
 
-if (!function_exists('unusualRoute')) {
+if (! function_exists('unusualRoute')) {
     /**
      * @param string $routeName
      * @param string $prefix
@@ -232,8 +241,6 @@ if (!function_exists('unusualRoute')) {
         // Fix module name case
         $route = Str::camel($route);
 
-
-
         // Create base route name
         // $routeName = 'admin.' . ($prefix ? $prefix . '.' : '');
         $routeName = ($prefix ? $prefix . '.' : '');
@@ -242,15 +249,15 @@ if (!function_exists('unusualRoute')) {
         if (
             unusualConfig('allow_duplicates_on_route_names', false) ||
             ($prefix !== $route &&
-                !Str::endsWith($prefix, '.' . $route))
+                ! Str::endsWith($prefix, '.' . $route))
         ) {
             $routeName .= "{$route}";
         }
 
-
         //  Add the action name
         $routeName .= $action ? ".{$action}" : '';
         dd($routeName);
+
         // dd($routeName, $moduleName, $prefix);
         // Build the route
         return route($routeName, $parameters, $absolute);
@@ -298,13 +305,13 @@ if (! function_exists('unusualTraitOptions')) {
     function unusualTraitOptions()
     {
         return Collection::make(Config::get(unusualBaseKey() . '.traits'))->map(function ($trait, $key) {
-                return [
-                    $key,
-                    $trait['command_option']['shortcut'] ?? null,
-                    $trait['command_option']['input_type'] ?? InputOption::VALUE_NONE,
-                    $trait['command_option']['description'] ?? '',
-                ];
-            })->values()->toArray();
+            return [
+                $key,
+                $trait['command_option']['shortcut'] ?? null,
+                $trait['command_option']['input_type'] ?? InputOption::VALUE_NONE,
+                $trait['command_option']['description'] ?? '',
+            ];
+        })->values()->toArray();
     }
 }
 
@@ -314,10 +321,11 @@ if (! function_exists('unusualConfig')) {
      */
     function unusualConfig($notation = null, $default = '')
     {
-        if(!$notation)
+        if (! $notation) {
             return config(unusualBaseKey());
-        else
+        } else {
             return config(unusualBaseKey($notation), $default);
+        }
     }
 }
 
@@ -327,7 +335,7 @@ if (! function_exists('findParentRoute')) {
      */
     function findParentRoute($config)
     {
-        return array_values(array_filter($config['routes'], function($r){
+        return array_values(array_filter($config['routes'], function ($r) {
             return isset($r['parent']) && $r['parent'];
         }))[0] ?? [];
     }
@@ -345,7 +353,7 @@ if (! function_exists('formatPermissionName')) {
         //     // get_class_methods(Permission::class)
         //     // Permission::{$permissionType}->value
         // );
-        return kebabCase($routeName) . "_" . Permission::get($permissionType);
+        return kebabCase($routeName) . '_' . Permission::get($permissionType);
     }
 }
 
@@ -365,7 +373,7 @@ if (! function_exists('routePermissionRecords')) {
      */
     function routePermissionRecords($routeName, $guardName, $cases = null)
     {
-        return Arr::map($cases ?:Permission::cases(), function($item) use($routeName, $guardName){
+        return Arr::map($cases ?: Permission::cases(), function ($item) use ($routeName, $guardName) {
             return ['name' => kebabCase($routeName) . '_' . $item->value, 'guard_name' => $guardName];
         });
     }
@@ -391,12 +399,12 @@ if (! function_exists('permissionRecordsFromRoutes')) {
 if (! function_exists('ifdd')) {
     function ifdd($condition, mixed ...$vars)
     {
-        if($condition){
-            if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) && !headers_sent()) {
+        if ($condition) {
+            if (! \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) && ! headers_sent()) {
                 header('HTTP/1.1 500 Internal Server Error');
             }
 
-            if (array_key_exists(0, $vars) && 1 === count($vars)) {
+            if (array_key_exists(0, $vars) && count($vars) === 1) {
                 VarDumper::dump($vars[0]);
             } else {
                 foreach ($vars as $k => $v) {
@@ -409,14 +417,14 @@ if (! function_exists('ifdd')) {
     }
 }
 
-if(! function_exists('exceptionalRunningInConsole')){
-    function exceptionalRunningInConsole(){
-        return !(App::runningInConsole() && App::runningConsoleCommand([
+if (! function_exists('exceptionalRunningInConsole')) {
+    function exceptionalRunningInConsole()
+    {
+        return ! (App::runningInConsole() && App::runningConsoleCommand([
             'unusual:make:module',
             'unusual:fix:module',
             'unusual:make:route',
-            'unusual:dev'
+            'unusual:dev',
         ]));
     }
 }
-

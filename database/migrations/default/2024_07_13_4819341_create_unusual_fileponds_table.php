@@ -1,18 +1,17 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up()
     {
         $filepondsTable = unusualConfig('tables.fileponds', 'modularity_fileponds');
 
-        if(!Schema::hasTable($filepondsTable)){
-            Schema::create($filepondsTable, function(Blueprint $table){
+        if (! Schema::hasTable($filepondsTable)) {
+            Schema::create($filepondsTable, function (Blueprint $table) {
                 $table->{unusualIncrementsMethod()}('id');
                 $table->uuidMorphs('filepondable');
                 $table->text('uuid');
@@ -26,9 +25,8 @@ return new class extends Migration
 
         $temporariesTable = unusualConfig('tables.filepond_temporaries', 'modularity_filepond_temporaries');
 
-        if(!Schema::hasTable($temporariesTable))
-        {
-            Schema::create($temporariesTable, function(Blueprint $table){
+        if (! Schema::hasTable($temporariesTable)) {
+            Schema::create($temporariesTable, function (Blueprint $table) {
                 $table->{unusualIncrementsMethod()}('id');
                 $table->string('file_name');
                 $table->string('folder_name');
@@ -37,7 +35,6 @@ return new class extends Migration
             });
         }
     }
-
 
     public function down()
     {

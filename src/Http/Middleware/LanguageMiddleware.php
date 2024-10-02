@@ -11,7 +11,6 @@ class LanguageMiddleware
      * Handles an incoming request.
      *
      * @param \Illuminate\Http\Request $request
-     * @param Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -20,8 +19,8 @@ class LanguageMiddleware
 
         if ($request->user() && $request->user()->language) {
             $locale = $request->user()->language;
-        }else{
-            if( strtolower( geoip()->getLocation($request->ip())->iso_code) === 'tr') {
+        } else {
+            if (mb_strtolower(geoip()->getLocation($request->ip())->iso_code) === 'tr') {
                 $locale = 'tr';
             }
         }
@@ -32,7 +31,7 @@ class LanguageMiddleware
         App::setFallbackLocale(unusualConfig('fallback_locale'));
 
         $currency = unusualConfig("payment.locale_currencies.{$locale}", null)
-            ?? unusualConfig("payment.currency", 'EUR');
+            ?? unusualConfig('payment.currency', 'EUR');
         config([unusualBaseKey() . '.payment.currency' => $currency]);
         $request->session()->put('currency', $currency);
 

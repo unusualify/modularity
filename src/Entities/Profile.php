@@ -12,13 +12,11 @@ class Profile extends Model
         'phone',
         'country',
         'language',
-        'timezone'
+        'timezone',
     ];
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'id', 'user_id');
     }
-
-
 }
