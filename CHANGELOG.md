@@ -2,6 +2,84 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.11.0 - 2024-10-02
+
+### :rocket: Features
+
+- add new CacheList command by @OoBook in https://github.com/unusualify/modularity/commit/537588472a7258669c836be3fc73fa63e12ae0ac
+- :art: add currency preset according to locale by @OoBook in https://github.com/unusualify/modularity/commit/623d9f3ad4e659a1df62093fee6fdbfc6356e379
+- :sparkles: add modularity:pint command for modules and modularity by @OoBook in https://github.com/unusualify/modularity/commit/a4b2c8e393aac286cf3edfe3a95cddd9e9ccf2be
+
+### :wrench: Bug Fixes
+
+- :bug: missing migration for is_external && is_internal fields on payment_services table by @gunesbizim in https://github.com/unusualify/modularity/commit/c88bcddcc310fe80974f3a6946532be0e208cc9b
+- :bug: creditCard component fixes and icon change for pay action by @gunesbizim in https://github.com/unusualify/modularity/commit/0c327f8e2c366403bbe162f25a5f235d6f8d95d2
+- :bug: added tags method to coreController && fixed the tags issue on relationTrait && updated paymentServiceSeeder for ideal payment by @gunesbizim in https://github.com/unusualify/modularity/commit/18bb8f66f7753f2b443eb3e64dfcea562dd2b9ab
+- add if Snapshot model has priceable by @OoBook in https://github.com/unusualify/modularity/commit/c8f38b6912557281cb6da698fbce5f86a2a1aa24
+- :ambulance: reset cache if paths does not match with base path by @OoBook in https://github.com/unusualify/modularity/commit/2863bf407e6f48fb7f284e39d2ce59cc67ff3204
+- :bug: remove class v-btn--uppercase from default v-btn by @OoBook in https://github.com/unusualify/modularity/commit/26c96d29939422b6760870b60a0d45f4b82486c7
+- add pint.json of the modularity as config into the pint command by @OoBook in https://github.com/unusualify/modularity/commit/ecb291789f957c495508735384c1bd3b09bd6d18
+- :bug: get module view path from module->getDirectoryPath by @OoBook in https://github.com/unusualify/modularity/commit/904925a03f7b573209b5b723207481a30202896f
+- enum for php >=8.1 by @OoBook in https://github.com/unusualify/modularity/commit/301036d8da97a708b82db54d7efd3cc11ffb1baa
+
+### :recycle: Refactors
+
+- add payment config for payable transactions by @OoBook in https://github.com/unusualify/modularity/commit/c74182e3801b12bd2359d0a4e321c2eb59bc1a47
+
+### :memo: Documentation
+
+- :pushpin: pin php support to 8.1 >=  for release 1 by @OoBook in https://github.com/unusualify/modularity/commit/85604530dff0abb8bc23e3e86413d5442e50ec52
+
+### Styling
+
+- :art: lint generally files according to pint.json added newly by @OoBook in https://github.com/unusualify/modularity/commit/b2c12b510e8969350790c3f768989ee01431971f
+
+### :green_heart: Workflow
+
+- change working-directory for vue tests by @OoBook in https://github.com/unusualify/modularity/commit/c88b8d6065bdfff2ef9008813c2fcfcd8c6cdc74
+- change main.yml by @OoBook in https://github.com/unusualify/modularity/commit/ab12b1b827590644372d85b40d15fbbd18023669
+- change main.yml by @OoBook in https://github.com/unusualify/modularity/commit/02a1756423a781b7ac69ee83308be75bedc43425
+- change main.yml by @OoBook in https://github.com/unusualify/modularity/commit/a25c79b00e7d02d590bebf863cbd18647ed31398
+- :green_heart: add laravel and vue conditions for testing by @OoBook in https://github.com/unusualify/modularity/commit/741e78858478772a5009f6107981a5a1ad459f8f
+- create debug.yml by @web-flow in https://github.com/unusualify/modularity/commit/45c17d2414a9d496fd31a108ff7f9f37c76fb543
+- remove vue and laravel tests from release action by @OoBook in https://github.com/unusualify/modularity/commit/badab6074abee05b5d29effc56e6f23b28acde4e
+- Update debug.yml by @web-flow in https://github.com/unusualify/modularity/commit/43ba43843e4491a24948b50f27e7fb513654d6be
+- add linter before releasing by @OoBook in https://github.com/unusualify/modularity/commit/503b06560b1a910ffe50a90a5d5edc3d6ec0d26e
+
+### :beers: Other Stuff
+
+- Update CHANGELOG
+- fix psr-4 issues by @OoBook in https://github.com/unusualify/modularity/commit/a40820ad37d733f34e2c25c96fce38d2c2d9c303
+- Merge pull request #62 from unusualify/dev
+
+We have merged ci changes.
+
+- remove manifest dd by @OoBook in https://github.com/unusualify/modularity/commit/6a69715b542af1ee37aa816bb0f88ff264b0ee59
+- Update main.yml
+- Merge remote-tracking branch 'origin/main' into dev
+- Update main.yml
+- Update main.yml
+- Update main.yml
+- add pint for dev changes by @OoBook in https://github.com/unusualify/modularity/commit/42c2abc524ff2023fa024541d132eebf018b8413
+- configure pint.json file by @OoBook in https://github.com/unusualify/modularity/commit/49a31ef3c1c4aefa580a75eb04cab4427a74ad83
+- Merge pull request #63 from unusualify/dev
+
+It's tested successfully.
+
+- merge remote-tracking branch 'origin/feature/media-tags' into dev by @OoBook in https://github.com/unusualify/modularity/commit/be75c556f19b6157b5ed52c354b14f52c1399a00
+- update php version by @OoBook in https://github.com/unusualify/modularity/commit/2e1671b08288d96de8a60c610d0b6a28944e2b64
+- add pint scripts by @OoBook in https://github.com/unusualify/modularity/commit/69087a2afda0fb0564e1f3fd56a957cb18d1fecf
+- Merge pull request #64 from unusualify/chore/pint-fix-all
+
+Thanks, the pint command is so good starting point. To style available files is also testing case, it has run successfully. That's done.
+
+- Merge remote-tracking branch 'origin/main' into dev
+- Update debug.yml
+- Merge remote-tracking branch 'origin/main' into dev
+- Update debug.yml
+- merge remote-tracking branch 'origin/main' into dev by @OoBook in https://github.com/unusualify/modularity/commit/64af45efe03b236665c9bf6b97389bcf2fbb2067
+- merge remote-tracking branch 'origin/main' into dev by @OoBook in https://github.com/unusualify/modularity/commit/8e3423785ce7d9cfe8f170be65e9496f993d86e8
+
 ## v0.10.0 - 2024-09-26
 
 ### :rocket: Features
