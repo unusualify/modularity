@@ -2,7 +2,8 @@
 
 namespace Unusualify\Modularity\Entities\Enums;
 
-enum UserRole:string {
+enum UserRole: string
+{
     case SUPERADMIN = 'Superadmin';
     case ADMIN = 'Admin';
     case PUBLISHER = 'Publisher';
@@ -27,4 +28,3 @@ enum UserRole:string {
 // }
 // if(phpversion())
 // use MyCLabs\Enum\Enum;
-
