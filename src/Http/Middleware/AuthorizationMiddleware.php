@@ -8,13 +8,12 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
-class AuthorizationMiddleware{
-
+class AuthorizationMiddleware
+{
     /**
      * @var AuthFactory
      */
     protected $authFactory;
-
 
     public function __construct(AuthFactory $authFactory)
     {
@@ -23,15 +22,14 @@ class AuthorizationMiddleware{
 
     public function handle($request, Closure $next)
     {
-        view()->composer(unusualBaseKey()."::layouts.master", function ($view)
-        {
+        view()->composer(unusualBaseKey() . '::layouts.master', function ($view) {
             $user = Auth::user();
 
-            $permissions = Arr::mapWithKeys(Gate::abilities(), function($closure, $key) use($user){
+            $permissions = Arr::mapWithKeys(Gate::abilities(), function ($closure, $key) {
                 return [$key => Gate::allows($key)];
             });
 
-            $roles = Arr::map($user->roles->toArray(), function($role){
+            $roles = Arr::map($user->roles->toArray(), function ($role) {
                 return $role['name'];
             });
 

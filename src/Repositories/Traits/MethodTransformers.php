@@ -14,7 +14,7 @@ trait MethodTransformers
 
     /**
      * @param string $class name resolution
-     * @return boolean
+     * @return bool
      */
     public function hasModelTrait($trait)
     {
@@ -35,8 +35,8 @@ trait MethodTransformers
 
         $query = $this->order($query, $orders);
 
-        if($isFormatted){
-            return $query->get()->map(function($item){
+        if ($isFormatted) {
+            return $query->get()->map(function ($item) {
                 return array_merge(
                     $this->getShowFields($item, $this->chunkInputs($this->inputs())),
                     $item->attributesToArray(),
@@ -45,11 +45,12 @@ trait MethodTransformers
                     // $columnsData
                 );
             });
-        }else{
+        } else {
 
             return $query->get();
         }
     }
+
     /**
      * @return string
      */
@@ -63,11 +64,9 @@ trait MethodTransformers
     }
 
     /**
-     * @param string $trait
-     *
      * @return array
      */
-    public function getColumns(string $trait = null)
+    public function getColumns(?string $trait = null)
     {
         preg_match('/\/([A-Za-z]*)\.php/', debug_backtrace()[0]['file'], $matches);
 
@@ -85,11 +84,11 @@ trait MethodTransformers
     {
         if (property_exists($this->model, 'checkboxes')) {
             foreach ($this->model->checkboxes as $field) {
-                if (!$this->shouldIgnoreFieldBeforeSave($field)) {
-                    if (!isset($fields[$field])) {
+                if (! $this->shouldIgnoreFieldBeforeSave($field)) {
+                    if (! isset($fields[$field])) {
                         $fields[$field] = false;
                     } else {
-                        $fields[$field] = !empty($fields[$field]);
+                        $fields[$field] = ! empty($fields[$field]);
                     }
                 }
             }
@@ -97,14 +96,14 @@ trait MethodTransformers
 
         if (property_exists($this->model, 'nullable')) {
             foreach ($this->model->nullable as $field) {
-                if (!isset($fields[$field]) && !$this->shouldIgnoreFieldBeforeSave($field)) {
+                if (! isset($fields[$field]) && ! $this->shouldIgnoreFieldBeforeSave($field)) {
                     $fields[$field] = null;
                 }
             }
         }
 
         foreach ($fields as $key => $value) {
-            if (!$this->shouldIgnoreFieldBeforeSave($key)) {
+            if (! $this->shouldIgnoreFieldBeforeSave($key)) {
                 if (is_array($value) && empty($value)) {
                     $fields[$key] = null;
                 }
@@ -124,20 +123,20 @@ trait MethodTransformers
     public function castFormFields($fields)
     {
         foreach ($this->chunkInputs($this->inputs()) as $input) {
-            if(isset($input['ext'])){
+            if (isset($input['ext'])) {
                 switch ($input['ext']) {
                     case 'date':
-                        # code...
+                        // code...
                         $fields[$input['name']] = '';
+
                         break;
 
                     default:
-                        # code...
+                        // code...
                         break;
                 }
             }
         }
-
 
         return $fields;
     }
@@ -145,7 +144,6 @@ trait MethodTransformers
     /**
      * @param array $columns
      * @param array $inputs
-     *
      * @return array
      */
     public function setColumns($columns, $inputs)
@@ -306,7 +304,7 @@ trait MethodTransformers
      */
     public function getFormFields($object, $schema = [])
     {
-        $chunkedInputs = $this->chunkInputs(all:true, schema: empty($schema) ? null : $schema);
+        $chunkedInputs = $this->chunkInputs(all: true, schema: empty($schema) ? null : $schema);
 
         $this->traitColumns = $this->setColumns($this->traitColumns, $chunkedInputs);
 
@@ -317,24 +315,26 @@ trait MethodTransformers
         foreach ($this->traitsMethods(__FUNCTION__) as $method) {
             $fields = $this->$method($object, $fields, $schema);
         }
-        if(!empty($fields)){
+        if (! empty($fields)) {
             // dd($schema, $fields);
-            $fields = Collection::make($fields)->reduce(function($acc, $value, $key){
+            $fields = Collection::make($fields)->reduce(function ($acc, $value, $key) {
                 Arr::set($acc, $key, $value);
+
                 return $acc;
             }, []);
             // dd($fields);
         }
+
         return $fields;
     }
 
     public function getShowFields($object, $schema = [])
     {
-        $chunkedInputs = $this->chunkInputs(all:true, schema: empty($schema) ? null : $schema);
+        $chunkedInputs = $this->chunkInputs(all: true, schema: empty($schema) ? null : $schema);
 
         $this->traitColumns = $this->setColumns($this->traitColumns, $chunkedInputs);
 
-        if(method_exists($object, 'setRelationsShowFormat')){
+        if (method_exists($object, 'setRelationsShowFormat')) {
             $object->setRelationsShowFormat();
         }
 
@@ -349,7 +349,6 @@ trait MethodTransformers
 
     /**
      * @param \Illuminate\Database\Query\Builder $query
-     * @param array $scopes
      * @return \Illuminate\Database\Query\Builder
      */
     public function filter($query, array $scopes = [])
@@ -360,8 +359,7 @@ trait MethodTransformers
             $this->$method($query, $scopes);
         }
 
-        unset($scopes['searches']);
-        unset($scopes['search']);
+        unset($scopes['searches'], $scopes['search']);
 
         if (isset($scopes['exceptIds'])) {
             $query->whereNotIn($this->model->getTable() . '.id', $scopes['exceptIds']);
@@ -374,11 +372,11 @@ trait MethodTransformers
             if (preg_match('/addRelation([A-Za-z]+)/', $column, $matches)) {
                 $relationName = $this->getCamelCase($matches[1]);
 
-                if(method_exists($this->getModel(), $relationName)){
+                if (method_exists($this->getModel(), $relationName)) {
                     $related = $this->getModel()->{$relationName}();
 
-                    if(method_exists(__CLASS__, $method = 'getForeignKey'. get_class_short_name($related))){
-                        $foreignKey = $this->$method($related,$scopes,$value);
+                    if (method_exists(__CLASS__, $method = 'getForeignKey' . get_class_short_name($related))) {
+                        $foreignKey = $this->$method($related, $scopes, $value);
                     }
                     // $tableName = $this->getTableNameFromName($relationName);
 
@@ -401,21 +399,22 @@ trait MethodTransformers
             // );
             if (method_exists($this->model, 'scope' . $studlyColumn)) {
                 $query->{$this->getCamelCase($column)}();
-            } else if( is_string($value) && method_exists($this->model, 'scope' . studlyName($value))){
+            } elseif (is_string($value) && method_exists($this->model, 'scope' . studlyName($value))) {
                 $query->{$this->getCamelCase($value)}();
 
             } else {
                 if (is_array($value)) {
                     $query->whereIn($column, $value);
                 } elseif ($column[0] == '%') {
-                    $value && ($value[0] == '!') ? $query->where(substr($column, 1), "not $likeOperator", '%' . substr($value, 1) . '%') : $query->where(substr($column, 1), $likeOperator, '%' . $value . '%');
+                    $value && ($value[0] == '!') ? $query->where(mb_substr($column, 1), "not $likeOperator", '%' . mb_substr($value, 1) . '%') : $query->where(mb_substr($column, 1), $likeOperator, '%' . $value . '%');
                 } elseif (isset($value[0]) && $value[0] == '!') {
-                    $query->where($column, '<>', substr($value, 1));
+                    $query->where($column, '<>', mb_substr($value, 1));
                 } elseif ($value !== '') {
                     $query->where($column, $value);
                 }
             }
         }
+
         // dd(
         //     $scopes,
         //     $query->toSql()
@@ -425,7 +424,6 @@ trait MethodTransformers
 
     /**
      * @param \Illuminate\Database\Query\Builder $query
-     * @param array $scopes
      * @return \Illuminate\Database\Query\Builder
      */
     public function filterBack($query, array $scopes = [])
@@ -455,9 +453,9 @@ trait MethodTransformers
                 if (is_array($value)) {
                     $query->whereIn($column, $value);
                 } elseif ($column[0] == '%') {
-                    $value && ($value[0] == '!') ? $query->where(substr($column, 1), "not $likeOperator", '%' . substr($value, 1) . '%') : $query->where(substr($column, 1), $likeOperator, '%' . $value . '%');
+                    $value && ($value[0] == '!') ? $query->where(mb_substr($column, 1), "not $likeOperator", '%' . mb_substr($value, 1) . '%') : $query->where(mb_substr($column, 1), $likeOperator, '%' . $value . '%');
                 } elseif (isset($value[0]) && $value[0] == '!') {
-                    $query->where($column, '<>', substr($value, 1));
+                    $query->where($column, '<>', mb_substr($value, 1));
                 } elseif ($value !== '') {
                     $query->where($column, $value);
                 }
@@ -469,7 +467,6 @@ trait MethodTransformers
 
     /**
      * @param \Illuminate\Database\Query\Builder $query
-     * @param array $orders
      * @return \Illuminate\Database\Query\Builder
      */
     public function order($query, array $orders = [])

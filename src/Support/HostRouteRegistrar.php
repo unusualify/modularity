@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularity\Support;
 
+use BadMethodCallException;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -9,20 +10,21 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularity\Traits\ManageNames;
-use BadMethodCallException;
-class HostRouteRegistrar{
+
+class HostRouteRegistrar
+{
     use ManageNames;
 
-
     private $hostClass;
+
     private $options;
+
     private $router;
 
     private $callables = [
         'host',
         'group',
     ];
-
 
     private $allowedAttributes = [
         'middleware',
@@ -35,24 +37,25 @@ class HostRouteRegistrar{
         'withoutMiddleware' => 'excluded_middleware',
     ];
 
-
     public function __construct(
         private Application $app,
         private string $baseHostName,
-    )
-    {
-    }
+    ) {}
 
-    public function group($callback){
+    public function group($callback)
+    {
         return Route::group($this->options, $callback);
     }
 
-    private function host($models){
+    private function host($models)
+    {
         $this->setModel($models)->setHostingOptions();
+
         return $this;
     }
 
-    private function setHostingOptions(){
+    private function setHostingOptions()
+    {
 
         $model = $this->getHostModel();
 
@@ -60,14 +63,14 @@ class HostRouteRegistrar{
         $prefixes = [];
         $middleware = [];
 
-        if($model){
+        if ($model) {
             $groupOptions['domain'] = $model->url;
             $prefixes = $model->hostableChildRouteParameters();
-        }else{
+        } else {
             $groupOptions['domain'] = $this->getBaseHostName();
-            $prefixes = array_map(function($class){
+            $prefixes = array_map(function ($class) {
                 return $class::hostableRouteBindingParameter();
-            }, $this->hostableClasses,);
+            }, $this->hostableClasses, );
         }
         $groupOptions['prefix'] = implode('/', $prefixes);
         $groupOptions['middleware'] = ['hostable'];
@@ -75,19 +78,19 @@ class HostRouteRegistrar{
         /**
          * host başta kullanılmadıysa middlewareleri eklemece
          */
-
         $this->options = $groupOptions;
 
         return $this;
 
-
-
     }
 
-    private function attributes($key, $value){
-        if(!in_array($key, $this->allowedAttributes)) return;
+    private function attributes($key, $value)
+    {
+        if (! in_array($key, $this->allowedAttributes)) {
+            return;
+        }
 
-        if($key === 'middleware'){
+        if ($key === 'middleware') {
             foreach ($value as $index => $middleware) {
                 $value[$index] = $middleware;
             }
@@ -99,53 +102,58 @@ class HostRouteRegistrar{
         return $this;
     }
 
-    private function getBaseHostName() : string
+    private function getBaseHostName(): string
     {
         return $this->baseHostName;
     }
 
-    private function getHostModel(){
+    private function getHostModel()
+    {
         return $this->hostClass;
     }
 
-    private function setModel($model){
+    private function setModel($model)
+    {
         $this->hostableClasses = is_array($model) ? $model : [$model];
         $this->setHostModel();
+
         return $this;
     }
 
-    private function setHostModel(){
+    private function setHostModel()
+    {
         $this->hostClass = $this->combineHostableClasses()
-        ->where(fn($hostable) => $hostable->url == $this->app['request']->getHost())
-        ->first();
+            ->where(fn ($hostable) => $hostable->url == $this->app['request']->getHost())
+            ->first();
 
         return $this;
     }
 
-
-    private function combineHostableClasses() : Collection
+    private function combineHostableClasses(): Collection
     {
 
-        if(!$this->areClassesHostable()) return Collection::make([]);
+        if (! $this->areClassesHostable()) {
+            return Collection::make([]);
+        }
 
-        return array_reduce($this->hostableClasses,function($carry, $class){
+        return array_reduce($this->hostableClasses, function ($carry, $class) {
             $carry = $carry->merge($class::hostables());
 
             return $carry;
-        } ,Collection::make([]));
+        }, Collection::make([]));
 
     }
 
-
-    private function areClassesHostable() : bool {
+    private function areClassesHostable(): bool
+    {
         foreach ($this->hostableClasses as $key => $model) {
-            if(!Schema::hasTable(App::make($model)->getTable())){
+            if (! Schema::hasTable(App::make($model)->getTable())) {
                 return false;
             }
         }
+
         return true;
     }
-
 
     public function getRouteArguments()
     {
@@ -162,11 +170,10 @@ class HostRouteRegistrar{
     public function __call($method, $arguments)
     {
 
-
-        if(in_array($method, $this->allowedAttributes)){
-            return  $this->attributes($method, $arguments);
-        };
-        if(in_array($method, $this->callables)){
+        if (in_array($method, $this->allowedAttributes)) {
+            return $this->attributes($method, $arguments);
+        }
+        if (in_array($method, $this->callables)) {
             return $this->{$method}($arguments);
         }
         throw new BadMethodCallException(

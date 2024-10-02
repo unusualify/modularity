@@ -8,12 +8,12 @@ return [
         'default' => 'tr',
         'itemTitle' => 'label',
         'itemValue' => 'value',
-        'items' => array_map(function($locale) {
+        'items' => array_map(function ($locale) {
             return [
                 'value' => $locale,
-                'label' => getLabelFromLocale($locale, true)
+                'label' => getLabelFromLocale($locale, true),
             ];
-        }, unusualConfig('available_user_locales', ['en', 'tr']))
+        }, unusualConfig('available_user_locales', ['en', 'tr'])),
     ],
     '_timezone' => [
         'type' => 'combobox',
@@ -23,10 +23,10 @@ return [
         'returnObject' => false,
         'itemTitle' => 'label',
         'itemValue' => 'value',
-        'items' => collect((new \Camroncade\Timezone\Timezone())->timezoneList)->map(function($value,$key){
+        'items' => collect((new \Camroncade\Timezone\Timezone)->timezoneList)->map(function ($value, $key) {
             return [
                 'label' => $key,
-                'value' => $value
+                'value' => $value,
             ];
         })->values()->toArray(),
     ],
@@ -46,13 +46,13 @@ return [
         'name' => 'phone',
         'label' => 'Phone Number',
         'default' => '',
-        'clearable' => false
+        'clearable' => false,
     ],
     '_email' => [
         'type' => 'text',
         'name' => 'email',
         'label' => 'E-mail',
-        'rules' => 'email'
+        'rules' => 'email',
     ],
     '_password_confirmation' => [
         'type' => 'password',
@@ -62,7 +62,7 @@ return [
         'slotHandlers' => [
             'appendInner' => 'password',
         ],
-        'rules' => 'sometimes|min:6'
+        'rules' => 'sometimes|min:6',
     ],
     '_password' => [
         'type' => 'password',

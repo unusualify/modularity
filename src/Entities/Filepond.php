@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Entities;
 
 class Filepond extends Model
 {
-
     protected $fillable = [
         'uuid',
         'file_name',
@@ -13,7 +12,6 @@ class Filepond extends Model
         'role',
         'locale',
     ];
-
 
     public function canDeleteSafely()
     {
@@ -25,7 +23,7 @@ class Filepond extends Model
         return [
             'folder_name' => $this->uuid,
             'file_name' => $this->file_name,
-            'source' => route('filepond.preview', ['folder' => $this->uuid])
+            'source' => route('filepond.preview', ['folder' => $this->uuid]),
             // 'source' => $this->uuid,
             // 'source' => $this->uuid . '/' .  $this->file_name,
         ];

@@ -10,11 +10,8 @@ use Unusualify\Modularity\Repositories\Traits\TagsTrait;
 
 class FileRepository extends Repository
 {
-    use TagsTrait, AuthorizedTrait;
+    use AuthorizedTrait, TagsTrait;
 
-    /**
-     * @param File $model
-     */
     public function __construct(File $model)
     {
         $this->model = $model;
@@ -22,12 +19,12 @@ class FileRepository extends Repository
 
     /**
      * @param \Illuminate\Database\Query\Builder $query
-     * @param array $scopes
      * @return \Illuminate\Database\Query\Builder
      */
     public function filter($query, array $scopes = [])
     {
         $this->searchIn($query, $scopes, 'search', ['filename']);
+
         return parent::filter($query, $scopes);
     }
 
@@ -49,7 +46,7 @@ class FileRepository extends Repository
      */
     public function prepareFieldsBeforeCreate($fields)
     {
-        if (!isset($fields['size'])) {
+        if (! isset($fields['size'])) {
             $uuid = str_replace(Config::get('filesystems.disks.twill_file_library.root'), '', $fields['uuid']);
             $fields['size'] = Storage::disk(Config::get('twill.file_library.disk'))->size($uuid);
         }

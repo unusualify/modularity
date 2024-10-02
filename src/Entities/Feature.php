@@ -30,5 +30,4 @@ class Feature extends BaseModel
     {
         return unusualConfig('features_table', 'twill_features');
     }
-
 }

@@ -12,7 +12,7 @@ return [
      */
     'locales' => [
         'tr',
-        'en'
+        'en',
     ],
 
     /*
@@ -38,8 +38,8 @@ return [
     |
      */
 
-     /**
-     * !danger don't change this value 
+    /**
+     * !danger don't change this value
      * !danger because of mess module translation up
      */
     'locale' => null,

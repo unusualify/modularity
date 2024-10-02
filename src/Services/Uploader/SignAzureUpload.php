@@ -20,9 +20,6 @@ class SignAzureUpload
      */
     protected $blobSharedAccessSignatureHelper;
 
-    /**
-     * @param Config $config
-     */
     public function __construct(Config $config)
     {
         $this->config = $config;
@@ -33,10 +30,10 @@ class SignAzureUpload
         try {
             $blobUri = $request->input('bloburi');
             $method = $request->input('_method');
-            $permissions = '' ;
-            if (strtolower($method) === 'put') {
+            $permissions = '';
+            if (mb_strtolower($method) === 'put') {
                 $permissions = 'w';
-            } else if (strtolower($method) === 'delete') {
+            } elseif (mb_strtolower($method) === 'delete') {
                 $permissions = 'd';
             }
 
@@ -45,11 +42,12 @@ class SignAzureUpload
                 $this->config->get('filesystems.disks.' . $disk . '.key')
             );
 
-            $now = new DateTime("now", new DateTimeZone("UTC"));
+            $now = new DateTime('now', new DateTimeZone('UTC'));
             $expire = $now->modify('+15 min');
 
-            $path = $this->config->get('filesystems.disks.' . $disk .'.container') . str_replace(azureEndpoint($disk), '', $blobUri);
+            $path = $this->config->get('filesystems.disks.' . $disk . '.container') . str_replace(azureEndpoint($disk), '', $blobUri);
             $sasUrl = $blobUri . '?' . $this->blobSharedAccessSignatureHelper->generateBlobServiceSharedAccessSignatureToken('b', $path, $permissions, $expire);
+
             return $listener->uploadIsSigned($sasUrl, false);
         } catch (\Exception $e) {
             return $listener->uploadIsNotValid();

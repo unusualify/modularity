@@ -5,9 +5,9 @@ namespace Unusualify\Modularity;
 use Composer\ClassMapGenerator\ClassMapGenerator;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Str;
 use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Json;
-use Illuminate\Support\Str;
 
 class Modularity extends FileRepository
 {
@@ -23,7 +23,7 @@ class Modularity extends FileRepository
 
     /**
      * The constructor.
-     * @param Container $app
+     *
      * @param string|null $path
      */
     public function __construct(Container $app, $path = null)
@@ -40,6 +40,50 @@ class Modularity extends FileRepository
     protected function createModule(...$args)
     {
         return new \Unusualify\Modularity\Module($args[1], $args[2] ?? null);
+    }
+
+    /**
+     * Get all modules.
+     */
+    public function all(): array
+    {
+        if (! $this->config('cache.enabled')) {
+            return $this->scan();
+        }
+
+        return $this->formatCached($this->getCached());
+    }
+
+    /**
+     * Format the cached data as array of modules.
+     *
+     * @param array $cached
+     * @return array
+     */
+    protected function formatCached($cached)
+    {
+        $modules = [];
+
+        $resetCache = false;
+        $basePath = base_path();
+        $pathPattern = preg_quote("{$basePath}", '/');
+
+        foreach ($cached as $name => $module) {
+            $path = $module['path'];
+
+            if (! preg_match("/{$pathPattern}/", $path)) {
+                $resetCache = true;
+
+                break;
+            }
+            $modules[$name] = $this->createModule($this->app, $name, $path);
+        }
+
+        if ($resetCache) {
+            return $this->scan();
+        }
+
+        return $modules;
     }
 
     /**
@@ -86,8 +130,6 @@ class Modularity extends FileRepository
 
     /**
      * Get scanned modules paths.
-     *
-     * @return array
      */
     public function getScanPaths(): array
     {
@@ -115,29 +157,35 @@ class Modularity extends FileRepository
     {
         $store = $this->modularityCache->store($this->modularityConfig->get('modules.cache.driver'));
 
-        if($store->has($this->config('cache.key'))){
+        if ($store->has($this->config('cache.key'))) {
             return $store->get($this->config('cache.key'));
-        }else{
-            $store->set($this->config('cache.key'), $this->toCollection()->toArray() , $this->config('cache.lifetime'));
+        } else {
+            $store->set($this->config('cache.key'), $this->toCollection()->toArray(), $this->config('cache.lifetime'));
+
             return $this->toCollection()->toArray();
         }
     }
 
-    public function getGroupedModules($group_name) {
-        return array_filter($this->allEnabled(), function($item) use($group_name){
+    public function getGroupedModules($group_name)
+    {
+        return array_filter($this->allEnabled(), function ($item) use ($group_name) {
             $module_config = $item->getConfig();
+
             return isset($module_config['group']) && $module_config['group'] === $group_name;
         });
     }
 
-    public function getSystemModules() {
+    public function getSystemModules()
+    {
         return $this->getGroupedModules('system');
     }
 
-    public function getModules() {
-        return array_filter($this->allEnabled(), function($item) {
+    public function getModules()
+    {
+        return array_filter($this->allEnabled(), function ($item) {
             $module_config = $item->getConfig();
-            return !isset($module_config['group']) || !$module_config['group'];
+
+            return ! isset($module_config['group']) || ! $module_config['group'];
         });
     }
 
@@ -150,11 +198,12 @@ class Modularity extends FileRepository
         foreach ($this->all() as $moduleInstance) {
             if ($moduleInstance->getStudlyName() === studlyName($name)) {
                 $module = $moduleInstance;
+
                 break;
             }
         }
 
-        if($module){
+        if ($module) {
             return $module->delete();
         }
 
@@ -166,11 +215,13 @@ class Modularity extends FileRepository
         $models = [];
 
         foreach ($this->allEnabled() as $key => $module) {
-            $entityPath =  $module->getDirectoryPath('Entities');
-            if( !file_exists( $entityPath ) ) continue;
+            $entityPath = $module->getDirectoryPath('Entities');
+            if (! file_exists($entityPath)) {
+                continue;
+            }
 
-            foreach($this->getClasses( $entityPath ) as $_class){
-                if(get_class_short_name(App::make($_class)) === studlyName($routeName)){
+            foreach ($this->getClasses($entityPath) as $_class) {
+                if (get_class_short_name(App::make($_class)) === studlyName($routeName)) {
                     $models[] = $_class;
                 }
             }
@@ -183,12 +234,10 @@ class Modularity extends FileRepository
     {
         $classes = [];
 
-        foreach (ClassMapGenerator::createMap($path) as $class => $file)
-        {
+        foreach (ClassMapGenerator::createMap($path) as $class => $file) {
             $classes[] = $class;
         }
 
         return $classes;
     }
-
 }

@@ -24,7 +24,7 @@ class ForgotPasswordController extends Controller
     |
      */
 
-    use SendsPasswordResetEmails, ManageUtilities;
+    use ManageUtilities, SendsPasswordResetEmails;
 
     /**
      * @var PasswordBrokerManager
@@ -48,27 +48,26 @@ class ForgotPasswordController extends Controller
     }
 
     /**
-     * @param ViewFactory $viewFactory
      * @return \Illuminate\Contracts\View\View
      */
     public function showLinkRequestForm(ViewFactory $viewFactory)
     {
         // return $viewFactory->make(unusualBaseKey().'::auth.passwords.email');
-        return $viewFactory->make(unusualBaseKey().'::auth.passwords.email', [
+        return $viewFactory->make(unusualBaseKey() . '::auth.passwords.email', [
             'formAttributes' => [
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
                 'schema' => ($schema = $this->createFormSchema([
                     'email' => [
-                        "type" => "text",
-                        "name" => "email",
-                        "label" => ___('authentication.email'),
-                        "default" => "",
+                        'type' => 'text',
+                        'name' => 'email',
+                        'label' => ___('authentication.email'),
+                        'default' => '',
                         'col' => [
                             'cols' => 12,
                         ],
                         'rules' => [
-                            ['email']
-                        ]
+                            ['email'],
+                        ],
                     ],
                 ])),
 
@@ -92,7 +91,7 @@ class ForgotPasswordController extends Controller
                                 'variant' => 'text',
                                 'href' => '',
                                 'class' => 'v-col-5',
-                            ]
+                            ],
                         ],
                         [
                             'tag' => 'v-btn',
@@ -101,12 +100,12 @@ class ForgotPasswordController extends Controller
                                 'variant' => 'elevated',
                                 'href' => '',
                                 'class' => 'v-col-5',
-                                'type' => 'submit'
+                                'type' => 'submit',
 
-                            ]
-                        ]
-                    ]
-                ]
+                            ],
+                        ],
+                    ],
+                ],
             ],
             'slots' => [
                 'bottom' => [
@@ -116,9 +115,9 @@ class ForgotPasswordController extends Controller
                     ],
                     'elements' => [
                         [
-                            "tag" => "v-btn",
+                            'tag' => 'v-btn',
                             'elements' => ___('authentication.sign-in-google'),
-                            "attributes" => [
+                            'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
@@ -130,14 +129,14 @@ class ForgotPasswordController extends Controller
                                         'symbol' => 'google',
                                         'width' => '25',
                                         'height' => '25',
-                                    ]
-                                ]
-                            ]
+                                    ],
+                                ],
+                            ],
                         ],
                         [
-                            "tag" => "v-btn",
+                            'tag' => 'v-btn',
                             'elements' => ___('authentication.sign-in-apple'),
-                            "attributes" => [
+                            'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
@@ -149,14 +148,14 @@ class ForgotPasswordController extends Controller
                                         'symbol' => 'apple',
                                         'width' => '25',
                                         'height' => '25',
-                                    ]
-                                ]
-                            ]
+                                    ],
+                                ],
+                            ],
                         ],
                         [
-                            "tag" => "v-btn",
+                            'tag' => 'v-btn',
                             'elements' => ___('authentication.create-an-account'),
-                            "attributes" => [
+                            'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
@@ -164,19 +163,18 @@ class ForgotPasswordController extends Controller
 
                         ],
 
-                    ]
+                    ],
 
-                ]
-            ]
+                ],
+            ],
         ]);
 
     }
 
-        /**
+    /**
      * Get the response for a successful password reset link.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $response
+     * @param string $response
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     protected function sendResetLinkResponse(Request $request, $response)
@@ -184,7 +182,7 @@ class ForgotPasswordController extends Controller
         return $request->wantsJson()
                     ? new JsonResponse([
                         'message' => ___($response),
-                        'variant' => MessageStage::SUCCESS
+                        'variant' => MessageStage::SUCCESS,
                     ], 200)
                     : back()->with('status', ___($response));
     }
@@ -192,8 +190,7 @@ class ForgotPasswordController extends Controller
     /**
      * Get the response for a failed password reset link.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $response
+     * @param string $response
      * @return \Illuminate\Http\RedirectResponse
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -205,7 +202,7 @@ class ForgotPasswordController extends Controller
             return new JsonResponse([
                 'email' => [___($response)],
                 'message' => ___($response),
-                'variant' => MessageStage::WARNING
+                'variant' => MessageStage::WARNING,
             ]);
             // throw ValidationException::withMessages([
             //     'email' => [trans($response)],
@@ -213,7 +210,7 @@ class ForgotPasswordController extends Controller
         }
 
         return back()
-                ->withInput($request->only('email'))
-                ->withErrors(['email' => ___($response)]);
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => ___($response)]);
     }
 }

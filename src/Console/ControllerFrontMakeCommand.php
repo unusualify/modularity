@@ -2,12 +2,11 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
-
-use Nwidart\Modules\Support\Stub;
 use Illuminate\Support\Str;
 use Nwidart\Modules\Support\Config\GeneratorPath;
+use Nwidart\Modules\Support\Stub;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Facades\Modularity;
 
 class ControllerFrontMakeCommand extends BaseCommand
@@ -51,6 +50,7 @@ class ControllerFrontMakeCommand extends BaseCommand
 
         ];
     }
+
     /**
      * Get the console command options.
      *
@@ -73,13 +73,13 @@ class ControllerFrontMakeCommand extends BaseCommand
         $module = Modularity::findOrFail($this->getModuleName());
 
         return (new Stub($this->getStubName(), [
-            'NAMESPACE'             => $this->getClassNamespace($module),
-            'STUDLY_MODULE_NAME'    => $module->getStudlyName(),
-            'LOWER_MODULE_NAME'     => $module->getLowerName(),
-            'STUDLY_NAME'           => $this->getStudlyName($name),
-            'LOWER_NAME'            => $this->getLowerName($name),
-            'CLASS'                 => $this->getControllerNameWithoutNamespace(),
-            'ROUTE_NAME'            => $this->getStudlyName($name),
+            'NAMESPACE' => $this->getClassNamespace($module),
+            'STUDLY_MODULE_NAME' => $module->getStudlyName(),
+            'LOWER_MODULE_NAME' => $module->getLowerName(),
+            'STUDLY_NAME' => $this->getStudlyName($name),
+            'LOWER_NAME' => $this->getLowerName($name),
+            'CLASS' => $this->getControllerNameWithoutNamespace(),
+            'ROUTE_NAME' => $this->getStudlyName($name),
         ]))->render();
     }
 
@@ -90,7 +90,7 @@ class ControllerFrontMakeCommand extends BaseCommand
     {
         $path = Modularity::getModulePath($this->getModuleName());
 
-        $controllerPath = new GeneratorPath( $this->baseConfig('paths.generator.route-controller-front') );
+        $controllerPath = new GeneratorPath($this->baseConfig('paths.generator.route-controller-front'));
 
         return $path . $controllerPath->getPath() . '/' . $this->getFileName() . 'Controller.php';
     }
@@ -102,13 +102,12 @@ class ControllerFrontMakeCommand extends BaseCommand
     {
         $controller = Str::studly($this->argument('name'));
 
-        if (Str::contains(strtolower($controller), 'controller') === false) {
+        if (Str::contains(mb_strtolower($controller), 'controller') === false) {
             $controller .= 'Controller';
         }
 
         return $controller;
     }
-
 
     /**
      * @return array|string
@@ -119,12 +118,9 @@ class ControllerFrontMakeCommand extends BaseCommand
     }
 
     /**
-     *
      * Get head string of path for namespace
-     *
-     * @return string
      */
-    public function getDefaultNamespace() : string
+    public function getDefaultNamespace(): string
     {
         return $this->baseConfig('paths.generator.route-controller-front.namespace') ?:
             $this->baseConfig('paths.generator.route-controller-front.path', 'Https\Controllers\Front');
@@ -138,14 +134,8 @@ class ControllerFrontMakeCommand extends BaseCommand
         return Str::studly($this->argument('name'));
     }
 
-
-    /**
-     * @return string
-     */
     protected function getStubName(): string
     {
         return '/route-controller-front.stub';
     }
-
-
 }

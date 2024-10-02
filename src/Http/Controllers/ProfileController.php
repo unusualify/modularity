@@ -5,16 +5,15 @@ namespace Unusualify\Modularity\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
-use Unusualify\Modularity\Entities\Enums\Permission;
-use Unusualify\Modularity\Entities\User;
 use Modules\SystemUser\Repositories\CompanyRepository;
 use Modules\SystemUser\Repositories\UserRepository;
+use Unusualify\Modularity\Entities\Enums\Permission;
+use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Services\View\UComponent;
 use Unusualify\Modularity\Services\View\UWrapper;
 
 class ProfileController extends BaseController
 {
-
     protected $namespace = 'Modules\SystemUser';
 
     /**
@@ -37,8 +36,7 @@ class ProfileController extends BaseController
         Request $request,
         protected UserRepository $userRepository,
         protected CompanyRepository $companyRepository,
-    )
-    {
+    ) {
 
         parent::__construct(
             $app,
@@ -83,10 +81,10 @@ class ProfileController extends BaseController
 
         $user = auth()->user();
 
-        $userSchema = $this->createFormSchema( getFormDraft('user') );
+        $userSchema = $this->createFormSchema(getFormDraft('user'));
         $userFields = $this->userRepository->getFormFields($user, $userSchema);
 
-        $userPasswordSchema = $this->createFormSchema( getFormDraft('user_password') );
+        $userPasswordSchema = $this->createFormSchema(getFormDraft('user_password'));
         $userPasswordFields = $this->userRepository->getFormFields($user, $userPasswordSchema, true);
 
         $sectionFields = [
@@ -101,8 +99,8 @@ class ProfileController extends BaseController
 
                         'modelValue' => $userFields,
                         'schema' => $userSchema,
-                        'defaultItem' => collect($userSchema)->mapWithKeys(function($item, $key){
-                            return [ $item['name'] => $item['default'] ?? ''];
+                        'defaultItem' => collect($userSchema)->mapWithKeys(function ($item, $key) {
+                            return [$item['name'] => $item['default'] ?? ''];
                             $carry[$key] = $item->default ?? '';
                         })->toArray(),
 
@@ -117,16 +115,16 @@ class ProfileController extends BaseController
 
                         'schema' => $userPasswordSchema,
                         'modelValue' => $userPasswordFields,
-                        'defaultItem' => collect($userPasswordSchema)->mapWithKeys(function($item, $key){
-                            return [ $item['name'] => $item['default'] ?? ''];
+                        'defaultItem' => collect($userPasswordSchema)->mapWithKeys(function ($item, $key) {
+                            return [$item['name'] => $item['default'] ?? ''];
                             $carry[$key] = $item->default ?? '';
                         })->toArray(),
-                        'actionUrl' => $this->getModuleRoute(id: $userPasswordFields['id'], action: 'update',  singleton: true),
-                    ])
-            ]
+                        'actionUrl' => $this->getModuleRoute(id: $userPasswordFields['id'], action: 'update', singleton: true),
+                    ]),
+            ],
         ];
 
-        if($user->company){
+        if ($user->company) {
             $companySchema = $this->createFormSchema([
                 // 'country_id' => [
                 //     "type" => "select",
@@ -271,7 +269,7 @@ class ProfileController extends BaseController
                 //     ]
                 // ],
             ]);
-            $companySchema = $this->createFormSchema( getFormDraft('company') );
+            $companySchema = $this->createFormSchema(getFormDraft('company'));
             $companyFields = $this->companyRepository->getFormFields(auth()->user()->company, $companySchema);
 
             $companyFields['country_id'] = 1;
@@ -291,13 +289,13 @@ class ProfileController extends BaseController
 
                             'modelValue' => $companyFields,
                             'schema' => $companySchema,
-                            'defaultItem' => collect($companySchema)->mapWithKeys(function($item, $key){
-                                return [ $item['name'] => $item['default'] ?? ''];
+                            'defaultItem' => collect($companySchema)->mapWithKeys(function ($item, $key) {
+                                return [$item['name'] => $item['default'] ?? ''];
                                 $carry[$key] = $item->default ?? '';
                             })->toArray(),
                             'actionUrl' => route(Route::hasAdmin('profile.company')),
-                        ])
-                ]
+                        ]),
+                ],
             ];
         }
         $data = [];
@@ -305,10 +303,11 @@ class ProfileController extends BaseController
         // dd($sectionFields);
 
         $data['elements'] = [
-            UWrapper::makeGridSection($sectionFields)
+            UWrapper::makeGridSection($sectionFields),
         ];
 
         $view = "$this->baseKey::layouts.profile";
+
         return View::make($view, $data);
     }
 
@@ -340,7 +339,7 @@ class ProfileController extends BaseController
 
         activity()->performedOn($item)->log('updated');
 
-        return $this->respondWithSuccess(___("save-success"));
+        return $this->respondWithSuccess(___('save-success'));
 
     }
 
@@ -361,7 +360,6 @@ class ProfileController extends BaseController
 
         $input = $this->request->all();
 
-
         $formRequest = $this->validateFormRequest();
 
         // dd($formRequest);
@@ -372,9 +370,7 @@ class ProfileController extends BaseController
 
         activity()->performedOn($item)->log('updated');
 
-        return $this->respondWithSuccess(___("save-success"));
+        return $this->respondWithSuccess(___('save-success'));
 
     }
-
-
 }

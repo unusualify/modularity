@@ -15,7 +15,7 @@ class CurrencyRequest extends Request
     {
         return [
 
-		];
+        ];
     }
 
     /**
@@ -37,5 +37,4 @@ class CurrencyRequest extends Request
     {
         return [];
     }
-
 }

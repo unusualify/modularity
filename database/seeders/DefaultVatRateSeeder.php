@@ -3,13 +3,13 @@
 namespace Unusualify\Modularity\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
-
-class DefaultVatRateSeeder extends Seeder{
-
-    public function run(){
+class DefaultVatRateSeeder extends Seeder
+{
+    public function run()
+    {
 
         $table = config('priceable.tables.vat_rates');
         $seedArray = [
@@ -81,8 +81,7 @@ class DefaultVatRateSeeder extends Seeder{
             // Add more countries and VAT rates as needed
         ];
         $now = Carbon::now()->format('Y-m-d H:i:s');
-        $vatRates = array_map(fn($vatRate) => $vatRate += ['created_at' => $now], $seedArray);
+        $vatRates = array_map(fn ($vatRate) => $vatRate += ['created_at' => $now], $seedArray);
         DB::table($table)->insert($vatRates);
     }
 }
-

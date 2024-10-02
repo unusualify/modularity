@@ -2,22 +2,23 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
-use Unusualify\Modularity\Entities\File;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Unusualify\Modularity\Entities\File;
 
 trait FilesTrait
 {
-
-    public function setColumnsFilesTrait($columns, $inputs) {
+    public function setColumnsFilesTrait($columns, $inputs)
+    {
 
         $traitName = get_class_short_name(__TRAIT__);
 
-        $columns[$traitName] = collect($inputs)->reduce(function($acc, $curr){
-            if(preg_match('/\bfile\b/', $curr['type'])){
+        $columns[$traitName] = collect($inputs)->reduce(function ($acc, $curr) {
+            if (preg_match('/\bfile\b/', $curr['type'])) {
                 $acc[] = $curr['name'];
             }
+
             return $acc;
         }, []);
 
@@ -90,31 +91,30 @@ trait FilesTrait
             $default_locale = config('app.locale');
             $filesByRole = $object->files->groupBy('pivot.role');
 
-
-
             foreach ($this->getColumns(__TRAIT__) as $role) {
-                if(isset($filesByRole[$role])){
+                if (isset($filesByRole[$role])) {
                     $input = $this->inputs()[$role];
-                    if($input['translated'] ?? false){
+                    if ($input['translated'] ?? false) {
                         foreach ($filesByRole[$role]->groupBy('pivot.locale') as $locale => $filesByLocale) {
                             $fields[$role][$locale] = $filesByLocale->map(function ($file) {
                                 return $file->mediableFormat();
                             });
                         }
-                    }else{
-                        $fields[$role] = $filesByRole[$role]->groupBy('pivot.locale')[$default_locale]->map(function($file){
+                    } else {
+                        $fields[$role] = $filesByRole[$role]->groupBy('pivot.locale')[$default_locale]->map(function ($file) {
                             return $file->mediableFormat();
                         });
                     }
-                }else {
+                } else {
                     $input = $this->inputs()[$role] ?? null;
 
-                    if($input)
+                    if ($input) {
                         $fields += [
-                            $input['name'] => ($input['translated']) ?? false ? Arr::mapWithKeys(getLocales(), function($locale){
-                                return [ $locale => [] ];
-                            }): []
+                            $input['name'] => ($input['translated']) ?? false ? Arr::mapWithKeys(getLocales(), function ($locale) {
+                                return [$locale => []];
+                            }) : [],
                         ];
+                    }
 
                     // foreach ($systemLocales as $locale) {
                     //     $fields[$role][$locale] = [];
@@ -122,6 +122,7 @@ trait FilesTrait
                 }
             }
         }
+
         return $fields;
     }
 
@@ -137,11 +138,11 @@ trait FilesTrait
 
         $fileRoles = $this->getColumns(__TRAIT__);
 
-        foreach($fileRoles as $role){
-            if(isset($fields[$role]) && count(array_keys($fields[$role])) > 0){
+        foreach ($fileRoles as $role) {
+            if (isset($fields[$role]) && count(array_keys($fields[$role])) > 0) {
                 $default_locale = array_keys($fields[$role])[0];
                 foreach ($systemLocales as $locale) {
-                    if(isset($fields[$role][$locale])){
+                    if (isset($fields[$role][$locale])) {
                         Collection::make($fields[$role][$locale])->each(function ($file) use (&$files, $role, $locale) {
                             $files->push([
                                 'id' => $file['id'],
@@ -149,7 +150,7 @@ trait FilesTrait
                                 'locale' => $locale,
                             ]);
                         });
-                    }else {
+                    } else {
                         Collection::make($fields[$role])->each(function ($file) use (&$files, $role, $locale) {
                             $files->push([
                                 'id' => $file['id'],
@@ -168,7 +169,7 @@ trait FilesTrait
                 //         ]);
                 //     });
                 // }
-            }else{
+            } else {
                 // dd($role);
             }
         }
@@ -178,9 +179,9 @@ trait FilesTrait
         if (isset($fields['medias'])) {
             foreach ($fields['medias'] as $role => $filesForRole) {
                 if (Str::contains($role, ['[', ']'])) {
-                    $start = strpos($role, '[') + 1;
-                    $finish = strpos($role, ']', $start);
-                    $locale = substr($role, $start, $finish - $start);
+                    $start = mb_strpos($role, '[') + 1;
+                    $finish = mb_strpos($role, ']', $start);
+                    $locale = mb_substr($role, $start, $finish - $start);
                     $role = strtok($role, '[');
                 }
 
@@ -203,6 +204,4 @@ trait FilesTrait
 
         return $files;
     }
-
-
 }

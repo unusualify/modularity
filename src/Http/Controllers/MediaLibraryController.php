@@ -2,11 +2,6 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
-use Unusualify\Modularity\Http\Requests\MediaRequest;
-use Unusualify\Modularity\Models\Media;
-use Unusualify\Modularity\Services\Uploader\SignAzureUpload;
-use Unusualify\Modularity\Services\Uploader\SignS3Upload;
-use Unusualify\Modularity\Services\Uploader\SignUploadListener;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\JsonResponse;
@@ -14,6 +9,11 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Unusualify\Modularity\Http\Requests\MediaRequest;
+use Unusualify\Modularity\Models\Media;
+use Unusualify\Modularity\Services\Uploader\SignAzureUpload;
+use Unusualify\Modularity\Services\Uploader\SignS3Upload;
+use Unusualify\Modularity\Services\Uploader\SignUploadListener;
 
 class MediaLibraryController extends BaseController implements SignUploadListener
 {
@@ -109,7 +109,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
 
         $scopes = $this->filterScope($prependScope);
         // dd($this->getIndexItems($scopes));
-        $items = $this->getIndexItems([],$scopes,false);
+        $items = $this->getIndexItems([], $scopes, false);
 
         return [
             'items' => $items->map(function ($item) {
@@ -143,7 +143,6 @@ class MediaLibraryController extends BaseController implements SignUploadListene
 
     /**
      * @param int|null $parentModuleId
-     * @return
      */
     public function store($parentModuleId = null)
     {
@@ -153,6 +152,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
         } else {
             $media = $this->storeReference($request);
         }
+
         return $this->responseFactory->json(['media' => $media->mediableFormat(), 'success' => true], 200);
     }
 
@@ -182,7 +182,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
 
         $uploadedFile = $request->file('qqfile');
 
-        list($w, $h) = getimagesize($uploadedFile->path());
+        [$w, $h] = getimagesize($uploadedFile->path());
 
         $uploadedFile->storeAs($fileDirectory, $filename, ['disk' => $disk]);
 
@@ -197,6 +197,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
             $media = $this->repository->whereId($id)->first();
             $this->repository->afterDelete($media);
             $media->replace($fields);
+
             return $media->fresh();
         } else {
             return $this->repository->create($fields);
@@ -219,6 +220,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
             $media = $this->repository->whereId($id)->first();
             $this->repository->afterDelete($media);
             $media->update($fields);
+
             return $media->fresh();
         } else {
             return $this->repository->create($fields);
@@ -283,8 +285,6 @@ class MediaLibraryController extends BaseController implements SignUploadListene
     }
 
     /**
-     * @param Request $request
-     * @param SignS3Upload $signS3Upload
      * @return mixed
      */
     public function signS3Upload(Request $request, SignS3Upload $signS3Upload)
@@ -293,8 +293,6 @@ class MediaLibraryController extends BaseController implements SignUploadListene
     }
 
     /**
-     * @param Request $request
-     * @param SignAzureUpload $signAzureUpload
      * @return mixed
      */
     public function signAzureUpload(Request $request, SignAzureUpload $signAzureUpload)
@@ -303,7 +301,6 @@ class MediaLibraryController extends BaseController implements SignUploadListene
     }
 
     /**
-     * @param $signature
      * @param bool $isJsonResponse
      * @return mixed
      */
@@ -319,7 +316,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
      */
     public function uploadIsNotValid()
     {
-        return $this->responseFactory->json(["invalid" => true], 500);
+        return $this->responseFactory->json(['invalid' => true], 500);
     }
 
     /**
@@ -345,6 +342,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
     {
         return is_numeric($id) ? $this->repository->whereId($id)->exists() : false;
     }
+
     /**
      * @return \Illuminate\Http\JsonResponse
      */

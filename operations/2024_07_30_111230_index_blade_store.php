@@ -1,10 +1,9 @@
 <?php
 
-use TimoKoerber\LaravelOneTimeOperations\OneTimeOperation;
 use Illuminate\Console\Concerns\InteractsWithIO;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Schema;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use TimoKoerber\LaravelOneTimeOperations\OneTimeOperation;
 use Unusualify\Modularity\Facades\Modularity;
 
 return new class extends OneTimeOperation
@@ -13,8 +12,9 @@ return new class extends OneTimeOperation
 
     public function __construct()
     {
-        $this->output = new ConsoleOutput();
+        $this->output = new ConsoleOutput;
     }
+
     /**
      * Determine if the operation is being processed asynchronously.
      */
@@ -39,7 +39,7 @@ return new class extends OneTimeOperation
             Artisan::call('unusual:make:module', [
                 'module' => $module->getName(),
                 '--just-stubs' => true,
-                '--stubs-only' => 'views/index'
+                '--stubs-only' => 'views/index',
             ]);
         }
         $this->output->writeln('');

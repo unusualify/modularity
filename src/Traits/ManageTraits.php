@@ -1,22 +1,21 @@
 <?php
+
 namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\UFinder;
 
-trait ManageTraits {
-
+trait ManageTraits
+{
     use ManageModuleRoute;
 
     /**
-     * @param string|null $method
      * @return array
      */
-    protected function traitsMethods(string $method = null)
+    protected function traitsMethods(?string $method = null)
     {
         $method = $method ?? debug_backtrace()[1]['function'];
 
@@ -39,16 +38,17 @@ trait ManageTraits {
 
         $routeName = $this->routeName();
 
-        if( $moduleName && $routeName){
+        if ($moduleName && $routeName) {
             $module = Modularity::find($moduleName);
             $route_config = $module->getRouteConfig($routeName);
 
             return $this->chunkInputs($route_config['inputs']);
             // return $route_config['inputs'];
         }
+
         return [];
 
-        return !empty($conf = $this->routeConfig()) ? $conf['inputs'] : [];
+        return ! empty($conf = $this->routeConfig()) ? $conf['inputs'] : [];
     }
 
     public function hasTranslatedInput($schema = [])
@@ -56,8 +56,9 @@ trait ManageTraits {
         $hasTranslated = false;
 
         foreach ((count($schema) ? $schema : $this->inputs()) as $input) {
-            if(isset($input['translated']) && $input['translated']){
+            if (isset($input['translated']) && $input['translated']) {
                 $hasTranslated = true;
+
                 break;
             }
         }
@@ -67,60 +68,70 @@ trait ManageTraits {
 
     public function chunkInputs($schema = null, $all = false)
     {
-        return Arr::mapWithKeys($schema ?? $this->inputs(), function($input, $key) use($all){
-            if(isset($input['type'])){
+        return Arr::mapWithKeys($schema ?? $this->inputs(), function ($input, $key) use ($all) {
+            if (isset($input['type'])) {
                 switch ($input['type']) {
                     case 'group':
 
-                        return Arr::mapWithKeys($this->chunkInputs($input['schema'] ?? []), function($_input) use($input){
+                        return Arr::mapWithKeys($this->chunkInputs($input['schema'] ?? []), function ($_input) use ($input) {
                             $name = "{$input['name']}.{$_input['name']}";
-                            if(isset($input['name'])){
+                            if (isset($input['name'])) {
                                 $_input['parentName'] = $input['name'];
                             }
-                            return [$name => array_merge($_input,['name' => $name])];
+
+                            return [$name => array_merge($_input, ['name' => $name])];
                         });
+
                         return $this->chunkInputs($input['schema'] ?? []);
                     case 'wrap':
-                        return Arr::map($this->chunkInputs($input['schema'] ?? []), function($_input) use($input){
-                            if(isset($input['name'])){
+                        return Arr::map($this->chunkInputs($input['schema'] ?? []), function ($_input) use ($input) {
+                            if (isset($input['name'])) {
                                 // $_input['parentName'] = $input['name'];
                             }
+
                             return $_input;
                         });
-                    break;
+
+                        break;
                     case 'morphTo':
-                        if($all){
+                        if ($all) {
                             return $this->chunkInputs($input['schema']);
                         }
 
-                        return [ uniqid() => $input];
-                    break;
+                        return [uniqid() => $input];
+
+                        break;
                     case 'repeater':
                     case 'input-repeater':
                     case 'json-repeater':
-                        if($all){
-                            return Arr::mapWithKeys($this->chunkInputs($input['schema']), function($item) use($input){
-                                if(isset($input['translated']) && $input['translated'])
-                                    return Arr::mapWithKeys(getLocales(), function($locale) use($item, $input){
+                        if ($all) {
+                            return Arr::mapWithKeys($this->chunkInputs($input['schema']), function ($item) use ($input) {
+                                if (isset($input['translated']) && $input['translated']) {
+                                    return Arr::mapWithKeys(getLocales(), function ($locale) use ($item, $input) {
                                         $repeater_input_name = "{$input['name']}.{$locale}.*.{$item['name']}";
-                                        return [ $repeater_input_name =>  array_merge($item, ['name' => $repeater_input_name])];
+
+                                        return [$repeater_input_name => array_merge($item, ['name' => $repeater_input_name])];
                                     });
-                                $repeater_input_name =  $input['name'] . ".*." .$item['name'];
-                                return [ $repeater_input_name =>  array_merge($item, ['name' => $repeater_input_name])];
+                                }
+                                $repeater_input_name = $input['name'] . '.*.' . $item['name'];
+
+                                return [$repeater_input_name => array_merge($item, ['name' => $repeater_input_name])];
                             });
                         }
-                    break;
+
+                        break;
                     default:
 
                         break;
                 }
 
-                if(isset($input['name'])){
+                if (isset($input['name'])) {
                     $_key = $input['name'];
 
-                    return [ $_key => $input ];
+                    return [$_key => $input];
                 }
             }
+
             return [];
         });
     }
@@ -135,7 +146,7 @@ trait ManageTraits {
     public function prepareFieldsBeforeSaveManageTraits($object, $fields)
     {
 
-        if(isset($fields['password'])){
+        if (isset($fields['password'])) {
             $fields['password'] = Hash::make($fields['password']);
         }
 

@@ -13,7 +13,7 @@ trait SlugsTrait
     {
         if (property_exists($this->model, 'slugAttributes')) {
             foreach (getLocales() as $locale) {
-                if (isset($fields['slug']) && isset($fields['slug'][$locale]) && !empty($fields['slug'][$locale])) {
+                if (isset($fields['slug']) && isset($fields['slug'][$locale]) && ! empty($fields['slug'][$locale])) {
                     $object->disableLocaleSlugs($locale);
                     $currentSlug = [];
                     $currentSlug['slug'] = $fields['slug'][$locale];
@@ -104,11 +104,11 @@ trait SlugsTrait
 
         $item = (clone $query)->forSlug($slug)->with($with)->withCount($withCount)->first();
 
-        if (!$item && $item = (clone $query)->forInactiveSlug($slug)->first()) {
+        if (! $item && $item = (clone $query)->forInactiveSlug($slug)->first()) {
             $item->redirect = true;
         }
 
-        if (!$item && config('translatable.use_property_fallback', false)
+        if (! $item && config('translatable.use_property_fallback', false)
         && config('translatable.fallback_locale') != config('app.locale')) {
             $item = (clone $query)->orWhere(function ($query) {
                 return $query->withActiveTranslations(config('translatable.fallback_locale'));

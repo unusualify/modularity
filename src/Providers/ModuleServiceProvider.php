@@ -7,10 +7,9 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
-use Unusualify\Modularity\Facades\Modularity;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
+use Unusualify\Modularity\Facades\Modularity;
 
-use Modules\Webinar\Http\Middleware\WebinarAuthMiddleware;
 class ModuleServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
@@ -28,15 +27,13 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
 
         $this->bootModules();
     }
+
     /**
      * Register the service provider.
      *
      * @return void
      */
-    public function register()
-    {
-
-    }
+    public function register() {}
 
     public function bootModules()
     {
@@ -49,18 +46,18 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
         $component_class_namespace = GenerateConfigReader::read('component-class')->getNamespace();
 
         // dd(config('modularity'));
-        foreach(Modularity::allEnabled() as $module){
+        foreach (Modularity::allEnabled() as $module) {
 
             $module_name = $module->getName();
 
             // REGISTER MODULE MIDDLEWARES
-            if(file_exists(($middlewareDir = $module->getDirectoryPath($middleware_folder)))){
+            if (file_exists(($middlewareDir = $module->getDirectoryPath($middleware_folder)))) {
                 foreach (glob($middlewareDir . '/*Middleware.php') as $middlewareFile) {
                     $middlewareFileName = pathinfo($middlewareFile)['filename']; // $filename
                     $middlewareClass = $module->getClassNamespace("{$middleware_namespace}\\" . $middlewareFileName);
-                    if(@class_exists($middlewareClass)){
+                    if (@class_exists($middlewareClass)) {
 
-                        $aliasName = implode('.', Arr::where(explode('_', snakeCase($middlewareFileName)), function($value){
+                        $aliasName = implode('.', Arr::where(explode('_', snakeCase($middlewareFileName)), function ($value) {
                             return $value !== 'middleware';
                         }));
 
@@ -82,7 +79,7 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
 
             // LOAD MODULE CONFIG
             // if(file_exists(module_path($module->getName(), 'Config/config.php'))){
-            if(file_exists($module->getDirectoryPath("{$config_folder}/config.php"))){
+            if (file_exists($module->getDirectoryPath("{$config_folder}/config.php"))) {
                 $this->mergeConfigFrom(
                     $module->getDirectoryPath("{$config_folder}/config.php"), $module->getSnakeName()
                 );
@@ -94,10 +91,8 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
                 $module->getDirectoryPath($migration_folder)
             );
 
-
             // LOAD MODULE VIEWS
-            $sourcePath = module_path($module->getName(), $views_folder);
-
+            $sourcePath = $module->getDirectoryPath($views_folder);
             $this->loadViewsFrom(
                 array_merge(
                     $this->getPublishableViewPaths(
@@ -128,5 +123,4 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
             }
         }
     }
-
 }

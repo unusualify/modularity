@@ -20,12 +20,12 @@ return [
         'location' => 'right',
         'rail' => false,
         'permanent' => true,
-        'max-width' => '10em'
+        'max-width' => '10em',
     ],
 
     'profileMenu' => [
         'superadmin' => [
-             [
+            [
                 'name' => 'Profile Settings',
                 // 'route_name' => 'admin.profile',
                 'icon' => '$accountSettings',
@@ -36,7 +36,7 @@ return [
                         'route_name' => 'admin.profile',
                         'icon' => '$accountSettings',
                     ],
-                ]
+                ],
 
             ],
             [
@@ -47,7 +47,7 @@ return [
                     'facebook' => [
                         'name' => 'Facebook',
                         'href' => 'https://www.facebook.com',
-                        'icon' => 'mdi-facebook'
+                        'icon' => 'mdi-facebook',
                     ],
                     'dashboard' => [
                         'name' => 'Dashboard',
@@ -58,21 +58,21 @@ return [
                         'name' => 'Permissions',
                         'route_name' => 'admin.system.system_user.permission.index',
                         'icon' => '$accountSettings',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'permissions' => [
                 'name' => 'Permissions',
                 'route_name' => 'admin.system.system_user.permission.index',
                 'icon' => '$accountSettings',
-            ]
-        ]
+            ],
+        ],
     ],
 
     'dashboard' => [
         'blocks' => [
 
-        ]
-    ]
+        ],
+    ],
 
 ];

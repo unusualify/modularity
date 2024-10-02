@@ -1,11 +1,11 @@
 <?php
+
 namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Collection;
 
-trait ManageScopes {
-
-
+trait ManageScopes
+{
     /**
      * @var array
      */
@@ -76,15 +76,19 @@ trait ManageScopes {
             switch ($requestFilters['status']) {
                 case 'published':
                     $scope['published'] = true;
+
                     break;
                 case 'draft':
                     $scope['draft'] = true;
+
                     break;
                 case 'trash':
                     $scope['onlyTrashed'] = true;
+
                     break;
                 case 'mine':
                     $scope['mine'] = true;
+
                     break;
             }
 
@@ -99,7 +103,7 @@ trait ManageScopes {
 
                     $fieldSplitted = explode('|', $field);
 
-                    if( $key == 'search' && $field != 'search'){
+                    if ($key == 'search' && $field != 'search') {
                         $fieldSplitted = explode('|', $field);
 
                         $scope['searches'] = $fieldSplitted;
@@ -178,25 +182,25 @@ trait ManageScopes {
 
         if ($this->request->has('sortBy')) {
 
-            foreach( $this->request->get('sortBy') as $str ){
+            foreach ($this->request->get('sortBy') as $str) {
                 $sort = json_decode($str);
                 // dd($sort);
 
-                if(preg_match('/(.*)(_timestamp)/', $sort->key, $matches)){
+                if (preg_match('/(.*)(_timestamp)/', $sort->key, $matches)) {
                     $sort->key = $matches[1];
                 }
 
-                if(preg_match('/(.*)(_uuid)/', $sort->key, $matches)){
+                if (preg_match('/(.*)(_uuid)/', $sort->key, $matches)) {
                     $sort->key = $matches[1];
                 }
 
-                if(preg_match('/(.*)(_relation)/', $sort->key, $matches)){
+                if (preg_match('/(.*)(_relation)/', $sort->key, $matches)) {
                     continue;
                     // dd($sort);
                     $sort->key = $matches[1];
                 }
 
-                if ( $sort->key == 'name') {
+                if ($sort->key == 'name') {
                     $sortBy = $this->titleColumnKey;
                 } elseif (! empty($sort->key)) {
                     $sortBy = $sort->key;

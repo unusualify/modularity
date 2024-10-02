@@ -2,7 +2,7 @@
 
 return [
     'enabled' => false,
-    'path' => base_path( env('MODULARITY_STUB_PATH') ?? 'vendor/unusualify/modularity/src/Console/stubs'),
+    'path' => base_path(env('MODULARITY_STUB_PATH') ?? 'vendor/unusualify/modularity/src/Console/stubs'),
     'files' => [
         'routes/web' => 'Routes/web.php',
         'routes/api' => 'Routes/api.php',
@@ -35,6 +35,5 @@ return [
             'PROVIDER_NAMESPACE',
         ],
     ],
-    'gitkeep' => true
+    'gitkeep' => true,
 ];
-

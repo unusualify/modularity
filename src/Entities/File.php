@@ -28,9 +28,10 @@ class File extends Model
         return DB::table(unusualConfig('tables.fileables', 'unusual_fileables'))->where('file_id', $this->id)->count() === 0;
     }
 
-    public function scopeUnused ($query)
+    public function scopeUnused($query)
     {
         $usedIds = DB::table(unusualConfig('tables.fileables'))->get()->pluck('file_id');
+
         return $query->whereNotIn('id', $usedIds->toArray())->get();
     }
 

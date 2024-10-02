@@ -15,7 +15,7 @@ class CreateUnusualDefaultTagsTables extends Migration
     {
         $unusualTaggedTable = unusualConfig('tables.tagged', 'modularity_tagged');
 
-        if (!Schema::hasTable($unusualTaggedTable)) {
+        if (! Schema::hasTable($unusualTaggedTable)) {
             Schema::create($unusualTaggedTable, function (Blueprint $table) {
                 $table->{unusualIncrementsMethod()}('id');
                 $table->string('taggable_type');
@@ -25,10 +25,9 @@ class CreateUnusualDefaultTagsTables extends Migration
             });
         }
 
-
         $unusualTagsTable = unusualConfig('tables.tags', 'modularity_tags');
 
-        if (!Schema::hasTable($unusualTagsTable)) {
+        if (! Schema::hasTable($unusualTagsTable)) {
             Schema::create($unusualTagsTable, function (Blueprint $table) {
                 $table->{unusualIncrementsMethod()}('id');
                 $table->string('namespace');

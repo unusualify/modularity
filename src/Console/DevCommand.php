@@ -16,14 +16,14 @@ class DevCommand extends BaseCommand
      *
      * @var string
      */
-    protected $description = "Hot reload unusual assets with custom Vue component, configuration";
+    protected $description = 'Hot reload unusual assets with custom Vue component, configuration';
 
     /*
      * Executes the console command.
      *
      * @return mixed
      */
-    public function handle() :int
+    public function handle(): int
     {
         $this->call('unusual:build', [
             '--hot' => true,

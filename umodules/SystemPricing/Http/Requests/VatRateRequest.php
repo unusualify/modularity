@@ -14,7 +14,7 @@ class VatRateRequest extends Request
     public function rulesForAll()
     {
         return [
-		];
+        ];
     }
 
     /**

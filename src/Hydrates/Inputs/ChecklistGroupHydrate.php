@@ -11,7 +11,7 @@ class ChecklistGroupHydrate extends InputHydrate
      * @var array
      */
     public $requirements = [
-        'default' => []
+        'default' => [],
     ];
 
     /**
@@ -25,12 +25,13 @@ class ChecklistGroupHydrate extends InputHydrate
 
         $input['type'] = 'input-checklist-group';
 
-        if(isset($input['schema'])){
+        if (isset($input['schema'])) {
 
-            $input['schema'] = array_filter($input['schema'], function($_input){
-                return isset($_input['items']) && !empty($_input['items']);
+            $input['schema'] = array_filter($input['schema'], function ($_input) {
+                return isset($_input['items']) && ! empty($_input['items']);
             });
         }
+
         return $input;
     }
 }

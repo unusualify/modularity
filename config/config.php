@@ -3,8 +3,8 @@
 use Unusualify\Modularity\Activators\FileActivator;
 
 return [
-    'namespace' => env('BASE_NAMESPACE','Unusualify\\Modularity'),
-    'name' => env('MODULARITY_BASE_NAME','Modularity'),
+    'namespace' => env('BASE_NAMESPACE', 'Unusualify\\Modularity'),
+    'name' => env('MODULARITY_BASE_NAME', 'Modularity'),
 
     'system_prefix' => 'system',
 
@@ -17,7 +17,7 @@ return [
     'version' => '1.0.0',
     'auth_login_redirect_path' => '/',
     'is_development' => env('UNUSUAL_DEV', false),
-    'development_url' => "http://" . env('UNUSUAL_DEV_URL', 'localhost:8080'),
+    'development_url' => 'http://' . env('UNUSUAL_DEV_URL', 'localhost:8080'),
     'public_dir' => env('UNUSUAL_ASSETS_DIR', 'unusual'),
     'vendor_path' => env('MODULARITY_VENDOR_PATH', 'vendor/unusualify/modularity'),
 
@@ -25,7 +25,7 @@ return [
     // 'vendor_components_resource_path' => 'assets/vendor/js/components',
 
     'manifest' => 'unusual-manifest.json',
-    'js_namespace' => env('VUE_APP_NAME','MODULARITY'),
+    'js_namespace' => env('VUE_APP_NAME', 'MODULARITY'),
     'build_timeout' => 300,
     'use_big_integers_on_migrations' => true,
 
@@ -43,7 +43,7 @@ return [
 
     'route_patterns' => [
         'id' => '[0-9]+',
-        'payment' => '[0-9]+'
+        'payment' => '[0-9]+',
     ],
 
     'activators' => [

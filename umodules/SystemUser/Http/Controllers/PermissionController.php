@@ -7,7 +7,6 @@ use Unusualify\Modularity\Http\Controllers\BaseController;
 
 class PermissionController extends BaseController
 {
-
     /**
      * @var string
      */
@@ -23,12 +22,9 @@ class PermissionController extends BaseController
      */
     protected $routeName = 'Permission';
 
-
     protected $titleColumnKey = 'name';
 
-
     // protected $perPage = 2;
-
 
     /**
      * @var string
@@ -38,16 +34,13 @@ class PermissionController extends BaseController
     /**
      * @var string
      */
-    protected $modelName = "Permission";
+    protected $modelName = 'Permission';
 
-
-    public function __construct(\Illuminate\Foundation\Application $app,Request $request)
+    public function __construct(\Illuminate\Foundation\Application $app, Request $request)
     {
         parent::__construct(
             $app,
             $request
         );
     }
-
-
 }

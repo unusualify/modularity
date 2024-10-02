@@ -2,8 +2,8 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
-use Unusualify\Modularity\Facades\TwillCapsules;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Facades\TwillCapsules;
 
 trait HasSlug
 {
@@ -41,7 +41,7 @@ trait HasSlug
      */
     public function getSlugClass()
     {
-        return new $this->getSlugModelClass();
+        return new $this->getSlugModelClass;
     }
 
     /**
@@ -62,7 +62,7 @@ trait HasSlug
 
     protected function getSlugClassName()
     {
-        return class_basename($this) . "Slug";
+        return class_basename($this) . 'Slug';
     }
 
     /**
@@ -135,7 +135,7 @@ trait HasSlug
             (($oldSlug = $this->getExistingSlug($slugParams)) != null)
             && ($restoring ? $slugParams['slug'] === $this->suffixSlugIfExisting($slugParams) : true)
         ) {
-            if (!$oldSlug->active && ($slugParams['active'] ?? false)) {
+            if (! $oldSlug->active && ($slugParams['active'] ?? false)) {
                 $this->getSlugModelClass()::where('id', $oldSlug->id)->update(['active' => 1]);
                 $this->disableLocaleSlugs($oldSlug->locale, $oldSlug->id);
             }
@@ -218,8 +218,8 @@ trait HasSlug
                 break;
             }
 
-            if (!empty($slugParams['slug'])) {
-                $slugParams['slug'] = $slugBackup . (($i > $this->nb_variation_slug) ? "-" . $this->getSuffixSlug() : "-{$i}");
+            if (! empty($slugParams['slug'])) {
+                $slugParams['slug'] = $slugBackup . (($i > $this->nb_variation_slug) ? '-' . $this->getSuffixSlug() : "-{$i}");
             }
         }
 
@@ -267,7 +267,7 @@ trait HasSlug
             return $slug->slug;
         }
 
-        return "";
+        return '';
     }
 
     /**
@@ -284,9 +284,9 @@ trait HasSlug
      */
     public function getSlugParams($locale = null)
     {
-        if (count(getLocales()) === 1 || !isset($this->translations)) {
+        if (count(getLocales()) === 1 || ! isset($this->translations)) {
             $slugParams = $this->getSingleSlugParams($locale);
-            if ($slugParams != null && !empty($slugParams)) {
+            if ($slugParams != null && ! empty($slugParams)) {
                 return $slugParams;
             }
         }
@@ -300,14 +300,14 @@ trait HasSlug
 
                 $slugDependenciesAttributes = [];
                 foreach ($attributes as $attribute) {
-                    if (!isset($this->$attribute)) {
+                    if (! isset($this->$attribute)) {
                         throw new \Exception("You must define the field {$attribute} in your model");
                     }
 
                     $slugDependenciesAttributes[$attribute] = $this->$attribute;
                 }
 
-                if (!isset($translation->$slugAttribute) && !isset($this->$slugAttribute)) {
+                if (! isset($translation->$slugAttribute) && ! isset($this->$slugAttribute)) {
                     throw new \Exception("You must define the field {$slugAttribute} in your model");
                 }
 
@@ -341,14 +341,14 @@ trait HasSlug
                 $slugAttribute = array_shift($attributes);
                 $slugDependenciesAttributes = [];
                 foreach ($attributes as $attribute) {
-                    if (!isset($this->$attribute)) {
+                    if (! isset($this->$attribute)) {
                         throw new \Exception("You must define the field {$attribute} in your model");
                     }
 
                     $slugDependenciesAttributes[$attribute] = $this->$attribute;
                 }
 
-                if (!isset($this->$slugAttribute)) {
+                if (! isset($this->$slugAttribute)) {
                     throw new \Exception("You must define the field {$slugAttribute} in your model");
                 }
 
@@ -386,7 +386,7 @@ trait HasSlug
      */
     public function getForeignKey()
     {
-        return Str::snake(class_basename(get_class($this))) . "_id";
+        return Str::snake(class_basename(get_class($this))) . '_id';
     }
 
     protected function getSuffixSlug()
@@ -406,18 +406,18 @@ trait HasSlug
         // Make sure string is in UTF-8 and strip invalid UTF-8 characters
         $str = mb_convert_encoding((string) $str, 'UTF-8', mb_list_encodings());
 
-        $defaults = array(
+        $defaults = [
             'delimiter' => '-',
             'limit' => null,
             'lowercase' => true,
-            'replacements' => array(),
+            'replacements' => [],
             'transliterate' => true,
-        );
+        ];
 
         // Merge options
         $options = array_merge($defaults, $options);
 
-        $char_map = array(
+        $char_map = [
             // Latin
             'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'A', 'Å' => 'A', 'Æ' => 'AE', 'Ç' => 'C',
             'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I',
@@ -490,7 +490,7 @@ trait HasSlug
             // Romanian
             'Ă' => 'A', 'Â' => 'A', 'Î' => 'I', 'Ș' => 'S', 'Ț' => 'T',
             'ă' => 'a', 'â' => 'a', 'î' => 'i', 'ș' => 's', 'ț' => 't',
-        );
+        ];
 
         // Make custom replacements
         $str = preg_replace(array_keys($options['replacements']), $options['replacements'], $str);
@@ -523,7 +523,7 @@ trait HasSlug
      */
     public function urlSlugShorter($string)
     {
-        return strtolower(trim(preg_replace('~[^0-9a-z]+~i', '-', html_entity_decode(preg_replace('~&([a-z]{1,2})(?:acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i', '$1', htmlentities($string, ENT_QUOTES, 'UTF-8')), ENT_QUOTES, 'UTF-8')), '-'));
+        return mb_strtolower(trim(preg_replace('~[^0-9a-z]+~i', '-', html_entity_decode(preg_replace('~&([a-z]{1,2})(?:acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i', '$1', htmlentities($string, ENT_QUOTES, 'UTF-8')), ENT_QUOTES, 'UTF-8')), '-'));
     }
 
     /**
@@ -545,8 +545,8 @@ trait HasSlug
     /**
      * Retrieve the model for a bound value.
      *
-     * @param  mixed  $value
-     * @param  string|null  $field
+     * @param mixed $value
+     * @param string|null $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function resolveRouteBinding($value, $field = null)
@@ -555,5 +555,4 @@ trait HasSlug
 
         return $query->firstOrFail();
     }
-
 }

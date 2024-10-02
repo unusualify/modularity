@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Repositories\Traits;
 
 trait OauthTrait
 {
-
     /**
      * @param \Laravel\Socialite\Contracts\User $oauthUser
      * @return \Unusualify\Modularity\Entities\User
@@ -17,7 +16,7 @@ trait OauthTrait
     /**
      * @param \Laravel\Socialite\Contracts\User $oauthUser
      * @param string $provider
-     * @return boolean
+     * @return bool
      */
     public function oauthIsUserLinked($oauthUser, $provider)
     {
@@ -66,5 +65,4 @@ trait OauthTrait
         return $user;
 
     }
-
 }

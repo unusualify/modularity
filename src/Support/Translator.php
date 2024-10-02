@@ -9,7 +9,7 @@ class Translator extends LaravelTranslator
     /**
      * The loader implementation.
      *
-     * @var  Unusualify\Modularity\Support\FileLoader
+     * @var Unusualify\Modularity\Support\FileLoader
      */
     protected $loader;
 

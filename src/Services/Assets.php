@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Cache;
 
 class Assets
 {
-    function asset($file)
+    public function asset($file)
     {
         return $this->devAsset($file) ?? $this->prodAsset($file);
     }
@@ -40,14 +40,14 @@ class Assets
 
     public function devAsset($file)
     {
-        if (!$this->devMode()) {
+        if (! $this->devMode()) {
             return null;
         }
 
         $devServerUrl = unusualConfig('development_url', 'http://localhost:8080');
         try {
             $manifest = $this->readJson(
-                'http://workspace:8080'.
+                'http://workspace:8080' .
                     '/' .
                     unusualConfig('public_dir') .
                     '/' .
@@ -68,6 +68,7 @@ class Assets
                 'Twill dev assets manifest is missing. Make sure you are running the npm run serve command inside Twill.'
             );
         }
+
         // dd(
         //     $devServerUrl,
         //     $manifest

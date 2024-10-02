@@ -10,8 +10,8 @@ return [
         'command_option' => [
             'shortcut' => '--T',
             'input_type' => InputOption::VALUE_NONE,
-            'description' => 'Whether model has translation trait or not'
-        ]
+            'description' => 'Whether model has translation trait or not',
+        ],
     ],
     'addMedia' => [
         'model' => 'HasImages',
@@ -20,8 +20,8 @@ return [
         'command_option' => [
             'shortcut' => '--M',
             'input_type' => InputOption::VALUE_NONE,
-            'description' => 'Do you need to attach images on this module?'
-        ]
+            'description' => 'Do you need to attach images on this module?',
+        ],
     ],
     'addFile' => [
         'model' => 'HasFiles',
@@ -30,8 +30,8 @@ return [
         'command_option' => [
             'shortcut' => '--F',
             'input_type' => InputOption::VALUE_NONE,
-            'description' => 'Do you need to attach files on this module?'
-        ]
+            'description' => 'Do you need to attach files on this module?',
+        ],
     ],
     'addPosition' => [
         'model' => 'HasPosition',
@@ -39,11 +39,11 @@ return [
         'command_option' => [
             'shortcut' => '--P',
             'input_type' => InputOption::VALUE_NONE,
-            'description' => 'Do you need to manage the position of records on this module?'
+            'description' => 'Do you need to manage the position of records on this module?',
         ],
         'implementations' => [
-            \Unusualify\Modularity\Entities\Interfaces\Sortable::class
-        ]
+            \Unusualify\Modularity\Entities\Interfaces\Sortable::class,
+        ],
     ],
     'addSlug' => [
         'model' => 'HasSlug',
@@ -52,8 +52,8 @@ return [
         'command_option' => [
             'shortcut' => '--S',
             'input_type' => InputOption::VALUE_NONE,
-            'description' => 'Whether model has sluggable trait or not'
-        ]
+            'description' => 'Whether model has sluggable trait or not',
+        ],
     ],
     'addPrice' => [
         'model' => \Oobook\Priceable\Traits\HasPriceable::class,
@@ -62,8 +62,8 @@ return [
         'command_option' => [
             'shortcut' => null,
             'input_type' => InputOption::VALUE_NONE,
-            'description' => 'Whether model has pricing trait or not'
-        ]
+            'description' => 'Whether model has pricing trait or not',
+        ],
     ],
     'addAuthorized' => [
         'model' => 'IsAuthorizedable',
@@ -72,8 +72,8 @@ return [
         'command_option' => [
             'shortcut' => '--A',
             'input_type' => InputOption::VALUE_NONE,
-            'description' => 'Authorized models to indicate scopes'
-        ]
+            'description' => 'Authorized models to indicate scopes',
+        ],
     ],
     'addFilepond' => [
         'model' => 'HasFileponds',
@@ -82,8 +82,8 @@ return [
         'command_option' => [
             'shortcut' => '--FP',
             'input_type' => InputOption::VALUE_NONE,
-            'description' => 'Do you need to attach fileponds on this module?'
-        ]
+            'description' => 'Do you need to attach fileponds on this module?',
+        ],
     ],
     'addUuid' => [
         'model' => 'HasUuid',
@@ -92,18 +92,17 @@ return [
         'command_option' => [
             'shortcut' => null,
             'input_type' => InputOption::VALUE_NONE,
-            'description' => 'Do you need to attach uuid on this module route?'
-        ]
+            'description' => 'Do you need to attach uuid on this module route?',
+        ],
     ],
     'addSnapshot' => [
-        'model' =>  \Oobook\Snapshot\Traits\HasSnapshot::class,
+        'model' => \Oobook\Snapshot\Traits\HasSnapshot::class,
         'repository' => null,
         'question' => 'Do you need to attach snapshot feature on this module route?',
         'command_option' => [
             'shortcut' => '--SS',
             'input_type' => InputOption::VALUE_NONE,
-            'description' => 'Do you need to attach snapshot feature on this module route?'
-        ]
+            'description' => 'Do you need to attach snapshot feature on this module route?',
+        ],
     ],
 ];
-

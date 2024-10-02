@@ -2,15 +2,15 @@
 
 namespace Unusualify\Modularity\Entities;
 
+use Illuminate\Database\Eloquent\Model as BaseModel;
 use Unusualify\Modularity\Entities\Traits\HasFiles;
 use Unusualify\Modularity\Entities\Traits\HasImages;
 use Unusualify\Modularity\Entities\Traits\HasPresenter;
 use Unusualify\Modularity\Entities\Traits\HasRelated;
-use Illuminate\Database\Eloquent\Model as BaseModel;
 
 class Block extends BaseModel
 {
-    use HasImages, HasFiles, HasPresenter, HasRelated;
+    use HasFiles, HasImages, HasPresenter, HasRelated;
 
     public $timestamps = false;
 
@@ -58,7 +58,7 @@ class Block extends BaseModel
         $value = $this->content[$name] ?? null;
 
         $locale = $forceLocale ?? (
-            config('translatable.use_property_fallback', false) && (!array_key_exists(app()->getLocale(), $value ?? []))
+            config('translatable.use_property_fallback', false) && (! array_key_exists(app()->getLocale(), $value ?? []))
             ? config('translatable.fallback_locale')
             : app()->getLocale()
         );

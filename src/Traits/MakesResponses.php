@@ -1,4 +1,5 @@
 <?php
+
 namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Facades\Redirect;
@@ -7,8 +8,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Services\MessageStage;
 
-trait MakesResponses {
-
+trait MakesResponses
+{
     /**
      * @param string|null $back_link
      * @param array $params
@@ -18,7 +19,7 @@ trait MakesResponses {
     {
         if (! isset($back_link)) {
             if (($back_link = Session::get($this->getBackLinkSessionKey())) == null) {
-                if($this->isNested){
+                if ($this->isNested) {
                     // dd(
                     //     $this->routeName,
                     //     $this->routePrefix,
@@ -59,8 +60,9 @@ trait MakesResponses {
      */
     protected function getBackLinkSessionKey()
     {
-        return $this->moduleName . "." . $this->routeName . ($this->isNested ? $this->nestedParentId ?? '' : '') . '_back_link';
-        return $this->moduleName . "." . $this->routeName . ($this->submodule ? $this->submoduleParentId ?? '' : '') . '_back_link';
+        return $this->moduleName . '.' . $this->routeName . ($this->isNested ? $this->nestedParentId ?? '' : '') . '_back_link';
+
+        return $this->moduleName . '.' . $this->routeName . ($this->submodule ? $this->submoduleParentId ?? '' : '') . '_back_link';
     }
 
     /**
@@ -78,6 +80,7 @@ trait MakesResponses {
             array_filter($params) + [Str::singular($this->moduleName) => $id],
             debug_backtrace()
         );
+
         return Redirect::to(moduleRoute(
             $this->moduleName,
             $this->routePrefix,
@@ -127,5 +130,4 @@ trait MakesResponses {
             'variant' => $variant,
         ]);
     }
-
 }

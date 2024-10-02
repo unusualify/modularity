@@ -14,7 +14,7 @@ class PriceTypeRequest extends Request
     public function rulesForAll()
     {
         return [
-		];
+        ];
     }
 
     /**

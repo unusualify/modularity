@@ -5,11 +5,11 @@ namespace Unusualify\Modularity\Providers;
 // use Unusualify\Modularity\Models\Enums\UserRole;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Unusualify\Modularity\Entities\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Permission;
+use Unusualify\Modularity\Entities\User;
 
 class AuthServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -41,21 +41,21 @@ class AuthServiceProvider extends ServiceProvider implements DeferrableProvider
 
     public function boot()
     {
-        if(exceptionalRunningInConsole() && database_exists() && Schema::hasTable(config('permission.table_names.permissions'))){
+        if (exceptionalRunningInConsole() && database_exists() && Schema::hasTable(config('permission.table_names.permissions'))) {
             Gate::before(function (User $user, $ability) {
                 return $user->hasRole(self::SUPERADMIN) ? true : null;
             });
 
             Gate::define('dashboard', function ($user) {
-                return $this->authorize($user, function ($user){
+                return $this->authorize($user, function ($user) {
                     return $this->userHasPermission($user, ['dashboard']);
                     // return $this->userHasRole($user, [UserRole::VIEWONLY, UserRole::PUBLISHER, UserRole::ADMIN]);
                 });
             });
 
-            foreach( Permission::all() as $permission ){
-                Gate::define($permission->name, function ($user) use($permission) {
-                    return $this->authorize($user, function ($user) use($permission){
+            foreach (Permission::all() as $permission) {
+                Gate::define($permission->name, function ($user) use ($permission) {
+                    return $this->authorize($user, function ($user) use ($permission) {
                         return $this->userHasPermission($user, [$permission->name]);
                         // return $this->userHasRole($user, [UserRole::VIEWONLY, UserRole::PUBLISHER, UserRole::ADMIN]);
                     });

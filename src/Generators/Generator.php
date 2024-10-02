@@ -4,16 +4,15 @@ namespace Unusualify\Modularity\Generators;
 
 use Illuminate\Config\Repository as Config;
 use Illuminate\Console\Command as Console;
+use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Nwidart\Modules\FileRepository;
+use Nwidart\Modules\Generators\Generator as NwidartGenerator;
 use Nwidart\Modules\Support\Config\GeneratorPath;
-use Illuminate\Container\Container;
 use Unusualify\Modularity\Module;
 use Unusualify\Modularity\Traits\ReplacementTrait;
-
-use Nwidart\Modules\Generators\Generator as NwidartGenerator;
 
 abstract class Generator extends NwidartGenerator
 {
@@ -85,7 +84,7 @@ abstract class Generator extends NwidartGenerator
     /**
      * use default inputs and headers
      *
-     * @var boolean
+     * @var bool
      */
     protected $useDefaults;
 
@@ -93,21 +92,17 @@ abstract class Generator extends NwidartGenerator
 
     protected $test = false;
 
-
     /**
      * The constructor.
-     * @param $name
+     *
      * @param FileRepository $module
-     * @param Config     $config
-     * @param Filesystem $filesystem
-     * @param Console    $console
      */
     public function __construct(
         $name,
-        Config $config = null,
-        Filesystem $filesystem = null,
-        Console $console = null,
-        Module $module = null
+        ?Config $config = null,
+        ?Filesystem $filesystem = null,
+        ?Console $console = null,
+        ?Module $module = null
     ) {
         $this->name = $name;
         $this->app = Container::getInstance();
@@ -116,9 +111,9 @@ abstract class Generator extends NwidartGenerator
         $this->console = $console;
         $this->module = $module;
 
-        if($module)
+        if ($module) {
             $this->moduleName = $this->module->getName();
-
+        }
 
         // Stub::setBasePath( config('modules.paths.modules').'/Base/Console/stubs');
     }
@@ -127,7 +122,6 @@ abstract class Generator extends NwidartGenerator
      * Set the laravel config instance.
      *
      * @param Config $config
-     *
      * @return $this
      */
     public function setConfig($config)
@@ -151,7 +145,6 @@ abstract class Generator extends NwidartGenerator
      * Set the laravel filesystem instance.
      *
      * @param Filesystem $filesystem
-     *
      * @return $this
      */
     public function setFilesystem($filesystem)
@@ -175,7 +168,6 @@ abstract class Generator extends NwidartGenerator
      * Set the laravel console instance.
      *
      * @param Console $console
-     *
      * @return $this
      */
     public function setConsole($console)
@@ -199,7 +191,6 @@ abstract class Generator extends NwidartGenerator
      * Set the Module instance.
      *
      * @param string $module
-     *
      * @return $this
      */
     public function setModule($module)
@@ -227,7 +218,6 @@ abstract class Generator extends NwidartGenerator
      * Set the module instance.
      *
      * @param mixed $module
-     *
      * @return $this
      */
     public function setRoute($route)
@@ -251,7 +241,6 @@ abstract class Generator extends NwidartGenerator
      * Set force status.
      *
      * @param bool|int $force
-     *
      * @return $this
      */
     public function setForce($force)
@@ -264,11 +253,11 @@ abstract class Generator extends NwidartGenerator
     /**
      * Set the fix attribute
      *
-     * @param boolean|int $fix
-     *
+     * @param bool|int $fix
      * @return $this
      */
-    public function setFix($fix){
+    public function setFix($fix)
+    {
         $this->fix = $fix;
 
         return $this;
@@ -277,20 +266,21 @@ abstract class Generator extends NwidartGenerator
     /**
      * Get if the configuration is set as istest or not
      *
-     * @return boolean|int
+     * @return bool|int
      */
-    public function getFix(){
+    public function getFix()
+    {
         return $this->fix;
     }
 
     /**
      * Set the test attribute
      *
-     * @param boolean|int $test
-     *
+     * @param bool|int $test
      * @return $this
      */
-    public function setTest($test){
+    public function setTest($test)
+    {
         $this->test = $test;
 
         return $this;
@@ -299,9 +289,10 @@ abstract class Generator extends NwidartGenerator
     /**
      * Get if the configuration is set as isTest or not
      *
-     * @return boolean|int
+     * @return bool|int
      */
-    public function getTest(){
+    public function getTest()
+    {
         return $this->test;
     }
 
@@ -320,13 +311,14 @@ abstract class Generator extends NwidartGenerator
      *
      * @return void
      */
-    public function getTargetPath() {
+    public function getTargetPath()
+    {
         return $this->module?->getPath() ?? false;
     }
 
     public function generatorConfig($generator)
     {
-        return (new GeneratorPath($this->config->get(unusualBaseKey() . '.paths.generator.'.$generator)));
+        return new GeneratorPath($this->config->get(unusualBaseKey() . '.paths.generator.' . $generator));
     }
 
     /**
@@ -334,7 +326,5 @@ abstract class Generator extends NwidartGenerator
      *
      * @return string
      */
-    abstract protected function generate():int;
-
-
+    abstract protected function generate(): int;
 }

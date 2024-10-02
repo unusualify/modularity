@@ -3,8 +3,8 @@
 namespace Unusualify\Modularity\Console;
 
 use Illuminate\Console\Command;
-use Unusualify\Modularity\Facades\Modularity;
 use Symfony\Component\Console\Input\InputArgument;
+use Unusualify\Modularity\Facades\Modularity;
 
 class DisableCommand extends Command
 {
@@ -25,7 +25,7 @@ class DisableCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle() : int
+    public function handle(): int
     {
         /** @var Module $module */
         // $module = $this->laravel['unusual.modularity']->findOrFail($this->argument('module'));

@@ -2,15 +2,20 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Factory as ValidatorFactory;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Entities\User;
 
-use function Laravel\Prompts\{text,note,confirm,error,info,password,warning};
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\error;
+use function Laravel\Prompts\info;
+use function Laravel\Prompts\password;
+use function Laravel\Prompts\text;
+use function Laravel\Prompts\warning;
 
 class CreateSuperAdminCommand extends BaseCommand
 {
@@ -21,14 +26,12 @@ class CreateSuperAdminCommand extends BaseCommand
      */
     protected $name = 'unusual:create:superadmin';
 
-
-
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = "Creates the superadmin account";
+    protected $description = 'Creates the superadmin account';
 
     /**
      * @var ValidatorFactory
@@ -40,10 +43,6 @@ class CreateSuperAdminCommand extends BaseCommand
      */
     protected $config;
 
-    /**
-     * @param ValidatorFactory $validatorFactory
-     * @param Config $config
-     */
     public function __construct(ValidatorFactory $validatorFactory, Config $config)
     {
         parent::__construct();
@@ -54,8 +53,6 @@ class CreateSuperAdminCommand extends BaseCommand
 
     /**
      * Get Console Command Options
-     *
-     * @return array
      */
     protected function getOptions(): array
     {
@@ -77,7 +74,7 @@ class CreateSuperAdminCommand extends BaseCommand
      *
      * @return void
      */
-    public function handle() :int
+    public function handle(): int
     {
 
         $email = $this->setEmail($this->argument('email'));
@@ -98,19 +95,17 @@ class CreateSuperAdminCommand extends BaseCommand
             if ($user->save()) {
                 DB::commit();
                 info('Your account has been created');
+
                 return 0;
             }
-
-
 
         } catch (\Throwable $th) {
             $this->error($th);
             DB::rollback();
         }
 
-
-
         error('Failed creating user. Things you can check: Database permissions, run migrations');
+
         return -1;
     }
 
@@ -119,12 +114,13 @@ class CreateSuperAdminCommand extends BaseCommand
      *
      * @return string $email
      */
-    private function setEmail(String $email=null)
+    private function setEmail(?string $email = null)
     {
 
-        if($this->option('default')){
+        if ($this->option('default')) {
             $email = getValueOrNull(env('UNUSUAL_ADMIN_EMAIL', 'software-dev@unusualgrowth.com')) ?? 'software-dev@unusualgrowth.com';
-            $this->info('Email configured for super-admin as '.$email);
+            $this->info('Email configured for super-admin as ' . $email);
+
             return $email;
         }
 
@@ -138,32 +134,31 @@ class CreateSuperAdminCommand extends BaseCommand
             hint: 'Default e-mail address: software-dev@unusualgrowth.com',
         );
 
-        if($useDefault){
+        if ($useDefault) {
             $email = env('UNUSUAL_ADMIN_EMAIL', 'software-dev@unusualgrowth.com');
-        }else{
+        } else {
             $email = text(
-                label:'Please enter a valid e-mail address for super-admin',
+                label: 'Please enter a valid e-mail address for super-admin',
                 placeholder: 'E.g. example@exampleHost.com',
                 hint: '',
-                required:true,
-                validate: fn($value) => match(true){
-                    DB::table(unusualConfig('tables.users', 'admin_users'))->where('email', $value)->exists() => $value. ' is already in use. Please use an unique e-mail',
-                    strlen($value) > 255 => 'Please enter maximum 255 characters',
-                    !filter_var($value, FILTER_VALIDATE_EMAIL) => 'Please enter a valid email pattern',
+                required: true,
+                validate: fn ($value) => match (true) {
+                    DB::table(unusualConfig('tables.users', 'admin_users'))->where('email', $value)->exists() => $value . ' is already in use. Please use an unique e-mail',
+                    mb_strlen($value) > 255 => 'Please enter maximum 255 characters',
+                    ! filter_var($value, FILTER_VALIDATE_EMAIL) => 'Please enter a valid email pattern',
                     default => null,
                 }
             );
         }
 
-        if($this->validateEmail($email)){
-            info('Email configured for super-admin as '.$email);
+        if ($this->validateEmail($email)) {
+            info('Email configured for super-admin as ' . $email);
+
             return $email;
-        }else{
+        } else {
             error('Enter a valid e-mail address');
             $this->setEmail();
         }
-
-
 
     }
 
@@ -172,12 +167,13 @@ class CreateSuperAdminCommand extends BaseCommand
      *
      * @return string $password
      */
-    private function setPassword(String $password = null)
+    private function setPassword(?string $password = null)
     {
 
-        if($this->option('default')){
+        if ($this->option('default')) {
             $password = env('UNUSUAL_ADMIN_PASSWORD', 'w@123456');
-            info('Password configured for super-admin as '.$password);
+            info('Password configured for super-admin as ' . $password);
+
             return $password;
         }
 
@@ -190,31 +186,33 @@ class CreateSuperAdminCommand extends BaseCommand
             hint: 'Default password is w@123456'
         );
 
-        if($useDefault){
-            $password = getValueOrNull(env('UNUSUAL_ADMIN_PASSWORD', 'w@123456'),bool:false);
-        }else{
+        if ($useDefault) {
+            $password = getValueOrNull(env('UNUSUAL_ADMIN_PASSWORD', 'w@123456'), bool: false);
+        } else {
             $password = password(
                 label: 'Please enter valid password',
                 hint: 'Please use at least 6 characters',
-                validate: fn(string $value) => match(true){
-                    strlen($value) < 6 => 'The password must be at least 6 characters',
+                validate: fn (string $value) => match (true) {
+                    mb_strlen($value) < 6 => 'The password must be at least 6 characters',
                     default => null,
                 }
             );
         }
-        info('Password configured for '.$this->argument('email').'is '.$password);
+        info('Password configured for ' . $this->argument('email') . 'is ' . $password);
+
         return $password;
     }
 
     /**
      * Determine if the email address given valid.
      *
-     * @param  string  $email
-     * @return boolean
+     * @param string $email
+     * @return bool
      */
     private function validateEmail($email)
     {
         $admin_user_table = $this->config->get(env('MODULARITY_BASE_NAME', 'modularity') . '.table.users', 'admin_users');
+
         return $this->validatorFactory->make(['email' => $email], [
             'email' => 'required|email|max:255|unique:' . $admin_user_table,
         ])->passes();
@@ -223,8 +221,8 @@ class CreateSuperAdminCommand extends BaseCommand
     /**
      * Determine if the password given valid.
      *
-     * @param  string  $password
-     * @return boolean
+     * @param string $password
+     * @return bool
      */
     private function validatePassword($password)
     {

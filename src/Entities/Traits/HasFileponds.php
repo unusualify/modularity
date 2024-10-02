@@ -6,7 +6,6 @@ use Unusualify\Modularity\Entities\Filepond;
 
 trait HasFileponds
 {
-
     public function fileponds(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(
@@ -16,7 +15,6 @@ trait HasFileponds
     }
 
     /**
-     *
      * @return Filepond[]
      */
     public function getFileponds()
@@ -26,10 +24,10 @@ trait HasFileponds
 
     public function hasFilepond($role = null)
     {
-        return !!$role
-            ?   $this->fileponds()->filter(function($filepond) use ($role){
-                    return $filepond->role === $role;
-                })->count()
-            :   $this->fileponds()->count();
+        return (bool) $role
+            ? $this->fileponds()->filter(function ($filepond) use ($role) {
+                return $filepond->role === $role;
+            })->count()
+            : $this->fileponds()->count();
     }
 }

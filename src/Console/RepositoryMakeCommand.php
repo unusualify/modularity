@@ -5,16 +5,15 @@ namespace Unusualify\Modularity\Console;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Support\Str;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Nwidart\Modules\Support\Stub;
-use Illuminate\Support\Str;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Facades\Modularity;
 
 class RepositoryMakeCommand extends BaseCommand
 {
-
     protected $name = 'unusual:make:repository';
 
     /**
@@ -58,13 +57,13 @@ class RepositoryMakeCommand extends BaseCommand
         parent::__construct();
     }
 
-    public function handle() : int
+    public function handle(): int
     {
         // $this->traits = getTraits();
         $this->setAskability();
 
         // $this->defaultConsent = false;
-        foreach(getUnusualTraits() as $_trait){
+        foreach (getUnusualTraits() as $_trait) {
             $this->responses[$_trait] = $this->checkOption($_trait);
         }
 
@@ -118,21 +117,21 @@ class RepositoryMakeCommand extends BaseCommand
         $modelName = $this->getFileName() ?? '';
         $modelClass = $this->getModelClass() ?? '';
 
-        if($this->option('custom-model') && @class_exists($this->option('custom-model'))){
+        if ($this->option('custom-model') && @class_exists($this->option('custom-model'))) {
             $modelName = get_class_short_name(App::make($this->option('custom-model')));
             $modelClass = $this->option('custom-model');
         }
 
         return (new Stub($this->getStubName(), [
-            'BASE_REPOSITORY'       => $this->baseConfig('base_repository'),
-            'NAMESPACE'             => $this->getClassNamespace($module),
-            'CLASS'                 => $this->getClass().'Repository',
-            'STUDLY_NAME'           => $this->getStudlyName($repository),
-            'MODEL_CLASS'           => $modelClass,
-            'MODEL_NAME'            => $modelName,
-            'MODULE'                => $this->argument('module'),
-            'TRAITS'                => $this->getTraits(),
-            'TRAIT_NAMESPACES'      => $this->getTraitNamespaces(),
+            'BASE_REPOSITORY' => $this->baseConfig('base_repository'),
+            'NAMESPACE' => $this->getClassNamespace($module),
+            'CLASS' => $this->getClass() . 'Repository',
+            'STUDLY_NAME' => $this->getStudlyName($repository),
+            'MODEL_CLASS' => $modelClass,
+            'MODEL_NAME' => $modelName,
+            'MODULE' => $this->argument('module'),
+            'TRAITS' => $this->getTraits(),
+            'TRAIT_NAMESPACES' => $this->getTraitNamespaces(),
         ]))->render();
     }
 
@@ -149,7 +148,7 @@ class RepositoryMakeCommand extends BaseCommand
         return $path . $repositoryPath->getPath() . '/' . $this->getFileName() . 'Repository.php';
     }
 
-    public function getDefaultNamespace() : string
+    public function getDefaultNamespace(): string
     {
         return $this->baseConfig('paths.generator.repository.namespace', 'Repositories') ?:
             $this->baseConfig('paths.generator.repository.path', 'Repositories');
@@ -166,9 +165,6 @@ class RepositoryMakeCommand extends BaseCommand
         return Str::studly($this->argument('repository'));
     }
 
-    /**
-     * @return string
-     */
     protected function getStubName(): string
     {
         return '/route-repository.stub';
@@ -184,29 +180,29 @@ class RepositoryMakeCommand extends BaseCommand
         // dd( config('modules.namespace'), $module->getName(), get_class_methods($module));
         $module_name = $module->getStudlyName();
 
-        if($this->option('custom-model') && @class_exists($this->option('custom-model'))){
+        if ($this->option('custom-model') && @class_exists($this->option('custom-model'))) {
             return $this->option('custom-model');
         }
 
         $model_name = $this->getFileName();
 
-        return config('modules.namespace')."\\{$module_name}\\Entities\\{$model_name}";
+        return config('modules.namespace') . "\\{$module_name}\\Entities\\{$model_name}";
     }
 
     /**
      * @return string
      */
-
     private function getTraits()
     {
         $traits = [];
 
         foreach ($this->responses as $trait => $status) {
-            if($status && ($t = $this->getTrait($trait)) != '')
+            if ($status && ($t = $this->getTrait($trait)) != '') {
                 $traits[] = $this->getTrait($trait);
+            }
         }
 
-        return count($traits) ? "use ".implode(',',$traits).";" : '';
+        return count($traits) ? 'use ' . implode(',', $traits) . ';' : '';
     }
 
     /**
@@ -216,19 +212,18 @@ class RepositoryMakeCommand extends BaseCommand
     {
         $namespaces = [];
 
-
         foreach ($this->responses as $trait => $status) {
-            if($status && ($t = $this->getTraitNamespace($trait)) != '')
+            if ($status && ($t = $this->getTraitNamespace($trait)) != '') {
                 $namespaces[] = $this->getTraitNamespace($trait);
+            }
         }
 
-        $namespaces = array_map(function($v){
+        $namespaces = array_map(function ($v) {
             return "use $v;\n";
-        }, $namespaces );
+        }, $namespaces);
 
         return count($namespaces) ? implode('', $namespaces) : '';
     }
-
 
     /**
      * Get Namespace of Trait.
@@ -266,11 +261,12 @@ class RepositoryMakeCommand extends BaseCommand
             return true;
         }
 
-        if(!$this->isAskable())
+        if (! $this->isAskable()) {
             return false;
+        }
 
-        $questions = Collection::make($this->baseConfig('traits'))->mapWithKeys(function($object, $key){
-            return [ $key => $object['question']];
+        $questions = Collection::make($this->baseConfig('traits'))->mapWithKeys(function ($object, $key) {
+            return [$key => $object['question']];
         })->toArray();
 
         $defaultAnswers = [
@@ -282,6 +278,6 @@ class RepositoryMakeCommand extends BaseCommand
         // dd(
         //     $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer)
         // );
-        return 'yes' === $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer);
+        return $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer) === 'yes';
     }
 }

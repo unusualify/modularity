@@ -3,12 +3,11 @@
 namespace Unusualify\Modularity\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DefaultPermissionsSeeder extends Seeder
 {
-
     /**
      * Auto generated seed file
      *
@@ -48,7 +47,7 @@ class DefaultPermissionsSeeder extends Seeder
                 // 'Currency',
                 // 'PriceType',
                 // 'Price',
-            ], 'unusual_users')
+            ], 'unusual_users'),
         ]);
     }
 }

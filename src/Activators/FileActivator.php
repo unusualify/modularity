@@ -2,18 +2,14 @@
 
 namespace Unusualify\Modularity\Activators;
 
-use Illuminate\Cache\CacheManager;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Filesystem\Filesystem;
 use Nwidart\Modules\Activators\FileActivator as ActivatorsFileActivator;
-use Nwidart\Modules\Contracts\ActivatorInterface;
 use Nwidart\Modules\Module;
-use Illuminate\Support\Str;
+
 class FileActivator extends ActivatorsFileActivator
 {
-
     /**
      * @var module name
      */
@@ -77,7 +73,7 @@ class FileActivator extends ActivatorsFileActivator
     {
         $this->module = $module;
 
-        $this->statusesFile = $path . '/' .  $this->config('statuses-file');
+        $this->statusesFile = $path . '/' . $this->config('statuses-file');
 
         $this->routesStatuses = $this->getRoutesStatuses();
 
@@ -87,8 +83,6 @@ class FileActivator extends ActivatorsFileActivator
     /**
      * Reads a config parameter under the 'activators.file' key
      *
-     * @param  string $key
-     * @param  $default
      * @return mixed
      */
     private function config(string $key, $default = null)
@@ -99,12 +93,12 @@ class FileActivator extends ActivatorsFileActivator
     /**
      * Get modules statuses, either from the cache or from
      * the json statuses file if the cache is disabled.
-     * @return array
+     *
      * @throws FileNotFoundException
      */
     public function getRoutesStatuses(): array
     {
-        if (!$this->config->get(unusualBaseKey() . '.cache.enabled')) {
+        if (! $this->config->get(unusualBaseKey() . '.cache.enabled')) {
             return $this->readRoutesJson();
         }
 
@@ -114,7 +108,7 @@ class FileActivator extends ActivatorsFileActivator
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function enable($route): void
     {
@@ -122,7 +116,7 @@ class FileActivator extends ActivatorsFileActivator
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function disable($route): void
     {
@@ -130,11 +124,11 @@ class FileActivator extends ActivatorsFileActivator
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function hasStatus($route, bool $status): bool
     {
-        if (!isset($this->routesStatuses[$route])) {
+        if (! isset($this->routesStatuses[$route])) {
             return $status === false;
         }
 
@@ -142,7 +136,7 @@ class FileActivator extends ActivatorsFileActivator
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setActive($route, bool $active): void
     {
@@ -150,7 +144,7 @@ class FileActivator extends ActivatorsFileActivator
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setActiveByName(string $name, bool $status): void
     {
@@ -160,11 +154,11 @@ class FileActivator extends ActivatorsFileActivator
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function delete($route): void
     {
-        if (!isset($this->routesStatuses[$route])) {
+        if (! isset($this->routesStatuses[$route])) {
             return;
         }
         unset($this->routesStatuses[$route]);
@@ -174,14 +168,15 @@ class FileActivator extends ActivatorsFileActivator
 
     /**
      * Reads the json file that contains the activation statuses.
-     * @return array
+     *
      * @throws FileNotFoundException
      */
     public function readRoutesJson(): array
     {
-        if (!$this->files->exists($this->statusesFile)) {
+        if (! $this->files->exists($this->statusesFile)) {
             return [];
         }
+
         return json_decode($this->files->get($this->statusesFile), true);
     }
 
@@ -201,9 +196,8 @@ class FileActivator extends ActivatorsFileActivator
         $this->cache->forget($this->cacheKey);
     }
 
-    public function getRoutes(){
+    public function getRoutes()
+    {
         return array_keys(json_decode($this->files->get($this->statusesFile), true));
     }
-
-
 }

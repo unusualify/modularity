@@ -15,18 +15,17 @@ use Unusualify\Modularity\Http\Controllers\FilepondController;
 |
 */
 
-Route::group(['prefix' => 'api'], function(){
-    Route::group(['prefix' => 'filepond', 'as' => 'filepond.'], function(){
+Route::group(['prefix' => 'api'], function () {
+    Route::group(['prefix' => 'filepond', 'as' => 'filepond.'], function () {
         Route::post('process', [FilepondController::class, 'upload'])->name('process');
         Route::delete('revert', [FilepondController::class, 'revert'])->name('revert');
         Route::get('preview/{folder}', [FilepondController::class, 'preview'])->name('preview');
     });
 
-    Route::group(['as' => 'api.'], function(){
+    Route::group(['as' => 'api.'], function () {
         Route::apiResource('languages', LanguageController::class, ['only' => 'index']);
     });
 });
-Route::get('/', function(\Illuminate\Http\Request $request){
+Route::get('/', function (\Illuminate\Http\Request $request) {
     return redirect()->route(Route::hasAdmin('login.form'));
 })->name('modularity.home');
-

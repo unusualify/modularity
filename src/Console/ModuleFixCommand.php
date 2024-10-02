@@ -1,10 +1,10 @@
 <?php
 
 namespace Unusualify\Modularity\Console;
-use Symfony\Component\Console\Input\InputOption;
+
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Generators\RouteGenerator;
 
 class ModuleFixCommand extends BaseCommand
 {
@@ -30,22 +30,18 @@ class ModuleFixCommand extends BaseCommand
         $moduleName = studlyName($this->argument('module'));
         $routes = Modularity::find($moduleName)->getRoutes();
 
-
         foreach ($routes as $key => $routeName) {
 
-            $this->call('unusual:make:route',[
+            $this->call('unusual:make:route', [
                 'module' => $moduleName,
                 'route' => $routeName,
                 '--fix' => true,
             ]);
 
         }
+
         return 0;
     }
-
-
-
-
 
     protected function getArguments()
     {
@@ -55,14 +51,11 @@ class ModuleFixCommand extends BaseCommand
         ];
     }
 
-
-    protected function getOptions(){
+    protected function getOptions()
+    {
         return array_merge([
-           ['migration', null, InputOption::VALUE_NONE, 'Fix will create migrations'],
+            ['migration', null, InputOption::VALUE_NONE, 'Fix will create migrations'],
 
-        ], unusualTraitOptions());;
+        ], unusualTraitOptions());
     }
-
-
-
 }

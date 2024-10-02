@@ -4,8 +4,8 @@ namespace Unusualify\Modularity\Console;
 
 use Illuminate\Console\Command;
 use Nwidart\Modules\Module;
-use Unusualify\Modularity\Facades\Modularity;
 use Symfony\Component\Console\Input\InputArgument;
+use Unusualify\Modularity\Facades\Modularity;
 
 class MigrateCommand extends Command
 {
@@ -26,14 +26,14 @@ class MigrateCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle() : int
+    public function handle(): int
     {
         /** @var Module $module */
         // $module = $this->laravel['unusual.modularity']->findOrFail($this->argument('module'));
         $module = Modularity::findOrFail($this->argument('module'));
 
         $this->call('migrate', [
-            '--path' => $module->getDirectoryPath('Database/Migrations', true)
+            '--path' => $module->getDirectoryPath('Database/Migrations', true),
         ]);
         try {
 

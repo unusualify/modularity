@@ -2,24 +2,23 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
-use Unusualify\Modularity\Entities\Media;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-
-use function PHPUnit\Framework\isEmpty;
+use Unusualify\Modularity\Entities\Media;
 
 trait ImagesTrait
 {
-
-    public function setColumnsImagesTrait($columns, $inputs){
+    public function setColumnsImagesTrait($columns, $inputs)
+    {
 
         $traitName = get_class_short_name(__TRAIT__);
 
-        $columns[$traitName] = collect($inputs)->reduce(function($acc, $curr){
-            if(preg_match('/image/', $curr['type'])){
+        $columns[$traitName] = collect($inputs)->reduce(function ($acc, $curr) {
+            if (preg_match('/image/', $curr['type'])) {
                 $acc[] = $curr['name'];
             }
+
             return $acc;
         }, []);
 
@@ -95,6 +94,7 @@ trait ImagesTrait
 
             }
         }
+
         return $fields;
     }
 
@@ -109,15 +109,15 @@ trait ImagesTrait
         $system_locales = getLocales();
 
         // $default_locale = unusualConfig('locale');
-        $default_locale =  config('app.locale');
+        $default_locale = config('app.locale');
 
-        foreach($this->getColumns(__TRAIT__) as $role){
-        // foreach(['repeater_name.*.participantImage'] as $role){
-        // foreach(['repeater_name.en.*.participantImage', 'repeater_name.tr.*.participantImage'] as $role){
+        foreach ($this->getColumns(__TRAIT__) as $role) {
+            // foreach(['repeater_name.*.participantImage'] as $role){
+            // foreach(['repeater_name.en.*.participantImage', 'repeater_name.tr.*.participantImage'] as $role){
             $imagesArray = data_get($fields, $role);
 
             // input checking for translated in dot notation
-            if(preg_match('/([A-Za-z-_]+)\.([a-z]{2})\.\*\.([A-Za-z-_\.]+)/', $role, $matches)){
+            if (preg_match('/([A-Za-z-_]+)\.([a-z]{2})\.\*\.([A-Za-z-_\.]+)/', $role, $matches)) {
                 $parent_input_name = $matches[1];
                 $locale = $matches[2];
 
@@ -134,18 +134,18 @@ trait ImagesTrait
 
                 // }
 
-            }else if(preg_match('/([A-Za-z-_]+)\.\*\.([A-Za-z-_\.]+)/', $role, $matches)){ // dot notation without translated field
+            } elseif (preg_match('/([A-Za-z-_]+)\.\*\.([A-Za-z-_\.]+)/', $role, $matches)) { // dot notation without translated field
                 foreach ($system_locales as $key => $locale) {
                     foreach ($imagesArray as $index => $data) {
                         $images = $this->pushImage($images, $data, $role, $locale, $index);
                     }
                 }
-            } else{
+            } else {
                 foreach ($system_locales as $key => $locale) {
                     $imagesData = [];
-                    if(isset($imagesArray[$locale])){ // checking whether related locale exists or not
+                    if (isset($imagesArray[$locale])) { // checking whether related locale exists or not
                         $imagesData = $imagesArray[$locale];
-                    } else if(count($intersectLocales = array_intersect(array_keys($imagesArray), $system_locales)) > 0){ // checking at least whether one of related locales exists or not
+                    } elseif (count($intersectLocales = array_intersect(array_keys($imagesArray), $system_locales)) > 0) { // checking at least whether one of related locales exists or not
                         $localeFound = $intersectLocales[0];
                         $imagesData = $imagesArray[$localeFound];
                     } else { // no locales exist on array
@@ -163,9 +163,9 @@ trait ImagesTrait
             foreach ($fields['medias'] as $role => $mediasForRole) {
                 if (unusualConfig('media_library.translated_form_fields', false)) {
                     if (Str::contains($role, ['[', ']'])) {
-                        $start = strpos($role, '[') + 1;
-                        $finish = strpos($role, ']', $start);
-                        $locale = substr($role, $start, $finish - $start);
+                        $start = mb_strpos($role, '[') + 1;
+                        $finish = mb_strpos($role, ']', $start);
+                        $locale = mb_substr($role, $start, $finish - $start);
                         $role = strtok($role, '[');
                     }
                 }
@@ -177,7 +177,7 @@ trait ImagesTrait
                     || in_array($role, array_keys(unusualConfig('settings.crops', [])))) {
                     Collection::make($mediasForRole)->each(function ($media) use (&$medias, $role, $locale) {
                         $customMetadatas = $media['metadatas']['custom'] ?? [];
-                        if (isset($media['crops']) && !empty($media['crops'])) {
+                        if (isset($media['crops']) && ! empty($media['crops'])) {
                             foreach ($media['crops'] as $cropName => $cropData) {
                                 $medias->push([
                                     'id' => $media['id'],
@@ -243,5 +243,3 @@ trait ImagesTrait
         return $this->model->mediasParams[$role];
     }
 }
-
-

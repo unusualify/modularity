@@ -9,12 +9,12 @@ return [
         'foreignKey' => [
             'required' => false,
             'position' => 1,
-            'default' => NULL,
+            'default' => null,
         ],
         'localKey' => [
             'required' => false,
             'position' => 2,
-            'default' => NULL,
+            'default' => null,
         ],
     ],
     'hasOneThrough' => [
@@ -29,22 +29,22 @@ return [
         'firstKey' => [
             'required' => false,
             'position' => 2,
-            'default' => NULL,
+            'default' => null,
         ],
         'secondKey' => [
             'required' => false,
             'position' => 3,
-            'default' => NULL,
+            'default' => null,
         ],
         'localKey' => [
             'required' => false,
             'position' => 4,
-            'default' => NULL,
+            'default' => null,
         ],
         'secondLocalKey' => [
             'required' => false,
             'position' => 5,
-            'default' => NULL,
+            'default' => null,
         ],
     ],
     'morphOne' => [
@@ -59,17 +59,17 @@ return [
         'type' => [
             'required' => false,
             'position' => 2,
-            'default' => NULL,
+            'default' => null,
         ],
         'id' => [
             'required' => false,
             'position' => 3,
-            'default' => NULL,
+            'default' => null,
         ],
         'localKey' => [
             'required' => false,
             'position' => 4,
-            'default' => NULL,
+            'default' => null,
         ],
     ],
     'belongsTo' => [
@@ -80,39 +80,39 @@ return [
         'foreignKey' => [
             'required' => false,
             'position' => 1,
-            'default' => NULL,
+            'default' => null,
         ],
         'ownerKey' => [
             'required' => false,
             'position' => 2,
-            'default' => NULL,
+            'default' => null,
         ],
         'relation' => [
             'required' => false,
             'position' => 3,
-            'default' => NULL,
+            'default' => null,
         ],
     ],
     'morphTo' => [
         'name' => [
             'required' => false,
             'position' => 0,
-            'default' => NULL,
+            'default' => null,
         ],
         'type' => [
             'required' => false,
             'position' => 1,
-            'default' => NULL,
+            'default' => null,
         ],
         'id' => [
             'required' => false,
             'position' => 2,
-            'default' => NULL,
+            'default' => null,
         ],
         'ownerKey' => [
             'required' => false,
             'position' => 3,
-            'default' => NULL,
+            'default' => null,
         ],
     ],
     'hasMany' => [
@@ -123,12 +123,12 @@ return [
         'foreignKey' => [
             'required' => false,
             'position' => 1,
-            'default' => NULL,
+            'default' => null,
         ],
         'localKey' => [
             'required' => false,
             'position' => 2,
-            'default' => NULL,
+            'default' => null,
         ],
     ],
     'hasManyThrough' => [
@@ -143,22 +143,22 @@ return [
         'firstKey' => [
             'required' => false,
             'position' => 2,
-            'default' => NULL,
+            'default' => null,
         ],
         'secondKey' => [
             'required' => false,
             'position' => 3,
-            'default' => NULL,
+            'default' => null,
         ],
         'localKey' => [
             'required' => false,
             'position' => 4,
-            'default' => NULL,
+            'default' => null,
         ],
         'secondLocalKey' => [
             'required' => false,
             'position' => 5,
-            'default' => NULL,
+            'default' => null,
         ],
     ],
     'morphMany' => [
@@ -173,17 +173,17 @@ return [
         'type' => [
             'required' => false,
             'position' => 2,
-            'default' => NULL,
+            'default' => null,
         ],
         'id' => [
             'required' => false,
             'position' => 3,
-            'default' => NULL,
+            'default' => null,
         ],
         'localKey' => [
             'required' => false,
             'position' => 4,
-            'default' => NULL,
+            'default' => null,
         ],
     ],
     'belongsToMany' => [
@@ -194,32 +194,32 @@ return [
         'table' => [
             'required' => false,
             'position' => 1,
-            'default' => NULL,
+            'default' => null,
         ],
         'foreignPivotKey' => [
             'required' => false,
             'position' => 2,
-            'default' => NULL,
+            'default' => null,
         ],
         'relatedPivotKey' => [
             'required' => false,
             'position' => 3,
-            'default' => NULL,
+            'default' => null,
         ],
         'parentKey' => [
             'required' => false,
             'position' => 4,
-            'default' => NULL,
+            'default' => null,
         ],
         'relatedKey' => [
             'required' => false,
             'position' => 5,
-            'default' => NULL,
+            'default' => null,
         ],
         'relation' => [
             'required' => false,
             'position' => 6,
-            'default' => NULL,
+            'default' => null,
         ],
     ],
     'morphToMany' => [
@@ -234,32 +234,32 @@ return [
         'table' => [
             'required' => false,
             'position' => 2,
-            'default' => NULL,
+            'default' => null,
         ],
         'foreignPivotKey' => [
             'required' => false,
             'position' => 3,
-            'default' => NULL,
+            'default' => null,
         ],
         'relatedPivotKey' => [
             'required' => false,
             'position' => 4,
-            'default' => NULL,
+            'default' => null,
         ],
         'parentKey' => [
             'required' => false,
             'position' => 5,
-            'default' => NULL,
+            'default' => null,
         ],
         'relatedKey' => [
             'required' => false,
             'position' => 6,
-            'default' => NULL,
+            'default' => null,
         ],
         'relation' => [
             'required' => false,
             'position' => 7,
-            'default' => NULL,
+            'default' => null,
         ],
         'inverse' => [
             'required' => false,
@@ -279,34 +279,32 @@ return [
         'table' => [
             'required' => false,
             'position' => 2,
-            'default' => NULL,
+            'default' => null,
         ],
         'foreignPivotKey' => [
             'required' => false,
             'position' => 3,
-            'default' => NULL,
+            'default' => null,
         ],
         'relatedPivotKey' => [
             'required' => false,
             'position' => 4,
-            'default' => NULL,
+            'default' => null,
         ],
         'parentKey' => [
             'required' => false,
             'position' => 5,
-            'default' => NULL,
+            'default' => null,
         ],
         'relatedKey' => [
             'required' => false,
             'position' => 6,
-            'default' => NULL,
+            'default' => null,
         ],
         'relation' => [
             'required' => false,
             'position' => 7,
-            'default' => NULL,
+            'default' => null,
         ],
     ],
 ];
-
-    

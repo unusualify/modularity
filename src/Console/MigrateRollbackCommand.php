@@ -3,10 +3,9 @@
 namespace Unusualify\Modularity\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Collection;
 use Nwidart\Modules\Module;
-use Unusualify\Modularity\Facades\Modularity;
 use Symfony\Component\Console\Input\InputArgument;
+use Unusualify\Modularity\Facades\Modularity;
 
 class MigrateRollbackCommand extends Command
 {
@@ -41,23 +40,24 @@ class MigrateRollbackCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle() : int
+    public function handle(): int
     {
         /** @var Module $module */
         // $module = $this->laravel['unusual.modularity']->findOrFail($this->argument('module'));
         $module = Modularity::findOrFail($this->argument('module'));
 
-        $basePattern = preg_quote(base_path("/"), '/');
-        $relativeDir = preg_replace("/". $basePattern ."/", '', $module->getDirectoryPath('Database/Migrations'));
+        $basePattern = preg_quote(base_path('/'), '/');
+        $relativeDir = preg_replace('/' . $basePattern . '/', '', $module->getDirectoryPath('Database/Migrations'));
 
         $migrationFiles = glob($module->getDirectoryPath('Database/Migrations/*.php'));
         $batches = [];
 
-        $this->migrator->usingConnection(null, function () use(&$batches, $migrationFiles){
-            $batches = collect($this->migrator->getRepository()->getMigrationBatches())->reduce(function(array $acc, int $batch, string $migrationName) use($migrationFiles){
+        $this->migrator->usingConnection(null, function () use (&$batches, $migrationFiles) {
+            $batches = collect($this->migrator->getRepository()->getMigrationBatches())->reduce(function (array $acc, int $batch, string $migrationName) use ($migrationFiles) {
                 foreach ($migrationFiles as $migrationFilePath) {
-                    if( $migrationName == basename($migrationFilePath, '.php') && !in_array($batch, $acc) ){
+                    if ($migrationName == basename($migrationFilePath, '.php') && ! in_array($batch, $acc)) {
                         $acc[] = $batch;
+
                         break;
                     }
                 }
@@ -68,12 +68,11 @@ class MigrateRollbackCommand extends Command
             rsort($batches);
         });
 
-
         try {
             foreach ($batches as $batch) {
                 $this->call('migrate:rollback', [
                     '--path' => $relativeDir,
-                    '--batch' => $batch
+                    '--batch' => $batch,
                 ]);
             }
 

@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Str;
 
-if (!function_exists('unusualIncrementsMethod')) {
+if (! function_exists('unusualIncrementsMethod')) {
     /**
      * @return string
      */
@@ -14,7 +14,7 @@ if (!function_exists('unusualIncrementsMethod')) {
     }
 }
 
-if (!function_exists('unusualIntegerMethod')) {
+if (! function_exists('unusualIntegerMethod')) {
     /**
      * @return string
      */
@@ -26,7 +26,7 @@ if (!function_exists('unusualIntegerMethod')) {
     }
 }
 
-if (!function_exists('createDefaultFields')) {
+if (! function_exists('createDefaultFields')) {
     /**
      * @param \Illuminate\Database\Schema\Blueprint $table
      * @param bool $softDeletes
@@ -42,7 +42,7 @@ if (!function_exists('createDefaultFields')) {
     }
 }
 
-if (!function_exists('createDefaultExtraTableFields')) {
+if (! function_exists('createDefaultExtraTableFields')) {
     /**
      * @param \Illuminate\Database\Schema\Blueprint $table
      * @param bool $softDeletes
@@ -75,7 +75,7 @@ if (!function_exists('createDefaultExtraTableFields')) {
     }
 }
 
-if (!function_exists('createDefaultTranslationsTableFields')) {
+if (! function_exists('createDefaultTranslationsTableFields')) {
     /**
      * @param \Illuminate\Database\Schema\Blueprint $table
      * @param string $tableNameSingular
@@ -84,7 +84,7 @@ if (!function_exists('createDefaultTranslationsTableFields')) {
      */
     function createDefaultTranslationsTableFields($table, $tableNameSingular, $tableNamePlural = null)
     {
-        if (!$tableNamePlural) {
+        if (! $tableNamePlural) {
             $tableNamePlural = Str::plural($tableNameSingular);
         }
 
@@ -98,7 +98,7 @@ if (!function_exists('createDefaultTranslationsTableFields')) {
 
         $foreignIndexName = "fk_{$tableNameSingular}_translations_{$tableNameSingular}_id";
 
-        if( strlen($tableNameSingular) > 18){
+        if (mb_strlen($tableNameSingular) > 18) {
             $shortcut = abbreviation($tableNameSingular);
             $foreignIndexName = "fk_{$tableNameSingular}_translations_{$shortcut}_id";
         }
@@ -111,7 +111,7 @@ if (!function_exists('createDefaultTranslationsTableFields')) {
     }
 }
 
-if (!function_exists('createDefaultSlugsTableFields')) {
+if (! function_exists('createDefaultSlugsTableFields')) {
     /**
      * @param \Illuminate\Database\Schema\Blueprint $table
      * @param string $tableNameSingular
@@ -120,7 +120,7 @@ if (!function_exists('createDefaultSlugsTableFields')) {
      */
     function createDefaultSlugsTableFields($table, $tableNameSingular, $tableNamePlural = null)
     {
-        if (!$tableNamePlural) {
+        if (! $tableNamePlural) {
             $tableNamePlural = Str::plural($tableNameSingular);
         }
 
@@ -136,7 +136,7 @@ if (!function_exists('createDefaultSlugsTableFields')) {
     }
 }
 
-if (!function_exists('createDefaultRelationshipTableFields')) {
+if (! function_exists('createDefaultRelationshipTableFields')) {
     /**
      * @param \Illuminate\Database\Schema\Blueprint $table
      * @param string $table1NameSingular
@@ -147,10 +147,10 @@ if (!function_exists('createDefaultRelationshipTableFields')) {
      */
     function createDefaultRelationshipTableFields($table, $table1NameSingular, $table2NameSingular, $table1NamePlural = null, $table2NamePlural = null)
     {
-        if (!$table1NamePlural) {
+        if (! $table1NamePlural) {
             $table1NamePlural = Str::plural($table1NameSingular);
         }
-        if (!$table2NamePlural) {
+        if (! $table2NamePlural) {
             $table2NamePlural = Str::plural($table2NameSingular);
         }
 
@@ -179,7 +179,7 @@ if (!function_exists('createDefaultRelationshipTableFields')) {
     }
 }
 
-if (!function_exists('createDefaultMorphPivotTableFields')) {
+if (! function_exists('createDefaultMorphPivotTableFields')) {
     /**
      * @param \Illuminate\Database\Schema\Blueprint $table
      * @param string $tableName
@@ -210,7 +210,7 @@ if (!function_exists('createDefaultMorphPivotTableFields')) {
     }
 }
 
-if (!function_exists('createDefaultRevisionsTableFields')) {
+if (! function_exists('createDefaultRevisionsTableFields')) {
     /**
      * @param \Illuminate\Database\Schema\Blueprint $table
      * @param string $tableNameSingular
@@ -219,7 +219,7 @@ if (!function_exists('createDefaultRevisionsTableFields')) {
      */
     function createDefaultRevisionsTableFields($table, $tableNameSingular, $tableNamePlural = null)
     {
-        if (!$tableNamePlural) {
+        if (! $tableNamePlural) {
             $tableNamePlural = Str::plural($tableNameSingular);
         }
 

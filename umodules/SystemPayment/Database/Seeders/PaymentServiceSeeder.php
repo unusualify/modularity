@@ -3,8 +3,8 @@
 namespace Modules\SystemPayment\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\SystemPayment\Entities\PaymentService;
 use Modules\SystemPayment\Entities\PaymentCurrency;
+use Modules\SystemPayment\Entities\PaymentService;
 
 class PaymentServiceSeeder extends Seeder
 {
@@ -45,6 +45,12 @@ class PaymentServiceSeeder extends Seeder
                 'title' => 'TebCommonPOS',
                 'is_external' => false,
                 'is_internal' => true,
+            ],
+            [
+                'name' => 'ideal',
+                'title' => 'iDEAL',
+                'is_external' => true,
+                'is_internal' => false,
             ],
         ];
 

@@ -10,7 +10,6 @@ class Company extends Model
     protected $table = 'unusual_companies';
 
     use HasFactory;
-
     use HasFactory;
 
     protected $fillable = [
@@ -35,9 +34,9 @@ class Company extends Model
     {
         return unusualConfig('tables.companies', parent::getTable());
     }
+
     protected static function newFactory()
     {
-        return new CompanyFactory();
+        return new CompanyFactory;
     }
-
 }

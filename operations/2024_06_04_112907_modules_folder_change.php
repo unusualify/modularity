@@ -1,12 +1,9 @@
 <?php
 
-use TimoKoerber\LaravelOneTimeOperations\OneTimeOperation;
 use Illuminate\Console\Concerns\InteractsWithIO;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Schema;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Unusualify\Modularity\Facades\Modularity;
+use TimoKoerber\LaravelOneTimeOperations\OneTimeOperation;
 
 return new class extends OneTimeOperation
 {
@@ -14,7 +11,7 @@ return new class extends OneTimeOperation
 
     public function __construct()
     {
-        $this->output = new ConsoleOutput();
+        $this->output = new ConsoleOutput;
     }
 
     /**
@@ -63,7 +60,7 @@ return new class extends OneTimeOperation
         $this->output->writeln('');
 
         $this->info("'{$old_folder_name}' folder name changed as '{$new_folder_name}'.\n");
-        $this->alert("Composer files changed. You must run command as following:");
+        $this->alert('Composer files changed. You must run command as following:');
         $this->warn("\tcomposer dump-autoload\n");
 
         $this->output->writeln('');
@@ -73,17 +70,17 @@ return new class extends OneTimeOperation
     {
         $composerPath = base_path($composerName);
 
-        if(File::isFile($composerPath)){
+        if (File::isFile($composerPath)) {
             $composer = File::json($composerPath);
             $composer['autoload']['psr-4']['Modules\\'] = "{$new_folder_name}/";
 
-            if(isset($composer['extra']['merge-plugin'])){
+            if (isset($composer['extra']['merge-plugin'])) {
                 $composer['extra'] = array_merge_recursive_preserve($composer['extra'], [
                     'merge-plugin' => [
                         'require' => [
-                            "{$new_folder_name}/*/composer.json"
-                        ]
-                    ]
+                            "{$new_folder_name}/*/composer.json",
+                        ],
+                    ],
                 ]);
                 $composer['extra']['merge-plugin']['require'] = array_unique($composer['extra']['merge-plugin']['require']);
             }

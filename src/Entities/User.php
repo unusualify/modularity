@@ -6,17 +6,18 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
-
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Unusualify\Modularity\Database\Factories\UserFactory;
-use Unusualify\Modularity\Entities\Traits\{ModelHelpers, HasScopes, IsTranslatable};
+use Unusualify\Modularity\Entities\Traits\HasScopes;
+use Unusualify\Modularity\Entities\Traits\IsTranslatable;
+use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, ModelHelpers, HasScopes, IsTranslatable;
+    use HasApiTokens, HasFactory, HasRoles, HasScopes, IsTranslatable, ModelHelpers, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -34,7 +35,7 @@ class User extends Authenticatable
         'phone',
         'country',
         'password',
-        'published'
+        'published',
     ];
 
     /**
@@ -61,7 +62,7 @@ class User extends Authenticatable
         parent::boot();
 
         static::creating(function ($model) {
-            if($model->password == null){
+            if ($model->password == null) {
                 $model->password = Hash::make(env('DEFAULT_USER_PASSWORD', 'Hj84TlN!'));
             }
             // dd($model);
@@ -91,6 +92,7 @@ class User extends Authenticatable
     public function isSuperAdmin()
     {
         return $this->hasRole('superadmin');
+
         return $this->roles === 'SUPERADMIN';
     }
 
@@ -99,15 +101,16 @@ class User extends Authenticatable
         return $this->hasRole('admin');
     }
 
-    protected function invalidCompany():Attribute
+    protected function invalidCompany(): Attribute
     {
         $inValid = false;
 
-        if($this->company_id != null){
+        if ($this->company_id != null) {
             foreach ($this->company->getAttributes() as $attr => $value) {
-                if (!str_contains($attr, '_at') && $attr != 'id') {
-                    if ($value == null)
+                if (! str_contains($attr, '_at') && $attr != 'id') {
+                    if ($value == null) {
                         $inValid = true;
+                    }
                 }
             }
         }
@@ -122,7 +125,8 @@ class User extends Authenticatable
         return $query->whereNotNull("{$this->getTable()}.company_id");
     }
 
-    public function isClient() {
+    public function isClient()
+    {
         return preg_match('/client-/', $this->roles[0]->name);
     }
 
@@ -133,7 +137,6 @@ class User extends Authenticatable
 
     protected static function newFactory()
     {
-        return new UserFactory();
+        return new UserFactory;
     }
-
 }

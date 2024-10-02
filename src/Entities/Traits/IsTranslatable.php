@@ -13,12 +13,12 @@ trait IsTranslatable
     public function isTranslatable($columns = null)
     {
         // Model must have the trait
-        if (!classHasTrait($this, 'Unusualify\Modularity\Entities\Traits\HasTranslation')) {
+        if (! classHasTrait($this, 'Unusualify\Modularity\Entities\Traits\HasTranslation')) {
             return false;
         }
 
         // Model must have the translatedAttributes property
-        if (!property_exists($this, 'translatedAttributes')) {
+        if (! property_exists($this, 'translatedAttributes')) {
             return false;
         }
 

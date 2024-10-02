@@ -4,15 +4,15 @@ namespace Unusualify\Modularity\Providers;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Support\Facades\View;
 use Unusualify\Modularity\Activators\FileActivator;
 use Unusualify\Modularity\Entities\User;
-use Unusualify\Modularity\Modularity;
-use Unusualify\Modularity\Services\View\UNavigation;
-use Illuminate\Support\Facades\View;
 use Unusualify\Modularity\Http\ViewComposers\CurrentUser;
 use Unusualify\Modularity\Http\ViewComposers\FilesUploaderConfig;
 use Unusualify\Modularity\Http\ViewComposers\Localization;
 use Unusualify\Modularity\Http\ViewComposers\MediasUploaderConfig;
+use Unusualify\Modularity\Modularity;
+use Unusualify\Modularity\Services\View\UNavigation;
 use Unusualify\Modularity\Support\FileLoader;
 use Unusualify\Modularity\Support\Translator;
 
@@ -61,21 +61,20 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->bootBaseViewComponents();
 
-
         AboutCommand::add('Modularity', function () {
             $composer = base_path('composer.lock');
 
-            if($this->app['files']->isFile( ($composer_path = base_path('composer-dev.lock')) )){
+            if ($this->app['files']->isFile(($composer_path = base_path('composer-dev.lock')))) {
                 $composer = $composer_path;
             }
 
             $package = collect(json_decode(file_get_contents($composer))->packages)
-                ->filter(fn($p) => $p->name == 'unusualify/modularity')
+                ->filter(fn ($p) => $p->name == 'unusualify/modularity')
                 ->first();
 
             return [
-                'Vendor'  => unusualConfig('vendor_path'),
-                'Theme'  => unusualConfig('app_theme'),
+                'Vendor' => unusualConfig('vendor_path'),
+                'Theme' => unusualConfig('app_theme'),
                 'Version' => $package->version,
             ];
         });
@@ -114,25 +113,25 @@ class BaseServiceProvider extends ServiceProvider
         $this->app->alias('unusual.modularity', 'modularity');
 
         $this->app->singleton('model.relation.namespace', function () {
-            return  "Illuminate\Database\Eloquent\Relations";
+            return "Illuminate\Database\Eloquent\Relations";
         });
 
         $this->app->singleton('model.relation.pattern', function () {
             $relationNamespace = app('model.relation.namespace');
 
-            return "|" . preg_quote($relationNamespace, "|") . "|";
+            return '|' . preg_quote($relationNamespace, '|') . '|';
         });
 
         $this->app->singleton('unusualify.hosting', function (Application $app) {
             return new \Unusualify\Modularity\Support\HostRouting($app, unusualConfig('app_url'));
         });
 
-        $this->app->singleton('unusualify.hostRouting', function(Application $app){
+        $this->app->singleton('unusualify.hostRouting', function (Application $app) {
             return new \Unusualify\Modularity\Support\HostRouteRegistrar($app, unusualConfig('app_url'));
         });
 
-        $this->app->singleton('FilePond', function(Application $app){
-            return new \Unusualify\Modularity\Services\Filepond\FilepondManager();
+        $this->app->singleton('FilePond', function (Application $app) {
+            return new \Unusualify\Modularity\Services\Filepond\FilepondManager;
         });
 
         $this->app->alias(\Unusualify\Modularity\Facades\ModularityVite::class, 'ModularityVite');
@@ -159,7 +158,7 @@ class BaseServiceProvider extends ServiceProvider
      */
     private function registerHelpers()
     {
-        foreach (glob( __DIR__ . '/../Helpers/*.php') as $file) {
+        foreach (glob(__DIR__ . '/../Helpers/*.php') as $file) {
             require_once $file;
         }
     }
@@ -192,7 +191,7 @@ class BaseServiceProvider extends ServiceProvider
     public function registerTranslationService()
     {
         $this->app->extend('translation.loader', function ($service, $app) {
-            return new FileLoader($app['files'], [base_path('vendor/laravel/framework/src/Illuminate/Translation/lang'), realpath(__DIR__.'/../../lang'),  $app['path.lang']]);
+            return new FileLoader($app['files'], [base_path('vendor/laravel/framework/src/Illuminate/Translation/lang'), realpath(__DIR__ . '/../../lang'),  $app['path.lang']]);
             // return new \Illuminate\Translation\FileLoader($app['files'], [base_path('vendor/laravel/framework/src/Illuminate/Translation/lang'), realpath(__DIR__.'/../../lang'),  $app['path.lang']]);
         });
 
@@ -241,18 +240,18 @@ class BaseServiceProvider extends ServiceProvider
         // Nwidart/laravel-modules scan enabled & scan path addition
         $scan_paths = config('modules.scan.paths', []);
         // array_push($scan_paths, base_path( unusualConfig('vendor_path') . '/umodules'));
-        array_push($scan_paths, realpath( __DIR__ . '/../../umodules'));
+        array_push($scan_paths, realpath(__DIR__ . '/../../umodules'));
         config([
             'modules.scan.enabled' => true,
-            'modules.scan.paths' => $scan_paths
+            'modules.scan.paths' => $scan_paths,
         ]);
 
         // timokoerber/laravel-one-time-operations directory set
         config([
-            'one-time-operations.directory' => unusualConfig('vendor_path'). '/operations',
+            'one-time-operations.directory' => unusualConfig('vendor_path') . '/operations',
         ]);
 
-        $modularityIsCacheable = !($this->app->runningInConsole() && $this->app->runningConsoleCommand([
+        $modularityIsCacheable = ! ($this->app->runningInConsole() && $this->app->runningConsoleCommand([
             'unusual:make:module',
             'u:m:m',
             'modularity:make:module',
@@ -270,7 +269,7 @@ class BaseServiceProvider extends ServiceProvider
             config([
                 'modules.cache.enabled' => true,
                 'modules.cache.key' => 'modularity',
-                'modules.cache.lifetime' => 600
+                'modules.cache.lifetime' => 600,
             ]);
         }
     }
@@ -305,7 +304,7 @@ class BaseServiceProvider extends ServiceProvider
     {
         // LOAD BASE MIGRATIONS
         $this->loadMigrationsFrom(
-            base_path( unusualConfig('vendor_path') . '/database/migrations/default' )
+            base_path(unusualConfig('vendor_path') . '/database/migrations/default')
         );
     }
 
@@ -362,12 +361,10 @@ class BaseServiceProvider extends ServiceProvider
 
     /**
      * Registers the package additional View Composers.
-     *
-     * @return void
      */
     private function bootBaseViewComposers(): void
     {
-        view()->composer('*',function($view) {
+        view()->composer('*', function ($view) {
             $view->with('BASE_KEY', $this->baseKey);
             $view->with('MODULARITY_VIEW_NAMESPACE', $this->baseKey);
         });
@@ -400,15 +397,12 @@ class BaseServiceProvider extends ServiceProvider
 
     /**
      * Registers the package additional View Composers.
-     *
-     * @return void
      */
     private function bootBaseViewComponents(): void
     {
         // Blade::component('table', Table::class);
 
     }
-
 
     /**
      * {@inheritdoc}
@@ -417,11 +411,11 @@ class BaseServiceProvider extends ServiceProvider
     {
         $cmds = [];
 
-        foreach (glob(__DIR__."/../Console/*.php") as $cmd) {
+        foreach (glob(__DIR__ . '/../Console/*.php') as $cmd) {
             preg_match("/[^\/]+(?=\.[^\/.]*$)/", $cmd, $match);
 
-            if(count($match) == 1 && !preg_match('#(.*?)(BaseCommand)(.*?)#', $cmd)){
-                $cmds[] = preg_match("|" . preg_quote($this->terminalNamespace, "|") . "|", $match[0])
+            if (count($match) == 1 && ! preg_match('#(.*?)(BaseCommand)(.*?)#', $cmd)) {
+                $cmds[] = preg_match('|' . preg_quote($this->terminalNamespace, '|') . '|', $match[0])
                             ? $cmd
                             : "{$this->terminalNamespace}\\{$match[0]}";
             }
@@ -438,13 +432,14 @@ class BaseServiceProvider extends ServiceProvider
             // . str_replace(['http://', 'https://'], '', config('app.url'))
             . request()->getHttpHost()
             . '/storage/'
-            . trim( unusualConfig($type . '_library.local_path'), '/ '),
+            . trim(unusualConfig($type . '_library.local_path'), '/ '),
         ]);
     }
 
-    public function mergeKeysFromConfig(array $mergeKeys = []) {
+    public function mergeKeysFromConfig(array $mergeKeys = [])
+    {
         foreach (config($this->baseKey) as $name => $array) {
-            if(in_array($name, $mergeKeys)){
+            if (in_array($name, $mergeKeys)) {
                 $this->app['files']->put(__DIR__ . "/../../config/merges/{$name}.php", php_array_file_content($array));
             }
         }

@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
-use Unusualify\Modularity\Exceptions\Handler as ModularityHandler;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -10,7 +9,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as LaravelController;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Config;
+use Unusualify\Modularity\Exceptions\Handler as ModularityHandler;
 
 class Controller extends LaravelController
 {

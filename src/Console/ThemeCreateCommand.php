@@ -2,13 +2,14 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Storage;
 use Nwidart\Modules\Support\Stub;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
-use function Laravel\Prompts\{select, confirm, warning};
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\select;
+use function Laravel\Prompts\warning;
 
 class ThemeCreateCommand extends BaseCommand
 {
@@ -35,7 +36,6 @@ class ThemeCreateCommand extends BaseCommand
      */
     protected $filesystem;
 
-
     /**
      * Create a new command instance.
      *
@@ -47,19 +47,19 @@ class ThemeCreateCommand extends BaseCommand
 
         $this->filesystem = $filesystem;
 
-        Stub::setBasePath(dirname(__FILE__).'/stubs');
+        Stub::setBasePath(dirname(__FILE__) . '/stubs');
     }
 
     /**
      * Execute the console command.
      */
-    public function handle() : int
+    public function handle(): int
     {
         $name = $this->argument('name');
 
         $success = true;
 
-        if(!file_exists(resource_path('vendor/modularity/themes'))){
+        if (! file_exists(resource_path('vendor/modularity/themes'))) {
             $this->filesystem->makeDirectory(resource_path('vendor/modularity/themes'));
             $this->filesystem->put(resource_path('vendor/modularity/themes/.keep'), '');
 
@@ -68,9 +68,9 @@ class ThemeCreateCommand extends BaseCommand
         $extendTheme = $this->option('extend');
 
         $sassPath = base_path(unusualConfig('vendor_path') . '/vue/src/sass/themes/' . $extendTheme);
-        $jsPath = base_path(unusualConfig('vendor_path') . '/vue/src/js/config/themes/' . $extendTheme . ".js");
+        $jsPath = base_path(unusualConfig('vendor_path') . '/vue/src/js/config/themes/' . $extendTheme . '.js');
 
-        if( !$extendTheme || !($this->filesystem->exists($sassPath) && $this->filesystem->exists($jsPath))  ){
+        if (! $extendTheme || ! ($this->filesystem->exists($sassPath) && $this->filesystem->exists($jsPath))) {
             warning('Theme name to be extended');
             // $useUnusualTheme = confirm(
             //     label: 'Do you want to use the unusual theme?',
@@ -88,10 +88,10 @@ class ThemeCreateCommand extends BaseCommand
             );
 
             $sassPath = base_path(unusualConfig('vendor_path') . '/vue/src/sass/themes/' . $extendTheme);
-            $jsPath = base_path(unusualConfig('vendor_path') . '/vue/src/js/config/themes/' . $extendTheme . ".js");
+            $jsPath = base_path(unusualConfig('vendor_path') . '/vue/src/js/config/themes/' . $extendTheme . '.js');
         }
 
-        $destination = resource_path('vendor/modularity/themes/' . $name );
+        $destination = resource_path('vendor/modularity/themes/' . $name);
 
         $this->filesystem->copyDirectory(
             $sassPath, $destination . '/sass'
@@ -102,7 +102,6 @@ class ThemeCreateCommand extends BaseCommand
         );
 
         $this->info('New theme has been created');
-
 
         return $success ? 0 : E_ERROR;
     }

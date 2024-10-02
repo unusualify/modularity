@@ -2,7 +2,6 @@
 
 namespace Modules\SystemUser\Repositories;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Repositories\Repository;

@@ -2,8 +2,8 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
-use Unusualify\Modularity\Services\MediaLibrary\Glide;
 use Illuminate\Foundation\Application;
+use Unusualify\Modularity\Services\MediaLibrary\Glide;
 
 class GlideController
 {

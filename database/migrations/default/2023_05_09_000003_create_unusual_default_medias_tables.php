@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
+
 class CreateUnusualDefaultMediasTables extends Migration
 {
     /**
@@ -14,11 +14,10 @@ class CreateUnusualDefaultMediasTables extends Migration
     public function up()
     {
 
-
         $unusualMediasTable = unusualConfig('tables.medias', 'modularity_medias');
         $unusualMediablesTable = unusualConfig('tables.mediables', 'modularity_mediables');
 
-        if (!Schema::hasTable($unusualMediasTable)) {
+        if (! Schema::hasTable($unusualMediasTable)) {
             Schema::create($unusualMediasTable, function (Blueprint $table) {
                 $table->{unusualIncrementsMethod()}('id');
                 $table->timestamps();
@@ -32,7 +31,7 @@ class CreateUnusualDefaultMediasTables extends Migration
             });
         }
 
-        if (!Schema::hasTable($unusualMediablesTable)) {
+        if (! Schema::hasTable($unusualMediablesTable)) {
             Schema::create($unusualMediablesTable, function (Blueprint $table) use ($unusualMediasTable) {
                 $table->{unusualIncrementsMethod()}('id');
                 $table->timestamps();

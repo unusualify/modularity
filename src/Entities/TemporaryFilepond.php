@@ -6,13 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class TemporaryFilepond extends Model
 {
-
     protected $fillable = [
         'file_name',
         'input_role',
         'folder_name',
     ];
-
 
     public function canDeleteSafely()
     {
@@ -24,4 +22,3 @@ class TemporaryFilepond extends Model
         return unusualConfig('tables.filepond_temporaries', parent::getTable());
     }
 }
-

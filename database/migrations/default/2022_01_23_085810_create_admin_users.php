@@ -13,7 +13,7 @@ return new class extends Migration
     {
         $adminUserTable = unusualConfig('tables.users', 'admin_users');
 
-        if(!Schema::hasTable($adminUserTable)){
+        if (! Schema::hasTable($adminUserTable)) {
             Schema::create(unusualConfig('tables.users', 'admin_users'), function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -35,7 +35,7 @@ return new class extends Migration
 
         $adminUserTable = unusualConfig('tables.users', 'admin_users');
 
-        if(Schema::hasTable($adminUserTable)){
+        if (Schema::hasTable($adminUserTable)) {
             Schema::dropIfExists(unusualConfig('tables.users', 'admin_users'));
         }
     }

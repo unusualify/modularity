@@ -23,8 +23,8 @@ return [
                     [
                         'name' => 'Profile',
                         'route_name' => 'profile',
-                    ]
-                ]
+                    ],
+                ],
             ],
         ],
     ],
