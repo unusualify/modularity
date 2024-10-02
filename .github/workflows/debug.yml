@@ -48,4 +48,4 @@ jobs:
           git config user.email github-actions@github.com
           git checkout main
           git merge --no-ff ${{ github.ref }}
-          git log -1
+          git log -3
