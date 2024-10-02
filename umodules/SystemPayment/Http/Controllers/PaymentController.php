@@ -15,5 +15,4 @@ class PaymentController extends BaseController
      * @var string
      */
     protected $routeName = 'Payment';
-
 }
