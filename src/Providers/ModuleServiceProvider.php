@@ -92,8 +92,7 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
             );
 
             // LOAD MODULE VIEWS
-            $sourcePath = module_path($module->getName(), $views_folder);
-
+            $sourcePath = $module->getDirectoryPath($views_folder);
             $this->loadViewsFrom(
                 array_merge(
                     $this->getPublishableViewPaths(
