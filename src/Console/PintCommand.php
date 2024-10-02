@@ -48,6 +48,8 @@ class PintCommand extends BaseCommand
 
         if( $this->option('self') ){
             $path = unusualConfig('vendor_path');
+
+            $path .= " --config {$path}/pint.json";
         }
 
         $command = sprintf('./vendor/bin/pint %s', $path);
