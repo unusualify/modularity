@@ -1,7 +1,6 @@
 <?php
 
 return [
-    'currency' => 'EUR',
     'locale_currencies' => [
         'tr' => 'TRY',
         'en' => 'EUR',
