@@ -21,9 +21,6 @@ class Imgix implements ImageServiceInterface
      */
     protected $config;
 
-    /**
-     * @param Config $config
-     */
     public function __construct(Config $config)
     {
         $this->config = $config;
@@ -44,7 +41,6 @@ class Imgix implements ImageServiceInterface
 
     /**
      * @param string $id
-     * @param array $params
      * @return string
      */
     public function getUrl($id, array $params = [])
@@ -52,7 +48,7 @@ class Imgix implements ImageServiceInterface
         $defaultParams = $this->config->get(unusualBaseKey() . '.imgix.default_params');
         $addParamsToSvgs = unusualConfig('imgix.add_params_to_svgs', false);
 
-        if (!$addParamsToSvgs && Str::endsWith($id, '.svg')) {
+        if (! $addParamsToSvgs && Str::endsWith($id, '.svg')) {
             return $this->urlBuilder->createURL($id);
         }
 
@@ -61,8 +57,6 @@ class Imgix implements ImageServiceInterface
 
     /**
      * @param string $id
-     * @param array $cropParams
-     * @param array $params
      * @return string
      */
     public function getUrlWithCrop($id, array $cropParams, array $params = [])
@@ -72,10 +66,8 @@ class Imgix implements ImageServiceInterface
 
     /**
      * @param string $id
-     * @param array $cropParams
      * @param mixed $width
      * @param mixed $height
-     * @param array $params
      * @return string
      */
     public function getUrlWithFocalCrop($id, array $cropParams, $width, $height, array $params = [])
@@ -85,7 +77,6 @@ class Imgix implements ImageServiceInterface
 
     /**
      * @param string $id
-     * @param array $params
      * @return string
      */
     public function getLQIPUrl($id, array $params = [])
@@ -101,7 +92,6 @@ class Imgix implements ImageServiceInterface
 
     /**
      * @param string $id
-     * @param array $params
      * @return string
      */
     public function getSocialUrl($id, array $params = [])
@@ -117,7 +107,6 @@ class Imgix implements ImageServiceInterface
 
     /**
      * @param string $id
-     * @param array $params
      * @return string
      */
     public function getCmsUrl($id, array $params = [])
@@ -157,7 +146,8 @@ class Imgix implements ImageServiceInterface
             ];
         } catch (\Exception $e) {
             try {
-                list($width, $height) = getimagesize($url);
+                [$width, $height] = getimagesize($url);
+
                 return [
                     'width' => $width,
                     'height' => $height,
@@ -177,9 +167,8 @@ class Imgix implements ImageServiceInterface
      */
     protected function getCrop($crop_params)
     {
-        if (!empty($crop_params)) {
-            return ['rect' =>
-                $crop_params['crop_x'] . ',' .
+        if (! empty($crop_params)) {
+            return ['rect' => $crop_params['crop_x'] . ',' .
                 $crop_params['crop_y'] . ',' .
                 $crop_params['crop_w'] . ',' .
                 $crop_params['crop_h'],
@@ -197,7 +186,7 @@ class Imgix implements ImageServiceInterface
      */
     protected function getFocalPointCrop($crop_params, $width, $height)
     {
-        if (!empty($crop_params)) {
+        if (! empty($crop_params)) {
             // determine center coordinates of user crop and express it in term of original image width and height percentage
             $fpX = ($crop_params['crop_w'] / 2 + $crop_params['crop_x']) / $width;
             $fpY = ($crop_params['crop_h'] / 2 + $crop_params['crop_y']) / $height;
@@ -212,7 +201,7 @@ class Imgix implements ImageServiceInterface
             $params = ['fp-x' => $fpX, 'fp-y' => $fpY, 'fp-z' => $fpZ];
 
             return array_map(function ($param) {
-                return number_format($param, 4, ".", "");
+                return number_format($param, 4, '.', '');
             }, $params) + ['crop' => 'focalpoint', 'fit' => 'crop'];
         }
 

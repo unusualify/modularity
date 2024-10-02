@@ -11,7 +11,7 @@ class TabGroupHydrate extends InputHydrate
      * @var array
      */
     public $requirements = [
-        'default' => []
+        'default' => [],
     ];
 
     /**
@@ -26,13 +26,13 @@ class TabGroupHydrate extends InputHydrate
 
         $eagers = [];
         foreach ($input['schema'] as $key => $_input) {
-            if($_input['type'] == 'input-comparison-table' && isset($_input['comparators'])){
+            if ($_input['type'] == 'input-comparison-table' && isset($_input['comparators'])) {
                 foreach ($_input['comparators'] as $relation => $conf) {
-                    $eagers[] = isset($conf['eager']) ? $conf['eager'] : $input['name'] . "." . $relation;
+                    $eagers[] = isset($conf['eager']) ? $conf['eager'] : $input['name'] . '.' . $relation;
                 }
             }
-            if(in_array($_input['type'], ['checklist', 'input-checklist', 'select', 'combobox', 'autocomplete'])){
-                $eagers[] = isset($_input['eager']) ? $_input['eager'] : $input['name'] . "." . $_input['name'];
+            if (in_array($_input['type'], ['checklist', 'input-checklist', 'select', 'combobox', 'autocomplete'])) {
+                $eagers[] = isset($_input['eager']) ? $_input['eager'] : $input['name'] . '.' . $_input['name'];
             }
         }
         $input['eagers'] = $eagers;

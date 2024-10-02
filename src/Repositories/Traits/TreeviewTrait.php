@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
-
 trait TreeviewTrait
 {
     /**
@@ -47,9 +46,9 @@ trait TreeviewTrait
             if (isset($fields[$relation])) {
                 try {
 
-                    if(is_array($fields[$relation])){
+                    if (is_array($fields[$relation])) {
                         foreach ($fields[$relation] as $key => $value) {
-                            if(is_array($value)){
+                            if (is_array($value)) {
                                 $fields[$relation][$key] = $value['id'];
                             }
                         }
@@ -57,7 +56,7 @@ trait TreeviewTrait
 
                     $object->{$relation}()->sync($fields[$relation]);
                 } catch (\Throwable $th) {
-                    dd($th, $relation,$fields[$relation]);
+                    dd($th, $relation, $fields[$relation]);
                 }
                 // unset($fields[$relation]);
                 // if (!empty($fields[$f])) {
@@ -79,7 +78,7 @@ trait TreeviewTrait
     public function prepareTreeviewField($fields, $f)
     {
         if ($date = Carbon::parse($fields[$f])) {
-            $fields[$f] = $date->format("Y-m-d H:i:s");
+            $fields[$f] = $date->format('Y-m-d H:i:s');
         } else {
             $fields[$f] = null;
         }
@@ -93,10 +92,13 @@ trait TreeviewTrait
         $treeviewRelations = $this->getTreeviewRelations();
 
         foreach ($schema as $key => $input) {
-            if(in_array($input['name'], $treeviewRelations) ){
-                $fields[$input['name']] = $object->{$input['name']}->map(function($item){ return $item->id; });
+            if (in_array($input['name'], $treeviewRelations)) {
+                $fields[$input['name']] = $object->{$input['name']}->map(function ($item) {
+                    return $item->id;
+                });
             }
         }
+
         // dd($this, $fields, $treeviewRelations, $schema, debug_backtrace());
         return $fields;
     }

@@ -59,7 +59,6 @@ class SchemaParser implements Arrayable
      * Parse a string to array of formatted schema.
      *
      * @param string $schema
-     *
      * @return array
      */
     public function parse($schema)
@@ -84,11 +83,11 @@ class SchemaParser implements Arrayable
      */
     public function getSchemas()
     {
-        if (is_null($this->schema) || empty($this->schema) ) {
+        if (is_null($this->schema) || empty($this->schema)) {
             return [];
         }
 
-        return preg_split('/(?<!\\\),/',str_replace(' ', '', $this->schema) );
+        return preg_split('/(?<!\\\),/', str_replace(' ', '', $this->schema));
 
         return explode(',', str_replace(' ', '', $this->schema));
     }
@@ -113,15 +112,15 @@ class SchemaParser implements Arrayable
         $results = '';
 
         foreach ($this->toArray() as $column => $attributes) {
-            if(in_array($attributes[0], ['morphTo'])){
+            if (in_array($attributes[0], ['morphTo'])) {
                 $morphable_id = makeMorphForeignKey($column);
                 $morphable_type = makeMorphForeignType($column);
 
                 $results .= $this->createField($morphable_type, ['string', 'nullable']);
                 $results .= $this->createField($morphable_id, ['unsignedBigInteger', 'nullable']);
-            }
-            else if(!in_array($attributes[0], ['belongsToMany', 'hasOne']))
+            } elseif (! in_array($attributes[0], ['belongsToMany', 'hasOne'])) {
                 $results .= $this->createField($column, $attributes);
+            }
         }
 
         return $results;
@@ -152,7 +151,7 @@ class SchemaParser implements Arrayable
                 $morphable_type = makeMorphForeignType($column);
                 $results .= $this->createField($morphable_type, ['morphTo'], 'remove');
                 $results .= $this->createField($morphable_id, ['morphTo'], 'remove');
-            } else if (!in_array($attributes[0], ['belongsToMany', 'hasOne'])){
+            } elseif (! in_array($attributes[0], ['belongsToMany', 'hasOne'])) {
                 $attributes = [head($attributes)];
                 $results .= $this->createField($column, $attributes, 'remove');
             }
@@ -161,14 +160,12 @@ class SchemaParser implements Arrayable
         return $results;
     }
 
-
     /**
      * Create field.
      *
      * @param string $column
-     * @param array  $attributes
+     * @param array $attributes
      * @param string $type
-     *
      * @return string
      */
     public function createField($column, $attributes, $type = 'add')
@@ -181,7 +178,7 @@ class SchemaParser implements Arrayable
 
             if (method_exists($this, "{$type}{$studly_type}Column")) {
                 $results .= $this->{"{$type}{$studly_type}Column"}($key, $field, $column);
-            }  else {
+            } else {
                 $results .= $this->{"{$type}Column"}($key, $field, $column);
             }
         }
@@ -192,10 +189,9 @@ class SchemaParser implements Arrayable
     /**
      * Add belongsTo column.
      *
-     * @param int    $key
+     * @param int $key
      * @param string $field
      * @param string $column
-     *
      * @return string
      */
     protected function addBelongsToColumn($key, $field, $column)
@@ -206,7 +202,8 @@ class SchemaParser implements Arrayable
 
             // return "->integer('{$relatedColumn}')->unsigned();" . PHP_EOL . "\t\t\t" . "\$table->foreignId('{$relatedColumn}')";
             return "->foreignId('{$relatedColumn}')->constrained()->onUpdate('cascade')->onDelete('cascade')";
-            return "->foreignFor()";
+
+            return '->foreignFor()';
         }
 
         if ($key === 1) {
@@ -227,6 +224,7 @@ class SchemaParser implements Arrayable
     protected function removeBelongsToColumn($key, $field, $column)
     {
         $column = makeForeignKey($column);
+
         return '->dropColumn(' . "'" . $column . "')";
     }
 
@@ -236,6 +234,7 @@ class SchemaParser implements Arrayable
         if ($key === 0) {
             $class = get_class(UFinder::getRouteRepository($column, asClass: true)->getModel());
             $classNameResolution = class_resolution($class);
+
             // return "->integer('{$relatedColumn}')->unsigned();" . PHP_EOL . "\t\t\t" . "\$table->foreignId('{$relatedColumn}')";
             return "->foreignFor({$classNameResolution})";
         }
@@ -248,10 +247,9 @@ class SchemaParser implements Arrayable
     /**
      * Format field to script.
      *
-     * @param int    $key
+     * @param int $key
      * @param string $field
      * @param string $column
-     *
      * @return string
      */
     protected function addColumn($key, $field, $column)
@@ -261,13 +259,12 @@ class SchemaParser implements Arrayable
         }
 
         if (Str::contains($field, '(')) {
-            return '->' . preg_replace( '/\\\,/', ',',$field);
+            return '->' . preg_replace('/\\\,/', ',', $field);
         }
 
         if ($key == 0) {
             return '->' . $field . "('" . $column . "')";
         }
-
 
         return '->' . $field . '()';
     }
@@ -275,10 +272,9 @@ class SchemaParser implements Arrayable
     /**
      * Format field to script.
      *
-     * @param int    $key
+     * @param int $key
      * @param string $field
      * @param string $column
-     *
      * @return string
      */
     protected function removeColumn($key, $field, $column)
@@ -286,6 +282,7 @@ class SchemaParser implements Arrayable
         if ($this->hasCustomAttribute($column)) {
             return '->' . $field;
         }
+
         return '->dropColumn(' . "'" . $column . "')";
     }
 
@@ -293,7 +290,6 @@ class SchemaParser implements Arrayable
      * Get column name from schema.
      *
      * @param string $schema
-     *
      * @return string
      */
     public function getColumn($schema)
@@ -306,14 +302,13 @@ class SchemaParser implements Arrayable
      *
      * @param string $column
      * @param string $schema
-     *
      * @return array
      */
     public function getAttributes($column, $schema)
     {
         $fields = str_replace($column . ':', '', $schema);
 
-        return $this->hasCustomAttribute($column) ? $this->getCustomAttribute($column) : array_map(function($field){
+        return $this->hasCustomAttribute($column) ? $this->getCustomAttribute($column) : array_map(function ($field) {
             return $field;
         }, explode(':', $fields));
     }
@@ -322,7 +317,6 @@ class SchemaParser implements Arrayable
      * Determine whether the given column is exist in customAttributes array.
      *
      * @param string $column
-     *
      * @return bool
      */
     public function hasCustomAttribute($column)
@@ -334,7 +328,6 @@ class SchemaParser implements Arrayable
      * Get custom attributes value.
      *
      * @param string $column
-     *
      * @return array
      */
     public function getCustomAttribute($column)

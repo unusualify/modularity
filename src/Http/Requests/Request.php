@@ -16,7 +16,8 @@ abstract class Request extends FormRequest
 
     protected $model;
 
-    public function __construct(protected $rules = []){
+    public function __construct(protected $rules = [])
+    {
         $this->model = $this->model();
     }
 
@@ -38,38 +39,39 @@ abstract class Request extends FormRequest
     public function rules()
     {
         switch ($this->method()) {
-            case 'POST':{
-                return $this->mergeRules(array_merge($this->rulesForAll(),$this->rulesForCreate()));
-            }
-            case 'PUT':{
-                return $this->mergeRules(array_merge($this->rulesForAll(),$this->rulesForUpdate()));
-            }
+            case 'POST':
+                return $this->mergeRules(array_merge($this->rulesForAll(), $this->rulesForCreate()));
+
+            case 'PUT':
+                return $this->mergeRules(array_merge($this->rulesForAll(), $this->rulesForUpdate()));
+
             default:break;
         }
 
         return [];
     }
 
-    public function mergeRules($rules) {
+    public function mergeRules($rules)
+    {
         $locales = getLocales();
 
         $localeActive = false;
 
         $rules = $this->mergeSchemaRules($rules);
 
-        if($this->model){
+        if ($this->model) {
             $translatedAttributes = (method_exists($this->model, 'isTranslatable') && $this->model->isTranslatable()) ? $this->model->getTranslatedAttributes() : [];
             $translatedRules = Arr::only($rules, $translatedAttributes);
             $rules = Arr::except($rules, $translatedAttributes);
 
-            if(count($translatedAttributes) > 0){
+            if (count($translatedAttributes) > 0) {
                 foreach ($locales as $locale) {
 
                     // $language = Collection::make($this->request->all('languages'))->where('value', $locale)->first();
                     // $currentLocaleActive = $language['published'] ?? false;
                     $currentLocaleActive = true;
 
-                    $rules = $this->updateRules( $rules, $translatedRules, $locale, $currentLocaleActive);
+                    $rules = $this->updateRules($rules, $translatedRules, $locale, $currentLocaleActive);
 
                     if ($currentLocaleActive) {
                         $localeActive = true;
@@ -77,25 +79,27 @@ abstract class Request extends FormRequest
                 }
             }
         }
+
         // dd($rules, $this->hydrateRules($rules), get_class($this));
         return $this->hydrateRules($rules);
     }
 
-    public function hydrateRules($rules) {
-        return Arr::map($rules, function($ruleSchema, $name){
+    public function hydrateRules($rules)
+    {
+        return Arr::map($rules, function ($ruleSchema, $name) {
 
-            if(is_string($ruleSchema)){
-                if(preg_match('/unique_table/', $ruleSchema)){
-                    $ruleSchema = preg_replace('/\|?(unique:[A-Za-z,_\d]*)(\|?|$)/', "", $ruleSchema);
+            if (is_string($ruleSchema)) {
+                if (preg_match('/unique_table/', $ruleSchema)) {
+                    $ruleSchema = preg_replace('/\|?(unique:[A-Za-z,_\d]*)(\|?|$)/', '', $ruleSchema);
                     $ruleSchema = preg_replace('/unique_table/', "unique:{$this->model->getTable()},{$name}" . ($this->id ? ",{$this->id}" : ''), $ruleSchema);
 
                     return $ruleSchema;
                     dd(
                         // preg_replace('/unique_table/', "unique:{$this->model->getTable()},{$name}", $ruleSchema),
-                        preg_replace('/\|?(unique:[A-Za-z,\d]*)(\|?|$)/', "$2", $ruleSchema)
+                        preg_replace('/\|?(unique:[A-Za-z,\d]*)(\|?|$)/', '$2', $ruleSchema)
                     );
                 }
-            }else {
+            } else {
                 // dd($ruleSchema);
 
             }
@@ -130,6 +134,7 @@ abstract class Request extends FormRequest
             $rules = $this->updateRules($rules, $fields, reset($locales));
         }
         dd($rules);
+
         return $rules;
     }
 
@@ -146,7 +151,7 @@ abstract class Request extends FormRequest
         // $table = $this->model()->getTable();
         // $table = get_class($this->model());
         // $translationTable =  App::make($this->model()->getTranslationModelName())->getTable();
-        $translationTableClass =  $this->model()->getTranslationModelName();
+        $translationTableClass = $this->model()->getTranslationModelName();
         $request = $this->request;
 
         foreach ($fields as $field => $fieldRules) {
@@ -167,11 +172,10 @@ abstract class Request extends FormRequest
                 });
 
                 // @TODO: Can be replaced with doesntContain in twill 3.x
-                if ($hasRequiredRule && !in_array($fieldRules, $fieldRules->toArray())) {
+                if ($hasRequiredRule && ! in_array($fieldRules, $fieldRules->toArray())) {
                     $fieldRules->add('nullable');
                 }
             }
-
 
             $rules["{$field}.{$locale}"] = $fieldRules->map(function ($rule) use ($locale, $fieldNames, $translationTableClass, $request) {
                 // allows using validation rule that references other fields even for translated fields
@@ -187,18 +191,18 @@ abstract class Request extends FormRequest
                     $id = $request->has('id') ? $request->get('id') : null;
                     $translationRelationKey = $this->model()->getTranslationRelationKey();
 
-                    $rule = function (string $attribute, mixed $value, Closure $fail) use($translationTableClass, $request, $id, $translationRelationKey){
+                    $rule = function (string $attribute, mixed $value, Closure $fail) use ($translationTableClass, $id, $translationRelationKey) {
                         [$_field, $_locale] = explode('.', $attribute);
                         $query = $translationTableClass::query();
 
-                        if($id){
+                        if ($id) {
                             $query = $query->whereNot($translationRelationKey, $id);
                         }
                         $records = $query
                             ->where($_field, $value)
                             ->where('locale', $_locale)
                             ->get();
-                        if($records->count() > 0){
+                        if ($records->count() > 0) {
                             $fail("The field exists on system, please enter an unique {$_field}.");
                         }
                     };
@@ -207,6 +211,7 @@ abstract class Request extends FormRequest
                 return $rule;
             })->toArray();
         }
+
         // dd($rules);
         return $rules;
     }
@@ -214,7 +219,6 @@ abstract class Request extends FormRequest
     /**
      * @param mixed $rule
      * @param string $needle
-     *
      * @return bool
      */
     private function ruleStartsWith($rule, $needle)
@@ -256,7 +260,8 @@ abstract class Request extends FormRequest
         return $messages;
     }
 
-    protected function mergeSchemaRules($rules) {
+    protected function mergeSchemaRules($rules)
+    {
         return formatRulesSchema(
             array_merge_recursive_preserve(
                 parseRulesSchema($this->rules),

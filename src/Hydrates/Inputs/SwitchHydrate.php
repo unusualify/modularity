@@ -2,9 +2,6 @@
 
 namespace Unusualify\Modularity\Hydrates\Inputs;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\App;
-
 class SwitchHydrate extends InputHydrate
 {
     /**

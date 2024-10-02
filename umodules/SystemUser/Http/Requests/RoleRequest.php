@@ -2,12 +2,10 @@
 
 namespace Modules\SystemUser\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Unusualify\Modularity\Http\Requests\Request;
 
 class RoleRequest extends Request
 {
-
     /**
      * Get the default validation rules that apply to the request.
      *
@@ -17,12 +15,13 @@ class RoleRequest extends Request
     {
         return [
 
-		];
+        ];
     }
 
     public function rulesForCreate()
     {
         $table_name = $this->model->getTable();
+
         return [
             'name' => "required|unique:$table_name|min:4",
         ];
@@ -31,8 +30,9 @@ class RoleRequest extends Request
     public function rulesForUpdate()
     {
         $table_name = $this->model->getTable();
+
         return [
-            'name' => "required|min:4|unique:{$table_name},name,".$this->id,
+            'name' => "required|min:4|unique:{$table_name},name," . $this->id,
         ];
     }
 }

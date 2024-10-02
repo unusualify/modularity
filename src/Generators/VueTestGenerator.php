@@ -25,31 +25,31 @@ class VueTestGenerator extends Generator
      */
     protected $types = [
         'component' => [
-            'import_dir'        => 'components/',
-            'target_dir'        => 'components',
-            'file_convention'   => 'PascalCase',
-            'stub'              => 'tests/vue-component',
-            'extension'         => 'vue'
+            'import_dir' => 'components/',
+            'target_dir' => 'components',
+            'file_convention' => 'PascalCase',
+            'stub' => 'tests/vue-component',
+            'extension' => 'vue',
         ],
         'util' => [
-            'import_dir'        => 'utils/',
-            'target_dir'        => 'utils',
-            'file_convention'   => 'CamelCase',
-            'stub'              => 'tests/vue-util',
+            'import_dir' => 'utils/',
+            'target_dir' => 'utils',
+            'file_convention' => 'CamelCase',
+            'stub' => 'tests/vue-util',
         ],
         'hook' => [
-            'import_dir'        => 'hooks/',
-            'target_dir'        => 'composables',
-            'file_convention'   => 'CamelCase',
-            'stub'              => 'tests/vue-composable',
+            'import_dir' => 'hooks/',
+            'target_dir' => 'composables',
+            'file_convention' => 'CamelCase',
+            'stub' => 'tests/vue-composable',
         ],
         'store' => [
-            'import_dir'        => 'store/modules/',
-            'target_dir'        => 'store',
-            'file_convention'   => 'KebabCase',
-            'stub'              => 'tests/vue-store',
+            'import_dir' => 'store/modules/',
+            'target_dir' => 'store',
+            'file_convention' => 'KebabCase',
+            'stub' => 'tests/vue-store',
 
-        ]
+        ],
     ];
 
     /**
@@ -75,18 +75,15 @@ class VueTestGenerator extends Generator
 
     /**
      * The constructor.
-     * @param $name
+     *
      * @param FileRepository $module
-     * @param Config     $config
-     * @param Filesystem $filesystem
-     * @param Console    $console
      */
     public function __construct(
         $name,
-        Config $config = null,
-        Filesystem $filesystem = null,
-        Console $console = null,
-        Module $module = null
+        ?Config $config = null,
+        ?Filesystem $filesystem = null,
+        ?Console $console = null,
+        ?Module $module = null
     ) {
 
         parent::__construct($name, $config, $filesystem, $console, $module);
@@ -97,7 +94,6 @@ class VueTestGenerator extends Generator
      * Set the type attribute
      *
      * @param string $fix
-     *
      * @return $this
      */
     public function setType($type)
@@ -110,7 +106,7 @@ class VueTestGenerator extends Generator
     /**
      * Get type of test
      *
-     * @return boolean|int
+     * @return bool|int
      */
     public function getType()
     {
@@ -121,7 +117,6 @@ class VueTestGenerator extends Generator
      * Set the sub import directory attribute
      *
      * @param string $dir
-     *
      * @return $this
      */
     public function setSubImportDir($dir)
@@ -135,7 +130,6 @@ class VueTestGenerator extends Generator
      * Set the sub target directory attribute
      *
      * @param string $dir
-     *
      * @return $this
      */
     public function setSubTargetDir($dir)
@@ -161,7 +155,7 @@ class VueTestGenerator extends Generator
         $sub = $this->subImportDir;
         $conventionMethod = 'get' . $type['file_convention'] ?? 'CamelCase';
 
-        return $type['import_dir'] . ($sub ? $sub .'/' : '') . $this->{$conventionMethod}($this->name);
+        return $type['import_dir'] . ($sub ? $sub . '/' : '') . $this->{$conventionMethod}($this->name);
     }
 
     public function getTypeTargetDir()
@@ -178,18 +172,15 @@ class VueTestGenerator extends Generator
 
     /**
      * Get Stub File
-     *
-     * @param  string $name
-     * @return string
      */
-    public function getStubFile(string $name) : string
+    public function getStubFile(string $name): string
     {
         return $this->getFiles()[$name];
     }
 
     public function getTargetPath()
     {
-        return base_path( unusualConfig('vendor_path') . '/vue/test' ) ;
+        return base_path(unusualConfig('vendor_path') . '/vue/test');
     }
 
     public function getTestFileName()
@@ -201,13 +192,13 @@ class VueTestGenerator extends Generator
             '/\$TEST_NAME\$/' => $this->getKebabCase($this->name),
         ];
 
-        return preg_replace( array_keys($patterns), array_values($patterns), $file);
+        return preg_replace(array_keys($patterns), array_values($patterns), $file);
     }
 
     /**
      * Generate the module.
      */
-    public function generate() : int
+    public function generate(): int
     {
         $path = "{$this->getTargetPath()}/{$this->getTypeTargetDir()}/{$this->getTestFileName()}";
 
@@ -219,11 +210,11 @@ class VueTestGenerator extends Generator
             'IMPORT',
         ])))->render();
         dd($content, $path);
-        if (!$this->filesystem->isDirectory($dir = dirname($path))) {
+        if (! $this->filesystem->isDirectory($dir = dirname($path))) {
             $this->filesystem->makeDirectory($dir, 0775, true);
         }
 
-        if(!file_exists($path)){
+        if (! file_exists($path)) {
             $this->filesystem->put($path, $content);
 
             $this->console->info("Created : {$path} test file");
@@ -252,6 +243,6 @@ class VueTestGenerator extends Generator
 
         $extension = isset($type['extension']) ? $type['extension'] : 'js';
 
-        return $type['import_dir'] . ($sub ? $sub .'/' : '') . $this->{$conventionMethod}($this->name) . '.' . $extension;
+        return $type['import_dir'] . ($sub ? $sub . '/' : '') . $this->{$conventionMethod}($this->name) . '.' . $extension;
     }
 }

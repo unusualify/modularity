@@ -2,12 +2,11 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
-
-use Nwidart\Modules\Support\Stub;
 use Illuminate\Support\Str;
 use Nwidart\Modules\Support\Config\GeneratorPath;
+use Nwidart\Modules\Support\Stub;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Facades\Modularity;
 
 class ControllerAPIMakeCommand extends BaseCommand
@@ -51,6 +50,7 @@ class ControllerAPIMakeCommand extends BaseCommand
 
         ];
     }
+
     /**
      * Get the console command options.
      *
@@ -73,12 +73,12 @@ class ControllerAPIMakeCommand extends BaseCommand
         $module = Modularity::findOrFail($this->getModuleName());
 
         return (new Stub($this->getStubName(), [
-            'NAMESPACE'             => $this->getClassNamespace($module),
-            'STUDLY_MODULE_NAME'    => $module->getStudlyName(),
-            'LOWER_MODULE_NAME'     => $module->getLowerName(),
-            'STUDLY_NAME'           => $this->getStudlyName($name),
-            'LOWER_NAME'            => $this->getLowerName($name),
-            'CLASS'                 => $this->getControllerNameWithoutNamespace(),
+            'NAMESPACE' => $this->getClassNamespace($module),
+            'STUDLY_MODULE_NAME' => $module->getStudlyName(),
+            'LOWER_MODULE_NAME' => $module->getLowerName(),
+            'STUDLY_NAME' => $this->getStudlyName($name),
+            'LOWER_NAME' => $this->getLowerName($name),
+            'CLASS' => $this->getControllerNameWithoutNamespace(),
         ]))->render();
     }
 
@@ -89,7 +89,7 @@ class ControllerAPIMakeCommand extends BaseCommand
     {
         $path = Modularity::getModulePath($this->getModuleName());
 
-        $controllerPath = new GeneratorPath( $this->baseConfig('paths.generator.route-controller-api') );
+        $controllerPath = new GeneratorPath($this->baseConfig('paths.generator.route-controller-api'));
 
         return $path . $controllerPath->getPath() . '/' . $this->getFileName() . 'Controller.php';
     }
@@ -101,13 +101,12 @@ class ControllerAPIMakeCommand extends BaseCommand
     {
         $controller = Str::studly($this->argument('name'));
 
-        if (Str::contains(strtolower($controller), 'controller') === false) {
+        if (Str::contains(mb_strtolower($controller), 'controller') === false) {
             $controller .= 'Controller';
         }
 
         return $controller;
     }
-
 
     /**
      * @return array|string
@@ -118,12 +117,9 @@ class ControllerAPIMakeCommand extends BaseCommand
     }
 
     /**
-     *
      * Get head string of path for namespace
-     *
-     * @return string
      */
-    public function getDefaultNamespace() : string
+    public function getDefaultNamespace(): string
     {
         // dd($this->baseConfig('paths.generator.controller-api.namespace'), $this->baseConfig('paths.generator.controller-api.path', 'Https\Controllers\API'));
         return $this->baseConfig('paths.generator.route-controller-api.namespace') ?:
@@ -138,14 +134,8 @@ class ControllerAPIMakeCommand extends BaseCommand
         return Str::studly($this->argument('name'));
     }
 
-
-    /**
-     * @return string
-     */
     protected function getStubName(): string
     {
         return '/route-controller-api.stub';
     }
-
-
 }

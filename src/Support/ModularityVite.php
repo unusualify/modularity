@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Support;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+
 class ModularityVite extends Vite
 {
     /**
@@ -42,11 +43,11 @@ class ModularityVite extends Vite
      */
     protected $manifestFilename = 'modularity-manifest.json';
 
-        /**
+    /**
      * Generate Vite tags for an entrypoint.
      *
-     * @param  string|string[]  $entrypoints
-     * @param  string|null  $buildDirectory
+     * @param string|string[] $entrypoints
+     * @param string|null $buildDirectory
      * @return \Illuminate\Support\HtmlString
      *
      * @throws \Exception
@@ -139,7 +140,6 @@ class ModularityVite extends Vite
             ->sortByDesc(fn ($args) => $this->isCssPath($args[1]))
             ->map(fn ($args) => $this->makePreloadTagForChunk(...$args));
 
-        return new HtmlString($preloads->join('').$stylesheets->join('').$scripts->join(''));
+        return new HtmlString($preloads->join('') . $stylesheets->join('') . $scripts->join(''));
     }
-
 }

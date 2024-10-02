@@ -10,7 +10,7 @@ return [
         'errorMessages' => [],
         'col' => [
             'cols' => 12,
-            'class' => 'pb-2 pt-2'
+            'class' => 'pb-2 pt-2',
         ],
         'offset' => [
             'offset' => 0,
@@ -76,7 +76,7 @@ return [
                         'xl' => 6,
                         'lg' => 6,
                         's' => 12,
-                        'class' => 'pr-theme-semi pb-theme-semi'
+                        'class' => 'pr-theme-semi pb-theme-semi',
                     ],
                     'attributes' => [
                         'container' => [
@@ -92,7 +92,7 @@ return [
                             'titleColor' => 'grey',
                             'infoClass' => 'text-h4 pt-0 pb-5',
                             'infoColor' => '#000000',
-                        ]
+                        ],
                     ],
                     'cards' => [
                         [
@@ -119,7 +119,7 @@ return [
                             'method' => 'where:company_id:1|count',
                             'flex' => 6,
                         ],
-                    ]
+                    ],
                 ],
                 [
                     'component' => 'new-table',
@@ -158,7 +158,7 @@ return [
                                 'isRowEditable' => true,
                                 'isColumnEditable' => true,
                                 'formatter' => [
-                                    'edit'
+                                    'edit',
                                 ],
                             ],
                             [
@@ -179,22 +179,22 @@ return [
                                     'status',
                                     [
                                         'Not Published',
-                                        'Published'
+                                        'Published',
                                     ],
                                     [
                                         'blue',
                                         'red',
-                                    ]
+                                    ],
                                 ],
                             ],
                         ],
                         'tableOptions' => [
-                            'page'          => 1,
-                            'sortBy'        => [],
-                            'multiSort'     => false,
-                            'mustSort'      => false,
-                            'groupBy'       => [],
-                            'itemsPerPage'  => 10,
+                            'page' => 1,
+                            'sortBy' => [],
+                            'multiSort' => false,
+                            'mustSort' => false,
+                            'groupBy' => [],
+                            'itemsPerPage' => 10,
                             'tableType' => 'dashboard', // !!!!!!
                         ],
                         'slots' => [
@@ -209,12 +209,12 @@ return [
                                             [
                                                 'tag' => 'v-btn-tertiary',
                                                 'elements' => 'MANAGE USERS',
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
                     ],
                 ],
                 [
@@ -255,7 +255,7 @@ return [
                                 'isRowEditable' => true,
                                 'isColumnEditable' => true,
                                 'formatter' => [
-                                    'edit'
+                                    'edit',
                                 ],
                             ],
                             [
@@ -293,29 +293,29 @@ return [
                                     'status',
                                     [
                                         'Not Published',
-                                        'Published'
+                                        'Published',
                                     ],
                                     [
                                         'blue',
                                         'red',
-                                    ]
+                                    ],
                                 ],
                             ],
                             [
                                 'title' => 'Actions',
                                 'key' => 'actions',
                                 'sortable' => false,
-                            ]
+                            ],
                         ],
                         'tableOptions' => [
-                            'page'          => 1,
-                            'sortBy'        => [],
-                            'multiSort'     => false,
-                            'mustSort'      => false,
-                            'groupBy'       => [],
-                            'itemsPerPage'  => 10,
+                            'page' => 1,
+                            'sortBy' => [],
+                            'multiSort' => false,
+                            'mustSort' => false,
+                            'groupBy' => [],
+                            'itemsPerPage' => 10,
                             'tableType' => 'dashboard',
-                             // !!!!!!
+                            // !!!!!!
                         ],
                         'slots' => [
                             'bottom' => [
@@ -329,18 +329,17 @@ return [
                                             [
                                                 'tag' => 'v-btn-tertiary',
                                                 'elements' => 'MANAGE USERS',
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
                     ],
                 ],
 
-
-            ]
-        ]
+            ],
+        ],
     ],
     'payment' => [
         'currency_services' => [
@@ -352,11 +351,11 @@ return [
         'locale_currencies' => [
             'tr' => 'TRY',
             'en' => 'EUR',
-        ]
+        ],
     ],
     'default_payment_service' => [
         'USD' => 'garanti-pos',
         'EUR' => 'garanti-pos',
         'TRY' => 'garanti-pos',
-    ]
+    ],
 ];

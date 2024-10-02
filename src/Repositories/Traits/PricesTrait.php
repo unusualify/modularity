@@ -2,12 +2,7 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
-use Unusualify\Modularity\Entities\File;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
-use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Module;
 
 trait PricesTrait
 {
@@ -22,16 +17,15 @@ trait PricesTrait
     protected $defaultPriceData = [
         'currency_id' => 1,
         'vat_rate_id' => 1,
-        'price_type_id' => 1
+        'price_type_id' => 1,
     ];
-
 
     public function setColumnsPricesTrait($columns, $inputs)
     {
         $traitName = get_class_short_name(__TRAIT__);
 
-        $columns[$traitName] = collect($inputs)->reduce(function($acc, $curr){
-            if(preg_match('/price/', $curr['type'])){
+        $columns[$traitName] = collect($inputs)->reduce(function ($acc, $curr) {
+            if (preg_match('/price/', $curr['type'])) {
                 $acc[] = $curr['name'];
             }
 
@@ -52,8 +46,8 @@ trait PricesTrait
             return;
         }
 
-        foreach( $this->getColumns(__TRAIT__) as $name ) {
-            if(isset($fields[$name])){
+        foreach ($this->getColumns(__TRAIT__) as $name) {
+            if (isset($fields[$name])) {
                 $existingPrices = $object->prices()->where('role', $name)->get();
 
                 foreach ($fields[$name] as $priceData) {
@@ -92,19 +86,19 @@ trait PricesTrait
             $pricesByRole = $object->prices->groupBy('role');
 
             foreach ($this->getColumns(__TRAIT__) as $role) {
-                if(isset($pricesByRole[$role])){
+                if (isset($pricesByRole[$role])) {
                     $fields[$role] = $pricesByRole[$role]->map(function ($price) {
-                        return Arr::mapWithKeys(Arr::only($price->toArray(), $this->formatableColumns) , function($val, $key){
-                            if(preg_match('/display_price|price_excluding|price_including/', $key)){
-                                return [$key => (double) $val / 100];
+                        return Arr::mapWithKeys(Arr::only($price->toArray(), $this->formatableColumns), function ($val, $key) {
+                            if (preg_match('/display_price|price_excluding|price_including/', $key)) {
+                                return [$key => (float) $val / 100];
                             }
 
                             return [$key => $val];
                         });
                     });
-                }else {
+                } else {
                     $fields[$role] = [
-                        array_merge_recursive_preserve($this->defaultPriceData, ['display_price' => 0.00])
+                        array_merge_recursive_preserve($this->defaultPriceData, ['display_price' => 0.00]),
                     ];
                 }
             }
@@ -120,6 +114,7 @@ trait PricesTrait
             //     // }
             // }
         }
+
         return $fields;
     }
 
@@ -127,11 +122,10 @@ trait PricesTrait
     {
         if ($object->has('prices')) {
             foreach ($this->getColumns(__TRAIT__) as $fieldName) {
-                $fields[$fieldName.'_show'] = $object->price_formatted;
+                $fields[$fieldName . '_show'] = $object->price_formatted;
             }
         }
 
         return $fields;
     }
-
 }

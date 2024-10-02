@@ -3,24 +3,21 @@
 namespace Unusualify\Modularity\Entities\Traits;
 
 use Oobook\Database\Eloquent\Concerns\ManageEloquent;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
 use Unusualify\Modularity\Traits\ManageModuleRoute;
 
 trait ModelHelpers
 {
-    use ManageModuleRoute, ManageEloquent;
+    use ManageEloquent, ManageModuleRoute;
 
     /**
      * Checks if this model is soft deletable.
      *
      * @param array|string|null $columns Optionally limit the check to a set of columns.
-     * @return bool
      */
     public function isSoftDeletable(): bool
     {
         // Model must have the trait
-        if (!classHasTrait($this, 'Illuminate\Database\Eloquent\SoftDeletes')) {
+        if (! classHasTrait($this, 'Illuminate\Database\Eloquent\SoftDeletes')) {
             return false;
         }
 
@@ -43,20 +40,22 @@ trait ModelHelpers
 
             if ($relation instanceof \Illuminate\Database\Eloquent\Collection) {
                 // dd($this, $relationName, $this->getRelations());
-                $this->{$relationName} = $relation->map(function($related) use($relationName){
+                $this->{$relationName} = $relation->map(function ($related) {
 
-                    if(method_exists($related, 'setRelationsShowFormat'))
+                    if (method_exists($related, 'setRelationsShowFormat')) {
                         $related->setRelationsShowFormat();
+                    }
 
                     return $related;
                 });
 
-                $this["{$relationName}_show"] ??= $this->{$relationName}->map(fn($model) => modelShowFormat($model))->implode(', ');;
+                $this["{$relationName}_show"] ??= $this->{$relationName}->map(fn ($model) => modelShowFormat($model))->implode(', ');
 
-            }else if($relation){
+            } elseif ($relation) {
 
-                if(method_exists($relation, 'setRelationsShowFormat'))
+                if (method_exists($relation, 'setRelationsShowFormat')) {
                     $relation->setRelationsShowFormat();
+                }
 
                 // $this->{$relationName} = $relation;
 

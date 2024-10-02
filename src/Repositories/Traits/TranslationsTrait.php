@@ -42,7 +42,7 @@ trait TranslationsTrait
                     return $lang['value'] == $locale;
                 }));
 
-                $shouldPublishFirstLanguage = ($index === 0 && !$atLeastOneLanguageIsPublished);
+                $shouldPublishFirstLanguage = ($index === 0 && ! $atLeastOneLanguageIsPublished);
 
                 $activeField = $shouldPublishFirstLanguage || (isset($submittedLanguage) ? $submittedLanguage['published'] : false);
 
@@ -113,13 +113,13 @@ trait TranslationsTrait
             $query->whereHas('translations', function ($q) use ($scopes, $attributes) {
                 foreach ($attributes as $attribute) {
                     if (isset($scopes[$attribute]) && is_string($scopes[$attribute])) {
-                        if(!(isset($scopes['searches']) && in_array($attribute, $scopes['searches']))){
+                        if (! (isset($scopes['searches']) && in_array($attribute, $scopes['searches']))) {
                             $q->where($attribute, $this->getLikeOperator(), '%' . $scopes[$attribute] . '%');
                         }
                     }
                 }
 
-                if(isset($scopes['searches'])){
+                if (isset($scopes['searches'])) {
                     $q->where(function ($query) use (&$scopes) {
                         foreach ($scopes['searches'] as $field) {
                             $query->orWhere($field, $this->getLikeOperator(), '%' . $scopes[$field] . '%');
@@ -166,8 +166,7 @@ trait TranslationsTrait
                 $query
                     ->join($tableTranslation, $foreignKey, '=', $table . '.id')
                     ->where($tableTranslation . '.locale', '=', $orders['locale'] ?? app()->getLocale())
-                    ->select($table . '.*')
-                ;
+                    ->select($table . '.*');
             }
         }
     }

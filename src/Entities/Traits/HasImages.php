@@ -2,11 +2,9 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Unusualify\Modularity\Exceptions\MediaCropNotFoundException;
-use Unusualify\Modularity\Entities\Media;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Unusualify\Modularity\Entities\Media;
 use Unusualify\Modularity\Services\MediaLibrary\ImageService;
 
 trait HasImages
@@ -18,11 +16,10 @@ trait HasImages
         'crop_h',
     ];
 
-
     public static function bootHasImages(): void
     {
         self::deleted(static function (Model $model) {
-            if (!method_exists($model, 'isForceDeleting') || $model->isForceDeleting()) {
+            if (! method_exists($model, 'isForceDeleting') || $model->isForceDeleting()) {
                 /** @var \Unusualify\Modularity\Entities\Traits\HasImages $model */
                 $model->medias()->detach();
             }
@@ -35,11 +32,11 @@ trait HasImages
             });
 
             if ($iconInput) {
-                if (($media = $model->findMedia('images')))
+                if (($media = $model->findMedia('images'))) {
                     $model->setAttribute('_icon', ImageService::getRawUrl($media->uuid));
-                else
+                } else {
                     $model->setAttribute('_icon', null);
-
+                }
 
             }
         });
@@ -79,11 +76,7 @@ trait HasImages
         });
     }
 
-    public function initializeHasImages(): void
-    {
-
-
-    }
+    public function initializeHasImages(): void {}
 
     /**
      * Defines the many-to-many relationship for media objects.
@@ -136,11 +129,11 @@ trait HasImages
      * @param string $crop Crop name.
      * @return bool
      */
-    public function hasImage($role, $crop = "default")
+    public function hasImage($role, $crop = 'default')
     {
         $media = $this->findMedia($role, $crop);
 
-        return !empty($media);
+        return ! empty($media);
     }
 
     /**
@@ -154,10 +147,10 @@ trait HasImages
      * @param Media|null $media Provide a media object if you already retrieved one to prevent more SQL queries.
      * @return string|null
      */
-    public function image($role, $crop = "default", $params = [], $has_fallback = false, $cms = false, $media = null)
+    public function image($role, $crop = 'default', $params = [], $has_fallback = false, $cms = false, $media = null)
     {
 
-        if (!$media) {
+        if (! $media) {
             $media = $this->findMedia($role, $crop);
         }
 
@@ -188,7 +181,7 @@ trait HasImages
      * @param array $params Parameters compatible with the current image service, like `w` or `h`.
      * @return array
      */
-    public function images($role, $crop = "default", $params = [])
+    public function images($role, $crop = 'default', $params = [])
     {
         $medias = $this->medias->filter(function ($media) use ($role, $crop) {
             return $media->pivot->role === $role && $media->pivot->crop === $crop;
@@ -235,9 +228,9 @@ trait HasImages
      * @param Media|null $media Provide a media object if you already retrieved one to prevent more SQL queries.
      * @return array
      */
-    public function imageAsArray($role, $crop = "default", $params = [], $media = null)
+    public function imageAsArray($role, $crop = 'default', $params = [], $media = null)
     {
-        if (!$media) {
+        if (! $media) {
             $media = $this->findMedia($role, $crop);
         }
 
@@ -263,7 +256,7 @@ trait HasImages
      * @param array $params Parameters compatible with the current image service, like `w` or `h`.
      * @return array
      */
-    public function imagesAsArrays($role, $crop = "default", $params = [])
+    public function imagesAsArrays($role, $crop = 'default', $params = [])
     {
         $medias = $this->medias->filter(function ($media) use ($role, $crop) {
             return $media->pivot->role === $role && $media->pivot->crop === $crop;
@@ -310,13 +303,13 @@ trait HasImages
      */
     public function imageAltText($role, $media = null)
     {
-        if (!$media) {
+        if (! $media) {
             $media = $this->medias->first(function ($media) use ($role) {
                 if (unusualConfig('media_library.translated_form_fields', false)) {
                     $localeScope = $media->pivot->locale === app()->getLocale();
                 }
 
-                return $media->pivot->role === $role && ($localeScope ?? true);;
+                return $media->pivot->role === $role && ($localeScope ?? true);
             });
         }
 
@@ -336,13 +329,13 @@ trait HasImages
      */
     public function imageCaption($role, $media = null)
     {
-        if (!$media) {
+        if (! $media) {
             $media = $this->medias->first(function ($media) use ($role) {
                 if (unusualConfig('media_library.translated_form_fields', false)) {
                     $localeScope = $media->pivot->locale === app()->getLocale();
                 }
 
-                return $media->pivot->role === $role && ($localeScope ?? true);;
+                return $media->pivot->role === $role && ($localeScope ?? true);
             });
         }
 
@@ -362,19 +355,20 @@ trait HasImages
      */
     public function imageVideo($role, $media = null)
     {
-        if (!$media) {
+        if (! $media) {
             $media = $this->medias->first(function ($media) use ($role) {
                 if (unusualConfig('media_library.translated_form_fields', false)) {
                     $localeScope = $media->pivot->locale === app()->getLocale();
                 }
 
-                return $media->pivot->role === $role && ($localeScope ?? true);;
+                return $media->pivot->role === $role && ($localeScope ?? true);
             });
         }
 
         if ($media) {
             $metadatas = (object) json_decode($media->pivot->metadatas);
             $language = app()->getLocale();
+
             return $metadatas->video->$language ?? (is_object($metadatas->video) ? '' : ($metadatas->video ?? ''));
         }
 
@@ -388,7 +382,7 @@ trait HasImages
      * @param string $crop Crop name.
      * @return Media|null
      */
-    public function imageObject($role, $crop = "default")
+    public function imageObject($role, $crop = 'default')
     {
         return $this->findMedia($role, $crop);
     }
@@ -402,9 +396,10 @@ trait HasImages
      * @param array $params Parameters compatible with the current image service, like `w` or `h`.
      * @param bool $has_fallback Indicate that you can provide a fallback. Will return `null` instead of the default image fallback.
      * @return string|null
+     *
      * @see \Unusualify\Modularity\Commands\RefreshLQIP
      */
-    public function lowQualityImagePlaceholder($role, $crop = "default", $params = [], $has_fallback = false)
+    public function lowQualityImagePlaceholder($role, $crop = 'default', $params = [], $has_fallback = false)
     {
         $media = $this->findMedia($role, $crop);
 
@@ -429,7 +424,7 @@ trait HasImages
      * @param bool $has_fallback Indicate that you can provide a fallback. Will return `null` instead of the default image fallback.
      * @return string|null
      */
-    public function socialImage($role, $crop = "default", $params = [], $has_fallback = false)
+    public function socialImage($role, $crop = 'default', $params = [], $has_fallback = false)
     {
         $media = $this->findMedia($role, $crop);
 
@@ -454,7 +449,7 @@ trait HasImages
      * @param array $params Parameters compatible with the current image service, like `w` or `h`.
      * @return string
      */
-    public function cmsImage($role, $crop = "default", $params = [])
+    public function cmsImage($role, $crop = 'default', $params = [])
     {
         return $this->image($role, $crop, $params, false, true, false) ?? ImageService::getTransparentFallbackUrl($params);
     }
@@ -483,7 +478,7 @@ trait HasImages
      * @param string $crop Crop name.
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function imageObjects($role, $crop = "default")
+    public function imageObjects($role, $crop = 'default')
     {
         return $this->medias->filter(function ($media) use ($role, $crop) {
             return $media->pivot->role === $role && $media->pivot->crop === $crop;

@@ -2,10 +2,6 @@
 
 namespace Unusualify\Modularity\Hydrates\Inputs;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\App;
-
 class ChecklistHydrate extends InputHydrate
 {
     /**
@@ -35,8 +31,5 @@ class ChecklistHydrate extends InputHydrate
         return $input;
     }
 
-    public function afterHydrateRecords(&$input)
-    {
-
-    }
+    public function afterHydrateRecords(&$input) {}
 }

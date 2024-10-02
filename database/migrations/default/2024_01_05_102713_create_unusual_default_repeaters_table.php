@@ -15,8 +15,8 @@ class CreateUnusualDefaultRepeatersTable extends Migration
     {
         $unusualRepeatersTable = unusualConfig('tables.repeaters', 'modularity_repeaters');
 
-        if (!Schema::hasTable($unusualRepeatersTable)) {
-            Schema::create($unusualRepeatersTable, function (Blueprint $table) use ($unusualRepeatersTable) {
+        if (! Schema::hasTable($unusualRepeatersTable)) {
+            Schema::create($unusualRepeatersTable, function (Blueprint $table) {
                 $table->{unusualIncrementsMethod()}('id');
                 $table->string('repeatable_type')->nullable(); // MODEL CLASS
                 $table->string('repeatable_id')->nullable(); // ID belonging to repeatable_type

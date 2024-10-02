@@ -15,13 +15,12 @@ class NestedsetCollection extends BaseNestedsetCollection
      * If `$root` is provided, the tree will contain only descendants of that node.
      *
      * @param mixed $root
-     *
      * @return NestedsetCollection
      */
     public function toTree($root = false)
     {
         if ($this->isEmpty()) {
-            return new static();
+            return new static;
         }
 
         $this->linkNodes();
@@ -36,8 +35,7 @@ class NestedsetCollection extends BaseNestedsetCollection
         foreach ($this->items as $node) {
             if ($node->getParentId() == $root) {
                 $items[] = $node;
-            }
-            elseif (!in_array($node->getParentId(), $ids)) {
+            } elseif (! in_array($node->getParentId(), $ids)) {
                 $items[] = $node;
             }
         }

@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\File;
 
 class RefreshCommand extends BaseCommand
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -19,14 +18,14 @@ class RefreshCommand extends BaseCommand
      *
      * @var string
      */
-    protected $description = "Move new unusual front sources";
+    protected $description = 'Move new unusual front sources';
 
     /**
      * Executes the console command.
      *
      * @return mixed
      */
-    public function handle() :int
+    public function handle(): int
     {
         File::deleteDirectory(public_path('vendor/modularity'));
 
@@ -50,5 +49,4 @@ class RefreshCommand extends BaseCommand
             '--force' => true,
         ]);
     }
-
 }

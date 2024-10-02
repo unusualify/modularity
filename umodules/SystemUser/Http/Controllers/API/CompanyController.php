@@ -10,35 +10,29 @@ use Modules\SystemUser\Transformers\CompanyResource;
 
 class CompanyController extends Controller
 {
-
     /**
      * This resource repository
      */
     private $repository;
 
-
-    /**
-     * @param CompanyRepository $repository
-     */
     public function __construct(CompanyRepository $repository)
     {
         $this->repository = $repository;
     }
 
-
     /**
      * Display a listing of the resource.
+     *
      * @return Renderable
      */
     public function index(Request $request)
     {
-        return new CompanyResource( $this->repository->paginate($request) );
+        return new CompanyResource($this->repository->paginate($request));
     }
-
 
     /**
      * Store a newly created resource in storage.
-     * @param Request $request
+     *
      * @return Renderable
      */
     public function store(Request $request)
@@ -46,21 +40,17 @@ class CompanyController extends Controller
         //
     }
 
-
     /**
      * Show the specified resource.
+     *
      * @param int $id
      * @return Renderable
      */
-    public function show($id)
-    {
-
-    }
-
+    public function show($id) {}
 
     /**
      * Update the specified resource in storage.
-     * @param Request $request
+     *
      * @param int $id
      * @return Renderable
      */
@@ -71,6 +61,7 @@ class CompanyController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
      * @param int $id
      * @return Renderable
      */

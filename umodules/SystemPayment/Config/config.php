@@ -90,7 +90,7 @@ return [
                     'name' => 'images',
                     'rules' => 'sometimes|required:array',
                     'isIcon' => true,
-                ]
+                ],
             ],
         ],
         'payment' => [
@@ -150,7 +150,7 @@ return [
                     'label' => 'Payment Service',
                     'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentServiceRepository',
                     'rules' => 'sometimes|required',
-                ]
+                ],
             ],
         ],
         'payment_currency' => [
@@ -196,7 +196,7 @@ return [
                     'name' => 'name',
                     'label' => 'Name',
                     'type' => 'text',
-                    'disabled'
+                    'disabled',
                 ],
                 [
                     'name' => 'paymentServices',
@@ -205,9 +205,8 @@ return [
                     'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentServiceRepository',
                     'multiple',
                     'itemTitle' => 'title',
-                ]
+                ],
             ],
         ],
     ],
 ];
-

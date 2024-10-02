@@ -12,9 +12,10 @@ namespace Unusualify\Modularity\Services;
 //     const INFO = 'help';
 // }
 
-enum MessageStage:string {
-  case SUCCESS = 'success';
-  case ERROR = 'error';
-  case WARNING = 'warning';
-  case INFO = 'info';
+enum MessageStage: string
+{
+    case SUCCESS = 'success';
+    case ERROR = 'error';
+    case WARNING = 'warning';
+    case INFO = 'info';
 }

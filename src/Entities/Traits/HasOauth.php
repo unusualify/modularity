@@ -6,7 +6,6 @@ use Unusualify\Modularity\Entities\UserOauth;
 
 trait HasOauth
 {
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -26,13 +25,12 @@ trait HasOauth
     {
 
         $provider = new UserOauth([
-            'token'    => $oauthUser->token,
-            'avatar'   => $oauthUser->avatar,
+            'token' => $oauthUser->token,
+            'avatar' => $oauthUser->avatar,
             'provider' => $provider,
             'oauth_id' => $oauthUser->id,
         ]);
 
         return $this->providers()->save($provider);
     }
-
 }

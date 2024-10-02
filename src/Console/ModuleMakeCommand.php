@@ -2,15 +2,11 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Illuminate\Support\Facades\Config;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
-
-use Illuminate\Support\Str;
-
-// use Illuminate\Console\Command as Console;
 use Illuminate\Support\Collection;
-use Nwidart\Modules\Facades\Module;
+use Illuminate\Support\Str;
+use Symfony\Component\Console\Input\InputArgument;
+// use Illuminate\Console\Command as Console;
+use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Facades\Modularity;
 
 class ModuleMakeCommand extends BaseCommand
@@ -29,7 +25,7 @@ class ModuleMakeCommand extends BaseCommand
      */
     protected $description = 'Create a module';
 
-    protected $aliases= [
+    protected $aliases = [
         'u:m:m',
         'modularity:make:module',
     ];
@@ -41,24 +37,25 @@ class ModuleMakeCommand extends BaseCommand
      */
     protected $console;
 
-    private function getPlainOption(){
-        return !(
+    private function getPlainOption()
+    {
+        return ! (
             $this->option('relationships')
             || $this->option('schema')
             || $this->option('rules')
         );
     }
 
-    public function handle() : int
+    public function handle(): int
     {
 
         // $console = new Console();
 
-        if($this->option('just-stubs')){
+        if ($this->option('just-stubs')) {
             $module = Modularity::find($this->argument('module'));
 
             foreach ($module->getRoutes() as $key => $routeName) {
-                $this->call('unusual:make:stubs',[
+                $this->call('unusual:make:stubs', [
                     'module' => $module->getName(),
                     'route' => $routeName,
                     '--fix' => true,
@@ -81,32 +78,32 @@ class ModuleMakeCommand extends BaseCommand
             return ["--{$key}" => $item];
         })->toArray();
 
-        $this->call('module:make',[
+        $this->call('module:make', [
             'name' => [$this->argument('module')],
-            '--plain' => true
+            '--plain' => true,
         ]);
 
         $this->call('unusual:make:route', [
-                'module' => $this->argument('module'),
-                'route' => $this->argument('module'),
-            ]
-            + ( $this->hasOption('schema') ?  ['--schema' => $this->option('schema')] : [])
-            + ( $this->hasOption('rules') ?  ['--rules' => $this->option('rules')] : [])
-            + ( $this->hasOption('relationships') ?  ['--relationships' => $this->option('rules')] : [])
-            + ( $this->option('force') ?  ['--force' => true] : [])
-            + ( $this->option('no-migrate') ?  ['--no-migrate' => true] : [])
-            + ( $this->option('no-defaults') ?  ['--no-defaults' => true] : [])
-            + ( $this->option('no-migration') ?  ['--no-migration' => true] : [])
-            + ( $this->option('table-name') ?  ['--table-name' => $this->option('table-name')] : [])
-            + ( ['-p' => $this->getPlainOption()])
+            'module' => $this->argument('module'),
+            'route' => $this->argument('module'),
+        ]
+            + ($this->hasOption('schema') ? ['--schema' => $this->option('schema')] : [])
+            + ($this->hasOption('rules') ? ['--rules' => $this->option('rules')] : [])
+            + ($this->hasOption('relationships') ? ['--relationships' => $this->option('rules')] : [])
+            + ($this->option('force') ? ['--force' => true] : [])
+            + ($this->option('no-migrate') ? ['--no-migrate' => true] : [])
+            + ($this->option('no-defaults') ? ['--no-defaults' => true] : [])
+            + ($this->option('no-migration') ? ['--no-migration' => true] : [])
+            + ($this->option('table-name') ? ['--table-name' => $this->option('table-name')] : [])
+            + (['-p' => $this->getPlainOption()])
             + $console_traits
             + ['--notAsk' => true]
             + ['--test' => false]
         );
 
-
         return 0;
     }
+
     /**
      * Get the console command arguments.
      *
@@ -146,12 +143,9 @@ class ModuleMakeCommand extends BaseCommand
     }
 
     /**
-     *
      * Get head string of path for namespace
-     *
-     * @return string
      */
-    public function getDefaultNamespace() : string
+    public function getDefaultNamespace(): string
     {
         // dd($this->baseConfig('paths.generator.controller-api.namespace'), $this->baseConfig('paths.generator.controller-api.path', 'Https\Controllers\API'));
         return $this->baseConfig('paths.generator.route-request.namespace') ?:
@@ -177,11 +171,12 @@ class ModuleMakeCommand extends BaseCommand
             return true;
         }
 
-        if ( !$this->isAskable() )
+        if (! $this->isAskable()) {
             return false;
+        }
 
-        $questions = Collection::make($this->baseConfig('traits'))->mapWithKeys(function($object, $key){
-            return [ $key => $object['question']];
+        $questions = Collection::make($this->baseConfig('traits'))->mapWithKeys(function ($object, $key) {
+            return [$key => $object['question']];
         })->toArray();
 
         $defaultAnswers = [
@@ -189,10 +184,10 @@ class ModuleMakeCommand extends BaseCommand
         ];
 
         $currentDefaultAnswer = $this->defaultReject ? 0 : ($defaultAnswers[$option] ?? 1);
+
         // dd(
         //     $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer)
         // );
-        return 'yes' === $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer);
+        return $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer) === 'yes';
     }
-
 }

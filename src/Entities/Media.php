@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Entities;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -38,9 +37,10 @@ class Media extends Model
         parent::__construct($attributes);
     }
 
-    public function scopeUnused ($query)
+    public function scopeUnused($query)
     {
         $usedIds = DB::table(unusualConfig('tables.mediables'))->get()->pluck('media_id');
+
         return $query->whereNotIn('id', $usedIds->toArray())->get();
     }
 
@@ -53,7 +53,7 @@ class Media extends Model
     {
         $filename = pathinfo($filename, PATHINFO_FILENAME);
         if (Str::endsWith($filename, '@2x')) {
-            $filename = substr($filename, 0, -2);
+            $filename = mb_substr($filename, 0, -2);
         }
 
         return ucwords(preg_replace('/[^a-zA-Z0-9]/', ' ', sanitizeFilename($filename)));
@@ -76,9 +76,9 @@ class Media extends Model
         return [
             'id' => $this->id,
             'name' => $this->filename,
-            'thumbnail' => ImageService::getCmsUrl($this->uuid, ["h" => "256"]),
+            'thumbnail' => ImageService::getCmsUrl($this->uuid, ['h' => '256']),
             'original' => ImageService::getRawUrl($this->uuid),
-            'medium' => ImageService::getUrl($this->uuid, ["h" => "430"]),
+            'medium' => ImageService::getUrl($this->uuid, ['h' => '430']),
             'width' => $this->width,
             'height' => $this->height,
             'tags' => $this->tags->map(function ($tag) {
@@ -146,8 +146,7 @@ class Media extends Model
         $prevHeight = $this->height;
         $prevWidth = $this->width;
 
-        if ($this->update($fields) && $this->isReferenced())
-        {
+        if ($this->update($fields) && $this->isReferenced()) {
             DB::table(unusualConfig('tables.mediables', 'unusual_mediables'))->where('media_id', $this->id)->get()->each(function ($mediable) use ($prevWidth, $prevHeight) {
 
                 if ($prevWidth != $this->width) {
@@ -160,7 +159,7 @@ class Media extends Model
                     $mediable->crop_h = $this->height;
                 }
 
-                DB::table(unusualConfig('tables.mediables', 'unusual_mediables'))->where('id', $mediable->id)->update((array)$mediable);
+                DB::table(unusualConfig('tables.mediables', 'unusual_mediables'))->where('id', $mediable->id)->update((array) $mediable);
             });
         }
     }
@@ -170,6 +169,7 @@ class Media extends Model
         if ($this->canDeleteSafely()) {
             return parent::delete();
         }
+
         return false;
     }
 

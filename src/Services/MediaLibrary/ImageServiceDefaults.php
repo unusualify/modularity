@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Services\MediaLibrary;
 
 trait ImageServiceDefaults
 {
-
     protected $cropParamsKeys = [
         'crop_x',
         'crop_y',
@@ -14,15 +13,15 @@ trait ImageServiceDefaults
 
     public function getSocialFallbackUrl(): string
     {
-        if ($id = unusualConfig("seo.image_default_id")) {
+        if ($id = unusualConfig('seo.image_default_id')) {
             return $this->getSocialUrl($id);
         }
 
-        return unusualConfig("seo.image_local_fallback");
+        return unusualConfig('seo.image_local_fallback');
     }
 
     public function getTransparentFallbackUrl(): string
     {
-        return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+        return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     }
 }

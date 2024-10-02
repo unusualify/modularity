@@ -97,7 +97,13 @@
     },
     "scripts": {
         "test": "vendor/bin/phpunit",
-        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
+        "pint": "vendor/bin/pint",
+        "pint:test": "vendor/bin/pint --test",
+        "pint:bail": "vendor/bin/pint --bail",
+        "pint:dirty": "vendor/bin/pint --dirty",
+        "pint:repair": "vendor/bin/pint --repair",
+        "pint:verbose": "vendor/bin/pint -v"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

@@ -28,14 +28,14 @@ class LaravelTestGenerator extends Generator
             'import_dir' => 'Unit/',
             'target_dir' => 'Unit',
             'file_contenction' => 'PascalCase',
-            'stub' => 'tests/laravel-unit'
+            'stub' => 'tests/laravel-unit',
         ],
         'feature' => [
             'import_dir' => 'Feature/',
             'target_dir' => 'Feature',
             'file_contenction' => 'PascalCase',
-            'stub' => 'tests/laravel-feature'
-        ]
+            'stub' => 'tests/laravel-feature',
+        ],
     ];
 
     /**
@@ -61,18 +61,15 @@ class LaravelTestGenerator extends Generator
 
     /**
      * The constructor.
-     * @param $name
+     *
      * @param FileRepository $module
-     * @param Config     $config
-     * @param Filesystem $filesystem
-     * @param Console    $console
      */
     public function __construct(
         $name,
-        Config $config = null,
-        Filesystem $filesystem = null,
-        Console $console = null,
-        Module $module = null
+        ?Config $config = null,
+        ?Filesystem $filesystem = null,
+        ?Console $console = null,
+        ?Module $module = null
     ) {
 
         parent::__construct($name, $config, $filesystem, $console, $module);
@@ -83,7 +80,6 @@ class LaravelTestGenerator extends Generator
      * Set the type attribute
      *
      * @param string $fix
-     *
      * @return $this
      */
     public function setType($type)
@@ -96,7 +92,7 @@ class LaravelTestGenerator extends Generator
     /**
      * Get type of test
      *
-     * @return boolean|int
+     * @return bool|int
      */
     public function getType()
     {
@@ -107,7 +103,6 @@ class LaravelTestGenerator extends Generator
      * Set the sub import directory attribute
      *
      * @param string $dir
-     *
      * @return $this
      */
     public function setSubImportDir($dir)
@@ -121,7 +116,6 @@ class LaravelTestGenerator extends Generator
      * Set the sub target directory attribute
      *
      * @param string $dir
-     *
      * @return $this
      */
     public function setSubTargetDir($dir)
@@ -147,7 +141,7 @@ class LaravelTestGenerator extends Generator
         $sub = $this->subImportDir;
         $conventionMethod = 'get' . $type['file_convention'] ?? 'CamelCase';
 
-        return $type['import_dir'] . ($sub ? $sub .'/' : '') . $this->{$conventionMethod}($this->name);
+        return $type['import_dir'] . ($sub ? $sub . '/' : '') . $this->{$conventionMethod}($this->name);
     }
 
     public function getTypeTargetDir()
@@ -164,18 +158,15 @@ class LaravelTestGenerator extends Generator
 
     /**
      * Get Stub File
-     *
-     * @param  string $name
-     * @return string
      */
-    public function getStubFile(string $name) : string
+    public function getStubFile(string $name): string
     {
         return $this->getFiles()[$name];
     }
 
     public function getTargetPath()
     {
-        return base_path( unusualConfig('vendor_path') . '/src/Tests' ) ;
+        return base_path(unusualConfig('vendor_path') . '/src/Tests');
     }
 
     public function getTestFileName()
@@ -187,13 +178,13 @@ class LaravelTestGenerator extends Generator
             '/\$TEST_NAME\$/' => $this->getKebabCase($this->name),
         ];
 
-        return preg_replace( array_keys($patterns), array_values($patterns), $file);
+        return preg_replace(array_keys($patterns), array_values($patterns), $file);
     }
 
     /**
      * Generate the module.
      */
-    public function generate() : int
+    public function generate(): int
     {
         $path = "{$this->getTargetPath()}/{$this->getTypeTargetDir()}/{$this->getTestFileName()}";
 
@@ -205,11 +196,11 @@ class LaravelTestGenerator extends Generator
             'IMPORT',
         ])))->render();
         dd($content, $path);
-        if (!$this->filesystem->isDirectory($dir = dirname($path))) {
+        if (! $this->filesystem->isDirectory($dir = dirname($path))) {
             $this->filesystem->makeDirectory($dir, 0775, true);
         }
 
-        if(!file_exists($path)){
+        if (! file_exists($path)) {
             $this->filesystem->put($path, $content);
 
             $this->console->info("Created : {$path} test file");
@@ -238,6 +229,6 @@ class LaravelTestGenerator extends Generator
 
         $extension = isset($type['extension']) ? $type['extension'] : 'js';
 
-        return $type['import_dir'] . ($sub ? $sub .'/' : '') . $this->{$conventionMethod}($this->name) . '.' . $extension;
+        return $type['import_dir'] . ($sub ? $sub . '/' : '') . $this->{$conventionMethod}($this->name) . '.' . $extension;
     }
 }

@@ -39,7 +39,9 @@ trait HasNesting
     public function getAncestorsSlug($locale = null)
     {
         return collect($this->ancestors ?? [])
-            ->map(function ($i) use ($locale) { return $i->getSlug($locale); })
+            ->map(function ($i) use ($locale) {
+                return $i->getSlug($locale);
+            })
             ->implode('/');
     }
 
@@ -60,7 +62,7 @@ trait HasNesting
             $nodeModel = $nodeModels->where('id', $nodeArray['id'])->first();
 
             if ($nodeArray['parent_id'] === null) {
-                if (!$nodeModel->isRoot() || $nodeModel->position !== $nodeArray['position']) {
+                if (! $nodeModel->isRoot() || $nodeModel->position !== $nodeArray['position']) {
                     $nodeModel->position = $nodeArray['position'];
                     $nodeModel->saveAsRoot();
                 }
@@ -74,7 +76,7 @@ trait HasNesting
         }
     }
 
-    public static function flattenTree(array $nodeTree, int $parentId = null)
+    public static function flattenTree(array $nodeTree, ?int $parentId = null)
     {
         $nodeArrays = [];
         $position = 0;

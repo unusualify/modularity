@@ -2,7 +2,4 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
-abstract class FrontController extends CoreController
-{
-
-}
+abstract class FrontController extends CoreController {}

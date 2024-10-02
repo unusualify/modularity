@@ -8,22 +8,19 @@ use Cartalyst\Tags\TaggableTrait;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use Unusualify\Modularity\Entities\Traits\{
-    HasPresenter,
-    ModelHelpers,
-    HasScopes,
-    IsTranslatable
-};
+use Unusualify\Modularity\Entities\Traits\HasPresenter;
+use Unusualify\Modularity\Entities\Traits\HasScopes;
+use Unusualify\Modularity\Entities\Traits\IsTranslatable;
+use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 
 class Model extends LaravelModel implements TaggableInterface
 {
-    use ModelHelpers,
-        HasPresenter,
+    use HasPresenter,
         HasScopes,
         IsTranslatable,
+        ModelHelpers,
         SoftDeletes,
         TaggableTrait;
-
 
     public $timestamps = true;
 
@@ -53,11 +50,11 @@ class Model extends LaravelModel implements TaggableInterface
         ) {
             $fillable = (new $this->baseModuleModel)->getTranslatedAttributes();
 
-            if (!collect($fillable)->contains('locale')) {
+            if (! collect($fillable)->contains('locale')) {
                 $fillable[] = 'locale';
             }
 
-            if (!collect($fillable)->contains('active')) {
+            if (! collect($fillable)->contains('active')) {
                 $fillable[] = 'active';
             }
         }
@@ -92,8 +89,8 @@ class Model extends LaravelModel implements TaggableInterface
     /**
      * Retrieve the model for a bound value.
      *
-     * @param  mixed  $value
-     * @param  string|null  $field
+     * @param mixed $value
+     * @param string|null $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function resolveRouteBinding_($value, $field = null)
@@ -104,14 +101,13 @@ class Model extends LaravelModel implements TaggableInterface
     /**
      * Retrieve the child model for a bound value.
      *
-     * @param  string  $childType
-     * @param  mixed  $value
-     * @param  string|null  $field
+     * @param string $childType
+     * @param mixed $value
+     * @param string|null $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function resolveChildRouteBinding_($childType, $value, $field)
     {
         return parent::resolveChildRouteBinding($childType, $value, $field);
     }
-
 }

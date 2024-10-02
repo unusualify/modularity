@@ -2,8 +2,6 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Unusualify\Modularity\Facades\Modularity;
 
 class ModuleRemoveCommand extends BaseCommand
@@ -21,9 +19,9 @@ class ModuleRemoveCommand extends BaseCommand
      *
      * @var string
      */
-    protected $description = "Remove completely a module.";
+    protected $description = 'Remove completely a module.';
 
-    protected $aliases= [
+    protected $aliases = [
         'u:r:m',
         'modularity:remove:module',
     ];
@@ -33,7 +31,7 @@ class ModuleRemoveCommand extends BaseCommand
      *
      * @return mixed
      */
-    public function handle() :int
+    public function handle(): int
     {
         $moduleName = $this->argument('module');
         $module = Modularity::find($moduleName);

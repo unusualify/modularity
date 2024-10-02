@@ -3,8 +3,8 @@
 namespace Modules\SystemPayment\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\SystemPayment\Entities\PaymentService;
 use Modules\SystemPayment\Entities\PaymentCurrency;
+use Modules\SystemPayment\Entities\PaymentService;
 
 class PaymentServiceSeeder extends Seeder
 {

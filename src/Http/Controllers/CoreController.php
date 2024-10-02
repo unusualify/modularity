@@ -5,23 +5,19 @@ namespace Unusualify\Modularity\Http\Controllers;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\App;
-
-use Illuminate\Support\Str;
-
 use Illuminate\Routing\Controller as LaravelController;
 use Illuminate\Support\Arr;
-use Unusualify\Modularity\Traits\{ManageNames, ManageTraits};
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Response;
+use Unusualify\Modularity\Traits\ManageNames;
+use Unusualify\Modularity\Traits\ManageTraits;
 
 abstract class CoreController extends LaravelController
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests,
+    use AuthorizesRequests, DispatchesJobs, ManageNames,
         ManageTraits,
-        ManageNames;
+        ValidatesRequests;
 
     /**
      * baseKey
@@ -55,7 +51,6 @@ abstract class CoreController extends LaravelController
      */
     protected $modelName;
 
-
     /**
      * @var \Unusualify\Modularity\Repositories\ModuleRepository
      */
@@ -81,7 +76,7 @@ abstract class CoreController extends LaravelController
      * @param bool $forcePagination
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    protected function getIndexItems($with=[], $scopes = [], $forcePagination = false, )
+    protected function getIndexItems($with = [], $scopes = [], $forcePagination = false)
     {
         return $this->transformIndexItems($this->repository->get(
             $this->indexWith + $with,
@@ -102,9 +97,7 @@ abstract class CoreController extends LaravelController
     }
 
     /**
-     *
-     *
-     * @param  array $paginator
+     * @param array $paginator
      * @return array
      */
     public function getFormattedIndexItems($paginator) // getIndexTableItems
@@ -118,7 +111,7 @@ abstract class CoreController extends LaravelController
     protected function getNamespace()
     {
         try {
-            return $this->namespace ?? config('modules.namespace', 'Modules')."\\{$this->moduleName}";
+            return $this->namespace ?? config('modules.namespace', 'Modules') . "\\{$this->moduleName}";
         } catch (\Throwable $th) {
             dd($th);
         }
@@ -151,6 +144,7 @@ abstract class CoreController extends LaravelController
             dd(
                 $this
             );
+
             return $th;
         }
     }
@@ -174,7 +168,7 @@ abstract class CoreController extends LaravelController
     /**
      * getRepositoryClass
      *
-     * @param  mixed $model
+     * @param mixed $model
      * @return void
      */
     public function getRepositoryClass($model)
@@ -182,7 +176,9 @@ abstract class CoreController extends LaravelController
         if (@class_exists($class = "$this->namespace\Repositories\\" . $model . 'Repository')) {
             return $class;
         }
+
         return null;
+
         // TODO if repository is not exists
         return TwillCapsules::getCapsuleForModel($model)->getRepositoryClass();
     }
@@ -211,7 +207,7 @@ abstract class CoreController extends LaravelController
         //     ? array_merge($this->request->route()->parameters(), $hostRoutingArguments)
         //     : [];
         $hostRoutingArguments = @class_exists('Unusualify\Modularity\Facades\HostRoutingRegistrar')
-                                ?  \Unusualify\Modularity\Facades\HostRoutingRegistrar::getRouteArguments()
+                                ? \Unusualify\Modularity\Facades\HostRoutingRegistrar::getRouteArguments()
                                 : [];
 
         return $this->request->route()
@@ -219,27 +215,30 @@ abstract class CoreController extends LaravelController
             : [];
     }
 
-    protected function routeModuleArguments(){
-        return Arr::mapWithKeys($this->routeArguments(), function($value, $snakeName){
-            return [ $this->getStudlyName($snakeName) => $value];
+    protected function routeModuleArguments()
+    {
+        return Arr::mapWithKeys($this->routeArguments(), function ($value, $snakeName) {
+            return [$this->getStudlyName($snakeName) => $value];
         });
     }
 
-    protected function routeArgument(){
-        $filtered =  Arr::where($this->routeArguments(), function ($value, $snakeName) {
+    protected function routeArgument()
+    {
+        $filtered = Arr::where($this->routeArguments(), function ($value, $snakeName) {
             return $this->getStudlyName($snakeName) == $this->routeName;
         });
 
         return $filtered[$this->getSnakeCase($this->routeName)] ?? null;
     }
 
-    protected function parentRouteArguments(){
-        $filtered =  Arr::where($this->routeArguments(), function ($value, $snakeName) {
+    protected function parentRouteArguments()
+    {
+        $filtered = Arr::where($this->routeArguments(), function ($value, $snakeName) {
             return $this->getStudlyName($snakeName) !== $this->routeName;
         });
 
-        return Arr::mapWithKeys($filtered, function($value, $snakeName){
-            return [ $this->getStudlyName($snakeName) => $value];
+        return Arr::mapWithKeys($filtered, function ($value, $snakeName) {
+            return [$this->getStudlyName($snakeName) => $value];
         });
     }
 
@@ -289,7 +288,7 @@ abstract class CoreController extends LaravelController
     public function tags()
     {
         $query = $this->request->input('q');
-        if(is_null($query)){
+        if (is_null($query)) {
             $query = '';
         }
         // dd($query, $this->repository);
@@ -302,9 +301,9 @@ abstract class CoreController extends LaravelController
                     'last_page' => 1,
                     'data' => $tags->map(function ($tag) {
                         return $tag->name;
-                        }
+                    }
                     ),
-                ]
+                ],
             ], 200);
     }
 }

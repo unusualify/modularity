@@ -2,10 +2,11 @@
 
 namespace Unusualify\Modularity\Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
 class DefaultUsersSeeder extends Seeder
 {
     /**
@@ -29,9 +30,9 @@ class DefaultUsersSeeder extends Seeder
             [
                 'id' => 1,
                 'name' => 'unusualify',
-                'company_id' => NULL,
-                'surname' => NULL,
-                'job_title' => NULL,
+                'company_id' => null,
+                'surname' => null,
+                'job_title' => null,
                 'email' => 'software-dev@unusualgrowth.com',
                 'language' => 'en',
                 'timezone' => 'Europe/London',
@@ -40,9 +41,9 @@ class DefaultUsersSeeder extends Seeder
             [
                 'id' => 2,
                 'name' => 'B2press',
-                'company_id' => NULL,
-                'surname' => NULL,
-                'job_title' => NULL,
+                'company_id' => null,
+                'surname' => null,
+                'job_title' => null,
                 'email' => 'info@b2press.com',
                 'language' => 'en',
                 'timezone' => 'Europe/London',

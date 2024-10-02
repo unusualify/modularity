@@ -6,8 +6,7 @@ use Illuminate\Support\Facades\Auth;
 
 trait IsAuthorizedable
 {
-
-    public static $authorizedGuardName = "unusual_users";
+    public static $authorizedGuardName = 'unusual_users';
 
     public $allAuthorizedRoles = [
         'admin',
@@ -17,14 +16,14 @@ trait IsAuthorizedable
 
     public $authorizedUserRoles = [
         'manager',
-        'client-manager'
+        'client-manager',
     ];
 
     protected static function bootIsAuthorizedable()
     {
         static::created(function ($model) {
             $model->authorized()->create([
-                'user_id' => auth(self::$authorizedGuardName)->user()->id
+                'user_id' => auth(self::$authorizedGuardName)->user()->id,
             ]);
         });
     }
@@ -65,22 +64,24 @@ trait IsAuthorizedable
      */
     public function scopeAuthorized($query)
     {
-        if(!Auth::check())
+        if (! Auth::check()) {
             return $query;
+        }
 
         $user = auth($this->authorizedGuardName)->user();
 
-        if($user->isSuperAdmin() || $user->hasRole($this->allAuthorizedRoles))
+        if ($user->isSuperAdmin() || $user->hasRole($this->allAuthorizedRoles)) {
             return $query;
+        }
 
-        return $query->whereHas('authorized', function ($query) use($user) {
+        return $query->whereHas('authorized', function ($query) use ($user) {
 
             $query = $this->addAuthorizedQuery($query, $user);
 
-            $query =  $query->whereHas('user', function($query) use($user){
+            $query = $query->whereHas('user', function ($query) use ($user) {
                 $query = $query->where('id', $user->id);
 
-                if($user->hasRole($this->authorizedUserRoles)){
+                if ($user->hasRole($this->authorizedUserRoles)) {
                     $query = $query->orWhere('company_id', $user->company_id);
                 }
 

@@ -1,12 +1,13 @@
 <?php
+
 namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Nwidart\Modules\Support\Stub;
 
-trait ReplacementTrait {
-
+trait ReplacementTrait
+{
     use ManageNames;
 
     protected $name;
@@ -26,13 +27,12 @@ trait ReplacementTrait {
     /**
      * Get the contents of the specified stub file by given stub name.
      *
-     * @param $stub
      *
      * @return string
      */
     protected function getStubContents($stub)
     {
-        return (new Stub('/' . $stub . '.stub',$this->getReplacement($stub)))
+        return (new Stub('/' . $stub . '.stub', $this->getReplacement($stub)))
             ->render();
     }
 
@@ -47,7 +47,6 @@ trait ReplacementTrait {
     /**
      * Get array replacement for the specified stub.
      *
-     * @param $stub
      *
      * @return array
      */
@@ -55,7 +54,7 @@ trait ReplacementTrait {
     {
         $replacements = $this->getReplacements();
 
-        if (!isset($replacements[$stub])) {
+        if (! isset($replacements[$stub])) {
             return [];
         }
 
@@ -76,7 +75,7 @@ trait ReplacementTrait {
         $replaces = [];
 
         foreach ($keys as $key) {
-            if (method_exists($this, $method = 'get' . ucfirst(Str::studly(strtolower($key))) . 'Replacement')) {
+            if (method_exists($this, $method = 'get' . ucfirst(Str::studly(mb_strtolower($key))) . 'Replacement')) {
                 $replaces[$key] = $this->$method();
             } else {
                 $replaces[$key] = null;
@@ -97,7 +96,7 @@ trait ReplacementTrait {
             '/\$CAMEL_CASE\$/' => $this->getCamelCase($this->getName()),
         ];
 
-        return preg_replace( array_keys($patterns), array_values($patterns), $string);
+        return preg_replace(array_keys($patterns), array_values($patterns), $string);
 
     }
 

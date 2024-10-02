@@ -3,7 +3,6 @@
 namespace Unusualify\Modularity\Console;
 
 use Nwidart\Modules\Support\Stub;
-use Symfony\Component\Console\Input\InputOption;
 
 class AddComposerScriptsCommand extends BaseCommand
 {
@@ -21,9 +20,9 @@ class AddComposerScriptsCommand extends BaseCommand
      *
      * @var string
      */
-    protected $description = "Add modularity composer scripts to composer-dev.json";
+    protected $description = 'Add modularity composer scripts to composer-dev.json';
 
-    protected $aliases= [
+    protected $aliases = [
         'modularity:composer:scripts',
     ];
 
@@ -32,7 +31,7 @@ class AddComposerScriptsCommand extends BaseCommand
      *
      * @return mixed
      */
-    public function handle() :int
+    public function handle(): int
     {
         $composerPath = base_path('composer-dev.json');
 
@@ -43,9 +42,9 @@ class AddComposerScriptsCommand extends BaseCommand
 
         $composer['scripts'] = array_merge($composer['scripts'], $scripts);
 
-        if( $this->laravel['files']->put($composerPath, collect($composer)->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ){
+        if ($this->laravel['files']->put($composerPath, collect($composer)->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))) {
             $this->info("Modularity composer scripts were updated on {$composerPath} file...\n");
-        };
+        }
 
         return 0;
     }

@@ -12,12 +12,11 @@ return new class extends Migration
             // this will create an id, name field
             createDefaultTableFields($table);
             $table->string('name');
-			$table->string('title');
+            $table->string('title');
 
             // a "published" column, and soft delete and timestamps columns
             createDefaultExtraTableFields($table);
         });
-
 
     }
 

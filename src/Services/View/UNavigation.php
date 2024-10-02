@@ -18,7 +18,7 @@ class UNavigation
         'default',
         'superadmin',
         'client',
-        'guest'
+        'guest',
     ];
 
     /**
@@ -46,23 +46,25 @@ class UNavigation
     public function sidebarMenuItem($array)
     {
         $is_active = 0;
-        if(isset($array['items']))
-            $array['items'] = array_map(function($item){
+        if (isset($array['items'])) {
+            $array['items'] = array_map(function ($item) {
                 return $this->sidebarMenuItem($item);
             }, $array['items']);
-        if(isset($array['menuItems']))
-            $array['menuItems'] = array_map(function($item){
+        }
+        if (isset($array['menuItems'])) {
+            $array['menuItems'] = array_map(function ($item) {
                 return $this->sidebarMenuItem($item);
             }, $array['menuItems']);
+        }
 
-        if(isset($array['route_name'])){
+        if (isset($array['route_name'])) {
             $routeName = Route::hasAdmin($array['route_name']);
-            if($routeName){
+            if ($routeName) {
                 $array['route'] = route($routeName);
-                if($array['route'] == $this->request->url()){
+                if ($array['route'] == $this->request->url()) {
                     $is_active = 1;
                 }
-            }else{
+            } else {
                 return false;
             }
         }
@@ -70,7 +72,7 @@ class UNavigation
 
         return array_merge_recursive_preserve([
             'is_active' => $is_active,
-            'icon' => ''
+            'icon' => '',
         ], $array);
     }
 
@@ -78,7 +80,7 @@ class UNavigation
     {
         $arrays = [];
 
-        foreach ( $modules as $moduleName => $module) {
+        foreach ($modules as $moduleName => $module) {
             // $pr => parent route
             // $sr => sub route
 
@@ -86,44 +88,43 @@ class UNavigation
             $config = $module->getConfig();
             $pr_name = $module->getSnakeName();
 
-            $pr = $module->getParentRoute()?:[
+            $pr = $module->getParentRoute() ?: [
                 'url' => pluralize(kebabCase($name)),
-                'route_name' => snakeCase($name)
+                'route_name' => snakeCase($name),
             ]; //  parent_route array|object
 
             // if( !array_key_exists('url', $pr) && !array_key_exists('route_name', $pr) ){
             //     $pr['url'] = pluralize(kebabCase($config['name']));
             //     $pr['route_name'] = snakeCase($config['name']);
             // }
-            $routes =$module->getRouteConfigs(valid: true);
+            $routes = $module->getRouteConfigs(valid: true);
             $number_route = count($routes);
 
             $array = [];
-            if($number_route > 0){
+            if ($number_route > 0) {
                 $array = [
                     'name' => $config['headline'] ?? pluralize(headline($name)),
                     'icon' => $config['icon'] ?? '',
                 ];
             }
 
-            $route_prefix = adminRouteNamePrefix() ? adminRouteNamePrefix() . '.' :  '';
+            $route_prefix = adminRouteNamePrefix() ? adminRouteNamePrefix() . '.' : '';
 
             $route_prefix .= $module->hasSystemPrefix()
                 ? systemRouteNamePrefix() . '.'
                 : '';
 
-            foreach( $routes as $item){
+            foreach ($routes as $item) {
 
                 // if(!isset($item['name']) ){
                 //     continue;
                 // }
 
-
                 // $sr sub route array|object
-                $route_name = ($item['route_name'] ?? snakeCase($item['name']))  . ".index";
+                $route_name = ($item['route_name'] ?? snakeCase($item['name'])) . '.index';
                 // dd($route_name);
 
-                if( !(isset($item['parent']) && $item['parent']) ){
+                if (! (isset($item['parent']) && $item['parent'])) {
                     try {
                         $route_name = $pr_name . '.' . $route_name;
                     } catch (\Throwable $th) {
@@ -137,35 +138,32 @@ class UNavigation
 
                 $route_name = $route_prefix . $route_name;
 
-                if( isset($item['parent']) && $item['parent'] ){
+                if (isset($item['parent']) && $item['parent']) {
                     // only one link for module
-                    if($number_route < 2 && Route::has($route_name)){
+                    if ($number_route < 2 && Route::has($route_name)) {
                         $array['route_name'] = $route_name;
-                    }else{
+                    } else {
 
                         $array['items'][$this->getSnakeCase($item['name'])] = [
                             'name' => $item['headline'] ?? pluralize(headline($item['name'])),
                             'icon' => $item['icon'] ?? '',
-                            'route_name' => $route_name
+                            'route_name' => $route_name,
                         ];
                     }
-                }else{
+                } else {
                     $array['items'][$this->getSnakeCase($item['name'])] = [
                         'name' => $item['headline'] ?? pluralize($item['name']),
                         'icon' => $item['icon'] ?? '',
-                        'route_name' => $route_name
+                        'route_name' => $route_name,
                     ];
                 }
             }
 
-            if(count($array) > 0 ){
+            if (count($array) > 0) {
                 $arrays[$module->getSnakeName()] = $array;
             }
 
         }
-
-
-
 
         return $arrays;
 
@@ -175,7 +173,7 @@ class UNavigation
     {
         // types default superadmin client
         foreach ($this->types as $type) {
-            if(isset($array[$type])){
+            if (isset($array[$type])) {
                 $this->formatSidebarMenu($array[$type]);
                 $this->setActiveSidebarItems($array[$type]);
             }
@@ -190,13 +188,13 @@ class UNavigation
 
         foreach ($array as $key => $item) {
             // this checking is important for not mischoosing keys of array and sidebar array configuration
-            if(array_key_exists('name', $item) && is_string($item['name']) ){
-                if(($res = $this->sidebarMenuItem($item))){
+            if (array_key_exists('name', $item) && is_string($item['name'])) {
+                if (($res = $this->sidebarMenuItem($item))) {
                     $array[$key] = $res;
-                }else{
+                } else {
                     unset($array[$key]);
                 }
-            }else{
+            } else {
                 $this->formatSidebarMenu($item);
             }
         }
@@ -206,12 +204,12 @@ class UNavigation
 
     public function unsetMenuKeys(&$array)
     {
-        if(is_array($array) && !array_key_exists('name', $array) ){
+        if (is_array($array) && ! array_key_exists('name', $array)) {
             $array = array_values($array);
-            foreach($array as $key => $conf){
+            foreach ($array as $key => $conf) {
                 $array[$key] = $this->unsetMenuKeys($conf);
             }
-        }else if(is_array($array) && array_key_exists('name', $array) && array_key_exists('items', $array)){
+        } elseif (is_array($array) && array_key_exists('name', $array) && array_key_exists('items', $array)) {
             $this->unsetMenuKeys($array['items']);
         }
 
@@ -221,24 +219,25 @@ class UNavigation
     public function setActiveSidebarItems(&$items)
     {
         foreach ($items as $key => &$item) {
-            if(isset($item['route']) && $this->request->url() == $item['route']){
+            if (isset($item['route']) && $this->request->url() == $item['route']) {
                 $item['is_active'] = 1;
+
                 return true;
-            }else if(isset($item['items'])){
-                if( $this->setActiveSidebarItems($item['items'])){
+            } elseif (isset($item['items'])) {
+                if ($this->setActiveSidebarItems($item['items'])) {
                     $item['is_active'] = 1;
+
                     return true;
                 }
-            }else if(isset($item['menuItems'])){
-                if( $this->setActiveSidebarItems($item['menuItems'])){
+            } elseif (isset($item['menuItems'])) {
+                if ($this->setActiveSidebarItems($item['menuItems'])) {
                     $item['is_active'] = 1;
+
                     return true;
                 }
             }
-        };
+        }
 
         return false;
     }
-
-
 }

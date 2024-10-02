@@ -9,35 +9,26 @@ use Modules\SystemPricing\Repositories\PriceTypeRepository;
 
 class PriceTypeController extends Controller
 {
-
     /**
      * This resource repository
      */
     private $repository;
 
-
-    /**
-     * @param PriceTypeRepository $repository
-     */
     public function __construct(PriceTypeRepository $repository)
     {
         $this->repository = $repository;
     }
 
-
     /**
      * Display a listing of the resource.
+     *
      * @return Renderable
      */
-    public function index(Request $request)
-    {
-
-    }
-
+    public function index(Request $request) {}
 
     /**
      * Store a newly created resource in storage.
-     * @param Request $request
+     *
      * @return Renderable
      */
     public function store(Request $request)
@@ -45,21 +36,17 @@ class PriceTypeController extends Controller
         //
     }
 
-
     /**
      * Show the specified resource.
+     *
      * @param int $id
      * @return Renderable
      */
-    public function show($id)
-    {
-
-    }
-
+    public function show($id) {}
 
     /**
      * Update the specified resource in storage.
-     * @param Request $request
+     *
      * @param int $id
      * @return Renderable
      */
@@ -70,6 +57,7 @@ class PriceTypeController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
      * @param int $id
      * @return Renderable
      */

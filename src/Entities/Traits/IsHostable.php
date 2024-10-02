@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 trait IsHostable
 {
-    use HasSlug, HasScopes, ModelHelpers;
+    use HasScopes, HasSlug, ModelHelpers;
 
     protected $hostableColumn = 'url';
 
@@ -24,9 +24,9 @@ trait IsHostable
     {
         foreach ($this->definedRelations('BelongsTo') as $key => $relationship) {
             $relatedModel = $this->{$relationship}()->getRelated();
-            if(in_array(__TRAIT__, class_uses_recursive($relatedModel))){
+            if (in_array(__TRAIT__, class_uses_recursive($relatedModel))) {
                 $relatedModelHostableColumn = $relatedModel->getHostableColumn();
-                $query = $query->whereHas($relationship, function($query) use($relatedModelHostableColumn){
+                $query = $query->whereHas($relationship, function ($query) use ($relatedModelHostableColumn) {
                     $query->whereNull($relatedModelHostableColumn);
                 });
             }
@@ -47,17 +47,17 @@ trait IsHostable
 
     public static function hostableRouteBindingParameterFormat($name)
     {
-        return "{". Str::snake($name) . "}";
+        return '{' . Str::snake($name) . '}';
     }
 
     public function hostableChildRouteParameters()
     {
-        return array_map(fn($ch) => self::hostableRouteBindingParameterFormat(get_class_short_name($ch)), $this->hostableChilds());
+        return array_map(fn ($ch) => self::hostableRouteBindingParameterFormat(get_class_short_name($ch)), $this->hostableChilds());
     }
 
     public function hostableRouteArguments()
     {
-        return array_reduce(array_merge($this->hostableParentRecords(), [$this]), function($carry, $model){
+        return array_reduce(array_merge($this->hostableParentRecords(), [$this]), function ($carry, $model) {
 
             $carry[Str::snake(get_class_short_name($model))] = $model->getSlug();
 
@@ -72,7 +72,7 @@ trait IsHostable
 
         foreach ($this->definedRelations('BelongsTo') as $key => $relationship) {
             $relatedModel = $this->{$relationship}()->getRelated();
-            if(in_array(__TRAIT__, class_uses_recursive($relatedModel))){
+            if (in_array(__TRAIT__, class_uses_recursive($relatedModel))) {
                 $parents[] = $relatedModel;
             }
         }
@@ -86,8 +86,8 @@ trait IsHostable
 
         foreach ($this->definedRelations('BelongsTo') as $key => $relationship) {
             $relatedModel = $this->{$relationship}()->getRelated();
-            if(in_array(__TRAIT__, class_uses_recursive($relatedModel))){
-                $parents[] =  $this->{$relationship};
+            if (in_array(__TRAIT__, class_uses_recursive($relatedModel))) {
+                $parents[] = $this->{$relationship};
             }
         }
 
@@ -100,12 +100,11 @@ trait IsHostable
 
         foreach ($this->definedRelations('HasMany') as $key => $relationship) {
             $relatedModel = $this->{$relationship}()->getRelated();
-            if(in_array(__TRAIT__, class_uses_recursive($relatedModel))){
+            if (in_array(__TRAIT__, class_uses_recursive($relatedModel))) {
                 $childs[] = $relatedModel;
             }
         }
 
         return $childs;
     }
-
 }

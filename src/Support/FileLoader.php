@@ -2,18 +2,14 @@
 
 namespace Unusualify\Modularity\Support;
 
-use Illuminate\Translation\FileLoader as LaravelFileLoader;
 use Illuminate\Filesystem\Filesystem;
-use Unusualify\Modularity\Facades\Modularity;
+use Illuminate\Translation\FileLoader as LaravelFileLoader;
 
 class FileLoader extends LaravelFileLoader
 {
-
     /**
      * Create a new file loader instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  array|string  $path
      * @return void
      */
     public function __construct(Filesystem $files, array|string $path)
@@ -21,20 +17,21 @@ class FileLoader extends LaravelFileLoader
         parent::__construct($files, $path);
     }
 
-    public function getPaths() :array
+    public function getPaths(): array
     {
         return $this->paths;
     }
 
-    public function getGroups() :array
+    public function getGroups(): array
     {
         $groups = [];
 
         foreach ($this->getPaths() as $dir) {
             foreach (glob($dir . '/**/*.php') as $path) {
                 $group = basename($path, '.php');
-                if(!in_array($group, $groups))
+                if (! in_array($group, $groups)) {
                     $groups[] = $group;
+                }
             }
         }
 

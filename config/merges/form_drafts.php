@@ -7,7 +7,7 @@ return [
             'col' => [
                 'sm' => 6,
             ],
-            'rules' => 'min:3|unique_table'
+            'rules' => 'min:3|unique_table',
         ],
         'surname' => [
             'type' => '_name',
@@ -16,7 +16,7 @@ return [
             'col' => [
                 'sm' => 6,
             ],
-            'rules' => 'min:2'
+            'rules' => 'min:2',
         ],
         'job_title' => [
             'type' => '_name',
@@ -25,7 +25,7 @@ return [
             'col' => [
                 'sm' => 6,
             ],
-            'rules' => 'min:2'
+            'rules' => 'min:2',
         ],
         'email' => [
             'type' => '_email',
@@ -47,13 +47,13 @@ return [
             'col' => [
                 'sm' => 6,
             ],
-            'rules' => 'min:3'
+            'rules' => 'min:3',
         ],
         'language' => [
             'type' => '_language',
             'name' => 'language',
             'label' => 'Preferred Language',
-            'col' => [ 'sm' => 6]
+            'col' => ['sm' => 6],
         ],
         'timezone' => [
             'type' => '_timezone',
@@ -69,7 +69,7 @@ return [
             'name' => 'current_password',
             'label' => 'Current Password',
             'default' => '',
-            'col' => [ 'sm' => 6],
+            'col' => ['sm' => 6],
             'rules' => 'sometimes|required|current_password',
         ],
         'gap-1' => [
@@ -80,29 +80,29 @@ return [
                 'cols' => 0,
                 'sm' => 6,
                 'class' => 'd-none d-sm-block',
-            ]
+            ],
         ],
         'password_confirmation' => [
             'type' => '_password',
             'name' => 'password_confirmation',
             'label' => 'New Password',
-            'col' => [ 'sm' => 6],
-            'rules' => 'sometimes|min:6'
+            'col' => ['sm' => 6],
+            'rules' => 'sometimes|min:6',
         ],
         'password' => [
             'type' => '_password',
             'name' => 'password',
             'label' => 'Confirm Password',
-            'col' => [ 'sm' => 6],
-            'rules' => 'sometimes|min:6|confirmed'
+            'col' => ['sm' => 6],
+            'rules' => 'sometimes|min:6|confirmed',
         ],
     ],
     'company' => [
         'name' => [
             'type' => '_name',
             'label' => 'Company',
-            'col' => [ 'sm' => 6],
-            'rules' => 'sometimes|min:3'
+            'col' => ['sm' => 6],
+            'rules' => 'sometimes|min:3',
         ],
         'address' => [
             'type' => 'text',
@@ -118,52 +118,52 @@ return [
             'name' => 'city',
             'label' => 'City',
             'default' => '',
-            'col' => [ 'sm' => 6],
-            'rules' => 'sometimes|min:3'
+            'col' => ['sm' => 6],
+            'rules' => 'sometimes|min:3',
         ],
         'state' => [
             'type' => 'text',
             'name' => 'state',
             'label' => 'State/Province',
             'default' => '',
-            'col' => [ 'sm' => 6],
-            'rules' => 'sometimes|min:3'
+            'col' => ['sm' => 6],
+            'rules' => 'sometimes|min:3',
         ],
         'country' => [
             'type' => 'text',
             'name' => 'country',
             'label' => 'Country',
             'default' => '',
-            'col' => [ 'sm' => 6],
-            'rules' => 'sometimes|min:3'
+            'col' => ['sm' => 6],
+            'rules' => 'sometimes|min:3',
         ],
         'zip_code' => [
             'type' => 'text',
             'name' => 'zip_code',
             'label' => 'ZIP/Postal Code',
             'default' => '',
-            'col' => [ 'sm' => 6],
-            'rules' => 'sometimes|min:3'
+            'col' => ['sm' => 6],
+            'rules' => 'sometimes|min:3',
         ],
         'phone' => [
             'type' => '_phone',
-            'col' => [ 'sm' => 6],
+            'col' => ['sm' => 6],
         ],
         'vat_number' => [
             'type' => 'text',
             'name' => 'vat_number',
             'label' => 'VAT Number',
             'default' => '',
-            'col' => [ 'sm' => 6],
-            'rules' => 'sometimes|min:3'
+            'col' => ['sm' => 6],
+            'rules' => 'sometimes|min:3',
         ],
         'tax_id' => [
             'type' => 'text',
             'name' => 'tax_id',
             'label' => 'Tax ID',
             'default' => '',
-            'col' => [ 'sm' => 6],
-            'rules' => 'sometimes|min:3'
+            'col' => ['sm' => 6],
+            'rules' => 'sometimes|min:3',
         ],
-    ]
+    ],
 ];

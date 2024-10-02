@@ -2,10 +2,11 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Cache\FileStore;
+use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Cache;
+
 class CacheListCommand extends Command
 {
     /**
@@ -50,7 +51,6 @@ class CacheListCommand extends Command
      */
     protected $limit;
 
-
     public function __construct(Filesystem $files)
     {
         parent::__construct();
@@ -71,8 +71,9 @@ class CacheListCommand extends Command
     {
         $store = Cache::getStore();
 
-        if (!$store instanceof FileStore) {
+        if (! $store instanceof FileStore) {
             $this->error('This command only works with the file cache driver.');
+
             return;
         }
 
@@ -83,6 +84,7 @@ class CacheListCommand extends Command
 
         if (empty($this->rows)) {
             $this->info('The cache is empty or all items have expired.');
+
             return;
         }
         $headers = ['Key', 'Expiration', 'Value'];
@@ -104,7 +106,9 @@ class CacheListCommand extends Command
         }
 
         foreach ($this->files->files($directory) as $file) {
-            if (count($this->rows) >= $this->limit) return;
+            if (count($this->rows) >= $this->limit) {
+                return;
+            }
 
             $this->processFile($file);
             // if ($file->getExtension() === 'cache') {
@@ -123,14 +127,14 @@ class CacheListCommand extends Command
     {
         $key = str_replace('.cache', '', $file->getFilename());
         $contents = $this->files->get($file->getPathname());
-        $expire = substr($contents, 0, 10);
-        $value = unserialize(substr($contents, 10));
+        $expire = mb_substr($contents, 0, 10);
+        $value = unserialize(mb_substr($contents, 10));
 
         if ($expire == 9999999999 || $expire > time()) {
             $this->rows[] = [
                 $key,
                 date('Y-m-d H:i:s', $expire),
-                json_encode($value, JSON_PRETTY_PRINT)
+                json_encode($value, JSON_PRETTY_PRINT),
             ];
         }
     }

@@ -1,9 +1,9 @@
 <?php
 
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Migrations\Migration;
 use Spatie\Permission\PermissionRegistrar;
 
 class AddTeamsFields extends Migration
@@ -99,16 +99,16 @@ class AddTeamsFields extends Migration
             return;
         }
 
-        if ( Schema::hasColumn($tableNames['roles'], $columnNames['team_foreign_key'])) {
+        if (Schema::hasColumn($tableNames['roles'], $columnNames['team_foreign_key'])) {
             Schema::table($tableNames['roles'], function (Blueprint $table) use ($columnNames) {
                 $table->dropIndex(['team_foreign_key']);
-                $table->dropUnique('roles_' . $columnNames['team_foreign_key'] .'_name_guard_name_unique');
+                $table->dropUnique('roles_' . $columnNames['team_foreign_key'] . '_name_guard_name_unique');
                 $table->unique(['name', 'guard_name']);
                 $table->dropColumn($columnNames['team_foreign_key']);
             });
         }
 
-        if ( Schema::hasColumn($tableNames['model_has_permissions'], $columnNames['team_foreign_key'])) {
+        if (Schema::hasColumn($tableNames['model_has_permissions'], $columnNames['team_foreign_key'])) {
             Schema::table($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames) {
                 $table->dropIndex(['team_foreign_key']);
 
@@ -129,7 +129,7 @@ class AddTeamsFields extends Migration
             });
         }
 
-        if ( Schema::hasColumn($tableNames['model_has_roles'], $columnNames['team_foreign_key'])) {
+        if (Schema::hasColumn($tableNames['model_has_roles'], $columnNames['team_foreign_key'])) {
             Schema::table($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames) {
                 $table->dropIndex(['team_foreign_key']);
 

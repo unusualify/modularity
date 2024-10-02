@@ -2,9 +2,6 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
-use Unusualify\Modularity\Http\Requests\Admin\OauthRequest;
-use Unusualify\Modularity\Entities\User;
-use Modules\SystemUser\Repositories\UserRepository;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Encryption\Encrypter;
@@ -14,13 +11,15 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Factory as ViewFactory;
-use Unusualify\Modularity\Traits\ManageUtilities;
+use Modules\SystemUser\Repositories\UserRepository;
 use PragmaRX\Google2FA\Google2FA;
 use Socialite;
+use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Http\Requests\Admin\OauthRequest;
 use Unusualify\Modularity\Services\MessageStage;
+use Unusualify\Modularity\Traits\ManageUtilities;
 
 class LoginController extends Controller
 {
@@ -99,7 +98,6 @@ class LoginController extends Controller
     /**
      * Handle a login request to the application.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -134,13 +132,13 @@ class LoginController extends Controller
             }
 
             return $request->wantsJson()
-                ?   new JsonResponse([
-                        'variant' => MessageStage::SUCCESS,
-                        'timeout' => 6000,
-                        'message' => __('authentication.login-success-message'),
-                        'redirector' => $this->redirectPath()
-                    ], 200)
-                :   $this->sendLoginResponse($request);
+                ? new JsonResponse([
+                    'variant' => MessageStage::SUCCESS,
+                    'timeout' => 6000,
+                    'message' => __('authentication.login-success-message'),
+                    'redirector' => $this->redirectPath(),
+                ], 200)
+                : $this->sendLoginResponse($request);
 
             // return $this->sendLoginResponse($request);
         }
@@ -150,14 +148,13 @@ class LoginController extends Controller
         // user surpasses their maximum number of attempts they will get locked out.
         $this->incrementLoginAttempts($request);
 
-
         return $request->wantsJson()
-            ?   new JsonResponse([
-                    $this->username() => [trans('auth.failed')],
-                    'message' => __('auth.failed'),
-                    'variant' =>  MessageStage::WARNING
-                ])
-            :   $this->sendFailedLoginResponse($request);
+            ? new JsonResponse([
+                $this->username() => [trans('auth.failed')],
+                'message' => __('auth.failed'),
+                'variant' => MessageStage::WARNING,
+            ])
+            : $this->sendFailedLoginResponse($request);
     }
 
     /**
@@ -165,38 +162,38 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-        return $this->viewFactory->make(unusualBaseKey().'::auth.login', [
+        return $this->viewFactory->make(unusualBaseKey() . '::auth.login', [
             'formAttributes' => [
                 // 'hasSubmit' => true,
 
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
                 'schema' => ($schema = $this->createFormSchema([
                     'email' => [
-                        "type" => "text",
-                        "name" => "email",
-                        "label" => ___('authentication.email'),
+                        'type' => 'text',
+                        'name' => 'email',
+                        'label' => ___('authentication.email'),
                         'hint' => 'enter @example.com',
-                        "default" => "",
+                        'default' => '',
                         'col' => [
-                            'lg' => 12
+                            'lg' => 12,
                         ],
                         'rules' => [
-                            ['email']
-                        ]
+                            ['email'],
+                        ],
                     ],
                     'password' => [
-                        "type" => "password",
-                        "name" => "password",
-                        "label" => ___('authentication.password'),
-                        "default" => "",
-                        "appendInnerIcon" => '$non-visibility',
-                        "slotHandlers" => [
+                        'type' => 'password',
+                        'name' => 'password',
+                        'label' => ___('authentication.password'),
+                        'default' => '',
+                        'appendInnerIcon' => '$non-visibility',
+                        'slotHandlers' => [
                             'appendInner' => 'password',
                         ],
                         'col' => [
-                            'lg' => 12
-                        ]
-                    ]
+                            'lg' => 12,
+                        ],
+                    ],
                 ])),
 
                 'actionUrl' => route(Route::hasAdmin('login')),
@@ -217,7 +214,7 @@ class LoginController extends Controller
                                 'variant' => 'text',
                                 'href' => '',
                                 'class' => 'v-col-5',
-                            ]
+                            ],
                         ],
                         [
                             'tag' => 'v-btn',
@@ -226,12 +223,12 @@ class LoginController extends Controller
                                 'variant' => 'elevated',
                                 'href' => '',
                                 'class' => 'v-col-5',
-                                'type' => 'submit'
+                                'type' => 'submit',
 
-                            ]
-                        ]
-                    ]
-                ]
+                            ],
+                        ],
+                    ],
+                ],
             ],
             'slots' => [
                 'bottom' => [
@@ -241,9 +238,9 @@ class LoginController extends Controller
                     ],
                     'elements' => [
                         [
-                            "tag" => "v-btn",
+                            'tag' => 'v-btn',
                             'elements' => ___('authentication.sign-in-google'),
-                            "attributes" => [
+                            'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
@@ -255,14 +252,14 @@ class LoginController extends Controller
                                         'symbol' => 'google',
                                         'width' => '25',
                                         'height' => '25',
-                                    ]
-                                ]
-                            ]
+                                    ],
+                                ],
+                            ],
                         ],
                         [
-                            "tag" => "v-btn",
+                            'tag' => 'v-btn',
                             'elements' => ___('authentication.sign-in-apple'),
-                            "attributes" => [
+                            'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
@@ -274,14 +271,14 @@ class LoginController extends Controller
                                         'symbol' => 'apple',
                                         'width' => '25',
                                         'height' => '25',
-                                    ]
-                                ]
-                            ]
+                                    ],
+                                ],
+                            ],
                         ],
                         [
-                            "tag" => "v-btn",
+                            'tag' => 'v-btn',
                             'elements' => ___('authentication.create-an-account'),
-                            "attributes" => [
+                            'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
@@ -289,10 +286,10 @@ class LoginController extends Controller
 
                         ],
 
-                    ]
+                    ],
 
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
@@ -301,11 +298,10 @@ class LoginController extends Controller
      */
     public function showLogin2FaForm()
     {
-        return $this->viewFactory->make(unusualBaseKey().'::auth.2fa');
+        return $this->viewFactory->make(unusualBaseKey() . '::auth.2fa');
     }
 
     /**
-     * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function logout(Request $request)
@@ -320,7 +316,6 @@ class LoginController extends Controller
     }
 
     /**
-     * @param Request $request
      * @param \Illuminate\Foundation\Auth\User $user
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -338,26 +333,26 @@ class LoginController extends Controller
             $request->session()->put('2fa:user:id', $user->id);
 
             return $request->wantsJson()
-                ?   new JsonResponse([
-                        'redirector' => $this->redirector->to(route(Route::hasAdmin('admin.login-2fa.form')))->getTargetUrl(),
-                    ])
-                :   $this->redirector->to(route(Route::hasAdmin('admin.login-2fa.form')));
+                ? new JsonResponse([
+                    'redirector' => $this->redirector->to(route(Route::hasAdmin('admin.login-2fa.form')))->getTargetUrl(),
+                ])
+                : $this->redirector->to(route(Route::hasAdmin('admin.login-2fa.form')));
         }
 
         return $request->wantsJson()
-            ?   new JsonResponse([
-                    'variant' => MessageStage::SUCCESS,
-                    'timeout' => 1500,
-                    'message' => __('authentication.login-success-message'),
-                    // 'redirector' => $this->redirectPath()
-                    'redirector' => $this->redirector->intended($this->redirectPath())->getTargetUrl(),
-                ])
-            :   $this->redirector->intended($this->redirectPath());
+            ? new JsonResponse([
+                'variant' => MessageStage::SUCCESS,
+                'timeout' => 1500,
+                'message' => __('authentication.login-success-message'),
+                // 'redirector' => $this->redirectPath()
+                'redirector' => $this->redirector->intended($this->redirectPath())->getTargetUrl(),
+            ])
+            : $this->redirector->intended($this->redirectPath());
     }
 
     /**
-     * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
+     *
      * @throws \PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException
      * @throws \PragmaRX\Google2FA\Exceptions\InvalidCharactersException
      * @throws \PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException
@@ -417,6 +412,7 @@ class LoginController extends Controller
 
                 // Login and redirect
                 $this->authManager->guard('unusual_users')->login($user);
+
                 return $this->afterAuthentication($request, $user);
             } else {
                 if ($user->password) {
@@ -426,12 +422,14 @@ class LoginController extends Controller
                     $request->session()->put('oauth:user_id', $user->id);
                     $request->session()->put('oauth:user', $oauthUser);
                     $request->session()->put('oauth:provider', $provider);
+
                     return $this->redirector->to(route(Route::hasAdmin('admin.login.oauth.showPasswordForm')));
                 } else {
                     $user->linkProvider($oauthUser, $provider);
 
                     // Login and redirect
                     $this->authManager->guard('unusual_users')->login($user);
+
                     return $this->afterAuthentication($request, $user);
                 }
             }
@@ -442,6 +440,7 @@ class LoginController extends Controller
 
             // Login and redirect
             $this->authManager->guard('unusual_users')->login($user);
+
             return $this->redirector->intended($this->redirectTo);
         }
     }

@@ -4,8 +4,8 @@ namespace Unusualify\Modularity\Console;
 
 use Illuminate\Console\Command;
 use Nwidart\Modules\Module;
-use Unusualify\Modularity\Facades\Modularity;
 use Symfony\Component\Console\Input\InputArgument;
+use Unusualify\Modularity\Facades\Modularity;
 
 class EnableCommand extends Command
 {
@@ -26,7 +26,7 @@ class EnableCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle() : int
+    public function handle(): int
     {
 
         /** @var Module $module */

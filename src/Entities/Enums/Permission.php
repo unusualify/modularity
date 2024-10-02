@@ -2,10 +2,8 @@
 
 namespace Unusualify\Modularity\Entities\Enums;
 
-use Exception;
-use ReflectionEnum;
-
-enum Permission:string {
+enum Permission: string
+{
     //case DASHBOARD = 'dashboard';
     case CREATE = 'create';
     case VIEW = 'view';
@@ -22,14 +20,12 @@ enum Permission:string {
 
     public static function get($caseName)
     {
-        foreach(self::cases() as $case) {
-            if($case->name == $caseName)
+        foreach (self::cases() as $case) {
+            if ($case->name == $caseName) {
                 return $case->value;
+            }
         }
 
         return null;
     }
-
 }
-
-

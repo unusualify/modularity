@@ -2,22 +2,25 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Str;
 
-if (!function_exists('unusualTrans')) {
+if (! function_exists('unusualTrans')) {
     function unusualTrans($key, $replace = [])
     {
         $locale = unusualConfig('locale', unusualConfig('fallback_locale', 'en'));
+
         return trans($key, $replace, $locale);
     }
 }
 
-if(!function_exists('___')) {
+if (! function_exists('___')) {
     function ___($key = null, $replace = [], $locale = null)
     {
         // Default behavior
-        if (is_null($key)) return $key;
+        if (is_null($key)) {
+            return $key;
+        }
 
         // dd(
         //     $key,
@@ -35,28 +38,32 @@ if(!function_exists('___')) {
         // Search in .json file
         $search = Arr::get(trans()->get('*'), $key);
 
-        if ($search !== null)
+        if ($search !== null) {
             return trans_replacements($search, $replace);
+        }
 
-        if (trans()->has($key))
+        if (trans()->has($key)) {
             return trans($key, $replace, $locale);
+        }
 
         // Return .json fallback
         $fallback = Arr::get(trans()->get('*', [], config('app.fallback_locale')), $key);
-        if ($fallback !== null)
+        if ($fallback !== null) {
             return trans_replacements($fallback, $replace);
+        }
         // Return key name if not found
-        else
+        else {
             return $key;
+        }
     }
 }
-if(!function_exists('hasUnusualTrans')) {
+if (! function_exists('hasUnusualTrans')) {
     /**
      * Determine if a translation exists.
      *
-     * @param  string  $key
-     * @param  string|null  $locale
-     * @param  bool  $fallback
+     * @param string $key
+     * @param string|null $locale
+     * @param bool $fallback
      * @return bool
      */
     function hasUnusualTrans($key, $locale = null, $fallback = true)
@@ -79,19 +86,21 @@ if(!function_exists('hasUnusualTrans')) {
         return $line !== $key;
     }
 }
-if(!function_exists('trans_replacements')) {
+if (! function_exists('trans_replacements')) {
     function trans_replacements($line, array $replace)
     {
-        if (empty($replace)) return $line;
+        if (empty($replace)) {
+            return $line;
+        }
 
         $shouldReplace = [];
         foreach ($replace as $key => $value) {
-            $shouldReplace[':'.Str::ucfirst($key)] = Str::ucfirst($value);
-            $shouldReplace[':'.Str::upper($key)] = Str::upper($value);
-            $shouldReplace[':'.$key] = $value;
-            $shouldReplace['{'.Str::ucfirst($key).'}'] = Str::ucfirst($value);
-            $shouldReplace['{'.Str::upper($key).'}'] = Str::upper($value);
-            $shouldReplace['{'.$key.'}'] = $value;
+            $shouldReplace[':' . Str::ucfirst($key)] = Str::ucfirst($value);
+            $shouldReplace[':' . Str::upper($key)] = Str::upper($value);
+            $shouldReplace[':' . $key] = $value;
+            $shouldReplace['{' . Str::ucfirst($key) . '}'] = Str::ucfirst($value);
+            $shouldReplace['{' . Str::upper($key) . '}'] = Str::upper($value);
+            $shouldReplace['{' . $key . '}'] = $value;
         }
 
         return strtr($line, $shouldReplace);
@@ -116,7 +125,7 @@ if(!function_exists('trans_replacements')) {
 //     );
 // }
 
-if (!function_exists('getLabelFromLocale')) {
+if (! function_exists('getLabelFromLocale')) {
     /**
      * @param string $code
      * @return string
@@ -147,11 +156,12 @@ if (!function_exists('getLabelFromLocale')) {
 
             return $lang;
         }
+
         return $code;
     }
 }
 
-if (!function_exists('getCode2LanguageTexts')) {
+if (! function_exists('getCode2LanguageTexts')) {
     function getCode2LanguageTexts()
     {
         return [
@@ -309,7 +319,7 @@ if (!function_exists('getCode2LanguageTexts')) {
     }
 }
 
-if (!function_exists('getLanguagesForVueStore')) {
+if (! function_exists('getLanguagesForVueStore')) {
     /**
      * @param array $form_fields
      * @param bool $translate
@@ -321,7 +331,7 @@ if (!function_exists('getLanguagesForVueStore')) {
         if ($manageMultipleLanguages && $translate) {
             $allLanguages = Collection::make(getLocales())->map(function ($locale, $index) use ($form_fields) {
                 return [
-                    'shortlabel' => strtoupper($locale),
+                    'shortlabel' => mb_strtoupper($locale),
                     'label' => getLabelFromLocale($locale),
                     'value' => $locale,
                     'disabled' => false,
@@ -336,10 +346,11 @@ if (!function_exists('getLanguagesForVueStore')) {
         }
 
         $locale = config('app.locale');
+
         return [
             'all' => [
                 [
-                    'shortlabel' => strtoupper($locale),
+                    'shortlabel' => mb_strtoupper($locale),
                     'label' => getLabelFromLocale($locale),
                     'value' => $locale,
                     'disabled' => false,

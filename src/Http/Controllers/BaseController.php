@@ -17,7 +17,7 @@ use Unusualify\Modularity\Traits\ManageUtilities;
 
 abstract class BaseController extends PanelController
 {
-    use ManageUtilities, ManagePrevious;
+    use ManagePrevious, ManageUtilities;
 
     /**
      * @var string
@@ -41,9 +41,8 @@ abstract class BaseController extends PanelController
     public function __construct(
         Application $app,
         Request $request
-    )
-    {
-        parent::__construct($app,$request);
+    ) {
+        parent::__construct($app, $request);
 
         // $this->setMiddlewarePermission();
         $this->viewPrefix = $this->getViewPrefix();
@@ -72,7 +71,7 @@ abstract class BaseController extends PanelController
 
         $view = Collection::make([
             "$this->viewPrefix.index",
-            "$this->baseKey::" . $this->getSnakeCase($this->routeName) . ".index",
+            "$this->baseKey::" . $this->getSnakeCase($this->routeName) . '.index',
             "$this->baseKey::layouts.index",
             "$this->baseKey::layouts.index",
         ])->first(function ($view) {
@@ -163,7 +162,7 @@ abstract class BaseController extends PanelController
         }
 
         return $this->request->ajax()
-            ? $this->respondWithSuccess(___("save-success"))
+            ? $this->respondWithSuccess(___('save-success'))
             : $this->respondWithRedirect(moduleRoute($this->routeName,
                 $this->routePrefix,
                 'edit',
@@ -188,14 +187,11 @@ abstract class BaseController extends PanelController
             // $this->formWithCount
         );
 
-
-
         $data = array_merge(
             $item->attributesToArray(),
             $this->repository->getShowFields($item),
             // $this->repository->getFormFields($item, $this->formSchema),
         );
-
 
         // dd(
         //     $this->formSchema,
@@ -326,14 +322,14 @@ abstract class BaseController extends PanelController
 
             if ($this->routeHasTrait('revisions')) {
                 return Response::json([
-                    'message' => ___("save-success"),
+                    'message' => ___('save-success'),
                     'variant' => MessageStage::SUCCESS,
                     'revisions' => $item->revisionsArray(),
                 ]);
             }
 
             // if()
-            return $this->respondWithSuccess(___("save-success"));
+            return $this->respondWithSuccess(___('save-success'));
         }
     }
 
@@ -354,11 +350,11 @@ abstract class BaseController extends PanelController
             // $this->fireEvent();
             activity()->performedOn($item)->log('deleted');
 
-            return $this->respondWithSuccess(___("listing.delete.success", ['modelTitle' => $this->modelTitle]));
+            return $this->respondWithSuccess(___('listing.delete.success', ['modelTitle' => $this->modelTitle]));
             // return $this->respondWithSuccess(___("$this->baseKey::lang.listing.delete.success", ['modelTitle' => $this->modelTitle]));
         }
 
-        return $this->respondWithError(___("listing.delete.error", ['modelTitle' => $this->modelTitle]));
+        return $this->respondWithError(___('listing.delete.error', ['modelTitle' => $this->modelTitle]));
         // return $this->respondWithError(unusualTrans("$this->baseKey::lang.listing.delete.error", ['modelTitle' => $this->modelTitle]));
     }
 
@@ -393,9 +389,7 @@ abstract class BaseController extends PanelController
     }
 
     /**
-     *
-     *
-     * @param  Illuminate\Pagination\LengthAwarePaginator $paginator
+     * @param Illuminate\Pagination\LengthAwarePaginator $paginator
      * @return array
      */
     public function getFormattedIndexItems($paginator) // getIndexTableItems
@@ -404,7 +398,7 @@ abstract class BaseController extends PanelController
 
         $schema = $this->formSchema;
 
-        $paginator->getCollection()->transform(function ($item) use($translated, $schema) {
+        $paginator->getCollection()->transform(function ($item) use ($translated, $schema) {
 
             $columnsData = Collection::make($this->getIndexTableColumns())->mapWithKeys(function (&$column) use ($item) {
                 return $this->getItemColumnData($item, $column);
@@ -469,8 +463,7 @@ abstract class BaseController extends PanelController
                     //     'languages' => $item->getActiveLanguages(),
                     // ] : [])
 
-                )
-                , $this->indexItemData($item)
+                ), $this->indexItemData($item)
             );
         });
 
@@ -515,14 +508,14 @@ abstract class BaseController extends PanelController
             $module = Str::singular(last(explode('.', $this->moduleName)));
             $value = '<a href="';
             $value .= moduleRoute("$this->moduleName.$field", $this->routePrefix, 'index', [$module => $this->getItemIdentifier($item)]);
-            $value .= '">' . $nestedCount . ' ' . (strtolower(Str::plural($column['title'], $nestedCount))) . '</a>';
+            $value .= '">' . $nestedCount . ' ' . (mb_strtolower(Str::plural($column['title'], $nestedCount))) . '</a>';
         } else {
             $field = $column['key'];
             $value = $item->$field;
         }
 
         // for relationship fields
-        if(preg_match('/(.*)(_relation)/', $column['key'], $matches)){
+        if (preg_match('/(.*)(_relation)/', $column['key'], $matches)) {
             // $field = $column['key'];
             $relation = $item->{$matches[1]}();
             $itemTitle = $column['itemTitle'] ?? 'name';
@@ -537,13 +530,13 @@ abstract class BaseController extends PanelController
             }
         }
 
-        if(preg_match('/(.*)(_timestamp)/', $column['key'], $matches)){
+        if (preg_match('/(.*)(_timestamp)/', $column['key'], $matches)) {
             $value = $item->{$matches[1]};
         }
 
-        if(preg_match('/(.*)(_uuid)/', $column['key'], $matches)){
+        if (preg_match('/(.*)(_uuid)/', $column['key'], $matches)) {
             // $value = $item->{$matches[1]};
-            $value = substr($item->{$matches[1]}, 0, 6);
+            $value = mb_substr($item->{$matches[1]}, 0, 6);
             // $value = "<span>" . substr($item->{$matches[1]}, 0, 6) . "</span>";
         }
 
@@ -566,9 +559,9 @@ abstract class BaseController extends PanelController
                 ->join(', ');
         }
 
-        if(is_array($value)
+        if (is_array($value)
             && (isset($value['title']) || isset($value['name']))
-        ){
+        ) {
             $value = $value['title'] ?? $value['name'];
         }
 
@@ -677,7 +670,7 @@ abstract class BaseController extends PanelController
 
     protected function getViewPrefix(): ?string
     {
-        $module_prefix =  Str::snake( $this->moduleName );
+        $module_prefix = Str::snake($this->moduleName);
 
         $route_prefix = Str::snake($this->routeName);
 
@@ -744,16 +737,16 @@ abstract class BaseController extends PanelController
     {
         $value = null;
 
-        if(isset($columnsData[($newKey = $this->titleColumnKey . '_relation')])){
+        if (isset($columnsData[($newKey = $this->titleColumnKey . '_relation')])) {
             $this->titleColumnKey = $newKey;
             $value = $columnsData[$newKey];
-        } else if(isset($columnsData[($newKey = $this->titleColumnKey . '_timestamp')])){
+        } elseif (isset($columnsData[($newKey = $this->titleColumnKey . '_timestamp')])) {
             $this->titleColumnKey = $newKey;
             $value = $columnsData[$newKey];
-        } else if(isset($columnsData[($newKey = $this->titleColumnKey . '_uuid')])){
+        } elseif (isset($columnsData[($newKey = $this->titleColumnKey . '_uuid')])) {
             $this->titleColumnKey = $newKey;
             $value = $columnsData[$newKey];
-        } else{
+        } else {
             $newKey = array_keys($columnsData)[0];
             $this->titleColumnKey = $newKey;
             $value = $columnsData[$newKey];
@@ -762,9 +755,9 @@ abstract class BaseController extends PanelController
         return $value;
     }
 
-    public function bulkDelete(){
-        if($this->repository->bulkDelete(explode(',', $this->request->get('ids'))))
-        {
+    public function bulkDelete()
+    {
+        if ($this->repository->bulkDelete(explode(',', $this->request->get('ids')))) {
             return $this->respondWithSuccess(___('listing.bulk-delete.success', ['modelTitle' => $this->modelTitle]));
         }
 
@@ -774,8 +767,7 @@ abstract class BaseController extends PanelController
 
     public function bulkForceDelete()
     {
-        if($this->repository->bulkForceDelete(explode(',', $this->request->get('ids'))))
-        {
+        if ($this->repository->bulkForceDelete(explode(',', $this->request->get('ids')))) {
             return $this->respondWithSuccess(___('listing.bulk-force-delete.success', ['modelTitle' => $this->modelTitle]));
         }
 
@@ -784,21 +776,21 @@ abstract class BaseController extends PanelController
 
     public function bulkRestore()
     {
-        if($this->repository->bulkRestore(explode(',', $this->request->get('ids'))))
-        {
+        if ($this->repository->bulkRestore(explode(',', $this->request->get('ids')))) {
             return $this->respondWithSuccess(___('listing.bulk-restore.success', ['modelTitle' => $this->modelTitle]));
         }
+
         return $this->respondWithError(___('listing.bulk-restore.error', ['modelTitle' => $this->modelTitle]));
     }
 
     public function reorder()
     {
         $ids = is_array($this->request->get('ids')) ? $this->request->get('ids') : explode(',', $this->request->get('ids'));
-        if($this->repository->getModel()->setNewOrder($ids))
-        {
+        if ($this->repository->getModel()->setNewOrder($ids)) {
 
             return $this->respondWithSuccess(___('listing.reorder.success', ['modelTitle' => $this->modelTitle]));
         }
+
         return $this->respondWithError(___('listing.reorder.error', ['modelTitle' => $this->modelTitle]));
     }
 }

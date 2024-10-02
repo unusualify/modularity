@@ -38,7 +38,7 @@ trait ManagePrevious
      *
      * @return string Returns the previous route name or an empty string if not found.
      */
-    public function getPreviousRouteName() :string
+    public function getPreviousRouteName(): string
     {
         return $this->previousRoute?->getName() ?? '';
     }
@@ -48,7 +48,7 @@ trait ManagePrevious
      *
      * @return bool Returns true if the previous route is the same as the current class's route, otherwise false.
      */
-    public function isPreviousRouteSelf() :bool
+    public function isPreviousRouteSelf(): bool
     {
         return $this->previousRoute?->getControllerClass() == get_class($this);
     }
@@ -58,19 +58,19 @@ trait ManagePrevious
      *
      * @return array Returns the schema for the previous route or the chunked form schema if not found.
      */
-    protected function getPreviousRouteSchema() :array
+    protected function getPreviousRouteSchema(): array
     {
-        if($this->isPreviousRouteSelf()){
+        if ($this->isPreviousRouteSelf()) {
             $parts = explode('.', $this->getPreviousRouteName());
             $action = array_pop($parts);
 
             $methodName = "get{$this->getStudlyName($action)}Schema";
 
-            if(method_exists($this, $methodName)){
+            if (method_exists($this, $methodName)) {
                 return $this->{$methodName}();
             }
         }
 
-        return $this->chunkInputs($this->formSchema, all:true);
+        return $this->chunkInputs($this->formSchema, all: true);
     }
 }

@@ -2,12 +2,10 @@
 
 namespace Unusualify\Modularity\Http\Controllers\API;
 
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Unusualify\Modularity\Http\Requests\StorePermissionRequest;
-use Unusualify\Modularity\Transformers\PermissionResource;
 use Spatie\Permission\Models\Permission;
+use Unusualify\Modularity\Transformers\PermissionResource;
 
 class PermissionController extends Controller
 {
@@ -19,13 +17,12 @@ class PermissionController extends Controller
     public function index()
     {
         // dd( Permission::all());
-        return new PermissionResource( Permission::all() );
+        return new PermissionResource(Permission::all());
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -36,16 +33,17 @@ class PermissionController extends Controller
         $validated = $request->safe()->only(['name']);
         $validated = $request->safe()->except(['name']);
 
-        $validated['guard_name'] = "web";
+        $validated['guard_name'] = 'web';
 
         $role = Permission::create($validated);
+
         return view("{$this->baseKey}::create");
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -56,8 +54,7 @@ class PermissionController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -68,7 +65,7 @@ class PermissionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)

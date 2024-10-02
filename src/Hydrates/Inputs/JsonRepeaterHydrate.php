@@ -11,7 +11,7 @@ class JsonRepeaterHydrate extends InputHydrate
      * @var array
      */
     public $requirements = [
-        'autoIdGenerator' => true
+        'autoIdGenerator' => true,
     ];
 
     /**
@@ -25,7 +25,7 @@ class JsonRepeaterHydrate extends InputHydrate
 
         $input['type'] = 'input-repeater';
 
-        if( $input['draggable'] ?? false){
+        if ($input['draggable'] ?? false) {
             $input['orderKey'] ??= 'position';
         }
 
@@ -36,18 +36,18 @@ class JsonRepeaterHydrate extends InputHydrate
         ];
         $input['col'] = array_merge_recursive_preserve($default_repeater_col, $input['col'] ?? []);
 
-        if(array_key_exists('schema', $input)){
+        if (array_key_exists('schema', $input)) {
             $inputStudlyName = '';
             $inputSnakeName = '';
 
-            if(isset($input['repository'])){
-                if( preg_match( '/(\w+)Repository/', get_class_short_name($input['repository']), $matches)){
+            if (isset($input['repository'])) {
+                if (preg_match('/(\w+)Repository/', get_class_short_name($input['repository']), $matches)) {
                     $relation_class = App::make($input['repository']);
                     $inputStudlyName = $matches[1];
                     $inputSnakeName = $this->getSnakeCase($inputStudlyName);
                     $inputCamelName = $this->getCamelCase($inputStudlyName);
                 }
-            } else if(isset($input['model'])){
+            } elseif (isset($input['model'])) {
                 // if( preg_match( '/(\w+)/', get_class_short_name($input['model']), $matches)){
                 //     dd($matches);
                 //     $relation_class = App::make($input['model']);
@@ -62,21 +62,22 @@ class JsonRepeaterHydrate extends InputHydrate
                     case 'select':
                     case 'combobox':
                     case 'autocomplete':
-                        if($inputSnakeName){
+                        if ($inputSnakeName) {
 
-                            if(preg_match("/{$inputSnakeName}_id/", $_input['name'])){ // it means foreign_id of pivot table
-                                if(isset($input['repository'])){
+                            if (preg_match("/{$inputSnakeName}_id/", $_input['name'])) { // it means foreign_id of pivot table
+                                if (isset($input['repository'])) {
                                     $_input['repository'] ??= $input['repository'];
-                                } else if(isset($input['model'])){
+                                } elseif (isset($input['model'])) {
                                     $_input['model'] ??= $input['model'];
                                 }
-                            }else {
+                            } else {
                                 $_input['items'] ??= [];
                             }
+
                             break;
                         }
                     default:
-                        # code...
+                        // code...
                         break;
                 }
             }

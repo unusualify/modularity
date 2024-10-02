@@ -11,17 +11,17 @@ trait TagsTrait
      */
     public function afterSaveTagsTrait($object, $fields)
     {
-        if (!isset($fields['bulk_tags']) && !isset($fields['previous_common_tags'])) {
-            if (!$this->shouldIgnoreFieldBeforeSave('tags')) {
+        if (! isset($fields['bulk_tags']) && ! isset($fields['previous_common_tags'])) {
+            if (! $this->shouldIgnoreFieldBeforeSave('tags')) {
                 $object->setTags($fields['tags'] ?? []);
             }
 
         } else {
-            if (!$this->shouldIgnoreFieldBeforeSave('bulk_tags')) {
+            if (! $this->shouldIgnoreFieldBeforeSave('bulk_tags')) {
                 $previousCommonTags = $fields['previous_common_tags']->pluck('name')->toArray();
 
-                if (!empty($previousCommonTags)) {
-                    if (!empty($difference = array_diff($previousCommonTags, $fields['bulk_tags'] ?? []))) {
+                if (! empty($previousCommonTags)) {
+                    if (! empty($difference = array_diff($previousCommonTags, $fields['bulk_tags'] ?? []))) {
                         $object->untag($difference);
                     }
                 }
@@ -50,11 +50,11 @@ trait TagsTrait
     {
         $tagQuery = $this->getTagsQuery();
 
-        if (!empty($query)) {
+        if (! empty($query)) {
             $tagQuery->where('slug', 'like', '%' . $query . '%');
         }
 
-        if (!empty($ids)) {
+        if (! empty($ids)) {
             foreach ($ids as $id) {
                 $tagQuery->whereHas(unusualConfig('tables.tagged', 'tagged'), function ($query) use ($id) {
                     $query->where('taggable_id', $id);
@@ -77,5 +77,4 @@ trait TagsTrait
             ];
         });
     }
-
 }

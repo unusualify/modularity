@@ -1,8 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Storage;
-
-if (!function_exists('bytesToHuman')) {
+if (! function_exists('bytesToHuman')) {
     /**
      * @param float $bytes
      * @return string
@@ -19,7 +17,7 @@ if (!function_exists('bytesToHuman')) {
     }
 }
 
-if (!function_exists('replaceAccents')) {
+if (! function_exists('replaceAccents')) {
     /**
      * @param string $str
      * @return bool|string
@@ -30,7 +28,7 @@ if (!function_exists('replaceAccents')) {
     }
 }
 
-if (!function_exists('sanitizeFilename')) {
+if (! function_exists('sanitizeFilename')) {
     /**
      * @param string $filename
      * @return string
@@ -39,11 +37,11 @@ if (!function_exists('sanitizeFilename')) {
     {
         $sanitizedFilename = replaceAccents($filename);
 
-        $invalid = array(
+        $invalid = [
             ' ' => '-',
             '%20' => '-',
             '_' => '-',
-        );
+        ];
 
         $sanitizedFilename = str_replace(array_keys($invalid), array_values($invalid), $sanitizedFilename);
 
@@ -51,7 +49,7 @@ if (!function_exists('sanitizeFilename')) {
         $sanitizedFilename = preg_replace('/\.(?=.*\.)/', '', $sanitizedFilename); // Remove all but last .
         $sanitizedFilename = preg_replace('/-+/', '-', $sanitizedFilename); // Replace any more than one - in a row
         $sanitizedFilename = str_replace('-.', '.', $sanitizedFilename); // Remove last - if at the end
-        $sanitizedFilename = strtolower($sanitizedFilename); // Lowercase
+        $sanitizedFilename = mb_strtolower($sanitizedFilename); // Lowercase
 
         return $sanitizedFilename;
     }

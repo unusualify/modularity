@@ -2,12 +2,11 @@
 
 namespace Modules\SystemPricing\Repositories;
 
-use Unusualify\Modularity\Repositories\Repository;
 use Oobook\Priceable\Models\Currency;
+use Unusualify\Modularity\Repositories\Repository;
 
 class CurrencyRepository extends Repository
 {
-
     public function __construct(Currency $model)
     {
         $this->model = $model;

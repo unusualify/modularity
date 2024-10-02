@@ -2,19 +2,18 @@
 
 namespace Unusualify\Modularity\Traits;
 
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
 
-trait ManageTable {
-
+trait ManageTable
+{
     /**
      * @var array
      */
     protected $indexTableColumns;
-
 
     /**
      * @var array
@@ -49,11 +48,11 @@ trait ManageTable {
          */
         if (! isset($this->defaultFilters)) {
             $this->defaultFilters = [
-                'search' => collect( $this->indexTableColumns ?? [] )->filter(function ($item) {
+                'search' => collect($this->indexTableColumns ?? [])->filter(function ($item) {
                     return isset($item['searchable']) ? $item['searchable'] : false;
-                })->map(function($item){
-                    return $this->dehydrateHeaderSuffix($item) ? $item['key']: $item['key'];
-                })->implode('|')
+                })->map(function ($item) {
+                    return $this->dehydrateHeaderSuffix($item) ? $item['key'] : $item['key'];
+                })->implode('|'),
             ];
         }
 
@@ -75,7 +74,7 @@ trait ManageTable {
 
         $statusFilters[] = [
             // 'name' => unusualTrans("{$this->baseKey}::lang.listing.filter.all-items"),
-            'name' => ___("listing.filter.all-items"),
+            'name' => ___('listing.filter.all-items'),
             'slug' => 'all',
             'number' => $this->repository->getCountByStatusSlug('all', $scope),
         ];
@@ -90,9 +89,9 @@ trait ManageTable {
 
         $fillables = $this->repository->getFillable();
 
-        if(in_array('published', $fillables) && $this->repository->hasColumn('published')){
+        if (in_array('published', $fillables) && $this->repository->hasColumn('published')) {
             $statusFilters[] = [
-                'name' => ___("listing.filter.published"),
+                'name' => ___('listing.filter.published'),
                 'slug' => 'published',
                 'number' => $this->repository->getCountByStatusSlug('published', $scope),
             ];
@@ -126,7 +125,7 @@ trait ManageTable {
         // );
         if ($this->getIndexOption('restore') && $this->repository->isSoftDeletable()) {
             $statusFilters[] = [
-                'name' => ___("listing.filter.trash"),
+                'name' => ___('listing.filter.trash'),
                 'slug' => 'trash',
                 'number' => $this->repository->getCountByStatusSlug('trash', $scope),
             ];
@@ -137,19 +136,21 @@ trait ManageTable {
 
     public function getIndexTableColumns()
     {
-        if(!!$this->indexTableColumns)
+        if ((bool) $this->indexTableColumns) {
             return $this->indexTableColumns;
-        else if(!$this->config)
+        } elseif (! $this->config) {
             return [];
-        else
+        } else {
             return $this->indexTableColumns = Collection::make(
                 $this->getConfigFieldsByRoute('headers')
-            )->reduce(function($carry, $item){
-                if(isset($item->key)){
+            )->reduce(function ($carry, $item) {
+                if (isset($item->key)) {
                     $carry[] = $this->getHeader((array) $item);
                 }
+
                 return $carry;
             }, []);
+        }
 
     }
 
@@ -160,7 +161,7 @@ trait ManageTable {
      */
     public function getTableAttributes()
     {
-        if(!!$this->config) {
+        if ((bool) $this->config) {
             try {
                 return Collection::make(
                     array_merge_recursive_preserve($this->defaultTableAttributes, object_to_array($this->getConfigFieldsByRoute('table_options')))
@@ -183,7 +184,7 @@ trait ManageTable {
         //     $this->getIndexOption('forceDelete'),
         //     $this->getIndexOption('restore'),
         // );
-        if($this->getIndexOption('duplicate') ){
+        if ($this->getIndexOption('duplicate')) {
             $actions[] = [
                 'name' => 'duplicate',
                 // 'icon' => '$edit',
@@ -191,7 +192,7 @@ trait ManageTable {
             ];
         }
 
-        if($this->getIndexOption('edit') ){
+        if ($this->getIndexOption('edit')) {
             $actions[] = [
                 'name' => 'edit',
                 // 'can' => $this->permissionPrefix(Permission::EDIT->value),
@@ -200,7 +201,7 @@ trait ManageTable {
             ];
         }
 
-        if($this->getIndexOption('delete')){
+        if ($this->getIndexOption('delete')) {
             $actions[] = [
                 'name' => 'delete',
                 'can' => $this->permissionPrefix(Permission::DELETE->value),
@@ -209,7 +210,7 @@ trait ManageTable {
             ];
         }
 
-        if($this->getIndexOption('restore')){
+        if ($this->getIndexOption('restore')) {
             $actions[] = [
                 'name' => 'restore',
                 // 'icon' => '$',
@@ -219,7 +220,7 @@ trait ManageTable {
             ];
         }
 
-        if($this->getIndexOption('forceDelete')){
+        if ($this->getIndexOption('forceDelete')) {
             $actions[] = [
                 'name' => 'forceDelete',
                 'icon' => '$delete',
@@ -229,7 +230,7 @@ trait ManageTable {
             ];
         }
         // if $this->repository has hasPayment
-        if(classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasPayment')){
+        if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasPayment')) {
             $actions[] = [
                 'name' => 'pay',
                 'icon' => 'mdi-contactless-payment',
@@ -247,21 +248,20 @@ trait ManageTable {
                     ],
                     'schema_formatter' => [
                         'payment_service.price' => '_price', //lodash set method
-                        'payment_service.currency' => 'price.currency.id'
-                    ]
+                        'payment_service.currency' => 'price.currency.id',
+                    ],
                 ],
                 //  admin.system.system_payment.payment routeName
                 //  admin.crm.template/system/system-payments/pay/{price}
             ];
         }
 
-
         $actions = array_merge(
             $actions,
             Modularity::find($this->moduleName)->getNavigationActions($this->routeName)
         );
 
-        if(count($actions) > 3){
+        if (count($actions) > 3) {
             $this->tableAttributes['rowActionsType'] = 'dropdown';
         }
 
@@ -272,7 +272,7 @@ trait ManageTable {
     /**
      * getTableOption
      *
-     * @param  mixed $option
+     * @param mixed $option
      * @return void
      */
     public function getTableOption($option)
@@ -280,15 +280,13 @@ trait ManageTable {
         return $this->tableOptions[$option] ?? false;
     }
 
-
-
     /**
      * method that checks whether the attribute configured on table_options
      * and returns its value or false if not.
      *
      *
      * @param mixed $attribute
-     * @return boolean|mixed returns referenced value or false if it's not defined at module config->table_options
+     * @return bool|mixed returns referenced value or false if it's not defined at module config->table_options
      */
     public function getTableAttribute($attribute)
     {
@@ -303,11 +301,11 @@ trait ManageTable {
     public function getVuetifyDatatableOptions()
     {
         return [
-            'page'          => request()->has('page') ? intval(request()->query('page')) : 1,
-            'itemsPerPage'  => request()->has('itemsPerPage') ? intval(request()->query('itemsPerPage')) : ($this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10),
-            'sortBy'        => request()->has('sortBy') ? [request()->get('sortBy')] : [],
-            'groupBy'       => [],
-            'search'        => ''
+            'page' => request()->has('page') ? intval(request()->query('page')) : 1,
+            'itemsPerPage' => request()->has('itemsPerPage') ? intval(request()->query('itemsPerPage')) : ($this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10),
+            'sortBy' => request()->has('sortBy') ? [request()->get('sortBy')] : [],
+            'groupBy' => [],
+            'search' => '',
             // 'multiSort'     => true,
             // 'mustSort'      => false,
             // 'groupDesc'     => [],
@@ -317,7 +315,7 @@ trait ManageTable {
 
     protected function getHeader($header)
     {
-        return array_merge_recursive_preserve( unusualConfig('default_header'), $this->hydrateHeader($header) );
+        return array_merge_recursive_preserve(unusualConfig('default_header'), $this->hydrateHeader($header));
     }
 
     protected function hydrateHeader($header)
@@ -325,25 +323,26 @@ trait ManageTable {
         $this->hydrateHeaderSuffix($header);
 
         // add edit functionality to table title cell
-        if($this->titleColumnKey == $header['key'] && !isset($header['formatter']))
+        if ($this->titleColumnKey == $header['key'] && ! isset($header['formatter'])) {
             $header['formatter'] = [
-                'edit'
+                'edit',
             ];
+        }
 
         // switch column
-        if(isset($header['formatter']) && count($header['formatter']) && $header['formatter'][0] == 'switch'){
+        if (isset($header['formatter']) && count($header['formatter']) && $header['formatter'][0] == 'switch') {
             $header['width'] = '20px';
             // $header['align'] = 'center';
         }
 
-        if(isset($header['sortable']) && $header['sortable']){
-            if(preg_match('/(.*)(_relation)/', $header['key'], $matches)){
+        if (isset($header['sortable']) && $header['sortable']) {
+            if (preg_match('/(.*)(_relation)/', $header['key'], $matches)) {
                 $header['sortable'] = false;
             }
 
         }
 
-        if($header['key'] == 'actions'){
+        if ($header['key'] == 'actions') {
             $header['width'] ??= '100px';
             $header['align'] ??= 'center';
             $header['sortable'] ??= false;
@@ -354,7 +353,7 @@ trait ManageTable {
 
     protected function setTableAttributes($tableOptions = null)
     {
-        if($tableOptions){
+        if ($tableOptions) {
             $this->tableAttributes = array_merge_recursive_preserve(
                 $this->defaultTableAttributes,
                 $tableOptions,
@@ -366,13 +365,11 @@ trait ManageTable {
 
     }
 
-    protected function getTableBulkActions(): Array
+    protected function getTableBulkActions(): array
     {
         $actions = [];
 
-
-        if($this->getIndexOption('delete'))
-        {
+        if ($this->getIndexOption('delete')) {
             $actions[] = [
                 'name' => 'bulkDelete',
                 'can' => $this->permissionPrefix(Permission::DELETE->value),
@@ -382,7 +379,7 @@ trait ManageTable {
             ];
         }
 
-        if($this->getIndexOption('forceDelete')){
+        if ($this->getIndexOption('forceDelete')) {
             $actions[] = [
                 'name' => 'bulkForceDelete',
                 'icon' => '$delete',
@@ -392,7 +389,7 @@ trait ManageTable {
             ];
         }
 
-        if($this->getIndexOption('restore')){
+        if ($this->getIndexOption('restore')) {
             $actions[] = [
                 'name' => 'bulkRestore',
                 'icon' => '$restore',
@@ -402,22 +399,21 @@ trait ManageTable {
             ];
         }
 
-
         return $actions;
     }
 
     protected function hydrateHeaderSuffix(&$header)
     {
-        if($this->isRelationField($header['key']))
+        if ($this->isRelationField($header['key'])) {
             $header['key'] .= '_relation';
+        }
 
-
-        if(method_exists($this->repository->getModel(), 'isTimestampColumn') && $this->repository->isTimestampColumn($header['key'])){
+        if (method_exists($this->repository->getModel(), 'isTimestampColumn') && $this->repository->isTimestampColumn($header['key'])) {
             $header['key'] .= '_timestamp';
         }
 
         // add uuid suffix for formatting on view
-        if($header['key'] == 'id' && $this->repository->hasModelTrait('Unusualify\Modularity\Entities\Traits\HasUuid')){
+        if ($header['key'] == 'id' && $this->repository->hasModelTrait('Unusualify\Modularity\Entities\Traits\HasUuid')) {
             $header['key'] .= '_uuid';
             $header['formatter'] ??= ['edit'];
         }
@@ -426,19 +422,19 @@ trait ManageTable {
 
     protected function dehydrateHeaderSuffix(&$header)
     {
-        $header['key'] = preg_replace('/_relation|_timestamp|_uuid/', '' ,$header['key']);
+        $header['key'] = preg_replace('/_relation|_timestamp|_uuid/', '', $header['key']);
     }
 
     protected function getTableAdvancedFilters()
     {
 
-        $filters = Collection::make($this->getConfigFieldsByRoute('filters'))->filter(function($f, $key){
+        $filters = Collection::make($this->getConfigFieldsByRoute('filters'))->filter(function ($f, $key) {
             return in_array($key, ['relations']);
         });
 
-        return $filters->mapWithKeys(function($filter, $key) {
-            if(method_exists(__TRAIT__, $key.'FilterConfiguration')){
-                return [$key => array_map([$this, $key.'FilterConfiguration'], object_to_array($filter))];
+        return $filters->mapWithKeys(function ($filter, $key) {
+            if (method_exists(__TRAIT__, $key . 'FilterConfiguration')) {
+                return [$key => array_map([$this, $key . 'FilterConfiguration'], object_to_array($filter))];
             }
 
             return [$key => $filter];
@@ -447,7 +443,7 @@ trait ManageTable {
 
     protected function relationsFilterConfiguration($filter)
     {
-        if(method_exists(__TRAIT__, $methodName = 'getTableAdvancedFilters'. $this->getStudlyName($filter['type']))){
+        if (method_exists(__TRAIT__, $methodName = 'getTableAdvancedFilters' . $this->getStudlyName($filter['type']))) {
             $filter = $this->$methodName($filter);
         }
 
@@ -456,19 +452,18 @@ trait ManageTable {
 
     protected function detailFilterConfiguration($filter)
     {
-        if(method_exists(__TRAIT__, $methodName = 'getTableAdvancedFilters'. $this->getStudlyName($filter['type']))){
+        if (method_exists(__TRAIT__, $methodName = 'getTableAdvancedFilters' . $this->getStudlyName($filter['type']))) {
             $filter = $this->$methodName($filter);
         }
 
         return $filter;
     }
 
-
     protected function getTableAdvancedFiltersSelect($filter)
     {
 
         $repository = App::make($filter['repository']);
-        $items =  $repository->list()->map(function($value, $key){
+        $items = $repository->list()->map(function ($value, $key) {
             return $value;
         });
 
@@ -476,27 +471,24 @@ trait ManageTable {
         $filter['componentOptions']['item-value'] ??= 'id';
         $filter['componentOptions']['item-title'] ??= 'name';
 
-
         return $filter;
     }
 
     protected function getTableAdvancedFiltersDatePicker($filter)
     {
 
-
         $filter['componentOptions']['title'] ??= $this->getHeadline($filter['slug']);
         $filter['componentOptions']['multiple'] ??= 'range';
-
 
         return $filter;
     }
 
     protected function getTableDraggableOptions()
     {
-        if($this->repository){
+        if ($this->repository) {
             return [
                 'draggable' => classHasTrait($this->repository->getModel(), \Unusualify\Modularity\Entities\Traits\HasPosition::class),
-                'orderKey' => 'position'
+                'orderKey' => 'position',
             ];
         }
 
@@ -505,6 +497,4 @@ trait ManageTable {
         ];
 
     }
-
-
 }

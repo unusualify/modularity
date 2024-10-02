@@ -7,39 +7,37 @@ use Money\Currency;
 
 trait HasPayment
 {
-  // Will be defining the relation between the completed payment model and payable model
+    // Will be defining the relation between the completed payment model and payable model
 
+    public function price(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(config('priceable.models.price'), 'priceable');
+    }
 
-  public function price() : \Illuminate\Database\Eloquent\Relations\MorphOne
-  {
-    return $this->morphOne(config('priceable.models.price'), 'priceable');
-  }
+    public static function bootHasPayment(): void
+    {
 
-  public static function bootHasPayment(): void {
+        self::retrieved(static function (Model $model) {
+            if ($model->price) {
+                // dd($model->price->currency);
+                $currency = new Currency($model->price->currency->iso_4217);
+                // dd($currency);
+                $model->setAttribute('_price', \Oobook\Priceable\Facades\PriceService::formatAmount($model->price->display_price, $currency));
+            }
+            // dd($model);
+        });
 
-    self::retrieved(static function (Model $model) {
-        if($model->price){
-            // dd($model->price->currency);
-            $currency = new Currency($model->price->currency->iso_4217);
-            // dd($currency);
-            $model->setAttribute('_price', \Oobook\Priceable\Facades\PriceService::formatAmount($model->price->display_price, $currency));
-        }
-        // dd($model);
-    });
+        self::updating(static function (Model $model) {
+            if ($model->_price) {
+                $model->offsetUnset('_price');
+            }
+        });
 
-    self::updating(static function (Model $model) {
-        if ($model->_price) {
-            $model->offsetUnset('_price');
-        }
-    });
+        self::saving(static function (Model $model) {
+            if ($model->_price) {
+                $model->offsetUnset('_price');
+            }
+        });
 
-    self::saving(static function (Model $model) {
-        if ($model->_price) {
-            $model->offsetUnset('_price');
-        }
-    });
-
-  }
-
-
+    }
 }

@@ -2,11 +2,11 @@
 
 namespace Unusualify\Modularity\Support;
 
-use Unusualify\Modularity\Traits\ManageNames;
 use Composer\Autoload\ClassMapGenerator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Traits\ManageNames;
 
 class Finder
 {
@@ -17,42 +17,47 @@ class Finder
      *
      * @param string|null $schema
      */
-    public function __construct()
-    {
-
-    }
+    public function __construct() {}
 
     public function getModel($table)
     {
         $model_class = '';
         // dd( array_filter( glob( base_path( config('modules.namespace')).'/*'), 'is_dir') );
 
-        foreach (array_filter( glob( config('modules.paths.modules').'/*'), 'is_dir') as $module_path) {
+        foreach (array_filter(glob(config('modules.paths.modules') . '/*'), 'is_dir') as $module_path) {
 
-            if( !file_exists( $module_path.'/Entities') ) continue;
+            if (! file_exists($module_path . '/Entities')) {
+                continue;
+            }
 
-            foreach($this->getClasses( $module_path.'/Entities' ) as $class){
-                if( method_exists($class,'getTable') ){
-                    if( with(new $class())->getTable() == $table ){
+            foreach ($this->getClasses($module_path . '/Entities') as $class) {
+                if (method_exists($class, 'getTable')) {
+                    if (with(new $class)->getTable() == $table) {
                         $model_class = $class;
+
                         break 2;
                     }
                 }
             }
         }
 
-        if($model_class !== '') return $model_class;
+        if ($model_class !== '') {
+            return $model_class;
+        }
 
-        foreach($this->getClasses( app_path('Models')) as $class){
-            if( method_exists($class,'getTable') ){
-                if( with(new $class())->getTable() == $table ){
+        foreach ($this->getClasses(app_path('Models')) as $class) {
+            if (method_exists($class, 'getTable')) {
+                if (with(new $class)->getTable() == $table) {
                     $model_class = $class;
+
                     break;
                 }
             }
         }
 
-        if($model_class !== '') return $model_class;
+        if ($model_class !== '') {
+            return $model_class;
+        }
 
         // foreach($this->getAllModels() as $class){
         //     dd($class);
@@ -65,7 +70,6 @@ class Finder
         // }
 
         // if($model_class !== '') return $model_class;
-
 
         return false;
     }
@@ -80,21 +84,24 @@ class Finder
         //     config('modules.scan')
         // );
 
-        foreach ( Modularity::allEnabled() as $key => $module) {
-            $entityPath =  $module->getDirectoryPath('Entities');
-            if( !file_exists( $entityPath ) ) continue;
+        foreach (Modularity::allEnabled() as $key => $module) {
+            $entityPath = $module->getDirectoryPath('Entities');
+            if (! file_exists($entityPath)) {
+                continue;
+            }
 
-            foreach($this->getClasses( $entityPath ) as $_class){
-                if(get_class_short_name(App::make($_class)) === $this->getStudlyName($routeName)){
+            foreach ($this->getClasses($entityPath) as $_class) {
+                if (get_class_short_name(App::make($_class)) === $this->getStudlyName($routeName)) {
                     $class = $_class;
+
                     break 2;
                 }
             }
         }
 
-
-        if($class !== '') return $asClass ? App::make($class) :  $class;
-
+        if ($class !== '') {
+            return $asClass ? App::make($class) : $class;
+        }
 
         return false;
     }
@@ -103,35 +110,43 @@ class Finder
     {
         $class = '';
 
-        foreach (array_filter( glob( config('modules.paths.modules').'/*'), 'is_dir') as $module_path) {
+        foreach (array_filter(glob(config('modules.paths.modules') . '/*'), 'is_dir') as $module_path) {
 
-            if( !file_exists( $module_path.'/Repositories') ) continue;
+            if (! file_exists($module_path . '/Repositories')) {
+                continue;
+            }
 
-            foreach($this->getClasses( $module_path.'/Repositories' ) as $_class){
+            foreach ($this->getClasses($module_path . '/Repositories') as $_class) {
                 // dd($module_path, $class);
-                if( App::make($_class)->getTable() == $table ){
+                if (App::make($_class)->getTable() == $table) {
                     $class = $_class;
+
                     break 2;
                 }
             }
         }
 
-        if($class !== '') return $class;
+        if ($class !== '') {
+            return $class;
+        }
 
         $repositoryPath = app_path('Repositories');
 
-        if(file_exists($repositoryPath)){
-            foreach($this->getClasses( app_path('Repositories')) as $_class){
-                if( method_exists($_class,'getTable') ){
-                    if( with(new $_class())->getTable() == $table ){
+        if (file_exists($repositoryPath)) {
+            foreach ($this->getClasses(app_path('Repositories')) as $_class) {
+                if (method_exists($_class, 'getTable')) {
+                    if (with(new $_class)->getTable() == $table) {
                         $class = $class;
+
                         break;
                     }
                 }
             }
         }
 
-        if($class !== '') return $class;
+        if ($class !== '') {
+            return $class;
+        }
 
         return false;
     }
@@ -140,34 +155,37 @@ class Finder
     {
         $class = '';
 
-        foreach ( Modularity::allEnabled() as $key => $module) {
-            $path =  $module->getDirectoryPath('Repositories');
-            if( !file_exists( $path ) ) continue;
-            foreach($this->getClasses( $path ) as $_class){
-                if(get_class_short_name(App::make($_class)) === $this->getStudlyName($routeName). 'Repository'){
+        foreach (Modularity::allEnabled() as $key => $module) {
+            $path = $module->getDirectoryPath('Repositories');
+            if (! file_exists($path)) {
+                continue;
+            }
+            foreach ($this->getClasses($path) as $_class) {
+                if (get_class_short_name(App::make($_class)) === $this->getStudlyName($routeName) . 'Repository') {
                     $class = $_class;
+
                     break 2;
                 }
             }
         }
 
-        if($class !== '') return $asClass ? App::make($class) : $class;
-
+        if ($class !== '') {
+            return $asClass ? App::make($class) : $class;
+        }
 
         return false;
     }
 
-    public function getPossibleModels($routeName) :array
+    public function getPossibleModels($routeName): array
     {
-        return $this->getAllModels()->filter(fn($model) => get_class_short_name($model) == $routeName)->values()->toArray();
+        return $this->getAllModels()->filter(fn ($model) => get_class_short_name($model) == $routeName)->values()->toArray();
     }
 
     public function getClasses($path)
     {
         $classes = [];
 
-        foreach (ClassMapGenerator::createMap($path) as $class => $file)
-        {
+        foreach (ClassMapGenerator::createMap($path) as $class => $file) {
             $classes[] = $class;
         }
 
@@ -186,12 +204,13 @@ class Finder
         foreach ($autoload as $className => $path) {
             // skip if we are not in the root namespace, ie App\, to ignore other vendor packages, of which there are a lot (dd($autoload) to see)
             try {
-                if ( ! substr($className, 0, strlen($namespace)) === $namespace) {
+                if (! mb_substr($className, 0, mb_strlen($namespace)) === $namespace) {
                     continue;
                 }
                 // check if class is extending Model
-                if( !preg_match('/vendor\/unusualify\//', $path) && preg_match('/vendor\//', $path))
+                if (! preg_match('/vendor\/unusualify\//', $path) && preg_match('/vendor\//', $path)) {
                     continue;
+                }
 
                 $reflection = new \ReflectionClass($className);
                 // dd(
@@ -204,12 +223,12 @@ class Finder
                 //     $reflection->isSubclassOf("Illuminate\Database\Eloquent\Model"),
                 //     // $reflection->getParentClass(),
                 // );
-                if(
+                if (
                     $reflection->isUserDefined()
-                    && !$reflection->isTrait()
-                    && !$reflection->isAbstract()
+                    && ! $reflection->isTrait()
+                    && ! $reflection->isAbstract()
                     && $reflection->isSubclassOf("Illuminate\Database\Eloquent\Model")
-                ){
+                ) {
                     // dd($reflection->getName());
                     $models[] = $className;
                 }
@@ -223,6 +242,4 @@ class Finder
 
         return collect($models);
     }
-
-
 }

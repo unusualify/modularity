@@ -4,18 +4,18 @@ namespace Unusualify\Modularity\Console;
 
 use Illuminate\Support\Facades\Config;
 use Nwidart\Modules\Commands\GeneratorCommand;
-use Nwidart\Modules\Support\Stub;
-use Nwidart\Modules\Traits\ModuleCommandTrait;
 use Nwidart\Modules\Exceptions\FileAlreadyExistException;
 use Nwidart\Modules\Generators\FileGenerator;
-use Unusualify\Modularity\Traits\ManageNames;
+use Nwidart\Modules\Support\Stub;
+use Nwidart\Modules\Traits\ModuleCommandTrait;
 use Unusualify\Modularity\Support\Decomposers\SchemaParser;
-use function Laravel\Prompts\{confirm};
+use Unusualify\Modularity\Traits\ManageNames;
 
+use function Laravel\Prompts\confirm;
 
 class BaseCommand extends GeneratorCommand
 {
-    use ModuleCommandTrait, ManageNames;
+    use ManageNames, ModuleCommandTrait;
 
     /**
      * The name of 'name' argument.
@@ -30,7 +30,7 @@ class BaseCommand extends GeneratorCommand
 
     protected $defaultReject = false;
 
-    protected $configBaseKey = "base";
+    protected $configBaseKey = 'base';
 
     protected $schemaParser;
 
@@ -47,11 +47,12 @@ class BaseCommand extends GeneratorCommand
 
         $this->configBaseKey = \Illuminate\Support\Str::snake(env('MODULARITY_BASE_NAME', 'Modularity'));
 
-        Stub::setBasePath( $this->baseConfig('stubs.path', dirname(__FILE__).'/stubs') );
+        Stub::setBasePath($this->baseConfig('stubs.path', dirname(__FILE__) . '/stubs'));
     }
 
-    public function baseConfig($string, $default = null){
-        return Config::get( $this->configBaseKey .".".$string, $default);
+    public function baseConfig($string, $default = null)
+    {
+        return Config::get($this->configBaseKey . '.' . $string, $default);
     }
 
     /**
@@ -59,18 +60,14 @@ class BaseCommand extends GeneratorCommand
      *
      * @return string
      */
-    protected function getTemplateContents(){
-
-    }
+    protected function getTemplateContents() {}
 
     /**
      * Get the destination file path.
      *
      * @return string
      */
-    protected function getDestinationFilePath(){
-
-    }
+    protected function getDestinationFilePath() {}
 
     /**
      * Execute the console command.
@@ -86,24 +83,24 @@ class BaseCommand extends GeneratorCommand
         //     // $this->getUsages(),
         //     // strtolower($this->getDescription())
         // );
-        $description = trim(strtolower($this->getDescription()), '.');
+        $description = trim(mb_strtolower($this->getDescription()), '.');
 
-        $runnable = !$this->hasOption('test') || !$this->option('test') || ($confirmed = confirm(label: "Do you want to {$description} in test mode?", default: false));
+        $runnable = ! $this->hasOption('test') || ! $this->option('test') || ($confirmed = confirm(label: "Do you want to {$description} in test mode?", default: false));
 
-        if($runnable){
-            if($this->hasOption('test') && $this->option('test')){
+        if ($runnable) {
+            if ($this->hasOption('test') && $this->option('test')) {
                 $contents = $this->getTemplateContents();
 
                 $this->info($contents);
-            }else{
-                if (!$this->laravel['files']->isDirectory($dir = dirname($path))) {
+            } else {
+                if (! $this->laravel['files']->isDirectory($dir = dirname($path))) {
                     $this->laravel['files']->makeDirectory($dir, 0777, true);
                 }
 
                 $contents = $this->getTemplateContents();
 
                 try {
-                    $this->components->task("Generating file {$path}",function () use ($path,$contents) {
+                    $this->components->task("Generating file {$path}", function () use ($path, $contents) {
                         $overwriteFile = $this->hasOption('force') ? $this->option('force') : false;
                         (new FileGenerator($path, $contents))->withFileOverwrite($overwriteFile)->generate();
                     });
@@ -126,13 +123,14 @@ class BaseCommand extends GeneratorCommand
      */
     public function getSchemaParser()
     {
-        return $this->schemaParser ?? ($this->schemaParser = new SchemaParser());
+        return $this->schemaParser ?? ($this->schemaParser = new SchemaParser);
     }
 
     protected function setAskability()
     {
-        if($this->hasOption('notAsk'))
+        if ($this->hasOption('notAsk')) {
             $this->isAskable = false;
+        }
     }
 
     protected function isAskable()
@@ -140,7 +138,7 @@ class BaseCommand extends GeneratorCommand
         return $this->isAskable ?? true;
     }
 
-    protected function getTraitResponse($trait) : bool
+    protected function getTraitResponse($trait): bool
     {
         return array_key_exists($trait, $this->responses) ? $this->responses[$trait] : false;
     }

@@ -3,8 +3,8 @@
 namespace Unusualify\Modularity\Repositories\Traits;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\UFinder;
 
 trait RelationTrait
@@ -20,7 +20,7 @@ trait RelationTrait
     {
 
         foreach ($this->getMorphToManyRelations() as $relationName) {
-            if(isset($fields[$relationName]) && $fields[$relationName] && $relationName != 'tags' && !classHasTrait(get_class($this), 'Unusualify\Modularity\Repositories\Traits\TagsTrait')){
+            if (isset($fields[$relationName]) && $fields[$relationName] && $relationName != 'tags' && ! classHasTrait(get_class($this), 'Unusualify\Modularity\Repositories\Traits\TagsTrait')) {
                 $object->{$relationName}()->sync($fields[$relationName]);
             }
 
@@ -29,7 +29,7 @@ trait RelationTrait
             foreach ($types as $key => $type) {
                 $name = $type['name'];
                 $repository = $type['repository'];
-                if(isset($fields[$name]) && $fields[$name]){
+                if (isset($fields[$name]) && $fields[$name]) {
                     // dd(
                     //     $object->{$relation}(),
                     //     get_class_methods(
@@ -67,22 +67,23 @@ trait RelationTrait
 
             if (isset($fields[$relation])) {
                 try {
-                    if(is_a($fields[$relation], 'Illuminate\Support\Collection')) {
+                    if (is_a($fields[$relation], 'Illuminate\Support\Collection')) {
                         $fields[$relation] = $fields[$relation]->toArray();
                     }
 
-                    if(is_array($fields[$relation])){
-                        $fields[$relation] = Arr::mapWithKeys($fields[$relation], function($item, $key) use($relatedPivotKey){
-                            if( isset($item['pivot']) && isset($item['pivot'][$relatedPivotKey])){
+                    if (is_array($fields[$relation])) {
+                        $fields[$relation] = Arr::mapWithKeys($fields[$relation], function ($item, $key) use ($relatedPivotKey) {
+                            if (isset($item['pivot']) && isset($item['pivot'][$relatedPivotKey])) {
                                 return [$key => $item['pivot'][$relatedPivotKey]];
                             }
+
                             return is_array($item)
-                                    ? [ $item[$relatedPivotKey] => Arr::except($item, [$this->getForeignKey()])]
-                                    : [ $key => $item];
+                                    ? [$item[$relatedPivotKey] => Arr::except($item, [$this->getForeignKey()])]
+                                    : [$key => $item];
                         });
 
                         foreach ($fields[$relation] as $key => $value) {
-                            if(is_array($value)){
+                            if (is_array($value)) {
                                 // dd(
                                 //     $key,
                                 //     $value,
@@ -111,7 +112,7 @@ trait RelationTrait
                 // } else {
                 //     $fields[$f] = null;
                 // }
-            }else if(array_key_exists($relation, $fields)){
+            } elseif (array_key_exists($relation, $fields)) {
 
                 $object->{$relation}()->sync([]);
             }
@@ -124,22 +125,23 @@ trait RelationTrait
                 $relatedLocalKey = $relation->getLocalKeyName(); //id
                 $foreignKey = $relation->getForeignKeyName(); // parent_name_id
 
-                $repository = UFinder::getRouteRepository( Str::singular($relationName), asClass: true);
+                $repository = UFinder::getRouteRepository(Str::singular($relationName), asClass: true);
 
                 $idsDeleted = $relation->get()->pluck($relatedLocalKey)->toArray();
 
                 foreach ($fields[$relationName] as $key => $data) {
-                    if(isset($data[$relatedLocalKey])){
+                    if (isset($data[$relatedLocalKey])) {
                         array_splice($idsDeleted, array_search($data[$relatedLocalKey], $idsDeleted), 1);
 
                         $repository->update($data[$relatedLocalKey], $data + [$foreignKey => $object->id]);
-                    }else{
+                    } else {
                         $repository->create(array_merge($data, [$foreignKey => $object->id]));
                     }
                 }
 
-                if(count($idsDeleted))
+                if (count($idsDeleted)) {
                     $repository->bulkDelete($idsDeleted);
+                }
             }
         }
 
@@ -147,7 +149,6 @@ trait RelationTrait
     }
 
     /**
-     * @param
      * @return void
      */
     public function afterForceDeleteRelationTrait($object)
@@ -171,8 +172,8 @@ trait RelationTrait
         $belongsToManyRelations = $this->getBelongsToManyRelations();
 
         foreach ($this->getMorphToManyRelations() as $relationName) {
-            if(array_key_exists($relationName, $inputs)){
-                $fields[$relationName] = $object->{$relationName}->map(fn($rel) => $rel->id)->toArray();
+            if (array_key_exists($relationName, $inputs)) {
+                $fields[$relationName] = $object->{$relationName}->map(fn ($rel) => $rel->id)->toArray();
             }
         }
 
@@ -181,13 +182,13 @@ trait RelationTrait
             foreach ($types as $index => $type) {
 
                 $column_name = snakeCase($relation);
-                if($object->{$column_name . '_type'} == $type['model']){
+                if ($object->{$column_name . '_type'} == $type['model']) {
                     $morphTo = App::make($type['repository'])->getById($object->{$column_name . '_id'});
                     $fields[$type['name']] = $morphTo->id;
-                }else if($morphTo){
+                } elseif ($morphTo) {
                     $fields[$type['name']] = $morphTo->{$type['name']};
                     $morphTo = App::make($type['repository'])->getById($morphTo->{$type['name']});
-                }else{
+                } else {
                     $fields[$type['name']] = null;
                 }
                 // dd($object, $fields, $index, $type);
@@ -195,7 +196,7 @@ trait RelationTrait
         }
 
         foreach ($this->getHasManyRelations() as $relation) {
-            if(isset($schema[$relation])){
+            if (isset($schema[$relation])) {
                 // dd($object, $relation, $object->{$relation});
                 $fields[$relation] = $object->{$relation};
             }
@@ -204,15 +205,15 @@ trait RelationTrait
         // dd($fields);
         foreach ($inputs as $key => $input) {
 
-            if(isset($input['name']) && in_array($input['name'], $belongsToManyRelations) ){
-                if(preg_match('/repeater/', $input['type'])){
+            if (isset($input['name']) && in_array($input['name'], $belongsToManyRelations)) {
+                if (preg_match('/repeater/', $input['type'])) {
                     $query = $object->{$input['name']}();
 
-                    if($input['orderable'] ?? false){
+                    if ($input['orderable'] ?? false) {
                         $query->orderBy('position');
                     }
 
-                    $fields[$input['name']] = $query->get()->map(function($item){
+                    $fields[$input['name']] = $query->get()->map(function ($item) {
                         // dd(
                         //     $item->pivot->active,
                         //     get_class_methods($item->pivot),
@@ -223,10 +224,12 @@ trait RelationTrait
                         return $item->pivot->toArray();
                     });
 
-                }else {
+                } else {
                     try {
                         //code...
-                        $fields[$input['name']] = $object->{$input['name']}->map(function($item){ return $item->id; });
+                        $fields[$input['name']] = $object->{$input['name']}->map(function ($item) {
+                            return $item->id;
+                        });
                     } catch (\Throwable $th) {
                         dd(
                             $object,
@@ -239,12 +242,12 @@ trait RelationTrait
         }
 
         foreach ($schema as $key => $input) {
-            if($input['type'] == 'input-repeater' && isset($input['ext']) && $input['ext'] == 'relationship'){
-                $repository = UFinder::getRouteRepository(Str::singular($input['name']), asClass:true);
+            if ($input['type'] == 'input-repeater' && isset($input['ext']) && $input['ext'] == 'relationship') {
+                $repository = UFinder::getRouteRepository(Str::singular($input['name']), asClass: true);
                 $relationshipName = $input['relationship'] ?? $input['name'];
                 $records = $object->{$relationshipName};
                 try {
-                    $fields[$relationshipName] = (!!$records && !$records->isEmpty()) ? $object->{$input['name']}->map(function($model) use($input, $repository){
+                    $fields[$relationshipName] = ((bool) $records && ! $records->isEmpty()) ? $object->{$input['name']}->map(function ($model) use ($input, $repository) {
                         return $repository->getFormFields($model, $input['schema']);
                     }) : $repository->getFormFields($repository->newInstance(), $input['schema']);
 
@@ -267,8 +270,8 @@ trait RelationTrait
         // dd(
         //     $this->definedRelationsTypes()
         // );
-        if(method_exists($this->model, 'definedRelationsTypes')){
-            foreach( $this->model->definedRelationsTypes() as $relationship => $relationshipType){
+        if (method_exists($this->model, 'definedRelationsTypes')) {
+            foreach ($this->model->definedRelationsTypes() as $relationship => $relationshipType) {
                 // if($relationship == 'prices'){
                 //     dd(
                 //         'prices',
@@ -282,11 +285,11 @@ trait RelationTrait
 
                         break;
                     case 'MorphManys':
-                        $fields["{$relationship}_show"] = $object->{$relationship}->map(fn($model) => method_exists($model, 'getShowFormat') ?  $model->getShowFormat() : $model->name)->implode(', ');
+                        $fields["{$relationship}_show"] = $object->{$relationship}->map(fn ($model) => method_exists($model, 'getShowFormat') ? $model->getShowFormat() : $model->name)->implode(', ');
 
                         break;
                     case 'MorphToManys':
-                        $fields["{$relationship}_show"] = $object->{$relationship}->map(fn($model) => method_exists($model, 'getShowFormat') ?  $model->getShowFormat() : $model->name)->implode(', ');
+                        $fields["{$relationship}_show"] = $object->{$relationship}->map(fn ($model) => method_exists($model, 'getShowFormat') ? $model->getShowFormat() : $model->name)->implode(', ');
 
                         break;
                     case 'BelongsToMany':
@@ -304,8 +307,8 @@ trait RelationTrait
                                 //         dd($model, modelShowFormat($model));
                                 //     }
                                 // });
-                                $fields["{$relationship}_show"] = $record->map(fn($model) => modelShowFormat($model))->implode(', ');
-                            } else if($record) {
+                                $fields["{$relationship}_show"] = $record->map(fn ($model) => modelShowFormat($model))->implode(', ');
+                            } elseif ($record) {
                                 $fields["{$relationship}_show"] = modelShowFormat($record);
                             }
                         } catch (\Throwable $th) {
@@ -331,7 +334,6 @@ trait RelationTrait
 
                         // }
 
-
                         break;
                 }
             }
@@ -344,7 +346,7 @@ trait RelationTrait
     {
         return $this->definedRelations('BelongsToMany');
 
-        if(method_exists($this->getModel(), 'getDefinedRelations')){
+        if (method_exists($this->getModel(), 'getDefinedRelations')) {
             return $this->getDefinedRelations('BelongsToMany');
         }
 
@@ -355,7 +357,7 @@ trait RelationTrait
     {
         return $this->definedRelations('HasMany');
 
-        if(method_exists($this->getModel(), 'getDefinedRelations')){
+        if (method_exists($this->getModel(), 'getDefinedRelations')) {
             return $this->getDefinedRelations('HasMany');
         }
 
@@ -378,14 +380,14 @@ trait RelationTrait
         //     }
         // }
 
-        return collect($this->inputs())->reduce(function($acc, $curr){
-            if(preg_match('/morphTo/', $curr['type'])){
-                if(isset($curr['schema'])){
+        return collect($this->inputs())->reduce(function ($acc, $curr) {
+            if (preg_match('/morphTo/', $curr['type'])) {
+                if (isset($curr['schema'])) {
                     $routeCamelCase = camelCase($this->routeName());
-                    $acc["{$routeCamelCase}able"] = Arr::map(array_reverse($curr['schema']), fn($item) => [
+                    $acc["{$routeCamelCase}able"] = Arr::map(array_reverse($curr['schema']), fn ($item) => [
                         'name' => $item['name'],
                         'repository' => $item['repository'],
-                        'model' => get_class( App::make($item['repository'])->getModel()),
+                        'model' => get_class(App::make($item['repository'])->getModel()),
                     ]);
                 }
             }
@@ -403,5 +405,4 @@ trait RelationTrait
     {
         return $this->definedRelations('MorphToMany');
     }
-
 }

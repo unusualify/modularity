@@ -13,8 +13,6 @@ use Illuminate\Support\Facades\Route;
 | Controller namespace Modules/${MODULENAME}/Http/Controllers/Front
 |
 */
-Route::prefix(curtModuleUrlPrefix(__FILE__))->name(curtModuleRouteNamePrefix(__FILE__).'.')->group(function(){
-    Route::middleware('auth')->group(function(){
-
-    });
+Route::prefix(curtModuleUrlPrefix(__FILE__))->name(curtModuleRouteNamePrefix(__FILE__) . '.')->group(function () {
+    Route::middleware('auth')->group(function () {});
 });

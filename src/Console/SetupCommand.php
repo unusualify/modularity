@@ -7,7 +7,6 @@ use Illuminate\Filesystem\Filesystem;
 
 class SetupCommand extends BaseCommand
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -20,7 +19,7 @@ class SetupCommand extends BaseCommand
      *
      * @var string
      */
-    protected $description = "Setup system environments";
+    protected $description = 'Setup system environments';
 
     /**
      * @var Filesystem
@@ -45,19 +44,19 @@ class SetupCommand extends BaseCommand
         $this->db = $db;
     }
 
-
     /**
      * Executes the console command.
      *
      * @return mixed
      */
-    public function handle() :int
+    public function handle(): int
     {
         //check the database connection before installing
         try {
             $this->db->connection()->getPdo();
         } catch (\Exception $e) {
             $this->error('Could not connect to the database, please check your configuration:' . "\n" . $e);
+
             return 0;
         }
 
@@ -104,9 +103,8 @@ class SetupCommand extends BaseCommand
      */
     private function createAdmin()
     {
-        if (!$this->option('no-interaction')) {
+        if (! $this->option('no-interaction')) {
             $this->call('unusual:superadmin');
         }
     }
-
 }

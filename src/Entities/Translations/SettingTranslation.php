@@ -2,8 +2,8 @@
 
 namespace Unusualify\Modularity\Entities\Translations;
 
-use Unusualify\Modularity\Entities\Model;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Entities\Model;
 
 class SettingTranslation extends Model
 {

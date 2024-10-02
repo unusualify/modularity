@@ -16,30 +16,29 @@ class StubsGenerator extends Generator
 
     /**
      * The constructor.
-     * @param $name
+     *
      * @param FileRepository $module
-     * @param Config     $config
-     * @param Filesystem $filesystem
-     * @param Console    $console
      */
     public function __construct(
         $name,
-        Config $config = null,
-        Filesystem $filesystem = null,
-        Console $console = null,
-        Module $module = null
+        ?Config $config = null,
+        ?Filesystem $filesystem = null,
+        ?Console $console = null,
+        ?Module $module = null
     ) {
 
         parent::__construct($name, $config, $filesystem, $console, $module);
     }
 
-    public function setOnly(array $only){
+    public function setOnly(array $only)
+    {
         $this->onlyStubs = $only;
 
         return $this;
     }
 
-    public function setExcept(array $except){
+    public function setExcept(array $except)
+    {
         $this->exceptStubs = $except;
 
         return $this;
@@ -48,14 +47,14 @@ class StubsGenerator extends Generator
     /**
      * Generate the module.
      */
-    public function generate() : int
+    public function generate(): int
     {
         $name = $this->getName();
 
         if ($this->module->getRouteConfig($name)) {
             if ($this->force) {
 
-            } else if(!$this->fix){
+            } elseif (! $this->fix) {
                 $this->console->error("Module Route [{$name}] files already exist!");
 
                 return E_ERROR;
@@ -64,7 +63,7 @@ class StubsGenerator extends Generator
 
         $this->generateFiles();
 
-        $this->console->info("Route [{$name}] stubs " .($this->fix ? 'fixed' : 'created'). " successfully.");
+        $this->console->info("Route [{$name}] stubs " . ($this->fix ? 'fixed' : 'created') . ' successfully.');
 
         return 0;
     }
@@ -76,15 +75,15 @@ class StubsGenerator extends Generator
     {
         foreach ($this->getFiles() as $stub => $file) {
 
-            $path = $this->module->getPath(). '/' . $file;
+            $path = $this->module->getPath() . '/' . $file;
 
             $path = $this->replaceString($path);
 
-            if (!$this->filesystem->isDirectory($dir = dirname($path))) {
+            if (! $this->filesystem->isDirectory($dir = dirname($path))) {
                 $this->filesystem->makeDirectory($dir, 0775, true);
             }
 
-            if(!file_exists($path) || $this->forcibleStub($stub)){
+            if (! file_exists($path) || $this->forcibleStub($stub)) {
                 $this->filesystem->put($path, $this->getStubContents($stub));
 
                 $this->console->info("Created : {$path}");
@@ -94,22 +93,24 @@ class StubsGenerator extends Generator
 
     public function forcibleStub($stub)
     {
-        if($this->force)
+        if ($this->force) {
             return true;
+        }
 
-        if($this->fix){
+        if ($this->fix) {
 
-            if(!empty($this->onlyStubs))
+            if (! empty($this->onlyStubs)) {
                 return in_array($stub, $this->onlyStubs);
+            }
 
-            if(!empty($this->exceptStubs))
-                return !in_array($stub, $this->exceptStubs);
+            if (! empty($this->exceptStubs)) {
+                return ! in_array($stub, $this->exceptStubs);
+            }
             dd($stub);
+
             return true;
         }
 
         return false;
     }
-
-
 }

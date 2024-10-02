@@ -9,10 +9,8 @@ trait HasFiles
 {
     /**
      * Defines the many-to-many relationship for file objects.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
-    public function files() : \Illuminate\Database\Eloquent\Relations\MorphToMany
+    public function files(): \Illuminate\Database\Eloquent\Relations\MorphToMany
     {
         return $this->morphToMany(
             File::class,
@@ -30,7 +28,7 @@ trait HasFiles
             return $file->pivot->role === $role && $file->pivot->locale === $locale;
         });
 
-        if (!$file && config('translatable.use_property_fallback', false)) {
+        if (! $file && config('translatable.use_property_fallback', false)) {
             $file = $this->files->first(function ($file) use ($role) {
                 return $file->pivot->role === $role && $file->pivot->locale === config('translatable.fallback_locale');
             });
@@ -50,7 +48,7 @@ trait HasFiles
     public function file($role, $locale = null, $file = null)
     {
 
-        if (!$file) {
+        if (! $file) {
             $file = $this->findFile($role, $locale);
         }
 
@@ -96,5 +94,4 @@ trait HasFiles
     {
         return $this->findFile($role, $locale);
     }
-
 }

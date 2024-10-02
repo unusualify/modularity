@@ -2,9 +2,8 @@
 
 namespace Unusualify\Modularity\Http\ViewComposers;
 
-use App;
-use Illuminate\Support\Facades\Lang;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Lang;
 
 class Localization
 {
@@ -13,21 +12,17 @@ class Localization
      *
      * @return void
      */
-    public function __construct()
-    {
-
-    }
+    public function __construct() {}
 
     /**
      * Bind data to the view.
      *
-     * @param  View  $view
      * @return void
      */
     public function compose(View $view)
     {
 
-        $name = snakeCase( unusualConfig('name') );
+        $name = snakeCase(unusualConfig('name'));
 
         // $currentLang = Lang::get("{$name}::lang", [], unusualConfig('locale'));
         $currentLang = Lang::get('*', [], unusualConfig('locale'));
@@ -40,7 +35,7 @@ class Localization
         $unusualLocalization = [
             'locale' => unusualConfig('locale'),
             'fallback_locale' => unusualConfig('fallback_locale', 'en'),
-            'lang' => $lang
+            'lang' => $lang,
         ];
 
         $view->with(['unusualLocalization' => $unusualLocalization]);

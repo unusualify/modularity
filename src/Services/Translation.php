@@ -13,7 +13,7 @@ abstract class Translation
     /**
      * Find all of the translations in the app without translation for a given language.
      *
-     * @param  string  $language
+     * @param string $language
      * @return array
      */
     public function findMissingTranslations($language)
@@ -27,7 +27,7 @@ abstract class Translation
     /**
      * Save all of the translations in the app without translation for a given language.
      *
-     * @param  string  $language
+     * @param string $language
      * @return void
      */
     public function saveMissingTranslations($language = false)
@@ -54,7 +54,7 @@ abstract class Translation
     /**
      * Get all translations for a given language merged with the source language.
      *
-     * @param  string  $language
+     * @param string $language
      * @return Collection
      */
     public function getSourceLanguageTranslationsWith($language)
@@ -80,8 +80,8 @@ abstract class Translation
     /**
      * Filter all keys and translations for a given language and string.
      *
-     * @param  string  $language
-     * @param  string  $filter
+     * @param string $language
+     * @param string $filter
      * @return Collection
      */
     public function filterTranslationsFor($language, $filter)
@@ -105,7 +105,7 @@ abstract class Translation
     public function add(Request $request, $language, $isGroupTranslation)
     {
         $namespace = $request->has('namespace') && $request->get('namespace') ? "{$request->get('namespace')}::" : '';
-        $group = $namespace.$request->get('group');
+        $group = $namespace . $request->get('group');
         $key = $request->get('key');
         $value = $request->get('value') ?: '';
 

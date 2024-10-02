@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
     'Address' => 'Adres',
     'City' => 'Şehir',
     'Code' => 'Kod',
@@ -19,4 +19,4 @@ return array (
     'Timezone' => 'Saat Dilimi',
     'Vat Number' => 'KDV Kayıt No',
     'Zip Code' => 'Posta Kodu',
-);
+];

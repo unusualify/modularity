@@ -6,14 +6,12 @@ use Illuminate\View\Component;
 
 class Table extends Component
 {
-
     /**
      * The headers.
      *
      * @var array
      */
     public $headers;
-
 
     /**
      * The inputs.

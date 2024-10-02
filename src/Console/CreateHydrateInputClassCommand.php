@@ -2,13 +2,9 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Storage;
 use Nwidart\Modules\Support\Stub;
-
-use function Laravel\Prompts\{select, confirm, warning};
+use Symfony\Component\Console\Input\InputArgument;
 
 class CreateHydrateInputClassCommand extends BaseCommand
 {
@@ -46,7 +42,7 @@ class CreateHydrateInputClassCommand extends BaseCommand
     /**
      * Execute the console command.
      */
-    public function handle() : int
+    public function handle(): int
     {
         $name = $this->argument('name');
 
@@ -58,13 +54,13 @@ class CreateHydrateInputClassCommand extends BaseCommand
 
         $path = base_path(unusualConfig('vendor_path') . '/src/Hydrates/Inputs/') . "{$className}.php";
 
-        if(!file_exists($path)){
+        if (! file_exists($path)) {
             $content = (string) new Stub('/input-hydrate.stub', ['name' => $className]);
 
             $this->filesystem->put($path, $content);
 
             $this->info("{$className} class created.");
-        }else{
+        } else {
             $success = false;
 
             $this->warn("{$className} class already exists!");

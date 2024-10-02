@@ -22,9 +22,9 @@ class PriceHydrate extends InputHydrate
         'default' => [
             [
                 'display_price' => '',
-                'currency_id' => 1
-            ]
-        ]
+                'currency_id' => 1,
+            ],
+        ],
     ];
 
     /**
