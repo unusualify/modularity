@@ -368,6 +368,9 @@ const processInputs = (inputObj) => {
       // };
     } else if (!value.slotable) {
       acc[key] = value;
+    } else {
+      acc[key] = value;
+      // __log(inputObj, value, key)
     }
     return acc;
   }, {});
