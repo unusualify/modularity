@@ -14,11 +14,10 @@ trait RelationTrait
     /**
      * @param \Unusualify\Modularity\Entities\Model|null $object
      * @param array $fields
-     * @return array
+     * @return void
      */
     public function afterSaveRelationTrait($object, $fields)
     {
-
         foreach ($this->getMorphToManyRelations() as $relationName) {
             if (isset($fields[$relationName]) && $fields[$relationName] && $relationName != 'tags' && ! classHasTrait(get_class($this), 'Unusualify\Modularity\Repositories\Traits\TagsTrait')) {
                 $object->{$relationName}()->sync($fields[$relationName]);
@@ -124,7 +123,6 @@ trait RelationTrait
                 $relation = $object->{$relationName}();
                 $relatedLocalKey = $relation->getLocalKeyName(); //id
                 $foreignKey = $relation->getForeignKeyName(); // parent_name_id
-
                 $repository = UFinder::getRouteRepository(Str::singular($relationName), asClass: true);
 
                 $idsDeleted = $relation->get()->pluck($relatedLocalKey)->toArray();
@@ -132,7 +130,6 @@ trait RelationTrait
                 foreach ($fields[$relationName] as $key => $data) {
                     if (isset($data[$relatedLocalKey])) {
                         array_splice($idsDeleted, array_search($data[$relatedLocalKey], $idsDeleted), 1);
-
                         $repository->update($data[$relatedLocalKey], $data + [$foreignKey => $object->id]);
                     } else {
                         $repository->create(array_merge($data, [$foreignKey => $object->id]));
@@ -147,7 +144,6 @@ trait RelationTrait
 
         return $fields;
     }
-
     /**
      * @return void
      */
