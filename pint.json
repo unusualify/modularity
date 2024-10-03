@@ -16,6 +16,7 @@
         "modernize_strpos": true,
         "no_multiline_whitespace_around_double_arrow": true,
         "normalize_index_brace": true,
+        "ordered_traits": false,
         "phpdoc_align": {
             "align": "left"
         },
