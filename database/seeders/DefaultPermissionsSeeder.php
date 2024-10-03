@@ -37,6 +37,7 @@ class DefaultPermissionsSeeder extends Seeder
                 'User',
                 'Role',
                 'Permission',
+                'Payment',
                 // 'PackageContinent',
                 // 'PackageRegion',
                 // 'PackageCountry',
