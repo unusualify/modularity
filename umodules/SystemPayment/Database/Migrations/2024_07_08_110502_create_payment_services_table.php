@@ -13,6 +13,8 @@ return new class extends Migration
             createDefaultTableFields($table);
             $table->string('name');
             $table->string('title');
+            $table->boolean('is_external');
+            $table->boolean('is_internal');
 
             // a "published" column, and soft delete and timestamps columns
             createDefaultExtraTableFields($table);
