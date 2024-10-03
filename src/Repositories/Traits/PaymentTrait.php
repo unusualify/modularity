@@ -18,7 +18,7 @@ trait PaymentTrait
      *
      * @var int
      */
-    public $paymentTraitDefaultCurrencyId = 2;
+    public $paymentTraitDefaultCurrencyId = 1;
 
     /**
      * requiredTrait
@@ -41,7 +41,7 @@ trait PaymentTrait
      */
     protected function afterSavePaymentTrait($object, $fields)
     {
-        $session_currency = Session::get('currency_id');
+        $session_currency = request()->getUserCurrency()->id;
 
         $currencyId = isset($fields['currency_id'])
             ? $fields['currency_id']
@@ -64,7 +64,6 @@ trait PaymentTrait
                 // dd($object->{$this->paymentTraitRelationName});
                 $records = $object->{$this->paymentTraitRelationName};
                 $totalPrice = 0;
-
                 if ($records instanceof \Illuminate\Database\Eloquent\Collection) {
                     foreach ($records as $record) {
                         $price = $record->prices()->where('currency_id', $currencyId)->first();
@@ -85,7 +84,7 @@ trait PaymentTrait
                     ]);
                 } elseif ($object->price->display_price != $totalPrice) {
 
-                    $object->price->display_price = $totalPrice;
+                    $object->price->display_price = $totalPrice / 100;
                     $object->price->currency_id = $currencyId;
                     // dd($object->price, $totalPrice, $currencyId);
                     $object->price()->save($object->price);
