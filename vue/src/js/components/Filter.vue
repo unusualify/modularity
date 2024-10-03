@@ -11,13 +11,15 @@
                 type="search"
                 class="form__input form__input--small v-filter__search__input"
                 name="search"
-                :modelValue="searchValue"
-                @update:modelValue="onSearchInput"
+                :modelValue="filterState.search"
+                @update:modelValue="updateSearch"
                 :placeholder="placeholder"
+                variant="outlined"
+                hide-details="true"
                 />
             <ue-btn
                 class="filter__toggle"
-                variant="ghost"
+                variant="outlined"
                 @click="toggleFilter"
                 v-if="withHiddenFilters"
                 :aria-expanded="opened ?  'true' : 'false'"
@@ -29,15 +31,15 @@
             </ue-btn>
           <slot name="additional-actions"></slot>
           <!-- Fix for Safari: the hidden submit button enables form submission by pressing Enter... -->
-          <button class="visually-hidden" aria-hidden="true" type="submit">{{ $trans('filter.apply-btn', 'Apply') }}</button>
+          <!-- <ue-btn class="visually-hidden" variant="outlined" aria-hidden="true" type="submit">{{ $trans('filter.apply-btn', 'Apply') }}</ue-btn> -->
         </div>
       </div>
       <transition :css='false' :duration="275" @before-enter="beforeEnter" @enter="enter" @before-leave="beforeLeave" @leave="leave">
         <div class="filter__more" v-show="opened" v-if="withHiddenFilters" :aria-hidden="!opened ? true : null" ref="more">
           <div class="filter__moreInner" ref="moreInner">
             <slot name="hidden-filters"></slot>
-            <ue-btn variant="ghost" type="submit">{{ $trans('filter.apply-btn', 'Apply') }}</ue-btn>
-            <ue-btn v-if="clearOption" variant="ghost" type="button" @click="clear">{{ $trans('filter.clear-btn', 'Clear') }}</ue-btn>
+            <ue-btn variant="outlined" type="submit">{{ $trans('filter.apply-btn', 'Apply') }}</ue-btn>
+            <ue-btn v-if="clearOption" variant="elavated" type="button" @click="clear">{{ $trans('filter.clear-btn', 'Clear') }}</ue-btn>
           </div>
         </div>
       </transition>
@@ -72,8 +74,13 @@ export default {
     clearOption: {
       type: Boolean,
       default: false
+    },
+    filterState: {
+      type: Object,
+      required: true
     }
   },
+  emits: ['update:filterState', 'submit', 'clear'],
   data: function () {
     return {
       openable: !this.closed,
@@ -165,7 +172,10 @@ export default {
     },
     _resize: debounce(function () {
       this.resetHeight()
-    }, 50)
+    }, 50),
+    updateSearch(value) {
+      this.$emit('update:filterState', { ...this.filterState, search: value });
+    },
   },
   beforeMount: function () {
     if (!this.$slots.navigation) this.withNavigation = false
@@ -174,142 +184,144 @@ export default {
 }
 </script>
 
-  <style lang="scss" scoped>
+<style lang="scss" scoped>
 
-    .filter__inner {
-      display: flex;
-      justify-content: space-between;
+  .filter__inner {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .filter__search, .filter__navigation {
+    padding:20px 0;
+    white-space: nowrap;
+  }
+  .filter__search {
+    display:flex;
+    align-items: center;
+    .v-filter__search__input {
+      display:inline-block;
+      width:20vw;
+      max-width:300px;
     }
 
-    .filter__search, .filter__navigation {
-      padding:20px 0;
-      white-space: nowrap;
+    .icon {
+      position:relative;
+      top:-2px;
+      margin-left:9px;
     }
-    .filter__search {
-      .v-filter__search__input {
-        display:inline-block;
-        width:20vw;
-        max-width:300px;
+
+    div {
+      display:inline-block;
+
+      button, a {
+        vertical-align: middle;
       }
 
-      .icon {
-        position:relative;
-        top:-2px;
-        margin-left:9px;
-      }
-
-      div {
-        display:inline-block;
-
-        button, a {
-          vertical-align: middle;
-        }
-
-        input, button, a {
-          margin-left:15px;
-        }
+      input, button, a {
+        margin-left:15px;
       }
     }
+  }
 
-    /* variant when filter has hidden filters on small screens */
-    @include breakpoint(xsmall) {
-      .filter--withHiddenFilters {
-        .filter__inner {
-          display:block;
-        }
+  /* variant when filter has hidden filters on small screens */
+  @include breakpoint(xsmall) {
+    .filter--withHiddenFilters {
+      .filter__inner {
+        display:block;
+      }
 
-        .filter__search {
-          display:flex;
+      .filter__search {
+        display:flex;
 
-          input {
-            flex-grow:1;
-          }
+        input {
+          flex-grow:1;
         }
       }
     }
+  }
 
-    .filter__more {
-      transition: height 0.275s ease;
-      overflow: hidden;
+  .filter__more {
+    transition: height 0.275s ease;
+    overflow: hidden;
+  }
+
+  .filter__moreInner {
+    padding: 20px 0 0 0;
+    border-top:1px solid $color__border;
+
+    button {
+      margin-right: 10px;
+      margin-bottom: 20px;
     }
+  }
 
+  @include breakpoint('small+') {
     .filter__moreInner {
-      padding: 20px 0 0 0;
-      border-top:1px solid $color__border;
+      display: flex;
+      flex-flow: row wrap;
+    }
+  }
 
-      button {
-        margin-right: 10px;
+  .filter__toggle {
+    position: relative;
+    padding-right:  20px + 20px !important;
+    margin-left: 15px !important;
+
+    .icon {
+      transition: all .2s linear;
+      transform: rotate(0deg);
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      margin-top: -3px;
+    }
+  }
+
+  /* Opened filters */
+  .filter--opened {
+    .filter__toggle .icon {
+      transform: rotate(180deg);
+    }
+  }
+
+  .filter__navigation {
+      padding: 20px 0;
+
+  }
+
+  .filter--single {
+    .filter__navigation {
+      display: none;
+    }
+  }
+</style>
+
+<style lang="scss">
+
+  .filter {
+    .filter__moreInner {
+      .input {
+        margin-top: 0;
         margin-bottom: 20px;
       }
     }
 
     @include breakpoint('small+') {
       .filter__moreInner {
-        display: flex;
-        flex-flow: row wrap;
-      }
-    }
-
-    .filter__toggle {
-      position: relative;
-      padding-right:  20px + 20px !important;
-      margin-left: 15px !important;
-
-      .icon {
-        transition: all .2s linear;
-        transform: rotate(0deg);
-        position: absolute;
-        right: 20px;
-        top: 50%;
-        margin-top: -3px;
-      }
-    }
-
-    /* Opened filters */
-    .filter--opened {
-      .filter__toggle .icon {
-        transform: rotate(180deg);
-      }
-    }
-
-    .filter__navigation {
-        padding: 20px 0;
-
-    }
-
-    .filter--single {
-      .filter__navigation {
-        display: none;
-      }
-    }
-  </style>
-
-  <style lang="scss">
-
-    .filter {
-      .filter__moreInner {
         .input {
           margin-top: 0;
-          margin-bottom: 20px;
+          margin-right: 20px;
         }
-      }
 
-      @include breakpoint('small+') {
-        .filter__moreInner {
-          .input {
-            margin-top: 0;
-            margin-right: 20px;
-          }
+        > div {
+          display: flex;
+          flex-flow: row wrap;
+        }
 
-          > div {
-            display: flex;
-            flex-flow: row wrap;
-          }
-
-          > div > * {
-            margin-right: 20px;
-          }
+        > div > * {
+          margin-right: 20px;
         }
       }
     }
-  </style>
+  }
+</style>

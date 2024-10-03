@@ -32,7 +32,12 @@
             </v-toolbar-items>
           </v-toolbar>
           <div class="medialibrary__header" ref="form">
-            <ue-filter @submit="submitFilter" :clearOption="true" @clear="clearFilters">
+            <ue-filter
+              @submit="submitFilter"
+              :clearOption="true"
+              @clear="clearFilters"
+              v-model:filterState="sharedFilterState"
+              >
               <ul class="secondarynav secondarynav--desktop py" slot="navigation" v-if="types.length">
                 <v-chip
                   v-for="navType in types"
@@ -67,11 +72,42 @@
               </div> -->
 
               <div slot="hidden-filters">
+
                 <!-- <a17-vselect class="medialibrary__filter-item" ref="filter" name="tag" :options="tags"
                             :placeholder="$trans('media-library.filter-select-label', 'Filter by tag')" :searchable="true" maxHeight="175px"/>
                 <a17-checkbox class="medialibrary__filter-item" ref="unused" name="unused" :initial-value="0" :value="1" :label="$trans('media-library.unused-filter-label', 'Show unused only')"/> -->
               </div>
+
             </ue-filter>
+            <ue-dropdown-filter
+            @submit="submitFilter"
+            @clear="clearDropdownFilters"
+            :loading="loading"
+            :filter-ref="$refs.filter"
+
+            v-model:filterState="sharedFilterState"
+            :schema="filterSchema"
+          >
+
+          </ue-dropdown-filter>
+<!--
+
+[
+  {
+    "clearable" => "true"
+    "chips" => "true",
+    "label" => $trans('media-library.filter-select-label', 'Filter by tag'),
+    "name" => "tag"
+    "items" => "tags"
+    "class" => "medialibrary__filter"
+    "ref" => "filter"
+    "maxHeight" => "175px"
+    "v-model" => "sharedFilterState.tag"
+  }
+]
+
+-->
+
           </div>
 
           <div class="medialibrary__inner">
@@ -192,7 +228,16 @@ export default {
       tags: [],
       lastScrollTop: 0,
       gridLoaded: false,
-      full: true
+      full: true,
+      sharedFilterState: {
+        search: '',
+        tag: null,
+        type: this.type ?? "image",
+        page: this.page ?? this.initialPage
+      },
+
+
+
       //   show: false
     }
   },
@@ -265,7 +310,27 @@ export default {
       // showModal: state => state.mediaLibrary.showModal,
 
       // show: state => state.mediaLibrary.showModal,
-    })
+    }),
+    filterSchema: function(){
+      return {
+        tag: {
+          type: "select",
+          name: "tag",
+          label: "Filter by tags",
+          items: this.tags,
+          variant: "outlined",
+          clearable: "true",
+          chips: "true",
+          col: "12"
+        },
+        // clearBtn: {
+        //   type: "btn",
+        //   label: "Clear Filters",
+        //   loading: this.loading,
+        //   click: "handleClear"
+        // }
+      }
+    }
 
     // show: {
     //     get () {
@@ -280,6 +345,10 @@ export default {
     type: function () {
       this.clearMediaItems()
       this.gridLoaded = false
+      this.sharedFilterState.type = newType;
+    },
+    page: function (newPage) {
+      this.sharedFilterState.page = newPage;
     }
   },
   methods: {
@@ -428,6 +497,11 @@ export default {
     clearFilters: function () {
       const self = this
       // reset tags
+      this.sharedFilterState = {
+        tag: null, // Set tag to null when clearing
+        type: this.type,
+        page: this.page
+      };
       if (this.$refs.filter) this.$refs.filter.value = null
       // reset unused field
       if (this.$refs.unused) {
@@ -435,6 +509,18 @@ export default {
         input && input.checked && input.click()
       }
 
+      this.$nextTick(function () {
+        self.submitFilter()
+      })
+    },
+    clearDropdownFilters: function () {
+      const self = this
+      // reset tags
+      this.sharedFilterState = {
+        tag: null, // Set tag to null when clearing
+        type: this.type,
+        page: this.page
+      };
       this.$nextTick(function () {
         self.submitFilter()
       })
@@ -466,16 +552,13 @@ export default {
       this.mediaItems.splice(0)
     },
     reloadGrid: function () {
+      const self = this;
       this.loading = true
+      // let formdata = null;
       const form = this.$refs.form
-      const formdata = this.getFormData(form)
-
-      // if (this.selected[this.connector]) {
-      //   formdata.except = this.selected[this.connector].map((media) => {
-      //     return media.id
-      //   })
-      //   console.log(formdata.except)
-      // }
+      console.log(this.sharedFilterState)
+      const formdata = self.cleanEmptyFilters(this.sharedFilterState);
+      // console.log(formdata)
 
       // see api/media-library for actual ajax
       api.get(this.endpoint, formdata, (resp) => {
@@ -486,7 +569,12 @@ export default {
           }
         })
         this.maxPage = resp.data.maxPage || 1
-        this.tags = resp.data.tags || []
+        let regularArray = resp.data.tags.map(({label, ...rest}) => ({
+          title: label,
+          ...rest
+        }));
+        this.tags = regularArray || []
+
         this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_TYPE_TOTAL, { type: this.type, total: resp.data.total })
         this.loading = false
         // this.listenScrollPosition()
@@ -560,6 +648,18 @@ export default {
 
     reloadTags: function (tags = []) {
       this.tags = tags
+    },
+    cleanEmptyFilters: function(obj) {
+      return Object.entries(obj).reduce((acc, [key, value]) => {
+        if (value !== null && value !== undefined && value !== '') {
+          if (typeof value === 'object' && !Array.isArray(value)) {
+            acc[key] = this.cleanEmptyFilters(value); // Recursively clean nested objects
+          } else {
+            acc[key] = value;
+          }
+        }
+        return acc;
+      }, {});
     }
   },
 
@@ -599,6 +699,10 @@ export default {
     background: $color__border--light;
     border-bottom: 1px solid $color__border;
     padding: 0 20px;
+    display:flex;
+    flex-flow:row;
+    align-items: center;
+    justify-content: space-between;
 
     @include breakpoint(small-) {
       .secondarynav {
