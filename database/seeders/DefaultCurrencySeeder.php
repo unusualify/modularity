@@ -14,14 +14,19 @@ class DefaultCurrencySeeder extends Seeder
 
         $seedArray = [
             [
+                'name' => 'Euro',
+                'symbol' => '€',
+                'iso_4217' => 'EUR',
+            ],
+            [
                 'name' => 'US Dollar',
                 'symbol' => '$',
                 'iso_4217' => 'USD',
             ],
             [
-                'name' => 'Euro',
-                'symbol' => '€',
-                'iso_4217' => 'EUR',
+                'name' => 'Turkish Lira',
+                'symbol' => '₺',
+                'iso_4217' => 'TRY',
             ],
             [
                 'name' => 'British Pound',
@@ -87,11 +92,6 @@ class DefaultCurrencySeeder extends Seeder
                 'name' => 'South Korean Won',
                 'symbol' => '₩',
                 'iso_4217' => 'KRW',
-            ],
-            [
-                'name' => 'Turkish Lira',
-                'symbol' => '₺',
-                'iso_4217' => 'TRY',
             ],
             [
                 'name' => 'Brazilian Real',
