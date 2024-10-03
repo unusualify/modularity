@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\App;
+use Oobook\Priceable\Models\Currency;
 
 class LanguageMiddleware
 {
@@ -31,9 +32,13 @@ class LanguageMiddleware
         App::setFallbackLocale(unusualConfig('fallback_locale'));
 
         $currency = unusualConfig("payment.locale_currencies.{$locale}", null)
-            ?? unusualConfig('payment.currency', 'EUR');
-        config([unusualBaseKey() . '.payment.currency' => $currency]);
-        $request->session()->put('currency', $currency);
+            ?? config('priceable.currency');
+
+        if($currency !== mb_strtoupper(config('priceable.currency'))){
+            config(['priceable.currency' => $currency]);
+            $currencyModel = Currency::where('iso_4217', config('priceable.currency'))->first();
+            $request->setUserCurrency($currencyModel);
+        }
 
         \Carbon\CarbonInterval::setLocale(config('app.locale'));
         \Carbon\Carbon::setLocale(config('app.locale'));
