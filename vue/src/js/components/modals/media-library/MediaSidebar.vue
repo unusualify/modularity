@@ -40,6 +40,45 @@
           :selected="hasMultipleMedias ? sharedTags : firstMedia.tags" :searchable="true"
           :emptyText="$trans('media-library.no-tags-found', 'Sorry, no tags found.')" :taggable="true" :pushTags="true"
           size="small" :endpoint="type.tagsEndpoint" @change="save" maxHeight="175px" /> -->
+          <template
+            v-if="!hasMultipleMedias"
+          >
+            <SelectTag
+              :label="$trans('media-library.sidebar.tags')"
+              :key="firstMedia.id + '-' + medias.length"
+              name=""
+              :v-model="hasMultipleMedias ? sharedTags : firstMedia.tags"
+              :options="tags"
+              :selected="hasMultipleMedias ? sharedTags : firstMedia.tags"
+              :searchable="true"
+              :multiple="true"
+              :emptyText="$trans('media-library.no-tags-found', 'Sorry, no tags found.')"
+              :taggable="true"
+              :pushTags="true"
+              size="small"
+              :endpoint="type.tagsEndpoint"
+              @change="save"
+            >
+            </SelectTag>
+            <v-text-field
+              :label="$trans('media-library.sidebar.alt-text')"
+              variant="outlined"
+              name="alt_text"
+              @blur="blur"
+              v-model="firstMedia.metadatas.default.altText"
+              >
+            </v-text-field>
+            <v-textarea
+              :label="$trans('media-library.sidebar.caption')"
+              variant="outlined"
+              name="caption"
+              @blur="blur"
+              v-model="firstMedia.metadatas.default.caption"
+            >
+            </v-textarea>
+          </template>
+
+
         <v-tooltip
           v-if="extraMetadatas.length && isImage && hasMultipleMedias && !fieldsRemovedFromBulkEditing.includes('tags')"
           text="Remove this field if you do not want to update it on all selected medias"
@@ -159,12 +198,17 @@ import FormDataAsObj from '@/utils/formDataAsObj.js'
 import a17VueFilters from '@/utils/filters.js'
 import UeMediaSidebarUpload from './MediaSidebarUpload.vue'
 import { ALERT } from '@/store/mutations'
+import SelectTag from '@/components/inputs/SelectTag';
+import formDataAsObj from '../../../utils/formDataAsObj'
+
 // import a17Langswitcher from '@/components/LangSwitcher'
 
 export default {
   name: 'A17MediaSidebar',
   components: {
-    'ue-mediasidebar-upload': UeMediaSidebarUpload
+    'ue-mediasidebar-upload': UeMediaSidebarUpload,
+    SelectTag
+
     // 'a17-langswitcher': a17Langswitcher
   },
   props: {
@@ -413,7 +457,6 @@ export default {
       if (!form) return
 
       const formData = this.getFormData(form)
-
       if (!isEqual(formData, this.previousSavedData) && !this.loading) {
         this.previousSavedData = formData
         this.update(form)
