@@ -21,7 +21,7 @@ use Unusualify\Modularity\Traits\ManageNames;
 
 abstract class Repository
 {
-    use DatesTrait, ManageNames, MethodTransformers, PaymentTrait, RelationTrait;
+    use DatesTrait, ManageNames, MethodTransformers, RelationTrait, PaymentTrait;
 
     /**
      * @var \Unusualify\Modularity\Models\Model
