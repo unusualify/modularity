@@ -46,6 +46,8 @@ final class LaravelServiceProvider extends ServiceProvider
             __DIR__ . '/../config/publishes/one-time-operations.php' => config_path('one-time-operations.php'),
             __DIR__ . '/../config/publishes/modules.php' => config_path('modules.php'),
             __DIR__ . '/../config/publishes/priceable.php' => config_path('priceable.php'),
+            __DIR__ . '/../config/publishes/snapshot.php' => config_path('snapshot.php'),
+            __DIR__ . '/../config/publishes/payable.php' => config_path('payable.php'),
             __DIR__ . '/../config/publishes/permission.php' => config_path('permission.php'),
             __DIR__ . '/../config/publishes/activitylog.php' => config_path('activitylog.php'),
             __DIR__ . '/../config/publishes/geoip.php' => config_path('geoip.php'),
