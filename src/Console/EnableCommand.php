@@ -14,7 +14,7 @@ class EnableCommand extends Command
      *
      * @var string
      */
-    protected $name = 'unusual:route:enable';
+    protected $name = 'modularity:route:enable';
 
     /**
      * The console command description.

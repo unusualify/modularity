@@ -11,7 +11,7 @@ class ModuleRemoveCommand extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'unusual:remove:module {module}
+    protected $signature = 'modularity:remove:module {module}
     ';
 
     /**
@@ -22,8 +22,8 @@ class ModuleRemoveCommand extends BaseCommand
     protected $description = 'Remove completely a module.';
 
     protected $aliases = [
-        'u:r:m',
-        'modularity:remove:module',
+        'm:r:m',
+        'unusual:remove:module',
     ];
 
     /*
@@ -38,7 +38,7 @@ class ModuleRemoveCommand extends BaseCommand
 
         // $this->call('optimize:clear');
 
-        $this->call('unusual:migrate:rollback', [
+        $this->call('modularity:migrate:rollback', [
             'module' => $moduleName,
         ]);
 

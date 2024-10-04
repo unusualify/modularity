@@ -16,7 +16,7 @@ class ControllerFrontMakeCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:make:controller:front';
+    protected $name = 'modularity:make:controller:front';
 
     /**
      * The console command description.

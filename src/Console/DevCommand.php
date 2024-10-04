@@ -9,8 +9,12 @@ class DevCommand extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'unusual:dev {--noInstall}';
+    protected $signature = 'modularity:dev {--noInstall}';
 
+
+    protected $aliases = [
+        'unusual:dev',
+    ];
     /**
      * The console command description.
      *
@@ -25,7 +29,7 @@ class DevCommand extends BaseCommand
      */
     public function handle(): int
     {
-        $this->call('unusual:build', [
+        $this->call('modularity:build', [
             '--hot' => true,
             '--noInstall' => $this->option('noInstall'),
         ]);

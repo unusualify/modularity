@@ -649,7 +649,7 @@ class RouteGenerator extends Generator
 
                 if ($this->migrate && ! $this->fix) { //!$this->module->isRouteTableExists($name)
 
-                    $this->console->call('unusual:migrate', [
+                    $this->console->call('modularity:migrate', [
                         'module' => $this->module->getStudlyName(),
                     ]);
 
@@ -753,21 +753,21 @@ class RouteGenerator extends Generator
     {
 
         if ($this->generatorConfig('route-controller')->generate()) {
-            $this->console->call('unusual:make:controller', [
+            $this->console->call('modularity:make:controller', [
                 'module' => $this->module->getStudlyName(),
                 'name' => $this->getName(),
             ]);
         }
 
         if ($this->generatorConfig('route-controller-api')->generate()) {
-            $this->console->call('unusual:make:controller:api', [
+            $this->console->call('modularity:make:controller:api', [
                 'module' => $this->module->getStudlyName(),
                 'name' => $this->getName(),
             ]);
         }
 
         if ($this->generatorConfig('route-controller-front')->generate()) {
-            $this->console->call('unusual:make:controller:front', [
+            $this->console->call('modularity:make:controller:front', [
                 'module' => $this->module->getStudlyName(),
                 'name' => $this->getName(),
             ]);
@@ -779,7 +779,7 @@ class RouteGenerator extends Generator
 
         $hasCustomModel = $this->customModel && @class_exists($this->customModel);
 
-        $this->console->call('unusual:make:model', [
+        $this->console->call('modularity:make:model', [
             'module' => $this->module->getStudlyName(),
             'model' => $this->getName(),
         ]
@@ -797,7 +797,7 @@ class RouteGenerator extends Generator
         if (! $hasCustomModel) {
             if (! $this->module->isFileExists("create_{$tableName}_table") && ! $this->fix) {
                 $this->console->call(
-                    'unusual:make:migration',
+                    'modularity:make:migration',
                     [
                         'module' => $this->module->getStudlyName(),
                         'name' => "create_{$tableName}_table",
@@ -811,7 +811,7 @@ class RouteGenerator extends Generator
         } elseif ($this->migration) {
             if (! $this->module->isFileExists("add_{$tableName}_table") && ! $this->fix) {
                 $this->console->call(
-                    'unusual:make:migration',
+                    'modularity:make:migration',
                     [
                         'module' => $this->module->getStudlyName(),
                         'name' => "add_{$tableName}_table",
@@ -829,7 +829,7 @@ class RouteGenerator extends Generator
 
         if ($this->generatorConfig('repository')->generate()) {
             // $this->console->call('module:make-repository', [
-            $this->console->call('unusual:make:repository', [
+            $this->console->call('modularity:make:repository', [
                 'module' => $this->module->getStudlyName(),
                 'repository' => $this->getName(),
             ]
@@ -841,7 +841,7 @@ class RouteGenerator extends Generator
 
         if ($this->generatorConfig('route-request')->generate()) {
 
-            $this->console->call('unusual:make:request', [
+            $this->console->call('modularity:make:request', [
                 'request' => $this->getName(),
                 'module' => $this->module->getStudlyName(),
             ]
@@ -1072,7 +1072,7 @@ class RouteGenerator extends Generator
 
                         $pivot_table_name = snakeCase($this->name) . '_' . snakeCase($route_name);
                         if (! $this->module->isFileExists("create_{$pivot_table_name}_table")) {
-                            $this->console->call('unusual:make:migration', [
+                            $this->console->call('modularity:make:migration', [
                                 '--relational' => 'BelongsToMany',
                                 '--no-defaults' => true,
                                 '--route' => $this->name,
@@ -1095,7 +1095,7 @@ class RouteGenerator extends Generator
 
                         if (! $this->module->isFileExists("create_{$pivot_table_name}_table")) {
 
-                            $this->console->call('unusual:make:migration', [
+                            $this->console->call('modularity:make:migration', [
                                 '--relational' => 'MorphedByMany',
                                 '--no-defaults' => true,
                                 'module' => $this->module->getStudlyName(),
@@ -1347,7 +1347,7 @@ class RouteGenerator extends Generator
 
             $hasCustomModel = $this->customModel && @class_exists($this->customModel);
 
-            $this->console->call('unusual:make:model', [
+            $this->console->call('modularity:make:model', [
                 'module' => $this->module->getStudlyName(),
                 'model' => $this->getName(),
             ]
@@ -1365,7 +1365,7 @@ class RouteGenerator extends Generator
 
             if (! $hasCustomModel) {
                 if (! $this->module->isFileExists("create_{$tableName}_table") && ! $this->fix) {
-                    $this->console->call('unusual:make:migration', [
+                    $this->console->call('modularity:make:migration', [
                         'module' => $this->module->getStudlyName(),
                         'name' => "create_{$tableName}_table",
                     ]
@@ -1379,7 +1379,7 @@ class RouteGenerator extends Generator
             } elseif ($this->migration) {
                 if (! $this->module->isFileExists("add_{$tableName}_table") && ! $this->fix) {
                     $this->console->call(
-                        'unusual:make:migration',
+                        'modularity:make:migration',
                         [
                             'module' => $this->module->getStudlyName(),
                             'name' => "add_{$tableName}_table",

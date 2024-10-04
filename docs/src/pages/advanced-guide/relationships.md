@@ -41,7 +41,7 @@ Model Relationships parameter add only methods to parent model, so it matters me
 <!-- "Model Relationships" => "belongsToMany:PackageFeature,position:integer,active:string|belongsToMany:PackageLanguage" -->
 ### Synopsis
 ```bash
-php artisan unusual:make:model <moduleName> <modelName> [--relationships=<MODELRELATIONSHIPS>] [options]
+php artisan modularity:make:model <moduleName> <modelName> [--relationships=<MODELRELATIONSHIPS>] [options]
 ```
 
 ```bash
@@ -94,7 +94,7 @@ Route relationships parameter more complex than model relationship, both makes w
   <!-- package_feature:belongsToMany,position:integer:unsigned:index,active:string:default(true)|package_language:belongsToMany -->
   <!-- [--relationships=[{routeName|columnName}:{relationshipCamelName|migrationMethodName}:{migrationChainMethod[:...]}[,...]][|...]] -->
 ```bash
-php artisan unusual:make:route <moduleName> <routeName> [--relationships=<ROUTERELATIONSHIPS>] [options]
+php artisan modularity:make:route <moduleName> <routeName> [--relationships=<ROUTERELATIONSHIPS>] [options]
 ```
 
 ```bash

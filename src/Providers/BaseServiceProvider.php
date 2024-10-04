@@ -252,17 +252,18 @@ class BaseServiceProvider extends ServiceProvider
         ]);
 
         $modularityIsCacheable = ! ($this->app->runningInConsole() && $this->app->runningConsoleCommand([
-            'unusual:make:module',
-            'u:m:m',
             'modularity:make:module',
-            'unusual:fix:module',
-            'unusual:make:route',
-            'u:m:r',
+            'unusual:make:module',
+            'm:m:m',
+            'modularity:fix:module',
             'modularity:make:route',
+            'unusual:make:route',
+            'm:m:r',
+            'modularity:dev',
             'unusual:dev',
-            'unusual:remove:module',
             'modularity:remove:module',
-            'u:r:m',
+            'unusual:remove:module',
+            'm:r:m',
         ]));
 
         if ($modularityIsCacheable) {

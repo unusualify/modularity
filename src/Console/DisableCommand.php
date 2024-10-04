@@ -13,7 +13,7 @@ class DisableCommand extends Command
      *
      * @var string
      */
-    protected $name = 'unusual:route:disable';
+    protected $name = 'modularity:route:disable';
 
     /**
      * The console command description.

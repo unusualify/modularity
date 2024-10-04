@@ -17,7 +17,7 @@ class Install extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:install';
+    protected $name = 'modularity:install';
 
     /**
      * The console command description.
@@ -122,7 +122,7 @@ class Install extends BaseCommand
         if ($operationType == 'vp') {
             $this->newLine();
             info('Vendor publish is done √. Config files can be customized now');
-            warning('Run php artisan unusual:install --db to run installation with db operations');
+            warning('Run php artisan modularity:install --db to run installation with db operations');
         }
         info('Process is done.');
 
@@ -139,7 +139,7 @@ class Install extends BaseCommand
         info("\t Creating super-admin account");
 
         if (! $this->option('no-interaction')) {
-            $this->call('unusual:create:superadmin', [
+            $this->call('modularity:create:superadmin', [
                 '--default' => $this->option('default'),
             ]);
         }

@@ -21,7 +21,7 @@ class MigrationMakeCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:make:migration';
+    protected $name = 'modularity:make:migration';
 
     /**
      * The console command description.

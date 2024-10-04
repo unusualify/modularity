@@ -16,7 +16,7 @@ class ModuleMakeCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:make:module';
+    protected $name = 'modularity:make:module';
 
     /**
      * The console command description.
@@ -26,8 +26,8 @@ class ModuleMakeCommand extends BaseCommand
     protected $description = 'Create a module';
 
     protected $aliases = [
-        'u:m:m',
-        'modularity:make:module',
+        'm:m:m',
+        'unusual:make:module',
     ];
 
     /**
@@ -55,7 +55,7 @@ class ModuleMakeCommand extends BaseCommand
             $module = Modularity::find($this->argument('module'));
 
             foreach ($module->getRoutes() as $key => $routeName) {
-                $this->call('unusual:make:stubs', [
+                $this->call('modularity:make:stubs', [
                     'module' => $module->getName(),
                     'route' => $routeName,
                     '--fix' => true,
@@ -83,7 +83,7 @@ class ModuleMakeCommand extends BaseCommand
             '--plain' => true,
         ]);
 
-        $this->call('unusual:make:route', [
+        $this->call('modularity:make:route', [
             'module' => $this->argument('module'),
             'route' => $this->argument('module'),
         ]

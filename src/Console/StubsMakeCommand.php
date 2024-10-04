@@ -14,7 +14,7 @@ class StubsMakeCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:make:stubs';
+    protected $name = 'modularity:make:stubs';
 
     /**
      * The console command description.

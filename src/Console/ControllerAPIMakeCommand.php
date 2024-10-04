@@ -16,7 +16,7 @@ class ControllerAPIMakeCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:make:controller:api';
+    protected $name = 'modularity:make:controller:api';
 
     /**
      * The console command description.

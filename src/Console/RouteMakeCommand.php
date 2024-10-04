@@ -15,7 +15,7 @@ class RouteMakeCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:make:route';
+    protected $name = 'modularity:make:route';
 
     /**
      * The console command description.
@@ -26,7 +26,7 @@ class RouteMakeCommand extends BaseCommand
 
     protected $aliases = [
         'u:m:r',
-        'modularity:make:route',
+        'unusual:make:route',
     ];
 
     protected $responses = [];

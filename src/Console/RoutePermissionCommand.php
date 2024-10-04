@@ -14,7 +14,7 @@ class RoutePermissionCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:create:route:permissions';
+    protected $name = 'modularity:create:route:permissions';
 
     /**
      * The console command description.

@@ -9,7 +9,7 @@ class ComposerMergeCommand extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'unusual:composer:merge
+    protected $signature = 'modularity:composer:merge
         {--p|production : Update Production composer.json file}
     ';
 

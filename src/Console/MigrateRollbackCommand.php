@@ -14,7 +14,7 @@ class MigrateRollbackCommand extends Command
      *
      * @var string
      */
-    protected $name = 'unusual:migrate:rollback';
+    protected $name = 'modularity:migrate:rollback';
 
     /**
      * The console command description.
