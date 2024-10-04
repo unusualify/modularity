@@ -214,6 +214,7 @@ class Install extends BaseCommand
     {
         info("\t Making required migrations");
         $this->call('migrate');
+        $this->call('unusual:migrate SystemPayment');
 
     }
 
