@@ -28,6 +28,7 @@ import { VueMaskDirective } from 'v-mask'
 import SvgSprite from '@/directives/svg'
 import Column from '@/directives/column'
 import FitGrid from '@/directives/fit-grid'
+import Scrollable from '@/directives/scrollable'
 import commonMethods from '@/utils/commonMethods'
 import { ALERT } from '../store/mutations'
 
@@ -176,6 +177,7 @@ export default {
     app.use(SvgSprite)
     app.use(Column)
     app.use(FitGrid)
+    app.use(Scrollable)
 
     app.provide('$app', app)
   }
