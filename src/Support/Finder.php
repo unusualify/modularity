@@ -2,7 +2,7 @@
 
 namespace Unusualify\Modularity\Support;
 
-use Composer\Autoload\ClassMapGenerator;
+use Composer\ClassMapGenerator\ClassMapGenerator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Unusualify\Modularity\Facades\Modularity;
