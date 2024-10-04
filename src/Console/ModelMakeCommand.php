@@ -18,7 +18,7 @@ use function Laravel\Prompts\confirm;
 
 class ModelMakeCommand extends BaseCommand
 {
-    protected $name = 'unusual:make:model';
+    protected $name = 'modularity:make:model';
 
     /**
      * The name of argument name.
@@ -31,7 +31,7 @@ class ModelMakeCommand extends BaseCommand
 
     protected $isAskable = true;
 
-    // protected $signature = 'unusual:make:model
+    // protected $signature = 'modularity:make:model
     //     {model : the model name in module}
     //     {module : the module name}
     //     {--fillable=}
@@ -50,7 +50,7 @@ class ModelMakeCommand extends BaseCommand
      *
      * @var string
      */
-    // protected $name = 'unusual:make:model';
+    // protected $name = 'modularity:make:model';
 
     /**
      * The console command description.

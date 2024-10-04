@@ -8,7 +8,7 @@
   Build the Modularity assets with custom Vue components
 
 ### Usage:
-  unusual:build [options]
+  modularity:build [options]
 
 ### Options:
 
@@ -45,7 +45,7 @@ Only copy custom theme script
 
 # Build Command
 
-**unusual:build** - Build the Modularity assets with custom vue components
+**modularity:build** - Build the Modularity assets with custom vue components
 
 ## SYNOPSIS
 ```

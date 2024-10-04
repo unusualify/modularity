@@ -24,7 +24,7 @@ class CreateSuperAdminCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:create:superadmin';
+    protected $name = 'modularity:create:superadmin';
 
     /**
      * The console command description.
@@ -118,7 +118,7 @@ class CreateSuperAdminCommand extends BaseCommand
     {
 
         if ($this->option('default')) {
-            $email = getValueOrNull(env('UNUSUAL_ADMIN_EMAIL', 'software-dev@unusualgrowth.com')) ?? 'software-dev@unusualgrowth.com';
+            $email = getValueOrNull(env('MODULARITY_ADMIN_EMAIL', 'software-dev@unusualgrowth.com')) ?? 'software-dev@unusualgrowth.com';
             $this->info('Email configured for super-admin as ' . $email);
 
             return $email;
@@ -135,7 +135,7 @@ class CreateSuperAdminCommand extends BaseCommand
         );
 
         if ($useDefault) {
-            $email = env('UNUSUAL_ADMIN_EMAIL', 'software-dev@unusualgrowth.com');
+            $email = env('MODULARITY_ADMIN_EMAIL', 'software-dev@unusualgrowth.com');
         } else {
             $email = text(
                 label: 'Please enter a valid e-mail address for super-admin',
@@ -171,7 +171,7 @@ class CreateSuperAdminCommand extends BaseCommand
     {
 
         if ($this->option('default')) {
-            $password = env('UNUSUAL_ADMIN_PASSWORD', 'w@123456');
+            $password = env('MODULARITY_ADMIN_PASSWORD', 'w@123456');
             info('Password configured for super-admin as ' . $password);
 
             return $password;
@@ -187,7 +187,7 @@ class CreateSuperAdminCommand extends BaseCommand
         );
 
         if ($useDefault) {
-            $password = getValueOrNull(env('UNUSUAL_ADMIN_PASSWORD', 'w@123456'), bool: false);
+            $password = getValueOrNull(env('MODULARITY_ADMIN_PASSWORD', 'w@123456'), bool: false);
         } else {
             $password = password(
                 label: 'Please enter valid password',

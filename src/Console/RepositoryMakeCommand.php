@@ -14,20 +14,20 @@ use Unusualify\Modularity\Facades\Modularity;
 
 class RepositoryMakeCommand extends BaseCommand
 {
-    protected $name = 'unusual:make:repository';
+    protected $name = 'modularity:make:repository';
 
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    // protected $name = 'unusual:make:repository';
+    // protected $name = 'modularity:make:repository';
 
     protected $defaultReject = true;
 
     protected $isAskable = true;
 
-    // protected $signature = 'unusual:make:repository
+    // protected $signature = 'modularity:make:repository
     //     {repository : the repository name in module}
     //     {module : the module name}
     //     {--f|force}

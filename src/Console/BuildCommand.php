@@ -12,7 +12,7 @@ class BuildCommand extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'unusual:build
+    protected $signature = 'modularity:build
         {--noInstall : No install npm packages}
         {--hot : Hot Reload}
         {--w|watch : Watcher for dev}
@@ -22,6 +22,9 @@ class BuildCommand extends BaseCommand
         {--cts|copyThemeScript : Only copy custom theme script}
         {--theme= : Custom theme name if was worked on}';
 
+    protected $aliases = [
+        'unusual:build',
+    ];
     /**
      * The console command description.
      *
@@ -122,14 +125,14 @@ class BuildCommand extends BaseCommand
         // $resource_path = resource_path('vendor/modularity/js/components/*.vue');
 
         if ($this->option('hot')) {
-            // $this->startWatcher( $resource_path, 'php artisan unusual:build --copyOnly');
+            // $this->startWatcher( $resource_path, 'php artisan modularity:build --copyOnly');
             $this->startWatchers();
 
             // $this->runVueProcess(['npm', 'run', 'serve', '--', "--mode={$mode}", "--port={$this->getDevPort()}"], true);
             // $this->runVueProcess(['npm', 'run', 'serve', '--','--source-map', '--inspect-loader ',"--port={$this->getDevPort()}"], true);
             $this->runVueProcess(['npm', 'run', 'dev'], true);
         } elseif ($this->option('watch')) {
-            // $this->startWatcher( $resource_path, 'php artisan unusual:build --copyOnly');
+            // $this->startWatcher( $resource_path, 'php artisan modularity:build --copyOnly');
             $this->startWatchers();
 
             $this->runVueProcess(['npm', 'run', 'watch'], true);
@@ -139,7 +142,7 @@ class BuildCommand extends BaseCommand
             $this->info('');
             $progressBar->setMessage("Publishing assets...\n\n");
             $progressBar->advance();
-            $this->call('unusual:refresh');
+            $this->call('modularity:refresh');
 
             $this->info('');
             $progressBar->setMessage("Done. \n\n");
@@ -184,7 +187,7 @@ class BuildCommand extends BaseCommand
             }
         } else {
             $this->warn("The `chokidar-cli` package was not found. It is required to watch custom blocks & components in development. You can install it by running:\n");
-            $this->warn("    php artisan unusual:dev\n");
+            $this->warn("    php artisan modularity:dev\n");
             $this->warn("without the `--noInstall` option.\n");
             sleep(2);
         }
@@ -193,7 +196,7 @@ class BuildCommand extends BaseCommand
     private function startWatchers()
     {
         $resource_path = resource_path('vendor/modularity/js/components/*.vue');
-        $this->startWatcher($resource_path, 'php artisan unusual:build --copyComponents');
+        $this->startWatcher($resource_path, 'php artisan modularity:build --copyComponents');
 
         $builtinThemes = builtInModularityThemes();
         $customThemes = customModularityThemes();
@@ -201,10 +204,10 @@ class BuildCommand extends BaseCommand
 
         if (! array_key_exists($theme, $builtinThemes->toArray()) && array_key_exists($theme, $customThemes->toArray())) {
             $path = resource_path('vendor/modularity/themes/' . $theme . '/sass/*');
-            $this->startWatcher($path, "php artisan unusual:build --copyTheme --theme='{$theme}'");
+            $this->startWatcher($path, "php artisan modularity:build --copyTheme --theme='{$theme}'");
 
             $path = resource_path('vendor/modularity/themes/' . "$theme/$theme.js");
-            $this->startWatcher($path, "php artisan unusual:build --copyThemeScript --theme='{$theme}'");
+            $this->startWatcher($path, "php artisan modularity:build --copyThemeScript --theme='{$theme}'");
         }
 
     }

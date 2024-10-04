@@ -13,7 +13,7 @@ class AddComposerScriptsCommand extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'unusual:composer:scripts';
+    protected $signature = 'modularity:composer:scripts';
 
     /**
      * The console command description.
@@ -23,7 +23,7 @@ class AddComposerScriptsCommand extends BaseCommand
     protected $description = 'Add modularity composer scripts to composer-dev.json';
 
     protected $aliases = [
-        'modularity:composer:scripts',
+        'unusual:composer:scripts',
     ];
 
     /*

@@ -14,7 +14,7 @@ class MigrateRefreshCommand extends Command
      *
      * @var string
      */
-    protected $name = 'unusual:migrate:refresh';
+    protected $name = 'modularity:migrate:refresh';
 
     /**
      * The console command description.
@@ -33,10 +33,10 @@ class MigrateRefreshCommand extends Command
         $module = Modularity::findOrFail($this->argument('module'));
 
         try {
-            $this->call('unusual:migrate:rollback', [
+            $this->call('modularity:migrate:rollback', [
                 'module' => $module->getName(),
             ]);
-            $this->call('unusual:migrate', [
+            $this->call('modularity:migrate', [
                 'module' => $module->getName(),
             ]);
 

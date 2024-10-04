@@ -36,7 +36,7 @@ return new class extends OneTimeOperation
     public function process(): void
     {
         foreach (Modularity::getModules() as $key => $module) {
-            Artisan::call('unusual:make:module', [
+            Artisan::call('modularity:make:module', [
                 'module' => $module->getName(),
                 '--just-stubs' => true,
                 '--stubs-only' => 'views/index',

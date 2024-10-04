@@ -1,45 +1,45 @@
 ```
     php artisan vendor:publish --provider="Unusualify\Modularity\LaravelServiceProvider" --tag="config"
     
-    php artisan unusual:build --noInstall --hot
+    php artisan modularity:build --noInstall --hot
 
-    php artisan unusual:make:module Package 
+    php artisan modularity:make:module Package 
         -TP 
         --schema="name:string:unique,type:enum('type'\,['POS'\,'SERVICE'])" 
         --rules="name=required|min:3|unique:payments&type=in:POS,SOCIAL"
     
-    php artisan unusual:make:route Invoice Payment
+    php artisan modularity:make:route Invoice Payment
         --schema="name:string:unique,type:enum('type'\,['POS'\,'SERVICE'])" 
         --rules="name=required|min:3|unique:payments&type=in:POS,SOCIAL"
 
-    php artisan unusual:make:route Invoice Payment 
+    php artisan modularity:make:route Invoice Payment 
         --schema="basic_name:string:unique,payment_id:foreignId:constrained:onUpdate('cascade'):onDelete('cascade'),soft_delete,remember_token"
     
-    php artisan unusual:make:route Invoice Payment 
+    php artisan modularity:make:route Invoice Payment 
         --schema="basic_name:string:unique,belongsTo:payment:id:payments:constrained:onUpdate('cascade'):onDelete('cascade'),soft_delete,remember_token"
 
-    php artisan unusual:make:controller Payment Invoice
+    php artisan modularity:make:controller Payment Invoice
 
-    php artisan unusual:make:model Payment Reference 
+    php artisan modularity:make:model Payment Reference 
         --soft-delete --has-factory
-    php artisan unusual:make:model Payment Invoice 
+    php artisan modularity:make:model Payment Invoice 
         --relationships="belongsTo:payments:payment_id:id,hasMany:users:user_id:id"
 
-    php artisan unusual:make:migration Payment create_invoices_table 
+    php artisan modularity:make:migration Payment create_invoices_table 
         --fields="name:string:unique,payment_id:foreignId:constrained:onUpdate('cascade'):onDelete('cascade'),soft_delete,remember_token"
 
-    php artisan unusual:make:repository Payment Reference -TMP
+    php artisan modularity:make:repository Payment Reference -TMP
 
-    php artisan unusual:make:request Payment Payment --rules="name=required|min:3|unique:payments&email=required|email|unique:payments"
+    php artisan modularity:make:request Payment Payment --rules="name=required|min:3|unique:payments&email=required|email|unique:payments"
 
     php artisan migrate --path="Modules/PressRelease/Database/Migrations"
     php artisan migrate:rollback --path="Modules/PressRelease/Database/Migrations"
     php artisan migrate:refresh --path="Modules/PressRelease/Database/Migrations"
 
     // MODULE MIGRATE OPERATIONS
-    php artisan unusual:migrate Package
-    php artisan unusual:migrate:rollback Package
-    php artisan unusual:migrate:refresh Package
+    php artisan modularity:migrate Package
+    php artisan modularity:migrate:rollback Package
+    php artisan modularity:migrate:refresh Package
 
     php artisan iseed sp_roles
 

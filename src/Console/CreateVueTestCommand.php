@@ -17,7 +17,7 @@ class CreateVueTestCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:create:test:vue';
+    protected $name = 'modularity:create:test:vue';
 
     /**
      * The console command description.

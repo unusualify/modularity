@@ -9,7 +9,7 @@ class PintCommand extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'modularity:pint
+    protected $signature = 'modxpint
                             {--test : Check if files need fixing}
                             {--dirty : Only fix files that have been modified}
                             {--repair : Repair the code}

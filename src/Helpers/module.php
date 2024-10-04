@@ -421,10 +421,10 @@ if (! function_exists('exceptionalRunningInConsole')) {
     function exceptionalRunningInConsole()
     {
         return ! (App::runningInConsole() && App::runningConsoleCommand([
-            'unusual:make:module',
-            'unusual:fix:module',
-            'unusual:make:route',
-            'unusual:dev',
+            'modularity:make:module',
+            'modularity:fix:module',
+            'modularity:make:route',
+            'modularity:dev',
         ]));
     }
 }

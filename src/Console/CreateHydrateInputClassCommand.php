@@ -13,7 +13,7 @@ class CreateHydrateInputClassCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:create:input:class';
+    protected $name = 'modularity:create:input:class';
 
     /**
      * The console command description.

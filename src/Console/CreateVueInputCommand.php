@@ -13,7 +13,7 @@ class CreateVueInputCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:create:vue:input';
+    protected $name = 'modularity:create:vue:input';
 
     /**
      * The console command description.

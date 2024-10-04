@@ -118,7 +118,7 @@ You can do further custom configuration through ``config`` files which are store
 ## Installation Wizard
 Modularity ships with a command line installation wizard that will help on scaffolding a basic project. After installation via Composer, wizard can be started by running:
 ```sh
-$ php artisan unusual:install
+$ php artisan modularity:install
 ```
 Wizard will be processing with simple questions to construct projects core configurations.
 ```

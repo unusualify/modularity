@@ -17,7 +17,7 @@ class RequestMakeCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:make:request';
+    protected $name = 'modularity:make:request';
 
     /**
      * The console command description.

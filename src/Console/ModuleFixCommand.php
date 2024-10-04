@@ -13,7 +13,7 @@ class ModuleFixCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:fix:module';
+    protected $name = 'modularity:fix:module';
 
     /**
      * The console command description.
@@ -32,7 +32,7 @@ class ModuleFixCommand extends BaseCommand
 
         foreach ($routes as $key => $routeName) {
 
-            $this->call('unusual:make:route', [
+            $this->call('modularity:make:route', [
                 'module' => $moduleName,
                 'route' => $routeName,
                 '--fix' => true,

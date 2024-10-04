@@ -15,7 +15,7 @@ class SetupModularityDevelopmentCommand extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'unusual:setup:development
+    protected $signature = 'modularity:setup:development
         {branch? : The name of branch to work.}
     ';
 
@@ -101,7 +101,7 @@ class SetupModularityDevelopmentCommand extends BaseCommand
             $this->info("composer-dev.json file created on root path.\n");
         }
 
-        $this->call('unusual:composer:scripts');
+        $this->call('modularity:composer:scripts');
 
         $this->alert('For getting into development process, run commands as following:');
         $this->warn("rm -rf vendor && rm -rf composer-dev.lock \n");

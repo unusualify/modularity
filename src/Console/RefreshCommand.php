@@ -11,7 +11,7 @@ class RefreshCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:refresh';
+    protected $name = 'modularity:refresh';
 
     /**
      * The console command description.

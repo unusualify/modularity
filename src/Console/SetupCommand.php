@@ -12,7 +12,7 @@ class SetupCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:setup';
+    protected $name = 'modularity:setup';
 
     /**
      * The console command description.
@@ -104,7 +104,7 @@ class SetupCommand extends BaseCommand
     private function createAdmin()
     {
         if (! $this->option('no-interaction')) {
-            $this->call('unusual:superadmin');
+            $this->call('modularity:superadmin');
         }
     }
 }

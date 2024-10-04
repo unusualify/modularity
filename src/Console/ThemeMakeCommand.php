@@ -14,7 +14,7 @@ class ThemeMakeCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'unusual:make:theme';
+    protected $name = 'modularity:make:theme';
 
     /**
      * The console command description.
