@@ -2,6 +2,25 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.14.0 - 2024-10-04
+
+### :rocket: Features
+
+- add SystemPayment migration to install command by @OoBook in https://github.com/unusualify/modularity/commit/f95226dd5a3641fd495f2596cbadd50294267204
+
+### :wrench: Bug Fixes
+
+- add ClassMapGenerator dependency to the Finder class by @OoBook in https://github.com/unusualify/modularity/commit/c3e942d966a025cf0b21a17f966f86167fe5a9ce
+
+### :beers: Other Stuff
+
+- organize seeder for test and setup by @OoBook in https://github.com/unusualify/modularity/commit/efde13964e747a72ba90a541c14a155fd8988188
+- Merge pull request #67 from unusualify/dev
+
+Dev
+
+- Update CHANGELOG
+
 ## v0.13.0 - 2024-10-04
 
 ### :rocket: Features
