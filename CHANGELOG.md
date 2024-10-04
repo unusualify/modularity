@@ -2,6 +2,49 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.13.0 - 2024-10-04
+
+### :rocket: Features
+
+- :sparkles: media library tag filters && ui update by @gunesbizim in https://github.com/unusualify/modularity/commit/9761ab91f112dc6f5344599e5e046ccec2e84dac
+- :sparkles: default system seeder by @gunesbizim in https://github.com/unusualify/modularity/commit/23e69e30e9e614d9171ffbeb6931dc0557a0ca0b
+
+### :wrench: Bug Fixes
+
+- :bug: add slotable input to processedInputs by @OoBook in https://github.com/unusualify/modularity/commit/827e44c0b3c21c75298daa86d1966e3a50501e44
+- set currency acc. to priceable setUserCurrency by @OoBook in https://github.com/unusualify/modularity/commit/3eeac3360ddab4f31dd3621d234ccc2f0272be9b
+- change currency behaviour and fix price calculating on update by @OoBook in https://github.com/unusualify/modularity/commit/79ef5709565c1d65b359359b901dc50c5b21d4c1
+- change orders of Relation and Payment traits by @OoBook in https://github.com/unusualify/modularity/commit/07219430736b947c79b6c3b96b366dfb79ed3257
+
+### :recycle: Refactors
+
+- :recycle: add is_external and is_internal field into payment_services create migration by @OoBook in https://github.com/unusualify/modularity/commit/c8c3c81b574de099b6ee3aa7da458d8782ed318c
+
+### Styling
+
+- set ordered_traits to false by @OoBook in https://github.com/unusualify/modularity/commit/825423c319cd43db38fa23c904469e1a6dc8fca2
+- change return value on comment by @OoBook in https://github.com/unusualify/modularity/commit/96413571fd7e4601d810a2394fa1cc44a0c3e40d
+
+### :package: Build
+
+- :building_construction: build the frontend for v0.13.0 by @OoBook in https://github.com/unusualify/modularity/commit/4fab4ce7dc072b22bd8adadde81e872ebe52e97c
+
+### :green_heart: Workflow
+
+- fix checkout before merge by @OoBook in https://github.com/unusualify/modularity/commit/992025145948ef81699de438cf2f3b447d3c870d
+
+### :beers: Other Stuff
+
+- merge remote-tracking branch 'origin/main' into dev by @OoBook in https://github.com/unusualify/modularity/commit/789798c05c2e2ba99573a25a492743804181bb56
+- assess currency config fields by @OoBook in https://github.com/unusualify/modularity/commit/63d8e93a6d8c20ec0c0f8b23aadfc21ba17b61fa
+- merge remote-tracking branch 'origin/feature/media-tags' into dev by @OoBook in https://github.com/unusualify/modularity/commit/58f465fe3dc773459f2a49041a1c95763b2ae5ad
+- change currency order in seeder by @OoBook in https://github.com/unusualify/modularity/commit/a26be282472c612fc5d1806d345a97a374ede9eb
+- add SystemPayment Main Seeder by @OoBook in https://github.com/unusualify/modularity/commit/b1f6efcec6072bf8b32371626e1ef4294694858b
+- add snapshot and payable configs to the publishes by @OoBook in https://github.com/unusualify/modularity/commit/2edd7f6a1c3eda3c5ff7aea00c04810cb664e93c
+- Merge pull request #66 from unusualify/feature/system-seeders
+
+feat: :sparkles: default system seeder
+
 ## v0.11.0 - 2024-10-02
 
 ### :rocket: Features
