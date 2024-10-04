@@ -2,6 +2,16 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.14.1 - 2024-10-04
+
+### :wrench: Bug Fixes
+
+- :ambulance: remove systemPayment migrate calling from InstallCommand by @OoBook in https://github.com/unusualify/modularity/commit/18309f0c8b6ebb3a58581ad521f98bf63edf5e26
+
+### :beers: Other Stuff
+
+- Update CHANGELOG
+
 ## v0.14.0 - 2024-10-04
 
 ### :rocket: Features
