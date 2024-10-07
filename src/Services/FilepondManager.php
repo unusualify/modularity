@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusualify\Modularity\Services\Filepond;
+namespace Unusualify\Modularity\Services;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;

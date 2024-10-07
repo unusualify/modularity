@@ -2,6 +2,12 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.15.0 - 2024-10-04
+
+### :beers: Other Stuff
+
+- change command signatures by @OoBook in https://github.com/unusualify/modularity/commit/29a7d9a5ea2c2054ab9ca0355331b7e82b7a8911
+
 ## v0.14.1 - 2024-10-04
 
 ### :wrench: Bug Fixes
