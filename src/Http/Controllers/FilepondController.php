@@ -4,7 +4,7 @@ namespace Unusualify\Modularity\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Unusualify\Modularity\Services\Filepond\FilepondManager;
+use Unusualify\Modularity\Services\FilepondManager;
 
 class FilepondController extends Controller
 {

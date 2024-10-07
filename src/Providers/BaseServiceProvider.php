@@ -130,8 +130,8 @@ class BaseServiceProvider extends ServiceProvider
             return new \Unusualify\Modularity\Support\HostRouteRegistrar($app, unusualConfig('app_url'));
         });
 
-        $this->app->singleton('FilePond', function (Application $app) {
-            return new \Unusualify\Modularity\Services\Filepond\FilepondManager;
+        $this->app->singleton('Filepond', function (Application $app) {
+            return new \Unusualify\Modularity\Services\FilepondManager;
         });
 
         $this->app->alias(\Unusualify\Modularity\Facades\ModularityVite::class, 'ModularityVite');

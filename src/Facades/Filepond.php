@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusualify\Modularity\Services\Filepond;
+namespace Unusualify\Modularity\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
@@ -11,6 +11,6 @@ class Filepond extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'FilePond';
+        return 'Filepond';
     }
 }
