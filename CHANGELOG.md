@@ -2,6 +2,19 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.15.1 - 2024-10-07
+
+### :wrench: Bug Fixes
+
+- change filepond facade and service class directory by @OoBook in https://github.com/unusualify/modularity/commit/db2de645dd5cdcec99ad053f5b4838a4a983599f
+
+### :beers: Other Stuff
+
+- Update CHANGELOG
+- Merge pull request #69 from unusualify/hotfix/v0.15.1
+
+fix: change filepond facade and service class directory
+
 ## v0.15.0 - 2024-10-04
 
 ### :beers: Other Stuff
