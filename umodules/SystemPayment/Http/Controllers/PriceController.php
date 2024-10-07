@@ -30,6 +30,7 @@ class PriceController extends Controller
             $paymentServiceName = unusualConfig('payment.currency_services' . ".{$currency}");
             $payment = new Payable($paymentServiceName);
             $paymentService = PaymentService::where('name', $paymentServiceName)->first();
+            // dd($paymentServiceName);
             Session::put('payable_payment_service', $paymentServiceName);
         } else {
             $paymentService = PaymentService::find($params['payment_service']['payment_method']);
