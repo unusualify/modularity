@@ -27,9 +27,10 @@ class PriceController extends Controller
             //TODO: find price with currency based on the currency get default payment service
             $currency = $price->currency->iso_4217;
             // $paymentServiceName = config("modularity.default_payment_service" . ".{$currency}");
-            $paymentServiceName = unusualConfig('payment_service.currency_services' . ".{$currency}");
+            $paymentServiceName = unusualConfig('payment.currency_services' . ".{$currency}");
             $payment = new Payable($paymentServiceName);
             $paymentService = PaymentService::where('name', $paymentServiceName)->first();
+            // dd($paymentServiceName);
             Session::put('payable_payment_service', $paymentServiceName);
         } else {
             $paymentService = PaymentService::find($params['payment_service']['payment_method']);
