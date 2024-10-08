@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Modules\SystemPayment\Entities\Payment;
 use Modules\SystemPayment\Entities\PaymentService;
+use Oobook\Priceable\Models\Price;
 use Unusualify\Payable\Payable;
-use Unusualify\Priceable\Models\Price;
 
 class PriceController extends Controller
 {
@@ -40,48 +40,49 @@ class PriceController extends Controller
         $company = $user->company;
         // dd($company);
         $payload = $payment->getPayloadSchema();
-        // dd($payload);
-        $payload['locale'] = app()->getLocale();
-        $payload['payment_service_id'] = $paymentService->id;
-        $payload['order_id'] = uniqid('ORD-');
-        $payload['price'] = $price->price_excluding_vat;
-        $payload['price_id'] = $price->id;
-        $payload['paid_price'] = $price->display_price;
-        $payload['currency'] = $price->currency;
-        $payload['installment'] = '1';
-        $payload['payment_group'] = 'PRODUCT';
-        $payload['card_name'] = $params['payment_service']['credit_card']['card_name'];
-        $payload['card_no'] = str_replace(' ', '', $params['payment_service']['credit_card']['card_number']);
-        $payload['card_month'] = (string) $params['payment_service']['credit_card']['card_month'];
-        $payload['card_year'] = (string) $params['payment_service']['credit_card']['card_year'];
-        $payload['card_cvv'] = $params['payment_service']['credit_card']['card_cvv'];
-        $payload['user_id'] = $user->id;
-        $payload['user_name'] = $user->name;
-        $payload['user_surname'] = $user->surname;
-        $payload['user_gsm'] = $user->phone;
-        $payload['user_email'] = $user->email;
-        $payload['user_ip'] = $request->ip();
-        $payload['user_last_login_date'] = Carbon::now()->format('Y-m-d H:i:s');
-        $payload['user_registration_date'] = $user->created_at->format('Y-m-d H:i:s');
-        $payload['user_address'] = $company->address;
-        $payload['user_city'] = $company->city;
-        $payload['user_country'] = $company->country;
-        $payload['user_zip_code'] = $company->zip_code;
-        $payload['basket_id'] = uniqid();
-        $payload['items'] = [
-            [
-                'id' => '1',
-                'name' => 'test',
-                'category1' => 'testcat1',
-                'category2' => 'testcat2',
+        $arr = [
+                'locale' => app()->getLocale(),
+                'payment_service_id' => $paymentService->id,
+                'order_id' => uniqid('ORD-'),
                 'price' => $price->price_excluding_vat,
-                'type' => 'VIRTUAL',
-            ],
-
-        ];
-        $payload['custom_fields'] = [
-            'previous_url' => session('_previous.url'),
-        ];
+                'price_id' => $price->id,
+                'paid_price' => $price->display_price,
+                'currency' => $price->currency,
+                'installment' => '1',
+                'payment_group' => 'PRODUCT',
+                'card_name' => $params['payment_service']['credit_card']['card_name'],
+                'card_no' => str_replace(' ', '', $params['payment_service']['credit_card']['card_number']),
+                'card_month' => (string) $params['payment_service']['credit_card']['card_month'],
+                'card_year' => (string) $params['payment_service']['credit_card']['card_year'],
+                'card_cvv' => $params['payment_service']['credit_card']['card_cvv'],
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'user_surname' => $user->surname,
+                'user_gsm' => $user->phone,
+                'user_email' => $user->email,
+                'user_ip' => $request->ip(),
+                'user_last_login_date' => Carbon::now()->format('Y-m-d H:i:s'),
+                'user_registration_date' => $user->created_at->format('Y-m-d H:i:s'),
+                'user_address' => $company->address,
+                'user_city' => $company->city,
+                'user_country' => $company->country,
+                'user_zip_code' => $company->zip_code,
+                'basket_id' => uniqid(),
+                'items' => [
+                    [
+                        'id' => '1',
+                        'name' => 'test',
+                        'category1' => 'testcat1',
+                        'category2' => 'testcat2',
+                        'price' => $price->price_excluding_vat,
+                        'type' => 'VIRTUAL',
+                    ],
+                ],
+                'custom_fields' => [
+                    'previous_url' => session('_previous.url'),
+                ]
+            ];
+        $payload = array_merge_recursive_preserve($payload, $arr);
         // dd($payload,$params);
         // dd(session('_previous.url'));
         $resp = $payment->pay($payload);
