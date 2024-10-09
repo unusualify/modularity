@@ -8,7 +8,7 @@
         </div>
         <div class="card-item__wrapper">
           <div class="card-item__top">
-            <img src="http://localhost:5173/vendor/modularity/public/png/cardtypes/chip.png" class="card-item__chip" />
+            <img src="/png/cardtypes/chip.png" class="card-item__chip" />
             <div class="card-item__type">
               <Transition name="slide-fade-up">
                 <img :src="cardImage" v-if="cardImage" :key="cardImage" alt class="card-item__typeImg" />
@@ -108,7 +108,7 @@ export default {
 
     const cardImage = computed(() => {
       let number = props.labels.cardNumber;
-      let img = `.${import.meta.env.BASE_URL}/public/png/cardtypes/`;
+      let img = `.${import.meta.env.BASE_URL}/png/cardtypes/`;
       switch (true) {
         case /^4/.test(number):
           img = img + 'visa.png';
@@ -178,7 +178,7 @@ export default {
     const currentCardBackground = computed(() => {
       if (props.randomBackgrounds && !props.backgroundImage) {
         let random = Math.floor(Math.random() * 25 + 1);
-        let img = `.${import.meta.env.BASE_URL}/public/jpg/payment/${random}.jpeg`;
+        let img = `.${import.meta.env.BASE_URL}/jpg/payment/${random}.jpeg`;
         let cardBg = new URL(img, baseUrl.value).href;
         return cardBg;
       } else if (props.backgroundImage) {
