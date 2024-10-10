@@ -556,7 +556,6 @@ export default {
       this.loading = true
       // let formdata = null;
       const form = this.$refs.form
-      console.log(this.sharedFilterState)
       const formdata = self.cleanEmptyFilters(this.sharedFilterState);
       // console.log(formdata)
 
