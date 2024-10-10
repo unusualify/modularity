@@ -25,16 +25,20 @@ import { CONFIG } from '@/store/mutations'
  function assignBOMHElpers(){
   window.__log = console.log
 
-  window.__isString = (obj) => {
-    return (Object.prototype.toString.call(obj) === '[object String]')
+  window.__isString = (value) => {
+    return (Object.prototype.toString.call(value) === '[object String]')
   }
 
-  window.__isNumber = (obj) => {
-    return !isNaN(obj)
+  window.__isBoolean = (value) => {
+    return typeof value == "boolean"
   }
 
-  window.__isObject = (obj) => {
-    return Object.prototype.toString.call(obj) === '[object Object]'
+  window.__isNumber = (value) => {
+    return !isNaN(value)
+  }
+
+  window.__isObject = (value) => {
+    return Object.prototype.toString.call(value) === '[object Object]'
   }
 
   window.__isset = (...args) => {
