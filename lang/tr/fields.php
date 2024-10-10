@@ -2,7 +2,6 @@
 
 return [
     'confirm-deletion' => '{name} {route} kaydını silmek istediğinize emin misiniz?',
-
     'cancel' => 'İptal',
     'close' => 'Kapat',
     'complete' => 'Tamamla',
@@ -25,12 +24,13 @@ return [
     'restore' => 'Geri Yükle',
     'save' => 'Kaydet',
     'saved' => 'Kaydedildi!|{0} kaydedildi!',
+    'selection' => '{1}Seçilenler |[2,*]Seçilen :item',
     'show' => 'Göster',
+    'step' => 'Adım',
     'submit' => 'Gönder',
     'success-create' => 'Başarıyla Oluşturuldu.',
     'success-update' => 'Başarıyla Güncellendi.',
     'success-delete' => 'Başarıyla Silindi.',
     'update' => 'Güncelle',
-
     'switch-language' => 'Dili Değiştir',
 ];

@@ -2,7 +2,6 @@
 
 return [
     'confirm-deletion' => 'Are you sure want to delete {name} {route}?',
-
     'cancel' => 'Cancel',
     'close' => 'Close',
     'city' => 'City',
@@ -28,12 +27,13 @@ return [
     'save' => 'Save',
     'saved' => 'Saved!|{0} is saved!',
     'save-success' => 'Content saved. All good!',
+    'selection' => '{1}Selections |[2,*]Selected :item',
     'show' => 'Show',
+    'step' => 'Step',
     'submit' => 'Submit',
     'success-create' => 'Created Successfully.',
     'success-update' => 'Updated Successfully.',
     'success-delete' => 'Removed Successfully.',
     'update' => 'Update',
-
     'switch-language' => 'Switch Language',
 ];
