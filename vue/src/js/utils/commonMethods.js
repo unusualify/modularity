@@ -111,5 +111,8 @@ export default {
   },
   $dialog: function (payload) {
     this.$store.commit(ALERT.SET_DIALOG, payload)
+  },
+  $hasRequestInProgress: function () {
+    return this.$store.getters.isRequestInProgress
   }
 }

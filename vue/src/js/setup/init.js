@@ -3,6 +3,9 @@
 import axios from 'axios'
 import jquery from 'jquery'
 import lodash, { snakeCase } from 'lodash-es'
+import store from '@/store' // Adjust the import based on your store structure
+import { CONFIG } from '@/store/mutations'
+
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
  * to our Laravel back-end. This library automatically handles sending the
@@ -531,6 +534,30 @@ export default function init(){
   window.axios.defaults.headers.post = {
     'Content-Type': 'application/json'
   }
+
+  axios.interceptors.request.use(function (config) {
+    // Do something before request is sent
+    store.commit(CONFIG.INCREASE_AXIOS_REQUEST)
+
+    return config;
+  }, function (error) {
+    store.commit(CONFIG.DECREASE_AXIOS_REQUEST)
+    // Do something with request error
+    return Promise.reject(error);
+  });
+
+  axios.interceptors.response.use(function (response) {
+    // Any status code that lie within the range of 2xx cause this function to trigger
+    // Do something with response data
+    store.commit(CONFIG.DECREASE_AXIOS_REQUEST)
+
+    return response;
+  }, function (error) {
+    store.commit(CONFIG.DECREASE_AXIOS_REQUEST)
+    // Any status codes that falls outside the range of 2xx cause this function to trigger
+    // Do something with response error
+    return Promise.reject(error);
+  });
 }
 
 /**
