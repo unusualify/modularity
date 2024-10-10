@@ -1,32 +1,27 @@
 <template>
   <v-tabs v-model="tab" align-tabs="center">
-    <v-tab v-if="tabValue=='_key'" v-for="key in Object.keys(items)" :key="`tab-object-${key}`" :value="key">{{ key }}</v-tab>
-    <v-tab v-else v-for="item in items" :key="`tab-array-${item[tabValue]}`" :value="item[tabValue]">{{ item[tabTitle] }}</v-tab>
+    <template v-for="element in elements" :key="`tab-${element[tabValue]}`" :value="element[tabValue]">
+      <slot :name="`tab.${element[tabValue]}`">
+        <v-tab :value="element[tabValue]">
+          <span>{{ element[tabTitle] }}</span>
+          <template v-slot:prepend>
+            <slot :name="`tab.${element[tabValue]}.prepend`"></slot>
+          </template>
+          <template v-slot:append>
+            <slot :name="`tab.${element[tabValue]}.append`"></slot>
+          </template>
+        </v-tab>
+      </slot>
+    </template>
   </v-tabs>
   <slot name="windows" v-bind="{active: tab}">
     <v-tabs-window v-model="tab">
       <v-tabs-window-item
-        v-if="tabValue=='_key'"
-        v-for="(key, n) in Object.keys(items)"
-        :key="`tab-window-object-${key}`"
-        :value="key"
-        class="pa-theme"
-      >
-        <slot name="window" v-bind="{index: n, key: key, items: items[key], model: models[key]}">
-          <template v-for="(item, i) in items[key]" :key="`window-row-${i}]`">
-            <slot name="window-item" v-bind="{index: n, item: item}">
-              <RowFormat :elements="[{text: `${item[itemTitle]}`, col: {'cols': 4}}]"/>
-            </slot>
-          </template>
-        </slot>
-      </v-tabs-window-item>
-      <v-tabs-window-item
-        v-else
         v-for="(item, n) in items"
-        :key="`tab-window-array-${key}`"
+        :key="`tab-window-${n}`"
         :value="item[tabValue]"
       >
-        <slot :name="`window.${n}`" v-bind="{index: n, item: item}">
+        <slot :name="`window.${n}`" v-bind="{index: n, item: item, model: models[item[tabValue]]}">
           <RowFormat :elements="[{text: `${item[itemTitle]}`, col: {'cols': 4}}]"/>
         </slot>
       </v-tabs-window-item>
@@ -48,7 +43,7 @@
       },
       tabValue: {
         type: String,
-        default: '_key',
+        default: 'id',
       },
       tabTitle: {
         type: String,
@@ -70,6 +65,13 @@
       return {
         tab_: this.modelValue ?? Object.keys(this.items)[0] ?? this.items[0][this.tabValue] ?? null,
         models: {},
+        elements: __isObject(this.items)
+          ? Object.keys(this.items).map(key => ({
+            [this.tabTitle]: key,
+            ...this.items[key],
+            [this.tabValue]: key,
+          }))
+          : this.items
       }
     },
     watch: {
