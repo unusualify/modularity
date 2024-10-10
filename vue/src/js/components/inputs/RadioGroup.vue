@@ -94,6 +94,7 @@ export default {
 
       .v-btn__content
         width: 100%
+        white-space: normal
 
 
 </style>
