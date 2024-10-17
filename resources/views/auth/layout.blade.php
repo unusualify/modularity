@@ -20,6 +20,7 @@
         {{-- @dd(get_defined_vars()) --}}
         <div id="auth">
             {{-- @dd(__('authentication.create-an-account')) --}}
+            {{-- @dd($formAttributes) --}}
             <ue-auth :title="'{{ __('authentication.create-an-account') ?? 'CREATE AN ACCOUNT' }}'">
                 @section('content')
 

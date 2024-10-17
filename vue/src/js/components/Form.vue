@@ -16,7 +16,7 @@
           <!-- <div class="text-h8 pt-5 pb-10 text-primary font-weight-bold" v-if="formTitle && false">
             {{ ($te(formTitle) ? $t(formTitle).toLocaleUpperCase($i18n.locale.toUpperCase()) : formTitle.toLocaleUpperCase($i18n.locale.toUpperCase())) }}
           </div> -->
-          <ue-title v-if="title" :classes="['px-0']">
+          <ue-title v-if="title" :classes="['px-0', title['classes']]">
             <div class="d-flex">
               <div class="me-auto">
                 {{ ($te(title)

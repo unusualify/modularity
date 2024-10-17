@@ -56,6 +56,7 @@ class ForgotPasswordController extends Controller
         return $viewFactory->make(unusualBaseKey() . '::auth.passwords.email', [
             'formAttributes' => [
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
+                'title' => __('authentication.forgot-password'),
                 'schema' => ($schema = $this->createFormSchema([
                     'email' => [
                         'type' => 'text',
