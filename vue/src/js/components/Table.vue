@@ -57,8 +57,6 @@
             <ue-title
               :text="tableTitle"
               :subTitle="tableSubtitle"
-              :classes="[]"
-              padding-reset
               :class="[someSelected ? 'w-33 h-100' : 'w-33 h-100']"
             />
             <v-slide-x-transition :group="true">

@@ -50,7 +50,6 @@
               <ue-title
                 :text="tableTitle"
                 :classes="['ue-table-header', 'pt-theme', 'pb-theme']"
-                padding-reset
               />
             </slot>
           </v-toolbar-title>
