@@ -3,11 +3,25 @@
 namespace Modules\SystemPayment\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Auth;
 use Modules\SystemPayment\Entities\PaymentCurrency;
 use Modules\SystemPayment\Entities\PaymentService;
+use Illuminate\Support\Facades\Storage;
+use Unusualify\Modularity\Entities\Media;
+use Illuminate\Support\Str;
+use Modules\User\Entities\User;
+use Unusualify\Modularity\Http\Controllers\MediaLibraryController;
+use Unusualify\Modularity\Http\Requests\MediaRequest;
 
 class PaymentServiceSeeder extends Seeder
 {
+    protected $mediaLibraryController;
+
+    public function __construct(MediaLibraryController $mediaLibraryController)
+    {
+        $this->mediaLibraryController = $mediaLibraryController;
+    }
     /**
      * Run the database seeds.
      *
@@ -21,45 +35,120 @@ class PaymentServiceSeeder extends Seeder
                 'title' => 'Iyzico',
                 'is_external' => false,
                 'is_internal' => true,
+                'image' => 'iyzico.png',
             ],
             [
                 'name' => 'paypal',
                 'title' => 'PayPal',
                 'is_external' => true,
                 'is_internal' => false,
+                'image' => 'paypal.png',
+
             ],
             [
                 'name' => 'garanti-pos',
                 'title' => 'GarantiPOS',
                 'is_external' => false,
                 'is_internal' => true,
+                'image' => 'garanti.png',
+
             ],
             [
                 'name' => 'teb-pos',
                 'title' => 'TebPOS',
                 'is_external' => false,
                 'is_internal' => true,
+                'image' => 'teb.png',
+
             ],
             [
                 'name' => 'teb-common-pos',
                 'title' => 'TebCommonPOS',
                 'is_external' => false,
                 'is_internal' => true,
+                'image' => 'teb-common.png',
+
             ],
             [
                 'name' => 'ideal',
                 'title' => 'iDEAL',
                 'is_external' => true,
                 'is_internal' => false,
+                'image' => 'ideal.png',
+
             ],
         ];
 
-        foreach ($paymentServices as $service) {
-            $paymentService = PaymentService::create($service);
+        // foreach ($paymentServices as $service) {
+        //     $paymentService = PaymentService::create($service);
 
-            // Attach some random currencies to each payment service
+        //     // Attach some random currencies to each payment service
+        //     $currencies = PaymentCurrency::inRandomOrder()->take(rand(1, 3))->get();
+        //     $paymentService->paymentCurrencies()->attach($currencies);
+        // }
+        $admin = User::where('email', 'admin@unusualgrowth.com')->first();
+        if (!$admin) {
+            $this->command->error('Admin user not found. Please ensure the admin user exists in the database.');
+            return;
+        }
+
+        $superadmin = User::find(1);
+        Auth::guard('unusual_users')->login($superadmin);
+
+        foreach ($paymentServices as $service) {
+            $paymentService = PaymentService::create([
+                'name' => $service['name'],
+                'title' => $service['title'],
+                'is_external' => $service['is_external'],
+                'is_internal' => $service['is_internal'],
+            ]);
+
+            $this->createAndAssociateImage($paymentService, $service['image']);
+
             $currencies = PaymentCurrency::inRandomOrder()->take(rand(1, 3))->get();
             $paymentService->paymentCurrencies()->attach($currencies);
+        }
+
+        Auth::logout();
+    }
+
+    /**
+     * Create a media object for the image and associate it with the payment service.
+     *
+     * @param PaymentService $paymentService
+     * @param string $imageName
+     */
+    private function createAndAssociateImage(PaymentService $paymentService, string $imageName)
+    {
+        $imagePath = storage_path('app/payment-service-images/' . $imageName);
+
+        if (file_exists($imagePath)) {
+            $file = new UploadedFile($imagePath, $imageName, null, null, true);
+
+            $request = new MediaRequest();
+            $request->files->set('qqfile', $file);
+            $request->merge([
+                'qqfilename' => $imageName,
+                'unique_folder_name' => Str::uuid()->toString(),
+            ]);
+
+            $media = $this->mediaLibraryController->storeFile($request);
+
+            if ($media) {
+                $paymentService->medias()->attach($media->id, [
+                    'role' => 'logo',
+                    'crop' => 'default',
+                    'locale' => 'en',
+                    'metadatas' => json_encode([
+                        'alt_text' => $paymentService->title . ' logo',
+                        'caption' => $paymentService->title . ' payment service logo',
+                    ]),
+                ]);
+            } else {
+                $this->command->warn("Failed to create media for: $imageName");
+            }
+        } else {
+            $this->command->warn("Image file not found: $imageName");
         }
     }
 }
