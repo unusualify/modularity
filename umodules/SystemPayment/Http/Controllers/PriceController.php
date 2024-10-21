@@ -109,7 +109,14 @@ class PriceController extends Controller
                 ]));
         } else {
             // dd($request->custom_fields['previous_url']);
-            return redirect(merge_url_query($request->custom_fields['previous_url'], ['payment' => 'error']));
+            return redirect(merge_url_query($request->custom_fields['previous_url'],
+            [
+                'customModal' => [
+                    'color' => 'error',
+                    'description' => 'Your payment has been successfully completed. Thank you for your purchase.',
+                    'icon' => '$error',
+                ],
+            ]));
         }
     }
 }
