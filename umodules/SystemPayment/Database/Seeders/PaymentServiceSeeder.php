@@ -120,8 +120,8 @@ class PaymentServiceSeeder extends Seeder
      */
     private function createAndAssociateImage(PaymentService $paymentService, string $imageName)
     {
-        $imagePath = storage_path('app/payment-service-images/' . $imageName);
-
+        $imagePath = public_path('vendor/modularity/assets/images/payment-service-images/' . $imageName);
+        // dd($imagePath);
         if (file_exists($imagePath)) {
             $file = new UploadedFile($imagePath, $imageName, null, null, true);
 
