@@ -167,7 +167,15 @@ class LoginController extends Controller
                 // 'hasSubmit' => true,
 
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
-                'title' => __('authentication.login-title'),
+                'title' => [
+                    'text' => __('authentication.login-title'),
+                    'tag' => 'h1',
+                    'type' => 'h5',
+                    'weight' => 'bold',
+                    'transform' => '',
+                    'align' => 'center',
+                    'justify' => 'center',
+                ],
                 'schema' => ($schema = $this->createFormSchema([
                     'email' => [
                         'type' => 'text',

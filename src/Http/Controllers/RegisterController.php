@@ -28,7 +28,15 @@ class RegisterController extends Controller
         return view(unusualBaseKey() . '::auth.register', [
             'formAttributes' => [
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
-                'title' => __('authentication.create-an-account'),
+                'title' => [
+                    'text' => __('authentication.create-an-account'),
+                    'tag' => 'h1',
+                    'type' => 'h5',
+                    'weight' => 'bold',
+                    'transform' => '',
+                    'align' => 'center',
+                    'justify' => 'center',
+                ],
                 'schema' => ($schema = $this->createFormSchema([
                     'name' => [
                         'type' => 'text',
