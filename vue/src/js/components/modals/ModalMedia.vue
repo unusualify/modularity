@@ -345,7 +345,7 @@ export default {
     type: function () {
       this.clearMediaItems()
       this.gridLoaded = false
-      this.sharedFilterState.type = newType;
+      this.sharedFilterState.type = this.type;
     },
     page: function (newPage) {
       this.sharedFilterState.page = newPage;
@@ -556,7 +556,6 @@ export default {
       this.loading = true
       // let formdata = null;
       const form = this.$refs.form
-      console.log(this.sharedFilterState)
       const formdata = self.cleanEmptyFilters(this.sharedFilterState);
       // console.log(formdata)
 

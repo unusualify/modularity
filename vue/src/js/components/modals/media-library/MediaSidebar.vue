@@ -65,6 +65,7 @@
               variant="outlined"
               name="alt_text"
               @blur="blur"
+              v-if="isImage"
               v-model="firstMedia.metadatas.default.altText"
               >
             </v-text-field>
@@ -73,6 +74,7 @@
               variant="outlined"
               name="caption"
               @blur="blur"
+              v-if="isImage"
               v-model="firstMedia.metadatas.default.caption"
             >
             </v-textarea>
