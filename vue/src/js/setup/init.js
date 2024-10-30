@@ -5,13 +5,14 @@ import jquery from 'jquery'
 import lodash, { snakeCase } from 'lodash-es'
 import store from '@/store' // Adjust the import based on your store structure
 import { CONFIG } from '@/store/mutations'
+import { useI18n } from 'vue-i18n'
+import pluralize from 'pluralize'
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
  * to our Laravel back-end. This library automatically handles sending the
  * CSRF token as a header based on the value of the "XSRF" token cookie.
  */
-
 
 /*
  |--------------------------------------------------------------------------
@@ -39,6 +40,9 @@ import { CONFIG } from '@/store/mutations'
 
   window.__isObject = (value) => {
     return Object.prototype.toString.call(value) === '[object Object]'
+  },
+  window.__isArray = (value) => {
+    return Array.isArray(value)
   }
 
   window.__isset = (...args) => {
@@ -70,6 +74,9 @@ import { CONFIG } from '@/store/mutations'
       i++
     }
     return true
+  }
+  window.__issetReturn = (arg, defaultValue) => {
+    return __isset(arg) ? arg : defaultValue
   }
 
   window.__getMethods = (obj) => Object.getOwnPropertyNames(obj).filter(item => typeof obj[item] === 'function')
@@ -173,6 +180,12 @@ import { CONFIG } from '@/store/mutations'
 
   window.__preg_quote = (str, delimeter = '') => {
     return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + '-]', 'g'), '\\$&');
+  }
+
+  window.__extract = (obj) => {
+    for (var key in obj) {
+      window[key] = obj[key];
+    }
   }
 
   window.__dot = (obj, prefix = '') => {
@@ -345,6 +358,65 @@ import { CONFIG } from '@/store/mutations'
       .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
   }
+
+  window.__headline = (str) => {
+    str = snakeCase(str)
+    return str
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+
+  window.__snakeNameFromForeignKey = (str) => {
+    let matches = str.match(/(.*)(_id)/)
+
+    if (matches) {
+      return snakeCase(matches[1]);
+    }
+
+    return false;
+  }
+
+  window.__nameFromForeignKey = (str) => {
+    str = __snakeNameFromForeignKey(str)
+
+    return !str ? __snakeToHeadline(str) : str;
+  }
+
+  window.__moduleName = (str) => {
+    let matches = str.match('/(.*)(_id)/')
+    if(matches){ // is foreign key
+      return __snakeNameFromForeignKey(matches[1])
+    }
+
+    return snakeCase(str);
+  }
+
+  window.__moduleTranslationName = (str) => {
+    __log(window)
+    const { t, te } = useI18n({ useScope: 'global' })
+
+    let isPlural = false
+    let name = str
+
+    let snakeNameFromForeignKey = __snakeNameFromForeignKey(name)
+
+    if(snakeNameFromForeignKey){ // is foreign key
+      name = snakeNameFromForeignKey
+      str = snakeNameFromForeignKey
+    }
+
+    if(pluralize.isPlural(name)){
+      isPlural = true
+      name = pluralize.singular(name)
+    }
+
+    name = snakeCase(name)
+    str = snakeCase(str)
+
+    return te(`modules.${name}`) ? t(`modules.${name}`, isPlural ? 1 : 0) : __snakeToHeadline(str)
+  }
+
   window.__removeQueryParams = (paramsToRemove) => {
     // Get the current URL
     const currentUrl = new URL(window.location.href);
@@ -377,6 +449,8 @@ import { CONFIG } from '@/store/mutations'
     // Update the URL without refreshing the page using replaceState
     window.history.replaceState({}, '', newUrl);
   }
+
+  window.__pluralize = (str) => pluralize.plural(str)
 }
 
 function tokenizePath(path) {
