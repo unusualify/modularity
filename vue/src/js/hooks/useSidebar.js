@@ -1,7 +1,7 @@
 import { reactive, computed, onMounted, toRefs, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 import { useStore } from 'vuex'
-
+import { CONFIG } from '@/store/mutations'
 // import openMediaLibrary from '@/behaviors/openMediaLibrary'
 
 export default function useSidebar () {
