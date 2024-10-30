@@ -12,6 +12,17 @@
     </template> -->
     <template v-slot:default="defaultSlot">
       <ue-tabs v-model="activeTab" :items="items" tab-value="id" tab-title="name">
+        <template v-for="(item, i) in items" :key="`tab-slot-${i}`" v-slot:[`tab.${item.id}`]>
+            <v-tab :value="item.id"
+              :color="!this.valids[i] && window.__isBoolean(this.valids[i]) ? 'error' : 'primary'"
+              :class="[window.__isBoolean(this.valids[i]) && !this.valids[i] ? 'bg-red-lighten-5' : '']"
+            >
+              <span>{{ item.name }}</span>
+              <template v-slot:append>
+                <v-icon v-if="window.__isBoolean(valids[i])" :icon="valids[i] ? '$check' : '$close'"></v-icon>
+              </template>
+            </v-tab>
+        </template>
         <template v-slot:windows="{active}">
           <v-window v-model="activeTab">
             <v-window-item v-for="(item, i) in elements" :key="item.id" :value="item.id">
@@ -25,24 +36,7 @@
           </v-window>
         </template>
       </ue-tabs>
-      <!-- <v-tabs
-        v-model="activeTab"
-        align-tabs="center"
-      >
-        <v-tab v-for="(item, i) in elements" :key="item.id" :value="item.id">
-          {{ item.name }}
-        </v-tab>
-      </v-tabs>
-      <v-window v-model="activeTab">
-        <v-window-item v-for="(item, i) in elements" :key="item.id" :value="item.id">
-          <ue-form
-            :ref="formRefs[item.id]"
-            v-model="models[item.id]"
-            :schema="schemas[item.id]"
-            v-model:valid="valids[i]"
-            />
-        </v-window-item>
-      </v-window> -->
+
     </template>
   </v-input>
 </template>
@@ -124,19 +118,23 @@ export default {
           loopValues:
           for(const id in v){
             let model = v[id]
-            // __log(v)
+
             for(const name in this.schema){
               let value = model[name]
               let input = this.schema[name]
 
               // let item = this.elements.find((el) => el.id == id)
               isValid = this.validateInput(input, value)
-              // __log(this.manualValidation)
+
               if(isValid !== true && this.manualValidation){
                 this.activeTab = parseInt(id)
                 let formRef = this.formRefs[id]
-                // __log(formRef)
+                // __log(formRef.value, formRef)
                 formRef.value[0].validate()
+                break loopValues;
+              }
+
+              if(isValid !== true){
                 break loopValues;
               }
 
@@ -163,7 +161,6 @@ export default {
 
           // if(!v.package)
           //   return ''
-          // __log(isValid)
           return isValid
         },
       ]
@@ -241,7 +238,6 @@ export default {
 
       return acc
     }, {})
-
   }
 }
 </script>
