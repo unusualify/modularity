@@ -915,7 +915,7 @@ class RouteGenerator extends Generator
                 'headline' => pluralize($headline),
                 'url' => pluralize($kebabCase),
                 'route_name' => $snakeCase,
-                'icon' => '', //'$modules',
+                'icon' => '$submodule', //'$modules',
                 'title_column_key' => $titleColumnKey,
                 'table_options' => static::$defaultTableOptions,
                 'headers' => $headers, //in Unusualify\Modularity\Support\Migrations\SchemaParser::class

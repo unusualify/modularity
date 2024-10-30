@@ -47,7 +47,7 @@ Route's configuration files allow you to configure input component and its metad
             'headline' => 'Web Companies',
             'url' => 'web-companies',
             'route_name' => 'web_company',
-            'icon' => '',
+            'icon' => '$submodule',
             'table_options' => [
                 //..code
             ],
