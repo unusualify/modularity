@@ -61,7 +61,6 @@ export const makeFileProps = propsFactory({
 
 // by convention, composable function names start with "use"
 export default function useFile (props, context) {
-  // const { injectRoot } = useRoot()
 
   const store = useStore()
   const inputHook = useInput(props, context)
