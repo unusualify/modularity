@@ -1,0 +1,537 @@
+{
+  "wrap-670d00824fd72": {
+    "type": "wrap",
+    "hint": "",
+    "placeholder": "",
+    "errorMessages": [],
+    "density": "comfortable",
+    "variant": "outlined",
+    "clearable": true,
+    "schema": {
+      "package_continent_id": {
+        "type": "select",
+        "density": "comfortable",
+        "variant": "outlined",
+        "name": "package_continent_id",
+        "label": "Continent",
+        "rules": "sometimes|required",
+        "ext": "morphTo",
+        "cascade": "package_region_id",
+        "itemValue": "id",
+        "itemTitle": "name",
+        "default": null,
+        "cascadeKey": "items",
+        "items": [
+          {
+            "id": 0,
+            "name": "Please Select"
+          },
+          {
+            "id": 1,
+            "name": "Europe",
+            "items": [
+              {
+                "id": 2,
+                "package_continent_id": 1,
+                "name": "Europe",
+                "items": [
+                  {
+                    "id": 1,
+                    "package_region_id": 2,
+                    "name": "Turkey"
+                  },
+                  {
+                    "id": 2,
+                    "package_region_id": 2,
+                    "name": "France"
+                  },
+                  {
+                    "id": 4,
+                    "package_region_id": 2,
+                    "name": "Bulgaria"
+                  },
+                  {
+                    "id": 5,
+                    "package_region_id": 2,
+                    "name": "Germany"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "name": "North America",
+            "items": []
+          },
+          {
+            "id": 3,
+            "name": "Africa",
+            "items": [
+              {
+                "id": 5,
+                "package_continent_id": 3,
+                "name": "Americas",
+                "items": [
+                  {
+                    "id": 6,
+                    "package_region_id": 5,
+                    "name": "Brasil"
+                  },
+                  {
+                    "id": 7,
+                    "package_region_id": 5,
+                    "name": "USA"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "name": "South America",
+            "items": []
+          },
+          {
+            "id": 5,
+            "name": "Asia",
+            "items": []
+          },
+          {
+            "id": 6,
+            "name": "All",
+            "items": [
+              {
+                "id": 1,
+                "package_continent_id": 6,
+                "name": "Global",
+                "items": [
+                  {
+                    "id": 3,
+                    "package_region_id": 1,
+                    "name": "Global Distribution"
+                  }
+                ]
+              },
+              {
+                "id": 3,
+                "package_continent_id": 6,
+                "name": "Mena Region",
+                "items": []
+              },
+              {
+                "id": 4,
+                "package_continent_id": 6,
+                "name": "Asia",
+                "items": [
+                  {
+                    "id": 8,
+                    "package_region_id": 4,
+                    "name": "China"
+                  },
+                  {
+                    "id": 9,
+                    "package_region_id": 4,
+                    "name": "India"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "class": "required required"
+      },
+      "package_region_id": {
+        "type": "select",
+        "hint": "",
+        "errorMessages": [],
+        "density": "comfortable",
+        "variant": "outlined",
+        "name": "package_region_id",
+        "label": "Region",
+        "ext": "morphTo",
+        "cascade": "package_country_id",
+        "items": [
+          {
+            "id": 0,
+            "name": "Please Select"
+          },
+          {
+            "id": 1,
+            "name": "Global"
+          },
+          {
+            "id": 2,
+            "name": "Europe"
+          },
+          {
+            "id": 3,
+            "name": "Mena Region"
+          },
+          {
+            "id": 4,
+            "name": "Asia"
+          },
+          {
+            "id": 5,
+            "name": "Americas"
+          }
+        ],
+        "itemValue": "id",
+        "itemTitle": "name",
+        "default": null,
+        "cascadeKey": "items"
+      },
+      "package_country_id": {
+        "type": "select",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": true,
+        "name": "package_country_id",
+        "label": "Country",
+        "ext": "morphTo",
+        "items": [
+          {
+            "id": 0,
+            "name": "Please Select"
+          },
+          {
+            "id": 1,
+            "name": "Turkey"
+          },
+          {
+            "id": 2,
+            "name": "France"
+          },
+          {
+            "id": 3,
+            "name": "Global Distribution"
+          },
+          {
+            "id": 4,
+            "name": "Bulgaria"
+          },
+          {
+            "id": 5,
+            "name": "Germany"
+          },
+          {
+            "id": 6,
+            "name": "Brasil"
+          },
+          {
+            "id": 7,
+            "name": "USA"
+          },
+          {
+            "id": 8,
+            "name": "China"
+          },
+          {
+            "id": 9,
+            "name": "India"
+          }
+        ],
+        "itemValue": "id",
+        "itemTitle": "name",
+        "default": null,
+        "cascadeKey": "items"
+      }
+    },
+    "typeInt": "sheet",
+    "title": "",
+    "name": "wrap-670d00824fd72",
+    "default": {
+      "package_continent_id": "",
+      "package_region_id": "",
+      "package_country_id": ""
+    }
+  },
+  "wrap-670d00825004c": {
+    "type": "wrap",
+    "hint": "",
+    "placeholder": "",
+    "errorMessages": [],
+    "density": "comfortable",
+    "variant": "outlined",
+    "clearable": true,
+    "schema": {
+      "name": {
+        "type": "text",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": true,
+        "name": "name",
+        "label": "Name"
+      },
+      "description": {
+        "type": "textarea",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": true,
+        "name": "description",
+        "label": "Description"
+      }
+    },
+    "typeInt": "sheet",
+    "title": "",
+    "name": "wrap-670d00825004c",
+    "default": {
+      "name": "",
+      "description": ""
+    }
+  },
+  "packageFeatures": {
+    "type": "input-repeater",
+    "hint": "",
+    "placeholder": "",
+    "errorMessages": [],
+    "density": "comfortable",
+    "variant": "outlined",
+    "clearable": true,
+    "name": "packageFeatures",
+    "label": "Please select the features",
+    "default": [],
+    "max": 3,
+    "draggable": true,
+    "rowAttribute": {
+      "noGutters": true
+    },
+    "schema": {
+      "package_feature_id": {
+        "type": "combobox",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "density": "comfortable",
+        "variant": "solo",
+        "clearable": false,
+        "name": "package_feature_id",
+        "default": 0,
+        "class": "pt-0 required",
+        "hideDetails": true,
+        "returnObject": false,
+        "rules": "required",
+        "itemValue": "id",
+        "itemTitle": "description",
+        "slots": {
+          "item": {
+            "elements": [
+              {
+                "tag": "v-list-item",
+                "attributes": {
+                  "title": [
+                    "$props.title",
+                    "__shorten"
+                  ]
+                },
+                "bind": "$props"
+              }
+            ]
+          }
+        },
+        "translated": false,
+        "cascadeKey": "items",
+        "items": [
+          {
+            "id": 0,
+            "description": "Please Select"
+          },
+          {
+            "id": 1,
+            "description": "Free Distribution"
+          },
+          {
+            "id": 2,
+            "description": "10 release contents"
+          },
+          {
+            "id": 4,
+            "description": "Writing SEO friendly press release in English (max 400 words)"
+          },
+          {
+            "id": 5,
+            "description": "Distributing to segmented media lists"
+          },
+          {
+            "id": 6,
+            "description": "Distributing to partnered websites"
+          }
+        ]
+      },
+      "active": {
+        "type": "select",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "density": "comfortable",
+        "variant": "solo",
+        "clearable": false,
+        "name": "active",
+        "class": "",
+        "default": "1",
+        "menuIcon": "",
+        "hideDetails": true,
+        "returnObject": false,
+        "style": "border-radius: 0px;",
+        "itemValue": "id",
+        "itemTitle": "name",
+        "items": [
+          {
+            "id": "1",
+            "name": "Yes"
+          },
+          {
+            "id": "0",
+            "name": "No"
+          }
+        ],
+        "translated": false,
+        "cascadeKey": "items"
+      }
+    },
+    "slots": [],
+    "autoIdGenerator": true,
+    "itemValue": "id",
+    "itemTitle": "name",
+    "orderKey": "position",
+    "singularLabel": "Please select the feature",
+    "items": [
+      {
+        "id": 1,
+        "name": null
+      },
+      {
+        "id": 2,
+        "name": null
+      },
+      {
+        "id": 4,
+        "name": null
+      },
+      {
+        "id": 5,
+        "name": null
+      },
+      {
+        "id": 6,
+        "name": null
+      }
+    ]
+  },
+  "prices": {
+    "type": "input-price",
+    "hint": "",
+    "placeholder": "",
+    "errorMessages": [],
+    "density": "comfortable",
+    "variant": "outlined",
+    "clearable": false,
+    "slotable": {
+      "slotTo": "packageFeatures",
+      "name": "addButtonRight"
+    },
+    "name": "prices",
+    "label": "Price",
+    "rules": "sometimes:required",
+    "tooltip": "Lütfen ücret değerini sayı olarak giriniz.",
+    "default": [
+      {
+        "display_price": "",
+        "currency_id": 1
+      }
+    ],
+    "currencies": [
+      {
+        "id": 1,
+        "name": "€"
+      },
+      {
+        "id": 2,
+        "name": "$"
+      },
+      {
+        "id": 3,
+        "name": "₺"
+      },
+      {
+        "id": 4,
+        "name": "£"
+      },
+      {
+        "id": 5,
+        "name": "¥"
+      },
+      {
+        "id": 6,
+        "name": "CA$"
+      },
+      {
+        "id": 7,
+        "name": "A$"
+      },
+      {
+        "id": 8,
+        "name": "CHF"
+      },
+      {
+        "id": 9,
+        "name": "¥"
+      },
+      {
+        "id": 10,
+        "name": "kr"
+      },
+      {
+        "id": 11,
+        "name": "NZ$"
+      },
+      {
+        "id": 12,
+        "name": "MX$"
+      },
+      {
+        "id": 13,
+        "name": "S$"
+      },
+      {
+        "id": 14,
+        "name": "HK$"
+      },
+      {
+        "id": 15,
+        "name": "kr"
+      },
+      {
+        "id": 16,
+        "name": "₩"
+      },
+      {
+        "id": 17,
+        "name": "R$"
+      },
+      {
+        "id": 18,
+        "name": "₽"
+      },
+      {
+        "id": 19,
+        "name": "₹"
+      },
+      {
+        "id": 20,
+        "name": "R"
+      }
+    ],
+    "class": "required"
+  }
+}
