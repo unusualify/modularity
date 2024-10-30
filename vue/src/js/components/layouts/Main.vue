@@ -5,13 +5,9 @@
 
     <v-app-bar app v-if="$vuetify.display.mdAndDown">
       <v-app-bar-nav-icon
-        v-if="sideBar.showToggleBtn.value && !sideBar.sidebarToggle.value"
-        @click="sideBar.methods.toggleSideBar">
-      </v-app-bar-nav-icon>
-      <v-app-bar-nav-icon
-        v-else-if="sideBar.showToggleBtn.value && sideBar.sidebarToggle.value"
-        icon="mdi-window-close"
-        @click="sideBar.methods.toggleSideBar">
+        v-if="!$vuetify.display.lgAndUp"
+        :icon="!$store.getters.sidebarStatus ? '$menu' : '$close'"
+        @click="$toggleSidebar()">
       </v-app-bar-nav-icon>
 
       <v-toolbar-title>CRM</v-toolbar-title>
@@ -47,46 +43,12 @@
     >
       <template v-slot:bottom>
         <ue-impersonate-toolbar
-          v-if="sideBar.root.isLgAndUp.value && impersonation.active"
+          v-if="$vuetify.display.lgAndUp && impersonation.active"
           v-model="showImpersonateToolbar"
           v-bind="impersonation"
         />
       </template>
     </ue-sidebar>
-
-
-    <v-app-bar app v-if="false">
-      <v-app-bar-nav-icon
-        v-if="$root.showToggleButton"
-        @click="$root.toggleSidebar">
-      </v-app-bar-nav-icon>
-
-      <v-toolbar-title>CRM</v-toolbar-title>
-
-      <v-btn
-        v-if="false"
-        class="ma-2"
-        :loading="loading"
-        :disabled="loading"
-        color="secondary"
-        @click="addSidebarItem"
-      >
-        Add Sidebar Item
-      </v-btn>
-
-      <!-- #language selector -->
-      <v-toolbar-title v-if="false">
-        <!-- {{ $t('fields.list') }}
-        {{ $n(100.77, 'currency') }} -->
-        {{ $t('fields.language-select') }}
-        <select v-model="$i18n.locale">
-          <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">
-            {{ lang }}
-          </option>
-        </select>
-      </v-toolbar-title>
-
-    </v-app-bar>
 
     <v-main>
       <slot name="main-top"></slot>
@@ -182,18 +144,9 @@
 </template>
 
 <script>
-  import { useSidebar, useRoot } from '@/hooks';
-  import { provide } from 'vue';
-  import { ALERT } from '@/store/mutations/index'
+  import { ALERT, CONFIG } from '@/store/mutations/index'
 
   export default {
-    setup(){
-      const sideBar = useSidebar();
-      provide('hooks',sideBar);
-      return {
-        sideBar,
-      }
-    },
     props: {
       navigation: {
         type: Object,
@@ -380,16 +333,7 @@
       }
     },
     created () {
-      // __log(this.authorization)
-      // this.$vToastify.success("Kaydetme İşleminiz Başarılı!", 'Başarılı');
 
-      // this.$toast.success('Info toast')
-
-      // this.$notification.success("hello world", {  timer: 5 });
-
-      // console.log( this.$vuetify.icons );
-
-      // console.log('mounted items', this.$refs)
     },
 
     mounted () {
@@ -420,8 +364,7 @@
       },
       closeAlertDialog(){
         this.$store.commit(ALERT.CLEAR_DIALOG)
-      }
-
+      },
     }
   }
 </script>

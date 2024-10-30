@@ -1,34 +1,19 @@
 import { reactive, computed, onMounted, toRefs, ref, watch } from 'vue'
+import { useDisplay } from 'vuetify'
 import { useStore } from 'vuex'
-// import openMediaLibrary from '@/behaviors/openMediaLibrary'
-import { propsFactory } from 'vuetify/lib/util/propsFactory.mjs'
-import { useRoot } from '@/hooks'
 
-const props = propsFactory({
-  miniStatus: {
-    type: Boolean,
-    default: false
-  },
-  hasRailMode: {
-    type: Boolean,
-    default: false
-  },
-  sidebarToggle: {
-    type: Boolean,
-    default: false
-  },
-  isExpanded: {
-    type: Boolean,
-    default: true
-  },
-})
+// import openMediaLibrary from '@/behaviors/openMediaLibrary'
 
 export default function useSidebar () {
+  const { lgAndUp, xlAndUp } = useDisplay()
   const isExpanded = ref(false)
   const activeMenuItem = ref('#profile')
   const store = useStore()
-  const root = useRoot()
+
+  const navigationDrawer = ref(null)
+
   const state = reactive({
+    navigationDrawer,
     open: [],
     activeMenu: computed({
       get () {
@@ -38,31 +23,25 @@ export default function useSidebar () {
         activeMenuItem.value = val
       }
     }),
-
-    csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-    sidebarToggle: props.sidebarToggle,
-    mainSidebar: store.state.config.sideBarOpt,
-    secondarySidebar: store.state.config.secondarySideBar,
-    profileMenu: store.state.config.profileMenu,
-    currentUser: store.state.config.currentUser,
-    mainLocation: computed(() => state.mainSidebar.mainLocation),
-    secondarySidebarExists: computed(() => state.secondarySidebar.exists),
-    secondaryLocation: computed(() => state.secondarySidebar.location),
-    contentDrawer: computed(() => state.mainSidebar.contentDrawer.exists),
-    rail: computed(() => state.mainSidebar.rail && root.isLgAndUp),
-    isMini: computed(() => state.mainSidebar.isMini && root.isLgAndUp),
-    isHoverable: computed(() => ((state.isMini && root.isLgAndUp) || state.rail) && state.mainSidebar.expandOnHover),
-    showToggleBtn: computed(() => !state.isMini.value),
-    width: computed(() => root.isXlAndUp.value ? 320 : 256),
-    expanded: computed({
-      get () {
-        return isExpanded.value
+    status: computed({
+      get() {
+        return store.state.config.sidebarStatus
       },
-      set (val) {
-        isExpanded.value = val
+      set(value) {
+        store.commit(CONFIG.SET_SIDEBAR, value)
       }
     }),
-    showIcon: computed(() => state.rail.value ? (state.expanded ? state.mainSidebar.showIcon : true) : state.mainSidebar.showIcon),
+    width: computed(() => xlAndUp.value ? 320 : 256),
+
+    options: store.state.config.sidebarOptions,
+    hideIcons: computed(() => !state.rail && state.options.hideIcons),
+    railManual: false,
+    rail: computed(() => (state.options.rail || state.railManual) && lgAndUp.value),
+    isHoverable: computed(() => (lgAndUp.value || state.rail) && state.options.expandOnHover),
+
+    secondaryOptions: store.state.config.secondarySidebarOptions,
+
+    profileMenu: store.state.config.profileMenu,
     socialMediaLinks: [
       [
         'mdi-twitter',
@@ -81,33 +60,10 @@ export default function useSidebar () {
         ''
       ]
     ],
+
   })
 
   const methods = reactive({
-    toggleSideBar: function () {
-      state.sidebarToggle = !state.sidebarToggle
-    },
-    handleMethodCall: function (functionName, ...val) {
-      return this[functionName](...val)
-    },
-    handleVmFunctionCall: function (functionName, ...val) {
-      return this[functionName](...val)
-    },
-    initializeSidebar: () => {
-      if (state.isMini.value && root.isLgAndUp.value) {
-        state.sidebarToggle = true
-      } else if (!state.isMini.value) {
-        state.sidebarToggle = false
-      }
-    },
-    handleExpanding: function (event) {
-      if (state.rail.value) {
-        state.expanded = !event
-      }
-    },
-    openFreeMediaLibrary: function () {
-      root.openMediaLibrary()
-    },
     handleProfile(event){
       if(event.type === 'mouseenter' && state.profileMenu.expandOnHover) state.open.push('User')
       console.log(event, state.profileMenu)
@@ -117,17 +73,18 @@ export default function useSidebar () {
     }
   })
 
-  watch(root.isLgAndUp, () => {
-    state.expanded = !state.rail.value
+  watch(lgAndUp, () => {
+    // __log('isLgAndUp', lgAndUp.value, state.rail)
+    // state.expanded = !state.rail.value
+    // __log('navigationDrawer', navigationDrawer.value)
   })
   onMounted(() => {
-    methods.initializeSidebar()
-    state.expanded = !state.rail.value
+    // methods.initializeSidebar()
+    // state.expanded = !state.rail.value
   })
 
   return {
     ...toRefs(state),
-    root,
     methods
   }
 }

@@ -40,7 +40,7 @@
         :disable-sort="disableSort"
         :loading="loading"
         :loading-text="$t('Loading... Please wait')"
-        :mobile="isSmAndDown"
+        :mobile="$vuetify.display.smAndDown"
 
         :show-select="showSelect"
         item-value="id"
@@ -429,7 +429,7 @@
           <!-- @click's editItem|deleteItem -->
           <!-- #actions -->
 
-          <v-menu v-if="rowActionsType === 'dropdown' || isSmAndDown"
+          <v-menu v-if="rowActionsType === 'dropdown' || $vuetify.display.smAndDown"
             :close-on-content-click="false"
             open-on-hover
             left

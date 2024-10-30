@@ -1,37 +1,98 @@
 <template>
-  <v-navigation-drawer
-    v-model="sidebarToggle"
-    id="navigation-drawer"
-    :expand-on-hover="isHoverable"
-    :mini-variant="isMini"
-    v-model:mini-variant="isMini"
-    :rail="rail"
-    :width="width"
+  <!-- <v-navigation-drawer
     @update:rail="methods.handleExpanding($event)"
     :location="mainLocation"
+  > -->
+  <v-navigation-drawer
+    ref="navigationDrawer"
+    id="navigation-drawer"
+    v-model="status"
+    :rail="rail"
+    :expand-on-hover="isHoverable"
+    :location="options.location"
+    :railWidth="options.railWidth"
+    :persistent="options.persistent ?? false"
+    :width="width"
   >
     <!-- <v-avatar class="d-block text-center mx-auto mt-2">
       <v-icon color="green darken-2" large icon="fa:fab fa-atlassian"/>
     </v-avatar> -->
 
-    <!-- <template v-slot:prepend>
-      <div>
-        <span v-svg symbol="main-logo"></span>
-      </div>
-    </template> -->
-    <ue-svg-icon symbol="main-logo"></ue-svg-icon>
+    <!-- <ue-svg-icon class="ue-sidebar__logo" symbol="main-logo-light"></ue-svg-icon> -->
+    <v-list class="ue-sidebar__info">
+      <v-list-item
+        prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg"
+        subtitle="info@b2press.com"
+        title="B2Press"
+        class="ue-sidebar__info-item"
+      >
+        <template v-slot:prepend>
+          <v-avatar class="ue-sidebar__avatar" color="primary">
+            <ue-svg-icon class="ue-sidebar__logo" symbol="main-logo-dark"></ue-svg-icon>
+          </v-avatar>
+        </template>
+      </v-list-item>
 
-    <v-divider class=""></v-divider>
+    </v-list>
 
-    <!-- <ue-list-element>
+    <div class="d-flex align-center position-relatie" style="">
+      <v-divider class="flex-grow-1"></v-divider>
+      <v-btn
+        v-if="!hasRail && $vuetify.display.lgAndUp"
+        icon
+        color="orange"
+        @click="railManual = !railManual"
+        class="sidebar-toggle-btn"
+        size="small"
+        style="position: absolute; right: -20px; z-index: 9999;"
+      >
+        <v-icon>{{ rail ? 'mdi-chevron-right' : 'mdi-chevron-left' }}</v-icon>
+      </v-btn>
+    </div>
 
-    </ue-list-element> -->
-
-    <ue-list-group :items="items" :expanded="expanded" :showIcon="showIcon">
-    </ue-list-group>
+    <ue-navigation-group :items="items" :hideIcons="hideIcons" :showTooltip="rail && !isHoverable" class="ue-sidebar__menu">
+    </ue-navigation-group>
 
     <template v-slot:append>
-      <slot name="profileMenu">
+      <v-divider></v-divider>
+      <v-list class="">
+        <v-list-item
+          prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg"
+          :title="$store.getters.currentUser.name"
+          :subtitle="$store.getters.currentUser.email"
+          class="ue-sidebar__info-item"
+        >
+          <template v-slot:prependxxxx>
+            <v-avatar class="" color="primary">
+              <ue-svg-icon class="ue-sidebar__logo" symbol="main-logo-dark"></ue-svg-icon>
+            </v-avatar>
+          </template>
+          <template v-slot:append>
+            <v-btn
+              @click="profileMenuOpen = !profileMenuOpen"
+              :icon="profileMenuOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+              size="small"
+              variant="text"
+            ></v-btn>
+          </template>
+        </v-list-item>
+        <v-expand-transition>
+          <ue-navigation-group
+            v-if="profileMenuOpen"
+            :items="profileMenu"
+            :profileMenu="true"
+          >
+          </ue-navigation-group>
+        </v-expand-transition>
+        <ue-logout-modal :csrf="$csrf()">
+          <template v-slot:activator="{ props }">
+            <v-list-item prepend-icon="mdi-logout" v-bind="props">
+              {{ $t("authentication.logout") }}
+            </v-list-item>
+          </template>
+        </ue-logout-modal>
+      </v-list>
+      <!-- <slot name="profileMenu">
         <v-list
           v-if="profileMenu.length"
           v-model:opened="open"
@@ -42,7 +103,6 @@
             expand-icon="mdi-menu-up"
             collapse-icon="mdi-menu-down"
           >
-            <!-- prepend-avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKjNTobklLhC-OZ7sH94RPOZj2jtkS4KWfv9Q7z8von0qzIKe3kgUepfs7kpyI2Gnp0rQ&usqp=CAU" -->
             <template v-slot:activator="{ props }">
               <v-list-item
                 v-bind="props"
@@ -55,7 +115,7 @@
             </template>
             <ue-list-group
               :items="profileMenu"
-              :showIcon="showIcon"
+              :hideIcons="hideIcons"
               :expanded="expanded"
               :profileMenu="true"
             >
@@ -73,7 +133,6 @@
             <slot name="bottom"> </slot>
           </div>
         </v-list>
-        <!-- DEFAULT IF NO PROFILE MENU -->
         <div v-else>
           <ue-logout-modal :csrf="csrf">
             <template v-slot:activator="{ props }">
@@ -118,7 +177,7 @@
             <slot name="bottom"> </slot>
           </div>
         </div>
-      </slot>
+      </slot> -->
     </template>
 
     <!-- <template v-slot:append>
@@ -126,26 +185,25 @@
     </template> -->
   </v-navigation-drawer>
   <v-navigation-drawer
-    v-if="contentDrawer"
+    v-if="options.contentDrawer.exists"
     :width="width"
-    :location="mainLocation"
+    :location="options.location"
     style="max-width: 15%"
   />
   <v-navigation-drawer
-    v-if="secondarySidebarExists"
-    :location="secondaryLocation"
+    v-if="secondaryOptions.exists"
+    :location="secondaryOptions.location"
     :width="width"
   />
 </template>
 
 <script>
-import { inject } from "vue";
+import { useSidebar } from '@/hooks';
 
 export default {
   setup() {
-    const sideBar = inject("hooks");
     return {
-      ...sideBar,
+      ...useSidebar()
     };
   },
   props: {
@@ -162,20 +220,17 @@ export default {
     return {
       dialog: false,
       logo: "@/sass/themes/template/main-logo.svg",
-      isExpanded: true,
+      // isExpanded: true,
+      profileMenuOpen: false,
     };
   },
 };
 </script>
 
 <style lang="sass">
-// @use 'styles/themes/b2press/settings' with(
-//   $button-text-transform: 'capitalize'
-// );
+
 </style>
 
 <style>
-/* .v-list-item-group .v-list-item-active {
-      color: grey;
-    } */
+
 </style>
