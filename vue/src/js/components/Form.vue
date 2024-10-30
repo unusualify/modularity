@@ -175,7 +175,7 @@ export default {
     },
     formClass: {
       type: [Array, String],
-      default: 'px-theme pb-theme'
+      default: 'px-12 pb-12'
     },
     actionUrl: {
       type: String

@@ -76,7 +76,7 @@ return [
                         'xl' => 6,
                         'lg' => 6,
                         's' => 12,
-                        'class' => 'pr-theme-semi pb-theme-semi',
+                        'class' => 'pr-6 pb-6',
                     ],
                     'attributes' => [
                         'container' => [
@@ -129,7 +129,7 @@ return [
                         'xl' => 6,
                         'lg' => 6,
                         's' => 12,
-                        'class' => 'pl-theme-semi pb-theme-semi',
+                        'class' => 'pl-6 pb-6',
                     ],
                     'controller' => 'Modules\\SystemUser\\Http\\Controllers\\UserController',
                     'attributes' => [
@@ -225,7 +225,7 @@ return [
                         'xl' => 12,
                         'lg' => 12,
                         's' => 12,
-                        'class' => 'pl-theme-semi pb-theme-semi',
+                        'class' => 'pl-6 pb-6',
                     ],
                     'controller' => 'Modules\SystemUser\\Http\\Controllers\\UserController',
                     'attributes' => [

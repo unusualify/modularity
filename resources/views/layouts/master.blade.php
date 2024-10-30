@@ -53,7 +53,7 @@
                         ></v-alert>
                     </template>
                 @endif
-                <div id="ue-main-body" class="ue--main-container h-100">
+                <div id="ue-main-body" class="ue--main-container pa-6 h-100">
 
                     @yield('content')
 
@@ -75,7 +75,6 @@
             </ue-main>
         </div>
         {{-- <script src="{{ asset('js/admin.js') }}"></script> --}}
-
         {{-- @yield('initial-scripts') --}}
         <script>
             window['{{ unusualConfig('js_namespace') }}'] = {};
@@ -89,10 +88,10 @@
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.config = {
                 test: false,
-                sideBarOpt: {!! json_encode(unusualConfig('ui_settings.sidebar')) !!},
-                secondarySideBar : {!! json_encode(unusualConfig('ui_settings.secondarySidebar')) !!},
+                currentUser: {!! json_encode($currentUser) !!},
                 profileMenu: {!! json_encode($navigation['profileMenu']) !!},
-                currentUser: {!! json_encode($currentUser) !!}
+                sidebarOptions: {!! json_encode(unusualConfig('ui_settings.sidebar')) !!},
+                secondarySidebarOptions : {!! json_encode(unusualConfig('ui_settings.secondarySidebar')) !!}
             },
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.medias = {};

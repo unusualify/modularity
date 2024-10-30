@@ -77,7 +77,7 @@
           </template>
         </Draggable>
       </div>
-      <div class="repeater__bottom mb-theme">
+      <div class="repeater__bottom mb-12">
         <div class="d-flex">
           <slot name="addButton" v-bind="{text: addButtonContent, addRepeaterBlock}">
             <v-btn-secondary
@@ -146,7 +146,7 @@ export default {
   $toolbar-height: 36px
 
   .repeater__block
-    margin-left: -1 * $theme-space
+    margin-left: -1 * 12 * $spacer
     .content__content
       margin-bottom: 20px
       + .dropdown
@@ -154,7 +154,7 @@ export default {
 
       .content__item
         z-index: 1
-        padding-left: $theme-space
+        padding-left: 12 * $spacer
         // border: 1px solid $color__border
         // border-top: 0 none
         position: relative

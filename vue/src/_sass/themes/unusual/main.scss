@@ -1,0 +1,8 @@
+// themes/${theme}/main.scss
+// @import url('https://fonts.googleapis.com/css?family=Montserrat:200,400,500,600,700,800,900');
+@use './vuetify';
+@use 'core';
+@use 'components';
+@use 'config/test';
+@use 'utilities';
+

@@ -31,7 +31,7 @@
 
         <v-card-actions class="justify-center">
           <!-- <v-spacer></v-spacer> -->
-          <v-btn class="mr-theme" variant="tonal" @click="dialog=false">
+          <v-btn class="mr-12" variant="tonal" @click="dialog=false">
             {{ $t('No') }}
           </v-btn>
           <v-form method="post" action="/logout">

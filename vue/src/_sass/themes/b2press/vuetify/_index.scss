@@ -1,5 +1,6 @@
 // themes/${theme}/vuetify/_index.scss
 @use '../abstract' as *;
+
 @use 'vuetify' with (
   // $color-pack: false,
   $body-font-family: $body-font-family,

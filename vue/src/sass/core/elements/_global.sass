@@ -1,0 +1,28 @@
+@use '../abstract' as *
+
+.sticky-top
+  position: sticky
+  top: 0
+
+/* width */
+::-webkit-scrollbar
+  width: 8px
+
+
+/* Track */
+::-webkit-scrollbar-track
+  background: transparent
+
+
+/* Handle */
+::-webkit-scrollbar-thumb
+  background: $scrollbar-thumb-color
+  border-radius: 8px
+
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover
+  background: $scrollbar-thumb-hover-color
+
+// .v-pagination__list
+//   padding-inline-start: 0px

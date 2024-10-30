@@ -47,7 +47,7 @@ export const makeRepeaterProps = propsFactory({
     default () {
       return {
         noGutters: false,
-        class: 'ml-theme'
+        class: 'ml-12'
         // justify:'center',
         // align:'center'
       }

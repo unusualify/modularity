@@ -25,7 +25,7 @@
             </v-list-item>
           </v-list>
         </template>
-        <v-row v-if="hasMedia" align="center" justify="space-around" class="mt-theme">
+        <v-row v-if="hasMedia" align="center" justify="space-around" class="mt-12">
           <v-btn v-if="hasSingleMedia" :href="firstMedia.original" download icon="mdi-download" size="small"/>
           <v-btn v-if="allowDelete && authorized" icon="$trash" size="small" type="button" @click="deleteSelectedMediasValidation" />
           <v-btn v-else icon="$trash" disabled size="small" type="button" />

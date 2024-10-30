@@ -23,7 +23,7 @@ export function globalError (component = null, error = { message: '', value: nul
     //   variant: 'warning'
     // })
     window.vm.config.globalProperties.$dialog({
-      message: 'Your session has expired, please <a class="v-btn v-btn--slim text-primary v-btn--density-default v-btn--size-default mr-theme" href="'
+      message: 'Your session has expired, please <a class="v-btn v-btn--slim text-primary v-btn--density-default v-btn--size-default mr-12" href="'
         + document.location
         + '" target="_blank">login in another tab</a>',
     })

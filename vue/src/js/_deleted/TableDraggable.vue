@@ -96,9 +96,9 @@
     <template v-if="hideHeaders" v-slot:headers="{ columns, isSorted, getSortIcon, toggleSort }"></template>
 
     <template v-slot:bottom="{page, pageCount}">
-      <div class="text-right py-theme">
+      <div class="text-right py-12">
         <v-btn
-          class="v-btn--icon bg-tertiary rounded px-8 py-2 mr-theme"
+          class="v-btn--icon bg-tertiary rounded px-8 py-2 mr-12"
           :disabled="options.page < 2"
           @click="goPreviousPage"
           >
@@ -108,7 +108,7 @@
           />
         </v-btn>
         <v-btn
-          class="v-btn--icon bg-tertiary rounded px-8 py-2 mr-theme"
+          class="v-btn--icon bg-tertiary rounded px-8 py-2 mr-12"
           :disabled="options.page >= totalPage"
           @click="goNextPage"
           >

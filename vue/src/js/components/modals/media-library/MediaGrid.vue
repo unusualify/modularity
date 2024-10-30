@@ -173,7 +173,10 @@ export default {
     justify-content: center; /* align horizontal */
     flex-direction: column;
     align-items: center; /* align vertical */
-    @include font-regular;
+
+    // @include font-regular;
+    font-size: 15px;
+
     user-select: none;
     // background:$color__lighter;
     top: 10px;

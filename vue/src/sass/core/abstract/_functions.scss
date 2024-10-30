@@ -1,0 +1,26 @@
+@use 'sass:list';
+@use 'sass:map';
+@use 'sass:math';
+@use 'sass:meta';
+
+@function map-list-to-map($list) {
+  $map: ();
+  @for $i from 1 through length($list) {
+    $item: nth($list, $i);
+    $key: nth($item, 1);
+    $value: nth($item, 2);
+    $map: map-merge($map, ($key: $value));
+  }
+  // @warn($map);
+  @return $map;
+}
+
+@function map-to-withClause($map) {
+  $withClause: ('$utilities': 'false');
+  @for $i from 1 through length($list) {
+
+  }
+  // @warn($map);
+  @return $withClause;
+}
+
