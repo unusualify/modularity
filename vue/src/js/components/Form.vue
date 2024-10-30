@@ -16,14 +16,23 @@
           <!-- <div class="text-h8 pt-5 pb-10 text-primary font-weight-bold" v-if="formTitle && false">
             {{ ($te(formTitle) ? $t(formTitle).toLocaleUpperCase($i18n.locale.toUpperCase()) : formTitle.toLocaleUpperCase($i18n.locale.toUpperCase())) }}
           </div> -->
-          <ue-title v-if="title" :classes="['px-0']">
-            <div class="d-flex">
-              <div class="me-auto">
-                {{ ($te(title)
-                      ? $t(title).toLocaleUpperCase($i18n.locale.toUpperCase())
-                      : title.toLocaleUpperCase($i18n.locale.toUpperCase()))
+          <ue-title
+            v-if="title"
+            :classes="['px-0']"
+            :tag="title.tag || 'div'"
+            :type="title.type || 'body-1'"
+            :weight="title.weight || 'regular'"
+            :transform="title.transform || 'none'"
+            :color="title.color"
+            :padding="title.padding || 'a-0'"
+            :margin="title.margin || 'a-0'"
+            :align="title.align || 'left'"
+            :justify="title.justify || 'start'"
+          >
+                {{ ($te(title.text)
+                      ? $t(title.text).toLocaleUpperCase($i18n.locale.toUpperCase())
+                      : title.text.toLocaleUpperCase($i18n.locale.toUpperCase()))
                 }}
-              </div>
               <slot name="headerRight">
                 <!-- <v-btn
                     class=""
@@ -32,7 +41,6 @@
                     density="compact"
                   ></v-btn> -->
               </slot>
-            </div>
           </ue-title>
           <v-custom-form-base
             :id="`ue-wrapper-${id}`"
