@@ -19,20 +19,9 @@
           <ue-title
             v-if="title"
             :classes="['px-0']"
-            :tag="title.tag || 'div'"
-            :type="title.type || 'body-1'"
-            :weight="title.weight || 'regular'"
-            :transform="title.transform || 'none'"
-            :color="title.color"
-            :padding="title.padding || 'a-0'"
-            :margin="title.margin || 'a-0'"
-            :align="title.align || 'left'"
-            :justify="title.justify || 'start'"
+            v-bind="titleOptions"
           >
-                {{ ($te(title.text)
-                      ? $t(title.text).toLocaleUpperCase($i18n.locale.toUpperCase())
-                      : title.text.toLocaleUpperCase($i18n.locale.toUpperCase()))
-                }}
+                {{  titleSerialized }}
               <slot name="headerRight">
                 <!-- <v-btn
                     class=""
@@ -183,7 +172,7 @@ export default {
     },
     formClass: {
       type: [Array, String],
-      default: 'px-12 pb-12'
+      default: 'px-6 pb-6'
     },
     actionUrl: {
       type: String
@@ -411,6 +400,35 @@ export default {
         'order-lg': '1',
         'order-xl': '1'
       }
+    },
+    titleOptions(){
+      let options = {}
+
+      if(__isObject(this.title)){
+        options = {
+          tag: this.title.tag || 'div',
+          type: this.title.type || 'body-1',
+          weight: this.title.weight || 'regular',
+          transform: this.title.transform || 'none',
+          color: this.title.color,
+          padding: this.title.padding || 'a-0',
+          margin: this.title.margin || 'a-0',
+          align: this.title.align || 'left',
+          justify: this.title.justify || 'start',
+        }
+      }
+      return options
+    },
+    titleSerialized(){
+      let title = this.title
+
+      if(__isObject(this.title)){
+        title = this.title.text
+      }
+
+      return this.$te(title)
+        ? this.$t(title).toLocaleUpperCase(this.$i18n.locale.toUpperCase())
+        : title.toLocaleUpperCase(this.$i18n.locale.toUpperCase())
     },
     ...mapState({
       editedItem: state => state.form.editedItem,
