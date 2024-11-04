@@ -269,7 +269,7 @@ trait ManageUtilities
                 'hasSubmit' => true,
                 'stickyButton' => false,
                 'modelValue' => $this->repository->getFormFields($item, $schema),
-                'title' => ___(((bool) $itemId ? 'edit-item' : 'new-item'), ['item' => trans_choice('modules.' . snakeCase($this->routeName), 0)]),
+                'title' => __(((bool) $itemId ? 'fields.edit-item' : 'fields.new-item'), ['item' => trans_choice('modules.' . snakeCase($this->routeName), 0)]),
                 'isEditing' => true,
                 '__removed' => [
                     // 'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => $this->routeName]),

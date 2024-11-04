@@ -12,7 +12,7 @@
           </v-card-text>
           <v-radio-group v-model="localPaymentMethod" column>
             <div class="service-container">
-              <v-radio :label="$t('Credit Card')" :value="-1" class="service-label">
+              <v-radio :label="$t('Credit Card')" :value="localDefaultPaymentMethod" class="service-label">
               </v-radio>
               <v-row align="center">
                 <v-col class="d-flex justify-content-end">
@@ -121,6 +121,7 @@ export default {
 
 
     const localPaymentMethod = ref('');
+    const localDefaultPaymentMethod = ref("-1");
     const localCreditCard = reactive({
       card_name: '',
       card_number: '',
@@ -137,7 +138,7 @@ export default {
     });
     watch(() => props.modelValue, (newValue) => {
       if (newValue && typeof newValue === 'object') {
-        localPaymentMethod.value = newValue.payment_method || '';
+        localPaymentMethod.value = newValue.payment_method || localDefaultPaymentMethod.value;
         Object.assign(localCreditCard, newValue.credit_card || {});
       }
     }, { immediate: true, deep: true });
@@ -188,6 +189,7 @@ export default {
     return {
       input,
       localPaymentMethod,
+      localDefaultPaymentMethod,
       localCreditCard,
       serviceItems,
       validatePaymentService,

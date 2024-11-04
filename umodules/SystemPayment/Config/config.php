@@ -12,7 +12,7 @@ return [
             'headline' => 'Payment Services',
             'url' => 'payment-services',
             'route_name' => 'payment_service',
-            'icon' => '',
+            'icon' => '$submodule',
             'title_column_key' => 'name',
             'table_options' => [
                 'createOnModal' => true,
@@ -98,7 +98,7 @@ return [
             'headline' => 'Payments',
             'url' => 'payments',
             'route_name' => 'payment',
-            'icon' => '',
+            'icon' => '$submodule',
             'title_column_key' => 'name',
             'table_options' => [
                 'createOnModal' => true,
@@ -158,7 +158,7 @@ return [
             'headline' => 'Payment Currencies',
             'url' => 'payment-currencies',
             'route_name' => 'payment_currency',
-            'icon' => '',
+            'icon' => '$submodule',
             'title_column_key' => 'name',
             'table_options' => [
                 'createOnModal' => false,

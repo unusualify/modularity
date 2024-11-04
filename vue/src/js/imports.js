@@ -9,7 +9,7 @@ import store from '@/store'
 import { RootMixin } from '@/mixins'
 
 // Global styles
-import 'styles/wireframe.scss'
+// import 'styles/wireframe.scss'
 
 export {
   createApp,

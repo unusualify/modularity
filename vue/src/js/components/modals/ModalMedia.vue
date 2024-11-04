@@ -345,7 +345,7 @@ export default {
     type: function () {
       this.clearMediaItems()
       this.gridLoaded = false
-      this.sharedFilterState.type = newType;
+      this.sharedFilterState.type = this.type;
     },
     page: function (newPage) {
       this.sharedFilterState.page = newPage;

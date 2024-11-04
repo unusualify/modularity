@@ -4,11 +4,13 @@
       <v-main class="d-flex align-center justify-center" >
         <v-row class="h-100">
           <v-col
-            cols="6"
+            cols="12"
+            md="6"
+            lg="6"
             class="pa-0 d-flex flex-column align-center justify-center bg-white">
             <!-- <v-card class="mx-auto"> -->
               <v-row width="85%" class="d-flex flex-column justify-center align-center">
-                <h1 class="text-primary">{{ title }}</h1>
+                <!-- <h1 class="text-primary">{{ title }}</h1> -->
                 <div class="bg-primary darken-3">
                   <!-- <span v-svg symbol="main-logo"></span> -->
                 </div>
@@ -24,6 +26,7 @@
                         :async="true"
                         :hasSubmit="true"
                         buttonText="auth.login"
+                        class="testclass"
                         >
                         <template #submit="{validForm, buttonDefaultText}">
                           <v-btn block dense type="submit" :disabled="!validForm">
@@ -45,9 +48,13 @@
 
             <!-- </v-card> -->
           </v-col>
-          <v-col cols="6" class="pa-0 col-r d-flex flex-column align-center justify-center">
+          <v-col
+            cols="12"
+            md="6"
+            lg="6"
+            class="pa-0 col-r d-flex flex-column align-center justify-center">
             <div class="mw-420">
-              <ue-svg-icon symbol="main-logo" class="mx-0"></ue-svg-icon>
+              <ue-svg-icon symbol="main-logo" class="mx-0 center-image"></ue-svg-icon>
 
               <h2 class="text-white my-5">
                 {{ description }}
@@ -185,12 +192,20 @@ export default {
 </script>
 
 <style>
+  @media screen and (min-width:'960px'){
+    .mw-lg-24em{
+      max-width: 24rem;
+      width: 24rem;
+    }
+    .mw-420{
+      max-width: 420px;
+    }
+  }
+  .mw-420{
+    padding: 0 4.5em;
+  }
   .col-r{
     background:#40AABB;
-  }
-  .mw-24em{
-    max-width: 24rem;
-    width: 24rem;
   }
   .custom-auth-button{
     width: 100%;
@@ -200,9 +215,6 @@ export default {
   .custom-auth-button.text-primary{
     color:black !important;
     height:3.2rem !important;
-  }
-  .mw-420{
-    max-width: 420px;
   }
   .mx-0 svg{
     margin-right: 0 !important;

@@ -72,7 +72,7 @@ class UNavigation
 
         return array_merge_recursive_preserve([
             'is_active' => $is_active,
-            'icon' => '',
+            'icon' => 'mdi-note-outline',
         ], $array);
     }
 
@@ -99,12 +99,11 @@ class UNavigation
             // }
             $routes = $module->getRouteConfigs(valid: true);
             $number_route = count($routes);
-
             $array = [];
             if ($number_route > 0) {
                 $array = [
                     'name' => $config['headline'] ?? pluralize(headline($name)),
-                    'icon' => $config['icon'] ?? '',
+                    'icon' => $config['icon'] ?? '$modules',
                 ];
             }
 
@@ -146,14 +145,14 @@ class UNavigation
 
                         $array['items'][$this->getSnakeCase($item['name'])] = [
                             'name' => $item['headline'] ?? pluralize(headline($item['name'])),
-                            'icon' => $item['icon'] ?? '',
+                            'icon' => $item['icon'] ?? '$submodule',
                             'route_name' => $route_name,
                         ];
                     }
                 } else {
                     $array['items'][$this->getSnakeCase($item['name'])] = [
                         'name' => $item['headline'] ?? pluralize($item['name']),
-                        'icon' => $item['icon'] ?? '',
+                        'icon' => $item['icon'] ?? '$submodule',
                         'route_name' => $route_name,
                     ];
                 }

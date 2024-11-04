@@ -1,0 +1,563 @@
+@use 'sass:map';
+@use 'abstract' as *;
+@use 'components' as *;
+@use 'directives' as *;
+@use 'mixins' as *;
+@forward 'elements';
+// // Default variables
+$default-theme-config: (
+  'primary-color': #007bff,
+  'secondary-color': #6c757d,
+  'table-row-height': 52px,
+  'table-header-height': 56px,
+  // Add more default variables here
+);
+
+$theme-config: () !default;
+$theme-config: map.merge($default-theme-config, $theme-config);
+
+// Vuetify configuration
+@use 'vuetify' with (
+  $color-pack: $color-pack,
+  $reset: $reset,
+  $layers: $layers,
+
+  $body-font-family: $body-font-family,
+  $spacer: $spacer,
+  $grid-gutter: $spacer * 12,
+  $line-height-root: $line-height-root, //1.5
+
+  $font-weights: $font-weights,
+
+  // $navigation-drawer-background: $navigation-drawer-background,
+  // $navigation-drawer-color: $global-dark-text-color,
+  // $font-size-root: 2rem, // 1rem
+  // $border-color-root: rgba(var(--v-border-color), var(--v-border-opacity)),
+  // $border-radius-root: 4px,
+  // $border-style-root: solid,
+  // Add more Vuetify variable overrides here
+);
+
+// @warn $button-font-size;
+
+// Import Vuetify styles
+// @use 'vuetify/styles';
+
+// @warn map.get($theme-config, 'table-row-height');
+// @warn $sizes;
+
+// Vuetify configurable variables
+
+// // Material Design Breakpoints
+// $grid-breakpoints: (
+//   'xs': 0,
+//   'sm': 600px,
+//   'md': 960px,
+//   'lg': 1280px,
+//   'xl': 1920px
+// ) !default;
+
+// // Grid
+// $container-max-widths: (
+//   'md': 904px,
+//   'lg': 1224px,
+//   'xl': 1440px
+// ) !default;
+// $container-padding-x: 16px !default;
+// $grid-columns: 12 !default;
+// $grid-gutter: 16px !default;
+// $form-grid-gutter: $grid-gutter / 2 !default;
+// $grid-gutters: (
+//   'xs': $form-grid-gutter / 3, // 2.666666
+//   'sm': $form-grid-gutter / 2, // 4px
+//   'md': $form-grid-gutter, // 8px
+//   'lg': $form-grid-gutter * 2, // 16px
+//   'xl': $form-grid-gutter * 3 // 24px
+// ) !default;
+
+// // Display
+// $display-breakpoints: (
+//   'print-only': 'only print',
+//   'screen-only': 'only screen',
+//   'xs-only': 'only screen and (max-width: #{map-get($grid-breakpoints, "sm") - 1})',
+//   'sm-only': 'only screen and (min-width: #{map-get($grid-breakpoints, "sm")}) and (max-width: #{map-get($grid-breakpoints, "md") - 1})',
+//   'sm-and-down': 'only screen and (max-width: #{map-get($grid-breakpoints, "md") - 1})',
+//   'sm-and-up': 'only screen and (min-width: #{map-get($grid-breakpoints, "sm")})',
+//   'md-only': 'only screen and (min-width: #{map-get($grid-breakpoints, "md")}) and (max-width: #{map-get($grid-breakpoints, "lg") - 1})',
+//   'md-and-down': 'only screen and (max-width: #{map-get($grid-breakpoints, "lg") - 1})',
+//   'md-and-up': 'only screen and (min-width: #{map-get($grid-breakpoints, "md")})',
+//   'lg-only': 'only screen and (min-width: #{map-get($grid-breakpoints, "lg")}) and (max-width: #{map-get($grid-breakpoints, "xl") - 1})',
+//   'lg-and-down': 'only screen and (max-width: #{map-get($grid-breakpoints, "xl") - 1})',
+//   'lg-and-up': 'only screen and (min-width: #{map-get($grid-breakpoints, "lg")})',
+//   'xl-only': 'only screen and (min-width: #{map-get($grid-breakpoints, "xl")})'
+// ) !default;
+
+// // Typography
+// $font-family: 'Roboto', sans-serif !default;
+// $line-height-root: 1.5 !default;
+// $font-size-root: 16px !default;
+
+// $border-radius-root: 4px !default;
+// $border-style-root: solid !default;
+
+// $typography: (
+//   'h1': (
+//     'size': 6rem,
+//     'weight': 300,
+//     'line-height': 6rem,
+//     'letter-spacing': -.015625em,
+//     'font-family': $font-family
+//   ),
+//   'h2': (
+//     'size': 3.75rem,
+//     'weight': 300,
+//     'line-height': 3.75rem,
+//     'letter-spacing': -.0083333333em,
+//     'font-family': $font-family
+//   ),
+//   'h3': (
+//     'size': 3rem,
+//     'weight': 400,
+//     'line-height': 3.125rem,
+//     'letter-spacing': normal,
+//     'font-family': $font-family
+//   ),
+//   'h4': (
+//     'size': 2.125rem,
+//     'weight': 400,
+//     'line-height': 2.5rem,
+//     'letter-spacing': .0073529412em,
+//     'font-family': $font-family
+//   ),
+//   'h5': (
+//     'size': 1.5rem,
+//     'weight': 400,
+//     'line-height': 2rem,
+//     'letter-spacing': normal,
+//     'font-family': $font-family
+//   ),
+//   'h6': (
+//     'size': 1.25rem,
+//     'weight': 500,
+//     'line-height': 2rem,
+//     'letter-spacing': .0125em,
+//     'font-family': $font-family
+//   ),
+//   'subtitle-1': (
+//     'size': 1rem,
+//     'weight': 400,
+//     'line-height': 1.75rem,
+//     'letter-spacing': .009375em,
+//     'font-family': $font-family
+//   ),
+//   'subtitle-2': (
+//     'size': .875rem,
+//     'weight': 500,
+//     'line-height': 1.375rem,
+//     'letter-spacing': .0071428571em,
+//     'font-family': $font-family
+//   ),
+//   'body-1': (
+//     'size': 1rem,
+//     'weight': 400,
+//     'line-height': 1.5rem,
+//     'letter-spacing': .03125em,
+//     'font-family': $font-family
+//   ),
+//   'body-2': (
+//     'size': .875rem,
+//     'weight': 400,
+//     'line-height': 1.25rem,
+//     'letter-spacing': .0178571429em,
+//     'font-family': $font-family
+//   ),
+//   'button': (
+//     'size': .875rem,
+//     'weight': 500,
+//     'line-height': 2.25rem,
+//     'letter-spacing': .0892857143em,
+//     'font-family': $font-family,
+//     'text-transform': uppercase
+//   ),
+//   'caption': (
+//     'size': .75rem,
+//     'weight': 400,
+//     'line-height': 1.25rem,
+//     'letter-spacing': .0333333333em,
+//     'font-family': $font-family
+//   ),
+//   'overline': (
+//     'size': .75rem,
+//     'weight': 500,
+//     'line-height': 2rem,
+//     'letter-spacing': .1666666667em,
+//     'font-family': $font-family,
+//     'text-transform': uppercase
+//   )
+// ) !default;
+
+// // Component Variables
+// $alert-border-opacity: 0.26 !default;
+// $alert-border-radius: $border-radius-root !default;
+// $alert-border-width: 4px !default;
+// $alert-dense-border-width: medium !default;
+// $alert-font-size: 16px !default;
+// $alert-icon-size: 24px !default;
+// $alert-padding: 16px !default;
+// $alert-margin: 16px !default;
+// $alert-outline: 2px !default;
+// $alert-positions: absolute relative fixed !default;
+
+// $aspect-ratios: (
+//   '16:9': 56.25%,
+//   '16:10': 62.5%,
+//   '4:3': 75%,
+//   '1:1': 100%,
+//   '2:3': 150%
+// ) !default;
+
+// $avatar-border-radius: 50% !default;
+// $avatar-size: 40px !default;
+
+// $badge-border-radius: 10px !default;
+// $badge-color: white !default;
+// $badge-dot-height: 8px !default;
+// $badge-dot-width: 8px !default;
+// $badge-font-family: $font-family !default;
+// $badge-font-size: 14px !default;
+// $badge-height: 22px !default;
+// $badge-min-width: 22px !default;
+// $badge-offset-x: 4px !default;
+// $badge-offset-y: 4px !default;
+// $badge-padding: 0 6px !default;
+// $badge-wrapper-margin: 0 4px !default;
+
+// $banner-actions-padding: 8px !default;
+// $banner-border-radius: 0 !default;
+// $banner-elevation: 0 !default;
+// $banner-icon-padding: 16px !default;
+// $banner-mobile-padding: 16px !default;
+// $banner-padding: 16px !default;
+// $banner-text-padding: 16px !default;
+
+// $bottom-navigation-background: white !default;
+// $bottom-navigation-border-radius: $border-radius-root !default;
+// $bottom-navigation-height: 56px !default;
+// $bottom-navigation-v-model-height: 56px !default;
+
+// $breadcrumbs-even-child-padding: 0 12px !default;
+// $breadcrumbs-item-font-size: 14px !default;
+// $breadcrumbs-margin: 0 !default;
+// $breadcrumbs-padding: 18px 12px !default;
+
+// $btn-active-opacity: 0.18 !default;
+// $btn-border-radius: $border-radius-root !default;
+// $btn-disabled-opacity: 0.26 !default;
+// $btn-focus-opacity: 0.24 !default;
+// $btn-font-size: map-deep-get($typography, 'button', 'size') !default;
+// $btn-font-weight: map-deep-get($typography, 'button', 'weight') !default;
+// $btn-hover-opacity: 0.08 !default;
+// $btn-icon-font-size: 18px !default;
+// $btn-icon-padding: 12px !default;
+// $btn-letter-spacing: map-deep-get($typography, 'button', 'letter-spacing') !default;
+// $btn-outline-border-width: thin !default;
+// $btn-rounded-border-radius: 28px !default;
+// $btn-sizes: (
+//   'x-small': 20,
+//   'small': 28,
+//   'default': 36,
+//   'large': 44,
+//   'x-large': 52
+// ) !default;
+// $btn-text-transform: uppercase !default;
+// $btn-transition-duration: 0.28s !default;
+// $btn-transition-fn: cubic-bezier(0.4, 0, 0.2, 1) !default;
+
+// $calendar-daily-weekday-padding: 3px 0px 0px 0px !default;
+// $calendar-weekly-weekday-padding: 0px 4px 0px 4px !default;
+
+// $card-actions-min-height: 52px !default;
+// $card-avatar-padding: 16px !default;
+// $card-border-radius: $border-radius-root !default;
+// $card-btn-margin-x: 9px !default;
+// $card-btn-padding: 0 8px !default;
+// $card-elevation: 2 !default;
+// $card-link-focus-opacity: 0.08 !default;
+// $card-link-hover-opacity: 0.04 !default;
+// $card-outlined-border-width: thin !default;
+// $card-progress-margin-top: -4px !default;
+// $card-subtitle-padding: 16px !default;
+// $card-text-font-size: map-deep-get($typography, 'body-2', 'size') !default;
+// $card-text-line-height: map-deep-get($typography, 'body-2', 'line-height') !default;
+// $card-text-padding: 16px !default;
+// $card-text-letter-spacing: map-deep-get($typography, 'body-2', 'letter-spacing') !default;
+// $card-title-font-size: map-deep-get($typography, 'h6', 'size') !default;
+// $card-title-letter-spacing: map-deep-get($typography, 'h6', 'letter-spacing') !default;
+// $card-title-line-height: map-deep-get($typography, 'h6', 'line-height') !default;
+// $card-title-padding: 16px !default;
+// $card-title-word-break: break-all !default;
+
+// $carousel-dot-margin: 0 8px !default;
+// $carousel-dot-size: 10px !default;
+
+// $chip-avatar-margin-right: -6px !default;
+// $chip-avatar-margin-left: -2px !default;
+// $chip-avatar-size: 24px !default;
+// $chip-close-margin-left: 2px !default;
+// $chip-close-margin-right: -4px !default;
+// $chip-close-padding: 0 2px !default;
+// $chip-close-size: 18px !default;
+// $chip-filter-margin-right: 8px !default;
+// $chip-font-size: map-deep-get($typography, 'body-2', 'size') !default;
+// $chip-font-weight: map-deep-get($typography, 'body-2', 'weight') !default;
+// $chip-icon-margin-left: -4px !default;
+// $chip-icon-margin-right: 4px !default;
+// $chip-icon-right-margin-left: 4px !default;
+// $chip-icon-right-margin-right: -4px !default;
+// $chip-icon-size: 18px !default;
+// $chip-label-border-radius: $border-radius-root !default;
+// $chip-label-font-size: map-deep-get($typography, 'body-2', 'size') !default;
+// $chip-label-height: 24px !default;
+// $chip-margin: 4px !default;
+// $chip-padding: 0 12px !default;
+// $chip-removable-padding: 0 4px 0 12px !default;
+// $chip-small-avatar-margin-left: -2px !default;
+// $chip-small-avatar-margin-right: -2px !default;
+// $chip-small-avatar-size: 16px !default;
+// $chip-small-close-margin-left: 0 !default;
+// $chip-small-close-margin-right: -4px !default;
+// $chip-small-filter-margin-right: 4px !default;
+// $chip-small-icon-margin-left: -4px !default;
+// $chip-small-icon-margin-right: 2px !default;
+// $chip-small-icon-right-margin-left: 2px !default;
+// $chip-small-icon-right-margin-right: -4px !default;
+// $chip-small-icon-size: 16px !default;
+// $chip-small-label-border-radius: 12px !default;
+// $chip-small-label-height: 20px !default;
+// $chip-small-margin: 2px !default;
+// $chip-small-padding: 0 8px !default;
+// $chip-small-removable-padding: 0 4px 0 8px !default;
+
+// $color-picker-swatches-border-radius: $border-radius-root !default;
+// $color-picker-swatches-margin-top: 16px !default;
+// $color-picker-swatches-spacing: 4px !default;
+
+// $data-footer-padding: 0 8px !default;
+// $data-header-padding: 4px 8px !default;
+// $data-table-mobile-row-header-font-weight: 600 !default;
+// $data-table-regular-header-font-size: map-deep-get($typography, 'caption', 'size') !default;
+// // Data Tables (continued)
+// $data-table-regular-header-height: 48px !default;
+// $data-table-regular-row-height: 48px !default;
+// $data-table-dense-header-font-size: map-deep-get($typography, 'caption', 'size') !default;
+// $data-table-dense-header-height: 32px !default;
+// $data-table-dense-row-height: 32px !default;
+// $data-table-header-sort-badge-min-height: 18px !default;
+// $data-table-header-sort-badge-min-width: 18px !default;
+// $data-table-header-sort-badge-top: -4px !default;
+// $data-table-progress-border-radius: $border-radius-root !default;
+
+// // Date Picker
+// $date-picker-title-btn-font-size: 32px !default;
+// $date-picker-title-btn-font-weight: 500 !default;
+// $date-picker-title-btn-height: 72px !default;
+// $date-picker-title-btn-padding: 0 24px !default;
+// $date-picker-title-date-font-size: 14px !default;
+// $date-picker-title-date-font-weight: 500 !default;
+// $date-picker-title-year-font-size: 14px !default;
+// $date-picker-title-year-font-weight: 500 !default;
+// $date-picker-header-padding: 4px 16px !default;
+// $date-picker-years-font-size: 16px !default;
+// $date-picker-years-font-weight: 400 !default;
+// $date-picker-years-item-height: 28px !default;
+// $date-picker-years-item-padding: 0 8px !default;
+
+// // Dialog
+// $dialog-border-radius: $border-radius-root !default;
+// $dialog-card-text-padding: 20px 24px 24px !default;
+// $dialog-card-title-padding: 16px 24px !default;
+// $dialog-elevation: 24 !default;
+// $dialog-margin: 24px !default;
+// $dialog-max-height: calc(100% - #{$dialog-margin * 2}) !default;
+// $dialog-transition: .3s cubic-bezier(.25, .8, .25, 1) !default;
+// $dialog-width: 600px !default;
+
+// // Divider
+// $divider-border-width: thin !default;
+// $divider-inset-margin: 72px !default;
+// $divider-margin-vertical: 8px !default;
+// $divider-margin-horizontal: 0 !default;
+
+// // Expansion Panel
+// $expansion-panel-active-margin: 16px !default;
+// $expansion-panel-border-radius: $border-radius-root !default;
+// $expansion-panel-content-padding: 0 24px 16px !default;
+// $expansion-panel-header-font-size: map-deep-get($typography, 'subtitle-1', 'size') !default;
+// $expansion-panel-header-min-height: 48px !default;
+// $expansion-panel-header-padding: 16px 24px !default;
+// $expansion-panel-popup-max-width: 95% !default;
+
+// // FAB (Floating Action Button)
+// $fab-border-radius: 50% !default;
+// $fab-elevation: 6 !default;
+// $fab-icon-sizes: (
+//   'small': 20,
+//   'default': 24,
+//   'large': 28
+// ) !default;
+// $fab-sizes: (
+//   'small': 40,
+//   'default': 56,
+//   'large': 64
+// ) !default;
+
+// // Footer
+// $footer-border-radius: $border-radius-root !default;
+// $footer-elevation: 0 !default;
+// $footer-padding: 6px 16px !default;
+
+// // Form
+// $form-input-prepend-append-margin: 4px !default;
+
+// // Icons
+// $icon-size: 24px !default;
+// $icon-size-dense: 20px !default;
+
+// // List
+// $list-background-color: transparent !default;
+// $list-border-radius: $border-radius-root !default;
+// $list-dense-min-height: 40px !default;
+// $list-dense-subheader-height: 40px !default;
+// $list-item-action-margin: 12px !default;
+// $list-item-avatar-horizontal-margin: 16px !default;
+// $list-item-content-padding: 16px !default;
+// $list-item-dense-title-font-size: .813rem !default;
+// $list-item-dense-title-font-weight: 500 !default;
+// $list-item-icon-margin: 16px !default;
+// $list-item-min-height: 48px !default;
+// $list-item-title-font-size: map-deep-get($typography, 'subtitle-1', 'size') !default;
+// $list-item-title-font-weight: map-deep-get($typography, 'subtitle-1', 'weight') !default;
+// $list-padding: 8px 0 !default;
+// $list-subheader-height: 48px !default;
+// $list-subheader-padding-top: 0 !default;
+
+// // Navigation Drawer
+// $navigation-drawer-border-width: thin !default;
+// $navigation-drawer-elevation: 16 !default;
+// $navigation-drawer-mini-variant-width: 56px !default;
+// $navigation-drawer-overlay-opacity: .6 !default;
+// $navigation-drawer-transition-duration: .2s !default;
+// $navigation-drawer-transition-timing-function: cubic-bezier(.4, 0, .2, 1) !default;
+// $navigation-drawer-width: 256px !default;
+
+// // Overlay
+// $overlay-opacity: .46 !default;
+// $overlay-scrim-background: #212121 !default;
+// $overlay-z-index: 5 !default;
+
+// // Progress
+// $progress-circular-intermediate-svg-transition: all .2s ease-in-out !default;
+// $progress-circular-overlay-transition: all .6s ease-in-out !default;
+// $progress-circular-rotate-animation: progress-circular-rotate 1.4s linear infinite !default;
+// $progress-circular-rotate-dash: progress-circular-dash 1.4s ease-in-out infinite !default;
+// $progress-circular-size: 32px !default;
+// $progress-circular-underlay-stroke: .3 !default;
+// $progress-linear-border-radius: $border-radius-root !default;
+// $progress-linear-stream-opacity: .3 !default;
+
+// // Rating
+// $rating-padding: 8px !default;
+// $rating-dense-padding: 4px !default;
+
+// // Sheet
+// $sheet-border-radius: $border-radius-root !default;
+// $sheet-elevation: 0 !default;
+
+// // Slider
+// $slider-thumb-size: 20px !default;
+// $slider-thumb-touch-size: 48px !default;
+// $slider-track-border-radius: $border-radius-root !default;
+// $slider-track-fill-height: 2px !default;
+// $slider-track-height: 2px !default;
+// $slider-track-transition: .3s cubic-bezier(.25, .8, .5, 1) !default;
+// $slider-vertical-min-height: 300px !default;
+
+// // Snackbar
+// $snackbar-action-margin: 8px !default;
+// $snackbar-background-color: #333333 !default;
+// $snackbar-border-radius: 4px !default;
+// $snackbar-elevation: 6 !default;
+// $snackbar-font-size: map-deep-get($typography, 'body-2', 'size') !default;
+// $snackbar-min-height: 48px !default;
+// $snackbar-padding: 16px !default;
+// $snackbar-text-color: white !default;
+
+// // Tabs
+// $tab-font-size: map-deep-get($typography, 'body-2', 'size') !default;
+// $tab-font-weight: map-deep-get($typography, 'body-2', 'weight') !default;
+// $tab-letter-spacing: map-deep-get($typography, 'body-2', 'letter-spacing') !default;
+// $tab-min-width: 90px !default;
+// $tabs-bar-height: 48px !default;
+// $tabs-item-align-tab: true !default;
+// $tabs-item-letter-spacing: .0892857143em !default;
+// $tabs-item-max-width: 360px !default;
+// $tabs-item-min-width: 90px !default;
+// $tabs-item-padding: 0 16px !default;
+// $tabs-slider-height: 2px !default;
+
+// // Text Field
+// $text-field-active-label-height: 12px !default;
+// $text-field-border-radius: $border-radius-root !default;
+// $text-field-counter-margin-top: 6px !default;
+// $text-field-details-margin-bottom: 8px !default;
+// $text-field-filled-margin-top: 22px !default;
+// $text-field-label-scale: .75 !default;
+// $text-field-loaderHeight: 2px !default;
+// $text-field-outlined-fieldset-border: 1px solid currentColor !default;
+// $text-field-outlined-fieldset-border-width: 1px !default;
+// $text-field-outlined-legend-line-height: 11px !default;
+// $text-field-prefix-padding-right: 4px !default;
+// $text-field-suffix-padding-left: 4px !default;
+
+// // Timeline
+// $timeline-dot-regular-size: 22px !default;
+// $timeline-dot-small-size: 16px !default;
+// $timeline-dot-large-size: 32px !default;
+// $timeline-inner-dot-small-size: 6px !default;
+// $timeline-inner-dot-large-size: 12px !default;
+// $timeline-line-width: 2px !default;
+
+// // Toolbar
+// $toolbar-border-radius: $border-radius-root !default;
+// $toolbar-btn-icon-size: 48px !default;
+// $toolbar-content-padding-x: 16px !default;
+// $toolbar-content-padding-y: 4px !default;
+// $toolbar-elevation: 4 !default;
+// $toolbar-padding-end: 16px !default;
+// $toolbar-padding-start: 16px !default;
+// $toolbar-prominent-padding: 6px !default;
+// $toolbar-transition-duration: .2s !default;
+// $toolbar-transition-timing-function: cubic-bezier(.4, 0, .2, 1) !default;
+
+// // Tooltip
+// $tooltip-background-color: rgba(97, 97, 97, .9) !default;
+// $tooltip-border-radius: $border-radius-root !default;
+// $tooltip-font-size: map-deep-get($typography, 'caption', 'size') !default;
+// $tooltip-line-height: 1.4 !default;
+// $tooltip-max-width: 300px !default;
+// $tooltip-padding: 5px 16px !default;
+// $tooltip-scale: .9 !default;
+
+// // Transitions
+// $transition: (
+//   'fast-out-slow-in': cubic-bezier(0.4, 0, 0.2, 1),
+//   'linear-out-slow-in': cubic-bezier(0, 0, 0.2, 1),
+//   'fast-out-linear-in': cubic-bezier(0.4, 0, 1, 1),
+//   'ease-in-out': cubic-bezier(0.4, 0, 0.6, 1),
+//   'fast-in-fast-out': cubic-bezier(0.25, 0.8, 0.25, 1),
+//   'swing': cubic-bezier(0.25, 0.8, 0.5, 1)
+// ) !default;
+
+// // Theme
+// $material-light: () !default;
+// $material-dark: () !default;

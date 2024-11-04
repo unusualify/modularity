@@ -53,13 +53,14 @@ const impersonateRoute = computed(() => {
   <v-bottom-sheet v-model="show">
     <template v-slot:activator="{ props }">
       <v-list-item
-            v-bind="props"
-            class="bg-red text-white font-weight-bold mt-2"
-            :ripple="false"
-            :append="false"
-            title="Impersonate Manager"
-            >
-        </v-list-item>
+          v-bind="props"
+          class="font-weight-bold mt-2"
+          :ripple="false"
+          :append="false"
+          prepend-icon="mdi-account-switch"
+          title="Impersonate Manager"
+          >
+      </v-list-item>
 
     </template>
 

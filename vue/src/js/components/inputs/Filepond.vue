@@ -2,7 +2,7 @@
   <v-input v-model="input"
     hide-details="auto">
     <template v-slot:default="defaultSlot">
-      <div class="v-field v-field--active v-field--center-affix v-field--dirty v-field--variant-outlined v-theme--jakomeet v-locale--is-ltr">
+      <div class="v-field v-field--active v-field--center-affix v-field--dirty v-field--variant-outlined v-locale--is-ltr">
         <div class="v-field__field d-flex flex-column" data-no-activator="">
           <v-label v-if="label">{{ label }}</v-label>
           <div class="fileField">
@@ -266,7 +266,7 @@ export default {
         },
       }
     },
-    csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+    // csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
     input: {
       get(){
         return this.modelValue ?? []

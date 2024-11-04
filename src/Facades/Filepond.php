@@ -23,5 +23,3 @@ class Filepond extends Facade
         return 'Filepond';
     }
 }
-
-

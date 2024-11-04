@@ -14,6 +14,7 @@ return [
             'dashboard' => [
                 'name' => 'Dashboard',
                 'route_name' => 'admin.dashboard',
+                'icon' => '$dashboard',
             ],
             'media_library' => [
                 'name' => 'Media Library',
@@ -31,6 +32,7 @@ return [
             ],
             '_system_settings' => [
                 'name' => 'System Settings',
+                'icon' => '$header',
             ],
             ...UNavigation::systemMenu(),
             'locales' => [
@@ -41,6 +43,7 @@ return [
             ],
             '_modules' => [
                 'name' => 'Modules',
+                'icon' => '$header',
             ],
             ...UNavigation::modulesMenu(),
             'media_library' => [
@@ -83,6 +86,7 @@ return [
             'register' => [
                 'name' => 'Register',
                 'route_name' => 'register.form',
+                'icon' => '$userAdd',
             ],
         ],
     ],

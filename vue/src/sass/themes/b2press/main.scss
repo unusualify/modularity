@@ -1,8 +1,22 @@
-// themes/${theme}/main.scss
-// @import url('https://fonts.googleapis.com/css?family=Montserrat:200,400,500,600,700,800,900');
-@use './vuetify';
-@use 'core';
-@use 'components';
-@use 'config/test';
-@use 'utilities';
+@use 'abstract';
+
+@use 'styles/core/base' with (
+  $theme-config: (
+    'primary-color': #0056b3,
+    'secondary-color': #5a6268,
+    'table-row-height': 49px,
+    'table-header-height': 49px,
+    // Add more theme-specific overrides here
+  )
+);
+
+// Apply the theme configuration
+// @include base.set-theme-config();
+
+// @use './variables' as *;
+// @use './components' as *;
+// @use './directives' as *;
+// @use './settings' as *;
+
+// Add any theme-specific styles here
 

@@ -3,11 +3,10 @@
 namespace Unusualify\Modularity\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 use Unusualify\Modularity\Entities\Company;
 use Unusualify\Modularity\Entities\User;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Hash;
 
 class DefaultTestUsersSeeder extends Seeder
 {
@@ -48,7 +47,7 @@ class DefaultTestUsersSeeder extends Seeder
             $user->assignRole($role);
 
             // 3. Assign company to client roles
-            if (strpos($role, 'client-') === 0) {
+            if (str_starts_with($role, 'client-')) {
                 $user->update(['company_id' => $defaultCompany->id]);
             }
         }

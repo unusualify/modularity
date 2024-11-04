@@ -81,7 +81,7 @@
     <v-card-item>
           <!-- MARK - EMBEDDED CU FORM -->
       <v-expand-transition>
-              <v-card class="mb-theme" elevation="4" v-if="formActive && embeddedForm">
+              <v-card class="mb-12" elevation="4" v-if="formActive && embeddedForm">
                 <ue-form has-submit button-text="save" :title="formTitle" ref="form">
                   <template v-slot:headerRight>
                     <v-btn class="" variant="text" icon="$close" density="compact"
@@ -127,12 +127,12 @@
           width-type="md"
           >
           <template v-slot:activator="{props}">
-            <!-- <v-btn-cta v-bind="props" dark class="mb-theme">
+            <!-- <v-btn-cta v-bind="props" dark class="mb-12">
                 CUSTOM MODAL
             </v-btn-cta> -->
           </template>
           <template v-slot:body="props">
-            <v-card class="pa-theme">
+            <v-card class="pa-12">
               <v-item-group selected-class="bg-primary">
                 <v-container>
                   <v-row>
@@ -363,9 +363,9 @@
           </template>
 
           <template v-slot:footer = "{page, pageCount}">
-            <div class="text-right py-theme">
+            <div class="text-right py-12">
           <v-btn
-            class="v-btn--icon bg-tertiary rounded px-8 py-2 mr-theme"
+            class="v-btn--icon bg-tertiary rounded px-8 py-2 mr-12"
             :disabled="options.page < 2"
             @click="goPreviousPage"
             >
@@ -375,7 +375,7 @@
             />
           </v-btn>
           <v-btn
-            class="v-btn--icon bg-tertiary rounded px-8 py-2 mr-theme"
+            class="v-btn--icon bg-tertiary rounded px-8 py-2 mr-12"
             :disabled="options.page >= totalPage"
             @click="goNextPage"
             >

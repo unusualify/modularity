@@ -28,6 +28,15 @@ class RegisterController extends Controller
         return view(unusualBaseKey() . '::auth.register', [
             'formAttributes' => [
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
+                'title' => [
+                    'text' => __('authentication.create-an-account'),
+                    'tag' => 'h1',
+                    'type' => 'h5',
+                    'weight' => 'bold',
+                    'transform' => '',
+                    'align' => 'center',
+                    'justify' => 'center',
+                ],
                 'schema' => ($schema = $this->createFormSchema([
                     'name' => [
                         'type' => 'text',
@@ -123,7 +132,7 @@ class RegisterController extends Controller
 
                 'actionUrl' => route(Route::hasAdmin('register')),
                 'buttonText' => 'authentication.register',
-                'formClass' => 'mw-24em',
+                'formClass' => 'mw-lg-24em',
             ],
             'formSlots' => [
                 'bottom' => [

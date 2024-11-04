@@ -101,8 +101,6 @@ export const makeImageProps = propsFactory({
 
 // by convention, composable function names start with "use"
 export default function useImage (props, context) {
-  // const { injectRoot } = useRoot()
-
   const store = useStore()
   const inputHook = useInput(props, context)
   const { modelValue, obj } = toRefs(props)

@@ -100,10 +100,21 @@ const datetimeFormats = {
 
 // https://vue-i18n.intlify.dev/guide/essentials/number.html
 const numberFormats = {
+  'en-US': {
+    currency: {
+      style: 'currency', currency: 'USD', notation: 'standard'
+    },
+    // decimal: {
+    //   style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2
+    // },
+    // percent: {
+    //   style: 'percent', useGrouping: false
+    // }
+  },
   en: {
     currency: {
       style: 'currency',
-      currency: 'USD'
+      currency: 'EUR'
       // currencyDisplay: '$'
 
     }

@@ -1,0 +1,83 @@
+// abstract/_variables.scss
+@use 'sass:math';
+@use 'sass:map';
+@use 'sass:meta';
+
+/* BUTTONS */
+$button-height: 32px !default; //2.5rem
+$button-min-width: 7.5rem !default;
+$button-max-width: 300px !default;
+$button-font-weight: 700 !default;
+$button-font-size: 0.75rem !default;
+
+/* INPUT */
+$input-font-size: .8rem !default;
+$input-control-height: 36px !default;
+$input-line-height: 1.2 !default; // default 1.5
+
+/* FIELDS */
+$field-control-height: 56px;
+$field-label-floating-scale: 0.81 !default;
+
+$zindex__loadingTable: 4 !default;
+
+/* BREAKPOINTS */
+// Breakpoint information, where each starts and stops
+// if a breakpoint is not fluid, then the start value is equal to the main col value plus 2x the gutter at this breakpoint
+/* 1540 = $max-width + 50 + 50 */
+$breakpoints: (
+  xsmall: (start: null, end: 599),
+  small: (start: 600, end: 849),
+  medium: (start: 850, end: 1039),
+  large: (start: 1040, end: 1539),
+  xlarge: (start: 1540, end: null),
+);
+
+
+// vuetify
+$color-pack: true !default;
+$reset: true !default;
+$layers: false !default;
+
+$body-font-family: 'Montserrat' !default;
+$font-size-root: 1rem !default;
+$line-height-root: 1.5 !default; // default 1.5
+$border-color-root: rgba(var(--v-border-color), var(--v-border-opacity)) !default;
+$border-radius-root: 4px !default;
+$border-style-root: solid !default;
+$border-width-root: thin !default;
+$transition-duration-root: 0.3s !default;
+$transition-move-duration-root: 0.5s !default;
+
+$spacer: 4px !default;
+// $theme-space: 6 * $spacer; //1.56%;æ
+
+$font-weights: () !default;
+$font-weights: map.deep-merge(
+  (
+    'thin': 100,
+    'light': 300,
+    'regular': 400,
+    'medium': 500,
+    'bold': 700,
+    'black': 900
+  ),
+  $font-weights
+);
+
+$list-item-nav-subtitle-font-size: 0.75rem !default;
+
+$sidebar-padding: calc($spacer * 6) !default;
+$sidebar-icon-size: 24px !default;
+$sidebar-info-padding: $sidebar-padding !default;
+$sidebar-info-avatar-size: 56px !default;
+$sidebar-info-logo-size: 50% !default;
+$sidebar-info-logo-width: $sidebar-info-logo-size !default;
+$sidebar-info-logo-height: $sidebar-info-logo-size !default;
+$sidebar-info-mini-avatar-size: 64px !default;
+$sidebar-info-mini-logo-size: $sidebar-info-logo-size !default;
+$sidebar-info-mini-logo-width: $sidebar-info-mini-logo-size !default;
+$sidebar-info-mini-logo-height: $sidebar-info-mini-logo-size !default;
+
+$stepper-form-summary-final-background: #005868 !default;
+

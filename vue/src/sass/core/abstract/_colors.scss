@@ -1,0 +1,76 @@
+
+$global-light-text-color: #000000 !default;
+$global-dark-text-color: #FFFFFF !default;
+
+// $calc(100% * 320/1920)
+$primary-color: #27A0B4 !default;
+$primary-2-color: #178DA0 !default;
+$primary-light-color: #63C0C4 !default;
+$secondary-color: #FFFFFF !default;
+$tertiary-color: #DFEFF0 !default;
+$cta-color: #F6A505 !default;
+$cta-secondary-color: #FFFFFF !default;
+$color__white : #fff !default;
+$primary-hover-color: #11758D !default;
+$secondary-hover-color: #DFEFF0 !default;
+$tertiary-hover-color: #27A0B4 !default;
+$cta-hover-color: #F08712 !default;
+$cta-secondary-hover-color: #F6A505 !default;
+
+$primary-text-color: #FFFFFF !default;
+$secondary-text-color: #27A0B4 !default;
+$tertiary-text-color: #27A0B4 !default;
+$cta-text-color: #FFFFFF !default;
+$cta-secondary-text-color: #F6A505 !default;
+
+$navigation-drawer-background: $primary-2-color !default;
+
+$scrollbar-thumb-color: $primary-light-color !default;
+$scrollbar-thumb-hover-color: $primary-hover-color !default;
+
+/* BUTTONS */
+$button-primary: $primary-color !default;
+$button-secondary: $secondary-color !default;
+$button-tertiary: $tertiary-color !default;
+$button-cta: $cta-color !default;
+$button-cta-secondary: $cta-secondary-color !default;
+
+$button-primary-text-color: $primary-text-color !default;
+$button-secondary-text-color: $secondary-text-color !default;
+$button-tertiary-text-color: $tertiary-text-color !default;
+$button-cta-text-color: $cta-text-color !default;
+$button-cta-secondary-text-color: $cta-secondary-text-color !default;
+
+$button-primary-hover: $primary-hover-color !default;
+$button-secondary-hover: $secondary-hover-color !default;
+$button-tertiary-hover: $tertiary-hover-color !default;
+$button-cta-hover: $cta-hover-color !default;
+$button-cta-secondary-hover: $cta-secondary-hover-color !default;
+
+$button-secondary-border-color: $primary-color !default;
+$button-cta-secondary-border-color: $cta-color !default;
+
+$button-tertiary-hover-text-color: $primary-text-color !default;
+
+$overlay-background: #00758D !default;
+$overlay-text-color: $secondary-color !default;
+
+//Media Modal variables
+$color__border: #e5e5e5;//$color__black--10;
+$color__border--hover: #d9d9d9;
+$color__border--light: #f2f2f2;
+$color__text: #262626; //$color__black--85;
+$color__text--light: #8c8c8c; //$color__black--45;
+$color__f--bg: #fbfbfb; //$color__black--2;
+$color__button_greyed--bg: #ccc; //$color__black--20;
+$color__border--focus: $color__button_greyed--bg; //$color__black--20;
+$color__action: #3278B8; //$color__darkBlue;
+$color__link: $color__action;
+$color__block-bg: #f4f9fd; //$color__translucentBlue;
+$color__translucentBlue: $color__block-bg;
+$color__error: #e61414; //$color__red;
+
+$color__black: $global-light-text-color;
+$color__background: $color__white;
+$color__lighter:#f6f6f6;
+$color__icons: #a6a6a6;

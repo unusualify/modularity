@@ -14,7 +14,7 @@ use Unusualify\Modularity\Http\ViewComposers\MediasUploaderConfig;
 use Unusualify\Modularity\Modularity;
 use Unusualify\Modularity\Services\View\UNavigation;
 use Unusualify\Modularity\Support\FileLoader;
-use Unusualify\Modularity\Support\Translator;
+use Unusualify\Modularity\Translation\Translator;
 
 class BaseServiceProvider extends ServiceProvider
 {

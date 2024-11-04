@@ -134,7 +134,7 @@ export default defineConfig(({ command, mode }) => {
       }),
       Vuetify({
         styles: {
-          configFile: 'src/sass/themes/' + APP_THEME_FOLDER + '/vuetify/_settings.scss'
+          configFile: 'src/sass/themes/' + APP_THEME_FOLDER + '/_settings.scss'
         }
       }),
       Components(),
