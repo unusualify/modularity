@@ -2,8 +2,6 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
-use Illuminate\Support\Facades\Session;
-
 trait PaymentTrait
 {
     /**

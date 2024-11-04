@@ -25,6 +25,7 @@ class BuildCommand extends BaseCommand
     protected $aliases = [
         'unusual:build',
     ];
+
     /**
      * The console command description.
      *

@@ -44,6 +44,7 @@ class PriceHydrate extends InputHydrate
         $input['items'] = Currency::query()->select(['id', 'symbol as name', 'iso_4217 as iso'])->get()->toArray();
 
         $input['default'][0]['currency_id'] = Request::getUserCurrency()->id;
+
         return $input;
     }
 }

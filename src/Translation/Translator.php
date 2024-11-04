@@ -2,8 +2,8 @@
 
 namespace Unusualify\Modularity\Translation;
 
-use Illuminate\Translation\Translator as IlluminateTranslator;
 use Illuminate\Support\Str;
+use Illuminate\Translation\Translator as IlluminateTranslator;
 
 class Translator extends IlluminateTranslator
 {
@@ -54,11 +54,10 @@ class Translator extends IlluminateTranslator
         $this->loader->addPath($path);
     }
 
-        /**
+    /**
      * Make the place-holder replacements on a line.
      *
-     * @param  string  $line
-     * @param  array  $replace
+     * @param string $line
      * @return string
      */
     protected function makeReplacements($line, array $replace)
@@ -74,12 +73,12 @@ class Translator extends IlluminateTranslator
                 $value = call_user_func($this->stringableHandlers[get_class($value)], $value);
             }
 
-            $shouldReplace[':'.Str::ucfirst($key ?? '')] = Str::ucfirst($value ?? '');
-            $shouldReplace[':'.Str::upper($key ?? '')] = Str::upper($value ?? '');
-            $shouldReplace[':'.$key] = $value;
-            $shouldReplace['{'.Str::ucfirst($key ?? '').'}'] = Str::ucfirst($value ?? '');
-            $shouldReplace['{'.Str::upper($key ?? '').'}'] = Str::upper($value ?? '');
-            $shouldReplace['{'.$key.'}'] = $value;
+            $shouldReplace[':' . Str::ucfirst($key ?? '')] = Str::ucfirst($value ?? '');
+            $shouldReplace[':' . Str::upper($key ?? '')] = Str::upper($value ?? '');
+            $shouldReplace[':' . $key] = $value;
+            $shouldReplace['{' . Str::ucfirst($key ?? '') . '}'] = Str::ucfirst($value ?? '');
+            $shouldReplace['{' . Str::upper($key ?? '') . '}'] = Str::upper($value ?? '');
+            $shouldReplace['{' . $key . '}'] = $value;
         }
 
         return strtr($line, $shouldReplace);

@@ -5,12 +5,11 @@ namespace Modules\SystemPayment\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Modules\SystemPayment\Entities\PaymentCurrency;
 use Modules\SystemPayment\Entities\PaymentService;
-use Illuminate\Support\Facades\Storage;
-use Unusualify\Modularity\Entities\Media;
-use Illuminate\Support\Str;
 use Modules\User\Entities\User;
+use Unusualify\Modularity\Entities\Media;
 use Unusualify\Modularity\Http\Controllers\MediaLibraryController;
 use Unusualify\Modularity\Http\Requests\MediaRequest;
 
@@ -22,6 +21,7 @@ class PaymentServiceSeeder extends Seeder
     {
         $this->mediaLibraryController = $mediaLibraryController;
     }
+
     /**
      * Run the database seeds.
      *
@@ -87,8 +87,9 @@ class PaymentServiceSeeder extends Seeder
         //     $paymentService->paymentCurrencies()->attach($currencies);
         // }
         $admin = User::where('email', 'admin@unusualgrowth.com')->first();
-        if (!$admin) {
+        if (! $admin) {
             $this->command->error('Admin user not found. Please ensure the admin user exists in the database.');
+
             return;
         }
 
@@ -114,9 +115,6 @@ class PaymentServiceSeeder extends Seeder
 
     /**
      * Create a media object for the image and associate it with the payment service.
-     *
-     * @param PaymentService $paymentService
-     * @param string $imageName
      */
     private function createAndAssociateImage(PaymentService $paymentService, string $imageName)
     {
@@ -125,7 +123,7 @@ class PaymentServiceSeeder extends Seeder
         if (file_exists($imagePath)) {
             $file = new UploadedFile($imagePath, $imageName, null, null, true);
 
-            $request = new MediaRequest();
+            $request = new MediaRequest;
             $request->files->set('qqfile', $file);
             $request->merge([
                 'qqfilename' => $imageName,
