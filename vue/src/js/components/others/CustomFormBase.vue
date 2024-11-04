@@ -128,7 +128,10 @@
                   >
                     <!-- <v-card-title v-if="obj.schema.title">{{obj.schema.title}}</v-card-title>
                     <v-card-subtitle v-if="obj.schema.subtitle">{{obj.schema.subtitle}}</v-card-subtitle>  -->
-                    <ue-title transform="none" weight="medium" class="text-overline mb-6 pa-0" v-if="obj.schema.title">{{obj.schema.title}}</ue-title>
+                    <div v-if="obj.schema.title || obj.schema.subtitle" class="mb-3">
+                      <ue-title color="black" padding="a-0" margin="b-0" transform="none" weight="bold" class="text-body-1" v-if="obj.schema.title">{{obj.schema.title}}</ue-title>
+                      <ue-title color="black" padding="a-0" margin="b-0" transform="none" weight="medium" class="text-caption" v-if="obj.schema.subtitle">{{obj.schema.subtitle}}</ue-title>
+                    </div>
                     <v-custom-form-base
                       :id="`${id}-${obj.key}`"
                       :modelValue="setValue(obj)"
