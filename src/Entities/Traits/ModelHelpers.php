@@ -7,7 +7,7 @@ use Unusualify\Modularity\Traits\ManageModuleRoute;
 
 trait ModelHelpers
 {
-    use ManageEloquent, ManageModuleRoute;
+    use ManageEloquent, ManageModuleRoute, HasScopes;
 
     /**
      * Checks if this model is soft deletable.

@@ -5,7 +5,7 @@ namespace Unusualify\Modularity\Entities;
 use Illuminate\Database\Eloquent\Model;
 
 use Astrotomic\Translatable\Translatable;
-
+use Unusualify\Modularity\Entities\Traits\HasScopes;
 
 class State extends Model
 {

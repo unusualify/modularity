@@ -5,12 +5,12 @@ namespace Unusualify\Modularity\Entities\Traits;
 use Illuminate\Database\Eloquent\Model;
 use Unusualify\Modularity\Entities\State;
 use Illuminate\Support\Facades\Log;
-use Modules\Utility\Entities\Stateable;
+use Modules\SystemUtility\Entities\Stateable;
 use Illuminate\Support\Str;
 
 
 trait HasStateable {
-    protected static $stateModel = 'Modules\Utility\Entities\State';
+    protected static $stateModel = 'Modules\SystemUtility\Entities\State';
     /**
      * Cached source model fields.
      *

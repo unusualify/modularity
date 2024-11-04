@@ -32,7 +32,7 @@ class StateableHydrate extends InputHydrate
         $input['itemValue'] = 'id';
 
 
-        $repository = App::make('Modules\Utility\Repositories\StateRepository');
+        $repository = App::make('Modules\SystemUtility\Repositories\StateRepository');
 
         $model = App::make('Modules\PressRelease\Entities\PressRelease');
         $states = $repository->getByColumnValues('code', $model->default_states);
