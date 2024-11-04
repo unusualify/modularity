@@ -81,16 +81,25 @@
             v-if="profileMenuOpen"
             :items="profileMenu"
             :profileMenu="true"
+            @activateMenu="handleMenu($event)"
           >
           </ue-navigation-group>
         </v-expand-transition>
         <ue-logout-modal :csrf="$csrf()">
           <template v-slot:activator="{ props }">
-            <v-list-item prepend-icon="mdi-logout" v-bind="props">
-              {{ $t("authentication.logout") }}
-            </v-list-item>
+            <v-tooltip text="Logout" location="top" :disabled="!(rail && !isHoverable)">
+              <template v-slot:activator="tooltipActivator">
+                <div v-bind="tooltipActivator.props">
+                    <v-list-item prepend-icon="mdi-logout" v-bind="props">
+                  {{ $t("authentication.logout") }}
+                </v-list-item>
+                </div>
+              </template>
+
+            </v-tooltip>
           </template>
         </ue-logout-modal>
+        <slot name="bottom"> </slot>
       </v-list>
       <!-- <slot name="profileMenu">
         <v-list
@@ -198,13 +207,19 @@
 </template>
 
 <script>
+import { computed } from 'vue';
 import { useSidebar } from '@/hooks';
 
 export default {
+  provide() {
+    return {
+      activeMenu: computed(() => this.activeMenu)
+    }
+  },
   setup() {
     return {
       ...useSidebar()
-    };
+    }
   },
   props: {
     items: {

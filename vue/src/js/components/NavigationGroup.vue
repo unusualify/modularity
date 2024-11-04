@@ -49,13 +49,14 @@
           :id="item.menuActivator"
           :slim="true"
 
-          @click="sideBar.methods.handleMenu(item.menuActivator)"
-        >
+          @click="$emit('activateMenu', item.menuActivator)"
+          >
+          <!-- @click="sideBar.methods.handleMenu(item.menuActivator)" -->
         </v-list-item>
         <v-menu
-          v-if="sideBar.activeMenu.value === `#${item.menuActivator}`"
+          v-if="activeMenu === `#${item.menuActivator}`"
           location="end"
-          :activator="sideBar.activeMenu.value"
+          :activator="activeMenu"
         >
           <v-list>
             <ue-navigation-group :items="Object.values(item.menuItems)" :show-tooltip="showTooltip">
@@ -106,6 +107,7 @@ import { inject } from "vue";
 
 export default {
   name: "ue-navigation-group",
+  inject: ['activeMenu'],
   props: {
     items: {
       type: Array,
