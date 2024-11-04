@@ -2,6 +2,97 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.16.0 - 2024-11-04
+
+### :rocket: Features
+
+- :sparkles: Global scrollable directive with height modifier by @gunesbizim in https://github.com/unusualify/modularity/commit/db119c1728c0a6bc39dc97eef9e2b7262e892b6c
+- :sparkles: add hasRequestInProgress feature for tracking any request in progress by @OoBook in https://github.com/unusualify/modularity/commit/343472acf3786eac1264bee1a088293f921dd333
+- add __isBoolean helper by @OoBook in https://github.com/unusualify/modularity/commit/65f303d46a500a489683771a03d8a1de8cb0deae
+- :sparkles: images of payment services to the seeder by @gunesbizim in https://github.com/unusualify/modularity/commit/39cc53dc017fb9cf0bb0bc169bc9e9b63b970b90
+- :sparkles: add curly braces expression into translation's replacement pattern by @OoBook in https://github.com/unusualify/modularity/commit/e4381a2b6b9fe8502f0807541de5d99bcea1f111
+- add en-US number format by @OoBook in https://github.com/unusualify/modularity/commit/62f77a7fb722c46e00f10ce0fc05aa6359c2bca7
+- :sparkles: translatable title and modified title component by @gunesbizim in https://github.com/unusualify/modularity/commit/768434641a54852bde1ef22790d551a5fc4e7d09
+- :lipstick: upgrade theming structure by @OoBook in https://github.com/unusualify/modularity/commit/b670fc992c9214d80bd37937f85d02e120e709bd
+- :art: add validation ui styling to ue-tab-group by @OoBook in https://github.com/unusualify/modularity/commit/28a2e259c3efd0e770ccedf56fc97a3c4dc03228
+- :art: add new infrastructure helpers by @OoBook in https://github.com/unusualify/modularity/commit/66e003c6a748c32d2f444bf2132b1f4ccad8f189
+- :art: add sidebar toggling methods and mutations to config store by @OoBook in https://github.com/unusualify/modularity/commit/01fcf6e1725abd95546661e9edada9a00284ae42
+- add ue-text-display component by @OoBook in https://github.com/unusualify/modularity/commit/21cdffd750433bb2ac351f081a0e89f962845fe4
+- :art: add new notation util for various dot formation by @OoBook in https://github.com/unusualify/modularity/commit/0187c7e6fb8aba4f0ed5f0eef186f454a49f7a82
+- add title and subtitle elements for wrap and group by @OoBook in https://github.com/unusualify/modularity/commit/4ec3a0d5e1fb4f4b64d0bdb50de15e1f3fa63bf2
+- add ue-overlay generic class by @OoBook in https://github.com/unusualify/modularity/commit/c7729c2936c0ba00450e61d3e46a45f43ab1159d
+- :art: add new ue-propert-list comp. to list bold and desc. elements of arrays by @OoBook in https://github.com/unusualify/modularity/commit/75cd736a3c3da0a809de7a6b008bcf18b27b3338
+- :art: add ue-dynamic-component-renderer for parse vue component literals into object by @OoBook in https://github.com/unusualify/modularity/commit/d85fcd6c3ab231fe4b23821824adf81f00e779e6
+- :sparkles: add configurableCard for various card combinations by @OoBook in https://github.com/unusualify/modularity/commit/2bc39845fa3935ee78b02fabeab7dca549f4e204
+
+### :wrench: Bug Fixes
+
+- merge remote-tracking branch 'origin/main' into dev by @OoBook in https://github.com/unusualify/modularity/commit/29c387ae064552f3c7dea15abbea2923246881f6
+- :bug: CreditCard component image url fix by @gunesbizim in https://github.com/unusualify/modularity/commit/acdd24c36e7d3a16e9516ded8d07bc75553c43a2
+- :bug: responsiveness of auth pages by @gunesbizim in https://github.com/unusualify/modularity/commit/65c4762496c259fb150b6235a6281f0156a5e481
+- update title localization of form for new fields group by @OoBook in https://github.com/unusualify/modularity/commit/08d2f3a70c0237eb22b5f8c3f5c3bcad85645b07
+- :bug: payment service icons by @gunesbizim in https://github.com/unusualify/modularity/commit/0fbf429071ac7ce2d886d56d1e9de8ecb6f77d30
+- :bug: default selected payment service && error response of payment by @gunesbizim in https://github.com/unusualify/modularity/commit/24ada13bda8b4b165f7dc5a966d3421d663cdcbc
+- :bug: sidebar issue for files by @gunesbizim in https://github.com/unusualify/modularity/commit/0c73fde84028f37139350bb1f3730a1d9ecd6334
+- remove v--theme class from v-field of inputs by @OoBook in https://github.com/unusualify/modularity/commit/6301a81ef209d1d8b07fa3a87cac230e7ddd0165
+- merge remote-tracking branch 'origin/bugfix/responsiveAuthPages' into dev by @OoBook in https://github.com/unusualify/modularity/commit/44f50bee6267acf676f4484474dfcb0123d6c960
+- :bug: add CONFIG mutation into useSidebar by @OoBook in https://github.com/unusualify/modularity/commit/118ad2f4ea51b21d3314623abd07600ea239f290
+- :bug: add a check for whether title is object or string by @OoBook in https://github.com/unusualify/modularity/commit/fb09615a2eac83abcbd6bec64e8424829a1b52b4
+- remove csrf variable from Filepond by @OoBook in https://github.com/unusualify/modularity/commit/554949e41aebcb40d3b98bc28bfb3540b47b6890
+- put bg if isset and put default and right slot by @OoBook in https://github.com/unusualify/modularity/commit/464785dd166c79d6dbd83b8a381100bff4b22d9d
+- :bug: add methods as ref by @OoBook in https://github.com/unusualify/modularity/commit/de96770bf690a752ee6fce07ab724b4c9579eb88
+- update the self value of related field as the value but not the object key by @OoBook in https://github.com/unusualify/modularity/commit/022ddf8492e6cdd7ce7894f7c1995ff64985cc1d
+- :bug: add set sidebar false if it's mdAndDown by @OoBook in https://github.com/unusualify/modularity/commit/56f64cc376fc4300127d88c158d9aceba87e5647
+- :bug: get $csrf from root methods by @OoBook in https://github.com/unusualify/modularity/commit/7c3a68e0943a91f32667cb61499c318623b09a1c
+- :bug: change activeMenu ux mechanism by @OoBook in https://github.com/unusualify/modularity/commit/1511ef93bf1a30e39893e59a378c627fb8e85cb7
+- :bug: move v-html directive from template to span by @OoBook in https://github.com/unusualify/modularity/commit/5d8c434e77ec15229b80450eccb51a4775a7d070
+- :art: add different ui options and ux operations into StepperForm by @OoBook in https://github.com/unusualify/modularity/commit/041b8893418413623ffc243ad6eec8fb92561786
+
+### :recycle: Refactors
+
+- :recycle: priceController optimized by @gunesbizim in https://github.com/unusualify/modularity/commit/c516084300b7ccaf5fde410841edb26a802cb98d
+- combine array ad object conditions by @OoBook in https://github.com/unusualify/modularity/commit/5416b48c37884387882cd40121f22dfca5ecd026
+- :recycle: configure title.vue structure with props by @OoBook in https://github.com/unusualify/modularity/commit/f0e9cc604e9138d3abb9414f8ef1d3016cd7b985
+- :recycle: configure title.vue structure with props by @gunesbizim in https://github.com/unusualify/modularity/commit/d7c0815fc44265e9e1465a02bd05034274b1a513
+- update price structure as in standard inputs, add additional attrs requiring on ui by @OoBook in https://github.com/unusualify/modularity/commit/37fc0e3abb46fedc07d2421f29a1cb28dc129b73
+- :art: add new sidebar structure, and update unnecessary dipslay thresholds by @OoBook in https://github.com/unusualify/modularity/commit/b70a3e5e1fcb7ae287c1fde418d19b517c787c58
+- add icon and remove colors from impersonate toolbar by @OoBook in https://github.com/unusualify/modularity/commit/e79550ff0bb889896f35f1646989ecc243c1e3b9
+
+### Styling
+
+- add white-space:normal to RadioGroup by @OoBook in https://github.com/unusualify/modularity/commit/c9382791ce5409896f3881d3d20aa6f6eab42063
+- :wastebasket: clean the hooks by @OoBook in https://github.com/unusualify/modularity/commit/d5275b87cd17d5087516f4fa6ecdfa4280c273e1
+
+### :package: Build
+
+- :building_construction: add pluralize package to frontend by @OoBook in https://github.com/unusualify/modularity/commit/74966b30b07cb09a7880cd47fd3f4ef19d154314
+- :arrow_up: upgrade vuetify from 3.6.13 to 3.7.3 by @OoBook in https://github.com/unusualify/modularity/commit/8fcabe5d9318850f30ded5b2213dfa5b2b741ea8
+- :building_construction: add new v0.16.0 front build by @OoBook in https://github.com/unusualify/modularity/commit/03b463f073dd800b64af1c3fde34a26c2dc5c18d
+
+### :beers: Other Stuff
+
+- :recycle: comment old development variables by @OoBook in https://github.com/unusualify/modularity/commit/a306972ab2e9ece0e7f629a48fdd3c5186f259c6
+- Update CHANGELOG
+- safety commit before merge
+- Merge remote-tracking branch 'origin/dev' into dev
+- live fixes
+- Merge remote-tracking branch 'origin/main' into dev
+- Merge remote-tracking branch 'origin/refactor/priceController' into dev
+- Merge remote-tracking branch 'origin/testing/payment-testing-live' into dev
+- Merge remote-tracking branch 'origin/feature/scrollable-directive' into dev
+- add facade comments by @OoBook in https://github.com/unusualify/modularity/commit/26fd5a89257e249e7ba6a3376aacac34820691ec
+- Merge pull request #71 from unusualify/bugfix/internal-payment-services
+
+fix: :bug: CreditCard component image url fix
+
+- add missing fields by @OoBook in https://github.com/unusualify/modularity/commit/d569bb7ae249053b335ccd855441c51270457353
+- remove log by @OoBook in https://github.com/unusualify/modularity/commit/ff1a98b1b1be6d48f16606c51a2bd79af18961e1
+- add missing icons for navigation by @OoBook in https://github.com/unusualify/modularity/commit/8737da67cd45267e890ec57b004a2b30695bf3f7
+- add some icons into mdi.js by @OoBook in https://github.com/unusualify/modularity/commit/4976b38d5b6f0a0032c9a1a4d3a148232940e9dc
+- add some snapshots by @OoBook in https://github.com/unusualify/modularity/commit/247a97e83fafc8340f77314a1100b973e98ac91f
+- add some test methods to getFormData by @OoBook in https://github.com/unusualify/modularity/commit/6521092963fb5e4cee178b502950a164e5bc59d5
+- :alembic: add experimental configurableCardHelper by @OoBook in https://github.com/unusualify/modularity/commit/7093bf8d801ed00c99c841ca31ada569e3a4cb99
+
 ## v0.15.1 - 2024-10-07
 
 ### :wrench: Bug Fixes
