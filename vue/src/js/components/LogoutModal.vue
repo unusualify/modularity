@@ -35,7 +35,7 @@
             {{ $t('No') }}
           </v-btn>
           <v-form method="post" action="/logout">
-            <input type="hidden" name="_token" :value="csrf">
+            <input type="hidden" name="_token" :value="$csrf()">
             <v-btn variant="tonal" color="warning" type="submit">
               {{ $t('Yes') }}
             </v-btn>
