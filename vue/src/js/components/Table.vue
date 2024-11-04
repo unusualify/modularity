@@ -40,7 +40,7 @@
         :disable-sort="disableSort"
         :loading="loading"
         :loading-text="$t('Loading... Please wait')"
-        :mobile="isSmAndDown"
+        :mobile="$vuetify.display.smAndDown"
 
         :show-select="showSelect"
         item-value="id"
@@ -57,8 +57,6 @@
             <ue-title
               :text="tableTitle"
               :subTitle="tableSubtitle"
-              :classes="[]"
-              padding-reset
               :class="[someSelected ? 'w-33 h-100' : 'w-33 h-100']"
             />
             <v-slide-x-transition :group="true">
@@ -203,7 +201,7 @@
             <div v-if="embeddedForm && !noForm" class=""
               :style="formStyles">
               <v-expand-transition>
-                <v-card class="mb-theme" elevation="4" v-if="formActive">
+                <v-card class="mb-12" elevation="4" v-if="formActive">
                   <ue-form has-submit button-text="save" :title="formTitle" ref="form">
                     <template v-slot:headerRight>
                       <v-btn class="" variant="text" icon="$close" density="compact"
@@ -431,7 +429,7 @@
           <!-- @click's editItem|deleteItem -->
           <!-- #actions -->
 
-          <v-menu v-if="rowActionsType === 'dropdown' || isSmAndDown"
+          <v-menu v-if="rowActionsType === 'dropdown' || $vuetify.display.smAndDown"
             :close-on-content-click="false"
             open-on-hover
             left
@@ -620,5 +618,5 @@ export default {
 .ue-datatable__container
   width: 100%
   &.ue-datatable--full-screen
-    min-height: calc(100vh - (2*$theme-space))
+    min-height: calc(100vh - (2*12 * $spacer))
 </style>

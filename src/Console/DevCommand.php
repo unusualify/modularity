@@ -11,10 +11,10 @@ class DevCommand extends BaseCommand
      */
     protected $signature = 'modularity:dev {--noInstall}';
 
-
     protected $aliases = [
         'unusual:dev',
     ];
+
     /**
      * The console command description.
      *

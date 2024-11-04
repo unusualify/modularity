@@ -144,6 +144,7 @@ trait RelationTrait
 
         return $fields;
     }
+
     /**
      * @return void
      */

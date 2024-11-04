@@ -1,0 +1,59 @@
+{
+  "id": 1,
+  "name": "Wire",
+  "packageable_id": 1,
+  "packageable_type": "Modules\\Package\\Entities\\PackageCountry",
+  "description": "Test Deneme",
+  "published": 0,
+  "created_at": "2023-12-07T12:35:43.000000Z",
+  "updated_at": "2024-08-15T13:56:51.000000Z",
+  "deleted_at": null,
+  "package_country_id": 1,
+  "package_region_id": 2,
+  "package_continent_id": 1,
+  "packageFeatures": [{
+    "package_id": 1,
+    "package_feature_id": 1,
+    "position": 1,
+    "active": "0"
+  }, {
+    "package_id": 1,
+    "package_feature_id": 2,
+    "position": 2,
+    "active": "0"
+  }, {
+    "package_id": 1,
+    "package_feature_id": 4,
+    "position": 4,
+    "active": "0"
+  }, {
+    "package_id": 1,
+    "package_feature_id": 5,
+    "position": 5,
+    "active": "0"
+  }, {
+    "package_id": 1,
+    "package_feature_id": 6,
+    "position": 6,
+    "active": "0"
+  }],
+  "prices": [{
+    "id": 1,
+    "price_type_id": 1,
+    "vat_rate_id": 1,
+    "currency_id": 1,
+    "display_price": 50
+  }, {
+    "id": 2,
+    "price_type_id": 1,
+    "vat_rate_id": 1,
+    "currency_id": 2,
+    "display_price": 55
+  }, {
+    "id": 3,
+    "price_type_id": 1,
+    "vat_rate_id": 1,
+    "currency_id": 3,
+    "display_price": 1000
+  }]
+}

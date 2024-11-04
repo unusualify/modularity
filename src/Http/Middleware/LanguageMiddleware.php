@@ -34,7 +34,7 @@ class LanguageMiddleware
         $currency = unusualConfig("payment.locale_currencies.{$locale}", null)
             ?? config('priceable.currency');
 
-        if($currency !== mb_strtoupper(config('priceable.currency'))){
+        if ($currency !== mb_strtoupper(config('priceable.currency'))) {
             config(['priceable.currency' => $currency]);
             $currencyModel = Currency::where('iso_4217', config('priceable.currency'))->first();
             $request->setUserCurrency($currencyModel);

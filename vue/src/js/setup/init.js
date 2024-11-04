@@ -3,12 +3,16 @@
 import axios from 'axios'
 import jquery from 'jquery'
 import lodash, { snakeCase } from 'lodash-es'
+import store from '@/store' // Adjust the import based on your store structure
+import { CONFIG } from '@/store/mutations'
+import { useI18n } from 'vue-i18n'
+import pluralize from 'pluralize'
+
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
  * to our Laravel back-end. This library automatically handles sending the
  * CSRF token as a header based on the value of the "XSRF" token cookie.
  */
-
 
 /*
  |--------------------------------------------------------------------------
@@ -22,16 +26,23 @@ import lodash, { snakeCase } from 'lodash-es'
  function assignBOMHElpers(){
   window.__log = console.log
 
-  window.__isString = (obj) => {
-    return (Object.prototype.toString.call(obj) === '[object String]')
+  window.__isString = (value) => {
+    return (Object.prototype.toString.call(value) === '[object String]')
   }
 
-  window.__isNumber = (obj) => {
-    return !isNaN(obj)
+  window.__isBoolean = (value) => {
+    return typeof value == "boolean"
   }
 
-  window.__isObject = (obj) => {
-    return Object.prototype.toString.call(obj) === '[object Object]'
+  window.__isNumber = (value) => {
+    return !isNaN(value)
+  }
+
+  window.__isObject = (value) => {
+    return Object.prototype.toString.call(value) === '[object Object]'
+  },
+  window.__isArray = (value) => {
+    return Array.isArray(value)
   }
 
   window.__isset = (...args) => {
@@ -63,6 +74,9 @@ import lodash, { snakeCase } from 'lodash-es'
       i++
     }
     return true
+  }
+  window.__issetReturn = (arg, defaultValue) => {
+    return __isset(arg) ? arg : defaultValue
   }
 
   window.__getMethods = (obj) => Object.getOwnPropertyNames(obj).filter(item => typeof obj[item] === 'function')
@@ -166,6 +180,12 @@ import lodash, { snakeCase } from 'lodash-es'
 
   window.__preg_quote = (str, delimeter = '') => {
     return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + '-]', 'g'), '\\$&');
+  }
+
+  window.__extract = (obj) => {
+    for (var key in obj) {
+      window[key] = obj[key];
+    }
   }
 
   window.__dot = (obj, prefix = '') => {
@@ -338,6 +358,65 @@ import lodash, { snakeCase } from 'lodash-es'
       .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
   }
+
+  window.__headline = (str) => {
+    str = snakeCase(str)
+    return str
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+
+  window.__snakeNameFromForeignKey = (str) => {
+    let matches = str.match(/(.*)(_id)/)
+
+    if (matches) {
+      return snakeCase(matches[1]);
+    }
+
+    return false;
+  }
+
+  window.__nameFromForeignKey = (str) => {
+    str = __snakeNameFromForeignKey(str)
+
+    return !str ? __snakeToHeadline(str) : str;
+  }
+
+  window.__moduleName = (str) => {
+    let matches = str.match('/(.*)(_id)/')
+    if(matches){ // is foreign key
+      return __snakeNameFromForeignKey(matches[1])
+    }
+
+    return snakeCase(str);
+  }
+
+  window.__moduleTranslationName = (str) => {
+    __log(window)
+    const { t, te } = useI18n({ useScope: 'global' })
+
+    let isPlural = false
+    let name = str
+
+    let snakeNameFromForeignKey = __snakeNameFromForeignKey(name)
+
+    if(snakeNameFromForeignKey){ // is foreign key
+      name = snakeNameFromForeignKey
+      str = snakeNameFromForeignKey
+    }
+
+    if(pluralize.isPlural(name)){
+      isPlural = true
+      name = pluralize.singular(name)
+    }
+
+    name = snakeCase(name)
+    str = snakeCase(str)
+
+    return te(`modules.${name}`) ? t(`modules.${name}`, isPlural ? 1 : 0) : __snakeToHeadline(str)
+  }
+
   window.__removeQueryParams = (paramsToRemove) => {
     // Get the current URL
     const currentUrl = new URL(window.location.href);
@@ -370,6 +449,8 @@ import lodash, { snakeCase } from 'lodash-es'
     // Update the URL without refreshing the page using replaceState
     window.history.replaceState({}, '', newUrl);
   }
+
+  window.__pluralize = (str) => pluralize.plural(str)
 }
 
 function tokenizePath(path) {
@@ -531,6 +612,30 @@ export default function init(){
   window.axios.defaults.headers.post = {
     'Content-Type': 'application/json'
   }
+
+  axios.interceptors.request.use(function (config) {
+    // Do something before request is sent
+    store.commit(CONFIG.INCREASE_AXIOS_REQUEST)
+
+    return config;
+  }, function (error) {
+    store.commit(CONFIG.DECREASE_AXIOS_REQUEST)
+    // Do something with request error
+    return Promise.reject(error);
+  });
+
+  axios.interceptors.response.use(function (response) {
+    // Any status code that lie within the range of 2xx cause this function to trigger
+    // Do something with response data
+    store.commit(CONFIG.DECREASE_AXIOS_REQUEST)
+
+    return response;
+  }, function (error) {
+    store.commit(CONFIG.DECREASE_AXIOS_REQUEST)
+    // Any status codes that falls outside the range of 2xx cause this function to trigger
+    // Do something with response error
+    return Promise.reject(error);
+  });
 }
 
 /**

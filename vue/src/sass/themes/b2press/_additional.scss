@@ -1,6 +1,4 @@
 // themes/${theme_name}/_additional.scss
 // for using in sass part of vue templates
-
-@forward 'styles/abstract';
 @forward 'abstract';
-@forward 'styles/mixins'
+@forward 'mixins'

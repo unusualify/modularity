@@ -1,9 +1,11 @@
 // hooks/useTable.js
 import { watch, computed, nextTick, reactive, toRefs, ref, toRef, onMounted} from 'vue'
+import { useDisplay } from 'vuetify'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
+import _ from 'lodash-es'
+
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
-import { isObject, find, omit, snakeCase, kebabCase, isEqual, cloneDeep } from 'lodash-es'
 import api from '@/store/api/datatable'
 
 import { DATATABLE, FORM } from '@/store/mutations/index'
@@ -13,7 +15,6 @@ import { mapGetters } from '@/utils/mapStore'
 import { getSubmitFormData } from '@/utils/getFormData.js'
 
 import { useFormatter, useRoot } from '@/hooks'
-import _ from 'lodash'
 
 export const makeTableProps = propsFactory({
   name: {
@@ -170,9 +171,9 @@ export default function useTable (props, context) {
 
   const store = useStore()
 
-  const { isSmAndDown } = useRoot()
+  const { smAndDown } = useDisplay()
 
-  const { t, te } = useI18n({ useScope: 'global' })
+  const { t, te, tm } = useI18n({ useScope: 'global' })
 
   const getters = mapGetters()
 
@@ -206,8 +207,8 @@ export default function useTable (props, context) {
       x: 0,
       y: 0
     },
-    snakeName: snakeCase(props.name),
-    permissionName: kebabCase(props.name),
+    snakeName: _.snakeCase(props.name),
+    permissionName: _.kebabCase(props.name),
     transNameSingular: computed(() => te('modules.' + state.snakeName, 0) ? t('modules.' + state.snakeName, 0) : props.name),
     transNamePlural: computed(() => t('modules.' + state.snakeName, 1)),
     transNameCountable: computed(() => t('modules.' + state.snakeName, getters.totalElements.value)),
@@ -216,9 +217,8 @@ export default function useTable (props, context) {
       return prefix + (__isset(props.customTitle) ? props.customTitle : state.transNamePlural)
     }),
     formTitle: computed(() => {
-      return t((state.editedIndex === -1 ? 'new-item' : 'edit-item'), {
-        item: te(`modules.${state.snakeName}`) ? t(`modules.${state.snakeName}`, 0) : props.name
-      })
+      let translationKey = state.editedIndex === -1 ? 'fields.new-item' : 'fields.edit-item'
+      return t(translationKey, { item: state.transNameSingular})
     }),
     deleteQuestion: computed(() => {
       // __log(store.state.form.editedItem, props.titleKey)
@@ -229,7 +229,7 @@ export default function useTable (props, context) {
         // route: state.transName.toLowerCase(),
         route: state.transNameSingular,
         name: (state.editedItem[props.titleKey]
-          ? (isObject(state.editedItem[props.titleKey]) ? state.editedItem[props.titleKey][store.state.user.locale] : state.editedItem[props.titleKey])
+          ? (_.isObject(state.editedItem[props.titleKey]) ? state.editedItem[props.titleKey][store.state.user.locale] : state.editedItem[props.titleKey])
           : '').toLocaleUpperCase()
       })
     }),
@@ -276,7 +276,7 @@ export default function useTable (props, context) {
       }
     }),
     filterActiveStatus: computed(() => store.state.datatable.filter.status ?? 'all'),
-    filterActive: computed(() => find(store.state.datatable.mainFilters, { slug: state.filterActiveStatus })),
+    filterActive: computed(() => _.find(store.state.datatable.mainFilters, { slug: state.filterActiveStatus })),
     // form store
     editedItem: computed(() => store.state.form.editedItem ?? {}),
     formLoading: computed(() => store.state.form.loading ?? false),
@@ -287,7 +287,7 @@ export default function useTable (props, context) {
       return form?.value?.validModel ?? null
     }),
     mobileTableLayout: computed(() => {
-      return isSmAndDown
+      return smAndDown.value
     }),
     hideSearchField: computed(()=> {return props.hideSearchField}),
     tableSubtitle: computed(() => {
@@ -577,7 +577,7 @@ export default function useTable (props, context) {
           // this.$refs.dialog.openModal()
           break
         case 'duplicate':
-          methods.setEditedItem(omit(item, 'id'))
+          methods.setEditedItem(_.omit(item, 'id'))
           methods.openForm()
 
           // methods.duplicateRow(item.id)
@@ -613,7 +613,7 @@ export default function useTable (props, context) {
           })
           break
         case 'activate':
-          state.activeTableItem = find(state.elements, { id: item.id })
+          state.activeTableItem = _.find(state.elements, { id: item.id })
           break
         case 'bulkDelete':
           state.activeModal = 'action';
@@ -652,8 +652,8 @@ export default function useTable (props, context) {
       if(_action.form){
         //use clone_dip
         // console.log(_action.form)
-        state.customFormSchema = cloneDeep(_action.form.attributes.schema);
-        state.customFormAttributes = cloneDeep(_action.form.attributes);
+        state.customFormSchema = _.cloneDeep(_action.form.attributes.schema);
+        state.customFormAttributes = _.cloneDeep(_action.form.attributes);
 
         // console.log(state.customFormSchema);
         if(_action.form.hasOwnProperty('model_formatter')){
@@ -736,7 +736,7 @@ export default function useTable (props, context) {
       // methods.openDeleteModal()
     },
     activateItem: function (item) {
-      state.activeTableItem = find(state.elements, { id: item.id })
+      state.activeTableItem = _.find(state.elements, { id: item.id })
     },
     hydrateNestedData: function (item, data) {
       const valuePattern = /\$([A-Za-z]+)/
@@ -759,7 +759,7 @@ export default function useTable (props, context) {
               }
             }
           }
-        } else if (Array.isArray(data[key]) || __isObject(data[key])) {
+        } else if (Array.isArray(data[key]) || _.isObject(data[key])) {
           data[key] = methods.hydrateNestedData(item, data[key])
         }
       }
@@ -868,7 +868,7 @@ export default function useTable (props, context) {
       store.dispatch(ACTIONS.GET_DATATABLE)
     },
     changeOptions(options){
-      if(!isEqual(options, state.options)){
+      if(!_.isEqual(options, state.options)){
         state.options = options
       }
     },
@@ -1022,7 +1022,6 @@ export default function useTable (props, context) {
     ...toRefs(state),
     ...getters,
     ...toRefs(methods),
-    ...formatter,
-    isSmAndDown,
+    ...formatter
   }
 }

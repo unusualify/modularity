@@ -1,7 +1,11 @@
 import { find, omitBy, reduce, cloneDeep, map, findIndex, snakeCase, orderBy, get, filter, includes, set, each, isEmpty, unset, omit, pick } from 'lodash-es'
+import { useI18n } from 'vue-i18n'
 import filters from '@/utils/filters'
 import axios from 'axios'
 import { globalError } from './errors'
+
+import sampleModel from '@/__snapshots/getFormData/model.json';
+import sampleSchema from '@/__snapshots/getFormData/schema.json';
 
 const isArrayable = 'input-treeview|treeview|input-checklist|input-repeater|input-file|input-image'
 // const isMediableTypes = 'input-file|input-image'
@@ -237,7 +241,6 @@ export const handleInputEvents = (events = null, fields, moduleSchema, name = nu
   const _field = fields[name]
   const _schema = moduleSchema[name]
 
-
   const isFieldFalsy = (Array.isArray(_field) && _field.length > 0) || (!Array.isArray(_field) && !!_field)
 
   if (events) {
@@ -346,6 +349,21 @@ export const handleMultiFormEvents = ( models, schemas, input, index, preview = 
   }
 }
 
+export const testMethods = {
+  // getDisplayData: () => {
+  //   return getDisplayData(sampleSchema, sampleModel)
+  // },
+  getSubmitFormData: () => {
+    return getSubmitFormData(sampleSchema, sampleModel)
+  },
+  getSchema: () => {
+    return getSchema(sampleSchema, sampleModel)
+  },
+  getModel: () => {
+    return getModel(sampleSchema, sampleModel)
+  }
+}
+
 export default {
   getSchema,
   getModel,
@@ -354,7 +372,8 @@ export default {
   onInputEventFormData,
   handleInputEvents,
   handleEvents,
-  handleMultiFormEvents
+  handleMultiFormEvents,
+  testMethods
 }
 
 const processInputs = (inputObj) => {

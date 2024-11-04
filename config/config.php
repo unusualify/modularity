@@ -16,9 +16,9 @@ return [
 
     'version' => '1.0.0',
     'auth_login_redirect_path' => '/',
-    'is_development' => env('UNUSUAL_DEV', false),
-    'development_url' => 'http://' . env('UNUSUAL_DEV_URL', 'localhost:8080'),
-    'public_dir' => env('UNUSUAL_ASSETS_DIR', 'unusual'),
+    // 'is_development' => env('UNUSUAL_DEV', false),
+    // 'development_url' => 'http://' . env('UNUSUAL_DEV_URL', 'localhost:8080'),
+    // 'public_dir' => env('UNUSUAL_ASSETS_DIR', 'unusual'),
     'vendor_path' => env('MODULARITY_VENDOR_PATH', 'vendor/unusualify/modularity'),
 
     'custom_components_resource_path' => 'vendor/modularity/js/components',

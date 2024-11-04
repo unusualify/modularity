@@ -16,14 +16,12 @@
           <!-- <div class="text-h8 pt-5 pb-10 text-primary font-weight-bold" v-if="formTitle && false">
             {{ ($te(formTitle) ? $t(formTitle).toLocaleUpperCase($i18n.locale.toUpperCase()) : formTitle.toLocaleUpperCase($i18n.locale.toUpperCase())) }}
           </div> -->
-          <ue-title v-if="title" :classes="['px-0']">
-            <div class="d-flex">
-              <div class="me-auto">
-                {{ ($te(title)
-                      ? $t(title).toLocaleUpperCase($i18n.locale.toUpperCase())
-                      : title.toLocaleUpperCase($i18n.locale.toUpperCase()))
-                }}
-              </div>
+          <ue-title
+            v-if="title"
+            :classes="['px-0']"
+            v-bind="titleOptions"
+          >
+                {{  titleSerialized }}
               <slot name="headerRight">
                 <!-- <v-btn
                     class=""
@@ -32,7 +30,6 @@
                     density="compact"
                   ></v-btn> -->
               </slot>
-            </div>
           </ue-title>
           <v-custom-form-base
             :id="`ue-wrapper-${id}`"
@@ -175,7 +172,7 @@ export default {
     },
     formClass: {
       type: [Array, String],
-      default: 'px-theme pb-theme'
+      default: 'px-6 pb-6'
     },
     actionUrl: {
       type: String
@@ -403,6 +400,35 @@ export default {
         'order-lg': '1',
         'order-xl': '1'
       }
+    },
+    titleOptions(){
+      let options = {}
+
+      if(__isObject(this.title)){
+        options = {
+          tag: this.title.tag || 'div',
+          type: this.title.type || 'body-1',
+          weight: this.title.weight || 'regular',
+          transform: this.title.transform || 'none',
+          color: this.title.color,
+          padding: this.title.padding || 'a-0',
+          margin: this.title.margin || 'a-0',
+          align: this.title.align || 'left',
+          justify: this.title.justify || 'start',
+        }
+      }
+      return options
+    },
+    titleSerialized(){
+      let title = this.title
+
+      if(__isObject(this.title)){
+        title = this.title.text
+      }
+
+      return this.$te(title)
+        ? this.$t(title).toLocaleUpperCase(this.$i18n.locale.toUpperCase())
+        : title.toLocaleUpperCase(this.$i18n.locale.toUpperCase())
     },
     ...mapState({
       editedItem: state => state.form.editedItem,

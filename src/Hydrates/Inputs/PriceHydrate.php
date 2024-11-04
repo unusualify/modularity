@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Hydrates\Inputs;
 
 use Modules\SystemPricing\Entities\Currency;
+use Unusualify\Modularity\Http\Requests\Request;
 
 class PriceHydrate extends InputHydrate
 {
@@ -40,7 +41,9 @@ class PriceHydrate extends InputHydrate
         $input['label'] ??= __('Prices');
         $input['clearable'] = false;
 
-        $input['currencies'] = Currency::query()->select(['id', 'symbol as name'])->get()->toArray();
+        $input['items'] = Currency::query()->select(['id', 'symbol as name', 'iso_4217 as iso'])->get()->toArray();
+
+        $input['default'][0]['currency_id'] = Request::getUserCurrency()->id;
 
         return $input;
     }

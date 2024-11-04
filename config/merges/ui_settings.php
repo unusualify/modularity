@@ -4,10 +4,10 @@ return [
     'sidebar' => [
         'expandOnHover' => true,
         'rail' => false,
-        'mainLocation' => 'right',
-        'permanent' => true,
-        'showIcon' => false,
-        'isMini' => true,
+        'location' => 'left',
+        'persistent' => false,
+        'hideIcons' => false,
+        'railWidth' => 130,
         'contentDrawer' => [
             'exists' => false,
             'float' => false,

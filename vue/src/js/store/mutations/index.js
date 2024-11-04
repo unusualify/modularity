@@ -14,3 +14,6 @@ export { default as LANGUAGE } from './language'
 
 /* browser */
 export { default as BROWSER } from './browser'
+
+/* config */
+export { default as CONFIG } from './config'

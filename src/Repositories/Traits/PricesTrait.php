@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Repositories\Traits;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Request;
 
 trait PricesTrait
 {
@@ -98,7 +99,7 @@ trait PricesTrait
                     });
                 } else {
                     $fields[$role] = [
-                        array_merge_recursive_preserve($this->defaultPriceData, ['display_price' => 0.00]),
+                        array_merge_recursive_preserve($this->defaultPriceData, ['display_price' => 0.00, 'currency_id' => Request::getUserCurrency()->id]),
                     ];
                 }
             }

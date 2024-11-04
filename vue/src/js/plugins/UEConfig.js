@@ -1,5 +1,6 @@
-import core from '@/core'
+import pluralize from 'pluralize'
 
+import core from '@/core'
 // import VFormBase from 'vuetify-form-base';
 import VCustomFormBase from '__components/others/CustomFormBase.vue'
 
@@ -28,6 +29,7 @@ import { VueMaskDirective } from 'v-mask'
 import SvgSprite from '@/directives/svg'
 import Column from '@/directives/column'
 import FitGrid from '@/directives/fit-grid'
+import Scrollable from '@/directives/scrollable'
 import commonMethods from '@/utils/commonMethods'
 import { ALERT } from '../store/mutations'
 
@@ -76,9 +78,18 @@ export default {
     app.config.globalProperties = {
       ...app.config.globalProperties,
       ...commonMethods,
+      $getLocale: i18n.global.locale.value,
+      $numberFormats: i18n.global.numberFormats.value,
       $te: function (key, locale) {
         const func = i18n.global.te
         return func(key, locale) ?? false
+      },
+      $tc: function (key, locale) {
+        const func = i18n.global.tc
+        return func(key, locale) ?? false
+      },
+      $plural: function (str) {
+        return pluralize.plural(str)
       },
       registerComponentsV1: function (components, folder = '', prefix = 'ue') {
         folder = folder !== '' ? folder + '/' : ''
@@ -176,6 +187,7 @@ export default {
     app.use(SvgSprite)
     app.use(Column)
     app.use(FitGrid)
+    app.use(Scrollable)
 
     app.provide('$app', app)
   }

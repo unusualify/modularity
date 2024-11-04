@@ -1,0 +1,27 @@
+@use 'abstract' as *;
+
+@forward 'vuetify/settings' with (
+  $button-font-size: $button-font-size,
+  $button-height: $button-height,
+  $button-max-width: $button-max-width,
+
+  // INPUT
+  $field-font-size: $input-font-size,
+  $field-label-floating-scale: $field-label-floating-scale, //0.81,
+  $field-control-height: $field-control-height, //56px,
+  $input-control-height: $field-control-height, //56px,
+
+  // $navigation-drawer-background: $navigation-drawer-background,
+  // $navigation-drawer-color: $global-dark-text-color,
+
+  $list-padding: 8px 0px,
+  $list-nav-padding: $sidebar-padding 4px,
+  $list-item-one-line-padding: 8px 13px,
+  $list-item-nav-subtitle-font-size: $list-item-nav-subtitle-font-size,
+  // $list-item-padding: 4px calc($spacer * 6),
+
+  // $list-item-icon-margin-end: 2px,
+  $list-item-icon-margin-start: calc($spacer * 3),
+  $list-item-avatar-size: 56px,
+
+);

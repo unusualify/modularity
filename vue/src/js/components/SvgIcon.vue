@@ -52,6 +52,11 @@ div span svg{
   max-width: 100%;
   max-height: 100%;
 }
+div.center-image span{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 
 </style>

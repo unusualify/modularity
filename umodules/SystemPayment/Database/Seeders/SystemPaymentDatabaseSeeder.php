@@ -12,7 +12,7 @@ class SystemPaymentDatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            PaymentServiceSeeder::class
+            PaymentServiceSeeder::class,
         ]);
     }
 }

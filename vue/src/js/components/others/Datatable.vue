@@ -49,8 +49,7 @@
             <slot name="header" v-bind="{tableTitle}">
               <ue-title
                 :text="tableTitle"
-                :classes="['ue-table-header', 'pt-theme', 'pb-theme']"
-                padding-reset
+                :classes="['ue-table-header', 'pt-12', 'pb-12']"
               />
             </slot>
           </v-toolbar-title>

@@ -61,7 +61,7 @@ export default {
     //   type: String,
     //   default: 'currency_id'
     // },
-    currencies: {
+    items: {
       type: Array
     }
   },
@@ -136,6 +136,9 @@ export default {
   },
 
   computed: {
+    currencies () {
+      return this.items
+    },
     displayedCurrency () {
       return this.deepModel.map((item, i) => {
         return this.currencies.find(o => { return o.id === item[this.currencyInputName] }).name

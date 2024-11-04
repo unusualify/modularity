@@ -1,26 +1,6 @@
 <template>
   <v-sheet class="fill-height">
-    <ue-title :text="moduleTitle" :classes="[]">
-      <div class="d-flex">
-        <div class="me-auto">{{ moduleTitle }}</div>
-        <slot name="headerRight">
-          <v-text-field
-            v-if="!hideSearchField"
-            variant="outlined"
-            append-inner-icon="mdi-magnify"
-            :placeholder="searchText"
-            hide-details
-            density="compact"
-            style="max-width: 30%; min-width: 50px; display: inline;"
-            single-line
-            :modelValue="searchInput"
-            @update:modelValue="searchInput = $event"
-            @keydown.enter.prevent="enterSearch"
-            @click:appendInner="enterSearch"
-          />
-        </slot>
-      </div>
-    </ue-title>
+    <ue-title :text="moduleTitle" :classes="[]"></ue-title>
     <ue-tabs :items="groupedItems" v-model="activeTab">
       <template v-for="(_, name) in $slots" v-slot:[name]="slotData"><slot :name="name" v-bind="slotData"></slot></template>
     </ue-tabs>

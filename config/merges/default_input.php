@@ -12,7 +12,7 @@ return [
         // 'md' => 8,
         // 'lg' => 6,
         // 'xl' => 6,
-        // 'class' => 'pr-theme-semi pl-theme-semi pb-2 pt-2',
+        // 'class' => 'pr-6 pl-6 pb-2 pt-2',
         'class' => 'pb-2 pt-2',
     ],
     'offset' => [

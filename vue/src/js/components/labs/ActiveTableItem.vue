@@ -9,7 +9,7 @@
       @click:outside="clickOutside"
       >
       <template v-slot:body="props">
-        <v-card class="pa-theme">
+        <v-card class="pa-12">
           <v-item-group selected-class="bg-primary">
             <v-container>
               <v-row>
@@ -65,7 +65,7 @@
         v-bind="{...$bindAttributes(), tableClasses: $parent.tableClasses}"
 
         :custom-title="activeBlock.title"
-        class="mb-theme"
+        class="mb-12"
         :is-row-editing="false"
         :embedded-form="false"
         :create-on-modal="false"

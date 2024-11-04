@@ -118,7 +118,12 @@ export default {
     });
 
     const years = computed(() => {
-      return Array.from({ length: 12 }, (v, i) => minCardYear + i);
+      const urlParams = new URLSearchParams(window.location.search);
+      if(urlParams.has('testYears')){
+        return Array.from({ length: urlParams.get('testYears') }, (v, i) => minCardYear + i);
+      }else{
+        return Array.from({ length: 12 }, (v, i) => minCardYear + i);
+      }
     });
 
     const minCardMonth = computed(() => {

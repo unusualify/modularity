@@ -1,0 +1,1532 @@
+{
+  "wrap-670fad99ebaed": {
+    "type": "wrap",
+    "hint": "",
+    "placeholder": "",
+    "errorMessages": [],
+    "col": {
+      "cols": 12,
+      "class": "pb-2 pt-2",
+      "md": 6
+    },
+    "offset": {
+      "offset": 0,
+      "offset-sm": 0,
+      "offset-md": 0,
+      "offset-lg": 0,
+      "offset-xl": 0
+    },
+    "order": {
+      "order": 0,
+      "order-sm": 0,
+      "order-md": 0,
+      "order-lg": 0,
+      "order-xl": 0
+    },
+    "prependIcon": "",
+    "prependInnerIcon": "",
+    "appendIcon": "",
+    "appendInnerIcon": "",
+    "density": "comfortable",
+    "variant": "outlined",
+    "clearable": true,
+    "schema": {
+      "package_continent_id": {
+        "type": "select",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "col": {
+          "cols": 12,
+          "class": "pb-2 pt-2"
+        },
+        "offset": {
+          "offset": 0,
+          "offset-sm": 0,
+          "offset-md": 0,
+          "offset-lg": 0,
+          "offset-xl": 0
+        },
+        "order": {
+          "order": 0,
+          "order-sm": 0,
+          "order-md": 0,
+          "order-lg": 0,
+          "order-xl": 0
+        },
+        "prependIcon": "",
+        "prependInnerIcon": "",
+        "appendIcon": "",
+        "appendInnerIcon": "",
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": true,
+        "name": "package_continent_id",
+        "label": "Continent",
+        "rules": "sometimes|required",
+        "ext": "morphTo",
+        "cascade": "package_region_id",
+        "itemValue": "id",
+        "itemTitle": "name",
+        "default": null,
+        "cascadeKey": "items",
+        "items": [{
+          "id": 0,
+          "name": "Please Select"
+        }, {
+          "id": 1,
+          "name": "Europe",
+          "items": [{
+            "id": 2,
+            "package_continent_id": 1,
+            "name": "Europe",
+            "items": [{
+              "id": 1,
+              "package_region_id": 2,
+              "name": "Turkey"
+            }, {
+              "id": 2,
+              "package_region_id": 2,
+              "name": "France"
+            }, {
+              "id": 4,
+              "package_region_id": 2,
+              "name": "Bulgaria"
+            }, {
+              "id": 5,
+              "package_region_id": 2,
+              "name": "Germany"
+            }]
+          }]
+        }, {
+          "id": 2,
+          "name": "North America",
+          "items": []
+        }, {
+          "id": 3,
+          "name": "Africa",
+          "items": [{
+            "id": 5,
+            "package_continent_id": 3,
+            "name": "Americas",
+            "items": [{
+              "id": 6,
+              "package_region_id": 5,
+              "name": "Brasil"
+            }, {
+              "id": 7,
+              "package_region_id": 5,
+              "name": "USA"
+            }]
+          }]
+        }, {
+          "id": 4,
+          "name": "South America",
+          "items": []
+        }, {
+          "id": 5,
+          "name": "Asia",
+          "items": []
+        }, {
+          "id": 6,
+          "name": "All",
+          "items": [{
+            "id": 1,
+            "package_continent_id": 6,
+            "name": "Global",
+            "items": [{
+              "id": 3,
+              "package_region_id": 1,
+              "name": "Global Distribution"
+            }]
+          }, {
+            "id": 3,
+            "package_continent_id": 6,
+            "name": "Mena Region",
+            "items": []
+          }, {
+            "id": 4,
+            "package_continent_id": 6,
+            "name": "Asia",
+            "items": [{
+              "id": 8,
+              "package_region_id": 4,
+              "name": "China"
+            }, {
+              "id": 9,
+              "package_region_id": 4,
+              "name": "India"
+            }]
+          }]
+        }],
+        "class": "required required"
+      },
+      "package_region_id": {
+        "type": "select",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "col": {
+          "cols": 12,
+          "class": "pb-2 pt-2"
+        },
+        "offset": {
+          "offset": 0,
+          "offset-sm": 0,
+          "offset-md": 0,
+          "offset-lg": 0,
+          "offset-xl": 0
+        },
+        "order": {
+          "order": 0,
+          "order-sm": 0,
+          "order-md": 0,
+          "order-lg": 0,
+          "order-xl": 0
+        },
+        "prependIcon": "",
+        "prependInnerIcon": "",
+        "appendIcon": "",
+        "appendInnerIcon": "",
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": true,
+        "name": "package_region_id",
+        "label": "Region",
+        "ext": "morphTo",
+        "cascade": "package_country_id",
+        "items": [{
+          "id": 0,
+          "name": "Please Select"
+        }, {
+          "id": 1,
+          "name": "Global"
+        }, {
+          "id": 2,
+          "name": "Europe"
+        }, {
+          "id": 3,
+          "name": "Mena Region"
+        }, {
+          "id": 4,
+          "name": "Asia"
+        }, {
+          "id": 5,
+          "name": "Americas"
+        }],
+        "itemValue": "id",
+        "itemTitle": "name",
+        "default": null,
+        "cascadeKey": "items"
+      },
+      "package_country_id": {
+        "type": "select",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "col": {
+          "cols": 12,
+          "class": "pb-2 pt-2"
+        },
+        "offset": {
+          "offset": 0,
+          "offset-sm": 0,
+          "offset-md": 0,
+          "offset-lg": 0,
+          "offset-xl": 0
+        },
+        "order": {
+          "order": 0,
+          "order-sm": 0,
+          "order-md": 0,
+          "order-lg": 0,
+          "order-xl": 0
+        },
+        "prependIcon": "",
+        "prependInnerIcon": "",
+        "appendIcon": "",
+        "appendInnerIcon": "",
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": true,
+        "name": "package_country_id",
+        "label": "Country",
+        "ext": "morphTo",
+        "items": [{
+          "id": 0,
+          "name": "Please Select"
+        }, {
+          "id": 1,
+          "name": "Turkey"
+        }, {
+          "id": 2,
+          "name": "France"
+        }, {
+          "id": 3,
+          "name": "Global Distribution"
+        }, {
+          "id": 4,
+          "name": "Bulgaria"
+        }, {
+          "id": 5,
+          "name": "Germany"
+        }, {
+          "id": 6,
+          "name": "Brasil"
+        }, {
+          "id": 7,
+          "name": "USA"
+        }, {
+          "id": 8,
+          "name": "China"
+        }, {
+          "id": 9,
+          "name": "India"
+        }],
+        "itemValue": "id",
+        "itemTitle": "name",
+        "default": null,
+        "cascadeKey": "items"
+      }
+    },
+    "typeInt": "sheet",
+    "title": "",
+    "name": "wrap-670fad99ebaed",
+    "default": {
+      "package_continent_id": "",
+      "package_region_id": "",
+      "package_country_id": ""
+    }
+  },
+  "wrap-670fad99ecd1e": {
+    "type": "wrap",
+    "hint": "",
+    "placeholder": "",
+    "errorMessages": [],
+    "col": {
+      "cols": 12,
+      "class": "pb-2 pt-2",
+      "md": 6
+    },
+    "offset": {
+      "offset": 0,
+      "offset-sm": 0,
+      "offset-md": 0,
+      "offset-lg": 0,
+      "offset-xl": 0
+    },
+    "order": {
+      "order": 0,
+      "order-sm": 0,
+      "order-md": 0,
+      "order-lg": 0,
+      "order-xl": 0
+    },
+    "prependIcon": "",
+    "prependInnerIcon": "",
+    "appendIcon": "",
+    "appendInnerIcon": "",
+    "density": "comfortable",
+    "variant": "outlined",
+    "clearable": true,
+    "schema": {
+      "name": {
+        "type": "text",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "col": {
+          "cols": 12,
+          "class": "pb-2 pt-2"
+        },
+        "offset": {
+          "offset": 0,
+          "offset-sm": 0,
+          "offset-md": 0,
+          "offset-lg": 0,
+          "offset-xl": 0
+        },
+        "order": {
+          "order": 0,
+          "order-sm": 0,
+          "order-md": 0,
+          "order-lg": 0,
+          "order-xl": 0
+        },
+        "prependIcon": "",
+        "prependInnerIcon": "",
+        "appendIcon": "",
+        "appendInnerIcon": "",
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": true,
+        "name": "name",
+        "label": "Name"
+      },
+      "description": {
+        "type": "textarea",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "col": {
+          "cols": 12,
+          "class": "pb-2 pt-2"
+        },
+        "offset": {
+          "offset": 0,
+          "offset-sm": 0,
+          "offset-md": 0,
+          "offset-lg": 0,
+          "offset-xl": 0
+        },
+        "order": {
+          "order": 0,
+          "order-sm": 0,
+          "order-md": 0,
+          "order-lg": 0,
+          "order-xl": 0
+        },
+        "prependIcon": "",
+        "prependInnerIcon": "",
+        "appendIcon": "",
+        "appendInnerIcon": "",
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": true,
+        "name": "description",
+        "label": "Description"
+      },
+      "prices": {
+        "type": "input-price",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "col": {
+          "cols": 12,
+          "class": "pb-2 pt-2",
+          "lg": 12,
+          "sm": 12
+        },
+        "offset": {
+          "offset": 0,
+          "offset-sm": 0,
+          "offset-md": 0,
+          "offset-lg": 0,
+          "offset-xl": 0
+        },
+        "order": {
+          "order": 0,
+          "order-sm": 0,
+          "order-md": 0,
+          "order-lg": 0,
+          "order-xl": 0
+        },
+        "prependIcon": "",
+        "prependInnerIcon": "",
+        "appendIcon": "",
+        "appendInnerIcon": "",
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": false,
+        "name": "prices",
+        "label": "Price",
+        "rules": "sometimes:required",
+        "tooltip": "L\u00fctfen \u00fccret de\u011ferini say\u0131 olarak giriniz.",
+        "default": [{
+          "display_price": "",
+          "currency_id": 1
+        }],
+        "items": [{
+          "id": 1,
+          "name": "\u20ac",
+          "iso": "EUR"
+        }, {
+          "id": 2,
+          "name": "$",
+          "iso": "USD"
+        }, {
+          "id": 3,
+          "name": "\u20ba",
+          "iso": "TRY"
+        }, {
+          "id": 4,
+          "name": "\u00a3",
+          "iso": "GBP"
+        }, {
+          "id": 5,
+          "name": "\u00a5",
+          "iso": "JPY"
+        }, {
+          "id": 6,
+          "name": "CA$",
+          "iso": "CAD"
+        }, {
+          "id": 7,
+          "name": "A$",
+          "iso": "AUD"
+        }, {
+          "id": 8,
+          "name": "CHF",
+          "iso": "CHF"
+        }, {
+          "id": 9,
+          "name": "\u00a5",
+          "iso": "CNY"
+        }, {
+          "id": 10,
+          "name": "kr",
+          "iso": "SEK"
+        }, {
+          "id": 11,
+          "name": "NZ$",
+          "iso": "NZD"
+        }, {
+          "id": 12,
+          "name": "MX$",
+          "iso": "MXN"
+        }, {
+          "id": 13,
+          "name": "S$",
+          "iso": "SGD"
+        }, {
+          "id": 14,
+          "name": "HK$",
+          "iso": "HKD"
+        }, {
+          "id": 15,
+          "name": "kr",
+          "iso": "NOK"
+        }, {
+          "id": 16,
+          "name": "\u20a9",
+          "iso": "KRW"
+        }, {
+          "id": 17,
+          "name": "R$",
+          "iso": "BRL"
+        }, {
+          "id": 18,
+          "name": "\u20bd",
+          "iso": "RUB"
+        }, {
+          "id": 19,
+          "name": "\u20b9",
+          "iso": "INR"
+        }, {
+          "id": 20,
+          "name": "R",
+          "iso": "ZAR"
+        }],
+        "class": "required"
+      }
+    },
+    "typeInt": "sheet",
+    "title": "",
+    "name": "wrap-670fad99ecd1e",
+    "default": {
+      "name": "",
+      "description": "",
+      "prices": [{
+        "display_price": "",
+        "currency_id": 1
+      }]
+    }
+  },
+  "packageFeatures": {
+    "type": "input-repeater",
+    "hint": "",
+    "placeholder": "",
+    "errorMessages": [],
+    "col": {
+      "cols": 12,
+      "class": "pb-2 pt-2",
+      "sm": 12,
+      "md": 12,
+      "lg": 12,
+      "xl": 12
+    },
+    "offset": {
+      "offset": 0,
+      "offset-sm": 0,
+      "offset-md": 0,
+      "offset-lg": 0,
+      "offset-xl": 0
+    },
+    "order": {
+      "order": 0,
+      "order-sm": 0,
+      "order-md": 0,
+      "order-lg": 0,
+      "order-xl": 0
+    },
+    "prependIcon": "",
+    "prependInnerIcon": "",
+    "appendIcon": "",
+    "appendInnerIcon": "",
+    "density": "comfortable",
+    "variant": "outlined",
+    "clearable": true,
+    "name": "packageFeatures",
+    "label": "Please select the features",
+    "default": [],
+    "max": 3,
+    "draggable": true,
+    "rowAttribute": {
+      "noGutters": true
+    },
+    "schema": {
+      "package_feature_id": {
+        "type": "combobox",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "col": {
+          "cols": 10,
+          "class": "",
+          "lg": 11
+        },
+        "offset": {
+          "offset": 0,
+          "offset-sm": 0,
+          "offset-md": 0,
+          "offset-lg": 0,
+          "offset-xl": 0
+        },
+        "order": {
+          "order": 0,
+          "order-sm": 0,
+          "order-md": 0,
+          "order-lg": 0,
+          "order-xl": 0
+        },
+        "prependIcon": "",
+        "prependInnerIcon": "",
+        "appendIcon": "",
+        "appendInnerIcon": "",
+        "density": "comfortable",
+        "variant": "solo",
+        "clearable": false,
+        "name": "package_feature_id",
+        "default": 0,
+        "class": "pt-0 required",
+        "hideDetails": true,
+        "returnObject": false,
+        "rules": "required",
+        "itemValue": "id",
+        "itemTitle": "description",
+        "slots": {
+          "item": {
+            "elements": [{
+              "tag": "v-list-item",
+              "attributes": {
+                "title": ["$props.title", "__shorten"]
+              },
+              "bind": "$props"
+            }]
+          }
+        },
+        "translated": false,
+        "cascadeKey": "items",
+        "items": [{
+          "id": 0,
+          "description": "Please Select"
+        }, {
+          "id": 1,
+          "description": "Free Distribution"
+        }, {
+          "id": 2,
+          "description": "10 release contents"
+        }, {
+          "id": 4,
+          "description": "Writing SEO friendly press release in English (max 400 words)"
+        }, {
+          "id": 5,
+          "description": "Distributing to segmented media lists"
+        }, {
+          "id": 6,
+          "description": "Distributing to partnered websites"
+        }]
+      },
+      "active": {
+        "type": "select",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "col": {
+          "cols": 2,
+          "class": "",
+          "lg": 1
+        },
+        "offset": {
+          "offset": 0,
+          "offset-sm": 0,
+          "offset-md": 0,
+          "offset-lg": 0,
+          "offset-xl": 0
+        },
+        "order": {
+          "order": 0,
+          "order-sm": 0,
+          "order-md": 0,
+          "order-lg": 0,
+          "order-xl": 0
+        },
+        "prependIcon": "",
+        "prependInnerIcon": "",
+        "appendIcon": "",
+        "appendInnerIcon": "",
+        "density": "comfortable",
+        "variant": "solo",
+        "clearable": false,
+        "name": "active",
+        "class": "",
+        "default": "1",
+        "menuIcon": "",
+        "hideDetails": true,
+        "returnObject": false,
+        "style": "border-radius: 0px;",
+        "itemValue": "id",
+        "itemTitle": "name",
+        "items": [{
+          "id": "1",
+          "name": "Yes"
+        }, {
+          "id": "0",
+          "name": "No"
+        }],
+        "translated": false,
+        "cascadeKey": "items"
+      }
+    },
+    "autoIdGenerator": true,
+    "itemValue": "id",
+    "itemTitle": "name",
+    "orderKey": "position",
+    "singularLabel": "Please select the feature",
+    "items": [{
+      "id": 1,
+      "name": null
+    }, {
+      "id": 2,
+      "name": null
+    }, {
+      "id": 4,
+      "name": null
+    }, {
+      "id": 5,
+      "name": null
+    }, {
+      "id": 6,
+      "name": null
+    }]
+  },
+  "published": {
+    "type": "switch",
+    "hint": "",
+    "placeholder": "",
+    "errorMessages": [],
+    "col": {
+      "cols": 12,
+      "class": "pb-2 pt-2"
+    },
+    "offset": {
+      "offset": 0,
+      "offset-sm": 0,
+      "offset-md": 0,
+      "offset-lg": 0,
+      "offset-xl": 0
+    },
+    "order": {
+      "order": 0,
+      "order-sm": 0,
+      "order-md": 0,
+      "order-lg": 0,
+      "order-xl": 0
+    },
+    "prependIcon": "",
+    "prependInnerIcon": "",
+    "appendIcon": "",
+    "appendInnerIcon": "",
+    "density": "comfortable",
+    "variant": "outlined",
+    "clearable": true,
+    "name": "published",
+    "label": "Status",
+    "color": "success",
+    "trueValue": 1,
+    "falseValue": 0,
+    "hideDetails": true,
+    "default": 0
+  },
+  "logo": {
+    "type": "input-image",
+    "hint": "",
+    "placeholder": "",
+    "errorMessages": [],
+    "col": {
+      "cols": 12,
+      "class": "pb-2 pt-2"
+    },
+    "offset": {
+      "offset": 0,
+      "offset-sm": 0,
+      "offset-md": 0,
+      "offset-lg": 0,
+      "offset-xl": 0
+    },
+    "order": {
+      "order": 0,
+      "order-sm": 0,
+      "order-md": 0,
+      "order-lg": 0,
+      "order-xl": 0
+    },
+    "prependIcon": "",
+    "prependInnerIcon": "",
+    "appendIcon": "",
+    "appendInnerIcon": "",
+    "density": "comfortable",
+    "variant": "outlined",
+    "clearable": true,
+    "name": "logo",
+    "label": "Logo",
+    "rules": "sometimes|required:array",
+    "translated": false,
+    "default": [],
+    "class": "required"
+  },
+  "avatar": {
+    "type": "input-filepond",
+    "hint": "",
+    "placeholder": "",
+    "errorMessages": [],
+    "col": {
+      "cols": 6,
+      "class": "pb-2 pt-2"
+    },
+    "offset": {
+      "offset": 0,
+      "offset-sm": 0,
+      "offset-md": 0,
+      "offset-lg": 0,
+      "offset-xl": 0
+    },
+    "order": {
+      "order": 0,
+      "order-sm": 0,
+      "order-md": 0,
+      "order-lg": 0,
+      "order-xl": 0
+    },
+    "prependIcon": "",
+    "prependInnerIcon": "",
+    "appendIcon": "",
+    "appendInnerIcon": "",
+    "density": "comfortable",
+    "variant": "outlined",
+    "clearable": true,
+    "name": "avatar",
+    "label": "Avatar",
+    "allow-image-preview": true,
+    "label-idle": "Drop files here...",
+    "default": [],
+    "accepted-file-types": ["image\/*, file\/*"],
+    "allow-multiple": true,
+    "max-files": null,
+    "allow-drop": true,
+    "allow-replace": true,
+    "allow-remove": true,
+    "allow-reorder": false,
+    "allow-process": true,
+    "drop-on-page": false,
+    "drop-on-element": true,
+    "drop-validation": false,
+    "credits": false,
+    "inputName": "avatar",
+    "endPoints": {
+      "process": "http:\/\/app.b2press.test\/api\/filepond\/process",
+      "revert": "http:\/\/app.b2press.test\/api\/filepond\/revert",
+      "load": "http:\/\/app.b2press.test\/api\/filepond\/preview\/"
+    },
+    "label-invalid-field": "filepon-invalid-field-label",
+    "label-file-loading": "filepond-loading-lable",
+    "label-file-load-error": "filepond-loading-error-lable",
+    "label-file-processing": "filepond-processing-lable",
+    "label-file-remove-error": "filepond-removing-error-lable"
+  },
+  "locations": {
+    "type": "input-checklist-group",
+    "hint": "",
+    "placeholder": "",
+    "errorMessages": [],
+    "col": {
+      "cols": 12,
+      "class": "pb-2 pt-2"
+    },
+    "offset": {
+      "offset": 0,
+      "offset-sm": 0,
+      "offset-md": 0,
+      "offset-lg": 0,
+      "offset-xl": 0
+    },
+    "order": {
+      "order": 0,
+      "order-sm": 0,
+      "order-md": 0,
+      "order-lg": 0,
+      "order-xl": 0
+    },
+    "prependIcon": "",
+    "prependInnerIcon": "",
+    "appendIcon": "",
+    "appendInnerIcon": "",
+    "density": "comfortable",
+    "variant": "outlined",
+    "clearable": true,
+    "name": "locations",
+    "default": [],
+    "ext": "filter:2.packages:items:group|preview:schema.$group.items.*.name:items",
+    "schema": {
+      "packageCountry": {
+        "type": "input-checklist",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "col": {
+          "cols": 12,
+          "class": "pb-2 pt-2"
+        },
+        "offset": {
+          "offset": 0,
+          "offset-sm": 0,
+          "offset-md": 0,
+          "offset-lg": 0,
+          "offset-xl": 0
+        },
+        "order": {
+          "order": 0,
+          "order-sm": 0,
+          "order-md": 0,
+          "order-lg": 0,
+          "order-xl": 0
+        },
+        "prependIcon": "",
+        "prependInnerIcon": "",
+        "appendIcon": "",
+        "appendInnerIcon": "",
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": true,
+        "name": "packageCountry",
+        "label": "Select Your Country",
+        "selectedLabel": "Selected Countries",
+        "_moduleName": "Package",
+        "_routeName": "PackageCountry",
+        "itemValue": "id",
+        "itemTitle": "name",
+        "default": [],
+        "cascadeKey": "items",
+        "items": [{
+          "id": 1,
+          "name": "Turkey",
+          "package_languages": [{
+            "id": 1,
+            "published": 0,
+            "created_at": "2023-12-07T12:35:02.000000Z",
+            "updated_at": "2023-12-07T12:35:02.000000Z",
+            "deleted_at": null,
+            "name": "Turkish",
+            "code": "tr",
+            "active": 0,
+            "pivot": {
+              "package_languageable_type": "Modules\\Package\\Entities\\PackageCountry",
+              "package_languageable_id": 1,
+              "package_language_id": 1
+            },
+            "translations": [{
+              "id": 2,
+              "package_language_id": 1,
+              "deleted_at": null,
+              "created_at": "2023-12-07T12:35:02.000000Z",
+              "updated_at": "2023-12-07T12:35:02.000000Z",
+              "locale": "en",
+              "active": 0,
+              "name": "Turkish",
+              "code": "tr"
+            }, {
+              "id": 1,
+              "package_language_id": 1,
+              "deleted_at": null,
+              "created_at": "2023-12-07T12:35:02.000000Z",
+              "updated_at": "2023-12-07T12:35:02.000000Z",
+              "locale": "tr",
+              "active": 1,
+              "name": "T\u00fcrk\u00e7e",
+              "code": "tr"
+            }]
+          }, {
+            "id": 2,
+            "published": 0,
+            "created_at": "2023-12-07T12:35:15.000000Z",
+            "updated_at": "2023-12-07T12:35:15.000000Z",
+            "deleted_at": null,
+            "name": "English",
+            "code": "en",
+            "active": 0,
+            "pivot": {
+              "package_languageable_type": "Modules\\Package\\Entities\\PackageCountry",
+              "package_languageable_id": 1,
+              "package_language_id": 2
+            },
+            "translations": [{
+              "id": 4,
+              "package_language_id": 2,
+              "deleted_at": null,
+              "created_at": "2023-12-07T12:35:15.000000Z",
+              "updated_at": "2024-02-14T08:12:02.000000Z",
+              "locale": "en",
+              "active": 0,
+              "name": "English",
+              "code": "en"
+            }, {
+              "id": 3,
+              "package_language_id": 2,
+              "deleted_at": null,
+              "created_at": "2023-12-07T12:35:15.000000Z",
+              "updated_at": "2024-02-14T08:12:02.000000Z",
+              "locale": "tr",
+              "active": 1,
+              "name": "\u0130ngilizce",
+              "code": "en"
+            }]
+          }, {
+            "id": 3,
+            "published": 0,
+            "created_at": "2024-06-13T08:21:38.000000Z",
+            "updated_at": "2024-06-13T08:21:38.000000Z",
+            "deleted_at": null,
+            "name": "French",
+            "code": "fr",
+            "active": 0,
+            "pivot": {
+              "package_languageable_type": "Modules\\Package\\Entities\\PackageCountry",
+              "package_languageable_id": 1,
+              "package_language_id": 3
+            },
+            "translations": [{
+              "id": 6,
+              "package_language_id": 3,
+              "deleted_at": null,
+              "created_at": "2024-06-13T08:21:38.000000Z",
+              "updated_at": "2024-06-13T08:21:38.000000Z",
+              "locale": "en",
+              "active": 0,
+              "name": "French",
+              "code": "fr"
+            }, {
+              "id": 5,
+              "package_language_id": 3,
+              "deleted_at": null,
+              "created_at": "2024-06-13T08:21:38.000000Z",
+              "updated_at": "2024-06-13T08:21:38.000000Z",
+              "locale": "tr",
+              "active": 1,
+              "name": "Frans\u0131zca",
+              "code": "fr"
+            }]
+          }]
+        }, {
+          "id": 2,
+          "name": "France",
+          "package_languages": [{
+            "id": 1,
+            "published": 0,
+            "created_at": "2023-12-07T12:35:02.000000Z",
+            "updated_at": "2023-12-07T12:35:02.000000Z",
+            "deleted_at": null,
+            "name": "Turkish",
+            "code": "tr",
+            "active": 0,
+            "pivot": {
+              "package_languageable_type": "Modules\\Package\\Entities\\PackageCountry",
+              "package_languageable_id": 2,
+              "package_language_id": 1
+            },
+            "translations": [{
+              "id": 2,
+              "package_language_id": 1,
+              "deleted_at": null,
+              "created_at": "2023-12-07T12:35:02.000000Z",
+              "updated_at": "2023-12-07T12:35:02.000000Z",
+              "locale": "en",
+              "active": 0,
+              "name": "Turkish",
+              "code": "tr"
+            }, {
+              "id": 1,
+              "package_language_id": 1,
+              "deleted_at": null,
+              "created_at": "2023-12-07T12:35:02.000000Z",
+              "updated_at": "2023-12-07T12:35:02.000000Z",
+              "locale": "tr",
+              "active": 1,
+              "name": "T\u00fcrk\u00e7e",
+              "code": "tr"
+            }]
+          }, {
+            "id": 2,
+            "published": 0,
+            "created_at": "2023-12-07T12:35:15.000000Z",
+            "updated_at": "2023-12-07T12:35:15.000000Z",
+            "deleted_at": null,
+            "name": "English",
+            "code": "en",
+            "active": 0,
+            "pivot": {
+              "package_languageable_type": "Modules\\Package\\Entities\\PackageCountry",
+              "package_languageable_id": 2,
+              "package_language_id": 2
+            },
+            "translations": [{
+              "id": 4,
+              "package_language_id": 2,
+              "deleted_at": null,
+              "created_at": "2023-12-07T12:35:15.000000Z",
+              "updated_at": "2024-02-14T08:12:02.000000Z",
+              "locale": "en",
+              "active": 0,
+              "name": "English",
+              "code": "en"
+            }, {
+              "id": 3,
+              "package_language_id": 2,
+              "deleted_at": null,
+              "created_at": "2023-12-07T12:35:15.000000Z",
+              "updated_at": "2024-02-14T08:12:02.000000Z",
+              "locale": "tr",
+              "active": 1,
+              "name": "\u0130ngilizce",
+              "code": "en"
+            }]
+          }, {
+            "id": 3,
+            "published": 0,
+            "created_at": "2024-06-13T08:21:38.000000Z",
+            "updated_at": "2024-06-13T08:21:38.000000Z",
+            "deleted_at": null,
+            "name": "French",
+            "code": "fr",
+            "active": 0,
+            "pivot": {
+              "package_languageable_type": "Modules\\Package\\Entities\\PackageCountry",
+              "package_languageable_id": 2,
+              "package_language_id": 3
+            },
+            "translations": [{
+              "id": 6,
+              "package_language_id": 3,
+              "deleted_at": null,
+              "created_at": "2024-06-13T08:21:38.000000Z",
+              "updated_at": "2024-06-13T08:21:38.000000Z",
+              "locale": "en",
+              "active": 0,
+              "name": "French",
+              "code": "fr"
+            }, {
+              "id": 5,
+              "package_language_id": 3,
+              "deleted_at": null,
+              "created_at": "2024-06-13T08:21:38.000000Z",
+              "updated_at": "2024-06-13T08:21:38.000000Z",
+              "locale": "tr",
+              "active": 1,
+              "name": "Frans\u0131zca",
+              "code": "fr"
+            }]
+          }]
+        }]
+      }
+    },
+    "filterEndpoint": {
+      "packageCountry": "\/packages\/package-countries\/{package_country}"
+    },
+    "event": "formatFilter:2.packages:items:group|formatPreview:schema.$group.items.*.name:items"
+  },
+  "packages": {
+    "type": "input-tab-group",
+    "hint": "",
+    "placeholder": "",
+    "errorMessages": [],
+    "col": {
+      "cols": 12,
+      "class": "pb-2 pt-2"
+    },
+    "offset": {
+      "offset": 0,
+      "offset-sm": 0,
+      "offset-md": 0,
+      "offset-lg": 0,
+      "offset-xl": 0
+    },
+    "order": {
+      "order": 0,
+      "order-sm": 0,
+      "order-md": 0,
+      "order-lg": 0,
+      "order-xl": 0
+    },
+    "prependIcon": "",
+    "prependInnerIcon": "",
+    "appendIcon": "",
+    "appendInnerIcon": "",
+    "density": "comfortable",
+    "variant": "outlined",
+    "clearable": true,
+    "name": "packages",
+    "default": [],
+    "tabFields": {
+      "package_id": "packages",
+      "packageLanguages": "packageLanguages"
+    },
+    "ext": "preview:items.*.name,items.*.packages.*.name,items.*.packageLanguages.*.name:*key,*.package_id,*.packageLanguages",
+    "schema": {
+      "package_id": {
+        "type": "input-comparison-table",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "col": {
+          "cols": 12,
+          "class": "pb-2 pt-2"
+        },
+        "offset": {
+          "offset": 0,
+          "offset-sm": 0,
+          "offset-md": 0,
+          "offset-lg": 0,
+          "offset-xl": 0
+        },
+        "order": {
+          "order": 0,
+          "order-sm": 0,
+          "order-md": 0,
+          "order-lg": 0,
+          "order-xl": 0
+        },
+        "prependIcon": "",
+        "prependInnerIcon": "",
+        "appendIcon": "",
+        "appendInnerIcon": "",
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": true,
+        "name": "package_id",
+        "label": "PACKAGES | DEFAULT COUNTRY",
+        "rules": "required",
+        "comparators": {
+          "packageFeatures": {
+            "key": "packageFeatures",
+            "eager": "packages.packageFeatures",
+            "field": "description"
+          },
+          "prices": {
+            "key": "prices_show",
+            "title": "PRICE",
+            "eager": "packages.prices",
+            "itemClasses": "text-success font-weight-bold"
+          }
+        },
+        "class": "required"
+      },
+      "packageLanguages": {
+        "type": "input-checklist",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "col": {
+          "cols": 12,
+          "class": "pb-2 pt-2"
+        },
+        "offset": {
+          "offset": 0,
+          "offset-sm": 0,
+          "offset-md": 0,
+          "offset-lg": 0,
+          "offset-xl": 0
+        },
+        "order": {
+          "order": 0,
+          "order-sm": 0,
+          "order-md": 0,
+          "order-lg": 0,
+          "order-xl": 0
+        },
+        "prependIcon": "",
+        "prependInnerIcon": "",
+        "appendIcon": "",
+        "appendInnerIcon": "",
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": true,
+        "label": "Distribution Languages for $*.name",
+        "name": "packageLanguages",
+        "eager": "packageLanguages",
+        "rules": "array|min:2|max:3",
+        "_moduleName": "Package",
+        "_routeName": "PackageLanguage",
+        "itemValue": "id",
+        "itemTitle": "name",
+        "default": [],
+        "cascadeKey": "items",
+        "items": [{
+          "id": 1,
+          "name": "Turkish"
+        }, {
+          "id": 2,
+          "name": "English"
+        }, {
+          "id": 3,
+          "name": "French"
+        }]
+      }
+    },
+    "eagers": ["packages.packageFeatures", "packages.prices", "packageLanguages"],
+    "event": "formatPreview:items.*.name,items.*.packages.*.name,items.*.packageLanguages.*.name:*key,*.package_id,*.packageLanguages"
+  },
+  "sessions": {
+    "type": "input-repeater",
+    "hint": "",
+    "placeholder": "",
+    "errorMessages": [],
+    "col": {
+      "cols": 12,
+      "class": "pb-2 pt-2",
+      "sm": 12,
+      "md": 12,
+      "lg": 12,
+      "xl": 12
+    },
+    "offset": {
+      "offset": 0,
+      "offset-sm": 0,
+      "offset-md": 0,
+      "offset-lg": 0,
+      "offset-xl": 0
+    },
+    "order": {
+      "order": 0,
+      "order-sm": 0,
+      "order-md": 0,
+      "order-lg": 0,
+      "order-xl": 0
+    },
+    "prependIcon": "",
+    "prependInnerIcon": "",
+    "appendIcon": "",
+    "appendInnerIcon": "",
+    "density": "comfortable",
+    "variant": "outlined",
+    "withGutter": true,
+    "name": "sessions",
+    "translated": true,
+    "label": "Fill Session Information",
+    "default": [],
+    "max": 3,
+    "draggable": true,
+    "rowAttribute": {
+      "noGutters": true
+    },
+    "schema": {
+      "start_time": {
+        "type": "text",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "col": {
+          "cols": 12,
+          "class": "pb-2 pt-2"
+        },
+        "offset": {
+          "offset": 0,
+          "offset-sm": 0,
+          "offset-md": 0,
+          "offset-lg": 0,
+          "offset-xl": 0
+        },
+        "order": {
+          "order": 0,
+          "order-sm": 0,
+          "order-md": 0,
+          "order-lg": 0,
+          "order-xl": 0
+        },
+        "prependIcon": "",
+        "prependInnerIcon": "",
+        "appendIcon": "",
+        "appendInnerIcon": "",
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": true,
+        "ext": "time",
+        "name": "start_time",
+        "label": "Start Time",
+        "default": "12:12",
+        "translated": false
+      },
+      "description": {
+        "type": "textarea",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "col": {
+          "cols": 12,
+          "class": "pb-2 pt-2"
+        },
+        "offset": {
+          "offset": 0,
+          "offset-sm": 0,
+          "offset-md": 0,
+          "offset-lg": 0,
+          "offset-xl": 0
+        },
+        "order": {
+          "order": 0,
+          "order-sm": 0,
+          "order-md": 0,
+          "order-lg": 0,
+          "order-xl": 0
+        },
+        "prependIcon": "",
+        "prependInnerIcon": "",
+        "appendIcon": "",
+        "appendInnerIcon": "",
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": true,
+        "name": "description",
+        "label": "Description",
+        "translated": false
+      }
+    },
+    "autoIdGenerator": true,
+    "orderKey": "position",
+    "singularLabel": "Fill Session Information"
+  },
+  "settings": {
+    "type": "group",
+    "hint": "",
+    "placeholder": "",
+    "errorMessages": [],
+    "col": {
+      "cols": 12,
+      "class": "pb-2 pt-2"
+    },
+    "offset": {
+      "offset": 0,
+      "offset-sm": 0,
+      "offset-md": 0,
+      "offset-lg": 0,
+      "offset-xl": 0
+    },
+    "order": {
+      "order": 0,
+      "order-sm": 0,
+      "order-md": 0,
+      "order-lg": 0,
+      "order-xl": 0
+    },
+    "prependIcon": "",
+    "prependInnerIcon": "",
+    "appendIcon": "",
+    "appendInnerIcon": "",
+    "density": "comfortable",
+    "variant": "outlined",
+    "clearable": true,
+    "name": "settings",
+    "label": "Settings",
+    "schema": {
+      "accept-guest-entries": {
+        "type": "checkbox",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "col": {
+          "cols": 12,
+          "class": "pb-2 pt-2"
+        },
+        "offset": {
+          "offset": 0,
+          "offset-sm": 0,
+          "offset-md": 0,
+          "offset-lg": 0,
+          "offset-xl": 0
+        },
+        "order": {
+          "order": 0,
+          "order-sm": 0,
+          "order-md": 0,
+          "order-lg": 0,
+          "order-xl": 0
+        },
+        "prependIcon": "",
+        "prependInnerIcon": "",
+        "appendIcon": "",
+        "appendInnerIcon": "",
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": true,
+        "name": "accept-guest-entries",
+        "label": "Accept Guest Entries",
+        "default": 0,
+        "color": "success",
+        "trueValue": 1,
+        "falseValue": 0,
+        "hideDetails": true,
+        "parentName": "settings"
+      },
+      "limit-per-participant": {
+        "type": "text",
+        "hint": "",
+        "placeholder": "",
+        "errorMessages": [],
+        "col": {
+          "cols": 12,
+          "class": "pb-2 pt-2"
+        },
+        "offset": {
+          "offset": 0,
+          "offset-sm": 0,
+          "offset-md": 0,
+          "offset-lg": 0,
+          "offset-xl": 0
+        },
+        "order": {
+          "order": 0,
+          "order-sm": 0,
+          "order-md": 0,
+          "order-lg": 0,
+          "order-xl": 0
+        },
+        "prependIcon": "",
+        "prependInnerIcon": "",
+        "appendIcon": "",
+        "appendInnerIcon": "",
+        "density": "comfortable",
+        "variant": "outlined",
+        "clearable": true,
+        "name": "limit-per-participant",
+        "label": "Limit Per Participant",
+        "default": 1,
+        "ext": "number",
+        "parentName": "settings"
+      }
+    },
+    "typeInt": "sheet",
+    "title": "Settings",
+    "default": {
+      "accept-guest-entries": 0,
+      "limit-per-participant": 1
+    }
+  }
+}

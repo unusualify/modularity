@@ -7,11 +7,10 @@ export default {
   },
   data () {
     return {
-      csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-      sidebarToggle: false,
-      miniStatus: false,
-      hasRailMode : true,
-      showIcon: true,
+      // csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+      // miniStatus: false,
+      // hasRailMode : true,
+      // showIcon: true,
     }
   },
   computed: {

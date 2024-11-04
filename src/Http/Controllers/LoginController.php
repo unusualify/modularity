@@ -167,6 +167,15 @@ class LoginController extends Controller
                 // 'hasSubmit' => true,
 
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
+                'title' => [
+                    'text' => __('authentication.login-title'),
+                    'tag' => 'h1',
+                    'type' => 'h5',
+                    'weight' => 'bold',
+                    'transform' => '',
+                    'align' => 'center',
+                    'justify' => 'center',
+                ],
                 'schema' => ($schema = $this->createFormSchema([
                     'email' => [
                         'type' => 'text',
@@ -209,10 +218,10 @@ class LoginController extends Controller
                     'elements' => [
                         [
                             'tag' => 'v-btn',
-                            'elements' => __('authentication.have-an-account'),
+                            'elements' => __('authentication.forgot-password'),
                             'attributes' => [
                                 'variant' => 'text',
-                                'href' => '',
+                                'href' => route('admin.password.reset.link'),
                                 'class' => 'v-col-5',
                             ],
                         ],
@@ -280,7 +289,7 @@ class LoginController extends Controller
                             'elements' => ___('authentication.create-an-account'),
                             'attributes' => [
                                 'variant' => 'outlined',
-                                'href' => route(Route::hasAdmin('login.form')),
+                                'href' => route('admin.register.form'),
                                 'class' => 'my-5 custom-auth-button',
                             ],
 

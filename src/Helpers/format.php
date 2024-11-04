@@ -329,6 +329,7 @@ if (! function_exists('modelShowFormat')) {
         if (in_array('Oobook\Priceable\Traits\HasPriceable', class_uses_recursive($model))) {
             // dd($model->priceFormatted);
             $model['prices_show'] = $model->price_formatted;
+            $model['price_show'] = $model->price_formatted;
             // $model['prices_show'] = "<span class='text-success font-weight-bold'> {$model->price_formatted} </span>";
         }
 
