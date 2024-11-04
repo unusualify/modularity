@@ -250,13 +250,13 @@ export default {
               let __displayData = {
                 _title: __displayLabel,
                 _type: input.type,
-                _value: {}
+                _value: null
               }
               // let _name = __moduleTranslationName(_key)
               let _value = obj[_key];
               let _haystack = item[_map];
               if (Array.isArray(_value) && _haystack) {
-                __displayData[_key] = _value.map(id => {
+                __displayData._value = _value.map(id => {
                   let item = _haystack.find(i => i.id === id);
                   return item ? item.title || item.name : 'N/A';
                 })
@@ -266,7 +266,7 @@ export default {
                   _value = item ? item.title || item.name : _value;
                   // __log(id, _key, _map, _displayData, _value)
 
-                  __displayData[_key] = _value;
+                  __displayData._value = _value;
                   let __displayKeys = this.$getDisplayKeys(item);
                   for(const displayKey in __displayKeys){
                     if(!__displayData[displayKey]){
