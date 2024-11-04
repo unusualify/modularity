@@ -85,6 +85,6 @@ export default function useSidebar () {
 
   return {
     ...toRefs(state),
-    methods
+    ...toRefs(methods)
   }
 }
