@@ -333,11 +333,12 @@
       }
     },
     created () {
-
+      if(this.$vuetify.display.mdAndDown){
+        this.$store.commit(CONFIG.SET_SIDEBAR, false)
+      }
     },
 
     mounted () {
-
     },
 
     methods: {
