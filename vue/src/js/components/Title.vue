@@ -7,12 +7,15 @@
       'd-flex'
     ]"
   >
-    <!-- <slot v-bind="{text}">
+    <slot v-bind="{text}">
       {{ text }}
-    </slot> -->
-    <slot v-bind="{right}">
+    </slot>
+    <slot name="right">
 
     </slot>
+    <!-- <slot v-bind="{right}">
+
+    </slot> -->
     <!-- <slot name="description" v-bind="{subTitle}">
       <div :class="[(!paddingReset ? paddingClasses: []), descriptionClasses]">
         {{ subTitle ?? '' }}
@@ -51,9 +54,12 @@ const props = defineProps({
     type: String,
     default: 'primary'
   },
+  bg: {
+    type: String
+  },
   padding: {
     type: String,
-    default: 'a-theme-semi',
+    default: 'a-3',
   },
   margin: {
     type: String,
@@ -88,6 +94,7 @@ const props = defineProps({
 
 const titleClasses = computed(() => [
   `text-${props.type}`,
+  props.bg ? `bg-${props.bg}` : '',
   `text-${props.color}`,
   `text-${props.transform}`,
   `font-weight-${props.weight}`,
@@ -100,7 +107,7 @@ const titleClasses = computed(() => [
 </script>
 
 <style lang="sass" scoped>
-.ue-title
-  display: flex
-  flex-direction: column
+  .ue-title
+    display: flex
+    flex-direction: column
 </style>
