@@ -32,9 +32,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table(config('payable.table'), function (Blueprint $table) {
+            $table->dropForeign(['payment_service_id']);
             $table->dropColumn('payment_service_id');
+            $table->dropForeign(['price_id']);
             $table->dropColumn('price_id');
             $table->integer('currency_id')->nullable(false)->change();
         });
+
     }
 };
