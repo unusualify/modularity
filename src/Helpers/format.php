@@ -75,7 +75,7 @@ if (! function_exists('makeForeignKey')) {
 if (! function_exists('makeMorphName')) {
     function makeMorphName($string)
     {
-        return Str::singular($string) . 'able';
+        return snakeCase(Str::singular($string) . 'able');
     }
 }
 

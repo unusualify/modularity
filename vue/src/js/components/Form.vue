@@ -224,7 +224,10 @@ export default {
         return {}
       }
     },
-    valid: null
+    valid: null,
+    isEditing: {
+      type: Number,
+    }
   },
   setup (props, context) {
     const inputHandlers = useInputHandlers()
@@ -277,11 +280,10 @@ export default {
     this.model = getModel(
       this.rawSchema,
       this.issetModel ? this.modelValue : this.editedItem,
-      this.$store.state
+      this.$store.state,
     )
-
-    this.inputSchema = this.invokeRuleGenerator(getSchema(this.rawSchema, this.model))
-
+    this.inputSchema = this.invokeRuleGenerator(getSchema(this.rawSchema, this.model, this.isEditing))
+    // console.log(this.inputSchema);
     this.resetSchemaErrors()
   },
 

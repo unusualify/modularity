@@ -176,6 +176,7 @@
                   <ue-form
                     ref="form"
                     :title="formTitle"
+                    :isEditing="editedIndex"
                   />
                 </v-card-text>
                 <v-divider/>
@@ -202,7 +203,12 @@
               :style="formStyles">
               <v-expand-transition>
                 <v-card class="mb-theme" elevation="4" v-if="formActive">
-                  <ue-form has-submit button-text="save" :title="formTitle" ref="form">
+                  <ue-form
+                    has-submit
+                    button-text="save"
+                    :title="formTitle"
+                    ref="form"
+                    :isEditing="editedIndex">
                     <template v-slot:headerRight>
                       <v-btn class="" variant="text" icon="$close" density="compact"
                         @click="closeForm()"
