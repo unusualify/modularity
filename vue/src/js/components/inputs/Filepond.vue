@@ -266,7 +266,7 @@ export default {
         },
       }
     },
-    csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+    // csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
     input: {
       get(){
         return this.modelValue ?? []
