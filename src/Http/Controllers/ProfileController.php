@@ -91,7 +91,7 @@ class ProfileController extends BaseController
             [
                 UComponent::makeUeForm()
                     ->setAttributes([
-                        'class' => 'mb-theme',
+                        'class' => 'mb-6',
                         'title' => ___('Personal Information'),
                         'buttonText' => 'update',
                         'hasSubmit' => true,
@@ -339,7 +339,7 @@ class ProfileController extends BaseController
 
         activity()->performedOn($item)->log('updated');
 
-        return $this->respondWithSuccess(___('save-success'));
+        return $this->respondWithSuccess(___('messages.save-success'));
 
     }
 
@@ -370,7 +370,7 @@ class ProfileController extends BaseController
 
         activity()->performedOn($item)->log('updated');
 
-        return $this->respondWithSuccess(___('save-success'));
+        return $this->respondWithSuccess(___('messages.save-success'));
 
     }
 }
