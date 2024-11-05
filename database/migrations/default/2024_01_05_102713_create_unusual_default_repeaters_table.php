@@ -26,7 +26,7 @@ class CreateUnusualDefaultRepeatersTable extends Migration
                 $table->string('locale', 6)->index();
                 $table->timestamps();
                 $table->softDeletes();
-                $table->index(['repeatable_type', 'repeatable_id']);
+                // $table->index(['repeatable_type', 'repeatable_id']);
             });
         }
     }
