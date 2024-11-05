@@ -13,13 +13,15 @@
             class="ue-stepper-item__icon--border25"
             >
             <template v-slot:title="titleScope">
-              <span :class="[ (titleScope.hasCompleted || titleScope.step == activeStep) ? 'text-info font-weight-bold' : '' ]">{{ titleScope.title }}</span>
+              <div @click="goStep(i+1)" style="cursor: pointer">
+                <span :class="[ (titleScope.hasCompleted || titleScope.step == activeStep) ? 'text-info font-weight-bold' : '' ]">{{ titleScope.title }}</span>
+              </div>
             </template>
           </v-stepper-item>
 
-          <v-divider
+          <!-- <v-divider
             v-if="i+1 !== forms.length"
-          ></v-divider>
+          ></v-divider> -->
         </template>
         <v-stepper-item
             :complete="activeStep > forms.length"
@@ -39,14 +41,16 @@
       <v-row class="mt-4 flex-fill">
         <v-col cols="8" lg="8" v-fit-grid>
           <v-sheet class="ue-stepper-form__body d-flex flex-column justify-space-between">
-            <v-stepper-window class="fill-height">
+            <v-stepper-window class="fill-height overflow-y-auto" style="max-height: 80vh;">
               <v-stepper-window-item
                 v-for="(form, i) in forms"
                 :key="`content-${i}`"
                 :value="i+1"
+                class="px-6 py-4"
               >
                 <ue-form
                   v-if="activeStep > i"
+                  formClass=""
                   :ref="formRefs[i]"
                   :id="`stepper-form-${i+1}`"
                   v-model="models[i]"
@@ -57,9 +61,10 @@
               </v-stepper-window-item>
               <v-stepper-window-item
                 :value="forms.length +1"
+                class="px-6 py-4"
               >
                 <slot name="preview">
-                  <v-sheet class="px-6 py-4">
+                  <v-sheet class="">
                     <ue-title weight="medium" color="black" padding="a-0">{{ $t('Preview & Summary').toUpperCase() }}</ue-title>
                     <v-row>
                       <template v-for="(context, index) in formattedPreview" :key="`summary-${index}`">
@@ -143,6 +148,7 @@
             </v-stepper-window>
 
             <v-stepper-actions
+              v-if="false"
               ref="stepperActionRef"
               :disabled="disabled"
               @click:next="next"
@@ -270,7 +276,9 @@
                         <tr class="py-0">
                           <td class="border-0 h-auto py-1 pl-0 text-h5">{{ $t('Total').toUpperCase() }}</td>
                           <td class="border-0 h-auto py-1 d-flex justify-end pr-0 font-weight-bold">
-                            <ue-text-display class="text-h5" :text="`$2500`" subText="+ VAT" />
+                            <slot name="final.total" v-bind="{payload: this.payload}">
+                              <ue-text-display class="text-h5" :text="`$2500`" subText="+ VAT" />
+                            </slot>
                           </td>
                         </tr>
                       </tbody>
@@ -278,13 +286,17 @@
 
                     <!-- Description -->
                     <div class="text-caption text-grey mb-6">
-                      At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium iusto odio
+                      <slot name="final.description">
+                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium iusto odio
+                      </slot>
                     </div>
                   </v-theme-provider>
 
 
                   <v-sheet class="pb-0 px-0 ue-stepper-form__preview-bottom" style="background-color: #005868;">
                     <v-btn-cta class="v-stepper-form__nextButton" block
+                      :disabled="loading || isCompleted"
+                      :loading="loading"
                       @click="completeForm"
                       >
                       {{ $t('Complete').toUpperCase() }}
@@ -300,7 +312,23 @@
 
       </v-row>
 
+      <ue-modal
+        ref="modal"
+        v-model="modalActive"
+        :width-type="'lg'"
+        cancel-text="$t('Cancel')"
+        confirm-text="$t('Cancel')"
+        :description-text="modalMessage"
+      >
+        <template v-slot:body.options>
+          <v-btn variant="outlined" color="primary" @click="completed">
+            {{ $t('Ok') }}
+          </v-btn>
+        </template>
+      </ue-modal>
+
     </template>
+
   </v-stepper>
 </template>
 
@@ -343,6 +371,10 @@ export default {
         }
       }
     },
+    redirectUrl: {
+      type: String,
+      default: null
+    },
     preview: {
       type: Array,
       default: []
@@ -383,14 +415,22 @@ export default {
             nested: true,
             outputFormat: 'object',
             items: [
+              [
+                'content.date',
+                'content.fullname',
+                'content.email',
+                'content.phone',
+              ],
               {
                 pattern: 'content.content-type',
                 simpleValue: true  // Only affects this pattern
               },
               [
-                'content.date',
-                'content.time',
-                'content.timezone'
+                {
+                  pattern: 'regex:^\\d+_content$',  // Matches 1_content, 2_content, etc.
+                  simpleValue: true
+                },
+                'content.press_release_images',
               ]
             ]
           }
@@ -403,9 +443,11 @@ export default {
     const validations = useValidation(props)
 
     const stepperActionRef = ref(null)
+    const loading = ref(false)
 
     const state = reactive({
       stepperActionRef,
+      loading,
     })
 
     const formRefs = computed(() => map(props.forms, (m,i) => ref(null) ))
@@ -420,52 +462,52 @@ export default {
   data () {
     return {
       activeStep: this.currentStep,
-      // models: this.schema.map(() => {return {}})
+      modalActive: false,
+      modalMessage: '',
+      isCompleted: false,
 
       schemas: [],
       models: [],
       valids: [],
 
-      previewModel: [
-        // {
-        //   locations: ['United States', 'France', 'Turkey'],
-        // },
-        // {
-        //   packages: [
-        //     ['United States', 'Wire', '(English, German, Turkish)'],
-        //     ['France', 'Premium', '(English, French)']
-        //   ],
-        // },
-      ],
-
-      // schemas: this.forms.map((form) => form.schema),
-      // models: this.schemas.map((schema) => getModel())
+      previewModel: [],
     }
   },
   methods: {
+    completed(){
+      this.modalActive = false
+      if(this.redirectUrl){
+        window.location.href = this.redirectUrl
+      }
+    },
     completeForm (){
-      const formData = reduce(this.models, function(acc, model, index){
-        return {...acc, ...model}
-      }, {})
+      const method = this.payload?.id ? 'put' :'post'
+      const self = this
 
+      // __log(JSON.stringify(this.schemas, null, 2))
+      // __log(JSON.stringify(this.models, null, 2))
+      // __log(JSON.stringify(this.displayInfo, null, 2))
+      // __log(JSON.stringify(this.previewModel, null, 2))
       // __log(formData)
-      const method = formData?.id ? 'put' :'post'
 
-      api[method](this.actionUrl, formData, function (response) {
-        // self.formLoading = false
-        __log(response.data)
+      this.loading = true
+      api[method](this.actionUrl, this.payload, function (response) {
+        self.loading = false
+        self.isCompleted = true
+        self.modalMessage = response.data.message
+        self.modalActive = true
         // redirector(response.data)
 
         // if (callback && typeof callback === 'function') callback(response.data)
       }, function (response) {
-        // self.formLoading = false
+        self.formLoading = false
         __log(response)
         // if (errorCallback && typeof errorCallback === 'function') errorCallback(response.data)
       })
       return
       // const formData = getSubmitFormData(this.rawSchema, this.model, this.$store._state.data)
       // const method = Object.prototype.hasOwnProperty.call(formData, 'id') ? 'put' : 'post'
-      const self = this
+      // const self = this
 
       api[method](this.actionUrl, formData, function (response) {
         self.formLoading = false
@@ -526,6 +568,13 @@ export default {
       this.valids[index] = val
       // __log('valid changed', index, val, this.valids)
     },
+    goStep(step){
+      // all previous steps are valid
+      if(this.valids.slice(0, step-1).every(v => v === true)){
+        this.activeStep = step
+        // __log('goStep', step, this.valids)
+      }
+    },
     async goNextForm(callback, index) {
       // __log(this.formRefs[index].value[0].validModel)
       if(this.formRefs[index].value[0].validModel === true){
@@ -536,36 +585,23 @@ export default {
       // callback()
     },
     async nextForm(index) {
-      // __log(this.formRefs[index].value[0].validModel)
-      // __log(this.stepperActionRef, this.$refs.stepperActionRef.$slots.next())
+
       if(this.formRefs[index].value[0].validModel === true){
         this.activeStep += 1
         // callback()
       }else if(index < this.forms.length) {
         await this.validateForm(index)
       }
-      // callback()
     },
     async validateForm(i) {
       const formRef = this.formRefs[i]
-
       formRef.value[0].manualValidation = true
 
       const result = await formRef.value[0].validate()
-
       formRef.value[0].manualValidation = false
 
-
       return result
-    },
-    getLocationPrice(location){
-      const currencyPackages = location.currencyPackages;
-      let packageId = this.models[1].pressReleasePackages[location.id]?.package_id
-      packageId = this.$lodash.isString(packageId) ? parseInt(packageId) : packageId
-
-      return this.$lodash.find(currencyPackages, ['id', packageId ])?.prices_show;
-    },
-
+    }
   },
   computed: {
     disabled () {
@@ -612,6 +648,13 @@ export default {
     },
     formattedPreview(){
       return NotationUtil.formattedPreview(this.displayInfo, this.previewNotations)
+    },
+
+    payload(){
+      __log(this.models)
+      return reduce(this.models, function(acc, model, index){
+        return {...acc, ...model}
+      }, {})
     }
   },
   watch: {
@@ -640,7 +683,7 @@ export default {
     }
   },
   created() {
-    NotationUtil.test()
+    // NotationUtil.test()
 
     let self = this
     this.forms.forEach((form, index) => {

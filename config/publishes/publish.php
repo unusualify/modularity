@@ -56,7 +56,7 @@ return [
         'formatter' => [],
     ],
     'default_table_attributes' => [
-        'embeddedForm' => true,
+        'embeddedForm' => false,
         'createOnModal' => true,
         'editOnModal' => true,
         'formWidth' => '60%',
