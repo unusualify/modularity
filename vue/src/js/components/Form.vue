@@ -33,7 +33,7 @@
           </ue-title>
           <v-custom-form-base
             :id="`ue-wrapper-${id}`"
-            class="pt-5"
+            class="pt-4"
 
             v-model="model"
             v-model:schema="inputSchema"
