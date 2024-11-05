@@ -3,6 +3,16 @@ import { find, omitBy, reduce, cloneDeep, map, findIndex, snakeCase, orderBy, ge
 
 const searchInData = (data, pattern) => {
   const results = [];
+
+  // Handle pattern objects and normalize pattern
+  if (typeof pattern === 'object' && pattern.pattern) {
+    pattern = pattern.pattern;
+  }
+
+  // Ensure pattern is a string and handle regex patterns
+  if (typeof pattern !== 'string') return results;
+  if (pattern.startsWith('regex:')) return results; // Skip regex patterns, handled elsewhere
+
   const patternParts = pattern.split('.');
 
   const search = (obj, dataIndex, currentPath = [], depth = 0, parentTitle = null) => {
@@ -46,13 +56,36 @@ const formatResult = (dataIndex, path, value, title, parentTitle) => {
   return result;
 }
 
-// const matchesPattern = (path, pattern) => {
-//   const pathParts = path.split('.').filter(part => part !== '_value' && part !== '*');
-//   const patternParts = pattern.split('.');
-//   return pathParts.slice(1).join('.') === patternParts.join('.'); // Ignore the first part (dataIndex)
-// }
-
 const findMatchingNotations = (data, pattern) => {
+  // Handle pattern objects
+  if (typeof pattern === 'object' && pattern.pattern) {
+    pattern = pattern.pattern;
+  }
+
+  // Handle regex patterns
+  if (typeof pattern === 'string' && pattern.startsWith('regex:')) {
+    const regexStr = pattern.replace('regex:', '')
+                           .replace('content.', ''); // Remove content. prefix if exists
+    const regex = new RegExp(regexStr);
+    const matches = [];
+
+    // Look through the data structure
+    for (const item of data) {
+      if (item.content) {
+        Object.entries(item.content).forEach(([key, value]) => {
+          if (regex.test(key)) {
+            matches.push({
+              key,
+              value: value // This will include _title and _value
+            });
+          }
+        });
+      }
+    }
+    return matches;
+  }
+
+  // Handle normal patterns
   return searchInData(data, pattern);
 }
 
@@ -169,13 +202,35 @@ const formattedPreview = (data, formation) => {
 
   // Helper to find the parent key of a field in the source data
   const findPrefix = (data, fieldPattern) => {
-    // Look through top level objects in data
+    if (typeof fieldPattern === 'object' && fieldPattern.pattern) {
+      fieldPattern = fieldPattern.pattern;
+    }
+
+    const patternParts = parsePattern(fieldPattern);
+    if (!patternParts.length) return '';
+
+    if (patternParts[0].startsWith('regex:')) {
+      const matches = [];
+      for (const item of data) {
+        for (const [key, value] of Object.entries(item)) {
+          if (typeof value === 'object' && value !== null) {
+            const hasField = Object.keys(value).some(k =>
+              matchesPattern(patternParts[0], k)
+            );
+            if (hasField) {
+              matches.push(key);
+            }
+          }
+        }
+      }
+      return matches.length ? matches : '';
+    }
+
+    // Original prefix finding logic
     for (const item of data) {
       for (const [key, value] of Object.entries(item)) {
         if (typeof value === 'object' && value !== null) {
-          // Check if this object contains our target field
-          const hasField = fieldPattern.split('.')[0];
-          if (hasField in value) {
+          if (patternParts[0] in value) {
             return key;
           }
         }
@@ -194,6 +249,36 @@ const formattedPreview = (data, formation) => {
 
   // Helper to generate section key
   const generateSectionKey = (index = 0) => `section_${index + 1}`;
+
+  // Add new helper for regex pattern matching
+  const matchesPattern = (pattern, key) => {
+    if (typeof pattern !== 'string') return false;
+    if (pattern.startsWith('regex:')) {
+      const regexStr = pattern.replace('regex:', '');
+      const regex = new RegExp(regexStr);
+      return regex.test(key);
+    }
+    return pattern === key;
+  };
+
+  // Helper to parse pattern path
+  const parsePattern = (pattern) => {
+    if (typeof pattern === 'object' && pattern.pattern) {
+      pattern = pattern.pattern;
+    }
+    if (typeof pattern !== 'string') return [];
+
+    // For regex patterns, return the full pattern
+    if (pattern.startsWith('regex:')) {
+      // Extract the content part for regex patterns
+      const contentPattern = pattern.includes('content.')
+        ? pattern.replace('regex:content.', 'regex:')
+        : pattern;
+      return ['content', contentPattern];
+    }
+
+    return pattern.split('.');
+  };
 
   // Process each formatting instruction
   for (const context of formation) {
@@ -332,34 +417,91 @@ const formattedPreview = (data, formation) => {
               }
             }
           } else {
-            // Handle object pattern with potential simpleValue
+            // Handle object pattern with regex support
             const pattern = item.pattern;
-            const prefix = findPrefix(data, pattern);
-            const fullPattern = prefix ? `${prefix}.${pattern}` : pattern;
 
-            const matches = findMatchingNotations(data, fullPattern);
-            matches.forEach(match => {
-              if (match.value && match.value._value) {
-                if (item.simpleValue) {
-                  // For simpleValue, just store the value directly
-                  if (context.nested) {
-                    result.items[generateSectionKey(sectionIndex)] = match.value._value;
+            if (pattern.startsWith('regex:')) {
+              const matches = findMatchingNotations(data, pattern);
+              const contentValues = {};
+
+              matches.forEach((match) => {
+                if (match.value && match.value._value) {
+                  if (item.simpleValue) {
+                    contentValues[match.key] = match.value._value;
                   } else {
-                    result.items = match.value._value;
-                  }
-                } else {
-                  // Original behavior
-                  const itemObject = {
-                    [match.value._title]: match.value._value
-                  };
-                  if (context.nested) {
-                    result.items[generateSectionKey(sectionIndex)] = itemObject;
-                  } else {
-                    Object.assign(result.items, itemObject);
+                    contentValues[match.value._title] = match.value._value;
                   }
                 }
+              });
+
+              if (Object.keys(contentValues).length > 0) {
+                if (context.nested) {
+                  result.items[generateSectionKey(sectionIndex)] = contentValues;
+                } else {
+                  Object.assign(result.items, contentValues);
+                }
               }
-            });
+            } else {
+              const prefixes = findPrefix(data, pattern);
+
+              if (Array.isArray(prefixes)) {
+                // Handle regex matches
+                prefixes.forEach((prefix, idx) => {
+                  const matches = findMatchingNotations(data, pattern);
+                  matches.forEach(match => {
+                    // Get the actual value from the data structure
+                    const contentValue = data.find(d => d.content)?.[match.key];
+                    if (contentValue && contentValue._value) {
+                      if (item.simpleValue) {
+                        if (context.nested) {
+                          result.items[generateSectionKey(idx)] = contentValue._value;
+                        } else {
+                          result.items[`content_${idx + 1}`] = contentValue._value;
+                        }
+                      } else {
+                        const itemObject = {
+                          [contentValue._title]: contentValue._value
+                        };
+                        if (context.nested) {
+                          result.items[generateSectionKey(idx)] = itemObject;
+                        } else {
+                          Object.assign(result.items, itemObject);
+                        }
+                      }
+                    }
+                  });
+                });
+              } else {
+                // Handle object pattern with potential simpleValue
+                const pattern = item.pattern;
+                const prefix = findPrefix(data, pattern);
+                const fullPattern = prefix ? `${prefix}.${pattern}` : pattern;
+
+                const matches = findMatchingNotations(data, fullPattern);
+                matches.forEach(match => {
+                  if (match.value && match.value._value) {
+                    if (item.simpleValue) {
+                      // For simpleValue, just store the value directly
+                      if (context.nested) {
+                        result.items[generateSectionKey(sectionIndex)] = match.value._value;
+                      } else {
+                        result.items = match.value._value;
+                      }
+                    } else {
+                      // Original behavior
+                      const itemObject = {
+                        [match.value._title]: match.value._value
+                      };
+                      if (context.nested) {
+                        result.items[generateSectionKey(sectionIndex)] = itemObject;
+                      } else {
+                        Object.assign(result.items, itemObject);
+                      }
+                    }
+                  }
+                });
+              }
+            }
           }
         } else {
           // Handle string pattern
@@ -406,8 +548,9 @@ const test = () => {
   //   console.log(pattern, findMatchingNotations(sampleSource, pattern), sampleSource)
   // })
 
-  __log(JSON.stringify(formattedPreview(sampleSource, samplePreview), null, 2))
+  // __log(JSON.stringify(formattedPreview(sampleSource, samplePreview), null, 2))
 }
+
 
 export default {
   findMatchingNotations,
@@ -434,21 +577,27 @@ const samplePreview = [
     mapArrayItems: false,
   },
   {
+    col: 12,
     title: 'Press Release Content',
     nested: true,
     outputFormat: 'object',
     items: [
+      [
+        'content.date',
+        'content.fullname',
+        'content.email',
+        'content.phone',
+      ],
       {
         pattern: 'content.content-type',
         simpleValue: true  // Only affects this pattern
       },
       [
+        {
+          pattern: 'regex:^\\d+_content$',  // Matches 1_content, 2_content, etc.
+          simpleValue: true
+        },
         'content.press_release_images',
-      ],
-      [
-        'content.date',
-        'content.time',
-        'content.timezone'
       ]
     ]
   }
@@ -464,7 +613,8 @@ const sampleSource = [
       "_title": "Ülke",
       "_type": "input-checklist",
       "_value": [
-        "Turkey"
+        "Turkey",
+        "France"
       ]
     }
   },
@@ -481,9 +631,9 @@ const sampleSource = [
             "_title": "Paket ",
             "_type": "input-tab-group",
             "_value": "Wire",
-            "packageFeatures": "Ücretsiz Dağıtım, 10 yayın içeriği, SEO kurallarına uygun İngilizce basın bülteni yazımı (max. 400 kelime)",
-            "prices": "TRY 2.200,00",
-            "price": "TRY 2.200,00"
+            "packageFeatures": "Ücretsiz Dağıtım, 10 yayın içeriği, SEO kurallarına uygun İngilizce basın bülteni yazımı (max. 400 kelime), Seçilen medya listesine dağıtım, Partner haber sitelerine gönderim",
+            "prices": "€ 50,00",
+            "price": "€ 50,00"
           },
           "packageLanguages": {
             "_title": "Dağıtım Dili",
@@ -501,21 +651,20 @@ const sampleSource = [
           "package_id": {
             "_title": "Paket ",
             "_type": "input-tab-group",
-            "_value": "Premium",
+            "_value": "Wire",
             "packageFeatures": "Ücretsiz Dağıtım, 10 yayın içeriği, SEO kurallarına uygun İngilizce basın bülteni yazımı (max. 400 kelime), Seçilen medya listesine dağıtım, Partner haber sitelerine gönderim",
-            "prices": "TRY 1.000,00",
-            "price": "TRY 1.000,00"
+            "prices": "€ 46,00",
+            "price": "€ 46,00"
           },
           "packageLanguages": {
             "_title": "Dağıtım Dili",
             "_type": "input-tab-group",
             "_value": [
-              "Türkçe",
-              "İngilizce"
+              "İngilizce",
+              "Türkçe"
             ]
           }
         }
-
       ]
     }
   },
@@ -523,25 +672,30 @@ const sampleSource = [
     "content": {
       "_title": "Content",
       "_type": "group",
-      "date": {
-        "_title": "Date",
-        "_type": "text",
-        "_value": "2024-10-31"
-      },
-      "time": {
-        "_title": "Time",
-        "_type": "text",
-        "_value": "12:00"
-      },
-      "timezone": {
-        "_title": "Saat Dilimi",
-        "_type": "combobox",
-        "_value": "(UTC+02:00) Istanbul"
-      },
       "content-type": {
         "_title": "Content-type",
         "_type": "input-radio-group",
-        "_value": "I Have Press Release"
+        "_value": "I Have A Press Release"
+      },
+      "date": {
+        "_title": "Publication Date",
+        "_type": "text",
+        "_value": "2024-11-05"
+      },
+      "fullname": {
+        "_title": "Contact Person",
+        "_type": "text",
+        "_value": "Oğuzhan Bükçüoğlu"
+      },
+      "email": {
+        "_title": "Email",
+        "_type": "text",
+        "_value": "oguz.bukcuoglu@gmail.com"
+      },
+      "phone": {
+        "_title": "Phone Number",
+        "_type": "input-phone",
+        "_value": "+90 552 313 08 93"
       },
       "2_content": {
         "_title": "İngilizce Content",
@@ -551,7 +705,9 @@ const sampleSource = [
       "1_content": {
         "_title": "Türkçe Content",
         "_type": "input-filepond",
-        "_value": []
+        "_value": [
+          "Screenshot 2024-11-02 at 23.48.26.png"
+        ]
       },
       "press_release_images": {
         "_title": "Medias",
@@ -561,3 +717,6 @@ const sampleSource = [
     }
   }
 ]
+
+// console.log(JSON.stringify(formattedPreview(sampleSource, samplePreview), null, 2))
+
