@@ -353,9 +353,4 @@ return [
             'en' => 'EUR',
         ],
     ],
-    'default_payment_service' => [
-        'USD' => 'garanti-pos',
-        'EUR' => 'garanti-pos',
-        'TRY' => 'garanti-pos',
-    ],
 ];

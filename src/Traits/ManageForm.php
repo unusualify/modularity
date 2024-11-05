@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Traits;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
@@ -108,25 +109,67 @@ trait ManageForm
             return $this->getSchemaInput($input, $inputs);
         })->toArray();
     }
-
+    //TODO: create an filter for roles if role is not allowed to see that input it shouldn't see it you can check getSchemaInput last part
     protected function getSchemaInput($input, $inputs = [])
     {
 
         // $default_input = collect(Config::get(unusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
         // $default_input = $this->configureInput(array_to_object(Config::get(unusualBaseKey() . '.default_input')));
         $default_input = (array) Config::get(unusualBaseKey() . '.default_input');
+        // dd($default_input);
         [$hydrated, $spreaded] = $this->hydrateInput(object_to_array($input), $inputs);
 
         if ($spreaded) {
             return $hydrated;
         }
-
+        if(isset($input->allowedRoles)){
+            $roles = explode(",", $input->allowedRoles);
+            $user = Auth::user();
+        }
         return isset($hydrated['name'])
             // ? [ $input->name => $default_input->union( $this->configureInput($input) ) ]
             // ? [ $input['name'] => array_merge_recursive_preserve( $default_input, $this->configureInput($input) ) ]
             ? [$hydrated['name'] => $this->configureInput(array_merge_recursive_preserve($default_input, $hydrated))]
             : [];
     }
+
+    public function filterFormSchemaByRoles($schema) {
+        return array_filter(
+            array_map(function ($field) {
+
+                if(is_null(Auth::user()))
+                    return false;
+                // dd(is_null(Auth::user()));
+
+                if (isset($field['allowedRoles']) && !Auth::user()->hasRole($field['allowedRoles'])) {
+                    return null;
+                }
+
+                // dd($field, Auth::user()->roles);
+                if ($field['type'] === 'group' && isset($field['schema'])) {
+                    $field['schema'] = $this->filterFormSchemaByRoles($field['schema']);
+
+                    if (empty($field['schema'])) {
+                        return null;
+                    }
+                }
+
+                if ($field['type'] === 'wrap' && isset($field['schema'])) {
+                    $field['schema'] = $this->filterFormSchemaByRoles($field['schema']);
+                    if (empty($field['schema'])) {
+                        return null;
+                    }
+                }
+
+                return $field;
+
+            }, $schema),
+            function ($field) {
+                return $field !== null;
+            }
+        );
+    }
+
 
     /**
      * @param array|stdClass $input

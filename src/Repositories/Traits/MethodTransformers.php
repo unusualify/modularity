@@ -23,6 +23,33 @@ trait MethodTransformers
         return $hasTrait;
     }
 
+    public function getByColumnValues($column = 'id',array $values, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null)
+    {
+        $query = $this->model->whereIn($column, $values);
+
+        $query = $query->with($this->formatWiths($query, $with));
+
+        $query = $this->filter($query, $scopes);
+
+        $query = $this->order($query, $orders);
+
+        if ($isFormatted) {
+            return $query->get()->map(function ($item) {
+                // dd($item);
+                return array_merge(
+                    $this->getShowFields($item, $this->chunkInputs($this->inputs())),
+                    $item->attributesToArray(),
+                    // $item->toArray(),
+                    // $this->getFormFields($item, $this->chunkInputs($this->inputs())),
+                    // $columnsData
+                );
+            });
+        } else {
+
+            return $query->get();
+        }
+    }
+
     public function getByIds(array $ids, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null)
     {
         // $query = $this->model->query();

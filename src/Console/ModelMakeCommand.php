@@ -458,7 +458,7 @@ class ModelMakeCommand extends BaseCommand
             // dd($str, class_exists($str), $methods);
         }
 
-        if ($this->option('addClone')) {
+        if ($this->option('addSnapshot')) {
             $methods[] = method_string(
                 method_name: 'getSnapshotSourceModelFillable',
                 content: [

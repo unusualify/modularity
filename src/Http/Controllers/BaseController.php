@@ -62,9 +62,7 @@ abstract class BaseController extends PanelController
             ];
             // return $indexData + ['replaceUrl' => true];
         }
-
         $indexData = $this->getIndexData($this->nestedParentScopes());
-
         if ($this->request->has('openCreate') && $this->request->get('openCreate')) {
             $indexData += ['openCreate' => true];
         }
@@ -77,6 +75,8 @@ abstract class BaseController extends PanelController
         ])->first(function ($view) {
             return View::exists($view);
         });
+
+        // dd($indexData);
 
         return View::make($view, $indexData);
     }

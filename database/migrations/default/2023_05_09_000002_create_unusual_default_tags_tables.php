@@ -19,8 +19,9 @@ class CreateUnusualDefaultTagsTables extends Migration
             Schema::create($unusualTaggedTable, function (Blueprint $table) {
                 $table->{unusualIncrementsMethod()}('id');
                 $table->string('taggable_type');
-                $table->integer('taggable_id')->unsigned();
-                $table->integer('tag_id')->unsigned();
+                // $table->integer('taggable_id')->unsigned();
+                // $table->integer('tag_id')->unsigned();
+                $table->uuidMorphs('taggable');
                 $table->index(['taggable_type', 'taggable_id']);
             });
         }

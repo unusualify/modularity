@@ -36,7 +36,7 @@ trait ManageUtilities
             'requestFilter' => json_decode(request()->get('filter'), true) ?? [],
             'searchText' => request()->has('search') ? request()->query('search') : '', // for current text of search parameter
             'headers' => $this->getIndexTableColumns(), // headers to be used in unusual datatable component
-            'formSchema' => $this->formSchema, // input fields to be used in unusual datatable component
+            'formSchema' => $this->filterFormSchemaByRoles($this->formSchema), // input fields to be used in unusual datatable component
         ];
         $data = [
             ...$_deprecated,
@@ -65,7 +65,7 @@ trait ManageUtilities
 
             ),
             'formStore' => [
-                'inputs' => $this->formSchema,
+                'inputs' => $this->filterFormSchemaByRoles($this->formSchema),
                 'fields' => [],
             ],
             'tableStore' => [
@@ -270,6 +270,7 @@ trait ManageUtilities
                 'stickyButton' => false,
                 'modelValue' => $this->repository->getFormFields($item, $schema),
                 'title' => __(((bool) $itemId ? 'fields.edit-item' : 'fields.new-item'), ['item' => trans_choice('modules.' . snakeCase($this->routeName), 0)]),
+                'isEditing' => true,
                 '__removed' => [
                     // 'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => $this->routeName]),
                     // 'schema'  => $schema, // input fields to be used in unusual datatable component
@@ -286,7 +287,7 @@ trait ManageUtilities
                     : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]),
             ] + $this->getUrls(),
             'formStore' => [
-                'inputs' => $schema,
+                'inputs' => $this->filterFormSchemaByRoles($schema),
             ],
 
             '__old' => [
