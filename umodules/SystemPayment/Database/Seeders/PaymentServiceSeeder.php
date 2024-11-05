@@ -8,8 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Modules\SystemPayment\Entities\PaymentCurrency;
 use Modules\SystemPayment\Entities\PaymentService;
-use Modules\User\Entities\User;
-use Unusualify\Modularity\Entities\Media;
+use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Http\Controllers\MediaLibraryController;
 use Unusualify\Modularity\Http\Requests\MediaRequest;
 
@@ -86,14 +85,14 @@ class PaymentServiceSeeder extends Seeder
         //     $currencies = PaymentCurrency::inRandomOrder()->take(rand(1, 3))->get();
         //     $paymentService->paymentCurrencies()->attach($currencies);
         // }
-        $admin = User::where('email', 'admin@unusualgrowth.com')->first();
-        if (! $admin) {
+        $superadmin = User::role('superadmin', 'unusual_users')->first();
+
+        if (! $superadmin) {
             $this->command->error('Admin user not found. Please ensure the admin user exists in the database.');
 
             return;
         }
 
-        $superadmin = User::find(1);
         Auth::guard('unusual_users')->login($superadmin);
 
         foreach ($paymentServices as $service) {
