@@ -31,8 +31,12 @@ class LanguageMiddleware
         App::setLocale($locale);
         App::setFallbackLocale(unusualConfig('fallback_locale'));
 
-        $currency = unusualConfig("payment.locale_currencies.{$locale}", null)
-            ?? config('priceable.currency');
+        $currency = config('priceable.currency', 'EUR');
+
+        if(!unusualConfig('services.currency_exchange.active')){ // onlyBaseCurrency
+            $currency = unusualConfig("payment.locale_currencies.{$locale}", null)
+                ?? config('priceable.currency');
+        }
 
         if ($currency !== mb_strtoupper(config('priceable.currency'))) {
             config(['priceable.currency' => $currency]);

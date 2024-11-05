@@ -41,7 +41,16 @@ class PriceHydrate extends InputHydrate
         $input['label'] ??= __('Prices');
         $input['clearable'] = false;
 
-        $input['items'] = Currency::query()->select(['id', 'symbol as name', 'iso_4217 as iso'])->get()->toArray();
+        $query =  Currency::query()->select(['id', 'symbol as name', 'iso_4217 as iso']);
+
+        $onlyBaseCurrency = unusualConfig('services.currency_exchange.active');
+
+        if($onlyBaseCurrency){
+            $baseCurrency = unusualConfig('services.currency_exchange.base_currency');
+            $query = $query->where('iso_4217', mb_strtoupper($baseCurrency));
+        }
+
+        $input['items'] = $query->get()->toArray();
 
         $input['default'][0]['currency_id'] = Request::getUserCurrency()->id;
 
