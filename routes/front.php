@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Unusualify\Modularity\Http\Controllers\API\LanguageController;
+use Unusualify\Modularity\Http\Controllers\CurrencyExchangeController;
 use Unusualify\Modularity\Http\Controllers\FilepondController;
 
 /*
@@ -21,6 +22,15 @@ Route::group(['prefix' => 'api'], function () {
         Route::delete('revert', [FilepondController::class, 'revert'])->name('revert');
         Route::get('preview/{folder}', [FilepondController::class, 'preview'])->name('preview');
     });
+
+    Route::controller(CurrencyExchangeController::class)
+        ->prefix('currency')
+        ->name('currency.')
+        ->group(function () {
+            Route::post('fetch-rates', 'fetchRates')->name('fetchRates');
+            Route::post('convert', 'convert')->name('convert');
+            Route::get('rate/{currency}', 'getRate')->name('getRate');
+        });
 
     Route::group(['as' => 'api.'], function () {
         Route::apiResource('languages', LanguageController::class, ['only' => 'index']);

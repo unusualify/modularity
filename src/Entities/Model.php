@@ -9,14 +9,13 @@ use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Traits\HasPresenter;
-use Unusualify\Modularity\Entities\Traits\HasScopes;
 use Unusualify\Modularity\Entities\Traits\IsTranslatable;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 
 class Model extends LaravelModel implements TaggableInterface
 {
     use HasPresenter,
-        HasScopes,
+
         IsTranslatable,
         ModelHelpers,
         SoftDeletes,

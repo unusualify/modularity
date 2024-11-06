@@ -1,0 +1,28 @@
+{
+    "name": "unusualify/system-utility",
+    "description": "",
+    "authors": [
+        {
+            "name": "Unusual Enterprise",
+            "email": "software-dev@unusualgrowth.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\SystemUtility\\Tests\\": "Tests/"
+        }
+    }
+}

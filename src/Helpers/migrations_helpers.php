@@ -198,15 +198,18 @@ if (! function_exists('createDefaultMorphPivotTableFields')) {
         $morphForeignKey = makeMorphForeignKey($modelName); //*able_id
         $morphForeignType = makeMorphForeignType($modelName); // *able_type
 
+        $morphName = makeMorphName($modelName);
+
         // $table->{unusualIntegerMethod()}($foreignKey)->unsigned();
         // $table->foreign($foreignKey, "fk_{$morphTableName}_{$foreignKey}")->references('id')->on($tableName)->onDelete('cascade')->onUpdate('cascade');
         $table->foreignId($foreignKey)->constrained()->onUpdate('cascade')->onDelete('cascade');
-        $table->{unusualIntegerMethod()}($morphForeignKey)->nullable()->unsigned();
-        $table->string($morphForeignType)->nullable();
+        // $table->{unusualIntegerMethod()}($morphForeignKey)->nullable()->unsigned();
+        // $table->string($morphForeignType)->nullable();
+        $table->uuidMorphs($morphName, "{$tableName}_type_id_index");
 
         // $table->timestamps();
         // $table->softDeletes();
-        $table->index([$morphForeignType, $morphForeignKey], "{$tableName}_type_id_index");
+        // $table->index([$morphForeignType, $morphForeignKey], "{$tableName}_type_id_index");
     }
 }
 

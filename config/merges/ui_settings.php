@@ -67,6 +67,32 @@ return [
                 'icon' => '$accountSettings',
             ],
         ],
+        'default' => [
+            [
+                'name' => 'Profile Settings',
+                'route_name' => 'admin.profile',
+                'icon' => '$accountSettings',
+
+            ],
+            'permissions' => [
+                'name' => 'Permissions',
+                'route_name' => 'admin.system.system_user.permission.index',
+                'icon' => '$accountSettings',
+            ],
+        ],
+        'client' => [
+            [
+                'name' => 'Profile Settings',
+                'route_name' => 'admin.profile',
+                'icon' => '$accountSettings',
+
+            ],
+            // 'permissions' => [
+            //     'name' => 'Permissions',
+            //     'route_name' => 'admin.system.system_user.permission.index',
+            //     'icon' => '$accountSettings',
+            // ],
+        ],
     ],
 
     'dashboard' => [

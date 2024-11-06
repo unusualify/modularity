@@ -34,11 +34,12 @@ class CreateUnusualDefaultFilesTables extends Migration
                 $table->softDeletes();
                 $table->{unusualIntegerMethod()}('file_id')->unsigned();
                 $table->foreign('file_id', 'fk_files_file_id')->references('id')->on($unusualFilesTable)->onDelete('cascade')->onUpdate('cascade');
-                $table->{unusualIntegerMethod()}('fileable_id')->nullable()->unsigned();
-                $table->string('fileable_type')->nullable();
+                // $table->{unusualIntegerMethod()}('fileable_id')->nullable()->unsigned();
+                // $table->string('fileable_type')->nullable();
+                $table->uuidMorphs('fileable');
                 $table->string('role')->nullable();
                 $table->string('locale', 6)->index();
-                $table->index(['fileable_type', 'fileable_id']);
+                // $table->index(['fileable_type', 'fileable_id']);
             });
         }
     }

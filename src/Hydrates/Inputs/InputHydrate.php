@@ -77,7 +77,7 @@ abstract class InputHydrate
 
         $this->input = $this->hydrate();
 
-        $this->input = $this->hydrateRecords();
+        (! isset($this->input['skipRecords']) || ! $this->input['skipRecords']) && $this->input = $this->hydrateRecords();
 
         $this->input = $this->hydrateRules();
 

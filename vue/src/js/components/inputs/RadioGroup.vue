@@ -1,7 +1,7 @@
 <template>
   <v-radio-group v-model="input" direction="horizontal"  class="v-input-radio-group">
     <v-row>
-      <v-col v-for="(item, i) in items" :key="`col-${item[itemValue]}`">
+      <v-col v-for="(item, i) in items" :key="`col-${item[itemValue]}`" :cols="12" :md="6">
         <v-btn
           block class="v-input-radio-group__btn"
           :variant="input == item[itemValue] ? 'elevated' : 'outlined'"

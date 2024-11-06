@@ -11,8 +11,8 @@ const isArrayable = 'input-treeview|treeview|input-checklist|input-repeater|inpu
 // const isMediableTypes = 'input-file|input-image'
 // const isMediableFields = 'files|medias'
 
-export const getSchema = (inputs, model = null) => {
-  const _inputs = omitBy(inputs, (value, key) => {
+export const getSchema = (inputs, model = null, isEditing) => {
+  let _inputs = omitBy(inputs, (value, key) => {
     return Object.prototype.hasOwnProperty.call(value, 'slotable')
   })
 
@@ -20,13 +20,23 @@ export const getSchema = (inputs, model = null) => {
     reduce(_inputs, (acc, input, key) => {
       if(Object.prototype.hasOwnProperty.call(input, 'group')){
 
-      }else{
+      }
+      else{
         acc[key] = input
       }
       return acc
     }, {})
   }
-
+  if (find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'createable'))) {
+    Object.keys(_inputs).forEach(key => {
+      // Check if the input has createable property and it's false
+      if (_inputs[key].createable === false && (isEditing < 0)) {
+        console.log('here', key);
+        delete _inputs[key];
+      }
+    });
+  }
+  console.log(_inputs);
   map(_inputs, (value, key) => {
     if(__isset(value.type) && value.type == 'group'){
       value.schema = flattenGroupSchema(value.schema, value.name);

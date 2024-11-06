@@ -56,7 +56,7 @@ return [
         'formatter' => [],
     ],
     'default_table_attributes' => [
-        'embeddedForm' => true,
+        'embeddedForm' => false,
         'createOnModal' => true,
         'editOnModal' => true,
         'formWidth' => '60%',
@@ -352,10 +352,5 @@ return [
             'tr' => 'TRY',
             'en' => 'EUR',
         ],
-    ],
-    'default_payment_service' => [
-        'USD' => 'garanti-pos',
-        'EUR' => 'garanti-pos',
-        'TRY' => 'garanti-pos',
     ],
 ];

@@ -134,6 +134,10 @@ class BaseServiceProvider extends ServiceProvider
             return new \Unusualify\Modularity\Services\FilepondManager;
         });
 
+        $this->app->singleton('currency.exchange', function (Application $app) {
+            return new \Unusualify\Modularity\Services\CurrencyExchangeService;
+        });
+
         $this->app->alias(\Unusualify\Modularity\Facades\ModularityVite::class, 'ModularityVite');
 
         // $this->app->alias(FileActivator::class, 'module_activator');
