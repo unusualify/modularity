@@ -11,9 +11,12 @@ use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Services\View\UComponent;
 use Unusualify\Modularity\Services\View\UWrapper;
+use Unusualify\Modularity\Traits\ManageUtilities;
 
 class ProfileController extends BaseController
 {
+    use ManageUtilities;
+
     protected $namespace = 'Modules\SystemUser';
 
     /**
@@ -305,6 +308,7 @@ class ProfileController extends BaseController
         $data['elements'] = [
             UWrapper::makeGridSection($sectionFields),
         ];
+        $data['endpoints'] = $this->getUrls();
 
         $view = "$this->baseKey::layouts.profile";
 

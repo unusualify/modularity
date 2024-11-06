@@ -78,7 +78,7 @@
 @stop
 
 @section('STORE')
-    window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {}
+    {{-- window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {} --}}
     window['{{ unusualConfig('js_namespace') }}'].STORE.form = {
         {{-- inputs: {!! json_encode($formSchema ?? new StdClass()) !!}, --}}
     }
