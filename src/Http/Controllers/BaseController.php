@@ -536,7 +536,8 @@ abstract class BaseController extends PanelController
 
         if (preg_match('/(.*)(_uuid)/', $column['key'], $matches)) {
             // $value = $item->{$matches[1]};
-            $value = mb_substr($item->{$matches[1]}, 0, 6);
+            // $value = mb_substr($item->{$matches[1]}, 0, 6);
+            $value = $item->{$matches[1]};
             // $value = "<span>" . substr($item->{$matches[1]}, 0, 6) . "</span>";
         }
 

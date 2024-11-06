@@ -12,6 +12,8 @@ class CreateStatesTable extends Migration
             // this will create an id, name field
             createDefaultTableFields($table);
 			$table->string('code');
+            $table->string('color');
+			$table->string('icon');
             // a "published" column, and soft delete and timestamps columns
             createDefaultExtraTableFields($table);
         });

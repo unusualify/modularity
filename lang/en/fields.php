@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'add-item' => 'Create',
     'confirm-deletion' => 'Are you sure want to delete {name} {route}?',
     'cancel' => 'Cancel',
     'close' => 'Close',

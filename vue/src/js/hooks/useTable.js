@@ -161,6 +161,10 @@ export const makeTableProps = propsFactory({
     type: Boolean,
     default: true,
   },
+  cellOptions: {
+    type: [Array, Object],
+    default: {}
+  }
 })
 
 // by convention, composable function names start with "use"
@@ -296,7 +300,7 @@ export default function useTable (props, context) {
     searchText: computed(() => t("Type to Search")),
     addBtnTitle: computed(() => {
       if(props.createOnModal || props.editOnModal){
-        return props.addBtnOptions.text ? t(props.addBtnOptions.text) : t('add-item', {'item' : state.transNameSingular})
+        return props.addBtnOptions.text ? t(props.addBtnOptions.text) : t('fields.add-item', {'item' : state.transNameSingular})
       }else{
         return props.addBtnOptions.text ?? t('ADD NEW')
       }

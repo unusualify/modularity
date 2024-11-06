@@ -101,6 +101,10 @@ export default function useFormatter (props, context, headers) {
       return {
         elements: value
       }
+    },
+    shortenFormatter: function (value) {
+      console.log(value);
+      return window.__shorten(value, 10)
     }
   })
 

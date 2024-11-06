@@ -102,7 +102,7 @@ trait ManageUtilities
             ],
 
         ];
-
+        // dd($data);
         // dd($options['tableStore']);
         return array_replace_recursive($data + $options, $this->indexData($this->request));
     }
