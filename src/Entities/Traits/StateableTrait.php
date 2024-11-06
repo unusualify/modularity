@@ -2,7 +2,4 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
-trait StateableTrait {
-
-
-}
+trait StateableTrait {}

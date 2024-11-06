@@ -11,24 +11,23 @@ class CreateStatesTable extends Migration
         Schema::create('states', function (Blueprint $table) {
             // this will create an id, name field
             createDefaultTableFields($table);
-			$table->string('code');
+            $table->string('code');
             $table->string('color');
-			$table->string('icon');
+            $table->string('icon');
             // a "published" column, and soft delete and timestamps columns
             createDefaultExtraTableFields($table);
         });
 
-        Schema::create('state_translations', function(Blueprint $table) {
-			createDefaultTranslationsTableFields($table, 'state');
-			$table->string('name');
-		});
-
+        Schema::create('state_translations', function (Blueprint $table) {
+            createDefaultTranslationsTableFields($table, 'state');
+            $table->string('name');
+        });
 
     }
 
     public function down()
     {
         Schema::dropIfExists('state_translations');
-		Schema::dropIfExists('states');
+        Schema::dropIfExists('states');
     }
 }

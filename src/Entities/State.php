@@ -2,10 +2,8 @@
 
 namespace Unusualify\Modularity\Entities;
 
-use Illuminate\Database\Eloquent\Model;
-
 use Astrotomic\Translatable\Translatable;
-use Unusualify\Modularity\Entities\Traits\HasScopes;
+use Illuminate\Database\Eloquent\Model;
 
 class State extends Model
 {
@@ -37,26 +35,24 @@ class State extends Model
         );
 
     }
-    /**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array<int, string>
-	 */
-	protected $fillable = [
-		'published',
-		'code',
-	];
 
     /**
-	 * The translated attributes that are assignable for hasTranslation Trait.
-	 *
-	 * @var array<int, string>
-	 */
-	public $translatedAttributes = [
-		'name',
-		'active'
-	];
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'published',
+        'code',
+    ];
 
-
-
+    /**
+     * The translated attributes that are assignable for hasTranslation Trait.
+     *
+     * @var array<int, string>
+     */
+    public $translatedAttributes = [
+        'name',
+        'active',
+    ];
 }

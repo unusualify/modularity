@@ -2,10 +2,9 @@
 
 namespace Modules\SystemUtility\Repositories;
 
-use Unusualify\Modularity\Repositories\Repository;
 use Modules\SystemUtility\Entities\State;
+use Unusualify\Modularity\Repositories\Repository;
 use Unusualify\Modularity\Repositories\Traits\TranslationsTrait;
-
 
 class StateRepository extends Repository
 {

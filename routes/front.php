@@ -30,7 +30,7 @@ Route::group(['prefix' => 'api'], function () {
             Route::post('fetch-rates', 'fetchRates')->name('fetchRates');
             Route::post('convert', 'convert')->name('convert');
             Route::get('rate/{currency}', 'getRate')->name('getRate');
-    });
+        });
 
     Route::group(['as' => 'api.'], function () {
         Route::apiResource('languages', LanguageController::class, ['only' => 'index']);

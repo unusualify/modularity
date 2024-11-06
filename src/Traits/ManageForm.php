@@ -109,6 +109,7 @@ trait ManageForm
             return $this->getSchemaInput($input, $inputs);
         })->toArray();
     }
+
     //TODO: create an filter for roles if role is not allowed to see that input it shouldn't see it you can check getSchemaInput last part
     protected function getSchemaInput($input, $inputs = [])
     {
@@ -122,10 +123,11 @@ trait ManageForm
         if ($spreaded) {
             return $hydrated;
         }
-        if(isset($input->allowedRoles)){
-            $roles = explode(",", $input->allowedRoles);
+        if (isset($input->allowedRoles)) {
+            $roles = explode(',', $input->allowedRoles);
             $user = Auth::user();
         }
+
         return isset($hydrated['name'])
             // ? [ $input->name => $default_input->union( $this->configureInput($input) ) ]
             // ? [ $input['name'] => array_merge_recursive_preserve( $default_input, $this->configureInput($input) ) ]
@@ -133,15 +135,17 @@ trait ManageForm
             : [];
     }
 
-    public function filterFormSchemaByRoles($schema) {
+    public function filterFormSchemaByRoles($schema)
+    {
         return array_filter(
             array_map(function ($field) {
 
-                if(is_null(Auth::user()))
+                if (is_null(Auth::user())) {
                     return false;
+                }
                 // dd(is_null(Auth::user()));
 
-                if (isset($field['allowedRoles']) && !Auth::user()->hasRole($field['allowedRoles'])) {
+                if (isset($field['allowedRoles']) && ! Auth::user()->hasRole($field['allowedRoles'])) {
                     return null;
                 }
 
@@ -169,7 +173,6 @@ trait ManageForm
             }
         );
     }
-
 
     /**
      * @param array|stdClass $input

@@ -107,5 +107,5 @@ return [
     ],
     'cellOptions' => [
         'maxChar' => 3,
-    ]
+    ],
 ];
