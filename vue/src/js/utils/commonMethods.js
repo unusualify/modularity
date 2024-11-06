@@ -328,5 +328,8 @@ export default {
       }
       return acc
     }, {})
+  },
+  $copy: function(text) {
+    window.navigator.clipboard.writeText(text);
   }
 }

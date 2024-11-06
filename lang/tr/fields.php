@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'add-item' => 'Ekle',
     'confirm-deletion' => '{name} {route} kaydını silmek istediğinize emin misiniz?',
     'cancel' => 'İptal',
     'close' => 'Kapat',

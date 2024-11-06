@@ -29,8 +29,8 @@ return [
         'image' => '', // image link for the background of the toolbar
     ],
     'filterBtnOptions' => [
-        'variant' => 'flat', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
-        'color' => 'purple', // rgb(255,255,255,1) or utility colors like white, purple
+        'variant' => 'outlined', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
+        'color' => 'primary', // rgb(255,255,255,1) or utility colors like white, purple
         // 'elevation' => null, // string or number refers to elevation
         // 'prepend-icon' => 'mdi-chevron-down', // material design icon name,
         'readonly' => false, // boolean to set the button readonly mode, can be used to disable button
@@ -39,7 +39,8 @@ return [
         'class' => 'mx-2 text-white text-capitialize rounded px-8',
         'size' => 'default', //sizes: x-small, small, default, large, and x-large.
         // 'icon' => 'mdi-filter-outline',
-        'prepend-icon' => 'mdi-chevron-down',
+        'prepend-icon' => 'mdi-filter-outline',
+        'append-icon' => 'mdi-chevron-down',
         'slim' => false,
         // 'loading' => true,
     ],
@@ -104,4 +105,7 @@ return [
         //     'xl' => 6,
         // ],
     ],
+    'cellOptions' => [
+        'maxChar' => 3,
+    ]
 ];

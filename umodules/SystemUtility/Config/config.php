@@ -4,6 +4,7 @@ return [
     'name' => 'SystemUtility',
     'system_prefix' => true,
     'headline' => 'System Utilities',
+    'group' => 'system',
     'routes' => [
         'state' => [
             'name' => 'State',

@@ -11,11 +11,10 @@
         @toggle="hideTable= $event"
       >
       </ActiveTableItem>
-
       <v-data-table-server
         v-if="!hideTable"
         v-bind="{...$bindAttributes(), ...footerProps}"
-        :class="[noFullScreen ? '' : 'h-100', tableClasses, fullWidthWrapper ? '' : 'ue-table--narrow-wrapper']"
+        :class="[noFullScreen ? '' : 'h-100', tableClasses, fullWidthWrapper ? '' : 'ue-table--narrow-wrapper', 'px-4', 'rounded-tr']"
         id="ue-table"
 
         :headers="headers"
@@ -87,7 +86,6 @@
               v-model="search"
             />
             <v-spacer v-else-if="hideSearchField"></v-spacer>
-
             <v-btn
               v-if="mainFilters.length > 0"
               id="filter-btn-activator"
@@ -379,41 +377,55 @@
 
         <!-- #formatterColumns -->
         <template
-          v-for="(col, i) in formatterColumns"
-          v-slot:[`item.${col.key}`]="{ item }"
-          >
-            <template v-if="col.formatter == 'edit' || col.formatter == 'activate'">
-              <v-btn
-                :key="i"
-                class="pa-0 justify-start"
-                variant="plain"
-                :color="`primary darken-1`"
-                @click="itemAction(item, ...col.formatter)"
-                >
-                <!-- {{ item[col.key].length > 40 ? item[col.key].substring(0,40) + '...' : item[col.key] }} -->
-                {{ window.__shorten(item[col.key]) }}
-              </v-btn>
-            </template>
-            <template v-else-if="col.formatter == 'switch'">
-                <v-switch
+        v-for="(col, i) in formatterColumns"
+        v-slot:[`item.${col.key}`]="{ item }"
+        >
+          <template v-if="col.formatter == 'edit' || col.formatter == 'activate'">
+            <v-tooltip :text="item[col.key]" :key="i">
+              <template v-slot:activator="{ props }">
+                <v-btn
                   :key="i"
-                  :model-value="item[col.key]"
-                  color="success"
-                  :true-value="1"
-                  false-value="0"
-                  hide-details
-                  @update:modelValue="itemAction(item, 'switch', $event, col.key )"
-                  >
-                  <template v-slot:label></template>
-                </v-switch>
-            </template>
-            <template v-else>
-              <ue-recursive-stuff
-                v-bind="handleFormatter(col.formatter, item[col.key])"
-                :key="item[col.key]"
-                />
-            </template>
-        </template>
+                  v-bind="props"
+                  class="pa-0 justify-start"
+                  variant="plain"
+                  :color="`primary darken-1`"
+                  @click="itemAction(item, ...col.formatter)"
+                >
+                  {{ col.key.match(/^id|uuid$/) ? window.__shorten(item[col.key], 8) : item[col.key] }}
+                </v-btn>
+                <template v-if="col.key.match(/^id|uuid$/)">
+                  <ue-copy-text :text="item[col.key]" />
+                </template>
+              </template>
+            </v-tooltip>
+          </template>
+          <template v-else-if="col.formatter == 'switch'">
+            <v-switch
+              :key="i"
+              :model-value="item[col.key]"
+              color="success"
+              :true-value="1"
+              false-value="0"
+              hide-details
+              @update:modelValue="itemAction(item, 'switch', $event, col.key )"
+            >
+              <template v-slot:label></template>
+            </v-switch>
+          </template>
+          <template v-else-if="col.formatter == 'dynamic'">
+            <ue-dynamic-component-renderer
+              :subject="item[col.key]"
+              :key="item[col.key]"
+            >
+            </ue-dynamic-component-renderer>
+          </template>
+          <template v-else>
+            <ue-recursive-stuff
+              v-bind="handleFormatter(col.formatter, window.__shorten(item[col.key], cellOptions.maxChars))"
+              :key="item[col.key]"
+            />
+          </template>
+      </template>
 
         <template v-slot:header.actions="_obj">
           <v-menu
@@ -561,9 +573,11 @@ import {
   makeFormatterProps,
 } from '@/hooks'
 
+import DynamicComponentRenderer from './DynamicComponentRenderer'
 import ActiveTableItem from '__components/labs/ActiveTableItem.vue'
 import PaymentService from './inputs/PaymentService.vue'
 import { useStore } from 'vuex'
+import DynamicComponentRendererVue from './DynamicComponentRenderer.vue'
 
 const { ignoreFormatters } = makeFormatterProps()
 
@@ -625,4 +639,32 @@ export default {
   width: 100%
   &.ue-datatable--full-screen
     min-height: calc(100vh - (2*12 * $spacer))
+.v-table
+  &.rounded-tr
+  tr
+  &:first-child
+    td
+      &:first-child
+        border-bottom-left-radius: 8px
+        border-top-left-radius: 8px
+
+      &:last-child
+        border-bottom-right-radius: 8px
+        border-top-right-radius: 8px
+
+
+  &:last-child
+    td
+      &:first-child
+        border-bottom-left-radius: 8px
+        border-top-left-radius: 8px
+
+      &:last-child
+        border-bottom-right-radius: 8px
+        border-top-right-radius: 8px
+
+  &.zebra-stripes
+      tr
+        &:nth-of-type(2n)
+          background-color: rgba(140,160,167, .2)
 </style>
