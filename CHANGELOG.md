@@ -2,6 +2,66 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.17.0 - 2024-11-06
+
+### :rocket: Features
+
+- :sparkles: stateable (dynamic enums) by @gunesbizim in https://github.com/unusualify/modularity/commit/596c2be27da6b54dadb9afd5d510490491bae937
+- add input-filepond case to get display value of it by @OoBook in https://github.com/unusualify/modularity/commit/547014e58b6d93f9b7f2af17cee79d7cc7b93d14
+- :art: add regex conditional to display preview by @OoBook in https://github.com/unusualify/modularity/commit/52936232d6605ad36bdd5e15b7eca64d8d9fa6fd
+- :art: add printRequest component to print data coming from an endpoint by @OoBook in https://github.com/unusualify/modularity/commit/9d5865bb5b51442be247b4a730de9bc11c30dafb
+- :art: add new currencyExchange service by @OoBook in https://github.com/unusualify/modularity/commit/12504b6a14b25699303f7fb3b8f2ba2e3dd4e0e6
+- :art: add ux upgrades on StepperForm by @OoBook in https://github.com/unusualify/modularity/commit/ee6cdbc46631ec31cf3ed742cf55bf35119a6c96
+- :sparkles: table updates, states table new field migrations by @gunesbizim in https://github.com/unusualify/modularity/commit/fb1fce48a91731e48623c3b3590a9db6dfc5c3e0
+
+### :wrench: Bug Fixes
+
+- add Roboto font family into b2press theme by @OoBook in https://github.com/unusualify/modularity/commit/90714c9e8dee1ea2dc45d2f5e8d4b8d1d4f6d39a
+- :ambulance: remove is_payable bullshiit leading prices table to drop by @OoBook in https://github.com/unusualify/modularity/commit/3f8c58ea3e4bb5bfcf91479b925da87536483ac9
+- :bug: set embeddedForm  as false on default by @OoBook in https://github.com/unusualify/modularity/commit/c256d31243442e11a9f8c11148ee5f9cd1c26a9c
+- convert save-success to messages. by @OoBook in https://github.com/unusualify/modularity/commit/3a2ffd6a0e558a5400e653f7141d2283b2fd8aed
+- :bug: get admin with role scope by @OoBook in https://github.com/unusualify/modularity/commit/17be0370e3e17a5d3e563ab8e533bd43be125cef
+- remove indexing problems for uuidMorphs by @OoBook in https://github.com/unusualify/modularity/commit/9ba0afe10ba63316a5ddfd9d85d78fe6802a2828
+- add previous components by @OoBook in https://github.com/unusualify/modularity/commit/5158f3256551e544919c9e66e756234584121540
+- :bug: migration fix by @gunesbizim in https://github.com/unusualify/modularity/commit/056327826ae5b7aada0cdd026b9c6a3ff2eaef6b
+- add getIndexUrls into dashboard and profile by @OoBook in https://github.com/unusualify/modularity/commit/2b44d586ad43b4cee4fb423d127d06367aa5d09e
+- add default and client keys into profileMenu by @OoBook in https://github.com/unusualify/modularity/commit/36c10ac3419853638ad439e49e0a9d31fac0067e
+
+### :recycle: Refactors
+
+- :recycle: utilities as system module by @gunesbizim in https://github.com/unusualify/modularity/commit/7cc6332f207eb2fd50cc953eccfc3ceafe621570
+
+### Styling
+
+- lint coding styles by @invalid-email-address in https://github.com/unusualify/modularity/commit/632254be57dc21840d48f43006957f7090c2faa1
+- :lipstick: change padding-top to 4 by @OoBook in https://github.com/unusualify/modularity/commit/6a5bdf52b7cfe2ce495601d85ef3b2b7b4f28c1e
+- :lipstick: add text-body-1 for subText by @OoBook in https://github.com/unusualify/modularity/commit/0a3e83503b6ad2189ef214c78536b84fbb0510ec
+- add md threshold for radio buttons by @OoBook in https://github.com/unusualify/modularity/commit/7029c67581d45d95a12031eaa5e09131834aa489
+
+### :package: Build
+
+- add new v0.17.0 front build by @OoBook in https://github.com/unusualify/modularity/commit/5b7b7069b2839744268c95088628b58b8cce8322
+
+### :beers: Other Stuff
+
+- Merge branch 'refs/heads/release/v0.16.0'
+- Update CHANGELOG
+- Merge branch 'dev' into feature/enum
+- Merge pull request #72 from unusualify/feature/enum
+
+Feature/enum branch passed tests, so we can merge it in experimental mode. We check it out again later.
+
+- add Vat and Total localization keys by @OoBook in https://github.com/unusualify/modularity/commit/d63f912627eef02ac388b9bc82cd3ee0e01fdff3
+- change defult input paddings by @OoBook in https://github.com/unusualify/modularity/commit/9d459fdf19a766873a502be64641909bb087c99e
+- add save-success key to translation by @OoBook in https://github.com/unusualify/modularity/commit/f330d2908dce79d9c9d70a1383e5bb59fa51abe2
+- fix mb-theme to mb by @OoBook in https://github.com/unusualify/modularity/commit/0508c3f71464c73d2e103922df7bf181c6591a43
+- :recycle: clear navigation defaults by @OoBook in https://github.com/unusualify/modularity/commit/92119ee22efbf5afa85a7b49d1e059ec4e4fede4
+- Merge pull request #73 from unusualify/feature/currency-exchange-service
+
+Feature/currency exchange service has passed tests.
+
+- Merge remote-tracking branch 'origin/feature/general-table-update' into dev
+
 ## v0.16.0 - 2024-11-04
 
 ### :rocket: Features
