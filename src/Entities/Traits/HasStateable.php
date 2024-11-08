@@ -170,10 +170,8 @@ trait HasStateable {
 
         if(!isset($model->default_state))
             $defaultState = $model->default_state;
-        elseif ($initialState)
-            $defaultState = $initialState;
         else
-            $defaultState = $model->default_states[0];
+            $defaultState = $initialState;
 
         if(is_string($defaultState)){
             $defaultState = [
