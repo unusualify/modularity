@@ -76,15 +76,18 @@ trait HasStateable {
             }
         });
         self::saving(static function (Model $model) {
+
             if(isset($model->_status)){
                 $model->preserved_state = $model->_state;
             }
+
             $model->offsetUnset('_state');
             $model->offsetUnset('_status');
         });
 
         self::saved(static function (Model $model) {
             $newState = State::find($model->preserved_state);
+
             if(is_null($newState))
                 return false;
 
@@ -126,12 +129,14 @@ trait HasStateable {
         $allStates = [];
 
         foreach ($defaultStates as $index => $state) {
+
             if(is_string($state))
                 $stateData = [
                     'code' => $state
                 ];
             else
                 $stateData = $state;
+
             if(is_string($state)){
                 foreach ($translationLangs as $lang) {
                     $stateData[$lang] = [
@@ -149,23 +154,28 @@ trait HasStateable {
             }
             $allStates[] = $stateData;
         }
-        if(!isset($model->inititalState))
-            $initialState = $model->default_states[0];
+
+        if(!isset($model->default_state))
+            $defaultState = $model->default_state;
+        elseif (!isset($model->initital_state))
+            $defaultState = $model->initial_state;
         else
-            $initialState = $model->initial_state;
-        if(is_string($initialState)){
-            $initialState = [
-                'name' => $model->initial_state,
+            $defaultState = $model->default_states[0];
+
+        if(is_string($defaultState)){
+            $defaultState = [
+                'name' => Str::headline($defaultState),
                 'icon' => '$warning',
                 'color' => 'warning'
             ];
         }
 
         foreach ($allStates as $state) {
+
             if(is_string($state)){
                 array_merge($state, [
-                    'color' => $initialState['color'] ?? 'warning',
-                    'icon' => $initialState['icon'] ?? '$warning'
+                    'color' => $defaultState['color'],
+                    'icon' => $defaultState['icon'],
                 ]);
 
             }
@@ -173,7 +183,7 @@ trait HasStateable {
 
             $pivotData = ['is_active' => false];
 
-            if($state['code'] == $initialState['code']) {
+            if($state['code'] == $defaultState['code']) {
                 $pivotData['is_active'] = true;
             }
 
