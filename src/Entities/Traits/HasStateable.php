@@ -42,33 +42,6 @@ trait HasStateable {
         self::created(static function (Model $model) {
             $model->createNonExistantStates($model);
         });
-
-        // self::retrieved(static function (Model $model) {
-        //     $state = $model->states->first(function($state) {
-        //         return $state->pivot->is_active === 1;
-        //     });
-
-        //     if(collect($model->default_states)->contains('code', $state->code)){
-
-        //     }
-
-        //     // Check if state code exists in default_states
-        //     // Exists -> merge fields of default_states['code'] to $state attributes
-        //     if(!is_null($state)){
-        //         $model->setAttribute('_state', $state->id);
-        //         $model->setAttribute(
-        //             '_status',
-        //             $model->previewState($state)
-        //         );
-        //     }else{
-        //         $model->setAttribute(
-        //             '_status',
-        //             $model->previewWhenStateNull($state)
-        //         );
-        //     }
-
-        // });
-
         self::retrieved(static function (Model $model) {
             $state = $model->states->first(function($state) {
                 return $state->pivot->is_active === 1;
