@@ -11,11 +11,9 @@ use Illuminate\Support\Str;
 trait HasStateable {
     protected static $stateModel = 'Modules\SystemUtility\Entities\State';
 
-    protected $_stateableSourceFields = [];
-    protected $_originalFillable = null;
-
     public function states(): \Illuminate\Database\Eloquent\Relations\MorphToMany
     {
+
         return $this->morphToMany(
             static::$stateModel,
             'stateable',
@@ -45,23 +43,66 @@ trait HasStateable {
             $model->createNonExistantStates($model);
         });
 
+        // self::retrieved(static function (Model $model) {
+        //     $state = $model->states->first(function($state) {
+        //         return $state->pivot->is_active === 1;
+        //     });
+
+        //     if(collect($model->default_states)->contains('code', $state->code)){
+
+        //     }
+
+        //     // Check if state code exists in default_states
+        //     // Exists -> merge fields of default_states['code'] to $state attributes
+        //     if(!is_null($state)){
+        //         $model->setAttribute('_state', $state->id);
+        //         $model->setAttribute(
+        //             '_status',
+        //             $model->previewState($state)
+        //         );
+        //     }else{
+        //         $model->setAttribute(
+        //             '_status',
+        //             $model->previewWhenStateNull($state)
+        //         );
+        //     }
+
+        // });
+
         self::retrieved(static function (Model $model) {
-                $state = $model->states->first(function($state) {
-                    return $state->pivot->is_active === 1;
-                });
-                if(!is_null($state)){
-                    $model->setAttribute('_state', $state->id);
-                    $model->setAttribute(
-                        '_status',
-                        $model->previewState($state)
+            $state = $model->states->first(function($state) {
+                return $state->pivot->is_active === 1;
+            });
+
+            if (!is_null($state)) {
+                // Get matching default state if exists
+                $defaultState = collect($model->default_states)->firstWhere('code', $state->code);
+
+                if ($defaultState) {
+                    // Merge only specific attributes using array_merge
+                    $attributes = array_merge(
+                        $state->toArray(),
+                        [
+                            'icon' => $defaultState['icon'],
+                            'color' => $defaultState['color'],
+                            'name' => $defaultState[app()->getLocale()]['name']
+                        ]
                     );
-                }else{
-                    $model->setAttribute(
-                        '_status',
-                        $model->previewWhenStateNull($state)
-                    );
+
+                    $state->fill($attributes);
                 }
 
+                $model->setAttribute('_state', $state->id);
+                $model->setAttribute(
+                    '_status',
+                    $model->previewState($state)
+                );
+            } else {
+                $model->setAttribute(
+                    '_status',
+                    $model->previewWhenStateNull($state)
+                );
+            }
         });
 
         self::saving(static function (Model $model) {
@@ -148,14 +189,14 @@ trait HasStateable {
             // dd(is_string($_state));
             if(is_string($_state)){
 
-                $state['color'] = $initialState['color'] ?? 'warning';
-                $state['icon'] = $initialState['icon'] ?? '$warning';
-                // dd($state);
-                $_state = State::create($state);
-            }else{
-                // dd($_state, $state);
-                $_state = State::create($state);
+                array_merge($state, [
+                    'color' => $initialState['color'] ?? 'warning',
+                    'icon' => $initialState['icon'] ?? '$warning'
+                ]);
+
             }
+            $_state = State::create($state);
+
             // dd($_state);
             $pivotData = ['is_active' => false];
 

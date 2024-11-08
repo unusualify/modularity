@@ -3,8 +3,7 @@
 namespace Modules\SystemUtility\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\SystemUtility\Repositories\StateRepository;
-use Modules\SystemUtility\Entities\State;
+use Illuminate\Support\Facades\App;
 
 class StateSeeder extends Seeder
 {
@@ -32,8 +31,8 @@ class StateSeeder extends Seeder
                 'published' => 1
             ],
             [
-                'code' => 'canceled',
-                'name' => 'Canceled',
+                'code' => 'cancelled',
+                'name' => 'Cancelled',
                 'color' => '#FF0000', // Red
                 'icon' => 'mdi-close-circle-outline',
                 'published' => 1
@@ -95,8 +94,7 @@ class StateSeeder extends Seeder
                 'published' => 1
             ],
         ];
-        $stateModel = app()->make('Modules\SystemUtility\Entities\State');
-        $stateRepository = new StateRepository($stateModel);
+        $stateRepository = App::make('Modules\SystemUtility\Repositories\StateRepository');;
 
         foreach ($states as $state){
             $stateRepository->create($state);
