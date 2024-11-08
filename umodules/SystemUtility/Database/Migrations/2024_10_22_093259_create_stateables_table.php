@@ -15,8 +15,6 @@ class CreateStateablesTable extends Migration
     {
         Schema::create('stateables', function (Blueprint $table) {
             createDefaultMorphPivotTableFields($table, 'stateables');
-            $table->string('color')->default('warning');
-            $table->string('icon')->default('$warning');
             $table->boolean('is_active')->default(false);
         });
     }

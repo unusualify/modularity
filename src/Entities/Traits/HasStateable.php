@@ -8,21 +8,10 @@ use Illuminate\Support\Facades\Log;
 use Modules\SystemUtility\Entities\Stateable;
 use Illuminate\Support\Str;
 
-
 trait HasStateable {
     protected static $stateModel = 'Modules\SystemUtility\Entities\State';
-    /**
-     * Cached source model fields.
-     *
-     * @var array
-     */
-    protected $_stateableSourceFields = [];
 
-    /**
-     * Original fillable attributes.
-     *
-     * @var array|null
-     */
+    protected $_stateableSourceFields = [];
     protected $_originalFillable = null;
 
     public function states(): \Illuminate\Database\Eloquent\Relations\MorphToMany
@@ -33,7 +22,7 @@ trait HasStateable {
             config('modularity.states.table', 'stateables'),
             'stateable_id',
             'state_id'
-        )->withPivot('is_active', 'color', 'icon');
+        )->withPivot('is_active');
     }
 
     public function state(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
@@ -52,79 +41,65 @@ trait HasStateable {
 
     public static function bootHasStateable(): void
     {
-
         self::created(static function (Model $model) {
-
-            // if (!isset($model->initial_state)) {
-            //     Log::warning('No initial state found in created event');
-            //     return;
-            // }
-
             $model->createNonExistantStates($model);
-
         });
 
         self::retrieved(static function (Model $model) {
-            $state = $model->states->first(function($state) {
-                return $state->pivot->is_active === 1;
-            });
-            $model->setAttribute(
-                '_state',
-                $state->id
-            );
-            $model->setAttribute(
-                '_status',
-                "<v-chip variant='text' color='warning' prepend-icon='{$state->pivot->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</v-chip>"
-            );
+                $state = $model->states->first(function($state) {
+                    return $state->pivot->is_active === 1;
+                });
+                if(!is_null($state)){
+                    $model->setAttribute('_state', $state->id);
+                    $model->setAttribute(
+                        '_status',
+                        $model->previewState($state)
+                    );
+                }else{
+                    $model->setAttribute(
+                        '_status',
+                        $model->previewWhenStateNull($state)
+                    );
+                }
 
         });
 
         self::saving(static function (Model $model) {
-
             if(isset($model->_status)){
-                //Updating the model
                 $model->preserved_state = $model->_state;
             }
-            // Clean up temporary attributes
             $model->offsetUnset('_state');
             $model->offsetUnset('_status');
-
         });
 
         self::saved(static function (Model $model) {
             $newState = State::find($model->preserved_state);
-            // Get current active state (if exists)
             if(is_null($newState))
                 return false;
+
             $currentActiveState = $model->states()
                 ->wherePivot('is_active', 1)
                 ->first();
 
-            // If current state exists and is different from new state
             if ($currentActiveState && $currentActiveState->id !== $newState->id) {
-                // Set current state's is_active to 0
                 $model->states()->updateExistingPivot($currentActiveState->id, [
                     'is_active' => 0
                 ]);
             }
-            // Check if relationship exists with new state
+
             $existingRelationship = $model->states()
-            ->where('state_id', $newState->id)
-            ->first();
+                ->where('state_id', $newState->id)
+                ->first();
 
             if ($existingRelationship) {
-                // Update existing relationship to active
                 $model->states()->updateExistingPivot($newState->id, [
                     'is_active' => 1
                 ]);
             } else {
-                // Create new relationship
                 $model->states()->attach($newState->id, [
                     'is_active' => 1
                 ]);
             }
-
-            // dd($model->states()->get());
         });
     }
 
@@ -138,23 +113,28 @@ trait HasStateable {
         $defaultStates = $model->default_states;
         $translationLangs = $model->getStateTranslationLanguages();
         $allStates = [];
-        // dd($translationLangs);
-        foreach ($defaultStates as $index => $state) {
-            $stateData = [
-                'code' => $state
-            ];
 
-            // Generate language specific structures
-            foreach ($translationLangs as $lang) {
-                $stateData[$lang] = [
-                    'name' => Str::headline($state),
-                    'active' => true,
+        foreach ($defaultStates as $index => $state) {
+            if(is_string($state))
+                $stateData = [
+                    'code' => $state
                 ];
+            else
+                $stateData = $state;
+            if(is_string($state)){
+                foreach ($translationLangs as $lang) {
+                    $stateData[$lang] = [
+                        'name' => Str::headline($state),
+                        'active' => true,
+                    ];
+                }
             }
+
 
             $allStates[] = $stateData;
         }
-        $initialState  = $model->initial_state;
+
+        $initialState = $model->initial_state;
         if(is_string($initialState)){
             $initialState = [
                 'name' => $model->initial_state,
@@ -162,35 +142,42 @@ trait HasStateable {
                 'color' => 'warning'
             ];
         }
-        // dd($initialState);
-        foreach ($allStates as $state){
-
-            $pivotData = [
-                'is_active' => false,
-                'color' => $model->initial_state['color'] ?? 'warning',
-                'icon' => $model->initial_state['icon'] ?? '$warning',
-            ];
-
+        // dd($allStates);
+        foreach ($allStates as $state) {
             $_state = State::where('code', $state['code'])->first();
-            // dd($_state);
-            if(is_null($_state)){
+            // dd(is_string($_state));
+            if(is_string($_state)){
+
+                $state['color'] = $initialState['color'] ?? 'warning';
+                $state['icon'] = $initialState['icon'] ?? '$warning';
+                // dd($state);
+                $_state = State::create($state);
+            }else{
+                // dd($_state, $state);
                 $_state = State::create($state);
             }
-            // dd($state, $initialState['code']);
-            if($state['code'] == $initialState['code'])
-                // dd($state, $initialState['code']);
+            // dd($_state);
+            $pivotData = ['is_active' => false];
+
+            if($state['code'] == $initialState['code']) {
                 $pivotData['is_active'] = true;
+            }
 
             $model->states()->attach($_state->id, $pivotData);
-
         }
     }
 
     public function getStateTranslationLanguages()
     {
-
         return [
             app()->getLocale()
         ];
+    }
+
+    public function previewState($state){
+        return "<span variant='text' color='{$state->color}' prepend-icon='{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</span>";
+    }
+    public function previewWhenStateNull(){
+        return "<span variant='text' color='' prepend-icon=''>No State</span>";
     }
 }

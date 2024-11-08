@@ -63,6 +63,9 @@ return [
         'isRowEditing' => false,
         'rowActionsType' => 'inline',
         'hideDefaultFooter' => false,
+        'striped' => true,
+        'hideBorderRow' => false,
+        'roundedRows' => true,
     ],
     'form_drafts' => [],
     'ui_settings' => [

@@ -16,9 +16,11 @@ class State extends \Unusualify\Modularity\Entities\State
 	 *
 	 * @var array<int, string>
 	 */
-	// protected $fillable = [x
+	// protected $fillable = [
 	// 	'published',
 	// 	'code',
+    //     'icon',
+    //     'color'
 	// ];
 
     /**

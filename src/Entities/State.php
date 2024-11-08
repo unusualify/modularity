@@ -45,6 +45,8 @@ class State extends Model
 	protected $fillable = [
 		'published',
 		'code',
+        'icon',
+        'color'
 	];
 
     /**
