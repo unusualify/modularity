@@ -149,8 +149,10 @@ trait HasStateable {
             }
             $allStates[] = $stateData;
         }
-
-        $initialState = $model->initial_state;
+        if(!isset($model->inititalState))
+            $initialState = $model->default_states[0];
+        else
+            $initialState = $model->initial_state;
         if(is_string($initialState)){
             $initialState = [
                 'name' => $model->initial_state,
