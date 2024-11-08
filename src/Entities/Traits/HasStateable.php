@@ -52,14 +52,12 @@ trait HasStateable {
                 $defaultState = collect($model->default_states)->firstWhere('code', $state->code);
 
                 if ($defaultState) {
-                    // Merge only specific attributes using array_merge
                     $attributes = array_merge(
                         $state->toArray(),
-                        [
-                            'icon' => $defaultState['icon'],
-                            'color' => $defaultState['color'],
-                            'name' => $defaultState[app()->getLocale()]['name']
-                        ]
+                        array_merge(
+                            $defaultState,
+                            $state->attributesToArray()
+                        )
                     );
 
                     $state->fill($attributes);
@@ -77,7 +75,6 @@ trait HasStateable {
                 );
             }
         });
-
         self::saving(static function (Model $model) {
             if(isset($model->_status)){
                 $model->preserved_state = $model->_state;
@@ -142,9 +139,14 @@ trait HasStateable {
                         'active' => true,
                     ];
                 }
+            }else {
+                foreach ($translationLangs as $lang) {
+                    $stateData[$lang] = [
+                        'name' => Str::headline($state),
+                        'active' => true,
+                    ];
+                }
             }
-
-
             $allStates[] = $stateData;
         }
 
@@ -156,10 +158,9 @@ trait HasStateable {
                 'color' => 'warning'
             ];
         }
-        // dd($allStates);
+
         foreach ($allStates as $state) {
             $_state = State::where('code', $state['code'])->first();
-            // dd(is_string($_state));
             if(is_string($_state)){
 
                 array_merge($state, [
@@ -170,7 +171,6 @@ trait HasStateable {
             }
             $_state = State::create($state);
 
-            // dd($_state);
             $pivotData = ['is_active' => false];
 
             if($state['code'] == $initialState['code']) {
