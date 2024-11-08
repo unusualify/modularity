@@ -142,7 +142,7 @@ trait HasStateable {
             }else {
                 foreach ($translationLangs as $lang) {
                     $stateData[$lang] = [
-                        'name' => Str::headline($state),
+                        'name' => Str::headline($state['code']),
                         'active' => true,
                     ];
                 }
@@ -160,9 +160,7 @@ trait HasStateable {
         }
 
         foreach ($allStates as $state) {
-            $_state = State::where('code', $state['code'])->first();
-            if(is_string($_state)){
-
+            if(is_string($state)){
                 array_merge($state, [
                     'color' => $initialState['color'] ?? 'warning',
                     'icon' => $initialState['icon'] ?? '$warning'
