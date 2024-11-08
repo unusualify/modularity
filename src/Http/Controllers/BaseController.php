@@ -147,7 +147,7 @@ abstract class BaseController extends PanelController
         Session::put($this->routeName . '_retain', true);
 
         if ($this->getTableOption('editOnModal')) {
-            return $this->respondWithSuccess(___('save-success'));
+            return $this->respondWithSuccess(___('messages.save-success'));
         }
 
         if (isset($input['cmsSaveType']) && Str::endsWith($input['cmsSaveType'], '-close')) {
@@ -162,7 +162,7 @@ abstract class BaseController extends PanelController
         }
 
         return $this->request->ajax()
-            ? $this->respondWithSuccess(___('save-success'))
+            ? $this->respondWithSuccess(___('messages.save-success'))
             : $this->respondWithRedirect(moduleRoute($this->routeName,
                 $this->routePrefix,
                 'edit',
@@ -322,14 +322,14 @@ abstract class BaseController extends PanelController
 
             if ($this->routeHasTrait('revisions')) {
                 return Response::json([
-                    'message' => ___('save-success'),
+                    'message' => ___('messages.save-success'),
                     'variant' => MessageStage::SUCCESS,
                     'revisions' => $item->revisionsArray(),
                 ]);
             }
 
             // if()
-            return $this->respondWithSuccess(___('save-success'));
+            return $this->respondWithSuccess(___('messages.save-success'));
         }
     }
 

@@ -228,6 +228,14 @@ export default {
             displayData[key]._value = value;
           }
         break;
+        case 'input-filepond':
+          // Repeater adds a nested level to the model as an array
+          if (Array.isArray(value)) {
+            displayData[key]._value = value.map(item => item.file_name);
+          } else {
+            displayData[key]._value = value.file_name;
+          }
+        break;
         case 'input-tab-group':
           // Repeater adds a nested level to the model as an array
           displayData[key]._value = _.reduce(value, (acc, obj, id) => {

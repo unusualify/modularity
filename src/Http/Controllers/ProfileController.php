@@ -11,9 +11,12 @@ use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Services\View\UComponent;
 use Unusualify\Modularity\Services\View\UWrapper;
+use Unusualify\Modularity\Traits\ManageUtilities;
 
 class ProfileController extends BaseController
 {
+    use ManageUtilities;
+
     protected $namespace = 'Modules\SystemUser';
 
     /**
@@ -91,7 +94,7 @@ class ProfileController extends BaseController
             [
                 UComponent::makeUeForm()
                     ->setAttributes([
-                        'class' => 'mb-theme',
+                        'class' => 'mb-6',
                         'title' => ___('Personal Information'),
                         'buttonText' => 'update',
                         'hasSubmit' => true,
@@ -305,6 +308,7 @@ class ProfileController extends BaseController
         $data['elements'] = [
             UWrapper::makeGridSection($sectionFields),
         ];
+        $data['endpoints'] = $this->getUrls();
 
         $view = "$this->baseKey::layouts.profile";
 
@@ -339,7 +343,7 @@ class ProfileController extends BaseController
 
         activity()->performedOn($item)->log('updated');
 
-        return $this->respondWithSuccess(___('save-success'));
+        return $this->respondWithSuccess(___('messages.save-success'));
 
     }
 
@@ -370,7 +374,7 @@ class ProfileController extends BaseController
 
         activity()->performedOn($item)->log('updated');
 
-        return $this->respondWithSuccess(___('save-success'));
+        return $this->respondWithSuccess(___('messages.save-success'));
 
     }
 }

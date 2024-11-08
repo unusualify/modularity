@@ -39,7 +39,7 @@ class CreateUnusualDefaultFilesTables extends Migration
                 $table->uuidMorphs('fileable');
                 $table->string('role')->nullable();
                 $table->string('locale', 6)->index();
-                $table->index(['fileable_type', 'fileable_id']);
+                // $table->index(['fileable_type', 'fileable_id']);
             });
         }
     }
