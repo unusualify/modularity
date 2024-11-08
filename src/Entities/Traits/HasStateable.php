@@ -155,21 +155,6 @@ trait HasStateable {
             $allStates[] = $stateData;
         }
 
-        if(!isset($model->default_state))
-            $defaultState = $model->default_state;
-        elseif (!isset($model->initital_state))
-            $defaultState = $model->initial_state;
-        else
-            $defaultState = $model->default_states[0];
-
-        if(is_string($defaultState)){
-            $defaultState = [
-                'name' => Str::headline($defaultState),
-                'icon' => '$warning',
-                'color' => 'warning'
-            ];
-        }
-
         if(!isset($model->inititalState))
             $initialState = $model->default_states[0];
         else
@@ -178,6 +163,21 @@ trait HasStateable {
         if(is_string($initialState)){
             $initialState = [
                 'name' => Str::headline($initialState),
+                'icon' => '$warning',
+                'color' => 'warning'
+            ];
+        }
+
+        if(!isset($model->default_state))
+            $defaultState = $model->default_state;
+        elseif ($initialState)
+            $defaultState = $initialState;
+        else
+            $defaultState = $model->default_states[0];
+
+        if(is_string($defaultState)){
+            $defaultState = [
+                'name' => Str::headline($defaultState),
                 'icon' => '$warning',
                 'color' => 'warning'
             ];
