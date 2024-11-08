@@ -170,6 +170,19 @@ trait HasStateable {
             ];
         }
 
+        if(!isset($model->inititalState))
+            $initialState = $model->default_states[0];
+        else
+            $initialState = $model->initial_state;
+
+        if(is_string($initialState)){
+            $initialState = [
+                'name' => Str::headline($initialState),
+                'icon' => '$warning',
+                'color' => 'warning'
+            ];
+        }
+
         foreach ($allStates as $state) {
 
             if(is_string($state)){
@@ -183,7 +196,7 @@ trait HasStateable {
 
             $pivotData = ['is_active' => false];
 
-            if($state['code'] == $defaultState['code']) {
+            if($state['code'] == $initialState['code']) {
                 $pivotData['is_active'] = true;
             }
 
