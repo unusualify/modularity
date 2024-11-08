@@ -22,8 +22,10 @@
     "This password reset link will expire in :count minutes.": "Bu şifre oluşturma linki :count dakika içerisinde sonlanacak.",
     "Total Amount" : "Genel Toplam",
     "Update Password": "Şifreyi Güncelle",
+    "VAT": "KDV",
     "YY": "YY",
     "You are receiving this email because we received a password reset request for your account.": "Hesabınızın şifresini sıfırlamak için bu maili alıyorsunuz",
     "Yes": "Evet",
-    "Year": "Yıl"
+    "Year": "Yıl",
+    "Total": "Toplam"
 }

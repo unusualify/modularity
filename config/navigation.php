@@ -16,13 +16,13 @@ return [
                 'route_name' => 'admin.dashboard',
                 'icon' => '$dashboard',
             ],
-            'media_library' => [
-                'name' => 'Media Library',
-                'icon' => '$media',
-                'attr' => 'data-medialib-btn',
-                // 'event' => '_triggerOpenMediaLibrary',
-                'event' => 'openFreeMediaLibrary',
-            ],
+            // 'media_library' => [
+            //     'name' => 'Media Library',
+            //     'icon' => '$media',
+            //     'attr' => 'data-medialib-btn',
+            //     // 'event' => '_triggerOpenMediaLibrary',
+            //     'event' => 'openFreeMediaLibrary',
+            // ],
         ],
         'superadmin' => [
             'dashboard' => [
@@ -61,26 +61,26 @@ return [
 
         ],
         'client' => [
-            'account' => [
-                'name' => 'My Account',
-                'items' => [
-                    'dashboard' => [
-                        'name' => 'Dashboard',
-                        'route_name' => 'admin.dashboard',
-                    ],
-                    'profile' => [
-                        'name' => 'Profile',
-                        'route_name' => 'admin.profile',
-                    ],
-                ],
-            ],
-            'media_library' => [
-                'name' => 'Media Library',
-                'icon' => '$media',
-                'attr' => 'data-medialib-btn',
-                // 'event' => '_triggerOpenMediaLibrary',
-                'event' => 'openFreeMediaLibrary',
-            ],
+            // 'account' => [
+            //     'name' => 'My Account',
+            //     'items' => [
+            //         'dashboard' => [
+            //             'name' => 'Dashboard',
+            //             'route_name' => 'admin.dashboard',
+            //         ],
+            //         'profile' => [
+            //             'name' => 'Profile',
+            //             'route_name' => 'admin.profile',
+            //         ],
+            //     ],
+            // ],
+            // 'media_library' => [
+            //     'name' => 'Media Library',
+            //     'icon' => '$media',
+            //     'attr' => 'data-medialib-btn',
+            //     // 'event' => '_triggerOpenMediaLibrary',
+            //     'event' => 'openFreeMediaLibrary',
+            // ],
         ],
         'guest' => [
             'register' => [

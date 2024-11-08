@@ -205,11 +205,11 @@ if (! function_exists('createDefaultMorphPivotTableFields')) {
         $table->foreignId($foreignKey)->constrained()->onUpdate('cascade')->onDelete('cascade');
         // $table->{unusualIntegerMethod()}($morphForeignKey)->nullable()->unsigned();
         // $table->string($morphForeignType)->nullable();
-        $table->uuidMorphs($morphName);
+        $table->uuidMorphs($morphName, "{$tableName}_type_id_index");
 
         // $table->timestamps();
         // $table->softDeletes();
-        $table->index([$morphForeignType, $morphForeignKey], "{$tableName}_type_id_index");
+        // $table->index([$morphForeignType, $morphForeignKey], "{$tableName}_type_id_index");
     }
 }
 

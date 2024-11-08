@@ -13,7 +13,7 @@ return [
         // 'lg' => 6,
         // 'xl' => 6,
         // 'class' => 'pr-6 pl-6 pb-2 pt-2',
-        'class' => 'pb-2 pt-2',
+        'class' => 'pb-0 pt-1',
     ],
     'offset' => [
         'offset' => 0,
