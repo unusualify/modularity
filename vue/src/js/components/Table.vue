@@ -14,9 +14,16 @@
       <v-data-table-server
         v-if="!hideTable"
         v-bind="{...$bindAttributes(), ...footerProps}"
-        :class="[noFullScreen ? '' : 'h-100', tableClasses, fullWidthWrapper ? '' : 'ue-table--narrow-wrapper', 'px-4', 'rounded-tr']"
+        :class="[
+          noFullScreen ? '' : 'h-100',
+          tableClasses,
+          fullWidthWrapper ? '' : 'ue-table--narrow-wrapper',
+          'px-4',
+          striped ? 'ue-datatable--striped' : '',
+          roundedRows ? 'ue-datatable--rounded-row' : '',
+          hideBorderRow ? 'ue-datatable--no-border-row' : ''
+        ]"
         id="ue-table"
-
         :headers="headers"
         :sticky="sticky"
         :items="elements"
@@ -449,9 +456,9 @@
 
           <v-menu v-if="rowActionsType === 'dropdown' || $vuetify.display.smAndDown"
             :close-on-content-click="false"
-            open-on-hover
             left
             offset-x
+            class="action-dropdown"
             >
             <template v-slot:activator="{ props }">
               <v-icon
@@ -596,6 +603,7 @@ export default {
     ...ignoreFormatters
   },
   setup (props, context) {
+    console.log('here Table.vue')
     return {
       ...useDraggable(props, context),
       ...useTable(props, context),
@@ -640,31 +648,43 @@ export default {
   &.ue-datatable--full-screen
     min-height: calc(100vh - (2*12 * $spacer))
 .v-table
-  &.rounded-tr
-  tr
-  &:first-child
-    td
-      &:first-child
-        border-bottom-left-radius: 8px
-        border-top-left-radius: 8px
+  &.ue-datatable
+    &--no-border-row
+      .v-table__wrapper
+        > table
+          > tbody
+            > tr:not(:last-child)
+              > td,
+              > th
+                border: none!important
+    &--rounded-row
+      th
+        background-color: rgba(140,160,167, .2) //TODO: table action border must be variable
+      tr
+        &:first-child
+          td,th
+            &:first-child
+              border-bottom-left-radius: 8px
+              border-top-left-radius: 8px
 
-      &:last-child
-        border-bottom-right-radius: 8px
-        border-top-right-radius: 8px
+            &:last-child
+              border-bottom-right-radius: 8px
+              border-top-right-radius: 8px
+        &:last-child
+          td,th
+            &:first-child
+              border-bottom-left-radius: 8px
+              border-top-left-radius: 8px
 
+            &:last-child
+              border-bottom-right-radius: 8px
+              border-top-right-radius: 8px
 
-  &:last-child
-    td
-      &:first-child
-        border-bottom-left-radius: 8px
-        border-top-left-radius: 8px
-
-      &:last-child
-        border-bottom-right-radius: 8px
-        border-top-right-radius: 8px
-
-  &.zebra-stripes
+    &--striped
       tr
         &:nth-of-type(2n)
-          background-color: rgba(140,160,167, .2)
+          background-color: rgba(140,160,167, .2) //TODO: table action border must be variable
+  .action-dropdown
+    .v-overlay__content
+      border: 1px solid #49454F !important //TODO: table action border must be variable
 </style>

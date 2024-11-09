@@ -87,7 +87,7 @@ return [
                 [
                     'label' => 'Images',
                     'type' => 'image',
-                    'name' => 'images',
+                    'name' => 'logo',
                     'rules' => 'sometimes|required:array',
                     'isIcon' => true,
                 ],

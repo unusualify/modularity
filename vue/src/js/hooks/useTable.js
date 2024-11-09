@@ -95,6 +95,9 @@ export const makeTableProps = propsFactory({
   createOnModal: Boolean,
   editOnModal: Boolean,
   embeddedForm: Boolean,
+  striped: Boolean,
+  hideBorderRow: Boolean,
+  roundedRows: Boolean,
 
   noForm: {
     type: Boolean,

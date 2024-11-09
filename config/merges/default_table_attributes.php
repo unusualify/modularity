@@ -8,7 +8,7 @@ return [
     'isRowEditing' => false,
     'rowActionsType' => 'inline',
     'hideDefaultFooter' => false,
-    'tableClasses' => 'elevation-2 zebra-stripes free-form',
+    'tableClasses' => 'elevation-2 free-form',
     'itemsPerPage' => 20,
     'hideHeaders' => false,
     'hideSearchField' => false,
