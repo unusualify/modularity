@@ -223,7 +223,8 @@ export default {
     },
     valid: null,
     isEditing: {
-      type: Number,
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -327,7 +328,7 @@ export default {
         let model = getModel(value, this.model, this.$store.state)
         if(JSON.stringify(Object.keys(__dot(model)) )!== JSON.stringify(Object.keys(__dot(oldModel)))){
           this.model = model
-          this.inputSchema = this.invokeRuleGenerator(getSchema(value, this.model))
+          this.inputSchema = this.invokeRuleGenerator(getSchema(value, this.model, this.isEditing))
         }
       },
       deep: true

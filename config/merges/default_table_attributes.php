@@ -18,6 +18,9 @@ return [
     // 'tableSubtitle' => '',
     'sticky' => true,
     'showSelect' => true,
+    'striped' => true,
+    'hideBorderRow' => false,
+    'roundedRows' => true,
 
     'toolbarOptions' => [
         'color' => 'transparent', // rgb(255,255,255,1) or utility colors like white, purple
