@@ -7,6 +7,7 @@ import store from '@/store' // Adjust the import based on your store structure
 import { CONFIG } from '@/store/mutations'
 import { useI18n } from 'vue-i18n'
 import pluralize from 'pluralize'
+import { addParametersToUrl, replaceState } from '@/utils/pushState'
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
@@ -451,6 +452,20 @@ import pluralize from 'pluralize'
   }
 
   window.__pluralize = (str) => pluralize.plural(str)
+
+  window.__pushQueryParams = (params) => {
+    // Get current URL and create URLSearchParams object
+    const url = new URL(window.location);
+    const searchParams = url.searchParams;
+
+    // Add new parameters
+    Object.entries(params).forEach(([key, value]) => {
+        searchParams.set(key, value);
+    });
+
+    // Update URL without reloading the page
+    window.history.pushState({}, '', url);
+  }
 }
 
 function tokenizePath(path) {
