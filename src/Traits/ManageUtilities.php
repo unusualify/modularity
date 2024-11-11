@@ -519,6 +519,17 @@ trait ManageUtilities
         // })->toArray();
     }
 
+    /**
+     * Filters the headers based on the user's roles.
+     *
+     * This method checks each header item to determine if the current user
+     * has the necessary permissions to view it. If the user is a super admin
+     * or if the header does not have any role restrictions, the header will
+     * be included in the returned array. Otherwise, it will be excluded.
+     *
+     * @param array $headers The array of header items to filter.
+     * @return array The filtered array of header items.
+     */
     public function filterHeadersByRoles($headers) {
         return array_reduce($headers, function($carry, $item){
             if( ( !$this->user || !isset($item['allowedRoles']) )
