@@ -141,11 +141,18 @@ trait ManageTable
         } elseif (! $this->config) {
             return [];
         } else {
-            return $this->indexTableColumns = Collection::make(
-                $this->getConfigFieldsByRoute('headers')
-            )->reduce(function ($carry, $item) {
+            $headers = Collection::make($this->getConfigFieldsByRoute('headers'))
+                ->map(fn($item) => (object) [...(array)$item, 'visible' => true]);
+
+            $visibleColumns = explode(',', $this->request->get('columns') ?? $headers->pluck('key')->implode(','));
+
+            return $this->indexTableColumns = $headers->reduce(function ($carry, $item) use ($visibleColumns) {
+                $header = $this->getHeader((array) $item);
                 if (isset($item->key)) {
-                    $carry[] = $this->getHeader((array) $item);
+                    if($item->key !== 'actions' && !in_array($item->key, $visibleColumns)){
+                        $header['visible'] = false;
+                    }
+                    $carry[] = $header;
                 }
 
                 return $carry;
