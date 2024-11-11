@@ -272,7 +272,7 @@ trait ManageUtilities
                 'stickyButton' => false,
                 'modelValue' => $this->repository->getFormFields($item, $schema),
                 'title' => __(((bool) $itemId ? 'fields.edit-item' : 'fields.new-item'), ['item' => trans_choice('modules.' . snakeCase($this->routeName), 0)]),
-                'isEditing' => true,
+                'isEditing' => $itemId ? true : false,
                 '__removed' => [
                     // 'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => $this->routeName]),
                     // 'schema'  => $schema, // input fields to be used in unusual datatable component

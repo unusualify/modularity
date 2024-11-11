@@ -24,7 +24,9 @@
           hideBorderRow ? 'ue-datatable--no-border-row' : ''
         ]"
         id="ue-table"
-        :headers="headers"
+
+        :headers="selectedHeaders"
+
         :sticky="sticky"
         :items="elements"
         :hover="true"
@@ -181,7 +183,7 @@
                   <ue-form
                     ref="form"
                     :title="formTitle"
-                    :isEditing="editedIndex"
+                    :isEditing="editedIndex > 0"
                   />
                 </v-card-text>
                 <v-divider/>
@@ -384,8 +386,8 @@
 
         <!-- #formatterColumns -->
         <template
-        v-for="(col, i) in formatterColumns"
-        v-slot:[`item.${col.key}`]="{ item }"
+          v-for="(col, i) in formatterColumns"
+          v-slot:[`item.${col.key}`]="{ item }"
         >
           <template v-if="col.formatter == 'edit' || col.formatter == 'activate'">
             <v-tooltip :text="item[col.key]" :key="i">
@@ -432,28 +434,67 @@
               :key="item[col.key]"
             />
           </template>
-      </template>
+        </template>
 
+        <!-- #header actions slot -->
         <template v-slot:header.actions="_obj">
           <v-menu
             :close-on-content-click="false"
-            open-on-hover
-            left
+            location="bottom"
             >
             <template v-slot:activator="{ props }">
-              <v-icon
+              <v-btn
+                size="large"
+                variant="plain"
+                color="black"
+                icon="mdi-cog-outline"
+                v-bind="props"
+              />
+              <!-- <v-icon
                 size="large"
                 icon="mdi-cog-outline"
                 v-bind="props"
-                >
-              </v-icon>
+              /> -->
             </template>
+            <v-card>
+              <v-card-title>
+                <v-list class="">
+                  <template v-for="(item, index) in headersModel" :key="index">
+                    <v-checkbox
+                      class="ml-n2"
+                      v-if="item.key !== 'actions'"
+                      :disabled="headersModel.filter(h => h.key !== 'actions' && h.visible === true).length < 2 && headersModel[index].visible === true"
+                      v-model="headersModel[index].visible"
+                      :label="item.title"
+                      hide-details
+                      density="comfortable"
+                    />
+                  </template>
+                </v-list>
+              </v-card-title>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <!-- <v-btn
+                  text="Clear"
+                  variant="plain"
+                  @click="clearAdvancedFilter"
+                ></v-btn> -->
+
+                <v-btn
+                  color="primary"
+                  text="Save"
+                  variant="tonal"
+                  @click="applyHeaders"
+                ></v-btn>
+              </v-card-actions>
+            </v-card>
+
           </v-menu>
         </template>
-        <template v-slot:item.actions="{ item }">
-          <!-- @click's editItem|deleteItem -->
-          <!-- #actions -->
 
+        <!-- #item actions slot-->
+        <template v-slot:item.actions="{ item }">
           <v-menu v-if="rowActionsType === 'dropdown' || $vuetify.display.smAndDown"
             :close-on-content-click="false"
             left
@@ -514,7 +555,6 @@
             <v-progress-circular :indeterminate="loading" v-if="enableInfiniteScroll && loading"></v-progress-circular>
         </template>
 
-
         <template v-slot:default v-if="draggable">
           <thead>
             <slot :name="headers">
@@ -560,9 +600,7 @@
           </Draggable>
         </template>
 
-
       </v-data-table-server>
-
     </div>
   <!-- </v-layout> -->
 </template>
