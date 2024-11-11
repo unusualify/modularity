@@ -661,24 +661,15 @@ export default {
       th
         background-color: rgba(140,160,167, .2) //TODO: table action border must be variable
       tr
-        &:first-child
-          td,th
-            &:first-child
-              border-bottom-left-radius: 8px
-              border-top-left-radius: 8px
+        // &:first-child
+        td,th
+          &:first-child
+            border-bottom-left-radius: 8px
+            border-top-left-radius: 8px
 
-            &:last-child
-              border-bottom-right-radius: 8px
-              border-top-right-radius: 8px
-        &:last-child
-          td,th
-            &:first-child
-              border-bottom-left-radius: 8px
-              border-top-left-radius: 8px
-
-            &:last-child
-              border-bottom-right-radius: 8px
-              border-top-right-radius: 8px
+          &:last-child
+            border-bottom-right-radius: 8px
+            border-top-right-radius: 8px
 
     &--striped
       tr
