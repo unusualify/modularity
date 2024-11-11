@@ -29,6 +29,7 @@ trait ManageUtilities
     {
         $initialResource = $this->getJSONData();
         $filters = json_decode($this->request->get('filter'), true) ?? [];
+        $headers = $this->filterHeadersByRoles($this->getIndexTableColumns());
 
         $_deprecated = [
             'initialResource' => $initialResource, //
@@ -71,7 +72,7 @@ trait ManageUtilities
             ],
             'tableStore' => [
                 'baseUrl' => rtrim(config('app.url'), '/') . '/',
-                'headers' => $this->getIndexTableColumns(),
+                'headers' => $headers,
                 'searchText' => request()->has('search') ? request()->query('search') : '',
                 'options' => $this->getVuetifyDatatableOptions(),
                 'data' => $initialResource['data'],
@@ -516,5 +517,18 @@ trait ManageUtilities
 
         //     ];
         // })->toArray();
+    }
+
+    public function filterHeadersByRoles($headers) {
+        return array_reduce($headers, function($carry, $item){
+            if( ( !$this->user || !isset($item['allowedRoles']) )
+                || $this->user->isSuperAdmin()
+                || $this->user->hasRole($item['allowedRoles'])
+            ){
+                $carry[] = $item;
+            }
+
+            return $carry;
+        }, []);
     }
 }
