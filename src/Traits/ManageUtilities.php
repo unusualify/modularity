@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -35,8 +36,8 @@ trait ManageUtilities
             'filters' => $filters,
             'requestFilter' => json_decode(request()->get('filter'), true) ?? [],
             'searchText' => request()->has('search') ? request()->query('search') : '', // for current text of search parameter
-            'headers' => $this->getIndexTableColumns(), // headers to be used in unusual datatable component
-            'formSchema' => $this->filterFormSchemaByRoles($this->formSchema), // input fields to be used in unusual datatable component
+            'headers' => $headers, // headers to be used in unusual datatable component
+            'formSchema' => $this->filterSchemaByRoles($this->formSchema), // input fields to be used in unusual datatable component
         ];
         $data = [
             ...$_deprecated,
@@ -65,7 +66,7 @@ trait ManageUtilities
 
             ),
             'formStore' => [
-                'inputs' => $this->filterFormSchemaByRoles($this->formSchema),
+                'inputs' => $this->filterSchemaByRoles($this->formSchema),
                 'fields' => [],
             ],
             'tableStore' => [
@@ -287,7 +288,7 @@ trait ManageUtilities
                     : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]),
             ] + $this->getUrls(),
             'formStore' => [
-                'inputs' => $this->filterFormSchemaByRoles($schema),
+                'inputs' => $this->filterSchemaByRoles($schema),
             ],
 
             '__old' => [
@@ -380,6 +381,57 @@ trait ManageUtilities
         return [
             'pageTitle' => $this->getHeadline($this->routeName) . ' Module',
         ];
+    }
+
+    /**
+     * Filters the provided schema based on the roles of the authenticated user.
+     *
+     * This method iterates through the schema fields and checks if the user has the
+     * necessary roles to access each field. If a field has an 'allowedRoles' attribute
+     * and the user does not possess the required role, that field will be excluded
+     * from the resulting schema. Additionally, if a field is of type 'group' or 'wrap',
+     * the method will recursively filter its schema as well.
+     *
+     * @param array $schema The schema to be filtered.
+     * @return array The filtered schema, containing only fields the user is allowed to access.
+     */
+    public function filterSchemaByRoles($schema) {
+        // moved here from ManageForm
+        // the method name changed
+        // as the Gunes did it.
+        // TODO: refactor this code to be more efficient like filterHeadersByRoles
+        return array_filter(
+            array_map(function ($field) {
+
+                if(is_null(Auth::user()))
+                    return false;
+
+                if (isset($field['allowedRoles']) && !Auth::user()->hasRole($field['allowedRoles'])) {
+                    return null;
+                }
+
+                if ($field['type'] === 'group' && isset($field['schema'])) {
+                    $field['schema'] = $this->filterSchemaByRoles($field['schema']);
+
+                    if (empty($field['schema'])) {
+                        return null;
+                    }
+                }
+
+                if ($field['type'] === 'wrap' && isset($field['schema'])) {
+                    $field['schema'] = $this->filterSchemaByRoles($field['schema']);
+                    if (empty($field['schema'])) {
+                        return null;
+                    }
+                }
+
+                return $field;
+
+            }, $schema),
+            function ($field) {
+                return $field !== null;
+            }
+        );
     }
 
     public function getNestedData()
