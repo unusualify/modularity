@@ -110,5 +110,8 @@ return [
     ],
     'cellOptions' => [
         'maxChar' => 3,
-    ]
+    ],
+    'headerOptions' => [
+        'color' => 'rgba(140,160,167, .2)' //Hex, rgba or default css colors
+    ],
 ];
