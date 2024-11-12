@@ -95,7 +95,16 @@ class ProfileController extends BaseController
                 UComponent::makeUeForm()
                     ->setAttributes([
                         'class' => 'mb-6',
-                        'title' => ___('Personal Information'),
+                        'title' => [
+                            'text' => __('Personal Information'),
+                            'tag' => 'p',
+                            'type' => 'h5',
+                            'weight' => 'bold',
+                            'transform' => '',
+                            'align' => 'center',
+                            'justify' => 'left',
+                            'margin' => 'y-8'
+                        ],
                         'buttonText' => 'update',
                         'hasSubmit' => true,
                         'stickyButton' => false,
@@ -111,7 +120,16 @@ class ProfileController extends BaseController
                     ]),
                 UComponent::makeUeForm()
                     ->setAttributes([
-                        'title' => ___('Update Password'),
+                        'title' => [
+                            'text' => __('Update Password'),
+                            'tag' => 'p',
+                            'type' => 'h5',
+                            'weight' => 'bold',
+                            'transform' => '',
+                            'align' => 'center',
+                            'justify' => 'left',
+                            'margin' => 'y-8'
+                        ],
                         'buttonText' => 'update',
                         'hasSubmit' => true,
                         'stickyButton' => false,
@@ -284,7 +302,16 @@ class ProfileController extends BaseController
                 'content' => [
                     UComponent::makeUeForm()
                         ->setAttributes([
-                            'title' => ___('Company Information'),
+                                'title' => [
+                                'text' => __('Company Information'),
+                                'tag' => 'p',
+                                'type' => 'h5',
+                                'weight' => 'bold',
+                                'transform' => '',
+                                'align' => 'center',
+                                'justify' => 'left',
+                                'margin' => 'y-8'
+                            ],
                             // 'editable' => true,
                             'buttonText' => 'update',
                             'hasSubmit' => true,
