@@ -220,7 +220,7 @@ export default function useTable (props, context) {
     },
     snakeName: _.snakeCase(props.name),
     permissionName: _.kebabCase(props.name),
-    transNameSingular: computed(() => te('modules.' + state.snakeName, 0) ? t('modules.' + state.snakeName, 0) : props.name),
+    transNameSingular: computed(() => t('modules.' + state.snakeName, 0) ? t('modules.' + state.snakeName, 0) : props.name),
     transNamePlural: computed(() => t('modules.' + state.snakeName, 1)),
     transNameCountable: computed(() => t('modules.' + state.snakeName, getters.totalElements.value)),
     tableTitle: computed(() => {

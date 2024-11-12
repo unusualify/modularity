@@ -1,0 +1,33 @@
+<?php
+
+return [
+    'Name' => 'Name',
+    'Status' => 'Status',
+    'Actions' => 'Actions',
+    'Continent' => 'Continent',
+    'Supported Languages' => 'Supported Languages',
+    'Packages' => 'Packages',
+    'Package Region' => 'Package Region',
+    'Description' => 'Description',
+    'Created Time' => 'Created Time',
+    'Code' => 'Code',
+    'Package Addon Parent' => 'Package Addon Parent',
+    'Email' => 'Email',
+    'Company' => 'Company',
+    'Roles' => 'Roles',
+    'Guard Name' => 'Guard Name',
+    'Users' => 'Users',
+    'Payment Service Name' => 'Payment Service Name',
+    'Payment Service Slug' => 'Payment Service Slug',
+    'Payment Service' => 'Payment Service',
+    'System Payment Parent' => 'System Payment Parent',
+    'Rate' => 'Rate',
+    'Symbol' => 'Symbol',
+    'ISO 4217' => 'ISO 4217',
+    'Date' => 'Date',
+    'PR#' => 'PR#',
+    'Price' => 'Price',
+    'Location' => 'Location',
+    'Press Release' => 'Press Release',
+    'Last Update' => 'Last Update'
+];
