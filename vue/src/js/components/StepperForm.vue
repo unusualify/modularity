@@ -53,6 +53,7 @@
                   formClass=""
                   :ref="formRefs[i]"
                   :id="`stepper-form-${i+1}`"
+                  :isEditing="isEditing"
                   v-model="models[i]"
                   v-model:schema="schemas[i]"
                   @input="handleInput($event, i)"
@@ -437,6 +438,10 @@ export default {
         ]
       }
     },
+    isEditing: {
+      type: Boolean,
+      default: false
+    }
   },
   setup (props, context) {
     const inputHandlers = useInputHandlers()
