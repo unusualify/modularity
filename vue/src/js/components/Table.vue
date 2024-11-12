@@ -108,7 +108,7 @@
             />
 
             <v-btn
-              v-if="can('create') && !noForm && !someSelected"
+              v-if="can('create') && !noForm && !someSelected && createOnModal"
               v-bind="addBtnOptions"
               @click="createForm"
               :text="addBtnTitle"
