@@ -38,15 +38,15 @@ exports[`ConfigurableCard > Actions > renders with action buttons > with-actions
     </div>
     <div data-v-cd6087b7="" class="ue-configurable-card__col ue-configurable-card__col--seperator">
       <!-- <v-divider class="my-2"></v-divider> -->
-      <div data-v-cd6087b7="" class="d-flex fill-height flex-wrap justify-space-evenly align-center"><button data-v-cd6087b7="" type="button" class="v-btn v-btn--elevated v-btn--icon v-theme--unusual bg-primary v-btn--density-default v-btn--variant-elevated mx-1 rounded" style="min-height: 44px; min-width: 44px; text-transform: none;"><span class="v-btn__overlay"></span><span class="v-btn__underlay"></span>
+      <div data-v-cd6087b7="" class="d-flex fill-height flex-wrap justify-space-evenly align-center"><button data-v-cd6087b7="" type="button" class="v-btn v-btn--elevated v-btn--icon v-theme--unusual bg-primary v-btn--density-compact v-btn--variant-elevated mx-1 rounded" style="min-height: 44px; min-width: 44px; text-transform: none;"><span class="v-btn__overlay"></span><span class="v-btn__underlay"></span>
           <!----><span class="v-btn__content" data-no-activator=""><i class="mdi-pencil mdi v-icon notranslate v-theme--unusual v-icon--size-default" aria-hidden="true"></i></span>
           <!---->
           <!---->
-        </button><button data-v-cd6087b7="" type="button" class="v-btn v-btn--elevated v-btn--icon v-theme--unusual bg-error v-btn--density-default v-btn--variant-elevated mx-1 rounded" style="min-height: 44px; min-width: 44px; text-transform: none;"><span class="v-btn__overlay"></span><span class="v-btn__underlay"></span>
+        </button><button data-v-cd6087b7="" type="button" class="v-btn v-btn--elevated v-btn--icon v-theme--unusual bg-error v-btn--density-compact v-btn--variant-elevated mx-1 rounded" style="min-height: 44px; min-width: 44px; text-transform: none;"><span class="v-btn__overlay"></span><span class="v-btn__underlay"></span>
           <!----><span class="v-btn__content" data-no-activator=""><i class="mdi-delete mdi v-icon notranslate v-theme--unusual v-icon--size-default" aria-hidden="true"></i></span>
           <!---->
           <!---->
-        </button><button data-v-cd6087b7="" type="button" class="v-btn v-btn--elevated v-theme--unusual bg-primary v-btn--density-default v-btn--variant-elevated mx-1 rounded px-6" style="min-height: 44px; min-width: 44px; text-transform: none;"><span class="v-btn__overlay"></span><span class="v-btn__underlay"></span>
+        </button><button data-v-cd6087b7="" type="button" class="v-btn v-btn--elevated v-theme--unusual bg-primary v-btn--density-compact v-btn--variant-elevated mx-1 rounded px-6" style="min-height: 44px; min-width: 44px; text-transform: none;"><span class="v-btn__overlay"></span><span class="v-btn__underlay"></span>
           <!----><span class="v-btn__content" data-no-activator="">complete</span>
           <!---->
           <!---->

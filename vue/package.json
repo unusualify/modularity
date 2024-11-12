@@ -11,6 +11,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
+    "test:update": "vitest -u",
+
     "test:coverage": "vitest run --coverage",
     "madge": "madge"
   },
