@@ -1,7 +1,6 @@
 <template>
   <!-- <v-layout fluid v-resize="onResize"> -->
     <div :class="['ue-datatable__container', noFullScreen ? '' : 'fill-height ue-datatable--full-screen_' ]">
-
       <ActiveTableItem
         class=""
         v-model="activeTableItem"
@@ -86,7 +85,7 @@
               append-inner-icon="mdi-magnify"
               :placeholder="searchText"
               hide-details
-              density="compact"
+              density="comfortable"
 
               style="max-width: 30%; display: inline;"
               single-line
@@ -97,15 +96,24 @@
               v-if="mainFilters.length > 0"
               id="filter-btn-activator"
               v-bind="{...filterBtnOptions, ...filterBtnTitle}"
+              density="comfortable"
               />
             <v-btn
               v-if="Object.keys(advancedFilters).length > 0"
               id="advanced-filter-btn"
               v-bind="{...filterBtnOptions, ...filterBtnTitle}"
               text="Advanced Filter"
+              density="comfortable"
+
             />
 
-            <v-btn v-if="can('create') && !noForm && !someSelected" v-bind="addBtnOptions" @click="createForm" :text="addBtnTitle"/>
+            <v-btn
+              v-if="can('create') && !noForm && !someSelected"
+              v-bind="addBtnOptions"
+              @click="createForm"
+              :text="addBtnTitle"
+              density="comfortable"
+              />
 
           </v-toolbar>
 
@@ -603,7 +611,6 @@ export default {
     ...ignoreFormatters
   },
   setup (props, context) {
-    console.log('here Table.vue')
     return {
       ...useDraggable(props, context),
       ...useTable(props, context),

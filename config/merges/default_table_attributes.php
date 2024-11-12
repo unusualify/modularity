@@ -24,9 +24,10 @@ return [
         'border' => false, // false, 'xs', 'sm', 'md', 'lg', 'xl'.
         'rounded' => false, // This can be 0, xs, sm, true, lg, xl, pill, circle, and shaped. string | number | boolean
         'collapse' => false, // false, true,
-        'density' => 'compact', // prominent, comfortable, compact, default
+        'density' => 'default', // prominent, comfortable, compact, default
         'elevation' => 0, // string or number refers to elevation
         'image' => '', // image link for the background of the toolbar
+        'height' => '90'
     ],
     'filterBtnOptions' => [
         'variant' => 'outlined', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
