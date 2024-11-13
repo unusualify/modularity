@@ -105,6 +105,7 @@ trait ManageUtilities
             ],
 
         ];
+
         // dd($data);
         // dd($options['tableStore']);
         return array_replace_recursive($data + $options, $this->indexData($this->request));
@@ -397,7 +398,8 @@ trait ManageUtilities
      * @param array $schema The schema to be filtered.
      * @return array The filtered schema, containing only fields the user is allowed to access.
      */
-    public function filterSchemaByRoles($schema) {
+    public function filterSchemaByRoles($schema)
+    {
         // moved here from ManageForm
         // the method name changed
         // as the Gunes did it.
@@ -405,10 +407,11 @@ trait ManageUtilities
         return array_filter(
             array_map(function ($field) {
 
-                if(is_null(Auth::user()))
+                if (is_null(Auth::user())) {
                     return false;
+                }
 
-                if (isset($field['allowedRoles']) && !Auth::user()->hasRole($field['allowedRoles'])) {
+                if (isset($field['allowedRoles']) && ! Auth::user()->hasRole($field['allowedRoles'])) {
                     return null;
                 }
 
@@ -531,12 +534,13 @@ trait ManageUtilities
      * @param array $headers The array of header items to filter.
      * @return array The filtered array of header items.
      */
-    public function filterHeadersByRoles($headers) {
-        return array_reduce($headers, function($carry, $item){
-            if( ( !$this->user || !isset($item['allowedRoles']) )
+    public function filterHeadersByRoles($headers)
+    {
+        return array_reduce($headers, function ($carry, $item) {
+            if ((! $this->user || ! isset($item['allowedRoles']))
                 || $this->user->isSuperAdmin()
                 || $this->user->hasRole($item['allowedRoles'])
-            ){
+            ) {
                 $carry[] = $item;
             }
 

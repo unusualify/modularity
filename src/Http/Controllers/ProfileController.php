@@ -103,7 +103,7 @@ class ProfileController extends BaseController
                             'transform' => '',
                             'align' => 'center',
                             'justify' => 'left',
-                            'margin' => 'y-8'
+                            'margin' => 'y-8',
                         ],
                         'buttonText' => 'update',
                         'hasSubmit' => true,
@@ -128,7 +128,7 @@ class ProfileController extends BaseController
                             'transform' => '',
                             'align' => 'center',
                             'justify' => 'left',
-                            'margin' => 'y-8'
+                            'margin' => 'y-8',
                         ],
                         'buttonText' => 'update',
                         'hasSubmit' => true,
@@ -302,7 +302,7 @@ class ProfileController extends BaseController
                 'content' => [
                     UComponent::makeUeForm()
                         ->setAttributes([
-                                'title' => [
+                            'title' => [
                                 'text' => __('Company Information'),
                                 'tag' => 'p',
                                 'type' => 'h5',
@@ -310,7 +310,7 @@ class ProfileController extends BaseController
                                 'transform' => '',
                                 'align' => 'center',
                                 'justify' => 'left',
-                                'margin' => 'y-8'
+                                'margin' => 'y-8',
                             ],
                             // 'editable' => true,
                             'buttonText' => 'update',

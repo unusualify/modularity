@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Hydrates\Inputs;
 
 use Illuminate\Support\Facades\App;
 
-
 class StateableHydrate extends InputHydrate
 {
     /**
@@ -31,7 +30,6 @@ class StateableHydrate extends InputHydrate
         $input['itemTitle'] = 'name';
         $input['itemValue'] = 'id';
 
-
         $repository = App::make('Modules\SystemUtility\Repositories\StateRepository');
 
         $model = App::make('Modules\PressRelease\Entities\PressRelease');
@@ -39,12 +37,12 @@ class StateableHydrate extends InputHydrate
         $states = $repository->getByColumnValues('code', array_column($model->default_states, 'code'));
         // dd($states);
         $items = [];
-        foreach($states as $state){
+        foreach ($states as $state) {
             array_push(
                 $items,
                 [
                     'id' => $state->id,
-                    'name' => $state->translatedAttribute('name')->first()
+                    'name' => $state->translatedAttribute('name')->first(),
                 ]
             );
         }
@@ -53,7 +51,8 @@ class StateableHydrate extends InputHydrate
         return $input;
     }
 
-    public function createNonExistantStates(){
+    public function createNonExistantStates()
+    {
         //
     }
 }

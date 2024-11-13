@@ -8,6 +8,5 @@ return [
 
     'save-success' => 'Kayıt Başarıyla Tamamlandı!',
 
-
     'invalid-company' => 'Şirket detayları doldurulmak zorundadır!',
 ];

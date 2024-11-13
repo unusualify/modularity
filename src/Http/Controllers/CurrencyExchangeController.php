@@ -22,6 +22,7 @@ class CurrencyExchangeController extends Controller
     {
         try {
             $this->currencyService->fetchExchangeRates();
+
             return response()->json(['message' => 'Exchange rates updated successfully.'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to update rates.'], 500);
@@ -39,7 +40,8 @@ class CurrencyExchangeController extends Controller
         ]);
 
         try {
-            $converted = $this->currencyService->convertTo($request->amount, strtoupper($request->currency));
+            $converted = $this->currencyService->convertTo($request->amount, mb_strtoupper($request->currency));
+
             return response()->json(['converted_amount' => $converted], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Conversion failed.'], 400);
@@ -52,8 +54,9 @@ class CurrencyExchangeController extends Controller
     public function getRate(Request $request, $currency)
     {
         try {
-            $rate = $this->currencyService->getExchangeRate(strtoupper($currency));
-            return response()->json(['currency' => strtoupper($currency), 'rate' => $rate], 200);
+            $rate = $this->currencyService->getExchangeRate(mb_strtoupper($currency));
+
+            return response()->json(['currency' => mb_strtoupper($currency), 'rate' => $rate], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Rate not found.'], 404);
         }

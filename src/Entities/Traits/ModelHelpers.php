@@ -33,7 +33,7 @@ trait ModelHelpers
             }
         });
         static::saving(function ($model) {
-            if(isset($model->base_price_show)){
+            if (isset($model->base_price_show)) {
                 $model->offsetUnset('base_price_show');
             }
         });

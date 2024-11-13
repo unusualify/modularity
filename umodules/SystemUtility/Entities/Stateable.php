@@ -17,6 +17,6 @@ class Stateable extends Model
         'stateable_type',
         'color',
         'icon',
-        'is_active'
+        'is_active',
     ];
 }

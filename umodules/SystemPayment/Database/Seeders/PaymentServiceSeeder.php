@@ -35,7 +35,7 @@ class PaymentServiceSeeder extends Seeder
                 'is_external' => false,
                 'is_internal' => true,
                 'image' => 'iyzico.png',
-                'currency' => 'TRY'
+                'currency' => 'TRY',
             ],
             [
                 'name' => 'paypal',
@@ -43,7 +43,7 @@ class PaymentServiceSeeder extends Seeder
                 'is_external' => true,
                 'is_internal' => false,
                 'image' => 'paypal.png',
-                'currency' => 'USD'
+                'currency' => 'USD',
             ],
             [
                 'name' => 'garanti-pos',
@@ -51,7 +51,7 @@ class PaymentServiceSeeder extends Seeder
                 'is_external' => false,
                 'is_internal' => true,
                 'image' => 'credit-card.png',
-                'currency' => 'TRY'
+                'currency' => 'TRY',
             ],
             [
                 'name' => 'teb-pos',
@@ -59,7 +59,7 @@ class PaymentServiceSeeder extends Seeder
                 'is_external' => false,
                 'is_internal' => true,
                 'image' => 'credit-card.png',
-                'currency' => 'TRY'
+                'currency' => 'TRY',
             ],
             [
                 'name' => 'teb-common-pos',
@@ -67,7 +67,7 @@ class PaymentServiceSeeder extends Seeder
                 'is_external' => false,
                 'is_internal' => true,
                 'image' => 'credit-card.png',
-                'currency' => 'TRY'
+                'currency' => 'TRY',
             ],
             [
                 'name' => 'ideal',
@@ -75,7 +75,7 @@ class PaymentServiceSeeder extends Seeder
                 'is_external' => true,
                 'is_internal' => false,
                 'image' => 'ideal.png',
-                'currency' => 'EUR'
+                'currency' => 'EUR',
             ],
         ];
 
@@ -90,6 +90,7 @@ class PaymentServiceSeeder extends Seeder
 
         if (! $superadmin) {
             $this->command->error('Admin user not found. Please ensure the admin user exists in the database.');
+
             return;
         }
 

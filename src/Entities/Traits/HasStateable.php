@@ -3,13 +3,27 @@
 namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Model;
-use Unusualify\Modularity\Entities\State;
-use Illuminate\Support\Facades\Log;
-use Modules\SystemUtility\Entities\Stateable;
 use Illuminate\Support\Str;
+use Modules\SystemUtility\Entities\Stateable;
+use Unusualify\Modularity\Entities\State;
 
-trait HasStateable {
+trait HasStateable
+{
     protected static $stateModel = 'Modules\SystemUtility\Entities\State';
+
+    /**
+     * Cached source model fields.
+     *
+     * @var array
+     */
+    protected $_stateableSourceFields = [];
+
+    /**
+     * Original fillable attributes.
+     *
+     * @var array|null
+     */
+    protected $_originalFillable = null;
 
     public function states(): \Illuminate\Database\Eloquent\Relations\MorphToMany
     {
@@ -33,8 +47,8 @@ trait HasStateable {
             'id',                // Local key on this model
             'state_id'           // Local key on stateables
         )
-        ->where(config('modularity.states.table', 'stateables').'.stateable_type', get_class($this))
-        ->where(config('modularity.states.table', 'stateables').'.is_active', 1);
+            ->where(config('modularity.states.table', 'stateables') . '.stateable_type', get_class($this))
+            ->where(config('modularity.states.table', 'stateables') . '.is_active', 1);
     }
 
     public static function bootHasStateable(): void
@@ -43,11 +57,11 @@ trait HasStateable {
             $model->createNonExistantStates($model);
         });
         self::retrieved(static function (Model $model) {
-            $state = $model->states->first(function($state) {
+            $state = $model->states->first(function ($state) {
                 return $state->pivot->is_active === 1;
             });
 
-            if (!is_null($state)) {
+            if (! is_null($state)) {
                 // Get matching default state if exists
                 $defaultState = collect($model->default_states)->firstWhere('code', $state->code);
 
@@ -77,7 +91,8 @@ trait HasStateable {
         });
         self::saving(static function (Model $model) {
 
-            if(isset($model->_status)){
+            if (isset($model->_status)) {
+                //Updating the model
                 $model->preserved_state = $model->_state;
             }
 
@@ -87,17 +102,17 @@ trait HasStateable {
 
         self::saved(static function (Model $model) {
             $newState = State::find($model->preserved_state);
-
-            if(is_null($newState))
+            // Get current active state (if exists)
+            if (is_null($newState)) {
                 return false;
-
+            }
             $currentActiveState = $model->states()
                 ->wherePivot('is_active', 1)
                 ->first();
 
             if ($currentActiveState && $currentActiveState->id !== $newState->id) {
                 $model->states()->updateExistingPivot($currentActiveState->id, [
-                    'is_active' => 0
+                    'is_active' => 0,
                 ]);
             }
 
@@ -107,11 +122,11 @@ trait HasStateable {
 
             if ($existingRelationship) {
                 $model->states()->updateExistingPivot($newState->id, [
-                    'is_active' => 1
+                    'is_active' => 1,
                 ]);
             } else {
                 $model->states()->attach($newState->id, [
-                    'is_active' => 1
+                    'is_active' => 1,
                 ]);
             }
         });
@@ -130,21 +145,22 @@ trait HasStateable {
 
         foreach ($defaultStates as $index => $state) {
 
-            if(is_string($state))
+            if (is_string($state)) {
                 $stateData = [
-                    'code' => $state
+                    'code' => $state,
                 ];
-            else
+            } else {
                 $stateData = $state;
+            }
 
-            if(is_string($state)){
+            if (is_string($state)) {
                 foreach ($translationLangs as $lang) {
                     $stateData[$lang] = [
                         'name' => Str::headline($state),
                         'active' => true,
                     ];
                 }
-            }else {
+            } else {
                 foreach ($translationLangs as $lang) {
                     $stateData[$lang] = [
                         'name' => Str::headline($state['code']),
@@ -155,35 +171,37 @@ trait HasStateable {
             $allStates[] = $stateData;
         }
 
-        if(!isset($model->inititalState))
+        if (! isset($model->inititalState)) {
             $initialState = $model->default_states[0];
-        else
+        } else {
             $initialState = $model->initial_state;
+        }
 
-        if(is_string($initialState)){
+        if (is_string($initialState)) {
             $initialState = [
                 'name' => Str::headline($initialState),
                 'icon' => '$warning',
-                'color' => 'warning'
+                'color' => 'warning',
             ];
         }
 
-        if(!isset($model->default_state))
+        if (! isset($model->default_state)) {
             $defaultState = $model->default_state;
-        else
+        } else {
             $defaultState = $initialState;
+        }
 
-        if(is_string($defaultState)){
+        if (is_string($defaultState)) {
             $defaultState = [
                 'name' => Str::headline($defaultState),
                 'icon' => '$warning',
-                'color' => 'warning'
+                'color' => 'warning',
             ];
         }
 
         foreach ($allStates as $state) {
 
-            if(is_string($state)){
+            if (is_string($state)) {
                 array_merge($state, [
                     'color' => $defaultState['color'],
                     'icon' => $defaultState['icon'],
@@ -194,7 +212,7 @@ trait HasStateable {
 
             $pivotData = ['is_active' => false];
 
-            if($state['code'] == $initialState['code']) {
+            if ($state['code'] == $initialState['code']) {
                 $pivotData['is_active'] = true;
             }
 
@@ -205,14 +223,17 @@ trait HasStateable {
     public function getStateTranslationLanguages()
     {
         return [
-            app()->getLocale()
+            app()->getLocale(),
         ];
     }
 
-    public function previewState($state){
+    public function previewState($state)
+    {
         return "<span variant='text' color='{$state->color}' prepend-icon='{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</span>";
     }
-    public function previewWhenStateNull(){
+
+    public function previewWhenStateNull()
+    {
         return "<span variant='text' color='' prepend-icon=''>No State</span>";
     }
 }

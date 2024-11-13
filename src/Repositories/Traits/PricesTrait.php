@@ -63,18 +63,18 @@ trait PricesTrait
                     // dd($priceData, $priceModel, $this->defaultPriceData);
                     $data = array_merge_recursive_preserve($this->defaultPriceData, $priceData + ['role' => $name]);
 
-                    if($onlyBaseCurrency){
-                        foreach ([1,2,3] as $key => $id) {
+                    if ($onlyBaseCurrency) {
+                        foreach ([1, 2, 3] as $key => $id) {
                             $_currency = Currency::find($id);
-                            if($_currency->iso_4217 !== $baseCurrency){
+                            if ($_currency->iso_4217 !== $baseCurrency) {
                                 $_data = array_merge($data, [
                                     'display_price' => round(CurrencyExchange::convertTo($data['display_price'], $_currency->iso_4217), 2),
-                                    'currency_id' => $_currency->id
+                                    'currency_id' => $_currency->id,
                                 ]);
 
-                                if($existingPrices->where('currency_id', $_currency->id)->count() == 0){
+                                if ($existingPrices->where('currency_id', $_currency->id)->count() == 0) {
                                     $object->prices()->create(Arr::except($_data, ['id']));
-                                }else{
+                                } else {
                                     $existingPrices->where('currency_id', $_currency->id)->first()->update(Arr::except($_data, ['id']));
                                 }
                             }
@@ -88,7 +88,6 @@ trait PricesTrait
                         // Create a new price
                         $object->prices()->create(Arr::except($data, ['id']));
                     }
-
 
                 }
 
@@ -113,7 +112,7 @@ trait PricesTrait
 
             $query = $object->prices();
 
-            if($onlyBaseCurrency){
+            if ($onlyBaseCurrency) {
                 $query = $query->where('currency_id', Request::getUserCurrency()->id);
             }
 

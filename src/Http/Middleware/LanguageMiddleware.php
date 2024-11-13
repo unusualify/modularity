@@ -33,7 +33,7 @@ class LanguageMiddleware
 
         $currency = config('priceable.currency', 'EUR');
 
-        if(!unusualConfig('services.currency_exchange.active')){ // onlyBaseCurrency
+        if (! unusualConfig('services.currency_exchange.active')) { // onlyBaseCurrency
             $currency = unusualConfig("payment.locale_currencies.{$locale}", null)
                 ?? config('priceable.currency');
         }

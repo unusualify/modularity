@@ -23,7 +23,7 @@ trait MethodTransformers
         return $hasTrait;
     }
 
-    public function getByColumnValues($column = 'id',array $values, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null)
+    public function getByColumnValues($column, array $values, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null)
     {
         $query = $this->model->whereIn($column, $values);
 

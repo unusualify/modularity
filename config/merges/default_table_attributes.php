@@ -30,7 +30,7 @@ return [
         'density' => 'default', // prominent, comfortable, compact, default
         'elevation' => 0, // string or number refers to elevation
         'image' => '', // image link for the background of the toolbar
-        'height' => '90'
+        'height' => '90',
     ],
     'filterBtnOptions' => [
         'variant' => 'outlined', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
@@ -113,6 +113,6 @@ return [
         'maxChar' => 3,
     ],
     'headerOptions' => [
-        'color' => 'rgba(140,160,167, .2)' //Hex, rgba or default css colors
+        'color' => 'rgba(140,160,167, .2)', //Hex, rgba or default css colors
     ],
 ];

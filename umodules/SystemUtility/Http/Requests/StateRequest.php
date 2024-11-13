@@ -14,7 +14,7 @@ class StateRequest extends Request
     public function rulesForAll()
     {
         return [
-		];
+        ];
     }
 
     /**

@@ -2,15 +2,19 @@
 
 namespace Unusualify\Modularity\Services;
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class CurrencyExchangeService
 {
     protected $apiKey;
+
     protected $baseCurrency;
+
     protected $endpoint;
+
     protected $parameters;
+
     protected $ratesKey;
 
     public function __construct()
@@ -25,8 +29,6 @@ class CurrencyExchangeService
 
     /**
      * Fetch and cache exchange rates.
-     *
-     * @return array
      */
     public function fetchExchangeRates(): array
     {
@@ -53,16 +55,12 @@ class CurrencyExchangeService
 
     /**
      * Convert amount from base currency to target currency.
-     *
-     * @param float $amount
-     * @param string $targetCurrency
-     * @return float
      */
     public function convertTo(float $amount, string $targetCurrency): float
     {
         $rates = $this->fetchExchangeRates();
 
-        if (!isset($rates[$targetCurrency])) {
+        if (! isset($rates[$targetCurrency])) {
             throw new \Exception("Unsupported currency: {$targetCurrency}");
         }
 
@@ -71,15 +69,12 @@ class CurrencyExchangeService
 
     /**
      * Get exchange rate for a specific currency.
-     *
-     * @param string $currency
-     * @return float
      */
     public function getExchangeRate(string $currency): float
     {
         $rates = $this->fetchExchangeRates();
 
-        if (!isset($rates[$currency])) {
+        if (! isset($rates[$currency])) {
             throw new \Exception("Unsupported currency: {$currency}");
         }
 
