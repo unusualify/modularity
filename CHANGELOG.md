@@ -2,6 +2,93 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.18.0 - 2024-11-13
+
+### :rocket: Features
+
+- :sparkles: table updates by @gunesbizim in https://github.com/unusualify/modularity/commit/cd8e15bfdbedeab09a4ea7f0fe7576b6c29915b6
+- :sparkles: pr fixes by @gunesbizim in https://github.com/unusualify/modularity/commit/f7807269828f6c3167ebc09d55575db3f4033598
+- :sparkles: pr fixes by @gunesbizim in https://github.com/unusualify/modularity/commit/703d1ef50c8cdcd1d841da32667c2d6084705fe2
+- :recycle: removes unnecessary checks by @gunesbizim in https://github.com/unusualify/modularity/commit/678ff5f7df010043746a8bd7c27fff700a09ac46
+- :sparkles: add filterHeadersByRoles method into ManageUtilities by @OoBook in https://github.com/unusualify/modularity/commit/d825387e7bf323b661211dfe33180c83a9a0852c
+- :art: add pushQueryParam helper by @OoBook in https://github.com/unusualify/modularity/commit/88c6a9f8ac101f22b6ae3c97f456db6798341093
+- :art: add selectable columns feature by custom by @OoBook in https://github.com/unusualify/modularity/commit/95e134bbd7aa1a5b4fa5c5a0ffb28e90eb4bfa16
+- :sparkles: adds color as table header option by @gunesbizim in https://github.com/unusualify/modularity/commit/c869fb7e6b7a8ae9888ee716a56cf188af500db7
+- add slots for each segment on ConfigurableCard by @OoBook in https://github.com/unusualify/modularity/commit/f0e6932b40b87497a57781e481831574c82e52f6
+- :art: add base_price set attribute into modelHelpers by @OoBook in https://github.com/unusualify/modularity/commit/c2472efa9547dd771341ec42ba5c31ff5a3431f9
+- add payload watcher to resend request by @OoBook in https://github.com/unusualify/modularity/commit/3a3f5d636cb33a652f53ccb95e0ff385579eeaf1
+- :art: add formattedSummary into notation util by @OoBook in https://github.com/unusualify/modularity/commit/6696c92e78f2a8a95716567c29f8c15e59f491ed
+- add lastStepForm feature for addons by @OoBook in https://github.com/unusualify/modularity/commit/49e71a898ed21d496c9087dd4a953aaa94a9b8d6
+
+### :wrench: Bug Fixes
+
+- :bug: where a key is not defined but tried to accessed on retrieved by @gunesbizim in https://github.com/unusualify/modularity/commit/222c45697fe8b44eb383a9d67e1ae9a2b07d687e
+- :bug: logic error fixed by @gunesbizim in https://github.com/unusualify/modularity/commit/beeb65374b177dc7ca46ee395e806d1bd3d8e7f0
+- :bug: where initial_state is not set on model by @gunesbizim in https://github.com/unusualify/modularity/commit/0bcedc5d91243f18ddc3e398d247eb803a165607
+- :recycle: refactor initial_state to defaultState and add defining default_state option. by @gunesbizim in https://github.com/unusualify/modularity/commit/7afee33d028f8a9602246089e8c80810699ac575
+- :bug: fix the issue where initialState and defaultState are mixed by @gunesbizim in https://github.com/unusualify/modularity/commit/3c79184f0431b5d8d712cd2ff5a8fec3dd372110
+- fix tr border radius of Table.vue and add merge config fields by @OoBook in https://github.com/unusualify/modularity/commit/7f92c6a476053a2579be3fd79a5ce18e97cfb2ae
+- :ambulance: change isEditing variable from Number to Boolean by @OoBook in https://github.com/unusualify/modularity/commit/c06f8a21967824bd4afce6e2cb0eaa5618a2ba06
+- fix serializeParameters recursive call by @OoBook in https://github.com/unusualify/modularity/commit/5a5645fb3a62e2135225a455943582d9031de6dd
+- handle getSchema recursive if only its type is in [wrap,group,repeater, input-repeater] by @OoBook in https://github.com/unusualify/modularity/commit/a60aed228c9a51dc3aa971001132b20d7b6623d4
+- add isEditing prop in order to pass Form components by @OoBook in https://github.com/unusualify/modularity/commit/22cc259a09ccef408bacea559d61097f70b775c3
+- :bug: auth pages responsive design fixes with global button and input styling updates by @gunesbizim in https://github.com/unusualify/modularity/commit/65ada8085172ac4f96c237d6f4ebc926d002f77b
+- :bug: fixed the issue where createOnModal is false for add button but still shown by @gunesbizim in https://github.com/unusualify/modularity/commit/7b8bd65fb6339048f266f678f0a42d106e08b700
+- :bug: fixed phone input issues && labels && titles by @gunesbizim in https://github.com/unusualify/modularity/commit/d7659b76675e5bf6931250ab138b234e5eedf5df
+- :ambulance: remove recursive lines by @OoBook in https://github.com/unusualify/modularity/commit/6d27391cd50e4b40543fbd9f7eb9cdaa8bc92f7e
+
+### :recycle: Refactors
+
+- :recycle: stateable structure changed by @gunesbizim in https://github.com/unusualify/modularity/commit/4b3cfa79fb55d4dfea4d47fa901273e58624f799
+- :recycle: removed unnecessary checks by @gunesbizim in https://github.com/unusualify/modularity/commit/2a9b17340b5825b888cd92394c231e641ccd340b
+- :recycle: move filterFormSchemaByRoles into ManageUtilities as filterSchemaByRoles by @OoBook in https://github.com/unusualify/modularity/commit/b563f77c49dae6956ba650b386682d646af15d12
+
+### Styling
+
+- lint coding styles by @invalid-email-address in https://github.com/unusualify/modularity/commit/2f0c7199c11d8a5858ffc25000409f9295f53c6b
+
+### :white_check_mark: Testing
+
+- :white_check_mark: snapshots updated vitest && added test:update command for snapshot by @gunesbizim in https://github.com/unusualify/modularity/commit/6bd8f404ad6e985312aed5d0e97e4e0ac3f986c0
+- by @OoBook in https://github.com/unusualify/modularity/commit/5bcae46f86cb58ccea5e377aaddef643dfa5887f
+
+### :package: Build
+
+- :building_construction: add new v0.18.0 front build by @OoBook in https://github.com/unusualify/modularity/commit/fd672168b6e9da2ad4448bc9f8809d900b2eece5
+
+### :beers: Other Stuff
+
+- Merge branch 'refs/heads/release/v0.17.0'
+- Update CHANGELOG
+- Merge branch 'dev' into feature/general-table-update
+- Merge branch 'feature/general-table-update' of https://github.com/unusualify/modularity into feature/general-table-update
+- Merge pull request #74 from unusualify/feature/general-table-update
+
+The stateable task was completed as I wanted. The Initial state, default state, and default_states structures look completed at first glance.
+
+- add comments of filterHeadersByRoles method by @OoBook in https://github.com/unusualify/modularity/commit/d955f7f56fb7f6987deca9647c2dddc9593a6dd1
+- Merge pull request #75 from unusualify/feature/add-allowed-roles-to-headers
+
+Feature/add allowed roles to headers
+
+- Merge pull request #76 from unusualify/bugfix/auth-pages
+
+fix(auth page responsive & design fixes): :bug: auth pages responsive…
+
+- Merge pull request #77 from unusualify/bugfix/edit-profile
+
+fix: :bug: fixed phone input issues && labels && titles
+
+- Merge pull request #78 from unusualify/feature/table-header-color
+
+feat(table): :sparkles: adds color as table header option
+
+- Merge pull request #79 from unusualify/feature/add-new-cards-to-stepper-form
+
+Feature/add new cards to stepper form
+
+- merge remote-tracking branch 'origin/dev' into release/v0.18.0
+
 ## v0.17.0 - 2024-11-06
 
 ### :rocket: Features
