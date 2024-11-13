@@ -167,6 +167,10 @@ export const makeTableProps = propsFactory({
   cellOptions: {
     type: [Array, Object],
     default: {}
+  },
+  headerOptions: {
+    type: [Array, Object],
+    default: {}
   }
 })
 

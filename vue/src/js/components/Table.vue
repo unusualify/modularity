@@ -566,7 +566,7 @@
         <template v-slot:default v-if="draggable">
           <thead>
             <slot :name="headers">
-              <VDataTableHeaders :mobile="this.datatable.mobile">
+              <VDataTableHeaders :mobile="this.datatable.mobile" :color="this.headerOptions.color">
                 <template v-for="(_, name) in this.datatable.$slots" v-slot:[name]="slotData">
                   <slot :name="name" v-bind="slotData">
                     <component
@@ -660,6 +660,7 @@ export default {
     }
   },
   mounted () {
+    document.documentElement.style.setProperty('--table-header-color', this.headerOptions.color);
 
     this.$nextTick(() => {
       if (this.$refs.datatable) {
@@ -704,7 +705,7 @@ export default {
                 border: none!important
     &--rounded-row
       th
-        background-color: rgba(140,160,167, .2) //TODO: table action border must be variable
+        background-color: var(--table-header-color) //TODO: table action border must be variable
       tr
         // &:first-child
         td,th
