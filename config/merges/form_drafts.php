@@ -47,7 +47,7 @@ return [
             'col' => [
                 'sm' => 6,
             ],
-            'rules' => 'min:3',
+            // 'rules' => 'min:3',
         ],
         'language' => [
             'type' => '_language',
@@ -55,13 +55,13 @@ return [
             'label' => 'Preferred Language',
             'col' => ['sm' => 6],
         ],
-        'timezone' => [
-            'type' => '_timezone',
-            'name' => 'timezone',
-            'col' => ['sm' => 6],
-            'name' => 'time',
-            'rules' => 'sometimes|required',
-        ],
+        // 'timezone' => [
+        //     'type' => '_timezone',
+        //     'name' => 'timezone',
+        //     'col' => ['sm' => 6],
+        //     'name' => 'time',
+        //     'rules' => 'sometimes|required',
+        // ],
     ],
     'user_password' => [
         'current_password' => [
