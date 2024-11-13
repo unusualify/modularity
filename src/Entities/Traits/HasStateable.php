@@ -120,8 +120,6 @@ trait HasStateable
             $existingRelationship = $model->states()
                 ->where('state_id', $newState->id)
                 ->first();
-                ->where('state_id', $newState->id)
-                ->first();
 
             if ($existingRelationship) {
                 $model->states()->updateExistingPivot($newState->id, [
@@ -225,13 +223,6 @@ trait HasStateable
         return [
             app()->getLocale(),
         ];
-    }
-
-    public function previewState($state){
-        return "<span variant='text' color='{$state->color}' prepend-icon='{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</span>";
-    }
-    public function previewWhenStateNull(){
-        return "<span variant='text' color='' prepend-icon=''>No State</span>";
     }
 
     public function previewState($state){
