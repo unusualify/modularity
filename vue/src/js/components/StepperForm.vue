@@ -83,63 +83,115 @@
                       </v-col>
 
                       <v-col cols="12">
-
-                        <!-- <div class="text-h5 mb-4">ADD ONS</div> -->
-                        <template v-for="(addon, index) in [
-                            {
-                              id: 1,
-                              title: 'Lorem Ipsum Dolor',
-                              description: 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis At vero eos et accusamus etiu.',
-                              price: 50
-                            },
-                            {
-                              id: 2,
-                              title: 'Lorem Ipsum Dolor',
-                              description: 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis At vero eos et accusamus etiu.',
-                              price: 50
-                            }
-                          ]"
-                          :key="addon.id"
-                          :title="addon.title"
-                        >
-                          <!-- <ConfigurableCard
-                            :items="[
-                              [
-                                addon.title,
-                              ],
-                              addon.price
-                            ]"
-                          /> -->
-                          <v-card
-                            v-if="false"
-                            elevation="2"
-                            class="addon-card pa-4"
-                            :class="{ 'addon-card--selected': selected }"
-                          >
-                            <v-row align="center" no-gutters>
-                              <v-col cols="8">
-                                <div class="text-h6 mb-2">{{ addon.title }}</div>
-                                <div class="text-body-2 text-grey-darken-1">{{ addon.description }}</div>
-                              </v-col>
-
-                              <v-col cols="2" class="text-h4 text-center">
-                                ${{ addon.price }}
-                              </v-col>
-
-                              <v-col cols="2" class="d-flex justify-center">
-                                <v-btn
-                                  icon
-                                  size="large"
-                                  @click="$emit('toggle')"
+                        <v-sheet class="pa-4 bg-grey-lighten-3 rounded" elevation="2">
+                          <!-- <div class="text-body-1 text-primary font-weight-bold" margin>{{ finalFormTitle }}</div> -->
+                           <!-- {{ $log(previewFormData) }} -->
+                          <ue-title type="body-1" color="primary" font-weight="bold" padding="a-0">{{ finalFormTitle }}</ue-title>
+                          <template v-for="(data, index) in previewFormData" :key="`final-form-data-${index}`">
+                            <ConfigurableCard
+                              style="background-color: transparent;"
+                              class="mx-n4"
+                              elevation="0"
+                              :items="[
+                                [
+                                  data.name || 'N/A ',
+                                  data.description || 'N/A',
+                                ],
+                                data.base_price_show || 'N/A'
+                              ]"
+                              :actions="[
+                                {
+                                  // icon: 'mdi-plus',
+                                  // color: 'primary',
+                                  // class: 'rounded-circle',
+                                  onClick: () => {
+                                    // console.log('clicked', lastStepModel);
+                                  }
+                                }
+                              ]"
+                              hide-separator
+                              align-center-columns
+                              justify-center-columns
+                            >
+                              <template
+                                #[`segment.1`]="segmentScope"
                                 >
-                                <!-- :color="selected ? 'primary' : 'grey'"
-                                :variant="selected ? 'flat' : 'outlined'" -->
-                                  <v-icon>{{ selected ? 'mdi-minus' : 'mdi-plus' }}</v-icon>
-                                </v-btn>
-                              </v-col>
-                            </v-row>
-                          </v-card>
-                        </template>
+                                <div class="text-body-2 font-weight-medium mb-1">{{ segmentScope.data[0] }}</div>
+                                <div class="text-caption text-grey-darken-1">{{ segmentScope.data[1] }}</div>
+                              </template>
+                              <template
+                                #[`segment.actions`]="segmentScope"
+                                >
+                                <div class="d-flex fill-height flex-wrap justify-space-evenly align-center">
+                                  <v-btn
+                                    class="mx-1 rounded-circle"
+                                    :min-width="segmentScope.actionProps.actionIconMinHeight"
+                                    :min-height="segmentScope.actionProps.actionIconMinHeight"
+                                    :size="segmentScope.actionProps.actionIconSize"
+                                    :icon="lastStepModel[data.fieldName].includes(data.id) ? 'mdi-minus' : 'mdi-plus'"
+                                    :color="lastStepModel[data.fieldName].includes(data.id) ? 'grey' : 'primary'"
+                                    @click="handleFinalFormAction(index)"
+                                  />
+                                </div>
+                              </template>
+                            </ConfigurableCard>
+                          </template>
+                          <template v-for="(addon, index) in [
+                              {
+                                id: 1,
+                                title: 'Lorem Ipsum Dolor',
+                                description: 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis At vero eos et accusamus etiu.',
+                                price: 50
+                              },
+                              {
+                                id: 2,
+                                title: 'Lorem Ipsum Dolor',
+                                description: 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis At vero eos et accusamus etiu.',
+                                price: 50
+                              }
+                            ]"
+                            :key="addon.id"
+                            :title="addon.title"
+                          >
+                            <!-- <ConfigurableCard
+                              :items="[
+                                [
+                                  addon.title,
+                                ],
+                                addon.price
+                              ]"
+                            /> -->
+                            <v-card
+                              v-if="false"
+                              elevation="2"
+                              class="addon-card pa-4"
+                              :class="{ 'addon-card--selected': selected }"
+                            >
+                              <v-row align="center" no-gutters>
+                                <v-col cols="8">
+                                  <div class="text-h6 mb-2">{{ addon.title }}</div>
+                                  <div class="text-body-2 text-grey-darken-1">{{ addon.description }}</div>
+                                </v-col>
+
+                                <v-col cols="2" class="text-h4 text-center">
+                                  ${{ addon.price }}
+                                </v-col>
+
+                                <v-col cols="2" class="d-flex justify-center">
+                                  <v-btn
+                                    icon
+                                    size="large"
+                                    @click="$emit('toggle')"
+                                  >
+                                  <!-- :color="selected ? 'primary' : 'grey'"
+                                  :variant="selected ? 'flat' : 'outlined'" -->
+                                    <v-icon>{{ selected ? 'mdi-minus' : 'mdi-plus' }}</v-icon>
+                                  </v-btn>
+                                </v-col>
+                              </v-row>
+                            </v-card>
+                          </template>
+                        </v-sheet>
 
                       </v-col>
                     </v-row>
@@ -335,7 +387,7 @@
 
 <script>
 import { toRefs, reactive, ref, computed } from 'vue';
-import { map, reduce } from 'lodash-es';
+import { map, reduce, find } from 'lodash-es';
 
 import { getModel, handleEvents, handleMultiFormEvents } from '@/utils/getFormData.js'
 
@@ -391,57 +443,42 @@ export default {
     summaryNotations: {
       type: Array,
       default: () => {
-        return {
-          // 'pressReleasePackages.package_id.price',
-          'pressReleasePackages.package_id.price': {
-            'title': 'Paketler',
-          }
-
-        }
+        return {}
       }
     },
     previewNotations: {
       type: [Array, Object],
       default: () => {
-        return [
-          {
-            pattern: 'pressReleasePackages.*',
-            mapArrayItems: false,
-            outputFormat: 'object',  // This will preserve arrays in _value
-            nested: true,
-          },
-          {
-            col: 12,
-            title: 'Press Release Content',
-            nested: true,
-            outputFormat: 'object',
-            items: [
-              [
-                'content.date',
-                'content.fullname',
-                'content.email',
-                'content.phone',
-              ],
-              {
-                pattern: 'content.content-type',
-                simpleValue: true  // Only affects this pattern
-              },
-              [
-                {
-                  pattern: 'regex:^\\d+_content$',  // Matches 1_content, 2_content, etc.
-                  simpleValue: true
-                },
-                'content.press_release_images',
-              ]
-            ]
-          }
-        ]
+        return []
       }
     },
     isEditing: {
       type: Boolean,
       default: false
+    },
+    finalFormTitle: {
+      type: String,
+      default: null
+    },
+    finalFormNotations: {
+      type: Object,
+      default: () => {
+        return {
+          '0.PackageCountry': '0.wrap_location.schema.PackageCountry.items.*.package_addons',
+          '0.PackageRegion': '0.wrap_location.schema.PackageRegion.items.*.package_addons',
+        }
+      }
+    },
+    finalCardShowFields: {
+      type: Array,
+      default: () => {
+        return [
+          ['name', 'description'],
+          ['base_price_show'],
+        ]
+      }
     }
+
   },
   setup (props, context) {
     const inputHandlers = useInputHandlers()
@@ -474,6 +511,7 @@ export default {
       schemas: [],
       models: [],
       valids: [],
+      lastStepModel: {},
 
       previewModel: [],
     }
@@ -496,6 +534,8 @@ export default {
       // __log(formData)
 
       this.loading = true
+      __log(this.payload)
+      return
       api[method](this.actionUrl, this.payload, function (response) {
         self.loading = false
         self.isCompleted = true
@@ -606,6 +646,22 @@ export default {
       formRef.value[0].manualValidation = false
 
       return result
+    },
+    handleFinalFormAction(index) {
+      const data = this.previewFormData[index]
+
+      if (this.lastStepModel[data.fieldName].includes(data.id)) {
+        // Create a new array to trigger reactivity
+        this.lastStepModel[data.fieldName] =
+          this.lastStepModel[data.fieldName].filter((id) => id !== data.id)
+      } else {
+        // Create a new array to trigger reactivity
+        this.lastStepModel[data.fieldName] =
+          [...this.lastStepModel[data.fieldName], data.id]
+      }
+
+      // Force reactivity by creating a new reference
+      this.lastStepModel = { ...this.lastStepModel }
     }
   },
   computed: {
@@ -630,36 +686,83 @@ export default {
     displayInfo(){
       let data = []
       for(const index in this.schemas){
-        // __log(this.schemas[index], this.models[index])
-        // data[index] = getDisplayData(this.schemas[index], this.models[index])
         data[index] = this.$getDisplayData(this.schemas[index], this.models[index])
-        // __log(data)
-        // if(index == 1){
-        // }
       }
 
       return data
     },
     formattedSummary(){
-      let formattedSummary = {}
-      let data = this.displayInfo
-      for(const notation in this.summaryNotations){
-        const object = this.summaryNotations[notation];
-        const values = NotationUtil.findMatchingNotations(data, notation);
-        formattedSummary[notation] = Object.assign({}, object, { values });
+      let formatteds = NotationUtil.formattedSummary(this.displayInfo, this.summaryNotations)
+      let previewFormData = this.previewFormData
+      let lastStepModel = this.lastStepModel
+
+      const lastStepSelections = reduce(lastStepModel, function(acc, data, key){
+        const selected = find(previewFormData, (item) => data.includes(item.id) && item.fieldName === key)
+        if(selected){
+          acc.push(selected)
+        }
+        return acc
+      }, [])
+
+
+      if(lastStepSelections.length > 0){
+        formatteds['lastStepSelections'] = {
+          title: this.finalFormTitle,
+          values: map(lastStepSelections, (data) => {
+            return {
+              title: data.name || data.title || 'N/A',
+              value: data.base_price_show || 'N/A',
+            }
+          }),
+        }
       }
-      // __log(formattedSummary)
-      return formattedSummary
+
+      // map(lastStepSelections, (data) => {
+
+      // })
+      // __log('formattedSummary', formatteds)
+      return formatteds
     },
     formattedPreview(){
       return NotationUtil.formattedPreview(this.displayInfo, this.previewNotations)
     },
+    previewFormData (){
+      let data = []
+      for(const modelKey in this.finalFormNotations){
+        let _value = __data_get(this.models, modelKey)
 
+        if(!_value)
+          continue
+
+        let notation = this.finalFormNotations[modelKey]
+        notation = __wildcard_change(notation, _value)
+        let dataSet = __data_get(this.schemas, notation, null)
+        let fieldName = notation.split('.').pop()
+
+        if(dataSet){
+          const pushRecursively = (item, fieldName) => {
+            if(Array.isArray(item)){
+              for(const subItem of item){
+                pushRecursively(subItem, fieldName)
+              }
+            } else if(typeof item === 'object' && item !== null){
+              data.push({...item, fieldName, isSelected: false})
+            }
+          }
+          pushRecursively(dataSet, fieldName)
+        }
+      }
+      return data
+    },
     payload(){
-      __log(this.models)
-      return reduce(this.models, function(acc, model, index){
+      let model = reduce(this.models, function(acc, model, index){
         return {...acc, ...model}
       }, {})
+
+      return {
+        ...model,
+        ...this.lastStepModel,
+      }
     }
   },
   watch: {
@@ -701,10 +804,14 @@ export default {
       self.valids.push(null)
     })
     this.previewModel = this.preview
-    // __log(this.models[0], this.schemas[0])
-    // handleMultiFormEvents(this.models, this.schemas, obj.schema, index, this.previewModel)
 
-    // models: this.schemas.map((schema) => getModel())
+    this.lastStepModel = reduce(this.finalFormNotations, (acc, notation, key) => {
+      let fieldName = notation.split('.').pop()
+      if(!__isset(acc[fieldName])){
+        acc[fieldName] = []
+      }
+      return acc
+    }, {})
   }
 }
 </script>
