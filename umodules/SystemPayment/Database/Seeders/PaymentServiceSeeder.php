@@ -35,6 +35,7 @@ class PaymentServiceSeeder extends Seeder
                 'is_external' => false,
                 'is_internal' => true,
                 'image' => 'iyzico.png',
+                'currency' => 'TRY',
             ],
             [
                 'name' => 'paypal',
@@ -42,31 +43,31 @@ class PaymentServiceSeeder extends Seeder
                 'is_external' => true,
                 'is_internal' => false,
                 'image' => 'paypal.png',
-
+                'currency' => 'USD',
             ],
             [
                 'name' => 'garanti-pos',
                 'title' => 'GarantiPOS',
                 'is_external' => false,
                 'is_internal' => true,
-                'image' => 'garanti.png',
-
+                'image' => 'credit-card.png',
+                'currency' => 'TRY',
             ],
             [
                 'name' => 'teb-pos',
                 'title' => 'TebPOS',
                 'is_external' => false,
                 'is_internal' => true,
-                'image' => 'teb.png',
-
+                'image' => 'credit-card.png',
+                'currency' => 'TRY',
             ],
             [
                 'name' => 'teb-common-pos',
                 'title' => 'TebCommonPOS',
                 'is_external' => false,
                 'is_internal' => true,
-                'image' => 'teb-common.png',
-
+                'image' => 'credit-card.png',
+                'currency' => 'TRY',
             ],
             [
                 'name' => 'ideal',
@@ -74,7 +75,7 @@ class PaymentServiceSeeder extends Seeder
                 'is_external' => true,
                 'is_internal' => false,
                 'image' => 'ideal.png',
-
+                'currency' => 'EUR',
             ],
         ];
 
@@ -105,8 +106,13 @@ class PaymentServiceSeeder extends Seeder
 
             $this->createAndAssociateImage($paymentService, $service['image']);
 
-            $currencies = PaymentCurrency::inRandomOrder()->take(rand(1, 3))->get();
-            $paymentService->paymentCurrencies()->attach($currencies);
+            // Get the specified currency for the payment service
+            $currency = PaymentCurrency::where('iso_4217', $service['currency'])->first();
+            if ($currency) {
+                $paymentService->paymentCurrencies()->attach($currency->id);
+            } else {
+                $this->command->warn("Currency {$service['currency']} not found for {$service['name']}");
+            }
         }
 
         Auth::logout();
@@ -118,7 +124,7 @@ class PaymentServiceSeeder extends Seeder
     private function createAndAssociateImage(PaymentService $paymentService, string $imageName)
     {
         $imagePath = public_path('vendor/modularity/assets/images/payment-service-images/' . $imageName);
-        // dd($imagePath);
+
         if (file_exists($imagePath)) {
             $file = new UploadedFile($imagePath, $imageName, null, null, true);
 
@@ -132,6 +138,7 @@ class PaymentServiceSeeder extends Seeder
             $media = $this->mediaLibraryController->storeFile($request);
 
             if ($media) {
+                // dd('here');
                 $paymentService->medias()->attach($media->id, [
                     'role' => 'logo',
                     'crop' => 'default',

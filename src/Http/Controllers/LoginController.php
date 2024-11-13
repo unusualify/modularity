@@ -207,13 +207,13 @@ class LoginController extends Controller
 
                 'actionUrl' => route(Route::hasAdmin('login')),
                 'buttonText' => __('authentication.login'),
-                'formClass' => 'px-5',
+                'formClass' => 'px-0',
             ],
             'formSlots' => [
                 'bottom' => [
                     'tag' => 'v-sheet',
                     'attributes' => [
-                        'class' => 'd-flex pb-5 justify-space-around w-100 text-black my-5',
+                        'class' => 'd-flex pb-5 justify-space-between w-100 text-black my-5',
                     ],
                     'elements' => [
                         [
@@ -222,7 +222,9 @@ class LoginController extends Controller
                             'attributes' => [
                                 'variant' => 'text',
                                 'href' => route('admin.password.reset.link'),
-                                'class' => 'v-col-5',
+                                'class' => 'v-col-5 d-flex justify-content-start',
+                                'density' => 'default',
+
                             ],
                         ],
                         [
@@ -233,7 +235,7 @@ class LoginController extends Controller
                                 'href' => '',
                                 'class' => 'v-col-5',
                                 'type' => 'submit',
-
+                                'density' => 'default',
                             ],
                         ],
                     ],
@@ -253,14 +255,15 @@ class LoginController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
+                                'density' => 'default',
                             ],
                             'slots' => [
                                 'prepend' => [
                                     'tag' => 'ue-svg-icon',
                                     'attributes' => [
                                         'symbol' => 'google',
-                                        'width' => '25',
-                                        'height' => '25',
+                                        'width' => '16',
+                                        'height' => '16',
                                     ],
                                 ],
                             ],
@@ -272,14 +275,15 @@ class LoginController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
+                                'density' => 'default',
                             ],
                             'slots' => [
                                 'prepend' => [
                                     'tag' => 'ue-svg-icon',
                                     'attributes' => [
                                         'symbol' => 'apple',
-                                        'width' => '25',
-                                        'height' => '25',
+                                        'width' => '16',
+                                        'height' => '16',
                                     ],
                                 ],
                             ],
@@ -291,6 +295,8 @@ class LoginController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route('admin.register.form'),
                                 'class' => 'my-5 custom-auth-button',
+                                'density' => 'default',
+
                             ],
 
                         ],

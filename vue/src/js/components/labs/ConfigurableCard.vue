@@ -3,7 +3,7 @@
     <!-- <template v-if="title" v-slot:title>
       <span class="font-weight-bold text-primary text-body-1">{{ title }}</span>
     </template> -->
-    <ue-title :text="title" padding="x-4" class="pt-4"/>
+    <ue-title v-if="title" :text="title" padding="x-4" class="pt-4"/>
 
     <div no-gutters class="ue-configurable-card__row">
       <div
@@ -11,46 +11,52 @@
         :key="segmentIndex"
         :class="[
           'ue-configurable-card__col',
-          !hideSeperator ? 'ue-configurable-card__col--seperator' : '',
+          !hideSeparator ? 'ue-configurable-card__col--seperator' : '',
           justifyCenterColumns ? 'ue-configurable-card__col--justify-center' : '',
           alignCenterColumns ? 'ue-configurable-card__col--align-center' : ''
         ]"
       >
-        <template v-if="actions.length && segmentIndex === '_actions'">
-          <!-- <v-divider class="my-2"></v-divider> -->
-          <div class="d-flex fill-height flex-wrap justify-space-evenly align-center">
-            <v-btn
-              v-for="(action, index) in actions"
-              :key="index"
-              class="mx-1 rounded"
-              :min-width="actionIconMinHeight"
-              :min-height="actionIconMinHeight"
-              :size="actionIconSize"
-              v-bind="action"
-            />
-          </div>
-        </template>
-        <template v-else-if="isObject(segment)">
-          <div class="d-flex fill-height">
-            <PropertyList :data="segment" class="" noPadding/>
-          </div>
-        </template>
-        <template v-else-if="isArray( segment)">
-          <div class="d-flex fill-height">
-            <PropertyList :data="segment.map(item => [item])" class="" noPadding/>
-          </div>
-          <!-- <v-list dense class="">
-            <v-list-item v-for="(item, itemIndex) in segment" :key="itemIndex">
-              {{ item }}
-            </v-list-item>
-          </v-list> -->
-        </template>
-        <template v-else>
-          <div class="d-flex fill-height">
-            <ue-dynamic-component-renderer :subject="segment"/>
-          </div>
-        </template>
-
+        <slot :name="`segment.${segmentIndex === '_actions' ? 'actions' : (parseInt(segmentIndex) + 1)}`"
+          v-bind="{
+            data: segment,
+            actions: actions,
+            actionProps: {actionIconMinHeight, actionIconSize}
+          }">
+          <template v-if="actions.length && segmentIndex === '_actions'">
+            <!-- <v-divider class="my-2"></v-divider> -->
+            <div class="d-flex fill-height flex-wrap justify-space-evenly align-center">
+              <v-btn
+                v-for="(action, index) in actions"
+                :key="index"
+                class="mx-1 rounded"
+                :min-width="actionIconMinHeight"
+                :min-height="actionIconMinHeight"
+                :size="actionIconSize"
+                v-bind="action"
+              />
+            </div>
+          </template>
+          <template v-else-if="isObject(segment)">
+            <div class="d-flex fill-height">
+              <PropertyList :data="segment" class="" noPadding/>
+            </div>
+          </template>
+          <template v-else-if="isArray( segment)">
+            <div class="d-flex fill-height">
+              <PropertyList :data="segment.map(item => [item])" class="" noPadding/>
+            </div>
+            <!-- <v-list dense class="">
+              <v-list-item v-for="(item, itemIndex) in segment" :key="itemIndex">
+                {{ item }}
+              </v-list-item>
+            </v-list> -->
+          </template>
+          <template v-else>
+            <div class="d-flex fill-height">
+              <ue-dynamic-component-renderer :subject="segment"/>
+            </div>
+          </template>
+        </slot>
       </div>
     </div>
 
@@ -84,7 +90,7 @@
         type: Array,
         default: () => []
       },
-      hideSeperator: {
+      hideSeparator: {
         type: Boolean,
         default: false
       },

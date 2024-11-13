@@ -8,7 +8,7 @@ return [
     'isRowEditing' => false,
     'rowActionsType' => 'inline',
     'hideDefaultFooter' => false,
-    'tableClasses' => 'elevation-2 zebra-stripes free-form',
+    'tableClasses' => 'elevation-2 free-form',
     'itemsPerPage' => 20,
     'hideHeaders' => false,
     'hideSearchField' => false,
@@ -18,15 +18,19 @@ return [
     // 'tableSubtitle' => '',
     'sticky' => true,
     'showSelect' => true,
+    'striped' => true,
+    'hideBorderRow' => false,
+    'roundedRows' => true,
 
     'toolbarOptions' => [
         'color' => 'transparent', // rgb(255,255,255,1) or utility colors like white, purple
         'border' => false, // false, 'xs', 'sm', 'md', 'lg', 'xl'.
         'rounded' => false, // This can be 0, xs, sm, true, lg, xl, pill, circle, and shaped. string | number | boolean
         'collapse' => false, // false, true,
-        'density' => 'compact', // prominent, comfortable, compact, default
+        'density' => 'default', // prominent, comfortable, compact, default
         'elevation' => 0, // string or number refers to elevation
         'image' => '', // image link for the background of the toolbar
+        'height' => '90',
     ],
     'filterBtnOptions' => [
         'variant' => 'outlined', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
@@ -107,5 +111,8 @@ return [
     ],
     'cellOptions' => [
         'maxChar' => 3,
+    ],
+    'headerOptions' => [
+        'color' => 'rgba(140,160,167, .2)', //Hex, rgba or default css colors
     ],
 ];

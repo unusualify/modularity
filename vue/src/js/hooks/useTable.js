@@ -95,6 +95,9 @@ export const makeTableProps = propsFactory({
   createOnModal: Boolean,
   editOnModal: Boolean,
   embeddedForm: Boolean,
+  striped: Boolean,
+  hideBorderRow: Boolean,
+  roundedRows: Boolean,
 
   noForm: {
     type: Boolean,
@@ -164,6 +167,10 @@ export const makeTableProps = propsFactory({
   cellOptions: {
     type: [Array, Object],
     default: {}
+  },
+  headerOptions: {
+    type: [Array, Object],
+    default: {}
   }
 })
 
@@ -174,9 +181,7 @@ export default function useTable (props, context) {
   // lifecycle to setup and teardown side effects.
 
   const store = useStore()
-
   const { smAndDown } = useDisplay()
-
   const { t, te, tm } = useI18n({ useScope: 'global' })
 
   const getters = mapGetters()
@@ -184,6 +189,8 @@ export default function useTable (props, context) {
   const form = ref(null)
   let loading = ref(false)
   let items = ref(props.items ?? store.state.datatable.data)
+  let headers = props.columns ?? store.state.datatable.headers ?? []
+
   const state = reactive({
 
     id: Math.ceil(Math.random() * 1000000) + '-table',
@@ -242,15 +249,21 @@ export default function useTable (props, context) {
     }),
     activeItemConfiguration: null,
     options:  props.tableOptions ?? store.state.datatable.options ?? {},
-    headers: props.columns ?? store.state.datatable.headers ?? [],
-    headersWithKeys: computed(() => {
-      let collection = {};
-       Object.values(state.headers).forEach((header, i) => {
-         collection[header['key']] = header
-       })
 
-       return collection
+    headers: headers,
+    headersModel: _.cloneDeep(headers),
+    headersModel_: computed({
+      get(){
+        return headers;
+      },
+      set(val){
+        // items.value = val
+      }
     }),
+    selectedHeaders: computed(() => {
+      return state.headers.filter(header => !!header.visible && header.visible == true)
+    }),
+
     inputs: props.inputFields ?? store.state.datatable.inputs ?? [],
     // elements: computed(() => props.items ?? store.state.datatable.data ?? []),
     elements: computed({
@@ -977,6 +990,19 @@ export default function useTable (props, context) {
       )
 
     },
+    applyHeaders(){
+      state.headers = _.cloneDeep(state.headersModel)
+
+      __pushQueryParams({
+        columns: state.headersModel.reduce((acc, h) => {
+          if(h.visible){
+            acc.push(h.key)
+          }
+          return acc
+        }, [])
+      })
+      // store.commit(DATATABLE.UPDATE_DATATABLE_HEADERS, state.headersModel)
+    }
   })
 
   watch(() => state.editedItem, (newValue, oldValue) => {
@@ -996,13 +1022,16 @@ export default function useTable (props, context) {
     newValue || methods.resetEditedItem()
   })
   watch(() => state.options, (newValue, oldValue) => {
-    if(state.indexUrl){
+
+    if( state.indexUrl ){
       newValue.replaceUrl = false
       methods.loadItems(newValue)
-    }else{
 
+    } else {
       store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue, infiniteScroll: state.enableInfiniteScroll }, endpoint : props.endpoints.index ?? null})
+
     }
+
   }, { deep: true })
   watch(() => state.elements, (newValue, oldValue) => {
   }, { deep: true })
