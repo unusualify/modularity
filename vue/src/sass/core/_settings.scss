@@ -4,12 +4,14 @@
   $button-font-size: $button-font-size,
   $button-height: $button-height,
   $button-max-width: $button-max-width,
-
+  $button-density: $button-density,
+  $button-stacked-density: $button-density,
   // INPUT
   $field-font-size: $input-font-size,
   $field-label-floating-scale: $field-label-floating-scale, //0.81,
   $field-control-height: $field-control-height, //56px,
   $input-control-height: $field-control-height, //56px,
+  $field-input-min-height: $field-input-min-height,
 
   // $navigation-drawer-background: $navigation-drawer-background,
   // $navigation-drawer-color: $global-dark-text-color,

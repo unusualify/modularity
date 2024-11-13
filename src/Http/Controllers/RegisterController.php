@@ -138,7 +138,7 @@ class RegisterController extends Controller
                 'bottom' => [
                     'tag' => 'v-sheet',
                     'attributes' => [
-                        'class' => 'd-flex pb-5 justify-space-around w-100 text-black my-5',
+                        'class' => 'd-flex pb-5 justify-space-between w-100 text-black my-5',
                     ],
                     'elements' => [
                         [
@@ -147,7 +147,8 @@ class RegisterController extends Controller
                             'attributes' => [
                                 'variant' => 'text',
                                 'href' => '',
-                                'class' => 'v-col-5',
+                                'class' => 'v-col-5 justify-content-start',
+                                'density' => 'default',
                             ],
                         ],
                         [
@@ -158,6 +159,7 @@ class RegisterController extends Controller
                                 'href' => '',
                                 'class' => 'v-col-5',
                                 'type' => 'submit',
+                                'density' => 'default',
 
                             ],
                         ],
@@ -178,14 +180,16 @@ class RegisterController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
+                                'density' => 'default',
+
                             ],
                             'slots' => [
                                 'prepend' => [
                                     'tag' => 'ue-svg-icon',
                                     'attributes' => [
                                         'symbol' => 'google',
-                                        'width' => '25',
-                                        'height' => '25',
+                                        'width' => '16',
+                                        'height' => '16',
                                     ],
                                 ],
                             ],
@@ -203,8 +207,10 @@ class RegisterController extends Controller
                                     'tag' => 'ue-svg-icon',
                                     'attributes' => [
                                         'symbol' => 'apple',
-                                        'width' => '25',
-                                        'height' => '25',
+                                        'width' => '16',
+                                        'height' => '16',
+                                        'density' => 'default',
+
                                     ],
                                 ],
                             ],

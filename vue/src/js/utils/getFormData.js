@@ -40,7 +40,7 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
       delete _inputs[key];
     }
 
-    if(__isset(_inputs[key]) && __isset(_inputs[key].schema)){
+    if(__isset(_inputs[key]) && __isset(_inputs[key].schema) && ['wrap', 'group', 'repeater', 'input-repeater'].includes(input.type)){
       _inputs[key].schema = getSchema(input.schema, input.type === 'wrap' ? model : model[key], isEditing)
     }
   });

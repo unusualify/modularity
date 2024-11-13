@@ -133,7 +133,7 @@
         />
       </v-sheet>
 
-      <v-sheet class="testclass">
+      <v-sheet class="">
         <slot name="bottom" v-bind="{}"></slot>
       </v-sheet>
 

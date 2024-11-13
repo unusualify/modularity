@@ -90,7 +90,7 @@ class ForgotPasswordController extends Controller
                 'bottom' => [
                     'tag' => 'v-sheet',
                     'attributes' => [
-                        'class' => 'd-flex pb-5 justify-space-around w-100 text-black my-5',
+                        'class' => 'd-flex pb-5 justify-space-between w-100 text-black my-5',
                     ],
                     'elements' => [
                         [
@@ -99,7 +99,8 @@ class ForgotPasswordController extends Controller
                             'attributes' => [
                                 'variant' => 'text',
                                 'href' => '',
-                                'class' => 'v-col-5',
+                                'class' => 'v-col-5 justify-content-start',
+                                'density' => 'default',
                             ],
                         ],
                         [
@@ -110,6 +111,7 @@ class ForgotPasswordController extends Controller
                                 'href' => '',
                                 'class' => 'v-col-5',
                                 'type' => 'submit',
+                                'density' => 'default',
 
                             ],
                         ],
@@ -136,8 +138,8 @@ class ForgotPasswordController extends Controller
                                     'tag' => 'ue-svg-icon',
                                     'attributes' => [
                                         'symbol' => 'google',
-                                        'width' => '25',
-                                        'height' => '25',
+                                        'width' => '16',
+                                        'height' => '16',
                                     ],
                                 ],
                             ],
@@ -155,8 +157,8 @@ class ForgotPasswordController extends Controller
                                     'tag' => 'ue-svg-icon',
                                     'attributes' => [
                                         'symbol' => 'apple',
-                                        'width' => '25',
-                                        'height' => '25',
+                                        'width' => '16',
+                                        'height' => '16',
                                     ],
                                 ],
                             ],
@@ -168,6 +170,8 @@ class ForgotPasswordController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
+                                'density' => 'default',
+
                             ],
 
                         ],

@@ -66,6 +66,7 @@ const opts = {
     VBtn: {
       color: 'primary',
       style: { textTransform: 'none' },
+      density: 'compact'
       // class: 'v-btn--uppercase',
     },
     VBtnSecondary: {

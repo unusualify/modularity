@@ -4,19 +4,20 @@
 @use 'sass:meta';
 
 /* BUTTONS */
-$button-height: 32px !default; //2.5rem
+$button-height: 52px !default; //2.5rem
 $button-min-width: 7.5rem !default;
 $button-max-width: 300px !default;
 $button-font-weight: 700 !default;
 $button-font-size: 0.75rem !default;
+$button-density: ('default': 0, 'comfortable': -2, 'compact': -3) !default;
 
 /* INPUT */
 $input-font-size: .8rem !default;
-$input-control-height: 36px !default;
+$input-control-height: 52px !default;
 $input-line-height: 1.2 !default; // default 1.5
 
 /* FIELDS */
-$field-control-height: 56px;
+$field-control-height: 52px;
 $field-label-floating-scale: 0.81 !default;
 
 $zindex__loadingTable: 4 !default;
@@ -80,4 +81,6 @@ $sidebar-info-mini-logo-width: $sidebar-info-mini-logo-size !default;
 $sidebar-info-mini-logo-height: $sidebar-info-mini-logo-size !default;
 
 $stepper-form-summary-final-background: #005868 !default;
+
+$field-input-min-height: max(var(--v-input-control-height, 52px), 1.2rem + var(--v-field-input-padding-top) + var(--v-field-input-padding-bottom));
 

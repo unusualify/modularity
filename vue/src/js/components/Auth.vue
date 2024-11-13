@@ -26,7 +26,7 @@
                         :async="true"
                         :hasSubmit="true"
                         buttonText="auth.login"
-                        class="testclass"
+                        class="auth-form"
                         >
                         <template #submit="{validForm, buttonDefaultText}">
                           <v-btn block dense type="submit" :disabled="!validForm">
@@ -52,11 +52,11 @@
             cols="12"
             md="6"
             lg="6"
-            class="pa-0 col-r d-flex flex-column align-center justify-center">
+            class="pa-0 col-r d-flex flex-column align-center justify-center col-right">
             <div class="mw-420">
-              <ue-svg-icon symbol="main-logo" class="mx-0 center-image"></ue-svg-icon>
+              <ue-svg-icon symbol="main-logo" class="mx-0 "></ue-svg-icon>
 
-              <h2 class="text-white my-5">
+              <h2 class="text-white my-5 text-h4">
                 {{ description }}
               </h2>
               <span class="text-white">
@@ -65,7 +65,10 @@
                 </v-img>
                 {{ ad }}
               </span>
-              <v-btn variant="outlined" class="text-white custom-right-auth-button my-5">
+              <v-btn
+                variant="outlined"
+                class="text-white custom-right-auth-button my-5"
+                density="default">
                 {{ rightBtnText }}
               </v-btn>
             </div>
@@ -94,7 +97,7 @@ export default {
     },
     description: {
       type: String,
-      default: 'Lorem ipsum dolor sit amet,consetetur sadipscing elitr.'
+      default: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
     },
     ad: {
       type: String,
@@ -191,37 +194,72 @@ export default {
 }
 </script>
 
-<style>
-  @media screen and (min-width:'960px'){
-    .mw-lg-24em{
-      max-width: 24rem;
-      width: 24rem;
-    }
-    .mw-420{
-      max-width: 420px;
-    }
+<style lang="scss">
+@media screen and (min-width: 960px) {
+  .mw-lg-24em {
+    max-width: 24rem;
+    width: 24rem;
   }
-  .mw-420{
-    padding: 0 4.5em;
+
+  .mw-420 {
+    max-width: 420px;
   }
-  .col-r{
-    background:#40AABB;
-  }
-  .custom-auth-button{
-    width: 100%;
-    min-width: 100% !important;
-    color:black !important;
-  }
-  .custom-auth-button.text-primary{
-    color:black !important;
-    height:3.2rem !important;
-  }
-  .mx-0 svg{
+}
+
+.col-r {
+  background: #40AABB;
+}
+
+.custom-auth-button {
+  width: 100%;
+  min-width: 100% !important;
+  color: black !important;
+  position: relative !important;
+  display: flex;
+
+  .v-btn__prepend {
+    position: absolute !important;
+    left: 16px !important;
     margin-right: 0 !important;
-    margin-left: 0 !important;
+
   }
-  .custom-right-auth-button.text-white{
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+  &.text-primary {
+    color: black !important;
+  }
+}
+
+
+.mx-0 {
+  svg {
+    margin: {
+      right: 0 !important;
+      left: 0 !important;
+    }
+  }
+}
+
+.custom-right-auth-button {
+  &.text-white {
     color: #fff !important;
-    height: 3.2rem !important;
   }
+}
+
+.col-right {
+  span.text-white {
+    display: block;
+  }
+  .icon--main-logo{
+    svg{
+      max-width: 180px;
+    }
+  }
+}
+.justify-content-start{
+  justify-content: flex-start;
+}
 </style>
