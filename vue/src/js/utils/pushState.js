@@ -87,7 +87,7 @@ export function serializeParameters(params, prefix) {
       key = (prefix ? `${prefix}[${key}]` : key);
 
     if (typeof value === 'object')
-      return serializeQuery(value, key);
+      return serializeParameters(value, key);
     else
       return `${key}=${encodeURIComponent(value)}`;
   });

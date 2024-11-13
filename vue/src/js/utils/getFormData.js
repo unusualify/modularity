@@ -11,7 +11,7 @@ const isArrayable = 'input-treeview|treeview|input-checklist|input-repeater|inpu
 // const isMediableTypes = 'input-file|input-image'
 // const isMediableFields = 'files|medias'
 
-export const getSchema = (inputs, model = null, isEditing) => {
+export const getSchema = (inputs, model = null, isEditing = false) => {
   let _inputs = omitBy(inputs, (value, key) => {
     return Object.prototype.hasOwnProperty.call(value, 'slotable')
   })
@@ -20,23 +20,31 @@ export const getSchema = (inputs, model = null, isEditing) => {
     reduce(_inputs, (acc, input, key) => {
       if(Object.prototype.hasOwnProperty.call(input, 'group')){
 
-      }
-      else{
+      } else{
         acc[key] = input
       }
       return acc
     }, {})
   }
-  if (find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'createable'))) {
-    Object.keys(_inputs).forEach(key => {
-      // Check if the input has createable property and it's false
-      if (_inputs[key].createable === false && (isEditing < 0)) {
-        console.log('here', key);
-        delete _inputs[key];
-      }
-    });
-  }
-  console.log(_inputs);
+
+  Object.keys(_inputs).forEach(key => {
+    const input = _inputs[key]
+    // Check if the input has createable property and it's false
+    // __log(input.name,input.creatable, isEditing)
+    if (input.creatable === false && !isEditing) {
+      delete _inputs[key];
+    }
+
+    // Check if the input has editable property and it's false
+    if (input.editable === false && isEditing) {
+      delete _inputs[key];
+    }
+
+    if(__isset(_inputs[key]) && __isset(_inputs[key].schema) && ['wrap', 'group', 'repeater', 'input-repeater'].includes(input.type)){
+      _inputs[key].schema = getSchema(input.schema, input.type === 'wrap' ? model : model[key], isEditing)
+    }
+  });
+
   map(_inputs, (value, key) => {
     if(__isset(value.type) && value.type == 'group'){
       value.schema = flattenGroupSchema(value.schema, value.name);
@@ -213,7 +221,8 @@ export const setSchemaInputField = (schema, value) => {
       if(key.includes('repeater'))
         break;
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      schema[sch.cascade][cascadeKey] = find(sch[cascadeKey], [sch.itemValue, value[sch.name]])?.[cascadeKey] ?? []
+      if(__isset(schema[sch.cascade]))
+        schema[sch.cascade][cascadeKey] = find(sch[cascadeKey], [sch.itemValue, value[sch.name]])?.[cascadeKey] ?? []
       // this.formSchema[key].items = find(this.formSchema[sch.parent].items, [this.formSchema[sch.parent].itemValue, this.valueIntern[sch.parent]]).items
     }
   }

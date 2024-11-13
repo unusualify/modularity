@@ -1,7 +1,6 @@
 <template>
   <!-- <v-layout fluid v-resize="onResize"> -->
     <div :class="['ue-datatable__container', noFullScreen ? '' : 'fill-height ue-datatable--full-screen_' ]">
-
       <ActiveTableItem
         class=""
         v-model="activeTableItem"
@@ -14,10 +13,19 @@
       <v-data-table-server
         v-if="!hideTable"
         v-bind="{...$bindAttributes(), ...footerProps}"
-        :class="[noFullScreen ? '' : 'h-100', tableClasses, fullWidthWrapper ? '' : 'ue-table--narrow-wrapper', 'px-4', 'rounded-tr']"
+        :class="[
+          noFullScreen ? '' : 'h-100',
+          tableClasses,
+          fullWidthWrapper ? '' : 'ue-table--narrow-wrapper',
+          'px-4',
+          striped ? 'ue-datatable--striped' : '',
+          roundedRows ? 'ue-datatable--rounded-row' : '',
+          hideBorderRow ? 'ue-datatable--no-border-row' : ''
+        ]"
         id="ue-table"
 
-        :headers="headers"
+        :headers="selectedHeaders"
+
         :sticky="sticky"
         :items="elements"
         :hover="true"
@@ -79,7 +87,7 @@
               append-inner-icon="mdi-magnify"
               :placeholder="searchText"
               hide-details
-              density="compact"
+              density="comfortable"
 
               style="max-width: 30%; display: inline;"
               single-line
@@ -90,15 +98,24 @@
               v-if="mainFilters.length > 0"
               id="filter-btn-activator"
               v-bind="{...filterBtnOptions, ...filterBtnTitle}"
+              density="comfortable"
               />
             <v-btn
               v-if="Object.keys(advancedFilters).length > 0"
               id="advanced-filter-btn"
               v-bind="{...filterBtnOptions, ...filterBtnTitle}"
               text="Advanced Filter"
+              density="comfortable"
+
             />
 
-            <v-btn v-if="can('create') && !noForm && !someSelected" v-bind="addBtnOptions" @click="createForm" :text="addBtnTitle"/>
+            <v-btn
+              v-if="can('create') && !noForm && !someSelected && createOnModal"
+              v-bind="addBtnOptions"
+              @click="createForm"
+              :text="addBtnTitle"
+              density="comfortable"
+              />
 
           </v-toolbar>
 
@@ -174,7 +191,7 @@
                   <ue-form
                     ref="form"
                     :title="formTitle"
-                    :isEditing="editedIndex"
+                    :isEditing="editedIndex > 0"
                   />
                 </v-card-text>
                 <v-divider/>
@@ -377,8 +394,8 @@
 
         <!-- #formatterColumns -->
         <template
-        v-for="(col, i) in formatterColumns"
-        v-slot:[`item.${col.key}`]="{ item }"
+          v-for="(col, i) in formatterColumns"
+          v-slot:[`item.${col.key}`]="{ item }"
         >
           <template v-if="col.formatter == 'edit' || col.formatter == 'activate'">
             <v-tooltip :text="item[col.key]" :key="i">
@@ -425,33 +442,72 @@
               :key="item[col.key]"
             />
           </template>
-      </template>
+        </template>
 
+        <!-- #header actions slot -->
         <template v-slot:header.actions="_obj">
           <v-menu
             :close-on-content-click="false"
-            open-on-hover
-            left
+            location="bottom"
             >
             <template v-slot:activator="{ props }">
-              <v-icon
+              <v-btn
+                size="large"
+                variant="plain"
+                color="black"
+                icon="mdi-cog-outline"
+                v-bind="props"
+              />
+              <!-- <v-icon
                 size="large"
                 icon="mdi-cog-outline"
                 v-bind="props"
-                >
-              </v-icon>
+              /> -->
             </template>
+            <v-card>
+              <v-card-title>
+                <v-list class="">
+                  <template v-for="(item, index) in headersModel" :key="index">
+                    <v-checkbox
+                      class="ml-n2"
+                      v-if="item.key !== 'actions'"
+                      :disabled="headersModel.filter(h => h.key !== 'actions' && h.visible === true).length < 2 && headersModel[index].visible === true"
+                      v-model="headersModel[index].visible"
+                      :label="item.title"
+                      hide-details
+                      density="comfortable"
+                    />
+                  </template>
+                </v-list>
+              </v-card-title>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <!-- <v-btn
+                  text="Clear"
+                  variant="plain"
+                  @click="clearAdvancedFilter"
+                ></v-btn> -->
+
+                <v-btn
+                  color="primary"
+                  text="Save"
+                  variant="tonal"
+                  @click="applyHeaders"
+                ></v-btn>
+              </v-card-actions>
+            </v-card>
+
           </v-menu>
         </template>
-        <template v-slot:item.actions="{ item }">
-          <!-- @click's editItem|deleteItem -->
-          <!-- #actions -->
 
+        <!-- #item actions slot-->
+        <template v-slot:item.actions="{ item }">
           <v-menu v-if="rowActionsType === 'dropdown' || $vuetify.display.smAndDown"
             :close-on-content-click="false"
-            open-on-hover
             left
             offset-x
+            class="action-dropdown"
             >
             <template v-slot:activator="{ props }">
               <v-icon
@@ -507,11 +563,10 @@
             <v-progress-circular :indeterminate="loading" v-if="enableInfiniteScroll && loading"></v-progress-circular>
         </template>
 
-
         <template v-slot:default v-if="draggable">
           <thead>
             <slot :name="headers">
-              <VDataTableHeaders :mobile="this.datatable.mobile">
+              <VDataTableHeaders :mobile="this.datatable.mobile" :color="this.headerOptions.color">
                 <template v-for="(_, name) in this.datatable.$slots" v-slot:[name]="slotData">
                   <slot :name="name" v-bind="slotData">
                     <component
@@ -553,9 +608,7 @@
           </Draggable>
         </template>
 
-
       </v-data-table-server>
-
     </div>
   <!-- </v-layout> -->
 </template>
@@ -607,6 +660,7 @@ export default {
     }
   },
   mounted () {
+    document.documentElement.style.setProperty('--table-header-color', this.headerOptions.color);
 
     this.$nextTick(() => {
       if (this.$refs.datatable) {
@@ -640,31 +694,34 @@ export default {
   &.ue-datatable--full-screen
     min-height: calc(100vh - (2*12 * $spacer))
 .v-table
-  &.rounded-tr
-  tr
-  &:first-child
-    td
-      &:first-child
-        border-bottom-left-radius: 8px
-        border-top-left-radius: 8px
+  &.ue-datatable
+    &--no-border-row
+      .v-table__wrapper
+        > table
+          > tbody
+            > tr:not(:last-child)
+              > td,
+              > th
+                border: none!important
+    &--rounded-row
+      th
+        background-color: var(--table-header-color) //TODO: table action border must be variable
+      tr
+        // &:first-child
+        td,th
+          &:first-child
+            border-bottom-left-radius: 8px
+            border-top-left-radius: 8px
 
-      &:last-child
-        border-bottom-right-radius: 8px
-        border-top-right-radius: 8px
+          &:last-child
+            border-bottom-right-radius: 8px
+            border-top-right-radius: 8px
 
-
-  &:last-child
-    td
-      &:first-child
-        border-bottom-left-radius: 8px
-        border-top-left-radius: 8px
-
-      &:last-child
-        border-bottom-right-radius: 8px
-        border-top-right-radius: 8px
-
-  &.zebra-stripes
+    &--striped
       tr
         &:nth-of-type(2n)
-          background-color: rgba(140,160,167, .2)
+          background-color: rgba(140,160,167, .2) //TODO: table action border must be variable
+  .action-dropdown
+    .v-overlay__content
+      border: 1px solid #49454F !important //TODO: table action border must be variable
 </style>

@@ -33,7 +33,8 @@ class StateableHydrate extends InputHydrate
         $repository = App::make('Modules\SystemUtility\Repositories\StateRepository');
 
         $model = App::make('Modules\PressRelease\Entities\PressRelease');
-        $states = $repository->getByColumnValues('code', $model->default_states);
+        // dd();
+        $states = $repository->getByColumnValues('code', array_column($model->default_states, 'code'));
         // dd($states);
         $items = [];
         foreach ($states as $state) {

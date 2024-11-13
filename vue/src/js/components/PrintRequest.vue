@@ -62,7 +62,7 @@ export default {
   },
   methods: {
     getDisplayText(data, index = null) {
-      __log(data, index, this.printKeys);
+      // __log(data, index, this.printKeys);
       if (Array.isArray(this.printKeys)) {
         // If printKeys is array of strings
         if (typeof this.printKeys[index || 0] === 'string') {
@@ -77,7 +77,7 @@ export default {
     },
 
     getSubText(data, index = null) {
-      __log(data, index, this.printKeys);
+      // __log(data, index, this.printKeys);
       if (Array.isArray(this.printKeys)) {
         // If printKeys is array of strings
         if (typeof this.printKeys[index || 1] === 'string') {
@@ -104,6 +104,14 @@ export default {
   },
   mounted() {
     this.sendRequest()
+  },
+  watch: {
+    payload: {
+      handler() {
+        this.sendRequest();
+      },
+      deep: true
+    }
   }
 }
 </script>

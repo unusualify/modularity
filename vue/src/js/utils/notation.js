@@ -542,6 +542,18 @@ const formattedPreview = (data, formation) => {
   return formatted;
 }
 
+const formattedSummary = (data, formation) => {
+  let formattedSummary = {}
+
+  for(const notation in formation){
+    const object = formation[notation];
+    const values = findMatchingNotations(data, notation);
+    formattedSummary[notation] = Object.assign({}, object, { values });
+  }
+
+  return formattedSummary
+}
+
 const test = () => {
 
   // samplePatterns.forEach(pattern => {
@@ -555,6 +567,7 @@ const test = () => {
 export default {
   findMatchingNotations,
   formattedPreview,
+  formattedSummary,
   test
 }
 

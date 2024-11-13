@@ -62,6 +62,18 @@ return [
                     'label' => 'Code',
                     'rules' => 'sometimes|required',
                 ],
+                [
+                    'type' => 'text',
+                    'name' => 'color',
+                    'label' => 'Color',
+                    'rules' => 'sometimes|required',
+                ],
+                [
+                    'type' => 'text',
+                    'name' => 'icon',
+                    'label' => 'Icon',
+                    'rules' => 'sometimes|required',
+                ],
             ],
         ],
     ],

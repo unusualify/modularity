@@ -7,26 +7,24 @@
         :items="sortedCountries"
         item-title="name"
         item-value="iso2"
+        :menu-props="{ maxHeight: 200 }"
         v-bind="$lodash.pick(boundProps, ['variant', 'menuProps', 'selectClasses', 'selectLabel', 'dense', 'density'])"
         autocomplete="off"
         return-object
-        >
-        <template #selection="object">
-          <div :class="activeCountry.iso2.toLowerCase()" class="vti__flag" />
-          <!-- <span class="v-select__selection-text">
-            {{ activeCountry.iso2 }}
-          </span> -->
+        @update:model-value="choose"
+      >
+        <template #selection>
+          <div v-if="activeCountry && activeCountry.iso2" :class="activeCountry.iso2.toLowerCase()" class="vti__flag" />
         </template>
-        <template v-if="false" #item="itemSlot">
-          <!-- {{  $log(itemSlot) }} -->
-          {{ itemSlot.item.raw.name }}
-          <!-- <v-list-item :title="`${itemSlot.item.raw.name} +${itemSlot.item.raw.dialCode}`" @click="itemSlot.props.onClick">
+        <template #item="{ item, props }">
+          <v-list-item v-bind="props">
             <template #prepend>
-              <span :class="itemSlot.raw.iso2.toLowerCase()" class="vti__flag" />
+              <div :class="item.raw.iso2.toLowerCase()" class="vti__flag" />
             </template>
-          </v-list-item> -->
-          <!-- <span :class="item.iso2.toLowerCase()" class="vti__flag" />
-          <span>{{ item.name }} {{ `+${item.dialCode}` }}</span> -->
+            <v-list-item-title>
+              +{{ item.raw.dialCode }}
+            </v-list-item-title>
+          </v-list-item>
         </template>
       </v-autocomplete>
       <v-text-field
@@ -186,16 +184,38 @@ export default {
       typeToFindInput: '',
       typeToFindTimer: null,
       cursorPosition: 0,
-      countryCode: null,
+      countryCode: {
+        handler(newValue) {
+        if (newValue && newValue !== this.activeCountry) {
+            this.choose(newValue, true)
+          }
+        },
+        deep: true
+      },
+      lastValidCountry: null,
 
-      phoneRule: v => {
-        return v
-          ? (PhoneNumber(
-              this.phone || '',
-              this.activeCountry.iso2
-            ).toJSON().valid || 'Geçersiz telefon numarası')
-          : 'Telefon Numarası gerekli'
-      }
+      data() {
+  return {
+    phone: '',
+    activeCountry: { iso2: '' },
+    open: false,
+    finishMounted: false,
+    selectedIndex: null,
+    typeToFindInput: '',
+    typeToFindTimer: null,
+    cursorPosition: 0,
+    countryCode: null,
+
+    phoneRule: v => {
+      return v
+        ? (PhoneNumber(
+            this.phone || '',
+            this.activeCountry.iso2
+          ).toJSON().valid || 'Geçersiz telefon numarası')
+        : 'Telefon Numarası gerekli'
+    }
+  }
+},
     }
   },
   computed: {
@@ -276,9 +296,11 @@ export default {
     'phoneObject.valid': function (value) {
       if (value) {
         this.phone = this.phoneText
+        // Store the last valid country when phone is valid
+        this.lastValidCountry = { ...this.activeCountry }
       }
       this.$emit('validate', this.phoneObject)
-      this.$emit('onValidate', this.phoneObject) // Deprecated
+      this.$emit('onValidate', this.phoneObject)
     },
     modelValue (val, oldValue) {
       // __log('phone.vue modelValue watch', val, this.modelValue, this.phone)
@@ -294,26 +316,43 @@ export default {
     },
     phone: {
       handler(newValue, oldValue) {
-        if (newValue || __isString(newValue)) {
+        if (newValue) {
           if (newValue[0] === '+') {
+            // Handle numbers starting with '+'
             const code = PhoneNumber(newValue).getRegionCode()
             if (code) {
-              this.activeCountry = this.findCountry(code) || this.activeCountry
+              const newCountry = this.findCountry(code)
+              if (newCountry) {
+                this.activeCountry = newCountry
+                this.countryCode = newCountry
+              }
+            }
+          } else {
+            // Try to find matching country for numbers without '+'
+            for (const country of this.sortedCountries) {
+              const phoneObj = PhoneNumber(newValue, country.iso2)
+
+              if (phoneObj.valid) {
+
+                this.activeCountry = country
+                this.countryCode = country
+                break
+              }
             }
           }
         }
-        // Reset the cursor to current position if it's not the last character.
+
+        // Preserve cursor position
         if (oldValue && this.cursorPosition < oldValue.length) {
           this.$nextTick(() => {
-            // __log(this.cursorPosition)
-            setCaretPosition(this.$refs[this.getReference('phoneInput')], newValue.length)
+            setCaretPosition(this.$refs[this.getReference('phoneInput')], this.cursorPosition)
           })
         }
-        // this.$emit('input', this.phoneText, this.phoneObject)
+
+        // Update model value
         this.updateModelValue(this.phoneText)
       },
-      // flush: 'post'
-      // once: true
+      immediate: true
     },
     activeCountry (value) {
       // __log('activeCountry watch', value)
@@ -330,11 +369,26 @@ export default {
   },
   mounted () {
     this.$watch(`$refs.${this.getReference('countryInput')}.isResetting`, v => v && this.reset())
-    this.reset()
+
+    // Only call reset if we don't have an activeCountry yet
+    if (!this.activeCountry || !this.activeCountry.iso2) {
+      this.reset()
+    }
   },
-  created () {
+  created() {
     if (this.modelValue) {
       this.phone = this.modelValue.trim()
+      // Initialize country from model value if it starts with '+'
+      if (this.phone[0] === '+') {
+        const code = PhoneNumber(this.phone).getRegionCode()
+        if (code) {
+          const initialCountry = this.findCountry(code)
+          if (initialCountry) {
+            this.activeCountry = initialCountry
+            this.countryCode = initialCountry
+          }
+        }
+      }
     }
 
     if (!__isset(this.boundProps.rules)) {
@@ -446,37 +500,47 @@ export default {
         preferred
       }
     },
-    choose (country, toEmitInputEvent = false) {
-      // __log('choose()', country, toEmitInputEvent)
+    choose(country, toEmitInputEvent = false) {
+      // Set the active country
       this.activeCountry = country || this.activeCountry || {}
+
+      // Format phone number if we have a country and phone number
       if (
         this.phone &&
         this.phone[0] === '+' &&
         this.activeCountry.iso2 &&
         this.phoneObject.number.significant
       ) {
-        // Attach the current phone number with the newly selected country
-        this.phone = PhoneNumber(
+        const phoneNumber = PhoneNumber(
           this.phoneObject.number.significant,
           this.activeCountry.iso2
-        ).getNumber('international')
+        )
+        if (phoneNumber.valid) {
+          this.phone = phoneNumber.getNumber('international')
+        }
       } else if (
         this.inputOptions &&
         this.inputOptions.showDialCode &&
-        country
+        country &&
+        country.dialCode
       ) {
-        // Reset phone if the showDialCode is set
         this.phone = `+${country.dialCode}`
       }
+
+      // Always sync countryCode with activeCountry
+      this.countryCode = this.activeCountry
+
       if (toEmitInputEvent) {
         this.$emit('input', this.phoneText, this.phoneObject)
-        this.$emit('onInput', this.phoneObject) // Deprecated
+        this.$emit('onInput', this.phoneObject)
       }
     },
 
-    reset () {
-      // __log('reset()', this.activeCountry)
-      if (__isObject(this.activeCountry) && this.activeCountry.iso2) { this.countryCode = this.activeCountry }
+    reset() {
+      if (this.activeCountry && this.activeCountry.iso2) {
+        this.countryCode = this.activeCountry
+      }
+
       this.initializeCountry()
         .then(() => {
           if (
@@ -487,14 +551,16 @@ export default {
           ) {
             this.phone = `+${this.activeCountry.dialCode}`
           }
+          // Ensure countryCode is synced with activeCountry
           this.countryCode = this.activeCountry
           this.$emit('validate', this.phoneObject)
-          this.$emit('onValidate', this.phoneObject) // Deprecated
+          this.$emit('onValidate', this.phoneObject)
         })
         .catch(console.error)
         .finally(() => {
           this.finishMounted = true
         })
+
       this.open = false
     },
 
@@ -658,6 +724,11 @@ export default {
             margin-left: auto;
           }
         }
+      }
+    }
+    .v-field__input{
+      input{
+        min-width:0 !important
       }
     }
   }
