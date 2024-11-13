@@ -305,11 +305,11 @@ export default {
           )
         break;
         default:
-
           if (__isObject(value)) {
-            __log('getDisplayData is object', input.type, value, input)
+            // __log('getDisplayData is object', input.type, value, input)
             displayData[key]._value = value;
           } else if (Array.isArray(value) && input.items) {
+            // __log('getDisplayData is array', input.type, key, value, input)
             displayData[key]._value = value.map(id => {
               const item = input.items.find(i => i[input.itemValue] === id);
               return item ? item[input.itemTitle] : id;

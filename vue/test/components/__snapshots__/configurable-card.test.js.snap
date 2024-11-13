@@ -232,10 +232,10 @@ exports[`ConfigurableCard > Press Release Content > renders simple array items >
         </div>
       </div>
       <!-- <v-list dense class="">
-            <v-list-item v-for="(item, itemIndex) in segment" :key="itemIndex">
-              {{ item }}
-            </v-list-item>
-          </v-list> -->
+              <v-list-item v-for="(item, itemIndex) in segment" :key="itemIndex">
+                {{ item }}
+              </v-list-item>
+            </v-list> -->
     </div>
     <div data-v-cd6087b7="" class="ue-configurable-card__col ue-configurable-card__col--seperator">
       <div data-v-cd6087b7="" class="d-flex fill-height">
