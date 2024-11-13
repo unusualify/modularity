@@ -37,16 +37,16 @@ class State extends Model
     }
 
     /**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array<int, string>
-	 */
-	protected $fillable = [
-		'published',
-		'code',
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'published',
+        'code',
         'icon',
-        'color'
-	];
+        'color',
+    ];
 
     /**
      * The translated attributes that are assignable for hasTranslation Trait.

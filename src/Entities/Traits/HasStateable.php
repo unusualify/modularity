@@ -3,7 +3,6 @@
 namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Modules\SystemUtility\Entities\Stateable;
 use Unusualify\Modularity\Entities\State;
@@ -62,7 +61,7 @@ trait HasStateable
                 return $state->pivot->is_active === 1;
             });
 
-            if (!is_null($state)) {
+            if (! is_null($state)) {
                 // Get matching default state if exists
                 $defaultState = collect($model->default_states)->firstWhere('code', $state->code);
 
@@ -146,21 +145,22 @@ trait HasStateable
 
         foreach ($defaultStates as $index => $state) {
 
-            if(is_string($state))
+            if (is_string($state)) {
                 $stateData = [
-                    'code' => $state
+                    'code' => $state,
                 ];
-            else
+            } else {
                 $stateData = $state;
+            }
 
-            if(is_string($state)){
+            if (is_string($state)) {
                 foreach ($translationLangs as $lang) {
                     $stateData[$lang] = [
                         'name' => Str::headline($state),
                         'active' => true,
                     ];
                 }
-            }else {
+            } else {
                 foreach ($translationLangs as $lang) {
                     $stateData[$lang] = [
                         'name' => Str::headline($state['code']),
@@ -171,12 +171,13 @@ trait HasStateable
             $allStates[] = $stateData;
         }
 
-        if(!isset($model->inititalState))
+        if (! isset($model->inititalState)) {
             $initialState = $model->default_states[0];
-        else
+        } else {
             $initialState = $model->initial_state;
+        }
 
-        if(is_string($initialState)){
+        if (is_string($initialState)) {
             $initialState = [
                 'name' => Str::headline($initialState),
                 'icon' => '$warning',
@@ -184,22 +185,23 @@ trait HasStateable
             ];
         }
 
-        if(!isset($model->default_state))
+        if (! isset($model->default_state)) {
             $defaultState = $model->default_state;
-        else
+        } else {
             $defaultState = $initialState;
+        }
 
-        if(is_string($defaultState)){
+        if (is_string($defaultState)) {
             $defaultState = [
                 'name' => Str::headline($defaultState),
                 'icon' => '$warning',
-                'color' => 'warning'
+                'color' => 'warning',
             ];
         }
 
         foreach ($allStates as $state) {
 
-            if(is_string($state)){
+            if (is_string($state)) {
                 array_merge($state, [
                     'color' => $defaultState['color'],
                     'icon' => $defaultState['icon'],
@@ -210,7 +212,7 @@ trait HasStateable
 
             $pivotData = ['is_active' => false];
 
-            if($state['code'] == $initialState['code']) {
+            if ($state['code'] == $initialState['code']) {
                 $pivotData['is_active'] = true;
             }
 
@@ -225,10 +227,13 @@ trait HasStateable
         ];
     }
 
-    public function previewState($state){
+    public function previewState($state)
+    {
         return "<span variant='text' color='{$state->color}' prepend-icon='{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</span>";
     }
-    public function previewWhenStateNull(){
+
+    public function previewWhenStateNull()
+    {
         return "<span variant='text' color='' prepend-icon=''>No State</span>";
     }
 }

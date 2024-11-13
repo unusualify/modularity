@@ -12,16 +12,16 @@ class State extends \Unusualify\Modularity\Entities\State
     use HasTranslation, ModelHelpers, IsTranslatable;
 
     /**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array<int, string>
-	 */
-	// protected $fillable = [
-	// 	'published',
-	// 	'code',
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    // protected $fillable = [
+    // 	'published',
+    // 	'code',
     //     'icon',
     //     'color'
-	// ];
+    // ];
 
     /**
      * The translated attributes that are assignable for hasTranslation Trait.
