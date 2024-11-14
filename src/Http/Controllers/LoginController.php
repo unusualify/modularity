@@ -180,7 +180,7 @@ class LoginController extends Controller
                     'email' => [
                         'type' => 'text',
                         'name' => 'email',
-                        'label' => ___('authentication.email'),
+                        'label' => 'Email',
                         'hint' => 'enter @example.com',
                         'default' => '',
                         'col' => [
@@ -193,7 +193,7 @@ class LoginController extends Controller
                     'password' => [
                         'type' => 'password',
                         'name' => 'password',
-                        'label' => ___('authentication.password'),
+                        'label' =>'Password',
                         'default' => '',
                         'appendInnerIcon' => '$non-visibility',
                         'slotHandlers' => [
@@ -208,6 +208,7 @@ class LoginController extends Controller
                 'actionUrl' => route(Route::hasAdmin('login')),
                 'buttonText' => __('authentication.login'),
                 'formClass' => 'px-0',
+                'rightBtnText' => 'Test',
             ],
             'formSlots' => [
                 'bottom' => [

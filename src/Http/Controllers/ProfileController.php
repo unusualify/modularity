@@ -89,7 +89,7 @@ class ProfileController extends BaseController
 
         $userPasswordSchema = $this->createFormSchema(getFormDraft('user_password'));
         $userPasswordFields = $this->userRepository->getFormFields($user, $userPasswordSchema, true);
-
+        // dd($userSchema);
         $sectionFields = [
             [
                 UComponent::makeUeForm()
@@ -105,7 +105,7 @@ class ProfileController extends BaseController
                             'justify' => 'left',
                             'margin' => 'y-8',
                         ],
-                        'buttonText' => 'update',
+                        'buttonText' => 'Update',
                         'hasSubmit' => true,
                         'stickyButton' => false,
 
@@ -130,7 +130,7 @@ class ProfileController extends BaseController
                             'justify' => 'left',
                             'margin' => 'y-8',
                         ],
-                        'buttonText' => 'update',
+                        'buttonText' => 'Update',
                         'hasSubmit' => true,
                         'stickyButton' => false,
 
@@ -313,7 +313,7 @@ class ProfileController extends BaseController
                                 'margin' => 'y-8',
                             ],
                             // 'editable' => true,
-                            'buttonText' => 'update',
+                            'buttonText' => 'Update',
                             'hasSubmit' => true,
                             'stickyButton' => false,
 

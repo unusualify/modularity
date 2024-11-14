@@ -68,7 +68,8 @@
               <v-btn
                 variant="outlined"
                 class="text-white custom-right-auth-button my-5"
-                density="default">
+                density="default"
+                >
                 {{ rightBtnText }}
               </v-btn>
             </div>
