@@ -327,7 +327,6 @@ trait ManageTable
     protected function hydrateHeader($header)
     {
         $this->hydrateHeaderSuffix($header);
-        $header['title'] = ___('table-headers.'.$header['title']);
         // add edit functionality to table title cell
         if ($this->titleColumnKey == $header['key'] && ! isset($header['formatter'])) {
             $header['formatter'] = [
@@ -504,9 +503,20 @@ trait ManageTable
 
     }
 
-    public function translateHeaders($headers){
-        foreach($headers as $key => $header){
-            $headers[$key]['title'] = __('table-headers.'. $headers[$key]['title']);
+    public function translateHeaders($headers)
+    {
+        foreach($headers as $key => $value) {
+
+            if (!isset($headers[$key]['title']) || !is_string($headers[$key]['title'])) {
+                continue;
+            }
+
+            $title = $headers[$key]['title'];
+            $translation = __('table-headers.' . $title);
+
+            if (!is_array($translation) && $translation !== 'table-headers.' . $title) {
+                $headers[$key]['title'] = $translation;
+            }
         }
         return $headers;
     }

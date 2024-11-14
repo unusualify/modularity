@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Traits;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
@@ -108,7 +109,6 @@ trait ManageForm
             return $this->getSchemaInput($input, $inputs);
         })->toArray();
     }
-
     //TODO: create an filter for roles if role is not allowed to see that input it shouldn't see it you can check getSchemaInput last part
     protected function getSchemaInput($input, $inputs = [])
     {
@@ -137,8 +137,9 @@ trait ManageForm
     {
         return collect($input)
             ->mapWithKeys(function ($v, $k) {
-                if ($k == 'label' && ___("form-labels.{$v}") !== "form-labels.{$v}") {
-                    $v = ___("form-labels.{$v}");
+                if ($k == 'label' &&
+                    $translation =  ___("form-labels.{$v}") !== "form-labels.{$v}") {
+                    $v = $translation;
                 }
                 // if($k == 'label')
                 //     $v = ___("form-labels.{$v}");
