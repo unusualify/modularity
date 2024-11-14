@@ -7,27 +7,36 @@
             <p class="total">Total Pay:</p>
             <p class="amount">{{ price }}</p>
           </v-card-title>
-          <v-card-text>
+          <v-card-text class="pa-0">
             <p class="select-title">How would you like to pay?</p>
           </v-card-text>
           <v-radio-group v-model="localPaymentMethod" column>
-            <div class="service-container">
+            <div
+              class="service-container pa-3"
+              :class="{ 'selected-service--focus': localPaymentMethod === localDefaultPaymentMethod }"
+            >
               <v-radio :label="$t('Credit Card')" :value="localDefaultPaymentMethod" class="service-label">
               </v-radio>
               <v-row align="center">
                 <v-col class="d-flex justify-content-end">
-                  <div class="service-icon-container">
+                  <div
+                    class="service-icon-container"
+                  >
                     <v-img-icon src="/storage/uploads/38fd5286-5643-48fc-8a5c-b6f1452f1276/group-25287.png" contain class="v-img__img--relative"></v-img-icon>
                   </div>
                 </v-col>
               </v-row>
             </div>
-            <div v-for="(service, key) in serviceItems" :key="`service-${key}`" class="service-container">
+            <div
+              v-for="(service, key) in serviceItems" :key="`service-${key}`"
+              class="service-container pa-3"
+              :class="{ 'selected-service--focus': localPaymentMethod === service[itemValue] }"
+              >
               <v-radio :label="service.title" :value="service[itemValue]" class="service-label">
               </v-radio>
               <v-row align="center">
                 <v-col class="d-flex justify-content-end">
-                  <div class="service-icon-container">
+                  <div class="service-icon-container ">
                     <v-img-icon :src="service[iconKey]" contain class="v-img__img--relative"></v-img-icon>
                   </div>
                 </v-col>
@@ -211,9 +220,9 @@ export default {
 }
 
 .headline{
-  background-color: #7CB749;
+  background-color: #54AF4C;
   color: white;
-  padding: 2rem;
+  padding: 1rem 2rem;
   border-radius: 8px 8px 0 0;
 
   *{
@@ -223,24 +232,20 @@ export default {
   }
   .total{
     font-size: 1.5rem;
-    color: #47791D;
+    color: white;
   }
   .amount{
     font-size: 4rem;
-    color: #fff;
+    color: white;
   }
 }
 
-.service-label{
- width: 100%;
-}
-
 .select-title {
-  font-size: 1.3rem;
-  color: #323C47;
-  font-weight: 700;
+  font-size: 1.4rem;
+  color: #32454A;
+  font-weight: 400;
   text-align: center;
-  margin: 3rem 0;
+  margin: 1.5rem 0;
 }
 .v-btn {
   background-color: #f5f5f5;
@@ -252,9 +257,24 @@ export default {
 .service-container{
   display:flex;
   flex-flow: row;
+  border: 1px solid #CACBCB;
+  border-radius: 4px;
+  margin: 0.5rem 1.5rem;
+  background-color: transparent;
+  transition: 0.3s linear all;
+
+  &.selected-service--focus{
+    border: 1px solid #54AF4C;
+    background-color: #E4F4D8;
+  }
+
+  .service-label{
+    width: 100%;
+  }
 
   .service-icon-container {
     width: fit-content;
+
     .v-img__img--relative {
       background: rgba(211, 216, 221, 0.30);
       padding: 8px 28px;
@@ -272,11 +292,18 @@ export default {
 </style>
 
 <style lang="scss">
-    .service-icon-container {
-      .v-img__img--relative {
-        img {
-          position: relative !important;
-        }
+  .service-container{
+    .v-label {
+      color: #20363B !important;
+      font-weight: 600 !important;
+    }
+  }
+  .service-icon-container {
+    .v-img__img--relative {
+      img {
+        position: relative !important;
       }
     }
+  }
+
 </style>
