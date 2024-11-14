@@ -507,14 +507,15 @@ trait ManageTable
     {
         foreach($headers as $key => $value) {
 
-            if (!isset($headers[$key]['title']) || !is_string($headers[$key]['title'])) {
+            if (!isset($headers[$key]['title'])) {
                 continue;
             }
 
             $title = $headers[$key]['title'];
-            $translation = __('table-headers.' . $title);
+            $tableHeader = 'table-headers.' . $title;
+            $translation = __($tableHeader);
 
-            if (!is_array($translation) && $translation !== 'table-headers.' . $title) {
+            if (!is_array($translation) && $translation !== $tableHeader) {
                 $headers[$key]['title'] = $translation;
             }
         }
