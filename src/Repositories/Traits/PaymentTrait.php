@@ -23,7 +23,7 @@ trait PaymentTrait
      *
      * @var string
      */
-    protected $requiredTrait = 'Oobook\Priceable\Traits\HasPriceable';
+    protected $requiredTrait = 'Unusualify\Modularity\Entities\Traits\HasPriceable';
 
     /**
      * snapshotTrait
