@@ -21,6 +21,7 @@ return [
     'striped' => true,
     'hideBorderRow' => false,
     'roundedRows' => true,
+    'controlsPosition' => 'top', // top, bottom
 
     'toolbarOptions' => [
         'color' => 'transparent', // rgb(255,255,255,1) or utility colors like white, purple
