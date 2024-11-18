@@ -38,12 +38,12 @@
           </template>
           <template v-else-if="isObject(segment)">
             <div class="d-flex fill-height">
-              <PropertyList :data="segment" class="" noPadding/>
+              <ue-property-list :data="segment" class="" noPadding/>
             </div>
           </template>
           <template v-else-if="isArray( segment)">
             <div class="d-flex fill-height">
-              <PropertyList :data="segment.map(item => [item])" class="" noPadding/>
+              <ue-property-list :data="segment.map(item => [item])" class="" noPadding/>
             </div>
             <!-- <v-list dense class="">
               <v-list-item v-for="(item, itemIndex) in segment" :key="itemIndex">
@@ -70,12 +70,7 @@
 </template>
 
 <script>
-  import PropertyList from '@/components/labs/PropertyList.vue';
-
   export default {
-    components: {
-      PropertyList,
-    },
     name: 'ue-configurable-card',
     props: {
       title: {

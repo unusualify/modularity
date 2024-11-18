@@ -70,12 +70,12 @@
                     <v-row>
                       <template v-for="(context, index) in formattedPreview" :key="`summary-${index}`">
                         <v-col cols="12" :lg="context.col || 6" v-fit-grid>
-                          <ConfigurableCard v-bind="context" elevation="3" class="my-2"/>
+                          <ue-configurable-card v-bind="context" elevation="3" class="my-2"/>
                         </v-col>
                       </template>
 
                       <v-col cols="12">
-                        <!-- <ConfigurableCard class="my-3" elevation="3"
+                        <!-- <ue-configurable-card class="my-3" elevation="3"
                           align-center-columns-x
                           justify-center-columns-x
                           v-bind="getPreviewConfigurableData()"
@@ -88,7 +88,7 @@
                            <!-- {{ $log(previewFormData) }} -->
                           <ue-title type="body-1" color="primary" font-weight="bold" padding="a-0">{{ finalFormTitle }}</ue-title>
                           <template v-for="(data, index) in previewFormData" :key="`final-form-data-${index}`">
-                            <ConfigurableCard
+                            <ue-configurable-card
                               style="background-color: transparent;"
                               class="mx-n4"
                               elevation="0"
@@ -134,7 +134,7 @@
                                   />
                                 </div>
                               </template>
-                            </ConfigurableCard>
+                            </ue-configurable-card>
                           </template>
                           <template v-for="(addon, index) in [
                               {
@@ -153,7 +153,7 @@
                             :key="addon.id"
                             :title="addon.title"
                           >
-                            <!-- <ConfigurableCard
+                            <!-- <ue-configurable-card
                               :items="[
                                 [
                                   addon.title,
@@ -394,14 +394,10 @@ import { getModel, handleEvents, handleMultiFormEvents } from '@/utils/getFormDa
 import { useInputHandlers, useValidation } from '@/hooks'
 import api from '@/store/api/form'
 
-import ConfigurableCard from '@/components/labs/ConfigurableCard.vue';
 
 import NotationUtil from '@/utils/notation';
 
 export default {
-  components: {
-    ConfigurableCard,
-  },
   props: {
     forms: {
       type: Object,
