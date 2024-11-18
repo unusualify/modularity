@@ -31,7 +31,7 @@ return [
         'density' => 'default', // prominent, comfortable, compact, default
         'elevation' => 0, // string or number refers to elevation
         'image' => '', // image link for the background of the toolbar
-        'height' => '90',
+        // 'height' => '90',
     ],
     'filterBtnOptions' => [
         'variant' => 'outlined', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
@@ -41,12 +41,13 @@ return [
         'readonly' => false, // boolean to set the button readonly mode, can be used to disable button
         'ripple' => true, // boolean
         // 'rounded' => 'md', // string | number | boolean - 0, xs, sm, true, lg, xl, pill, circle, and shaped.
-        'class' => 'mx-2 text-white text-capitialize rounded px-8',
+        'class' => 'mx-2 text-white text-capitialize rounded px-4',
         'size' => 'default', //sizes: x-small, small, default, large, and x-large.
         // 'icon' => 'mdi-filter-outline',
         'prepend-icon' => 'mdi-filter-outline',
         'append-icon' => 'mdi-chevron-down',
         'slim' => false,
+        'density' => 'comfortable',
         // 'loading' => true,
     ],
     'addBtnOptions' => [
@@ -57,11 +58,12 @@ return [
         'readonly' => false, // boolean to set the button readonly mode, can be used to disable button
         'ripple' => true, // boolean
         'rounded' => 'md', // string | number | boolean - 0, xs, sm, true, lg, xl, pill, circle, and shaped.
-        'class' => 'ml-2 text-white text-capitialize text-bold',
+        'class' => 'ml-2 text-white rounded text-capitialize text-bold',
         'size' => 'default', //sizes: x-small, small, default, large, and x-large.
         // 'text' => 'CREATE NEW',
         // 'icon' => 'mdi-abacus'
         // 'loading' => true,
+        'density' => 'comfortable',
     ],
     'paginationOptions' => [
         'footerComponent' => 'default', // default|vuePagination|infiniteScroll:
@@ -101,7 +103,10 @@ return [
         ],
     ],
     'customRowComponent' => [
-        // 'iteratorComponent' => 'card-iterator',
+        // 'iteratorComponent' => 'configurable-card-iterator',
+        // 'col' => [
+        //     'cols' => 12,
+        // ]
         // 'col' => [
         //     'cols' => 6,
         //     'sm' => 6,
