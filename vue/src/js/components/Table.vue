@@ -14,13 +14,14 @@
         v-if="!hideTable"
         v-bind="{...$bindAttributes(), ...footerProps}"
         :class="[
+          'px-4',
           noFullScreen ? '' : 'h-100',
           tableClasses,
           fullWidthWrapper ? '' : 'ue-table--narrow-wrapper',
-          'px-4',
           striped ? 'ue-datatable--striped' : '',
           roundedRows ? 'ue-datatable--rounded-row' : '',
-          hideBorderRow ? 'ue-datatable--no-border-row' : ''
+          hideBorderRow ? 'ue-datatable--no-border-row' : '',
+          controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'ue-datatable--bottom-controls' : ''
         ]"
         id="ue-table"
 
@@ -53,72 +54,129 @@
         item-value="id"
         v-model="selectedItems"
 
-
         @update:options="changeOptions($event)"
       >
       <!-- v-model:options="options" -->
         <template v-slot:top="{ someSelected }">
           <v-toolbar
             v-bind="toolbarOptions"
+            :class="[
+              'pt-1',
+            ]"
           >
-            <ue-title
-              :text="tableTitle"
-              :subTitle="tableSubtitle"
-              :class="[someSelected ? 'w-33 h-100' : 'w-33 h-100']"
-            />
+            <!-- table title -->
+            <div
+              :class="[
+                controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'pt-2' : 'flex-grow-1 h-100 d-flex flex-column justify-center',
+              ]"
+              style="min-width: 20%;"
+            >
+              <!-- title -->
+              <ue-title
+                type="subtitle-1"
+                color="black"
+                :text="tableTitle"
+                padding="x-3"
+              />
+              <!-- subtitle -->
+              <ue-title
+                v-if="tableSubtitle"
+                type="caption"
+                weight="medium"
+                color="grey-darken-1"
+                transform="none"
+                padding="x-3"
+                :text="tableSubtitle"
+              />
+            </div>
+
+            <v-divider v-if="controlsPosition === 'bottom' || $vuetify.display.smAndDown" class="my-3"></v-divider>
+
+            <!-- table controls -->
             <v-slide-x-transition :group="true">
-                <template v-for="(action, k) in bulkActions" :key="k">
-                  <v-btn
-                    v-if="someSelected && canBulkAction(action)"
-                    :icon="(action.icon ? action.icon : `$${action.name}`)"
-                    :color="action.color ?? 'primary'"
-                    @click="itemAction(action, action.name)"
-                    v-tooltip="$lodash.startCase(action.name)"
-                    small
-                    left
+              <div
+                :class="[
+                  'd-flex',
+                  controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'justify-end flex-grow-1',
+
+                ]"
+              >
+                <template v-if="someSelected">
+                  <!-- bulk actions -->
+                  <template v-for="(action, k) in bulkActions" :key="k">
+                    <v-btn
+                      v-if="can(action.name)"
+                      v-bind="filterBtnOptions"
+                      :append-icon="false"
+                      :prepend-icon="(action.icon ? action.icon : `$${action.name}`)"
+                      :text="window.__headline(action.name)"
+                      :color="action.color ?? 'primary'"
+                      @click="itemAction(action, action.name)"
+                      v-tooltip="$lodash.startCase(action.name)"
+                    />
+                  </template>
+                </template>
+                <template v-else>
+                  <!-- search field -->
+                  <v-text-field
+                    v-if="!hideSearchField"
+                    v-model="search"
+                    variant="outlined"
+                    append-inner-icon="mdi-magnify"
+                    hide-details
+                    density="comfortable"
+                    single-line
+                    :placeholder="searchText"
+                    :class="[
+                      'mr-2',
+                      controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'flex-grow-1' : ''
+                    ]"
+                    :style="[
+                      'display: inline',
+                      // controlsPosition === 'top' || $vuetify.display.smAndDown ? 'max-width: 300px' : '',
+                      'min-width: 100px'
+                    ]"
+                  />
+
+                  <!-- <v-spacer v-else-if="hideSearchField"></v-spacer> -->
+
+                  <!-- filter button -->
+                  <v-btn v-if="mainFilters.length > 0"
+                    id="filter-btn-activator"
+                    v-bind="{...filterBtnOptions, ...filterBtnTitle}"
+                    :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
+                    :text="$vuetify.display.smAndDown ? null : filterBtnTitle['text']"
+                    :prepend-icon="$vuetify.display.smAndDown ? null : filterBtnOptions['prepend-icon']"
+                    :density="$vuetify.display.smAndDown ? 'compact' : (filterBtnOptions['density'] ?? 'comfortable')"
+                  />
+
+                  <!-- advanced filter button -->
+                  <v-btn v-if="Object.keys(advancedFilters).length > 0"
+                    id="advanced-filter-btn"
+                    v-bind="{...filterBtnOptions, ...filterBtnTitle}"
+                    :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
+                    :text="$vuetify.display.smAndDown ? null : 'Advanced Filter'"
+                    :prepend-icon="$vuetify.display.smAndDown ? null : filterBtnOptions['prepend-icon']"
+                    :density="$vuetify.display.smAndDown ? 'compact' : (filterBtnOptions['density'] ?? 'comfortable')"
+                  />
+
+                  <!-- create button -->
+                  <v-btn v-if="can('create') && !noForm && !someSelected && createOnModal"
+                    v-bind="addBtnOptions"
+                    @click="createForm"
+                    :icon="$vuetify.display.smAndDown ? addBtnOptions['prepend-icon'] : null"
+                    :text="$vuetify.display.smAndDown ? null : addBtnTitle"
+                    :prepend-icon="$vuetify.display.smAndDown ? null : addBtnOptions['prepend-icon']"
+                    :density="$vuetify.display.smAndDown ? 'compact' : (addBtnOptions['density'] ?? 'comfortable')"
                   />
                 </template>
+              </div>
             </v-slide-x-transition>
-
-            <v-text-field
-              v-if="!hideSearchField"
-              class="px-3"
-              variant="outlined"
-              append-inner-icon="mdi-magnify"
-              :placeholder="searchText"
-              hide-details
-              density="comfortable"
-
-              style="max-width: 30%; display: inline;"
-              single-line
-              v-model="search"
-            />
-            <v-spacer v-else-if="hideSearchField"></v-spacer>
-            <v-btn
-              v-if="mainFilters.length > 0"
-              id="filter-btn-activator"
-              v-bind="{...filterBtnOptions, ...filterBtnTitle}"
-              density="comfortable"
-              />
-            <v-btn
-              v-if="Object.keys(advancedFilters).length > 0"
-              id="advanced-filter-btn"
-              v-bind="{...filterBtnOptions, ...filterBtnTitle}"
-              text="Advanced Filter"
-              density="comfortable"
-
-            />
-
-            <v-btn
-              v-if="can('create') && !noForm && !someSelected && createOnModal"
-              v-bind="addBtnOptions"
-              @click="createForm"
-              :text="addBtnTitle"
-              density="comfortable"
-              />
-
           </v-toolbar>
 
+          <v-divider v-if="controlsPosition === 'top' && $vuetify.display.mdAndUp" class="mb-4 mt-2"></v-divider>
+
+          <!-- filter menu -->
           <v-menu
             activator="#filter-btn-activator"
             >
@@ -133,6 +191,7 @@
               </v-list>
           </v-menu>
 
+          <!-- advanced filter menu -->
           <v-menu
             activator="#advanced-filter-btn"
             :close-on-content-click="false"
@@ -176,6 +235,7 @@
             </v-card>
           </v-menu>
 
+          <!-- form modal -->
           <ue-modal
             ref="formModal"
             v-model="formActive"
@@ -213,6 +273,7 @@
             </template>
           </ue-modal>
 
+          <!-- embeddedform modal -->
           <div class="ue-table-top__wrapper">
             <div v-if="embeddedForm && !noForm" class=""
               :style="formStyles">
@@ -234,57 +295,6 @@
               </v-expand-transition>
             </div>
 
-            <!-- <ue-modal
-              v-model="actionModalActive"
-              transition="dialog-bottom-transition"
-              width-type="sm"
-              persistant
-            >
-            <template v-slot:body="props" >
-                <v-card >
-                  <v-card-title class="text-h5 text-center" style="word-break: break-word;">
-                    {{ textDescription }}
-                  </v-card-title>
-                  <v-card-text class="text-center" style="word-break: break-word;" >
-                    {{ actionDialogQuestion }}
-                  </v-card-text>
-                  <v-divider/>
-                  <v-card-actions>
-                    <v-spacer/>
-                    <v-btn color="blue" text @click="closeActionModal()"> {{ props.textCancel }}</v-btn>
-                    <v-btn color="blue" text @click="confirmAction()"> {{ props.textConfirm }}</v-btn>
-                    <v-spacer></v-spacer>
-                  </v-card-actions>
-                </v-card>
-              </template>
-
-            </ue-modal> -->
-
-            <!-- #deletemodal-->
-            <!-- <ue-modal
-              ref="deleteModal"
-              v-model="deleteModalActive"
-              transition="dialog-bottom-transition"
-              width-type="sm"
-              >
-              <template v-slot:body="props" >
-                <v-card >
-                  <v-card-title class="text-h5 text-center" style="word-break: break-word;">
-                    {{ textDescription }}
-                  </v-card-title>
-                  <v-card-text class="text-center" style="word-break: break-word;" >
-                    {{ deleteQuestion }}
-                  </v-card-text>
-                  <v-divider/>
-                  <v-card-actions>
-                    <v-spacer/>
-                    <v-btn color="blue" text @click="closeDeleteModal()"> {{ props.textCancel }}</v-btn>
-                    <v-btn color="blue" text @click="deleteRow()"> {{ props.textConfirm }}</v-btn>
-                    <v-spacer></v-spacer>
-                  </v-card-actions>
-                </v-card>
-              </template>
-            </ue-modal> -->
             <!-- custom modal -->
             <ue-modal
               ref="customModal"
@@ -294,49 +304,51 @@
               :persistent="modals[activeModal].persistent"
               :description-text="modals[activeModal].content"
             >
-            <template #body="props">
-              <v-card>
-                <v-card-title class="text-h5 text-center" style="word-break: break-word;"
-                  v-if="modals[activeModal].title">
-                  <!-- {{ modal.title }} -->
-                </v-card-title>
-                <v-icon
-                  v-if="modals[activeModal].img"
-                  :icon="modals[activeModal].icon"
-                  style="margin:auto; border:4px solid;border-radius:50%;padding:32px;"
-                  size="32"
-                  :color="modals[activeModal].color"/>
+              <template #body="props">
+                <v-card>
+                  <v-card-title class="text-h5 text-center" style="word-break: break-word;"
+                    v-if="modals[activeModal].title">
+                    <!-- {{ modal.title }} -->
+                  </v-card-title>
+                  <v-icon
+                    v-if="modals[activeModal].img"
+                    :icon="modals[activeModal].icon"
+                    style="margin:auto; border:4px solid;border-radius:50%;padding:32px;"
+                    size="32"
+                    :color="modals[activeModal].color"/>
 
-                <v-card-text class="text-center" style="word-break: break-word;">
-                  {{ modals[activeModal].content }}
-                </v-card-text>
-                <v-divider />
-                <v-card-actions>
-                  <v-spacer />
-                  <v-btn :color="modals[activeModal].color ? modals[activeModal].color : 'blue'" text @click="modals[activeModal].closeAction()">
-                    {{ modals[activeModal].cancelText || props.textCancel }}
-                  </v-btn>
-                  <!-- <v-btn color="blue" text @click="handleModal('confirm', modal.ref, props.onConfirm)"></v-btn> -->
-                  <v-btn :color="modals[activeModal].color ? modals[activeModal].color : 'blue'" text @click="modals[activeModal].confirmAction()">
-                    {{ modals[activeModal].confirmText || props.textConfirm }}
-                  </v-btn>
-                  <v-spacer />
-                </v-card-actions>
-              </v-card>
-            </template>
-          </ue-modal>
-          <ue-modal
-            ref="customFormModal"
-            v-model="customFormModalActive"
-            :width-type="'lg'"
-          >
-            <ue-form
-              ref="customForm"
-              v-model="customFormModel"
-              v-bind="customFormAttributes"
+                  <v-card-text class="text-center" style="word-break: break-word;">
+                    {{ modals[activeModal].content }}
+                  </v-card-text>
+                  <v-divider />
+                  <v-card-actions>
+                    <v-spacer />
+                    <v-btn :color="modals[activeModal].color ? modals[activeModal].color : 'blue'" text @click="modals[activeModal].closeAction()">
+                      {{ modals[activeModal].cancelText || props.textCancel }}
+                    </v-btn>
+                    <!-- <v-btn color="blue" text @click="handleModal('confirm', modal.ref, props.onConfirm)"></v-btn> -->
+                    <v-btn :color="modals[activeModal].color ? modals[activeModal].color : 'blue'" text @click="modals[activeModal].confirmAction()">
+                      {{ modals[activeModal].confirmText || props.textConfirm }}
+                    </v-btn>
+                    <v-spacer />
+                  </v-card-actions>
+                </v-card>
+              </template>
+            </ue-modal>
+
+            <!-- custom form modal -->
+            <ue-modal
+              ref="customFormModal"
+              v-model="customFormModalActive"
+              :width-type="'lg'"
             >
-            </ue-form>
-          </ue-modal>
+              <ue-form
+                ref="customForm"
+                v-model="customFormModel"
+                v-bind="customFormAttributes"
+              >
+              </ue-form>
+            </ue-modal>
 
           </div>
 
@@ -344,25 +356,53 @@
 
         <!-- MARK: DATA-ITERATOR BODY -->
         <template v-slot:body="{ items }" v-if="enableIterators" class="ue-datatable__container">
-            <v-row>
-              <v-col
+          <v-row no-gutters>
+            <v-col
               v-for="(element, i) in items"
               :key="element.id"
               v-bind="customRowComponent.col"
+            >
+            <!-- // TODO - check if its empty -->
+              <component
+                :is="`ue-${customRowComponent.iteratorComponent}`"
+                :key="element.id"
+                :item="element"
+                :headers="headers"
+                :rowActions = "rowActions"
+                @click-action="itemAction"
+                @edit-item = "editItem"
               >
-              <!-- // TODO - check if its empty -->
-                <component
-                  :is="`ue-${customRowComponent.iteratorComponent}`"
-                  :key="element.id"
-                  :item="element"
-                  :headers="headers"
-                  :rowActions = "rowActions"
-                  @click-action="itemAction"
-                  @edit-item = "editItem"
-                >
-                </component>
-              </v-col>
-            </v-row>
+
+                <template v-slot:actions>
+                  <div>
+                    <div class="d-flex flex-wrap ga-2 justify-sm-end ml-n2 ml-md-0">
+                      <template v-for="(action, k) in rowActions" :key="k">
+                        {{ $log(action) }}
+                        <v-tooltip
+                          v-if="itemHasAction(element, action)"
+                          :text="$t( action.label ?? $headline(action.name) )"
+                          location="top"
+                          >
+                          <template v-slot:activator="{ props }">
+                            <v-btn
+                              :variant="action.variant ?? 'elevated'"
+                              size="small"
+                              :icon="action.forceLabel ? null : (action.icon ? action.icon : '$' + action.name)"
+                              :color="action.color ?? 'primary'"
+                              :rounded="action.forceLabel ? null : true"
+                              @click="itemAction(item, action)"
+                              v-bind="props"
+                              :text="action.forceLabel ? $t( action.label ?? $headline(action.name) ) : null"
+                            />
+                          </template>
+                        </v-tooltip>
+                      </template>
+                    </div>
+                  </div>
+                </template>
+              </component>
+            </v-col>
+          </v-row>
         </template>
 
         <!-- MARK PAGINATION BUTTONS -->
@@ -417,6 +457,7 @@
             </v-tooltip>
           </template>
           <template v-else-if="col.formatter == 'switch'">
+            <!-- {{ $log('switch', item, col.key) }} -->
             <v-switch
               :key="i"
               :model-value="item[col.key]"
@@ -481,19 +522,12 @@
                 </v-list>
               </v-card-title>
               <v-card-actions>
-                <v-spacer></v-spacer>
-
-                <!-- <v-btn
-                  text="Clear"
-                  variant="plain"
-                  @click="clearAdvancedFilter"
-                ></v-btn> -->
-
                 <v-btn
                   color="primary"
                   text="Save"
                   variant="tonal"
                   @click="applyHeaders"
+                  block
                 ></v-btn>
               </v-card-actions>
             </v-card>
@@ -527,7 +561,7 @@
                     <v-icon small :color="action.color" left>
                       {{ action.icon ? action.icon : '$' + action.name }}
                     </v-icon>
-                    {{ $t( action.label ?? action.name ) }}
+                    {{ $t( action.label ?? $headline(action.name) ) }}
                 </v-list-item>
               </template>
             </v-list>
@@ -552,7 +586,6 @@
                   </v-icon>
                 </template>
               </v-tooltip>
-
             </template>
           </div>
         </template>
@@ -619,18 +652,21 @@ import { VDataTableRows } from 'vuetify/lib/components/VDataTable/index.mjs'
 import { VDataTableRow } from 'vuetify/lib/components/VDataTable/index.mjs'
 
 import {
-  useTable,
+  makeTableNamesProps,
+  makeTableEndpointsProps,
+  makeTableHeadersProps,
+  makeTableFormsProps,
+  makeTableFiltersProps,
+  makeTableItemActionsProps,
   makeTableProps,
-  useDraggable,
   makeDraggableProps,
   makeFormatterProps,
+  useTable,
+  useDraggable,
 } from '@/hooks'
 
-import DynamicComponentRenderer from './DynamicComponentRenderer'
 import ActiveTableItem from '__components/labs/ActiveTableItem.vue'
 import PaymentService from './inputs/PaymentService.vue'
-import { useStore } from 'vuex'
-import DynamicComponentRendererVue from './DynamicComponentRenderer.vue'
 
 const { ignoreFormatters } = makeFormatterProps()
 
@@ -644,8 +680,14 @@ export default {
 
   },
   props: {
-    ...makeDraggableProps(),
+    ...makeTableNamesProps(),
+    ...makeTableEndpointsProps(),
+    ...makeTableFiltersProps(),
+    ...makeTableHeadersProps(),
+    ...makeTableFormsProps(),
+    ...makeTableItemActionsProps(),
     ...makeTableProps(),
+    ...makeDraggableProps(),
     ...ignoreFormatters
   },
   setup (props, context) {
@@ -691,10 +733,17 @@ export default {
 <style lang="sass">
 .ue-datatable__container
   width: 100%
+
   &.ue-datatable--full-screen
     min-height: calc(100vh - (2*12 * $spacer))
+
 .v-table
   &.ue-datatable
+    &--bottom-controls
+      .v-toolbar__content
+        display: block
+        height: unset !important
+
     &--no-border-row
       .v-table__wrapper
         > table
@@ -703,6 +752,7 @@ export default {
               > td,
               > th
                 border: none!important
+
     &--rounded-row
       th
         background-color: var(--table-header-color) //TODO: table action border must be variable
@@ -721,6 +771,7 @@ export default {
       tr
         &:nth-of-type(2n)
           background-color: rgba(140,160,167, .2) //TODO: table action border must be variable
+
   .action-dropdown
     .v-overlay__content
       border: 1px solid #49454F !important //TODO: table action border must be variable

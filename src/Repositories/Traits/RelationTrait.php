@@ -151,7 +151,6 @@ trait RelationTrait
     public function afterForceDeleteRelationTrait($object)
     {
         foreach ($this->getBelongsToManyRelations() as $relation) {
-            // dd('afterForceDelete', $relation, );
             try {
                 $object->{$relation}()->detach();
             } catch (\Throwable $th) {
@@ -159,6 +158,36 @@ trait RelationTrait
                 continue;
             }
         }
+    }
+
+    public function prepareFieldsBeforeSaveRelationTrait($object, $fields)
+    {
+        foreach ($this->getHasManyRelations() as $relation) {
+            // dd('afterForceDelete', $relation, );
+            if(isset($fields[$relation])){
+                $values = array_values($fields[$relation]);
+                $related = $object->{$relation}()->getRelated();
+                if (in_array('Oobook\Snapshot\Traits\HasSnapshot', class_uses_recursive($related))) {
+                    // The related model has the HasSnapshot trait
+                    // You can add any additional logic here if needed
+                    $idValues = array_reduce($values, function($acc, $item) use ($related, ){
+                        if(!is_array($item)){
+                            $id = $item;
+                            $acc[] = [
+                                $related->getSourceForeignKey() => $id
+                            ];
+                        }
+                        return $acc;
+                    }, []);
+
+                    if(count($idValues)){
+                        $fields[$relation] = $idValues;
+                    }
+                }
+            }
+        }
+
+        return $fields;
     }
 
     public function getFormFieldsRelationTrait($object, $fields, $schema = [])
@@ -305,8 +334,21 @@ trait RelationTrait
                                 //     }
                                 // });
                                 $fields["{$relationship}_show"] = $record->map(fn ($model) => modelShowFormat($model))->implode(', ');
-                            } elseif ($record) {
+
+                            } elseif ($record instanceof \Illuminate\Database\Eloquent\Model) {
                                 $fields["{$relationship}_show"] = modelShowFormat($record);
+
+                            } elseif (!is_null($record)) {
+                                dd(
+                                    // $relationship,
+                                    // $object,
+                                    // $record,
+                                    // $object->{$relationship}(),
+                                    // $object->{$relationship}()->get()
+                                    $related = $object->{$relationship}()->getRelated()->fill($record),
+                                );
+
+                                $fields["{$relationship}_show"] = null;
                             }
                         } catch (\Throwable $th) {
                             dd(

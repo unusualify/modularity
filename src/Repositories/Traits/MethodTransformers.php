@@ -402,14 +402,35 @@ trait MethodTransformers
                 if (method_exists($this->getModel(), $relationName)) {
                     $related = $this->getModel()->{$relationName}();
 
-                    if (method_exists(__CLASS__, $method = 'getForeignKey' . get_class_short_name($related))) {
-                        $foreignKey = $this->$method($related, $scopes, $value);
+                    if ($related instanceof \Illuminate\Database\Eloquent\Relations\MorphTo) {
+                        // Handle morphTo relationship
+                        $morphType = $related->getMorphType(); // Gets the type column (e.g., 'modelable_type')
+                        $morphId = $related->getForeignKeyName(); // Gets the id column (e.g., 'modelable_id')
+
+                        $morphFilters = array_reduce($value, function ($acc, $item) {
+                            if (isset($item['type']) && isset($item['id'])) {
+                                $acc[] = $item;
+                            }
+                            return $acc;
+                        }, []);
+
+                        if(count($morphFilters) > 0) {
+                            $type = $morphFilters[0]['type'];
+                            $values = array_map(function ($item) {
+                                return $item['id'];
+                            }, $morphFilters);
+                            $query->where($morphType, $type)
+                                ->whereIn($morphId, $values);
+                        };
+
+                    } else {
+                        // Handle belongsTo relationship
+                        if (method_exists(__CLASS__, $method = 'getForeignKey' . get_class_short_name($related))) {
+                            $foreignKey = $this->$method($related, $scopes, $value);
+                        }
+                        $scopes[$foreignKey] = $value;
+                        $this->addRelationFilterScope($query, $scopes, $foreignKey, $relationName);
                     }
-                    // $tableName = $this->getTableNameFromName($relationName);
-
-                    $scopes[$foreignKey] = $value;
-
-                    $this->addRelationFilterScope($query, $scopes, $foreignKey, $relationName);
                 }
 
                 unset($scopes[$column]);
