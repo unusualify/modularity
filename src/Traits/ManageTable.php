@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularity\Traits;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
@@ -476,9 +477,25 @@ trait ManageTable
             return $value;
         });
 
-        $filter['componentOptions']['items'] = $items->toArray();
         $filter['componentOptions']['item-value'] ??= 'id';
         $filter['componentOptions']['item-title'] ??= 'name';
+
+        $model = $this->repository->getModel();
+
+        $method = $filter['slug'];
+        if(method_exists($model, $method)) {
+            $returnType = (new \ReflectionMethod($model, $method))->getReturnType();
+            if($returnType == 'Illuminate\Database\Eloquent\Relations\MorphTo') {
+                $filter['componentOptions']['return-object'] = 'true';
+                $class = get_class($repository->getModel());
+                $items = $items->map(function (Model $item) use ($class) {
+                    $item->setAttribute('type', $class);
+                    return $item;
+                });
+            }
+        }
+
+        $filter['componentOptions']['items'] = $items->toArray();
 
         return $filter;
     }
