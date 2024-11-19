@@ -69,7 +69,7 @@ class ForgotPasswordController extends Controller
                     'email' => [
                         'type' => 'text',
                         'name' => 'email',
-                        'label' => ___('authentication.email'),
+                        'label' => 'Email',
                         'default' => '',
                         'col' => [
                             'cols' => 12,
@@ -98,7 +98,7 @@ class ForgotPasswordController extends Controller
                             'elements' => __('authentication.login'),
                             'attributes' => [
                                 'variant' => 'text',
-                                'href' => '',
+                                'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'v-col-5 justify-content-start',
                                 'density' => 'default',
                             ],
@@ -132,6 +132,8 @@ class ForgotPasswordController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
+                                'density' => 'default',
+
                             ],
                             'slots' => [
                                 'prepend' => [
@@ -151,6 +153,8 @@ class ForgotPasswordController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
+                                'density' => 'default',
+
                             ],
                             'slots' => [
                                 'prepend' => [
@@ -168,7 +172,7 @@ class ForgotPasswordController extends Controller
                             'elements' => ___('authentication.create-an-account'),
                             'attributes' => [
                                 'variant' => 'outlined',
-                                'href' => route(Route::hasAdmin('login.form')),
+                                'href' => route(Route::hasAdmin('register.form')),
                                 'class' => 'my-5 custom-auth-button',
                                 'density' => 'default',
 

@@ -2,12 +2,12 @@
   <v-app>
     <v-layout class="rounded rounded-md bg-tertiary h-100">
       <v-main class="d-flex align-center justify-center" >
-        <v-row class="h-100">
+        <v-row class="h-100 mw-100">
           <v-col
             cols="12"
             md="6"
             lg="6"
-            class="pa-0 d-flex flex-column align-center justify-center bg-white">
+            class="py-12 d-flex flex-column align-center justify-center bg-white">
             <!-- <v-card class="mx-auto"> -->
               <v-row width="85%" class="d-flex flex-column justify-center align-center">
                 <!-- <h1 class="text-primary">{{ title }}</h1> -->
@@ -52,7 +52,7 @@
             cols="12"
             md="6"
             lg="6"
-            class="pa-0 col-r d-flex flex-column align-center justify-center col-right">
+            class="px-xs-12 py-xs-3 px-sm-12 py-sm-3 pa-12 pa-md-0 d-flex flex-column align-center justify-center col-right bg-primary">
             <div class="mw-420">
               <ue-svg-icon symbol="main-logo" class="mx-0 "></ue-svg-icon>
 
@@ -68,7 +68,8 @@
               <v-btn
                 variant="outlined"
                 class="text-white custom-right-auth-button my-5"
-                density="default">
+                density="default"
+                >
                 {{ rightBtnText }}
               </v-btn>
             </div>
@@ -206,16 +207,12 @@ export default {
   }
 }
 
-.col-r {
-  background: #40AABB;
-}
-
 .custom-auth-button {
   width: 100%;
   min-width: 100% !important;
   color: black !important;
   position: relative !important;
-  display: flex;
+  display: flex !important;
 
   .v-btn__prepend {
     position: absolute !important;
@@ -261,5 +258,8 @@ export default {
 }
 .justify-content-start{
   justify-content: flex-start;
+}
+.mw-100{
+  max-width: 100%;
 }
 </style>

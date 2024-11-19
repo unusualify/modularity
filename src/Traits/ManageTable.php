@@ -146,7 +146,6 @@ trait ManageTable
                 ->map(fn ($item) => (object) [...(array) $item, 'visible' => true]);
 
             $visibleColumns = explode(',', $this->request->get('columns') ?? $headers->pluck('key')->implode(','));
-
             return $this->indexTableColumns = $headers->reduce(function ($carry, $item) use ($visibleColumns) {
                 $header = $this->getHeader((array) $item);
                 if (isset($item->key)) {
@@ -331,7 +330,6 @@ trait ManageTable
     protected function hydrateHeader($header)
     {
         $this->hydrateHeaderSuffix($header);
-
         // add edit functionality to table title cell
         if ($this->titleColumnKey == $header['key'] && ! isset($header['formatter'])) {
             $header['formatter'] = [
@@ -522,5 +520,24 @@ trait ManageTable
             'draggable' => false,
         ];
 
+    }
+
+    public function translateHeaders($headers)
+    {
+        foreach($headers as $key => $value) {
+
+            if (!isset($headers[$key]['title'])) {
+                continue;
+            }
+
+            $title = $headers[$key]['title'];
+            $tableHeader = 'table-headers.' . $title;
+            $translation = __($tableHeader);
+
+            if (!is_array($translation) && $translation !== $tableHeader) {
+                $headers[$key]['title'] = $translation;
+            }
+        }
+        return $headers;
     }
 }
