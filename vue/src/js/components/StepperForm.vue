@@ -74,24 +74,27 @@
                         </v-col>
                       </template>
 
-                      <v-col cols="12">
-                        <!-- <ue-configurable-card class="my-3" elevation="3"
+                      <!-- <v-col cols="12">
+                        <ue-configurable-card class="my-3" elevation="3"
                           align-center-columns-x
                           justify-center-columns-x
                           v-bind="getPreviewConfigurableData()"
-                        /> -->
-                      </v-col>
+                        />
+                      </v-col> -->
 
                       <v-col cols="12">
-                        <v-sheet class="pa-4 bg-grey-lighten-3 rounded" elevation="2">
+                        <v-sheet class="px-4">
                           <!-- <div class="text-body-1 text-primary font-weight-bold" margin>{{ finalFormTitle }}</div> -->
                            <!-- {{ $log(previewFormData) }} -->
-                          <ue-title type="body-1" color="primary" font-weight="bold" padding="a-0">{{ finalFormTitle }}</ue-title>
+                          <ue-title type="body-1" color="primary" font-weight="bold" padding="a-0" margin="y-4">{{ finalFormTitle }}</ue-title>
                           <template v-for="(data, index) in previewFormData" :key="`final-form-data-${index}`">
                             <ue-configurable-card
                               style="background-color: transparent;"
-                              class="mx-n4"
-                              elevation="0"
+                              :class="[
+                                lastStepModel[data.fieldName].includes(data.id) ? 'bg-primary' : 'bg-grey-lighten-3'
+                              ]"
+                              class="mx-n4 mb-4 py-4"
+                              elevation="2"
                               :items="[
                                 [
                                   data.name || 'N/A ',
@@ -112,17 +115,29 @@
                               hide-separator
                               align-center-columns
                               justify-center-columns
+                              :column-styles="{
+                                1: 'flex-basis: 50%;',
+                                2: 'flex-grow: 1; display: flex; justify-content: center; align-items: center;',
+                                3: 'flex-grow: 1; display: flex; align-items: end;',
+                              }"
                             >
                               <template
                                 #[`segment.1`]="segmentScope"
                                 >
                                 <div class="text-body-2 font-weight-medium mb-1">{{ segmentScope.data[0] }}</div>
-                                <div class="text-caption text-grey-darken-1">{{ segmentScope.data[1] }}</div>
+                                <div class="text-caption">{{ segmentScope.data[1] }}</div>
+                              </template>
+                              <template
+                                #[`segment.2`]="segmentScope"
+                                >
+                                <div class="text-body-2 font-weight-medium py-auto">{{ segmentScope.data }}</div>
                               </template>
                               <template
                                 #[`segment.actions`]="segmentScope"
                                 >
-                                <div class="d-flex fill-height flex-wrap justify-space-evenly align-center">
+
+                                <div class="d-flex fill-height justify-space-evenly align-content-md-center">
+                                  <v-divider v-if="$vuetify.display.lgAndUp ? true : false" vertical></v-divider>
                                   <v-btn
                                     class="mx-1 rounded-circle"
                                     :min-width="segmentScope.actionProps.actionIconMinHeight"
@@ -219,7 +234,7 @@
             </v-stepper-actions>
           </v-sheet>
         </v-col>
-        <v-col cols="4" lg="4">
+        <v-col cols="12" lg="4">
           <slot name="summary">
             <v-sheet-rounded class="d-flex flex-column fill-height pa-6"
               :style="[isLastStep ? 'background-color: #005868;' : '']"
@@ -282,6 +297,7 @@
 
                   <v-sheet class="ue-stepper-form__preview-bottom">
                     <v-btn-cta class="v-stepper-form__nextButton"
+                      density="comfortable"
                       :disabled="$hasRequestInProgress()"
                       @click="nextForm(activeStep-1)"
                       >
@@ -396,6 +412,7 @@ import api from '@/store/api/form'
 
 
 import NotationUtil from '@/utils/notation';
+import notation from '../utils/notation';
 
 export default {
   props: {
@@ -460,8 +477,14 @@ export default {
       type: Object,
       default: () => {
         return {
-          '0.PackageCountry': '0.wrap_location.schema.PackageCountry.items.*.package_addons',
-          '0.PackageRegion': '0.wrap_location.schema.PackageRegion.items.*.package_addons',
+          '0.PackageCountry': {
+            pattern: '0.wrap_location.schema.PackageCountry.items.*.package_addons',
+            inputName: 'pressReleasePackageAddons',
+          },
+          '0.PackageRegion': {
+            pattern: '0.wrap_location.schema.PackageRegion.items.*.package_addons',
+            inputName: 'pressReleasePackageAddons',
+          },
         }
       }
     },
@@ -530,8 +553,8 @@ export default {
       // __log(formData)
 
       this.loading = true
-      __log(this.payload)
-      return
+      // __log(this.payload)
+      // return
       api[method](this.actionUrl, this.payload, function (response) {
         self.loading = false
         self.isCompleted = true
@@ -541,7 +564,7 @@ export default {
 
         // if (callback && typeof callback === 'function') callback(response.data)
       }, function (response) {
-        self.formLoading = false
+        self.loading = false
         __log(response)
         // if (errorCallback && typeof errorCallback === 'function') errorCallback(response.data)
       })
@@ -730,22 +753,35 @@ export default {
         if(!_value)
           continue
 
-        let notation = this.finalFormNotations[modelKey]
-        notation = __wildcard_change(notation, _value)
-        let dataSet = __data_get(this.schemas, notation, null)
-        let fieldName = notation.split('.').pop()
+        let _notation = this.finalFormNotations[modelKey]
+        let fieldName = null
+        let notation = null
 
-        if(dataSet){
-          const pushRecursively = (item, fieldName) => {
-            if(Array.isArray(item)){
-              for(const subItem of item){
-                pushRecursively(subItem, fieldName)
+        if(__isObject(_notation)){
+          notation = _notation.pattern
+          fieldName = _notation.inputName || _notation.fieldName || notation.split('.').pop()
+        }else{
+          notation = _notation
+          fieldName = notation.split('.').pop()
+        }
+
+        __log(_notation, notation, fieldName)
+        if(notation){
+          notation = __wildcard_change(notation, _value)
+          let dataSet = __data_get(this.schemas, notation, null)
+
+          if(dataSet){
+            const pushRecursively = (item, fieldName) => {
+              if(Array.isArray(item)){
+                for(const subItem of item){
+                  pushRecursively(subItem, fieldName)
+                }
+              } else if(typeof item === 'object' && item !== null){
+                data.push({...item, fieldName, isSelected: false})
               }
-            } else if(typeof item === 'object' && item !== null){
-              data.push({...item, fieldName, isSelected: false})
             }
+            pushRecursively(dataSet, fieldName)
           }
-          pushRecursively(dataSet, fieldName)
         }
       }
       return data
@@ -802,7 +838,14 @@ export default {
     this.previewModel = this.preview
 
     this.lastStepModel = reduce(this.finalFormNotations, (acc, notation, key) => {
-      let fieldName = notation.split('.').pop()
+      let fieldName = null
+
+      if(__isObject(notation)){
+        fieldName = notation.inputName || notation.fieldName || notation.pattern.split('.').pop()
+      }else{
+        fieldName = notation.split('.').pop()
+      }
+
       if(!__isset(acc[fieldName])){
         acc[fieldName] = []
       }
