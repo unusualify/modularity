@@ -1,0 +1,107 @@
+@use 'styles/core/abstract' as *;
+
+@mixin wavy-border(
+  $position: bottom,
+  $wave-height: 10px,
+  $wave-width: 20px,
+  $border-width: 2px,
+  $color: currentColor
+) {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    #{$position}: 0;
+    height: $wave-height;
+    background: transparent;
+    background-image:
+      repeating-radial-gradient(
+        circle at 0 50%,
+        transparent 0,
+        transparent ($wave-width/4),
+        $color ($wave-width/4),
+        $color ($wave-width/2)
+      );
+    background-size: $wave-width $wave-height;
+    background-repeat: repeat-x;
+    background-position: 0 50%;
+  }
+}
+
+@mixin smooth-wave-border(
+  $position: bottom,
+  $wave-height: 15px,
+  $color: currentColor,
+  $border-width: 1px
+) {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: -$border-width;
+    right: -$border-width;
+    #{$position}: -$wave-height;
+    height: $wave-height * 2;
+    border: $border-width solid $color;
+    border-bottom: 0;
+    border-top-left-radius: 100%;
+    border-top-right-radius: 100%;
+    background: white; // Or your background color
+  }
+}
+
+
+@mixin sine-wave-border(
+  $position: bottom,
+  $wave-height: 20px,
+  $color: currentColor,
+  $border-width: 1px,
+  $amplitude: 4,
+  $height: 40px,
+  $phase: 0  // 0 starts at middle, 25 starts at peak, 50 starts at trough
+) {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: $height;
+    background: $color;
+
+    // SVG path parameters
+    --size: #{$wave-height};
+    --b: #{$border-width};
+    --m: #{$amplitude};
+    --p: calc(var(--m) * var(--size));
+    --R: calc(var(--size) * sqrt(var(--m) * var(--m) + 1) + var(--b)/2);
+    --phase: #{$phase}%;
+
+    // Create wave effect using radial gradients with phase offset
+    --_g: #0000 calc(99% - var(--b)),#000 calc(101% - var(--b)) 99%,#0000 101%;
+    mask:
+      radial-gradient(var(--R) at left 50% bottom calc(-1*var(--p)), var(--_g))
+        calc(50% - 2*var(--size) + var(--phase)) calc(50% - var(--size)/2 - var(--b)/2)/calc(4*var(--size)) calc(var(--size) + var(--b)) repeat-x,
+      radial-gradient(var(--R) at left 50% top calc(-1*var(--p)), var(--_g))
+        calc(50% + var(--phase)) calc(50% + var(--size)/2 + var(--b)/2)/calc(4*var(--size)) calc(var(--size) + var(--b)) repeat-x;
+    -webkit-mask:
+      radial-gradient(
+        var(--R) at left 50% bottom calc(-1*var(--p)),
+        var(--_g)
+      )
+      calc(50% - 2 * var(--size) + var(--phase))
+      calc(50% - var(--size)/2 - var(--b)/2) / calc(4*var(--size)) calc(var(--size) + var(--b)) repeat-x,
+      radial-gradient(
+        var(--R) at left 50% top calc( -1 * var(--p) ),
+        var(--_g)
+      )
+      calc(50% + var(--phase))
+      calc(50% + var(--size)/2 + var(--b)/2)/calc(4*var(--size)) calc(var(--size) + var(--b))
+      repeat-x;
+  }
+}
