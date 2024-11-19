@@ -39,7 +39,7 @@
       </v-stepper-header>
 
       <v-row class="mt-4 flex-fill">
-        <v-col cols="8" lg="8" v-fit-grid>
+        <v-col cols="12" lg="8" v-fit-grid>
           <v-sheet class="ue-stepper-form__body d-flex flex-column justify-space-between">
             <v-stepper-window class="fill-height overflow-y-auto" style="max-height: 80vh;">
               <v-stepper-window-item
@@ -69,7 +69,7 @@
                     <ue-title weight="medium" color="black" padding="a-0">{{ $t('Preview & Summary').toUpperCase() }}</ue-title>
                     <v-row>
                       <template v-for="(context, index) in formattedPreview" :key="`summary-${index}`">
-                        <v-col cols="12" :lg="context.col || 6" v-fit-grid>
+                        <v-col cols="12" :md="context.col || 6" v-fit-grid>
                           <ue-configurable-card v-bind="context" elevation="3" class="my-2"/>
                         </v-col>
                       </template>
