@@ -9,6 +9,7 @@ return [
     'complete' => 'Complete',
     'confirm' => 'Confirm',
     'confirm-deletion' => 'Are you sure want to delete {name} {route}?',
+    'confirm-soft-deletion' => 'Are you sure want to delete {name} {route} permanently?',
     'confirm-description' => 'Are you sure you want to do this?',
     'confirm-action' => 'Are you sure want to {action} on selected {route}',
     'country' => 'Country',

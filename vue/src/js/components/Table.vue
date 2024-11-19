@@ -14,10 +14,10 @@
         v-if="!hideTable"
         v-bind="{...$bindAttributes(), ...footerProps}"
         :class="[
+          'px-4',
           noFullScreen ? '' : 'h-100',
           tableClasses,
           fullWidthWrapper ? '' : 'ue-table--narrow-wrapper',
-          'px-4',
           striped ? 'ue-datatable--striped' : '',
           roundedRows ? 'ue-datatable--rounded-row' : '',
           hideBorderRow ? 'ue-datatable--no-border-row' : '',
@@ -53,7 +53,6 @@
         :show-select="showSelect"
         item-value="id"
         v-model="selectedItems"
-
 
         @update:options="changeOptions($event)"
       >
@@ -106,7 +105,7 @@
                   <!-- bulk actions -->
                   <template v-for="(action, k) in bulkActions" :key="k">
                     <v-btn
-                      v-if="canBulkAction(action)"
+                      v-if="can(action.name)"
                       v-bind="filterBtnOptions"
                       :append-icon="false"
                       :prepend-icon="(action.icon ? action.icon : `$${action.name}`)"
@@ -362,20 +361,48 @@
               v-for="(element, i) in items"
               :key="element.id"
               v-bind="customRowComponent.col"
+            >
+            <!-- // TODO - check if its empty -->
+              <component
+                :is="`ue-${customRowComponent.iteratorComponent}`"
+                :key="element.id"
+                :item="element"
+                :headers="headers"
+                :rowActions = "rowActions"
+                @click-action="itemAction"
+                @edit-item = "editItem"
               >
-              <!-- // TODO - check if its empty -->
-                <component
-                  :is="`ue-${customRowComponent.iteratorComponent}`"
-                  :key="element.id"
-                  :item="element"
-                  :headers="headers"
-                  :rowActions = "rowActions"
-                  @click-action="itemAction"
-                  @edit-item = "editItem"
-                >
-                </component>
-              </v-col>
-            </v-row>
+
+                <template v-slot:actions>
+                  <div>
+                    <div class="d-flex flex-wrap ga-2 justify-sm-end ml-n2 ml-md-0">
+                      <template v-for="(action, k) in rowActions" :key="k">
+                        {{ $log(action) }}
+                        <v-tooltip
+                          v-if="itemHasAction(element, action)"
+                          :text="$t( action.label ?? $headline(action.name) )"
+                          location="top"
+                          >
+                          <template v-slot:activator="{ props }">
+                            <v-btn
+                              :variant="action.variant ?? 'elevated'"
+                              size="small"
+                              :icon="action.forceLabel ? null : (action.icon ? action.icon : '$' + action.name)"
+                              :color="action.color ?? 'primary'"
+                              :rounded="action.forceLabel ? null : true"
+                              @click="itemAction(item, action)"
+                              v-bind="props"
+                              :text="action.forceLabel ? $t( action.label ?? $headline(action.name) ) : null"
+                            />
+                          </template>
+                        </v-tooltip>
+                      </template>
+                    </div>
+                  </div>
+                </template>
+              </component>
+            </v-col>
+          </v-row>
         </template>
 
         <!-- MARK PAGINATION BUTTONS -->
@@ -430,6 +457,7 @@
             </v-tooltip>
           </template>
           <template v-else-if="col.formatter == 'switch'">
+            <!-- {{ $log('switch', item, col.key) }} -->
             <v-switch
               :key="i"
               :model-value="item[col.key]"
@@ -494,19 +522,12 @@
                 </v-list>
               </v-card-title>
               <v-card-actions>
-                <v-spacer></v-spacer>
-
-                <!-- <v-btn
-                  text="Clear"
-                  variant="plain"
-                  @click="clearAdvancedFilter"
-                ></v-btn> -->
-
                 <v-btn
                   color="primary"
                   text="Save"
                   variant="tonal"
                   @click="applyHeaders"
+                  block
                 ></v-btn>
               </v-card-actions>
             </v-card>
@@ -540,7 +561,7 @@
                     <v-icon small :color="action.color" left>
                       {{ action.icon ? action.icon : '$' + action.name }}
                     </v-icon>
-                    {{ $t( action.label ?? action.name ) }}
+                    {{ $t( action.label ?? $headline(action.name) ) }}
                 </v-list-item>
               </template>
             </v-list>
@@ -565,7 +586,6 @@
                   </v-icon>
                 </template>
               </v-tooltip>
-
             </template>
           </div>
         </template>
@@ -632,18 +652,21 @@ import { VDataTableRows } from 'vuetify/lib/components/VDataTable/index.mjs'
 import { VDataTableRow } from 'vuetify/lib/components/VDataTable/index.mjs'
 
 import {
-  useTable,
+  makeTableNamesProps,
+  makeTableEndpointsProps,
+  makeTableHeadersProps,
+  makeTableFormsProps,
+  makeTableFiltersProps,
+  makeTableItemActionsProps,
   makeTableProps,
-  useDraggable,
   makeDraggableProps,
   makeFormatterProps,
+  useTable,
+  useDraggable,
 } from '@/hooks'
 
-import DynamicComponentRenderer from './DynamicComponentRenderer'
 import ActiveTableItem from '__components/labs/ActiveTableItem.vue'
 import PaymentService from './inputs/PaymentService.vue'
-import { useStore } from 'vuex'
-import DynamicComponentRendererVue from './DynamicComponentRenderer.vue'
 
 const { ignoreFormatters } = makeFormatterProps()
 
@@ -657,8 +680,14 @@ export default {
 
   },
   props: {
-    ...makeDraggableProps(),
+    ...makeTableNamesProps(),
+    ...makeTableEndpointsProps(),
+    ...makeTableFiltersProps(),
+    ...makeTableHeadersProps(),
+    ...makeTableFormsProps(),
+    ...makeTableItemActionsProps(),
     ...makeTableProps(),
+    ...makeDraggableProps(),
     ...ignoreFormatters
   },
   setup (props, context) {

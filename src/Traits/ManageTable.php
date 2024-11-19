@@ -212,8 +212,9 @@ trait ManageTable
             $actions[] = [
                 'name' => 'delete',
                 'can' => $this->permissionPrefix(Permission::DELETE->value),
+                'variant' => 'outlined',
                 // 'color' => 'red darken-2',
-                'color' => 'primary',
+                'color' => 'error',
             ];
         }
 
@@ -241,9 +242,10 @@ trait ManageTable
             $actions[] = [
                 'name' => 'pay',
                 'icon' => 'mdi-contactless-payment',
+                'forceLabel' => true,
                 // 'can' => 'pay',
                 // 'color' => 'red darken-2',
-                'color' => 'red',
+                'color' => 'primary',
                 'form' => [
                     'attributes' => [
                         'schema' => $this->createFormSchema($this->repository->getPaymentFormSchema()),
