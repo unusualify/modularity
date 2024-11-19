@@ -399,7 +399,6 @@ abstract class BaseController extends PanelController
         $schema = $this->formSchema;
 
         $paginator->getCollection()->transform(function ($item) use ($translated, $schema) {
-
             $columnsData = Collection::make($this->getIndexTableColumns())->mapWithKeys(function (&$column) use ($item) {
                 return $this->getItemColumnData($item, $column);
             })->toArray();
