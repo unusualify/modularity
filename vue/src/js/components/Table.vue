@@ -251,7 +251,7 @@
                   <ue-form
                     ref="form"
                     :title="formTitle"
-                    :isEditing="editedIndex > 0"
+                    :isEditing="editedIndex > -1"
                   />
                 </v-card-text>
                 <v-divider/>
