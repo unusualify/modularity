@@ -125,7 +125,7 @@ return [
                     ],
                 ],
                 [
-                    'component' => 'new-table',
+                    'component' => 'table',
                     'col' => [
                         'cols' => 12,
                         'xxl' => 6,
@@ -221,7 +221,7 @@ return [
                     ],
                 ],
                 [
-                    'component' => 'new-table',
+                    'component' => 'table',
                     'col' => [
                         'cols' => 12,
                         'xxl' => 12,

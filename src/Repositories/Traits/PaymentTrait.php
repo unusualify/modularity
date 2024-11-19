@@ -23,7 +23,7 @@ trait PaymentTrait
      *
      * @var string
      */
-    protected $requiredTrait = 'Oobook\Priceable\Traits\HasPriceable';
+    protected $requiredTrait = 'Unusualify\Modularity\Entities\Traits\HasPriceable';
 
     /**
      * snapshotTrait
@@ -46,48 +46,65 @@ trait PaymentTrait
             : $session_currency ?? $this->paymentTraitDefaultCurrencyId;
 
         if ($this->paymentTraitRelationName) {
-            $relatedClass = $object->{$this->paymentTraitRelationName}()->getRelated();
+            $relations = is_array($this->paymentTraitRelationName)
+                ? $this->paymentTraitRelationName
+                : [$this->paymentTraitRelationName];
 
-            $requirementMet = false;
+            $totalPrice = 0;
+            $calculated = false;
 
-            if (classHasTrait($relatedClass, $this->requiredTrait)) {
-                $requirementMet = true;
-            } elseif (classHasTrait($relatedClass, $this->snapshotTrait)
-                && classHasTrait($relatedClass->source()->getRelated(), $this->requiredTrait)
-            ) {
-                $requirementMet = true;
-            }
+            // dd($relations);
 
-            if ($requirementMet) {
-                // dd($object->{$this->paymentTraitRelationName});
-                $records = $object->{$this->paymentTraitRelationName};
-                $totalPrice = 0;
-                if ($records instanceof \Illuminate\Database\Eloquent\Collection) {
-                    foreach ($records as $record) {
-                        $price = $record->prices()->where('currency_id', $currencyId)->first();
+            foreach($relations as $relationName){
 
-                        if (! is_null($price)) {
-                            $totalPrice += $price->display_price;
+                $relatedClass = $object->{$relationName}()->getRelated();
+
+                $requirementMet = false;
+
+                if (classHasTrait($relatedClass, $this->requiredTrait)) {
+                    $requirementMet = true;
+                } elseif (classHasTrait($relatedClass, $this->snapshotTrait)
+                    && classHasTrait($relatedClass->source()->getRelated(), $this->requiredTrait)
+                ) {
+                    $requirementMet = true;
+                }
+
+                if ($requirementMet) {
+                    // dd($object->{$this->paymentTraitRelationName});
+                    // dd($object, $relationName, $object->{$relationName});
+                    $records = $object->{$relationName};
+                    if ($records instanceof \Illuminate\Database\Eloquent\Collection) {
+
+                        foreach ($records as $record) {
+                            $price = $record->prices()->where('currency_id', $currencyId)->first();
+
+                            if (! is_null($price)) {
+                                $calculated = true;
+                                $totalPrice += $price->display_price;
+                            }
                         }
                     }
-                }
 
-                if (! $object->price && ! empty($records)) {
 
-                    $object->price()->create([
-                        'price_type_id' => 1,
-                        'vat_rate_id' => 1,
-                        'currency_id' => $currencyId,
-                        'display_price' => ($totalPrice / 100),
-                    ]);
-                } elseif ($object->price->display_price != $totalPrice) {
-
-                    $object->price->display_price = $totalPrice / 100;
-                    $object->price->currency_id = $currencyId;
-                    // dd($object->price, $totalPrice, $currencyId);
-                    $object->price()->save($object->price);
                 }
             }
+            // dd($object, $calculated, $totalPrice);
+            if (! $object->price && $calculated) {
+
+                $object->price()->create([
+                    'price_type_id' => 1,
+                    'vat_rate_id' => 1,
+                    'currency_id' => $currencyId,
+                    'display_price' => ($totalPrice / 100),
+                ]);
+            } elseif ($object->price && $object->price->display_price != $totalPrice) {
+
+                $object->price->display_price = $totalPrice / 100;
+                $object->price->currency_id = $currencyId;
+                // dd($object->price, $totalPrice, $currencyId);
+                $object->price()->save($object->price);
+            }
+
         }
     }
 
