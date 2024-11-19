@@ -16,7 +16,7 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
     return Object.prototype.hasOwnProperty.call(value, 'slotable')
   })
 
-  if (find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'wrap'))) {
+  if (_.find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'wrap'))) {
     _.reduce(_inputs, (acc, input, key) => {
       if(Object.prototype.hasOwnProperty.call(input, 'group')){
 
@@ -112,7 +112,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
     // const value = editing ? (__isset(item[name]) ? item[name] : _default) : _default
     if(editing){
       if(input.type == 'group' && __isset(item[name])){
-        let defaultGroupKeys = Object.keys(omit(__dot(_default), ['id']));
+        let defaultGroupKeys = Object.keys(_.omit(__dot(_default), ['id']));
         if(JSON.stringify(defaultGroupKeys) !== JSON.stringify(Object.keys(omit(__dot(item[name]), ['id'])))){
 
           value = {
@@ -565,7 +565,7 @@ const FormatFuncs = {
     let setterNotation = `${inputNotation}.${inputPropToFormat}`
     let eagers = _.get(schema, `${inputNotation}.eagers`) ?? [];
 
-    if( !get(schema, setterNotation))
+    if( !_.get(schema, setterNotation))
       _.set(schema, setterNotation, [])
 
     let newItems = _.cloneDeep( _.get(schema, setterNotation) );
@@ -581,7 +581,7 @@ const FormatFuncs = {
 
       if( !newItems.find((el) => el.id == id) ) {
         try {
-          let res = await axios.get(endpoint.replace(`{${snakeCase(modelValue)}}`, id), {
+          let res = await axios.get(endpoint.replace(`{${_.snakeCase(modelValue)}}`, id), {
             params: {
               eagers: eagers
             }
