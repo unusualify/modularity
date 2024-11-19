@@ -4,6 +4,7 @@
       <span class="font-weight-bold text-primary text-body-1">{{ title }}</span>
     </template> -->
     <ue-title v-if="title" :text="title" padding="x-4" class="pt-4"/>
+
     <div no-gutters class="ue-configurable-card__row">
       <div
         v-for="( segment,  segmentIndex) in itemsWithActions"
@@ -12,10 +13,8 @@
           'ue-configurable-card__col',
           !hideSeparator ? 'ue-configurable-card__col--seperator' : '',
           justifyCenterColumns ? 'ue-configurable-card__col--justify-center' : '',
-          alignCenterColumns ? 'ue-configurable-card__col--align-center' : '',
-          $isset(columnStyles[parseInt(segmentIndex) + 1]) ? `ue-configurable-card__col--unset-flex-basis` : ''
+          alignCenterColumns ? 'ue-configurable-card__col--align-center' : ''
         ]"
-        :style="columnStyles[parseInt(segmentIndex) + 1] ?? ''"
       >
         <slot :name="`segment.${segmentIndex === '_actions' ? 'actions' : (parseInt(segmentIndex) + 1)}`"
           v-bind="{
@@ -39,12 +38,12 @@
           </template>
           <template v-else-if="isObject(segment)">
             <div class="d-flex fill-height">
-              <ue-property-list :data="segment" class="" noPadding/>
+              <PropertyList :data="segment" class="" noPadding/>
             </div>
           </template>
           <template v-else-if="isArray( segment)">
             <div class="d-flex fill-height">
-              <ue-property-list :data="segment.map(item => [item])" class="" noPadding/>
+              <PropertyList :data="segment.map(item => [item])" class="" noPadding/>
             </div>
             <!-- <v-list dense class="">
               <v-list-item v-for="(item, itemIndex) in segment" :key="itemIndex">
@@ -71,7 +70,12 @@
 </template>
 
 <script>
+  import PropertyList from '@/components/labs/PropertyList.vue';
+
   export default {
+    components: {
+      PropertyList,
+    },
     name: 'ue-configurable-card',
     props: {
       title: {
@@ -114,11 +118,6 @@
       justifyCenterColumns: {
         type: Boolean,
         default: false
-      },
-      columnStyles: {
-        type: Object,
-        default: () => ({}),
-        // Example format: { 0: 'flex-basis: 50%', 1: 'flex-basis: 25%', 2: 'flex-basis: 25%' } or { 0: 'flex-grow: 2', 1: 'flex-grow: 1' }
       }
     },
     computed: {
@@ -169,7 +168,7 @@
               justify-content: center
 
     .ue-configurable-card__col
-      // flex: 1
+      flex: 1
       min-width: 0
       padding: 0 calc($spacer * 4)
       margin: calc($spacer * 4) 0
@@ -185,7 +184,7 @@
     // Custom styles for different column counts
     @for $i from 1 through 12
       &--#{$i}-columns
-        .ue-configurable-card__col:not([class*="ue-configurable-card__col--unset-flex-basis"])
+        .ue-configurable-card__col
           flex-basis: calc(100% / #{$i})
           max-width: calc(100% / #{$i})
 

@@ -5,7 +5,7 @@
   ]">
     <div v-if="!items || items.length === 0">No data available</div>
     <template v-else>
-      <div v-for="(item, index) in items" :key="index" class="ue-property-list__item d-flex flex-wrap">
+      <div v-for="(item, index) in items" :key="index" class="ue-property-list__item">
         <span class="text-caption font-weight-bold pr-1" v-html="item[0].trim() + (item.slice(1).length > 0 ? ':' : '')"></span>
         <span class="text-caption" v-html="formatValue(item.slice(1))">
         </span>

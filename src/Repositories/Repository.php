@@ -385,6 +385,8 @@ abstract class Repository
             $this->beforeSave($object, $fields);
 
             $fields = $this->prepareFieldsBeforeSave($object, $fields);
+            // if(get_class_short_name($this) == 'PressReleasePackageRepository')
+            //     dd($fields);
 
             $object->fill(Arr::except($fields, $this->getReservedFields()));
 

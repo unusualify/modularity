@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import ConfigurableCard from '../../src/js/components/ConfigurableCard.vue'
+import ConfigurableCard from '../../src/js/components/labs/ConfigurableCard.vue'
 import vuetify from '../../src/js/plugins/vuetify'
 import UEConfig from '../../src/js/plugins/UEConfig'
 
@@ -28,7 +28,7 @@ describe('ConfigurableCard', () => {
           }
         ]
       })
-      // expect(wrapper.html()).toMatchSnapshot('press-release-content')
+      expect(wrapper.html()).toMatchSnapshot('press-release-content')
     })
   })
 
@@ -53,7 +53,7 @@ describe('ConfigurableCard', () => {
           status: 'Pending Payment'
         }
       })
-      // expect(wrapper.html()).toMatchSnapshot('package-details')
+      expect(wrapper.html()).toMatchSnapshot('package-details')
     })
   })
 
@@ -68,7 +68,7 @@ describe('ConfigurableCard', () => {
           }
         }
       })
-      // expect(wrapper.html()).toMatchSnapshot('addon-configuration')
+      expect(wrapper.html()).toMatchSnapshot('addon-configuration')
     })
   })
 
@@ -88,7 +88,7 @@ describe('ConfigurableCard', () => {
 
       const actionButtons = wrapper.findAll('.v-btn')
       expect(actionButtons).toHaveLength(3)
-      // expect(wrapper.html()).toMatchSnapshot('with-actions')
+      expect(wrapper.html()).toMatchSnapshot('with-actions')
     })
 
     it('handles action click events', async () => {

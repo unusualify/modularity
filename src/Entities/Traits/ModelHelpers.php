@@ -22,10 +22,20 @@ trait ModelHelpers
     public static function bootModelHelpers()
     {
         static::retrieved(function ($model) {
-
+            if (in_array('Oobook\Priceable\Traits\HasPriceable', class_uses_recursive($model)) && $model->price) {
+                $basePrice = $model->basePrice;
+                $basePriceFormatted = null;
+                if ($basePrice) {
+                    $currency = new Currency($basePrice->currency->iso_4217);
+                    $basePriceFormatted = \Oobook\Priceable\Facades\PriceService::formatAmount($basePrice->display_price, $currency);
+                }
+                $model->setAttribute('base_price_show', $basePriceFormatted);
+            }
         });
         static::saving(function ($model) {
-
+            if (isset($model->base_price_show)) {
+                $model->offsetUnset('base_price_show');
+            }
         });
     }
 
@@ -85,13 +95,10 @@ trait ModelHelpers
         }
     }
 
-    public function setStateablePreview($state)
+    public function basePrice(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
-        return "<v-chip variant='text' color='{$state->color}' prepend-icon='{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</v-chip>";
-    }
-
-    public function setStateablePreviewNull()
-    {
-        return "<v-chip  color='' prepend-icon=''>" . __('No Status') . "</v-chip>";
+        // dd(Request::getUserCurrency());
+        // return $this->prices()->where('currency_id', Request::getUserCurrency()->id);
+        return $this->morphOne(Price::class, 'priceable')->where('currency_id', Request::getUserCurrency()->id);
     }
 }

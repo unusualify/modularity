@@ -56,7 +56,7 @@ return [
         ],
     ],
     'addPrice' => [
-        'model' => 'HasPriceable',
+        'model' => \Oobook\Priceable\Traits\HasPriceable::class,
         'repository' => 'PricesTrait',
         'question' => 'Do you need to add pricing feature on this route?',
         'command_option' => [

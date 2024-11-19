@@ -1,0 +1,259 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ConfigurableCard > Actions > renders with action buttons > with-actions 1`] = `
+"<div data-v-cd6087b7="" class="v-card v-theme--unusual v-card--density-default v-card--variant-elevated ue-configurable-card ue-configurable-card--2-columns">
+  <!---->
+  <div class="v-card__loader">
+    <div class="v-progress-linear v-theme--unusual v-locale--is-ltr" style="top: 0px; height: 0px; --v-progress-linear-height: 2px;" role="progressbar" aria-hidden="true" aria-valuemin="0" aria-valuemax="100">
+      <!---->
+      <div class="v-progress-linear__background"></div>
+      <div class="v-progress-linear__buffer" style="width: 0%;"></div>
+      <transition-stub name="fade-transition" appear="false" persisted="false" css="true">
+        <div class="v-progress-linear__indeterminate">
+          <div class="v-progress-linear__indeterminate long"></div>
+          <div class="v-progress-linear__indeterminate short"></div>
+        </div>
+      </transition-stub>
+      <!---->
+    </div>
+  </div>
+  <!---->
+  <!---->
+  <!-- <template v-if="title" v-slot:title>
+      <span class="font-weight-bold text-primary text-body-1">{{ title }}</span>
+    </template> -->
+  <div data-v-e944dbcc="" data-v-cd6087b7="" class="text-body-1 text-primary text-uppercase font-weight-bold px-4 ma-0 text-left justify-start d-flex pt-4">With Actions
+    <!-- <slot v-bind="{right}">
+
+    </slot> -->
+    <!-- <slot name="description" v-bind="{subTitle}">
+      <div :class="[(!paddingReset ? paddingClasses: []), descriptionClasses]">
+        {{ subTitle ?? '' }}
+      </div>
+    </slot> -->
+  </div>
+  <div data-v-cd6087b7="" no-gutters="" class="ue-configurable-card__row">
+    <div data-v-cd6087b7="" class="ue-configurable-card__col ue-configurable-card__col--seperator">
+      <div data-v-cd6087b7="" class="d-flex fill-height">value</div>
+    </div>
+    <div data-v-cd6087b7="" class="ue-configurable-card__col ue-configurable-card__col--seperator">
+      <!-- <v-divider class="my-2"></v-divider> -->
+      <div data-v-cd6087b7="" class="d-flex fill-height flex-wrap justify-space-evenly align-center"><button data-v-cd6087b7="" type="button" class="v-btn v-btn--elevated v-btn--icon v-theme--unusual bg-primary v-btn--density-compact v-btn--variant-elevated mx-1 rounded" style="min-height: 44px; min-width: 44px; text-transform: none;"><span class="v-btn__overlay"></span><span class="v-btn__underlay"></span>
+          <!----><span class="v-btn__content" data-no-activator=""><i class="mdi-pencil mdi v-icon notranslate v-theme--unusual v-icon--size-default" aria-hidden="true"></i></span>
+          <!---->
+          <!---->
+        </button><button data-v-cd6087b7="" type="button" class="v-btn v-btn--elevated v-btn--icon v-theme--unusual bg-error v-btn--density-compact v-btn--variant-elevated mx-1 rounded" style="min-height: 44px; min-width: 44px; text-transform: none;"><span class="v-btn__overlay"></span><span class="v-btn__underlay"></span>
+          <!----><span class="v-btn__content" data-no-activator=""><i class="mdi-delete mdi v-icon notranslate v-theme--unusual v-icon--size-default" aria-hidden="true"></i></span>
+          <!---->
+          <!---->
+        </button><button data-v-cd6087b7="" type="button" class="v-btn v-btn--elevated v-theme--unusual bg-primary v-btn--density-compact v-btn--variant-elevated mx-1 rounded px-6" style="min-height: 44px; min-width: 44px; text-transform: none;"><span class="v-btn__overlay"></span><span class="v-btn__underlay"></span>
+          <!----><span class="v-btn__content" data-no-activator="">complete</span>
+          <!---->
+          <!---->
+        </button></div>
+    </div>
+  </div>
+  <!-- <v-card-actions v-if="actions && actions.length">
+      <v-spacer></v-spacer>
+      <v-btn v-for="(action, index) in actions" :key="index" :icon="action.icon" :color="action.color">
+        <v-icon>{{ action.icon }}</v-icon>
+      </v-btn>
+    </v-card-actions> -->
+  <!---->
+  <!----><span class="v-card__underlay"></span>
+</div>"
+`;
+
+exports[`ConfigurableCard > Addon Configuration > renders info structure > addon-configuration 1`] = `
+"<div data-v-cd6087b7="" class="v-card v-theme--unusual v-card--density-default v-card--variant-elevated ue-configurable-card ue-configurable-card--1-columns">
+  <!---->
+  <div class="v-card__loader">
+    <div class="v-progress-linear v-theme--unusual v-locale--is-ltr" style="top: 0px; height: 0px; --v-progress-linear-height: 2px;" role="progressbar" aria-hidden="true" aria-valuemin="0" aria-valuemax="100">
+      <!---->
+      <div class="v-progress-linear__background"></div>
+      <div class="v-progress-linear__buffer" style="width: 0%;"></div>
+      <transition-stub name="fade-transition" appear="false" persisted="false" css="true">
+        <div class="v-progress-linear__indeterminate">
+          <div class="v-progress-linear__indeterminate long"></div>
+          <div class="v-progress-linear__indeterminate short"></div>
+        </div>
+      </transition-stub>
+      <!---->
+    </div>
+  </div>
+  <!---->
+  <!---->
+  <!-- <template v-if="title" v-slot:title>
+      <span class="font-weight-bold text-primary text-body-1">{{ title }}</span>
+    </template> -->
+  <div data-v-e944dbcc="" data-v-cd6087b7="" class="text-body-1 text-primary text-uppercase font-weight-bold px-4 ma-0 text-left justify-start d-flex pt-4">ADDON
+    <!-- <slot v-bind="{right}">
+
+    </slot> -->
+    <!-- <slot name="description" v-bind="{subTitle}">
+      <div :class="[(!paddingReset ? paddingClasses: []), descriptionClasses]">
+        {{ subTitle ?? '' }}
+      </div>
+    </slot> -->
+  </div>
+  <div data-v-cd6087b7="" no-gutters="" class="ue-configurable-card__row">
+    <div data-v-cd6087b7="" class="ue-configurable-card__col ue-configurable-card__col--seperator">
+      <div data-v-cd6087b7="" class="d-flex fill-height">
+        <div data-v-2e888638="" data-v-cd6087b7="" class="ue-property-list">
+          <div data-v-2e888638="" class="ue-property-list__item"><span data-v-2e888638="" class="text-caption font-weight-bold pr-1">title:</span><span data-v-2e888638="" class="text-caption">Lorem Ipsum Dolor</span></div>
+          <div data-v-2e888638="" class="ue-property-list__item"><span data-v-2e888638="" class="text-caption font-weight-bold pr-1">description:</span><span data-v-2e888638="" class="text-caption">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis At vero eos et accusamus etiu.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <v-card-actions v-if="actions && actions.length">
+      <v-spacer></v-spacer>
+      <v-btn v-for="(action, index) in actions" :key="index" :icon="action.icon" :color="action.color">
+        <v-icon>{{ action.icon }}</v-icon>
+      </v-btn>
+    </v-card-actions> -->
+  <!---->
+  <!----><span class="v-card__underlay"></span>
+</div>"
+`;
+
+exports[`ConfigurableCard > Package Details > renders nested object structure > package-details 1`] = `
+"<div data-v-cd6087b7="" class="v-card v-theme--unusual v-card--density-default v-card--variant-elevated ue-configurable-card ue-configurable-card--4-columns">
+  <!---->
+  <div class="v-card__loader">
+    <div class="v-progress-linear v-theme--unusual v-locale--is-ltr" style="top: 0px; height: 0px; --v-progress-linear-height: 2px;" role="progressbar" aria-hidden="true" aria-valuemin="0" aria-valuemax="100">
+      <!---->
+      <div class="v-progress-linear__background"></div>
+      <div class="v-progress-linear__buffer" style="width: 0%;"></div>
+      <transition-stub name="fade-transition" appear="false" persisted="false" css="true">
+        <div class="v-progress-linear__indeterminate">
+          <div class="v-progress-linear__indeterminate long"></div>
+          <div class="v-progress-linear__indeterminate short"></div>
+        </div>
+      </transition-stub>
+      <!---->
+    </div>
+  </div>
+  <!---->
+  <!---->
+  <!-- <template v-if="title" v-slot:title>
+      <span class="font-weight-bold text-primary text-body-1">{{ title }}</span>
+    </template> -->
+  <div data-v-e944dbcc="" data-v-cd6087b7="" class="text-body-1 text-primary text-uppercase font-weight-bold px-4 ma-0 text-left justify-start d-flex pt-4">Package Details
+    <!-- <slot v-bind="{right}">
+
+    </slot> -->
+    <!-- <slot name="description" v-bind="{subTitle}">
+      <div :class="[(!paddingReset ? paddingClasses: []), descriptionClasses]">
+        {{ subTitle ?? '' }}
+      </div>
+    </slot> -->
+  </div>
+  <div data-v-cd6087b7="" no-gutters="" class="ue-configurable-card__row">
+    <div data-v-cd6087b7="" class="ue-configurable-card__col ue-configurable-card__col--seperator">
+      <div data-v-cd6087b7="" class="d-flex fill-height">
+        <div data-v-2e888638="" data-v-cd6087b7="" class="ue-property-list">
+          <div data-v-2e888638="" class="ue-property-list__item"><span data-v-2e888638="" class="text-caption font-weight-bold pr-1">Package:</span><span data-v-2e888638="" class="text-caption">Exclusive</span></div>
+          <div data-v-2e888638="" class="ue-property-list__item"><span data-v-2e888638="" class="text-caption font-weight-bold pr-1">Languages:</span><span data-v-2e888638="" class="text-caption">English, German, French</span></div>
+          <div data-v-2e888638="" class="ue-property-list__item"><span data-v-2e888638="" class="text-caption font-weight-bold pr-1">Distribution Countries:</span><span data-v-2e888638="" class="text-caption">Germany, France, Türkiye</span></div>
+        </div>
+      </div>
+    </div>
+    <div data-v-cd6087b7="" class="ue-configurable-card__col ue-configurable-card__col--seperator">
+      <div data-v-cd6087b7="" class="d-flex fill-height">
+        <div data-v-2e888638="" data-v-cd6087b7="" class="ue-property-list">
+          <div data-v-2e888638="" class="ue-property-list__item"><span data-v-2e888638="" class="text-caption font-weight-bold pr-1">Content:</span><span data-v-2e888638="" class="text-caption">Filename.docx</span></div>
+          <div data-v-2e888638="" class="ue-property-list__item"><span data-v-2e888638="" class="text-caption font-weight-bold pr-1">Media:</span><span data-v-2e888638="" class="text-caption">Filename.png</span></div>
+          <div data-v-2e888638="" class="ue-property-list__item"><span data-v-2e888638="" class="text-caption font-weight-bold pr-1">Date:</span><span data-v-2e888638="" class="text-caption">24.09.2024</span></div>
+          <div data-v-2e888638="" class="ue-property-list__item"><span data-v-2e888638="" class="text-caption font-weight-bold pr-1">Time:</span><span data-v-2e888638="" class="text-caption">15:00</span></div>
+          <div data-v-2e888638="" class="ue-property-list__item"><span data-v-2e888638="" class="text-caption font-weight-bold pr-1">Time Zone:</span><span data-v-2e888638="" class="text-caption">GMT +3 (Türkiye)</span></div>
+        </div>
+      </div>
+    </div>
+    <div data-v-cd6087b7="" class="ue-configurable-card__col ue-configurable-card__col--seperator">
+      <div data-v-cd6087b7="" class="d-flex fill-height">$1,450 + VAT</div>
+    </div>
+    <div data-v-cd6087b7="" class="ue-configurable-card__col ue-configurable-card__col--seperator">
+      <div data-v-cd6087b7="" class="d-flex fill-height">Pending Payment</div>
+    </div>
+  </div>
+  <!-- <v-card-actions v-if="actions && actions.length">
+      <v-spacer></v-spacer>
+      <v-btn v-for="(action, index) in actions" :key="index" :icon="action.icon" :color="action.color">
+        <v-icon>{{ action.icon }}</v-icon>
+      </v-btn>
+    </v-card-actions> -->
+  <!---->
+  <!----><span class="v-card__underlay"></span>
+</div>"
+`;
+
+exports[`ConfigurableCard > Press Release Content > renders simple array items > press-release-content 1`] = `
+"<div data-v-cd6087b7="" class="v-card v-theme--unusual v-card--density-default v-card--variant-elevated ue-configurable-card ue-configurable-card--3-columns">
+  <!---->
+  <div class="v-card__loader">
+    <div class="v-progress-linear v-theme--unusual v-locale--is-ltr" style="top: 0px; height: 0px; --v-progress-linear-height: 2px;" role="progressbar" aria-hidden="true" aria-valuemin="0" aria-valuemax="100">
+      <!---->
+      <div class="v-progress-linear__background"></div>
+      <div class="v-progress-linear__buffer" style="width: 0%;"></div>
+      <transition-stub name="fade-transition" appear="false" persisted="false" css="true">
+        <div class="v-progress-linear__indeterminate">
+          <div class="v-progress-linear__indeterminate long"></div>
+          <div class="v-progress-linear__indeterminate short"></div>
+        </div>
+      </transition-stub>
+      <!---->
+    </div>
+  </div>
+  <!---->
+  <!---->
+  <!-- <template v-if="title" v-slot:title>
+      <span class="font-weight-bold text-primary text-body-1">{{ title }}</span>
+    </template> -->
+  <div data-v-e944dbcc="" data-v-cd6087b7="" class="text-body-1 text-primary text-uppercase font-weight-bold px-4 ma-0 text-left justify-start d-flex pt-4">Press Release Content
+    <!-- <slot v-bind="{right}">
+
+    </slot> -->
+    <!-- <slot name="description" v-bind="{subTitle}">
+      <div :class="[(!paddingReset ? paddingClasses: []), descriptionClasses]">
+        {{ subTitle ?? '' }}
+      </div>
+    </slot> -->
+  </div>
+  <div data-v-cd6087b7="" no-gutters="" class="ue-configurable-card__row">
+    <div data-v-cd6087b7="" class="ue-configurable-card__col ue-configurable-card__col--seperator">
+      <div data-v-cd6087b7="" class="d-flex fill-height">I have Press Release</div>
+    </div>
+    <div data-v-cd6087b7="" class="ue-configurable-card__col ue-configurable-card__col--seperator">
+      <div data-v-cd6087b7="" class="d-flex fill-height">
+        <div data-v-2e888638="" data-v-cd6087b7="" class="ue-property-list">
+          <div data-v-2e888638="" class="ue-property-list__item"><span data-v-2e888638="" class="text-caption font-weight-bold pr-1">Filename.docx</span><span data-v-2e888638="" class="text-caption"></span></div>
+          <div data-v-2e888638="" class="ue-property-list__item"><span data-v-2e888638="" class="text-caption font-weight-bold pr-1">Filename.png</span><span data-v-2e888638="" class="text-caption"></span></div>
+        </div>
+      </div>
+      <!-- <v-list dense class="">
+              <v-list-item v-for="(item, itemIndex) in segment" :key="itemIndex">
+                {{ item }}
+              </v-list-item>
+            </v-list> -->
+    </div>
+    <div data-v-cd6087b7="" class="ue-configurable-card__col ue-configurable-card__col--seperator">
+      <div data-v-cd6087b7="" class="d-flex fill-height">
+        <div data-v-2e888638="" data-v-cd6087b7="" class="ue-property-list">
+          <div data-v-2e888638="" class="ue-property-list__item"><span data-v-2e888638="" class="text-caption font-weight-bold pr-1">Date:</span><span data-v-2e888638="" class="text-caption">24.09.2024</span></div>
+          <div data-v-2e888638="" class="ue-property-list__item"><span data-v-2e888638="" class="text-caption font-weight-bold pr-1">Time:</span><span data-v-2e888638="" class="text-caption">15:00</span></div>
+          <div data-v-2e888638="" class="ue-property-list__item"><span data-v-2e888638="" class="text-caption font-weight-bold pr-1">Time Zone:</span><span data-v-2e888638="" class="text-caption">GMT +3</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <v-card-actions v-if="actions && actions.length">
+      <v-spacer></v-spacer>
+      <v-btn v-for="(action, index) in actions" :key="index" :icon="action.icon" :color="action.color">
+        <v-icon>{{ action.icon }}</v-icon>
+      </v-btn>
+    </v-card-actions> -->
+  <!---->
+  <!----><span class="v-card__underlay"></span>
+</div>"
+`;

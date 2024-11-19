@@ -178,9 +178,6 @@ export default {
   $translation: function (key, ...args) {
     return this.$te(key) ? this.$t(key, ...args) : false
   },
-  $headline: function (str) {
-    return window.__headline(str)
-  },
   $getDisplayData: function (schema, model) {
     let displayData = {};
 
@@ -332,7 +329,7 @@ export default {
     return displayData;
   },
   $getDisplayKeys: function (item) {
-    return _.reduce(Object.keys(item ?? {}), (acc, key) => {
+    return _.reduce(Object.keys(item), (acc, key) => {
       let matches = key.match(/^([a-zA-Z0-9]+)(_show)$/)
       if(matches){
         acc[key] = matches[1]

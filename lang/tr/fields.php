@@ -8,7 +8,6 @@ return [
     'complete' => 'Tamamla',
     'confirm' => 'Onayla',
     'confirm-deletion' => '{name} {route} kaydını silmek istediğinize emin misiniz?',
-    'confirm-soft-deletion' => '{name} {route} kaydını kalıcı olarak silmek istediğinize emin misiniz?',
     'confirm-description' => 'Bu işlemi yapmak istediğinize emin misiniz?',
     'confirm-action' => 'Seçili {route} üzerinde {action} yapmak istediğinize emin misiniz?',
     'country' => 'Ülke',

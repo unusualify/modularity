@@ -1,6 +1,5 @@
 import { ref, reactive, computed, onMounted, toRefs, getCurrentInstance } from 'vue'
 import { useI18n } from 'vue-i18n'
-import _ from 'lodash-es'
 
 import { propsFactory } from 'vuetify/lib/util/propsFactory.mjs'
 
@@ -53,8 +52,7 @@ export default function useModule (props, context) {
   })
 
   const state = reactive({
-    snakeName: _.snakeCase(props.name),
-    permissionName: _.kebabCase(props.name),
+    snakeName: snakeCase(props.name),
     transNameSingular: computed(() => te('modules.' + state.snakeName, 0) ? t('modules.' + state.snakeName, 0) : props.name),
     transNamePlural: computed(() => t('modules.' + state.snakeName, 1)),
     // transNameCountable: computed(() => t('modules.' + state.snakeName, getters.totalElements.value)),
