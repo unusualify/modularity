@@ -113,11 +113,11 @@ export const getModel = (inputs, item = null, rootState = null) => {
     if(editing){
       if(input.type == 'group' && __isset(item[name])){
         let defaultGroupKeys = Object.keys(_.omit(__dot(_default), ['id']));
-        if(JSON.stringify(defaultGroupKeys) !== JSON.stringify(Object.keys(omit(__dot(item[name]), ['id'])))){
+        if(JSON.stringify(defaultGroupKeys) !== JSON.stringify(Object.keys(_.omit(__dot(item[name]), ['id'])))){
 
           value = {
             ..._default,
-            ...pick(item[name], defaultGroupKeys)
+            ..._.pick(item[name], defaultGroupKeys)
           }
         }
       }
@@ -826,7 +826,7 @@ const FormatFuncs = {
           handlerValue = _.reduce(handlerValue, function(acc, array){
             acc = [...(array ?? []), ...acc];
 
-            return [...new _.Set(acc)]
+            return [...new Set(acc)]
           }, [])
         }
       }
