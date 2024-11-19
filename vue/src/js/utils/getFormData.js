@@ -29,15 +29,35 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
 
   Object.keys(_inputs).forEach(key => {
     const input = _inputs[key]
-    // Check if the input has createable property and it's false
-    // __log(input.name,input.creatable, isEditing)
-    if (input.creatable === false && !isEditing) {
-      delete _inputs[key];
-    }
 
-    // Check if the input has editable property and it's false
-    if (input.editable === false && isEditing) {
-      delete _inputs[key];
+    _inputs[key].class = _inputs[key]._originalClass || _inputs[key].class
+    _inputs[key]._originalClass = _inputs[key].class
+    _inputs[key].disabled = false
+
+    let inputClass = input.class || []
+
+    if(__isString(inputClass))
+      inputClass = inputClass.split(' ')
+
+    let isCreatable = input.creatable
+    let isEditable = input.editable
+    // Check if the input has createable property and it's false or hidden
+    if ((isCreatable === false || isCreatable === 'hidden') && !isEditing) {
+      if(isCreatable === 'hidden'){
+        inputClass = _.union(inputClass, ['d-none'])
+        _inputs[key].class = inputClass.join(' ')
+      } else {
+        _inputs[key].disabled = true
+      }
+    }
+    // Check if the input has editable property and it's false or hidden
+    if ((isEditable === false || isEditable === 'hidden') && isEditing) {
+      if(isEditable === 'hidden'){
+        inputClass = _.union(inputClass, ['d-none'])
+        _inputs[key].class = inputClass.join(' ')
+      } else {
+        _inputs[key].disabled = true
+      }
     }
 
     if(__isset(_inputs[key]) && __isset(_inputs[key].schema) && ['wrap', 'group', 'repeater', 'input-repeater'].includes(input.type)){
