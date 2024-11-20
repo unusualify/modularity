@@ -284,7 +284,7 @@
                     button-text="save"
                     :title="formTitle"
                     ref="form"
-                    :isEditing="editedIndex">
+                    :isEditing="editedIndex > -1">
                     <template v-slot:headerRight>
                       <v-btn class="" variant="text" icon="$close" density="compact"
                         @click="closeForm()"
@@ -377,7 +377,7 @@
                   <div>
                     <div class="d-flex flex-wrap ga-2 justify-sm-end ml-n2 ml-md-0">
                       <template v-for="(action, k) in rowActions" :key="k">
-                        {{ $log(action) }}
+                        <!-- {{ $log(action) }} -->
                         <v-tooltip
                           v-if="itemHasAction(element, action)"
                           :text="$t( action.label ?? $headline(action.name) )"
@@ -390,7 +390,7 @@
                               :icon="action.forceLabel ? null : (action.icon ? action.icon : '$' + action.name)"
                               :color="action.color ?? 'primary'"
                               :rounded="action.forceLabel ? null : true"
-                              @click="itemAction(item, action)"
+                              @click="itemAction(element, action)"
                               v-bind="props"
                               :text="action.forceLabel ? $t( action.label ?? $headline(action.name) ) : null"
                             />
