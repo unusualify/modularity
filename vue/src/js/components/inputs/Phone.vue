@@ -693,7 +693,9 @@ export default {
 <!-- <style src="css/sprite.css"></style> -->
 <style lang="scss">
   @import 'css/sprite.css';
-
+  .v-autocomplete__selection{
+    height: 1.25rem !important;
+  }
   .vti__flag {
     margin-right: 8px;
   }

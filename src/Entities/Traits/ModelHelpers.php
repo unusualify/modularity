@@ -2,10 +2,7 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
-use Illuminate\Support\Facades\Request;
-use Money\Currency;
 use Oobook\Database\Eloquent\Concerns\ManageEloquent;
-use Oobook\Priceable\Models\Price;
 use Unusualify\Modularity\Traits\ManageModuleRoute;
 
 trait ModelHelpers
@@ -21,12 +18,8 @@ trait ModelHelpers
      */
     public static function bootModelHelpers()
     {
-        static::retrieved(function ($model) {
-
-        });
-        static::saving(function ($model) {
-
-        });
+        static::retrieved(function ($model) {});
+        static::saving(function ($model) {});
     }
 
     /**
@@ -92,6 +85,6 @@ trait ModelHelpers
 
     public function setStateablePreviewNull()
     {
-        return "<v-chip  color='' prepend-icon=''>" . __('No Status') . "</v-chip>";
+        return "<v-chip  color='' prepend-icon=''>" . __('No Status') . '</v-chip>';
     }
 }

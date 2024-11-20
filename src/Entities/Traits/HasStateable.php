@@ -9,6 +9,8 @@ use Unusualify\Modularity\Entities\State;
 
 trait HasStateable
 {
+    public $_preserved_stateable;
+
     protected static $stateModel = 'Modules\SystemUtility\Entities\State';
 
     /**
@@ -31,7 +33,7 @@ trait HasStateable
 
             if (isset($model->_status)) {
                 //Updating the model
-                $model->preserved_state = $model->_state;
+                $model->_preserved_stateable = $model->_stateable;
             }
 
             $model->offsetUnset('_stateable');
@@ -81,7 +83,7 @@ trait HasStateable
         });
 
         self::saved(static function (Model $model) {
-            $newState = State::find($model->preserved_state);
+            $newState = State::find($model->_preserved_stateable);
             // Get current active state (if exists)
             if (is_null($newState)) {
                 return false;

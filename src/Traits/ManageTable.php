@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularity\Traits;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
@@ -212,8 +213,9 @@ trait ManageTable
             $actions[] = [
                 'name' => 'delete',
                 'can' => $this->permissionPrefix(Permission::DELETE->value),
+                'variant' => 'outlined',
                 // 'color' => 'red darken-2',
-                'color' => 'primary',
+                'color' => 'error',
             ];
         }
 
@@ -241,9 +243,10 @@ trait ManageTable
             $actions[] = [
                 'name' => 'pay',
                 'icon' => 'mdi-contactless-payment',
+                'forceLabel' => true,
                 // 'can' => 'pay',
                 // 'color' => 'red darken-2',
-                'color' => 'red',
+                'color' => 'primary',
                 'form' => [
                     'attributes' => [
                         'schema' => $this->createFormSchema($this->repository->getPaymentFormSchema()),
@@ -328,7 +331,6 @@ trait ManageTable
     protected function hydrateHeader($header)
     {
         $this->hydrateHeaderSuffix($header);
-
         // add edit functionality to table title cell
         if ($this->titleColumnKey == $header['key'] && ! isset($header['formatter'])) {
             $header['formatter'] = [
@@ -474,9 +476,26 @@ trait ManageTable
             return $value;
         });
 
-        $filter['componentOptions']['items'] = $items->toArray();
         $filter['componentOptions']['item-value'] ??= 'id';
         $filter['componentOptions']['item-title'] ??= 'name';
+
+        $model = $this->repository->getModel();
+
+        $method = $filter['slug'];
+        if (method_exists($model, $method)) {
+            $returnType = (new \ReflectionMethod($model, $method))->getReturnType();
+            if ($returnType == 'Illuminate\Database\Eloquent\Relations\MorphTo') {
+                $filter['componentOptions']['return-object'] = 'true';
+                $class = get_class($repository->getModel());
+                $items = $items->map(function (Model $item) use ($class) {
+                    $item->setAttribute('type', $class);
+
+                    return $item;
+                });
+            }
+        }
+
+        $filter['componentOptions']['items'] = $items->toArray();
 
         return $filter;
     }
@@ -503,5 +522,25 @@ trait ManageTable
             'draggable' => false,
         ];
 
+    }
+
+    public function translateHeaders($headers)
+    {
+        foreach ($headers as $key => $value) {
+
+            if (! isset($headers[$key]['title'])) {
+                continue;
+            }
+
+            $title = $headers[$key]['title'];
+            $tableHeader = 'table-headers.' . $title;
+            $translation = __($tableHeader);
+
+            if (! is_array($translation) && $translation !== $tableHeader) {
+                $headers[$key]['title'] = $translation;
+            }
+        }
+
+        return $headers;
     }
 }

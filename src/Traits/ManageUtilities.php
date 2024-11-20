@@ -30,7 +30,8 @@ trait ManageUtilities
         $initialResource = $this->getJSONData();
         $filters = json_decode($this->request->get('filter'), true) ?? [];
         $headers = $this->filterHeadersByRoles($this->getIndexTableColumns());
-
+        $headers = $this->translateHeaders($headers);
+        // dd($this->translateHeaders($headers));
         $_deprecated = [
             'initialResource' => $initialResource, //
             'tableMainFilters' => $this->getTableMainFilters(),

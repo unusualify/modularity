@@ -1,4 +1,4 @@
-import { find, omitBy, reduce, cloneDeep, map, findIndex, snakeCase, orderBy, get, filter, includes, set, each, isEmpty, unset, omit, pick } from 'lodash-es'
+import _ from 'lodash-es'
 import { useI18n } from 'vue-i18n'
 import filters from '@/utils/filters'
 import axios from 'axios'
@@ -12,12 +12,12 @@ const isArrayable = 'input-treeview|treeview|input-checklist|input-repeater|inpu
 // const isMediableFields = 'files|medias'
 
 export const getSchema = (inputs, model = null, isEditing = false) => {
-  let _inputs = omitBy(inputs, (value, key) => {
+  let _inputs = _.omitBy(inputs, (value, key) => {
     return Object.prototype.hasOwnProperty.call(value, 'slotable')
   })
 
-  if (find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'wrap'))) {
-    reduce(_inputs, (acc, input, key) => {
+  if (_.find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'wrap'))) {
+    _.reduce(_inputs, (acc, input, key) => {
       if(Object.prototype.hasOwnProperty.call(input, 'group')){
 
       } else{
@@ -29,15 +29,35 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
 
   Object.keys(_inputs).forEach(key => {
     const input = _inputs[key]
-    // Check if the input has createable property and it's false
-    // __log(input.name,input.creatable, isEditing)
-    if (input.creatable === false && !isEditing) {
-      delete _inputs[key];
-    }
 
-    // Check if the input has editable property and it's false
-    if (input.editable === false && isEditing) {
-      delete _inputs[key];
+    _inputs[key].class = _inputs[key]._originalClass || _inputs[key].class
+    _inputs[key]._originalClass = _inputs[key].class
+    _inputs[key].disabled = false
+
+    let inputClass = input.class || []
+
+    if(__isString(inputClass))
+      inputClass = inputClass.split(' ')
+
+    let isCreatable = input.creatable
+    let isEditable = input.editable
+    // Check if the input has createable property and it's false or hidden
+    if ((isCreatable === false || isCreatable === 'hidden') && !isEditing) {
+      if(isCreatable === 'hidden'){
+        inputClass = _.union(inputClass, ['d-none'])
+        _inputs[key].class = inputClass.join(' ')
+      } else {
+        _inputs[key].disabled = true
+      }
+    }
+    // Check if the input has editable property and it's false or hidden
+    if ((isEditable === false || isEditable === 'hidden') && isEditing) {
+      if(isEditable === 'hidden'){
+        inputClass = _.union(inputClass, ['d-none'])
+        _inputs[key].class = inputClass.join(' ')
+      } else {
+        _inputs[key].disabled = true
+      }
     }
 
     if(__isset(_inputs[key]) && __isset(_inputs[key].schema) && ['wrap', 'group', 'repeater', 'input-repeater'].includes(input.type)){
@@ -45,7 +65,7 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
     }
   });
 
-  map(_inputs, (value, key) => {
+  _.map(_inputs, (value, key) => {
     if(__isset(value.type) && value.type == 'group'){
       value.schema = flattenGroupSchema(value.schema, value.name);
     }
@@ -77,7 +97,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
     if (input.type == 'group') _default = getModel(input.schema, item ?? input.default)
 
     if (isTranslated) {
-      _default = reduce(languages, function (acc, language, k) {
+      _default = _.reduce(languages, function (acc, language, k) {
         acc[language.value] = _default
         return acc
       }, {})
@@ -92,12 +112,12 @@ export const getModel = (inputs, item = null, rootState = null) => {
     // const value = editing ? (__isset(item[name]) ? item[name] : _default) : _default
     if(editing){
       if(input.type == 'group' && __isset(item[name])){
-        let defaultGroupKeys = Object.keys(omit(__dot(_default), ['id']));
-        if(JSON.stringify(defaultGroupKeys) !== JSON.stringify(Object.keys(omit(__dot(item[name]), ['id'])))){
+        let defaultGroupKeys = Object.keys(_.omit(__dot(_default), ['id']));
+        if(JSON.stringify(defaultGroupKeys) !== JSON.stringify(Object.keys(_.omit(__dot(item[name]), ['id'])))){
 
           value = {
             ..._default,
-            ...pick(item[name], defaultGroupKeys)
+            ..._.pick(item[name], defaultGroupKeys)
           }
         }
       }
@@ -109,8 +129,8 @@ export const getModel = (inputs, item = null, rootState = null) => {
           const hasTranslations = Object.prototype.hasOwnProperty.call(item, 'translations')
           if (hasTranslations && item.translations[name]) {
             fields[name] = languages.reduce(function (map, lang) {
-              map[lang.value] = find(item.translations, { locale: lang.value })
-                ? find(item.translations, { locale: lang.value })[name]
+              map[lang.value] = _.find(item.translations, { locale: lang.value })
+                ? _.find(item.translations, { locale: lang.value })[name]
                 : item.translations[name][lang.value]
               return map
             }, {})
@@ -222,8 +242,8 @@ export const setSchemaInputField = (schema, value) => {
         break;
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
       if(__isset(schema[sch.cascade]))
-        schema[sch.cascade][cascadeKey] = find(sch[cascadeKey], [sch.itemValue, value[sch.name]])?.[cascadeKey] ?? []
-      // this.formSchema[key].items = find(this.formSchema[sch.parent].items, [this.formSchema[sch.parent].itemValue, this.valueIntern[sch.parent]]).items
+        schema[sch.cascade][cascadeKey] = _.find(sch[cascadeKey], [sch.itemValue, value[sch.name]])?.[cascadeKey] ?? []
+      // this.formSchema[key].items = _.find(this.formSchema[sch.parent].items, [this.formSchema[sch.parent].itemValue, this.valueIntern[sch.parent]]).items
     }
   }
 }
@@ -236,8 +256,8 @@ export const onInputEventFormData = (obj, schema, stateData, sortedStateData, va
     const selectItemValue = obj.schema.itemValue ?? 'id'
 
     // ACTIONS
-    schema[cascadedSelectName][cascadeKey] = find(obj.schema[cascadeKey], [selectItemValue, value[obj.key]])?.schema ?? []
-    const sortIndex = findIndex(sortedStateData, ['key', cascadedSelectName])
+    schema[cascadedSelectName][cascadeKey] = _.find(obj.schema[cascadeKey], [selectItemValue, value[obj.key]])?.schema ?? []
+    const sortIndex = _.findIndex(sortedStateData, ['key', cascadedSelectName])
 
     stateData[cascadedSelectName] = schema[cascadedSelectName][cascadeKey].length > 0 ? schema[cascadedSelectName][cascadeKey][0].value : []
     sortedStateData[sortIndex].value = value[cascadedSelectName]
@@ -248,7 +268,7 @@ export const onInputEventFormData = (obj, schema, stateData, sortedStateData, va
     __log('autofill')
     // obj.schema.autofill.forEach(element => {
     //   if (schema[element].autofillable) {
-    //     stateData[element] = find(obj.schema.items, ['id', value[obj.key]])?.[element] ?? ''
+    //     stateData[element] = _.find(obj.schema.items, ['id', value[obj.key]])?.[element] ?? ''
     //     // ## TODO type conditional default value
     //   }
     // })
@@ -339,8 +359,8 @@ export const handleEvents = ( model, schema, input) => {
 
 export const handleMultiFormEvents = ( models, schemas, input, index, preview = []) => {
   const handlerName = input.name
-  const handlerSchema = schemas[index][handlerName] ?? get(schemas, `[${index}].${handlerName}`)
-  const handlerValue = models[index][handlerName] ?? get(models, `[${index}].${handlerName}`)
+  const handlerSchema = schemas[index][handlerName] ?? _.get(schemas, `[${index}].${handlerName}`)
+  const handlerValue = models[index][handlerName] ?? _.get(models, `[${index}].${handlerName}`)
 
   const isFieldFalsy = (Array.isArray(handlerValue) && handlerValue.length > 0) || (!Array.isArray(handlerValue) && !!handlerValue)
 
@@ -357,12 +377,12 @@ export const handleMultiFormEvents = ( models, schemas, input, index, preview = 
   if(false && input.schema){
     for(const name in input.schema){
 
-      const _input = cloneDeep(input.schema[name])
+      const _input = _.cloneDeep(input.schema[name])
       _input.name = `${input.name}.${input.schema[name].name}`
       _input.key = `${input.name}.schema.${input.schema[name].name}`
       // __log(
-      //   // get(schemas, `[${index}].${_input.key}`),
-      //   // get(models, `[${index}].${_input.name}`),
+      //   // _.get(schemas, `[${index}].${_input.key}`),
+      //   // _.get(models, `[${index}].${_input.name}`),
       // )
     }
   }
@@ -396,7 +416,7 @@ export default {
 }
 
 const processInputs = (inputObj) => {
-  return reduce(inputObj, (acc, value, key) => {
+  return _.reduce(inputObj, (acc, value, key) => {
     if (value.type === 'wrap' && value.schema) {
       Object.assign(acc, processInputs(value.schema));
     } else if (value.type === 'groupz' && value.schema) {
@@ -415,7 +435,7 @@ const processInputs = (inputObj) => {
 };
 
 const flattenGroupSchema = (schema, groupName) => {
-  return reduce(schema, (acc, value, key) => {
+  return _.reduce(schema, (acc, value, key) => {
     const newKey = key.split('.').filter(part => part !== groupName).join('.');
     acc[newKey] = value;
     return acc;
@@ -510,9 +530,9 @@ const FormatFuncs = {
 
       if(dataSet && dataSet.length > 0){
         const newValue = dataSet.shift()
-        set(schema, setterNotation, newValue)
+        _.set(schema, setterNotation, newValue)
         if(inputPropToFormat.match(/schema/)){
-          set(schema, `${inputNotation}.default`, getModel(newValue))
+          _.set(schema, `${inputNotation}.default`, getModel(newValue))
         }
       }
     }
@@ -543,12 +563,12 @@ const FormatFuncs = {
     }
 
     let setterNotation = `${inputNotation}.${inputPropToFormat}`
-    let eagers = get(schema, `${inputNotation}.eagers`) ?? [];
+    let eagers = _.get(schema, `${inputNotation}.eagers`) ?? [];
 
-    if( !get(schema, setterNotation))
-      set(schema, setterNotation, [])
+    if( !_.get(schema, setterNotation))
+      _.set(schema, setterNotation, [])
 
-    let newItems = cloneDeep( get(schema, setterNotation) );
+    let newItems = _.cloneDeep( _.get(schema, setterNotation) );
 
     for(const i in newItems){
       if(!filterValues.includes(newItems[i].id)){
@@ -561,7 +581,7 @@ const FormatFuncs = {
 
       if( !newItems.find((el) => el.id == id) ) {
         try {
-          let res = await axios.get(endpoint.replace(`{${snakeCase(modelValue)}}`, id), {
+          let res = await axios.get(endpoint.replace(`{${_.snakeCase(modelValue)}}`, id), {
             params: {
               eagers: eagers
             }
@@ -592,7 +612,7 @@ const FormatFuncs = {
       }
     }
 
-    set(schema, setterNotation, orderBy(newItems, ['id'], ['asc']))
+    _.set(schema, setterNotation, _.orderBy(newItems, ['id'], ['asc']))
   },
 
   formatPreview: async function(args, model, schema, input, index, preview = []) {
@@ -672,7 +692,7 @@ const FormatFuncs = {
         let targetValueKey = targetValueKeys[_index] ?? null
         let stages = inputToFormat.split('.')
 
-        stages = map(stages, function(stage, i){
+        stages = _.map(stages, function(stage, i){
           let found
           let convertedStage = stage
 
@@ -699,7 +719,7 @@ const FormatFuncs = {
           let matches = targetValueKey.match(/\*\.?(\w+)/)
 
           let key = matches[1]
-          targetValue = map( handlerValue, function(el, i){
+          targetValue = _.map( handlerValue, function(el, i){
             return el[key]
             return {id: el[key]}
           })
@@ -720,13 +740,13 @@ const FormatFuncs = {
             clear = targetValue.length < 1
 
             let parentPattern = inputToFormat.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*')
-            patternValues[parentPattern] = map(targetValue, (val) => inputToFormat.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*' + `id=${val}`))
+            patternValues[parentPattern] = _.map(targetValue, (val) => inputToFormat.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*' + `id=${val}`))
 
             let data = __data_get(handlerSchema, __wildcard_change(inputToFormat, targetValue))
-            each(data, (val,i) => clear
-              ? unset(previewValue, isMultiple ? `[${i}][${_index}]` : `[${i}]`)
-              : set(previewValue, isMultiple ? `[${i}][${_index}]` : `[${i}]`, val)  )
-            // set(previewValue, )
+            _.each(data, (val,i) => clear
+              ? _.unset(previewValue, isMultiple ? `[${i}][${_index}]` : `[${i}]`)
+              : _.set(previewValue, isMultiple ? `[${i}][${_index}]` : `[${i}]`, val)  )
+            // _.set(previewValue, )
           }else{
             let parentPatterns
 
@@ -742,10 +762,10 @@ const FormatFuncs = {
               }
             })
 
-            each(targetValue, (val, i) => {
+            _.each(targetValue, (val, i) => {
               if(val){
 
-                if(Array.isArray(val) && isEmpty(val)) return
+                if(Array.isArray(val) && _.isEmpty(val)) return
 
                 let parentPattern = parentPatterns[i];
 
@@ -759,7 +779,7 @@ const FormatFuncs = {
                   formattedData = `(${data.join(',')})`
                 }
 
-                set(previewValue, isMultiple ? `[${i}][${_index}]` : `[${_index}]`, formattedData)
+                _.set(previewValue, isMultiple ? `[${i}][${_index}]` : `[${_index}]`, formattedData)
               }
             })
           }
@@ -772,7 +792,7 @@ const FormatFuncs = {
         preview[index] = {}
 
       if(clear)
-        unset(preview[index], handlerName)
+        _.unset(preview[index], handlerName)
       else
         preview[index][handlerName] = previewValue
 
@@ -803,7 +823,7 @@ const FormatFuncs = {
       if(prepend){
         handlerValue = __data_get(handlerValue, prepend)
         if(prepend.match(/^\*(.*)/)){
-          handlerValue = reduce(handlerValue, function(acc, array){
+          handlerValue = _.reduce(handlerValue, function(acc, array){
             acc = [...(array ?? []), ...acc];
 
             return [...new Set(acc)]
@@ -811,12 +831,12 @@ const FormatFuncs = {
         }
       }
 
-      let inputToPrepended = get(schema, inputNotation)
+      let inputToPrepended = _.get(schema, inputNotation)
       // __log(inputNotation, inputToPrepended, schema)
       if(!inputToPrepended || !inputToPrepended.schema)
           return
 
-      let oldSchema = cloneDeep(inputToPrepended.schema);
+      let oldSchema = _.cloneDeep(inputToPrepended.schema);
 
       let prependerInput =  __data_get(handlerSchema, setterSchemaKey)
       // __log(inputNotation, prependerInput)
@@ -826,7 +846,7 @@ const FormatFuncs = {
           if(!prependerInput.items)
             return
           // __log(handlerValue)
-          handlerValue = reduce(handlerValue, (acc, id) => {
+          handlerValue = _.reduce(handlerValue, (acc, id) => {
             acc[id] = {
               label_prefix: __data_get(prependerInput.items, `*id=${id}.${prependerInput.itemTitle}`)?.shift(),
             }
@@ -834,7 +854,7 @@ const FormatFuncs = {
           }, {})
         }
 
-        let newSchema = cloneDeep({})
+        let newSchema = _.cloneDeep({})
 
         for(const prependKey in prependerInput.schema){ // prependKey _content
 
@@ -853,7 +873,7 @@ const FormatFuncs = {
           }
           for(const val in handlerValue){
             // __log(id, handlerValue, prependKey)
-            let draftSchema = cloneDeep(prependerInput.schema[prependKey])
+            let draftSchema = _.cloneDeep(prependerInput.schema[prependKey])
 
             let pattern = /(\$[\w]+\$)/
             let _inputName = prependKey.replace(pattern, val)
@@ -871,10 +891,10 @@ const FormatFuncs = {
         let updatedSchema =  Object.assign(newSchema, oldSchema)
         if(JSON.stringify(inputToPrepended.schema) !== JSON.stringify(updatedSchema)){
           // __log(inputNotation, '[2].content-merge.schema.["content-merge.wrap-files"].schema')
-          set(schema, inputNotation + '.schema', updatedSchema)
+          _.set(schema, inputNotation + '.schema', updatedSchema)
           // __log(inputNotation)
-          // set(schema, '[2].content-merge.schema.["content-merge.wrap-files"].schema', newSchema)
-          // __log(inputNotation + '.schema', get(schema, inputNotation + '.schema'))
+          // _.set(schema, '[2].content-merge.schema.["content-merge.wrap-files"].schema', newSchema)
+          // __log(inputNotation + '.schema', _.get(schema, inputNotation + '.schema'))
         }
 
       }
@@ -891,8 +911,8 @@ const FormatFuncs = {
     if(!handlerValue && __isset(handlerSchema.parentName)){
       handlerValue = __data_get(model, !isNaN(index) ? `${index}.${handlerSchema.parentName}.${handlerModelName}` : `${handlerSchema.parentName}.${handlerModelName}`)
     }
-    // const handlerSchema = get(schema, `${index}.${handlerSchemaName}`)
-    // const handlerValue = get(model, `${index}.${handlerModelName}`)
+    // const handlerSchema = _.get(schema, `${index}.${handlerSchemaName}`)
+    // const handlerValue = _.get(model, `${index}.${handlerModelName}`)
     return {
       handlerName,
       handlerModelName,

@@ -137,8 +137,11 @@ trait ManageForm
     {
         return collect($input)
             ->mapWithKeys(function ($v, $k) {
-                if ($k == 'label' && ___("form-labels.{$v}") !== "form-labels.{$v}") {
-                    $v = ___("form-labels.{$v}");
+
+                if ($k == 'label'
+                    && ($translation = ___("form-labels.{$v}")) !== "form-labels.{$v}"
+                ) {
+                    $v = $translation;
                 }
                 // if($k == 'label')
                 //     $v = ___("form-labels.{$v}");
