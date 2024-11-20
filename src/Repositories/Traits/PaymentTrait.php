@@ -55,7 +55,7 @@ trait PaymentTrait
 
             // dd($relations);
 
-            foreach($relations as $relationName){
+            foreach ($relations as $relationName) {
 
                 $relatedClass = $object->{$relationName}()->getRelated();
 
@@ -84,7 +84,6 @@ trait PaymentTrait
                             }
                         }
                     }
-
 
                 }
             }

@@ -411,17 +411,18 @@ trait MethodTransformers
                             if (isset($item['type']) && isset($item['id'])) {
                                 $acc[] = $item;
                             }
+
                             return $acc;
                         }, []);
 
-                        if(count($morphFilters) > 0) {
+                        if (count($morphFilters) > 0) {
                             $type = $morphFilters[0]['type'];
                             $values = array_map(function ($item) {
                                 return $item['id'];
                             }, $morphFilters);
                             $query->where($morphType, $type)
                                 ->whereIn($morphId, $values);
-                        };
+                        }
 
                     } else {
                         // Handle belongsTo relationship

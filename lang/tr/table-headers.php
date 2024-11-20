@@ -29,5 +29,5 @@ return [
     'Price' => 'Fiyat',
     'Location' => 'Konum',
     'Press Release' => 'Basın Bülteni',
-    'Last Update' => 'Son Güncelleme'
+    'Last Update' => 'Son Güncelleme',
 ];

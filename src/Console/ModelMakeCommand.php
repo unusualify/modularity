@@ -17,6 +17,7 @@ use Unusualify\Modularity\Support\Decomposers\SchemaParser;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\select;
+
 class ModelMakeCommand extends BaseCommand
 {
     protected $name = 'modularity:make:model';
@@ -361,7 +362,7 @@ class ModelMakeCommand extends BaseCommand
 
             $models = UFinder::getAllModels();
             $snapshotSourceModel = select(
-                label: "Select the snapshot source model?",
+                label: 'Select the snapshot source model?',
                 options: $models
             );
 

@@ -146,6 +146,7 @@ trait ManageTable
                 ->map(fn ($item) => (object) [...(array) $item, 'visible' => true]);
 
             $visibleColumns = explode(',', $this->request->get('columns') ?? $headers->pluck('key')->implode(','));
+
             return $this->indexTableColumns = $headers->reduce(function ($carry, $item) use ($visibleColumns) {
                 $header = $this->getHeader((array) $item);
                 if (isset($item->key)) {
@@ -481,13 +482,14 @@ trait ManageTable
         $model = $this->repository->getModel();
 
         $method = $filter['slug'];
-        if(method_exists($model, $method)) {
+        if (method_exists($model, $method)) {
             $returnType = (new \ReflectionMethod($model, $method))->getReturnType();
-            if($returnType == 'Illuminate\Database\Eloquent\Relations\MorphTo') {
+            if ($returnType == 'Illuminate\Database\Eloquent\Relations\MorphTo') {
                 $filter['componentOptions']['return-object'] = 'true';
                 $class = get_class($repository->getModel());
                 $items = $items->map(function (Model $item) use ($class) {
                     $item->setAttribute('type', $class);
+
                     return $item;
                 });
             }
@@ -524,9 +526,9 @@ trait ManageTable
 
     public function translateHeaders($headers)
     {
-        foreach($headers as $key => $value) {
+        foreach ($headers as $key => $value) {
 
-            if (!isset($headers[$key]['title'])) {
+            if (! isset($headers[$key]['title'])) {
                 continue;
             }
 
@@ -534,10 +536,11 @@ trait ManageTable
             $tableHeader = 'table-headers.' . $title;
             $translation = __($tableHeader);
 
-            if (!is_array($translation) && $translation !== $tableHeader) {
+            if (! is_array($translation) && $translation !== $tableHeader) {
                 $headers[$key]['title'] = $translation;
             }
         }
+
         return $headers;
     }
 }

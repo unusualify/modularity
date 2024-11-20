@@ -27,5 +27,5 @@ return [
     'Timezone' => 'Saat Dilimi',
     'VAT Number' => 'KDV Kayıt No',
     'ZIP/Postal Code' => 'ZIP/Posta Kodu',
-    'Zip Code' => 'Posta Kodu'
+    'Zip Code' => 'Posta Kodu',
 ];

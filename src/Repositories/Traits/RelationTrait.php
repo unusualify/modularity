@@ -164,23 +164,24 @@ trait RelationTrait
     {
         foreach ($this->getHasManyRelations() as $relation) {
             // dd('afterForceDelete', $relation, );
-            if(isset($fields[$relation])){
+            if (isset($fields[$relation])) {
                 $values = array_values($fields[$relation]);
                 $related = $object->{$relation}()->getRelated();
                 if (in_array('Oobook\Snapshot\Traits\HasSnapshot', class_uses_recursive($related))) {
                     // The related model has the HasSnapshot trait
                     // You can add any additional logic here if needed
-                    $idValues = array_reduce($values, function($acc, $item) use ($related, ){
-                        if(!is_array($item)){
+                    $idValues = array_reduce($values, function ($acc, $item) use ($related) {
+                        if (! is_array($item)) {
                             $id = $item;
                             $acc[] = [
-                                $related->getSourceForeignKey() => $id
+                                $related->getSourceForeignKey() => $id,
                             ];
                         }
+
                         return $acc;
                     }, []);
 
-                    if(count($idValues)){
+                    if (count($idValues)) {
                         $fields[$relation] = $idValues;
                     }
                 }
@@ -338,7 +339,7 @@ trait RelationTrait
                             } elseif ($record instanceof \Illuminate\Database\Eloquent\Model) {
                                 $fields["{$relationship}_show"] = modelShowFormat($record);
 
-                            } elseif (!is_null($record)) {
+                            } elseif (! is_null($record)) {
                                 dd(
                                     // $relationship,
                                     // $object,

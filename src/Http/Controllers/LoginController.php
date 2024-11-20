@@ -193,7 +193,7 @@ class LoginController extends Controller
                     'password' => [
                         'type' => 'password',
                         'name' => 'password',
-                        'label' =>'Password',
+                        'label' => 'Password',
                         'default' => '',
                         'appendInnerIcon' => '$non-visibility',
                         'slotHandlers' => [

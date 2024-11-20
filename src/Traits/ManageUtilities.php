@@ -547,6 +547,4 @@ trait ManageUtilities
             return $carry;
         }, []);
     }
-
-
 }

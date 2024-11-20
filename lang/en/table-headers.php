@@ -29,5 +29,5 @@ return [
     'Price' => 'Price',
     'Location' => 'Location',
     'Press Release' => 'Press Release',
-    'Last Update' => 'Last Update'
+    'Last Update' => 'Last Update',
 ];
