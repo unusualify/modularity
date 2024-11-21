@@ -671,6 +671,7 @@ export default function useTable (props, context) {
         // console.log(_action.form)
         state.customFormSchema = _.cloneDeep(_action.form.attributes.schema);
         state.customFormAttributes = _.cloneDeep(_action.form.attributes);
+
         // console.log(state.customFormSchema);
         if(_action.form.hasOwnProperty('model_formatter')){
           for(let key in _action.form.model_formatter){
