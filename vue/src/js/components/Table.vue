@@ -294,59 +294,59 @@
               :persistent="modals[activeModal].persistent"
               :description-text="modals[activeModal].content"
             >
-            <template #body="props">
-              <v-card>
-                <v-card-title class="text-h5 text-center" style="word-break: break-word;"
-                  v-if="modals[activeModal].title">
-                  <!-- {{ modal.title }} -->
-                </v-card-title>
-                <v-icon
-                  v-if="modals[activeModal].img"
-                  :icon="modals[activeModal].icon"
-                  style="margin:auto; border:4px solid;border-radius:50%;padding:32px;"
-                  size="32"
-                  :color="modals[activeModal].color"/>
+              <template #body="props">
+                <v-card>
+                  <v-card-title class="text-h5 text-center" style="word-break: break-word;"
+                    v-if="modals[activeModal].title">
+                    <!-- {{ modal.title }} -->
+                  </v-card-title>
+                  <v-icon
+                    v-if="modals[activeModal].img"
+                    :icon="modals[activeModal].icon"
+                    style="margin:auto; border:4px solid;border-radius:50%;padding:32px;"
+                    size="32"
+                    :color="modals[activeModal].color"/>
 
-                <v-card-text class="text-center" style="word-break: break-word;">
-                  {{ modals[activeModal].content }}
-                </v-card-text>
-                <v-divider />
-                <v-card-actions>
-                  <v-spacer />
-                  <v-btn :color="modals[activeModal].color ? modals[activeModal].color : 'blue'" text @click="modals[activeModal].closeAction()">
-                    {{ modals[activeModal].cancelText || props.textCancel }}
-                  </v-btn>
-                  <!-- <v-btn color="blue" text @click="handleModal('confirm', modal.ref, props.onConfirm)"></v-btn> -->
-                  <v-btn :color="modals[activeModal].color ? modals[activeModal].color : 'blue'" text @click="modals[activeModal].confirmAction()">
-                    {{ modals[activeModal].confirmText || props.textConfirm }}
-                  </v-btn>
-                  <v-spacer />
-                </v-card-actions>
-              </v-card>
-            </template>
-          </ue-modal>
-          <ue-modal
-            ref="customFormModal"
-            v-model="customFormModalActive"
-            :width-type="'lg'"
-
-          >
-          <!-- <slot name="systembar">
-            test
-          </slot> -->
-            <ue-form
-              ref="customForm"
-              v-model="customFormModel"
-              v-bind="customFormAttributes"
-              divider="true"
-            >
-              <template v-slot:headerRight>
-                <v-btn class="ml-auto" variant="text" icon="$close" density="compact" color="deafult"
-                  @click="customFormModalActive = false"
-                ></v-btn>
+                  <v-card-text class="text-center" style="word-break: break-word;">
+                    {{ modals[activeModal].content }}
+                  </v-card-text>
+                  <v-divider />
+                  <v-card-actions>
+                    <v-spacer />
+                    <v-btn :color="modals[activeModal].color ? modals[activeModal].color : 'blue'" text @click="modals[activeModal].closeAction()">
+                      {{ modals[activeModal].cancelText || props.textCancel }}
+                    </v-btn>
+                    <!-- <v-btn color="blue" text @click="handleModal('confirm', modal.ref, props.onConfirm)"></v-btn> -->
+                    <v-btn :color="modals[activeModal].color ? modals[activeModal].color : 'blue'" text @click="modals[activeModal].confirmAction()">
+                      {{ modals[activeModal].confirmText || props.textConfirm }}
+                    </v-btn>
+                    <v-spacer />
+                  </v-card-actions>
+                </v-card>
               </template>
-            </ue-form>
-          </ue-modal>
+            </ue-modal>
+            <ue-modal
+              ref="customFormModal"
+              v-model="customFormModalActive"
+              :width-type="'lg'"
+
+            >
+            <!-- <slot name="systembar">
+              test
+            </slot> -->
+              <ue-form
+                ref="customForm"
+                v-model="customFormModel"
+                v-bind="customFormAttributes"
+                divider="true"
+              >
+                <template v-slot:headerRight>
+                  <v-btn class="ml-auto" variant="text" icon="$close" density="compact" color="deafult"
+                    @click="customFormModalActive = false"
+                  ></v-btn>
+                </template>
+              </ue-form>
+            </ue-modal>
 
           </div>
 
