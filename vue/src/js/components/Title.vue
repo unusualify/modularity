@@ -101,6 +101,7 @@ const titleClasses = computed(() => [
   `p${props.padding}`,
   `m${props.margin}`,
   `text-${props.align}`,
+  `align-${props.align}`,
   `justify-${props.justify}`
 ]);
 
