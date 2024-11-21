@@ -85,11 +85,23 @@ return [
                     'type' => 'checkbox',
                 ],
                 [
-                    'label' => 'Images',
+                    'label' => 'Logo',
                     'type' => 'image',
                     'name' => 'logo',
                     'rules' => 'sometimes|required:array',
                     'isIcon' => true,
+                ],
+                [
+                    'label' => 'Button Logo',
+                    'type' => 'image',
+                    'name' => 'button_logo',
+                    'rules' => '',
+                    'isIcon' => true,
+                ],
+                [
+                    'name' => 'button_style',
+                    'label' => 'Button Style',
+                    'type' => 'text',
                 ],
             ],
         ],
@@ -206,6 +218,76 @@ return [
                     'multiple',
                     'itemTitle' => 'title',
                 ],
+            ],
+        ],
+        'card_type' => [
+            'name' => 'CardType',
+            'headline' => 'Card Types',
+            'url' => 'card-types',
+            'route_name' => 'card_type',
+            'icon' => '$submodule',
+            'title_column_key' => 'name',
+            'table_options' => [
+                'createOnModal' => true,
+                'editOnModal' => true,
+                'isRowEditing' => false,
+                'rowActionsType' => 'inline',
+            ],
+            'headers' => [
+                [
+                    'title' => 'Name',
+                    'key' => 'name',
+                    'formatter' => [
+                        'edit',
+                    ],
+                    'searchable' => true,
+                ],
+                [
+                    'title' => 'Card Type',
+                    'key' => 'card_type',
+                    'searchable' => true,
+                ],
+                [
+                    'title' => 'Created Time',
+                    'key' => 'created_at',
+                    'formatter' => [
+                        'date',
+                        'long',
+                    ],
+                    'searchable' => true,
+                ],
+                [
+                    'title' => 'Actions',
+                    'key' => 'actions',
+                    'sortable' => false,
+                ],
+            ],
+            'inputs' => [
+                [
+                    'name' => 'name',
+                    'label' => 'Name',
+                    'type' => 'text',
+                ],
+                [
+                    'type' => 'text',
+                    'name' => 'card_type',
+                    'label' => 'Card Type',
+                    'rules' => 'sometimes|required',
+                ],
+                [
+                    'name' => 'paymentServices',
+                    'label' => 'Payment Services',
+                    'type' => 'select',
+                    'multiple',
+                    'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentServiceRepository',
+                ],
+                [
+                    'label' => 'Logo',
+                    'type' => 'image',
+                    'name' => 'logo',
+                    'rules' => 'sometimes|required:array',
+                    'isIcon' => true,
+                ]
             ],
         ],
     ],

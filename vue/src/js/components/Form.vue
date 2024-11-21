@@ -31,6 +31,9 @@
                   ></v-btn> -->
               </slot>
           </ue-title>
+          <v-divider
+            v-if="hasDivider">
+          </v-divider>
           <v-custom-form-base
             :id="`ue-wrapper-${id}`"
             class="pt-4"
@@ -223,6 +226,10 @@ export default {
     },
     valid: null,
     isEditing: {
+      type: Boolean,
+      default: false
+    },
+    hasDivider: {
       type: Boolean,
       default: false
     }

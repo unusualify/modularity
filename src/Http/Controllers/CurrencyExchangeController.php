@@ -38,10 +38,8 @@ class CurrencyExchangeController extends Controller
             'amount' => 'required|numeric',
             'currency' => 'required|string|size:3',
         ]);
-
         try {
             $converted = $this->currencyService->convertTo($request->amount, mb_strtoupper($request->currency));
-
             return response()->json(['converted_amount' => $converted], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Conversion failed.'], 400);

@@ -335,18 +335,28 @@
                 </v-card>
               </template>
             </ue-modal>
-
+            
             <!-- custom form modal -->
             <ue-modal
               ref="customFormModal"
               v-model="customFormModalActive"
               :width-type="'lg'"
             >
+            <!-- <slot name="systembar">
+              test
+            </slot> -->
+            
               <ue-form
                 ref="customForm"
                 v-model="customFormModel"
                 v-bind="customFormAttributes"
+                hasDivider="true"
               >
+                <template v-slot:headerRight>
+                  <v-btn class="ml-auto" variant="text" icon="$close" density="compact" color="deafult"
+                    @click="customFormModalActive = false"
+                  ></v-btn>
+                </template>
               </ue-form>
             </ue-modal>
 

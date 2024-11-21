@@ -249,6 +249,18 @@ trait ManageTable
                 'color' => 'primary',
                 'form' => [
                     'attributes' => [
+                        'title' => [
+                            'text' =>   'PAYMENT AND INVOICES',
+                            'tag' => 'div',
+                            'type' => 'p',
+                            'weight' => 'medium',
+                            'align' => 'center',
+                            'justify' => 'left',
+                            'margin' => 'a-5',
+                            'color' => 'default',
+                            'classes' => 'justify-content-between'
+                        ],
+                        // 'systembar' => true,
                         'schema' => $this->createFormSchema($this->repository->getPaymentFormSchema()),
                         'actionUrl' => route('admin.system.system_payment.payment'),
                         'async' => false,
@@ -264,6 +276,7 @@ trait ManageTable
                 //  admin.system.system_payment.payment routeName
                 //  admin.crm.template/system/system-payments/pay/{price}
             ];
+            // dd($actions);
         }
 
         $actions = array_merge(

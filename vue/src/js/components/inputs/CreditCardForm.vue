@@ -37,7 +37,11 @@
           </div>
         </div>
       </div>
-      <v-btn class="card-form__button" @click="submitForm" block>
+      <v-btn
+        class="card-form__button bg-success"
+        @click="submitForm"
+        density="comfortable"
+        block>
         {{ $t('PAY') }}
       </v-btn>
     </div>
@@ -373,8 +377,8 @@ export default {
 
   &__inner {
     background: #fff;
-    box-shadow: 0 30px 60px 0 rgba(90, 116, 148, 0.4);
-    border-radius: 10px;
+    border-radius: 4px;
+    border:1px solid #54AF4C;
     padding: 35px;
     padding-top: 180px;
 
@@ -443,15 +447,8 @@ export default {
 
   &__button {
     width: 100%;
-    height: 55px;
-    background: #2364d2;
     border: none;
-    border-radius: 5px;
-    font-size: 1.25rem;
-    font-weight: 500;
-    font-family: "Source Sans Pro", sans-serif;
-    box-shadow: 3px 10px 20px 0px rgba(35, 100, 210, 0.3);
-    color: #fff;
+    font-size: 0.875rem;
     margin-top: 20px;
     cursor: pointer;
 
