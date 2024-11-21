@@ -1,5 +1,6 @@
 <template>
-  <v-radio-group v-model="input" direction="horizontal"  class="v-input-radio-group">
+  <v-radio-group v-model="input" direction="horizontal"  class="v-input-radio-group" hide-details>
+    <ue-title v-if="label" :text="label" color="grey-darken-5" padding="b-4" margin="b-0" transform="none"/>
     <v-row>
       <v-col v-for="(item, i) in items" :key="`col-${item[itemValue]}`" :cols="12" :md="6">
         <v-btn
