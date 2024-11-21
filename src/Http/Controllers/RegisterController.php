@@ -41,7 +41,7 @@ class RegisterController extends Controller
                     'name' => [
                         'type' => 'text',
                         'name' => 'name',
-                        'label' => ___('authentication.name'),
+                        'label' => 'Name',
                         'default' => '',
                         'col' => [
                             'cols' => 6,
@@ -54,7 +54,7 @@ class RegisterController extends Controller
                     'surname' => [
                         'type' => 'text',
                         'name' => 'surname',
-                        'label' => ___('authentication.surname'),
+                        'label' => 'Surname',
                         'default' => '',
                         'col' => [
                             'cols' => 6,
@@ -67,7 +67,7 @@ class RegisterController extends Controller
                     'company' => [
                         'type' => 'text',
                         'name' => 'company',
-                        'label' => ___('authentication.company'),
+                        'label' => 'Company',
                         'default' => '',
                         'col' => [
                             'cols' => 6,
@@ -80,7 +80,7 @@ class RegisterController extends Controller
                     'email' => [
                         'type' => 'text',
                         'name' => 'email',
-                        'label' => ___('authentication.email'),
+                        'label' => 'Email',
                         'default' => '',
                         'col' => [
                             'cols' => 6,
@@ -93,7 +93,7 @@ class RegisterController extends Controller
                     'password' => [
                         'type' => 'password',
                         'name' => 'password',
-                        'label' => ___('authentication.password'),
+                        'label' => 'Password',
                         'default' => '',
                         'appendInnerIcon' => '$non-visibility',
                         'slotHandlers' => [
@@ -107,7 +107,7 @@ class RegisterController extends Controller
                     're_password' => [
                         'type' => 'password',
                         'name' => 're-password',
-                        'label' => ___('authentication.repeat_password'),
+                        'label' => 'Repeat Password',
                         'default' => '',
                         'appendInnerIcon' => '$non-visibility',
                         'slotHandlers' => [
@@ -146,14 +146,14 @@ class RegisterController extends Controller
                             'elements' => __('authentication.have-an-account'),
                             'attributes' => [
                                 'variant' => 'text',
-                                'href' => '',
+                                'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'v-col-5 justify-content-start',
                                 'density' => 'default',
                             ],
                         ],
                         [
                             'tag' => 'v-btn',
-                            'elements' => __('authentication.login'),
+                            'elements' => __('authentication.register'),
                             'attributes' => [
                                 'variant' => 'elevated',
                                 'href' => '',
@@ -201,6 +201,8 @@ class RegisterController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
+                                'density' => 'default',
+
                             ],
                             'slots' => [
                                 'prepend' => [

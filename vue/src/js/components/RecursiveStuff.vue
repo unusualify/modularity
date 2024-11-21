@@ -176,7 +176,7 @@ export default {
     }
   },
   created () {
-    console.log(this.configuration)
+    // console.log(this.configuration)
   }
 }
 </script>

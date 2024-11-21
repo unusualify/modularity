@@ -11,10 +11,12 @@ use Nwidart\Modules\Support\Stub;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Support\Decomposers\ModelRelationParser;
 use Unusualify\Modularity\Support\Decomposers\SchemaParser;
 
 use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\select;
 
 class ModelMakeCommand extends BaseCommand
 {
@@ -330,14 +332,14 @@ class ModelMakeCommand extends BaseCommand
 
     private function getTranslatedAttributes(): string
     {
-        $attributes = '';
+        $attributes = [];
 
         if ($this->getTraitResponse('addTranslation')) {
             $fillable = $this->option('fillable');
 
             $fields = array_merge($this->defaultFillables, $fillable != '' ? explode(',', $fillable) : []);
 
-            $attributes = "\t/**\n"
+            $attribute = "\t/**\n"
                 . "\t * The translated attributes that are assignable for hasTranslation Trait.\n"
                 . "\t * \n"
                 . "\t * @var array<int, string>\n"
@@ -347,14 +349,36 @@ class ModelMakeCommand extends BaseCommand
 
             $fields = array_merge($fields, (new SchemaParser($defaultTranslatedSchema))->getColumns());
 
-            $attributes .= "\tpublic \$translatedAttributes = [\n"
+            $attribute .= "\tpublic \$translatedAttributes = [\n"
                 . collect($fields)->map(function ($field) {
                     return "\t\t'{$field}'";
                 })->implode(",\n") . "\n"
                 . "\t]; \n";
+
+            $attributes[] = $attribute;
         }
 
-        return $attributes;
+        if ($this->getTraitResponse('addSnapshot')) {
+
+            $models = UFinder::getAllModels();
+            $snapshotSourceModel = select(
+                label: 'Select the snapshot source model?',
+                options: $models
+            );
+
+            $attribute = comment_string(
+                [
+                    'The source model for the snapshot.',
+                    '',
+                    '@var Model required',
+                ]
+            ) . "\n";
+
+            $attribute .= "\tpublic \$snapshotSourceModel = '{$snapshotSourceModel}';";
+            $attributes[] = $attribute;
+        }
+
+        return implode("\n\t", $attributes);
     }
 
     private function getSlugAttributes(): string

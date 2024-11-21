@@ -9,6 +9,8 @@ use Unusualify\Modularity\Entities\State;
 
 trait HasStateable
 {
+    public $_preserved_stateable;
+
     protected static $stateModel = 'Modules\SystemUtility\Entities\State';
 
     /**
@@ -25,37 +27,23 @@ trait HasStateable
      */
     protected $_originalFillable = null;
 
-    public function states(): \Illuminate\Database\Eloquent\Relations\MorphToMany
-    {
-
-        return $this->morphToMany(
-            static::$stateModel,
-            'stateable',
-            config('modularity.states.table', 'stateables'),
-            'stateable_id',
-            'state_id'
-        )->withPivot('is_active');
-    }
-
-    public function state(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
-    {
-        return $this->hasOneThrough(
-            static::$stateModel,  // Target model (State)
-            Stateable::class, // Intermediate table
-            'stateable_id',      // Foreign key on stateables
-            'id',                // Foreign key on states
-            'id',                // Local key on this model
-            'state_id'           // Local key on stateables
-        )
-            ->where(config('modularity.states.table', 'stateables') . '.stateable_type', get_class($this))
-            ->where(config('modularity.states.table', 'stateables') . '.is_active', 1);
-    }
-
     public static function bootHasStateable(): void
     {
+        self::saving(static function (Model $model) {
+
+            if (isset($model->_status)) {
+                //Updating the model
+                $model->_preserved_stateable = $model->_stateable;
+            }
+
+            $model->offsetUnset('_stateable');
+            $model->offsetUnset('_status');
+        });
+
         self::created(static function (Model $model) {
             $model->createNonExistantStates($model);
         });
+
         self::retrieved(static function (Model $model) {
             $state = $model->states->first(function ($state) {
                 return $state->pivot->is_active === 1;
@@ -77,31 +65,25 @@ trait HasStateable
                     $state->fill($attributes);
                 }
 
-                $model->setAttribute('_state', $state->id);
+                $model->setAttribute('_stateable', $state->id);
                 $model->setAttribute(
                     '_status',
-                    $model->previewState($state)
+                    method_exists($model, 'setStateablePreview')
+                        ? $model->setStateablePreview($state)
+                        : "<span variant='text' color='{$state->color}' prepend-icon='{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</span>"
                 );
             } else {
                 $model->setAttribute(
                     '_status',
-                    $model->previewWhenStateNull($state)
+                    method_exists($model, 'setStateablePreviewNull')
+                        ? $model->setStateablePreviewNull()
+                        : "<span variant='text' color='' prepend-icon=''>No State</span>"
                 );
             }
         });
-        self::saving(static function (Model $model) {
-
-            if (isset($model->_status)) {
-                //Updating the model
-                $model->preserved_state = $model->_state;
-            }
-
-            $model->offsetUnset('_state');
-            $model->offsetUnset('_status');
-        });
 
         self::saved(static function (Model $model) {
-            $newState = State::find($model->preserved_state);
+            $newState = State::find($model->_preserved_stateable);
             // Get current active state (if exists)
             if (is_null($newState)) {
                 return false;
@@ -134,7 +116,31 @@ trait HasStateable
 
     public function initializeHasStateable()
     {
-        $this->mergeFillable(['_state']);
+        $this->mergeFillable(['_stateable']);
+    }
+
+    public function states(): \Illuminate\Database\Eloquent\Relations\MorphToMany
+    {
+        return $this->morphToMany(
+            static::$stateModel,
+            'stateable',
+            config('modularity.states.table', 'stateables'),
+            'stateable_id',
+            'state_id'
+        )->withPivot('is_active');
+    }
+
+    public function state(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
+    {
+        return $this->hasOneThrough(
+            static::$stateModel,  // Target model (State)
+            Stateable::class, // Intermediate table
+            'stateable_id',      // Foreign key on stateables
+            'id',                // Foreign key on states
+            'id',                // Local key on this model
+            'state_id'           // Local key on stateables
+        )->where(config('modularity.states.table', 'stateables') . '.stateable_type', get_class($this))
+            ->where(config('modularity.states.table', 'stateables') . '.is_active', 1);
     }
 
     public function createNonExistantStates($model)
@@ -227,13 +233,13 @@ trait HasStateable
         ];
     }
 
-    public function previewState($state)
-    {
-        return "<span variant='text' color='{$state->color}' prepend-icon='{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</span>";
-    }
+    // public function setStateablePreview($state)
+    // {
+    //     return "<span variant='text' color='{$state->color}' prepend-icon='{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</span>";
+    // }
 
-    public function previewWhenStateNull()
-    {
-        return "<span variant='text' color='' prepend-icon=''>No State</span>";
-    }
+    // public function setStateablePreviewNull()
+    // {
+    //     return "<span variant='text' color='' prepend-icon=''>No State</span>";
+    // }
 }

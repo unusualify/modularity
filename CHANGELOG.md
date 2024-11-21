@@ -2,6 +2,68 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.19.0 - 2024-11-20
+
+### :rocket: Features
+
+- add pint command end of generating route by @OoBook in https://github.com/unusualify/modularity/commit/2b027d80facb77f769dc4bffd865fa1a61ca2869
+- prepare snapshot fields before save by @OoBook in https://github.com/unusualify/modularity/commit/30539b7b46dec40c06b8314a115f5b22d2d367f7
+- :art: add controls-position feature top/bottom and also use it on mobile by @OoBook in https://github.com/unusualify/modularity/commit/07c8481f02d26d7856d341b7a6327934607c227d
+- add controlsPosition prop to useTable by @OoBook in https://github.com/unusualify/modularity/commit/1a6541bcb25c9cb1bf32666dba375dcfda761dab
+- :art: add assignability of an array or string value into PaymentTrait by @OoBook in https://github.com/unusualify/modularity/commit/39cd9bea42c761e0e6e4453843ecb8bf340a6c42
+- :bug: add flex-wrap feature to PropertyList by @OoBook in https://github.com/unusualify/modularity/commit/36375802eef35c52bd37580b15fe4a9f1259f592
+- :art: add final form structure into StepperForm by @OoBook in https://github.com/unusualify/modularity/commit/fdee92dbc2d07e31bf44d7a1dca82bd38e3a46a4
+- add $headline root helper by @OoBook in https://github.com/unusualify/modularity/commit/e71ff251cffc00fb24201a88ac9930e048ec5b04
+- :art: put columnStyling on ConfigurableCard by @OoBook in https://github.com/unusualify/modularity/commit/90e39babc9284276c422d90e86c76552e7063037
+- :art: add morphTo filter for unspecific parents taking the type from repository by @OoBook in https://github.com/unusualify/modularity/commit/d7858f6dbcb620f05ee2181f2996bbf4e98f8f6a
+- :art: develop editable/creatable input structure with hidden/boolean cases by @OoBook in https://github.com/unusualify/modularity/commit/f5386adb12ef5433101cbdab2b9ee6f1bf660e80
+- :sparkles: add wavy border mixins by @OoBook in https://github.com/unusualify/modularity/commit/f34b0d7fb6d598e89388e845eef8576d64ab4ad2
+- :sparkles: add striped and highlighted features to comparisonTable by @OoBook in https://github.com/unusualify/modularity/commit/65322ec5719484e60c90467561c959235cf30c17
+- :sparkles: upgrade checklist component by @OoBook in https://github.com/unusualify/modularity/commit/4a627af22d77228ed834a62a6ec7676f00cb5c91
+
+### :wrench: Bug Fixes
+
+- :adhesive_bandage: add ssl link of Roboto's font family by @OoBook in https://github.com/unusualify/modularity/commit/40c5f16c761d8556bab984b1bc2190aeaae22820
+- :bug: fix table header translation when translation doesn't exist && refactor label translation by @gunesbizim in https://github.com/unusualify/modularity/commit/b1bca14418b7105e922775bfab8bbe309bffda00
+- :bug: fix responsiveness of auth pages by @gunesbizim in https://github.com/unusualify/modularity/commit/7e4118f7a7fe082119dfd4538132ab32975c44d4
+- :bug: fix responsive auth pages && auth page translations && profile translations && refactor manageForm by @gunesbizim in https://github.com/unusualify/modularity/commit/4de6ec08445a8ec6902cf49ecb8e3a781bf369da
+- add snapshot attributes on modelMakeCommand by @OoBook in https://github.com/unusualify/modularity/commit/e94b0d6df2fe7e5e7f0b2dc40de1bdc6e16a8030
+- :lipstick: change flex structure of window of stepperform by @OoBook in https://github.com/unusualify/modularity/commit/b4b414cedc735a625840d725042ee2a4cc5df6e5
+- :egg: add custom components to UEConfig by @OoBook in https://github.com/unusualify/modularity/commit/9915615fca8a19c6f7993bd1f14c09cd4e2a98c3
+- :bug: change isEditing condition as gt -1 by @OoBook in https://github.com/unusualify/modularity/commit/2c095f3ebef479c42f410016ea68d155c8faead3
+- :bug: update forgotten lodash methods by @OoBook in https://github.com/unusualify/modularity/commit/2196265b5191a650dcc7483b9b5d1f935b86bb88
+- :bug: add '|' character into pattern of $castValueMatch by @OoBook in https://github.com/unusualify/modularity/commit/bb63cf871b140c599134dabdcc4730d90f570c81
+- :ambulance: update forgotten methods of lodash by @OoBook in https://github.com/unusualify/modularity/commit/68d40735fc556e19487217a9324dc28ff56a6e0d
+- :bug: put underscore preserved_state variable due to confusion with other fillable by @OoBook in https://github.com/unusualify/modularity/commit/069eca879a83fa4fb5b7ea84a4e856d9fa68f1bc
+- :bug: put element variable on itemAction instead of null item by @OoBook in https://github.com/unusualify/modularity/commit/0e5b527b467b8a84008c69f21d3703421638b6fc
+
+### :recycle: Refactors
+
+- :sparkles: add table header translations by @gunesbizim in https://github.com/unusualify/modularity/commit/a0c489ca021a01097cfde9abe2aa28cb979f2afa
+- :recycle: refactor translateHeaders method to be more efficient by @gunesbizim in https://github.com/unusualify/modularity/commit/3a7066c94d217ea0f677913efa2506ec7f363e40
+- add new HasPriceable trait using Oobook/HasPriceable and use it traits by @OoBook in https://github.com/unusualify/modularity/commit/c13ffd04146dad92edbcc32e8422b15c0a1699c0
+- move configurableCard and propertyList components on the generics by @OoBook in https://github.com/unusualify/modularity/commit/ec7489972bc573afa4c5f08018ee2b947378f7b9
+- :recycle: change stateable preview structure by @OoBook in https://github.com/unusualify/modularity/commit/61bfb83138fd86c728a7ae40d7f4008ffcb532d6
+- :recycle: break down the Table into smaller composables by @OoBook in https://github.com/unusualify/modularity/commit/f01d226fc96417510e694169df2fd0772b467437
+- :recycle: get lodash methods with underscore by @OoBook in https://github.com/unusualify/modularity/commit/6a6d4fc6c2d4ae51c7b71c052ab2c6b222354e22
+
+### :lipstick: Styling
+
+- lint coding styles by @invalid-email-address in https://github.com/unusualify/modularity/commit/b556f10de404c6b978be6a27ddd85821e05a96c0
+
+### :white_check_mark: Testing
+
+- remove snapshots of configurable-card test by @OoBook in https://github.com/unusualify/modularity/commit/b4b539ea5ca5a60491819dd6ce196f0eb6f3573c
+
+### :package: Build
+
+- :building_construction: add new v0.19.0 build by @OoBook in https://github.com/unusualify/modularity/commit/65e6ca423af02d9ee35c64d11a2d5e31497a6adf
+
+### :beers: Other Stuff
+
+- by @OoBook in https://github.com/unusualify/modularity/commit/4d56e6f05aed373bcb6f0d566cd33810e0eeeec2
+- :technologist: add PressReleaseCardIterator as experimental by @OoBook in https://github.com/unusualify/modularity/commit/bf418a3cbaa8382435761c656fb73d7a7719d23d
+
 ## v0.18.0 - 2024-11-13
 
 ### :rocket: Features

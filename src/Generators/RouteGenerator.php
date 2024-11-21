@@ -656,6 +656,10 @@ class RouteGenerator extends Generator
                     $this->console->info("Migration of [{$name}] run.");
                 }
             }
+
+            // lint module folder with pint
+            exec("composer run-script pint modules/{$this->moduleName}");
+
         }
 
         // $this->generateRouteJsonFile();

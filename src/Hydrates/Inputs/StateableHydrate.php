@@ -25,7 +25,7 @@ class StateableHydrate extends InputHydrate
     {
         $input = $this->input;
 
-        $input['name'] = '_state';
+        $input['name'] = '_stateable';
         $input['type'] = 'select';
         $input['itemTitle'] = 'name';
         $input['itemValue'] = 'id';
@@ -33,9 +33,10 @@ class StateableHydrate extends InputHydrate
         $repository = App::make('Modules\SystemUtility\Repositories\StateRepository');
 
         $model = App::make('Modules\PressRelease\Entities\PressRelease');
-        // dd();
+
+        // TODO #Stateable - default states on the model could be array of strings, not array of objects,
+        // so create a method converting them to objects, use it in the model and call it here
         $states = $repository->getByColumnValues('code', array_column($model->default_states, 'code'));
-        // dd($states);
         $items = [];
         foreach ($states as $state) {
             array_push(
@@ -49,10 +50,5 @@ class StateableHydrate extends InputHydrate
         $input['items'] = $items;
 
         return $input;
-    }
-
-    public function createNonExistantStates()
-    {
-        //
     }
 }
