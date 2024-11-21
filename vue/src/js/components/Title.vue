@@ -67,6 +67,11 @@ const props = defineProps({
   },
   align: {
     type: String,
+    default: 'start',
+    validator: (value) => ['start', 'center', 'end'].includes(value)
+  },
+  textPosition: {
+    type: String,
     default: 'left',
     validator: (value) => ['left', 'center', 'right'].includes(value)
   },
@@ -100,7 +105,7 @@ const titleClasses = computed(() => [
   `font-weight-${props.weight}`,
   `p${props.padding}`,
   `m${props.margin}`,
-  `text-${props.align}`,
+  `text-${props.textPosition}`,
   `align-${props.align}`,
   `justify-${props.justify}`
 ]);

@@ -32,7 +32,7 @@
               </slot>
           </ue-title>
           <v-divider
-            v-if="divider">
+            v-if="hasDivider">
           </v-divider>
           <v-custom-form-base
             :id="`ue-wrapper-${id}`"
@@ -229,7 +229,7 @@ export default {
       type: Boolean,
       default: false
     },
-    divider: {
+    hasDivider: {
       type: Boolean,
       default: false
     }

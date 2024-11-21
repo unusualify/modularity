@@ -338,7 +338,7 @@
                 ref="customForm"
                 v-model="customFormModel"
                 v-bind="customFormAttributes"
-                divider="true"
+                hasDivider="true"
               >
                 <template v-slot:headerRight>
                   <v-btn class="ml-auto" variant="text" icon="$close" density="compact" color="deafult"
