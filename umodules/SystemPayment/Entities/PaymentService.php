@@ -20,6 +20,7 @@ class PaymentService extends Model
         'title',
         'is_external',
         'is_internal',
+        'button_style',
     ];
 
     /**
@@ -37,4 +38,15 @@ class PaymentService extends Model
     {
         return $this->belongsToMany(\Modules\SystemPayment\Entities\PaymentCurrency::class);
     }
+
+
+	/**
+	 * The cardTypes that belong to the PaymentService.
+	 * 
+	 */
+	public function cardTypes() : \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	{
+		return $this->belongsToMany(\Modules\SystemPayment\Entities\CardType::class);
+	}
+
 }

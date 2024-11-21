@@ -9,34 +9,56 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Modules\SystemPayment\Entities\Payment;
 use Modules\SystemPayment\Entities\PaymentService;
+use Modules\SystemPricing\Entities\Currency;
 use Oobook\Priceable\Models\Price;
 use Unusualify\Payable\Payable;
+use Unusualify\Modularity\Services\CurrencyExchangeService;
+
 
 class PriceController extends Controller
 {
+    protected $currencyService;
+
+    public function __construct(CurrencyExchangeService $currencyService)
+    {
+        $this->currencyService = $currencyService;
+    }
+
     public function pay(Request $request)
     {
         // dd(redirect());
 
         $params = $request->all();
-        // dd($params);
         $payment = null;
         $price = Price::with('currency')->find($params['price_id']);
+
+        $requestCurrency = $params['payment_service']['currency']['iso_4217'];
+
+        if($price->currency->iso_4217 != $requestCurrency){
+            $newCurrency = Currency::where('iso_4217', $requestCurrency)->first();
+            $price->currency_id = $newCurrency->id;
+
+            $price = $this->updatePrice($price,$newCurrency);
+            $price->save();
+        }
         $paymentService = null;
         if ($params['payment_service']['payment_method'] == -1) {
-            //TODO: find price with currency based on the currency get default payment service
+
             $currency = $price->currency->iso_4217;
-            // $paymentServiceName = config("modularity.default_payment_service" . ".{$currency}");
             $paymentServiceName = unusualConfig('payment.currency_services' . ".{$currency}");
             $payment = new Payable($paymentServiceName);
             $paymentService = PaymentService::where('name', $paymentServiceName)->first();
             // dd($paymentServiceName);
             Session::put('payable_payment_service', $paymentServiceName);
+
         } else {
+
             $paymentService = PaymentService::find($params['payment_service']['payment_method']);
             $payment = new Payable($paymentService->name);
             Session::put('payable_payment_service', $paymentService->name);
+
         }
+
         $user = Auth::user();
         $company = $user->company;
         // dd($company);
@@ -83,9 +105,8 @@ class PriceController extends Controller
                 'previous_url' => session('_previous.url'),
             ],
         ];
+
         $payload = array_merge_recursive_preserve($payload, $arr);
-        // dd($payload,$params);
-        // dd(session('_previous.url'));
         $resp = $payment->pay($payload);
 
         return $resp;
@@ -93,12 +114,7 @@ class PriceController extends Controller
 
     public function response(Request $request)
     {
-        // Left the variables separete incase we need data to display.
-        // $payment = Payment::find($request->id);
-        // $price = $payment->price;
-        // $priceable = $price->priceable;
-        // dd($price,$priceable);
-        // dd($request);
+
         if ($request->status == 'success') {
             return redirect(merge_url_query($request->custom_fields['previous_url'],
                 [
@@ -119,5 +135,26 @@ class PriceController extends Controller
                     ],
                 ]));
         }
+    }
+
+
+    protected function updatePrice($price, $currency){
+
+        try {
+
+            $converted = $this->currencyService->convertTo($price->display_price, mb_strtoupper($currency->iso_4217));
+            $vatPercentage = ($price->vat_amount / $price->display_price) * 100;
+
+            $price->display_price = $converted / 100;
+            $price->vat_amount = ($converted * $vatPercentage) / 100;
+            $price->price_excluding_vat = ($price->display_price - $price->vat_amount) / 100;
+            $price->price_including_vat = $price->display_price;
+
+            return $price;
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Conversion failed.'], 400);
+        }
+
     }
 }
