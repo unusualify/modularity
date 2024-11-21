@@ -4,8 +4,8 @@ namespace Modules\SystemPayment\Entities;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
-use OoBook\Priceable\Models\Currency;
-use OoBook\Priceable\Models\Price;
+use Oobook\Priceable\Models\Currency;
+use Oobook\Priceable\Models\Price;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 
 class Payment extends \Unusualify\Payable\Models\Payment
@@ -51,7 +51,7 @@ class Payment extends \Unusualify\Payable\Models\Payment
      */
     public function currencyServices(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(\Modules\SystemPayment\Entities\Currency::class);
+        return $this->belongsToMany(\Modules\SystemPayment\Entities\PaymentCurrency::class);
     }
 
     /**
@@ -59,6 +59,6 @@ class Payment extends \Unusualify\Payable\Models\Payment
      */
     public function currencies(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(\Modules\SystemPayment\Entities\Currency::class);
+        return $this->belongsToMany(\Modules\SystemPayment\Entities\PaymentCurrency::class);
     }
 }
