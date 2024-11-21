@@ -21,7 +21,7 @@ class RouteGeneratorTest extends TestCase
             ->setModule('SystemPayment');
     }
 
-    public function test_getName_method()
+    public function test_get_name_method()
     {
         $methodName = 'getName';
         $expectedResult = 'Test';
