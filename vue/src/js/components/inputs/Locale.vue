@@ -8,20 +8,7 @@
           v-bind="attributesPerLang[`${language.value}`]"
           @update:modelValue="modelUpdated($event, language.value)"
           >
-          <template v-slot:append>
-            <!-- <v-tooltip
-              location="top"
-              >
-              <template v-slot:activator>
-                <v-chip v-if="languages.length > 1" @click="updateLocale(currentLocale)">
-                  {{ displayedLocale }}
-                </v-chip>
-              </template>
-              <div>
-                {{ $t('fields.generic.switch-language') }}
-              </div>
-            </v-tooltip> -->
-
+          <template v-slot:appendx>
             <v-chip v-if="languages.length > 1" @click="updateLocale(currentLocale)">
               {{ displayedLocale }}
               <v-tooltip
@@ -30,6 +17,18 @@
                 >
                 {{ $t('fields.switch-language') }}
               </v-tooltip>
+            </v-chip>
+          </template>
+          <template v-slot:label="labelScope">
+            <!-- <slot name="label"></slot> -->
+            {{ labelScope.label }}
+            <v-chip v-if="labelScope.isActive.value || labelScope.isFocused.value" style="font-size: var(--v-field-label-scale); height: calc(var(--v-field-label-scale) * 1.5);"
+              size="x-small"
+              density="compact"
+              color="primary"
+              class="ml-1"
+            >
+              {{ displayedLocale }}
             </v-chip>
           </template>
           <slot></slot>

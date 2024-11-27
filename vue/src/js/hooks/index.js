@@ -16,7 +16,8 @@ export { default as useSidebar } from './useSidebar'
 export { default as useIterator } from './useIterator'
 export { default as useCurrencyNumber } from './useCurrencyNumber'
 export { default as useModule, makeModuleProps } from './useModule'
-
+export { default as useLocale } from './useLocale'
+// Table Hooks
 export { default as useTableItem, makeTableItemProps } from './useTableItem'
 export { default as useTableNames, makeTableNamesProps } from './useTableNames'
 export { default as useTableEndpoints, makeTableEndpointsProps } from './useTableEndpoints'

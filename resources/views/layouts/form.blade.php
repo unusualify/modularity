@@ -34,13 +34,10 @@
 
 
 @section('content')
-    <v-sheet>
-        {{-- <ue-stepper-form></ue-stepper-form> --}}
-        <ue-form
-            v-bind='@json($formAttributes)'
-            >
-        </ue-form>
-    </v-sheet>
+    <ue-form
+        v-bind='@json($formAttributes)'
+        >
+    </ue-form>
 @stop
 
 @push('head_last_js')

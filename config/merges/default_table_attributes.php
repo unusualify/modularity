@@ -3,12 +3,13 @@
 return [
     'embeddedForm' => false,
     'createOnModal' => true,
+    'class' => 'pa-3',
     'editOnModal' => true,
     'formWidth' => '60%',
     'isRowEditing' => false,
     'rowActionsType' => 'inline',
     'hideDefaultFooter' => false,
-    'tableClasses' => 'elevation-2 free-form',
+    'tableClasses' => 'elevation-2',
     'itemsPerPage' => 20,
     'hideHeaders' => false,
     'hideSearchField' => false,
@@ -52,7 +53,7 @@ return [
     ],
     'addBtnOptions' => [
         'variant' => 'flat', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
-        'color' => 'orange', // rgb(255,255,255,1) or utility colors like white, purple
+        'color' => 'secondary', // rgb(255,255,255,1) or utility colors like white, purple
         // 'elevation' => null, // string or number refers to elevation
         'prepend-icon' => 'mdi-plus', // material design icon name,
         'readonly' => false, // boolean to set the button readonly mode, can be used to disable button

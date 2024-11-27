@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex align-baseline">
     <span class="font-weight-bold">{{ text }}</span>
-    <span v-if="subText" class="text-medium-emphasis text-body-1">{{ subText }}</span>
+    <span v-if="subText" class="text-body-1">{{ subText }}</span>
   </div>
 </template>
 

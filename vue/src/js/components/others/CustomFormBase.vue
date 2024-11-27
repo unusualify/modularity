@@ -128,9 +128,9 @@
                   >
                     <!-- <v-card-title v-if="obj.schema.title">{{obj.schema.title}}</v-card-title>
                     <v-card-subtitle v-if="obj.schema.subtitle">{{obj.schema.subtitle}}</v-card-subtitle>  -->
-                    <div v-if="obj.schema.title || obj.schema.subtitle" class="mb-3">
-                      <ue-title color="black" padding="a-0" margin="b-0" transform="none" weight="bold" class="text-body-1" v-if="obj.schema.title">{{obj.schema.title}}</ue-title>
-                      <ue-title color="black" padding="a-0" margin="b-0" transform="none" weight="medium" class="text-caption" v-if="obj.schema.subtitle">{{obj.schema.subtitle}}</ue-title>
+                    <div v-if="obj.schema.noLabel !== true && (obj.schema.title || obj.schema.subtitle)" class="mb-3">
+                      <ue-title color="grey-darken-5" padding="a-0" margin="b-0" transform="none" weight="bold" class="text-body-1" v-if="obj.schema.title">{{obj.schema.title}}</ue-title>
+                      <ue-title color="grey-darken-1" padding="a-0" margin="b-4" transform="none" weight="regular" class="text-caption" v-if="obj.schema.subtitle">{{obj.schema.subtitle}}</ue-title>
                     </div>
                     <v-custom-form-base
                       :id="`${id}-${obj.key}`"
@@ -308,9 +308,7 @@
                   :attributes="obj.schema"
                   :modelValue="setValue(obj)"
                   @update:modelValue="onInput($event, obj)"
-                  >
-
-                </v-input-locale>
+                />
 
                 <!-- MASK  -->
                 <component v-else-if="obj.schema.mask"
@@ -357,11 +355,11 @@
                   @click:minute= "onEvent({type:'click'}, obj, minute)"
                   @click:second= "onEvent({type:'click'}, obj, second)"
                   @update:modelValue="onInput($event, obj)"
-                  >
-                <!-- component doesn't work with #[s]="slotData" " -->
-                <template v-for="s in getInjectedScopedSlots(id, obj)" v-slot:[s]="slotData">
-                  <slot :name= "getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, ...slotData,  model: valueIntern }"/>
-                </template>
+                >
+                  <!-- component doesn't work with #[s]="slotData" " -->
+                  <template v-for="s in getInjectedScopedSlots(id, obj)" v-slot:[s]="slotData">
+                    <slot :name= "getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, ...slotData,  model: valueIntern }"/>
+                  </template>
                 </component>
                 <!-- END DEFAULT -->
               </slot>
@@ -526,7 +524,7 @@ const second = 'second'
 // symbol on drop
 const dropEffect = 'move' // 'copy, link, move
 // Default row setting if no row-attribute defined
-const rowDefault = { noGutters: true } // { noGutters:true, justify:'center', align:'center' }
+const rowDefault = { noGutters: false } // { noGutters:true, justify:'center', align:'center' }
 
 // Default col setting, overrideable by prop col or by schema.col definition
 // Default col setting, overrideable by prop flex or by schema.flex definition (flex is DEPRECATED use col instead)

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('title');
             $table->boolean('is_external');
             $table->boolean('is_internal');
+            $table->string('button_style')->default('');
 
             // a "published" column, and soft delete and timestamps columns
             createDefaultExtraTableFields($table);

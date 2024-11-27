@@ -38,7 +38,6 @@ class CurrencyExchangeController extends Controller
             'amount' => 'required|numeric',
             'currency' => 'required|string|size:3',
         ]);
-
         try {
             $converted = $this->currencyService->convertTo($request->amount, mb_strtoupper($request->currency));
 
