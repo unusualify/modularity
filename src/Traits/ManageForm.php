@@ -44,8 +44,6 @@ trait ManageForm
 
     /**
      * getFormOptions
-     *
-     * @return array
      */
     public function getFormAttributes(): array
     {
@@ -163,21 +161,21 @@ trait ManageForm
         $name = getValueOrNull($hydrated, 'name');
         $_input = null;
 
-        if($type == 'divider' || !!$name){
-            $_input =  $this->configureInput(array_merge_recursive_preserve($default_input, $hydrated));
-            if($type == 'divider'){
+        if ($type == 'divider' || (bool) $name) {
+            $_input = $this->configureInput(array_merge_recursive_preserve($default_input, $hydrated));
+            if ($type == 'divider') {
                 $name = $type . '_' . uniqid();
                 $_input['name'] ??= $name;
             }
         }
 
-        return !!$name ? [$name => $_input] : [];
+        return (bool) $name ? [$name => $_input] : [];
 
         return isset($name)
             // ? [ $input->name => $default_input->union( $this->configureInput($input) ) ]
             // ? [ $input['name'] => array_merge_recursive_preserve( $default_input, $this->configureInput($input) ) ]
             ? [$hydrated['name'] => $this->configureInput(array_merge_recursive_preserve($default_input, $hydrated))]
-            : ($type == 'divider' ? [ $type . '_' . uniqid() => $hydrated] : []);
+            : ($type == 'divider' ? [$type . '_' . uniqid() => $hydrated] : []);
     }
 
     /**

@@ -12,13 +12,12 @@ class CreateCardTypesTable extends Migration
             // this will create an id, name field
             createDefaultTableFields($table);
             $table->string('name');
-			$table->string('card_type');
+            $table->string('card_type');
 
             // a "published" column, and soft delete and timestamps columns
             createDefaultExtraTableFields($table);
         });
 
-        
     }
 
     public function down()

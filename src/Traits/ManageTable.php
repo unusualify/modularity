@@ -250,7 +250,7 @@ trait ManageTable
                 'form' => [
                     'attributes' => [
                         'title' => [
-                            'text' =>   'PAYMENT AND INVOICES',
+                            'text' => 'PAYMENT AND INVOICES',
                             'tag' => 'div',
                             'type' => 'p',
                             'weight' => 'medium',
@@ -258,7 +258,7 @@ trait ManageTable
                             'justify' => 'left',
                             'margin' => 'a-5',
                             'color' => 'default',
-                            'classes' => 'justify-content-between'
+                            'classes' => 'justify-content-between',
                         ],
                         // 'systembar' => true,
                         'schema' => $this->createFormSchema($this->repository->getPaymentFormSchema()),
