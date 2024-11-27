@@ -1,6 +1,10 @@
 <template>
+  <!-- TODO: V2: This component and it's incoming config can be changed and can be made with RecursiveStuff -->
   <v-card :color="container.color" density="comfortable" :elevation="container.elevation" :class="container.class">
+   <!-- {{ console.log('here2') }} -->
+
     <v-card-title style="font-weight: bolder"> {{ $t("AT A GLANCE") }}</v-card-title>
+    {{ console.log(cards) }}
     <v-card-item class="px-5">
       <v-row>
         <v-col
@@ -9,11 +13,22 @@
         :cols="card.flex"
         class="px-6"
         >
-          <v-card :variant="cardAttribute.variant" :style="{'border-radius': cardAttribute.borderRadius}" :border="cardAttribute.border">
-            <v-card-title align="center" :class="cardAttribute.titleClass" :style="{'color' : cardAttribute.titleColor}">
+          <v-card
+            :variant="cardAttribute.variant"
+            :style="{'border-radius': cardAttribute.borderRadius}"
+            :border="cardAttribute.border">
+            <v-card-title
+              align="center"
+              :class="cardAttribute.titleClass"
+              :style="{'color' : cardAttribute.titleColor}">
               {{ $t(card.title) }}
             </v-card-title>
-            <v-card-item align="center" :class="cardAttribute.infoClass" :style="{'color' : cardAttribute.infoColor}">{{ card.data }}</v-card-item>
+            <v-card-item
+              align="center"
+              :class="cardAttribute.infoClass"
+              :style="{'color' : cardAttribute.infoColor}">
+              {{ card.data.items }}
+            </v-card-item>
           </v-card>
         </v-col>
       </v-row>

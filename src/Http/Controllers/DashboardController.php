@@ -69,10 +69,9 @@ class DashboardController extends BaseController
                 case 'ue-table':
                     // $controller = App::make($block['controller'])->setTableAttributes(tableOptions: $block['attributes']['tableOptions'],
                     // );
+                    // dd($block);
                     $widget = new UWidget();
-                    // dd($block['component']);
                     $widget = $widget->makeComponent($block['tag'],$block)->render();
-                    dd($widget);
 
                     // dd(change_connector_event(get_connector_event($block['connector'])));
                     // $data = init_connector($block['connector']);
@@ -84,34 +83,31 @@ class DashboardController extends BaseController
                     // $block['attributes']['items'] = $controller->getIndexData()['initialResource']->resource['data'];
                     // $block['attributes']['items'] = $data['items']->toArray();
                     $block = $widget;
+                    // dd($block['elements'][0]['attributes']['items'] = []);
+                    // $block['elements'][0]['attributes']['items'] = [];
                     // dd($block);
                     // dd($block['elements']->attributes['endpoints']);
                     // dd($this->transformRoutes($widget['elements'][0]['module']->getRouteUris($widget['elements'][0]['route'])));
-                    if(!is_array($block['elements'])){
-                        // dd($block['elements']->attributes['route']);
-                        $block['elements']->attributes['endpoints'] = array_merge($this->transformRoutes($block['elements']->attributes['module']->getRouteUris($block['elements']->attributes['route'])), $this->getUrls());
-                        $block['elements']->attributes['tableOptions']['search'] = null;
 
-                    }
-                    else{
+                    // dd($block['elements']->attributes['route']);
+                    // dd($block['elements'][0]['attributes']);
+                    $block['elements'][0]['attributes']['endpoints'] = array_merge($this->transformRoutes($block['elements'][0]['attributes']['module']->getRouteUris($block['elements'][0]['attributes']['route'])), $this->getUrls());
+                    $block['elements'][0]['attributes']['tableOptions']['search'] = null;
 
-                        $block['elements'][0]->attributes['endpoints'] = array_merge($this->transformRoutes($widget['elements'][0]['module']->getRouteUris($widget['elements'][0]['route'])), $this->getUrls());
-
-                    }
-
+                    // dd($block);
                     // dd(array_merge($block['attributes']['endpoints'], $this->getUrls()));
 
                     // $block['attributes']['rowActions'] = $controller->getTableActions();
                     // in order to keep url as default home url
-                    dd($block);
+                    // dd($block);
                     $blocks[$index] = $block;
                     // dd($block);
                     break;
-                case 'board-information-plus':
+                case 'ue-board-information-plus':
                     $cards = $block['cards'] ?? [];
                     // dd($cards);
-
-                    foreach ($cards as $key => $card) {
+                    // dd($block);
+                    // foreach ($cards as $key => $card) {
 
                         try {
                             $widget = new UWidget();
@@ -131,15 +127,16 @@ class DashboardController extends BaseController
                             // });
                             // dd($data);
                             // dd($data);
+                            // dd($widget);
                         } catch (\Throwable $th) {
                             $widget = [];
-                            // dd('here');
+                            dd($th);
                         }
-                        $card = $widget;
-                        $cards[$key] = $card;
-                    }
-                    $blocks[$index] = $cards;
 
+                        $cards = $widget;
+                    // }
+                    $blocks[$index] = $cards;
+                    // dd($blocks);
                     break;
                 default:
                     break;

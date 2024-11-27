@@ -335,7 +335,7 @@
                 </v-card>
               </template>
             </ue-modal>
-            
+
             <!-- custom form modal -->
             <ue-modal
               ref="customFormModal"
@@ -345,7 +345,7 @@
             <!-- <slot name="systembar">
               test
             </slot> -->
-            
+
               <ue-form
                 ref="customForm"
                 v-model="customFormModel"

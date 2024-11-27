@@ -9,11 +9,10 @@
           v-bind="block.attributes"
          ></component>
     </v-col> -->
-    {{ console.log(blocks) }}
     <ue-recursive-stuff
       v-for="(block, i) in blocks"
       :key="`tag-0-${i}`"
-      :configuration="block.widget"
+      :configuration="block"
     />
   </v-row>
 </template>
