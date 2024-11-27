@@ -98,10 +98,10 @@ class UWidget extends UComponent {
             }
         }
         // dd($attributes);
-        $test = $boardInformation->makeComponent($attributes['component'], $attributes['attributes']);
+        $boardInformation->makeComponent($attributes['component'], $attributes['attributes']);
 
         // dd($test);
-        return $test;
+        return $boardInformation->makeComponent($attributes['component'], $attributes['attributes']);
     }
 
     // UWidget::makeTable()->setAttributes();

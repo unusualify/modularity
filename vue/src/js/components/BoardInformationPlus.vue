@@ -4,7 +4,6 @@
    <!-- {{ console.log('here2') }} -->
 
     <v-card-title style="font-weight: bolder"> {{ $t("AT A GLANCE") }}</v-card-title>
-    {{ console.log(cards) }}
     <v-card-item class="px-5">
       <v-row>
         <v-col
