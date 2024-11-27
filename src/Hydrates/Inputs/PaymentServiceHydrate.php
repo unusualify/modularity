@@ -34,46 +34,50 @@ class PaymentServiceHydrate extends InputHydrate
         $input['default_payment_service'] = config('modularity.default_payment_service');
         $input['api'] = route('currency.convert');
 
-        $cct = $ps->where('is_internal',1)->with(['paymentCurrencies','cardTypes'])->get()->all();
+        $cct = $ps->where('is_internal', 1)->with(['paymentCurrencies', 'cardTypes'])->get()->all();
 
         $mappedData = [];
         foreach ($cct as $service) {
             foreach ($service->paymentCurrencies as $currency) {
                 $currencyCode = $currency->iso_4217 ?? '';
-                if (!$currencyCode) continue;
+                if (! $currencyCode) {
+                    continue;
+                }
 
-                if (!isset($mappedData[$currencyCode])) {
+                if (! isset($mappedData[$currencyCode])) {
                     $mappedData[$currencyCode] = [];
                 }
 
                 foreach ($service->cardTypes as $cardType) {
                     $cardInfo = [
-                        'name' => strtolower($cardType->name ?? ''),
-                        'logo' => $this->getCardLogo($cardType)
+                        'name' => mb_strtolower($cardType->name ?? ''),
+                        'logo' => $this->getCardLogo($cardType),
                     ];
 
-                    if ($cardInfo['name'] && !$this->cardExists($mappedData[$currencyCode], $cardInfo['name'])) {
+                    if ($cardInfo['name'] && ! $this->cardExists($mappedData[$currencyCode], $cardInfo['name'])) {
                         $mappedData[$currencyCode][] = $cardInfo;
                     }
                 }
             }
         }
         $input['currencyCardTypes'] = $mappedData;
+
         return $input;
 
     }
 
     private function getCardLogo($cardType)
     {
-        $logoMedia = $cardType->medias->first(function($media) {
+        $logoMedia = $cardType->medias->first(function ($media) {
             return $media->pivot->role === 'logo';
         });
+
         return $logoMedia?->uuid ?? null;
     }
 
     private function cardExists($currencyCards, $cardName)
     {
-        return collect($currencyCards)->contains(function($card) use ($cardName) {
+        return collect($currencyCards)->contains(function ($card) use ($cardName) {
             return $card['name'] === $cardName;
         });
 

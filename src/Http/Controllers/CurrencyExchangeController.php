@@ -40,6 +40,7 @@ class CurrencyExchangeController extends Controller
         ]);
         try {
             $converted = $this->currencyService->convertTo($request->amount, mb_strtoupper($request->currency));
+
             return response()->json(['converted_amount' => $converted], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Conversion failed.'], 400);
