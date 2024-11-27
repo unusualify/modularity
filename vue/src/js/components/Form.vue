@@ -23,6 +23,43 @@
         >
           {{ titleSerialized }}
           <template v-slot:right>
+
+            <!-- Input events-->
+            <template v-if="topSchema && topSchema.length">
+              <template v-for="topInput in topSchema" :key="topInput.name">
+                <v-menu
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  offset-y
+                >
+                  <template v-slot:activator="{ props }">
+                    <v-btn
+                      variant="outlined"
+                      append-icon="mdi-chevron-down"
+                      v-bind="props"
+                    >
+                      <!-- {{ topInput.label }} -->
+                      {{ getTopInputActiveLabel(topInput) }}
+                      <!-- {{ topInput.items.find(item => item[topInput.itemValue] ===  ($isset(model[topInput.name]) ? model[topInput.name] : -1))[topInput.itemTitle] ?? topInput.label }} -->
+                    </v-btn>
+                  </template>
+
+                  <v-list>
+                    <v-list-item
+                      v-for="(item, index) in topInput.items"
+                      :key="item.id"
+                      @click="model[topInput.name] = item.id"
+                    >
+                      <v-list-item-title>
+                        {{ item.name }}
+                        <v-icon v-if="$isset(model[topInput.name]) && item[topInput.itemValue] === model[topInput.name]" size="small" icon="$check" color="primary"></v-icon>
+                      </v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </template>
+            </template>
+
             <!-- Language Selector -->
             <v-chip-group
               v-if="hasTraslationInputs && languages && languages.length && languages.length > 1"
@@ -153,10 +190,11 @@
 
   import { useI18n } from 'vue-i18n'
 
-  import { getModel, getSubmitFormData, getSchema, handleInputEvents, handleEvents, getTranslationInputsCount } from '@/utils/getFormData.js'
+  import { getModel, getSubmitFormData, getSchema, handleInputEvents, handleEvents, getTranslationInputsCount, getTopSchema } from '@/utils/getFormData.js'
 
   import { redirector } from '@/utils/response'
   import { cloneDeep } from 'lodash-es'
+import { top } from '@popperjs/core'
 
   export default {
     name: 'ue-form',
@@ -286,6 +324,7 @@
 
         rawSchema: null,
         inputSchema: null,
+        topSchema: null,
         defaultItem: null,
         manualValidation: false
       }
@@ -302,14 +341,17 @@
     created () {
       this.rawSchema = this.issetSchema ? this.schema : this.$store.state.form.inputs
       this.defaultItem = this.issetSchema ? getModel(this.rawSchema) : this.$store.getters.defaultItem
-
+      __log(this.rawSchema)
       this.model = getModel(
         this.rawSchema,
         this.issetModel ? this.modelValue : this.editedItem,
         this.$store.state,
       )
       this.inputSchema = this.invokeRuleGenerator(getSchema(this.rawSchema, this.model, this.isEditing))
-      // console.log(this.inputSchema);
+      __log(this.model, this.inputSchema)
+      // this.topSchema = this.invokeRuleGenerator(getTopSchema(this.rawSchema, this.model, this.isEditing))
+      this.topSchema = getTopSchema(this.rawSchema)
+      console.log(this.topSchema);
       this.resetSchemaErrors()
     },
 
@@ -704,6 +746,11 @@
 
         //   }
         // }
+      },
+
+      getTopInputActiveLabel (topInput) {
+        const item = topInput.items.find(item => item[topInput.itemValue] ===  (this.$isset(this.model[topInput.name]) ? this.model[topInput.name] : -1))
+        return item ? item[topInput.itemTitle] : topInput.label
       }
     }
   }
