@@ -4,11 +4,16 @@
   >
     <div class="w-100">
       <div class="d-flex">
-        <ue-title v-if="label && (schema.length || Object.keys(schema).length) " :classes="['pl-0 pt-0']">
+        <ue-title v-if="label && (schema.length || Object.keys(schema).length) " :classes="['pl-0 pt-0']" color="grey-darken-5" transform="none" weight="medium">
           {{ label }}
         </ue-title>
         <slot name="append"></slot>
       </div>
+      <v-row v-if="hasHeaders" class="mb-4" no-gutters>
+        <v-col v-for="header in headers" :key="header.title" v-bind="header.col">
+          {{ header.title }}
+        </v-col>
+      </v-row>
       <div :class="['repeater__block']">
         <Draggable
           class="content__content"
@@ -80,14 +85,15 @@
       <div class="repeater__bottom mb-12">
         <div class="d-flex">
           <slot name="addButton" v-bind="{text: addButtonContent, addRepeaterBlock}">
-            <v-btn-secondary
+            <v-btn
+              variant="outlined"
               class=""
               @click="addRepeaterBlock"
               appendIcon="$add"
               v-if="schema.length || Object.keys(schema).length"
               >
               {{ addButtonContent }}
-            </v-btn-secondary>
+            </v-btn>
           </slot>
           <div class="ml-auto">
             <slot name="addButtonRight" v-bind="{}"></slot>
@@ -167,7 +173,7 @@ export default {
         &.active
           z-index: 3
           >.content__item--body
-            border: $border-width solid $border-color
+            // border: $border-width solid $border-color
             >.content__item--toolbar
               display: flex
               border-top: $border-width solid $border-color
@@ -189,7 +195,7 @@ export default {
           z-index: 2
           position: absolute
           top: -1 * $toolbar-height
-          left: -1 * $border-width
+          // left: -1 * $border-width
           transition: border 200ms ease
           height: $toolbar-height
           box-sizing: border-box

@@ -3,7 +3,7 @@
 // import { ref, watch, computed, nextTick } from 'vue'
 import { reactive, toRefs, computed } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
-import { transform, cloneDeep, filter, omit, find, isEmpty } from 'lodash-es'
+import { transform, cloneDeep, filter, omit, find, isEmpty, map, reduce } from 'lodash-es'
 import { getModel } from '@/utils/getFormData'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
@@ -70,6 +70,10 @@ export const makeRepeaterProps = propsFactory({
   autoIdGenerator: {
     type: Boolean,
     default: true
+  },
+  hasHeaders: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -87,8 +91,7 @@ export default function useRepeater (props, context) {
   }
 
   function hydrateRepeaterInput (item, index) {
-    const model = getModel(props.schema, item)
-
+    const model = getModel(state.processedSchema, item)
     return {
       ...(props.autoIdGenerator ? { id: index } : {}),
       ...transform(omit(model, []), (o, v, k) => {
@@ -107,7 +110,8 @@ export default function useRepeater (props, context) {
   function hydrateSchemas (inputs) {
     const schemas = []
     inputs.forEach((item, i) => {
-      const schema = invokeRuleGenerator(cloneDeep(props.schema))
+      const schema = invokeRuleGenerator(cloneDeep(state.processedSchema))
+
       schemas[i] = transform(schema, (schema, input, key) => {
         const _input = cloneDeep(input)
         const newName = namingRepeaterField(i, input.name)
@@ -161,9 +165,10 @@ export default function useRepeater (props, context) {
         if (isEmpty(props.schema)) {
           return []
         }
+        let rawSchema = cloneDeep(props.schema)
         const initialRepeats = hydrateRepeaterInputs(Array.isArray(modelValue.value) ? modelValue.value : [])
         if (props.min > 0 && initialRepeats.length < props.min) {
-          const schema = invokeRuleGenerator(cloneDeep(props.schema))
+          const schema = invokeRuleGenerator(rawSchema)
           initialRepeats.push(hydrateRepeaterInput(getModel(schema), 1))
         }
 
@@ -213,6 +218,23 @@ export default function useRepeater (props, context) {
         })
       })
       return slotableSchemas
+    }),
+    processedSchema: computed(() => {
+      if (props.hasHeaders) {
+        return reduce(cloneDeep(props.schema ?? {}), (acc, input, name) => {
+          __log(input, name)
+          acc[name] = omit(input, ['label'])
+
+          return acc
+        }, {})
+      }
+      return cloneDeep(props.schema ?? {})
+    }),
+    headers: map(props.schema ?? [], input => {
+      return {
+        title: input.label || __headline(input.name),
+        col: input.col
+      }
     }),
 
     addButtonContent: computed(() => {
