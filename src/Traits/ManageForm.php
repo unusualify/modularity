@@ -12,6 +12,16 @@ use Unusualify\Modularity\Support\Finder;
 
 trait ManageForm
 {
+    /**
+     * @var array
+     */
+    protected $defaultFormAttributes = [];
+
+    /**
+     * @var array
+     */
+    protected $formAttributes = [];
+
     protected $formSchema;
 
     protected $inputTypes = [];
@@ -23,6 +33,33 @@ trait ManageForm
         $this->inputTypes = unusualConfig('input_types', []);
         $this->module = Modularity::find($this->moduleName);
         $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+    }
+
+    protected function __afterConstructManageForm($app, $request)
+    {
+        $this->defaultFormAttributes = (array) Config::get(unusualBaseKey() . '.default_form_attributes');
+
+        $this->formAttributes = array_merge_recursive_preserve($this->getFormAttributes(), $this->formAttributes ?? []);
+    }
+
+    /**
+     * getFormOptions
+     *
+     * @return array
+     */
+    public function getFormAttributes(): array
+    {
+        if ((bool) $this->config) {
+            try {
+                return Collection::make(
+                    array_merge_recursive_preserve($this->defaultFormAttributes, object_to_array($this->getConfigFieldsByRoute('form_options', [])))
+                )->toArray();
+            } catch (\Throwable $th) {
+                return [];
+            }
+        }
+
+        return [];
     }
 
     protected function addWithsManageForm(): array
