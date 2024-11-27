@@ -95,15 +95,16 @@ class ProfileController extends BaseController
                 UComponent::makeUeForm()
                     ->setAttributes([
                         'class' => 'mb-6',
+                        'formClass' => 'elevation-2 rounded',
                         'title' => [
                             'text' => __('Personal Information'),
                             'tag' => 'p',
-                            'type' => 'h5',
+                            'type' => 'h6',
                             'weight' => 'bold',
                             'transform' => '',
                             'align' => 'center',
                             'justify' => 'left',
-                            'margin' => 'y-8',
+                            // 'margin' => 'b-11',
                         ],
                         'buttonText' => 'Update',
                         'hasSubmit' => true,
@@ -120,15 +121,17 @@ class ProfileController extends BaseController
                     ]),
                 UComponent::makeUeForm()
                     ->setAttributes([
+                        'formClass' => 'elevation-2 rounded',
+                        'class' => 'rounded',
                         'title' => [
                             'text' => __('Update Password'),
                             'tag' => 'p',
-                            'type' => 'h5',
+                            'type' => 'h6',
                             'weight' => 'bold',
                             'transform' => '',
                             'align' => 'center',
                             'justify' => 'left',
-                            'margin' => 'y-8',
+                            // 'margin' => 'y-6',
                         ],
                         'buttonText' => 'Update',
                         'hasSubmit' => true,
@@ -146,150 +149,6 @@ class ProfileController extends BaseController
         ];
 
         if ($user->company) {
-            $companySchema = $this->createFormSchema([
-                // 'country_id' => [
-                //     "type" => "select",
-                //     "name" => "country_id",
-                //     "label" => "Country",
-                //     "default" => "",
-                //     "cascade" => "city_id",
-                //     'col' => [
-                //         'cols' => 6,
-                //         'xxl' => 6,
-                //         'xl' => 6,
-                //         'lg' => 6,
-                //     ],
-                //     'itemValue' => 'value',
-                //     'itemTitle' => 'text',
-                //     'items' => [
-                //         [
-                //             'value' => 1,
-                //             'text' => 'Germany',
-                //             'items' => [
-                //                 [
-                //                     "value" => 1,
-                //                     "text" => 'Berlin',
-                //                     'items' => [
-                //                         [
-                //                             'value' => 1,
-                //                             'text' => 'Mitte',
-                //                         ],
-                //                         [
-                //                             'value' => 2,
-                //                             'text' => 'Pankow',
-                //                         ],
-                //                     ]
-                //                 ],
-                //                 [
-                //                     "value" => 2,
-                //                     "text" => 'Munchen',
-                //                     'items' => [
-                //                         [
-                //                             'value' => 3,
-                //                             'text' => 'Altstadt',
-                //                         ],
-                //                         [
-                //                             'value' => 4,
-                //                             'text' => 'Bogenhausen',
-                //                         ],
-                //                     ]
-                //                 ],
-                //             ]
-                //         ],
-                //         [
-                //             'value' => 2,
-                //             'text' => 'France',
-                //             'items' => [
-                //                 [
-                //                     "value" => 3,
-                //                     "text" => 'Nantes',
-                //                     'items' => [
-                //                         [
-                //                             'value' => 5,
-                //                             'text' => 'Malakoff',
-                //                         ],
-                //                         [
-                //                             'value' => 6,
-                //                             'text' => 'Bouffay',
-                //                         ],
-                //                     ]
-                //                 ],
-                //                 [
-                //                     "value" => 4,
-                //                     "text" => 'Bordeaux',
-                //                     'items' => [
-                //                         [
-                //                             'value' => 7,
-                //                             'text' => 'Tere',
-                //                         ],
-                //                         [
-                //                             'value' => 8,
-                //                             'text' => 'Bhausen',
-                //                         ],
-                //                     ]
-                //                 ],
-                //             ]
-                //         ],
-                //         [
-                //             'value' => 3,
-                //             'text' => 'Italy',
-                //             'items' => [
-                //                 [
-                //                     "value" => 5,
-                //                     "text" => 'Milano'
-                //                 ],
-                //                 [
-                //                     "value" => 6,
-                //                     "text" => 'Venice'
-                //                 ]
-                //             ]
-                //         ]
-                //     ],
-                //     'rules' => [
-                //         // ['email']
-                //     ]
-                // ],
-                // 'city_id' => [
-                //     "type" => "select",
-                //     "name" => "city_id",
-                //     "parent" => "country_id",
-                //     "cascade" => "district_id",
-                //     "label" => "City",
-                //     "default" => "",
-                //     'col' => [
-                //         'cols' => 6,
-                //         'xxl' => 6,
-                //         'xl' => 6,
-                //         'lg' => 6,
-                //     ],
-                //     'itemValue' => 'value',
-                //     'itemTitle' => 'text',
-                //     // 'items' => 'country_id.items',
-                //     'items' => [],
-                //     'rules' => [
-                //         // ['email']
-                //     ]
-                // ],
-                // 'district_id' => [
-                //     "type" => "select",
-                //     "name" => "district_id",
-                //     "label" => "District",
-                //     "default" => "",
-                //     'col' => [
-                //         'cols' => 6,
-                //         'xxl' => 6,
-                //         'xl' => 6,
-                //         'lg' => 6,
-                //     ],
-                //     'itemValue' => 'value',
-                //     'itemTitle' => 'text',
-                //     // 'items' => 'country_id.items',
-                //     'items' => [],
-                //     'rules' => [
-                //         // ['email']
-                //     ]
-                // ],
-            ]);
             $companySchema = $this->createFormSchema(getFormDraft('company'));
             $companyFields = $this->companyRepository->getFormFields(auth()->user()->company, $companySchema);
 
@@ -302,15 +161,16 @@ class ProfileController extends BaseController
                 'content' => [
                     UComponent::makeUeForm()
                         ->setAttributes([
+                            'formClass' => 'elevation-2 rounded',
                             'title' => [
                                 'text' => __('Company Information'),
                                 'tag' => 'p',
-                                'type' => 'h5',
+                                'type' => 'h6',
                                 'weight' => 'bold',
                                 'transform' => '',
                                 'align' => 'center',
                                 'justify' => 'left',
-                                'margin' => 'y-8',
+                                // 'margin' => 'y-6',
                             ],
                             // 'editable' => true,
                             'buttonText' => 'Update',
@@ -335,6 +195,7 @@ class ProfileController extends BaseController
         $data['elements'] = [
             UWrapper::makeGridSection($sectionFields),
         ];
+        // dd($data);
         $data['endpoints'] = $this->getUrls();
 
         $view = "$this->baseKey::layouts.profile";

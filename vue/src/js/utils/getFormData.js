@@ -176,6 +176,22 @@ export const getModel = (inputs, item = null, rootState = null) => {
   return values
 }
 
+export const getTranslationInputsCount = (inputs) => {
+  return getTranslationInputs(inputs).length
+}
+
+export const getTranslationInputs = (inputs, acc = []) => {
+  return _.reduce(inputs, (acc, input) => {
+    if(__isset(input) && __isset(input.schema) && ['wrap', 'group', 'repeater', 'input-repeater'].includes(input.type)){
+      acc = getTranslationInputs(input.schema, acc)
+    } else if(Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated)
+      acc.push(input)
+
+    return acc
+    // return Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated
+  }, acc)
+}
+
 export const getSubmitFormData = (inputs, item = null, rootState = null) => {
   inputs = processInputs(inputs)
 

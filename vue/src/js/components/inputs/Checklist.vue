@@ -249,7 +249,7 @@ export default {
       return [
         this.checkboxOnRight ? 'd-flex align-center pl-4 pr-1 rounded-sm' : '',
         this.checkboxOnRight && isSelected ? 'checked' : '',
-        this.checkboxOnRight && this.checkboxHighlighted && isSelected ? 'bg-grey-lighten-4 text-primary font-weight-bold' : ''
+        this.checkboxOnRight && this.checkboxHighlighted && isSelected ? 'bg-grey-lighten-5 text-primary font-weight-bold' : ''
       ];
     },
     getCheckboxClasses(item) {
@@ -257,7 +257,7 @@ export default {
       return [
         this.checkboxOnLeft ? 'rounded-sm' : '',
         this.checkboxOnLeft && isSelected ? 'checked' : '',
-        this.checkboxOnLeft && this.checkboxHighlighted && isSelected ? 'bg-grey-lighten-4 text-primary font-weight-bold' : ''
+        this.checkboxOnLeft && this.checkboxHighlighted && isSelected ? 'bg-grey-lighten-5 text-primary font-weight-bold' : ''
       ];
     }
   },

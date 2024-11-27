@@ -1,43 +1,59 @@
 <template>
-  <v-sheet>
+  <div :class="fillHeight ? '' : ''"
+    :style="{height: fillHeight ? ($vuetify.display.mdAndDown ? `calc(97vh - 64px)` : `calc(97vh)` ) : ''}">
     <v-form
       :id="id"
       :ref="reference"
       :action="actionUrl"
       method="POST"
-      :class="formClass"
       v-model="validModel"
       @submit="submit"
+      :class="formClasses"
       >
       <input v-if="!async" type="hidden" name="_token" :value="csrf"/>
 
-      <v-sheet class="d-flex">
-        <v-sheet class="w-100">
-          <!-- <div class="text-h8 pt-5 pb-10 text-primary font-weight-bold" v-if="formTitle && false">
-            {{ ($te(formTitle) ? $t(formTitle).toLocaleUpperCase($i18n.locale.toUpperCase()) : formTitle.toLocaleUpperCase($i18n.locale.toUpperCase())) }}
-          </div> -->
-          <ue-title
-            v-if="title"
-            :classes="['px-0']"
-            v-bind="titleOptions"
-          >
-                {{  titleSerialized }}
-              <slot name="headerRight">
-                <!-- <v-btn
-                    class=""
-                    variant="text"
-                    icon="$close"
-                    density="compact"
-                  ></v-btn> -->
-              </slot>
-          </ue-title>
-          <v-divider
-            v-if="hasDivider">
-          </v-divider>
+      <!-- Header Section -->
+      <div :class="[(hasDivider || title) ? 'pb-6' : '', scrollable ? 'flex-grow-0' : '']">
+        <ue-title
+          v-if="title"
+          padding="b-3"
+          color="grey-darken-5"
+          align="center"
+          v-bind="titleOptions"
+        >
+          {{ titleSerialized }}
+          <template v-slot:right>
+            <!-- Language Selector -->
+            <v-chip-group
+              v-if="hasTraslationInputs && languages && languages.length && languages.length > 1"
+              :modelValue="currentLocale.value"
+              @update:modelValue="updateLocale($event)"
+              selected-class="bg-primary"
+              mandatory
+            >
+              <v-chip
+                v-for="language in languages"
+                :key="language.value"
+                :text="language.shortlabel"
+                :value="language.value"
+                variant="outlined"
+              ></v-chip>
+            </v-chip-group>
+            <slot name="headerRight">
+
+            </slot>
+          </template>
+        </ue-title>
+
+        <v-divider v-if="hasDivider"></v-divider>
+      </div>
+
+      <!-- Scrollable Content Section -->
+      <div :class="['d-flex', scrollable ? 'flex-grow-1 overflow-hidden mr-n5' : '']">
+        <div :class="['w-100', scrollable ? 'overflow-y-auto pr-3' : '']"
+        >
           <v-custom-form-base
             :id="`ue-wrapper-${id}`"
-            class="pt-4"
-
             v-model="model"
             v-model:schema="inputSchema"
             :row="rowAttribute"
@@ -88,60 +104,43 @@
               </span>
             </template> -->
           </v-custom-form-base>
-        </v-sheet>
-        <div v-if="hasStickyFrame"
-          class="d-flex flex-column mx-5"
-          style="position:sticky;"
-          >
-          <div class="d-flex flex-column align-items-center ml-auto mr-auto" style="position:sticky;top:100px;">
-            <slot v-if="hasSubmit && stickyButton" name="submit"
-              v-bind="{
-                validForm: validModel || !serverValid,
-                buttonDefaultText
-              }"
-              >
-              <v-btn type="submit" :disabled="!(validModel || !serverValid)" class="ml-auto">
-                {{ buttonDefaultText }}
-              </v-btn>
-            </slot>
-            <slot name="stickyBody" :attrs="{}">
-              <!-- <v-card class="mt-6" height="">
-                      <div>
-                          <v-icon>mdi-camera</v-icon>
-                          <h3>Upload</h3>
-                      </div>
-              </v-card> -->
-            </slot>
-          </div>
-          <!-- <v-spacer></v-spacer> -->
         </div>
-      </v-sheet>
-      <v-sheet class="d-flex pt-6" v-if="hasSubmit && !stickyButton">
-        <slot name="submit"
-          v-bind="{
-            validForm: validModel || !serverValid,
-            buttonDefaultText
-          }">
-          <v-btn type="submit" :disabled="!(validModel || !serverValid) || loading" class="ml-auto mb-5">
-            {{ buttonDefaultText }}
-          </v-btn>
-        </slot>
-      </v-sheet>
+        <!-- Sticky Frame Section -->
 
-      <v-sheet  v-if="hasSubmit && !stickyButton">
-        <v-progress-linear
-          v-if="loading"
-          indeterminate
-          color="green"
-        />
-      </v-sheet>
+      </div>
 
-      <v-sheet class="">
-        <slot name="bottom" v-bind="{}"></slot>
-      </v-sheet>
+      <!-- <v-spacer></v-spacer> -->
+
+      <!-- Footer Section -->
+      <div :class="[scrollable ? 'flex-grow-0' : '']">
+        <v-divider v-if="hasSubmit && !stickyButton && hasDivider" class="mt-6"></v-divider>
+        <div class="d-flex pt-6" v-if="hasSubmit && !stickyButton">
+          <slot name="submit"
+            v-bind="{
+              validForm: validModel || !serverValid,
+              buttonDefaultText
+            }">
+            <v-btn type="submit" :disabled="!(validModel || !serverValid) || loading" class="ml-auto mb-5">
+              {{ buttonDefaultText }}
+            </v-btn>
+          </slot>
+        </div>
+
+        <div v-if="hasSubmit && !stickyButton">
+          <v-progress-linear
+            v-if="loading"
+            indeterminate
+            color="green"
+          />
+        </div>
+
+        <div class="ue-form__bottom">
+          <slot name="bottom" v-bind="{}"></slot>
+        </div>
+      </div>
 
     </v-form>
-  </v-sheet>
+  </div>
 </template>
 
 <script>
@@ -150,11 +149,11 @@ import { mapState } from 'vuex'
 import { FORM, ALERT } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
 import api from '@/store/api/form'
-import { useInputHandlers, useValidation } from '@/hooks'
+import { useInputHandlers, useValidation, useLocale } from '@/hooks'
 
 import { useI18n } from 'vue-i18n'
 
-import { getModel, getSubmitFormData, getSchema, handleInputEvents, handleEvents } from '@/utils/getFormData.js'
+import { getModel, getSubmitFormData, getSchema, handleInputEvents, handleEvents, getTranslationInputsCount } from '@/utils/getFormData.js'
 
 import { redirector } from '@/utils/response'
 import { cloneDeep } from 'lodash-es'
@@ -175,7 +174,7 @@ export default {
     },
     formClass: {
       type: [Array, String],
-      default: 'px-6 pb-6'
+      default: ''
     },
     actionUrl: {
       type: String
@@ -212,7 +211,8 @@ export default {
       type: Object,
       default () {
         return {
-          noGutters: false
+          noGutters: false,
+          class: 'py-4',
           // justify:'center',
           // align:'center'
         }
@@ -224,7 +224,10 @@ export default {
         return {}
       }
     },
-    valid: null,
+    valid: {
+      type: Boolean,
+      default: null
+    },
     isEditing: {
       type: Boolean,
       default: false
@@ -232,11 +235,28 @@ export default {
     hasDivider: {
       type: Boolean,
       default: false
+    },
+    fillHeight: {
+      type: Boolean,
+      default: false
+    },
+    scrollable: {
+      type: Boolean,
+      default: false
+    },
+    noDefaultFormPadding: {
+      type: Boolean,
+      default: false
+    },
+    noDefaultSurface: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
     const inputHandlers = useInputHandlers()
     const validations = useValidation(props)
+    const locale = useLocale()
 
     const { t, te } = useI18n({ useScope: 'global' })
 
@@ -246,6 +266,7 @@ export default {
     return {
       ...inputHandlers,
       ...validations,
+      ...locale,
       buttonDefaultText
     }
   },
@@ -343,6 +364,17 @@ export default {
   },
 
   computed: {
+    hasTraslationInputs () {
+      return getTranslationInputsCount(this.rawSchema) > 0
+    },
+    formClasses () {
+      return [
+        this.noDefaultFormPadding ? '' : 'px-6 py-6',
+        this.noDefaultSurface ? '' : 'bg-surface',
+        this.fillHeight ? 'd-flex flex-column h-100' : '',
+        this.formClass,
+      ]
+    },
     formSlots () {
       const slots = []
 
@@ -674,10 +706,10 @@ export default {
       // }
     }
   }
-
 }
 </script>
 
-<style>
+<style lang="sass" scoped>
+
 
 </style>

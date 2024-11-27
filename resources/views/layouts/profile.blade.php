@@ -24,7 +24,7 @@
 
 {{-- @dd($elements) --}}
 @section('content')
-    <div>
+    <div class="pa-3">
         @foreach ($elements as $i => $context)
             <ue-recursive-stuff
                 :configuration='@json($context)'

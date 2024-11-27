@@ -524,7 +524,7 @@ const second = 'second'
 // symbol on drop
 const dropEffect = 'move' // 'copy, link, move
 // Default row setting if no row-attribute defined
-const rowDefault = { noGutters: true } // { noGutters:true, justify:'center', align:'center' }
+const rowDefault = { noGutters: false } // { noGutters:true, justify:'center', align:'center' }
 
 // Default col setting, overrideable by prop col or by schema.col definition
 // Default col setting, overrideable by prop flex or by schema.flex definition (flex is DEPRECATED use col instead)
