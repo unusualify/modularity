@@ -213,8 +213,7 @@ trait HasStateable
                 ]);
             }
 
-            $existingState = State::where('code', $state['code'])->first();
-            $_state = $existingState ?? State::create($state);
+            $_state = State::where('code', $state['code'])->first() ?? State::create($state);
 
             $isActive = $state['code'] === $initialState['code'];
             $model->states()->attach($_state->id, ['is_active' => $isActive]);
