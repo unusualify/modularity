@@ -664,20 +664,16 @@
         const result = await formRef.value[0].validate()
         formRef.value[0].manualValidation = false
 
-      return result
-    },
-    handleFinalFormAction(index) {
-      const data = this.previewFormData[index]
+        return result
+      },
+      handleFinalFormAction(index) {
+        const data = this.previewFormData[index]
+        const fieldArray = this.lastStepModel[data.fieldName];
 
-      if (this.lastStepModel[data.fieldName].includes(data.id)) {
-        // Create a new array to trigger reactivity
-        this.lastStepModel[data.fieldName] =
-          this.lastStepModel[data.fieldName].filter((id) => id !== data.id)
-      } else {
-        // Create a new array to trigger reactivity
-        this.lastStepModel[data.fieldName] =
-          [...this.lastStepModel[data.fieldName], data.id]
-      }
+        // Check if the id exists in the array and toggle it
+        this.lastStepModel[data.fieldName] = fieldArray.includes(data.id)
+          ? fieldArray.filter((id) => id !== data.id)
+          : [...fieldArray, data.id];
 
         // Force reactivity by creating a new reference
         this.lastStepModel = { ...this.lastStepModel };
@@ -708,33 +704,36 @@
           data[index] = this.$getDisplayData(this.schemas[index], this.models[index])
         }
 
-      return data
-    },
-    formattedSummary(){
-      let formatteds = NotationUtil.formattedSummary(this.displayInfo, this.summaryNotations)
-      let previewFormData = this.previewFormData
-      let lastStepModel = this.lastStepModel
+        return data
+      },
+      formattedSummary(){
+        let formatteds = NotationUtil.formattedSummary(this.displayInfo, this.summaryNotations)
+        let previewFormData = this.previewFormData
+        let lastStepModel = this.lastStepModel
 
-      const lastStepSelections = reduce(lastStepModel, function(acc, data, key){
-        const selected = find(previewFormData, (item) => data.includes(item.id) && item.fieldName === key)
-        if(selected){
-          acc.push(selected)
-        }
-        return acc
-      }, [])
+        const lastStepSelections = reduce(lastStepModel, function(acc, data, key){
+          let _data = Array.isArray(data) ? data : [data]
 
-
-      if(lastStepSelections.length > 0){
-        formatteds['lastStepSelections'] = {
-          title: this.finalFormTitle,
-          values: map(lastStepSelections, (data) => {
-            return {
-              title: data.name || data.title || 'N/A',
-              value: data.base_price_show || 'N/A',
+          each(_data, (id) => {
+            const selected = find(previewFormData, (item) => item.id === id && item.fieldName === key)
+            if(selected){
+              acc.push(selected)
             }
-          }),
+          })
+          return acc
+        }, [])
+
+        if(lastStepSelections.length > 0){
+          formatteds['lastStepSelections'] = {
+            title: this.finalFormTitle,
+            values: map(lastStepSelections, (data) => {
+              return {
+                title: data.name || data.title || 'N/A',
+                value: data.base_price_show || 'N/A',
+              }
+            }),
+          }
         }
-      }
 
         return formatteds
       },
