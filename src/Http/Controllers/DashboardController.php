@@ -11,6 +11,7 @@ use Modules\Webinar\Repositories\VimeoWebinarRepository;
 // use Modules\PressRelease\Entities\PressRelease;
 // use Modules\PressRelease\Repositories\PressReleaseRepository;
 use Unusualify\Modularity\Entities\Enums\Permission;
+use Unusualify\Modularity\Services\View\UWidget;
 use Unusualify\Modularity\Traits\ManageUtilities;
 
 class DashboardController extends BaseController
@@ -65,35 +66,57 @@ class DashboardController extends BaseController
 
         foreach ($blocks as $index => $block) {
             switch ($block['component']) {
-                case 'table':
+                case 'ue-table':
                     // $controller = App::make($block['controller'])->setTableAttributes(tableOptions: $block['attributes']['tableOptions'],
                     // );
-                    $data = $this->initConnector($block['connector']);
+                    $widget = new UWidget();
+                    // dd($block['component']);
+                    $widget = $widget->makeComponent($block['tag'],$block)->render();
+                    dd($widget);
+
+                    // dd(change_connector_event(get_connector_event($block['connector'])));
+                    // $data = init_connector($block['connector']);
                     // dd($data);
                     // dd(
                     //     $controller->getIndexData()['initialResource']->resource['data'],
                     //     $data
                     // );
                     // $block['attributes']['items'] = $controller->getIndexData()['initialResource']->resource['data'];
-                    $block['attributes']['items'] = $data['items']->toArray();
-                    $block['attributes']['endpoints'] = array_merge($this->transformRoutes($data['module']->getRouteUris($data['route'])), $this->getUrls());
+                    // $block['attributes']['items'] = $data['items']->toArray();
+                    $block = $widget;
+                    // dd($block);
+                    // dd($block['elements']->attributes['endpoints']);
+                    // dd($this->transformRoutes($widget['elements'][0]['module']->getRouteUris($widget['elements'][0]['route'])));
+                    if(!is_array($block['elements'])){
+                        // dd($block['elements']->attributes['route']);
+                        $block['elements']->attributes['endpoints'] = array_merge($this->transformRoutes($block['elements']->attributes['module']->getRouteUris($block['elements']->attributes['route'])), $this->getUrls());
+                        $block['elements']->attributes['tableOptions']['search'] = null;
+
+                    }
+                    else{
+
+                        $block['elements'][0]->attributes['endpoints'] = array_merge($this->transformRoutes($widget['elements'][0]['module']->getRouteUris($widget['elements'][0]['route'])), $this->getUrls());
+
+                    }
+
                     // dd(array_merge($block['attributes']['endpoints'], $this->getUrls()));
 
                     // $block['attributes']['rowActions'] = $controller->getTableActions();
                     // in order to keep url as default home url
-
-                    $block['attributes']['tableOptions']['search'] = null;
+                    dd($block);
                     $blocks[$index] = $block;
-
+                    // dd($block);
                     break;
                 case 'board-information-plus':
                     $cards = $block['cards'] ?? [];
                     // dd($cards);
 
                     foreach ($cards as $key => $card) {
-                        $data = $this->initConnector($card['connector']);
+
                         try {
-                            $data = $this->initConnector($card['connector']);
+                            $widget = new UWidget();
+                            // dd('here');
+                            $widget = $widget->makeComponent($block['tag'],$block)->render();
                             // dd($data);
                             // $repository = App::make($card['repository']);
                             // $data = array_reduce(explode('|', $card['method']), function ($s, $a) use ($repository) {
@@ -109,13 +132,13 @@ class DashboardController extends BaseController
                             // dd($data);
                             // dd($data);
                         } catch (\Throwable $th) {
-                            $data = '-';
+                            $widget = [];
                             // dd('here');
                         }
-                        $card['data'] = $data['items'];
+                        $card = $widget;
                         $cards[$key] = $card;
                     }
-                    $blocks[$index]['attributes']['cards'] = $cards;
+                    $blocks[$index] = $cards;
 
                     break;
                 default:
@@ -125,7 +148,7 @@ class DashboardController extends BaseController
         }
 
         $options = ['blocks' => $blocks];
-
+        // dd($blocks);
         // dd($data['blocks']);
         $view = "$this->baseKey::layouts.dashboard";
 

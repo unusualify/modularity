@@ -109,11 +109,14 @@ export default {
         funcs = value
       }
 
-      if (isObject(value)
-      // || (isArray(value) && !__isString(value[0]))
+      if (isObject(value) || (isArray(value)
+      //&& !__isString(value[0])
+      )
       ) {
       } else {
-        // __log(_value, value)
+        // __log(object, key, _value, value)
+        // __log(isObject(_value), isObject(value))
+
         const matches = _value.match(castPattern)
 
         if (matches) {
