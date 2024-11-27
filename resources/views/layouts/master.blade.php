@@ -53,7 +53,7 @@
                         ></v-alert>
                     </template>
                 @endif
-                <div id="ue-main-body" class="ue--main-container pa-6 h-100">
+                <div id="ue-main-body" class="ue--main-container pa-3 h-100">
 
                     @yield('content')
 

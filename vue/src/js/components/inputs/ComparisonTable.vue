@@ -200,6 +200,11 @@
   $borderWidth: 1px
   $borderColor: rgba(var(--v-theme-primary), .7 )
   $stripedColor: rgba(var(--v-theme-primary), .1 )
+
+  .v-table
+    --v-table-header-height: 50px
+    --v-table-row-height: 40px
+
   .v-input-comparison-table
     .v-input__control
       display: block
@@ -221,9 +226,10 @@
                   border-top: $borderWidth solid $borderColor !important
                   border-top-left-radius: 8px !important
                   border-top-right-radius: 8px !important
+                  border-bottom: $borderWidth solid $borderColor !important
                   // +smooth-wave-border( $position: bottom, $wave-height: 5px, $color: rgba(var(--v-theme-primary), 1), $border-width: 1px )
                   // +wavy-border( $position: bottom, $wave-height: 15px, $wave-width: 50%,$border-width: 1px ,$color: rgba(var(--v-theme-primary), 1))
-                  +sine-wave-border( $position: bottom, $wave-height: 20px,$color: $borderColor, $border-width: 1px, $amplitude: 4, $height: 25px, $phase: -5)
+                  // +sine-wave-border( $position: bottom, $wave-height: 20px,$color: $borderColor, $border-width: 1px, $amplitude: 4, $height: 25px, $phase: -5)
             > td, th
               border-bottom: unset !important
               &:not(:first-child)

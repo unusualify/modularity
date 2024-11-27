@@ -335,17 +335,13 @@
                 </v-card>
               </template>
             </ue-modal>
-            
+
             <!-- custom form modal -->
             <ue-modal
               ref="customFormModal"
               v-model="customFormModalActive"
               :width-type="'lg'"
             >
-            <!-- <slot name="systembar">
-              test
-            </slot> -->
-            
               <ue-form
                 ref="customForm"
                 v-model="customFormModel"
@@ -403,6 +399,7 @@
                               @click="itemAction(element, action)"
                               v-bind="props"
                               :text="action.forceLabel ? $t( action.label ?? $headline(action.name) ) : null"
+                              class="text-capitalize"
                             />
                           </template>
                         </v-tooltip>
@@ -453,7 +450,7 @@
                 <v-btn
                   :key="i"
                   v-bind="props"
-                  class="pa-0 justify-start"
+                  class="pa-0 justify-start text-capitalize"
                   variant="plain"
                   :color="`primary darken-1`"
                   @click="itemAction(item, ...col.formatter)"

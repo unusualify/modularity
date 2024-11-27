@@ -31,6 +31,8 @@
                 v-model="models[item.id]"
                 :schema="schemas[item.id]"
                 v-model:valid="valids[i]"
+                noDefaultFormPadding
+                class="pt-3"
                 />
             </v-window-item>
           </v-window>
