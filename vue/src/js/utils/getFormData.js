@@ -13,7 +13,7 @@ const isArrayable = 'input-treeview|treeview|input-checklist|input-repeater|inpu
 
 export const getSchema = (inputs, model = null, isEditing = false) => {
   let _inputs = _.omitBy(inputs, (value, key) => {
-    return Object.prototype.hasOwnProperty.call(value, 'slotable')
+    return Object.prototype.hasOwnProperty.call(value, 'slotable') || isTopEventInput(value)
   })
 
   if (_.find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'wrap'))) {
@@ -174,6 +174,10 @@ export const getModel = (inputs, item = null, rootState = null) => {
   }
 
   return values
+}
+
+export const getTopSchema = (inputs) => {
+  return _.filter(inputs, (input) => isTopEventInput(input))
 }
 
 export const getTranslationInputsCount = (inputs) => {
@@ -467,6 +471,10 @@ const slugify = (newValue) => {
   }
 
   return filters.slugify(text)
+}
+
+const isTopEventInput = (input) => {
+  return Object.prototype.hasOwnProperty.call(input, 'topEvent') && input.topEvent && ['select', 'autocomplete', 'combobox'].includes(input.type)
 }
 
 const FormatFuncs = {

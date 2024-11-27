@@ -433,6 +433,7 @@
                   </div>
                 </template>
               </component>
+              <v-divider v-if="i < items.length - 1" />
             </v-col>
           </v-row>
         </template>
