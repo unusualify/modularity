@@ -255,7 +255,7 @@ class LoginController extends Controller
                             'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'my-5 custom-auth-button',
+                                'class' => 'mt-5 mb-2 custom-auth-button',
                                 'density' => 'default',
                             ],
                             'slots' => [
@@ -275,7 +275,7 @@ class LoginController extends Controller
                             'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'my-5 custom-auth-button',
+                                'class' => 'my-2 custom-auth-button',
                                 'density' => 'default',
                             ],
                             'slots' => [
@@ -295,7 +295,7 @@ class LoginController extends Controller
                             'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route('admin.register.form'),
-                                'class' => 'my-5 custom-auth-button',
+                                'class' => 'my-2 custom-auth-button',
                                 'density' => 'default',
 
                             ],
