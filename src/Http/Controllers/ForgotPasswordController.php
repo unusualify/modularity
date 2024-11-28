@@ -176,7 +176,7 @@ class ForgotPasswordController extends Controller
                             'elements' => ___('authentication.create-an-account'),
                             'attributes' => [
                                 'variant' => 'outlined',
-                                'href' => route(Route::hasAdmin('login.form')),
+                                'href' => route(Route::hasAdmin('register.form')),
                                 'class' => 'my-2 custom-auth-button',
                                 'density' => 'default',
                                 'color' => 'gray-lighten-1'
