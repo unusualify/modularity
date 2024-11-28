@@ -56,7 +56,7 @@
             <div class="mw-420">
               <ue-svg-icon symbol="main-logo" class="mx-0 "></ue-svg-icon>
 
-              <h2 class="text-white mt-5 text-h4 custom-mb-8rem">
+              <h2 class="text-white mt-5 text-h4 custom-mb-8rem fs-2rem">
                 {{ description }}
               </h2>
               <span class="text-white">
@@ -206,6 +206,12 @@ export default {
 .custom-mb-8rem{
   margin-bottom: 8.25rem !important;
 }
+.text-h4{
+  &.fs-2rem{
+    font-size: 2rem !important;
+  }
+}
+
 
 .custom-auth-button {
   width: 100%;
