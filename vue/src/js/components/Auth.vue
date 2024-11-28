@@ -197,10 +197,6 @@ export default {
 
 <style lang="scss">
 @media screen and (min-width: 960px) {
-  .mw-lg-24em {
-    max-width: 24rem;
-    width: 24rem;
-  }
 
   .mw-420 {
     max-width: 420px;
@@ -213,6 +209,11 @@ export default {
   color: black !important;
   position: relative !important;
   display: flex !important;
+  background: transparent !important;
+
+  &:hover{
+    background: transparent !important;
+  }
 
   .v-btn__prepend {
     position: absolute !important;
@@ -227,6 +228,8 @@ export default {
 
   &.text-primary {
     color: black !important;
+    --v-theme-overlay-multiplier: var(--v-hover-opacity);
+
   }
 }
 
@@ -261,5 +264,12 @@ export default {
 }
 .mw-100{
   max-width: 100%;
+}
+
+.override{
+  &.px-0{
+    padding-right: 0 !important;
+    padding-left:0 !important;
+  }
 }
 </style>

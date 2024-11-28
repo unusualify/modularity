@@ -180,7 +180,7 @@ class LoginController extends Controller
                     'email' => [
                         'type' => 'text',
                         'name' => 'email',
-                        'label' => 'Email',
+                        'label' => ___('authentication.email'),
                         'hint' => 'enter @example.com',
                         'default' => '',
                         'col' => [
@@ -206,9 +206,8 @@ class LoginController extends Controller
                 ])),
 
                 'actionUrl' => route(Route::hasAdmin('login')),
-                'buttonText' => __('authentication.login'),
-                'formClass' => 'px-0',
-                'rightBtnText' => 'Test',
+                'buttonText' => __('authentication.sign-in'),
+                'formClass' => 'override px-0',
             ],
             'formSlots' => [
                 'bottom' => [
@@ -225,12 +224,13 @@ class LoginController extends Controller
                                 'href' => route('admin.password.reset.link'),
                                 'class' => 'v-col-5 d-flex justify-content-start',
                                 'density' => 'default',
+                                'color' => 'gray-lighten-1'
 
                             ],
                         ],
                         [
                             'tag' => 'v-btn',
-                            'elements' => __('authentication.login'),
+                            'elements' => __('authentication.sign-in'),
                             'attributes' => [
                                 'variant' => 'elevated',
                                 'href' => '',

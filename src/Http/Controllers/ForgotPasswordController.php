@@ -69,7 +69,7 @@ class ForgotPasswordController extends Controller
                     'email' => [
                         'type' => 'text',
                         'name' => 'email',
-                        'label' => 'Email',
+                        'label' => ___('authentication.email'),
                         'default' => '',
                         'col' => [
                             'cols' => 12,
@@ -83,7 +83,7 @@ class ForgotPasswordController extends Controller
                 'actionUrl' => route(Route::hasAdmin('password.reset.email')),
                 'buttonText' => 'authentication.reset-send',
 
-                'formClass' => 'px-5',
+                'formClass' => 'override px-0',
 
             ],
             'formSlots' => [
@@ -95,12 +95,14 @@ class ForgotPasswordController extends Controller
                     'elements' => [
                         [
                             'tag' => 'v-btn',
-                            'elements' => __('authentication.login'),
+                            'elements' => __('authentication.sign-in'),
                             'attributes' => [
                                 'variant' => 'text',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'v-col-5 justify-content-start',
                                 'density' => 'default',
+                                'color' => 'gray-lighten-1'
+
                             ],
                         ],
                         [
@@ -172,7 +174,7 @@ class ForgotPasswordController extends Controller
                             'elements' => ___('authentication.create-an-account'),
                             'attributes' => [
                                 'variant' => 'outlined',
-                                'href' => route(Route::hasAdmin('register.form')),
+                                'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-5 custom-auth-button',
                                 'density' => 'default',
 

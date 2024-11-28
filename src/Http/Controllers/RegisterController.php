@@ -80,7 +80,7 @@ class RegisterController extends Controller
                     'email' => [
                         'type' => 'text',
                         'name' => 'email',
-                        'label' => 'Email',
+                        'label' => ___('authentication.email'),
                         'default' => '',
                         'col' => [
                             'cols' => 6,
@@ -132,7 +132,7 @@ class RegisterController extends Controller
 
                 'actionUrl' => route(Route::hasAdmin('register')),
                 'buttonText' => 'authentication.register',
-                'formClass' => 'mw-lg-24em',
+                'formClass' => 'override px-0',
             ],
             'formSlots' => [
                 'bottom' => [
@@ -149,6 +149,7 @@ class RegisterController extends Controller
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'v-col-5 justify-content-start',
                                 'density' => 'default',
+                                'color' => 'gray-lighten-1'
                             ],
                         ],
                         [
