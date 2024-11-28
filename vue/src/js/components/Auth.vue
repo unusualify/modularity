@@ -216,10 +216,10 @@ export default {
 .custom-auth-button {
   width: 100%;
   min-width: 100% !important;
-  color: black !important;
   position: relative !important;
   display: flex !important;
   background: transparent !important;
+  --v-theme-overlay-multiplier: var(--v-hover-opacity);
 
   &:hover{
     background: transparent !important;
@@ -235,12 +235,6 @@ export default {
       width: 16px;
       height: 16px;
     }
-
-  &.text-primary {
-    color: black !important;
-    --v-theme-overlay-multiplier: var(--v-hover-opacity);
-
-  }
 }
 
 
