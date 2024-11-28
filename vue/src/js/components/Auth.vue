@@ -270,10 +270,4 @@ export default {
   max-width: 100%;
 }
 
-.override{
-  &.px-0{
-    padding-right: 0 !important;
-    padding-left:0 !important;
-  }
-}
 </style>

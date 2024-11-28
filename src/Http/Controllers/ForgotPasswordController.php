@@ -82,8 +82,8 @@ class ForgotPasswordController extends Controller
 
                 'actionUrl' => route(Route::hasAdmin('password.reset.email')),
                 'buttonText' => 'authentication.reset-send',
-
-                'formClass' => 'override px-0',
+                'formClass' => 'py-6',
+                'no-default-form-padding' => true,
 
             ],
             'formSlots' => [
@@ -101,7 +101,7 @@ class ForgotPasswordController extends Controller
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'v-col-5 justify-content-start',
                                 'density' => 'default',
-                                'color' => 'gray-lighten-1'
+                                'color' => 'grey-lighten-1'
 
                             ],
                         ],
@@ -135,7 +135,7 @@ class ForgotPasswordController extends Controller
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'mt-5 mb-2 custom-auth-button',
                                 'density' => 'default',
-                                'color' => 'gray-lighten-1'
+                                'color' => 'grey-lighten-1'
 
                             ],
                             'slots' => [
@@ -157,7 +157,7 @@ class ForgotPasswordController extends Controller
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-2 custom-auth-button',
                                 'density' => 'default',
-                                'color' => 'gray-lighten-1'
+                                'color' => 'grey-lighten-1'
 
                             ],
                             'slots' => [
@@ -179,7 +179,7 @@ class ForgotPasswordController extends Controller
                                 'href' => route(Route::hasAdmin('register.form')),
                                 'class' => 'my-2 custom-auth-button',
                                 'density' => 'default',
-                                'color' => 'gray-lighten-1'
+                                'color' => 'grey-lighten-1'
 
                             ],
 

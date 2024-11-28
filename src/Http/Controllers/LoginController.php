@@ -207,7 +207,8 @@ class LoginController extends Controller
 
                 'actionUrl' => route(Route::hasAdmin('login')),
                 'buttonText' => __('authentication.sign-in'),
-                'formClass' => 'override px-0',
+                'formClass' => 'py-6',
+                'no-default-form-padding' => true,
             ],
             'formSlots' => [
                 'bottom' => [
@@ -224,7 +225,7 @@ class LoginController extends Controller
                                 'href' => route('admin.password.reset.link'),
                                 'class' => 'v-col-5 d-flex justify-content-start',
                                 'density' => 'default',
-                                'color' => 'gray-lighten-1'
+                                'color' => 'grey-lighten-1'
 
                             ],
                         ],
@@ -257,7 +258,7 @@ class LoginController extends Controller
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'mt-5 mb-2 custom-auth-button',
                                 'density' => 'default',
-                                'color' => 'gray-lighten-1'
+                                'color' => 'grey-lighten-1'
                             ],
                             'slots' => [
                                 'prepend' => [
@@ -278,7 +279,7 @@ class LoginController extends Controller
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-2 custom-auth-button',
                                 'density' => 'default',
-                                'color' => 'gray-lighten-1'
+                                'color' => 'grey-lighten-1'
                             ],
                             'slots' => [
                                 'prepend' => [
@@ -299,7 +300,7 @@ class LoginController extends Controller
                                 'href' => route('admin.register.form'),
                                 'class' => 'my-2 custom-auth-button',
                                 'density' => 'default',
-                                'color' => 'gray-lighten-1'
+                                'color' => 'grey-lighten-1'
 
                             ],
 
