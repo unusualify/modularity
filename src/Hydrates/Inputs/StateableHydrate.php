@@ -35,9 +35,7 @@ class StateableHydrate extends InputHydrate
         $model = App::make('Modules\PressRelease\Entities\PressRelease');
 
         // If default_states contains strings, convert them to objects first
-        $stateObjects = is_string(reset($model->default_states))
-            ? $this->stringArrayToObjectArray($model->default_states, 'code')
-            : $model->default_states;
+        $stateObjects =  $model->getDefaultStates();
 
         $states = $repository->getByColumnValues('code', array_column($stateObjects, 'code'));
         $items = [];
@@ -55,23 +53,5 @@ class StateableHydrate extends InputHydrate
         return $input;
     }
 
-    /**
-     * Convert an array of strings to an array of objects with a specified key
-     *
-     * @param array $array Array of strings to convert
-     * @param string $targetKey The object key that will hold the string value
-     * @return array Array of objects
-     */
-    protected function stringArrayToObjectArray($array, $targetKey)
-    {
-        $objectArray = [];
-        foreach($array as $item) {
-            if(is_string($item)) {
-                $obj = new \stdClass();
-                $obj->$targetKey = $item;
-                $objectArray[] = $obj;
-            }
-        }
-        return $objectArray;
-    }
+
 }
