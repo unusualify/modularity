@@ -83,6 +83,7 @@ class DashboardController extends BaseController
                     // $block['attributes']['items'] = $controller->getIndexData()['initialResource']->resource['data'];
                     // $block['attributes']['items'] = $data['items']->toArray();
                     $block = $widget;
+                    // dd($block);
                     // dd($block['elements'][0]['attributes']['items'] = []);
                     // $block['elements'][0]['attributes']['items'] = [];
                     // dd($block);
@@ -94,6 +95,7 @@ class DashboardController extends BaseController
                     $block['elements'][0]['attributes']['endpoints'] = array_merge($this->transformRoutes($block['elements'][0]['attributes']['module']->getRouteUris($block['elements'][0]['attributes']['route'])), $this->getUrls());
                     $block['elements'][0]['attributes']['tableOptions']['search'] = null;
 
+                    unset($block['elements'][0]['attributes']['endpoints']['index']); //Disable vuetify table store
                     // dd($block);
                     // dd(array_merge($block['attributes']['endpoints'], $this->getUrls()));
 
@@ -143,7 +145,7 @@ class DashboardController extends BaseController
             }
 
         }
-
+        // dd($blocks);
         $options = ['blocks' => $blocks];
         // dd($blocks);
         // dd($data['blocks']);

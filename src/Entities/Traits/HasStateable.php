@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Modules\SystemUtility\Entities\Stateable;
 use Unusualify\Modularity\Entities\State;
@@ -242,4 +243,72 @@ trait HasStateable
     // {
     //     return "<span variant='text' color='' prepend-icon=''>No State</span>";
     // }
+
+    public function scopeDistributed(){
+        return $this->scopeAuthorized($this)
+            ->whereHas('states', function($q) {
+                $q->where('code', 'distributed')
+                  ->where('stateables.is_active', 1);
+            });
+    }
+
+    public function scopeDistributedCount(){
+
+        return $this->scopeDistributed()->count();
+
+    }
+
+    // Since countries doesn't have a relation with States this can be added to PressRelease model
+    public function scopeDistributedCountries()
+    {
+        // return $this->scopeDistributed()
+        //     ->join('press_release_packages', 'press_releases.id', '=', 'press_release_packages.press_release_id')
+        //     ->join('umod_snapshots', function($join) {
+        //         $join->on('press_release_packages.id', '=', 'umod_snapshots.snapshotable_id')
+        //             ->where('umod_snapshots.snapshotable_type', '=', 'Modules\PressRelease\Entities\PressReleasePackage');
+        //     })
+        //     ->join('packages', function($join) {
+        //         $join->on('packages.id', '=', 'umod_snapshots.source_id')
+        //             ->where('umod_snapshots.source_type', '=', 'Modules\Package\Entities\Package');
+        //     })
+        //     ->select(\DB::raw('COUNT(DISTINCT packages.packageable_id) as country_count'))
+        //     ->where('packages.packageable_type', '=', 'Modules\Package\Entities\PackageCountry')
+        //     ->value('country_count');
+        return $this->scopeDistributed()
+        ->join('press_release_packages', 'press_releases.id', '=', 'press_release_packages.press_release_id')
+        ->join('umod_snapshots', function($join) {
+            $join->on('press_release_packages.id', '=', 'umod_snapshots.snapshotable_id')
+                 ->where('umod_snapshots.snapshotable_type', '=', 'Modules\PressRelease\Entities\PressReleasePackage');
+        })
+        ->join('packages', function($join) {
+            $join->on('packages.id', '=', 'umod_snapshots.source_id')
+                 ->where('umod_snapshots.source_type', '=', 'Modules\Package\Entities\Package');
+        })
+        ->leftJoin('package_regions', function($join) {
+            $join->on('package_regions.id', '=', 'packages.packageable_id')
+                 ->where('packages.packageable_type', '=', 'Modules\Package\Entities\PackageRegion');
+        })
+        ->leftJoin('package_countries as region_countries', 'region_countries.package_region_id', '=', 'package_regions.id')
+        ->leftJoin('package_countries as direct_countries', function($join) {
+            $join->on('direct_countries.id', '=', 'packages.packageable_id')
+                 ->where('packages.packageable_type', '=', 'Modules\Package\Entities\PackageCountry');
+        })
+        ->select(\DB::raw('COUNT(DISTINCT COALESCE(region_countries.id, direct_countries.id)) as country_count'))
+        ->value('country_count');
+
+        // $test = $this->scopeDistributed()
+        // ->join('press_release_packages', 'press_releases.id', '=', 'press_release_packages.press_release_id')
+        // ->join('umod_snapshots', function($join) {
+        //     $join->on('press_release_packages.id', '=', 'umod_snapshots.snapshotable_id')
+        //         ->where('umod_snapshots.snapshotable_type', '=', 'Modules\PressRelease\Entities\PressReleasePackage');
+        // })
+        // ->join('packages', function($join) {
+        //     $join->on('packages.id', '=', 'umod_snapshots.source_id')
+        //         ->where('umod_snapshots.source_type', '=', 'Modules\Package\Entities\Package');
+        // })
+        // ->select(\DB::raw('COUNT(DISTINCT packages.packageable_id) as country_count'))
+        // ->where('packages.packageable_type', '=', 'Modules\Package\Entities\PackageCountry')
+        // ->value('country_count');
+        // dd($test);
+    }
 }

@@ -49,7 +49,10 @@ const opts = {
     VBtnCtaSecondary: components.VBtn,
     VBtnSuccess: components.VBtn,
     VImgIcon: components.VImg,
-    VSheetRounded: components.VSheet
+    VSheetRounded: components.VSheet,
+    VRowSecondary: components.VRow,
+    VRowTertiary: components.VRow,
+
 
   },
   defaults: {
@@ -91,6 +94,12 @@ const opts = {
     },
     VImgIcon: {
       height: '2.5rem',
+    },
+    VRowSecondary: {
+      'class': 'v-row-secondary'
+    },
+    VRowTertiary: {
+      'class': 'v-row-tertiary'
     }
 
   },

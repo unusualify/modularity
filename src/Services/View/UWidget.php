@@ -59,10 +59,11 @@ class UWidget extends UComponent {
         );
     }
 
+    //Experimental left for general components maybe
+
     protected function setComponentAttributes($attributes)
     {
-        //Experimental left for general components maybe
-        dd($attributes['connector']);
+        // dd($attributes['connector']);
         if(!isset($attributes['connector'])) {
             return null;
         }
@@ -71,7 +72,7 @@ class UWidget extends UComponent {
         $data['items'] = $data['items']->toArray();
 
         $table = new UWidget();
-        dd($attributes['component']);
+        // dd($attributes['component']);
         return $table->makeComponent(
             $attributes['component'],
             array_merge(
