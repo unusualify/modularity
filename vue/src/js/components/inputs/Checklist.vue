@@ -369,10 +369,7 @@
       }
     },
 
-    created () {
-      __log(this.disabled)
-      // __log(this.max, this.$bindAttributes())
-    }
+    created () {}
   }
 </script>
 
