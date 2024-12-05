@@ -547,7 +547,7 @@ import { top } from '@popperjs/core'
         this.$emit('input', v)
       },
       handleEvent (obj) {
-        handleEvents(this.model, this.inputSchema, obj.schema)
+        handleEvents(this.model, this.inputSchema, obj.schema, true)
         // const { _fields: newModel, moduleSchema: newSchema } = handleInputEvents(obj.schema.event, this.model, this.inputSchema, obj.key)
         // this.model = newModel
         // this.inputSchema = newSchema
