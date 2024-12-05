@@ -472,14 +472,18 @@ trait ManageForm
 
         $this->hydrateInputExtension($input, $data, $arrayable, $inputs);
 
-        if (isset($this->repository)) {
-            if (method_exists($this->repository->getModel(), 'getTranslatedAttributes')
-                && in_array($input['name'], $this->repository->getTranslatedAttributes())
-            ) {
-                $input['translated'] ??= true;
-                // $input['locale_input'] = $input['type'];
-                // $input['type'] = 'input-locale';
-                $data = $input;
+        if (isset($this->repository) && isset($input['name'])) {
+            try {
+                if (method_exists($this->repository->getModel(), 'isTranslationAttribute')
+                    && $this->repository->isTranslationAttribute($input['name'])
+                ) {
+                    $input['translated'] ??= true;
+                    // $input['locale_input'] = $input['type'];
+                    // $input['type'] = 'input-locale';
+                    $data = $input;
+                }
+            } catch (\Throwable $th) {
+                dd($input, $th);
             }
 
         }
