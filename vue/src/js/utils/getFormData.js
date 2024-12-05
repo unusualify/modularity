@@ -807,8 +807,9 @@ const FormatFuncs = {
                 let getter = [parentPattern, __wildcard_change(inputToFormat, val)].join('.')
                 let data = __data_get(handlerSchema, getter).shift()
                 let formattedData = data[0] ?? ''
-                if(data.length > 1){
-                  formattedData = `(${data.join(',')})`
+
+                if(_index > 1 && Array.isArray(data)){
+                  formattedData = `(${data.join(', ')})`
                 }
 
                 _.set(previewValue, isMultiple ? `[${i}][${_index}]` : `[${_index}]`, formattedData)
