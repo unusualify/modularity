@@ -273,7 +273,7 @@ abstract class Repository
             $column = is_array($column) ? array_shift($column) : $column;
 
             return $query->get()->map(fn ($item) => [
-                'id' => $item->id,
+                ...$item->toArray(),
                 $column => $item->{$column},
             ]);
         }
