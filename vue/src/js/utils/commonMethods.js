@@ -84,10 +84,12 @@ export default {
           if(this.$te(`modules.${snakeCased}`)){
             _value = this.$t(`modules.${snakeCased}`)
           }
+        }else if(__isNumber(newValue)){
+          _value = newValue.toString()
         }
 
         if(_value){
-          let remainingQuote = '\\w\\s' + __preg_quote('çşıİğüö.,;?|')
+          let remainingQuote = '\\w\\s' + __preg_quote('çşıİğüö.,;?|:_')
           let pattern = new RegExp( String.raw`^([${remainingQuote}]+)?(${quoted})([${remainingQuote}]+)?$`)
 
           if(value.match(pattern)){
@@ -95,7 +97,6 @@ export default {
           }else{
             __log(
               'Not matched sentence',
-              remainingQuote,
               pattern,
               value,
               value.match(pattern)
