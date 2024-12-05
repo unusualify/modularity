@@ -31,6 +31,8 @@ trait ManageUtilities
         $filters = json_decode($this->request->get('filter'), true) ?? [];
         $headers = $this->filterHeadersByRoles($this->getIndexTableColumns());
         $headers = $this->translateHeaders($headers);
+
+        $tableAttributes = $this->hydrateTableAttributes();
         // dd($this->translateHeaders($headers));
         $_deprecated = [
             'initialResource' => $initialResource, //
@@ -62,7 +64,7 @@ trait ManageUtilities
                         'name' => $this->getHeadline($this->routeName),
                         'titleKey' => $this->titleColumnKey,
                     ],
-                    $this->tableAttributes,
+                    $tableAttributes,
                 ),
                 $this->getTableDraggableOptions(),
 

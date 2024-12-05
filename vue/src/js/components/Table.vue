@@ -386,16 +386,16 @@
         </template>
 
         <!-- MARK: DATA-ITERATOR BODY -->
-        <template v-slot:body="{ items }" v-if="enableIterators" class="ue-datatable__container">
+        <template v-slot:body="{ items }" v-if="hasCustomRow" class="ue-datatable__container">
           <v-row no-gutters>
             <v-col
               v-for="(element, i) in items"
               :key="element.id"
-              v-bind="customRowComponent.col"
+              v-bind="customRow.col"
             >
             <!-- // TODO - check if its empty -->
               <component
-                :is="`ue-${customRowComponent.iteratorComponent}`"
+                :is="`ue-${customRow.name}`"
                 :key="element.id"
                 :item="element"
                 :headers="headers"

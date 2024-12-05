@@ -146,10 +146,6 @@ abstract class BaseController extends PanelController
         // );
         Session::put($this->routeName . '_retain', true);
 
-        if ($this->getTableOption('editOnModal')) {
-            return $this->respondWithSuccess(___('messages.save-success'));
-        }
-
         if (isset($input['cmsSaveType']) && Str::endsWith($input['cmsSaveType'], '-close')) {
             return $this->respondWithRedirect($this->getBackLink());
         }
