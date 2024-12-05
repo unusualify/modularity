@@ -78,7 +78,7 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
 }
 
 export const getModel = (inputs, item = null, rootState = null) => {
-  const languages = window[import.meta.env.VUE_APP_NAME].STORE.languages.all
+  const languages = getTranslationLanguages()
   const editing = __isset(item)
 
   inputs = processInputs(inputs)
@@ -98,7 +98,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
 
     if (isTranslated) {
       _default = _.reduce(languages, function (acc, language, k) {
-        acc[language.value] = _default
+        acc[language] = _default
         return acc
       }, {})
     }
@@ -129,9 +129,9 @@ export const getModel = (inputs, item = null, rootState = null) => {
           const hasTranslations = Object.prototype.hasOwnProperty.call(item, 'translations')
           if (hasTranslations && item.translations[name]) {
             fields[name] = languages.reduce(function (map, lang) {
-              map[lang.value] = _.find(item.translations, { locale: lang.value })
-                ? _.find(item.translations, { locale: lang.value })[name]
-                : item.translations[name][lang.value]
+              map[lang] = _.find(item.translations, { locale: lang })
+                ? _.find(item.translations, { locale: lang })[name]
+                : item.translations[name][lang]
               return map
             }, {})
           } else {
