@@ -399,6 +399,7 @@ abstract class Repository
     public function update($id, $fields, $schema = null)
     {
         $this->traitColumns = $this->setColumns($this->traitColumns, $schema ?? $this->chunkInputs(all: true));
+
         DB::transaction(function () use ($id, $fields) {
             $object = $this->model->findOrFail($id);
 
@@ -897,20 +898,19 @@ abstract class Repository
     {
         return array_map(function ($item) {
             return is_array($item)
-                    ? function ($query) use ($item) {
-                        // dd($item);
-                        // $db->table('roles')->pluck('id');
-                        // $query->addSelect('id');
-                        if (is_array($item[0])) {
-                            foreach ($item as $key => $args) {
-                                $query->{array_shift($args)}(...$args);
-                            }
-                        } else {
-                            $query->{array_shift($item)}(...$item);
+                ? function ($query) use ($item) {
+
+                    if (is_array($item[0])) {
+                        foreach ($item as $key => $args) {
+                            $query->{array_shift($args)}(...$args);
                         }
-                        $query->without('pivot');
+                    } else {
+                        $query->{array_shift($item)}(...$item);
                     }
-            : $item;
+                    $query->without('pivot');
+                }
+                : $item
+            ;
         }, $with);
     }
 
