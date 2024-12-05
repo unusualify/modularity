@@ -423,7 +423,10 @@ trait ManageForm
                                 $relationshipName = pluralize($this->getCamelNameFromForeignKey($foreignKey));
                                 $relationChain .= ! $relationChain ? $relationshipName : ".{$relationshipName}";
                                 $ownerKey = $j == 0 ? $attachable['name'] : $selectables[$j - 1]['name'];
-                                $attachable['cascades'][] = $relationChain . ":{$item['itemValue']},{$ownerKey},{$item['itemTitle']}";
+
+                                $attachable['cascades'][] = $relationChain;
+                                // $attachable['cascades'][] = $relationChain . ":{$item['itemValue']},{$ownerKey},{$item['itemTitle']}";
+
                                 // $attachable['cascades'][$relationChain . " as {$relationChain}_items"] = [
                                 //     ['select', $item['itemValue'] , $ownerKey, $item['itemTitle']]
                                 // ];
