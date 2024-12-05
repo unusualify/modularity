@@ -351,8 +351,8 @@ trait RelationshipMap
                 //     $data,
                 //     $index,
                 // );
-                if ($data[$lastModel]['relationship_method'] == 'belongsToMany' && count($data[$lastModel]['chain_methods']) > 0) {
-                    $chainIndex = count($data[$lastModel]['chain_methods']) - 1;
+                if ($data[$lastIndex]['relationship_method'] == 'belongsToMany' && count($data[$lastIndex]['chain_methods']) > 0) {
+                    $chainIndex = count($data[$lastIndex]['chain_methods']) - 1;
                     $data[$lastIndex]['chain_methods'][$chainIndex]['arguments'][] = "'{$this->getMethodName($schema)}'";
                 }
             }
