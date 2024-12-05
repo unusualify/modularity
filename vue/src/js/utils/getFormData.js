@@ -481,6 +481,10 @@ const isTopEventInput = (input) => {
   return Object.prototype.hasOwnProperty.call(input, 'topEvent') && input.topEvent && ['select', 'autocomplete', 'combobox'].includes(input.type)
 }
 
+const getTranslationLanguages = (input) => {
+  return _.map(window[import.meta.env.VUE_APP_NAME].STORE.languages.all, 'value')
+}
+
 const FormatFuncs = {
   formatPermalink: function(args, model, schema, input) {
     const handlerName = input.name
