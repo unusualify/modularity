@@ -164,6 +164,9 @@ trait ManageForm
         $_input = null;
 
         if($type == 'divider' || !!$name){
+            if($default_input['color'] && in_array($hydrated['type'], ['morphTo', 'relationship', 'wrap', 'group'])){
+                unset($default_input['color']);
+            }
             $_input =  $this->configureInput(array_merge_recursive_preserve($default_input, $hydrated));
             if($type == 'divider'){
                 $name = $type . '_' . uniqid();
