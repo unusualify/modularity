@@ -28,7 +28,10 @@
             <v-window-item v-for="(item, i) in elements" :key="item.id" :value="item.id">
               <ue-form
                 :ref="formRefs[item.id]"
-                v-model="models[item.id]"
+                :key="`form-${item.id}-${JSON.stringify(schemas[item.id])}`"
+                v-modelx="models[item.id]"
+                :modelValue="models[item.id]"
+                @update:modelValue="updateModel($event, item.id)"
                 :schema="schemas[item.id]"
                 v-model:valid="valids[i]"
                 noDefaultFormPadding
@@ -45,7 +48,7 @@
 
 <script>
 import { toRefs, reactive, ref, computed } from 'vue';
-import { cloneDeep, each, map } from 'lodash-es';
+import { cloneDeep, each, filter, startCase } from 'lodash-es';
 
 import { useInput,
   makeInputProps,
@@ -80,6 +83,10 @@ export default {
       type: Object,
       default: () => []
     },
+    triggers: {
+      type: Object,
+      default: () => []
+    }
   },
   setup (props, context) {
     const inputHandlers = useInputHandlers()
@@ -180,7 +187,8 @@ export default {
     models: {
       handler (value, oldValue) {
         this.validate()
-        this.$emit('update:modelValue', value)
+
+        // this.$emit('update:modelValue', value)
       },
       deep: true
     },
@@ -204,6 +212,69 @@ export default {
 
       return result
     },
+
+    updateModel(val, index) {
+      let oldModels = cloneDeep(this.models)
+      let oldValue = oldModels[index]
+
+      // Find changed keys by comparing old and new values
+      const changedKeys = Object.keys(val).filter(key =>
+        JSON.stringify(val[key]) !== JSON.stringify(oldValue[key])
+      )
+
+      const changedValues = changedKeys.reduce((acc, key) => {
+        acc[key] = {
+          old: oldValue[key],
+          new: val[key]
+        }
+        return acc
+      }, {})
+
+      let schemas = cloneDeep(this.schemas)
+      let schemasChanged = false
+
+      each(changedKeys, (triggerKey) => {
+        let triggers = filter(this.triggers, (trigger) => trigger.trigger == triggerKey)
+        let newValue = changedValues[triggerKey].new
+        let triggerSchema = cloneDeep(this.schemas[index][triggerKey])
+        let triggerItem = null
+
+        if(triggerSchema.items && Array.isArray(triggerSchema.items)){
+          triggerItem = triggerSchema.items.find((item) => item.id == newValue)
+        }
+
+        each(triggers, (trigger) => {
+          let targetInput = cloneDeep(this.schemas[index][trigger.target])
+          let rulesChanged = false
+          each(trigger.actions, (actionValue, actionName) => {
+            schemasChanged = true
+            let key = actionName
+            if(actionName == 'rules'){
+              rulesChanged = true
+              actionName = 'raw' + startCase(actionName)
+            }
+            if(triggerItem){
+              targetInput[actionName] = this.$castValueMatch(actionValue, triggerItem)
+            }
+          })
+          schemas[index][trigger.target] = targetInput
+          if(rulesChanged){
+            schemas[index] = this.invokeRuleGenerator(schemas[index])
+          }
+        })
+      })
+
+      if(schemasChanged){
+        this.schemas = cloneDeep(schemas)
+      }
+
+      // __log('Changed keys:', changedKeys, oldValue, val)
+
+      oldModels[index] = val
+      this.models = cloneDeep(oldModels)
+      // __log('models', this.models)
+      this.$emit('update:modelValue', this.models)
+    }
 
   },
   created() {

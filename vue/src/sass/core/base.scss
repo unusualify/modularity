@@ -53,7 +53,7 @@ $theme-config: map.merge($default-theme-config, $theme-config);
   $body-font-family: $body-font-family,
   $spacer: $spacer,
   $grid-gutter: $spacer * 12,
-  $line-height-root: $line-height-root, //1.5
+  // $line-height-root: $line-height-root, //1.5
 
   $font-weights: $font-weights,
 

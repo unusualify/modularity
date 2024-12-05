@@ -2,19 +2,22 @@
   <v-input
     v-model="input"
     hideDetails="auto"
+    :disabled="disabled"
+    class="v-input-checklist"
     >
     <template v-slot:default="defaultSlot">
-      <div class="ue-checklist d-flex">
+      <div class="v-input-checklist__field d-flex">
         <div v-if="label"
-          class="d-flex align-center"
+          class="d-flex flex-column"
           :style="[
             !flexColumn ? 'flex: 0 1 25%;' : ''
           ]"
           >
-          <ue-title v-if="label" me :classes="['pl-0 pt-0']" data-test="title" :color="labelColor" transform="none">
+          <ue-title v-if="label" padding="x-3" data-test="title" :color="labelColor" transform="none">
             {{ label }}
           </ue-title>
           <ue-title v-if="subtitle"
+            padding="x-3"
             type="caption"
             weight="medium"
             transform="none"
@@ -75,6 +78,7 @@
                         v-model="input"
                         :label="item[`${itemTitle}`]"
                         :value="item[`${itemValue}`]"
+                        :disabled="!canSelectMore() && !input.includes(item[itemValue])"
                         color="success"
                         hide-details
                         density="compact"
@@ -89,12 +93,13 @@
                     class="pl-0"
                     >
                     <v-checkbox
-                    v-model="input"
-                    :label="group[`${itemTitle}`]"
-                    :value="group[`${itemValue}`]"
-                    color="success"
-                    hide-details
-                    density="compact"
+                      v-model="input"
+                      :label="group[`${itemTitle}`]"
+                      :value="group[`${itemValue}`]"
+                      :disabled="!canSelectMore() && !input.includes(group[itemValue])"
+                      color="success"
+                      hide-details
+                      density="compact"
                     />
                     <!-- <template v-slot:default="{isActive, isSelected, isIndeterminate, select}">
                     </template> -->
@@ -118,12 +123,12 @@
                 <div
                   :class="getCheckboxContainerClasses(item)"
                 >
-                  <span v-if="checkboxOnRight">{{ item[itemTitle] }}</span>
+                  <span v-if="checkboxOnRight" :class="[($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue])) ? 'v-input-checklist__label--disabled' : '']">{{ item[itemTitle] }}</span>
                   <v-spacer v-if="checkboxOnRight"></v-spacer>
                   <v-checkbox
                     data-test="checkbox"
                     v-model="input"
-                    :disabled="$attrs.disabled ?? false"
+                    :disabled="($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue]))"
                     :value="item[itemValue]"
                     :color="checkboxColor"
                     hide-details
@@ -146,195 +151,234 @@
 </template>
 
 <script>
-import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
+  import { computed } from 'vue'
+  import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 
-export default {
-  name: 'v-input-checklist',
-  emits: [...makeInputEmits],
-  props: {
-    ...makeInputProps(),
-    label: {
-      type: String,
-      default: ''
+  export default {
+    name: 'v-input-checklist',
+    emits: [...makeInputEmits],
+    props: {
+      ...makeInputProps(),
+      color: {
+        type: String,
+        default: null
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      },
+      subtitle: {
+        type: String,
+        default: null
+      },
+      itemValue: {
+        type: String,
+        default: 'id'
+      },
+      itemTitle: {
+        type: String,
+        default: 'name'
+      },
+      items: {
+        type: Array,
+        default: () => []
+      },
+      checkboxColor: {
+        type: String,
+        default: 'primary'
+      },
+      isTreeview: {
+        type: Boolean,
+        default: false
+      },
+      chunkCharacter: {
+        type: String,
+        default: '_'
+      },
+      labelColor: {
+        type: String,
+        default: 'grey-darken-1'
+      },
+      subtitleColor: {
+        type: String,
+        default: 'grey-darken-1'
+      },
+      flexColumn: {
+        type: Boolean,
+        default: true
+      },
+      checkboxHighlighted: {
+        type: Boolean,
+        default: false
+      },
+      checkboxPosition: {
+        type: String,
+        default: 'right'
+      },
+      checkboxCol: {
+        type: Object,
+        default: () => ({
+          cols: 3
+        })
+      },
+      rawRules: {
+        type: [String, Array],
+        default: null
+      },
+      max: {
+        type: [Number, String],
+        default: null
+      },
     },
-    subtitle: {
-      type: String,
-      default: null
-    },
-    itemValue: {
-      type: String,
-      default: 'id'
-    },
-    itemTitle: {
-      type: String,
-      default: 'name'
-    },
-    items: {
-      type: Array,
-      default: () => []
-    },
-    checkboxColor: {
-      type: String,
-      default: 'success'
-    },
-    isTreeview: {
-      type: Boolean,
-      default: false
-    },
-    chunkCharacter: {
-      type: String,
-      default: '_'
-    },
-    labelColor: {
-      type: String,
-      default: 'grey-darken-1'
-    },
-    subtitleColor: {
-      type: String,
-      default: 'grey-darken-1'
-    },
-    flexColumn: {
-      type: Boolean,
-      default: true
-    },
-    checkboxHighlighted: {
-      type: Boolean,
-      default: false
-    },
-    checkboxPosition: {
-      type: String,
-      default: 'right'
-    },
-    checkboxCol: {
-      type: Object,
-      default: () => ({
-        cols: 3
+    setup (props, context) {
+      const maxSelectable = computed(() => {
+        let max = props.max
+
+        if(window.__isString(max)){
+          max = parseInt(max)
+        } else if(!max && window.__isString(props.rawRules)){
+          max = props.rawRules.match(/max:\d+/)?.[0].split(':')[1]
+        }
+        return max
       })
-    }
-  },
-  setup (props, context) {
-    return {
-      ...useInput(props, context)
-    }
-  },
-
-  methods: {
-    isAllSelected (group) {
-      const ids = group.items.map((item) => item.id)
-
-      return ids.every(v => this.input.includes(v))
-    },
-    isIndeterminateGroup (group) {
-      const ids = group.items.map((item) => item.id)
-
-      return !ids.every(v => this.input.includes(v)) && ids.some(v => this.input.includes(v))
-    },
-    updatedParent (value, group) {
-      const ids = group.items.map((item) => item.id)
-
-      if (!value) {
-        this.input = this.input.filter(function (id) {
-          return !ids.includes(id)
-        })
-      } else {
-        ids.forEach((id) => {
-          if (!this.input.includes(id)) {
-            this.input.push(id)
-          }
-        })
+      return {
+        ...useInput(props, context),
+        maxSelectable
       }
     },
-    getCheckboxContainerClasses(item) {
-      const isSelected = Array.isArray(this.input) && this.input.includes(item[this.itemValue]);
-      return [
-        this.checkboxOnRight ? 'd-flex align-center pl-4 pr-1 rounded-sm' : '',
-        this.checkboxOnRight && isSelected ? 'checked' : '',
-        this.checkboxOnRight && this.checkboxHighlighted && isSelected ? 'bg-grey-lighten-5 text-primary font-weight-bold' : ''
-      ];
-    },
-    getCheckboxClasses(item) {
-      const isSelected = Array.isArray(this.input) && this.input.includes(item[this.itemValue]);
-      return [
-        this.checkboxOnLeft ? 'rounded-sm' : '',
-        this.checkboxOnLeft && isSelected ? 'checked' : '',
-        this.checkboxOnLeft && this.checkboxHighlighted && isSelected ? 'bg-grey-lighten-5 text-primary font-weight-bold' : ''
-      ];
-    }
-  },
 
-  computed: {
-    checkboxOnRight () {
-      return this.checkboxPosition === 'right'
-    },
-    checkboxOnLeft () {
-      return this.checkboxPosition === 'left'
-    },
-    groupedItems () {
-      const groups = {}
+    methods: {
+      isAllSelected (group) {
+        const ids = group.items.map((item) => item.id)
 
-      for (const i in this.items) {
-        const splitted = this.items[i].name.split(this.chunkCharacter)
-        if (splitted.length > 1) {
-          const groupName = splitted[0]
-          const permissionName = splitted[1]
-          if (Object.prototype.hasOwnProperty.call(groups, groupName)) {
-            if (__isset(groups[groupName].id)) delete groups[groupName].id
-            groups[groupName].items.unshift({
-              id: this.items[i].id,
-              name: this.$lodash.startCase(this.$lodash.camelCase(permissionName))
-            })
-          } else {
-            groups[groupName] = {
-              name: this.$lodash.startCase(this.$lodash.camelCase(groupName)),
-              items: [{
+        return ids.every(v => this.input.includes(v))
+      },
+      isIndeterminateGroup (group) {
+        const ids = group.items.map((item) => item.id)
+
+        return !ids.every(v => this.input.includes(v)) && ids.some(v => this.input.includes(v))
+      },
+      updatedParent (value, group) {
+        const ids = group.items.map((item) => item.id)
+
+        if (!value) {
+          this.input = this.input.filter(function (id) {
+            return !ids.includes(id)
+          })
+        } else {
+          // Check if adding all items would exceed the limit
+          if (this.maxSelectable) {
+            const newItemsCount = ids.filter(id => !this.input.includes(id)).length;
+            if (this.input.length + newItemsCount > this.maxSelectable) {
+              return; // Don't add if it would exceed the limit
+            }
+          }
+
+          ids.forEach((id) => {
+            if (!this.input.includes(id)) {
+              this.input.push(id)
+            }
+          })
+        }
+      },
+      getCheckboxContainerClasses(item) {
+        const isSelected = Array.isArray(this.input) && this.input.includes(item[this.itemValue]);
+        return [
+          this.checkboxOnRight ? 'd-flex align-center pl-4 pr-1 rounded-sm' : '',
+          this.checkboxOnRight && isSelected ? 'checked' : '',
+          this.checkboxOnRight && this.checkboxHighlighted && isSelected ? 'bg-grey-lighten-5 text-primary font-weight-bold' : ''
+        ];
+      },
+      getCheckboxClasses(item) {
+        const isSelected = Array.isArray(this.input) && this.input.includes(item[this.itemValue]);
+        return [
+          this.checkboxOnLeft ? 'rounded-sm' : '',
+          this.checkboxOnLeft && isSelected ? 'checked' : '',
+          this.checkboxOnLeft && this.checkboxHighlighted && isSelected ? 'bg-grey-lighten-5 text-primary font-weight-bold' : ''
+        ];
+      },
+      canSelectMore() {
+        return !this.disabled && (!this.maxSelectable || (Array.isArray(this.input) && this.input.length < this.maxSelectable));
+      }
+    },
+
+    computed: {
+      checkboxOnRight () {
+        return this.checkboxPosition === 'right'
+      },
+      checkboxOnLeft () {
+        return this.checkboxPosition === 'left'
+      },
+      groupedItems () {
+        const groups = {}
+
+        for (const i in this.items) {
+          const splitted = this.items[i].name.split(this.chunkCharacter)
+          if (splitted.length > 1) {
+            const groupName = splitted[0]
+            const permissionName = splitted[1]
+            if (Object.prototype.hasOwnProperty.call(groups, groupName)) {
+              if (__isset(groups[groupName].id)) delete groups[groupName].id
+              groups[groupName].items.unshift({
                 id: this.items[i].id,
                 name: this.$lodash.startCase(this.$lodash.camelCase(permissionName))
-              }]
+              })
+            } else {
+              groups[groupName] = {
+                name: this.$lodash.startCase(this.$lodash.camelCase(groupName)),
+                items: [{
+                  id: this.items[i].id,
+                  name: this.$lodash.startCase(this.$lodash.camelCase(permissionName))
+                }]
+              }
             }
-          }
-        } else {
-          const groupName = 'alpha'
-          if (Object.prototype.hasOwnProperty.call(groups, groupName)) {
-            if (__isset(groups[groupName].id)) delete groups[groupName].id
-            groups[groupName].items.unshift({
-              id: this.items[i].id,
-              name: this.$lodash.startCase(this.$lodash.camelCase(this.items[i].name))
-            })
           } else {
-            groups[groupName] = {
-              name: this.$t('General'),
-              items: [{
+            const groupName = 'alpha'
+            if (Object.prototype.hasOwnProperty.call(groups, groupName)) {
+              if (__isset(groups[groupName].id)) delete groups[groupName].id
+              groups[groupName].items.unshift({
                 id: this.items[i].id,
                 name: this.$lodash.startCase(this.$lodash.camelCase(this.items[i].name))
-              }]
+              })
+            } else {
+              groups[groupName] = {
+                name: this.$t('General'),
+                items: [{
+                  id: this.items[i].id,
+                  name: this.$lodash.startCase(this.$lodash.camelCase(this.items[i].name))
+                }]
+              }
             }
+
+            // groups[this.items[i].name] = {
+            //   id: this.items[i].id,
+            //   name: this.$lodash.startCase(this.$lodash.camelCase(this.items[i].name))
+            // }
           }
-
-          // groups[this.items[i].name] = {
-          //   id: this.items[i].id,
-          //   name: this.$lodash.startCase(this.$lodash.camelCase(this.items[i].name))
-          // }
         }
+
+        const array = Object.values(groups)
+        array.sort(function (left, right) {
+          return left.hasOwnProperty('items') ? 1 : right.hasOwnProperty('items') ? -1 : 0
+        })
+
+        return array
+      },
+      disabledCheckbox() {
+        return this.$attrs.disabled || (!this.canSelectMore() && !Array.isArray(this.input));
       }
+    },
 
-      const array = Object.values(groups)
-      array.sort(function (left, right) {
-        return left.hasOwnProperty('items') ? 1 : right.hasOwnProperty('items') ? -1 : 0
-      })
-
-      return array
-    }
-  },
-
-  created () {
-    // __log(this.items)
+    created () {}
   }
-}
 </script>
 
 <style lang="sass">
-  .ue-checklist
-    width: 100%
+  .v-input-checklist
+    .v-input-checklist__field
+      width: 100%
+    .v-input-checklist__label--disabled
+      opacity: 0.5
     .v-input--horizontal .v-input__prepend
         margin-inline-end: 0px
 

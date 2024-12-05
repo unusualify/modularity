@@ -76,7 +76,7 @@
                 type="subtitle-1"
                 color="black"
                 :text="tableTitle"
-                padding="x-3"
+                padding="a-0"
               />
               <!-- subtitle -->
               <ue-title
@@ -85,7 +85,7 @@
                 weight="medium"
                 color="grey-darken-1"
                 transform="none"
-                padding="x-3"
+                padding="a-0"
                 :text="tableSubtitle"
               />
             </div>
@@ -124,7 +124,7 @@
                     variant="outlined"
                     append-inner-icon="mdi-magnify"
                     hide-details
-                    density="comfortable"
+                    density="compact"
                     single-line
                     :placeholder="searchText"
                     :class="[
@@ -416,14 +416,15 @@
                           >
                           <template v-slot:activator="{ props }">
                             <v-btn
+                              v-bind="props"
+                              :text="action.forceLabel ? $t( action.label ?? $headline(action.name) ) : null"
                               :variant="action.variant ?? 'elevated'"
-                              size="small"
+                              :density="action.density ?? (action.forceLabel ? 'comfortable' : 'compact')"
+                              :size="action.size ?? (action.forceLabel ? 'default' : 'default')"
                               :icon="action.forceLabel ? null : (action.icon ? action.icon : '$' + action.name)"
                               :color="action.color ?? 'primary'"
                               :rounded="action.forceLabel ? null : true"
                               @click="itemAction(element, action)"
-                              v-bind="props"
-                              :text="action.forceLabel ? $t( action.label ?? $headline(action.name) ) : null"
                               class="text-capitalize"
                             />
                           </template>

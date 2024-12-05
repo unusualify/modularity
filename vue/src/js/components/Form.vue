@@ -19,66 +19,68 @@
           padding="b-3"
           color="grey-darken-5"
           align="center"
+          justify="space-between"
           v-bind="titleOptions"
         >
           {{ titleSerialized }}
           <template v-slot:right>
+            <div class="d-flex">
+              <!-- Input events-->
+              <template v-if="topSchema && topSchema.length">
+                <template v-for="topInput in topSchema" :key="topInput.name">
+                  <v-menu
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    offset-y
+                  >
+                    <template v-slot:activator="{ props }">
+                      <v-btn
+                        variant="outlined"
+                        append-icon="mdi-chevron-down"
+                        v-bind="props"
+                      >
+                        <!-- {{ topInput.label }} -->
+                        {{ getTopInputActiveLabel(topInput) }}
+                        <!-- {{ topInput.items.find(item => item[topInput.itemValue] ===  ($isset(model[topInput.name]) ? model[topInput.name] : -1))[topInput.itemTitle] ?? topInput.label }} -->
+                      </v-btn>
+                    </template>
 
-            <!-- Input events-->
-            <template v-if="topSchema && topSchema.length">
-              <template v-for="topInput in topSchema" :key="topInput.name">
-                <v-menu
-                  :close-on-content-click="false"
-                  transition="scale-transition"
-                  offset-y
-                >
-                  <template v-slot:activator="{ props }">
-                    <v-btn
-                      variant="outlined"
-                      append-icon="mdi-chevron-down"
-                      v-bind="props"
-                    >
-                      <!-- {{ topInput.label }} -->
-                      {{ getTopInputActiveLabel(topInput) }}
-                      <!-- {{ topInput.items.find(item => item[topInput.itemValue] ===  ($isset(model[topInput.name]) ? model[topInput.name] : -1))[topInput.itemTitle] ?? topInput.label }} -->
-                    </v-btn>
-                  </template>
-
-                  <v-list>
-                    <v-list-item
-                      v-for="(item, index) in topInput.items"
-                      :key="item.id"
-                      @click="model[topInput.name] = item.id"
-                    >
-                      <v-list-item-title>
-                        {{ item.name }}
-                        <v-icon v-if="$isset(model[topInput.name]) && item[topInput.itemValue] === model[topInput.name]" size="small" icon="$check" color="primary"></v-icon>
-                      </v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
+                    <v-list>
+                      <v-list-item
+                        v-for="(item, index) in topInput.items"
+                        :key="item.id"
+                        @click="model[topInput.name] = item.id"
+                      >
+                        <v-list-item-title>
+                          {{ item.name }}
+                          <v-icon v-if="$isset(model[topInput.name]) && item[topInput.itemValue] === model[topInput.name]" size="small" icon="$check" color="primary"></v-icon>
+                        </v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+                </template>
               </template>
-            </template>
 
-            <!-- Language Selector -->
-            <v-chip-group
-              v-if="hasTraslationInputs && languages && languages.length && languages.length > 1"
-              :modelValue="currentLocale.value"
-              @update:modelValue="updateLocale($event)"
-              selected-class="bg-primary"
-              mandatory
-            >
-              <v-chip
-                v-for="language in languages"
-                :key="language.value"
-                :text="language.shortlabel"
-                :value="language.value"
-                variant="outlined"
-              ></v-chip>
-            </v-chip-group>
-            <slot name="headerRight">
+              <!-- Language Selector -->
+              <v-chip-group
+                v-if="hasTraslationInputs && languages && languages.length && languages.length > 1"
+                :modelValue="currentLocale.value"
+                @update:modelValue="updateLocale($event)"
+                selected-class="bg-primary"
+                mandatory
+              >
+                <v-chip
+                  v-for="language in languages"
+                  :key="language.value"
+                  :text="language.shortlabel"
+                  :value="language.value"
+                  variant="outlined"
+                ></v-chip>
+              </v-chip-group>
+              <slot name="headerRight">
 
-            </slot>
+              </slot>
+            </div>
           </template>
         </ue-title>
 
@@ -341,17 +343,17 @@ import { top } from '@popperjs/core'
     created () {
       this.rawSchema = this.issetSchema ? this.schema : this.$store.state.form.inputs
       this.defaultItem = this.issetSchema ? getModel(this.rawSchema) : this.$store.getters.defaultItem
-      __log(this.rawSchema)
+
       this.model = getModel(
         this.rawSchema,
         this.issetModel ? this.modelValue : this.editedItem,
         this.$store.state,
       )
+
       this.inputSchema = this.invokeRuleGenerator(getSchema(this.rawSchema, this.model, this.isEditing))
-      __log(this.model, this.inputSchema)
-      // this.topSchema = this.invokeRuleGenerator(getTopSchema(this.rawSchema, this.model, this.isEditing))
+
       this.topSchema = getTopSchema(this.rawSchema)
-      console.log(this.topSchema);
+
       this.resetSchemaErrors()
     },
 
@@ -547,7 +549,7 @@ import { top } from '@popperjs/core'
         this.$emit('input', v)
       },
       handleEvent (obj) {
-        handleEvents(this.model, this.inputSchema, obj.schema)
+        handleEvents(this.model, this.inputSchema, obj.schema, true)
         // const { _fields: newModel, moduleSchema: newSchema } = handleInputEvents(obj.schema.event, this.model, this.inputSchema, obj.key)
         // this.model = newModel
         // this.inputSchema = newSchema

@@ -42,13 +42,15 @@ export default {
       const el = doc.body.firstChild
 
       const name = el.tagName.toLowerCase()
-      const props = {}
+      let props = {}
       const content = el.textContent
 
       for (let i = 0; i < el.attributes.length; i++) {
         const attr = el.attributes[i]
         props[attr.name] = attr.value
       }
+
+      props = { ...props, ...this.$bindAttributes() }
 
       return { name, props, content }
     }

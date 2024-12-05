@@ -164,6 +164,9 @@ trait ManageForm
         $_input = null;
 
         if($type == 'divider' || !!$name){
+            if($default_input['color'] && in_array($hydrated['type'], ['morphTo', 'relationship', 'wrap', 'group'])){
+                unset($default_input['color']);
+            }
             $_input =  $this->configureInput(array_merge_recursive_preserve($default_input, $hydrated));
             if($type == 'divider'){
                 $name = $type . '_' . uniqid();
@@ -399,6 +402,14 @@ trait ManageForm
                     $reversedParents = array_reverse($input['schema']);
 
                     foreach ($reversedParents as $index => $attachable) {
+                        $name = $attachable['name'];
+                        $connector = $attachable['connector'] ?? null;
+                        $attachable = $this->getSchemaInput($attachable + ['noRecords' => true])[$name];
+
+                        if(!!$connector){
+                            $attachable['connector'] = $connector;
+                        }
+                        unset($attachable['noRecords']);
                         $attachable['ext'] = 'morphTo';
 
                         if ($index == ($length - 1)) {
@@ -412,7 +423,10 @@ trait ManageForm
                                 $relationshipName = pluralize($this->getCamelNameFromForeignKey($foreignKey));
                                 $relationChain .= ! $relationChain ? $relationshipName : ".{$relationshipName}";
                                 $ownerKey = $j == 0 ? $attachable['name'] : $selectables[$j - 1]['name'];
-                                $attachable['cascades'][] = $relationChain . ":{$item['itemValue']},{$ownerKey},{$item['itemTitle']}";
+
+                                $attachable['cascades'][] = $relationChain;
+                                // $attachable['cascades'][] = $relationChain . ":{$item['itemValue']},{$ownerKey},{$item['itemTitle']}";
+
                                 // $attachable['cascades'][$relationChain . " as {$relationChain}_items"] = [
                                 //     ['select', $item['itemValue'] , $ownerKey, $item['itemTitle']]
                                 // ];
@@ -461,14 +475,18 @@ trait ManageForm
 
         $this->hydrateInputExtension($input, $data, $arrayable, $inputs);
 
-        if (isset($this->repository)) {
-            if (method_exists($this->repository->getModel(), 'getTranslatedAttributes')
-                && in_array($input['name'], $this->repository->getTranslatedAttributes())
-            ) {
-                $input['translated'] ??= true;
-                // $input['locale_input'] = $input['type'];
-                // $input['type'] = 'input-locale';
-                $data = $input;
+        if (isset($this->repository) && isset($input['name'])) {
+            try {
+                if (method_exists($this->repository->getModel(), 'isTranslationAttribute')
+                    && $this->repository->isTranslationAttribute($input['name'])
+                ) {
+                    $input['translated'] ??= true;
+                    // $input['locale_input'] = $input['type'];
+                    // $input['type'] = 'input-locale';
+                    $data = $input;
+                }
+            } catch (\Throwable $th) {
+                dd($input, $th);
             }
 
         }
