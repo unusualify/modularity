@@ -542,10 +542,12 @@ const FormatFuncs = {
 
   formatSet: async function(args, model, schema, input, index = null, preview = []) {
     const inputNotation = this.getInputToFormat(args, model, schema, index )
+    const languages = getTranslationLanguages()
 
     if(!inputNotation)
       return
 
+    const inputToFormat = inputNotation
     const inputPropToFormat = args.shift() //
     const setterNotation = `${inputNotation}.${inputPropToFormat}`
     const setPropFormat = args.shift() // items.*.schema
@@ -561,11 +563,75 @@ const FormatFuncs = {
       dataSet = __data_get(handlerSchema, notation, null)
 
       if(dataSet && dataSet.length > 0){
-        const newValue = dataSet.shift()
-        _.set(schema, setterNotation, newValue)
-        if(inputPropToFormat.match(/schema/)){
-          _.set(schema, `${inputNotation}.default`, getModel(newValue))
+        let newValue = dataSet.shift()
+
+
+        let matches = inputPropToFormat.match(/^(modelValue|model)$/g)
+        // __log(inputPropToFormat, matches)
+        if(matches){ // setting modelValue
+          let targetInput = _.get(schema, inputToFormat)
+          let targetInputName = targetInput.name
+          let targetForeignKey = __extractForeignKey(targetInputName)
+          let targetInputSchema = targetInput.schema ?? null
+          let isRepeater = targetInput.type == 'input-repeater'
+          let isArrayValue = Array.isArray(newValue)
+
+          if(__isset(targetInput['translated']) && targetInput['translated']){
+            let translationParts = notation.split('.')
+            let field = translationParts.pop()
+            let translationNotation = translationParts.join('.') + '.translations'
+            notation.split('.').pop()
+            let rawTranslation = __data_get(handlerSchema, translationNotation).shift()
+
+            if(rawTranslation){
+              // TODO: translations do not comes from package_type
+              __log(rawTranslation)
+              newValue = _.reduce(languages, (acc, language) => {
+                let translation = _.find(rawTranslation, (el) => el.locale == language) ?? rawTranslation[0]
+                let value = translation[field] ?? null
+                acc[language] = translation[field] ?? null
+                return acc
+              }, {})
+            }
+          }
+
+          if(isArrayValue && newValue.length > 0){
+            let values = newValue.map((item) => {
+              if(targetInputSchema){
+                return _.reduce(targetInputSchema, (acc, value, key) => {
+                  // __log(key, value)
+                  if(isRepeater && key == targetForeignKey){
+                    acc[targetForeignKey] = item['id'] ?? null
+                  }else{
+                    acc[key] = item[key] ?? null
+                  }
+
+                  return acc
+                }, {})
+              }
+            })
+
+            _.set(model, inputToFormat, values)
+            // let currentValue = _.get(model, inputToFormat)
+            // __log( inputToFormat, __data_get(model, inputToFormat), model )
+            // if( !(Array.isArray(currentValue) && currentValue.length > 0)){
+            //   // __log('setting')
+            // }
+          }else if(!isArrayValue){
+            try{
+              _.set(model, targetInputName, newValue)
+            }catch(e){
+              console.error(e)
+            }
+          }
+        }else{
+          _.set(schema, setterNotation, newValue)
+          if(inputPropToFormat.match(/schema/)){
+            _.set(schema, `${inputNotation}.default`, getModel(newValue))
+          }
+
         }
+
       }
     }
   },
@@ -800,7 +866,6 @@ const FormatFuncs = {
                 if(Array.isArray(val) && _.isEmpty(val)) return
 
                 let parentPattern = parentPatterns[i];
-
                 let ids = Array.isArray(val) ? val.join(',') : val
 
                 // let getter = [parentPattern, inputToFormat.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*' + `id=${ids}` + '$3')].join('.')
