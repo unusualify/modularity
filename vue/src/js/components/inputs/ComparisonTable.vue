@@ -17,6 +17,18 @@
         hide-default-footer
 
         >
+        <!-- header slots -->
+        <template
+          v-for="(header, i) in headers"
+          :key="`header-${header.key}`"
+          v-slot:[`header.${header.key}`]="headerScope"
+          >
+          <div v-if="$isset(header.id) && input == header.id" class="v-input-comparison-table__header--selected">
+            {{ header.title }}
+          </div>
+          <div v-else v-html="header.title"></div>
+        </template>
+        <!-- item slots -->
         <template
           v-for="(header, i) in headers"
           :key="`item-${header.key}`"
@@ -53,6 +65,10 @@
       items: {
         type: Object,
         default: () => []
+      },
+      comparatorField: {
+        type: String,
+        default: 'name'
       },
       comparators: {
         type: Object,
@@ -153,21 +169,20 @@
           rowData.comparator_name = comparisonValue
 
           this.items.forEach((item) => {
-
             if(__isObject(comparator)){
-              let found = find( item['package_features'], ['id', comparator.id] )
+              let found = find( item[this.comparatorField], ['id', comparator.id] )
 
               if(found){
-                rowData[item.name] = found.pivot.active == '1'
-                  ? '<span class="mdi mdi-check text-info font-weight-bold"></span>'
-                  : '<span class="mdi mdi-close text-error font-weight-bold"></span>'
+                rowData[item.name] = found.pivot.value
+                // rowData[item.name] = found.pivot.active == '1'
+                //   ? '<span class="mdi mdi-check text-info font-weight-bold"></span>'
+                //   : '<span class="mdi mdi-close text-error font-weight-bold"></span>'
               }else{
                 rowData[item.name] = ''
               }
             }else {
               let value = item[comparator]
               rowData[item.name] = value
-
               let rec = null
               if(( rec = find(this.comparators, ['key', comparator]) ) && __isset(rec.itemClasses)){
                 rowData[item.name] = `<span class="${rec.itemClasses}"> ${value} </span>`
@@ -209,6 +224,9 @@
     .v-input__control
       display: block
 
+    th:has(> .v-input-comparison-table__header--selected)
+      background-color: rgb(var(--v-theme-primary)) !important
+      color: rgb(var(--v-theme-on-primary)) !important
     &--striped
       tr
         &:nth-of-type(2n)
