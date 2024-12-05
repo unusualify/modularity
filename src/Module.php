@@ -463,6 +463,8 @@ class Module extends NwidartModule
             'bulkDelete',
             'bulkForceDelete',
             'bulkRestore',
+            'tags',
+            'tagsUpdate',
         ];
 
         $isParentRoute = $this->isParentRoute($routeName);
