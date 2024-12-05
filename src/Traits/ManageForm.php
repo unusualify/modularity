@@ -402,6 +402,14 @@ trait ManageForm
                     $reversedParents = array_reverse($input['schema']);
 
                     foreach ($reversedParents as $index => $attachable) {
+                        $name = $attachable['name'];
+                        $connector = $attachable['connector'] ?? null;
+                        $attachable = $this->getSchemaInput($attachable + ['noRecords' => true])[$name];
+
+                        if(!!$connector){
+                            $attachable['connector'] = $connector;
+                        }
+                        unset($attachable['noRecords']);
                         $attachable['ext'] = 'morphTo';
 
                         if ($index == ($length - 1)) {
