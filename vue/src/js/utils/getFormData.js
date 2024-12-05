@@ -357,7 +357,7 @@ export const handleInputEvents = (events = null, fields, moduleSchema, name = nu
   }
 }
 
-export const handleEvents = ( model, schema, input) => {
+export const handleEvents = ( model, schema, input, valueChanged = false) => {
 
   const handlerName = input.name
   const handlerSchema = schema[handlerName]
@@ -369,8 +369,12 @@ export const handleEvents = ( model, schema, input) => {
     input.event.split('|').forEach(event => {
       let args = event.split(':')
       let methodName = args.shift()
+      let runnable = true
 
-      if(typeof FormatFuncs[methodName] !== 'undefined')
+      if(methodName == 'formatSet' && !valueChanged)
+        runnable = false
+
+      if(runnable && typeof FormatFuncs[methodName] !== 'undefined')
         FormatFuncs?.[methodName](args, model, schema, input)
 
     })
