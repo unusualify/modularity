@@ -9,15 +9,18 @@ $button-min-width: 7.5rem !default;
 $button-max-width: 300px !default;
 $button-font-weight: 700 !default;
 $button-font-size: 0.75rem !default;
-$button-density: ('default': 0, 'comfortable': -2, 'compact': -3) !default;
+$button-density: ('default': 0, 'comfortable': -2, 'compact': -4) !default;
+$button-icon-font-size: 1rem !default;
 
 /* INPUT */
-$input-font-size: .8rem !default;
+$input-density: ('default': 1, 'comfortable': 0, 'compact': -2) !default;
+$input-font-size: 1rem !default;
 $input-control-height: 52px !default;
 $input-line-height: 1.2 !default; // default 1.5
 
 /* FIELDS */
-$field-control-height: 52px;
+$field-font-size: $input-font-size !default;
+$field-control-height: $input-control-height;
 $field-label-floating-scale: 0.81 !default;
 
 $zindex__loadingTable: 4 !default;
