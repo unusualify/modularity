@@ -32,7 +32,12 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
 
     _inputs[key].class = _inputs[key]._originalClass || _inputs[key].class
     _inputs[key]._originalClass = _inputs[key].class
-    _inputs[key].disabled = _inputs[key]._originalDisabled ?? _inputs[key].disabled ?? false
+    _inputs[key].disabled = __isset(_inputs[key]._originalDisabled)
+      ? _inputs[key]._originalDisabled
+      : __isset(_inputs[key].disabled)
+        ? _inputs[key].disabled
+        : false
+    _inputs[key]._originalDisabled = _inputs[key].disabled
 
     let inputClass = input.class || []
 
