@@ -108,13 +108,9 @@ export const getModel = (inputs, item = null, rootState = null) => {
       }, {})
     }
 
-    // if (isMediableTypes.includes(input.type)) {
-    //   // if (editing) { __log(name, item, input) }
-    //   return fields
-    // }
-    // __log(name, _default, item)
-    let value = editing ? (__isset(fields[name]) ? fields[name] : (__isset(item[name]) ? item[name] : _default)) : _default
-    // const value = editing ? (__isset(item[name]) ? item[name] : _default) : _default
+    let accessName = name.replace(/->/g, '.')
+    let value = editing ? (__isset(fields[name]) ? fields[name] : (__data_get(item, accessName, _default))) : _default
+
     if(editing){
       if(input.type == 'group' && __isset(item[name])){
         let defaultGroupKeys = Object.keys(_.omit(__dot(_default), ['id']));
@@ -213,8 +209,11 @@ export const getSubmitFormData = (inputs, item = null, rootState = null) => {
     // }
 
     const name = input.name
+
+    const value = __data_get(item, name, undefined)
+
     // default model value
-    if (!__isset(item[name])) {
+    if (!__isset(value)) {
       let value = input.default ?? ''
       if (isArrayable.includes(input.type)) {
         value = []
@@ -224,7 +223,7 @@ export const getSubmitFormData = (inputs, item = null, rootState = null) => {
 
       return fields
     }
-    const value = item[name]
+    // const value = item[name]
 
     if (__isObject(input)) {
       if (Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated) { // translations
