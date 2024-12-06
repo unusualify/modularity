@@ -26,7 +26,7 @@
     </template>
 
     <template v-else-if="isTextable(configuration.elements)">
-      {{ configuration.elements }}
+      {{ applyCasting(configuration.elements) }}
     </template>
 
 
