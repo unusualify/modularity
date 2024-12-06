@@ -100,7 +100,6 @@ class ForgotPasswordController extends Controller
                                 'variant' => 'text',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'v-col-5 justify-content-start',
-                                'density' => 'default',
                                 'color' => 'grey-lighten-1'
 
                             ],
@@ -113,8 +112,6 @@ class ForgotPasswordController extends Controller
                                 'href' => '',
                                 'class' => 'v-col-5',
                                 'type' => 'submit',
-                                'density' => 'default',
-
                             ],
                         ],
                     ],
@@ -134,7 +131,6 @@ class ForgotPasswordController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'mt-5 mb-2 custom-auth-button',
-                                'density' => 'default',
                                 'color' => 'grey-lighten-1'
 
                             ],
@@ -156,7 +152,6 @@ class ForgotPasswordController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-2 custom-auth-button',
-                                'density' => 'default',
                                 'color' => 'grey-lighten-1'
 
                             ],
@@ -178,7 +173,6 @@ class ForgotPasswordController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('register.form')),
                                 'class' => 'my-2 custom-auth-button',
-                                'density' => 'default',
                                 'color' => 'grey-lighten-1'
 
                             ],

@@ -3,11 +3,11 @@
 return [
     'back-to-login' => 'Back to Login',
     'choose-password' => 'Choose password',
-    'email' => 'Email',
+    'email' => 'E-mail address',
     'forgot-password' => 'Forgot password',
     'login' => 'Login',
     'name' => 'Name',
-    'login-title' => 'Login',
+    'login-title' => 'SIGN IN TO GET STARTED',
     'oauth-link-title' => 'Re-enter your password to link :provider to your account',
     'otp' => 'One-time password',
     'password' => 'Password',
@@ -26,5 +26,6 @@ return [
     'sign-in-apple' => 'Sign in with Apple',
     'sign-in-google' => 'Sign in with Google',
     'have-an-account' => 'Already have an account?',
+    'sign-in' => 'Sign In',
 
 ];

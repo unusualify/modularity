@@ -149,7 +149,6 @@ class RegisterController extends Controller
                                 'variant' => 'text',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'v-col-5 justify-content-start',
-                                'density' => 'default',
                                 'color' => 'grey-lighten-1'
                             ],
                         ],
@@ -161,7 +160,6 @@ class RegisterController extends Controller
                                 'href' => '',
                                 'class' => 'v-col-5',
                                 'type' => 'submit',
-                                'density' => 'default',
 
                             ],
                         ],
@@ -182,7 +180,6 @@ class RegisterController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'mt-5 mb-2 custom-auth-button',
-                                'density' => 'default',
                                 'color' => 'grey-lighten-1'
 
                             ],
@@ -204,7 +201,6 @@ class RegisterController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-2 custom-auth-button',
-                                'density' => 'default',
                                 'color' => 'grey-lighten-1'
 
                             ],
@@ -215,7 +211,6 @@ class RegisterController extends Controller
                                         'symbol' => 'apple',
                                         'width' => '16',
                                         'height' => '16',
-                                        'density' => 'default',
 
                                     ],
                                 ],
