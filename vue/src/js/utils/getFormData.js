@@ -13,7 +13,7 @@ const isArrayable = 'input-treeview|treeview|input-checklist|input-repeater|inpu
 
 export const getSchema = (inputs, model = null, isEditing = false) => {
   let _inputs = _.omitBy(inputs, (value, key) => {
-    return Object.prototype.hasOwnProperty.call(value, 'slotable') || isTopEventInput(value)
+    return Object.prototype.hasOwnProperty.call(value, 'slotable') || isTopEventInput(value) || isViewOnlyInput(value)
   })
 
   if (_.find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'wrap'))) {
@@ -27,48 +27,48 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
     }, {})
   }
 
-  Object.keys(_inputs).forEach(key => {
-    const input = _inputs[key]
+  _inputs = _.reduce(_inputs, (acc, input, key) => {
+    input.class = input._originalClass || input.class;
+    input._originalClass = input.class;
 
-    _inputs[key].class = _inputs[key]._originalClass || _inputs[key].class
-    _inputs[key]._originalClass = _inputs[key].class
-    _inputs[key].disabled = __isset(_inputs[key]._originalDisabled)
-      ? _inputs[key]._originalDisabled
-      : __isset(_inputs[key].disabled)
-        ? _inputs[key].disabled
-        : false
-    _inputs[key]._originalDisabled = _inputs[key].disabled
+    let inputClass = input.class || [];
 
-    let inputClass = input.class || []
+    if (__isString(inputClass)) {
+      inputClass = inputClass.split(' ');
+    }
 
-    if(__isString(inputClass))
-      inputClass = inputClass.split(' ')
+    let isCreatable = input.creatable;
+    let isEditable = input.editable;
 
-    let isCreatable = input.creatable
-    let isEditable = input.editable
     // Check if the input has createable property and it's false or hidden
     if ((isCreatable === false || isCreatable === 'hidden') && !isEditing) {
-      if(isCreatable === 'hidden'){
-        inputClass = _.union(inputClass, ['d-none'])
-        _inputs[key].class = inputClass.join(' ')
+      if (isCreatable === 'hidden') {
+        inputClass = _.union(inputClass, ['d-none']);
+        input.class = inputClass.join(' ');
       } else {
-        _inputs[key].disabled = true
-      }
-    }
-    // Check if the input has editable property and it's false or hidden
-    if ((isEditable === false || isEditable === 'hidden') && isEditing) {
-      if(isEditable === 'hidden'){
-        inputClass = _.union(inputClass, ['d-none'])
-        _inputs[key].class = inputClass.join(' ')
-      } else {
-        _inputs[key].disabled = true
+        input.disabled = true;
       }
     }
 
-    if(__isset(_inputs[key]) && __isset(_inputs[key].schema) && ['wrap', 'group', 'repeater', 'input-repeater'].includes(input.type)){
-      _inputs[key].schema = getSchema(input.schema, input.type === 'wrap' ? model : model[key], isEditing)
+    // Check if the input has editable property and it's false or hidden
+    if ((isEditable === false || isEditable === 'hidden') && isEditing) {
+      if (isEditable === 'hidden') {
+        inputClass = _.union(inputClass, ['d-none']);
+        input.class = inputClass.join(' ');
+      } else {
+        input.disabled = true;
+      }
     }
-  });
+
+    if (__isset(input) && __isset(input.schema) && ['wrap', 'group', 'repeater', 'input-repeater'].includes(input.type)) {
+      input.schema = getSchema(input.schema, input.type === 'wrap' ? model : model[key], isEditing);
+    }
+
+    // Always add the input to the accumulator
+    acc[key] = input;
+
+    return acc;
+  }, {});
 
   _.map(_inputs, (value, key) => {
     if(__isset(value.type) && value.type == 'group'){
@@ -481,8 +481,14 @@ const slugify = (newValue) => {
   return filters.slugify(text)
 }
 
-const isTopEventInput = (input) => {
-  return Object.prototype.hasOwnProperty.call(input, 'topEvent') && input.topEvent && ['select', 'autocomplete', 'combobox'].includes(input.type)
+export const isTopEventInput = (input) => {
+  return Object.prototype.hasOwnProperty.call(input, 'topEvent')
+    && input.topEvent
+    && ( ['select', 'autocomplete', 'combobox'].includes(input.type) || __isset(input.viewOnlyComponent) )
+}
+
+const isViewOnlyInput = (input) => {
+  return Object.prototype.hasOwnProperty.call(input, 'viewOnlyComponent')
 }
 
 const getTranslationLanguages = (input) => {

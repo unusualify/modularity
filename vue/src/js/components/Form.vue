@@ -24,14 +24,18 @@
         >
           {{ titleSerialized }}
           <template v-slot:right>
-            <div class="d-flex">
+            <div class="d-flex align-center">
               <slot name="headerCenter">
 
               </slot>
               <!-- Input events-->
               <template v-if="topSchema && topSchema.length">
                 <template v-for="topInput in topSchema" :key="topInput.name">
-                  <v-menu
+                  <ue-recursive-stuff v-if="topInput.viewOnlyComponent"
+                    :configuration="topInput.viewOnlyComponent"
+                    :bind-data="editedItem"
+                  />
+                  <v-menu v-else
                     :close-on-content-click="false"
                     transition="scale-transition"
                     offset-y

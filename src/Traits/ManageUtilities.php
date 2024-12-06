@@ -400,43 +400,33 @@ trait ManageUtilities
      */
     public function filterSchemaByRoles($schema)
     {
-        // moved here from ManageForm
-        // the method name changed
-        // as the Gunes did it.
-        // TODO: refactor this code to be more efficient like filterHeadersByRoles
-        return array_filter(
-            array_map(function ($field) {
+        return Collection::make($schema)->reduce(function ($carry, $field, $name) {
+            $isAllowed = (! $this->user || ! isset($field['allowedRoles']))
+                // || $this->user->isSuperAdmin()
+                || $this->user->hasRole($field['allowedRoles']);
 
-                if (is_null(Auth::user())) {
-                    return false;
-                }
+            if (
+                $isAllowed
+                || isset($field['viewOnlyComponent'])
+            ) {
 
-                if (isset($field['allowedRoles']) && ! Auth::user()->hasRole($field['allowedRoles'])) {
-                    return null;
-                }
+                if(!$isAllowed && isset($field['viewOnlyComponent'])){
+                    $carry[$name] = $field;
+                } else if(in_array($field['type'], ['group', 'wrap'])){
+                    if(isset($field['schema'])){
+                        $field['schema'] = $this->filterSchemaByRoles($field['schema']);
 
-                if ($field['type'] === 'group' && isset($field['schema'])) {
-                    $field['schema'] = $this->filterSchemaByRoles($field['schema']);
-
-                    if (empty($field['schema'])) {
-                        return null;
+                        if(!empty($field['schema'])){
+                            $carry[$name] = Arr::except($field, ['viewOnlyComponent']);
+                        }
                     }
+                } else {
+                    $carry[$name] = Arr::except($field, ['viewOnlyComponent']);
                 }
 
-                if ($field['type'] === 'wrap' && isset($field['schema'])) {
-                    $field['schema'] = $this->filterSchemaByRoles($field['schema']);
-                    if (empty($field['schema'])) {
-                        return null;
-                    }
-                }
-
-                return $field;
-
-            }, $schema),
-            function ($field) {
-                return $field !== null;
             }
-        );
+            return $carry;
+        }, []);
     }
 
     public function getNestedData()
