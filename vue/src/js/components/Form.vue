@@ -25,6 +25,9 @@
           {{ titleSerialized }}
           <template v-slot:right>
             <div class="d-flex">
+              <slot name="headerCenter">
+
+              </slot>
               <!-- Input events-->
               <template v-if="topSchema && topSchema.length">
                 <template v-for="topInput in topSchema" :key="topInput.name">
@@ -86,6 +89,10 @@
 
         <v-divider v-if="hasDivider"></v-divider>
       </div>
+
+      <slot name="top">
+
+      </slot>
 
       <!-- Scrollable Content Section -->
       <div :class="['d-flex', scrollable ? 'flex-grow-1 overflow-hidden mr-n5' : '']">
