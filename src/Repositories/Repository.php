@@ -273,15 +273,35 @@ abstract class Repository
             $column = is_array($column) ? array_shift($column) : $column;
 
             return $query->get()->map(fn ($item) => [
-                'id' => $item->id,
+                ...$item->toArray(),
                 $column => $item->{$column},
             ]);
-        }
-        if (is_array($column)) {
-            return $query->get(['id', ...$column]);
+
+            // return $query->get()->map(fn ($item) => [
+            //     'id' => $item->id,
+            //     $column => $item->{$column},
+            // ]);
         }
 
-        return $query->get(['id', $column]);
+        $columns = ['id', ...(is_array($column) ? $column : [$column] )];
+
+        try {
+            return $query->get($columns);
+        } catch (\Throwable $th) {
+            if(method_exists($this->model, 'getColumns')){
+                $appends = $this->model->getAppends();
+                $differentElements = array_diff($columns, $this->model->getColumns());
+                // if absent columns exist in appends, we can return the result with the absent columns
+                if (empty(array_diff($differentElements, $appends))) {
+                    // All differentElements exist in appends
+                    // You can proceed with your logic here if needed
+                    return $query->get()->map(fn ($item) => collect($columns)->map(fn ($c) => $item->{$c})->toArray());
+                }
+            }
+            // no absent columns exist in appends, we can't return the result with the absent columns
+            throw $th;
+        }
+
     }
 
     /**
@@ -379,6 +399,7 @@ abstract class Repository
     public function update($id, $fields, $schema = null)
     {
         $this->traitColumns = $this->setColumns($this->traitColumns, $schema ?? $this->chunkInputs(all: true));
+
         DB::transaction(function () use ($id, $fields) {
             $object = $this->model->findOrFail($id);
 
@@ -877,20 +898,19 @@ abstract class Repository
     {
         return array_map(function ($item) {
             return is_array($item)
-                    ? function ($query) use ($item) {
-                        // dd($item);
-                        // $db->table('roles')->pluck('id');
-                        // $query->addSelect('id');
-                        if (is_array($item[0])) {
-                            foreach ($item as $key => $args) {
-                                $query->{array_shift($args)}(...$args);
-                            }
-                        } else {
-                            $query->{array_shift($item)}(...$item);
+                ? function ($query) use ($item) {
+
+                    if (is_array($item[0])) {
+                        foreach ($item as $key => $args) {
+                            $query->{array_shift($args)}(...$args);
                         }
-                        $query->without('pivot');
+                    } else {
+                        $query->{array_shift($item)}(...$item);
                     }
-            : $item;
+                    $query->without('pivot');
+                }
+                : $item
+            ;
         }, $with);
     }
 

@@ -15,7 +15,7 @@ class CreateCardTypePaymentServiceTable extends Migration
     {
         Schema::create('card_type_payment_service', function (Blueprint $table) {
             createDefaultRelationshipTableFields($table, 'card_type', 'payment_service');
-            
+
         });
     }
 

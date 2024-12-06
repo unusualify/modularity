@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Response;
 use Unusualify\Modularity\Traits\ManageNames;
 use Unusualify\Modularity\Traits\ManageTraits;
+use Illuminate\Support\Str;
+use Unusualify\Modularity\Services\MessageStage;
 
 abstract class CoreController extends LaravelController
 {
@@ -305,5 +307,57 @@ abstract class CoreController extends LaravelController
                     ),
                 ],
             ], 200);
+    }
+
+    /**
+     * update Tags
+     *
+     * @return Illuminate\Support\Facades\Response
+     */
+    public function tagsUpdate()
+    {
+
+        // dd($this->request->all());
+        // $this->repository
+        //     ->getModel()
+        //     ->addTag($this->request->input('value'));
+
+        $name = $this->request->input('value');
+        $model = $this->repository
+            ->getModel();
+
+        // $model->addTag($name);
+        // // $model->removeTag($this->request->input('value'));
+
+        // $tag = $model->createTagsModel()
+        //     ->select(['id'])
+        //     ->whereName($name)
+        //     ->whereNamespace(get_class($model))
+        //     ->first();
+
+        // Create new tag with namespace
+        $tag =  $model->createTagsModel()->create([
+            'name' => $this->request->input('value'),
+            'slug' => Str::slug($this->request->input('value')),
+            'namespace' => get_class($model)
+        ]);
+
+        return Response::json([
+            'message' => 'Tag created successfully',
+            'variant' => MessageStage::SUCCESS,
+            'id' => $tag->id
+        ], 200);
+
+        return Response::json(
+            [
+                'resource' => [
+                    'last_page' => 1,
+                    'data' => $tags->map(function ($tag) {
+                        return $tag->name;
+                    }
+                    ),
+                ],
+            ], 200);
+
     }
 }

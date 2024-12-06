@@ -39,14 +39,11 @@ class PaymentService extends Model
         return $this->belongsToMany(\Modules\SystemPayment\Entities\PaymentCurrency::class);
     }
 
-
-	/**
-	 * The cardTypes that belong to the PaymentService.
-	 * 
-	 */
-	public function cardTypes() : \Illuminate\Database\Eloquent\Relations\BelongsToMany
-	{
-		return $this->belongsToMany(\Modules\SystemPayment\Entities\CardType::class);
-	}
-
+    /**
+     * The cardTypes that belong to the PaymentService.
+     */
+    public function cardTypes(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(\Modules\SystemPayment\Entities\CardType::class);
+    }
 }

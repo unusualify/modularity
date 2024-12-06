@@ -95,7 +95,9 @@ abstract class InputHydrate
     {
         $input = $this->input;
 
-        if (isset($input['repository'])) {
+        $noRecords = isset($input['noRecords']) && $input['noRecords'];
+
+        if (isset($input['repository']) && ! $noRecords) {
             $args = explode(':', $input['repository']);
 
             $className = array_shift($args);
@@ -116,6 +118,7 @@ abstract class InputHydrate
 
             $params = array_merge_recursive($params, ['with' => $this->getWiths()]);
             // dd($params, [$input['itemTitle'] ?? 'name', ...$this->getItemColumns()]);
+
             $items = call_user_func_array([$repository, $methodName], [
                 ...($methodName == 'list' ? ['column' => [$input['itemTitle'] ?? 'name', ...$this->getItemColumns()]] : []),
                 ...$params,

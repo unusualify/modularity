@@ -4,12 +4,14 @@ import { mount } from '@vue/test-utils'
 import Checklist from '../../src/js/components/inputs/Checklist.vue'
 
 import vuetify from '../../src/js/plugins/vuetify'
+import UEConfig from '../../src/js/plugins/UEConfig'
+
 
 function factory(props, options = {}) {
 
   return mount(Checklist, {
     global: {
-      plugins: [vuetify],
+      plugins: [UEConfig]
     },
     ...options,
     props

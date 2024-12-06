@@ -76,7 +76,7 @@
                 type="subtitle-1"
                 color="black"
                 :text="tableTitle"
-                padding="x-3"
+                padding="a-0"
               />
               <!-- subtitle -->
               <ue-title
@@ -85,7 +85,7 @@
                 weight="medium"
                 color="grey-darken-1"
                 transform="none"
-                padding="x-3"
+                padding="a-0"
                 :text="tableSubtitle"
               />
             </div>
@@ -124,7 +124,7 @@
                     variant="outlined"
                     append-inner-icon="mdi-magnify"
                     hide-details
-                    density="comfortable"
+                    density="compact"
                     single-line
                     :placeholder="searchText"
                     :class="[
@@ -203,11 +203,20 @@
               min-width="40vw"
               max-width="50vw"
             >
-              <v-row  class="justify-center" no-gutters>
+              <v-card-text>
+                <template v-for="(filters, index) in advancedFilters" :key="index">
+                  <component v-for="(filter, ind) in filters"
+                    :is="`v-${filter.type}`"
+                    v-bind="filter.componentOptions"
+                    v-model="filter['selecteds']"
+                  />
+                </template>
+              </v-card-text>
+              <!-- <v-row class="justify-center" no-gutters>
                 <v-col
                   cols="11"
-                  v-for="(filters, index) in advancedFilters"
                   :key="index"
+                  v-for="(filters, index) in advancedFilters"
                 >
                   <component v-for="(filter, ind) in filters"
                     :is="`v-${filter.type}`"
@@ -215,10 +224,9 @@
                     v-model="filter['selecteds']"
                   />
                 </v-col>
-              </v-row>
+              </v-row> -->
               <v-card-actions>
                 <v-spacer></v-spacer>
-
                 <v-btn
                   text="Clear"
                   variant="plain"
@@ -239,35 +247,52 @@
           <ue-modal
             ref="formModal"
             v-model="formActive"
-            scrollable
+            scrollablex
             transition="dialog-bottom-transition"
             width-type="lg"
             v-if="!embeddedForm"
           >
             <template v-slot:body="props">
-              <v-card >
-                <v-card-title class="text-h5 grey lighten-2"> </v-card-title>
-                <v-card-text>
-                  <ue-form
-                    ref="form"
-                    :title="formTitle"
-                    :isEditing="editedIndex > -1"
-                  />
-                </v-card-text>
-                <v-divider/>
-                <v-card-actions>
+              <v-card class="fill-height d-flex flex-column">
+                <!-- <v-card-title class="text-h5 grey lighten-2"> </v-card-title> -->
+                <ue-form
+                  ref="form"
+                  :title="formTitle"
+                  :isEditing="editedIndex > -1"
+                  fill-height
+                  scrollable
+                  has-divider
+                  no-default-form-padding
+                  form-class="px-6 pt-6 pb-0"
+                  style="height: 70vh !important;"
+                >
+                  <template v-slot:headerRight>
+                    <v-btn variant="text" icon="$close" density="compact" color="grey-darken-5"
+                      @click="closeForm()"
+                    ></v-btn>
+                  </template>
+                </ue-form>
+                <!-- <v-card-text>
+                </v-card-text> -->
+
+                <v-divider class="mx-6 mt-4"/>
+                <v-card-actions class="px-6 flex-grow-0">
                   <v-spacer></v-spacer>
-                  <v-btn color="error darken-1" text @click="closeForm()">
+                  <!-- <v-btn-secondary @click="closeForm()"
+                    :slim="false"
+                    variant="outlined"
+                  >
                     {{ props.textCancel }}
-                  </v-btn>
-                  <v-btn color="teal darken-1"
-                    text
+                  </v-btn-secondary> -->
+                  <v-btn-primary
+                    :slim="false"
+                    variant="elevated"
                     @click="confirmFormModal()"
                     :disabled="!formIsValid"
                     :loading="formLoading"
                   >
                     {{ $t('fields.save') }}
-                  </v-btn>
+                  </v-btn-primary>
                 </v-card-actions>
               </v-card>
             </template>
@@ -345,7 +370,6 @@
             <!-- <slot name="systembar">
               test
             </slot> -->
-
               <ue-form
                 ref="customForm"
                 v-model="customFormModel"
@@ -395,14 +419,16 @@
                           >
                           <template v-slot:activator="{ props }">
                             <v-btn
+                              v-bind="props"
+                              :text="action.forceLabel ? $t( action.label ?? $headline(action.name) ) : null"
                               :variant="action.variant ?? 'elevated'"
-                              size="small"
+                              :density="action.density ?? (action.forceLabel ? 'comfortable' : 'compact')"
+                              :size="action.size ?? (action.forceLabel ? 'default' : 'default')"
                               :icon="action.forceLabel ? null : (action.icon ? action.icon : '$' + action.name)"
                               :color="action.color ?? 'primary'"
                               :rounded="action.forceLabel ? null : true"
                               @click="itemAction(element, action)"
-                              v-bind="props"
-                              :text="action.forceLabel ? $t( action.label ?? $headline(action.name) ) : null"
+                              class="text-capitalize"
                             />
                           </template>
                         </v-tooltip>
@@ -411,6 +437,7 @@
                   </div>
                 </template>
               </component>
+              <v-divider v-if="i < items.length - 1" />
             </v-col>
           </v-row>
         </template>
@@ -453,7 +480,7 @@
                 <v-btn
                   :key="i"
                   v-bind="props"
-                  class="pa-0 justify-start"
+                  class="pa-0 justify-start text-capitalize"
                   variant="plain"
                   :color="`primary darken-1`"
                   @click="itemAction(item, ...col.formatter)"
