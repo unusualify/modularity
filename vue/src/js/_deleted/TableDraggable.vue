@@ -71,22 +71,9 @@
     </template>
 
     <template #tbody="props">
-      <!-- {{ $log(props.items) }} -->
       <draggable v-model="props.items" itemKey="value" tag="transition-group" :component-data="{name:'fade'}">
-        <!-- {{
-          $log(
-            // _createVNode(VDataTableRows, _mergeProps(dataTableRowsProps, {
-            //   "items": props.groupedItems
-            // }))
-            createNode( $refs.tabledraggable.$props , props.groupedItems)
-            // _createVNode(VDataTableRows, _mergeProps(VDataTableRows.filterProps($refs.tabledraggable.$props), {
-            //   "items": props.groupedItems
-            // }))
-          )
-        }} -->
         <!-- <v-nodes :vnodes="$refs.tabledraggable.genItems(props.items, props)" /> -->
-        <!-- {{  $log(element) }} -->
-        <!-- {{ $log(props, $refs.tabledraggable) }} -->
+
         <template #item="item">
           <VDataTableRow :index="item.index" :item="item.element" />
         </template>

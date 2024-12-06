@@ -38,7 +38,10 @@ class UWrapper
                 }
 
                 if (count($contents) > 1) {
-                    $div = UComponent::makeDiv();
+                    $div = UComponent::makeDiv()
+                        ->setAttributes([
+                            'class' => 'w-100',
+                        ]);
                     foreach ($contents as $component) {
                         $div->addChildren($component);
                     }

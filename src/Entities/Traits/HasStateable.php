@@ -207,23 +207,17 @@ trait HasStateable
         }
 
         foreach ($allStates as $state) {
-
             if (is_string($state)) {
-                array_merge($state, [
+                $state = array_merge($state, [
                     'color' => $defaultState['color'],
                     'icon' => $defaultState['icon'],
                 ]);
-
-            }
-            $_state = State::create($state);
-
-            $pivotData = ['is_active' => false];
-
-            if ($state['code'] == $initialState['code']) {
-                $pivotData['is_active'] = true;
             }
 
-            $model->states()->attach($_state->id, $pivotData);
+            $_state = State::where('code', $state['code'])->first() ?? State::create($state);
+
+            $isActive = $state['code'] === $initialState['code'];
+            $model->states()->attach($_state->id, ['is_active' => $isActive]);
         }
     }
 

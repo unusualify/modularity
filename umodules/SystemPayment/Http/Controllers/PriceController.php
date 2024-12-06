@@ -7,13 +7,11 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-use Modules\SystemPayment\Entities\Payment;
 use Modules\SystemPayment\Entities\PaymentService;
 use Modules\SystemPricing\Entities\Currency;
 use Oobook\Priceable\Models\Price;
-use Unusualify\Payable\Payable;
 use Unusualify\Modularity\Services\CurrencyExchangeService;
-
+use Unusualify\Payable\Payable;
 
 class PriceController extends Controller
 {
@@ -34,11 +32,11 @@ class PriceController extends Controller
 
         $requestCurrency = $params['payment_service']['currency']['iso_4217'];
 
-        if($price->currency->iso_4217 != $requestCurrency){
+        if ($price->currency->iso_4217 != $requestCurrency) {
             $newCurrency = Currency::where('iso_4217', $requestCurrency)->first();
             $price->currency_id = $newCurrency->id;
 
-            $price = $this->updatePrice($price,$newCurrency);
+            $price = $this->updatePrice($price, $newCurrency);
             $price->save();
         }
         $paymentService = null;
@@ -137,8 +135,8 @@ class PriceController extends Controller
         }
     }
 
-
-    protected function updatePrice($price, $currency){
+    protected function updatePrice($price, $currency)
+    {
 
         try {
 

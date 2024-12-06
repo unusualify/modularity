@@ -14,7 +14,7 @@ class CardTypeRequest extends Request
     public function rulesForAll()
     {
         return [
-		];
+        ];
     }
 
     /**

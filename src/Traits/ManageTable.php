@@ -185,13 +185,48 @@ trait ManageTable
     protected function getTableActions()
     {
         $actions = [];
-        // dd(
-        //     $this->getIndexOption('duplicate'),
-        //     $this->getIndexOption('edit'),
-        //     $this->getIndexOption('delete'),
-        //     $this->getIndexOption('forceDelete'),
-        //     $this->getIndexOption('restore'),
-        // );
+
+        // if $this->repository has hasPayment
+        if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasPayment')) {
+            $actions[] = [
+                'name' => 'pay',
+                'icon' => 'mdi-contactless-payment',
+                'forceLabel' => true,
+                // 'can' => 'pay',
+                // 'color' => 'red darken-2',
+                'color' => 'primary',
+                'form' => [
+                    'attributes' => [
+                        'title' => [
+                            'text' =>   'PAYMENT AND INVOICES',
+                            'tag' => 'div',
+                            'type' => 'p',
+                            'weight' => 'medium',
+                            'align' => 'center',
+                            'justify' => 'left',
+                            'margin' => 'a-5',
+                            'color' => 'default',
+                            'classes' => 'justify-content-between'
+                        ],
+                        // 'systembar' => true,
+                        'schema' => $this->createFormSchema($this->repository->getPaymentFormSchema()),
+                        'actionUrl' => route('admin.system.system_payment.payment'),
+                        'async' => false,
+                    ],
+                    'model_formatter' => [
+                        'price_id' => 'price.id', //lodash get method
+                    ],
+                    'schema_formatter' => [
+                        'payment_service.price' => '_price', //lodash set method
+                        'payment_service.currency' => 'price.currency.id',
+                    ],
+                ],
+                //  admin.system.system_payment.payment routeName
+                //  admin.crm.template/system/system-payments/pay/{price}
+            ];
+            // dd($actions);
+        }
+
         if ($this->getIndexOption('duplicate')) {
             $actions[] = [
                 'name' => 'duplicate',
@@ -237,46 +272,6 @@ trait ManageTable
                 // 'color' => 'red darken-2',
                 'color' => 'red',
             ];
-        }
-        // if $this->repository has hasPayment
-        if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasPayment')) {
-            $actions[] = [
-                'name' => 'pay',
-                'icon' => 'mdi-contactless-payment',
-                'forceLabel' => true,
-                // 'can' => 'pay',
-                // 'color' => 'red darken-2',
-                'color' => 'primary',
-                'form' => [
-                    'attributes' => [
-                        'title' => [
-                            'text' =>   'PAYMENT AND INVOICES',
-                            'tag' => 'div',
-                            'type' => 'p',
-                            'weight' => 'medium',
-                            'align' => 'center',
-                            'justify' => 'left',
-                            'margin' => 'a-5',
-                            'color' => 'default',
-                            'classes' => 'justify-content-between'
-                        ],
-                        // 'systembar' => true,
-                        'schema' => $this->createFormSchema($this->repository->getPaymentFormSchema()),
-                        'actionUrl' => route('admin.system.system_payment.payment'),
-                        'async' => false,
-                    ],
-                    'model_formatter' => [
-                        'price_id' => 'price.id', //lodash get method
-                    ],
-                    'schema_formatter' => [
-                        'payment_service.price' => '_price', //lodash set method
-                        'payment_service.currency' => 'price.currency.id',
-                    ],
-                ],
-                //  admin.system.system_payment.payment routeName
-                //  admin.crm.template/system/system-payments/pay/{price}
-            ];
-            // dd($actions);
         }
 
         $actions = array_merge(
@@ -499,9 +494,11 @@ trait ManageTable
             $returnType = (new \ReflectionMethod($model, $method))->getReturnType();
             if ($returnType == 'Illuminate\Database\Eloquent\Relations\MorphTo') {
                 $filter['componentOptions']['return-object'] = 'true';
+
                 $class = get_class($repository->getModel());
-                $items = $items->map(function (Model $item) use ($class) {
-                    $item->setAttribute('type', $class);
+                $items = $items->map(function ($item) use ($class) {
+                    // $item->setAttribute('type', $class);
+                    $item['type'] = $class;
 
                     return $item;
                 });

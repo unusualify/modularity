@@ -2,6 +2,17 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.19.1 - 2024-11-27
+
+### :wrench: Bug Fixes
+
+- :ambulance: hotfix HasStateable duplicate state issue by @gunesbizim in https://github.com/unusualify/modularity/commit/2faf67ff012f102f915ab5b8e3446d7e4dc23860
+- :ambulance: hotfix HasStateable duplicate state issue by @gunesbizim in https://github.com/unusualify/modularity/commit/48b61df2d2e31afebc81a3ede0f056d0f865768b
+
+### :lipstick: Styling
+
+- lint coding styles by @invalid-email-address in https://github.com/unusualify/modularity/commit/e1058b90e52bc5ddfd887185859011157e00ebd5
+
 ## v0.19.0 - 2024-11-20
 
 ### :rocket: Features

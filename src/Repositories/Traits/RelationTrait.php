@@ -18,12 +18,13 @@ trait RelationTrait
      */
     public function afterSaveRelationTrait($object, $fields)
     {
+
         foreach ($this->getMorphToManyRelations() as $relationName) {
             if (isset($fields[$relationName]) && $fields[$relationName] && $relationName != 'tags' && ! classHasTrait(get_class($this), 'Unusualify\Modularity\Repositories\Traits\TagsTrait')) {
                 $object->{$relationName}()->sync($fields[$relationName]);
             }
-
         }
+
         foreach ($this->getMorphToRelations() as $relation => $types) {
             foreach ($types as $key => $type) {
                 $name = $type['name'];
@@ -93,7 +94,7 @@ trait RelationTrait
                         }
 
                     }
-
+                    // dd($relation, $fields[$relation], $object);
                     $object->{$relation}()->sync(
                         $fields[$relation]
                     );
@@ -105,12 +106,6 @@ trait RelationTrait
                         $th
                     );
                 }
-                // unset($fields[$relation]);
-                // if (!empty($fields[$f])) {
-                //     $fields = $this->prepareTreeviewField($fields, $f);
-                // } else {
-                //     $fields[$f] = null;
-                // }
             } elseif (array_key_exists($relation, $fields)) {
 
                 $object->{$relation}()->sync([]);
@@ -128,6 +123,7 @@ trait RelationTrait
                 $idsDeleted = $relation->get()->pluck($relatedLocalKey)->toArray();
 
                 foreach ($fields[$relationName] as $key => $data) {
+
                     if (isset($data[$relatedLocalKey])) {
                         array_splice($idsDeleted, array_search($data[$relatedLocalKey], $idsDeleted), 1);
                         $repository->update($data[$relatedLocalKey], $data + [$foreignKey => $object->id]);
@@ -260,8 +256,9 @@ trait RelationTrait
                     } catch (\Throwable $th) {
                         dd(
                             $object,
-                            $object->permissions,
-                            $input['name']
+                            $object->packageFeatures,
+                            $input['name'],
+                            $th
                         );
                     }
                 }

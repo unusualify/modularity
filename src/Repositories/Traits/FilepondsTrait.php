@@ -2,7 +2,7 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
-use Unusualify\Modularity\Services\Filepond\Filepond;
+use Unusualify\Modularity\Facades\Filepond;
 
 trait FilepondsTrait
 {
@@ -29,7 +29,7 @@ trait FilepondsTrait
         foreach ($columns as $role) {
             $files = data_get($fields, $role);
             if ($files) {
-                FilePond::saveFile($object, $files, $role);
+                Filepond::saveFile($object, $files, $role);
             }
         }
     }
@@ -44,7 +44,7 @@ trait FilepondsTrait
                 dd($role, $files, $fields);
                 // $this->saveFilePond($value, $object, $fields);
                 // $this->saveFilePond($object, $files, $role);
-                FilePond::saveFile($object, $files, $role);
+                Filepond::saveFile($object, $files, $role);
             }
         }
         dd($columns);

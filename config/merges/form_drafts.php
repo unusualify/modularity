@@ -18,15 +18,15 @@ return [
             ],
             'rules' => 'min:2',
         ],
-        'job_title' => [
-            'type' => '_name',
-            'name' => 'job_title',
-            'label' => 'Job Title',
-            'col' => [
-                'sm' => 6,
-            ],
-            'rules' => 'min:2',
-        ],
+        // 'job_title' => [
+        //     'type' => '_name',
+        //     'name' => 'job_title',
+        //     'label' => 'Job Title',
+        //     'col' => [
+        //         'sm' => 6,
+        //     ],
+        //     'rules' => 'min:2',
+        // ],
         'email' => [
             'type' => '_email',
             'default' => '',

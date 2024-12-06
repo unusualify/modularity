@@ -269,9 +269,7 @@ trait ManageUtilities
 
         $data = [
             'translate' => $this->routeHas('translations') || $this->hasTranslatedInput(),
-            'formAttributes' => [
-                'hasSubmit' => true,
-                'stickyButton' => false,
+            'formAttributes' => array_merge([
                 'modelValue' => $this->repository->getFormFields($item, $schema),
                 'title' => __(((bool) $itemId ? 'fields.edit-item' : 'fields.new-item'), ['item' => trans_choice('modules.' . snakeCase($this->routeName), 0)]),
                 'isEditing' => $itemId ? true : false,
@@ -284,7 +282,7 @@ trait ManageUtilities
                     // })->toArray(),
                     // 'actionUrl' => $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]),
                 ],
-            ],
+            ], $this->formAttributes),
             'endpoints' => [
                 ((bool) $itemId ? 'update' : 'store') => $itemId
                     ? $this->getModuleRoute($itemId, 'update')

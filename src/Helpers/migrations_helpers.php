@@ -94,7 +94,7 @@ if (! function_exists('createDefaultTranslationsTableFields')) {
         $table->softDeletes();
         $table->timestamps();
         $table->string('locale', 7)->index();
-        $table->boolean('active');
+        $table->boolean('active')->default(true);
 
         $foreignIndexName = "fk_{$tableNameSingular}_translations_{$tableNameSingular}_id";
 

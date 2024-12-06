@@ -1,6 +1,7 @@
 @use 'abstract';
 
 @use 'styles/core/base' with (
+  // $sidebar-list-item-overlay-color: ,
   $theme-config: (
     'primary-color': #0056b3,
     'secondary-color': #5a6268,

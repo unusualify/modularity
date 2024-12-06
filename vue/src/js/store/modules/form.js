@@ -47,7 +47,9 @@ const state = {
    */
   isSubmitPrevented: false,
 
-  loading: false
+  loading: false,
+
+  taggableItems: {}
 }
 
 // getters
@@ -152,6 +154,13 @@ const mutations = {
   },
   [FORM.UPDATE_FORM_SAVE_TYPE] (state, type) {
     state.type = type
+  },
+
+  [FORM.SET_TAGGABLE_ITEMS] (state, { taggable_type, items }) {
+    state.taggableItems[taggable_type] = items
+  },
+  [FORM.ADD_TAGGABLE_ITEM] (state, { taggable_type, item }) {
+    state.taggableItems[taggable_type].push(item)
   }
 }
 

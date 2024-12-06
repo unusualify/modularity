@@ -43,10 +43,11 @@ function loadIcons ($font) {
 const opts = {
 //   blueprint: md2,
   aliases: {
+    VBtnPrimary: components.VBtn,
     VBtnSecondary: components.VBtn,
-    VBtnTertiary: components.VBtn,
-    VBtnCta: components.VBtn,
-    VBtnCtaSecondary: components.VBtn,
+    // VBtnTertiary: components.VBtn,
+    // VBtnCta: components.VBtn,
+    // VBtnCtaSecondary: components.VBtn,
     VBtnSuccess: components.VBtn,
     VImgIcon: components.VImg,
     VSheetRounded: components.VSheet,
@@ -68,26 +69,33 @@ const opts = {
     },
     VBtn: {
       color: 'primary',
-      style: { textTransform: 'none' },
-      density: 'compact'
-      // class: 'v-btn--uppercase',
+      density: 'comfortable',
+      variant: 'elevated'
+    },
+    VBtnPrimary: {
+      color: 'primary',
+      density: 'comfortable',
+      variant: 'elevated',
+      class: 'text-uppercase',
     },
     VBtnSecondary: {
-      color: 'primary',
-      variant: 'outlined'
+      color: 'secondary',
+      density: 'comfortable',
+      variant: 'elevated',
+      class: 'text-uppercase',
     },
-    VBtnTertiary: {
-      color: 'tertiary'
-      // variant: 'plain'
-    },
-    VBtnCta: {
-      color: 'cta'
-      // variant: 'plain'
-    },
-    VBtnCtaSecondary: {
-      color: 'cta-secondary'
-      // variant: 'plain'
-    },
+    // VBtnTertiary: {
+    //   color: 'tertiary'
+    //   // variant: 'plain'
+    // },
+    // VBtnCta: {
+    //   color: 'cta'
+    //   // variant: 'plain'
+    // },
+    // VBtnCtaSecondary: {
+    //   color: 'cta-secondary'
+    //   // variant: 'plain'
+    // },
     VBtnSuccess: {
       color: 'success',
       variant: 'elevated'

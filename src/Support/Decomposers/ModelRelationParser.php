@@ -183,7 +183,7 @@ class ModelRelationParser implements Arrayable
             $schemas = explode(',', $relationship);
             $relationship_name = explode(':', $schemas[0])[0];
 
-            if (in_array($relationship_name, $this->pivotableRelationships) && count($schemas) > 2) {
+            if (in_array($relationship_name, $this->pivotableRelationships) && count($schemas) > 1) {
                 $creatable = true;
 
                 break;

@@ -15,7 +15,8 @@ export default {
   download: 'mdi-download',
   duplicate: 'mdi-content-copy',
 
-  edit: 'mdi-pencil',
+  // edit: 'mdi-pencil',
+  edit: 'mdi-pencil-box-outline',
   error: 'mdi-close-circle-outline',
 
   filter_list: 'mdi-filter',

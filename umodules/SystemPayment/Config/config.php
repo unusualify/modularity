@@ -287,7 +287,7 @@ return [
                     'name' => 'logo',
                     'rules' => 'sometimes|required:array',
                     'isIcon' => true,
-                ]
+                ],
             ],
         ],
     ],
