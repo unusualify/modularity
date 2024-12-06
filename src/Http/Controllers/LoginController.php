@@ -224,7 +224,8 @@ class LoginController extends Controller
                                 'variant' => 'text',
                                 'href' => route('admin.password.reset.link'),
                                 'class' => 'v-col-5 d-flex justify-content-start',
-                                'color' => 'grey-lighten-1'
+                                'color' => 'grey-lighten-1',
+                                'density' => 'default'
 
                             ],
                         ],
@@ -236,6 +237,8 @@ class LoginController extends Controller
                                 'href' => '',
                                 'class' => 'v-col-5',
                                 'type' => 'submit',
+                                'density' => 'default'
+
                             ],
                         ],
                     ],
@@ -255,7 +258,9 @@ class LoginController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'mt-5 mb-2 custom-auth-button',
-                                'color' => 'grey-lighten-1'
+                                'color' => 'grey-lighten-1',
+                                'density' => 'default'
+
                             ],
                             'slots' => [
                                 'prepend' => [
@@ -275,7 +280,9 @@ class LoginController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-2 custom-auth-button',
-                                'color' => 'grey-lighten-1'
+                                'color' => 'grey-lighten-1',
+                                'density' => 'default'
+
                             ],
                             'slots' => [
                                 'prepend' => [
@@ -295,7 +302,9 @@ class LoginController extends Controller
                                 'variant' => 'outlined',
                                 'href' => route('admin.register.form'),
                                 'class' => 'my-2 custom-auth-button',
-                                'color' => 'grey-lighten-1'
+                                'color' => 'grey-lighten-1',
+                                'density' => 'default'
+
 
                             ],
 
