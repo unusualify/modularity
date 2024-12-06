@@ -34,9 +34,10 @@ class StateableHydrate extends InputHydrate
 
         $model = App::make('Modules\PressRelease\Entities\PressRelease');
 
-        // TODO #Stateable - default states on the model could be array of strings, not array of objects,
-        // so create a method converting them to objects, use it in the model and call it here
-        $states = $repository->getByColumnValues('code', array_column($model->default_states, 'code'));
+        // If default_states contains strings, convert them to objects first
+        $stateObjects =  $model->getDefaultStates();
+
+        $states = $repository->getByColumnValues('code', array_column($stateObjects, 'code'));
         $items = [];
         foreach ($states as $state) {
             array_push(
@@ -51,4 +52,6 @@ class StateableHydrate extends InputHydrate
 
         return $input;
     }
+
+
 }

@@ -7,7 +7,7 @@ return [
             'col' => [
                 'sm' => 6,
             ],
-            'rules' => 'min:3|unique_table',
+            'rules' => 'min:3|unique_table', // Removed |unique_table since it causes update problems on name. Name shouldn't be unique
         ],
         'surname' => [
             'type' => '_name',

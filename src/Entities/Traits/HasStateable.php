@@ -13,29 +13,108 @@ trait HasStateable
 
     protected static $stateModel = 'Modules\SystemUtility\Entities\State';
 
-    /**
-     * Cached source model fields.
-     *
-     * @var array
-     */
     protected $_stateableSourceFields = [];
-
-    /**
-     * Original fillable attributes.
-     *
-     * @var array|null
-     */
     protected $_originalFillable = null;
+
+    protected function setFormattedState($state, $defaultAttributes = null)
+    {
+        if (is_null($defaultAttributes)) {
+            $defaultAttributes = [
+                'icon' => '$warning',
+                'color' => 'warning'
+            ];
+        }
+
+        if (is_string($state)) {
+            $stateData = [
+                'code' => $state,
+            ];
+
+            // Add translations for each language
+            foreach ($this->getStateTranslationLanguages() as $lang) {
+                $stateData[$lang] = [
+                    'name' => Str::headline($state),
+                    'active' => true,
+                ];
+            }
+
+            // Merge with default attributes
+            $stateData = array_merge($stateData, $defaultAttributes);
+        } else {
+            $stateData = $state;
+
+
+            // If translations are not set, add them
+            if (!array_key_exists(app()->getLocale(), $stateData)) {
+                foreach ($this->getStateTranslationLanguages() as $lang) {
+                    $stateData[$lang] = [
+                        'name' => Str::headline($stateData['code']),
+                        'active' => true,
+                    ];
+                }
+            }
+
+            // Merge with default attributes if icon or color is not set
+            if (!isset($stateData['icon']) || !isset($stateData['color'])) {
+                $stateData = array_merge($defaultAttributes, $stateData);
+            }
+        }
+
+        return $stateData;
+    }
+
+    public function getDefaultStates()
+    {
+        return array_map(function ($state) {
+            return $this->setFormattedState($state, $this->getDefaultState());
+        }, $this->default_states);
+    }
+
+    public function getDefaultState()
+    {
+        if (isset($this->default_state)) {
+            if (!isset($this->default_state['code'])) {
+                throw new \InvalidArgumentException('Default state must have a code attribute');
+            }
+            return $this->setFormattedState($this->default_state);
+        }
+
+        return $this->getInitialState() ?? [
+            'code' => 'default',
+            'icon' => '$warning',
+            'color' => 'warning'
+        ];
+    }
+
+    public function getInitialState()
+    {
+        if (isset($this->initial_state)) {
+            return $this->setFormattedState($this->initial_state);
+        }
+
+        return isset($this->default_states[0])
+            ? $this->setFormattedState($this->default_states[0])
+            : null;
+    }
+
+    public function createNonExistantStates($model)
+    {
+        $defaultStates = $this->getDefaultStates();
+        $initialState = $this->getInitialState();
+
+        foreach ($defaultStates as $state) {
+            $_state = State::where('code', $state['code'])->first() ?? State::create($state);
+            $isActive = $state['code'] === $initialState['code'];
+            $model->states()->attach($_state->id, ['is_active' => $isActive]);
+        }
+    }
 
     public static function bootHasStateable(): void
     {
         self::saving(static function (Model $model) {
-
             if (isset($model->_status)) {
-                //Updating the model
                 $model->_preserved_stateable = $model->_stateable;
             }
-
             $model->offsetUnset('_stateable');
             $model->offsetUnset('_status');
         });
@@ -49,9 +128,8 @@ trait HasStateable
                 return $state->pivot->is_active === 1;
             });
 
-            if (! is_null($state)) {
-                // Get matching default state if exists
-                $defaultState = collect($model->default_states)->firstWhere('code', $state->code);
+            if (!is_null($state)) {
+                $defaultState = collect($model->getDefaultStates())->firstWhere('code', $state->code);
 
                 if ($defaultState) {
                     $attributes = array_merge(
@@ -61,7 +139,6 @@ trait HasStateable
                             $state->attributesToArray()
                         )
                     );
-
                     $state->fill($attributes);
                 }
 
@@ -84,10 +161,10 @@ trait HasStateable
 
         self::saved(static function (Model $model) {
             $newState = State::find($model->_preserved_stateable);
-            // Get current active state (if exists)
             if (is_null($newState)) {
                 return false;
             }
+
             $currentActiveState = $model->states()
                 ->wherePivot('is_active', 1)
                 ->first();
@@ -133,91 +210,14 @@ trait HasStateable
     public function state(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
         return $this->hasOneThrough(
-            static::$stateModel,  // Target model (State)
-            Stateable::class, // Intermediate table
-            'stateable_id',      // Foreign key on stateables
-            'id',                // Foreign key on states
-            'id',                // Local key on this model
-            'state_id'           // Local key on stateables
+            static::$stateModel,
+            Stateable::class,
+            'stateable_id',
+            'id',
+            'id',
+            'state_id'
         )->where(config('modularity.states.table', 'stateables') . '.stateable_type', get_class($this))
             ->where(config('modularity.states.table', 'stateables') . '.is_active', 1);
-    }
-
-    public function createNonExistantStates($model)
-    {
-        $defaultStates = $model->default_states;
-        $translationLangs = $model->getStateTranslationLanguages();
-        $allStates = [];
-
-        foreach ($defaultStates as $index => $state) {
-
-            if (is_string($state)) {
-                $stateData = [
-                    'code' => $state,
-                ];
-            } else {
-                $stateData = $state;
-            }
-
-            if (is_string($state)) {
-                foreach ($translationLangs as $lang) {
-                    $stateData[$lang] = [
-                        'name' => Str::headline($state),
-                        'active' => true,
-                    ];
-                }
-            } else {
-                foreach ($translationLangs as $lang) {
-                    $stateData[$lang] = [
-                        'name' => Str::headline($state['code']),
-                        'active' => true,
-                    ];
-                }
-            }
-            $allStates[] = $stateData;
-        }
-
-        if (! isset($model->inititalState)) {
-            $initialState = $model->default_states[0];
-        } else {
-            $initialState = $model->initial_state;
-        }
-
-        if (is_string($initialState)) {
-            $initialState = [
-                'name' => Str::headline($initialState),
-                'icon' => '$warning',
-                'color' => 'warning',
-            ];
-        }
-
-        if (! isset($model->default_state)) {
-            $defaultState = $model->default_state;
-        } else {
-            $defaultState = $initialState;
-        }
-
-        if (is_string($defaultState)) {
-            $defaultState = [
-                'name' => Str::headline($defaultState),
-                'icon' => '$warning',
-                'color' => 'warning',
-            ];
-        }
-
-        foreach ($allStates as $state) {
-            if (is_string($state)) {
-                $state = array_merge($state, [
-                    'color' => $defaultState['color'],
-                    'icon' => $defaultState['icon'],
-                ]);
-            }
-
-            $_state = State::where('code', $state['code'])->first() ?? State::create($state);
-
-            $isActive = $state['code'] === $initialState['code'];
-            $model->states()->attach($_state->id, ['is_active' => $isActive]);
-        }
     }
 
     public function getStateTranslationLanguages()
@@ -226,14 +226,4 @@ trait HasStateable
             app()->getLocale(),
         ];
     }
-
-    // public function setStateablePreview($state)
-    // {
-    //     return "<span variant='text' color='{$state->color}' prepend-icon='{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</span>";
-    // }
-
-    // public function setStateablePreviewNull()
-    // {
-    //     return "<span variant='text' color='' prepend-icon=''>No State</span>";
-    // }
 }
