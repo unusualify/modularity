@@ -1112,4 +1112,10 @@ abstract class Repository
 
         return $foreignKey;
     }
+
+    public function getCountFor($method){
+        // dd($method);
+        $methodName = 'scope'. ucfirst($method[0]);
+        return $this->model->$methodName();
+    }
 }

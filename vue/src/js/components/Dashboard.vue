@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <v-col v-for="(block,i) in blocks" :key="`block-${i}`"
+    <!-- <v-col v-for="(block,i) in blocks" :key="`block-${i}`"
       v-bind="$bindAttributes(block.col)"
       v-fit-grid
       >
@@ -8,7 +8,12 @@
           :is="`ue-${block.component}`"
           v-bind="block.attributes"
          ></component>
-    </v-col>
+    </v-col> -->
+    <ue-recursive-stuff
+      v-for="(block, i) in blocks"
+      :key="`tag-0-${i}`"
+      :configuration="block"
+    />
   </v-row>
 </template>
 
@@ -24,6 +29,9 @@ export default {
   },
   components: {
 
+  },
+  setup (props, context) {
+    return;
   },
   data () {
     return {

@@ -594,6 +594,7 @@ export default function useTable (props, context) {
       methods.loadItems(newValue)
 
     } else {
+      console.log(props, tableEndpoints)
       store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue, infiniteScroll: state.enableInfiniteScroll }, endpoint : props.endpoints.index ?? null})
 
     }
