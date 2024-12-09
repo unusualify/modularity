@@ -69,6 +69,7 @@
             window['{{ unusualConfig('js_namespace') }}'].STORE = {};
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.config = {
+                test: false,
                 // isMiniSidebar:  '{{ $isMiniSidebar ?? true }}',
                 isMiniSidebar:  {!! json_encode($isMiniSidebar ?? true) !!},
             },
