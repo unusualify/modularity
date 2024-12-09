@@ -118,11 +118,18 @@ export default function useRepeater (props, context) {
 
   function hydrateRepeaterInput (item, index) {
     const model = getModel(state.processedSchema, item)
+    const extraFields = {}
+
+    if (props.draggable && !model[props.orderKey]) {
+      extraFields[props.orderKey] = index + 1
+    }
+
     return {
       ...(props.autoIdGenerator ? { id: index } : {}),
       ...transform(omit(model, []), (o, v, k) => {
         o[namingRepeaterField(index, k)] = v
-      })
+      }),
+      ...extraFields
     }
   }
 
@@ -206,11 +213,21 @@ export default function useRepeater (props, context) {
         let rawSchema = cloneDeep(props.schema)
 
         const initialRepeats = hydrateRepeaterInputs(Array.isArray(modelValue.value) ? modelValue.value : [])
+
+        if (initialRepeats.length > 0) {
+          const parsedInitialRepeats = parseRepeaterInputs(initialRepeats).map(item => {
+            return omit(item, ['id'])
+          })
+          if (JSON.stringify(modelValue.value) !== JSON.stringify(parsedInitialRepeats)) {
+            parsedInitialRepeats.forEach((item, index) => {
+              modelValue.value[index] = item
+            })
+          }
+        }
         // if (props.min > 0 && initialRepeats.length < props.min) {
         //   const schema = invokeRuleGenerator(rawSchema)
         //   initialRepeats.push(hydrateRepeaterInput(getModel(schema), 1))
         // }
-
         if (isUnique) {
           uniqueFilledValues.value = reduce(cloneDeep(initialRepeats), (acc, _rawModel) => {
             const _model = parseRepeaterInput(_rawModel)

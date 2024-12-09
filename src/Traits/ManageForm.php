@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Support\Finder;
@@ -24,9 +25,16 @@ trait ManageForm
 
     protected $formSchema;
 
+    /**
+     * actions/buttons to see in the form
+     *
+     * @var array
+     */
+    // protected $formActions = [];
+
     protected $inputTypes = [];
 
-    protected $schemaChangers = [];
+    // protected $schemaChangers = [];
 
     protected function __beforeConstructManageForm($app, $request)
     {
@@ -38,8 +46,9 @@ trait ManageForm
     protected function __afterConstructManageForm($app, $request)
     {
         $this->defaultFormAttributes = (array) Config::get(unusualBaseKey() . '.default_form_attributes');
-
         $this->formAttributes = array_merge_recursive_preserve($this->getFormAttributes(), $this->formAttributes ?? []);
+
+        $this->setFormActions();
     }
 
     /**
@@ -58,6 +67,52 @@ trait ManageForm
         }
 
         return [];
+    }
+
+    public function setFormActions()
+    {
+        $this->defaultFormActions = (array) Config::get(unusualBaseKey() . '.default_form_actions', []);
+
+        $formActions = [];
+
+        if ((bool) $this->config) {
+            try {
+                $formActions = Collection::make(
+                    array_merge_recursive_preserve($this->defaultFormActions, object_to_array($this->getConfigFieldsByRoute('form_actions', [])))
+                )->toArray();
+            } catch (\Throwable $th) {
+
+            }
+        }
+
+        $this->formActions = array_merge_recursive_preserve($formActions, $this->formActions ?? []);
+    }
+
+    public function getFormActions(): array
+    {
+        $default_action = (array) Config::get(unusualBaseKey() . '.default_form_action');
+
+        return Collection::make($this->formActions)->reduce(function($acc, $action, $key) use ($default_action){
+
+            // dd($action);
+            if(isset($action['endpoint']) && ($routeName = Route::hasAdmin($action['endpoint']))){
+                $parameters = Route::getRoutes()->getByName($routeName)->parameterNames();
+                $action['endpoint'] = route($routeName, array_fill_keys($parameters, ':id'));
+                // $action['endpoint'] = route($routeName, ['press_release' => ':id']);
+                // dd($parameters, $action);
+                // $action['endpoint'] = route($routeName, ['{id}' => '{id}']);
+            }
+
+            if(isset($action['schema'])){
+                $action['schema'] = $this->createFormSchema($action['schema']);
+                // dd($action['schema']);
+            }
+
+            $acc[$key] = array_merge_recursive_preserve($default_action, $action);
+
+
+            return $acc;
+        }, []);
     }
 
     protected function addWithsManageForm(): array
@@ -144,7 +199,6 @@ trait ManageForm
         })->toArray();
     }
 
-    //TODO: create an filter for roles if role is not allowed to see that input it shouldn't see it you can check getSchemaInput last part
     protected function getSchemaInput($input, $inputs = [])
     {
         // $default_input = collect(Config::get(unusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
