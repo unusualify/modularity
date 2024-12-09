@@ -13,7 +13,7 @@ const isArrayable = 'input-treeview|treeview|input-checklist|input-repeater|inpu
 
 export const getSchema = (inputs, model = null, isEditing = false) => {
   let _inputs = _.omitBy(inputs, (value, key) => {
-    return Object.prototype.hasOwnProperty.call(value, 'slotable') || isTopEventInput(value)
+    return Object.prototype.hasOwnProperty.call(value, 'slotable') || isTopEventInput(value) || isViewOnlyInput(value)
   })
 
   if (_.find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'wrap'))) {
@@ -27,48 +27,54 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
     }, {})
   }
 
-  Object.keys(_inputs).forEach(key => {
-    const input = _inputs[key]
-
-    _inputs[key].class = _inputs[key]._originalClass || _inputs[key].class
-    _inputs[key]._originalClass = _inputs[key].class
-    _inputs[key].disabled = __isset(_inputs[key]._originalDisabled)
-      ? _inputs[key]._originalDisabled
-      : __isset(_inputs[key].disabled)
-        ? _inputs[key].disabled
+  _inputs = _.reduce(_inputs, (acc, input, key) => {
+    input.col.class = input._originalClass || input.col?.class || [];
+    input._originalClass = input.col.class || [];
+    input.disabled = __isset(input._originalDisabled)
+      ? input._originalDisabled
+      : __isset(input.disabled)
+        ? input.disabled
         : false
-    _inputs[key]._originalDisabled = _inputs[key].disabled
+    input._originalDisabled = input.disabled
 
-    let inputClass = input.class || []
+    let inputColClass = input.col?.class || [];
 
-    if(__isString(inputClass))
-      inputClass = inputClass.split(' ')
+    if (__isString(inputColClass)) {
+      inputColClass = inputColClass.split(' ');
+    }
 
-    let isCreatable = input.creatable
-    let isEditable = input.editable
+    let isCreatable = input.creatable;
+    let isEditable = input.editable;
+
     // Check if the input has createable property and it's false or hidden
     if ((isCreatable === false || isCreatable === 'hidden') && !isEditing) {
-      if(isCreatable === 'hidden'){
-        inputClass = _.union(inputClass, ['d-none'])
-        _inputs[key].class = inputClass.join(' ')
+      if (isCreatable === 'hidden') {
+        inputColClass = _.union(inputColClass, ['d-none']);
+        input.col.class = inputColClass.join(' ');
       } else {
-        _inputs[key].disabled = true
-      }
-    }
-    // Check if the input has editable property and it's false or hidden
-    if ((isEditable === false || isEditable === 'hidden') && isEditing) {
-      if(isEditable === 'hidden'){
-        inputClass = _.union(inputClass, ['d-none'])
-        _inputs[key].class = inputClass.join(' ')
-      } else {
-        _inputs[key].disabled = true
+        input.disabled = true;
       }
     }
 
-    if(__isset(_inputs[key]) && __isset(_inputs[key].schema) && ['wrap', 'group', 'repeater', 'input-repeater'].includes(input.type)){
-      _inputs[key].schema = getSchema(input.schema, input.type === 'wrap' ? model : model[key], isEditing)
+    // Check if the input has editable property and it's false or hidden
+    if ((isEditable === false || isEditable === 'hidden') && isEditing) {
+      if (isEditable === 'hidden') {
+        inputColClass = _.union(inputColClass, ['d-none']);
+        input.col.class = inputColClass.join(' ');
+      } else {
+        input.disabled = true;
+      }
     }
-  });
+
+    if (__isset(input) && __isset(input.schema) && ['wrap', 'group', 'repeater', 'input-repeater'].includes(input.type)) {
+      input.schema = getSchema(input.schema, input.type === 'wrap' ? model : model[key], isEditing);
+    }
+
+    // Always add the input to the accumulator
+    acc[key] = input;
+
+    return acc;
+  }, {});
 
   _.map(_inputs, (value, key) => {
     if(__isset(value.type) && value.type == 'group'){
@@ -108,13 +114,9 @@ export const getModel = (inputs, item = null, rootState = null) => {
       }, {})
     }
 
-    // if (isMediableTypes.includes(input.type)) {
-    //   // if (editing) { __log(name, item, input) }
-    //   return fields
-    // }
-    // __log(name, _default, item)
-    let value = editing ? (__isset(fields[name]) ? fields[name] : (__isset(item[name]) ? item[name] : _default)) : _default
-    // const value = editing ? (__isset(item[name]) ? item[name] : _default) : _default
+    let accessName = name.replace(/->/g, '.')
+    let value = editing ? (__isset(fields[name]) ? fields[name] : (__data_get(item, accessName, _default) ?? _default)) : _default
+
     if(editing){
       if(input.type == 'group' && __isset(item[name])){
         let defaultGroupKeys = Object.keys(_.omit(__dot(_default), ['id']));
@@ -213,8 +215,11 @@ export const getSubmitFormData = (inputs, item = null, rootState = null) => {
     // }
 
     const name = input.name
+
+    const value = __data_get(item, name, undefined)
+
     // default model value
-    if (!__isset(item[name])) {
+    if (!__isset(value)) {
       let value = input.default ?? ''
       if (isArrayable.includes(input.type)) {
         value = []
@@ -224,7 +229,7 @@ export const getSubmitFormData = (inputs, item = null, rootState = null) => {
 
       return fields
     }
-    const value = item[name]
+    // const value = item[name]
 
     if (__isObject(input)) {
       if (Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated) { // translations
@@ -482,8 +487,14 @@ const slugify = (newValue) => {
   return filters.slugify(text)
 }
 
-const isTopEventInput = (input) => {
-  return Object.prototype.hasOwnProperty.call(input, 'topEvent') && input.topEvent && ['select', 'autocomplete', 'combobox'].includes(input.type)
+export const isTopEventInput = (input) => {
+  return Object.prototype.hasOwnProperty.call(input, 'topEvent')
+    && input.topEvent
+    && ( ['select', 'autocomplete', 'combobox'].includes(input.type) || __isset(input.viewOnlyComponent) )
+}
+
+const isViewOnlyInput = (input) => {
+  return Object.prototype.hasOwnProperty.call(input, 'viewOnlyComponent')
 }
 
 const getTranslationLanguages = (input) => {

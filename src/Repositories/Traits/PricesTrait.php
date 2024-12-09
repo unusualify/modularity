@@ -53,7 +53,7 @@ trait PricesTrait
         $baseCurrency = unusualConfig('services.currency_exchange.base_currency');
 
         foreach ($this->getColumns(__TRAIT__) as $name) {
-            if (isset($fields[$name])) {
+            if ($name !== 'payment' && isset($fields[$name])) {
                 $existingPrices = $object->prices()->where('role', $name)->get();
 
                 foreach ($fields[$name] as $priceData) {
@@ -107,7 +107,7 @@ trait PricesTrait
      */
     public function getFormFieldsPricesTrait($object, $fields)
     {
-        if ($object->has('prices')) {
+        if (method_exists($object, 'prices') && $object->has('prices')) {
             $onlyBaseCurrency = unusualConfig('services.currency_exchange.active');
 
             $query = $object->prices();
@@ -160,7 +160,7 @@ trait PricesTrait
 
     public function getShowFieldsPricesTrait($object, $fields, $schema = [])
     {
-        if ($object->has('prices')) {
+        if (isset($fields['prices']) && method_exists($object, 'prices') && $object->has('prices')) {
             foreach ($this->getColumns(__TRAIT__) as $fieldName) {
                 $fields[$fieldName . '_show'] = $object->price_formatted;
             }

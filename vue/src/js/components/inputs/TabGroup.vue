@@ -219,7 +219,7 @@ export default {
 
       // Find changed keys by comparing old and new values
       const changedKeys = Object.keys(val).filter(key =>
-        JSON.stringify(val[key]) !== JSON.stringify(oldValue[key])
+        __isset(oldValue[key]) && JSON.stringify(val[key]) !== JSON.stringify(oldValue[key])
       )
 
       const changedValues = changedKeys.reduce((acc, key) => {
@@ -246,6 +246,7 @@ export default {
         each(triggers, (trigger) => {
           let targetInput = cloneDeep(this.schemas[index][trigger.target])
           let rulesChanged = false
+
           each(trigger.actions, (actionValue, actionName) => {
             schemasChanged = true
             let key = actionName
@@ -253,6 +254,10 @@ export default {
               rulesChanged = true
               actionName = 'raw' + startCase(actionName)
             }
+            if(actionName == 'disabled'){
+              targetInput['_originalDisabled'] = actionValue
+            }
+
             if(triggerItem){
               targetInput[actionName] = this.$castValueMatch(actionValue, triggerItem)
             }

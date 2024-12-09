@@ -1,12 +1,8 @@
 <template>
-  <v-input
-    v-model="deepModel"
-    hide-details
-    :variant="boundProps.variant"
-    class="v-input-price"
-    >
-    <template v-for="(price,i) in deepModel" :key="`price-${i}`">
+  <template v-for="(price,i) in deepModel" :key="`price-${i}`">
+    <div class="d-flex w-100 ga-2">
       <CurrencyNumber
+        class="flex-grow-1"
         v-bind="{label, ...$attrs }"
         :name="`${$attrs['name']}-${i}`"
         :modelValue="deepModel[i][priceInputName]"
@@ -18,8 +14,31 @@
           </v-chip>
         </template>
       </CurrencyNumber>
-    </template>
-  </v-input>
+      <v-select
+        v-show="vatRates.length > 0"
+        v-bind="{...$lodash.omit($attrs, ['rules', 'error', 'errorMessages'])}"
+        :label="$t('VAT Rate')"
+        :items="vatRates"
+        class="flex-grow-0"
+        v-model="deepModel[i].vat_rate_id"
+      />
+    </div>
+    <div v-if="vatRates.length > 0" class="w-100 d-flex justify-center">
+      <v-card
+        class="w-75"
+        color="success"
+        rounded="lg"
+        elevation="0"
+      >
+        <v-card-text class="text-center py-6">
+          <div class="text-h6 text-white mb-2">Total Pay:</div>
+          <div class="text-h2 text-white font-weight-bold">
+            {{ displayedCurrency[i] + ' ' + (deepModel[i].display_price * (1 + $lodash.find(vatRates, ['value', deepModel[i].vat_rate_id])?.rate / 100)).toFixed(2) }}
+          </div>
+        </v-card-text>
+      </v-card>
+    </div>
+  </template>
 </template>
 
 <script>
@@ -39,8 +58,10 @@ export default {
       default () {
         return [
           {
-            display_price: '',
-            currency_id: 1
+            display_price: 1.00,
+            currency_id: 1,
+            vat_rate_id: 1,
+            price_type_id: 1
           }
         ]
       }
@@ -63,6 +84,18 @@ export default {
     // },
     items: {
       type: Array
+    },
+    vatRates: {
+      type: Array,
+      default: () => []
+    },
+    rules: {
+      type: Array,
+      default: () => []
+    },
+    error: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -77,10 +110,12 @@ export default {
 
   data () {
     return {
-      deepModel: this.modelValue.map((item) => {
-        return item
-        return {...item, [this.priceInputName]: item[this.priceInputName] / this.numberMultiplier }
-      }),
+      deepModel: Array.isArray(this.modelValue)
+        ? this.modelValue.map((item) => {
+            return item
+            return {...item, [this.priceInputName]: item[this.priceInputName] / this.numberMultiplier }
+          })
+        : [this.modelValue]
     }
   },
 
@@ -93,11 +128,10 @@ export default {
       // this.updateModelValue()
     },
     updateNumberInput (e, index) {
-
       this.deepModel[index][this.priceInputName] = e
-
-      // this.updateModelValue()
-
+    },
+    updateVatRate (e, index) {
+      this.deepModel[index].vat_rate_id = e
     },
     updateModelValue() {
 
@@ -113,10 +147,12 @@ export default {
       deep: true,
       handler (newValue, old) {
         if (newValue) {
-          this.deepModel = newValue.map((item) => {
-            return item
-            return {...item, [this.priceInputName]: item[this.priceInputName] / this.numberMultiplier }
-          })
+          this.deepModel = Array.isArray(newValue)
+            ? newValue.map((item) => {
+                return item
+                return {...item, [this.priceInputName]: item[this.priceInputName] / this.numberMultiplier }
+              })
+            : [newValue]
         } else {
           this.deepModel = [
             {

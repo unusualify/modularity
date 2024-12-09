@@ -18,6 +18,8 @@
     $vBind = array_merge_recursive_preserve($defaultTableAttributes, $tableAttributes ?? []);
 @endphp
 
-<ue-table v-bind='@json($vBind)' />
+<ue-table v-bind='@json($vBind)'>
+    {!! $table_body ?? '' !!}
+</ue-table>
 {{-- <ue-table-binder component-name="{{$tableComponent}}" :table-attributes='@json($vBind)'/> --}}
 

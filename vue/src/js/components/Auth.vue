@@ -56,7 +56,7 @@
             <div class="mw-420">
               <ue-svg-icon symbol="main-logo" class="mx-0 "></ue-svg-icon>
 
-              <h2 class="text-white my-5 text-h4">
+              <h2 class="text-white mt-5 text-h4 custom-mb-8rem fs-2rem">
                 {{ description }}
               </h2>
               <span class="text-white">
@@ -197,22 +197,33 @@ export default {
 
 <style lang="scss">
 @media screen and (min-width: 960px) {
-  .mw-lg-24em {
-    max-width: 24rem;
-    width: 24rem;
-  }
 
   .mw-420 {
     max-width: 420px;
   }
 }
 
+.custom-mb-8rem{
+  margin-bottom: 8.25rem !important;
+}
+.text-h4{
+  &.fs-2rem{
+    font-size: 2rem !important;
+  }
+}
+
+
 .custom-auth-button {
   width: 100%;
   min-width: 100% !important;
-  color: black !important;
   position: relative !important;
   display: flex !important;
+  background: transparent !important;
+  --v-theme-overlay-multiplier: var(--v-hover-opacity);
+
+  &:hover{
+    background: transparent !important;
+  }
 
   .v-btn__prepend {
     position: absolute !important;
@@ -224,10 +235,6 @@ export default {
       width: 16px;
       height: 16px;
     }
-
-  &.text-primary {
-    color: black !important;
-  }
 }
 
 
@@ -262,4 +269,5 @@ export default {
 .mw-100{
   max-width: 100%;
 }
+
 </style>

@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
@@ -20,19 +21,22 @@ trait ManageTable
      * @var array
      */
     protected $defaultTableAttributes = [
-        // 'embeddedForm' => true,
+        // 'embeddedForm' => false,
         // 'createOnModal' => true,
         // 'editOnModal' => true,
         // 'formWidth' => '60%',
         // 'isRowEditing' => false,
         // 'rowActionsType' => 'inline',
         // 'hideDefaultFooter' => false,
+        // 'striped' => true,
+        // 'hideBorderRow' => true,
+        // 'roundedRows' => true,
     ];
 
     /**
      * @var array
      */
-    protected $tableAttributes = [];
+    // public $tableAttributes = [];
 
     protected function __afterConstructManageTable($app, $request)
     {
@@ -59,7 +63,7 @@ trait ManageTable
 
         $this->defaultTableAttributes = (array) Config::get(unusualBaseKey() . '.default_table_attributes');
 
-        $this->tableAttributes = array_merge_recursive_preserve($this->getTableAttributes(), $this->tableAttributes);
+        $this->tableAttributes = array_merge_recursive_preserve($this->getTableAttributes(), $this->tableAttributes ?? []);
     }
 
     /**
@@ -172,23 +176,75 @@ trait ManageTable
         if ((bool) $this->config) {
             try {
                 return Collection::make(
-                    array_merge_recursive_preserve($this->defaultTableAttributes, object_to_array($this->getConfigFieldsByRoute('table_options')))
+                    array_merge_recursive_preserve(
+                        $this->defaultTableAttributes,
+                        object_to_array($this->getConfigFieldsByRoute('table_attributes') ?? $this->getConfigFieldsByRoute('table_options') ?? (object) [] ))
                 )->toArray();
             } catch (\Throwable $th) {
-                return [];
+                return $this->defaultTableAttributes;
             }
         }
 
-        return [];
+        return $this->defaultTableAttributes;
+    }
+
+    /**
+     * method that checks whether the attribute configured on table_options
+     * and returns its value or false if not.
+     *
+     *
+     * @param mixed $attribute
+     * @return bool|mixed returns referenced value or false if it's not defined at module config->table_options
+     */
+    public function getTableAttribute($attribute)
+    {
+        return $this->tableAttributes[$attribute] ?? null;
+    }
+
+    protected function hydrateTableAttributes()
+    {
+        $attributes = $this->tableAttributes;
+
+        if(isset($attributes['customRow'])) {
+            // Handle associative array case
+            if(Arr::isAssoc($attributes['customRow'])) {
+                if(isset($attributes['customRow']['name'])) {
+                    $attributes['customRow'] = $this->hydrateCustomRow($attributes['customRow']);
+                }
+            }
+            // Handle sequential array case with role-based filtering
+            else {
+                $firstMatch = [];
+                foreach ($attributes['customRow'] as $component) {
+                    // Skip if component doesn't pass role check
+                    if (isset($component['allowedRoles']) &&
+                        (!$this->user ||
+                        (!$this->user->hasRole($component['allowedRoles'])))
+                    ) {
+                        continue;
+                    }
+
+                    // Convert first matching component to standard format and break
+                    if (isset($component['name'])) {
+                        $firstMatch = $this->hydrateCustomRow($component);
+                        break;
+                    }
+                }
+
+                $attributes['customRow'] = $firstMatch;
+            }
+        }
+
+        return $attributes;
     }
 
     protected function getTableActions()
     {
-        $actions = [];
+        $tableActions = [];
 
         // if $this->repository has hasPayment
         if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasPayment')) {
-            $actions[] = [
+            $tableActions[] = [
                 'name' => 'pay',
                 'icon' => 'mdi-contactless-payment',
                 'forceLabel' => true,
@@ -227,16 +283,18 @@ trait ManageTable
             // dd($actions);
         }
 
+        // duplicate action
         if ($this->getIndexOption('duplicate')) {
-            $actions[] = [
+            $tableActions[] = [
                 'name' => 'duplicate',
                 // 'icon' => '$edit',
                 'color' => 'primary darken-2',
             ];
         }
 
+        // edit action
         if ($this->getIndexOption('edit')) {
-            $actions[] = [
+            $tableActions[] = [
                 'name' => 'edit',
                 // 'can' => $this->permissionPrefix(Permission::EDIT->value),
                 // 'color' => 'green darken-2',
@@ -244,8 +302,9 @@ trait ManageTable
             ];
         }
 
+        // delete action
         if ($this->getIndexOption('delete')) {
-            $actions[] = [
+            $tableActions[] = [
                 'name' => 'delete',
                 'can' => $this->permissionPrefix(Permission::DELETE->value),
                 'variant' => 'outlined',
@@ -254,8 +313,9 @@ trait ManageTable
             ];
         }
 
+        // restore action
         if ($this->getIndexOption('restore')) {
-            $actions[] = [
+            $tableActions[] = [
                 'name' => 'restore',
                 // 'icon' => '$',
                 'can' => 'restore',
@@ -264,8 +324,9 @@ trait ManageTable
             ];
         }
 
+        // force delete action
         if ($this->getIndexOption('forceDelete')) {
-            $actions[] = [
+            $tableActions[] = [
                 'name' => 'forceDelete',
                 'icon' => '$delete',
                 'can' => 'forceDelete',
@@ -274,41 +335,19 @@ trait ManageTable
             ];
         }
 
-        $actions = array_merge(
-            $actions,
+        // navigation actions
+        $tableActions = array_merge(
+            $tableActions,
             Modularity::find($this->moduleName)->getNavigationActions($this->routeName)
         );
 
-        if (count($actions) > 3) {
+        // dropdown actions
+        if (count($tableActions) > 3) {
             $this->tableAttributes['rowActionsType'] = 'dropdown';
         }
 
-        // dd($actions);
-        return $actions;
-    }
 
-    /**
-     * getTableOption
-     *
-     * @param mixed $option
-     * @return void
-     */
-    public function getTableOption($option)
-    {
-        return $this->tableOptions[$option] ?? false;
-    }
-
-    /**
-     * method that checks whether the attribute configured on table_options
-     * and returns its value or false if not.
-     *
-     *
-     * @param mixed $attribute
-     * @return bool|mixed returns referenced value or false if it's not defined at module config->table_options
-     */
-    public function getTableAttribute($attribute)
-    {
-        return $this->tableAttributes[$attribute] ?? null;
+        return $tableActions;
     }
 
     /**
@@ -440,6 +479,11 @@ trait ManageTable
     protected function dehydrateHeaderSuffix(&$header)
     {
         $header['key'] = preg_replace('/_relation|_timestamp|_uuid/', '', $header['key']);
+    }
+
+    protected function hydrateCustomRow($customRow)
+    {
+        return array_merge_recursive_preserve(['col' => ['cols' => 12]], array_diff_key($customRow, ['allowedRoles' => '']));
     }
 
     protected function getTableAdvancedFilters()

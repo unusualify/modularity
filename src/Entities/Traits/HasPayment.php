@@ -8,23 +8,22 @@ use Money\Currency;
 trait HasPayment
 {
     // Will be defining the relation between the completed payment model and payable model
+    use HasPriceable;
 
-    public function price(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    public function paymentPrice(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
-        return $this->morphOne(config('priceable.models.price'), 'priceable');
+        return $this->morphOne(config('priceable.models.price'), 'priceable')
+            ->where('role', 'payment');
     }
 
     public static function bootHasPayment(): void
     {
 
         self::retrieved(static function (Model $model) {
-            if ($model->price) {
-                // dd($model->price->currency);
-                $currency = new Currency($model->price->currency->iso_4217);
-                // dd($currency);
-                $model->setAttribute('_price', \Oobook\Priceable\Facades\PriceService::formatAmount($model->price->display_price, $currency));
+            if ($model->paymentPrice) {
+                $currency = new Currency($model->paymentPrice->currency->iso_4217);
+                $model->setAttribute('_price', \Oobook\Priceable\Facades\PriceService::formatAmount($model->paymentPrice->display_price, $currency));
             }
-            // dd($model);
         });
 
         self::updating(static function (Model $model) {
