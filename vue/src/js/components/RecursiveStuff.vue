@@ -101,7 +101,11 @@ export default {
       return __isObject(value)
     }
     function applyCasting(value, funcs = []) {
+      if(!window.__isString(value))
+        return value
+
       const matches = value.match(castPattern)
+
       if (matches) {
         let result = get(props.bindData, matches[1])
         funcs.forEach((func) => {
@@ -109,7 +113,7 @@ export default {
         })
         return result
       }
-      return null
+      return value
     }
     function castAttribute(object, key, value) {
       let _value = value
@@ -119,7 +123,7 @@ export default {
         _value = value.shift()
         funcs = value
       }
-      
+
       if (isObject(value)) {
         // Do nothing
       } else {

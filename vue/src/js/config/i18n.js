@@ -176,11 +176,11 @@ export async function loadLocaleMessages (i18n, endpoint) {
   // for (const locale in response.data) {
   //   loadLocaleMessage(i18n, locale, response.data[locale])
   // }
-
   if(!store.state.config.test){
     try {
       axios.get(endpoint ?? '/api/languages')
         .then((response) => {
+          __log('response', endpointresponse.data)
           for (const locale in response.data) {
             loadLocaleMessage(i18n, locale, response.data[locale])
           }
