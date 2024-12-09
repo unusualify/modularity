@@ -120,10 +120,7 @@ export default {
         funcs = value
       }
 
-      if (isObject(value) || (isArray(value)
-      //&& !__isString(value[0])
-      )
-      ) {
+      if (isObject(value)) {
       } else {
         // __log(object, key, _value, value)
         // __log(isObject(_value), isObject(value))
