@@ -34,6 +34,7 @@ trait ManageUtilities
 
         $tableAttributes = $this->hydrateTableAttributes();
         // dd($this->translateHeaders($headers));
+        // dd($this->getFormActions());
         $_deprecated = [
             'initialResource' => $initialResource, //
             'tableMainFilters' => $this->getTableMainFilters(),
@@ -57,6 +58,7 @@ trait ManageUtilities
                     'rowActions' => $this->getTableActions(),
                     'bulkActions' => $this->getTableBulkActions(),
                     'nestedData' => $this->getNestedData(),
+                    'formActions' => $this->getFormActions(),
                 ],
                 ($this->isNested ? ['titlePrefix' => $this->nestedParentModel->getTitleField() . ' \ '] : []),
                 array_merge_recursive_preserve(

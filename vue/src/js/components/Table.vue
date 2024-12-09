@@ -265,9 +265,11 @@
                   no-default-form-padding
                   form-class="px-6 pt-6 pb-0"
                   style="height: 70vh !important;"
+                  :actions="formActions"
+                  @action-complete="handleFormActionComplete"
                 >
                   <template v-slot:headerRight>
-                    <v-btn variant="text" icon="$close" density="compact" color="grey-darken-5"
+                    <v-btn variant="plain" icon="$close" density="compact" color="grey-darken-5" rounded
                       @click="closeForm()"
                     ></v-btn>
                   </template>
