@@ -2,7 +2,7 @@ import { CONFIG } from '../mutations'
 
 
 const state = {
-  test: window[import.meta.env.VUE_APP_NAME]?.STORE.config.test ?? true,
+  test: window[import.meta.env.VUE_APP_NAME]?.STORE.config.test ?? false,
   currentUser: window[import.meta.env.VUE_APP_NAME]?.STORE.config.currentUser ?? {},
   profileMenu: window[import.meta.env.VUE_APP_NAME]?.STORE.config.profileMenu ?? [],
   sidebarStatus: true,
