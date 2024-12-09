@@ -10,10 +10,10 @@ use Illuminate\Routing\Controller as LaravelController;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Response;
-use Unusualify\Modularity\Traits\ManageNames;
-use Unusualify\Modularity\Traits\ManageTraits;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Services\MessageStage;
+use Unusualify\Modularity\Traits\ManageNames;
+use Unusualify\Modularity\Traits\ManageTraits;
 
 abstract class CoreController extends LaravelController
 {
@@ -336,16 +336,16 @@ abstract class CoreController extends LaravelController
         //     ->first();
 
         // Create new tag with namespace
-        $tag =  $model->createTagsModel()->create([
+        $tag = $model->createTagsModel()->create([
             'name' => $this->request->input('value'),
             'slug' => Str::slug($this->request->input('value')),
-            'namespace' => get_class($model)
+            'namespace' => get_class($model),
         ]);
 
         return Response::json([
             'message' => 'Tag created successfully',
             'variant' => MessageStage::SUCCESS,
-            'id' => $tag->id
+            'id' => $tag->id,
         ], 200);
 
         return Response::json(

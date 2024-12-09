@@ -5,8 +5,6 @@ namespace Unusualify\Modularity\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\View;
-use Modules\Webinar\Repositories\SurveyRepository;
-use Modules\Webinar\Repositories\VimeoWebinarRepository;
 // use Modules\Package\Repositories\PackageContinentRepository;
 // use Modules\PressRelease\Entities\PressRelease;
 // use Modules\PressRelease\Repositories\PressReleaseRepository;
@@ -70,8 +68,8 @@ class DashboardController extends BaseController
                     // $controller = App::make($block['controller'])->setTableAttributes(tableOptions: $block['attributes']['tableOptions'],
                     // );
                     // dd($block);
-                    $widget = new UWidget();
-                    $widget = $widget->makeComponent($block['tag'],$block)->render();
+                    $widget = new UWidget;
+                    $widget = $widget->makeComponent($block['tag'], $block)->render();
 
                     // dd(change_connector_event(get_connector_event($block['connector'])));
                     // $data = init_connector($block['connector']);
@@ -103,6 +101,7 @@ class DashboardController extends BaseController
                     // in order to keep url as default home url
                     // dd($block);
                     $blocks[$index] = $block;
+
                     // dd($block);
                     break;
                 case 'ue-board-information-plus':
@@ -111,33 +110,34 @@ class DashboardController extends BaseController
                     // dd($block);
                     // foreach ($cards as $key => $card) {
 
-                        try {
-                            $widget = new UWidget();
-                            // dd('here');
-                            $widget = $widget->makeComponent($block['tag'],$block)->render();
-                            // dd($data);
-                            // $repository = App::make($card['repository']);
-                            // $data = array_reduce(explode('|', $card['method']), function ($s, $a) use ($repository) {
-                            //     [$methodName, $args] = array_pad(explode(':', $a, 2), 2, null);
-                            //     if ($args) {
-                            //         $s = empty($s) ? $repository->{$methodName}(...explode(':', $args))->get() : $s->{$methodName}(...explode(':', $args))->get();
-                            //     } else {
-                            //         $s = empty($s) ? $repository->{$methodName}() : $s->$methodName();
-                            //     }
+                    try {
+                        $widget = new UWidget;
+                        // dd('here');
+                        $widget = $widget->makeComponent($block['tag'], $block)->render();
+                        // dd($data);
+                        // $repository = App::make($card['repository']);
+                        // $data = array_reduce(explode('|', $card['method']), function ($s, $a) use ($repository) {
+                        //     [$methodName, $args] = array_pad(explode(':', $a, 2), 2, null);
+                        //     if ($args) {
+                        //         $s = empty($s) ? $repository->{$methodName}(...explode(':', $args))->get() : $s->{$methodName}(...explode(':', $args))->get();
+                        //     } else {
+                        //         $s = empty($s) ? $repository->{$methodName}() : $s->$methodName();
+                        //     }
 
-                            //     return $s;
-                            // });
-                            // dd($data);
-                            // dd($data);
-                            // dd($widget);
-                        } catch (\Throwable $th) {
-                            $widget = [];
-                            dd($th);
-                        }
+                        //     return $s;
+                        // });
+                        // dd($data);
+                        // dd($data);
+                        // dd($widget);
+                    } catch (\Throwable $th) {
+                        $widget = [];
+                        dd($th);
+                    }
 
-                        $cards = $widget;
+                    $cards = $widget;
                     // }
                     $blocks[$index] = $cards;
+
                     // dd($blocks);
                     break;
                 default:
@@ -156,7 +156,8 @@ class DashboardController extends BaseController
         return View::make($view, $options);
     }
 
-    protected function transformRoutes($routes) {
+    protected function transformRoutes($routes)
+    {
         $result = [];
         foreach ($routes as $key => $value) {
             // Skip if value is an array
@@ -175,6 +176,7 @@ class DashboardController extends BaseController
 
             $result[$newKey] = $newValue;
         }
+
         return $result;
     }
 

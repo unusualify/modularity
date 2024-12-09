@@ -92,10 +92,10 @@ trait ManageForm
     {
         $default_action = (array) Config::get(unusualBaseKey() . '.default_form_action');
 
-        return Collection::make($this->formActions)->reduce(function($acc, $action, $key) use ($default_action){
+        return Collection::make($this->formActions)->reduce(function ($acc, $action, $key) use ($default_action) {
 
             // dd($action);
-            if(isset($action['endpoint']) && ($routeName = Route::hasAdmin($action['endpoint']))){
+            if (isset($action['endpoint']) && ($routeName = Route::hasAdmin($action['endpoint']))) {
                 $parameters = Route::getRoutes()->getByName($routeName)->parameterNames();
                 $action['endpoint'] = route($routeName, array_fill_keys($parameters, ':id'));
                 // $action['endpoint'] = route($routeName, ['press_release' => ':id']);
@@ -103,13 +103,12 @@ trait ManageForm
                 // $action['endpoint'] = route($routeName, ['{id}' => '{id}']);
             }
 
-            if(isset($action['schema'])){
+            if (isset($action['schema'])) {
                 $action['schema'] = $this->createFormSchema($action['schema']);
                 // dd($action['schema']);
             }
 
             $acc[$key] = array_merge_recursive_preserve($default_action, $action);
-
 
             return $acc;
         }, []);
@@ -215,12 +214,12 @@ trait ManageForm
         $name = getValueOrNull($hydrated, 'name');
         $_input = null;
 
-        if($type == 'divider' || !!$name){
-            if($default_input['color'] && in_array($hydrated['type'], ['morphTo', 'relationship', 'wrap', 'group'])){
+        if ($type == 'divider' || (bool) $name) {
+            if ($default_input['color'] && in_array($hydrated['type'], ['morphTo', 'relationship', 'wrap', 'group'])) {
                 unset($default_input['color']);
             }
-            $_input =  $this->configureInput(array_merge_recursive_preserve($default_input, $hydrated));
-            if($type == 'divider'){
+            $_input = $this->configureInput(array_merge_recursive_preserve($default_input, $hydrated));
+            if ($type == 'divider') {
                 $name = $type . '_' . uniqid();
                 $_input['name'] ??= $name;
             }
@@ -458,7 +457,7 @@ trait ManageForm
                         $connector = $attachable['connector'] ?? null;
                         $attachable = $this->getSchemaInput($attachable + ['noRecords' => true])[$name];
 
-                        if(!!$connector){
+                        if ((bool) $connector) {
                             $attachable['connector'] = $connector;
                         }
                         unset($attachable['noRecords']);

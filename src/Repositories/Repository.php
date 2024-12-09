@@ -283,12 +283,12 @@ abstract class Repository
             // ]);
         }
 
-        $columns = ['id', ...(is_array($column) ? $column : [$column] )];
+        $columns = ['id', ...(is_array($column) ? $column : [$column])];
 
         try {
             return $query->get($columns);
         } catch (\Throwable $th) {
-            if(method_exists($this->model, 'getColumns')){
+            if (method_exists($this->model, 'getColumns')) {
                 $appends = $this->model->getAppends();
                 $differentElements = array_diff($columns, $this->model->getColumns());
                 // if absent columns exist in appends, we can return the result with the absent columns
@@ -909,8 +909,7 @@ abstract class Repository
                     }
                     $query->without('pivot');
                 }
-                : $item
-            ;
+            : $item;
         }, $with);
     }
 
@@ -1113,9 +1112,11 @@ abstract class Repository
         return $foreignKey;
     }
 
-    public function getCountFor($method){
+    public function getCountFor($method)
+    {
         // dd($method);
-        $methodName = 'scope'. ucfirst($method[0]);
+        $methodName = 'scope' . ucfirst($method[0]);
+
         return $this->model->$methodName();
     }
 }

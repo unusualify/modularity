@@ -45,7 +45,7 @@ class TagHydrate extends InputHydrate
             $input['items'] = array_merge($repository->getTags()->toArray());
             $input['taggable'] = get_class($repository->getModel());
 
-            if (!isset($input['default']) && count($input['items']) > 0) {
+            if (! isset($input['default']) && count($input['items']) > 0) {
                 $input['default'] = $input['items'][0][$input['itemValue']];
             }
             // dd($input, $repository->getTags()->toArray());

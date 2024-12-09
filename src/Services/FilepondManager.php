@@ -85,9 +85,11 @@ class FilepondManager
 
         if (in_array($fileType, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'])) {
             $image = Image::make($storagePath);
+
             return $image->response($image->mime());
         } else {
             $mimeType = mime_content_type($storagePath);
+
             return response()->file($storagePath, [
                 'Content-Type' => $mimeType,
             ]);

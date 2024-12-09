@@ -112,7 +112,7 @@ class ForgotPasswordController extends Controller
                                 'href' => '',
                                 'class' => 'v-col-5',
                                 'type' => 'submit',
-                                'density' => 'default'
+                                'density' => 'default',
                             ],
                         ],
                     ],
@@ -133,7 +133,7 @@ class ForgotPasswordController extends Controller
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'mt-5 mb-2 custom-auth-button',
                                 'color' => 'grey-lighten-1',
-                                'density' => 'default'
+                                'density' => 'default',
 
                             ],
                             'slots' => [
@@ -155,7 +155,7 @@ class ForgotPasswordController extends Controller
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'my-2 custom-auth-button',
                                 'color' => 'grey-lighten-1',
-                                'density' => 'default'
+                                'density' => 'default',
                             ],
                             'slots' => [
                                 'prepend' => [
@@ -176,7 +176,7 @@ class ForgotPasswordController extends Controller
                                 'href' => route(Route::hasAdmin('register.form')),
                                 'class' => 'my-2 custom-auth-button',
                                 'color' => 'grey-lighten-1',
-                                'density' => 'default'
+                                'density' => 'default',
 
                             ],
 

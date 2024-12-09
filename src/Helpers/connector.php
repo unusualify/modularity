@@ -9,7 +9,8 @@ use Unusualify\Payable\Services\Paypal\Str;
 
 if (! function_exists('init_connector')) {
 
-    function init_connector($connector){
+    function init_connector($connector)
+    {
         $targetType = 'uri';
 
         $moduleInfo = find_module_and_route($connector);
@@ -22,7 +23,8 @@ if (! function_exists('init_connector')) {
 
 if (! function_exists('find_module_and_route')) {
 
-    function find_module_and_route($connector){
+    function find_module_and_route($connector)
+    {
 
         // $events = get_connector_event($connector);
         // dd($events);
@@ -31,6 +33,7 @@ if (! function_exists('find_module_and_route')) {
         $routeName = Str::studly(array_pop($names));
         $targetModuleName = Str::studly(array_pop($names));
         $targetModule = Modularity::find($targetModuleName);
+
         // dd($events);
         return [
             'module' => $targetModule,
@@ -41,39 +44,44 @@ if (! function_exists('find_module_and_route')) {
     }
 }
 
-if(! function_exists('find_module_route_names')){
-    function find_module_route_names($connector){
+if (! function_exists('find_module_route_names')) {
+    function find_module_route_names($connector)
+    {
         $parts = explode('|', $connector);
         // dd($parts);
         $names = array_shift($parts);
+
         // dd($names);
         return explode(':', $names);
     }
 }
 
-if(! function_exists('get_connector_event')){
-    function get_connector_event($connector){
+if (! function_exists('get_connector_event')) {
+    function get_connector_event($connector)
+    {
         // dd(explode('|', $connector));
         $parts = explode('|', $connector);
         // dd(explode('|',$connector));
         $events = $parts[1];
+
         // dd($events);
         return explode('|', $events);
     }
 }
 
-
-if(! function_exists('change_connector_event')){
-    function change_connector_event($event, $newEvent){
+if (! function_exists('change_connector_event')) {
+    function change_connector_event($event, $newEvent)
+    {
         $event = $newEvent;
+
         return $event;
     }
 }
 
+if (! function_exists('find_target')) {
 
-if (! function_exists('find_target')){
-
-    function find_target(Module $moduleClass, string $routeName, $events){
+    function find_target(Module $moduleClass, string $routeName, $events)
+    {
         $targetType = 'uri'; // Default target type
         // dd($events);
         $types = ! empty($events) ? explode(':', array_shift($events)) : ['uri', 'index']; //uri:edit
@@ -85,22 +93,26 @@ if (! function_exists('find_target')){
         switch ($targetType) {
             case 'uri':
                 $item['endpoint'] = $moduleClass->getRouteActionUri($routeName, empty($types) ? 'index' : array_shift($types));
+
                 break;
             default:
                 $item[kebabCase($targetType)] = implode(':', [$moduleClass->getRouteClass($routeName, $targetType), ...$types]);
+
                 break;
         }
 
         $item['module'] = $moduleClass;
         $item['route'] = $routeName;
+
         // dd($item);
         return $item;
     }
 }
 
-if (! function_exists('exec_target')){
+if (! function_exists('exec_target')) {
 
-    function exec_target($item){
+    function exec_target($item)
+    {
 
         if (isset($item['repository'])) {
             $args = explode(':', $item['repository']);
@@ -118,6 +130,7 @@ if (! function_exists('exec_target')){
             $params = Collection::make($args)->mapWithKeys(function ($arg) {
 
                 [$name, $value] = explode('=', $arg);
+
                 // if($name == 'columns')
                 //     dd($name);
                 return [$name => explode(',', $value)];
@@ -161,7 +174,7 @@ if (! function_exists('exec_target')){
 
 // }
 
-if (! function_exists('withs')){
+if (! function_exists('withs')) {
 
     function withs(): array
     {
@@ -170,7 +183,7 @@ if (! function_exists('withs')){
 
 }
 
-if (! function_exists('get_item_columns')){
+if (! function_exists('get_item_columns')) {
 
     function get_item_columns()
     {
@@ -211,8 +224,7 @@ if (! function_exists('get_item_columns')){
 
 }
 
-
-if (! function_exists('item_columns')){
+if (! function_exists('item_columns')) {
 
     function item_columns(): array
     {
@@ -220,5 +232,3 @@ if (! function_exists('item_columns')){
     }
 
 }
-
-
