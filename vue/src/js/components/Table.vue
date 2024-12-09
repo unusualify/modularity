@@ -50,7 +50,7 @@
         :loading-text="$t('Loading... Please wait')"
         :mobile="$vuetify.display.smAndDown"
 
-        :show-select="showSelect"
+        :show-select="$store.getters.isSuperAdmin && showSelect"
         item-value="id"
         v-model="selectedItems"
 
