@@ -28,13 +28,19 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
   }
 
   _inputs = _.reduce(_inputs, (acc, input, key) => {
-    input.class = input._originalClass || input.class;
-    input._originalClass = input.class;
+    input.col.class = input._originalClass || input.col?.class || [];
+    input._originalClass = input.col.class || [];
+    input.disabled = __isset(input._originalDisabled)
+      ? input._originalDisabled
+      : __isset(input.disabled)
+        ? input.disabled
+        : false
+    input._originalDisabled = input.disabled
 
-    let inputClass = input.class || [];
+    let inputColClass = input.col?.class || [];
 
-    if (__isString(inputClass)) {
-      inputClass = inputClass.split(' ');
+    if (__isString(inputColClass)) {
+      inputColClass = inputColClass.split(' ');
     }
 
     let isCreatable = input.creatable;
@@ -43,8 +49,8 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
     // Check if the input has createable property and it's false or hidden
     if ((isCreatable === false || isCreatable === 'hidden') && !isEditing) {
       if (isCreatable === 'hidden') {
-        inputClass = _.union(inputClass, ['d-none']);
-        input.class = inputClass.join(' ');
+        inputColClass = _.union(inputColClass, ['d-none']);
+        input.col.class = inputColClass.join(' ');
       } else {
         input.disabled = true;
       }
@@ -53,8 +59,8 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
     // Check if the input has editable property and it's false or hidden
     if ((isEditable === false || isEditable === 'hidden') && isEditing) {
       if (isEditable === 'hidden') {
-        inputClass = _.union(inputClass, ['d-none']);
-        input.class = inputClass.join(' ');
+        inputColClass = _.union(inputColClass, ['d-none']);
+        input.col.class = inputColClass.join(' ');
       } else {
         input.disabled = true;
       }
@@ -109,7 +115,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
     }
 
     let accessName = name.replace(/->/g, '.')
-    let value = editing ? (__isset(fields[name]) ? fields[name] : (__data_get(item, accessName, _default))) : _default
+    let value = editing ? (__isset(fields[name]) ? fields[name] : (__data_get(item, accessName, _default) ?? _default)) : _default
 
     if(editing){
       if(input.type == 'group' && __isset(item[name])){
