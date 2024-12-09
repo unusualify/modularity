@@ -2,6 +2,53 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.20.0 - 2024-12-09
+
+### :rocket: Features
+
+- :sparkles: add currency exchange on payment form by @gunesbizim in https://github.com/unusualify/modularity/commit/767a9424fc644e4602c8d985e53a6138b9b81970
+- :sparkles: add custom payment service button styling to payment services by @gunesbizim in https://github.com/unusualify/modularity/commit/6235a891e86add90229eae3f6b6521529fccafd4
+- :sparkles: add cardType to payment services by @gunesbizim in https://github.com/unusualify/modularity/commit/0577d5f0c34f6ad256553753dea82b40db1cde5d
+- :sparkles: add currencyServices relation to payment for available currencies with specific payment method by @gunesbizim in https://github.com/unusualify/modularity/commit/03c24c80b36a9458560adf23bad9cfee911f436b
+- :sparkles: add align class to title by @gunesbizim in https://github.com/unusualify/modularity/commit/ecdcc61e68d867dbab7ecf81b0407c92e9fd41b1
+- :sparkles: update ui for currency selection on payment form by @gunesbizim in https://github.com/unusualify/modularity/commit/da21b0cdb6f5bc372dcb8d5470f000d0ff640d90
+- :art: add label to RadioGroup by @OoBook in https://github.com/unusualify/modularity/commit/ba66fc1ce5e24d0b19d5c83f76d8adb015f507fc
+- :art: handle divider case on hydrating input by @OoBook in https://github.com/unusualify/modularity/commit/1e8e9bb1fbdf078482fc50f55a39e89f0eed6b15
+- :art: add a feature shwoing labels as headers like a table by @OoBook in https://github.com/unusualify/modularity/commit/58cc1558086fd5f686aaf9341657fb1819f45a4d
+- :art: add default form attributes and module specific form attributes by @OoBook in https://github.com/unusualify/modularity/commit/6d62a57950b919376accc5b4282654eed6f12e16
+- :art: add new translated input helpers by @OoBook in https://github.com/unusualify/modularity/commit/9e3f7847418ba8872ca20be01499d7b30b12e493
+- :triangular_flag_on_post: add locale hook to handle languages, active language by @OoBook in https://github.com/unusualify/modularity/commit/33302ebbc3f869d5bb016111a1dcfe698d564ee9
+- :art: add a translation info to append of label by @OoBook in https://github.com/unusualify/modularity/commit/106df083bc64abf5900baa8278177f23c2d84591
+- :lipstick: add coloring patterns by @OoBook in https://github.com/unusualify/modularity/commit/f1037558414eabcf0d2868a5c11c83be8d7c3a91
+
+### :wrench: Bug Fixes
+
+- :bug: fix selected input styling && design issue by @gunesbizim in https://github.com/unusualify/modularity/commit/bce51c7a0efedc655275f192ab880b167fa4a042
+- :bug: fix hasDivider prop && title align- and text- prop by @gunesbizim in https://github.com/unusualify/modularity/commit/d5e58b6b726e71cfc3d0615cf8eef7e28b2b74f9
+- :bug: fix the flexibility of right slot of title by @OoBook in https://github.com/unusualify/modularity/commit/19f3c6cb5cc7b740fd9601ae6bc82ccadad03ab5
+- :bug: fix ux issues of last step form's summary by @OoBook in https://github.com/unusualify/modularity/commit/0cb1b2f6735f4581a23b6725e1a9d177b7679965
+- :art: update profile structre acc. to new theming structure by @OoBook in https://github.com/unusualify/modularity/commit/209dded0df42b6558a87dbb0849f9a9151654b9a
+
+### :recycle: Refactors
+
+- refactor for conflict by @gunesbizim in https://github.com/unusualify/modularity/commit/ef418c7d1b4be2f19b2e6721cfa846cd8069d8ed
+- :recycle: refactor conflict fix by @gunesbizim in https://github.com/unusualify/modularity/commit/7faa14caca1c79a307b0c35719394e8c1542a1dd
+- :art: arrange wrap/group's title/subtitle styling by @OoBook in https://github.com/unusualify/modularity/commit/e61ac751303805df875d31141754701f5bffcf66
+- :bug: remove emphasize from text display sub text by @OoBook in https://github.com/unusualify/modularity/commit/0f3784af53fec2ee3fae341c5096b607ceb52cb1
+- :recycle: upgrade advanced filter menu by @OoBook in https://github.com/unusualify/modularity/commit/a72f5365f8d136bdfb14d1c0c99e1afde797f55f
+
+### :white_check_mark: Testing
+
+- :test_tube: change vuetify plugin as UEConfig by @OoBook in https://github.com/unusualify/modularity/commit/369c390c012020af2f4961be48f645288e12c8c9
+
+### :package: Build
+
+- :building_construction: add new v0.20.0 build by @OoBook in https://github.com/unusualify/modularity/commit/27ea59d21b988c7b1266fe5e135baaada1306c42
+
+### :beers: Other Stuff
+
+- :children_crossing: remove job title from user profile by @OoBook in https://github.com/unusualify/modularity/commit/76af300a737611ea36f5ba6fc7971ac3a2db727f
+
 ## v0.19.1 - 2024-11-27
 
 ### :wrench: Bug Fixes
