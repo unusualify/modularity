@@ -639,7 +639,8 @@ class RouteServiceProvider extends ServiceProvider
                 // 'browser',
                 // 'feature',
                 // 'bulkFeature',
-                // 'tags',
+                'tags',
+                'tagsUpdate',
                 // 'preview',
                 'restore',
                 'bulkRestore',
@@ -664,7 +665,8 @@ class RouteServiceProvider extends ServiceProvider
             //     );
             // }
             foreach ($customRoutes as $customRoute) {
-                $routeSlug = "{$url}/{$customRoute}";
+                $customRouteKebab = kebabCase($customRoute);
+                $routeSlug = "{$url}/{$customRouteKebab}";
 
                 $mapping = [
                     // 'as' => $customRoutePrefix . ".{$customRoute}",
@@ -686,6 +688,7 @@ class RouteServiceProvider extends ServiceProvider
                         'feature',
                         'restore',
                         'forceDelete',
+                        'tagsUpdate',
                     ])
                 ) {
                     Route::put($routeSlug, $mapping);

@@ -28,10 +28,10 @@
                   <div :class="['content__item', isHovering ? 'active' :'', draggable ? 'draggable': '']" v-bind="props">
                     <div :class="['content__item--body', {gutter: withGutter}]">
                       <div class="content__item--toolbar">
-                        <v-btn @click="addRepeaterBlock()" color="success" variant="text" density="compact" class="" icon="">
+                        <v-btn v-if="isAddible" @click="addRepeaterBlock()" color="success" variant="text" density="compact" class="" icon="">
                           <v-icon size="x-small" icon="mdi-plus" />
                         </v-btn>
-                        <v-btn @click="duplicateRepeaterBlock(itemSlot.index)" variant="text" density="compact" class="" icon="">
+                        <v-btn v-if="!isUnique" @click="duplicateRepeaterBlock(itemSlot.index)" variant="text" density="compact" class="" icon="">
                           <v-icon size="x-small" icon="mdi-content-copy" />
                         </v-btn>
                         <v-btn @click="deleteRepeaterBlock(itemSlot.index)" color="red" variant="text" density="compact" class="" icon="">
@@ -84,10 +84,11 @@
       </div>
       <div class="repeater__bottom mb-12">
         <div class="d-flex">
-          <slot name="addButton" v-bind="{text: addButtonContent, addRepeaterBlock}">
+          <slot name="addButton" v-bind="{text: addButtonContent, addRepeaterBlock, isActive: addButtonIsActive}">
             <v-btn
               variant="outlined"
               class=""
+              :disabled="!addButtonIsActive"
               @click="addRepeaterBlock"
               appendIcon="$add"
               v-if="schema.length || Object.keys(schema).length"

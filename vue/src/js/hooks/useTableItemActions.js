@@ -26,6 +26,10 @@ export const makeTableItemActionsProps = propsFactory({
     type: String,
     default: '',
   },
+  formActions: {
+    type: Array,
+    default: []
+  }
 })
 
 export default function useTableItemActions(props, { tableForms, tableModals, tableEndpoints }) {

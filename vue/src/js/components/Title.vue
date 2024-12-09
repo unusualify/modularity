@@ -10,11 +10,9 @@
     <slot v-bind="{text}">
       {{ text }}
     </slot>
-    <div class="ml-auto d-flex">
-      <slot name="right">
+    <slot name="right">
 
-      </slot>
-    </div>
+    </slot>
     <!-- <slot v-bind="{right}">
 
     </slot> -->

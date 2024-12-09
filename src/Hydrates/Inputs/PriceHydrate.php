@@ -2,7 +2,9 @@
 
 namespace Unusualify\Modularity\Hydrates\Inputs;
 
+use Illuminate\Support\Facades\App;
 use Modules\SystemPricing\Entities\Currency;
+use Modules\SystemPricing\Repositories\VatRateRepository;
 use Unusualify\Modularity\Http\Requests\Request;
 
 class PriceHydrate extends InputHydrate
@@ -48,6 +50,18 @@ class PriceHydrate extends InputHydrate
         if ($onlyBaseCurrency) {
             $baseCurrency = unusualConfig('services.currency_exchange.base_currency');
             $query = $query->where('iso_4217', mb_strtoupper($baseCurrency));
+        }
+
+        if (isset($input['hasVatRate']) && $input['hasVatRate']) {
+            $input['vatRates'] = App::make(VatRateRepository::class)->list(['name', 'rate'])->map(function ($item) {
+                return [
+                    'title' => $item['name'] . ' (' . $item['rate'] . '%)',
+                    'value' => $item['id'],
+                    'rate' => $item['rate'],
+                ];
+            })->toArray();
+
+            // dd($input);
         }
 
         $input['items'] = $query->get()->toArray();

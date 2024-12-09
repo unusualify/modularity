@@ -50,11 +50,18 @@ $theme-config: map.merge($default-theme-config, $theme-config);
     ),
   ),
 
+
+
   $body-font-family: $body-font-family,
   $spacer: $spacer,
   $grid-gutter: $spacer * 12,
-  $line-height-root: $line-height-root, //1.5
+  // $grid-gutter-secondary: $spacer * 12 * calc(2 / 3),
+  // $grid-gutter-tertiary: $spacer * 12 * calc(1 / 3),
+  // $grid-gutter-secondary: $spacer * 12 * (2 / 3),
+  // $grid-gutter-tertiary: $spacer * 12 * (1 / 3),
 
+  $line-height-root: $line-height-root, //1.5
+  // $line-height-root: $line-height-root, //1.5
   $font-weights: $font-weights,
 
   // $navigation-drawer-background: $navigation-drawer-background,

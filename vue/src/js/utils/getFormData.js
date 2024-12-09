@@ -13,7 +13,7 @@ const isArrayable = 'input-treeview|treeview|input-checklist|input-repeater|inpu
 
 export const getSchema = (inputs, model = null, isEditing = false) => {
   let _inputs = _.omitBy(inputs, (value, key) => {
-    return Object.prototype.hasOwnProperty.call(value, 'slotable') || isTopEventInput(value)
+    return Object.prototype.hasOwnProperty.call(value, 'slotable') || isTopEventInput(value) || isViewOnlyInput(value)
   })
 
   if (_.find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'wrap'))) {
@@ -27,43 +27,54 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
     }, {})
   }
 
-  Object.keys(_inputs).forEach(key => {
-    const input = _inputs[key]
+  _inputs = _.reduce(_inputs, (acc, input, key) => {
+    input.col.class = input._originalClass || input.col?.class || [];
+    input._originalClass = input.col.class || [];
+    input.disabled = __isset(input._originalDisabled)
+      ? input._originalDisabled
+      : __isset(input.disabled)
+        ? input.disabled
+        : false
+    input._originalDisabled = input.disabled
 
-    _inputs[key].class = _inputs[key]._originalClass || _inputs[key].class
-    _inputs[key]._originalClass = _inputs[key].class
-    _inputs[key].disabled = false
+    let inputColClass = input.col?.class || [];
 
-    let inputClass = input.class || []
+    if (__isString(inputColClass)) {
+      inputColClass = inputColClass.split(' ');
+    }
 
-    if(__isString(inputClass))
-      inputClass = inputClass.split(' ')
+    let isCreatable = input.creatable;
+    let isEditable = input.editable;
 
-    let isCreatable = input.creatable
-    let isEditable = input.editable
     // Check if the input has createable property and it's false or hidden
     if ((isCreatable === false || isCreatable === 'hidden') && !isEditing) {
-      if(isCreatable === 'hidden'){
-        inputClass = _.union(inputClass, ['d-none'])
-        _inputs[key].class = inputClass.join(' ')
+      if (isCreatable === 'hidden') {
+        inputColClass = _.union(inputColClass, ['d-none']);
+        input.col.class = inputColClass.join(' ');
       } else {
-        _inputs[key].disabled = true
-      }
-    }
-    // Check if the input has editable property and it's false or hidden
-    if ((isEditable === false || isEditable === 'hidden') && isEditing) {
-      if(isEditable === 'hidden'){
-        inputClass = _.union(inputClass, ['d-none'])
-        _inputs[key].class = inputClass.join(' ')
-      } else {
-        _inputs[key].disabled = true
+        input.disabled = true;
       }
     }
 
-    if(__isset(_inputs[key]) && __isset(_inputs[key].schema) && ['wrap', 'group', 'repeater', 'input-repeater'].includes(input.type)){
-      _inputs[key].schema = getSchema(input.schema, input.type === 'wrap' ? model : model[key], isEditing)
+    // Check if the input has editable property and it's false or hidden
+    if ((isEditable === false || isEditable === 'hidden') && isEditing) {
+      if (isEditable === 'hidden') {
+        inputColClass = _.union(inputColClass, ['d-none']);
+        input.col.class = inputColClass.join(' ');
+      } else {
+        input.disabled = true;
+      }
     }
-  });
+
+    if (__isset(input) && __isset(input.schema) && ['wrap', 'group', 'repeater', 'input-repeater'].includes(input.type)) {
+      input.schema = getSchema(input.schema, input.type === 'wrap' ? model : model[key], isEditing);
+    }
+
+    // Always add the input to the accumulator
+    acc[key] = input;
+
+    return acc;
+  }, {});
 
   _.map(_inputs, (value, key) => {
     if(__isset(value.type) && value.type == 'group'){
@@ -78,7 +89,7 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
 }
 
 export const getModel = (inputs, item = null, rootState = null) => {
-  const languages = window[import.meta.env.VUE_APP_NAME].STORE.languages.all
+  const languages = getTranslationLanguages()
   const editing = __isset(item)
 
   inputs = processInputs(inputs)
@@ -98,18 +109,14 @@ export const getModel = (inputs, item = null, rootState = null) => {
 
     if (isTranslated) {
       _default = _.reduce(languages, function (acc, language, k) {
-        acc[language.value] = _default
+        acc[language] = _default
         return acc
       }, {})
     }
 
-    // if (isMediableTypes.includes(input.type)) {
-    //   // if (editing) { __log(name, item, input) }
-    //   return fields
-    // }
-    // __log(name, _default, item)
-    let value = editing ? (__isset(fields[name]) ? fields[name] : (__isset(item[name]) ? item[name] : _default)) : _default
-    // const value = editing ? (__isset(item[name]) ? item[name] : _default) : _default
+    let accessName = name.replace(/->/g, '.')
+    let value = editing ? (__isset(fields[name]) ? fields[name] : (__data_get(item, accessName, _default) ?? _default)) : _default
+
     if(editing){
       if(input.type == 'group' && __isset(item[name])){
         let defaultGroupKeys = Object.keys(_.omit(__dot(_default), ['id']));
@@ -129,9 +136,9 @@ export const getModel = (inputs, item = null, rootState = null) => {
           const hasTranslations = Object.prototype.hasOwnProperty.call(item, 'translations')
           if (hasTranslations && item.translations[name]) {
             fields[name] = languages.reduce(function (map, lang) {
-              map[lang.value] = _.find(item.translations, { locale: lang.value })
-                ? _.find(item.translations, { locale: lang.value })[name]
-                : item.translations[name][lang.value]
+              map[lang] = _.find(item.translations, { locale: lang })
+                ? _.find(item.translations, { locale: lang })[name]
+                : item.translations[name][lang]
               return map
             }, {})
           } else {
@@ -208,8 +215,11 @@ export const getSubmitFormData = (inputs, item = null, rootState = null) => {
     // }
 
     const name = input.name
+
+    const value = __data_get(item, name, undefined)
+
     // default model value
-    if (!__isset(item[name])) {
+    if (!__isset(value)) {
       let value = input.default ?? ''
       if (isArrayable.includes(input.type)) {
         value = []
@@ -219,7 +229,7 @@ export const getSubmitFormData = (inputs, item = null, rootState = null) => {
 
       return fields
     }
-    const value = item[name]
+    // const value = item[name]
 
     if (__isObject(input)) {
       if (Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated) { // translations
@@ -357,7 +367,7 @@ export const handleInputEvents = (events = null, fields, moduleSchema, name = nu
   }
 }
 
-export const handleEvents = ( model, schema, input) => {
+export const handleEvents = ( model, schema, input, valueChanged = false) => {
 
   const handlerName = input.name
   const handlerSchema = schema[handlerName]
@@ -369,8 +379,12 @@ export const handleEvents = ( model, schema, input) => {
     input.event.split('|').forEach(event => {
       let args = event.split(':')
       let methodName = args.shift()
+      let runnable = true
 
-      if(typeof FormatFuncs[methodName] !== 'undefined')
+      if(methodName == 'formatSet' && !valueChanged)
+        runnable = false
+
+      if(runnable && typeof FormatFuncs[methodName] !== 'undefined')
         FormatFuncs?.[methodName](args, model, schema, input)
 
     })
@@ -473,8 +487,18 @@ const slugify = (newValue) => {
   return filters.slugify(text)
 }
 
-const isTopEventInput = (input) => {
-  return Object.prototype.hasOwnProperty.call(input, 'topEvent') && input.topEvent && ['select', 'autocomplete', 'combobox'].includes(input.type)
+export const isTopEventInput = (input) => {
+  return Object.prototype.hasOwnProperty.call(input, 'topEvent')
+    && input.topEvent
+    && ( ['select', 'autocomplete', 'combobox'].includes(input.type) || __isset(input.viewOnlyComponent) )
+}
+
+const isViewOnlyInput = (input) => {
+  return Object.prototype.hasOwnProperty.call(input, 'viewOnlyComponent')
+}
+
+const getTranslationLanguages = (input) => {
+  return _.map(window[import.meta.env.VUE_APP_NAME].STORE.languages.all, 'value')
 }
 
 const FormatFuncs = {
@@ -534,10 +558,12 @@ const FormatFuncs = {
 
   formatSet: async function(args, model, schema, input, index = null, preview = []) {
     const inputNotation = this.getInputToFormat(args, model, schema, index )
+    const languages = getTranslationLanguages()
 
     if(!inputNotation)
       return
 
+    const inputToFormat = inputNotation
     const inputPropToFormat = args.shift() //
     const setterNotation = `${inputNotation}.${inputPropToFormat}`
     const setPropFormat = args.shift() // items.*.schema
@@ -553,11 +579,75 @@ const FormatFuncs = {
       dataSet = __data_get(handlerSchema, notation, null)
 
       if(dataSet && dataSet.length > 0){
-        const newValue = dataSet.shift()
-        _.set(schema, setterNotation, newValue)
-        if(inputPropToFormat.match(/schema/)){
-          _.set(schema, `${inputNotation}.default`, getModel(newValue))
+        let newValue = dataSet.shift()
+
+
+        let matches = inputPropToFormat.match(/^(modelValue|model)$/g)
+        // __log(inputPropToFormat, matches)
+        if(matches){ // setting modelValue
+          let targetInput = _.get(schema, inputToFormat)
+          let targetInputName = targetInput.name
+          let targetForeignKey = __extractForeignKey(targetInputName)
+          let targetInputSchema = targetInput.schema ?? null
+          let isRepeater = targetInput.type == 'input-repeater'
+          let isArrayValue = Array.isArray(newValue)
+
+          if(__isset(targetInput['translated']) && targetInput['translated']){
+            let translationParts = notation.split('.')
+            let field = translationParts.pop()
+            let translationNotation = translationParts.join('.') + '.translations'
+            notation.split('.').pop()
+            let rawTranslation = __data_get(handlerSchema, translationNotation).shift()
+
+            if(rawTranslation){
+              // TODO: translations do not comes from package_type
+              __log(rawTranslation)
+              newValue = _.reduce(languages, (acc, language) => {
+                let translation = _.find(rawTranslation, (el) => el.locale == language) ?? rawTranslation[0]
+                let value = translation[field] ?? null
+                acc[language] = translation[field] ?? null
+                return acc
+              }, {})
+            }
+          }
+
+          if(isArrayValue && newValue.length > 0){
+            let values = newValue.map((item) => {
+              if(targetInputSchema){
+                return _.reduce(targetInputSchema, (acc, value, key) => {
+                  // __log(key, value)
+                  if(isRepeater && key == targetForeignKey){
+                    acc[targetForeignKey] = item['id'] ?? null
+                  }else{
+                    acc[key] = item[key] ?? null
+                  }
+
+                  return acc
+                }, {})
+              }
+            })
+
+            _.set(model, inputToFormat, values)
+            // let currentValue = _.get(model, inputToFormat)
+            // __log( inputToFormat, __data_get(model, inputToFormat), model )
+            // if( !(Array.isArray(currentValue) && currentValue.length > 0)){
+            //   // __log('setting')
+            // }
+          }else if(!isArrayValue){
+            try{
+              _.set(model, targetInputName, newValue)
+            }catch(e){
+              console.error(e)
+            }
+          }
+        }else{
+          _.set(schema, setterNotation, newValue)
+          if(inputPropToFormat.match(/schema/)){
+            _.set(schema, `${inputNotation}.default`, getModel(newValue))
+          }
+
         }
+
       }
     }
   },
@@ -792,15 +882,15 @@ const FormatFuncs = {
                 if(Array.isArray(val) && _.isEmpty(val)) return
 
                 let parentPattern = parentPatterns[i];
-
                 let ids = Array.isArray(val) ? val.join(',') : val
 
                 // let getter = [parentPattern, inputToFormat.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*' + `id=${ids}` + '$3')].join('.')
                 let getter = [parentPattern, __wildcard_change(inputToFormat, val)].join('.')
                 let data = __data_get(handlerSchema, getter).shift()
                 let formattedData = data[0] ?? ''
-                if(data.length > 1){
-                  formattedData = `(${data.join(',')})`
+
+                if(_index > 1 && Array.isArray(data)){
+                  formattedData = `(${data.join(', ')})`
                 }
 
                 _.set(previewValue, isMultiple ? `[${i}][${_index}]` : `[${_index}]`, formattedData)

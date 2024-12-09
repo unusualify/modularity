@@ -104,17 +104,32 @@ return [
         ],
     ],
     'customRowComponent' => [
-        // 'iteratorComponent' => 'configurable-card-iterator',
-        // 'col' => [
-        //     'cols' => 12,
-        // ]
-        // 'col' => [
-        //     'cols' => 6,
-        //     'sm' => 6,
-        //     'md' => 6,
-        //     'lg' => 6,
-        //     'xl' => 6,
-        // ],
+        /**
+         * an object with the following properties:
+         * 'iteratorComponent' => 'configurable-card-iterator',
+         * 'col' => [
+         *     'cols' => 12,
+         * ]
+         *
+         * or
+         *
+         * an array of objects with the following properties:
+         * [
+         *     'name' => 'configurable-card-iterator',
+         *     'allowedRoles' => ['admin'],
+         *     'col' => [
+         *     'cols' => 12,
+         * ]
+         * ],
+         * [
+         *     'name' => 'configurable-card-iterator',
+         *     'allowedRoles' => ['manager'],
+         *     'col' => [
+         *     'cols' => 12,
+         * ]
+         * ],
+         */
+
     ],
     'cellOptions' => [
         'maxChar' => 3,

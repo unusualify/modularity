@@ -26,7 +26,7 @@
     </template>
 
     <template v-else-if="isTextable(configuration.elements)">
-      {{ configuration.elements }}
+      {{ applyCasting(configuration.elements) }}
     </template>
 
 
@@ -80,6 +80,7 @@ export default {
     // const directives = [vFitGrid];
     // const directives = props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : []
     // __log(directives)
+    // console.log(props.configuration.value);
     const slots = computed(() => {
       // console.log(props.configuration);
       if(props.configuration.hasOwnProperty('slots'))
@@ -99,33 +100,33 @@ export default {
     function isObject (value) {
       return __isObject(value)
     }
-    function castAttribute (object, key, value) {
+    function applyCasting(value, funcs = []) {
+      const matches = value.match(castPattern)
+      if (matches) {
+        let result = get(props.bindData, matches[1])
+        funcs.forEach((func) => {
+          result = window[func](result)
+        })
+        return result
+      }
+      return null
+    }
+    function castAttribute(object, key, value) {
       let _value = value
-
       let funcs = []
 
       if (isArray(value) && __isString(value[0])) {
         _value = value.shift()
         funcs = value
       }
-
-      if (isObject(value)
-      // || (isArray(value) && !__isString(value[0]))
-      ) {
+      
+      if (isObject(value)) {
+        // Do nothing
       } else {
-        // __log(_value, value)
-        const matches = _value.match(castPattern)
-
-        if (matches) {
-          let result = get(props.bindData, matches[1])
-          funcs.forEach((func) => {
-            result = window[func](result)
-          })
-
-          if (result) {
-            object[key] = result
-            delete filteredAttributes[key]
-          }
+        const result = applyCasting(_value, funcs)
+        if (result) {
+          object[key] = result
+          delete filteredAttributes[key]
         }
       }
     }
@@ -151,7 +152,7 @@ export default {
         if (matches && !!props.bindData) {
           const key = matches[1]
           if (Object.prototype.hasOwnProperty.call(props.bindData, key)) {
-            return props.bindData[key]
+            return __data_get(props.bindData, key)
           }
         }
       }
@@ -163,6 +164,7 @@ export default {
       // directives: props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : [],
       isTextable,
       isArray,
+      applyCasting,
       hasSlot,
       filteredAttributes,
       castedAttributes,
