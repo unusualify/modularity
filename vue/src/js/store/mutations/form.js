@@ -29,6 +29,10 @@ export const UPDATE_MODAL_FIELD = 'updateModalField'
 export const REMOVE_MODAL_FIELD = 'removeModalField'
 export const REPLACE_MODAL_FIELDS = 'replaceModalField'
 
+/* Tags */
+export const SET_TAGGABLE_ITEMS = 'setTaggableItems'
+export const ADD_TAGGABLE_ITEM = 'addTaggableItem'
+
 export default {
   SET_EDITED_ITEM,
   RESET_EDITED_ITEM,
@@ -55,5 +59,7 @@ export default {
   EMPTY_MODAL_FIELDS,
   UPDATE_MODAL_FIELD,
   REMOVE_MODAL_FIELD,
-  REPLACE_MODAL_FIELDS
+  REPLACE_MODAL_FIELDS,
+  SET_TAGGABLE_ITEMS,
+  ADD_TAGGABLE_ITEM
 }

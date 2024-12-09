@@ -22,7 +22,7 @@ export const makeTableHeadersProps = propsFactory({
     type: [Array, Object],
     default: {}
   },
-  customRowComponent: {
+  customRow: {
     type: Object,
     default: {}
   },
@@ -41,11 +41,11 @@ export default function useTableHeaders(props) {
   )
 
   const hideHeaders = computed(() =>
-    props.hideHeaders || enableIterators.value
+    props.hideHeaders || hasCustomRow.value
   )
 
-  const enableIterators = computed(() =>
-    Object.keys(props.customRowComponent || {}).length
+  const hasCustomRow = computed(() =>
+    Object.keys(props.customRow || {}).length
   )
 
   // Methods
@@ -70,7 +70,7 @@ export default function useTableHeaders(props) {
     // Computed
     selectedHeaders,
     hideHeaders,
-    enableIterators,
+    hasCustomRow,
 
     // Methods
     applyHeaders

@@ -20,7 +20,7 @@ Route::group(['prefix' => 'api'], function () {
     Route::group(['prefix' => 'filepond', 'as' => 'filepond.'], function () {
         Route::post('process', [FilepondController::class, 'upload'])->name('process');
         Route::delete('revert', [FilepondController::class, 'revert'])->name('revert');
-        Route::get('preview/{folder}', [FilepondController::class, 'preview'])->name('preview');
+        Route::get('preview/{uuid}', [FilepondController::class, 'preview'])->name('preview');
     });
 
     Route::controller(CurrencyExchangeController::class)

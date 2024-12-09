@@ -19,76 +19,149 @@
           padding="b-3"
           color="grey-darken-5"
           align="center"
+          justify="space-between"
           v-bind="titleOptions"
         >
           {{ titleSerialized }}
           <template v-slot:right>
+            <div class="d-flex align-center">
+              <slot name="headerCenter">
 
-            <!-- Input events-->
-            <template v-if="topSchema && topSchema.length">
-              <template v-for="topInput in topSchema" :key="topInput.name">
-                <v-menu
-                  :close-on-content-click="false"
-                  transition="scale-transition"
-                  offset-y
-                >
-                  <template v-slot:activator="{ props }">
-                    <v-btn
-                      variant="outlined"
-                      append-icon="mdi-chevron-down"
-                      v-bind="props"
+              </slot>
+              <!-- Form Actions -->
+              <template v-if="computedActions && computedActions.length">
+                <div class="d-flex flex-wrap ga-2 mr-2">
+                  <template v-for="(action, key) in computedActions">
+                    <v-tooltip
+                      v-if="shouldShowAction(action) && action.type !== 'modal'"
+                      :disabled="!action.icon || action.forceLabel"
+                      :location="action.tooltipLocation ?? 'top'"
                     >
-                      <!-- {{ topInput.label }} -->
-                      {{ getTopInputActiveLabel(topInput) }}
-                      <!-- {{ topInput.items.find(item => item[topInput.itemValue] ===  ($isset(model[topInput.name]) ? model[topInput.name] : -1))[topInput.itemTitle] ?? topInput.label }} -->
-                    </v-btn>
+                      <template v-slot:activator="{ props }">
+                        <v-btn
+                          :icon="!action.forceLabel ? action.icon : null"
+                          :text="action.forceLabel ? action.label : null"
+                          :color="action.color"
+                          :variant="action.variant"
+                          :density="action.density ?? 'comfortable'"
+                          :size="action.size ?? 'default'"
+                          :rounded="action.forceLabel ? null : true"
+                          v-bind="props"
+                          @click="handleAction(action)"
+                        />
+                      </template>
+                      <span>{{ action.tooltip ?? action.label }}</span>
+                    </v-tooltip>
+                    <v-menu v-else-if="action.type === 'modal'"
+                      :close-on-content-click="false"
+                      open-on-hoverx
+                      transition="scale-transition"
+                    >
+                      <template v-slot:activator="{ props }">
+                        <v-btn
+                          :icon="!action.forceLabel ? action.icon : null"
+                          :text="action.forceLabel ? action.label : null"
+                          :color="action.color"
+                          :variant="action.variant"
+                          :density="action.density ?? 'comfortable'"
+                          :size="action.size ?? 'default'"
+                          :rounded="action.forceLabel ? null : true"
+                          v-bind="props"
+                        />
+                      </template>
+                      <v-sheet :style="$vuetify.display.mdAndDown ? {width: '70vw'} : {width: '40vw'}">
+                        <ue-form
+                          :ref="`extra-form-${key}`"
+                          :modelValue="createModel(action.schema)"
+                          @updatex:modelValue="$log($event)"
+                          :title="action.formTitle ?? null"
+                          :schema="action.schema"
+                          :action-url="action.endpoint.replace(':id', editedItem.id)"
+                          :valid="extraValids[key]"
+                          @update:valid="extraValids[key] = $event"
+                          has-divider
+                          has-submit
+                          button-text="Save"
+                        />
+                      </v-sheet>
+                    </v-menu>
                   </template>
-
-                  <v-list>
-                    <v-list-item
-                      v-for="(item, index) in topInput.items"
-                      :key="item.id"
-                      @click="model[topInput.name] = item.id"
-                    >
-                      <v-list-item-title>
-                        {{ item.name }}
-                        <v-icon v-if="$isset(model[topInput.name]) && item[topInput.itemValue] === model[topInput.name]" size="small" icon="$check" color="primary"></v-icon>
-                      </v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
+                </div>
               </template>
-            </template>
 
-            <!-- Language Selector -->
-            <v-chip-group
-              v-if="hasTraslationInputs && languages && languages.length && languages.length > 1"
-              :modelValue="currentLocale.value"
-              @update:modelValue="updateLocale($event)"
-              selected-class="bg-primary"
-              mandatory
-            >
-              <v-chip
-                v-for="language in languages"
-                :key="language.value"
-                :text="language.shortlabel"
-                :value="language.value"
-                variant="outlined"
-              ></v-chip>
-            </v-chip-group>
-            <slot name="headerRight">
+              <!-- Input events-->
+              <template v-if="topSchema && topSchema.length">
+                <template v-for="topInput in topSchema" :key="topInput.name">
+                  <ue-recursive-stuff v-if="topInput.viewOnlyComponent"
+                    :configuration="topInput.viewOnlyComponent"
+                    :bind-data="editedItem"
+                  />
+                  <v-menu v-else
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    offset-y
+                  >
+                    <template v-slot:activator="{ props }">
+                      <v-btn
+                        variant="outlined"
+                        append-icon="mdi-chevron-down"
+                        v-bind="props"
+                      >
+                        <!-- {{ topInput.label }} -->
+                        {{ getTopInputActiveLabel(topInput) }}
+                        <!-- {{ topInput.items.find(item => item[topInput.itemValue] ===  ($isset(model[topInput.name]) ? model[topInput.name] : -1))[topInput.itemTitle] ?? topInput.label }} -->
+                      </v-btn>
+                    </template>
 
-            </slot>
+                    <v-list>
+                      <v-list-item
+                        v-for="(item, index) in topInput.items"
+                        :key="item.id"
+                        @click="model[topInput.name] = item.id"
+                      >
+                        <v-list-item-title>
+                          {{ item.name }}
+                          <v-icon v-if="$isset(model[topInput.name]) && item[topInput.itemValue] === model[topInput.name]" size="small" icon="$check" color="primary"></v-icon>
+                        </v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+                </template>
+              </template>
+
+              <!-- Language Selector -->
+              <v-chip-group
+                v-if="hasTraslationInputs && languages && languages.length && languages.length > 1"
+                :modelValue="currentLocale.value"
+                @update:modelValue="updateLocale($event)"
+                selected-class="bg-primary"
+                mandatory
+              >
+                <v-chip
+                  v-for="language in languages"
+                  :key="language.value"
+                  :text="language.shortlabel"
+                  :value="language.value"
+                  variant="outlined"
+                ></v-chip>
+              </v-chip-group>
+              <slot name="headerRight">
+
+              </slot>
+            </div>
           </template>
         </ue-title>
 
         <v-divider v-if="hasDivider"></v-divider>
       </div>
 
+
       <!-- Scrollable Content Section -->
       <div :class="['d-flex', scrollable ? 'flex-grow-1 overflow-hidden mr-n5' : '']">
         <div :class="['w-100', scrollable ? 'overflow-y-auto pr-3' : '']"
         >
+          <slot name="top" v-bind="{item, schema}"></slot>
+
           <v-custom-form-base
             :id="`ue-wrapper-${id}`"
             v-model="model"
@@ -194,14 +267,14 @@
 
   import { redirector } from '@/utils/response'
   import { cloneDeep } from 'lodash-es'
-import { top } from '@popperjs/core'
 
   export default {
     name: 'ue-form',
     emits: [
       'update:valid',
       'update:modelValue',
-      'input'
+      'input',
+      'actionComplete'
     ],
     props: {
       modelValue: {
@@ -289,6 +362,10 @@ import { top } from '@popperjs/core'
       noDefaultSurface: {
         type: Boolean,
         default: false
+      },
+      actions: {
+        type: [Array, Object],
+        default: []
       }
     },
     setup (props, context) {
@@ -311,7 +388,6 @@ import { top } from '@popperjs/core'
     data () {
       return {
         id: Math.ceil(Math.random() * 1000000) + '-form',
-
         formLoading: false,
         formErrors: {},
         // inputs: this.invokeRuleGenerator(this.schema),
@@ -326,7 +402,8 @@ import { top } from '@popperjs/core'
         inputSchema: null,
         topSchema: null,
         defaultItem: null,
-        manualValidation: false
+        manualValidation: false,
+        extraValids: []
       }
     },
 
@@ -341,17 +418,18 @@ import { top } from '@popperjs/core'
     created () {
       this.rawSchema = this.issetSchema ? this.schema : this.$store.state.form.inputs
       this.defaultItem = this.issetSchema ? getModel(this.rawSchema) : this.$store.getters.defaultItem
-      __log(this.rawSchema)
+
       this.model = getModel(
         this.rawSchema,
         this.issetModel ? this.modelValue : this.editedItem,
         this.$store.state,
       )
       this.inputSchema = this.invokeRuleGenerator(getSchema(this.rawSchema, this.model, this.isEditing))
-      __log(this.model, this.inputSchema)
-      // this.topSchema = this.invokeRuleGenerator(getTopSchema(this.rawSchema, this.model, this.isEditing))
+
       this.topSchema = getTopSchema(this.rawSchema)
-      console.log(this.topSchema);
+
+      this.extraValids = this.computedActions.map(action => true)
+
       this.resetSchemaErrors()
     },
 
@@ -406,6 +484,9 @@ import { top } from '@popperjs/core'
     },
 
     computed: {
+      item() {
+        return this.issetModel ? this.modelValue : this.editedItem
+      },
       hasTraslationInputs () {
         return getTranslationInputsCount(this.rawSchema) > 0
       },
@@ -514,6 +595,9 @@ import { top } from '@popperjs/core'
           ? this.$t(title).toLocaleUpperCase(this.$i18n.locale.toUpperCase())
           : title.toLocaleUpperCase(this.$i18n.locale.toUpperCase())
       },
+      computedActions() {
+        return __isObject(this.actions) ? Object.values(this.actions) : this.actions;
+      },
       ...mapState({
         editedItem: state => state.form.editedItem,
         serverValid: state => state.form.serverValid
@@ -523,6 +607,13 @@ import { top } from '@popperjs/core'
     },
 
     methods: {
+      createModel(schema) {
+        return getModel(schema, this.item, this.$store.state)
+      },
+      createSchema(schema, model) {
+        // __log(this.item, getSchema(schema, model, true))
+        return this.invokeRuleGenerator(getSchema(schema, model, true))
+      },
       async validate () {
         const result = await this.$refs[this.reference].validate()
 
@@ -547,7 +638,7 @@ import { top } from '@popperjs/core'
         this.$emit('input', v)
       },
       handleEvent (obj) {
-        handleEvents(this.model, this.inputSchema, obj.schema)
+        handleEvents(this.model, this.inputSchema, obj.schema, true)
         // const { _fields: newModel, moduleSchema: newSchema } = handleInputEvents(obj.schema.event, this.model, this.inputSchema, obj.key)
         // this.model = newModel
         // this.inputSchema = newSchema
@@ -751,6 +842,185 @@ import { top } from '@popperjs/core'
       getTopInputActiveLabel (topInput) {
         const item = topInput.items.find(item => item[topInput.itemValue] ===  (this.$isset(this.model[topInput.name]) ? this.model[topInput.name] : -1))
         return item ? item[topInput.itemTitle] : topInput.label
+      },
+      shouldShowAction(action) {
+        // Base condition for editing/creating
+        const baseCondition = this.isEditing ? action.editable : action.creatable;
+
+        // If no conditions defined, return base condition
+        if (!action.conditions) {
+          return baseCondition;
+        }
+
+        // Check all conditions
+        return baseCondition && action.conditions.every(condition => {
+          const [path, operator, value] = condition;
+          const actualValue = this.getNestedValue(this.editedItem, path);
+
+          switch (operator) {
+            case '=':
+            case '==':
+              return actualValue === value;
+            case '!=':
+              return actualValue !== value;
+            case '>':
+              return actualValue > value;
+            case '<':
+              return actualValue < value;
+            case '>=':
+              return actualValue >= value;
+            case '<=':
+              return actualValue <= value;
+            case 'in':
+              return Array.isArray(value) && value.includes(actualValue);
+            case 'not in':
+              return Array.isArray(value) && !value.includes(actualValue);
+            case 'exists':
+              return actualValue !== undefined && actualValue !== null;
+            default:
+              console.warn(`Unknown operator: ${operator}`);
+              return false;
+          }
+        });
+      },
+
+      // Helper method to get nested object values using dot notation
+      getNestedValue(obj, path) {
+        return path.split('.').reduce((current, part) => {
+          return current && current[part] !== undefined ? current[part] : undefined;
+        }, obj);
+      },
+
+      handleAction(action) {
+        if (!action.type) {
+          console.warn('Action type not specified:', action);
+          return;
+        }
+
+        __log(action)
+
+        // Replace any URL parameters
+        const endpoint = action.endpoint?.replace(':id', this.editedItem.id);
+
+        switch (action.type) {
+          case 'request':
+            this.handleRequestAction(action, endpoint);
+            break;
+
+          case 'modal':
+            this.handleModalAction(action, endpoint);
+            break;
+
+          case 'download':
+            this.handleDownloadAction(endpoint);
+            break;
+
+          default:
+            console.warn('Unknown action type:', action.type);
+        }
+      },
+
+      handleRequestAction(action, endpoint) {
+        if (!endpoint) {
+          console.error('Endpoint not specified for request action');
+          return;
+        }
+
+        const method = action.method?.toLowerCase() || 'post';
+        if (!api[method]) {
+          console.error('Invalid request method:', method);
+          return;
+        }
+
+        // Prepare parameters
+        const params = {};
+
+        // Process each parameter based on its configuration
+        for (const [key, config] of Object.entries(action.params)) {
+          if (typeof config === 'object' && config !== null) {
+            const value = this.resolveParamValue(config);
+            if (value === undefined) {
+              console.error(`Could not resolve parameter value for ${key}`);
+              return;
+            }
+            params[key] = value;
+          } else {
+            params[key] = config;
+          }
+        }
+
+        api[method](endpoint, params,
+          (response) => {
+            // __log('handleRequestAction', response)
+            if (response.data.message) {
+              this.$store.commit(ALERT.SET_ALERT, {
+                message: response.data.message,
+                variant: response.data.variant
+              });
+            }
+            this.$emit('actionComplete', { action, response });
+          },
+          (error) => {
+            this.$store.commit(ALERT.SET_ALERT, {
+              message: error.data?.message || 'Action failed',
+              variant: 'error'
+            });
+          }
+        );
+      },
+
+      resolveParamValue(config) {
+        if (!config.source || !config.find || !config.return) {
+          return config;
+        }
+
+        const sourceData = this.editedItem[config.source];
+        if (!Array.isArray(sourceData)) {
+          return undefined;
+        }
+
+        const [findKey, findValue] = config.find;
+        const item = sourceData.find(item => item[findKey] === findValue);
+
+        return item ? item[config.return] : undefined;
+      },
+
+      handleModalAction(action, endpoint) {
+        // Assuming you have a modal system
+        this.$store.commit('SET_MODAL', {
+          show: true,
+          title: action.label,
+          component: 'ue-form',
+          props: {
+            schema: action.schema,
+            actionUrl: endpoint,
+            async: true
+          },
+          on: {
+            success: (response) => {
+              this.$store.commit(ALERT.SET_ALERT, {
+                message: response.message || 'Action completed successfully',
+                variant: 'success'
+              });
+              this.$emit('action-complete', { action, response });
+            }
+          }
+        });
+      },
+
+      handleDownloadAction(endpoint) {
+        if (!endpoint) {
+          console.error('Endpoint not specified for download action');
+          return;
+        }
+
+        // Create a temporary link and trigger download
+        const link = document.createElement('a');
+        link.href = endpoint;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       }
     }
   }

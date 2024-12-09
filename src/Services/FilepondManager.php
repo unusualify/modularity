@@ -80,7 +80,21 @@ class FilepondManager
         $storagePath = Storage::path($path);
 
         ob_end_clean(); // if I remove this, it does not work
-        // dd($storagePath);
+
+        $fileType = pathinfo($storagePath, PATHINFO_EXTENSION);
+
+        if (in_array($fileType, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'])) {
+            $image = Image::make($storagePath);
+
+            return $image->response($image->mime());
+        } else {
+            $mimeType = mime_content_type($storagePath);
+
+            return response()->file($storagePath, [
+                'Content-Type' => $mimeType,
+            ]);
+        }
+
         $image = Image::make($storagePath);
 
         return $image
@@ -94,7 +108,7 @@ class FilepondManager
         $temporary_path = $this->tmp_file_path . $temp_filepond->folder_name . '/' . $temp_filepond->file_name;
 
         $new_folder = $temp_filepond->folder_name;
-        // dd($temporary_path, Storage::exists($temporary_path));
+
         if (Storage::exists($temporary_path)) {
 
             $new_path = $this->file_path . $temp_filepond->folder_name . '/' . $temp_filepond->file_name;
@@ -103,14 +117,16 @@ class FilepondManager
                 Storage::delete($new_path);
             }
 
+            $this->createFilepond($model, $temp_filepond);
+
+            $this->deleteFilePondFromSession($temp_filepond);
+
             Storage::move($temporary_path, $new_path);
 
             Storage::deleteDirectory($temporary_path);
 
             rmdir(Storage::path($this->tmp_file_path . $temp_filepond->folder_name));
 
-            $this->createFilepond($model, $temp_filepond);
-            $this->deleteFilePondFromSession($temp_filepond);
             $temp_filepond->delete();
 
             return $new_folder;
@@ -141,7 +157,6 @@ class FilepondManager
         $exist_files = array_column($files, 'folder_name');
         $fileponds = $object->fileponds()->where('role', $role)->get();
 
-        // dd($fileponds->select('uuid', $files[0]['folder_name']));
         // files listesinde gelmeyip object->fileponds listesinde olanlari fileponds tablosundan ve storage'tan sil
         foreach ($fileponds as $file) {
             if (! in_array($file->uuid, $exist_files)) {
@@ -165,7 +180,6 @@ class FilepondManager
             }
 
         }
-
     }
 
     public function deleteFile($folder)

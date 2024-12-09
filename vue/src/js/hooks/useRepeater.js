@@ -1,7 +1,7 @@
 // hooks/formatter .js
 
 // import { ref, watch, computed, nextTick } from 'vue'
-import { reactive, toRefs, computed } from 'vue'
+import { reactive, toRefs, computed, ref } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 import { transform, cloneDeep, filter, omit, find, isEmpty, map, reduce } from 'lodash-es'
 import { getModel } from '@/utils/getFormData'
@@ -74,6 +74,22 @@ export const makeRepeaterProps = propsFactory({
   hasHeaders: {
     type: Boolean,
     default: true
+  },
+  isUnique: {
+    type: Boolean,
+    default: false
+  },
+  uniqueValue: {
+    type: String,
+    default: 'id'
+  },
+  uniqueField: {
+    type: String,
+    default: null
+  },
+  disableAddButton: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -85,6 +101,16 @@ export default function useRepeater (props, context) {
   const inputHook = useInput(props, context)
 
   const { modelValue } = toRefs(props)
+  const isUnique = props.isUnique
+  const uniqueValue = props.uniqueValue
+  const uniqueFilledValues = ref([])
+  let uniqueField = null
+  let uniqueInput = null
+
+  if (isUnique && window.__isset(props.schema) && Object.keys(props.schema).length > 0) {
+    uniqueField = props.uniqueField ?? Object.values(props.schema)[0].name
+    uniqueInput = props.schema[uniqueField]
+  }
 
   function namingRepeaterField (index, name) {
     return `repeater${inputHook.id.value}[${index}][${name}]`
@@ -92,11 +118,18 @@ export default function useRepeater (props, context) {
 
   function hydrateRepeaterInput (item, index) {
     const model = getModel(state.processedSchema, item)
+    const extraFields = {}
+
+    if (props.draggable && !model[props.orderKey]) {
+      extraFields[props.orderKey] = index + 1
+    }
+
     return {
       ...(props.autoIdGenerator ? { id: index } : {}),
       ...transform(omit(model, []), (o, v, k) => {
         o[namingRepeaterField(index, k)] = v
-      })
+      }),
+      ...extraFields
     }
   }
 
@@ -110,7 +143,19 @@ export default function useRepeater (props, context) {
   function hydrateSchemas (inputs) {
     const schemas = []
     inputs.forEach((item, i) => {
-      const schema = invokeRuleGenerator(cloneDeep(state.processedSchema))
+      const processedSchema = cloneDeep(state.processedSchema)
+
+      // remove the items selected at other repeats
+      if (isUnique) {
+        if (processedSchema[uniqueField]) {
+          const _model = parseRepeaterInput(state.repeaterInputs[i])
+          const selfValue = _model[uniqueField]
+          // __log('hydrateSchemas', selfValue, uniqueFilledValues.value, state.processedSchema[uniqueField].items)
+          processedSchema[uniqueField].items = uniqueInput.items.filter(item => !(uniqueFilledValues.value.includes(item[uniqueValue]) && selfValue !== item[uniqueValue]))
+        }
+      }
+
+      const schema = invokeRuleGenerator(processedSchema)
 
       schemas[i] = transform(schema, (schema, input, key) => {
         const _input = cloneDeep(input)
@@ -152,6 +197,7 @@ export default function useRepeater (props, context) {
       ...extraFields
     }
   }
+
   function parseRepeaterInputs (model) {
     return model.map((object, i) => {
       return parseRepeaterInput(object, i)
@@ -161,33 +207,50 @@ export default function useRepeater (props, context) {
   const state = reactive({
     repeaterInputs: computed({
       get: () => {
-        // return hydrateRepeaterInputs(modelValue.value ?? [])
         if (isEmpty(props.schema)) {
           return []
         }
         let rawSchema = cloneDeep(props.schema)
+
         const initialRepeats = hydrateRepeaterInputs(Array.isArray(modelValue.value) ? modelValue.value : [])
-        if (props.min > 0 && initialRepeats.length < props.min) {
-          const schema = invokeRuleGenerator(rawSchema)
-          initialRepeats.push(hydrateRepeaterInput(getModel(schema), 1))
+
+        if (initialRepeats.length > 0) {
+          const parsedInitialRepeats = parseRepeaterInputs(initialRepeats).map(item => {
+            return omit(item, ['id'])
+          })
+          if (JSON.stringify(modelValue.value) !== JSON.stringify(parsedInitialRepeats)) {
+            parsedInitialRepeats.forEach((item, index) => {
+              modelValue.value[index] = item
+            })
+          }
+        }
+        // if (props.min > 0 && initialRepeats.length < props.min) {
+        //   const schema = invokeRuleGenerator(rawSchema)
+        //   initialRepeats.push(hydrateRepeaterInput(getModel(schema), 1))
+        // }
+        if (isUnique) {
+          uniqueFilledValues.value = reduce(cloneDeep(initialRepeats), (acc, _rawModel) => {
+            const _model = parseRepeaterInput(_rawModel)
+            if (uniqueField && _model[uniqueField]) {
+              acc.push(_model[uniqueField])
+            }
+            return acc
+          }, [])
         }
 
         return initialRepeats
       },
       set: (val, old) => {
-        __log(
-          'repeaterInputs setter',
-          val
-          // state.repeaterInputs
-
-        )
+        // working on only deleting a repeat
         inputHook.updateModelValue.value(parseRepeaterInputs(val))
       }
     }),
 
     totalRepeats: computed(() => state.repeaterInputs.length),
-    isAddible: computed(() => (props.max < 1) || state.totalRepeats < props.max),
+    isRemainingAddible: computed(() => (!isUnique || (state.totalRepeats < uniqueInput.items.length && state.totalRepeats < uniqueInput.items.filter(item => item[uniqueValue] > 0).length))),
+    isAddible: computed(() => ((props.max < 1) || state.totalRepeats < props.max) && state.isRemainingAddible),
     isDeletable: computed(() => (props.min < 1) || state.totalRepeats > props.min),
+    addButtonIsActive: computed(() => !props.disableAddButton || state.isAddible),
     // repeaterSchemas_: computed({
     //   get: () => {
     //     // __log('repeaterSchemas getter', hydrateSchemas(state.repeaterInputs))
@@ -222,7 +285,6 @@ export default function useRepeater (props, context) {
     processedSchema: computed(() => {
       if (props.hasHeaders) {
         return reduce(cloneDeep(props.schema ?? {}), (acc, input, name) => {
-          __log(input, name)
           acc[name] = omit(input, ['label'])
 
           return acc
@@ -236,7 +298,6 @@ export default function useRepeater (props, context) {
         col: input.col
       }
     }),
-
     addButtonContent: computed(() => {
       return props.addButtonText + (props.buttonHasLabel && __isset(props.singularLabel) ? ` ${props.singularLabel}` : '')
     })
@@ -254,7 +315,11 @@ export default function useRepeater (props, context) {
         const schema = invokeRuleGenerator(cloneDeep(props.schema))
         modelValue.value.push(hydrateRepeaterInput(getModel(schema), state.totalRepeats))
       } else {
-        store.commit(ALERT.SET_ALERT, { message: `You cannot add new item, because the number of elements should be at much ${props.max}`, variant: 'warning', location: 'top' })
+        let message = `You cannot add new item, because the number of elements should be at much ${props.max}`
+        if (!state.isRemainingAddible) {
+          message = `You cannot add new item, because there are no more items to add`
+        }
+        store.commit(ALERT.SET_ALERT, { message, variant: 'warning', location: 'top' })
       }
     },
     deleteRepeaterBlock: function (index) {

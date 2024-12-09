@@ -129,6 +129,17 @@ export default function useTable (props, context) {
   const { smAndDown } = useDisplay()
   const { t, te, tm } = useI18n({ useScope: 'global' })
 
+  const editedIndex = ref(-1)
+  let items = ref(props.items ?? store.state.datatable.data)
+  const elements = computed({
+    get(){
+      return items.value;
+    },
+    set(val){
+      items.value = val
+    }
+  });
+
   // Get item-related computeds
   const tableItem = useTableItem()
   // Get name-related computeds
@@ -142,7 +153,7 @@ export default function useTable (props, context) {
   // Get forms-related computeds
   const tableForms = useTableForms(props, {
     ...context,
-    ...tableNames,
+    ...tableNames
   })
   const tableModals = useTableModals(props)
 
@@ -150,7 +161,7 @@ export default function useTable (props, context) {
 
   const form = ref(null)
   let loading = ref(false)
-  let items = ref(props.items ?? store.state.datatable.data)
+
   // let headers = props.columns ?? store.state.datatable.headers ?? []
 
   const state = reactive({
@@ -179,14 +190,7 @@ export default function useTable (props, context) {
       return footerProps
     }),
     // elements: computed(() => props.items ?? store.state.datatable.data ?? []),
-    elements: computed({
-      get(){
-        return items.value;
-      },
-      set(val){
-        items.value = val
-      }
-    }),
+    elements: elements,
     // datatable store
     loading: computed({
       get() {
@@ -196,41 +200,7 @@ export default function useTable (props, context) {
         loading.value = val
       }
     }),
-    editedIndex: -1,
-    // form store
-    // editedItem: computed(() => store.state.form.editedItem ?? {}),
-    // editedItem: tableItem.editedItem,
-
-    // formRef: computed(() => {
-    //   return state.id + '-form'
-    // }),
-    // formStyles: { width: props.formWidth },
-    // formActive: false,
-    // customFormModalActive : false,
-    // customFormAttributes: {},
-    // customFormSchema: {},
-    // customFormModel: {},
-    // formLoading: computed(() => store.state.form.loading ?? false),
-    // formErrors: computed(() => store.state.form.errors ?? {}),
-    // formIsValid: computed(function () {
-    //   // __log(form?.value?.valid, form?.value)
-    //   return form?.value?.validModel ?? null
-    // }),
-    // addBtnTitle: computed(() => {
-    //   if(props.createOnModal || props.editOnModal){
-    //     return props.addBtnOptions.text ? t(props.addBtnOptions.text) : t('fields.add-item', {'item' : state.transNameSingular})
-    //   }else{
-    //     return props.addBtnOptions.text ?? t('ADD NEW')
-    //   }
-    // }),
-    // inputs: props.inputFields ?? store.state.datatable.inputs ?? [],
-
-
-    // createUrl: computed(() => props.endpoints.create ?? null),
-    // editUrl: computed(() => props.endpoints.edit ??  null ),
-    // reorderUrl: computed(() => props.endpoints.reorder ?? null),
-    // indexUrl: computed(() => props.endpoints.index ?? null),
-
+    editedIndex: editedIndex,
     selectedItems: [],
 
     _modals: {
@@ -408,42 +378,6 @@ export default function useTable (props, context) {
       )
     },
 
-    // setEditedItem: function (item) {
-    //   store.commit(FORM.SET_EDITED_ITEM, item)
-    // },
-    // resetEditedItem: function () {
-    //   // __log('resetEditedItem')
-    //   nextTick(() => {
-    //     store.commit(FORM.RESET_EDITED_ITEM)
-    //   })
-    // },
-    // createForm () {
-    //   methods.resetEditedItem()
-    //   methods.openForm()
-    // },
-    // openForm: function () {
-    //   state.formActive = true
-    //   // state.modals.form.active = true;
-    // },
-    // closeForm: function () {
-    //   state.formActive = false
-    // },
-    // confirmFormModal () {
-    //   form.value.submit(null, (res) => {
-    //     if (Object.prototype.hasOwnProperty.call(res, 'variant') && res.variant.toLowerCase() === 'success') { methods.closeForm() }
-    //   })
-    // },
-    // editItem: function (item) {
-    //   if (props.editOnModal || props.embeddedForm) {
-    //     tableForms.setEditedItem(item)
-    //     tableForms.openForm()
-    //     // this.$refs.formModal.openModal()
-    //   } else {
-    //     const route = state.editUrl.replace(':id', item.id)
-    //     window.open(route)
-    //   }
-    // },
-
     setEditedItem: tableItem.setEditedItem,
     resetEditedItem: tableItem.resetEditedItem,
 
@@ -594,12 +528,19 @@ export default function useTable (props, context) {
       methods.loadItems(newValue)
 
     } else {
+      console.log(props, tableEndpoints)
       store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue, infiniteScroll: state.enableInfiniteScroll }, endpoint : props.endpoints.index ?? null})
 
     }
 
   }, { deep: true })
   watch(() => state.elements, (newValue, oldValue) => {
+
+    // Refresh edited item
+    if(state.editedIndex > -1) {
+      let refreshItem = newValue[state.editedIndex]
+      tableItem.setEditedItem(refreshItem)
+    }
   }, { deep: true })
   watch(() => store.state.datatable.data, (newValue, oldValue) => {
     state.elements = newValue;

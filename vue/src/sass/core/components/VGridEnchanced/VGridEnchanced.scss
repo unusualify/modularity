@@ -1,0 +1,62 @@
+@use 'sass:map';
+@use '../../abstract' as *;
+
+// Extended make-row mixin to handle different gutter sizes
+@mixin make-row($gutter) {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+  margin: -$gutter * 0.5;
+}
+
+// Secondary row
+.v-row-secondary {
+  @include make-row($grid-gutter-secondary);
+
+  > .v-col,
+  > [class*="v-col-"] {
+    padding: $grid-gutter-secondary * 0.5;
+  }
+
+  &--dense {
+    margin: -($grid-gutter-secondary * 0.5);
+    > .v-col,
+    > [class*="v-col-"] {
+      padding: $grid-gutter-secondary * 0.5;
+    }
+  }
+
+  &--no-gutters {
+    margin: 0;
+    > .v-col,
+    > [class*="v-col-"] {
+      padding: 0;
+    }
+  }
+}
+
+// Tertiary row
+.v-row-tertiary {
+  @include make-row($grid-gutter-tertiary);
+
+  > .v-col,
+  > [class*="v-col-"] {
+    padding: $grid-gutter-tertiary * 0.5;
+  }
+
+  &--dense {
+    margin: -($grid-gutter-tertiary * 0.5);
+    > .v-col,
+    > [class*="v-col-"] {
+      padding: $grid-gutter-tertiary * 0.5;
+    }
+  }
+
+  &--no-gutters {
+    margin: 0;
+    > .v-col,
+    > [class*="v-col-"] {
+      padding: 0;
+    }
+  }
+}

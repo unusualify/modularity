@@ -12,6 +12,13 @@ class FilepondHydrate extends InputHydrate
      */
     public $requirements = [
         'default' => [],
+
+        // keynote: application/x-iwork-keynote-sffkey
+        // pages: application/x-iwork-pages-sffpages
+        // numbers: application/x-iwork-numbers-sffnumbers
+        // pdf: application/pdf,
+        // doc: application/msword,
+        // docx: application/vnd.openxmlformats-officedocument.wordprocessingml.document
         'accepted-file-types' => [ // Acceptable file types - however not working well for now
             'image/*, file/*',
         ],
@@ -56,7 +63,7 @@ class FilepondHydrate extends InputHydrate
         $input['endPoints'] = [
             'process' => route('filepond.process'),
             'revert' => route('filepond.revert'), // for deleting temp files
-            'load' => str_replace(':id', '', route('filepond.preview', ['folder' => ':id'])),
+            'load' => str_replace(':id', '', route('filepond.preview', ['uuid' => ':id'])),
         ];
 
         // Custom Labels

@@ -368,6 +368,30 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
       .join(' ');
   }
 
+  /**
+   * Extracts the foreign key from a given model name.
+   * Converts camelCase or snake_case and plural forms to snake_case singular with '_id'.
+   *
+   * @param {string} modelName - The name of the model (e.g., 'packageFeature', 'package_features').
+   * @returns {string} - The foreign key in snake_case singular form with '_id' suffix (e.g., 'package_feature_id').
+   */
+  window.__extractForeignKey = (modelName) => {
+    if (typeof modelName !== 'string') {
+      throw new TypeError('modelName must be a string');
+    }
+
+    // Convert camelCase to snake_case if necessary
+    let snakeCaseName = lodash.snakeCase(modelName);
+
+    // Convert to singular form
+    let singularName = pluralize.isPlural(snakeCaseName) ? pluralize.singular(snakeCaseName) : snakeCaseName;
+
+    // Append '_id' suffix
+    const foreignKey = `${singularName}_id`;
+
+    return foreignKey;
+  }
+
   window.__snakeNameFromForeignKey = (str) => {
     let matches = str.match(/(.*)(_id)/)
 

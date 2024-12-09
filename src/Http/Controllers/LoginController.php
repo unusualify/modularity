@@ -180,7 +180,7 @@ class LoginController extends Controller
                     'email' => [
                         'type' => 'text',
                         'name' => 'email',
-                        'label' => 'Email',
+                        'label' => ___('authentication.email'),
                         'hint' => 'enter @example.com',
                         'default' => '',
                         'col' => [
@@ -206,9 +206,9 @@ class LoginController extends Controller
                 ])),
 
                 'actionUrl' => route(Route::hasAdmin('login')),
-                'buttonText' => __('authentication.login'),
-                'formClass' => 'px-0',
-                'rightBtnText' => 'Test',
+                'buttonText' => __('authentication.sign-in'),
+                'formClass' => 'py-6',
+                'no-default-form-padding' => true,
             ],
             'formSlots' => [
                 'bottom' => [
@@ -224,19 +224,21 @@ class LoginController extends Controller
                                 'variant' => 'text',
                                 'href' => route('admin.password.reset.link'),
                                 'class' => 'v-col-5 d-flex justify-content-start',
+                                'color' => 'grey-lighten-1',
                                 'density' => 'default',
 
                             ],
                         ],
                         [
                             'tag' => 'v-btn',
-                            'elements' => __('authentication.login'),
+                            'elements' => __('authentication.sign-in'),
                             'attributes' => [
                                 'variant' => 'elevated',
                                 'href' => '',
                                 'class' => 'v-col-5',
                                 'type' => 'submit',
                                 'density' => 'default',
+
                             ],
                         ],
                     ],
@@ -255,8 +257,10 @@ class LoginController extends Controller
                             'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'my-5 custom-auth-button',
+                                'class' => 'mt-5 mb-2 custom-auth-button',
+                                'color' => 'grey-lighten-1',
                                 'density' => 'default',
+
                             ],
                             'slots' => [
                                 'prepend' => [
@@ -275,8 +279,10 @@ class LoginController extends Controller
                             'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'my-5 custom-auth-button',
+                                'class' => 'my-2 custom-auth-button',
+                                'color' => 'grey-lighten-1',
                                 'density' => 'default',
+
                             ],
                             'slots' => [
                                 'prepend' => [
@@ -295,7 +301,8 @@ class LoginController extends Controller
                             'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route('admin.register.form'),
-                                'class' => 'my-5 custom-auth-button',
+                                'class' => 'my-2 custom-auth-button',
+                                'color' => 'grey-lighten-1',
                                 'density' => 'default',
 
                             ],

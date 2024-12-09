@@ -35,7 +35,7 @@ class StateableHydrate extends InputHydrate
         $model = App::make('Modules\PressRelease\Entities\PressRelease');
 
         // If default_states contains strings, convert them to objects first
-        $stateObjects =  $model->getDefaultStates();
+        $stateObjects = $model->getDefaultStates();
 
         $states = $repository->getByColumnValues('code', array_column($stateObjects, 'code'));
         $items = [];
@@ -52,6 +52,4 @@ class StateableHydrate extends InputHydrate
 
         return $input;
     }
-
-
 }

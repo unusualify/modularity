@@ -69,7 +69,7 @@ class ForgotPasswordController extends Controller
                     'email' => [
                         'type' => 'text',
                         'name' => 'email',
-                        'label' => 'Email',
+                        'label' => ___('authentication.email'),
                         'default' => '',
                         'col' => [
                             'cols' => 12,
@@ -82,8 +82,8 @@ class ForgotPasswordController extends Controller
 
                 'actionUrl' => route(Route::hasAdmin('password.reset.email')),
                 'buttonText' => 'authentication.reset-send',
-
-                'formClass' => 'px-5',
+                'formClass' => 'py-6',
+                'no-default-form-padding' => true,
 
             ],
             'formSlots' => [
@@ -95,11 +95,12 @@ class ForgotPasswordController extends Controller
                     'elements' => [
                         [
                             'tag' => 'v-btn',
-                            'elements' => __('authentication.login'),
+                            'elements' => __('authentication.sign-in'),
                             'attributes' => [
                                 'variant' => 'text',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'v-col-5 justify-content-start',
+                                'color' => 'grey-lighten-1',
                                 'density' => 'default',
                             ],
                         ],
@@ -112,7 +113,6 @@ class ForgotPasswordController extends Controller
                                 'class' => 'v-col-5',
                                 'type' => 'submit',
                                 'density' => 'default',
-
                             ],
                         ],
                     ],
@@ -131,7 +131,8 @@ class ForgotPasswordController extends Controller
                             'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'my-5 custom-auth-button',
+                                'class' => 'mt-5 mb-2 custom-auth-button',
+                                'color' => 'grey-lighten-1',
                                 'density' => 'default',
 
                             ],
@@ -152,9 +153,9 @@ class ForgotPasswordController extends Controller
                             'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'my-5 custom-auth-button',
+                                'class' => 'my-2 custom-auth-button',
+                                'color' => 'grey-lighten-1',
                                 'density' => 'default',
-
                             ],
                             'slots' => [
                                 'prepend' => [
@@ -173,7 +174,8 @@ class ForgotPasswordController extends Controller
                             'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('register.form')),
-                                'class' => 'my-5 custom-auth-button',
+                                'class' => 'my-2 custom-auth-button',
+                                'color' => 'grey-lighten-1',
                                 'density' => 'default',
 
                             ],

@@ -1,9 +1,11 @@
 // hooks/useTable.js
 import { computed, ref, nextTick, watch } from 'vue'
+import _ from 'lodash-es'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
+
 import { FORM } from '@/store/mutations'
-import _ from 'lodash-es'
+import ACTIONS from '@/store/actions'
 
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 import { useTableItem } from '@/hooks'
@@ -105,6 +107,17 @@ export default function useTableForms(props, context) {
     })
   }
 
+  const handleFormActionComplete = (payload) => {
+    // payload.action
+    // payload.response
+    const action = payload.action
+    const response = payload.response
+
+    if(action.type === 'request') {
+      store.dispatch(ACTIONS.GET_DATATABLE)
+    }
+  }
+
   // Watch effect for form active state
   watch(() => formActive.value, (newValue) => {
     if (!newValue) {
@@ -139,6 +152,7 @@ export default function useTableForms(props, context) {
     openForm,
     closeForm,
     createForm,
-    confirmFormModal
+    confirmFormModal,
+    handleFormActionComplete
   }
 }

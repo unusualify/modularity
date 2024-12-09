@@ -95,6 +95,8 @@ class ModelMakeCommand extends BaseCommand
             ]);
         }
 
+        $this->createPivotModels();
+
         if (parent::handle() === E_ERROR) {
             return E_ERROR;
         }
@@ -604,7 +606,7 @@ class ModelMakeCommand extends BaseCommand
         return $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer) === 'yes';
     }
 
-    private function createAdditionalModels()
+    private function createPivotModels()
     {
         Modularity::scan();
 
@@ -645,6 +647,19 @@ class ModelMakeCommand extends BaseCommand
                 }
             }
         }
+    }
+
+    private function createAdditionalModels()
+    {
+        Modularity::scan();
+
+        $module = Modularity::findOrFail($this->getModuleName());
+
+        $overwriteFile = $this->hasOption('force') ? $this->option('force') : false;
+
+        $path = Modularity::getModulePath($this->getModuleName());
+
+        $modelPath = new GeneratorPath($this->baseConfig('paths.generator.model'));
 
         if ($this->modelRelationParser) {
             $this->modelRelationParser->writeReverseRelationships($this->option('test') ? true : false);

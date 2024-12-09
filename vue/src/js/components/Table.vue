@@ -50,7 +50,7 @@
         :loading-text="$t('Loading... Please wait')"
         :mobile="$vuetify.display.smAndDown"
 
-        :show-select="showSelect"
+        :show-select="$store.getters.isSuperAdmin && showSelect"
         item-value="id"
         v-model="selectedItems"
 
@@ -76,7 +76,7 @@
                 type="subtitle-1"
                 color="black"
                 :text="tableTitle"
-                padding="x-3"
+                padding="a-0"
               />
               <!-- subtitle -->
               <ue-title
@@ -85,7 +85,7 @@
                 weight="medium"
                 color="grey-darken-1"
                 transform="none"
-                padding="x-3"
+                padding="a-0"
                 :text="tableSubtitle"
               />
             </div>
@@ -124,7 +124,7 @@
                     variant="outlined"
                     append-inner-icon="mdi-magnify"
                     hide-details
-                    density="comfortable"
+                    density="compact"
                     single-line
                     :placeholder="searchText"
                     :class="[
@@ -265,11 +265,19 @@
                   no-default-form-padding
                   form-class="px-6 pt-6 pb-0"
                   style="height: 70vh !important;"
+                  :actions="formActions"
+                  @action-complete="handleFormActionComplete"
                 >
                   <template v-slot:headerRight>
-                    <v-btn variant="text" icon="$close" density="compact" color="grey-darken-5"
+                    <v-btn variant="plain" icon="$close" density="compact" color="grey-darken-5" rounded
                       @click="closeForm()"
                     ></v-btn>
+                  </template>
+
+                  <template v-slot:top="formTopScope">
+                    <slot name="form-top" v-bind="formTopScope">
+
+                    </slot>
                   </template>
                 </ue-form>
                 <!-- <v-card-text>
@@ -309,7 +317,11 @@
                     button-text="save"
                     :title="formTitle"
                     ref="form"
-                    :isEditing="editedIndex > -1">
+                    :isEditing="editedIndex > -1"
+                  >
+                    <template v-slot:headerCenter>
+
+                    </template>
                     <template v-slot:headerRight>
                       <v-btn class="" variant="text" icon="$close" density="compact"
                         @click="closeForm()"
@@ -367,6 +379,9 @@
               v-model="customFormModalActive"
               :width-type="'lg'"
             >
+            <!-- <slot name="systembar">
+              test
+            </slot> -->
               <ue-form
                 ref="customForm"
                 v-model="customFormModel"
@@ -386,16 +401,16 @@
         </template>
 
         <!-- MARK: DATA-ITERATOR BODY -->
-        <template v-slot:body="{ items }" v-if="enableIterators" class="ue-datatable__container">
+        <template v-slot:body="{ items }" v-if="hasCustomRow" class="ue-datatable__container">
           <v-row no-gutters>
             <v-col
               v-for="(element, i) in items"
               :key="element.id"
-              v-bind="customRowComponent.col"
+              v-bind="customRow.col"
             >
             <!-- // TODO - check if its empty -->
               <component
-                :is="`ue-${customRowComponent.iteratorComponent}`"
+                :is="`ue-${customRow.name}`"
                 :key="element.id"
                 :item="element"
                 :headers="headers"
@@ -416,14 +431,15 @@
                           >
                           <template v-slot:activator="{ props }">
                             <v-btn
+                              v-bind="props"
+                              :text="action.forceLabel ? $t( action.label ?? $headline(action.name) ) : null"
                               :variant="action.variant ?? 'elevated'"
-                              size="small"
+                              :density="action.density ?? (action.forceLabel ? 'comfortable' : 'compact')"
+                              :size="action.size ?? (action.forceLabel ? 'default' : 'default')"
                               :icon="action.forceLabel ? null : (action.icon ? action.icon : '$' + action.name)"
                               :color="action.color ?? 'primary'"
                               :rounded="action.forceLabel ? null : true"
                               @click="itemAction(element, action)"
-                              v-bind="props"
-                              :text="action.forceLabel ? $t( action.label ?? $headline(action.name) ) : null"
                               class="text-capitalize"
                             />
                           </template>
@@ -450,7 +466,6 @@
           </div>
         </template>
 
-
         <!-- Custom Slots -->
         <template
           v-for="(context, slotName) in slots" v-slot:[slotName]
@@ -468,6 +483,7 @@
         <!-- #formatterColumns -->
         <template
           v-for="(col, i) in formatterColumns"
+          :key="`formatter-${i}`"
           v-slot:[`item.${col.key}`]="{ item }"
         >
           <template v-if="col.formatter == 'edit' || col.formatter == 'activate'">

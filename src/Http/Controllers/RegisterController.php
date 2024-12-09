@@ -80,7 +80,7 @@ class RegisterController extends Controller
                     'email' => [
                         'type' => 'text',
                         'name' => 'email',
-                        'label' => 'Email',
+                        'label' => ___('authentication.email'),
                         'default' => '',
                         'col' => [
                             'cols' => 6,
@@ -132,7 +132,8 @@ class RegisterController extends Controller
 
                 'actionUrl' => route(Route::hasAdmin('register')),
                 'buttonText' => 'authentication.register',
-                'formClass' => 'mw-lg-24em',
+                'formClass' => 'py-6',
+                'no-default-form-padding' => true,
             ],
             'formSlots' => [
                 'bottom' => [
@@ -148,7 +149,9 @@ class RegisterController extends Controller
                                 'variant' => 'text',
                                 'href' => route(Route::hasAdmin('login.form')),
                                 'class' => 'v-col-5 justify-content-start',
+                                'color' => 'grey-lighten-1',
                                 'density' => 'default',
+
                             ],
                         ],
                         [
@@ -179,7 +182,8 @@ class RegisterController extends Controller
                             'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'my-5 custom-auth-button',
+                                'class' => 'mt-5 mb-2 custom-auth-button',
+                                'color' => 'grey-lighten-1',
                                 'density' => 'default',
 
                             ],
@@ -200,7 +204,8 @@ class RegisterController extends Controller
                             'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'my-5 custom-auth-button',
+                                'class' => 'my-2 custom-auth-button',
+                                'color' => 'grey-lighten-1',
                                 'density' => 'default',
 
                             ],
@@ -211,7 +216,6 @@ class RegisterController extends Controller
                                         'symbol' => 'apple',
                                         'width' => '16',
                                         'height' => '16',
-                                        'density' => 'default',
 
                                     ],
                                 ],

@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -31,6 +30,8 @@ trait ManageUtilities
         $filters = json_decode($this->request->get('filter'), true) ?? [];
         $headers = $this->filterHeadersByRoles($this->getIndexTableColumns());
         $headers = $this->translateHeaders($headers);
+
+        $tableAttributes = $this->hydrateTableAttributes();
         // dd($this->translateHeaders($headers));
         $_deprecated = [
             'initialResource' => $initialResource, //
@@ -55,6 +56,7 @@ trait ManageUtilities
                     'rowActions' => $this->getTableActions(),
                     'bulkActions' => $this->getTableBulkActions(),
                     'nestedData' => $this->getNestedData(),
+                    'formActions' => $this->getFormActions(),
                 ],
                 ($this->isNested ? ['titlePrefix' => $this->nestedParentModel->getTitleField() . ' \ '] : []),
                 array_merge_recursive_preserve(
@@ -62,7 +64,7 @@ trait ManageUtilities
                         'name' => $this->getHeadline($this->routeName),
                         'titleKey' => $this->titleColumnKey,
                     ],
-                    $this->tableAttributes,
+                    $tableAttributes,
                 ),
                 $this->getTableDraggableOptions(),
 
@@ -398,43 +400,34 @@ trait ManageUtilities
      */
     public function filterSchemaByRoles($schema)
     {
-        // moved here from ManageForm
-        // the method name changed
-        // as the Gunes did it.
-        // TODO: refactor this code to be more efficient like filterHeadersByRoles
-        return array_filter(
-            array_map(function ($field) {
+        return Collection::make($schema)->reduce(function ($carry, $field, $name) {
+            $isAllowed = (! $this->user || ! isset($field['allowedRoles']))
+                // || $this->user->isSuperAdmin()
+                || $this->user->hasRole($field['allowedRoles']);
 
-                if (is_null(Auth::user())) {
-                    return false;
-                }
+            if (
+                $isAllowed
+                || isset($field['viewOnlyComponent'])
+            ) {
 
-                if (isset($field['allowedRoles']) && ! Auth::user()->hasRole($field['allowedRoles'])) {
-                    return null;
-                }
+                if (! $isAllowed && isset($field['viewOnlyComponent'])) {
+                    $carry[$name] = $field;
+                } elseif (in_array($field['type'], ['group', 'wrap'])) {
+                    if (isset($field['schema'])) {
+                        $field['schema'] = $this->filterSchemaByRoles($field['schema']);
 
-                if ($field['type'] === 'group' && isset($field['schema'])) {
-                    $field['schema'] = $this->filterSchemaByRoles($field['schema']);
-
-                    if (empty($field['schema'])) {
-                        return null;
+                        if (! empty($field['schema'])) {
+                            $carry[$name] = Arr::except($field, ['viewOnlyComponent']);
+                        }
                     }
+                } else {
+                    $carry[$name] = Arr::except($field, ['viewOnlyComponent']);
                 }
 
-                if ($field['type'] === 'wrap' && isset($field['schema'])) {
-                    $field['schema'] = $this->filterSchemaByRoles($field['schema']);
-                    if (empty($field['schema'])) {
-                        return null;
-                    }
-                }
-
-                return $field;
-
-            }, $schema),
-            function ($field) {
-                return $field !== null;
             }
-        );
+
+            return $carry;
+        }, []);
     }
 
     public function getNestedData()

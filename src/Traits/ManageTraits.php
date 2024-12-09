@@ -150,6 +150,31 @@ trait ManageTraits
             $fields['password'] = Hash::make($fields['password']);
         }
 
+        // Handle JSON column updates
+        $jsonUpdates = [];
+        $regularFields = [];
+        foreach ($fields as $key => $value) {
+            if (str_contains($key, '->') || str_contains($key, '.')) {
+                $parts = str_contains($key, '->') ? explode('->', $key) : explode('.', $key);
+                $jsonColumn = $parts[0];
+                $jsonKey = $parts[1];
+
+                if (! isset($jsonUpdates[$jsonColumn])) {
+                    $jsonUpdates[$jsonColumn] = $object->{$jsonColumn} ?? [];
+                }
+
+                $jsonUpdates[$jsonColumn][$jsonKey] = $value;
+            } else {
+                $regularFields[$key] = $value;
+            }
+        }
+
+        // Merge JSON updates with regular fields
+        $fields = array_merge(
+            $regularFields,
+            $jsonUpdates
+        );
+
         return $fields;
     }
 }

@@ -311,6 +311,7 @@ const actions = {
 
     if (_changed) {
       commit(DATATABLE.UPDATE_DATATABLE_LOADING, true)
+      console.log(state)
       const parameters = {
         ...(Object.keys(state.options).reduce(function (filtered, key) {
           const { active, value } = activeOption(
