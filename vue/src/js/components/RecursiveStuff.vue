@@ -80,6 +80,7 @@ export default {
     // const directives = [vFitGrid];
     // const directives = props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : []
     // __log(directives)
+    // console.log(props.configuration.value);
     const slots = computed(() => {
       // console.log(props.configuration);
       if(props.configuration.hasOwnProperty('slots'))
@@ -118,7 +119,7 @@ export default {
         _value = value.shift()
         funcs = value
       }
-
+      
       if (isObject(value)) {
         // Do nothing
       } else {

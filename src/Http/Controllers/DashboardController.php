@@ -11,6 +11,7 @@ use Modules\Webinar\Repositories\VimeoWebinarRepository;
 // use Modules\PressRelease\Entities\PressRelease;
 // use Modules\PressRelease\Repositories\PressReleaseRepository;
 use Unusualify\Modularity\Entities\Enums\Permission;
+use Unusualify\Modularity\Services\View\UWidget;
 use Unusualify\Modularity\Traits\ManageUtilities;
 
 class DashboardController extends BaseController
@@ -60,274 +61,93 @@ class DashboardController extends BaseController
 
         // );
         $blocks = app()->config->get(unusualBaseKey() . '.ui_settings.dashboard.blocks');
-        // $blocks = $blocks +
-        // [
-        //     1 => [
-        //         'component' => 'new-table',
-        //         'col' => [
-        //             'cols' => 12,
-        //             'xxl' => 6,
-        //             'xl' => 6,
-        //             'lg' => 6,
-        //             's' => 12,
-        //             'class' => 'pl-theme-semi pb-theme-semi'
-        //         ],
-        //         'attributes' => [
-        //             'customTitle' => 'ANNOUNCEMENTS',
-        //             'tableSubtitle' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lobortis.',
-        //             'hide-headers' => true,
-        //             'fullWidthWrapper' => false,
-        //             'hideSearchField' => true,
-        //             'tableType' => 'dashboard',
-        //             'style' => '',
-        //             'items' =>  App::make(SurveyRepository::class)->get([], [], [
-        //                 'created_at' => 'desc'
-        //             ], 2)->items(),
-        //             'columns' => [
-        //                 [
-        //                     'title' => 'name',
-        //                     'key' => 'created_at',
-        //                     'align' => 'start',
-        //                     'sortable' => true,
-        //                     'filterable' => false,
-        //                     'groupable' => false,
-        //                     'divider' => false,
-        //                     'class' => '',
-        //                     'cellClass' => '',
-        //                     'width' => '',
-        //                     // 'max-width' => 'max-content',
-        //                     'searchable' => true,
-        //                     'isRowEditable' => true,
-        //                     'isColumnEditable' => false,
-        //                     'formatter' => [
-        //                         'date',
-        //                         'numeric'
-        //                     ]
-        //                     // 'formatter' => ['date', 'numeric'],
-        //                 ],
-        //                 [
-        //                     'title' => 'Name',
-        //                     'key' => 'name',
-        //                     'align' => 'start',
-        //                     'sortable' => false,
-        //                     'filterable' => false,
-        //                     'groupable' => false,
-        //                     'divider' => false,
-        //                     'class' => '',
-        //                     'cellClass' => '',
-        //                     'width' => '',
-        //                     'searchable' => true,
-        //                     'isRowEditable' => true,
-        //                     'isColumnEditable' => true,
-        //                     'formatter' => [
 
-        //                     ],
-        //                 ],
-        //                 [
-        //                     'title' => 'Actions',
-        //                     'key' => 'actions',
-        //                     'sortable' => false,
-
-        //                 ],
-        //             ],
-        //             'tableOptions' => [
-        //                 'page'          => 1,
-        //                 'itemsPerPage'  => 1,
-        //                 'sortBy'        => [],
-        //                 'multiSort'     => false,
-        //                 'mustSort'      => false,
-        //                 'groupBy'       => [],
-        //             ],
-        //             'slots' => [
-        //                 'headerBtn' => [
-        //                     'elements' => [
-        //                         [
-        //                             'tag' => 'div',
-        //                             'attributes' => [
-        //                                 'class' => 'text-right pa-8',
-        //                             ],
-        //                             'elements' => [
-        //                                 [
-        //                                     'tag' => 'v-btn-tertiary',
-        //                                     'elements' => 'MANAGE RELEASES',
-        //                                 ]
-        //                             ]
-        //                         ]
-        //                     ]
-        //                 ]
-        //             ]
-        //         ],
-        //     ],
-        //     2 => [
-        //         'component' => 'new-table',
-        //         'col' => [
-        //             'cols' => 12,
-        //             'xxl' => 12,
-        //             'xl' => 12,
-        //             'lg' => 12,
-        //             'class' => ''
-        //         ],
-        //         'attributes' => [
-
-        //             'customTitle' => 'Vimeo Webinars',
-        //             'tableSubtitle' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lobortis.',
-        //             'tableType' => 'dashboard',
-        //             'hide-headers' => false,
-        //             'fullWidthWrapper' => true,
-        //             'hideSearchField' => true,
-        //             'fillHeight' => true,
-        //             'style' => '',
-        //             'items' =>  App::make(VimeoWebinarRepository::class)->get([], [], [
-        //                 'created_at' => 'desc'
-        //             ], 2)->items(),
-        //             'columns' => [
-        //                 [
-        //                     'title' => 'Date',
-        //                     'key' => 'start_date',
-        //                     'align' => 'start',
-        //                     'sortable' => true,
-        //                     'filterable' => false,
-        //                     'groupable' => false,
-        //                     'divider' => false,
-        //                     'class' => '',
-        //                     'cellClass' => '',
-        //                     'width' => '',
-        //                     // 'max-width' => 'max-content',
-        //                     'searchable' => true,
-        //                     'isRowEditable' => true,
-        //                     'isColumnEditable' => false,
-        //                     'formatter' => [
-        //                         'date',
-        //                         'numeric'
-        //                     ]
-        //                     // 'formatter' => ['date', 'numeric'],
-        //                 ],
-        //                 [
-        //                     'title' => 'Name',
-        //                     'key' => 'name',
-        //                     'align' => 'start',
-        //                     'sortable' => false,
-        //                     'filterable' => false,
-        //                     'groupable' => false,
-        //                     'divider' => false,
-        //                     'class' => '',
-        //                     'cellClass' => '',
-        //                     'width' => '',
-        //                     'searchable' => true,
-        //                     'isRowEditable' => true,
-        //                     'isColumnEditable' => true,
-        //                     'formatter' => [
-        //                     ],
-        //                 ],
-        //                 [
-        //                     'title' => 'Published',
-        //                     'key' => 'published',
-        //                     'align' => 'start',
-        //                     'sortable' => false,
-        //                     'filterable' => false,
-        //                     'groupable' => false,
-        //                     'divider' => false,
-        //                     'class' => '',
-        //                     'cellClass' => '',
-        //                     'width' => '',
-        //                     'searchable' => true,
-        //                     'isRowEditable' => true,
-        //                     'isColumnEditable' => true,
-        //                     'formatter' => [
-        //                         'status',
-        //                         [
-        //                             'Not Published',
-        //                             'Published'
-        //                         ],
-        //                         [
-        //                             'blue',
-        //                             'red',
-        //                         ]
-        //                     ],
-        //                 ],
-        //                 [
-        //                     'title' => 'Actions',
-        //                     'key' => 'actions',
-        //                     'sortable' => false,
-
-        //                 ],
-        //             ],
-        //             'tableOptions' => [
-        //                 'page'          => 1,
-        //                 'itemsPerPage'  => 1,
-        //                 'sortBy'        => [],
-        //                 'multiSort'     => false,
-        //                 'mustSort'      => false,
-        //                 'groupBy'       => [],
-        //             ],
-        //             'slots' => [
-        //                 'bottom' => [
-        //                     'elements' => [
-        //                         [
-        //                             'tag' => 'div',
-        //                             'attributes' => [
-        //                                 'class' => 'text-right pa-8',
-        //                             ],
-        //                             'elements' => [
-        //                                 [
-        //                                     'tag' => 'v-btn-tertiary',
-        //                                     'elements' => 'MANAGE RELEASES',
-        //                                 ]
-        //                             ]
-        //                         ]
-        //                     ]
-        //                 ]
-        //             ]
-        //         ],
-        //     ],
-        // ] ;
+        // dd('here');
 
         foreach ($blocks as $index => $block) {
             switch ($block['component']) {
-                case 'table':
-                    $controller = App::make($block['controller'])->setTableAttributes(tableOptions: $block['attributes']['tableOptions'],
-                    );
-                    $block['attributes']['items'] = $controller->getIndexData()['initialResource']->resource['data'];
-                    $block['attributes']['endpoints'] = $controller->getIndexData()['endpoints'];
-                    $block['attributes']['rowActions'] = $controller->getTableActions();
+                case 'ue-table':
+                    // $controller = App::make($block['controller'])->setTableAttributes(tableOptions: $block['attributes']['tableOptions'],
+                    // );
+                    // dd($block);
+                    $widget = new UWidget();
+                    $widget = $widget->makeComponent($block['tag'],$block)->render();
+
+                    // dd(change_connector_event(get_connector_event($block['connector'])));
+                    // $data = init_connector($block['connector']);
+                    // dd($data);
+                    // dd(
+                    //     $controller->getIndexData()['initialResource']->resource['data'],
+                    //     $data
+                    // );
+                    // $block['attributes']['items'] = $controller->getIndexData()['initialResource']->resource['data'];
+                    // $block['attributes']['items'] = $data['items']->toArray();
+                    $block = $widget;
+                    // dd($block);
+                    // dd($block['elements'][0]['attributes']['items'] = []);
+                    // $block['elements'][0]['attributes']['items'] = [];
+                    // dd($block);
+                    // dd($block['elements']->attributes['endpoints']);
+                    // dd($this->transformRoutes($widget['elements'][0]['module']->getRouteUris($widget['elements'][0]['route'])));
+
+                    // dd($block['elements']->attributes['route']);
+                    // dd($block['elements'][0]['attributes']);
+                    $block['elements'][0]['attributes']['endpoints'] = array_merge($this->transformRoutes($block['elements'][0]['attributes']['module']->getRouteUris($block['elements'][0]['attributes']['route'])), $this->getUrls());
+                    $block['elements'][0]['attributes']['tableOptions']['search'] = null;
+
+                    unset($block['elements'][0]['attributes']['endpoints']['index']); //Disable vuetify table store
+                    // dd($block);
+                    // dd(array_merge($block['attributes']['endpoints'], $this->getUrls()));
+
+                    // $block['attributes']['rowActions'] = $controller->getTableActions();
                     // in order to keep url as default home url
-
-                    $block['attributes']['tableOptions']['search'] = null;
+                    // dd($block);
                     $blocks[$index] = $block;
-
+                    // dd($block);
                     break;
-                case 'board-information-plus':
+                case 'ue-board-information-plus':
                     $cards = $block['cards'] ?? [];
-                    foreach ($cards as $key => $card) {
+                    // dd($cards);
+                    // dd($block);
+                    // foreach ($cards as $key => $card) {
+
                         try {
-                            $repository = App::make($card['repository']);
-                            $data = array_reduce(explode('|', $card['method']), function ($s, $a) use ($repository) {
-                                [$methodName, $args] = array_pad(explode(':', $a, 2), 2, null);
-                                if ($args) {
-                                    $s = empty($s) ? $repository->{$methodName}(...explode(':', $args))->get() : $s->{$methodName}(...explode(':', $args))->get();
-                                } else {
-                                    $s = empty($s) ? $repository->{$methodName}() : $s->$methodName();
-                                }
+                            $widget = new UWidget();
+                            // dd('here');
+                            $widget = $widget->makeComponent($block['tag'],$block)->render();
+                            // dd($data);
+                            // $repository = App::make($card['repository']);
+                            // $data = array_reduce(explode('|', $card['method']), function ($s, $a) use ($repository) {
+                            //     [$methodName, $args] = array_pad(explode(':', $a, 2), 2, null);
+                            //     if ($args) {
+                            //         $s = empty($s) ? $repository->{$methodName}(...explode(':', $args))->get() : $s->{$methodName}(...explode(':', $args))->get();
+                            //     } else {
+                            //         $s = empty($s) ? $repository->{$methodName}() : $s->$methodName();
+                            //     }
 
-                                return $s;
-                            });
+                            //     return $s;
+                            // });
+                            // dd($data);
+                            // dd($data);
+                            // dd($widget);
                         } catch (\Throwable $th) {
-                            $data = '-';
+                            $widget = [];
+                            dd($th);
                         }
-                        $card['data'] = $data;
-                        $cards[$key] = $card;
-                    }
-                    $blocks[$index]['attributes']['cards'] = $cards;
 
+                        $cards = $widget;
+                    // }
+                    $blocks[$index] = $cards;
+                    // dd($blocks);
                     break;
                 default:
                     break;
             }
 
         }
-
+        // dd($blocks);
         $options = ['blocks' => $blocks];
-
+        // dd($blocks);
         // dd($data['blocks']);
         $view = "$this->baseKey::layouts.dashboard";
 
@@ -335,4 +155,28 @@ class DashboardController extends BaseController
 
         return View::make($view, $options);
     }
+
+    protected function transformRoutes($routes) {
+        $result = [];
+        foreach ($routes as $key => $value) {
+            // Skip if value is an array
+            if (is_array($value)) {
+                continue;
+            }
+
+            // Transform the key - remove everything before last dot
+            $newKey = preg_replace('/^.*\.([^.]+)$/', '$1', $key);
+
+            // Transform the value - replace {something} with :id
+            $newValue = preg_replace('/\{[^}]+\}/', ':id', $value);
+
+            // Add base url to the path using Laravel's url helper
+            $newValue = url($newValue);
+
+            $result[$newKey] = $newValue;
+        }
+        return $result;
+    }
+
+    // Usage example:
 }

@@ -56,6 +56,7 @@ $transition-move-duration-root: 0.5s !default;
 $spacer: 4px !default;
 // $theme-space: 6 * $spacer; //1.56%;æ
 
+
 $font-weights: () !default;
 $font-weights: map.deep-merge(
   (
@@ -87,4 +88,9 @@ $sidebar-list-item-overlay-color: currentColor !default;
 $stepper-form-summary-final-background: #005868 !default;
 
 $field-input-min-height: max(var(--v-input-control-height, 52px), 1.2rem + var(--v-field-input-padding-top) + var(--v-field-input-padding-bottom));
+
+$grid-gutter-secondary: $spacer * 6 * calc(2 / 3) !default;
+
+$grid-gutter-tertiary: $spacer * 6 * calc(1 / 3) !default;
+
 

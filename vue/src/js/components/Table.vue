@@ -379,6 +379,9 @@
               v-model="customFormModalActive"
               :width-type="'lg'"
             >
+            <!-- <slot name="systembar">
+              test
+            </slot> -->
               <ue-form
                 ref="customForm"
                 v-model="customFormModel"
