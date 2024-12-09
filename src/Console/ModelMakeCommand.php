@@ -661,7 +661,6 @@ class ModelMakeCommand extends BaseCommand
 
         $modelPath = new GeneratorPath($this->baseConfig('paths.generator.model'));
 
-
         if ($this->modelRelationParser) {
             $this->modelRelationParser->writeReverseRelationships($this->option('test') ? true : false);
         }

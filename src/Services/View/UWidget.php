@@ -4,8 +4,8 @@ namespace Unusualify\Modularity\Services\View;
 
 use Illuminate\Support\Str;
 
-class UWidget extends UComponent {
-
+class UWidget extends UComponent
+{
     public function setAttributes($attributes = [])
     {
         if (isset($attributes['col'])) {
@@ -14,6 +14,7 @@ class UWidget extends UComponent {
             $this->attributes = $attributes;
         }
         $this->setWidgetAttributes($attributes);
+
         return $this;
     }
 
@@ -21,14 +22,15 @@ class UWidget extends UComponent {
     {
         $methodName = null;
         // dd($attributes);
-        if(isset($attributes['component']) && $this->tag == 'v-col') {
-            $methodName = 'set' . Str::studly(str_replace('ue-','',$attributes['component'])) . 'Attributes';
+        if (isset($attributes['component']) && $this->tag == 'v-col') {
+            $methodName = 'set' . Str::studly(str_replace('ue-', '', $attributes['component'])) . 'Attributes';
             // dd($methodName);
             // dd(method_exists($this, $methodName), $methodName, Str::studly(str_replace('ue-','',$attributes['component'])));
-            if(method_exists($this, $methodName)) {
+            if (method_exists($this, $methodName)) {
                 $this->addChildren($this->$methodName($attributes));
+
                 return;
-            }else{
+            } else {
                 // dd($attributes);
                 $this->addChildren(($this->setComponentAttributes($attributes)));
             }
@@ -37,14 +39,15 @@ class UWidget extends UComponent {
 
     protected function setTableAttributes($attributes)
     {
-        if(!isset($attributes['connector'])) {
+        if (! isset($attributes['connector'])) {
             return null;
         }
 
         $data = init_connector($attributes['connector']);
         $data['items'] = $data['items']->toArray();
 
-        $table = new UWidget();
+        $table = new UWidget;
+
         return $table->makeComponent(
             $attributes['component'],
             array_merge(
@@ -53,7 +56,7 @@ class UWidget extends UComponent {
                     'items' => $data['items'],
                     'route' => $data['route'],
                     'repository' => $data['repository'],
-                    'module' => $data['module']
+                    'module' => $data['module'],
                 ]
             )
         );
@@ -64,14 +67,15 @@ class UWidget extends UComponent {
     protected function setComponentAttributes($attributes)
     {
         // dd($attributes['connector']);
-        if(!isset($attributes['connector'])) {
+        if (! isset($attributes['connector'])) {
             return null;
         }
 
         $data = init_connector($attributes['connector']);
         $data['items'] = $data['items']->toArray();
 
-        $table = new UWidget();
+        $table = new UWidget;
+
         // dd($attributes['component']);
         return $table->makeComponent(
             $attributes['component'],
@@ -81,7 +85,7 @@ class UWidget extends UComponent {
                     'items' => $data['items'],
                     'route' => $data['route'],
                     'repository' => $data['repository'],
-                    'module' => $data['module']
+                    'module' => $data['module'],
                 ]
             )
         );
@@ -89,9 +93,9 @@ class UWidget extends UComponent {
 
     protected function setBoardInformationPlusAttributes($attributes)
     {
-        $boardInformation = new UWidget();
-        foreach ($attributes['cards'] as $card){
-            if(isset($card['connector'])){
+        $boardInformation = new UWidget;
+        foreach ($attributes['cards'] as $card) {
+            if (isset($card['connector'])) {
                 $data = init_connector($card['connector']);
                 $card['data'] = $data;
                 $attributes['attributes']['cards'][] = $card;
@@ -106,6 +110,5 @@ class UWidget extends UComponent {
     }
 
     // UWidget::makeTable()->setAttributes();
-
 
 }

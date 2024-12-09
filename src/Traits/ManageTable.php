@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Traits;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
@@ -178,7 +177,7 @@ trait ManageTable
                 return Collection::make(
                     array_merge_recursive_preserve(
                         $this->defaultTableAttributes,
-                        object_to_array($this->getConfigFieldsByRoute('table_attributes') ?? $this->getConfigFieldsByRoute('table_options') ?? (object) [] ))
+                        object_to_array($this->getConfigFieldsByRoute('table_attributes') ?? $this->getConfigFieldsByRoute('table_options') ?? (object) []))
                 )->toArray();
             } catch (\Throwable $th) {
                 return $this->defaultTableAttributes;
@@ -205,10 +204,10 @@ trait ManageTable
     {
         $attributes = $this->tableAttributes;
 
-        if(isset($attributes['customRow'])) {
+        if (isset($attributes['customRow'])) {
             // Handle associative array case
-            if(Arr::isAssoc($attributes['customRow'])) {
-                if(isset($attributes['customRow']['name'])) {
+            if (Arr::isAssoc($attributes['customRow'])) {
+                if (isset($attributes['customRow']['name'])) {
                     $attributes['customRow'] = $this->hydrateCustomRow($attributes['customRow']);
                 }
             }
@@ -218,8 +217,8 @@ trait ManageTable
                 foreach ($attributes['customRow'] as $component) {
                     // Skip if component doesn't pass role check
                     if (isset($component['allowedRoles']) &&
-                        (!$this->user ||
-                        (!$this->user->hasRole($component['allowedRoles'])))
+                        (! $this->user ||
+                        (! $this->user->hasRole($component['allowedRoles'])))
                     ) {
                         continue;
                     }
@@ -227,6 +226,7 @@ trait ManageTable
                     // Convert first matching component to standard format and break
                     if (isset($component['name'])) {
                         $firstMatch = $this->hydrateCustomRow($component);
+
                         break;
                     }
                 }
@@ -254,7 +254,7 @@ trait ManageTable
                 'form' => [
                     'attributes' => [
                         'title' => [
-                            'text' =>   'PAYMENT AND INVOICES',
+                            'text' => 'PAYMENT AND INVOICES',
                             'tag' => 'div',
                             'type' => 'p',
                             'weight' => 'medium',
@@ -262,7 +262,7 @@ trait ManageTable
                             'justify' => 'left',
                             'margin' => 'a-5',
                             'color' => 'default',
-                            'classes' => 'justify-content-between'
+                            'classes' => 'justify-content-between',
                         ],
                         // 'systembar' => true,
                         'schema' => $this->createFormSchema($this->repository->getPaymentFormSchema()),
@@ -345,7 +345,6 @@ trait ManageTable
         if (count($tableActions) > 3) {
             $this->tableAttributes['rowActionsType'] = 'dropdown';
         }
-
 
         return $tableActions;
     }

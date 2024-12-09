@@ -40,7 +40,6 @@ return [
                 'image' => '', // image link for the background of the toolbar
             ],
 
-
             'hideHeaders' => false,
             'fullWidthWrapper' => true,
             'hideSearchField' => true,

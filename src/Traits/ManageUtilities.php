@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -411,13 +410,13 @@ trait ManageUtilities
                 || isset($field['viewOnlyComponent'])
             ) {
 
-                if(!$isAllowed && isset($field['viewOnlyComponent'])){
+                if (! $isAllowed && isset($field['viewOnlyComponent'])) {
                     $carry[$name] = $field;
-                } else if(in_array($field['type'], ['group', 'wrap'])){
-                    if(isset($field['schema'])){
+                } elseif (in_array($field['type'], ['group', 'wrap'])) {
+                    if (isset($field['schema'])) {
                         $field['schema'] = $this->filterSchemaByRoles($field['schema']);
 
-                        if(!empty($field['schema'])){
+                        if (! empty($field['schema'])) {
                             $carry[$name] = Arr::except($field, ['viewOnlyComponent']);
                         }
                     }
@@ -426,6 +425,7 @@ trait ManageUtilities
                 }
 
             }
+
             return $carry;
         }, []);
     }

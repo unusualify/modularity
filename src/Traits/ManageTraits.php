@@ -159,7 +159,7 @@ trait ManageTraits
                 $jsonColumn = $parts[0];
                 $jsonKey = $parts[1];
 
-                if (!isset($jsonUpdates[$jsonColumn])) {
+                if (! isset($jsonUpdates[$jsonColumn])) {
                     $jsonUpdates[$jsonColumn] = $object->{$jsonColumn} ?? [];
                 }
 

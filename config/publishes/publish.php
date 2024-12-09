@@ -186,7 +186,6 @@ return [
                             'image' => '', // image link for the background of the toolbar
                         ],
 
-
                         'hideHeaders' => false,
                         'fullWidthWrapper' => true,
                         'hideSearchField' => true,
@@ -392,7 +391,7 @@ return [
                                 'createable' => false,
                                 'topEvent' => true,
                                 'allowedRoles' => ['superadmin', 'admin', 'manager'],
-                            ]
+                            ],
                         ],
                         'tableOptions' => [
                             'page' => 1,

@@ -23,7 +23,6 @@ class FilepondHydrate extends InputHydrate
             'image/*, file/*',
         ],
 
-
         // Multiple file upload functionalities
         'allow-multiple' => true,
         'max-files' => null,

@@ -9,6 +9,7 @@ use Oobook\Priceable\Models\Price;
 trait PaymentTrait
 {
     use PricesTrait;
+
     /**
      * paymentTraitRelationName
      *
@@ -44,13 +45,13 @@ trait PaymentTrait
      */
     protected function afterSavePaymentTrait($object, $fields)
     {
-        if(isset($fields['payment'])){
+        if (isset($fields['payment'])) {
             $val = Arr::isAssoc($fields['payment']) ? $fields['payment'] : $fields['payment'][0];
             // $val['display_price'] = $val['display_price'] * 100;
             $paymentPrice = Price::find($val['id']);
             $paymentPrice->update(Arr::only($val, ['price_type_id', 'vat_rate_id', 'currency_id', 'display_price', 'role', 'valid_from', 'valid_till']));
 
-        }else if(!$object->paymentPrice){
+        } elseif (! $object->paymentPrice) {
             $session_currency = request()->getUserCurrency()->id;
 
             $currencyId = isset($fields['currency_id'])
@@ -128,12 +129,12 @@ trait PaymentTrait
 
             $paymentPrice = $object->paymentPrice;
 
-            if($paymentPrice){
+            if ($paymentPrice) {
                 $serialized = $paymentPrice->toArray();
                 // dd($serialized);
                 $serialized['display_price'] = (float) $serialized['display_price'] / 100;
                 $fields['payment'] = $serialized;
-            }else{
+            } else {
                 $fields['payment'] = [
                     array_merge_recursive_preserve($this->defaultPriceData, [
                         'display_price' => 0.00,

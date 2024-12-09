@@ -2,6 +2,161 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.21.0 - 2024-12-09
+
+### :rocket: Features
+
+- :sparkles: add __extractForeignKey helper to find foreign name of a model by @OoBook in https://github.com/unusualify/modularity/commit/ed7054f570b06ead264a2c31cd769cfaf5a10360
+- :art: add unique feature to the repeater input by @OoBook in https://github.com/unusualify/modularity/commit/dfbc4645ae532c873fc1a39213651d7ee2a479e1
+- :recycle: add getTranslationLanguages method to get system languages by @OoBook in https://github.com/unusualify/modularity/commit/ee050e912237baf0bfa598ba9723d354220f84e4
+- :art: add modelValue setter to formatSet if the inputPropFormat matches modelValue or model by @OoBook in https://github.com/unusualify/modularity/commit/e3de2df6f85289fcffbe7a0fc7208a23e8d62e9c
+- :art: add trigger feature to TabGroup to update inner repetitive schemas by @OoBook in https://github.com/unusualify/modularity/commit/c51de594b6b47014eaef3d5daca4d5c6205273c5
+- :sparkles: add ue-filepond-preview experimental component to show file/image details by @OoBook in https://github.com/unusualify/modularity/commit/7f4414c9da448ac9740d5c6d9d68dca0ea120eaa
+- :art: add noRecords attr to prevent making query to db by @OoBook in https://github.com/unusualify/modularity/commit/d59893e631a5a3cd763e3345f3c0803a0cd16e9b
+- :art: add a appends check of the model to get right columns by @OoBook in https://github.com/unusualify/modularity/commit/447b735653716b44a92af5d57e68b799b9e9bacc
+- :sparkles: add new tag input connecting to Taggable structure by @OoBook in https://github.com/unusualify/modularity/commit/3fa0360e85599ed10556d959c7e17a286b590cec
+- :art: add allowedRoles feature to the customRow attribute by @OoBook in https://github.com/unusualify/modularity/commit/a5a630a1f3eec0f817971021de0206cb8839dc14
+- :art: add new headerCenter and top slots to Form component by @OoBook in https://github.com/unusualify/modularity/commit/4391ce4300f7e8c4e3708d404d470bb8b9976374
+- :sparkles: add new viewOnlyComponent feat to inputs when it is in the nonAllowed roles by @OoBook in https://github.com/unusualify/modularity/commit/6213baec76ff9f6ff19731127d3f934c87eb95cb
+- :sparkles: add form action feature into Form by @OoBook in https://github.com/unusualify/modularity/commit/e4a79f49fab271010acc43dc570de606716887c6
+- :art: add form-top slot into Table by @OoBook in https://github.com/unusualify/modularity/commit/ba6aae5b2bc1608915dc59faa2f6f218d8e673a4
+- :art: add hasVatRate into Price by @OoBook in https://github.com/unusualify/modularity/commit/fb5bf09b5aa8582682cb42f995be0e08d73415d8
+
+### :wrench: Bug Fixes
+
+- :bug: fix auth pages form widths && buttons && translations && colors by @gunesbizim in https://github.com/unusualify/modularity/commit/558f08e20a106fdd70c416fb5e4f41718da6df7c
+- :bug: fix third party button spacings by @gunesbizim in https://github.com/unusualify/modularity/commit/3e16c70d374e62695655e542c16609878bb97886
+- :bug: fix spacing on right side of auth pages by @gunesbizim in https://github.com/unusualify/modularity/commit/9df49c0dbd63138fddb51d1cb2a84f37afc710eb
+- :bug: fix custom font-size for description text on the right column by @gunesbizim in https://github.com/unusualify/modularity/commit/ad72001d231c27266cf8066f1d738b7cc55413de
+- :bug: fix colors for future used gray-color-lighten-1 for third party auth buttons && removed unnecessary scss by @gunesbizim in https://github.com/unusualify/modularity/commit/6ee1fd28f29e25090fae177e3d366210196c3223
+- :bug: fix forgot password auth page create account button link by @gunesbizim in https://github.com/unusualify/modularity/commit/566836964db5736a08a2ac095232dc3daccbc0b2
+- :bug: fix stateable hydrate if default_states array of strings convert to array of objects by @gunesbizim in https://github.com/unusualify/modularity/commit/c110404b04ea3cbbdba6ea6531fdc60c0c33d431
+- :bug: fix usage of padding on auth forms && remove unnecessary scss by @gunesbizim in https://github.com/unusualify/modularity/commit/6207a9617614758a4676bd56bd517eabe70b7571
+- :bug: move pivotModel generation to back of the additional models by @OoBook in https://github.com/unusualify/modularity/commit/d1784fe8f261f47c6455ae12b1a266e697488aae
+- :bug: add default true value to active column of translation table migrations by @OoBook in https://github.com/unusualify/modularity/commit/6476b56ddf5a2dd10dadb3c8eecf24633be12819
+- :ambulance: change lastModel as lastIndex for chain methods of pivot tables and fix calculation of schemas number on pivotableRelationships by @OoBook in https://github.com/unusualify/modularity/commit/72f32c0b7632e7e65e45d20bb05753a9fdfb8497
+- :art: append ':' and '_' characters into pattern to cast strings including these by @OoBook in https://github.com/unusualify/modularity/commit/d8742188172a1eb542aa95855c2c3224eceea96f
+- :bug: add disabled styling into checklist's checkboxes by @OoBook in https://github.com/unusualify/modularity/commit/445d80e17609e8a18e8f977ca7e8340c81ad7b55
+- :bug: protect previous value disabled prop by @OoBook in https://github.com/unusualify/modularity/commit/c57b317cecbd1db3239051886cc9736be7d7c7e4
+- :bug: prevent the formatSet on loading item by @OoBook in https://github.com/unusualify/modularity/commit/35948d8f4c6051085ba54f468d1bfbcbbaee7517
+- :bug: add parenthesis if the element is third on formatPreview. by @OoBook in https://github.com/unusualify/modularity/commit/aeb0217a67484fd4b5213fcecd9b3f491e13c542
+- :art: change padding of table's titles and change flex behaviour of iterator's actions by @OoBook in https://github.com/unusualify/modularity/commit/0282d184ae9b7a512bc6604886ae4be2edea7c69
+- :bug: remove ml-auto due to lead to confusions on putting multiple items on the slot by @OoBook in https://github.com/unusualify/modularity/commit/914022075fb93fbbca16e0867dd3313fc02317c8
+- :art: add valueChanged parameter as true on handleEvents by @OoBook in https://github.com/unusualify/modularity/commit/c36be9ed3c5a70bd6568628fb1cc692e9416d622
+- :bug: put action items d-flex wrapper at right slot of Title.vue by @OoBook in https://github.com/unusualify/modularity/commit/5bdf8dc09163324076cb937724ff07f4999f8e83
+- :bug: add a handle to pass fallthrough attributes by @OoBook in https://github.com/unusualify/modularity/commit/498b449b6762770999ca746f34807f45d92478a5
+- :bug: remove coloring the sheet inputs by @OoBook in https://github.com/unusualify/modularity/commit/21e5da144fb930fb254d8c96753578b14b5b84ca
+- :bug: set originalDisabled to disabled prop by @OoBook in https://github.com/unusualify/modularity/commit/800bf56006718402b52d661efa123ab02e5e1b81
+- :art: return respond file type on filepond preview response by @OoBook in https://github.com/unusualify/modularity/commit/ad3bfd8f81d10e6c877b4ce13c15b02856d40ae3
+- :art: return records by serializing on translation models at list method of repository by @OoBook in https://github.com/unusualify/modularity/commit/9459eee32edac86589d286fd82e72fd3724d61bb
+- :bug: remove column fetching on repository list from cascade inputs of morphTo by @OoBook in https://github.com/unusualify/modularity/commit/1f43c024fd35791547da0df4b7154d0d2b1e7606
+- :bug: remove __log helper by @OoBook in https://github.com/unusualify/modularity/commit/afcfc21b8ae54bcad901944fd1a2203df200bc6b
+- :bug: handle json nested fields with '->' character at first level. by @OoBook in https://github.com/unusualify/modularity/commit/04007806539994e1b5a08c084c9cccdc239aaceb
+- :bug: fix unnecessary density usage && translations by @gunesbizim in https://github.com/unusualify/modularity/commit/a88d287b272913c3af5d798248d3b83925a638bc
+- :bug: fix restore unique_table rule by @gunesbizim in https://github.com/unusualify/modularity/commit/0fc24da2177e488160a74be9f393148218e4fd42
+- :bug: fix button density to default on auth pages by @gunesbizim in https://github.com/unusualify/modularity/commit/a30b6b7742cc96200f147fc46634ed35804b4fba
+- :bug: fix moved widgets.php to /merges && removed publishing code from LaravelServiceProvider by @gunesbizim in https://github.com/unusualify/modularity/commit/48518ca405ae575613763c7607449f7792a95731
+- :bug: use applyCasting on string elements case by @OoBook in https://github.com/unusualify/modularity/commit/5eccdce8a30fb470b0a0e817825c046cdb966cab
+- :bug: add class hidden into col and fix disabled case by @OoBook in https://github.com/unusualify/modularity/commit/369aa1157009c993cf774906f243d7916f732c2a
+- fix payment price relationship by @OoBook in https://github.com/unusualify/modularity/commit/6537c43d46995062d8bd05b6066ccd060bc1f33f
+- :bug: call triggers on changing fields by @OoBook in https://github.com/unusualify/modularity/commit/4eb2b2b3943775ae52d10576b61d89a22fc227bd
+- :bug: reformat modelValue of Repeater if not formatted by @OoBook in https://github.com/unusualify/modularity/commit/508d5765b1041f658dbd81a3909aa1fdfb69756a
+- remove isArray check from RecursiveStuff by @web-flow in https://github.com/unusualify/modularity/commit/07fd65de93106ca99e82d401da4df3e22194957f
+- remove extra if check from RecursiveStuff by @web-flow in https://github.com/unusualify/modularity/commit/456ee3c5db06f37e553adaf8b53518711ee54494
+- :art: remove showSelect from users except superadmin by @OoBook in https://github.com/unusualify/modularity/commit/f454598b9d869929b50c819d97be747f40aebd87
+- remove applyCasting error return null by @OoBook in https://github.com/unusualify/modularity/commit/067c4428b5830714be1471ea33d54409794de140
+- remove applyCasting error return null by @OoBook in https://github.com/unusualify/modularity/commit/7c6005f6683e115c226c820887d89e97aa9f676d
+
+### :recycle: Refactors
+
+- :recycle: refactor dashboard to use connector instead of controller by @gunesbizim in https://github.com/unusualify/modularity/commit/8e948a77ad59a811930d73a4cb1f8d30d2f32e63
+- :recycle: refactor dashboard creation logic by @gunesbizim in https://github.com/unusualify/modularity/commit/5cabce6d94a1997186c11e5b72c4a4850e2aef5f
+- :recycle: refactor of BoardInformationPlus usage and component by @gunesbizim in https://github.com/unusualify/modularity/commit/047686993309061345e1083f95e9b07a2fe371ec
+- :recycle: refactor remove unnecessary variable and log by @gunesbizim in https://github.com/unusualify/modularity/commit/ba3b90dc52efabf6e3217da20d386de4fb6b96d8
+- :recycle: refactor HasStateable trait and update hydrate accordingly by @gunesbizim in https://github.com/unusualify/modularity/commit/30e71f2360aae1b11ac754b94ff944e124ecce48
+- :recycle: refactor dashboard table && boardInformationPlus && controller && feature UWidget by @gunesbizim in https://github.com/unusualify/modularity/commit/34b3b18052dbce6dfb95e56547e6faf32b5fa1bc
+- :recycle: refactor publish.php && LaravelServiceProvider.php && create widgets.php for publish by @gunesbizim in https://github.com/unusualify/modularity/commit/5bfc6ba9caf6bea9b38df761bd49f6233ef9488f
+- :lipstick: update button/input sizes acc. to density by @OoBook in https://github.com/unusualify/modularity/commit/df07aa7c1346de4296d6e3f79de377468e9937f0
+- :recycle: update comparison table input to show comparator values and add active highlighted by @OoBook in https://github.com/unusualify/modularity/commit/85bc22dd0bef68424ae0662c1cbda1dbf0659cef
+- :recycle: use getTranslationLanguages method on getModel by @OoBook in https://github.com/unusualify/modularity/commit/a2b951b3c12dbf5db7bfde9c9367fecd1d9c640e
+- :lipstick: update the styles as in the design. by @OoBook in https://github.com/unusualify/modularity/commit/7749d7166fe02bdb46aaa3f0f3188267bd91fcc3
+- :recycle: remove the autocomplete styling by @OoBook in https://github.com/unusualify/modularity/commit/0a8ccd7225c1c48fe2da64abb58771363e4a0381
+- :recycle: change filepond.preview binding as uuid by @OoBook in https://github.com/unusualify/modularity/commit/28b1f688cc7428bea45777fa8f0f5db454b63b8f
+- :recycle: prevent making query to db on MorphTo input type by @OoBook in https://github.com/unusualify/modularity/commit/9d67730ecb02b68d1668d0028d14dd3a691717c4
+- :recycle: use isTranslationAttribute method of hasTranslation instead of using in_array helper by @OoBook in https://github.com/unusualify/modularity/commit/050160120e737e25d5cf0941b42433d60867c133
+- :recycle: remove Model type from morphTo relations by @OoBook in https://github.com/unusualify/modularity/commit/e40b7ed467f3ba299eedb04c51f0c5b86b8c7660
+- :art: add applyCasting method to use it by @OoBook in https://github.com/unusualify/modularity/commit/732691fe4bbdcf87d3bde93191d8ada320344b9d
+
+### :lipstick: Styling
+
+- :green_heart: update space and new lines by @OoBook in https://github.com/unusualify/modularity/commit/d3807262217b3d8ce72ef680a519ba03562d53a1
+- :green_heart: remove dd's from formatWiths by @OoBook in https://github.com/unusualify/modularity/commit/14910ff952a037d6bacdb439eaadec44369bcfb1
+- lint coding styles by @OoBook in https://github.com/unusualify/modularity/commit/6155bb0d7ea49038fd4667cc144677b163e14e6f
+- lint coding styles by @invalid-email-address in https://github.com/unusualify/modularity/commit/0e9ece78a07a17ecc41d10bcaf6a17a3326ede7c
+
+### :white_check_mark: Testing
+
+- :test_tube: add UEConfig to checklist test by @OoBook in https://github.com/unusualify/modularity/commit/24c5c3f9792fd03c04ad163f8648a104b462281b
+- :test_tube: change vuetify plugin as UEConfig by @OoBook in https://github.com/unusualify/modularity/commit/9a36e606ab6d2c1befa1510695efb8259f6e05aa
+
+### :package: Build
+
+- :building_construction: add new v0.20.0 build by @OoBook in https://github.com/unusualify/modularity/commit/38e50a43e9a8ed2c043f4a98fb8d44e8d12b63cb
+- :building_construction: add new v0.20.1 build by @OoBook in https://github.com/unusualify/modularity/commit/efa248c330bafe7b933b903a434df991067aa3fd
+- :building_construction: add new v0.21.0 build by @OoBook in https://github.com/unusualify/modularity/commit/aad79b04ee71da81f2b80dd9565478a4ad3dc9a1
+- :building_construction: add new v0.22.0 build by @OoBook in https://github.com/unusualify/modularity/commit/766831ef9a5f0537b17a57c0c2f6a0d26365a1cc
+
+### :beers: Other Stuff
+
+- :lipstick: change edit icon content by @OoBook in https://github.com/unusualify/modularity/commit/a5ead38ea263453f334c94dd701b9a773a8444b7
+
+## v0.20.0 - 2024-12-09
+
+### :rocket: Features
+
+- :sparkles: add currency exchange on payment form by @gunesbizim in https://github.com/unusualify/modularity/commit/767a9424fc644e4602c8d985e53a6138b9b81970
+- :sparkles: add custom payment service button styling to payment services by @gunesbizim in https://github.com/unusualify/modularity/commit/6235a891e86add90229eae3f6b6521529fccafd4
+- :sparkles: add cardType to payment services by @gunesbizim in https://github.com/unusualify/modularity/commit/0577d5f0c34f6ad256553753dea82b40db1cde5d
+- :sparkles: add currencyServices relation to payment for available currencies with specific payment method by @gunesbizim in https://github.com/unusualify/modularity/commit/03c24c80b36a9458560adf23bad9cfee911f436b
+- :sparkles: add align class to title by @gunesbizim in https://github.com/unusualify/modularity/commit/ecdcc61e68d867dbab7ecf81b0407c92e9fd41b1
+- :sparkles: update ui for currency selection on payment form by @gunesbizim in https://github.com/unusualify/modularity/commit/da21b0cdb6f5bc372dcb8d5470f000d0ff640d90
+- :art: add label to RadioGroup by @OoBook in https://github.com/unusualify/modularity/commit/ba66fc1ce5e24d0b19d5c83f76d8adb015f507fc
+- :art: handle divider case on hydrating input by @OoBook in https://github.com/unusualify/modularity/commit/1e8e9bb1fbdf078482fc50f55a39e89f0eed6b15
+- :art: add a feature shwoing labels as headers like a table by @OoBook in https://github.com/unusualify/modularity/commit/58cc1558086fd5f686aaf9341657fb1819f45a4d
+- :art: add default form attributes and module specific form attributes by @OoBook in https://github.com/unusualify/modularity/commit/6d62a57950b919376accc5b4282654eed6f12e16
+- :art: add new translated input helpers by @OoBook in https://github.com/unusualify/modularity/commit/9e3f7847418ba8872ca20be01499d7b30b12e493
+- :triangular_flag_on_post: add locale hook to handle languages, active language by @OoBook in https://github.com/unusualify/modularity/commit/33302ebbc3f869d5bb016111a1dcfe698d564ee9
+- :art: add a translation info to append of label by @OoBook in https://github.com/unusualify/modularity/commit/106df083bc64abf5900baa8278177f23c2d84591
+- :lipstick: add coloring patterns by @OoBook in https://github.com/unusualify/modularity/commit/f1037558414eabcf0d2868a5c11c83be8d7c3a91
+
+### :wrench: Bug Fixes
+
+- :bug: fix selected input styling && design issue by @gunesbizim in https://github.com/unusualify/modularity/commit/bce51c7a0efedc655275f192ab880b167fa4a042
+- :bug: fix hasDivider prop && title align- and text- prop by @gunesbizim in https://github.com/unusualify/modularity/commit/d5e58b6b726e71cfc3d0615cf8eef7e28b2b74f9
+- :bug: fix the flexibility of right slot of title by @OoBook in https://github.com/unusualify/modularity/commit/19f3c6cb5cc7b740fd9601ae6bc82ccadad03ab5
+- :bug: fix ux issues of last step form's summary by @OoBook in https://github.com/unusualify/modularity/commit/0cb1b2f6735f4581a23b6725e1a9d177b7679965
+- :art: update profile structre acc. to new theming structure by @OoBook in https://github.com/unusualify/modularity/commit/209dded0df42b6558a87dbb0849f9a9151654b9a
+
+### :recycle: Refactors
+
+- refactor for conflict by @gunesbizim in https://github.com/unusualify/modularity/commit/ef418c7d1b4be2f19b2e6721cfa846cd8069d8ed
+- :recycle: refactor conflict fix by @gunesbizim in https://github.com/unusualify/modularity/commit/7faa14caca1c79a307b0c35719394e8c1542a1dd
+- :art: arrange wrap/group's title/subtitle styling by @OoBook in https://github.com/unusualify/modularity/commit/e61ac751303805df875d31141754701f5bffcf66
+- :bug: remove emphasize from text display sub text by @OoBook in https://github.com/unusualify/modularity/commit/0f3784af53fec2ee3fae341c5096b607ceb52cb1
+- :recycle: upgrade advanced filter menu by @OoBook in https://github.com/unusualify/modularity/commit/a72f5365f8d136bdfb14d1c0c99e1afde797f55f
+
+### :white_check_mark: Testing
+
+- :test_tube: change vuetify plugin as UEConfig by @OoBook in https://github.com/unusualify/modularity/commit/369c390c012020af2f4961be48f645288e12c8c9
+
+### :package: Build
+
+- :building_construction: add new v0.20.0 build by @OoBook in https://github.com/unusualify/modularity/commit/27ea59d21b988c7b1266fe5e135baaada1306c42
+
+### :beers: Other Stuff
+
+- :children_crossing: remove job title from user profile by @OoBook in https://github.com/unusualify/modularity/commit/76af300a737611ea36f5ba6fc7971ac3a2db727f
+
 ## v0.19.1 - 2024-11-27
 
 ### :wrench: Bug Fixes
