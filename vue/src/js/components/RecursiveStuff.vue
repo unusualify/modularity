@@ -119,24 +119,7 @@ export default {
         _value = value.shift()
         funcs = value
       }
-
-      if (isObject(value)) {
-      } else {
-        // __log(object, key, _value, value)
-        // __log(isObject(_value), isObject(value))
-
-        const matches = _value.match(castPattern)
-
-        if (matches) {
-          let result = get(props.bindData, matches[1])
-          funcs.forEach((func) => {
-            result = window[func](result)
-          })
-
-          if (result) {
-            object[key] = result
-            delete filteredAttributes[key]
-          }
+      
       if (isObject(value)) {
         // Do nothing
       } else {
