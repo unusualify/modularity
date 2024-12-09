@@ -240,11 +240,11 @@ trait ManageTable
 
     protected function getTableActions()
     {
-        $actions = [];
+        $tableActions = [];
 
         // if $this->repository has hasPayment
         if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasPayment')) {
-            $actions[] = [
+            $tableActions[] = [
                 'name' => 'pay',
                 'icon' => 'mdi-contactless-payment',
                 'forceLabel' => true,
@@ -283,16 +283,18 @@ trait ManageTable
             // dd($actions);
         }
 
+        // duplicate action
         if ($this->getIndexOption('duplicate')) {
-            $actions[] = [
+            $tableActions[] = [
                 'name' => 'duplicate',
                 // 'icon' => '$edit',
                 'color' => 'primary darken-2',
             ];
         }
 
+        // edit action
         if ($this->getIndexOption('edit')) {
-            $actions[] = [
+            $tableActions[] = [
                 'name' => 'edit',
                 // 'can' => $this->permissionPrefix(Permission::EDIT->value),
                 // 'color' => 'green darken-2',
@@ -300,8 +302,9 @@ trait ManageTable
             ];
         }
 
+        // delete action
         if ($this->getIndexOption('delete')) {
-            $actions[] = [
+            $tableActions[] = [
                 'name' => 'delete',
                 'can' => $this->permissionPrefix(Permission::DELETE->value),
                 'variant' => 'outlined',
@@ -310,8 +313,9 @@ trait ManageTable
             ];
         }
 
+        // restore action
         if ($this->getIndexOption('restore')) {
-            $actions[] = [
+            $tableActions[] = [
                 'name' => 'restore',
                 // 'icon' => '$',
                 'can' => 'restore',
@@ -320,8 +324,9 @@ trait ManageTable
             ];
         }
 
+        // force delete action
         if ($this->getIndexOption('forceDelete')) {
-            $actions[] = [
+            $tableActions[] = [
                 'name' => 'forceDelete',
                 'icon' => '$delete',
                 'can' => 'forceDelete',
@@ -330,17 +335,19 @@ trait ManageTable
             ];
         }
 
-        $actions = array_merge(
-            $actions,
+        // navigation actions
+        $tableActions = array_merge(
+            $tableActions,
             Modularity::find($this->moduleName)->getNavigationActions($this->routeName)
         );
 
-        if (count($actions) > 3) {
+        // dropdown actions
+        if (count($tableActions) > 3) {
             $this->tableAttributes['rowActionsType'] = 'dropdown';
         }
 
-        // dd($actions);
-        return $actions;
+
+        return $tableActions;
     }
 
     /**

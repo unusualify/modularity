@@ -273,6 +273,12 @@
                       @click="closeForm()"
                     ></v-btn>
                   </template>
+
+                  <template v-slot:top="formTopScope">
+                    <slot name="form-top" v-bind="formTopScope">
+
+                    </slot>
+                  </template>
                 </ue-form>
                 <!-- <v-card-text>
                 </v-card-text> -->
@@ -311,7 +317,11 @@
                     button-text="save"
                     :title="formTitle"
                     ref="form"
-                    :isEditing="editedIndex > -1">
+                    :isEditing="editedIndex > -1"
+                  >
+                    <template v-slot:headerCenter>
+
+                    </template>
                     <template v-slot:headerRight>
                       <v-btn class="" variant="text" icon="$close" density="compact"
                         @click="closeForm()"
@@ -453,7 +463,6 @@
           </div>
         </template>
 
-
         <!-- Custom Slots -->
         <template
           v-for="(context, slotName) in slots" v-slot:[slotName]
@@ -471,6 +480,7 @@
         <!-- #formatterColumns -->
         <template
           v-for="(col, i) in formatterColumns"
+          :key="`formatter-${i}`"
           v-slot:[`item.${col.key}`]="{ item }"
         >
           <template v-if="col.formatter == 'edit' || col.formatter == 'activate'">

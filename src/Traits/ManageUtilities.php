@@ -34,7 +34,6 @@ trait ManageUtilities
 
         $tableAttributes = $this->hydrateTableAttributes();
         // dd($this->translateHeaders($headers));
-        // dd($this->getFormActions());
         $_deprecated = [
             'initialResource' => $initialResource, //
             'tableMainFilters' => $this->getTableMainFilters(),
