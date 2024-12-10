@@ -54,7 +54,7 @@ jobs:
       - name: Sanitize Branch Name
         id: branch_name
         run: |
-          TITLE=${{ steps.extract.outputs.title }}
+          TITLE="${{ steps.extract.outputs.title }}"
           # Convert to lowercase, trim whitespace, replace multiple spaces/special chars with single hyphen
           SANITIZED=$(echo "$TITLE" | \
             tr '[:upper:]' '[:lower:]' | \
@@ -62,7 +62,7 @@ jobs:
             sed -e 's/[^[:alnum:]]/-/g' | \
             sed -e 's/-\{2,\}/-/g' | \
             sed -e 's/^-//' -e 's/-$//')
-          echo "::set-output name=branch::$SANITIZED"
+          echo "branch=$SANITIZED" >> $GITHUB_OUTPUT
 
       - name: Create Branch
         if: steps.prefix.outputs.prefix != ''
