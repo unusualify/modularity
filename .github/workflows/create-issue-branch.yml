@@ -25,8 +25,6 @@ jobs:
       - name: Extract Issue Details
         id: extract
         run: |
-          # Parse the issue body to extract severity
-          BODY="${{ github.event.issue.body }}"
           SEVERITY=""
           if [[ "${{ contains(github.event.issue.labels.*.name, 'bug') }}" == "true" ]]; then
             SEVERITY="${{ steps.issue-parser.outputs.issueparser_severity }}"
