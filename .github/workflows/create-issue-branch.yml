@@ -14,8 +14,11 @@ jobs:
       - name: Extract Issue Details
         id: extract
         run: |
-          echo "::set-output name=title::$(echo '${{ github.event.issue.title }}' | awk -F ':]' '{print $2}')"
-          echo "::set-output name=severity::$(jq -r '.severity' <<< '${{ toJson(github.event.issue.body) }}')"
+          # Parse the issue body to extract severity
+          BODY='${{ github.event.issue.body }}'
+          SEVERITY=$(echo "$BODY" | grep -A 1 "### Severity" | tail -n 1 | tr -d '[:space:]')
+          echo "title=$(echo '${{ github.event.issue.title }}' | awk -F ':]' '{print $2}')" >> $GITHUB_OUTPUT
+          echo "severity=$SEVERITY" >> $GITHUB_OUTPUT
 
       - name: Determine Branch Prefix
         id: prefix
