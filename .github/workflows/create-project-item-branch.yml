@@ -1,0 +1,66 @@
+name: Create Issue Branch
+
+on:
+  project_card:
+    types: [moved]
+
+jobs:
+  create_branch:
+    runs-on: ubuntu-latest
+    if: github.event.project_card.project_name == 'modularity'
+    steps:
+      - name: Get Issue Details
+        id: issue
+        run: |
+          ISSUE_URL=$(jq -r '.project_card.content_url' "${{ github.event_path }}")
+          ISSUE_DATA=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" $ISSUE_URL)
+          echo "::set-output name=title::$(echo "$ISSUE_DATA" | jq -r '.title')"
+          echo "::set-output name=body::$(echo "$ISSUE_DATA" | jq -r '.body')"
+
+      - name: Extract Issue Details
+        id: extract
+        run: |
+          echo "::set-output name=title::$(echo '${{ steps.issue.outputs.title }}' | awk -F ' - ' '{print $2}')"
+          echo "::set-output name=type::$(echo '${{ steps.issue.outputs.title }}' | awk '{print $1}' | tr -d ':')"
+          echo "::set-output name=severity::$(jq -r '.severity' <<< '${{ steps.issue.outputs.body }}')"
+
+      - name: Determine Branch Prefix
+        id: prefix
+        run: |
+          TYPE=${{ steps.extract.outputs.type }}
+          SEVERITY=${{ steps.extract.outputs.severity }}
+          if [ "$TYPE" == "feat" ]; then
+            PREFIX="feature/"
+          elif [ "$TYPE" == "fix" ]; then
+            if [ "$SEVERITY" == "Critical" ]; then
+              PREFIX="hotfix/"
+            else
+              PREFIX="bugfix/"
+            fi
+          elif [ "$TYPE" == "perf" ]; then
+            PREFIX="perf/"
+          elif [ "$TYPE" == "docs" ]; then
+            PREFIX="docs/"
+          else
+            PREFIX=""
+          fi
+          echo "::set-output name=prefix::$PREFIX"
+
+      - name: Sanitize Branch Name
+        id: branch_name
+        run: |
+          TITLE=${{ steps.extract.outputs.title }}
+          # Lowercase, replace spaces with hyphens, remove non-alphanumeric chars
+          SANITIZED=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9-_')
+          echo "::set-output name=branch::$SANITIZED"
+
+      - name: Create Branch
+        if: steps.prefix.outputs.prefix != ''
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+          git checkout -b "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
+          git push origin "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
