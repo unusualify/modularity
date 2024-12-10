@@ -29,7 +29,8 @@ jobs:
           if [[ "${{ contains(github.event.issue.labels.*.name, 'bug') }}" == "true" ]]; then
             SEVERITY="${{ steps.issue-parser.outputs.issueparser_severity }}"
           fi
-          TITLE=$(echo "${{ github.event.issue.title }}" | awk -F ':]' '{print $NF}')
+          TITLE="${{ github.event.issue.title }}"
+          TITLE=$(echo "$TITLE" | awk -F ':]' '{print $NF}')
           echo "title=$TITLE" >> $GITHUB_OUTPUT
           echo "severity=$SEVERITY" >> $GITHUB_OUTPUT
 
