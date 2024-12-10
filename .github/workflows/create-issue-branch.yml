@@ -15,8 +15,8 @@ jobs:
         if: contains(github.event.issue.labels.*.name, 'bug')
         uses: stefanbuck/github-issue-parser@v3
         id: issue-parser
-        with:
-          template-path: .github/ISSUE_TEMPLATE/1-bug.yml # optional but recommended
+        # with:
+        #   template-path: .github/ISSUE_TEMPLATE/1-bug.yml # optional but recommended
 
       - name: Print Issue Body
         if: contains(github.event.issue.labels.*.name, 'bug')
