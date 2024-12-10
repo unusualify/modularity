@@ -37,22 +37,29 @@ jobs:
           echo "title=$TITLE" >> $GITHUB_OUTPUT
           echo "severity=$SEVERITY" >> $GITHUB_OUTPUT
 
-      - name: Determine Branch Prefix
+      - name: Determine Branch Type
         id: prefix
         run: |
+          SOURCE="dev"
           if [[ "${{ contains(github.event.issue.labels.*.name, 'enhancement') }}" == "true" ]]; then
             PREFIX="feature/"
           elif [[ "${{ contains(github.event.issue.labels.*.name, 'bug') }}" == "true" ]]; then
             SEVERITY=${{ steps.extract.outputs.severity }}
             if [ "$SEVERITY" == "Critical" ]; then
               PREFIX="hotfix/"
+              SOURCE="main"
             else
               PREFIX="bugfix/"
             fi
           else
             PREFIX=""
           fi
-          echo "::set-output name=prefix::$PREFIX"
+
+          echo "::add-mask::Prefix: $PREFIX"
+          echo "::add-mask::Source: $SOURCE"
+
+          echo "prefix=$PREFIX" >> $GITHUB_OUTPUT
+          echo "source=$SOURCE" >> $GITHUB_OUTPUT
 
       - name: Sanitize Branch Name
         id: branch_name
@@ -65,6 +72,8 @@ jobs:
             sed -e 's/[^[:alnum:]]/-/g' | \
             sed -e 's/-\{2,\}/-/g' | \
             sed -e 's/^-//' -e 's/-$//')
+          SANITIZED="$SANITIZED-issue-${{ github.event.issue.number}}"
+          echo "::debug::Branch Name: $SANITIZED"
           echo "branch=$SANITIZED" >> $GITHUB_OUTPUT
 
       - name: Create Branch
@@ -74,12 +83,44 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Configure Git and Create Branch
+      # - name: Configure Git and Create Branch
+      #   if: steps.prefix.outputs.prefix != ''
+      #   run: |
+      #     git config --global user.name "github-actions[bot]"
+      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      #     git checkout -b "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
+      #     git push origin "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Issue Branch
         if: steps.prefix.outputs.prefix != ''
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
-          git push origin "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
+        uses: robvanderleek/create-issue-branch@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          autoCloseIssue: true
+          autoLinkIssue: true
+          # autoDeleteBranch: true
+          branchName:  ${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}
+          # commentMessage: 'Branch ${branchName} created for issue: ${issue.title}'
+          defaultBranch: ${{ steps.prefix.outputs.source }}
+
+          # branches:
+          #   - label: enhancement
+          #     name: dev
+          #   - label: bug
+          #     name: staging
+          # branches:
+          #   - label:
+          #       - enhancement
+          #       - docs
+          #     name: docs
+          #   - label: enhancement
+          #     name: dev
+          #     prefix: feature/
+          #   - label:
+          #       - bug
+          #     name: dev
+
+
