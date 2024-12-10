@@ -29,7 +29,8 @@ jobs:
           if [[ "${{ contains(github.event.issue.labels.*.name, 'bug') }}" == "true" ]]; then
             SEVERITY="${{ steps.issue-parser.outputs.issueparser_severity }}"
           fi
-          echo "title=$(echo '${{ github.event.issue.title }}' | awk -F ':]' '{print $2}')" >> $GITHUB_OUTPUT
+          TITLE=$(echo '${{ github.event.issue.title }}' | awk -F ':]' '{print $2}')
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
           echo "severity=$SEVERITY" >> $GITHUB_OUTPUT
 
       - name: Determine Branch Prefix
