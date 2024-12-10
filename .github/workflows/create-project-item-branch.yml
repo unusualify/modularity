@@ -1,4 +1,4 @@
-name: Create Issue Branch
+name: Create Project Item Branch
 
 on:
   project_card:

@@ -11,22 +11,36 @@ jobs:
       contains(github.event.issue.labels.*.name, 'accepted') &&
       (contains(github.event.issue.labels.*.name, 'enhancement') || contains(github.event.issue.labels.*.name, 'bug'))
     steps:
+      - name: Parse Issue
+        if: contains(github.event.issue.labels.*.name, 'bug')
+        uses: stefanbuck/github-issue-parser@v3
+        id: issue-parser
+        with:
+          template-path: .github/ISSUE_TEMPLATE/1-bug.yml # optional but recommended
+
+      - name: Print Issue Body
+        if: contains(github.event.issue.labels.*.name, 'bug')
+        run: cat ${HOME}/issue-parser-result.json
+
       - name: Extract Issue Details
         id: extract
         run: |
           # Parse the issue body to extract severity
-          BODY='${{ github.event.issue.body }}'
-          SEVERITY=$(echo "$BODY" | grep -A 1 "### Severity" | tail -n 1 | tr -d '[:space:]')
+          BODY="${{ github.event.issue.body }}"
+          SEVERITY=""
+          if [[ "${{ contains(github.event.issue.labels.*.name, 'bug') }}" == "true" ]]; then
+            SEVERITY="${{ steps.issue-parser.outputs.issueparser_severity }}"
+          fi
           echo "title=$(echo '${{ github.event.issue.title }}' | awk -F ':]' '{print $2}')" >> $GITHUB_OUTPUT
           echo "severity=$SEVERITY" >> $GITHUB_OUTPUT
 
       - name: Determine Branch Prefix
         id: prefix
         run: |
-          SEVERITY=${{ steps.extract.outputs.severity }}
           if [[ "${{ contains(github.event.issue.labels.*.name, 'enhancement') }}" == "true" ]]; then
             PREFIX="feature/"
           elif [[ "${{ contains(github.event.issue.labels.*.name, 'bug') }}" == "true" ]]; then
+            SEVERITY=${{ steps.extract.outputs.severity }}
             if [ "$SEVERITY" == "Critical" ]; then
               PREFIX="hotfix/"
             else
