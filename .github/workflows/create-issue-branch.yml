@@ -1,0 +1,59 @@
+name: Create Issue Branch
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  create_branch:
+    runs-on: ubuntu-latest
+    if: |
+      contains(github.event.issue.labels.*.name, 'accepted') &&
+      (contains(github.event.issue.labels.*.name, 'enhancement') || contains(github.event.issue.labels.*.name, 'bug'))
+    steps:
+      - name: Extract Issue Details
+        id: extract
+        run: |
+          echo "::set-output name=title::$(echo '${{ github.event.issue.title }}' | awk -F ':]' '{print $2}')"
+          echo "::set-output name=severity::$(jq -r '.severity' <<< '${{ toJson(github.event.issue.body) }}')"
+
+      - name: Determine Branch Prefix
+        id: prefix
+        run: |
+          SEVERITY=${{ steps.extract.outputs.severity }}
+          if [[ "${{ contains(github.event.issue.labels.*.name, 'enhancement') }}" == "true" ]]; then
+            PREFIX="feature/"
+          elif [[ "${{ contains(github.event.issue.labels.*.name, 'bug') }}" == "true" ]]; then
+            if [ "$SEVERITY" == "Critical" ]; then
+              PREFIX="hotfix/"
+            else
+              PREFIX="bugfix/"
+            fi
+          else
+            PREFIX=""
+          fi
+          echo "::set-output name=prefix::$PREFIX"
+
+      - name: Sanitize Branch Name
+        id: branch_name
+        run: |
+          TITLE=${{ steps.extract.outputs.title }}
+          # Convert to lowercase, trim whitespace, replace multiple spaces/special chars with single hyphen
+          SANITIZED=$(echo "$TITLE" | \
+            tr '[:upper:]' '[:lower:]' | \
+            sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | \
+            sed -e 's/[^[:alnum:]]/-/g' | \
+            sed -e 's/-\{2,\}/-/g' | \
+            sed -e 's/^-//' -e 's/-$//')
+          echo "::set-output name=branch::$SANITIZED"
+
+      - name: Create Branch
+        if: steps.prefix.outputs.prefix != ''
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+          git checkout -b "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
+          git push origin "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
