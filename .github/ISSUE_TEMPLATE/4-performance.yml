@@ -1,0 +1,67 @@
+name: "⚡ Performance Issue"
+description: Create a new ticket for a performance issue or optimization request
+title: "⚡ [PERF]: ${{ env.ISSUE_TITLE }}"
+labels: [
+  "performance"
+]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: "Performance Issue Title"
+      description: Provide a clear title for the performance issue (this will be used for branch naming)
+      placeholder: e.g., slow page load time on dashboard
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: "Description"
+      description: Please describe the performance issue in detail
+      placeholder: Explain what performance problem you're experiencing...
+    validations:
+      required: true
+  - type: textarea
+    id: current_behavior
+    attributes:
+      label: "Current Performance"
+      description: Describe the current performance metrics or behavior
+      placeholder: e.g., Page takes 5 seconds to load, API response time is 3 seconds
+    validations:
+      required: true
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: "Expected Performance"
+      description: Describe what performance level you expect or need
+      placeholder: e.g., Page should load within 2 seconds, API should respond within 500ms
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: "Steps to Reproduce"
+      description: Please provide steps to reproduce the performance issue
+      value: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Observe performance issue
+    validations:
+      required: true
+  - type: textarea
+    id: metrics
+    attributes:
+      label: "Performance Metrics"
+      description: If available, provide any performance metrics, profiling data, or benchmarks
+      render: bash
+    validations:
+      required: false
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: "Screenshots/Recordings"
+      description: If applicable, add screenshots or recordings showing the performance issue
+      value: |
+        ![DESCRIPTION](LINK.png)
+    validations:
+      required: false

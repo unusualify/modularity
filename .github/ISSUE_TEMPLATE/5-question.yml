@@ -1,0 +1,48 @@
+name: "❓ Question"
+description: Create a new ticket for a question
+title: "❓ [QUESTION]: ${{ env.ISSUE_TITLE }}"
+labels: [
+  "question"
+]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: "Question Title"
+      description: Provide a clear title for your question
+      placeholder: e.g., how to implement feature X
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: "Question"
+      description: Please provide your question with as much detail as possible
+      placeholder: Describe what you're trying to understand or accomplish...
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: "Context"
+      description: Provide any relevant context or background information
+      placeholder: What have you tried? What documentation have you read?
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: "Code Examples"
+      description: If applicable, provide code examples related to your question
+      render: bash
+    validations:
+      required: false
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: "Screenshots"
+      description: If applicable, add screenshots to help explain your question
+      value: |
+        ![DESCRIPTION](LINK.png)
+    validations:
+      required: false

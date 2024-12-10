@@ -1,0 +1,39 @@
+name: "💡 Feature Request"
+description: Create a new ticket for a new feature request
+# title: "💡 [REQUEST] - <title>"
+title: "💡 [FEATURE]: ${{ env.ISSUE_TITLE }}"
+labels: [
+  "enhancement",
+]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: "Feature Title"
+      description: Provide a clear title for the feature (this will be used for branch naming)
+      placeholder: e.g., add user authentication
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: "Summary"
+      description: Provide a brief explanation of the feature
+      placeholder: Describe in a few lines your feature request
+    validations:
+      required: true
+  - type: textarea
+    id: basic_example
+    attributes:
+      label: "Basic Example"
+      description: Indicate here some basic examples of your feature.
+      placeholder: A few specific words about your feature request.
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: "Screenshots"
+      description: If applicable, add screenshots to help explain your problem.
+    validations:
+      required: false
