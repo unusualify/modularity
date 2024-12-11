@@ -97,6 +97,24 @@ jobs:
           # Get the SHA of the source branch
           SOURCE_SHA=$(git rev-parse ${{ steps.prefix.outputs.source }})
 
+          # Get Repository Node ID
+          REPO_ID=$(gh api graphql -f query='
+            query($owner:String!, $name:String!) {
+              repository(owner:$owner, name:$name) {
+                id
+              }
+            }' -f owner="${{ github.repository_owner }}" -f name="${{ github.event.repository.name }}" --jq '.data.repository.id')
+
+          # Get Issue Node ID
+          ISSUE_ID=$(gh api graphql -f query='
+            query($owner:String!, $name:String!, $number:Int!) {
+              repository(owner:$owner, name:$name) {
+                issue(number:$number) {
+                  id
+                }
+              }
+            }' -f owner="${{ github.repository_owner }}" -f name="${{ github.event.repository.name }}" -f number=${{ github.event.issue.number }} --jq '.data.repository.issue.id')
+
           # Create branch using GraphQL API to properly link it to the issue
           gh api graphql -f query='
             mutation ($repositoryId: ID!, $issueId: ID!, $name: String!, $oid: GitObjectID!) {
@@ -106,8 +124,8 @@ jobs:
                 }
               }
             }' \
-            -f repositoryId="$(gh api repos/${{ github.repository }} --jq .node_id)" \
-            -f issueId="$(gh api issues/${{ github.event.issue.number }} --jq .node_id)" \
+            -f repositoryId="$REPO_ID" \
+            -f issueId="$ISSUE_ID" \
             -f name="$BRANCH_NAME" \
             -f oid="$SOURCE_SHA"
 
