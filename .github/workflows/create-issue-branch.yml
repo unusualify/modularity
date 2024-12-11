@@ -55,8 +55,8 @@ jobs:
             PREFIX=""
           fi
 
-          echo "::add-mask::Prefix: $PREFIX"
-          echo "::add-mask::Source: $SOURCE"
+          echo "Prefix: $PREFIX"
+          echo "Source: $SOURCE"
 
           echo "prefix=$PREFIX" >> $GITHUB_OUTPUT
           echo "source=$SOURCE" >> $GITHUB_OUTPUT
@@ -73,10 +73,10 @@ jobs:
             sed -e 's/-\{2,\}/-/g' | \
             sed -e 's/^-//' -e 's/-$//')
           SANITIZED="$SANITIZED-issue-${{ github.event.issue.number}}"
-          echo "::debug::Branch Name: $SANITIZED"
+          echo "Branch Name: $SANITIZED"
           echo "branch=$SANITIZED" >> $GITHUB_OUTPUT
 
-      - name: Create Branch
+      - name: Checkout Branch
         if: steps.prefix.outputs.prefix != ''
         uses: actions/checkout@v4
         with:
@@ -97,14 +97,17 @@ jobs:
         if: steps.prefix.outputs.prefix != ''
         uses: robvanderleek/create-issue-branch@main
         env:
+          LOG_LEVEL: verbose
+          number: ${{ github.event.issue.number }}
+          title: ${{ github.event.issue.title }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           autoCloseIssue: true
           autoLinkIssue: true
-          # autoDeleteBranch: true
-          branchName:  ${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}
-          # commentMessage: 'Branch ${branchName} created for issue: ${issue.title}'
+          branchName: '${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}'
           defaultBranch: ${{ steps.prefix.outputs.source }}
+          # autoDeleteBranch: true
+          # commentMessage: 'Branch ${branchName} created for issue: ${issue.title}'
 
           # branches:
           #   - label: enhancement
