@@ -1,10 +1,19 @@
 name: "🐛 Bug Report"
 description: Create a new ticket for a bug.
-title: "🐛 [BUG] - <title>"
+# title: "🐛 [BUG] - <title>"
+title: "🐛 [BUG]: ${{ env.ISSUE_TITLE }}"
 labels: [
   "bug"
 ]
 body:
+  - type: input
+    id: title
+    attributes:
+      label: "Bug Title"
+      description: Provide a clear title for the bug (this will be used for branch naming)
+      placeholder: e.g., fix user authentication
+    validations:
+      required: true
   - type: textarea
     id: description
     attributes:
@@ -13,14 +22,30 @@ body:
       placeholder: Short and explicit description of your incident...
     validations:
       required: true
-  - type: input
-    id: reprod-url
+  - type: dropdown
+    id: severity
     attributes:
-      label: "Reproduction URL"
-      description: Please enter your GitHub URL to provide a reproduction of the issue
-      placeholder: ex. https://github.com/USERNAME/REPO-NAME
+      label: "Severity"
+      description: Select the severity of the bug (this will determine if it's a hotfix)
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical
     validations:
       required: true
+  # - type: dropdown
+  #   id: version
+  #   attributes:
+  #     label: "Version"
+  #     description: Select which version of the software the bug is in
+  #     options:
+  #       - Low
+  #       - Medium
+  #       - High
+  #       - Critical
+  #   validations:
+  #     required: true
   - type: textarea
     id: reprod
     attributes:
@@ -41,7 +66,7 @@ body:
       description: If applicable, add screenshots to help explain your problem.
       value: |
         ![DESCRIPTION](LINK.png)
-      render: bash
+      # render: bash
     validations:
       required: false
   - type: textarea
@@ -52,6 +77,14 @@ body:
       render: bash
     validations:
       required: false
+  - type: input
+    id: reprod-url
+    attributes:
+      label: "Reproduction URL"
+      description: Please enter your GitHub URL to provide a reproduction of the issue
+      placeholder: ex. https://github.com/USERNAME/REPO-NAME
+    validations:
+      required: true
   - type: dropdown
     id: browsers
     attributes:

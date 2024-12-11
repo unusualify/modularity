@@ -1,0 +1,128 @@
+name: Create Issue Branch
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  contents: write
+
+jobs:
+  create_branch:
+    runs-on: ubuntu-latest
+    if: |
+      contains(github.event.issue.labels.*.name, 'accepted') &&
+      (contains(github.event.issue.labels.*.name, 'enhancement') || contains(github.event.issue.labels.*.name, 'bug'))
+    steps:
+      - name: Parse Issue
+        if: contains(github.event.issue.labels.*.name, 'bug')
+        uses: stefanbuck/github-issue-parser@v3
+        id: issue-parser
+        # with:
+        #   template-path: .github/ISSUE_TEMPLATE/1-bug.yml # optional but recommended
+
+      - name: Print Issue Body
+        if: contains(github.event.issue.labels.*.name, 'bug')
+        run: cat ${HOME}/issue-parser-result.json
+
+      - name: Extract Issue Details
+        id: extract
+        run: |
+          SEVERITY=""
+          if [[ "${{ contains(github.event.issue.labels.*.name, 'bug') }}" == "true" ]]; then
+            SEVERITY="${{ steps.issue-parser.outputs.issueparser_severity }}"
+          fi
+          TITLE="${{ github.event.issue.title }}"
+          TITLE=$(echo "$TITLE" | awk -F ']:' '{print $NF}')
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "severity=$SEVERITY" >> $GITHUB_OUTPUT
+
+      - name: Determine Branch Type
+        id: prefix
+        run: |
+          SOURCE="dev"
+          if [[ "${{ contains(github.event.issue.labels.*.name, 'enhancement') }}" == "true" ]]; then
+            PREFIX="feature/"
+          elif [[ "${{ contains(github.event.issue.labels.*.name, 'bug') }}" == "true" ]]; then
+            SEVERITY=${{ steps.extract.outputs.severity }}
+            if [ "$SEVERITY" == "Critical" ]; then
+              PREFIX="hotfix/"
+              SOURCE="main"
+            else
+              PREFIX="bugfix/"
+            fi
+          else
+            PREFIX=""
+          fi
+
+          echo "Prefix: $PREFIX"
+          echo "Source: $SOURCE"
+
+          echo "prefix=$PREFIX" >> $GITHUB_OUTPUT
+          echo "source=$SOURCE" >> $GITHUB_OUTPUT
+
+      - name: Sanitize Branch Name
+        id: branch_name
+        run: |
+          TITLE="${{ steps.extract.outputs.title }}"
+          # Convert to lowercase, trim whitespace, replace multiple spaces/special chars with single hyphen
+          SANITIZED=$(echo "$TITLE" | \
+            tr '[:upper:]' '[:lower:]' | \
+            sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | \
+            sed -e 's/[^[:alnum:]]/-/g' | \
+            sed -e 's/-\{2,\}/-/g' | \
+            sed -e 's/^-//' -e 's/-$//')
+          SANITIZED="$SANITIZED-issue-${{ github.event.issue.number}}"
+          echo "Branch Name: $SANITIZED"
+          echo "branch=$SANITIZED" >> $GITHUB_OUTPUT
+
+      - name: Checkout Branch
+        if: steps.prefix.outputs.prefix != ''
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Configure Git and Create Branch
+      #   if: steps.prefix.outputs.prefix != ''
+      #   run: |
+      #     git config --global user.name "github-actions[bot]"
+      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      #     git checkout -b "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
+      #     git push origin "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Issue Branch
+        if: steps.prefix.outputs.prefix != ''
+        uses: robvanderleek/create-issue-branch@main
+        env:
+          number: ${{ github.event.issue.number }}
+          title: ${{ github.event.issue.title }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          autoCloseIssue: true
+          autoLinkIssue: true
+          branchName: '${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}'
+          defaultBranch: ${{ steps.prefix.outputs.source }}
+          # autoDeleteBranch: true
+          # commentMessage: 'Branch ${branchName} created for issue: ${issue.title}'
+
+          # branches:
+          #   - label: enhancement
+          #     name: dev
+          #   - label: bug
+          #     name: staging
+          # branches:
+          #   - label:
+          #       - enhancement
+          #       - docs
+          #     name: docs
+          #   - label: enhancement
+          #     name: dev
+          #     prefix: feature/
+          #   - label:
+          #       - bug
+          #     name: dev
+
+

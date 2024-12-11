@@ -1,0 +1,52 @@
+name: "📚 Documentation"
+description: Create a new ticket for documentation
+title: "📚 [DOCS]: ${{ env.ISSUE_TITLE }}"
+labels: [
+  "documentation"
+]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: "Documentation Title"
+      description: Provide a clear title for the documentation request (this will be used for branch naming)
+      placeholder: e.g., add API authentication docs
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: "Summary"
+      description: Provide a brief explanation of what documentation is needed
+      placeholder: Describe what documentation needs to be added or updated
+    validations:
+      required: true
+  - type: dropdown
+    id: doc_type
+    attributes:
+      label: "Documentation Type"
+      description: Select the type of documentation needed
+      options:
+        - API Documentation
+        - User Guide
+        - Developer Guide
+        - Installation Guide
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: current_documentation
+    attributes:
+      label: "Current Documentation"
+      description: If this is an update, please provide links to the current documentation
+      placeholder: Links to existing documentation or N/A if this is new
+    validations:
+      required: false
+  - type: textarea
+    id: proposed_changes
+    attributes:
+      label: "Proposed Changes"
+      description: Describe the specific changes or additions needed
+      placeholder: List the specific sections or topics that need to be documented
+    validations:
+      required: true
