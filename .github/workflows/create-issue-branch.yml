@@ -97,7 +97,6 @@ jobs:
         if: steps.prefix.outputs.prefix != ''
         uses: robvanderleek/create-issue-branch@main
         env:
-          LOG_LEVEL: verbose
           number: ${{ github.event.issue.number }}
           title: ${{ github.event.issue.title }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
