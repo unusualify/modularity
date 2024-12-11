@@ -105,7 +105,7 @@ jobs:
               }
             }' -f owner="${{ github.repository_owner }}" -f name="${{ github.event.repository.name }}" --jq '.data.repository.id')
 
-          # Get Issue Node ID
+          # Get Issue Node ID (converting issue number to integer)
           ISSUE_ID=$(gh api graphql -f query='
             query($owner:String!, $name:String!, $number:Int!) {
               repository(owner:$owner, name:$name) {
@@ -113,7 +113,7 @@ jobs:
                   id
                 }
               }
-            }' -f owner="${{ github.repository_owner }}" -f name="${{ github.event.repository.name }}" -f number=${{ github.event.issue.number }} --jq '.data.repository.issue.id')
+            }' -f owner="${{ github.repository_owner }}" -f name="${{ github.event.repository.name }}" -F number=${{ github.event.issue.number }} --jq '.data.repository.issue.id')
 
           # Create branch using GraphQL API to properly link it to the issue
           gh api graphql -f query='
