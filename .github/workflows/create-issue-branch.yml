@@ -92,23 +92,27 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Create and push branch
           BRANCH_NAME="${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
-          git checkout -b "$BRANCH_NAME"
-          git push origin "$BRANCH_NAME"
+
+          # Create branch using GraphQL API to properly link it to the issue
+          gh api graphql -f query='
+            mutation ($repositoryId: ID!, $issueId: ID!, $name: String!) {
+              createLinkedBranch(input: {repositoryId: $repositoryId, issueId: $issueId, name: $name}) {
+                linkedBranch {
+                  id
+                }
+              }
+            }' \
+            -f repositoryId="$(gh api repos/${{ github.repository }} --jq .node_id)" \
+            -f issueId="$(gh api issues/${{ github.event.issue.number }} --jq .node_id)" \
+            -f name="$BRANCH_NAME"
+
+          # Fetch the new branch
+          git fetch origin "$BRANCH_NAME"
+          git checkout "$BRANCH_NAME"
 
           # Create comment on issue linking the branch
           gh issue comment "${{ github.event.issue.number }}" --body "Created branch [\`$BRANCH_NAME\`](https://github.com/${{ github.repository }}/tree/$BRANCH_NAME) for this issue."
-
-          # Get the SHA of the new branch
-          SHA=$(git rev-parse HEAD)
-
-          # Add issue link to branch description with SHA
-          gh api \
-            --method PATCH \
-            "/repos/${{ github.repository }}/git/refs/heads/$BRANCH_NAME" \
-            -f sha="$SHA" \
-            -f description="Branch for #${{ github.event.issue.number }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
