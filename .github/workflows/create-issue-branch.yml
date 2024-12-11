@@ -83,30 +83,30 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Configure Git and Create Branch
-      #   if: steps.prefix.outputs.prefix != ''
-      #   run: |
-      #     git config --global user.name "github-actions[bot]"
-      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
-      #     git checkout -b "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
-      #     git push origin "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Issue Branch
+      - name: Configure Git and Create Branch
         if: steps.prefix.outputs.prefix != ''
-        uses: robvanderleek/create-issue-branch@main
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
+          git push origin "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
         env:
-          number: ${{ github.event.issue.number }}
-          title: ${{ github.event.issue.title }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          autoCloseIssue: true
-          autoLinkIssue: true
-          branchName: '${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}'
-          defaultBranch: ${{ steps.prefix.outputs.source }}
-          # autoDeleteBranch: true
-          # commentMessage: 'Branch ${branchName} created for issue: ${issue.title}'
+
+      # - name: Create Issue Branch
+      #   if: steps.prefix.outputs.prefix != ''
+      #   uses: robvanderleek/create-issue-branch@main
+      #   env:
+      #     number: ${{ github.event.issue.number }}
+      #     title: ${{ github.event.issue.title }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     autoCloseIssue: true
+      #     autoLinkIssue: true
+      #     branchName: '${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}'
+      #     defaultBranch: ${{ steps.prefix.outputs.source }}
+      #     # autoDeleteBranch: true
+      #     # commentMessage: 'Branch ${branchName} created for issue: ${issue.title}'
 
           # branches:
           #   - label: enhancement
