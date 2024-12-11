@@ -81,48 +81,31 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ steps.prefix.outputs.source }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Configure Git and Create Branch
-      #   if: steps.prefix.outputs.prefix != ''
-      #   run: |
-      #     git config --global user.name "github-actions[bot]"
-      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
-      #     git checkout -b "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
-      #     git push origin "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Issue Branch
+      - name: Configure Git and Create Branch
         if: steps.prefix.outputs.prefix != ''
-        uses: robvanderleek/create-issue-branch@main
-        env:
-          number: ${{ github.event.issue.number }}
-          title: ${{ github.event.issue.title }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          autoCloseIssue: true
-          autoLinkIssue: true
-          branchName: '${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}'
-          defaultBranch: ${{ steps.prefix.outputs.source }}
-          # autoDeleteBranch: true
-          # commentMessage: 'Branch ${branchName} created for issue: ${issue.title}'
+        run: |
+          # Configure Git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # branches:
-          #   - label: enhancement
-          #     name: dev
-          #   - label: bug
-          #     name: staging
-          # branches:
-          #   - label:
-          #       - enhancement
-          #       - docs
-          #     name: docs
-          #   - label: enhancement
-          #     name: dev
-          #     prefix: feature/
-          #   - label:
-          #       - bug
-          #     name: dev
+          # Create and push branch
+          BRANCH_NAME="${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
+          git checkout -b "$BRANCH_NAME"
+          git push origin "$BRANCH_NAME"
+
+          # Create comment on issue linking the branch
+          gh issue comment "${{ github.event.issue.number }}" --body "Created branch [\`$BRANCH_NAME\`](https://github.com/${{ github.repository }}/tree/$BRANCH_NAME) for this issue."
+
+          # Add issue link to branch description (optional)
+          gh api \
+            --method POST \
+            "/repos/${{ github.repository }}/git/refs/heads/$BRANCH_NAME" \
+            -f description="Branch for #${{ github.event.issue.number }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
