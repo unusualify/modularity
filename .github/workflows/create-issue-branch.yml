@@ -100,10 +100,14 @@ jobs:
           # Create comment on issue linking the branch
           gh issue comment "${{ github.event.issue.number }}" --body "Created branch [\`$BRANCH_NAME\`](https://github.com/${{ github.repository }}/tree/$BRANCH_NAME) for this issue."
 
-          # Add issue link to branch description (optional)
+          # Get the SHA of the new branch
+          SHA=$(git rev-parse HEAD)
+
+          # Add issue link to branch description with SHA
           gh api \
-            --method POST \
+            --method PATCH \
             "/repos/${{ github.repository }}/git/refs/heads/$BRANCH_NAME" \
+            -f sha="$SHA" \
             -f description="Branch for #${{ github.event.issue.number }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
