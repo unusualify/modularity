@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   create_branch:
@@ -81,48 +82,61 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ steps.prefix.outputs.source }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Configure Git and Create Branch
-      #   if: steps.prefix.outputs.prefix != ''
-      #   run: |
-      #     git config --global user.name "github-actions[bot]"
-      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
-      #     git checkout -b "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
-      #     git push origin "${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Issue Branch
+      - name: Configure Git and Create Branch
         if: steps.prefix.outputs.prefix != ''
-        uses: robvanderleek/create-issue-branch@main
-        env:
-          number: ${{ github.event.issue.number }}
-          title: ${{ github.event.issue.title }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          autoCloseIssue: true
-          autoLinkIssue: true
-          branchName: '${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}'
-          defaultBranch: ${{ steps.prefix.outputs.source }}
-          # autoDeleteBranch: true
-          # commentMessage: 'Branch ${branchName} created for issue: ${issue.title}'
+        run: |
+          # Configure Git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # branches:
-          #   - label: enhancement
-          #     name: dev
-          #   - label: bug
-          #     name: staging
-          # branches:
-          #   - label:
-          #       - enhancement
-          #       - docs
-          #     name: docs
-          #   - label: enhancement
-          #     name: dev
-          #     prefix: feature/
-          #   - label:
-          #       - bug
-          #     name: dev
+          BRANCH_NAME="${{ steps.prefix.outputs.prefix }}${{ steps.branch_name.outputs.branch }}"
+
+          # Get the SHA of the source branch
+          SOURCE_SHA=$(git rev-parse ${{ steps.prefix.outputs.source }})
+
+          # Get Repository Node ID
+          REPO_ID=$(gh api graphql -f query='
+            query($owner:String!, $name:String!) {
+              repository(owner:$owner, name:$name) {
+                id
+              }
+            }' -f owner="${{ github.repository_owner }}" -f name="${{ github.event.repository.name }}" --jq '.data.repository.id')
+
+          # Get Issue Node ID (converting issue number to integer)
+          ISSUE_ID=$(gh api graphql -f query='
+            query($owner:String!, $name:String!, $number:Int!) {
+              repository(owner:$owner, name:$name) {
+                issue(number:$number) {
+                  id
+                }
+              }
+            }' -f owner="${{ github.repository_owner }}" -f name="${{ github.event.repository.name }}" -F number=${{ github.event.issue.number }} --jq '.data.repository.issue.id')
+
+          # Create branch using GraphQL API to properly link it to the issue
+          gh api graphql -f query='
+            mutation ($repositoryId: ID!, $issueId: ID!, $name: String!, $oid: GitObjectID!) {
+              createLinkedBranch(input: {repositoryId: $repositoryId, issueId: $issueId, name: $name, oid: $oid}) {
+                linkedBranch {
+                  id
+                }
+              }
+            }' \
+            -f repositoryId="$REPO_ID" \
+            -f issueId="$ISSUE_ID" \
+            -f name="$BRANCH_NAME" \
+            -f oid="$SOURCE_SHA"
+
+          # Fetch the new branch
+          git fetch origin "$BRANCH_NAME"
+          git checkout "$BRANCH_NAME"
+
+          # Create comment on issue linking the branch
+          gh issue comment "${{ github.event.issue.number }}" --body "Created branch [\`$BRANCH_NAME\`](https://github.com/${{ github.repository }}/tree/$BRANCH_NAME) for this issue."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 

@@ -1,18 +1,10 @@
 name: "⚡ Performance Issue"
 description: Create a new ticket for a performance issue or optimization request
-title: "⚡ [PERF]: ${{ env.ISSUE_TITLE }}"
+title: "⚡ [PERF]: "
 labels: [
   "performance"
 ]
 body:
-  - type: input
-    id: title
-    attributes:
-      label: "Performance Issue Title"
-      description: Provide a clear title for the performance issue (this will be used for branch naming)
-      placeholder: e.g., slow page load time on dashboard
-    validations:
-      required: true
   - type: textarea
     id: description
     attributes:

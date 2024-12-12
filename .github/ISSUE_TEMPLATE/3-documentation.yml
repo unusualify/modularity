@@ -1,22 +1,14 @@
 name: "📚 Documentation"
 description: Create a new ticket for documentation
-title: "📚 [DOCS]: ${{ env.ISSUE_TITLE }}"
+title: "📚 [DOCS]: "
 labels: [
   "documentation"
 ]
 body:
-  - type: input
-    id: title
-    attributes:
-      label: "Documentation Title"
-      description: Provide a clear title for the documentation request (this will be used for branch naming)
-      placeholder: e.g., add API authentication docs
-    validations:
-      required: true
   - type: textarea
-    id: summary
+    id: description
     attributes:
-      label: "Summary"
+      label: "Description"
       description: Provide a brief explanation of what documentation is needed
       placeholder: Describe what documentation needs to be added or updated
     validations:

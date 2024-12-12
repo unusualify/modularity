@@ -1,19 +1,11 @@
 name: "🐛 Bug Report"
 description: Create a new ticket for a bug.
 # title: "🐛 [BUG] - <title>"
-title: "🐛 [BUG]: ${{ env.ISSUE_TITLE }}"
+title: "🐛 [BUG]: "
 labels: [
   "bug"
 ]
 body:
-  - type: input
-    id: title
-    attributes:
-      label: "Bug Title"
-      description: Provide a clear title for the bug (this will be used for branch naming)
-      placeholder: e.g., fix user authentication
-    validations:
-      required: true
   - type: textarea
     id: description
     attributes:
@@ -84,7 +76,7 @@ body:
       description: Please enter your GitHub URL to provide a reproduction of the issue
       placeholder: ex. https://github.com/USERNAME/REPO-NAME
     validations:
-      required: true
+      required: false
   - type: dropdown
     id: browsers
     attributes:

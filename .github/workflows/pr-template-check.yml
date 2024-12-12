@@ -1,0 +1,99 @@
+name: PR Template Checker Experimental
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get PR Commits
+        id: get-commits
+        run: |
+          # Get all commits in PR excluding merge commits
+          COMMITS=$(git log --no-merges ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} --pretty=format:"%s")
+          echo "commits<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Check Conventional Commits
+        id: conventional-commits
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+          ignoreLabels: |
+            bot
+            merge
+
+      - name: Update PR Template Checklist
+        if: success()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const body = pr.body;
+
+            // Get commits from previous step
+            const commits = process.env.commits ? process.env.commits.split('\n').filter(Boolean) : [];
+
+            // Parse commit messages (excluding merge commits)
+            const commitPattern = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+/;
+            const conventionalCommits = commits.filter(commit =>
+              !commit.startsWith('Merge') && commitPattern.test(commit)
+            );
+
+            let updatedBody = body;
+
+            // Check if all non-merge commits follow convention
+            if (conventionalCommits.length === commits.length) {
+              updatedBody = updatedBody.replace('- [ ] My code follows the code style of this project.', '- [x] My code follows the code style of this project.');
+
+              // Update type of changes based on commit types
+              conventionalCommits.forEach(commit => {
+                const type = commit.split(':')[0];
+                const checkbox = `- [ ] ${type}:`;
+                const checkedBox = `- [x] ${type}:`;
+                updatedBody = updatedBody.replace(checkbox, checkedBox);
+              });
+            }
+
+            // Check for docs changes
+            const hasDocsChanges = pr.changed_files.some(file =>
+              file.filename.includes('docs') ||
+              file.filename.endsWith('.md') ||
+              file.filename.endsWith('.mdx')
+            );
+            if (hasDocsChanges) {
+              updatedBody = updatedBody.replace('- [ ] My change requires a change to the documentation.', '- [x] My change requires a change to the documentation.');
+              updatedBody = updatedBody.replace('- [ ] I have updated the documentation accordingly.', '- [x] I have updated the documentation accordingly.');
+            }
+
+            echo "//Body"
+            echo "$updatedBody"
+
+
+            // Update PR body
+            # await github.rest.pulls.update({
+            #   owner: context.repo.owner,
+            #   repo: context.repo.repo,
+            #   pull_number: context.issue.number,
+            #   body: updatedBody
+            # });
