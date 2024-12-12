@@ -1,18 +1,10 @@
 name: "❓ Question"
 description: Create a new ticket for a question
-title: "❓ [QUESTION]: ${{ env.ISSUE_TITLE }}"
+title: "❓ [QUESTION]: "
 labels: [
   "question"
 ]
 body:
-  - type: input
-    id: title
-    attributes:
-      label: "Question Title"
-      description: Provide a clear title for your question
-      placeholder: e.g., how to implement feature X
-    validations:
-      required: true
   - type: textarea
     id: question
     attributes:
