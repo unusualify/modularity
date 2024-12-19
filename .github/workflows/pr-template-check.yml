@@ -86,8 +86,8 @@ jobs:
               updatedBody = updatedBody.replace('- [ ] I have updated the documentation accordingly.', '- [x] I have updated the documentation accordingly.');
             }
 
-            echo "//Body"
-            echo "$updatedBody"
+            console.log(updatedBody)
+            console.log(context.issue)
 
 
             // Update PR body
