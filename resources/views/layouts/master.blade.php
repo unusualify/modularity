@@ -88,6 +88,12 @@
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.config = {
                 test: false,
+                appName: '{{ env('APP_NAME') }}',
+                appEmail: '{{ env('APP_EMAIL') }}',
+                appEnv: '{{ env('APP_ENV') }}',
+                appDebug: '{{ env('APP_DEBUG') }}',
+                systemPackageVersions: {!! json_encode($SYSTEM_PACKAGE_VERSIONS) !!},
+
                 currentUser: {!! json_encode($currentUser) !!},
                 profileMenu: {!! json_encode($navigation['profileMenu']) !!},
                 sidebarOptions: {!! json_encode(unusualConfig('ui_settings.sidebar')) !!},
