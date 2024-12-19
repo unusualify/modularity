@@ -173,7 +173,7 @@ export function setI18nLocale (i18n, locale) {
 
 export async function loadLocaleMessages (i18n, endpoint) {
 
-  if(TRANSLATIONS){
+  if (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS) {
     for (const locale in TRANSLATIONS) {
       loadLocaleMessage(i18n, locale, TRANSLATIONS[locale])
     }
