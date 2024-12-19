@@ -372,6 +372,12 @@ class BaseServiceProvider extends ServiceProvider
         view()->composer('*', function ($view) {
             $view->with('BASE_KEY', $this->baseKey);
             $view->with('MODULARITY_VIEW_NAMESPACE', $this->baseKey);
+            $view->with('SYSTEM_PACKAGE_VERSIONS', [
+                'APP_VERSION' => env('APP_VERSION', 'v0.0.1'),
+                'MODULARITY_VERSION' => env('MODULARITY_VERSION', 'Not Found'),
+                'PAYABLE_VERSION' => env('PAYABLE_VERSION', 'Not Found'),
+                'SNAPSHOT_VERSION' => env('SNAPSHOT_VERSION', 'Not Found'),
+            ]);
         });
 
         if (config($this->baseKey . '.enabled.users-management')) {

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -109,6 +110,7 @@ if (! function_exists('builtInModularityThemes')) {
         });
     }
 }
+
 if (! function_exists('customModularityThemes')) {
 
     function customModularityThemes()
@@ -121,5 +123,35 @@ if (! function_exists('customModularityThemes')) {
 
             return [$info['filename'] => Str::headline($info['filename'])];
         });
+    }
+}
+
+if (! function_exists('get_translations')) {
+
+    function get_translations() : array
+    {
+        $cache_key = 'modularity-languages';
+
+        $cache = Cache::store('file');
+
+        if ($cache->has($cache_key) && false) {
+            return $cache->get($cache_key);
+        }
+
+        $translations = app('translator')->getTranslations();
+
+        $cache->set($cache_key, json_encode($translations), 600);
+
+        return $translations;
+    }
+}
+
+if (! function_exists('clear_translations')) {
+
+    function clear_translations() : void
+    {
+        $cache_key = 'modularity-languages';
+
+        Cache::forget($cache_key);
     }
 }

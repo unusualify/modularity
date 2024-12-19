@@ -1,6 +1,5 @@
 import colors from 'vuetify/util/colors'
 
-console.log(colors)
 export default {
   dark: false,
   colors: {

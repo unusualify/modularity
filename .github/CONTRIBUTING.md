@@ -10,7 +10,7 @@ Then add your fork as a local project:
 git clone https://github.com/unusualify/modularity.git
 
 # Using SSH
-git clone git@github.com:stevemao/github-issue-templates.git
+git clone git@github.com:unusualify/modularity.git
 ```
 
 > [Which remote URL should be used ?](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories)
@@ -31,7 +31,7 @@ git remote add upstream https://github.com/unusualify/modularity.git
 
 # Using SSH
 git remote add fork git@github.com:YOUR-USERNAME/modularity.git
-git remote add upstream git@github.com/unusualify/modularity.git
+git remote add upstream git@github.com:unusualify/modularity.git
 ```
 
 You can now verify that you have your two git remotes:
@@ -48,13 +48,14 @@ git pull upstream main
 ```
 
 ## Choose a base branch
-Before starting development, you need to know which branch to base your modifications/additions on. When in doubt, use master.
+Before starting development, you need to know which branch to base your modifications/additions on. When in doubt, use main.
 
 | Type of change                |           | Branches              |
 | :------------------           |:---------:| ---------------------:|
+| Bug fixes                     |           | `dev`              |
+| New features                  |           | `dev`              |
+| Hot fixes                     |           | `main`              |
 | Documentation                 |           | `main`              |
-| Bug fixes                     |           | `main`              |
-| New features                  |           | `main`              |
 | New issues models             |           | `YOUR-USERNAME:patch` |
 
 ```sh
