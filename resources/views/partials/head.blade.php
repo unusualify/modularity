@@ -24,8 +24,11 @@
     {{-- <link href="{{ unusualMix('chunk-vendors.css' )}}" rel="stylesheet" crossorigin/> --}}
 @endunless
 
-
+<script>
+    const TRANSLATIONS = @json(get_translations());
+</script>
 {{-- @yield('pre-scripts') --}}
 @stack('head_css')
 @stack('head_js')
+
 

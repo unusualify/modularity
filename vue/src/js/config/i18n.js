@@ -172,22 +172,13 @@ export function setI18nLocale (i18n, locale) {
 }
 
 export async function loadLocaleMessages (i18n, endpoint) {
-  // const response = await axios.get('/api/languages')
-  // for (const locale in response.data) {
-  //   loadLocaleMessage(i18n, locale, response.data[locale])
-  // }
-  if(!store.state.config.test){
-    try {
-      axios.get(endpoint ?? '/api/languages')
-        .then((response) => {
-          for (const locale in response.data) {
-            loadLocaleMessage(i18n, locale, response.data[locale])
-          }
-        })
-    } catch (error) {
-      __log('api.languages error', error)
+
+  if(TRANSLATIONS){
+    for (const locale in TRANSLATIONS) {
+      loadLocaleMessage(i18n, locale, TRANSLATIONS[locale])
     }
   }
+
 }
 export function loadLocaleMessage (i18n, locale, messages) {
   // set locale and locale message
