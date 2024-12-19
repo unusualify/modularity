@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 if (! function_exists('lowerName')) {
@@ -515,5 +516,42 @@ if (! function_exists('merge_url_query')) {
         $finalUrl = $newQueryString ? $mainUrl . '?' . $newQueryString : $mainUrl;
 
         return $finalUrl;
+    }
+}
+
+if (! function_exists('get_package_version')) {
+    function get_package_version($package = null)
+    {
+        $tag = trim(shell_exec('cd ' . base_path() . ' && git describe --tags --abbrev=0'));
+
+        if ($package) {
+            $composer_lock = file_exists(base_path('composer-dev.lock')) && !app()->isProduction()
+                ? 'composer-dev.lock'
+                : 'composer.lock';
+
+            $tag = trim(shell_exec('cat ' . $composer_lock . ' | grep -A 5 "\\"name\\": \\"' . $package . '\\"" | grep version | head -n 1 | sed \'s/.*: "\\(.*\\)",/\\1/\''));
+        }
+
+        return $tag;
+    }
+}
+
+if (! function_exists('set_env_file')) {
+    function set_env_file($variable, $value)
+    {
+        // Read the current .env file
+        $envFile = base_path('.env');
+        $envContents = File::get($envFile);
+
+        // Replace the APP_VERSION line
+        $envContents = preg_replace(
+            '/' . $variable . '=.*/',
+            $variable . '=' . $value,
+            $envContents
+        );
+
+        // Write the modified contents back to .env
+        File::put($envFile, $envContents);
+
     }
 }
