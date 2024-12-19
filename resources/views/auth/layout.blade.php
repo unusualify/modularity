@@ -2,14 +2,6 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale() ) }}">
     <head>
         @include("{$MODULARITY_VIEW_NAMESPACE}::partials.head")
-
-        {{-- @if( app()->isProduction() )
-            <link href="{{ unusualMix('core-auth.js') }}" rel="preload" as="script" crossorigin />
-        @else
-            <script src="{{ unusualMix('chunk-common.js')}}" defer></script>
-            <script src="{{ unusualMix('chunk-vendors.js') }}" defer></script>
-            <script type="text/javascript" src="{{ unusualMix('core-auth.js') }}" defer></script>
-        @endif --}}
         {{
             ModularityVite::useHotFile(public_path('modularity.hot'))->withEntryPoints(['src/js/core-auth.js'])
         }}
