@@ -97,7 +97,11 @@
                 currentUser: {!! json_encode($currentUser) !!},
                 profileMenu: {!! json_encode($navigation['profileMenu']) !!},
                 sidebarOptions: {!! json_encode(unusualConfig('ui_settings.sidebar')) !!},
-                secondarySidebarOptions : {!! json_encode(unusualConfig('ui_settings.secondarySidebar')) !!}
+                secondarySidebarOptions : {!! json_encode(unusualConfig('ui_settings.secondarySidebar')) !!},
+
+                profileRoute: '{{ route(Route::hasAdmin('profile.update')) }}',
+                profileShortcutModel: {!! json_encode($profileShortcutModel) !!},
+                profileShortcutSchema: {!! json_encode($profileShortcutSchema) !!}
             },
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.medias = {};

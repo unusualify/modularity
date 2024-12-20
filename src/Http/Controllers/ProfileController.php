@@ -215,17 +215,18 @@ class ProfileController extends BaseController
         $id = last($params) ?: $this->request->get('id');
 
         $item = $this->repository->getById($id);
-        // $item = auth()->user();
-        // dd($item);
-        // $input = $this->request->all();
 
         $formRequest = $this->validateFormRequest(
             getFormDraft('user') + getFormDraft('user_password')
         );
 
-        // dd($formRequest);
+        $schema = null;
 
-        $this->repository->update($id, $formRequest->all());
+        if (array_key_exists('avatar', $formRequest->all())) {
+            $schema = getFormDraft('profile_shortcut');
+        }
+
+        $this->repository->update($id, $formRequest->all(), $schema);
 
         // $item->update($formRequest->all());
 
@@ -233,6 +234,19 @@ class ProfileController extends BaseController
 
         return $this->respondWithSuccess(___('messages.save-success'));
 
+    }
+
+    public function display()
+    {
+        $user = auth()->user();
+
+        $data = get_user_profile($user);
+
+        if($this->request->ajax()){
+            return response()->json($data);
+        }
+
+        return view('modularity::layouts.profile', $data);
     }
 
     /**

@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 
 class AuthorizationMiddleware
@@ -42,7 +43,21 @@ class AuthorizationMiddleware
                 // 'hasRestorable' => $user->isSuperAdmin(),
                 // 'hasBulkable' => $user->isSuperAdmin(),
             ];
-            // setActiveMenuItem($configuration['sidebar'], $configuration['current_url']);
+
+            $defaultInput = (array) Config::get(unusualBaseKey() . '.default_input');
+            $user = auth()->user();
+            $userRepository = app()->make(\Modules\SystemUser\Repositories\UserRepository::class);
+
+            $profileShortcutDraft = getFormDraft('profile_shortcut');
+
+            $profileShortcutSchema = collect($profileShortcutDraft)->mapWithKeys(function ($v, $k) use($defaultInput) {
+                return [$k => configure_input(hydrate_input(array_merge($defaultInput, $v)))];
+            })->toArray();
+
+            $profileShortcutModel = $userRepository->getFormFields($user, $profileShortcutSchema);
+
+            $view->with('profileShortcutModel', $profileShortcutModel);
+            $view->with('profileShortcutSchema', $profileShortcutSchema);
             $view->with('authorization', $authorization);
         });
 

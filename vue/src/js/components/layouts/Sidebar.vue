@@ -62,10 +62,47 @@
           :subtitle="$store.getters.currentUser.email"
           class="ue-sidebar__info-item"
         >
-          <template v-slot:prependxxxx>
-            <v-avatar class="" color="primary">
-              <ue-svg-icon class="ue-sidebar__logo" symbol="main-logo-dark"></ue-svg-icon>
-            </v-avatar>
+          <template v-slot:prepend="prependScope">
+            <v-dialog ref="profileDialog" width="500">
+              <template v-slot:activator="{ props }">
+                <v-avatar v-bind="props" :image="$store.getters.currentUser.avatar_url"/>
+              </template>
+              <template v-slot:default="{ isActive }">
+                <v-card>
+                  <v-card-title>
+                    <ue-title padding="0" :text="$t('Upload Profile Image')" color="grey-darken-5" transform="none" align="center" justify="space-between">
+                      <template #right>
+                        <v-btn icon="$close" variant="plain" color="grey-darken-5" size="default" @click="isActive.value = false"/>
+                      </template>
+                    </ue-title>
+                    <v-divider/>
+                  </v-card-title>
+                  <v-card-text>
+                    <div class="d-flex">
+                      <div class="my-3 flex-grow-0">
+                        <v-avatar class="my-aut" :image="$store.getters.currentUser.avatar_url" size="100"/>
+                      </div>
+                      <ue-form
+                        class="flex-grow-1 pl-6"
+                        :schema="$store.state.config.profileShortcutSchema"
+                        v-model="$store.state.config.profileShortcutModel"
+                        :action-url="$store.state.config.profileRoute"
+
+                        :async="true"
+                        :hasSubmit="true"
+                        no-default-form-padding
+                        is-editing
+                        buttonText="fields.save"
+
+                        @submitted="profileFormSubmitted"
+
+                      >
+                      </ue-form>
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </template>
+            </v-dialog>
           </template>
           <template v-slot:append>
             <v-btn
@@ -76,6 +113,7 @@
             ></v-btn>
           </template>
         </v-list-item>
+
         <v-expand-transition>
           <ue-navigation-group
             v-if="profileMenuOpen"
@@ -85,6 +123,7 @@
           >
           </ue-navigation-group>
         </v-expand-transition>
+
         <ue-logout-modal :csrf="$csrf()">
           <template v-slot:activator="{ props }">
             <v-tooltip text="Logout" location="top" :disabled="!(rail && !isHoverable)">
@@ -100,8 +139,8 @@
           </template>
         </ue-logout-modal>
 
-
-        <v-dialog max-width="500" v-if="$store.getters.versions && !$store.getters.isClient">
+        <!-- About Dialog -->
+        <v-dialog ref="aboutDialog" max-width="500" v-if="$store.getters.versions && !$store.getters.isClient">
           <template v-slot:activator="{ props: activatorProps }">
             <v-list-item prepend-icon="mdi-information" v-bind="activatorProps">
               {{ $t("About") }}
@@ -138,6 +177,8 @@
             </v-card>
           </template>
         </v-dialog>
+
+        <!-- Bottom Slot -->
         <slot name="bottom"> </slot>
       </v-list>
       <!-- <slot name="profileMenu">
@@ -248,7 +289,7 @@
 <script>
 import { computed } from 'vue';
 import { useSidebar } from '@/hooks';
-
+import { CONFIG } from '@/store/mutations';
 export default {
   provide() {
     return {
@@ -278,6 +319,16 @@ export default {
       profileMenuOpen: false,
     };
   },
+  methods: {
+    profileFormSubmitted(res) {
+
+      if (typeof URLS !== 'undefined' && URLS) {
+        axios.get(URLS.profileShow).then(res => {
+          this.$store.commit(CONFIG.SET_PROFILE_DATA, res.data)
+        })
+      }
+    }
+  }
 };
 </script>
 

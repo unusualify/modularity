@@ -15,6 +15,10 @@ const state = {
   appEnv: window[import.meta.env.VUE_APP_NAME]?.STORE.config.appEnv ?? '',
   appDebug: window[import.meta.env.VUE_APP_NAME]?.STORE.config.appDebug ?? '',
   appEmail: window[import.meta.env.VUE_APP_NAME]?.STORE.config.appEmail ?? '',
+
+  profileShortcutModel: window[import.meta.env.VUE_APP_NAME]?.STORE.config.profileShortcutModel ?? {},
+  profileShortcutSchema: window[import.meta.env.VUE_APP_NAME]?.STORE.config.profileShortcutSchema ?? {},
+  profileRoute: window[import.meta.env.VUE_APP_NAME]?.STORE.config.profileRoute ?? '',
 }
 
 // getters
@@ -42,6 +46,9 @@ const getters = {
 }
 
 const mutations = {
+  [CONFIG.SET_PROFILE_DATA] (state, data) {
+    state.currentUser = data
+  },
   [CONFIG.SIDEBAR_TOGGLE] (state) {
     state.sidebarStatus = !state.sidebarStatus; // Mutation to toggle sidebar
   },

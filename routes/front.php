@@ -36,6 +36,7 @@ Route::group(['prefix' => 'api'], function () {
         Route::apiResource('languages', LanguageController::class, ['only' => 'index']);
     });
 });
+
 Route::get('/', function (\Illuminate\Http\Request $request) {
     return redirect()->route(Route::hasAdmin('login.form'));
 })->name('modularity.home');
