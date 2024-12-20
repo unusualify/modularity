@@ -240,20 +240,7 @@ trait ManageForm
      */
     protected function configureInput($input)
     {
-        return collect($input)
-            ->mapWithKeys(function ($v, $k) {
-
-                if ($k == 'label'
-                    && ($translation = ___("form-labels.{$v}")) !== "form-labels.{$v}"
-                ) {
-                    $v = $translation;
-                }
-                // if($k == 'label')
-                //     $v = ___("form-labels.{$v}");
-
-                return is_numeric($k) ? [$v => true] : [$k => $v];
-            })
-            ->toArray();
+        return configure_input($input);
     }
 
     /**
