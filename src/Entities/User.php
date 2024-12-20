@@ -11,13 +11,14 @@ use Illuminate\Support\Facades\Session;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Unusualify\Modularity\Database\Factories\UserFactory;
+use Unusualify\Modularity\Entities\Traits\HasFileponds;
 use Unusualify\Modularity\Entities\Traits\HasScopes;
 use Unusualify\Modularity\Entities\Traits\IsTranslatable;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, HasRoles, HasScopes, IsTranslatable, ModelHelpers, Notifiable;
+    use HasApiTokens, HasFactory, HasRoles, HasScopes, IsTranslatable, ModelHelpers, Notifiable, HasFileponds;
 
     /**
      * The attributes that are mass assignable.
