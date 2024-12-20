@@ -3,6 +3,8 @@
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Entities\Model;
+use Unusualify\Modularity\Hydrates\InputHydrator;
 
 if (! function_exists('lowerName')) {
     function lowerName($string)
@@ -553,5 +555,49 @@ if (! function_exists('set_env_file')) {
         // Write the modified contents back to .env
         File::put($envFile, $envContents);
 
+    }
+}
+
+if (! function_exists('configure_input')) {
+    function configure_input(array $input)
+    {
+        return collect($input)
+            ->mapWithKeys(function ($v, $k) {
+                if ($k == 'label'
+                    && ($translation = ___("form-labels.{$v}")) !== "form-labels.{$v}"
+                ) {
+                    $v = $translation;
+                }
+
+                return is_numeric($k) ? [$v => true] : [$k => $v];
+            })
+            ->toArray();
+    }
+}
+
+if (! function_exists('hydrate_input')) {
+    function hydrate_input(array $input, $module = null)
+    {
+        $hydrator = new InputHydrator($input, $module);
+
+        return $hydrator->hydrate();
+    }
+}
+
+if (! function_exists('get_user_profile')) {
+    /**
+     * get_user_profile
+     *
+     * @param  Model $user
+     * @return array
+     */
+    function get_user_profile($user)
+    {
+        return $user->only(['name', 'email']) + [
+            'avatar_url' => $user->fileponds()
+                ->where('role', 'avatar')
+                ->first()
+                ?->mediableFormat()['source'] ?? '/vendor/modularity/jpg/anonymous.jpg',
+        ];
     }
 }
