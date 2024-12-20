@@ -11,6 +11,7 @@ use Unusualify\Modularity\Http\ViewComposers\CurrentUser;
 use Unusualify\Modularity\Http\ViewComposers\FilesUploaderConfig;
 use Unusualify\Modularity\Http\ViewComposers\Localization;
 use Unusualify\Modularity\Http\ViewComposers\MediasUploaderConfig;
+use Unusualify\Modularity\Http\ViewComposers\Urls;
 use Unusualify\Modularity\Modularity;
 use Unusualify\Modularity\Services\View\UNavigation;
 use Unusualify\Modularity\Support\FileLoader;
@@ -379,6 +380,8 @@ class BaseServiceProvider extends ServiceProvider
                 'SNAPSHOT_VERSION' => env('SNAPSHOT_VERSION', 'Not Found'),
             ]);
         });
+
+        view()->composer('*', Urls::class);
 
         if (config($this->baseKey . '.enabled.users-management')) {
             View::composer(['admin.*', "$this->baseKey::*"], CurrentUser::class);
