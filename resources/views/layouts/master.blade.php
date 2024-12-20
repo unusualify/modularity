@@ -27,7 +27,6 @@
             $navigation ??= [];
             $impersonation ??= [];
             $authorization ??= [];
-            $currentUser = $currentUser ? $currentUser->only(['name', 'email']) : [];
 
             $_mainConfiguration = [
                 'navigation' => $navigation,
