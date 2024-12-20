@@ -497,14 +497,7 @@ trait ManageForm
         }
 
         if (isset($input['type'])) {
-            $hydrateClass = "Unusualify\Modularity\Hydrates\Inputs\\" . studlyName($input['type']) . 'Hydrate';
-
-            if (@class_exists($hydrateClass)) {
-                $input = App::make($hydrateClass, [
-                    'input' => $input,
-                    'module' => $this->module ?? null,
-                ])->render();
-            }
+            $input = hydrate_input($input, $this->module ?? null);
 
             if (in_array($input['type'], ['input-repeater']) && isset($input['schema'])) {
                 $input['schema'] = $this->createFormSchema($input['schema']);
