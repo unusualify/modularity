@@ -10,6 +10,7 @@
 
 <script>
     const TRANSLATIONS = @json(get_translations());
+    const URLS = @json($urls);
 </script>
 
 @stack('head_css')
