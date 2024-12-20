@@ -1,20 +1,27 @@
 <template>
-  <v-input v-model="input"
-    hide-details="auto">
+  <v-input
+    ref="VInput"
+    v-model="input"
+    hide-details="auto"
+  >
     <template v-slot:default="defaultSlot">
-      <div class="fileField">
-        <FilePond
-          ref="pond"
-          :id="key"
-          :key="key"
-          v-bind="$lodash.omit($bindAttributes(), ['rules'])"
-          :name="name"
-          @init="init"
-          :files="files"
-          @processfile="postProcess"
-          @removefile="removeFile"
-          :server="server"
-        />
+      <div class="w-100">
+        <ue-title v-if="label" :text="label" transform="none" padding="a-0" weight="regular" color="grey-darken-5"/>
+        <div class="fileField">
+          <FilePond
+            ref="pond"
+            :id="key"
+            :key="key"
+            v-bind="$lodash.omit($bindAttributes(), ['rules'])"
+            :name="name"
+
+            :server="server"
+            @init="init"
+            @processfile="postProcess"
+            @removefile="removeFile"
+
+          />
+        </div>
       </div>
     </template>
   </v-input>
@@ -60,26 +67,25 @@
     },
     data() {
       return {
-        files: isArray(this.modelValue) ? this.modelValue.map(function (file) {
-            return {
-              // source:  file.source ?? `${file.folder_name}`,
-              source:  file.source ?? `${this.endPoints.load}${file.folder_name}`,
-              options: {
-                type : `${file.type ?? 'local'}`,
-                // file initial metadata
-                // metadata: {
-                //     date: '2018-10-5T12:00',
-                // },
-              }
-            }
-          }) : []
+        // files: isArray(this.modelValue) ? this.modelValue.map(function (file) {
+        //     return {
+        //       source:  file.source ?? `${this.endPoints.load}${file.uuid}`,
+        //       options: {
+        //         type : `${file.type ?? 'local'}`,
+        //         // file initial metadata
+        //         // metadata: {
+        //         //     date: '2018-10-5T12:00',
+        //         // },
+        //       }
+        //     }
+        //   }) : [],
       }
     },
     methods:{
       postProcess : function(error, file){
         if(!error){
           this.input = this.input.concat({
-            folder_name: file.serverId,
+            uuid: file.serverId,
             file_name: file.filename,
             source: `${this.endPoints.load}${file.serverId}`
           });
@@ -88,32 +94,30 @@
         }
       },
       removeFile: function(error, file) {
-        const uuid = file.serverId?.replace(`/${file.filename}`, '') ?? file.folder_name;
+        const uuid = file.filename ?? file.serverId?.replace(`/${file.filename}`, '') ?? file.uuid;
 
-        this.input = this.input.filter((asset) => asset.folder_name != uuid)
+        const newInput = this.input.filter((asset) => asset.uuid != uuid);
+
+        this.input = newInput
       },
       init() {
-        // const files = isArray(this.modelValue) ? this.modelValue.map(function (file) {
-        //       return {
-        //         source:  file.source ?? `${file.folder_name}/${file.file_name}`,
-        //         options: {
-        //           type : `${file.type ?? 'local'}`,
+        const files = isArray(this.input) ? this.input.map(function (file) {
+              return {
+                source:  file.source ?? `${file.uuid}/${file.file_name}`,
+                options: {
+                  type : `${file.type ?? 'local'}`,
 
-        //           // file initial metadata
-        //           // metadata: {
-        //           //     date: '2018-10-5T12:00',
-        //           // },
-        //         }
-        //       }
-        //   }) : [];
-          // __log(
-          //   this.modelValue,
-          //   files
-          // )
-        // __log('init')
+                  // file initial metadata
+                  // metadata: {
+                  //     date: '2018-10-5T12:00',
+                  // },
+                }
+              }
+          }) : [];
+
         setOptions({
 
-          // files: files,
+          files: files,
           server_: {
             process_: this.endPoints.process,
             revert_: this.endPoints.revert,
@@ -161,61 +165,74 @@
     computed:{
       server() {
         return {
-          process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
-              // fieldName is the name of the input field
-              // file is the actual file object to send
-              const formData = new FormData();
-              if(fieldName.match(/(\w)+.(\w)+/)){
-                let parts = fieldName.split('.')
-                fieldName = ''
-                for(const index in parts){
-                  if(index == 0) fieldName += parts[index]
-                  else fieldName += `[${parts[index]}]`
-                }
-                // fieldName = `${parentName}[${fieldName}]`
-              }
-              formData.append(fieldName, file, file.name);
-              let requestId = 'process-' + fieldName
-              axios.post( this.endPoints.process, formData, {
-                    requestId,
-                    onUploadProgress: e => {
-                      __log('onUpload', e)
-                      // Should call the progress method to update the progress to 100% before calling load
-                      // Setting computable to false switches the loading indicator to infinite mode
-                      progress(e.lengthComputable, e.loaded, e.total);
-                    }
-                  })
-                  .then(function (res) {
-                    //handle success
-                    load(res.data);
-                  })
-                  .catch(function (res) {
-                    if(res.status == 500 && res.response.match(/^\<script\> Sfdump/)){
-                        globalError(Component, {
-                          message: 'Filepond process error.',
-                          value: request
-                        })
-                        error('Dump error on processing');
-                      }else{
-                        error('Processing Error');
-                      }
-                  });
-
-              // Should expose an abort method so the request can be cancelled
-              return {
-                  abort: () => {
-                    __log('aborted')
-                    // This function is entered if the user has tapped the cancel button
-                    // request.abort();
-                    axios.abort(requestId);
-
-                    // Let FilePond know the request has been cancelled
-                    abort();
-                  },
-              };
+          // revert: this.endPoints.revert,
+          revert: (uniqueFileId, load, error) => {
+            let requestId = 'revert-' + uniqueFileId
+            axios.delete(this.endPoints.revert, {
+              requestId,
+              data: uniqueFileId
+            }).then(res => {
+              this.input = this.input.filter(file => file.uuid != uniqueFileId)
+              load()
+            }).catch(err => {
+              console.error('server revert error', err)
+            })
           },
-          revert: this.endPoints.revert,
-          load_: this.endPoints.load,
+          process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+            // fieldName is the name of the input field
+            // file is the actual file object to send
+            const formData = new FormData();
+            if(fieldName.match(/(\w)+.(\w)+/)){
+              let parts = fieldName.split('.')
+              fieldName = ''
+              for(const index in parts){
+                if(index == 0) fieldName += parts[index]
+                else fieldName += `[${parts[index]}]`
+              }
+              // fieldName = `${parentName}[${fieldName}]`
+            }
+            formData.append(fieldName, file, file.name);
+            let requestId = 'process-' + fieldName
+            axios.post( this.endPoints.process, formData, {
+                requestId,
+                onUploadProgress: e => {
+                  // __log('onUpload', e)
+                  // Should call the progress method to update the progress to 100% before calling load
+                  // Setting computable to false switches the loading indicator to infinite mode
+                  progress(e.lengthComputable, e.loaded, e.total);
+                }
+              })
+              .then(function (res) {
+                //handle success
+                load(res.data);
+              })
+              .catch(function (res) {
+                if(res.status == 500 && res.response.match(/^\<script\> Sfdump/)){
+                    globalError(Component, {
+                      message: 'Filepond process error.',
+                      value: request
+                    })
+                    error('Dump error on processing');
+                  }else{
+                    error('Processing Error');
+                  }
+              });
+
+            // Should expose an abort method so the request can be cancelled
+            return {
+                abort: () => {
+                  __log('aborted')
+                  // This function is entered if the user has tapped the cancel button
+                  // request.abort();
+                  axios.abort(requestId);
+
+                  // Let FilePond know the request has been cancelled
+                  abort();
+                },
+            };
+          },
+
+          // load_: this.endPoints.load,
           load: (source, load, error, progress, abort, headers) => {
               // Should request a file object from the server here
               // ...
@@ -223,6 +240,7 @@
               // // Should call the progress method to update the progress to 100% before calling load
               // // (endlessMode, loadedSize, totalSize)
               // progress(true, 0, 1024);
+
               axios.get(source,{
                   responseType: "blob",
                   validateStatus: status => (status >= 200 && status < 300) || status === 422
@@ -267,7 +285,7 @@
           return this.modelValue ?? []
         },
         set(val){
-          this.updateModalValue(val)
+          this.updateModelValue(val)
         }
       },
       key: {

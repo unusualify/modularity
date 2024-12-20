@@ -27,9 +27,11 @@ trait FilepondsTrait
         $columns = $this->getColumns(__TRAIT__);
 
         foreach ($columns as $role) {
-            $files = data_get($fields, $role);
+            $files = data_get($fields, $role) ?? [];
+
+            Filepond::saveFile($object, $files, $role);
             if ($files) {
-                Filepond::saveFile($object, $files, $role);
+                // Filepond::saveFile($object, $files, $role);
             }
         }
     }

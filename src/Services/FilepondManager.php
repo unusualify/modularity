@@ -154,28 +154,26 @@ class FilepondManager
     public function saveFile($object, $files, $role, $locale = 'tr')
     {
         $files ??= [];
-        $exist_files = array_column($files, 'folder_name');
+        $existingUuids = array_column($files, 'uuid');
         $fileponds = $object->fileponds()->where('role', $role)->get();
 
         // files listesinde gelmeyip object->fileponds listesinde olanlari fileponds tablosundan ve storage'tan sil
         foreach ($fileponds as $file) {
-            if (! in_array($file->uuid, $exist_files)) {
-                // dd($file->uuid, $exist_files);
+            if (! in_array($file->uuid, $existingUuids)) {
                 $file->delete();
-                unset($files[array_search($file->uuid, $exist_files)]);
+                // unset($files[array_search($file->uuid, $existingUuids)]);
             }
         }
+        // dd($files, $fileponds);
+        foreach ($files as $file) {
 
-        foreach ($files as $folder) {
-
-            if ((bool) $fileponds->select('uuid', $folder['folder_name']) && Storage::exists($this->file_path . $folder['folder_name'])) {
+            if ((bool) $fileponds->select('uuid', $file['uuid']) && Storage::exists($this->file_path . $file['uuid'])) {
                 continue;
             }
 
-            $tmp_file = TemporaryFilepond::where('folder_name', $folder['folder_name'])->first();
-            // dump($tmp_file);
+            $tmp_file = TemporaryFilepond::where('folder_name', $file['uuid'])->first();
+
             if ($tmp_file) {
-                // dump('persist');
                 $this->persistFile($tmp_file, $object);
             }
 
