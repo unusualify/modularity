@@ -21,6 +21,7 @@
     <!-- <ue-svg-icon class="ue-sidebar__logo" symbol="main-logo-light"></ue-svg-icon> -->
     <v-list class="ue-sidebar__info">
       <v-list-item
+        v-if="!$store.getters.isSuperAdmin"
         prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg"
         :subtitle="$store.state.config.appEmail"
         :title="$store.state.config.appName"
@@ -32,6 +33,20 @@
           </v-avatar>
         </template>
       </v-list-item>
+      <div v-else class="mx-3">
+        <div v-for="(version, key) in $store.getters.versions" :key="key" class="d-flex align-center my-1">
+          {{ $headline(key) }}:
+          <span class="ml-1 font-weight-bold">{{ version }}</span>
+        </div>
+        <div v-if="$store.getters.isSuperAdmin" v-for="key in ['appName', 'appEnv', 'appDebug']" :key="key" class="d-flex align-center my-1">
+          {{ key === 'appDebug' ? 'Debug Mode' : $headline(key) }}:
+          <span class="ml-1 font-weight-bold">{{ key === 'appDebug' ? $store.state.config[key] ? 'Active' : 'Inactive' : $store.state.config[key] }}</span>
+        </div>
+      </div>
+      <!-- <v-list-item
+        v-else
+      >
+      </v-list-item> -->
 
     </v-list>
 
@@ -140,7 +155,7 @@
         </ue-logout-modal>
 
         <!-- About Dialog -->
-        <v-dialog ref="aboutDialog" max-width="500" v-if="$store.getters.versions && !$store.getters.isClient">
+        <v-dialog ref="aboutDialog" max-width="500" v-if="$store.getters.versions && !$store.getters.isClient && !$store.getters.isSuperAdmin">
           <template v-slot:activator="{ props: activatorProps }">
             <v-list-item prepend-icon="mdi-information" v-bind="activatorProps">
               {{ $t("About") }}
