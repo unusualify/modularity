@@ -209,7 +209,7 @@ class VueTestGenerator extends Generator
             'NAMESPACE',
             'IMPORT',
         ])))->render();
-        dd($content, $path);
+
         if (! $this->filesystem->isDirectory($dir = dirname($path))) {
             $this->filesystem->makeDirectory($dir, 0775, true);
         }
