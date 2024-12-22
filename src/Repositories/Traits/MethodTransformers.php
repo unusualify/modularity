@@ -355,6 +355,11 @@ trait MethodTransformers
         return $fields;
     }
 
+    /**
+     * @param \Unusualify\Modularity\Models\Model $object
+     * @param array $schema
+     * @return array
+     */
     public function getShowFields($object, $schema = [])
     {
         $chunkedInputs = $this->chunkInputs(all: true, schema: empty($schema) ? null : $schema);
