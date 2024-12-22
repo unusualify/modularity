@@ -4,6 +4,8 @@ namespace Unusualify\Modularity\Console;
 
 class $STUDLY_NAME$Command extends BaseCommand
 {
+    protected $hidden = true;
+
     /**
      * The name and signature of the console command.
      *
