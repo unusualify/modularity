@@ -240,4 +240,26 @@ class Modularity extends FileRepository
 
         return $classes;
     }
+
+    /**
+     * Get vendor path.
+     *
+     * @param string $dir
+     * @return string
+     */
+    public function getVendorPath($dir = '')
+    {
+        return base_path(concatenate_path(unusualConfig('vendor_path'), $dir));
+    }
+
+    /**
+     * Get modularity namespace.
+     *
+     * @param \Nwidart\Modules\Module $module
+     * @return string
+     */
+    public function getVendorNamespace($append = null)
+    {
+        return concatenate_namespace(unusualConfig('namespace'), $append);
+    }
 }
