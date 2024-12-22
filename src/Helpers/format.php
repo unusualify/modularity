@@ -601,3 +601,33 @@ if (! function_exists('get_user_profile')) {
         ];
     }
 }
+
+if (! function_exists('concatenate_path')) {
+    /**
+     * concatenate_path
+     *
+     * @param string $path
+     * @param string $dir
+     * @return string
+     */
+    function concatenate_path($path, $dir)
+    {
+        $separator = DIRECTORY_SEPARATOR;
+
+        return implode($separator, [rtrim($path, $separator), ltrim($dir, $separator)]);
+    }
+}
+
+if (! function_exists('concatenate_namespace')) {
+    /**
+     * concatenate_namespace
+     *
+     * @param string $namespace
+     * @param string $append
+     * @return string
+     */
+    function concatenate_namespace($namespace, $append)
+    {
+        return implode('\\', [rtrim($namespace, '\\'), ltrim($append, '\\')]);
+    }
+}
