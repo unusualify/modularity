@@ -3,7 +3,7 @@
 use Unusualify\Modularity\Activators\FileActivator;
 
 return [
-    'namespace' => env('BASE_NAMESPACE', 'Unusualify\\Modularity'),
+    'namespace' => 'Unusualify\\Modularity',
     'name' => env('MODULARITY_BASE_NAME', 'Modularity'),
 
     'system_prefix' => 'system',
