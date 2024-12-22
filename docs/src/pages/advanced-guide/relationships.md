@@ -41,7 +41,7 @@ Model Relationships parameter add only methods to parent model, so it matters me
 <!-- "Model Relationships" => "belongsToMany:PackageFeature,position:integer,active:string|belongsToMany:PackageLanguage" -->
 ### Synopsis
 ```bash
-php artisan modularity:make:model <moduleName> <modelName> [--relationships=<MODELRELATIONSHIPS>] [options]
+php artisan modularity:make:model <modelName> <moduleName> [--relationships=<MODELRELATIONSHIPS>] [options]
 ```
 
 ```bash

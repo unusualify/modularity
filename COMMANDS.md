@@ -20,12 +20,12 @@
 
     php artisan modularity:make:controller Payment Invoice
 
-    php artisan modularity:make:model Payment Reference 
+    php artisan modularity:make:model Reference Payment
         --soft-delete --has-factory
-    php artisan modularity:make:model Payment Invoice 
+    php artisan modularity:make:model Invoice Payment
         --relationships="belongsTo:payments:payment_id:id,hasMany:users:user_id:id"
 
-    php artisan modularity:make:migration Payment create_invoices_table 
+    php artisan modularity:make:migration create_invoices_table Payment
         --fields="name:string:unique,payment_id:foreignId:constrained:onUpdate('cascade'):onDelete('cascade'),soft_delete,remember_token"
 
     php artisan modularity:make:repository Payment Reference -TMP
