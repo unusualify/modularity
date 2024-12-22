@@ -1,0 +1,55 @@
+<?php
+
+namespace Unusualify\Modularity\Entities\Traits;
+
+use Illuminate\Database\Eloquent\Model;
+
+trait Has$STUDLY_NAME$
+{
+    /**
+     * Perform any actions when booting the trait
+     *
+     * @return void
+     */
+    public static function bootHas$STUDLY_NAME$(): void
+    {
+        static::retrieved(function (Model $model) {});
+
+        static::creating(function (Model $model) {});
+
+        static::created(function (Model $model) {});
+
+        static::updating(function (Model $model) {});
+
+        static::updated(function (Model $model) {});
+
+        static::saving(function (Model $model) {});
+
+        static::saved(function (Model $model) {});
+
+        static::restoring(function (Model $model) {});
+
+        static::restored(function (Model $model) {});
+
+        static::replicating(function (Model $model) {});
+
+        static::deleting(function (Model $model) {});
+
+        static::deleted(function (Model $model) {});
+
+        static::forceDeleting(function (Model $model) {});
+
+        static::forceDeleted(function (Model $model) {});
+    }
+
+    /**
+     * Laravel hook to initialize the trait
+     *
+     * @return void
+     */
+    public function initializeHas$STUDLY_NAME$(): void
+    {
+
+    }
+
+}
