@@ -71,6 +71,8 @@ class CreateConsoleCommand extends BaseCommand
 
         $this->filesystem->put($path, $content);
 
+        $this->info("Command created successfully: {$path}");
+
         return 0;
     }
 }
