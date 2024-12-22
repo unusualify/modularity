@@ -17,7 +17,15 @@ class CreateVueTestCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'modularity:create:test:vue';
+    protected $signature = 'modularity:create:vue:test
+        {name? : The name of test will be used.}
+        {type? : The type of test.}
+        {--importDir : The subfolder for importing.}
+        {--F|force : Force the operation to run when the route files already exist.}';
+
+    protected $aliases = [
+        'mod:c:vue:test'
+    ];
 
     /**
      * The console command description.
@@ -70,31 +78,5 @@ class CreateVueTestCommand extends BaseCommand
         }
 
         return $success ? 0 : E_ERROR;
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['name', InputArgument::OPTIONAL, 'The name of test will be used.'],
-            ['type', InputArgument::OPTIONAL, 'The type of test.'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['importDir', null, InputOption::VALUE_OPTIONAL, 'Vue subfolder for importing.', null],
-            ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
-        ];
     }
 }
