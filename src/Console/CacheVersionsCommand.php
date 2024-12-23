@@ -9,7 +9,7 @@ class CacheVersionsCommand extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'modularity:cache:version';
+    protected $signature = 'modularity:cache:versions';
 
     protected $aliases = [
         'mod:cache:ver',
