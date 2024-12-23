@@ -256,28 +256,35 @@ class BaseServiceProvider extends ServiceProvider
             'one-time-operations.directory' => unusualConfig('vendor_path') . '/operations',
         ]);
 
-        $modularityIsCacheable = ! ($this->app->runningInConsole() && $this->app->runningConsoleCommand([
-            'modularity:make:module',
-            'unusual:make:module',
-            'm:m:m',
-            'modularity:fix:module',
-            'modularity:make:route',
-            'unusual:make:route',
-            'm:m:r',
-            'modularity:dev',
-            'unusual:dev',
-            'modularity:remove:module',
-            'unusual:remove:module',
-            'm:r:m',
-        ]));
+        config([
+            'modules.cache.enabled' => $this->app->isProduction() ?: unusualConfig('cache.enabled'),
+            'modules.cache.key' => unusualConfig('cache.key'),
+            'modules.cache.lifetime' => unusualConfig('cache.lifetime'),
+        ]);
 
-        if ($modularityIsCacheable) {
-            config([
-                'modules.cache.enabled' => true,
-                'modules.cache.key' => 'modularity',
-                'modules.cache.lifetime' => 600,
-            ]);
-        }
+        // $modularityIsCacheable = ! ($this->app->runningInConsole() && $this->app->runningConsoleCommand([
+        //     'modularity:make:module',
+        //     'unusual:make:module',
+        //     // 'u:m:m',
+        //     'm:m:m',
+        //     'modularity:fix:module',
+        //     'modularity:make:route',
+        //     'unusual:make:route',
+        //     'm:m:r',
+        //     'u:m:r',
+        //     'modularity:dev',
+        //     'unusual:dev',
+        //     'modularity:remove:module',
+        //     'unusual:remove:module',
+        //     'm:r:m',
+        // ]));
+        // if ($modularityIsCacheable) {
+        //     config([
+        //         'modules.cache.enabled' => true,
+        //         'modules.cache.key' => 'modularity',
+        //         'modules.cache.lifetime' => 600,
+        //     ]);
+        // }
     }
 
     /**
