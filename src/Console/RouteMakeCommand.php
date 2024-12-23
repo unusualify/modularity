@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Nwidart\Modules\Support\Stub;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Generators\RouteGenerator;
 
 class RouteMakeCommand extends BaseCommand
@@ -25,6 +26,7 @@ class RouteMakeCommand extends BaseCommand
     protected $description = 'Create files for routes.';
 
     protected $aliases = [
+        'm:m:r',
         'u:m:r',
         'unusual:make:route',
     ];
@@ -62,6 +64,7 @@ class RouteMakeCommand extends BaseCommand
      */
     public function handle(): int
     {
+        Modularity::disableCache();
 
         $route = $this->argument('route');
 
@@ -74,6 +77,7 @@ class RouteMakeCommand extends BaseCommand
         }
 
         $success = true;
+
         $code = with(new RouteGenerator($route))
             ->setFilesystem($this->laravel['files'])
             ->setConfig($this->laravel['config'])
@@ -97,6 +101,8 @@ class RouteMakeCommand extends BaseCommand
         if ($code === E_ERROR) {
             $success = false;
         }
+
+        Modularity::clearCache();
 
         return $success ? 0 : E_ERROR;
     }
