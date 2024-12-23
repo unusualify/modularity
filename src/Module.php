@@ -149,7 +149,7 @@ class Module extends NwidartModule
     {
 
         if (unusualConfig('cache.enabled')) {
-            $this->cache->store()->flush();
+            // $this->cache->store()->flush();
         }
     }
 
