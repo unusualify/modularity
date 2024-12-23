@@ -166,6 +166,26 @@ class Modularity extends FileRepository
         }
     }
 
+    /**
+     * Clear the modules cache if it is enabled
+     */
+    public function clearCache()
+    {
+        if (config('modules.cache.enabled') === true) {
+            app('cache')->forget(config('modules.cache.key'));
+        }
+    }
+
+    /**
+     * Disable the modules cache
+     */
+    public function disableCache()
+    {
+        return config([
+            'modules.cache.enabled' => false,
+        ]);
+    }
+
     public function getGroupedModules($group_name)
     {
         return array_filter($this->allEnabled(), function ($item) use ($group_name) {
@@ -204,7 +224,15 @@ class Modularity extends FileRepository
         }
 
         if ($module) {
-            return $module->delete();
+            $res = $module->delete();
+
+            if ($res) {
+                $this->clearCache();
+
+                return $res;
+            }
+
+            return $res;
         }
 
         return false;
