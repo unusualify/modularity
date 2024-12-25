@@ -23,7 +23,6 @@ trait HasChatable
             }
         });
 
-
         static::creating(function (Model $model) {
             // dd('creating', $model);
         });
