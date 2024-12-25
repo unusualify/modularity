@@ -52,7 +52,7 @@
                       </template>
                       <span>{{ action.tooltip ?? action.label }}</span>
                     </v-tooltip>
-                    <v-menu v-else-if="action.type === 'modal'"
+                    <v-menu v-else-if="shouldShowAction(action) && action.type === 'modal'"
                       :close-on-content-click="false"
                       open-on-hoverx
                       transition="scale-transition"
