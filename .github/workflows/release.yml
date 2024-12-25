@@ -71,22 +71,25 @@ jobs:
           git checkout main
           git merge --no-ff ${{ github.ref }}
           git tag ${{ env.TAG_NAME }}
+          git push origin ${{ env.TAG_NAME }}
 
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          # branch: ${{ github.event.inputs.major_version }}
-          branch: 'main'
-          force: true
-      - uses: oobook/automated-tag@v1
-        id: tag-generation
-        with:
-          gh_token: ${{ github.token }}
+      # - name: Push changes
+      #   uses: ad-m/github-push-action@master
+      #   with:
+      #     # branch: ${{ github.event.inputs.major_version }}
+      #     branch: 'main'
+      #     force: true
+
+      # - uses: oobook/automated-tag@v1
+      #   id: tag-generation
+      #   with:
+      #     gh_token: ${{ github.token }}
 
       - name: Create Release
         uses: oobook/automated-release@v1
         id: release-generation
         with:
           gh_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: "${{ steps.tag-generation.outputs.tag }}"
+          # tag: "${{ steps.tag-generation.outputs.tag }}"
+          tag: "${{ env.TAG_NAME }}"
           prerelease: true
