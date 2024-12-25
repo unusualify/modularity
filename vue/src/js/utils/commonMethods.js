@@ -8,7 +8,7 @@ export default {
     return document.querySelector('meta[name="csrf-token"]').getAttribute('content')
   },
   $log: function (...args) {
-    window.__log(...args)
+    return window.__log(...args)
   },
   $isset: function (...args) {
     return window.__isset(...args)
