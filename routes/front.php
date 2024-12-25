@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Unusualify\Modularity\Http\Controllers\API\LanguageController;
+use Unusualify\Modularity\Http\Controllers\ChatableController;
 use Unusualify\Modularity\Http\Controllers\CurrencyExchangeController;
 use Unusualify\Modularity\Http\Controllers\FilepondController;
 
@@ -21,6 +22,15 @@ Route::group(['prefix' => 'api'], function () {
         Route::post('process', [FilepondController::class, 'upload'])->name('process');
         Route::delete('revert', [FilepondController::class, 'revert'])->name('revert');
         Route::get('preview/{uuid}', [FilepondController::class, 'preview'])->name('preview');
+    });
+
+    Route::group(['prefix' => 'chatable', 'as' => 'chatable.'], function () {
+        Route::get('{chat}', [ChatableController::class, 'index'])->name('index');
+        Route::get('{chat}/attachments', [ChatableController::class, 'attachments'])->name('attachments');
+        Route::post('{chat}', [ChatableController::class, 'store'])->name('store');
+        Route::put('{chat_message}', [ChatableController::class, 'update'])->name('update');
+        Route::get('show/{chat_message}', [ChatableController::class, 'show'])->name('show');
+        Route::delete('destroy/{chat_message}', [ChatableController::class, 'destroy'])->name('destroy');
     });
 
     Route::controller(CurrencyExchangeController::class)
