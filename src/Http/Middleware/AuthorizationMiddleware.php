@@ -44,7 +44,8 @@ class AuthorizationMiddleware
                 // 'hasBulkable' => $user->isSuperAdmin(),
             ];
 
-            $defaultInput = (array) Config::get(unusualBaseKey() . '.default_input');
+            $defaultInput = modularity_default_input();
+
             $user = auth()->user();
             $userRepository = app()->make(\Modules\SystemUser\Repositories\UserRepository::class);
 
