@@ -2,6 +2,13 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.22.3 - 2024-12-25
+
+### :wrench: Bug Fixes
+
+- create chat instance if none exists during model booting by @OoBook in https://github.com/unusualify/modularity/commit/45f76044f2e9165f8476904c41d582b87b1748c7
+- update route check for profile access by @OoBook in https://github.com/unusualify/modularity/commit/59bebcb6f36053da7ee07fc6b92ae3bbc06e4535
+
 ## v0.22.2 - 2024-12-25
 
 ### :package: Build
