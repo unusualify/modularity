@@ -17,6 +17,9 @@ trait HasChatable
             // dd('retrieved', $model->chatMessages);
             if ($model->chat) {
                 $model->setAttribute('_chat_id', $model->chat->id);
+            } else {
+                $chat = $model->chat()->create();
+                $model->setAttribute('_chat_id', $chat->id);
             }
         });
 
