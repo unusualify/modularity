@@ -33,14 +33,14 @@
           </v-avatar>
         </template>
       </v-list-item>
-      <div v-else class="mx-3">
+      <div v-else class="mx-3 text-subtitle-2">
         <div v-for="(version, key) in $store.getters.versions" :key="key" class="d-flex align-center my-1">
-          {{ $headline(key) }}:
-          <span class="ml-1 font-weight-bold">{{ version }}</span>
+          <div class="flex-grow-1">{{ $headline(key) }}:</div>
+          <div class="flex-grow-0 ml-1 font-weight-bold">{{ version }}</div>
         </div>
         <div v-if="$store.getters.isSuperAdmin" v-for="key in ['appName', 'appEnv', 'appDebug']" :key="key" class="d-flex align-center my-1">
-          {{ key === 'appDebug' ? 'Debug Mode' : $headline(key) }}:
-          <span class="ml-1 font-weight-bold">{{ key === 'appDebug' ? $store.state.config[key] ? 'Active' : 'Inactive' : $store.state.config[key] }}</span>
+          <div class="flex-grow-1">{{ key === 'appDebug' ? 'Debug Mode' : $headline(key) }}:</div>
+          <div class="flex-grow-0 ml-1 font-weight-bold">{{ key === 'appDebug' ? $store.state.config[key] ? 'Active' : 'Inactive' : $store.state.config[key] }}</div>
         </div>
       </div>
       <!-- <v-list-item
