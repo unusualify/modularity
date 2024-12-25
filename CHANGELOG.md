@@ -2,6 +2,20 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.22.1 - 2024-12-25
+
+### :wrench: Bug Fixes
+
+- update modal action visibility condition by @OoBook in https://github.com/unusualify/modularity/commit/0141eb486efc3d9594dbe1e3e1ad06067b9f665f
+
+### :lipstick: Styling
+
+- lint coding styles for v0.22.0 by @invalid-email-address in https://github.com/unusualify/modularity/commit/87f14a150544be2a61f158d5740d0078b0acd5aa
+
+### :package: Build
+
+- update build artifacts for v0.22.0 by @invalid-email-address in https://github.com/unusualify/modularity/commit/712e5bfee037c291113090912400bd2d32cd9aaf
+
 ## v0.22.0 - 2024-12-25
 
 ### :rocket: Features
