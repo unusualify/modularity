@@ -9,8 +9,7 @@ class InputHydrator
     public function __construct(
         protected $input,
         protected $module,
-    ) {
-    }
+    ) {}
 
     public function hydrate(): array
     {
@@ -29,4 +28,3 @@ class InputHydrator
         return $input;
     }
 }
-

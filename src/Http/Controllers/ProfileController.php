@@ -242,7 +242,7 @@ class ProfileController extends BaseController
 
         $data = get_user_profile($user);
 
-        if($this->request->ajax()){
+        if ($this->request->ajax()) {
             return response()->json($data);
         }
 

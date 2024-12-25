@@ -3,8 +3,8 @@
 namespace Unusualify\Modularity\Console;
 
 use Illuminate\Support\Facades\File;
-use Nwidart\Modules\Support\Stub;
 use Illuminate\Support\Str;
+use Nwidart\Modules\Support\Stub;
 
 class CreateModelTraitCommand extends BaseCommand
 {
@@ -18,7 +18,7 @@ class CreateModelTraitCommand extends BaseCommand
     protected $signature = 'modularity:create:model:trait {name}';
 
     protected $aliases = [
-        'mod:c:model:trait'
+        'mod:c:model:trait',
     ];
 
     /**
@@ -53,7 +53,7 @@ class CreateModelTraitCommand extends BaseCommand
             'STUDLY_NAME' => $studlyName,
         ];
 
-        $content = (new Stub("/classes/model-trait.stub", $replacements))->render();
+        $content = (new Stub('/classes/model-trait.stub', $replacements))->render();
 
         $path = base_path(unusualConfig('vendor_path') . '/src/Entities/Traits/Has' . $studlyName . '.php');
 

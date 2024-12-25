@@ -11,7 +11,6 @@ use Unusualify\Modularity\Facades\Filepond;
 
 class ChatableController extends Controller
 {
-
     public function index(Request $request, Chat $chat)
     {
         $from = $request->get('from', null);
@@ -21,7 +20,7 @@ class ChatableController extends Controller
             $user_id = $request->get('user_id', null);
             $query = $chat->messages();
 
-            if($user_id) {
+            if ($user_id) {
                 // $query = $query->whereHas('user', function($query) use ($user_id) {
                 //     $userTable = $query->getModel()->getTable();
                 //     $query->where("{$userTable}.id", '!=', $user_id);
@@ -32,8 +31,8 @@ class ChatableController extends Controller
             $query->where('created_at', '>', $from);
             $messages = $query->get();
 
-            if($user_id) {
-                $messages = $messages->filter(function($message) use ($user_id) {
+            if ($user_id) {
+                $messages = $messages->filter(function ($message) use ($user_id) {
                     return $message->user->id !== $user_id;
                 });
             }
@@ -87,6 +86,7 @@ class ChatableController extends Controller
     public function destroy(Request $request, ChatMessage $message)
     {
         $message->delete();
+
         return response()->json($message);
     }
 }

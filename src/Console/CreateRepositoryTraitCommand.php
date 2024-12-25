@@ -3,12 +3,13 @@
 namespace Unusualify\Modularity\Console;
 
 use Illuminate\Support\Facades\File;
-use Nwidart\Modules\Support\Stub;
 use Illuminate\Support\Str;
+use Nwidart\Modules\Support\Stub;
 
 class CreateRepositoryTraitCommand extends BaseCommand
 {
     protected $hidden = true;
+
     /**
      * The name and signature of the console command.
      *
@@ -17,7 +18,7 @@ class CreateRepositoryTraitCommand extends BaseCommand
     protected $signature = 'modularity:create:repository:trait {name}';
 
     protected $aliases = [
-        'mod:c:repo:trait'
+        'mod:c:repo:trait',
     ];
 
     /**
@@ -52,7 +53,7 @@ class CreateRepositoryTraitCommand extends BaseCommand
             'STUDLY_NAME' => $studlyName,
         ];
 
-        $content = (new Stub("/classes/repository-trait.stub", $replacements))->render();
+        $content = (new Stub('/classes/repository-trait.stub', $replacements))->render();
 
         $path = base_path(unusualConfig('vendor_path') . '/src/Repositories/Traits/' . $studlyName . 'Trait.php');
 

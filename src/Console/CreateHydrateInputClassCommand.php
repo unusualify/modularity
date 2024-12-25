@@ -16,7 +16,7 @@ class CreateHydrateInputClassCommand extends BaseCommand
     protected $name = 'modularity:create:input:hydrate';
 
     protected $aliases = [
-        'mod:c:input:hydrate'
+        'mod:c:input:hydrate',
     ];
 
     /**

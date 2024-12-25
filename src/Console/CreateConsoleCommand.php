@@ -3,8 +3,8 @@
 namespace Unusualify\Modularity\Console;
 
 use Illuminate\Filesystem\Filesystem;
-use Nwidart\Modules\Support\Stub;
 use Illuminate\Support\Str;
+use Nwidart\Modules\Support\Stub;
 
 class CreateConsoleCommand extends BaseCommand
 {
@@ -20,7 +20,7 @@ class CreateConsoleCommand extends BaseCommand
         'mod:c:cmd',
     ];
 
-        /**
+    /**
      * The console command description.
      *
      * @var string
@@ -65,7 +65,7 @@ class CreateConsoleCommand extends BaseCommand
             'DESCRIPTION' => $description,
         ];
 
-        $content = (new Stub("/scaffold/command.stub", $replacements))->render();
+        $content = (new Stub('/scaffold/command.stub', $replacements))->render();
 
         $path = base_path(unusualConfig('vendor_path') . '/src/Console/' . $studlyName . 'Command.php');
 

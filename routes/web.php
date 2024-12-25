@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Unusualify\Modularity\Http\Controllers\DashboardController;
 use Unusualify\Modularity\Http\Controllers\ProfileController;
 
 /*

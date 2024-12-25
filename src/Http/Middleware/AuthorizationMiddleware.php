@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 
 class AuthorizationMiddleware
@@ -51,7 +50,7 @@ class AuthorizationMiddleware
 
             $profileShortcutDraft = getFormDraft('profile_shortcut');
 
-            $profileShortcutSchema = collect($profileShortcutDraft)->mapWithKeys(function ($v, $k) use($defaultInput) {
+            $profileShortcutSchema = collect($profileShortcutDraft)->mapWithKeys(function ($v, $k) use ($defaultInput) {
                 return [$k => configure_input(hydrate_input(array_merge($defaultInput, $v)))];
             })->toArray();
 

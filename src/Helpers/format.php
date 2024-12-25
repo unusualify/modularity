@@ -528,7 +528,7 @@ if (! function_exists('get_package_version')) {
         $tag = trim(shell_exec('cd ' . base_path() . ' && git describe --tags --abbrev=0'));
 
         if ($package) {
-            $composer_lock = file_exists(base_path('composer-dev.lock')) && !app()->isProduction()
+            $composer_lock = file_exists(base_path('composer-dev.lock')) && ! app()->isProduction()
                 ? 'composer-dev.lock'
                 : 'composer.lock';
 
@@ -614,12 +614,12 @@ if (! function_exists('get_user_profile')) {
     /**
      * get_user_profile
      *
-     * @param  Model $user
+     * @param Model $user
      * @return array
      */
     function get_user_profile($user)
     {
-        return $user->only(['id','name', 'email']) + [
+        return $user->only(['id', 'name', 'email']) + [
             'avatar_url' => $user->fileponds()
                 ->where('role', 'avatar')
                 ->first()

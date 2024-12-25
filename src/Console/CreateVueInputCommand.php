@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Console;
 
 use Illuminate\Filesystem\Filesystem;
 use Nwidart\Modules\Support\Stub;
-use Symfony\Component\Console\Input\InputArgument;
 
 class CreateVueInputCommand extends BaseCommand
 {
@@ -19,7 +18,7 @@ class CreateVueInputCommand extends BaseCommand
         {name : The name of the component to be created.}';
 
     protected $aliases = [
-        'mod:c:vue:input'
+        'mod:c:vue:input',
     ];
 
     /**

@@ -3,21 +3,20 @@
 namespace Unusualify\Modularity\Entities;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Unusualify\Modularity\Entities\Model;
 
 class Chat extends Model
 {
     /**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array<int, string>
-	 */
-	protected $fillable = [
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
         'chatable_id',
         'chatable_type',
     ];
 
-        /**
+    /**
      * The accessors to append to the model's array form.
      *
      * @var array
@@ -52,5 +51,4 @@ class Chat extends Model
     {
         return unusualConfig('tables.chats', parent::getTable());
     }
-
 }

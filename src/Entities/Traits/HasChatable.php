@@ -10,14 +10,12 @@ trait HasChatable
 {
     /**
      * Perform any actions when booting the trait
-     *
-     * @return void
      */
     public static function bootHasChatable(): void
     {
         static::retrieved(function (Model $model) {
             // dd('retrieved', $model->chatMessages);
-            if($model->chat) {
+            if ($model->chat) {
                 $model->setAttribute('_chat_id', $model->chat->id);
             }
         });
@@ -59,13 +57,8 @@ trait HasChatable
 
     /**
      * Laravel hook to initialize the trait
-     *
-     * @return void
      */
-    public function initializeHasChatable(): void
-    {
-
-    }
+    public function initializeHasChatable(): void {}
 
     public function chat(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
@@ -76,5 +69,4 @@ trait HasChatable
     {
         return $this->hasManyThrough(ChatMessage::class, Chat::class, 'chatable_id', 'chat_id', 'id', 'id');
     }
-
 }

@@ -23,7 +23,7 @@ class ModelMakeCommand extends BaseCommand
     protected $name = 'modularity:make:model';
 
     protected $aliases = [
-        'mod:m:model'
+        'mod:m:model',
     ];
 
     /**
@@ -80,7 +80,7 @@ class ModelMakeCommand extends BaseCommand
 
         $moduleName = $this->getModuleName();
 
-        if($moduleName){
+        if ($moduleName) {
             $this->createPivotModels();
         }
 
@@ -88,7 +88,7 @@ class ModelMakeCommand extends BaseCommand
             return E_ERROR;
         }
 
-        if($moduleName){
+        if ($moduleName) {
             $this->createAdditionalModels();
         }
 
@@ -141,7 +141,7 @@ class ModelMakeCommand extends BaseCommand
     {
         $moduleName = $this->getModuleName();
         $module = null;
-        if($moduleName){
+        if ($moduleName) {
             $module = Modularity::findOrFail($moduleName);
         }
 
@@ -182,7 +182,7 @@ class ModelMakeCommand extends BaseCommand
     {
         $path = Modularity::getVendorPath('/src');
 
-        if($this->getModuleName() != ''){
+        if ($this->getModuleName() != '') {
             $path = Modularity::getModulePath($this->getModuleName());
         }
 

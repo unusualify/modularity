@@ -128,7 +128,7 @@ if (! function_exists('customModularityThemes')) {
 
 if (! function_exists('get_translations')) {
 
-    function get_translations() : array
+    function get_translations(): array
     {
         $cache_key = 'modularity-languages';
 
@@ -148,7 +148,7 @@ if (! function_exists('get_translations')) {
 
 if (! function_exists('clear_translations')) {
 
-    function clear_translations() : void
+    function clear_translations(): void
     {
         $cache_key = 'modularity-languages';
 

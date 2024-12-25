@@ -180,13 +180,13 @@ class MigrationMakeCommand extends BaseCommand
 
         $path = Modularity::getVendorPath('');
 
-        if($moduleName != ''){
+        if ($moduleName != '') {
             $path = Modularity::getModulePath($moduleName);
         }
 
         $migrationFolder = 'database/migrations/default';
 
-        if($moduleName != ''){
+        if ($moduleName != '') {
             $migrationGeneratorPath = GenerateConfigReader::read('migration');
             $migrationFolder = $migrationGeneratorPath->getPath();
         }

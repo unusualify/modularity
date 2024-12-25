@@ -2,9 +2,6 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
-
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\text;
 
@@ -24,7 +21,7 @@ class CreateVueTestCommand extends BaseCommand
         {--F|force : Force the operation to run when the route files already exist.}';
 
     protected $aliases = [
-        'mod:c:vue:test'
+        'mod:c:vue:test',
     ];
 
     /**

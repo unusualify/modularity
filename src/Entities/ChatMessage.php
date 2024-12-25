@@ -3,7 +3,6 @@
 namespace Unusualify\Modularity\Entities;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Unusualify\Modularity\Entities\Model;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
 use Unusualify\Modularity\Entities\Traits\IsAuthorizedable;
 
@@ -12,12 +11,12 @@ class ChatMessage extends Model
     use IsAuthorizedable, HasFileponds;
 
     /**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array<int, string>
-	 */
-	protected $fillable = [
-        'content'
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'content',
     ];
 
     /**
@@ -29,8 +28,6 @@ class ChatMessage extends Model
 
     /**
      * Perform any actions when booting the trait
-     *
-     * @return void
      */
     public static function booted(): void
     {
@@ -78,5 +75,4 @@ class ChatMessage extends Model
     {
         return unusualConfig('tables.chat_messages', parent::getTable());
     }
-
 }

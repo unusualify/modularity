@@ -13,7 +13,7 @@ class Urls
      */
     protected $authFactory;
 
-    public function __construct(){}
+    public function __construct() {}
 
     /**
      * Binds data to the view.
