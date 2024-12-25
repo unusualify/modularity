@@ -1,27 +1,48 @@
 <template>
+  <slot name="activator" v-bind="{
+    browse,
+    addFile,
+    removeFile,
+    removeFiles,
+    getFiles,
+    getFile,
+  }"/>
+  <!-- <v-btn @click="pondBrowse">Text</v-btn> -->
   <v-input
     ref="VInput"
     v-model="input"
     hide-details="auto"
   >
     <template v-slot:default="defaultSlot">
-      <div class="w-100">
-        <ue-title v-if="label" :text="label" transform="none" padding="a-0" weight="regular" color="grey-darken-5"/>
-        <div class="fileField">
-          <FilePond
-            ref="pond"
-            :id="key"
-            :key="key"
-            v-bind="$lodash.omit($bindAttributes(), ['rules'])"
-            :name="name"
-
-            :server="server"
-            @init="init"
-            @processfile="postProcess"
-            @removefile="removeFile"
-
-          />
-        </div>
+      <div
+        :class="[
+          'w-100',
+          $slots.activator ? 'd-non' : ''
+        ]"
+        >
+        <slot name="label">
+          <ue-title v-if="label" :text="label" transform="none" padding="a-0" weight="regular" color="grey-darken-5"/>
+        </slot>
+        <slot name="body">
+          <div
+            :class="[
+              'fileField',
+              $slots.activator ? 'd-none' : ''
+            ]"
+          >
+            <FilePond
+              ref="pond"
+              :id="key"
+              :key="key"
+              v-bind="$lodash.omit($bindAttributes(), ['rules'])"
+              :name="name"
+              :server="server"
+              @init="init"
+              @processfile="postProcessFilepond"
+              @removefile="removeFilepond"
+            />
+          </div>
+        </slot>
       </div>
     </template>
   </v-input>
@@ -82,7 +103,7 @@
       }
     },
     methods:{
-      postProcess : function(error, file){
+      postProcessFilepond : function(error, file){
         if(!error){
           this.input = this.input.concat({
             uuid: file.serverId,
@@ -93,7 +114,7 @@
           __log('postProcess error', error)
         }
       },
-      removeFile: function(error, file) {
+      removeFilepond: function(error, file) {
         const uuid = file.filename ?? file.serverId?.replace(`/${file.filename}`, '') ?? file.uuid;
 
         const newInput = this.input.filter((asset) => asset.uuid != uuid);
@@ -160,7 +181,27 @@
           //   return true
           // }
         });
-      }
+      },
+
+
+      addFile(...args){
+        return this.$refs.pond.addFile(...args)
+      },
+      browse(...args){
+        return this.$refs.pond._pond.browse()
+      },
+      removeFile(...args){
+        return this.$refs.pond.removeFile(...args)
+      },
+      removeFiles(...args){
+        return this.$refs.pond.removeFiles(...args)
+      },
+      getFiles(...args){
+        return this.$refs.pond.getFiles(...args)
+      },
+      getFile(...args){
+        return this.$refs.pond.getFile(...args)
+      },
     },
     computed:{
       server() {
@@ -295,7 +336,7 @@
       },
       name(){
         let name = this.$attrs.name
-        if(this.obj.schema.parentName){
+        if(this.obj && this.obj.schema && this.obj.schema.parentName){
           name = `${this.obj.schema.parentName}.${name}`
         }
         // __log(name)
