@@ -22,6 +22,10 @@ class ModelMakeCommand extends BaseCommand
 {
     protected $name = 'modularity:make:model';
 
+    protected $aliases = [
+        'mod:m:model',
+    ];
+
     /**
      * The name of argument name.
      *
@@ -32,27 +36,6 @@ class ModelMakeCommand extends BaseCommand
     protected $defaultReject = true;
 
     protected $isAskable = true;
-
-    // protected $signature = 'modularity:make:model
-    //     {model : the model name in module}
-    //     {module : the module name}
-    //     {--fillable=}
-    //     {--relationships=}
-    //     {--f|force}
-    //     {--T|translationTrait}
-    //     {--M|mediaTrait}
-    //     {--F|fileTrait}
-    //     {--P|positionTrait}
-    //     {--all}
-    //     {--soft-delete}
-    //     {--has-factory}
-    //     {--notAsk}';
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    // protected $name = 'modularity:make:model';
 
     /**
      * The console command description.
@@ -95,13 +78,19 @@ class ModelMakeCommand extends BaseCommand
             ]);
         }
 
-        $this->createPivotModels();
+        $moduleName = $this->getModuleName();
+
+        if ($moduleName) {
+            $this->createPivotModels();
+        }
 
         if (parent::handle() === E_ERROR) {
             return E_ERROR;
         }
 
-        $this->createAdditionalModels();
+        if ($moduleName) {
+            $this->createAdditionalModels();
+        }
 
         // $this->handleOptionalMigrationOption();
         // $this->handleOptionalControllerOption();
@@ -118,8 +107,8 @@ class ModelMakeCommand extends BaseCommand
     protected function getArguments()
     {
         return [
-            ['module', InputArgument::REQUIRED, 'The name of module will be used.'],
             ['model', InputArgument::REQUIRED, 'The name of model will be created.'],
+            ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
         ];
     }
 
@@ -150,7 +139,11 @@ class ModelMakeCommand extends BaseCommand
      */
     protected function getTemplateContents()
     {
-        $module = Modularity::findOrFail($this->getModuleName());
+        $moduleName = $this->getModuleName();
+        $module = null;
+        if ($moduleName) {
+            $module = Modularity::findOrFail($moduleName);
+        }
 
         $class_namespaces = implode("\n", [
             $this->getExtendModelNamespace(),
@@ -158,9 +151,13 @@ class ModelMakeCommand extends BaseCommand
             $this->getTraitNamespaces(),
         ]);
 
+        $modelGeneratorPath = new GeneratorPath($this->baseConfig('paths.generator.model'));
+
+        $namespace = $module ? $this->getClassNamespace($module) : Modularity::getVendorNamespace($modelGeneratorPath->getNamespace());
+
         return (new Stub($this->getStubName(), [
             // 'BASE_MODEL'            => $this->baseConfig('base_model'),
-            'NAMESPACE' => $this->getClassNamespace($module),
+            'NAMESPACE' => $namespace,
             'EXTEND_MODEL' => $this->getExtendModel(),
             'NAMESPACES' => $class_namespaces,
             // 'EXTEND_MODEL_NAMESPACE'=> $this->getExtendModelNamespace(),
@@ -183,11 +180,17 @@ class ModelMakeCommand extends BaseCommand
      */
     protected function getDestinationFilePath()
     {
-        $path = Modularity::getModulePath($this->getModuleName());
+        $path = Modularity::getVendorPath('/src');
 
-        $modelPath = new GeneratorPath($this->baseConfig('paths.generator.model'));
+        if ($this->getModuleName() != '') {
+            $path = Modularity::getModulePath($this->getModuleName());
+        }
 
-        return $path . $modelPath->getPath() . '/' . $this->getModelName() . '.php';
+        $modelFolder = new GeneratorPath($this->baseConfig('paths.generator.model'));
+
+        $modelDir = $modelFolder->getPath() . '/' . $this->getModelName() . '.php';
+
+        return concatenate_path($path, $modelDir);
     }
 
     /**

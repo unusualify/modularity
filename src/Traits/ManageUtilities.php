@@ -155,18 +155,14 @@ trait ManageUtilities
             // 'delete',
 
             'forceDelete',
-
             'restore',
             'duplicate',
             'reorder',
             // 'show',
-            // 'update',
-            // 'destroy'
 
             // 'publish',
             // 'bulkPublish',
 
-            // 'reorder',
             // 'feature',
             // 'bulkFeature',
             'bulkForceDelete',

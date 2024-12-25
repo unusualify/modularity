@@ -274,7 +274,8 @@
       'update:valid',
       'update:modelValue',
       'input',
-      'actionComplete'
+      'actionComplete',
+      'submitted'
     ],
     props: {
       modelValue: {
@@ -676,6 +677,8 @@
               self.$store.commit(FORM.SET_SERVER_VALID, false)
               self.$store.commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
             }
+
+            self.$emit('submitted', response.data)
 
             redirector(response.data)
 

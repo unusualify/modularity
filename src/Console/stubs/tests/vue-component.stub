@@ -2,9 +2,9 @@
 import { describe, expect, test, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 
-import vuetify from '../src/js/plugins/vuetify'
+import vuetify from '../../src/js/plugins/vuetify'
 
-import $STUDLY_NAME$ from '../src/js/$IMPORT$'
+import $STUDLY_NAME$ from '../../src/js/$IMPORT$'
 
 let getModel = () => {}
 

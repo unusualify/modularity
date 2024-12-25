@@ -3,7 +3,7 @@
 use Unusualify\Modularity\Activators\FileActivator;
 
 return [
-    'namespace' => env('BASE_NAMESPACE', 'Unusualify\\Modularity'),
+    'namespace' => 'Unusualify\\Modularity',
     'name' => env('MODULARITY_BASE_NAME', 'Modularity'),
 
     'system_prefix' => 'system',
@@ -65,8 +65,8 @@ return [
     |
     */
     'cache' => [
-        'enabled' => false,
-        'key' => 'ue-modules',
-        'lifetime' => 60,
+        'enabled' => env('MODULARITY_CACHE_ENABLED', false),
+        'key' => env('MODULARITY_CACHE_KEY', 'modularity'),
+        'lifetime' => env('MODULARITY_CACHE_LIFETIME', 600),
     ],
 ];

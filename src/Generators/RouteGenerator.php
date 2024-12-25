@@ -784,8 +784,8 @@ class RouteGenerator extends Generator
         $hasCustomModel = $this->customModel && @class_exists($this->customModel);
 
         $this->console->call('modularity:make:model', [
-            'module' => $this->module->getStudlyName(),
             'model' => $this->getName(),
+            'module' => $this->module->getStudlyName(),
         ]
             + (count($this->getModelFillables()) ? ['--fillable' => implode(',', $this->getModelFillables())] : [])
             + (count($this->getModelRelationships()) ? ['--relationships' => implode('|', $this->getModelRelationships())] : [])

@@ -1,0 +1,160 @@
+<?php
+
+namespace Unusualify\Modularity\Repositories\Traits;
+
+trait $STUDLY_NAME$Trait
+{
+    /**
+     * @param array $columns
+     * @param array $inputs
+     * @return array
+     */
+    public function setColumns$STUDLY_NAME$Trait($columns, $inputs)
+    {
+        $traitName = get_class_short_name(__TRAIT__);
+
+        $columns[$traitName] = [];
+
+        return $columns;
+    }
+
+    /**
+     * @param array $fields
+     * @return array
+     */
+    public function prepareFieldsBeforeCreate$STUDLY_NAME$Trait($fields)
+    {
+        // set, cast or unset related fields in order to prepare if necessary
+
+        return $fields;
+    }
+
+    /**
+     * @param \Unusualify\Modularity\Models\Model $object
+     * @param array $fields
+     * @return string[]
+     */
+    public function prepareFieldsBeforeSave$STUDLY_NAME$Trait($object, $fields)
+    {
+        // set, cast or unset related fields in order to prepare if necessary
+
+        return $fields;
+    }
+
+    /**
+     * @param \Unusualify\Modularity\Models\Model $object
+     * @param array $fields
+     * @return void
+     */
+    public function afterUpdateBasic$STUDLY_NAME$Trait($object, $fields)
+    {
+        // do something after the updateBasic method of repository
+    }
+
+    /**
+     * @param \Unusualify\Modularity\Models\Model $object
+     * @param array $fields
+     * @return void
+     */
+    public function beforeSave$STUDLY_NAME$Trait($object, $fields)
+    {
+        // do something before the create, update or duplicate methods of repository
+    }
+
+    /**
+     * @param \Unusualify\Modularity\Models\Model $object
+     * @param array $fields
+     * @return void
+     */
+    public function afterSave$STUDLY_NAME$Trait($object, $fields)
+    {
+        // do something after the create, update or duplicate methods of repository
+    }
+
+    /**
+     * @param \Unusualify\Modularity\Models\Model $object
+     * @return void
+     */
+    public function afterDelete$STUDLY_NAME$Trait($object)
+    {
+        // do something after the delete method of repository
+    }
+
+    /**
+     * @param \Unusualify\Modularity\Models\Model $object
+     * @return void
+     */
+    public function afterForceDelete$STUDLY_NAME$Trait($object)
+    {
+        // do something after the forceDelete, bulkForceDelete methods of repository
+    }
+
+    /**
+     * @param \Unusualify\Modularity\Models\Model $object
+     * @return void
+     */
+    public function afterRestore$STUDLY_NAME$Trait($object)
+    {
+        // do something after the restore, bulkRestore methods of repository
+    }
+
+    /**
+     * @param \Unusualify\Modularity\Models\Model $object
+     * @param array $fields
+     * @return \Unusualify\Modularity\Models\Model
+     */
+    public function hydrate$STUDLY_NAME$Trait($object, $fields)
+    {
+        // change, cast or set related fields in order to hydrate the object Model
+
+        return $object;
+    }
+
+    /**
+     * @param \Unusualify\Modularity\Models\Model $object
+     * @param array $fields
+     * @param array $schema
+     * @return array
+     */
+    public function getFormFields$STUDLY_NAME$Trait($object, $fields, $schema = [])
+    {
+        // set, cast, unset or manipulate the fields by using object, fields and schema
+
+        return $fields;
+    }
+
+    /**
+     * @param \Unusualify\Modularity\Models\Model $object
+     * @param array $fields
+     * @param array $schema
+     * @return array
+     */
+    public function getShowFields$STUDLY_NAME$Trait($object, $fields, $schema = [])
+    {
+        // set, cast, unset or manipulate the fields by using object, fields and schema
+
+        return $fields;
+    }
+
+    /**
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param array $scopes
+     * @return void
+     */
+    public function filter$STUDLY_NAME$Trait($query, &$scopes)
+    {
+        // set, cast, unset or manipulate the scopes by using query and scopes
+        // $scopes['filter'] = true;
+    }
+
+    /**
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param array $orders
+     * @return void
+     */
+    public function order$STUDLY_NAME$Trait($query, &$orders)
+    {
+        // set, cast, unset or manipulate the orders by using query and orders
+        // $orders['order'] = true;
+    }
+}

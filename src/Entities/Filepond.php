@@ -21,9 +21,10 @@ class Filepond extends Model
     public function mediableFormat()
     {
         return [
-            'folder_name' => $this->uuid,
+            'uuid' => $this->uuid,
             'file_name' => $this->file_name,
-            'source' => route('filepond.preview', ['folder' => $this->uuid]),
+            'source' => route('filepond.preview', ['uuid' => $this->uuid]),
+            'created_at' => $this->created_at,
             // 'source' => $this->uuid,
             // 'source' => $this->uuid . '/' .  $this->file_name,
         ];

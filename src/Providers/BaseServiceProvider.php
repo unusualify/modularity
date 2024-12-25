@@ -11,6 +11,7 @@ use Unusualify\Modularity\Http\ViewComposers\CurrentUser;
 use Unusualify\Modularity\Http\ViewComposers\FilesUploaderConfig;
 use Unusualify\Modularity\Http\ViewComposers\Localization;
 use Unusualify\Modularity\Http\ViewComposers\MediasUploaderConfig;
+use Unusualify\Modularity\Http\ViewComposers\Urls;
 use Unusualify\Modularity\Modularity;
 use Unusualify\Modularity\Services\View\UNavigation;
 use Unusualify\Modularity\Support\FileLoader;
@@ -255,28 +256,35 @@ class BaseServiceProvider extends ServiceProvider
             'one-time-operations.directory' => unusualConfig('vendor_path') . '/operations',
         ]);
 
-        $modularityIsCacheable = ! ($this->app->runningInConsole() && $this->app->runningConsoleCommand([
-            'modularity:make:module',
-            'unusual:make:module',
-            'm:m:m',
-            'modularity:fix:module',
-            'modularity:make:route',
-            'unusual:make:route',
-            'm:m:r',
-            'modularity:dev',
-            'unusual:dev',
-            'modularity:remove:module',
-            'unusual:remove:module',
-            'm:r:m',
-        ]));
+        config([
+            'modules.cache.enabled' => $this->app->isProduction() ?: unusualConfig('cache.enabled'),
+            'modules.cache.key' => unusualConfig('cache.key'),
+            'modules.cache.lifetime' => unusualConfig('cache.lifetime'),
+        ]);
 
-        if ($modularityIsCacheable) {
-            config([
-                'modules.cache.enabled' => true,
-                'modules.cache.key' => 'modularity',
-                'modules.cache.lifetime' => 600,
-            ]);
-        }
+        // $modularityIsCacheable = ! ($this->app->runningInConsole() && $this->app->runningConsoleCommand([
+        //     'modularity:make:module',
+        //     'unusual:make:module',
+        //     // 'u:m:m',
+        //     'm:m:m',
+        //     'modularity:fix:module',
+        //     'modularity:make:route',
+        //     'unusual:make:route',
+        //     'm:m:r',
+        //     'u:m:r',
+        //     'modularity:dev',
+        //     'unusual:dev',
+        //     'modularity:remove:module',
+        //     'unusual:remove:module',
+        //     'm:r:m',
+        // ]));
+        // if ($modularityIsCacheable) {
+        //     config([
+        //         'modules.cache.enabled' => true,
+        //         'modules.cache.key' => 'modularity',
+        //         'modules.cache.lifetime' => 600,
+        //     ]);
+        // }
     }
 
     /**
@@ -372,7 +380,15 @@ class BaseServiceProvider extends ServiceProvider
         view()->composer('*', function ($view) {
             $view->with('BASE_KEY', $this->baseKey);
             $view->with('MODULARITY_VIEW_NAMESPACE', $this->baseKey);
+            $view->with('SYSTEM_PACKAGE_VERSIONS', [
+                'APP_VERSION' => env('APP_VERSION', 'v0.0.1'),
+                'MODULARITY_VERSION' => env('MODULARITY_VERSION', 'Not Found'),
+                'PAYABLE_VERSION' => env('PAYABLE_VERSION', 'Not Found'),
+                'SNAPSHOT_VERSION' => env('SNAPSHOT_VERSION', 'Not Found'),
+            ]);
         });
+
+        view()->composer('*', Urls::class);
 
         if (config($this->baseKey . '.enabled.users-management')) {
             View::composer(['admin.*', "$this->baseKey::*"], CurrentUser::class);

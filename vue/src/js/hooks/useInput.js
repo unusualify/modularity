@@ -42,6 +42,11 @@ export default function useInput (props, context) {
   })
 
   const methods = reactive({
+    async validate() {
+      if(this.$refs.VInput){
+        const result = await this.$refs.VInput.validate()
+      }
+    },
     updateModelValue: function (val) {
       context.emit('update:modelValue', val)
     },

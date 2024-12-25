@@ -4,16 +4,22 @@ namespace Unusualify\Modularity\Console;
 
 use Illuminate\Filesystem\Filesystem;
 use Nwidart\Modules\Support\Stub;
-use Symfony\Component\Console\Input\InputArgument;
 
 class CreateVueInputCommand extends BaseCommand
 {
+    protected $hidden = true;
+
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'modularity:create:vue:input';
+    protected $signature = 'modularity:create:vue:input
+        {name : The name of the component to be created.}';
+
+    protected $aliases = [
+        'mod:c:vue:input',
+    ];
 
     /**
      * The console command description.
@@ -60,7 +66,7 @@ class CreateVueInputCommand extends BaseCommand
 
             $this->filesystem->put($path, $content);
 
-            $this->info("{$componentName} component created.");
+            $this->info("{$componentName} component created. Path: {$path}");
         } else {
             $success = false;
 
@@ -68,28 +74,5 @@ class CreateVueInputCommand extends BaseCommand
         }
 
         return $success ? 0 : E_ERROR;
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['name', InputArgument::REQUIRED, 'The name of theme to be created.'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return array_merge([
-        ]);
     }
 }

@@ -1,6 +1,5 @@
 import colors from 'vuetify/util/colors'
 
-console.log(colors)
 export default {
   dark: false,
   colors: {
@@ -75,6 +74,7 @@ export default {
     'grey-lighten-6': '#F2F1F1',    // R:242 G:241 B:241
     'grey-lighten-4': '#CACBCB',    // R:202 G:203 B:203
     'grey-lighten-5': '#E4E4E4',    // R:228 G:228 B:228
+    'grey-lighten-6': '#F2F1F1',    // R:242 G:241 B:241
     'grey-darken-1': '#657275',     // R:101 G:114 B:117
     'grey-darken-2': '#546367',     // R:84  G:99  B:103
     'grey-darken-3': '#435458',     // R:67  G:84  B:88

@@ -36,6 +36,18 @@ trait IsAuthorizedable
         );
     }
 
+    public function user()
+    {
+        return $this->hasOneThrough(
+            $this->getAuthorizedUserModel(),
+            $this->getAuthorizedModel(),
+            'authorizedable_id',
+            'id',
+            'id',
+            'user_id'
+        );
+    }
+
     protected function getAuthorizedModel()
     {
         return \Unusualify\Modularity\Entities\Authorized::class;
