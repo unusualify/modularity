@@ -31,6 +31,7 @@
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "madge": "^6.1.0",
+    "moment": "^2.30.1",
     "pluralize": "^8.0.0",
     "truncate-utf8-bytes": "^1.0.2",
     "v-mask": "^2.3.0",
