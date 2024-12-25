@@ -2,6 +2,18 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.22.2 - 2024-12-25
+
+### :package: Build
+
+- update build artifacts for v0.22.1 by @invalid-email-address in https://github.com/unusualify/modularity/commit/4b8ea07c4e1d8345750c6e58e60ee10a654a2989
+- update build artifacts for 0.22.2 by @OoBook in https://github.com/unusualify/modularity/commit/b84febecc40bea1554c90ff8ae15a9173544816f
+- update build artifacts for v0.22.2 by @invalid-email-address in https://github.com/unusualify/modularity/commit/7fc99cd4bc369bd884ff6a729fce5b1069256f54
+
+### :green_heart: Workflow
+
+- update GitHub Actions workflow for release process by @OoBook in https://github.com/unusualify/modularity/commit/89cc9ae3c438e2c8ae09a3650acd30d564fc2b87
+
 ## v0.22.1 - 2024-12-25
 
 ### :wrench: Bug Fixes
