@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Model;
@@ -575,12 +576,37 @@ if (! function_exists('configure_input')) {
     }
 }
 
+if (! function_exists('modularity_default_input')) {
+    function modularity_default_input()
+    {
+        return (array) Config::get(unusualBaseKey() . '.default_input');
+    }
+}
+
 if (! function_exists('hydrate_input')) {
     function hydrate_input(array $input, $module = null)
     {
         $hydrator = new InputHydrator($input, $module);
 
         return $hydrator->hydrate();
+    }
+}
+
+if (! function_exists('modularity_format_input')) {
+    function modularity_format_input(array $input)
+    {
+        $defaultInput = modularity_default_input();
+
+        return configure_input(hydrate_input(array_merge($defaultInput, $input)));
+    }
+}
+
+if (! function_exists('modularity_format_inputs')) {
+    function modularity_format_inputs(array $inputs)
+    {
+        return array_map(function ($v) {
+            return modularity_format_input($v);
+        }, $inputs);
     }
 }
 
@@ -593,7 +619,7 @@ if (! function_exists('get_user_profile')) {
      */
     function get_user_profile($user)
     {
-        return $user->only(['name', 'email']) + [
+        return $user->only(['id','name', 'email']) + [
             'avatar_url' => $user->fileponds()
                 ->where('role', 'avatar')
                 ->first()
