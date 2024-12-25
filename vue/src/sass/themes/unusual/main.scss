@@ -1,0 +1,23 @@
+@use 'abstract';
+
+@use 'styles/core/base' with (
+  // $sidebar-list-item-overlay-color: ,
+  $theme-config: (
+    'primary-color': #0056b3,
+    'secondary-color': #5a6268,
+    'table-row-height': 49px,
+    'table-header-height': 49px,
+    // Add more theme-specific overrides here
+  )
+);
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);
+// Apply the theme configuration
+// @include base.set-theme-config();
+
+// @use './variables' as *;
+// @use './components' as *;
+// @use './directives' as *;
+// @use './settings' as *;
+
+// Add any theme-specific styles here
+
