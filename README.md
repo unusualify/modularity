@@ -55,7 +55,7 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 To install the git hooks for release branches:
 
 ```bash
-bash setup-hooks.sh
+chmod +x setup-hooks.sh && ./setup-hooks.sh
 ```
 These hooks will automatically format PHP code and build Vue assets before pushing to release branches.
 
