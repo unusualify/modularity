@@ -14,10 +14,9 @@ trait HasChatable
     public static function bootHasChatable(): void
     {
         static::retrieved(function (Model $model) {
-            // dd('retrieved', $model->chatMessages);
             if ($model->chat) {
                 $model->setAttribute('_chat_id', $model->chat->id);
-            } else {
+            } else if ($model->{$model->getForeignKey()}) {
                 $chat = $model->chat()->create();
                 $model->setAttribute('_chat_id', $chat->id);
             }
