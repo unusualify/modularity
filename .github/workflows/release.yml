@@ -20,40 +20,41 @@ jobs:
           fetch-depth: 0
       - name: Extract tag name
         run: echo "TAG_NAME=${GITHUB_REF#refs/heads/release/}" >> $GITHUB_ENV
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.3
-          extensions: json, dom, curl, libxml, mbstring
-          coverage: none
 
-      - name: Install Pint
-        run: composer global require laravel/pint
+      # - name: Setup PHP
+      #   uses: shivammathur/setup-php@v2
+      #   with:
+      #     php-version: 8.3
+      #     extensions: json, dom, curl, libxml, mbstring
+      #     coverage: none
 
-      - name: Run Pint
-        run: pint
+      # - name: Install Pint
+      #   run: composer global require laravel/pint
 
-      - name: Check for Vue changes
-        id: check-vue-changes
-        run: |
-          # git diff --quiet HEAD^ HEAD vue/src/ vue/public/ || echo "vue_changed=true" >> $GITHUB_OUTPUT
-          git diff --quiet HEAD^ HEAD vue/ || echo "vue_changed=true" >> $GITHUB_OUTPUT
+      # - name: Run Pint
+      #   run: pint
 
-      - name: Setup Node.js
-        if: steps.check-vue-changes.outputs.vue_changed == 'true'
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
+      # - name: Check for Vue changes
+      #   id: check-vue-changes
+      #   run: |
+      #     # git diff --quiet HEAD^ HEAD vue/src/ vue/public/ || echo "vue_changed=true" >> $GITHUB_OUTPUT
+      #     git diff --quiet HEAD^ HEAD vue/ || echo "vue_changed=true" >> $GITHUB_OUTPUT
 
-      - name: Install Vue dependencies
-        if: steps.check-vue-changes.outputs.vue_changed == 'true'
-        working-directory: vue
-        run: npm install
+      # - name: Setup Node.js
+      #   if: steps.check-vue-changes.outputs.vue_changed == 'true'
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: '18'
 
-      - name: Build Vue
-        if: steps.check-vue-changes.outputs.vue_changed == 'true'
-        working-directory: vue
-        run: npm run build
+      # - name: Install Vue dependencies
+      #   if: steps.check-vue-changes.outputs.vue_changed == 'true'
+      #   working-directory: vue
+      #   run: npm install
+
+      # - name: Build Vue
+      #   if: steps.check-vue-changes.outputs.vue_changed == 'true'
+      #   working-directory: vue
+      #   run: npm run build
 
       # - name: Stage changes, commit and push to release branch
       #   run: |
@@ -84,10 +85,11 @@ jobs:
       #     # branch: ${{ github.event.inputs.major_version }}
       #     branch: 'main'
       #     force: true
-      # - uses: oobook/automated-tag@v1
-      #   id: tag-generation
-      #   with:
-      #     gh_token: ${{ github.token }}
+      - uses: oobook/automated-tag@v1
+        id: tag-generation
+        with:
+          gh_token: ${{ github.token }}
+          tag: ${{ env.TAG_NAME }}
 
       - name: Create Release
         uses: oobook/automated-release@v1
