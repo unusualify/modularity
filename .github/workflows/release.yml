@@ -55,33 +55,39 @@ jobs:
         working-directory: vue
         run: npm run build
 
-      - name: Stage changes, commit and tag it
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          # Check if vue/dist has changes and commit if necessary
-          if [ -d "vue/dist" ] && git status vue/dist --porcelain | grep .; then
-            git add vue/dist
-            git commit -m "build(vue): update build artifacts for ${{ env.TAG_NAME }}"
-          fi
-          # Continue with other changes
-          git add .
-          git diff --quiet && git diff --staged --quiet || git commit -m "style(laravel): lint coding styles for ${{ env.TAG_NAME }}"
-          git push
-          git checkout main
-          git merge --no-ff ${{ github.ref }}
-          git tag ${{ env.TAG_NAME }}
+      # - name: Stage changes, commit and push to release branch
+      #   run: |
+      #     git config user.name github-actions
+      #     git config user.email github-actions@github.com
+      #     # Check if vue/dist has changes and commit if necessary
+      #     if [ -d "vue/dist" ] && git status vue/dist --porcelain | grep .; then
+      #       git add vue/dist
+      #       git commit -m "build(vue): update build artifacts for ${{ env.TAG_NAME }}"
+      #     fi
+      #     # Continue with other changes
+      #     git add .
+      #     git diff --quiet && git diff --staged --quiet || git commit -m "style(laravel): lint coding styles for ${{ env.TAG_NAME }}"
+      #     git push origin ${{ github.ref }}
 
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          # branch: ${{ github.event.inputs.major_version }}
-          branch: 'main'
-          force: true
-      - uses: oobook/automated-tag@v1
-        id: tag-generation
-        with:
-          gh_token: ${{ github.token }}
+      # - name: Merge to main and create tag
+      #   run: |
+      #     git checkout main
+      #     git pull origin main
+      #     git merge --no-ff ${{ github.ref }} -m "chore: merge release/${{ env.TAG_NAME }} into main"
+      #     git push origin main
+      #     git tag -a ${{ env.TAG_NAME }} -m "Release ${{ env.TAG_NAME }}"
+      #     git push origin ${{ env.TAG_NAME }}
+
+      # - name: Push changes
+      #   uses: ad-m/github-push-action@master
+      #   with:
+      #     # branch: ${{ github.event.inputs.major_version }}
+      #     branch: 'main'
+      #     force: true
+      # - uses: oobook/automated-tag@v1
+      #   id: tag-generation
+      #   with:
+      #     gh_token: ${{ github.token }}
 
       - name: Create Release
         uses: oobook/automated-release@v1
