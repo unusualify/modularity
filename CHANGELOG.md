@@ -2,6 +2,21 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.22.5 - 2024-12-26
+
+### :lipstick: Styling
+
+- lint coding styles for v0.22.4 by @invalid-email-address in https://github.com/unusualify/modularity/commit/43ea6698dfb4001b86c3a83eefd9163c4fa9714d
+- lint coding styles by @OoBook in https://github.com/unusualify/modularity/commit/bc1851f193e0e4ad4209c1518a64529168f0075e
+
+### :green_heart: Workflow
+
+- Comment out PHP and Vue setup steps in release workflow by @OoBook in https://github.com/unusualify/modularity/commit/de5da26f57c32586480b9359e6565b1293498633
+
+### :beers: Other Stuff
+
+- Add development setup instructions and git hooks for release branches by @OoBook in https://github.com/unusualify/modularity/commit/a2eb1a1ee4874233bce057ddffe94161dde9ddb1
+
 ## v0.22.4 - 2024-12-26
 
 ### :wrench: Bug Fixes
