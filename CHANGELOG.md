@@ -2,6 +2,16 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.22.4 - 2024-12-26
+
+### :wrench: Bug Fixes
+
+- streamline chat instance creation logic by @OoBook in https://github.com/unusualify/modularity/commit/9509159b4bf112ae6d06f5b8976fe5784145a831
+
+### :lipstick: Styling
+
+- lint coding styles for v0.22.3 by @invalid-email-address in https://github.com/unusualify/modularity/commit/6dcc0bef1cfb20cdcfbb95ce6df7ab44ee9009b8
+
 ## v0.22.3 - 2024-12-25
 
 ### :wrench: Bug Fixes
