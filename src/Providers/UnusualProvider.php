@@ -2,6 +2,8 @@
 
 namespace Unusualify\Modularity\Providers;
 
+use Illuminate\Auth\Notifications\ResetPassword;
+
 class UnusualProvider extends ServiceProvider
 {
     protected $providers = [
@@ -40,6 +42,18 @@ class UnusualProvider extends ServiceProvider
      */
     public function boot()
     {
+        ResetPassword::createUrlUsing(function ($notifiable, string $token) {
+
+            // return route('admin.password.reset',[
+            //     'token' => $token,
+            //     'email' => $notifiable->getEmailForPasswordReset()
+            // ]);
+            //TODO: Move this to BaseServiceProvider
+            return url(route('admin.password.reset', [
+                'token' => $token,
+                'email' => $notifiable->getEmailForPasswordReset(),
+            ], false));
+        });
         // dd(__FUNCTION__, __CLASS__);
         // Has to be merged after routeServiceProvider registered
         if (exceptionalRunningInConsole()) {

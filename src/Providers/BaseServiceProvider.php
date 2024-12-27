@@ -235,7 +235,7 @@ class BaseServiceProvider extends ServiceProvider
             if (blank(config('auth.passwords.unusual_users'))) {
                 config(['auth.passwords.unusual_users' => [
                     'provider' => 'unusual_users',
-                    'table' => unusualConfig('password_resets_table', 'password_resets'),
+                    'table' => unusualConfig('password_resets_table', 'password_reset_tokens'),
                     'expire' => 60,
                     'throttle' => 60,
                 ]]);

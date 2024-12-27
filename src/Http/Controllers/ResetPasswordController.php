@@ -221,7 +221,7 @@ class ResetPasswordController extends Controller
             ]);
         }
 
-        return $this->redirector->to(route('password.reset'))->withErrors([
+        return $this->redirector->to(route('admin.password.reset'))->withErrors([
             'token' => 'Your password reset token has expired or could not be found, please retry.',
         ]);
     }
