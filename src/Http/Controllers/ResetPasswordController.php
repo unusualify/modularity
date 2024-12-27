@@ -295,4 +295,17 @@ class ResetPasswordController extends Controller
             ->withInput($request->only('email'))
             ->withErrors(['email' => trans($response)]);
     }
+
+    public function success()
+    {
+        return view(unusualBaseKey() . '::auth.success', [
+           'taskState' => [
+                'status' => 'success',
+                'title' => __('authentication.password-sent'),
+                'description' => __('authentication.succcess-reset-email'),
+                'button_text' => __('authentication.go-to-sign-in'),
+                'button_url' => 'Test'
+           ]
+        ]);
+    }
 }
