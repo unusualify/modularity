@@ -26,10 +26,11 @@ if (unusualConfig('enabled.users-management')) {
     Route::post('login', 'LoginController@login')->name('login');
     Route::post('logout', 'LoginController@logout')->name('logout');
 
+    Route::get('password/reset/{token}', 'ResetPasswordController@showResetForm')->name('password.reset');
+
     Route::get('password/reset', 'ForgotPasswordController@showLinkRequestForm')->name('password.reset.link');
     Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.reset.email');
 
-    Route::get('password/reset/{token}', 'ResetPasswordController@showResetForm')->name('password.reset');
     // Route::get('password/welcome/{token}', 'ResetPasswordController@showWelcomeForm')->name('password.reset.welcome.form');
     Route::post('password/reset', 'ResetPasswordController@reset')->name('password.reset.update');
 
