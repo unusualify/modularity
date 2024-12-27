@@ -26,7 +26,7 @@ jobs:
       - name: Close Issue
         if: steps.extract.outputs.issue_number != ''
         run: |
-          gh issue close ${{ steps.extract.outputs.issue_number }} --comment "Closing issue as PR [#${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }}) has been merged."
+          gh issue close ${{ steps.extract.outputs.issue_number }} --repo ${{ github.repository }} --comment "Closing issue as PR [#${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }}) has been merged."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
