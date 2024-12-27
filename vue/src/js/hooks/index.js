@@ -26,3 +26,6 @@ export { default as useTableHeaders, makeTableHeadersProps } from './useTableHea
 export { default as useTableForms, makeTableFormsProps } from './useTableForms'
 export { default as useTableItemActions, makeTableItemActionsProps } from './useTableItemActions'
 export { default as useTableModals } from './useTableModals'
+export { default as useCurrency } from './useCurrency'
+
+

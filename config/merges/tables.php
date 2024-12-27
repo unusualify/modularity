@@ -13,4 +13,5 @@ return [
     'tags' => 'umod_tags',
     'repeaters' => 'umod_repeaters',
     'authorizeds' => 'umod_authorizeds',
+    'payments' => 'umod_payments',
 ];

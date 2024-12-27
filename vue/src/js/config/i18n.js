@@ -104,12 +104,12 @@ const numberFormats = {
     currency: {
       style: 'currency', currency: 'USD', notation: 'standard'
     },
-    // decimal: {
-    //   style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2
-    // },
-    // percent: {
-    //   style: 'percent', useGrouping: false
-    // }
+    decimal: {
+      style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2
+    },
+    percent: {
+      style: 'percent', useGrouping: false
+    }
   },
   en: {
     currency: {
@@ -180,7 +180,7 @@ export async function loadLocaleMessages (i18n, endpoint) {
     try {
       axios.get(endpoint ?? '/api/languages')
         .then((response) => {
-          __log('response', endpointresponse.data)
+          __log('response', endpoint,response.data)
           for (const locale in response.data) {
             loadLocaleMessage(i18n, locale, response.data[locale])
           }
