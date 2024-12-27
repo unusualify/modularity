@@ -461,49 +461,6 @@ export default function useTable (props, context) {
 
       return data
     },
-
-
-    _canItemAction: function (action) {
-      // __log(store.getters.userPermissions)
-      if (__isset(action.can) && action.can) {
-        // __log(action, action.can)
-        // if (store.getters.isSuperAdmin) {
-        //   return true
-        // }
-        // __log(
-        //   action.can
-        // )
-        // __log(
-        //   permission,
-        //   this.$store.getters.isSuperAdmin,
-        //   this.$store.getters.userPermissions
-        // )
-        // if (this.$store.getters.isSuperAdmin) {
-        //   return true
-        // }
-
-        // return false
-      }
-
-      return true
-    },
-    _openDeleteModal: function (modal) {
-      modal.open()
-      // state.deleteModal.open()
-      // state.deleteModalActive = true
-    },
-    _closeDeleteModal: function () {
-      state.modals[0].active.value = false
-      // state.modals[0].ref.close()
-      // state.deleteModalActive = false
-    },
-    _openActionModal(action, name){
-      return;
-      state.customModalActive = true;
-      openAction=true;
-      // state.actionModalActive = true
-      // state.selectedAction = action
-    },
   })
 
   watch(() => tableItem.editedItem.value, (newValue, oldValue) => {

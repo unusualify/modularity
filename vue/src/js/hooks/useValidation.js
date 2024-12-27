@@ -113,6 +113,44 @@ export default function useValidation (props) {
     return isValid
   }
 
+  function invokeRule(input){
+    let Input = cloneDeep(input)
+    let _input = cloneDeep(input)
+
+    if (Object.prototype.hasOwnProperty.call(_input, 'rules')) {
+      Input.rawRules = !__isset(Input.rawRules)
+        ? _input.rules
+        : Input.rawRules
+
+      if (window.__isString(Input.rawRules)) {
+        _input.rules = Input.rawRules.split('|')
+      } else {
+        _input.rules = Input.rawRules
+      }
+      Input.rules = []
+      _input.rules.forEach((rule, index) => {
+        if (window.__isString(rule)) {
+          rule = rule.split(':')
+        }
+        const method = rule[0] + 'Rule'
+        if (Object.prototype.hasOwnProperty.call(ruleMethods, method)) {
+          Input.rules.push(ruleMethods[method](...(rule.slice(1))))
+        }
+      })
+    }
+
+    if(__isset(Input.schema)){
+      Input.schema = invokeRuleGenerator(Input.schema)
+    }
+
+    if(!__isset(input.rawRules)){
+      Input.rules = []
+      Input.rawRules = ''
+    }
+
+    return Input
+  }
+
   function invokeRuleGenerator (inputs) {
     const _inputs = cloneDeep(inputs)
 
@@ -150,15 +188,7 @@ export default function useValidation (props) {
         }
       })
     }
-    // __log(methods, obj.schema, methods.hasOwnProperty('passwordHandler'))
-    // const camelSlotName = _.camelCase(slotName)
 
-    // if (obj.schema.hasOwnProperty('slotHandlers') &&
-    //   obj.schema.slotHandlers.hasOwnProperty(camelSlotName)) {
-    //   const name = _.camelCase(obj.schema.slotHandlers[camelSlotName])
-    //   const func = `${name}Handler`
-    //   return methods[func](obj, camelSlotName)
-    // }
     return inputs
   }
 
@@ -168,6 +198,7 @@ export default function useValidation (props) {
   // expose managed state as return value
   return {
     // invokeRuleValidator,
+    invokeRule,
     invokeRuleGenerator,
     ...toRefs(ruleMethods),
     ...toRefs(state)

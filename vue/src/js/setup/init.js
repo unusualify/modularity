@@ -3,10 +3,12 @@
 import axios from 'axios'
 import jquery from 'jquery'
 import lodash, { snakeCase } from 'lodash-es'
+import pluralize from 'pluralize'
+import moment from 'moment'
+import { useI18n } from 'vue-i18n'
+
 import store from '@/store' // Adjust the import based on your store structure
 import { CONFIG } from '@/store/mutations'
-import { useI18n } from 'vue-i18n'
-import pluralize from 'pluralize'
 import { addParametersToUrl, replaceState } from '@/utils/pushState'
 
 /**
@@ -663,7 +665,7 @@ export default function init(){
   window.axios = axios
   window.$ = jquery
   window._ = lodash
-
+  window.$moment = moment
   window.axios.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest',
     Accept: 'application/json'

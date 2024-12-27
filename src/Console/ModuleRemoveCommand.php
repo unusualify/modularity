@@ -23,6 +23,7 @@ class ModuleRemoveCommand extends BaseCommand
 
     protected $aliases = [
         'm:r:m',
+        'mod:r:module',
         'unusual:remove:module',
     ];
 
@@ -33,7 +34,10 @@ class ModuleRemoveCommand extends BaseCommand
      */
     public function handle(): int
     {
+        Modularity::disableCache();
+
         $moduleName = $this->argument('module');
+
         $module = Modularity::find($moduleName);
 
         // $this->call('optimize:clear');

@@ -10,10 +10,22 @@ const state = {
   secondarySidebarOptions: window[import.meta.env.VUE_APP_NAME]?.STORE.config.secondarySidebarOptions ?? false,
   isRequestInProgress: false, // New state property to track async requests
   ongoingAxiosRequests: 0, // Counter for ongoing requests
+  systemPackageVersions: window[import.meta.env.VUE_APP_NAME]?.STORE.config.systemPackageVersions ?? {},
+  appName: window[import.meta.env.VUE_APP_NAME]?.STORE.config.appName ?? '',
+  appEnv: window[import.meta.env.VUE_APP_NAME]?.STORE.config.appEnv ?? '',
+  appDebug: window[import.meta.env.VUE_APP_NAME]?.STORE.config.appDebug ?? '',
+  appEmail: window[import.meta.env.VUE_APP_NAME]?.STORE.config.appEmail ?? '',
+
+  profileShortcutModel: window[import.meta.env.VUE_APP_NAME]?.STORE.config.profileShortcutModel ?? {},
+  profileShortcutSchema: window[import.meta.env.VUE_APP_NAME]?.STORE.config.profileShortcutSchema ?? {},
+  profileRoute: window[import.meta.env.VUE_APP_NAME]?.STORE.config.profileRoute ?? '',
 }
 
 // getters
 const getters = {
+  versions: state => {
+    return state.systemPackageVersions
+  },
   currentUser: state => {
     return state.currentUser
   },
@@ -34,6 +46,9 @@ const getters = {
 }
 
 const mutations = {
+  [CONFIG.SET_PROFILE_DATA] (state, data) {
+    state.currentUser = data
+  },
   [CONFIG.SIDEBAR_TOGGLE] (state) {
     state.sidebarStatus = !state.sidebarStatus; // Mutation to toggle sidebar
   },

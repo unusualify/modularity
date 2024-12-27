@@ -2,6 +2,191 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.22.5 - 2024-12-26
+
+### :lipstick: Styling
+
+- lint coding styles for v0.22.4 by @invalid-email-address in https://github.com/unusualify/modularity/commit/43ea6698dfb4001b86c3a83eefd9163c4fa9714d
+- lint coding styles by @OoBook in https://github.com/unusualify/modularity/commit/bc1851f193e0e4ad4209c1518a64529168f0075e
+
+### :green_heart: Workflow
+
+- Comment out PHP and Vue setup steps in release workflow by @OoBook in https://github.com/unusualify/modularity/commit/de5da26f57c32586480b9359e6565b1293498633
+
+### :beers: Other Stuff
+
+- Add development setup instructions and git hooks for release branches by @OoBook in https://github.com/unusualify/modularity/commit/a2eb1a1ee4874233bce057ddffe94161dde9ddb1
+
+## v0.22.4 - 2024-12-26
+
+### :wrench: Bug Fixes
+
+- streamline chat instance creation logic by @OoBook in https://github.com/unusualify/modularity/commit/9509159b4bf112ae6d06f5b8976fe5784145a831
+
+### :lipstick: Styling
+
+- lint coding styles for v0.22.3 by @invalid-email-address in https://github.com/unusualify/modularity/commit/6dcc0bef1cfb20cdcfbb95ce6df7ab44ee9009b8
+
+## v0.22.3 - 2024-12-25
+
+### :wrench: Bug Fixes
+
+- create chat instance if none exists during model booting by @OoBook in https://github.com/unusualify/modularity/commit/45f76044f2e9165f8476904c41d582b87b1748c7
+- update route check for profile access by @OoBook in https://github.com/unusualify/modularity/commit/59bebcb6f36053da7ee07fc6b92ae3bbc06e4535
+
+## v0.22.2 - 2024-12-25
+
+### :package: Build
+
+- update build artifacts for v0.22.1 by @invalid-email-address in https://github.com/unusualify/modularity/commit/4b8ea07c4e1d8345750c6e58e60ee10a654a2989
+- update build artifacts for 0.22.2 by @OoBook in https://github.com/unusualify/modularity/commit/b84febecc40bea1554c90ff8ae15a9173544816f
+- update build artifacts for v0.22.2 by @invalid-email-address in https://github.com/unusualify/modularity/commit/7fc99cd4bc369bd884ff6a729fce5b1069256f54
+
+### :green_heart: Workflow
+
+- update GitHub Actions workflow for release process by @OoBook in https://github.com/unusualify/modularity/commit/89cc9ae3c438e2c8ae09a3650acd30d564fc2b87
+
+## v0.22.1 - 2024-12-25
+
+### :wrench: Bug Fixes
+
+- update modal action visibility condition by @OoBook in https://github.com/unusualify/modularity/commit/0141eb486efc3d9594dbe1e3e1ad06067b9f665f
+
+### :lipstick: Styling
+
+- lint coding styles for v0.22.0 by @invalid-email-address in https://github.com/unusualify/modularity/commit/87f14a150544be2a61f158d5740d0078b0acd5aa
+
+### :package: Build
+
+- update build artifacts for v0.22.0 by @invalid-email-address in https://github.com/unusualify/modularity/commit/712e5bfee037c291113090912400bd2d32cd9aaf
+
+## v0.22.0 - 2024-12-25
+
+### :rocket: Features
+
+- add GitHub Actions workflow to automatically close issues when associated PRs are merged by @OoBook in https://github.com/unusualify/modularity/commit/c6c31667f38b22d57b5907b488297599a648bc18
+- add CreateConsoleCommand and command stub for modularity command generation by @OoBook in https://github.com/unusualify/modularity/commit/ec1df30b25a2282c62b9f6cca5eacab648071cd1
+- add functions to retrieve package version and update .env file by @OoBook in https://github.com/unusualify/modularity/commit/16a2d5e1ff8757f515bf695c4219e79077fe43a5
+- add GetVersionCommand to retrieve package version by @OoBook in https://github.com/unusualify/modularity/commit/191fc39b27297da854079facc136f20335be8174
+- add CacheVersionsCommand to cache package versions by @OoBook in https://github.com/unusualify/modularity/commit/a6b7f2930f2c68474b46fe167c09a023b53ff417
+- enhance application configuration and sidebar display by @OoBook in https://github.com/unusualify/modularity/commit/dbdbdb96ed6907d75a292dafc1b6a46f21ff094c
+- add caching functions for translations by @OoBook in https://github.com/unusualify/modularity/commit/89fc2f143b5a273118a0b3c74f359c91b813acef
+- integrate translations into the application by @OoBook in https://github.com/unusualify/modularity/commit/46a1f1a06e43b71a6b7e9063bce01c6fcb24d13e
+- add async validation method to input hook by @OoBook in https://github.com/unusualify/modularity/commit/9c8e2fd113f17bc3135473c70236b2e9f5c549cd
+- emit 'submitted' event on form submission by @OoBook in https://github.com/unusualify/modularity/commit/07580686ca2a500b6d34c930d875092f2f826f8c
+- integrate Fileponds functionality into User entity and repository by @OoBook in https://github.com/unusualify/modularity/commit/ef94f411d1d8f2eb513b645a2363a986aaec7c6a
+- implement InputHydrator class for dynamic input handling by @OoBook in https://github.com/unusualify/modularity/commit/662f670b18f97a5c10783d3583a33f2b68b8aa1d
+- add Urls view composer for dynamic URL binding by @OoBook in https://github.com/unusualify/modularity/commit/667fc625337e4d21431ad0fe36c1ab11905f859a
+- add input configuration and hydration functions by @OoBook in https://github.com/unusualify/modularity/commit/6a6a086658be2ea192dc14d4d8b926f4b3f31415
+- enhance profile management and UI integration by @OoBook in https://github.com/unusualify/modularity/commit/c60c4730fbc323e2cf63bb7239009eadf49fb038
+- add dynamic URL binding to head script by @OoBook in https://github.com/unusualify/modularity/commit/1f1de72deaba2b673411a9d813db26996865dabc
+- enhance sidebar for user role display and information by @OoBook in https://github.com/unusualify/modularity/commit/90dac8ee0b8fdf90bbb2f97148575da8e34583c0
+- add path and namespace concatenation functions by @OoBook in https://github.com/unusualify/modularity/commit/7d3ad2f90958fe74623254f226fe283e0bb9289b
+- add vendor path and namespace retrieval methods by @OoBook in https://github.com/unusualify/modularity/commit/38d55a131f511cbbe9460454a6b97f55b90e115d
+- add command to generate model traits by @OoBook in https://github.com/unusualify/modularity/commit/4ceea130128d66069f15b20d1a10e7cc70e5cb58
+- add command to generate repository traits by @OoBook in https://github.com/unusualify/modularity/commit/bc4ba0be4d94ba5fa88b125a423fe22c33a21107
+- add command to create modularity features by @OoBook in https://github.com/unusualify/modularity/commit/b7b4a2a9554607e367c1c59c01fd376b8e88e585
+- add command to flush Modularity caches by @OoBook in https://github.com/unusualify/modularity/commit/28419f5774689d298f8f8c1201a045cdf4ede33a
+- add cache management methods by @OoBook in https://github.com/unusualify/modularity/commit/ce3490b6718fe4a51b4140d10c4fccedb9625aa6
+- enhance file preview layout and add date display by @OoBook in https://github.com/unusualify/modularity/commit/095ff9609d23e2246a5ac904fb5dd0197a33a9fa
+- add user relationship method for authorized entities by @OoBook in https://github.com/unusualify/modularity/commit/0950d6ac24b1a5be190a4a8271c8f1160a28900a
+- add created_at field to mediableFormat method for enhanced file metadata by @OoBook in https://github.com/unusualify/modularity/commit/e8cb26d8b536812b549f5dc4454523de37873b5e
+- add modularity input formatting functions for enhanced input management by @OoBook in https://github.com/unusualify/modularity/commit/07b23841d709ce51d8c3d7c74435bb195fa84f1c
+- :sparkles: add new chat and chat_messages configurations for modularity by @OoBook in https://github.com/unusualify/modularity/commit/730b9cfca0bf65a79e7528e57cb5c9db79b11bb6
+- :sparkles: - Introduced 'chats' and 'chat_messages' entries in the tables configuration to support modular chat functionalities. - This addition enhances the application's capability to manage chat-related data, aligning with recent modularity improvements. by @OoBook in https://github.com/unusualify/modularity/commit/b3e859e20e3ca51847086a4f9b2407e4d113d8f5
+- add new theme styles and SVG icons for unusual theme by @OoBook in https://github.com/unusualify/modularity/commit/79e178bfa84838191046e4f44da4eeab63be1145
+
+### :wrench: Bug Fixes
+
+- remove applyCasting error return null by @OoBook in https://github.com/unusualify/modularity/commit/1c135ebc079e5183848f969d66e31a0acbaf3023
+- remove applyCasting error return null by @OoBook in https://github.com/unusualify/modularity/commit/62b5cb5fcf88feace64e4fab596583938d88e261
+- refine company registration logic to ensure proper redirection based on user status and route checks by @OoBook in https://github.com/unusualify/modularity/commit/b9ce789b1ca297b0ec337bd000a60c6ca05d7a84
+- remove unnecessary logging in loadLocaleMessages function by @OoBook in https://github.com/unusualify/modularity/commit/9627deece243075536c357986096feef65c8227a
+- improve TRANSLATIONS check in loadLocaleMessages function by @OoBook in https://github.com/unusualify/modularity/commit/6b6d332acefcfe9b4cab27aeed2ac3a6a14e37be
+- set fixed namespace value in configuration by @OoBook in https://github.com/unusualify/modularity/commit/68b050610f87bdcfa074b5d93e9d432c9c50dc41
+- enhance cache management in ModuleMakeCommand, ModuleRemoveCommand, and RouteMakeCommand by @OoBook in https://github.com/unusualify/modularity/commit/b90533b2ec6099c8c9d7d4d7a0eb28fd2bc4e75b
+- correct duplicate grey-lighten-6 color definition by @OoBook in https://github.com/unusualify/modularity/commit/c9d8d7e8160ba95f8748932bf2c2b63715878a3a
+- update import paths in vue-component.stub for correct module resolution by @OoBook in https://github.com/unusualify/modularity/commit/3a698d9a31581234ab3dea965f8a04a8938cc23b
+- correct import paths in v-input-chat test file by @OoBook in https://github.com/unusualify/modularity/commit/9c7d604c84144c24f409c04152f0bfc4cdd61e88
+
+### :recycle: Refactors
+
+- remove unused modal and permission handling functions to clean up code by @OoBook in https://github.com/unusualify/modularity/commit/5f622aa09bbff0190a3d76566695f490498def60
+- clean up layout file by removing commented script tags by @OoBook in https://github.com/unusualify/modularity/commit/9a7df0a13249616b74240f898ee2aae552df7dd4
+- remove commented-out font and CSS preload links by @OoBook in https://github.com/unusualify/modularity/commit/bdf75e7c367d234558b64ccdcc7a2bf2e9242f5a
+- remove commented-out pre-scripts section by @OoBook in https://github.com/unusualify/modularity/commit/cd58b26f28f9e4770392a762b259aa63f3111735
+- simplify input configuration and hydration methods by @OoBook in https://github.com/unusualify/modularity/commit/5eb635cfecd4d28337fc29d9ebcf03947878ac56
+- streamline input hydration process by @OoBook in https://github.com/unusualify/modularity/commit/e40cae8de35dae17cd085eb4a636df17155f5a91
+- clean up unused action comments by @OoBook in https://github.com/unusualify/modularity/commit/1cfcb2060c56f403aae351d42a2e46acebe4aaea
+- update file handling structure and improve clarity by @OoBook in https://github.com/unusualify/modularity/commit/fd61ab2e75f7f8e2a3024627f63e9903f060ca16
+- streamline current user data handling by @OoBook in https://github.com/unusualify/modularity/commit/95ae763093e230e9b7041ddb27389a7cb235ca18
+- improve user profile retrieval logic by @OoBook in https://github.com/unusualify/modularity/commit/99db6dda8764237edc5a013054b41347e2b76dd5
+- update model and migration command syntax by @OoBook in https://github.com/unusualify/modularity/commit/cc7c208961c0f9c3f5790706a2b1932122a9c0eb
+- update command signature and remove deprecated methods by @OoBook in https://github.com/unusualify/modularity/commit/cb524b58811ac6f2708653b2cf89f1792ad6b2d0
+- update command signature and enhance user feedback by @OoBook in https://github.com/unusualify/modularity/commit/443925db2b09a9843cd0b1c63d47e40b1ea97660
+- remove debug statement and clean up code by @OoBook in https://github.com/unusualify/modularity/commit/5d6e4f1ecff6141249b8d25ab5928dc9363caff5
+- update command signature for consistency by @OoBook in https://github.com/unusualify/modularity/commit/d753d26492f9a8aa50dbceab139ecc5fa991b6a4
+- comment out cache flush call in flushModuleCache method by @OoBook in https://github.com/unusualify/modularity/commit/4b858016f386db268d2ebfba754ccb43c1f2729f
+- update cache configuration to use environment variables by @OoBook in https://github.com/unusualify/modularity/commit/5182d48ba4bb7216162b4b4ae8ac30561e292115
+- update cache configuration logic by @OoBook in https://github.com/unusualify/modularity/commit/84ffc2e132b1a30e534e8b1eed4c8823e2853051
+- enhance file handling and slot integration by @OoBook in https://github.com/unusualify/modularity/commit/f8ad80cd12eb6462fc8e41fb5f9b312d80b9ae84
+- improve layout and structure for version display on superadmin user by @OoBook in https://github.com/unusualify/modularity/commit/7975c1c7c3b8cf6f9064ebf382f961acf6f2af0b
+- update $log method to return log output by @OoBook in https://github.com/unusualify/modularity/commit/526d42b76f519133cc786d43f810e713922d1efa
+- rename command and add alias by @OoBook in https://github.com/unusualify/modularity/commit/d47ef76c23f46e5f79c915bb5ce5ec97bde08d24
+- replace default input retrieval with modularity function by @OoBook in https://github.com/unusualify/modularity/commit/5aa785eb12ac0d3adfc3b758c83fca0d3473bc29
+
+### :memo: Documentation
+
+- update repository URLs and branch naming conventions by @OoBook in https://github.com/unusualify/modularity/commit/9bf9a5d71516fc8b743848f6796a21a5c6579409
+
+### :lipstick: Styling
+
+- add getShowFields comments by @OoBook in https://github.com/unusualify/modularity/commit/7e1cd4c4c82a31279567d4848802df9c8899255a
+- remove unused code and clean up component structure by @OoBook in https://github.com/unusualify/modularity/commit/14fb498602c80db9a258a93c26211028e95b1dd1
+
+### :green_heart: Workflow
+
+- :construction_worker: add new issue workflows by @OoBook in https://github.com/unusualify/modularity/commit/aea5272a4d6670aa8534423ddeecef30a69e590b
+- :bug: fix getting the severity value and use $GITHUB_OUTPUT due deprecation warnings by @OoBook in https://github.com/unusualify/modularity/commit/dbb4589db6c5ff1d2a536580704ac60883ba752a
+- :green_heart: add github-issue-parser action by @OoBook in https://github.com/unusualify/modularity/commit/e6382e63f146142b91194e3e4650827af758834f
+- :bug: remove BODY print by @OoBook in https://github.com/unusualify/modularity/commit/1ffc2331dc2b924bef2f4d6722ebb1d60d70f680
+- :bug: comment out template-path parameter by @OoBook in https://github.com/unusualify/modularity/commit/e8ac93f6f8ef2fcecf78a3a69131f20619595ca1
+- :bug: add actions/checkout by @OoBook in https://github.com/unusualify/modularity/commit/34e62b9f0012c58c5bba9407779b2ac6505b0d6d
+- update create-issue-branch.yml by @web-flow in https://github.com/unusualify/modularity/commit/433cb727c59b6e2c763f24c7f66a80dddd24a6c0
+- update create-issue-branch.yml by @web-flow in https://github.com/unusualify/modularity/commit/5b417a0238cab06d5afff7f633f310ae6b0550d7
+- update create-issue-branch.yml by @web-flow in https://github.com/unusualify/modularity/commit/5c3316a707326fd98d9a8fa920f20a548b39f2b9
+- update create-issue-branch.yml by @web-flow in https://github.com/unusualify/modularity/commit/f5055fce9198f419b20a9d93d89ba94fcfffced2
+- :bug: add permissions by @OoBook in https://github.com/unusualify/modularity/commit/a1a99c4a4d3dc4f155a5e0501e91991d95ad9f14
+- :bug: add create-issue-branch action by @OoBook in https://github.com/unusualify/modularity/commit/f8784310eb4f21c2bdeca1bcdfec0cb2ffd66325
+- :bug: add debug prints by @OoBook in https://github.com/unusualify/modularity/commit/081d67682620fea503f9b517764c423fa5678d4b
+- remove LOG_LEVEL environment variable from create-issue-branch workflow by @OoBook in https://github.com/unusualify/modularity/commit/14b2ee649f3a60b31ad83219464fe36f0300a2d0
+- refactor create-issue-branch workflow to directly configure Git and create branch by @OoBook in https://github.com/unusualify/modularity/commit/f7fc925be0907363092b81fee1d9881b14203a4e
+- update create-issue-branch workflow to use action for branch creation by @OoBook in https://github.com/unusualify/modularity/commit/c92c3359cab9f8aaecb8c7e1498295b7b9f27110
+- streamline create-issue-branch workflow by directly configuring Git and enhancing branch creation process by @OoBook in https://github.com/unusualify/modularity/commit/dec75b55a1485440a903dd73f5889a9f0c4ba107
+- add 'issues' permission to create-issue-branch workflow for enhanced issue management by @OoBook in https://github.com/unusualify/modularity/commit/0a69358515023398f30a9d2f9af842da47408853
+- enhance create-issue-branch workflow to include SHA in branch description for better traceability by @OoBook in https://github.com/unusualify/modularity/commit/8f7185280cf8d01fe2030e8e9728bbbdbb5f6d51
+- refactor create-issue-branch workflow to use GraphQL API for branch creation and improve linking to issues by @OoBook in https://github.com/unusualify/modularity/commit/3e53fb5acffff256274bbe919f77d91e845996b7
+- update create-issue-branch workflow to include source branch SHA in GraphQL mutation for improved branch linking by @OoBook in https://github.com/unusualify/modularity/commit/f9a2e713d28c35d8c50df20a57dd7e979d4424a1
+- enhance create-issue-branch workflow to retrieve and utilize repository and issue Node IDs for improved branch linking by @OoBook in https://github.com/unusualify/modularity/commit/695821b3f58caf087efabad50d4d151031908ffc
+- clarify issue number handling in create-issue-branch workflow by converting it to integer for GraphQL query by @OoBook in https://github.com/unusualify/modularity/commit/ec6ee320672173cb628b2568298fa72f447b9784
+- add PR template checker to enforce conventional commit messages and update checklist on experimental mode by @OoBook in https://github.com/unusualify/modularity/commit/6c32e3b7461f7056af13c5ffd4e4581a169c822f
+- enhance release workflow to check for Vue changes, install dependencies, and build artifacts before committing updates by @OoBook in https://github.com/unusualify/modularity/commit/a205e964bcc20e8c3aad4f3ab128525bb2e3f103
+- add PHPStan configuration and GitHub Actions workflow for static analysis by @OoBook in https://github.com/unusualify/modularity/commit/a4db3c4eb485f3906b0c9aa9b0910c4ced998826
+- update pr-template-check.yml by @web-flow in https://github.com/unusualify/modularity/commit/08f720b69e26a229fa74e3b44a08d30ccf850253
+
+### :beers: Other Stuff
+
+- :art: upgrade issue templates by @OoBook in https://github.com/unusualify/modularity/commit/a1fb332b048048ac2a3272b461c4d5b94d61da15
+- simplify issue templates by removing title input fields and updating descriptions for clarity by @OoBook in https://github.com/unusualify/modularity/commit/62d6117826925663f78eda5bef1d186c4396e85b
+- update pull request template to include a checklist and refined types of changes by @OoBook in https://github.com/unusualify/modularity/commit/7ebbb8781308803c8dfb1942aa4ba1a05d113f3e
+- update vitest and related packages to version 2.1.8 by @OoBook in https://github.com/unusualify/modularity/commit/23efe989313049b0f8a51a8f91ddb69b6ce60732
+- add anonymous image for user profiles by @OoBook in https://github.com/unusualify/modularity/commit/837e409c3e848b7f60616a2a7719e9c463562043
+- add success message after command creation by @OoBook in https://github.com/unusualify/modularity/commit/fe73d1f7d855781cff39f216cab93493051b8378
+- hide command from console output by @OoBook in https://github.com/unusualify/modularity/commit/3686c8506eaa8e4abf298df2442ccddc21b19c59
+- add moment.js dependency by @OoBook in https://github.com/unusualify/modularity/commit/368d6e4f0f4fe6064e138f28840a7ed7257262d8
+- add invokeRule function for enhanced rule processing in experimental mode by @OoBook in https://github.com/unusualify/modularity/commit/ccbca4747431491f721dc9c63a9c6d491be6d094
+- enhance initialization script with moment.js and pluralize imports by @OoBook in https://github.com/unusualify/modularity/commit/58af445dcfdc4dd61bac86cff6c2f4019c841612
+
 ## v0.21.0 - 2024-12-09
 
 ### :rocket: Features

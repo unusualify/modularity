@@ -240,20 +240,7 @@ trait ManageForm
      */
     protected function configureInput($input)
     {
-        return collect($input)
-            ->mapWithKeys(function ($v, $k) {
-
-                if ($k == 'label'
-                    && ($translation = ___("form-labels.{$v}")) !== "form-labels.{$v}"
-                ) {
-                    $v = $translation;
-                }
-                // if($k == 'label')
-                //     $v = ___("form-labels.{$v}");
-
-                return is_numeric($k) ? [$v => true] : [$k => $v];
-            })
-            ->toArray();
+        return configure_input($input);
     }
 
     /**
@@ -510,14 +497,7 @@ trait ManageForm
         }
 
         if (isset($input['type'])) {
-            $hydrateClass = "Unusualify\Modularity\Hydrates\Inputs\\" . studlyName($input['type']) . 'Hydrate';
-
-            if (@class_exists($hydrateClass)) {
-                $input = App::make($hydrateClass, [
-                    'input' => $input,
-                    'module' => $this->module ?? null,
-                ])->render();
-            }
+            $input = hydrate_input($input, $this->module ?? null);
 
             if (in_array($input['type'], ['input-repeater']) && isset($input['schema'])) {
                 $input['schema'] = $this->createFormSchema($input['schema']);

@@ -48,8 +48,7 @@ class ModuleMakeCommand extends BaseCommand
 
     public function handle(): int
     {
-
-        // $console = new Console();
+        Modularity::disableCache();
 
         if ($this->option('just-stubs')) {
             $module = Modularity::find($this->argument('module'));
@@ -100,6 +99,8 @@ class ModuleMakeCommand extends BaseCommand
             + ['--notAsk' => true]
             + ['--test' => false]
         );
+
+        Modularity::clearCache();
 
         return 0;
     }

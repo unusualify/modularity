@@ -5,11 +5,12 @@ namespace Modules\SystemUser\Repositories;
 use Illuminate\Support\Arr;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Repositories\Repository;
-use Unusualify\Modularity\Repositories\Traits\TreeviewTrait;
+use Unusualify\Modularity\Repositories\Traits\FilepondsTrait;
 
 class UserRepository extends Repository
 {
-    // use TreeviewTrait;
+    use FilepondsTrait;
+
     public $exceptRelations = [
         // 'roles'
     ];

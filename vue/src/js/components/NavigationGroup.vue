@@ -77,27 +77,6 @@
         </template>
         <span>{{ item.name }}</span>
       </v-tooltip>
-      <!-- <component
-        v-else
-        :is="getComponentType(item)"
-        v-bind="getComponentProps(item, i)"
-      /> -->
-      <!-- <template v-else-if="isHeader(item)">
-        <v-divider v-if="i != 0" :key="i + 'subdivider'" :index="i"></v-divider>
-        <v-list-item
-          :key="i + 'subheader'"
-          :index="i"
-
-          nav
-          :ripple="false"
-          :append="false"
-          :prepend-icon="!hideIcons ? item.icon : null"
-
-          disabled
-          :inactive="true"
-          >
-        </v-list-item>
-      </template> -->
     </template>
   </v-list>
 </template>
@@ -154,20 +133,6 @@ export default {
     opened: [],
   }),
   computed: {
-    // opened: {
-    //   get () {
-    //     const matches = []
-    //     this.getListGroupOpens(matches, this.items)
-
-    //     __log('opened getter', matches)
-    //     return matches
-    //   },
-    //   set (val) {
-    //     // __log('opened setter', val)
-    //     return val
-    //   }
-
-    // },
     activeIndex: {
       get() {
         try {

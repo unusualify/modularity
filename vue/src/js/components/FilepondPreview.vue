@@ -1,16 +1,19 @@
 <template>
-  <div class="d-flex flex-wrap ga-2">
+  <div :class="[
+    'd-flex ga-2',
+    showInlineFileName || showFileName ? 'flex-wrap' : ''
+  ]">
     <div
       v-for="(item, index) in normalizedSource"
       :key="item.uuid"
       class="file-preview-item"
-      :style="{ width: showInlineFileName || showFileName ? '100%' : 'auto' }"
+      :style="{ width: showInlineFileName || showFileName ? '100%' : 'aut' }"
     >
       <v-hover v-slot="{ isHovering, props }">
         <v-card
           v-bind="props"
-          class="rounded position-relative d-flex"
-          :width="showInlineFileName || showFileName ? '100%' : '64'"
+          class="rounded position-relative d-flex bg-transparent"
+          :width="showInlineFileName || showFileName ? '100%' : `${imageSize}`"
           :height="imageSize"
           :elevation="isHovering ? 4 : 0"
           @click="previewFile(index)"
@@ -49,11 +52,36 @@
             v-if="showInlineFileName || showFileName"
             class="d-flex align-center px-4"
           >
-            <span class="text-body-2 text-truncate">{{ item.file_name }}</span>
+            <span class="text-body-2 text-truncate">{{ shortenFileName(item.file_name) }}</span>
           </div>
 
+          <div v-if="showDate" class="ml-auto mr-1">
+            <span class="text-caption text-truncate">{{ $d(new Date(item.created_at), 'numeric-full') }}</span>
+          </div>
+
+          <!-- Right side: Filename (only if showInlineFileName is true) -->
+          <!-- <div
+            v-if="noOverlay"
+            class="d-flex align-center px-4"
+          >
+            <v-btn
+              icon="mdi-download"
+              size="x-small"
+              variant="text"
+              @click.stop="downloadFile(item.uuid)"
+              :loading="downloadingStates[index]"
+            ></v-btn>
+            <v-btn
+              icon="mdi-eye"
+              size="x-small"
+              variant="text"
+              @click.stop="previewFile(index)"
+              :loading="downloadingStates[index]"
+            ></v-btn>
+          </div> -->
+
           <div
-            v-if="isHovering"
+            v-if="isHovering && !noOverlay"
             class="overlay-content d-flex align-center justify-center"
           >
             <v-btn
@@ -154,6 +182,14 @@
       maxFileNameLength: {
         type: Number,
         default: 10
+      },
+      noOverlay: {
+        type: Boolean,
+        default: false
+      },
+      showDate: {
+        type: Boolean,
+        default: false
       }
     },
     computed: {

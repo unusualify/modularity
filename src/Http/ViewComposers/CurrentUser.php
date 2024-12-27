@@ -26,6 +26,10 @@ class CurrentUser
     {
         $currentUser = $this->authFactory->guard('unusual_users')->user();
 
+        if ($currentUser) {
+            $currentUser = get_user_profile($currentUser);
+        }
+
         $view->with(compact('currentUser'));
     }
 }

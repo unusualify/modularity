@@ -23,6 +23,10 @@ class MigrationMakeCommand extends BaseCommand
      */
     protected $name = 'modularity:make:migration';
 
+    protected $aliases = [
+        'mod:m:migration',
+    ];
+
     /**
      * The console command description.
      *
@@ -66,8 +70,8 @@ class MigrationMakeCommand extends BaseCommand
     protected function getArguments()
     {
         return [
-            ['module', InputArgument::REQUIRED, 'The name of module that the migration will be created in.'],
             ['name', InputArgument::REQUIRED, 'The migration name will be created.'],
+            ['module', InputArgument::OPTIONAL, 'The name of module that the migration will be created in.'],
         ];
     }
 
@@ -172,11 +176,24 @@ class MigrationMakeCommand extends BaseCommand
      */
     protected function getDestinationFilePath()
     {
-        $path = Modularity::getModulePath($this->getModuleName());
+        $moduleName = $this->getModuleName();
 
-        $generatorPath = GenerateConfigReader::read('migration');
+        $path = Modularity::getVendorPath('');
 
-        return $path . $generatorPath->getPath() . '/' . $this->getFileName() . '.php';
+        if ($moduleName != '') {
+            $path = Modularity::getModulePath($moduleName);
+        }
+
+        $migrationFolder = 'database/migrations/default';
+
+        if ($moduleName != '') {
+            $migrationGeneratorPath = GenerateConfigReader::read('migration');
+            $migrationFolder = $migrationGeneratorPath->getPath();
+        }
+
+        $migrationDir = concatenate_path($migrationFolder, $this->getFileName() . '.php');
+
+        return concatenate_path($path, $migrationDir);
     }
 
     /**

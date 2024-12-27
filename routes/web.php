@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Unusualify\Modularity\Http\Controllers\DashboardController;
 use Unusualify\Modularity\Http\Controllers\ProfileController;
 
 /*
@@ -16,21 +15,13 @@ use Unusualify\Modularity\Http\Controllers\ProfileController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-// Route::get('', ['as' => 'dashboard', 'uses' => 'DashboardController@index']);
 Route::resource('', 'DashboardController', ['as' => 'dashboard', 'names' => ['index' => 'dashboard']])->only(['index']);
 
-// Route::resource('profile', 'ProfileController', ['names' => ['index' => 'profile']])->only(['index', 'update']);
 Route::singleton('profile', 'ProfileController', ['names' => ['edit' => 'profile']]);
+Route::group(['prefix' => 'profile', 'as' => 'profile.'], function () {
+    Route::get('show', [ProfileController::class, 'display'])->name('show');
+});
 Route::put('profile/company', 'ProfileController@updateCompany')->name('profile.company');
-
-// Route::group(['prefix' => 'api/user', 'as' => 'api.user.', 'namespace' => 'API'], function(){
-//     Route::apiResource('role', RoleController::class);
-//     Route::apiResource('permission', PermissionController::class);
-// });
-
-// Route::group(['prefix' => 'api', 'as' => 'api.lang.', 'namespace' => 'API'], function(){
-//     Route::apiResource('languages', LanguageController::class);
-// });
 
 // system internal api routes (for ajax web routes)
 Route::prefix('api')->group(function () {

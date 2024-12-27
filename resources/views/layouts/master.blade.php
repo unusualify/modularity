@@ -27,7 +27,6 @@
             $navigation ??= [];
             $impersonation ??= [];
             $authorization ??= [];
-            $currentUser = $currentUser ? $currentUser->only(['name', 'email']) : [];
 
             $_mainConfiguration = [
                 'navigation' => $navigation,
@@ -88,10 +87,20 @@
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.config = {
                 test: false,
+                appName: '{{ env('APP_NAME') }}',
+                appEmail: '{{ env('APP_EMAIL') }}',
+                appEnv: '{{ env('APP_ENV') }}',
+                appDebug: '{{ env('APP_DEBUG') }}',
+                systemPackageVersions: {!! json_encode($SYSTEM_PACKAGE_VERSIONS) !!},
+
                 currentUser: {!! json_encode($currentUser) !!},
                 profileMenu: {!! json_encode($navigation['profileMenu']) !!},
                 sidebarOptions: {!! json_encode(unusualConfig('ui_settings.sidebar')) !!},
-                secondarySidebarOptions : {!! json_encode(unusualConfig('ui_settings.secondarySidebar')) !!}
+                secondarySidebarOptions : {!! json_encode(unusualConfig('ui_settings.secondarySidebar')) !!},
+
+                profileRoute: '{{ route(Route::hasAdmin('profile.update')) }}',
+                profileShortcutModel: {!! json_encode($profileShortcutModel) !!},
+                profileShortcutSchema: {!! json_encode($profileShortcutSchema) !!}
             },
 
             window['{{ unusualConfig('js_namespace') }}'].STORE.medias = {};

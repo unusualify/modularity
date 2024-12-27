@@ -166,4 +166,34 @@ return [
             'rules' => 'sometimes|min:3',
         ],
     ],
+    'profile_shortcut' => [
+        'id' => [
+            'type' => 'hidden',
+            'name' => 'id',
+        ],
+        // 'name' => [
+        //     'type' => 'text',
+        //     'name' => 'name',
+        //     'label' => 'Name',
+        //     'col' => ['cols' => 12],
+        //     'editable' => false,
+        // ],
+        // 'email' => [
+        //     'type' => 'text',
+        //     'name' => 'email',
+        //     'label' => 'E-mail',
+        //     'rules' => 'email',
+        //     'col' => ['cols' => 12],
+        //     'editable' => false,
+        // ],
+        'avatar' => [
+            'type' => 'filepond',
+            // 'label' => 'Profile Avatar',
+            'name' => 'avatar',
+            'max' => 1,
+            'allow-image-preview' => true,
+            'label-idle' => 'Drop files here...',
+            'rules' => 'sometimes|required:array',
+        ],
+    ],
 ];
