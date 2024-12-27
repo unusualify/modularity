@@ -13,6 +13,7 @@ class SystemPaymentDatabaseSeeder extends Seeder
     {
         $this->call([
             PaymentServiceSeeder::class,
+            CardTypeSeeder::class,
         ]);
     }
 }

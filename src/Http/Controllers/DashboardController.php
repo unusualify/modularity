@@ -39,25 +39,6 @@ class DashboardController extends BaseController
 
     public function index($parentId = null)
     {
-        // $parentId = $this->getParentId() ?? $parentId;
-
-        // $data = $this->getIndexData($this->isNested ? [
-        //     $this->getParentModuleForeignKey() => $parentId,
-        // ] : []);
-
-        // App::make($this->getRepositoryClass($this->modelName));
-
-        // dd(
-        //     get_class_methods( App::make(PressReleaseRepository::class)->get() ),
-        //     App::make(PressReleaseRepository::class)
-        //         ->get()
-        //         ->toArray(),
-        //     App::make(PressReleaseRepository::class)
-        //         ->get()
-        //         ->items()
-        //     // $this->getIndexItems([])
-
-        // );
         $blocks = app()->config->get(unusualBaseKey() . '.ui_settings.dashboard.blocks');
 
         // dd('here');
@@ -65,40 +46,20 @@ class DashboardController extends BaseController
         foreach ($blocks as $index => $block) {
             switch ($block['component']) {
                 case 'ue-table':
-                    // $controller = App::make($block['controller'])->setTableAttributes(tableOptions: $block['attributes']['tableOptions'],
-                    // );
-                    // dd($block);
+
                     $widget = new UWidget;
                     $widget = $widget->makeComponent($block['tag'], $block)->render();
 
-                    // dd(change_connector_event(get_connector_event($block['connector'])));
-                    // $data = init_connector($block['connector']);
-                    // dd($data);
-                    // dd(
-                    //     $controller->getIndexData()['initialResource']->resource['data'],
-                    //     $data
-                    // );
-                    // $block['attributes']['items'] = $controller->getIndexData()['initialResource']->resource['data'];
-                    // $block['attributes']['items'] = $data['items']->toArray();
-                    $block = $widget;
-                    // dd($block);
-                    // dd($block['elements'][0]['attributes']['items'] = []);
-                    // $block['elements'][0]['attributes']['items'] = [];
-                    // dd($block);
-                    // dd($block['elements']->attributes['endpoints']);
-                    // dd($this->transformRoutes($widget['elements'][0]['module']->getRouteUris($widget['elements'][0]['route'])));
 
-                    // dd($block['elements']->attributes['route']);
-                    // dd($block['elements'][0]['attributes']);
+                    $block = $widget;
+
                     $block['elements'][0]['attributes']['endpoints'] = array_merge($this->transformRoutes($block['elements'][0]['attributes']['module']->getRouteUris($block['elements'][0]['attributes']['route'])), $this->getUrls());
+                    // $block['elements'][0]['attributes']['endpoints']['index'] = 'test';
+
                     $block['elements'][0]['attributes']['tableOptions']['search'] = null;
 
-                    unset($block['elements'][0]['attributes']['endpoints']['index']); //Disable vuetify table store
-                    // dd($block);
-                    // dd(array_merge($block['attributes']['endpoints'], $this->getUrls()));
+                    // unset($block['elements'][0]['attributes']['endpoints']['index']); //Enable vuetify table store
 
-                    // $block['attributes']['rowActions'] = $controller->getTableActions();
-                    // in order to keep url as default home url
                     // dd($block);
                     $blocks[$index] = $block;
 
@@ -106,29 +67,11 @@ class DashboardController extends BaseController
                     break;
                 case 'ue-board-information-plus':
                     $cards = $block['cards'] ?? [];
-                    // dd($cards);
-                    // dd($block);
-                    // foreach ($cards as $key => $card) {
 
                     try {
                         $widget = new UWidget;
-                        // dd('here');
                         $widget = $widget->makeComponent($block['tag'], $block)->render();
-                        // dd($data);
-                        // $repository = App::make($card['repository']);
-                        // $data = array_reduce(explode('|', $card['method']), function ($s, $a) use ($repository) {
-                        //     [$methodName, $args] = array_pad(explode(':', $a, 2), 2, null);
-                        //     if ($args) {
-                        //         $s = empty($s) ? $repository->{$methodName}(...explode(':', $args))->get() : $s->{$methodName}(...explode(':', $args))->get();
-                        //     } else {
-                        //         $s = empty($s) ? $repository->{$methodName}() : $s->$methodName();
-                        //     }
 
-                        //     return $s;
-                        // });
-                        // dd($data);
-                        // dd($data);
-                        // dd($widget);
                     } catch (\Throwable $th) {
                         $widget = [];
                         dd($th);

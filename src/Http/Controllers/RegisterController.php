@@ -283,7 +283,7 @@ class RegisterController extends Controller
 
         return $request->wantsJson()
         ? new JsonResponse([
-            'redirector' => route(Route::hasAdmin('login.form')),
+            'redirector' => route(Route::hasAdmin('register.success')),
         ], 200)
         : $this->sendLoginResponse($request);
     }
@@ -296,6 +296,19 @@ class RegisterController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
         ];
+    }
+
+    public function success()
+    {
+        return view(unusualBaseKey() . '::auth.success', [
+           'taskState' => [
+                'status' => 'success',
+                'title' => __('authentication.register-title'),
+                'description' => __('authentication.register-description'),
+                'button_text' => __('authentication.register-button_text'),
+                'button_url' => 'Test'
+           ]
+        ]);
     }
 
     // public function store(Request $request)

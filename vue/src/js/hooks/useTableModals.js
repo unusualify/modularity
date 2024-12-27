@@ -131,7 +131,7 @@ export default function useTableModals(props, context) {
   // Cleanup Method
   const cleanupModals = () => {
     if (store._state.data.datatable.customModal) {
-      __removeQueryParams(['customModal[description]', 'customModal[color]', 'customModal[icon]'])
+      __removeQueryParams(['customModal[description]', 'customModal[color]', 'customModal[icon]', 'customModal[hideModalCancel]'])
     }
   }
 

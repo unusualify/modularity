@@ -13,26 +13,36 @@
         <div id="auth">
             {{-- @dd(__('authentication.create-an-account')) --}}
             {{-- @dd($formAttributes) --}}
-            <ue-auth :title="'{{ __('authentication.create-an-account') ?? 'CREATE AN ACCOUNT' }}'">
+            {{-- @dd(!isset($taskState)) --}}
+
+            <ue-auth
+                title="'{{ __('authentication.create-an-account') ?? 'CREATE AN ACCOUNT' }}'"
+                @if(isset($taskState))
+                    no-divider
+                @endif
+            >
                 @section('content')
-
-                    <ue-form v-bind='@json($formAttributes)'>
-                        <template v-slot:submit="object">
-                            <v-btn block dense type="submit" :disabled="!object.validForm">
-                            @{{ object.buttonDefaultText.toUpperCase() }}
-                            </v-btn>
-                        </template>
-                        {{-- @dd($formSlots) --}}
-                        @foreach( ($formSlots ?? []) as $slotTestName => $testconf)
-                        {{-- @dd($slotName, $configuration) --}}
-                            <template v-slot:{{ $slotTestName }} >
-                                <ue-recursive-stuff
-                                    :configuration='@json($testconf)'
-                                />
+                    @if(!isset($taskState))
+                        <ue-form v-bind='@json($formAttributes)'>
+                            <template v-slot:submit="object">
+                                <v-btn block dense type="submit" :disabled="!object.validForm">
+                                @{{ object.buttonDefaultText.toUpperCase() }}
+                                </v-btn>
                             </template>
-                        @endforeach
-                    </ue-form>
-
+                            {{-- @dd($formSlots) --}}
+                            @foreach( ($formSlots ?? []) as $slotTestName => $testconf)
+                            {{-- @dd($slotName, $configuration) --}}
+                                <template v-slot:{{ $slotTestName }} >
+                                    <ue-recursive-stuff
+                                        :configuration='@json($testconf)'
+                                    />
+                                </template>
+                            @endforeach
+                        </ue-form>
+                    @else
+                        <ue-success v-bind='@json($taskState)'>
+                        </ue-success>
+                    @endif
 
                     @foreach( ($slots ?? []) as $slotName => $configuration)
                         <template v-slot:{{ $slotName }} >
@@ -46,7 +56,6 @@
                             />
                         </template> --}}
                     @endforeach
-
                 @stop
                 @yield('content')
             </ue-auth>
