@@ -360,7 +360,9 @@
                   <v-divider />
                   <v-card-actions>
                     <v-spacer />
-                    <v-btn :color="modals[activeModal].color ? modals[activeModal].color : 'blue'" text @click="modals[activeModal].closeAction()">
+                    <v-btn
+                    v-if="modals[activeModal].hideModalCancel"
+                    :color="modals[activeModal].color ? modals[activeModal].color : 'blue'" text @click="modals[activeModal].closeAction()">
                       {{ modals[activeModal].cancelText || props.textCancel }}
                     </v-btn>
                     <!-- <v-btn color="blue" text @click="handleModal('confirm', modal.ref, props.onConfirm)"></v-btn> -->
@@ -386,7 +388,12 @@
                 ref="customForm"
                 v-model="customFormModel"
                 v-bind="customFormAttributes"
-                hasDivider="true"
+                fill-height
+                scrollable
+                has-divider
+                no-default-form-padding
+                form-class="px-6 pb-0"
+                style="height: 90vh !important;"
               >
                 <template v-slot:headerRight>
                   <v-btn class="ml-auto" variant="text" icon="$close" density="compact" color="deafult"

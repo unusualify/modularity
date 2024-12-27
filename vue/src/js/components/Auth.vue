@@ -16,7 +16,9 @@
                 </div>
                 <slot name="cardTop"></slot>
 
-                <v-sheet class="" :width="width">
+                <v-sheet
+                  class=""
+                  :width="width">
                     <slot v-bind="{}"
                       >
                       <ue-form
@@ -37,7 +39,9 @@
                     </slot>
                 </v-sheet>
 
-                  <div class="d-flex w-100 align-center justify-center">
+                  <div
+                    v-if="!noDivider"
+                    class="d-flex w-100 align-center justify-center">
                     <v-divider />
                     <div class="text-no-wrap px-3">or</div>
                     <v-divider />
@@ -111,6 +115,10 @@ export default {
     rightBtnText: {
       type: String,
       default: 'CONTINUE WITHOUT LOGIN'
+    },
+    noDivider: {
+      type: [Boolean, Number],
+      default: false
     }
   },
   data: () => ({
@@ -181,6 +189,9 @@ export default {
         return props.rightBtnText
       }
     })
+    // Fix for showDivider logic
+
+    // console.log(showSuccess.value)
     return {
       width,
       title,

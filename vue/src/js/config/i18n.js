@@ -104,12 +104,12 @@ const numberFormats = {
     currency: {
       style: 'currency', currency: 'USD', notation: 'standard'
     },
-    // decimal: {
-    //   style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2
-    // },
-    // percent: {
-    //   style: 'percent', useGrouping: false
-    // }
+    decimal: {
+      style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2
+    },
+    percent: {
+      style: 'percent', useGrouping: false
+    }
   },
   en: {
     currency: {
@@ -180,6 +180,7 @@ export async function loadLocaleMessages (i18n, endpoint) {
   }
 
 }
+
 export function loadLocaleMessage (i18n, locale, messages) {
   // set locale and locale message
   i18n.global.setLocaleMessage(locale, messages)

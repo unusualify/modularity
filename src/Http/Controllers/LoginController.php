@@ -128,6 +128,7 @@ class LoginController extends Controller
             $this->clearLoginAttempts($request);
 
             if ($response = $this->authenticated($request, $this->guard()->user())) {
+                // dd($response);
                 return $response;
             }
 
@@ -136,7 +137,7 @@ class LoginController extends Controller
                     'variant' => MessageStage::SUCCESS,
                     'timeout' => 6000,
                     'message' => __('authentication.login-success-message'),
-                    'redirector' => $this->redirectPath(),
+                    'redirector' => $request->url(),
                 ], 200)
                 : $this->sendLoginResponse($request);
 
@@ -349,18 +350,28 @@ class LoginController extends Controller
 
     private function afterAuthentication(Request $request, $user)
     {
+        // dd('here',$user->google_2fa_secret && $user->google_2fa_enabled);
 
         if ($user->google_2fa_secret && $user->google_2fa_enabled) {
             $this->guard()->logout();
 
             $request->session()->put('2fa:user:id', $user->id);
-
             return $request->wantsJson()
                 ? new JsonResponse([
                     'redirector' => $this->redirector->to(route(Route::hasAdmin('admin.login-2fa.form')))->getTargetUrl(),
                 ])
                 : $this->redirector->to(route(Route::hasAdmin('admin.login-2fa.form')));
         }
+        // dd($request->wantsJson());
+        return $request->wantsJson()
+        ? new JsonResponse([
+            'variant' => MessageStage::SUCCESS,
+            'timeout' => 1500,
+            'message' => __('authentication.login-success-message') ,
+            // 'redirector' => $this->redirectPath()
+            'redirector' => $request->url() . '?status=success',
+        ])
+        : $this->redirector->intended($this->redirectPath());
 
         return $request->wantsJson()
             ? new JsonResponse([

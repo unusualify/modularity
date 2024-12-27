@@ -253,6 +253,7 @@ export default function useTable (props, context) {
       },
       'custom': {
         content: computed(() => store._state.data.datatable.customModal.description),
+        hideModalCancel: computed(() => store._state.data.datatable.customModal.hideModalCancel),
         closeAction() {
           state.customModalActive = false;
           state.modals.custom.confirmText = '';
@@ -480,6 +481,7 @@ export default function useTable (props, context) {
   })
   watch(() => state.options, (newValue, oldValue) => {
 
+    console.log(tableEndpoints.indexUrl.value )
     if( tableEndpoints.indexUrl.value ){
       newValue.replaceUrl = false
       methods.loadItems(newValue)

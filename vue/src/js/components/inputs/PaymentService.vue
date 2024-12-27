@@ -4,70 +4,85 @@
       <v-col class="d-flex flex-column justify-center px-0">
         <v-card class="pa-4 payment-container" elevation="0">
           <v-card-text class="pa-0">
-            <!-- TODO: Title should come from config -->
             <p class="select-title">How would you like to pay?</p>
           </v-card-text>
+
+          <!-- Currency Selector -->
           <v-select
+            v-model="selectedCurrency"
+            :items="formattedCurrencies"
             label="Currency"
             variant="outlined"
             density="comfortable"
-            v-model="selectedCurrency"
-            :items="formattedCurrencies"
             item-title="display"
             item-value="id"
             @update:model-value="handleCurrencyChange"
             class="mx-6"
-          ></v-select>
+          />
+
+          <!-- Payment Methods -->
           <v-radio-group v-model="localPaymentMethod" column>
+            <!-- Credit Card Option -->
             <div
               class="service-container px-3 py-cs-1 credit-card-service"
               :class="{ 'selected-service--focus': localPaymentMethod === localDefaultPaymentMethod }"
             >
-              <v-radio :label="$t('Credit Card')" :value="localDefaultPaymentMethod" class="service-label">
-              </v-radio>
+              <v-radio
+                :label="$t('Credit Card')"
+                :value="localDefaultPaymentMethod"
+                class="service-label"
+              />
+              {{ console.log(currencyCardTypes, selectedCurrencyIso) }}
               <v-row align="center">
                 <v-col class="d-flex justify-content-end custom-service-col">
-                  <div
-                    class="service-icon-container"
-                  >
+                  <div class="service-icon-container">
                     <v-img-icon
-                      v-for="(type, key) in currencyCardTypes[currencies.find(currency => currency.id === selectedCurrency).iso_4217]" :key="`type-${key}`"
-                      :src="'/storage/uploads/' + type['logo']"
+                      v-for="(type, key) in currencyCardTypes[selectedCurrencyIso]"
+                      :key="`type-${key}`"
+                      :src="'/storage/uploads/' + type.logo"
                       contain
-                      class="v-img__img--relative">
-                  </v-img-icon>
-
+                      class="v-img__img--relative"
+                    />
                   </div>
                 </v-col>
               </v-row>
             </div>
+
+            <!-- Other Payment Services -->
             <div
-              v-for="(service, key) in filteredServiceItems" :key="`service-${key}`"
+              v-for="(service, key) in filteredServiceItems"
+              :key="`service-${key}`"
               class="service-container px-3 py-1"
               :class="{ 'selected-service--focus': localPaymentMethod === service[itemValue] }"
-              >
-              <v-radio :label="service.title" :value="service[itemValue]" class="service-label">
-              </v-radio>
+            >
+              <v-radio
+                :label="service.title"
+                :value="service[itemValue]"
+                class="service-label"
+              />
               <v-row align="center">
                 <v-col class="d-flex justify-content-end">
-                  <div class="service-icon-container ">
+                  <div class="service-icon-container">
                     <v-img-icon
-                      :src="'/storage/uploads/' + service?.medias.find(item =>
-                      item?.pivot?.role === 'logo').uuid || ''"
+                      :src="'/storage/uploads/' + service?.medias.find(item => item?.pivot?.role === 'logo')?.uuid"
                       contain
-                      class="v-img__img--relative"></v-img-icon>
+                      class="v-img__img--relative"
+                    />
                   </div>
-
                 </v-col>
               </v-row>
             </div>
           </v-radio-group>
         </v-card>
+
+        <!-- Total Amount Display -->
         <v-card-title class="headline">
           <p class="total">Total Pay:</p>
           <p class="amount">{{ displayPrice }}</p>
         </v-card-title>
       </v-col>
+
+      <!-- Payment Form Section -->
       <v-col class="px-0 d-flex align-center justify-center">
         <CreditCardForm
           v-if="showCreditCardForm"
@@ -78,21 +93,19 @@
           v-model:cardCvv="localCreditCard.card_cvv"
         />
         <v-btn
-          v-if="!showCreditCardForm"
-          :style="selectedService?.button_style || ''"
+          v-else
+          :style="selectedService?.button_style"
           @click="submitForm"
           density="comfortable"
           max-width="300px"
           min-width="80%"
         >
-
-        <v-img
-          width="100px"
-          contain
-          max-height="36px"
-          :src="'/storage/uploads/' + selectedService?.medias.find(item =>
-          item?.pivot?.role === 'button_logo').uuid || ''"
-        ></v-img>
+          <v-img
+            width="100px"
+            contain
+            max-height="36px"
+            :src="'/storage/uploads/' + selectedService?.medias.find(item => item?.pivot?.role === 'button_logo')?.uuid"
+          />
         </v-btn>
       </v-col>
     </v-row>
@@ -101,18 +114,23 @@
 
 <script>
 import { computed, ref, reactive, watch, inject } from 'vue';
-import { makeInputProps, makeInputEmits } from '@/hooks';
+import { makeInputProps, makeInputEmits, useCurrency } from '@/hooks';
 import CreditCardForm from '@/components/inputs/CreditCardForm';
-import useValidation from '@/hooks/useValidation';
 
 export default {
   name: 'PaymentService',
+
+  components: {
+    CreditCardForm
+  },
+
   emits: [
     ...makeInputEmits,
     'update:modelValue',
     'update:price',
     'currency-converted'
   ],
+
   props: {
     ...makeInputProps(),
     modelValue: {
@@ -123,60 +141,39 @@ export default {
       type: String,
       default: 'id'
     },
-    itemTitle: {
-      type: String,
-      default: 'name'
+    price_object: {
+      type: [Object, Array, Proxy],
+      default: () => ({})
     },
-    price: {
-      type: String,
-    },
-    currency:{
-      type: Number,
-    },
-    items:{
+    items: {
       type: Array,
       default: () => []
     },
-    currencies:{
+    currencies: {
       type: Array,
       default: () => []
     },
-    serviceItems: {
-      type: Array,
-      default: () => []
-    },
-    item: {
-      type: [Object, Proxy, Array],
-      default () {
-        return {}
-      }
-    },
-    iconKey: {
-      default: '_icon'
-    },
-    showCreditCardForm : {
-      type: Boolean,
-      default: true
-    },
-    api:{
+    api: {
       type: String,
       default: ''
     },
-    currencyCardTypes:{
+    currencyCardTypes: {
       type: [Object, Proxy, Array],
-      default () {
-        return {}
-      }
+      default: () => ({})
     }
   },
-  components: {
-    CreditCardForm
-  },
-  setup(props, { emit }) {
-    const submitForm = inject('submitForm')
 
+  setup(props, { emit }) {
+    const submitForm = inject('submitForm');
+    const { formatPrice } = useCurrency();
+
+    // Refs
     const localPaymentMethod = ref('');
     const localDefaultPaymentMethod = ref("-1");
+    const selectedCurrency = ref(props.price_object.currency_id || props.currencies[0]?.id);
+    const displayPrice = ref(formatPrice.value(props.price_object.price_including_vat / 100, props.currencies[0]?.symbol || ''));
+
+    // Reactive state
     const localCreditCard = reactive({
       card_name: '',
       card_number: '',
@@ -185,88 +182,44 @@ export default {
       card_cvv: ''
     });
 
-    const displayPrice = ref(props.price);
-    watch(() => props.price, (newPrice) => {
-      displayPrice.value = newPrice;
-    });
-
-    const input = computed({
-      get: () => props.modelValue,
-      set: (newValue) => {
-        emit('update:modelValue', newValue);
-      }
-    });
-    watch(() => props.modelValue, (newValue) => {
-      if (newValue && typeof newValue === 'object') {
-        localPaymentMethod.value = newValue.payment_method || localDefaultPaymentMethod.value;
-        Object.assign(localCreditCard, newValue.credit_card || {});
-      }
-    }, { immediate: true, deep: true });
-
-
-    const filterItemsByCurrencyId = (items, currencyId) => {
-      return items.filter(item => {
-        // Check if payment_currencies exists and is an array
-        if (Array.isArray(item.payment_currencies)) {
-          // Check if any currency in payment_currencies has the specified id
-          return item.payment_currencies.some(currency => currency.id === currencyId);
-        }
-        // If payment_currencies doesn't exist or isn't an array, keep the item
-        return true;
-      });
-    };
-
-    const serviceItems = computed(() => {
-      return filterItemsByCurrencyId(props.items, props.currency);
-    });
-
-
-    const selectedService = computed(() => {
-      return serviceItems.value.find(service => service[props.itemValue] === localPaymentMethod.value);
-    });
-
-    const showCreditCardForm = computed(() => {
-      return !selectedService.value || !selectedService.value.is_external;
-    });
-
-
-    const validatePaymentService = () => {
-      const isValid = useValidation(
-        { rules: 'required' },
-        localPaymentMethod.value
-      );
-      return isValid === true ? true : 'Please select a payment service';
-    };
-
-    const selectedCurrency = ref(props.currency || null);
-    const currencies = props.currencies;
-    const formattedCurrencies = computed(() => {
-      return props.currencies.map(currency => ({
-        id: currency.id,
-        display: `${currency.symbol} - ${currency.name}`,
-      }));
-    });
-
-    const filteredServiceItems = computed(() => {
-
-      if (!selectedCurrency.value) return [];
-
-      return serviceItems.value.filter(service => {
-        if (!service.payment_currencies || !Array.isArray(service.payment_currencies)) {
-          return false;
-        }
-        return service.payment_currencies.some(
-          currency => currency.id === selectedCurrency.value
-        );
-      });
-    });
-
-    const convertedPrice = ref(null);
-
+    // Computed
     const selectedCurrencyObj = computed(() =>
       props.currencies.find(curr => curr.id === selectedCurrency.value)
     );
 
+    const selectedCurrencyIso = computed(() =>
+      selectedCurrencyObj.value?.iso_4217
+    );
+
+    const formattedCurrencies = computed(() =>
+      props.currencies.map(currency => ({
+        id: currency.id,
+        display: `${currency.symbol} - ${currency.name}`,
+      }))
+    );
+
+    const filteredServiceItems = computed(() => {
+      if (!selectedCurrency.value) return [];
+
+      return props.items.filter(service =>
+        service.payment_currencies?.some(currency => currency.id === selectedCurrency.value)
+      );
+    });
+
+    const selectedService = computed(() =>
+      filteredServiceItems.value.find(service => service[props.itemValue] === localPaymentMethod.value)
+    );
+
+    const showCreditCardForm = computed(() =>
+      !selectedService.value?.is_external
+    );
+
+    const input = computed({
+      get: () => props.modelValue,
+      set: (newValue) => emit('update:modelValue', newValue)
+    });
+
+    // Methods
     const handleCurrencyChange = async (newCurrencyId) => {
       selectedCurrency.value = newCurrencyId;
       localPaymentMethod.value = localDefaultPaymentMethod.value;
@@ -275,34 +228,36 @@ export default {
       if (!selectedCurrencyObject || !props.api) return;
 
       try {
-        const numericAmount = parseFloat(props.price.replace(/[^0-9.-]+/g, ""));
-
         const response = await axios.post(props.api, {
           currency: selectedCurrencyObject.iso_4217,
-          amount: numericAmount / 100
+          amount: props.price_object.price_including_vat/ 100
         });
 
-        const newPrice = selectedCurrencyObject.symbol + ' ' + response.data.converted_amount.toFixed(2);
+        displayPrice.value = formatPrice.value(
+          response.data.converted_amount,
+          selectedCurrencyObject.symbol
+        );
 
-        // Update local display
-        displayPrice.value = newPrice;
-
-        // Emit the new price to parent
-        emit('update:price', newPrice);
-
-        // Emit additional event for other potential listeners
-        emit('currency-converted', newPrice);
-
+        emit('update:price', displayPrice.value);
+        emit('currency-converted', displayPrice.value);
       } catch (error) {
         console.error('Currency conversion error:', error);
       }
     };
 
+    // Watchers
+    watch(() => props.modelValue, (newValue) => {
+      if (newValue && typeof newValue === 'object') {
+        localPaymentMethod.value = newValue.payment_method || localDefaultPaymentMethod.value;
+        Object.assign(localCreditCard, newValue.credit_card || {});
+      }
+    }, { immediate: true, deep: true });
+
     watch([localPaymentMethod, localCreditCard, selectedCurrencyObj], () => {
       input.value = {
         payment_method: localPaymentMethod.value,
         credit_card: { ...localCreditCard },
-        currency: selectedCurrencyObj,
+        currency: selectedCurrencyObj.value,
       };
     }, { deep: true });
 
@@ -311,24 +266,19 @@ export default {
       localPaymentMethod,
       localDefaultPaymentMethod,
       localCreditCard,
-      serviceItems,
-      validatePaymentService,
       showCreditCardForm,
       submitForm,
       selectedCurrency,
+      selectedCurrencyIso,
       formattedCurrencies,
-      filteredServiceItems, // Use this instead of serviceItems in your template
+      filteredServiceItems,
       handleCurrencyChange,
-      convertedPrice,
-      selectedCurrencyObj,
       displayPrice,
       selectedService,
-      currencies
     };
-}
+  }
 };
 </script>
-
 <!-- Styles remain unchanged -->
 <style lang="scss" scoped>
   .py-cs-1{

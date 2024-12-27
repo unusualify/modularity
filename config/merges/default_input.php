@@ -37,4 +37,5 @@ return [
     'density' => 'comfortable', // default | comfortable | compact
     'variant' => 'outlined',
     'clearable',
+    'color' => '',
 ];
