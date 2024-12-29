@@ -277,7 +277,7 @@ class Modularity extends FileRepository
      */
     public function getVendorPath($dir = '')
     {
-        return base_path(concatenate_path(unusualConfig('vendor_path'), $dir));
+        return get_modularity_vendor_path($dir);
     }
 
     /**

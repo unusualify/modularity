@@ -67,8 +67,8 @@ class ThemeCreateCommand extends BaseCommand
 
         $extendTheme = $this->option('extend');
 
-        $sassPath = base_path(unusualConfig('vendor_path') . '/vue/src/sass/themes/' . $extendTheme);
-        $jsPath = base_path(unusualConfig('vendor_path') . '/vue/src/js/config/themes/' . $extendTheme . '.js');
+        $sassPath = get_modularity_vendor_path("vue/src/sass/themes/{$extendTheme}");
+        $jsPath = get_modularity_vendor_path("vue/src/js/config/themes/{$extendTheme}.js");
 
         if (! $extendTheme || ! ($this->filesystem->exists($sassPath) && $this->filesystem->exists($jsPath))) {
             warning('Theme name to be extended');
@@ -87,8 +87,8 @@ class ThemeCreateCommand extends BaseCommand
                 default: 'unusual'
             );
 
-            $sassPath = base_path(unusualConfig('vendor_path') . '/vue/src/sass/themes/' . $extendTheme);
-            $jsPath = base_path(unusualConfig('vendor_path') . '/vue/src/js/config/themes/' . $extendTheme . '.js');
+            $sassPath = get_modularity_vendor_path("vue/src/sass/themes/{$extendTheme}");
+            $jsPath = get_modularity_vendor_path("vue/src/js/config/themes/{$extendTheme}.js");
         }
 
         $destination = resource_path('vendor/modularity/themes/' . $name);

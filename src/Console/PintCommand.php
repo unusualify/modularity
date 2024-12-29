@@ -44,15 +44,15 @@ class PintCommand extends BaseCommand
         //     $command = sprintf('./vendor/bin/pint');
         // }
 
-        $path = config('modules.paths.modules');
+        $dir = config('modules.paths.modules');
 
         if ($this->option('self')) {
-            $path = unusualConfig('vendor_path');
+            $dir = get_modularity_vendor_dir();
 
-            $path .= " --config {$path}/pint.json";
+            $dir .= " --config {$dir}/pint.json";
         }
 
-        $command = sprintf('./vendor/bin/pint %s', $path);
+        $command = sprintf('./vendor/bin/pint %s', $dir);
 
         if ($this->option('test')) {
             $command .= ' --test';
@@ -67,7 +67,7 @@ class PintCommand extends BaseCommand
             $command .= ' --repair';
         }
         // Run the command and log output
-        $this->info('Pint ' . $path . '...');
+        $this->info('Pint ' . $dir . '...');
 
         // $exitCode = shell_exec($command);
         exec($command, $output, $exitCode);

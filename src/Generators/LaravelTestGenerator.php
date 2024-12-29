@@ -166,7 +166,7 @@ class LaravelTestGenerator extends Generator
 
     public function getTargetPath()
     {
-        return base_path(unusualConfig('vendor_path') . '/src/Tests');
+        return get_modularity_vendor_path('src/Tests');
     }
 
     public function getTestFileName()

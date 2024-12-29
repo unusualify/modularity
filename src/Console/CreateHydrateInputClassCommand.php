@@ -56,7 +56,7 @@ class CreateHydrateInputClassCommand extends BaseCommand
 
         $className = "{$studlyName}Hydrate";
 
-        $path = base_path(unusualConfig('vendor_path') . '/src/Hydrates/Inputs/') . "{$className}.php";
+        $path = get_modularity_vendor_path("src/Hydrates/Inputs/{$className}.php");
 
         if (! file_exists($path)) {
             $content = (string) new Stub('/input-hydrate.stub', ['name' => $className]);

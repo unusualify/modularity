@@ -59,7 +59,7 @@ class CreateVueInputCommand extends BaseCommand
         $componentName = studlyName($name);
         $componentKebabName = 'v-input-' . kebabCase($name);
 
-        $path = base_path(unusualConfig('vendor_path') . '/vue/src/js/components/inputs/') . "{$componentName}.vue";
+        $path = get_modularity_vendor_path("vue/src/js/components/inputs/{$componentName}.vue");
 
         if (! file_exists($path)) {
             $content = (string) new Stub('/input-component.vue', ['name' => $componentKebabName]);

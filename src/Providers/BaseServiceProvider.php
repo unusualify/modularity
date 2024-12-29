@@ -74,7 +74,7 @@ class BaseServiceProvider extends ServiceProvider
                 ->first();
 
             return [
-                'Vendor' => unusualConfig('vendor_path'),
+                'Vendor' => get_modularity_vendor_dir(),
                 'Theme' => unusualConfig('app_theme'),
                 'Version' => $package->version,
             ];
@@ -253,7 +253,7 @@ class BaseServiceProvider extends ServiceProvider
 
         // timokoerber/laravel-one-time-operations directory set
         config([
-            'one-time-operations.directory' => unusualConfig('vendor_path') . '/operations',
+            'one-time-operations.directory' => get_modularity_vendor_dir('operations'),
         ]);
 
         config([
@@ -317,7 +317,7 @@ class BaseServiceProvider extends ServiceProvider
     {
         // LOAD BASE MIGRATIONS
         $this->loadMigrationsFrom(
-            base_path(unusualConfig('vendor_path') . '/database/migrations/default')
+            get_modularity_vendor_path('database/migrations/default')
         );
     }
 

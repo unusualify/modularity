@@ -52,6 +52,7 @@ class BuildCommand extends BaseCommand
      */
     public function handle(): int
     {
+
         if ($this->option('copyOnly')) {
             return $this->copyCustoms();
         }
@@ -173,7 +174,7 @@ class BuildCommand extends BaseCommand
             return;
         }
 
-        $chokidarPath = base_path($this->baseConfig('vendor_path') . '/vue') . '/node_modules/.bin/chokidar';
+        $chokidarPath = get_modularity_vendor_path('vue') . '/node_modules/.bin/chokidar';
         $chokidarCommand = [$chokidarPath, $pattern, '-c', $command];
 
         if ($this->filesystem->exists($chokidarPath)) {
@@ -218,7 +219,7 @@ class BuildCommand extends BaseCommand
      */
     private function runVueProcess(array $command, $disableTimeout = false)
     {
-        $process = new Process($command, base_path($this->baseConfig('vendor_path')) . '/vue');
+        $process = new Process($command, get_modularity_vendor_path('vue'));
         $process->setTty(Process::isTtySupported());
 
         if ($disableTimeout) {
@@ -257,7 +258,7 @@ class BuildCommand extends BaseCommand
         $this->info('Copying custom components...');
 
         $localCustomComponentsPath = resource_path(unusualConfig('custom_components_resource_path', 'vendor/modularity/js/components'));
-        $vueCustomComponentsPath = base_path(unusualConfig('vendor_path')) . '/vue/src/js/components/customs';
+        $vueCustomComponentsPath = get_modularity_vendor_path('vue/src/js/components/customs');
 
         $this->copyDirectory($localCustomComponentsPath, $vueCustomComponentsPath, clean: true);
 
@@ -284,7 +285,7 @@ class BuildCommand extends BaseCommand
         $this->info('Copying custom theme files...');
 
         $sources = resource_path('vendor/modularity/themes/' . $theme . '/sass');
-        $targetPath = base_path(unusualConfig('vendor_path')) . '/vue/src/sass/themes/customs/' . $theme;
+        $targetPath = get_modularity_vendor_path('vue/src/sass/themes/customs/' . $theme);
 
         $this->copyDirectory($sources, $targetPath);
 
@@ -301,7 +302,7 @@ class BuildCommand extends BaseCommand
         $this->info('Copying custom theme script...');
 
         $source = resource_path('vendor/modularity/themes/' . "{$theme}/{$theme}.js");
-        $targetPath = base_path(unusualConfig('vendor_path')) . '/vue/src/js/config/themes/customs/' . $theme . '.js';
+        $targetPath = get_modularity_vendor_path('vue/src/js/config/themes/customs/' . $theme . '.js');
 
         $this->copyFile($source, $targetPath);
 
