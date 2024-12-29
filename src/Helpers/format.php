@@ -1,11 +1,8 @@
 <?php
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Model;
-use Unusualify\Modularity\Hydrates\InputHydrator;
 
 if (! function_exists('lowerName')) {
     function lowerName($string)
@@ -519,94 +516,6 @@ if (! function_exists('merge_url_query')) {
         $finalUrl = $newQueryString ? $mainUrl . '?' . $newQueryString : $mainUrl;
 
         return $finalUrl;
-    }
-}
-
-if (! function_exists('get_package_version')) {
-    function get_package_version($package = null)
-    {
-        $tag = trim(shell_exec('cd ' . base_path() . ' && git describe --tags --abbrev=0'));
-
-        if ($package) {
-            $composer_lock = file_exists(base_path('composer-dev.lock')) && ! app()->isProduction()
-                ? 'composer-dev.lock'
-                : 'composer.lock';
-
-            $tag = trim(shell_exec('cat ' . $composer_lock . ' | grep -A 5 "\\"name\\": \\"' . $package . '\\"" | grep version | head -n 1 | sed \'s/.*: "\\(.*\\)",/\\1/\''));
-        }
-
-        return $tag;
-    }
-}
-
-if (! function_exists('set_env_file')) {
-    function set_env_file($variable, $value)
-    {
-        // Read the current .env file
-        $envFile = base_path('.env');
-        $envContents = File::get($envFile);
-
-        // Replace the APP_VERSION line
-        $envContents = preg_replace(
-            '/' . $variable . '=.*/',
-            $variable . '=' . $value,
-            $envContents
-        );
-
-        // Write the modified contents back to .env
-        File::put($envFile, $envContents);
-
-    }
-}
-
-if (! function_exists('configure_input')) {
-    function configure_input(array $input)
-    {
-        return collect($input)
-            ->mapWithKeys(function ($v, $k) {
-                if ($k == 'label'
-                    && ($translation = ___("form-labels.{$v}")) !== "form-labels.{$v}"
-                ) {
-                    $v = $translation;
-                }
-
-                return is_numeric($k) ? [$v => true] : [$k => $v];
-            })
-            ->toArray();
-    }
-}
-
-if (! function_exists('modularity_default_input')) {
-    function modularity_default_input()
-    {
-        return (array) Config::get(unusualBaseKey() . '.default_input');
-    }
-}
-
-if (! function_exists('hydrate_input')) {
-    function hydrate_input(array $input, $module = null)
-    {
-        $hydrator = new InputHydrator($input, $module);
-
-        return $hydrator->hydrate();
-    }
-}
-
-if (! function_exists('modularity_format_input')) {
-    function modularity_format_input(array $input)
-    {
-        $defaultInput = modularity_default_input();
-
-        return configure_input(hydrate_input(array_merge($defaultInput, $input)));
-    }
-}
-
-if (! function_exists('modularity_format_inputs')) {
-    function modularity_format_inputs(array $inputs)
-    {
-        return array_map(function ($v) {
-            return modularity_format_input($v);
-        }, $inputs);
     }
 }
 
