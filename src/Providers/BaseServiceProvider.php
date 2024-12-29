@@ -242,6 +242,12 @@ class BaseServiceProvider extends ServiceProvider
             }
         }
 
+        config([
+            'modularity.vendor_dir' => is_modularity_production()
+                ? 'vendor/unusualify/modularity'
+                : env('MODULARITY_VENDOR_DIR', env('MODULARITY_VENDOR_PATH', 'packages/modularity')),
+        ]);
+
         // Nwidart/laravel-modules scan enabled & scan path addition
         $scan_paths = config('modules.scan.paths', []);
         // array_push($scan_paths, base_path( unusualConfig('vendor_path') . '/umodules'));
