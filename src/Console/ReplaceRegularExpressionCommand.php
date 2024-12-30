@@ -51,26 +51,6 @@ class ReplaceRegularExpressionCommand extends BaseCommand
      */
     public function handle(): int
     {
-
-        // dd(
-        //     get_class($this->output),
-        //     $this->output->getVerbosity(),
-        //     $this->output->isVerbose(),
-        //     $this->output->isQuiet(),
-        //     $this->output->isVerbose(),
-        //     $this->output->isVeryVerbose(),
-        //     $this->output->isDebug(),
-        // );
-        // // Set verbosity level based on options
-        // $verbose = null;
-        // if ($this->option('vvv')) {
-        //     $this->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
-        // } elseif ($this->option('vv')) {
-        //     $this->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
-        // } elseif ($this->option('v')) {
-        //     $this->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
-        // }
-
         $path = $this->argument('path');
         $pattern = $this->argument('pattern');
         $data = $this->argument('data');
