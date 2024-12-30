@@ -4,7 +4,7 @@ namespace Unusualify\Modularity\Console;
 
 use Nwidart\Modules\Support\Stub;
 
-class AddComposerScriptsCommand extends BaseCommand
+class ComposerScriptsCommand extends BaseCommand
 {
     protected $hidden = true;
 
@@ -24,6 +24,7 @@ class AddComposerScriptsCommand extends BaseCommand
 
     protected $aliases = [
         'unusual:composer:scripts',
+        'mod:composer:scripts',
     ];
 
     /*
