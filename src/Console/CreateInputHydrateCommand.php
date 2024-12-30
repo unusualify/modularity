@@ -6,7 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Nwidart\Modules\Support\Stub;
 use Symfony\Component\Console\Input\InputArgument;
 
-class CreateHydrateInputClassCommand extends BaseCommand
+class CreateInputHydrateCommand extends BaseCommand
 {
     /**
      * The name and signature of the console command.
@@ -24,7 +24,7 @@ class CreateHydrateInputClassCommand extends BaseCommand
      *
      * @var string
      */
-    protected $description = 'Create Hydrate Input Class.';
+    protected $description = 'Create Input Hydrate Class.';
 
     /**
      * @var Filesystem
