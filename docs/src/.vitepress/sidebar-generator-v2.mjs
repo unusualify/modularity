@@ -46,15 +46,15 @@ const readLevel =  (srcDir, to) => {
 
         const filematter = readFrontMatterSync(`${srcDir}/${to}/${dir.name}`)
         itemList.push(generateMdItem(dir.name, filematter.sidebarPos))
-        }else if(dir.isDirectory()){
-          itemList.push({
-            text: generateFileName(dir.name),
-            base: `/${to}/${dir.name}/`,
-            collapsed: true,
-            sidebarPos: readFrontMatterSync(`${srcDir}/${to}/${dir.name}/index.md`)?.sidebarPos,
-            items: readLevel(`${srcDir}`,`${to}/${dir.name}`),
-          })
-        }
+      }else if(dir.isDirectory()){
+        itemList.push({
+          text: generateFileName(dir.name),
+          base: `/${to}/${dir.name}/`,
+          collapsed: true,
+          sidebarPos: readFrontMatterSync(`${srcDir}/${to}/${dir.name}/index.md`)?.sidebarPos,
+          items: readLevel(`${srcDir}`,`${to}/${dir.name}`),
+        })
+      }
     }
   )
   itemList.sort((a,b) => a.sidebarPos - b.sidebarPos)
@@ -80,10 +80,11 @@ export default async function(srcDir = 'src/pages/'){
     sidebarConfig.push(
       {
         text: dirName,
-        collapsed: false,
+        collapsed: true,
         base: `/${dir}/`,
         items: readLevel(srcDir, dir),
       })
   }
+
   return sidebarConfig
 }
