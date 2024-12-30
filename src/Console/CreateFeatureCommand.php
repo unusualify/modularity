@@ -55,6 +55,7 @@ class CreateFeatureCommand extends BaseCommand
         }
         $studlyName = Str::studly($name);
 
+        // Repository Trait
         if (confirm(
             label: 'Do you want to create a repository trait for this feature?',
             default: false
@@ -62,6 +63,7 @@ class CreateFeatureCommand extends BaseCommand
             $this->call('modularity:create:repository:trait', ['name' => $name]);
         }
 
+        // Model Trait
         if (confirm(
             label: 'Do you want to create a model trait for this feature?',
             default: false
@@ -69,6 +71,7 @@ class CreateFeatureCommand extends BaseCommand
             $this->call('modularity:create:model:trait', ['name' => $name]);
         }
 
+        // Model and Migration
         if (confirm(
             label: 'Do you want to create a model and migration for this feature?',
             default: false
@@ -82,6 +85,7 @@ class CreateFeatureCommand extends BaseCommand
             $this->call('modularity:make:migration', ['name' => "create_{$tableName}_table", '--no-defaults' => true]);
         }
 
+        // Vue Input Component
         if (confirm(
             label: 'Do you want to create a vue input component for this feature?',
             default: false
@@ -90,13 +94,25 @@ class CreateFeatureCommand extends BaseCommand
 
             $this->call('modularity:create:vue:input', ['name' => $componentName]);
 
+            // Vue Component Test
             if (confirm(
                 label: 'Do you want to create a vue component test for this input component?',
                 default: false
             )) {
                 $this->call('modularity:create:vue:test', ['name' => Str::kebab("VInput$componentName"), 'type' => 'component']);
             }
+
+            // Input Hydrate Class
+            if (confirm(
+                label: 'Do you want to create a input hydrate class for this feature?',
+                default: false
+            )) {
+                // $hydrateName = Str::studly(text('What will be the name of the input hydrate class?'));
+
+                $this->call('modularity:create:input:hydrate', ['name' => $componentName]);
+            }
         }
+
 
         $this->info('Feature created successfully');
 
