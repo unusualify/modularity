@@ -14,8 +14,8 @@ hero:
       text: Get Started
       link: get-started/installation-guide
     - theme: alt
-      text: Contribution Guide
-      link: advanced-guide/api-examples
+      text: Components
+      link: guide/components/data-tables
     - theme: alt
       text: GitHub
       link: https://www.github.com/unusualify/modularity
