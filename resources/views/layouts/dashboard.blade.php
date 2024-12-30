@@ -1,10 +1,7 @@
 @extends("{$MODULARITY_VIEW_NAMESPACE}::layouts.master")
 
 @php
-    // $emptyMessage = $emptyMessage ?? twillTrans('twill::lang.dashboard.empty-message');
-    // $isDashboard = true;
-    // $translate = true;
-    // dd($blocks);
+
 @endphp
 
 @push('head_last_js')

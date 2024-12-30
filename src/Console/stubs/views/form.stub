@@ -3,29 +3,26 @@
 @section('appTypeClass', 'body--form')
 
 @php
-    $titleFormKey = $titleFormKey ?? 'name';
-    $disableContentFieldset = $disableContentFieldset ?? false;
+
 @endphp
-
-@section('content')
-    <ue-form v-bind='@json($formAttributes)'/>
-
-@stop
 
 @push('head_last_js')
     {{
-        ModularityVite::useHotFile(public_path('modularity.hot'))->withEntryPoints(['src/js/core-index.js'])
+        ModularityVite::useHotFile(public_path('modularity.hot'))->withEntryPoints(['src/js/core-form.js'])
     }}
 @endpush
 
-@push('post_js')
+@section('content')
+    <ue-form v-bind='@json($formAttributes)'/>
+@stop
 
+@push('post_js')
+    <script>
+
+    </script>
 @endpush
 
-@section('STORE')
+@push('STORE')
     window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
     window['{{ unusualConfig('js_namespace') }}'].STORE.form = {!! json_encode($formStore ?? new StdClass()) !!}
-@endsection
-
-
-
+@endpush

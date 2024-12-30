@@ -19,7 +19,3 @@
     window['{{ unusualConfig('js_namespace') }}'].STORE.browser = {}
     window['{{ unusualConfig('js_namespace') }}'].STORE.browser.selected = {}
 @stop
-
-{{-- @push('extra_js')
-    <script src="{{ unusualAsset('core-free.js') }}" crossorigin></script>
-@endpush --}}
