@@ -16,6 +16,15 @@
 
     // STORE MODULES
     window['{{ unusualConfig('js_namespace') }}'].STORE = {};
+    window['{{ unusualConfig('js_namespace') }}'].STORE.ambient = {
+        isHot: @json(ModularityVite::useHotFile(public_path('modularity.hot'))->isRunningHot()),
+        appName: '{{ env('APP_NAME') }}',
+        appEmail: '{{ env('APP_EMAIL') }}',
+        appEnv: '{{ env('APP_ENV') }}',
+        appDebug: '{{ env('APP_DEBUG') }}',
+        systemPackageVersions: {!! json_encode($SYSTEM_PACKAGE_VERSIONS) !!},
+    };
+    window['{{ unusualConfig('js_namespace') }}'].STORE.user = {};
     window['{{ unusualConfig('js_namespace') }}'].STORE.languages = {!! json_encode(getLanguagesForVueStore($form_fields ?? [], $translate ?? false)) !!};
     window['{{ unusualConfig('js_namespace') }}'].STORE.config = {}
     window['{{ unusualConfig('js_namespace') }}'].STORE.datatable = {}
@@ -29,5 +38,6 @@
         useWysiwyg: {{ unusualConfig('media_library.media_caption_use_wysiwyg') ? 'true' : 'false' }},
         wysiwygOptions: {!! json_encode(unusualConfig('media_library.media_caption_wysiwyg_options')) !!}
     };
+
     @stack('STORE')
 </script>

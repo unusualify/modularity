@@ -6,9 +6,11 @@ import config from './modules/config'
 import user from './modules/user'
 import language from './modules/language'
 import browser from './modules/browser'
+import ambient from './modules/ambient'
 
 export default createStore({
   modules: {
+    ambient,
     user,
     alert,
     config,
