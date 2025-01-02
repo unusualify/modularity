@@ -59,11 +59,10 @@ const svgConfig = (suffix = null, isProduction = true) => {
 export default defineConfig(({ command, mode }) => {
   const ENV = loadEnv(mode, process.cwd(), '')
   const envPrefix = 'VUE'
+  const isProduction = mode === 'production'
 
-  const vendorPath = ENV.MODULARITY_VENDOR_PATH || ENV.UNUSUAL_VENDOR_PATH || 'vendor/unusualify/modularity'
-
-  // const CD_PARENT_STRING = Array(vendorPath.split('/').length + 1).fill('..').join('/') // 2 or 3 => '../../../
-  const LARAVEL_ROOT_LEVEL = laravelRootUpperLevel(vendorPath)
+  const vendorDir = ENV.VENDOR_DIR || 'vendor/unusualify/modularity'
+  const LARAVEL_ROOT_LEVEL = laravelRootUpperLevel(vendorDir)
 
   const APP_THEME = ENV.VUE_APP_THEME || 'unusual'
   const VUE_DEV_PORT = ENV.VUE_DEV_PORT || 5173
@@ -80,10 +79,7 @@ export default defineConfig(({ command, mode }) => {
   const outDir = 'dist/modularity'
   // const outDir = fileURLToPath(new URL(`${LARAVEL_ROOT_LEVEL}/public${base}`, import.meta.url))
   const targetDir = fileURLToPath(new URL(`${LARAVEL_ROOT_LEVEL}/public`, import.meta.url))
-
   const publicDir = 'public'
-
-  const isProduction = mode === 'production'
 
   const server = {
     host: '0.0.0.0',

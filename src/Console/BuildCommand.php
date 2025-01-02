@@ -222,6 +222,12 @@ class BuildCommand extends BaseCommand
         $process = new Process($command, get_modularity_vendor_path('vue'));
         $process->setTty(Process::isTtySupported());
 
+        // Add environment variables
+        $process->setEnv([
+            'BASE_PATH' => base_path(),
+            'VENDOR_DIR' => unusualConfig('vendor_dir'),
+        ]);
+
         if ($disableTimeout) {
             $process->setTimeout(null);
         } else {
