@@ -3,6 +3,15 @@
 
     <slot name="top"></slot>
 
+    <v-chip
+      v-if="$store.getters.isHot"
+      color="green"
+      class="position-absolute"
+      style="top: 4px; right: 0;  z-index: 10000;"
+      @click="$store.state.ambient.isHot = false"
+    >
+      Development Mode
+    </v-chip>
     <v-app-bar app v-if="$vuetify.display.mdAndDown">
       <v-app-bar-nav-icon
         v-if="!$vuetify.display.lgAndUp"
