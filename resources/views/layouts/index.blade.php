@@ -6,16 +6,16 @@
 
 @endphp
 
-@section('content')
-    {{-- @include("{$MODULARITY_VIEW_NAMESPACE}::components.datatable", $tableAttributes ?? []) --}}
-    @include("{$MODULARITY_VIEW_NAMESPACE}::components.table", $tableAttributes ?? [])
-@stop
-
 @push('head_last_js')
     {{
         ModularityVite::useHotFile(public_path('modularity.hot'))->withEntryPoints(['src/js/core-index.js'])
     }}
 @endpush
+
+@section('content')
+    {{-- @include("{$MODULARITY_VIEW_NAMESPACE}::components.datatable", $tableAttributes ?? []) --}}
+    @include("{$MODULARITY_VIEW_NAMESPACE}::components.table", $tableAttributes ?? [])
+@stop
 
 @push('post_js')
     <script>

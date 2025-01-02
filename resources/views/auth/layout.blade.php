@@ -93,13 +93,11 @@
 @endsection
 
 @push('STORE')
-    console.log('store auth layout')
-    window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {
+    {{-- window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {
         languages: @json(route('api.languages.index'))
-    };
+    }; --}}
     window['{{ unusualConfig('js_namespace') }}'].STORE.config = {
         test: false,
-        isMiniSidebar:  {!! json_encode($isMiniSidebar ?? true) !!},
     };
     window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
     window['{{ unusualConfig('js_namespace') }}'].STORE.form = {!! json_encode($formStore ?? new StdClass()) !!}
