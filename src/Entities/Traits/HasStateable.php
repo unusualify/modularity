@@ -231,15 +231,33 @@ trait HasStateable
         ];
     }
 
-    // public function setStateablePreview($state)
-    // {
-    //     return "<span variant='text' color='{$state->color}' prepend-icon='{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</span>";
-    // }
+    public function getStateableList($itemValue = 'name')
+    {
+        $defaultStates = $this->getDefaultStates();
+        $defaultStateCodes = array_column($defaultStates, 'code');
 
-    // public function setStateablePreviewNull()
-    // {
-    //     return "<span variant='text' color='' prepend-icon=''>No State</span>";
-    // }
+        return State::whereIn('code', $defaultStateCodes)
+            ->get()
+            ->map(function($state) use ($itemValue) {
+                return [
+                    'id' => $state->id,
+                    $itemValue => $state->name,
+                    'code' => $state->code,
+                ];
+            })
+            ->sortBy(function($state) use ($defaultStateCodes, $itemValue)  {
+                return array_search($state['code'], $defaultStateCodes);
+            })
+            ->values()
+            ->toArray();
+    }
+
+    public function scopeStateable($query, $state)
+    {
+        return $query->whereHas('states', function ($q) use ($state) {
+            $q->where('code', $state);
+        });
+    }
 
     public function scopeDistributed()
     {

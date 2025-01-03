@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Hydrates\Inputs;
 
 use Illuminate\Support\Facades\App;
+use Unusualify\Modularity\Facades\Modularity;
 
 class StateableHydrate extends InputHydrate
 {
@@ -32,23 +33,11 @@ class StateableHydrate extends InputHydrate
 
         $repository = App::make('Modules\SystemUtility\Repositories\StateRepository');
 
-        $model = App::make('Modules\PressRelease\Entities\PressRelease');
-
         // If default_states contains strings, convert them to objects first
-        $stateObjects = $model->getDefaultStates();
+        $module = Modularity::find($input['_moduleName']);
+        $model = App::make($module->getRouteClass($input['_routeName'], 'model'));
 
-        $states = $repository->getByColumnValues('code', array_column($stateObjects, 'code'));
-        $items = [];
-        foreach ($states as $state) {
-            array_push(
-                $items,
-                [
-                    'id' => $state->id,
-                    'name' => $state->translatedAttribute('name')->first(),
-                ]
-            );
-        }
-        $input['items'] = $items;
+        $input['items'] = $model->getStateableList();
 
         return $input;
     }
