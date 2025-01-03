@@ -36,6 +36,7 @@
               :key="key"
               v-bind="$lodash.omit($bindAttributes(), ['rules'])"
               :name="name"
+              :files="files"
               :server="server"
               @init="init"
               @processfile="postProcessFilepond"
@@ -88,18 +89,18 @@
     },
     data() {
       return {
-        // files: isArray(this.modelValue) ? this.modelValue.map(function (file) {
-        //     return {
-        //       source:  file.source ?? `${this.endPoints.load}${file.uuid}`,
-        //       options: {
-        //         type : `${file.type ?? 'local'}`,
-        //         // file initial metadata
-        //         // metadata: {
-        //         //     date: '2018-10-5T12:00',
-        //         // },
-        //       }
-        //     }
-        //   }) : [],
+        files: isArray(this.modelValue) ? this.modelValue.map(function (file) {
+            return {
+              source:  file.source ?? `${this.endPoints.load}${file.uuid}`,
+              options: {
+                type : `${file.type ?? 'local'}`,
+                // file initial metadata
+                // metadata: {
+                //     date: '2018-10-5T12:00',
+                // },
+              }
+            }
+          }) : [],
       }
     },
     methods:{
@@ -122,23 +123,23 @@
         this.input = newInput
       },
       init() {
-        const files = isArray(this.input) ? this.input.map(function (file) {
-              return {
-                source:  file.source ?? `${file.uuid}/${file.file_name}`,
-                options: {
-                  type : `${file.type ?? 'local'}`,
+        // const files = isArray(this.input) ? this.input.map(function (file) {
+        //       return {
+        //         source:  file.source ?? `${file.uuid}/${file.file_name}`,
+        //         options: {
+        //           type : `${file.type ?? 'local'}`,
 
-                  // file initial metadata
-                  // metadata: {
-                  //     date: '2018-10-5T12:00',
-                  // },
-                }
-              }
-          }) : [];
+        //           // file initial metadata
+        //           // metadata: {
+        //           //     date: '2018-10-5T12:00',
+        //           // },
+        //         }
+        //       }
+        //   }) : [];
 
         setOptions({
 
-          files: files,
+          files_: files,
           server_: {
             process_: this.endPoints.process,
             revert_: this.endPoints.revert,
