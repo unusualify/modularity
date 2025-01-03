@@ -26,8 +26,9 @@ return new class extends Migration
                     ->onDelete('cascade')
                     ->onUpdate('cascade');
 
-                $table->string('authorizedable_type')->nullable(); // MODEL CLASS
-                $table->string('authorizedable_id')->nullable(); // ID of model to be authorized
+                $table->uuidMorphs('authorizedable');
+                // $table->string('authorizedable_type')->nullable(); // MODEL CLASS
+                // $table->string('authorizedable_id')->nullable(); // ID of model to be authorized
             });
         }
 
