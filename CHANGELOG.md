@@ -2,6 +2,12 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.23.1 - 2025-01-03
+
+### :wrench: Bug Fixes
+
+- comment out default locale initialization in HasStateable trait by @OoBook in https://github.com/unusualify/modularity/commit/27a1fc298d8cc9f77a01d597b4022ee558ef68da
+
 ## v0.23.0 - 2025-01-03
 
 ### :rocket: Features
