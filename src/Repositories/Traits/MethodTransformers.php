@@ -4,91 +4,11 @@ namespace Unusualify\Modularity\Repositories\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
-use PDO;
 use Unusualify\Modularity\Traits\ManageTraits;
 
 trait MethodTransformers
 {
     use ManageTraits;
-
-    /**
-     * @param string $class name resolution
-     * @return bool
-     */
-    public function hasModelTrait($trait)
-    {
-        $hasTrait = classHasTrait($this->getModel(), $trait);
-
-        return $hasTrait;
-    }
-
-    public function getByColumnValues($column, array $values, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null)
-    {
-        $query = $this->model->whereIn($column, $values);
-
-        $query = $query->with($this->formatWiths($query, $with));
-
-        $query = $this->filter($query, $scopes);
-
-        $query = $this->order($query, $orders);
-
-        if ($isFormatted) {
-            return $query->get()->map(function ($item) {
-                // dd($item);
-                return array_merge(
-                    $this->getShowFields($item, $this->chunkInputs($this->inputs())),
-                    $item->attributesToArray(),
-                    // $item->toArray(),
-                    // $this->getFormFields($item, $this->chunkInputs($this->inputs())),
-                    // $columnsData
-                );
-            });
-        } else {
-
-            return $query->get();
-        }
-    }
-
-    public function getByIds(array $ids, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null)
-    {
-        // $query = $this->model->query();
-        // dd($ids);
-        $query = $this->model->whereIn('id', $ids);
-
-        $query = $query->with($this->formatWiths($query, $with));
-
-        $query = $this->filter($query, $scopes);
-
-        $query = $this->order($query, $orders);
-
-        if ($isFormatted) {
-            return $query->get()->map(function ($item) {
-                return array_merge(
-                    $this->getShowFields($item, $this->chunkInputs($this->inputs())),
-                    $item->attributesToArray(),
-                    // $item->toArray(),
-                    // $this->getFormFields($item, $this->chunkInputs($this->inputs())),
-                    // $columnsData
-                );
-            });
-        } else {
-
-            return $query->get();
-        }
-    }
-
-    /**
-     * @return string
-     */
-    protected function getLikeOperator()
-    {
-        if (DB::connection()->getPDO()->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') {
-            return 'ILIKE';
-        }
-
-        return 'LIKE';
-    }
 
     /**
      * @return array
@@ -401,6 +321,7 @@ trait MethodTransformers
         $_scopes = $scopes;
         foreach ($_scopes as $column => $value) {
             $studlyColumn = studlyName($column);
+
             if (preg_match('/addRelation([A-Za-z]+)/', $column, $matches)) {
                 $relationName = $this->getCamelCase($matches[1]);
 
@@ -446,13 +367,16 @@ trait MethodTransformers
             $studlyColumn = studlyName($column);
             $studlyValue = studlyName($value);
             // dd(
-            //     is_bool($value),
             //     method_exists($this->model, 'scope' . $studlyColumn),
             //     $studlyColumn,
             //     $scopes
             // );
             if (method_exists($this->model, 'scope' . $studlyColumn)) {
-                $query->{$this->getCamelCase($column)}();
+                if (! is_bool($value)) {
+                    $query->{$this->getCamelCase($column)}($value);
+                } else {
+                    $query->{$this->getCamelCase($column)}();
+                }
             } elseif (is_string($value) && method_exists($this->model, 'scope' . studlyName($value))) {
                 $query->{$this->getCamelCase($value)}();
 

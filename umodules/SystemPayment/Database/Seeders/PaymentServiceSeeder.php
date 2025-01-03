@@ -34,7 +34,7 @@ class PaymentServiceSeeder extends Seeder
                 'title' => 'Iyzico',
                 'is_external' => false,
                 'is_internal' => true,
-                'image' => 'iyzico.png',
+                'image' => 'credit-card.png',
                 'currency' => 'TRY',
             ],
             [
@@ -121,9 +121,16 @@ class PaymentServiceSeeder extends Seeder
     /**
      * Create a media object for the image and associate it with the payment service.
      */
-    private function createAndAssociateImage(PaymentService $paymentService, string $imageName)
+    private function createAndAssociateImage(PaymentService $paymentService, string $imageName, ?string $base_path = null)
     {
-        $imagePath = public_path('vendor/modularity/assets/images/payment-service-images/' . $imageName);
+        if ($base_path) {
+            $imagePath = $base_path . $imageName;
+
+        } else {
+            $imagePath = base_path('vendor/unusualify/modularity/resources/assets/images/payment-service-images/' . $imageName);
+        }
+        $imagePath = base_path('vendor/unusualify/modularity/resources/assets/images/payment-service-images/' . $imageName);
+        // $this->command->warn("Image path: $imagePath");
 
         if (file_exists($imagePath)) {
             $file = new UploadedFile($imagePath, $imageName, null, null, true);

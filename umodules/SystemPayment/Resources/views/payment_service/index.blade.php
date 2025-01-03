@@ -27,7 +27,7 @@
 
 @endpush
 
-@section('STORE')
+@push('STORE')
     window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
     window['{{ unusualConfig('js_namespace') }}'].STORE.form = {
         inputs: {!! json_encode($formSchema) !!},
@@ -45,7 +45,7 @@
         filter: { status: '{{ $filters['status'] ?? $defaultFilterSlug ?? 'all' }}' },
     }
 
-@endsection
+@endpush
 
 
 

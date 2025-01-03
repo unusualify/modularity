@@ -205,7 +205,7 @@ if (! function_exists('moduleRoute')) {
         // );
         // Build the route
         try {
-            //code...
+            // code...
             return route($routeName, $parameters, $absolute);
         } catch (\Throwable $th) {
             dd(
@@ -220,7 +220,7 @@ if (! function_exists('moduleRoute')) {
                 ],
                 debug_backtrace()
             );
-            //throw $th;
+            // throw $th;
         }
 
         return route($routeName, $parameters, $absolute);

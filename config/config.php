@@ -19,7 +19,7 @@ return [
     // 'is_development' => env('UNUSUAL_DEV', false),
     // 'development_url' => 'http://' . env('UNUSUAL_DEV_URL', 'localhost:8080'),
     // 'public_dir' => env('UNUSUAL_ASSETS_DIR', 'unusual'),
-    'vendor_path' => env('MODULARITY_VENDOR_PATH', 'vendor/unusualify/modularity'),
+    'vendor_dir' => 'vendor/unusualify/modularity',
 
     'custom_components_resource_path' => 'vendor/modularity/js/components',
     // 'vendor_components_resource_path' => 'assets/vendor/js/components',

@@ -44,7 +44,7 @@ class ForgotPasswordController extends Controller
      */
     public function broker()
     {
-        return $this->passwordBrokerManager->broker('users');
+        return $this->passwordBrokerManager->broker('unusual_users');
     }
 
     /**

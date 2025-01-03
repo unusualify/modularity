@@ -51,7 +51,7 @@ export default function useTableNames(props, context) {
   })
 
   const formTitle = computed(() => {
-    const translationKey = store.state.form.editedIndex === -1
+    const translationKey = context.editedIndex.value === -1
       ? 'fields.new-item'
       : 'fields.edit-item'
 

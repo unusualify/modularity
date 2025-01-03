@@ -69,8 +69,8 @@ class ThemeMakeCommand extends BaseCommand
             return E_ERROR;
         }
 
-        $jsTarget = base_path(unusualConfig('vendor_path') . "/vue/src/js/config/themes/{$name}.js");
-        $sassTarget = base_path(unusualConfig('vendor_path') . "/vue/src/sass/themes/{$name}");
+        $jsTarget = get_modularity_vendor_path("vue/src/js/config/themes/{$name}.js");
+        $sassTarget = get_modularity_vendor_path("vue/src/sass/themes/{$name}");
 
         $this->filesystem->copy(
             $jsSource, $jsTarget
@@ -81,8 +81,8 @@ class ThemeMakeCommand extends BaseCommand
         );
 
         // delete custom modularity paths
-        $this->filesystem->delete(base_path(unusualConfig('vendor_path') . "/vue/src/js/config/themes/customs/{$name}.js"));
-        $this->filesystem->deleteDirectory(base_path(unusualConfig('vendor_path') . "/vue/src/sass/themes/customs/{$name}"));
+        $this->filesystem->delete(get_modularity_vendor_path("vue/src/js/config/themes/customs/{$name}.js"));
+        $this->filesystem->deleteDirectory(get_modularity_vendor_path("vue/src/sass/themes/customs/{$name}"));
 
         // delete custom resource path
         $this->filesystem->deleteDirectory(resource_path("vendor/modularity/themes/{$name}"));
@@ -120,7 +120,7 @@ class ThemeMakeCommand extends BaseCommand
 
     protected function writeThemeExport($themeName)
     {
-        $filePath = base_path(unusualConfig('vendor_path') . '/vue/src/js/config/themes/index.js');
+        $filePath = get_modularity_vendor_path('vue/src/js/config/themes/index.js');
 
         $content = get_file_string($filePath);
 

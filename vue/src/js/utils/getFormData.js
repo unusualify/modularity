@@ -183,8 +183,16 @@ export const getModel = (inputs, item = null, rootState = null) => {
   return values
 }
 
-export const getTopSchema = (inputs) => {
-  return _.filter(inputs, (input) => isTopEventInput(input))
+export const getTopSchema = (inputs, isEditing = false) => {
+  return _.filter(inputs, (input) => {
+    if(isEditing && __isset(input.editable) && (input.editable === false || input.editable === 'hidden'))
+      return false
+
+    if(!isEditing && __isset(input.creatable) && (input.creatable === false || input.creatable === 'hidden'))
+      return false
+
+    return isTopEventInput(input)
+  })
 }
 
 export const getTranslationInputsCount = (inputs) => {

@@ -11,7 +11,7 @@ class ChatHydrate extends InputHydrate
      * @var array
      */
     public $requirements = [
-        'default' => null,
+        'default' => -1,
     ];
 
     /**

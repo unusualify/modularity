@@ -19,14 +19,14 @@ class CreateLaravelTestCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'modularity:create:test:laravel';
+    protected $name = 'modularity:create:laravel:test';
 
     /**
      * The signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'modularity:create:test:laravel {module} {test} {--unit}';
+    protected $signature = 'modularity:create:laravel:test {module} {test} {--unit}';
 
     /**
      * The console command description.

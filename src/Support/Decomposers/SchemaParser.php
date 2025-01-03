@@ -471,7 +471,7 @@ class SchemaParser extends Parser
 
                 foreach (array_slice($options, 1) as $key => $routeName) {
                     $routeName = $this->getStudlyName($routeName);
-                    $foreign_id = $this->getForeignKeyFromName($routeName); //$this->getSnakeCase($routeName) . '_id';
+                    $foreign_id = $this->getForeignKeyFromName($routeName); // $this->getSnakeCase($routeName) . '_id';
                     if (($repository = $finder->getRouteRepository($routeName))) {
                         array_push($parents, [
                             'name' => $foreign_id,

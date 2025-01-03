@@ -16,7 +16,7 @@ trait HasChatable
         static::retrieved(function (Model $model) {
             if ($model->chat) {
                 $model->setAttribute('_chat_id', $model->chat->id);
-            } elseif ($model->{$model->getForeignKey()}) {
+            } elseif ($model->{$model->getKeyName()}) {
                 $chat = $model->chat()->create();
                 $model->setAttribute('_chat_id', $chat->id);
             }

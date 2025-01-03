@@ -3,23 +3,8 @@
 @section('appTypeClass', 'body--listing')
 
 @php
-    // $translate = $translate ?? false;
-    // $translateTitle = $translateTitle ?? $translate ?? false;
-    // $reorder = $reorder ?? false;
-    // $nested = $nested ?? false;
-    // $bulkEdit = $bulkEdit ?? true;
-    // $create = $create ?? false;
-    // $skipCreateModal = $skipCreateModal ?? false;
 
-    // $controlLanguagesPublication = $controlLanguagesPublication ?? true;
-    // dd($tableMainFilters);
-    // dd(get_defined_vars());
 @endphp
-
-@section('content')
-    {{-- @include("{$MODULARITY_VIEW_NAMESPACE}::components.datatable", $tableAttributes ?? []) --}}
-    @include("{$MODULARITY_VIEW_NAMESPACE}::components.table", $tableAttributes ?? [])
-@stop
 
 @push('head_last_js')
     {{
@@ -27,8 +12,19 @@
     }}
 @endpush
 
-@section('STORE')
+@section('content')
+    {{-- @include("{$MODULARITY_VIEW_NAMESPACE}::components.datatable", $tableAttributes ?? []) --}}
+    @include("{$MODULARITY_VIEW_NAMESPACE}::components.table", $tableAttributes ?? [])
+@stop
+
+@push('post_js')
+    <script>
+
+    </script>
+@endpush
+
+@push('STORE')
     window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
     window['{{ unusualConfig('js_namespace') }}'].STORE.form = {!! json_encode($formStore ?? new StdClass()) !!}
     window['{{ unusualConfig('js_namespace') }}'].STORE.datatable = {!! json_encode($tableStore ?? new StdClass()) !!}
-@endsection
+@endpush

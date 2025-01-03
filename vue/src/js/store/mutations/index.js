@@ -17,3 +17,6 @@ export { default as BROWSER } from './browser'
 
 /* config */
 export { default as CONFIG } from './config'
+
+/* user */
+export { default as USER } from './user'

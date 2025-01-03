@@ -55,7 +55,7 @@ class CreateRepositoryTraitCommand extends BaseCommand
 
         $content = (new Stub('/classes/repository-trait.stub', $replacements))->render();
 
-        $path = base_path(unusualConfig('vendor_path') . '/src/Repositories/Traits/' . $studlyName . 'Trait.php');
+        $path = get_modularity_vendor_path("src/Repositories/Traits/{$studlyName}Trait.php");
 
         File::put($path, $content);
 

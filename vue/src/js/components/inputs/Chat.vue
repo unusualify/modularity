@@ -305,7 +305,8 @@
     },
     computed: {
       currentUser() {
-        return this.$store.getters.currentUser;
+        // __log(this.$store.getters.userProfile)
+        return this.$store.getters.userProfile;
       },
       formattedMessages() {
         return this.formatMessages(this.messages);
@@ -332,7 +333,7 @@
       },
       formatMessage(message) {
         message = {
-          user_profile: this.currentUser,
+          user_profile: this.$lodash.cloneDeep(this.currentUser),
           attachments: [],
           reverse: false,
           loading: false,
@@ -404,13 +405,28 @@
       addMessage(message) {
         return this.messages.push(message) - 1;
       },
+      findMessageByTempId(tempId) {
+        return this.messages.findIndex(message => message.tempId === tempId);
+      },
+      updateMessageByTempId(tempId, newMessage) {
+        const index = this.findMessageByTempId(tempId);
+        if (index !== -1) {
+          this.messages[index] = {
+            ...this.messages[index],
+            ...newMessage
+          };
+        }
+      },
       sendMessage() {
         const endpoint = this.endpoints.store.replace(':id', this.input);
 
-        let newIndex = this.addMessage({
+        const newMessage = {
           loading: true,
-          content: this.message
-        });
+          content: this.message,
+          tempId: Date.now() // Add unique tempId to identify this message later
+        };
+        let tempId = newMessage.tempId;
+        this.addMessage(newMessage);
 
         this.loading = true;
 
@@ -419,10 +435,14 @@
           attachments: this.attachments
         }).then(response => {
           if (response.status === 200) {
-            this.messages[newIndex].loading = false;
-            this.messages[newIndex].id = response.data.id;
-            this.messages[newIndex].created_at = response.data.created_at;
-            this.messages[newIndex].attachments = response.data.attachments ?? [];
+
+            let message = response.data
+            message.loading = false;
+            this.updateMessageByTempId(tempId, message);
+            // this.messages[newIndex].loading = false;
+            // this.messages[newIndex].id = response.data.id;
+            // this.messages[newIndex].created_at = response.data.created_at;
+            // this.messages[newIndex].attachments = response.data.attachments ?? [];
             this.message = '';
             this.attachments = [];
           }
@@ -448,7 +468,6 @@
             .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
 
           if(lastMessage && lastMessage.created_at) {
-            __log(lastMessage.created_at)
             created_at = lastMessage.created_at;
           }
         }
@@ -474,16 +493,21 @@
       // __log('Chat', this.getAttachments());
     },
     mounted() {
-      this.loadMessages();
-      this.getAttachments();
 
-      this.refreshInterval = setInterval(() => {
-        this.refreshMessages();
-      }, this.refreshTime);
+      if(this.input && this.input > -1) {
+        this.loadMessages();
+        this.getAttachments();
+        this.refreshInterval = setInterval(() => {
+          this.refreshMessages();
+        }, this.refreshTime);
+      }
+
     },
     beforeUnmount() {
       clearInterval(this.refreshInterval);
       this.refreshInterval = null;
+      if(this.input && this.input > -1) {
+      }
     }
   }
 </script>

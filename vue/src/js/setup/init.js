@@ -492,6 +492,27 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
     // Update URL without reloading the page
     window.history.pushState({}, '', url);
   }
+
+  window.__formatCurrencyPrice = (amount, symbol, preferedLocale = 'en') => {
+
+    // const { locale } = useI18n({ useScope: 'global' })
+
+    // Handle invalid input
+    // if(isNull(preferedLocale))
+    //   preferedLocale = locale.value;
+    // console.log('here', amount, symbol, preferedLocale)
+    if (typeof amount !== 'number' || isNaN(amount))
+      throw new Error('Amount must be a valid number');
+
+    // Format the number with proper grouping and decimal places
+    const formatter = new Intl.NumberFormat(preferedLocale, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+
+    // Format the number and add the symbol
+    return `${symbol}${formatter.format(amount)}`;
+  }
 }
 
 function tokenizePath(path) {

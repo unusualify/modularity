@@ -101,7 +101,7 @@ if (! function_exists('builtInModularityThemes')) {
     function builtInModularityThemes()
     {
         return collect(array_filter(
-            glob(base_path(unusualConfig('vendor_path') . '/vue/src/sass/themes/*', GLOB_ONLYDIR)),
+            glob(get_modularity_vendor_path('vue/src/sass/themes/*', GLOB_ONLYDIR)),
             fn ($dir) => File::isDirectory($dir) && ! preg_match('/customs/', $dir)
         ))->mapWithKeys(function ($dir) {
             $info = pathinfo($dir);

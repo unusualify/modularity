@@ -29,16 +29,16 @@ class FilepondHydrate extends InputHydrate
 
         // Other Functionalities
         'allow-drop' => true,
-        'allow-replace' => true, //only works when allowMultiple is false
+        'allow-replace' => true, // only works when allowMultiple is false
         'allow-remove' => true,
         'allow-reorder' => false,
         'allow-process' => true,
         'allow-image-preview' => false,
 
         // Drag-Drop Properties
-        'drop-on-page' => false, //FilePond will catch all files dropped on the webpage
-        'drop-on-element' => true, //Require drop on the FilePond element itself to catch the file.
-        'drop-validation' => false, //When enabled, files are validated before they are dropped. A file is not added when it's invalid.
+        'drop-on-page' => false, // FilePond will catch all files dropped on the webpage
+        'drop-on-element' => true, // Require drop on the FilePond element itself to catch the file.
+        'drop-validation' => false, // When enabled, files are validated before they are dropped. A file is not added when it's invalid.
     ];
 
     /**

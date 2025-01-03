@@ -50,7 +50,7 @@ return [
         'featured' => false,
 
         // custom fields for ue-datatable start
-        'searchable' => false, //true,
+        'searchable' => false, // true,
         'isRowEditable' => false,
         'isColumnEditable' => false,
         'formatter' => [],
@@ -305,7 +305,7 @@ return [
                             'image' => '', // image link for the background of the toolbar
                         ],
                         'headerOptions' => [
-                            'color' => 'rgba(140,160,167, .2)', //Hex, rgba or default css colors
+                            'color' => 'rgba(140,160,167, .2)', // Hex, rgba or default css colors
                         ],
 
                         'hideHeaders' => false,

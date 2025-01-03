@@ -158,7 +158,7 @@ abstract class CoreController extends LaravelController
     {
         return $this->getRepositoryClass($this->modelName) ? App::make($this->getRepositoryClass($this->modelName)) : null;
         try {
-            //code...
+            // code...
         } catch (\Throwable $th) {
             dd(
                 "repositoryClass not exists for {$this->routeName} in {$this->moduleName}",

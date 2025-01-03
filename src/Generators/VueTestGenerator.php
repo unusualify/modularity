@@ -180,7 +180,7 @@ class VueTestGenerator extends Generator
 
     public function getTargetPath()
     {
-        return base_path(unusualConfig('vendor_path') . '/vue/test');
+        return get_modularity_vendor_path('vue/test');
     }
 
     public function getTestFileName()

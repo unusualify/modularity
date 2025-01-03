@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 trait ManageScopes
 {
@@ -92,6 +93,15 @@ trait ManageScopes
                     break;
             }
 
+            if (! Str::startsWith($requestFilters['status'], 'stateable')) {
+                unset($requestFilters['status']);
+            }
+        }
+
+        if (array_key_exists('status', $requestFilters)) {
+            $code = Str::kebab(Str::after($requestFilters['status'], 'stateable'));
+            // $scope[$requestFilters['status']] = true;
+            $scope['stateable'] = $code;
             unset($requestFilters['status']);
         }
 

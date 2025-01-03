@@ -28,10 +28,10 @@ class PriceController extends Controller
 
         $params = $request->all();
         $payment = null;
+        // dd($params);
         $price = Price::with('currency')->find($params['price_id']);
-
         $requestCurrency = $params['payment_service']['currency']['iso_4217'];
-
+        // dd($price);
         if ($price->currency->iso_4217 != $requestCurrency) {
             $newCurrency = Currency::where('iso_4217', $requestCurrency)->first();
             $price->currency_id = $newCurrency->id;
@@ -84,6 +84,7 @@ class PriceController extends Controller
             'user_ip' => $request->ip(),
             'user_last_login_date' => Carbon::now()->format('Y-m-d H:i:s'),
             'user_registration_date' => $user->created_at->format('Y-m-d H:i:s'),
+            'company_name' => $company->name,
             'user_address' => $company->address,
             'user_city' => $company->city,
             'user_country' => $company->country,
@@ -120,6 +121,7 @@ class PriceController extends Controller
                         'color' => 'success',
                         'description' => 'Your payment has been successfully completed. Thank you for your purchase.',
                         'icon' => '$check',
+                        'hideModalCancel' => true,
                     ],
                 ]));
         } else {
@@ -128,8 +130,9 @@ class PriceController extends Controller
                 [
                     'customModal' => [
                         'color' => 'error',
-                        'description' => 'Your payment has been successfully completed. Thank you for your purchase.',
+                        'description' => 'Your payment has been failed. Please try again later or contact with administrator.',
                         'icon' => '$error',
+                        'hideModalCancel' => true,
                     ],
                 ]));
         }

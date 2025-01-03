@@ -55,7 +55,7 @@ class CreateModelTraitCommand extends BaseCommand
 
         $content = (new Stub('/classes/model-trait.stub', $replacements))->render();
 
-        $path = base_path(unusualConfig('vendor_path') . '/src/Entities/Traits/Has' . $studlyName . '.php');
+        $path = get_modularity_vendor_path("src/Entities/Traits/Has{$studlyName}.php");
 
         File::put($path, $content);
 

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use PDO;
 use ReflectionClass;
 use Unusualify\Modularity\Entities\Behaviors\Sortable;
 use Unusualify\Modularity\Repositories\Traits\DatesTrait;
@@ -111,7 +112,7 @@ abstract class Repository
         }
 
         try {
-            //code...
+            // code...
             // dd(
             //     $query->toSql(),
 
@@ -120,7 +121,7 @@ abstract class Repository
             return $query->paginate($perPage);
 
         } catch (\Throwable $th) {
-            //throw $th;
+            // throw $th;
             dd(
 
                 $query->toSql(),
@@ -221,14 +222,14 @@ abstract class Repository
         $query = $this->order($query, $orders);
 
         try {
-            //code...
+            // code...
             // dd(
             //     $query->toSql(),
 
             // );
             return $query->get();
         } catch (\Throwable $th) {
-            //throw $th;
+            // throw $th;
             dd(
                 $th,
                 debug_backtrace()
@@ -935,7 +936,7 @@ abstract class Repository
         $builtInMethods = app('model.builtin.methods');
 
         try {
-            //code...
+            // code...
             $builtInMethods = app('model.builtin.methods');
         } catch (\Throwable $th) {
             dd($this, debug_backtrace());
@@ -961,7 +962,7 @@ abstract class Repository
                                     $carry[$method->name] = get_class_short_name($return);
                                 }
                             } catch (\Throwable $th) {
-                                //throw $th;
+                                // throw $th;
                             }
                         }
                     }
@@ -986,7 +987,7 @@ abstract class Repository
                             $carry[$method->name] = get_class_short_name($return);
                         }
                     } catch (\Throwable $th) {
-                        //throw $th;
+                        // throw $th;
                     }
                 }
             }
@@ -1118,5 +1119,83 @@ abstract class Repository
         $methodName = 'scope' . ucfirst($method[0]);
 
         return $this->model->$methodName();
+    }
+
+    /**
+     * @param string $class name resolution
+     * @return bool
+     */
+    public function hasModelTrait($trait)
+    {
+        $hasTrait = classHasTrait($this->getModel(), $trait);
+
+        return $hasTrait;
+    }
+
+    public function getByColumnValues($column, array $values, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null)
+    {
+        $query = $this->model->whereIn($column, $values);
+
+        $query = $query->with($this->formatWiths($query, $with));
+
+        $query = $this->filter($query, $scopes);
+
+        $query = $this->order($query, $orders);
+
+        if ($isFormatted) {
+            return $query->get()->map(function ($item) {
+                // dd($item);
+                return array_merge(
+                    $this->getShowFields($item, $this->chunkInputs($this->inputs())),
+                    $item->attributesToArray(),
+                    // $item->toArray(),
+                    // $this->getFormFields($item, $this->chunkInputs($this->inputs())),
+                    // $columnsData
+                );
+            });
+        } else {
+
+            return $query->get();
+        }
+    }
+
+    public function getByIds(array $ids, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null)
+    {
+        // $query = $this->model->query();
+        // dd($ids);
+        $query = $this->model->whereIn('id', $ids);
+
+        $query = $query->with($this->formatWiths($query, $with));
+
+        $query = $this->filter($query, $scopes);
+
+        $query = $this->order($query, $orders);
+
+        if ($isFormatted) {
+            return $query->get()->map(function ($item) {
+                return array_merge(
+                    $this->getShowFields($item, $this->chunkInputs($this->inputs())),
+                    $item->attributesToArray(),
+                    // $item->toArray(),
+                    // $this->getFormFields($item, $this->chunkInputs($this->inputs())),
+                    // $columnsData
+                );
+            });
+        } else {
+
+            return $query->get();
+        }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLikeOperator()
+    {
+        if (DB::connection()->getPDO()->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') {
+            return 'ILIKE';
+        }
+
+        return 'LIKE';
     }
 }

@@ -427,7 +427,7 @@
       )
       this.inputSchema = this.invokeRuleGenerator(getSchema(this.rawSchema, this.model, this.isEditing))
 
-      this.topSchema = getTopSchema(this.rawSchema)
+      this.topSchema = getTopSchema(this.rawSchema, this.isEditing)
 
       this.extraValids = this.computedActions.map(action => true)
 

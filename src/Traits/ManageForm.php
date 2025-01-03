@@ -552,7 +552,7 @@ trait ManageForm
             $targetModuleName = $this->getStudlyName(! empty($names) ? array_pop($names) : $this->moduleName);
             $targetModule = Modularity::find($targetModuleName);
 
-            $types = ! empty($parts) ? explode(':', array_shift($parts)) : ['uri', 'index']; //uri:edit
+            $types = ! empty($parts) ? explode(':', array_shift($parts)) : ['uri', 'index']; // uri:edit
             // controller,repository,uri
             $targetType = array_shift($types) ?? $targetType; //
 
@@ -665,7 +665,7 @@ trait ManageForm
                 // [$methodName, $formattedInput, $parentColumnName] = array_pad(explode(':',$pattern), 3, null);
                 $changers = [];
                 switch ($methodName) {
-                    case 'permalinkPrefix': //'permalinkPrefix:slug',
+                    case 'permalinkPrefix': // 'permalinkPrefix:slug',
                         $inputToFormat = array_shift($args);
                         if (isset($input['repository'])) {
                             foreach ($this->getConfigFieldsByRoute('inputs') as $key => $_input) {
@@ -678,13 +678,13 @@ trait ManageForm
                         }
 
                         break;
-                    case 'lock': //'lock:url:url'
+                    case 'lock': // 'lock:url:url'
                         $inputToFormat = array_shift($args);
                         $parentColumnName = array_shift($args);
                         $events[] = "formatLock:{$inputToFormat}:{$parentColumnName}";
 
                         break;
-                    case 'permalink': //'permalink:slug',
+                    case 'permalink': // 'permalink:slug',
                         $inputToFormat = array_shift($args);
                         $permalinkPrefix = getHost() . '/';
                         $permalinkPrefixFormat = getHost() . '/';
@@ -721,7 +721,7 @@ trait ManageForm
                         $events[] = 'formatPermalink:' . $inputToFormat;
 
                         break;
-                    case 'filter': //'filter:{target_input_name}:{target_prop_name}:{followed_key_name}'
+                    case 'filter': // 'filter:{target_input_name}:{target_prop_name}:{followed_key_name}'
                         $inputToFormat = array_shift($args);
                         $targetPropName = array_shift($args) ?? 'inputs';
 
@@ -830,7 +830,7 @@ trait ManageForm
             if (! empty($events)) {
                 $data = (array) ($data ?? $input);
                 try {
-                    //code...
+                    // code...
                     // if($input['name'] == 'packageCountry'){
                     //     dd($data, $events, explode('|', $data['event'] ?? ''));
                     // }

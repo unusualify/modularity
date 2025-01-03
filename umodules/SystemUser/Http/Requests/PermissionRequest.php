@@ -37,7 +37,7 @@ class PermissionRequest extends Request
             // 'logo' => 'nullable|image|max:1024',
             // 'bio' => 'nullable|max:300',
             // 'github_url' => 'nullable|url'
-            //… more validation
+            // … more validation
 
         ];
     }

@@ -190,12 +190,12 @@ if (! function_exists('createDefaultMorphPivotTableFields')) {
         // $table->{unusualIncrementsMethod()}('id');
         // $tableName => package_languageables
 
-        $modelName = getMorphModelNameFromTableName($tableName); //*ables
+        $modelName = getMorphModelNameFromTableName($tableName); // *ables
 
         $foreignKey = makeForeignKey($modelName); // *_id
         $morphTableName = tableName($modelName);
 
-        $morphForeignKey = makeMorphForeignKey($modelName); //*able_id
+        $morphForeignKey = makeMorphForeignKey($modelName); // *able_id
         $morphForeignType = makeMorphForeignType($modelName); // *able_type
 
         $morphName = makeMorphName($modelName);

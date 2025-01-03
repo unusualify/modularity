@@ -38,7 +38,7 @@ class CurrencyExchangeService
                 $parameters[$parameter] = $this->{$property};
             }
             // dd($parameters);
-            //https://api.freecurrencyapi.com/v1/latest?apikey={apiKey}&currencies=EUR%2CUSD%2CCAD&base_currency=TRY
+            // https://api.freecurrencyapi.com/v1/latest?apikey={apiKey}&currencies=EUR%2CUSD%2CCAD&base_currency=TRY
             $response = Http::get($this->endpoint, $parameters);
             // $response = Http::get($this->endpoint, [
             //     'app_id' => $this->apiKey,

@@ -23,8 +23,8 @@
       <v-list-item
         v-if="!$store.getters.isSuperAdmin"
         prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg"
-        :subtitle="$store.state.config.appEmail"
-        :title="$store.state.config.appName"
+        :subtitle="$store.getters.appEmail"
+        :title="$store.getters.appName"
         class="ue-sidebar__info-item"
       >
         <template v-slot:prepend>
@@ -40,7 +40,7 @@
         </div>
         <div v-if="$store.getters.isSuperAdmin" v-for="key in ['appName', 'appEnv', 'appDebug']" :key="key" class="d-flex align-center my-1">
           <div class="flex-grow-1">{{ key === 'appDebug' ? 'Debug Mode' : $headline(key) }}:</div>
-          <div class="flex-grow-0 ml-1 font-weight-bold">{{ key === 'appDebug' ? $store.state.config[key] ? 'Active' : 'Inactive' : $store.state.config[key] }}</div>
+          <div class="flex-grow-0 ml-1 font-weight-bold">{{ key === 'appDebug' ? $store.getters[key] ? 'Active' : 'Inactive' : $store.getters[key] }}</div>
         </div>
       </div>
       <!-- <v-list-item
@@ -73,14 +73,14 @@
       <v-list class="">
         <v-list-item
           prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg"
-          :title="$store.getters.currentUser.name"
-          :subtitle="$store.getters.currentUser.email"
+          :title="$store.getters.userProfile.name"
+          :subtitle="$store.getters.userProfile.email"
           class="ue-sidebar__info-item"
         >
           <template v-slot:prepend="prependScope">
             <v-dialog ref="profileDialog" width="500">
               <template v-slot:activator="{ props }">
-                <v-avatar v-bind="props" :image="$store.getters.currentUser.avatar_url"/>
+                <v-avatar v-bind="props" :image="$store.getters.userProfile.avatar_url"/>
               </template>
               <template v-slot:default="{ isActive }">
                 <v-card>
@@ -95,13 +95,13 @@
                   <v-card-text>
                     <div class="d-flex">
                       <div class="my-3 flex-grow-0">
-                        <v-avatar class="my-aut" :image="$store.getters.currentUser.avatar_url" size="100"/>
+                        <v-avatar class="my-aut" :image="$store.getters.userProfile.avatar_url" size="100"/>
                       </div>
                       <ue-form
                         class="flex-grow-1 pl-6"
-                        :schema="$store.state.config.profileShortcutSchema"
-                        v-model="$store.state.config.profileShortcutModel"
-                        :action-url="$store.state.config.profileRoute"
+                        :schema="$store.state.user.profileShortcutSchema"
+                        v-model="$store.state.user.profileShortcutModel"
+                        :action-url="$store.state.user.profileRoute"
 
                         :async="true"
                         :hasSubmit="true"
@@ -173,8 +173,8 @@
                 </div>
                 <div v-if="$store.getters.isSuperAdmin" v-for="key in ['appName', 'appEnv', 'appDebug']" :key="key" class="d-flex align-center my-1">
                   {{ key === 'appDebug' ? 'Debug Mode' : $headline(key) }}:
-                  <v-chip variant="outlined" :color="key === 'appDebug' ? $store.state.config[key] ? 'success' : 'error' : 'primary'" class="ml-2">
-                    {{ key === 'appDebug' ? $store.state.config[key] ? 'Active' : 'Inactive' : $store.state.config[key] }}
+                  <v-chip variant="outlined" :color="key === 'appDebug' ? $store.getters[key] ? 'success' : 'error' : 'primary'" class="ml-2">
+                    {{ key === 'appDebug' ? $store.getters[key] ? 'Active' : 'Inactive' : $store.getters[key] }}
                   </v-chip>
                 </div>
                 <!-- Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. -->
@@ -304,7 +304,7 @@
 <script>
 import { computed } from 'vue';
 import { useSidebar } from '@/hooks';
-import { CONFIG } from '@/store/mutations';
+import { USER } from '@/store/mutations';
 export default {
   provide() {
     return {
@@ -339,7 +339,7 @@ export default {
 
       if (typeof URLS !== 'undefined' && URLS) {
         axios.get(URLS.profileShow).then(res => {
-          this.$store.commit(CONFIG.SET_PROFILE_DATA, res.data)
+          this.$store.commit(USER.SET_PROFILE_DATA, res.data)
         })
       }
     }

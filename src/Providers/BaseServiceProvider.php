@@ -74,7 +74,7 @@ class BaseServiceProvider extends ServiceProvider
                 ->first();
 
             return [
-                'Vendor' => unusualConfig('vendor_path'),
+                'Vendor' => get_modularity_vendor_dir(),
                 'Theme' => unusualConfig('app_theme'),
                 'Version' => $package->version,
             ];
@@ -235,12 +235,18 @@ class BaseServiceProvider extends ServiceProvider
             if (blank(config('auth.passwords.unusual_users'))) {
                 config(['auth.passwords.unusual_users' => [
                     'provider' => 'unusual_users',
-                    'table' => unusualConfig('password_resets_table', 'password_resets'),
+                    'table' => unusualConfig('password_resets_table', 'password_reset_tokens'),
                     'expire' => 60,
                     'throttle' => 60,
                 ]]);
             }
         }
+
+        config([
+            'modularity.vendor_dir' => is_modularity_production()
+                ? 'vendor/unusualify/modularity'
+                : env('MODULARITY_VENDOR_DIR', env('MODULARITY_VENDOR_PATH', 'packages/modularity')),
+        ]);
 
         // Nwidart/laravel-modules scan enabled & scan path addition
         $scan_paths = config('modules.scan.paths', []);
@@ -253,7 +259,7 @@ class BaseServiceProvider extends ServiceProvider
 
         // timokoerber/laravel-one-time-operations directory set
         config([
-            'one-time-operations.directory' => unusualConfig('vendor_path') . '/operations',
+            'one-time-operations.directory' => get_modularity_vendor_dir('operations'),
         ]);
 
         config([
@@ -317,7 +323,7 @@ class BaseServiceProvider extends ServiceProvider
     {
         // LOAD BASE MIGRATIONS
         $this->loadMigrationsFrom(
-            base_path(unusualConfig('vendor_path') . '/database/migrations/default')
+            get_modularity_vendor_path('database/migrations/default')
         );
     }
 

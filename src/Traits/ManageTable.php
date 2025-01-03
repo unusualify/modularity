@@ -114,25 +114,19 @@ trait ManageTable
             // ];
         }
 
-        // $statusFilters[] = [
-        //     'name' => ___("listing.filter.trash"),
-        //     'slug' => 'trash',
-        //     'number' => $this->repository->getCountByStatusSlug('trash', $scope),
-        // ];
-
-        // dd(
-        //     $this->repository,
-        //     $this->repository->isSoftDeletable(),
-        //     $this->getIndexOption('restore'),
-        //     $this->getIndexOption('forceDelete')
-        //     // get_class_methods($this->repository->getModel())
-        // );
         if ($this->getIndexOption('restore') && $this->repository->isSoftDeletable()) {
             $statusFilters[] = [
                 'name' => ___('listing.filter.trash'),
                 'slug' => 'trash',
                 'number' => $this->repository->getCountByStatusSlug('trash', $scope),
             ];
+        }
+
+        if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasStateable')) {
+            $statusFilters = array_merge(
+                $statusFilters,
+                $this->repository->getModel()->getStateableFilterList(),
+            );
         }
 
         return $statusFilters;
@@ -270,11 +264,11 @@ trait ManageTable
                         'async' => false,
                     ],
                     'model_formatter' => [
-                        'price_id' => 'price.id', //lodash get method
+                        'price_id' => 'payment_price.id', // lodash get method
                     ],
                     'schema_formatter' => [
-                        'payment_service.price' => '_price', //lodash set method
-                        'payment_service.currency' => 'price.currency.id',
+                        'payment_service.price_object' => 'payment_price',
+
                     ],
                 ],
                 //  admin.system.system_payment.payment routeName

@@ -85,7 +85,9 @@ class BaseCommand extends GeneratorCommand
         // );
         $description = trim(mb_strtolower($this->getDescription()), '.');
 
-        $runnable = ! $this->hasOption('test') || ! $this->option('test') || ($confirmed = confirm(label: "Do you want to {$description} in test mode?", default: false));
+        $runnable = ! $this->hasOption('test')
+            || ! $this->option('test')
+            || ($confirmed = confirm(label: "Do you want to {$description} in test mode?", default: false));
 
         if ($runnable) {
             if ($this->hasOption('test') && $this->option('test')) {
