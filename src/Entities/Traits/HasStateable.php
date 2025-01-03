@@ -101,10 +101,12 @@ trait HasStateable
 
     public function initializeHasStateable()
     {
+        $this->defaultLocale = app()->getLocale();
+
         $this->mergeFillable(['_stateable']);
     }
 
-    protected function setFormattedState($state, $defaultAttributes = null)
+    protected static function setFormattedState($state, $defaultAttributes = null)
     {
         if (is_null($defaultAttributes)) {
             $defaultAttributes = [
@@ -119,7 +121,7 @@ trait HasStateable
             ];
 
             // Add translations for each language
-            foreach ($this->getStateTranslationLanguages() as $lang) {
+            foreach (self::getStateableTranslationLanguages() as $lang) {
                 $stateData[$lang] = [
                     'name' => Str::headline($state),
                     'active' => true,
@@ -132,7 +134,7 @@ trait HasStateable
             $stateData = $state;
             // If translations are not set, add them
             if (! array_key_exists(app()->getLocale(), $stateData)) {
-                foreach ($this->getStateTranslationLanguages() as $lang) {
+                foreach (self::getStateableTranslationLanguages() as $lang) {
                     $stateData[$lang] = [
                         'name' => Str::headline(
                             isset($stateData['name']) && isset($stateData['name'][$lang])
@@ -152,39 +154,39 @@ trait HasStateable
         return $stateData;
     }
 
-    public function getDefaultStates()
+    public static function getDefaultStates()
     {
         return array_map(function ($state) {
             // dd($this->setFormattedState($state, $this->getDefaultState()));
-            return $this->setFormattedState($state, $this->getDefaultState());
-        }, $this->default_states);
+            return self::setFormattedState($state, self::getDefaultState());
+        }, static::$default_states ?? []);
     }
 
-    public function getDefaultState()
+    public static function getDefaultState()
     {
-        if (isset($this->default_state)) {
-            if (! isset($this->default_state['code'])) {
+        if (isset(static::$default_state)) {
+            if (! isset(static::$default_state['code'])) {
                 throw new \InvalidArgumentException('Default state must have a code attribute');
             }
 
-            return $this->setFormattedState($this->default_state);
+            return self::setFormattedState(static::$default_state);
         }
 
-        return $this->getInitialState() ?? [
+        return self::getInitialState() ?? [
             'code' => 'default',
             'icon' => '$warning',
             'color' => 'warning',
         ];
     }
 
-    public function getInitialState()
+    public static function getInitialState()
     {
-        if (isset($this->initial_state)) {
-            return $this->setFormattedState($this->initial_state);
+        if (isset(static::$initial_state)) {
+            return self::setFormattedState(static::$initial_state);
         }
 
-        return isset($this->default_states[0])
-            ? $this->setFormattedState($this->default_states[0])
+        return isset(static::$default_states[0])
+            ? self::setFormattedState(static::$default_states[0])
             : null;
     }
 
@@ -224,39 +226,80 @@ trait HasStateable
             ->where(config('modularity.states.table', 'stateables') . '.is_active', 1);
     }
 
-    public function getStateTranslationLanguages()
+    public static function getStateableTranslationLanguages()
     {
         return [
             app()->getLocale(),
         ];
     }
 
-    public function getStateableList($itemValue = 'name')
+    public static function getStateableList($itemValue = 'name')
     {
-        $defaultStates = $this->getDefaultStates();
+        $defaultStates = self::getDefaultStates();
         $defaultStateCodes = array_column($defaultStates, 'code');
 
         return State::whereIn('code', $defaultStateCodes)
             ->get()
+            ->sortBy(function($state) use ($defaultStateCodes, $itemValue)  {
+                return array_search($state->code, $defaultStateCodes);
+            })
             ->map(function($state) use ($itemValue) {
                 return [
                     'id' => $state->id,
                     $itemValue => $state->name,
-                    'code' => $state->code,
                 ];
-            })
-            ->sortBy(function($state) use ($defaultStateCodes, $itemValue)  {
-                return array_search($state['code'], $defaultStateCodes);
             })
             ->values()
             ->toArray();
     }
 
-    public function scopeStateable($query, $state)
+    public static function getStateableFilterList()
     {
-        return $query->whereHas('states', function ($q) use ($state) {
-            $q->where('code', $state);
+        $defaultStates = self::getDefaultStates();
+        $defaultStateCodes = array_column($defaultStates, 'code');
+
+        return State::whereIn('code', $defaultStateCodes)
+            ->get()
+            ->map(function($state) use ($defaultStates) {
+                $studlyCode = Str::studly($state->code);
+                return [
+                    'name' => $state->name ?? $state->translations->first()->name,
+                    'code' => $state->code,
+                    'slug' => "stateable{$studlyCode}",
+                    'number' => self::stateableCount($state->code),
+                    // 'number' => static::query()->where('stateable', $state->code)->count(),
+                ];
+            })
+            ->sortBy(function($state) use ($defaultStateCodes)  {
+                return array_search($state['code'], $defaultStateCodes);
+            })
+            ->filter(function($state) {
+                return $state['number'] > 0;
+            })
+            ->values()
+            ->toArray();
+    }
+
+    public function scopeStateable($query, $code)
+    {
+        return $query->whereHas('state', function ($q) use ($code) {
+            $q->where($q->getModel()->getTable() . '.code', $code);
         });
+    }
+
+    public function scopeStateableCount($query, $code)
+    {
+        return $query->stateable($code)->count();
+    }
+
+    public function __call($method, $parameters)
+    {
+        // if (Str::startsWith($method, 'stateable') && !Str::endsWith($method, 'Count')) {
+        //     dd($method, $parameters);
+        //     return $this->stateable(Str::after($method, 'scopeStateable'));
+        // }
+
+        return parent::__call($method, $parameters);
     }
 
     public function scopeDistributed()
