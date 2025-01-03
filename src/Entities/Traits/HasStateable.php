@@ -101,7 +101,7 @@ trait HasStateable
 
     public function initializeHasStateable()
     {
-        $this->defaultLocale = app()->getLocale();
+        // $this->defaultLocale = app()->getLocale();
 
         $this->mergeFillable(['_stateable']);
     }
