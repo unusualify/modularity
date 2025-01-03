@@ -17,99 +17,6 @@ trait HasStateable
 
     protected $_originalFillable = null;
 
-    protected function setFormattedState($state, $defaultAttributes = null)
-    {
-        if (is_null($defaultAttributes)) {
-            $defaultAttributes = [
-                'icon' => '$warning',
-                'color' => 'warning',
-            ];
-        }
-
-        if (is_string($state)) {
-            $stateData = [
-                'code' => $state,
-            ];
-
-            // Add translations for each language
-            foreach ($this->getStateTranslationLanguages() as $lang) {
-                $stateData[$lang] = [
-                    'name' => Str::headline($state),
-                    'active' => true,
-                ];
-            }
-
-            // Merge with default attributes
-            $stateData = array_merge($stateData, $defaultAttributes);
-        } else {
-            $stateData = $state;
-
-            // If translations are not set, add them
-            if (! array_key_exists(app()->getLocale(), $stateData)) {
-                foreach ($this->getStateTranslationLanguages() as $lang) {
-                    $stateData[$lang] = [
-                        'name' => Str::headline($stateData['code']),
-                        'active' => true,
-                    ];
-                }
-            }
-
-            // Merge with default attributes if icon or color is not set
-            if (! isset($stateData['icon']) || ! isset($stateData['color'])) {
-                $stateData = array_merge($defaultAttributes, $stateData);
-            }
-        }
-
-        return $stateData;
-    }
-
-    public function getDefaultStates()
-    {
-        return array_map(function ($state) {
-            return $this->setFormattedState($state, $this->getDefaultState());
-        }, $this->default_states);
-    }
-
-    public function getDefaultState()
-    {
-        if (isset($this->default_state)) {
-            if (! isset($this->default_state['code'])) {
-                throw new \InvalidArgumentException('Default state must have a code attribute');
-            }
-
-            return $this->setFormattedState($this->default_state);
-        }
-
-        return $this->getInitialState() ?? [
-            'code' => 'default',
-            'icon' => '$warning',
-            'color' => 'warning',
-        ];
-    }
-
-    public function getInitialState()
-    {
-        if (isset($this->initial_state)) {
-            return $this->setFormattedState($this->initial_state);
-        }
-
-        return isset($this->default_states[0])
-            ? $this->setFormattedState($this->default_states[0])
-            : null;
-    }
-
-    public function createNonExistantStates($model)
-    {
-        $defaultStates = $this->getDefaultStates();
-        $initialState = $this->getInitialState();
-
-        foreach ($defaultStates as $state) {
-            $_state = State::where('code', $state['code'])->first() ?? State::create($state);
-            $isActive = $state['code'] === $initialState['code'];
-            $model->states()->attach($_state->id, ['is_active' => $isActive]);
-        }
-    }
-
     public static function bootHasStateable(): void
     {
         self::saving(static function (Model $model) {
@@ -121,7 +28,7 @@ trait HasStateable
         });
 
         self::created(static function (Model $model) {
-            $model->createNonExistantStates($model);
+            $model->createNonExistantStates();
         });
 
         self::retrieved(static function (Model $model) {
@@ -195,6 +102,102 @@ trait HasStateable
     public function initializeHasStateable()
     {
         $this->mergeFillable(['_stateable']);
+    }
+
+    protected function setFormattedState($state, $defaultAttributes = null)
+    {
+        if (is_null($defaultAttributes)) {
+            $defaultAttributes = [
+                'icon' => '$warning',
+                'color' => 'warning',
+            ];
+        }
+
+        if (is_string($state)) {
+            $stateData = [
+                'code' => $state,
+            ];
+
+            // Add translations for each language
+            foreach ($this->getStateTranslationLanguages() as $lang) {
+                $stateData[$lang] = [
+                    'name' => Str::headline($state),
+                    'active' => true,
+                ];
+            }
+
+            // Merge with default attributes
+            $stateData = array_merge($stateData, $defaultAttributes);
+        } else {
+            $stateData = $state;
+            // If translations are not set, add them
+            if (! array_key_exists(app()->getLocale(), $stateData)) {
+                foreach ($this->getStateTranslationLanguages() as $lang) {
+                    $stateData[$lang] = [
+                        'name' => Str::headline(
+                            isset($stateData['name']) && isset($stateData['name'][$lang])
+                                ? $stateData['name'][$lang]
+                                : ($stateData['code'] ?? $state['code'])
+                        ),
+                        'active' => true,
+                    ];
+                }
+            }
+            // Merge with default attributes if icon or color is not set
+            if (! isset($stateData['icon']) || ! isset($stateData['color'])) {
+                $stateData = array_merge($defaultAttributes, $stateData);
+            }
+        }
+
+        return $stateData;
+    }
+
+    public function getDefaultStates()
+    {
+        return array_map(function ($state) {
+            // dd($this->setFormattedState($state, $this->getDefaultState()));
+            return $this->setFormattedState($state, $this->getDefaultState());
+        }, $this->default_states);
+    }
+
+    public function getDefaultState()
+    {
+        if (isset($this->default_state)) {
+            if (! isset($this->default_state['code'])) {
+                throw new \InvalidArgumentException('Default state must have a code attribute');
+            }
+
+            return $this->setFormattedState($this->default_state);
+        }
+
+        return $this->getInitialState() ?? [
+            'code' => 'default',
+            'icon' => '$warning',
+            'color' => 'warning',
+        ];
+    }
+
+    public function getInitialState()
+    {
+        if (isset($this->initial_state)) {
+            return $this->setFormattedState($this->initial_state);
+        }
+
+        return isset($this->default_states[0])
+            ? $this->setFormattedState($this->default_states[0])
+            : null;
+    }
+
+    public function createNonExistantStates()
+    {
+        $defaultStates = $this->getDefaultStates();
+        $initialState = $this->getInitialState();
+
+        foreach ($defaultStates as $state) {
+            $_state = State::where('code', $state['code'])->first() ?? State::create($state);
+            $isActive = $state['code'] === $initialState['code'];
+            $this->states()->attach($_state->id, ['is_active' => $isActive]);
+        }
     }
 
     public function states(): \Illuminate\Database\Eloquent\Relations\MorphToMany
