@@ -299,13 +299,13 @@ class ResetPasswordController extends Controller
     public function success()
     {
         return view(unusualBaseKey() . '::auth.success', [
-           'taskState' => [
+            'taskState' => [
                 'status' => 'success',
                 'title' => __('authentication.password-sent'),
                 'description' => __('authentication.succcess-reset-email'),
                 'button_text' => __('authentication.go-to-sign-in'),
-                'button_url' => 'Test'
-           ]
+                'button_url' => 'Test',
+            ],
         ]);
     }
 }

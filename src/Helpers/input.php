@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Str;
 use Unusualify\Modularity\Hydrates\InputHydrator;
 
 if (! function_exists('configure_input')) {

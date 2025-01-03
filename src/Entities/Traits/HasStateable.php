@@ -240,10 +240,10 @@ trait HasStateable
 
         return State::whereIn('code', $defaultStateCodes)
             ->get()
-            ->sortBy(function($state) use ($defaultStateCodes, $itemValue)  {
+            ->sortBy(function ($state) use ($defaultStateCodes) {
                 return array_search($state->code, $defaultStateCodes);
             })
-            ->map(function($state) use ($itemValue) {
+            ->map(function ($state) use ($itemValue) {
                 return [
                     'id' => $state->id,
                     $itemValue => $state->name,
@@ -260,8 +260,9 @@ trait HasStateable
 
         return State::whereIn('code', $defaultStateCodes)
             ->get()
-            ->map(function($state) use ($defaultStates) {
+            ->map(function ($state) {
                 $studlyCode = Str::studly($state->code);
+
                 return [
                     'name' => $state->name ?? $state->translations->first()->name,
                     'code' => $state->code,
@@ -270,10 +271,10 @@ trait HasStateable
                     // 'number' => static::query()->where('stateable', $state->code)->count(),
                 ];
             })
-            ->sortBy(function($state) use ($defaultStateCodes)  {
+            ->sortBy(function ($state) use ($defaultStateCodes) {
                 return array_search($state['code'], $defaultStateCodes);
             })
-            ->filter(function($state) {
+            ->filter(function ($state) {
                 return $state['number'] > 0;
             })
             ->values()

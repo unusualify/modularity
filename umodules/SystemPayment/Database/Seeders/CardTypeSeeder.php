@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Modules\SystemPayment\Entities\CardType;
 use Modules\SystemPayment\Entities\PaymentCurrency;
-use Modules\SystemPayment\Entities\PaymentService;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Http\Controllers\MediaLibraryController;
 use Unusualify\Modularity\Http\Requests\MediaRequest;
@@ -34,20 +33,20 @@ class CardTypeSeeder extends Seeder
                 'name' => 'MasterCard',
                 'card_type' => 'mastercard',
                 'image' => 'mastercard.png',
-                'paymentServices' => [1,3,4,5],
+                'paymentServices' => [1, 3, 4, 5],
             ],
             [
                 'name' => 'Visa',
                 'card_type' => 'Visa',
                 'image' => 'visa.png',
-                'paymentServices' => [1,3,4,5],
+                'paymentServices' => [1, 3, 4, 5],
             ],
             [
                 'name' => 'Amex',
                 'card_type' => 'amex',
                 'image' => 'amex.png',
-                'paymentServices' => [1,3,4,5], // Creation order of payment services in seeder
-            ]
+                'paymentServices' => [1, 3, 4, 5], // Creation order of payment services in seeder
+            ],
         ];
 
         $superadmin = User::role('superadmin', 'unusual_users')->first();
@@ -69,7 +68,7 @@ class CardTypeSeeder extends Seeder
             // dd($cardType);
             $this->createAndAssociateImage($cardType, $types['image']);
 
-            foreach($cardType['paymentServices'] as $paymentService){
+            foreach ($cardType['paymentServices'] as $paymentService) {
                 $cardType->paymentServices()->attach($paymentService);
             }
 
@@ -88,12 +87,12 @@ class CardTypeSeeder extends Seeder
     /**
      * Create a media object for the image and associate it with the payment service.
      */
-    private function createAndAssociateImage(CardType $cardType, string $imageName, string $base_path = null)
+    private function createAndAssociateImage(CardType $cardType, string $imageName, ?string $base_path = null)
     {
-        if($base_path){
+        if ($base_path) {
             $imagePath = $base_path . $imageName;
 
-        }else{
+        } else {
             $imagePath = base_path('vendor/unusualify/modularity/resources/assets/images/card-types/' . $imageName);
         }
         if (file_exists($imagePath)) {

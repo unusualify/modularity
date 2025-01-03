@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use PDO;
 use ReflectionClass;
 use Unusualify\Modularity\Entities\Behaviors\Sortable;
 use Unusualify\Modularity\Repositories\Traits\DatesTrait;
@@ -18,7 +19,6 @@ use Unusualify\Modularity\Repositories\Traits\MethodTransformers;
 use Unusualify\Modularity\Repositories\Traits\PaymentTrait;
 use Unusualify\Modularity\Repositories\Traits\RelationTrait;
 use Unusualify\Modularity\Traits\ManageNames;
-use PDO;
 
 abstract class Repository
 {

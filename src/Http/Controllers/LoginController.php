@@ -356,18 +356,20 @@ class LoginController extends Controller
             $this->guard()->logout();
 
             $request->session()->put('2fa:user:id', $user->id);
+
             return $request->wantsJson()
                 ? new JsonResponse([
                     'redirector' => $this->redirector->to(route(Route::hasAdmin('admin.login-2fa.form')))->getTargetUrl(),
                 ])
                 : $this->redirector->to(route(Route::hasAdmin('admin.login-2fa.form')));
         }
+
         // dd($request->wantsJson());
         return $request->wantsJson()
         ? new JsonResponse([
             'variant' => MessageStage::SUCCESS,
             'timeout' => 1500,
-            'message' => __('authentication.login-success-message') ,
+            'message' => __('authentication.login-success-message'),
             // 'redirector' => $this->redirectPath()
             'redirector' => $request->url() . '?status=success',
         ])

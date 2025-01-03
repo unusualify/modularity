@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('order_id');
             $table->integer('amount');
             $table->integer('currency_id')->nullable();
-            $table->enum('status', ['PENDING','CANCELLED','COMPLETED','FAILED','REFUNDED']);
+            $table->enum('status', ['PENDING', 'CANCELLED', 'COMPLETED', 'FAILED', 'REFUNDED']);
             $table->string('email')->nullable();
             $table->integer('installment')->nullable();
             $table->json('parameters')->nullable();
@@ -35,7 +35,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists(config('payable.tables.payments', 'umod_payments'));
-
 
     }
 };

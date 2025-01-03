@@ -301,13 +301,13 @@ class RegisterController extends Controller
     public function success()
     {
         return view(unusualBaseKey() . '::auth.success', [
-           'taskState' => [
+            'taskState' => [
                 'status' => 'success',
                 'title' => __('authentication.register-title'),
                 'description' => __('authentication.register-description'),
                 'button_text' => __('authentication.register-button_text'),
-                'button_url' => 'Test'
-           ]
+                'button_url' => 'Test',
+            ],
         ]);
     }
 

@@ -372,7 +372,7 @@ trait MethodTransformers
             //     $scopes
             // );
             if (method_exists($this->model, 'scope' . $studlyColumn)) {
-                if(!is_bool($value)) {
+                if (! is_bool($value)) {
                     $query->{$this->getCamelCase($column)}($value);
                 } else {
                     $query->{$this->getCamelCase($column)}();

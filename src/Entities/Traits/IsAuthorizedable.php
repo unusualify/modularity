@@ -39,7 +39,7 @@ trait IsAuthorizedable
         // Add deleted event handler
         static::deleting(function ($model) {
             // This will automatically delete the associated authorized record
-            if ( !(method_exists($model, 'isSoftDeletable') && $model->isSoftDeletable()) ) {
+            if (! (method_exists($model, 'isSoftDeletable') && $model->isSoftDeletable())) {
                 $model->authorized()->delete();
             }
         });
@@ -145,9 +145,9 @@ trait IsAuthorizedable
     {
         $authorizedModel = new ($this->getAuthorizedModel());
         $userModel = new ($this->getAuthorizedUserModel());
-        $companyModel = new Company();
+        $companyModel = new Company;
         $query = Company::query()
-            ->select($companyModel->getTable().'.*')  // Only select company fields
+            ->select($companyModel->getTable() . '.*')  // Only select company fields
             ->join(
                 $userModel->getTable(),
                 $userModel->getTable() . '.company_id',
@@ -156,7 +156,7 @@ trait IsAuthorizedable
             )
             ->join(
                 $authorizedModel->getTable(),
-                function($join) use ($authorizedModel, $userModel) {
+                function ($join) use ($authorizedModel, $userModel) {
                     $join->on($authorizedModel->getTable() . '.user_id', '=', $userModel->getTable() . '.id')
                         ->where($authorizedModel->getTable() . '.authorizedable_type', '=', get_class($this))
                         ->where($authorizedModel->getTable() . '.authorizedable_id', '=', $this->id);

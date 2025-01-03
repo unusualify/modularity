@@ -38,5 +38,4 @@ if (unusualConfig('enabled.users-management')) {
 
     Route::get('register/success', 'RegisterController@success')->name('register.success');
 
-
 }

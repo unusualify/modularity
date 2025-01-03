@@ -24,7 +24,7 @@ class ReplaceRegularExpressionCommand extends BaseCommand
     ';
 
     protected $aliases = [
-        'mod:replace:regex'
+        'mod:replace:regex',
     ];
 
     /**
@@ -58,39 +58,41 @@ class ReplaceRegularExpressionCommand extends BaseCommand
         $directory_pattern = $this->option('directory') ?? '**/*.php';
         $pretend = $this->option('pretend');
 
-        if (!Str::startsWith($path, '/')) {
+        if (! Str::startsWith($path, '/')) {
             $path = base_path($path);
         }
 
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             $this->error('The path does not exist: ' . $path);
+
             return 1;
         }
 
-        if (!is_string($pattern)) {
+        if (! is_string($pattern)) {
             $this->error('The pattern is not a string');
+
             return 1;
         }
 
         try {
             // $pattern = '/'.preg_quote($pattern).'/';
-            $pattern = '/'.$pattern.'/';
+            $pattern = '/' . $pattern . '/';
 
             preg_match($pattern, '');
         } catch (\Exception $e) {
             $this->error('Invalid regular expression pattern: ' . $e->getMessage());
+
             return 1;
         }
 
-
-        if (!is_string($data)) {
+        if (! is_string($data)) {
             $this->error('The data is not a string');
+
             return 1;
         }
 
-
-        if (!$this->output->isQuiet()) {
-            if (!$pretend) {
+        if (! $this->output->isQuiet()) {
+            if (! $pretend) {
                 $this->info('Starting regex replacement...');
             } else {
                 $this->info('Pretending to replace regex...');
@@ -110,7 +112,7 @@ class ReplaceRegularExpressionCommand extends BaseCommand
 
         $replacement->run();
 
-        if (!$this->output->isQuiet() && !$pretend) {
+        if (! $this->output->isQuiet() && ! $pretend) {
             $this->info('Replacement completed.');
         }
 

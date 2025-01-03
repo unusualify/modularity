@@ -93,7 +93,7 @@ trait ManageTable
 
         $fillables = $this->repository->getFillable();
 
-        if (in_array('published', $fillables) && $this->repository->hasColumn('published') ) {
+        if (in_array('published', $fillables) && $this->repository->hasColumn('published')) {
             $statusFilters[] = [
                 'name' => ___('listing.filter.published'),
                 'slug' => 'published',
@@ -267,8 +267,7 @@ trait ManageTable
                         'price_id' => 'payment_price.id', //lodash get method
                     ],
                     'schema_formatter' => [
-                        'payment_service.price_object' => 'payment_price'
-
+                        'payment_service.price_object' => 'payment_price',
 
                     ],
                 ],

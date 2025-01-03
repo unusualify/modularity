@@ -93,7 +93,7 @@ trait ManageScopes
                     break;
             }
 
-            if (!Str::startsWith($requestFilters['status'], 'stateable')) {
+            if (! Str::startsWith($requestFilters['status'], 'stateable')) {
                 unset($requestFilters['status']);
             }
         }

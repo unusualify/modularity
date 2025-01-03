@@ -2,10 +2,10 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Descriptor\MarkdownDescriptor;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Descriptor\MarkdownDescriptor;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class GenerateCommandDocsCommand extends BaseCommand
 {
@@ -51,25 +51,26 @@ class GenerateCommandDocsCommand extends BaseCommand
         $outputPath = $this->option('output') ?? get_modularity_vendor_path('docs/src/pages/advanced-guide/commands');
         $force = $this->option('force');
 
-        if (!Str::startsWith($outputPath, '/')) {
+        if (! Str::startsWith($outputPath, '/')) {
             $outputPath = base_path($outputPath);
         }
 
         // Ensure output directory exists
-        if (!is_dir($outputPath)) {
+        if (! is_dir($outputPath)) {
             mkdir($outputPath, 0755, true);
         }
 
         // Get all registered commands
         $commands = $this->getLaravel()->make('Illuminate\Contracts\Console\Kernel')->all();
         // Filter only modularity commands
-        $commands = array_filter($commands, function($command) {
+        $commands = array_filter($commands, function ($command) {
             return Str::startsWith($command->getName(), 'modularity:') ||
                    Str::startsWith($command->getName(), 'mod:');
         });
 
-        $commands = array_reduce($commands, function($carry, $command) {
+        $commands = array_reduce($commands, function ($carry, $command) {
             $carry[$command->getName()] = $command;
+
             return $carry;
         }, []);
 
@@ -83,15 +84,15 @@ class GenerateCommandDocsCommand extends BaseCommand
 
             try {
                 // Create a buffered output to capture the help text
-                $output = new BufferedOutput();
+                $output = new BufferedOutput;
 
                 // Run the help command for each command
                 $input = new ArrayInput(['command_name' => $name]);
-                $helpCommand = new \Symfony\Component\Console\Command\HelpCommand();
+                $helpCommand = new \Symfony\Component\Console\Command\HelpCommand;
                 $helpCommand->setCommand($command);
 
                 // Use Markdown descriptor
-                $descriptor = new MarkdownDescriptor();
+                $descriptor = new MarkdownDescriptor;
                 $descriptor->describe($output, $command, [
                     'format' => 'md',
                     'raw_text' => false,
@@ -109,8 +110,8 @@ class GenerateCommandDocsCommand extends BaseCommand
 
                 $category = $this->getCommandCategory($command);
 
-                if($category !== 'Other') {
-                    if(!is_dir($outputPath . '/' . $category)) {
+                if ($category !== 'Other') {
+                    if (! is_dir($outputPath . '/' . $category)) {
                         mkdir($outputPath . '/' . $category, 0755, true);
                     }
                     $filepath = $outputPath . '/' . $category . '/' . $filename;
@@ -118,8 +119,9 @@ class GenerateCommandDocsCommand extends BaseCommand
                     $filepath = $outputPath . '/' . $filename;
                 }
 
-                if (file_exists($filepath) && !$force) {
+                if (file_exists($filepath) && ! $force) {
                     $this->info("Skipping {$filepath} because it already exists");
+
                     continue;
                 }
 
@@ -132,6 +134,7 @@ class GenerateCommandDocsCommand extends BaseCommand
         }
 
         $this->info('Documentation extraction completed!');
+
         return 0;
     }
 
@@ -180,7 +183,7 @@ class GenerateCommandDocsCommand extends BaseCommand
             'Generators' => [
                 'generate',
                 'make',
-                'create'
+                'create',
             ],
             'Database' => [
                 'migrate',
@@ -226,13 +229,13 @@ class GenerateCommandDocsCommand extends BaseCommand
         // Get all arguments
         $arguments = $definition->getArguments();
 
-        if(count($arguments) == 0) {
+        if (count($arguments) == 0) {
             $examples .= "### Basic Usage\n\n```bash\nphp artisan {$name}\n```\n\n";
         } else {
             $examples .= "### With Arguments\n\n```bash\n";
             $exampleWithArgs = "php artisan {$name}";
             foreach ($arguments as $argument) {
-                $argName = strtoupper($argument->getName());
+                $argName = mb_strtoupper($argument->getName());
                 $exampleWithArgs .= " {$argName}";
             }
             $examples .= $exampleWithArgs . "\n```\n\n";
@@ -246,10 +249,10 @@ class GenerateCommandDocsCommand extends BaseCommand
             $exampleWithOptions = "php artisan {$name}";
             $exceptOptions = ['help', 'quiet', 'verbose', 'version', 'ansi', 'no-ansi', 'no-interaction', 'no-warnings', 'env'];
 
-            $options = array_filter($options, function($option) use ($exceptOptions) {
-                return !in_array($option->getName(), $exceptOptions);
+            $options = array_filter($options, function ($option) use ($exceptOptions) {
+                return ! in_array($option->getName(), $exceptOptions);
             });
-            if( count($options) > 0) {
+            if (count($options) > 0) {
                 $examples .= "### With Options\n\n";
             }
             foreach ($options as $option) {
@@ -260,7 +263,7 @@ class GenerateCommandDocsCommand extends BaseCommand
 
                 if ($option->acceptValue()) {
                     // For options that require values
-                    $valueHint = strtoupper($optionName);
+                    $valueHint = mb_strtoupper($optionName);
                     if ($shortcut) {
                         $examples .= "```bash\n# Using shortcut\n";
                         $examples .= "php artisan {$name} -{$shortcut} {$valueHint}\n\n";
@@ -289,16 +292,19 @@ class GenerateCommandDocsCommand extends BaseCommand
             $commonExample = "php artisan {$name}";
 
             // Add first argument if exists
-            if (!empty($arguments)) {
+            if (! empty($arguments)) {
                 $firstArg = array_key_first($arguments);
-                $commonExample .= " " . strtoupper($firstArg);
+                $commonExample .= ' ' . mb_strtoupper($firstArg);
             }
 
             // Add common options
             foreach ($options as $option) {
-                if ($option->getName() === 'help') continue;
+                if ($option->getName() === 'help') {
+                    continue;
+                }
                 if ($option->isValueRequired()) {
-                    $commonExample .= " --{$option->getName()}=" . strtoupper($option->getName());
+                    $commonExample .= " --{$option->getName()}=" . mb_strtoupper($option->getName());
+
                     break; // Just add one example option
                 }
             }

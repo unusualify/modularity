@@ -121,12 +121,12 @@ class PaymentServiceSeeder extends Seeder
     /**
      * Create a media object for the image and associate it with the payment service.
      */
-    private function createAndAssociateImage(PaymentService $paymentService, string $imageName, string $base_path = null)
+    private function createAndAssociateImage(PaymentService $paymentService, string $imageName, ?string $base_path = null)
     {
-        if($base_path){
+        if ($base_path) {
             $imagePath = $base_path . $imageName;
 
-        }else{
+        } else {
             $imagePath = base_path('vendor/unusualify/modularity/resources/assets/images/payment-service-images/' . $imageName);
         }
         $imagePath = base_path('vendor/unusualify/modularity/resources/assets/images/payment-service-images/' . $imageName);

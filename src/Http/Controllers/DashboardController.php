@@ -3,7 +3,6 @@
 namespace Unusualify\Modularity\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\View;
 // use Modules\Package\Repositories\PackageContinentRepository;
 // use Modules\PressRelease\Entities\PressRelease;
@@ -49,7 +48,6 @@ class DashboardController extends BaseController
 
                     $widget = new UWidget;
                     $widget = $widget->makeComponent($block['tag'], $block)->render();
-
 
                     $block = $widget;
 

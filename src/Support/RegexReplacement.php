@@ -51,7 +51,7 @@ class RegexReplacement
     {
         $content = file_get_contents($file);
 
-        if (!$content) {
+        if (! $content) {
             return false;
         }
 
@@ -61,16 +61,16 @@ class RegexReplacement
         if ($this->isQuiet()) {
             return;
         }
-        if (!empty($matches[0])) {
+        if (! empty($matches[0])) {
 
-            if($this->isVerbose() || $this->pretending()){
+            if ($this->isVerbose() || $this->pretending()) {
                 echo "\n\033[33m--------------------------------------------\033[0m";
             }
 
-            if($this->isVerbose() || $this->pretending()){
+            if ($this->isVerbose() || $this->pretending()) {
                 echo "\n\033[36mFile to be processed: " . $file . "\n";
-            }else{
-                echo "\033[36m " . $file ."\n";
+            } else {
+                echo "\033[36m " . $file . "\n";
             }
 
             if ($this->isVerbose()) {
@@ -79,26 +79,26 @@ class RegexReplacement
 
             if ($this->isVerbose() || $this->pretending()) {
 
-                if($this->isVerbose()){
+                if ($this->isVerbose()) {
                     // Display the matches
                     foreach ($matches[0] as $idx => $match) {
-                        $lineNumber = substr_count(substr($content, 0, $match[1]), "\n") + 1;
+                        $lineNumber = mb_substr_count(mb_substr($content, 0, $match[1]), "\n") + 1;
                         $contextStart = max(0, $match[1] - 50);
-                        $contextLength = min(strlen($content) - $contextStart, $match[1] - $contextStart + strlen($match[0]) + 50);
-                        $context = substr($content, $contextStart, $contextLength);
+                        $contextLength = min(mb_strlen($content) - $contextStart, $match[1] - $contextStart + mb_strlen($match[0]) + 50);
+                        $context = mb_substr($content, $contextStart, $contextLength);
 
                         echo "\n\033[34mLine {$lineNumber}\033[0m\n";
 
                         // Split context into lines and add line numbers
                         $lines = explode("\n", $context);
-                        $startLine = $lineNumber - substr_count(substr($context, 0, strpos($context, $match[0])), "\n");
+                        $startLine = $lineNumber - mb_substr_count(mb_substr($context, 0, mb_strpos($context, $match[0])), "\n");
 
                         // Find the line containing the match start and end
                         $matchStartLine = null;
                         $matchEndLine = null;
-                        $matchPos = strpos($context, $match[0]);
-                        $matchStartLine = substr_count(substr($context, 0, $matchPos), "\n");
-                        $matchEndLine = $matchStartLine + substr_count($match[0], "\n");
+                        $matchPos = mb_strpos($context, $match[0]);
+                        $matchStartLine = mb_substr_count(mb_substr($context, 0, $matchPos), "\n");
+                        $matchEndLine = $matchStartLine + mb_substr_count($match[0], "\n");
 
                         foreach ($lines as $i => $line) {
                             $currentLine = $startLine + $i;
@@ -147,7 +147,7 @@ class RegexReplacement
     {
         $content = file_get_contents($file);
 
-        if (!$content) {
+        if (! $content) {
             return false;
         }
 
@@ -155,7 +155,7 @@ class RegexReplacement
 
         $replacedContent = preg_replace($this->pattern, $this->data, $content);
 
-        if (!$this->pretending()) {
+        if (! $this->pretending()) {
             file_put_contents($file, $replacedContent);
         }
 
@@ -191,6 +191,4 @@ class RegexReplacement
 
         return true;
     }
-
-
 }
