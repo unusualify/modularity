@@ -93,7 +93,7 @@ trait ManageTable
 
         $fillables = $this->repository->getFillable();
 
-        if (in_array('published', $fillables) && $this->repository->hasColumn('published')) {
+        if (in_array('published', $fillables) && $this->repository->hasColumn('published') ) {
             $statusFilters[] = [
                 'name' => ___('listing.filter.published'),
                 'slug' => 'published',
@@ -114,25 +114,19 @@ trait ManageTable
             // ];
         }
 
-        // $statusFilters[] = [
-        //     'name' => ___("listing.filter.trash"),
-        //     'slug' => 'trash',
-        //     'number' => $this->repository->getCountByStatusSlug('trash', $scope),
-        // ];
-
-        // dd(
-        //     $this->repository,
-        //     $this->repository->isSoftDeletable(),
-        //     $this->getIndexOption('restore'),
-        //     $this->getIndexOption('forceDelete')
-        //     // get_class_methods($this->repository->getModel())
-        // );
         if ($this->getIndexOption('restore') && $this->repository->isSoftDeletable()) {
             $statusFilters[] = [
                 'name' => ___('listing.filter.trash'),
                 'slug' => 'trash',
                 'number' => $this->repository->getCountByStatusSlug('trash', $scope),
             ];
+        }
+
+        if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasStateable')) {
+            $statusFilters = array_merge(
+                $statusFilters,
+                $this->repository->getModel()->getStateableFilterList(),
+            );
         }
 
         return $statusFilters;
