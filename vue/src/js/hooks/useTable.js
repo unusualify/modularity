@@ -143,7 +143,9 @@ export default function useTable (props, context) {
   // Get item-related computeds
   const tableItem = useTableItem()
   // Get name-related computeds
-  const tableNames = useTableNames(props)
+  const tableNames = useTableNames(props, {
+    editedIndex: editedIndex
+  })
   // Get endpoints-related computeds
   const tableEndpoints = useTableEndpoints(props)
   // Get filter-related computeds
