@@ -6,7 +6,14 @@ use Illuminate\Support\Str;
 if (! function_exists('get_installed_composer')) {
     function get_installed_composer()
     {
-        $installed= require(base_path('vendor/composer/installed.php'));
+
+        if(isset($GLOBALS['_composer_bin_dir'])){
+            $installedPath = realpath(concatenate_path($GLOBALS['_composer_bin_dir'], '../composer/installed.php'));
+        }else{
+            $installedPath = base_path('vendor/composer/installed.php');
+        }
+
+        $installed = require($installedPath);
 
         return $installed;
     }
