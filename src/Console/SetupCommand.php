@@ -51,7 +51,7 @@ class SetupCommand extends BaseCommand
      */
     public function handle(): int
     {
-        //check the database connection before installing
+        // check the database connection before installing
         try {
             $this->db->connection()->getPdo();
         } catch (\Exception $e) {

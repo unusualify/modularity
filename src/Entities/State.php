@@ -21,7 +21,7 @@ class State extends Model
         if (@class_exists($model)) {
             return $model;
         }
-        //TODO: Fix this while creating a package for State
+        // TODO: Fix this while creating a package for State
         $model = class_namespace($this) . "\Translations\\" . class_basename($this) . 'Translation';
 
         if (@class_exists($model)) {

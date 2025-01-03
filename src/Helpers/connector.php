@@ -84,7 +84,7 @@ if (! function_exists('find_target')) {
     {
         $targetType = 'uri'; // Default target type
         // dd($events);
-        $types = ! empty($events) ? explode(':', array_shift($events)) : ['uri', 'index']; //uri:edit
+        $types = ! empty($events) ? explode(':', array_shift($events)) : ['uri', 'index']; // uri:edit
         // dd($types);
         $targetType = array_shift($types) ?? $targetType;
 

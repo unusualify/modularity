@@ -647,7 +647,7 @@ class RouteGenerator extends Generator
 
                 $this->createRoutePermissions();
 
-                if ($this->migrate && ! $this->fix) { //!$this->module->isRouteTableExists($name)
+                if ($this->migrate && ! $this->fix) { // !$this->module->isRouteTableExists($name)
 
                     $this->console->call('modularity:migrate', [
                         'module' => $this->module->getStudlyName(),
@@ -919,11 +919,11 @@ class RouteGenerator extends Generator
                 'headline' => pluralize($headline),
                 'url' => pluralize($kebabCase),
                 'route_name' => $snakeCase,
-                'icon' => '$submodule', //'$modules',
+                'icon' => '$submodule', // '$modules',
                 'title_column_key' => $titleColumnKey,
                 'table_options' => static::$defaultTableOptions,
-                'headers' => $headers, //in Unusualify\Modularity\Support\Migrations\SchemaParser::class
-                'inputs' => $this->getInputs(), //in Unusualify\Modularity\Support\Migrations\SchemaParser::class
+                'headers' => $headers, // in Unusualify\Modularity\Support\Migrations\SchemaParser::class
+                'inputs' => $this->getInputs(), // in Unusualify\Modularity\Support\Migrations\SchemaParser::class
             ];
 
             if ($runnable && $this->getTest()) {

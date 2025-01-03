@@ -128,7 +128,7 @@ trait HasScanModule
                             $carry[$method->name] = get_class_short_name($return);
                         }
                     } catch (\Throwable $th) {
-                        //throw $th;
+                        // throw $th;
                     }
                 }
             }

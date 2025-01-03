@@ -38,7 +38,7 @@ return [
                 'image' => '', // image link for the background of the toolbar
             ],
             'headerOptions' => [
-                'color' => 'rgba(140,160,167, .2)', //Hex, rgba or default css colors
+                'color' => 'rgba(140,160,167, .2)', // Hex, rgba or default css colors
             ],
 
             'hideHeaders' => false,

@@ -235,7 +235,7 @@ class Finder
                 // if (is_subclass_of($className, "Illuminate\Database\Eloquent\Model")) {
                 // }
             } catch (\Throwable $th) {
-                //throw $th;
+                // throw $th;
             }
 
         }

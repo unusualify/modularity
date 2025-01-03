@@ -516,7 +516,7 @@ abstract class BaseController extends PanelController
             $itemTitle = $column['itemTitle'] ?? 'name';
 
             try {
-                //code...
+                // code...
                 $value = collect($relation->get())
                     ->pluck($itemTitle)
                     ->join(', ');

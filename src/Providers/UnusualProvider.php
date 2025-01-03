@@ -48,7 +48,7 @@ class UnusualProvider extends ServiceProvider
             //     'token' => $token,
             //     'email' => $notifiable->getEmailForPasswordReset()
             // ]);
-            //TODO: Move this to BaseServiceProvider
+            // TODO: Move this to BaseServiceProvider
             return url(route('admin.password.reset', [
                 'token' => $token,
                 'email' => $notifiable->getEmailForPasswordReset(),

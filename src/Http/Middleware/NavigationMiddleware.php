@@ -66,9 +66,9 @@ class NavigationMiddleware
 
         if (Auth::check() && false) {
             $role = 'guest';
-            //$role =  Auth::user()->menuroles;
+            // $role =  Auth::user()->menuroles;
             $userRoles = Auth::user()->getRoleNames();
-            //$userRoles = $userRoles['items'];
+            // $userRoles = $userRoles['items'];
             $roleHierarchy = RoleHierarchy::select('role_hierarchy.role_id', 'roles.name')
                 ->join('roles', 'roles.id', '=', 'role_hierarchy.role_id')
                 ->orderBy('role_hierarchy.hierarchy', 'asc')->get();
@@ -89,7 +89,7 @@ class NavigationMiddleware
         } else {
             $role = 'guest';
         }
-        //session(['prime_user_role' => $role]);
+        // session(['prime_user_role' => $role]);
         $menus = new GetSidebarMenu;
         $menulists = Menulist::all();
         $result = [];

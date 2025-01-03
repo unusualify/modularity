@@ -264,7 +264,7 @@ trait ManageTable
                         'async' => false,
                     ],
                     'model_formatter' => [
-                        'price_id' => 'payment_price.id', //lodash get method
+                        'price_id' => 'payment_price.id', // lodash get method
                     ],
                     'schema_formatter' => [
                         'payment_service.price_object' => 'payment_price',

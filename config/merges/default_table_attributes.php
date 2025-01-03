@@ -35,7 +35,7 @@ return [
         // 'height' => '90',
     ],
     'filterBtnOptions' => [
-        'variant' => 'outlined', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
+        'variant' => 'outlined', // 'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
         'color' => 'primary', // rgb(255,255,255,1) or utility colors like white, purple
         // 'elevation' => null, // string or number refers to elevation
         // 'prepend-icon' => 'mdi-chevron-down', // material design icon name,
@@ -43,7 +43,7 @@ return [
         'ripple' => true, // boolean
         // 'rounded' => 'md', // string | number | boolean - 0, xs, sm, true, lg, xl, pill, circle, and shaped.
         'class' => 'mx-2 text-white text-capitialize rounded px-4',
-        'size' => 'default', //sizes: x-small, small, default, large, and x-large.
+        'size' => 'default', // sizes: x-small, small, default, large, and x-large.
         // 'icon' => 'mdi-filter-outline',
         'prepend-icon' => 'mdi-filter-outline',
         'append-icon' => 'mdi-chevron-down',
@@ -52,7 +52,7 @@ return [
         // 'loading' => true,
     ],
     'addBtnOptions' => [
-        'variant' => 'flat', //'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
+        'variant' => 'flat', // 'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
         'color' => 'secondary', // rgb(255,255,255,1) or utility colors like white, purple
         // 'elevation' => null, // string or number refers to elevation
         'prepend-icon' => 'mdi-plus', // material design icon name,
@@ -60,7 +60,7 @@ return [
         'ripple' => true, // boolean
         'rounded' => 'md', // string | number | boolean - 0, xs, sm, true, lg, xl, pill, circle, and shaped.
         'class' => 'ml-2 text-white rounded text-capitialize text-bold',
-        'size' => 'default', //sizes: x-small, small, default, large, and x-large.
+        'size' => 'default', // sizes: x-small, small, default, large, and x-large.
         // 'text' => 'CREATE NEW',
         // 'icon' => 'mdi-abacus'
         // 'loading' => true,
@@ -134,6 +134,6 @@ return [
         'maxChar' => 3,
     ],
     'headerOptions' => [
-        'color' => 'rgba(140,160,167, .2)', //Hex, rgba or default css colors
+        'color' => 'rgba(140,160,167, .2)', // Hex, rgba or default css colors
     ],
 ];

@@ -655,7 +655,7 @@ abstract class PanelController extends CoreController
             ];
         }
 
-        //for hasOneThrough relationship
+        // for hasOneThrough relationship
         if (method_exists($this->repository->getModel(), $this->getCamelCase($this->nestedParentName))) {
             return [
                 'addRelation' . $this->getStudlyName($this->nestedParentName) => $this->nestedParentId,

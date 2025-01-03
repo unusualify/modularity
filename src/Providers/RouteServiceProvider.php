@@ -64,7 +64,7 @@ class RouteServiceProvider extends ServiceProvider
                 $router->group(
                     $groupOptions,
                     function ($router) use ($supportSubdomainRouting) {
-                        //internal authentication routes (login,register,forgot-password etc.)
+                        // internal authentication routes (login,register,forgot-password etc.)
                         $router->group(
                             [
                                 'middleware' => [
@@ -169,7 +169,7 @@ class RouteServiceProvider extends ServiceProvider
             UnusualRoutes::registerRoutes(
                 $router,
                 [...$_groupOptions, ...(Arr::only($groupOptions, ['domain']))],
-                ['web'], //$middlewares,
+                ['web'], // $middlewares,
                 $module->getClassNamespace("{$controller_namespace}"),
                 $module->getDirectoryPath("{$routes_folder}/web.php"),
                 true
@@ -177,7 +177,7 @@ class RouteServiceProvider extends ServiceProvider
             UnusualRoutes::registerRoutes(
                 $router,
                 $_groupOptions,
-                ['api'], //$middlewares,
+                ['api'], // $middlewares,
                 $module->getClassNamespace("{$controller_namespace}\API"),
                 $module->getDirectoryPath("{$routes_folder}/api.php"),
                 true
@@ -185,7 +185,7 @@ class RouteServiceProvider extends ServiceProvider
             UnusualRoutes::registerRoutes(
                 $router,
                 [],
-                ['web'], //$middlewares,
+                ['web'], // $middlewares,
                 $module->getClassNamespace("{$controller_namespace}\Front"),
                 $module->getDirectoryPath("{$routes_folder}/front.php"),
                 true
@@ -340,7 +340,7 @@ class RouteServiceProvider extends ServiceProvider
 
             $config = $module->getConfig();
             $moduleName = $config['name'] ?? $module->getName();
-            if ($moduleName) { //&& getStringOrFalse($config['name'])
+            if ($moduleName) { // && getStringOrFalse($config['name'])
                 $pr = $module->getParentRoute();
 
                 $has_system_prefix = $module->hasSystemPrefix();
@@ -368,7 +368,7 @@ class RouteServiceProvider extends ServiceProvider
 
                     foreach ($routes as $key => $item) {
 
-                        if (isset($item['name'])) { //&& getStringOrFalse($item['name'])
+                        if (isset($item['name'])) { // && getStringOrFalse($item['name'])
                             $itemKebabName = kebabCase($item['name']);
                             $itemStudlyName = studlyName($item['name']);
                             $itemSnakeName = snakeCase($item['name']);
@@ -492,7 +492,7 @@ class RouteServiceProvider extends ServiceProvider
 
             $config = $module->getConfig();
             $moduleName = $config['name'] ?? $module->getName();
-            if ($moduleName) { //&& getStringOrFalse($config['name'])
+            if ($moduleName) { // && getStringOrFalse($config['name'])
                 $pr = $module->getParentRoute();
 
                 $has_system_prefix = $module->hasSystemPrefix();
@@ -520,7 +520,7 @@ class RouteServiceProvider extends ServiceProvider
 
                     foreach ($routes as $key => $item) {
 
-                        if (isset($item['name'])) { //&& getStringOrFalse($item['name'])
+                        if (isset($item['name'])) { // && getStringOrFalse($item['name'])
                             $itemKebabName = kebabCase($item['name']);
                             $itemStudlyName = studlyName($item['name']);
                             $itemSnakeName = snakeCase($item['name']);

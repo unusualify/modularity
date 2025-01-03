@@ -116,7 +116,7 @@ trait RelationTrait
 
             if (isset($fields[$relationName])) {
                 $relation = $object->{$relationName}();
-                $relatedLocalKey = $relation->getLocalKeyName(); //id
+                $relatedLocalKey = $relation->getLocalKeyName(); // id
                 $foreignKey = $relation->getForeignKeyName(); // parent_name_id
                 $repository = UFinder::getRouteRepository(Str::singular($relationName), asClass: true);
 
@@ -249,7 +249,7 @@ trait RelationTrait
 
                 } else {
                     try {
-                        //code...
+                        // code...
                         $fields[$input['name']] = $object->{$input['name']}->map(function ($item) {
                             return $item->id;
                         });
@@ -322,7 +322,7 @@ trait RelationTrait
 
                     default:
                         try {
-                            //code...
+                            // code...
                             $record = $object->{$relationship};
 
                             if ($record instanceof \Illuminate\Database\Eloquent\Collection) {
@@ -356,7 +356,7 @@ trait RelationTrait
                                 $this->definedRelationsTypes(),
                                 $th
                             );
-                            //throw $th;
+                            // throw $th;
                         }
 
                         // if($relationship == 'packages'){

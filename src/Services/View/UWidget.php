@@ -62,7 +62,7 @@ class UWidget extends UComponent
         );
     }
 
-    //Experimental left for general components maybe
+    // Experimental left for general components maybe
 
     protected function setComponentAttributes($attributes)
     {

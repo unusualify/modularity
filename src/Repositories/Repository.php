@@ -112,7 +112,7 @@ abstract class Repository
         }
 
         try {
-            //code...
+            // code...
             // dd(
             //     $query->toSql(),
 
@@ -121,7 +121,7 @@ abstract class Repository
             return $query->paginate($perPage);
 
         } catch (\Throwable $th) {
-            //throw $th;
+            // throw $th;
             dd(
 
                 $query->toSql(),
@@ -222,14 +222,14 @@ abstract class Repository
         $query = $this->order($query, $orders);
 
         try {
-            //code...
+            // code...
             // dd(
             //     $query->toSql(),
 
             // );
             return $query->get();
         } catch (\Throwable $th) {
-            //throw $th;
+            // throw $th;
             dd(
                 $th,
                 debug_backtrace()
@@ -936,7 +936,7 @@ abstract class Repository
         $builtInMethods = app('model.builtin.methods');
 
         try {
-            //code...
+            // code...
             $builtInMethods = app('model.builtin.methods');
         } catch (\Throwable $th) {
             dd($this, debug_backtrace());
@@ -962,7 +962,7 @@ abstract class Repository
                                     $carry[$method->name] = get_class_short_name($return);
                                 }
                             } catch (\Throwable $th) {
-                                //throw $th;
+                                // throw $th;
                             }
                         }
                     }
@@ -987,7 +987,7 @@ abstract class Repository
                             $carry[$method->name] = get_class_short_name($return);
                         }
                     } catch (\Throwable $th) {
-                        //throw $th;
+                        // throw $th;
                     }
                 }
             }
