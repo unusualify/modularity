@@ -18,6 +18,7 @@ use Unusualify\Modularity\Repositories\Traits\MethodTransformers;
 use Unusualify\Modularity\Repositories\Traits\PaymentTrait;
 use Unusualify\Modularity\Repositories\Traits\RelationTrait;
 use Unusualify\Modularity\Traits\ManageNames;
+use PDO;
 
 abstract class Repository
 {
@@ -1118,5 +1119,83 @@ abstract class Repository
         $methodName = 'scope' . ucfirst($method[0]);
 
         return $this->model->$methodName();
+    }
+
+    /**
+     * @param string $class name resolution
+     * @return bool
+     */
+    public function hasModelTrait($trait)
+    {
+        $hasTrait = classHasTrait($this->getModel(), $trait);
+
+        return $hasTrait;
+    }
+
+    public function getByColumnValues($column, array $values, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null)
+    {
+        $query = $this->model->whereIn($column, $values);
+
+        $query = $query->with($this->formatWiths($query, $with));
+
+        $query = $this->filter($query, $scopes);
+
+        $query = $this->order($query, $orders);
+
+        if ($isFormatted) {
+            return $query->get()->map(function ($item) {
+                // dd($item);
+                return array_merge(
+                    $this->getShowFields($item, $this->chunkInputs($this->inputs())),
+                    $item->attributesToArray(),
+                    // $item->toArray(),
+                    // $this->getFormFields($item, $this->chunkInputs($this->inputs())),
+                    // $columnsData
+                );
+            });
+        } else {
+
+            return $query->get();
+        }
+    }
+
+    public function getByIds(array $ids, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null)
+    {
+        // $query = $this->model->query();
+        // dd($ids);
+        $query = $this->model->whereIn('id', $ids);
+
+        $query = $query->with($this->formatWiths($query, $with));
+
+        $query = $this->filter($query, $scopes);
+
+        $query = $this->order($query, $orders);
+
+        if ($isFormatted) {
+            return $query->get()->map(function ($item) {
+                return array_merge(
+                    $this->getShowFields($item, $this->chunkInputs($this->inputs())),
+                    $item->attributesToArray(),
+                    // $item->toArray(),
+                    // $this->getFormFields($item, $this->chunkInputs($this->inputs())),
+                    // $columnsData
+                );
+            });
+        } else {
+
+            return $query->get();
+        }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLikeOperator()
+    {
+        if (DB::connection()->getPDO()->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') {
+            return 'ILIKE';
+        }
+
+        return 'LIKE';
     }
 }
