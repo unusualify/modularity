@@ -321,6 +321,7 @@ trait MethodTransformers
         $_scopes = $scopes;
         foreach ($_scopes as $column => $value) {
             $studlyColumn = studlyName($column);
+
             if (preg_match('/addRelation([A-Za-z]+)/', $column, $matches)) {
                 $relationName = $this->getCamelCase($matches[1]);
 
@@ -366,13 +367,16 @@ trait MethodTransformers
             $studlyColumn = studlyName($column);
             $studlyValue = studlyName($value);
             // dd(
-            //     is_bool($value),
             //     method_exists($this->model, 'scope' . $studlyColumn),
             //     $studlyColumn,
             //     $scopes
             // );
             if (method_exists($this->model, 'scope' . $studlyColumn)) {
-                $query->{$this->getCamelCase($column)}();
+                if(!is_bool($value)) {
+                    $query->{$this->getCamelCase($column)}($value);
+                } else {
+                    $query->{$this->getCamelCase($column)}();
+                }
             } elseif (is_string($value) && method_exists($this->model, 'scope' . studlyName($value))) {
                 $query->{$this->getCamelCase($value)}();
 
