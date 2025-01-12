@@ -2,6 +2,8 @@
 
 namespace Unusualify\Modularity\Providers;
 
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\View;
@@ -61,6 +63,14 @@ class BaseServiceProvider extends ServiceProvider
         $this->bootBaseViewComposers();
 
         $this->bootBaseViewComponents();
+
+        ResetPassword::createUrlUsing(function ($notifiable, string $token) {
+            return url(route('admin.password.reset', [
+                'token' => $token,
+                'email' => $notifiable->getEmailForPasswordReset(),
+            ], false));
+        });
+
 
         AboutCommand::add('Modularity', function () {
             $composer = base_path('composer.lock');
