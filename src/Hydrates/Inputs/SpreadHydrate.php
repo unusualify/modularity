@@ -5,7 +5,7 @@ namespace Unusualify\Modularity\Hydrates\Inputs;
 use Illuminate\Support\Facades\App;
 use Unusualify\Modularity\Facades\Modularity;
 
-class SpreadableHydrate extends InputHydrate
+class SpreadHydrate extends InputHydrate
 {
     /**
      * Default values to set before hydrating
@@ -24,10 +24,10 @@ class SpreadableHydrate extends InputHydrate
      */
     public function hydrate()
     {
-        $input = $this->input;
 
+        $input = $this->input;
         // add your logic
-        $input['type'] = 'input-spreadable';
+        $input['type'] = 'input-spread';
         // dd($input);
         // $input['items'] = ['test'];
         if(in_array('scrollable', $input)){

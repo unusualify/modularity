@@ -170,7 +170,6 @@ const props = defineProps({
     default: '300px'
   }
 })
-// console.log(props.reservedKeys)
 
 const emit = defineEmits([...makeInputEmits])
 

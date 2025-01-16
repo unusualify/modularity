@@ -54,14 +54,14 @@ return [
                 //     'type' => 'text',
                 //     'spreadable' => true,
                 // ],
-                // [
-                //     'name' => '_spread',
-                //     'label' => 'Spreadable',
-                //     'type' => 'spreadable',
-                //     'connector' => 'SystemSetting:General',
-                //     'height' => '250px',
-                //     'scrollable'
-                // ],
+                [
+                    'name' => '_spread',
+                    'label' => 'Spread',
+                    'type' => 'spread',
+                    'connector' => 'SystemSetting:General',
+                    'height' => '250px',
+                    'scrollable'
+                ],
                 [
                     'name' => 'logo',
                     'label' => 'Logo',

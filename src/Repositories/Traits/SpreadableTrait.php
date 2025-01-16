@@ -6,7 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Request;
 use Oobook\Priceable\Models\Price;
 
-trait SpreadTrait
+trait SpreadableTrait
 {
     protected function beforeSaveSpreadTrait($object, $fields)
     {

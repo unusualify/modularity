@@ -1,16 +1,16 @@
-// test/components/v-input-spreadable.test.js
+// test/components/v-input-Spread.test.js
 import { describe, expect, test, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 
 import vuetify from '../../src/js/plugins/vuetify'
 
-import VInputSpreadable from '../../src/js/components/VInputSpreadable.vue'
+import VInputSpread from '../../src/js/components/inputs/Spread.vue'
 
 let getModel = () => {}
 
 async function factory(props = {}, options = {}) {
 
-  return await mount(VInputSpreadable, {
+  return await mount(VInputSpread, {
     global: {
       plugins: [vuetify],
     },
@@ -22,7 +22,7 @@ async function factory(props = {}, options = {}) {
 }
 
 
-describe('VInputSpreadable tests', () => {
+describe('VInputSpread tests', () => {
 
   test('renders the component', async () => {
 
