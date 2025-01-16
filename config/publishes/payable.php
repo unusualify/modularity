@@ -6,5 +6,5 @@
  */
 
 return [
-    'table' => 'unfy_payments',
+    'table' => 'umod_payments',
 ];

@@ -16,4 +16,5 @@ return [
     'payments' => 'umod_payments',
     'chats' => 'umod_chats',
     'chat_messages' => 'umod_chat_messages',
+    'spreads' => 'umod_spreads',
 ];
