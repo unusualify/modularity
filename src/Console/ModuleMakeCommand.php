@@ -43,6 +43,7 @@ class ModuleMakeCommand extends BaseCommand
             $this->option('relationships')
             || $this->option('schema')
             || $this->option('rules')
+            || $this->option('no-plain')
         );
     }
 
@@ -130,6 +131,7 @@ class ModuleMakeCommand extends BaseCommand
             ['relationships', null, InputOption::VALUE_OPTIONAL, 'The many to many relationships.', null],
             ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
             // ['plain', null, InputOption::VALUE_NONE, 'Don\'t create route.'],
+            ['no-plain', null, InputOption::VALUE_NONE, 'Create route.'],
             ['no-migrate', null, InputOption::VALUE_NONE, 'don\'t migrate.'],
             ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
             ['no-migration', null, InputOption::VALUE_NONE, 'don\'t create migration file.'],
