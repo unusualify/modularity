@@ -39,8 +39,8 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
     {
         $migration_folder = GenerateConfigReader::read('migration')->getPath();
         $config_folder = GenerateConfigReader::read('config')->getPath();
-        $middleware_folder = GenerateConfigReader::read('filter')->getPath();
-        $middleware_namespace = GenerateConfigReader::read('filter')->getNamespace();
+        $provider_folder = GenerateConfigReader::read('provider')->getPath();
+        $provider_namespace = GenerateConfigReader::read('provider')->getNamespace();
         $views_folder = GenerateConfigReader::read('views')->getPath();
         $lang_folder = GenerateConfigReader::read('lang')->getPath();
         $component_class_namespace = GenerateConfigReader::read('component-class')->getNamespace();
@@ -51,32 +51,18 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
             $module_name = $module->getName();
 
             // REGISTER MODULE MIDDLEWARES
-            if (file_exists(($middlewareDir = $module->getDirectoryPath($middleware_folder)))) {
-                foreach (glob($middlewareDir . '/*Middleware.php') as $middlewareFile) {
-                    $middlewareFileName = pathinfo($middlewareFile)['filename']; // $filename
-                    $middlewareClass = $module->getClassNamespace("{$middleware_namespace}\\" . $middlewareFileName);
-                    if (@class_exists($middlewareClass)) {
+            $module->createMiddlewareAliases();
 
-                        $aliasName = implode('.', Arr::where(explode('_', snakeCase($middlewareFileName)), function ($value) {
-                            return $value !== 'middleware';
-                        }));
-
-                        Route::aliasMiddleware($aliasName, $middlewareClass);
+            // REGISTER MODULE PROVIDERS
+            if (file_exists(($providerDir = $module->getDirectoryPath($provider_folder)))) {
+                foreach (glob($providerDir . '/*ServiceProvider.php') as $providerFile) {
+                    $providerFileName = pathinfo($providerFile)['filename']; // $filename
+                    $providerClass = $module->getClassNamespace("{$provider_namespace}\\" . $providerFileName);
+                    if (@class_exists($providerClass)) {
+                        $this->app->register($providerClass);
                     }
                 }
-                // foreach ( ClassFinder::getClassesInNamespace($module->getClassNamespace('Http\Middleware')) as $key => $middleware) {
-                //     if(@class_exists($middleware)){
-                //         $class = app($middleware);
-                //         $shortName = get_class_short_name($class);
-                //         $namespace = get_class($class);
-                //         $aliasName = implode('.', Arr::where(explode('_', snakeCase($shortName)), function($value){
-                //             return $value !== 'middleware';
-                //         }));
-                //         Route::aliasMiddleware($aliasName, $namespace);
-                //     }
-                // }
             }
-
             // LOAD MODULE CONFIG
             // if(file_exists(module_path($module->getName(), 'Config/config.php'))){
             if (file_exists($module->getDirectoryPath("{$config_folder}/config.php"))) {
