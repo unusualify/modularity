@@ -155,6 +155,8 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->app->alias(\Torann\GeoIP\Facades\GeoIP::class, 'GeoIP');
 
+        $this->app->register(TelescopeServiceProvider::class);
+
         $this->registerTranslationService();
     }
 
