@@ -25,27 +25,16 @@ return [
             // ],
         ],
         'superadmin' => [
-            'dashboard' => [
-                'name' => 'Dashboard',
-                'route_name' => 'admin.dashboard',
-                'icon' => '$dashboard',
-            ],
-            '_system_settings' => [
-                'name' => 'System Settings',
-                'icon' => '$header',
-            ],
-            ...UNavigation::systemMenu(),
-            'locales' => [
-                'name' => 'Locales',
-                'icon' => 'mdi-exit-to-app',
-                'route_name' => 'admin.languages.index',
-                'target' => '_blank',
-            ],
             '_modules' => [
                 'name' => 'Modules',
                 'icon' => '$header',
             ],
             ...UNavigation::modulesMenu(),
+            '_system_settings' => [
+                'name' => 'System Settings',
+                'icon' => '$header',
+            ],
+            ...UNavigation::systemMenu(),
             'media_library' => [
                 'name' => 'Media Library',
                 'icon' => '$media',
@@ -53,12 +42,28 @@ return [
                 // 'event' => '_triggerOpenMediaLibrary',
                 'event' => 'openFreeMediaLibrary',
             ],
-            'profile' => [
-                'name' => 'Profile Settings',
-                'route_name' => 'admin.profile',
-                'icon' => '$accountSettings',
+            '_vendor' => [
+                'name' => 'Vendor',
+                'icon' => '$header',
             ],
-
+            '_locales' => [
+                'name' => 'Locales',
+                'icon' => 'mdi-exit-to-app',
+                'route_name' => 'languages.index',
+                'target' => '_blank',
+            ],
+            '_horizon' => [
+                'name' => 'Horizon',
+                'icon' => 'mdi-exit-to-app',
+                'route_name' => 'horizon.index',
+                'target' => '_blank',
+            ],
+            '_telescope' => [
+                'name' => 'Telescope',
+                'icon' => 'mdi-exit-to-app',
+                'route_name' => 'telescope',
+                'target' => '_blank',
+            ],
         ],
         'client' => [
             // 'account' => [
