@@ -24,7 +24,7 @@ class $CLASS$ extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadMigrationsFrom(module_path($this->moduleName, '$MIGRATIONS_PATH$'));
+
     }
 
     /**
@@ -34,7 +34,7 @@ class $CLASS$ extends ServiceProvider
      */
     public function register()
     {
-        $this->app->register(RouteServiceProvider::class);
+
     }
 
     /**
