@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
+use Laravel\Horizon\Horizon;
 use Spatie\Permission\Models\Permission;
 use Unusualify\Modularity\Entities\User;
 
@@ -145,5 +146,11 @@ class AuthServiceProvider extends ServiceProvider implements DeferrableProvider
             });
         }
 
+        Horizon::auth(function ($request) {
+            // dd($request->user());
+            return app()->environment('local') || $request->user()->isSuperAdmin() || in_array($request->user()->email, [
+                'software-dev@unusualgrowth.cm',
+            ]);
+        });
     }
 }
