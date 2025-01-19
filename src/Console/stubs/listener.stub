@@ -1,0 +1,26 @@
+<?php
+
+namespace $NAMESPACE$;
+
+$NAMESPACES$
+class $CLASS$
+{
+$TRAITS$
+$ATTRIBUTES$
+    /**
+     * Create the event listener.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Handle the event.
+     */
+    public function handle($EVENT_PARAMETER$): void
+    {
+        //
+    }
+$METHODS$
+}
