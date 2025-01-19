@@ -4,7 +4,7 @@
 
     <ul class="flex-grow justify-end pr-2">
         <li>
-            <a href="{{ route('dashboard') }}" >
+            <a href="{{ route('admin.dashboard') }}" >
                 {{ __('Go Back') }}
             </a>
         </li>
