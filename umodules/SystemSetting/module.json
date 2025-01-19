@@ -1,0 +1,11 @@
+{
+    "name": "SystemSetting",
+    "alias": "systemsetting",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        
+    ],
+    "files": []
+}
