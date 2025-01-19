@@ -8,20 +8,27 @@ use Cartalyst\Tags\TaggableTrait;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+// use Modules\Notification\Events\ModelCreated;
 use Unusualify\Modularity\Entities\Traits\HasPresenter;
 use Unusualify\Modularity\Entities\Traits\IsTranslatable;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
+use Illuminate\Notifications\Notifiable;
+
 
 class Model extends LaravelModel implements TaggableInterface
 {
     use HasPresenter,
-
         IsTranslatable,
         ModelHelpers,
         SoftDeletes,
-        TaggableTrait;
+        TaggableTrait,
+        Notifiable;
 
     public $timestamps = true;
+
+    // protected $dispatchesEvents = [
+    //     'created' => ModelCreated::class,
+    // ];
 
     protected function isTranslationModel(): bool
     {
