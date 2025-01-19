@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Providers;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
@@ -29,6 +30,8 @@ class RouteServiceProvider extends ServiceProvider
         $this->bootMacros();
 
         $this->bootRouteMiddlewares($this->app->get('router'));
+
+        require __DIR__ . '/../../routes/channels.php';
 
         parent::boot();
     }
@@ -366,7 +369,9 @@ class RouteServiceProvider extends ServiceProvider
                             : false
                     );
 
+
                     foreach ($routes as $key => $item) {
+                        $middlewares = $module->getRouteMiddlewareAliases($item['name']);
 
                         if (isset($item['name'])) { //&& getStringOrFalse($item['name'])
                             $itemKebabName = kebabCase($item['name']);
@@ -457,7 +462,7 @@ class RouteServiceProvider extends ServiceProvider
                             // if($item['name'] == 'User'){
                             //     dd($routeUrlSegment, $resourceOptionsAs, $resourceOptions, $parameters);
                             // }
-                            Route::prefix(implode('/', $prefixes))->group(function () use (
+                            Route::middleware($middlewares)->prefix(implode('/', $prefixes))->group(function () use (
                                 $controllerName,
                                 $routeUrlSegment,
                                 $itemStudlyName,
