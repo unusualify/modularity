@@ -205,6 +205,31 @@ if (! function_exists('add_route_to_config')) {
         $pattern = "/(?<='routes'\s\=\>\s\[)([^\}]*)(\s{4}\],)/";
 
         return preg_replace($pattern, '$1' . $export . "\n" . '$2', $content);
+        // TODO: refactor this replacement with implementing the File::replaceInFile method
+        // Illuminate\Support\Facades\File::replaceInFile(
+        //     "'connections' => [\n",
+        //     <<<'CONFIG'
+        //     'connections' => [
+
+        //             'reverb' => [
+        //                 'driver' => 'reverb',
+        //                 'key' => env('REVERB_APP_KEY'),
+        //                 'secret' => env('REVERB_APP_SECRET'),
+        //                 'app_id' => env('REVERB_APP_ID'),
+        //                 'options' => [
+        //                     'host' => env('REVERB_HOST'),
+        //                     'port' => env('REVERB_PORT', 443),
+        //                     'scheme' => env('REVERB_SCHEME', 'https'),
+        //                     'useTLS' => env('REVERB_SCHEME', 'https') === 'https',
+        //                 ],
+        //                 'client_options' => [
+        //                     // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
+        //                 ],
+        //             ],
+
+        //     CONFIG,
+        //     app()->configPath('broadcasting.php')
+        // );
     }
 }
 
