@@ -1,0 +1,8 @@
+[program:$PROGRAM_NAME$]
+process_name=%(program_name)s_%(process_num)02d
+command=$PHP$ $COMMAND$
+user=$USER$
+autostart=true
+autorestart=true
+redirect_stderr=true
+stdout_logfile=$APP_PATH$/storage/logs/$LOG_FILE_NAME$.log
