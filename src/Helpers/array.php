@@ -83,7 +83,8 @@ if (! function_exists('array_export')) {
         $array = preg_split("/\r\n|\n|\r/", $export);
         $array = preg_replace(["/\s*array\s\($/", "/\)(,)?$/", "/\s=>\s$/"], [null, ']$1', ' => ['], $array);
 
-        $array = preg_replace('/\d+\s\=\>\s(?=\[|(\'[A-Za-z_\-]+\'))/', '', $array); // removing index numbers of array.
+        // $array = preg_replace('/\d+\s\=\>\s(?=\[|(\'[A-Za-z_\-]+\'))/', '', $array); // removing index numbers of array.
+        $array = preg_replace('/\d+\s\=\>\s(?=\[|\'[^\']*\'|\d+|null|true|false)/', '', $array); // removing index numbers of array for strings, numbers, booleans, null and nested arrays
 
         $export = implode(PHP_EOL, array_filter(['['] + $array));
 
