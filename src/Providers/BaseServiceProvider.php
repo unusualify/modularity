@@ -7,6 +7,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\View;
+use Laravel\Telescope\Telescope;
 use Unusualify\Modularity\Activators\FileActivator;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Http\ViewComposers\CurrentUser;
@@ -90,6 +91,18 @@ class BaseServiceProvider extends ServiceProvider
             ];
         });
 
+        // Register scheduler class instead of direct command
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
+            $schedule->command('modularity:clean-temporary-fileponds')
+                ->everyFiveMinutes();
+                // ->appendOutputTo(storage_path('logs/scheduler.log'));
+
+            $schedule->command('telescope:prune --hours=48')
+                ->everyMinute()
+                ->appendOutputTo(storage_path('logs/scheduler.log'));
+
+        });
+
     }
 
     /**
@@ -107,7 +120,7 @@ class BaseServiceProvider extends ServiceProvider
         $this->registerCommands();
 
         // $this->app->singleton(\Unusualify\Modularity\Contracts\RepositoryInterface::class, function ($app) {
-        $this->app->singleton('unusual.modularity', function (Application $app) {
+        $this->app->singleton('modularity', function (Application $app) {
             $path = $app['config']->get('modules.paths.modules');
 
             return new Modularity($app, $path);
@@ -121,7 +134,7 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->app->singleton('unusual.navigation', UNavigation::class);
         // $this->app->alias(\Unusualify\Modularity\Contracts\RepositoryInterface::class, 'ue_modules');
-        $this->app->alias('unusual.modularity', 'modularity');
+        // $this->app->alias('unusual.modularity', 'modularity');
 
         $this->app->singleton('model.relation.namespace', function () {
             return "Illuminate\Database\Eloquent\Relations";
@@ -403,6 +416,7 @@ class BaseServiceProvider extends ServiceProvider
                 'MODULARITY_VERSION' => env('MODULARITY_VERSION', 'Not Found'),
                 'PAYABLE_VERSION' => env('PAYABLE_VERSION', 'Not Found'),
                 'SNAPSHOT_VERSION' => env('SNAPSHOT_VERSION', 'Not Found'),
+                'COMPOSER' => env('COMPOSER', 'Not Found'),
             ]);
         });
 
@@ -457,6 +471,18 @@ class BaseServiceProvider extends ServiceProvider
                 $cmds[] = preg_match('|' . preg_quote($this->terminalNamespace, '|') . '|', $match[0])
                             ? $cmd
                             : "{$this->terminalNamespace}\\{$match[0]}";
+            }
+        }
+
+        foreach (glob(__DIR__ . '/../Schedulers/*.php') as $filePath) {
+            $filePath = realpath($filePath);
+            $fileContents = file_get_contents($filePath);
+
+            // Extract namespace using regex
+            if (preg_match('/namespace\s+([^;]+);/', $fileContents, $matches)) {
+                $namespace = $matches[1];
+                $className = basename($filePath, '.php');
+                $cmds[] = $namespace . '\\' . $className;
             }
         }
 
