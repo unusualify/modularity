@@ -45,6 +45,7 @@ class CacheVersionsCommand extends BaseCommand
         set_env_file('MODULARITY_VERSION', get_package_version('unusualify/modularity'));
         set_env_file('PAYABLE_VERSION', get_package_version('unusualify/payable'));
         set_env_file('SNAPSHOT_VERSION', get_package_version('oobook/snapshot'));
+        set_env_file('COMPOSER', get_installed_composer()['root']['name']);
 
         $this->info('Package versions cached');
 
