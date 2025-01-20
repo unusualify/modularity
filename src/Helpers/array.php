@@ -199,11 +199,11 @@ if (! function_exists('add_route_to_config')) {
         array_shift($parts);
         array_pop($parts);
         array_pop($parts);
-        $export = implode("\n", $parts);
+        $export = "\t" . ltrim(implode("\n", $parts));
 
-        $pattern = "/(?<='routes'\s\=\>\s\[)([^\}]*)(\s{4}\],)/";
+        $pattern = "/(?<='routes'\s\=\>\s\[)([^\;]*)(\]\,[\n\s\t]?\]\;)/";
 
-        return preg_replace($pattern, '$1' . $export . "\n" . '$2', $content);
+        return preg_replace($pattern, '$1' . $export . "\n\t" . '$2', $content);
     }
 }
 
