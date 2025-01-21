@@ -2,6 +2,16 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.24.1 - 2025-01-21
+
+### :wrench: Bug Fixes
+
+- :sparkles: improve mandatory item handling in Checklist component by @OoBook in https://github.com/unusualify/modularity/commit/6b4c3d3f8e798e82098a02524085ed6556efd9d8
+
+### :package: Build
+
+- update build artifacts for v0.24.1 by @OoBook in https://github.com/unusualify/modularity/commit/69a6988298040a6ed5e95c5a634a6becf43424aa
+
 ## v0.24.0 - 2025-01-21
 
 ### :rocket: Features
