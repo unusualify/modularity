@@ -78,20 +78,36 @@ trait ImagesTrait
      */
     public function getFormFieldsImagesTrait($object, $fields, $schema)
     {
-        $t = [];
+        // $t = [];
         if ($object->has('medias')) {
-            // dd($object->medias->groupBy('pivot.role'));
-            foreach ($object->medias->groupBy('pivot.role') as $role => $mediasByRole) {
-                foreach ($mediasByRole->groupBy('pivot.locale') as $locale => $mediasByLocale) {
+            $mediasByRole = $object->medias->groupBy('pivot.role');
+            $default_locale = config('app.locale');
 
-                    $role_ = $role;
+            foreach ($this->getColumns(__TRAIT__) as $role) {
+                if (isset($mediasByRole[$role])) {
+                    $input = $this->inputs()[$role];
+                    if ($input['translated'] ?? false) {
+                        foreach ($mediasByRole[$role]->groupBy('pivot.locale') as $locale => $mediasByLocale) {
+                            $fields[$role][$locale] = $mediasByLocale->map(function ($media) {
+                                return $media->mediableFormat();
+                            });
+                        }
+                    } else {
+                        $fields[$role] = $mediasByRole[$role]->groupBy('pivot.locale')[$default_locale]->map(function ($media) {
+                            return $media->mediableFormat();
+                        });
+                    }
+                } else {
+                    $input = $this->inputs()[$role] ?? null;
 
-                    $t[] = $role_;
-                    Arr::set($fields, "{$role_}", $mediasByLocale->map(function ($media) {
-                        return $media->mediableFormat();
-                    }));
+                    if ($input) {
+                        $fields += [
+                            $input['name'] => ($input['translated']) ?? false ? Arr::mapWithKeys(getLocales(), function ($locale) {
+                                return [$locale => []];
+                            }) : [],
+                        ];
+                    }
                 }
-
             }
         }
 
@@ -106,114 +122,24 @@ trait ImagesTrait
     {
         $images = Collection::make();
 
-        $system_locales = getLocales();
+        $systemLocales = getLocales();
 
-        // $default_locale = unusualConfig('locale');
-        $default_locale = config('app.locale');
+        $imageRoles = $this->getColumns(__TRAIT__);
 
-        foreach ($this->getColumns(__TRAIT__) as $role) {
-            // foreach(['repeater_name.*.participantImage'] as $role){
-            // foreach(['repeater_name.en.*.participantImage', 'repeater_name.tr.*.participantImage'] as $role){
-            $imagesArray = data_get($fields, $role);
+        foreach($imageRoles as $role){
+            if(isset($fields[$role])){
+                foreach ($systemLocales as $locale) {
+                    if (isset($fields[$role][$locale])) {
+                        $images = $this->pushImage($images, $fields[$role][$locale], $role, $locale);
+                    } else {
+                        $images = $this->pushImage($images, $fields[$role], $role, $locale);
 
-            // input checking for translated in dot notation
-            if (preg_match('/([A-Za-z-_]+)\.([a-z]{2})\.\*\.([A-Za-z-_\.]+)/', $role, $matches)) {
-                $parent_input_name = $matches[1];
-                $locale = $matches[2];
-
-                foreach ($imagesArray as $index => $data) {
-                    $images = $this->pushImage($images, $data, $role, $locale, $index);
-                }
-                // if(empty($imagesArray)){
-                //     dd(
-                //         $locale,
-                //         $role,
-
-                //     );
-                // }else{
-
-                // }
-
-            } elseif (preg_match('/([A-Za-z-_]+)\.\*\.([A-Za-z-_\.]+)/', $role, $matches)) { // dot notation without translated field
-                foreach ($system_locales as $key => $locale) {
-                    foreach ($imagesArray as $index => $data) {
-                        $images = $this->pushImage($images, $data, $role, $locale, $index);
                     }
-                }
-            } else {
-                foreach ($system_locales as $key => $locale) {
-                    $imagesData = [];
-                    if (isset($imagesArray[$locale])) { // checking whether related locale exists or not
-                        $imagesData = $imagesArray[$locale];
-                    } elseif (count($intersectLocales = array_intersect(array_keys($imagesArray), $system_locales)) > 0) { // checking at least whether one of related locales exists or not
-                        $localeFound = $intersectLocales[0];
-                        $imagesData = $imagesArray[$localeFound];
-                    } else { // no locales exist on array
-                        $imagesData = $imagesArray;
-                    }
-
-                    $images = $this->pushImage($images, $imagesData, $role, $locale);
                 }
             }
         }
 
         return $images;
-
-        if (isset($fields['medias'])) {
-            foreach ($fields['medias'] as $role => $mediasForRole) {
-                if (unusualConfig('media_library.translated_form_fields', false)) {
-                    if (Str::contains($role, ['[', ']'])) {
-                        $start = mb_strpos($role, '[') + 1;
-                        $finish = mb_strpos($role, ']', $start);
-                        $locale = mb_substr($role, $start, $finish - $start);
-                        $role = strtok($role, '[');
-                    }
-                }
-
-                $locale = $locale ?? config('app.locale');
-
-                if (in_array($role, array_keys($this->model->mediasParams ?? []))
-                    || in_array($role, array_keys(unusualConfig('block_editor.crops', [])))
-                    || in_array($role, array_keys(unusualConfig('settings.crops', [])))) {
-                    Collection::make($mediasForRole)->each(function ($media) use (&$medias, $role, $locale) {
-                        $customMetadatas = $media['metadatas']['custom'] ?? [];
-                        if (isset($media['crops']) && ! empty($media['crops'])) {
-                            foreach ($media['crops'] as $cropName => $cropData) {
-                                $medias->push([
-                                    'id' => $media['id'],
-                                    'crop' => $cropName,
-                                    'role' => $role,
-                                    'locale' => $locale,
-                                    'ratio' => $cropData['name'],
-                                    'crop_w' => $cropData['width'],
-                                    'crop_h' => $cropData['height'],
-                                    'crop_x' => $cropData['x'],
-                                    'crop_y' => $cropData['y'],
-                                    'metadatas' => json_encode($customMetadatas),
-                                ]);
-                            }
-                        } else {
-                            foreach ($this->getCrops($role) as $cropName => $cropDefinitions) {
-                                $medias->push([
-                                    'id' => $media['id'],
-                                    'crop' => $cropName,
-                                    'role' => $role,
-                                    'locale' => $locale,
-                                    'ratio' => Arr::first($cropDefinitions)['name'],
-                                    'crop_w' => null,
-                                    'crop_h' => null,
-                                    'crop_x' => null,
-                                    'crop_y' => null,
-                                    'metadatas' => json_encode($customMetadatas),
-                                ]);
-                            }
-                        }
-                    });
-                }
-            }
-        }
-
-        return $medias;
     }
 
     public function pushImage($images, $imagesData, $role, $locale, $index = null)
