@@ -17,6 +17,8 @@ export { default as useIterator } from './useIterator'
 export { default as useCurrencyNumber } from './useCurrencyNumber'
 export { default as useModule, makeModuleProps } from './useModule'
 export { default as useLocale } from './useLocale'
+export { default as useItemActions, makeItemActionsProps } from './useItemActions'
+
 // Table Hooks
 export { default as useTableItem, makeTableItemProps } from './useTableItem'
 export { default as useTableNames, makeTableNamesProps } from './useTableNames'
