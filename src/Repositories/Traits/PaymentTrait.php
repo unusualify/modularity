@@ -51,9 +51,9 @@ trait PaymentTrait
             $paymentPrice = Price::find($val['id']);
             $paymentPrice->update(Arr::only($val, ['price_type_id', 'vat_rate_id', 'currency_id', 'display_price', 'role', 'valid_from', 'valid_till']));
 
-        } elseif (! $object->paymentPrice) {
+        } elseif (! $object->paymentPrice || (isset($fields['force_payment_update']) && $fields['force_payment_update'])) {
             $session_currency = request()->getUserCurrency()->id;
-
+            // dd($fields);
             $currencyId = isset($fields['currency_id'])
                 ? $fields['currency_id']
                 : $session_currency ?? $this->paymentTraitDefaultCurrencyId;

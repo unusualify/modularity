@@ -33,7 +33,8 @@ export default function useInput (props, context) {
 
     input: computed({
       get: () => {
-        return modelValue.value ?? []
+        let _val = modelValue.value ?? []
+        return context.initializeInput ? context.initializeInput(_val) : _val
       },
       set: (val, old) => {
         methods.updateModelValue(val)

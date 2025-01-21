@@ -67,6 +67,7 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
   // Action Handlers
   const handleEditAction = (item) => {
     if (props.editOnModal || props.embeddedForm) {
+      __log(item)
       tableItem.setEditedItem(item)
       tableForms.openForm()
     } else {

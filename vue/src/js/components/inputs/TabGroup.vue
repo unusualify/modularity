@@ -218,66 +218,100 @@ export default {
       let oldValue = oldModels[index]
 
       // Find changed keys by comparing old and new values
-      const changedKeys = Object.keys(val).filter(key =>
-        __isset(oldValue[key]) && JSON.stringify(val[key]) !== JSON.stringify(oldValue[key])
-      )
+      // Get all keys from val that exist in oldValue
+      const modelKeys = Object.keys(val).filter(key => __isset(oldValue[key]))
 
-      const changedValues = changedKeys.reduce((acc, key) => {
-        acc[key] = {
-          old: oldValue[key],
-          new: val[key]
+      // Track changes and validity
+      const changedKeys = []
+      const changedValues = {}
+
+      // Check each key for changes and validity
+      modelKeys.forEach(key => {
+        const isChanged = JSON.stringify(val[key]) !== JSON.stringify(oldValue[key])
+        const isValid = true // Add validation logic here if needed
+
+        if (isValid) {
+          changedKeys.push(key)
+          changedValues[key] = {
+            old: oldValue[key],
+            new: val[key]
+          }
         }
-        return acc
-      }, {})
+      })
 
       let schemas = cloneDeep(this.schemas)
       let schemasChanged = false
 
-      each(changedKeys, (triggerKey) => {
-        let triggers = filter(this.triggers, (trigger) => trigger.trigger == triggerKey)
-        let newValue = changedValues[triggerKey].new
-        let triggerSchema = cloneDeep(this.schemas[index][triggerKey])
+      // Process triggers for valid keys, regardless of changes
+      modelKeys.forEach(triggerKey => {
+        const triggers = filter(this.triggers, trigger => trigger.trigger === triggerKey)
+
+        if(triggers.length < 1)
+          return
+
+        const newValue = val[triggerKey]
+        const triggerSchema = cloneDeep(this.schemas[index][triggerKey])
         let triggerItem = null
 
-        if(triggerSchema.items && Array.isArray(triggerSchema.items)){
-          triggerItem = triggerSchema.items.find((item) => item.id == newValue)
+        if (triggerSchema.items && Array.isArray(triggerSchema.items)) {
+          triggerItem = triggerSchema.items.find(item => item.id == newValue)
         }
 
-        each(triggers, (trigger) => {
+        triggers.forEach(trigger => {
           let targetInput = cloneDeep(this.schemas[index][trigger.target])
           let rulesChanged = false
 
           each(trigger.actions, (actionValue, actionName) => {
-            schemasChanged = true
-            let key = actionName
-            if(actionName == 'rules'){
-              rulesChanged = true
-              actionName = 'raw' + startCase(actionName)
-            }
-            if(actionName == 'disabled'){
-              targetInput['_originalDisabled'] = actionValue
-            }
+            if (Array.isArray(actionValue)) {
+              if (actionName === 'class') {
+                let availableValue = targetInput?.class ?? ''
 
-            if(triggerItem){
-              targetInput[actionName] = this.$castValueMatch(actionValue, triggerItem)
+                if (availableValue) {
+                  let classes = availableValue.split(' ')
+                  let [func, ...newClasses] = actionValue
+
+                  if (func === 'remove') {
+                    classes = classes.filter(cls => !newClasses.includes(cls))
+                  } else if (func === 'add') {
+                    classes = [...classes, ...newClasses]
+                  }
+                  targetInput.class = classes.join(' ')
+                  schemasChanged = true
+                }
+              }
+            } else {
+              schemasChanged = true
+              if (actionName === 'rules') {
+                rulesChanged = true
+                actionName = 'raw' + startCase(actionName)
+              }
+              if (actionName === 'disabled') {
+                targetInput['_originalDisabled'] = actionValue
+              }
+
+              if (actionName === 'items') {
+                targetInput[actionName] = __data_get(triggerItem, actionValue, [])
+              } else if (triggerItem) {
+                targetInput[actionName] = this.$castValueMatch(actionValue, triggerItem)
+              }
             }
           })
+
           schemas[index][trigger.target] = targetInput
-          if(rulesChanged){
+          if (rulesChanged) {
             schemas[index] = this.invokeRuleGenerator(schemas[index])
           }
         })
       })
 
+
       if(schemasChanged){
         this.schemas = cloneDeep(schemas)
       }
 
-      // __log('Changed keys:', changedKeys, oldValue, val)
-
       oldModels[index] = val
       this.models = cloneDeep(oldModels)
-      // __log('models', this.models)
+
       this.$emit('update:modelValue', this.models)
     }
 

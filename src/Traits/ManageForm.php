@@ -94,7 +94,18 @@ trait ManageForm
 
         return Collection::make($this->formActions)->reduce(function ($acc, $action, $key) use ($default_action) {
 
-            // dd($action);
+            $allowedRoles = $action['allowedRoles'] ?? null;
+
+            if (is_string($allowedRoles)) {
+                $allowedRoles = explode(',', $allowedRoles);
+            }
+
+            if ($allowedRoles && $this->user) {
+                if (! $this->user->isSuperAdmin() && ! $this->user->hasRole($allowedRoles)) {
+                    return $acc;
+                }
+            }
+
             if (isset($action['endpoint']) && ($routeName = Route::hasAdmin($action['endpoint']))) {
                 $parameters = Route::getRoutes()->getByName($routeName)->parameterNames();
                 $action['endpoint'] = route($routeName, array_fill_keys($parameters, ':id'));

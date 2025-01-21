@@ -144,8 +144,8 @@ class MigrationMakeCommand extends BaseCommand
             return Stub::create('/migration/add.stub', [
                 'class' => $this->getClass(),
                 'table' => $tableName,
-                'fields_up' => ltrim(rtrim($this->getSchemaParser()->up())),
-                'fields_down' => ltrim(rtrim($this->getSchemaParser()->down())),
+                'fields_up' => ltrim(rtrim($schemaParser->up())),
+                'fields_down' => ltrim(rtrim($schemaParser->down())),
             ]);
         } elseif ($parser->isDelete()) {
             $schemaParser = new NwidartSchemaParser($this->option('fields'));
