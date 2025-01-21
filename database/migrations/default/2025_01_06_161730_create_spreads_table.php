@@ -11,7 +11,7 @@ class CreateSpreadsTable extends Migration
     {
         $modularitySpreadsTable = unusualConfig('tables.spreads', 'modularity_spreads');
 
-        if(! Schema::hasTable($modularitySpreadsTable)){
+        if (! Schema::hasTable($modularitySpreadsTable)) {
             Schema::create($modularitySpreadsTable, function (Blueprint $table) {
                 createDefaultTableFields($table);
                 // $table->string('spreadable_type');

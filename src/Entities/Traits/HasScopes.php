@@ -2,8 +2,8 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use PDO;
 
 trait HasScopes

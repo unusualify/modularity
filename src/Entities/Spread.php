@@ -2,13 +2,10 @@
 
 namespace Unusualify\Modularity\Entities;
 
-use Astrotomic\Translatable\Translatable;
-use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 
 class Spread extends Model
 {
-
     /**
      * The attributes that are mass assignable.
      *
@@ -17,11 +14,11 @@ class Spread extends Model
     protected $fillable = [
         'name',
         'published',
-        'content'
+        'content',
     ];
 
     protected $casts = [
-        'content' => 'array'
+        'content' => 'array',
     ];
 
     // protected function casts(): array

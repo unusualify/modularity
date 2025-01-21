@@ -43,7 +43,7 @@ class GeneralController extends Controller
     /**
      * Show the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Renderable
      */
     public function show($id) {}
@@ -51,7 +51,7 @@ class GeneralController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Renderable
      */
     public function update(Request $request, $id)
@@ -62,7 +62,7 @@ class GeneralController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Renderable
      */
     public function destroy($id)

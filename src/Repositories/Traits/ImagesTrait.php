@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Repositories\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Media;
 
 trait ImagesTrait
@@ -126,8 +125,8 @@ trait ImagesTrait
 
         $imageRoles = $this->getColumns(__TRAIT__);
 
-        foreach($imageRoles as $role){
-            if(isset($fields[$role])){
+        foreach ($imageRoles as $role) {
+            if (isset($fields[$role])) {
                 foreach ($systemLocales as $locale) {
                     if (isset($fields[$role][$locale])) {
                         $images = $this->pushImage($images, $fields[$role][$locale], $role, $locale);

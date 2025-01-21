@@ -96,12 +96,12 @@ trait ManageForm
 
             $allowedRoles = $action['allowedRoles'] ?? null;
 
-            if(is_string($allowedRoles)) {
+            if (is_string($allowedRoles)) {
                 $allowedRoles = explode(',', $allowedRoles);
             }
 
             if ($allowedRoles && $this->user) {
-                if (!$this->user->isSuperAdmin() && !$this->user->hasRole($allowedRoles)) {
+                if (! $this->user->isSuperAdmin() && ! $this->user->hasRole($allowedRoles)) {
                     return $acc;
                 }
             }

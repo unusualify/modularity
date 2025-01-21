@@ -49,21 +49,21 @@ trait HasPriceable
             ->where('currency_id', Request::getUserCurrency()->id);
     }
 
-    protected function basePriceRaw() : Attribute
+    protected function basePriceRaw(): Attribute
     {
         return Attribute::make(
             get: fn ($value) => $this->basePrice->display_price,
         );
     }
 
-    protected function basePriceFormatted() : Attribute
+    protected function basePriceFormatted(): Attribute
     {
         return Attribute::make(
             get: fn ($value) => \Oobook\Priceable\Facades\PriceService::formatAmount($this->basePriceRaw) . (config('priceable.prices_are_including_vat') ? '' : ' +' . __('VAT')),
         );
     }
 
-    protected function basePriceFormattedWithoutVat() : Attribute
+    protected function basePriceFormattedWithoutVat(): Attribute
     {
         return Attribute::make(
             get: fn ($value) => \Oobook\Priceable\Facades\PriceService::formatAmount($this->basePriceRaw),

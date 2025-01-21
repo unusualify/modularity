@@ -2,8 +2,6 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
-use Modules\SystemUtility\Entities\State;
-
 trait StateableTrait
 {
     public function getStateableFilterList()
@@ -19,4 +17,3 @@ trait StateableTrait
         return $this->getModel()->defaultStateables($scopes);
     }
 }
-

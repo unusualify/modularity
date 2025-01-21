@@ -18,8 +18,8 @@ trait SpreadableTrait
         $newJson = array_merge($currentJson, $fields['_spread'] ?? []);
         // Update the spreadable JSON
 
-        foreach($this->getSpreadableInputKeys() as $key){
-            if(isset($fields[$key])){
+        foreach ($this->getSpreadableInputKeys() as $key) {
+            if (isset($fields[$key])) {
                 $newJson[$key] = $fields[$key];
             }
         }
@@ -66,10 +66,9 @@ trait SpreadableTrait
         return $fields;
     }
 
-
-
     /**
      * Get the spreadable fields from the model
+     *
      * @return array
      */
     protected function getSpreadableInputKeys()
