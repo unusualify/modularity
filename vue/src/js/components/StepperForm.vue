@@ -100,7 +100,7 @@
                                   data.name || 'N/A ',
                                   data.description || 'N/A',
                                 ],
-                                data.base_price_show || 'N/A'
+                                data.basePrice_show || 'N/A'
                               ]"
                               :actions="[
                                 {
@@ -493,7 +493,7 @@
         default: () => {
           return [
             ['name', 'description'],
-            ['base_price_show'],
+            ['basePrice_show'],
           ]
         }
       }
@@ -703,7 +703,6 @@
         for(const index in this.schemas){
           data[index] = this.$getDisplayData(this.schemas[index], this.models[index])
         }
-
         return data
       },
       formattedSummary(){
@@ -729,7 +728,7 @@
             values: map(lastStepSelections, (data) => {
               return {
                 title: data.name || data.title || 'N/A',
-                value: data.base_price_show || 'N/A',
+                value: data.basePrice_show || 'N/A',
               }
             }),
           }
