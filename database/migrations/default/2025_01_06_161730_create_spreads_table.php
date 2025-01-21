@@ -14,9 +14,10 @@ class CreateSpreadsTable extends Migration
         if(! Schema::hasTable($modularitySpreadsTable)){
             Schema::create($modularitySpreadsTable, function (Blueprint $table) {
                 createDefaultTableFields($table);
-                $table->string('spreadable_type');
-                $table->{unusualIntegerMethod()}('spreadable_id')->nullable()->unsigned();
-                $table->json('json')->default(new Expression('(JSON_ARRAY())'));
+                // $table->string('spreadable_type');
+                // $table->{unusualIntegerMethod()}('spreadable_id')->nullable()->unsigned();
+                $table->uuidMorphs('spreadable');
+                $table->json('content')->default(new Expression('(JSON_ARRAY())'));
                 // $table->uuidMorphs('chatable');
                 $table->timestamps();
                 $table->softDeletes();

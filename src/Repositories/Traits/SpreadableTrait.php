@@ -2,10 +2,6 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Request;
-use Oobook\Priceable\Models\Price;
-
 trait SpreadableTrait
 {
     protected function beforeSaveSpreadTrait($object, $fields)
@@ -18,7 +14,7 @@ trait SpreadableTrait
         // if (!$spreadableModel) {
         //     return;
         // }
-        $currentJson = $spreadableModel->json;
+        $currentJson = $spreadableModel->content;
         $newJson = array_merge($currentJson, $fields['_spread'] ?? []);
         // Update the spreadable JSON
 

@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Oobook\Database\Eloquent\Concerns\ManageEloquent;
-use Unusualify\Modularity\Entities\Spread;
 
 trait HasSpreadable
 {
@@ -23,7 +22,7 @@ trait HasSpreadable
             } else if($model->_spread) {
                 // Handle existing spread updates
                 $model->spreadable()->update([
-                    'json' => $model->_spread
+                    'content' => $model->_spread
                 ]);
             }
 
@@ -39,7 +38,7 @@ trait HasSpreadable
             // dd('text');
             // dd($model);
             if ($model->spreadable) {
-                $jsonData = $model->spreadable->json ?? [];
+                $jsonData = $model->spreadable->content ?? [];
 
                 // Set spreadable attributes on model, excluding protected attributes
                 foreach ($jsonData as $key => $value) {
@@ -65,6 +64,7 @@ trait HasSpreadable
     {
         $this->mergeFillable(['_spread']);
     }
+
     //TODO: rename relation to spread as well
     public function spreadable(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
