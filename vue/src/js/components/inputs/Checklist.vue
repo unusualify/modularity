@@ -157,7 +157,7 @@
 <script>
   import { computed } from 'vue'
   import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
-
+  import { cloneDeep } from 'lodash-es'
   export default {
     name: 'v-input-checklist',
     emits: [...makeInputEmits],
@@ -261,12 +261,22 @@
             }
           }
           if(mandatoryItems.length > 0){
+            // Check if mandatory items were not in previous input
+            const previous = cloneDeep(input)
+            const previousInput = Array.isArray(previous) ? previous : []
+            const mandatoryItemsIds = mandatoryItems.map(item => item[props.itemValue])
+            const missingMandatoryItems = mandatoryItemsIds.filter(id => !previousInput.includes(id))
             input = [
               ...new Set([
                 ...(Array.isArray(input) ? input : []),
-                ...mandatoryItems.map((item) => item[props.itemValue])
+                ...mandatoryItemsIds
               ])
             ]
+
+            if (missingMandatoryItems.length > 0) {
+              context.emit('update:modelValue', input)
+            }
+
           }
         }
 
