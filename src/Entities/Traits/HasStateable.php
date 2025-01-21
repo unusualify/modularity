@@ -253,21 +253,24 @@ trait HasStateable
             ->toArray();
     }
 
-    public static function getStateableFilterList()
+    public static function defaultStateables($scopes = [])
     {
         $defaultStates = self::getDefaultStates();
         $defaultStateCodes = array_column($defaultStates, 'code');
 
         return State::whereIn('code', $defaultStateCodes)
             ->get()
-            ->map(function ($state) {
+            ->map(function ($state) use ($scopes) {
                 $studlyCode = Str::studly($state->code);
+
+                $number = static::handleScopes(static::query(), $scopes)
+                    ->stateableCount($state->code);
 
                 return [
                     'name' => $state->name ?? $state->translations->first()->name,
                     'code' => $state->code,
                     'slug' => "stateable{$studlyCode}",
-                    'number' => self::stateableCount($state->code),
+                    'number' => $number,
                     // 'number' => static::query()->where('stateable', $state->code)->count(),
                 ];
             })
