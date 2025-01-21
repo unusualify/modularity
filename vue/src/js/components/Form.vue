@@ -255,11 +255,11 @@
 
 <script>
   import { computed, provide } from 'vue'
-  import { mapState } from 'vuex'
+  import { mapState, useStore } from 'vuex'
   import { FORM, ALERT } from '@/store/mutations/index'
   import ACTIONS from '@/store/actions'
   import api from '@/store/api/form'
-  import { useInputHandlers, useValidation, useLocale } from '@/hooks'
+  import { useInputHandlers, useValidation, useLocale, useItemActions } from '@/hooks'
 
   import { useI18n } from 'vue-i18n'
 
@@ -370,20 +370,28 @@
       }
     },
     setup (props, context) {
+      const store = useStore()
       const inputHandlers = useInputHandlers()
       const validations = useValidation(props)
       const locale = useLocale()
-
       const { t, te } = useI18n({ useScope: 'global' })
 
       const buttonDefaultText = computed(() => props.buttonText ? (te(props.buttonText) ? t(props.buttonText) : props.buttonText) : t('submit'))
 
 
+      const editedItem = computed(() => store.state.form.editedItem)
+      const serverValid = computed(() => store.state.form.serverValid)
+
+      const itemActions = useItemActions(props, {...context, item: editedItem.value})
+
       return {
+        buttonDefaultText,
+        editedItem,
+        serverValid,
+        ...itemActions,
         ...inputHandlers,
         ...validations,
         ...locale,
-        buttonDefaultText
       }
     },
     data () {
@@ -599,12 +607,12 @@
       computedActions() {
         return __isObject(this.actions) ? Object.values(this.actions) : this.actions;
       },
-      ...mapState({
-        editedItem: state => state.form.editedItem,
-        serverValid: state => state.form.serverValid
-        // loading: state => state.form.loading,
-        // errors: state => state.form.errors
-      })
+      // ...mapState({
+      //   editedItem: state => state.form.editedItem,
+      //   serverValid: state => state.form.serverValid
+      //   // loading: state => state.form.loading,
+      //   // errors: state => state.form.errors
+      // })
     },
 
     methods: {
@@ -846,185 +854,6 @@
         const item = topInput.items.find(item => item[topInput.itemValue] ===  (this.$isset(this.model[topInput.name]) ? this.model[topInput.name] : -1))
         return item ? item[topInput.itemTitle] : topInput.label
       },
-      shouldShowAction(action) {
-        // Base condition for editing/creating
-        const baseCondition = this.isEditing ? action.editable : action.creatable;
-
-        // If no conditions defined, return base condition
-        if (!action.conditions) {
-          return baseCondition;
-        }
-
-        // Check all conditions
-        return baseCondition && action.conditions.every(condition => {
-          const [path, operator, value] = condition;
-          const actualValue = this.getNestedValue(this.editedItem, path);
-
-          switch (operator) {
-            case '=':
-            case '==':
-              return actualValue === value;
-            case '!=':
-              return actualValue !== value;
-            case '>':
-              return actualValue > value;
-            case '<':
-              return actualValue < value;
-            case '>=':
-              return actualValue >= value;
-            case '<=':
-              return actualValue <= value;
-            case 'in':
-              return Array.isArray(value) && value.includes(actualValue);
-            case 'not in':
-              return Array.isArray(value) && !value.includes(actualValue);
-            case 'exists':
-              return actualValue !== undefined && actualValue !== null;
-            default:
-              console.warn(`Unknown operator: ${operator}`);
-              return false;
-          }
-        });
-      },
-
-      // Helper method to get nested object values using dot notation
-      getNestedValue(obj, path) {
-        return path.split('.').reduce((current, part) => {
-          return current && current[part] !== undefined ? current[part] : undefined;
-        }, obj);
-      },
-
-      handleAction(action) {
-        if (!action.type) {
-          console.warn('Action type not specified:', action);
-          return;
-        }
-
-        __log(action)
-
-        // Replace any URL parameters
-        const endpoint = action.endpoint?.replace(':id', this.editedItem.id);
-
-        switch (action.type) {
-          case 'request':
-            this.handleRequestAction(action, endpoint);
-            break;
-
-          case 'modal':
-            this.handleModalAction(action, endpoint);
-            break;
-
-          case 'download':
-            this.handleDownloadAction(endpoint);
-            break;
-
-          default:
-            console.warn('Unknown action type:', action.type);
-        }
-      },
-
-      handleRequestAction(action, endpoint) {
-        if (!endpoint) {
-          console.error('Endpoint not specified for request action');
-          return;
-        }
-
-        const method = action.method?.toLowerCase() || 'post';
-        if (!api[method]) {
-          console.error('Invalid request method:', method);
-          return;
-        }
-
-        // Prepare parameters
-        const params = {};
-
-        // Process each parameter based on its configuration
-        for (const [key, config] of Object.entries(action.params)) {
-          if (typeof config === 'object' && config !== null) {
-            const value = this.resolveParamValue(config);
-            if (value === undefined) {
-              console.error(`Could not resolve parameter value for ${key}`);
-              return;
-            }
-            params[key] = value;
-          } else {
-            params[key] = config;
-          }
-        }
-
-        api[method](endpoint, params,
-          (response) => {
-            // __log('handleRequestAction', response)
-            if (response.data.message) {
-              this.$store.commit(ALERT.SET_ALERT, {
-                message: response.data.message,
-                variant: response.data.variant
-              });
-            }
-            this.$emit('actionComplete', { action, response });
-          },
-          (error) => {
-            this.$store.commit(ALERT.SET_ALERT, {
-              message: error.data?.message || 'Action failed',
-              variant: 'error'
-            });
-          }
-        );
-      },
-
-      resolveParamValue(config) {
-        if (!config.source || !config.find || !config.return) {
-          return config;
-        }
-
-        const sourceData = this.editedItem[config.source];
-        if (!Array.isArray(sourceData)) {
-          return undefined;
-        }
-
-        const [findKey, findValue] = config.find;
-        const item = sourceData.find(item => item[findKey] === findValue);
-
-        return item ? item[config.return] : undefined;
-      },
-
-      handleModalAction(action, endpoint) {
-        // Assuming you have a modal system
-        this.$store.commit('SET_MODAL', {
-          show: true,
-          title: action.label,
-          component: 'ue-form',
-          props: {
-            schema: action.schema,
-            actionUrl: endpoint,
-            async: true
-          },
-          on: {
-            success: (response) => {
-              this.$store.commit(ALERT.SET_ALERT, {
-                message: response.message || 'Action completed successfully',
-                variant: 'success'
-              });
-              this.$emit('action-complete', { action, response });
-            }
-          }
-        });
-      },
-
-      handleDownloadAction(endpoint) {
-        if (!endpoint) {
-          console.error('Endpoint not specified for download action');
-          return;
-        }
-
-        // Create a temporary link and trigger download
-        const link = document.createElement('a');
-        link.href = endpoint;
-        link.target = '_blank';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
     }
   }
 </script>
