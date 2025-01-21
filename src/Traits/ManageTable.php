@@ -125,7 +125,7 @@ trait ManageTable
         if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasStateable')) {
             $statusFilters = array_merge(
                 $statusFilters,
-                $this->repository->getModel()->getStateableFilterList(),
+                $this->repository->getStateableFilterList(),
             );
         }
 
