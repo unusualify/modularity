@@ -1,2 +1,0 @@
-import{Z as a}from"../js/vendor.BwyRT0YL.js";import{f as r,U as e,s,r as m}from"../js/form.D3PG0pWn.js";import{d as i,U as p}from"../js/datatable.D0II_fBl.js";import"../js/awesome-phonenumber.CPpBdrPW.js";import"../js/fine-uploader.C8t-Jhyu.js";import"../js/vuetify.c0XAB6Gn.js";const t=s;t.registerModule("datatable",i);t.registerModule("form",r);const o=a({store:t,mixins:[m]});o.use(e);o.component("ue-datatable",p);o.mount("#admin");
-//# sourceMappingURL=core-index.CJ8tYo4D.js.map
