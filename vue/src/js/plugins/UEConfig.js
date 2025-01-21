@@ -30,6 +30,7 @@ import SvgSprite from '@/directives/svg'
 import Column from '@/directives/column'
 import FitGrid from '@/directives/fit-grid'
 import Scrollable from '@/directives/scrollable'
+import Transition from '@/directives/transition'
 import commonMethods from '@/utils/commonMethods'
 import { ALERT } from '../store/mutations'
 
@@ -189,7 +190,7 @@ export default {
     app.use(Column)
     app.use(FitGrid)
     app.use(Scrollable)
-
+    app.use(Transition)
     app.provide('$app', app)
   }
 }
