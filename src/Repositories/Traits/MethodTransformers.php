@@ -319,6 +319,7 @@ trait MethodTransformers
         }
 
         $_scopes = $scopes;
+
         foreach ($_scopes as $column => $value) {
             $studlyColumn = studlyName($column);
 
@@ -363,6 +364,7 @@ trait MethodTransformers
                 unset($scopes[$column]);
             }
         }
+
         foreach ($scopes as $column => $value) {
             $studlyColumn = studlyName($column);
             $studlyValue = studlyName($value);
@@ -393,10 +395,6 @@ trait MethodTransformers
             }
         }
 
-        // dd(
-        //     $scopes,
-        //     $query->toSql()
-        // );
         return $query;
     }
 
@@ -420,11 +418,7 @@ trait MethodTransformers
         }
 
         foreach ($scopes as $column => $value) {
-            // dd(
-            //     $column,
-            //     ucfirst($column),
-            //     method_exists($this->model, 'scope' . ucfirst($column))
-            // );
+
             if (method_exists($this->model, 'scope' . ucfirst($column))) {
                 $query->$column();
             } else {
