@@ -954,14 +954,14 @@ const FormatFuncs = {
       }
 
       let inputToPrepended = _.get(schema, inputNotation)
-      // __log(inputNotation, inputToPrepended, schema)
+
       if(!inputToPrepended || !inputToPrepended.schema)
           return
 
       let oldSchema = _.cloneDeep(inputToPrepended.schema);
 
       let prependerInput =  __data_get(handlerSchema, setterSchemaKey)
-      // __log(inputNotation, prependerInput)
+
       if(prependerInput && __isset(prependerInput.schema)){
 
         if(Array.isArray(handlerValue)){
@@ -1011,12 +1011,9 @@ const FormatFuncs = {
         }
 
         let updatedSchema =  Object.assign(newSchema, oldSchema)
+
         if(JSON.stringify(inputToPrepended.schema) !== JSON.stringify(updatedSchema)){
-          // __log(inputNotation, '[2].content-merge.schema.["content-merge.wrap-files"].schema')
           _.set(schema, inputNotation + '.schema', updatedSchema)
-          // __log(inputNotation)
-          // _.set(schema, '[2].content-merge.schema.["content-merge.wrap-files"].schema', newSchema)
-          // __log(inputNotation + '.schema', _.get(schema, inputNotation + '.schema'))
         }
 
       }
