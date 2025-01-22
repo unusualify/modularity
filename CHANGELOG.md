@@ -2,6 +2,28 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.25.0 - 2025-01-22
+
+### :rocket: Features
+
+- :sparkles: add published status toggle to input types configuration by @OoBook in https://github.com/unusualify/modularity/commit/15b7da07bf9317da337dc8da5315619665948092
+- :sparkles: enhance form component with switch inputs for better user interaction by @OoBook in https://github.com/unusualify/modularity/commit/97bb857f83167e82de62332ce43a10d7c8576c3d
+
+### :recycle: Refactors
+
+- :recycle: enhance array_merge_recursive_preserve function for improved flexibility by @OoBook in https://github.com/unusualify/modularity/commit/339c1e9eeb58b7515663cf5eb1aeea208c3b704b
+- :recycle: optimize translation field handling in TranslationsTrait by @OoBook in https://github.com/unusualify/modularity/commit/9cf7655eb750718d64c48570c01618f7e4eed5cd
+- :recycle: streamline table order management in ManageScopes trait by @OoBook in https://github.com/unusualify/modularity/commit/43ed1f7896100150b85a37b3ee2f190d39890280
+
+### :lipstick: Styling
+
+- lint coding styles for v0.25.0 by @OoBook in https://github.com/unusualify/modularity/commit/3839a76ddac516d93e75e038cf4cd4061274eb8b
+
+### :package: Build
+
+- update build artifacts for v0.24.1 by @invalid-email-address in https://github.com/unusualify/modularity/commit/95ef52136c3617bbb83b9400afaf8cbaa923fe78
+- update build artifacts for v0.25.0 by @OoBook in https://github.com/unusualify/modularity/commit/0b57543880207984eae812486a6152b1c53a37fd
+
 ## v0.24.1 - 2025-01-21
 
 ### :wrench: Bug Fixes
