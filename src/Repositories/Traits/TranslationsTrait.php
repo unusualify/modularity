@@ -34,6 +34,7 @@ trait TranslationsTrait
             foreach ($attributes as $attribute) {
                 if (isset($fields[$attribute]) || isset($translationsFields[$attribute])) {
                     $hasTranslationFields = true;
+
                     break;
                 }
             }
