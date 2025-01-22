@@ -38,7 +38,13 @@
                       :location="action.tooltipLocation ?? 'top'"
                     >
                       <template v-slot:activator="{ props }">
+                        <v-switch
+                          v-if="action.type === 'publish'"
+                          :modelValue="editedItem[action.key ?? 'published'] ?? action.default ?? false"
+                          @update:modelValue="handleAction(action)"
+                        />
                         <v-btn
+                          v-else
                           :icon="!action.forceLabel ? action.icon : null"
                           :text="action.forceLabel ? action.label : null"
                           :color="action.color"
@@ -92,7 +98,14 @@
               <!-- Input events-->
               <template v-if="topSchema && topSchema.length">
                 <template v-for="topInput in topSchema" :key="topInput.name">
-                  <ue-recursive-stuff v-if="topInput.viewOnlyComponent"
+                  <v-switch
+                    v-if="topInput.type === 'switch'"
+                    v-bind="$lodash.omit(topInput, 'label')"
+                    hide-details
+                    :modelValue="model[topInput.name] ?? topInput.default ?? false"
+                    @update:modelValue="model[topInput.name] = $event"
+                  />
+                  <ue-recursive-stuff v-else-if="topInput.viewOnlyComponent"
                     :configuration="topInput.viewOnlyComponent"
                     :bind-data="editedItem"
                   />

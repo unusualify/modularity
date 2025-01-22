@@ -74,4 +74,10 @@ return [
             'appendInner' => 'password',
         ],
     ],
+    '_published' => [
+        'type' => 'switch',
+        'name' => 'published',
+        'label' => 'Status',
+        'default' => true,
+    ],
 ];

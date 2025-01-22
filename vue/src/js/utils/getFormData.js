@@ -498,7 +498,7 @@ const slugify = (newValue) => {
 export const isTopEventInput = (input) => {
   return Object.prototype.hasOwnProperty.call(input, 'topEvent')
     && input.topEvent
-    && ( ['select', 'autocomplete', 'combobox'].includes(input.type) || __isset(input.viewOnlyComponent) )
+    && ( ['select', 'autocomplete', 'combobox', 'switch'].includes(input.type) || __isset(input.viewOnlyComponent) )
 }
 
 const isViewOnlyInput = (input) => {
