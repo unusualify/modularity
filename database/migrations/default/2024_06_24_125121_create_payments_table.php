@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $paymentsTable = unusualConfig('payable.tables.payments', 'umod_payments');
+        $paymentsTable = config('payable.tables.payments', 'umod_payments');
         // dd($paymentsTable);
         Schema::create($paymentsTable, function (Blueprint $table) {
             $table->id();
