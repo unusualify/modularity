@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use TimoKoerber\LaravelOneTimeOperations\OneTimeOperation;
+use Unusualify\Modularity\Facades\Modularity;
 
 return new class extends OneTimeOperation
 {
@@ -35,7 +36,6 @@ return new class extends OneTimeOperation
      */
     public function process(): void
     {
-
         if (! Schema::hasTable('umod_payments')
             && Schema::hasTable('unfy_payments')) {
 
@@ -50,8 +50,9 @@ return new class extends OneTimeOperation
         }else {
 
             Artisan::call('migrate', [
-                '--path' => 'vendor/unusualify/modularity/database/migrations/default/2024_06_24_125121_create_payments_table.php'
+                '--path' => Modularity::getVendorPath('database/migrations/default/2024_06_24_125121_create_payments_table.php')
             ]);
+
             $this->info("\tumod_payments created");
 
         }
