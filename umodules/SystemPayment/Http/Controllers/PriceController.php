@@ -125,7 +125,7 @@ class PriceController extends Controller
                     ],
                 ]));
         } else {
-            // dd($request->custom_fields['previous_url']);
+            // dd($request->custom_fields);
             return redirect(merge_url_query($request->custom_fields['previous_url'],
                 [
                     'customModal' => [
