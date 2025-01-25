@@ -320,7 +320,8 @@ class BaseServiceProvider extends ServiceProvider
     {
         // LOAD BASE MIGRATIONS
         $this->loadMigrationsFrom(
-            get_modularity_vendor_path('database/migrations/default')
+            // get_modularity_vendor_path('database/migrations/default')
+            \Unusualify\Modularity\Facades\Modularity::getVendorPath('database/migrations/default')
         );
     }
 
