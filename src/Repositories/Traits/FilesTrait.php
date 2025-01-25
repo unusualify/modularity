@@ -189,7 +189,7 @@ trait FilesTrait
 
                 if (in_array($role, $this->model->filesColumns ?? [])
                     || in_array($role, $this->setColumnsFilesTrait() ?: [])
-                    || in_array($role, unusualConfig('block_editor.files', []))) {
+                    || in_array($role, modularityConfig('block_editor.files', []))) {
 
                     Collection::make($filesForRole)->each(function ($file) use (&$files, $role, $locale) {
                         $files->push([

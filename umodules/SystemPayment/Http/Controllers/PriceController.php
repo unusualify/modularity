@@ -43,7 +43,7 @@ class PriceController extends Controller
         if ($params['payment_service']['payment_method'] == -1) {
 
             $currency = $price->currency->iso_4217;
-            $paymentServiceName = unusualConfig('payment.currency_services' . ".{$currency}");
+            $paymentServiceName = modularityConfig('payment.currency_services' . ".{$currency}");
             $payment = new Payable($paymentServiceName);
             $paymentService = PaymentService::where('name', $paymentServiceName)->first();
             // dd($paymentServiceName);

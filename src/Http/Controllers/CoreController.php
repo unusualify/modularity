@@ -60,7 +60,7 @@ abstract class CoreController extends LaravelController
 
     public function __construct(Request $request)
     {
-        $this->baseKey = unusualBaseKey();
+        $this->baseKey = modularityBaseKey();
 
         $this->request = $request;
 

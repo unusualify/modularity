@@ -9,16 +9,13 @@ class CreateSpreadsTable extends Migration
 {
     public function up()
     {
-        $modularitySpreadsTable = unusualConfig('tables.spreads', 'modularity_spreads');
+        $modularitySpreadsTable = modularityConfig('tables.spreads', 'modularity_spreads');
 
         if (! Schema::hasTable($modularitySpreadsTable)) {
             Schema::create($modularitySpreadsTable, function (Blueprint $table) {
                 createDefaultTableFields($table);
-                // $table->string('spreadable_type');
-                // $table->{unusualIntegerMethod()}('spreadable_id')->nullable()->unsigned();
                 $table->uuidMorphs('spreadable');
                 $table->json('content')->default(new Expression('(JSON_ARRAY())'));
-                // $table->uuidMorphs('chatable');
                 $table->timestamps();
                 $table->softDeletes();
             });
@@ -29,6 +26,6 @@ class CreateSpreadsTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists(unusualConfig('tables.spreads', 'modularity_spreads'));
+        Schema::dropIfExists(modularityConfig('tables.spreads', 'modularity_spreads'));
     }
 }

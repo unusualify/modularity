@@ -21,7 +21,7 @@ trait ReplacementTrait
      */
     public function getFiles()
     {
-        return Config::get(unusualBaseKey() . '.stubs.files');
+        return Config::get(modularityBaseKey() . '.stubs.files');
     }
 
     /**
@@ -41,7 +41,7 @@ trait ReplacementTrait
      */
     public function getReplacements()
     {
-        return Config::get(unusualBaseKey() . '.stubs.replacements');
+        return Config::get(modularityBaseKey() . '.stubs.replacements');
     }
 
     /**
@@ -157,7 +157,7 @@ trait ReplacementTrait
      */
     protected function getVendorReplacement()
     {
-        return unusualConfig('composer.vendor');
+        return modularityConfig('composer.vendor');
     }
 
     /**
@@ -177,7 +177,7 @@ trait ReplacementTrait
      */
     protected function getAuthorReplacement()
     {
-        return unusualConfig('composer.author.name');
+        return modularityConfig('composer.author.name');
     }
 
     /**
@@ -187,6 +187,6 @@ trait ReplacementTrait
      */
     protected function getAuthorEmailReplacement()
     {
-        return unusualConfig('composer.author.email');
+        return modularityConfig('composer.author.email');
     }
 }

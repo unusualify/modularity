@@ -64,8 +64,8 @@ class ResetPasswordController extends Controller
         $this->viewFactory = $viewFactory;
         $this->config = $config;
 
-        $this->redirectTo = $this->config->get(unusualBaseKey() . '.auth_login_redirect_path', '/');
-        $this->middleware('unusual_guest');
+        $this->redirectTo = $this->config->get(modularityBaseKey() . '.auth_login_redirect_path', '/');
+        $this->middleware('modularity.guest');
     }
 
     /**
@@ -133,7 +133,7 @@ class ResetPasswordController extends Controller
         // call exists on the Password repository to check for token expiration (default 1 hour)
         // otherwise redirect to the ask reset link form with error message
         if ($user && Password::broker('users')->getRepository()->exists($user, $token)) {
-            return $this->viewFactory->make(unusualBaseKey() . '::auth.passwords.reset')->with([
+            return $this->viewFactory->make(modularityBaseKey() . '::auth.passwords.reset')->with([
                 'token' => $token,
                 'email' => $user->email,
 
@@ -215,7 +215,7 @@ class ResetPasswordController extends Controller
 
         // we don't call exists on the Password repository here because we don't want to expire the token for welcome emails
         if ($user) {
-            return $this->viewFactory->make(unusualBaseKey() . '::auth.passwords.reset')->with([
+            return $this->viewFactory->make(modularityBaseKey() . '::auth.passwords.reset')->with([
                 'token' => $token,
                 'email' => $user->email,
                 'welcome' => true,
@@ -299,7 +299,7 @@ class ResetPasswordController extends Controller
 
     public function success()
     {
-        return view(unusualBaseKey() . '::auth.success', [
+        return view(modularityBaseKey() . '::auth.success', [
             'taskState' => [
                 'status' => 'success',
                 'title' => __('authentication.password-sent'),

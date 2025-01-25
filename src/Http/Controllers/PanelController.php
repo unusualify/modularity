@@ -214,7 +214,7 @@ abstract class PanelController extends CoreController
         Application $app,
         Request $request
     ) {
-        // if (unusualConfig('bind_exception_handler', true)) {
+        // if (modularityConfig('bind_exception_handler', true)) {
         //     App::singleton(ExceptionHandler::class, ModularityHandler::class);
         // }
 
@@ -516,7 +516,7 @@ abstract class PanelController extends CoreController
     {
         $snakeCase = $this->getSnakeCase($this->moduleName);
 
-        return array_to_object(Config::get(unusualBaseKey() . '.system_modules.' . $snakeCase) ?: Config::get($snakeCase));
+        return array_to_object(Config::get(modularityBaseKey() . '.system_modules.' . $snakeCase) ?: Config::get($snakeCase));
     }
 
     /**
@@ -533,7 +533,7 @@ abstract class PanelController extends CoreController
         if ($this->request->route() != null) {
             $routePrefix = ltrim(
                 str_replace(
-                    Config::get(unusualBaseKey() . '.admin_app_path'), // TODO uri segment control
+                    Config::get(modularityBaseKey() . '.admin_app_path'), // TODO uri segment control
                     '',
                     $this->request->route()->getPrefix()
                 ),

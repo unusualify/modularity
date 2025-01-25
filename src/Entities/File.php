@@ -25,12 +25,12 @@ class File extends Model
 
     public function canDeleteSafely()
     {
-        return DB::table(unusualConfig('tables.fileables', 'unusual_fileables'))->where('file_id', $this->id)->count() === 0;
+        return DB::table(modularityConfig('tables.fileables'))->where('file_id', $this->id)->count() === 0;
     }
 
     public function scopeUnused($query)
     {
-        $usedIds = DB::table(unusualConfig('tables.fileables'))->get()->pluck('file_id');
+        $usedIds = DB::table(modularityConfig('tables.fileables'))->get()->pluck('file_id');
 
         return $query->whereNotIn('id', $usedIds->toArray())->get();
     }
@@ -49,6 +49,6 @@ class File extends Model
 
     public function getTable()
     {
-        return unusualConfig('tables.files', parent::getTable());
+        return modularityConfig('tables.files', parent::getTable());
     }
 }

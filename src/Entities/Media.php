@@ -26,11 +26,11 @@ class Media extends Model
 
     public function __construct(array $attributes = [])
     {
-        $this->fillable(array_merge($this->fillable, Collection::make(unusualConfig('media_library.extra_metadatas_fields', []))->map(function ($field) {
+        $this->fillable(array_merge($this->fillable, Collection::make(modularityConfig('media_library.extra_metadatas_fields', []))->map(function ($field) {
             return $field['name'];
         })->toArray()));
 
-        Collection::make(unusualConfig('media_library.translatable_metadatas_fields', []))->each(function ($field) {
+        Collection::make(modularityConfig('media_library.translatable_metadatas_fields', []))->each(function ($field) {
             $this->casts[$field] = 'json';
         });
 
@@ -39,7 +39,7 @@ class Media extends Model
 
     public function scopeUnused($query)
     {
-        $usedIds = DB::table(unusualConfig('tables.mediables'))->get()->pluck('media_id');
+        $usedIds = DB::table(modularityConfig('tables.mediables'))->get()->pluck('media_id');
 
         return $query->whereNotIn('id', $usedIds->toArray())->get();
     }
@@ -61,12 +61,12 @@ class Media extends Model
 
     public function canDeleteSafely()
     {
-        return DB::table(unusualConfig('tables.mediables', 'unusual_mediables'))->where('media_id', $this->id)->count() === 0;
+        return DB::table(modularityConfig('tables.mediables'))->where('media_id', $this->id)->count() === 0;
     }
 
     public function isReferenced()
     {
-        return DB::table(unusualConfig('tables.mediables', 'unusual_mediables'))->where('media_id', $this->id)->count() > 0;
+        return DB::table(modularityConfig('tables.mediables'))->where('media_id', $this->id)->count() > 0;
     }
 
     public function mediableFormat()
@@ -93,7 +93,7 @@ class Media extends Model
                     'caption' => $this->caption,
                     'altText' => $this->alt_text,
                     'video' => null,
-                ] + Collection::make(unusualConfig('media_library.extra_metadatas_fields', []))->mapWithKeys(function ($field) {
+                ] + Collection::make(modularityConfig('media_library.extra_metadatas_fields', []))->mapWithKeys(function ($field) {
                     return [
                         $field['name'] => $this->{$field['name']},
                     ];
@@ -118,7 +118,7 @@ class Media extends Model
 
         $fallbackLocale = config('translatable.fallback_locale');
 
-        if (in_array($name, unusualConfig('media_library.translatable_metadatas_fields', [])) && config('translatable.use_property_fallback', false) && ($metadatas->$name->$fallbackLocale ?? false)) {
+        if (in_array($name, modularityConfig('media_library.translatable_metadatas_fields', [])) && config('translatable.use_property_fallback', false) && ($metadatas->$name->$fallbackLocale ?? false)) {
             return $metadatas->$name->$fallbackLocale;
         }
 
@@ -126,7 +126,7 @@ class Media extends Model
 
         $fallback = $fallback ?? $name;
 
-        if (in_array($fallback, unusualConfig('media_library.translatable_metadatas_fields', []))) {
+        if (in_array($fallback, modularityConfig('media_library.translatable_metadatas_fields', []))) {
             $fallbackValue = $fallbackValue[$language] ?? '';
 
             if ($fallbackValue === '' && config('translatable.use_property_fallback', false)) {
@@ -147,7 +147,7 @@ class Media extends Model
         $prevWidth = $this->width;
 
         if ($this->update($fields) && $this->isReferenced()) {
-            DB::table(unusualConfig('tables.mediables', 'unusual_mediables'))->where('media_id', $this->id)->get()->each(function ($mediable) use ($prevWidth, $prevHeight) {
+            DB::table(modularityConfig('tables.mediables'))->where('media_id', $this->id)->get()->each(function ($mediable) use ($prevWidth, $prevHeight) {
 
                 if ($prevWidth != $this->width) {
                     $mediable->crop_x = 0;
@@ -159,7 +159,7 @@ class Media extends Model
                     $mediable->crop_h = $this->height;
                 }
 
-                DB::table(unusualConfig('tables.mediables', 'unusual_mediables'))->where('id', $mediable->id)->update((array) $mediable);
+                DB::table(modularityConfig('tables.mediables'))->where('id', $mediable->id)->update((array) $mediable);
             });
         }
     }
@@ -175,6 +175,6 @@ class Media extends Model
 
     public function getTable()
     {
-        return unusualConfig('tables.medias', parent::getTable());
+        return modularityConfig('tables.medias', parent::getTable());
     }
 }

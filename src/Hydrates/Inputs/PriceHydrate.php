@@ -45,10 +45,10 @@ class PriceHydrate extends InputHydrate
 
         $query = Currency::query()->select(['id', 'symbol as name', 'iso_4217 as iso']);
 
-        $onlyBaseCurrency = unusualConfig('services.currency_exchange.active');
+        $onlyBaseCurrency = modularityConfig('services.currency_exchange.active');
 
         if ($onlyBaseCurrency) {
-            $baseCurrency = unusualConfig('services.currency_exchange.base_currency');
+            $baseCurrency = modularityConfig('services.currency_exchange.base_currency');
             $query = $query->where('iso_4217', mb_strtoupper($baseCurrency));
         }
 

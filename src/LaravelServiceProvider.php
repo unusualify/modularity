@@ -41,8 +41,8 @@ final class LaravelServiceProvider extends ServiceProvider
     private function publishConfigs(): void
     {
         $this->publishes([
-            __DIR__ . '/../config/publishes/publish.php' => config_path(unusualBaseKey() . '.php'),
-            __DIR__ . '/../config/publishes/navigation-publish.php' => config_path(unusualBaseKey() . '-navigation.php'),
+            __DIR__ . '/../config/publishes/publish.php' => config_path(modularityBaseKey() . '.php'),
+            __DIR__ . '/../config/publishes/navigation-publish.php' => config_path(modularityBaseKey() . '-navigation.php'),
             __DIR__ . '/../config/publishes/translatable.php' => config_path('translatable.php'),
             __DIR__ . '/../config/publishes/translation.php' => config_path('translation.php'),
             __DIR__ . '/../config/publishes/one-time-operations.php' => config_path('one-time-operations.php'),
@@ -72,7 +72,7 @@ final class LaravelServiceProvider extends ServiceProvider
     private function publishResources(): void
     {
         $this->publishes([
-            __DIR__ . '/../vue/drafts/components' => resource_path(unusualConfig('custom_components_resource_path', 'vendor/modularity/js/components')),
+            __DIR__ . '/../vue/drafts/components' => resource_path(modularityConfig('custom_components_resource_path', 'vendor/modularity/js/components')),
         ], 'custom-components');
     }
 

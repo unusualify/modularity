@@ -32,7 +32,7 @@ class ImpersonateMiddleware
             $this->authFactory->guard(Modularity::getAuthGuardName())->onceUsingId($request->session()->get('impersonate'));
         }
 
-        view()->composer(unusualBaseKey() . '::layouts.master', function ($view) {
+        view()->composer(modularityBaseKey() . '::layouts.master', function ($view) {
             $userRepository = app()->make(\Modules\SystemUser\Repositories\UserRepository::class);
             $users = $userRepository->whereNot('id', 1)->get();
 

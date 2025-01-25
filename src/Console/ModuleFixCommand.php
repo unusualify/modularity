@@ -56,6 +56,6 @@ class ModuleFixCommand extends BaseCommand
         return array_merge([
             ['migration', null, InputOption::VALUE_NONE, 'Fix will create migrations'],
 
-        ], unusualTraitOptions());
+        ], modularityTraitOptions());
     }
 }

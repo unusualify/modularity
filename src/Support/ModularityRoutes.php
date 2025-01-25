@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Support;
 
 use Illuminate\Support\Facades\Route;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Middleware\AuthenticateMiddleware;
 use Unusualify\Modularity\Http\Middleware\AuthorizationMiddleware;
 use Unusualify\Modularity\Http\Middleware\CompanyRegistrationMiddleware;
@@ -12,17 +13,12 @@ use Unusualify\Modularity\Http\Middleware\LanguageMiddleware;
 use Unusualify\Modularity\Http\Middleware\NavigationMiddleware;
 use Unusualify\Modularity\Http\Middleware\RedirectIfAuthenticatedMiddleware;
 
-class UnusualRoutes
+class ModularityRoutes
 {
     public $counter = 1;
 
     private $defaultMiddlewares = [
-        'unusual.core',
-        // 'language',
-        // 'impersonate',
-
-        // 'unusual_auth:unusual_users',
-        // 'auth',
+        'modularity.core',
     ];
 
     public function registerRoutes(
@@ -56,7 +52,7 @@ class UnusualRoutes
 
                 $router->group(
                     $groupOptions + [
-                        // 'domain' => unusualConfig('app_url', env('APP_URL')),
+                        // 'domain' => modularityConfig('app_url', env('APP_URL')),
                     ],
                     $hostRoutes
                 );
@@ -80,7 +76,7 @@ class UnusualRoutes
 
     public function configureRoutePatterns(): void
     {
-        if (($patterns = unusualConfig('route_patterns')) != null) {
+        if (($patterns = modularityConfig('route_patterns')) != null) {
             if (is_array($patterns)) {
                 foreach ($patterns as $label => $pattern) {
                     Route::pattern($label, $pattern);
@@ -93,8 +89,8 @@ class UnusualRoutes
     {
         return [
             'as' => adminRouteNamePrefix() . '.',
-            ...(unusualConfig('admin_app_url')
-                ? ['domain' => unusualConfig('admin_app_url')]
+            ...(modularityConfig('admin_app_url')
+                ? ['domain' => modularityConfig('admin_app_url')]
                 : ['prefix' => adminUrlPrefix()]
             ),
 
@@ -114,7 +110,7 @@ class UnusualRoutes
         return [
             ...['web.auth'],
             ...$this->defaultMiddlewares,
-            ...['unusual.panel'],
+            ...['modularity.panel'],
         ];
     }
 
@@ -139,27 +135,36 @@ class UnusualRoutes
         return $this->defaultMiddlewares;
     }
 
+    public function defaultPanelMiddlewares(): array
+    {
+        return [
+            'modularity.panel',
+        ];
+    }
+
     public function generateRouteMiddlewares()
     {
 
-        Route::aliasMiddleware('unusual_auth', AuthenticateMiddleware::class);
-        Route::aliasMiddleware('unusual_guest', RedirectIfAuthenticatedMiddleware::class);
+        Route::aliasMiddleware('modularity.auth', AuthenticateMiddleware::class);
+        Route::aliasMiddleware('modularity.guest', RedirectIfAuthenticatedMiddleware::class);
 
+        $authGuardName = Modularity::getAuthGuardName();
         Route::middlewareGroup('web.auth', [
             'web',
-            'unusual_auth:unusual_users',
+            'modularity.auth:' . $authGuardName,
             // 'auth',
         ]);
         Route::middlewareGroup('api.auth', [
             'api',
-            'unusual_auth:unusual_users',
+            'modularity.auth:' . $authGuardName,
             // 'auth',
         ]);
 
         Route::aliasMiddleware('language', LanguageMiddleware::class);
         Route::aliasMiddleware('impersonate', ImpersonateMiddleware::class);
         Route::aliasMiddleware('navigation', NavigationMiddleware::class);
-        Route::middlewareGroup('unusual.core', [
+
+        Route::middlewareGroup('modularity.core', [
             'language',
             'impersonate',
             'navigation',
@@ -167,7 +172,9 @@ class UnusualRoutes
 
         Route::aliasMiddleware('authorization', AuthorizationMiddleware::class);
         Route::aliasMiddleware('company_registration', CompanyRegistrationMiddleware::class);
-        Route::middlewareGroup('unusual.panel', [
+
+        Route::middlewareGroup('modularity.panel', [
+            // 'modularity.core',
             'authorization',
             'company_registration',
         ]);

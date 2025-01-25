@@ -30,6 +30,6 @@ class Spread extends Model
 
     public function getTable()
     {
-        return unusualConfig('tables.spreads', 'modularity_spreads');
+        return modularityConfig('tables.spreads', 'modularity_spreads');
     }
 }

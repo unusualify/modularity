@@ -318,6 +318,6 @@ class Modularity extends FileRepository
      */
     public function getVendorNamespace($append = null)
     {
-        return concatenate_namespace(unusualConfig('namespace'), $append);
+        return concatenate_namespace(modularityConfig('namespace'), $append);
     }
 }

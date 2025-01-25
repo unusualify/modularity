@@ -1,20 +1,20 @@
 <?php
 
-$media_library_key = unusualBaseKey() . '_media_library';
-$file_library_key = unusualBaseKey() . '_file_library';
+$media_library_key = modularityBaseKey() . '_media_library';
+$file_library_key = modularityBaseKey() . '_file_library';
 
 $localRootPrefix = storage_path('app/public/');
 
 $mediaLocalConfig = [
     'driver' => 'local',
     'visibility' => 'public',
-    'root' => $localRootPrefix . trim(unusualConfig('media_library.local_path'), '/'),
+    'root' => $localRootPrefix . trim(modularityConfig('media_library.local_path'), '/'),
 ];
 
 $fileLocalConfig = [
     'driver' => 'local',
     'visibility' => 'public',
-    'root' => $localRootPrefix . trim(unusualConfig('file_library.local_path'), '/ '),
+    'root' => $localRootPrefix . trim(modularityConfig('file_library.local_path'), '/ '),
 ];
 
 $s3Config = [
@@ -51,6 +51,6 @@ $fileConfigByEndpointType = [
 ];
 
 return [
-    $media_library_key => $mediaConfigByEndpointType[config(unusualBaseKey('media_library.endpoint_type'))],
-    $file_library_key => $fileConfigByEndpointType[config(unusualBaseKey('file_library.endpoint_type'))],
+    $media_library_key => $mediaConfigByEndpointType[config(modularityBaseKey('media_library.endpoint_type'))],
+    $file_library_key => $fileConfigByEndpointType[config(modularityBaseKey('file_library.endpoint_type'))],
 ];

@@ -84,8 +84,8 @@ class LoginController extends Controller
         $this->viewFactory = $viewFactory;
         $this->config = $config;
 
-        $this->middleware('unusual_guest', ['except' => 'logout']);
-        $this->redirectTo = unusualConfig('auth_login_redirect_path', '/');
+        $this->middleware('modularity.guest', ['except' => 'logout']);
+        $this->redirectTo = modularityConfig('auth_login_redirect_path', '/');
     }
 
     /**
@@ -164,7 +164,7 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-        return $this->viewFactory->make(unusualBaseKey() . '::auth.login', [
+        return $this->viewFactory->make(modularityBaseKey() . '::auth.login', [
             'formAttributes' => [
                 // 'hasSubmit' => true,
 
@@ -323,7 +323,7 @@ class LoginController extends Controller
      */
     public function showLogin2FaForm()
     {
-        return $this->viewFactory->make(unusualBaseKey() . '::auth.2fa');
+        return $this->viewFactory->make(modularityBaseKey() . '::auth.2fa');
     }
 
     /**
@@ -425,8 +425,8 @@ class LoginController extends Controller
     public function redirectToProvider($provider, OauthRequest $request)
     {
         return Socialite::driver($provider)
-            ->scopes($this->config->get(unusualBaseKey() . '.oauth.' . $provider . '.scopes', []))
-            ->with($this->config->get(unusualBaseKey() . '.oauth.' . $provider . '.with', []))
+            ->scopes($this->config->get(modularityBaseKey() . '.oauth.' . $provider . '.scopes', []))
+            ->with($this->config->get(modularityBaseKey() . '.oauth.' . $provider . '.with', []))
             ->redirect();
     }
 

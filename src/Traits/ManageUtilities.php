@@ -39,8 +39,8 @@ trait ManageUtilities
             'filters' => $filters,
             'requestFilter' => json_decode(request()->get('filter'), true) ?? [],
             'searchText' => request()->has('search') ? request()->query('search') : '', // for current text of search parameter
-            'headers' => $headers, // headers to be used in unusual datatable component
-            'formSchema' => $this->filterSchemaByRoles($this->formSchema), // input fields to be used in unusual datatable component
+            'headers' => $headers, // headers to be used in modularity datatable component
+            'formSchema' => $this->filterSchemaByRoles($this->formSchema), // input fields to be used in modularity datatable component
         ];
         $data = [
             ...$_deprecated,
@@ -50,7 +50,7 @@ trait ManageUtilities
         $options = [
             'moduleName' => $this->getHeadline($this->moduleName),
             'translate' => $this->routeHas('translations') || $this->hasTranslatedInput(),
-            'listOptions' => $this->getVuetifyDatatableOptions(), // options to be used in unusual table components in datatable store
+            'listOptions' => $this->getVuetifyDatatableOptions(), // options to be used in modularity table components in datatable store
             'tableAttributes' => array_merge(
                 [
                     'rowActions' => $this->getTableActions(),
@@ -271,15 +271,6 @@ trait ManageUtilities
                 'modelValue' => $this->repository->getFormFields($item, $schema),
                 'title' => __(((bool) $itemId ? 'fields.edit-item' : 'fields.new-item'), ['item' => trans_choice('modules.' . snakeCase($this->routeName), 0)]),
                 'isEditing' => $itemId ? true : false,
-                '__removed' => [
-                    // 'title' => ___((!!$itemId ? 'edit-item': 'new-item'), ['item' => $this->routeName]),
-                    // 'schema'  => $schema, // input fields to be used in unusual datatable component
-                    // 'defaultItem' => collect($schema)->mapWithKeys(function($item, $key){
-                    //     return [ $item['name'] => $item['default'] ?? ''];
-                    //     $carry[$key] = $item->default ?? '';
-                    // })->toArray(),
-                    // 'actionUrl' => $itemId ? $this->getModuleRoute($itemId, 'update') : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]),
-                ],
             ], $this->formAttributes),
             'endpoints' => [
                 ((bool) $itemId ? 'update' : 'store') => $itemId
@@ -497,17 +488,6 @@ trait ManageUtilities
         }
 
         return $withs;
-
-        // return collect($this->getConfigFieldsByRoute('modules', []))->filter(function($item){
-        //     return in_array(isset($item->type) ? $item->type : '', [
-        //         'formWrapper'
-        //     ]);
-        // })->map(function($item){
-        //     $item->elements;
-        //     return [
-
-        //     ];
-        // })->toArray();
     }
 
     /**

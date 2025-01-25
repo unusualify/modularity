@@ -20,12 +20,12 @@ class RegisterController extends Controller
     {
         parent::__construct();
 
-        $this->middleware('unusual_guest');
+        $this->middleware('modularity.guest');
     }
 
     public function showLoginForm()
     {
-        return view(unusualBaseKey() . '::auth.register', [
+        return view(modularityBaseKey() . '::auth.register', [
             'formAttributes' => [
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
                 'title' => [
@@ -274,11 +274,7 @@ class RegisterController extends Controller
             'email' => $request['email'],
             'password' => Hash::make($request['password']),
         ]);
-        // Permission::all()->each(function($p){
-        //     $p->update([
-        //         'guard_name' => 'unusual_users'
-        //     ]);
-        // });
+
         $user->assignRole('client-manager');
 
         return $request->wantsJson()
@@ -300,7 +296,7 @@ class RegisterController extends Controller
 
     public function success()
     {
-        return view(unusualBaseKey() . '::auth.success', [
+        return view(modularityBaseKey() . '::auth.success', [
             'taskState' => [
                 'status' => 'success',
                 'title' => __('authentication.register-title'),

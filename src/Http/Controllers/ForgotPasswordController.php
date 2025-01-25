@@ -37,7 +37,7 @@ class ForgotPasswordController extends Controller
         parent::__construct();
 
         $this->passwordBrokerManager = $passwordBrokerManager;
-        $this->middleware('unusual_guest');
+        $this->middleware('modularity.guest');
     }
 
     /**
@@ -53,8 +53,8 @@ class ForgotPasswordController extends Controller
      */
     public function showLinkRequestForm(ViewFactory $viewFactory)
     {
-        // return $viewFactory->make(unusualBaseKey().'::auth.passwords.email');
-        return $viewFactory->make(unusualBaseKey() . '::auth.passwords.email', [
+        // return $viewFactory->make(modularityBaseKey().'::auth.passwords.email');
+        return $viewFactory->make(modularityBaseKey() . '::auth.passwords.email', [
             'formAttributes' => [
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
                 'title' => [

@@ -49,7 +49,7 @@ class Glide implements ImageServiceInterface
         $this->request = $request;
 
         $baseUrlHost = $this->config->get(
-            unusualBaseKey() . '.glide.base_url',
+            modularityBaseKey() . '.glide.base_url',
             $this->request->getScheme() . '://' . str_replace(
                 ['http://', 'https://'],
                 '',
@@ -59,7 +59,7 @@ class Glide implements ImageServiceInterface
 
         $baseUrl = implode('/', [
             rtrim($baseUrlHost, '/'),
-            ltrim($this->config->get(unusualBaseKey() . '.glide.base_path'), '/'),
+            ltrim($this->config->get(modularityBaseKey() . '.glide.base_path'), '/'),
         ]);
 
         if (! empty($baseUrlHost) && ! Str::startsWith($baseUrl, ['http://', 'https://'])) {
@@ -68,17 +68,17 @@ class Glide implements ImageServiceInterface
 
         $this->server = ServerFactory::create([
             'response' => new LaravelResponseFactory($this->request),
-            'source' => $this->config->get(unusualBaseKey() . '.glide.source'),
-            'cache' => $this->config->get(unusualBaseKey() . '.glide.cache'),
-            'cache_path_prefix' => $this->config->get(unusualBaseKey() . '.glide.cache_path_prefix'),
+            'source' => $this->config->get(modularityBaseKey() . '.glide.source'),
+            'cache' => $this->config->get(modularityBaseKey() . '.glide.cache'),
+            'cache_path_prefix' => $this->config->get(modularityBaseKey() . '.glide.cache_path_prefix'),
             'base_url' => $baseUrl,
-            'presets' => $this->config->get(unusualBaseKey() . '.glide.presets', []),
-            'driver' => $this->config->get(unusualBaseKey() . '.glide.driver'),
+            'presets' => $this->config->get(modularityBaseKey() . '.glide.presets', []),
+            'driver' => $this->config->get(modularityBaseKey() . '.glide.driver'),
         ]);
 
         $this->urlBuilder = UrlBuilderFactory::create(
             $baseUrl,
-            $this->config->get(unusualBaseKey() . '.glide.use_signed_urls') ? $this->config->get(unusualBaseKey() . '.glide.sign_key') : null
+            $this->config->get(modularityBaseKey() . '.glide.use_signed_urls') ? $this->config->get(modularityBaseKey() . '.glide.sign_key') : null
         );
     }
 
@@ -88,8 +88,8 @@ class Glide implements ImageServiceInterface
      */
     public function render($path)
     {
-        if ($this->config->get(unusualBaseKey() . '.glide.use_signed_urls')) {
-            SignatureFactory::create($this->config->get(unusualBaseKey() . '.glide.sign_key'))->validateRequest($this->config->get(unusualBaseKey() . '.glide.base_path') . '/' . $path, $this->request->all());
+        if ($this->config->get(modularityBaseKey() . '.glide.use_signed_urls')) {
+            SignatureFactory::create($this->config->get(modularityBaseKey() . '.glide.sign_key'))->validateRequest($this->config->get(modularityBaseKey() . '.glide.base_path') . '/' . $path, $this->request->all());
         }
 
         return $this->server->getImageResponse($path, $this->request->all());
@@ -101,7 +101,7 @@ class Glide implements ImageServiceInterface
      */
     public function getUrl($id, array $params = [])
     {
-        $defaultParams = unusualConfig('glide.default_params');
+        $defaultParams = modularityConfig('glide.default_params');
 
         return $this->getOriginalMediaUrl($id) ??
             $this->urlBuilder->getUrl($id, array_replace($defaultParams, $params));
@@ -133,7 +133,7 @@ class Glide implements ImageServiceInterface
      */
     public function getLQIPUrl($id, array $params = [])
     {
-        $defaultParams = unusualConfig('glide.lqip_default_params');
+        $defaultParams = modularityConfig('glide.lqip_default_params');
 
         $cropParams = Arr::has($params, $this->cropParamsKeys) ? $this->getCrop($params) : [];
 
@@ -148,7 +148,7 @@ class Glide implements ImageServiceInterface
      */
     public function getSocialUrl($id, array $params = [])
     {
-        $defaultParams = unusualConfig('glide.social_default_params');
+        $defaultParams = modularityConfig('glide.social_default_params');
 
         $cropParams = Arr::has($params, $this->cropParamsKeys) ? $this->getCrop($params) : [];
 
@@ -163,7 +163,7 @@ class Glide implements ImageServiceInterface
      */
     public function getCmsUrl($id, array $params = [])
     {
-        $defaultParams = unusualConfig('glide.cms_default_params');
+        $defaultParams = modularityConfig('glide.cms_default_params');
 
         $cropParams = Arr::has($params, $this->cropParamsKeys) ? $this->getCrop($params) : [];
 
@@ -266,13 +266,13 @@ class Glide implements ImageServiceInterface
      */
     private function getOriginalMediaUrl($id)
     {
-        $originalMediaForExtensions = $this->config->get(unusualBaseKey() . '.glide.original_media_for_extensions');
-        $addParamsToSvgs = $this->config->get(unusualBaseKey() . '.glide.add_params_to_svgs', false);
+        $originalMediaForExtensions = $this->config->get(modularityBaseKey() . '.glide.original_media_for_extensions');
+        $addParamsToSvgs = $this->config->get(modularityBaseKey() . '.glide.add_params_to_svgs', false);
 
         if ((Str::endsWith($id, '.svg') && $addParamsToSvgs) || ! Str::endsWith($id, $originalMediaForExtensions)) {
             return null;
         }
 
-        return Storage::disk(unusualConfig('media_library.disk'))->url($id);
+        return Storage::disk(modularityConfig('media_library.disk'))->url($id);
     }
 }

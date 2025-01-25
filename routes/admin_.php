@@ -3,11 +3,11 @@
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 
-// if (unusualConfig('enabled.users-management')) {
+// if (modularityConfig('enabled.users-management')) {
 //     Route::module('users', ['except' => ['sort', 'feature']]);
 // }
 
-// if (unusualConfig('enabled.media-library')) {
+// if (modularityConfig('enabled.media-library')) {
 //     Route::group(['prefix' => 'media-library', 'as' => 'media-library.'], function () {
 //         // Route::post('sign-s3-upload', ['as' => 'sign-s3-upload', 'uses' => 'MediaLibraryController@signS3Upload']);
 //         // Route::get('sign-azure-upload', ['as' => 'sign-azure-upload', 'uses' => 'MediaLibraryController@signAzureUpload']);
@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 //     });
 // }
 
-// if (unusualConfig('enabled.file-library')) {
+// if (modularityConfig('enabled.file-library')) {
 //     Route::group(['prefix' => 'file-library', 'as' => 'file-library.'], function () {
 //         Route::post('sign-s3-upload', ['as' => 'sign-s3-upload', 'uses' => 'FileLibraryController@signS3Upload']);
 //         Route::get('sign-azure-upload', ['as' => 'sign-azure-upload', 'uses' => 'FileLibraryController@signAzureUpload']);
@@ -31,12 +31,12 @@ use Illuminate\Support\Facades\Route;
 //     });
 // }
 
-// if (unusualConfig('enabled.block-editor')) {
+// if (modularityConfig('enabled.block-editor')) {
 //     Route::post('blocks/preview', ['as' => 'blocks.preview', 'uses' => 'BlocksController@preview']);
 // }
 
-// if (unusualConfig('enabled.buckets')) {
-//     $bucketsRoutes = unusualConfig('bucketsRoutes') ?? Collection::make(unusualConfig('buckets'))->mapWithKeys(function ($bucketSection, $bucketSectionKey) {
+// if (modularityConfig('enabled.buckets')) {
+//     $bucketsRoutes = modularityConfig('bucketsRoutes') ?? Collection::make(modularityConfig('buckets'))->mapWithKeys(function ($bucketSection, $bucketSectionKey) {
 //         return [$bucketSectionKey => 'featured'];
 //     })->toArray();
 
@@ -51,16 +51,16 @@ use Illuminate\Support\Facades\Route;
 //     }
 // }
 
-// if (unusualConfig('enabled.settings')) {
+// if (modularityConfig('enabled.settings')) {
 //     Route::name('settings')->get('/settings/{section}', 'SettingController@index');
 //     Route::name('settings.update')->post('/settings/{section}', 'SettingController@update');
 // }
 
-// if (unusualConfig('enabled.dashboard')) {
+// if (modularityConfig('enabled.dashboard')) {
 //     Route::name('dashboard')->get('/', 'DashboardController@index');
 // }
 
-// if (unusualConfig('enabled.search')) {
+// if (modularityConfig('enabled.search')) {
 //     Route::name('search')->get('search', 'DashboardController@search');
 // }
 

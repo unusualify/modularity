@@ -4,7 +4,7 @@ namespace Unusualify\Modularity\Providers;
 
 use Illuminate\Auth\Notifications\ResetPassword;
 
-class UnusualProvider extends ServiceProvider
+class ModularityProvider extends ServiceProvider
 {
     protected $providers = [
         // Third Party Providers
@@ -57,17 +57,17 @@ class UnusualProvider extends ServiceProvider
         // dd(__FUNCTION__, __CLASS__);
         // Has to be merged after routeServiceProvider registered
         if (exceptionalRunningInConsole()) {
-            $this->mergeConfigFrom(__DIR__ . '/../../config/navigation.php', unusualBaseKey() . '-navigation');
+            $this->mergeConfigFrom(__DIR__ . '/../../config/navigation.php', modularityBaseKey() . '-navigation');
         }
-        // dd($this->app->config->get(unusualBaseKey() . '-navigation'), require __DIR__ . '/../../config/navigation.php');
+        // dd($this->app->config->get(modularityBaseKey() . '-navigation'), require __DIR__ . '/../../config/navigation.php');
         // dd(
-        //     $this->app->config->get(unusualBaseKey() . '-navigation')
+        //     $this->app->config->get(modularityBaseKey() . '-navigation')
         // );
         // dd(
-        //     $this->app->config->get(unusualBaseKey() . '-navigation')
+        //     $this->app->config->get(modularityBaseKey() . '-navigation')
         // );
         // $this->app->config->set([
-        //     unusualBaseKey() . '-navigation.sidebar' => UNavigation::formatSidebarMenus($this->app->config->get(unusualBaseKey() . '-navigation.sidebar'))
+        //     modularityBaseKey() . '-navigation.sidebar' => UNavigation::formatSidebarMenus($this->app->config->get(modularityBaseKey() . '-navigation.sidebar'))
         // ]);
 
         // // load unusual migrations

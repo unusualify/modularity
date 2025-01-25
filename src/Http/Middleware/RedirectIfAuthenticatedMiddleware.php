@@ -40,7 +40,7 @@ class RedirectIfAuthenticatedMiddleware
     public function handle($request, Closure $next, $guard = 'modularity')
     {
         if ($this->authFactory->guard($guard)->check()) {
-            return $this->redirector->to($this->config->get('unusual.auth_login_redirect_path', '/'));
+            return $this->redirector->to( modularityConfig('auth_login_redirect_path', '/') );
         }
 
         return $next($request);

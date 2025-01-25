@@ -29,25 +29,25 @@ class BaseServiceProvider extends ServiceProvider
     {
         $this->bootPackageConfigs();
 
-        if (unusualConfig('enabled.media-library')) {
+        if (modularityConfig('enabled.media-library')) {
             $this->app->singleton('imageService', function () {
                 return $this->app->make(config($this->baseKey . '.media_library.image_service'));
             });
         }
         if (
-            unusualConfig('media_library.endpoint_type') === 'local'
-            && unusualConfig('media_library.disk') === unusualBaseKey() . '_media_library'
+            modularityConfig('media_library.endpoint_type') === 'local'
+            && modularityConfig('media_library.disk') === modularityBaseKey() . '_media_library'
         ) {
             $this->setLocalDiskUrl('media');
         }
 
-        if (unusualConfig('enabled.file-library')) {
+        if (modularityConfig('enabled.file-library')) {
             $this->app->singleton('fileService', function () {
                 return $this->app->make(config($this->baseKey . '.file_library.file_service'));
             });
         }
-        if (unusualConfig('file_library.endpoint_type') === 'local'
-            && unusualConfig('file_library.disk') === unusualBaseKey() . '_file_library') {
+        if (modularityConfig('file_library.endpoint_type') === 'local'
+            && modularityConfig('file_library.disk') === modularityBaseKey() . '_file_library') {
             $this->setLocalDiskUrl('file');
         }
 
@@ -76,7 +76,7 @@ class BaseServiceProvider extends ServiceProvider
 
             return [
                 'Vendor' => get_modularity_vendor_dir(),
-                'Theme' => unusualConfig('app_theme'),
+                'Theme' => modularityConfig('app_theme'),
                 'Version' => $package->version,
             ];
         });
@@ -98,21 +98,19 @@ class BaseServiceProvider extends ServiceProvider
         $this->registerCommands();
 
         // $this->app->singleton(\Unusualify\Modularity\Contracts\RepositoryInterface::class, function ($app) {
-        $this->app->singleton('unusual.modularity', function (Application $app) {
+        $this->app->singleton('modularity', function (Application $app) {
             $path = $app['config']->get('modules.paths.modules');
 
             return new Modularity($app, $path);
         });
 
         // $this->app->singleton(FileActivator::class, function ($app) {
-        $this->app->singleton('unusual.activator', function (Application $app) {
-            // echo 'unusual.activator' . "</br>";
+        $this->app->singleton('modularity.activator', function (Application $app) {
             return new FileActivator($app);
         });
 
-        $this->app->singleton('unusual.navigation', UNavigation::class);
+        $this->app->singleton('modularity.navigation', UNavigation::class);
         // $this->app->alias(\Unusualify\Modularity\Contracts\RepositoryInterface::class, 'ue_modules');
-        $this->app->alias('unusual.modularity', 'modularity');
 
         $this->app->singleton('model.relation.namespace', function () {
             return "Illuminate\Database\Eloquent\Relations";
@@ -125,11 +123,11 @@ class BaseServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('unusualify.hosting', function (Application $app) {
-            return new \Unusualify\Modularity\Support\HostRouting($app, unusualConfig('app_url'));
+            return new \Unusualify\Modularity\Support\HostRouting($app, modularityConfig('app_url'));
         });
 
         $this->app->singleton('unusualify.hostRouting', function (Application $app) {
-            return new \Unusualify\Modularity\Support\HostRouteRegistrar($app, unusualConfig('app_url'));
+            return new \Unusualify\Modularity\Support\HostRouteRegistrar($app, modularityConfig('app_url'));
         });
 
         $this->app->singleton('Filepond', function (Application $app) {
@@ -346,7 +344,7 @@ class BaseServiceProvider extends ServiceProvider
     {
 
         // $name = snakeCase( config($this->baseKey . '.name') );
-        $name = unusualBaseKey();
+        $name = modularityBaseKey();
         $langPath = base_path('lang/modules/' . $name);
         $laravelLangPath = base_path('lang');
 
@@ -452,12 +450,12 @@ class BaseServiceProvider extends ServiceProvider
     private function setLocalDiskUrl($type): void
     {
         config([
-            'filesystems.disks.' . unusualBaseKey() . '_' . $type . '_library.url' => request()->getScheme()
+            'filesystems.disks.' . modularityBaseKey() . '_' . $type . '_library.url' => request()->getScheme()
             . '://'
             // . str_replace(['http://', 'https://'], '', config('app.url'))
             . request()->getHttpHost()
             . '/storage/'
-            . trim(unusualConfig($type . '_library.local_path'), '/ '),
+            . trim(modularityConfig($type . '_library.local_path'), '/ '),
         ]);
     }
 

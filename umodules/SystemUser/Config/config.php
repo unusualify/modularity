@@ -919,9 +919,9 @@ return [
                     'type' => 'text',
                     'name' => 'guard_name',
                     'label' => 'Guard Name',
-                    'placeholder' => 'unusual_users',
+                    'placeholder' => 'modularity',
                     '_tooltip' => 'Enter the guard name',
-                    'default' => 'unusual_users',
+                    'default' => 'modularity',
                     'col' => [
                         'cols' => 10,
                         'sm' => 10,
@@ -1019,7 +1019,7 @@ return [
                     'name' => 'guard_name',
                     'label' => 'Guard Name',
                     'placeholder' => 'web',
-                    'default' => 'unusual_users',
+                    'default' => 'modularity',
                     'col' => [
                         'cols' => 12,
                         'sm' => 8,
@@ -1418,7 +1418,7 @@ return [
                     '_name' => 'guard_name',
                     'label' => 'Guard Name',
                     'placeholder' => 'web',
-                    'default' => 'unusual_users',
+                    'default' => 'modularity',
                     'col' => [
                         'cols' => 12,
                         'sm' => 8,

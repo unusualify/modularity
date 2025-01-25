@@ -18,7 +18,7 @@ return [
     | - 'Unusualify\Modularity\Services\FileLibrary\Disk'
     |
      */
-    'disk' => unusualBaseKey() . '_file_library',
+    'disk' => modularityBaseKey() . '_file_library',
     'endpoint_type' => env('FILE_LIBRARY_ENDPOINT_TYPE', 'local'),
     'cascade_delete' => env('FILE_LIBRARY_CASCADE_DELETE', true),
     'local_path' => env('FILE_LIBRARY_LOCAL_PATH', 'uploads'),

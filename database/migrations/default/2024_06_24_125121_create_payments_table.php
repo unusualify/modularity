@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $paymentsTable = unusualConfig('tables.payments', 'umod_payments');
+        $paymentsTable = modularityConfig('tables.payments', 'modularity_payments');
         // dd($paymentsTable);
         Schema::create($paymentsTable, function (Blueprint $table) {
             $table->id();
@@ -34,7 +34,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists(config('payable.tables.payments', 'umod_payments'));
+        $paymentsTable = modularityConfig('tables.payments', 'modularity_payments');
+
+        Schema::dropIfExists($paymentsTable);
 
     }
 };

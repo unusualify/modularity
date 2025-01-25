@@ -73,6 +73,6 @@ class ChatMessage extends Model
 
     public function getTable()
     {
-        return unusualConfig('tables.chat_messages', parent::getTable());
+        return modularityConfig('tables.chat_messages', parent::getTable());
     }
 }

@@ -70,9 +70,9 @@ class RouteMakeCommand extends BaseCommand
 
         $module = $this->argument('module');
 
-        $traits = activeUnusualTraits($this->options());
+        $traits = activeModularityTraits($this->options());
 
-        foreach (getUnusualTraits() as $_trait) {
+        foreach (getModularityTraits() as $_trait) {
             $this->responses[$_trait] = $this->checkOption($_trait);
         }
 
@@ -142,7 +142,7 @@ class RouteMakeCommand extends BaseCommand
             ['table-name', null, InputOption::VALUE_OPTIONAL, 'Sets table  name for custom model'],
             ['no-migration', null, InputOption::VALUE_NONE, 'don\'t create migration file.'],
             ['test', null, InputOption::VALUE_NONE, 'Test the Route Generator'],
-        ], unusualTraitOptions());
+        ], modularityTraitOptions());
     }
 
     private function checkOption($option)

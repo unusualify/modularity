@@ -11,7 +11,7 @@ class FileRequest extends Request
      */
     public function rules()
     {
-        switch (unusualConfig('file_library.endpoint_type')) {
+        switch (modularityConfig('file_library.endpoint_type')) {
             case 'local':
                 return [
                     'qqfilename' => 'required',
