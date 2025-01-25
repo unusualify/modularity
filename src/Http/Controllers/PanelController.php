@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Enums\Permission;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Traits\MakesResponses;
 use Unusualify\Modularity\Traits\ManageScopes;
@@ -433,19 +434,9 @@ abstract class PanelController extends CoreController
                 // 'skipCreateModal' => 'edit',
             ];
 
-            /**
-             * TODO #guard
-             */
-            // dd(
-            //     $authorizableOptions,
-            //     $option,
-            //     Auth::guard('unusual_users')->user(),
-            //     debug_backtrace(),
-            // );
             $authorized = ($this->isGateable() && array_key_exists($option, $authorizableOptions))
-                ? Auth::guard('unusual_users')->user()->can($authorizableOptions[$option])
+                ? Auth::guard(Modularity::getAuthGuardName())->user()->can($authorizableOptions[$option])
                 : true;
-            // $authorized = true;
 
             return ($this->indexOptions[$option] ?? $this->defaultIndexOptions[$option] ?? false) && $authorized;
         });
@@ -459,7 +450,7 @@ abstract class PanelController extends CoreController
     {
 
         $unauthorizedFields = Collection::make($this->fieldsPermissions)->filter(function ($permission, $field) {
-            return Auth::guard('unusual_users')->user()->cannot($permission);
+            return Auth::guard(Modularity::getAuthGuardName())->user()->cannot($permission);
         })->keys();
 
         $unauthorizedFields->each(function ($field) {

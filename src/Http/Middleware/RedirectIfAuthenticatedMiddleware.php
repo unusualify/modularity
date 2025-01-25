@@ -37,7 +37,7 @@ class RedirectIfAuthenticatedMiddleware
      * @param \Illuminate\Http\Request $request
      * @return mixed
      */
-    public function handle($request, Closure $next, $guard = 'unusual_users')
+    public function handle($request, Closure $next, $guard = 'modularity')
     {
         if ($this->authFactory->guard($guard)->check()) {
             return $this->redirector->to($this->config->get('unusual.auth_login_redirect_path', '/'));

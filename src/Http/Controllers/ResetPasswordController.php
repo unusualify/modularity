@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\Factory as ViewFactory;
 use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Traits\ManageUtilities;
 
@@ -72,7 +73,7 @@ class ResetPasswordController extends Controller
      */
     protected function guard()
     {
-        return Auth::guard('unusual_users');
+        return Auth::guard(Modularity::getAuthGuardName());
     }
 
     /**
@@ -80,7 +81,7 @@ class ResetPasswordController extends Controller
      */
     public function broker()
     {
-        return Password::broker('users');
+        return Password::broker(Modularity::getAuthProviderName());
     }
 
     /**
@@ -237,7 +238,7 @@ class ResetPasswordController extends Controller
      */
     private function getUserFromToken($token)
     {
-        $clearToken = DB::table($this->config->get('auth.passwords.unusual_users.table', 'password_resets'))->where('token', $token)->first();
+        $clearToken = DB::table($this->config->get('auth.passwords.' . Modularity::getAuthProviderName() . '.table', 'password_resets'))->where('token', $token)->first();
 
         if ($clearToken) {
             return User::where('email', $clearToken->email)->first();
