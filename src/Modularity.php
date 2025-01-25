@@ -22,6 +22,16 @@ class Modularity extends FileRepository
     private $modularityCache;
 
     /**
+     * @var string
+     */
+    private static $authGuardName = 'modularity';
+
+    /**
+     * @var string
+     */
+    private static $authProviderName = 'modularity_users';
+
+    /**
      * The constructor.
      *
      * @param string|null $path
@@ -146,6 +156,26 @@ class Modularity extends FileRepository
         }, $paths);
 
         return $paths;
+    }
+
+    /**
+     * Get the authentication guard name used by Modularity
+     *
+     * @return string The configured auth guard name
+     */
+    public static function getAuthGuardName()
+    {
+        return self::$authGuardName;
+    }
+
+    /**
+     * Get the authentication provider name used by Modularity
+     *
+     * @return string The configured auth provider name
+     */
+    public static function getAuthProviderName()
+    {
+        return self::$authProviderName;
     }
 
     /**
