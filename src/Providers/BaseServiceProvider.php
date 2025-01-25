@@ -16,6 +16,7 @@ use Unusualify\Modularity\Modularity;
 use Unusualify\Modularity\Services\View\UNavigation;
 use Unusualify\Modularity\Support\FileLoader;
 use Unusualify\Modularity\Translation\Translator;
+use Unusualify\Modularity\Exceptions\AuthConfigurationException;
 
 class BaseServiceProvider extends ServiceProvider
 {
@@ -221,25 +222,38 @@ class BaseServiceProvider extends ServiceProvider
      */
     private function bootPackageConfigs()
     {
-        if (unusualConfig('enabled.users-management')) {
-            config(['auth.providers.unusual_users' => [
-                'driver' => 'eloquent',
-                'model' => User::class,
-            ]]);
+        if (modularityConfig('enabled.users-management') && !$this->app->runningInConsole()) {
+            $modularityAuthGuardAbsent = blank(config('auth.guards.' . Modularity::getAuthGuardName()));
+            $modularityAuthProviderAbsent = blank(config('auth.providers.' . Modularity::getAuthProviderName()));
+            $modularityAuthPasswordAbsent = blank(config('auth.passwords.' . Modularity::getAuthProviderName()));
 
-            config(['auth.guards.unusual_users' => [
-                'driver' => 'session',
-                'provider' => 'unusual_users',
-            ]]);
-
-            if (blank(config('auth.passwords.unusual_users'))) {
-                config(['auth.passwords.unusual_users' => [
-                    'provider' => 'unusual_users',
-                    'table' => unusualConfig('password_resets_table', 'password_reset_tokens'),
-                    'expire' => 60,
-                    'throttle' => 60,
-                ]]);
+            if ($modularityAuthGuardAbsent) {
+                throw AuthConfigurationException::guardMissing();
             }
+
+            if ($modularityAuthProviderAbsent) {
+                throw AuthConfigurationException::providerMissing();
+            }
+
+            if ($modularityAuthPasswordAbsent) {
+                throw AuthConfigurationException::passwordMissing();
+            }
+
+            // try {
+            //     // code that might throw AuthConfigurationException
+            // } catch (AuthConfigurationException $e) {
+            //     switch ($e->getCode()) {
+            //         case AuthConfigurationException::GUARD_MISSING:
+            //             // Handle missing guard
+            //             break;
+            //         case AuthConfigurationException::PROVIDER_MISSING:
+            //             // Handle missing provider
+            //             break;
+            //         case AuthConfigurationException::PASSWORD_MISSING:
+            //             // Handle missing password configuration
+            //             break;
+            //     }
+            // }
         }
 
         config([
@@ -249,13 +263,25 @@ class BaseServiceProvider extends ServiceProvider
         ]);
 
         // Nwidart/laravel-modules scan enabled & scan path addition
+        if(!config('modules.scan.enabled')) {
+            config([
+                'modules.scan.enabled' => true,
+            ]);
+        }
         $scan_paths = config('modules.scan.paths', []);
-        // array_push($scan_paths, base_path( unusualConfig('vendor_path') . '/umodules'));
-        array_push($scan_paths, realpath(__DIR__ . '/../../umodules'));
-        config([
-            'modules.scan.enabled' => true,
-            'modules.scan.paths' => $scan_paths,
-        ]);
+        $umodulesPath = \Unusualify\Modularity\Facades\Modularity::getVendorPath('umodules');
+        if(!in_array($umodulesPath, $scan_paths)) {
+            array_push($scan_paths, $umodulesPath);
+            config([
+                'modules.scan.paths' => $scan_paths,
+            ]);
+        }
+
+        if(!$this->app->isProduction() && config('modules.cache.enabled')){
+            config([
+                'modules.cache.enabled' => false,
+            ]);
+        }
 
         // timokoerber/laravel-one-time-operations directory set
         config([
