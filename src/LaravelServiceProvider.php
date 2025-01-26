@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity;
 
 use Illuminate\Support\ServiceProvider;
+use Unusualify\Modularity\Facades\Modularity;
 
 final class LaravelServiceProvider extends ServiceProvider
 {
@@ -16,6 +17,7 @@ final class LaravelServiceProvider extends ServiceProvider
         $this->publishAssets();
         $this->publishViews();
         $this->publishResources();
+        $this->publishOperations();
 
     }
 
@@ -81,5 +83,12 @@ final class LaravelServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../lang' => base_path('lang'),
         ], 'lang');
+    }
+
+    private function publishOperations(): void
+    {
+        $this->publishes([
+            Modularity::getVendorPath('operations') => base_path('operations'),
+        ], 'operations');
     }
 }
