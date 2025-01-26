@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Console\Concerns\InteractsWithIO;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use TimoKoerber\LaravelOneTimeOperations\OneTimeOperation;
+use Unusualify\Modularity\Facades\Modularity;
 
 return new class extends OneTimeOperation
 {
@@ -27,24 +28,27 @@ return new class extends OneTimeOperation
     /**
      * A tag name, that this operation can be filtered by.
      */
-    protected ?string $tag = null;
+    protected ?string $tag = 'modularity:local';
 
     /**
      * Process the operation.
      */
     public function process(): void
     {
-
-        if (! Schema::hasTable(unusualConfig('tables.users'))) {
-
-            Schema::rename('users', unusualConfig('tables.users'));
-
-            $this->output->writeln('');
-            $this->output->writeln('');
-
-            $this->info("\tusers table changed as " . unusualConfig('tables.users'));
-
-            $this->output->writeln('');
+        $this->output->writeln('');
+        if (app()->environment('local')) {
+            foreach (Modularity::getModules() as $key => $module) {
+                Artisan::call('modularity:make:module', [
+                    'module' => $module->getName(),
+                    '--just-stubs' => true,
+                    '--stubs-only' => 'views/index',
+                ]);
+            }
+            $this->info("\tIndex.blade's store fields updated.");
+        } else {
+            $this->info("\tSkipping index.blade's store fields update in non-local environment.");
         }
+
+        $this->output->writeln('');
     }
 };

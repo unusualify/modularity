@@ -28,24 +28,27 @@ return new class extends OneTimeOperation
     /**
      * A tag name, that this operation can be filtered by.
      */
-    protected ?string $tag = null;
+    protected ?string $tag = 'modularity:local';
 
     /**
      * Process the operation.
      */
     public function process(): void
     {
-        foreach (Modularity::getModules() as $key => $module) {
-            Artisan::call('modularity:make:module', [
-                'module' => $module->getName(),
-                '--just-stubs' => true,
-                '--stubs-only' => 'views/index,views/form',
-            ]);
+        if (app()->environment('local')) {
+            foreach (Modularity::getModules() as $key => $module) {
+                Artisan::call('modularity:make:module', [
+                    'module' => $module->getName(),
+                    '--just-stubs' => true,
+                    '--stubs-only' => 'views/index,views/form',
+                ]);
+            }
+            $this->output->writeln('');
+            $this->output->writeln('');
+            $this->info("\tIndex and form blade files converted to vite format.");
+        } else {
+            $this->info("\tSkipping vite blade update in non-local environment.");
         }
-        $this->output->writeln('');
-        $this->output->writeln('');
-
-        $this->info("\tIndex and form blade files converted to vite format.");
 
         $this->output->writeln('');
     }

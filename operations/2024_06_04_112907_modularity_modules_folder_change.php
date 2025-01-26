@@ -27,43 +27,47 @@ return new class extends OneTimeOperation
     /**
      * A tag name, that this operation can be filtered by.
      */
-    protected ?string $tag = null;
+    protected ?string $tag = 'modularity:local';
 
     /**
      * Process the operation.
      */
     public function process(): void
     {
-        $old_folder_name = 'Modules';
-        $new_folder_name = 'modules';
-        $old_modules_path = base_path($old_folder_name);
-        $temp_modules_path = base_path('_modules');
-        $new_modules_path = base_path($new_folder_name);
+        if (app()->environment('local')) {
+            $old_folder_name = 'Modules';
+            $new_folder_name = 'modules';
+            $old_modules_path = base_path($old_folder_name);
+            $temp_modules_path = base_path('_modules');
+            $new_modules_path = base_path($new_folder_name);
 
-        $modulesConfigPath = base_path('config/modules.php');
-        $contents = File::get($modulesConfigPath);
-        $injection = "'modules' => base_path('{$new_folder_name}'),";
+            $modulesConfigPath = base_path('config/modules.php');
+            $contents = File::get($modulesConfigPath);
+            $injection = "'modules' => base_path('{$new_folder_name}'),";
 
-        $pattern = "/'modules'\s\=\>\sbase_path\('" . $old_folder_name . "'\),/";
+            $pattern = "/'modules'\s\=\>\sbase_path\('" . $old_folder_name . "'\),/";
 
-        $contents = preg_replace($pattern, $injection, $contents);
+            $contents = preg_replace($pattern, $injection, $contents);
 
-        File::put($modulesConfigPath, $contents);
+            File::put($modulesConfigPath, $contents);
 
-        rename($old_modules_path, $temp_modules_path);
-        rename($temp_modules_path, $new_modules_path);
+            rename($old_modules_path, $temp_modules_path);
+            rename($temp_modules_path, $new_modules_path);
 
-        $this->composerUpdate('composer.json', $new_folder_name);
-        $this->composerUpdate('composer-dev.json', $new_folder_name);
+            $this->composerUpdate('composer.json', $new_folder_name);
+            $this->composerUpdate('composer-dev.json', $new_folder_name);
 
-        $this->output->writeln('');
-        $this->output->writeln('');
+            $this->output->writeln('');
+            $this->output->writeln('');
 
-        $this->info("'{$old_folder_name}' folder name changed as '{$new_folder_name}'.\n");
-        $this->alert('Composer files changed. You must run command as following:');
-        $this->warn("\tcomposer dump-autoload\n");
+            $this->info("'{$old_folder_name}' folder name changed as '{$new_folder_name}'.\n");
+            $this->alert('Composer files changed. You must run command as following:');
+            $this->warn("\tcomposer dump-autoload\n");
 
-        $this->output->writeln('');
+            $this->output->writeln('');
+        } else {
+            $this->info("\tSkipping modules folder change in non-local environment.");
+        }
     }
 
     public function composerUpdate($composerName, $new_folder_name)
