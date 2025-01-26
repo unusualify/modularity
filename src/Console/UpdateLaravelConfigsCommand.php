@@ -143,6 +143,38 @@ class UpdateLaravelConfigsCommand extends BaseCommand
             // );
         }
 
+        // Larravel translation config
+        if(confirm('Do you want to update joedixon/laravel-translation config?', default: false)){
+            File::replaceInFile(
+                "'middleware' => 'web'",
+                <<<'CONFIG'
+                'middleware' => [
+                            'web',
+                            'modularity.auth:modularity',
+                            'language',
+                            'auth',
+                            'navigation',
+                            'impersonate'
+                        ]
+                CONFIG,
+                app()->configPath('translation.php')
+            );
+            File::replaceInFile(
+                "'ui_url' => 'languages',",
+                <<<'CONFIG'
+                'ui_url' => 'system-settings/locales',
+                CONFIG,
+                app()->configPath('translation.php')
+            );
+            File::replaceInFile(
+                "'translation_methods' => ['trans', '__'],",
+                <<<'CONFIG'
+                'translation_methods' => ['trans', '__', '___'],
+                CONFIG,
+                app()->configPath('translation.php')
+            );
+        }
+
         $this->info('Laravel Configs updated successfully');
         return 0;
     }
