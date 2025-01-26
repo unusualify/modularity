@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'prices_are_including_vat' => false,
     'currency' => env('CURRENCY', env('CASHIER_CURRENCY', 'eur')),
     'tables' => [
         'vat_rates' => 'unfy_vat_rates',
