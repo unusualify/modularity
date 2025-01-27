@@ -157,7 +157,7 @@ return [
     */
 
     'scan' => [
-        'enabled' => false,
+        'enabled' => true,
         'paths' => [
             base_path('vendor/*/*'),
         ],
@@ -189,9 +189,9 @@ return [
     |
     */
     'cache' => [
-        'enabled' => false,
-        'key' => 'laravel-modules',
-        'lifetime' => 60,
+        'enabled' => env('MODULARITY_CACHE_ENABLED', true),
+        'key' => env('MODULARITY_CACHE_KEY', 'modularity'),
+        'lifetime' => env('MODULARITY_CACHE_LIFETIME', 600),
     ],
     /*
     |--------------------------------------------------------------------------
