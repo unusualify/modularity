@@ -260,12 +260,10 @@ class BaseServiceProvider extends ServiceProvider
                 : env('MODULARITY_VENDOR_DIR', env('MODULARITY_VENDOR_PATH', 'packages/modularity')),
         ]);
 
-        // Nwidart/laravel-modules scan enabled & scan path addition
-        if(!config('modules.scan.enabled')) {
-            config([
-                'modules.scan.enabled' => true,
-            ]);
+        if(!config('modules.scan.enabled')){
+            throw new \Exception('Modules scan is not enabled, set scan.enabled to true in config/modules.php');
         }
+
         $scan_paths = config('modules.scan.paths', []);
         $umodulesPath = \Unusualify\Modularity\Facades\Modularity::getVendorPath('umodules');
         if(!in_array($umodulesPath, $scan_paths)) {
@@ -275,16 +273,16 @@ class BaseServiceProvider extends ServiceProvider
             ]);
         }
 
-        if(!$this->app->isProduction() && config('modules.cache.enabled')){
-            config([
-                'modules.cache.enabled' => false,
-            ]);
-        }
+        // if(!$this->app->isProduction() && config('modules.cache.enabled')){
+        //     config([
+        //         'modules.cache.enabled' => false,
+        //     ]);
+        // }
 
         // timokoerber/laravel-one-time-operations directory set
-        config([
-            'one-time-operations.directory' => get_modularity_vendor_dir('operations'),
-        ]);
+        // config([
+        //     'one-time-operations.directory' => get_modularity_vendor_dir('operations'),
+        // ]);
 
     }
 
