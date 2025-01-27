@@ -105,42 +105,37 @@ class UpdateLaravelConfigsCommand extends BaseCommand
                     app()->configPath('modules.php')
                 );
             }
-            dd('fs');
+
             File::replaceInFile(
-                "'cache' => [\n        'enabled' => false,\n        'key' => 'laravel-modules',",
+                "'cache' => [\n        'enabled' => false",
                 <<<'CONFIG'
                 'cache' => [
-                        'enabled' => false,
-                        'key' => 'modularity',
+                        'enabled' => env('MODULARITY_CACHE_ENABLED', true)
                 CONFIG,
                 app()->configPath('modules.php')
             );
             File::replaceInFile(
-                "'cache' => [\n        'enabled' => true,\n        'key' => 'laravel-modules',",
+                "'cache' => [\n        'enabled' => true",
                 <<<'CONFIG'
                 'cache' => [
-                        'enabled' => true,
-                        'key' => 'modularity',
+                        'enabled' => env('MODULARITY_CACHE_ENABLED', true)
                 CONFIG,
                 app()->configPath('modules.php')
             );
-            // $scan_paths = config('modules.scan.paths', []);
-            // dd($scan_paths, \Unusualify\Modularity\Facades\Modularity::getVendorPath('umodules'));
-
-            // File::replaceInFile(
-            //     "'scan' => [\n        'enabled' => true,\n        'paths' => [\n",
-            //     <<<'CONFIG'
-            //     'scan' => [
-            //             'enabled' => true,
-            //             'paths' => [
-            //                 base_path('vendor/*/*'),
-            //                 realpath(__DIR__ . '/../../umodules'),
-            //             ],
-            //     ],
-
-            //     CONFIG,
-            //     app()->configPath('modules.php')
-            // );
+            File::replaceInFile(
+                "'key' => 'laravel-modules',",
+                <<<'CONFIG'
+                'key' => env('MODULARITY_CACHE_KEY', 'modularity'),
+                CONFIG,
+                app()->configPath('modules.php')
+            );
+            File::replaceInFile(
+                "'lifetime' => 60,",
+                <<<'CONFIG'
+                'lifetime' => env('MODULARITY_CACHE_LIFETIME', 600),
+                CONFIG,
+                app()->configPath('modules.php')
+            );
         }
 
         // Larravel translation config
