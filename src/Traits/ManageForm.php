@@ -820,6 +820,22 @@ trait ManageForm
                         }
 
                         break;
+                    case 'clearModel': //
+                        $inputToFormat = array_shift($args) ?? '';
+
+                        if ($inputToFormat) {
+                            $events[] = "formatClearModel:{$inputToFormat}";
+                        }
+
+                        break;
+                    case 'resetItems': //
+                        $inputToFormat = array_shift($args) ?? '';
+
+                        if ($inputToFormat) {
+                            $events[] = "formatResetItems:{$inputToFormat}";
+                        }
+
+                        break;
                     case 'prependSchema': //
                         $inputToFormat = array_shift($args) ?? '';
                         $prependKey = array_shift($args) ?? null;
