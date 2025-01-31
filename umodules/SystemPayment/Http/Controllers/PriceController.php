@@ -15,6 +15,7 @@ use Modules\SystemPricing\Entities\Currency;
 use Oobook\Priceable\Models\Price;
 use Unusualify\Modularity\Services\CurrencyExchangeService;
 use Unusualify\Payable\Payable;
+
 class PriceController extends Controller
 {
     protected $currencyService;
@@ -54,8 +55,6 @@ class PriceController extends Controller
         $convertedCurrency = Currency::where('iso_4217', $requestCurrencyIso4217 ?? $price->currencyIso4217)->first();
 
         $paymentService = null;
-
-
 
         if ($params['payment_service']['payment_method'] == -1) {
 
@@ -134,7 +133,7 @@ class PriceController extends Controller
         if ($request->status == 'success') {
 
             try {
-                if($request->get('id')) {
+                if ($request->get('id')) {
 
                     $payment = Payment::find($request->get('id'));
 
@@ -153,12 +152,12 @@ class PriceController extends Controller
                         'Error details:\n' .
                         'Payment ID: ' . request()->get('id') . '\n\n' .
                         'Error: ' . $th->getMessage() . '\n\n' .
-                        'Trace: ' . $th->getTraceAsString(), function($message) {
-                    $message->to('oguzhan@unusualgrowth.com')
-                           ->subject('Payment Price Update Error');
-                    });
+                        'Trace: ' . $th->getTraceAsString(), function ($message) {
+                            $message->to('oguzhan@unusualgrowth.com')
+                                ->subject('Payment Price Update Error');
+                        });
                 } catch (\Throwable $th) {
-                    //throw $th;
+                    // throw $th;
                 }
             }
 

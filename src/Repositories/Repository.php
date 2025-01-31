@@ -16,7 +16,6 @@ use ReflectionClass;
 use Unusualify\Modularity\Entities\Behaviors\Sortable;
 use Unusualify\Modularity\Repositories\Traits\DatesTrait;
 use Unusualify\Modularity\Repositories\Traits\MethodTransformers;
-use Unusualify\Modularity\Repositories\Traits\PaymentTrait;
 use Unusualify\Modularity\Repositories\Traits\RelationTrait;
 use Unusualify\Modularity\Traits\ManageNames;
 
@@ -80,7 +79,7 @@ abstract class Repository
                 return ! in_array($value, $translatedAttributes);
             });
 
-            dd($searches, $translatedAttributes, $scopes, );
+            dd($searches, $translatedAttributes, $scopes);
 
             $this->searchIn($query, $scopes, 'search', $searches);
 

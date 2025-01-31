@@ -15,8 +15,6 @@ trait HasPayment
     // Will be defining the relation between the completed payment model and payable model
     use HasPriceable;
 
-
-
     public static function bootHasPayment(): void
     {
 
@@ -25,13 +23,13 @@ trait HasPayment
                 $currency = new Currency($model->paymentPrice->currency->iso_4217);
                 $model->setAttribute('_price', \Oobook\Priceable\Facades\PriceService::formatAmount($model->paymentPrice->display_price, $currency));
                 $model->setAttribute('priceExcludingVatFormatted', \Oobook\Priceable\Facades\PriceService::formatAmount($model->paymentPrice->display_price, $currency));
-                $model->setAttribute('paymentStatus', match(true) {
-                    !$model->paidPrices()->exists() => PaymentStatus::UNPAID,
+                $model->setAttribute('paymentStatus', match (true) {
+                    ! $model->paidPrices()->exists() => PaymentStatus::UNPAID,
                     $model->payablePrice?->price_including_vat > 0 => PaymentStatus::PARTIALLY_PAID,
                     default => PaymentStatus::PAID
                 });
-                $model->setAttribute('paymentStatusTranslated', match(true) {
-                    !$model->paidPrices()->exists() => __('Unpaid'),
+                $model->setAttribute('paymentStatusTranslated', match (true) {
+                    ! $model->paidPrices()->exists() => __('Unpaid'),
                     $model->payablePrice?->price_including_vat > 0 => __('Partially Paid'),
                     default => __('Paid')
                 });
@@ -90,31 +88,30 @@ trait HasPayment
     protected function totalCostExcludingVat(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $this->prices->sum('price_excluding_vat')
+            get: fn ($value) => $this->prices->sum('price_excluding_vat')
         );
     }
 
     protected function totalCostIncludingVat(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $this->prices->sum('price_including_vat')
+            get: fn ($value) => $this->prices->sum('price_including_vat')
         );
     }
 
     protected function totalCostExcludingVatFormatted(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => PriceService::formatAmount($this->totalCostExcludingVat, new Currency($this->initialPayablePrice->currency_iso_4217))
+            get: fn ($value) => PriceService::formatAmount($this->totalCostExcludingVat, new Currency($this->initialPayablePrice->currency_iso_4217))
         );
     }
 
     protected function totalCostIncludingVatFormatted(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => PriceService::formatAmount($this->totalCostIncludingVat, new Currency($this->initialPayablePrice->currency_iso_4217))
+            get: fn ($value) => PriceService::formatAmount($this->totalCostIncludingVat, new Currency($this->initialPayablePrice->currency_iso_4217))
         );
     }
-
 
     protected function initialPriceExcludingVat(): Attribute
     {
@@ -123,8 +120,8 @@ trait HasPayment
         foreach ($this->getPaymentRelations() as $relation) {
             $relation = $this->$relation;
 
-            if($relation instanceof Collection) {
-                $relation = $relation->each(function($item) use (&$price) {
+            if ($relation instanceof Collection) {
+                $relation = $relation->each(function ($item) use (&$price) {
                     $basePrice = $item->basePrice ?? $item->base_price;
 
                     try {
@@ -135,7 +132,7 @@ trait HasPayment
                         dd($e, $item);
                     }
                 });
-            }else{
+            } else {
                 $basePrice = $relation->basePrice;
                 $price += $basePrice instanceof Model
                     ? $basePrice->price_excluding_vat
@@ -144,14 +141,14 @@ trait HasPayment
         }
 
         return Attribute::make(
-            get: fn($value) => $price
+            get: fn ($value) => $price
         );
     }
 
     protected function initialPriceExcludingVatFormatted(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => PriceService::formatAmount($this->initialPriceExcludingVat, new Currency($this->initialPayablePrice->currency_iso_4217))
+            get: fn ($value) => PriceService::formatAmount($this->initialPriceExcludingVat, new Currency($this->initialPayablePrice->currency_iso_4217))
         );
     }
 
@@ -166,7 +163,7 @@ trait HasPayment
     {
         return Attribute::make(
             get: fn ($value) => isset($this->payablePriceExcludingVat)
-                ? PriceService::formatAmount($this->payablePriceExcludingVat, new Currency($this->payablePrice->currency_iso_4217)).  ' +' . __('VAT')
+                ? PriceService::formatAmount($this->payablePriceExcludingVat, new Currency($this->payablePrice->currency_iso_4217)) . ' +' . __('VAT')
                 : null,
         );
     }
@@ -187,7 +184,6 @@ trait HasPayment
         );
     }
 
-
     protected function isPaid(): Attribute
     {
         return Attribute::make(
@@ -205,7 +201,7 @@ trait HasPayment
     protected function isUnpaid(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => !$this->paidPrices()->exists(),
+            get: fn ($value) => ! $this->paidPrices()->exists(),
         );
     }
 
@@ -226,5 +222,4 @@ trait HasPayment
                 ? (is_string($this->hasPaymentRelations) ? [$this->hasPaymentRelations] : $this->hasPaymentRelations)
                 : [];
     }
-
 }

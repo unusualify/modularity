@@ -2,8 +2,6 @@
 
 namespace Unusualify\Modularity\Console;
 
-use Unusualify\Modularity\Facades\Modularity;
-
 class PublishOperationsCommand extends BaseCommand
 {
     protected $hidden = true;

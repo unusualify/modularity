@@ -798,6 +798,7 @@ trait ManageForm
                         if ($inputToFormat) {
                             $events[] = "formatPreview:{$inputToFormat}{$previewFieldPatterns}";
                         }
+
                         break;
                     case 'set': //
                         $inputToFormat = array_shift($args) ?? '';

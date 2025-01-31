@@ -7,7 +7,9 @@ use Exception;
 class AuthConfigurationException extends Exception
 {
     const GUARD_MISSING = 1;
+
     const PROVIDER_MISSING = 2;
+
     const PASSWORD_MISSING = 3;
 
     public static function guardMissing(): self

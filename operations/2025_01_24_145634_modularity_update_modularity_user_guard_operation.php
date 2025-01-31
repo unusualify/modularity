@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Console\Concerns\InteractsWithIO;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use TimoKoerber\LaravelOneTimeOperations\OneTimeOperation;
-use Illuminate\Support\Facades\DB;
 use Unusualify\Modularity\Facades\Modularity;
 
 return new class extends OneTimeOperation
@@ -12,7 +12,7 @@ return new class extends OneTimeOperation
 
     public function __construct()
     {
-        $this->output = new ConsoleOutput();
+        $this->output = new ConsoleOutput;
     }
 
     /**

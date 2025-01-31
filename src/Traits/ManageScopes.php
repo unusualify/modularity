@@ -118,7 +118,7 @@ trait ManageScopes
                 $value = $requestFilters[$key];
                 if ($value == 0 || ! empty($value)) {
                     // add some syntaxic sugar to scope the same filter on multiple columns
-                    if($field != ''){
+                    if ($field != '') {
                         $fieldSplitted = explode('|', $field);
                         if ($key == 'search' && $field != 'search') {
                             $fieldSplitted = explode('|', $field);

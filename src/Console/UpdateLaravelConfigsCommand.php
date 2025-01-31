@@ -47,7 +47,7 @@ class UpdateLaravelConfigsCommand extends BaseCommand
         $modularityAuthGuardName = Modularity::getAuthGuardName();
         $modularityAuthProviderName = Modularity::getAuthProviderName();
         // Laravel Auth Configs
-        if(blank(config('auth.guards.' . $modularityAuthGuardName))){
+        if (blank(config('auth.guards.' . $modularityAuthGuardName))) {
             File::replaceInFile(
                 "'guards' => [\n",
                 <<<CONFIG
@@ -61,7 +61,7 @@ class UpdateLaravelConfigsCommand extends BaseCommand
                 app()->configPath('auth.php')
             );
         }
-        if(blank(config('auth.providers.' . $modularityAuthProviderName))){
+        if (blank(config('auth.providers.' . $modularityAuthProviderName))) {
             File::replaceInFile(
                 "'providers' => [\n",
                 <<<CONFIG
@@ -75,7 +75,7 @@ class UpdateLaravelConfigsCommand extends BaseCommand
                 app()->configPath('auth.php')
             );
         }
-        if(blank(config('auth.passwords.' . $modularityAuthProviderName))){
+        if (blank(config('auth.passwords.' . $modularityAuthProviderName))) {
             $passwordResetTokensTable = modularityConfig('tables.password_reset_tokens', 'password_reset_tokens');
             File::replaceInFile(
                 "'passwords' => [\n",
@@ -94,11 +94,11 @@ class UpdateLaravelConfigsCommand extends BaseCommand
         }
 
         // Laravel Modules Configs
-        if(confirm('Do you want to update nwidart/laravel-modules config?', default: false)){
-            if(!config('modules.scan.enabled')){
+        if (confirm('Do you want to update nwidart/laravel-modules config?', default: false)) {
+            if (! config('modules.scan.enabled')) {
                 File::replaceInFile(
                     "'scan' => [\n        'enabled' => false,",
-                        <<<'CONFIG'
+                    <<<'CONFIG'
                     'scan' => [
                             'enabled' => true,
                     CONFIG,
@@ -139,7 +139,7 @@ class UpdateLaravelConfigsCommand extends BaseCommand
         }
 
         // Larravel translation config
-        if(confirm('Do you want to update joedixon/laravel-translation config?', default: false)){
+        if (confirm('Do you want to update joedixon/laravel-translation config?', default: false)) {
             File::replaceInFile(
                 "'middleware' => 'web'",
                 <<<'CONFIG'
@@ -171,6 +171,7 @@ class UpdateLaravelConfigsCommand extends BaseCommand
         }
 
         $this->info('Laravel Configs updated successfully');
+
         return 0;
     }
 }
