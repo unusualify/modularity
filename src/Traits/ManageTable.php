@@ -271,6 +271,10 @@ trait ManageTable
 
                     ],
                 ],
+                'conditions' => [
+                    ['state.code', 'in', ['pending-payment']],
+                    ['payable_price.price_including_vat', '>', 0],
+                ],
                 //  admin.system.system_payment.payment routeName
                 //  admin.crm.template/system/system-payments/pay/{price}
             ];
