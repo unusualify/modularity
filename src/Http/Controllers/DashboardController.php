@@ -38,7 +38,7 @@ class DashboardController extends BaseController
 
     public function index($parentId = null)
     {
-        $blocks = app()->config->get(unusualBaseKey() . '.ui_settings.dashboard.blocks');
+        $blocks = app()->config->get(modularityBaseKey() . '.ui_settings.dashboard.blocks');
 
         // dd('here');
 

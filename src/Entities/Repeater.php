@@ -30,6 +30,6 @@ class Repeater extends Model
 
     public function getTable()
     {
-        return unusualConfig('tables.repeaters', parent::getTable());
+        return modularityConfig('tables.repeaters', parent::getTable());
     }
 }

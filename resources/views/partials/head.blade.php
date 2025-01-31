@@ -4,7 +4,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
     <meta name="robots" content="noindex,nofollow" />
 
-    {{-- <title>{{ config('app.name') }} {{ unusualConfig('admin_app_title_suffix') }}</title> --}}
+    {{-- <title>{{ config('app.name') }} {{ modularityConfig('admin_app_title_suffix') }}</title> --}}
     <title> {{ $pageTitle ?? 'Module Template' }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Fonts -->

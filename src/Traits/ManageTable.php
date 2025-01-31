@@ -60,7 +60,7 @@ trait ManageTable
             ];
         }
 
-        $this->defaultTableAttributes = (array) Config::get(unusualBaseKey() . '.default_table_attributes');
+        $this->defaultTableAttributes = (array) Config::get(modularityBaseKey() . '.default_table_attributes');
 
         $this->tableAttributes = array_merge_recursive_preserve($this->getTableAttributes(), $this->tableAttributes ?? []);
     }
@@ -77,7 +77,7 @@ trait ManageTable
         $scope = $this->nestedParentScopes() + $scopes;
 
         $statusFilters[] = [
-            // 'name' => unusualTrans("{$this->baseKey}::lang.listing.filter.all-items"),
+            // 'name' => modularityTrans("{$this->baseKey}::lang.listing.filter.all-items"),
             'name' => ___('listing.filter.all-items'),
             'slug' => 'all',
             'number' => $this->repository->getCountByStatusSlug('all', $scope),
@@ -85,7 +85,7 @@ trait ManageTable
 
         // if ($this->routeHasTrait('revisions') && $this->getIndexOption('create')) {
         //     $statusFilters[] = [
-        //         'name' => unusualTrans("$this->baseKey::lang.listing.filter.mine"),
+        //         'name' => modularityTrans("$this->baseKey::lang.listing.filter.mine"),
         //         'slug' => 'mine',
         //         'number' => $this->repository->getCountByStatusSlug('mine', $scope),
         //     ];
@@ -271,6 +271,10 @@ trait ManageTable
 
                     ],
                 ],
+                'conditions' => [
+                    ['state.code', 'in', ['pending-payment']],
+                    ['payable_price.price_including_vat', '>', 0],
+                ],
                 //  admin.system.system_payment.payment routeName
                 //  admin.crm.template/system/system-payments/pay/{price}
             ];
@@ -365,7 +369,7 @@ trait ManageTable
 
     protected function getHeader($header)
     {
-        return array_merge_recursive_preserve(unusualConfig('default_header'), $this->hydrateHeader($header));
+        return array_merge_recursive_preserve(modularityConfig('default_header'), $this->hydrateHeader($header));
     }
 
     protected function hydrateHeader($header)

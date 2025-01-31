@@ -6,7 +6,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\View;
 use Unusualify\Modularity\Activators\FileActivator;
-use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Exceptions\AuthConfigurationException;
 use Unusualify\Modularity\Http\ViewComposers\CurrentUser;
 use Unusualify\Modularity\Http\ViewComposers\FilesUploaderConfig;
 use Unusualify\Modularity\Http\ViewComposers\Localization;
@@ -28,25 +28,25 @@ class BaseServiceProvider extends ServiceProvider
     {
         $this->bootPackageConfigs();
 
-        if (unusualConfig('enabled.media-library')) {
+        if (modularityConfig('enabled.media-library')) {
             $this->app->singleton('imageService', function () {
                 return $this->app->make(config($this->baseKey . '.media_library.image_service'));
             });
         }
         if (
-            unusualConfig('media_library.endpoint_type') === 'local'
-            && unusualConfig('media_library.disk') === unusualBaseKey() . '_media_library'
+            modularityConfig('media_library.endpoint_type') === 'local'
+            && modularityConfig('media_library.disk') === modularityBaseKey() . '_media_library'
         ) {
             $this->setLocalDiskUrl('media');
         }
 
-        if (unusualConfig('enabled.file-library')) {
+        if (modularityConfig('enabled.file-library')) {
             $this->app->singleton('fileService', function () {
                 return $this->app->make(config($this->baseKey . '.file_library.file_service'));
             });
         }
-        if (unusualConfig('file_library.endpoint_type') === 'local'
-            && unusualConfig('file_library.disk') === unusualBaseKey() . '_file_library') {
+        if (modularityConfig('file_library.endpoint_type') === 'local'
+            && modularityConfig('file_library.disk') === modularityBaseKey() . '_file_library') {
             $this->setLocalDiskUrl('file');
         }
 
@@ -75,7 +75,7 @@ class BaseServiceProvider extends ServiceProvider
 
             return [
                 'Vendor' => get_modularity_vendor_dir(),
-                'Theme' => unusualConfig('app_theme'),
+                'Theme' => modularityConfig('app_theme'),
                 'Version' => $package->version,
             ];
         });
@@ -97,21 +97,19 @@ class BaseServiceProvider extends ServiceProvider
         $this->registerCommands();
 
         // $this->app->singleton(\Unusualify\Modularity\Contracts\RepositoryInterface::class, function ($app) {
-        $this->app->singleton('unusual.modularity', function (Application $app) {
+        $this->app->singleton('modularity', function (Application $app) {
             $path = $app['config']->get('modules.paths.modules');
 
             return new Modularity($app, $path);
         });
 
         // $this->app->singleton(FileActivator::class, function ($app) {
-        $this->app->singleton('unusual.activator', function (Application $app) {
-            // echo 'unusual.activator' . "</br>";
+        $this->app->singleton('modularity.activator', function (Application $app) {
             return new FileActivator($app);
         });
 
-        $this->app->singleton('unusual.navigation', UNavigation::class);
+        $this->app->singleton('modularity.navigation', UNavigation::class);
         // $this->app->alias(\Unusualify\Modularity\Contracts\RepositoryInterface::class, 'ue_modules');
-        $this->app->alias('unusual.modularity', 'modularity');
 
         $this->app->singleton('model.relation.namespace', function () {
             return "Illuminate\Database\Eloquent\Relations";
@@ -124,11 +122,11 @@ class BaseServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('unusualify.hosting', function (Application $app) {
-            return new \Unusualify\Modularity\Support\HostRouting($app, unusualConfig('app_url'));
+            return new \Unusualify\Modularity\Support\HostRouting($app, modularityConfig('app_url'));
         });
 
         $this->app->singleton('unusualify.hostRouting', function (Application $app) {
-            return new \Unusualify\Modularity\Support\HostRouteRegistrar($app, unusualConfig('app_url'));
+            return new \Unusualify\Modularity\Support\HostRouteRegistrar($app, modularityConfig('app_url'));
         });
 
         $this->app->singleton('Filepond', function (Application $app) {
@@ -221,25 +219,38 @@ class BaseServiceProvider extends ServiceProvider
      */
     private function bootPackageConfigs()
     {
-        if (unusualConfig('enabled.users-management')) {
-            config(['auth.providers.unusual_users' => [
-                'driver' => 'eloquent',
-                'model' => User::class,
-            ]]);
+        if (modularityConfig('enabled.users-management') && ! $this->app->runningInConsole()) {
+            $modularityAuthGuardAbsent = blank(config('auth.guards.' . Modularity::getAuthGuardName()));
+            $modularityAuthProviderAbsent = blank(config('auth.providers.' . Modularity::getAuthProviderName()));
+            $modularityAuthPasswordAbsent = blank(config('auth.passwords.' . Modularity::getAuthProviderName()));
 
-            config(['auth.guards.unusual_users' => [
-                'driver' => 'session',
-                'provider' => 'unusual_users',
-            ]]);
-
-            if (blank(config('auth.passwords.unusual_users'))) {
-                config(['auth.passwords.unusual_users' => [
-                    'provider' => 'unusual_users',
-                    'table' => unusualConfig('password_resets_table', 'password_reset_tokens'),
-                    'expire' => 60,
-                    'throttle' => 60,
-                ]]);
+            if ($modularityAuthGuardAbsent) {
+                throw AuthConfigurationException::guardMissing();
             }
+
+            if ($modularityAuthProviderAbsent) {
+                throw AuthConfigurationException::providerMissing();
+            }
+
+            if ($modularityAuthPasswordAbsent) {
+                throw AuthConfigurationException::passwordMissing();
+            }
+
+            // try {
+            //     // code that might throw AuthConfigurationException
+            // } catch (AuthConfigurationException $e) {
+            //     switch ($e->getCode()) {
+            //         case AuthConfigurationException::GUARD_MISSING:
+            //             // Handle missing guard
+            //             break;
+            //         case AuthConfigurationException::PROVIDER_MISSING:
+            //             // Handle missing provider
+            //             break;
+            //         case AuthConfigurationException::PASSWORD_MISSING:
+            //             // Handle missing password configuration
+            //             break;
+            //     }
+            // }
         }
 
         config([
@@ -248,49 +259,30 @@ class BaseServiceProvider extends ServiceProvider
                 : env('MODULARITY_VENDOR_DIR', env('MODULARITY_VENDOR_PATH', 'packages/modularity')),
         ]);
 
-        // Nwidart/laravel-modules scan enabled & scan path addition
+        if (! config('modules.scan.enabled')) {
+            throw new \Exception('Modules scan is not enabled, set scan.enabled to true in config/modules.php');
+        }
+
         $scan_paths = config('modules.scan.paths', []);
-        // array_push($scan_paths, base_path( unusualConfig('vendor_path') . '/umodules'));
-        array_push($scan_paths, realpath(__DIR__ . '/../../umodules'));
-        config([
-            'modules.scan.enabled' => true,
-            'modules.scan.paths' => $scan_paths,
-        ]);
+        $umodulesPath = \Unusualify\Modularity\Facades\Modularity::getVendorPath('umodules');
+        if (! in_array($umodulesPath, $scan_paths)) {
+            array_push($scan_paths, $umodulesPath);
+            config([
+                'modules.scan.paths' => $scan_paths,
+            ]);
+        }
 
-        // timokoerber/laravel-one-time-operations directory set
-        config([
-            'one-time-operations.directory' => get_modularity_vendor_dir('operations'),
-        ]);
-
-        config([
-            'modules.cache.enabled' => $this->app->isProduction() ?: unusualConfig('cache.enabled'),
-            'modules.cache.key' => unusualConfig('cache.key'),
-            'modules.cache.lifetime' => unusualConfig('cache.lifetime'),
-        ]);
-
-        // $modularityIsCacheable = ! ($this->app->runningInConsole() && $this->app->runningConsoleCommand([
-        //     'modularity:make:module',
-        //     'unusual:make:module',
-        //     // 'u:m:m',
-        //     'm:m:m',
-        //     'modularity:fix:module',
-        //     'modularity:make:route',
-        //     'unusual:make:route',
-        //     'm:m:r',
-        //     'u:m:r',
-        //     'modularity:dev',
-        //     'unusual:dev',
-        //     'modularity:remove:module',
-        //     'unusual:remove:module',
-        //     'm:r:m',
-        // ]));
-        // if ($modularityIsCacheable) {
+        // if(!$this->app->isProduction() && config('modules.cache.enabled')){
         //     config([
-        //         'modules.cache.enabled' => true,
-        //         'modules.cache.key' => 'modularity',
-        //         'modules.cache.lifetime' => 600,
+        //         'modules.cache.enabled' => false,
         //     ]);
         // }
+
+        // timokoerber/laravel-one-time-operations directory set
+        // config([
+        //     'one-time-operations.directory' => get_modularity_vendor_dir('operations'),
+        // ]);
+
     }
 
     /**
@@ -323,7 +315,8 @@ class BaseServiceProvider extends ServiceProvider
     {
         // LOAD BASE MIGRATIONS
         $this->loadMigrationsFrom(
-            get_modularity_vendor_path('database/migrations/default')
+            // get_modularity_vendor_path('database/migrations/default')
+            \Unusualify\Modularity\Facades\Modularity::getVendorPath('database/migrations/default')
         );
     }
 
@@ -348,7 +341,7 @@ class BaseServiceProvider extends ServiceProvider
     {
 
         // $name = snakeCase( config($this->baseKey . '.name') );
-        $name = unusualBaseKey();
+        $name = modularityBaseKey();
         $langPath = base_path('lang/modules/' . $name);
         $laravelLangPath = base_path('lang');
 
@@ -454,12 +447,12 @@ class BaseServiceProvider extends ServiceProvider
     private function setLocalDiskUrl($type): void
     {
         config([
-            'filesystems.disks.' . unusualBaseKey() . '_' . $type . '_library.url' => request()->getScheme()
+            'filesystems.disks.' . modularityBaseKey() . '_' . $type . '_library.url' => request()->getScheme()
             . '://'
             // . str_replace(['http://', 'https://'], '', config('app.url'))
             . request()->getHttpHost()
             . '/storage/'
-            . trim(unusualConfig($type . '_library.local_path'), '/ '),
+            . trim(modularityConfig($type . '_library.local_path'), '/ '),
         ]);
     }
 

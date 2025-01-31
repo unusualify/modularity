@@ -17,7 +17,7 @@ class Controller extends LaravelController
 
     public function __construct()
     {
-        if (unusualConfig('bind_exception_handler', false)) {
+        if (modularityConfig('bind_exception_handler', false)) {
             App::singleton(ExceptionHandler::class, ModularityHandler::class);
         }
     }

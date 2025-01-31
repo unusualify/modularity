@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Factory as ViewFactory;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Traits\ManageUtilities;
 
@@ -36,7 +37,7 @@ class ForgotPasswordController extends Controller
         parent::__construct();
 
         $this->passwordBrokerManager = $passwordBrokerManager;
-        $this->middleware('unusual_guest');
+        $this->middleware('modularity.guest');
     }
 
     /**
@@ -44,7 +45,7 @@ class ForgotPasswordController extends Controller
      */
     public function broker()
     {
-        return $this->passwordBrokerManager->broker('unusual_users');
+        return $this->passwordBrokerManager->broker(Modularity::getAuthProviderName());
     }
 
     /**
@@ -52,8 +53,8 @@ class ForgotPasswordController extends Controller
      */
     public function showLinkRequestForm(ViewFactory $viewFactory)
     {
-        // return $viewFactory->make(unusualBaseKey().'::auth.passwords.email');
-        return $viewFactory->make(unusualBaseKey() . '::auth.passwords.email', [
+        // return $viewFactory->make(modularityBaseKey().'::auth.passwords.email');
+        return $viewFactory->make(modularityBaseKey() . '::auth.passwords.email', [
             'formAttributes' => [
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
                 'title' => [

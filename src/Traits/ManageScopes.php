@@ -63,7 +63,7 @@ trait ManageScopes
     // ];
     protected function __afterConstructManageScopes($app, $request)
     {
-        $this->defaultTableOrders = (array) Config::get(unusualBaseKey() . '.default_table_orders', ['created_at' => 'desc']);
+        $this->defaultTableOrders = (array) Config::get(modularityBaseKey() . '.default_table_orders', ['created_at' => 'desc']);
 
         // $this->tableOrders = array_merge_recursive_preserve($this->getTableOrders(), $this->tableOrders ?? []);
         $this->tableOrders = $this->getTableOrders();
@@ -118,26 +118,25 @@ trait ManageScopes
                 $value = $requestFilters[$key];
                 if ($value == 0 || ! empty($value)) {
                     // add some syntaxic sugar to scope the same filter on multiple columns
-
-                    $fieldSplitted = explode('|', $field);
-
-                    if ($key == 'search' && $field != 'search') {
+                    if ($field != '') {
                         $fieldSplitted = explode('|', $field);
+                        if ($key == 'search' && $field != 'search') {
+                            $fieldSplitted = explode('|', $field);
 
-                        $scope['searches'] = $fieldSplitted;
+                            $scope['searches'] = $fieldSplitted;
 
-                        $scope[$key] = $requestFilters[$key]; // search
-                    }
+                            $scope[$key] = $requestFilters[$key]; // search
+                        }
+                        if (count($fieldSplitted) > 1) {
+                            $requestValue = $requestFilters[$key];
 
-                    if (count($fieldSplitted) > 1) {
-                        $requestValue = $requestFilters[$key];
-
-                        // $scope[$scopeKey] =
-                        Collection::make($fieldSplitted)->each(function ($scopeKey) use (&$scope, $requestValue) {
-                            $scope[$scopeKey] = $requestValue;
-                        });
-                    } else {
-                        $scope[$field] = $requestFilters[$key];
+                            // $scope[$scopeKey] =
+                            Collection::make($fieldSplitted)->each(function ($scopeKey) use (&$scope, $requestValue) {
+                                $scope[$scopeKey] = $requestValue;
+                            });
+                        } else {
+                            $scope[$field] = $requestFilters[$key];
+                        }
                     }
                 }
             }

@@ -563,7 +563,6 @@ const FormatFuncs = {
       schema[firstLevelName].schema[secondLevelName].placeHolder = lockInput
     }
   },
-
   formatSet: async function(args, model, schema, input, index = null, preview = []) {
     const inputNotation = this.getInputToFormat(args, model, schema, index )
     const languages = getTranslationLanguages()
@@ -735,6 +734,40 @@ const FormatFuncs = {
     }
 
     _.set(schema, setterNotation, _.orderBy(newItems, ['id'], ['asc']))
+  },
+
+  formatClearModel: async function(args, model, schema, input, index = null, preview = []) {
+    const inputNotation = this.getInputToFormat(args, model, schema, index )
+
+    if(!inputNotation)
+      return
+
+    let {handlerName, handlerSchema, handlerValue} = this.handlers(input, model, index)
+
+    let targetSchema = _.get(schema, inputNotation)
+    let defaultValue = targetSchema?.default ?? []
+
+    _.set(model, inputNotation, defaultValue)
+
+    if(_.get(preview, inputNotation)){
+      _.unset(preview, inputNotation)
+      __log('formatClearModel', preview)
+    }
+
+  },
+
+  formatResetItems: async function(args, model, schema, input, index = null, preview = []) {
+    const inputNotation = this.getInputToFormat(args, model, schema, index )
+
+    if(!inputNotation)
+      return
+
+    let {handlerName, handlerSchema, handlerValue} = this.handlers(input, model, index)
+
+    let targetSchema = _.get(schema, inputNotation)
+    let defaultValue = []
+
+    _.set(schema, inputNotation + '.items', defaultValue)
   },
 
   formatPreview: async function(args, model, schema, input, index, preview = []) {
@@ -975,45 +1008,45 @@ const FormatFuncs = {
             return acc
           }, {})
         }
-
         let newSchema = _.cloneDeep({})
+        let lastPrependedKeys = _.get(schema, inputNotation + '._prependedKeys', [])
 
+        let relatedKeys = []
         for(const prependKey in prependerInput.schema){ // prependKey _content
 
           let quotedPattern = __preg_quote(prependKey)
           let pattern = new RegExp( String.raw`^(\d+)(${quotedPattern})`)
-          for(const name in oldSchema){
-            let matches = name.match(pattern)
-            if(matches){
-              let searchId = matches[1]
-              // __log( inputNotation, setterSchemaKey, handlerValue)
-              if(!__isset(handlerValue[searchId])){
-                delete oldSchema[matches[0]]
-                // __log('delete this', matches[0])
-              }
-            }
-          }
           for(const val in handlerValue){
-            // __log(id, handlerValue, prependKey)
             let draftSchema = _.cloneDeep(prependerInput.schema[prependKey])
 
             let pattern = /(\$[\w]+\$)/
             let _inputName = prependKey.replace(pattern, val)
+            relatedKeys.push(_inputName)
             if(!oldSchema[_inputName]){
               newSchema[_inputName] = {
                 ...draftSchema,
                 name: _inputName,
-                label: draftSchema.label ? `${handlerValue[val].label_prefix} ${draftSchema.label}` : __snakeToHeadline(handlerValue.label_prefix + draftSchema.name)
+                label: draftSchema.label
+                  ? `${handlerValue[val].label_prefix} ${draftSchema.label}`
+                  : __snakeToHeadline(handlerValue.label_prefix + draftSchema.name)
               }
-              // __log(newSchema[_inputName])
             }
           }
         }
+
+        let deletedKeys = lastPrependedKeys.filter(key => !relatedKeys.includes(key))
+
+        // delete oldSchema last prepended keys that are not in newSchema
+        deletedKeys.forEach(key => {
+          delete oldSchema[key]
+        })
+        let prependedKeys = relatedKeys.filter(key => !deletedKeys.includes(key))
 
         let updatedSchema =  Object.assign(newSchema, oldSchema)
 
         if(JSON.stringify(inputToPrepended.schema) !== JSON.stringify(updatedSchema)){
           _.set(schema, inputNotation + '.schema', updatedSchema)
+          _.set(schema, inputNotation + '._prependedKeys', prependedKeys)
         }
 
       }

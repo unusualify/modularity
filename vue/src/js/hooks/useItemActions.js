@@ -1,5 +1,5 @@
 // hooks/useItemActions.js
-import { toRefs } from 'vue'
+import { toRefs, computed, reactive } from 'vue'
 import { useStore } from 'vuex'
 import _ from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
@@ -12,13 +12,21 @@ export const makeItemActionsProps = propsFactory({
   isEditing: {
     type: Boolean,
     default: false
+  },
+  actions: {
+    type: [Array, Object],
+    default: () => []
   }
 })
 
 export default function useItemActions(props, context) {
   const store = useStore()
 
-  const editingItem = context.item
+  const editingItem = context.actionItem
+    || context.item
+    || context.editedItem
+    || props.item
+    || props.editedItem
 
   const resolveParamValue = (config) => {
     if (!config.source || !config.find || !config.return) {
@@ -139,49 +147,66 @@ export default function useItemActions(props, context) {
     document.body.removeChild(link);
   }
 
-  const methods = {
-    // methods
-    shouldShowAction(action) {
-      // Base condition for editing/creating
-      const baseCondition = props.isEditing ? action.editable : action.creatable;
+  const can = (permission) => {
+    const name = tableNames.permissionName.value + '_' + permission
+    return store.getters.isSuperAdmin || store.getters.userPermissions[name]
+  }
 
-      // If no conditions defined, return base condition
-      if (!action.conditions) {
-        return baseCondition;
+  const shouldShowAction = (action) => {
+    // Base condition for editing/creating
+    const baseCondition = props.isEditing ? action.editable : action.creatable;
+
+    // If no conditions defined, return base condition
+    if (!action.conditions || !baseCondition) {
+      return baseCondition;
+    }
+
+    // Check all conditions
+    return baseCondition && action.conditions.every(condition => {
+      const [path, operator, value] = condition;
+      const actualValue = getNestedValue(editingItem, path);
+
+      switch (operator) {
+        case '=':
+        case '==':
+          return actualValue === value;
+        case '!=':
+          return actualValue !== value;
+        case '>':
+          return actualValue > value;
+        case '<':
+          return actualValue < value;
+        case '>=':
+          return actualValue >= value;
+        case '<=':
+          return actualValue <= value;
+        case 'in':
+          return Array.isArray(value) && value.includes(actualValue);
+        case 'not in':
+          return Array.isArray(value) && !value.includes(actualValue);
+        case 'exists':
+          return actualValue !== undefined && actualValue !== null;
+        default:
+          console.warn(`Unknown operator: ${operator}`);
+          return false;
       }
+    });
+  }
 
-      // Check all conditions
-      return baseCondition && action.conditions.every(condition => {
-        const [path, operator, value] = condition;
-        const actualValue = getNestedValue(editingItem, path);
+  const flattenedActions = computed(() => window.__isObject(props.actions)
+      ? Object.values(props.actions)
+      : props.actions
+  )
 
-        switch (operator) {
-          case '=':
-          case '==':
-            return actualValue === value;
-          case '!=':
-            return actualValue !== value;
-          case '>':
-            return actualValue > value;
-          case '<':
-            return actualValue < value;
-          case '>=':
-            return actualValue >= value;
-          case '<=':
-            return actualValue <= value;
-          case 'in':
-            return Array.isArray(value) && value.includes(actualValue);
-          case 'not in':
-            return Array.isArray(value) && !value.includes(actualValue);
-          case 'exists':
-            return actualValue !== undefined && actualValue !== null;
-          default:
-            console.warn(`Unknown operator: ${operator}`);
-            return false;
-        }
-      });
-    },
+  const states = reactive({
+    showedActions: computed(() => flattenedActions.value.filter(action => shouldShowAction(action)))
+  })
 
+  // __log(states.showedActions, flattenedActions.value)
+
+  const methods = reactive({
+    // methods
+    shouldShowAction,
     handleAction(action) {
       if (!action.type) {
         console.warn('Action type not specified:', action);
@@ -212,9 +237,10 @@ export default function useItemActions(props, context) {
           console.warn('Unknown action type:', action.type);
       }
     }
-  }
+  })
 
   return {
+    ...toRefs(states),
     ...toRefs(methods),
     // ...toRefs(states)
   }

@@ -13,7 +13,7 @@ return [
                 'value' => $locale,
                 'label' => getLabelFromLocale($locale, true),
             ];
-        }, unusualConfig('available_user_locales', ['en', 'tr'])),
+        }, modularityConfig('available_user_locales', ['en', 'tr'])),
     ],
     '_timezone' => [
         'type' => 'combobox',

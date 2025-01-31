@@ -18,7 +18,7 @@ class RefreshCommand extends BaseCommand
      *
      * @var string
      */
-    protected $description = 'Move new unusual front sources';
+    protected $description = 'Move new modularity front sources';
 
     /**
      * Executes the console command.

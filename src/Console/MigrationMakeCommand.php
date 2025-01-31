@@ -94,7 +94,7 @@ class MigrationMakeCommand extends BaseCommand
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
             ['table-name', null, InputOption::VALUE_OPTIONAL, 'set table name'],
             ['test', null, InputOption::VALUE_NONE, 'Test the Route Generator'],
-        ], unusualTraitOptions());
+        ], modularityTraitOptions());
     }
 
     /**

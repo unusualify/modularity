@@ -19,12 +19,6 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
      */
     public function boot()
     {
-        // config([
-        //     'modules.cache.enabled' => true,
-        //     'modules.cache.key' => 'modularity',
-        //     'modules.cache.lifetime' => 600
-        // ]);
-
         $this->bootModules();
     }
 

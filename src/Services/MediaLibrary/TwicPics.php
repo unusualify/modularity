@@ -21,7 +21,7 @@ class TwicPics implements ImageServiceInterface
      */
     public function getUrl($id, array $params = [])
     {
-        $defaultParams = unusualConfig('twicpics.default_params');
+        $defaultParams = modularityConfig('twicpics.default_params');
 
         return $this->createUrl($id, array_replace($defaultParams, $params));
     }
@@ -54,7 +54,7 @@ class TwicPics implements ImageServiceInterface
      */
     public function getLQIPUrl($id, array $params = [])
     {
-        $defaultParams = unusualConfig('twicpics.lqip_default_params');
+        $defaultParams = modularityConfig('twicpics.lqip_default_params');
 
         return $this->getUrlWithDefaultParams($id, $params, $defaultParams);
     }
@@ -65,7 +65,7 @@ class TwicPics implements ImageServiceInterface
      */
     public function getSocialUrl($id, array $params = [])
     {
-        $defaultParams = unusualConfig('twicpics.social_default_params');
+        $defaultParams = modularityConfig('twicpics.social_default_params');
 
         return $this->getUrlWithDefaultParams($id, $params, $defaultParams);
     }
@@ -76,7 +76,7 @@ class TwicPics implements ImageServiceInterface
      */
     public function getCmsUrl($id, array $params = [])
     {
-        $defaultParams = unusualConfig('twicpics.cms_default_params');
+        $defaultParams = modularityConfig('twicpics.cms_default_params');
 
         return $this->getUrlWithDefaultParams($id, $params, $defaultParams);
     }
@@ -87,8 +87,8 @@ class TwicPics implements ImageServiceInterface
      */
     public function getRawUrl($id)
     {
-        $domain = unusualConfig('twicpics.domain');
-        $path = unusualConfig('twicpics.path');
+        $domain = modularityConfig('twicpics.domain');
+        $path = modularityConfig('twicpics.path');
 
         if (! empty($path)) {
             $path = "{$path}/";
@@ -115,7 +115,7 @@ class TwicPics implements ImageServiceInterface
     {
         $rawUrl = $this->getRawUrl($id);
 
-        $apiVersion = unusualConfig('twicpics.api_version');
+        $apiVersion = modularityConfig('twicpics.api_version');
 
         $params = $this->paramsProcessor->process($params);
 

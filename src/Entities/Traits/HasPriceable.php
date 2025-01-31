@@ -4,8 +4,8 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\Request;
+use Modules\SystemPricing\Entities\Price;
 use Money\Currency;
-use Oobook\Priceable\Models\Price;
 use Oobook\Priceable\Traits\HasPriceable as TraitsHasPriceable;
 
 trait HasPriceable
@@ -39,6 +39,11 @@ trait HasPriceable
                 $model->offsetUnset('basePrice_show');
             }
         });
+    }
+
+    public function prices(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(Price::class, 'priceable');
     }
 
     public function basePrice(): \Illuminate\Database\Eloquent\Relations\MorphOne

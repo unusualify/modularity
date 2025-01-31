@@ -14,12 +14,12 @@ class CreateUnusualDefaultMediasTables extends Migration
     public function up()
     {
 
-        $unusualMediasTable = unusualConfig('tables.medias', 'modularity_medias');
-        $unusualMediablesTable = unusualConfig('tables.mediables', 'modularity_mediables');
+        $mediasTable = modularityConfig('tables.medias', 'modularity_medias');
+        $mediablesTable = modularityConfig('tables.mediables', 'modularity_mediables');
 
-        if (! Schema::hasTable($unusualMediasTable)) {
-            Schema::create($unusualMediasTable, function (Blueprint $table) {
-                $table->{unusualIncrementsMethod()}('id');
+        if (! Schema::hasTable($mediasTable)) {
+            Schema::create($mediasTable, function (Blueprint $table) {
+                $table->{modularityIncrementsMethod()}('id');
                 $table->timestamps();
                 $table->softDeletes();
                 $table->text('uuid');
@@ -31,14 +31,14 @@ class CreateUnusualDefaultMediasTables extends Migration
             });
         }
 
-        if (! Schema::hasTable($unusualMediablesTable)) {
-            Schema::create($unusualMediablesTable, function (Blueprint $table) use ($unusualMediasTable) {
-                $table->{unusualIncrementsMethod()}('id');
+        if (! Schema::hasTable($mediablesTable)) {
+            Schema::create($mediablesTable, function (Blueprint $table) use ($mediasTable) {
+                $table->{modularityIncrementsMethod()}('id');
                 $table->timestamps();
                 $table->softDeletes();
-                $table->{unusualIntegerMethod()}('mediable_id')->nullable()->unsigned();
+                $table->{modularityIntegerMethod()}('mediable_id')->nullable()->unsigned();
                 $table->string('mediable_type')->nullable();
-                $table->{unusualIntegerMethod()}('media_id')->unsigned();
+                $table->{modularityIntegerMethod()}('media_id')->unsigned();
                 $table->integer('crop_x')->nullable();
                 $table->integer('crop_y')->nullable();
                 $table->integer('crop_w')->nullable();
@@ -49,7 +49,7 @@ class CreateUnusualDefaultMediasTables extends Migration
                 $table->text('lqip_data')->nullable();
                 $table->string('ratio')->nullable();
                 $table->json('metadatas');
-                $table->foreign('media_id', 'fk_mediables_media_id')->references('id')->on($unusualMediasTable)->onDelete('cascade')->onUpdate('cascade');
+                $table->foreign('media_id', 'fk_mediables_media_id')->references('id')->on($mediasTable)->onDelete('cascade')->onUpdate('cascade');
                 $table->index(['mediable_type', 'mediable_id']);
 
             });
@@ -63,10 +63,10 @@ class CreateUnusualDefaultMediasTables extends Migration
      */
     public function down()
     {
-        $unusualMediasTable = unusualConfig('tables.medias', 'modularity_medias');
-        $unusualMediablesTable = unusualConfig('tables.mediables', 'modularity_mediables');
+        $mediasTable = modularityConfig('tables.medias', 'modularity_medias');
+        $mediablesTable = modularityConfig('tables.mediables', 'modularity_mediables');
 
-        Schema::dropIfExists($unusualMediablesTable);
-        Schema::dropIfExists($unusualMediasTable);
+        Schema::dropIfExists($mediablesTable);
+        Schema::dropIfExists($mediasTable);
     }
 }

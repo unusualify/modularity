@@ -13,11 +13,11 @@ trait ImageServiceDefaults
 
     public function getSocialFallbackUrl(): string
     {
-        if ($id = unusualConfig('seo.image_default_id')) {
+        if ($id = modularityConfig('seo.image_default_id')) {
             return $this->getSocialUrl($id);
         }
 
-        return unusualConfig('seo.image_local_fallback');
+        return modularityConfig('seo.image_local_fallback');
     }
 
     public function getTransparentFallbackUrl(): string

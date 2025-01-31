@@ -391,7 +391,7 @@ class RouteGenerator extends Generator
      */
     public function getFolders()
     {
-        return $this->config->get(unusualBaseKey() . '.paths.generator');
+        return $this->config->get(modularityBaseKey() . '.paths.generator');
     }
 
     /**
@@ -401,7 +401,7 @@ class RouteGenerator extends Generator
      */
     public function getFiles()
     {
-        return $this->config->get(unusualBaseKey() . '.stubs.files');
+        return $this->config->get(modularityBaseKey() . '.stubs.files');
     }
 
     /**
@@ -706,7 +706,7 @@ class RouteGenerator extends Generator
                 } else {
                     $this->filesystem->makeDirectory($path, 0755, true);
 
-                    if ($this->config->get(unusualBaseKey() . '.stubs.gitkeep')) {
+                    if ($this->config->get(modularityBaseKey() . '.stubs.gitkeep')) {
                         $this->generateGitKeep($path);
                     }
                 }
@@ -1039,19 +1039,20 @@ class RouteGenerator extends Generator
 
         $repository = App::make(PermissionRepository::class);
 
+        $modularityAuthGuardName = Modularity::getAuthGuardName();
         // default permissions of a module
-        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::CREATE->value, 'guard_name' => 'unusual_users']);
-        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::VIEW->value, 'guard_name' => 'unusual_users']);
-        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::EDIT->value, 'guard_name' => 'unusual_users']);
-        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::DELETE->value, 'guard_name' => 'unusual_users']);
-        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::FORCEDELETE->value, 'guard_name' => 'unusual_users']);
-        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::RESTORE->value, 'guard_name' => 'unusual_users']);
-        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::DUPLICATE->value, 'guard_name' => 'unusual_users']);
-        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::REORDER->value, 'guard_name' => 'unusual_users']);
-        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::BULK->value, 'guard_name' => 'unusual_users']);
-        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::BULKDELETE->value, 'guard_name' => 'unusual_users']);
-        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::BULKFORCEDELETE->value, 'guard_name' => 'unusual_users']);
-        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::BULKRESTORE->value, 'guard_name' => 'unusual_users']);
+        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::CREATE->value, 'guard_name' => $modularityAuthGuardName]);
+        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::VIEW->value, 'guard_name' => $modularityAuthGuardName]);
+        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::EDIT->value, 'guard_name' => $modularityAuthGuardName]);
+        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::DELETE->value, 'guard_name' => $modularityAuthGuardName]);
+        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::FORCEDELETE->value, 'guard_name' => $modularityAuthGuardName]);
+        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::RESTORE->value, 'guard_name' => $modularityAuthGuardName]);
+        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::DUPLICATE->value, 'guard_name' => $modularityAuthGuardName]);
+        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::REORDER->value, 'guard_name' => $modularityAuthGuardName]);
+        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::BULK->value, 'guard_name' => $modularityAuthGuardName]);
+        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::BULKDELETE->value, 'guard_name' => $modularityAuthGuardName]);
+        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::BULKFORCEDELETE->value, 'guard_name' => $modularityAuthGuardName]);
+        $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::BULKRESTORE->value, 'guard_name' => $modularityAuthGuardName]);
 
         return true;
     }
@@ -1122,7 +1123,7 @@ class RouteGenerator extends Generator
 
     public function generatorConfig($generator)
     {
-        return new GeneratorPath($this->config->get(unusualBaseKey() . '.paths.generator.' . $generator));
+        return new GeneratorPath($this->config->get(modularityBaseKey() . '.paths.generator.' . $generator));
     }
 
     /**
@@ -1145,7 +1146,7 @@ class RouteGenerator extends Generator
      */
     public function getReplacements()
     {
-        return $this->config->get(unusualBaseKey() . '.stubs.replacements');
+        return $this->config->get(modularityBaseKey() . '.stubs.replacements');
     }
 
     /**
@@ -1292,7 +1293,7 @@ class RouteGenerator extends Generator
      */
     protected function getVendorReplacement()
     {
-        return unusualConfig('composer.vendor');
+        return modularityConfig('composer.vendor');
     }
 
     /**
@@ -1312,7 +1313,7 @@ class RouteGenerator extends Generator
      */
     protected function getAuthorReplacement()
     {
-        return unusualConfig('composer.author.name');
+        return modularityConfig('composer.author.name');
     }
 
     /**
@@ -1322,7 +1323,7 @@ class RouteGenerator extends Generator
      */
     protected function getAuthorEmailReplacement()
     {
-        return unusualConfig('composer.author.email');
+        return modularityConfig('composer.author.email');
     }
 
     public function setTableName($tableName)

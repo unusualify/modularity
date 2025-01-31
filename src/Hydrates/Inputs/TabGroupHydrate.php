@@ -23,6 +23,7 @@ class TabGroupHydrate extends InputHydrate
     {
         $input = $this->input;
         $input['type'] = 'input-tab-group';
+        $input['default'] = json_decode('{}');
 
         $eagers = [];
         foreach ($input['schema'] as $key => $_input) {

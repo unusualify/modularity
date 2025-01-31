@@ -65,6 +65,6 @@ class UserController extends BaseController
         }
 
         return $this->respondWithError(___('listing.delete.error', ['modelTitle' => $this->modelTitle]));
-        // return $this->respondWithError(unusualTrans("$this->baseKey::lang.listing.delete.error", ['modelTitle' => $this->modelTitle]));
+        // return $this->respondWithError(modularityTrans("$this->baseKey::lang.listing.delete.error", ['modelTitle' => $this->modelTitle]));
     }
 }

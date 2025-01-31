@@ -13,12 +13,12 @@ class CreateUnusualDefaultFilesTables extends Migration
      */
     public function up()
     {
-        $unusualFilesTable = unusualConfig('tables.files', 'modularity_files');
-        $unusualFileablesTable = unusualConfig('tables.fileables', 'modularity_fileables');
+        $filesTable = modularityConfig('tables.files', 'modularity_files');
+        $fileablesTable = modularityConfig('tables.fileables', 'modularity_fileables');
 
-        if (! Schema::hasTable($unusualFilesTable)) {
-            Schema::create($unusualFilesTable, function (Blueprint $table) {
-                $table->{unusualIncrementsMethod()}('id');
+        if (! Schema::hasTable($filesTable)) {
+            Schema::create($filesTable, function (Blueprint $table) {
+                $table->{modularityIncrementsMethod()}('id');
                 $table->timestamps();
                 $table->softDeletes();
                 $table->text('uuid');
@@ -27,14 +27,14 @@ class CreateUnusualDefaultFilesTables extends Migration
             });
         }
 
-        if (! Schema::hasTable($unusualFileablesTable)) {
-            Schema::create($unusualFileablesTable, function (Blueprint $table) use ($unusualFilesTable) {
-                $table->{unusualIncrementsMethod()}('id');
+        if (! Schema::hasTable($fileablesTable)) {
+            Schema::create($fileablesTable, function (Blueprint $table) use ($filesTable) {
+                $table->{modularityIncrementsMethod()}('id');
                 $table->timestamps();
                 $table->softDeletes();
-                $table->{unusualIntegerMethod()}('file_id')->unsigned();
-                $table->foreign('file_id', 'fk_files_file_id')->references('id')->on($unusualFilesTable)->onDelete('cascade')->onUpdate('cascade');
-                // $table->{unusualIntegerMethod()}('fileable_id')->nullable()->unsigned();
+                $table->{modularityIntegerMethod()}('file_id')->unsigned();
+                $table->foreign('file_id', 'fk_files_file_id')->references('id')->on($filesTable)->onDelete('cascade')->onUpdate('cascade');
+                // $table->{modularityIntegerMethod()}('fileable_id')->nullable()->unsigned();
                 // $table->string('fileable_type')->nullable();
                 $table->uuidMorphs('fileable');
                 $table->string('role')->nullable();
@@ -51,10 +51,10 @@ class CreateUnusualDefaultFilesTables extends Migration
      */
     public function down()
     {
-        $unusualFilesTable = unusualConfig('tables.files', 'modularity_files');
-        $unusualFileablesTable = unusualConfig('tables.fileables', 'modularity_fileables');
+        $filesTable = modularityConfig('tables.files', 'modularity_files');
+        $fileablesTable = modularityConfig('tables.fileables', 'modularity_fileables');
 
-        Schema::dropIfExists($unusualFileablesTable);
-        Schema::dropIfExists($unusualFilesTable);
+        Schema::dropIfExists($fileablesTable);
+        Schema::dropIfExists($filesTable);
     }
 }

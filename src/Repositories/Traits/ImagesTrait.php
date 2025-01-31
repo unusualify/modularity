@@ -42,7 +42,7 @@ trait ImagesTrait
 
         $mediasFromFields->each(function ($media) use ($object, $mediasCollection) {
             $newMedia = Media::withTrashed()->find(is_array($media['id']) ? Arr::first($media['id']) : $media['id']);
-            $pivot = $newMedia->newPivot($object, Arr::except($media, ['id']), unusualConfig('tables.mediables', 'umod_mediables'), true);
+            $pivot = $newMedia->newPivot($object, Arr::except($media, ['id']), modularityConfig('tables.mediables', 'umod_mediables'), true);
             $newMedia->setRelation('pivot', $pivot);
             $mediasCollection->push($newMedia);
         });

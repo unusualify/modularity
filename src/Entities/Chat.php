@@ -49,6 +49,6 @@ class Chat extends Model
 
     public function getTable()
     {
-        return unusualConfig('tables.chats', parent::getTable());
+        return modularityConfig('tables.chats', parent::getTable());
     }
 }

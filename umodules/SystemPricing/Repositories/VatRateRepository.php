@@ -2,11 +2,12 @@
 
 namespace Modules\SystemPricing\Repositories;
 
+use Modules\SystemPricing\Entities\VatRate;
 use Unusualify\Modularity\Repositories\Repository;
 
 class VatRateRepository extends Repository
 {
-    public function __construct(\Oobook\Priceable\Models\VatRate $model)
+    public function __construct(VatRate $model)
     {
         $this->model = $model;
     }

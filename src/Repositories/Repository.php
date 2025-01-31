@@ -16,13 +16,12 @@ use ReflectionClass;
 use Unusualify\Modularity\Entities\Behaviors\Sortable;
 use Unusualify\Modularity\Repositories\Traits\DatesTrait;
 use Unusualify\Modularity\Repositories\Traits\MethodTransformers;
-use Unusualify\Modularity\Repositories\Traits\PaymentTrait;
 use Unusualify\Modularity\Repositories\Traits\RelationTrait;
 use Unusualify\Modularity\Traits\ManageNames;
 
 abstract class Repository
 {
-    use DatesTrait, ManageNames, MethodTransformers, RelationTrait, PaymentTrait;
+    use DatesTrait, ManageNames, MethodTransformers, RelationTrait;
 
     /**
      * @var \Unusualify\Modularity\Models\Model
@@ -70,15 +69,17 @@ abstract class Repository
     public function get($with = [], $scopes = [], $orders = [], $perPage = 20, $forcePagination = false)
     {
         $query = $this->model->query();
-
         $query = $this->model->with($this->formatWiths($query, $with));
 
         if (isset($scopes['searches']) && isset($scopes['search']) && is_array($scopes['searches'])) {
             $translatedAttributes = $this->model->translatedAttributes ?? [];
 
+            dd($scopes['searches'], $translatedAttributes);
             $searches = Arr::where($scopes['searches'], function (string|int $value, int $key) use ($translatedAttributes) {
                 return ! in_array($value, $translatedAttributes);
             });
+
+            dd($searches, $translatedAttributes, $scopes);
 
             $this->searchIn($query, $scopes, 'search', $searches);
 

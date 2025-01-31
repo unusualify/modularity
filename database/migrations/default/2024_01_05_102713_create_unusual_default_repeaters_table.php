@@ -13,11 +13,11 @@ class CreateUnusualDefaultRepeatersTable extends Migration
      */
     public function up()
     {
-        $unusualRepeatersTable = unusualConfig('tables.repeaters', 'modularity_repeaters');
+        $repeatersTable = modularityConfig('tables.repeaters', 'modularity_repeaters');
 
-        if (! Schema::hasTable($unusualRepeatersTable)) {
-            Schema::create($unusualRepeatersTable, function (Blueprint $table) {
-                $table->{unusualIncrementsMethod()}('id');
+        if (! Schema::hasTable($repeatersTable)) {
+            Schema::create($repeatersTable, function (Blueprint $table) {
+                $table->{modularityIncrementsMethod()}('id');
                 // $table->string('repeatable_type')->nullable(); // MODEL CLASS
                 // $table->string('repeatable_id')->nullable(); // ID belonging to repeatable_type
                 $table->uuidMorphs('repeatable');
@@ -38,8 +38,8 @@ class CreateUnusualDefaultRepeatersTable extends Migration
      */
     public function down()
     {
-        $unusualRepeatersTable = unusualConfig('tables.repeaters', 'modularity_repeaters');
+        $repeatersTable = modularityConfig('tables.repeaters', 'modularity_repeaters');
 
-        Schema::dropIfExists($unusualRepeatersTable);
+        Schema::dropIfExists($repeatersTable);
     }
 }

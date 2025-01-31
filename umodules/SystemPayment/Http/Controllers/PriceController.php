@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
+use Modules\SystemPayment\Entities\Payment;
 use Modules\SystemPayment\Entities\PaymentService;
 use Modules\SystemPricing\Entities\Currency;
 use Oobook\Priceable\Models\Price;
@@ -24,29 +27,42 @@ class PriceController extends Controller
 
     public function pay(Request $request)
     {
-        // dd(redirect());
-
         $params = $request->all();
         $payment = null;
-        // dd($params);
         $price = Price::with('currency')->find($params['price_id']);
-        $requestCurrency = $params['payment_service']['currency']['iso_4217'];
-        // dd($price);
-        if ($price->currency->iso_4217 != $requestCurrency) {
-            $newCurrency = Currency::where('iso_4217', $requestCurrency)->first();
-            $price->currency_id = $newCurrency->id;
+        $requestCurrencyIso4217 = $params['payment_service']['currency']['iso_4217'];
 
-            $price = $this->updatePrice($price, $newCurrency);
-            $price->save();
+        $convertedPrice = $price->price_including_vat;
+        $convertedPriceExcludingVat = $price->price_excluding_vat;
+
+        if (Str::upper($price->currency->iso_4217) != Str::upper($requestCurrencyIso4217)) {
+            $convertedPriceExcludingVat = $this->currencyService
+                ->convertTo(
+                    $convertedPriceExcludingVat,
+                    mb_strtoupper($requestCurrencyIso4217),
+                    decimals: 0,
+                    round: 'round'
+                );
+            $convertedPrice = $this->currencyService
+                ->convertTo(
+                    $convertedPrice,
+                    mb_strtoupper($requestCurrencyIso4217),
+                    decimals: 0,
+                    round: 'round'
+                );
         }
+
+        $convertedCurrency = Currency::where('iso_4217', $requestCurrencyIso4217 ?? $price->currencyIso4217)->first();
+
         $paymentService = null;
+
         if ($params['payment_service']['payment_method'] == -1) {
 
-            $currency = $price->currency->iso_4217;
-            $paymentServiceName = unusualConfig('payment.currency_services' . ".{$currency}");
+            $currency = $convertedCurrency->iso_4217;
+            $paymentServiceName = modularityConfig('payment.currency_services' . ".{$currency}");
             $payment = new Payable($paymentServiceName);
             $paymentService = PaymentService::where('name', $paymentServiceName)->first();
-            // dd($paymentServiceName);
+
             Session::put('payable_payment_service', $paymentServiceName);
 
         } else {
@@ -59,16 +75,16 @@ class PriceController extends Controller
 
         $user = Auth::user();
         $company = $user->company;
-        // dd($company);
+
         $payload = $payment->getPayloadSchema();
         $arr = [
             'locale' => app()->getLocale(),
             'payment_service_id' => $paymentService->id,
             'order_id' => uniqid('ORD-'),
-            'price' => $price->price_excluding_vat,
             'price_id' => $price->id,
-            'paid_price' => $price->display_price,
-            'currency' => $price->currency,
+            'price' => $convertedPriceExcludingVat,
+            'paid_price' => $convertedPrice,
+            'currency' => $convertedCurrency,
             'installment' => '1',
             'payment_group' => 'PRODUCT',
             'card_name' => $params['payment_service']['credit_card']['card_name'],
@@ -115,6 +131,36 @@ class PriceController extends Controller
     {
 
         if ($request->status == 'success') {
+
+            try {
+                if ($request->get('id')) {
+
+                    $payment = Payment::find($request->get('id'));
+
+                    $newPrice = $payment->price->replicate();
+
+                    $newPrice->saveQuietly();
+
+                    $newPrice->update([
+                        'display_price' => 0,
+                    ]);
+                }
+            } catch (\Throwable $th) {
+
+                try {
+                    Mail::raw('There was an error updating the price after payment.\n\n' .
+                        'Error details:\n' .
+                        'Payment ID: ' . request()->get('id') . '\n\n' .
+                        'Error: ' . $th->getMessage() . '\n\n' .
+                        'Trace: ' . $th->getTraceAsString(), function ($message) {
+                            $message->to('oguzhan@unusualgrowth.com')
+                                ->subject('Payment Price Update Error');
+                        });
+                } catch (\Throwable $th) {
+                    // throw $th;
+                }
+            }
+
             return redirect(merge_url_query($request->custom_fields['previous_url'],
                 [
                     'customModal' => [

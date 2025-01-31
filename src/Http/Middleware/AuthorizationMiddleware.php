@@ -22,7 +22,7 @@ class AuthorizationMiddleware
 
     public function handle($request, Closure $next)
     {
-        view()->composer(unusualBaseKey() . '::layouts.master', function ($view) {
+        view()->composer(modularityBaseKey() . '::layouts.master', function ($view) {
             $user = Auth::user();
 
             $permissions = Arr::mapWithKeys(Gate::abilities(), function ($closure, $key) {
