@@ -25,8 +25,8 @@ class SwitchHydrate extends InputHydrate
     {
         $input = $this->input;
 
-        $input['hideDetails'] = true;
-        $input['default'] = 0;
+        $input['hideDetails'] = $input['hideDetails'] ?? true;
+        $input['default'] = $input['default'] ?? 1;
 
         // add your logic
 
