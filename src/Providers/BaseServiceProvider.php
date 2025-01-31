@@ -6,7 +6,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\View;
 use Unusualify\Modularity\Activators\FileActivator;
-use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Exceptions\AuthConfigurationException;
 use Unusualify\Modularity\Http\ViewComposers\CurrentUser;
 use Unusualify\Modularity\Http\ViewComposers\FilesUploaderConfig;
 use Unusualify\Modularity\Http\ViewComposers\Localization;
@@ -16,7 +16,6 @@ use Unusualify\Modularity\Modularity;
 use Unusualify\Modularity\Services\View\UNavigation;
 use Unusualify\Modularity\Support\FileLoader;
 use Unusualify\Modularity\Translation\Translator;
-use Unusualify\Modularity\Exceptions\AuthConfigurationException;
 
 class BaseServiceProvider extends ServiceProvider
 {
@@ -220,7 +219,7 @@ class BaseServiceProvider extends ServiceProvider
      */
     private function bootPackageConfigs()
     {
-        if (modularityConfig('enabled.users-management') && !$this->app->runningInConsole()) {
+        if (modularityConfig('enabled.users-management') && ! $this->app->runningInConsole()) {
             $modularityAuthGuardAbsent = blank(config('auth.guards.' . Modularity::getAuthGuardName()));
             $modularityAuthProviderAbsent = blank(config('auth.providers.' . Modularity::getAuthProviderName()));
             $modularityAuthPasswordAbsent = blank(config('auth.passwords.' . Modularity::getAuthProviderName()));
@@ -260,13 +259,13 @@ class BaseServiceProvider extends ServiceProvider
                 : env('MODULARITY_VENDOR_DIR', env('MODULARITY_VENDOR_PATH', 'packages/modularity')),
         ]);
 
-        if(!config('modules.scan.enabled')){
+        if (! config('modules.scan.enabled')) {
             throw new \Exception('Modules scan is not enabled, set scan.enabled to true in config/modules.php');
         }
 
         $scan_paths = config('modules.scan.paths', []);
         $umodulesPath = \Unusualify\Modularity\Facades\Modularity::getVendorPath('umodules');
-        if(!in_array($umodulesPath, $scan_paths)) {
+        if (! in_array($umodulesPath, $scan_paths)) {
             array_push($scan_paths, $umodulesPath);
             config([
                 'modules.scan.paths' => $scan_paths,

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Nwidart\Modules\Support\Stub;
 use Unusualify\Modularity\Facades\Modularity;
+
 class CreateOperationCommand extends BaseCommand
 {
     protected $hidden = true;

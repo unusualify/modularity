@@ -55,6 +55,7 @@ class CurrencyExchangeService
 
     /**
      * Convert amount from base currency to target currency.
+     *
      * @param float $amount Amount to convert
      * @param string $targetCurrency Currency to convert to
      * @param int $decimals Number of decimal places (default: 2)

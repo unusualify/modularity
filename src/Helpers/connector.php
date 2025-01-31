@@ -15,7 +15,7 @@ if (! function_exists('init_connector')) {
 
         $moduleInfo = find_module_and_route($connector);
 
-        if(!$moduleInfo['module']){
+        if (! $moduleInfo['module']) {
             throw new \Exception('Module not found' . $connector);
         }
 

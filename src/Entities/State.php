@@ -51,6 +51,5 @@ class State extends Model
         }
 
         throw new \Exception('State translation model not found');
-
     }
 }

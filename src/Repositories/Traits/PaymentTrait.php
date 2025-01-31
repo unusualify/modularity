@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Repositories\Traits;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Request;
 use Modules\SystemPricing\Entities\Price;
+
 trait PaymentTrait
 {
     use PricesTrait;
@@ -48,7 +49,6 @@ trait PaymentTrait
             $val = Arr::isAssoc($fields['payment']) ? $fields['payment'] : $fields['payment'][0];
             $price = Price::find($val['id']);
 
-
             if ($price->isUnpaid) {
                 // Update existing unpaid record
                 $price->update(Arr::only($val, [
@@ -58,7 +58,7 @@ trait PaymentTrait
                     'display_price',
                     'role',
                     'valid_from',
-                    'valid_till'
+                    'valid_till',
                 ]));
             } else {
                 // Create new record with previous data for paid records
@@ -70,7 +70,7 @@ trait PaymentTrait
                     'display_price',
                     'role',
                     'valid_from',
-                    'valid_till'
+                    'valid_till',
                 ]));
                 $newPrice->save();
             }
