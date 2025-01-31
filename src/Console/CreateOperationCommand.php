@@ -59,7 +59,7 @@ class CreateOperationCommand extends BaseCommand
 
         $content = (new Stub('/operation.stub', $replacements))->render();
 
-        $path = Modularity::getVendorPath('operations/' . $this->getDatePrefix() . '_' . $snakeName . '_operation.php');
+        $path = Modularity::getVendorPath('operations/' . $this->getDatePrefix() . '_modularity_' . $snakeName . '_operation.php');
 
         File::put($path, $content);
 
