@@ -2,7 +2,7 @@
 
 namespace Modules\SystemPricing\Repositories;
 
-use Oobook\Priceable\Models\PriceType;
+use Modules\SystemPricing\Entities\PriceType;
 use Unusualify\Modularity\Repositories\Repository;
 
 class PriceTypeRepository extends Repository
