@@ -18,7 +18,7 @@ return new class extends OneTimeOperation
     /**
      * Determine if the operation is being processed asynchronously.
      */
-    protected bool $async = false;
+    protected bool $async = true;
 
     /**
      * The queue that the job will be dispatched to.
@@ -47,9 +47,6 @@ return new class extends OneTimeOperation
         DB::table($rolesTable)
             ->where('guard_name', 'unusual_users')
             ->update(['guard_name' => $modularityAuthGuardName]);
-        // $result = DB::pretend(function () {
-        // });
-        // dd($result);
 
         $this->info("\tPermissions guard names updated from 'unusual_users' to '{$modularityAuthGuardName}'");
         $this->output->writeln('');
