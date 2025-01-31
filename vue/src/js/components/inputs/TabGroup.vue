@@ -26,7 +26,7 @@
         <template v-slot:windows="{active}">
           <v-window v-model="activeTab">
             <v-window-item v-for="(item, i) in elements" :key="item.id" :value="item.id">
-              <ue-form
+              <ue-form-old
                 :ref="formRefs[item.id]"
                 :key="`form-${item.id}-${JSON.stringify(schemas[item.id])}`"
                 v-modelx="models[item.id]"
@@ -181,7 +181,7 @@ export default {
   watch: {
     activeTab: {
       handler (value, oldValue) {
-        __log('activeTab', value)
+        // __log('activeTab', value)
       }
     },
     models: {
@@ -317,7 +317,6 @@ export default {
 
   },
   created() {
-
     this.models = this.elements.reduce((acc, item) => {
       if(!__isset(acc[item.id])){
         acc[item.id] = this.input?.[item.id] ?? {}
