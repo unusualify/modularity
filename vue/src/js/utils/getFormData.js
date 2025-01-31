@@ -563,7 +563,6 @@ const FormatFuncs = {
       schema[firstLevelName].schema[secondLevelName].placeHolder = lockInput
     }
   },
-
   formatSet: async function(args, model, schema, input, index = null, preview = []) {
     const inputNotation = this.getInputToFormat(args, model, schema, index )
     const languages = getTranslationLanguages()
@@ -735,6 +734,40 @@ const FormatFuncs = {
     }
 
     _.set(schema, setterNotation, _.orderBy(newItems, ['id'], ['asc']))
+  },
+
+  formatClearModel: async function(args, model, schema, input, index = null, preview = []) {
+    const inputNotation = this.getInputToFormat(args, model, schema, index )
+
+    if(!inputNotation)
+      return
+
+    let {handlerName, handlerSchema, handlerValue} = this.handlers(input, model, index)
+
+    let targetSchema = _.get(schema, inputNotation)
+    let defaultValue = targetSchema?.default ?? []
+
+    _.set(model, inputNotation, defaultValue)
+
+    if(_.get(preview, inputNotation)){
+      _.unset(preview, inputNotation)
+      __log('formatClearModel', preview)
+    }
+
+  },
+
+  formatResetItems: async function(args, model, schema, input, index = null, preview = []) {
+    const inputNotation = this.getInputToFormat(args, model, schema, index )
+
+    if(!inputNotation)
+      return
+
+    let {handlerName, handlerSchema, handlerValue} = this.handlers(input, model, index)
+
+    let targetSchema = _.get(schema, inputNotation)
+    let defaultValue = []
+
+    _.set(schema, inputNotation + '.items', defaultValue)
   },
 
   formatPreview: async function(args, model, schema, input, index, preview = []) {
