@@ -2,6 +2,76 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.26.0 - 2025-02-01
+
+### :rocket: Features
+
+- add authentication guard and provider configuration methods by @OoBook in https://github.com/unusualify/modularity/commit/77ebbc63b78368d4c2cf19f791d5d4f6b97455b2
+- add AuthConfigurationException for robust authentication setup by @OoBook in https://github.com/unusualify/modularity/commit/d2eb26d74deb6f3d57e81043db9db9a4f6e7cc60
+- add CreateOperationCommand for generating one-time operations by @OoBook in https://github.com/unusualify/modularity/commit/26a06fd16799c5ee749de41995b54487d3b8c39d
+- add PublishOperationsCommand and operation stub template by @OoBook in https://github.com/unusualify/modularity/commit/83868b000b55ae57a00458a5561a9490f744f17e
+- update Laravel translation package configuration by @OoBook in https://github.com/unusualify/modularity/commit/80c124ac09ba94b888111d68f2272133317af2c2
+- enhance service provider with operations publishing and config management by @OoBook in https://github.com/unusualify/modularity/commit/ffbdf133227da645971d7766583893b5281d05ff
+- add one-time operations for system configuration updates by @OoBook in https://github.com/unusualify/modularity/commit/6838cd1e948b55cf01693fac9e63629383b63bc8
+- enable module scanning and dynamic cache configuration by @OoBook in https://github.com/unusualify/modularity/commit/7aa1e3858b4deba4f024aeb55320720c169e6afd
+- enhance modules config with environment-based cache settings by @OoBook in https://github.com/unusualify/modularity/commit/086d18738ca88d75d631c712c46a0055416b3df1
+- add one-time operation for updating user guard names by @OoBook in https://github.com/unusualify/modularity/commit/d5560d2e8665adc14d5e74535d43d3ea9dbc0420
+- add dynamic condition evaluation for table item actions by @OoBook in https://github.com/unusualify/modularity/commit/dd99615fcf26a34cb82dc32d58df1f9a871ef8ac
+- improve input hook with enhanced default value handling by @OoBook in https://github.com/unusualify/modularity/commit/9b920d5f96f410b571cbc2ef4ed293059a6a3189
+- enhance form data handling with new utility functions by @OoBook in https://github.com/unusualify/modularity/commit/318b5c172145e9068f47f1a7b9e0a871480f16c4
+- improve prepend schema key tracking and deletion by @OoBook in https://github.com/unusualify/modularity/commit/0834ac7d2c85d614a2d6beb9c982a40b2dd6ff52
+- improve table form action handling and validation reset by @OoBook in https://github.com/unusualify/modularity/commit/e55ac219334a0e11d4533d86a9299c353c695014
+- add FormActions component for dynamic form interactions by @OoBook in https://github.com/unusualify/modularity/commit/41b218e2ff411da95708446ec18c774954618ffe
+- add useForm hook for comprehensive form management by @OoBook in https://github.com/unusualify/modularity/commit/03ab5e83f04d265342fd7eee34917938846ff8b2
+- add stepper components for multi-step form workflow by @OoBook in https://github.com/unusualify/modularity/commit/d623f403f454db80734b1f73a47b8cd5418dcc49
+- add SystemPricing module entities and repositories by @OoBook in https://github.com/unusualify/modularity/commit/11a6d0a8b9756d6fc2e9d919729038aada8713a6
+- add PaymentStatus enum for payment state management by @OoBook in https://github.com/unusualify/modularity/commit/a71363a2b9727757f44caeff9e18d3fcc49b300f
+- update HasPriceable trait with SystemPricing module integration by @OoBook in https://github.com/unusualify/modularity/commit/4450a3a40bf969ae65e53e0b47b351078a949f3d
+- add default value for tab group input hydration by @OoBook in https://github.com/unusualify/modularity/commit/7d7ebbf8b088ab17324d49a78ee332e2179e35a0
+- enhance convertTo method with rounding and decimal precision by @OoBook in https://github.com/unusualify/modularity/commit/09e08bf5e5d85edccd8fba12463c8511e6564fca
+- add new format events for model clearing and item resetting by @OoBook in https://github.com/unusualify/modularity/commit/31d72dd35cf9920649a6cbc5b53ce92cf875cb88
+- add conditional filtering for pending payment states by @OoBook in https://github.com/unusualify/modularity/commit/07bb77e3e228c462686b361283de7fff136c2100
+- enhance HasPayment trait with comprehensive payment state management by @OoBook in https://github.com/unusualify/modularity/commit/a45cb061a42c5ba54f2c0e76818ab96971c7933f
+- implement intelligent price update strategy for unpaid and paid records by @OoBook in https://github.com/unusualify/modularity/commit/0ca5f39229b5921b33ba8bd50301ef58be868db9
+- implement advanced currency conversion and payment processing by @OoBook in https://github.com/unusualify/modularity/commit/a596084c75faf2aad82ce45fd9271a9bc771aeba
+
+### :wrench: Bug Fixes
+
+- add default return URL configuration for payment module by @OoBook in https://github.com/unusualify/modularity/commit/bb3c81736224816cab67c681e87a247abb2500e6
+- add configuration for VAT pricing mode by @OoBook in https://github.com/unusualify/modularity/commit/9a85a3ec9a2fc2f1b80e4e671ae301a7f43b2b47
+- add error handling for module resolution by @OoBook in https://github.com/unusualify/modularity/commit/a1ab6ae0b9681878e2f85e6a6246cf4e247c654c
+- improve default values for switch input hydration by @OoBook in https://github.com/unusualify/modularity/commit/904116fac66120d329db3e91e30e9b0b933ccfa7
+- modify operation file naming convention by @OoBook in https://github.com/unusualify/modularity/commit/106cfb68f7892898e35801d99d3f02c05b5d88df
+- remove PaymentTrait and add debug statements for search functionality by @OoBook in https://github.com/unusualify/modularity/commit/b72f8c0989429e0bc58bdfcb05f2f629bb13751a
+- refactor filterScope method for more robust field handling by @OoBook in https://github.com/unusualify/modularity/commit/94ef1be3aa75b5e29f45d30878e78f66fcda4fa7
+
+### :recycle: Refactors
+
+- update BaseServiceProvider with modularity configuration and auth handling by @OoBook in https://github.com/unusualify/modularity/commit/67708ab5b1b06a6eda7b0a3ef9858c9abe9f72fa
+- update authentication and configuration references across controllers by @OoBook in https://github.com/unusualify/modularity/commit/04bfb7d98947c070d28bb45c1e2a8652edc14752
+- update translation configuration middleware by @OoBook in https://github.com/unusualify/modularity/commit/ccdba975d7da38630d6564d3ae142b238e568724
+- enhance BaseServiceProvider with robust configuration and auth handling by @OoBook in https://github.com/unusualify/modularity/commit/6f18aec58f3a535af2d9dba272c59d707b8055eb
+- update BaseServiceProvider with consistent configuration methods by @OoBook in https://github.com/unusualify/modularity/commit/87343f9efff65f3a53f93c9d1b990b08668f11c3
+- dynamically configure auth guard in default seeders by @OoBook in https://github.com/unusualify/modularity/commit/2831284dc1c1b8b0e46959cc5bd9f741e48027f1
+- update LoginController and ImpersonateMiddleware with dynamic authentication methods by @OoBook in https://github.com/unusualify/modularity/commit/c08a8fda856740d7fcad63c3239e6c9e376de585
+- rename theme and update route middleware configuration by @OoBook in https://github.com/unusualify/modularity/commit/a55ba8dcf27db9d10f5758b16401a1367aa19f9c
+- update default activity log table name by @OoBook in https://github.com/unusualify/modularity/commit/b289fab8f946e7e1c585c435d89fefec295ea0f5
+- update module configuration for Vite and webpack replacement by @OoBook in https://github.com/unusualify/modularity/commit/1fcd3c6c7699e3a1154f9f5790af0692a0250872
+- reorganize config publishing with vendor-specific configurations by @OoBook in https://github.com/unusualify/modularity/commit/6bdb3fb1445b34629ee3dc7a4e1a04db6bbac41f
+- simplify module scanning and configuration management by @OoBook in https://github.com/unusualify/modularity/commit/eb04d6cd304da5f5584d10519eb4c34c36aaddf2
+- enhance useItemActions hook with dynamic action handling by @OoBook in https://github.com/unusualify/modularity/commit/9131189b6d75e08f243a9a438082abef3469ff7e
+- simplify Form component with useForm hook and FormActions by @OoBook in https://github.com/unusualify/modularity/commit/d369890770189e589b68ae34128fbcfc34467d5b
+- update TabGroup component with minor form component changes by @OoBook in https://github.com/unusualify/modularity/commit/7dac4e395fb9f06206763e12544fd40cb4b78a77
+- modularize StepperForm component with extracted subcomponents by @OoBook in https://github.com/unusualify/modularity/commit/e54973e613d413aa15ce5bc56fac57fad18c1e1f
+
+### :lipstick: Styling
+
+- lint coding styles for v0.26.0 by @OoBook in https://github.com/unusualify/modularity/commit/fa0e64a217bfbd5b2404673b2f6d5e556cb6f7df
+
+### :package: Build
+
+- update build artifacts for v0.26.0 by @OoBook in https://github.com/unusualify/modularity/commit/32c74a1edff6338f84f5efa70303e43af3500a0c
+
 ## v0.25.0 - 2025-01-22
 
 ### :rocket: Features
