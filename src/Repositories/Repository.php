@@ -74,12 +74,9 @@ abstract class Repository
         if (isset($scopes['searches']) && isset($scopes['search']) && is_array($scopes['searches'])) {
             $translatedAttributes = $this->model->translatedAttributes ?? [];
 
-            dd($scopes['searches'], $translatedAttributes);
             $searches = Arr::where($scopes['searches'], function (string|int $value, int $key) use ($translatedAttributes) {
                 return ! in_array($value, $translatedAttributes);
             });
-
-            dd($searches, $translatedAttributes, $scopes);
 
             $this->searchIn($query, $scopes, 'search', $searches);
 
