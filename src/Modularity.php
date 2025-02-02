@@ -201,9 +201,7 @@ class Modularity extends FileRepository
      */
     public function clearCache()
     {
-        if (config('modules.cache.enabled') === true) {
-            app('cache')->forget(config('modules.cache.key'));
-        }
+        app('cache')->forget($this->config('cache.key'));
     }
 
     /**
