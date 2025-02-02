@@ -81,7 +81,7 @@
             "Unusualify\\Modularity\\": "src",
             "Unusualify\\Modularity\\Database\\Seeders\\": "database/seeders",
             "Unusualify\\Modularity\\Database\\Factories\\": "database/factories",
-            "Modules\\": "umodules"
+            "Modules\\": "modules"
         },
         "files": [
           "src/Support/Migrations/SchemaParser.php",

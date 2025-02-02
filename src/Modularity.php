@@ -187,6 +187,11 @@ class Modularity extends FileRepository
     {
         $store = $this->modularityCache->store($this->modularityConfig->get('modules.cache.driver'));
 
+        // dd(
+        //     // $store->forget($this->config('cache.key')),
+        //     $store->has($this->config('cache.key')),
+        //     $store->get($this->config('cache.key'))
+        // );
         if ($store->has($this->config('cache.key'))) {
             return $store->get($this->config('cache.key'));
         } else {
@@ -202,7 +207,7 @@ class Modularity extends FileRepository
     public function clearCache()
     {
         if (config('modules.cache.enabled') === true) {
-            app('cache')->forget(config('modules.cache.key'));
+            app('cache')->forget($this->config('cache.key'));
         }
     }
 

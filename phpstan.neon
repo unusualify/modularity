@@ -13,7 +13,7 @@ parameters:
         - resources
         - routes
         - src
-        - umodules
+        - modules
 
 #    ignoreErrors:
 #        - '#PHPDoc tag @var#'

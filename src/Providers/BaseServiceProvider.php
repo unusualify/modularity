@@ -263,15 +263,6 @@ class BaseServiceProvider extends ServiceProvider
             throw new \Exception('Modules scan is not enabled, set scan.enabled to true in config/modules.php');
         }
 
-        $scan_paths = config('modules.scan.paths', []);
-        $umodulesPath = \Unusualify\Modularity\Facades\Modularity::getVendorPath('umodules');
-        if (! in_array($umodulesPath, $scan_paths)) {
-            array_push($scan_paths, $umodulesPath);
-            config([
-                'modules.scan.paths' => $scan_paths,
-            ]);
-        }
-
         // if(!$this->app->isProduction() && config('modules.cache.enabled')){
         //     config([
         //         'modules.cache.enabled' => false,

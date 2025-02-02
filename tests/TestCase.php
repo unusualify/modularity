@@ -10,7 +10,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     public $path;
 
-    public $umodulesPath;
+    public $modulesPath;
 
     protected function setUp(): void
     {
@@ -21,7 +21,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $this->path = realpath(__DIR__ . '/..');
 
-        $this->umodulesPath = realpath($this->path . '/umodules');
+        $this->modulesPath = realpath($this->path . '/modules');
 
         // $app['cache'] = $this->createMock(CacheManager::class);
         // $app['files'] = $this->createMock(Filesystem::class);
@@ -82,8 +82,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     }
 
-    public function umoduleDirectory(string $moduleName): string
+    public function moduleDirectory(string $moduleName): string
     {
-        return realpath("{$this->umodulesPath}/{$moduleName}");
+        return realpath("{$this->modulesPath}/{$moduleName}");
     }
 }
