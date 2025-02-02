@@ -2,6 +2,12 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.26.1 - 2025-02-02
+
+### :wrench: Bug Fixes
+
+- remove debug statements from search method by @OoBook in https://github.com/unusualify/modularity/commit/4828684da7f174c06ef7b543a06d16f47441e675
+
 ## v0.26.0 - 2025-02-01
 
 ### :rocket: Features
