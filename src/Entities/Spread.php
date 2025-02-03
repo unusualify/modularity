@@ -18,11 +18,11 @@ class Spread extends Model
     protected $fillable = [
         'name',
         'published',
-        'json'
+        'content'
     ];
 
     protected $casts = [
-        'json' => 'array'
+        'content' => 'array'
     ];
 
     // protected function casts(): array
