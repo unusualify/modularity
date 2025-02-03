@@ -23,6 +23,9 @@ Route::group(['prefix' => 'profile', 'as' => 'profile.'], function () {
 });
 Route::put('profile/company', 'ProfileController@updateCompany')->name('profile.company');
 
+Route::get('users/impersonate/stop', 'ImpersonateController@stopImpersonate')->name('impersonate.stop');
+Route::get('users/impersonate/{id}', 'ImpersonateController@impersonate')->name('impersonate');
+
 // system internal api routes (for ajax web routes)
 Route::prefix('api')->group(function () {
     if (modularityConfig('enabled.media-library')) {

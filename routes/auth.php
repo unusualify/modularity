@@ -33,9 +33,6 @@ if (modularityConfig('enabled.users-management')) {
     // Route::get('password/welcome/{token}', 'ResetPasswordController@showWelcomeForm')->name('password.reset.welcome.form');
     Route::post('password/reset', 'ResetPasswordController@reset')->name('password.reset.update');
 
-    Route::get('users/impersonate/stop', 'ImpersonateController@stopImpersonate')->name('impersonate.stop');
-    Route::get('users/impersonate/{id}', 'ImpersonateController@impersonate')->name('impersonate');
-
     Route::get('register/success', 'RegisterController@success')->name('register.success');
 
 }
