@@ -75,8 +75,15 @@ jobs:
               });
             }
 
+            // Fetch changed files using GitHub API
+            const { data: changedFiles } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
             // Check for docs changes
-            const hasDocsChanges = pr.changed_files.some(file =>
+            const hasDocsChanges = changedFiles.some(file =>
               file.filename.includes('docs') ||
               file.filename.endsWith('.md') ||
               file.filename.endsWith('.mdx')
@@ -86,8 +93,8 @@ jobs:
               updatedBody = updatedBody.replace('- [ ] I have updated the documentation accordingly.', '- [x] I have updated the documentation accordingly.');
             }
 
-            console.log(updatedBody)
-            console.log(context.issue)
+            console.log(updatedBody);
+            console.log(context.issue);
 
             // Update PR body
             // await github.rest.pulls.update({
