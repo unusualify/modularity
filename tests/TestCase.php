@@ -50,6 +50,12 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $app['config']->set('cache.prefix', 'spatie_tests---');
         $app['config']->set('cache.default', getenv('CACHE_DRIVER') ?: 'array');
+        $app['config']->set('modules.scan.enabled', true);
+        $app['config']->set('modules.cache.enabled', false);
+        $app['config']->set('modules.scan.paths', [
+            base_path('vendor/*/*'),
+            realpath(__DIR__ . '/../modules'),
+        ]);
 
     }
 
