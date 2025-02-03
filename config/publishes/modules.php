@@ -191,6 +191,7 @@ return [
     */
     'cache' => [
         'enabled' => env('MODULARITY_CACHE_ENABLED', true),
+        'driver' => env('MODULARITY_CACHE_DRIVER', 'file'),
         'key' => env('MODULARITY_CACHE_KEY', 'modularity'),
         'lifetime' => env('MODULARITY_CACHE_LIFETIME', 600),
     ],
