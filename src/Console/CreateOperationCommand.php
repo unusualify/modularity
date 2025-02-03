@@ -22,7 +22,10 @@ class CreateOperationCommand extends BaseCommand
         {--t|tag=modularity : The tag of the operation}
     ';
 
-    protected $aliases = [];
+    protected $aliases = [
+        'modularity:operations:make',
+        'mod:c:operation',
+    ];
 
     /**
      * The console command description.
