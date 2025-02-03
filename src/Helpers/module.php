@@ -17,8 +17,8 @@ use Unusualify\Modularity\Facades\Modularity;
 |--------------------------------------------------------------------------
 */
 
-if (! function_exists('unusualBaseKey')) {
-    function unusualBaseKey($notation = null)
+if (! function_exists('modularityBaseKey')) {
+    function modularityBaseKey($notation = null)
     {
         $notation = ! $notation ? $notation : '.' . $notation;
 
@@ -178,7 +178,7 @@ if (! function_exists('moduleRoute')) {
 
         // Prefix it with module name only if prefix doesn't contains it already
         if (
-            unusualConfig('allow_duplicates_on_route_names', false) ||
+            modularityConfig('allow_duplicates_on_route_names', false) ||
             ($prefix !== $moduleName &&
                 ! Str::endsWith($prefix, '.' . $moduleName))
         ) {
@@ -227,7 +227,7 @@ if (! function_exists('moduleRoute')) {
     }
 }
 
-if (! function_exists('unusualRoute')) {
+if (! function_exists('modularityRoute')) {
     /**
      * @param string $routeName
      * @param string $prefix
@@ -236,7 +236,7 @@ if (! function_exists('unusualRoute')) {
      * @param bool $absolute
      * @return string
      */
-    function unusualRoute($route, $prefix, $action = '', $parameters = [], $absolute = true)
+    function modularityRoute($route, $prefix, $action = '', $parameters = [], $absolute = true)
     {
         // Fix module name case
         $route = Str::camel($route);
@@ -247,7 +247,7 @@ if (! function_exists('unusualRoute')) {
 
         // Prefix it with module name only if prefix doesn't contains it already
         if (
-            unusualConfig('allow_duplicates_on_route_names', false) ||
+            modularityConfig('allow_duplicates_on_route_names', false) ||
             ($prefix !== $route &&
                 ! Str::endsWith($prefix, '.' . $route))
         ) {
@@ -264,13 +264,13 @@ if (! function_exists('unusualRoute')) {
     }
 }
 
-if (! function_exists('getUnusualTraits')) {
+if (! function_exists('getModularityTraits')) {
     /**
      * @return array
      */
-    function getUnusualTraits()
+    function getModularityTraits()
     {
-        return array_keys(Config::get(unusualBaseKey() . '.traits'));
+        return array_keys(Config::get(modularityBaseKey() . '.traits'));
         // return [
         //     // 'hasBlocks',
         //     'translationTrait',
@@ -284,27 +284,27 @@ if (! function_exists('getUnusualTraits')) {
     }
 }
 
-if (! function_exists('activeUnusualTraits')) {
+if (! function_exists('activeModularityTraits')) {
     /**
      * @return array
      */
-    function activeUnusualTraits($traitOptions)
+    function activeModularityTraits($traitOptions)
     {
         return Collection::make($traitOptions)
-            ->only(getUnusualTraits())
+            ->only(getModularityTraits())
             ->filter(function ($enabled) {
                 return $enabled;
             });
     }
 }
 
-if (! function_exists('unusualTraitOptions')) {
+if (! function_exists('modularityTraitOptions')) {
     /**
      * @return array
      */
-    function unusualTraitOptions()
+    function modularityTraitOptions()
     {
-        return Collection::make(Config::get(unusualBaseKey() . '.traits'))->map(function ($trait, $key) {
+        return Collection::make(Config::get(modularityBaseKey() . '.traits'))->map(function ($trait, $key) {
             return [
                 $key,
                 $trait['command_option']['shortcut'] ?? null,
@@ -315,16 +315,16 @@ if (! function_exists('unusualTraitOptions')) {
     }
 }
 
-if (! function_exists('unusualConfig')) {
+if (! function_exists('modularityConfig')) {
     /**
      * @return string|array
      */
-    function unusualConfig($notation = null, $default = '')
+    function modularityConfig($notation = null, $default = '')
     {
         if (! $notation) {
-            return config(unusualBaseKey());
+            return config(modularityBaseKey());
         } else {
-            return config(unusualBaseKey($notation), $default);
+            return config(modularityBaseKey($notation), $default);
         }
     }
 }

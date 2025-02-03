@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html dir="ltr" lang="{{ unusualConfig('locale', 'en') }}">
+<html dir="ltr" lang="{{ modularityConfig('locale', 'en') }}">
     <head>
         @include('twill::partials.head')
     </head>

@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Modules\SystemPayment\Entities\PaymentCurrency;
 use Modules\SystemPayment\Entities\PaymentService;
 use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Controllers\MediaLibraryController;
 use Unusualify\Modularity\Http\Requests\MediaRequest;
 
@@ -86,7 +87,7 @@ class PaymentServiceSeeder extends Seeder
         //     $currencies = PaymentCurrency::inRandomOrder()->take(rand(1, 3))->get();
         //     $paymentService->paymentCurrencies()->attach($currencies);
         // }
-        $superadmin = User::role('superadmin', 'unusual_users')->first();
+        $superadmin = User::role('superadmin', Modularity::getGuardName())->first();
 
         if (! $superadmin) {
             $this->command->error('Admin user not found. Please ensure the admin user exists in the database.');
@@ -94,7 +95,7 @@ class PaymentServiceSeeder extends Seeder
             return;
         }
 
-        Auth::guard('unusual_users')->login($superadmin);
+        Auth::guard(Modularity::getGuardName())->login($superadmin);
 
         foreach ($paymentServices as $service) {
             $paymentService = PaymentService::create([

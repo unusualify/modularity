@@ -22,7 +22,7 @@ use Unusualify\Modularity\Traits\ManageNames;
 
 abstract class Repository
 {
-    use DatesTrait, ManageNames, MethodTransformers, RelationTrait, PaymentTrait;
+    use DatesTrait, ManageNames, MethodTransformers, RelationTrait;
 
     /**
      * @var \Unusualify\Modularity\Models\Model
@@ -70,15 +70,17 @@ abstract class Repository
     public function get($with = [], $scopes = [], $orders = [], $perPage = 20, $forcePagination = false)
     {
         $query = $this->model->query();
-
         $query = $this->model->with($this->formatWiths($query, $with));
 
         if (isset($scopes['searches']) && isset($scopes['search']) && is_array($scopes['searches'])) {
             $translatedAttributes = $this->model->translatedAttributes ?? [];
 
+            dd($scopes['searches'], $translatedAttributes);
             $searches = Arr::where($scopes['searches'], function (string|int $value, int $key) use ($translatedAttributes) {
                 return ! in_array($value, $translatedAttributes);
             });
+
+            dd($searches, $translatedAttributes, $scopes, );
 
             $this->searchIn($query, $scopes, 'search', $searches);
 
@@ -87,18 +89,10 @@ abstract class Repository
             });
             // unset($scopes['searches']);
         }
-        // dd(
-        //     $scopes,
-        //     $query->toSql(),
-        //     $query1 = $this->filter($query, $scopes),
-        //     $query1->toSql(),
-        //     $query2 = $this->filterBack($query, $scopes),
-        //     $query2->toSql(),
 
-        // );
         $query = $this->filter($query, $scopes);
-
         // $query = $this->filterBack($query, $scopes);
+
         $query = $this->order($query, $orders);
 
         if (! $forcePagination && $this->model instanceof Sortable) {
@@ -112,26 +106,14 @@ abstract class Repository
         }
 
         try {
-            // code...
-            // dd(
-            //     $query->toSql(),
-
-            // );
 
             return $query->paginate($perPage);
 
         } catch (\Throwable $th) {
-            // throw $th;
             dd(
-
                 $query->toSql(),
                 $th,
                 debug_backtrace()
-                // $th,
-                // $with,
-                // $scopes,
-                // $orders,
-                // $perPage
             );
         }
 
@@ -208,36 +190,19 @@ abstract class Repository
             $this->searchIn($query, $scopes, 'search', $scopes['searches']);
             unset($scopes['searches']);
         }
-        // dd(
-        //     $scopes,
-        //     $query->toSql(),
-        //     $query1 = $this->filter($query, $scopes),
-        //     $query1->toSql(),
-        //     $query2 = $this->filterBack($query, $scopes),
-        //     $query2->toSql(),
 
-        // );
         $query = $this->filter($query, $scopes);
         // $query = $this->filterBack($query, $scopes);
+
         $query = $this->order($query, $orders);
 
         try {
-            // code...
-            // dd(
-            //     $query->toSql(),
-
-            // );
             return $query->get();
         } catch (\Throwable $th) {
             // throw $th;
             dd(
                 $th,
                 debug_backtrace()
-                // $th,
-                // $with,
-                // $scopes,
-                // $orders,
-                // $perPage
             );
         }
 
@@ -278,10 +243,6 @@ abstract class Repository
                 $column => $item->{$column},
             ]);
 
-            // return $query->get()->map(fn ($item) => [
-            //     'id' => $item->id,
-            //     $column => $item->{$column},
-            // ]);
         }
 
         $columns = ['id', ...(is_array($column) ? $column : [$column])];
@@ -914,120 +875,11 @@ abstract class Repository
         }, $with);
     }
 
-    public function _modelRelations($relations = null): array
-    {
-
-        $relationNamespace = app('model.relation.namespace');
-
-        $relationClassesPattern = app('model.relation.pattern');
-
-        if ($relations) {
-            if (is_array($relations)) {
-                $relationNamespaces = implode('|', Arr::map($relations, function ($relationName) use ($relationNamespace) {
-                    return $relationNamespace . '\\' . $relationName;
-                }));
-                $relationClassesPattern = '|' . preg_quote($relationNamespaces, '|') . '|';
-
-            } elseif (is_string($relations)) {
-                $relationClassesPattern = '|' . preg_quote($relationNamespace . '\\' . $relations, '|') . '|';
-            }
-        }
-
-        $builtInMethods = app('model.builtin.methods');
-
-        try {
-            // code...
-            $builtInMethods = app('model.builtin.methods');
-        } catch (\Throwable $th) {
-            dd($this, debug_backtrace());
-        }
-
-        $reflector = new \ReflectionClass($this->getModel());
-
-        if (get_class_short_name($this->getModel()) == 'Surveyx') {
-            dd(
-                $builtInMethods,
-                collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))->reduce(function ($carry, $method) use ($relationClassesPattern, $builtInMethods) {
-
-                    if (! in_array($method->name, $builtInMethods) && $method->getNumberOfParameters() < 1) {
-                        if ($method->hasReturnType()) {
-                            if (preg_match($relationClassesPattern, ($returnType = $method->getReturnType()))) {
-                                $carry[$method->name] = get_class_short_name((string) $returnType);
-                            }
-                        } else {
-                            try {
-                                $return = $method->invoke($this->getModel());
-
-                                if ($return instanceof Relation) {
-                                    $carry[$method->name] = get_class_short_name($return);
-                                }
-                            } catch (\Throwable $th) {
-                                // throw $th;
-                            }
-                        }
-                    }
-
-                    return $carry;
-                }, [])
-            );
-        }
-
-        return collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))->reduce(function ($carry, $method) use ($relationClassesPattern, $builtInMethods) {
-
-            if (! in_array($method->name, $builtInMethods) && $method->getNumberOfParameters() < 1) {
-                if ($method->hasReturnType()) {
-                    if (preg_match($relationClassesPattern, ($returnType = $method->getReturnType()))) {
-                        $carry[$method->name] = get_class_short_name((string) $returnType);
-                    }
-                } else {
-                    try {
-                        $return = $method->invoke($this->getModel());
-
-                        if ($return instanceof Relation) {
-                            $carry[$method->name] = get_class_short_name($return);
-                        }
-                    } catch (\Throwable $th) {
-                        // throw $th;
-                    }
-                }
-            }
-
-            return $carry;
-        }, []);
-
-        // dd(collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC)));
-        return collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))
-            ->filter(function ($method) use ($relationClassesPattern) {
-                return ! empty($returnType = $method->getReturnType())
-                    ? preg_match("{$relationClassesPattern}", $returnType)
-                    : tryOperation(fn () => $this->{$method->name}()) instanceof Relation;
-                // if(!empty($returnType = $method->getReturnType())){
-                //     return preg_match("{$relationClassesPattern}", $returnType);
-                // }else{
-                //     return tryOperation(fn() => $this->{$method->name}()) instanceof Relation;
-                // }
-
-            })
-            ->pluck('name')
-            ->all();
-
-        return collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))
-            ->filter(fn ($method) => ! empty($returnType = $method->getReturnType())
-                ? preg_match("{$relationClassesPattern}", $returnType)
-                : tryOperation(fn () => $this->{$method->name}()) instanceof Relation
-                // : ( ($return = tryOperation(fn() => $this->{$method->name}())) != false ?  $return instanceof Relation : false )
-            )
-            ->pluck('name')
-            ->all();
-    }
-
     public function definedRelations($relations = null): array
     {
         if (method_exists($this->model, 'definedRelations')) {
             return $this->model->definedRelations($relations);
         }
-
-        // return [];
 
         $relationNamespace = "Illuminate\Database\Eloquent\Relations";
 
@@ -1047,36 +899,15 @@ abstract class Repository
 
         $reflector = new \ReflectionClass($this->getModel());
 
-        // dd(
-        //     $this->model,
-        //     $this->model->getRelations(),
-        //     $reflector->isUserDefined(),
-        //     get_class_methods($reflector)
-        // );
-
         return collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))->reduce(function ($carry, $method) use ($relationClassesPattern) {
 
             if ($method->getNumberOfParameters() < 1) {
                 if ($method->hasReturnType()) {
                     if (preg_match($relationClassesPattern, ($returnType = $method->getReturnType()))) {
-                        // $carry[$method->name] = get_class_short_name((string) $returnType);
                         $carry[] = $method->name;
                     }
                 } else {
-                    // try {
-                    //     $return = $method->invoke($this->getModel());
 
-                    //     if( $return instanceof Relation){
-                    //         // dd( $return, $relationClassesPattern );
-                    //         if(preg_match($relationClassesPattern, ($returnType = $method->getReturnType()))){
-                    //             // $carry[$method->name] = get_class_short_name((string) $returnType);
-                    //             $carry[] = $method->name;
-                    //         }
-                    //         // $carry[$method->name] = get_class_short_name($return);
-                    //     }
-                    // } catch (\Throwable $th) {
-                    //     //throw $th;
-                    // }
                 }
             }
 
@@ -1093,7 +924,6 @@ abstract class Repository
     {
         if (method_exists($related, 'getRelatedPivotKeyName')) {
             $foreignKey = $related->getRelatedPivotKeyName();
-            // $scopes[$foreignKey] = $value;
         }
 
         return $foreignKey;
@@ -1161,8 +991,6 @@ abstract class Repository
 
     public function getByIds(array $ids, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null)
     {
-        // $query = $this->model->query();
-        // dd($ids);
         $query = $this->model->whereIn('id', $ids);
 
         $query = $query->with($this->formatWiths($query, $with));
@@ -1176,9 +1004,6 @@ abstract class Repository
                 return array_merge(
                     $this->getShowFields($item, $this->chunkInputs($this->inputs())),
                     $item->attributesToArray(),
-                    // $item->toArray(),
-                    // $this->getFormFields($item, $this->chunkInputs($this->inputs())),
-                    // $columnsData
                 );
             });
         } else {

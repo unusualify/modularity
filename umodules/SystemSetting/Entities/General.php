@@ -13,7 +13,6 @@ class General extends Model
      *
      * @var array<int, string>
      */
-
     use HasSpreadable, HasImages;
 
     protected $fillable = [

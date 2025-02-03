@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Oobook\Database\Eloquent\Concerns\ManageEloquent;
-use Unusualify\Modularity\Entities\Spread;
 
 trait HasSpreadable
 {
@@ -14,36 +13,36 @@ trait HasSpreadable
 
     public static function bootHasSpreadable()
     {
-        //TODO: Keep the old spreadable data from model and remove attributes based on that don't remove all column fields
-        self::saving(static function(Model $model) {
+        // TODO: Keep the old spreadable data from model and remove attributes based on that don't remove all column fields
+        self::saving(static function (Model $model) {
             // Store the spread data before cleaning
-            if (!$model->exists) {
+            if (! $model->exists) {
                 // Set property to preserve data through events
                 $model->_pendingSpreadData = $model->_spread ?: $model->prepareSpreadableJson();
-            } else if($model->_spread) {
+            } elseif ($model->_spread) {
                 // Handle existing spread updates
                 $model->spreadable()->update([
-                    'json' => $model->_spread
+                    'content' => $model->_spread,
                 ]);
             }
 
             $model->cleanSpreadableAttributes();
         });
 
-        self::created(static function(Model $model) {
+        self::created(static function (Model $model) {
             $model->spreadable()->create($model->_pendingSpreadData ?? []);
         });
 
-        self::retrieved(static function(Model $model) {
+        self::retrieved(static function (Model $model) {
             // If there's a spread model, load its attributes
             // dd('text');
             // dd($model);
             if ($model->spreadable) {
-                $jsonData = $model->spreadable->json ?? [];
+                $jsonData = $model->spreadable->content ?? [];
 
                 // Set spreadable attributes on model, excluding protected attributes
                 foreach ($jsonData as $key => $value) {
-                    if (!$model->isProtectedAttribute($key)) {
+                    if (! $model->isProtectedAttribute($key)) {
                         $model->setAttribute($key, $value);
                     }
                 }
@@ -65,7 +64,8 @@ trait HasSpreadable
     {
         $this->mergeFillable(['_spread']);
     }
-    //TODO: rename relation to spread as well
+
+    // TODO: rename relation to spread as well
     public function spreadable(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
         return $this->morphOne(\Unusualify\Modularity\Entities\Spread::class, 'spreadable');
@@ -77,7 +77,8 @@ trait HasSpreadable
         return in_array($key, $this->getReservedKeys());
     }
 
-    public function getReservedKeys(): array {
+    public function getReservedKeys(): array
+    {
 
         return array_merge(
             $this->getColumns(),  // Using ManageEloquent's getColumns
@@ -107,10 +108,10 @@ trait HasSpreadable
     {
         $columns = $this->getColumns();
         $attributes = $this->getAttributes();
-        //TODO: Instead of removing any attribute remove the ones that you know that needs to be removed
+        // TODO: Instead of removing any attribute remove the ones that you know that needs to be removed
         // Remove any attributes that aren't database columns
         foreach ($attributes as $key => $value) {
-            if (!in_array($key, $columns)) {
+            if (! in_array($key, $columns)) {
                 unset($this->attributes[$key]);
             }
         }

@@ -57,49 +57,13 @@
             @yield('content')
         </ue-auth>
     </div>
-    <script>
-        // window['{{ unusualConfig('js_namespace') }}'] = {};
-        // window['{{ unusualConfig('js_namespace') }}'].LOCALE = '{{ unusualConfig('locale') }}';
-        // window['{{ unusualConfig('js_namespace') }}'].version = '{{ unusualConfig('version') }}';
-        // window['{{ unusualConfig('js_namespace') }}'].STORE = {};
-
-
-
-        // window['{{ unusualConfig('js_namespace') }}'].STORE.languages = {!! json_encode(getLanguagesForVueStore($form_fields ?? [], $translate ?? false)) !!};
-
-        // window['{{ unusualConfig('js_namespace') }}'].STORE.medias = {};
-        // window['{{ unusualConfig('js_namespace') }}'].STORE.medias.types = [];
-        // window['{{ unusualConfig('js_namespace') }}'].STORE.medias.config = {
-        //     useWysiwyg: {{ unusualConfig('media_library.media_caption_use_wysiwyg') ? 'true' : 'false' }},
-        //     wysiwygOptions: {!! json_encode(unusualConfig('media_library.media_caption_wysiwyg_options')) !!}
-        // };
-
-
-
-        // window['{{ unusualConfig('js_namespace') }}'].unusualLocalization = {!! json_encode($unusualLocalization) !!};
-
-        // window['{{ unusualConfig('js_namespace') }}'].STORE.datatable = {}
-        // window['{{ unusualConfig('js_namespace') }}'].STORE.form = {}
-
-        // @section('STORE')
-
-        // @stop
-
-        // window['{{ unusualConfig('js_namespace') }}'].STORE.browser = {
-        //     selected: {}
-        // }
-        // @yield('STORE')
-    </script>
 @endsection
 
 @push('STORE')
-    {{-- window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {
-        languages: @json(route('api.languages.index'))
-    }; --}}
-    window['{{ unusualConfig('js_namespace') }}'].STORE.config = {
+    window['{{ modularityConfig('js_namespace') }}'].STORE.config = {
         test: false,
     };
-    window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
-    window['{{ unusualConfig('js_namespace') }}'].STORE.form = {!! json_encode($formStore ?? new StdClass()) !!}
+    window['{{ modularityConfig('js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
+    window['{{ modularityConfig('js_namespace') }}'].STORE.form = {!! json_encode($formStore ?? new StdClass()) !!}
 @endpush
 

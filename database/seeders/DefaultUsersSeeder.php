@@ -18,7 +18,7 @@ class DefaultUsersSeeder extends Seeder
     {
         Model::unguard();
 
-        $table = unusualConfig('tables.users');
+        $table = modularityConfig('tables.users');
 
         Schema::disableForeignKeyConstraints();
 

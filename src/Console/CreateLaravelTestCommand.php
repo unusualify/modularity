@@ -92,7 +92,7 @@ class CreateLaravelTestCommand extends BaseCommand
             // ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
             // ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             // ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
-        ], unusualTraitOptions());
+        ], modularityTraitOptions());
     }
 
     /**

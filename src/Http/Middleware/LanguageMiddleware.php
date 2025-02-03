@@ -26,15 +26,15 @@ class LanguageMiddleware
             }
         }
 
-        config([unusualBaseKey() . '.locale' => $locale]);
-        config([unusualBaseKey() . '.timezone' => auth()->user()->timezone ?? 'Europe/London']);
+        config([modularityBaseKey() . '.locale' => $locale]);
+        config([modularityBaseKey() . '.timezone' => auth()->user()->timezone ?? 'Europe/London']);
         App::setLocale($locale);
-        App::setFallbackLocale(unusualConfig('fallback_locale'));
+        App::setFallbackLocale(modularityConfig('fallback_locale'));
 
         $currency = config('priceable.currency', 'EUR');
 
-        if (! unusualConfig('services.currency_exchange.active')) { // onlyBaseCurrency
-            $currency = unusualConfig("payment.locale_currencies.{$locale}", null)
+        if (! modularityConfig('services.currency_exchange.active')) { // onlyBaseCurrency
+            $currency = modularityConfig("payment.locale_currencies.{$locale}", null)
                 ?? config('priceable.currency');
         }
 

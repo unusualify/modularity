@@ -28,13 +28,13 @@
 @endpush
 
 @push('STORE')
-    window['{{ unusualConfig('js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
-    window['{{ unusualConfig('js_namespace') }}'].STORE.form = {
+    window['{{ modularityConfig('js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
+    window['{{ modularityConfig('js_namespace') }}'].STORE.form = {
         inputs: {!! json_encode($formSchema) !!},
         fields: []
     }
 
-    window['{{ unusualConfig('js_namespace') }}'].STORE.datatable = {
+    window['{{ modularityConfig('js_namespace') }}'].STORE.datatable = {
         baseUrl: '{{ rtrim(config('app.url'), '/') . '/' }}',
         headers: {!! json_encode($headers) !!},
         searchText: '{{ $searchText ?? '' }}',

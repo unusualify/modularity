@@ -13,13 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        $authorizedsTable = unusualConfig('tables.authorizeds', 'modularity_authorizeds');
-        $usersTable = unusualConfig('tables.users', 'admin_users');
+        $authorizedsTable = modularityConfig('tables.authorizeds', 'modularity_authorizeds');
+        $usersTable = modularityConfig('tables.users', 'admin_users');
 
         if (! Schema::hasTable($authorizedsTable)) {
             Schema::create($authorizedsTable, function (Blueprint $table) use ($usersTable) {
-                $table->{unusualIncrementsMethod()}('id');
-                $table->{unusualIntegerMethod()}('user_id')->unsigned();
+                $table->{modularityIncrementsMethod()}('id');
+                $table->{modularityIntegerMethod()}('user_id')->unsigned();
                 $table->foreign('user_id', "fk_{$usersTable}_authorized_id")
                     ->references('id')
                     ->on($usersTable)
@@ -41,7 +41,7 @@ return new class extends Migration
      */
     public function down()
     {
-        $authorizedsTable = unusualConfig('tables.authorizeds', 'modularity_authorizeds');
+        $authorizedsTable = modularityConfig('tables.authorizeds', 'modularity_authorizeds');
 
         Schema::dropIfExists($authorizedsTable);
     }

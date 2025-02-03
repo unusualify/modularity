@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $paymentsTable = config('payable.tables.payments', 'umod_payments');
+        $paymentsTable = config('payable.table', 'unfy_payments');
+
         // dd($paymentsTable);
         Schema::create($paymentsTable, function (Blueprint $table) {
             $table->id();
@@ -34,7 +35,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists(config('payable.tables.payments', 'umod_payments'));
+        $paymentsTable = config('payable.table', 'unfy_payments');
+
+        Schema::dropIfExists($paymentsTable);
 
     }
 };

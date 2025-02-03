@@ -8,8 +8,8 @@ class CreateChatsTable extends Migration
 {
     public function up()
     {
-        $modularityChatsTable = unusualConfig('tables.chats', 'modularity_chats');
-        $modularityChatMessagesTable = unusualConfig('tables.chat_messages', 'modularity_chat_messages');
+        $modularityChatsTable = modularityConfig('tables.chats', 'modularity_chats');
+        $modularityChatMessagesTable = modularityConfig('tables.chat_messages', 'modularity_chat_messages');
 
         if (! Schema::hasTable($modularityChatsTable)) {
             Schema::create($modularityChatsTable, function (Blueprint $table) {
@@ -39,8 +39,8 @@ class CreateChatsTable extends Migration
 
     public function down()
     {
-        $modularityChatsTable = unusualConfig('tables.chats', 'modularity_chats');
-        $modularityChatMessagesTable = unusualConfig('tables.chat_messages', 'modularity_chat_messages');
+        $modularityChatsTable = modularityConfig('tables.chats', 'modularity_chats');
+        $modularityChatMessagesTable = modularityConfig('tables.chat_messages', 'modularity_chat_messages');
 
         Schema::dropIfExists($modularityChatMessagesTable);
         Schema::dropIfExists($modularityChatsTable);

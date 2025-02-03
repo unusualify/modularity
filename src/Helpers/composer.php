@@ -46,7 +46,7 @@ if (! function_exists('is_modularity_production')) {
 if (! function_exists('get_modularity_vendor_dir')) {
     function get_modularity_vendor_dir($dir = null)
     {
-        $vendor_dir = unusualConfig('vendor_dir');
+        $vendor_dir = modularityConfig('vendor_dir');
 
         if ($dir) {
             $vendor_dir = concatenate_path($vendor_dir, $dir);

@@ -39,9 +39,9 @@ class FilesUploaderConfig
      */
     public function compose(View $view)
     {
-        $libraryDisk = $this->config->get(unusualBaseKey() . '.file_library.disk');
-        $endpointType = $this->config->get(unusualBaseKey() . '.file_library.endpoint_type');
-        $allowedExtensions = $this->config->get(unusualBaseKey() . '.file_library.allowed_extensions');
+        $libraryDisk = $this->config->get(modularityBaseKey() . '.file_library.disk');
+        $endpointType = $this->config->get(modularityBaseKey() . '.file_library.endpoint_type');
+        $allowedExtensions = $this->config->get(modularityBaseKey() . '.file_library.allowed_extensions');
 
         // anonymous functions are used to let configuration dictate
         // the execution of the appropriate implementation
@@ -73,8 +73,8 @@ class FilesUploaderConfig
             'endpointRoot' => $endpointType === 'local' ? '' : $this->config->get('filesystems.disks.' . $libraryDisk . '.root', ''),
             'accessKey' => $this->config->get('filesystems.disks.' . $libraryDisk . '.key', 'none'),
             'csrfToken' => $this->sessionStore->token(),
-            'acl' => $this->config->get(unusualBaseKey() . '.file_library.acl'),
-            'filesizeLimit' => $this->config->get(unusualBaseKey() . '.file_library.filesize_limit'),
+            'acl' => $this->config->get(modularityBaseKey() . '.file_library.acl'),
+            'filesizeLimit' => $this->config->get(modularityBaseKey() . '.file_library.filesize_limit'),
             'allowedExtensions' => $allowedExtensions,
         ];
 

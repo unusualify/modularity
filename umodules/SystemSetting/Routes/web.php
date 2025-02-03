@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Route;
 | Now create something great!
 |
 */
-Route::middleware(['web.auth', 'unusual.core'])->group(function () {
+Route::middleware(['web.auth', ...\Unusualify\Modularity\Facades\ModularityRoutes::defaultMiddlewares()])->group(function () {
 
-    Route::middleware(('unusual.panel'))->group(function () {});
+    Route::middleware((\Unusualify\Modularity\Facades\ModularityRoutes::defaultPanelMiddlewares()))->group(function () {});
 
 });

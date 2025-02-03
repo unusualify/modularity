@@ -49,7 +49,7 @@ trait RepeatersTrait
         if ($this->shouldIgnoreFieldBeforeSave('repeaters')) {
             return $object;
         }
-        // $defaultLocale = unusualConfig('locale');
+        // $defaultLocale = modularityConfig('locale');
         $defaultLocale = config('app.locale');
         // $locales = getLocales();
         $system_locales = getLocales();

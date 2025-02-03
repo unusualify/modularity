@@ -13,11 +13,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 // dd(
-//     unusualConfig('enabled.users-management')
+//     modularityConfig('enabled.users-management')
 // );
 // Auth::routes();
 
-if (unusualConfig('enabled.users-management')) {
+if (modularityConfig('enabled.users-management')) {
 
     Route::get('register', 'RegisterController@showLoginForm')->name('register.form');
     Route::post('register', 'RegisterController@register')->name('register');

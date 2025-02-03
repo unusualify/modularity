@@ -76,7 +76,7 @@ from
     (?<=[Config::get\(|config\(])\s?getUnusualBaseKey\(\)\s?\.\s?'\.
 to 
     \Illuminate\Support\Str::snake(env('MODULARITY_BASE_NAME', 'Base')) . '.
-    unusualBaseKey() . '.
+    modularityBaseKey() . '.
 
 from 
     ["'](base)(::[A-Za-z\$\->\.]*)["']

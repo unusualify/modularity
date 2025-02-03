@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\Factory as ViewFactory;
 use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Traits\ManageUtilities;
 
@@ -63,8 +64,8 @@ class ResetPasswordController extends Controller
         $this->viewFactory = $viewFactory;
         $this->config = $config;
 
-        $this->redirectTo = $this->config->get(unusualBaseKey() . '.auth_login_redirect_path', '/');
-        $this->middleware('unusual_guest');
+        $this->redirectTo = $this->config->get(modularityBaseKey() . '.auth_login_redirect_path', '/');
+        $this->middleware('modularity.guest');
     }
 
     /**
@@ -72,7 +73,7 @@ class ResetPasswordController extends Controller
      */
     protected function guard()
     {
-        return Auth::guard('unusual_users');
+        return Auth::guard(Modularity::getAuthGuardName());
     }
 
     /**
@@ -80,7 +81,7 @@ class ResetPasswordController extends Controller
      */
     public function broker()
     {
-        return Password::broker('users');
+        return Password::broker(Modularity::getAuthProviderName());
     }
 
     /**
@@ -132,7 +133,7 @@ class ResetPasswordController extends Controller
         // call exists on the Password repository to check for token expiration (default 1 hour)
         // otherwise redirect to the ask reset link form with error message
         if ($user && Password::broker('users')->getRepository()->exists($user, $token)) {
-            return $this->viewFactory->make(unusualBaseKey() . '::auth.passwords.reset')->with([
+            return $this->viewFactory->make(modularityBaseKey() . '::auth.passwords.reset')->with([
                 'token' => $token,
                 'email' => $user->email,
 
@@ -214,7 +215,7 @@ class ResetPasswordController extends Controller
 
         // we don't call exists on the Password repository here because we don't want to expire the token for welcome emails
         if ($user) {
-            return $this->viewFactory->make(unusualBaseKey() . '::auth.passwords.reset')->with([
+            return $this->viewFactory->make(modularityBaseKey() . '::auth.passwords.reset')->with([
                 'token' => $token,
                 'email' => $user->email,
                 'welcome' => true,
@@ -237,7 +238,7 @@ class ResetPasswordController extends Controller
      */
     private function getUserFromToken($token)
     {
-        $clearToken = DB::table($this->config->get('auth.passwords.unusual_users.table', 'password_resets'))->where('token', $token)->first();
+        $clearToken = DB::table($this->config->get('auth.passwords.' . Modularity::getAuthProviderName() . '.table', 'password_resets'))->where('token', $token)->first();
 
         if ($clearToken) {
             return User::where('email', $clearToken->email)->first();
@@ -298,7 +299,7 @@ class ResetPasswordController extends Controller
 
     public function success()
     {
-        return view(unusualBaseKey() . '::auth.success', [
+        return view(modularityBaseKey() . '::auth.success', [
             'taskState' => [
                 'status' => 'success',
                 'title' => __('authentication.password-sent'),

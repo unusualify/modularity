@@ -15,9 +15,9 @@ trait HasFiles
         return $this->morphToMany(
             File::class,
             'fileable',
-            unusualConfig('tables.fileables', 'unusual_fileables')
+            modularityConfig('tables.fileables')
         )->withPivot(['role', 'locale'])
-            ->withTimestamps()->orderBy(unusualConfig('tables.fileables', 'unusual_fileables') . '.id', 'asc');
+            ->withTimestamps()->orderBy(modularityConfig('tables.fileables') . '.id', 'asc');
     }
 
     private function findFile($role, $locale)

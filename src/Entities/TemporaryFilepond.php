@@ -12,13 +12,8 @@ class TemporaryFilepond extends Model
         'folder_name',
     ];
 
-    public function canDeleteSafely()
-    {
-        // return DB::table(unusualConfig('tables.mediables', 'unusual_mediables'))->where('media_id', $this->id)->count() === 0;
-    }
-
     public function getTable()
     {
-        return unusualConfig('tables.filepond_temporaries', parent::getTable());
+        return modularityConfig('tables.filepond_temporaries', parent::getTable());
     }
 }

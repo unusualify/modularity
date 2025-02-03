@@ -70,7 +70,7 @@ class Local implements ImageServiceInterface
      */
     public function getRawUrl($id)
     {
-        return Storage::disk(config(unusualBaseKey() . '.media_library.disk'))->url($id);
+        return Storage::disk(config(modularityBaseKey() . '.media_library.disk'))->url($id);
     }
 
     /**

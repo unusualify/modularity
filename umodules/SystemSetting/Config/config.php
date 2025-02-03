@@ -60,14 +60,14 @@ return [
                     'type' => 'spread',
                     'connector' => 'SystemSetting:General',
                     'height' => '250px',
-                    'scrollable'
+                    'scrollable',
                 ],
                 [
                     'name' => 'logo',
                     'label' => 'Logo',
                     'type' => 'image',
                     'translated' => true,
-                ]
+                ],
             ],
         ],
     ],

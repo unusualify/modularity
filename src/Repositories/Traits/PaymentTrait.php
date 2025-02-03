@@ -4,8 +4,7 @@ namespace Unusualify\Modularity\Repositories\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Request;
-use Oobook\Priceable\Models\Price;
-
+use Modules\SystemPricing\Entities\Price;
 trait PaymentTrait
 {
     use PricesTrait;
@@ -47,28 +46,51 @@ trait PaymentTrait
     {
         if (isset($fields['payment'])) {
             $val = Arr::isAssoc($fields['payment']) ? $fields['payment'] : $fields['payment'][0];
-            // $val['display_price'] = $val['display_price'] * 100;
-            $paymentPrice = Price::find($val['id']);
-            $paymentPrice->update(Arr::only($val, ['price_type_id', 'vat_rate_id', 'currency_id', 'display_price', 'role', 'valid_from', 'valid_till']));
+            $price = Price::find($val['id']);
 
-        } elseif (! $object->paymentPrice) {
+
+            if ($price->isUnpaid) {
+                // Update existing unpaid record
+                $price->update(Arr::only($val, [
+                    'price_type_id',
+                    'vat_rate_id',
+                    'currency_id',
+                    'display_price',
+                    'role',
+                    'valid_from',
+                    'valid_till'
+                ]));
+            } else {
+                // Create new record with previous data for paid records
+                $newPrice = $price->replicate();
+                $newPrice->fill(Arr::only($val, [
+                    'price_type_id',
+                    'vat_rate_id',
+                    'currency_id',
+                    'display_price',
+                    'role',
+                    'valid_from',
+                    'valid_till'
+                ]));
+                $newPrice->save();
+            }
+        } elseif (! $object->paymentPrice || (isset($fields['force_payment_update']) && $fields['force_payment_update'])) {
             $session_currency = request()->getUserCurrency()->id;
-
+            // dd($fields);
             $currencyId = isset($fields['currency_id'])
                 ? $fields['currency_id']
                 : $session_currency ?? $this->paymentTraitDefaultCurrencyId;
 
-            if ($this->paymentTraitRelationName) {
-                $relations = is_array($this->paymentTraitRelationName)
-                    ? $this->paymentTraitRelationName
-                    : [$this->paymentTraitRelationName];
+            $paymentRelations = $this->model->getPaymentRelations();
+
+            if (count($paymentRelations) > 0) {
 
                 $totalPrice = 0;
                 $calculated = false;
 
                 // dd($relations);
 
-                foreach ($relations as $relationName) {
+                foreach ($paymentRelations as $relationName) {
 
                     $relatedClass = $object->{$relationName}()->getRelated();
 

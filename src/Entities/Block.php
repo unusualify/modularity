@@ -78,7 +78,7 @@ class Block extends BaseModel
 
     public function getPresenterAttribute()
     {
-        if (($presenter = unusualConfig('block_editor.block_presenter_path')) != null) {
+        if (($presenter = modularityConfig('block_editor.block_presenter_path')) != null) {
             return $presenter;
         }
 
@@ -87,6 +87,6 @@ class Block extends BaseModel
 
     public function getTable()
     {
-        return unusualConfig('blocks_table', 'twill_blocks');
+        return modularityConfig('blocks_table', 'twill_blocks');
     }
 }

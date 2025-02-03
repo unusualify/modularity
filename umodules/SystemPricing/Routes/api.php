@@ -13,4 +13,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['api.auth', 'unusual.core'])->group(function () {});
+Route::middleware(['api.auth', ...\Unusualify\Modularity\Facades\ModularityRoutes::defaultMiddlewares()])->group(function () {});

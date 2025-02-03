@@ -38,14 +38,14 @@ trait ManageForm
 
     protected function __beforeConstructManageForm($app, $request)
     {
-        $this->inputTypes = unusualConfig('input_types', []);
+        $this->inputTypes = modularityConfig('input_types', []);
         $this->module = Modularity::find($this->moduleName);
         $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
     }
 
     protected function __afterConstructManageForm($app, $request)
     {
-        $this->defaultFormAttributes = (array) Config::get(unusualBaseKey() . '.default_form_attributes');
+        $this->defaultFormAttributes = (array) Config::get(modularityBaseKey() . '.default_form_attributes');
         $this->formAttributes = array_merge_recursive_preserve($this->getFormAttributes(), $this->formAttributes ?? []);
 
         $this->setFormActions();
@@ -71,7 +71,7 @@ trait ManageForm
 
     public function setFormActions()
     {
-        $this->defaultFormActions = (array) Config::get(unusualBaseKey() . '.default_form_actions', []);
+        $this->defaultFormActions = (array) Config::get(modularityBaseKey() . '.default_form_actions', []);
 
         $formActions = [];
 
@@ -90,11 +90,22 @@ trait ManageForm
 
     public function getFormActions(): array
     {
-        $default_action = (array) Config::get(unusualBaseKey() . '.default_form_action');
+        $default_action = (array) Config::get(modularityBaseKey() . '.default_form_action');
 
         return Collection::make($this->formActions)->reduce(function ($acc, $action, $key) use ($default_action) {
 
-            // dd($action);
+            $allowedRoles = $action['allowedRoles'] ?? null;
+
+            if (is_string($allowedRoles)) {
+                $allowedRoles = explode(',', $allowedRoles);
+            }
+
+            if ($allowedRoles && $this->user) {
+                if (! $this->user->isSuperAdmin() && ! $this->user->hasRole($allowedRoles)) {
+                    return $acc;
+                }
+            }
+
             if (isset($action['endpoint']) && ($routeName = Route::hasAdmin($action['endpoint']))) {
                 $parameters = Route::getRoutes()->getByName($routeName)->parameterNames();
                 $action['endpoint'] = route($routeName, array_fill_keys($parameters, ':id'));
@@ -200,9 +211,9 @@ trait ManageForm
 
     protected function getSchemaInput($input, $inputs = [])
     {
-        // $default_input = collect(Config::get(unusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
-        // $default_input = $this->configureInput(array_to_object(Config::get(unusualBaseKey() . '.default_input')));
-        $default_input = (array) Config::get(unusualBaseKey() . '.default_input');
+        // $default_input = collect(Config::get(modularityBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
+        // $default_input = $this->configureInput(array_to_object(Config::get(modularityBaseKey() . '.default_input')));
+        $default_input = (array) Config::get(modularityBaseKey() . '.default_input');
         // dd($default_input);
         [$hydrated, $spreaded] = $this->hydrateInput(object_to_array($input), $inputs);
 
@@ -787,7 +798,6 @@ trait ManageForm
                         if ($inputToFormat) {
                             $events[] = "formatPreview:{$inputToFormat}{$previewFieldPatterns}";
                         }
-
                         break;
                     case 'set': //
                         $inputToFormat = array_shift($args) ?? '';
@@ -807,6 +817,22 @@ trait ManageForm
                         ];
                         if ($inputToFormat && $inputPropToFormat) {
                             $events[] = "formatSet:{$inputToFormat}:{$inputPropToFormat}:{$setProp}";
+                        }
+
+                        break;
+                    case 'clearModel': //
+                        $inputToFormat = array_shift($args) ?? '';
+
+                        if ($inputToFormat) {
+                            $events[] = "formatClearModel:{$inputToFormat}";
+                        }
+
+                        break;
+                    case 'resetItems': //
+                        $inputToFormat = array_shift($args) ?? '';
+
+                        if ($inputToFormat) {
+                            $events[] = "formatResetItems:{$inputToFormat}";
                         }
 
                         break;

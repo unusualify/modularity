@@ -58,7 +58,7 @@ class CreateSuperAdminCommand extends BaseCommand
     {
         return array_merge([
             ['default', '--d', InputOption::VALUE_NONE, 'Use default options for super-admin auth. information'],
-        ], unusualTraitOptions());
+        ], modularityTraitOptions());
     }
 
     protected function getArguments(): array
@@ -143,7 +143,7 @@ class CreateSuperAdminCommand extends BaseCommand
                 hint: '',
                 required: true,
                 validate: fn ($value) => match (true) {
-                    DB::table(unusualConfig('tables.users', 'admin_users'))->where('email', $value)->exists() => $value . ' is already in use. Please use an unique e-mail',
+                    DB::table(modularityConfig('tables.users', 'admin_users'))->where('email', $value)->exists() => $value . ' is already in use. Please use an unique e-mail',
                     mb_strlen($value) > 255 => 'Please enter maximum 255 characters',
                     ! filter_var($value, FILTER_VALIDATE_EMAIL) => 'Please enter a valid email pattern',
                     default => null,

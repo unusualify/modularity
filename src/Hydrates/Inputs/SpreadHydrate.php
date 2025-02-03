@@ -30,7 +30,7 @@ class SpreadHydrate extends InputHydrate
         $input['type'] = 'input-spread';
         // dd($input);
         // $input['items'] = ['test'];
-        if(in_array('scrollable', $input)){
+        if (in_array('scrollable', $input)) {
             $input = array_diff($input, ['scrollable']);
             $input['scrollable'] = true;
 
@@ -40,7 +40,7 @@ class SpreadHydrate extends InputHydrate
         $model = App::make($module->getRouteClass($input['_routeName'], 'model'));
         // dd($model);
 
-        if(!isset($input['reservedKeys'])){
+        if (! isset($input['reservedKeys'])) {
             $input['reservedKeys'] = $model->getReservedKeys();
         }
 
@@ -51,7 +51,7 @@ class SpreadHydrate extends InputHydrate
             })
             ->pluck('name');
 
-        if(!empty($spreadableInputs) || $spreadableInputs){
+        if (! empty($spreadableInputs) || $spreadableInputs) {
             // dd( array_merge($input['reservedKeys'], $spreadableInputs->toArray()));
             $input['reservedKeys'] = array_merge($input['reservedKeys'], $spreadableInputs->toArray());
         }

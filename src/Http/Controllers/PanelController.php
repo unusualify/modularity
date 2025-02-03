@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Enums\Permission;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Traits\MakesResponses;
 use Unusualify\Modularity\Traits\ManageScopes;
@@ -213,7 +214,7 @@ abstract class PanelController extends CoreController
         Application $app,
         Request $request
     ) {
-        // if (unusualConfig('bind_exception_handler', true)) {
+        // if (modularityConfig('bind_exception_handler', true)) {
         //     App::singleton(ExceptionHandler::class, ModularityHandler::class);
         // }
 
@@ -433,19 +434,9 @@ abstract class PanelController extends CoreController
                 // 'skipCreateModal' => 'edit',
             ];
 
-            /**
-             * TODO #guard
-             */
-            // dd(
-            //     $authorizableOptions,
-            //     $option,
-            //     Auth::guard('unusual_users')->user(),
-            //     debug_backtrace(),
-            // );
             $authorized = ($this->isGateable() && array_key_exists($option, $authorizableOptions))
-                ? Auth::guard('unusual_users')->user()->can($authorizableOptions[$option])
+                ? Auth::guard(Modularity::getAuthGuardName())->user()->can($authorizableOptions[$option])
                 : true;
-            // $authorized = true;
 
             return ($this->indexOptions[$option] ?? $this->defaultIndexOptions[$option] ?? false) && $authorized;
         });
@@ -459,7 +450,7 @@ abstract class PanelController extends CoreController
     {
 
         $unauthorizedFields = Collection::make($this->fieldsPermissions)->filter(function ($permission, $field) {
-            return Auth::guard('unusual_users')->user()->cannot($permission);
+            return Auth::guard(Modularity::getAuthGuardName())->user()->cannot($permission);
         })->keys();
 
         $unauthorizedFields->each(function ($field) {
@@ -525,7 +516,7 @@ abstract class PanelController extends CoreController
     {
         $snakeCase = $this->getSnakeCase($this->moduleName);
 
-        return array_to_object(Config::get(unusualBaseKey() . '.system_modules.' . $snakeCase) ?: Config::get($snakeCase));
+        return array_to_object(Config::get(modularityBaseKey() . '.system_modules.' . $snakeCase) ?: Config::get($snakeCase));
     }
 
     /**
@@ -542,7 +533,7 @@ abstract class PanelController extends CoreController
         if ($this->request->route() != null) {
             $routePrefix = ltrim(
                 str_replace(
-                    Config::get(unusualBaseKey() . '.admin_app_path'), // TODO uri segment control
+                    Config::get(modularityBaseKey() . '.admin_app_path'), // TODO uri segment control
                     '',
                     $this->request->route()->getPrefix()
                 ),
