@@ -5,6 +5,7 @@ namespace Unusualify\Modularity;
 use Composer\ClassMapGenerator\ClassMapGenerator;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Json;
@@ -30,6 +31,11 @@ class Modularity extends FileRepository
      * @var string
      */
     private static $authProviderName = 'modularity_users';
+
+    /**
+     * @var string
+     */
+    private static $translationCacheKey = 'modularity-languages';
 
     /**
      * The constructor.
@@ -212,6 +218,72 @@ class Modularity extends FileRepository
         return config([
             'modules.cache.enabled' => false,
         ]);
+    }
+
+    public function getAppUrl()
+    {
+        return $this->config('app_url');
+    }
+
+    public function getAdminAppUrl()
+    {
+        return $this->config('admin_app_url');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function config(string $key, $default = null)
+    {
+        return $this->modularityConfig->get('modules.' . $key,
+            $this->modularityConfig->get('modularity.' . $key, $default)
+        );
+    }
+
+    public function getAdminRouteNamePrefix()
+    {
+        return rtrim(ltrim($this->config('admin_route_name_prefix', 'admin'), '.'), '.');
+    }
+
+    public function getAdminUrlPrefix()
+    {
+        return $this->config('admin_app_url')
+            ? false
+            : rtrim(ltrim($this->config('admin_app_path', 'admin'), '/'), '/');
+    }
+
+    public function getSystemUrlPrefix()
+    {
+        return $this->config('system_prefix', 'system-settings');
+    }
+
+    public function getSystemRouteNamePrefix()
+    {
+        return snakeCase(studlyName($this->getSystemUrlPrefix()));
+    }
+
+    public function getTranslations()
+    {
+        $cache_key = static::$translationCacheKey;
+
+        $cache = Cache::store('file');
+
+        if ($cache->has($cache_key) && false) {
+            return $cache->get($cache_key);
+        }
+
+        $translations = app('translator')->getTranslations();
+
+        $cache->set($cache_key, json_encode($translations), 600);
+
+        return $translations;
+    }
+
+    public function clearTranslations()
+    {
+        $cache_key = static::$translationCacheKey;
+
+        Cache::forget($cache_key);
     }
 
     public function getGroupedModules($group_name)
