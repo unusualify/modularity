@@ -63,20 +63,16 @@ class BaseServiceProvider extends ServiceProvider
         $this->bootBaseViewComponents();
 
         AboutCommand::add('Modularity', function () {
-            $composer = base_path('composer.lock');
-
-            if ($this->app['files']->isFile(($composer_path = base_path('composer-dev.lock')))) {
-                $composer = $composer_path;
-            }
-
-            $package = collect(json_decode(file_get_contents($composer))->packages)
-                ->filter(fn ($p) => $p->name == 'unusualify/modularity')
-                ->first();
 
             return [
-                'Vendor' => get_modularity_vendor_dir(),
+                // 'Mode' => $this->app['modularity']->isDevelopment() ? 'development' : 'production',
+                'Cache' => $this->app['modularity']->config('cache.enabled') ? 'enabled' : 'disabled',
+                'Scan' => $this->app['modularity']->config('scan.enabled') ? 'enabled' : 'disabled',
                 'Theme' => modularityConfig('app_theme'),
-                'Version' => $package->version,
+                'Url' => $this->app['modularity']->getAppUrl(),
+                'Url (Admin)' => $this->app['modularity']->getAdminAppUrl(),
+                'Vendor' => $this->app['modularity']->getVendorDir(),
+                'Version' => get_package_version('unusualify/modularity'),
             ];
         });
 
