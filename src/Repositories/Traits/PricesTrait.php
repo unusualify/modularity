@@ -49,8 +49,8 @@ trait PricesTrait
             return;
         }
 
-        $onlyBaseCurrency = unusualConfig('services.currency_exchange.active');
-        $baseCurrency = unusualConfig('services.currency_exchange.base_currency');
+        $onlyBaseCurrency = modularityConfig('services.currency_exchange.active');
+        $baseCurrency = modularityConfig('services.currency_exchange.base_currency');
 
         foreach ($this->getColumns(__TRAIT__) as $name) {
             if ($name !== 'payment' && isset($fields[$name])) {
@@ -108,7 +108,7 @@ trait PricesTrait
     public function getFormFieldsPricesTrait($object, $fields)
     {
         if (method_exists($object, 'prices') && $object->has('prices')) {
-            $onlyBaseCurrency = unusualConfig('services.currency_exchange.active');
+            $onlyBaseCurrency = modularityConfig('services.currency_exchange.active');
 
             $query = $object->prices();
 

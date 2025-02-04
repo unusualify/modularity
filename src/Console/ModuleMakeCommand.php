@@ -67,9 +67,9 @@ class ModuleMakeCommand extends BaseCommand
 
         }
 
-        $traits = activeUnusualTraits($this->options());
+        $traits = activeModularityTraits($this->options());
 
-        // foreach(getUnusualTraits() as $_trait){
+        // foreach(getModularityTraits() as $_trait){
         //     $this->responses[$_trait] = $this->checkOption($_trait);
         // }
 
@@ -140,7 +140,7 @@ class ModuleMakeCommand extends BaseCommand
             ['just-stubs', null, InputOption::VALUE_NONE, 'only stubs fix'],
             ['stubs-only', null, InputOption::VALUE_OPTIONAL, 'Get only stubs'],
             ['stubs-except', null, InputOption::VALUE_OPTIONAL, 'Get except stubs'],
-        ], unusualTraitOptions());
+        ], modularityTraitOptions());
     }
 
     /**

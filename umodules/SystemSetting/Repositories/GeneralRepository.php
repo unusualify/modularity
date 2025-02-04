@@ -10,6 +10,7 @@ use Unusualify\Modularity\Repositories\Traits\SpreadableTrait;
 class GeneralRepository extends Repository
 {
     use ImagesTrait, SpreadableTrait;
+
     public function __construct(General $model)
     {
         $this->model = $model;

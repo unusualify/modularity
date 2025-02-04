@@ -30,7 +30,7 @@ class SpreadHydrate extends InputHydrate
         $input['type'] = 'input-spread';
         // dd($input);
         // $input['items'] = ['test'];
-        if(in_array('scrollable', $input)){
+        if (in_array('scrollable', $input)) {
             $input = array_diff($input, ['scrollable']);
             $input['scrollable'] = true;
 

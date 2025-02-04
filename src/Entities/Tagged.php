@@ -8,6 +8,6 @@ class Tagged extends IlluminateTagged
 {
     public function getTable()
     {
-        return unusualConfig('tables.tagged', parent::getTable());
+        return modularityConfig('tables.tagged', parent::getTable());
     }
 }

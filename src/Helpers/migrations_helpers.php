@@ -2,25 +2,25 @@
 
 use Illuminate\Support\Str;
 
-if (! function_exists('unusualIncrementsMethod')) {
+if (! function_exists('modularityIncrementsMethod')) {
     /**
      * @return string
      */
-    function unusualIncrementsMethod()
+    function modularityIncrementsMethod()
     {
-        return unusualConfig('use_big_integers_on_migrations')
+        return modularityConfig('use_big_integers_on_migrations')
             ? 'bigIncrements'
             : 'increments';
     }
 }
 
-if (! function_exists('unusualIntegerMethod')) {
+if (! function_exists('modularityIntegerMethod')) {
     /**
      * @return string
      */
-    function unusualIntegerMethod()
+    function modularityIntegerMethod()
     {
-        return unusualConfig('use_big_integers_on_migrations')
+        return modularityConfig('use_big_integers_on_migrations')
             ? 'bigInteger'
             : 'integer';
     }
@@ -37,7 +37,7 @@ if (! function_exists('createDefaultFields')) {
      */
     function createDefaultTableFields($table, $has_name = true)
     {
-        $table->{unusualIncrementsMethod()}('id');
+        $table->{modularityIncrementsMethod()}('id');
         // $table->string('name');
     }
 }
@@ -88,8 +88,8 @@ if (! function_exists('createDefaultTranslationsTableFields')) {
             $tableNamePlural = Str::plural($tableNameSingular);
         }
 
-        $table->{unusualIncrementsMethod()}('id');
-        $table->{unusualIntegerMethod()}("{$tableNameSingular}_id")->unsigned();
+        $table->{modularityIncrementsMethod()}('id');
+        $table->{modularityIntegerMethod()}("{$tableNameSingular}_id")->unsigned();
 
         $table->softDeletes();
         $table->timestamps();
@@ -124,8 +124,8 @@ if (! function_exists('createDefaultSlugsTableFields')) {
             $tableNamePlural = Str::plural($tableNameSingular);
         }
 
-        $table->{unusualIncrementsMethod()}('id');
-        $table->{unusualIntegerMethod()}("{$tableNameSingular}_id")->unsigned();
+        $table->{modularityIncrementsMethod()}('id');
+        $table->{modularityIntegerMethod()}("{$tableNameSingular}_id")->unsigned();
 
         $table->softDeletes();
         $table->timestamps();
@@ -157,8 +157,8 @@ if (! function_exists('createDefaultRelationshipTableFields')) {
         $table1ForeignKey = "{$table1NameSingular}_id";
         $table2ForeignKey = "{$table2NameSingular}_id";
 
-        // $table->{unusualIntegerMethod()}("{$table1NameSingular}_id")->unsigned();
-        // $table->{unusualIntegerMethod()}("{$table2NameSingular}_id")->unsigned();
+        // $table->{modularityIntegerMethod()}("{$table1NameSingular}_id")->unsigned();
+        // $table->{modularityIntegerMethod()}("{$table2NameSingular}_id")->unsigned();
         // $table1IndexName = $table1NameSingular;
         // $table2IndexName = $table2NameSingular;
         // if( strlen($table1IndexName) > 12){
@@ -187,7 +187,7 @@ if (! function_exists('createDefaultMorphPivotTableFields')) {
      */
     function createDefaultMorphPivotTableFields($table, $tableName)
     {
-        // $table->{unusualIncrementsMethod()}('id');
+        // $table->{modularityIncrementsMethod()}('id');
         // $tableName => package_languageables
 
         $modelName = getMorphModelNameFromTableName($tableName); // *ables
@@ -200,10 +200,10 @@ if (! function_exists('createDefaultMorphPivotTableFields')) {
 
         $morphName = makeMorphName($modelName);
 
-        // $table->{unusualIntegerMethod()}($foreignKey)->unsigned();
+        // $table->{modularityIntegerMethod()}($foreignKey)->unsigned();
         // $table->foreign($foreignKey, "fk_{$morphTableName}_{$foreignKey}")->references('id')->on($tableName)->onDelete('cascade')->onUpdate('cascade');
         $table->foreignId($foreignKey)->constrained()->onUpdate('cascade')->onDelete('cascade');
-        // $table->{unusualIntegerMethod()}($morphForeignKey)->nullable()->unsigned();
+        // $table->{modularityIntegerMethod()}($morphForeignKey)->nullable()->unsigned();
         // $table->string($morphForeignType)->nullable();
         $table->uuidMorphs($morphName, "{$tableName}_type_id_index");
 
@@ -226,13 +226,13 @@ if (! function_exists('createDefaultRevisionsTableFields')) {
             $tableNamePlural = Str::plural($tableNameSingular);
         }
 
-        $table->{unusualIncrementsMethod()}('id');
-        $table->{unusualIntegerMethod()}("{$tableNameSingular}_id")->unsigned();
-        $table->{unusualIntegerMethod()}('user_id')->unsigned()->nullable();
+        $table->{modularityIncrementsMethod()}('id');
+        $table->{modularityIntegerMethod()}("{$tableNameSingular}_id")->unsigned();
+        $table->{modularityIntegerMethod()}('user_id')->unsigned()->nullable();
 
         $table->timestamps();
         $table->json('payload');
         $table->foreign("{$tableNameSingular}_id")->references('id')->on("{$tableNamePlural}")->onDelete('cascade');
-        $table->foreign('user_id')->references('id')->on(unusualConfig('tables.users', 'admin_users'))->onDelete('set null');
+        $table->foreign('user_id')->references('id')->on(modularityConfig('tables.users', 'admin_users'))->onDelete('set null');
     }
 }

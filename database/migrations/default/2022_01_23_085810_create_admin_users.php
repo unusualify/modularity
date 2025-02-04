@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $adminUserTable = unusualConfig('tables.users', 'admin_users');
+        $adminUserTable = modularityConfig('tables.users', 'admin_users');
 
         if (! Schema::hasTable($adminUserTable)) {
-            Schema::create(unusualConfig('tables.users', 'admin_users'), function (Blueprint $table) {
+            Schema::create(modularityConfig('tables.users', 'admin_users'), function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
                 $table->boolean('published')->default(false);
@@ -33,10 +33,10 @@ return new class extends Migration
     public function down(): void
     {
 
-        $adminUserTable = unusualConfig('tables.users', 'admin_users');
+        $adminUserTable = modularityConfig('tables.users', 'admin_users');
 
         if (Schema::hasTable($adminUserTable)) {
-            Schema::dropIfExists(unusualConfig('tables.users', 'admin_users'));
+            Schema::dropIfExists(modularityConfig('tables.users', 'admin_users'));
         }
     }
 };

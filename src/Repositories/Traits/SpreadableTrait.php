@@ -2,10 +2,6 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Request;
-use Oobook\Priceable\Models\Price;
-
 trait SpreadableTrait
 {
     /**

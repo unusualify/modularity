@@ -19,22 +19,22 @@ class Assets
             return $manifest[$file];
         }
 
-        return '/' . unusualConfig('public_dir', 'unusual') . '/' . $file;
+        return '/' . modularityConfig('public_dir', 'unusual') . '/' . $file;
     }
 
     public function getManifestFilename()
     {
         $fileName =
-            public_path(unusualConfig('public_dir', 'unusual')) .
+            public_path(modularityConfig('public_dir', 'unusual')) .
             '/' .
-            unusualConfig('manifest', 'unusual-manifest.json');
+            modularityConfig('manifest', 'unusual-manifest.json');
 
         if (file_exists($fileName)) {
             return $fileName;
         }
 
         return base_path(
-            unusualConfig('vendor_path') . '/vue/dist/' . unusualConfig('public_dir') . '/' . unusualConfig('manifest')
+            modularityConfig('vendor_path') . '/vue/dist/' . modularityConfig('public_dir') . '/' . modularityConfig('manifest')
         );
     }
 
@@ -44,22 +44,22 @@ class Assets
             return null;
         }
 
-        $devServerUrl = unusualConfig('development_url', 'http://localhost:8080');
+        $devServerUrl = modularityConfig('development_url', 'http://localhost:8080');
         try {
             $manifest = $this->readJson(
                 'http://workspace:8080' .
                     '/' .
-                    unusualConfig('public_dir') .
+                    modularityConfig('public_dir') .
                     '/' .
-                    unusualConfig('manifest', 'unusual-manifest.json')
+                    modularityConfig('manifest', 'unusual-manifest.json')
             );
         } catch (\Exception $e) {
             dd(
                 $devServerUrl .
                 '/' .
-                unusualConfig('public_dir') .
+                modularityConfig('public_dir') .
                 '/' .
-                unusualConfig('manifest', 'unusual-manifest.json'),
+                modularityConfig('manifest', 'unusual-manifest.json'),
 
                 $file,
                 debug_backtrace()
@@ -102,6 +102,6 @@ class Assets
     private function devMode()
     {
         return app()->environment('local', 'development') &&
-            unusualConfig('is_development', false);
+            modularityConfig('is_development', false);
     }
 }

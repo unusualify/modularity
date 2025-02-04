@@ -48,8 +48,8 @@ if (! function_exists('getFormDraft')) {
     {
 
         $draft = $preserve
-            ? array_merge_recursive_preserve(unusualConfig("form_drafts.{$name}", []), $overwrites)
-            : array_merge(unusualConfig("form_drafts.{$name}", []), $overwrites);
+            ? array_merge_recursive_preserve(modularityConfig("form_drafts.{$name}", []), $overwrites)
+            : array_merge(modularityConfig("form_drafts.{$name}", []), $overwrites);
 
         if (count($excludes)) {
 
@@ -66,7 +66,7 @@ if (! function_exists('adminRouteNamePrefix')) {
 
     function adminRouteNamePrefix()
     {
-        return rtrim(ltrim(unusualConfig('admin_route_name_prefix', 'admin'), '.'), '.');
+        return rtrim(ltrim(modularityConfig('admin_route_name_prefix', 'admin'), '.'), '.');
     }
 }
 
@@ -74,9 +74,9 @@ if (! function_exists('adminUrlPrefix')) {
 
     function adminUrlPrefix()
     {
-        return unusualConfig('admin_app_url')
+        return modularityConfig('admin_app_url')
             ? false
-            : rtrim(ltrim(unusualConfig('admin_app_path', 'admin'), '/'), '/');
+            : rtrim(ltrim(modularityConfig('admin_app_path', 'admin'), '/'), '/');
     }
 }
 
@@ -84,7 +84,7 @@ if (! function_exists('systemUrlPrefix')) {
 
     function systemUrlPrefix()
     {
-        return unusualConfig('system_prefix', 'system-settings');
+        return modularityConfig('system_prefix', 'system-settings');
     }
 }
 

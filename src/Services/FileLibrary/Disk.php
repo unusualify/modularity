@@ -29,6 +29,6 @@ class Disk implements FileServiceInterface
      */
     public function getUrl($id)
     {
-        return $this->filesystemManager->disk($this->config->get(unusualBaseKey() . '.file_library.disk'))->url($id);
+        return $this->filesystemManager->disk($this->config->get(modularityBaseKey() . '.file_library.disk'))->url($id);
     }
 }

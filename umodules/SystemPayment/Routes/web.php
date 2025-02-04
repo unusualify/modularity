@@ -15,9 +15,9 @@ use Modules\SystemPayment\Http\Controllers\PriceController;
 | Now create something great!
 |
 */
-Route::middleware(['web.auth', 'unusual.core'])->group(function () {
+Route::middleware(['web.auth', ...\Unusualify\Modularity\Facades\ModularityRoutes::defaultMiddlewares()])->group(function () {
 
-    Route::middleware(('unusual.panel'))->group(function () {});
+    Route::middleware((\Unusualify\Modularity\Facades\ModularityRoutes::defaultPanelMiddlewares()))->group(function () {});
     Route::controller(PriceController::class)->group(function () {
         Route::post('/pay', 'pay')->name('payment');
     });

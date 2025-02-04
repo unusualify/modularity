@@ -318,7 +318,7 @@ abstract class Generator extends NwidartGenerator
 
     public function generatorConfig($generator)
     {
-        return new GeneratorPath($this->config->get(unusualBaseKey() . '.paths.generator.' . $generator));
+        return new GeneratorPath($this->config->get(modularityBaseKey() . '.paths.generator.' . $generator));
     }
 
     /**

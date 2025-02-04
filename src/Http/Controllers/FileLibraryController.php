@@ -90,7 +90,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
 
         // $this->removeMiddleware('can:edit');
         // $this->middleware('can:edit', ['only' => ['signS3Upload', 'signAzureUpload', 'tags', 'store', 'singleUpdate', 'bulkUpdate']]);
-        $this->endpointType = $this->config->get(unusualBaseKey() . '.file_library.endpoint_type');
+        $this->endpointType = $this->config->get(modularityBaseKey() . '.file_library.endpoint_type');
     }
 
     /**
@@ -197,13 +197,13 @@ class FileLibraryController extends BaseController implements SignUploadListener
 
         $uuid = $request->input('unique_folder_name') . '/' . $cleanFilename;
 
-        if ($this->config->get(unusualBaseKey() . '.file_library.prefix_uuid_with_local_path', false)) {
-            $prefix = trim($this->config->get(unusualBaseKey() . '.file_library.local_path'), '/ ') . '/';
+        if ($this->config->get(modularityBaseKey() . '.file_library.prefix_uuid_with_local_path', false)) {
+            $prefix = trim($this->config->get(modularityBaseKey() . '.file_library.local_path'), '/ ') . '/';
             $fileDirectory = $prefix . $fileDirectory;
             $uuid = $prefix . $uuid;
         }
 
-        $disk = $this->config->get(unusualBaseKey() . '.file_library.disk');
+        $disk = $this->config->get(modularityBaseKey() . '.file_library.disk');
 
         $request->file('qqfile')->storeAs($fileDirectory, $cleanFilename, $disk);
 
@@ -289,7 +289,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
      */
     public function signS3Upload(Request $request, SignS3Upload $signS3Upload)
     {
-        return $signS3Upload->fromPolicy($request->getContent(), $this, $this->config->get(unusualBaseKey() . '.file_library.disk'));
+        return $signS3Upload->fromPolicy($request->getContent(), $this, $this->config->get(modularityBaseKey() . '.file_library.disk'));
     }
 
     /**
@@ -297,7 +297,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
      */
     public function signAzureUpload(Request $request, SignAzureUpload $signAzureUpload)
     {
-        return $signAzureUpload->getSasUrl($request, $this, $this->config->get(unusualBaseKey() . '.file_library.disk'));
+        return $signAzureUpload->getSasUrl($request, $this, $this->config->get(modularityBaseKey() . '.file_library.disk'));
     }
 
     /**

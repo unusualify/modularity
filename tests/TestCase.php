@@ -4,7 +4,7 @@ namespace Unusualify\Modularity\Tests;
 
 use Nwidart\Modules\LaravelModulesServiceProvider;
 use Unusualify\Modularity\LaravelServiceProvider;
-use Unusualify\Modularity\Providers\UnusualProvider;
+use Unusualify\Modularity\Providers\ModularityProvider;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -34,7 +34,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         return [
             LaravelModulesServiceProvider::class,
             LaravelServiceProvider::class,
-            UnusualProvider::class,
+            ModularityProvider::class,
         ];
     }
 

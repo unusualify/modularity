@@ -133,7 +133,7 @@ class User extends Authenticatable
 
     public function getTable()
     {
-        return unusualConfig('tables.users', parent::getTable());
+        return modularityConfig('tables.users', parent::getTable());
     }
 
     protected static function newFactory()

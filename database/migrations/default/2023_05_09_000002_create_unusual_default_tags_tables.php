@@ -13,11 +13,11 @@ class CreateUnusualDefaultTagsTables extends Migration
      */
     public function up()
     {
-        $unusualTaggedTable = unusualConfig('tables.tagged', 'modularity_tagged');
+        $modularityTaggedTable = modularityConfig('tables.tagged', 'modularity_tagged');
 
-        if (! Schema::hasTable($unusualTaggedTable)) {
-            Schema::create($unusualTaggedTable, function (Blueprint $table) {
-                $table->{unusualIncrementsMethod()}('id');
+        if (! Schema::hasTable($modularityTaggedTable)) {
+            Schema::create($modularityTaggedTable, function (Blueprint $table) {
+                $table->{modularityIncrementsMethod()}('id');
                 $table->uuidMorphs('taggable');
                 // $table->string('taggable_type');
                 // $table->integer('taggable_id')->unsigned();
@@ -26,11 +26,11 @@ class CreateUnusualDefaultTagsTables extends Migration
             });
         }
 
-        $unusualTagsTable = unusualConfig('tables.tags', 'modularity_tags');
+        $modularityTagsTable = modularityConfig('tables.tags', 'modularity_tags');
 
-        if (! Schema::hasTable($unusualTagsTable)) {
-            Schema::create($unusualTagsTable, function (Blueprint $table) {
-                $table->{unusualIncrementsMethod()}('id');
+        if (! Schema::hasTable($modularityTagsTable)) {
+            Schema::create($modularityTagsTable, function (Blueprint $table) {
+                $table->{modularityIncrementsMethod()}('id');
                 $table->string('namespace');
                 $table->string('slug');
                 $table->string('name');
@@ -46,7 +46,7 @@ class CreateUnusualDefaultTagsTables extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(unusualConfig('tables.tags', 'modularity_tags'));
-        Schema::dropIfExists(unusualConfig('tables.tagged', 'modularity_tagged'));
+        Schema::dropIfExists(modularityConfig('tables.tags', 'modularity_tags'));
+        Schema::dropIfExists(modularityConfig('tables.tagged', 'modularity_tagged'));
     }
 }

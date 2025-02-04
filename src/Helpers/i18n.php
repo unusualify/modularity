@@ -5,10 +5,10 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 
-if (! function_exists('unusualTrans')) {
-    function unusualTrans($key, $replace = [])
+if (! function_exists('modularityTrans')) {
+    function modularityTrans($key, $replace = [])
     {
-        $locale = unusualConfig('locale', unusualConfig('fallback_locale', 'en'));
+        $locale = modularityConfig('locale', modularityConfig('fallback_locale', 'en'));
 
         return trans($key, $replace, $locale);
     }
@@ -132,7 +132,7 @@ if (! function_exists('getLabelFromLocale')) {
      */
     function getLabelFromLocale($code, $native = false)
     {
-        $base_key = unusualBaseKey();
+        $base_key = modularityBaseKey();
 
         if (class_exists(Locale::class)) {
             if ($native) {

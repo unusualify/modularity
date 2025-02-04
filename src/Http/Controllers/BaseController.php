@@ -306,7 +306,7 @@ abstract class BaseController extends PanelController
                         ['openCreate' => true]
                     ));
                 } elseif ($input['cmsSaveType'] === 'restore') {
-                    Session::flash('status', unusualTrans("$this->baseKey::lang.publisher.restore-success"));
+                    Session::flash('status', modularityTrans("$this->baseKey::lang.publisher.restore-success"));
 
                     return $this->respondWithRedirect(moduleRoute($this->routeName,
                         $this->routePrefix,
@@ -351,7 +351,7 @@ abstract class BaseController extends PanelController
         }
 
         return $this->respondWithError(___('listing.delete.error', ['modelTitle' => $this->modelTitle]));
-        // return $this->respondWithError(unusualTrans("$this->baseKey::lang.listing.delete.error", ['modelTitle' => $this->modelTitle]));
+        // return $this->respondWithError(modularityTrans("$this->baseKey::lang.listing.delete.error", ['modelTitle' => $this->modelTitle]));
     }
 
     /**
@@ -581,7 +581,7 @@ abstract class BaseController extends PanelController
         ) {
             $tableColumns[] = [
                 'name' => 'thumbnail',
-                'label' => unusualTrans("$this->baseKey::lang.listing.columns.thumbnail"),
+                'label' => modularityTrans("$this->baseKey::lang.listing.columns.thumbnail"),
                 'visible' => $visibleColumns ? in_array('thumbnail', $visibleColumns) : true,
                 'optional' => true,
                 'sortable' => false,
@@ -592,7 +592,7 @@ abstract class BaseController extends PanelController
         if ($this->getIndexOption('feature')) {
             $tableColumns[] = [
                 'name' => 'featured',
-                'label' => unusualTrans("$this->baseKey::lang.listing.columns.featured"),
+                'label' => modularityTrans("$this->baseKey::lang.listing.columns.featured"),
                 'visible' => true,
                 'optional' => false,
                 'sortable' => false,
@@ -601,7 +601,7 @@ abstract class BaseController extends PanelController
         if ($this->getIndexOption('publish')) {
             $tableColumns[] = [
                 'name' => 'published',
-                'label' => unusualTrans("$this->baseKey::lang.listing.columns.published"),
+                'label' => modularityTrans("$this->baseKey::lang.listing.columns.published"),
                 'visible' => true,
                 'optional' => false,
                 'sortable' => false,
@@ -610,7 +610,7 @@ abstract class BaseController extends PanelController
 
         $tableColumns[] = [
             'name' => 'name',
-            'label' => $indexColumnCopy[$this->titleColumnKey]['title'] ?? unusualTrans("$this->baseKey::lang.listing.columns.name"),
+            'label' => $indexColumnCopy[$this->titleColumnKey]['title'] ?? modularityTrans("$this->baseKey::lang.listing.columns.name"),
             'visible' => true,
             'optional' => false,
             'sortable' => $this->getIndexOption('reorder') ? false : ($indexColumnCopy[$this->titleColumnKey]['sort'] ?? false),
@@ -644,7 +644,7 @@ abstract class BaseController extends PanelController
         if ($this->getIndexOption('includeScheduledInList') && $this->repository->isFillable('publish_start_date')) {
             $tableColumns[] = [
                 'name' => 'publish_start_date',
-                'label' => unusualTrans("$this->baseKey::lang.listing.columns.published"),
+                'label' => modularityTrans("$this->baseKey::lang.listing.columns.published"),
                 'visible' => true,
                 'optional' => true,
                 'sortable' => true,
@@ -654,7 +654,7 @@ abstract class BaseController extends PanelController
         if ($this->routeHasTrait('translations') && count(getLocales()) > 1) {
             $tableColumns[] = [
                 'name' => 'languages',
-                'label' => unusualTrans("$this->baseKey::lang.listing.languages"),
+                'label' => modularityTrans("$this->baseKey::lang.listing.languages"),
                 'visible' => $visibleColumns ? in_array('languages', $visibleColumns) : true,
                 'optional' => true,
                 'sortable' => false,

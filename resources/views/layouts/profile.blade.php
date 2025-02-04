@@ -9,9 +9,7 @@
         ModularityVite::useHotFile(public_path('modularity.hot'))->withEntryPoints(['src/js/core-free.js'])
     }}
 @endpush
-@push('post_js')
-    {{-- <script src="{{ unusualMix('core-free.js') }}"></script> --}}
-@endpush
+
 
 @section('content')
     <div class="pa-3">
@@ -24,6 +22,6 @@
 @stop
 
 @section('STORE')
-    window['{{ unusualConfig('js_namespace') }}'].STORE.form = {}
+    window['{{ modularityConfig('js_namespace') }}'].STORE.form = {}
 @stop
 

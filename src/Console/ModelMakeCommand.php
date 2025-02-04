@@ -63,7 +63,7 @@ class ModelMakeCommand extends BaseCommand
             ? $this->option('override-model')
             : null;
 
-        foreach (getUnusualTraits() as $_trait) {
+        foreach (getModularityTraits() as $_trait) {
             $this->responses[$_trait] = $this->checkOption($_trait);
         }
 
@@ -131,7 +131,7 @@ class ModelMakeCommand extends BaseCommand
             ['has-factory', null, InputOption::VALUE_NONE, 'Flag to add hasFactory to model.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
             ['test', null, InputOption::VALUE_NONE, 'Test the Route Generator'],
-        ], unusualTraitOptions());
+        ], modularityTraitOptions());
     }
 
     /**

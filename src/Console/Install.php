@@ -24,7 +24,7 @@ class Install extends BaseCommand
      *
      * @var string
      */
-    protected $description = 'Install unusual-modularity into your Laravel application';
+    protected $description = 'Install modularity into your Laravel application';
 
     /**
      * @var Filesystem
@@ -52,7 +52,7 @@ class Install extends BaseCommand
             // ['vendor-publish', '--vp', InputOption::VALUE_NONE, 'Only publish vendor assets, configurations and views'],
             ['db-process', '--db', InputOption::VALUE_NONE, 'Only handle database configuration processes'],
             // ['complete installment', '--complete', InputOption::VALUE_NONE, 'Complete default installment options'],
-        ], unusualTraitOptions());
+        ], modularityTraitOptions());
     }
 
     /**

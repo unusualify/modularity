@@ -139,7 +139,7 @@
 
         setOptions({
 
-          files_: files,
+          // files_: files,
           server_: {
             process_: this.endPoints.process,
             revert_: this.endPoints.revert,

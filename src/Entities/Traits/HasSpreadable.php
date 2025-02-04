@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Oobook\Database\Eloquent\Concerns\ManageEloquent;
-use Unusualify\Modularity\Entities\Spread;
 
 trait HasSpreadable
 {
@@ -56,7 +55,7 @@ trait HasSpreadable
             if ($model->spreadable) {
                 $jsonData = $model->spreadable->content ?? [];
                 foreach ($jsonData as $key => $value) {
-                    if (!$model->isProtectedAttribute($key)) {
+                    if (! $model->isProtectedAttribute($key)) {
                         $model->setAttribute($key, $value);
                     }
                 }

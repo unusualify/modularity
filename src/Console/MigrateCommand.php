@@ -29,7 +29,6 @@ class MigrateCommand extends Command
     public function handle(): int
     {
         /** @var Module $module */
-        // $module = $this->laravel['unusual.modularity']->findOrFail($this->argument('module'));
         $module = Modularity::findOrFail($this->argument('module'));
 
         $this->call('migrate', [

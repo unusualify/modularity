@@ -28,6 +28,6 @@ class Feature extends BaseModel
 
     public function getTable()
     {
-        return unusualConfig('features_table', 'twill_features');
+        return modularityConfig('features_table', 'twill_features');
     }
 }

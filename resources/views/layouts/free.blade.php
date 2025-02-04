@@ -13,9 +13,9 @@
 @stop
 
 @section('initialStore')
-    window['{{ unusualConfig('js_namespace') }}'].STORE.medias.crops = {!! json_encode(config('unusual.settings.crops') ?? []) !!}
-    window['{{ unusualConfig('js_namespace') }}'].STORE.medias.selected = {}
+    window['{{ modularityConfig('js_namespace') }}'].STORE.medias.crops = {!! json_encode(modularityConfig('settings.crops') ?? []) !!}
+    window['{{ modularityConfig('js_namespace') }}'].STORE.medias.selected = {}
 
-    window['{{ unusualConfig('js_namespace') }}'].STORE.browser = {}
-    window['{{ unusualConfig('js_namespace') }}'].STORE.browser.selected = {}
+    window['{{ modularityConfig('js_namespace') }}'].STORE.browser = {}
+    window['{{ modularityConfig('js_namespace') }}'].STORE.browser.selected = {}
 @stop

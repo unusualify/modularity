@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Unusualify\Modularity\Facades\Modularity;
 
 class DefaultPermissionsSeeder extends Seeder
 {
@@ -26,14 +27,15 @@ class DefaultPermissionsSeeder extends Seeder
 
         Schema::enableForeignKeyConstraints();
 
+        $modularityAuthGuardName = Modularity::getAuthGuardName();
         DB::table($table)->insert([
             [
                 'name' => 'dashboard',
-                'guard_name' => 'unusual_users',
+                'guard_name' => $modularityAuthGuardName,
             ],
             [
                 'name' => 'mediaLibrary',
-                'guard_name' => 'unusual_users',
+                'guard_name' => $modularityAuthGuardName,
             ],
             ...permissionRecordsFromRoutes([
                 'User',
@@ -43,7 +45,7 @@ class DefaultPermissionsSeeder extends Seeder
                 'Currency',
                 'PriceType',
                 'Payment',
-            ], 'unusual_users'),
+            ], $modularityAuthGuardName),
         ]);
 
         $roleInstances = Role::all()->keyBy('name');

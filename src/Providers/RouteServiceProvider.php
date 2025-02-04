@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Unusualify\Modularity\Facades\HostRoutingRegistrar;
 use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Facades\UnusualRoutes;
+use Unusualify\Modularity\Facades\ModularityRoutes;
 use Unusualify\Modularity\Http\Controllers\GlideController;
 
 class RouteServiceProvider extends ServiceProvider
@@ -39,7 +39,7 @@ class RouteServiceProvider extends ServiceProvider
     public function map(Router $router)
     {
 
-        UnusualRoutes::configureRoutePatterns();
+        ModularityRoutes::configureRoutePatterns();
 
         $this->mapSystemRoutes(
             $router
@@ -54,7 +54,7 @@ class RouteServiceProvider extends ServiceProvider
         $router,
         $supportSubdomainRouting = false
     ) {
-        $groupOptions = UnusualRoutes::groupOptions();
+        $groupOptions = ModularityRoutes::groupOptions();
 
         $router->group(
             [
@@ -69,7 +69,7 @@ class RouteServiceProvider extends ServiceProvider
                             [
                                 'middleware' => [
                                     'web',
-                                    ...UnusualRoutes::defaultMiddlewares(),
+                                    ...ModularityRoutes::defaultMiddlewares(),
                                     ...($supportSubdomainRouting ? ['supportSubdomainRouting'] : []),
                                 ],
                             ],
@@ -81,13 +81,13 @@ class RouteServiceProvider extends ServiceProvider
                         // internal auth web routes
                         $router->group(
                             [
-                                // 'domain' => unusualConfig('admin_app_url'),
+                                // 'domain' => modularityConfig('admin_app_url'),
                             ],
                             function ($router) {
 
                                 $router->group(
                                     [
-                                        'middleware' => UnusualRoutes::webPanelMiddlewares(),
+                                        'middleware' => ModularityRoutes::webPanelMiddlewares(),
                                     ],
                                     function ($router) {
                                         require __DIR__ . '/../../routes/web.php';
@@ -102,7 +102,7 @@ class RouteServiceProvider extends ServiceProvider
                             [
                                 'prefix' => 'api',
                                 'middleware' => [
-                                    ...UnusualRoutes::webPanelMiddlewares(),
+                                    ...ModularityRoutes::webPanelMiddlewares(),
                                     ...($supportSubdomainRouting ? ['supportSubdomainRouting'] : []),
                                 ],
                             ],
@@ -114,7 +114,7 @@ class RouteServiceProvider extends ServiceProvider
                         // if ($supportSubdomainRouting) {
                         //     $router->group(
                         //         [
-                        //             'domain' => unusualConfig('admin_app_subdomain', 'admin') .
+                        //             'domain' => modularityConfig('admin_app_subdomain', 'admin') .
                         //             '.{subdomain}.' .
                         //             config('app.url'),
                         //         ],
@@ -138,12 +138,12 @@ class RouteServiceProvider extends ServiceProvider
         );
 
         if (
-            unusualConfig('media_library.image_service') ===
+            modularityConfig('media_library.image_service') ===
             'Unusualify\Modularity\Services\MediaLibrary\Glide'
         ) {
             $router
                 ->get(
-                    '/' . unusualConfig('glide.base_path') . '/{path}',
+                    '/' . modularityConfig('glide.base_path') . '/{path}',
                     GlideController::class
                 )
                 ->where('path', '.*');
@@ -154,7 +154,7 @@ class RouteServiceProvider extends ServiceProvider
         $router,
         $supportSubdomainRouting = false
     ) {
-        $groupOptions = UnusualRoutes::groupOptions();
+        $groupOptions = ModularityRoutes::groupOptions();
         $controller_namespace = GenerateConfigReader::read('controller')->getNamespace();
         $front_controller_namespace = $controller_namespace . '\\Front';
         $routes_folder = GenerateConfigReader::read('routes')->getPath();
@@ -166,7 +166,7 @@ class RouteServiceProvider extends ServiceProvider
             ];
             // $_groupOptions['prefix'] = $module->fullPrefix();
             // $_groupOptions['as'] = $module->fullRouteNamePrefix() . '.';
-            UnusualRoutes::registerRoutes(
+            ModularityRoutes::registerRoutes(
                 $router,
                 [...$_groupOptions, ...(Arr::only($groupOptions, ['domain']))],
                 ['web'], // $middlewares,
@@ -174,7 +174,7 @@ class RouteServiceProvider extends ServiceProvider
                 $module->getDirectoryPath("{$routes_folder}/web.php"),
                 true
             );
-            UnusualRoutes::registerRoutes(
+            ModularityRoutes::registerRoutes(
                 $router,
                 $_groupOptions,
                 ['api'], // $middlewares,
@@ -182,7 +182,7 @@ class RouteServiceProvider extends ServiceProvider
                 $module->getDirectoryPath("{$routes_folder}/api.php"),
                 true
             );
-            UnusualRoutes::registerRoutes(
+            ModularityRoutes::registerRoutes(
                 $router,
                 [],
                 ['web'], // $middlewares,
@@ -194,7 +194,7 @@ class RouteServiceProvider extends ServiceProvider
             $router->group([
                 ...$groupOptions,
                 ...[
-                    'middleware' => UnusualRoutes::webPanelMiddlewares(),
+                    'middleware' => ModularityRoutes::webPanelMiddlewares(),
                     'namespace' => $module->getClassNamespace("{$controller_namespace}"),
                 ],
             ],
@@ -203,14 +203,14 @@ class RouteServiceProvider extends ServiceProvider
                 }
             );
             // dd(
-            //     UnusualRoutes::webMiddlewares(),
+            //     ModularityRoutes::webMiddlewares(),
             //     $groupOptions,
             //     $_groupOptions
             // );
             $router->group([
                 ...[
-                    // 'middleware' => UnusualRoutes::webPanelMiddlewares(),
-                    'middleware' => UnusualRoutes::webMiddlewares(),
+                    // 'middleware' => ModularityRoutes::webPanelMiddlewares(),
+                    'middleware' => ModularityRoutes::webMiddlewares(),
                     'namespace' => $module->getClassNamespace("{$front_controller_namespace}"),
                 ],
             ],
@@ -240,7 +240,7 @@ class RouteServiceProvider extends ServiceProvider
         //     ValidateBackHistory::class
         // );
 
-        UnusualRoutes::generateRouteMiddlewares();
+        ModularityRoutes::generateRouteMiddlewares();
 
     }
 
@@ -723,7 +723,7 @@ class RouteServiceProvider extends ServiceProvider
     public static function shouldPrefixRouteName($groupPrefix, $lastRouteGroupName)
     {
         return ! empty($groupPrefix) && (blank($lastRouteGroupName) ||
-            unusualConfig('allow_duplicates_on_route_names', true) ||
+            modularityConfig('allow_duplicates_on_route_names', true) ||
             (! Str::endsWith($lastRouteGroupName, ".{$groupPrefix}.")));
     }
 
@@ -745,10 +745,10 @@ class RouteServiceProvider extends ServiceProvider
             '.'
         );
 
-        if (! empty(unusualConfig('admin_app_path'))) {
+        if (! empty(modularityConfig('admin_app_path'))) {
             $groupPrefix = ltrim(
                 str_replace(
-                    unusualConfig('admin_app_path'),
+                    modularityConfig('admin_app_path'),
                     '',
                     $groupPrefix
                 ),

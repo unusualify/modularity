@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Http\Controllers;
 
 use Illuminate\Auth\AuthManager;
 use Modules\SystemUser\Repositories\UserRepository;
+use Unusualify\Modularity\Facades\Modularity;
 
 class ImpersonateController extends Controller
 {
@@ -25,9 +26,9 @@ class ImpersonateController extends Controller
      */
     public function impersonate($id, UserRepository $users)
     {
-        if ($this->authManager->guard('unusual_users')->user()->can('impersonate')) {
+        if ($this->authManager->guard(Modularity::getAuthGuardName())->user()->can('impersonate')) {
             $user = $users->getById($id);
-            $this->authManager->guard('unusual_users')->user()->setImpersonating($user->id);
+            $this->authManager->guard(Modularity::getAuthGuardName())->user()->setImpersonating($user->id);
         }
 
         return back();
@@ -38,7 +39,7 @@ class ImpersonateController extends Controller
      */
     public function stopImpersonate()
     {
-        $this->authManager->guard('unusual_users')->user()->stopImpersonating();
+        $this->authManager->guard(Modularity::getAuthGuardName())->user()->stopImpersonating();
 
         return back();
     }

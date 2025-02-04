@@ -17,7 +17,8 @@ return new class extends Migration
         $price = new Price;
         $priceTableName = $price->getTable();
         // dd(config('payable.table', 'umod_payments'));
-        Schema::table(config('payable.tables.payments', 'modularity_payments'), function (Blueprint $table) use ($priceTableName) {
+        Schema::table(config('payable.table', 'unfy_payments'), function (Blueprint $table) use ($priceTableName) {
+
             $table->foreignId('payment_service_id')->after('id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('price_id')->after('payment_service_id')->constrained($priceTableName);
             $table->integer('currency_id')->nullable()->change();
@@ -32,7 +33,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table(config('payable.tables.payments', 'modularity_payments'), function (Blueprint $table) {
+      
+        Schema::table(config('payable.table', 'unfy_payments'), function (Blueprint $table) {
             $table->dropForeign(['payment_service_id']);
             $table->dropColumn('payment_service_id');
             $table->dropForeign(['price_id']);

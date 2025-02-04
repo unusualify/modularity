@@ -63,7 +63,7 @@ class RepositoryMakeCommand extends BaseCommand
         $this->setAskability();
 
         // $this->defaultConsent = false;
-        foreach (getUnusualTraits() as $_trait) {
+        foreach (getModularityTraits() as $_trait) {
             $this->responses[$_trait] = $this->checkOption($_trait);
         }
 
@@ -103,7 +103,7 @@ class RepositoryMakeCommand extends BaseCommand
             ['custom-model', null, InputOption::VALUE_OPTIONAL, 'The model class for usage of a available model.', null],
             ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
-        ], unusualTraitOptions());
+        ], modularityTraitOptions());
     }
 
     /**

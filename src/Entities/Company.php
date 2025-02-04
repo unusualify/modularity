@@ -7,8 +7,6 @@ use Unusualify\Modularity\Database\Factories\CompanyFactory;
 
 class Company extends Model
 {
-    protected $table = 'unusual_companies';
-
     use HasFactory;
     use HasFactory;
 
@@ -32,7 +30,7 @@ class Company extends Model
 
     public function getTable()
     {
-        return unusualConfig('tables.companies', parent::getTable());
+        return modularityConfig('tables.companies', parent::getTable());
     }
 
     protected static function newFactory()

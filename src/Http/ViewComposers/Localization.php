@@ -22,22 +22,22 @@ class Localization
     public function compose(View $view)
     {
 
-        $name = snakeCase(unusualConfig('name'));
+        $name = snakeCase(modularityConfig('name'));
 
-        // $currentLang = Lang::get("{$name}::lang", [], unusualConfig('locale'));
-        $currentLang = Lang::get('*', [], unusualConfig('locale'));
+        // $currentLang = Lang::get("{$name}::lang", [], modularityConfig('locale'));
+        $currentLang = Lang::get('*', [], modularityConfig('locale'));
 
-        // $fallbackLang = Lang::get("{$name}::lang", [], unusualConfig('fallback_locale', 'en'));
-        $fallbackLang = Lang::get('*', [], unusualConfig('fallback_locale', 'en'));
+        // $fallbackLang = Lang::get("{$name}::lang", [], modularityConfig('fallback_locale', 'en'));
+        $fallbackLang = Lang::get('*', [], modularityConfig('fallback_locale', 'en'));
 
         $lang = array_replace_recursive($fallbackLang, $currentLang);
 
-        $unusualLocalization = [
-            'locale' => unusualConfig('locale'),
-            'fallback_locale' => unusualConfig('fallback_locale', 'en'),
+        $modularityLocalization = [
+            'locale' => modularityConfig('locale'),
+            'fallback_locale' => modularityConfig('fallback_locale', 'en'),
             'lang' => $lang,
         ];
 
-        $view->with(['unusualLocalization' => $unusualLocalization]);
+        $view->with(['modularityLocalization' => $modularityLocalization]);
     }
 }

@@ -50,6 +50,7 @@
                         density="compact"
                         :modelValue="isAllSelected(group)"
                         @update:modelValue="updatedParent($event, group)"
+                        :readonly="isMandatoryItem(group)"
                         >
                         <template v-slot:prepend>
                           <v-icon
@@ -82,6 +83,7 @@
                         color="success"
                         hide-details
                         density="compact"
+                        :readonly="isMandatoryItem(item)"
                         >
                       </v-checkbox>
                     </v-list-item>
@@ -97,6 +99,7 @@
                       :label="group[`${itemTitle}`]"
                       :value="group[`${itemValue}`]"
                       :disabled="!canSelectMore() && !input.includes(group[itemValue])"
+                      :readonly="isMandatoryItem(group)"
                       color="success"
                       hide-details
                       density="compact"
@@ -134,6 +137,7 @@
                     hide-details
                     :label="item[itemTitle]"
                     :class="getCheckboxClasses(item)"
+                    :readonly="isMandatoryItem(item)"
                   >
                     <template v-if="checkboxOnRight" #label>
                       <span></span>
@@ -153,7 +157,7 @@
 <script>
   import { computed } from 'vue'
   import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
-
+  import { cloneDeep } from 'lodash-es'
   export default {
     name: 'v-input-checklist',
     emits: [...makeInputEmits],
@@ -229,6 +233,10 @@
         type: [Number, String],
         default: null
       },
+      mandatory: {
+        type: String,
+        default: null
+      }
     },
     setup (props, context) {
       const maxSelectable = computed(() => {
@@ -239,10 +247,51 @@
         } else if(!max && window.__isString(props.rawRules)){
           max = props.rawRules.match(/max:\d+/)?.[0].split(':')[1]
         }
-        return max
+        return max ?? 999
       })
+
+      const initializeInput = (input) => {
+        if(props.mandatory){
+          let mandatoryItems = props.items.filter((item) => __data_get(item, props.mandatory, false))
+
+          if(props.max){
+            let max = parseInt(props.max)
+            if(mandatoryItems.length > max){
+              mandatoryItems = mandatoryItems.slice(0, max)
+            }
+          }
+          if(mandatoryItems.length > 0){
+            // Check if mandatory items were not in previous input
+            const previous = cloneDeep(input)
+            const previousInput = Array.isArray(previous) ? previous : []
+            const mandatoryItemsIds = mandatoryItems.map(item => item[props.itemValue])
+            const missingMandatoryItems = mandatoryItemsIds.filter(id => !previousInput.includes(id))
+            input = [
+              ...new Set([
+                ...(Array.isArray(input) ? input : []),
+                ...mandatoryItemsIds
+              ])
+            ]
+
+            if (missingMandatoryItems.length > 0) {
+              context.emit('update:modelValue', input)
+            }
+
+          }
+        }
+
+        if(maxSelectable.value > 1 && input.length > maxSelectable.value){
+          input = input.sort((a, b) => a - b).slice(0, maxSelectable.value)
+          context.emit('update:modelValue', input)
+        }
+        return input
+      }
+
       return {
-        ...useInput(props, context),
+        ...useInput(props, {
+          ...context,
+          initializeInput
+        }),
         maxSelectable
       }
     },
@@ -299,6 +348,9 @@
       },
       canSelectMore() {
         return !this.disabled && (!this.maxSelectable || (Array.isArray(this.input) && this.input.length < this.maxSelectable));
+      },
+      isMandatoryItem(item) {
+        return __data_get(item, this.mandatory, false)
       }
     },
 
@@ -366,10 +418,15 @@
       },
       disabledCheckbox() {
         return this.$attrs.disabled || (!this.canSelectMore() && !Array.isArray(this.input));
-      }
+      },
+      hasMandatoryItems() {
+        return this.items.some((item) => __data_get(item, this.mandatory, false))
+      },
     },
 
-    created () {}
+    created () {
+
+    }
   }
 </script>
 

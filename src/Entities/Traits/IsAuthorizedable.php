@@ -4,10 +4,11 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Support\Facades\Auth;
 use Unusualify\Modularity\Entities\Company;
+use Unusualify\Modularity\Facades\Modularity;
 
 trait IsAuthorizedable
 {
-    // public static $authorizedGuardName = 'unusual_users';
+    // public static $authorizedGuardName = 'modularity_users';
 
     // public $absoluteRolesAuthorized = [
     //     'admin',
@@ -67,7 +68,7 @@ trait IsAuthorizedable
 
     protected static function getAuthorizedGuardName()
     {
-        return self::$authorizedGuardName ?? 'unusual_users';
+        return self::$authorizedGuardName ?? Modularity::getAuthGuardName();
     }
 
     protected function getAuthorizedModel()

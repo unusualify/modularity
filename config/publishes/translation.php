@@ -25,7 +25,7 @@ return [
     'route_group_config' => [
         'middleware' => [
             'web',
-            'unusual_auth:unusual_users',
+            'modularity.auth:modularity',
             'language',
             'auth',
             'navigation',

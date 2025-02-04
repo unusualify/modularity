@@ -18,7 +18,7 @@ trait HasTranslation
      */
     public function getTranslationModelNameDefault()
     {
-        $model = config('unusual.namespace') . "\Entities\Translations\\" . class_basename($this) . 'Translation';
+        $model = modularityConfig('namespace') . "\Entities\Translations\\" . class_basename($this) . 'Translation';
 
         if (@class_exists($model)) {
             return $model;
