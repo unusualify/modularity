@@ -239,6 +239,16 @@ class Modularity extends FileRepository
         ]);
     }
 
+    final public function isDevelopment()
+    {
+        return get_installed_composer()['root']['name'] === 'unusualify/modularity-dev';
+    }
+
+    final public function isProduction()
+    {
+        return ! $this->isDevelopment();
+    }
+
     public function getAppUrl()
     {
         return $this->config('app_url');
