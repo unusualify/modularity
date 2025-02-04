@@ -2,12 +2,12 @@
 
 namespace Unusualify\Modularity\Entities;
 
-use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
+use Unusualify\Modularity\Entities\Traits\HasTranslation;
 
 class State extends Model
 {
-    use Translatable;
+    use HasTranslation;
 
     /**
      * The attributes that are mass assignable.
@@ -51,5 +51,10 @@ class State extends Model
         }
 
         throw new \Exception('State translation model not found');
+    }
+
+    public function getTable()
+    {
+        return modularityConfig('tables.states', 'modularity_states');
     }
 }

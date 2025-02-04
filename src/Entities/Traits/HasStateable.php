@@ -4,8 +4,8 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Modules\SystemUtility\Entities\Stateable;
 use Unusualify\Modularity\Entities\State;
+use Unusualify\Modularity\Entities\Stateable;
 
 trait HasStateable
 {
@@ -207,7 +207,8 @@ trait HasStateable
         return $this->morphToMany(
             static::$stateModel,
             'stateable',
-            config('modularity.states.table', 'stateables'),
+            // config('modularity.states.table', 'stateables'),
+            modularityConfig('tables.stateables', 'modularity_stateables'),
             'stateable_id',
             'state_id'
         )->withPivot('is_active');
@@ -222,8 +223,8 @@ trait HasStateable
             'id',
             'id',
             'state_id'
-        )->where(config('modularity.states.table', 'stateables') . '.stateable_type', get_class($this))
-            ->where(config('modularity.states.table', 'stateables') . '.is_active', 1);
+        )->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.stateable_type', get_class($this))
+            ->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.is_active', 1);
     }
 
     public static function getStateableTranslationLanguages()
@@ -311,7 +312,7 @@ trait HasStateable
         return $this->scopeAuthorized($this)
             ->whereHas('states', function ($q) {
                 $q->where('code', 'distributed')
-                    ->where('stateables.is_active', 1);
+                    ->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.is_active', 1);
             });
     }
 
