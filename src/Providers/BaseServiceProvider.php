@@ -249,28 +249,15 @@ class BaseServiceProvider extends ServiceProvider
             // }
         }
 
-        config([
-            'modularity.vendor_dir' => is_modularity_production()
-                ? 'vendor/unusualify/modularity'
-                : env('MODULARITY_VENDOR_DIR', env('MODULARITY_VENDOR_PATH', 'packages/modularity')),
-        ]);
-
         if (! config('modules.scan.enabled')) {
             throw new \Exception('Modules scan is not enabled, set scan.enabled to true in config/modules.php');
         }
-
 
         // if(!$this->app->isProduction() && config('modules.cache.enabled')){
         //     config([
         //         'modules.cache.enabled' => false,
         //     ]);
         // }
-
-        // timokoerber/laravel-one-time-operations directory set
-        // config([
-        //     'one-time-operations.directory' => get_modularity_vendor_dir('operations'),
-        // ]);
-
     }
 
     /**
