@@ -38,6 +38,21 @@ class Modularity extends FileRepository
     private static $translationCacheKey = 'modularity-languages';
 
     /**
+     * @var string
+     */
+    private $appPath = null;
+
+    /**
+     * @var string
+     */
+    private $vendorPath = null;
+
+    /**
+     * @var string
+     */
+    private $vendorDir = null;
+
+    /**
      * The constructor.
      *
      * @param string|null $path
@@ -45,6 +60,10 @@ class Modularity extends FileRepository
     public function __construct(Container $app, $path = null)
     {
         parent::__construct($app, $path);
+
+        $this->appPath = realpath(get_installed_composer()['root']['install_path']);
+        $this->vendorPath = realpath(get_installed_composer()['versions']['unusualify/modularity']['install_path']);
+        $this->vendorDir = trim(Str::replaceFirst($this->appPath, '', $this->vendorPath), DIRECTORY_SEPARATOR);
 
         $this->modularityCache = $app['cache'];
         $this->modularityConfig = $app['config'];
