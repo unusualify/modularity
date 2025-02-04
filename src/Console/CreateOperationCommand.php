@@ -19,7 +19,11 @@ class CreateOperationCommand extends BaseCommand
      */
     protected $signature = 'modularity:create:operation
         {name : The name of the operation}
-        {--t|tag=modularity : The tag of the operation}
+        {--self : The path of the modularity}
+        {--path= : The path of the operation}
+        {--t|tag= : The tag of the operation}
+        {--async : The operation will be processed asynchronously}
+        {--queue=default : The queue that the job will be dispatched to}
     ';
 
     protected $aliases = [
@@ -55,15 +59,43 @@ class CreateOperationCommand extends BaseCommand
         $snakeName = Str::snake($name);
         $headlineName = Str::headline($name);
         $tag = $this->option('tag');
+        $path = null;
+        $fileNameSegments = [$this->getDatePrefix()];
+
+        if ($this->option('self')) {
+            $path = Modularity::getVendorPath('operations');
+            $tag = $tag ?? 'modularity';
+            $fileNameSegments[] = 'modularity';
+
+        } else {
+            $path = $this->option('path') ?? base_path(config('one-time-operations.directory', 'operations'));
+
+            if (! Str::startsWith($path, '/')) {
+                $path = base_path($path);
+            }
+        }
+
+        if (! File::exists($path)) {
+            $this->error("Path does not exist: {$path}");
+
+            return 1;
+        }
+
+        $fileNameSegments[] = $snakeName;
+        $fileNameSegments[] = 'operation';
+
+        $fileName = implode('_', $fileNameSegments) . '.php';
 
         $replacements = [
             'NAME' => $headlineName,
             'TAG' => $tag,
+            'ASYNC' => $this->option('async') ? 'true' : 'false',
+            'QUEUE' => $this->option('queue'),
         ];
 
         $content = (new Stub('/operation.stub', $replacements))->render();
 
-        $path = Modularity::getVendorPath('operations/' . $this->getDatePrefix() . '_modularity_' . $snakeName . '_operation.php');
+        $path = concatenate_path($path, $fileName);
 
         File::put($path, $content);
 
