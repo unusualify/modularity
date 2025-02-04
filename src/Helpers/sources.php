@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Facades\Modularity;
 
 if (! function_exists('getLocales')) {
     /**
@@ -101,7 +102,7 @@ if (! function_exists('builtInModularityThemes')) {
     function builtInModularityThemes()
     {
         return collect(array_filter(
-            glob(get_modularity_vendor_path('vue/src/sass/themes/*', GLOB_ONLYDIR)),
+            File::glob(Modularity::getVendorPath('vue/src/sass/themes') . '/*', GLOB_ONLYDIR),
             fn ($dir) => File::isDirectory($dir) && ! preg_match('/customs/', $dir)
         ))->mapWithKeys(function ($dir) {
             $info = pathinfo($dir);
@@ -116,7 +117,7 @@ if (! function_exists('customModularityThemes')) {
     function customModularityThemes()
     {
         return collect(array_filter(
-            glob(resource_path('vendor/modularity/themes/*', GLOB_ONLYDIR)),
+            File::glob(resource_path('vendor/modularity/themes/*'), GLOB_ONLYDIR),
             fn ($dir) => File::isDirectory($dir)
         ))->mapWithKeys(function ($dir) {
             $info = pathinfo($dir);
