@@ -260,7 +260,7 @@ class Modularity extends FileRepository
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function config(string $key, $default = null)
     {
@@ -404,9 +404,29 @@ class Modularity extends FileRepository
      * @param string $dir
      * @return string
      */
-    public function getVendorPath($dir = '')
+    final public function getVendorPath($dir = '')
     {
-        return get_modularity_vendor_path($dir);
+        if (! $dir) {
+            return $this->vendorPath;
+        }
+
+        return concatenate_path($this->vendorPath, $dir);
+        // return realpath(concatenate_path($this->vendorPath, $dir));
+    }
+
+    /**
+     * Get vendor path.
+     *
+     * @param string $dir
+     * @return string
+     */
+    final public function getVendorDir($dir = '')
+    {
+        if (! $dir) {
+            return $this->vendorDir;
+        }
+
+        return concatenate_path($this->vendorDir, $dir);
     }
 
     /**
