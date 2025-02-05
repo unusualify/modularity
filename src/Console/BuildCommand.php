@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Console;
 
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
+use Unusualify\Modularity\Facades\Modularity;
 
 class BuildCommand extends BaseCommand
 {
@@ -225,7 +226,8 @@ class BuildCommand extends BaseCommand
         // Add environment variables
         $process->setEnv([
             'BASE_PATH' => base_path(),
-            'VENDOR_DIR' => modularityConfig('vendor_dir'),
+            // 'VENDOR_DIR' => modularityConfig('vendor_dir'),
+            'VENDOR_DIR' => Modularity::getVendorDir(),
         ]);
 
         if ($disableTimeout) {
