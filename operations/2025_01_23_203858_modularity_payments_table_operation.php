@@ -19,7 +19,7 @@ return new class extends OneTimeOperation
     /**
      * Determine if the operation is being processed asynchronously.
      */
-    protected bool $async = true;
+    protected bool $async = false;
 
     /**
      * The queue that the job will be dispatched to.
@@ -52,7 +52,6 @@ return new class extends OneTimeOperation
             } else {
                 Artisan::call('migrate', [
                     '--path' => Modularity::getVendorPath('database/migrations/default/2024_06_24_125121_create_payments_table.php'),
-                    // '--path' => 'vendor/unusualify/modularity/database/migrations/default/2024_06_24_125121_create_payments_table.php'
                 ]);
 
                 $this->info("\t" . $paymentsTable . " created");
