@@ -37,7 +37,7 @@ final class LaravelServiceProvider extends ServiceProvider
             __DIR__ . '/../vue/dist/modularity' => public_path('vendor/modularity'),
             __DIR__ . '/../resources/assets/images' => public_path('vendor/modularity/assets/images'),
 
-        ], 'assets');
+        ], 'public');
     }
 
     private function publishConfigs(): void
@@ -57,6 +57,8 @@ final class LaravelServiceProvider extends ServiceProvider
             __DIR__ . '/../config/publishes/translation.php' => config_path('translation.php'),
 
             base_path('vendor/torann/geoip/config/geoip.php') => config_path('geoip.php'),
+            __DIR__ . '/../config/publishes/horizon.php' => config_path('horizon.php'),
+            __DIR__ . '/../config/publishes/telescope.php' => config_path('telescope.php'),
             // base_path('vendor/spatie/laravel-permission/config/permission.php') => config_path('permission.php'),
         ], 'config');
 
@@ -66,11 +68,14 @@ final class LaravelServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__ . '/../resources/views/vendor/translation' => resource_path('views/vendor/translation'),
+            __DIR__ . '/../resources/views/vendor/horizon' => resource_path('views/vendor/horizon'),
+            __DIR__ . '/../resources/views/vendor/telescope' => resource_path('views/vendor/telescope'),
         ], 'views');
 
         $this->publishes([
             __DIR__ . '/../vue/dist/modularity/assets/icons' => resource_path('views/vendor/modularity/partials/icons'),
-        ], 'assets');
+        ], 'views');
+
     }
 
     private function publishResources(): void

@@ -75,9 +75,29 @@ class FileActivator extends ActivatorsFileActivator
 
         $this->statusesFile = $path . '/' . $this->config('statuses-file');
 
+        $this->setCacheKey($this->generateCacheKey());
+
         $this->routesStatuses = $this->getRoutesStatuses();
 
         return $this;
+    }
+
+    public function generateCacheKey()
+    {
+        $moduleName = (string) $this->module;
+        return 'module-activator.installed.' . kebabCase($moduleName);
+    }
+
+    public function setCacheKey($key)
+    {
+        $this->cacheKey = $key;
+
+        return $this;
+    }
+
+    public function getCacheKey()
+    {
+        return $this->cacheKey;
     }
 
     /**
@@ -102,7 +122,7 @@ class FileActivator extends ActivatorsFileActivator
             return $this->readRoutesJson();
         }
 
-        return $this->cache->remember($this->cacheKey, $this->cacheLifetime, function () {
+        return $this->cache->remember($this->getCacheKey(), $this->cacheLifetime, function () {
             return $this->readRoutesJson();
         });
     }

@@ -58,7 +58,7 @@ const svgConfig = (suffix = null, isProduction = true) => {
 
 export default defineConfig(({ command, mode }) => {
   const ENV = loadEnv(mode, process.cwd(), '')
-  const envPrefix = 'VUE'
+  const envPrefix = ['VUE', 'VITE']
   const isProduction = mode === 'production'
 
   const vendorDir = ENV.VENDOR_DIR || 'vendor/unusualify/modularity'

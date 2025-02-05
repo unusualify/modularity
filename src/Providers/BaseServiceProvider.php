@@ -2,9 +2,12 @@
 
 namespace Unusualify\Modularity\Providers;
 
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\View;
+use Laravel\Telescope\Telescope;
 use Unusualify\Modularity\Activators\FileActivator;
 use Unusualify\Modularity\Exceptions\AuthConfigurationException;
 use Unusualify\Modularity\Http\ViewComposers\CurrentUser;
@@ -62,6 +65,14 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->bootBaseViewComponents();
 
+        ResetPassword::createUrlUsing(function ($notifiable, string $token) {
+            return url(route('admin.password.reset', [
+                'token' => $token,
+                'email' => $notifiable->getEmailForPasswordReset(),
+            ], false));
+        });
+
+
         AboutCommand::add('Modularity', function () {
 
             return [
@@ -74,6 +85,18 @@ class BaseServiceProvider extends ServiceProvider
                 'Vendor' => $this->app['modularity']->getVendorDir(),
                 'Version' => get_package_version('unusualify/modularity'),
             ];
+        });
+
+        // Register scheduler class instead of direct command
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
+            $schedule->command('modularity:clean-temporary-fileponds')
+                ->everyFiveMinutes();
+                // ->appendOutputTo(storage_path('logs/scheduler.log'));
+
+            $schedule->command('telescope:prune --hours=48')
+                ->everyMinute()
+                ->appendOutputTo(storage_path('logs/scheduler.log'));
+
         });
 
     }
@@ -138,6 +161,8 @@ class BaseServiceProvider extends ServiceProvider
         // $this->app->alias(FileActivator::class, 'module_activator');
 
         $this->app->alias(\Torann\GeoIP\Facades\GeoIP::class, 'GeoIP');
+
+        $this->app->register(TelescopeServiceProvider::class);
 
         $this->registerTranslationService();
     }
@@ -359,6 +384,7 @@ class BaseServiceProvider extends ServiceProvider
                 'MODULARITY_VERSION' => env('MODULARITY_VERSION', 'Not Found'),
                 'PAYABLE_VERSION' => env('PAYABLE_VERSION', 'Not Found'),
                 'SNAPSHOT_VERSION' => env('SNAPSHOT_VERSION', 'Not Found'),
+                'COMPOSER' => env('COMPOSER', 'Not Found'),
             ]);
         });
 
@@ -413,6 +439,18 @@ class BaseServiceProvider extends ServiceProvider
                 $cmds[] = preg_match('|' . preg_quote($this->terminalNamespace, '|') . '|', $match[0])
                             ? $cmd
                             : "{$this->terminalNamespace}\\{$match[0]}";
+            }
+        }
+
+        foreach (glob(__DIR__ . '/../Schedulers/*.php') as $filePath) {
+            $filePath = realpath($filePath);
+            $fileContents = file_get_contents($filePath);
+
+            // Extract namespace using regex
+            if (preg_match('/namespace\s+([^;]+);/', $fileContents, $matches)) {
+                $namespace = $matches[1];
+                $className = basename($filePath, '.php');
+                $cmds[] = $namespace . '\\' . $className;
             }
         }
 

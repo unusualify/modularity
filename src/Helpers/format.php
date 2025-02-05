@@ -94,6 +94,13 @@ if (! function_exists('makeMorphForeignType')) {
     }
 }
 
+if (! function_exists('makeProviderName')) {
+    function makeProviderName($string)
+    {
+        return studlyName($string) . 'ServiceProvider';
+    }
+}
+
 if (! function_exists('makeMorphToMethodName')) {
     function makeMorphToMethodName($string)
     {
@@ -396,6 +403,13 @@ if (! function_exists('replace_curly_braces')) {
     }
 }
 
+if (! function_exists('indent')) {
+    function indent($indent = 4, $string = "")
+    {
+        return str_repeat(" ", $indent) . $string;
+    }
+}
+
 if (! function_exists('comment_string')) {
     /**
      * comment_string
@@ -405,9 +419,9 @@ if (! function_exists('comment_string')) {
      * @param mixed $return_type
      * @param mixed $asArray
      */
-    function comment_string(array|string $descriptions, $parameters = [], ?string $return_type = null, $asArray = false): array|string
+    function comment_string(array|string $descriptions, $parameters = [], ?string $returnType = null, ?string $varType = null, $asArray = false): array|string
     {
-        $lines = ["\t/**"];
+        $lines = [indent(string: "/**")];
 
         if (is_string($descriptions)) {
             $descriptions = [$descriptions];
@@ -421,20 +435,25 @@ if (! function_exists('comment_string')) {
         // dd($lines);
 
         $lines = array_reduce($parameters, function ($carry, $line) {
-            [$name, $value] = explode('=', $line);
+            [$name] = explode('=', $line);
             $parts = explode(' ', $name);
             $type = 'mixin';
+            $parameter = $name;
             if (count($parts) > 1) {
                 $type = array_shift($parts);
-                $line = array_shift($parts);
+                $parameter = array_shift($parts);
             }
-            $carry[] = " * @param {$type} {$line}";
+            $carry[] = " * @param {$type} {$parameter}";
 
             return $carry;
         }, $lines);
 
-        if ($return_type) {
-            $lines[] = " * @return {$return_type}";
+        if ($returnType) {
+            $lines[] = " * @return {$returnType}";
+        }
+
+        if ($varType) {
+            $lines[] = " * @var {$varType}";
         }
 
         $lines[] = ' */';
@@ -443,7 +462,7 @@ if (! function_exists('comment_string')) {
             return $lines;
         }
 
-        return implode("\n\t", $lines);
+        return implode("\n" . indent(), $lines);
     }
 }
 
@@ -464,20 +483,48 @@ if (! function_exists('method_string')) {
 
         $parameters = implode(',', $parameters);
         $return_type = $return_type ? ": {$return_type}" : '';
-        $lines[] = "{$modifier} function {$method_name}($parameters){$return_type}\n\t{\n\t\t";
+        $lines[] = "{$modifier} function {$method_name}($parameters){$return_type}\n" . indent() . "{";
 
         if (is_string($content)) {
             $content = [$content];
         }
         $lines = array_reduce($content, function ($carry, $line) {
-            $carry[] = "\t{$line}";
+            $carry[] = indent(string: "{$line}");
 
             return $carry;
         }, $lines);
 
         $lines[] = '}';
 
-        return implode("\n\t", $lines);
+        return implode("\n" . indent(), $lines);
+    }
+}
+
+if (! function_exists('attribute_string')) {
+    /**
+     * method_string
+     *
+     * @param mixed $method_name
+     * @param mixed $content
+     * @param mixed $modifier
+     * @param mixed $comment
+     * @param mixed $parameters
+     * @param mixed $return_type
+     */
+    function attribute_string($attribute_name, $value, $modifier = 'public', $comment = null, $customVarType = null): string
+    {
+        $varType = gettype($value);
+        $lines = comment_string($comment, varType: $customVarType ?? $varType, asArray: true);
+
+        if($varType == 'array'){
+            $value = array_export($value, true);
+        } else if($varType == 'string'){
+            $value = "'{$value}'";
+        }
+
+        $lines[] = "{$modifier} \${$attribute_name} = {$value};";
+
+        return implode("\n" . indent(), $lines);
     }
 }
 
@@ -561,5 +608,23 @@ if (! function_exists('concatenate_namespace')) {
     function concatenate_namespace($namespace, $append)
     {
         return implode('\\', [rtrim($namespace, '\\'), ltrim($append, '\\')]);
+    }
+}
+
+if(!function_exists('get_file_class')){
+    function get_file_class($file){
+        $content = file_get_contents($file);
+
+        $namespace = null;
+        if (preg_match('/namespace\s+([^;]+);/', $content, $matches)) {
+            $namespace = $matches[1];
+        }
+
+        $className = null;
+        if (preg_match('/class\s+(\w+)(?:\s+extends|\s+implements|\s*{|$)/', $content, $matches)) {
+            $className = $matches[1];
+        }
+
+        return $namespace ? $namespace . '\\' . $className : $className;
     }
 }

@@ -15,6 +15,7 @@ import { MEDIA_LIBRARY } from '@/store/mutations'
 
 // Add-ons
 import vuetify from '@/plugins/vuetify'
+import broadcasting from '@/plugins/broadcasting'
 
 // Store
 import store from '@/store'
@@ -62,7 +63,7 @@ export default {
     app.use(vuetify)
     app.use(store)
     app.use(i18n)
-
+    app.use(broadcasting)
     app.config.globalProperties.$jquery = window.$
     app.config.globalProperties.$axios = window.axios
     app.config.globalProperties.$lodash = window._
