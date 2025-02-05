@@ -60,7 +60,7 @@ trait ManageTable
             ];
         }
 
-        $this->defaultTableAttributes = (array) Config::get(unusualBaseKey() . '.default_table_attributes');
+        $this->defaultTableAttributes = (array) Config::get(modularityBaseKey() . '.default_table_attributes');
 
         $this->tableAttributes = array_merge_recursive_preserve($this->getTableAttributes(), $this->tableAttributes ?? []);
     }
@@ -77,7 +77,7 @@ trait ManageTable
         $scope = $this->nestedParentScopes() + $scopes;
 
         $statusFilters[] = [
-            // 'name' => unusualTrans("{$this->baseKey}::lang.listing.filter.all-items"),
+            // 'name' => modularityTrans("{$this->baseKey}::lang.listing.filter.all-items"),
             'name' => ___('listing.filter.all-items'),
             'slug' => 'all',
             'number' => $this->repository->getCountByStatusSlug('all', $scope),
@@ -85,7 +85,7 @@ trait ManageTable
 
         // if ($this->routeHasTrait('revisions') && $this->getIndexOption('create')) {
         //     $statusFilters[] = [
-        //         'name' => unusualTrans("$this->baseKey::lang.listing.filter.mine"),
+        //         'name' => modularityTrans("$this->baseKey::lang.listing.filter.mine"),
         //         'slug' => 'mine',
         //         'number' => $this->repository->getCountByStatusSlug('mine', $scope),
         //     ];
@@ -93,7 +93,7 @@ trait ManageTable
 
         $fillables = $this->repository->getFillable();
 
-        if (in_array('published', $fillables) && $this->repository->hasColumn('published') ) {
+        if (in_array('published', $fillables) && $this->repository->hasColumn('published')) {
             $statusFilters[] = [
                 'name' => ___('listing.filter.published'),
                 'slug' => 'published',
@@ -125,7 +125,7 @@ trait ManageTable
         if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasStateable')) {
             $statusFilters = array_merge(
                 $statusFilters,
-                $this->repository->getModel()->getStateableFilterList(),
+                $this->repository->getStateableFilterList(),
             );
         }
 
@@ -264,13 +264,16 @@ trait ManageTable
                         'async' => false,
                     ],
                     'model_formatter' => [
-                        'price_id' => 'payment_price.id', //lodash get method
+                        'price_id' => 'payment_price.id', // lodash get method
                     ],
                     'schema_formatter' => [
-                        'payment_service.price_object' => 'payment_price'
-
+                        'payment_service.price_object' => 'payment_price',
 
                     ],
+                ],
+                'conditions' => [
+                    ['state.code', 'in', ['pending-payment']],
+                    ['payable_price.price_including_vat', '>', 0],
                 ],
                 //  admin.system.system_payment.payment routeName
                 //  admin.crm.template/system/system-payments/pay/{price}
@@ -366,7 +369,7 @@ trait ManageTable
 
     protected function getHeader($header)
     {
-        return array_merge_recursive_preserve(unusualConfig('default_header'), $this->hydrateHeader($header));
+        return array_merge_recursive_preserve(modularityConfig('default_header'), $this->hydrateHeader($header));
     }
 
     protected function hydrateHeader($header)

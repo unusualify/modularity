@@ -8,10 +8,10 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create(unusualConfig('tables.companies', 'modularity_companies'), function (Blueprint $table) {
+        Schema::create(modularityConfig('tables.companies', 'modularity_companies'), function (Blueprint $table) {
             // this will create an id, a "published" column, and soft delete and timestamps columns
             createDefaultTableFields($table);
-            // $table->{unusualIntegerMethod()}("_id")->unsigned();
+            // $table->{modularityIntegerMethod()}("_id")->unsigned();
             $table->string('name', 30)->nullable();
             $table->text('address')->nullable();
             $table->string('city', 30)->nullable();
@@ -31,6 +31,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists(unusualConfig('tables.companies', 'modularity_companies'));
+        Schema::dropIfExists(modularityConfig('tables.companies', 'modularity_companies'));
     }
 };

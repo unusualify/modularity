@@ -124,13 +124,13 @@ trait HasSlug
      */
     public function updateOrNewSlug($slugParams, $restoring = false)
     {
-        if (in_array($slugParams['locale'], unusualConfig('slug_utf8_languages', []))) {
+        if (in_array($slugParams['locale'], modularityConfig('slug_utf8_languages', []))) {
             $slugParams['slug'] = $this->getUtf8Slug($slugParams['slug']);
         } else {
             $slugParams['slug'] = Str::slug($slugParams['slug']);
         }
 
-        //active old slug if already existing or create a new one
+        // active old slug if already existing or create a new one
         if (
             (($oldSlug = $this->getExistingSlug($slugParams)) != null)
             && ($restoring ? $slugParams['slug'] === $this->suffixSlugIfExisting($slugParams) : true)
@@ -155,7 +155,7 @@ trait HasSlug
         $query = $this->slugs();
 
         foreach ($slugParams as $key => $value) {
-            //check variations of the slug
+            // check variations of the slug
             if ($key == 'slug') {
                 $query->where(function ($query) use ($value) {
                     $query->orWhere('slug', $value);

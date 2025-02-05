@@ -41,6 +41,14 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
     const name = tableNames.permissionName.value + '_' + permission
     return store.getters.isSuperAdmin || store.getters.userPermissions[name]
   }
+
+  // Helper method to get nested object values using dot notation
+  const getNestedValue = (obj, path) => {
+    return path.split('.').reduce((current, part) => {
+      return current && current[part] !== undefined ? current[part] : undefined;
+    }, obj);
+  }
+
   // Action Permissions
   const itemHasAction = (item, action) => {
     let hasAction = true
@@ -60,6 +68,42 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
       default:
         break
     }
+
+    if(action.conditions) {
+      return hasAction && action.conditions.every(condition => {
+        const [path, operator, value] = condition;
+        const actualValue = getNestedValue(item, path);
+
+        switch (operator) {
+          case '=':
+          case '==':
+            return actualValue === value;
+          case '!=':
+            return actualValue !== value;
+          case '>':
+            __log(value, actualValue, actualValue > value)
+            return actualValue > value;
+          case '<':
+            return actualValue < value;
+          case '>=':
+            return actualValue >= value;
+          case '<=':
+            return actualValue <= value;
+          case 'in':
+            __log(value, actualValue, Array.isArray(value) && value.includes(actualValue))
+            return Array.isArray(value) && value.includes(actualValue);
+          case 'not in':
+            return Array.isArray(value) && !value.includes(actualValue);
+          case 'exists':
+            return actualValue !== undefined && actualValue !== null;
+          default:
+              console.warn(`Unknown operator: ${operator}`);
+              return false;
+        }
+      })
+    }
+
+
 
     return hasAction
   }

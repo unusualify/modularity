@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Api Routes
 |
-| Middlewares : [ 'web.auth', 'unusual.core', 'unusual.panel']
+| Middlewares : [ 'web.auth', ...\Unusualify\Modularity\Facades\ModularityRoutes::defaultMiddlewares(), \Unusualify\Modularity\Facades\ModularityRoutes::defaultPanelMiddlewares()]
 |--------------------------------------------------------------------------
 |
 | Here is where you can register web routes for your application. These
@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 // });
 
 // Route::group([ 'prefix' => 'filepond'], function(){
-//     Route::middleware(['web'])->withoutMiddleware(['web.auth', 'unusual.panel', 'unusual.core'])->group(function(){
+//     Route::middleware(['web'])->withoutMiddleware(['web.auth', \Unusualify\Modularity\Facades\ModularityRoutes::defaultPanelMiddlewares(), ...\Unusualify\Modularity\Facades\ModularityRoutes::defaultMiddlewares()])->group(function(){
 //         Route::post('process', ['as' => 'filepond.process', 'uses' => 'FilepondController@upload']);
 //         Route::delete('revert', ['as' => 'filepond.revert', 'uses' => 'FilepondController@revert']);
 //         Route::get('preview/{folder}', ['as' => 'filepond.preview', 'uses' => 'FilepondController@preview']);

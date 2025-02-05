@@ -38,7 +38,6 @@ class Module extends NwidartModule
 
         parent::__construct($app, $name, $path);
 
-        // $this->moduleActivator = $app['unusual.activator'];
         try {
             $this->moduleActivator = (new FileActivator($app))->setModule($this->getName(), $path);
         } catch (\Throwable $th) {
@@ -111,7 +110,7 @@ class Module extends NwidartModule
 
     public function setModuleActivator($name)
     {
-        //Directory path fix for System Modules
+        // Directory path fix for System Modules
         $this->moduleActivator->setModule($name, $this->getDirectoryPath());
     }
 
@@ -180,7 +179,7 @@ class Module extends NwidartModule
     private function flushModuleCache(): void
     {
 
-        if (unusualConfig('cache.enabled')) {
+        if (modularityConfig('cache.enabled')) {
             // $this->cache->store()->flush();
         }
     }
@@ -471,12 +470,6 @@ class Module extends NwidartModule
         }, array_filter(Route::getRoutes()->getRoutesByName(), fn ($r) => preg_match('/' . $quote . '/', $r->getName())));
 
         return $moduleRoutes;
-        dd(
-            $moduleRoutes,
-            Route::getRoutes()->getByName('webinar'),
-            Route::getRoutes()->hasNamedRoute('webinar'),
-            Route::getRoutes()->getRoutesByName(),
-        );
     }
 
     public function getRouteUris($routeName): array
@@ -504,12 +497,6 @@ class Module extends NwidartModule
         $midQuote = '(.nested.[a-z|_]+)?.(';
         $quote = $this->fullRouteNamePrefix($isParentRoute) . '.' . snakeCase($routeName) . $midQuote . implode('|', $actions) . ')$';
 
-        // dd(
-        //     $quote,
-        //     $this->isParentRoute($routeName),
-        //     $this->fullRouteNamePrefix($this->isParentRoute($routeName)),
-        //     Collection::make($this->getModuleUris())->filter(fn($uri, $name) => preg_match('/' . $quote .'/', $name))->toArray()
-        // );
         return Collection::make($this->getModuleUris())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name))->toArray();
     }
 

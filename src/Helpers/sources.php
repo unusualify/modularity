@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Facades\Modularity;
 
 if (! function_exists('getLocales')) {
     /**
@@ -48,8 +49,8 @@ if (! function_exists('getFormDraft')) {
     {
 
         $draft = $preserve
-            ? array_merge_recursive_preserve(unusualConfig("form_drafts.{$name}", []), $overwrites)
-            : array_merge(unusualConfig("form_drafts.{$name}", []), $overwrites);
+            ? array_merge_recursive_preserve(modularityConfig("form_drafts.{$name}", []), $overwrites)
+            : array_merge(modularityConfig("form_drafts.{$name}", []), $overwrites);
 
         if (count($excludes)) {
 
@@ -66,7 +67,7 @@ if (! function_exists('adminRouteNamePrefix')) {
 
     function adminRouteNamePrefix()
     {
-        return rtrim(ltrim(unusualConfig('admin_route_name_prefix', 'admin'), '.'), '.');
+        return rtrim(ltrim(modularityConfig('admin_route_name_prefix', 'admin'), '.'), '.');
     }
 }
 
@@ -74,9 +75,9 @@ if (! function_exists('adminUrlPrefix')) {
 
     function adminUrlPrefix()
     {
-        return unusualConfig('admin_app_url')
+        return modularityConfig('admin_app_url')
             ? false
-            : rtrim(ltrim(unusualConfig('admin_app_path', 'admin'), '/'), '/');
+            : rtrim(ltrim(modularityConfig('admin_app_path', 'admin'), '/'), '/');
     }
 }
 
@@ -84,7 +85,7 @@ if (! function_exists('systemUrlPrefix')) {
 
     function systemUrlPrefix()
     {
-        return unusualConfig('system_prefix', 'system-settings');
+        return modularityConfig('system_prefix', 'system-settings');
     }
 }
 
@@ -101,7 +102,7 @@ if (! function_exists('builtInModularityThemes')) {
     function builtInModularityThemes()
     {
         return collect(array_filter(
-            glob(get_modularity_vendor_path('vue/src/sass/themes/*', GLOB_ONLYDIR)),
+            File::glob(Modularity::getVendorPath('vue/src/sass/themes') . '/*', GLOB_ONLYDIR),
             fn ($dir) => File::isDirectory($dir) && ! preg_match('/customs/', $dir)
         ))->mapWithKeys(function ($dir) {
             $info = pathinfo($dir);
@@ -116,7 +117,7 @@ if (! function_exists('customModularityThemes')) {
     function customModularityThemes()
     {
         return collect(array_filter(
-            glob(resource_path('vendor/modularity/themes/*', GLOB_ONLYDIR)),
+            File::glob(resource_path('vendor/modularity/themes/*'), GLOB_ONLYDIR),
             fn ($dir) => File::isDirectory($dir)
         ))->mapWithKeys(function ($dir) {
             $info = pathinfo($dir);

@@ -26,14 +26,14 @@ class Imgix implements ImageServiceInterface
         $this->config = $config;
 
         $urlBuilder = new UrlBuilder(
-            $this->config->get(unusualBaseKey() . '.imgix.source_host'),
-            $this->config->get(unusualBaseKey() . '.imgix.use_https'),
+            $this->config->get(modularityBaseKey() . '.imgix.source_host'),
+            $this->config->get(modularityBaseKey() . '.imgix.use_https'),
             '',
             false
         );
 
-        if ($this->config->get(unusualBaseKey() . '.imgix.use_signed_urls')) {
-            $urlBuilder->setSignKey($this->config->get(unusualBaseKey() . '.imgix.sign_key'));
+        if ($this->config->get(modularityBaseKey() . '.imgix.use_signed_urls')) {
+            $urlBuilder->setSignKey($this->config->get(modularityBaseKey() . '.imgix.sign_key'));
         }
 
         $this->urlBuilder = $urlBuilder;
@@ -45,8 +45,8 @@ class Imgix implements ImageServiceInterface
      */
     public function getUrl($id, array $params = [])
     {
-        $defaultParams = $this->config->get(unusualBaseKey() . '.imgix.default_params');
-        $addParamsToSvgs = unusualConfig('imgix.add_params_to_svgs', false);
+        $defaultParams = $this->config->get(modularityBaseKey() . '.imgix.default_params');
+        $addParamsToSvgs = modularityConfig('imgix.add_params_to_svgs', false);
 
         if (! $addParamsToSvgs && Str::endsWith($id, '.svg')) {
             return $this->urlBuilder->createURL($id);
@@ -81,7 +81,7 @@ class Imgix implements ImageServiceInterface
      */
     public function getLQIPUrl($id, array $params = [])
     {
-        $defaultParams = $this->config->get(unusualBaseKey() . '.imgix.lqip_default_params');
+        $defaultParams = $this->config->get(modularityBaseKey() . '.imgix.lqip_default_params');
 
         $cropParams = Arr::has($params, $this->cropParamsKeys) ? $this->getCrop($params) : [];
 
@@ -96,7 +96,7 @@ class Imgix implements ImageServiceInterface
      */
     public function getSocialUrl($id, array $params = [])
     {
-        $defaultParams = $this->config->get(unusualBaseKey() . '.imgix.social_default_params');
+        $defaultParams = $this->config->get(modularityBaseKey() . '.imgix.social_default_params');
 
         $cropParams = Arr::has($params, $this->cropParamsKeys) ? $this->getCrop($params) : [];
 
@@ -111,7 +111,7 @@ class Imgix implements ImageServiceInterface
      */
     public function getCmsUrl($id, array $params = [])
     {
-        $defaultParams = $this->config->get(unusualBaseKey() . '.imgix.cms_default_params');
+        $defaultParams = $this->config->get(modularityBaseKey() . '.imgix.cms_default_params');
 
         $cropParams = Arr::has($params, $this->cropParamsKeys) ? $this->getCrop($params) : [];
 

@@ -113,7 +113,6 @@ class CreateFeatureCommand extends BaseCommand
             }
         }
 
-
         $this->info('Feature created successfully');
 
         return 0;

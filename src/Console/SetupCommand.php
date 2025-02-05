@@ -51,7 +51,7 @@ class SetupCommand extends BaseCommand
      */
     public function handle(): int
     {
-        //check the database connection before installing
+        // check the database connection before installing
         try {
             $this->db->connection()->getPdo();
         } catch (\Exception $e) {
@@ -77,7 +77,7 @@ class SetupCommand extends BaseCommand
     private function publishConfig()
     {
         $this->call('vendor:publish', [
-            '--provider' => 'Unusualify\Modularity\Providers\UnusualProvider',
+            '--provider' => 'Unusualify\Modularity\Providers\ModularityProvider',
             '--tag' => 'config',
         ]);
     }
@@ -90,7 +90,7 @@ class SetupCommand extends BaseCommand
     private function publishAssets()
     {
         $this->call('vendor:publish', [
-            '--provider' => 'Unusualify\Modularity\Providers\UnusualProvider',
+            '--provider' => 'Unusualify\Modularity\Providers\ModularityProvider',
             '--tag' => 'assets',
             '--force' => true,
         ]);

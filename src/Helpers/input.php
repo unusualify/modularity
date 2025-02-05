@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Str;
 use Unusualify\Modularity\Hydrates\InputHydrator;
 
 if (! function_exists('configure_input')) {
@@ -24,7 +23,7 @@ if (! function_exists('configure_input')) {
 if (! function_exists('modularity_default_input')) {
     function modularity_default_input()
     {
-        return (array) Config::get(unusualBaseKey() . '.default_input');
+        return (array) Config::get(modularityBaseKey() . '.default_input');
     }
 }
 

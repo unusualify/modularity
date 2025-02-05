@@ -13,11 +13,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 // dd(
-//     unusualConfig('enabled.users-management')
+//     modularityConfig('enabled.users-management')
 // );
 // Auth::routes();
 
-if (unusualConfig('enabled.users-management')) {
+if (modularityConfig('enabled.users-management')) {
 
     Route::get('register', 'RegisterController@showLoginForm')->name('register.form');
     Route::post('register', 'RegisterController@register')->name('register');
@@ -33,10 +33,6 @@ if (unusualConfig('enabled.users-management')) {
     // Route::get('password/welcome/{token}', 'ResetPasswordController@showWelcomeForm')->name('password.reset.welcome.form');
     Route::post('password/reset', 'ResetPasswordController@reset')->name('password.reset.update');
 
-    Route::get('users/impersonate/stop', 'ImpersonateController@stopImpersonate')->name('impersonate.stop');
-    Route::get('users/impersonate/{id}', 'ImpersonateController@impersonate')->name('impersonate');
-
     Route::get('register/success', 'RegisterController@success')->name('register.success');
-
 
 }

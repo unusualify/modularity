@@ -5,6 +5,7 @@ namespace Unusualify\Modularity;
 use Composer\ClassMapGenerator\ClassMapGenerator;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Json;
@@ -22,6 +23,36 @@ class Modularity extends FileRepository
     private $modularityCache;
 
     /**
+     * @var string
+     */
+    private static $authGuardName = 'modularity';
+
+    /**
+     * @var string
+     */
+    private static $authProviderName = 'modularity_users';
+
+    /**
+     * @var string
+     */
+    private static $translationCacheKey = 'modularity-languages';
+
+    /**
+     * @var string
+     */
+    private $appPath = null;
+
+    /**
+     * @var string
+     */
+    private $vendorPath = null;
+
+    /**
+     * @var string
+     */
+    private $vendorDir = null;
+
+    /**
      * The constructor.
      *
      * @param string|null $path
@@ -29,6 +60,10 @@ class Modularity extends FileRepository
     public function __construct(Container $app, $path = null)
     {
         parent::__construct($app, $path);
+
+        $this->appPath = realpath(get_installed_composer()['root']['install_path']);
+        $this->vendorPath = realpath(get_installed_composer()['versions']['unusualify/modularity']['install_path']);
+        $this->vendorDir = trim(Str::replaceFirst($this->appPath, '', $this->vendorPath), DIRECTORY_SEPARATOR);
 
         $this->modularityCache = $app['cache'];
         $this->modularityConfig = $app['config'];
@@ -149,6 +184,26 @@ class Modularity extends FileRepository
     }
 
     /**
+     * Get the authentication guard name used by Modularity
+     *
+     * @return string The configured auth guard name
+     */
+    public static function getAuthGuardName()
+    {
+        return self::$authGuardName;
+    }
+
+    /**
+     * Get the authentication provider name used by Modularity
+     *
+     * @return string The configured auth provider name
+     */
+    public static function getAuthProviderName()
+    {
+        return self::$authProviderName;
+    }
+
+    /**
      * Get cached modules.
      *
      * @return array
@@ -171,9 +226,7 @@ class Modularity extends FileRepository
      */
     public function clearCache()
     {
-        if (config('modules.cache.enabled') === true) {
-            app('cache')->forget(config('modules.cache.key'));
-        }
+        app('cache')->forget($this->config('cache.key'));
     }
 
     /**
@@ -184,6 +237,82 @@ class Modularity extends FileRepository
         return config([
             'modules.cache.enabled' => false,
         ]);
+    }
+
+    final public function isDevelopment()
+    {
+        return get_installed_composer()['root']['name'] === 'unusualify/modularity-dev';
+    }
+
+    final public function isProduction()
+    {
+        return ! $this->isDevelopment();
+    }
+
+    public function getAppUrl()
+    {
+        return $this->config('app_url');
+    }
+
+    public function getAdminAppUrl()
+    {
+        return $this->config('admin_app_url');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function config(string $key, $default = null)
+    {
+        return $this->modularityConfig->get('modules.' . $key,
+            $this->modularityConfig->get('modularity.' . $key, $default)
+        );
+    }
+
+    public function getAdminRouteNamePrefix()
+    {
+        return rtrim(ltrim($this->config('admin_route_name_prefix', 'admin'), '.'), '.');
+    }
+
+    public function getAdminUrlPrefix()
+    {
+        return $this->config('admin_app_url')
+            ? false
+            : rtrim(ltrim($this->config('admin_app_path', 'admin'), '/'), '/');
+    }
+
+    public function getSystemUrlPrefix()
+    {
+        return $this->config('system_prefix', 'system-settings');
+    }
+
+    public function getSystemRouteNamePrefix()
+    {
+        return snakeCase(studlyName($this->getSystemUrlPrefix()));
+    }
+
+    public function getTranslations()
+    {
+        $cache_key = static::$translationCacheKey;
+
+        $cache = Cache::store('file');
+
+        if ($cache->has($cache_key) && false) {
+            return $cache->get($cache_key);
+        }
+
+        $translations = app('translator')->getTranslations();
+
+        $cache->set($cache_key, json_encode($translations), 600);
+
+        return $translations;
+    }
+
+    public function clearTranslations()
+    {
+        $cache_key = static::$translationCacheKey;
+
+        Cache::forget($cache_key);
     }
 
     public function getGroupedModules($group_name)
@@ -275,9 +404,29 @@ class Modularity extends FileRepository
      * @param string $dir
      * @return string
      */
-    public function getVendorPath($dir = '')
+    final public function getVendorPath($dir = '')
     {
-        return get_modularity_vendor_path($dir);
+        if (! $dir) {
+            return $this->vendorPath;
+        }
+
+        return concatenate_path($this->vendorPath, $dir);
+        // return realpath(concatenate_path($this->vendorPath, $dir));
+    }
+
+    /**
+     * Get vendor path.
+     *
+     * @param string $dir
+     * @return string
+     */
+    final public function getVendorDir($dir = '')
+    {
+        if (! $dir) {
+            return $this->vendorDir;
+        }
+
+        return concatenate_path($this->vendorDir, $dir);
     }
 
     /**
@@ -288,6 +437,6 @@ class Modularity extends FileRepository
      */
     public function getVendorNamespace($append = null)
     {
-        return concatenate_namespace(unusualConfig('namespace'), $append);
+        return concatenate_namespace(modularityConfig('namespace'), $append);
     }
 }

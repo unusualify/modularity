@@ -15,8 +15,6 @@ class StateTranslation extends Model
 
     public function getTable()
     {
-        $stateSettingsTable = unusualConfig('settings_table', 'state');
-
-        return Str::singular($stateSettingsTable) . '_translations';
+        return modularityConfig('tables.state_translations', 'modularity_state_translations');
     }
 }

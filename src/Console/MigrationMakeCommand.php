@@ -94,7 +94,7 @@ class MigrationMakeCommand extends BaseCommand
             ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
             ['table-name', null, InputOption::VALUE_OPTIONAL, 'set table name'],
             ['test', null, InputOption::VALUE_NONE, 'Test the Route Generator'],
-        ], unusualTraitOptions());
+        ], modularityTraitOptions());
     }
 
     /**
@@ -105,7 +105,7 @@ class MigrationMakeCommand extends BaseCommand
     protected function getTemplateContents()
     {
         $parser = new NameParser($this->argument('name'));
-        //Table name option added. If table name option is not set get from parser.
+        // Table name option added. If table name option is not set get from parser.
         $tableName = $this->option('table-name') ? $this->option('table-name') : $parser->getTableName();
 
         if (($relational = $this->option('relational'))) {
@@ -144,8 +144,8 @@ class MigrationMakeCommand extends BaseCommand
             return Stub::create('/migration/add.stub', [
                 'class' => $this->getClass(),
                 'table' => $tableName,
-                'fields_up' => ltrim(rtrim($this->getSchemaParser()->up())),
-                'fields_down' => ltrim(rtrim($this->getSchemaParser()->down())),
+                'fields_up' => ltrim(rtrim($schemaParser->up())),
+                'fields_down' => ltrim(rtrim($schemaParser->down())),
             ]);
         } elseif ($parser->isDelete()) {
             $schemaParser = new NwidartSchemaParser($this->option('fields'));

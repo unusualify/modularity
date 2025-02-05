@@ -53,15 +53,6 @@ class ServiceProvider extends Provider
     {
         if (! ($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
             $config = $this->app->make('config');
-            // if($key == 'unusual'){
-            //     dd(
-            //         require $path,
-            //         $config->get($key, []),
-            //         array_merge(
-            //             require $path, $config->get($key, [])
-            //         )
-            //     );
-            // }
             $config->set($key, array_merge_recursive_preserve(
                 require $path, $config->get($key, [])
             ));

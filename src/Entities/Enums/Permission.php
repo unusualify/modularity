@@ -4,7 +4,7 @@ namespace Unusualify\Modularity\Entities\Enums;
 
 enum Permission: string
 {
-    //case DASHBOARD = 'dashboard';
+    // case DASHBOARD = 'dashboard';
     case CREATE = 'create';
     case VIEW = 'view';
     case EDIT = 'edit';

@@ -1,384 +1,89 @@
 <template>
   <v-stepper v-model="activeStep" color="prima" :class="['ue-stepper-form','ue-stepper--no-background', 'fill-height  d-flex flex-column']">
     <template v-slot:default="{ prev, next }">
-      <v-stepper-header class="rounded elevation-2">
-        <template v-for="(form, i) in forms" :key="`stepper-item-${i}`">
-          <v-stepper-item
-            :complete="activeStep > i+1"
-            :title="form.title"
-            :value="i+1"
-            color="primary"
-            :step="`Step {{ n }}`"
-            complete-icon="$complete"
-            class="ue-stepper-item__icon--border25"
-            >
-            <template v-slot:title="titleScope">
-              <div @click="goStep(i+1)" style="cursor: pointer">
-                <span :class="[ (titleScope.hasCompleted || titleScope.step == activeStep) ? 'text-primary font-weight-bold' : '' ]">{{ titleScope.title }}</span>
-              </div>
-            </template>
-          </v-stepper-item>
-          <!-- <v-divider
-            v-if="i+1 !== forms.length"
-          ></v-divider> -->
-        </template>
-        <v-stepper-item
-            :complete="activeStep > forms.length"
-            title="Preview & Summary"
-            :value="forms.length+1"
-            color="primary"
-            :step="`Step Summary`"
-            complete-icon="$complete"
-            class="ue-stepper-item__icon--border25"
-            >
-            <template v-slot:title="titleScope">
-              <span :class="[ (titleScope.hasCompleted || titleScope.step == activeStep) ? 'text-primary font-weight-bold' : '' ]">{{ titleScope.title }}</span>
-            </template>
-        </v-stepper-item>
-      </v-stepper-header>
+      <StepperHeader
+        :forms="forms"
+        :active-step="activeStep"
+        @step-click="goStep"
+      />
 
       <v-row class="mt-4 flex-fill">
         <!-- left side -->
         <v-col cols="12" lg="8" v-fit-grid>
-          <v-sheet-rounded class="ue-stepper-form__body d-flex w-100 flex-column justify-space-between elevation-2">
-            <v-stepper-window class="fill-height overflow-y-auto px-6" style="max-height: 80vh;">
-              <v-stepper-window-item
-                v-for="(form, i) in forms"
-                :key="`content-${i}`"
-                :value="i+1"
-                class=""
-              >
-                <ue-form
-                  v-if="activeStep > i"
-                  :ref="formRefs[i]"
-                  :id="`stepper-form-${i+1}`"
-                  :isEditing="isEditing"
-                  v-model="models[i]"
-                  v-model:schema="schemas[i]"
-                  @input="handleInput($event, i)"
-                  @update:valid="updateFormValid($event, i)"
-                  noDefaultFormPadding
-                />
-              </v-stepper-window-item>
-              <v-stepper-window-item
-                :value="forms.length +1"
-                class="pt-3"
-              >
-                <slot name="preview">
-                  <v-sheet class="">
-                    <ue-title weight="medium" color="black" padding="a-0">{{ $t('Preview & Summary').toUpperCase() }}</ue-title>
-                    <v-row>
-                      <template v-for="(context, index) in formattedPreview" :key="`summary-${index}`">
-                        <v-col cols="12" :md="context.col || 6" v-fit-grid>
-                          <ue-configurable-card v-bind="context" elevation="2" class="my-2"/>
-                        </v-col>
-                      </template>
-
-                      <!-- <v-col cols="12">
-                        <ue-configurable-card class="my-3" elevation="3"
-                          align-center-columns-x
-                          justify-center-columns-x
-                          v-bind="getPreviewConfigurableData()"
-                        />
-                      </v-col> -->
-
-                      <v-col cols="12">
-                        <v-sheet class="px-4">
-                          <!-- <div class="text-body-1 text-primary font-weight-bold" margin>{{ finalFormTitle }}</div> -->
-                           <!-- {{ $log(previewFormData) }} -->
-                          <ue-title type="body-1" color="primary" font-weight="bold" padding="a-0" margin="y-4">{{ finalFormTitle }}</ue-title>
-                          <template v-for="(data, index) in previewFormData" :key="`final-form-data-${index}`">
-                            <ue-configurable-card
-                              style="background-color: transparent;"
-                              :class="[
-                                lastStepModel[data.fieldName].includes(data.id) ? 'bg-primary' : 'bg-grey-lighten-5'
-                              ]"
-                              class="mx-n4 mb-4 py-4"
-                              elevation="2"
-                              :items="[
-                                [
-                                  data.name || 'N/A ',
-                                  data.description || 'N/A',
-                                ],
-                                data.base_price_show || 'N/A'
-                              ]"
-                              :actions="[
-                                {
-                                  // icon: 'mdi-plus',
-                                  // color: 'primary',
-                                  // class: 'rounded-circle',
-                                  onClick: () => {
-                                    // console.log('clicked', lastStepModel);
-                                  }
-                                }
-                              ]"
-                              hide-separator
-                              align-center-columns
-                              justify-center-columns
-                              :column-styles="{
-                                1: 'flex-basis: 50%;',
-                                2: 'flex-grow: 1; display: flex; justify-content: center; align-items: center;',
-                                3: 'flex-grow: 1; display: flex; align-items: end;',
-                              }"
-                            >
-                              <template
-                                #[`segment.1`]="segmentScope"
-                                >
-                                <div class="text-body-2 font-weight-medium mb-1">{{ segmentScope.data[0] }}</div>
-                                <div class="text-caption">{{ segmentScope.data[1] }}</div>
-                              </template>
-                              <template
-                                #[`segment.2`]="segmentScope"
-                                >
-                                <div class="text-body-2 font-weight-medium py-auto">{{ segmentScope.data }}</div>
-                              </template>
-                              <template
-                                #[`segment.actions`]="segmentScope"
-                                >
-
-                                <div class="d-flex fill-height justify-space-evenly align-content-md-center">
-                                  <v-divider v-if="$vuetify.display.lgAndUp ? true : false" vertical></v-divider>
-                                  <v-btn
-                                    class="mx-1 rounded-circle"
-                                    :min-width="segmentScope.actionProps.actionIconMinHeight"
-                                    :min-height="segmentScope.actionProps.actionIconMinHeight"
-                                    :size="segmentScope.actionProps.actionIconSize"
-                                    :icon="lastStepModel[data.fieldName].includes(data.id) ? 'mdi-minus' : 'mdi-plus'"
-                                    :color="lastStepModel[data.fieldName].includes(data.id) ? 'grey' : 'primary'"
-                                    @click="handleFinalFormAction(index)"
-                                  />
-                                </div>
-                              </template>
-                            </ue-configurable-card>
-                          </template>
-                          <template v-for="(addon, index) in [
-                              {
-                                id: 1,
-                                title: 'Lorem Ipsum Dolor',
-                                description: 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis At vero eos et accusamus etiu.',
-                                price: 50
-                              },
-                              {
-                                id: 2,
-                                title: 'Lorem Ipsum Dolor',
-                                description: 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis At vero eos et accusamus etiu.',
-                                price: 50
-                              }
-                            ]"
-                            :key="addon.id"
-                            :title="addon.title"
-                          >
-                            <!-- <ue-configurable-card
-                              :items="[
-                                [
-                                  addon.title,
-                                ],
-                                addon.price
-                              ]"
-                            /> -->
-                            <v-card
-                              v-if="false"
-                              elevation="2"
-                              class="addon-card pa-4"
-                              :class="{ 'addon-card--selected': selected }"
-                            >
-                              <v-row align="center" no-gutters>
-                                <v-col cols="8">
-                                  <div class="text-h6 mb-2">{{ addon.title }}</div>
-                                  <div class="text-body-2 text-grey-darken-1">{{ addon.description }}</div>
-                                </v-col>
-
-                                <v-col cols="2" class="text-h4 text-center">
-                                  ${{ addon.price }}
-                                </v-col>
-
-                                <v-col cols="2" class="d-flex justify-center">
-                                  <v-btn
-                                    icon
-                                    size="large"
-                                    @click="$emit('toggle')"
-                                  >
-                                  <!-- :color="selected ? 'primary' : 'grey'"
-                                  :variant="selected ? 'flat' : 'outlined'" -->
-                                    <v-icon>{{ selected ? 'mdi-minus' : 'mdi-plus' }}</v-icon>
-                                  </v-btn>
-                                </v-col>
-                              </v-row>
-                            </v-card>
-                          </template>
-                        </v-sheet>
-
-                      </v-col>
-                    </v-row>
-                  </v-sheet>
-                </slot>
-              </v-stepper-window-item>
-            </v-stepper-window>
-
-            <v-stepper-actions
-              v-if="false"
-              ref="stepperActionRef"
-              :disabled="disabled"
-              @click:next="next"
-              @click:prev="prev"
-              >
-              <template v-slot:next="nextScope">
-                <!-- :disabled="!valids[activeStep-1]" -->
-                <!-- <v-btn-secondary
-
-                  @click="goNextForm(nextScope.props.onClick, activeStep-1)"
-                  >
-                  {{ $t('fields.save').toUpperCase() }}
-                </v-btn-secondary> -->
-              </template>
-            </v-stepper-actions>
-          </v-sheet-rounded>
+          <StepperContent
+            v-model="models"
+            :schemas="schemas"
+            @update:schemas="schemas = $event"
+            :forms="forms"
+            :active-step="activeStep"
+            :form-refs="formRefs"
+            :is-editing="isEditing"
+            @form-input="handleInput"
+            @form-valid="updateFormValid"
+          >
+            <template #preview>
+              <StepperPreview
+                :formatted-preview="formattedPreview"
+                :preview-form-data="previewFormData"
+                :last-step-model="lastStepModel"
+                :final-form-title="finalFormTitle"
+                @final-form-action="handleFinalFormAction"
+              />
+            </template>
+          </StepperContent>
         </v-col>
 
         <!-- right side -->
         <v-col cols="12" lg="4">
-          <slot name="summary">
-            <v-sheet-rounded class="d-flex flex-column fill-height pa-6 elevation-2"
-              :style="[isLastStep ? '' : '']"
-              :class="[isLastStep ? 'pa-6 bg-primary-darken-2' : '']"
+          <StepperSummary
+            :is-last-step="isLastStep"
+            :forms="forms"
+            :active-step="activeStep"
+            :models="models"
+            :schemas="schemas"
+            :preview-model="previewModel"
+            :preview-titles="previewTitles"
+            :is-preview-model-filled="isPreviewModelFilled"
+            @next-form="nextForm"
+            @complete-form="completeForm"
+          >
+            <template v-for="(slot, slotName) in summaryFormScopes" :key="`slot-${i}`" v-slot:[`${slotName}`]="summaryFormScope">
+              <slot :name="slotName" v-bind="summaryFormScope">
+
+              </slot>
+            </template>
+
+            <template #summary.final="{ onComplete }">
+              <slot name="summary.final"
+                v-bind="{
+                  model: models,
+                  schema: schemas,
+                  previewModel: previewModel,
+                  completeForm: completeForm,
+                }"
               >
-              <template v-if="!isLastStep">
-                <slot name="summary.forms">
-                  <v-sheet class="ue-stepper-form__preview fill-height">
-                    <template
-                      v-for="(form, i) in forms"
-                      :key="`stepper-summary-item-${i}`"
-                      >
-                      <slot
-                        :name="`summary-form-${i+1}`"
-                        v-bind="{
-                          index: i,
-                          order: i+1,
-                          title: previewTitles[i],
-                          isPreviewModelFilled: isPreviewModelFilled,
-                          model: models[i],
-                          schema: schemas[i],
-                          previewModel: previewModel[i] ?? {},
-                          // previewModels: previewModel,
-
-                        }"
-                      >
-                        <v-divider v-if="isPreviewModelFilled(i) && i !== 0" class="mb-6"/>
-                        <div v-if="isPreviewModelFilled(i)" class="mb-6">
-                          <!-- Step title -->
-                          <div class="d-inline-flex align-center text-body-2" style="line-height: 1;">
-                            <v-avatar variant="flat" color="primary" class="ue-avatar--border25" style="width: 24px; height: 24px; margin-inline-end: 8px;">{{ i + 1 }}</v-avatar>
-                            <span class="font-weight-bold text-primary"> {{ $t('fields.step') }} {{ i + 1 }}</span>
-                          </div>
-                          <!-- Secondary title -->
-                          <div class="text-body-1 font-weight-bold text-truncate mb-5">
-                              {{ previewTitles[i] }}
-                          </div>
-
-                          <!-- Step body -->
-                          <template v-for="(val, inputName) in previewModel[i]" :key="`stepper-preview-item-subtitle-${inputName}`">
-                            <template v-for="(context, key) in previewModel[i][inputName]" :key="`stepper-preview-item-subtitle-${inputName}-${i}`">
-                              <template v-if="Array.isArray(context)">
-                                <div class="">
-                                  <span class='text-primary font-weight-bold' style="margin-inline-end: 8px;">{{ window.__isObject(previewModel[i][inputName]) ? key : context[0] }}:</span>
-                                  <span v-for="(text) in ( window.__isObject(previewModel[i][inputName]) ? context : context.slice(1))" :key="`stepper-preview-item-subtitle-${inputName}-${i}-${inputName}-${key}`" style="margin-inline-end: 8px;">
-                                    {{ text }}
-                                  </span>
-                                </div>
-                              </template>
-                              <v-btn v-else readonly active-color="black" color="black" variant="outlined" style="margin-inline-end: 8px;">{{context}}</v-btn>
-                            </template>
-                          </template>
-                        </div>
-                      </slot>
-                    </template>
-                  </v-sheet>
-
-
-                  <v-spacer></v-spacer>
-
-                  <v-sheet class="ue-stepper-form__preview-bottom">
-                    <v-btn-secondary class="v-stepper-form__nextButton"
-                      density="comfortable"
-                      :disabled="$hasRequestInProgress()"
-                      @click="nextForm(activeStep-1)"
-                      >
-                      {{ $t('next').toUpperCase() }}
-                    </v-btn-secondary>
-                  </v-sheet>
-                </slot>
-              </template>
-              <template v-else>
-                <slot name="summary.final"
-                  v-bind="{
-                    model: models,
-                    schema: schemas,
-                    previewModel: previewModel,
-                    completeForm: completeForm,
-                  }"
+                <StepperFinalSummary
+                  :formatted-summary="formattedSummary"
+                  :loading="loading"
+                  :is-completed="isCompleted"
+                  @complete="onComplete"
                 >
-                  <v-sheet class="bg-primary-darken-2">
-                    <ue-title justify="center" color="white" :text="$t('Total Amount').toUpperCase()" type="h5" />
-                    <v-divider/>
-
-                    <template v-for="(sample, index) in formattedSummary">
-                      <ue-title :text="sample.title" transform="capitalize" type="h6" color="white" padding="x-6" margin="t-6" class="mx-n6 py-3 bg-primary-darken-1" />
-                      <v-table class="bg-transparent my-3">
-                        <tbody>
-                          <template v-for="(value, index) in sample.values">
-                            <tr class="py-0">
-                              <td class="border-0 h-auto py-1 pl-0 text-body-1">{{ value.parentTitle || value.title || 'N/A' }}</td>
-                              <td class="border-0 h-auto py-1 text-right pr-0 font-weight-bold text-body-1">{{ value.value || 'N/A' }}</td>
-                            </tr>
-                          </template>
-                        </tbody>
-                      </v-table>
-                    </template>
-                  </v-sheet>
-
-                  <v-spacer></v-spacer>
-
-                  <v-divider></v-divider>
-
-                  <!-- Total -->
-                  <v-table class="bg-transparent my-3">
-                    <tbody>
-                      <tr class="py-0">
-                        <td class="border-0 h-auto py-1 pl-0 text-h5">{{ $t('Total').toUpperCase() }}</td>
-                        <td class="border-0 h-auto py-1 d-flex justify-end pr-0 font-weight-bold">
-                          <slot name="final.total" v-bind="{payload: this.payload}">
-                            <ue-text-display class="text-h5" :text="`$2500`" subText="+ VAT" />
-                          </slot>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </v-table>
-
-                  <!-- Description -->
-                  <div class="text-caption text-grey mb-6">
-                    <slot name="final.description">
+                  <template v-slot:total>
+                    <slot name='summary.final.total' v-bind="{payload: this.payload}">
+                      <ue-text-display class="text-h5 text-white" text="$2500" subText="+ VAT" />
+                    </slot>
+                  </template>
+                  <template v-slotdescription>
+                    <slot name="summary.final.description">
                       At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium iusto odio
                     </slot>
-                  </div>
+                  </template>
 
-                  <v-sheet class="pb-0 px-0 ue-stepper-form__preview-bottom" style="background-color: #005868;">
-                    <v-btn-secondary class="v-stepper-form__nextButton"
-                      block
-                      :disabled="loading || isCompleted"
-                      :loading="loading"
-                      @click="completeForm"
-                      >
-                      {{ $t('Complete').toUpperCase() }}
-                    </v-btn-secondary>
-                  </v-sheet>
-                  <!-- <v-sheet class="v-stepper-form-preview fill-height rounded-0" style="background-color: #005868;">
-                  </v-sheet> -->
-                </slot>
-              </template>
-            </v-sheet-rounded>
-          </slot>
+                </StepperFinalSummary>
+              </slot>
+            </template>
+          </StepperSummary>
         </v-col>
-
       </v-row>
 
       <ue-modal
@@ -403,7 +108,7 @@
 
 <script>
   import { toRefs, reactive, ref, computed } from 'vue';
-  import { map, reduce, find, each } from 'lodash-es';
+  import { map, reduce, find, each, filter, get, isEqual } from 'lodash-es';
 
   import { getModel, handleEvents, handleMultiFormEvents } from '@/utils/getFormData.js'
 
@@ -414,7 +119,21 @@
   import NotationUtil from '@/utils/notation';
   import notation from '../utils/notation';
 
+  import StepperHeader from './stepper/StepperHeader.vue'
+  import StepperContent from './stepper/StepperContent.vue'
+  import StepperSummary from './stepper/StepperSummary.vue'
+  import StepperPreview from './stepper/StepperPreview.vue'
+  import StepperFinalSummary from './stepper/StepperFinalSummary.vue'
+
   export default {
+    name: 'StepperForm',
+    components: {
+      StepperHeader,
+      StepperContent,
+      StepperSummary,
+      StepperPreview,
+      StepperFinalSummary
+    },
     props: {
       forms: {
         type: Object,
@@ -493,7 +212,7 @@
         default: () => {
           return [
             ['name', 'description'],
-            ['base_price_show'],
+            ['basePrice_show'],
           ]
         }
       }
@@ -533,6 +252,7 @@
         lastStepModel: {},
 
         previewModel: [],
+        pendingHandleFunctions: [],
       }
     },
     methods: {
@@ -545,12 +265,6 @@
       completeForm (){
         const method = this.payload?.id ? 'put' :'post'
         const self = this
-
-        // __log(JSON.stringify(this.schemas, null, 2))
-        // __log(JSON.stringify(this.models, null, 2))
-        // __log(JSON.stringify(this.displayInfo, null, 2))
-        // __log(JSON.stringify(this.previewModel, null, 2))
-        // __log(formData)
 
         this.loading = true
         // __log(this.payload)
@@ -613,15 +327,25 @@
         return isFilled
       },
       handleInput (v, index) {
-        const { on, key, obj } = v
-
+        const { on, key, obj, value } = v
         if (on === 'input' && !!key) {
           // if (!this.serverValid) {
           //   this.resetSchemaError(key)
           // }
           // __log(index, key, obj, v)
           // this.handleEvent(obj)
-          handleMultiFormEvents(this.models, this.schemas, obj.schema, index, this.previewModel)
+          let availableValue = get(this.models[index], key)
+
+          if(JSON.stringify(availableValue) !== JSON.stringify(value)){
+            this.pendingHandleFunctions.push((models, schemas, previewModel) => {
+              // __log('run pending function', obj.schema)
+              handleMultiFormEvents(models, schemas, obj.schema, index, previewModel)
+            })
+          }else{
+            handleMultiFormEvents(this.models, this.schemas, obj.schema, index, this.previewModel)
+          }
+
+          // __log('handleInput', v, this.models,)
           // __log(
           //   'StepperForm previewData',
           //   this.previewModel,
@@ -677,7 +401,7 @@
 
         // Force reactivity by creating a new reference
         this.lastStepModel = { ...this.lastStepModel };
-      }
+      },
     },
     computed: {
       disabled () {
@@ -703,7 +427,6 @@
         for(const index in this.schemas){
           data[index] = this.$getDisplayData(this.schemas[index], this.models[index])
         }
-
         return data
       },
       formattedSummary(){
@@ -729,7 +452,7 @@
             values: map(lastStepSelections, (data) => {
               return {
                 title: data.name || data.title || 'N/A',
-                value: data.base_price_show || 'N/A',
+                value: data.basePrice_show || 'N/A',
               }
             }),
           }
@@ -790,20 +513,41 @@
           ...model,
           ...this.lastStepModel,
         }
+      },
+      summaryFormScopes(){
+        return reduce(this.$slots, (acc, slot, slotName) => {
+            if(slotName.match(/summary-form-\d+/)){
+              acc[slotName] = slot
+            }
+          return acc
+        }, {})
       }
     },
     watch: {
       schemas: {
         handler (value, oldValue) {
-          // __log(value[0].wrap_location, oldValue[0].wrap_location)
           // __log('schemas watch', value, oldValue)
+          // __log(value[0].wrap_location, oldValue[0].wrap_location)
+          // __log('stepperForm schemas watch', value, this.schemas, !isEqual(value, this.schemas))
+          if(!isEqual(value, this.schemas)){
+            // __log('schemas watch', value, this.schemas)
+            this.schemas = value
+          }
         },
         deep: true
       },
       models: {
         handler (value, oldValue) {
+
+          if(this.pendingHandleFunctions.length > 0){
+            this.pendingHandleFunctions.forEach((fn) => {
+              if(typeof fn === 'function'){
+                fn(this.models, this.schemas, this.previewModel)
+              }
+            })
+            this.pendingHandleFunctions = []
+          }
           // __log(value[0].wrap_location, oldValue[0].wrap_location)
-          // __log('models watcher')
           this.models.forEach((model, index) => {
             if(!!this.previewModel[index]){
               Object.keys(this.previewModel[index]).forEach((key) => {

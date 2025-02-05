@@ -90,22 +90,22 @@ class SchemaParser extends Parser
 
         $this->useDefaults = $useDefaults;
 
-        $this->relationshipParametersMap = unusualConfig('laravel-relationship-map', []);
+        $this->relationshipParametersMap = modularityConfig('laravel-relationship-map', []);
         $this->model = $model;
 
         if ($this->useDefaults) {
-            $this->defaultInputs = unusualConfig('schemas.default_inputs', []);
-            $this->defaultPreHeaders = unusualConfig('schemas.default_pre_headers', []);
+            $this->defaultInputs = modularityConfig('schemas.default_inputs', []);
+            $this->defaultPreHeaders = modularityConfig('schemas.default_pre_headers', []);
         }
 
-        $this->defaultPostHeaders = unusualConfig('schemas.default_post_headers', []);
+        $this->defaultPostHeaders = modularityConfig('schemas.default_post_headers', []);
 
-        $this->defaultHeaderFormat = unusualConfig('default_header', []);
+        $this->defaultHeaderFormat = modularityConfig('default_header', []);
 
-        // $this->baseNamespace = Config::get(unusualBaseKey() . '.namespace')."\\".Config::get(unusualBaseKey() . '.name');
-        $this->baseNamespace = unusualConfig('namespace');
+        // $this->baseNamespace = Config::get(modularityBaseKey() . '.namespace')."\\".Config::get(modularityBaseKey() . '.name');
+        $this->baseNamespace = modularityConfig('namespace');
 
-        $traits = unusualConfig('traits', []);
+        $traits = modularityConfig('traits', []);
 
         foreach ($traits as $key => $object) {
             $modelTrait = $object['model'];
@@ -471,7 +471,7 @@ class SchemaParser extends Parser
 
                 foreach (array_slice($options, 1) as $key => $routeName) {
                     $routeName = $this->getStudlyName($routeName);
-                    $foreign_id = $this->getForeignKeyFromName($routeName); //$this->getSnakeCase($routeName) . '_id';
+                    $foreign_id = $this->getForeignKeyFromName($routeName); // $this->getSnakeCase($routeName) . '_id';
                     if (($repository = $finder->getRouteRepository($routeName))) {
                         array_push($parents, [
                             'name' => $foreign_id,

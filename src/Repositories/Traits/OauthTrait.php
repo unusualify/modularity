@@ -56,7 +56,7 @@ trait OauthTrait
         $user = $this->model->firstOrNew([
             'name' => $oauthUser->name,
             'email' => $oauthUser->email,
-            'role' => unusualConfig('oauth.default_role'),
+            'role' => modularityConfig('oauth.default_role'),
             'published' => true,
         ]);
 

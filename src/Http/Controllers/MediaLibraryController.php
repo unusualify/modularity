@@ -83,8 +83,8 @@ class MediaLibraryController extends BaseController implements SignUploadListene
         // $this->removeMiddleware('can:edit');
         // $this->removeMiddleware('can:_create');
         // $this->middleware('can:edit', ['only' => ['signS3Upload', 'signAzureUpload', 'tags', 'store', 'singleUpdate', 'bulkUpdate']]);
-        $this->endpointType = $this->config->get(unusualBaseKey() . '.media_library.endpoint_type');
-        $this->customFields = $this->config->get(unusualBaseKey() . '.media_library.extra_metadatas_fields');
+        $this->endpointType = $this->config->get(modularityBaseKey() . '.media_library.endpoint_type');
+        $this->customFields = $this->config->get(modularityBaseKey() . '.media_library.extra_metadatas_fields');
     }
 
     /**
@@ -172,13 +172,13 @@ class MediaLibraryController extends BaseController implements SignUploadListene
 
         $uuid = $request->input('unique_folder_name') . '/' . $filename;
 
-        if ($this->config->get(unusualBaseKey() . '.media_library.prefix_uuid_with_local_path', false)) {
-            $prefix = trim($this->config->get(unusualBaseKey() . '.media_library.local_path'), '/ ') . '/';
+        if ($this->config->get(modularityBaseKey() . '.media_library.prefix_uuid_with_local_path', false)) {
+            $prefix = trim($this->config->get(modularityBaseKey() . '.media_library.local_path'), '/ ') . '/';
             $fileDirectory = $prefix . $fileDirectory;
             $uuid = $prefix . $uuid;
         }
 
-        $disk = $this->config->get(unusualBaseKey() . '.media_library.disk');
+        $disk = $this->config->get(modularityBaseKey() . '.media_library.disk');
 
         $uploadedFile = $request->file('qqfile');
 
@@ -289,7 +289,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
      */
     public function signS3Upload(Request $request, SignS3Upload $signS3Upload)
     {
-        return $signS3Upload->fromPolicy($request->getContent(), $this, $this->config->get(unusualBaseKey() . '.media_library.disk'));
+        return $signS3Upload->fromPolicy($request->getContent(), $this, $this->config->get(modularityBaseKey() . '.media_library.disk'));
     }
 
     /**
@@ -297,7 +297,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
      */
     public function signAzureUpload(Request $request, SignAzureUpload $signAzureUpload)
     {
-        return $signAzureUpload->getSasUrl($request, $this, $this->config->get(unusualBaseKey() . '.media_library.disk'));
+        return $signAzureUpload->getSasUrl($request, $this, $this->config->get(modularityBaseKey() . '.media_library.disk'));
     }
 
     /**

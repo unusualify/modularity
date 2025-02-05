@@ -2,6 +2,245 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.26.1 - 2025-02-02
+
+### :wrench: Bug Fixes
+
+- remove debug statements from search method by @OoBook in https://github.com/unusualify/modularity/commit/4828684da7f174c06ef7b543a06d16f47441e675
+
+## v0.26.0 - 2025-02-01
+
+### :rocket: Features
+
+- add authentication guard and provider configuration methods by @OoBook in https://github.com/unusualify/modularity/commit/77ebbc63b78368d4c2cf19f791d5d4f6b97455b2
+- add AuthConfigurationException for robust authentication setup by @OoBook in https://github.com/unusualify/modularity/commit/d2eb26d74deb6f3d57e81043db9db9a4f6e7cc60
+- add CreateOperationCommand for generating one-time operations by @OoBook in https://github.com/unusualify/modularity/commit/26a06fd16799c5ee749de41995b54487d3b8c39d
+- add PublishOperationsCommand and operation stub template by @OoBook in https://github.com/unusualify/modularity/commit/83868b000b55ae57a00458a5561a9490f744f17e
+- update Laravel translation package configuration by @OoBook in https://github.com/unusualify/modularity/commit/80c124ac09ba94b888111d68f2272133317af2c2
+- enhance service provider with operations publishing and config management by @OoBook in https://github.com/unusualify/modularity/commit/ffbdf133227da645971d7766583893b5281d05ff
+- add one-time operations for system configuration updates by @OoBook in https://github.com/unusualify/modularity/commit/6838cd1e948b55cf01693fac9e63629383b63bc8
+- enable module scanning and dynamic cache configuration by @OoBook in https://github.com/unusualify/modularity/commit/7aa1e3858b4deba4f024aeb55320720c169e6afd
+- enhance modules config with environment-based cache settings by @OoBook in https://github.com/unusualify/modularity/commit/086d18738ca88d75d631c712c46a0055416b3df1
+- add one-time operation for updating user guard names by @OoBook in https://github.com/unusualify/modularity/commit/d5560d2e8665adc14d5e74535d43d3ea9dbc0420
+- add dynamic condition evaluation for table item actions by @OoBook in https://github.com/unusualify/modularity/commit/dd99615fcf26a34cb82dc32d58df1f9a871ef8ac
+- improve input hook with enhanced default value handling by @OoBook in https://github.com/unusualify/modularity/commit/9b920d5f96f410b571cbc2ef4ed293059a6a3189
+- enhance form data handling with new utility functions by @OoBook in https://github.com/unusualify/modularity/commit/318b5c172145e9068f47f1a7b9e0a871480f16c4
+- improve prepend schema key tracking and deletion by @OoBook in https://github.com/unusualify/modularity/commit/0834ac7d2c85d614a2d6beb9c982a40b2dd6ff52
+- improve table form action handling and validation reset by @OoBook in https://github.com/unusualify/modularity/commit/e55ac219334a0e11d4533d86a9299c353c695014
+- add FormActions component for dynamic form interactions by @OoBook in https://github.com/unusualify/modularity/commit/41b218e2ff411da95708446ec18c774954618ffe
+- add useForm hook for comprehensive form management by @OoBook in https://github.com/unusualify/modularity/commit/03ab5e83f04d265342fd7eee34917938846ff8b2
+- add stepper components for multi-step form workflow by @OoBook in https://github.com/unusualify/modularity/commit/d623f403f454db80734b1f73a47b8cd5418dcc49
+- add SystemPricing module entities and repositories by @OoBook in https://github.com/unusualify/modularity/commit/11a6d0a8b9756d6fc2e9d919729038aada8713a6
+- add PaymentStatus enum for payment state management by @OoBook in https://github.com/unusualify/modularity/commit/a71363a2b9727757f44caeff9e18d3fcc49b300f
+- update HasPriceable trait with SystemPricing module integration by @OoBook in https://github.com/unusualify/modularity/commit/4450a3a40bf969ae65e53e0b47b351078a949f3d
+- add default value for tab group input hydration by @OoBook in https://github.com/unusualify/modularity/commit/7d7ebbf8b088ab17324d49a78ee332e2179e35a0
+- enhance convertTo method with rounding and decimal precision by @OoBook in https://github.com/unusualify/modularity/commit/09e08bf5e5d85edccd8fba12463c8511e6564fca
+- add new format events for model clearing and item resetting by @OoBook in https://github.com/unusualify/modularity/commit/31d72dd35cf9920649a6cbc5b53ce92cf875cb88
+- add conditional filtering for pending payment states by @OoBook in https://github.com/unusualify/modularity/commit/07bb77e3e228c462686b361283de7fff136c2100
+- enhance HasPayment trait with comprehensive payment state management by @OoBook in https://github.com/unusualify/modularity/commit/a45cb061a42c5ba54f2c0e76818ab96971c7933f
+- implement intelligent price update strategy for unpaid and paid records by @OoBook in https://github.com/unusualify/modularity/commit/0ca5f39229b5921b33ba8bd50301ef58be868db9
+- implement advanced currency conversion and payment processing by @OoBook in https://github.com/unusualify/modularity/commit/a596084c75faf2aad82ce45fd9271a9bc771aeba
+
+### :wrench: Bug Fixes
+
+- add default return URL configuration for payment module by @OoBook in https://github.com/unusualify/modularity/commit/bb3c81736224816cab67c681e87a247abb2500e6
+- add configuration for VAT pricing mode by @OoBook in https://github.com/unusualify/modularity/commit/9a85a3ec9a2fc2f1b80e4e671ae301a7f43b2b47
+- add error handling for module resolution by @OoBook in https://github.com/unusualify/modularity/commit/a1ab6ae0b9681878e2f85e6a6246cf4e247c654c
+- improve default values for switch input hydration by @OoBook in https://github.com/unusualify/modularity/commit/904116fac66120d329db3e91e30e9b0b933ccfa7
+- modify operation file naming convention by @OoBook in https://github.com/unusualify/modularity/commit/106cfb68f7892898e35801d99d3f02c05b5d88df
+- remove PaymentTrait and add debug statements for search functionality by @OoBook in https://github.com/unusualify/modularity/commit/b72f8c0989429e0bc58bdfcb05f2f629bb13751a
+- refactor filterScope method for more robust field handling by @OoBook in https://github.com/unusualify/modularity/commit/94ef1be3aa75b5e29f45d30878e78f66fcda4fa7
+
+### :recycle: Refactors
+
+- update BaseServiceProvider with modularity configuration and auth handling by @OoBook in https://github.com/unusualify/modularity/commit/67708ab5b1b06a6eda7b0a3ef9858c9abe9f72fa
+- update authentication and configuration references across controllers by @OoBook in https://github.com/unusualify/modularity/commit/04bfb7d98947c070d28bb45c1e2a8652edc14752
+- update translation configuration middleware by @OoBook in https://github.com/unusualify/modularity/commit/ccdba975d7da38630d6564d3ae142b238e568724
+- enhance BaseServiceProvider with robust configuration and auth handling by @OoBook in https://github.com/unusualify/modularity/commit/6f18aec58f3a535af2d9dba272c59d707b8055eb
+- update BaseServiceProvider with consistent configuration methods by @OoBook in https://github.com/unusualify/modularity/commit/87343f9efff65f3a53f93c9d1b990b08668f11c3
+- dynamically configure auth guard in default seeders by @OoBook in https://github.com/unusualify/modularity/commit/2831284dc1c1b8b0e46959cc5bd9f741e48027f1
+- update LoginController and ImpersonateMiddleware with dynamic authentication methods by @OoBook in https://github.com/unusualify/modularity/commit/c08a8fda856740d7fcad63c3239e6c9e376de585
+- rename theme and update route middleware configuration by @OoBook in https://github.com/unusualify/modularity/commit/a55ba8dcf27db9d10f5758b16401a1367aa19f9c
+- update default activity log table name by @OoBook in https://github.com/unusualify/modularity/commit/b289fab8f946e7e1c585c435d89fefec295ea0f5
+- update module configuration for Vite and webpack replacement by @OoBook in https://github.com/unusualify/modularity/commit/1fcd3c6c7699e3a1154f9f5790af0692a0250872
+- reorganize config publishing with vendor-specific configurations by @OoBook in https://github.com/unusualify/modularity/commit/6bdb3fb1445b34629ee3dc7a4e1a04db6bbac41f
+- simplify module scanning and configuration management by @OoBook in https://github.com/unusualify/modularity/commit/eb04d6cd304da5f5584d10519eb4c34c36aaddf2
+- enhance useItemActions hook with dynamic action handling by @OoBook in https://github.com/unusualify/modularity/commit/9131189b6d75e08f243a9a438082abef3469ff7e
+- simplify Form component with useForm hook and FormActions by @OoBook in https://github.com/unusualify/modularity/commit/d369890770189e589b68ae34128fbcfc34467d5b
+- update TabGroup component with minor form component changes by @OoBook in https://github.com/unusualify/modularity/commit/7dac4e395fb9f06206763e12544fd40cb4b78a77
+- modularize StepperForm component with extracted subcomponents by @OoBook in https://github.com/unusualify/modularity/commit/e54973e613d413aa15ce5bc56fac57fad18c1e1f
+
+### :lipstick: Styling
+
+- lint coding styles for v0.26.0 by @OoBook in https://github.com/unusualify/modularity/commit/fa0e64a217bfbd5b2404673b2f6d5e556cb6f7df
+
+### :package: Build
+
+- update build artifacts for v0.26.0 by @OoBook in https://github.com/unusualify/modularity/commit/32c74a1edff6338f84f5efa70303e43af3500a0c
+
+## v0.25.0 - 2025-01-22
+
+### :rocket: Features
+
+- :sparkles: add published status toggle to input types configuration by @OoBook in https://github.com/unusualify/modularity/commit/15b7da07bf9317da337dc8da5315619665948092
+- :sparkles: enhance form component with switch inputs for better user interaction by @OoBook in https://github.com/unusualify/modularity/commit/97bb857f83167e82de62332ce43a10d7c8576c3d
+
+### :recycle: Refactors
+
+- :recycle: enhance array_merge_recursive_preserve function for improved flexibility by @OoBook in https://github.com/unusualify/modularity/commit/339c1e9eeb58b7515663cf5eb1aeea208c3b704b
+- :recycle: optimize translation field handling in TranslationsTrait by @OoBook in https://github.com/unusualify/modularity/commit/9cf7655eb750718d64c48570c01618f7e4eed5cd
+- :recycle: streamline table order management in ManageScopes trait by @OoBook in https://github.com/unusualify/modularity/commit/43ed1f7896100150b85a37b3ee2f190d39890280
+
+### :lipstick: Styling
+
+- lint coding styles for v0.25.0 by @OoBook in https://github.com/unusualify/modularity/commit/3839a76ddac516d93e75e038cf4cd4061274eb8b
+
+### :package: Build
+
+- update build artifacts for v0.24.1 by @invalid-email-address in https://github.com/unusualify/modularity/commit/95ef52136c3617bbb83b9400afaf8cbaa923fe78
+- update build artifacts for v0.25.0 by @OoBook in https://github.com/unusualify/modularity/commit/0b57543880207984eae812486a6152b1c53a37fd
+
+## v0.24.1 - 2025-01-21
+
+### :wrench: Bug Fixes
+
+- :sparkles: improve mandatory item handling in Checklist component by @OoBook in https://github.com/unusualify/modularity/commit/6b4c3d3f8e798e82098a02524085ed6556efd9d8
+
+### :package: Build
+
+- update build artifacts for v0.24.1 by @OoBook in https://github.com/unusualify/modularity/commit/69a6988298040a6ed5e95c5a634a6becf43424aa
+
+## v0.24.0 - 2025-01-21
+
+### :rocket: Features
+
+- :sparkles: add spreadable feature && spreadable vue component by @gunesbizim in https://github.com/unusualify/modularity/commit/d7183193d0ba8ea0dd971732cb1d25943a7518ac
+- :sparkles: add system setting module && general route by @gunesbizim in https://github.com/unusualify/modularity/commit/7bf04f5d7a55d390ddc53de3bebc290231e7fbf3
+- :sparkles: add useItemActions hook for managing item actions by @OoBook in https://github.com/unusualify/modularity/commit/46a08b6f59a66d8248f02600f70f8cfcc0457745
+- :sparkles: add transition directive for enhanced element animations by @OoBook in https://github.com/unusualify/modularity/commit/6612d595844954675556249d4d42adfbd3f6abf0
+- enhance input initialization in useInput hook by @OoBook in https://github.com/unusualify/modularity/commit/aa725d7c6b9c98c9b808c6122e9d51faf0bd678e
+- :sparkles: enhance form action permissions in ManageForm trait by @OoBook in https://github.com/unusualify/modularity/commit/b7e5f030431c02bc4cd9b1bbc16b88349785efdf
+- :sparkles: add handleScopes method for dynamic query scope handling by @OoBook in https://github.com/unusualify/modularity/commit/b1cb4817a60b25e4c043fc23bf6730edd3829ff5
+- :sparkles: implement StateableTrait for enhanced state filtering by @OoBook in https://github.com/unusualify/modularity/commit/127a7d2ed80cc36382cf43a09e4c400e20a05c50
+- :sparkles: enhance price handling in HasPriceable trait with new attributes by @OoBook in https://github.com/unusualify/modularity/commit/803538d7f51b6ad52a4254321f5a8e0ecd07cf9d
+- :sparkles: add mandatory item handling to Checklist component by @OoBook in https://github.com/unusualify/modularity/commit/90f98973a4415d6fbcd497285c54c5087f876d58
+
+### :wrench: Bug Fixes
+
+- :bug: fix currency seeder && table names && migrations by @gunesbizim in https://github.com/unusualify/modularity/commit/e47b6342ba01d5d38400daf9095c87d4258a7d4c
+- :bug: adjust route export formatting in add_route_to_config function by @OoBook in https://github.com/unusualify/modularity/commit/712b70b25b814708c78748a95f01141b46f1c51a
+- :bug: enhance media handling in ImagesTrait for improved localization support by @OoBook in https://github.com/unusualify/modularity/commit/4033a1b485407a23f0f63f308410c50fc715c2bc
+- :bug: update payment price handling in PaymentTrait to support forced updates by @OoBook in https://github.com/unusualify/modularity/commit/c7211d64eab25a77071350399177f3a1c99d4414
+- :bug: correct attribute naming for base price in StepperForm component by @OoBook in https://github.com/unusualify/modularity/commit/a5e60799a5ab594a1b7abe61316662d965be1e88
+
+### :recycle: Refactors
+
+- :recycle: refactor Spreadable to Spread on some files by @gunesbizim in https://github.com/unusualify/modularity/commit/e1be74ffaafdc11beb1088dd1201591a7872da21
+- :recycle: comment out unused files_ option in Filepond component by @OoBook in https://github.com/unusualify/modularity/commit/69a9977dbc78a1b21d1337e97a4ae46339a94db9
+- :recycle: integrate useItemActions hook and clean up Form.vue component by @OoBook in https://github.com/unusualify/modularity/commit/cfe9549766b5ba5ae410afb6ba8f9b5eeab02604
+- :recycle: remove commented-out debug logs in getFormData utility by @OoBook in https://github.com/unusualify/modularity/commit/51307eda6dfb6de4422dd9c30f0f188f263f6e8e
+- :recycle: update Spread model and migration to use UUID morphs and rename JSON fields by @OoBook in https://github.com/unusualify/modularity/commit/b0c5a8e03c8f85f964cdfa45e7a3e05495d6daf7
+- :recycle: update MigrationMakeCommand to use schema parser variable by @OoBook in https://github.com/unusualify/modularity/commit/49bde06a6614aeddaa49fe2380d6316ccf2f31c6
+- :recycle: update getStateableFilterList method call in ManageTable trait by @OoBook in https://github.com/unusualify/modularity/commit/4a3b10071b1c0add7f5ea55a277d037cbc230ea7
+- :recycle: improve change tracking and trigger processing in TabGroup component by @OoBook in https://github.com/unusualify/modularity/commit/42880757a406509172bb238c3537107f0afcdc1c
+
+### :lipstick: Styling
+
+- :lipstick: clean up unused code and comments in Repository and MethodTransformers by @OoBook in https://github.com/unusualify/modularity/commit/884311d017725971f00449ea48d03bb9b1cc2ab0
+- :lipstick: clean up Model and MethodTransformers classes by removing unused code by @OoBook in https://github.com/unusualify/modularity/commit/ab48d30acfe69f0553eaedf03fea7484756a1b19
+- lint coding styles for v0.24.0 by @OoBook in https://github.com/unusualify/modularity/commit/27315d06a07c2d5f619b51770b482b561321642f
+
+### :package: Build
+
+- update build artifacts for v0.24.0 by @OoBook in https://github.com/unusualify/modularity/commit/bf59ce14e6d51080331ea6139c706d4e2770983c
+
+### :beers: Other Stuff
+
+- remove jsconfig.json file from vue.vue-cli directory by @OoBook in https://github.com/unusualify/modularity/commit/b28e62664768fb867aab7f616166bd3a2da992c3
+
+## v0.23.1 - 2025-01-03
+
+### :wrench: Bug Fixes
+
+- comment out default locale initialization in HasStateable trait by @OoBook in https://github.com/unusualify/modularity/commit/27a1fc298d8cc9f77a01d597b4022ee558ef68da
+
+## v0.23.0 - 2025-01-03
+
+### :rocket: Features
+
+- :sparkles: feature auth success pages by @gunesbizim in https://github.com/unusualify/modularity/commit/fe748eaf3994b03c3dcdd24368e2938927f9a404
+- :sparkles: add composer helper functions for package management by @OoBook in https://github.com/unusualify/modularity/commit/5a0d79aa04ef5e925ef7c4b7205a58285f0f54c0
+- :sparkles: add Verbosity trait for enhanced output control by @OoBook in https://github.com/unusualify/modularity/commit/248bc5e80f8e73029f263f0efcc22b107a539430
+- :sparkles: add Pretending trait for dry run functionality by @OoBook in https://github.com/unusualify/modularity/commit/5640daa9baf8c1944e7288be99f39c4ab28dfbe4
+- :sparkles: add regex replacement command and support class by @OoBook in https://github.com/unusualify/modularity/commit/c6ce18d065fcd4a8ecff9c2c82a66519c4c87de1
+- :sparkles: enhance CreateFeatureCommand with additional trait and component options by @OoBook in https://github.com/unusualify/modularity/commit/22ae08d5a43114913a0051d0970855925bfc946d
+- :sparkles: add GenerateCommandDocsCommand for extracting Laravel console documentation by @OoBook in https://github.com/unusualify/modularity/commit/2d4ea08d651987b0f3214472e064ff0644d8d40a
+- :sparkles: add user profile management to Vuex store by @OoBook in https://github.com/unusualify/modularity/commit/2a1379b71ffd7701ccbccca31660f022089e3327
+- :sparkles: add ambient module to Vuex store and enhance footer script by @OoBook in https://github.com/unusualify/modularity/commit/bd799fb417fa32e9a58607110c7ae80811579d48
+- :sparkles: add development mode indicator to Main.vue by @OoBook in https://github.com/unusualify/modularity/commit/722b137895eb9d5690482c92898a79c4623ec1c2
+- :sparkles: improve filter method in MethodTransformers trait by @OoBook in https://github.com/unusualify/modularity/commit/72e8e0a2be8dc66f5cb87e90b5dcf11440428cd9
+- :sparkles: add stateable filtering to controller traits by @OoBook in https://github.com/unusualify/modularity/commit/75c4eb60d600afb3e39a7d87d6f0dc20377f4118
+
+### :wrench: Bug Fixes
+
+- :bug: fix paymentService modal && cardTypeSeeder images fix by @gunesbizim in https://github.com/unusualify/modularity/commit/84f574347a3dd692dce2aadec7254e306271e168
+- :bug: fix reset password controller and mailing by @gunesbizim in https://github.com/unusualify/modularity/commit/d2999688660b424babe8f77e5c226384bbb44819
+- add repository context to issue close command in GitHub Actions by @OoBook in https://github.com/unusualify/modularity/commit/305c7b7fc94332e5e013816ae5d254edf4a653dc
+- :bug: enhance getTopSchema filtering logic for editing and creation states by @OoBook in https://github.com/unusualify/modularity/commit/474470acbb78b9930525c42754be57221c5d8ec9
+- :bug: update useTable and useTableNames to utilize editedIndex from context by @OoBook in https://github.com/unusualify/modularity/commit/8571ab36f09e012cc1a15a1829a0363966fbbf14
+
+### :recycle: Refactors
+
+- :sparkles: standardize vendor path retrieval across the application by @OoBook in https://github.com/unusualify/modularity/commit/5aeb351552db134d3eb8050a57f92090401c3fb6
+- :recycle: add CreateInputHydrateCommand for generating input hydrate classes by @OoBook in https://github.com/unusualify/modularity/commit/7faab412ed628fdd3c848a1419c0e2e57f78904c
+- :recycle: add ComposerScriptsCommand for managing modularity composer scripts by @OoBook in https://github.com/unusualify/modularity/commit/064a50465a4e55ef7465e2b3ea5d9c8bcfa6a03a
+- :recycle: rename Laravel test command for consistency by @OoBook in https://github.com/unusualify/modularity/commit/19da5ad74a55e460f83e1273fd92bcbb5d4bbee2
+- :recycle: clean up and organize VitePress configuration and sidebar generation by @OoBook in https://github.com/unusualify/modularity/commit/ed5687458cbae9ef121c9e7ef18162287f227f04
+- :recycle: remove deprecated layout files and streamline structure by @OoBook in https://github.com/unusualify/modularity/commit/c3bc2d7ad966627eecc07bd1f800322c5ad35342
+- :recycle: replace @section with @push for STORE in multiple Blade views by @OoBook in https://github.com/unusualify/modularity/commit/5652424c2eb66dc66eb62234b8347231b7c670c9
+- :recycle: clean up Blade views and streamline JavaScript handling by @OoBook in https://github.com/unusualify/modularity/commit/c4bfda3b06cf004b4f1f614b17d2ab897fd9d27d
+- :recycle: simplify Vuex store configuration by removing unused state and mutations by @OoBook in https://github.com/unusualify/modularity/commit/45f1ee2c7624e5b870958cfd6f8b4b649387801d
+- :recycle: update Sidebar.vue to utilize Vuex getters for user and app information by @OoBook in https://github.com/unusualify/modularity/commit/4918e8a843bf639a52b516c9af3fe27b9f38e982
+- :recycle: move the methods must be on repository class by @OoBook in https://github.com/unusualify/modularity/commit/d4b08423beaeb70ffcfe2c65ef34913f7fe4bfd1
+- :recycle: remove unnecessary parameter passing into createNonExistantStates by @OoBook in https://github.com/unusualify/modularity/commit/8b6b1cba27ecc6b96551f9dd79b8d553c1a88da6
+- :recycle: enhance state management with new stateable methods by @OoBook in https://github.com/unusualify/modularity/commit/f58faef8715eafc0acb6d2004ed78c29e5dadb9a
+- :recycle: simplify authorizedable fields in migration for unusual defaults by @OoBook in https://github.com/unusualify/modularity/commit/5472de12e0ca99266cc8f7877d03be02d415298b
+- :recycle: remove StateableTrait as it is no longer needed by @OoBook in https://github.com/unusualify/modularity/commit/74a3c0d718db03165a303da6131543f74539bf4b
+- :recycle: update chat attribute handling in HasChatable trait by @OoBook in https://github.com/unusualify/modularity/commit/7e0250736da1a9375439acc6efab90f9ca605718
+- :recycle: enhance authorization handling in IsAuthorizedable trait by @OoBook in https://github.com/unusualify/modularity/commit/6f8f869511fdfdb6213773a29a8d21e93935e0e3
+- :recycle: update default requirement in ChatHydrate to -1 by @OoBook in https://github.com/unusualify/modularity/commit/d7570fc38348b395791c9c26ddbb6935055f4733
+- :recycle: enhance state management in HasStateable trait by @OoBook in https://github.com/unusualify/modularity/commit/28538a2eab48d5a27cf360512adff860c2ecef85
+- update Chat component to improve message handling and user profile retrieval by @OoBook in https://github.com/unusualify/modularity/commit/ea12bd4be10128301f9f4d27da18c10340e84cb6
+- enhance Filepond component to support file handling by @OoBook in https://github.com/unusualify/modularity/commit/5812e312da61f11884c92851f534826487dc1f85
+- improve get_installed_composer function to support dynamic path resolution by @OoBook in https://github.com/unusualify/modularity/commit/84ed28ee2ad1f92039f720bed8cde767c4d02de3
+
+### :memo: Documentation
+
+- :sparkles: add multiple modularity commands for enhanced functionality by @OoBook in https://github.com/unusualify/modularity/commit/95eafc28e0686b93364d599b161e2da87a039502
+- :sparkles: add new guide components and index documentation by @OoBook in https://github.com/unusualify/modularity/commit/1a90eb08f74bffd2fabde6da75232f47f0994080
+- :sparkles: update index and remove deprecated API examples by @OoBook in https://github.com/unusualify/modularity/commit/a2a4ed048e0dedec9e3de79ea885e2e17fd4b14f
+
+### :lipstick: Styling
+
+- :art: clean up commented-out code in ReplaceRegularExpressionCommand by @OoBook in https://github.com/unusualify/modularity/commit/ce8dd4a9135bbf848d99574195664cceac435c02
+- lint coding styles for v0.23.0 by @OoBook in https://github.com/unusualify/modularity/commit/3457d4c7b3173b7b95464a547125d3359d69dbe4
+- lint coding styles for v0.23.0 by @OoBook in https://github.com/unusualify/modularity/commit/3ca5a1adb91be08397d76eb7a61bf17f8ddc3c88
+
+### :white_check_mark: Testing
+
+- add ModularityTest class for comprehensive module functionality testing by @OoBook in https://github.com/unusualify/modularity/commit/199b54df3468f2543539f82625d4b5271b33d2ae
+- add comprehensive tests for Modularity functionality by @OoBook in https://github.com/unusualify/modularity/commit/f484ef8f94e359ac5496fdb49d31927e21f550bd
+
+### :package: Build
+
+- update build artifacts for v0.23.0 by @OoBook in https://github.com/unusualify/modularity/commit/d068e547cfc0b6afd89c58bde123bfe6348f65d7
+
+### :beers: Other Stuff
+
+- clean up commented-out code in PR template check workflow by @OoBook in https://github.com/unusualify/modularity/commit/85d6dea9323dc718def4e2f6053464a0f3ff1d14
+- :sparkles: enhance Vue process configuration with environment variables by @OoBook in https://github.com/unusualify/modularity/commit/ab197cd1c3a2d877632f52cfc8c7b134d238fe83
+- update getTopSchema to include editing state in Form.vue by @OoBook in https://github.com/unusualify/modularity/commit/8ed44eb6fbaf57f074166de5fe7174bac6cdf829
+
 ## v0.22.5 - 2024-12-26
 
 ### :lipstick: Styling

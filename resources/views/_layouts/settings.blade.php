@@ -8,7 +8,7 @@
 @stop
 
 @push('vuexStore')
-  window['{{ unusualConfig('js_namespace') }}'].STORE.publication.submitOptions = {
+  window['{{ modularityConfig('js_namespace') }}'].STORE.publication.submitOptions = {
     update: [
       {
         name: 'update',

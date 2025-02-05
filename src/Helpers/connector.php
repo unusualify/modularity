@@ -14,7 +14,13 @@ if (! function_exists('init_connector')) {
         $targetType = 'uri';
 
         $moduleInfo = find_module_and_route($connector);
+
+        if (! $moduleInfo['module']) {
+            throw new \Exception('Module not found' . $connector);
+        }
+
         $targetType = find_target($moduleInfo['module'], $moduleInfo['route'], get_connector_event($connector));
+
         $data = exec_target($targetType);
 
         return $data;
@@ -84,7 +90,7 @@ if (! function_exists('find_target')) {
     {
         $targetType = 'uri'; // Default target type
         // dd($events);
-        $types = ! empty($events) ? explode(':', array_shift($events)) : ['uri', 'index']; //uri:edit
+        $types = ! empty($events) ? explode(':', array_shift($events)) : ['uri', 'index']; // uri:edit
         // dd($types);
         $targetType = array_shift($types) ?? $targetType;
 

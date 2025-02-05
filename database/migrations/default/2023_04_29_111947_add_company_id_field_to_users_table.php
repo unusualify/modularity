@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $companyTableName = unusualConfig('tables.companies', 'modularity_companies');
-        Schema::table(unusualConfig('tables.users', 'admin_users'), function (Blueprint $table) use ($companyTableName) {
+        $companyTableName = modularityConfig('tables.companies', 'modularity_companies');
+        Schema::table(modularityConfig('tables.users', 'admin_users'), function (Blueprint $table) use ($companyTableName) {
 
             $table->after('id', function ($table) {
                 $table->unsignedBigInteger('company_id')->nullable(); // Foreign key column
@@ -31,7 +31,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table(unusualConfig('tables.users', 'admin_users'), function (Blueprint $table) {
+        Schema::table(modularityConfig('tables.users', 'admin_users'), function (Blueprint $table) {
             // $table->dropConstrainedForeignId(['company_id']);
             $table->dropForeign(['company_id']);
             $table->dropColumn('company_id');

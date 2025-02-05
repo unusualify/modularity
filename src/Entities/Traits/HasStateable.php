@@ -4,8 +4,8 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Modules\SystemUtility\Entities\Stateable;
 use Unusualify\Modularity\Entities\State;
+use Unusualify\Modularity\Entities\Stateable;
 
 trait HasStateable
 {
@@ -101,7 +101,7 @@ trait HasStateable
 
     public function initializeHasStateable()
     {
-        $this->defaultLocale = app()->getLocale();
+        // $this->defaultLocale = app()->getLocale();
 
         $this->mergeFillable(['_stateable']);
     }
@@ -207,7 +207,8 @@ trait HasStateable
         return $this->morphToMany(
             static::$stateModel,
             'stateable',
-            config('modularity.states.table', 'stateables'),
+            // config('modularity.states.table', 'stateables'),
+            modularityConfig('tables.stateables', 'modularity_stateables'),
             'stateable_id',
             'state_id'
         )->withPivot('is_active');
@@ -222,8 +223,8 @@ trait HasStateable
             'id',
             'id',
             'state_id'
-        )->where(config('modularity.states.table', 'stateables') . '.stateable_type', get_class($this))
-            ->where(config('modularity.states.table', 'stateables') . '.is_active', 1);
+        )->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.stateable_type', get_class($this))
+            ->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.is_active', 1);
     }
 
     public static function getStateableTranslationLanguages()
@@ -240,10 +241,10 @@ trait HasStateable
 
         return State::whereIn('code', $defaultStateCodes)
             ->get()
-            ->sortBy(function($state) use ($defaultStateCodes, $itemValue)  {
+            ->sortBy(function ($state) use ($defaultStateCodes) {
                 return array_search($state->code, $defaultStateCodes);
             })
-            ->map(function($state) use ($itemValue) {
+            ->map(function ($state) use ($itemValue) {
                 return [
                     'id' => $state->id,
                     $itemValue => $state->name,
@@ -253,27 +254,31 @@ trait HasStateable
             ->toArray();
     }
 
-    public static function getStateableFilterList()
+    public static function defaultStateables($scopes = [])
     {
         $defaultStates = self::getDefaultStates();
         $defaultStateCodes = array_column($defaultStates, 'code');
 
         return State::whereIn('code', $defaultStateCodes)
             ->get()
-            ->map(function($state) use ($defaultStates) {
+            ->map(function ($state) use ($scopes) {
                 $studlyCode = Str::studly($state->code);
+
+                $number = static::handleScopes(static::query(), $scopes)
+                    ->stateableCount($state->code);
+
                 return [
                     'name' => $state->name ?? $state->translations->first()->name,
                     'code' => $state->code,
                     'slug' => "stateable{$studlyCode}",
-                    'number' => self::stateableCount($state->code),
+                    'number' => $number,
                     // 'number' => static::query()->where('stateable', $state->code)->count(),
                 ];
             })
-            ->sortBy(function($state) use ($defaultStateCodes)  {
+            ->sortBy(function ($state) use ($defaultStateCodes) {
                 return array_search($state['code'], $defaultStateCodes);
             })
-            ->filter(function($state) {
+            ->filter(function ($state) {
                 return $state['number'] > 0;
             })
             ->values()
@@ -307,7 +312,7 @@ trait HasStateable
         return $this->scopeAuthorized($this)
             ->whereHas('states', function ($q) {
                 $q->where('code', 'distributed')
-                    ->where('stateables.is_active', 1);
+                    ->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.is_active', 1);
             });
     }
 

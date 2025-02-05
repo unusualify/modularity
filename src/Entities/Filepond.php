@@ -15,7 +15,7 @@ class Filepond extends Model
 
     public function canDeleteSafely()
     {
-        // return DB::table(unusualConfig('tables.fileables', 'unusual_fileables'))->where('file_id', $this->id)->count() === 0;
+        // return DB::table(modularityConfig('tables.fileponds'))->where('file_id', $this->id)->count() === 0;
     }
 
     public function mediableFormat()
@@ -32,6 +32,6 @@ class Filepond extends Model
 
     public function getTable()
     {
-        return unusualConfig('tables.fileponds', parent::getTable());
+        return modularityConfig('tables.fileponds', parent::getTable());
     }
 }

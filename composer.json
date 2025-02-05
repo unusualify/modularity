@@ -69,7 +69,7 @@
         "laravel": {
             "providers": [
                 "Unusualify\\Modularity\\LaravelServiceProvider",
-                "Unusualify\\Modularity\\Providers\\UnusualProvider"
+                "Unusualify\\Modularity\\Providers\\ModularityProvider"
             ],
             "aliases": {
                 "ModularityVite": "Unusualify\\Modularity\\Facades\\ModularityVite"
@@ -84,7 +84,7 @@
             "Unusualify\\Modularity\\": "src",
             "Unusualify\\Modularity\\Database\\Seeders\\": "database/seeders",
             "Unusualify\\Modularity\\Database\\Factories\\": "database/factories",
-            "Modules\\": "umodules"
+            "Modules\\": "modules"
         },
         "files": [
           "src/Support/Migrations/SchemaParser.php",

@@ -38,14 +38,14 @@ trait ManageForm
 
     protected function __beforeConstructManageForm($app, $request)
     {
-        $this->inputTypes = unusualConfig('input_types', []);
+        $this->inputTypes = modularityConfig('input_types', []);
         $this->module = Modularity::find($this->moduleName);
         $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
     }
 
     protected function __afterConstructManageForm($app, $request)
     {
-        $this->defaultFormAttributes = (array) Config::get(unusualBaseKey() . '.default_form_attributes');
+        $this->defaultFormAttributes = (array) Config::get(modularityBaseKey() . '.default_form_attributes');
         $this->formAttributes = array_merge_recursive_preserve($this->getFormAttributes(), $this->formAttributes ?? []);
 
         $this->setFormActions();
@@ -71,7 +71,7 @@ trait ManageForm
 
     public function setFormActions()
     {
-        $this->defaultFormActions = (array) Config::get(unusualBaseKey() . '.default_form_actions', []);
+        $this->defaultFormActions = (array) Config::get(modularityBaseKey() . '.default_form_actions', []);
 
         $formActions = [];
 
@@ -90,11 +90,22 @@ trait ManageForm
 
     public function getFormActions(): array
     {
-        $default_action = (array) Config::get(unusualBaseKey() . '.default_form_action');
+        $default_action = (array) Config::get(modularityBaseKey() . '.default_form_action');
 
         return Collection::make($this->formActions)->reduce(function ($acc, $action, $key) use ($default_action) {
 
-            // dd($action);
+            $allowedRoles = $action['allowedRoles'] ?? null;
+
+            if (is_string($allowedRoles)) {
+                $allowedRoles = explode(',', $allowedRoles);
+            }
+
+            if ($allowedRoles && $this->user) {
+                if (! $this->user->isSuperAdmin() && ! $this->user->hasRole($allowedRoles)) {
+                    return $acc;
+                }
+            }
+
             if (isset($action['endpoint']) && ($routeName = Route::hasAdmin($action['endpoint']))) {
                 $parameters = Route::getRoutes()->getByName($routeName)->parameterNames();
                 $action['endpoint'] = route($routeName, array_fill_keys($parameters, ':id'));
@@ -200,9 +211,9 @@ trait ManageForm
 
     protected function getSchemaInput($input, $inputs = [])
     {
-        // $default_input = collect(Config::get(unusualBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
-        // $default_input = $this->configureInput(array_to_object(Config::get(unusualBaseKey() . '.default_input')));
-        $default_input = (array) Config::get(unusualBaseKey() . '.default_input');
+        // $default_input = collect(Config::get(modularityBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
+        // $default_input = $this->configureInput(array_to_object(Config::get(modularityBaseKey() . '.default_input')));
+        $default_input = (array) Config::get(modularityBaseKey() . '.default_input');
         // dd($default_input);
         [$hydrated, $spreaded] = $this->hydrateInput(object_to_array($input), $inputs);
 
@@ -552,7 +563,7 @@ trait ManageForm
             $targetModuleName = $this->getStudlyName(! empty($names) ? array_pop($names) : $this->moduleName);
             $targetModule = Modularity::find($targetModuleName);
 
-            $types = ! empty($parts) ? explode(':', array_shift($parts)) : ['uri', 'index']; //uri:edit
+            $types = ! empty($parts) ? explode(':', array_shift($parts)) : ['uri', 'index']; // uri:edit
             // controller,repository,uri
             $targetType = array_shift($types) ?? $targetType; //
 
@@ -665,7 +676,7 @@ trait ManageForm
                 // [$methodName, $formattedInput, $parentColumnName] = array_pad(explode(':',$pattern), 3, null);
                 $changers = [];
                 switch ($methodName) {
-                    case 'permalinkPrefix': //'permalinkPrefix:slug',
+                    case 'permalinkPrefix': // 'permalinkPrefix:slug',
                         $inputToFormat = array_shift($args);
                         if (isset($input['repository'])) {
                             foreach ($this->getConfigFieldsByRoute('inputs') as $key => $_input) {
@@ -678,13 +689,13 @@ trait ManageForm
                         }
 
                         break;
-                    case 'lock': //'lock:url:url'
+                    case 'lock': // 'lock:url:url'
                         $inputToFormat = array_shift($args);
                         $parentColumnName = array_shift($args);
                         $events[] = "formatLock:{$inputToFormat}:{$parentColumnName}";
 
                         break;
-                    case 'permalink': //'permalink:slug',
+                    case 'permalink': // 'permalink:slug',
                         $inputToFormat = array_shift($args);
                         $permalinkPrefix = getHost() . '/';
                         $permalinkPrefixFormat = getHost() . '/';
@@ -721,7 +732,7 @@ trait ManageForm
                         $events[] = 'formatPermalink:' . $inputToFormat;
 
                         break;
-                    case 'filter': //'filter:{target_input_name}:{target_prop_name}:{followed_key_name}'
+                    case 'filter': // 'filter:{target_input_name}:{target_prop_name}:{followed_key_name}'
                         $inputToFormat = array_shift($args);
                         $targetPropName = array_shift($args) ?? 'inputs';
 
@@ -810,6 +821,22 @@ trait ManageForm
                         }
 
                         break;
+                    case 'clearModel': //
+                        $inputToFormat = array_shift($args) ?? '';
+
+                        if ($inputToFormat) {
+                            $events[] = "formatClearModel:{$inputToFormat}";
+                        }
+
+                        break;
+                    case 'resetItems': //
+                        $inputToFormat = array_shift($args) ?? '';
+
+                        if ($inputToFormat) {
+                            $events[] = "formatResetItems:{$inputToFormat}";
+                        }
+
+                        break;
                     case 'prependSchema': //
                         $inputToFormat = array_shift($args) ?? '';
                         $prependKey = array_shift($args) ?? null;
@@ -830,7 +857,7 @@ trait ManageForm
             if (! empty($events)) {
                 $data = (array) ($data ?? $input);
                 try {
-                    //code...
+                    // code...
                     // if($input['name'] == 'packageCountry'){
                     //     dd($data, $events, explode('|', $data['event'] ?? ''));
                     // }

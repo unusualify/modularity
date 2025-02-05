@@ -37,13 +37,13 @@ return [
             'composer' => 'composer.json',
             'assets/js/app' => 'Resources/assets/js/app.js',
             'assets/sass/app' => 'Resources/assets/sass/app.scss',
-            'webpack' => 'webpack.mix.js',
+            'vite' => 'vite.config.js',
             'package' => 'package.json',
         ],
         'replacements' => [
             'routes/web' => ['LOWER_NAME', 'STUDLY_NAME'],
             'routes/api' => ['LOWER_NAME'],
-            'webpack' => ['LOWER_NAME'],
+            'vite' => ['LOWER_NAME'],
             'json' => ['LOWER_NAME', 'STUDLY_NAME', 'MODULE_NAMESPACE', 'PROVIDER_NAMESPACE'],
             'views/index' => ['LOWER_NAME'],
             'views/master' => ['LOWER_NAME', 'STUDLY_NAME'],
@@ -159,9 +159,10 @@ return [
     */
 
     'scan' => [
-        'enabled' => false,
+        'enabled' => true,
         'paths' => [
             base_path('vendor/*/*'),
+            base_path('vendor/unusualify/modularity/modules'),
         ],
     ],
     /*
@@ -191,9 +192,10 @@ return [
     |
     */
     'cache' => [
-        'enabled' => false,
-        'key' => 'laravel-modules',
-        'lifetime' => 60,
+        'enabled' => env('MODULARITY_CACHE_ENABLED', true),
+        'driver' => env('MODULARITY_CACHE_DRIVER', 'file'),
+        'key' => env('MODULARITY_CACHE_KEY', 'modularity'),
+        'lifetime' => env('MODULARITY_CACHE_LIFETIME', 600),
     ],
     /*
     |--------------------------------------------------------------------------

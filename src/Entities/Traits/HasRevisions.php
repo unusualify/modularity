@@ -48,7 +48,7 @@ trait HasRevisions
 
     protected function getRevisionModel()
     {
-        $revision = unusualConfig('namespace') . "\Models\Revisions\\" . class_basename($this) . 'Revision';
+        $revision = modularityConfig('namespace') . "\Models\Revisions\\" . class_basename($this) . 'Revision';
 
         if (@class_exists($revision)) {
             return $revision;

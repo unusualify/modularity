@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Console;
 
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
+use Unusualify\Modularity\Facades\Modularity;
 
 class BuildCommand extends BaseCommand
 {
@@ -23,7 +24,7 @@ class BuildCommand extends BaseCommand
         {--theme= : Custom theme name if was worked on}';
 
     protected $aliases = [
-        'unusual:build',
+        'build:modularity',
     ];
 
     /**
@@ -96,7 +97,7 @@ class BuildCommand extends BaseCommand
             sleep(1);
         }
 
-        if (! file_exists(resource_path(unusualConfig('custom_components_resource_path', 'vendor/modularity/js/components')))) {
+        if (! file_exists(resource_path(modularityConfig('custom_components_resource_path', 'vendor/modularity/js/components')))) {
             $this->call('vendor:publish', [
                 '--provider' => 'Unusualify\Modularity\LaravelServiceProvider',
                 '--tag' => 'custom-components',
@@ -202,7 +203,7 @@ class BuildCommand extends BaseCommand
 
         $builtinThemes = builtInModularityThemes();
         $customThemes = customModularityThemes();
-        $theme = env('VUE_APP_THEME', 'unusual');
+        $theme = env('VUE_APP_THEME', 'unusualify');
 
         if (! array_key_exists($theme, $builtinThemes->toArray()) && array_key_exists($theme, $customThemes->toArray())) {
             $path = resource_path('vendor/modularity/themes/' . $theme . '/sass/*');
@@ -225,7 +226,8 @@ class BuildCommand extends BaseCommand
         // Add environment variables
         $process->setEnv([
             'BASE_PATH' => base_path(),
-            'VENDOR_DIR' => unusualConfig('vendor_dir'),
+            // 'VENDOR_DIR' => modularityConfig('vendor_dir'),
+            'VENDOR_DIR' => Modularity::getVendorDir(),
         ]);
 
         if ($disableTimeout) {
@@ -246,7 +248,7 @@ class BuildCommand extends BaseCommand
 
         $builtinThemes = builtInModularityThemes();
         $customThemes = customModularityThemes();
-        $theme = env('VUE_APP_THEME', 'unusual');
+        $theme = env('VUE_APP_THEME', 'unusualify');
 
         if (array_key_exists($theme, $customThemes->toArray())) {
             $this->copyTheme($theme);
@@ -263,7 +265,7 @@ class BuildCommand extends BaseCommand
     {
         $this->info('Copying custom components...');
 
-        $localCustomComponentsPath = resource_path(unusualConfig('custom_components_resource_path', 'vendor/modularity/js/components'));
+        $localCustomComponentsPath = resource_path(modularityConfig('custom_components_resource_path', 'vendor/modularity/js/components'));
         $vueCustomComponentsPath = get_modularity_vendor_path('vue/src/js/components/customs');
 
         $this->copyDirectory($localCustomComponentsPath, $vueCustomComponentsPath, clean: true);
@@ -271,16 +273,6 @@ class BuildCommand extends BaseCommand
         $this->info('Done.');
 
         return 1;
-        // if (!$this->filesystem->exists($unusualCustomComponentsPath)) {
-        //     $this->filesystem->makeDirectory($unusualCustomComponentsPath, 0755, true);
-        // }
-
-        // $this->filesystem->cleanDirectory($unusualCustomComponentsPath);
-        // $this->filesystem->put($unusualCustomComponentsPath . '/.keep', '');
-
-        // if ($this->filesystem->exists($localCustomComponentsPath)) {
-        //     $this->filesystem->copyDirectory($localCustomComponentsPath, $unusualCustomComponentsPath);
-        // }
     }
 
     /**

@@ -6,7 +6,7 @@ use Unusualify\Modularity\Http\Controllers\ProfileController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
-| Middlewares : [ 'web.auth', 'unusual.core', 'unusual.panel']
+| Middlewares : [ 'web.auth', ...\Unusualify\Modularity\Facades\ModularityRoutes::defaultMiddlewares(), \Unusualify\Modularity\Facades\ModularityRoutes::defaultPanelMiddlewares()]
 |
 |--------------------------------------------------------------------------
 |
@@ -23,9 +23,12 @@ Route::group(['prefix' => 'profile', 'as' => 'profile.'], function () {
 });
 Route::put('profile/company', 'ProfileController@updateCompany')->name('profile.company');
 
+Route::get('users/impersonate/stop', 'ImpersonateController@stopImpersonate')->name('impersonate.stop');
+Route::get('users/impersonate/{id}', 'ImpersonateController@impersonate')->name('impersonate');
+
 // system internal api routes (for ajax web routes)
 Route::prefix('api')->group(function () {
-    if (unusualConfig('enabled.media-library')) {
+    if (modularityConfig('enabled.media-library')) {
         Route::group(['prefix' => 'media-library', 'as' => 'media-library.'], function () {
             Route::post('sign-s3-upload', ['as' => 'sign-s3-upload', 'uses' => 'MediaLibraryController@signS3Upload']);
             Route::get('sign-azure-upload', ['as' => 'sign-azure-upload', 'uses' => 'MediaLibraryController@signAzureUpload']);
@@ -37,7 +40,7 @@ Route::prefix('api')->group(function () {
         });
     }
 
-    if (unusualConfig('enabled.file-library')) {
+    if (modularityConfig('enabled.file-library')) {
         Route::group(['prefix' => 'file-library', 'as' => 'file-library.'], function () {
             Route::post('sign-s3-upload', ['as' => 'sign-s3-upload', 'uses' => 'FileLibraryController@signS3Upload']);
             Route::get('sign-azure-upload', ['as' => 'sign-azure-upload', 'uses' => 'FileLibraryController@signAzureUpload']);

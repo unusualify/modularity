@@ -81,7 +81,7 @@ class ModelRelationParser implements Arrayable
 
         $this->relationships = $relationships;
 
-        $this->relationshipParametersMap = unusualConfig('laravel-relationship-map', []);
+        $this->relationshipParametersMap = modularityConfig('laravel-relationship-map', []);
     }
 
     /**

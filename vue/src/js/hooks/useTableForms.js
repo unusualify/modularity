@@ -116,12 +116,16 @@ export default function useTableForms(props, context) {
     if(action.type === 'request') {
       store.dispatch(ACTIONS.GET_DATATABLE)
     }
+
+    if(action.type === 'modal') {
+      store.dispatch(ACTIONS.GET_DATATABLE)
+    }
   }
 
   // Watch effect for form active state
   watch(() => formActive.value, (newValue) => {
     if (!newValue) {
-      form.value?.resetValidation()
+      // form.value?.resetValidation()
       resetEditedItem()
     }
 

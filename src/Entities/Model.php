@@ -86,7 +86,7 @@ class Model extends LaravelModel implements TaggableInterface
         return $this->morphToMany(
             static::$tagsModel,
             'taggable',
-            unusualConfig('tables.tagged', 'tagged'),
+            modularityConfig('tables.tagged', 'tagged'),
             'taggable_id',
             'tag_id'
         );

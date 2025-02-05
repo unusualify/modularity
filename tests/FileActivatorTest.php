@@ -18,7 +18,7 @@ class FileActivatorTest extends TestCase
     {
 
         $fileActivator = new FileActivator($this->app);
-        $fileActivator->setModule('SystemPayment', $this->umoduleDirectory('SystemPayment'));
+        $fileActivator->setModule('SystemPayment', $this->moduleDirectory('SystemPayment'));
 
         $statuses = $fileActivator->getRoutesStatuses();
 

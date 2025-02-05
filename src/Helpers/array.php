@@ -43,25 +43,28 @@ if (! function_exists('array_merge_recursive_distinct')) {
 
 if (! function_exists('array_merge_recursive_preserve')) {
 
-    function array_merge_recursive_preserve($array1, $array2)
+    function array_merge_recursive_preserve(...$arrays)
     {
-        foreach ($array1 as $key => $value) {
-            if (array_key_exists($key, $array2)) {
-                if (is_array($value) && is_array($array2[$key])) {
-                    // dd(
-                    //     $value,
-                    //     $array2[$key],
-                    //     array_merge_recursive_preserve($value, $array2[$key])
-                    // );
-                    $array2[$key] = array_merge_recursive_preserve($value, $array2[$key]);
-                } else {
-                    $array1[$key] = $array2[$key];
-                }
-            }
+        if (count($arrays) < 2) {
+            return $arrays[0] ?? [];
         }
 
-        // return $array2;
-        return array_merge($array1, $array2);
+        $result = array_shift($arrays);
+
+        foreach ($arrays as $array) {
+            foreach ($result as $key => $value) {
+                if (array_key_exists($key, $array)) {
+                    if (is_array($value) && is_array($array[$key])) {
+                        $array[$key] = array_merge_recursive_preserve($value, $array[$key]);
+                    } else {
+                        $result[$key] = $array[$key];
+                    }
+                }
+            }
+            $result = array_merge($result, $array);
+        }
+
+        return $result;
     }
 }
 
@@ -199,11 +202,11 @@ if (! function_exists('add_route_to_config')) {
         array_shift($parts);
         array_pop($parts);
         array_pop($parts);
-        $export = implode("\n", $parts);
+        $export = "\t" . ltrim(implode("\n", $parts));
 
-        $pattern = "/(?<='routes'\s\=\>\s\[)([^\}]*)(\s{4}\],)/";
+        $pattern = "/(?<='routes'\s\=\>\s\[)([^\;]*)(\]\,[\n\s\t]?\]\;)/";
 
-        return preg_replace($pattern, '$1' . $export . "\n" . '$2', $content);
+        return preg_replace($pattern, '$1' . $export . "\n\t" . '$2', $content);
     }
 }
 

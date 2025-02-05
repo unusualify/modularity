@@ -30,6 +30,6 @@ class Authorized extends Model
 
     public function getTable()
     {
-        return unusualConfig('tables.authorizeds', 'modularity_authorizeds');
+        return modularityConfig('tables.authorizeds', 'modularity_authorizeds');
     }
 }

@@ -108,13 +108,6 @@ if (! function_exists('makeMorphToMethodName')) {
     }
 }
 
-if (! function_exists('makeMorphToMethodName')) {
-    function makeMorphToMethodName($string)
-    {
-        return makeMorphName(camelCase($string));
-    }
-}
-
 if (! function_exists('makeMorphPivotTableName')) {
     function makeMorphPivotTableName($string)
     {
@@ -122,12 +115,16 @@ if (! function_exists('makeMorphPivotTableName')) {
     }
 }
 
-if (! function_exists('getMorphModelNameFromTableName')) {
-    function getMorphModelNameFromTableName($string)
+if (! function_exists('getMorphModelName')) {
+    function getMorphModelName($string)
     {
-        preg_match("/^(\w+)(ables)$/", $string, $matches);
+        preg_match("/^(\w+)(able[s]?)$/", $string, $matches);
 
-        return studlyName($matches[1]);
+        if ($matches && count($matches) > 1) {
+            return studlyName($matches[1]);
+        }
+
+        return Str::studly(Str::singular($string));
     }
 }
 

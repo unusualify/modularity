@@ -26,44 +26,58 @@ trait TranslationsTrait
     public function prepareFieldsBeforeSaveTranslationsTrait($object, $fields)
     {
         if ($this->model->isTranslatable()) {
-            $locales = getLocales();
-            $localesCount = count($locales);
             $attributes = Collection::make($this->model->translatedAttributes);
             $translationsFields = $fields['translations'] ?? [];
 
-            $submittedLanguages = Collection::make($fields['languages'] ?? []);
+            // Check if any translated fields are present
+            $hasTranslationFields = false;
+            foreach ($attributes as $attribute) {
+                if (isset($fields[$attribute]) || isset($translationsFields[$attribute])) {
+                    $hasTranslationFields = true;
 
-            $atLeastOneLanguageIsPublished = $submittedLanguages->contains(function ($language) {
-                return $language['published'];
-            });
-
-            foreach ($locales as $index => $locale) {
-                $submittedLanguage = Arr::first($submittedLanguages->filter(function ($lang) use ($locale) {
-                    return $lang['value'] == $locale;
-                }));
-
-                $shouldPublishFirstLanguage = ($index === 0 && ! $atLeastOneLanguageIsPublished);
-
-                $activeField = $shouldPublishFirstLanguage || (isset($submittedLanguage) ? $submittedLanguage['published'] : false);
-
-                $fields[$locale] = [
-                    'active' => $activeField,
-                ] + $attributes->mapWithKeys(function ($attribute) use (&$fields, $locale, $localesCount, $index, $translationsFields) {
-                    $attributeValue = $fields[$attribute] ?? $translationsFields[$attribute] ?? null;
-
-                    // if we are at the last locale,
-                    // let's unset this field as it is now managed by this trait
-                    if ($index + 1 === $localesCount) {
-                        unset($fields[$attribute]);
-                    }
-
-                    return [
-                        // $attribute => ($attributeValue[$locale] ?? null),
-                        $attribute => ($attributeValue[$locale] ?? $attributeValue ?? null),
-                    ];
-                })->toArray();
+                    break;
+                }
             }
 
+            // Only process translations if we have translation fields
+            if ($hasTranslationFields) {
+                $locales = getLocales();
+                $localesCount = count($locales);
+                $submittedLanguages = Collection::make($fields['languages'] ?? []);
+
+                $atLeastOneLanguageIsPublished = $submittedLanguages->contains(function ($language) {
+                    return $language['published'];
+                });
+
+                foreach ($locales as $index => $locale) {
+                    $submittedLanguage = Arr::first($submittedLanguages->filter(function ($lang) use ($locale) {
+                        return $lang['value'] == $locale;
+                    }));
+
+                    $shouldPublishFirstLanguage = ($index === 0 && ! $atLeastOneLanguageIsPublished);
+
+                    $activeField = $shouldPublishFirstLanguage || (isset($submittedLanguage) ? $submittedLanguage['published'] : false);
+
+                    $fields[$locale] = [
+                        'active' => $activeField,
+                    ] + $attributes->mapWithKeys(function ($attribute) use (&$fields, $locale, $localesCount, $index, $translationsFields) {
+                        $attributeValue = $fields[$attribute] ?? $translationsFields[$attribute] ?? null;
+
+                        // if we are at the last locale,
+                        // let's unset this field as it is now managed by this trait
+                        if ($index + 1 === $localesCount) {
+                            unset($fields[$attribute]);
+                        }
+
+                        return [
+                            // $attribute => ($attributeValue[$locale] ?? null),
+                            $attribute => ($attributeValue[$locale] ?? $attributeValue ?? null),
+                        ];
+                    })->toArray();
+                }
+            }
+
+            // Always clean up the languages field
             unset($fields['languages']);
         }
 

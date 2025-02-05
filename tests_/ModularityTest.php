@@ -10,13 +10,14 @@ use Unusualify\Modularity\Modularity;
 class ModularityTest extends TestCase
 {
     protected $modularity;
+
     protected $app;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->app = new Container();
+        $this->app = new Container;
         $this->app->instance('cache', app('cache'));
         $this->app->instance('config', app('config'));
 

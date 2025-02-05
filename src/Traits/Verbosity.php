@@ -48,16 +48,16 @@ trait Verbosity
 
     public function isVerbose()
     {
-        return OutputInterface::VERBOSITY_VERBOSE <= $this->verbosity;
+        return $this->verbosity >= OutputInterface::VERBOSITY_VERBOSE;
     }
 
     public function isVeryVerbose()
     {
-        return OutputInterface::VERBOSITY_VERY_VERBOSE <= $this->verbosity;
+        return $this->verbosity >= OutputInterface::VERBOSITY_VERY_VERBOSE;
     }
 
     public function isDebug()
     {
-        return OutputInterface::VERBOSITY_DEBUG <= $this->verbosity;
+        return $this->verbosity >= OutputInterface::VERBOSITY_DEBUG;
     }
 }

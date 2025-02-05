@@ -19,12 +19,6 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
      */
     public function boot()
     {
-        // config([
-        //     'modules.cache.enabled' => true,
-        //     'modules.cache.key' => 'modularity',
-        //     'modules.cache.lifetime' => 600
-        // ]);
-
         $this->bootModules();
     }
 
@@ -93,10 +87,10 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
             $namespace = $module->getClassNamespace($component_class_namespace);
             Blade::componentNamespace($namespace, snakeCase($module_name));
 
-            //LOAD MODULE TRANSLATION
+            // LOAD MODULE TRANSLATION
             $langPath = base_path('lang/modules/' . $module->getLowerName());
 
-            //Add lang paths to merge with laravel translations
+            // Add lang paths to merge with laravel translations
             $this->app['translator']->addPath($module->getDirectoryPath($lang_folder));
 
             if (is_dir($langPath)) {

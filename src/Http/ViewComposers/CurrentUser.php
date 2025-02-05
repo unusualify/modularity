@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Http\ViewComposers;
 
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\View\View;
+use Unusualify\Modularity\Facades\Modularity;
 
 class CurrentUser
 {
@@ -24,7 +25,7 @@ class CurrentUser
      */
     public function compose(View $view)
     {
-        $currentUser = $this->authFactory->guard('unusual_users')->user();
+        $currentUser = $this->authFactory->guard(Modularity::getAuthGuardName())->user();
 
         if ($currentUser) {
             $currentUser = get_user_profile($currentUser);

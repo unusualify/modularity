@@ -21,12 +21,12 @@ class NavigationMiddleware
     public function handle($request, Closure $next)
     {
         app()->config->set([
-            unusualBaseKey() . '-navigation.sidebar' => UNavigation::formatSidebarMenus(app()->config->get(unusualBaseKey() . '-navigation.sidebar')),
+            modularityBaseKey() . '-navigation.sidebar' => UNavigation::formatSidebarMenus(app()->config->get(modularityBaseKey() . '-navigation.sidebar')),
         ]);
         app()->config->set([
-            unusualBaseKey() . '.ui_settings.profileMenu' => UNavigation::formatSidebarMenus(app()->config->get(unusualBaseKey() . '.ui_settings.profileMenu')),
+            modularityBaseKey() . '.ui_settings.profileMenu' => UNavigation::formatSidebarMenus(app()->config->get(modularityBaseKey() . '.ui_settings.profileMenu')),
         ]);
-        view()->composer([unusualBaseKey() . '::layouts.master', 'translation::layout'], function ($view) {
+        view()->composer([modularityBaseKey() . '::layouts.master', 'translation::layout'], function ($view) {
 
             $navigation = [
                 'current_url' => url()->current(),
@@ -36,24 +36,24 @@ class NavigationMiddleware
             ];
 
             // dd(
-            //     config(unusualBaseKey() .'-navigation.sidebar')
+            //     config(modularityBaseKey() .'-navigation.sidebar')
             // );
             if (Auth::guest()) {
-                $navigation['sidebar'] = array_values(config(unusualBaseKey() . '-navigation.sidebar.guest'));
-                // $navigation['profileMenu'] = array_values( app()->config->get(unusualBaseKey(). '.ui_settings.profileMenu.client' ,default: []));
+                $navigation['sidebar'] = array_values(config(modularityBaseKey() . '-navigation.sidebar.guest'));
+                // $navigation['profileMenu'] = array_values( app()->config->get(modularityBaseKey(). '.ui_settings.profileMenu.client' ,default: []));
 
             } else {
                 $user = auth()->user();
                 if (count($user->roles) > 0 && $user->isClient()) {
-                    $navigation['sidebar'] = array_values(config(unusualBaseKey() . '-navigation.sidebar.client'));
-                    $navigation['profileMenu'] = array_values(app()->config->get(unusualBaseKey() . '.ui_settings.profileMenu.client', default: []));
+                    $navigation['sidebar'] = array_values(config(modularityBaseKey() . '-navigation.sidebar.client'));
+                    $navigation['profileMenu'] = array_values(app()->config->get(modularityBaseKey() . '.ui_settings.profileMenu.client', default: []));
 
                 } elseif ($user->hasRole(1)) {
-                    $navigation['sidebar'] = array_values(config(unusualBaseKey() . '-navigation.sidebar.superadmin'));
-                    $navigation['profileMenu'] = array_values(app()->config->get(unusualBaseKey() . '.ui_settings.profileMenu.superadmin', default: []));
+                    $navigation['sidebar'] = array_values(config(modularityBaseKey() . '-navigation.sidebar.superadmin'));
+                    $navigation['profileMenu'] = array_values(app()->config->get(modularityBaseKey() . '.ui_settings.profileMenu.superadmin', default: []));
                 } else {
-                    $navigation['sidebar'] = array_values(config(unusualBaseKey() . '-navigation.sidebar.default'));
-                    $navigation['profileMenu'] = array_values(app()->config->get(unusualBaseKey() . '.ui_settings.profileMenu.default', default: []));
+                    $navigation['sidebar'] = array_values(config(modularityBaseKey() . '-navigation.sidebar.default'));
+                    $navigation['profileMenu'] = array_values(app()->config->get(modularityBaseKey() . '.ui_settings.profileMenu.default', default: []));
                 }
 
             }
@@ -66,9 +66,9 @@ class NavigationMiddleware
 
         if (Auth::check() && false) {
             $role = 'guest';
-            //$role =  Auth::user()->menuroles;
+            // $role =  Auth::user()->menuroles;
             $userRoles = Auth::user()->getRoleNames();
-            //$userRoles = $userRoles['items'];
+            // $userRoles = $userRoles['items'];
             $roleHierarchy = RoleHierarchy::select('role_hierarchy.role_id', 'roles.name')
                 ->join('roles', 'roles.id', '=', 'role_hierarchy.role_id')
                 ->orderBy('role_hierarchy.hierarchy', 'asc')->get();
@@ -89,7 +89,7 @@ class NavigationMiddleware
         } else {
             $role = 'guest';
         }
-        //session(['prime_user_role' => $role]);
+        // session(['prime_user_role' => $role]);
         $menus = new GetSidebarMenu;
         $menulists = Menulist::all();
         $result = [];

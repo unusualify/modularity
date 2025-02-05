@@ -38,7 +38,7 @@ class CurrencyExchangeService
                 $parameters[$parameter] = $this->{$property};
             }
             // dd($parameters);
-            //https://api.freecurrencyapi.com/v1/latest?apikey={apiKey}&currencies=EUR%2CUSD%2CCAD&base_currency=TRY
+            // https://api.freecurrencyapi.com/v1/latest?apikey={apiKey}&currencies=EUR%2CUSD%2CCAD&base_currency=TRY
             $response = Http::get($this->endpoint, $parameters);
             // $response = Http::get($this->endpoint, [
             //     'app_id' => $this->apiKey,
@@ -55,8 +55,12 @@ class CurrencyExchangeService
 
     /**
      * Convert amount from base currency to target currency.
+     *
+     * @param float $amount Amount to convert
+     * @param string $targetCurrency Currency to convert to
+     * @param int $decimals Number of decimal places (default: 2)
      */
-    public function convertTo(float $amount, string $targetCurrency): float
+    public function convertTo(float $amount, string $targetCurrency, int $decimals = 2, string $round = 'round'): float
     {
         $rates = $this->fetchExchangeRates();
 
@@ -64,7 +68,14 @@ class CurrencyExchangeService
             throw new \Exception("Unsupported currency: {$targetCurrency}");
         }
 
-        return $amount * $rates[$targetCurrency];
+        if ($round == 'ceil') {
+            return ceil($amount * $rates[$targetCurrency]);
+        }
+        if ($round == 'floor') {
+            return floor($amount * $rates[$targetCurrency]);
+        }
+
+        return round($amount * $rates[$targetCurrency], $decimals);
     }
 
     /**

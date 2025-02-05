@@ -10,6 +10,6 @@ class Tag extends IlluminateTag
 
     public function getTable()
     {
-        return unusualConfig('tables.tags', parent::getTable());
+        return modularityConfig('tables.tags', parent::getTable());
     }
 }

@@ -84,7 +84,7 @@ class ThemeCreateCommand extends BaseCommand
             $extendTheme = select(
                 label: 'Which theme to be extended?',
                 options: $themes,
-                default: 'unusual'
+                default: 'unusualify'
             );
 
             $sassPath = get_modularity_vendor_path("vue/src/sass/themes/{$extendTheme}");

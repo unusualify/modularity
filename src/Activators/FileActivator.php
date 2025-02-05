@@ -107,7 +107,7 @@ class FileActivator extends ActivatorsFileActivator
      */
     private function config(string $key, $default = null)
     {
-        return $this->config->get(unusualBaseKey() . '.activators.file.' . $key, $default);
+        return $this->config->get(modularityBaseKey() . '.activators.file.' . $key, $default);
     }
 
     /**
@@ -118,7 +118,7 @@ class FileActivator extends ActivatorsFileActivator
      */
     public function getRoutesStatuses(): array
     {
-        if (! $this->config->get(unusualBaseKey() . '.cache.enabled')) {
+        if (! $this->config->get(modularityBaseKey() . '.cache.enabled')) {
             return $this->readRoutesJson();
         }
 

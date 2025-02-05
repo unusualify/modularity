@@ -17,6 +17,7 @@ use Modules\SystemUser\Repositories\UserRepository;
 use PragmaRX\Google2FA\Google2FA;
 use Socialite;
 use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Requests\Admin\OauthRequest;
 use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Traits\ManageUtilities;
@@ -83,8 +84,8 @@ class LoginController extends Controller
         $this->viewFactory = $viewFactory;
         $this->config = $config;
 
-        $this->middleware('unusual_guest', ['except' => 'logout']);
-        $this->redirectTo = unusualConfig('auth_login_redirect_path', '/');
+        $this->middleware('modularity.guest', ['except' => 'logout']);
+        $this->redirectTo = modularityConfig('auth_login_redirect_path', '/');
     }
 
     /**
@@ -92,7 +93,7 @@ class LoginController extends Controller
      */
     protected function guard()
     {
-        return $this->authManager->guard('unusual_users');
+        return $this->authManager->guard(Modularity::getAuthGuardName());
     }
 
     /**
@@ -128,16 +129,15 @@ class LoginController extends Controller
             $this->clearLoginAttempts($request);
 
             if ($response = $this->authenticated($request, $this->guard()->user())) {
-                // dd($response);
                 return $response;
             }
 
             return $request->wantsJson()
                 ? new JsonResponse([
                     'variant' => MessageStage::SUCCESS,
-                    'timeout' => 6000,
+                    'timeout' => 1500,
                     'message' => __('authentication.login-success-message'),
-                    'redirector' => $request->url(),
+                    'redirector' => redirect()->intended($this->redirectTo)->getTargetUrl(),
                 ], 200)
                 : $this->sendLoginResponse($request);
 
@@ -163,7 +163,7 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-        return $this->viewFactory->make(unusualBaseKey() . '::auth.login', [
+        return $this->viewFactory->make(modularityBaseKey() . '::auth.login', [
             'formAttributes' => [
                 // 'hasSubmit' => true,
 
@@ -322,7 +322,7 @@ class LoginController extends Controller
      */
     public function showLogin2FaForm()
     {
-        return $this->viewFactory->make(unusualBaseKey() . '::auth.2fa');
+        return $this->viewFactory->make(modularityBaseKey() . '::auth.2fa');
     }
 
     /**
@@ -356,22 +356,23 @@ class LoginController extends Controller
             $this->guard()->logout();
 
             $request->session()->put('2fa:user:id', $user->id);
+
             return $request->wantsJson()
                 ? new JsonResponse([
                     'redirector' => $this->redirector->to(route(Route::hasAdmin('admin.login-2fa.form')))->getTargetUrl(),
                 ])
                 : $this->redirector->to(route(Route::hasAdmin('admin.login-2fa.form')));
         }
-        // dd($request->wantsJson());
+
         return $request->wantsJson()
-        ? new JsonResponse([
-            'variant' => MessageStage::SUCCESS,
-            'timeout' => 1500,
-            'message' => __('authentication.login-success-message') ,
-            // 'redirector' => $this->redirectPath()
-            'redirector' => $request->url() . '?status=success',
-        ])
-        : $this->redirector->intended($this->redirectPath());
+            ? new JsonResponse([
+                'variant' => MessageStage::SUCCESS,
+                'timeout' => 1500,
+                'message' => __('authentication.login-success-message'),
+                // 'redirector' => $this->redirectPath()
+                'redirector' => $this->redirector->intended($this->redirectPath())->getTargetUrl() . '?status=success',
+            ])
+            : $this->redirector->intended($this->redirectPath());
 
         return $request->wantsJson()
             ? new JsonResponse([
@@ -403,7 +404,7 @@ class LoginController extends Controller
         );
 
         if ($valid) {
-            $this->authManager->guard('unusual_users')->loginUsingId($userId);
+            $this->authManager->guard(Modularity::getAuthGuardName())->loginUsingId($userId);
 
             $request->session()->pull('2fa:user:id');
 
@@ -422,8 +423,8 @@ class LoginController extends Controller
     public function redirectToProvider($provider, OauthRequest $request)
     {
         return Socialite::driver($provider)
-            ->scopes($this->config->get(unusualBaseKey() . '.oauth.' . $provider . '.scopes', []))
-            ->with($this->config->get(unusualBaseKey() . '.oauth.' . $provider . '.with', []))
+            ->scopes($this->config->get(modularityBaseKey() . '.oauth.' . $provider . '.scopes', []))
+            ->with($this->config->get(modularityBaseKey() . '.oauth.' . $provider . '.with', []))
             ->redirect();
     }
 
@@ -445,7 +446,7 @@ class LoginController extends Controller
                 $user = $repository->oauthUpdateProvider($oauthUser, $provider);
 
                 // Login and redirect
-                $this->authManager->guard('unusual_users')->login($user);
+                $this->authManager->guard(Modularity::getAuthGuardName())->login($user);
 
                 return $this->afterAuthentication($request, $user);
             } else {
@@ -462,7 +463,7 @@ class LoginController extends Controller
                     $user->linkProvider($oauthUser, $provider);
 
                     // Login and redirect
-                    $this->authManager->guard('unusual_users')->login($user);
+                    $this->authManager->guard(Modularity::getAuthGuardName())->login($user);
 
                     return $this->afterAuthentication($request, $user);
                 }
@@ -473,7 +474,7 @@ class LoginController extends Controller
             $user->linkProvider($oauthUser, $provider);
 
             // Login and redirect
-            $this->authManager->guard('unusual_users')->login($user);
+            $this->authManager->guard(Modularity::getAuthGuardName())->login($user);
 
             return $this->redirector->intended($this->redirectTo);
         }
@@ -507,7 +508,7 @@ class LoginController extends Controller
 
             // Link the provider and login
             $user->linkProvider($request->session()->get('oauth:user'), $request->session()->get('oauth:provider'));
-            $this->authManager->guard('unusual_users')->login($user);
+            $this->authManager->guard(Modularity::getAuthGuardName())->login($user);
 
             // Remove session variables
             $request->session()->forget('oauth:user_id');

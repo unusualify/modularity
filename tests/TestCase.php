@@ -3,14 +3,16 @@
 namespace Unusualify\Modularity\Tests;
 
 use Nwidart\Modules\LaravelModulesServiceProvider;
+use Spatie\Permission\PermissionServiceProvider;
 use Unusualify\Modularity\LaravelServiceProvider;
-use Unusualify\Modularity\Providers\UnusualProvider;
+use Unusualify\Modularity\Providers\ModularityProvider;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     public $path;
 
-    public $umodulesPath;
+    public $modulesPath;
+
 
     protected function setUp(): void
     {
@@ -21,7 +23,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $this->path = realpath(__DIR__ . '/..');
 
-        $this->umodulesPath = realpath($this->path . '/umodules');
+        $this->modulesPath = realpath($this->path . '/modules');
 
         // $app['cache'] = $this->createMock(CacheManager::class);
         // $app['files'] = $this->createMock(Filesystem::class);
@@ -34,7 +36,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         return [
             LaravelModulesServiceProvider::class,
             LaravelServiceProvider::class,
-            UnusualProvider::class,
+            ModularityProvider::class,
+            PermissionServiceProvider::class,
         ];
     }
 
@@ -49,6 +52,12 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $app['config']->set('cache.prefix', 'spatie_tests---');
         $app['config']->set('cache.default', getenv('CACHE_DRIVER') ?: 'array');
+        $app['config']->set('modules.scan.enabled', true);
+        $app['config']->set('modules.cache.enabled', false);
+        $app['config']->set('modules.scan.paths', [
+            base_path('vendor/*/*'),
+            realpath(__DIR__ . '/../modules'),
+        ]);
 
     }
 
@@ -82,8 +91,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     }
 
-    public function umoduleDirectory(string $moduleName): string
+    public function moduleDirectory(string $moduleName): string
     {
-        return realpath("{$this->umodulesPath}/{$moduleName}");
+        return realpath("{$this->modulesPath}/{$moduleName}");
     }
 }

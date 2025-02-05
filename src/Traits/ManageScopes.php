@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Traits;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 
 trait ManageScopes
@@ -52,14 +53,21 @@ trait ManageScopes
      */
     protected $filtersDefaultOptions = [];
 
-    /**
-     * Default orders for the index view.
-     *
-     * @var array
-     */
-    protected $defaultOrders = [
-        'created_at' => 'desc',
-    ];
+    // /**
+    //  * Default orders for the index view.
+    //  *
+    //  * @var array
+    //  */
+    // protected $defaultOrders = [
+    //     'created_at' => 'desc',
+    // ];
+    protected function __afterConstructManageScopes($app, $request)
+    {
+        $this->defaultTableOrders = (array) Config::get(modularityBaseKey() . '.default_table_orders', ['created_at' => 'desc']);
+
+        // $this->tableOrders = array_merge_recursive_preserve($this->getTableOrders(), $this->tableOrders ?? []);
+        $this->tableOrders = $this->getTableOrders();
+    }
 
     /**
      * @param array $prepend
@@ -93,7 +101,7 @@ trait ManageScopes
                     break;
             }
 
-            if (!Str::startsWith($requestFilters['status'], 'stateable')) {
+            if (! Str::startsWith($requestFilters['status'], 'stateable')) {
                 unset($requestFilters['status']);
             }
         }
@@ -110,26 +118,25 @@ trait ManageScopes
                 $value = $requestFilters[$key];
                 if ($value == 0 || ! empty($value)) {
                     // add some syntaxic sugar to scope the same filter on multiple columns
-
-                    $fieldSplitted = explode('|', $field);
-
-                    if ($key == 'search' && $field != 'search') {
+                    if ($field != '') {
                         $fieldSplitted = explode('|', $field);
+                        if ($key == 'search' && $field != 'search') {
+                            $fieldSplitted = explode('|', $field);
 
-                        $scope['searches'] = $fieldSplitted;
+                            $scope['searches'] = $fieldSplitted;
 
-                        $scope[$key] = $requestFilters[$key]; // search
-                    }
+                            $scope[$key] = $requestFilters[$key]; // search
+                        }
+                        if (count($fieldSplitted) > 1) {
+                            $requestValue = $requestFilters[$key];
 
-                    if (count($fieldSplitted) > 1) {
-                        $requestValue = $requestFilters[$key];
-
-                        // $scope[$scopeKey] =
-                        Collection::make($fieldSplitted)->each(function ($scopeKey) use (&$scope, $requestValue) {
-                            $scope[$scopeKey] = $requestValue;
-                        });
-                    } else {
-                        $scope[$field] = $requestFilters[$key];
+                            // $scope[$scopeKey] =
+                            Collection::make($fieldSplitted)->each(function ($scopeKey) use (&$scope, $requestValue) {
+                                $scope[$scopeKey] = $requestValue;
+                            });
+                        } else {
+                            $scope[$field] = $requestFilters[$key];
+                        }
                     }
                 }
             }
@@ -184,6 +191,7 @@ trait ManageScopes
     }
 
     /**
+    /**
      * @return array
      */
     protected function orderScope()
@@ -223,9 +231,29 @@ trait ManageScopes
         }
 
         // don't apply default orders if reorder is enabled
-        $reorder = $this->getIndexOption('reorder');
-        $defaultOrders = ($reorder ? [] : ($this->defaultOrders ?? []));
+        // $reorder = $this->getIndexOption('reorder');
+        // $defaultOrders = ($reorder ? [] : ($this->defaultOrders ?? []));
+        $defaultOrders = $this->getTableOrders();
 
         return $orders + $defaultOrders;
+    }
+
+    protected function getTableOrders()
+    {
+        if ((bool) $this->config) {
+            try {
+                return Collection::make(
+                    array_merge_recursive_preserve(
+                        $this->defaultTableOrders,
+                        object_to_array($this->getConfigFieldsByRoute('table_orders') ?? $this->getConfigFieldsByRoute('table_orders') ?? (object) []),
+                        $this->tableOrders ?? []
+                    )
+                )->toArray();
+            } catch (\Throwable $th) {
+                return $this->defaultTableOrders;
+            }
+        }
+
+        return array_merge_recursive_preserve($this->tableOrders ?? [], $this->defaultTableOrders);
     }
 }
