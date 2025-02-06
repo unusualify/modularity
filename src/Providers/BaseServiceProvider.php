@@ -277,12 +277,6 @@ class BaseServiceProvider extends ServiceProvider
         if (! config('modules.scan.enabled')) {
             throw new \Exception('Modules scan is not enabled, set scan.enabled to true in config/modules.php');
         }
-
-        // if(!$this->app->isProduction() && config('modules.cache.enabled')){
-        //     config([
-        //         'modules.cache.enabled' => false,
-        //     ]);
-        // }
     }
 
     /**
