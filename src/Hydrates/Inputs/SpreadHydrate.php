@@ -37,23 +37,27 @@ class SpreadHydrate extends InputHydrate
         }
 
         $module = Modularity::find($input['_moduleName']);
+        // dd($module);
+        // dd($module->getRepository($input['_routeName']));
+        $repository = $module->getRepository($input['_routeName']);
         $model = App::make($module->getRouteClass($input['_routeName'], 'model'));
-        // dd($model);
-
-        if (! isset($input['reservedKeys'])) {
+        // dd($repository, get_class_methods($repository));
+        // dd($repository);
+        if(!isset($input['reservedKeys'])){
             $input['reservedKeys'] = $model->getReservedKeys();
         }
 
         // $allInputs = $model->getRouteInputs();
-        $spreadableInputs = collect($model->getRouteInputs())
-            ->filter(function ($item) {
-                return isset($item['spreadable']) && $item['spreadable'] === true;
-            })
-            ->pluck('name');
-
-        if (! empty($spreadableInputs) || $spreadableInputs) {
-            // dd( array_merge($input['reservedKeys'], $spreadableInputs->toArray()));
-            $input['reservedKeys'] = array_merge($input['reservedKeys'], $spreadableInputs->toArray());
+        // dd($model->getRouteInputs());
+        // $spreadableInputs = collect($model->getRouteInputs())
+        //     ->filter(function ($item) {
+        //         return isset($item['spreadable']) && $item['spreadable'] === true;
+        //     })
+        //     ->pluck('name');
+        $spreadableInputs = $repository->getSpreadableInputKeys($model);
+        // dd($spreadableInputs);
+        if(!empty($spreadableInputs) || $spreadableInputs){
+            $input['reservedKeys'] = array_merge($input['reservedKeys'], $spreadableInputs);
         }
         // dd($input['reservedKeys']);
         // $input['reservedKeys'] = collect($this->module->getRouteInput($input['_routeName']))
