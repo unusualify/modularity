@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Json;
+use Unusualify\Modularity\Exceptions\ModularitySystemPathException;
 
 class Modularity extends FileRepository
 {
@@ -53,6 +54,11 @@ class Modularity extends FileRepository
     private $vendorDir = null;
 
     /**
+     * @var string
+     */
+    private $retainModulesPath = null;
+
+    /**
      * The constructor.
      *
      * @param string|null $path
@@ -67,6 +73,8 @@ class Modularity extends FileRepository
 
         $this->modularityCache = $app['cache'];
         $this->modularityConfig = $app['config'];
+
+        $this->retainModulesPath = $this->modularityConfig->get('modules.paths.modules');
     }
 
     /**
@@ -247,6 +255,24 @@ class Modularity extends FileRepository
     final public function isProduction()
     {
         return ! $this->isDevelopment();
+    }
+
+    public function setSystemModulesPath()
+    {
+        if($this->isProduction()){
+            throw new ModularitySystemPathException;
+        }
+
+        config([
+            'modules.paths.modules' => $this->getVendorPath('modules'),
+        ]);
+    }
+
+    public function revertSystemModulesPath()
+    {
+        config([
+            'modules.paths.modules' => $this->retainModulesPath,
+        ]);
     }
 
     public function getAppUrl()
