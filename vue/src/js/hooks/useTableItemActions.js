@@ -81,7 +81,6 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
           case '!=':
             return actualValue !== value;
           case '>':
-            __log(value, actualValue, actualValue > value)
             return actualValue > value;
           case '<':
             return actualValue < value;
@@ -90,7 +89,6 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
           case '<=':
             return actualValue <= value;
           case 'in':
-            __log(value, actualValue, Array.isArray(value) && value.includes(actualValue))
             return Array.isArray(value) && value.includes(actualValue);
           case 'not in':
             return Array.isArray(value) && !value.includes(actualValue);
