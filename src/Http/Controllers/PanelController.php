@@ -13,8 +13,8 @@ use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\UFinder;
-use Unusualify\Modularity\Traits\MakesResponses;
-use Unusualify\Modularity\Traits\ManageScopes;
+use Unusualify\Modularity\Http\Controllers\Traits\MakesResponses;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageScopes;
 
 abstract class PanelController extends CoreController
 {

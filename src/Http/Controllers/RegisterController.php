@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Unusualify\Modularity\Entities\Company;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Services\MessageStage;
-use Unusualify\Modularity\Traits\ManageUtilities;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 
 class RegisterController extends Controller
 {

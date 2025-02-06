@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\View\Factory as ViewFactory;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Services\MessageStage;
-use Unusualify\Modularity\Traits\ManageUtilities;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 
 class ForgotPasswordController extends Controller
 {

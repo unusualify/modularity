@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusualify\Modularity\Traits;
+namespace Unusualify\Modularity\Http\Controllers\Traits;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
