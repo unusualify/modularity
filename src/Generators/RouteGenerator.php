@@ -932,6 +932,10 @@ class RouteGenerator extends Generator
             $config['name'] = $config['name'] ?? $studlyName;
             $config['system_prefix'] = $config['system_prefix'] ?? $config['base_prefix'] ?? false;
             $config['headline'] = $config['headline'] ?? pluralize($headline);
+            if($this->module->isModularityModule()){
+                $config['group'] = 'system';
+                $config['system_prefix'] = true;
+            }
             // $config['parent_route'] = $route_array;
             $config['routes'] = $config['routes'] ?? [];
 
