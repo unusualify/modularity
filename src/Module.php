@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Nwidart\Modules\Laravel\Module as NwidartModule;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Unusualify\Modularity\Activators\FileActivator;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Support\Finder;
 
 class Module extends NwidartModule
@@ -196,6 +197,13 @@ class Module extends NwidartModule
         }
 
         return $path . (empty($directory) ? '/' : "/$directory");
+    }
+
+    public function isModularityModule()
+    {
+        $modularityModulesPath = Modularity::getVendorPath('modules');
+
+        return str_starts_with($this->getPath(), $modularityModulesPath);
     }
 
     /**
