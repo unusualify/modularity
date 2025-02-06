@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
+use Unusualify\Modularity\Facades\Modularity;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +17,6 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('models.{modelId}', function ($user, $modelId) {
     return $user->id == $modelId;
     return $user->id === $modelType::findOrNew($modelId);
-}, ['guards' => ['web', 'unusual_users']]);
+}, ['guards' => ['web', Modularity::getAuthGuardName()]]);
 
 

@@ -8,7 +8,7 @@ use Unusualify\Modularity\Facades\Modularity;
 
 trait IsAuthorizedable
 {
-    // public static $authorizedGuardName = 'modularity_users';
+    // public static $authorizedGuardName = 'modularity';
 
     // public $absoluteRolesAuthorized = [
     //     'admin',

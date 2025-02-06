@@ -70,7 +70,7 @@ return [
     |
     */
 
-    'middleware' => ['web', 'auth:unusual_users'],
+    'middleware' => ['web', 'auth:modularity'],
 
     /*
     |--------------------------------------------------------------------------
