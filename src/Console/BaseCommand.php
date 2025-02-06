@@ -16,7 +16,7 @@ use function Laravel\Prompts\confirm;
 
 abstract class BaseCommand extends Command implements PromptsForMissingInput
 {
-    use ManageNames, ModuleCommandTrait;
+    use ManageNames;
 
     /**
      * The name of 'name' argument.
@@ -38,14 +38,26 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
     protected $test = false;
 
     /**
+     * Whether to use trait options.
+     *
+     * @var bool
+     */
+    public $useTraitOptions = false;
+
+    /**
      * Create a new command instance.
      *
      * @return void
      */
     public function __construct()
     {
+        if($this->signature && $this->useTraitOptions){
+            $this->signature .= ' ' . modularityTraitOptions(asSignature: true);
+        }
+
         parent::__construct();
 
+        $this->configBaseKey = \Illuminate\Support\Str::snake(env('MODULARITY_BASE_NAME', 'Modularity'));
         $this->configBaseKey = \Illuminate\Support\Str::snake(env('MODULARITY_BASE_NAME', 'Modularity'));
 
         Stub::setBasePath($this->baseConfig('stubs.path', dirname(__FILE__) . '/stubs'));
@@ -76,14 +88,7 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
     public function handle(): int
     {
         $path = str_replace('\\', '/', $this->getDestinationFilePath());
-        // dd(
-        //     // get_class_methods($this),
-        //     // $this->getDefinition()
-        //     // $this->getSynopsis(true),
-        //     // $this->getSynopsis(),
-        //     // $this->getUsages(),
-        //     // strtolower($this->getDescription())
-        // );
+
         $description = trim(mb_strtolower($this->getDescription()), '.');
 
         $runnable = ! $this->hasOption('test')
@@ -202,5 +207,23 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
     protected function getTest()
     {
         return $this->test;
+    }
+
+        /**
+     * Get the module name.
+     *
+     * @return string
+     */
+    public function getModuleName()
+    {
+        $module = $this->argument('module') ?: null;
+
+        if(!$module) {
+            return null;
+        }
+
+        $module = app('modules')->findOrFail($module);
+
+        return $module->getStudlyName();
     }
 }
