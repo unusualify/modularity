@@ -300,18 +300,29 @@ if (! function_exists('activeModularityTraits')) {
 
 if (! function_exists('modularityTraitOptions')) {
     /**
-     * @return array
+     * @param bool $asSignature Return as command signature string instead of array
+     * @return array|string
      */
-    function modularityTraitOptions()
+    function modularityTraitOptions($asSignature = false)
     {
-        return Collection::make(Config::get(modularityBaseKey() . '.traits'))->map(function ($trait, $key) {
+        $options = Collection::make(Config::get(modularityBaseKey() . '.traits'))->map(function ($trait, $key) use ($asSignature) {
+            if ($asSignature) {
+                $shortcut = isset($trait['command_option']['shortcut']) ? $trait['command_option']['shortcut'] . '|' . $key : '--' . $key;
+                $valueType = ($trait['command_option']['input_type'] ?? InputOption::VALUE_NONE) !== InputOption::VALUE_NONE ? '=' : '';
+                $description = $trait['command_option']['description'] ?? '';
+
+                return sprintf("\n{%s%s : %s}", $shortcut, $valueType, $description);
+            }
+
             return [
                 $key,
                 $trait['command_option']['shortcut'] ?? null,
                 $trait['command_option']['input_type'] ?? InputOption::VALUE_NONE,
                 $trait['command_option']['description'] ?? '',
             ];
-        })->values()->toArray();
+        });
+
+        return $asSignature ? $options->implode(' ') : $options->values()->toArray();
     }
 }
 
