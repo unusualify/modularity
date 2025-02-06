@@ -18,7 +18,7 @@ return [
         'repository' => 'ImagesTrait',
         'question' => 'Do you need to attach images on this module?',
         'command_option' => [
-            'shortcut' => '--M',
+            'shortcut' => '--I',
             'input_type' => InputOption::VALUE_NONE,
             'description' => 'Do you need to attach images on this module?',
         ],
@@ -80,7 +80,7 @@ return [
         'repository' => 'FilepondsTrait',
         'question' => 'Do you need to attach fileponds on this module?',
         'command_option' => [
-            'shortcut' => '--FP',
+            'shortcut' => null,
             'input_type' => InputOption::VALUE_NONE,
             'description' => 'Do you need to attach fileponds on this module?',
         ],
@@ -100,7 +100,7 @@ return [
         'repository' => null,
         'question' => 'Do you need to attach snapshot feature on this module route?',
         'command_option' => [
-            'shortcut' => '--SS',
+            'shortcut' => null,
             'input_type' => InputOption::VALUE_NONE,
             'description' => 'Do you need to attach snapshot feature on this module route?',
         ],
