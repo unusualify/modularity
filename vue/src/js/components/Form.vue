@@ -40,7 +40,7 @@
                       <template v-slot:activator="{ props }">
                         <v-switch
                           v-if="action.type === 'publish'"
-                          :modelValue="editedItem[action.key ?? 'published'] ?? action.default ?? false"
+                          :modelValue="model[action.key ?? 'published'] ?? action.default ?? false"
                           @update:modelValue="handleAction(action)"
                         />
                         <v-btn
@@ -82,7 +82,7 @@
                           @updatex:modelValue="$log($event)"
                           :title="action.formTitle ?? null"
                           :schema="action.schema"
-                          :action-url="action.endpoint.replace(':id', editedItem.id)"
+                          :action-url="action.endpoint.replace(':id', model.id)"
                           :valid="extraValids[key]"
                           @update:valid="extraValids[key] = $event"
                           has-divider
@@ -97,7 +97,7 @@
 
               <FormActions
                 v-if="isEditing"
-                :modelValue="editedItem"
+                :modelValue="issetModel ? modelValue : $store.state.form.editedItem"
                 :actions="actions"
                 :is-editing="isEditing"
                 @action-complete="$emit('actionComplete', $event)"
@@ -119,7 +119,7 @@
                       />
                       <ue-recursive-stuff v-else-if="topInput.viewOnlyComponent"
                         :configuration="topInput.viewOnlyComponent"
-                        :bind-data="editedItem"
+                        :bind-data="model"
                         v-bind="props"
                       />
                       <v-menu v-else
@@ -191,7 +191,7 @@
       <div :class="['d-flex', scrollable ? 'flex-grow-1 overflow-hidden mr-n5' : '']">
         <div :class="['w-100', scrollable ? 'overflow-y-auto pr-3' : '']"
         >
-          <slot name="top" v-bind="{item: editedItem, schema}"></slot>
+          <slot name="top" v-bind="{item: model, schema}"></slot>
 
           <v-custom-form-base
             :id="`ue-wrapper-${id}`"

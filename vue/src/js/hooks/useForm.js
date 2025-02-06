@@ -27,32 +27,7 @@ export default function useForm(props, context) {
   const issetModel = ref(Object.keys(props.modelValue).length > 0)
   const issetSchema = ref(Object.keys(props.schema).length > 0)
 
-  // const manualValidation = ref(false)
-  // const id = ref(Math.ceil(Math.random() * 1000000) + '-form')
-  // const VForm = ref(null)
-  // const hasStickyFrame = ref(props.stickyFrame || props.stickyButton)
-  // const model = ref(issetModel.value ? props.modelValue : store.state.form.editedItem)
-  // const inputSchema = ref(null)
-  // const topSchema = ref(null)
-  // const extraValids = ref([])
-
   const editedItem = computed(() => store.state.form.editedItem)
-  // const serverValid = computed(() => store.state.form.serverValid)
-
-
-  // __log(editedItem.value)
-  // Computed
-  // const buttonDefaultText = computed(() =>
-  //   props.buttonText ? (te(props.buttonText) ? t(props.buttonText) : props.buttonText) : t('submit')
-  // )
-
-  // const loading = computed(() =>
-  //   props.actionUrl ? formLoading.value : store.state.form.loading
-  // )
-
-  // const errors = computed(() =>
-  //   props.actionUrl ? formErrors.value : store.state.form.errors
-  // )
 
   const reference = computed(() => 'ref-' + id.value)
 
@@ -61,6 +36,7 @@ export default function useForm(props, context) {
     VForm: null,
     model: issetModel.value ? props.modelValue : store.state.form.editedItem,
     // issetModel: Object.keys(props.modelValue).length > 0,
+    issetModel,
     issetSchema,
     hasStickyFrame: props.stickyFrame || props.stickyButton,
     inputSchema: null,
@@ -82,7 +58,7 @@ export default function useForm(props, context) {
       props.actionUrl ? formErrors.value : store.state.form.errors
     ),
     reference: computed(() => 'ref-' + states.id),
-    hasTraslationInputs: computed(() => getTranslationInputsCount(rawSchema.value) > 0),
+    hasTraslationInputs: computed(() => getTranslationInputsCount(states.inputSchema) > 0),
     flattenedActions: computed(() => __isObject(props.actions) ? Object.values(props.actions) : props.actions),
     hasActions: computed(() => states.flattenedActions.length > 0),
   })
@@ -241,7 +217,8 @@ export default function useForm(props, context) {
 
     states.model = getModel(
       rawSchema.value,
-      issetModel.value ? props.modelValue : editedItem.value,
+      // issetModel.value ? props.modelValue : editedItem.value,
+      issetModel.value ? props.modelValue : store.state.form.editedItem,
       store.state,
     )
 
@@ -260,7 +237,7 @@ export default function useForm(props, context) {
       return result
     },
     createModel: (schema) => {
-      return getModel(schema, editedItem.value, store.state)
+      return getModel(schema, states.model.value, store.state)
     },
     handleInput: (v, s) => {
       const { on, key, obj } = v
