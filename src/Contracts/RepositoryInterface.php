@@ -94,6 +94,13 @@ interface RepositoryInterface
      */
     public function findOrFail(string $name);
 
+    /**
+     * Get module path for a specific module.
+     *
+     * @param $module
+     *
+     * @return string
+     */
     public function getModulePath($moduleName);
 
     /**
