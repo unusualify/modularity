@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 trait HasSpreadsheetable
 {
+
+    protected $_pendingSpreadsheetData = [];
+
     /**
      * Perform any actions when booting the trait
      *
@@ -23,7 +26,18 @@ trait HasSpreadsheetable
 
         static::updated(function (Model $model) {});
 
-        static::saving(function (Model $model) {});
+        static::saving(function (Model $model) {
+            // dd($model);
+            if (!$model->exists) {
+                // For new models, preserve the spreadsheet data for after creation.
+                $model->_pendingSpreadData = array_merge($model->_pendingSpreadsheetData, $model->_spreadsheet);
+
+            } else if($model->_spread){
+                $model->spreadsheetable()->update([
+                    'content' => json_encode($model->_spreadsheet)
+                ]);
+            }
+        });
 
         static::saved(function (Model $model) {});
 
@@ -49,7 +63,13 @@ trait HasSpreadsheetable
      */
     public function initializeHasSpreadsheetable(): void
     {
+        $spreadsheetableFields = ['_spreadsheet'];
+        $this->mergeFillable($spreadsheetableFields);
+    }
 
+    public function spreadsheetable(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(\Unusualify\Modularity\Entities\Spreadsheet::class, 'spreadsheetable');
     }
 
 }

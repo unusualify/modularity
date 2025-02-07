@@ -45,10 +45,10 @@
         />
 
         <v-btn
-          v-if="sampleFileUrl"
+          v-if="example_file"
           color="info"
           icon="mdi-download"
-          :href="sampleFileUrl"
+          :href="example_file"
           target="_blank"
           variant="tonal"
         />
@@ -94,7 +94,7 @@ import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 // Props
 const props = defineProps({
   ...makeInputProps(),
-  columns: {
+  sheet_columns: {
     type: Array,
     default: () => [
       { value: 'Yayin_Adi' },
@@ -102,7 +102,7 @@ const props = defineProps({
       { value: 'highlighted' }
     ]
   },
-  sampleFileUrl: {
+  example_file: {
     type: String,
     default: ''
   }
@@ -139,6 +139,8 @@ onMounted(() => {
     fileInput.value = [new File([], 'existing-data.xlsx')]
     processTableData()
   }
+  console.log(props.example_file)
+
 })
 
 // Watch for external changes
@@ -213,7 +215,7 @@ const processData = (data) => {
 
   if (hasValidHeaders) {
     return data.map(row => {
-      return props.columns.reduce((acc, col) => {
+      return props.sheet_columns.reduce((acc, col) => {
         acc[col.value] = row[col.value] || ''
         return acc
       }, {})

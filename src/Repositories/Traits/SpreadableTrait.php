@@ -108,7 +108,7 @@ trait SpreadableTrait
     {
         // Get the spreadable model instance
         $spreadableModel = $object->spreadable()->first();
-
+        // dd($fields);
         $currentJson = $spreadableModel->content;
         $newJson = array_merge(
             $currentJson,
@@ -151,5 +151,12 @@ trait SpreadableTrait
         }
         return $fields;
     }
+    protected function prepareFieldsBeforeCreateSpreadableTrait($fields){
+        if(isset($fields['_spread'])){
+            return $fields;
+        }
+        return $this->prepareFieldsBeforeSaveSpreadableTrait($this->model, $fields);
+    }
+
 
 }

@@ -21,6 +21,7 @@ trait HasSpreadable
                 // For new models, preserve the spread data for after creation.
                 // dd($model);
                 // dd($model->attributesToArray(), $model->fillable);
+                // dd($model->_pendingSpreadData, $model->_spread)
                 $model->_pendingSpreadData = array_merge($model->_pendingSpreadData, $model->_spread);
                 // dd($model, $model->_spread, $model->_pendingSpreadData);
                 // dd($model->attributesToArray());
