@@ -11,13 +11,16 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageEvents;
+use Unusualify\Modularity\Http\Controllers\Traits\ManagePrevious;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageSingleton;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularity\Services\MessageStage;
-use Unusualify\Modularity\Traits\ManagePrevious;
-use Unusualify\Modularity\Traits\ManageUtilities;
+
 
 abstract class BaseController extends PanelController
 {
-    use ManagePrevious, ManageUtilities;
+    use ManagePrevious, ManageUtilities, ManageEvents, ManageSingleton;
 
     /**
      * @var string
@@ -133,17 +136,23 @@ abstract class BaseController extends PanelController
         //         'create'
         //     ));
         // }
-        // dd();
+
+        // $items = $this->repository->getModel()->all();
+        // $item = $items[0];
+        // $this->handleActionEvent($item, __FUNCTION__);
+
+        // event(new ModelCreatedEvent($model));
+        // ModelCreatedEvent::dispatch($model);
+        // ModelCreatedEvent::dispatchIf($this->request->ajax(), $model);
+
+
+
         $item = $this->repository->create($input + $optionalParent, $this->getPreviousRouteSchema());
 
         activity()->performedOn($item)->log('created');
 
         // $this->fireEvent($input);
 
-        // dd(
-        //     $parentModuleId,
-        //     $input
-        // );
         Session::put($this->routeName . '_retain', true);
 
         if (isset($input['cmsSaveType']) && Str::endsWith($input['cmsSaveType'], '-close')) {
@@ -189,17 +198,7 @@ abstract class BaseController extends PanelController
             // $this->repository->getFormFields($item, $this->formSchema),
         );
 
-        // dd(
-        //     $this->formSchema,
-        //     $item->attributesToArray(),
-        //     $this->repository->getShowFields($item, $this->formSchema),
-        //     $this->repository->getFormFields($item, $this->formSchema),
-        //     array_merge(
-        //         $item->attributesToArray(),
-        //         $this->repository->getShowFields($item),
-        //         $this->repository->getFormFields($item, $this->formSchema),
-        //     )
-        // );
+
         if ($this->request->ajax()) {
             return $data;
             // return $indexData + ['replaceUrl' => true];
@@ -235,7 +234,7 @@ abstract class BaseController extends PanelController
      * @param int|null $submoduleId
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
-    public function edit($id)
+    public function edit($id = null)
     {
         $params = $this->request->route()->parameters();
 
@@ -271,7 +270,11 @@ abstract class BaseController extends PanelController
 
         $id = last($params);
 
-        $item = $this->repository->getById($id);
+        if($this->isSingleton){
+            $item = $this->repository->getModel()->single();
+        }else{
+            $item = $this->repository->getById($id);
+        }
         $input = $this->request->all();
 
         if (isset($input['cmsSaveType']) && $input['cmsSaveType'] === 'cancel') {
