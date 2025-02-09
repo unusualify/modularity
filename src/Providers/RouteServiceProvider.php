@@ -205,14 +205,9 @@ class RouteServiceProvider extends ServiceProvider
                     Route::moduleRoutes($module);
                 }
             );
-            // dd(
-            //     ModularityRoutes::webMiddlewares(),
-            //     $groupOptions,
-            //     $_groupOptions
-            // );
+
             $router->group([
                 ...[
-                    // 'middleware' => ModularityRoutes::webPanelMiddlewares(),
                     'middleware' => ModularityRoutes::webMiddlewares(),
                     'namespace' => $module->getClassNamespace("{$front_controller_namespace}"),
                 ],
@@ -232,19 +227,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     private function bootRouteMiddlewares(Router $router)
     {
-        // Route::aliasMiddleware(
-        //     'supportSubdomainRouting',
-        //     SupportSubdomainRouting::class
-        // );
-        // Route::aliasMiddleware('twill_auth', Authenticate::class);
-        // Route::aliasMiddleware('twill_guest', RedirectIfAuthenticated::class);
-        // Route::aliasMiddleware(
-        //     'validateBackHistory',
-        //     ValidateBackHistory::class
-        // );
-
         ModularityRoutes::generateRouteMiddlewares();
-
     }
 
     /**
@@ -286,31 +269,6 @@ class RouteServiceProvider extends ServiceProvider
             //         $controllerName . 'Controller@show'
             //     )
             //     ->middleware(['web', 'twill_auth:twill_users', 'can:list']);
-        });
-
-        Route::macro('singleton', function (
-            $slug,
-            $options = [],
-            $resource_options = [],
-            $resource = true
-        ) {
-            // $pluralSlug = Str::plural($slug);
-            // $modelName = Str::studly($slug);
-
-            // Route::module($pluralSlug, $options, $resource_options, $resource);
-
-            // $lastRouteGroupName = RouteServiceProvider::getLastRouteGroupName();
-
-            // $groupPrefix = RouteServiceProvider::getGroupPrefix();
-
-            // // Check if name will be a duplicate, and prevent if needed/allowed
-            // if (RouteServiceProvider::shouldPrefixRouteName($groupPrefix, $lastRouteGroupName)) {
-            //     $singletonRouteName = "{$groupPrefix}.{$slug}";
-            // } else {
-            //     $singletonRouteName = $slug;
-            // }
-
-            // Route::get($slug, $modelName . 'Controller@editSingleton')->name($singletonRouteName);
         });
     }
 
@@ -372,12 +330,17 @@ class RouteServiceProvider extends ServiceProvider
 
                     foreach ($routes as $key => $item) {
                         $middlewares = $module->getRouteMiddlewareAliases($item['name']);
+                        $isSingleton = $module->isSingleton($item['name']);
 
                         if (isset($item['name'])) { // && getStringOrFalse($item['name'])
                             $itemKebabName = kebabCase($item['name']);
                             $itemStudlyName = studlyName($item['name']);
                             $itemSnakeName = snakeCase($item['name']);
+
                             $routeUrlSegment = $item['url'] ?? pluralize($itemKebabName);
+                            if($isSingleton){
+                                $routeUrlSegment = Str::singular($routeUrlSegment);
+                            }
 
                             $controllerName = $itemStudlyName . 'Controller';
 
@@ -446,23 +409,14 @@ class RouteServiceProvider extends ServiceProvider
 
                             }
 
-                            // $url = $system_prefix . $url;
                             $resourceOptions = [
                                 'as' => implode('.', $resourceOptionsAs),
                                 'names' => $resourceOptionsNames,
                             ];
 
                             $resourceOptionsAs[] = $itemSnakeName;
-                            // $resourceOptionsAs[] = snakeCase(studlyName(Str::singular($routeUrlSegment)));
-                            // dd(
-                            //     $url,
-                            //     $prefixes,
-                            //     get_defined_vars()
-                            // );
-                            // if($item['name'] == 'User'){
-                            //     dd($routeUrlSegment, $resourceOptionsAs, $resourceOptions, $parameters);
-                            // }
                             Route::middleware($middlewares)->prefix(implode('/', $prefixes))->group(function () use (
+                                $isSingleton,
                                 $controllerName,
                                 $routeUrlSegment,
                                 $itemStudlyName,
@@ -470,17 +424,20 @@ class RouteServiceProvider extends ServiceProvider
                                 $resourceOptions,
                                 $parameters,
                             ) {
-                                // dd(
-                                //     get_defined_vars()
-                                // );
 
-                                Route::additionalRoutes($routeUrlSegment, $itemStudlyName, [
-                                    'as' => implode('.', $resourceOptionsAs),
-                                ]);
+                                if($isSingleton){
+                                    Route::singleton($routeUrlSegment, $controllerName, $resourceOptions);
+                                    // Route::get($routeUrlSegment, $controllerName . '@editSingleton')->name($itemSnakeName);
+                                }else{
+                                    Route::additionalRoutes($routeUrlSegment, $itemStudlyName, [
+                                        'as' => implode('.', $resourceOptionsAs),
+                                    ]);
 
-                                Route::resource($routeUrlSegment, $controllerName, $resourceOptions)
-                                    // ->scoped($scoped)
-                                    ->parameters($parameters);
+                                    Route::resource($routeUrlSegment, $controllerName, $resourceOptions)
+                                        // ->scoped($scoped)
+                                        ->parameters($parameters);
+                                }
+
                             });
                         }
 
@@ -524,12 +481,16 @@ class RouteServiceProvider extends ServiceProvider
                     );
 
                     foreach ($routes as $key => $item) {
+                        $isSingleton = $module->isSingleton($item['name']);
 
                         if (isset($item['name'])) { // && getStringOrFalse($item['name'])
                             $itemKebabName = kebabCase($item['name']);
                             $itemStudlyName = studlyName($item['name']);
                             $itemSnakeName = snakeCase($item['name']);
                             $routeUrlSegment = $item['url'] ?? pluralize($itemKebabName);
+                            if($isSingleton){
+                                $routeUrlSegment = Str::singular($routeUrlSegment);
+                            }
 
                             $controllerName = $itemStudlyName . 'Controller';
 
@@ -547,47 +508,8 @@ class RouteServiceProvider extends ServiceProvider
                             }
 
                             $parameters[$routeUrlSegment] = $itemSnakeName;
-                            // $parameters[$routeUrlSegment] = snakeCase(studlyName(Str::singular($routeUrlSegment)));
-
-                            // if(isset($item['belongs']) && $item['belongs']){
-                            //     foreach ($item['belongs'] as $key => $belong) {
-                            //         $belongRoute = $module->getRouteConfigs($belong);
-                            //         if($belongRoute){
-                            //             $belongRouteName = $belongRoute['route_name'] ?? snakeCase($belongRoute['name']); // package_region
-                            //             $belongRouteUrl = $belongRoute['url'] ?? pluralize(kebabCase($belongRoute['name'])); // package-regions
-                            //             // Route::prefix('packages')->group(function(){
-                            //             //     Route::resource('package-regions.package-countries', 'PackageCountryController', [
-                            //             //         'as' => 'package_region',
-                            //             //         'names' => 'package_region.nested.package_country',
-                            //             //     ]);
-                            //             // });
-                            //             Route::prefix($parentUrlSegment)->group(function() use(
-                            //                 $parentSnakeName,
-                            //                 $routeUrlSegment,
-                            //                 $itemSnakeName,
-                            //                 $controllerName,
-                            //                 $belongRouteUrl,
-                            //                 $belongRouteName,
-                            //                 $parameters
-                            //             ){
-                            //                 $resourceRegistrar = Route::resource("{$belongRouteUrl}.{$routeUrlSegment}", $controllerName, [
-                            //                     'as' => $parentSnakeName,
-                            //                     'names' => nestedRouteNameFormat($belongRouteName, $itemSnakeName),
-                            //                 ])->parameters($parameters + [
-                            //                     $belongRouteUrl => $belongRouteName
-                            //                 ]);
-                            //                 $resourceRegistrar->only([
-                            //                     'index',
-                            //                     'create',
-                            //                     'store'
-                            //                 ]);
-                            //             });
-                            //         }
-                            //     }
-                            // }
 
                             if (($isNotParent = ! (isset($item['parent']) && $item['parent'])) || $parentUrlSegment !== $routeUrlSegment) { // unless parent route
-                                // $url = $parentUrlSegment . "/" . $url;
                                 $prefixes[] = $parentUrlSegment;
 
                                 if ($isNotParent) {
@@ -596,7 +518,6 @@ class RouteServiceProvider extends ServiceProvider
 
                             }
 
-                            // $url = $system_prefix . $url;
                             $resourceOptions = [
                                 'as' => implode('.', $resourceOptionsAs),
                                 'names' => $resourceOptionsNames,
@@ -605,24 +526,19 @@ class RouteServiceProvider extends ServiceProvider
                             $resourceOptionsAs[] = $itemSnakeName;
 
                             Route::prefix(implode('/', $prefixes))->group(function () use (
+                                $isSingleton,
                                 $controllerName,
                                 $routeUrlSegment,
                                 $resourceOptions,
                                 $parameters,
                             ) {
-                                // Route::additionalRoutes($routeUrlSegment, $itemStudlyName, [
-                                //     'as' => implode( '.', $resourceOptionsAs)
-                                // ]);
-                                // dd(
-                                //     $routeUrlSegment,
-                                //     $controllerName,
-                                //     $resourceOptions,
-                                //     $parameters
-                                // );
-
-                                Route::resource($routeUrlSegment, $controllerName, $resourceOptions + ['only' => ['index', 'create', 'store', 'show']])
-                                    // ->scoped($scoped)
-                                    ->parameters($parameters);
+                                if($isSingleton){
+                                    Route::singleton($routeUrlSegment, $controllerName, $resourceOptions);
+                                }else{
+                                    Route::resource($routeUrlSegment, $controllerName, $resourceOptions + ['only' => ['index', 'create', 'store', 'show']])
+                                        // ->scoped($scoped)
+                                        ->parameters($parameters);
+                                }
                             });
                         }
 
