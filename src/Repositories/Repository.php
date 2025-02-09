@@ -359,7 +359,12 @@ abstract class Repository
         $this->traitColumns = $this->setColumns($this->traitColumns, $schema ?? $this->chunkInputs(all: true));
 
         DB::transaction(function () use ($id, $fields) {
-            $object = $this->model->findOrFail($id);
+
+            if(classHasTrait($this->model, 'Unusualify\Modularity\Entities\Traits\IsSingular')){
+                $object = $this->model->single();
+            }else{
+                $object = $this->model->findOrFail($id);
+            }
 
             $this->beforeSave($object, $fields);
 
