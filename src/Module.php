@@ -7,6 +7,7 @@ use Illuminate\Foundation\AliasLoader;
 use Illuminate\Foundation\ProviderRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -311,6 +312,14 @@ class Module extends NwidartModule
         return count(($pr = $this->getParentRoute())) > 0 && $pr['name'] == studlyName($routeName);
     }
 
+    public function isSingleton($routeName)
+    {
+        $singularTrait = 'Unusualify\Modularity\Entities\Traits\IsSingular';
+        $repository = $this->getRouteClass($routeName, 'repository', true);
+
+        return classHasTrait(App::make($repository)->getModel(), $singularTrait);
+    }
+
     /**
      * hasSystemPrefix
      */
@@ -508,13 +517,20 @@ class Module extends NwidartModule
         return Collection::make($this->getModuleUris())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name))->toArray();
     }
 
-    public function getRouteActionUri($routeName, $action, $replacements = []): string
+    public function getRouteActionUri($routeName, $action, $replacements = [], $absolute = false): string
     {
         $quote = preg_quote('.' . $action);
 
-        $endpoint = '/' . Collection::make($this->getRouteUris($routeName))->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name))->first();
+        $endpoint = '/' . Collection::make($this->getRouteUris($routeName))
+            ->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name))->first();
 
-        return replace_curly_braces($endpoint, $replacements);
+        $endpoint = replace_curly_braces($endpoint, $replacements);
+
+        if($absolute){
+            return url($endpoint);
+        }
+
+        return $endpoint;
     }
 
     public function getParentNamespace(string $target): string
@@ -532,13 +548,17 @@ class Module extends NwidartModule
         return $this->getDirectoryPath(GenerateConfigReader::read(kebabCase($target))->getPath()) . ($className ? '/' . $className : '');
     }
 
-    public function getRouteClass(string $routeName, string $target): string
+    public function getRouteClass(string $routeName, string $target, $asClass = false): string
     {
         $className = studlyName($routeName);
 
         if (! preg_match('/model/', kebabCase($target))) {
             $className .= studlyName($target);
         }
+
+        // if($asClass){
+        //     return App::make($this->getParentNamespace($target) . '\\' . $className);
+        // }
 
         return $this->getParentNamespace($target) . '\\' . $className;
     }
