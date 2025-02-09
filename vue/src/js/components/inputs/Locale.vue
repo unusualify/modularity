@@ -229,6 +229,10 @@ export default {
         if (this.input && __isset(this.input[lang])) {
           this.input[lang] = value
           this.updateModelValue(this.input)
+        } else if (this.input && !__isset(this.input[lang]) && value) {
+          this.input = {}
+          this.input[lang] = value
+          this.updateModelValue(this.input)
         } else if (!this.input && value) {
           this.input = {}
           // __log(this.input, value)
