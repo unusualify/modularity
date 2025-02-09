@@ -35,6 +35,7 @@ export default function useForm(props, context) {
     id: Math.ceil(Math.random() * 1000000) + '-form',
     VForm: null,
     model: issetModel.value ? props.modelValue : store.state.form.editedItem,
+    formItem: computed(() => issetModel.value ? props.modelValue : store.state.form.editedItem),
     // issetModel: Object.keys(props.modelValue).length > 0,
     issetModel,
     issetSchema,
