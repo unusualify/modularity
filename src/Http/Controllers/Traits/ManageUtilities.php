@@ -243,19 +243,11 @@ trait ManageUtilities
      * @param \Unusualify\Modularity\Models\Model|null $item
      * @return array
      */
-    protected function getFormData($id)
+    protected function getFormData($id = null)
     {
         $schema = $this->formSchema;
 
-        if ($id) {
-            $item = $this->repository->getById(
-                $id,
-                $this->formWith,
-                $this->formWithCount
-            );
-        } else {
-            $item = $this->repository->newInstance();
-        }
+        $item = $this->getFormItem($id);
 
         $fullRoutePrefix = 'admin.' . ($this->routePrefix ? $this->routePrefix . '.' : '') . $this->moduleName . '.';
         $previewRouteName = $fullRoutePrefix . 'preview';
@@ -268,14 +260,15 @@ trait ManageUtilities
         $data = [
             'translate' => $this->routeHas('translations') || $this->hasTranslatedInput(),
             'formAttributes' => array_merge([
-                'modelValue' => $this->repository->getFormFields($item, $schema),
-                'title' => __(((bool) $itemId ? 'fields.edit-item' : 'fields.new-item'), ['item' => trans_choice('modules.' . snakeCase($this->routeName), 0)]),
+                'modelValue' => $this->repository->getFormFields($item, $this->chunkInputs(all: true, schema: $schema)),
+                'title' => __(((bool) $itemId
+                    ? 'fields.edit-item'
+                    : 'fields.new-item'), ['item' => trans_choice('modules.' . snakeCase($this->routeName), 1)]
+                ),
                 'isEditing' => $itemId ? true : false,
             ], $this->formAttributes),
             'endpoints' => [
-                ((bool) $itemId ? 'update' : 'store') => $itemId
-                    ? $this->getModuleRoute($itemId, 'update')
-                    : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]),
+                ((bool) $itemId ? 'update' : 'store') => $this->getFormUrl($itemId),
             ] + $this->getUrls(),
             'formStore' => [
                 'inputs' => $this->filterSchemaByRoles($schema),
@@ -364,6 +357,31 @@ trait ManageUtilities
     public function modalFormData($request)
     {
         return [];
+    }
+
+    public function getFormItem($id = null)
+    {
+        if($this->isSingleton){
+            $item = $this->repository->getModel()->single();
+        }else if ($id) {
+            $item = $this->repository->getById(
+                $id,
+                $this->formWith,
+                $this->formWithCount
+            );
+        } else {
+            $item = $this->repository->newInstance();
+        }
+        return $item;
+    }
+
+    public function getFormUrl($itemId = null)
+    {
+        $url = $itemId
+            ? $this->getModuleRoute($itemId, 'update', $this->isSingleton)
+            : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]);
+
+        return $url;
     }
 
     public function getViewLayoutVariables()
