@@ -21,11 +21,33 @@ class MigrationMakeCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'modularity:make:migration';
+    // protected $name = 'modularity:make:migration';
+
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'modularity:make:migration
+        {name : The migration name will be created}
+        {module? : The name of module that the migration will be created in}
+        {--self : Create a modularity migration}
+        {--fields= : The specified fields table}
+        {--route= : The route name for pivot table}
+        {--plain : Create plain migration}
+        {--f|force : Force the operation to run when the route files already exist}
+        {--relational : Create relational table for many-to-many and polymorphic relationships}
+        {--notAsk : Don\'t ask for trait questions}
+        {--no-defaults : Unuse default input and headers}
+        {--all : Add all traits}
+        {--table-name= : Set table name}
+        {--test : Test the Route Generator}';
 
     protected $aliases = [
         'mod:m:migration',
     ];
+
+    public $useTraitOptions = true;
 
     /**
      * The console command description.
@@ -36,13 +58,28 @@ class MigrationMakeCommand extends BaseCommand
 
     protected $defaultFieldSchemas = [];
 
+    protected $nonTranslatableFillable = [];
+
+    protected $nonMigrationFields = [];
+
     /**
      * Run the command.
      */
     public function handle(): int
     {
         if (! $this->option('no-defaults')) {
-            $this->defaultFieldSchemas = $this->baseConfig('schemas.default_fields') ?? [];
+            $this->nonMigrationFields = $this->baseConfig('schemas.non_migration_fields', []);
+            $this->defaultFieldSchemas = array_filter($this->baseConfig('schemas.default_fields') ?? [], function($field) {
+                $field = explode(':', $field)[0];
+                return !in_array($field, $this->nonMigrationFields);
+            });
+        }
+
+
+        if($this->option('addSingular')){
+            $this->info('Pass making migration due to addSingular option!');
+
+            return 0;
         }
 
         if (parent::handle() === E_ERROR) {
@@ -60,41 +97,6 @@ class MigrationMakeCommand extends BaseCommand
         }
 
         return 0;
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['name', InputArgument::REQUIRED, 'The migration name will be created.'],
-            ['module', InputArgument::OPTIONAL, 'The name of module that the migration will be created in.'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-
-        return array_merge([
-            ['fields', null, InputOption::VALUE_OPTIONAL, 'The specified fields table.', null],
-            ['route', null, InputOption::VALUE_OPTIONAL, 'The route name for pivot table.', null],
-            ['plain', null, InputOption::VALUE_NONE, 'Create plain migration.'],
-            ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
-            ['relational', null, InputOption::VALUE_NONE, 'Create relational table for many-to-many and polymorphic relationships.'],
-            ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
-            ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
-            ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
-            ['table-name', null, InputOption::VALUE_OPTIONAL, 'set table name'],
-            ['test', null, InputOption::VALUE_NONE, 'Test the Route Generator'],
-        ], modularityTraitOptions());
     }
 
     /**
@@ -178,20 +180,23 @@ class MigrationMakeCommand extends BaseCommand
     {
         $moduleName = $this->getModuleName();
 
-        $path = Modularity::getVendorPath('');
+        $path = base_path();
+        $migrationFolder = 'database/migrations';
+
+        $fileName = $this->getFileName();
 
         if ($moduleName != '') {
             $path = Modularity::getModulePath($moduleName);
-        }
-
-        $migrationFolder = 'database/migrations/default';
-
-        if ($moduleName != '') {
             $migrationGeneratorPath = GenerateConfigReader::read('migration');
             $migrationFolder = $migrationGeneratorPath->getPath();
+        }else{
+            if($this->option('self')){
+                $path = Modularity::getVendorPath('');
+                $migrationFolder = 'database/migrations/default';
+            }
         }
 
-        $migrationDir = concatenate_path($migrationFolder, $this->getFileName() . '.php');
+        $migrationDir = concatenate_path($migrationFolder, $fileName . '.php');
 
         return concatenate_path($path, $migrationDir);
     }
@@ -203,12 +208,13 @@ class MigrationMakeCommand extends BaseCommand
      */
     public function getSchemaParser()
     {
-
         $fields = '';
 
         if ($this->option('addPosition')) {
             $fields .= 'position:integer:unsigned:nullable,';
         }
+
+        // dd($this->defaultFieldSchemas, $this->nonTranslatableFillable);
 
         if (! $this->option('addTranslation')) {
             if (count($this->defaultFieldSchemas)) {
@@ -217,6 +223,7 @@ class MigrationMakeCommand extends BaseCommand
             $fields .= $this->option('fields');
         }
 
+        // dd(new SchemaParser(rtrim($fields, ',')), $fields, $this->nonTranslatableFillable, $this->defaultFieldSchemas);
         return new SchemaParser(rtrim($fields, ','));
     }
 
@@ -226,7 +233,6 @@ class MigrationMakeCommand extends BaseCommand
         $singular_table = Str::singular((new NameParser($this->argument('name')))->getTableName());
 
         if ($this->option('addTranslation')) {
-
             $fields = implode(',', array_merge($this->defaultFieldSchemas, $this->option('fields') ? explode(',', $this->option('fields')) : []));
 
             $schemas .= "\t\t\tSchema::create('{$singular_table}_translations', function(Blueprint \$table) {\n"

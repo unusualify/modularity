@@ -46,11 +46,13 @@ class ModelMakeCommand extends BaseCommand
 
     protected $modelTraits;
 
-    protected $defaultFillables = [];
+    protected $defaultFillable = [];
 
     protected $modelRelationParser;
 
     protected $overrideModel = null;
+
+    protected $nonTranslatableFillable = [];
 
     public function handle(): int
     {
@@ -67,9 +69,24 @@ class ModelMakeCommand extends BaseCommand
             $this->responses[$_trait] = $this->checkOption($_trait);
         }
 
-        if (! $this->option('no-defaults')) {
-            $this->defaultFillables += (new SchemaParser(implode(',', $this->baseConfig('schemas.default_fields') ?? [])))->getColumns();
+        $isSingularExceptionTraits = [
+            'addTranslation',
+            'addSnapshot',
+        ];
+
+        foreach ($this->responses as $trait => $response) {
+            if ($response) {
+                if(in_array($trait, $isSingularExceptionTraits) && $this->getTraitResponse('addSingular')){
+                    $this->responses[$trait] = false;
+                }
+            }
         }
+
+        if (! $this->option('no-defaults')) {
+            $this->defaultFillable += (new SchemaParser(implode(',', $this->baseConfig('schemas.default_fields') ?? [])))->getColumns();
+        }
+
+        $this->nonTranslatableFillable = $this->baseConfig('schemas.non_translatable_fillable', []);
 
         if ($this->option('relationships')) {
             $this->modelRelationParser = App::makeWith(ModelRelationParser::class, [
@@ -258,24 +275,28 @@ class ModelMakeCommand extends BaseCommand
 
     private function getFillable(): string
     {
+        // $defaultFillableSchema = implode(',', $this->baseConfig('schemas.fillables'));
+        // $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
+        // dd($this->defaultFillable);
+        $fields = $this->defaultFillable;
+
         if (! $this->overrideModel) {
-            $defaultFillableSchema = implode(',', $this->baseConfig('schemas.fillables'));
-
-            $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
-
-            if (! $this->getTraitResponse('addTranslation')) {
-                $fields = array_merge($this->defaultFillables, $fields);
+            if (! $this->getTraitResponse('addTranslation') || $this->getTraitResponse('addSingular')) {
+                // $fields = array_merge($this->defaultFillable, $fields);
 
                 $fillable = $this->option('fillable');
+
                 $fields = array_merge($fields, $fillable != '' ? explode(',', $fillable) : []);
+            } else if($this->getTraitResponse('addTranslation')){
+                $fields = array_values(array_intersect($this->defaultFillable, $this->nonTranslatableFillable));
+            }
+
+            if ($this->getTraitResponse('addSingular')) {
+                $fields = $this->defaultFillable;
             }
 
             return $this->generateFillable($fields);
         } else {
-            $defaultFillableSchema = implode(',', $this->baseConfig('schemas.fillables'));
-
-            $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
-
             return $this->generateFillable($fields);
         }
 
@@ -288,7 +309,7 @@ class ModelMakeCommand extends BaseCommand
 
         dd(
             $defaultFillableSchema,
-            $this->defaultFillables,
+            $this->defaultFillable,
             $this->option('fillable'),
             (new SchemaParser($defaultFillableSchema))->getCasts()
         );
@@ -296,7 +317,7 @@ class ModelMakeCommand extends BaseCommand
         $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
 
         if (! $this->getTraitResponse('addTranslation')) {
-            $fields = array_merge($this->defaultFillables, $fields);
+            $fields = array_merge($this->defaultFillable, $fields);
 
             $fillable = $this->option('fillable');
             $fields = array_merge($fields, $fillable != '' ? explode(',', $fillable) : []);
@@ -339,10 +360,14 @@ class ModelMakeCommand extends BaseCommand
     {
         $attributes = [];
 
-        if ($this->getTraitResponse('addTranslation')) {
+        $defaultFields = $this->defaultFillable;
+
+        if ($this->getTraitResponse('addTranslation') && ! $this->getTraitResponse('addSingular')) {
             $fillable = $this->option('fillable');
 
-            $fields = array_merge($this->defaultFillables, $fillable != '' ? explode(',', $fillable) : []);
+            $translatedFields = array_values(array_diff($defaultFields, $this->nonTranslatableFillable));
+
+            $translatedFields = array_merge($translatedFields, $fillable != '' ? explode(',', $fillable) : []);
 
             $attribute = "\t/**\n"
                 . "\t * The translated attributes that are assignable for hasTranslation Trait.\n"
@@ -352,10 +377,10 @@ class ModelMakeCommand extends BaseCommand
 
             $defaultTranslatedSchema = implode(',', $this->baseConfig('schemas.translated_attributes'));
 
-            $fields = array_merge($fields, (new SchemaParser($defaultTranslatedSchema))->getColumns());
+            $translatedFields = array_merge($translatedFields, (new SchemaParser($defaultTranslatedSchema))->getColumns());
 
             $attribute .= "\tpublic \$translatedAttributes = [\n"
-                . collect($fields)->map(function ($field) {
+                . collect($translatedFields)->map(function ($field) {
                     return "\t\t'{$field}'";
                 })->implode(",\n") . "\n"
                 . "\t]; \n";
@@ -363,7 +388,7 @@ class ModelMakeCommand extends BaseCommand
             $attributes[] = $attribute;
         }
 
-        if ($this->getTraitResponse('addSnapshot')) {
+        if ($this->getTraitResponse('addSnapshot') && ! $this->getTraitResponse('addSingular')) {
 
             $models = UFinder::getAllModels();
             $snapshotSourceModel = select(
@@ -392,7 +417,7 @@ class ModelMakeCommand extends BaseCommand
 
         if ($this->getTraitResponse('addSlug')) {
 
-            $fields[] = $this->defaultFillables[0];
+            $fields[] = $this->defaultFillable[0];
 
             $attributes = "\t/**\n"
                 . "\t * The slug attributes that are assignable for hasSlug Trait.\n"
@@ -466,6 +491,7 @@ class ModelMakeCommand extends BaseCommand
         $namespaces = array_map(function ($v) {
             return "use $v;";
         }, $namespaces);
+
 
         return count($namespaces) ? implode("\n", $namespaces) : null;
     }

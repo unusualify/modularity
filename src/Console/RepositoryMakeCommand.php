@@ -67,6 +67,19 @@ class RepositoryMakeCommand extends BaseCommand
             $this->responses[$_trait] = $this->checkOption($_trait);
         }
 
+        $isSingularExceptionTraits = [
+            'addTranslation',
+            'addSnapshot',
+        ];
+
+        foreach ($this->responses as $trait => $response) {
+            if ($response) {
+                if(in_array($trait, $isSingularExceptionTraits) && $this->getTraitResponse('addSingular')){
+                    $this->responses[$trait] = false;
+                }
+            }
+        }
+
         if (parent::handle() === E_ERROR) {
             return E_ERROR;
         }

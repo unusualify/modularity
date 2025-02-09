@@ -946,6 +946,7 @@ class RouteGenerator extends Generator
         if (! $this->plain) {
 
             $headers = $this->getHeaders();
+            $inputs = $this->getInputs();
 
             $titleColumnKey = count($filtered = array_filter($headers, fn ($i) => $i['key'] === 'name' || $i['key'] === 'title')) > 0
                 ? $filtered[0]['key']
@@ -960,7 +961,7 @@ class RouteGenerator extends Generator
                 'title_column_key' => $titleColumnKey,
                 'table_options' => static::$defaultTableOptions,
                 'headers' => $headers, // in Unusualify\Modularity\Support\Migrations\SchemaParser::class
-                'inputs' => $this->getInputs(), // in Unusualify\Modularity\Support\Migrations\SchemaParser::class
+                'inputs' => $inputs, // in Unusualify\Modularity\Support\Migrations\SchemaParser::class
             ];
 
             if ($runnable && $this->getTest()) {
