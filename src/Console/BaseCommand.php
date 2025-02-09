@@ -9,6 +9,7 @@ use Nwidart\Modules\Exceptions\FileAlreadyExistException;
 use Nwidart\Modules\Generators\FileGenerator;
 use Nwidart\Modules\Support\Stub;
 use Nwidart\Modules\Traits\ModuleCommandTrait;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Support\Decomposers\SchemaParser;
 use Unusualify\Modularity\Traits\ManageNames;
 
@@ -87,6 +88,11 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
      */
     public function handle(): int
     {
+
+        if($this->checkSelfOption() === E_ERROR){
+            return E_ERROR;
+        }
+
         $path = str_replace('\\', '/', $this->getDestinationFilePath());
 
         $description = trim(mb_strtolower($this->getDescription()), '.');
@@ -209,7 +215,17 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
         return $this->test;
     }
 
-        /**
+    protected function checkSelfOption()
+    {
+        if( $this->hasOption('self') && $this->option('self') && Modularity::isProduction()){
+            $this->components->error('Self option is not available in production.');
+            return E_ERROR;
+        }
+
+        return true;
+    }
+
+    /**
      * Get the module name.
      *
      * @return string
