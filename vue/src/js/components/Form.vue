@@ -97,67 +97,70 @@
 
               <FormActions
                 v-if="isEditing"
-                :modelValue="issetModel ? modelValue : $store.state.form.editedItem"
+                :modelValue="formItem"
                 :actions="actions"
                 :is-editing="isEditing"
                 @action-complete="$emit('actionComplete', $event)"
               />
               <!-- Input events-->
               <template v-if="topSchema && topSchema.length">
-                <template v-for="topInput in topSchema" :key="topInput.name">
-                  <v-tooltip
-                    :disabled="topInput.tooltip == ''"
-                    :location="topInput.tooltipLocation ?? 'top'"
-                  >
-                    <template v-slot:activator="{ props }">
-                      <v-switch
-                        v-if="topInput.type === 'switch'"
-                        v-bind="{...$lodash.omit(topInput, 'label'), ...props}"
-                        hide-details
-                        :modelValue="model[topInput.name] ?? topInput.default ?? false"
-                        @update:modelValue="model[topInput.name] = $event"
-                      />
-                      <ue-recursive-stuff v-else-if="topInput.viewOnlyComponent"
-                        :configuration="topInput.viewOnlyComponent"
-                        :bind-data="model"
-                        v-bind="props"
-                      />
-                      <v-menu v-else
-                        :close-on-content-click="false"
-                        transition="scale-transition"
-                        offset-y
-                        v-bind="props"
-                      >
-                        <template v-slot:activator="{ props }">
-                          <v-btn
-                            variant="outlined"
-                            append-icon="mdi-chevron-down"
-                            v-bind="props"
-                          >
-                            <!-- {{ topInput.label }} -->
-                            {{ getTopInputActiveLabel(topInput) }}
-                            <!-- {{ topInput.items.find(item => item[topInput.itemValue] ===  ($isset(model[topInput.name]) ? model[topInput.name] : -1))[topInput.itemTitle] ?? topInput.label }} -->
-                          </v-btn>
-                        </template>
+                  <template v-for="topInput in topSchema" :key="topInput.name">
+                    <v-tooltip
+                      :disabled="topInput.tooltip == ''"
+                      :location="topInput.tooltipLocation ?? 'top'"
+                    >
+                      <template v-slot:activator="{ props }">
+                        <v-switch
+                          v-if="topInput.type === 'switch'"
+                          v-bind="{...$lodash.omit(topInput, 'label'), ...props}"
+                          hide-details
+                          :modelValue="model[topInput.name] ?? topInput.default ?? false"
+                          @update:modelValue="model[topInput.name] = $event"
+                          class="mr-2"
+                        />
+                        <ue-recursive-stuff v-else-if="topInput.viewOnlyComponent"
+                          :configuration="topInput.viewOnlyComponent"
+                          :bind-data="model"
+                          v-bind="props"
+                          class="mr-2"
+                        />
+                        <v-menu v-else
+                          :close-on-content-click="false"
+                          transition="scale-transition"
+                          offset-y
+                          v-bind="props"
+                        >
+                          <template v-slot:activator="{ props }">
+                            <v-btn
+                              class="mr-2"
+                              variant="outlined"
+                              append-icon="mdi-chevron-down"
+                              v-bind="props"
+                            >
+                              <!-- {{ topInput.label }} -->
+                              {{ getTopInputActiveLabel(topInput) }}
+                              <!-- {{ topInput.items.find(item => item[topInput.itemValue] ===  ($isset(model[topInput.name]) ? model[topInput.name] : -1))[topInput.itemTitle] ?? topInput.label }} -->
+                            </v-btn>
+                          </template>
 
-                        <v-list>
-                          <v-list-item
-                            v-for="(item, index) in topInput.items"
-                            :key="item.id"
-                            @click="model[topInput.name] = item.id"
-                          >
-                            <v-list-item-title>
-                              {{ item.name }}
-                              <v-icon v-if="$isset(model[topInput.name]) && item[topInput.itemValue] === model[topInput.name]" size="small" icon="$check" color="primary"></v-icon>
-                            </v-list-item-title>
-                          </v-list-item>
-                        </v-list>
-                      </v-menu>
-                    </template>
-                    <span>{{ topInput.tooltip ?? topInput.label }}</span>
-                  </v-tooltip>
+                          <v-list>
+                            <v-list-item
+                              v-for="(item, index) in topInput.items"
+                              :key="item.id"
+                              @click="model[topInput.name] = item.id"
+                            >
+                              <v-list-item-title>
+                                {{ item.name }}
+                                <v-icon v-if="$isset(model[topInput.name]) && item[topInput.itemValue] === model[topInput.name]" size="small" icon="$check" color="primary"></v-icon>
+                              </v-list-item-title>
+                            </v-list-item>
+                          </v-list>
+                        </v-menu>
+                      </template>
+                      <span>{{ topInput.tooltip ?? topInput.label }}</span>
+                    </v-tooltip>
 
-                </template>
+                  </template>
               </template>
 
               <!-- Language Selector -->
@@ -186,12 +189,12 @@
         <v-divider v-if="hasDivider"></v-divider>
       </div>
 
-
+      <!-- {{ $log(model, formItem) }} -->
       <!-- Scrollable Content Section -->
       <div :class="['d-flex', scrollable ? 'flex-grow-1 overflow-hidden mr-n5' : '']">
         <div :class="['w-100', scrollable ? 'overflow-y-auto pr-3' : '']"
         >
-          <slot name="top" v-bind="{item: model, schema}"></slot>
+          <slot name="top" v-bind="{item: formItem, schema}"></slot>
 
           <v-custom-form-base
             :id="`ue-wrapper-${id}`"
