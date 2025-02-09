@@ -12,6 +12,7 @@
     ref="VInput"
     v-model="input"
     hide-details="auto"
+    :label="label"
   >
     <template v-slot:default="defaultSlot">
       <div

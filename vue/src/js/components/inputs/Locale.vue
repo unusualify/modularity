@@ -22,7 +22,7 @@
           <template v-slot:label="labelScope">
             <!-- <slot name="label"></slot> -->
             {{ labelScope.label }}
-            <v-chip v-if="labelScope.isActive.value || labelScope.isFocused.value" style="font-size: var(--v-field-label-scale); height: calc(var(--v-field-label-scale) * 1.5);"
+            <v-chip v-if="labelScope.label && (labelScope.isActive) &&  (labelScope.isActive.value || labelScope.isFocused.value)" style="font-size: var(--v-field-label-scale); height: calc(var(--v-field-label-scale) * 1.5);"
               size="x-small"
               density="compact"
               color="primary"

@@ -183,7 +183,9 @@
           <div class="v-field__outline__start"></div>
           <div class="v-field__outline__notch">
             <label class="v-label v-field-label v-field-label--floating" aria-hidden="true" for="input-29">
-              {{ boundProps.label }}
+              <slot name="label" v-bind="{label: label}">
+                {{ boundProps.label }}
+              </slot>
             </label>
           </div>
           <div class="v-field__outline__end"></div>
