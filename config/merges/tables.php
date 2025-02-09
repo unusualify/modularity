@@ -20,4 +20,5 @@ return [
     'chats' => 'umod_chats',
     'chat_messages' => 'umod_chat_messages',
     'spreads' => 'umod_spreads',
+    'singletons' => 'umod_singletons',
 ];

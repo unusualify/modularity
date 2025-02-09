@@ -105,4 +105,14 @@ return [
             'description' => 'Do you need to attach snapshot feature on this module route?',
         ],
     ],
+    'addSingular' => [
+        'model' => 'IsSingular',
+        'repository' => null,
+        'question' => 'Would you like to make this module a singleton?',
+        'command_option' => [
+            'shortcut' => null,
+            'input_type' => InputOption::VALUE_NONE,
+            'description' => 'Would you like to make this module a singleton?',
+        ],
+    ],
 ];
