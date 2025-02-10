@@ -18,7 +18,7 @@ final class LaravelServiceProvider extends ServiceProvider
         $this->publishViews();
         $this->publishResources();
         $this->publishOperations();
-        $this->publishMigrations();
+        // $this->publishMigrations();
     }
 
     /**
