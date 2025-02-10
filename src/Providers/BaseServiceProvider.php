@@ -308,10 +308,10 @@ class BaseServiceProvider extends ServiceProvider
     private function bootBaseMigrations()
     {
         // LOAD BASE MIGRATIONS
-        $this->loadMigrationsFrom(
-            // get_modularity_vendor_path('database/migrations/default')
-            \Unusualify\Modularity\Facades\Modularity::getVendorPath('database/migrations/default')
-        );
+        // $this->loadMigrationsFrom(
+        //     // get_modularity_vendor_path('database/migrations/default')
+        //     \Unusualify\Modularity\Facades\Modularity::getVendorPath('database/migrations/default')
+        // );
     }
 
     /**

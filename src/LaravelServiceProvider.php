@@ -18,7 +18,7 @@ final class LaravelServiceProvider extends ServiceProvider
         $this->publishViews();
         $this->publishResources();
         $this->publishOperations();
-
+        $this->publishMigrations();
     }
 
     /**
@@ -98,4 +98,12 @@ final class LaravelServiceProvider extends ServiceProvider
             Modularity::getVendorPath('operations') => base_path('operations'),
         ], 'operations');
     }
+
+    private function publishMigrations(): void
+    {
+        $this->publishes([
+            Modularity::getVendorPath('database/migrations/default') => $this->app->databasePath('migrations'),
+        ], 'modularity-migrations');
+    }
+
 }
