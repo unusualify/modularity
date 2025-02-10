@@ -87,7 +87,7 @@ class PaymentServiceSeeder extends Seeder
         //     $currencies = PaymentCurrency::inRandomOrder()->take(rand(1, 3))->get();
         //     $paymentService->paymentCurrencies()->attach($currencies);
         // }
-        $superadmin = User::role('superadmin', Modularity::getGuardName())->first();
+        $superadmin = User::role('superadmin', Modularity::getAuthGuardName())->first();
 
         if (! $superadmin) {
             $this->command->error('Admin user not found. Please ensure the admin user exists in the database.');
@@ -95,7 +95,7 @@ class PaymentServiceSeeder extends Seeder
             return;
         }
 
-        Auth::guard(Modularity::getGuardName())->login($superadmin);
+        Auth::guard(Modularity::getAuthGuardName())->login($superadmin);
 
         foreach ($paymentServices as $service) {
             $paymentService = PaymentService::create([

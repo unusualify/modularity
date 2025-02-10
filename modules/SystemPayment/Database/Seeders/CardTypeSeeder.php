@@ -50,7 +50,7 @@ class CardTypeSeeder extends Seeder
             ],
         ];
 
-        $superadmin = User::role('superadmin', Modularity::getGuardName())->first();
+        $superadmin = User::role('superadmin', Modularity::getAuthGuardName())->first();
 
         if (! $superadmin) {
             $this->command->error('Admin user not found. Please ensure the admin user exists in the database.');
@@ -58,7 +58,7 @@ class CardTypeSeeder extends Seeder
             return;
         }
 
-        Auth::guard(Modularity::getGuardName())->login($superadmin);
+        Auth::guard(Modularity::getAuthGuardName())->login($superadmin);
 
         foreach ($cardTypes as $types) {
             $cardType = CardType::create([
