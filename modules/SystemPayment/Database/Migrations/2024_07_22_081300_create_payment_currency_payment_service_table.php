@@ -14,8 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('payment_currency_payment_service', function (Blueprint $table) {
-            createDefaultRelationshipTableFields($table, 'payment_currency', 'payment_service');
-
+            createDefaultRelationshipTableFields($table, 'payment_currency', 'payment_service', config('priceable.tables.currencies', 'unfy_currencies'));
         });
     }
 
