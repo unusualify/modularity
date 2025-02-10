@@ -21,22 +21,17 @@ class RepositoryMakeCommand extends BaseCommand
      *
      * @var string
      */
-    // protected $name = 'modularity:make:repository';
+    protected $signature = 'modularity:make:repository
+        {repository : The name of the repository class}
+        {module : The name of module will be used}
+        {--f|force : Force the operation to run when the route files already exist}
+        {--custom-model= : The model class for usage of a available model}
+        {--notAsk : Don\'t ask for trait questions}
+        {--all : Add all traits}';
 
     protected $defaultReject = true;
 
     protected $isAskable = true;
-
-    // protected $signature = 'modularity:make:repository
-    //     {repository : the repository name in module}
-    //     {module : the module name}
-    //     {--f|force}
-    //     {--T|translationTrait}
-    //     {--M|mediaTrait}
-    //     {--F|fileTrait}
-    //     {--P|positionTrait}
-    //     {--all}
-    //     {--notAsk}';
 
     /**
      * The console command description.
@@ -46,6 +41,8 @@ class RepositoryMakeCommand extends BaseCommand
     protected $description = 'Create a new repository class for the specified module.';
 
     protected $argumentName = 'repository';
+
+    public $useTraitOptions = true;
 
     /**
      * Create a new command instance.
@@ -89,34 +86,6 @@ class RepositoryMakeCommand extends BaseCommand
         $this->info('Repository created successfully!');
 
         return 0;
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['module', InputArgument::REQUIRED, 'The name of module will be used.'],
-            ['repository', InputArgument::REQUIRED, 'The name of the repository class.'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return array_merge([
-            ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
-            ['custom-model', null, InputOption::VALUE_OPTIONAL, 'The model class for usage of a available model.', null],
-            ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
-            ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
-        ], modularityTraitOptions());
     }
 
     /**

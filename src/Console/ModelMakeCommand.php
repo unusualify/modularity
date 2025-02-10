@@ -20,6 +20,27 @@ use function Laravel\Prompts\select;
 
 class ModelMakeCommand extends BaseCommand
 {
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'modularity:make:model
+        {model : The name of model will be created}
+        {module? : The name of module will be used}
+        {--fillable= : The fillable attributes}
+        {--relationships= : The relationship attributes}
+        {--self : Create a modularity model}
+        {--override-model= : The override model for extension}
+        {--f|force : Force the operation to run when the route files already exist}
+        {--notAsk : Don\'t ask for trait questions}
+        {--no-defaults : Unuse default input and headers}
+        {--s|soft-delete : Flag to add softDeletes trait to model}
+        {--has-factory : Flag to add hasFactory to model}
+        {--all : Add all traits}
+        {--test : Test the Route Generator}';
+
+
     protected $name = 'modularity:make:model';
 
     protected $aliases = [
@@ -36,6 +57,8 @@ class ModelMakeCommand extends BaseCommand
     protected $defaultReject = true;
 
     protected $isAskable = true;
+
+    public $useTraitOptions = true;
 
     /**
      * The console command description.
@@ -117,49 +140,21 @@ class ModelMakeCommand extends BaseCommand
     }
 
     /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['model', InputArgument::REQUIRED, 'The name of model will be created.'],
-            ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-
-        return array_merge([
-            ['fillable', null, InputOption::VALUE_OPTIONAL, 'The fillable attributes.', null],
-            ['relationships', null, InputOption::VALUE_OPTIONAL, 'The relationship attributes.', null],
-            ['override-model', null, InputOption::VALUE_OPTIONAL, 'The override model for extension.', null],
-            ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
-            ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
-            ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
-            ['soft-delete', 's', InputOption::VALUE_NONE, 'Flag to add softDeletes trait to model.'],
-            ['has-factory', null, InputOption::VALUE_NONE, 'Flag to add hasFactory to model.'],
-            ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
-            ['test', null, InputOption::VALUE_NONE, 'Test the Route Generator'],
-        ], modularityTraitOptions());
-    }
-
-    /**
      * @return mixed
      */
     protected function getTemplateContents()
     {
         $moduleName = $this->getModuleName();
+        $namespace = 'App\\Models';
+
+        $modelGeneratorPath = new GeneratorPath($this->baseConfig('paths.generator.model'));
         $module = null;
+
         if ($moduleName) {
             $module = Modularity::findOrFail($moduleName);
+            $namespace = $this->getClassNamespace($module);
+        }else if($this->option('self')){
+            $namespace = Modularity::getVendorNamespace($modelGeneratorPath->getNamespace());
         }
 
         $class_namespaces = implode("\n", [
@@ -167,10 +162,6 @@ class ModelMakeCommand extends BaseCommand
             $this->getInterfaceNamespaces(),
             $this->getTraitNamespaces(),
         ]);
-
-        $modelGeneratorPath = new GeneratorPath($this->baseConfig('paths.generator.model'));
-
-        $namespace = $module ? $this->getClassNamespace($module) : Modularity::getVendorNamespace($modelGeneratorPath->getNamespace());
 
         return (new Stub($this->getStubName(), [
             // 'BASE_MODEL'            => $this->baseConfig('base_model'),
@@ -197,15 +188,22 @@ class ModelMakeCommand extends BaseCommand
      */
     protected function getDestinationFilePath()
     {
-        $path = Modularity::getVendorPath('/src');
+        $path = base_path('app');
+        $modelDir = 'Models';
+        $fileName = $this->getModelName() . '.php';
+        $modelDir = concatenate_path($modelDir, $fileName);
 
         if ($this->getModuleName() != '') {
             $path = Modularity::getModulePath($this->getModuleName());
+        }else if($this->option('self')){
+            $path = Modularity::getVendorPath('/src');
         }
 
-        $modelFolder = new GeneratorPath($this->baseConfig('paths.generator.model'));
+        if ($this->option('self') || $this->getModuleName() != '') {
+            $modelFolder = new GeneratorPath($this->baseConfig('paths.generator.model'));
 
-        $modelDir = $modelFolder->getPath() . '/' . $this->getModelName() . '.php';
+            $modelDir = concatenate_path($modelFolder->getPath(), $fileName);
+        }
 
         return concatenate_path($path, $modelDir);
     }
