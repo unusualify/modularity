@@ -1141,6 +1141,7 @@ class RouteGenerator extends Generator
                             $this->console->call('modularity:make:migration', [
                                 '--relational' => 'MorphedByMany',
                                 '--no-defaults' => true,
+                                '--route' => $this->name,
                                 'module' => $this->module->getStudlyName(),
                                 'name' => "create_{$pivot_table_name}_table",
                             ]

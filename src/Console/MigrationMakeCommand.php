@@ -126,9 +126,19 @@ class MigrationMakeCommand extends BaseCommand
                 ]);
             } elseif ($relational == 'MorphedByMany') {
 
+                if($this->option('route')){
+                    $modelName = Str::studly($this->option('route'));
+                }else{
+                    preg_match('/^create_(.*)_table$/', $this->option('name'), $matches);
+                    $modelName = Str::studly(getMorphModelName($matches[1]));
+                }
+                $morphedTableName = tableName($modelName);
+
                 return Stub::create('/migration/morphPivot.stub', [
                     'class' => $this->getClass(),
                     'table' => $tableName,
+                    'modelName' => $modelName,
+                    'morphedTableName' => $morphedTableName,
                     'fields' => ltrim((new SchemaParser(useDefaults: false))->render()),
                 ]);
             }
