@@ -197,7 +197,7 @@ if (! function_exists('createDefaultMorphPivotTableFields')) {
      * @param string|null $tableName tableables
      * @return void
      */
-    function createDefaultMorphPivotTableFields($table, $modelName = null, $tableName = null)
+    function createDefaultMorphPivotTableFields($table, $modelName = null, $tableName = null, $morphedTableName = null)
     {
         if(!$modelName && !$tableName) {
             throw new \Exception('modelName or tableName is required');
@@ -213,11 +213,15 @@ if (! function_exists('createDefaultMorphPivotTableFields')) {
             $tableName = makeMorphPivotTableName($modelName);
         }
 
+        if(!$morphedTableName) {
+            $morphedTableName = tableName($modelName);
+        }
+
         $foreignKey = makeForeignKey($modelName); // *_id
         $morphName = makeMorphName($modelName);
 
         $table->foreignId($foreignKey)
-            ->constrained()
+            ->constrained($morphedTableName)
             ->onUpdate('cascade')
             ->onDelete('cascade');
 
