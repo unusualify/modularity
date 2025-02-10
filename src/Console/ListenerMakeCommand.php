@@ -19,6 +19,7 @@ class ListenerMakeCommand extends BaseCommand
 	protected $signature = 'modularity:make:listener
 		{name : The name of listener}
 		{module? : The name of module}
+        {--self : Create a modularity listener}
         {--f|force : Overwrite existing file}
         {--should-handle-events-after-commit : Should the event handle events after commit}
         {--should-queue : Should the event be queued}';
@@ -50,18 +51,21 @@ class ListenerMakeCommand extends BaseCommand
     {
         $moduleName = $this->getModuleName();
         $className = $this->getFileName();
+        $self = $this->option('self');
 
         $namespace = 'App\Listeners';
 
-        if($moduleName) {
+        if($self){
+            $namespace = Modularity::getVendorNamespace('/src/Listeners');
+        }else if($moduleName) {
             $module = Modularity::findOrFail($moduleName);
             $namespace = $module->getTargetClassNamespace('listener');
         }
 
         $paths = [
             base_path('app/Events'),
-            base_path('Modules/**/Events'),
-            // base_path('vendor/unusualify/modularity/src/Listeners'),
+            Modularity::getModulePath('/**/Events'),
+            Modularity::getVendorPath('/src/Events'),
         ];
 
         $implements = [];
@@ -71,34 +75,31 @@ class ListenerMakeCommand extends BaseCommand
         $traits = [];
         $eventParameter = '$event';
 
-        if(confirm('Do you want use a specific event on this listener?', default: false)) {
-            $events = collect(Finder::create()->files()->depth(0)->in($paths))->reduce(function($carry, $file) {
-                $content = get_file_string($file->getRealPath());
-                $className = get_file_class($file->getRealPath());
+        $events = collect(Finder::create()->files()->depth(0)->in($paths))->reduce(function($carry, $file) {
+            $content = get_file_string($file->getRealPath());
+            $className = get_file_class($file->getRealPath());
 
-                if($className) {
-                    $reflector = new \ReflectionClass(get_file_class($file->getRealPath()));
-                    if(!$reflector->isAbstract() && !$reflector->isInterface()) {
-                        // $carry[$className] = $file;
-                    }
+            if($className) {
+                $reflector = new \ReflectionClass(get_file_class($file->getRealPath()));
+                if(!$reflector->isAbstract() && !$reflector->isInterface()) {
+                    $carry[$className] = $file;
                 }
-                return $carry;
-            }, collect());
-
-            if($events->count() > 0) {
-                $eventClass = select(
-                    label: 'Select the event class',
-                    options: $events->keys()->toArray(),
-                    default: $events->keys()->first(),
-                );
-
-                $eventClassShortName = get_class_short_name($eventClass);
-                $eventParameter = $eventClassShortName . ' $event';
-                $namespaces[] = $eventClass;
-            }else{
-                $this->warn('No event found');
             }
+            return $carry;
+        }, collect());
 
+        if($events->count() > 0) {
+            $eventClass = select(
+                label: 'Select the event class',
+                options: $events->keys()->toArray(),
+                default: $events->keys()->first(),
+            );
+
+            $eventClassShortName = get_class_short_name($eventClass);
+            $eventParameter = $eventClassShortName . ' $event';
+            $namespaces[] = $eventClass;
+        }else{
+            $this->warn('No event found');
         }
 
         if($this->option('should-queue')) {
@@ -189,15 +190,21 @@ class ListenerMakeCommand extends BaseCommand
     protected function getDestinationFilePath()
     {
         $moduleName = $this->getModuleName();
-        $fileName = $this->getFileName();
+        $path = base_path('app/Listeners');
+        $fileName = $this->getFileName() . '.php';
+        $self = $this->option('self');
 
         if (!$moduleName) {
-            return base_path("app/Listeners/{$fileName}.php");
+            if($self){
+                return Modularity::getVendorPath("/src/Listeners/{$fileName}");
+            }
+
+            return base_path("app/Listeners/{$fileName}");
         }
 
         $module = Modularity::findOrFail($moduleName);
 
-        $targetClassPath = $module->getTargetClassPath('listener', $fileName . ".php");
+        $targetClassPath = $module->getTargetClassPath('listener', $fileName);
 
 
         return $targetClassPath;
