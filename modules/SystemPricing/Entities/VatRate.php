@@ -2,4 +2,15 @@
 
 namespace Modules\SystemPricing\Entities;
 
-class VatRate extends \Oobook\Priceable\Models\VatRate {}
+use Unusualify\Modularity\Entities\Traits\ModelHelpers;
+
+class VatRate extends \Oobook\Priceable\Models\VatRate
+{
+    use ModelHelpers;
+
+    public $fillable = [
+        'name',
+        'slug',
+        'rate',
+    ];
+}

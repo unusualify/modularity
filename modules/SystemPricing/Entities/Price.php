@@ -4,9 +4,11 @@ namespace Modules\SystemPricing\Entities;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Modules\SystemPayment\Entities\Payment;
-
+use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 class Price extends \Oobook\Priceable\Models\Price
 {
+    use ModelHelpers;
+
     protected function vatRateNumber(): Attribute
     {
         return new Attribute(
