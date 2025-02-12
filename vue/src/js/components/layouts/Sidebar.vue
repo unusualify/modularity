@@ -78,46 +78,8 @@
           class="ue-sidebar__info-item"
         >
           <template v-slot:prepend="prependScope">
-            <v-dialog ref="profileDialog" width="500">
-              <template v-slot:activator="{ props }">
-                <v-avatar v-bind="props" :image="$store.getters.userProfile.avatar_url"/>
-              </template>
-              <template v-slot:default="{ isActive }">
-                <v-card>
-                  <v-card-title>
-                    <ue-title padding="0" :text="$t('Upload Profile Image')" color="grey-darken-5" transform="none" align="center" justify="space-between">
-                      <template #right>
-                        <v-btn icon="$close" variant="plain" color="grey-darken-5" size="default" @click="isActive.value = false"/>
-                      </template>
-                    </ue-title>
-                    <v-divider/>
-                  </v-card-title>
-                  <v-card-text>
-                    <div class="d-flex">
-                      <div class="my-3 flex-grow-0">
-                        <v-avatar class="my-aut" :image="$store.getters.userProfile.avatar_url" size="100"/>
-                      </div>
-                      <ue-form
-                        class="flex-grow-1 pl-6"
-                        :schema="$store.state.user.profileShortcutSchema"
-                        v-model="$store.state.user.profileShortcutModel"
-                        :action-url="$store.state.user.profileRoute"
-
-                        :async="true"
-                        :hasSubmit="true"
-                        no-default-form-padding
-                        is-editing
-                        buttonText="fields.save"
-
-                        @submitted="profileFormSubmitted"
-
-                      >
-                      </ue-form>
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </template>
-            </v-dialog>
+            <v-avatar :image="$store.getters.userProfile.avatar_url"
+              @click="$openProfileDialog"/>
           </template>
           <template v-slot:append>
             <v-btn
@@ -196,92 +158,6 @@
         <!-- Bottom Slot -->
         <slot name="bottom"> </slot>
       </v-list>
-      <!-- <slot name="profileMenu">
-        <v-list
-          v-if="profileMenu.length"
-          v-model:opened="open"
-          bg-color="grey-lighten-3"
-        >
-          <v-list-group
-            value="User"
-            expand-icon="mdi-menu-up"
-            collapse-icon="mdi-menu-down"
-          >
-            <template v-slot:activator="{ props }">
-              <v-list-item
-                v-bind="props"
-                :title="currentUser.name"
-                :subtitle="currentUser.email"
-                lines="one"
-                @mouseenter="methods.handleProfile"
-              >
-              </v-list-item>
-            </template>
-            <ue-list-group
-              :items="profileMenu"
-              :hideIcons="hideIcons"
-              :expanded="expanded"
-              :profileMenu="true"
-            >
-            </ue-list-group>
-
-            <ue-logout-modal :csrf="csrf">
-              <template v-slot:activator="{ props }">
-                <v-list-item prepend-icon="mdi-logout" v-bind="props">
-                  {{ $t("authentication.logout") }}
-                </v-list-item>
-              </template>
-            </ue-logout-modal>
-          </v-list-group>
-          <div>
-            <slot name="bottom"> </slot>
-          </div>
-        </v-list>
-        <div v-else>
-          <ue-logout-modal :csrf="csrf">
-            <template v-slot:activator="{ props }">
-              <v-btn
-                v-if="expanded"
-                class="v-button--logout my-3"
-                variant="plain"
-                v-bind="props"
-                color="white"
-                prepend-icon="mdi-power"
-              >
-                {{ $t("authentication.logout") }}
-              </v-btn>
-              <v-btn
-                v-else
-                variant="plain"
-                v-bind="props"
-                icon="mdi-power"
-                color="white"
-                class="px-6"
-              >
-              </v-btn>
-            </template>
-          </ue-logout-modal>
-
-          <div class="d-flex justify-center">
-            <v-btn
-              v-if="expanded"
-              v-for="[_icon, _link] in socialMediaLinks"
-              class="ma-1"
-              :key="_icon"
-              :icon="_icon"
-              :href="_link"
-              target="_blank"
-              color="white"
-              size="x-small"
-            >
-              <v-icon size="medium" color="primary"></v-icon>
-            </v-btn>
-          </div>
-          <div>
-            <slot name="bottom"> </slot>
-          </div>
-        </div>
-      </slot> -->
     </template>
 
     <!-- <template v-slot:append>
