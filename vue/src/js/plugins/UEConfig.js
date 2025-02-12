@@ -80,7 +80,6 @@ export default {
     // add Global methods to all components
     app.config.globalProperties = {
       ...app.config.globalProperties,
-      ...commonMethods,
       $getLocale: i18n.global.locale.value,
       $numberFormats: i18n.global.numberFormats.value,
       $te: function (key, locale) {
@@ -118,8 +117,12 @@ export default {
         //   // __log(componentName, fileName, folder)
         //   app.component(componentName, require(`__components/${folder}${fileName}.vue`).default)
         // })
-      }
+      },
     }
+
+    Object.keys(commonMethods).forEach(key => {
+      app.config.globalProperties[key] = commonMethods[key].bind(app.config.globalProperties)
+    })
 
     // Global Vue mixin : Use global mixins sparsely and carefully!
     app.mixin({
