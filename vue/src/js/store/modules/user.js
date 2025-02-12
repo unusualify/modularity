@@ -6,6 +6,7 @@ const state = {
   timezone: window[import.meta.env.VUE_APP_NAME]?.TIMEZONE ?? 'Europe/London',
   authorization: window[import.meta.env.VUE_APP_NAME]?.AUTHORIZATION ?? {},
 
+  profileDialog: false,
   profile: window[import.meta.env.VUE_APP_NAME]?.STORE?.user?.profile ?? {},
   profileRoute: window[import.meta.env.VUE_APP_NAME]?.STORE?.user?.profileRoute ?? '',
   profileShortcutModel: window[import.meta.env.VUE_APP_NAME]?.STORE?.user?.profileShortcutModel ?? {},

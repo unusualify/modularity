@@ -35,6 +35,15 @@ export default {
   $main: function () {
     return this.$root.$refs.main
   },
+  $profileDialog: function () {
+    return this.$root.$refs.sidebar.$refs.profileDialog
+  },
+  $openProfileDialog: function () {
+    return this.$store.state.user.profileDialog = true
+  },
+  $closeProfileDialog: function () {
+    return this.$store.state.user.profileDialog = false
+  },
   $can: function (permission) {
     if (this.$store.getters.isSuperAdmin) {
       return true
