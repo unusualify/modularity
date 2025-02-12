@@ -1,5 +1,5 @@
 // hooks/useTableModals.js
-import { ref, computed, toRefs, onMounted } from 'vue'
+import { ref, computed, toRefs, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import _ from 'lodash-es'
@@ -87,6 +87,69 @@ export default function useTableModals(props, context) {
         customModalActive.value = false
         resetCustomModal()
       }
+    },
+    'show': {
+      ref: ref(null),
+      active: false,
+      data: null,
+
+      transition: 'dialog-bottom-transition',
+      widthType: 'lg',
+      fullscreen: false,
+      persistent: false,
+      title: t('Display Details'),
+      confirmText: t('Confirm'),
+      cancelText: t('Cancel'),
+
+      _old: {},
+
+      toggle(state = null) {
+        this.active = state ?? !this.active
+      },
+      close() {
+        this.toggle(false)
+      },
+      open() {
+        this.toggle(true)
+      },
+      set(attributes) {
+        let feasibles = Object.keys(attributes).reduce((acc, attribute) => {
+          if (this[attribute] !== undefined && !['active', 'ref', 'data', '_old'].includes(attribute)) {
+            acc[attribute] = attributes[attribute]
+          }
+          return acc
+        }, {})
+        let assignables = _.reduce(feasibles, (acc, value, attribute) => {
+          acc[attribute] = value
+          this._old[attribute] = _.cloneDeep(this[attribute])
+          return acc
+        }, {})
+        Object.assign(this, assignables)
+      },
+      loadData(data) {
+        this.data = data
+      },
+      resetData() {
+        this.data = null
+      },
+
+      cancel() {
+        this.toggle(false)
+        this.reset()
+      },
+      confirm() {
+        // this.toggle(false)
+        // this.reset()
+      },
+      reset() {
+        this.resetData()
+
+        _.each(this._old, (value, attribute) => {
+          this[attribute] = value
+         }
+        )
+        this._old = {}
+      },
     }
   })
 
@@ -134,6 +197,12 @@ export default function useTableModals(props, context) {
       __removeQueryParams(['customModal[description]', 'customModal[color]', 'customModal[icon]', 'customModal[hideModalCancel]'])
     }
   }
+
+  watch(() => modals.value.show.active, (value) => {
+    if (!value) {
+      modals.value.show.reset()
+    }
+  })
 
   onMounted(() => {
     console.log('Component using useTable is mounted', props.name)
