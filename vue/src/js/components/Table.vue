@@ -361,12 +361,19 @@
                   <v-card-actions>
                     <v-spacer />
                     <v-btn
-                    v-if="modals[activeModal].hideModalCancel"
-                    :color="modals[activeModal].color ? modals[activeModal].color : 'blue'" text @click="modals[activeModal].closeAction()">
+                      v-if="modals[activeModal].hideModalCancel"
+                      :color="modals[activeModal].color ? modals[activeModal].color : 'blue'"
+                      text
+                      @click="modals[activeModal].closeAction()"
+                    >
                       {{ modals[activeModal].cancelText || props.textCancel }}
                     </v-btn>
                     <!-- <v-btn color="blue" text @click="handleModal('confirm', modal.ref, props.onConfirm)"></v-btn> -->
-                    <v-btn :color="modals[activeModal].color ? modals[activeModal].color : 'blue'" text @click="modals[activeModal].confirmAction()">
+                    <v-btn
+                      :color="modals[activeModal].color ? modals[activeModal].color : 'blue'"
+                      text
+                      @click="modals[activeModal].confirmAction()"
+                    >
                       {{ modals[activeModal].confirmText || props.textConfirm }}
                     </v-btn>
                     <v-spacer />
