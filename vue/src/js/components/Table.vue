@@ -600,7 +600,7 @@
 
         <!-- #item actions slot-->
         <template v-slot:item.actions="{ item }">
-          <v-menu v-if="rowActionsType === 'dropdown' || $vuetify.display.smAndDown"
+          <v-menu v-if="actionShowingType === 'dropdown'"
             :close-on-content-click="false"
             left
             offset-x
