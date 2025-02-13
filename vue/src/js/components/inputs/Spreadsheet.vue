@@ -143,7 +143,7 @@ const snackbar = ref({
 
 // Initialize from props
 onMounted(() => {
-  console.log(input?.value.length, input?.value)
+  // console.log(input?.value.length, input?.value)
   if (input?.value.length) {
     fileInput.value = [new File([], 'existing-data.xlsx')]
     processTableData(input?.value)
@@ -175,10 +175,10 @@ const processTableHeaders = (data) => {
 // Process table data
 const processTableData = (data = null) => {
   if(data){
-    tableData.value = _.cloneDeep(input.value)
+    tableData.value = _.cloneDeep(data)
     tableHeaders.value = processTableHeaders(input.value)
   }else {
-    tableData.value = _.cloneDeep(data)
+    tableData.value = _.cloneDeep(input.value)
     tableHeaders.value = processTableHeaders(input.value)
   }
 
