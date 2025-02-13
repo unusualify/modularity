@@ -382,6 +382,55 @@
               </template>
             </ue-modal>
 
+            <!-- show modal -->
+            <ue-modal
+              v-if="modals['show'].active"
+              :ref="modals['show'].ref"
+              v-model="modals['show'].active"
+              :transition="modals['show'].transition || 'dialog-bottom-transition'"
+              :width-type="modals['show'].widthType || 'lg'"
+              :persistent="modals['show'].persistent"
+              :description-text="modals['show'].description"
+            >
+              <template v-slot:body="props">
+                <v-card class="fill-height d-flex flex-column">
+                  <v-card-title>
+                    <ue-title
+                      padding="a-3"
+                      color="grey-darken-5"
+                      align="center"
+                      justify="space-between"
+                    >
+                      {{ modals['show'].title }}
+                      <template v-slot:right>
+                      </template>
+                    </ue-title>
+                  </v-card-title>
+
+                  <v-divider class="mx-6"/>
+                  <v-card-text>
+                    <ue-recursive-data-viewer
+                      :data="modals['show'].data"
+                      :all-array-items-open="false"
+                      :all-array-items-closed="false"
+                    />
+                  </v-card-text>
+
+                  <v-divider class="mx-6 mt-4"/>
+                  <v-card-actions class="px-6 flex-grow-0">
+                    <v-spacer></v-spacer>
+                    <v-btn-primary
+                      :slim="false"
+                      variant="elevated"
+                      @click="modals['show'].cancel()"
+                    >
+                      {{ $t('fields.close') }}
+                    </v-btn-primary>
+                  </v-card-actions>
+                </v-card>
+              </template>
+            </ue-modal>
+
             <!-- custom form modal -->
             <ue-modal
               ref="customFormModal"
