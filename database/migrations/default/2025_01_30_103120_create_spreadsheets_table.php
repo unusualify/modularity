@@ -25,6 +25,14 @@ class CreateSpreadsheetsTable extends Migration
             createDefaultExtraTableFields($table);
         });
 
+        Schema::create('spreadsheet_translations', function (Blueprint $table) {
+            // createDefaultTranslationsTableFields($table, Str::singular(modularityConfig('tables.spreadsheets', 'modularity_spreadsheets')));
+            createDefaultTranslationsTableFields($table, 'spreadsheet');
+
+            $table->json('content')->default(new Expression('(JSON_ARRAY())'));;
+        });
+
+
     }
 
     public function down()

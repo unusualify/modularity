@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 trait HasSpreadsheetable
 {
 
+
     protected $_pendingSpreadsheetData = [];
 
     /**
@@ -17,13 +18,13 @@ trait HasSpreadsheetable
     public static function bootHasSpreadsheetable(): void
     {
         static::retrieved(function (Model $model) {
-            if ($model->spreadsheetable) {
-
-                $jsonData = $model->spreadsheetable->first()->content ?? [];
-                $model->setAttribute('_spreadsheet', $jsonData);
-
+            // Assuming you have one spreadsheet per locale
+            $spreadsheet = $model->spreadsheetable()->first();
+            if ($spreadsheet) {
+                // Load the spreadsheet's translation for the current locale
+                $translatedSpreadsheet = $spreadsheet->translateOrDefault(app()->getLocale());
+                $model->setAttribute('_spreadsheet', $translatedSpreadsheet->content);
             } else {
-
                 $model->setAttribute('_spreadsheet', []);
             }
         });
@@ -31,11 +32,10 @@ trait HasSpreadsheetable
         static::creating(function (Model $model) {});
 
         static::created(function (Model $model) {
-
             $model->spreadsheetable()->create([
-                'content' => $model->_pendingSpreadsheetData ?? []
+                'content' => $model->_pendingSpreadsheetData ?? [],
+                'locale'  => app()->getLocale(),
             ]);
-
         });
 
         static::updating(function (Model $model) {});
@@ -43,20 +43,17 @@ trait HasSpreadsheetable
         static::updated(function (Model $model) {});
 
         static::saving(function (Model $model) {
-
             if (!$model->exists) {
-                // For new models, preserve the spreadsheet data for after creation.
                 $model->_pendingSpreadsheetData = array_merge($model->_pendingSpreadsheetData, $model->_spreadsheet ?? []);
-
-            } else if($model->_spreadsheet){
-
-                $model->spreadsheetable()->update([
-                    'content' => json_encode($model->_spreadsheet)
-                ]);
+            } else if ($model->_spreadsheet) {
+                $locale = app()->getLocale();
+                // Update or create the spreadsheet translation via the relationship
+                $model->spreadsheetable()->updateOrCreate(
+                    ['locale' => $locale],
+                    ['content' => $model->_spreadsheet]
+                );
             }
-
             $model->offsetUnset('_spreadsheet');
-
         });
 
         static::saved(function (Model $model) {});
@@ -91,5 +88,9 @@ trait HasSpreadsheetable
     {
         return $this->morphMany(\Unusualify\Modularity\Entities\Spreadsheet::class, 'spreadsheetable');
     }
+
+    // protected function handleTranslatedSpreadsheet($data){
+
+    // }
 
 }
