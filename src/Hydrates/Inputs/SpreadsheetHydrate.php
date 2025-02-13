@@ -78,8 +78,6 @@ class SpreadsheetHydrate extends InputHydrate
             $input['sheet_columns'][$key] = mb_strtolower($value);
         }
         $input['example_file'] = $this->generateExampleFile($input);
-
-        // dd($input);
         return $input;
     }
 
