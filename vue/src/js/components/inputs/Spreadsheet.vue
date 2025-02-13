@@ -1,5 +1,7 @@
 <template>
-  <div>
+  <v-input
+    v-model="input"
+  >
     <!-- Loading Overlay -->
     <v-overlay v-model="isLoading" class="align-center justify-center">
       <v-progress-circular color="primary" indeterminate size="64"></v-progress-circular>
@@ -82,7 +84,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-  </div>
+  </v-input>
 </template>
 
 <script setup>
@@ -105,6 +107,12 @@ const props = defineProps({
   example_file: {
     type: String,
     default: ''
+  },
+  spreadsheetData: {
+    type: [Array, Proxy, Object],
+    default: () => [
+
+    ]
   }
 })
 
@@ -135,12 +143,12 @@ const snackbar = ref({
 
 // Initialize from props
 onMounted(() => {
+  console.log(input?.value.length, input?.value)
   if (input?.value.length) {
     fileInput.value = [new File([], 'existing-data.xlsx')]
-    processTableData()
-  }
-  console.log(props.example_file)
+    processTableData(input?.value)
 
+  }
 })
 
 // Watch for external changes
@@ -165,9 +173,15 @@ const processTableHeaders = (data) => {
 }
 
 // Process table data
-const processTableData = () => {
-  tableData.value = _.cloneDeep(input.value)
-  tableHeaders.value = processTableHeaders(input.value)
+const processTableData = (data = null) => {
+  if(data){
+    tableData.value = _.cloneDeep(input.value)
+    tableHeaders.value = processTableHeaders(input.value)
+  }else {
+    tableData.value = _.cloneDeep(data)
+    tableHeaders.value = processTableHeaders(input.value)
+  }
+
 }
 
 // Handle file change
