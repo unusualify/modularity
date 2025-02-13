@@ -10,13 +10,16 @@ class CreateSpreadsheetsTable extends Migration
 {
     public function up()
     {
-        $modularitySpreadssheetsTable = modularityConfig('tables.spreadsheets', 'modularity_spreadsheets');
+        $modularitySpreadsheetsTable = modularityConfig('tables.spreadsheets', 'modularity_spreadsheets');
 
-        Schema::create($modularitySpreadssheetsTable, function (Blueprint $table) {
+        Schema::create($modularitySpreadsheetsTable, function (Blueprint $table) {
             // this will create an id, name field
             createDefaultTableFields($table);
             $table->uuidMorphs('spreadsheetable');
             $table->json('content')->default(new Expression('(JSON_ARRAY())'));
+            $table->string('role')->nullable();
+            $table->string('locale')->nullable();
+
             // a "published" column, and soft delete and timestamps columns
             createDefaultExtraTableFields($table);
         });
