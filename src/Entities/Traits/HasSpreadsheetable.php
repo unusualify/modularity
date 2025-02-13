@@ -16,27 +16,47 @@ trait HasSpreadsheetable
      */
     public static function bootHasSpreadsheetable(): void
     {
-        static::retrieved(function (Model $model) {});
+        static::retrieved(function (Model $model) {
+            if ($model->spreadsheetable) {
+
+                $jsonData = $model->spreadsheetable->first()->content ?? [];
+                $model->setAttribute('_spreadsheet', $jsonData);
+
+            } else {
+
+                $model->setAttribute('_spreadsheet', []);
+            }
+        });
 
         static::creating(function (Model $model) {});
 
-        static::created(function (Model $model) {});
+        static::created(function (Model $model) {
+
+            $model->spreadsheetable()->create([
+                'content' => $model->_pendingSpreadsheetData ?? []
+            ]);
+
+        });
 
         static::updating(function (Model $model) {});
 
         static::updated(function (Model $model) {});
 
         static::saving(function (Model $model) {
-            // dd($model);
+
             if (!$model->exists) {
                 // For new models, preserve the spreadsheet data for after creation.
-                $model->_pendingSpreadData = array_merge($model->_pendingSpreadsheetData, $model->_spreadsheet);
+                $model->_pendingSpreadsheetData = array_merge($model->_pendingSpreadsheetData, $model->_spreadsheet ?? []);
 
-            } else if($model->_spread){
+            } else if($model->_spreadsheet){
+
                 $model->spreadsheetable()->update([
                     'content' => json_encode($model->_spreadsheet)
                 ]);
             }
+
+            $model->offsetUnset('_spreadsheet');
+
         });
 
         static::saved(function (Model $model) {});
@@ -67,9 +87,9 @@ trait HasSpreadsheetable
         $this->mergeFillable($spreadsheetableFields);
     }
 
-    public function spreadsheetable(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    public function spreadsheetable(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
-        return $this->morphOne(\Unusualify\Modularity\Entities\Spreadsheet::class, 'spreadsheetable');
+        return $this->morphMany(\Unusualify\Modularity\Entities\Spreadsheet::class, 'spreadsheetable');
     }
 
 }

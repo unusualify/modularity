@@ -19,31 +19,18 @@ trait HasSpreadable
 
             if (!$model->exists) {
                 // For new models, preserve the spread data for after creation.
-                // dd($model);
-                // dd($model->attributesToArray(), $model->fillable);
-                // dd($model->_pendingSpreadData, $model->_spread)
+
                 $model->_pendingSpreadData = array_merge($model->_pendingSpreadData, $model->_spread);
-                // dd($model, $model->_spread, $model->_pendingSpreadData);
-                // dd($model->attributesToArray());
-                // dd($model->_pendingSpreadData);
+
             } else if($model->_spread){
                 // For existing models, rebuild the _spread attribute from the spreadable fillable inputs,
                 // and clean those fillables from the model.
-                // dd($model);
-
-                // $spreadData = $model->updateSpreadableFromFillable();
-                // Update the related spread record with the rebuilt spread data.
-                // dd($model);
-                // dd($model->attributesToArray(), $model->fillable);
 
                 $model->spreadable()->update([
                     'content' => $model->_spread
                 ]);
             }
             $model->offsetUnset('_spread');
-
-            // Clean any remaining spreadable attributes from the main model.
-            // $model->cleanSpreadableAttributes();
         });
 
         self::created(static function(Model $model) {
