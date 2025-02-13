@@ -15,12 +15,17 @@ class Spreadsheet extends Model
     protected $fillable = [
         'published',
         'content',
-        'report_id', // Ensure report_id is fillable if needed
+        'role',
+        'locale'
+    ];
+
+    protected $casts = [
+        'content' => 'array'
     ];
 
     public function __construct(array $attributes = [])
     {
-        $this->table = modularityConfig('tables.spreadsheets', 'modularity_spreadsheets');
+        $this->table = $this->getTable();
         parent::__construct($attributes);
     }
 
@@ -28,12 +33,4 @@ class Spreadsheet extends Model
     {
         return modularityConfig('tables.spreadsheets', 'modularity_spreads');
     }
-
-    /**
-     * Get the report that owns the spreadsheet.
-     */
-    // public function report()
-    // {
-    //     return $this->belongsTo(Report::class, 'report_id', 'id');
-    // }
 }
