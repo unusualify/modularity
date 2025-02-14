@@ -28,7 +28,7 @@ abstract class ModelEvent
     /**
      * Create a new event instance.
      */
-    public function __construct(public $model)
+    public function __construct(public $model, public $serializedData = null)
     {
         $this->modelType = get_class($this->model);
 
