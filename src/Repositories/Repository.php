@@ -13,15 +13,17 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use PDO;
 use ReflectionClass;
+use Spatie\Activitylog\Facades\LogBatch;
 use Unusualify\Modularity\Entities\Behaviors\Sortable;
 use Unusualify\Modularity\Repositories\Traits\DatesTrait;
+use Unusualify\Modularity\Repositories\Traits\DispatchEvents;
 use Unusualify\Modularity\Repositories\Traits\MethodTransformers;
 use Unusualify\Modularity\Repositories\Traits\RelationTrait;
 use Unusualify\Modularity\Traits\ManageNames;
 
 abstract class Repository
 {
-    use DatesTrait, ManageNames, MethodTransformers, RelationTrait;
+    use DatesTrait, ManageNames, MethodTransformers, RelationTrait, DispatchEvents;
 
     /**
      * @var \Unusualify\Modularity\Models\Model
@@ -166,7 +168,11 @@ abstract class Repository
     {
         $query = $this->model->query();
 
-        return $query->with($this->formatWiths($query, $with))->withCount($withCount)->findOrFail($id);
+        if(classHasTrait($this->model, 'Illuminate\Database\Eloquent\SoftDeletes')){
+            return $query->withTrashed()->with($this->formatWiths($query, $with))->withCount($withCount)->findOrFail($id);
+        }else{
+            return $query->with($this->formatWiths($query, $with))->withCount($withCount)->findOrFail($id);
+        }
     }
 
     /**
@@ -302,6 +308,8 @@ abstract class Repository
         $this->traitColumns = $this->setColumns($this->traitColumns, $schema ?? $this->chunkInputs(all: true));
 
         return DB::transaction(function () use ($fields) {
+            LogBatch::startBatch();
+
             $original_fields = $fields;
 
             $fields = $this->prepareFieldsBeforeCreate($fields);
@@ -315,6 +323,10 @@ abstract class Repository
             $object->save();
 
             $this->afterSave($object, $fields);
+
+            LogBatch::endBatch();
+
+            $this->dispatchEvent($object, 'create');
 
             return $object;
         }, 3);
@@ -359,6 +371,7 @@ abstract class Repository
         $this->traitColumns = $this->setColumns($this->traitColumns, $schema ?? $this->chunkInputs(all: true));
 
         DB::transaction(function () use ($id, $fields) {
+            LogBatch::startBatch();
 
             if(classHasTrait($this->model, 'Unusualify\Modularity\Entities\Traits\IsSingular')){
                 $object = $this->model->single();
@@ -375,6 +388,10 @@ abstract class Repository
             $object->save();
 
             $this->afterSave($object, $fields);
+
+            LogBatch::endBatch();
+
+            $this->dispatchEvent($object, 'update');
         }, 3);
     }
 
@@ -501,7 +518,10 @@ abstract class Repository
             }
 
             if (! method_exists($object, 'canDeleteSafely') || $object->canDeleteSafely()) {
+                $this->dispatchEvent($object, 'delete');
+
                 $object->delete();
+
                 $this->afterDelete($object);
 
                 return true;
@@ -542,11 +562,19 @@ abstract class Repository
     public function forceDelete($id)
     {
         return DB::transaction(function () use ($id) {
+
             if (($object = $this->model->onlyTrashed()->find($id)) === null) {
                 return false;
             } else {
+                LogBatch::startBatch();
+
+                $this->dispatchEvent($object, 'forceDelete');
+
                 $object->forceDelete();
+
                 $this->afterForceDelete($object);
+
+                LogBatch::endBatch();
 
                 return true;
             }
@@ -587,8 +615,15 @@ abstract class Repository
     {
         return DB::transaction(function () use ($id) {
             if (($object = $this->model->withTrashed()->find($id)) != null) {
+                LogBatch::startBatch();
+
                 $object->restore();
+
                 $this->afterRestore($object);
+
+                $this->dispatchEvent($object, 'restore');
+
+                LogBatch::endBatch();
 
                 return true;
             }
