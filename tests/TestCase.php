@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Tests;
 
 use Nwidart\Modules\LaravelModulesServiceProvider;
+use Oobook\Database\Eloquent\ManageEloquentServiceProvider;
 use Spatie\Permission\PermissionServiceProvider;
 use Unusualify\Modularity\LaravelServiceProvider;
 use Unusualify\Modularity\Providers\ModularityProvider;
@@ -38,6 +39,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             LaravelServiceProvider::class,
             ModularityProvider::class,
             PermissionServiceProvider::class,
+            ManageEloquentServiceProvider::class,
         ];
     }
 

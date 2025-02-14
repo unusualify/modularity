@@ -48,7 +48,8 @@
     "vuetify-toast-snackbar": "^0.6.1",
     "vuex": "^4.1.0",
     "webfontloader": "^1.0.0",
-    "whatwg-fetch": "^3.6.2"
+    "whatwg-fetch": "^3.6.2",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.19.1",

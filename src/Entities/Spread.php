@@ -14,11 +14,11 @@ class Spread extends Model
     protected $fillable = [
         'name',
         'published',
-        'content',
+        'content'
     ];
 
     protected $casts = [
-        'content' => 'array',
+        'content' => 'array'
     ];
 
     // protected function casts(): array

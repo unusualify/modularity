@@ -28,8 +28,7 @@ class SpreadHydrate extends InputHydrate
         $input = $this->input;
         // add your logic
         $input['type'] = 'input-spread';
-        // dd($input);
-        // $input['items'] = ['test'];
+
         if (in_array('scrollable', $input)) {
             $input = array_diff($input, ['scrollable']);
             $input['scrollable'] = true;
@@ -37,32 +36,21 @@ class SpreadHydrate extends InputHydrate
         }
 
         $module = Modularity::find($input['_moduleName']);
+
+        $repository = $module->getRepository($input['_routeName']);
         $model = App::make($module->getRouteClass($input['_routeName'], 'model'));
-        // dd($model);
 
-        if (! isset($input['reservedKeys'])) {
-            $input['reservedKeys'] = $model->getReservedKeys();
+        if(!isset($input['reservedKeys'])){
+            $input['reservedKeys'] = $model->getSpreadableReservedKeys();
         }
 
-        // $allInputs = $model->getRouteInputs();
-        $spreadableInputs = collect($model->getRouteInputs())
-            ->filter(function ($item) {
-                return isset($item['spreadable']) && $item['spreadable'] === true;
-            })
-            ->pluck('name');
 
-        if (! empty($spreadableInputs) || $spreadableInputs) {
-            // dd( array_merge($input['reservedKeys'], $spreadableInputs->toArray()));
-            $input['reservedKeys'] = array_merge($input['reservedKeys'], $spreadableInputs->toArray());
+        $spreadableInputs = $repository->getSpreadableInputKeys($model);
+
+        if(!empty($spreadableInputs) || $spreadableInputs){
+            $input['reservedKeys'] = array_merge($input['reservedKeys'], $spreadableInputs);
         }
-        // dd($input['reservedKeys']);
-        // $input['reservedKeys'] = collect($this->module->getRouteInput($input['_routeName']))
-        // ->filter(fn($item) => $item['name'] !== '_spread')
-        // ->pluck('name')
-        // ->toArray();
 
-        // dd($reservedKeys);
-        // dd($input, $this->module, get_class_methods($this->module));
         return $input;
     }
 }

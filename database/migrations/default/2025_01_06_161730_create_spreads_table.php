@@ -16,8 +16,7 @@ class CreateSpreadsTable extends Migration
                 createDefaultTableFields($table);
                 $table->uuidMorphs('spreadable');
                 $table->json('content')->default(new Expression('(JSON_ARRAY())'));
-                $table->timestamps();
-                $table->softDeletes();
+                createDefaultExtraTableFields($table);
             });
 
         }

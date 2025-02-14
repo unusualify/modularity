@@ -20,4 +20,6 @@ return [
     'chats' => 'umod_chats',
     'chat_messages' => 'umod_chat_messages',
     'spreads' => 'umod_spreads',
+    'spreadsheets' => 'umod_spreadsheets',
+
 ];
