@@ -118,6 +118,10 @@ export default {
         //   app.component(componentName, require(`__components/${folder}${fileName}.vue`).default)
         // })
       },
+
+      $call: function (functionName, ...args) {
+        return this[functionName](...args)
+      },
     }
 
     Object.keys(commonMethods).forEach(key => {
