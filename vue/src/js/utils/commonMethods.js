@@ -13,9 +13,6 @@ export default {
   $isset: function (...args) {
     return window.__isset(...args)
   },
-  $call: function (functionName, ...args) {
-    return this[functionName](...args)
-  },
   $bindAttributes: function (attributes = null) {
     const _attributes = {}
     if (attributes) {
