@@ -2,6 +2,7 @@
 
 use Nwidart\Modules\Activators\FileActivator;
 use Nwidart\Modules\Providers\ConsoleServiceProvider;
+use Unusualify\Modularity\Activators\ModularityActivator;
 
 return [
 
@@ -232,7 +233,13 @@ return [
             'cache-key' => 'activator.installed',
             'cache-lifetime' => 604800,
         ],
+        'modularity' => [
+            'class' => ModularityActivator::class,
+            'statuses-file' => base_path('modules_statuses.json'),
+            'cache-key' => 'modularity.activator.installed',
+            'cache-lifetime' => 604800,
+        ],
     ],
 
-    'activator' => 'file',
+    'activator' => 'modularity',
 ];
