@@ -18,6 +18,9 @@ enum Permission: string
     case BULKFORCEDELETE = 'bulkForceDelete';
     case BULKRESTORE = 'bulkRestore';
 
+    case ACTIVITY = 'activity';
+    case SHOW = 'show';
+
     public static function get($caseName)
     {
         foreach (self::cases() as $case) {
