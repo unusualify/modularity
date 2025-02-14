@@ -37,7 +37,7 @@ trait ModelHelpers
         return true;
     }
 
-    public function getTitleField()
+    public function getTitleValue()
     {
         return $this->{$this->getRouteTitleColumnKey()};
     }
