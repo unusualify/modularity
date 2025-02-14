@@ -119,7 +119,6 @@ if (! function_exists('exec_target')) {
 
     function exec_target($item)
     {
-
         if (isset($item['repository'])) {
             $args = explode(':', $item['repository']);
             // dd($args);
@@ -154,8 +153,9 @@ if (! function_exists('exec_target')) {
                     $item['itemTitle'] = array_keys(Arr::except($item['items'][0], ['name']))[0];
                 }
             }
+            $item['repository'] = $repository;
+
         }
-        $item['repository'] = $repository;
 
         return $item;
 
