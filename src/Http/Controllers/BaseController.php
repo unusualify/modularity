@@ -137,20 +137,12 @@ abstract class BaseController extends PanelController
         //     ));
         // }
 
-        // $items = $this->repository->getModel()->all();
-        // $item = $items[0];
-        // $this->handleActionEvent($item, __FUNCTION__);
-
-        // event(new ModelCreatedEvent($model));
-        // ModelCreatedEvent::dispatch($model);
-        // ModelCreatedEvent::dispatchIf($this->request->ajax(), $model);
-
-
 
         $item = $this->repository->create($input + $optionalParent, $this->getPreviousRouteSchema());
 
         activity()->performedOn($item)->log('created');
 
+        // $this->handleActionEvent($item, __FUNCTION__);
         // $this->fireEvent($input);
 
         Session::put($this->routeName . '_retain', true);
@@ -288,7 +280,7 @@ abstract class BaseController extends PanelController
 
             $this->repository->update($id, $formRequest->all(), $this->getPreviousRouteSchema());
 
-            activity()->performedOn($item)->log('updated');
+            // $this->handleActionEvent($item, __FUNCTION__);
 
             // $this->fireEvent();
 
@@ -345,9 +337,11 @@ abstract class BaseController extends PanelController
 
         $item = $this->repository->getById($id);
 
+        // $this->handleActionEvent($item, __FUNCTION__);
+
         if ($this->repository->delete($id)) {
             // $this->fireEvent();
-            activity()->performedOn($item)->log('deleted');
+            // activity()->performedOn($item)->log('deleted');
 
             return $this->respondWithSuccess(___('listing.delete.success', ['modelTitle' => $this->modelTitle]));
             // return $this->respondWithSuccess(___("$this->baseKey::lang.listing.delete.success", ['modelTitle' => $this->modelTitle]));
@@ -362,8 +356,11 @@ abstract class BaseController extends PanelController
      */
     public function forceDelete()
     {
+        $item = $this->repository->getById($this->request->get('id'));
+
         if ($this->repository->forceDelete($this->request->get('id'))) {
             // $this->fireEvent();
+            // $this->handleActionEvent($item, __FUNCTION__);
 
             return $this->respondWithSuccess(__('listing.force-delete.success', ['modelTitle' => $this->modelTitle]));
         }
@@ -380,6 +377,7 @@ abstract class BaseController extends PanelController
         if ($this->repository->restore($this->request->get('id'))) {
             // $this->fireEvent();
             activity()->performedOn($this->repository->getById($this->request->get('id')))->log('restored');
+            // $this->handleActionEvent($this->repository->getById($this->request->get('id')), __FUNCTION__);
 
             return $this->respondWithSuccess(__('listing.restore.success', ['modelTitle' => $this->modelTitle]));
         }
