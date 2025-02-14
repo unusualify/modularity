@@ -333,6 +333,53 @@ trait ManageTable
             ];
         }
 
+        // show action
+        if ($this->getIndexOption('show')) {
+            $tableActions[] = [
+                'name' => 'Show',
+                'icon' => 'mdi-eye',
+                'color' => 'info',
+                'show' => true,
+                'title' => 'Show Item',
+                'widthType' => '',
+                'except' => [
+                    'actions',
+                    'last_activities',
+                    'activities',
+                    'activities_show',
+                    'lastActivities_show',
+                ],
+                'fullscreen' => true,
+            ];
+        }
+
+        // activity action
+        if ($this->getIndexOption('activity')) {
+            $tableActions[] = [
+                'name' => 'Last Operations',
+                'icon' => 'mdi-book-open-variant',
+                'color' => 'grey-darken-2',
+                'show' => 'last_activities',
+                'conditions' => [
+                    ['last_activities', '>', 0]
+                ],
+                'title' => 'Last Operations',
+                'only' => [
+                    'created_at' => 'Time',
+                    'event' => 'Event',
+                    'causer_id' => 'Causer ID',
+                    'causer_type' => 'Causer Type',
+                    'causer.name' => 'User Name',
+                    // 'causer' => 'Causer',
+                    'properties.attributes' => 'New Data',
+                    'properties.old' => 'Previous Data',
+                ],
+                // 'except' => [
+                //     'batch_uuid',
+                // ]
+            ];
+        }
+
         // navigation actions
         $tableActions = array_merge(
             $tableActions,
