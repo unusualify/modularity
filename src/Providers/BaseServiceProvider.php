@@ -8,7 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\View;
 use Laravel\Telescope\Telescope;
-use Unusualify\Modularity\Activators\FileActivator;
+use Unusualify\Modularity\Activators\ModuleActivator;
 use Unusualify\Modularity\Exceptions\AuthConfigurationException;
 use Unusualify\Modularity\Http\ViewComposers\CurrentUser;
 use Unusualify\Modularity\Http\ViewComposers\FilesUploaderConfig;
@@ -115,20 +115,27 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->registerCommands();
 
-        // $this->app->singleton(\Unusualify\Modularity\Contracts\RepositoryInterface::class, function ($app) {
-        $this->app->singleton('modularity', function (Application $app) {
+
+        // $this->app->singleton('modularity', function (Application $app) {
+        //     $path = $app['config']->get('modules.paths.modules');
+
+        //     return new Modularity($app, $path);
+        // });
+        // CANCEL \Nwidart\Modules\Laravel\LaravelFileRepository binding
+        // and Nwidart\Modules\Laravel\Module binding in the LaravelFileRepository createModule method
+        $this->app->singleton(\Nwidart\Modules\Contracts\RepositoryInterface::class, function($app) {
             $path = $app['config']->get('modules.paths.modules');
 
             return new Modularity($app, $path);
         });
+        $this->app->alias(Modularity::class, 'modularity');
 
         // $this->app->singleton(FileActivator::class, function ($app) {
-        $this->app->singleton('modularity.activator', function (Application $app) {
-            return new FileActivator($app);
-        });
+        // $this->app->singleton('modularity.activator', function (Application $app) {
+        //     return new ModuleActivator($app);
+        // });
 
         $this->app->singleton('modularity.navigation', UNavigation::class);
-        // $this->app->alias(\Unusualify\Modularity\Contracts\RepositoryInterface::class, 'ue_modules');
 
         $this->app->singleton('model.relation.namespace', function () {
             return "Illuminate\Database\Eloquent\Relations";
@@ -157,8 +164,6 @@ class BaseServiceProvider extends ServiceProvider
         });
 
         $this->app->alias(\Unusualify\Modularity\Facades\ModularityVite::class, 'ModularityVite');
-
-        // $this->app->alias(FileActivator::class, 'module_activator');
 
         $this->app->alias(\Torann\GeoIP\Facades\GeoIP::class, 'GeoIP');
 

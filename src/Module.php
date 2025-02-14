@@ -11,14 +11,16 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Nwidart\Modules\Contracts\ActivatorInterface;
 use Nwidart\Modules\Laravel\Module as NwidartModule;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
-use Unusualify\Modularity\Activators\FileActivator;
+use Unusualify\Modularity\Activators\ModuleActivator;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Support\Finder;
 
 class Module extends NwidartModule
 {
+    private $activator;
     /**
      * @var ModuleActivatorInterface
      */
@@ -34,21 +36,29 @@ class Module extends NwidartModule
     /**
      * The constructor.
      */
-    public function __construct(string $name, $path)
+    public function __construct($app, string $name, $path)
     {
-        $app = app();
-
         parent::__construct($app, $name, $path);
-
+        // $this->name = $name;
+        // $this->path = $path;
+        // $this->cache = $app['cache'];
+        // $this->files = $app['files'];
+        // $this->translator = $app['translator'];
+        // $this->activator = $app[ActivatorInterface::class];
+        $this->app = $app;
+        $this->moduleActivator = (new ModuleActivator($app, $this));
         try {
-            $this->moduleActivator = (new FileActivator($app))->setModule($this->getName(), $path);
+            // dd($app, $name, $path);
+            // $this->moduleActivator = (new ModuleActivator($app))->setModule($this->getName(), $path);
         } catch (\Throwable $th) {
-            dd($path, $name, $this->getName());
+            dd($name, $path, $th);
         }
 
         $this->setMiddlewares();
         // $this->moduleActivator->setModule($name);
     }
+
+
 
     /**
      * {@inheritdoc}
@@ -84,6 +94,32 @@ class Module extends NwidartModule
         }
     }
 
+    /**
+     * Determine whether the given status same with the current module status.
+     *
+     * @param bool $status
+     *
+     * @return bool
+     */
+    public function isStatus(bool $status): bool
+    {
+        return $this->activator->hasStatus($this, $status);
+        try {
+        } catch (\Throwable $th) {
+            dd($this, $status, $this->activator, $th, debug_backtrace());
+        }
+    }
+
+    public function getActivator()
+    {
+        return $this->activator;
+    }
+
+    public function clearCache()
+    {
+        $this->activator->reset();
+    }
+
     public function setMiddlewares()
     {
         $middleware_folder = GenerateConfigReader::read('filter')->getPath();
@@ -110,11 +146,11 @@ class Module extends NwidartModule
         }
     }
 
-    public function setModuleActivator($name)
-    {
-        // Directory path fix for System Modules
-        $this->moduleActivator->setModule($name, $this->getDirectoryPath());
-    }
+    // public function setModuleActivator($name)
+    // {
+    //     // Directory path fix for System Modules
+    //     $this->moduleActivator->setModule($name, $this->getDirectoryPath());
+    // }
 
     /**
      * Enable the current module route.
@@ -288,6 +324,8 @@ class Module extends NwidartModule
 
         return $this->app['config']->set("{$this->getSnakeName()}{$notation}", $newConfig);
     }
+
+
 
     /**
      * getParentRoute

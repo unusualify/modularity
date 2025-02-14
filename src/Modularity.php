@@ -14,6 +14,11 @@ use Unusualify\Modularity\Exceptions\ModularitySystemPathException;
 class Modularity extends FileRepository
 {
     /**
+     * @var ActivatorInterface
+     */
+    private $activator;
+
+    /**
      * @var ConfigRepository
      */
     private $modularityConfig;
@@ -74,7 +79,10 @@ class Modularity extends FileRepository
         $this->modularityCache = $app['cache'];
         $this->modularityConfig = $app['config'];
 
+        $this->activator = $app[\Nwidart\Modules\Contracts\ActivatorInterface::class];
+
         $this->retainModulesPath = $this->modularityConfig->get('modules.paths.modules');
+
     }
 
     /**
@@ -82,7 +90,7 @@ class Modularity extends FileRepository
      */
     protected function createModule(...$args)
     {
-        return new \Unusualify\Modularity\Module($args[1], $args[2] ?? null);
+        return new \Unusualify\Modularity\Module(...$args);
     }
 
     /**
@@ -90,11 +98,36 @@ class Modularity extends FileRepository
      */
     public function all(): array
     {
+        // dd($this);
         if (! $this->config('cache.enabled')) {
             return $this->scan();
         }
 
         return $this->formatCached($this->getCached());
+    }
+
+        /**
+     * Get modules by status.
+     *
+     * @param $status
+     *
+     * @return array
+     */
+    public function getByStatus($status): array
+    {
+        $modules = [];
+
+        /** @var Module $module */
+        foreach ($this->all() as $name => $module) {
+            if($this->activator->hasStatus($module, $status)){
+                $modules[$name] = $module;
+            }
+            // if ($module->isStatus($status)) {
+            //     $modules[$name] = $module;
+            // }
+        }
+
+        return $modules;
     }
 
     /**
@@ -123,9 +156,11 @@ class Modularity extends FileRepository
         }
 
         if ($resetCache) {
+            dd($modules);
             return $this->scan();
         }
 
+        // dd($modules);
         return $modules;
     }
 
@@ -140,30 +175,15 @@ class Modularity extends FileRepository
 
         $modules = [];
 
+        // dump($paths);
         foreach ($paths as $key => $path) {
-            // dd(
-            //     $paths,
-            //     $path,
-            //     $this->getFiles()->glob(
-            //         "{$path}/module.json"
-            //     )
-            // );
             $manifests = $this->getFiles()->glob("{$path}/module.json");
 
             is_array($manifests) || $manifests = [];
             foreach ($manifests as $manifest) {
                 $name = Json::make($manifest)->get('name');
-                // if(preg_match('/oguzhanbukcuoglu/', $manifest)){
-                //     dd(
-                //         $manifest,
-                //         dirname($manifest),
-                //         $name,
-                //         $manifests,
-                //     );
-                // }
-                $modules[$name] = $this->createModule($this->app, $name, dirname($manifest));
 
-                // dd($path, $manifests, $paths,  Json::make($manifest), $modules);
+                $modules[$name] = $this->createModule($this->app, $name, dirname($manifest));
 
             }
         }
@@ -235,6 +255,11 @@ class Modularity extends FileRepository
     public function clearCache()
     {
         app('cache')->forget($this->config('cache.key'));
+        $this->activator->flushCache(); // for modules_statuses.json cache
+        // foreach($this->all() as $module){
+        //     dd($module->clearCache());
+        //     app('cache')->forget($module->getActivator()->getCacheKey());
+        // }
     }
 
     /**
@@ -339,6 +364,16 @@ class Modularity extends FileRepository
         $cache_key = static::$translationCacheKey;
 
         Cache::forget($cache_key);
+    }
+
+    /**
+     * Get list of enabled modules.
+     *
+     * @return array
+     */
+    public function allEnabled(): array
+    {
+        return $this->getByStatus(true);
     }
 
     public function getGroupedModules($group_name)

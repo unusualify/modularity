@@ -40,6 +40,7 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
         $component_class_namespace = GenerateConfigReader::read('component-class')->getNamespace();
 
         // dd(config('modularity'));
+        // dd(Modularity::allEnabled(), Modularity::all());
         foreach (Modularity::allEnabled() as $module) {
 
             $module_name = $module->getName();
@@ -101,6 +102,8 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
                     $module->getLowerName()
                 );
             }
+        }
+        if(!$this->app->runningInConsole()){
         }
     }
 }
