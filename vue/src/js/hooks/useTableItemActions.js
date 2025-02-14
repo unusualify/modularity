@@ -311,12 +311,12 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
   const states = reactive({
     actionShowingType: computed(() => {
       const shouldShowDropdown = (actionsLength) => {
-        if (actionsLength > 5) return lgAndDown.value
-        if (actionsLength > 3) return mdAndDown.value
+        if (actionsLength > 7) return lgAndDown.value
+        if (actionsLength > 4) return mdAndDown.value
         return smAndDown.value
       }
 
-      props.rowActionsType === 'dropdown' || shouldShowDropdown(props.rowActions.length)
+      return props.rowActionsType === 'dropdown' || shouldShowDropdown(props.rowActions.length)
         ? 'dropdown'
         : 'inline'
     }),
