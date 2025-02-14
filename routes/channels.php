@@ -19,4 +19,14 @@ Broadcast::channel('models.{modelId}', function ($user, $modelId) {
     return $user->id === $modelType::findOrNew($modelId);
 }, ['guards' => ['web', Modularity::getAuthGuardName()]]);
 
+// Broadcast::channel('chatable', function ($user, $modelId) {
+//     return $user->id == $modelId;
+//     return $user->id === $modelType::findOrNew($modelId);
+// }, ['guards' => ['web', Modularity::getAuthGuardName()]]);
+
+// Broadcast::channel('stateable', function ($user, $modelId) {
+//     return $user->id == $modelId;
+//     return $user->id === $modelType::findOrNew($modelId);
+// }, ['guards' => ['web', Modularity::getAuthGuardName()]]);
+
 
