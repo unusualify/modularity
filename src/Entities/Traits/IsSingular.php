@@ -19,7 +19,7 @@ trait IsSingular
         self::creating(static function (Model $model) {
             $model->setAttribute('singleton_type', static::class);
             $model->setAttribute('content', Collection::make($model->fillable)
-                ->filter(fn ($attribute) => !in_array($attribute, self::$isSingularSelfAttributes))
+                ->filter(fn ($attribute) => !in_array($attribute, self::$isSingularSelfAttributes) && in_array($attribute, $model->getFillable()))
                 ->mapWithKeys(fn ($attribute) => [$attribute => $model->{$attribute}])
                 ->toArray());
 
@@ -32,7 +32,7 @@ trait IsSingular
 
         self::updating(static function (Model $model) {
             $model->setAttribute('content', Collection::make($model->fillable)
-                ->filter(fn ($attribute) => !in_array($attribute, self::$isSingularSelfAttributes))
+                ->filter(fn ($attribute) => !in_array($attribute, self::$isSingularSelfAttributes) && in_array($attribute, $model->getFillable()))
                 ->mapWithKeys(fn ($attribute) => [$attribute => $model->{$attribute}])
                 ->toArray());
 
@@ -47,7 +47,9 @@ trait IsSingular
             if ($model->content) {
                 $data = $model->content ?? [];
                 foreach ($data as $key => $value) {
-                    $model->setAttribute($key, $value);
+                    if(in_array($key, $model->getFillable())){
+                        $model->setAttribute($key, $value);
+                    }
                 }
             }
             $model->offsetUnset('content');
