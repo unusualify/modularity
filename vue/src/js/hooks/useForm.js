@@ -310,22 +310,13 @@ export default function useForm(props, context) {
     }
   })
 
-  // const itemActions = useItemActions(props, {...context, item: states.editedItem})
-
-  // Watch handlers
-  // watch(() => props.modelValue, (newValue) => {
-  //   __log('watch modelValue', newValue)
-  //   states.model = newValue
-  // }, { deep: true })
 
   watch(states.model, (value) => {
-    __log('watch model', value)
     context.emit('update:modelValue', value)
   }, { deep: true })
 
   // Watch editedItem
   watch(editedItem, (newValue, oldValue) => {
-    __log('watch editedItem', newValue, oldValue)
     if (!issetModel.value) {
       methods.regenerateInputSchema(newValue)
       states.model = getModel(rawSchema.value, newValue, store.state)
