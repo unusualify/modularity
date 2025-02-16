@@ -12,10 +12,10 @@
     @endforeach
 @stop
 
-@section('initialStore')
+@push('STORE')
     window['{{ modularityConfig('js_namespace') }}'].STORE.medias.crops = {!! json_encode(modularityConfig('settings.crops') ?? []) !!}
     window['{{ modularityConfig('js_namespace') }}'].STORE.medias.selected = {}
 
     window['{{ modularityConfig('js_namespace') }}'].STORE.browser = {}
     window['{{ modularityConfig('js_namespace') }}'].STORE.browser.selected = {}
-@stop
+@endpush
