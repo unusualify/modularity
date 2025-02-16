@@ -166,9 +166,7 @@ class FilepondManager
         // files listesinde gelmeyip object->fileponds listesinde olanlari fileponds tablosundan ve storage'tan sil
         foreach ($fileponds as $file) {
             if (! in_array($file->uuid, $existingUuids)) {
-                dd($file);
                 $file->delete();
-                // unset($files[array_search($file->uuid, $existingUuids)]);
             }
         }
 
@@ -185,7 +183,6 @@ class FilepondManager
             }
 
         }
-        // dd($fileponds, $role, $locale, $existingUuids);
 
     }
 
@@ -272,5 +269,53 @@ class FilepondManager
             return '';
         }
 
+    }
+
+    public function clearFolders()
+    {
+        $allFolders = Storage::directories($this->file_path);
+        $excludedFolders = [
+            trim($this->tmp_file_path, '/'),
+        ];
+
+        $excludedFolders = array_merge($excludedFolders, Filepond::all()->pluck('uuid')->map(fn($uuid) => $this->file_path . $uuid)->toArray());
+
+        $deleteFolders = array_values(array_diff($allFolders, $excludedFolders));
+
+        foreach ($deleteFolders as $folder) {
+            if (Storage::files($folder)) {
+                Storage::deleteDirectory($folder);
+            }
+        }
+    }
+
+    public function clearTemporaryFiles($days = 7)
+    {
+        $query = TemporaryFilepond::where('created_at', '<', now()->subDays($days));
+        $temporaryFileponds = $query->get();
+
+        $deleteFolders = $temporaryFileponds->pluck('folder_name')->map(fn($folder) => $this->tmp_file_path . $folder)->toArray();
+
+        foreach ($deleteFolders as $folder) {
+            if (Storage::files($folder)) {
+                Storage::deleteDirectory($folder);
+            }
+        }
+
+        $query->delete();
+
+        // delete empty folders
+        $allFolders = Storage::directories($this->tmp_file_path);
+        $excludedFolders = TemporaryFilepond::all()->pluck('folder_name')->map(fn($folder) => $this->tmp_file_path . $folder)->toArray();
+
+        $deleteFolders = array_values(array_diff($allFolders, $excludedFolders));
+
+        foreach ($deleteFolders as $folder) {
+            if (Storage::files($folder)) {
+                Storage::deleteDirectory($folder);
+            }
+        }
+
+        return $temporaryFileponds;
     }
 }
