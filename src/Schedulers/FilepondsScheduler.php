@@ -5,15 +5,18 @@ namespace Unusualify\Modularity\Schedulers;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Unusualify\Modularity\Entities\TemporaryFilepond;
+use Unusualify\Modularity\Facades\Filepond;
 
-class CleanTemporaryFilepondsScheduler extends Command
+class FilepondsScheduler extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'modularity:clean-temporary-fileponds';
+    protected $signature = 'modularity:fileponds:scheduler
+        {days=7 : The number of days to keep temporary fileponds}
+    ';
 
     /**
      * The console command description.
@@ -39,12 +42,12 @@ class CleanTemporaryFilepondsScheduler extends Command
      */
     public function handle()
     {
-        $query = TemporaryFilepond::where('created_at', '<', now()->subDay());
-        $count = $query->count();
-        $query->delete();
+        $temporaryFileponds = Filepond::clearTemporaryFiles($this->argument('days'));
+
+        Filepond::clearFolders();
 
         Log::channel('scheduler')
-            ->info("Modularity: Deleted {$count} expired temporary fileponds");
+            ->info("Modularity: Deleted {$temporaryFileponds->count()} expired temporary fileponds in last {$this->argument('days')} days");
 
 
         // $this->info(now()->format('Y-m-d H:i:s') . ' - Modularity: Temporary fileponds cleaned');
