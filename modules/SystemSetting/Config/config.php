@@ -55,12 +55,13 @@ return [
                 //     'spreadable' => true,
                 // ],
                 [
-                    'name' => '_spread',
+                    'name' => 'cont',
                     'label' => 'Spread',
                     'type' => 'spread',
                     'connector' => 'SystemSetting:General',
+                    'reservedKeys' => ['name'],
                     'height' => '250px',
-                    'scrollable',
+                    // 'scrollable' => true,
                 ],
                 [
                     'name' => 'logo',
