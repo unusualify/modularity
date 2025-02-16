@@ -102,8 +102,8 @@ abstract class BaseController extends PanelController
 
         $parentModuleId = $this->getParentModuleIdFromRequest($this->request) ?? $parentModuleId;
 
-        $this->submodule = isset($parentModuleId);
-        $this->submoduleParentId = $parentModuleId;
+        // $this->submodule = isset($parentModuleId);
+        // $this->submoduleParentId = $parentModuleId;
 
         $view = Collection::make([
             "$this->viewPrefix.form",
