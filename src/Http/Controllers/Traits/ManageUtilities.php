@@ -306,6 +306,7 @@ trait ManageUtilities
              ] : []);
 
         return array_replace_recursive($data, $this->formData($this->request, $item));
+
     }
 
     /**
@@ -377,9 +378,14 @@ trait ManageUtilities
 
     public function getFormUrl($itemId = null)
     {
-        $url = $itemId
-            ? $this->getModuleRoute($itemId, 'update', $this->isSingleton)
-            : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->submoduleParentId]);
+        try {
+            $url = $itemId
+                ? $this->getModuleRoute($itemId, 'update', $this->isSingleton)
+                : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->nestedParentId]);
+            //code...
+        } catch (\Throwable $th) {
+            dd($th, $this->routeName, $this->routePrefix, $this->nestedParentId, $this->isNested);
+        }
 
         return $url;
     }
