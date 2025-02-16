@@ -12,7 +12,7 @@
     ref="VInput"
     v-model="input"
     hide-details="auto"
-    :label="label"
+    :class="class"
   >
     <template v-slot:default="defaultSlot">
       <div
@@ -21,7 +21,10 @@
           $slots.activator ? 'd-non' : ''
         ]"
         >
-        <slot name="label">
+        <slot name="label" v-bind="{
+          label: label,
+          ref: $refs.VInput,
+        }">
           <ue-title v-if="label" :text="label" transform="none" padding="a-0" weight="regular" color="grey-darken-5"/>
         </slot>
         <slot name="body">
@@ -36,12 +39,15 @@
               :id="key"
               :key="key"
               v-bind="$lodash.omit($bindAttributes(), ['rules'])"
+              :allow-multiple="true"
+              :max-files="maxFiles"
               :name="name"
               :files="files"
               :server="server"
-              @init="init"
               @processfile="postProcessFilepond"
               @removefile="removeFilepond"
+
+              @init="init"
             />
           </div>
         </slot>
@@ -78,9 +84,17 @@
     },
     props: {
       ...makeInputProps(),
+      maxFiles: {
+        type: Number,
+        default: 2,
+      },
       endPoints: {
         type: Object,
         default: () => ({}),
+      },
+      class: {
+        type: String,
+        default: '',
       },
     },
     setup(props, context) {
@@ -322,7 +336,6 @@
           },
         }
       },
-      // csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
       input: {
         get(){
           return this.modelValue ?? []
@@ -333,7 +346,7 @@
       },
       key: {
         get(){
-          return this.modelValue?.[0]?.id + '-pod'
+          return `filepond-${Date.now()}`
         }
       },
       name(){
@@ -347,8 +360,8 @@
 
     },
     created() {
-      // __log(this.endPoints)
-    }
+    },
+
   };
 </script>
 
