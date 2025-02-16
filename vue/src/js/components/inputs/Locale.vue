@@ -4,8 +4,8 @@
       <template v-for="language in languages" :key="language.value">
         <component
           v-bind:is="`${type}`"
-          :class="[language.value === currentLocale.value || isCustomForm ? '' : 'd-none']"
           v-bind="attributesPerLang[`${language.value}`]"
+          :class="[language.value === currentLocale.value || isCustomForm ? '' : 'd-none']"
           @update:modelValue="modelUpdated($event, language.value)"
           >
           <template v-slot:appendx>
