@@ -36,8 +36,9 @@ final class LaravelServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../vue/dist/modularity' => public_path('vendor/modularity'),
             __DIR__ . '/../resources/assets/images' => public_path('vendor/modularity/assets/images'),
+            __DIR__ . '/../vue/dist/telescope' => public_path('vendor/telescope'),
 
-        ], 'public');
+        ], 'modularity-assets');
     }
 
     private function publishConfigs(): void
