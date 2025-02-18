@@ -13,7 +13,7 @@
       </template>
 
       <!-- Final form data -->
-      <v-col cols="12">
+      <v-col cols="12" v-if="previewFormData.length > 0">
         <v-sheet class="px-4">
           <ue-title
             type="body-1"
@@ -24,7 +24,6 @@
           >
             {{ finalFormTitle }}
           </ue-title>
-
           <!-- Preview form items -->
           <template
             v-for="(data, index) in previewFormData"
