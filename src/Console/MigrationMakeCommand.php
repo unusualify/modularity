@@ -36,7 +36,7 @@ class MigrationMakeCommand extends BaseCommand
         {--route= : The route name for pivot table}
         {--plain : Create plain migration}
         {--f|force : Force the operation to run when the route files already exist}
-        {--relational : Create relational table for many-to-many and polymorphic relationships}
+        {--relational= : Create relational table for many-to-many and polymorphic relationships}
         {--notAsk : Don\'t ask for trait questions}
         {--no-defaults : Unuse default input and headers}
         {--all : Add all traits}
