@@ -173,4 +173,34 @@ trait HasTranslation
     {
         return $this->translatedAttributes ?? [];
     }
+
+    /**
+     * Scope a query to find models by a translated attribute value for a specific locale.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $attribute The translated attribute name
+     * @param mixed $value The value to search for
+     * @param string|null $locale The locale to search in (defaults to current locale)
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWhereTranslation($query, $attribute, $value, $locale = null)
+    {
+        $locale = $locale ?: app()->getLocale();
+        $translationTable = $this->getTranslationsTable();
+
+        return $query->whereHas('translations', function($q) use ($attribute, $value, $locale) {
+            $q->where('locale', $locale)
+              ->where($attribute, $value);
+        });
+    }
+
+    /**
+     * Get the translations table name.
+     *
+     * @return string
+     */
+    protected function getTranslationsTable()
+    {
+        return $this->translations()->getRelated()->getTable();
+    }
 }
