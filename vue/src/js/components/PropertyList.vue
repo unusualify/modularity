@@ -40,7 +40,14 @@ const items = computed(() => {
 const formatValue = (values) => {
   if (!values) return null
   if (values.length === 0) return null;
-  return values.join(',');
+
+  let formattedValues = values.map(value => {
+    if (Array.isArray(value)) {
+      return value.join(', ');
+    }
+    return value;
+  });
+  return formattedValues.join(', ');
 };
 
 </script>
