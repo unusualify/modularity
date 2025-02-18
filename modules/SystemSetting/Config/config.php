@@ -3,6 +3,7 @@
 return [
     'name' => 'SystemSetting',
     'system_prefix' => true,
+    'group' => 'system',
     'headline' => 'System Settings',
     'routes' => [
         'general' => [
