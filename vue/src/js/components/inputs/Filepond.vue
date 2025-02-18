@@ -21,12 +21,24 @@
           $slots.activator ? 'd-non' : ''
         ]"
         >
-        <slot name="label" v-bind="{
-          label: label,
-          ref: $refs.VInput,
-        }">
-          <ue-title v-if="label" :text="label" transform="none" padding="a-0" weight="regular" color="grey-darken-5"/>
-        </slot>
+
+        <ue-title v-if="label" transform="none" padding="a-0" :weight="labelWeight" color="grey-darken-5">
+          <slot name="label" v-bind="{
+            label: label,
+            ref: $refs.VInput,
+          }">
+            {{ label }}
+          </slot>
+        </ue-title>
+        <ue-title v-if="subtitle" type="caption" transform="none" padding="a-0" :weight="subtitleWeight" color="grey-darken-5">
+          <slot name="subtitle" v-bind="{
+            subtitle: subtitle,
+            ref: $refs.VInput,
+          }">
+            <span v-html="subtitle"></span>
+          </slot>
+        </ue-title>
+
         <slot name="body">
           <div
             :class="[
@@ -39,9 +51,13 @@
               :id="key"
               :key="key"
               v-bind="$lodash.omit($bindAttributes(), ['rules'])"
+
               :allow-multiple="true"
+              :allow-file-type-validation="true"
+              :accepted-file-types="acceptedFileTypes"
               :max-files="maxFiles"
               :name="name"
+
               :files="files"
               :server="server"
               @processfile="postProcessFilepond"
@@ -51,6 +67,15 @@
             />
           </div>
         </slot>
+        <div class="hint-container">
+          <ue-title v-if="hint" type="caption" transform="none" padding="a-0" :weight="hintWeight" color="grey-darken-5">
+            <slot name="hint" v-bind="{
+              hint: hint,
+            }">
+              <span v-html="hint"></span>
+            </slot>
+          </ue-title>
+        </div>
       </div>
     </template>
   </v-input>
@@ -84,6 +109,14 @@
     },
     props: {
       ...makeInputProps(),
+      hint: {
+        type: String,
+        default: null,
+      },
+      hintWeight: {
+        type: String,
+        default: 'thin',
+      },
       maxFiles: {
         type: Number,
         default: 2,
@@ -93,6 +126,22 @@
         default: () => ({}),
       },
       class: {
+        type: String,
+        default: '',
+      },
+      labelWeight: {
+        type: String,
+        default: 'regular',
+      },
+      subtitle: {
+        type: String,
+        default: null,
+      },
+      subtitleWeight: {
+        type: String,
+        default: 'thin',
+      },
+      acceptedFileTypes: {
         type: String,
         default: '',
       },
@@ -444,4 +493,13 @@
       background-color: rgba(0, 0, 0, 0.75);
     }
   }
+
+  .hint-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: static !important;
+    transform: translateY(-15px) translateX(0px);
+  }
+
 </style>
