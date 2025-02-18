@@ -30,6 +30,14 @@
             >
               {{ displayedLocale }}
             </v-chip>
+            <v-chip v-else-if="labelScope.label && !$isset(labelScope.isActive)" style=""
+              size="x-small"
+              density="compact"
+              color="primary"
+              class="ml-1"
+            >
+              {{ displayedLocale }}
+            </v-chip>
           </template>
           <slot></slot>
         </component>
