@@ -450,49 +450,74 @@ trait ManageForm
 
                     $reversedParents = array_reverse($input['schema']);
 
+                    $foreignKeys = array_map(fn($i) => $i['name'], $reversedParents);
+
+                    $cascades = collect($reversedParents)->mapWithKeys(fn($i) => [
+                        $i['name'] => []
+                    ])->toArray();
+                    // dd($reversedParents, $foreignKeys);
                     foreach ($reversedParents as $index => $attachable) {
+                        $isCascadeable = false;
                         $name = $attachable['name'];
                         $connector = $attachable['connector'] ?? null;
+                        // dd($foreignKeys, $name, $attachable, $connector);
                         $attachable = $this->getSchemaInput($attachable + ['noRecords' => true])[$name];
 
                         if ((bool) $connector) {
                             $attachable['connector'] = $connector;
                         }
+
+                        $modelClass = null;
+
+                        if(isset($attachable['repository'])){
+                            $modelClass = App::make($attachable['repository'])->getModel();
+                        }else if(isset($attachable['_moduleName']) && isset($attachable['_routeName'])){
+                            $modelClass = Modularity::find($attachable['_moduleName'])->getRepository($attachable['_routeName'])->getModel();
+                        }else{
+                            throw new \Exception('Repository or connector not found on morphTo input: '.$name);
+                        }
+
+                        $columns = $modelClass->getColumns();
+                        $intersects = array_values(array_intersect($foreignKeys, $columns));
+                        if(count($intersects) > 0){
+                            $isCascadeable = true;
+                            foreach($intersects as $intersect){
+                                $cascades[$intersect][] = $name;
+                            }
+                        }
+
                         unset($attachable['noRecords']);
                         $attachable['ext'] = 'morphTo';
 
-                        if ($index == ($length - 1)) {
-                            // 'packageRegions:id,package_continent_id,name',
-                            // 'packageRegions.packageCountries:id,package_region_id,name'
+                        if(count($cascades[$name]) > 0){
                             $attachable['cascades'] = [];
-                            $selectables = array_values(array_reverse($data));
-                            $relationChain = '';
-                            foreach ($selectables as $j => $item) {
-                                $foreignKey = $item['name'];
-                                $relationshipName = pluralize($this->getCamelNameFromForeignKey($foreignKey));
-                                $relationChain .= ! $relationChain ? $relationshipName : ".{$relationshipName}";
-                                $ownerKey = $j == 0 ? $attachable['name'] : $selectables[$j - 1]['name'];
-
-                                $attachable['cascades'][] = $relationChain;
-                                // $attachable['cascades'][] = $relationChain . ":{$item['itemValue']},{$ownerKey},{$item['itemTitle']}";
-
-                                // $attachable['cascades'][$relationChain . " as {$relationChain}_items"] = [
-                                //     ['select', $item['itemValue'] , $ownerKey, $item['itemTitle']]
-                                // ];
+                            foreach($cascades[$name] as $cascadeableName){
+                                if(isset($data[$cascadeableName])){
+                                    $foreignKey = $data[$cascadeableName]['name'];
+                                    $relationshipName = pluralize($this->getCamelNameFromForeignKey($foreignKey));
+                                    $attachable['cascades'][] = $relationshipName;
+                                    $attachable['cascade'] = $foreignKey;
+                                }
                             }
-                            $attachable['cascade'] = $reversedParents[$index - 1]['name'];
-
-                        } elseif ($index) {
-                            $attachable['cascade'] = $reversedParents[$index - 1]['name'];
+                        }else{
+                            // $attachable['cascade'] = $reversedParents[$index - 1]['name'];
                         }
 
-                        if ($index !== ($length - 1)) {
+                        // if ($index !== ($length - 1)) {
+                        //     $attachable['items'] = [];
+                        // }
+
+                        if ($isCascadeable) {
                             $attachable['items'] = [];
                         }
 
-                        $_input = $this->getSchemaInput($attachable);
+                        try {
+                            $_input = $this->getSchemaInput($attachable);
 
-                        $data += $_input;
+                            $data += $_input;
+                        } catch (\Throwable $th) {
+                            dd($attachable, $th);
+                        }
                     }
                     $data = array_reverse($data);
                 }
