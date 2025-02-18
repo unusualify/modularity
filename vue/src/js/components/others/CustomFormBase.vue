@@ -130,7 +130,9 @@
                     <v-card-subtitle v-if="obj.schema.subtitle">{{obj.schema.subtitle}}</v-card-subtitle>  -->
                     <div v-if="obj.schema.noLabel !== true && (obj.schema.title || obj.schema.subtitle)" class="mb-3">
                       <ue-title color="grey-darken-5" padding="a-0" margin="b-0" transform="none" weight="bold" class="text-body-1" v-if="obj.schema.title">{{obj.schema.title}}</ue-title>
-                      <ue-title color="grey-darken-1" padding="a-0" margin="b-4" transform="none" weight="regular" class="text-caption" v-if="obj.schema.subtitle">{{obj.schema.subtitle}}</ue-title>
+                      <ue-title color="grey-darken-1" padding="a-0" margin="b-4" transform="none" weight="regular" class="text-caption" v-if="obj.schema.subtitle">
+                        <span v-html="obj.schema.subtitle"></span>
+                      </ue-title>
                     </div>
                     <v-custom-form-base
                       :id="`${id}-${obj.key}`"
