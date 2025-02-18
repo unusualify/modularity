@@ -216,7 +216,7 @@ abstract class Repository
      * @param null $exceptId
      * @return \Illuminate\Support\Collection
      */
-    public function list($column = 'name', $with = [], $scopes = [], $orders = [], $exceptId = null)
+    public function list($column = 'name', $with = [], $scopes = [], $orders = [], $appends = [], $exceptId = null)
     {
         $query = $this->model->newQuery();
 
@@ -236,18 +236,42 @@ abstract class Repository
             $query = $this->order($query, $orders);
         }
 
+        $columns = ['id', ...(is_array($column) ? $column : [$column])];
+
         if (method_exists($this->getModel(), 'isTranslatable') && $this->model->isTranslatable()) {
             $query = $query->withTranslation();
-            $column = is_array($column) ? array_shift($column) : $column;
+            $translatedAttributes = $this->getTranslatedAttributes();
+            $oldColumns = $columns;
+            $columns = array_diff($columns, $translatedAttributes);
+            $translatedColumns = array_values(array_intersect($oldColumns, $translatedAttributes));
 
-            return $query->get()->map(fn ($item) => [
-                ...$item->toArray(),
-                $column => $item->{$column},
+            $relationships = collect($with)->map(function ($r) {
+                $r = explode('.', $r)[0];
+                return $r;
+            })->toArray();
+
+            $foreignableRelationships = collect($relationships)->filter(function ($r) {
+                return in_array($this->getModel()->getRelationType($r), ['BelongsTo', 'MorphTo']);
+            })->values()->toArray();
+
+            foreach ($foreignableRelationships as $r) {
+                $columns[] = $this->getModel()->{$r}()->getForeignKeyName();
+            }
+
+            return $query->get($columns)->map(fn ($item) => [
+                ...collect($appends)->mapWithKeys(function ($append) use ($item) {
+                    return [$append => $item->{$append}];
+                })->toArray(),
+                ...collect($with)->mapWithKeys(function ($r) use ($item) {
+                    $r = explode('.', $r)[0];
+                    return [$r => $item->{$r}];
+                })->toArray(),
+                ...(collect($columns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
+                ...(collect($translatedColumns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
             ]);
 
         }
 
-        $columns = ['id', ...(is_array($column) ? $column : [$column])];
 
         try {
             return $query->get($columns);
