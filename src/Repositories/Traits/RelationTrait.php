@@ -21,7 +21,7 @@ trait RelationTrait
     {
 
         foreach ($this->getMorphToManyRelations() as $relationName) {
-            if (isset($fields[$relationName]) && $fields[$relationName] && $relationName != 'tags' && ! classHasTrait(get_class($this), 'Unusualify\Modularity\Repositories\Traits\TagsTrait')) {
+            if (isset($fields[$relationName]) && $fields[$relationName] && $relationName != 'tags') {
                 $object->{$relationName}()->sync($fields[$relationName]);
             }
         }
