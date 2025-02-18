@@ -15,9 +15,7 @@
           {{ item[itemTitle].toUpperCase() }}
         </v-btn>
 
-        <div v-if="item.description" class="text-caption pa-2">
-          {{ item.description }}
-        </div>
+        <div v-if="item[descriptionTitle]" class="text-caption pa-2" v-html="item[descriptionTitle]"></div>
       </v-col>
     </v-row>
   </v-radio-group>
@@ -51,6 +49,10 @@ export default {
       type: String,
       default: 'id'
     },
+    descriptionTitle: {
+      type: String,
+      default: 'description'
+    }
   },
   setup (props, context) {
     return {
