@@ -27,6 +27,9 @@ class TabGroupHydrate extends InputHydrate
 
         $eagers = [];
         foreach ($input['schema'] as $key => $_input) {
+            if (isset($_input['noEager']) && $_input['noEager'] === true) {
+                continue;
+            }
             if ($_input['type'] == 'input-comparison-table' && isset($_input['comparators'])) {
                 foreach ($_input['comparators'] as $relation => $conf) {
                     $eagers[] = isset($conf['eager']) ? $conf['eager'] : $input['name'] . '.' . $relation;
