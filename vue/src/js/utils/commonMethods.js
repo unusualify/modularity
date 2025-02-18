@@ -275,8 +275,8 @@ export default {
               let _haystack = item[_map];
               if (Array.isArray(_value) && _haystack) {
                 __displayData._value = _value.map(id => {
-                  let item = _haystack.find(i => i.id === id);
-                  return item ? item.title || item.name : 'N/A';
+                  let _item = _haystack.find(i => i.id === id);
+                  return _item ? _item.title || _item.name : 'N/A';
                 })
               } else {
                 if(!!_haystack){
