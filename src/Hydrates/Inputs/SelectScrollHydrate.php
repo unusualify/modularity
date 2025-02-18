@@ -17,6 +17,7 @@ class SelectScrollHydrate extends InputHydrate
         'itemTitle' => 'name',
         'default' => [],
         'cascadeKey' => 'items',
+        'returnObject' => false,
     ];
 
     /**
