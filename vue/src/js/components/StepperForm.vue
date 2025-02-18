@@ -483,7 +483,6 @@
             fieldName = notation.split('.').pop()
           }
 
-          __log(_notation, notation, fieldName)
           if(notation){
             notation = __wildcard_change(notation, _value)
             let dataSet = __data_get(this.schemas, notation, null)
