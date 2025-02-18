@@ -14,19 +14,13 @@
           </template>
           {{ item[itemTitle].toUpperCase() }}
         </v-btn>
+
+        <div v-if="item.description" class="text-caption pa-2">
+          {{ item.description }}
+        </div>
       </v-col>
     </v-row>
   </v-radio-group>
-  <!-- <v-input
-    v-model="selectedItems"
-    hideDetails="auto"
-    appendIcon="mdi-close"
-    :variant="boundProps.variant"
-    class="v-input-radio-group"
-    >
-    <template v-slot:default="defaultSlot">
-    </template>
-  </v-input> -->
 </template>
 
 <script>
