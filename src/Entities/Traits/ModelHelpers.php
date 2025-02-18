@@ -25,6 +25,10 @@ trait ModelHelpers
      */
     public static function bootModelHelpers()
     {
+        if(!auth()->check()) {
+            activity()->disableLogging();
+        }
+
         static::retrieved(function ($model) {});
 
         static::saving(function ($model) {
@@ -255,6 +259,11 @@ trait ModelHelpers
             ->with('causer')
             ->orderBy('created_at', 'desc')
             ->limit(10);
+    }
+
+    public function isForeignKeyRelationship($relation)
+    {
+        return $this->definedRelationTypes;
     }
 
     // public function tapActivity(\Spatie\Activitylog\Contracts\Activity $activity, string $eventName)
