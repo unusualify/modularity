@@ -5,7 +5,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSpreadsTable extends Migration
+return new class extends Migration
 {
     public function up()
     {
@@ -28,4 +28,4 @@ class CreateSpreadsTable extends Migration
     {
         Schema::dropIfExists(modularityConfig('tables.spreads', 'modularity_spreads'));
     }
-}
+};

@@ -6,7 +6,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularity\Facades\Modularity;
 
-class CreateModularitySingletonsTable extends Migration
+return new class extends Migration
 {
     public function up()
     {
@@ -16,7 +16,7 @@ class CreateModularitySingletonsTable extends Migration
             // this will create an id, name field
             createDefaultTableFields($table);
             $table->string('singleton_type');
-            $table->json('data')->default(new Expression('(JSON_ARRAY())'));
+            $table->json('content')->default(new Expression('(JSON_ARRAY())'));
 
             // a "published" column, and soft delete and timestamps columns
             createDefaultExtraTableFields($table, published: false);
@@ -30,4 +30,4 @@ class CreateModularitySingletonsTable extends Migration
         $table = Modularity::config('tables.singletons', 'modularity_singletons');
         Schema::dropIfExists($table);
     }
-}
+};

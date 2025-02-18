@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUnusualDefaultTagsTables extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -49,4 +49,4 @@ class CreateUnusualDefaultTagsTables extends Migration
         Schema::dropIfExists(modularityConfig('tables.tags', 'modularity_tags'));
         Schema::dropIfExists(modularityConfig('tables.tagged', 'modularity_tagged'));
     }
-}
+};
