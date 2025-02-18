@@ -559,8 +559,6 @@
           }
         }
 
-        __log(groups)
-
         const array = Object.values(groups)
         array.sort(function (left, right) {
           return left.hasOwnProperty('items') ? 1 : right.hasOwnProperty('items') ? -1 : 0
@@ -586,7 +584,7 @@
     },
 
     created () {
-      __log(this.items)
+
     }
   }
 </script>
