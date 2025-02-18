@@ -8,6 +8,7 @@ use Unusualify\Modularity\Facades\Modularity;
 
 abstract class Listener
 {
+    protected $mailEnabled = false;
     /**
      * Notification paths
      */
@@ -18,6 +19,10 @@ abstract class Listener
      */
     public function __construct()
     {
+        if (config('modularity.mail.enabled')) {
+            $this->mailEnabled = true;
+        }
+
         $this->addNotificationPath(Modularity::find('SystemNotification')->getDirectoryPath('Notifications'));
     }
 
@@ -75,12 +80,15 @@ abstract class Listener
      */
     public function handle($event): void
     {
-        $notificationClass = $this->getNotificationClass($event);
+        if ($this->mailEnabled) {
+            $notificationClass = $this->getNotificationClass($event);
 
-        if ($notificationClass) {
-            Notification::route('mail', 'oguz.bukcuoglu@gmail.com')
-                ->notifyNow(new $notificationClass($event->model, $event->serializedData));
+            if ($notificationClass) {
+                Notification::route('mail', 'oguz.bukcuoglu@gmail.com')
+                    ->notifyNow(new $notificationClass($event->model, $event->serializedData));
+            }
         }
+
 
         // $event->model->notify(new ModelCreatedNotification());
 
