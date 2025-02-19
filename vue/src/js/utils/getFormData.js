@@ -16,16 +16,16 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
     return Object.prototype.hasOwnProperty.call(value, 'slotable') || isTopEventInput(value) || isViewOnlyInput(value)
   })
 
-  if (_.find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'wrap'))) {
-    _.reduce(_inputs, (acc, input, key) => {
-      if(Object.prototype.hasOwnProperty.call(input, 'group')){
+  // if (_.find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'wrap'))) {
+  //   _.reduce(_inputs, (acc, input, key) => {
+  //     if(Object.prototype.hasOwnProperty.call(input, 'group')){
 
-      } else{
-        acc[key] = input
-      }
-      return acc
-    }, {})
-  }
+  //     } else{
+  //       acc[key] = input
+  //     }
+  //     return acc
+  //   }, {})
+  // }
 
   _inputs = _.reduce(_inputs, (acc, input, key) => {
     input.col.class = input._originalClass || input.col?.class || [];
@@ -121,7 +121,6 @@ export const getModel = (inputs, item = null, rootState = null) => {
       if(input.type == 'group' && __isset(item[name])){
         let defaultGroupKeys = Object.keys(_.omit(__dot(_default), ['id']));
         if(JSON.stringify(defaultGroupKeys) !== JSON.stringify(Object.keys(_.omit(__dot(item[name]), ['id'])))){
-
           value = {
             ..._default,
             ..._.pick(item[name], defaultGroupKeys)
