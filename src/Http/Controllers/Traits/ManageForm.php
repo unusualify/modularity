@@ -312,7 +312,7 @@ trait ManageForm
                     ],
                 ];
 
-                break;
+            break;
             case 'group':
             case 'wrap':
                 $input['typeInt'] ??= 'sheet';
@@ -377,7 +377,7 @@ trait ManageForm
                 // if($input['name'] == 'wrap-content')
                 $data = $input;
 
-                break;
+            break;
             case 'relationship':
                 $relationshipName = $input['relationship'] ?? $input['name'] ?? null;
 
@@ -438,7 +438,7 @@ trait ManageForm
                 //     unset($data['name']);
                 // }
 
-                break;
+            break;
             case 'morphTo':
 
                 $data = [];
@@ -526,7 +526,109 @@ trait ManageForm
                     $input = $data;
                 }
 
-                break;
+            break;
+            case 'polymorphic':
+                $arrayable = true;
+
+                if (!isset($input['model'])) {
+                    throw new \Exception('Model is required for polymorphic input');
+                }
+
+                $model = $input['model'];
+
+                if(!class_exists($model)) {
+                    throw new \Exception('Model ' . $model . ' does not exist on polymorphic input');
+                }
+
+                $modelInstance = App::make($model);
+
+                $morphId = $input['morphId'] ?? makeMorphForeignKey(get_class_short_name($model));
+                $morphType = $input['morphType'] ?? makeMorphForeignType(get_class_short_name($model));
+
+                $columns = $modelInstance->getColumns();
+
+
+                if(!(in_array($morphId, $columns) && in_array($morphType, $columns))) {
+                    throw new \Exception("{$morphType} and {$morphId} columns are not present in the model " . $model);
+                }
+
+                // Ensure we have morphs array
+                if (!isset($input['morphs']) || !is_array($input['morphs'])) {
+                    throw new \Exception('Morphs array is required for polymorphic input');
+                }
+
+
+                // Transform models into options for the type combobox
+                $polymorphics = collect($input['morphs'])->map(function($p) {
+                    $polymorphic = $p;
+                    $repository = $p;
+                    if (is_array($polymorphic)) {
+                        $repository = $polymorphic['repository'];
+                    } else {
+                        throw new \Exception('Invalid polymorphic input');
+                    }
+
+                    if (!class_exists($repository)) {
+                        throw new \Exception('Repository ' . $repository . ' does not exist on polymorphic input');
+                    }
+
+                    $repositoryInstance = App::make($repository);
+
+                    if (is_string($polymorphic)) {
+                        $polymorphic = [
+                            'repository' => $repository,
+                        ];
+                    }
+
+                    if(isset($polymorphic['name'])){
+                        if(trans()->has($polymorphic['name'])){
+                            $polymorphic['name'] = trans_choice($polymorphic['name'], 1);
+                        }else{
+                            $polymorphic['name'] = $polymorphic['name'];
+                        }
+                    }else{
+                        $polymorphic['name'] = get_class_short_name($repositoryInstance->getModel()::class);
+                    }
+
+                    return [
+                        'name' => $polymorphic['name'],
+                        'type' => $repositoryInstance->getModel()::class,
+                        'items' => $repositoryInstance->list(),
+                    ];
+                })->toArray();
+
+                $typeInput = [
+                    'type' => 'select',
+                    'name' => $morphType,
+                    'label' => 'Type',
+                    'itemValue' => 'id',
+                    'itemTitle' => 'name',
+                    'cascade' => $morphId,
+                    'items' => collect($polymorphics)->map(function($polymorphic) {
+                        return [
+                            'id' => $polymorphic['type'],
+                            'name' => $polymorphic['name'],
+                            'items' => $polymorphic['items'],
+                        ];
+                    })->toArray(),
+                ];
+
+                $idInput = [
+                    'type' => 'combobox',
+                    'name' => $morphId,
+                    'label' => 'Element',
+                    'itemValue' => 'id',
+                    'itemTitle' => 'name',
+                    'items' => [],
+                ];
+
+                $input = [
+                    $typeInput,
+                    $idInput,
+                ];
+
+                // $input = [];
+            break;
             default:
 
                 break;
