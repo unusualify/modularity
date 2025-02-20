@@ -236,13 +236,18 @@ abstract class Repository
             $query = $this->order($query, $orders);
         }
 
-        $columns = ['id', ...(is_array($column) ? $column : [$column])];
+        $defaultColumns = is_array($column) ? $column : [$column];
+
+        $columns = ['id', ...$defaultColumns];
+
+        $tableColumns = $this->getModel()->getColumns();
 
         if (method_exists($this->getModel(), 'isTranslatable') && $this->model->isTranslatable()) {
             $query = $query->withTranslation();
             $translatedAttributes = $this->getTranslatedAttributes();
             $oldColumns = $columns;
             $columns = array_diff($columns, $translatedAttributes);
+            $defaultColumns = array_diff($defaultColumns, $translatedAttributes);
             $translatedColumns = array_values(array_intersect($oldColumns, $translatedAttributes));
 
             $relationships = collect($with)->map(function ($r) {
@@ -258,17 +263,49 @@ abstract class Repository
                 $columns[] = $this->getModel()->{$r}()->getForeignKeyName();
             }
 
-            return $query->get($columns)->map(fn ($item) => [
-                ...collect($appends)->mapWithKeys(function ($append) use ($item) {
-                    return [$append => $item->{$append}];
-                })->toArray(),
-                ...collect($with)->mapWithKeys(function ($r) use ($item) {
-                    $r = explode('.', $r)[0];
-                    return [$r => $item->{$r}];
-                })->toArray(),
-                ...(collect($columns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
-                ...(collect($translatedColumns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
-            ]);
+            $with = array_merge($this->getModel()->getWith(), $with);
+
+            $absentColumns = array_diff($defaultColumns, $tableColumns);
+
+            if(in_array('name', $absentColumns)){
+                $titleColumnKey = $this->getModel()->getRouteTitleColumnKey();
+                if(in_array($titleColumnKey, $translatedAttributes)){
+                    $columns = array_filter($columns, fn($col) => $col !== 'name');
+                    $translatedColumns[] = $titleColumnKey;
+                }else{
+                    $columns = array_filter($columns, fn($col) => $col !== 'name');
+                    $columns[] = "{$this->getModel()->getRouteTitleColumnKey()} as name";
+                }
+            }
+
+            try {
+                //code...
+                return $query->get($columns)->map(fn ($item) => [
+                    ...collect($appends)->mapWithKeys(function ($append) use ($item) {
+                        return [$append => $item->{$append}];
+                    })->toArray(),
+                    ...collect($with)->mapWithKeys(function ($r) use ($item) {
+                        $r = explode('.', $r)[0];
+                        return [$r => $item->{$r}];
+                    })->toArray(),
+                    ...(collect($columns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
+                    ...(collect($translatedColumns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
+                ]);
+            } catch (\Throwable $th) {
+                dd(
+                    $this->getModel()->getRouteTitleColumnKey(),
+                    static::class,
+                    $columns,
+                    $appends,
+                    $with,
+                    $translatedColumns,
+                    $foreignableRelationships,
+                    $relationships,
+                    $foreignableRelationships,
+                    $th,
+                    debug_backtrace()
+                );
+            }
 
         }
 
