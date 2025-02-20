@@ -114,10 +114,10 @@ trait ModelHelpers
      *
      * @param array|string|null $columns Optionally limit the check to a set of columns.
      */
-    public function isSoftDeletable(): bool
+    public static function isSoftDeletable(): bool
     {
         // Model must have the trait
-        if (! classHasTrait($this, 'Illuminate\Database\Eloquent\SoftDeletes')) {
+        if (! classHasTrait(static::class, 'Illuminate\Database\Eloquent\SoftDeletes')) {
             return false;
         }
 
@@ -264,6 +264,16 @@ trait ModelHelpers
     public function isForeignKeyRelationship($relation)
     {
         return $this->definedRelationTypes;
+    }
+
+    /**
+     * Get the relationships that should be eager loaded by default
+     *
+     * @return array
+     */
+    public function getWith(): array
+    {
+        return $this->with ?? [];
     }
 
     // public function tapActivity(\Spatie\Activitylog\Contracts\Activity $activity, string $eventName)
