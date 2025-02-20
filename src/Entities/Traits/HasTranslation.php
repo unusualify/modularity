@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Entities\Traits;
 
 use Astrotomic\Translatable\Translatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
 use Unusualify\Modularity\Facades\TwillCapsules;
@@ -11,6 +12,15 @@ trait HasTranslation
 {
     use Translatable;
 
+    public static function bootHasTranslation(): void
+    {
+        if(method_exists(self::class, 'isSoftDeletable') && self::isSoftDeletable()){
+            static::forceDeleting(function (Model $model) {
+                /* @var Translatable $model */
+                return $model->deleteTranslations();
+            });
+        }
+    }
     /**
      * Returns the fully qualified translation class name for this model.
      *
