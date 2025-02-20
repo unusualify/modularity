@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Http\Controllers;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -137,6 +138,9 @@ abstract class BaseController extends PanelController
         //     ));
         // }
 
+        // dd(
+        //     $input
+        // );
 
         $item = $this->repository->create($input + $optionalParent, $this->getPreviousRouteSchema());
 
@@ -513,16 +517,30 @@ abstract class BaseController extends PanelController
         // for relationship fields
         if (preg_match('/(.*)(_relation)/', $column['key'], $matches)) {
             // $field = $column['key'];
+            $relationshipName = $matches[1];
             $relation = $item->{$matches[1]}();
             $itemTitle = $column['itemTitle'] ?? 'name';
 
             try {
-                // code...
-                $value = collect($relation->get())
-                    ->pluck($itemTitle)
-                    ->join(', ');
+                $records = $item->{$relationshipName};
+
+                if($records instanceof Collection){
+                    $value = $records
+                        ->pluck($itemTitle)
+                        ->join(', ');
+                }else if($records instanceof Model){
+                    $value = $records->{$itemTitle};
+                }else{
+                    $value = $records;
+                }
             } catch (\Throwable $th) {
-                dd($relation, $column, $matches, $th);
+                dd(
+                    $relationshipName,
+                    $records,
+                    $item,
+                    $th
+                );
+                dd($relationshipName, $relation, $column, $matches, $th);
             }
         }
 
