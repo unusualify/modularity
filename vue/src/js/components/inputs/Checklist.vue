@@ -27,20 +27,29 @@
             {{ subtitle }}
           </ue-title>
         </div>
+
         <v-divider v-if="label || subtitle" vertical class="mr-4"></v-divider>
+
+        <!-- treeview -->
         <v-row v-if="isTreeview">
           <v-col v-bind="{...treeviewCols}">
-            <v-list >
+
+            <v-list v-model:opened="openedGroups">
+
               <template
                 v-for="(group, key) in groupedItems"
-                :key="`checkbox-${key}`">
+                :key="`checkbox-${key}`"
+              >
+                <!-- group items -->
                 <template v-if="$isset(group.items) && group.items.length > 0">
                   <v-list-group
                     class="pl-0"
                     collapse-icon=""
                     expand-icon=""
-                    :opened="isGroupOpen(key)"
+                    :value="group.name"
                     >
+
+                    <!-- group expand activator -->
                     <template v-slot:activator="{ props, isOpen }">
                       <v-checkbox
                         v-if="!noGroupAllSelectable"
@@ -84,50 +93,53 @@
                       <v-divider v-if="hasGroupBottomDivider" class="mt-0"></v-divider>
                     </template>
 
-                    <v-list-item
-                      v-if="chunkField"
+                    <!-- list items -->
+                    <v-list-item v-if="chunkField"
                       style="padding-inline-start: 0px !important;"
                     >
                       <v-row
+                        no-gutters
                         :style="[
                           !flexColumn ? 'flex: 1 0 60%;' : ''
                         ]"
-                        no-gutters
                       >
-                        <template v-for="(item, index) in items"
-                            :key="`checkbox-${index}`">
-                            <v-col v-bind="checkboxCol"
-                              class="pb-0 pr-0 "
-                              >
-                              <div
-                                :class="getCheckboxContainerClasses(item)"
-                              >
-                                <span v-if="checkboxOnRight" :class="[($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue])) ? 'v-input-checklist__label--disabled' : '']">{{ item[itemTitle] }}</span>
-                                <v-spacer v-if="checkboxOnRight"></v-spacer>
-                                <v-checkbox
-                                  data-test="checkbox"
-                                  v-model="input"
-                                  :disabled="($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue]))"
-                                  :value="item[itemValue]"
-                                  :color="checkboxColor"
-                                  hide-details
-                                  :label="item[itemTitle]"
-                                  :class="getCheckboxClasses(item)"
-                                  :readonly="isMandatoryItem(item)"
-                                >
-                                  <template v-if="checkboxOnRight" #label>
-                                    <span></span>
-                                  </template>
-                                </v-checkbox>
-                              </div>
-                            </v-col>
-                            <!-- <v-spacer></v-spacer> -->
-                            <!-- <v-responsive v-if="index % 4 == 3" width="100%"></v-responsive> -->
-                        </template>
+                        <v-col
+                          v-for="(item, index) in group.items"
+                          :key="`checkbox-${index}`"
+                          v-bind="checkboxCol"
+                          class="pb-0 pr-0 "
+                          >
+                          <div
+                            :class="getCheckboxContainerClasses(item)"
+                          >
+                            <!-- checkbox is on right -->
+                            <span v-if="checkboxOnRight" :class="[($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue])) ? 'v-input-checklist__label--disabled' : '']">{{ item[itemTitle] }}</span>
+                            <v-spacer v-if="checkboxOnRight"></v-spacer>
+
+                            <!-- checkbox -->
+                            <v-checkbox
+                              data-test="checkbox"
+                              v-model="input"
+                              :disabled="($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue]))"
+                              :value="item[itemValue]"
+                              :color="checkboxColor"
+                              hide-details
+                              :label="item[itemTitle]"
+                              :class="getCheckboxClasses(item)"
+                              :readonly="isMandatoryItem(item)"
+                            >
+                              <!-- checkbox is on right -->
+                              <template v-if="checkboxOnRight" #label>
+                                <span></span>
+                              </template>
+                            </v-checkbox>
+
+                          </div>
+                        </v-col>
                       </v-row>
                     </v-list-item>
-                    <v-list-item
-                      v-else
+
+                    <v-list-item v-else
                       v-for="(item, i) in group.items"
                       :key="`checkbox-${i}`"
                       class="pl-0"
@@ -148,6 +160,8 @@
 
                   </v-list-group>
                 </template>
+
+                <!-- single item -->
                 <template v-else>
                   <v-list-item
                     class="pl-0"
@@ -162,15 +176,17 @@
                       hide-details
                       density="compact"
                     />
-                    <!-- <template v-slot:default="{isActive, isSelected, isIndeterminate, select}">
-                    </template> -->
                   </v-list-item>
 
                 </template>
+
               </template>
+
             </v-list>
           </v-col>
         </v-row>
+
+        <!-- standard checkbox list -->
         <v-row v-else
             :style="[
               !flexColumn ? 'flex: 1 0 60%;' : ''
@@ -221,13 +237,14 @@
               <!-- <v-responsive v-if="index % 4 == 3" width="100%"></v-responsive> -->
           </template>
         </v-row>
+
       </div>
     </template>
   </v-input>
 </template>
 
 <script>
-  import { computed } from 'vue'
+  import { computed, ref, toRef } from 'vue'
   import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
   import { cloneDeep } from 'lodash-es'
   export default {
@@ -313,10 +330,6 @@
         type: Boolean,
         default: true
       },
-      onlyFirstGroupOpen: {
-        type: Boolean,
-        default: true
-      },
       openAllGroups: {
         type: Boolean,
         default: false
@@ -395,11 +408,14 @@
         return input
       }
 
+      const openedGroups = ref([])
+
       return {
         ...useInput(props, {
           ...context,
           initializeInput
         }),
+        openedGroups: toRef(openedGroups),
         maxSelectable
       }
     },
@@ -466,7 +482,7 @@
         } else if(this.closeAllGroups){
           return false
         } else {
-          return this.onlyFirstGroupOpen ? index === 0 : true
+          return index === 0
         }
       },
       getCardStats(item) {
@@ -494,19 +510,20 @@
           if(this.chunkField){
             const groupName = this.items[i][this.chunkField]
             const checklistTitle = this.items[i][this.chunkTitleKey]
-
+            const item = this.items[i]
             if (Object.prototype.hasOwnProperty.call(groups, groupName)) {
-              if (__isset(groups[groupName].id)) delete groups[groupName].id
+              // if (__isset(groups[groupName].id)) delete groups[groupName].id
               groups[groupName].items.unshift({
-                id: this.items[i].id,
-                name: this.$lodash.startCase(this.$lodash.camelCase(checklistTitle))
+                id: item.id,
+                name: checklistTitle
               })
             }else{
               groups[groupName] = {
                 name: this.$lodash.startCase(this.$lodash.camelCase(groupName)),
                 items: [{
-                  id: this.items[i].id,
-                  name: this.$lodash.startCase(this.$lodash.camelCase(checklistTitle))
+                  id: item.id,
+                  // name: this.$lodash.startCase(this.$lodash.camelCase(checklistTitle))
+                  name: checklistTitle
                 }]
               }
             }
@@ -564,6 +581,12 @@
           return left.hasOwnProperty('items') ? 1 : right.hasOwnProperty('items') ? -1 : 0
         })
 
+        if(this.closeAllGroups){
+          this.openedGroups = []
+        } else {
+          this.openedGroups = !this.openAllGroups ? [array[0].name] : array.map((group) => group.name)
+        }
+
         return array
       },
       disabledCheckbox() {
@@ -584,7 +607,6 @@
     },
 
     created () {
-
     }
   }
 </script>
