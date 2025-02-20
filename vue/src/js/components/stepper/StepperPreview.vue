@@ -13,7 +13,7 @@
       </template>
 
       <!-- Final form data -->
-      <v-col cols="12" v-if="previewFormData.length > 0">
+      <v-col cols="12" v-if="previewFormData.length > 0" v-fit-grid>
         <v-sheet class="px-4">
           <ue-title
             type="body-1"
