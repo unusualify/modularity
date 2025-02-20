@@ -597,7 +597,9 @@ trait ManageForm
                     ];
                 })->toArray();
 
+                $spreadedProps = Arr::only($input, ['createable', 'editable']);
                 $typeInput = [
+                    ...$spreadedProps,
                     'type' => 'select',
                     'name' => $morphType,
                     'label' => 'Type',
@@ -614,6 +616,7 @@ trait ManageForm
                 ];
 
                 $idInput = [
+                    ...$spreadedProps,
                     'type' => 'combobox',
                     'name' => $morphId,
                     'label' => 'Element',
