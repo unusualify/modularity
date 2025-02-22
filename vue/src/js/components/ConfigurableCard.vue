@@ -13,9 +13,10 @@
           !hideSeparator ? 'ue-configurable-card__col--seperator' : '',
           justifyCenterColumns ? 'ue-configurable-card__col--justify-center' : '',
           alignCenterColumns ? 'ue-configurable-card__col--align-center' : '',
-          $isset(columnStyles[parseInt(segmentIndex) + 1]) ? `ue-configurable-card__col--unset-flex-basis` : ''
+          $isset(columnStyles[segmentIndex]) ? `ue-configurable-card__col--unset-flex-basis` : '',
+          columnClasses[segmentIndex] ?? ''
         ]"
-        :style="columnStyles[parseInt(segmentIndex) + 1] ?? ''"
+        :style="columnStyles[segmentIndex] ?? ''"
       >
         <slot :name="`segment.${segmentIndex === '_actions' ? 'actions' : (parseInt(segmentIndex) + 1)}`"
           v-bind="{
@@ -119,6 +120,11 @@
         type: Object,
         default: () => ({}),
         // Example format: { 0: 'flex-basis: 50%', 1: 'flex-basis: 25%', 2: 'flex-basis: 25%' } or { 0: 'flex-grow: 2', 1: 'flex-grow: 1' }
+      },
+      columnClasses: {
+        type: Object,
+        default: () => ({}),
+        // Example format: { 0: 'd-flex', '_actions': 'd-flex' }
       }
     },
     computed: {
