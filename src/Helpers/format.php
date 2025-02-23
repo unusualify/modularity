@@ -74,23 +74,23 @@ if (! function_exists('makeForeignKey')) {
 }
 
 if (! function_exists('makeMorphName')) {
-    function makeMorphName($string)
+    function makeMorphName($string, $suffix = 'able')
     {
-        return snakeCase(Str::singular($string) . 'able');
+        return snakeCase(Str::singular($string) . $suffix);
     }
 }
 
 if (! function_exists('makeMorphForeignKey')) {
-    function makeMorphForeignKey($string)
+    function makeMorphForeignKey($string, $suffix = 'able')
     {
-        return makeForeignKey(makeMorphName($string));
+        return makeForeignKey(makeMorphName($string, $suffix));
     }
 }
 
 if (! function_exists('makeMorphForeignType')) {
-    function makeMorphForeignType($string)
+    function makeMorphForeignType($string, $suffix = 'able')
     {
-        return snakeCase(makeMorphName($string)) . '_type';
+        return snakeCase(makeMorphName($string, $suffix)) . '_type';
     }
 }
 

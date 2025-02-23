@@ -91,6 +91,8 @@ class FormatHelpersTest extends TestCase
         $this->assertEquals('userable', makeMorphName('User'));
         $this->assertEquals('postable', makeMorphName('Post'));
         $this->assertEquals('imageable', makeMorphName('Image'));
+
+        $this->assertEquals('accessible', makeMorphName('Access', 'ible'));
     }
 
     /** @test */
