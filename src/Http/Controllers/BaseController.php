@@ -182,6 +182,7 @@ abstract class BaseController extends PanelController
         $params = $this->request->route()->parameters();
 
         $id = last($params);
+
         $item = $this->repository->getById(
             $id,
             $this->request->get('eagers') ?? [],
@@ -196,7 +197,9 @@ abstract class BaseController extends PanelController
 
 
         if ($this->request->ajax()) {
-            return $data;
+
+            return $item->toArray();
+            // return $data;
             // return $indexData + ['replaceUrl' => true];
         }
 
