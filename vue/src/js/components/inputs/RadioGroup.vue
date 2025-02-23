@@ -55,8 +55,12 @@ export default {
     }
   },
   setup (props, context) {
+
+    const initializeInput = (val) => {
+      return val
+    }
     return {
-      ...useInput(props, context)
+      ...useInput(props, {...context, ...{initializeInput}})
     }
   },
   data: function () {
