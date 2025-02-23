@@ -1154,7 +1154,7 @@
     "event": "formatFilter:2.packages:items:group|formatPreview:schema.$group.items.*.name:items"
   },
   "packages": {
-    "type": "input-tab-group",
+    "type": "input-form-tabs",
     "hint": "",
     "placeholder": "",
     "errorMessages": [],

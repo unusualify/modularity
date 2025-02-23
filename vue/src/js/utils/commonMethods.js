@@ -246,7 +246,7 @@ export default {
             displayData[key]._value = value.file_name;
           }
         break;
-        case 'input-tab-group':
+        case 'input-form-tabs':
           // Repeater adds a nested level to the model as an array
           displayData[key]._value = _.reduce(value, (acc, obj, id) => {
             id = __isString(id) ? parseInt(id) : id

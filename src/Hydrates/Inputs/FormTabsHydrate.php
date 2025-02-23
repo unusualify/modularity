@@ -2,7 +2,7 @@
 
 namespace Unusualify\Modularity\Hydrates\Inputs;
 
-class TabGroupHydrate extends InputHydrate
+class FormTabsHydrate extends InputHydrate
 {
     /**
      * Default values to set before hydrating
@@ -22,7 +22,7 @@ class TabGroupHydrate extends InputHydrate
     public function hydrate()
     {
         $input = $this->input;
-        $input['type'] = 'input-tab-group';
+        $input['type'] = 'input-form-tabs';
         $input['default'] = json_decode('{}');
 
         $eagers = [];
