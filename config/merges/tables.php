@@ -13,6 +13,7 @@ return [
     'tags' => 'umod_tags',
     'repeaters' => 'umod_repeaters',
     'authorizeds' => 'umod_authorizeds',
+    'creator_records' => 'umod_creator_records',
     'payments' => 'umod_payments',
     'states' => 'umod_states',
     'state_translations' => 'umod_state_translations',

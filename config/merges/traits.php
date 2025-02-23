@@ -65,14 +65,14 @@ return [
             'description' => 'Whether model has pricing trait or not',
         ],
     ],
-    'addAuthorized' => [
-        'model' => 'IsAuthorizedable',
-        'repository' => 'AuthorizedTrait',
-        'question' => 'Do you need to add authorized feature on this module?',
+    'addCreator' => [
+        'model' => 'HasCreator',
+        'repository' => 'CreatorTrait',
+        'question' => 'Do you need to add creator feature on this module?',
         'command_option' => [
-            'shortcut' => '--A',
+            'shortcut' => null,
             'input_type' => InputOption::VALUE_NONE,
-            'description' => 'Authorized models to indicate scopes',
+            'description' => 'Creator models to indicate scopes',
         ],
     ],
     'addFilepond' => [

@@ -24,14 +24,14 @@ Route::group(['prefix' => 'api'], function () {
         Route::get('preview/{uuid}', [FilepondController::class, 'preview'])->name('preview');
     });
 
-    Route::group(['prefix' => 'chatable', 'as' => 'chatable.'], function () {
-        Route::get('{chat}', [ChatableController::class, 'index'])->name('index');
-        Route::get('{chat}/attachments', [ChatableController::class, 'attachments'])->name('attachments');
-        Route::post('{chat}', [ChatableController::class, 'store'])->name('store');
-        Route::put('{chat_message}', [ChatableController::class, 'update'])->name('update');
-        Route::get('show/{chat_message}', [ChatableController::class, 'show'])->name('show');
-        Route::delete('destroy/{chat_message}', [ChatableController::class, 'destroy'])->name('destroy');
-    });
+    // Route::group(['prefix' => 'chatable', 'as' => 'chatable.'], function () {
+    //     Route::get('{chat}', [ChatableController::class, 'index'])->name('index');
+    //     Route::get('{chat}/attachments', [ChatableController::class, 'attachments'])->name('attachments');
+    //     Route::post('{chat}', [ChatableController::class, 'store'])->name('store');
+    //     Route::put('{chat_message}', [ChatableController::class, 'update'])->name('update');
+    //     Route::get('show/{chat_message}', [ChatableController::class, 'show'])->name('show');
+    //     Route::delete('destroy/{chat_message}', [ChatableController::class, 'destroy'])->name('destroy');
+    // });
 
     Route::controller(CurrencyExchangeController::class)
         ->prefix('currency')

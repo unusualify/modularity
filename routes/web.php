@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Unusualify\Modularity\Http\Controllers\ChatableController;
 use Unusualify\Modularity\Http\Controllers\ProfileController;
 
 /*
@@ -28,6 +29,15 @@ Route::get('users/impersonate/{id}', 'ImpersonateController@impersonate')->name(
 
 // system internal api routes (for ajax web routes)
 Route::prefix('api')->group(function () {
+    Route::group(['prefix' => 'chatable', 'as' => 'chatable.'], function () {
+        Route::get('{chat}', [ChatableController::class, 'index'])->name('index');
+        Route::get('{chat}/attachments', [ChatableController::class, 'attachments'])->name('attachments');
+        Route::post('{chat}', [ChatableController::class, 'store'])->name('store');
+        Route::put('{chat_message}', [ChatableController::class, 'update'])->name('update');
+        Route::get('show/{chat_message}', [ChatableController::class, 'show'])->name('show');
+        Route::delete('destroy/{chat_message}', [ChatableController::class, 'destroy'])->name('destroy');
+    });
+
     if (modularityConfig('enabled.media-library')) {
         Route::group(['prefix' => 'media-library', 'as' => 'media-library.'], function () {
             Route::post('sign-s3-upload', ['as' => 'sign-s3-upload', 'uses' => 'MediaLibraryController@signS3Upload']);

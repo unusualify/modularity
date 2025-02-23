@@ -2,7 +2,7 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
-trait AuthorizedTrait
+trait CreatorTrait
 {
     /**
      * Scope a query to only include the current user's revisions.
@@ -10,13 +10,13 @@ trait AuthorizedTrait
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function filterAuthorizedTrait($query, &$scopes)
+    public function filterCreatorTrait($query, &$scopes)
     {
         $scopes['authorized'] = true;
     }
 
-    public function afterForceDeleteAuthorizedTrait($object, $fields)
+    public function afterForceDeleteCreatorTrait($object, $fields)
     {
-        $object->authorized()->delete();
+        $object->creatorModel()->delete();
     }
 }

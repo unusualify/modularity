@@ -57,7 +57,10 @@ abstract class BaseController extends PanelController
 
     public function index($parentId = null)
     {
-
+        // dd(
+        //     class_uses_recursive(auth()->guard()->user()),
+        //     get_class_methods(auth()->guard())
+        // );
         if ($this->request->ajax()) {
             return [
                 'resource' => $this->getJSONData(),

@@ -27,12 +27,12 @@ class ChatHydrate extends InputHydrate
         $input['type'] = 'input-chat';
 
         $input['endpoints'] = [
-            'index' => route('chatable.index', ['chat' => ':id']),
-            'store' => route('chatable.store', ['chat' => ':id']),
-            'show' => route('chatable.show', ['chat_message' => ':id']),
-            'update' => route('chatable.update', ['chat_message' => ':id']),
-            'destroy' => route('chatable.destroy', ['chat_message' => ':id']),
-            'attachments' => route('chatable.attachments', ['chat' => ':id']),
+            'index' => route('admin.chatable.index', ['chat' => ':id']),
+            'store' => route('admin.chatable.store', ['chat' => ':id']),
+            'show' => route('admin.chatable.show', ['chat_message' => ':id']),
+            'update' => route('admin.chatable.update', ['chat_message' => ':id']),
+            'destroy' => route('admin.chatable.destroy', ['chat_message' => ':id']),
+            'attachments' => route('admin.chatable.attachments', ['chat' => ':id']),
         ];
 
         $acceptedFileTypes = $input['accepted-file-types']
