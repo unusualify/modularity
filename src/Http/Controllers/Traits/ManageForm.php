@@ -225,12 +225,12 @@ trait ManageForm
         $name = getValueOrNull($hydrated, 'name');
         $_input = null;
 
-        if ($type == 'divider' || (bool) $name) {
+        if (in_array($type, ['divider', 'title']) || (bool) $name) {
             if ($default_input['color'] && in_array($hydrated['type'], ['morphTo', 'relationship', 'wrap', 'group'])) {
                 unset($default_input['color']);
             }
             $_input = $this->configureInput(array_merge_recursive_preserve($default_input, $hydrated));
-            if ($type == 'divider') {
+            if (in_array($type, ['divider', 'title'])) {
                 $name = $type . '_' . uniqid();
                 $_input['name'] ??= $name;
             }
@@ -242,7 +242,7 @@ trait ManageForm
             // ? [ $input->name => $default_input->union( $this->configureInput($input) ) ]
             // ? [ $input['name'] => array_merge_recursive_preserve( $default_input, $this->configureInput($input) ) ]
             ? [$hydrated['name'] => $this->configureInput(array_merge_recursive_preserve($default_input, $hydrated))]
-            : ($type == 'divider' ? [$type . '_' . uniqid() => $hydrated] : []);
+            : (in_array($type, ['title', 'divider']) ? [$type . '_' . uniqid() => $hydrated] : []);
     }
 
     /**
@@ -332,6 +332,8 @@ trait ManageForm
                 if ($input['type'] == 'wrap') {
                     $input['name'] ??= 'wrap-' . uniqid();
                 }
+
+                $input['class'] ??= 'bg-transparent';
 
                 $input['schema'] = $input['type'] == 'wrap'
                     ? $schema
@@ -629,6 +631,16 @@ trait ManageForm
                     $typeInput,
                     $idInput,
                 ];
+
+                // $input = [];
+            break;
+            case 'title':
+                $input['padding'] ??= 'a-0';
+                $input['margin'] ??= 'b-0';
+                $input['transform'] ??= 'none';
+                $input['weight'] ??= 'bold';
+                $input['class'] ??= 'text-body-1';
+                $input['color'] ??= null;
 
                 // $input = [];
             break;
