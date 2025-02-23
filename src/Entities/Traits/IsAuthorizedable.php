@@ -31,19 +31,22 @@ trait IsAuthorizedable
             ]);
         });
 
-        // Add deleted event handler
-        static::forceDeleting(function ($model) {
-            // This will automatically delete the associated authorized record
-            $model->authorized()->delete();
-        });
 
-        // Add deleted event handler
-        static::deleting(function ($model) {
-            // This will automatically delete the associated authorized record
-            if (! (method_exists($model, 'isSoftDeletable') && $model->isSoftDeletable())) {
+        if(in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(static::class))){
+            // Add deleted event handler
+            static::forceDeleting(function ($model) {
+                // This will automatically delete the associated authorized record
                 $model->authorized()->delete();
-            }
-        });
+            });
+        }else{
+            // Add deleted event handler
+            static::deleting(function ($model) {
+                // This will automatically delete the associated authorized record
+                $model->authorized()->delete();
+            });
+        }
+
+
     }
 
     public function authorized(): \Illuminate\Database\Eloquent\Relations\MorphOne
