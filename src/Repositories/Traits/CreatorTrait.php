@@ -14,9 +14,4 @@ trait CreatorTrait
     {
         $scopes['authorized'] = true;
     }
-
-    public function afterForceDeleteCreatorTrait($object, $fields)
-    {
-        $object->creatorModel()->delete();
-    }
 }

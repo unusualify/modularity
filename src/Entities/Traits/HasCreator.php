@@ -10,9 +10,7 @@ trait HasCreator
 {
     protected static function bootHasCreator()
     {
-        if(in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(static::class))){
 
-        }
 
         static::created(function ($model) {
             if(Auth::check()){
@@ -50,7 +48,7 @@ trait HasCreator
         );
     }
 
-    public function creator()
+    public function creator() : \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
         return $this->hasOneThrough(
             $this->getCreatorModel(),
@@ -108,10 +106,6 @@ trait HasCreator
         ];
     }
 
-    protected function hasSpatiePermission($user)
-    {
-        return in_array('Spatie\Permission\Traits\HasRoles', class_uses_recursive($user));
-    }
 
     /**
      * Scope a query to only include the current user's revisions.
@@ -129,7 +123,7 @@ trait HasCreator
 
         $user = auth($guardName)->user();
 
-        $hasSpatiePermission = $this->hasSpatiePermission($user);
+        $hasSpatiePermission = in_array('Spatie\Permission\Traits\HasRoles', class_uses_recursive($user));
 
         if($hasSpatiePermission){
             if ($user->isSuperAdmin() || $user->hasRole($this->getAuthorizedRolesForCreatorRecord())) {
