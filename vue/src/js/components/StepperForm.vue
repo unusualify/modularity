@@ -12,14 +12,17 @@
         <v-col cols="12" lg="8" v-fit-grid>
           <StepperContent
             v-model="models"
+
             :schemas="schemas"
             @update:schemas="schemas = $event"
+
             :forms="forms"
             :active-step="activeStep"
             :form-refs="formRefs"
             :is-editing="isEditing"
-            @form-input="handleInput"
-            @form-valid="updateFormValid"
+
+            @form-input="handleInput($event)"
+            @form-valid="updateFormValid($event)"
           >
             <template #preview>
               <StepperPreview
@@ -110,14 +113,13 @@
   import { toRefs, reactive, ref, computed } from 'vue';
   import { map, reduce, find, each, filter, get, isEqual } from 'lodash-es';
 
-  import { getModel, handleEvents, handleMultiFormEvents } from '@/utils/getFormData.js'
+  import { getModel, handleMultiFormEvents } from '@/utils/getFormData.js'
 
   import { useInputHandlers, useValidation } from '@/hooks'
   import api from '@/store/api/form'
 
 
   import NotationUtil from '@/utils/notation';
-  import notation from '../utils/notation';
 
   import StepperHeader from './stepper/StepperHeader.vue'
   import StepperContent from './stepper/StepperContent.vue'
@@ -326,8 +328,9 @@
 
         return isFilled
       },
-      handleInput (v, index) {
-        const { on, key, obj, value } = v
+      handleInput (payload) {
+        const { event, index } = payload
+        const { on, key, obj, value } = event
         if (on === 'input' && !!key) {
           // if (!this.serverValid) {
           //   this.resetSchemaError(key)
@@ -335,26 +338,19 @@
           // __log(index, key, obj, v)
           // this.handleEvent(obj)
           let availableValue = get(this.models[index], key)
-
           if(JSON.stringify(availableValue) !== JSON.stringify(value)){
             this.pendingHandleFunctions.push((models, schemas, previewModel) => {
-              // __log('run pending function', obj.schema)
               handleMultiFormEvents(models, schemas, obj.schema, index, previewModel)
             })
           }else{
             handleMultiFormEvents(this.models, this.schemas, obj.schema, index, this.previewModel)
           }
 
-          // __log('handleInput', v, this.models,)
-          // __log(
-          //   'StepperForm previewData',
-          //   this.previewModel,
-          // )
         }
       },
-      updateFormValid(val, index) {
-        this.valids[index] = val
-        // __log('valid changed', index, val, this.valids)
+      updateFormValid(payload) {
+        const { event, index } = payload
+        this.valids[index] = event
       },
       goStep(step){
         // all previous steps are valid
@@ -373,7 +369,6 @@
         // callback()
       },
       async nextForm(index) {
-
         if(this.formRefs[index].value[0].validModel === true){
           this.activeStep += 1
           // callback()
@@ -536,8 +531,7 @@
         deep: true
       },
       models: {
-        handler (value, oldValue) {
-
+        handler (newVal, oldVal) {
           if(this.pendingHandleFunctions.length > 0){
             this.pendingHandleFunctions.forEach((fn) => {
               if(typeof fn === 'function'){
