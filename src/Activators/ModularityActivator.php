@@ -83,7 +83,6 @@ class ModularityActivator implements ActivatorInterface
      */
     public function reset(): void
     {
-        dd(__CLASS__, $this->statusesFile, $this->files->exists($this->statusesFile));
         if ($this->files->exists($this->statusesFile)) {
             $this->files->delete($this->statusesFile);
         }
@@ -112,17 +111,14 @@ class ModularityActivator implements ActivatorInterface
      */
     public function hasStatus(Module $module, bool $status): bool
     {
-        if (!isset($this->modulesStatuses[$module->getName()])) {
-            // if($status)
-            //     dd($module->getName(), $module, $this->modulesStatuses);
+        // $statuses = $this->modulesStatuses;
+        $statuses = $this->getModulesStatuses();
 
+        if (!isset($statuses[$module->getName()])) {
             return $status === false;
         }
 
-        // if($this->modulesStatuses[$module->getName()] === false){
-        //     dd($module->getName());
-        // }
-        return $this->modulesStatuses[$module->getName()] === $status;
+        return $statuses[$module->getName()] === $status;
     }
 
     /**
@@ -148,10 +144,15 @@ class ModularityActivator implements ActivatorInterface
      */
     public function delete(Module $module): void
     {
-        if (!isset($this->modulesStatuses[$module->getName()])) {
+        // $statuses = $this->modulesStatuses;
+        $statuses = $this->getModulesStatuses();
+
+        if (!isset($statuses[$module->getName()])) {
             return;
         }
-        unset($this->modulesStatuses[$module->getName()]);
+
+        unset($statuses[$module->getName()]);
+        $this->modulesStatuses = $statuses;
         $this->writeJson();
         $this->flushCache();
     }
@@ -185,7 +186,7 @@ class ModularityActivator implements ActivatorInterface
      * @return array
      * @throws FileNotFoundException
      */
-    private function getModulesStatuses(): array
+    public function getModulesStatuses(): array
     {
         // dd(
         //     $this->config->get('modules.cache.enabled'),
