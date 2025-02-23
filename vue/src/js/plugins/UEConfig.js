@@ -46,8 +46,10 @@ import { ALERT } from '../store/mutations'
 const includeGlobalComponents = import.meta.glob('__components/*.vue', {eager: true})
 const includeIteratorComponents = import.meta.glob('__components/data_iterators/*.vue', {eager: true})
 const includeLayouts = import.meta.glob('__components/layouts/*.vue', {eager:true})
-const includeCustomFormInputs = import.meta.glob('__components/inputs/*.vue', {eager: true})
+const includeFormInputs = import.meta.glob('__components/inputs/*.vue', {eager: true})
+
 const includeCustomComponents = import.meta.glob('__components/customs/*.vue', {eager: true})
+const includeCustomFormInputs = import.meta.glob('__components/customs/inputs/*.vue', {eager: true})
 
 core()
 
@@ -169,8 +171,9 @@ export default {
     app.config.globalProperties.registerComponents(includeIteratorComponents)
     // app.config.globalProperties.registerComponents(includeLabComponents, 'labs')
     app.config.globalProperties.registerComponents(includeLayouts, 'layouts')
-    app.config.globalProperties.registerComponents(includeCustomFormInputs, 'inputs', 'v-input')
+    app.config.globalProperties.registerComponents(includeFormInputs, 'inputs', 'v-input')
     app.config.globalProperties.registerComponents(includeCustomComponents, 'customs', 'ue-custom')
+    // app.config.globalProperties.registerComponents(includeCustomFormInputs, 'customs/inputs', 'v-input')
     // // Configurations
     // Vue.config.productionTip = isProd
     // Vue.config.devtools = true
