@@ -208,6 +208,7 @@
 
 <script>
   import { ALERT, CONFIG } from '@/store/mutations/index'
+  import { USER } from '@/store/mutations';
 
   export default {
     props: {
