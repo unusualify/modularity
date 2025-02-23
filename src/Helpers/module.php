@@ -439,3 +439,12 @@ if (! function_exists('exceptionalRunningInConsole')) {
         ]));
     }
 }
+
+if (! function_exists('backtrace_formatter')) {
+    function backtrace_formatter($carry, $item)
+    {
+        $carry[$item['file']] = $item['line'];
+
+        return $carry;
+    }
+}
