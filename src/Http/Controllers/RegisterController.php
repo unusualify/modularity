@@ -31,6 +31,7 @@ class RegisterController extends Controller
                 'title' => [
                     'text' => __('authentication.create-an-account'),
                     'tag' => 'h1',
+                    'color' => 'primary',
                     'type' => 'h5',
                     'weight' => 'bold',
                     'transform' => '',

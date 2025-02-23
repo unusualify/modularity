@@ -171,6 +171,7 @@ class LoginController extends Controller
                 'title' => [
                     'text' => __('authentication.login-title'),
                     'tag' => 'h1',
+                    'color' => 'primary',
                     'type' => 'h5',
                     'weight' => 'bold',
                     'transform' => '',

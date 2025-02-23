@@ -60,6 +60,7 @@ class ForgotPasswordController extends Controller
                 'title' => [
                     'text' => __('authentication.forgot-password'),
                     'tag' => 'h1',
+                    'color' => 'primary',
                     'type' => 'h5',
                     'weight' => 'bold',
                     'transform' => '',

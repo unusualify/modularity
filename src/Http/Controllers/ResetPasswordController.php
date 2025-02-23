@@ -139,7 +139,7 @@ class ResetPasswordController extends Controller
 
                 'formAttributes' => [
                     'hasSubmit' => true,
-
+                    'color' => 'primary',
                     // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
                     'modelValue' => [
                         'email' => $user->email,
