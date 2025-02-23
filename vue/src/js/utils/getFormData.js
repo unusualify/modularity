@@ -927,6 +927,17 @@ const FormatFuncs = {
                 // let getter = [parentPattern, inputToFormat.replace(/^([\w\.]+)(\*)([\w\.\*]+)$/, '$1*' + `id=${ids}` + '$3')].join('.')
                 let getter = [parentPattern, __wildcard_change(inputToFormat, val)].join('.')
                 let data = __data_get(handlerSchema, getter).shift()
+
+                if(!data){
+                  console.warn('formatPreview error', {
+                    getter,
+                    inputToFormat,
+                    data,
+                    handlerSchema,
+
+                  })
+                  return
+                }
                 let formattedData = data[0] ?? ''
 
                 if(_index > 1 && Array.isArray(data)){
