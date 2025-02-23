@@ -75,6 +75,16 @@ return [
             'description' => 'Creator models to indicate scopes',
         ],
     ],
+    'addAuthorize' => [
+        'model' => 'HasAuthorizable',
+        'repository' => 'AuthorizableTrait',
+        'question' => 'Do you need to add authorize feature on this module?',
+        'command_option' => [
+            'shortcut' => null,
+            'input_type' => InputOption::VALUE_NONE,
+            'description' => 'Authorize models to indicate scopes',
+        ],
+    ],
     'addFilepond' => [
         'model' => 'HasFileponds',
         'repository' => 'FilepondsTrait',
