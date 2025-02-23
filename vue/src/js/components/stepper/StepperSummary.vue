@@ -42,7 +42,7 @@
             class="v-stepper-form__nextButton"
             density="comfortable"
             :disabled="$hasRequestInProgress()"
-            @click="$emit('next-form', activeStep-1)"
+            @click="$emit('next-form', activeStep - 1 )"
           >
             {{ $t('next').toUpperCase() }}
           </v-btn-secondary>

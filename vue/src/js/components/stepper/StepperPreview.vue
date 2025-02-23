@@ -40,6 +40,7 @@
                 [
                   data.name || 'N/A ',
                   data.description || 'N/A',
+                  data.tags || [],
                 ],
                 data.basePrice_show || 'N/A'
               ]"
@@ -52,32 +53,43 @@
               align-center-columns
               justify-center-columns
               :column-styles="{
-                1: 'flex-basis: 50%;',
-                2: 'flex-grow: 1; display: flex; justify-content: center; align-items: center;',
-                3: 'flex-grow: 1; display: flex; align-items: end;',
+                '0': '',
+                '1': '',
+                '_actions': '',
+              }"
+              :column-classes="{
+                '0': 'flex-1-1-100 flex-md-1-0',
+                '1': 'flex-0-1 d-flex align-center',
+                '_actions': 'flex-0-1',
               }"
             >
               <!-- Name and description -->
               <template #[`segment.1`]="segmentScope">
+                {{ $log(segmentScope.data) }}
                 <div class="text-body-2 font-weight-medium mb-1">
                   {{ segmentScope.data[0] }}
                 </div>
                 <div class="text-caption">
                   {{ segmentScope.data[1] }}
                 </div>
+                <div v-if="segmentScope.data[2].length > 0" class="text-caption mt-4 d-flex ga-4 flex-wrap" >
+                  <v-chip v-for="tag in segmentScope.data[2]" :key="tag" variant="outlined" size="small" class="">
+                    {{ tag.name ?? tag.slug }}
+                  </v-chip>
+                </div>
               </template>
 
               <!-- Price -->
               <template #[`segment.2`]="segmentScope">
-                <div class="text-body-2 font-weight-medium py-auto">
+                <div class="text-h4 font-weight-medium py-auto">
                   {{ segmentScope.data }}
                 </div>
               </template>
 
               <!-- Actions -->
               <template #[`segment.actions`]="segmentScope">
-                <div class="d-flex fill-height justify-space-evenly align-content-md-center">
-                  <v-divider v-if="$vuetify.display.lgAndUp ? true : false" vertical></v-divider>
+                <div class="d-flex fill-height align-content-md-center">
+                  <!-- <v-divider v-if="$vuetify.display.lgAndUp ? true : false" vertical></v-divider> -->
                   <v-btn
                     class="mx-1 rounded-circle"
                     :min-width="segmentScope.actionProps.actionIconMinHeight"
