@@ -16,6 +16,10 @@ trait ModelHelpers
 
     public $oldTranslations = [];
 
+    public static $defaultAuthorizedModel = \Unusualify\Modularity\Entities\User::class;
+
+    public static $obligatoryAuthorizationRoles = ['superadmin', 'admin', 'client-manager', 'client-assistant'];
+
     /**
      * Boot the trait.
      *
