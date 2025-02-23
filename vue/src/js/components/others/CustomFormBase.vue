@@ -42,8 +42,14 @@
             <slot :name="getTypeItemSlot(obj)" v-bind= "{ obj, index, id }">
               <!-- slot replaces complete item of defined KEY -> <div slot="slot-item-key-[propertyName]">-->
               <slot :name="getKeyItemSlot(obj)" v-bind= "{ obj, index, id }">
+
+                <ue-title v-if="obj.schema.type === 'title'"
+                  :text="obj.schema.title ?? obj.schema.text ?? obj.schema.label ?? obj.schema.name"
+                  v-bind="bindSchema(obj)"
+                />
+
                 <!-- RADIO -->
-                <v-radio-group v-if="obj.schema.type === 'radio'"
+                <v-radio-group v-else-if="obj.schema.type === 'radio'"
                   v-bind="bindSchema(obj)"
                   :modelValue="setValue(obj)"
                   @change="onInput($event, obj)"
@@ -129,8 +135,8 @@
                     <!-- <v-card-title v-if="obj.schema.title">{{obj.schema.title}}</v-card-title>
                     <v-card-subtitle v-if="obj.schema.subtitle">{{obj.schema.subtitle}}</v-card-subtitle>  -->
                     <div v-if="obj.schema.noLabel !== true && (obj.schema.title || obj.schema.subtitle)" class="mb-3">
-                      <ue-title color="grey-darken-5" padding="a-0" margin="b-0" transform="none" weight="bold" class="text-body-1" v-if="obj.schema.title">{{obj.schema.title}}</ue-title>
-                      <ue-title color="grey-darken-1" padding="a-0" margin="b-4" transform="none" weight="regular" class="text-caption" v-if="obj.schema.subtitle">
+                      <ue-title padding="a-0" margin="b-0" transform="none" weight="bold" class="text-body-1" v-if="obj.schema.title">{{obj.schema.title}}</ue-title>
+                      <ue-title padding="a-0" margin="b-4" transform="none" weight="regular" class="text-caption" v-if="obj.schema.subtitle">
                         <span v-html="obj.schema.subtitle"></span>
                       </ue-title>
                     </div>
