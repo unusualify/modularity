@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Tests;
 
 use Nwidart\Modules\LaravelModulesServiceProvider;
 use Spatie\Permission\PermissionServiceProvider;
+use Unusualify\Modularity\Activators\ModularityActivator;
 use Unusualify\Modularity\LaravelServiceProvider;
 use Unusualify\Modularity\Providers\ModularityProvider;
 
@@ -38,6 +39,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             LaravelServiceProvider::class,
             ModularityProvider::class,
             PermissionServiceProvider::class,
+            \Oobook\Priceable\LaravelServiceProvider::class,
         ];
     }
 
@@ -58,6 +60,15 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             base_path('vendor/*/*'),
             realpath(__DIR__ . '/../modules'),
         ]);
+
+        $app['config']->set('modules.activators.modularity', [
+            'class' => ModularityActivator::class,
+            'statuses-file' => base_path('modules_statuses.json'),
+            'cache-key' => 'modularity.activator.installed',
+            'cache-lifetime' => 604800,
+        ]);
+
+        $app['config']->set('modules.activator', 'modularity');
 
     }
 
