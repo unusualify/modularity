@@ -8,7 +8,7 @@ import { useI18n } from 'vue-i18n'
 import { useInputHandlers, useValidation, useLocale, useItemActions } from '@/hooks'
 import { getModel, getSubmitFormData, getSchema, handleEvents, getTranslationInputsCount, getTopSchema } from '@/utils/getFormData.js'
 import { redirector } from '@/utils/response'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, isEqual } from 'lodash-es'
 
 export default function useForm(props, context) {
   const store = useStore()
@@ -20,36 +20,59 @@ export default function useForm(props, context) {
   const locale = useLocale()
 
   // Data refs
+  const VForm = ref(null)
+
+  // const issetModel = ref(props.modelValue ? Object.keys(props.modelValue).length > 0 : false)
+  // const issetSchema = ref(props.schema ? Object.keys(props.schema).length > 0 : false)
+  const issetModel = ref(props.modelValue ? true : false)
+  const issetSchema = ref(props.schema ? true : false)
+
   const formLoading = ref(false)
   const formErrors = ref({})
-  const rawSchema = ref(props)
-  const defaultItem = ref(null)
-  const issetModel = ref(Object.keys(props.modelValue).length > 0)
-  const issetSchema = ref(Object.keys(props.schema).length > 0)
 
-  const editedItem = computed(() => store.state.form.editedItem)
+  const rawSchema = ref(issetSchema.value
+    ? props.schema
+    : store.state.form.inputs)
 
-  const reference = computed(() => 'ref-' + id.value)
+  const defaultItem = ref(issetSchema.value
+    ? getModel(rawSchema.value)
+    : store.getters.defaultItem)
+
+
+  const storeEditedItem = computed(() => store.state.form.editedItem)
+
+  const model = ref(getModel(
+    rawSchema.value,
+    issetModel.value ? props.modelValue : storeEditedItem.value,
+    store.state,
+  ))
+
+  const inputSchema = ref(validations.invokeRuleGenerator(getSchema(rawSchema.value, model.value, props.isEditing)))
+  const topSchema = ref(getTopSchema(rawSchema.value, props.isEditing))
+  const extraValids = ref(props.actions.length ? props.actions.map(() => true) : [])
 
   const states = reactive({
     id: Math.ceil(Math.random() * 1000000) + '-form',
-    VForm: null,
-    model: issetModel.value ? props.modelValue : store.state.form.editedItem,
-    formItem: computed(() => issetModel.value ? props.modelValue : store.state.form.editedItem),
-    // issetModel: Object.keys(props.modelValue).length > 0,
+    VForm,
+
     issetModel,
     issetSchema,
+
+    model,
+    // storeEditedItem,
+    formItem: computed(() => issetModel.value ? props.modelValue : storeEditedItem.value),
+
+    inputSchema,
+    topSchema,
+    extraValids,
+
     hasStickyFrame: props.stickyFrame || props.stickyButton,
-    inputSchema: null,
-    topSchema: null,
     // formLoading: false,
     // formErrors: {},
     manualValidation: false,
-    extraValids: [],
     buttonDefaultText: computed(() =>
       props.buttonText ? (te(props.buttonText) ? t(props.buttonText) : props.buttonText) : t('submit')
     ),
-    editedItem,
     // editedItem: computed(() => store.state.form.editedItem),
     serverValid: computed(() => store.state.form.serverValid ?? true),
     loading: computed(() =>
@@ -59,7 +82,7 @@ export default function useForm(props, context) {
       props.actionUrl ? formErrors.value : store.state.form.errors
     ),
     reference: computed(() => 'ref-' + states.id),
-    hasTraslationInputs: computed(() => getTranslationInputsCount(states.inputSchema) > 0),
+    hasTraslationInputs: computed(() => getTranslationInputsCount(inputSchema.value) > 0),
     flattenedActions: computed(() => __isObject(props.actions) ? Object.values(props.actions) : props.actions),
     hasActions: computed(() => states.flattenedActions.length > 0),
   })
@@ -140,7 +163,7 @@ export default function useForm(props, context) {
   }
 
   const handleEvent = (obj) => {
-    handleEvents(states.model, states.inputSchema, obj.schema, true)
+    handleEvents(model.value, inputSchema.value, obj.schema, true)
   }
 
   const convertToNestedFormData = (obj, parentKey = '') => {
@@ -197,52 +220,51 @@ export default function useForm(props, context) {
       }
     }
     for (const name in _errors) {
-      if( states.inputSchema[name]) states.inputSchema[name].errorMessages = _errors[name]
+      if( inputSchema.value[name]) inputSchema.value[name].errorMessages = _errors[name]
     }
   }
 
   const resetSchemaError = (key) => {
-    states.inputSchema[key].errorMessages = []
+    inputSchema.value[key].errorMessages = []
   }
 
   const resetSchemaErrors = () => {
-    for (const key in states.inputSchema) {
+    for (const key in inputSchema.value) {
       resetSchemaError(key)
     }
   }
 
   // Initialize
   const initialize = () => {
-    rawSchema.value = issetSchema.value ? props.schema : store.state.form.inputs
-    defaultItem.value = issetSchema.value ? getModel(rawSchema.value) : store.getters.defaultItem
+    // rawSchema.value = issetSchema.value ? props.schema : store.state.form.inputs
+    // defaultItem.value = issetSchema.value ? getModel(rawSchema.value) : store.getters.defaultItem
 
-    states.model = getModel(
-      rawSchema.value,
-      // issetModel.value ? props.modelValue : editedItem.value,
-      issetModel.value ? props.modelValue : store.state.form.editedItem,
-      store.state,
-    )
+    // model.value = getModel(
+    //   rawSchema.value,
+    //   issetModel.value ? props.modelValue : editedItem.value,
+    //   // states.model,
+    //   store.state,
+    // )
 
-    states.inputSchema = validations.invokeRuleGenerator(getSchema(rawSchema.value, states.model, props.isEditing))
-    states.topSchema = getTopSchema(rawSchema.value, props.isEditing)
-    states.extraValids = props.actions.length ? props.actions.map(() => true) : []
+    // states.inputSchema = validations.invokeRuleGenerator(getSchema(rawSchema.value, states.model, props.isEditing))
+    // states.topSchema = getTopSchema(rawSchema.value, props.isEditing)
+    // states.extraValids = props.actions.length ? props.actions.map(() => true) : []
 
-    // __log('initialize', states.model)
+    // __log('initialize')
     resetSchemaErrors()
   }
 
   const methods = reactive({
     async validate () {
-      const result = await states.VForm.value.validate()
+      const result = await states.VForm.validate()
 
       return result
     },
     createModel: (schema) => {
       return getModel(schema, states.model.value, store.state)
     },
-    handleInput: (v, s) => {
-      const { on, key, obj } = v
-
+    handleInput: (event) => {
+      const { on, key, obj } = event
       if (on === 'input' && !!key) {
         if (!states.serverValid) {
           resetSchemaError(key)
@@ -250,7 +272,8 @@ export default function useForm(props, context) {
 
         handleEvent(obj)
       }
-      context.emit('input', v)
+      // __log('useForm handleInput', event)
+      context.emit('input', event)
     },
     handleClick: (e) => {
       const { on, obj, params } = e
@@ -307,21 +330,46 @@ export default function useForm(props, context) {
     getTopInputActiveLabel: (topInput) => {
       const item = topInput.items.find(item => item[topInput.itemValue] ===  (window.__isset(states.model[topInput.name]) ? states.model[topInput.name] : -1))
       return item ? item[topInput.itemTitle] : topInput.label
-    }
+    },
+
+    updatedCustomFormBaseModelValue: (value) => {
+      __log('updatedCustomFormBaseModelValue', value)
+      model.value = value
+    },
   })
 
+  // Add watch to sync with modelValue when it exists
+  watch(() => props.modelValue, (newVal, oldVal) => {
 
-  watch(states.model, (value) => {
-    context.emit('update:modelValue', value)
-  }, { deep: true })
+    if(oldVal === undefined) return
+
+    if (issetModel.value) {
+      // __log('modelValue watch', isEqual(newVal, oldVal), isEqual(newVal, model.value), newVal, model.value)
+      if(isEqual(newVal, oldVal) && isEqual(newVal, model.value)) return
+      // __log('modelValue watch', newVal, oldVal)
+      model.value = getModel(rawSchema.value, newVal, store.state)
+    }
+  })
 
   // Watch editedItem
-  watch(editedItem, (newValue, oldValue) => {
+  watch(() => storeEditedItem.value, (newVal, oldVal) => {
     if (!issetModel.value) {
-      methods.regenerateInputSchema(newValue)
-      states.model = getModel(rawSchema.value, newValue, store.state)
+      // methods.regenerateInputSchema(newValue)
+      // model.value = getModel(rawSchema.value, newValue, store.state)
     }
   })
+
+  watch(() => model.value, (newVal, oldVal) => { // ✅ Proper ref watching
+    if (issetModel.value) {
+      // __log('model watch', isEqual(newVal, oldVal), isEqual(newVal, props.modelValue), newVal, props.modelValue)
+
+      if(isEqual(newVal, oldVal) && isEqual(newVal, props.modelValue)) return
+
+      context.emit('update:modelValue', newVal)
+    } else {
+      // __log('useForm model watch for editedItem', newVal, oldVal)
+    }
+  }, { deep: true })
 
   // Watch errors
   watch(() => states.errors, (newValue) => {
@@ -329,30 +377,55 @@ export default function useForm(props, context) {
   })
 
   // Watch validModel
-  watch(() => validations.validModel, (newValue) => {
+  watch(() => validations.validModel.value, (newValue) => {
     context.emit('update:valid', newValue)
   })
 
   // Watch schema
-  watch(() => props.schema, (value, oldValue) => {
-    if (JSON.stringify(value) !== JSON.stringify(oldValue)) {
+  watch(() => props.schema, (newValue, oldValue) => {
+    // __log('schema watch', isEqual(newValue, oldValue), newValue, oldValue)
+    if (!isEqual(newValue, oldValue)) {
+      rawSchema.value = newValue
+      defaultItem.value = getModel(rawSchema.value)
+
+      // model.value = getModel(
+      //   rawSchema.value,
+      //   issetModel.value ? props.modelValue : storeEditedItem.value,
+      //   store.state,
+      // )
+
+      inputSchema.value = validations.invokeRuleGenerator(getSchema(rawSchema.value, model.value, props.isEditing))
+      topSchema.value = getTopSchema(rawSchema.value, props.isEditing)
+      // states.extraValids = props.actions.length ? props.actions.map(() => true) : []
       initialize()
     }
   }, { deep: true })
 
   // Watch inputSchema
-  watch(() => states.inputSchema, (value) => {
+  watch(() => inputSchema.value, (newValue, oldValue) => {
+    // __log('inputSchema watch', newValue, oldValue)
     // You can add any specific handling needed when inputSchema changes
   }, { deep: true })
 
   // Watch rawSchema
-  watch(rawSchema, (value, oldValue) => {
-    let oldModel = cloneDeep(states.model)
-    let model = getModel(value, states.model, store.state)
-    if (JSON.stringify(Object.keys(__dot(model))) !== JSON.stringify(Object.keys(__dot(oldModel)))) {
-      states.model = model
-      states.inputSchema = validations.invokeRuleGenerator(getSchema(value, states.model, props.isEditing))
+  watch(() => rawSchema.value, (value, oldValue) => {
+    // __log('watch rawSchema', value, oldValue)
+    if(oldValue === undefined) {
+      return
     }
+    if( !isEqual(value, oldValue)) {
+      const oldModel = cloneDeep(model.value)
+      // Changed variable name to avoid conflict
+      const newModel = getModel(value, model.value, store.state)
+
+      if (!isEqual(newModel, oldModel)) {
+        model.value = newModel
+        inputSchema.value = validations.invokeRuleGenerator(
+          getSchema(value, model.value, props.isEditing)
+        )
+      }
+    }
+
   }, { deep: true })
 
   initialize()

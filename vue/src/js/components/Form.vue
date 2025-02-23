@@ -3,7 +3,7 @@
     :style="{height: fillHeight ? ($vuetify.display.mdAndDown ? `calc(97vh - 64px)` : `calc(97vh)` ) : ''}">
     <v-form
       :id="id"
-      :ref="VForm"
+      ref="VForm"
       :action="actionUrl"
       method="POST"
       v-model="validModel"
@@ -17,7 +17,6 @@
         <ue-title
           v-if="title"
           padding="b-3"
-          color="grey-darken-5"
           align="center"
           justify="space-between"
           v-bind="titleOptions"
@@ -198,8 +197,9 @@
 
           <v-custom-form-base
             :id="`ue-wrapper-${id}`"
+
             v-model="model"
-            v-model:schema="inputSchema"
+            :schema="inputSchema"
             :row="rowAttribute"
 
             @update="handleUpdate"
@@ -310,9 +310,9 @@ export default {
   props: {
     modelValue: {
       type: Object,
-      default () {
-        return {}
-      }
+      // default () {
+      //   return {}
+      // }
     },
     formClass: {
       type: [Array, String],
@@ -326,9 +326,9 @@ export default {
     },
     schema: {
       type: Object,
-      default () {
-        return {}
-      }
+      // default () {
+      //   return {}
+      // }
     },
     async: {
       type: Boolean,
