@@ -18,7 +18,7 @@ return [
         'repository' => 'ImagesTrait',
         'question' => 'Do you need to attach images on this module?',
         'command_option' => [
-            'shortcut' => '--M',
+            'shortcut' => '--I',
             'input_type' => InputOption::VALUE_NONE,
             'description' => 'Do you need to attach images on this module?',
         ],
@@ -65,14 +65,24 @@ return [
             'description' => 'Whether model has pricing trait or not',
         ],
     ],
-    'addAuthorized' => [
-        'model' => 'IsAuthorizedable',
-        'repository' => 'AuthorizedTrait',
-        'question' => 'Do you need to add authorized feature on this module?',
+    'addCreator' => [
+        'model' => 'HasCreator',
+        'repository' => 'CreatorTrait',
+        'question' => 'Do you need to add creator feature on this module?',
         'command_option' => [
-            'shortcut' => '--A',
+            'shortcut' => null,
             'input_type' => InputOption::VALUE_NONE,
-            'description' => 'Authorized models to indicate scopes',
+            'description' => 'Creator models to indicate scopes',
+        ],
+    ],
+    'addAuthorize' => [
+        'model' => 'HasAuthorizable',
+        'repository' => 'AuthorizableTrait',
+        'question' => 'Do you need to add authorize feature on this module?',
+        'command_option' => [
+            'shortcut' => null,
+            'input_type' => InputOption::VALUE_NONE,
+            'description' => 'Authorize models to indicate scopes',
         ],
     ],
     'addFilepond' => [
@@ -80,7 +90,7 @@ return [
         'repository' => 'FilepondsTrait',
         'question' => 'Do you need to attach fileponds on this module?',
         'command_option' => [
-            'shortcut' => '--FP',
+            'shortcut' => null,
             'input_type' => InputOption::VALUE_NONE,
             'description' => 'Do you need to attach fileponds on this module?',
         ],
@@ -100,9 +110,19 @@ return [
         'repository' => null,
         'question' => 'Do you need to attach snapshot feature on this module route?',
         'command_option' => [
-            'shortcut' => '--SS',
+            'shortcut' => null,
             'input_type' => InputOption::VALUE_NONE,
             'description' => 'Do you need to attach snapshot feature on this module route?',
+        ],
+    ],
+    'addSingular' => [
+        'model' => 'IsSingular',
+        'repository' => null,
+        'question' => 'Would you like to make this module a singleton?',
+        'command_option' => [
+            'shortcut' => null,
+            'input_type' => InputOption::VALUE_NONE,
+            'description' => 'Would you like to make this module a singleton?',
         ],
     ],
 ];

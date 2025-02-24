@@ -15,6 +15,7 @@ import { MEDIA_LIBRARY } from '@/store/mutations'
 
 // Add-ons
 import vuetify from '@/plugins/vuetify'
+import broadcasting from '@/plugins/broadcasting'
 
 // Store
 import store from '@/store'
@@ -45,8 +46,10 @@ import { ALERT } from '../store/mutations'
 const includeGlobalComponents = import.meta.glob('__components/*.vue', {eager: true})
 const includeIteratorComponents = import.meta.glob('__components/data_iterators/*.vue', {eager: true})
 const includeLayouts = import.meta.glob('__components/layouts/*.vue', {eager:true})
-const includeCustomFormInputs = import.meta.glob('__components/inputs/*.vue', {eager: true})
+const includeFormInputs = import.meta.glob('__components/inputs/*.vue', {eager: true})
+
 const includeCustomComponents = import.meta.glob('__components/customs/*.vue', {eager: true})
+const includeCustomFormInputs = import.meta.glob('__components/customs/inputs/*.vue', {eager: true})
 
 core()
 
@@ -62,7 +65,7 @@ export default {
     app.use(vuetify)
     app.use(store)
     app.use(i18n)
-
+    app.use(broadcasting)
     app.config.globalProperties.$jquery = window.$
     app.config.globalProperties.$axios = window.axios
     app.config.globalProperties.$lodash = window._
@@ -79,7 +82,6 @@ export default {
     // add Global methods to all components
     app.config.globalProperties = {
       ...app.config.globalProperties,
-      ...commonMethods,
       $getLocale: i18n.global.locale.value,
       $numberFormats: i18n.global.numberFormats.value,
       $te: function (key, locale) {
@@ -117,8 +119,16 @@ export default {
         //   // __log(componentName, fileName, folder)
         //   app.component(componentName, require(`__components/${folder}${fileName}.vue`).default)
         // })
-      }
+      },
+
+      $call: function (functionName, ...args) {
+        return this[functionName](...args)
+      },
     }
+
+    Object.keys(commonMethods).forEach(key => {
+      app.config.globalProperties[key] = commonMethods[key].bind(app.config.globalProperties)
+    })
 
     // Global Vue mixin : Use global mixins sparsely and carefully!
     app.mixin({
@@ -161,8 +171,9 @@ export default {
     app.config.globalProperties.registerComponents(includeIteratorComponents)
     // app.config.globalProperties.registerComponents(includeLabComponents, 'labs')
     app.config.globalProperties.registerComponents(includeLayouts, 'layouts')
-    app.config.globalProperties.registerComponents(includeCustomFormInputs, 'inputs', 'v-input')
+    app.config.globalProperties.registerComponents(includeFormInputs, 'inputs', 'v-input')
     app.config.globalProperties.registerComponents(includeCustomComponents, 'customs', 'ue-custom')
+    // app.config.globalProperties.registerComponents(includeCustomFormInputs, 'customs/inputs', 'v-input')
     // // Configurations
     // Vue.config.productionTip = isProd
     // Vue.config.devtools = true

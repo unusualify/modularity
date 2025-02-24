@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Http\Controllers;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -11,13 +12,16 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageEvents;
+use Unusualify\Modularity\Http\Controllers\Traits\ManagePrevious;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageSingleton;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularity\Services\MessageStage;
-use Unusualify\Modularity\Traits\ManagePrevious;
-use Unusualify\Modularity\Traits\ManageUtilities;
+
 
 abstract class BaseController extends PanelController
 {
-    use ManagePrevious, ManageUtilities;
+    use ManagePrevious, ManageUtilities, ManageEvents, ManageSingleton;
 
     /**
      * @var string
@@ -53,7 +57,10 @@ abstract class BaseController extends PanelController
 
     public function index($parentId = null)
     {
-
+        // dd(
+        //     class_uses_recursive(auth()->guard()->user()),
+        //     get_class_methods(auth()->guard())
+        // );
         if ($this->request->ajax()) {
             return [
                 'resource' => $this->getJSONData(),
@@ -99,8 +106,8 @@ abstract class BaseController extends PanelController
 
         $parentModuleId = $this->getParentModuleIdFromRequest($this->request) ?? $parentModuleId;
 
-        $this->submodule = isset($parentModuleId);
-        $this->submoduleParentId = $parentModuleId;
+        // $this->submodule = isset($parentModuleId);
+        // $this->submoduleParentId = $parentModuleId;
 
         $view = Collection::make([
             "$this->viewPrefix.form",
@@ -133,17 +140,18 @@ abstract class BaseController extends PanelController
         //         'create'
         //     ));
         // }
-        // dd();
+
+        // dd(
+        //     $input
+        // );
+
         $item = $this->repository->create($input + $optionalParent, $this->getPreviousRouteSchema());
 
         activity()->performedOn($item)->log('created');
 
+        // $this->handleActionEvent($item, __FUNCTION__);
         // $this->fireEvent($input);
 
-        // dd(
-        //     $parentModuleId,
-        //     $input
-        // );
         Session::put($this->routeName . '_retain', true);
 
         if (isset($input['cmsSaveType']) && Str::endsWith($input['cmsSaveType'], '-close')) {
@@ -177,6 +185,7 @@ abstract class BaseController extends PanelController
         $params = $this->request->route()->parameters();
 
         $id = last($params);
+
         $item = $this->repository->getById(
             $id,
             $this->request->get('eagers') ?? [],
@@ -189,19 +198,11 @@ abstract class BaseController extends PanelController
             // $this->repository->getFormFields($item, $this->formSchema),
         );
 
-        // dd(
-        //     $this->formSchema,
-        //     $item->attributesToArray(),
-        //     $this->repository->getShowFields($item, $this->formSchema),
-        //     $this->repository->getFormFields($item, $this->formSchema),
-        //     array_merge(
-        //         $item->attributesToArray(),
-        //         $this->repository->getShowFields($item),
-        //         $this->repository->getFormFields($item, $this->formSchema),
-        //     )
-        // );
+
         if ($this->request->ajax()) {
-            return $data;
+
+            return $item->toArray();
+            // return $data;
             // return $indexData + ['replaceUrl' => true];
         }
 
@@ -235,7 +236,7 @@ abstract class BaseController extends PanelController
      * @param int|null $submoduleId
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
-    public function edit($id)
+    public function edit($id = null)
     {
         $params = $this->request->route()->parameters();
 
@@ -271,7 +272,11 @@ abstract class BaseController extends PanelController
 
         $id = last($params);
 
-        $item = $this->repository->getById($id);
+        if($this->isSingleton){
+            $item = $this->repository->getModel()->single();
+        }else{
+            $item = $this->repository->getById($id);
+        }
         $input = $this->request->all();
 
         if (isset($input['cmsSaveType']) && $input['cmsSaveType'] === 'cancel') {
@@ -285,7 +290,7 @@ abstract class BaseController extends PanelController
 
             $this->repository->update($id, $formRequest->all(), $this->getPreviousRouteSchema());
 
-            activity()->performedOn($item)->log('updated');
+            // $this->handleActionEvent($item, __FUNCTION__);
 
             // $this->fireEvent();
 
@@ -342,9 +347,11 @@ abstract class BaseController extends PanelController
 
         $item = $this->repository->getById($id);
 
+        // $this->handleActionEvent($item, __FUNCTION__);
+
         if ($this->repository->delete($id)) {
             // $this->fireEvent();
-            activity()->performedOn($item)->log('deleted');
+            // activity()->performedOn($item)->log('deleted');
 
             return $this->respondWithSuccess(___('listing.delete.success', ['modelTitle' => $this->modelTitle]));
             // return $this->respondWithSuccess(___("$this->baseKey::lang.listing.delete.success", ['modelTitle' => $this->modelTitle]));
@@ -359,8 +366,11 @@ abstract class BaseController extends PanelController
      */
     public function forceDelete()
     {
+        $item = $this->repository->getById($this->request->get('id'));
+
         if ($this->repository->forceDelete($this->request->get('id'))) {
             // $this->fireEvent();
+            // $this->handleActionEvent($item, __FUNCTION__);
 
             return $this->respondWithSuccess(__('listing.force-delete.success', ['modelTitle' => $this->modelTitle]));
         }
@@ -377,6 +387,7 @@ abstract class BaseController extends PanelController
         if ($this->repository->restore($this->request->get('id'))) {
             // $this->fireEvent();
             activity()->performedOn($this->repository->getById($this->request->get('id')))->log('restored');
+            // $this->handleActionEvent($this->repository->getById($this->request->get('id')), __FUNCTION__);
 
             return $this->respondWithSuccess(__('listing.restore.success', ['modelTitle' => $this->modelTitle]));
         }
@@ -512,16 +523,30 @@ abstract class BaseController extends PanelController
         // for relationship fields
         if (preg_match('/(.*)(_relation)/', $column['key'], $matches)) {
             // $field = $column['key'];
+            $relationshipName = $matches[1];
             $relation = $item->{$matches[1]}();
             $itemTitle = $column['itemTitle'] ?? 'name';
 
             try {
-                // code...
-                $value = collect($relation->get())
-                    ->pluck($itemTitle)
-                    ->join(', ');
+                $records = $item->{$relationshipName};
+
+                if($records instanceof Collection){
+                    $value = $records
+                        ->pluck($itemTitle)
+                        ->join(', ');
+                }else if($records instanceof Model){
+                    $value = $records->{$itemTitle};
+                }else{
+                    $value = $records;
+                }
             } catch (\Throwable $th) {
-                dd($relation, $column, $matches, $th);
+                dd(
+                    $relationshipName,
+                    $records,
+                    $item,
+                    $th
+                );
+                dd($relationshipName, $relation, $column, $matches, $th);
             }
         }
 

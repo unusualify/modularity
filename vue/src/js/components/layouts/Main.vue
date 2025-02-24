@@ -32,6 +32,15 @@
         Add Sidebar Item
       </v-btn>
 
+      <v-spacer></v-spacer>
+      <div class="d-flex justify-end mr-4">
+        <div class="d-flex align-center">
+          <v-avatar
+            :image="$store.getters.userProfile.avatar_url"
+            @click="$openProfileDialog"
+          />
+        </div>
+      </div>
       <!-- #language selector -->
       <v-toolbar-title v-if="false">
         <!-- {{ $t('fields.list') }}
@@ -52,7 +61,7 @@
     >
       <template v-slot:bottom>
         <ue-impersonate-toolbar
-          v-if="$vuetify.display.lgAndUp && impersonation.active"
+          v-if="impersonation.active"
           v-model="showImpersonateToolbar"
           v-bind="impersonation"
         />
@@ -73,11 +82,14 @@
       </div>
       <slot></slot>
 
+      <!-- Media Library -->
       <ue-modal-media
         v-if="authorization && !$lodash.isEmpty(authorization) && !authorization.isClient"
         v-model="showMediaLibrary"
         ref="mediaLibrary"
       ></ue-modal-media>
+
+      <!-- Delete Warning Media Modal -->
       <ue-modal
         ref="deleteWarningMediaModal"
         v-model="showDeleteWarning"
@@ -91,6 +103,48 @@
           <p v-html="$t('media-library.dialogs.delete.delete-media-desc')"></p>
         </template>
       </ue-modal>
+
+      <!-- Profile Dialog -->
+      <v-dialog
+        ref="profileDialog"
+        width="500"
+        v-model="$store.state.user.profileDialog"
+      >
+        <template v-slot:default="{ isActive }">
+          <v-card>
+            <v-card-title>
+              <ue-title padding="0" :text="$t('Upload Profile Image')" color="grey-darken-5" transform="none" align="center" justify="space-between">
+                <template #right>
+                  <v-btn icon="$close" variant="plain" color="grey-darken-5" size="default" @click="isActive.value = false"/>
+                </template>
+              </ue-title>
+              <v-divider/>
+            </v-card-title>
+            <v-card-text>
+              <div class="d-flex">
+                <div class="my-3 flex-grow-0">
+                  <v-avatar class="my-aut" :image="$store.getters.userProfile.avatar_url" size="100"/>
+                </div>
+                <ue-form
+                  class="flex-grow-1 pl-6"
+                  :schema="$store.state.user.profileShortcutSchema"
+                  v-model="$store.state.user.profileShortcutModel"
+                  :action-url="$store.state.user.profileRoute"
+
+                  :async="true"
+                  :hasSubmit="true"
+                  no-default-form-padding
+                  is-editing
+                  buttonText="fields.save"
+
+                  @submitted="profileFormSubmitted"
+                >
+                </ue-form>
+              </div>
+            </v-card-text>
+          </v-card>
+        </template>
+      </v-dialog>
 
       <!-- <a17-dialog
         ref="deleteWarningMediaLibrary"
@@ -154,6 +208,7 @@
 
 <script>
   import { ALERT, CONFIG } from '@/store/mutations/index'
+  import { USER } from '@/store/mutations';
 
   export default {
     props: {
@@ -375,6 +430,14 @@
       closeAlertDialog(){
         this.$store.commit(ALERT.CLEAR_DIALOG)
       },
+      profileFormSubmitted(res) {
+
+        if (typeof URLS !== 'undefined' && URLS) {
+          axios.get(URLS.profileShow).then(res => {
+            this.$store.commit(USER.SET_PROFILE_DATA, res.data)
+          })
+        }
+      }
     }
   }
 </script>

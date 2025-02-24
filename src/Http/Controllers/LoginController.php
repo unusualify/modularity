@@ -20,7 +20,7 @@ use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Requests\Admin\OauthRequest;
 use Unusualify\Modularity\Services\MessageStage;
-use Unusualify\Modularity\Traits\ManageUtilities;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 
 class LoginController extends Controller
 {
@@ -129,16 +129,15 @@ class LoginController extends Controller
             $this->clearLoginAttempts($request);
 
             if ($response = $this->authenticated($request, $this->guard()->user())) {
-                // dd($response);
                 return $response;
             }
 
             return $request->wantsJson()
                 ? new JsonResponse([
                     'variant' => MessageStage::SUCCESS,
-                    'timeout' => 6000,
+                    'timeout' => 1500,
                     'message' => __('authentication.login-success-message'),
-                    'redirector' => $request->url(),
+                    'redirector' => redirect()->intended($this->redirectTo)->getTargetUrl(),
                 ], 200)
                 : $this->sendLoginResponse($request);
 
@@ -172,6 +171,7 @@ class LoginController extends Controller
                 'title' => [
                     'text' => __('authentication.login-title'),
                     'tag' => 'h1',
+                    'color' => 'primary',
                     'type' => 'h5',
                     'weight' => 'bold',
                     'transform' => '',
@@ -365,16 +365,15 @@ class LoginController extends Controller
                 : $this->redirector->to(route(Route::hasAdmin('admin.login-2fa.form')));
         }
 
-        // dd($request->wantsJson());
         return $request->wantsJson()
-        ? new JsonResponse([
-            'variant' => MessageStage::SUCCESS,
-            'timeout' => 1500,
-            'message' => __('authentication.login-success-message'),
-            // 'redirector' => $this->redirectPath()
-            'redirector' => $request->url() . '?status=success',
-        ])
-        : $this->redirector->intended($this->redirectPath());
+            ? new JsonResponse([
+                'variant' => MessageStage::SUCCESS,
+                'timeout' => 1500,
+                'message' => __('authentication.login-success-message'),
+                // 'redirector' => $this->redirectPath()
+                'redirector' => $this->redirector->intended($this->redirectPath())->getTargetUrl() . '?status=success',
+            ])
+            : $this->redirector->intended($this->redirectPath());
 
         return $request->wantsJson()
             ? new JsonResponse([

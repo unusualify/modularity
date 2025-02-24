@@ -8,9 +8,12 @@ use Cartalyst\Tags\TaggableTrait;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+// use Modules\Notification\Events\ModelCreated;
 use Unusualify\Modularity\Entities\Traits\HasPresenter;
 use Unusualify\Modularity\Entities\Traits\IsTranslatable;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
+use Illuminate\Notifications\Notifiable;
+
 
 class Model extends LaravelModel implements TaggableInterface
 {
@@ -18,9 +21,14 @@ class Model extends LaravelModel implements TaggableInterface
         IsTranslatable,
         ModelHelpers,
         SoftDeletes,
-        TaggableTrait;
+        TaggableTrait,
+        Notifiable;
 
     public $timestamps = true;
+
+    // protected $dispatchesEvents = [
+    //     'created' => ModelCreated::class,
+    // ];
 
     protected function isTranslationModel(): bool
     {
@@ -55,6 +63,18 @@ class Model extends LaravelModel implements TaggableInterface
             if (! collect($fillable)->contains('active')) {
                 $fillable[] = 'active';
             }
+        }
+
+        if(in_array('Unusualify\Modularity\Entities\Traits\HasCreator', class_uses_recursive(static::class))){
+            $fillable = array_merge($fillable, static::$hasCreatorFillable);
+        }
+
+        if(in_array('Unusualify\Modularity\Entities\Traits\HasAuthorizable', class_uses_recursive(static::class))){
+            $fillable = array_merge($fillable, static::$hasAuthorizableFillable);
+        }
+
+        if(in_array('Unusualify\Modularity\Entities\Traits\HasStateable', class_uses_recursive(static::class))){
+            $fillable = array_merge($fillable, static::$hasStateableFillable);
         }
 
         return $fillable;

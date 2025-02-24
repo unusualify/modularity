@@ -13,15 +13,17 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use PDO;
 use ReflectionClass;
+use Spatie\Activitylog\Facades\LogBatch;
 use Unusualify\Modularity\Entities\Behaviors\Sortable;
 use Unusualify\Modularity\Repositories\Traits\DatesTrait;
+use Unusualify\Modularity\Repositories\Traits\DispatchEvents;
 use Unusualify\Modularity\Repositories\Traits\MethodTransformers;
 use Unusualify\Modularity\Repositories\Traits\RelationTrait;
 use Unusualify\Modularity\Traits\ManageNames;
 
 abstract class Repository
 {
-    use DatesTrait, ManageNames, MethodTransformers, RelationTrait;
+    use DatesTrait, ManageNames, MethodTransformers, RelationTrait, DispatchEvents;
 
     /**
      * @var \Unusualify\Modularity\Models\Model
@@ -166,7 +168,11 @@ abstract class Repository
     {
         $query = $this->model->query();
 
-        return $query->with($this->formatWiths($query, $with))->withCount($withCount)->findOrFail($id);
+        if(classHasTrait($this->model, 'Illuminate\Database\Eloquent\SoftDeletes')){
+            return $query->withTrashed()->with($this->formatWiths($query, $with))->withCount($withCount)->findOrFail($id);
+        }else{
+            return $query->with($this->formatWiths($query, $with))->withCount($withCount)->findOrFail($id);
+        }
     }
 
     /**
@@ -210,7 +216,7 @@ abstract class Repository
      * @param null $exceptId
      * @return \Illuminate\Support\Collection
      */
-    public function list($column = 'name', $with = [], $scopes = [], $orders = [], $exceptId = null)
+    public function list($column = 'name', $with = [], $scopes = [], $orders = [], $appends = [], $exceptId = null)
     {
         $query = $this->model->newQuery();
 
@@ -230,35 +236,101 @@ abstract class Repository
             $query = $this->order($query, $orders);
         }
 
+        $defaultColumns = is_array($column) ? $column : [$column];
+
+        $columns = ['id', ...$defaultColumns];
+        $oldColumns = $columns;
+
+        $tableColumns = $this->getModel()->getColumns();
+        $translatedColumns = [];
+
+
         if (method_exists($this->getModel(), 'isTranslatable') && $this->model->isTranslatable()) {
             $query = $query->withTranslation();
-            $column = is_array($column) ? array_shift($column) : $column;
+            $translatedAttributes = $this->getTranslatedAttributes();
 
-            return $query->get()->map(fn ($item) => [
-                ...$item->toArray(),
-                $column => $item->{$column},
-            ]);
+            $columns = array_diff($columns, $translatedAttributes);
+            $defaultColumns = array_diff($defaultColumns, $translatedAttributes);
+            $translatedColumns = array_values(array_intersect($oldColumns, $translatedAttributes));
+            $absentColumns = array_diff($defaultColumns, $tableColumns);
 
-        }
-
-        $columns = ['id', ...(is_array($column) ? $column : [$column])];
-
-        try {
-            return $query->get($columns);
-        } catch (\Throwable $th) {
-            if (method_exists($this->model, 'getColumns')) {
-                $appends = $this->model->getAppends();
-                $differentElements = array_diff($columns, $this->model->getColumns());
-                // if absent columns exist in appends, we can return the result with the absent columns
-                if (empty(array_diff($differentElements, $appends))) {
-                    // All differentElements exist in appends
-                    // You can proceed with your logic here if needed
-                    return $query->get()->map(fn ($item) => collect($columns)->map(fn ($c) => $item->{$c})->toArray());
+            if(in_array('name', $absentColumns)){
+                $titleColumnKey = $this->getModel()->getRouteTitleColumnKey();
+                if(in_array($titleColumnKey, $translatedAttributes)){
+                    $columns = array_filter($columns, fn($col) => $col !== 'name');
+                    $translatedColumns[] = $titleColumnKey;
+                }else{
+                    $columns = array_filter($columns, fn($col) => $col !== 'name');
+                    $columns[] = "{$this->getModel()->getRouteTitleColumnKey()} as name";
                 }
             }
-            // no absent columns exist in appends, we can't return the result with the absent columns
-            throw $th;
+
+
+
         }
+
+        $relationships = collect($with)->map(function ($r) {
+            $r = explode('.', $r)[0];
+            return $r;
+        })->toArray();
+
+        $foreignableRelationships = collect($relationships)->filter(function ($r) {
+            return in_array($this->getModel()->getRelationType($r), ['BelongsTo', 'MorphTo']);
+        })->values()->toArray();
+
+        foreach ($foreignableRelationships as $r) {
+            $columns[] = $this->getModel()->{$r}()->getForeignKeyName();
+        }
+
+        $with = array_merge($this->getModel()->getWith(), $with);
+
+        // dd($columns, $appends, $with, $columns, $translatedColumns);
+
+        try {
+            //code...
+            return $query->get($columns)->map(fn ($item) => [
+                ...collect($appends)->mapWithKeys(function ($append) use ($item) {
+                    return [$append => $item->{$append}];
+                })->toArray(),
+                ...collect($with)->mapWithKeys(function ($r) use ($item) {
+                    $r = explode('.', $r)[0];
+                    return [$r => $item->{$r}];
+                })->toArray(),
+                ...(collect($columns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
+                ...(collect($translatedColumns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
+            ]);
+        } catch (\Throwable $th) {
+            dd(
+                $this->getModel()->getRouteTitleColumnKey(),
+                static::class,
+                $columns,
+                $appends,
+                $with,
+                $translatedColumns,
+                $foreignableRelationships,
+                $relationships,
+                $foreignableRelationships,
+                $th,
+                array_reduce(debug_backtrace(), 'backtrace_formatter', [])
+            );
+        }
+
+        // try {
+        //     return $query->get($columns);
+        // } catch (\Throwable $th) {
+        //     if (method_exists($this->model, 'getColumns')) {
+        //         $appends = $this->model->getAppends();
+        //         $differentElements = array_diff($columns, $this->model->getColumns());
+        //         // if absent columns exist in appends, we can return the result with the absent columns
+        //         if (empty(array_diff($differentElements, $appends))) {
+        //             // All differentElements exist in appends
+        //             // You can proceed with your logic here if needed
+        //             return $query->get()->map(fn ($item) => collect($columns)->map(fn ($c) => $item->{$c})->toArray());
+        //         }
+        //     }
+        //     // no absent columns exist in appends, we can't return the result with the absent columns
+        //     throw $th;
+        // }
 
     }
 
@@ -302,6 +374,8 @@ abstract class Repository
         $this->traitColumns = $this->setColumns($this->traitColumns, $schema ?? $this->chunkInputs(all: true));
 
         return DB::transaction(function () use ($fields) {
+            LogBatch::startBatch();
+
             $original_fields = $fields;
 
             $fields = $this->prepareFieldsBeforeCreate($fields);
@@ -315,6 +389,10 @@ abstract class Repository
             $object->save();
 
             $this->afterSave($object, $fields);
+
+            LogBatch::endBatch();
+
+            $this->dispatchEvent($object, 'create');
 
             return $object;
         }, 3);
@@ -359,7 +437,13 @@ abstract class Repository
         $this->traitColumns = $this->setColumns($this->traitColumns, $schema ?? $this->chunkInputs(all: true));
 
         DB::transaction(function () use ($id, $fields) {
-            $object = $this->model->findOrFail($id);
+            LogBatch::startBatch();
+
+            if(classHasTrait($this->model, 'Unusualify\Modularity\Entities\Traits\IsSingular')){
+                $object = $this->model->single();
+            }else{
+                $object = $this->model->findOrFail($id);
+            }
 
             $this->beforeSave($object, $fields);
 
@@ -370,6 +454,10 @@ abstract class Repository
             $object->save();
 
             $this->afterSave($object, $fields);
+
+            LogBatch::endBatch();
+
+            $this->dispatchEvent($object, 'update');
         }, 3);
     }
 
@@ -496,7 +584,10 @@ abstract class Repository
             }
 
             if (! method_exists($object, 'canDeleteSafely') || $object->canDeleteSafely()) {
+                $this->dispatchEvent($object, 'delete');
+
                 $object->delete();
+
                 $this->afterDelete($object);
 
                 return true;
@@ -537,11 +628,19 @@ abstract class Repository
     public function forceDelete($id)
     {
         return DB::transaction(function () use ($id) {
+
             if (($object = $this->model->onlyTrashed()->find($id)) === null) {
                 return false;
             } else {
+                LogBatch::startBatch();
+
+                $this->dispatchEvent($object, 'forceDelete');
+
                 $object->forceDelete();
+
                 $this->afterForceDelete($object);
+
+                LogBatch::endBatch();
 
                 return true;
             }
@@ -582,8 +681,15 @@ abstract class Repository
     {
         return DB::transaction(function () use ($id) {
             if (($object = $this->model->withTrashed()->find($id)) != null) {
+                LogBatch::startBatch();
+
                 $object->restore();
+
                 $this->afterRestore($object);
+
+                $this->dispatchEvent($object, 'restore');
+
+                LogBatch::endBatch();
 
                 return true;
             }

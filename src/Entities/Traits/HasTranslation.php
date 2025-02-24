@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Entities\Traits;
 
 use Astrotomic\Translatable\Translatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
 use Unusualify\Modularity\Facades\TwillCapsules;
@@ -11,6 +12,21 @@ trait HasTranslation
 {
     use Translatable;
 
+    public static function bootHasTranslation(): void
+    {
+        if(in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(static::class))){
+            static::forceDeleting(function (Model $model) {
+                /* @var Translatable $model */
+                return $model->deleteTranslations();
+            });
+        }else{
+            static::deleting(function (Model $model) {
+                /* @var Translatable $model */
+                return $model->deleteTranslations();
+            });
+        }
+
+    }
     /**
      * Returns the fully qualified translation class name for this model.
      *
@@ -169,8 +185,56 @@ trait HasTranslation
         });
     }
 
+    /**
+     * Get the translated attributes for the model.
+     *
+     * @return array
+     */
     public function getTranslatedAttributes()
     {
         return $this->translatedAttributes ?? [];
     }
+
+    /**
+     * Get the translated attribute value for a specific locale.
+     *
+     * @param string $key The attribute name
+     * @param string|null $locale The locale to get the value for (defaults to current locale)
+     * @return mixed The translated attribute value
+     */
+    public function getTranslatedAttribute($key, $locale = null)
+    {
+        $locale = $locale ?: $this->locale();
+
+        return $this->translate($locale)->$key;
+    }
+    // /**
+    //  * Scope a query to find models by a translated attribute value for a specific locale.
+    //  *
+    //  * @param \Illuminate\Database\Eloquent\Builder $query
+    //  * @param string $attribute The translated attribute name
+    //  * @param mixed $value The value to search for
+    //  * @param string|null $locale The locale to search in (defaults to current locale)
+    //  * @return \Illuminate\Database\Eloquent\Builder
+    //  */
+    // public function scopeWhereTranslation($query, $attribute, $value, $locale = null)
+    // {
+    //     $locale = $locale ?: app()->getLocale();
+    //     $translationTable = $this->getTranslationsTable();
+
+    //     return $query->whereHas('translations', function($q) use ($attribute, $value, $locale) {
+    //         $q->where('locale', $locale)
+    //           ->where($attribute, $value);
+    //     });
+    // }
+
+    /**
+     * Get the translations table name.
+     *
+     * @return string
+     */
+    // protected function getTranslationsTable()
+    // {
+    //     return $this->translations()->getRelated()->getTable();
+    // }
 }

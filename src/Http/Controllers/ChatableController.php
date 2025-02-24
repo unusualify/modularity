@@ -33,7 +33,7 @@ class ChatableController extends Controller
 
             if ($user_id) {
                 $messages = $messages->filter(function ($message) use ($user_id) {
-                    return $message->user->id !== $user_id;
+                    return $message->creator_id !== $user_id;
                 });
             }
         } else {

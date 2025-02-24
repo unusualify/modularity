@@ -2,20 +2,22 @@
 
 namespace Unusualify\Modularity\Console;
 
+use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Support\Facades\Config;
-use Nwidart\Modules\Commands\GeneratorCommand;
+use Illuminate\Console\Command;
 use Nwidart\Modules\Exceptions\FileAlreadyExistException;
 use Nwidart\Modules\Generators\FileGenerator;
 use Nwidart\Modules\Support\Stub;
 use Nwidart\Modules\Traits\ModuleCommandTrait;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Support\Decomposers\SchemaParser;
 use Unusualify\Modularity\Traits\ManageNames;
 
 use function Laravel\Prompts\confirm;
 
-class BaseCommand extends GeneratorCommand
+abstract class BaseCommand extends Command implements PromptsForMissingInput
 {
-    use ManageNames, ModuleCommandTrait;
+    use ManageNames;
 
     /**
      * The name of 'name' argument.
@@ -37,14 +39,26 @@ class BaseCommand extends GeneratorCommand
     protected $test = false;
 
     /**
+     * Whether to use trait options.
+     *
+     * @var bool
+     */
+    public $useTraitOptions = false;
+
+    /**
      * Create a new command instance.
      *
      * @return void
      */
     public function __construct()
     {
+        if($this->signature && $this->useTraitOptions){
+            $this->signature .= ' ' . modularityTraitOptions(asSignature: true);
+        }
+
         parent::__construct();
 
+        $this->configBaseKey = \Illuminate\Support\Str::snake(env('MODULARITY_BASE_NAME', 'Modularity'));
         $this->configBaseKey = \Illuminate\Support\Str::snake(env('MODULARITY_BASE_NAME', 'Modularity'));
 
         Stub::setBasePath($this->baseConfig('stubs.path', dirname(__FILE__) . '/stubs'));
@@ -74,15 +88,13 @@ class BaseCommand extends GeneratorCommand
      */
     public function handle(): int
     {
+
+        if($this->checkSelfOption() === E_ERROR){
+            return E_ERROR;
+        }
+
         $path = str_replace('\\', '/', $this->getDestinationFilePath());
-        // dd(
-        //     // get_class_methods($this),
-        //     // $this->getDefinition()
-        //     // $this->getSynopsis(true),
-        //     // $this->getSynopsis(),
-        //     // $this->getUsages(),
-        //     // strtolower($this->getDescription())
-        // );
+
         $description = trim(mb_strtolower($this->getDescription()), '.');
 
         $runnable = ! $this->hasOption('test')
@@ -116,6 +128,52 @@ class BaseCommand extends GeneratorCommand
         }
 
         return 0;
+    }
+
+    /**
+     * Get class name.
+     *
+     * @return string
+     */
+    public function getClass()
+    {
+        return class_basename($this->argument($this->argumentName));
+    }
+
+    /**
+     * Get default namespace.
+     *
+     * @return string
+     */
+    public function getDefaultNamespace(): string
+    {
+        return '';
+    }
+
+    /**
+     * Get class namespace.
+     *
+     * @param \Nwidart\Modules\Module $module
+     *
+     * @return string
+     */
+    public function getClassNamespace($module)
+    {
+        $extra = str_replace($this->getClass(), '', $this->argument($this->argumentName));
+
+        $extra = str_replace('/', '\\', $extra);
+
+        $namespace = $this->laravel['modules']->config('namespace');
+
+        $namespace .= '\\' . $module->getStudlyName();
+
+        $namespace .= '\\' . $this->getDefaultNamespace();
+
+        $namespace .= '\\' . $extra;
+
+        $namespace = str_replace('/', '\\', $namespace);
+
+        return trim($namespace, '\\');
     }
 
     /**
@@ -155,5 +213,33 @@ class BaseCommand extends GeneratorCommand
     protected function getTest()
     {
         return $this->test;
+    }
+
+    protected function checkSelfOption()
+    {
+        if( $this->hasOption('self') && $this->option('self') && Modularity::isProduction()){
+            $this->components->error('Self option is not available in production.');
+            return E_ERROR;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the module name.
+     *
+     * @return string
+     */
+    public function getModuleName()
+    {
+        $module = $this->argument('module') ?: null;
+
+        if(!$module) {
+            return null;
+        }
+
+        $module = app('modules')->findOrFail($module);
+
+        return $module->getStudlyName();
     }
 }

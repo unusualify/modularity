@@ -97,7 +97,7 @@ abstract class InputHydrate
 
         $noRecords = isset($input['noRecords']) && $input['noRecords'];
 
-        if (isset($input['repository']) && ! $noRecords) {
+        if (isset($input['repository']) && ! $noRecords && ! App::runningInConsole()) {
             $args = explode(':', $input['repository']);
 
             $className = array_shift($args);

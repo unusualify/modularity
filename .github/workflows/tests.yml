@@ -73,7 +73,7 @@ jobs:
         with:
           files: |
             src/**
-            umodules/**
+            modules/**
             vue/src/**
             tests/**
             routes/**

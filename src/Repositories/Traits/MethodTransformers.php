@@ -365,8 +365,22 @@ trait MethodTransformers
             }
         }
 
-        foreach ($scopes as $column => $value) {
+        foreach ($scopes as $column => $values) {
             $studlyColumn = studlyName($column);
+
+            $value = $values;
+            $arguments = [];
+
+            if(is_string($values)){
+                $exploded = explode('^', $values);
+                $value = $exploded[0];
+
+                if(count($exploded) > 1){
+                    // dd($exploded);
+                    $arguments = explode(';', $exploded[1]);
+                }
+            }
+
 
             if (method_exists($this->model, 'scope' . $studlyColumn)) {
                 if (! is_bool($value)) {
@@ -375,7 +389,8 @@ trait MethodTransformers
                     $query->{$this->getCamelCase($column)}();
                 }
             } elseif (is_string($value) && method_exists($this->model, 'scope' . studlyName($value))) {
-                $query->{$this->getCamelCase($value)}();
+                // $query->{$this->getCamelCase($value)}(...$arguments);
+                $query->{$this->getCamelCase($value)}(...$arguments);
             } else {
                 if (is_array($value)) {
                     $query->whereIn($column, $value);

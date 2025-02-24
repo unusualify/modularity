@@ -6,12 +6,12 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
-use Unusualify\Modularity\Entities\Traits\IsAuthorizedable;
+use Unusualify\Modularity\Entities\Traits\HasCreator;
 use Unusualify\Modularity\Services\MediaLibrary\ImageService;
 
 class Media extends Model
 {
-    use IsAuthorizedable;
+    use HasCreator;
 
     public $timestamps = true;
 

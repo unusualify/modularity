@@ -113,15 +113,17 @@ class UNavigation
                 ? systemRouteNamePrefix() . '.'
                 : '';
 
-            foreach ($routes as $item) {
-
-                // if(!isset($item['name']) ){
-                //     continue;
-                // }
+            foreach ($routes as $_name => $item) {
 
                 // $sr sub route array|object
-                $route_name = ($item['route_name'] ?? snakeCase($item['name'])) . '.index';
-                // dd($route_name);
+                $isSingular = $module->isSingleton($_name);
+                $route_name = ($item['route_name'] ?? snakeCase($item['name']));
+
+                if($isSingular){
+                    $route_name = $route_name . '.edit';
+                }else{
+                    $route_name = $route_name . '.index';
+                }
 
                 if (! (isset($item['parent']) && $item['parent'])) {
                     try {

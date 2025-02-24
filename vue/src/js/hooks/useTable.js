@@ -68,12 +68,6 @@ export const makeTableProps = propsFactory({
   hideBorderRow: Boolean,
   roundedRows: Boolean,
 
-  // endpoints: {
-  //   type: Object,
-  //   default : {}
-  // },
-
-
   fullWidthWrapper: {
     type: Boolean,
     default: false
@@ -86,15 +80,10 @@ export const makeTableProps = propsFactory({
     type:String,
     default: 'comfortable',
   },
-
   toolbarOptions:{
     type: Object,
     default: {},
   },
-
-
-
-
   bulkActions: {
     type: [Array, Object],
     default: []

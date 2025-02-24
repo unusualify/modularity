@@ -52,7 +52,6 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: 'primary'
   },
   bg: {
     type: String
@@ -100,11 +99,11 @@ const props = defineProps({
 const titleClasses = computed(() => [
   `text-${props.type}`,
   props.bg ? `bg-${props.bg}` : '',
-  `text-${props.color}`,
+  props.color ? `text-${props.color}` : '',
   `text-${props.transform}`,
   `font-weight-${props.weight}`,
-  `p${props.padding}`,
-  `m${props.margin}`,
+  props.padding ? `p${props.padding}` : '',
+  props.margin ? `m${props.margin}` : '',
   `text-${props.textPosition}`,
   `align-${props.align}`,
   `justify-${props.justify}`

@@ -16,7 +16,23 @@ class RouteMakeCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'modularity:make:route';
+    protected $signature = 'modularity:make:route
+        {module : The name of module will be used}
+        {route : The name of the route}
+        {--schema= : The specified migration schema table}
+        {--rules= : The specified validation rules for FormRequest}
+        {--custom-model= : The model class for usage of a available model}
+        {--relationships= : The many to many relationships}
+        {--f|force : Force the operation to run when the route files already exist}
+        {--p|plain : Don\'t create route}
+        {--notAsk : Don\'t ask for trait questions}
+        {--all : Add all traits}
+        {--no-migrate : Don\'t migrate}
+        {--no-defaults : Unuse default input and headers}
+        {--fix : Fixes the model config errors}
+        {--table-name= : Sets table name for custom model}
+        {--no-migration : Don\'t create migration file}
+        {--test : Test the Route Generator}';
 
     /**
      * The console command description.
@@ -47,6 +63,7 @@ class RouteMakeCommand extends BaseCommand
 
     protected $isAskable = false;
 
+    public $useTraitOptions = true;
     /**
      * Create a new command instance.
      *
@@ -105,44 +122,6 @@ class RouteMakeCommand extends BaseCommand
         Modularity::clearCache();
 
         return $success ? 0 : E_ERROR;
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['module', InputArgument::REQUIRED, 'The name of module will be used.'],
-            ['route', InputArgument::REQUIRED, 'The name of the route.'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return array_merge([
-            ['schema', null, InputOption::VALUE_OPTIONAL, 'The specified migration schema table.', null],
-            ['rules', null, InputOption::VALUE_OPTIONAL, 'The specified validation rules for FormRequest.', null],
-            ['custom-model', null, InputOption::VALUE_OPTIONAL, 'The model class for usage of a available model.', null],
-            ['relationships', null, InputOption::VALUE_OPTIONAL, 'The many to many relationships.', null],
-            ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
-            ['plain', '--p', InputOption::VALUE_NONE, 'Don\'t create route.'],
-            ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
-            ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
-            ['no-migrate', null, InputOption::VALUE_NONE, 'don\'t migrate.'],
-            ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
-            ['fix', null, InputOption::VALUE_NONE, 'Fixes the model config errors'],
-            ['table-name', null, InputOption::VALUE_OPTIONAL, 'Sets table  name for custom model'],
-            ['no-migration', null, InputOption::VALUE_NONE, 'don\'t create migration file.'],
-            ['test', null, InputOption::VALUE_NONE, 'Test the Route Generator'],
-        ], modularityTraitOptions());
     }
 
     private function checkOption($option)

@@ -27,7 +27,7 @@ class RadioGroupHydrate extends InputHydrate
         $input['type'] = 'input-radio-group';
 
         if (count($input['items']) > 0) {
-            $input['default'] = $input['items'][0][$input['itemValue']];
+            $input['default'] ??= $input['items'][0][$input['itemValue']];
         }
 
         return $input;

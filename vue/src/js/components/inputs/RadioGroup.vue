@@ -14,19 +14,11 @@
           </template>
           {{ item[itemTitle].toUpperCase() }}
         </v-btn>
+
+        <div v-if="item[descriptionTitle]" class="text-caption pa-2" v-html="item[descriptionTitle]"></div>
       </v-col>
     </v-row>
   </v-radio-group>
-  <!-- <v-input
-    v-model="selectedItems"
-    hideDetails="auto"
-    appendIcon="mdi-close"
-    :variant="boundProps.variant"
-    class="v-input-radio-group"
-    >
-    <template v-slot:default="defaultSlot">
-    </template>
-  </v-input> -->
 </template>
 
 <script>
@@ -57,10 +49,18 @@ export default {
       type: String,
       default: 'id'
     },
+    descriptionTitle: {
+      type: String,
+      default: 'description'
+    }
   },
   setup (props, context) {
+
+    const initializeInput = (val) => {
+      return val
+    }
     return {
-      ...useInput(props, context)
+      ...useInput(props, {...context, ...{initializeInput}})
     }
   },
   data: function () {

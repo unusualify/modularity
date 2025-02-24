@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Unusualify\Modularity\Entities\Company;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Services\MessageStage;
-use Unusualify\Modularity\Traits\ManageUtilities;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 
 class RegisterController extends Controller
 {
@@ -31,6 +31,7 @@ class RegisterController extends Controller
                 'title' => [
                     'text' => __('authentication.create-an-account'),
                     'tag' => 'h1',
+                    'color' => 'primary',
                     'type' => 'h5',
                     'weight' => 'bold',
                     'transform' => '',

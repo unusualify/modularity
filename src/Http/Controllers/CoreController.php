@@ -290,6 +290,7 @@ abstract class CoreController extends LaravelController
     public function tags()
     {
         $query = $this->request->input('q');
+
         if (is_null($query)) {
             $query = '';
         }
@@ -303,8 +304,7 @@ abstract class CoreController extends LaravelController
                     'last_page' => 1,
                     'data' => $tags->map(function ($tag) {
                         return $tag->name;
-                    }
-                    ),
+                    }),
                 ],
             ], 200);
     }
