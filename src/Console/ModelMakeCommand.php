@@ -8,8 +8,6 @@ use Illuminate\Support\Str;
 use Nwidart\Modules\Generators\FileGenerator;
 use Nwidart\Modules\Support\Config\GeneratorPath;
 use Nwidart\Modules\Support\Stub;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Support\Decomposers\ModelRelationParser;
@@ -20,6 +18,26 @@ use function Laravel\Prompts\select;
 
 class ModelMakeCommand extends BaseCommand
 {
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'modularity:make:model
+        {model : The name of model will be created}
+        {module? : The name of module will be used}
+        {--fillable= : The fillable attributes}
+        {--relationships= : The relationship attributes}
+        {--self : Create a modularity model}
+        {--override-model= : The override model for extension}
+        {--f|force : Force the operation to run when the route files already exist}
+        {--notAsk : Don\'t ask for trait questions}
+        {--no-defaults : Unuse default input and headers}
+        {--s|soft-delete : Flag to add softDeletes trait to model}
+        {--has-factory : Flag to add hasFactory to model}
+        {--all : Add all traits}
+        {--test : Test the Route Generator}';
+
     protected $name = 'modularity:make:model';
 
     protected $aliases = [
@@ -37,6 +55,8 @@ class ModelMakeCommand extends BaseCommand
 
     protected $isAskable = true;
 
+    public $useTraitOptions = true;
+
     /**
      * The console command description.
      *
@@ -46,11 +66,13 @@ class ModelMakeCommand extends BaseCommand
 
     protected $modelTraits;
 
-    protected $defaultFillables = [];
+    protected $defaultFillable = [];
 
     protected $modelRelationParser;
 
     protected $overrideModel = null;
+
+    protected $nonTranslatableFillable = [];
 
     public function handle(): int
     {
@@ -67,9 +89,24 @@ class ModelMakeCommand extends BaseCommand
             $this->responses[$_trait] = $this->checkOption($_trait);
         }
 
-        if (! $this->option('no-defaults')) {
-            $this->defaultFillables += (new SchemaParser(implode(',', $this->baseConfig('schemas.default_fields') ?? [])))->getColumns();
+        $isSingularExceptionTraits = [
+            'addTranslation',
+            'addSnapshot',
+        ];
+
+        foreach ($this->responses as $trait => $response) {
+            if ($response) {
+                if (in_array($trait, $isSingularExceptionTraits) && $this->getTraitResponse('addSingular')) {
+                    $this->responses[$trait] = false;
+                }
+            }
         }
+
+        if (! $this->option('no-defaults')) {
+            $this->defaultFillable += (new SchemaParser(implode(',', $this->baseConfig('schemas.default_fields') ?? [])))->getColumns();
+        }
+
+        $this->nonTranslatableFillable = $this->baseConfig('schemas.non_translatable_fillable', []);
 
         if ($this->option('relationships')) {
             $this->modelRelationParser = App::makeWith(ModelRelationParser::class, [
@@ -100,49 +137,21 @@ class ModelMakeCommand extends BaseCommand
     }
 
     /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['model', InputArgument::REQUIRED, 'The name of model will be created.'],
-            ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-
-        return array_merge([
-            ['fillable', null, InputOption::VALUE_OPTIONAL, 'The fillable attributes.', null],
-            ['relationships', null, InputOption::VALUE_OPTIONAL, 'The relationship attributes.', null],
-            ['override-model', null, InputOption::VALUE_OPTIONAL, 'The override model for extension.', null],
-            ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
-            ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
-            ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
-            ['soft-delete', 's', InputOption::VALUE_NONE, 'Flag to add softDeletes trait to model.'],
-            ['has-factory', null, InputOption::VALUE_NONE, 'Flag to add hasFactory to model.'],
-            ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
-            ['test', null, InputOption::VALUE_NONE, 'Test the Route Generator'],
-        ], modularityTraitOptions());
-    }
-
-    /**
      * @return mixed
      */
     protected function getTemplateContents()
     {
         $moduleName = $this->getModuleName();
+        $namespace = 'App\\Models';
+
+        $modelGeneratorPath = new GeneratorPath($this->baseConfig('paths.generator.model'));
         $module = null;
+
         if ($moduleName) {
             $module = Modularity::findOrFail($moduleName);
+            $namespace = $this->getClassNamespace($module);
+        } elseif ($this->option('self')) {
+            $namespace = Modularity::getVendorNamespace($modelGeneratorPath->getNamespace());
         }
 
         $class_namespaces = implode("\n", [
@@ -150,10 +159,6 @@ class ModelMakeCommand extends BaseCommand
             $this->getInterfaceNamespaces(),
             $this->getTraitNamespaces(),
         ]);
-
-        $modelGeneratorPath = new GeneratorPath($this->baseConfig('paths.generator.model'));
-
-        $namespace = $module ? $this->getClassNamespace($module) : Modularity::getVendorNamespace($modelGeneratorPath->getNamespace());
 
         return (new Stub($this->getStubName(), [
             // 'BASE_MODEL'            => $this->baseConfig('base_model'),
@@ -180,15 +185,22 @@ class ModelMakeCommand extends BaseCommand
      */
     protected function getDestinationFilePath()
     {
-        $path = Modularity::getVendorPath('/src');
+        $path = base_path('app');
+        $modelDir = 'Models';
+        $fileName = $this->getModelName() . '.php';
+        $modelDir = concatenate_path($modelDir, $fileName);
 
         if ($this->getModuleName() != '') {
             $path = Modularity::getModulePath($this->getModuleName());
+        } elseif ($this->option('self')) {
+            $path = Modularity::getVendorPath('/src');
         }
 
-        $modelFolder = new GeneratorPath($this->baseConfig('paths.generator.model'));
+        if ($this->option('self') || $this->getModuleName() != '') {
+            $modelFolder = new GeneratorPath($this->baseConfig('paths.generator.model'));
 
-        $modelDir = $modelFolder->getPath() . '/' . $this->getModelName() . '.php';
+            $modelDir = concatenate_path($modelFolder->getPath(), $fileName);
+        }
 
         return concatenate_path($path, $modelDir);
     }
@@ -258,24 +270,28 @@ class ModelMakeCommand extends BaseCommand
 
     private function getFillable(): string
     {
+        // $defaultFillableSchema = implode(',', $this->baseConfig('schemas.fillables'));
+        // $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
+        // dd($this->defaultFillable);
+        $fields = $this->defaultFillable;
+
         if (! $this->overrideModel) {
-            $defaultFillableSchema = implode(',', $this->baseConfig('schemas.fillables'));
-
-            $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
-
-            if (! $this->getTraitResponse('addTranslation')) {
-                $fields = array_merge($this->defaultFillables, $fields);
+            if (! $this->getTraitResponse('addTranslation') || $this->getTraitResponse('addSingular')) {
+                // $fields = array_merge($this->defaultFillable, $fields);
 
                 $fillable = $this->option('fillable');
+
                 $fields = array_merge($fields, $fillable != '' ? explode(',', $fillable) : []);
+            } elseif ($this->getTraitResponse('addTranslation')) {
+                $fields = array_values(array_intersect($this->defaultFillable, $this->nonTranslatableFillable));
+            }
+
+            if ($this->getTraitResponse('addSingular')) {
+                $fields = $this->defaultFillable;
             }
 
             return $this->generateFillable($fields);
         } else {
-            $defaultFillableSchema = implode(',', $this->baseConfig('schemas.fillables'));
-
-            $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
-
             return $this->generateFillable($fields);
         }
 
@@ -288,7 +304,7 @@ class ModelMakeCommand extends BaseCommand
 
         dd(
             $defaultFillableSchema,
-            $this->defaultFillables,
+            $this->defaultFillable,
             $this->option('fillable'),
             (new SchemaParser($defaultFillableSchema))->getCasts()
         );
@@ -296,7 +312,7 @@ class ModelMakeCommand extends BaseCommand
         $fields = (new SchemaParser($defaultFillableSchema))->getColumns();
 
         if (! $this->getTraitResponse('addTranslation')) {
-            $fields = array_merge($this->defaultFillables, $fields);
+            $fields = array_merge($this->defaultFillable, $fields);
 
             $fillable = $this->option('fillable');
             $fields = array_merge($fields, $fillable != '' ? explode(',', $fillable) : []);
@@ -339,10 +355,14 @@ class ModelMakeCommand extends BaseCommand
     {
         $attributes = [];
 
-        if ($this->getTraitResponse('addTranslation')) {
+        $defaultFields = $this->defaultFillable;
+
+        if ($this->getTraitResponse('addTranslation') && ! $this->getTraitResponse('addSingular')) {
             $fillable = $this->option('fillable');
 
-            $fields = array_merge($this->defaultFillables, $fillable != '' ? explode(',', $fillable) : []);
+            $translatedFields = array_values(array_diff($defaultFields, $this->nonTranslatableFillable));
+
+            $translatedFields = array_merge($translatedFields, $fillable != '' ? explode(',', $fillable) : []);
 
             $attribute = "\t/**\n"
                 . "\t * The translated attributes that are assignable for hasTranslation Trait.\n"
@@ -352,10 +372,10 @@ class ModelMakeCommand extends BaseCommand
 
             $defaultTranslatedSchema = implode(',', $this->baseConfig('schemas.translated_attributes'));
 
-            $fields = array_merge($fields, (new SchemaParser($defaultTranslatedSchema))->getColumns());
+            $translatedFields = array_merge($translatedFields, (new SchemaParser($defaultTranslatedSchema))->getColumns());
 
             $attribute .= "\tpublic \$translatedAttributes = [\n"
-                . collect($fields)->map(function ($field) {
+                . collect($translatedFields)->map(function ($field) {
                     return "\t\t'{$field}'";
                 })->implode(",\n") . "\n"
                 . "\t]; \n";
@@ -363,7 +383,7 @@ class ModelMakeCommand extends BaseCommand
             $attributes[] = $attribute;
         }
 
-        if ($this->getTraitResponse('addSnapshot')) {
+        if ($this->getTraitResponse('addSnapshot') && ! $this->getTraitResponse('addSingular')) {
 
             $models = UFinder::getAllModels();
             $snapshotSourceModel = select(
@@ -392,7 +412,7 @@ class ModelMakeCommand extends BaseCommand
 
         if ($this->getTraitResponse('addSlug')) {
 
-            $fields[] = $this->defaultFillables[0];
+            $fields[] = $this->defaultFillable[0];
 
             $attributes = "\t/**\n"
                 . "\t * The slug attributes that are assignable for hasSlug Trait.\n"

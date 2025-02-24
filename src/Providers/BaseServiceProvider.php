@@ -2,10 +2,12 @@
 
 namespace Unusualify\Modularity\Providers;
 
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\View;
-use Unusualify\Modularity\Activators\FileActivator;
+use Unusualify\Modularity\Activators\ModuleActivator;
 use Unusualify\Modularity\Exceptions\AuthConfigurationException;
 use Unusualify\Modularity\Http\ViewComposers\CurrentUser;
 use Unusualify\Modularity\Http\ViewComposers\FilesUploaderConfig;
@@ -62,22 +64,38 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->bootBaseViewComponents();
 
+        ResetPassword::createUrlUsing(function ($notifiable, string $token) {
+            return url(route('admin.password.reset', [
+                'token' => $token,
+                'email' => $notifiable->getEmailForPasswordReset(),
+            ], false));
+        });
+
         AboutCommand::add('Modularity', function () {
-            $composer = base_path('composer.lock');
-
-            if ($this->app['files']->isFile(($composer_path = base_path('composer-dev.lock')))) {
-                $composer = $composer_path;
-            }
-
-            $package = collect(json_decode(file_get_contents($composer))->packages)
-                ->filter(fn ($p) => $p->name == 'unusualify/modularity')
-                ->first();
 
             return [
-                'Vendor' => get_modularity_vendor_dir(),
+                // 'Mode' => $this->app['modularity']->isDevelopment() ? 'development' : 'production',
+                'Cache' => $this->app['modularity']->config('cache.enabled') ? 'enabled' : 'disabled',
+                'Scan' => $this->app['modularity']->config('scan.enabled') ? 'enabled' : 'disabled',
                 'Theme' => modularityConfig('app_theme'),
-                'Version' => $package->version,
+                'Url' => $this->app['modularity']->getAppUrl(),
+                'Url (Admin)' => $this->app['modularity']->getAdminAppUrl(),
+                'Vendor' => $this->app['modularity']->getVendorDir(),
+                'Version' => get_package_version('unusualify/modularity'),
             ];
+        });
+
+        // Register scheduler class instead of direct command
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
+            $schedule->command('modularity:fileponds:scheduler --days=7')
+                ->everyDay();
+            // ->everyFiveMinutes();
+            // ->appendOutputTo(storage_path('logs/scheduler.log'));
+
+            $schedule->command('telescope:prune --hours=168')
+                ->everyDay()
+                ->appendOutputTo(storage_path('logs/scheduler.log'));
+
         });
 
     }
@@ -96,20 +114,26 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->registerCommands();
 
-        // $this->app->singleton(\Unusualify\Modularity\Contracts\RepositoryInterface::class, function ($app) {
-        $this->app->singleton('modularity', function (Application $app) {
+        // $this->app->singleton('modularity', function (Application $app) {
+        //     $path = $app['config']->get('modules.paths.modules');
+
+        //     return new Modularity($app, $path);
+        // });
+        // CANCEL \Nwidart\Modules\Laravel\LaravelFileRepository binding
+        // and Nwidart\Modules\Laravel\Module binding in the LaravelFileRepository createModule method
+        $this->app->singleton(\Nwidart\Modules\Contracts\RepositoryInterface::class, function ($app) {
             $path = $app['config']->get('modules.paths.modules');
 
             return new Modularity($app, $path);
         });
+        $this->app->alias(Modularity::class, 'modularity');
 
         // $this->app->singleton(FileActivator::class, function ($app) {
-        $this->app->singleton('modularity.activator', function (Application $app) {
-            return new FileActivator($app);
-        });
+        // $this->app->singleton('modularity.activator', function (Application $app) {
+        //     return new ModuleActivator($app);
+        // });
 
         $this->app->singleton('modularity.navigation', UNavigation::class);
-        // $this->app->alias(\Unusualify\Modularity\Contracts\RepositoryInterface::class, 'ue_modules');
 
         $this->app->singleton('model.relation.namespace', function () {
             return "Illuminate\Database\Eloquent\Relations";
@@ -139,9 +163,9 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->app->alias(\Unusualify\Modularity\Facades\ModularityVite::class, 'ModularityVite');
 
-        // $this->app->alias(FileActivator::class, 'module_activator');
-
         $this->app->alias(\Torann\GeoIP\Facades\GeoIP::class, 'GeoIP');
+
+        $this->app->register(TelescopeServiceProvider::class);
 
         $this->registerTranslationService();
     }
@@ -253,35 +277,9 @@ class BaseServiceProvider extends ServiceProvider
             // }
         }
 
-        config([
-            'modularity.vendor_dir' => is_modularity_production()
-                ? 'vendor/unusualify/modularity'
-                : env('MODULARITY_VENDOR_DIR', env('MODULARITY_VENDOR_PATH', 'packages/modularity')),
-        ]);
-
         if (! config('modules.scan.enabled')) {
             throw new \Exception('Modules scan is not enabled, set scan.enabled to true in config/modules.php');
         }
-
-        $scan_paths = config('modules.scan.paths', []);
-        $umodulesPath = \Unusualify\Modularity\Facades\Modularity::getVendorPath('umodules');
-        if (! in_array($umodulesPath, $scan_paths)) {
-            array_push($scan_paths, $umodulesPath);
-            config([
-                'modules.scan.paths' => $scan_paths,
-            ]);
-        }
-
-        // if(!$this->app->isProduction() && config('modules.cache.enabled')){
-        //     config([
-        //         'modules.cache.enabled' => false,
-        //     ]);
-        // }
-
-        // timokoerber/laravel-one-time-operations directory set
-        // config([
-        //     'one-time-operations.directory' => get_modularity_vendor_dir('operations'),
-        // ]);
 
     }
 
@@ -325,7 +323,6 @@ class BaseServiceProvider extends ServiceProvider
      */
     private function bootBaseViews()
     {
-
         // LOAD BASE VIEWS
         $this->loadViewsFrom(
             array_merge(
@@ -384,6 +381,7 @@ class BaseServiceProvider extends ServiceProvider
                 'MODULARITY_VERSION' => env('MODULARITY_VERSION', 'Not Found'),
                 'PAYABLE_VERSION' => env('PAYABLE_VERSION', 'Not Found'),
                 'SNAPSHOT_VERSION' => env('SNAPSHOT_VERSION', 'Not Found'),
+                'COMPOSER' => env('COMPOSER', 'Not Found'),
             ]);
         });
 
@@ -438,6 +436,18 @@ class BaseServiceProvider extends ServiceProvider
                 $cmds[] = preg_match('|' . preg_quote($this->terminalNamespace, '|') . '|', $match[0])
                             ? $cmd
                             : "{$this->terminalNamespace}\\{$match[0]}";
+            }
+        }
+
+        foreach (glob(__DIR__ . '/../Schedulers/*.php') as $filePath) {
+            $filePath = realpath($filePath);
+            $fileContents = file_get_contents($filePath);
+
+            // Extract namespace using regex
+            if (preg_match('/namespace\s+([^;]+);/', $fileContents, $matches)) {
+                $namespace = $matches[1];
+                $className = basename($filePath, '.php');
+                $cmds[] = $namespace . '\\' . $className;
             }
         }
 

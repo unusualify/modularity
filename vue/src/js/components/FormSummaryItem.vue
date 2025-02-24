@@ -55,7 +55,7 @@
           active-color="black"
           color="black"
           variant="outlined"
-          style="margin-inline-end: 8px;"
+          style="margin-inline-end: 8px; margin-block-end: 8px;"
         >
           {{ context }}
         </v-btn>

@@ -5,12 +5,19 @@ namespace Unusualify\Modularity;
 use Composer\ClassMapGenerator\ClassMapGenerator;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Json;
+use Unusualify\Modularity\Exceptions\ModularitySystemPathException;
 
 class Modularity extends FileRepository
 {
+    /**
+     * @var ActivatorInterface
+     */
+    private $activator;
+
     /**
      * @var ConfigRepository
      */
@@ -32,6 +39,31 @@ class Modularity extends FileRepository
     private static $authProviderName = 'modularity_users';
 
     /**
+     * @var string
+     */
+    private static $translationCacheKey = 'modularity-languages';
+
+    /**
+     * @var string
+     */
+    private $appPath = null;
+
+    /**
+     * @var string
+     */
+    private $vendorPath = null;
+
+    /**
+     * @var string
+     */
+    private $vendorDir = null;
+
+    /**
+     * @var string
+     */
+    private $retainModulesPath = null;
+
+    /**
      * The constructor.
      *
      * @param string|null $path
@@ -40,8 +72,17 @@ class Modularity extends FileRepository
     {
         parent::__construct($app, $path);
 
+        $this->appPath = realpath(get_installed_composer()['root']['install_path']);
+        $this->vendorPath = realpath(get_installed_composer()['versions']['unusualify/modularity']['install_path']);
+        $this->vendorDir = trim(Str::replaceFirst($this->appPath, '', $this->vendorPath), DIRECTORY_SEPARATOR);
+
         $this->modularityCache = $app['cache'];
         $this->modularityConfig = $app['config'];
+
+        $this->activator = $app[\Nwidart\Modules\Contracts\ActivatorInterface::class];
+
+        $this->retainModulesPath = $this->modularityConfig->get('modules.paths.modules');
+
     }
 
     /**
@@ -49,7 +90,7 @@ class Modularity extends FileRepository
      */
     protected function createModule(...$args)
     {
-        return new \Unusualify\Modularity\Module($args[1], $args[2] ?? null);
+        return new \Unusualify\Modularity\Module(...$args);
     }
 
     /**
@@ -57,11 +98,32 @@ class Modularity extends FileRepository
      */
     public function all(): array
     {
+        // dd($this);
         if (! $this->config('cache.enabled')) {
             return $this->scan();
         }
 
         return $this->formatCached($this->getCached());
+    }
+
+    /**
+     * Get modules by status.
+     */
+    public function getByStatus($status): array
+    {
+        $modules = [];
+
+        /** @var Module $module */
+        foreach ($this->all() as $name => $module) {
+            if ($this->activator->hasStatus($module, $status)) {
+                $modules[$name] = $module;
+            }
+            // if ($module->isStatus($status)) {
+            //     $modules[$name] = $module;
+            // }
+        }
+
+        return $modules;
     }
 
     /**
@@ -90,9 +152,12 @@ class Modularity extends FileRepository
         }
 
         if ($resetCache) {
+            dd($modules);
+
             return $this->scan();
         }
 
+        // dd($modules);
         return $modules;
     }
 
@@ -107,30 +172,15 @@ class Modularity extends FileRepository
 
         $modules = [];
 
+        // dump($paths);
         foreach ($paths as $key => $path) {
-            // dd(
-            //     $paths,
-            //     $path,
-            //     $this->getFiles()->glob(
-            //         "{$path}/module.json"
-            //     )
-            // );
             $manifests = $this->getFiles()->glob("{$path}/module.json");
 
             is_array($manifests) || $manifests = [];
             foreach ($manifests as $manifest) {
                 $name = Json::make($manifest)->get('name');
-                // if(preg_match('/oguzhanbukcuoglu/', $manifest)){
-                //     dd(
-                //         $manifest,
-                //         dirname($manifest),
-                //         $name,
-                //         $manifests,
-                //     );
-                // }
-                $modules[$name] = $this->createModule($this->app, $name, dirname($manifest));
 
-                // dd($path, $manifests, $paths,  Json::make($manifest), $modules);
+                $modules[$name] = $this->createModule($this->app, $name, dirname($manifest));
 
             }
         }
@@ -201,9 +251,12 @@ class Modularity extends FileRepository
      */
     public function clearCache()
     {
-        if (config('modules.cache.enabled') === true) {
-            app('cache')->forget(config('modules.cache.key'));
-        }
+        app('cache')->forget($this->config('cache.key'));
+        $this->activator->flushCache(); // for modules_statuses.json cache
+        // foreach($this->all() as $module){
+        //     dd($module->clearCache());
+        //     app('cache')->forget($module->getActivator()->getCacheKey());
+        // }
     }
 
     /**
@@ -214,6 +267,108 @@ class Modularity extends FileRepository
         return config([
             'modules.cache.enabled' => false,
         ]);
+    }
+
+    final public function isDevelopment()
+    {
+        return get_installed_composer()['root']['name'] === 'unusualify/modularity-dev';
+    }
+
+    final public function isProduction()
+    {
+        return ! $this->isDevelopment();
+    }
+
+    public function setSystemModulesPath()
+    {
+        if ($this->isProduction()) {
+            throw new ModularitySystemPathException;
+        }
+
+        config([
+            'modules.paths.modules' => $this->getVendorPath('modules'),
+        ]);
+    }
+
+    public function revertSystemModulesPath()
+    {
+        config([
+            'modules.paths.modules' => $this->retainModulesPath,
+        ]);
+    }
+
+    public function getAppUrl()
+    {
+        return $this->config('app_url');
+    }
+
+    public function getAdminAppUrl()
+    {
+        return $this->config('admin_app_url');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function config(string $key, $default = null)
+    {
+        return $this->modularityConfig->get('modules.' . $key,
+            $this->modularityConfig->get('modularity.' . $key, $default)
+        );
+    }
+
+    public function getAdminRouteNamePrefix()
+    {
+        return rtrim(ltrim($this->config('admin_route_name_prefix', 'admin'), '.'), '.');
+    }
+
+    public function getAdminUrlPrefix()
+    {
+        return $this->config('admin_app_url')
+            ? false
+            : rtrim(ltrim($this->config('admin_app_path', 'admin'), '/'), '/');
+    }
+
+    public function getSystemUrlPrefix()
+    {
+        return $this->config('system_prefix', 'system-settings');
+    }
+
+    public function getSystemRouteNamePrefix()
+    {
+        return snakeCase(studlyName($this->getSystemUrlPrefix()));
+    }
+
+    public function getTranslations()
+    {
+        $cache_key = static::$translationCacheKey;
+
+        $cache = Cache::store('file');
+
+        if ($cache->has($cache_key) && false) {
+            return $cache->get($cache_key);
+        }
+
+        $translations = app('translator')->getTranslations();
+
+        $cache->set($cache_key, json_encode($translations), 600);
+
+        return $translations;
+    }
+
+    public function clearTranslations()
+    {
+        $cache_key = static::$translationCacheKey;
+
+        Cache::forget($cache_key);
+    }
+
+    /**
+     * Get list of enabled modules.
+     */
+    public function allEnabled(): array
+    {
+        return $this->getByStatus(true);
     }
 
     public function getGroupedModules($group_name)
@@ -305,9 +460,29 @@ class Modularity extends FileRepository
      * @param string $dir
      * @return string
      */
-    public function getVendorPath($dir = '')
+    final public function getVendorPath($dir = '')
     {
-        return get_modularity_vendor_path($dir);
+        if (! $dir) {
+            return $this->vendorPath;
+        }
+
+        return concatenate_path($this->vendorPath, $dir);
+        // return realpath(concatenate_path($this->vendorPath, $dir));
+    }
+
+    /**
+     * Get vendor path.
+     *
+     * @param string $dir
+     * @return string
+     */
+    final public function getVendorDir($dir = '')
+    {
+        if (! $dir) {
+            return $this->vendorDir;
+        }
+
+        return concatenate_path($this->vendorDir, $dir);
     }
 
     /**

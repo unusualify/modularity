@@ -97,3 +97,6 @@ for seeders
     [$CONTROLLER_NAME::class, '$METHOD_NAME'] => '$CONTROLLER_NAME@$METHOD_NAME'
     \[([a-zA-Z]*)::class,\s'(.*)'\] => '$1@$2'
  */
+
+/** modularity:replace:regex command */
+art mod:replace:regex modules "@section\s*\(\s*[\']STORE[\']\s*\)([\s\S]*?)@endsection" "@push('STORE')\$1@endpush" --directory='**/*.blade.php' -p

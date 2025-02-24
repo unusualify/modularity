@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Entities\Translations;
 
-use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Model;
 
 class StateTranslation extends Model
@@ -15,8 +14,6 @@ class StateTranslation extends Model
 
     public function getTable()
     {
-        $stateSettingsTable = modularityConfig('settings_table', 'state');
-
-        return Str::singular($stateSettingsTable) . '_translations';
+        return modularityConfig('tables.state_translations', 'modularity_state_translations');
     }
 }

@@ -3,12 +3,12 @@
 namespace Unusualify\Modularity\Entities;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Unusualify\Modularity\Entities\Traits\HasCreator;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
-use Unusualify\Modularity\Entities\Traits\IsAuthorizedable;
 
 class ChatMessage extends Model
 {
-    use IsAuthorizedable, HasFileponds;
+    use HasCreator, HasFileponds;
 
     /**
      * The attributes that are mass assignable.
@@ -58,7 +58,7 @@ class ChatMessage extends Model
     protected function userProfile(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => get_user_profile($this->user),
+            get: fn ($value) => get_user_profile($this->creator),
         );
     }
 

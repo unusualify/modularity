@@ -23,7 +23,7 @@ import * as themes from '@/config/themes'
 
 // import 'vuetify/lib/styles/main.sass'
 
-const APP_THEME = import.meta.env.VUE_APP_THEME || 'unusual'
+const APP_THEME = import.meta.env.VUE_APP_THEME || 'unusualify'
 
 function loadIcons ($font) {
   const locales = require.context('../config/icons', true, /[A-Za-z0-9-_,\s]+.json$/i)

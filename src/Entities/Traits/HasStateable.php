@@ -4,12 +4,20 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Modules\SystemUtility\Entities\Stateable;
 use Unusualify\Modularity\Entities\State;
+use Unusualify\Modularity\Entities\Stateable;
 
 trait HasStateable
 {
     public $_preserved_stateable;
+
+    protected static $hasStateableFillable = [
+        'initial_stateable',
+        // '_stateable',
+        // '_status',
+    ];
+
+    protected $customInitialStateable = null;
 
     protected static $stateModel = 'Modules\SystemUtility\Entities\State';
 
@@ -20,11 +28,24 @@ trait HasStateable
     public static function bootHasStateable(): void
     {
         self::saving(static function (Model $model) {
+
+            if (isset($model->initial_stateable)) {
+                $defaultStates = $model->getDefaultStates();
+
+                $initialStateFound = collect($defaultStates)->firstWhere('code', $model->initial_stateable);
+
+                if ($initialStateFound) {
+                    $model->customInitialStateable = $initialStateFound;
+                }
+            }
             if (isset($model->_status)) {
                 $model->_preserved_stateable = $model->_stateable;
             }
             $model->offsetUnset('_stateable');
             $model->offsetUnset('_status');
+            foreach (static::$hasStateableFillable as $field) {
+                $model->offsetUnset($field);
+            }
         });
 
         self::created(static function (Model $model) {
@@ -193,7 +214,7 @@ trait HasStateable
     public function createNonExistantStates()
     {
         $defaultStates = $this->getDefaultStates();
-        $initialState = $this->getInitialState();
+        $initialState = $this->customInitialStateable ?? $this->getInitialState();
 
         foreach ($defaultStates as $state) {
             $_state = State::where('code', $state['code'])->first() ?? State::create($state);
@@ -207,7 +228,8 @@ trait HasStateable
         return $this->morphToMany(
             static::$stateModel,
             'stateable',
-            config('modularity.states.table', 'stateables'),
+            // config('modularity.states.table', 'stateables'),
+            modularityConfig('tables.stateables', 'modularity_stateables'),
             'stateable_id',
             'state_id'
         )->withPivot('is_active');
@@ -222,8 +244,8 @@ trait HasStateable
             'id',
             'id',
             'state_id'
-        )->where(config('modularity.states.table', 'stateables') . '.stateable_type', get_class($this))
-            ->where(config('modularity.states.table', 'stateables') . '.is_active', 1);
+        )->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.stateable_type', get_class($this))
+            ->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.is_active', 1);
     }
 
     public static function getStateableTranslationLanguages()
@@ -311,7 +333,7 @@ trait HasStateable
         return $this->scopeAuthorized($this)
             ->whereHas('states', function ($q) {
                 $q->where('code', 'distributed')
-                    ->where('stateables.is_active', 1);
+                    ->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.is_active', 1);
             });
     }
 

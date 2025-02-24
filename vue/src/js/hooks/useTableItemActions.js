@@ -1,6 +1,7 @@
 // hooks/useTableItemActions.js
-import { computed } from 'vue'
+import { computed, reactive, toRefs } from 'vue'
 import { useStore } from 'vuex'
+import { useDisplay } from 'vuetify'
 import _ from 'lodash-es'
 import ACTIONS from '@/store/actions'
 
@@ -37,6 +38,8 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
   const tableItem = useTableItem()
   const tableNames = useTableNames(props)
 
+  const { smAndDown, mdAndDown, lgAndDown } = useDisplay()
+
   const can = (permission) => {
     const name = tableNames.permissionName.value + '_' + permission
     return store.getters.isSuperAdmin || store.getters.userPermissions[name]
@@ -72,7 +75,11 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
     if(action.conditions) {
       return hasAction && action.conditions.every(condition => {
         const [path, operator, value] = condition;
-        const actualValue = getNestedValue(item, path);
+        let actualValue = getNestedValue(item, path);
+
+        if(['>', '<', '>=', '<=', '='].includes(operator) && Array.isArray(actualValue)) {
+          actualValue = actualValue.length;
+        }
 
         switch (operator) {
           case '=':
@@ -81,7 +88,6 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
           case '!=':
             return actualValue !== value;
           case '>':
-            __log(value, actualValue, actualValue > value)
             return actualValue > value;
           case '<':
             return actualValue < value;
@@ -90,7 +96,6 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
           case '<=':
             return actualValue <= value;
           case 'in':
-            __log(value, actualValue, Array.isArray(value) && value.includes(actualValue))
             return Array.isArray(value) && value.includes(actualValue);
           case 'not in':
             return Array.isArray(value) && !value.includes(actualValue);
@@ -102,8 +107,6 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
         }
       })
     }
-
-
 
     return hasAction
   }
@@ -187,6 +190,79 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
     tableForms.customFormModalActive.value = true
   }
 
+  const getOnlyShowData = (data, only = null) => {
+    if(!only) return data
+
+    if(Array.isArray(data)) {
+      data = data.map(item => {
+        return getOnlyShowData(item, only)
+      })
+    } else if (__isObject(data)) {
+      if(Array.isArray(only)) {
+        let newData = {}
+        only.forEach((key) => {
+          let value = __data_get(data, key, null)
+          newData[key] = value
+        })
+      } else if (__isObject(only)) {
+        let newData = {}
+        Object.keys(only).forEach((key) => {
+          let label = only[key]
+          let value = __data_get(data, key, null)
+
+          newData[label] = value
+        })
+        data = _.cloneDeep(newData)
+      }
+    }
+
+    return data
+  }
+
+  const getExceptShowData = (data, except = null) => {
+    if(!except) return data
+
+    if(Array.isArray(data)) {
+      data = data.map(item => {
+        return getExceptShowData(item, except)
+      })
+    } else if (__isObject(data) && Array.isArray(except)) {
+      let newData = _.cloneDeep(data)
+      except.forEach((key) => {
+        let value = __data_get(data, key, null)
+        delete newData[key]
+      })
+      data = _.cloneDeep(newData)
+    }
+
+    return data
+  }
+
+  const handleShowAction = (action, item) => {
+    let data = null
+
+    if(action.show  === true ) {
+      data = item
+    } else {
+      data = __data_get(item, action.show, null);
+    }
+
+
+    if(data) {
+      if(action.only) {
+        data = getOnlyShowData(data, action?.only)
+      } else if (action.except) {
+        data = getExceptShowData(data, action?.except)
+      }
+      tableModals.modals.value.show.loadData(data)
+      tableModals.modals.value.show.set(action)
+      tableModals.modals.value.show.open()
+    }
+    // tableModals.modals.value.show.description = action.show.description
+    // tableModals.activeModal.value = 'showModal'
+    // tableModals.showModalActive.value = true
+  }
+
   // Main Action Handler
   const itemAction = (item = null, action = null, ...args) => {
     const _action = __isString(action) ? { name: action } : action
@@ -226,9 +302,28 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
     if (_action.form) {
       handleCustomFormAction(_action, item)
     }
+
+    if (_action.show) {
+      handleShowAction(_action, item)
+    }
   }
 
+  const states = reactive({
+    actionShowingType: computed(() => {
+      const shouldShowDropdown = (actionsLength) => {
+        if (actionsLength > 7) return lgAndDown.value
+        if (actionsLength > 4) return mdAndDown.value
+        return smAndDown.value
+      }
+
+      return props.rowActionsType === 'dropdown' || shouldShowDropdown(props.rowActions.length)
+        ? 'dropdown'
+        : 'inline'
+    }),
+  })
+
   return {
+    ...toRefs(states),
     // methods
     itemAction,
     itemHasAction,

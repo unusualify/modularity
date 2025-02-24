@@ -58,13 +58,13 @@ const svgConfig = (suffix = null, isProduction = true) => {
 
 export default defineConfig(({ command, mode }) => {
   const ENV = loadEnv(mode, process.cwd(), '')
-  const envPrefix = 'VUE'
+  const envPrefix = ['VUE', 'VITE']
   const isProduction = mode === 'production'
 
   const vendorDir = ENV.VENDOR_DIR || 'vendor/unusualify/modularity'
   const LARAVEL_ROOT_LEVEL = laravelRootUpperLevel(vendorDir)
 
-  const APP_THEME = ENV.VUE_APP_THEME || 'unusual'
+  const APP_THEME = ENV.VUE_APP_THEME || 'unusualify'
   const VUE_DEV_PORT = ENV.VUE_DEV_PORT || 5173
   const VUE_DEV_HOST = ENV.VUE_DEV_HOST || 'localhost' // jakomeet.test
   const VUE_DEV_PROXY = ENV.VUE_DEV_PROXY || null

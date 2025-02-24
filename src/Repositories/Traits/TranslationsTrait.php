@@ -43,7 +43,7 @@ trait TranslationsTrait
             if ($hasTranslationFields) {
                 $locales = getLocales();
                 $localesCount = count($locales);
-                $submittedLanguages = Collection::make($fields['languages'] ?? []);
+                $submittedLanguages = Collection::make($fields['translationLanguages'] ?? []);
 
                 $atLeastOneLanguageIsPublished = $submittedLanguages->contains(function ($language) {
                     return $language['published'];
@@ -78,7 +78,7 @@ trait TranslationsTrait
             }
 
             // Always clean up the languages field
-            unset($fields['languages']);
+            unset($fields['translationLanguages']);
         }
 
         return $fields;

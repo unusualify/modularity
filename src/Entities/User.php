@@ -58,6 +58,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'company_name',
+        'name_with_company',
+    ];
+
     protected static function boot()
     {
         parent::boot();
@@ -118,6 +123,20 @@ class User extends Authenticatable
 
         return Attribute::make(
             get: fn () => $inValid,
+        );
+    }
+
+    protected function companyName(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->company()->exists() ? $this->company->name : null,
+        );
+    }
+
+    protected function nameWithCompany(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->name . ' (' . ($this->company_name ? $this->company_name : __('System User')) . ')',
         );
     }
 

@@ -634,7 +634,7 @@ const sampleSource = [
   {
     "pressReleasePackages": {
       "_title": "Paketler",
-      "_type": "input-tab-group",
+      "_type": "input-form-tabs",
       "_value": [
         {
           "_title": "Turkey",
@@ -642,7 +642,7 @@ const sampleSource = [
           "_value": {},
           "package_id": {
             "_title": "Paket ",
-            "_type": "input-tab-group",
+            "_type": "input-form-tabs",
             "_value": "Wire",
             "packageFeatures": "Ücretsiz Dağıtım, 10 yayın içeriği, SEO kurallarına uygun İngilizce basın bülteni yazımı (max. 400 kelime), Seçilen medya listesine dağıtım, Partner haber sitelerine gönderim",
             "prices": "€ 50,00",
@@ -650,7 +650,7 @@ const sampleSource = [
           },
           "packageLanguages": {
             "_title": "Dağıtım Dili",
-            "_type": "input-tab-group",
+            "_type": "input-form-tabs",
             "_value": [
               "Türkçe",
               "İngilizce"
@@ -663,7 +663,7 @@ const sampleSource = [
           "_value": {},
           "package_id": {
             "_title": "Paket ",
-            "_type": "input-tab-group",
+            "_type": "input-form-tabs",
             "_value": "Wire",
             "packageFeatures": "Ücretsiz Dağıtım, 10 yayın içeriği, SEO kurallarına uygun İngilizce basın bülteni yazımı (max. 400 kelime), Seçilen medya listesine dağıtım, Partner haber sitelerine gönderim",
             "prices": "€ 46,00",
@@ -671,7 +671,7 @@ const sampleSource = [
           },
           "packageLanguages": {
             "_title": "Dağıtım Dili",
-            "_type": "input-tab-group",
+            "_type": "input-form-tabs",
             "_value": [
               "İngilizce",
               "Türkçe"

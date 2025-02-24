@@ -6,12 +6,7 @@ class $STUDLY_NAME$Command extends BaseCommand
 {
     protected $hidden = true;
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'modularity:$SIGNATURE$';
+    $SIGNATURE$
 
     protected $aliases = [];
 

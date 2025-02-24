@@ -3,6 +3,8 @@
 namespace Unusualify\Modularity\Tests;
 
 use Nwidart\Modules\LaravelModulesServiceProvider;
+use Spatie\Permission\PermissionServiceProvider;
+use Unusualify\Modularity\Activators\ModularityActivator;
 use Unusualify\Modularity\LaravelServiceProvider;
 use Unusualify\Modularity\Providers\ModularityProvider;
 
@@ -10,7 +12,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     public $path;
 
-    public $umodulesPath;
+    public $modulesPath;
 
     protected function setUp(): void
     {
@@ -21,7 +23,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $this->path = realpath(__DIR__ . '/..');
 
-        $this->umodulesPath = realpath($this->path . '/umodules');
+        $this->modulesPath = realpath($this->path . '/modules');
 
         // $app['cache'] = $this->createMock(CacheManager::class);
         // $app['files'] = $this->createMock(Filesystem::class);
@@ -35,6 +37,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             LaravelModulesServiceProvider::class,
             LaravelServiceProvider::class,
             ModularityProvider::class,
+            PermissionServiceProvider::class,
+            \Oobook\Priceable\LaravelServiceProvider::class,
         ];
     }
 
@@ -49,6 +53,21 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $app['config']->set('cache.prefix', 'spatie_tests---');
         $app['config']->set('cache.default', getenv('CACHE_DRIVER') ?: 'array');
+        $app['config']->set('modules.scan.enabled', true);
+        $app['config']->set('modules.cache.enabled', false);
+        $app['config']->set('modules.scan.paths', [
+            base_path('vendor/*/*'),
+            realpath(__DIR__ . '/../modules'),
+        ]);
+
+        $app['config']->set('modules.activators.modularity', [
+            'class' => ModularityActivator::class,
+            'statuses-file' => base_path('modules_statuses.json'),
+            'cache-key' => 'modularity.activator.installed',
+            'cache-lifetime' => 604800,
+        ]);
+
+        $app['config']->set('modules.activator', 'modularity');
 
     }
 
@@ -82,8 +101,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     }
 
-    public function umoduleDirectory(string $moduleName): string
+    public function moduleDirectory(string $moduleName): string
     {
-        return realpath("{$this->umodulesPath}/{$moduleName}");
+        return realpath("{$this->modulesPath}/{$moduleName}");
     }
 }

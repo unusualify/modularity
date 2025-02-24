@@ -1,0 +1,11 @@
+{
+    "name": "SystemNotification",
+    "alias": "system-notification",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+
+    ],
+    "files": []
+}

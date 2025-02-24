@@ -13,8 +13,8 @@ use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\UFinder;
-use Unusualify\Modularity\Traits\MakesResponses;
-use Unusualify\Modularity\Traits\ManageScopes;
+use Unusualify\Modularity\Http\Controllers\Traits\MakesResponses;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageScopes;
 
 abstract class PanelController extends CoreController
 {
@@ -86,6 +86,8 @@ abstract class PanelController extends CoreController
      * @var array
      */
     protected $defaultIndexOptions = [
+        'activity' => true,
+        'show' => true,
         'index' => true,
         'create' => true,
         'edit' => true,
@@ -404,11 +406,11 @@ abstract class PanelController extends CoreController
                 'delete' => $this->permissionPrefix(Permission::DELETE->value),
                 'destroy' => $this->permissionPrefix(Permission::DELETE->value),
 
-                // 'restore' => 'restore',
                 'restore' => $this->permissionPrefix(Permission::RESTORE->value),
                 'forceDelete' => $this->permissionPrefix(Permission::FORCEDELETE->value),
                 'duplicate' => $this->permissionPrefix(Permission::DUPLICATE->value),
-
+                'activity' => $this->permissionPrefix(Permission::ACTIVITY->value),
+                'show' => $this->permissionPrefix(Permission::SHOW->value),
             /**
              * TODO #additionalRoutePermission
              */

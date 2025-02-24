@@ -13,9 +13,6 @@ export default {
   $isset: function (...args) {
     return window.__isset(...args)
   },
-  $call: function (functionName, ...args) {
-    return this[functionName](...args)
-  },
   $bindAttributes: function (attributes = null) {
     const _attributes = {}
     if (attributes) {
@@ -34,6 +31,15 @@ export default {
   },
   $main: function () {
     return this.$root.$refs.main
+  },
+  $profileDialog: function () {
+    return this.$root.$refs.sidebar.$refs.profileDialog
+  },
+  $openProfileDialog: function () {
+    return this.$store.state.user.profileDialog = true
+  },
+  $closeProfileDialog: function () {
+    return this.$store.state.user.profileDialog = false
   },
   $can: function (permission) {
     if (this.$store.getters.isSuperAdmin) {
@@ -240,7 +246,7 @@ export default {
             displayData[key]._value = value.file_name;
           }
         break;
-        case 'input-tab-group':
+        case 'input-form-tabs':
           // Repeater adds a nested level to the model as an array
           displayData[key]._value = _.reduce(value, (acc, obj, id) => {
             id = __isString(id) ? parseInt(id) : id
@@ -269,8 +275,8 @@ export default {
               let _haystack = item[_map];
               if (Array.isArray(_value) && _haystack) {
                 __displayData._value = _value.map(id => {
-                  let item = _haystack.find(i => i.id === id);
-                  return item ? item.title || item.name : 'N/A';
+                  let _item = _haystack.find(i => i.id === id);
+                  return _item ? _item.title || _item.name : 'N/A';
                 })
               } else {
                 if(!!_haystack){

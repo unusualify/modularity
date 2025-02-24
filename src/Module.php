@@ -7,16 +7,21 @@ use Illuminate\Foundation\AliasLoader;
 use Illuminate\Foundation\ProviderRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Nwidart\Modules\Contracts\ActivatorInterface;
 use Nwidart\Modules\Laravel\Module as NwidartModule;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
-use Unusualify\Modularity\Activators\FileActivator;
+use Unusualify\Modularity\Activators\ModuleActivator;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Support\Finder;
 
 class Module extends NwidartModule
 {
+    private $activator;
+
     /**
      * @var ModuleActivatorInterface
      */
@@ -25,20 +30,32 @@ class Module extends NwidartModule
     private $config;
 
     /**
+     * @var array
+     */
+    private $middlewares = [];
+
+    /**
      * The constructor.
      */
-    public function __construct(string $name, $path)
+    public function __construct($app, string $name, $path)
     {
-        $app = app();
-
         parent::__construct($app, $name, $path);
-
+        // $this->name = $name;
+        // $this->path = $path;
+        // $this->cache = $app['cache'];
+        // $this->files = $app['files'];
+        // $this->translator = $app['translator'];
+        // $this->activator = $app[ActivatorInterface::class];
+        $this->app = $app;
+        $this->moduleActivator = (new ModuleActivator($app, $this));
         try {
-            $this->moduleActivator = (new FileActivator($app))->setModule($this->getName(), $path);
+            // dd($app, $name, $path);
+            // $this->moduleActivator = (new ModuleActivator($app))->setModule($this->getName(), $path);
         } catch (\Throwable $th) {
-            dd($path, $name, $this->getName());
+            dd($name, $path, $th);
         }
 
+        $this->setMiddlewares();
         // $this->moduleActivator->setModule($name);
     }
 
@@ -76,11 +93,58 @@ class Module extends NwidartModule
         }
     }
 
-    public function setModuleActivator($name)
+    /**
+     * Determine whether the given status same with the current module status.
+     */
+    public function isStatus(bool $status): bool
     {
-        // Directory path fix for System Modules
-        $this->moduleActivator->setModule($name, $this->getDirectoryPath());
+        return $this->activator->hasStatus($this, $status);
+        try {
+        } catch (\Throwable $th) {
+            dd($this, $status, $this->activator, $th, debug_backtrace());
+        }
     }
+
+    public function getActivator()
+    {
+        return $this->activator;
+    }
+
+    public function clearCache()
+    {
+        $this->activator->reset();
+    }
+
+    public function setMiddlewares()
+    {
+        $middleware_folder = GenerateConfigReader::read('filter')->getPath();
+        $middleware_namespace = GenerateConfigReader::read('filter')->getNamespace();
+
+        if (file_exists(($middlewareDir = $this->getDirectoryPath($middleware_folder)))) {
+            foreach (glob($middlewareDir . '/*Middleware.php') as $middlewareFile) {
+                $middlewareFileName = pathinfo($middlewareFile)['filename']; // $filename
+                $middlewareClass = $this->getClassNamespace("{$middleware_namespace}\\" . $middlewareFileName);
+                if (@class_exists($middlewareClass)) {
+
+                    $name = implode('.', Arr::where(explode('_', snakeCase($middlewareFileName)), function ($value) {
+                        return $value !== 'middleware';
+                    }));
+                    $aliasName = 'modules.' . $this->getSnakeName() . '.' . $name;
+
+                    $this->middlewares[$name] = [
+                        'alias' => $aliasName,
+                        'class' => $middlewareClass,
+                    ];
+                }
+            }
+        }
+    }
+
+    // public function setModuleActivator($name)
+    // {
+    //     // Directory path fix for System Modules
+    //     $this->moduleActivator->setModule($name, $this->getDirectoryPath());
+    // }
 
     /**
      * Enable the current module route.
@@ -164,6 +228,13 @@ class Module extends NwidartModule
         }
 
         return $path . (empty($directory) ? '/' : "/$directory");
+    }
+
+    public function isModularityModule()
+    {
+        $modularityModulesPath = Modularity::getVendorPath('modules');
+
+        return str_starts_with($this->getPath(), $modularityModulesPath);
     }
 
     /**
@@ -269,6 +340,14 @@ class Module extends NwidartModule
     public function isParentRoute($routeName): bool
     {
         return count(($pr = $this->getParentRoute())) > 0 && $pr['name'] == studlyName($routeName);
+    }
+
+    public function isSingleton($routeName)
+    {
+        $singularTrait = 'Unusualify\Modularity\Entities\Traits\IsSingular';
+        $repository = $this->getRouteClass($routeName, 'repository', true);
+
+        return classHasTrait(App::make($repository)->getModel(), $singularTrait);
     }
 
     /**
@@ -468,13 +547,20 @@ class Module extends NwidartModule
         return Collection::make($this->getModuleUris())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name))->toArray();
     }
 
-    public function getRouteActionUri($routeName, $action, $replacements = []): string
+    public function getRouteActionUri($routeName, $action, $replacements = [], $absolute = false): string
     {
         $quote = preg_quote('.' . $action);
 
-        $endpoint = '/' . Collection::make($this->getRouteUris($routeName))->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name))->first();
+        $endpoint = '/' . Collection::make($this->getRouteUris($routeName))
+            ->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name))->first();
 
-        return replace_curly_braces($endpoint, $replacements);
+        $endpoint = replace_curly_braces($endpoint, $replacements);
+
+        if ($absolute) {
+            return url($endpoint);
+        }
+
+        return $endpoint;
     }
 
     public function getParentNamespace(string $target): string
@@ -482,13 +568,27 @@ class Module extends NwidartModule
         return $this->getBaseNamespace() . '\\' . GenerateConfigReader::read(kebabCase($target))->getNamespace();
     }
 
-    public function getRouteClass(string $routeName, string $target): string
+    public function getTargetClassNamespace(string $target, $className = null): string
+    {
+        return $this->getBaseNamespace() . '\\' . GenerateConfigReader::read(kebabCase($target))->getNamespace() . ($className ? '\\' . $className : '');
+    }
+
+    public function getTargetClassPath(string $target, $className = null): string
+    {
+        return $this->getDirectoryPath(GenerateConfigReader::read(kebabCase($target))->getPath()) . ($className ? '/' . $className : '');
+    }
+
+    public function getRouteClass(string $routeName, string $target, $asClass = false): string
     {
         $className = studlyName($routeName);
 
         if (! preg_match('/model/', kebabCase($target))) {
             $className .= studlyName($target);
         }
+
+        // if($asClass){
+        //     return App::make($this->getParentNamespace($target) . '\\' . $className);
+        // }
 
         return $this->getParentNamespace($target) . '\\' . $className;
     }
@@ -524,5 +624,32 @@ class Module extends NwidartModule
         }
 
         return $navigationActions;
+    }
+
+    public function createMiddlewareAliases()
+    {
+        foreach ($this->middlewares as $name => $middleware) {
+            Route::aliasMiddleware($middleware['alias'], $middleware['class']);
+        }
+    }
+
+    public function getRouteMiddlewareAliases($routeName)
+    {
+        $snakeName = snakeCase($routeName);
+
+        $autoMiddlewares = [];
+
+        if (isset($this->middlewares[$snakeName])) {
+            $noAutoMiddleware = $this->getRouteConfig($routeName)['noAutoMiddleware'] ?? false;
+
+            if (! $noAutoMiddleware) {
+                $autoMiddlewares = [$this->middlewares[$snakeName]['alias']];
+            }
+        }
+
+        return array_merge(
+            $autoMiddlewares,
+            $this->getRouteConfigs($routeName)['middleware'] ?? $this->getRouteConfigs($routeName)['middlewares'] ?? []
+        );
     }
 }

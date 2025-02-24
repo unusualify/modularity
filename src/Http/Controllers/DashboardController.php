@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\View;
 // use Modules\PressRelease\Entities\PressRelease;
 // use Modules\PressRelease\Repositories\PressReleaseRepository;
 use Unusualify\Modularity\Entities\Enums\Permission;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularity\Services\View\UWidget;
-use Unusualify\Modularity\Traits\ManageUtilities;
 
 class DashboardController extends BaseController
 {

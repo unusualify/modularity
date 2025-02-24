@@ -16,12 +16,12 @@ return new class extends OneTimeOperation
     /**
      * Determine if the operation is being processed asynchronously.
      */
-    protected bool $async = true;
+    protected bool $async = $ASYNC$;
 
     /**
      * The queue that the job will be dispatched to.
      */
-    protected string $queue = 'default';
+    protected string $queue = '$QUEUE$';
 
     /**
      * A tag name, that this operation can be filtered by.

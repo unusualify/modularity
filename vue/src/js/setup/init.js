@@ -229,7 +229,7 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
   window.__wildcard_change = (string, val, search_key = 'id') => {
     let values = Array.isArray(val) ? val.join(',') : val
     // __log('wildcard_change', string, val)
-    return string.replace(/^([\w\.]+)?(\*)([\w\.\*]+)$/, '$1*' + `${search_key}=${values}` + '$3')
+    return string.replace(/^([\w\.]+)?(\*)([\w_\-\.\*]+)$/, '$1*' + `${search_key}=${values}` + '$3')
   }
 
   window.__data_get = (data, path, defaultValue) => {
@@ -297,7 +297,7 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
     return current;
   }
 
-  // TODO: inputs/TabGroup.vue
+  // TODO: inputs/FormTabs.vue
   window.__cast_value_match = (value, ownerItem ) => {
     let matches
 
@@ -331,10 +331,18 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
           _value = newValue.join(',')
         }else if(__isString(newValue)){
           _value = newValue
+
+          let snakeCased = snakeCase(_value)
+
+          if(this.$te(`modules.${snakeCased}`)){
+            _value = this.$t(`modules.${snakeCased}`)
+          }
+        }else if(__isNumber(newValue)){
+          _value = newValue.toString()
         }
 
         if(_value){
-          let remainingQuote = '\\w\\s' + __preg_quote('çşıİğüö.,;?')
+          let remainingQuote = '\\w\\s' + __preg_quote('çşıİğüö.,;?|:_')
           let pattern = new RegExp( String.raw`^([${remainingQuote}]+)?(${quoted})([${remainingQuote}]+)?$`)
 
           if(value.match(pattern)){
@@ -342,7 +350,6 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
           }else{
             __log(
               'Not matched sentence',
-              remainingQuote,
               pattern,
               value,
               value.match(pattern)

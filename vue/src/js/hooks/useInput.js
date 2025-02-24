@@ -38,7 +38,9 @@ export default function useInput (props, context) {
         return context.initializeInput ? context.initializeInput(_val) : _val
       },
       set: (val, old) => {
-        methods.updateModelValue(val)
+        context.updateModelValue
+          ? context.updateModelValue(val, old)
+          : methods.emitModelValue(val, old)
       }
     }),
   })
@@ -49,8 +51,11 @@ export default function useInput (props, context) {
         const result = await this.$refs.VInput.validate()
       }
     },
-    updateModelValue: function (val) {
-      context.emit('update:modelValue', val)
+    updateModelValue: function (val, old) {
+      context.emit('update:modelValue', val, old)
+    },
+    emitModelValue: function (val, old) {
+      context.emit('update:modelValue', val, old)
     },
     makeReference (key) {
       return `${key}-${states.id}`

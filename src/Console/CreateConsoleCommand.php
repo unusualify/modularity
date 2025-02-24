@@ -58,10 +58,18 @@ class CreateConsoleCommand extends BaseCommand
         $headline = Str::headline($name);
         $signature = $this->argument('signature');
         $description = $this->option('description') ?? "{$headline} description";
+        $signature = str_replace(['\t', '\n'], ["\t", "\n"], $signature);
+
+        $created = "\t/**\n"
+            . "\t * The name and signature of the console command.\n"
+            . "\t *\n"
+            . "\t * @var string\n"
+            . "\t */\n"
+            . "\tprotected \$signature = 'modularity:{$signature}';";
 
         $replacements = [
             'STUDLY_NAME' => $studlyName,
-            'SIGNATURE' => $signature,
+            'SIGNATURE' => $created,
             'DESCRIPTION' => $description,
         ];
 

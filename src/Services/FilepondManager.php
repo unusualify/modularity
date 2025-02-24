@@ -103,7 +103,7 @@ class FilepondManager
         // ->response('jpg', 70);
     }
 
-    public function persistFile(TemporaryFilepond $temp_filepond, Model $model)
+    public function persistFile(TemporaryFilepond $temp_filepond, Model $model, $role = null, $locale = null)
     {
         $temporary_path = $this->tmp_file_path . $temp_filepond->folder_name . '/' . $temp_filepond->file_name;
 
@@ -117,7 +117,7 @@ class FilepondManager
                 Storage::delete($new_path);
             }
 
-            $this->createFilepond($model, $temp_filepond);
+            $this->createFilepond($model, $temp_filepond, role: $role, locale: $locale);
 
             $this->deleteFilePondFromSession($temp_filepond);
 
@@ -136,7 +136,7 @@ class FilepondManager
 
     }
 
-    public function createFilepond($object, $temp_filepond)
+    public function createFilepond($object, $temp_filepond, $role = null, $locale = null)
     {
         $filepondable_id = $object->id;
         $filepondable_type = get_class($object);
@@ -145,28 +145,32 @@ class FilepondManager
             'filepondable_id' => $filepondable_id,
             'filepondable_type' => $filepondable_type,
             'file_name' => $temp_filepond->file_name,
-            'role' => $temp_filepond->input_role,
+            'role' => $role ?? $temp_filepond->input_role,
             'uuid' => $temp_filepond->folder_name,
-            'locale' => 'tr',
+            'locale' => $locale ?? config('app.locale', 'en'),
         ]);
     }
 
-    public function saveFile($object, $files, $role, $locale = 'tr')
+    public function saveFile($object, $files, $role, $locale = null)
     {
         $files ??= [];
         $existingUuids = array_column($files, 'uuid');
-        $fileponds = $object->fileponds()->where('role', $role)->get();
+        $fileponds = $object->fileponds()->where('role', $role);
 
+        if ($locale) {
+            $fileponds = $fileponds->where('locale', $locale);
+        }
+
+        $fileponds = $fileponds->get();
         // files listesinde gelmeyip object->fileponds listesinde olanlari fileponds tablosundan ve storage'tan sil
         foreach ($fileponds as $file) {
             if (! in_array($file->uuid, $existingUuids)) {
                 $file->delete();
-                // unset($files[array_search($file->uuid, $existingUuids)]);
             }
         }
+
         // dd($files, $fileponds);
         foreach ($files as $file) {
-
             if ((bool) $fileponds->select('uuid', $file['uuid']) && Storage::exists($this->file_path . $file['uuid'])) {
                 continue;
             }
@@ -174,10 +178,11 @@ class FilepondManager
             $tmp_file = TemporaryFilepond::where('folder_name', $file['uuid'])->first();
 
             if ($tmp_file) {
-                $this->persistFile($tmp_file, $object);
+                $this->persistFile($tmp_file, $object, role: $role, locale: $locale);
             }
 
         }
+
     }
 
     public function deleteFile($folder)
@@ -263,5 +268,53 @@ class FilepondManager
             return '';
         }
 
+    }
+
+    public function clearFolders()
+    {
+        $allFolders = Storage::directories($this->file_path);
+        $excludedFolders = [
+            trim($this->tmp_file_path, '/'),
+        ];
+
+        $excludedFolders = array_merge($excludedFolders, Filepond::all()->pluck('uuid')->map(fn ($uuid) => $this->file_path . $uuid)->toArray());
+
+        $deleteFolders = array_values(array_diff($allFolders, $excludedFolders));
+
+        foreach ($deleteFolders as $folder) {
+            if (Storage::files($folder)) {
+                Storage::deleteDirectory($folder);
+            }
+        }
+    }
+
+    public function clearTemporaryFiles($days = 7)
+    {
+        $query = TemporaryFilepond::where('created_at', '<', now()->subDays($days));
+        $temporaryFileponds = $query->get();
+
+        $deleteFolders = $temporaryFileponds->pluck('folder_name')->map(fn ($folder) => $this->tmp_file_path . $folder)->toArray();
+
+        foreach ($deleteFolders as $folder) {
+            if (Storage::files($folder)) {
+                Storage::deleteDirectory($folder);
+            }
+        }
+
+        $query->delete();
+
+        // delete empty folders
+        $allFolders = Storage::directories($this->tmp_file_path);
+        $excludedFolders = TemporaryFilepond::all()->pluck('folder_name')->map(fn ($folder) => $this->tmp_file_path . $folder)->toArray();
+
+        $deleteFolders = array_values(array_diff($allFolders, $excludedFolders));
+
+        foreach ($deleteFolders as $folder) {
+            if (Storage::files($folder)) {
+                Storage::deleteDirectory($folder);
+            }
+        }
+
+        return $temporaryFileponds;
     }
 }

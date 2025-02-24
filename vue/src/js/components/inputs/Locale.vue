@@ -4,8 +4,8 @@
       <template v-for="language in languages" :key="language.value">
         <component
           v-bind:is="`${type}`"
-          :class="[language.value === currentLocale.value || isCustomForm ? '' : 'd-none']"
           v-bind="attributesPerLang[`${language.value}`]"
+          :class="[language.value === currentLocale.value || isCustomForm ? '' : 'd-none']"
           @update:modelValue="modelUpdated($event, language.value)"
           >
           <template v-slot:appendx>
@@ -22,7 +22,15 @@
           <template v-slot:label="labelScope">
             <!-- <slot name="label"></slot> -->
             {{ labelScope.label }}
-            <v-chip v-if="labelScope.isActive.value || labelScope.isFocused.value" style="font-size: var(--v-field-label-scale); height: calc(var(--v-field-label-scale) * 1.5);"
+            <v-chip v-if="labelScope.label && (labelScope.isActive) &&  (labelScope.isActive.value || labelScope.isFocused.value)" style="font-size: var(--v-field-label-scale); height: calc(var(--v-field-label-scale) * 1.5);"
+              size="x-small"
+              density="compact"
+              color="primary"
+              class="ml-1"
+            >
+              {{ displayedLocale }}
+            </v-chip>
+            <v-chip v-else-if="labelScope.label && !$isset(labelScope.isActive)" style=""
               size="x-small"
               density="compact"
               color="primary"
@@ -227,6 +235,10 @@ export default {
     modelUpdated (value, lang) {
       try {
         if (this.input && __isset(this.input[lang])) {
+          this.input[lang] = value
+          this.updateModelValue(this.input)
+        } else if (this.input && !__isset(this.input[lang]) && value) {
+          this.input = {}
           this.input[lang] = value
           this.updateModelValue(this.input)
         } else if (!this.input && value) {

@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\View\Factory as ViewFactory;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularity\Services\MessageStage;
-use Unusualify\Modularity\Traits\ManageUtilities;
 
 class ResetPasswordController extends Controller
 {
@@ -139,7 +139,7 @@ class ResetPasswordController extends Controller
 
                 'formAttributes' => [
                     'hasSubmit' => true,
-
+                    'color' => 'primary',
                     // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
                     'modelValue' => [
                         'email' => $user->email,

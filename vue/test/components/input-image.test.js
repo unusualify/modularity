@@ -12,6 +12,8 @@ import store from '../../src/js/store'
 import fitGrid from '../../src/js/directives/fit-grid'
 import { wrap } from 'lodash'
 
+global.ResizeObserver = require('resize-observer-polyfill')
+
 // vi.mock('../src/js/components/modals/ModalMedia.vue', () => ({
 //   render: () => h('div', {
 

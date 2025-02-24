@@ -34,15 +34,16 @@ return new class extends OneTimeOperation
      */
     public function process(): void
     {
+        $adminUserTable = modularityConfig('tables.users');
 
-        if (! Schema::hasTable(modularityConfig('tables.users'))) {
+        if (! Schema::hasTable($adminUserTable)) {
 
-            Schema::rename('users', modularityConfig('tables.users'));
+            Schema::rename('users', $adminUserTable);
 
             $this->output->writeln('');
             $this->output->writeln('');
 
-            $this->info("\tusers table changed as " . modularityConfig('tables.users'));
+            $this->info("\tusers table changed as " . $adminUserTable);
 
             $this->output->writeln('');
         }

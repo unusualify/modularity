@@ -2,6 +2,7 @@
 
 use Nwidart\Modules\Activators\FileActivator;
 use Nwidart\Modules\Providers\ConsoleServiceProvider;
+use Unusualify\Modularity\Activators\ModularityActivator;
 
 return [
 
@@ -103,20 +104,22 @@ return [
         'generator' => [
             'config' => ['path' => 'Config', 'generate' => true],
             'command' => ['path' => 'Console', 'generate' => false],
+            'channels' => ['path' => 'Broadcasting', 'generate' => false],
             'migration' => ['path' => 'Database/Migrations', 'generate' => true],
             'seeder' => ['path' => 'Database/Seeders', 'generate' => true],
-            'factory' => ['path' => 'Database/factories', 'generate' => true],
+            'factory' => ['path' => 'Database/factories', 'generate' => false],
             'model' => ['path' => 'Entities', 'generate' => true],
-            'routes' => ['path' => 'Routes', 'generate' => false],
+            'observer' => ['path' => 'Observers', 'generate' => false],
+            'routes' => ['path' => 'Routes', 'generate' => true],
             'controller' => ['path' => 'Http/Controllers', 'generate' => true],
-            'filter' => ['path' => 'Http/Middleware', 'generate' => true],
+            'filter' => ['path' => 'Http/Middleware', 'generate' => false],
             'request' => ['path' => 'Http/Requests', 'generate' => true],
-            'provider' => ['path' => 'Providers', 'generate' => true],
-            'assets' => ['path' => 'Resources/assets', 'generate' => true],
+            'provider' => ['path' => 'Providers', 'generate' => false],
+            'assets' => ['path' => 'Resources/assets', 'generate' => false],
             'lang' => ['path' => 'Resources/lang', 'generate' => true],
             'views' => ['path' => 'Resources/views', 'generate' => true],
-            'test' => ['path' => 'Tests/Unit', 'generate' => true],
-            'test-feature' => ['path' => 'Tests/Feature', 'generate' => true],
+            'test' => ['path' => 'Tests/Unit', 'generate' => false],
+            'test-feature' => ['path' => 'Tests/Feature', 'generate' => false],
             'repository' => ['path' => 'Repositories', 'generate' => false],
             'event' => ['path' => 'Events', 'generate' => false],
             'listener' => ['path' => 'Listeners', 'generate' => false],
@@ -125,7 +128,7 @@ return [
             'jobs' => ['path' => 'Jobs', 'generate' => false],
             'emails' => ['path' => 'Emails', 'generate' => false],
             'notifications' => ['path' => 'Notifications', 'generate' => false],
-            'resource' => ['path' => 'Transformers', 'generate' => false],
+            'resource' => ['path' => 'Transformers', 'generate' => true],
             'component-view' => ['path' => 'Resources/views/components', 'generate' => false],
             'component-class' => ['path' => 'View/Components', 'generate' => false],
         ],
@@ -160,6 +163,7 @@ return [
         'enabled' => true,
         'paths' => [
             base_path('vendor/*/*'),
+            base_path('vendor/unusualify/modularity/modules'),
         ],
     ],
     /*
@@ -190,6 +194,7 @@ return [
     */
     'cache' => [
         'enabled' => env('MODULARITY_CACHE_ENABLED', true),
+        'driver' => env('MODULARITY_CACHE_DRIVER', 'file'),
         'key' => env('MODULARITY_CACHE_KEY', 'modularity'),
         'lifetime' => env('MODULARITY_CACHE_LIFETIME', 600),
     ],
@@ -228,7 +233,13 @@ return [
             'cache-key' => 'activator.installed',
             'cache-lifetime' => 604800,
         ],
+        'modularity' => [
+            'class' => ModularityActivator::class,
+            'statuses-file' => base_path('modules_statuses.json'),
+            'cache-key' => 'modularity.activator.installed',
+            'cache-lifetime' => 604800,
+        ],
     ],
 
-    'activator' => 'file',
+    'activator' => 'modularity',
 ];

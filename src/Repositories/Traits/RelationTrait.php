@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Repositories\Traits;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\UFinder;
 
 trait RelationTrait
@@ -20,7 +21,7 @@ trait RelationTrait
     {
 
         foreach ($this->getMorphToManyRelations() as $relationName) {
-            if (isset($fields[$relationName]) && $fields[$relationName] && $relationName != 'tags' && ! classHasTrait(get_class($this), 'Unusualify\Modularity\Repositories\Traits\TagsTrait')) {
+            if (isset($fields[$relationName]) && $fields[$relationName] && $relationName != 'tags') {
                 $object->{$relationName}()->sync($fields[$relationName]);
             }
         }
@@ -203,14 +204,15 @@ trait RelationTrait
         foreach ($morphToRelations as $relation => $types) {
             $morphTo = null;
             foreach ($types as $index => $type) {
-
                 $column_name = snakeCase($relation);
                 if ($object->{$column_name . '_type'} == $type['model']) {
                     $morphTo = App::make($type['repository'])->getById($object->{$column_name . '_id'});
                     $fields[$type['name']] = $morphTo->id;
-                } elseif ($morphTo) {
+                } elseif ($morphTo && $morphTo->{$type['name']}) {
                     $fields[$type['name']] = $morphTo->{$type['name']};
                     $morphTo = App::make($type['repository'])->getById($morphTo->{$type['name']});
+                } elseif ($object->{$type['name']}) {
+                    $fields[$type['name']] = $object->{$type['name']};
                 } else {
                     $fields[$type['name']] = null;
                 }
@@ -403,29 +405,35 @@ trait RelationTrait
 
     public function getMorphToRelations()
     {
-        // $reflector = new \ReflectionClass($this->model);
-
-        // $relations = [];
-
-        // foreach ($reflector->getMethods() as $reflectionMethod) {
-        //     $returnType = $reflectionMethod->getReturnType();
-        //     if ($returnType) {
-        //         // if (in_array(class_basename($returnType->getName()), ['HasOne', 'HasMany', 'BelongsTo', 'BelongsToMany', 'MorphToMany', 'MorphTo'])) {
-        //         if (in_array(class_basename($returnType->getName()), ['MorphOne'])) {
-        //             $relations[] = $reflectionMethod->name;
-        //         }
-        //     }
-        // }
-
+        // dd($this->inputs(), $this->chunkInputs());
         return collect($this->inputs())->reduce(function ($acc, $curr) {
             if (preg_match('/morphTo/', $curr['type'])) {
                 if (isset($curr['schema'])) {
                     $routeCamelCase = camelCase($this->routeName());
-                    $acc["{$routeCamelCase}able"] = Arr::map(array_reverse($curr['schema']), fn ($item) => [
-                        'name' => $item['name'],
-                        'repository' => $item['repository'],
-                        'model' => get_class(App::make($item['repository'])->getModel()),
-                    ]);
+                    // dd($curr);
+                    $acc["{$routeCamelCase}able"] = Arr::map(array_reverse($curr['schema']), function ($item) {
+                        $repository = null;
+                        if (! isset($item['repository'])) {
+                            if (isset($item['connector'])) {
+                                $parsedConnector = find_module_and_route($item['connector']);
+                                $repository = Modularity::find($parsedConnector['module'])->getRepository($parsedConnector['route']);
+                            } else {
+                                throw new \Exception('Repository or connector not found on morphTo input: ' . $item['name']);
+                            }
+                        } else {
+                            if (class_exists($item['repository'])) {
+                                $repository = App::make($item['repository']);
+                            } else {
+                                throw new \Exception('Repository not found on morphTo input: ' . $item['name']);
+                            }
+                        }
+
+                        return [
+                            'name' => $item['name'],
+                            'repository' => $repository::class,
+                            'model' => $repository->getModel()::class,
+                        ];
+                    });
                 }
             }
 

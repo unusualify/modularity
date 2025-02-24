@@ -17,6 +17,7 @@ class SelectHydrate extends InputHydrate
         'itemTitle' => 'name',
         'default' => [],
         'cascadeKey' => 'items',
+        'returnObject' => false,
     ];
 
     /**

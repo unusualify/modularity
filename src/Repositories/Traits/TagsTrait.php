@@ -4,6 +4,23 @@ namespace Unusualify\Modularity\Repositories\Traits;
 
 trait TagsTrait
 {
+    public function setColumnsTagsTrait($columns, $inputs)
+    {
+        $traitName = get_class_short_name(__TRAIT__);
+
+        $_columns = collect($inputs)->reduce(function ($acc, $curr) {
+            if (preg_match('/tagger/', $curr['type'])) {
+                $acc[] = $curr['name'];
+            }
+
+            return $acc;
+        }, []);
+
+        $columns[$traitName] = array_unique(array_merge($this->traitColumns[$traitName] ?? [], $_columns));
+
+        return $columns;
+    }
+
     /**
      * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
@@ -31,6 +48,17 @@ trait TagsTrait
         }
     }
 
+    public function getFormFieldsTagsTrait($object, $fields, $schema = null)
+    {
+        if ($object->has('tags')) {
+            foreach ($this->getColumns(__TRAIT__) as $column) {
+                $fields[$column] = $object->tags->map(fn ($tag) => $tag->name);
+            }
+        }
+
+        return $fields;
+    }
+
     protected function filterTagsTrait($query, &$scopes)
     {
         $this->addRelationFilterScope($query, $scopes, 'tag_id', 'tags');
@@ -54,6 +82,7 @@ trait TagsTrait
             $tagQuery->where('slug', 'like', '%' . $query . '%');
         }
 
+        // dd($tagQuery->toRawSql());
         if (! empty($ids)) {
             foreach ($ids as $id) {
                 $tagQuery->whereHas(modularityConfig('tables.tagged', 'tagged'), function ($query) use ($id) {

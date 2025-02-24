@@ -10,76 +10,54 @@
       <slot :name="name" v-bind="slotProps || {}"></slot>
     </template>
 
-    <!-- <template v-slot:activator="{ props }">
-      <slot name="activator" :props="{...props}"></slot>
-    </template> -->
+    <template v-slot:default="defaultScope">
+      <slot name="default" v-bind="defaultScope">
+        <slot v-if="systembar" name="systembar">
+          <v-layout style="height: 40px">
+            <v-col>
+              <v-system-bar dark>
+                <v-icon @click="toggleFullScreen()" :x-small="full">
+                  mdi-checkbox-blank-outline
+                </v-icon>
+                <v-icon @click="close()">mdi-close</v-icon>
+              </v-system-bar>
+            </v-col>
+          </v-layout>
+        </slot>
+        <slot name="body"
+            v-bind="{
+                textCancel: this.textCancel,
+                textConfirm: this.textConfirm,
+                textDescription: this.textDescription,
 
-    <!-- <v-card>
-      <slot v-if="systembar" name="systembar">
-        <v-layout style="height: 40px">
-          <v-system-bar dark>
-            <v-icon @click="toggleFullScreen()" :x-small="full">
-              mdi-checkbox-blank-outline
-            </v-icon>
-            <v-icon @click="close()">mdi-close</v-icon>
-          </v-system-bar>
-        </v-layout>
+                onOpen: this.open,
+                onClose: this.close,
+                onConfirm: this.confirm,
+            }"
+            :closeDialog="close"
+            >
+            <v-card >
+              <v-card-title class="text-h5 text-center" style="word-break: break-word;">
+                <!-- {{ textDescription }} -->
+              </v-card-title>
+              <v-card-text class="text-center" style="word-break: break-word;" >
+                <slot name="body.description" v-bind="{textDescription}">
+                  {{ textDescription }}
+                </slot>
+              </v-card-text>
+              <v-divider/>
+              <v-card-actions>
+                <v-spacer/>
+                <slot name="body.options" v-bind="{textDescription}">
+                  <v-btn ref="modalCancel" class="modal-cancel" color="red" text @click="cancel()"> {{ textCancel }}</v-btn>
+                  <v-btn ref="modalConfirm" class="modal-confirm" color="green" text @click="confirm()"> {{ textConfirm }}</v-btn>
+                </slot>
+                <v-spacer/>
+              </v-card-actions>
+            </v-card>
+        </slot>
       </slot>
-      <slot name="body"
-        v-bind="{
-            onOpen: this.open,
-            onClose: this.close,
-            onConfirm: this.confirm
-        }"
-        :closeDialog="close"
-        >
-      </slot>
-    </v-card> -->
-
-    <slot v-if="systembar" name="systembar">
-      <v-layout style="height: 40px">
-        <v-col>
-          <v-system-bar dark>
-            <v-icon @click="toggleFullScreen()" :x-small="full">
-              mdi-checkbox-blank-outline
-            </v-icon>
-            <v-icon @click="close()">mdi-close</v-icon>
-          </v-system-bar>
-        </v-col>
-      </v-layout>
-    </slot>
-    <slot name="body"
-        v-bind="{
-            textCancel: this.textCancel,
-            textConfirm: this.textConfirm,
-            textDescription: this.textDescription,
-
-            onOpen: this.open,
-            onClose: this.close,
-            onConfirm: this.confirm,
-        }"
-        :closeDialog="close"
-        >
-        <v-card >
-          <v-card-title class="text-h5 text-center" style="word-break: break-word;">
-            <!-- {{ textDescription }} -->
-          </v-card-title>
-          <v-card-text class="text-center" style="word-break: break-word;" >
-            <slot name="body.description" v-bind="{textDescription}">
-              {{ textDescription }}
-            </slot>
-          </v-card-text>
-          <v-divider/>
-          <v-card-actions>
-            <v-spacer/>
-            <slot name="body.options" v-bind="{textDescription}">
-              <v-btn ref="modalCancel" class="modal-cancel" color="red" text @click="cancel()"> {{ textCancel }}</v-btn>
-              <v-btn ref="modalConfirm" class="modal-confirm" color="green" text @click="confirm()"> {{ textConfirm }}</v-btn>
-            </slot>
-            <v-spacer/>
-          </v-card-actions>
-        </v-card>
-    </slot>
+    </template>
   </v-dialog>
 </template>
 

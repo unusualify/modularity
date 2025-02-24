@@ -5,12 +5,12 @@ namespace Unusualify\Modularity\Repositories;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Unusualify\Modularity\Entities\File;
-use Unusualify\Modularity\Repositories\Traits\AuthorizedTrait;
+use Unusualify\Modularity\Repositories\Traits\CreatorTrait;
 use Unusualify\Modularity\Repositories\Traits\TagsTrait;
 
 class FileRepository extends Repository
 {
-    use AuthorizedTrait, TagsTrait;
+    use CreatorTrait, TagsTrait;
 
     public function __construct(File $model)
     {

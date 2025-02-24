@@ -78,11 +78,11 @@ class CreateFeatureCommand extends BaseCommand
         )) {
             $modelName = Str::studly(text('What will be the name of the model?'));
 
-            $this->call('modularity:make:model', ['model' => $modelName, '--no-defaults' => true]);
+            $this->call('modularity:make:model', ['model' => $modelName, '--self' => true, '--no-defaults' => true]);
 
             $tableName = tableName($modelName);
 
-            $this->call('modularity:make:migration', ['name' => "create_{$tableName}_table", '--no-defaults' => true]);
+            $this->call('modularity:make:migration', ['name' => "create_modularity_{$tableName}_table", '--self' => true, '--no-defaults' => true]);
         }
 
         // Vue Input Component

@@ -6,6 +6,7 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Console\Command as Console;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Modules\SystemUser\Repositories\PermissionRepository;
@@ -167,9 +168,7 @@ class RouteGenerator extends Generator
      */
     protected $modelRelationParser;
 
-    protected $traits = [
-
-    ];
+    protected $traits;
 
     protected static $defaultTableOptions = [
         'createOnModal' => true,
@@ -198,6 +197,7 @@ class RouteGenerator extends Generator
         $this->filesystem = $filesystem;
         $this->console = $console;
         $this->module = $module;
+        $this->traits = Collection::make([]);
 
         $this->moduleName = $this->module ? $this->module->getName() : null;
 
@@ -594,6 +594,14 @@ class RouteGenerator extends Generator
     }
 
     /**
+     * Get traits.
+     */
+    public function getTraits(): Collection
+    {
+        return $this->traits;
+    }
+
+    /**
      * Get model input formats for form.
      *
      * @return array
@@ -756,6 +764,7 @@ class RouteGenerator extends Generator
     public function generateResources()
     {
 
+        // add controller
         if ($this->generatorConfig('route-controller')->generate()) {
             $this->console->call('modularity:make:controller', [
                 'module' => $this->module->getStudlyName(),
@@ -763,6 +772,7 @@ class RouteGenerator extends Generator
             ]);
         }
 
+        // add controller api
         if ($this->generatorConfig('route-controller-api')->generate()) {
             $this->console->call('modularity:make:controller:api', [
                 'module' => $this->module->getStudlyName(),
@@ -770,6 +780,7 @@ class RouteGenerator extends Generator
             ]);
         }
 
+        // add controller front
         if ($this->generatorConfig('route-controller-front')->generate()) {
             $this->console->call('modularity:make:controller:front', [
                 'module' => $this->module->getStudlyName(),
@@ -783,6 +794,7 @@ class RouteGenerator extends Generator
 
         $hasCustomModel = $this->customModel && @class_exists($this->customModel);
 
+        // add model
         $this->console->call('modularity:make:model', [
             'model' => $this->getName(),
             'module' => $this->module->getStudlyName(),
@@ -798,6 +810,7 @@ class RouteGenerator extends Generator
 
         $tableName = $this->getTableName() ? $this->getTableName() : $this->getDBTableName($this->name);
 
+        // add migration
         if (! $hasCustomModel) {
             if (! $this->module->isFileExists("create_{$tableName}_table") && ! $this->fix) {
                 $this->console->call(
@@ -831,6 +844,7 @@ class RouteGenerator extends Generator
 
         $this->generateExtraMigrations();
 
+        // add repository
         if ($this->generatorConfig('repository')->generate()) {
             // $this->console->call('module:make-repository', [
             $this->console->call('modularity:make:repository', [
@@ -843,6 +857,7 @@ class RouteGenerator extends Generator
             );
         }
 
+        // add request
         if ($this->generatorConfig('route-request')->generate()) {
 
             $this->console->call('modularity:make:request', [
@@ -852,6 +867,7 @@ class RouteGenerator extends Generator
             + ($this->rules ? ['--rules' => $this->rules] : []));
         }
 
+        // add resource
         if ($this->generatorConfig('route-resource')->generate()) {
             $this->console->call('module:make-resource', [
                 'name' => $this->getName() . 'Resource',
@@ -859,6 +875,21 @@ class RouteGenerator extends Generator
             ]);
         }
 
+        // add provider
+        if (GenerateConfigReader::read('provider')->generate() || confirm(label: 'Do you want to create a route provider?', default: false)) {
+            $this->console->call('module:make-provider', [
+                'name' => makeProviderName($this->getName()),
+                'module' => $this->module->getStudlyName(),
+            ]);
+        }
+
+        // add middleware
+        if (GenerateConfigReader::read('filter')->generate() || confirm(label: 'Do you want to create a route middleware?', default: false)) {
+            $this->console->call('module:make-middleware', [
+                'name' => $this->getName() . 'Middleware',
+                'module' => $this->module->getStudlyName(),
+            ]);
+        }
     }
 
     /**
@@ -899,6 +930,10 @@ class RouteGenerator extends Generator
             $config['name'] = $config['name'] ?? $studlyName;
             $config['system_prefix'] = $config['system_prefix'] ?? $config['base_prefix'] ?? false;
             $config['headline'] = $config['headline'] ?? pluralize($headline);
+            if ($this->module->isModularityModule()) {
+                $config['group'] = 'system';
+                $config['system_prefix'] = true;
+            }
             // $config['parent_route'] = $route_array;
             $config['routes'] = $config['routes'] ?? [];
 
@@ -909,6 +944,7 @@ class RouteGenerator extends Generator
         if (! $this->plain) {
 
             $headers = $this->getHeaders();
+            $inputs = $this->getInputs();
 
             $titleColumnKey = count($filtered = array_filter($headers, fn ($i) => $i['key'] === 'name' || $i['key'] === 'title')) > 0
                 ? $filtered[0]['key']
@@ -923,7 +959,7 @@ class RouteGenerator extends Generator
                 'title_column_key' => $titleColumnKey,
                 'table_options' => static::$defaultTableOptions,
                 'headers' => $headers, // in Unusualify\Modularity\Support\Migrations\SchemaParser::class
-                'inputs' => $this->getInputs(), // in Unusualify\Modularity\Support\Migrations\SchemaParser::class
+                'inputs' => $inputs, // in Unusualify\Modularity\Support\Migrations\SchemaParser::class
             ];
 
             if ($runnable && $this->getTest()) {
@@ -1103,6 +1139,7 @@ class RouteGenerator extends Generator
                             $this->console->call('modularity:make:migration', [
                                 '--relational' => 'MorphedByMany',
                                 '--no-defaults' => true,
+                                '--route' => $this->name,
                                 'module' => $this->module->getStudlyName(),
                                 'name' => "create_{$pivot_table_name}_table",
                             ]

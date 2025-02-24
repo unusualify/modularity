@@ -2,6 +2,8 @@
 
 namespace Unusualify\Modularity\Console;
 
+use Unusualify\Modularity\Facades\Modularity;
+
 class PintCommand extends BaseCommand
 {
     /**
@@ -9,12 +11,11 @@ class PintCommand extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'modxpint
-                            {--test : Check if files need fixing}
-                            {--dirty : Only fix files that have been modified}
-                            {--repair : Repair the code}
-                            {--self : modularity package}
-    ';
+    protected $signature = 'modularity:pint
+        {--test : Check if files need fixing}
+        {--dirty : Only fix files that have been modified}
+        {--repair : Repair the code}
+        {--s|self : Lint modularity sources}';
 
     /**
      * The console command description.
@@ -28,28 +29,15 @@ class PintCommand extends BaseCommand
      */
     public function handle(): int
     {
-        // $targets = $this->argument('targets');
-
-        // if (count($targets) > 0) {
-        //     // Build the Pint command with flags
-        //     // $command = sprintf('pint --config=%s --stdin-filename=%s --write %s',
-        //     //     config('pintCommand.config_file'),
-        //     //     $targets[0], // Assuming first target for stdin-filename
-        //     //     implode(' ', $targets)
-        //     // );
-        //     $command = sprintf('./vendor/bin/pint %s',
-        //         $targets[0], // Assuming first target for stdin-filename
-        //     );
-        // } else {
-        //     $command = sprintf('./vendor/bin/pint');
-        // }
-
         $dir = config('modules.paths.modules');
 
         if ($this->option('self')) {
-            $dir = get_modularity_vendor_dir();
-
-            $dir .= " --config {$dir}/pint.json";
+            if (Modularity::isProduction()) {
+                throw new \Exception('Pint\'s self argument is not allowed in production mode.');
+            }
+            $dir = Modularity::getVendorDir();
+            $path = Modularity::getVendorPath();
+            $dir = "\"{$path}\" --config \"{$dir}/pint.json\"";
         }
 
         $command = sprintf('./vendor/bin/pint %s', $dir);

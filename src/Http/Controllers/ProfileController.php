@@ -9,9 +9,9 @@ use Modules\SystemUser\Repositories\CompanyRepository;
 use Modules\SystemUser\Repositories\UserRepository;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularity\Services\View\UComponent;
 use Unusualify\Modularity\Services\View\UWrapper;
-use Unusualify\Modularity\Traits\ManageUtilities;
 
 class ProfileController extends BaseController
 {

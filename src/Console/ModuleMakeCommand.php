@@ -4,9 +4,8 @@ namespace Unusualify\Modularity\Console;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Symfony\Component\Console\Input\InputArgument;
 // use Illuminate\Console\Command as Console;
-use Symfony\Component\Console\Input\InputOption;
+use Unusualify\Modularity\Exceptions\ModularitySystemPathException;
 use Unusualify\Modularity\Facades\Modularity;
 
 class ModuleMakeCommand extends BaseCommand
@@ -16,7 +15,24 @@ class ModuleMakeCommand extends BaseCommand
      *
      * @var string
      */
-    protected $name = 'modularity:make:module';
+    protected $signature = 'modularity:make:module
+        {module : The name of the module}
+        {--schema= : The specified migration schema table}
+        {--rules= : The specified validation rules for FormRequest}
+        {--relationships= : The many to many relationships}
+        {--system : Create a system module}
+        {--f|force : Force the operation to run when the route files already exist}
+        {--no-plain : Create route}
+        {--no-migrate : Don\'t migrate}
+        {--no-defaults : Unuse default input and headers}
+        {--no-migration : Don\'t create migration file}
+        {--custom-model= : The model class for usage of a available model}
+        {--table-name= : Sets table name for custom model}
+        {--notAsk : Don\'t ask for trait questions}
+        {--all : Add all traits}
+        {--just-stubs : Only stubs fix}
+        {--stubs-only= : Get only stubs}
+        {--stubs-except= : Get except stubs}';
 
     /**
      * The console command description.
@@ -29,6 +45,8 @@ class ModuleMakeCommand extends BaseCommand
         'm:m:m',
         'unusual:make:module',
     ];
+
+    public $useTraitOptions = true;
 
     /**
      * The laravel console instance.
@@ -43,11 +61,23 @@ class ModuleMakeCommand extends BaseCommand
             $this->option('relationships')
             || $this->option('schema')
             || $this->option('rules')
+            || $this->option('no-plain')
         );
     }
 
     public function handle(): int
     {
+        if ($this->option('system')) {
+            try {
+                Modularity::setSystemModulesPath();
+
+            } catch (ModularitySystemPathException $e) {
+                $this->error('You cannot create system module because of modularity production');
+
+                return 0;
+            }
+        }
+
         Modularity::disableCache();
 
         if ($this->option('just-stubs')) {
@@ -68,7 +98,6 @@ class ModuleMakeCommand extends BaseCommand
         }
 
         $traits = activeModularityTraits($this->options());
-
         // foreach(getModularityTraits() as $_trait){
         //     $this->responses[$_trait] = $this->checkOption($_trait);
         // }
@@ -103,44 +132,6 @@ class ModuleMakeCommand extends BaseCommand
         Modularity::clearCache();
 
         return 0;
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['module', InputArgument::REQUIRED, 'The name of the module.'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return array_merge([
-            ['schema', null, InputOption::VALUE_OPTIONAL, 'The specified migration schema table.', null],
-            ['rules', null, InputOption::VALUE_OPTIONAL, 'The specified validation rules for FormRequest.', null],
-            ['relationships', null, InputOption::VALUE_OPTIONAL, 'The many to many relationships.', null],
-            ['force', '--f', InputOption::VALUE_NONE, 'Force the operation to run when the route files already exist.'],
-            // ['plain', null, InputOption::VALUE_NONE, 'Don\'t create route.'],
-            ['no-migrate', null, InputOption::VALUE_NONE, 'don\'t migrate.'],
-            ['no-defaults', null, InputOption::VALUE_NONE, 'unuse default input and headers.'],
-            ['no-migration', null, InputOption::VALUE_NONE, 'don\'t create migration file.'],
-            ['custom-model', null, InputOption::VALUE_OPTIONAL, 'The model class for usage of a available model.', null],
-            ['table-name', null, InputOption::VALUE_OPTIONAL, 'Sets table  name for custom model'],
-            ['notAsk', null, InputOption::VALUE_NONE, 'don\'t ask for trait questions.'],
-            ['all', null, InputOption::VALUE_NONE, 'add all traits.'],
-            ['just-stubs', null, InputOption::VALUE_NONE, 'only stubs fix'],
-            ['stubs-only', null, InputOption::VALUE_OPTIONAL, 'Get only stubs'],
-            ['stubs-except', null, InputOption::VALUE_OPTIONAL, 'Get except stubs'],
-        ], modularityTraitOptions());
     }
 
     /**
