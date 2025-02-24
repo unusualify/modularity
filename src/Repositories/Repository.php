@@ -239,32 +239,19 @@ abstract class Repository
         $defaultColumns = is_array($column) ? $column : [$column];
 
         $columns = ['id', ...$defaultColumns];
+        $oldColumns = $columns;
 
         $tableColumns = $this->getModel()->getColumns();
+        $translatedColumns = [];
+
 
         if (method_exists($this->getModel(), 'isTranslatable') && $this->model->isTranslatable()) {
             $query = $query->withTranslation();
             $translatedAttributes = $this->getTranslatedAttributes();
-            $oldColumns = $columns;
+
             $columns = array_diff($columns, $translatedAttributes);
             $defaultColumns = array_diff($defaultColumns, $translatedAttributes);
             $translatedColumns = array_values(array_intersect($oldColumns, $translatedAttributes));
-
-            $relationships = collect($with)->map(function ($r) {
-                $r = explode('.', $r)[0];
-                return $r;
-            })->toArray();
-
-            $foreignableRelationships = collect($relationships)->filter(function ($r) {
-                return in_array($this->getModel()->getRelationType($r), ['BelongsTo', 'MorphTo']);
-            })->values()->toArray();
-
-            foreach ($foreignableRelationships as $r) {
-                $columns[] = $this->getModel()->{$r}()->getForeignKeyName();
-            }
-
-            $with = array_merge($this->getModel()->getWith(), $with);
-
             $absentColumns = array_diff($defaultColumns, $tableColumns);
 
             if(in_array('name', $absentColumns)){
@@ -278,54 +265,72 @@ abstract class Repository
                 }
             }
 
-            try {
-                //code...
-                return $query->get($columns)->map(fn ($item) => [
-                    ...collect($appends)->mapWithKeys(function ($append) use ($item) {
-                        return [$append => $item->{$append}];
-                    })->toArray(),
-                    ...collect($with)->mapWithKeys(function ($r) use ($item) {
-                        $r = explode('.', $r)[0];
-                        return [$r => $item->{$r}];
-                    })->toArray(),
-                    ...(collect($columns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
-                    ...(collect($translatedColumns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
-                ]);
-            } catch (\Throwable $th) {
-                dd(
-                    $this->getModel()->getRouteTitleColumnKey(),
-                    static::class,
-                    $columns,
-                    $appends,
-                    $with,
-                    $translatedColumns,
-                    $foreignableRelationships,
-                    $relationships,
-                    $foreignableRelationships,
-                    $th,
-                    debug_backtrace()
-                );
-            }
+
 
         }
 
+        $relationships = collect($with)->map(function ($r) {
+            $r = explode('.', $r)[0];
+            return $r;
+        })->toArray();
+
+        $foreignableRelationships = collect($relationships)->filter(function ($r) {
+            return in_array($this->getModel()->getRelationType($r), ['BelongsTo', 'MorphTo']);
+        })->values()->toArray();
+
+        foreach ($foreignableRelationships as $r) {
+            $columns[] = $this->getModel()->{$r}()->getForeignKeyName();
+        }
+
+        $with = array_merge($this->getModel()->getWith(), $with);
+
+        // dd($columns, $appends, $with, $columns, $translatedColumns);
 
         try {
-            return $query->get($columns);
+            //code...
+            return $query->get($columns)->map(fn ($item) => [
+                ...collect($appends)->mapWithKeys(function ($append) use ($item) {
+                    return [$append => $item->{$append}];
+                })->toArray(),
+                ...collect($with)->mapWithKeys(function ($r) use ($item) {
+                    $r = explode('.', $r)[0];
+                    return [$r => $item->{$r}];
+                })->toArray(),
+                ...(collect($columns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
+                ...(collect($translatedColumns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
+            ]);
         } catch (\Throwable $th) {
-            if (method_exists($this->model, 'getColumns')) {
-                $appends = $this->model->getAppends();
-                $differentElements = array_diff($columns, $this->model->getColumns());
-                // if absent columns exist in appends, we can return the result with the absent columns
-                if (empty(array_diff($differentElements, $appends))) {
-                    // All differentElements exist in appends
-                    // You can proceed with your logic here if needed
-                    return $query->get()->map(fn ($item) => collect($columns)->map(fn ($c) => $item->{$c})->toArray());
-                }
-            }
-            // no absent columns exist in appends, we can't return the result with the absent columns
-            throw $th;
+            dd(
+                $this->getModel()->getRouteTitleColumnKey(),
+                static::class,
+                $columns,
+                $appends,
+                $with,
+                $translatedColumns,
+                $foreignableRelationships,
+                $relationships,
+                $foreignableRelationships,
+                $th,
+                array_reduce(debug_backtrace(), 'backtrace_formatter', [])
+            );
         }
+
+        // try {
+        //     return $query->get($columns);
+        // } catch (\Throwable $th) {
+        //     if (method_exists($this->model, 'getColumns')) {
+        //         $appends = $this->model->getAppends();
+        //         $differentElements = array_diff($columns, $this->model->getColumns());
+        //         // if absent columns exist in appends, we can return the result with the absent columns
+        //         if (empty(array_diff($differentElements, $appends))) {
+        //             // All differentElements exist in appends
+        //             // You can proceed with your logic here if needed
+        //             return $query->get()->map(fn ($item) => collect($columns)->map(fn ($c) => $item->{$c})->toArray());
+        //         }
+        //     }
+        //     // no absent columns exist in appends, we can't return the result with the absent columns
+        //     throw $th;
+        // }
 
     }
 
