@@ -11,6 +11,14 @@ trait HasStateable
 {
     public $_preserved_stateable;
 
+    protected static $hasStateableFillable = [
+        'initial_stateable',
+        // '_stateable',
+        // '_status',
+    ];
+
+    protected $customInitialStateable = null;
+
     protected static $stateModel = 'Modules\SystemUtility\Entities\State';
 
     protected $_stateableSourceFields = [];
@@ -20,11 +28,24 @@ trait HasStateable
     public static function bootHasStateable(): void
     {
         self::saving(static function (Model $model) {
+
+            if (isset($model->initial_stateable)) {
+                $defaultStates = $model->getDefaultStates();
+
+                $initialStateFound = collect($defaultStates)->firstWhere('code', $model->initial_stateable);
+
+                if($initialStateFound){
+                    $model->customInitialStateable = $initialStateFound;
+                }
+            }
             if (isset($model->_status)) {
                 $model->_preserved_stateable = $model->_stateable;
             }
             $model->offsetUnset('_stateable');
             $model->offsetUnset('_status');
+            foreach(static::$hasStateableFillable as $field){
+                $model->offsetUnset($field);
+            }
         });
 
         self::created(static function (Model $model) {
@@ -193,7 +214,7 @@ trait HasStateable
     public function createNonExistantStates()
     {
         $defaultStates = $this->getDefaultStates();
-        $initialState = $this->getInitialState();
+        $initialState = $this->customInitialStateable ?? $this->getInitialState();
 
         foreach ($defaultStates as $state) {
             $_state = State::where('code', $state['code'])->first() ?? State::create($state);
