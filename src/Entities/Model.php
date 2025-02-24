@@ -65,6 +65,18 @@ class Model extends LaravelModel implements TaggableInterface
             }
         }
 
+        if(in_array('Unusualify\Modularity\Entities\Traits\HasCreator', class_uses_recursive(static::class))){
+            $fillable = array_merge($fillable, static::$hasCreatorFillable);
+        }
+
+        if(in_array('Unusualify\Modularity\Entities\Traits\HasAuthorizable', class_uses_recursive(static::class))){
+            $fillable = array_merge($fillable, static::$hasAuthorizableFillable);
+        }
+
+        if(in_array('Unusualify\Modularity\Entities\Traits\HasStateable', class_uses_recursive(static::class))){
+            $fillable = array_merge($fillable, static::$hasStateableFillable);
+        }
+
         return $fillable;
     }
 
