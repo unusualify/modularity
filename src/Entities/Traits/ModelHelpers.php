@@ -20,6 +20,8 @@ trait ModelHelpers
 
     public static $obligatoryAuthorizationRoles = ['superadmin', 'admin', 'client-manager', 'client-assistant'];
 
+    public static $defaultHasCreatorModel = \Unusualify\Modularity\Entities\User::class;
+
     /**
      * Boot the trait.
      *
