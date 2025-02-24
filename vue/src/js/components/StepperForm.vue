@@ -92,14 +92,18 @@
       <ue-modal
         ref="modal"
         v-model="modalActive"
-        :width-type="'lg'"
-        cancel-text="$t('Cancel')"
-        confirm-text="$t('Cancel')"
+        :width-type="'md'"
         :description-text="modalMessage"
+        persistent
       >
+        <template v-slot:body.description>
+          <v-icon size="64" color="success" class="mb-4">mdi-check-circle-outline</v-icon>
+          <h2 class="text-h4 mb-4 text-success">{{ $t('Request Complete') }}</h2>
+          <p class="text-subtitle-1 grey--text">{{ $t('Congratulations! Your PR request is complete.') }}</p>
+        </template>
         <template v-slot:body.options>
-          <v-btn variant="outlined" color="primary" @click="completed">
-            {{ $t('Ok') }}
+          <v-btn variant="flat" color="success" @click="completed">
+            {{ $t('Go Back') }}
           </v-btn>
         </template>
       </ue-modal>
