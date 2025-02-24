@@ -22,6 +22,9 @@ return new class extends Migration
                 // $table->string('taggable_type');
                 // $table->integer('taggable_id')->unsigned();
                 $table->integer('tag_id')->unsigned();
+
+                // $table->engine = 'InnoDB';
+
                 // $table->index(['taggable_type', 'taggable_id']);
             });
         }
