@@ -443,7 +443,11 @@ if (! function_exists('exceptionalRunningInConsole')) {
 if (! function_exists('backtrace_formatter')) {
     function backtrace_formatter($carry, $item)
     {
-        $carry[$item['file']] = $item['line'];
+        try {
+            $carry[$item['file'] ?? $item['class']] = $item['line'] ?? $item['function'];
+        } catch (\Throwable $th) {
+            dd($item);
+        }
 
         return $carry;
     }
