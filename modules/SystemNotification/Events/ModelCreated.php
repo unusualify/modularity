@@ -5,12 +5,10 @@ namespace Modules\SystemNotification\Events;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-use Illuminate\Foundation\Events\Dispatchable;
-use Unusualify\Modularity\Events\ModelEvent;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+use Unusualify\Modularity\Events\ModelEvent;
 
 class ModelCreated extends ModelEvent implements ShouldDispatchAfterCommit
 {
@@ -42,6 +40,5 @@ class ModelCreated extends ModelEvent implements ShouldDispatchAfterCommit
     // {
     //     return 'model.created';
     // }
-
 
 }

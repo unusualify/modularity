@@ -18,7 +18,6 @@ use Unusualify\Modularity\Http\Controllers\Traits\ManageSingleton;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularity\Services\MessageStage;
 
-
 abstract class BaseController extends PanelController
 {
     use ManagePrevious, ManageUtilities, ManageEvents, ManageSingleton;
@@ -198,7 +197,6 @@ abstract class BaseController extends PanelController
             // $this->repository->getFormFields($item, $this->formSchema),
         );
 
-
         if ($this->request->ajax()) {
 
             return $item->toArray();
@@ -272,9 +270,9 @@ abstract class BaseController extends PanelController
 
         $id = last($params);
 
-        if($this->isSingleton){
+        if ($this->isSingleton) {
             $item = $this->repository->getModel()->single();
-        }else{
+        } else {
             $item = $this->repository->getById($id);
         }
         $input = $this->request->all();
@@ -530,13 +528,13 @@ abstract class BaseController extends PanelController
             try {
                 $records = $item->{$relationshipName};
 
-                if($records instanceof Collection){
+                if ($records instanceof Collection) {
                     $value = $records
                         ->pluck($itemTitle)
                         ->join(', ');
-                }else if($records instanceof Model){
+                } elseif ($records instanceof Model) {
                     $value = $records->{$itemTitle};
-                }else{
+                } else {
                     $value = $records;
                 }
             } catch (\Throwable $th) {

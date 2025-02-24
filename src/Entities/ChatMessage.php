@@ -3,8 +3,8 @@
 namespace Unusualify\Modularity\Entities;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Unusualify\Modularity\Entities\Traits\HasFileponds;
 use Unusualify\Modularity\Entities\Traits\HasCreator;
+use Unusualify\Modularity\Entities\Traits\HasFileponds;
 
 class ChatMessage extends Model
 {

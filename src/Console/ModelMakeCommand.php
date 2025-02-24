@@ -8,8 +8,6 @@ use Illuminate\Support\Str;
 use Nwidart\Modules\Generators\FileGenerator;
 use Nwidart\Modules\Support\Config\GeneratorPath;
 use Nwidart\Modules\Support\Stub;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Support\Decomposers\ModelRelationParser;
@@ -39,7 +37,6 @@ class ModelMakeCommand extends BaseCommand
         {--has-factory : Flag to add hasFactory to model}
         {--all : Add all traits}
         {--test : Test the Route Generator}';
-
 
     protected $name = 'modularity:make:model';
 
@@ -99,7 +96,7 @@ class ModelMakeCommand extends BaseCommand
 
         foreach ($this->responses as $trait => $response) {
             if ($response) {
-                if(in_array($trait, $isSingularExceptionTraits) && $this->getTraitResponse('addSingular')){
+                if (in_array($trait, $isSingularExceptionTraits) && $this->getTraitResponse('addSingular')) {
                     $this->responses[$trait] = false;
                 }
             }
@@ -153,7 +150,7 @@ class ModelMakeCommand extends BaseCommand
         if ($moduleName) {
             $module = Modularity::findOrFail($moduleName);
             $namespace = $this->getClassNamespace($module);
-        }else if($this->option('self')){
+        } elseif ($this->option('self')) {
             $namespace = Modularity::getVendorNamespace($modelGeneratorPath->getNamespace());
         }
 
@@ -195,7 +192,7 @@ class ModelMakeCommand extends BaseCommand
 
         if ($this->getModuleName() != '') {
             $path = Modularity::getModulePath($this->getModuleName());
-        }else if($this->option('self')){
+        } elseif ($this->option('self')) {
             $path = Modularity::getVendorPath('/src');
         }
 
@@ -285,7 +282,7 @@ class ModelMakeCommand extends BaseCommand
                 $fillable = $this->option('fillable');
 
                 $fields = array_merge($fields, $fillable != '' ? explode(',', $fillable) : []);
-            } else if($this->getTraitResponse('addTranslation')){
+            } elseif ($this->getTraitResponse('addTranslation')) {
                 $fields = array_values(array_intersect($this->defaultFillable, $this->nonTranslatableFillable));
             }
 
@@ -489,7 +486,6 @@ class ModelMakeCommand extends BaseCommand
         $namespaces = array_map(function ($v) {
             return "use $v;";
         }, $namespaces);
-
 
         return count($namespaces) ? implode("\n", $namespaces) : null;
     }

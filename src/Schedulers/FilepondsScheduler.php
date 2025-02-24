@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Schedulers;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
-use Unusualify\Modularity\Entities\TemporaryFilepond;
 use Unusualify\Modularity\Facades\Filepond;
 
 class FilepondsScheduler extends Command
@@ -48,7 +47,6 @@ class FilepondsScheduler extends Command
 
         Log::channel('scheduler')
             ->info("Modularity: Deleted {$temporaryFileponds->count()} expired temporary fileponds in last {$this->argument('days')} days");
-
 
         // $this->info(now()->format('Y-m-d H:i:s') . ' - Modularity: Temporary fileponds cleaned');
     }

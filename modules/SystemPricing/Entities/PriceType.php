@@ -10,6 +10,6 @@ class PriceType extends \Oobook\Priceable\Models\PriceType
 
     public $fillable = [
         'name',
-        'slug'
+        'slug',
     ];
 }

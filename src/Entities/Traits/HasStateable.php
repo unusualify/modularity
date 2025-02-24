@@ -34,7 +34,7 @@ trait HasStateable
 
                 $initialStateFound = collect($defaultStates)->firstWhere('code', $model->initial_stateable);
 
-                if($initialStateFound){
+                if ($initialStateFound) {
                     $model->customInitialStateable = $initialStateFound;
                 }
             }
@@ -43,7 +43,7 @@ trait HasStateable
             }
             $model->offsetUnset('_stateable');
             $model->offsetUnset('_status');
-            foreach(static::$hasStateableFillable as $field){
+            foreach (static::$hasStateableFillable as $field) {
                 $model->offsetUnset($field);
             }
         });

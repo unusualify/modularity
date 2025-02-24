@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Entities\Translations;
 
-use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Model;
 
 class StateTranslation extends Model

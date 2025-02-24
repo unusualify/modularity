@@ -3,10 +3,10 @@
 namespace Unusualify\Modularity\Http\Controllers\Traits;
 
 use Modules\SystemNotification\Events\ModelCreated;
-use Modules\SystemNotification\Events\ModelUpdated;
 use Modules\SystemNotification\Events\ModelDeleted;
 use Modules\SystemNotification\Events\ModelForceDeleted;
 use Modules\SystemNotification\Events\ModelRestored;
+use Modules\SystemNotification\Events\ModelUpdated;
 
 trait ManageEvents
 {
@@ -38,7 +38,7 @@ trait ManageEvents
         // dd($model->getChanges(), $model->isDirty(), $model->getDirty());
 
         // return;
-        if (!isset($this->events[$action])) {
+        if (! isset($this->events[$action])) {
             return;
         }
 

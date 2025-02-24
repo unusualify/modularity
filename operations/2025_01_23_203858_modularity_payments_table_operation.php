@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Console\Concerns\InteractsWithIO;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schema;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use TimoKoerber\LaravelOneTimeOperations\OneTimeOperation;
 use Unusualify\Modularity\Facades\Modularity;
@@ -40,7 +40,7 @@ return new class extends OneTimeOperation
 
         if (! Schema::hasTable($paymentsTable)) {
 
-            if(Schema::hasTable('unfy_payments')) {
+            if (Schema::hasTable('unfy_payments')) {
                 Schema::rename('unfy_payments', $paymentsTable);
 
                 $this->output->writeln('');
@@ -54,7 +54,7 @@ return new class extends OneTimeOperation
                     '--path' => Modularity::getVendorPath('database/migrations/default/2024_06_24_125121_create_payments_table.php'),
                 ]);
 
-                $this->info("\t" . $paymentsTable . " created");
+                $this->info("\t" . $paymentsTable . ' created');
             }
         }
     }

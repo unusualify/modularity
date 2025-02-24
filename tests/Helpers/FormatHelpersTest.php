@@ -2,8 +2,8 @@
 
 namespace Unusualify\Modularity\Tests\Helpers;
 
-use Unusualify\Modularity\Tests\TestCase;
 use stdClass;
+use Unusualify\Modularity\Tests\TestCase;
 
 class FormatHelpersTest extends TestCase
 {
@@ -197,7 +197,7 @@ class FormatHelpersTest extends TestCase
         );
 
         // Test with object replacements
-        $obj = new stdClass();
+        $obj = new stdClass;
         $obj->name = 'John';
         $obj->age = '30';
         $this->assertEquals(

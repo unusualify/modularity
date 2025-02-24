@@ -2,10 +2,6 @@
 
 namespace Modules\SystemNotification\Listeners;
 
-use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Notification;
 use Unusualify\Modularity\Listeners\Listener;
 
 class ModelForceDeletedListener extends Listener

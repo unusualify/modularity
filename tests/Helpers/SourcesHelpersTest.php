@@ -25,7 +25,7 @@ class SourcesHelpersTest extends TestCase
     {
         Config::set('translatable.locales', [
             'en' => ['US', 'GB'],
-            'fr' => ['FR', 'BE']
+            'fr' => ['FR', 'BE'],
         ]);
 
         $locales = getLocales();
@@ -53,7 +53,7 @@ class SourcesHelpersTest extends TestCase
             ->andReturn(collect([
                 'UTC' => 'UTC (UTC +00:00)',
                 'Europe/London' => 'Europe/London (UTC +01:00)',
-                'America/New_York' => 'America/New_York (UTC -04:00)'
+                'America/New_York' => 'America/New_York (UTC -04:00)',
             ]));
 
         $timezones = getTimeZoneList();
@@ -70,13 +70,13 @@ class SourcesHelpersTest extends TestCase
             'field1' => [
                 'type' => 'text',
                 'label' => 'Field 1',
-                'default' => 'value1'
+                'default' => 'value1',
             ],
             'field2' => [
                 'type' => 'text',
                 'label' => 'Field 2',
-                'default' => 'value2'
-            ]
+                'default' => 'value2',
+            ],
         ]);
 
         $draft = getFormDraft('test_form');
@@ -85,13 +85,13 @@ class SourcesHelpersTest extends TestCase
             'field1' => [
                 'type' => 'text',
                 'label' => 'Field 1',
-                'default' => 'value1'
+                'default' => 'value1',
             ],
             'field2' => [
                 'type' => 'text',
                 'label' => 'Field 2',
-                'default' => 'value2'
-            ]
+                'default' => 'value2',
+            ],
         ], $draft);
     }
 
@@ -102,44 +102,44 @@ class SourcesHelpersTest extends TestCase
             'field1' => [
                 'type' => 'text',
                 'label' => 'Field 1',
-                'default' => 'value1'
+                'default' => 'value1',
             ],
             'field2' => [
                 'type' => 'text',
                 'label' => 'Field 2',
-                'default' => 'value2'
-            ]
+                'default' => 'value2',
+            ],
         ]);
 
         $draft = getFormDraft('test_form', [
             'field2' => [
                 'type' => 'text',
                 'label' => 'Field 2',
-                'default' => 'new_value'
+                'default' => 'new_value',
             ],
             'field3' => [
                 'type' => 'text',
                 'label' => 'Field 3',
-                'default' => 'value3'
-            ]
+                'default' => 'value3',
+            ],
         ]);
 
         $this->assertEquals([
             'field1' => [
                 'type' => 'text',
                 'label' => 'Field 1',
-                'default' => 'value1'
+                'default' => 'value1',
             ],
             'field2' => [
                 'type' => 'text',
                 'label' => 'Field 2',
-                'default' => 'new_value'
+                'default' => 'new_value',
             ],
             'field3' => [
                 'type' => 'text',
                 'label' => 'Field 3',
-                'default' => 'value3'
-            ]
+                'default' => 'value3',
+            ],
         ], $draft);
     }
 
@@ -149,14 +149,14 @@ class SourcesHelpersTest extends TestCase
         Config::set('modularity.form_drafts.test_form', [
             'field1' => 'value1',
             'field2' => 'value2',
-            'field3' => 'value3'
+            'field3' => 'value3',
         ]);
 
         $draft = getFormDraft('test_form', [], ['field2']);
 
         $this->assertEquals([
             'field1' => 'value1',
-            'field3' => 'value3'
+            'field3' => 'value3',
         ], $draft);
     }
 
@@ -200,7 +200,7 @@ class SourcesHelpersTest extends TestCase
     {
         $mockThemes = [
             '/path/to/vendor/modularity/vue/src/sass/themes/default',
-            '/path/to/vendor/modularity/vue/src/sass/themes/dark'
+            '/path/to/vendor/modularity/vue/src/sass/themes/dark',
         ];
 
         File::shouldReceive('isDirectory')->andReturn(true);
@@ -211,7 +211,7 @@ class SourcesHelpersTest extends TestCase
 
         $this->assertEquals([
             'default' => 'Default',
-            'dark' => 'Dark'
+            'dark' => 'Dark',
         ], $themes->toArray());
     }
 
@@ -220,9 +220,8 @@ class SourcesHelpersTest extends TestCase
     {
         $mockThemes = [
             resource_path('vendor/modularity/themes/custom1'),
-            resource_path('vendor/modularity/themes/custom2')
+            resource_path('vendor/modularity/themes/custom2'),
         ];
-
 
         File::shouldReceive('isDirectory')->andReturn(true);
         File::shouldReceive('glob')->with(resource_path('vendor/modularity/themes/*'), GLOB_ONLYDIR)
@@ -237,7 +236,7 @@ class SourcesHelpersTest extends TestCase
 
         $this->assertEquals([
             'custom1' => 'Custom1',
-            'custom2' => 'Custom2'
+            'custom2' => 'Custom2',
         ], $themes->toArray());
     }
 

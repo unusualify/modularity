@@ -371,16 +371,15 @@ trait MethodTransformers
             $value = $values;
             $arguments = [];
 
-            if(is_string($values)){
+            if (is_string($values)) {
                 $exploded = explode('^', $values);
                 $value = $exploded[0];
 
-                if(count($exploded) > 1){
+                if (count($exploded) > 1) {
                     // dd($exploded);
                     $arguments = explode(';', $exploded[1]);
                 }
             }
-
 
             if (method_exists($this->model, 'scope' . $studlyColumn)) {
                 if (! is_bool($value)) {

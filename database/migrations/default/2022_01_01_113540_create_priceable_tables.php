@@ -25,7 +25,7 @@ return new class extends Migration
         Schema::create(config('priceable.tables.currencies'), function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->text('symbol', 10)->nullable()->default(NULL);
+            $table->text('symbol', 10)->nullable()->default(null);
             $table->string('iso_4217', 3)->default(null)->nullable();
             $table->integer('iso_4217_number')->default(null)->nullable();
             $table->timestamps();

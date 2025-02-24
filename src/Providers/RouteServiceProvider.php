@@ -5,7 +5,6 @@ namespace Unusualify\Modularity\Providers;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
@@ -327,7 +326,6 @@ class RouteServiceProvider extends ServiceProvider
                             : false
                     );
 
-
                     foreach ($routes as $key => $item) {
                         $middlewares = $module->getRouteMiddlewareAliases($item['name']);
                         $isSingleton = $module->isSingleton($item['name']);
@@ -338,7 +336,7 @@ class RouteServiceProvider extends ServiceProvider
                             $itemSnakeName = snakeCase($item['name']);
 
                             $routeUrlSegment = $item['url'] ?? pluralize($itemKebabName);
-                            if($isSingleton){
+                            if ($isSingleton) {
                                 $routeUrlSegment = Str::singular($routeUrlSegment);
                             }
 
@@ -425,10 +423,10 @@ class RouteServiceProvider extends ServiceProvider
                                 $parameters,
                             ) {
 
-                                if($isSingleton){
+                                if ($isSingleton) {
                                     Route::singleton($routeUrlSegment, $controllerName, $resourceOptions);
                                     // Route::get($routeUrlSegment, $controllerName . '@editSingleton')->name($itemSnakeName);
-                                }else{
+                                } else {
                                     Route::additionalRoutes($routeUrlSegment, $itemStudlyName, [
                                         'as' => implode('.', $resourceOptionsAs),
                                     ]);
@@ -488,7 +486,7 @@ class RouteServiceProvider extends ServiceProvider
                             $itemStudlyName = studlyName($item['name']);
                             $itemSnakeName = snakeCase($item['name']);
                             $routeUrlSegment = $item['url'] ?? pluralize($itemKebabName);
-                            if($isSingleton){
+                            if ($isSingleton) {
                                 $routeUrlSegment = Str::singular($routeUrlSegment);
                             }
 
@@ -532,9 +530,9 @@ class RouteServiceProvider extends ServiceProvider
                                 $resourceOptions,
                                 $parameters,
                             ) {
-                                if($isSingleton){
+                                if ($isSingleton) {
                                     Route::singleton($routeUrlSegment, $controllerName, $resourceOptions);
-                                }else{
+                                } else {
                                     Route::resource($routeUrlSegment, $controllerName, $resourceOptions + ['only' => ['index', 'create', 'store', 'show']])
                                         // ->scoped($scoped)
                                         ->parameters($parameters);

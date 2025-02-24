@@ -6,18 +6,21 @@ use Illuminate\Support\Str;
 use Nwidart\Modules\Support\Stub;
 use Symfony\Component\Finder\Finder;
 use Unusualify\Modularity\Facades\Modularity;
-use function Laravel\Prompts\{select, text, confirm};
+
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\select;
+use function Laravel\Prompts\text;
 
 class EventMakeCommand extends BaseCommand
 {
     protected $hidden = true;
 
     /**
-	 * The name and signature of the console command.
-	 *
-	 * @var string
-	 */
-	protected $signature = 'modularity:make:event
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'modularity:make:event
 		{name : The name of event}
 		{module? : The name of module}
         {--self : The path of the modularity}
@@ -25,7 +28,6 @@ class EventMakeCommand extends BaseCommand
         {--should-broadcast : Should the event broadcast}
         {--should-broadcast-now : Should the event broadcast now}
         {--should-dispatch-after-commit : Should the event dispatch after commit}';
-
 
     protected $aliases = [];
 
@@ -62,27 +64,25 @@ class EventMakeCommand extends BaseCommand
         $attributes = [];
         $methods = [];
 
-        if($self){
+        if ($self) {
             $namespace = 'Unusualify\Modularity\Events';
 
-
-        }else if($moduleName) {
+        } elseif ($moduleName) {
             $module = Modularity::findOrFail($moduleName);
             $namespace = $module->getTargetClassNamespace('event');
         }
-
 
         $abstractEventPaths = [
             base_path('app/Events'),
             Modularity::getModulePath('/**/Events'),
             Modularity::getVendorPath('/src/Events'),
         ];
-        $abstractEventClasses = collect(Finder::create()->files()->depth(0)->in($abstractEventPaths))->reduce(function($carry, $file) {
+        $abstractEventClasses = collect(Finder::create()->files()->depth(0)->in($abstractEventPaths))->reduce(function ($carry, $file) {
             $className = get_file_class($file->getRealPath());
 
-            if($className) {
+            if ($className) {
                 $reflector = new \ReflectionClass(get_file_class($file->getRealPath()));
-                if($reflector->isAbstract()) {
+                if ($reflector->isAbstract()) {
                     $carry[$className] = $file;
                 }
             }
@@ -90,7 +90,7 @@ class EventMakeCommand extends BaseCommand
             return $carry;
         }, collect());
 
-        if($abstractEventClasses->count() > 0 && confirm('Do you want use a specific abstract event class?', default: false)) {
+        if ($abstractEventClasses->count() > 0 && confirm('Do you want use a specific abstract event class?', default: false)) {
             $abstractEventClass = select(
                 label: 'Select the abstract event class',
                 options: $abstractEventClasses->keys()->toArray(),
@@ -101,17 +101,16 @@ class EventMakeCommand extends BaseCommand
             $extend = $abstractEventClassShortName;
         }
 
-
-        if($this->option('should-dispatch-after-commit')) {
+        if ($this->option('should-dispatch-after-commit')) {
             $implements[] = 'ShouldDispatchAfterCommit';
             $namespaces[] = 'Illuminate\Contracts\Events\ShouldDispatchAfterCommit';
         }
 
-        if($this->option('should-broadcast-now')) {
+        if ($this->option('should-broadcast-now')) {
             $implements[] = 'ShouldBroadcastNow';
             $namespaces[] = 'Illuminate\Contracts\Broadcasting\ShouldBroadcastNow';
 
-        } else if($this->option('should-broadcast')) {
+        } elseif ($this->option('should-broadcast')) {
             $implements[] = 'ShouldBroadcast';
             $namespaces[] = 'Illuminate\Contracts\Broadcasting\ShouldBroadcast';
 
@@ -136,7 +135,7 @@ class EventMakeCommand extends BaseCommand
         }
 
         $broadcastOn = '';
-        if($this->option('should-broadcast-now') || $this->option('should-broadcast')) {
+        if ($this->option('should-broadcast-now') || $this->option('should-broadcast')) {
             $channelType = select(
                 label: 'Select the channel type',
                 options: ['Channel', 'PrivateChannel', 'PresenceChannel'],
@@ -149,17 +148,17 @@ class EventMakeCommand extends BaseCommand
             $broadcastOn = "new {$channelType}('{$channelName}')";
         }
 
-        if($extend) {
+        if ($extend) {
             $className = $className . ' extends ' . $extend;
         }
 
-        if(count($implements) > 0) {
+        if (count($implements) > 0) {
             $className = $className . ' implements ' . implode(', ', $implements);
         }
 
         return (new Stub($this->getStubName(), [
             'NAMESPACE' => $namespace,
-            'NAMESPACES' => array_reduce($namespaces, function($carry, $namespace) {
+            'NAMESPACES' => array_reduce($namespaces, function ($carry, $namespace) {
                 return $carry . "use $namespace;\n";
             }, ''),
             'CLASS' => $className,
@@ -178,13 +177,14 @@ class EventMakeCommand extends BaseCommand
         $fileName = $this->getFileName() . '.php';
         $self = $this->option('self');
 
-        if($self){
-            if(Modularity::isProduction()) {
+        if ($self) {
+            if (Modularity::isProduction()) {
                 throw new \Exception('You cannot create an event in the vendor path in production');
             }
+
             return Modularity::getVendorPath('src/Events/') . "{$fileName}";
 
-        }else if (!$moduleName){
+        } elseif (! $moduleName) {
             return base_path("app/Events/{$fileName}");
         }
 

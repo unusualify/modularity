@@ -404,9 +404,9 @@ if (! function_exists('replace_curly_braces')) {
 }
 
 if (! function_exists('indent')) {
-    function indent($indent = 4, $string = "")
+    function indent($indent = 4, $string = '')
     {
-        return str_repeat(" ", $indent) . $string;
+        return str_repeat(' ', $indent) . $string;
     }
 }
 
@@ -421,7 +421,7 @@ if (! function_exists('comment_string')) {
      */
     function comment_string(array|string $descriptions, $parameters = [], ?string $returnType = null, ?string $varType = null, $asArray = false): array|string
     {
-        $lines = [indent(string: "/**")];
+        $lines = [indent(string: '/**')];
 
         if (is_string($descriptions)) {
             $descriptions = [$descriptions];
@@ -483,7 +483,7 @@ if (! function_exists('method_string')) {
 
         $parameters = implode(',', $parameters);
         $return_type = $return_type ? ": {$return_type}" : '';
-        $lines[] = "{$modifier} function {$method_name}($parameters){$return_type}\n" . indent() . "{";
+        $lines[] = "{$modifier} function {$method_name}($parameters){$return_type}\n" . indent() . '{';
 
         if (is_string($content)) {
             $content = [$content];
@@ -516,9 +516,9 @@ if (! function_exists('attribute_string')) {
         $varType = gettype($value);
         $lines = comment_string($comment, varType: $customVarType ?? $varType, asArray: true);
 
-        if($varType == 'array'){
+        if ($varType == 'array') {
             $value = array_export($value, true);
-        } else if($varType == 'string'){
+        } elseif ($varType == 'string') {
             $value = "'{$value}'";
         }
 
@@ -611,8 +611,9 @@ if (! function_exists('concatenate_namespace')) {
     }
 }
 
-if(!function_exists('get_file_class')){
-    function get_file_class($file){
+if (! function_exists('get_file_class')) {
+    function get_file_class($file)
+    {
         $content = file_get_contents($file);
 
         $namespace = null;

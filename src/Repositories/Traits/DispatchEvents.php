@@ -4,10 +4,10 @@ namespace Unusualify\Modularity\Repositories\Traits;
 
 use Illuminate\Support\Facades\DB;
 use Modules\SystemNotification\Events\ModelCreated;
-use Modules\SystemNotification\Events\ModelUpdated;
 use Modules\SystemNotification\Events\ModelDeleted;
 use Modules\SystemNotification\Events\ModelForceDeleted;
 use Modules\SystemNotification\Events\ModelRestored;
+use Modules\SystemNotification\Events\ModelUpdated;
 
 trait DispatchEvents
 {
@@ -25,9 +25,9 @@ trait DispatchEvents
     public function commitEvent($event, $model, $serializedData = null)
     {
         DB::afterCommit(function () use ($event, $model, $serializedData) {
-            if($serializedData) {
+            if ($serializedData) {
                 $event::dispatch($model, $serializedData);
-            }else{
+            } else {
                 $event::dispatch($model);
             }
         });
@@ -42,14 +42,14 @@ trait DispatchEvents
 
     public function dispatchEvent($model, $action)
     {
-        if (!isset($this->events[$action])) {
+        if (! isset($this->events[$action])) {
             return;
         }
 
         $event = $this->events[$action];
         $serializedData = null;
 
-        if(in_array($action, ['delete', 'destroy', 'forceDelete'])) {
+        if (in_array($action, ['delete', 'destroy', 'forceDelete'])) {
             $serializedData = $model->toArray();
         }
 

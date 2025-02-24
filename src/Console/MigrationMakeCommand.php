@@ -9,8 +9,6 @@ use Nwidart\Modules\Support\Migrations\SchemaParser as NwidartSchemaParser;
 use Nwidart\Modules\Support\Stub;
 // use Nwidart\Modules\Support\Migrations\SchemaParser;
 
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Support\Decomposers\SchemaParser;
 
@@ -69,14 +67,14 @@ class MigrationMakeCommand extends BaseCommand
     {
         if (! $this->option('no-defaults')) {
             $this->nonMigrationFields = $this->baseConfig('schemas.non_migration_fields', []);
-            $this->defaultFieldSchemas = array_filter($this->baseConfig('schemas.default_fields') ?? [], function($field) {
+            $this->defaultFieldSchemas = array_filter($this->baseConfig('schemas.default_fields') ?? [], function ($field) {
                 $field = explode(':', $field)[0];
-                return !in_array($field, $this->nonMigrationFields);
+
+                return ! in_array($field, $this->nonMigrationFields);
             });
         }
 
-
-        if($this->option('addSingular')){
+        if ($this->option('addSingular')) {
             $this->info('Pass making migration due to addSingular option!');
 
             return 0;
@@ -126,9 +124,9 @@ class MigrationMakeCommand extends BaseCommand
                 ]);
             } elseif ($relational == 'MorphedByMany') {
 
-                if($this->option('route')){
+                if ($this->option('route')) {
                     $modelName = Str::studly($this->option('route'));
-                }else{
+                } else {
                     preg_match('/^create_(.*)_table$/', $this->option('name'), $matches);
                     $modelName = Str::studly(getMorphModelName($matches[1]));
                 }
@@ -199,8 +197,8 @@ class MigrationMakeCommand extends BaseCommand
             $path = Modularity::getModulePath($moduleName);
             $migrationGeneratorPath = GenerateConfigReader::read('migration');
             $migrationFolder = $migrationGeneratorPath->getPath();
-        }else{
-            if($this->option('self')){
+        } else {
+            if ($this->option('self')) {
                 $path = Modularity::getVendorPath('');
                 $migrationFolder = 'database/migrations/default';
             }

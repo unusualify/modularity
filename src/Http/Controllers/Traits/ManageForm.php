@@ -312,7 +312,7 @@ trait ManageForm
                     ],
                 ];
 
-            break;
+                break;
             case 'group':
             case 'wrap':
                 $input['typeInt'] ??= 'sheet';
@@ -379,7 +379,7 @@ trait ManageForm
                 // if($input['name'] == 'wrap-content')
                 $data = $input;
 
-            break;
+                break;
             case 'relationship':
                 $relationshipName = $input['relationship'] ?? $input['name'] ?? null;
 
@@ -440,7 +440,7 @@ trait ManageForm
                 //     unset($data['name']);
                 // }
 
-            break;
+                break;
             case 'morphTo':
 
                 $data = [];
@@ -452,10 +452,10 @@ trait ManageForm
 
                     $reversedParents = array_reverse($input['schema']);
 
-                    $foreignKeys = array_map(fn($i) => $i['name'], $reversedParents);
+                    $foreignKeys = array_map(fn ($i) => $i['name'], $reversedParents);
 
-                    $cascades = collect($reversedParents)->mapWithKeys(fn($i) => [
-                        $i['name'] => []
+                    $cascades = collect($reversedParents)->mapWithKeys(fn ($i) => [
+                        $i['name'] => [],
                     ])->toArray();
                     // dd($reversedParents, $foreignKeys);
                     foreach ($reversedParents as $index => $attachable) {
@@ -471,19 +471,19 @@ trait ManageForm
 
                         $modelClass = null;
 
-                        if(isset($attachable['repository'])){
+                        if (isset($attachable['repository'])) {
                             $modelClass = App::make($attachable['repository'])->getModel();
-                        }else if(isset($attachable['_moduleName']) && isset($attachable['_routeName'])){
+                        } elseif (isset($attachable['_moduleName']) && isset($attachable['_routeName'])) {
                             $modelClass = Modularity::find($attachable['_moduleName'])->getRepository($attachable['_routeName'])->getModel();
-                        }else{
-                            throw new \Exception('Repository or connector not found on morphTo input: '.$name);
+                        } else {
+                            throw new \Exception('Repository or connector not found on morphTo input: ' . $name);
                         }
 
                         $columns = $modelClass->getColumns();
                         $intersects = array_values(array_intersect($foreignKeys, $columns));
-                        if(count($intersects) > 0){
+                        if (count($intersects) > 0) {
                             $isCascadeable = true;
-                            foreach($intersects as $intersect){
+                            foreach ($intersects as $intersect) {
                                 $cascades[$intersect][] = $name;
                             }
                         }
@@ -491,17 +491,17 @@ trait ManageForm
                         unset($attachable['noRecords']);
                         $attachable['ext'] = 'morphTo';
 
-                        if(count($cascades[$name]) > 0){
+                        if (count($cascades[$name]) > 0) {
                             $attachable['cascades'] = [];
-                            foreach($cascades[$name] as $cascadeableName){
-                                if(isset($data[$cascadeableName])){
+                            foreach ($cascades[$name] as $cascadeableName) {
+                                if (isset($data[$cascadeableName])) {
                                     $foreignKey = $data[$cascadeableName]['name'];
                                     $relationshipName = pluralize($this->getCamelNameFromForeignKey($foreignKey));
                                     $attachable['cascades'][] = $relationshipName;
                                     $attachable['cascade'] = $foreignKey;
                                 }
                             }
-                        }else{
+                        } else {
                             // $attachable['cascade'] = $reversedParents[$index - 1]['name'];
                         }
 
@@ -528,17 +528,17 @@ trait ManageForm
                     $input = $data;
                 }
 
-            break;
+                break;
             case 'polymorphic':
                 $arrayable = true;
 
-                if (!isset($input['model'])) {
+                if (! isset($input['model'])) {
                     throw new \Exception('Model is required for polymorphic input');
                 }
 
                 $model = $input['model'];
 
-                if(!class_exists($model)) {
+                if (! class_exists($model)) {
                     throw new \Exception('Model ' . $model . ' does not exist on polymorphic input');
                 }
 
@@ -549,19 +549,17 @@ trait ManageForm
 
                 $columns = $modelInstance->getColumns();
 
-
-                if(!(in_array($morphId, $columns) && in_array($morphType, $columns))) {
+                if (! (in_array($morphId, $columns) && in_array($morphType, $columns))) {
                     throw new \Exception("{$morphType} and {$morphId} columns are not present in the model " . $model);
                 }
 
                 // Ensure we have morphs array
-                if (!isset($input['morphs']) || !is_array($input['morphs'])) {
+                if (! isset($input['morphs']) || ! is_array($input['morphs'])) {
                     throw new \Exception('Morphs array is required for polymorphic input');
                 }
 
-
                 // Transform models into options for the type combobox
-                $polymorphics = collect($input['morphs'])->map(function($p) {
+                $polymorphics = collect($input['morphs'])->map(function ($p) {
                     $polymorphic = $p;
                     $repository = $p;
                     if (is_array($polymorphic)) {
@@ -570,7 +568,7 @@ trait ManageForm
                         throw new \Exception('Invalid polymorphic input');
                     }
 
-                    if (!class_exists($repository)) {
+                    if (! class_exists($repository)) {
                         throw new \Exception('Repository ' . $repository . ' does not exist on polymorphic input');
                     }
 
@@ -582,13 +580,13 @@ trait ManageForm
                         ];
                     }
 
-                    if(isset($polymorphic['name'])){
-                        if(trans()->has($polymorphic['name'])){
+                    if (isset($polymorphic['name'])) {
+                        if (trans()->has($polymorphic['name'])) {
                             $polymorphic['name'] = trans_choice($polymorphic['name'], 1);
-                        }else{
+                        } else {
                             $polymorphic['name'] = $polymorphic['name'];
                         }
-                    }else{
+                    } else {
                         $polymorphic['name'] = get_class_short_name($repositoryInstance->getModel()::class);
                     }
 
@@ -608,7 +606,7 @@ trait ManageForm
                     'itemValue' => 'id',
                     'itemTitle' => 'name',
                     'cascade' => $morphId,
-                    'items' => collect($polymorphics)->map(function($polymorphic) {
+                    'items' => collect($polymorphics)->map(function ($polymorphic) {
                         return [
                             'id' => $polymorphic['type'],
                             'name' => $polymorphic['name'],
@@ -633,7 +631,7 @@ trait ManageForm
                 ];
 
                 // $input = [];
-            break;
+                break;
             case 'title':
                 $input['padding'] ??= 'a-0';
                 $input['margin'] ??= 'b-0';
@@ -643,7 +641,7 @@ trait ManageForm
                 $input['color'] ??= null;
 
                 // $input = [];
-            break;
+                break;
             default:
 
                 break;

@@ -2,15 +2,11 @@
 
 namespace Modules\SystemNotification\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Unusualify\Modularity\Events\ModelEvent;
-use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class ModelRestored extends ModelEvent implements ShouldDispatchAfterCommit
 {
@@ -29,6 +25,7 @@ class ModelRestored extends ModelEvent implements ShouldDispatchAfterCommit
      * @var string
      */
     public $queue = 'default';
+
     /**
      * Create a new event instance.
      */
@@ -36,6 +33,4 @@ class ModelRestored extends ModelEvent implements ShouldDispatchAfterCommit
     {
         parent::__construct($model);
     }
-
-
 }

@@ -30,7 +30,7 @@ trait FilepondsTrait
 
         foreach ($columns as $role) {
             $files = data_get($fields, $role) ?? [];
-            if( Arr::isAssoc($files) ) {
+            if (Arr::isAssoc($files)) {
                 foreach ($files as $locale => $filesByLocale) {
                     Filepond::saveFile($object, $filesByLocale, $role, $locale);
                 }

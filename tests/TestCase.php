@@ -14,7 +14,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     public $modulesPath;
 
-
     protected function setUp(): void
     {
         parent::setUp();

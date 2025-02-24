@@ -4,8 +4,8 @@ namespace Modules\SystemSetting\Entities;
 
 use Unusualify\Modularity\Entities\Model;
 use Unusualify\Modularity\Entities\Traits\HasImages;
-use Unusualify\Modularity\Entities\Traits\HasSpreadable;
 use Unusualify\Modularity\Entities\Traits\IsSingular;
+
 class General extends Model
 {
     /**
@@ -18,6 +18,6 @@ class General extends Model
     protected $fillable = [
         'name',
         'published',
-        'cont'
+        'cont',
     ];
 }

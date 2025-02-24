@@ -2,7 +2,4 @@
 
 namespace Modules\SystemUtility\Entities;
 
-class State extends \Unusualify\Modularity\Entities\State
-{
-
-}
+class State extends \Unusualify\Modularity\Entities\State {}

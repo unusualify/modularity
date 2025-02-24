@@ -18,9 +18,9 @@ use PragmaRX\Google2FA\Google2FA;
 use Socialite;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularity\Http\Requests\Admin\OauthRequest;
 use Unusualify\Modularity\Services\MessageStage;
-use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 
 class LoginController extends Controller
 {

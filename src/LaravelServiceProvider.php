@@ -106,5 +106,4 @@ final class LaravelServiceProvider extends ServiceProvider
             Modularity::getVendorPath('database/migrations/default') => $this->app->databasePath('migrations'),
         ], 'modularity-migrations');
     }
-
 }

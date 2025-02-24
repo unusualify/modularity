@@ -21,6 +21,7 @@ use Unusualify\Modularity\Support\Finder;
 class Module extends NwidartModule
 {
     private $activator;
+
     /**
      * @var ModuleActivatorInterface
      */
@@ -58,8 +59,6 @@ class Module extends NwidartModule
         // $this->moduleActivator->setModule($name);
     }
 
-
-
     /**
      * {@inheritdoc}
      */
@@ -96,10 +95,6 @@ class Module extends NwidartModule
 
     /**
      * Determine whether the given status same with the current module status.
-     *
-     * @param bool $status
-     *
-     * @return bool
      */
     public function isStatus(bool $status): bool
     {
@@ -125,7 +120,6 @@ class Module extends NwidartModule
         $middleware_folder = GenerateConfigReader::read('filter')->getPath();
         $middleware_namespace = GenerateConfigReader::read('filter')->getNamespace();
 
-
         if (file_exists(($middlewareDir = $this->getDirectoryPath($middleware_folder)))) {
             foreach (glob($middlewareDir . '/*Middleware.php') as $middlewareFile) {
                 $middlewareFileName = pathinfo($middlewareFile)['filename']; // $filename
@@ -135,7 +129,7 @@ class Module extends NwidartModule
                     $name = implode('.', Arr::where(explode('_', snakeCase($middlewareFileName)), function ($value) {
                         return $value !== 'middleware';
                     }));
-                    $aliasName = "modules." . $this->getSnakeName() . '.' . $name;
+                    $aliasName = 'modules.' . $this->getSnakeName() . '.' . $name;
 
                     $this->middlewares[$name] = [
                         'alias' => $aliasName,
@@ -324,8 +318,6 @@ class Module extends NwidartModule
 
         return $this->app['config']->set("{$this->getSnakeName()}{$notation}", $newConfig);
     }
-
-
 
     /**
      * getParentRoute
@@ -564,7 +556,7 @@ class Module extends NwidartModule
 
         $endpoint = replace_curly_braces($endpoint, $replacements);
 
-        if($absolute){
+        if ($absolute) {
             return url($endpoint);
         }
 
@@ -641,17 +633,16 @@ class Module extends NwidartModule
         }
     }
 
-
     public function getRouteMiddlewareAliases($routeName)
     {
         $snakeName = snakeCase($routeName);
 
         $autoMiddlewares = [];
 
-        if(isset($this->middlewares[$snakeName])){
+        if (isset($this->middlewares[$snakeName])) {
             $noAutoMiddleware = $this->getRouteConfig($routeName)['noAutoMiddleware'] ?? false;
 
-            if(!$noAutoMiddleware){
+            if (! $noAutoMiddleware) {
                 $autoMiddlewares = [$this->middlewares[$snakeName]['alias']];
             }
         }
@@ -661,5 +652,4 @@ class Module extends NwidartModule
             $this->getRouteConfigs($routeName)['middleware'] ?? $this->getRouteConfigs($routeName)['middlewares'] ?? []
         );
     }
-
 }

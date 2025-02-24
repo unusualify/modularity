@@ -37,35 +37,32 @@ class AuthorizeHydrate extends InputHydrate
 
         $authorizedModel = null;
 
-        if(isset($input['authorized_type'])){
+        if (isset($input['authorized_type'])) {
             $authorizedModel = $input['authorized_type'];
             $authorizedModel = new $authorizedModel;
-        }
-        else if($input['_module'] && $input['_route']){
+        } elseif ($input['_module'] && $input['_route']) {
             $module = Modularity::find($input['_module']);
             $selfModel = $module->getRouteClass($input['_routeName'], 'model');
-            if(in_array('Unusualify\Modularity\Entities\Traits\HasAuthorizable', class_uses_recursive($selfModel))){
+            if (in_array('Unusualify\Modularity\Entities\Traits\HasAuthorizable', class_uses_recursive($selfModel))) {
                 $selfModel = new $selfModel;
                 $authorizedModel = $selfModel->getAuthorizedModel();
                 $input['items'] = $selfModel::all();
             }
-        }
-        else if(isset($input['routeName'])){
+        } elseif (isset($input['routeName'])) {
             $selfModel = $this->module->getRouteClass($input['routeName'], 'model');
-            if(in_array('Unusualify\Modularity\Entities\Traits\HasAuthorizable', class_uses_recursive($selfModel))){
+            if (in_array('Unusualify\Modularity\Entities\Traits\HasAuthorizable', class_uses_recursive($selfModel))) {
                 $selfModel = new $selfModel;
                 $authorizedModel = $selfModel->getAuthorizedModel();
                 $input['items'] = $selfModel::all();
             }
         }
 
-        if($authorizedModel){
+        if ($authorizedModel) {
             $q = $authorizedModel::query();
 
-
-            if(isset($input['scopeRole'])){
+            if (isset($input['scopeRole'])) {
                 $roles = Role::whereIn('name', $input['scopeRole'])->get('name');
-                $q->role($roles->map(fn($role) => $role->name)->toArray());
+                $q->role($roles->map(fn ($role) => $role->name)->toArray());
             }
 
             $input['items'] = $q->get(['id', 'name']);
@@ -85,5 +82,4 @@ class AuthorizeHydrate extends InputHydrate
         // }
         // dd($input);
     }
-
 }

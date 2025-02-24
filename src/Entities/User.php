@@ -136,7 +136,7 @@ class User extends Authenticatable
     protected function nameWithCompany(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->name .  ' ('  .($this->company_name ? $this->company_name : __('System User')) . ')',
+            get: fn () => $this->name . ' (' . ($this->company_name ? $this->company_name : __('System User')) . ')',
         );
     }
 

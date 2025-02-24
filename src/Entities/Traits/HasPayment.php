@@ -76,7 +76,7 @@ trait HasPayment
             ->where('role', 'payment')
             // ->hasPayment(false)
             ->hasPayment(false)
-            ->orWhereHas('payments', fn($q) => $q->where('status', '!=', 'COMPLETED'))
+            ->orWhereHas('payments', fn ($q) => $q->where('status', '!=', 'COMPLETED'))
             ->latest('created_at');
     }
 

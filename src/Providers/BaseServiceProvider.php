@@ -7,7 +7,6 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\View;
-use Laravel\Telescope\Telescope;
 use Unusualify\Modularity\Activators\ModuleActivator;
 use Unusualify\Modularity\Exceptions\AuthConfigurationException;
 use Unusualify\Modularity\Http\ViewComposers\CurrentUser;
@@ -72,7 +71,6 @@ class BaseServiceProvider extends ServiceProvider
             ], false));
         });
 
-
         AboutCommand::add('Modularity', function () {
 
             return [
@@ -91,8 +89,8 @@ class BaseServiceProvider extends ServiceProvider
         $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
             $schedule->command('modularity:fileponds:scheduler --days=7')
                 ->everyDay();
-                // ->everyFiveMinutes();
-                // ->appendOutputTo(storage_path('logs/scheduler.log'));
+            // ->everyFiveMinutes();
+            // ->appendOutputTo(storage_path('logs/scheduler.log'));
 
             $schedule->command('telescope:prune --hours=168')
                 ->everyDay()
@@ -116,7 +114,6 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->registerCommands();
 
-
         // $this->app->singleton('modularity', function (Application $app) {
         //     $path = $app['config']->get('modules.paths.modules');
 
@@ -124,7 +121,7 @@ class BaseServiceProvider extends ServiceProvider
         // });
         // CANCEL \Nwidart\Modules\Laravel\LaravelFileRepository binding
         // and Nwidart\Modules\Laravel\Module binding in the LaravelFileRepository createModule method
-        $this->app->singleton(\Nwidart\Modules\Contracts\RepositoryInterface::class, function($app) {
+        $this->app->singleton(\Nwidart\Modules\Contracts\RepositoryInterface::class, function ($app) {
             $path = $app['config']->get('modules.paths.modules');
 
             return new Modularity($app, $path);
@@ -246,7 +243,7 @@ class BaseServiceProvider extends ServiceProvider
      */
     private function bootPackageConfigs()
     {
-        if (modularityConfig('enabled.users-management') && !  $this->app->runningInConsole()) {
+        if (modularityConfig('enabled.users-management') && ! $this->app->runningInConsole()) {
             $modularityAuthGuardAbsent = blank(config('auth.guards.' . Modularity::getAuthGuardName()));
             $modularityAuthProviderAbsent = blank(config('auth.providers.' . Modularity::getAuthProviderName()));
             $modularityAuthPasswordAbsent = blank(config('auth.passwords.' . Modularity::getAuthProviderName()));

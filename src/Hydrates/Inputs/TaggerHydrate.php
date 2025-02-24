@@ -36,25 +36,25 @@ class TaggerHydrate extends InputHydrate
         // add your logic
         $modelInstance = null;
         if (isset($input['modelx'])) {
-            if(!class_exists($input['model'])) {
+            if (! class_exists($input['model'])) {
                 throw new \Exception('Model ' . $input['model'] . ' does not exist in ' . $this->input['name'] . ' input');
             }
 
             $modelInstance = App::make($input['model']);
-        }else if (isset($input['repositoryx'])) {
-            if(!class_exists($input['repository'])) {
+        } elseif (isset($input['repositoryx'])) {
+            if (! class_exists($input['repository'])) {
                 throw new \Exception('Repository ' . $input['repository'] . ' does not exist in ' . $this->input['name'] . ' input');
             }
 
             $repositoryInstance = App::make($input['repository']);
 
             $modelInstance = $repositoryInstance->getModel();
-        } else if (isset($input['_moduleName']) && isset($input['_routeName'])) {
+        } elseif (isset($input['_moduleName']) && isset($input['_routeName'])) {
             $module = Modularity::find($input['_moduleName']);
             $repository = $module->getRouteClass($input['_routeName'], 'repository');
             $repository = App::make($repository);
 
-            if (!classHasTrait($repository, 'Unusualify\Modularity\Repositories\Traits\TagsTrait')) {
+            if (! classHasTrait($repository, 'Unusualify\Modularity\Repositories\Traits\TagsTrait')) {
                 throw new \Exception('Repository ' . $repository . ' does not have TagsTrait in ' . $this->input['name'] . ' input');
             }
 
@@ -63,7 +63,7 @@ class TaggerHydrate extends InputHydrate
             // $repository->getTagsList()->toArray() // this get used tags
             // $repository->getTags()->toArray() // this get all tags
 
-            $items = $repository->getTags()->map(fn($tag, $index) => [
+            $items = $repository->getTags()->map(fn ($tag, $index) => [
                 'id' => $tag->id,
                 'name' => $tag->name,
                 'color' => $input['colors'][$index % count($input['colors'])],

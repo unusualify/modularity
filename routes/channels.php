@@ -16,6 +16,7 @@ use Unusualify\Modularity\Facades\Modularity;
 
 Broadcast::channel('models.{modelId}', function ($user, $modelId) {
     return $user->id == $modelId;
+
     return $user->id === $modelType::findOrNew($modelId);
 }, ['guards' => ['web', Modularity::getAuthGuardName()]]);
 
@@ -28,5 +29,3 @@ Broadcast::channel('models.{modelId}', function ($user, $modelId) {
 //     return $user->id == $modelId;
 //     return $user->id === $modelType::findOrNew($modelId);
 // }, ['guards' => ['web', Modularity::getAuthGuardName()]]);
-
-

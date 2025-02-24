@@ -50,7 +50,7 @@ class ModuleActivator extends FileActivator
      */
     private $routesStatuses;
 
-    public function __construct(Container $app, Private Module $module)
+    public function __construct(Container $app, private Module $module)
     {
         // parent::__construct($app);
 

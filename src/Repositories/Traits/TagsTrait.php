@@ -20,6 +20,7 @@ trait TagsTrait
 
         return $columns;
     }
+
     /**
      * @param \Unusualify\Modularity\Models\Model $object
      * @param array $fields
@@ -49,14 +50,15 @@ trait TagsTrait
 
     public function getFormFieldsTagsTrait($object, $fields, $schema = null)
     {
-        if($object->has('tags')) {
-            foreach($this->getColumns(__TRAIT__) as $column) {
+        if ($object->has('tags')) {
+            foreach ($this->getColumns(__TRAIT__) as $column) {
                 $fields[$column] = $object->tags->map(fn ($tag) => $tag->name);
             }
         }
 
         return $fields;
     }
+
     protected function filterTagsTrait($query, &$scopes)
     {
         $this->addRelationFilterScope($query, $scopes, 'tag_id', 'tags');

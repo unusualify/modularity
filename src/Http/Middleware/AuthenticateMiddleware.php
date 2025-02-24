@@ -18,7 +18,7 @@ class AuthenticateMiddleware extends Middleware
     protected function redirectTo($request)
     {
 
-        if (!$request->expectsJson()) {
+        if (! $request->expectsJson()) {
             $modularityAdminRouteNamePrefix = Modularity::getAdminRouteNamePrefix();
             // Define auth routes that should not be stored as intended URL
             $excludedRoutes = Arr::map([
@@ -27,13 +27,13 @@ class AuthenticateMiddleware extends Middleware
                 'password.reset.link', 'password.reset.email',
                 'password.reset.success', 'password.reset',
                 'password.reset.update',
-                'impersonate.stop', 'impersonate'
+                'impersonate.stop', 'impersonate',
             ], function ($route) use ($modularityAdminRouteNamePrefix) {
                 return $modularityAdminRouteNamePrefix ? $modularityAdminRouteNamePrefix . '.' . $route : $route;
             });
 
             // Only store the previous URL if it's not an auth route
-            if (!in_array($request->route()->getName(), $excludedRoutes)) {
+            if (! in_array($request->route()->getName(), $excludedRoutes)) {
                 session()->put('url.intended', url()->previous());
             }
         }

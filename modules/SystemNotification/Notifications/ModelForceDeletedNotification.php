@@ -3,9 +3,9 @@
 namespace Modules\SystemNotification\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
@@ -38,7 +38,6 @@ class ModelForceDeletedNotification extends Notification implements ShouldQueue
                 ?? $this->modelData['slug']
                 ?? $this->modelData['id'];
 
-
         return (new MailMessage)
             ->greeting(__('Hi,'))
             ->subject($moduleRouteHeadline . ' Permanently Deleted')
@@ -57,9 +56,12 @@ class ModelForceDeletedNotification extends Notification implements ShouldQueue
     {
         $details = '';
         foreach ($this->modelData as $key => $value) {
-            if (is_array($value) || is_object($value)) continue;
+            if (is_array($value) || is_object($value)) {
+                continue;
+            }
             $details .= "<strong>{$key}</strong>: {$value}<br>";
         }
+
         return $details;
     }
 

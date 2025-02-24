@@ -199,21 +199,21 @@ if (! function_exists('createDefaultMorphPivotTableFields')) {
      */
     function createDefaultMorphPivotTableFields($table, $modelName = null, $tableName = null, $morphedTableName = null)
     {
-        if(!$modelName && !$tableName) {
+        if (! $modelName && ! $tableName) {
             throw new \Exception('modelName or tableName is required');
         }
 
-        if(!$modelName) {
+        if (! $modelName) {
             $modelName = getMorphModelName($tableName);
         } else {
             $modelName = getMorphModelName($modelName); // guarentee model name with clearing able|ables
         }
 
-        if(!$tableName) {
+        if (! $tableName) {
             $tableName = makeMorphPivotTableName($modelName);
         }
 
-        if(!$morphedTableName) {
+        if (! $morphedTableName) {
             $morphedTableName = tableName($modelName);
         }
 

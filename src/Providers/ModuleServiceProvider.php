@@ -2,11 +2,8 @@
 
 namespace Unusualify\Modularity\Providers;
 
-use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Route;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Unusualify\Modularity\Facades\Modularity;
 
@@ -103,7 +100,7 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
                 );
             }
         }
-        if(!$this->app->runningInConsole()){
+        if (! $this->app->runningInConsole()) {
         }
     }
 }

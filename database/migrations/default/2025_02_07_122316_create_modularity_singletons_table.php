@@ -22,7 +22,6 @@ return new class extends Migration
             createDefaultExtraTableFields($table, published: false);
         });
 
-
     }
 
     public function down()

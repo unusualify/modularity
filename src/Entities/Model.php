@@ -7,13 +7,12 @@ use Cartalyst\Tags\TaggableInterface;
 use Cartalyst\Tags\TaggableTrait;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
+use Illuminate\Notifications\Notifiable;
 // use Modules\Notification\Events\ModelCreated;
+use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Traits\HasPresenter;
 use Unusualify\Modularity\Entities\Traits\IsTranslatable;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
-use Illuminate\Notifications\Notifiable;
-
 
 class Model extends LaravelModel implements TaggableInterface
 {
@@ -65,15 +64,15 @@ class Model extends LaravelModel implements TaggableInterface
             }
         }
 
-        if(in_array('Unusualify\Modularity\Entities\Traits\HasCreator', class_uses_recursive(static::class))){
+        if (in_array('Unusualify\Modularity\Entities\Traits\HasCreator', class_uses_recursive(static::class))) {
             $fillable = array_merge($fillable, static::$hasCreatorFillable);
         }
 
-        if(in_array('Unusualify\Modularity\Entities\Traits\HasAuthorizable', class_uses_recursive(static::class))){
+        if (in_array('Unusualify\Modularity\Entities\Traits\HasAuthorizable', class_uses_recursive(static::class))) {
             $fillable = array_merge($fillable, static::$hasAuthorizableFillable);
         }
 
-        if(in_array('Unusualify\Modularity\Entities\Traits\HasStateable', class_uses_recursive(static::class))){
+        if (in_array('Unusualify\Modularity\Entities\Traits\HasStateable', class_uses_recursive(static::class))) {
             $fillable = array_merge($fillable, static::$hasStateableFillable);
         }
 

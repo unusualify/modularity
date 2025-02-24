@@ -362,9 +362,9 @@ trait ManageUtilities
 
     public function getFormItem($id = null)
     {
-        if($this->isSingleton){
+        if ($this->isSingleton) {
             $item = $this->repository->getModel()->single();
-        }else if ($id) {
+        } elseif ($id) {
             $item = $this->repository->getById(
                 $id,
                 $this->formWith,
@@ -373,6 +373,7 @@ trait ManageUtilities
         } else {
             $item = $this->repository->newInstance();
         }
+
         return $item;
     }
 
@@ -382,7 +383,7 @@ trait ManageUtilities
             $url = $itemId
                 ? $this->getModuleRoute($itemId, 'update', $this->isSingleton)
                 : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->nestedParentId]);
-            //code...
+            // code...
         } catch (\Throwable $th) {
             dd($th, $this->routeName, $this->routePrefix, $this->nestedParentId, $this->isNested);
         }

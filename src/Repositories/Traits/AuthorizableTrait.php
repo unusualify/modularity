@@ -14,6 +14,4 @@ trait AuthorizableTrait
         // set, cast, unset or manipulate the scopes by using query and scopes
         $scopes['hasAuthorization'] = true;
     }
-
-
 }

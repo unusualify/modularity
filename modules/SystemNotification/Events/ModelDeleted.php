@@ -2,15 +2,10 @@
 
 namespace Modules\SystemNotification\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Unusualify\Modularity\Events\ModelEvent;
-use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class ModelDeleted extends ModelEvent
 {
@@ -29,6 +24,7 @@ class ModelDeleted extends ModelEvent
      * @var string
      */
     public $queue = 'default';
+
     /**
      * Create a new event instance.
      */
@@ -36,6 +32,4 @@ class ModelDeleted extends ModelEvent
     {
         parent::__construct($model, $serializedData);
     }
-
-
 }

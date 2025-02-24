@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Http\Controllers\Traits;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 
@@ -10,9 +9,10 @@ trait ManageSingleton
 {
     protected $isSingleton = false;
 
-    protected function __afterConstructManageSingleton($app, $request) {
+    protected function __afterConstructManageSingleton($app, $request)
+    {
 
-        if($this->module){
+        if ($this->module) {
             $this->isSingleton = $this->module->isSingleton($this->routeName);
         }
 
@@ -29,9 +29,10 @@ trait ManageSingleton
 
         $item = app($model)->first();
 
-        if (!$item) {
+        if (! $item) {
             if (config('twill.auto_seed_singletons', false)) {
                 $this->seed();
+
                 return $this->editSingleton();
             }
 
@@ -66,11 +67,11 @@ trait ManageSingleton
 
         $seederClass = $seederNamespace . $seederName;
 
-        if (!class_exists($seederClass)) {
+        if (! class_exists($seederClass)) {
             throw new \Exception("$seederClass is missing");
         }
 
-        $seeder = new $seederClass();
+        $seeder = new $seederClass;
         $seeder->run();
     }
 }

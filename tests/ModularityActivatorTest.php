@@ -8,30 +8,34 @@ use Illuminate\Filesystem\Filesystem;
 use Nwidart\Modules\Module;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Unusualify\Modularity\Activators\ModularityActivator;
-use Unusualify\Modularity\Facades\Modularity;
 
 class ModularityActivatorTest extends OrchestraTestCase
 {
     private $activator;
+
     private $filesystem;
+
     private $config;
+
     private $cache;
+
     private $statusesFile;
+
     private $moduleStatuses;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->statusesFile = base_path('modules_statuses.json');
 
         $this->moduleStatuses = [
-            "SystemUser" => true,
-            "SystemPricing" => true,
-            "SystemPayment" => true,
-            "SystemUtility" => true,
-            "SystemNotification" => true,
-            "SystemSetting" => true,
+            'SystemUser' => true,
+            'SystemPricing' => true,
+            'SystemPayment' => true,
+            'SystemUtility' => true,
+            'SystemNotification' => true,
+            'SystemSetting' => true,
         ];
 
         // Mock filesystem
@@ -117,6 +121,7 @@ class ModularityActivatorTest extends OrchestraTestCase
                 $this->statusesFile,
                 $this->callback(function ($content) {
                     $decoded = json_decode($content, true);
+
                     return isset($decoded['TestModule']) && $decoded['TestModule'] === true;
                 })
             );
@@ -135,6 +140,7 @@ class ModularityActivatorTest extends OrchestraTestCase
                 $this->statusesFile,
                 $this->callback(function ($content) {
                     $decoded = json_decode($content, true);
+
                     return isset($decoded['TestModule']) && $decoded['TestModule'] === false;
                 })
             );
@@ -167,7 +173,8 @@ class ModularityActivatorTest extends OrchestraTestCase
                 $this->statusesFile,
                 $this->callback(function ($content) {
                     $decoded = json_decode($content, true);
-                    return !isset($decoded['SystemUser']);
+
+                    return ! isset($decoded['SystemUser']);
                 })
             );
 

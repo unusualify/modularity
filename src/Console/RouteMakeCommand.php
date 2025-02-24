@@ -4,8 +4,6 @@ namespace Unusualify\Modularity\Console;
 
 use Illuminate\Support\Collection;
 use Nwidart\Modules\Support\Stub;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Generators\RouteGenerator;
 
@@ -64,6 +62,7 @@ class RouteMakeCommand extends BaseCommand
     protected $isAskable = false;
 
     public $useTraitOptions = true;
+
     /**
      * Create a new command instance.
      *

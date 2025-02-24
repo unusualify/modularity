@@ -98,7 +98,6 @@ interface RepositoryInterface
      * Get module path for a specific module.
      *
      * @param $module
-     *
      * @return string
      */
     public function getModulePath($moduleName);

@@ -2,15 +2,10 @@
 
 namespace Modules\SystemNotification\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Unusualify\Modularity\Events\ModelEvent;
-use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class ModelForceDeleted extends ModelEvent
 {
@@ -37,6 +32,4 @@ class ModelForceDeleted extends ModelEvent
     {
         parent::__construct($model, $serializedData);
     }
-
-
 }

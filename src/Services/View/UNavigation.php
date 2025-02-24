@@ -119,9 +119,9 @@ class UNavigation
                 $isSingular = $module->isSingleton($_name);
                 $route_name = ($item['route_name'] ?? snakeCase($item['name']));
 
-                if($isSingular){
+                if ($isSingular) {
                     $route_name = $route_name . '.edit';
-                }else{
+                } else {
                     $route_name = $route_name . '.index';
                 }
 

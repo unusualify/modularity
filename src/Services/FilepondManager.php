@@ -117,7 +117,6 @@ class FilepondManager
                 Storage::delete($new_path);
             }
 
-
             $this->createFilepond($model, $temp_filepond, role: $role, locale: $locale);
 
             $this->deleteFilePondFromSession($temp_filepond);
@@ -158,7 +157,7 @@ class FilepondManager
         $existingUuids = array_column($files, 'uuid');
         $fileponds = $object->fileponds()->where('role', $role);
 
-        if($locale) {
+        if ($locale) {
             $fileponds = $fileponds->where('locale', $locale);
         }
 
@@ -278,7 +277,7 @@ class FilepondManager
             trim($this->tmp_file_path, '/'),
         ];
 
-        $excludedFolders = array_merge($excludedFolders, Filepond::all()->pluck('uuid')->map(fn($uuid) => $this->file_path . $uuid)->toArray());
+        $excludedFolders = array_merge($excludedFolders, Filepond::all()->pluck('uuid')->map(fn ($uuid) => $this->file_path . $uuid)->toArray());
 
         $deleteFolders = array_values(array_diff($allFolders, $excludedFolders));
 
@@ -294,7 +293,7 @@ class FilepondManager
         $query = TemporaryFilepond::where('created_at', '<', now()->subDays($days));
         $temporaryFileponds = $query->get();
 
-        $deleteFolders = $temporaryFileponds->pluck('folder_name')->map(fn($folder) => $this->tmp_file_path . $folder)->toArray();
+        $deleteFolders = $temporaryFileponds->pluck('folder_name')->map(fn ($folder) => $this->tmp_file_path . $folder)->toArray();
 
         foreach ($deleteFolders as $folder) {
             if (Storage::files($folder)) {
@@ -306,7 +305,7 @@ class FilepondManager
 
         // delete empty folders
         $allFolders = Storage::directories($this->tmp_file_path);
-        $excludedFolders = TemporaryFilepond::all()->pluck('folder_name')->map(fn($folder) => $this->tmp_file_path . $folder)->toArray();
+        $excludedFolders = TemporaryFilepond::all()->pluck('folder_name')->map(fn ($folder) => $this->tmp_file_path . $folder)->toArray();
 
         $deleteFolders = array_values(array_diff($allFolders, $excludedFolders));
 

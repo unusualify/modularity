@@ -70,8 +70,6 @@ class ModularityActivator implements ActivatorInterface
 
     /**
      * Get the path of the file where statuses are stored
-     *
-     * @return string
      */
     public function getStatusesFilePath(): string
     {
@@ -79,7 +77,7 @@ class ModularityActivator implements ActivatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function reset(): void
     {
@@ -91,7 +89,7 @@ class ModularityActivator implements ActivatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function enable(Module $module): void
     {
@@ -99,7 +97,7 @@ class ModularityActivator implements ActivatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function disable(Module $module): void
     {
@@ -107,14 +105,14 @@ class ModularityActivator implements ActivatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function hasStatus(Module $module, bool $status): bool
     {
         // $statuses = $this->modulesStatuses;
         $statuses = $this->getModulesStatuses();
 
-        if (!isset($statuses[$module->getName()])) {
+        if (! isset($statuses[$module->getName()])) {
             return $status === false;
         }
 
@@ -122,7 +120,7 @@ class ModularityActivator implements ActivatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setActive(Module $module, bool $active): void
     {
@@ -130,7 +128,7 @@ class ModularityActivator implements ActivatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setActiveByName(string $name, bool $status): void
     {
@@ -140,14 +138,14 @@ class ModularityActivator implements ActivatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function delete(Module $module): void
     {
         // $statuses = $this->modulesStatuses;
         $statuses = $this->getModulesStatuses();
 
-        if (!isset($statuses[$module->getName()])) {
+        if (! isset($statuses[$module->getName()])) {
             return;
         }
 
@@ -156,7 +154,6 @@ class ModularityActivator implements ActivatorInterface
         $this->writeJson();
         $this->flushCache();
     }
-
 
     /**
      * Writes the activation statuses in a file, as json
@@ -168,12 +165,12 @@ class ModularityActivator implements ActivatorInterface
 
     /**
      * Reads the json file that contains the activation statuses.
-     * @return array
+     *
      * @throws FileNotFoundException
      */
     private function readJson(): array
     {
-        if (!$this->files->exists($this->statusesFile)) {
+        if (! $this->files->exists($this->statusesFile)) {
             return [];
         }
 
@@ -183,7 +180,7 @@ class ModularityActivator implements ActivatorInterface
     /**
      * Get modules statuses, either from the cache or from
      * the json statuses file if the cache is disabled.
-     * @return array
+     *
      * @throws FileNotFoundException
      */
     public function getModulesStatuses(): array
@@ -195,7 +192,7 @@ class ModularityActivator implements ActivatorInterface
         //     $this->cache->store($this->config->get('modules.cache.driver')),
         //     $this->cache->store($this->config->get('modules.cache.driver'))->get($this->cacheKey),
         //  );
-        if (!$this->config->get('modules.cache.enabled')) {
+        if (! $this->config->get('modules.cache.enabled')) {
             return $this->readJson();
         }
 
@@ -207,8 +204,6 @@ class ModularityActivator implements ActivatorInterface
     /**
      * Reads a config parameter under the 'activators.file' key
      *
-     * @param  string $key
-     * @param  $default
      * @return mixed
      */
     private function config(string $key, $default = null)

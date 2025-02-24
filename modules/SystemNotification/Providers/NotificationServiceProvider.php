@@ -2,8 +2,8 @@
 
 namespace Modules\SystemNotification\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\ServiceProvider;
 use Modules\SystemNotification\Events\ModelCreated;
 use Modules\SystemNotification\Events\ModelDeleted;
 use Modules\SystemNotification\Events\ModelForceDeleted;

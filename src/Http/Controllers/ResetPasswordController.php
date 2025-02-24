@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\View\Factory as ViewFactory;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
+use Unusualify\Modularity\Services\MessageStage;
 
 class ResetPasswordController extends Controller
 {

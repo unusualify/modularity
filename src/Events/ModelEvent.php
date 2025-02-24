@@ -3,9 +3,9 @@
 namespace Unusualify\Modularity\Events;
 
 use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Support\Str;
 
 abstract class ModelEvent
@@ -23,7 +23,6 @@ abstract class ModelEvent
      * @var string
      */
     public $broadcastService = 'reverb';
-
 
     /**
      * Create a new event instance.
@@ -50,7 +49,7 @@ abstract class ModelEvent
         return [
             // new PrivateChannel('models.'.$this->type.'.'.$this->model->id),
             // new PresenceChannel('models.'.$this->model->id),
-            new PrivateChannel('models.'. $this->model->id),
+            new PrivateChannel('models.' . $this->model->id),
             new Channel('model'),
         ];
     }

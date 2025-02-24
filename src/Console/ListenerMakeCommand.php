@@ -6,24 +6,24 @@ use Illuminate\Support\Str;
 use Nwidart\Modules\Support\Stub;
 use Symfony\Component\Finder\Finder;
 use Unusualify\Modularity\Facades\Modularity;
-use function Laravel\Prompts\{select, text, confirm};
+
+use function Laravel\Prompts\select;
+use function Laravel\Prompts\text;
 
 class ListenerMakeCommand extends BaseCommand
 {
-
     /**
-	 * The name and signature of the console command.
-	 *
-	 * @var string
-	 */
-	protected $signature = 'modularity:make:listener
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'modularity:make:listener
 		{name : The name of listener}
 		{module? : The name of module}
         {--self : Create a modularity listener}
         {--f|force : Overwrite existing file}
         {--should-handle-events-after-commit : Should the event handle events after commit}
         {--should-queue : Should the event be queued}';
-
 
     protected $aliases = [];
 
@@ -55,9 +55,9 @@ class ListenerMakeCommand extends BaseCommand
 
         $namespace = 'App\Listeners';
 
-        if($self){
+        if ($self) {
             $namespace = Modularity::getVendorNamespace('/src/Listeners');
-        }else if($moduleName) {
+        } elseif ($moduleName) {
             $module = Modularity::findOrFail($moduleName);
             $namespace = $module->getTargetClassNamespace('listener');
         }
@@ -75,20 +75,21 @@ class ListenerMakeCommand extends BaseCommand
         $traits = [];
         $eventParameter = '$event';
 
-        $events = collect(Finder::create()->files()->depth(0)->in($paths))->reduce(function($carry, $file) {
+        $events = collect(Finder::create()->files()->depth(0)->in($paths))->reduce(function ($carry, $file) {
             $content = get_file_string($file->getRealPath());
             $className = get_file_class($file->getRealPath());
 
-            if($className) {
+            if ($className) {
                 $reflector = new \ReflectionClass(get_file_class($file->getRealPath()));
-                if(!$reflector->isAbstract() && !$reflector->isInterface()) {
+                if (! $reflector->isAbstract() && ! $reflector->isInterface()) {
                     $carry[$className] = $file;
                 }
             }
+
             return $carry;
         }, collect());
 
-        if($events->count() > 0) {
+        if ($events->count() > 0) {
             $eventClass = select(
                 label: 'Select the event class',
                 options: $events->keys()->toArray(),
@@ -98,11 +99,11 @@ class ListenerMakeCommand extends BaseCommand
             $eventClassShortName = get_class_short_name($eventClass);
             $eventParameter = $eventClassShortName . ' $event';
             $namespaces[] = $eventClass;
-        }else{
+        } else {
             $this->warn('No event found');
         }
 
-        if($this->option('should-queue')) {
+        if ($this->option('should-queue')) {
             $implements[] = 'ShouldQueue';
             $namespaces[] = 'Illuminate\Contracts\Queue\ShouldQueue';
             $namespaces[] = 'Illuminate\Queue\InteractsWithQueue';
@@ -162,18 +163,18 @@ class ListenerMakeCommand extends BaseCommand
             );
         }
 
-        if($this->option('should-handle-events-after-commit')) {
+        if ($this->option('should-handle-events-after-commit')) {
             $implements[] = 'ShouldHandleEventsAfterCommit';
             $namespaces[] = 'Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit';
         }
 
-        if(count($implements) > 0) {
+        if (count($implements) > 0) {
             $className = $className . ' implements ' . implode(', ', $implements);
         }
 
         return (new Stub($this->getStubName(), [
             'NAMESPACE' => $namespace,
-            'NAMESPACES' => array_reduce($namespaces, function($carry, $namespace) {
+            'NAMESPACES' => array_reduce($namespaces, function ($carry, $namespace) {
                 return $carry . "use $namespace;\n";
             }, ''),
             'CLASS' => $className,
@@ -194,8 +195,8 @@ class ListenerMakeCommand extends BaseCommand
         $fileName = $this->getFileName() . '.php';
         $self = $this->option('self');
 
-        if (!$moduleName) {
-            if($self){
+        if (! $moduleName) {
+            if ($self) {
                 return Modularity::getVendorPath("/src/Listeners/{$fileName}");
             }
 
@@ -205,7 +206,6 @@ class ListenerMakeCommand extends BaseCommand
         $module = Modularity::findOrFail($moduleName);
 
         $targetClassPath = $module->getTargetClassPath('listener', $fileName);
-
 
         return $targetClassPath;
     }

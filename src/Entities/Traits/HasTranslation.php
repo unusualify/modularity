@@ -14,12 +14,12 @@ trait HasTranslation
 
     public static function bootHasTranslation(): void
     {
-        if(in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(static::class))){
+        if (in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(static::class))) {
             static::forceDeleting(function (Model $model) {
                 /* @var Translatable $model */
                 return $model->deleteTranslations();
             });
-        }else{
+        } else {
             static::deleting(function (Model $model) {
                 /* @var Translatable $model */
                 return $model->deleteTranslations();
@@ -27,6 +27,7 @@ trait HasTranslation
         }
 
     }
+
     /**
      * Returns the fully qualified translation class name for this model.
      *

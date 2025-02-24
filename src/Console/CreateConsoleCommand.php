@@ -73,7 +73,6 @@ class CreateConsoleCommand extends BaseCommand
             'DESCRIPTION' => $description,
         ];
 
-
         $content = (new Stub('/scaffold/command.stub', $replacements))->render();
 
         $path = get_modularity_vendor_path('src/Console/' . $studlyName . 'Command.php');

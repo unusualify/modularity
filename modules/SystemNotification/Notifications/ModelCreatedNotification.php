@@ -3,9 +3,9 @@
 namespace Modules\SystemNotification\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
@@ -39,9 +39,9 @@ class ModelCreatedNotification extends Notification implements ShouldQueue
         $moduleRouteModelName = get_class_short_name($this->model);
         $moduleRouteHeadline = Str::headline($moduleRouteModelName);
 
-        if(method_exists($this->model, 'getTitleValue')) {
+        if (method_exists($this->model, 'getTitleValue')) {
             $titleField = $this->model->getTitleValue();
-        }else{
+        } else {
             $titleField = $this->model->name
                 ?? $this->model->title
                 ?? $this->model->slug

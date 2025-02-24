@@ -10,7 +10,6 @@ use Unusualify\Modularity\Entities\User;
 
 class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 {
-
     public function boot()
     {
         Telescope::auth(function ($request) {

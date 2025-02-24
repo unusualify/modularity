@@ -3,7 +3,6 @@
 namespace Unusualify\Modularity\Services;
 
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 
 /**
@@ -29,13 +28,14 @@ use Illuminate\Broadcasting\PrivateChannel;
 class BroadcastManager
 {
     protected $model;
+
     protected $eventClasses = [];
 
     /**
      * Constructor.
      *
-     * @param mixed $model         The model instance.
-     * @param array $eventClasses  The list of event class names to extract broadcasting info from.
+     * @param mixed $model The model instance.
+     * @param array $eventClasses The list of event class names to extract broadcasting info from.
      */
     public function __construct($model, array $eventClasses = [])
     {
@@ -67,12 +67,12 @@ class BroadcastManager
                     // Both PrivateChannel and Channel have a public "name" property.
                     $channelName = (is_object($channel) && property_exists($channel, 'name'))
                         ? $channel->name
-                        : (string)$channel;
+                        : (string) $channel;
                     // Determine channel type by instance.
                     $channelType = ($channel instanceof PrivateChannel) ? 'private' : 'public';
 
                     // Group events by channel name.
-                    if (!isset($channelEvents[$channelName])) {
+                    if (! isset($channelEvents[$channelName])) {
                         $channelEvents[$channelName] = [
                             'type' => $channelType,
                             'events' => [],
@@ -88,8 +88,8 @@ class BroadcastManager
         $config = [];
         foreach ($channelEvents as $channelName => $details) {
             $config[] = [
-                'name'   => $channelName,
-                'type'   => $details['type'],
+                'name' => $channelName,
+                'type' => $details['type'],
                 'events' => $details['events'],
             ];
         }
@@ -100,14 +100,13 @@ class BroadcastManager
     /**
      * A static helper method to obtain the broadcast configuration for a given model.
      *
-     * @param mixed $model         The model instance.
-     * @param array $eventClasses  An array of event class names.
-     *
-     * @return array
+     * @param mixed $model The model instance.
+     * @param array $eventClasses An array of event class names.
      */
     public static function forModel($model, array $eventClasses = []): array
     {
         $instance = new static($model, $eventClasses);
+
         return $instance->getBroadcastConfiguration();
     }
 }

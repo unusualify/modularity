@@ -4,9 +4,7 @@ namespace Unusualify\Modularity\Console;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Symfony\Component\Console\Input\InputArgument;
 // use Illuminate\Console\Command as Console;
-use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Exceptions\ModularitySystemPathException;
 use Unusualify\Modularity\Facades\Modularity;
 

@@ -8,12 +8,12 @@ class FilepondFlushCommand extends BaseCommand
 {
     protected $hidden = true;
 
-    	/**
-	 * The name and signature of the console command.
-	 *
-	 * @var string
-	 */
-	protected $signature = 'modularity:filepond:flush
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'modularity:filepond:flush
         {days=7 : The number of days to keep temporary fileponds}
     ';
 

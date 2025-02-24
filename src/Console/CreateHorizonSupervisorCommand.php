@@ -5,17 +5,19 @@ namespace Unusualify\Modularity\Console;
 use Illuminate\Support\Facades\File;
 use Nwidart\Modules\Support\Stub;
 
-use function Laravel\Prompts\{confirm, text};
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\text;
+
 class CreateHorizonSupervisorCommand extends BaseCommand
 {
     protected $hidden = true;
 
-    	/**
-	 * The name and signature of the console command.
-	 *
-	 * @var string
-	 */
-	protected $signature = 'modularity:create:horizon:supervisor';
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'modularity:create:horizon:supervisor';
 
     protected $aliases = [];
 
@@ -52,17 +54,18 @@ class CreateHorizonSupervisorCommand extends BaseCommand
 
             $this->info("Detected operating system: $os");
 
-            if (strtoupper(substr($os, 0, 3)) === 'WIN') {
+            if (mb_strtoupper(mb_substr($os, 0, 3)) === 'WIN') {
                 $this->error('Supervisor is not supported on Windows systems.');
+
                 return 1;
             }
 
             $installCommand = '';
-            if (strpos($os, 'Darwin') !== false) {
+            if (str_contains($os, 'Darwin')) {
                 // macOS
                 $this->info('For macOS, install supervisor via Homebrew:');
                 $this->line('brew install supervisor');
-            } elseif (strpos($os, 'Linux') !== false) {
+            } elseif (str_contains($os, 'Linux')) {
                 // Check Linux distribution
                 $distro = '';
                 if (file_exists('/etc/os-release')) {
@@ -72,12 +75,13 @@ class CreateHorizonSupervisorCommand extends BaseCommand
                     }
                 }
 
-                switch(strtolower($distro)) {
+                switch (mb_strtolower($distro)) {
                     case 'ubuntu':
                     case 'debian':
                         $this->info('For Ubuntu/Debian, run:');
                         $this->line('sudo apt-get update');
                         $this->line('sudo apt-get install supervisor');
+
                         break;
                     case 'centos':
                     case 'rhel':
@@ -85,9 +89,11 @@ class CreateHorizonSupervisorCommand extends BaseCommand
                         $this->info('For CentOS/RHEL/Fedora, run:');
                         $this->line('sudo yum install epel-release');
                         $this->line('sudo yum install supervisor');
+
                         break;
                     default:
                         $this->info('Please install supervisor using your distribution\'s package manager');
+
                         break;
                 }
             }
@@ -95,19 +101,19 @@ class CreateHorizonSupervisorCommand extends BaseCommand
 
         // Find supervisor configuration path based on OS
         $supervisorConfigPath = '';
-        if (strpos($os, 'Darwin') !== false) {
+        if (str_contains($os, 'Darwin')) {
             // macOS supervisor config locations
             $possiblePaths = [
                 '/usr/local/etc/supervisor/conf.d',
                 '/usr/local/etc/supervisor.d',
-                '/opt/homebrew/etc/supervisor.d'
+                '/opt/homebrew/etc/supervisor.d',
             ];
         } else {
             // Linux supervisor config locations
             $possiblePaths = [
                 '/etc/supervisor/conf.d',
                 '/etc/supervisord.d',
-                '/etc/supervisord/conf.d'
+                '/etc/supervisord/conf.d',
             ];
         }
 
@@ -115,6 +121,7 @@ class CreateHorizonSupervisorCommand extends BaseCommand
         foreach ($possiblePaths as $path) {
             if (is_dir($path) && is_writable($path)) {
                 $supervisorConfigPath = $path;
+
                 break;
             }
         }
@@ -125,6 +132,7 @@ class CreateHorizonSupervisorCommand extends BaseCommand
             foreach ($possiblePaths as $path) {
                 $this->line('- ' . $path);
             }
+
             return 1;
         }
 
@@ -138,8 +146,9 @@ class CreateHorizonSupervisorCommand extends BaseCommand
         // Check if a process with appName already exists
         $existingProcesses = shell_exec('sudo supervisorctl status');
         if ($existingProcesses && str_contains($existingProcesses, $appName)) {
-            if (!confirm("A supervisor process containing '{$appName}' already exists. Do you want to continue?", default: false)) {
+            if (! confirm("A supervisor process containing '{$appName}' already exists. Do you want to continue?", default: false)) {
                 $this->info('Operation cancelled by user.');
+
                 return 1;
             }
         }
@@ -160,21 +169,18 @@ class CreateHorizonSupervisorCommand extends BaseCommand
         $this->line('sudo supervisorctl start ' . $programName);
         $path = concatenate_path($supervisorConfigPath, $programName . '-horizon.conf');
 
-        if(confirm('Do you want to see supervisor config content to create?', default: true)) {
+        if (confirm('Do you want to see supervisor config content to create?', default: true)) {
             $this->line($content);
         }
 
-        if(confirm('Do you want to create supervisor config file at ' . $path . '?', default: true)) {
+        if (confirm('Do you want to create supervisor config file at ' . $path . '?', default: true)) {
             File::put($path, $content);
             $this->info("Supervisor config file created successfully: {$path}");
-        }else{
-            $this->info("Supervisor config file not created");
+        } else {
+            $this->info('Supervisor config file not created');
 
             return 1;
         }
-
-
-
 
         return 0;
     }

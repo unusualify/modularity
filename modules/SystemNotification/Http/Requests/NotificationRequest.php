@@ -14,7 +14,7 @@ class NotificationRequest extends Request
     public function rulesForAll()
     {
         return [
-		];
+        ];
     }
 
     /**

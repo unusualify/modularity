@@ -2,16 +2,12 @@
 
 namespace Modules\SystemNotification\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Unusualify\Modularity\Events\ModelEvent;
-use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class ModelUpdated extends ModelEvent implements ShouldDispatchAfterCommit
 {
@@ -38,6 +34,4 @@ class ModelUpdated extends ModelEvent implements ShouldDispatchAfterCommit
     {
         parent::__construct($model);
     }
-
-
 }

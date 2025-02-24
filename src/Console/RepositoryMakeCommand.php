@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Nwidart\Modules\Support\Stub;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularity\Facades\Modularity;
 
 class RepositoryMakeCommand extends BaseCommand
@@ -71,7 +69,7 @@ class RepositoryMakeCommand extends BaseCommand
 
         foreach ($this->responses as $trait => $response) {
             if ($response) {
-                if(in_array($trait, $isSingularExceptionTraits) && $this->getTraitResponse('addSingular')){
+                if (in_array($trait, $isSingularExceptionTraits) && $this->getTraitResponse('addSingular')) {
                     $this->responses[$trait] = false;
                 }
             }

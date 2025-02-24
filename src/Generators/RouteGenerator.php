@@ -595,8 +595,6 @@ class RouteGenerator extends Generator
 
     /**
      * Get traits.
-     *
-     * @return Collection
      */
     public function getTraits(): Collection
     {
@@ -867,7 +865,7 @@ class RouteGenerator extends Generator
                 'module' => $this->module->getStudlyName(),
             ]
             + ($this->rules ? ['--rules' => $this->rules] : []));
-            }
+        }
 
         // add resource
         if ($this->generatorConfig('route-resource')->generate()) {
@@ -932,7 +930,7 @@ class RouteGenerator extends Generator
             $config['name'] = $config['name'] ?? $studlyName;
             $config['system_prefix'] = $config['system_prefix'] ?? $config['base_prefix'] ?? false;
             $config['headline'] = $config['headline'] ?? pluralize($headline);
-            if($this->module->isModularityModule()){
+            if ($this->module->isModularityModule()) {
                 $config['group'] = 'system';
                 $config['system_prefix'] = true;
             }

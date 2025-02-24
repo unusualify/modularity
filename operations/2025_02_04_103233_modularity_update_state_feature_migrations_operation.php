@@ -9,6 +9,7 @@ use TimoKoerber\LaravelOneTimeOperations\OneTimeOperation;
 use Unusualify\Modularity\Facades\Modularity;
 
 use function Laravel\Prompts\confirm;
+
 return new class extends OneTimeOperation
 {
     use InteractsWithIO;
@@ -42,7 +43,6 @@ return new class extends OneTimeOperation
         $stateTranslationsTable = Modularity::config('tables.state_translations', 'modularity_state_translations');
         $stateablesTable = Modularity::config('tables.stateables', 'modularity_stateables');
 
-
         // 2024_10_22_093259_create_stateables_table.php
         // 2024_10_22_093258_create_states_table.php
         DB::table('migrations')
@@ -60,7 +60,7 @@ return new class extends OneTimeOperation
             $stateTranslationsTableExists = Schema::hasTable('state_translations');
             $stateablesTableExists = Schema::hasTable('stateables');
 
-            if($stateTableExists && $stateTranslationsTableExists && $stateablesTableExists && confirm('Do you want to rename the states, state_translations and stateables tables to ' . $stateTable . ', ' . $stateTranslationsTable . ' and ' . $stateablesTable . '?')) {
+            if ($stateTableExists && $stateTranslationsTableExists && $stateablesTableExists && confirm('Do you want to rename the states, state_translations and stateables tables to ' . $stateTable . ', ' . $stateTranslationsTable . ' and ' . $stateablesTable . '?')) {
 
                 Schema::rename('states', $stateTable);
                 Schema::rename('state_translations', $stateTranslationsTable);
@@ -75,24 +75,24 @@ return new class extends OneTimeOperation
                     '--path' => Modularity::getVendorPath('database/migrations/default/2024_10_22_093258_create_modularity_stateable_tables.php'),
                 ]);
 
-                $this->info("\t" . $stateTable . " migrations created");
+                $this->info("\t" . $stateTable . ' migrations created');
             }
         }
 
         if (Schema::hasTable($stateTranslationsTable)) {
             try {
-                Schema::table($stateTranslationsTable, function($table) use ($stateTable, $stateTranslationsTable) {
+                Schema::table($stateTranslationsTable, function ($table) use ($stateTable, $stateTranslationsTable) {
                     // Get the current foreign key reference table
-                    $currentForeignKey = DB::select("
+                    $currentForeignKey = DB::select('
                         SELECT REFERENCED_TABLE_NAME
                         FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
                         WHERE TABLE_NAME = ?
                         AND CONSTRAINT_NAME = ?
-                        AND TABLE_SCHEMA = ?",
+                        AND TABLE_SCHEMA = ?',
                         [$stateTranslationsTable, 'fk_state_translations_state_id', DB::getDatabaseName()]
                     );
                     // Only update if the foreign key points to a different table
-                    if (!empty($currentForeignKey) && $currentForeignKey[0]->REFERENCED_TABLE_NAME !== $stateTable) {
+                    if (! empty($currentForeignKey) && $currentForeignKey[0]->REFERENCED_TABLE_NAME !== $stateTable) {
                         $table->dropForeign('fk_state_translations_state_id');
                         $table->foreign('state_id', 'fk_state_translations_state_id')
                             ->references('id')
@@ -101,7 +101,7 @@ return new class extends OneTimeOperation
                     }
                 });
             } catch (\Exception $e) {
-                $this->error("Could not update foreign key: " . $e->getMessage());
+                $this->error('Could not update foreign key: ' . $e->getMessage());
             }
         }
 

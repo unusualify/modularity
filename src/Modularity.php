@@ -106,12 +106,8 @@ class Modularity extends FileRepository
         return $this->formatCached($this->getCached());
     }
 
-        /**
+    /**
      * Get modules by status.
-     *
-     * @param $status
-     *
-     * @return array
      */
     public function getByStatus($status): array
     {
@@ -119,7 +115,7 @@ class Modularity extends FileRepository
 
         /** @var Module $module */
         foreach ($this->all() as $name => $module) {
-            if($this->activator->hasStatus($module, $status)){
+            if ($this->activator->hasStatus($module, $status)) {
                 $modules[$name] = $module;
             }
             // if ($module->isStatus($status)) {
@@ -157,6 +153,7 @@ class Modularity extends FileRepository
 
         if ($resetCache) {
             dd($modules);
+
             return $this->scan();
         }
 
@@ -284,7 +281,7 @@ class Modularity extends FileRepository
 
     public function setSystemModulesPath()
     {
-        if($this->isProduction()){
+        if ($this->isProduction()) {
             throw new ModularitySystemPathException;
         }
 
@@ -368,8 +365,6 @@ class Modularity extends FileRepository
 
     /**
      * Get list of enabled modules.
-     *
-     * @return array
      */
     public function allEnabled(): array
     {

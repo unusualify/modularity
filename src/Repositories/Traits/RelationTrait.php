@@ -411,22 +411,23 @@ trait RelationTrait
                 if (isset($curr['schema'])) {
                     $routeCamelCase = camelCase($this->routeName());
                     // dd($curr);
-                    $acc["{$routeCamelCase}able"] = Arr::map(array_reverse($curr['schema']), function ($item) use ($routeCamelCase) {
+                    $acc["{$routeCamelCase}able"] = Arr::map(array_reverse($curr['schema']), function ($item) {
                         $repository = null;
-                        if(!isset($item['repository'])){
-                            if(isset($item['connector'])){
+                        if (! isset($item['repository'])) {
+                            if (isset($item['connector'])) {
                                 $parsedConnector = find_module_and_route($item['connector']);
                                 $repository = Modularity::find($parsedConnector['module'])->getRepository($parsedConnector['route']);
-                            }else{
-                                throw new \Exception('Repository or connector not found on morphTo input: '.$item['name']);
+                            } else {
+                                throw new \Exception('Repository or connector not found on morphTo input: ' . $item['name']);
                             }
                         } else {
-                            if(class_exists($item['repository'])){
+                            if (class_exists($item['repository'])) {
                                 $repository = App::make($item['repository']);
-                            }else{
-                                throw new \Exception('Repository not found on morphTo input: '.$item['name']);
+                            } else {
+                                throw new \Exception('Repository not found on morphTo input: ' . $item['name']);
                             }
                         }
+
                         return [
                             'name' => $item['name'],
                             'repository' => $repository::class,

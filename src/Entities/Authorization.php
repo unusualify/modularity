@@ -6,19 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Authorization extends Model
 {
-
     /**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array<int, string>
-	 */
-	protected $fillable = [
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
         'id',
         'authorized_id',
         'authorized_type',
         'authorizable_id',
         'authorizable_type',
-	];
+    ];
 
     public function authorized()
     {
@@ -34,5 +33,4 @@ class Authorization extends Model
     {
         return modularityConfig('tables.authorizations', 'modularity_authorizations');
     }
-
 }

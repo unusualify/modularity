@@ -17,7 +17,6 @@ class CreateNotificationsTable extends Migration
             createDefaultExtraTableFields($table);
         });
 
-        
     }
 
     public function down()

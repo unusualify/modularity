@@ -3,9 +3,6 @@
 namespace Modules\SystemNotification\Listeners;
 
 use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Notification;
 use Unusualify\Modularity\Listeners\Listener;
 
 class ModelListener extends Listener implements ShouldHandleEventsAfterCommit
@@ -20,7 +17,7 @@ class ModelListener extends Listener implements ShouldHandleEventsAfterCommit
         parent::__construct();
     }
 
-    public function handle($event, ): void
+    public function handle($event): void
     {
         parent::handle($event);
     }

@@ -24,7 +24,7 @@ class MigrationHelpersTest extends TestCase
             'published',
             'deleted_at',
             'created_at',
-            'updated_at'
+            'updated_at',
         ]));
 
         $columns = Schema::getColumns('product_extras');
@@ -48,7 +48,7 @@ class MigrationHelpersTest extends TestCase
             'publish_end_date',
             'deleted_at',
             'created_at',
-            'updated_at'
+            'updated_at',
         ]));
 
         $columns = Schema::getColumns('product_extras');
@@ -76,7 +76,7 @@ class MigrationHelpersTest extends TestCase
             'public',
             'deleted_at',
             'created_at',
-            'updated_at'
+            'updated_at',
         ]));
 
         $columns = Schema::getColumns('product_extras');
@@ -99,7 +99,7 @@ class MigrationHelpersTest extends TestCase
         $this->assertTrue(Schema::hasColumns('product_extras', [
             'published',
             'created_at',
-            'updated_at'
+            'updated_at',
         ]));
     }
 
@@ -122,6 +122,7 @@ class MigrationHelpersTest extends TestCase
         $this->assertEquals('datetime', collect($columns)->firstWhere('name', 'updated_at')['type']);
         $this->assertEquals('datetime', collect($columns)->firstWhere('name', 'deleted_at')['type']);
     }
+
     /**
      * @test
      */
@@ -138,7 +139,7 @@ class MigrationHelpersTest extends TestCase
             'created_at',
             'updated_at',
             'locale',
-            'active'
+            'active',
         ]));
     }
 
@@ -158,7 +159,7 @@ class MigrationHelpersTest extends TestCase
             'created_at',
             'updated_at',
             'locale',
-            'active'
+            'active',
         ]));
     }
 
@@ -275,7 +276,7 @@ class MigrationHelpersTest extends TestCase
 
         $this->assertTrue(Schema::hasColumns('product_category', [
             'product_id',
-            'category_id'
+            'category_id',
         ]));
     }
 
@@ -296,7 +297,7 @@ class MigrationHelpersTest extends TestCase
 
         $this->assertTrue(Schema::hasColumns('product_category', [
             'product_id',
-            'category_id'
+            'category_id',
         ]));
     }
 
@@ -341,7 +342,7 @@ class MigrationHelpersTest extends TestCase
         $this->assertCount(2, $foreignKeys);
 
         // Sort foreign keys by local column name to ensure consistent testing order
-        usort($foreignKeys, function($a, $b) {
+        usort($foreignKeys, function ($a, $b) {
             return strcmp($a->getLocalColumns()[0], $b->getLocalColumns()[0]);
         });
 

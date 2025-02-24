@@ -168,9 +168,9 @@ abstract class Repository
     {
         $query = $this->model->query();
 
-        if(classHasTrait($this->model, 'Illuminate\Database\Eloquent\SoftDeletes')){
+        if (classHasTrait($this->model, 'Illuminate\Database\Eloquent\SoftDeletes')) {
             return $query->withTrashed()->with($this->formatWiths($query, $with))->withCount($withCount)->findOrFail($id);
-        }else{
+        } else {
             return $query->with($this->formatWiths($query, $with))->withCount($withCount)->findOrFail($id);
         }
     }
@@ -244,7 +244,6 @@ abstract class Repository
         $tableColumns = $this->getModel()->getColumns();
         $translatedColumns = [];
 
-
         if (method_exists($this->getModel(), 'isTranslatable') && $this->model->isTranslatable()) {
             $query = $query->withTranslation();
             $translatedAttributes = $this->getTranslatedAttributes();
@@ -254,23 +253,22 @@ abstract class Repository
             $translatedColumns = array_values(array_intersect($oldColumns, $translatedAttributes));
             $absentColumns = array_diff($defaultColumns, $tableColumns);
 
-            if(in_array('name', $absentColumns)){
+            if (in_array('name', $absentColumns)) {
                 $titleColumnKey = $this->getModel()->getRouteTitleColumnKey();
-                if(in_array($titleColumnKey, $translatedAttributes)){
-                    $columns = array_filter($columns, fn($col) => $col !== 'name');
+                if (in_array($titleColumnKey, $translatedAttributes)) {
+                    $columns = array_filter($columns, fn ($col) => $col !== 'name');
                     $translatedColumns[] = $titleColumnKey;
-                }else{
-                    $columns = array_filter($columns, fn($col) => $col !== 'name');
+                } else {
+                    $columns = array_filter($columns, fn ($col) => $col !== 'name');
                     $columns[] = "{$this->getModel()->getRouteTitleColumnKey()} as name";
                 }
             }
-
-
 
         }
 
         $relationships = collect($with)->map(function ($r) {
             $r = explode('.', $r)[0];
+
             return $r;
         })->toArray();
 
@@ -287,13 +285,14 @@ abstract class Repository
         // dd($columns, $appends, $with, $columns, $translatedColumns);
 
         try {
-            //code...
+            // code...
             return $query->get($columns)->map(fn ($item) => [
                 ...collect($appends)->mapWithKeys(function ($append) use ($item) {
                     return [$append => $item->{$append}];
                 })->toArray(),
                 ...collect($with)->mapWithKeys(function ($r) use ($item) {
                     $r = explode('.', $r)[0];
+
                     return [$r => $item->{$r}];
                 })->toArray(),
                 ...(collect($columns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
@@ -439,9 +438,9 @@ abstract class Repository
         DB::transaction(function () use ($id, $fields) {
             LogBatch::startBatch();
 
-            if(classHasTrait($this->model, 'Unusualify\Modularity\Entities\Traits\IsSingular')){
+            if (classHasTrait($this->model, 'Unusualify\Modularity\Entities\Traits\IsSingular')) {
                 $object = $this->model->single();
-            }else{
+            } else {
                 $object = $this->model->findOrFail($id);
             }
 

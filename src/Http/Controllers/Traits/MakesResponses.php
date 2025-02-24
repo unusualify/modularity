@@ -28,9 +28,9 @@ trait MakesResponses
                     $params[$this->nestedParentName] ??= $this->nestedParentId;
                 }
 
-                if($this->module->isSingleton($this->routeName)){
+                if ($this->module->isSingleton($this->routeName)) {
                     $back_link = $this->module->getRouteActionUri($this->routeName, 'show', $params, true);
-                }else{
+                } else {
                     $back_link = $this->request->headers->get('referer') ?? moduleRoute(
                         $this->routeName,
                         $this->routePrefix,

@@ -2,13 +2,14 @@
 
 namespace Unusualify\Modularity\Listeners;
 
-use Symfony\Component\Finder\Finder;
 use Illuminate\Support\Facades\Notification;
+use Symfony\Component\Finder\Finder;
 use Unusualify\Modularity\Facades\Modularity;
 
 abstract class Listener
 {
     protected $mailEnabled = false;
+
     /**
      * Notification paths
      */
@@ -25,7 +26,6 @@ abstract class Listener
 
         $this->addNotificationPath(Modularity::find('SystemNotification')->getDirectoryPath('Notifications'));
     }
-
 
     /**
      * Add notification path
@@ -54,12 +54,12 @@ abstract class Listener
 
         foreach ($this->notificationPaths as $path) {
 
-            if (!is_dir($path)) {
+            if (! is_dir($path)) {
                 continue;
             }
 
             // Find all PHP files in the directory
-            $finder = new Finder();
+            $finder = new Finder;
             $finder->files()->in($path)->name('*.php');
 
             foreach ($finder as $file) {
@@ -88,7 +88,6 @@ abstract class Listener
                     ->notifyNow(new $notificationClass($event->model, $event->serializedData));
             }
         }
-
 
         // $event->model->notify(new ModelCreatedNotification());
 

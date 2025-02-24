@@ -31,7 +31,7 @@ trait ModelHelpers
      */
     public static function bootModelHelpers()
     {
-        if(!auth()->check()) {
+        if (! auth()->check()) {
             activity()->disableLogging();
         }
 
@@ -46,7 +46,7 @@ trait ModelHelpers
                         foreach ($translation->getDirty() as $key => $value) {
                             if (in_array($key, $model->getTranslatedAttributes())) {
                                 $prev = data_get($model->oldTranslations, $translation->locale, []);
-                                data_set($prev, $key , $translation->getOriginal($key));
+                                data_set($prev, $key, $translation->getOriginal($key));
                                 data_set($model->oldTranslations, $translation->locale, $prev);
                                 // $model->setAttribute("original_{$key}", $translation->getOriginal($key));
                             }
@@ -59,9 +59,9 @@ trait ModelHelpers
         static::saved(function ($model) {
             // dd($model->oldTranslations);
             try {
-                //code...
+                // code...
             } catch (\Throwable $th) {
-                //throw $th;
+                // throw $th;
             }
             if (method_exists($model, 'isTranslatable') && $model->isTranslatable()) {
                 $changes = [];
@@ -77,7 +77,7 @@ trait ModelHelpers
                     }
                 });
 
-                if (!empty($changes)) {
+                if (! empty($changes)) {
                     $translatedAttributes = $model->getTranslatedAttributes();
                     $foreignKey = $model->getForeignKey();
                     $batchUuid = LogBatch::getUuid(); // save batch id to retrieve activities later
@@ -87,20 +87,20 @@ trait ModelHelpers
                         'old' => $oldValues,
                     ];
 
-                    if($batchUuid) {
+                    if ($batchUuid) {
                         $batchActivityModel = Activity::forBatch($batchUuid)
                             ->where('subject_type', static::class)
                             ->where('subject_id', $model->id)
                             ->first();
 
                         // dd($attributesToBeLogged);
-                        if($batchActivityModel) {
+                        if ($batchActivityModel) {
                             $batchActivityModel->update(
                                 [
-                                    'properties' => array_merge_recursive_preserve($batchActivityModel->properties, $properties)
+                                    'properties' => array_merge_recursive_preserve($batchActivityModel->properties, $properties),
                                 ]
                             );
-                        }else{
+                        } else {
                             activity()
                                 ->event('saved')
                                 ->performedOn($model)
@@ -113,7 +113,6 @@ trait ModelHelpers
             }
         });
     }
-
 
     /**
      * Checks if this model is soft deletable.
@@ -184,19 +183,20 @@ trait ModelHelpers
     public function getActivitylogOptions(): LogOptions
     {
 
-        if(isset($this->baseModuleModel)) {
+        if (isset($this->baseModuleModel)) {
             $baseModuleClass = new $this->baseModuleModel;
 
-            if($baseModuleClass && $baseModuleClass->isTranslatable()) {
+            if ($baseModuleClass && $baseModuleClass->isTranslatable()) {
                 $this->disableLogging();
+
                 return LogOptions::defaults()->dontSubmitEmptyLogs();
 
-                if(false){
+                if (false) {
                     $translatedAttributes = $baseModuleClass->translatedAttributes;
                     $parentForeignKey = $baseModuleClass->getForeignKey();
                     $batchUuid = LogBatch::getUuid(); // save batch id to retrieve activities later
 
-                    if($batchUuid) {
+                    if ($batchUuid) {
                         $batchActivity = Activity::forBatch($batchUuid)
                             ->where('subject_type', $this->baseModuleModel)
                             ->where('subject_id', $this->{$parentForeignKey})
@@ -205,19 +205,19 @@ trait ModelHelpers
                         $dirty = $this->getDirty();
                         $previousAttributes = $this->getOriginal();
                         $attributesToBeLogged = [];
-                        foreach($dirty as $key => $value) {
-                            if(in_array($key, $translatedAttributes)) {
+                        foreach ($dirty as $key => $value) {
+                            if (in_array($key, $translatedAttributes)) {
                                 $attributesToBeLogged[$key] = $previousAttributes[$key];
                             }
                         }
                         // dd($attributesToBeLogged);
-                        if($batchActivity) {
+                        if ($batchActivity) {
                             $batchActivity->update(
                                 [
-                                    'properties' => array_merge_recursive_preserve($batchActivity->properties, $this->attributesToBeLogged())
+                                    'properties' => array_merge_recursive_preserve($batchActivity->properties, $this->attributesToBeLogged()),
                                 ]
                             );
-                        }else{
+                        } else {
 
                             app(ActivityLogger::class)
                                 ->useLog('default')
@@ -232,7 +232,6 @@ trait ModelHelpers
                     }
                 }
             }
-
 
         }
 
@@ -255,11 +254,10 @@ trait ModelHelpers
             // ->dontLogIfAttributesChangedOnly(['text'])
             ->logFillable()
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
-            ;
+            ->dontSubmitEmptyLogs();
     }
 
-    public function lastActivities() : \Illuminate\Database\Eloquent\Relations\MorphMany
+    public function lastActivities(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->activities()
             ->with('causer')
@@ -274,8 +272,6 @@ trait ModelHelpers
 
     /**
      * Get the relationships that should be eager loaded by default
-     *
-     * @return array
      */
     public function getWith(): array
     {

@@ -2,8 +2,6 @@
 
 namespace Unusualify\Modularity\Providers;
 
-use Illuminate\Auth\Notifications\ResetPassword;
-
 class ModularityProvider extends ServiceProvider
 {
     protected $providers = [

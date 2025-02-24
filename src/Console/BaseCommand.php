@@ -2,13 +2,12 @@
 
 namespace Unusualify\Modularity\Console;
 
+use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Console\Command;
 use Nwidart\Modules\Exceptions\FileAlreadyExistException;
 use Nwidart\Modules\Generators\FileGenerator;
 use Nwidart\Modules\Support\Stub;
-use Nwidart\Modules\Traits\ModuleCommandTrait;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Support\Decomposers\SchemaParser;
 use Unusualify\Modularity\Traits\ManageNames;
@@ -52,7 +51,7 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
      */
     public function __construct()
     {
-        if($this->signature && $this->useTraitOptions){
+        if ($this->signature && $this->useTraitOptions) {
             $this->signature .= ' ' . modularityTraitOptions(asSignature: true);
         }
 
@@ -89,7 +88,7 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
     public function handle(): int
     {
 
-        if($this->checkSelfOption() === E_ERROR){
+        if ($this->checkSelfOption() === E_ERROR) {
             return E_ERROR;
         }
 
@@ -142,8 +141,6 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
 
     /**
      * Get default namespace.
-     *
-     * @return string
      */
     public function getDefaultNamespace(): string
     {
@@ -154,7 +151,6 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
      * Get class namespace.
      *
      * @param \Nwidart\Modules\Module $module
-     *
      * @return string
      */
     public function getClassNamespace($module)
@@ -217,8 +213,9 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
 
     protected function checkSelfOption()
     {
-        if( $this->hasOption('self') && $this->option('self') && Modularity::isProduction()){
+        if ($this->hasOption('self') && $this->option('self') && Modularity::isProduction()) {
             $this->components->error('Self option is not available in production.');
+
             return E_ERROR;
         }
 
@@ -234,7 +231,7 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
     {
         $module = $this->argument('module') ?: null;
 
-        if(!$module) {
+        if (! $module) {
             return null;
         }
 

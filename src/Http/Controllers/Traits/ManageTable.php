@@ -361,7 +361,7 @@ trait ManageTable
                 'color' => 'grey-darken-2',
                 'show' => 'last_activities',
                 'conditions' => [
-                    ['last_activities', '>', 0]
+                    ['last_activities', '>', 0],
                 ],
                 'title' => 'Last Operations',
                 'only' => [

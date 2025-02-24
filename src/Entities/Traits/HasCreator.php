@@ -17,14 +17,14 @@ trait HasCreator
     protected static function bootHasCreator()
     {
         static::created(function ($model) {
-            if(Auth::check()){
+            if (Auth::check()) {
                 $guard = Auth::guard();
 
-                if($model->isCustomCreatorSaving){
+                if ($model->isCustomCreatorSaving) {
                     $model->creatorRecord()->create($model->customHasCreatorFields);
                     $model->isCustomCreatorSaving = false;
                     $model->customHasCreatorFields = [];
-                }else{
+                } else {
                     $model->creatorRecord()->create([
                         'creator_id' => $guard->id(), // creator user id
                         'creator_type' => $guard->getProvider()->getModel(), // creator model
@@ -36,7 +36,7 @@ trait HasCreator
         });
 
         static::saving(function ($model) {
-            if(Auth::check() && $model->custom_creator_id){
+            if (Auth::check() && $model->custom_creator_id) {
                 $guard = Auth::guard();
                 $model->isCustomCreatorSaving = true;
                 $model->customHasCreatorFields = [
@@ -46,18 +46,18 @@ trait HasCreator
                 ];
             }
 
-            foreach(static::$hasCreatorFillable as $field){
+            foreach (static::$hasCreatorFillable as $field) {
                 $model->offsetUnset($field);
             }
         });
 
-        if(in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(static::class))){
+        if (in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(static::class))) {
             // Add deleted event handler
             static::forceDeleting(function ($model) {
                 // This will automatically delete the associated authorized record
                 $model->creatorRecord()->delete();
             });
-        }else{
+        } else {
             // Add deleted event handler
             static::deleting(function ($model) {
                 // This will automatically delete the associated authorized record
@@ -65,9 +65,7 @@ trait HasCreator
             });
         }
 
-
     }
-
 
     public function creatorRecord(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
@@ -77,7 +75,7 @@ trait HasCreator
         );
     }
 
-    public function creator() : \Illuminate\Database\Eloquent\Relations\HasOneThrough
+    public function creator(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
         return $this->hasOneThrough(
             $this->getCreatorModel(),
@@ -104,7 +102,7 @@ trait HasCreator
         try {
             return $this->creatorRecord()->exists() ? $this->creatorRecord->creator_type : static::getDefaultCreatorModel();
         } catch (\Exception $e) {
-            dd($this, $this->creatorRecord );
+            dd($this, $this->creatorRecord);
         }
     }
 
@@ -140,7 +138,6 @@ trait HasCreator
         ];
     }
 
-
     /**
      * Scope a query to only include the current user's revisions.
      *
@@ -160,10 +157,10 @@ trait HasCreator
         $hasSpatiePermission = in_array('Spatie\Permission\Traits\HasRoles', class_uses_recursive($user));
         $spatieRoleModel = config('permission.models.role');
 
-        if($hasSpatiePermission){
+        if ($hasSpatiePermission) {
             $existingRoles = $spatieRoleModel::whereIn('name', $this->getAuthorizedRolesForCreatorRecord())->get();
 
-            if ($user->isSuperAdmin() || $user->hasRole($existingRoles->map(fn($role) => $role->name)->toArray())) {
+            if ($user->isSuperAdmin() || $user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
                 return $query;
             }
         }
@@ -177,7 +174,7 @@ trait HasCreator
 
                 if ($hasSpatiePermission) {
                     $existingRoles = $spatieRoleModel::whereIn('name', $this->getAuthorizedUserRolesForCreatorRecord())->get();
-                    if($user->hasRole($existingRoles->map(fn($role) => $role->name)->toArray())){
+                    if ($user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
                         $query = $query->orWhere('company_id', $user->company_id);
                     }
                 }

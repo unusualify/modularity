@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Unusualify\Modularity\Entities\Scopes\SingularScope;
@@ -19,12 +18,12 @@ trait IsSingular
         self::creating(static function (Model $model) {
             $model->setAttribute('singleton_type', static::class);
             $model->setAttribute('content', Collection::make($model->fillable)
-                ->filter(fn ($attribute) => !in_array($attribute, self::$isSingularSelfAttributes) && in_array($attribute, $model->getFillable()))
+                ->filter(fn ($attribute) => ! in_array($attribute, self::$isSingularSelfAttributes) && in_array($attribute, $model->getFillable()))
                 ->mapWithKeys(fn ($attribute) => [$attribute => $model->{$attribute}])
                 ->toArray());
 
             foreach ($model->fillable as $attribute) {
-                if(!in_array($attribute, self::$isSingularSelfAttributes)){
+                if (! in_array($attribute, self::$isSingularSelfAttributes)) {
                     $model->offsetUnset($attribute);
                 }
             }
@@ -32,12 +31,12 @@ trait IsSingular
 
         self::updating(static function (Model $model) {
             $model->setAttribute('content', Collection::make($model->fillable)
-                ->filter(fn ($attribute) => !in_array($attribute, self::$isSingularSelfAttributes) && in_array($attribute, $model->getFillable()))
+                ->filter(fn ($attribute) => ! in_array($attribute, self::$isSingularSelfAttributes) && in_array($attribute, $model->getFillable()))
                 ->mapWithKeys(fn ($attribute) => [$attribute => $model->{$attribute}])
                 ->toArray());
 
             foreach ($model->fillable as $attribute) {
-                if(!in_array($attribute, self::$isSingularSelfAttributes)){
+                if (! in_array($attribute, self::$isSingularSelfAttributes)) {
                     $model->offsetUnset($attribute);
                 }
             }
@@ -47,7 +46,7 @@ trait IsSingular
             if ($model->content) {
                 $data = $model->content ?? [];
                 foreach ($data as $key => $value) {
-                    if(in_array($key, $model->getFillable())){
+                    if (in_array($key, $model->getFillable())) {
                         $model->setAttribute($key, $value);
                     }
                 }
@@ -77,7 +76,6 @@ trait IsSingular
     {
         return (bool) ($this->content['published'] ?? true);
     }
-
 
     final public function getTable()
     {
