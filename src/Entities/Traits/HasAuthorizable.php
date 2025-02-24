@@ -10,6 +10,7 @@ trait HasAuthorizable
 {
     // protected $defaultAuthorizedModel = \App\Models\User::class;
 
+    protected static $hasAuthorizableFillable = ['authorized_id', 'authorized_type'];
     protected $modelIsAuthorizing = false;
 
     protected $hasAuthorizableFields = [];
@@ -66,8 +67,9 @@ trait HasAuthorizable
                 }
             }
 
-            $model->offsetUnset('authorized_id');
-            $model->offsetUnset('authorized_type');
+            foreach(static::$hasAuthorizableFillable as $field){
+                $model->offsetUnset($field);
+            }
         });
 
         static::saved(function (Model $model) {
@@ -103,14 +105,6 @@ trait HasAuthorizable
 
     }
 
-    public function getFillable(): array
-    {
-        return array_merge(
-            parent::getFillable(),
-            ['authorized_id', 'authorized_type']
-        );
-    }
-
     public function authorizationRecord() : \Illuminate\Database\Eloquent\Relations\MorphOne
     {
         return $this->morphOne(Authorization::class, 'authorizable');
@@ -128,10 +122,12 @@ trait HasAuthorizable
         );
     }
 
-    protected function getAuthorizedModel()
+    final public function getAuthorizedModel()
     {
         try {
-            return $this->authorizationRecord->authorized_type ?? $this->getDefaultAuthorizedModel();
+            return $this->authorizationRecord()->exists()
+                ? $this->authorizationRecord->authorized_type
+                : $this->getDefaultAuthorizedModel();
         } catch (\Exception $e) {
             dd($this, $this->authorizationRecord, $e );
         }
@@ -141,11 +137,6 @@ trait HasAuthorizable
     {
         return static::$defaultAuthorizedModel ?? \App\Models\User::class;
     }
-
-    // public function hasSpatiePermission($user)
-    // {
-    //     return in_array('Spatie\Permission\Traits\HasRoles', class_uses_recursive($user));
-    // }
 
     public static function getObligatoryAuthorizationRoles()
     {
@@ -165,7 +156,9 @@ trait HasAuthorizable
         }
 
         if(in_array('Spatie\Permission\Traits\HasRoles', class_uses_recursive($user))){
-            if ($user->hasRole($this->getObligatoryAuthorizationRoles())) {
+            $roleModel = config('permission.models.role');
+            $existingRoles = $roleModel::whereIn('name', $this->getObligatoryAuthorizationRoles())->get();
+            if ($user->hasRole($existingRoles->map(fn($role) => $role->name)->toArray())) {
                 return $query;
             }
         }
