@@ -37,7 +37,7 @@ trait HasPayment
         });
 
         self::updating(static function (Model $model) {
-            if ($model->_price) {
+            if (isset($model->_price)) {
                 $model->offsetUnset('_price');
                 $model->offsetUnset('priceExcludingVatFormatted');
                 $model->offsetUnset('paymentStatus');
@@ -46,7 +46,7 @@ trait HasPayment
         });
 
         self::saving(static function (Model $model) {
-            if ($model->_price) {
+            if (isset($model->_price)) {
                 $model->offsetUnset('_price');
                 $model->offsetUnset('priceExcludingVatFormatted');
                 $model->offsetUnset('paymentStatus');
@@ -74,7 +74,9 @@ trait HasPayment
     {
         return $this->morphOne(Price::class, 'priceable')
             ->where('role', 'payment')
+            // ->hasPayment(false)
             ->hasPayment(false)
+            ->orWhereHas('payments', fn($q) => $q->where('status', '!=', 'COMPLETED'))
             ->latest('created_at');
     }
 
@@ -82,7 +84,7 @@ trait HasPayment
     {
         return $this->morphMany(Price::class, 'priceable')
             ->where('role', 'payment')
-            ->hasPayment();
+            ->hasPayment(true, 'COMPLETED');
     }
 
     protected function totalCostExcludingVat(): Attribute
