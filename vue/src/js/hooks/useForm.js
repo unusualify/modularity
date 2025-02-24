@@ -383,8 +383,9 @@ export default function useForm(props, context) {
 
   // Watch schema
   watch(() => props.schema, (newValue, oldValue) => {
+    // __log('schema watch', newValue)
     // __log('schema watch', isEqual(newValue, oldValue), newValue, oldValue)
-    if (!isEqual(newValue, oldValue)) {
+    if (!isEqual(newValue, oldValue) && issetSchema.value && !isEqual(newValue, inputSchema.value)) {
       rawSchema.value = newValue
       defaultItem.value = getModel(rawSchema.value)
 
@@ -398,18 +399,26 @@ export default function useForm(props, context) {
       topSchema.value = getTopSchema(rawSchema.value, props.isEditing)
       // states.extraValids = props.actions.length ? props.actions.map(() => true) : []
       initialize()
+      // context.emit('update:schema' )
     }
   }, { deep: true })
 
   // Watch inputSchema
   watch(() => inputSchema.value, (newValue, oldValue) => {
     // __log('inputSchema watch', newValue, oldValue)
+
+    // if(isEqual(newValue, oldValue) && isEqual(newValue, rawSchema.value)) return
+
+    // if(issetSchema.value) {
+
+    //   context.emit('update:schema', newValue)
+    // }
     // You can add any specific handling needed when inputSchema changes
   }, { deep: true })
 
   // Watch rawSchema
   watch(() => rawSchema.value, (value, oldValue) => {
-    // __log('watch rawSchema', value, oldValue)
+    // __log('watch rawSchema', value)
     if(oldValue === undefined) {
       return
     }

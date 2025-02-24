@@ -303,6 +303,7 @@ export default {
   emits: [
     'update:valid',
     'update:modelValue',
+    'update:schema',
     'input',
     'actionComplete',
     'submitted'
