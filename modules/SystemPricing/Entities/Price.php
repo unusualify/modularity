@@ -33,7 +33,7 @@ class Price extends \Oobook\Priceable\Models\Price
     protected function isPaid(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => $this->payments()->exists(),
+            get: fn ($value) => $this->payment('COMPLETED')->exists(),
         );
     }
 
@@ -59,20 +59,37 @@ class Price extends \Oobook\Priceable\Models\Price
         return $this->morphTo();
     }
 
-    public function payment(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function payment($status = null): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasOne(Payment::class);
+        return $this->hasOne(Payment::class)
+            ->when($status, fn($q) => is_array($status) ? $q->whereIn('status', $status) : $q->whereStatus($status));
     }
 
-    public function payments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function payments($status = null): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Payment::class);
+        // status : 'PENDING','CANCELLED','COMPLETED','FAILED','REFUNDED'
+        return $this->hasMany(Payment::class)
+            ->when($status, fn($q) => is_array($status) ? $q->whereIn('status', $status) : $q->whereStatus($status));
     }
 
-    public function scopeHasPayment($query, $has = true)
+    public function completedPayments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->payments('COMPLETED');
+    }
+    public function failedPayments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->payments('FAILED');
+    }
+
+    public function refundedPayments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->payments('REFUNDED');
+    }
+
+    public function scopeHasPayment($query, $has = true, $status = null)
     {
         return $has
-            ? $query->whereHas('payments')
-            : $query->whereDoesntHave('payments');
+            ? $query->whereHas('payments', fn($q) => $q->when($status, fn($q) => is_array($status) ? $q->whereIn('status', $status) : $q->whereStatus($status)))
+            : $query->whereDoesntHave('payments', fn($q) => $q->when($status, fn($q) => is_array($status) ? $q->whereIn('status', $status) : $q->whereStatus($status)));
     }
 }
