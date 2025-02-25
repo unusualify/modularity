@@ -245,14 +245,15 @@
 
           <!-- form modal -->
           <ue-modal
+            v-if="!embeddedForm"
             ref="formModal"
             v-model="formActive"
             scrollablex
             transition="dialog-bottom-transition"
             width-type="lg"
-            v-if="!embeddedForm"
+            full
           >
-            <template v-slot:body="props">
+            <template v-slot:body="formModalBodyScope">
               <v-card class="fill-height d-flex flex-column">
                 <!-- <v-card-title class="text-h5 grey lighten-2"> </v-card-title> -->
                 <ue-form
@@ -264,14 +265,13 @@
                   has-divider
                   no-default-form-padding
                   form-class="px-6 pt-6 pb-0"
-                  style="height: 70vh !important;"
+                  :style="formModalBodyScope.isFullActive ? 'height: 90vh !important;' : 'height: 70vh !important;'"
                   :actions="formActions"
                   @action-complete="handleFormActionComplete"
                 >
                   <template v-slot:headerRight>
-                    <v-btn variant="plain" icon="$close" density="compact" color="grey-darken-5" rounded
-                      @click="closeForm()"
-                    ></v-btn>
+                    <v-btn :icon="formModalBodyScope.isFullActive ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="compact" @click="formModalBodyScope.toggleFullscreen()"/>
+                    <v-btn icon="$close" variant="plain" size="compact" color="grey-darken-5" rounded @click="closeForm()" />
                   </template>
 
                   <template v-slot:top="formTopScope">
