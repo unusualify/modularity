@@ -11,12 +11,20 @@
     </template>
 
     <template v-slot:default="defaultScope">
-      <slot name="default" v-bind="defaultScope">
-        <slot v-if="systembar" name="systembar">
-          <v-layout style="height: 40px">
+      <slot name="default" v-bind="{
+          ...defaultScope,
+          isFullActive: this.full,
+          toggleFullscreen: () => this.toggleFullscreen(),
+          close: () => this.close(),
+          confirm: () => this.confirm(),
+          open: () => this.open(),
+
+        }">
+        <slot name="systembar">
+          <v-layout v-if="hasSystembar" style="height: 40px">
             <v-col>
               <v-system-bar dark>
-                <v-icon @click="toggleFullScreen()" :x-small="full">
+                <v-icon @click="toggleFullscreen()" :x-small="full">
                   mdi-checkbox-blank-outline
                 </v-icon>
                 <v-icon @click="close()">mdi-close</v-icon>
@@ -29,10 +37,12 @@
                 textCancel: this.textCancel,
                 textConfirm: this.textConfirm,
                 textDescription: this.textDescription,
+                isFullActive: this.full,
 
-                onOpen: this.open,
-                onClose: this.close,
-                onConfirm: this.confirm,
+                open: () => this.open(),
+                close: () => this.close(),
+                confirm: () => this.confirm(),
+                toggleFullscreen: () => this.toggleFullscreen(),
             }"
             :closeDialog="close"
             >
@@ -143,7 +153,7 @@ export default {
     // attrs (attrs) {
     //   return attrs
     // },
-    toggleFullScreen () {
+    toggleFullscreen () {
       this.full = !this.full
     },
     screenListener (e) {
