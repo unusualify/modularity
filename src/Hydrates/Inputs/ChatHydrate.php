@@ -12,6 +12,8 @@ class ChatHydrate extends InputHydrate
      */
     public $requirements = [
         'default' => -1,
+        'height' => '30vh',
+        'bodyHeight' => '20vh',
     ];
 
     /**
@@ -38,7 +40,7 @@ class ChatHydrate extends InputHydrate
         $acceptedFileTypes = $input['accepted-file-types']
             ?? 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/x-iwork-pages-sffpages';
 
-        $maxAttachments = $input['max-attachments'] ?? 2;
+        $maxAttachments = $input['max-attachments'] ?? 3;
         $input['filepond'] = modularity_format_input([
             'type' => 'filepond',
             'name' => 'attachments',
