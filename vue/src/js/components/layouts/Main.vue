@@ -105,22 +105,27 @@
       </ue-modal>
 
       <!-- Profile Dialog -->
-      <v-dialog
+      <ue-modal
         ref="profileDialog"
-        width="500"
         v-model="$store.state.user.profileDialog"
+        Xwidth="500"
+        scrollable
       >
-        <template v-slot:default="{ isActive }">
+        <template v-slot:body="{ isActive, toggleFullscreen, close , isFullActive}">
           <v-card>
             <v-card-title>
-              <ue-title padding="0" :text="$t('Upload Profile Image')" color="grey-darken-5" transform="none" align="center" justify="space-between">
+              <ue-title padding="y-3" :text="$t('Upload Profile Image')" color="grey-darken-5" transform="none" align="center" justify="space-between">
                 <template #right>
-                  <v-btn icon="$close" variant="plain" color="grey-darken-5" size="default" @click="isActive.value = false"/>
+                  <div class="d-flex align-center">
+                    <v-icon :icon="isFullActive ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="default" @click="toggleFullscreen()"/>
+                    <v-icon icon="$close" variant="plain" color="grey-darken-5" size="default" @click="close()"/>
+                  </div>
                 </template>
               </ue-title>
               <v-divider/>
             </v-card-title>
-            <v-card-text>
+
+            <v-card-text Xstyle="height: 30vh;">
               <div class="d-flex">
                 <div class="my-3 flex-grow-0">
                   <v-avatar class="my-aut" :image="$store.getters.userProfile.avatar_url" size="100"/>
@@ -141,10 +146,23 @@
                 >
                 </ue-form>
               </div>
+              <!-- <div class="">
+                <v-radio-group
+                  v-model="dialog"
+                  messages="Select a Country from the radio group"
+                >
+                  <v-radio v-for="([label, value]) in [['1', 1], ['2', 2], ['3', 3], ['4', 4], ['5', 5], ['6', 6], ['7', 7], ['8', 8], ['9', 9], ['10', 10]]"
+                    :key="value"
+                    :label="label"
+                    :value="value"
+                  ></v-radio>
+                </v-radio-group>
+              </div> -->
             </v-card-text>
+
           </v-card>
         </template>
-      </v-dialog>
+      </ue-modal>
 
       <!-- <a17-dialog
         ref="deleteWarningMediaLibrary"
