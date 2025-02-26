@@ -41,8 +41,17 @@ class ChatHydrate extends InputHydrate
             'attachments' => route('admin.chatable.attachments', ['chat' => ':id']),
         ];
 
+        if (isset($input['acceptedExtensions']) && is_array($input['acceptedExtensions'])) {
+            $input['accepted-file-types'] = $this->getAcceptedFileTypes($input['acceptedExtensions']);
+            unset($input['acceptedExtensions']);
+        }
+
+        $filepondAcceptedFileTypes = isset($input['acceptedExtensions']) && is_array($input['acceptedExtensions'])
+            ? $input['acceptedExtensions']
+            : ['pdf', 'doc', 'docx', 'pages'];
+
         $acceptedFileTypes = $input['accepted-file-types']
-            ?? 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/x-iwork-pages-sffpages';
+            ?? $this->getAcceptedFileTypes($filepondAcceptedFileTypes);
 
         $maxAttachments = $input['max-attachments'] ?? 3;
         $input['filepond'] = modularity_format_input([
