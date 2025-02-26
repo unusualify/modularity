@@ -12,8 +12,12 @@ class ChatHydrate extends InputHydrate
      */
     public $requirements = [
         'default' => -1,
-        'height' => '30vh',
-        'bodyHeight' => '20vh',
+        'height' => '40vh',
+        'bodyHeight' => '26vh',
+        'variant' => 'outlined', // ['elevated', 'flat', 'tonal', 'outlined', 'text', 'plain'] https://vuetifyjs.com/en/components/cards/#variants
+        'elevation' => 0,
+        'color' => 'grey-lighten-2',
+        'inputVariant' => 'outlined',
     ];
 
     /**
