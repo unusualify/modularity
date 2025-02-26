@@ -15,13 +15,17 @@
       <!-- Header Section -->
       <div :class="[(hasDivider || title) ? 'pb-6' : '', scrollable ? 'flex-grow-0' : '']">
         <ue-title
-          v-if="title"
+          v-if="!noTitle && title"
           padding="b-3"
           align="center"
           justify="space-between"
           v-bind="titleOptions"
         >
-          {{ titleSerialized }}
+          <template v-slot:default>
+            <slot name="header.left" v-bind="{title: titleSerialized, model: model, schema: inputSchema}">
+              {{ titleSerialized }}
+            </slot>
+          </template>
           <template v-slot:right>
             <div class="d-flex align-center">
               <slot name="headerCenter">
@@ -178,7 +182,7 @@
                   variant="outlined"
                 ></v-chip>
               </v-chip-group>
-              <slot name="headerRight">
+              <slot name="header.right">
 
               </slot>
             </div>
@@ -191,64 +195,94 @@
       <!-- {{ $log(model, formItem) }} -->
       <!-- Scrollable Content Section -->
       <div :class="['d-flex', scrollable ? 'flex-grow-1 overflow-hidden mr-n5' : '']">
-        <div :class="['w-100', scrollable ? 'overflow-y-auto pr-3' : '']"
+        <div :class="['w-100 d-flex', scrollable ? 'overflow-y-auto pr-3' : '']"
         >
-          <slot name="top" v-bind="{item: formItem, schema}"></slot>
+          <div class="flex-grow-1">
 
-          <v-custom-form-base
-            :id="`ue-wrapper-${id}`"
+            <slot name="top" v-bind="{item: formItem, schema}"></slot>
 
-            v-model="model"
-            :schema="inputSchema"
-            :row="rowAttribute"
+            <v-custom-form-base
+              :id="`ue-wrapper-${id}`"
 
-            @update="handleUpdate"
-            @input="handleInput"
-            @resize="handleResize"
-            @blur="handleBlur"
-            @click="handleClick"
-            >
-            <template
-              v-for="(_slot, key) in formSlots"
-              :key="key"
-              v-slot:[`slot-inject-${_slot.name}-key-ue-wrapper-${id}-${_slot.inputName}`]="_slotData"
+              v-model="model"
+              :schema="inputSchema"
+              :row="rowAttribute"
+
+              @update="handleUpdate"
+              @input="handleInput"
+              @resize="handleResize"
+              @blur="handleBlur"
+              @click="handleClick"
               >
-              <template v-if="_slot.type == 'form'">
-                <v-custom-form-base
-                  :id="`ue-wrapper-${id}-${_slot.name}`"
-                  v-model="model"
-                  v-model:schema="_slot.schema"
-                  :row="rowAttribute"
+              <template
+                v-for="(_slot, key) in formSlots"
+                :key="key"
+                v-slot:[`slot-inject-${_slot.name}-key-ue-wrapper-${id}-${_slot.inputName}`]="_slotData"
+                >
+                <template v-if="_slot.type == 'form'">
+                  <v-custom-form-base
+                    :id="`ue-wrapper-${id}-${_slot.name}`"
+                    v-model="model"
+                    v-model:schema="_slot.schema"
+                    :row="rowAttribute"
 
-                  >
+                    >
 
-                </v-custom-form-base>
+                  </v-custom-form-base>
+                </template>
+                <template v-else-if="_slot.type == 'recursive-stuff'">
+                  <ue-recursive-stuff
+                    v-for="(context, i) in _slot.context.elements"
+                    :key="i"
+                    :configuration="context"
+                    :bindData="_slotData">
+                  </ue-recursive-stuff>
+                </template>
+                <!-- <div>
+                  {{ $log(_slot, _slotData) }}
+                  Hello
+                </div> -->
               </template>
-              <template v-else-if="_slot.type == 'recursive-stuff'">
-                <ue-recursive-stuff
-                  v-for="(context, i) in _slot.context.elements"
-                  :key="i"
-                  :configuration="context"
-                  :bindData="_slotData">
-                </ue-recursive-stuff>
+              <!-- <template v-slot:[`slot-inject-prepend-key-treeview-slot-permissions`]="{open}" >
+                <v-icon color="blue">
+                    {{open ? 'mdi-folder-open' : 'mdi-folder'}}
+                </v-icon>
               </template>
-              <!-- <div>
-                {{ $log(_slot, _slotData) }}
-                Hello
-              </div> -->
-            </template>
-            <!-- <template v-slot:[`slot-inject-prepend-key-treeview-slot-permissions`]="{open}" >
-              <v-icon color="blue">
-                  {{open ? 'mdi-folder-open' : 'mdi-folder'}}
-              </v-icon>
-            </template>
-            <template #slot-inject-label-key-treeview-slot-permissions="{item}" >
-              <span class="caption" >
-                {{item.name.toUpperCase()}}
-              </span>
-            </template> -->
-          </v-custom-form-base>
+              <template #slot-inject-label-key-treeview-slot-permissions="{item}" >
+                <span class="caption" >
+                  {{item.name.toUpperCase()}}
+                </span>
+              </template> -->
+            </v-custom-form-base>
+          </div>
+          {{ $log($slots) }}
+          <div v-if="$slots.right || $slots['right.top'] || $slots['right.bottom'] || $slots['right.middle']"
+            :class="[
+              $vuetify.display.lgAndUp ? 'flex-grow-1' : 'd-none',
+              'pl-4 pt-2'
+            ]"
+            style="max-width: 500px;"
+          >
+            <slot name="right" v-bind="{item: formItem, schema}">
+
+              <slot name="right.top" v-bind="{item: formItem, schema}">
+
+              </slot>
+
+              <slot name="right.middle" v-bind="{item: formItem, schema}">
+
+              </slot>
+
+              <slot name="right.bottom" v-bind="{item: formItem, schema}">
+
+              </slot>
+
+            </slot>
+
+          </div>
         </div>
+
+
         <!-- Sticky Frame Section -->
 
       </div>
@@ -324,6 +358,10 @@ export default {
     },
     title: {
       type: String
+    },
+    noTitle: {
+      type: Boolean,
+      default: false
     },
     schema: {
       type: Object,
@@ -513,7 +551,7 @@ export default {
       formClasses,
       formSlots,
       titleOptions,
-      titleSerialized,
+      titleSerialized
       // formColumnAttrs,
       // stickyColumnAttrs
     }
