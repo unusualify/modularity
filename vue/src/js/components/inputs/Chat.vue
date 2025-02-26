@@ -6,17 +6,21 @@
     class="v-input-chat"
     >
     <template v-slot:default="defaultSlot">
-      <v-card class='w-100' :elevation="elevation"
+      <v-card
+        class='w-100'
+        :variant="variant"
+        :elevation="elevation"
         :class="[
-          !noBackground ? `bg-${background}` : '',
+          !noBackground && background ? `bg-${background}` : '',
           disabled ? 'bg-grey-lighten-4' : ''
         ]"
+        :color="color"
         :heightx="height"
         :disabled="disabled"
       >
         <v-card-title class="d-flex w-100 py-4">
           <ue-title :text="label" align="center" padding="a-0" transform="none" class="w-100">
-            <template v-slot:right>
+            <template v-slot:rightX>
               <div class="w-100 d-flex justify-end">
                 <slot name="actions">
 
@@ -159,7 +163,7 @@
           <slot name="sending">
             <v-textarea
               v-model="message"
-              variant="solo"
+              :variant="inputVariant"
               :disabled="loading"
               hide-details
               placeholder="Type your answer here..."
@@ -197,7 +201,7 @@
                 <ue-filepond-preview :source="attachments" image-size="24"/>
                 <template v-for="attachment in attachments">
                 </template>
-                <v-btn size="default" icon="mdi-paperclip" density="compact" @click="$refs.inputFilepond.browse()" />
+                <v-btn :color="color" size="default" icon="mdi-paperclip" density="compact" @click="$refs.inputFilepond.browse()" />
                 <v-btn
                   variant="elevated"
                   density="compact"
@@ -226,9 +230,8 @@
     },
     props: {
       ...makeInputProps(),
-      endpoints: {
-        type: Object,
-        default: () => ({})
+      color: {
+        type: String,
       },
       disabled: {
         type: Boolean,
@@ -240,7 +243,7 @@
       },
       background: {
         type: String,
-        default: 'grey-lighten-5'
+        // default: 'grey-lighten-5'
       },
       elevation: {
         type: Number,
@@ -249,6 +252,14 @@
       density: {
         type: String,
         default: 'comfortable'
+      },
+      variant: {
+        type: String,
+        default: 'plain'
+      },
+      endpoints: {
+        type: Object,
+        default: () => ({})
       },
       perPage: {
         type: Number,
@@ -285,6 +296,10 @@
       refreshTime: {
         type: Number,
         default: 10000
+      },
+      inputVariant: {
+        type: String,
+        default: 'outlined'
       }
     },
     setup (props, context) {
