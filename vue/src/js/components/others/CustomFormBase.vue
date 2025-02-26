@@ -4,7 +4,8 @@
   <v-row
     :id="id"
     v-bind="getRow"
-    v-resize.quiet="onResize">
+    v-resize.quiet="onResize"
+  >
     <!-- FORM-BASE TOP SLOT -->
     <slot :name="getFormTopSlot()" :id="id" />
     <!-- main loop over components/controls -->
@@ -140,6 +141,7 @@
                         <span v-html="obj.schema.subtitle"></span>
                       </ue-title>
                     </div>
+
                     <v-custom-form-base
                       :id="`${id}-${obj.key}`"
                       :modelValue="setValue(obj)"
@@ -533,6 +535,7 @@ const second = 'second'
 const dropEffect = 'move' // 'copy, link, move
 // Default row setting if no row-attribute defined
 const rowDefault = { noGutters: false } // { noGutters:true, justify:'center', align:'center' }
+const rowGroupDefault = { noGutters: true } // { noGutters:true, justify:'center', align:'center' }
 
 // Default col setting, overrideable by prop col or by schema.col definition
 // Default col setting, overrideable by prop flex or by schema.flex definition (flex is DEPRECATED use col instead)
@@ -582,7 +585,13 @@ export default {
     row: {
       type: [Object]
     },
+    rowGroup: {
+      type: [Object]
+    },
     col: {
+      type: [Object, Number, String]
+    },
+    colGroup: {
       type: [Object, Number, String]
     },
     flex: {
@@ -962,7 +971,7 @@ export default {
       return { ...colObject, ...offsetObject, ...orderObject }
     },
     getRowGroupOrArray (obj) {
-      return obj.schema.row || this.row || rowDefault
+      return obj.schema.rowGroup || this.rowGroup || rowGroupDefault
     },
     getColGroupOrArray (obj) {
       return obj.schema.col || this.col || colDefault
