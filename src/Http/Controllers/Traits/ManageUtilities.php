@@ -32,6 +32,7 @@ trait ManageUtilities
         $headers = $this->translateHeaders($headers);
 
         $tableAttributes = $this->hydrateTableAttributes();
+        $tableEndpoints = $this->getIndexUrls() + $this->getUrls();
         // dd($this->translateHeaders($headers));
         $_deprecated = [
             'initialResource' => $initialResource, //
@@ -44,7 +45,7 @@ trait ManageUtilities
         ];
         $data = [
             ...$_deprecated,
-            'endpoints' => $this->getIndexUrls() + $this->getUrls(),
+            'endpoints' => $tableEndpoints,
         ] + $this->getViewLayoutVariables();
 
         $options = [
@@ -57,6 +58,7 @@ trait ManageUtilities
                     'bulkActions' => $this->getTableBulkActions(),
                     'nestedData' => $this->getNestedData(),
                     'formActions' => $this->getFormActions(),
+                    'endpoints' => $tableEndpoints,
                 ],
                 ($this->isNested ? ['titlePrefix' => $this->nestedParentModel->getTitleValue() . ' \ '] : []),
                 array_merge_recursive_preserve(
