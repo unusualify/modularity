@@ -269,13 +269,38 @@
                   :actions="formActions"
                   @action-complete="handleFormActionComplete"
                 >
-                  <template v-slot:headerRight>
-                    <v-btn :icon="formModalBodyScope.isFullActive ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="compact" @click="formModalBodyScope.toggleFullscreen()"/>
-                    <v-btn icon="$close" variant="plain" size="compact" color="grey-darken-5" rounded @click="closeForm()" />
+
+                  <template v-slot:header.left="headerLeftScope">
+                    <slot name="form.header.left" v-bind="headerLeftScope">
+                      {{ headerLeftScope.title }}
+                    </slot>
+                  </template>
+
+                  <template v-slot:header.right>
+                    <slot name="form.header.right">
+                      <v-btn :icon="formModalBodyScope.isFullActive ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="compact" @click="formModalBodyScope.toggleFullscreen()"/>
+                      <v-btn icon="$close" variant="plain" size="compact" color="grey-darken-5" rounded @click="closeForm()" />
+                    </slot>
+                  </template>
+
+                  <template v-if="$slots['form.right.top']" v-slot:right.top="rightScope">
+                    <slot name="form.right.top" v-bind="rightScope">
+
+                    </slot>
+                  </template>
+                  <template v-if="$slots['form.right.middle']" v-slot:right.middle="rightScope">
+                    <slot name="form.right.middle" v-bind="rightScope">
+
+                    </slot>
+                  </template>
+                  <template v-if="$slots['form.right.bottom']" v-slot:right.bottom="rightScope">
+                    <slot name="form.right.bottom" v-bind="rightScope">
+
+                    </slot>
                   </template>
 
                   <template v-slot:top="formTopScope">
-                    <slot name="form-top" v-bind="formTopScope">
+                    <slot name="form.top" v-bind="formTopScope">
 
                     </slot>
                   </template>
@@ -319,10 +344,15 @@
                     ref="form"
                     :isEditing="editedIndex > -1"
                   >
+                    <template v-slot:header.left="headerLeftScope">
+                      <slot name="form.header.left" v-bind="headerLeftScope">
+                        {{ headerLeftScope.title }}
+                      </slot>
+                    </template>
                     <template v-slot:headerCenter>
 
                     </template>
-                    <template v-slot:headerRight>
+                    <template v-slot:header.right>
                       <v-btn class="" variant="text" icon="$close" density="compact"
                         @click="closeForm()"
                       ></v-btn>
@@ -451,7 +481,7 @@
                 form-class="px-6 pb-0"
                 style="height: 90vh !important;"
               >
-                <template v-slot:headerRight>
+                <template v-slot:header.right>
                   <v-btn class="ml-auto" variant="text" icon="$close" density="compact" color="deafult"
                     @click="customFormModalActive = false"
                   ></v-btn>
