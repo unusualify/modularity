@@ -10,7 +10,7 @@ return [
     'rowActionsType' => 'inline',
     'hideDefaultFooter' => false,
     'tableClasses' => 'elevation-2',
-    'itemsPerPage' => 10,
+    'itemsPerPage' => 15,
     'hideHeaders' => false,
     'hideSearchField' => false,
     'multiSort' => false,
