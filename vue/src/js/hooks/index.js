@@ -30,6 +30,6 @@ export { default as useTableItemActions, makeTableItemActionsProps } from './use
 export { default as useTableModals } from './useTableModals'
 export { default as useCurrency } from './useCurrency'
 
-export { default as useForm } from './useForm'
+export { default as useForm, makeFormProps } from './useForm'
 
 
