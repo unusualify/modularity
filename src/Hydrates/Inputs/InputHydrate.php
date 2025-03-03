@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Hydrates\Inputs;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Module;
 use Unusualify\Modularity\Traits\ManageNames;
 
@@ -31,7 +32,14 @@ abstract class InputHydrate
      *
      * @var Unusualify\Modularity\Module
      */
-    public $module;
+    protected $module;
+
+    /**
+     * Route name
+     *
+     * @var string
+     */
+    protected $routeName;
 
     /**
      * Default values to set before hydrating
@@ -100,11 +108,13 @@ abstract class InputHydrate
     /**
      * Create a new HydrateInput instance.
      */
-    public function __construct(array $input, ?Module $module = null)
+    public function __construct(array $input, ?Module $module = null, ?string $routeName = null)
     {
         $this->input = $input;
 
         $this->module = $module;
+
+        $this->routeName = $routeName;
     }
 
     /**
@@ -127,7 +137,7 @@ abstract class InputHydrate
     /**
      * return hydrated input
      */
-    public function render(): array
+    final public function render(): array
     {
         $this->setDefaults();
 
@@ -319,6 +329,53 @@ abstract class InputHydrate
 
         return implode(',', $acceptedFileTypes);
     }
+
+    /**
+     * Get module
+     *
+     * @return Unusualify\Modularity\Module
+     */
+    final protected function getModule()
+    {
+        return isset($this->input['_moduleName'])
+            ? Modularity::find($this->input['_moduleName'])
+            : ($this->hasModule()
+                ? $this->module
+                : throw new \Exception("No Module in '" . ($this->input['name'] ?? $this->input['type']) . "' input"));
+    }
+
+
+    final protected function hasModule()
+    {
+        return $this->module !== null;
+    }
+
+    /**
+     * Check if route name is set
+     *
+     * @return bool
+     */
+    final protected function hasRouteName()
+    {
+        return $this->routeName !== null;
+    }
+
+    /**
+     * Get default route name
+     *
+     * @return string
+     */
+    final protected function getRouteName()
+    {
+        return isset($this->input['_routeName'])
+            ? $this->input['_routeName']
+            : ($this->hasRouteName()
+                ? $this->routeName
+                : throw new \Exception("No Route Name in '" . ($this->input['name'] ?? $this->input['type']) . "' input"));
+    }
+
+
+
     /**
      * Handle magic method __toString.
      *
