@@ -9,6 +9,7 @@ class InputHydrator
     public function __construct(
         protected $input,
         protected $module,
+        protected $routeName,
     ) {}
 
     public function hydrate(): array
@@ -21,6 +22,7 @@ class InputHydrator
                 $input = App::make($hydrateClass, [
                     'input' => $input,
                     'module' => $this->module ?? null,
+                    'routeName' => $this->routeName ?? null,
                 ])->render();
             }
         }
