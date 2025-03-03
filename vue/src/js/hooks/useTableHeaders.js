@@ -35,6 +35,8 @@ export default function useTableHeaders(props) {
   const headers = ref(props.columns ?? store.state.datatable.headers ?? [])
   const headersModel = ref(_.cloneDeep(headers.value))
 
+  const hasSearchableHeader = ref(!!_.find(headers.value, header => window.__isset(header.searchable) && header.searchable === true))
+
   // Computed properties
   const selectedHeaders = computed(() =>
     headers.value.filter(header => !!header.visible && header.visible === true)
@@ -66,7 +68,7 @@ export default function useTableHeaders(props) {
     // Refs
     headers,
     headersModel,
-
+    hasSearchableHeader,
     // Computed
     selectedHeaders,
     hideHeaders,
