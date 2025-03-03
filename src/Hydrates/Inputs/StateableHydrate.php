@@ -31,11 +31,28 @@ class StateableHydrate extends InputHydrate
         $input['itemTitle'] = 'name';
         $input['itemValue'] = 'id';
 
-        $repository = App::make('Modules\SystemUtility\Repositories\StateRepository');
+        // $repository = App::make('Modules\SystemUtility\Repositories\StateRepository');
+
+        $module = null;
+        $routeName = null;
+        if(isset($input['_moduleName'])) {
+            $module = Modularity::find($input['_moduleName']);
+        } else if($this->hasModule()) {
+            $module = $this->module;
+        } else {
+            throw new \Exception("No Module in '{$input['name']} input'");
+        }
+
+        if(isset($input['_routeName'])) {
+            $routeName = Modularity::find($input['_moduleName']);
+        } else if($this->hasRouteName()) {
+            $routeName = $this->getRouteName();
+        } else {
+            throw new \Exception("No Route in '{$input['name']} input'");
+        }
 
         // If default_states contains strings, convert them to objects first
-        $module = Modularity::find($input['_moduleName']);
-        $model = App::make($module->getRouteClass($input['_routeName'], 'model'));
+        $model = App::make($module->getRouteClass($routeName, 'model'));
 
         $input['items'] = $model->getStateableList();
 
