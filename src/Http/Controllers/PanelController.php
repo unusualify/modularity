@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Http\Controllers\Traits\MakesResponses;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageScopes;
 
@@ -336,7 +335,8 @@ abstract class PanelController extends CoreController
         if (count($parentParams)) {
             $nestedParentName = array_key_last($parentParams); // snakecase;
             $nestedParentId = last($parentParams);
-            $nestedParentModel = UFinder::getRouteModel($nestedParentName)::find($nestedParentId);
+            $nestedParentModel = $this->module->getRouteClass($nestedParentName, 'model');
+            $nestedParentModel = $nestedParentModel::find($nestedParentId);
 
             return [true, $nestedParentId, $nestedParentName, $nestedParentModel];
         }

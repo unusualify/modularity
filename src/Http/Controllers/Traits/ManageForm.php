@@ -39,7 +39,7 @@ trait ManageForm
     protected function __beforeConstructManageForm($app, $request)
     {
         $this->inputTypes = modularityConfig('input_types', []);
-        $this->module = Modularity::find($this->moduleName);
+
         $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
     }
 

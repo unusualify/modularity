@@ -11,6 +11,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Traits\ManageNames;
 use Unusualify\Modularity\Traits\ManageTraits;
@@ -58,6 +59,11 @@ abstract class CoreController extends LaravelController
      */
     protected $repository;
 
+    /**
+     * @var \Unusualify\Modularity\Module
+     */
+    protected $module;
+
     public function __construct(Request $request)
     {
         $this->baseKey = modularityBaseKey();
@@ -65,6 +71,8 @@ abstract class CoreController extends LaravelController
         $this->request = $request;
 
         $this->moduleName = $this->getModuleName();
+        $this->module = Modularity::find($this->moduleName);
+
         $this->namespace = $this->getNamespace();
         $this->routeName = $this->getRouteName();
 
