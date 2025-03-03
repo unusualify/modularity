@@ -34,6 +34,9 @@ const getters = {
   },
   userPermissions: state => {
     return state.authorization.permissions ?? []
+  },
+  userRoles: state => {
+    return state.authorization.roles ?? []
   }
 }
 
