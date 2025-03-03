@@ -325,7 +325,7 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
-import { useForm } from '@/hooks'
+import { useForm, makeFormProps } from '@/hooks'
 import { cloneDeep, omit } from 'lodash-es'
 import FormActions from './form/FormActions.vue'
 
@@ -343,100 +343,7 @@ export default {
     'submitted'
   ],
   props: {
-    modelValue: {
-      type: Object,
-      // default () {
-      //   return {}
-      // }
-    },
-    formClass: {
-      type: [Array, String],
-      default: ''
-    },
-    actionUrl: {
-      type: String
-    },
-    title: {
-      type: String
-    },
-    noTitle: {
-      type: Boolean,
-      default: false
-    },
-    schema: {
-      type: Object,
-      // default () {
-      //   return {}
-      // }
-    },
-    async: {
-      type: Boolean,
-      default: true
-    },
-    buttonText: {
-      type: String
-    },
-    hasSubmit: {
-      type: Boolean,
-      default: false
-    },
-    stickyFrame: {
-      type: Boolean,
-      default: false
-    },
-    stickyButton: {
-      type: Boolean,
-      default: false
-    },
-    rowAttribute: {
-      type: Object,
-      default () {
-        return {
-          noGutters: false,
-          class: 'py-4',
-          // justify:'center',
-          // align:'center'
-        }
-      }
-    },
-    slots: {
-      type: Object,
-      default () {
-        return {}
-      }
-    },
-    valid: {
-      type: Boolean,
-      default: null
-    },
-    isEditing: {
-      type: Boolean,
-      default: false
-    },
-    hasDivider: {
-      type: Boolean,
-      default: false
-    },
-    fillHeight: {
-      type: Boolean,
-      default: false
-    },
-    scrollable: {
-      type: Boolean,
-      default: false
-    },
-    noDefaultFormPadding: {
-      type: Boolean,
-      default: false
-    },
-    noDefaultSurface: {
-      type: Boolean,
-      default: false
-    },
-    actions: {
-      type: [Array, Object],
-      default: []
-    }
+    ...makeFormProps(),
   },
   provide() {
       // use function syntax so that we can access `this`
