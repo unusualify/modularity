@@ -29,7 +29,12 @@ trait FilepondsTrait
         $columns = $this->getColumns(__TRAIT__);
 
         foreach ($columns as $role) {
-            $files = data_get($fields, $role) ?? [];
+            $files = data_get($fields, $role) ?? null;
+
+            if(!$files){
+                continue;
+            }
+
             if (Arr::isAssoc($files)) {
                 foreach ($files as $locale => $filesByLocale) {
                     Filepond::saveFile($object, $filesByLocale, $role, $locale);
@@ -63,13 +68,15 @@ trait FilepondsTrait
 
     public function getFormFieldsFilepondsTrait($object, $fields, $schema)
     {
+        $columns = $this->getColumns(__TRAIT__);
 
-        if ($object->has('fileponds')) {
+        if (count($columns) > 0 && $object->has('fileponds')) {
             $filepondsByRole = $object->fileponds->groupBy('role');
             $default_locale = config('app.locale');
             $locales = getLocales();
 
             foreach ($this->getColumns(__TRAIT__) as $role) {
+
                 if (isset($filepondsByRole[$role])) {
                     $input = $schema[$role];
 
@@ -94,7 +101,7 @@ trait FilepondsTrait
                         });
                     }
                 } else {
-                    $input = $this->inputs()[$role] ?? null;
+                    $input = $this->inputs()[$role] ?? $schema[$role] ?? null;
 
                     if ($input) {
                         $fields += [
