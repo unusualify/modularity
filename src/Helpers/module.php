@@ -444,11 +444,22 @@ if (! function_exists('backtrace_formatter')) {
     function backtrace_formatter($carry, $item)
     {
         try {
-            $carry[$item['file'] ?? $item['class']] = $item['line'] ?? $item['function'];
+            $carry[$item['file'] ?? $item['class']] = [
+                'line' => $item['line'] ?? null,
+                'function' => $item['function'] ?? null,
+                // 'args' => $noArgs ? null : $item['args'] ?? null,
+            ];
         } catch (\Throwable $th) {
             dd($item);
         }
 
         return $carry;
+    }
+}
+
+if (! function_exists('backtrace_formatted')) {
+    function backtrace_formatted()
+    {
+        return array_reduce(debug_backtrace(), 'backtrace_formatter', []);
     }
 }
