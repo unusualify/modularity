@@ -255,13 +255,18 @@
               </template> -->
             </v-custom-form-base>
           </div>
-          {{ $log($slots) }}
+
           <div v-if="$slots.right || $slots['right.top'] || $slots['right.bottom'] || $slots['right.middle']"
             :class="[
-              $vuetify.display.lgAndUp ? 'flex-grow-1' : 'd-none',
-              'pl-4 pt-2'
+              $vuetify.display.lgAndUp ? 'flex-grow-0' : 'd-none',
+              'pt-2',
+              `ml-${rightSlotGap}`,
             ]"
-            style="max-width: 500px;"
+            :style="{
+              ...(rightSlotWidth ? {width: `${rightSlotWidth}px`} : {}),
+              ...(rightSlotMinWidth ? {minWidth: `${rightSlotMinWidth}px`} : {}),
+              ...(rightSlotMaxWidth ? {maxWidth: `${rightSlotMaxWidth}px`} : {})
+            }"
           >
             <slot name="right" v-bind="{item: formItem, schema}">
 
