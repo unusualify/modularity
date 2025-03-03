@@ -1,5 +1,6 @@
 import _ from 'lodash-es'
 import pluralize from 'pluralize'
+import { useAuthorization } from '@/hooks'
 
 import { ALERT, CONFIG } from '../store/mutations'
 
@@ -41,19 +42,15 @@ export default {
   $closeProfileDialog: function () {
     return this.$store.state.user.profileDialog = false
   },
-  $can: function (permission) {
-    if (this.$store.getters.isSuperAdmin) {
-      return true
-    }
+  $can: function (permission, moduleName = null) {
+    const { can } = useAuthorization()
 
-    return false
+    return can(permission, moduleName)
   },
   $hasRoles: function (roles) {
-    if(window.__isString(roles)){
-      roles = roles.split(',').map(role => role.trim())
-    }
+    const { hasRoles } = useAuthorization()
 
-    return this.$store.getters.userRoles.some(role => roles.includes(role))
+    return hasRoles(roles)
   },
   $toggleSidebar: function () {
     this.$store.commit(CONFIG.SIDEBAR_TOGGLE)
