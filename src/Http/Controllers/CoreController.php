@@ -78,14 +78,21 @@ abstract class CoreController extends LaravelController
      * @param bool $forcePagination
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    protected function getIndexItems($with = [], $scopes = [], $forcePagination = false)
+    protected function getIndexItems($with = [], $scopes = [], $appends = [], $forcePagination = false)
     {
+        $perPage = $this->request->get('itemsPerPage') ?? $this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10;
+
+        if( !$this->request->ajax() ){
+            $perPage = -1;
+        }
+
         return $this->transformIndexItems($this->repository->get(
-            $this->indexWith + $with,
-            $scopes,
-            $this->orderScope(),
-            $this->request->get('itemsPerPage') ?? $this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 50,
-            $forcePagination
+            with: ($this->indexWith ?? []) + $with,
+            scopes: $scopes,
+            orders: $this->orderScope(),
+            perPage: $perPage,
+            forcePagination: $forcePagination,
+            appends: $appends,
         ));
     }
 

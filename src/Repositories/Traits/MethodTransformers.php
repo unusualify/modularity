@@ -249,13 +249,17 @@ trait MethodTransformers
      * @param \Unusualify\Modularity\Models\Model $object
      * @return array
      */
-    public function getFormFields($object, $schema = [])
+    public function getFormFields($object, $schema = [], $noSerialization = false)
     {
         $chunkedInputs = $this->chunkInputs(all: true, schema: empty($schema) ? null : $schema);
 
         $this->traitColumns = $this->setColumns($this->traitColumns, $chunkedInputs);
 
-        $fields = $object->attributesToArray();
+        if(!$noSerialization){
+            $fields = $object->attributesToArray();
+        }else{
+            $fields = [];
+        }
 
         // $fields = $this->castFormFields($fields);
 

@@ -6,17 +6,21 @@
     class="v-input-chat"
     >
     <template v-slot:default="defaultSlot">
-      <v-card class='w-100' :elevation="elevation"
+      <v-card
+        class='w-100'
+        :variant="variant"
+        :elevation="elevation"
         :class="[
-          !noBackground ? `bg-${background}` : '',
+          !noBackground && background ? `bg-${background}` : '',
           disabled ? 'bg-grey-lighten-4' : ''
         ]"
+        :color="color"
         :heightx="height"
         :disabled="disabled"
       >
         <v-card-title class="d-flex w-100 py-4">
           <ue-title :text="label" align="center" padding="a-0" transform="none" class="w-100">
-            <template v-slot:right>
+            <template v-slot:rightX>
               <div class="w-100 d-flex justify-end">
                 <slot name="actions">
 
@@ -157,20 +161,21 @@
         <v-card-actions class="pa-4" v-if="!noSendAction">
 
           <slot name="sending">
-            <v-text-field
+            <v-textarea
               v-model="message"
-              variant="solo"
+              :variant="inputVariant"
               :disabled="loading"
               hide-details
               placeholder="Type your answer here..."
               density="compact"
               @click:append="sendMessage"
               @keyup.enter="sendMessage"
+              :rows="1"
             >
-              <template v-slot:append>
-                <v-btn variant="elevated" density="comfortable" @click="sendMessage" :disabled="loading || !message">
-                  {{ $t('Send') }}
-                </v-btn>
+              <template v-slot:prepend>
+                <div class="flex-grow-0">
+                  <v-avatar class="my-aut" :image="$store.getters.userProfile.avatar_url" size="40"/>
+                </div>
                 <v-input-filepond
                   v-if="filepond"
                   ref="inputFilepond"
@@ -182,25 +187,31 @@
                   @xupdate:modelValue="$log('update:modelValue', $event)"
                 >
                   <template v-slot:activator="activatorProps">
-                    <!-- <v-btn
-                      size="default"
-                      icon="mdi-paperclip"
-                      density="compact"
-                      @click="activatorProps.browse()"
-                      :disabled="loading"
-                      >
-                    </v-btn> -->
+
                   </template>
                 </v-input-filepond>
               </template>
-              <template v-if="filepond" v-slot:append-inner>
-                <v-btn size="default" icon="mdi-paperclip" density="compact" @click="$refs.inputFilepond.browse()" />
+              <template v-slot:appendx>
+                <!-- <v-btn variant="elevated" density="comfortable" @click="sendMessage" :disabled="loading || !message">
+                  {{ $t('Send') }}
+                </v-btn> -->
+
+              </template>
+              <template v-slot:append-inner>
                 <ue-filepond-preview :source="attachments" image-size="24"/>
                 <template v-for="attachment in attachments">
-
                 </template>
+                <v-btn :color="color" size="default" icon="mdi-paperclip" density="compact" @click="$refs.inputFilepond.browse()" />
+                <v-btn
+                  variant="elevated"
+                  density="compact"
+                  :icon="sendButtonIcon"
+                  size="small"
+                  :disabled="loading || !message"
+                  @click="sendMessage"
+                />
               </template>
-            </v-text-field>
+            </v-textarea>
           </slot>
         </v-card-actions>
       </v-card>
@@ -219,9 +230,8 @@
     },
     props: {
       ...makeInputProps(),
-      endpoints: {
-        type: Object,
-        default: () => ({})
+      color: {
+        type: String,
       },
       disabled: {
         type: Boolean,
@@ -233,7 +243,7 @@
       },
       background: {
         type: String,
-        default: 'grey-lighten-5'
+        // default: 'grey-lighten-5'
       },
       elevation: {
         type: Number,
@@ -242,6 +252,14 @@
       density: {
         type: String,
         default: 'comfortable'
+      },
+      variant: {
+        type: String,
+        default: 'plain'
+      },
+      endpoints: {
+        type: Object,
+        default: () => ({})
       },
       perPage: {
         type: Number,
@@ -278,6 +296,10 @@
       refreshTime: {
         type: Number,
         default: 10000
+      },
+      inputVariant: {
+        type: String,
+        default: 'outlined'
       }
     },
     setup (props, context) {
@@ -319,6 +341,13 @@
       },
       isInfiniteScrollable() {
         return this.perPage > -1;
+      },
+      sendButtonIcon() {
+        return this.loading || !this.message
+          ? 'mdi-send-lock'
+          : this.message
+            ? 'mdi-send-check'
+            : 'mdi-send';
       }
     },
     watch: {

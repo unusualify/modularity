@@ -35,7 +35,7 @@ const state = {
   // name: window[import.meta.env.VUE_APP_NAME].STORE.datatable.name,
   headers: window[import.meta.env.VUE_APP_NAME].STORE.datatable.headers,
   // inputs: window[import.meta.env.VUE_APP_NAME].STORE.datatable.inputs,
-  search: window[import.meta.env.VUE_APP_NAME].STORE.datatable.searchText,
+  search: window[import.meta.env.VUE_APP_NAME].STORE.datatable.searchText ?? '',
   options: window[import.meta.env.VUE_APP_NAME].STORE.datatable.options,
   data: window[import.meta.env.VUE_APP_NAME].STORE.datatable.data || [],
   total: parseInt(window[import.meta.env.VUE_APP_NAME].STORE.datatable.total),
@@ -311,7 +311,6 @@ const actions = {
 
     if (_changed) {
       commit(DATATABLE.UPDATE_DATATABLE_LOADING, true)
-      console.log(state)
       const parameters = {
         ...(Object.keys(state.options).reduce(function (filtered, key) {
           const { active, value } = activeOption(
@@ -335,7 +334,6 @@ const actions = {
         ) }),
         // ...(state.filter.status !== 'all' ? { filter: state.filter } : {})
 
-
       }
 
       const url = endpoint ?? window[import.meta.env.VUE_APP_NAME].ENDPOINTS.index
@@ -350,6 +348,11 @@ const actions = {
 
         if (__isset(payload.options)) { commit(DATATABLE.UPDATE_DATATABLE_OPTIONS, payload.options) }
         if (__isset(payload.search)) { commit(DATATABLE.UPDATE_DATATABLE_SEARCH, payload.search) }
+
+        if (callback && typeof callback === 'function') callback(resp)
+      }, function (error) {
+        commit(DATATABLE.UPDATE_DATATABLE_LOADING, false)
+        if (errorCallback && typeof errorCallback === 'function') errorCallback(error)
       })
     }
     // }

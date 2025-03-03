@@ -68,7 +68,9 @@ abstract class BaseController extends PanelController
             ];
             // return $indexData + ['replaceUrl' => true];
         }
+
         $indexData = $this->getIndexData($this->nestedParentScopes());
+
         if ($this->request->has('openCreate') && $this->request->get('openCreate')) {
             $indexData += ['openCreate' => true];
         }
@@ -487,6 +489,7 @@ abstract class BaseController extends PanelController
      */
     protected function getItemColumnData($item, $column)
     {
+
         if (isset($column['thumb']) && $column['thumb']) {
             if (isset($column['present']) && $column['present']) {
                 return [
@@ -515,7 +518,7 @@ abstract class BaseController extends PanelController
             $value .= '">' . $nestedCount . ' ' . (mb_strtolower(Str::plural($column['title'], $nestedCount))) . '</a>';
         } else {
             $field = $column['key'];
-            $value = $item->$field;
+            $value = data_get($item, $field, null);
         }
 
         // for relationship fields
@@ -583,6 +586,17 @@ abstract class BaseController extends PanelController
         ) {
             $value = $value['title'] ?? $value['name'];
         }
+
+        // if($value === null) {
+        //     $appends = $item->getAppends();
+
+        //     if(in_array($column['key'], $appends)) {
+
+        //         $value = $item->{$column['key']};
+        //     } else {
+        //         // $value = '---';
+        //     }
+        // }
 
         return [
             "$field" => $value,

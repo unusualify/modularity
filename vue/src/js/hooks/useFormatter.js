@@ -102,9 +102,12 @@ export default function useFormatter (props, context, headers) {
         elements: value
       }
     },
-    shortenFormatter: function (value) {
-      console.log(value);
-      return window.__shorten(value, 10)
+    shortenFormatter: function (value, max = 10) {
+      return {
+        configuration: {
+          elements: window.__shorten(value, max)
+        }
+      }
     }
   })
 

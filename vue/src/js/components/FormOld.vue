@@ -159,7 +159,7 @@
                   variant="outlined"
                 ></v-chip>
               </v-chip-group>
-              <slot name="headerRight">
+              <slot name="header.right">
 
               </slot>
             </div>

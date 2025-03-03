@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Unusualify\Modularity\Http\Controllers\ChatableController;
+use Unusualify\Modularity\Http\Controllers\ProcessController;
 use Unusualify\Modularity\Http\Controllers\ProfileController;
 
 /*
@@ -36,6 +37,11 @@ Route::prefix('api')->group(function () {
         Route::put('{chat_message}', [ChatableController::class, 'update'])->name('update');
         Route::get('show/{chat_message}', [ChatableController::class, 'show'])->name('show');
         Route::delete('destroy/{chat_message}', [ChatableController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['prefix' => 'process', 'as' => 'process.'], function () {
+        Route::get('{process}', [ProcessController::class, 'show'])->name('show');
+        Route::put('{process}', [ProcessController::class, 'update'])->name('update');
     });
 
     if (modularityConfig('enabled.media-library')) {

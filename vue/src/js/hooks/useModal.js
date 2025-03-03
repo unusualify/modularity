@@ -1,7 +1,7 @@
 // hooks/formatter .js
 
 // import { ref, watch, computed, nextTick } from 'vue'
-import { reactive, toRefs, computed } from 'vue'
+import { reactive, toRefs, computed, ref } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 import htmlClasses from '@/utils/htmlClasses'
 import { useI18n } from 'vue-i18n'
@@ -11,7 +11,7 @@ const defaultWidths = {
   sm: '480px',
   md: '540px',
   lg: '1080px',
-  xl: '1200px'
+  xl: '1600px'
 }
 
 export const makeModalProps = propsFactory({
@@ -28,7 +28,7 @@ export const makeModalProps = propsFactory({
     default: 'md',
     validator: v => Object.prototype.hasOwnProperty.call(defaultWidths, v)
   },
-  systembar: {
+  hasSystembar: {
     type: Boolean,
     default: false
   },
@@ -81,10 +81,11 @@ export const makeModalMediaProps = propsFactory({
 export default function useModal (props, context) {
   const { modelValue } = toRefs(props)
 
+  const full = ref(props.fullscreen)
   const states = reactive({
     modalClass: htmlClasses.modal,
     width: props.widthType,
-    full: props.fullscreen,
+    full,
     dialog: computed({
       get: () => {
         return modelValue.value
@@ -96,7 +97,7 @@ export default function useModal (props, context) {
     }),
     togglePersistent: computed(() => props.persistent),
     toggleScrollable: computed(() => props.scrollable),
-    modalWidth: computed(() => props.widthType ? defaultWidths[props.widthType] : null)
+    modalWidth: computed(() => props.widthType && !full.value ? defaultWidths[props.widthType] : null)
 
   })
   const methods = reactive({

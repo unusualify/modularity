@@ -119,14 +119,14 @@
                 <template v-else>
                   <!-- search field -->
                   <v-text-field
-                    v-if="!hideSearchField"
-                    v-model="search"
+                    v-if="!hideSearchField && isStoreTable && hasSearchableHeader"
+                    v-model="searchModel"
                     variant="outlined"
-                    append-inner-icon="mdi-magnify"
+                    :append-inner-iconx="searchModel !== search ? 'mdi-magnify' : null"
                     hide-details
                     density="compact"
                     single-line
-                    :placeholder="searchText"
+                    :placeholder="searchPlaceholder"
                     :class="[
                       'mr-2',
                       controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'flex-grow-1' : ''
@@ -136,7 +136,14 @@
                       // controlsPosition === 'top' || $vuetify.display.smAndDown ? 'max-width: 300px' : '',
                       'min-width: 100px'
                     ]"
-                  />
+                    @click:append-inner="searchItems()"
+                    :disabled="loading"
+                    @keydown.enter="searchItems()"
+                  >
+                    <template #append-inner>
+                      <v-btn :disabled="searchModel === search" icon="mdi-magnify" variant="plain" size="compact" color="grey-darken-5" rounded @click="searchItems()" />
+                    </template>
+                  </v-text-field>
 
                   <!-- <v-spacer v-else-if="hideSearchField"></v-spacer> -->
 
@@ -245,37 +252,66 @@
 
           <!-- form modal -->
           <ue-modal
+            v-if="!embeddedForm"
             ref="formModal"
             v-model="formActive"
-            scrollablex
+
             transition="dialog-bottom-transition"
+            :fullscreen="false"
             width-type="lg"
-            v-if="!embeddedForm"
+            v-bind="formModalAttributes"
           >
-            <template v-slot:body="props">
-              <v-card class="fill-height d-flex flex-column">
-                <!-- <v-card-title class="text-h5 grey lighten-2"> </v-card-title> -->
+          <template v-slot:body="formModalBodyScope">
+            <v-card class="fill-height d-flex flex-column">
+              <!-- <v-card-title class="text-h5 grey lighten-2"> </v-card-title> -->
                 <ue-form
-                  ref="form"
-                  :title="formTitle"
-                  :isEditing="editedIndex > -1"
+                  ref="UeForm"
+
+                  form-class="px-6 pt-6 pb-0"
                   fill-height
                   scrollable
                   has-divider
                   no-default-form-padding
-                  form-class="px-6 pt-6 pb-0"
-                  style="height: 70vh !important;"
+                  v-bind="formAttributes"
+
+                  :title="formTitle"
+                  :isEditing="editedIndex > -1"
+                  :style="formModalBodyScope.isFullActive ? 'height: 90vh !important;' : 'height: 70vh !important;'"
                   :actions="formActions"
                   @action-complete="handleFormActionComplete"
                 >
-                  <template v-slot:headerRight>
-                    <v-btn variant="plain" icon="$close" density="compact" color="grey-darken-5" rounded
-                      @click="closeForm()"
-                    ></v-btn>
+
+                  <template v-slot:header.left="headerLeftScope">
+                    <slot name="form.header.left" v-bind="headerLeftScope">
+                      {{ headerLeftScope.title }}
+                    </slot>
+                  </template>
+
+                  <template v-slot:header.right>
+                    <slot name="form.header.right">
+                      <v-btn :icon="formModalBodyScope.isFullActive ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="compact" @click="formModalBodyScope.toggleFullscreen()"/>
+                      <v-btn icon="$close" variant="plain" size="compact" color="grey-darken-5" rounded @click="closeForm()" />
+                    </slot>
+                  </template>
+
+                  <template v-if="$slots['form.right.top']" v-slot:right.top="rightScope">
+                    <slot name="form.right.top" v-bind="rightScope">
+
+                    </slot>
+                  </template>
+                  <template v-if="$slots['form.right.middle']" v-slot:right.middle="rightScope">
+                    <slot name="form.right.middle" v-bind="rightScope">
+
+                    </slot>
+                  </template>
+                  <template v-if="$slots['form.right.bottom']" v-slot:right.bottom="rightScope">
+                    <slot name="form.right.bottom" v-bind="rightScope">
+
+                    </slot>
                   </template>
 
                   <template v-slot:top="formTopScope">
-                    <slot name="form-top" v-bind="formTopScope">
+                    <slot name="form.top" v-bind="formTopScope">
 
                     </slot>
                   </template>
@@ -286,12 +322,14 @@
                 <v-divider class="mx-6 mt-4"/>
                 <v-card-actions class="px-6 flex-grow-0">
                   <v-spacer></v-spacer>
-                  <!-- <v-btn-secondary @click="closeForm()"
+                  <v-btn-secondary
+                    v-if="$store.getters.isSuperAdmin"
                     :slim="false"
                     variant="outlined"
+                    @click="$refs.UeForm.validate()"
                   >
-                    {{ props.textCancel }}
-                  </v-btn-secondary> -->
+                    {{ $t('Validate') }}
+                  </v-btn-secondary>
                   <v-btn-primary
                     :slim="false"
                     variant="elevated"
@@ -319,10 +357,15 @@
                     ref="form"
                     :isEditing="editedIndex > -1"
                   >
+                    <template v-slot:header.left="headerLeftScope">
+                      <slot name="form.header.left" v-bind="headerLeftScope">
+                        {{ headerLeftScope.title }}
+                      </slot>
+                    </template>
                     <template v-slot:headerCenter>
 
                     </template>
-                    <template v-slot:headerRight>
+                    <template v-slot:header.right>
                       <v-btn class="" variant="text" icon="$close" density="compact"
                         @click="closeForm()"
                       ></v-btn>
@@ -451,7 +494,7 @@
                 form-class="px-6 pb-0"
                 style="height: 90vh !important;"
               >
-                <template v-slot:headerRight>
+                <template v-slot:header.right>
                   <v-btn class="ml-auto" variant="text" icon="$close" density="compact" color="deafult"
                     @click="customFormModalActive = false"
                   ></v-btn>
@@ -821,6 +864,8 @@ export default {
         this.datatable = this.$refs.datatable;
       }
     });
+
+    this.initialize()
     // __log(
     //   // this.$props,
     //   // _.omit(this.$props ?? {}, ['columns']),

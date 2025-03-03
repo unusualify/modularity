@@ -1,14 +1,130 @@
 // hooks/useForm.js
 import { ref, computed, watch, toRefs, reactive, nextTick } from 'vue'
 import { useStore } from 'vuex'
+import { useI18n } from 'vue-i18n'
+import { cloneDeep, isEqual } from 'lodash-es'
+import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
+
+import { useInputHandlers, useValidation, useLocale, useItemActions } from '@/hooks'
 import { FORM, ALERT } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
 import api from '@/store/api/form'
-import { useI18n } from 'vue-i18n'
-import { useInputHandlers, useValidation, useLocale, useItemActions } from '@/hooks'
 import { getModel, getSubmitFormData, getSchema, handleEvents, getTranslationInputsCount, getTopSchema } from '@/utils/getFormData.js'
 import { redirector } from '@/utils/response'
-import { cloneDeep, isEqual } from 'lodash-es'
+
+export const makeFormProps = propsFactory({
+  modelValue: {
+    type: Object,
+    // default () {
+    //   return {}
+    // }
+  },
+  formClass: {
+    type: [Array, String],
+    default: ''
+  },
+  actionUrl: {
+    type: String
+  },
+  title: {
+    type: String
+  },
+  noTitle: {
+    type: Boolean,
+    default: false
+  },
+  schema: {
+    type: Object,
+    // default () {
+    //   return {}
+    // }
+  },
+  async: {
+    type: Boolean,
+    default: true
+  },
+  buttonText: {
+    type: String
+  },
+  hasSubmit: {
+    type: Boolean,
+    default: false
+  },
+  stickyFrame: {
+    type: Boolean,
+    default: false
+  },
+  stickyButton: {
+    type: Boolean,
+    default: false
+  },
+  rowAttribute: {
+    type: Object,
+    default () {
+      return {
+        noGutters: false,
+        class: 'py-4',
+        // justify:'center',
+        // align:'center'
+      }
+    }
+  },
+  slots: {
+    type: Object,
+    default () {
+      return {}
+    }
+  },
+  valid: {
+    type: Boolean,
+    default: null
+  },
+  isEditing: {
+    type: Boolean,
+    default: false
+  },
+  hasDivider: {
+    type: Boolean,
+    default: false
+  },
+  fillHeight: {
+    type: Boolean,
+    default: false
+  },
+  scrollable: {
+    type: Boolean,
+    default: false
+  },
+  noDefaultFormPadding: {
+    type: Boolean,
+    default: false
+  },
+  noDefaultSurface: {
+    type: Boolean,
+    default: false
+  },
+  actions: {
+    type: [Array, Object],
+    default: []
+  },
+  rightSlotGap: {
+    type: Number,
+    default: 12
+  },
+  rightSlotWidth: {
+    type: Number,
+    default: null
+  },
+  rightSlotMinWidth: {
+    type: Number,
+    default: 300
+  },
+  rightSlotMaxWidth: {
+    type: Number,
+    default: 600
+  },
+
+})
 
 export default function useForm(props, context) {
   const store = useStore()
@@ -37,7 +153,6 @@ export default function useForm(props, context) {
   const defaultItem = ref(issetSchema.value
     ? getModel(rawSchema.value)
     : store.getters.defaultItem)
-
 
   const storeEditedItem = computed(() => store.state.form.editedItem)
 

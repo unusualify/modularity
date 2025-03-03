@@ -284,11 +284,16 @@ class Module extends NwidartModule
      * @param mixed $route_name
      * @param mixed $input_name
      */
-    public function getRouteInput($route_name, $input_name = null): array
+    public function getRouteInputs($route_name, $input_name = null): array
     {
-        $inputs = $this->getRouteConfig($route_name)['inputs'];
-
         return $this->getRouteConfig($route_name)['inputs'];
+    }
+
+    public function getRouteInput($route_name, $input_name, $field = 'name'): array
+    {
+        $inputs = $this->getRouteInputs($route_name);
+
+        return Arr::first($inputs, fn ($item) => $item[$field] == $input_name);
     }
 
     /**

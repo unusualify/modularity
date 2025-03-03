@@ -216,6 +216,10 @@ export const getSubmitFormData = (inputs, item = null, rootState = null) => {
   const isArrayable = 'input-treeview|treeview|input-checklist'
 
   const values = Object.keys(inputs).reduce((fields, k) => {
+
+    if(window.__isset(inputs[k].noSubmit) && inputs[k].noSubmit)
+      return fields
+
     const input = inputs[k]
     // if (isMediableTypes.includes(input.type)) {
     //   return fields
