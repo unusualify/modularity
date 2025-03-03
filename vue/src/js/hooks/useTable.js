@@ -93,6 +93,15 @@ export const makeTableProps = propsFactory({
     default: {}
   },
 
+  formAttributes: {
+    type: Object,
+    default: {}
+  },
+  formModalAttributes: {
+    type: Object,
+    default: {}
+  },
+
   showSelect: {
     type: Boolean,
     default: true,
@@ -119,7 +128,7 @@ export default function useTable (props, context) {
   const { t, te, tm } = useI18n({ useScope: 'global' })
 
   const editedIndex = ref(-1)
-  let items = ref(props.items ?? store.state.datatable.data)
+  let items = ref(props.items ?? store.state.datatable?.data ?? [])
   const elements = computed({
     get(){
       return items.value;
@@ -151,21 +160,28 @@ export default function useTable (props, context) {
   const getters = mapGetters()
 
   const form = ref(null)
-  let loading = ref(false)
+  const loading = ref(false)
 
-  // let headers = props.columns ?? store.state.datatable.headers ?? []
+  const searchModel = ref(store.state.datatable.search ?? '')
+
+  const isStoreTable = computed(() => {
+    return props.endpoints.index.replace(/\/$/, '').split('?')[0] === window.location.href.replace(/\/$/, '').split('?')[0]
+  })
+
+  const options = ref(props.tableOptions ?? store.state.datatable.options ?? {})
 
   const state = reactive({
 
     id: Math.ceil(Math.random() * 1000000) + '-table',
     hideTable: false,
-    searchText: computed(() => t("Type to Search")),
+    searchPlaceholder: t("Type to Search"),
     fillHeight: computed(() => props.fillHeight),
     windowSize: {
       x: 0,
       y: 0
     },
-    options:  props.tableOptions ?? store.state.datatable.options ?? {},
+    isStoreTable,
+    options,
     mobileTableLayout: computed(() => {
       return smAndDown.value
     }),
@@ -185,7 +201,7 @@ export default function useTable (props, context) {
     // datatable store
     loading: computed({
       get() {
-        return props.endpoints.index ? loading.value : store.state.datatable.loading
+        return isStoreTable.value ? store.state.datatable.loading : loading.value
       },
       set(val) {
         loading.value = val
@@ -193,102 +209,6 @@ export default function useTable (props, context) {
     }),
     editedIndex: editedIndex,
     selectedItems: [],
-
-    _modals: {
-      'delete': {
-        // title: computed(() => t('confirm-deletion')),
-        content: tableNames.deleteQuestion,
-        confirmAction () {
-
-          if (state.isSoftDeletableItem) {
-            store.dispatch(ACTIONS.DESTROY_ITEM, {
-              id: state.editedItem.id,
-              callback: () => {
-                state.customModalActive = false
-              },
-              errorCallback: () => {
-
-              }
-            })
-          } else {
-            store.dispatch(ACTIONS.DELETE_ITEM, {
-              id: state.editedItem.id,
-              callback: () => {
-                state.customModalActive = false
-              },
-              errorCallback: () => {
-
-              }
-            })
-          }
-        },
-        closeAction () {
-          state.customModalActive = false
-          // this.active = false
-        }
-      },
-      'action': {
-        content: computed(() => state.actionDialogQuestion),
-        confirmAction() {
-          methods.bulkAction(state.selectedAction)
-          state.customModalActive = false;
-        },
-        openAction(action) {
-          // state.actionModalActive = true
-          state.selectedAction = action
-          state.customModalActive = true;
-        },
-        closeAction() {
-          state.customModalActive = false;
-        }
-      },
-      'custom': {
-        content: computed(() => store._state.data.datatable.customModal.description),
-        hideModalCancel: computed(() => store._state.data.datatable.customModal.hideModalCancel),
-        closeAction() {
-          state.customModalActive = false;
-          state.modals.custom.confirmText = '';
-          state.modals.custom.cancelText = '';
-          state.modals.custom.img = '';
-          state.modals.custom.icon = '';
-          state.modals.custom.iconSize = null;
-          state.modals.custom.title = '';
-          state.modals.custom.color = '';
-          console.log(state.modals.custom)
-        },
-        confirmAction() {
-          state.customModalActive = false;
-          state.modals.custom.confirmText = '';
-          state.modals.custom.cancelText = '';
-          state.modals.custom.img = '';
-          state.modals.custom.icon = '';
-          state.modals.custom.iconSize = null;
-          state.modals.custom.title = '';
-          state.modals.custom.color = '';
-          console.log(state.modals.custom)
-        },
-        confirmText: 'Done',
-        cancelText: ' ',
-        img: 'https://cdn2.iconfinder.com/data/icons/greenline/512/check-1024.png',
-        icon: store._state.data.datatable.customModal.icon,
-        iconSize: 72,
-        title: 'Payment Complete',
-        color: 'success'
-      }
-    },
-    //deleteModalActive: false,
-    // deleteModal: ref(null),
-    // customModalActive: !(_.isEmpty(store._state.data.datatable.customModal)),
-    // activeModal: 'custom',
-    // actionModalActive: false,
-    // actionDialogQuestion: computed(() => {
-    //   return t('confirm-action', {
-    //     // route: state.transName.toLowerCase(),
-    //     route: state.transNameSingular,
-    //     action: t(state.selectedAction?.name ?? ''),
-    //   })
-    // }),
-    // selectedAction: null,
 
     activeTableItem: null,
     activeItemConfiguration: null,
@@ -316,6 +236,7 @@ export default function useTable (props, context) {
       return items;
     }),
 
+    searchModel
   })
 
   const tableItemActions = useTableItemActions(props, {
@@ -332,12 +253,19 @@ export default function useTable (props, context) {
       state.windowSize = { x: window.innerWidth, y: window.innerHeight }
     },
     initialize: function () {
-      store.commit(DATATABLE.UPDATE_DATATABLE_SEARCH, '')
-      store.commit(
-        DATATABLE.UPDATE_DATATABLE_OPTIONS,
-        window[import.meta.env.VUE_APP_NAME].STORE.datatable.options
-      )
-      store.dispatch(ACTIONS.GET_DATATABLE)
+
+      if(!isStoreTable.value){
+        store.commit(DATATABLE.UPDATE_DATATABLE_SEARCH, '')
+      } else {
+        state.loading = true
+        store.dispatch(ACTIONS.GET_DATATABLE, { callback: (res) => {
+          state.loading = false
+        }})
+      }
+      // store.commit(
+      //   DATATABLE.UPDATE_DATATABLE_OPTIONS,
+      //   window[import.meta.env.VUE_APP_NAME].STORE.datatable.options
+      // )
     },
     goNextPage () {
       if (state.options.page < store.getters.totalPage) { state.options.page += 1 }
@@ -357,6 +285,7 @@ export default function useTable (props, context) {
     },
     loadItems(options = null){
       state.loading = true
+
       api.get(
         tableEndpoints.indexUrl.value, options ?? state.options, function(response){
           const incomingDataArray = response.resource.data
@@ -406,7 +335,6 @@ export default function useTable (props, context) {
     closeActionModal(){
       state.actionModalActive = false
     },
-
     sortElements(list){
       // state.elements = list;
 
@@ -423,7 +351,6 @@ export default function useTable (props, context) {
       )
 
     },
-
     hydrateNestedData: function (item, data) {
       const valuePattern = /\$([A-Za-z]+)/
       // const urlPattern = /\/:([A-Za-z])+/
@@ -452,6 +379,11 @@ export default function useTable (props, context) {
 
       return data
     },
+    searchItems(){
+      if(tableFilters.search.value !== searchModel.value){
+        tableFilters.search.value = searchModel.value
+      }
+    }
   })
 
   watch(() => tableItem.editedItem.value, (newValue, oldValue) => {
@@ -471,16 +403,11 @@ export default function useTable (props, context) {
     newValue || methods.resetEditedItem()
   })
   watch(() => state.options, (newValue, oldValue) => {
-
-    console.log(tableEndpoints.indexUrl.value )
-    if( tableEndpoints.indexUrl.value ){
+    if (isStoreTable.value) {
+      store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue, infiniteScroll: state.enableInfiniteScroll }, endpoint : props.endpoints.index ?? null})
+    }else {
       newValue.replaceUrl = false
       methods.loadItems(newValue)
-
-    } else {
-      console.log(props, tableEndpoints)
-      store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue, infiniteScroll: state.enableInfiniteScroll }, endpoint : props.endpoints.index ?? null})
-
     }
 
   }, { deep: true })
