@@ -48,6 +48,13 @@ export default {
 
     return false
   },
+  $hasRoles: function (roles) {
+    if(window.__isString(roles)){
+      roles = roles.split(',').map(role => role.trim())
+    }
+
+    return this.$store.getters.userRoles.some(role => roles.includes(role))
+  },
   $toggleSidebar: function () {
     this.$store.commit(CONFIG.SIDEBAR_TOGGLE)
   },
