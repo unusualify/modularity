@@ -1,5 +1,5 @@
 // hooks/useTable.js
-import { computed, ref, nextTick, watch } from 'vue'
+import { computed, ref, nextTick, watch, toRefs, toRef } from 'vue'
 import _ from 'lodash-es'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
@@ -43,7 +43,7 @@ export default function useTableForms(props, context) {
   const { setEditedItem, resetEditedItem, editedItem } = useTableItem()
 
   // Form refs and state
-  const form = ref(null)
+  const UeForm = ref(null)
   const formActive = ref(false)
   const customFormModalActive = ref(false)
 
@@ -71,9 +71,9 @@ export default function useTableForms(props, context) {
     store.state.form.errors ?? {}
   )
 
-  const formIsValid = computed(() =>
-    form.value?.validModel ?? null
-  )
+  const formIsValid = computed(() => {
+    return UeForm.value?.validModel ?? null
+  })
 
   const addBtnTitle = computed(() => {
     if(props.createOnModal || props.editOnModal) {
@@ -99,7 +99,7 @@ export default function useTableForms(props, context) {
   }
 
   const confirmFormModal = () => {
-    form.value.submit(null, (res) => {
+    UeForm.value.submit(null, (res) => {
       if (Object.prototype.hasOwnProperty.call(res, 'variant') &&
           res.variant.toLowerCase() === 'success') {
         closeForm()
@@ -136,12 +136,14 @@ export default function useTableForms(props, context) {
 
   return {
     // Refs
-    form,
-    formActive,
-    customFormModalActive,
-    customFormAttributes,
-    customFormSchema,
-    customFormModel,
+    ...toRefs({
+      UeForm,
+      formActive,
+      customFormModalActive,
+      customFormAttributes,
+      customFormSchema,
+      customFormModel,
+    }),
 
     // Computed
     inputs,
