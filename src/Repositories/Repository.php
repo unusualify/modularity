@@ -68,7 +68,7 @@ abstract class Repository
      * @param bool $forcePagination
      * @return \Illuminate\Support\Collection|\Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function get($with = [], $scopes = [], $orders = [], $perPage = 20, $forcePagination = false)
+    public function get($with = [], $scopes = [], $orders = [], $perPage = 20, $appends = [], $forcePagination = false)
     {
         $query = $this->model->query();
         $query = $this->model->with($this->formatWiths($query, $with));
@@ -98,9 +98,7 @@ abstract class Repository
         }
 
         if ($perPage == -1) {
-            return $query->paginate(0);
-
-            return $query->get();
+            return $query->simplePaginate($perPage);
         }
 
         try {
