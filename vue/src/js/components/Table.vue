@@ -255,23 +255,27 @@
             v-if="!embeddedForm"
             ref="formModal"
             v-model="formActive"
-            scrollablex
+
             transition="dialog-bottom-transition"
+            :fullscreen="false"
             width-type="lg"
-            full
+            v-bind="formModalAttributes"
           >
-            <template v-slot:body="formModalBodyScope">
-              <v-card class="fill-height d-flex flex-column">
-                <!-- <v-card-title class="text-h5 grey lighten-2"> </v-card-title> -->
+          <template v-slot:body="formModalBodyScope">
+            <v-card class="fill-height d-flex flex-column">
+              <!-- <v-card-title class="text-h5 grey lighten-2"> </v-card-title> -->
                 <ue-form
-                  ref="form"
-                  :title="formTitle"
-                  :isEditing="editedIndex > -1"
+                  ref="UeForm"
+
+                  form-class="px-6 pt-6 pb-0"
                   fill-height
                   scrollable
                   has-divider
                   no-default-form-padding
-                  form-class="px-6 pt-6 pb-0"
+                  v-bind="formAttributes"
+
+                  :title="formTitle"
+                  :isEditing="editedIndex > -1"
                   :style="formModalBodyScope.isFullActive ? 'height: 90vh !important;' : 'height: 70vh !important;'"
                   :actions="formActions"
                   @action-complete="handleFormActionComplete"
@@ -318,12 +322,14 @@
                 <v-divider class="mx-6 mt-4"/>
                 <v-card-actions class="px-6 flex-grow-0">
                   <v-spacer></v-spacer>
-                  <!-- <v-btn-secondary @click="closeForm()"
+                  <v-btn-secondary
+                    v-if="$store.getters.isSuperAdmin"
                     :slim="false"
                     variant="outlined"
+                    @click="$refs.UeForm.validate()"
                   >
-                    {{ props.textCancel }}
-                  </v-btn-secondary> -->
+                    {{ $t('Validate') }}
+                  </v-btn-secondary>
                   <v-btn-primary
                     :slim="false"
                     variant="elevated"
@@ -858,6 +864,8 @@ export default {
         this.datatable = this.$refs.datatable;
       }
     });
+
+    this.initialize()
     // __log(
     //   // this.$props,
     //   // _.omit(this.$props ?? {}, ['columns']),
