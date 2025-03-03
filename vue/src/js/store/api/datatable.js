@@ -17,7 +17,7 @@ export default {
     * filter: the current navigation ("all", "mine", "published", "draft", "trash")
     *
     */
-  get (url,params, callback) {
+  get (url,params, callback, errorCallback = null) {
 
     axios.get(url, { params })
       .then(function (resp) {
@@ -40,7 +40,11 @@ export default {
           message: 'Get request error.',
           value: resp
         }
-        //   globalError(component, error)
+        if (errorCallback && typeof errorCallback === 'function') {
+          errorCallback(error)
+        } else {
+          // globalError(component, error)
+        }
       })
   },
 
