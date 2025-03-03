@@ -155,7 +155,7 @@ abstract class PanelController extends CoreController
     /**
      * @var int
      */
-    protected $perPage = 20;
+    protected $perPage = 10;
 
     /**
      * Name of the index column to use as name column.
@@ -469,7 +469,7 @@ abstract class PanelController extends CoreController
 
         $paginator = $this->getIndexItems(with: $with, scopes: $scopes);
 
-        return $this->getTransformer($this->getFormattedIndexItems($paginator));
+        return $this->getTransformer( $this->getFormattedIndexItems($paginator) );
         // return $this->getTransformer( $paginator->toArray() );
     }
 
@@ -761,7 +761,7 @@ abstract class PanelController extends CoreController
         });
 
         foreach ($methods as $key => $method) {
-            $this->indexWith += $this->{$method}();
+            $this->indexWith = array_merge($this->indexWith, $this->{$method}());
         }
     }
 
