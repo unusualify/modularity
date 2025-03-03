@@ -469,7 +469,7 @@ abstract class PanelController extends CoreController
 
         $paginator = $this->getIndexItems(with: $with, scopes: $scopes);
 
-        return $this->getTransformer( $this->getFormattedIndexItems($paginator) );
+        return $this->getTransformer($this->getFormattedIndexItems($paginator));
         // return $this->getTransformer( $paginator->toArray() );
     }
 

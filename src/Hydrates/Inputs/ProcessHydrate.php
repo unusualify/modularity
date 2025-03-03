@@ -29,7 +29,6 @@ class ProcessHydrate extends InputHydrate
     {
         $input = $this->input;
 
-
         if (isset($input['_moduleName']) && isset($input['_routeName'])) {
             $module = Modularity::find($input['_moduleName']);
             $model = $module->getRouteClass($input['_routeName'], 'model');

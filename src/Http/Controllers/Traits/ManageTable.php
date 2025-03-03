@@ -648,17 +648,17 @@ trait ManageTable
 
         $rawHeaders = $this->getConfigFieldsByRoute('headers', []);
 
-        if(count($rawHeaders) > 0){
+        if (count($rawHeaders) > 0) {
             $model = $this->repository->getModel();
-            if(method_exists($model, 'hasRelation')) {
+            if (method_exists($model, 'hasRelation')) {
                 foreach ($rawHeaders as $header) {
-                    if(isset($header->with)) {
+                    if (isset($header->with)) {
                         $with = is_string($header->with) ? [$header->with] : (array) $header->with;
 
-                        if(Arr::isAssoc($with)) {
-                            foreach($with as $relationshipName => $mappings) {
-                                if(isset($mappings['functions'])) {
-                                    $withs[$relationshipName] = fn($query) => array_reduce($mappings['functions'], fn($query, $function) => $query->$function(), $query);
+                        if (Arr::isAssoc($with)) {
+                            foreach ($with as $relationshipName => $mappings) {
+                                if (isset($mappings['functions'])) {
+                                    $withs[$relationshipName] = fn ($query) => array_reduce($mappings['functions'], fn ($query, $function) => $query->$function(), $query);
                                 } else {
                                     $withs[$relationshipName] = $mappings;
                                 }

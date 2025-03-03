@@ -391,7 +391,7 @@ trait ManageForm
 
                 $foreignKey = $this->getForeignKeyFromName($this->routeName);
 
-                $input['type'] =  $input['component'] ?? 'input-repeater';
+                $input['type'] = $input['component'] ?? 'input-repeater';
                 // $input['label'] ??= pluralize($this->getHeadline($input['name']));
                 $input['autoIdGenerator'] ??= false;
 

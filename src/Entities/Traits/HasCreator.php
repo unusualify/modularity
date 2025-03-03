@@ -102,7 +102,7 @@ trait HasCreator
         $key = $this->getKey();
 
         try {
-            return (!is_null($key) && $this->creatorRecord()->exists()) ? $this->creatorRecord->creator_type : static::getDefaultCreatorModel();
+            return (! is_null($key) && $this->creatorRecord()->exists()) ? $this->creatorRecord->creator_type : static::getDefaultCreatorModel();
         } catch (\Exception $e) {
             dd($this, $this->creatorRecord);
         }

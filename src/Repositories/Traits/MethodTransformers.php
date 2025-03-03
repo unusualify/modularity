@@ -255,9 +255,9 @@ trait MethodTransformers
 
         $this->traitColumns = $this->setColumns($this->traitColumns, $chunkedInputs);
 
-        if(!$noSerialization){
+        if (! $noSerialization) {
             $fields = $object->attributesToArray();
-        }else{
+        } else {
             $fields = [];
         }
 

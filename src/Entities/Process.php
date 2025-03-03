@@ -12,11 +12,11 @@ use Unusualify\Modularity\Entities\Enums\ProcessStatus;
 class Process extends Model
 {
     /**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array<int, string>
-	 */
-	protected $fillable = [
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
         'processable_id',
         'processable_type',
         'status',

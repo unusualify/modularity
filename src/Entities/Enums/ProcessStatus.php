@@ -12,7 +12,7 @@ enum ProcessStatus: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PREPARING => __('Preparing'),
             self::WAITING_FOR_CONFIRMATION => __('Waiting for Action'),
             self::WAITING_FOR_REACTION => __('Waiting for Reaction'),
@@ -24,7 +24,7 @@ enum ProcessStatus: string
 
     public function color(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PREPARING => 'info',
             self::WAITING_FOR_CONFIRMATION => 'warning',
             self::WAITING_FOR_REACTION => 'warning',
@@ -36,7 +36,7 @@ enum ProcessStatus: string
 
     public function cardColor(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PREPARING => 'grey',
             self::WAITING_FOR_CONFIRMATION => 'blue-darken-1',
             self::WAITING_FOR_REACTION => 'blue-darken-1',
@@ -48,7 +48,7 @@ enum ProcessStatus: string
 
     public function cardVariant(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PREPARING => 'outlined',
             self::WAITING_FOR_CONFIRMATION => 'outlined',
             self::WAITING_FOR_REACTION => 'outlined',
@@ -60,7 +60,7 @@ enum ProcessStatus: string
 
     public function icon(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PREPARING => 'mdi-progress-clock',
             self::WAITING_FOR_CONFIRMATION => 'mdi-clock-check-outline',
             self::WAITING_FOR_REACTION => 'mdi-clock-check-outline',
@@ -72,7 +72,7 @@ enum ProcessStatus: string
 
     public function nextActionLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PREPARING => __('Send for Confirmation'),
             self::WAITING_FOR_CONFIRMATION => __('Confirm'),
             self::WAITING_FOR_REACTION => __('Confirm'),
@@ -84,7 +84,7 @@ enum ProcessStatus: string
 
     public function statusReasonLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PREPARING => __('Preparing'),
             self::WAITING_FOR_CONFIRMATION => __('Arrangement'),
             self::WAITING_FOR_REACTION => __('Arrangement'),
@@ -96,7 +96,7 @@ enum ProcessStatus: string
 
     public function nextActionColor(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PREPARING => 'secondary',
             self::WAITING_FOR_CONFIRMATION => 'success',
             self::WAITING_FOR_REACTION => 'success',

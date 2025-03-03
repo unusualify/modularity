@@ -82,7 +82,7 @@ abstract class CoreController extends LaravelController
     {
         $perPage = $this->request->get('itemsPerPage') ?? $this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10;
 
-        if( !$this->request->ajax() ){
+        if (! $this->request->ajax()) {
             $perPage = -1;
         }
 

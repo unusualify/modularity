@@ -344,7 +344,6 @@ abstract class InputHydrate
                 : throw new \Exception("No Module in '" . ($this->input['name'] ?? $this->input['type']) . "' input"));
     }
 
-
     final protected function hasModule()
     {
         return $this->module !== null;
@@ -373,8 +372,6 @@ abstract class InputHydrate
                 ? $this->routeName
                 : throw new \Exception("No Route Name in '" . ($this->input['name'] ?? $this->input['type']) . "' input"));
     }
-
-
 
     /**
      * Handle magic method __toString.

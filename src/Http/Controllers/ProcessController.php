@@ -28,7 +28,7 @@ class ProcessController extends Controller
 
         $serializedProcess = $process->toArray();
 
-        if(method_exists($processableModel, 'moduleName') && method_exists($processableModel, 'routeName')) {
+        if (method_exists($processableModel, 'moduleName') && method_exists($processableModel, 'routeName')) {
 
             $module = Modularity::find($processableModel->moduleName());
             $repository = App::make($module->getRouteClass($processableModel->routeName(), 'repository'));
@@ -38,22 +38,21 @@ class ProcessController extends Controller
             $schema = $module->getRouteInputs($processableModel->routeName());
 
             $processableFields = [];
-            if(count($schema) > 0){
-                $processInput = Arr::first($schema, function($input){
+            if (count($schema) > 0) {
+                $processInput = Arr::first($schema, function ($input) {
                     return $input['type'] == 'process';
                 });
 
-                if($processInput && isset($processInput['schema'])){
+                if ($processInput && isset($processInput['schema'])) {
                     $processableFields = $repository->getFormFields($process->processable, $schema);
-                    $processableFields = Arr::only($processableFields, array_map(fn($i) => $i['name'], $processInput['schema']));
+                    $processableFields = Arr::only($processableFields, array_map(fn ($i) => $i['name'], $processInput['schema']));
                 }
 
                 // $processableFields = array_merge($processInput);
             }
 
-            $serializedProcess['processable'] = array_merge($serializedProcess['processable'], $processableFields );
+            $serializedProcess['processable'] = array_merge($serializedProcess['processable'], $processableFields);
         }
-
 
         return response()->json($serializedProcess);
     }
@@ -62,17 +61,17 @@ class ProcessController extends Controller
     {
         $processableModel = App::make($process->processable_type);
 
-        if(method_exists($processableModel, 'moduleName') && method_exists($processableModel, 'routeName')) {
+        if (method_exists($processableModel, 'moduleName') && method_exists($processableModel, 'routeName')) {
             // $moduleName = $processableModel->moduleName();
             // $routeName = $processableModel->routeName();
             $module = Modularity::find($processableModel->moduleName());
             $schema = $module->getRouteInputs($processableModel->routeName());
             $repository = App::make($module->getRouteClass($processableModel->routeName(), 'repository'));
 
-            foreach($schema as $input){
-                if(isset($input['type']) && $input['type'] == 'process' && isset($input['schema'])){
-                    foreach($input['schema'] as $schemaInput){
-                        if(isset($schemaInput['name'])){
+            foreach ($schema as $input) {
+                if (isset($input['type']) && $input['type'] == 'process' && isset($input['schema'])) {
+                    foreach ($input['schema'] as $schemaInput) {
+                        if (isset($schemaInput['name'])) {
                             $schema[] = $schemaInput;
                         }
                     }
@@ -85,10 +84,9 @@ class ProcessController extends Controller
 
         $processFields = Arr::only($request->all(), $process->getFillable());
         // dd($processFields);
-        if(count($processFields) > 0){
+        if (count($processFields) > 0) {
             $process->processable->setProcessStatus($request->get('status'), $request->get('reason') ?? null);
         }
-
 
         return response()->json(['variant' => 'success', 'message' => 'Process updated successfully']);
     }

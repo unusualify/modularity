@@ -4,8 +4,6 @@ namespace Unusualify\Modularity\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Unusualify\Modularity\Entities\Process;
-use Unusualify\Modularity\Entities\User;
 
 class ProcessHistory extends Model
 {

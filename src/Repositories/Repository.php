@@ -959,20 +959,22 @@ abstract class Repository
     {
         return array_map(function ($item) {
 
-            if(is_array($item)) {
-                if(Arr::isAssoc($item)) {
-                    if(request()->ajax()) {
+            if (is_array($item)) {
+                if (Arr::isAssoc($item)) {
+                    if (request()->ajax()) {
                         dd($item);
                     }
-                    return fn($query) => array_reduce($item['functions'], fn($query, $function) => $query->$function(), $query);
-                }else{
-                    if(request()->ajax()) {
+
+                    return fn ($query) => array_reduce($item['functions'], fn ($query, $function) => $query->$function(), $query);
+                } else {
+                    if (request()->ajax()) {
                         // dd($item);
                     }
                 }
             }
 
             return $item;
+
             return is_array($item)
                 ? function ($query) use ($item) {
 

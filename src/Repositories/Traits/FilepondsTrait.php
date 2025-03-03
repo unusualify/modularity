@@ -31,7 +31,7 @@ trait FilepondsTrait
         foreach ($columns as $role) {
             $files = data_get($fields, $role) ?? null;
 
-            if(!$files){
+            if (! $files) {
                 continue;
             }
 

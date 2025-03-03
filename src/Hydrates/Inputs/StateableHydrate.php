@@ -35,17 +35,17 @@ class StateableHydrate extends InputHydrate
 
         $module = null;
         $routeName = null;
-        if(isset($input['_moduleName'])) {
+        if (isset($input['_moduleName'])) {
             $module = Modularity::find($input['_moduleName']);
-        } else if($this->hasModule()) {
+        } elseif ($this->hasModule()) {
             $module = $this->module;
         } else {
             throw new \Exception("No Module in '{$input['name']} input'");
         }
 
-        if(isset($input['_routeName'])) {
+        if (isset($input['_routeName'])) {
             $routeName = Modularity::find($input['_moduleName']);
-        } else if($this->hasRouteName()) {
+        } elseif ($this->hasRouteName()) {
             $routeName = $this->getRouteName();
         } else {
             throw new \Exception("No Route in '{$input['name']} input'");
