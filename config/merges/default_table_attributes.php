@@ -10,7 +10,7 @@ return [
     'rowActionsType' => 'inline',
     'hideDefaultFooter' => false,
     'tableClasses' => 'elevation-2',
-    'itemsPerPage' => 20,
+    'itemsPerPage' => 10,
     'hideHeaders' => false,
     'hideSearchField' => false,
     'multiSort' => false,
@@ -135,5 +135,19 @@ return [
     ],
     'headerOptions' => [
         'color' => 'rgba(140,160,167, .2)', // Hex, rgba or default css colors
+    ],
+
+    'formAttributes' => [
+        'formClass' => 'px-6 pt-6 pb-0',
+        'scrollable' => true,
+        'hasSubmit' => false,
+        'fillHeight' => true,
+        'hasDivider' => true,
+        'noDefaultFormPadding' => true,
+    ],
+    'formModalAttributes' => [
+        'widthType' => 'lg',
+        'fullscreen' => false,
+        'transition' => 'dialog-bottom-transition',
     ],
 ];
