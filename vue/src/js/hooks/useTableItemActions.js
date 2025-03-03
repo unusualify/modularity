@@ -7,7 +7,9 @@ import ACTIONS from '@/store/actions'
 
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
-import { useTableItem, useTableNames } from '@/hooks'
+import { useTableItem, useTableNames, useAuthorization } from '@/hooks'
+
+import { checkItemConditions } from '@/utils/itemConditions';
 
 export const makeTableItemActionsProps = propsFactory({
   isRowEditing: Boolean,
@@ -37,20 +39,9 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
   const store = useStore()
   const tableItem = useTableItem()
   const tableNames = useTableNames(props)
+  const { can } = useAuthorization()
 
   const { smAndDown, mdAndDown, lgAndDown } = useDisplay()
-
-  const can = (permission) => {
-    const name = tableNames.permissionName.value + '_' + permission
-    return store.getters.isSuperAdmin || store.getters.userPermissions[name]
-  }
-
-  // Helper method to get nested object values using dot notation
-  const getNestedValue = (obj, path) => {
-    return path.split('.').reduce((current, part) => {
-      return current && current[part] !== undefined ? current[part] : undefined;
-    }, obj);
-  }
 
   // Action Permissions
   const itemHasAction = (item, action) => {
@@ -62,53 +53,18 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
       case 'switch':
       case 'duplicate':
       case 'activate':
-        hasAction = !tableItem.isSoftDeletable(item) && can(action.name)
+        hasAction = !tableItem.isSoftDeletable(item) && can(action.name, tableNames.permissionName.value)
         break
       case 'forceDelete':
       case 'restore':
-        hasAction = tableItem.isSoftDeletable(item) && can(action.name)
+        hasAction = tableItem.isSoftDeletable(item) && can(action.name, tableNames.permissionName.value)
         break
       default:
         break
     }
 
-    if(action.conditions) {
-      return hasAction && action.conditions.every(condition => {
-        const [path, operator, value] = condition;
-        let actualValue = getNestedValue(item, path);
+    return hasAction && checkItemConditions(item, action.conditions)
 
-        if(['>', '<', '>=', '<=', '='].includes(operator) && Array.isArray(actualValue)) {
-          actualValue = actualValue.length;
-        }
-
-        switch (operator) {
-          case '=':
-          case '==':
-            return actualValue === value;
-          case '!=':
-            return actualValue !== value;
-          case '>':
-            return actualValue > value;
-          case '<':
-            return actualValue < value;
-          case '>=':
-            return actualValue >= value;
-          case '<=':
-            return actualValue <= value;
-          case 'in':
-            return Array.isArray(value) && value.includes(actualValue);
-          case 'not in':
-            return Array.isArray(value) && !value.includes(actualValue);
-          case 'exists':
-            return actualValue !== undefined && actualValue !== null;
-          default:
-              console.warn(`Unknown operator: ${operator}`);
-              return false;
-        }
-      })
-    }
-
-    return hasAction
   }
 
   // Action Handlers
@@ -326,7 +282,6 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
     ...toRefs(states),
     // methods
     itemAction,
-    itemHasAction,
-    can
+    itemHasAction
   }
 }

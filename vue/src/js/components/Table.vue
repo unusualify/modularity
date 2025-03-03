@@ -105,7 +105,7 @@
                   <!-- bulk actions -->
                   <template v-for="(action, k) in bulkActions" :key="k">
                     <v-btn
-                      v-if="can(action.name)"
+                      v-if="$can(action.name, permissionName)"
                       v-bind="filterBtnOptions"
                       :append-icon="false"
                       :prepend-icon="(action.icon ? action.icon : `$${action.name}`)"
@@ -168,7 +168,7 @@
                   />
 
                   <!-- create button -->
-                  <v-btn v-if="can('create') && !noForm && !someSelected && createOnModal"
+                  <v-btn v-if="$can('create', permissionName) && !noForm && !someSelected && createOnModal"
                     v-bind="addBtnOptions"
                     @click="createForm"
                     :icon="$vuetify.display.smAndDown ? addBtnOptions['prepend-icon'] : null"
@@ -866,20 +866,9 @@ export default {
     });
 
     this.initialize()
-    // __log(
-    //   // this.$props,
-    //   // _.omit(this.$props ?? {}, ['columns']),
-    //   // this.$lodash.pick(this.$props ?? {}, ['name', 'fullWidthWrapper']),
-    //   Object.values(this.$lodash.omitBy(this.headers, 'actions'))
-    // )
   },
   created () {
-    // this.$can(this.rowActions[0].can ?? '')
 
-    // const store = useStore();
-    // if(store._state.data.datatable.customModal){
-    //   __removeQueryParams(['customModal[description]', 'customModal[color]']);
-    // }
   },
   methods: {
   },

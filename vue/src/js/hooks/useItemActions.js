@@ -8,6 +8,8 @@ import ACTIONS from '@/store/actions'
 import { FORM, ALERT } from '@/store/mutations/index'
 import api from '@/store/api/form'
 
+import { checkItemConditions } from '@/utils/itemConditions';
+
 export const makeItemActionsProps = propsFactory({
   isEditing: {
     type: Boolean,
@@ -42,13 +44,6 @@ export default function useItemActions(props, context) {
     const item = sourceData.find(item => item[findKey] === findValue);
 
     return item ? item[config.return] : undefined;
-  }
-
-  // Helper method to get nested object values using dot notation
-  const getNestedValue = (obj, path) => {
-    return path.split('.').reduce((current, part) => {
-      return current && current[part] !== undefined ? current[part] : undefined;
-    }, obj);
   }
 
   const handleRequestAction = (action, endpoint) => {
@@ -147,11 +142,6 @@ export default function useItemActions(props, context) {
     document.body.removeChild(link);
   }
 
-  const can = (permission) => {
-    const name = tableNames.permissionName.value + '_' + permission
-    return store.getters.isSuperAdmin || store.getters.userPermissions[name]
-  }
-
   const shouldShowAction = (action) => {
     // Base condition for editing/creating
     const baseCondition = props.isEditing ? action.editable : action.creatable;
@@ -162,35 +152,7 @@ export default function useItemActions(props, context) {
     }
 
     // Check all conditions
-    return baseCondition && action.conditions.every(condition => {
-      const [path, operator, value] = condition;
-      const actualValue = getNestedValue(editingItem, path);
-
-      switch (operator) {
-        case '=':
-        case '==':
-          return actualValue === value;
-        case '!=':
-          return actualValue !== value;
-        case '>':
-          return actualValue > value;
-        case '<':
-          return actualValue < value;
-        case '>=':
-          return actualValue >= value;
-        case '<=':
-          return actualValue <= value;
-        case 'in':
-          return Array.isArray(value) && value.includes(actualValue);
-        case 'not in':
-          return Array.isArray(value) && !value.includes(actualValue);
-        case 'exists':
-          return actualValue !== undefined && actualValue !== null;
-        default:
-          console.warn(`Unknown operator: ${operator}`);
-          return false;
-      }
-    });
+    return baseCondition && checkItemConditions(editingItem, action.conditions);
   }
 
   const flattenedActions = computed(() => window.__isObject(props.actions)
@@ -201,8 +163,6 @@ export default function useItemActions(props, context) {
   const states = reactive({
     showedActions: computed(() => flattenedActions.value.filter(action => shouldShowAction(action)))
   })
-
-  // __log(states.showedActions, flattenedActions.value)
 
   const methods = reactive({
     // methods
