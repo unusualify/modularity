@@ -390,28 +390,29 @@ trait ManageForm
                 }
 
                 $foreignKey = $this->getForeignKeyFromName($this->routeName);
-                $relationshipInputs = $this->app['modularity']
-                    ->find($this->moduleName)
-                    ->getRouteConfig(studlyName($input['name']) . '.inputs');
 
-                $input['type'] = 'input-repeater';
-                $input['label'] = pluralize($this->getHeadline($input['name']));
-                $input['autoIdGenerator'] = false;
+                $input['type'] =  $input['component'] ?? 'input-repeater';
+                // $input['label'] ??= pluralize($this->getHeadline($input['name']));
+                $input['autoIdGenerator'] ??= false;
 
                 $singularRelationshipName = $this->getCamelCase($this->getSingular($relationshipName));
                 $pluralRelationshipName = pluralize($singularRelationshipName);
 
-                if (($relationType = $this->repository->getRelationType($singularRelationshipName))) {
+                if (($relationType = $this->repository->getModel()->getRelationType($singularRelationshipName))) { // if singular relationship name is a relation
                     $relationshipName = $singularRelationshipName;
-                } elseif (($relationType = $this->repository->getRelationType($pluralRelationshipName))) {
+                } elseif (($relationType = $this->repository->getModel()->getRelationType($pluralRelationshipName))) { // if plural relationship name is a relation
                     $relationshipName = $pluralRelationshipName;
                 } else {
-
+                    throw new \Exception("Relationship {$singularRelationshipName} or {$pluralRelationshipName} not found");
                 }
 
-                if ($relationType) {
+                $relationshipRouteName = Str::camel($singularRelationshipName);
 
-                    $input['schema'] = $this->createFormSchema(Collection::make($relationshipInputs)->map(function ($_input) use ($foreignKey) {
+                $relationshipInputs = $this->module
+                    ->getRouteConfig($relationshipRouteName . '.inputs');
+
+                if ($relationType) {
+                    $input['schema'] = $this->createFormSchema(Collection::make($input['schema'] ?? $relationshipInputs)->map(function ($_input) use ($foreignKey) {
 
                         if (isset($_input['name']) && $foreignKey == $_input['name']) {
                             unset($_input['rules']);
@@ -421,10 +422,11 @@ trait ManageForm
                         return $_input;
                     })->toArray());
 
+                    // dd($input['schema']);
+
                     $input['name'] = $relationshipName;
                     $input['ext'] = 'relationship';
-                    $input[] = 'withGutter';
-
+                    // $input[] = 'withGutter';
                     $relationshipName = $input['relationship'] ?? $input['name'];
 
                     // $relationships =  method_exists($this->repository->getModel(), 'getDefinedRelations')
@@ -648,7 +650,7 @@ trait ManageForm
         }
 
         if (isset($input['type'])) {
-            $input = hydrate_input($input, $this->module ?? null);
+            $input = hydrate_input($input, $this->module ?? null, $this->routeName ?? null);
 
             if (in_array($input['type'], ['input-repeater']) && isset($input['schema'])) {
                 $input['schema'] = $this->createFormSchema($input['schema']);
