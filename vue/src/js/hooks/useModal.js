@@ -11,7 +11,7 @@ const defaultWidths = {
   sm: '480px',
   md: '540px',
   lg: '1080px',
-  xl: '1200px'
+  xl: '1600px'
 }
 
 export const makeModalProps = propsFactory({
