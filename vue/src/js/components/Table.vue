@@ -119,14 +119,14 @@
                 <template v-else>
                   <!-- search field -->
                   <v-text-field
-                    v-if="!hideSearchField"
-                    v-model="search"
+                    v-if="!hideSearchField && isStoreTable && hasSearchableHeader"
+                    v-model="searchModel"
                     variant="outlined"
-                    append-inner-icon="mdi-magnify"
+                    :append-inner-iconx="searchModel !== search ? 'mdi-magnify' : null"
                     hide-details
                     density="compact"
                     single-line
-                    :placeholder="searchText"
+                    :placeholder="searchPlaceholder"
                     :class="[
                       'mr-2',
                       controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'flex-grow-1' : ''
@@ -136,7 +136,14 @@
                       // controlsPosition === 'top' || $vuetify.display.smAndDown ? 'max-width: 300px' : '',
                       'min-width: 100px'
                     ]"
-                  />
+                    @click:append-inner="searchItems()"
+                    :disabled="loading"
+                    @keydown.enter="searchItems()"
+                  >
+                    <template #append-inner>
+                      <v-btn :disabled="searchModel === search" icon="mdi-magnify" variant="plain" size="compact" color="grey-darken-5" rounded @click="searchItems()" />
+                    </template>
+                  </v-text-field>
 
                   <!-- <v-spacer v-else-if="hideSearchField"></v-spacer> -->
 
