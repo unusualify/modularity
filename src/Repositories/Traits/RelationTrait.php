@@ -268,21 +268,23 @@ trait RelationTrait
         }
 
         foreach ($schema as $key => $input) {
-            if ($input['type'] == 'input-repeater' && isset($input['ext']) && $input['ext'] == 'relationship') {
+            if (isset($input['ext']) && $input['ext'] == 'relationship') {
                 $repository = UFinder::getRouteRepository(Str::singular($input['name']), asClass: true);
                 $relationshipName = $input['relationship'] ?? $input['name'];
                 $records = $object->{$relationshipName};
+                $fields[$relationshipName] = ((bool) $records && ! $records->isEmpty()) ? $object->{$input['name']}->map(function ($model) use ($input, $repository) {
+                    return $repository->getFormFields($model, $input['schema']);
+                }) : $repository->getFormFields($repository->newInstance(), $input['schema']);
                 try {
-                    $fields[$relationshipName] = ((bool) $records && ! $records->isEmpty()) ? $object->{$input['name']}->map(function ($model) use ($input, $repository) {
-                        return $repository->getFormFields($model, $input['schema']);
-                    }) : $repository->getFormFields($repository->newInstance(), $input['schema']);
 
                 } catch (\Throwable $th) {
 
                     dd(
-                        $object,
+                        get_class($object),
                         $relationshipName,
                         $object->{$relationshipName},
+                        backtrace_formatted(),
+                        $th
                     );
                 }
             }
