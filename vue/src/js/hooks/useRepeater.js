@@ -35,6 +35,9 @@ export const makeRepeaterProps = propsFactory({
     type: String,
     default: ''
   },
+  subtitle: {
+    type: String
+  },
   singularLabel: {
     type: String
   },
@@ -47,11 +50,23 @@ export const makeRepeaterProps = propsFactory({
     default () {
       return {
         noGutters: false,
+      }
+    }
+  },
+  formRowAttribute: {
+    type: Object,
+    default () {
+      return {
+        noGutters: false,
         class: 'ml-12'
         // justify:'center',
         // align:'center'
       }
     }
+  },
+  noAddButton: {
+    type: Boolean,
+    default: false
   },
   addButtonText: {
     type: String,
@@ -90,7 +105,13 @@ export const makeRepeaterProps = propsFactory({
   disableAddButton: {
     type: Boolean,
     default: true
-  }
+  },
+  formCol: {
+    type: Object,
+    default: () => {
+      return { cols: 12 }
+    }
+  },
 })
 
 // by convention, composable function names start with "use"
