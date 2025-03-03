@@ -113,7 +113,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
     public function getIndexData($prependScope = [])
     {
         $scopes = $this->filterScope($prependScope);
-        $items = $this->getIndexItems(scopes: $scopes);
+        $items = $this->getIndexItems(scopes: $scopes, forcePagination: false);
 
         return [
             'items' => $items->map(function ($item) {
@@ -274,7 +274,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
         }
 
         $scopes = $this->filterScope(['id' => $ids]);
-        $items = $this->getIndexItems($scopes);
+        $items = $this->getIndexItems(scopes: $scopes, forcePagination: false);
 
         return $this->responseFactory->json([
             'items' => $items->map(function ($item) {

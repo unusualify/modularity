@@ -108,8 +108,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
     {
 
         $scopes = $this->filterScope($prependScope);
-        // dd($this->getIndexItems($scopes));
-        $items = $this->getIndexItems([], $scopes, false);
+        $items = $this->getIndexItems(scopes: $scopes, forcePagination: false);
 
         return [
             'items' => $items->map(function ($item) {
@@ -274,7 +273,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
         }
 
         $scopes = $this->filterScope(['id' => $ids]);
-        $items = $this->getIndexItems($scopes);
+        $items = $this->getIndexItems(scopes: $scopes, forcePagination: false);
 
         return $this->responseFactory->json([
             'items' => $items->map(function ($item) {
