@@ -28,9 +28,9 @@ if (! function_exists('modularity_default_input')) {
 }
 
 if (! function_exists('hydrate_input')) {
-    function hydrate_input(array $input, $module = null, $routeName = null)
+    function hydrate_input(array $input, $module = null, $routeName = null, $skipQueries = null)
     {
-        $hydrator = new InputHydrator($input, $module, $routeName);
+        $hydrator = new InputHydrator($input, $module, $routeName, $skipQueries);
 
         return $hydrator->hydrate();
     }

@@ -42,6 +42,13 @@ abstract class InputHydrate
     protected $routeName;
 
     /**
+     * Skip queries
+     *
+     * @var bool
+     */
+    protected $skipQueries = false;
+
+    /**
      * Default values to set before hydrating
      *
      *
@@ -108,13 +115,19 @@ abstract class InputHydrate
     /**
      * Create a new HydrateInput instance.
      */
-    public function __construct(array $input, ?Module $module = null, ?string $routeName = null)
-    {
+    public function __construct(
+        array $input,
+        ?Module $module = null,
+        ?string $routeName = null,
+        bool $skipQueries = false
+    ){
         $this->input = $input;
 
         $this->module = $module;
 
         $this->routeName = $routeName;
+
+        $this->skipQueries = $skipQueries;
     }
 
     /**
@@ -183,21 +196,19 @@ abstract class InputHydrate
             })->toArray();
 
             $params = array_merge_recursive($params, ['with' => $this->getWiths()]);
-            // dd($params, [$input['itemTitle'] ?? 'name', ...$this->getItemColumns()]);
 
-            $items = call_user_func_array([$repository, $methodName], [
-                ...($methodName == 'list' ? ['column' => [$input['itemTitle'] ?? 'name', ...$this->getItemColumns()]] : []),
-                ...$params,
-            ])->toArray();
+            $items =  [];
+
+            if(!$this->skipQueries) {
+                $items = call_user_func_array([$repository, $methodName], [
+                    ...($methodName == 'list' ? ['column' => [$input['itemTitle'] ?? 'name', ...$this->getItemColumns()]] : []),
+                    ...$params,
+                ])->toArray();
+            }
 
             $input['items'] = $items;
-            // $input =  Arr::except($input, ['route', 'model', 'repository']) + [
-            //     'items' => $items
-            // ];
+
             if (count($input['items']) > 0) {
-                // if(!isset($input['itemTitle'])){
-                //     dd($input);
-                // }
                 if (! isset($input['items'][0][$input['itemTitle']])) {
                     $input['itemTitle'] = array_keys(Arr::except($input['items'][0], [$input['itemValue']]))[0];
                 }
