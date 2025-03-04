@@ -42,7 +42,9 @@ class TagHydrate extends InputHydrate
 
             $input['endpoint'] = $module->getRouteActionUri($input['_routeName'], 'tags');
             $input['updateEndpoint'] = $module->getRouteActionUri($input['_routeName'], 'tagsUpdate');
-            $input['items'] = array_merge($repository->getTags()->toArray());
+            $input['items'] = !$this->skipQueries
+                ? $repository->getTags()->toArray()
+                : [];
             $input['taggable'] = get_class($repository->getModel());
 
             if (! isset($input['default']) && count($input['items']) > 0) {

@@ -28,13 +28,21 @@ class PaymentServiceHydrate extends InputHydrate
     {
         $input = $this->input;
         $input['type'] = 'input-payment-service';
-        $ps = new PaymentService;
-        $input['currencies'] = PaymentCurrency::whereHas('paymentServices')->with('paymentServices')->get()->all();
-        $input['items'] = $ps->where('is_external', 1)->with('paymentCurrencies')->get()->all();
+
         $input['default_payment_service'] = config('modularity.default_payment_service');
+
         $input['api'] = route('currency.convert');
 
-        $cct = $ps->where('is_internal', 1)->with(['paymentCurrencies', 'cardTypes'])->get()->all();
+        $ps = new PaymentService;
+        $input['currencies'] = !$this->skipQueries
+            ? PaymentCurrency::whereHas('paymentServices')->with('paymentServices')->get()->all()
+            : [];
+        $input['items'] = !$this->skipQueries
+            ? $ps->where('is_external', 1)->with('paymentCurrencies')->get()->all()
+            : [];
+        $cct = !$this->skipQueries
+            ? $ps->where('is_internal', 1)->with(['paymentCurrencies', 'cardTypes'])->get()->all()
+            : [];
 
         $mappedData = [];
         foreach ($cct as $service) {

@@ -53,18 +53,22 @@ class PriceHydrate extends InputHydrate
         }
 
         if (isset($input['hasVatRate']) && $input['hasVatRate']) {
-            $input['vatRates'] = App::make(VatRateRepository::class)->list(['name', 'rate'])->map(function ($item) {
-                return [
-                    'title' => $item['name'] . ' (' . $item['rate'] . '%)',
-                    'value' => $item['id'],
-                    'rate' => $item['rate'],
-                ];
-            })->toArray();
+            $input['vatRates'] = !$this->skipQueries
+                ? App::make(VatRateRepository::class)->list(['name', 'rate'])->map(function ($item) {
+                    return [
+                        'title' => $item['name'] . ' (' . $item['rate'] . '%)',
+                        'value' => $item['id'],
+                        'rate' => $item['rate'],
+                    ];
+                })->toArray()
+                : [];
 
             // dd($input);
         }
 
-        $input['items'] = $query->get()->toArray();
+        $input['items'] = !$this->skipQueries
+            ? $query->get()->toArray()
+            : [];
 
         $input['default'][0]['currency_id'] = Request::getUserCurrency()->id;
 
