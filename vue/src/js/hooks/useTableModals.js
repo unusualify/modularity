@@ -205,7 +205,6 @@ export default function useTableModals(props, context) {
   })
 
   onMounted(() => {
-    console.log('Component using useTable is mounted', props.name)
     cleanupModals()
   })
 
