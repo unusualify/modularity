@@ -253,11 +253,11 @@ abstract class PanelController extends CoreController
 
         $this->fixedFilters = array_merge((array) $this->getConfigFieldsByRoute('filters.fixed', []), $this->fixedFilters ?? []);
 
-        $this->addWiths();
+        // $this->addWiths();
 
-        $this->addIndexWiths();
+        // $this->addIndexWiths();
 
-        $this->addFormWiths();
+        // $this->addFormWiths();
 
     }
 

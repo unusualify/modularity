@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
@@ -23,7 +24,10 @@ trait ManageForm
      */
     protected $formAttributes = [];
 
-    protected $formSchema;
+    /**
+     * @var array
+     */
+    // protected $formSchema = [];
 
     /**
      * actions/buttons to see in the form
@@ -40,12 +44,13 @@ trait ManageForm
     {
         $this->inputTypes = modularityConfig('input_types', []);
 
-        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+        // $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
     }
 
     protected function __afterConstructManageForm($app, $request)
     {
         $this->defaultFormAttributes = (array) Config::get(modularityBaseKey() . '.default_form_attributes');
+
         $this->formAttributes = array_merge_recursive_preserve($this->getFormAttributes(), $this->formAttributes ?? []);
 
         $this->setFormActions();
@@ -127,8 +132,6 @@ trait ManageForm
 
     protected function addWithsManageForm(): array
     {
-        // $this->indexWith += collect($schema)->filter(function($item){
-
         return collect(array_to_object($this->formSchema))->filter(function ($input) {
             // return $this->hasWithModel($item['type']);
             return in_array($input->type, [
@@ -595,7 +598,7 @@ trait ManageForm
                     return [
                         'name' => $polymorphic['name'],
                         'type' => $repositoryInstance->getModel()::class,
-                        'items' => $repositoryInstance->list(),
+                        'items' => !$this->request->ajax() ? $repositoryInstance->list() : [],
                     ];
                 })->toArray();
 
@@ -650,7 +653,12 @@ trait ManageForm
         }
 
         if (isset($input['type'])) {
-            $input = hydrate_input($input, $this->module ?? null, $this->routeName ?? null);
+            $input = hydrate_input(
+                input: $input,
+                module: $this->module ?? null,
+                routeName: $this->routeName ?? null,
+                skipQueries: Request::ajax() || App::runningInConsole() || false,
+            );
 
             if (in_array($input['type'], ['input-repeater']) && isset($input['schema'])) {
                 $input['schema'] = $this->createFormSchema($input['schema']);
@@ -665,8 +673,7 @@ trait ManageForm
                     && $this->repository->isTranslationAttribute($input['name'])
                 ) {
                     $input['translated'] ??= true;
-                    // $input['locale_input'] = $input['type'];
-                    // $input['type'] = 'input-locale';
+
                     $data = $input;
                 }
             } catch (\Throwable $th) {

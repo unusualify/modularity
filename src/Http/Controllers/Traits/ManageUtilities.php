@@ -13,13 +13,6 @@ trait ManageUtilities
 {
     use ManageForm, ManageTable;
 
-    protected function __afterConstructManageUtilities($app, $request) {}
-
-    protected function __beforeConstructManageUtilities($app, $request)
-    {
-        // $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
-    }
-
     /**
      * @param array $prependScope
      * @return array
@@ -33,7 +26,7 @@ trait ManageUtilities
 
         $tableAttributes = $this->hydrateTableAttributes();
         $tableEndpoints = $this->getIndexUrls() + $this->getUrls();
-        // dd($this->translateHeaders($headers));
+
         $_deprecated = [
             'initialResource' => $initialResource, //
             'tableMainFilters' => $this->getTableMainFilters(),
@@ -110,8 +103,6 @@ trait ManageUtilities
 
         ];
 
-        // dd($data);
-        // dd($options['tableStore']);
         return array_replace_recursive($data + $options, $this->indexData($this->request));
     }
 
@@ -467,11 +458,6 @@ trait ManageUtilities
                             return [$parameter => ":{$parameter}"];
                         })->toArray();
 
-                        // $modelValueAbstract = $this->getSnakeCase($this->routeName);
-                        // if(isset($element->relation)){
-                        //     $modelValueAbstract = $element->relation;
-                        //     // $this->indexWith[] = $element->relation;
-                        // }
                         $modelValueAbstract = isset($element->relation) ? $element->relation : $this->getSnakeCase($this->routeName);
 
                         return [

@@ -56,17 +56,18 @@ abstract class BaseController extends PanelController
 
     public function index($parentId = null)
     {
-        // dd(
-        //     class_uses_recursive(auth()->guard()->user()),
-        //     get_class_methods(auth()->guard())
-        // );
+        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        $this->addWiths();
+
+        $this->addIndexWiths();
+
         if ($this->request->ajax()) {
             return [
                 'resource' => $this->getJSONData(),
                 'mainFilters' => $this->getTableMainFilters(),
                 'replaceUrl' => $this->getReplaceUrl(),
             ];
-            // return $indexData + ['replaceUrl' => true];
         }
 
         $indexData = $this->getIndexData($this->nestedParentScopes());
@@ -84,8 +85,6 @@ abstract class BaseController extends PanelController
             return View::exists($view);
         });
 
-        // dd($indexData);
-
         return View::make($view, $indexData);
     }
 
@@ -95,6 +94,11 @@ abstract class BaseController extends PanelController
      */
     public function create($parentModuleId = null)
     {
+        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        $this->addWiths();
+
+        $this->addFormWiths();
 
         if (! $this->getIndexOption('skipCreateModal') && false) {
             return Redirect::to(moduleRoute(
@@ -128,6 +132,12 @@ abstract class BaseController extends PanelController
     public function store($parentId = null)
     {
         // $parentId = $this->parentId ?? $parentId;
+
+        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        $this->addWiths();
+
+        $this->addFormWiths();
 
         $input = $this->validateFormRequest()->all();
 
@@ -185,6 +195,12 @@ abstract class BaseController extends PanelController
     {
         $params = $this->request->route()->parameters();
 
+        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        $this->addWiths();
+
+        $this->addFormWiths();
+
         $id = last($params);
 
         $item = $this->repository->getById(
@@ -240,6 +256,12 @@ abstract class BaseController extends PanelController
     {
         $params = $this->request->route()->parameters();
 
+        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        $this->addWiths();
+
+        $this->addFormWiths();
+
         $id = last($params);
 
         if ($this->getIndexOption('editInModal')) {
@@ -268,6 +290,12 @@ abstract class BaseController extends PanelController
      */
     public function update($id, $submoduleId = null)
     {
+        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        $this->addWiths();
+
+        $this->addFormWiths();
+
         $params = $this->request->route()->parameters();
 
         $id = last($params);
@@ -741,6 +769,12 @@ abstract class BaseController extends PanelController
     public function duplicate($id, $submoduleId = null)
     {
         $params = $this->request->route()->parameters();
+
+        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        $this->addWiths();
+
+        $this->addFormWiths();
 
         $id = last($params);
 
