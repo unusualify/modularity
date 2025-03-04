@@ -346,13 +346,15 @@ abstract class InputHydrate
      *
      * @return Unusualify\Modularity\Module
      */
-    final protected function getModule()
+    final protected function getModule(bool $noSelfModule = false)
     {
         return isset($this->input['_moduleName'])
             ? Modularity::find($this->input['_moduleName'])
-            : ($this->hasModule()
+            : ((!$noSelfModule && $this->hasModule())
                 ? $this->module
-                : throw new \Exception("No Module in '" . ($this->input['name'] ?? $this->input['type']) . "' input"));
+                : throw new \Exception($noSelfModule
+                    ? "No connector or module definition in '" . ($this->input['name'] ?? $this->input['type']) . "' input"
+                    : "No Module in '" . ($this->input['name'] ?? $this->input['type']) . "' input"));
     }
 
 
@@ -376,13 +378,17 @@ abstract class InputHydrate
      *
      * @return string
      */
-    final protected function getRouteName()
+    final protected function getRouteName($noSelfRouteName = false)
     {
         return isset($this->input['_routeName'])
             ? $this->input['_routeName']
-            : ($this->hasRouteName()
+            : ((!$noSelfRouteName && $this->hasRouteName())
                 ? $this->routeName
-                : throw new \Exception("No Route Name in '" . ($this->input['name'] ?? $this->input['type']) . "' input"));
+                : throw new \Exception($noSelfRouteName
+                    ? "No connector or route definition in '" . ($this->input['name'] ?? $this->input['type']) . "' input"
+                    : "No Route Name in '" . ($this->input['name'] ?? $this->input['type']) . "' input"
+                )
+            );
     }
 
 
