@@ -673,9 +673,19 @@ export default function init(){
   window.$ = jquery
   window._ = lodash
   window.$moment = moment
+  axios.defaults.headers.common = {
+    'X-Requested-With': 'XMLHttpRequest',
+    Accept: 'application/json',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    Pragma: 'no-cache',
+    Expires: '0',
+  }
   window.axios.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest',
-    Accept: 'application/json'
+    Accept: 'application/json',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    Pragma: 'no-cache',
+    Expires: '0',
   }
 
   window.axios.defaults.headers.post = {
