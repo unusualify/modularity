@@ -44,7 +44,7 @@ class StateableHydrate extends InputHydrate
         }
 
         if(isset($input['_routeName'])) {
-            $routeName = Modularity::find($input['_moduleName']);
+            $routeName = $input['_routeName'];
         } else if($this->hasRouteName()) {
             $routeName = $this->getRouteName();
         } else {
