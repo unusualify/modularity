@@ -39,7 +39,11 @@ trait HasPosition
     public static function setNewOrder($ids, $startOrder = 1)
     {
         if (! is_array($ids)) {
-            throw new \Exception('You must pass an array to setNewOrder');
+            throw new \Exception('You must pass an array to setNewOrder()');
+        }
+
+        if ($startOrder < 1) {
+            throw new \Exception('$startOrder must be bigger or equal to 1');
         }
 
         foreach ($ids as $id) {
