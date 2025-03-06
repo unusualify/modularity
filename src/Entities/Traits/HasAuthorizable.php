@@ -99,11 +99,21 @@ trait HasAuthorizable
      */
     public function initializeHasAuthorizable(): void {}
 
+    /**
+     * Get the authorization record associated with this model
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
     public function authorizationRecord(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
         return $this->morphOne(Authorization::class, 'authorizable');
     }
 
+    /**
+     * Get the authorized user associated with this model through the authorization record
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+     */
     public function authorizedUser(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
         return $this->hasOneThrough(
@@ -116,6 +126,12 @@ trait HasAuthorizable
         );
     }
 
+    /**
+     * Get the authorized model class from the authorization record or default
+     *
+     * @return string The fully qualified class name of the authorized model
+     * @throws \Exception If there's an error retrieving the model
+     */
     final public function getAuthorizedModel()
     {
         try {
@@ -127,16 +143,33 @@ trait HasAuthorizable
         }
     }
 
+    /**
+     * Get the default authorized model class name
+     *
+     * @return string The fully qualified class name of the default authorized model
+     */
     public static function getDefaultAuthorizedModel()
     {
         return static::$defaultAuthorizedModel ?? \App\Models\User::class;
     }
 
+    /**
+     * Get the array of obligatory authorization roles
+     *
+     * @return array Array of role names that have full authorization
+     */
     public static function getObligatoryAuthorizationRoles()
     {
         return static::$obligatoryAuthorizationRoles ?? ['superadmin', 'admin'];
     }
 
+    /**
+     * Scope query to only include records authorized for the given user
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed|null $user The user to check authorization for (defaults to authenticated user)
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function scopeHasAuthorization($query, $user = null)
     {
         if (! Auth::check()) {
