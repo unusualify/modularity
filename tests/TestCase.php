@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularity\Tests;
 
+use Illuminate\Database\Schema\Blueprint;
 use Nwidart\Modules\LaravelModulesServiceProvider;
 use Spatie\Permission\PermissionServiceProvider;
 use Unusualify\Modularity\LaravelServiceProvider;
@@ -12,7 +13,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     public $path;
 
     public $modulesPath;
-
 
     protected function setUp(): void
     {
@@ -38,6 +38,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             LaravelServiceProvider::class,
             ModularityProvider::class,
             PermissionServiceProvider::class,
+            \Oobook\Priceable\LaravelServiceProvider::class,
+            \Oobook\Database\Eloquent\ManageEloquentServiceProvider::class,
         ];
     }
 
@@ -59,6 +61,18 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             realpath(__DIR__ . '/../modules'),
         ]);
 
+        $app['config']->set('modularity.admin_app_url', 'http://admin.modularity.test');
+        $app['config']->set('geoip.service', 'ipapi');
+        $app['config']->set('geoip.services.ipapi', [
+            'class' => \Torann\GeoIP\Services\IPApi::class,
+            'secure' => true,
+            'key' => env('IPAPI_KEY'),
+            'continent_path' => storage_path('app/continents.json'),
+            'lang' => 'en',
+        ]);
+
+        $app['config']->set('modularity.vite.dev_server', false);
+        $app['config']->set('modularity.vite.build_path', '/build');
     }
 
     /**
@@ -69,24 +83,22 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected function setUpDatabase($app)
     {
         $schema = $app['db']->connection()->getSchemaBuilder();
-
-        // $schema->create('users', function (Blueprint $table) {
-        //     $table->increments('id');
-        //     $table->foreignId('company_id')->nullable()->constrained()->nullOnDelete();
-        //     $table->string('email');
-        //     $table->softDeletes();
-        // });
-
-        // $schema->create('companies', function (Blueprint $table) {
-        //     $table->increments('id');
+        // $schema->create(modularityConfig('tables.users', 'admin_users'), function (Blueprint $table) {
+        //     $table->id();
+        //     $table->unsignedBigInteger('company_id')->nullable();
         //     $table->string('name');
+        //     $table->string('surname', 30)->nullable();
+        //     $table->string('job_title')->nullable();
+        //     $table->boolean('published')->default(false);
+        //     $table->string('email')->unique();
+        //     $table->string('language')->default('en');
+        //     $table->string('timezone')->default('Europe/London');
+        //     $table->string('phone', 20)->nullable();
+        //     $table->string('country', 100)->nullable();
+        //     $table->timestamp('email_verified_at')->nullable();
+        //     $table->string('password');
+        //     $table->rememberToken();
         //     $table->timestamps();
-        // });
-
-        // $schema->create('files', function (Blueprint $table) {
-        //     $table->increments('id');
-        //     $table->uuidMorphs('fileable');
-        //     $table->string('name');
         // });
 
     }

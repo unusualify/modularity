@@ -321,6 +321,7 @@ if (! function_exists('modularityConfig')) {
      */
     function modularityConfig($notation = null, $default = '')
     {
+
         if (! $notation) {
             return config(modularityBaseKey());
         } else {

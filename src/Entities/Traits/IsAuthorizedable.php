@@ -21,24 +21,29 @@ trait IsAuthorizedable
     // ];
     protected static function bootIsAuthorizedable()
     {
+        // dd('Boot');
 
         // static::creating(function ($model) {
         //     dd(Auth::check(), Auth::user(), self::$authorizedGuardName, auth(self::$authorizedGuardName)->user());
         // });
         static::created(function ($model) {
+            // dd('Created the model in boot');
             $model->authorized()->create([
                 'user_id' => auth(static::getAuthorizedGuardName())->user()->id,
             ]);
         });
 
+        /*
         // Add deleted event handler
         static::forceDeleting(function ($model) {
             // This will automatically delete the associated authorized record
             $model->authorized()->delete();
         });
 
+        */
         // Add deleted event handler
         static::deleting(function ($model) {
+            // dd('Deleting');
             // This will automatically delete the associated authorized record
             if (! (method_exists($model, 'isSoftDeletable') && $model->isSoftDeletable())) {
                 $model->authorized()->delete();

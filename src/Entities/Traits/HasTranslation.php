@@ -5,7 +5,6 @@ namespace Unusualify\Modularity\Entities\Traits;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
-use Unusualify\Modularity\Facades\TwillCapsules;
 
 trait HasTranslation
 {
@@ -18,6 +17,12 @@ trait HasTranslation
      */
     public function getTranslationModelNameDefault()
     {
+        if (isset(static::$hasTranslationModel)) {
+            if (@class_exists(static::$hasTranslationModel)) {
+                return static::$hasTranslationModel;
+            }
+        }
+
         $model = modularityConfig('namespace') . "\Entities\Translations\\" . class_basename($this) . 'Translation';
 
         if (@class_exists($model)) {
@@ -29,14 +34,9 @@ trait HasTranslation
         if (@class_exists($model)) {
             return $model;
         }
-        dd(
-            $model,
-            class_namespace($this),
 
-            get_class($this)
-        );
-
-        return TwillCapsules::getCapsuleForModel(class_basename($this))->getTranslationModel();
+        throw new \Exception(class_basename($this) . 'Translation cannot be found!');
+        // return TwillCapsules::getCapsuleForModel(class_basename($this))->getTranslationModel();
     }
 
     /**
@@ -48,7 +48,6 @@ trait HasTranslation
     {
         if (method_exists($query->getModel(), 'translations')) {
             $locale = $locale == null ? app()->getLocale() : $locale;
-
             $query->whereHas('translations', function ($query) use ($locale) {
                 $query->whereActive(true);
                 $query->whereLocale($locale);

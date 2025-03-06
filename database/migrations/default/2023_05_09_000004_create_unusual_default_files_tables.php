@@ -13,6 +13,7 @@ class CreateUnusualDefaultFilesTables extends Migration
      */
     public function up()
     {
+
         $filesTable = modularityConfig('tables.files', 'modularity_files');
         $fileablesTable = modularityConfig('tables.fileables', 'modularity_fileables');
 
