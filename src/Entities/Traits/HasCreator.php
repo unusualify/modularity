@@ -8,10 +8,25 @@ use Unusualify\Modularity\Facades\Modularity;
 
 trait HasCreator
 {
+    /**
+     * Indicates if a custom creator is currently being saved.
+     *
+     * @var bool
+     */
     protected $isCustomCreatorSaving = false;
 
+    /**
+     * The fillable attributes for the creator record.
+     *
+     * @var array
+     */
     protected static $hasCreatorFillable = ['custom_creator_id', 'custom_creator_type', 'custom_guard_name'];
 
+    /**
+     * Custom fields for the creator record.
+     *
+     * @var array
+     */
     protected $customHasCreatorFields = [];
 
     protected static function bootHasCreator()
@@ -67,6 +82,11 @@ trait HasCreator
 
     }
 
+    /**
+     * Get the creator record associated with this model
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
     public function creatorRecord(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
         return $this->morphOne(
@@ -75,6 +95,11 @@ trait HasCreator
         );
     }
 
+    /**
+     * Get the creator associated with this model through the creator record
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+     */
     public function creator(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
         return $this->hasOneThrough(
@@ -92,11 +117,21 @@ trait HasCreator
     //     return self::$authorizedGuardName ?? Modularity::getAuthGuardName();
     // }
 
+    /**
+     * Get the creator record model class name
+     *
+     * @return string The fully qualified class name of the creator record model
+     */
     protected function getCreatorRecordModel()
     {
         return \Unusualify\Modularity\Entities\CreatorRecord::class;
     }
 
+    /**
+     * Get the creator model class name
+     *
+     * @return string The fully qualified class name of the creator model
+     */
     protected function getCreatorModel()
     {
         $key = $this->getKey();
@@ -108,21 +143,45 @@ trait HasCreator
         }
     }
 
+    /**
+     * Get the default creator model class name
+     *
+     * @return string The fully qualified class name of the default creator model
+     */
     public static function getDefaultCreatorModel()
     {
         return static::$defaultHasCreatorModel ?? \App\Models\User::class;
     }
 
+    /**
+     * Add authorized query conditions for the creator record
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $user The user to check authorization for
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     protected function addAuthorizedQueryForCreatorRecord($query, $user)
     {
         return $query;
     }
 
+    /**
+     * Add authorized user query conditions for the creator record
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $user The user to check authorization for
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     protected function addAuthorizedUserQueryForCreatorRecord($query, $user)
     {
         return $query;
     }
 
+    /**
+     * Get the authorized roles for the creator record
+     *
+     * @return array Array of authorized role names
+     */
     protected function getAuthorizedRolesForCreatorRecord()
     {
         return $this->authorizedRolesForCreatorRecord ?? [
@@ -132,6 +191,11 @@ trait HasCreator
         ];
     }
 
+    /**
+     * Get the authorized user roles for the creator record
+     *
+     * @return array Array of authorized user role names
+     */
     protected function getAuthorizedUserRolesForCreatorRecord()
     {
         return $this->authorizedUserRolesForCreatorRecord ?? [
