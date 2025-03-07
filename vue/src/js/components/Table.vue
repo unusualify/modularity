@@ -634,7 +634,7 @@
           </template>
           <template v-else>
             <ue-recursive-stuff
-              v-bind="handleFormatter(col.formatter, window.__shorten(item[col.key], cellOptions.maxChars))"
+              v-bind="handleFormatter(col.formatter, window.__shorten(item[col.key] ?? '', cellOptions.maxChars))"
               :key="item[col.key]"
             />
           </template>
