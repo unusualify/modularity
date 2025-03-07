@@ -11,7 +11,7 @@
     </template>
 
     <template v-slot:default="defaultScope">
-      <slot name="default" v-bind="{
+      <slot v-bind="{
           ...defaultScope,
           isFullActive: this.full,
           toggleFullscreen: () => this.toggleFullscreen(),
@@ -72,7 +72,6 @@
 </template>
 
 <script>
-import htmlClasses from '@/utils/htmlClasses'
 import { makeModalProps, useModal } from '@/hooks'
 
 export default {
