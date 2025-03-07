@@ -152,7 +152,7 @@ export default function useItemActions(props, context) {
     }
 
     // Check all conditions
-    return baseCondition && checkItemConditions(editingItem, action.conditions);
+    return baseCondition && checkItemConditions(action.conditions, editingItem);
   }
 
   const flattenedActions = computed(() => window.__isObject(props.actions)

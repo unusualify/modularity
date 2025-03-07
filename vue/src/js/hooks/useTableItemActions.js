@@ -63,7 +63,7 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
         break
     }
 
-    return hasAction && checkItemConditions(item, action.conditions)
+    return hasAction && checkItemConditions(action.conditions, item)
 
   }
 

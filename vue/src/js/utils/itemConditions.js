@@ -16,7 +16,7 @@ export const getNestedValue = (obj, path) => {
  * @param {Array} conditions - Array of condition triplets [path, operator, value]
  * @returns {boolean} True if all conditions are met, false otherwise
  */
-export const checkItemConditions = (item, conditions) => {
+export const checkItemConditions = (conditions, item) => {
   if (!conditions || !Array.isArray(conditions) || conditions.length === 0) {
     return true;
   }
