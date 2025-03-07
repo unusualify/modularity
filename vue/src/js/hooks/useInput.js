@@ -16,6 +16,10 @@ export const makeInputProps = propsFactory({
   label: {
     type: String,
     default: ''
+  },
+  hideIfEmpty: {
+    type: Boolean,
+    default: false
   }
 })
 export const makeInputEmits = ['update:modelValue', 'change', 'update:preview']
