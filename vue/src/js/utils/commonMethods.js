@@ -369,7 +369,6 @@ export default {
     window.navigator.clipboard.writeText(text);
   },
 
-
   $openLoginModal: function () {
     this.$store.commit(USER.OPEN_LOGIN_MODAL)
   },

@@ -61,6 +61,18 @@ export const makeModalProps = propsFactory({
   descriptionText: {
     type: String,
     default: ''
+  },
+  confirmCallback: {
+    type: Function,
+  },
+
+  rejectLoading: {
+    type: Boolean,
+    default: false
+  },
+  confirmLoading: {
+    type: Boolean,
+    default: false
   }
 })
 

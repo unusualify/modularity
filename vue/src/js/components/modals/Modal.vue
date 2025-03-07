@@ -59,8 +59,8 @@
               <v-card-actions>
                 <v-spacer/>
                 <slot name="body.options" v-bind="{textDescription}">
-                  <v-btn ref="modalCancel" class="modal-cancel" color="red" text @click="cancel()"> {{ textCancel }}</v-btn>
-                  <v-btn ref="modalConfirm" class="modal-confirm" color="green" text @click="confirm()"> {{ textConfirm }}</v-btn>
+                  <v-btn variant="flat" ref="modalCancel" class="modal-cancel" color="red" text @click="cancel()" :loading="rejectLoading" :disabled="rejectLoading"> {{ textCancel }}</v-btn>
+                  <v-btn variant="flat" ref="modalConfirm" class="modal-confirm" color="green" text @click="confirm()" :loading="confirmLoading" :disabled="confirmLoading"> {{ textConfirm }}</v-btn>
                 </slot>
                 <v-spacer/>
               </v-card-actions>
@@ -135,12 +135,25 @@ export default {
         })
       }
     },
-    confirm (callback = null) {
+    async confirm (callback = null) {
       if (callback) {
-        callback()
+        const res = await callback()
+        if(res) {
+          this.dialog = false
+          this.$emit('confirm')
+        }
+      } else if (this.confirmCallback && typeof this.confirmCallback === 'function') {
+        let res = await this.confirmCallback()
+
+        if(typeof res === 'boolean' && res) {
+          this.dialog = false
+        }
+
+        this.$emit('confirm')
+      } else {
+        this.dialog = false
+        this.$emit('confirm')
       }
-      this.dialog = false
-      this.$emit('confirm')
     },
     cancel (callback = null) {
       if (callback) {
