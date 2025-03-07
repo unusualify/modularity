@@ -301,9 +301,14 @@
           <slot name="submit"
             v-bind="{
               validForm: validModel || !serverValid,
-              buttonDefaultText
+              buttonDefaultText,
+              loading
             }">
-            <v-btn type="submit" :disabled="!(validModel || !serverValid) || loading" class="ml-auto mb-5">
+            <v-btn type="submit"
+              :disabled="!(validModel || !serverValid) || loading"
+              class="ml-auto mb-5"
+              :loading="loading"
+              >
               {{ buttonDefaultText }}
             </v-btn>
           </slot>
