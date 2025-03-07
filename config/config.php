@@ -33,6 +33,13 @@ return [
     'fallback_locale' => 'en',
     'timezone' => 'Europe/London',
 
+    'log_dir' => storage_path('logs/modularity'),
+
+    'benchmark_enabled' => env('MODULARITY_BENCHMARK_ENABLED', false),
+    'benchmark_log_level' => env('MODULARITY_BENCHMARK_LOG_LEVEL', null),
+    'benchmark_log_file' => env('MODULARITY_BENCHMARK_LOG_FILE', 'modularity-benchmark.log'),
+    'benchmark_emergency_time' => env('MODULARITY_BENCHMARK_EMERGENCY_TIME', 1000), // in milliseconds
+
     'base_model' => \Unusualify\Modularity\Entities\Model::class,
 
     'base_repository' => \Unusualify\Modularity\Repositories\Repository::class,
