@@ -22,6 +22,7 @@ trait ProcessableTrait
 
             return $acc;
         }, []);
+
         $columns[$traitName] = array_unique(array_merge($this->traitColumns[$traitName] ?? [], $_columns));
 
         return $columns;

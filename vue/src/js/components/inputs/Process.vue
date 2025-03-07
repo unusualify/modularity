@@ -66,7 +66,7 @@
 
       <v-skeleton-loader v-if="loading" type="table-heading, list-item-three-line" class="mb-4 w-100 h-100" style="min-height: 300px;"></v-skeleton-loader>
 
-      <template v-else>
+      <template v-else-if="processModel">
         <v-card-text>
 
           <!-- Processable Title -->
@@ -425,12 +425,19 @@ export default {
 
         const self = this
 
-        axios.get(endpoint).then(response => {
-          self.loading = false
-          self.processModel = response.data
-          self.processableModel = self.processModel?.processable ?? {}
-          self.setSchema()
-        })
+        axios.get(endpoint)
+          .then(response => {
+            self.loading = false
+            if(response.status === 200) {
+              self.processModel = response.data
+              self.processableModel = self.processModel?.processable ?? {}
+              self.setSchema()
+            }
+          }).catch(error => {
+
+          }).finally(() => {
+            self.loading = false
+          })
       }
     },
     updateProcess(status) {
@@ -445,12 +452,15 @@ export default {
 
         const self = this
         axios.put(endpoint, data).then(response => {
-          self.updating = false
-          self.promptModalActive = false
-          self.reason = ''
+          if(response.status === 200) {
+            self.promptModalActive = false
+            self.reason = ''
 
-          self.$store.commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
-          self.fetchProcess()
+            self.$store.commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
+            self.fetchProcess()
+          }
+        }).finally(() => {
+          self.updating = false
         })
       }
     },
