@@ -393,31 +393,33 @@
         this.loading = true;
 
         axios.get(endpoint, { params }).then(response => {
-          if (this.perPage > -1) {
-            const total = response.data.total;
-            this.lastPage = response.data.last_page;
-            this.page = response.data.current_page;
+          if(response.status === 200) {
+            if (this.perPage > -1) {
+              const total = response.data.total;
+              this.lastPage = response.data.last_page;
+              this.page = response.data.current_page;
 
-            this.messages = [...response.data.data, ...this.messages]
+              this.messages = [...response.data.data, ...this.messages]
 
-            if(total !== 0) {
-              if(done) {
-                if(this.page === this.lastPage) {
-                  done('empty');
-                } else {
-                  done('ok');
+              if(total !== 0) {
+                if(done) {
+                  if(this.page === this.lastPage) {
+                    done('empty');
+                  } else {
+                    done('ok');
+                  }
+                } else{
+
                 }
-              } else{
 
+              } else if(done) {
+                done('empty');
               }
-
-            } else if(done) {
+            } else {
+              __log(response.data)
+              this.messages = this.formatMessages(response.data);
               done('empty');
             }
-          } else {
-            __log(response.data)
-            this.messages = this.formatMessages(response.data);
-            done('empty');
           }
         }).finally(() => {
           this.loading = false;
@@ -514,6 +516,11 @@
               this.messages = [...this.messages, ...response.data];
               this.getAttachments();
             }
+          }
+
+          if(response.status === 401) {
+            clearInterval(this.refreshInterval);
+            this.refreshInterval = null;
           }
         });
       }
