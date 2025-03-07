@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Unusualify\Modularity\Entities\Authorization;
 
 trait HasAuthorizable
@@ -154,16 +155,6 @@ trait HasAuthorizable
     }
 
     /**
-     * Get the array of obligatory authorization roles
-     *
-     * @return array Array of role names that have full authorization
-     */
-    public static function getObligatoryAuthorizationRoles()
-    {
-        return static::$obligatoryAuthorizationRoles ?? ['superadmin', 'admin'];
-    }
-
-    /**
      * Scope query to only include records authorized for the given user
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
@@ -183,11 +174,20 @@ trait HasAuthorizable
         }
 
         if (in_array('Spatie\Permission\Traits\HasRoles', class_uses_recursive($user))) {
-            $roleModel = config('permission.models.role');
-            $existingRoles = $roleModel::whereIn('name', $this->getObligatoryAuthorizationRoles())->get();
-            if ($user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
-                return $query;
+            // Get roles to check from model's static property if defined
+            $rolesToCheck = static::$authorizableRolesToCheck ?? null;
+
+            // If no specific roles defined, get all roles from the user
+            if (! (is_null($rolesToCheck) || empty($rolesToCheck)) ) {
+                // Check for specific roles
+                $roleModel = config('permission.models.role');
+                $existingRoles = $roleModel::whereIn('name', $rolesToCheck)->get();
+
+                if (!$user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
+                    return $query;
+                }
             }
+
         }
 
         return $query->whereHas('authorizationRecord', function ($query) use ($user) {
