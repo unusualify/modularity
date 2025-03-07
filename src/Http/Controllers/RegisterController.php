@@ -303,7 +303,7 @@ class RegisterController extends Controller
                 'title' => __('authentication.register-title'),
                 'description' => __('authentication.register-description'),
                 'button_text' => __('authentication.register-button_text'),
-                'button_url' => 'Test',
+                'button_url' => route('admin.login'),
             ],
         ]);
     }

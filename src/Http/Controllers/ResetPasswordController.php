@@ -303,9 +303,9 @@ class ResetPasswordController extends Controller
             'taskState' => [
                 'status' => 'success',
                 'title' => __('authentication.password-sent'),
-                'description' => __('authentication.succcess-reset-email'),
+                'description' => __('authentication.success-reset-email'),
                 'button_text' => __('authentication.go-to-sign-in'),
-                'button_url' => 'Test',
+                'button_url' => route('admin.login'),
             ],
         ]);
     }
