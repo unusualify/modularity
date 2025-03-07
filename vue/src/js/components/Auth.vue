@@ -14,38 +14,39 @@
                 <div class="bg-primary darken-3">
                   <!-- <span v-svg symbol="main-logo"></span> -->
                 </div>
+
                 <slot name="cardTop"></slot>
 
                 <v-sheet
                   class=""
-                  :width="width">
-                    <slot v-bind="{}"
-                      >
-                      <ue-form
-                        :model="model"
-                        :schema="schema"
-                        action-url="/login"
-                        :async="true"
-                        :hasSubmit="true"
-                        buttonText="auth.login"
-                        class="auth-form"
-                        >
-                        <template #submit="{validForm, buttonDefaultText}">
-                          <v-btn block dense type="submit" :disabled="!validForm">
-                            {{ buttonDefaultText.toUpperCase() }}
-                          </v-btn>
-                        </template>
-                      </ue-form>
-                    </slot>
+                  :width="width"
+                >
+                  <slot v-bind="{}">
+                    <ue-form
+                      :model="model"
+                      :schema="schema"
+                      action-url="/login"
+                      :async="true"
+                      :hasSubmit="true"
+                      buttonText="auth.login"
+                      class="auth-form"
+                    >
+                      <template #submit="submitScope">
+                        <v-btn block dense type="submit" :disabled="!submitScope.validForm" :loading="submitScope.loading">
+                          {{ submitScope.buttonDefaultText.toUpperCase() }}
+                        </v-btn>
+                      </template>
+                    </ue-form>
+                  </slot>
                 </v-sheet>
 
-                  <div
-                    v-if="!noDivider"
-                    class="d-flex w-100 align-center justify-center">
-                    <v-divider />
-                    <div class="text-no-wrap px-3">or</div>
-                    <v-divider />
-                  </div>
+                <div
+                  v-if="!noDivider"
+                  class="d-flex w-100 align-center justify-center">
+                  <v-divider />
+                  <div class="text-no-wrap px-3">or</div>
+                  <v-divider />
+                </div>
 
                 <slot name="bottom" v-bind="{}"></slot>
               </v-row>
