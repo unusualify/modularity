@@ -201,9 +201,6 @@
         </template>
       </ue-modal>
 
-      <v-btn v-if="$isSuperAdmin()" @click="$openLoginModal()">
-        Login
-      </v-btn>
       <!-- Login Modal -->
       <ue-modal
         ref="loginModal"
