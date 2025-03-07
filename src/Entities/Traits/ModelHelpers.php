@@ -20,6 +20,10 @@ trait ModelHelpers
 
     public static $obligatoryAuthorizationRoles = ['superadmin', 'admin', 'client-manager', 'client-assistant'];
 
+    public static $authorizableRolesToCheck = ['manager', 'account-executive'];
+
+    public static $assignableRolesToCheck = ['editor', 'reporter'];
+
     public static $defaultHasCreatorModel = \Unusualify\Modularity\Entities\User::class;
 
     /**
