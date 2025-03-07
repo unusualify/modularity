@@ -161,7 +161,7 @@ class LoginController extends Controller
     /**
      * @return \Illuminate\View\View
      */
-    public function showLoginForm()
+    public function showForm()
     {
         return $this->viewFactory->make(modularityBaseKey() . '::auth.login', [
             'formAttributes' => [

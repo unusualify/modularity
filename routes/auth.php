@@ -19,10 +19,10 @@ use Illuminate\Support\Facades\Route;
 
 if (modularityConfig('enabled.users-management')) {
 
-    Route::get('register', 'RegisterController@showLoginForm')->name('register.form');
+    Route::get('register', 'RegisterController@showForm')->name('register.form');
     Route::post('register', 'RegisterController@register')->name('register');
 
-    Route::get('login', 'LoginController@showLoginForm')->name('login.form');
+    Route::get('login', 'LoginController@showForm')->name('login.form');
     Route::post('login', 'LoginController@login')->name('login');
     Route::post('logout', 'LoginController@logout')->name('logout');
 

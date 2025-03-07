@@ -23,7 +23,7 @@ class RegisterController extends Controller
         $this->middleware('modularity.guest');
     }
 
-    public function showLoginForm()
+    public function showForm()
     {
         return view(modularityBaseKey() . '::auth.register', [
             'formAttributes' => [
