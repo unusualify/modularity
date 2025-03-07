@@ -111,7 +111,7 @@ export const makeRepeaterProps = propsFactory({
     default: () => {
       return { cols: 12 }
     }
-  },
+  }
 })
 
 // by convention, composable function names start with "use"

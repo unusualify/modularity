@@ -1,6 +1,9 @@
 <template>
   <v-input
-    class="v-input-repeater"
+    :class="[
+      'v-input-repeater',
+      repeaterInputs.length === 0 && hideIfEmpty ? 'd-none' : ''
+    ]"
   >
     <div class="w-100">
       <ue-collapsible
@@ -177,8 +180,6 @@
           </div>
         </template>
       </ue-collapsible>
-
-
     </div>
   </v-input>
 </template>
