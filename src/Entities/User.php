@@ -150,6 +150,14 @@ class User extends Authenticatable
         return preg_match('/client-/', $this->roles[0]->name);
     }
 
+    protected function avatar(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->fileponds()
+                ->where('role', 'avatar')
+                ->first()?->mediableFormat()['source'] ?? '/vendor/modularity/jpg/anonymous.jpg',
+        );
+    }
     public function getTable()
     {
         return modularityConfig('tables.users', parent::getTable());
