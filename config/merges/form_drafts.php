@@ -196,4 +196,16 @@ return [
             'rules' => 'sometimes|required:array',
         ],
     ],
+    'login_shortcut' => [
+        'email' => [
+            'type' => 'email',
+            'name' => 'email',
+            'label' => 'E-mail',
+        ],
+        'password' => [
+            'type' => 'password',
+            'name' => 'password',
+            'label' => 'Password',
+        ],
+    ],
 ];
