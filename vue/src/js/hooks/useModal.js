@@ -9,7 +9,7 @@ import { useI18n } from 'vue-i18n'
 const defaultWidths = {
   xs: '320px',
   sm: '480px',
-  md: '540px',
+  md: '720px',
   lg: '1080px',
   xl: '1600px'
 }
@@ -21,7 +21,21 @@ export const makeModalProps = propsFactory({
   },
   transition: {
     type: String,
-    default: 'bottom'
+    default: 'bottom',
+
+    values: [
+      'dialog-transition',
+      'dialog-bottom-transition',
+      'dialog-top-transition',
+      'fade-transition',
+      'scale-transition',
+      'slide-x-transition',
+      'slide-y-transition',
+      'slide-x-reverse-transition',
+      'slide-y-reverse-transition',
+      'scroll-x-transition',
+      'scroll-y-transition',
+    ]
   },
   widthType: {
     type: String,
