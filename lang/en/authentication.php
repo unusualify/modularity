@@ -28,4 +28,12 @@ return [
     'have-an-account' => 'Already have an account?',
     'sign-in' => 'Sign In',
 
+    'password-sent' => 'Password is sent',
+    'success-reset-email' => 'Please check your email for the password reset link.',
+    'go-to-sign-in' => 'Go to Sign In',
+
+    'register-title' => 'Registration Complete',
+    'register-description' => 'Congratulations! Your registration is complete.',
+    'register-button_text' => 'Go to Sign In?',
+
 ];
