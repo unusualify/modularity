@@ -119,6 +119,8 @@ class LoginController extends Controller
             return $this->sendLockoutResponse($request);
         }
 
+        $previousRouteName = previous_route_name();
+
         if ($this->attemptLogin($request)) {
             if ($request->hasSession()) {
                 $request->session()->put('auth.password_confirmed_at', time());
@@ -132,13 +134,18 @@ class LoginController extends Controller
                 return $response;
             }
 
+            $body = [
+                'variant' => MessageStage::SUCCESS,
+                'timeout' => 1500,
+                'message' => __('authentication.login-success-message'),
+            ];
+
+            if($previousRouteName === 'admin.login.form') {
+                $body['redirector'] = redirect()->intended($this->redirectTo)->getTargetUrl();
+            }
+
             return $request->wantsJson()
-                ? new JsonResponse([
-                    'variant' => MessageStage::SUCCESS,
-                    'timeout' => 1500,
-                    'message' => __('authentication.login-success-message'),
-                    'redirector' => redirect()->intended($this->redirectTo)->getTargetUrl(),
-                ], 200)
+                ? new JsonResponse($body, 200)
                 : $this->sendLoginResponse($request);
 
             // return $this->sendLoginResponse($request);
@@ -365,25 +372,23 @@ class LoginController extends Controller
                 : $this->redirector->to(route(Route::hasAdmin('admin.login-2fa.form')));
         }
 
-        return $request->wantsJson()
-            ? new JsonResponse([
-                'variant' => MessageStage::SUCCESS,
-                'timeout' => 1500,
-                'message' => __('authentication.login-success-message'),
-                // 'redirector' => $this->redirectPath()
-                'redirector' => $this->redirector->intended($this->redirectPath())->getTargetUrl() . '?status=success',
-            ])
-            : $this->redirector->intended($this->redirectPath());
+        $previousRouteName = previous_route_name();
+
+        $body = [
+            'variant' => MessageStage::SUCCESS,
+            'timeout' => 1500,
+            'message' => __('authentication.login-success-message'),
+        ];
+
+        if($previousRouteName === 'admin.login.form') {
+            // 'redirector' => $this->redirector->intended($this->redirectPath())->getTargetUrl() . '?status=success',
+            $body['redirector'] = redirect()->intended($this->redirectTo)->getTargetUrl();
+        }
 
         return $request->wantsJson()
-            ? new JsonResponse([
-                'variant' => MessageStage::SUCCESS,
-                'timeout' => 1500,
-                'message' => __('authentication.login-success-message'),
-                // 'redirector' => $this->redirectPath()
-                'redirector' => $this->redirector->intended($this->redirectPath())->getTargetUrl(),
-            ])
+            ? new JsonResponse($body)
             : $this->redirector->intended($this->redirectPath());
+
     }
 
     /**
