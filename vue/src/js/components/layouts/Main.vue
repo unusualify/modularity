@@ -177,6 +177,7 @@
       </a17-dialog> -->
 
       <ue-alert ref='alert'></ue-alert>
+
       <ue-modal
         ref='dialog'
         v-model="alertDialog"
@@ -200,26 +201,52 @@
         </template>
       </ue-modal>
 
-      <!-- <v-layout-item
-        v-if="impersonation.active"
-        class="text-end pointer-events-none"
-        model-value
-        position="bottom"
-        size="88"
+      <v-btn v-if="$isSuperAdmin()" @click="$openLoginModal()">
+        Login
+      </v-btn>
+      <!-- Login Modal -->
+      <ue-modal
+        ref="loginModal"
+        v-model="$store.state.user.showLoginModal"
+        scrollable
+        transition="dialog-bottom-transition"
+        width-type="sm"
       >
-        <div class="ma-4">
-          <v-fab-transition>
-            <v-btn
-              class="mt-auto pointer-events-initial"
-              color="error"
-              elevation="8"
-              :icon="(showImpersonateToolbar ? 'mdi-chevron-down' : 'mdi-chevron-up')"
-              size="large"
-              @click="showImpersonateToolbar = !showImpersonateToolbar"
-            />
-          </v-fab-transition>
-        </div>
-      </v-layout-item> -->
+        <template v-slot:body="{ isActive, toggleFullscreen, close , isFullActive}">
+          <v-card>
+
+            <v-card-title>
+              <ue-title padding="y-3" :text="$t('Login')" color="grey-darken-5" transform="none" align="center" justify="space-between">
+                <template #right>
+                  <div class="d-flex align-center">
+                    <v-icon :icon="isFullActive ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="default" @click="toggleFullscreen()"/>
+                    <v-icon icon="$close" variant="plain" color="grey-darken-5" size="default" @click="close()"/>
+                  </div>
+                </template>
+              </ue-title>
+              <v-divider/>
+            </v-card-title>
+
+            <v-card-text>
+              <ue-form
+                class="flex-grow-1"
+                :schema="$store.state.user.loginShortcutSchema"
+                v-model="$store.state.user.loginShortcutModel"
+                :action-url="$store.state.user.loginRoute"
+
+                :async="true"
+                :hasSubmit="true"
+                no-default-form-padding
+                buttonText="fields.login"
+
+                @submitted="loginFormSubmitted"
+              >
+              </ue-form>
+            </v-card-text>
+
+          </v-card>
+        </template>
+      </ue-modal>
     </v-main>
   </v-app>
 </template>
@@ -455,6 +482,10 @@
             this.$store.commit(USER.SET_PROFILE_DATA, res.data)
           })
         }
+      },
+      loginFormSubmitted(res) {
+        __log('Login Form Submitted', res)
+        // this.$store.commit(USER.CLOSE_LOGIN_MODAL)
       }
     }
   }

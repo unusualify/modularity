@@ -8,7 +8,7 @@ import moment from 'moment'
 import { useI18n } from 'vue-i18n'
 
 import store from '@/store' // Adjust the import based on your store structure
-import { CONFIG } from '@/store/mutations'
+import { CONFIG, USER } from '@/store/mutations'
 import { addParametersToUrl, replaceState } from '@/utils/pushState'
 
 /**
@@ -673,14 +673,8 @@ export default function init(){
   window.$ = jquery
   window._ = lodash
   window.$moment = moment
-  axios.defaults.headers.common = {
-    'X-Requested-With': 'XMLHttpRequest',
-    Accept: 'application/json',
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
-    Pragma: 'no-cache',
-    Expires: '0',
-  }
-  window.axios.defaults.headers.common = {
+
+  const commonHeaders = {
     'X-Requested-With': 'XMLHttpRequest',
     Accept: 'application/json',
     'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -688,9 +682,22 @@ export default function init(){
     Expires: '0',
   }
 
+  axios.defaults.headers.common = commonHeaders
+
+  window.axios.defaults.headers.common = commonHeaders
+
   window.axios.defaults.headers.post = {
     'Content-Type': 'application/json'
   }
+
+  // Set validateStatus on both axios instances
+  const validateStatus = (status) => {
+    return (status >= 200 && status < 300) || status === 422 || status === 401 || status === 419;
+  }
+
+  // Add validateStatus config to accept 422 and 401 as valid
+  axios.defaults.validateStatus = validateStatus
+  window.axios.defaults.validateStatus = validateStatus
 
   axios.interceptors.request.use(function (config) {
     // Do something before request is sent
@@ -708,10 +715,24 @@ export default function init(){
     // Do something with response data
     store.commit(CONFIG.DECREASE_AXIOS_REQUEST)
 
+    // Check for 401 Unauthenticated error
+    if (response.status === 401) {
+      store.commit(USER.OPEN_LOGIN_MODAL)
+    }
+
+    if (response.status === 419 || response.data.message === 'CSRF token mismatch.') {
+      store.commit(USER.OPEN_LOGIN_MODAL)
+    }
+
     return response;
   }, function (error) {
     store.commit(CONFIG.DECREASE_AXIOS_REQUEST)
     // Any status codes that falls outside the range of 2xx cause this function to trigger
+
+    // Check for 401 Unauthenticated error
+    if (error.response?.status === 401) {
+      // store.commit(USER.OPEN_LOGIN_MODAL)
+    }
     // Do something with response error
     return Promise.reject(error);
   });

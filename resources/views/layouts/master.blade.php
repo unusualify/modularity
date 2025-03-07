@@ -66,7 +66,11 @@
         profile: {!! json_encode($currentUser) !!},
         profileRoute: '{{ route(Route::hasAdmin('profile.update')) }}',
         profileShortcutModel: {!! json_encode($profileShortcutModel) !!},
-        profileShortcutSchema: {!! json_encode($profileShortcutSchema) !!}
+        profileShortcutSchema: {!! json_encode($profileShortcutSchema) !!},
+
+        loginShortcutModel: {!! json_encode($loginShortcutModel) !!},
+        loginShortcutSchema: {!! json_encode($loginShortcutSchema) !!},
+        loginRoute: '{{ route('admin.login') }}',
     },
 
     @if (modularityConfig('enabled.media-library'))

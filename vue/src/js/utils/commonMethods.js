@@ -1,8 +1,9 @@
+import { useI18n } from 'vue-i18n'
 import _ from 'lodash-es'
 import pluralize from 'pluralize'
 import { useAuthorization } from '@/hooks'
 
-import { ALERT, CONFIG } from '../store/mutations'
+import { ALERT, CONFIG, USER } from '../store/mutations'
 
 export default {
   $csrf: function () {
@@ -51,6 +52,14 @@ export default {
     const { hasRoles } = useAuthorization()
 
     return hasRoles(roles)
+  },
+  $isYou: function (id) {
+    const { isYou } = useAuthorization()
+
+    return isYou(id)
+  },
+  $isSuperAdmin: function () {
+    return this.$store.getters.isSuperAdmin
   },
   $toggleSidebar: function () {
     this.$store.commit(CONFIG.SIDEBAR_TOGGLE)
@@ -351,7 +360,20 @@ export default {
       return acc
     }, {})
   },
+  $d: function (date, format = 'long') {
+    const { d } = useI18n({ useScope: 'global' })
+
+    return d(new Date(date), format)
+  },
   $copy: function(text) {
     window.navigator.clipboard.writeText(text);
+  },
+
+
+  $openLoginModal: function () {
+    this.$store.commit(USER.OPEN_LOGIN_MODAL)
+  },
+  $closeLoginModal: function () {
+    this.$store.commit(USER.CLOSE_LOGIN_MODAL)
   }
 }

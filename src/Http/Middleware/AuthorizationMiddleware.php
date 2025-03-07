@@ -56,9 +56,18 @@ class AuthorizationMiddleware
 
             $profileShortcutModel = $userRepository->getFormFields($user, $profileShortcutSchema);
 
+            $loginShortcutSchema = getFormDraft('login_shortcut');
+            $loginShortcutSchema = collect($loginShortcutSchema)->mapWithKeys(function ($v, $k) use ($defaultInput) {
+                return [$k => configure_input(hydrate_input(array_merge($defaultInput, $v)))];
+            })->toArray();
+            // $loginShortcutModel = $userRepository->getFormFields($user, $loginShortcutSchema);
+            // dd($loginShortcutSchema);
+
             $view->with('profileShortcutModel', $profileShortcutModel);
             $view->with('profileShortcutSchema', $profileShortcutSchema);
             $view->with('authorization', $authorization);
+            $view->with('loginShortcutModel', []);
+            $view->with('loginShortcutSchema', $loginShortcutSchema);
         });
 
         return $next($request);

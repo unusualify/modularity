@@ -10,6 +10,10 @@ export default function useAuthorization() {
     return store.getters.isSuperAdmin || store.getters.userPermissions[name]
   }
 
+  const isYou = (id) => {
+    return store.getters?.userProfile.id == id
+  }
+
   const hasRoles = (roles) => {
     if(window.__isString(roles)){
       roles = roles.split(',').map(role => role.trim())
@@ -20,6 +24,7 @@ export default function useAuthorization() {
 
   return {
     can,
-    hasRoles
+    hasRoles,
+    isYou
   }
 }

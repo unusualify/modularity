@@ -10,7 +10,12 @@ const state = {
   profile: window[import.meta.env.VUE_APP_NAME]?.STORE?.user?.profile ?? {},
   profileRoute: window[import.meta.env.VUE_APP_NAME]?.STORE?.user?.profileRoute ?? '',
   profileShortcutModel: window[import.meta.env.VUE_APP_NAME]?.STORE?.user?.profileShortcutModel ?? {},
-  profileShortcutSchema: window[import.meta.env.VUE_APP_NAME]?.STORE?.user?.profileShortcutSchema ?? {}
+  profileShortcutSchema: window[import.meta.env.VUE_APP_NAME]?.STORE?.user?.profileShortcutSchema ?? {},
+
+  showLoginModal: false,
+  loginShortcutModel: window[import.meta.env.VUE_APP_NAME]?.STORE?.user?.loginShortcutModel ?? {},
+  loginShortcutSchema: window[import.meta.env.VUE_APP_NAME]?.STORE?.user?.loginShortcutSchema ?? {},
+  loginRoute: window[import.meta.env.VUE_APP_NAME]?.STORE?.user?.loginRoute ?? '',
 }
 
 const getters = {
@@ -41,13 +46,18 @@ const getters = {
 }
 
 const actions = {
-
 }
 
 const mutations = {
   [USER.SET_PROFILE_DATA] (state, data) {
     state.profile = data
   },
+  [USER.OPEN_LOGIN_MODAL] (state) {
+    state.showLoginModal = true
+  },
+  [USER.CLOSE_LOGIN_MODAL] (state) {
+    state.showLoginModal = false
+  }
 }
 
 export default {
