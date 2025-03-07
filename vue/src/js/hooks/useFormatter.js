@@ -13,7 +13,7 @@ export const makeFormatterProps = propsFactory({
   }
 })
 // by convention, composable function names start with "use"
-export default function useFormatter (props, context, headers) {
+export default function useFormatter (props, context, headers = []) {
   // state encapsulated and managed by the composable
   const { d } = useI18n({ useScope: 'global' })
 
@@ -30,9 +30,9 @@ export default function useFormatter (props, context, headers) {
         configuration: methods.makeText(d(new Date(value), datetimeFormat))
       }
     },
-    chipFormatter: function (value, color = '') {
+    chipFormatter: function (value, attributes = {}) {
       return {
-        configuration: methods.makeChip(value, color)
+        configuration: methods.makeChip(value, attributes)
       }
     },
     editFormatter: function (value) {
@@ -88,11 +88,11 @@ export default function useFormatter (props, context, headers) {
 
       }
     },
-    makeChip: function (value, color = '') {
+    makeChip: function (value, attributes = {}) {
       return {
         tag: 'v-chip',
         attributes: {
-          color
+          ...attributes,
         },
         elements: value
       }
@@ -116,7 +116,15 @@ export default function useFormatter (props, context, headers) {
     const name = args.shift()
     // const pascalCase = methods.(name)
     const func = `${name}Formatter`
+
     try {
+      if(!value) {
+        return {
+          configuration: {
+            elements: ''
+          }
+        }
+      }
       return methods[func](value, ..._(args))
     } catch (error) {
       console.error(`${error}: ${func}`);
