@@ -34,7 +34,7 @@
           <div>{{ message.user_profile.name }}</div>
           <!-- <div> {{ message.created_at ? $d(new Date(message.created_at), 'numeric-full') : window.$moment().fromNow() }}</div> -->
         </div>
-        <div :class="['d-flex', reverse ? 'flex-row-reverse' : 'flex-row']">{{ message.content }}</div>
+        <div :class="['d-flex text-break', reverse ? 'flex-row-reverse' : 'flex-row']">{{ message.content }}</div>
 
         <!-- Attachments -->
         <div v-if="message.attachments.length > 0" class="mt-2 pa-1 rounded" style="">
