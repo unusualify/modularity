@@ -62,4 +62,11 @@ return [
         ],
     ],
     'activator' => 'file',
+
+    'oauth' => [
+        'providers' => [
+            'google',
+            'apple',
+        ],
+    ],
 ];
