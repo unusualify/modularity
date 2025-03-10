@@ -9,7 +9,7 @@ use Unusualify\Modularity\Entities\Chat;
 use Unusualify\Modularity\Entities\ChatMessage;
 use Unusualify\Modularity\Facades\Filepond;
 
-class ChatableController extends Controller
+class ChatController extends Controller
 {
     public function index(Request $request, Chat $chat)
     {

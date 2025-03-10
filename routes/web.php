@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Unusualify\Modularity\Http\Controllers\ChatableController;
+use Unusualify\Modularity\Http\Controllers\ChatController;
 use Unusualify\Modularity\Http\Controllers\ProcessController;
 use Unusualify\Modularity\Http\Controllers\ProfileController;
 
@@ -30,13 +30,13 @@ Route::get('users/impersonate/{id}', 'ImpersonateController@impersonate')->name(
 
 // system internal api routes (for ajax web routes)
 Route::prefix('api')->group(function () {
-    Route::group(['prefix' => 'chatable', 'as' => 'chatable.'], function () {
-        Route::get('{chat}', [ChatableController::class, 'index'])->name('index');
-        Route::get('{chat}/attachments', [ChatableController::class, 'attachments'])->name('attachments');
-        Route::post('{chat}', [ChatableController::class, 'store'])->name('store');
-        Route::put('{chat_message}', [ChatableController::class, 'update'])->name('update');
-        Route::get('show/{chat_message}', [ChatableController::class, 'show'])->name('show');
-        Route::delete('destroy/{chat_message}', [ChatableController::class, 'destroy'])->name('destroy');
+    Route::group(['prefix' => 'chatable', 'as' => 'chatable.', 'controller' => ChatController::class], function () {
+        Route::get('{chat}', 'index')->name('index');
+        Route::get('{chat}/attachments', 'attachments')->name('attachments');
+        Route::post('{chat}', 'store')->name('store');
+        Route::put('{chat_message}', 'update')->name('update');
+        Route::get('show/{chat_message}', 'show')->name('show');
+        Route::delete('destroy/{chat_message}', 'destroy')->name('destroy');
     });
 
     Route::group(['prefix' => 'process', 'as' => 'process.'], function () {
