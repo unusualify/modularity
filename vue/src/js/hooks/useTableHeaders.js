@@ -31,9 +31,23 @@ export const makeTableHeadersProps = propsFactory({
 export default function useTableHeaders(props) {
   const store = useStore()
 
+  const getStorageKey = () => {
+    // Get the current route path as the unique identifier
+    const path = window.location.pathname
+
+    return `table_unvisible_columns_${path}`
+  }
+
+  const getUnvisibleHeaders = () => {
+    const unvisibleHeaders = localStorage.getItem(getStorageKey())
+    return unvisibleHeaders ? unvisibleHeaders.split(',') : []
+  }
+
+  let unvisibleHeaders = getUnvisibleHeaders()
   // Initialize headers
-  const headers = ref(props.columns ?? store.state.datatable.headers ?? [])
-  const headersModel = ref(_.cloneDeep(headers.value))
+  const rawHeaders = props.columns ?? store.state.datatable.headers ?? []
+  const headers = ref(rawHeaders.filter(h => !unvisibleHeaders.includes(h.key)))
+  const headersModel = ref(_.cloneDeep(rawHeaders.map(h => ({...h, visible: !unvisibleHeaders.includes(h.key) ? true : false}))))
 
   const hasSearchableHeader = ref(!!_.find(headers.value, header => window.__isset(header.searchable) && header.searchable === true))
 
@@ -54,14 +68,9 @@ export default function useTableHeaders(props) {
   const applyHeaders = () => {
     headers.value = _.cloneDeep(headersModel.value)
 
-    __pushQueryParams({
-      columns: headersModel.value.reduce((acc, h) => {
-        if(h.visible) {
-          acc.push(h.key)
-        }
-        return acc
-      }, [])
-    })
+    const unvisibleHeaders = headersModel.value.filter((h, index) => !h.visible)
+
+    localStorage.setItem(getStorageKey(), unvisibleHeaders.map(h => h.key).join(','))
   }
 
   return {

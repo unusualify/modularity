@@ -664,11 +664,11 @@
               <v-card-title>
                 <v-list class="">
                   <template v-for="(item, index) in headersModel" :key="index">
-                    <v-checkbox
-                      class="ml-n2"
-                      v-if="item.key !== 'actions'"
-                      :disabled="headersModel.filter(h => h.key !== 'actions' && h.visible === true).length < 2 && headersModel[index].visible === true"
+                    <v-checkbox v-if="item.key !== 'actions'"
                       v-model="headersModel[index].visible"
+                      color="primary"
+                      class="ml-n2"
+                      :disabled="headersModel.filter(h => h.key !== 'actions' && h.visible === true).length < 2 && headersModel[index].visible === true"
                       :label="item.title"
                       hide-details
                       density="comfortable"

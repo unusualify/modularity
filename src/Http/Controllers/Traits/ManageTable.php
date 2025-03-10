@@ -147,9 +147,9 @@ trait ManageTable
             return $this->indexTableColumns = $headers->reduce(function ($carry, $item) use ($visibleColumns) {
                 $header = $this->getHeader((array) $item);
                 if (isset($item->key)) {
-                    if ($item->key !== 'actions' && ! in_array($item->key, $visibleColumns)) {
-                        $header['visible'] = false;
-                    }
+                    // if ($item->key !== 'actions' && ! in_array($item->key, $visibleColumns)) {
+                    //     $header['visible'] = false;
+                    // }
                     $carry[] = $header;
                 }
 
