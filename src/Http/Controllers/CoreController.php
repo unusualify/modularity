@@ -375,4 +375,59 @@ abstract class CoreController extends LaravelController
             ], 200);
 
     }
+
+    public function assignments($id)
+    {
+        $assignments = $this->repository->getAssignments($id);
+
+        return Response::json($assignments);
+    }
+
+    public function createAssignment($id)
+    {
+        if($this->request->get('status')){
+            $assignable = $this->repository->getById($id);
+
+            $assignable->lastAssignment->update([
+                'status' => $this->request->get('status'),
+                'completed_at' => $this->request->get('status') === 'completed' ? now() : null,
+            ]);
+
+            return Response::json([
+                'location' => 'top',
+                'variant' => MessageStage::SUCCESS,
+                'message' => __('Assignment updated successfully!'),
+                'assignments' => $this->repository->getAssignments($id),
+            ]);
+        }
+
+        $this->validate($this->request, [
+            'assignee_id' => 'required|',
+            'assignee_type' => 'required',
+
+            'assignable_id' => 'required',
+            'assignable_type' => 'required',
+
+            // 'title' => 'required',
+            'description' => 'required',
+            'due_at' => 'required|date',
+        ]);
+
+        $assignable = $this->repository->getById($id);
+
+        if($assignable->lastAssignment->status !== 'completed'){
+            $assignable->lastAssignment->update([
+                'status' => 'cancelled',
+            ]);
+        }
+
+        $assignment = $assignable->assignments()->create($this->request->only([
+            'assignee_id',
+            'assignee_type',
+            'due_at',
+            'description',
+        ]));
+
+        return Response::json($assignment);
+    }
 }

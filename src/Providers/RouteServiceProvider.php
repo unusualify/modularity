@@ -557,17 +557,22 @@ class RouteServiceProvider extends ServiceProvider
                 // 'bulkPublish',
                 // 'browser',
                 // 'feature',
-                // 'bulkFeature',
-                'tags',
-                'tagsUpdate',
                 // 'preview',
+                // 'bulkFeature',
+                // 'restoreRevision',
+
                 'restore',
                 'bulkRestore',
                 'forceDelete',
                 'bulkForceDelete',
                 'bulkDelete',
-                // 'restoreRevision',
                 'duplicate',
+
+                'tags',
+                'tagsUpdate',
+
+                'assignments',
+                'createAssignment',
             ];
 
             $controllerClass = "{$routeName}Controller";
@@ -593,6 +598,14 @@ class RouteServiceProvider extends ServiceProvider
                     'uses' => "{$controllerClass}@{$customRoute}",
                 ];
 
+                if($customRoute === 'assignments') {
+                    Route::get("{$url}/{{$snakeCase}}/assignments", $mapping);
+                }
+
+                if($customRoute === 'createAssignment') {
+                    Route::post("{$url}/{{$snakeCase}}/assignments", $mapping);
+                }
+
                 if (in_array($customRoute, ['browser', 'tags'])) {
                     Route::get($routeSlug, $mapping);
                 }
@@ -610,6 +623,7 @@ class RouteServiceProvider extends ServiceProvider
                         'tagsUpdate',
                     ])
                 ) {
+
                     Route::put($routeSlug, $mapping);
                 }
 
@@ -631,6 +645,7 @@ class RouteServiceProvider extends ServiceProvider
                         'bulkForceDelete',
                     ])
                 ) {
+
                     Route::post($routeSlug, $mapping);
                 }
 

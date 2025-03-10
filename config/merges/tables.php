@@ -23,4 +23,7 @@ return [
     'spreads' => 'umod_spreads',
     'singletons' => 'umod_singletons',
     'authorizations' => 'umod_authorizations',
+    'processes' => 'umod_processes',
+    'process_histories' => 'umod_process_histories',
+    'assignments' => 'um_assignments',
 ];
