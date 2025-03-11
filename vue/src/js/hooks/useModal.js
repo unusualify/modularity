@@ -16,8 +16,7 @@ const defaultWidths = {
 
 export const makeModalProps = propsFactory({
   modelValue: {
-    type: Boolean,
-    default: false
+    type: Boolean
   },
   transition: {
     type: String,
@@ -73,6 +72,10 @@ export const makeModalProps = propsFactory({
   confirmLoading: {
     type: Boolean,
     default: false
+  },
+  useModelValue: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -108,17 +111,22 @@ export default function useModal (props, context) {
   const { modelValue } = toRefs(props)
 
   const full = ref(props.fullscreen)
+  const internalOpen = ref(false)
+
   const states = reactive({
     modalClass: htmlClasses.modal,
     width: props.widthType,
     full,
     dialog: computed({
       get: () => {
-        return modelValue.value
+        return props.useModelValue ? (modelValue.value ?? false) : internalOpen.value
       },
-      set: (value, old) => {
-        // __log('modalOpened setter')
-        methods.emitModelValue(value)
+      set: (value) => {
+        if (props.useModelValue) {
+          methods.emitModelValue(value)
+        } else {
+          internalOpen.value = value
+        }
       }
     }),
     togglePersistent: computed(() => props.persistent),
@@ -130,11 +138,23 @@ export default function useModal (props, context) {
     emitModelValue: function (val) {
       context.emit('update:modelValue', val)
     },
-    emitOpened: function (val) {
-      context.emit('opened', val)
+    emitOpened: function () {
+      context.emit('opened', states.dialog)
     },
     clickOutside: function (event) {
       context.emit('click:outside', event)
+    },
+    openModal: function() {
+      states.dialog = true
+      return states.dialog
+    },
+    closeModal: function() {
+      states.dialog = false
+      return states.dialog
+    },
+    toggleModal: function() {
+      states.dialog = !states.dialog
+      return states.dialog
     }
   })
 

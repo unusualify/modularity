@@ -18,7 +18,6 @@
           close: () => this.close(),
           confirm: () => this.confirm(),
           open: () => this.open(),
-
         }">
         <slot name="systembar">
           <v-layout v-if="hasSystembar" style="height: 40px">
@@ -77,112 +76,118 @@ import { makeModalProps, useModal } from '@/hooks'
 export default {
   emits: [
     'update:modelValue',
-    'opened'
+    'opened',
+    'confirm',
+    'cancel'
   ],
   props: {
     ...makeModalProps()
   },
-  setup (props, context) {
+  setup(props, context) {
     return {
       ...useModal(props, context)
     }
   },
   computed: {
-    textCancel () {
+    textCancel() {
       return this.cancelText !== '' ? this.cancelText : this.$t('fields.cancel')
     },
-    textConfirm () {
+    textConfirm() {
       return this.confirmText !== '' ? this.confirmText : this.$t('fields.confirm')
     },
-    textDescription () {
+    textDescription() {
       return this.descriptionText
     }
   },
-
   watch: {
-    dialog (value) {
-      !value || this.emitOpened()
+    dialog(value) {
+      if (value) {
+        this.emitOpened()
+      }
     }
   },
-
   methods: {
-    toggle () {
-      this.dialog = !this.dialog
+    // Imperative API methods
+    toggle() {
+      return this.toggleModal()
     },
-    close (callback = null) {
+    close(callback = null) {
       if (callback) {
         callback()
       }
-      this.dialog = false
+      return this.closeModal()
     },
-    open (callback = null, nextCallback = null) {
+    open(callback = null, nextCallback = null) {
       if (callback) {
         callback()
       }
 
-      this.dialog = true
+      this.openModal()
+
       if (nextCallback) {
         const _this = this
         this.$nextTick().then(() => {
-          _this.$refs.modalConfirm.$el.addEventListener('click', (e) => {
-            nextCallback()
-            _this.close()
-          })
+          if (_this.$refs.modalConfirm) {
+            _this.$refs.modalConfirm.$el.addEventListener('click', (e) => {
+              nextCallback()
+              _this.close()
+            })
+          }
 
-          _this.$refs.modalCancel.$el.addEventListener('click', (e) => {
-            _this.close()
-          })
+          if (_this.$refs.modalCancel) {
+            _this.$refs.modalCancel.$el.addEventListener('click', (e) => {
+              _this.close()
+            })
+          }
         })
       }
+
+      return true
     },
-    async confirm (callback = null) {
+    async confirm(callback = null) {
+      let shouldClose = true
+
       if (callback) {
         const res = await callback()
-        if(res) {
-          this.dialog = false
+        shouldClose = !!res
+
+        if (shouldClose) {
+          this.closeModal()
           this.$emit('confirm')
         }
       } else if (this.confirmCallback && typeof this.confirmCallback === 'function') {
         let res = await this.confirmCallback()
+        shouldClose = typeof res === 'boolean' ? res : true
 
-        if(typeof res === 'boolean' && res) {
-          this.dialog = false
+        if (shouldClose) {
+          this.closeModal()
         }
 
         this.$emit('confirm')
       } else {
-        this.dialog = false
+        this.closeModal()
         this.$emit('confirm')
       }
+
+      return shouldClose
     },
-    cancel (callback = null) {
+    cancel(callback = null) {
       if (callback) {
         callback()
       }
-      this.dialog = false
+      this.closeModal()
       this.$emit('cancel')
     },
-    // attrs (attrs) {
-    //   return attrs
-    // },
-    toggleFullscreen () {
+    toggleFullscreen() {
       this.full = !this.full
     },
-    screenListener (e) {
+    screenListener(e) {
       this.full = e.target.fullScreen
     }
-  },
-  beforeUnmount: function () {
-
-  },
-  created () {
-    // setInterval((self) => {
-    //   __log('dialog', self.dialog)
-    // }, 5000, this)
   }
 }
 </script>
 
 <style>
-
+/* You can add any additional styles here */
 </style>
