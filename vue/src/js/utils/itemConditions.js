@@ -17,7 +17,7 @@ export const getNestedValue = (obj, path) => {
  * @returns {boolean} True if all conditions are met, false otherwise
  */
 export const checkItemConditions = (conditions, item) => {
-  if (!conditions || !Array.isArray(conditions) || conditions.length === 0) {
+  if (!item || !window.__isObject(item) || !conditions || !Array.isArray(conditions) || conditions.length === 0) {
     return true;
   }
 
