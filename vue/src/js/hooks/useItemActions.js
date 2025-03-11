@@ -1,5 +1,5 @@
 // hooks/useItemActions.js
-import { toRefs, computed, reactive } from 'vue'
+import { toRefs, computed, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
 import _ from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
@@ -8,6 +8,7 @@ import ACTIONS from '@/store/actions'
 import { FORM, ALERT } from '@/store/mutations/index'
 import api from '@/store/api/form'
 
+import { useFormatter } from '@/hooks'
 import { checkItemConditions } from '@/utils/itemConditions';
 
 export const makeItemActionsProps = propsFactory({
@@ -23,6 +24,9 @@ export const makeItemActionsProps = propsFactory({
 
 export default function useItemActions(props, context) {
   const store = useStore()
+  const { castMatch } = useFormatter(props, context)
+
+  const Actions = _.cloneDeep(props.actions)
 
   const editingItem = context.actionItem
     || context.item
@@ -155,13 +159,28 @@ export default function useItemActions(props, context) {
     return baseCondition && checkItemConditions(action.conditions, editingItem);
   }
 
-  const flattenedActions = computed(() => window.__isObject(props.actions)
-      ? Object.values(props.actions)
-      : props.actions
+  const formatActions = (_actions) => {
+    return _actions.map(action => {
+
+      Object.keys(action).forEach(key => {
+        if (key === 'badge') {
+          action[key] = castMatch.value(action[key], editingItem)
+        }
+      })
+      return action
+    })
+  }
+
+  const flattenedActions = ref(window.__isObject(Actions)
+      ? Object.values(Actions)
+      : Actions
   )
 
+  const formattedActions = computed(() => formatActions(flattenedActions.value.filter(action => shouldShowAction(action))))
+
   const states = reactive({
-    showedActions: computed(() => flattenedActions.value.filter(action => shouldShowAction(action)))
+    formattedActions,
+    hasActions: computed(() => formattedActions.value.length > 0)
   })
 
   const methods = reactive({
