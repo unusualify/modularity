@@ -18,6 +18,23 @@ trait TranslationsTrait
         return $this->prepareFieldsBeforeSaveTranslationsTrait(null, $fields);
     }
 
+    public function setColumnsTranslationsTrait($columns, $inputs)
+    {
+        $traitName = get_class_short_name(__TRAIT__);
+
+        $_columns = collect($inputs)->reduce(function ($acc, $curr) {
+            if(isset($curr['translated']) && $curr['translated']) {
+                $acc[] = $curr['name'];
+            }
+
+            return $acc;
+        }, []);
+
+        $columns[$traitName] = array_unique(array_merge($this->traitColumns[$traitName] ?? [], $_columns));
+
+        return $columns;
+    }
+
     /**
      * @param \Unusualify\Modularity\Entities\Model|null $object
      * @param array $fields
