@@ -3,7 +3,7 @@ import { useI18n } from 'vue-i18n'
 import filters from '@/utils/filters'
 import axios from 'axios'
 import { globalError } from './errors'
-
+import { checkItemConditions } from './itemConditions'
 import sampleModel from '@/__snapshots/getFormData/model.json';
 import sampleSchema from '@/__snapshots/getFormData/schema.json';
 
@@ -13,7 +13,10 @@ const isArrayable = 'input-treeview|treeview|input-checklist|input-repeater|inpu
 
 export const getSchema = (inputs, model = null, isEditing = false) => {
   let _inputs = _.omitBy(inputs, (value, key) => {
-    return Object.prototype.hasOwnProperty.call(value, 'slotable') || isTopEventInput(value) || isViewOnlyInput(value)
+    return !checkItemConditions(value.conditions, model)
+      || Object.prototype.hasOwnProperty.call(value, 'slotable')
+      || isFormEventInput(value, model)
+      || isViewOnlyInput(value)
   })
 
   // if (_.find(_inputs, (input) => Object.prototype.hasOwnProperty.call(input, 'wrap'))) {
@@ -93,6 +96,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
   const editing = __isset(item)
 
   inputs = processInputs(inputs)
+
   const values = Object.keys(inputs).reduce((fields, k) => {
     const input = inputs[k]
     const name = input.name
@@ -143,6 +147,11 @@ export const getModel = (inputs, item = null, rootState = null) => {
           } else {
             fields[name] = value
           }
+        }else{ // translations create
+          fields[name] = getTranslationLanguages().reduce(function (map, lang) {
+            map[lang] = __isset(value[lang]) ? value[lang] : ''
+            return map
+          }, {})
         }
       } else {
         if (!value &&
@@ -182,7 +191,7 @@ export const getModel = (inputs, item = null, rootState = null) => {
   return values
 }
 
-export const getTopSchema = (inputs, isEditing = false) => {
+export const getFormEventSchema = (inputs, model = null, isEditing = false) => {
   return _.filter(inputs, (input) => {
     if(isEditing && __isset(input.editable) && (input.editable === false || input.editable === 'hidden'))
       return false
@@ -190,7 +199,9 @@ export const getTopSchema = (inputs, isEditing = false) => {
     if(!isEditing && __isset(input.creatable) && (input.creatable === false || input.creatable === 'hidden'))
       return false
 
-    return isTopEventInput(input)
+
+
+    return isFormEventInput(input, model)
   })
 }
 
@@ -460,7 +471,7 @@ export default {
   testMethods
 }
 
-const processInputs = (inputObj) => {
+export const processInputs = (inputObj) => {
   return _.reduce(inputObj, (acc, value, key) => {
     if (value.type === 'wrap' && value.schema) {
       Object.assign(acc, processInputs(value.schema));
@@ -498,10 +509,13 @@ const slugify = (newValue) => {
   return filters.slugify(text)
 }
 
-export const isTopEventInput = (input) => {
-  return Object.prototype.hasOwnProperty.call(input, 'topEvent')
-    && input.topEvent
-    && ( ['select', 'autocomplete', 'combobox', 'switch'].includes(input.type) || __isset(input.viewOnlyComponent) )
+export const isFormEventInput = (input, model) => {
+  return Object.prototype.hasOwnProperty.call(input, 'isEvent')
+    && input.isEvent
+    && ( ['select', 'autocomplete', 'combobox', 'switch'].includes(input.type)
+      || __isset(input.viewOnlyComponent)
+      || input.noSubmit
+    )
 }
 
 const isViewOnlyInput = (input) => {
@@ -588,75 +602,79 @@ const FormatFuncs = {
       let notation = __wildcard_change(setPropFormat, handlerValue)
       dataSet = __data_get(handlerSchema, notation, null)
 
-      if(dataSet && dataSet.length > 0){
+      if(Array.isArray(dataSet) && (dataSet.length > 0)){
         let newValue = dataSet.shift()
 
+        if(!!newValue){
+          let matches = inputPropToFormat.match(/^(modelValue|model)$/g)
+          // __log(inputPropToFormat, matches)
+          if(matches){ // setting modelValue
+            let targetInput = _.get(schema, inputToFormat)
+            let targetInputName = targetInput.name
+            let targetForeignKey = __extractForeignKey(targetInputName)
+            let targetInputSchema = targetInput.schema ?? null
+            let isRepeater = targetInput.type == 'input-repeater'
+            let isArrayValue = Array.isArray(newValue)
 
-        let matches = inputPropToFormat.match(/^(modelValue|model)$/g)
-        // __log(inputPropToFormat, matches)
-        if(matches){ // setting modelValue
-          let targetInput = _.get(schema, inputToFormat)
-          let targetInputName = targetInput.name
-          let targetForeignKey = __extractForeignKey(targetInputName)
-          let targetInputSchema = targetInput.schema ?? null
-          let isRepeater = targetInput.type == 'input-repeater'
-          let isArrayValue = Array.isArray(newValue)
+            if(__isset(targetInput['translated']) && targetInput['translated']){
+              let translationParts = notation.split('.')
+              let field = translationParts.pop()
+              let translationNotation = translationParts.join('.') + '.translations'
+              notation.split('.').pop()
+              let rawTranslation = __data_get(handlerSchema, translationNotation).shift()
 
-          if(__isset(targetInput['translated']) && targetInput['translated']){
-            let translationParts = notation.split('.')
-            let field = translationParts.pop()
-            let translationNotation = translationParts.join('.') + '.translations'
-            notation.split('.').pop()
-            let rawTranslation = __data_get(handlerSchema, translationNotation).shift()
-
-            if(rawTranslation){
-              // TODO: translations do not comes from package_type
-              __log(rawTranslation)
-              newValue = _.reduce(languages, (acc, language) => {
-                let translation = _.find(rawTranslation, (el) => el.locale == language) ?? rawTranslation[0]
-                let value = translation[field] ?? null
-                acc[language] = translation[field] ?? null
-                return acc
-              }, {})
-            }
-          }
-
-          if(isArrayValue && newValue.length > 0){
-            let values = newValue.map((item) => {
-              if(targetInputSchema){
-                return _.reduce(targetInputSchema, (acc, value, key) => {
-                  // __log(key, value)
-                  if(isRepeater && key == targetForeignKey){
-                    acc[targetForeignKey] = item['id'] ?? null
-                  }else{
-                    acc[key] = item[key] ?? null
-                  }
-
+              if(rawTranslation){
+                // TODO: translations do not comes from package_type
+                __log(rawTranslation)
+                newValue = _.reduce(languages, (acc, language) => {
+                  let translation = _.find(rawTranslation, (el) => el.locale == language) ?? rawTranslation[0]
+                  let value = translation[field] ?? null
+                  acc[language] = translation[field] ?? null
                   return acc
                 }, {})
               }
-            })
-
-            _.set(model, inputToFormat, values)
-            // let currentValue = _.get(model, inputToFormat)
-            // __log( inputToFormat, __data_get(model, inputToFormat), model )
-            // if( !(Array.isArray(currentValue) && currentValue.length > 0)){
-            //   // __log('setting')
-            // }
-          }else if(!isArrayValue){
-            try{
-              _.set(model, targetInputName, newValue)
-            }catch(e){
-              console.error(e)
             }
-          }
-        }else{
-          _.set(schema, setterNotation, newValue)
-          if(inputPropToFormat.match(/schema/)){
-            _.set(schema, `${inputNotation}.default`, getModel(newValue))
-          }
 
+            if(isArrayValue && newValue.length > 0){
+              let values = newValue.map((item) => {
+                if(targetInputSchema){
+                  return _.reduce(targetInputSchema, (acc, value, key) => {
+                    // __log(key, value)
+                    if(isRepeater && key == targetForeignKey){
+                      acc[targetForeignKey] = item['id'] ?? null
+                    }else{
+                      acc[key] = item[key] ?? null
+                    }
+
+                    return acc
+                  }, {})
+                }
+              })
+
+              _.set(model, inputToFormat, values)
+
+              // let currentValue = _.get(model, inputToFormat)
+              // __log( inputToFormat, __data_get(model, inputToFormat), model )
+              // if( !(Array.isArray(currentValue) && currentValue.length > 0)){
+              //   // __log('setting')
+              // }
+            }else if(!isArrayValue){
+              try{
+                _.set(model, targetInputName, newValue)
+              }catch(e){
+                console.error(e)
+              }
+            }
+          }else{
+            _.set(schema, setterNotation, newValue)
+            if(inputPropToFormat.match(/schema/)){
+              _.set(schema, `${inputNotation}.default`, getModel(newValue))
+            }
+
+          }
         }
+
+
 
       }
     }
