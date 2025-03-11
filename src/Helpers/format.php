@@ -629,3 +629,16 @@ if (! function_exists('get_file_class')) {
         return $namespace ? $namespace . '\\' . $className : $className;
     }
 }
+
+if (! function_exists('is_plural')) {
+    /**
+     * Check if a string is in plural form
+     *
+     * @param string $string The string to check
+     * @return bool Returns true if the string is plural, false otherwise
+     */
+    function is_plural($string)
+    {
+        return Str::plural($string) === $string;
+    }
+}
