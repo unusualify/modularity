@@ -15,7 +15,7 @@ export default {
   props: {
     subject: {
       type: String,
-      required: true
+      default: ''
     }
   },
   data() {
