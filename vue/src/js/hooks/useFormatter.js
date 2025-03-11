@@ -15,7 +15,7 @@ export const makeFormatterProps = propsFactory({
 // by convention, composable function names start with "use"
 export default function useFormatter (props, context, headers = []) {
   // state encapsulated and managed by the composable
-  const { d } = useI18n({ useScope: 'global' })
+  const { d, te, t } = useI18n({ useScope: 'global' })
 
   const formatterColumns = ref(headers.filter((h) =>
     Object.prototype.hasOwnProperty.call(h, 'formatter') &&
@@ -33,6 +33,11 @@ export default function useFormatter (props, context, headers = []) {
     chipFormatter: function (value, attributes = {}) {
       return {
         configuration: methods.makeChip(value, attributes)
+      }
+    },
+    badgeFormatter: function (value, attributes = {}) {
+      return {
+        configuration: methods.makeBadge(value, attributes)
       }
     },
     editFormatter: function (value) {
@@ -88,6 +93,14 @@ export default function useFormatter (props, context, headers = []) {
 
       }
     },
+    shortenFormatter: function (value, max = 10) {
+      return {
+        configuration: {
+          elements: window.__shorten(value, max)
+        }
+      }
+    },
+
     makeChip: function (value, attributes = {}) {
       return {
         tag: 'v-chip',
@@ -97,18 +110,88 @@ export default function useFormatter (props, context, headers = []) {
         elements: value
       }
     },
+    makeBadge: function (value, attributes = {}) {
+      return {
+        tag: 'v-badge',
+        attributes: {
+          ...attributes,
+          content: value
+        },
+      }
+    },
     makeText: function (value) {
       return {
         elements: value
       }
     },
-    shortenFormatter: function (value, max = 10) {
-      return {
-        configuration: {
-          elements: window.__shorten(value, max)
+
+    castMatch: function (value, ownerItem) {
+      let castPattern = /\$([\w\d\.\*\_]+)/
+      let matches
+
+      let returnValue = value
+
+      if(window.__isString(value) && (matches = value.match(castPattern))){
+        let notation = matches[1]
+        let quoted = window.__preg_quote(matches[0])
+        let parts = notation.split('.')
+        // __log(parts)
+
+        let newParts = []
+        for(const j in parts){
+          let part = parts[j]
+          if(part === '*'){
+            // let searchedValue =
+            let _id = ownerItem.id
+            // parts[j] = `*id=${_id}`
+          }else{
+            newParts.push(part)
+          }
+        }
+
+        notation = newParts.join('.')
+
+        let newValue = window.__data_get(ownerItem, notation)
+
+        if(newValue !== undefined && newValue !== null){
+          let _value
+
+          if(Array.isArray(newValue) && newValue.length > 0){
+            _value = newValue.join(',')
+          }else if(window.__isString(newValue)){
+            _value = newValue
+
+            let snakeCased = _.snakeCase(_value)
+
+            if(te(`modules.${snakeCased}`)){
+              _value = t(`modules.${snakeCased}`)
+            }
+          }else if(window.__isNumber(newValue)){
+            _value = newValue.toString()
+          }
+
+          if(_value !== undefined){
+            let remainingQuote = '\\w\\s' + window.__preg_quote('çşıİğüö.,;?|:_')
+            let pattern = new RegExp( String.raw`^([${remainingQuote}]+)?(${quoted})([${remainingQuote}]+)?$`)
+
+            // __log('castMatch', value, _value, value.match(pattern))
+            if(value.match(pattern)){
+              returnValue = value.replace(pattern, '$1' + _value + '$3')
+            }else{
+              __log(
+                'Not matched sentence',
+                pattern,
+                value,
+                value.match(pattern)
+              )
+            }
+          }
         }
       }
+
+      return returnValue
     }
+
   })
 
   function handleFormatter (formatter, value) {
