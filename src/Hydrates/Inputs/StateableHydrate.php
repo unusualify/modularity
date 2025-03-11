@@ -26,7 +26,7 @@ class StateableHydrate extends InputHydrate
     {
         $input = $this->input;
 
-        $input['name'] = '_stateable';
+        $input['name'] = 'stateable_id';
         $input['type'] = 'select';
         $input['itemTitle'] = 'name';
         $input['itemValue'] = 'id';

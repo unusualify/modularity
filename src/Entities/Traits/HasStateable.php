@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\State;
@@ -13,11 +14,16 @@ trait HasStateable
 
     protected static $hasStateableFillable = [
         'initial_stateable',
+        'stateable_id',
         // '_stateable',
         // '_status',
     ];
 
     protected $customInitialStateable = null;
+
+    protected $modelStateIsUpdating = false;
+
+    protected $modelStateIsUpdatingId = null;
 
     protected static $stateModel = 'Modules\SystemUtility\Entities\State';
 
@@ -28,7 +34,6 @@ trait HasStateable
     public static function bootHasStateable(): void
     {
         self::saving(static function (Model $model) {
-
             if (isset($model->initial_stateable)) {
                 $defaultStates = $model->getDefaultStates();
 
@@ -38,11 +43,19 @@ trait HasStateable
                     $model->customInitialStateable = $initialStateFound;
                 }
             }
+
             if (isset($model->_status)) {
                 $model->_preserved_stateable = $model->_stateable;
             }
+
+            if (isset($model->stateable_id)) {
+                $model->modelStateIsUpdating = true;
+                $model->modelStateIsUpdatingId = $model->stateable_id;
+            }
+
             $model->offsetUnset('_stateable');
             $model->offsetUnset('_status');
+
             foreach (static::$hasStateableFillable as $field) {
                 $model->offsetUnset($field);
             }
@@ -71,25 +84,28 @@ trait HasStateable
                     $state->fill($attributes);
                 }
 
+                $model->setAttribute('stateable_id', $state->id);
+
                 $model->setAttribute('_stateable', $state->id);
-                $model->setAttribute(
-                    '_status',
-                    method_exists($model, 'setStateablePreview')
-                        ? $model->setStateablePreview($state)
-                        : "<span variant='text' color='{$state->color}' prepend-icon='{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</span>"
-                );
+                // $model->setAttribute(
+                //     '_status',
+                //     method_exists($model, 'setStateablePreview')
+                //         ? $model->setStateablePreview($state)
+                //         : "<span class='text-{$state->color} mdi-{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</span>"
+                // );
             } else {
-                $model->setAttribute(
-                    '_status',
-                    method_exists($model, 'setStateablePreviewNull')
-                        ? $model->setStateablePreviewNull()
-                        : "<span variant='text' color='' prepend-icon=''>No State</span>"
-                );
+                // $model->setAttribute(
+                //     '_status',
+                //     method_exists($model, 'setStateablePreviewNull')
+                //         ? $model->setStateablePreviewNull()
+                //         : "<span class='text-grey mdi-alert-circle-outline'>No State</span>"
+                // );
             }
         });
 
         self::saved(static function (Model $model) {
-            $newState = State::find($model->_preserved_stateable);
+            $newState = State::find($model->_preserved_stateable) ?? State::find($model->modelStateIsUpdatingId);
+
             if (is_null($newState)) {
                 return false;
             }
@@ -122,9 +138,54 @@ trait HasStateable
 
     public function initializeHasStateable()
     {
-        // $this->defaultLocale = app()->getLocale();
+        // $this->setAppends(['state_formatted']);
 
         $this->mergeFillable(['_stateable']);
+    }
+
+    public function states(): \Illuminate\Database\Eloquent\Relations\MorphToMany
+    {
+        return $this->morphToMany(
+            static::$stateModel,
+            'stateable',
+            // config('modularity.states.table', 'stateables'),
+            modularityConfig('tables.stateables', 'modularity_stateables'),
+            'stateable_id',
+            'state_id'
+        )->withPivot('is_active');
+    }
+
+    public function state(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
+    {
+        return $this->hasOneThrough(
+            static::$stateModel,
+            Stateable::class,
+            'stateable_id',
+            'id',
+            'id',
+            'state_id'
+        )->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.stateable_type', get_class($this))
+            ->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.is_active', 1);
+    }
+
+    public static function getStateableTranslationLanguages()
+    {
+        return [
+            app()->getLocale(),
+        ];
+    }
+
+    protected function stateFormatted() : Attribute
+    {
+        $state = $this->state;
+
+        return new Attribute(
+            get: fn () => method_exists($this, 'setStateFormatted')
+                ? $this->setStateFormatted($state)
+                : ($state
+                    ? "<span class='text-{$state->color} mdi-{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</span>"
+                    : "<span class='text-grey mdi-alert-circle-outline'>No State</span>")
+        );
     }
 
     protected static function setFormattedState($state, $defaultAttributes = null)
@@ -223,38 +284,6 @@ trait HasStateable
         }
     }
 
-    public function states(): \Illuminate\Database\Eloquent\Relations\MorphToMany
-    {
-        return $this->morphToMany(
-            static::$stateModel,
-            'stateable',
-            // config('modularity.states.table', 'stateables'),
-            modularityConfig('tables.stateables', 'modularity_stateables'),
-            'stateable_id',
-            'state_id'
-        )->withPivot('is_active');
-    }
-
-    public function state(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
-    {
-        return $this->hasOneThrough(
-            static::$stateModel,
-            Stateable::class,
-            'stateable_id',
-            'id',
-            'id',
-            'state_id'
-        )->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.stateable_type', get_class($this))
-            ->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.is_active', 1);
-    }
-
-    public static function getStateableTranslationLanguages()
-    {
-        return [
-            app()->getLocale(),
-        ];
-    }
-
     public static function getStateableList($itemValue = 'name')
     {
         $defaultStates = self::getDefaultStates();
@@ -318,15 +347,15 @@ trait HasStateable
         return $query->stateable($code)->count();
     }
 
-    public function __call($method, $parameters)
-    {
-        // if (Str::startsWith($method, 'stateable') && !Str::endsWith($method, 'Count')) {
-        //     dd($method, $parameters);
-        //     return $this->stateable(Str::after($method, 'scopeStateable'));
-        // }
+    // public function __call($method, $parameters)
+    // {
+    //     // if (Str::startsWith($method, 'stateable') && !Str::endsWith($method, 'Count')) {
+    //     //     dd($method, $parameters);
+    //     //     return $this->stateable(Str::after($method, 'scopeStateable'));
+    //     // }
 
-        return parent::__call($method, $parameters);
-    }
+    //     return parent::__call($method, $parameters);
+    // }
 
     public function scopeDistributed()
     {
