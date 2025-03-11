@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
+use Illuminate\Support\Str;
 use Oobook\Database\Eloquent\Concerns\ManageEloquent;
 use Spatie\Activitylog\ActivityLogger;
 use Spatie\Activitylog\Facades\LogBatch;
@@ -184,6 +185,15 @@ trait ModelHelpers
         return "<v-chip  color='' prepend-icon=''>" . __('No Status') . '</v-chip>';
     }
 
+    public function setStateFormatted($state)
+    {
+        if($state) {
+            return "<v-chip variant='text' color='{$state->color}' prepend-icon='{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</v-chip>";
+        }else{
+            return "<v-chip variant='text' color='grey' prepend-icon='mdi-alert-circle-outline'>" . __('No Status') . '</v-chip>';
+        }
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
 
@@ -286,5 +296,28 @@ trait ModelHelpers
     // {
     //     $activity->description = "activity.logs.message.{$eventName}";
     // }
+
+    public function __call($method, $arguments)
+    {
+        if (!method_exists($this, $method)) {
+
+            if(preg_match('/^numberOf(.*)/', $method, $matches)) {
+                $relationshipTypes = $this->definedRelationsTypes();
+                $camelCase = Str::camel($matches[1]);
+                $snakeCase = Str::snake($matches[1]);
+
+
+                if(array_key_exists($camelCase, $relationshipTypes) && in_array($relationshipTypes[$camelCase], ['hasMany', 'belongsToMany', 'HasManyThrough', 'MorphMany', 'MorphToMany'])) {
+                    return $this->{$camelCase}()->count();
+                }else if(array_key_exists($snakeCase, $relationshipTypes) && in_array($relationshipTypes[$snakeCase], ['hasMany', 'belongsToMany', 'HasManyThrough', 'MorphMany', 'MorphToMany'])) {
+                    return $this->{$snakeCase}()->count();
+                }
+                // if(is_plural($matches[1])) {
+                // }
+            }
+        }
+
+        return parent::__call($method, $arguments);
+    }
 
 }
