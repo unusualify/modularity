@@ -9,7 +9,7 @@ import { useInputHandlers, useValidation, useLocale, useItemActions } from '@/ho
 import { FORM, ALERT } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
 import api from '@/store/api/form'
-import { getModel, getSubmitFormData, getSchema, handleEvents, getTranslationInputsCount, getTopSchema } from '@/utils/getFormData.js'
+import { getModel, getSubmitFormData, getSchema, handleEvents, getTranslationInputsCount, getFormEventSchema, processInputs } from '@/utils/getFormData.js'
 import { redirector } from '@/utils/response'
 
 export const makeFormProps = propsFactory({
@@ -107,6 +107,13 @@ export const makeFormProps = propsFactory({
     type: [Array, Object],
     default: []
   },
+  actionsPosition: {
+    type: String,
+    default: 'top',
+    validator(value) {
+      return ['title-right', 'title-center', 'top', 'middle', 'bottom', 'right-top', 'right-middle', 'right-bottom'].includes(value)
+    }
+  },
   rightSlotGap: {
     type: Number,
     default: 12
@@ -150,6 +157,8 @@ export default function useForm(props, context) {
     ? props.schema
     : store.state.form.inputs)
 
+  const chunkedRawSchema = computed(() => processInputs(rawSchema.value))
+
   const defaultItem = ref(issetSchema.value
     ? getModel(rawSchema.value)
     : store.getters.defaultItem)
@@ -162,8 +171,10 @@ export default function useForm(props, context) {
     store.state,
   ))
 
-  const inputSchema = ref(validations.invokeRuleGenerator(getSchema(rawSchema.value, model.value, props.isEditing)))
-  const topSchema = ref(getTopSchema(rawSchema.value, props.isEditing))
+  const formItem = computed(() => issetModel.value ? props.modelValue : storeEditedItem.value)
+
+  const inputSchema = ref(validations.invokeRuleGenerator(getSchema(rawSchema.value, { ...model.value, ...formItem.value }, props.isEditing)))
+  const formEventSchema = ref(getFormEventSchema(rawSchema.value, { ...model.value, ...formItem.value }, props.isEditing))
   const extraValids = ref(props.actions.length ? props.actions.map(() => true) : [])
 
   const states = reactive({
@@ -175,10 +186,11 @@ export default function useForm(props, context) {
 
     model,
     // storeEditedItem,
-    formItem: computed(() => issetModel.value ? props.modelValue : storeEditedItem.value),
+    formItem,
 
+    chunkedRawSchema,
     inputSchema,
-    topSchema,
+    formEventSchema,
     extraValids,
 
     hasStickyFrame: props.stickyFrame || props.stickyButton,
@@ -198,8 +210,6 @@ export default function useForm(props, context) {
     ),
     reference: computed(() => 'ref-' + states.id),
     hasTraslationInputs: computed(() => getTranslationInputsCount(inputSchema.value) > 0),
-    flattenedActions: computed(() => __isObject(props.actions) ? Object.values(props.actions) : props.actions),
-    hasActions: computed(() => states.flattenedActions.length > 0),
   })
   // Methods
 
@@ -442,10 +452,6 @@ export default function useForm(props, context) {
       //   if (__isset(this.rawSchema[key].event)) {
 
     },
-    getTopInputActiveLabel: (topInput) => {
-      const item = topInput.items.find(item => item[topInput.itemValue] ===  (window.__isset(states.model[topInput.name]) ? states.model[topInput.name] : -1))
-      return item ? item[topInput.itemTitle] : topInput.label
-    },
 
     updatedCustomFormBaseModelValue: (value) => {
       __log('updatedCustomFormBaseModelValue', value)
@@ -511,7 +517,7 @@ export default function useForm(props, context) {
       // )
 
       inputSchema.value = validations.invokeRuleGenerator(getSchema(rawSchema.value, model.value, props.isEditing))
-      topSchema.value = getTopSchema(rawSchema.value, props.isEditing)
+      formEventSchema.value = getFormEventSchema(rawSchema.value, formItem.value, props.isEditing)
       // states.extraValids = props.actions.length ? props.actions.map(() => true) : []
       initialize()
       // context.emit('update:schema' )

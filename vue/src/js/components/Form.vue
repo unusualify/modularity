@@ -22,149 +22,97 @@
           v-bind="titleOptions"
         >
           <template v-slot:default>
-            <slot name="header.left" v-bind="{title: titleSerialized, model: model, schema: inputSchema}">
+            <slot name="header.left" v-bind="{title: titleSerialized, model: model, schema: inputSchema, formItem}">
               {{ titleSerialized }}
             </slot>
           </template>
           <template v-slot:right>
             <div class="d-flex align-center">
-              <slot name="headerCenter">
-
-              </slot>
-              <!-- Form Actions -->
-              <template v-if="hasAction && false">
-                <div class="d-flex flex-wrap ga-2 mr-2">
-                  <template v-for="(action, key) in flattenedActions">
-                    <v-tooltip
-                      v-if="shouldShowAction(action) && action.type !== 'modal'"
-                      :disabled="!action.icon || action.forceLabel"
-                      :location="action.tooltipLocation ?? 'top'"
-                    >
-                      <template v-slot:activator="{ props }">
-                        <v-switch
-                          v-if="action.type === 'publish'"
-                          :modelValue="model[action.key ?? 'published'] ?? action.default ?? false"
-                          @update:modelValue="handleAction(action)"
-                        />
-                        <v-btn
-                          v-else
-                          :icon="!action.forceLabel ? action.icon : null"
-                          :text="action.forceLabel ? action.label : null"
-                          :color="action.color"
-                          :variant="action.variant"
-                          :density="action.density ?? 'comfortable'"
-                          :size="action.size ?? 'default'"
-                          :rounded="action.forceLabel ? null : true"
-                          v-bind="props"
-                          @click="handleAction(action)"
-                        />
-                      </template>
-                      <span>{{ action.tooltip ?? action.label }}</span>
-                    </v-tooltip>
-                    <v-menu v-else-if="shouldShowAction(action) && action.type === 'modal'"
-                      :close-on-content-click="false"
-                      open-on-hoverx
-                      transition="scale-transition"
-                    >
-                      <template v-slot:activator="{ props }">
-                        <v-btn
-                          :icon="!action.forceLabel ? action.icon : null"
-                          :text="action.forceLabel ? action.label : null"
-                          :color="action.color"
-                          :variant="action.variant"
-                          :density="action.density ?? 'comfortable'"
-                          :size="action.size ?? 'default'"
-                          :rounded="action.forceLabel ? null : true"
-                          v-bind="props"
-                        />
-                      </template>
-                      <v-sheet :style="$vuetify.display.mdAndDown ? {width: '70vw'} : {width: '40vw'}">
-                        <ue-form
-                          :ref="`extra-form-${key}`"
-                          :modelValue="createModel(action.schema)"
-                          @updatex:modelValue="$log($event)"
-                          :title="action.formTitle ?? null"
-                          :schema="action.schema"
-                          :action-url="action.endpoint.replace(':id', model.id)"
-                          :valid="extraValids[key]"
-                          @update:valid="extraValids[key] = $event"
-                          has-divider
-                          has-submit
-                          button-text="Save"
-                        />
-                      </v-sheet>
-                    </v-menu>
-                  </template>
-                </div>
-              </template>
-
-              <FormActions
-                v-if="isEditing"
+              <!-- Title Center Form Actions -->
+              <FormActions v-if="actionsPosition == 'title-center' && isEditing"
                 :modelValue="formItem"
                 :actions="actions"
                 :is-editing="isEditing"
                 @action-complete="$emit('actionComplete', $event)"
               />
+
+              <!-- Slot for headerCenter -->
+              <slot name="headerCenter">
+
+              </slot>
+
+              <!-- Title Right Form Actions -->
+              <FormActions v-if="actionsPosition == 'title-right' && isEditing"
+                :modelValue="formItem"
+                :actions="actions"
+                :is-editing="isEditing"
+                @action-complete="$emit('actionComplete', $event)"
+              />
+
               <!-- Input events-->
-              <template v-if="topSchema && topSchema.length">
-                  <template v-for="topInput in topSchema" :key="topInput.name">
-                    <v-tooltip
-                      :disabled="topInput.tooltip == ''"
-                      :location="topInput.tooltipLocation ?? 'top'"
-                    >
-                      <template v-slot:activator="{ props }">
-                        <v-switch
-                          v-if="topInput.type === 'switch'"
-                          v-bind="{...$lodash.omit(topInput, 'label'), ...props}"
-                          hide-details
-                          :modelValue="model[topInput.name] ?? topInput.default ?? false"
-                          @update:modelValue="model[topInput.name] = $event"
-                          class="mr-2"
-                        />
-                        <ue-recursive-stuff v-else-if="topInput.viewOnlyComponent"
-                          :configuration="topInput.viewOnlyComponent"
-                          :bind-data="model"
-                          v-bind="props"
-                          class="mr-2"
-                        />
-                        <v-menu v-else
-                          :close-on-content-click="false"
-                          transition="scale-transition"
-                          offset-y
-                          v-bind="props"
-                        >
-                          <template v-slot:activator="{ props }">
-                            <v-btn
-                              class="mr-2"
-                              variant="outlined"
-                              append-icon="mdi-chevron-down"
-                              v-bind="props"
-                            >
-                              <!-- {{ topInput.label }} -->
-                              {{ getTopInputActiveLabel(topInput) }}
-                              <!-- {{ topInput.items.find(item => item[topInput.itemValue] ===  ($isset(model[topInput.name]) ? model[topInput.name] : -1))[topInput.itemTitle] ?? topInput.label }} -->
-                            </v-btn>
-                          </template>
+              <template v-if="formEventSchema && formEventSchema.length && false">
+                <template v-for="formEventInput in formEventSchema" :key="formEventInput.name">
+                  <v-tooltip
+                    :disabled="formEventInput.tooltip == ''"
+                    :location="topInput.tooltipLocation ?? 'top'"
+                  >
+                    <template v-slot:activator="{ props }">
+                      <v-switch
+                        v-if="topInput.type === 'switch'"
+                        v-bind="{...$lodash.omit(topInput, 'label'), ...props}"
+                        hide-details
+                        :modelValue="model[topInput.name] ?? topInput.default ?? false"
+                        @update:modelValue="model[topInput.name] = $event"
+                        class="mr-2"
+                      />
+                      <ue-recursive-stuff v-else-if="topInput.viewOnlyComponent"
+                        :configuration="topInput.viewOnlyComponent"
+                        :bind-data="model"
+                        v-bind="props"
+                        class="mr-2"
+                      />
+                      <v-menu v-else
+                        :close-on-content-click="false"
+                        transition="scale-transition"
+                        offset-y
+                        v-bind="props"
+                      >
+                        <template v-slot:activator="{ props }">
+                          <v-btn
+                            class="mr-2"
+                            variant="outlined"
+                            append-icon="mdi-chevron-down"
+                            v-bind="props"
+                          >
+                            <!-- {{ topInput.label }} -->
+                            {{ getTopInputActiveLabel(topInput) }}
+                            <!-- {{ topInput.items.find(item => item[topInput.itemValue] ===  ($isset(model[topInput.name]) ? model[topInput.name] : -1))[topInput.itemTitle] ?? topInput.label }} -->
+                          </v-btn>
+                        </template>
 
-                          <v-list>
-                            <v-list-item
-                              v-for="(item, index) in topInput.items"
-                              :key="item.id"
-                              @click="model[topInput.name] = item.id"
-                            >
-                              <v-list-item-title>
-                                {{ item.name }}
-                                <v-icon v-if="$isset(model[topInput.name]) && item[topInput.itemValue] === model[topInput.name]" size="small" icon="$check" color="primary"></v-icon>
-                              </v-list-item-title>
-                            </v-list-item>
-                          </v-list>
-                        </v-menu>
-                      </template>
-                      <span>{{ topInput.tooltip ?? topInput.label }}</span>
-                    </v-tooltip>
+                        <v-list>
+                          <v-list-item
+                            v-for="(item, index) in topInput.items"
+                            :key="item.id"
+                            @click="model[topInput.name] = item.id"
+                          >
+                            <v-list-item-title>
+                              {{ item.name }}
+                              <v-icon v-if="$isset(model[topInput.name]) && item[topInput.itemValue] === model[topInput.name]" size="small" icon="$check" color="primary"></v-icon>
+                            </v-list-item-title>
+                          </v-list-item>
+                        </v-list>
+                      </v-menu>
+                    </template>
+                    <span>{{ topInput.tooltip ?? topInput.label }}</span>
+                  </v-tooltip>
 
-                  </template>
+                </template>
               </template>
+              <FormEvents v-if="formEventSchema && formEventSchema.length && model"
+                :events="formEventSchema"
+                v-model="model"
+              />
 
               <!-- Language Selector -->
               <v-chip-group
@@ -182,6 +130,8 @@
                   variant="outlined"
                 ></v-chip>
               </v-chip-group>
+
+              <!-- Slot for headerRight -->
               <slot name="header.right">
 
               </slot>
@@ -192,14 +142,30 @@
         <v-divider v-if="hasDivider"></v-divider>
       </div>
 
-      <!-- {{ $log(model, formItem) }} -->
       <!-- Scrollable Content Section -->
       <div :class="['d-flex', scrollable ? 'flex-grow-1 overflow-hidden mr-n5' : '']">
         <div :class="['w-100 d-flex', scrollable ? 'overflow-y-auto pr-3' : '']"
         >
           <div class="flex-grow-1">
+            <!-- Top Form Actions -->
+            <FormActions v-if="actionsPosition == 'top' && isEditing"
+              :modelValue="formItem"
+              :actions="actions"
+              :is-editing="isEditing"
+              @action-complete="$emit('actionComplete', $event)"
+            />
 
-            <slot name="top" v-bind="{item: formItem, schema}"></slot>
+            <slot name="top" v-bind="{item: formItem, schema}">
+
+            </slot>
+
+            <!-- Middle Form Actions -->
+            <FormActions v-if="actionsPosition == 'middle' && isEditing"
+              :modelValue="formItem"
+              :actions="actions"
+              :is-editing="isEditing"
+              @action-complete="$emit('actionComplete', $event)"
+            />
 
             <v-custom-form-base
               :id="`ue-wrapper-${id}`"
@@ -254,33 +220,65 @@
                 </span>
               </template> -->
             </v-custom-form-base>
+
+            <!-- Bottom Form Actions -->
+            <FormActions v-if="actionsPosition == 'bottom' && isEditing"
+              :modelValue="formItem"
+              :actions="actions"
+              :is-editing="isEditing"
+              @action-complete="$emit('actionComplete', $event)"
+            />
           </div>
 
-          <div v-if="$slots.right || $slots['right.top'] || $slots['right.bottom'] || $slots['right.middle']"
+          <div v-if="$slots.right || $slots['right.top'] || $slots['right.bottom'] || $slots['right.middle'] || ['right-top', 'right-middle', 'right-bottom'].includes(actionsPosition)"
             :class="[
-              $vuetify.display.lgAndUp ? 'flex-grow-0' : 'd-none',
-              'pt-2',
-              `ml-${rightSlotGap}`,
+              `flex-grow-0 ml-${rightSlotGap}`,
             ]"
-            :style="{
-              ...(rightSlotWidth ? {width: `${rightSlotWidth}px`} : {}),
-              ...(rightSlotMinWidth ? {minWidth: `${rightSlotMinWidth}px`} : {}),
-              ...(rightSlotMaxWidth ? {maxWidth: `${rightSlotMaxWidth}px`} : {})
-            }"
           >
-            <slot name="right" v-bind="{item: formItem, schema}">
+            <div
+              :class="[
+                `pt-2 gr-4`,
+                $vuetify.display.smAndDown ? 'd-none' : 'd-flex flex-column',
+              ]"
+              :style="{
+                ...(rightSlotWidth ? {width: `${rightSlotWidth}px`} : {}),
+                ...(rightSlotMinWidth ? {minWidth: `${rightSlotMinWidth}px`} : {}),
+                ...(rightSlotMaxWidth ? {maxWidth: `${rightSlotMaxWidth}px`} : {})
+              }"
+              >
 
-              <slot name="right.top" v-bind="{item: formItem, schema}">
+            </div>
+            <slot name="right" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}">
 
-              </slot>
+              <!-- Right Top Form Actions -->
+              <FormActions v-if="actionsPosition == 'right-top' && isEditing"
+                :modelValue="formItem"
+                :actions="actions"
+                :is-editing="isEditing"
+                @action-complete="$emit('actionComplete', $event)"
+              />
 
-              <slot name="right.middle" v-bind="{item: formItem, schema}">
+              <slot name="right.top" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
 
-              </slot>
+              <!-- Right Middle Form Actions -->
+              <FormActions v-if="actionsPosition == 'right-middle' && isEditing"
+                :modelValue="formItem"
+                :actions="actions"
+                :is-editing="isEditing"
+                @action-complete="$emit('actionComplete', $event)"
+              />
 
-              <slot name="right.bottom" v-bind="{item: formItem, schema}">
+              <slot name="right.middle" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
 
-              </slot>
+              <!-- Right Bottom Form Actions -->
+              <FormActions v-if="actionsPosition == 'right-bottom' && isEditing"
+                :modelValue="formItem"
+                :actions="actions"
+                :is-editing="isEditing"
+                @action-complete="$emit('actionComplete', $event)"
+              />
+
+              <slot name="right.bottom" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
 
             </slot>
 
@@ -338,11 +336,12 @@ import { useI18n } from 'vue-i18n'
 import { useForm, makeFormProps } from '@/hooks'
 import { cloneDeep, omit } from 'lodash-es'
 import FormActions from './form/FormActions.vue'
-
+import FormEvents from './form/FormEvents.vue'
 export default {
   name: 'ue-form',
   components: {
-    FormActions
+    FormActions,
+    FormEvents
   },
   emits: [
     'update:valid',
