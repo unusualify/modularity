@@ -50,6 +50,8 @@
                             :elevation="0"
                             :body-height="`calc(${dialogHeight} * 0.60)`"
                             :height="`calc(${dialogHeight} * 0.80)`"
+                            :noStarring="noStarring"
+                            :noPinning="noPinning"
                           >
                             <template #actions>
                               <v-btn color="grey-darken-1" icon="mdi-close" size="default" variant="plain" density="compact" @click="dialogOpen = false"></v-btn>
@@ -121,6 +123,32 @@
         </v-card-title>
 
         <v-card-text class="">
+
+          <!-- Pinned Message -->
+          <v-list
+            v-if="pinnedMessage"
+            elevation="3"
+            class="bg-grey-lighten-4 mx-n4"
+            :items="[{
+              title: pinnedMessage.content,
+              subtitle: pinnedMessage.created_at ? $d(new Date(pinnedMessage.created_at), 'short') : '',
+              prepend: pinnedMessage.user_profile.avatar_url
+            }]"
+            lines="two"
+            prependIcon="mdi-pin"
+            item-props
+          >
+            <template #prepend="prependScope">
+              <v-icon size="small" color="primary" class="mr-2" style="transform: rotate(325deg)" @click="unpinMessage(pinnedMessage)">mdi-pin</v-icon>
+              <v-tooltip :text="pinnedMessage.user_profile.name" location="top">
+                <template #activator="{ props: activatorProps }">
+                  <v-avatar :image="prependScope.item.prepend" size="24" v-bind="activatorProps"/>
+                </template>
+              </v-tooltip>
+            </template>
+          </v-list>
+          <v-divider v-else></v-divider>
+
           <v-infinite-scroll
             ref="infiniteScroll"
             :height="bodyHeight ? `calc(${bodyHeight})` : `calc(${height}*0.65)`"
@@ -136,9 +164,12 @@
                     'v-input-chat__message',
                     message.loading  ? 'v-input-chat__message--loading' : '',
                   ]"
-                  :message="message"
+                  :modelValue="message"
+                  @update:modelValue="updatedMessage($event, index)"
                   :reverse="message.reverse"
-                  :reversex="index % 2 === 0"
+                  :updateEndpoint="endpoints.update"
+                  :noStarring="noStarring"
+                  :noPinning="noPinning"
                 />
               </slot>
             </div>
@@ -300,6 +331,14 @@
       inputVariant: {
         type: String,
         default: 'outlined'
+      },
+      noStarring: {
+        type: Boolean,
+        default: false
+      },
+      noPinning: {
+        type: Boolean,
+        default: false
       }
     },
     setup (props, context) {
@@ -322,7 +361,8 @@
         uploadedAttachments: [],
         uploadedAttachmentsDialog: false,
 
-        refreshInterval: null
+        refreshInterval: null,
+        pinnedMessage: null
       }
     },
     computed: {
@@ -348,10 +388,19 @@
           : this.message
             ? 'mdi-send-check'
             : 'mdi-send';
-      }
+      },
     },
     watch: {
+      messages: {
+        handler(newValue) {
+          this.pinnedMessage = newValue.find(message => message.is_pinned);
 
+          if(!this.pinnedMessage) {
+            this.fetchPinnedMessage();
+          }
+        },
+        deep: true
+      }
     },
     methods: {
       scrollEndInfiniteScroll() {
@@ -371,6 +420,7 @@
 
         if(message.user_profile.id === this.currentUser.id) {
           message.reverse = true;
+          message.is_read = true;
           message.user_profile.name = this.$t('You');
         }
 
@@ -436,10 +486,25 @@
       addMessage(message) {
         return this.messages.push(message) - 1;
       },
+      unpinMessage(message) {
+        let endpoint = this.endpoints.update.replace(':id', message.id);
+
+        let self = this;
+        let index = this.messages.findIndex(m => m.id === message.id);
+        axios.put(endpoint, {
+          is_pinned: false
+        }).then(response => {
+          self.messages[index] = {
+            ...self.messages[index],
+            is_pinned: false
+          };
+        });
+      },
       findMessageByTempId(tempId) {
         return this.messages.findIndex(message => message.tempId === tempId);
       },
       updateMessageByTempId(tempId, newMessage) {
+        this.messages = this.messages.filter(message => message.id !== newMessage.id);
         const index = this.findMessageByTempId(tempId);
         if (index !== -1) {
           this.messages[index] = {
@@ -488,7 +553,17 @@
           this.uploadedAttachments = response.data;
         });
       },
+      fetchPinnedMessage() {
+        const endpoint = this.endpoints.pinnedMessage.replace(':id', this.input);
+        axios.get(endpoint).then(response => {
 
+          if(response.status === 200 && response.data) {
+            if(Object.keys(response.data).length > 0) {
+              this.pinnedMessage = response.data;
+            }
+          }
+        });
+      },
       refreshMessages() {
         const endpoint = this.endpoints.index.replace(':id', this.input);
 
@@ -523,7 +598,42 @@
             this.refreshInterval = null;
           }
         });
-      }
+      },
+      updatedMessage(event) {
+
+        let messages = [...this.messages];
+        let index = messages.findIndex(message => message.id === event.id);
+        let oldMessage = this.messages[index];
+
+        if(oldMessage.is_pinned !== event.is_pinned) {
+          if(event.is_pinned) {
+            let oldPinnedMessage = this.pinnedMessage;
+            this.pinnedMessage = event;
+
+            if(oldPinnedMessage) {
+              let oldPinnedMessageIndex = messages.findIndex(message => message.id === oldPinnedMessage.id);
+              if(oldPinnedMessageIndex !== -1) {
+                messages[oldPinnedMessageIndex] = {
+                  ...messages[oldPinnedMessageIndex],
+                  is_pinned: false
+                };
+              }
+            }
+
+          } else {
+            this.pinnedMessage = null;
+          }
+        }
+
+        if(index !== -1) {
+          messages[index] = {
+            ...messages[index],
+            ...event
+          };
+        }
+
+        this.messages = messages;
+      },
     },
     created() {
       // __log('Chat', this.getAttachments());

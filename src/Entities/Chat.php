@@ -47,6 +47,13 @@ class Chat extends Model
         return $this->morphTo();
     }
 
+    public function pinnedMessage(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->messages()->where('is_pinned', 1)->first(),
+        );
+    }
+
     public function getTable()
     {
         return modularityConfig('tables.chats', parent::getTable());

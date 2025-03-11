@@ -33,6 +33,7 @@ Route::prefix('api')->group(function () {
     Route::group(['prefix' => 'chatable', 'as' => 'chatable.', 'controller' => ChatController::class], function () {
         Route::get('{chat}', 'index')->name('index');
         Route::get('{chat}/attachments', 'attachments')->name('attachments');
+        Route::get('{chat}/pinned-message', 'pinnedMessage')->name('pinned-message');
         Route::post('{chat}', 'store')->name('store');
         Route::put('{chat_message}', 'update')->name('update');
         Route::get('show/{chat_message}', 'show')->name('show');

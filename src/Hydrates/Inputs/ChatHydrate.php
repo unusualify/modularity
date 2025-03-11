@@ -39,6 +39,7 @@ class ChatHydrate extends InputHydrate
             'update' => route('admin.chatable.update', ['chat_message' => ':id']),
             'destroy' => route('admin.chatable.destroy', ['chat_message' => ':id']),
             'attachments' => route('admin.chatable.attachments', ['chat' => ':id']),
+            'pinnedMessage' => route('admin.chatable.pinned-message', ['chat' => ':id']),
         ];
 
         if (isset($input['acceptedExtensions']) && is_array($input['acceptedExtensions'])) {

@@ -2,12 +2,17 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Unusualify\Modularity\Entities\Chat;
 use Unusualify\Modularity\Entities\ChatMessage;
+use Unusualify\Modularity\Entities\Scopes\ChatableScopes;
 
 trait HasChatable
 {
+    use ChatableScopes;
+
     /**
      * Perform any actions when booting the trait
      */
@@ -22,45 +27,27 @@ trait HasChatable
             }
         });
 
-        static::creating(function (Model $model) {
-            // dd('creating', $model);
-        });
-
         static::created(function (Model $model) {
             $model->chat()->create();
         });
 
-        static::updating(function (Model $model) {});
-
-        static::updated(function (Model $model) {});
-
         static::saving(function (Model $model) {
             $model->offsetUnset('_chat_id');
         });
-
-        static::saved(function (Model $model) {
-            // dd('saved', $model);
-        });
-
-        static::restoring(function (Model $model) {});
-
-        static::restored(function (Model $model) {});
-
-        static::replicating(function (Model $model) {});
-
-        static::deleting(function (Model $model) {});
-
-        static::deleted(function (Model $model) {});
-
-        static::forceDeleting(function (Model $model) {});
-
-        static::forceDeleted(function (Model $model) {});
     }
+
 
     /**
      * Laravel hook to initialize the trait
      */
-    public function initializeHasChatable(): void {}
+    public function initializeHasChatable(): void
+    {
+        $noAppend = static::$noChatableAppends ?? false;
+
+        if(!$noAppend) {
+            $this->setAppends(array_merge($this->getAppends(), ['chat_messages_count', 'unread_chat_messages_count', 'unread_chat_messages_for_you_count']));
+        }
+    }
 
     public function chat(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
@@ -70,5 +57,36 @@ trait HasChatable
     public function chatMessages(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
         return $this->hasManyThrough(ChatMessage::class, Chat::class, 'chatable_id', 'chat_id', 'id', 'id');
+    }
+
+    public function unreadChatMessages(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->chatMessages()->where('is_read', false);
+    }
+
+    public function unreadChatMessagesForYou(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->unreadChatMessages()->whereNot(fn ($query) => $query->authorized());
+    }
+
+    protected function chatMessagesCount(): Attribute
+    {
+        return new Attribute(
+            get: fn () => $this->numberOfChatMessages(),
+        );
+    }
+
+    protected function unreadChatMessagesCount(): Attribute
+    {
+        return new Attribute(
+            get: fn () => $this->numberOfUnreadChatMessages(),
+        );
+    }
+
+    protected function unreadChatMessagesForYouCount(): Attribute
+    {
+        return new Attribute(
+            get: fn () => $this->numberOfUnreadChatMessagesForYou(),
+        );
     }
 }
