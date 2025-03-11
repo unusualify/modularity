@@ -29,6 +29,7 @@ trait HasCreator
      */
     protected $customHasCreatorFields = [];
 
+
     protected static function bootHasCreator()
     {
         static::created(function ($model) {
@@ -66,6 +67,10 @@ trait HasCreator
             }
         });
 
+        static::creating(function ($model) {
+            // dd($model);
+        });
+
         if (in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(static::class))) {
             // Add deleted event handler
             static::forceDeleting(function ($model) {
@@ -80,6 +85,12 @@ trait HasCreator
             });
         }
 
+    }
+
+    public function initializeHasCreator()
+    {
+        // $this->fillable = array_merge($this->fillable, ['test']);
+        // dd('initialize');
     }
 
     /**
@@ -220,14 +231,20 @@ trait HasCreator
 
         $user = auth($guardName)->user();
 
+        $abortRoleExceptions = static::$abortCreatorRoleExceptions ?? false;
+
         $hasSpatiePermission = in_array('Spatie\Permission\Traits\HasRoles', class_uses_recursive($user));
+
         $spatieRoleModel = config('permission.models.role');
 
-        if ($hasSpatiePermission) {
-            $existingRoles = $spatieRoleModel::whereIn('name', $this->getAuthorizedRolesForCreatorRecord())->get();
+        if(!$abortRoleExceptions) {
 
-            if ($user->isSuperAdmin() || $user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
-                return $query;
+            if ($hasSpatiePermission) {
+                $existingRoles = $spatieRoleModel::whereIn('name', $this->getAuthorizedRolesForCreatorRecord())->get();
+
+                if ($user->isSuperAdmin() || $user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
+                    return $query;
+                }
             }
         }
 
