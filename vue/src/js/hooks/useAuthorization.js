@@ -11,7 +11,7 @@ export default function useAuthorization() {
   }
 
   const isYou = (id) => {
-    return store.getters?.userProfile.id == id
+    return (store?.getters?.userProfile?.id ?? -1) == id
   }
 
   const hasRoles = (roles) => {
