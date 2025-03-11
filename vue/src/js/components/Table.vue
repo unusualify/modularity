@@ -261,9 +261,9 @@
             width-type="lg"
             v-bind="formModalAttributes"
           >
-          <template v-slot:body="formModalBodyScope">
-            <v-card class="fill-height d-flex flex-column">
-              <!-- <v-card-title class="text-h5 grey lighten-2"> </v-card-title> -->
+            <template v-slot:body="formModalBodyScope">
+              <v-card class="fill-height d-flex flex-column">
+                <!-- <v-card-title class="text-h5 grey lighten-2"> </v-card-title> -->
                 <ue-form
                   ref="UeForm"
 
@@ -293,6 +293,19 @@
                       <v-btn icon="$close" variant="plain" size="compact" color="grey-darken-5" rounded @click="closeForm()" />
                     </slot>
                   </template>
+
+                  <template v-if="$slots['form.top']" v-slot:top="topScope">
+                    <slot name="form.top" v-bind="topScope">
+
+                    </slot>
+                  </template>
+
+                  <template v-if="$slots['form.bottom']" v-slot:bottom="bottomScope">
+                    <slot name="form.bottom" v-bind="bottomScope">
+
+                    </slot>
+                  </template>
+
 
                   <template v-if="$slots['form.right.top']" v-slot:right.top="rightScope">
                     <slot name="form.right.top" v-bind="rightScope">
