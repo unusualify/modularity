@@ -682,9 +682,10 @@ export default function init(){
     Expires: '0',
   }
 
+  window.axios.defaults.headers.common = commonHeaders
+
   axios.defaults.headers.common = commonHeaders
 
-  window.axios.defaults.headers.common = commonHeaders
 
   window.axios.defaults.headers.post = {
     'Content-Type': 'application/json'
