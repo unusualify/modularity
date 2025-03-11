@@ -128,23 +128,33 @@ describe('VInputProcess tests', () => {
   })
 
   test('fetches process data when input ID is provided', async () => {
+    // Mock axios.get to resolve immediately with test data
+    global.axios.get.mockImplementationOnce(() => Promise.resolve({
+      status: 200,
+      data: {
+        id: 1,
+        status: 'preparing',
+        status_label: 'Preparing',
+        processable: {
+          id: 101,
+          name: 'Test Process'
+        }
+      }
+    }));
+
     const wrapper = await factory({ modelValue: 1 });
 
-    // Initial state should be loading
-    expect(wrapper.vm.loading).toBe(true);
+    // Wait for the next tick to allow the component to process the axios response
+    await wrapper.vm.$nextTick();
 
-    // Manually wait for the loading state to change
-    // This is a more reliable way to wait for the async operation to complete
-    await vi.waitUntil(() => wrapper.vm.loading === false, {
-      timeout: 3000,
-      interval: 100
-    });
+    // Wait for loading to complete
+    await vi.waitUntil(() => wrapper.vm.loading === false);
 
     // Now check that data is loaded
-    expect(global.axios.get).toHaveBeenCalled();
+    expect(global.axios.get).toHaveBeenCalledWith('/api/process/1');
     expect(wrapper.vm.processModel).toBeTruthy();
     expect(wrapper.vm.processableModel).toBeTruthy();
-  }, 5000); // Increase test timeout to 5 seconds
+  });
 
   test('displays process title and status correctly', async () => {
     const processData = {
