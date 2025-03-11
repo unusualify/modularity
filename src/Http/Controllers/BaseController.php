@@ -63,11 +63,11 @@ abstract class BaseController extends PanelController
         $this->addIndexWiths();
 
         if ($this->request->ajax()) {
-            return [
+            return Response::json([
                 'resource' => $this->getJSONData(),
                 'mainFilters' => $this->getTableMainFilters(),
                 'replaceUrl' => $this->getReplaceUrl(),
-            ];
+            ]);
         }
 
         $indexData = $this->getIndexData($this->nestedParentScopes());
