@@ -542,6 +542,8 @@ class Module extends NwidartModule
             'bulkRestore',
             'tags',
             'tagsUpdate',
+            'assignments',
+            'createAssignment',
         ];
 
         $isParentRoute = $this->isParentRoute($routeName);
