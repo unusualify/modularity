@@ -44,7 +44,18 @@
               <!-- slot replaces complete item of defined KEY -> <div slot="slot-item-key-[propertyName]">-->
               <slot :name="getKeyItemSlot(obj)" v-bind= "{ obj, index, id }">
 
-                <ue-title v-if="obj.schema.type === 'title'"
+                <!-- PREVIEW -->
+                <ue-recursive-stuff v-if="obj.schema.type === 'preview' && obj.schema.configuration"
+                  :configuration="obj.schema.configuration"
+                />
+
+                <!-- DYNAMIC COMPONENT -->
+                <ue-dynamic-component-renderer v-else-if="obj.schema.type === 'dynamic-component'"
+                  :subject="obj.schema.subject"
+                />
+
+                <!-- TITLE -->
+                <ue-title v-else-if="obj.schema.type === 'title'"
                   :text="obj.schema.title ?? obj.schema.text ?? obj.schema.label ?? obj.schema.name"
                   v-bind="bindSchema(obj)"
                 />
@@ -535,7 +546,10 @@ const second = 'second'
 const dropEffect = 'move' // 'copy, link, move
 // Default row setting if no row-attribute defined
 const rowDefault = { noGutters: false } // { noGutters:true, justify:'center', align:'center' }
-const rowGroupDefault = { noGutters: true } // { noGutters:true, justify:'center', align:'center' }
+const rowGroupDefault = {
+  noGutters: false,
+  class: 'my-2'
+} // { noGutters:true, justify:'center', align:'center' }
 
 // Default col setting, overrideable by prop col or by schema.col definition
 // Default col setting, overrideable by prop flex or by schema.flex definition (flex is DEPRECATED use col instead)
