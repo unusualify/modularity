@@ -71,16 +71,20 @@ class ChatController extends Controller
         return response()->json($chat->attachments);
     }
 
-    public function update(Request $request, ChatMessage $message)
+    public function update(Request $request, $id)
     {
+        $message = ChatMessage::find($id);
+
         $message->update($request->all());
 
         return response()->json($message);
     }
 
-    public function show(Request $request, ChatMessage $message)
+    public function pinnedMessage(Request $request, $id)
     {
-        return response()->json($message);
+        $chat = Chat::find($id);
+
+        return response()->json($chat->pinnedMessage);
     }
 
     public function destroy(Request $request, ChatMessage $message)
