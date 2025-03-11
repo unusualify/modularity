@@ -94,7 +94,7 @@
                     rounded
                     color="success"
                     density="compact"
-                    class="flex-grow-0"
+                    class="flex-grow-0 my-2"
                     v-bind="props"
                     :disabled="!input || updating"
                     :loading="updating"
@@ -124,7 +124,7 @@
                         rounded
                         color="info"
                         density="compact"
-                        class="flex-grow-0"
+                        class="flex-grow-0 my-2"
 
                         :disabled="!input || updating"
                         :loading="updating"
