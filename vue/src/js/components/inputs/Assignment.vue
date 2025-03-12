@@ -446,14 +446,14 @@ export default {
 
         const self = this
 
-        __log(this.input)
-        axios.get(endpoint).then(response => {
-          if(response.status === 200) {
-            self.assignments = response.data
-          }
-        }).finally(() => {
-          self.loading = false
-        })
+        axios.get(endpoint)
+          .then(response => {
+            if(response.status === 200) {
+              self.assignments = response.data
+            }
+          }).finally(() => {
+            self.loading = false
+          })
       }
     },
     async createAssignment() {
@@ -528,8 +528,6 @@ export default {
             self.completeModal = false
           }
         )
-
-        __log(res)
 
         return res
       }

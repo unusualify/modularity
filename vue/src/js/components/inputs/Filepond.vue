@@ -430,12 +430,12 @@
     watch: {
       modelValue: {
         handler(newVal) {
-          __log('modelValue', newVal)
+          // __log('modelValue', newVal)
         },
       },
     },
     created() {
-      __log('created', this.obj.schema.name)
+      // __log('created', this.obj.schema.name)
       let rawRules = __data_get(this.obj, 'schema.rawRules', '') || '';
 
       if(this.min && this.min > 0 && !rawRules.match(/required:array:\d+/)){
