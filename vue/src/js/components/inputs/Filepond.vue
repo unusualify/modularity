@@ -1,18 +1,21 @@
 <template>
-  <slot name="activator" v-bind="{
-    browse,
-    addFile,
-    removeFile,
-    removeFiles,
-    getFiles,
-    getFile,
-  }"/>
+  <slot name="activator"
+    v-bind="{
+      browse,
+      addFile,
+      removeFile,
+      removeFiles,
+      getFiles,
+      getFile,
+    }"
+  />
   <!-- <v-btn @click="pondBrowse">Text</v-btn> -->
   <v-input
     ref="VInput"
     v-model="input"
-    hide-details="auto"
+    hide-details
     :class="class"
+    :rules="rules"
   >
     <template v-slot:default="defaultSlot">
       <div
@@ -21,7 +24,6 @@
           $slots.activator ? 'd-non' : ''
         ]"
         >
-
         <ue-title v-if="label" transform="none" padding="a-0" :weight="labelWeight" color="grey-darken-5">
           <slot name="label" v-bind="{
             label: label,
@@ -67,8 +69,13 @@
             />
           </div>
         </slot>
-        <div class="hint-container">
-          <ue-title v-if="hint" type="caption" transform="none" padding="a-0" :weight="hintWeight" color="grey-darken-5">
+        <div class="details-container">
+          <div v-if="errorMessages.length > 0">
+            <ue-title type="caption" transform="none" padding="a-0" weight="regular" color="red" v-for="error in errorMessages" :key="error">
+              {{ error }}
+            </ue-title>
+          </div>
+          <ue-title v-else-if="hint" type="caption" transform="none" padding="a-0" :weight="hintWeight" color="grey-darken-5">
             <slot name="hint" v-bind="{
               hint: hint,
             }">
@@ -93,6 +100,7 @@
 
   import { useInput, makeInputProps } from '@/hooks';
   import { globalError } from '@/utils/errors'
+  import { useValidation } from '@/hooks'
 
   // Create component
   const Component = 'Filepond'
@@ -112,6 +120,13 @@
       hint: {
         type: String,
         default: null,
+      },
+      min: {
+        type: Number,
+      },
+      rules: {
+        type: Array,
+        default: () => [],
       },
       hintWeight: {
         type: String,
@@ -147,12 +162,17 @@
       },
     },
     setup(props, context) {
+      const { requiredRule } = useValidation(props)
+
       return {
         ...useInput(props,context),
+        requiredRule,
       };
     },
     data() {
       return {
+        errorMessages: [],
+        onStart: true,
         files: isArray(this.modelValue) ? this.modelValue.map(function (file) {
             return {
               source:  file.source ?? `${this.endPoints.load}${file.uuid}`,
@@ -406,9 +426,36 @@
         // __log(name)
         return name
       },
-
+    },
+    watch: {
+      modelValue: {
+        handler(newVal) {
+          __log('modelValue', newVal)
+        },
+      },
     },
     created() {
+      __log('created', this.obj.schema.name)
+      let rawRules = __data_get(this.obj, 'schema.rawRules', '') || '';
+
+      if(this.min && this.min > 0 && !rawRules.match(/required:array:\d+/)){
+        this.rules.push(this.requiredRule('array', this.min))
+      }
+    },
+    mounted() {
+      // Set up a MutationObserver to watch for changes in VInput's error state
+      if (this.$refs.VInput) {
+        this.$watch(
+          () => this.$refs.VInput.errorMessages,
+          (newVal) => {
+            if(!this.onStart){
+              this.errorMessages = newVal
+            }
+            this.onStart = false
+          },
+          { deep: true }
+        )
+      }
     },
 
   };
@@ -494,7 +541,7 @@
     }
   }
 
-  .hint-container {
+  .details-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
