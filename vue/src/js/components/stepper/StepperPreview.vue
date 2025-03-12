@@ -1,6 +1,6 @@
 <template>
   <v-sheet>
-    <ue-title weight="medium" color="black" padding="a-0">
+    <ue-title type="body-1" weight="bold" padding="a-0">
       {{ $t('Preview & Summary').toUpperCase() }}
     </ue-title>
 
@@ -8,16 +8,15 @@
       <!-- Preview cards -->
       <template v-for="(context, index) in formattedPreview" :key="`summary-${index}`">
         <v-col cols="12" :md="context.col || 6" v-fit-grid>
-          <ue-configurable-card v-bind="context" elevation="2" class="my-2"/>
+          <ue-configurable-card v-bind="context" elevation="2" title-color="primary" class="my-2 w-100"/>
         </v-col>
       </template>
 
       <!-- Final form data -->
       <v-col cols="12" v-if="previewFormData.length > 0" v-fit-grid>
-        <v-sheet class="px-4">
+        <v-sheet class="px-0">
           <ue-title
             type="body-1"
-            color="primary"
             font-weight="bold"
             padding="a-0"
             margin="y-4"
@@ -30,11 +29,13 @@
             :key="`final-form-data-${index}`"
           >
             <ue-configurable-card
-              style="background-color: transparent;"
+              row-min-height="120px"
+              style="background-color: transparent; min-height: 150px;"
               :class="[
-                lastStepModel[data.fieldName].includes(data.id) ? 'bg-primary' : 'bg-grey-lighten-5'
+                lastStepModel[data.fieldName].includes(data.id) ? 'bg-primary' : 'bg-grey-lighten-5',
+                'w-100'
               ]"
-              class="mx-n4 mb-4 py-4"
+              class="mb-4 py-4"
               elevation="2"
               :items="[
                 [
