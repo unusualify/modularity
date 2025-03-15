@@ -33,3 +33,4 @@ export { default as useCurrency } from './useCurrency'
 export { default as useForm, makeFormProps } from './useForm'
 
 export { default as useAuthorization } from './useAuthorization'
+export { default as useCache } from './useCache'

@@ -1,9 +1,9 @@
 import { useI18n } from 'vue-i18n'
 import _ from 'lodash-es'
 import pluralize from 'pluralize'
-import { useAuthorization } from '@/hooks'
+import { useAuthorization, useCache } from '@/hooks'
 
-import { ALERT, CONFIG, USER } from '../store/mutations'
+import { ALERT, CONFIG, USER, CACHE } from '../store/mutations'
 
 export default {
   $csrf: function () {
@@ -288,12 +288,13 @@ export default {
               let _haystack = item[_map];
               if (Array.isArray(_value) && _haystack) {
                 __displayData._value = _value.map(id => {
-                  let _item = _haystack.find(i => i.id === id);
+                  let _item = _haystack.find(i => i.id == id);
                   return _item ? _item.title || _item.name : 'N/A';
                 })
               } else {
+
                 if(!!_haystack){
-                  let item = _haystack.find(i => i.id === _value);
+                  let item = _haystack.find(i => i.id == _value);
                   _value = item ? item.title || item.name : _value;
                   // __log(id, _key, _map, _displayData, _value)
 
@@ -368,11 +369,36 @@ export default {
   $copy: function(text) {
     window.navigator.clipboard.writeText(text);
   },
-
   $openLoginModal: function () {
     this.$store.commit(USER.OPEN_LOGIN_MODAL)
   },
   $closeLoginModal: function () {
     this.$store.commit(USER.CLOSE_LOGIN_MODAL)
+  },
+
+  $cacheGet: function (key) {
+    const { get } = useCache()
+
+    return get(key)
+  },
+  $cachePut: function (key, value) {
+    const { put } = useCache()
+
+    put(key, value)
+  },
+  $cachePush: function (key, value) {
+    const { push } = useCache()
+
+    push(key, value)
+  },
+  $cacheLast: function (key) {
+    const { last } = useCache()
+
+    return last(key)
+  },
+  $cacheForget: function (key) {
+    const { forget } = useCache()
+
+    forget(key)
   }
 }
