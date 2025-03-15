@@ -104,14 +104,18 @@ trait HasPayment
     protected function totalCostExcludingVatFormatted(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => PriceService::formatAmount($this->totalCostExcludingVat, new Currency($this->initialPayablePrice->currency_iso_4217))
+            get: fn ($value) => $this->totalCostExcludingVat
+                ? PriceService::formatAmount($this->totalCostExcludingVat, new Currency($this->initialPayablePrice->currency_iso_4217))
+                : null
         );
     }
 
     protected function totalCostIncludingVatFormatted(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => PriceService::formatAmount($this->totalCostIncludingVat, new Currency($this->initialPayablePrice->currency_iso_4217))
+            get: fn ($value) => $this->totalCostIncludingVat
+                ? PriceService::formatAmount($this->totalCostIncludingVat, new Currency($this->initialPayablePrice->currency_iso_4217))
+                : null
         );
     }
 
@@ -126,15 +130,17 @@ trait HasPayment
                 $relation = $relation->each(function ($item) use (&$price) {
                     $basePrice = $item->basePrice ?? $item->base_price;
 
-                    try {
-                        $price += $basePrice instanceof Model
-                            ? $basePrice->price_excluding_vat
-                            : $basePrice['price_excluding_vat'];
-                    } catch (\Exception $e) {
-                        dd($e, $item);
+                    if($basePrice){
+                        try {
+                            $price += $basePrice instanceof Model
+                                ? $basePrice->price_excluding_vat
+                                : $basePrice['price_excluding_vat'];
+                        } catch (\Exception $e) {
+                            dd($e, $item);
+                        }
                     }
                 });
-            } else {
+            } else if ($relation instanceof Model) {
                 $basePrice = $relation->basePrice;
                 $price += $basePrice instanceof Model
                     ? $basePrice->price_excluding_vat
