@@ -7,8 +7,8 @@
     <v-row>
       <!-- Preview cards -->
       <template v-for="(context, index) in formattedPreview" :key="`summary-${index}`">
-        <v-col cols="12" :md="context.col || 6" v-fit-grid>
-          <ue-configurable-card v-bind="context" elevation="2" title-color="primary" class="my-2 w-100"/>
+        <v-col cols="12" :md="context.col || 6" class="d-flex">
+          <ue-configurable-card v-bind="context" elevation="2" title-color="primary" class="my-2 w-100 h-100"/>
         </v-col>
       </template>
 
@@ -32,7 +32,7 @@
               row-min-height="120px"
               style="background-color: transparent; min-height: 150px;"
               :class="[
-                lastStepModel[data.fieldName].includes(data.id) ? 'bg-primary' : 'bg-grey-lighten-5',
+                $lodash.includes(lastStepModel[data.fieldName], data.id) ? 'bg-primary' : 'bg-grey-lighten-5',
                 'w-100'
               ]"
               class="mb-4 py-4"
@@ -66,7 +66,6 @@
             >
               <!-- Name and description -->
               <template #[`segment.1`]="segmentScope">
-                {{ $log(segmentScope.data) }}
                 <div class="text-body-2 font-weight-medium mb-1">
                   {{ segmentScope.data[0] }}
                 </div>
@@ -96,8 +95,8 @@
                     :min-width="segmentScope.actionProps.actionIconMinHeight"
                     :min-height="segmentScope.actionProps.actionIconMinHeight"
                     :size="segmentScope.actionProps.actionIconSize"
-                    :icon="lastStepModel[data.fieldName].includes(data.id) ? 'mdi-minus' : 'mdi-plus'"
-                    :color="lastStepModel[data.fieldName].includes(data.id) ? 'grey' : 'primary'"
+                    :icon="$lodash.includes(lastStepModel[data.fieldName], data.id) ? 'mdi-minus' : 'mdi-plus'"
+                    :color="$lodash.includes(lastStepModel[data.fieldName], data.id) ? 'grey' : 'primary'"
                     @click="$emit('final-form-action', index)"
                   />
                 </div>
@@ -113,6 +112,7 @@
 <script>
 export default {
   name: 'StepperPreview',
+  emits: ['final-form-action'],
   props: {
     formattedPreview: {
       type: Array,
@@ -131,12 +131,11 @@ export default {
       required: true
     }
   },
-  emits: ['final-form-action']
 }
 </script>
 
 <style scoped>
-.ue-configurable-card {
-  transition: background-color 0.2s ease;
-}
+  .ue-configurable-card {
+    transition: background-color 0.2s ease;
+  }
 </style>
