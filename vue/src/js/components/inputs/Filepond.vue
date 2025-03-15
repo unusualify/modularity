@@ -60,10 +60,19 @@
               :max-files="maxFiles"
               :name="name"
 
+              :disabled="disabled"
+              :allow-drop="!disabled"
+              :allow-browse="!disabled"
+
               :files="files"
               :server="server"
               @processfile="postProcessFilepond"
               @removefile="removeFilepond"
+
+              @onaddfilestart="$emit('loading')"
+              @onaddfileprogress="$emit('loading')"
+              @onaddfile="$emit('loaded')"
+
 
               @init="init"
             />
@@ -115,11 +124,20 @@
     components: {
       FilePond,
     },
+    emits: [
+      'update:modelValue',
+      'loading',
+      'loaded',
+    ],
     props: {
       ...makeInputProps(),
       hint: {
         type: String,
         default: null,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
       },
       min: {
         type: Number,
@@ -267,8 +285,6 @@
           // }
         });
       },
-
-
       addFile(...args){
         return this.$refs.pond.addFile(...args)
       },
@@ -431,6 +447,11 @@
       modelValue: {
         handler(newVal) {
           // __log('modelValue', newVal)
+        },
+      },
+      disabled: {
+        handler(newVal) {
+          // __log('disabled', newVal)
         },
       },
     },
