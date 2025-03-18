@@ -1,3 +1,4 @@
+// hooks/table/useTableIterator.js
 import { watch, computed, nextTick, reactive, toRefs, ref, watchEffect } from 'vue'
 import { propsFactory } from "vuetify/lib/util/propsFactory.mjs";
 import { useFormatter, useRoot } from '@/hooks'

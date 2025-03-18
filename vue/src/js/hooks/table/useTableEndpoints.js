@@ -1,5 +1,5 @@
-// hooks/useTableEndpoints.js
-import { computed, ref, nextTick, watch } from 'vue'
+// hooks/table/useTableEndpoints.js
+import { computed } from 'vue'
 
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 

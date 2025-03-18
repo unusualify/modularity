@@ -1,4 +1,4 @@
-// hooks/useTableItemActions.js
+// hooks/table/useTableItemActions.js
 import { computed, reactive, toRefs } from 'vue'
 import { useStore } from 'vuex'
 import { useDisplay } from 'vuetify'

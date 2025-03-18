@@ -1,4 +1,4 @@
-// hooks/useTableFilters.js
+// hooks/table/useTableFilters.js
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { DATATABLE } from '@/store/mutations'

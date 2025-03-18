@@ -1,4 +1,4 @@
-// hooks/useTableItem.js
+// hooks/table/useTableItem.js
 import { computed, ref, nextTick, watch } from 'vue'
 import { useStore } from 'vuex'
 import { FORM } from '@/store/mutations'

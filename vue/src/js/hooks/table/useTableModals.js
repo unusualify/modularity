@@ -1,4 +1,4 @@
-// hooks/useTableModals.js
+// hooks/table/useTableModals.js
 import { ref, computed, toRefs, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
