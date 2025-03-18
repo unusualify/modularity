@@ -19,26 +19,10 @@ trait ManageForm
         Form\FormActions;
 
     /**
-     * @var array
+     * @param \Illuminate\Foundation\Application $app
+     * @param \Illuminate\Http\Request $request
+     * @return void
      */
-    // protected $formSchema = [];
-
-    /**
-     * actions/buttons to see in the form
-     *
-     * @var array
-     */
-    // protected $formActions = [];
-
-    // protected $schemaChangers = [];
-
-    // protected function __beforeConstructManageForm($app, $request)
-    // {
-    //     $this->inputTypes = modularityConfig('input_types', []);
-
-    //     // $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
-    // }
-
     protected function __afterConstructManageForm($app, $request)
     {
         $this->defaultFormAttributes = (array) Config::get(modularityBaseKey() . '.default_form_attributes');
@@ -46,6 +30,9 @@ trait ManageForm
         $this->formAttributes = array_merge_recursive_preserve($this->getFormAttributes(), $this->formAttributes ?? []);
     }
 
+    /**
+     * @return array
+     */
     protected function addWithsManageForm(): array
     {
         return collect(array_to_object($this->formSchema))->filter(function ($input) {
