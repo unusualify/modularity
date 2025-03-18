@@ -32,7 +32,7 @@
 
 <script>
 
-import useIterator, { makeIteratorProps, iterableEmits } from '@/hooks/useIterator'
+import { useTableIterator, makeTableIteratorProps, tableIterableEmits } from '@/hooks/table'
 import { makeFormatterProps } from '@/hooks/useFormatter';
 
 const { ignoreFormatters } = makeFormatterProps()
@@ -40,12 +40,12 @@ const { ignoreFormatters } = makeFormatterProps()
  export default{
 
   props:{
-    ...makeIteratorProps(),
+    ...makeTableIteratorProps(),
     ignoreFormatters
   },
   setup(props, context){
     return {
-      ...useIterator(props, context)
+      ...useTableIterator(props, context)
     }
   },
   data(){

@@ -14,7 +14,16 @@ import ACTIONS from '@/store/actions'
 import { mapGetters } from '@/utils/mapStore'
 import { getSubmitFormData } from '@/utils/getFormData.js'
 
-import { useRoot,
+import { useRoot, useFormatter } from '@/hooks'
+
+import {
+  makeTableNamesProps,
+  makeTableEndpointsProps,
+  makeTableFiltersProps,
+  makeTableHeadersProps,
+  makeTableFormsProps,
+  makeTableItemActionsProps,
+
   useTableItem,
   useTableNames,
   useTableFilters,
@@ -22,11 +31,16 @@ import { useRoot,
   useTableForms,
   useTableItemActions,
   useTableModals,
-  useFormatter
-} from '@/hooks'
-import useTableEndpoints from './useTableEndpoints'
+  useTableEndpoints,
+} from '@/hooks/table'
 
 export const makeTableProps = propsFactory({
+  ...makeTableNamesProps(),
+  ...makeTableEndpointsProps(),
+  ...makeTableFiltersProps(),
+  ...makeTableHeadersProps(),
+  ...makeTableFormsProps(),
+  ...makeTableItemActionsProps(),
   fillHeight: {
     type: Boolean,
     default: false,

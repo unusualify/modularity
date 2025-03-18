@@ -1,8 +1,9 @@
 import { watch, computed, nextTick, reactive, toRefs, ref, watchEffect } from 'vue'
 import { propsFactory } from "vuetify/lib/util/propsFactory.mjs";
-import { useFormatter, useRoot, useTableItemActions } from '@/hooks'
+import { useFormatter, useRoot } from '@/hooks'
+import { useTableItemActions } from '@/hooks/table'
 
-export const makeIteratorProps = propsFactory({
+export const makeTableIteratorProps = propsFactory({
   item: {
     type: Object,
     default: {}
@@ -21,12 +22,12 @@ export const makeIteratorProps = propsFactory({
   }
 })
 
-export const iterableEmits = [
+export const tableIterableEmits = [
   'click-action',
   'edit-item'
 ]
 
-export default function useIterator(props, context){
+export default function useTableIterator(props, context){
 
   const state = reactive({
     id: Math.ceil(Math.random() * 1000000 ) + ' -iterator',
@@ -39,7 +40,6 @@ export default function useIterator(props, context){
       return collection
     })
   })
-
 
   const formatter = useFormatter(props, context, props.headers)
 
@@ -113,8 +113,6 @@ export default function useIterator(props, context){
       context.emit('edit-item', item)
     }
   })
-
-
 
   return {
     ...toRefs(methods),

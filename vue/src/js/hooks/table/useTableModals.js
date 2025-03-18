@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 import _ from 'lodash-es'
 
 import ACTIONS from '@/store/actions'
-import { useTableItem, useTableNames } from '@/hooks'
+import { useTableItem, useTableNames } from '@/hooks/table'
 
 export default function useTableModals(props, context) {
   const store = useStore()

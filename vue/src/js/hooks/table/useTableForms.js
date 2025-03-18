@@ -8,7 +8,7 @@ import { FORM } from '@/store/mutations'
 import ACTIONS from '@/store/actions'
 
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
-import { useTableItem } from '@/hooks'
+import { useTableItem } from '@/hooks/table'
 
 export const makeTableFormsProps = propsFactory({
   inputFields: {

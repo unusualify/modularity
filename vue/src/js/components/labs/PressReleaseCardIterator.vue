@@ -46,20 +46,20 @@
 </template>
 
 <script>
-  import useIterator, {makeIteratorProps, iterableEmits} from '@/hooks/useIterator';
-  import { makeFormatterProps } from '@/hooks/useFormatter';
+import { useTableIterator, makeTableIteratorProps, tableIterableEmits } from '@/hooks/table'
+import { makeFormatterProps } from '@/hooks/useFormatter';
 
   const { ignoreFormatters } = makeFormatterProps()
 
   export default{
-  emits: iterableEmits,
+  emits: tableIterableEmits,
   props:{
-    ...makeIteratorProps(),
+    ...makeTableIteratorProps(),
     ignoreFormatters
   },
   setup(props, context){
     return {
-      ...useIterator(props, context)
+      ...useTableIterator(props, context)
     }
   },
   created(){

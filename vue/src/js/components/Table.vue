@@ -820,12 +820,6 @@ import { VDataTableRows } from 'vuetify/lib/components/VDataTable/index.mjs'
 import { VDataTableRow } from 'vuetify/lib/components/VDataTable/index.mjs'
 
 import {
-  makeTableNamesProps,
-  makeTableEndpointsProps,
-  makeTableHeadersProps,
-  makeTableFormsProps,
-  makeTableFiltersProps,
-  makeTableItemActionsProps,
   makeTableProps,
   makeDraggableProps,
   makeFormatterProps,
@@ -848,12 +842,6 @@ export default {
 
   },
   props: {
-    ...makeTableNamesProps(),
-    ...makeTableEndpointsProps(),
-    ...makeTableFiltersProps(),
-    ...makeTableHeadersProps(),
-    ...makeTableFormsProps(),
-    ...makeTableItemActionsProps(),
     ...makeTableProps(),
     ...makeDraggableProps(),
     ...ignoreFormatters

@@ -5,7 +5,8 @@ import { useI18n } from 'vue-i18n'
 import _ from 'lodash-es'
 
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
-import { useModule, useTableItem } from '@/hooks'
+import { useModule } from '@/hooks'
+import { useTableItem } from '@/hooks/table'
 
 export const makeTableNamesProps = propsFactory({
   name: {

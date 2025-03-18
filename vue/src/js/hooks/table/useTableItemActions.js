@@ -7,7 +7,8 @@ import ACTIONS from '@/store/actions'
 
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
-import { useTableItem, useTableNames, useAuthorization } from '@/hooks'
+import { useAuthorization } from '@/hooks'
+import { useTableItem, useTableNames } from '@/hooks/table'
 
 import { checkItemConditions } from '@/utils/itemConditions';
 
