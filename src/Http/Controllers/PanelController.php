@@ -14,10 +14,11 @@ use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Controllers\Traits\MakesResponses;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageScopes;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageAuthorization;
 
 abstract class PanelController extends CoreController
 {
-    use MakesResponses, ManageScopes;
+    use MakesResponses, ManageScopes, ManageAuthorization;
 
     /**
      * @var Application
@@ -293,7 +294,6 @@ abstract class PanelController extends CoreController
     protected function setMiddlewarePermission()
     {
 
-        // dd('setMiddlewarePermission', $this->getSnakeCase($this->routeName), $this->user );
         // Permission::where('name', 'LIKE', "%{$this->getKebabCase($this->routeName)}%")->get(),
 
         $name = $this->getKebabCase($this->routeName);
@@ -450,7 +450,6 @@ abstract class PanelController extends CoreController
      */
     protected function validateFormRequest($schema = [])
     {
-
         $unauthorizedFields = Collection::make($this->fieldsPermissions)->filter(function ($permission, $field) {
             return Auth::guard(Modularity::getAuthGuardName())->user()->cannot($permission);
         })->keys();
