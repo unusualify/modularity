@@ -47,7 +47,7 @@ trait ManageUtilities
             'listOptions' => $this->getVuetifyDatatableOptions(), // options to be used in modularity table components in datatable store
             'tableAttributes' => array_merge(
                 [
-                    'rowActions' => $this->getTableActions(),
+                    'rowActions' => $this->getTableRowActions(),
                     'bulkActions' => $this->getTableBulkActions(),
                     'nestedData' => $this->getNestedData(),
                     'formActions' => $this->getFormActions(),

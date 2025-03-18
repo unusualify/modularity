@@ -232,7 +232,7 @@ trait ManageTable
         return $attributes;
     }
 
-    protected function getTableActions()
+    protected function getTableRowActions()
     {
         $tableActions = [];
 
