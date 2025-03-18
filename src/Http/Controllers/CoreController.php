@@ -18,9 +18,11 @@ use Unusualify\Modularity\Traits\ManageTraits;
 
 abstract class CoreController extends LaravelController
 {
-    use AuthorizesRequests, DispatchesJobs, ManageNames,
-        ManageTraits,
-        ValidatesRequests;
+    use AuthorizesRequests,
+        DispatchesJobs,
+        ValidatesRequests,
+        ManageNames,
+        ManageTraits;
 
     /**
      * baseKey
