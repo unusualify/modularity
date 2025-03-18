@@ -146,8 +146,12 @@ export default function useItemActions(props, context) {
     document.body.removeChild(link);
   }
 
-  const shouldShowAction = (action) => {
+  const validateAction = (action) => {
     // Base condition for editing/creating
+    if(!editingItem) {
+      return true
+    }
+
     const baseCondition = props.isEditing ? action.editable : action.creatable;
 
     // If no conditions defined, return base condition
@@ -162,11 +166,18 @@ export default function useItemActions(props, context) {
   const formatActions = (_actions) => {
     return _actions.map(action => {
 
-      Object.keys(action).forEach(key => {
-        if (key === 'badge') {
-          action[key] = castMatch.value(action[key], editingItem)
-        }
-      })
+      if(editingItem) {
+        Object.keys(action).forEach(key => {
+          if (key === 'badge') {
+            action[key] = castMatch.value(action[key], editingItem)
+          }
+        })
+      }
+
+      if(!validateAction(action)) {
+        action.disabled = true
+      }
+
       return action
     })
   }
@@ -176,16 +187,19 @@ export default function useItemActions(props, context) {
       : Actions
   )
 
-  const formattedActions = computed(() => formatActions(flattenedActions.value.filter(action => shouldShowAction(action))))
+  const allActions = computed(() => formatActions(flattenedActions.value))
+  const visibleActions = computed(() => allActions.value.filter(action => !(window.__isset(action.disabled) && action.disabled)))
 
   const states = reactive({
-    formattedActions,
-    hasActions: computed(() => formattedActions.value.length > 0)
+    hasActions: computed(() => allActions.value.length > 0),
+    hasVisibleActions: computed(() => visibleActions.value.length > 0),
+    allActions,
+    visibleActions,
   })
 
   const methods = reactive({
     // methods
-    shouldShowAction,
+    shouldShowAction: validateAction,
     handleAction(action) {
       if (!action.type) {
         console.warn('Action type not specified:', action);
