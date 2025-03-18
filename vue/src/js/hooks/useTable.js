@@ -23,6 +23,7 @@ import {
   makeTableHeadersProps,
   makeTableFormsProps,
   makeTableItemActionsProps,
+  makeTableActionsProps,
 
   useTableItem,
   useTableNames,
@@ -32,6 +33,7 @@ import {
   useTableItemActions,
   useTableModals,
   useTableEndpoints,
+  useTableActions,
 } from '@/hooks/table'
 
 export const makeTableProps = propsFactory({
@@ -41,6 +43,7 @@ export const makeTableProps = propsFactory({
   ...makeTableHeadersProps(),
   ...makeTableFormsProps(),
   ...makeTableItemActionsProps(),
+  ...makeTableActionsProps(),
   fillHeight: {
     type: Boolean,
     default: false,
@@ -441,6 +444,7 @@ export default function useTable (props, context) {
 
   return {
     form,
+    ...useTableActions(props, context),
     ...toRefs(state),
     ...toRefs(methods),
     ...tableNames,
