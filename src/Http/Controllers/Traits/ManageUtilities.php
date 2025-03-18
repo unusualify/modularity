@@ -11,7 +11,10 @@ use Unusualify\Modularity\Services\View\UWrapper;
 
 trait ManageUtilities
 {
-    use ManageForm, ManageTable;
+    use ManageForm,
+        ManageTable,
+        Utilities\UrlUtility,
+        Utilities\FormPageUtility;
 
     /**
      * @param array $prependScope
@@ -24,6 +27,22 @@ trait ManageUtilities
         $headers = $this->filterHeadersByRoles($this->getIndexTableColumns());
         $headers = $this->translateHeaders($headers);
 
+        // $i = $this->repository->getModel()->hasUnreadChatMessagesForYou()->latest()->first();
+        // dd(
+        //     $this->repository->getModel()->hasUnreadChatMessagesForYou()->latest()->get()->map(fn ($i) => [
+        //         'press_release_id' => $i->id,
+        //         'chat_id' => $i->chat->id,
+
+        //         // 'chat_messages_count' => $i->chatMessages()->count(),
+        //         // 'chat_messages_count' => $i->numberOfChatMessages(),
+        //         // 'unread_chat_messages_count' => $i->numberOfUnreadChatMessages(),
+        //         'unread_chat_messages_for_you_count' => $i->numberOfUnreadChatMessagesForYou(),
+
+        //         // 'unread_messages_count' => $i->unreadChatMessages()->count(),
+
+        //     ])
+        //     ->toArray()
+        // );
         $tableAttributes = $this->hydrateTableAttributes();
         $tableEndpoints = $this->getIndexUrls() + $this->getUrls();
 
@@ -125,113 +144,6 @@ trait ManageUtilities
     }
 
     /**
-     * @param string $moduleName
-     * @param string $routePrefix
-     * @return array
-     */
-    protected function getIndexUrls()
-    {
-
-        // 'indexEndpoint' => route(
-        //     ($this->isParentRoute() ? '' : $this->getSnakeCase($this->moduleName) . '.')
-        //         . $this->getSnakeCase($this->routeName)
-        //         . ".index"
-        // ), // basic laravel index url for create|edit|store|update|delete routes
-
-        return Collection::make([
-            'index',
-            'create',
-            'store',
-            'edit',
-            'update',
-            'destroy',
-            // 'delete',
-
-            'forceDelete',
-            'restore',
-            'duplicate',
-            'reorder',
-            // 'show',
-
-            // 'publish',
-            // 'bulkPublish',
-
-            // 'feature',
-            // 'bulkFeature',
-            'bulkForceDelete',
-            'bulkRestore',
-            'bulkDelete',
-        ])->mapWithKeys(function ($action) {
-
-            // $parameters = $this->submodule ? [$this->submoduleParentId] : [];
-            $parameters = [];
-
-            if ($this->isNested) {
-                // $parameters[Str::camel($this->moduleName)] = $this->parentId;
-                $parameters[$this->nestedParentName] = $this->nestedParentId;
-
-            }
-            $optionIsActive = $this->getIndexOption($action);
-
-            // if(!$optionIsActive && !preg_match('/edit|create|forceDelete|restore/', $action)){
-            //     dd($action);
-            // }
-
-            $prefix = $this->routePrefix;
-            // dd(moduleRoute(
-            //     $this->getConfigFieldsByRoute('route_name'),
-            //     $prefix,
-            //     'store',
-            //     $parameters),
-            //     $this->getConfigFieldsByRoute('route_name'),
-            //     $action,
-            //     );
-
-            if (! in_array($action, ['index', 'create', 'store'])) {
-                $prefix = $this->generateRoutePrefix(noNested: true);
-            }
-
-            return [
-                // $action . 'Endpoint' => $optionIsActive
-                $action => $optionIsActive
-                            ? moduleRoute(
-                                $this->getConfigFieldsByRoute('route_name'),
-                                $prefix,
-                                $action,
-                                $parameters
-                            )
-                            : null,
-            ];
-
-        })->toArray();
-        // + ['languages' => route(Route::hasAdminRoute(''))]
-
-    }
-
-    /**
-     * @param string $moduleName
-     * @param string $routePrefix
-     * @return array
-     */
-    protected function getUrls()
-    {
-        return [
-            'languages' => route(Route::hasAdmin('api.languages.index')),
-            'base_permalinks' => Arr::mapWithKeys(getLocales(), function ($locale, $key) {
-                extract(parse_url(config('app.url'))); // $scheme, $host
-
-                return [$locale => $host];
-                dd(
-                    parse_url(config('app.url')),
-                    // config('app.url'),
-                    // request()->getHost(),
-                    // $locale, $key, getLocales()
-                );
-            }),
-        ];
-    }
-
-    /**
      * @param int $id
      * @param \Unusualify\Modularity\Models\Model|null $item
      * @return array
@@ -311,128 +223,11 @@ trait ManageUtilities
         return [];
     }
 
-    /**
-     * @param int $id
-     * @return array
-     */
-    protected function getModalFormData($id)
-    {
-        $item = $this->repository->getById($id, $this->formWith, $this->formWithCount);
-        $fields = $this->repository->getFormFields($item);
-        $data = [];
-
-        if ($this->routeHasTrait('translations') && isset($fields['translations'])) {
-            foreach ($fields['translations'] as $fieldName => $fieldValue) {
-                $data['fields'][] = [
-                    'name' => $fieldName,
-                    'value' => $fieldValue,
-                ];
-            }
-
-            $data['languages'] = $item->getActiveLanguages();
-
-            unset($fields['translations']);
-        }
-
-        foreach ($fields as $fieldName => $fieldValue) {
-            $data['fields'][] = [
-                'name' => $fieldName,
-                'value' => $fieldValue,
-            ];
-        }
-
-        return array_replace_recursive($data, $this->modalFormData($this->request));
-    }
-
-    /**
-     * @param Request $request
-     * @return array
-     */
-    public function modalFormData($request)
-    {
-        return [];
-    }
-
-    public function getFormItem($id = null)
-    {
-        if ($this->isSingleton) {
-            $item = $this->repository->getModel()->single();
-        } elseif ($id) {
-            $item = $this->repository->getById(
-                $id,
-                $this->formWith,
-                $this->formWithCount
-            );
-        } else {
-            $item = $this->repository->newInstance();
-        }
-
-        return $item;
-    }
-
-    public function getFormUrl($itemId = null)
-    {
-        try {
-            $url = $itemId
-                ? $this->getModuleRoute($itemId, 'update', $this->isSingleton)
-                : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->nestedParentId]);
-            // code...
-        } catch (\Throwable $th) {
-            dd($th, $this->routeName, $this->routePrefix, $this->nestedParentId, $this->isNested);
-        }
-
-        return $url;
-    }
-
     public function getViewLayoutVariables()
     {
         return [
             'pageTitle' => $this->getHeadline($this->routeName) . ' Module',
         ];
-    }
-
-    /**
-     * Filters the provided schema based on the roles of the authenticated user.
-     *
-     * This method iterates through the schema fields and checks if the user has the
-     * necessary roles to access each field. If a field has an 'allowedRoles' attribute
-     * and the user does not possess the required role, that field will be excluded
-     * from the resulting schema. Additionally, if a field is of type 'group' or 'wrap',
-     * the method will recursively filter its schema as well.
-     *
-     * @param array $schema The schema to be filtered.
-     * @return array The filtered schema, containing only fields the user is allowed to access.
-     */
-    public function filterSchemaByRoles($schema)
-    {
-        return Collection::make($schema)->reduce(function ($carry, $field, $name) {
-            $isAllowed = (! $this->user || ! isset($field['allowedRoles']))
-                // || $this->user->isSuperAdmin()
-                || $this->user->hasRole($field['allowedRoles']);
-
-            if (
-                $isAllowed
-                || isset($field['viewOnlyComponent'])
-            ) {
-
-                if (! $isAllowed && isset($field['viewOnlyComponent'])) {
-                    $carry[$name] = $field;
-                } elseif (in_array($field['type'], ['group', 'wrap'])) {
-                    if (isset($field['schema'])) {
-                        $field['schema'] = $this->filterSchemaByRoles($field['schema']);
-
-                        if (! empty($field['schema'])) {
-                            $carry[$name] = Arr::except($field, ['viewOnlyComponent']);
-                        }
-                    }
-                } else {
-                    $carry[$name] = Arr::except($field, ['viewOnlyComponent']);
-                }
-
-            }
-
-            return $carry;
-        }, []);
     }
 
     public function getNestedData()
@@ -501,30 +296,5 @@ trait ManageUtilities
         }
 
         return $withs;
-    }
-
-    /**
-     * Filters the headers based on the user's roles.
-     *
-     * This method checks each header item to determine if the current user
-     * has the necessary permissions to view it. If the user is a super admin
-     * or if the header does not have any role restrictions, the header will
-     * be included in the returned array. Otherwise, it will be excluded.
-     *
-     * @param array $headers The array of header items to filter.
-     * @return array The filtered array of header items.
-     */
-    public function filterHeadersByRoles($headers)
-    {
-        return array_reduce($headers, function ($carry, $item) {
-            if ((! $this->user || ! isset($item['allowedRoles']))
-                || $this->user->isSuperAdmin()
-                || $this->user->hasRole($item['allowedRoles'])
-            ) {
-                $carry[] = $item;
-            }
-
-            return $carry;
-        }, []);
     }
 }
