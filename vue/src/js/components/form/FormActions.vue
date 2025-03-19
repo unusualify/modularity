@@ -3,7 +3,7 @@
       hasActions ? 'd-flex flex-wrap ga-4 py-4' : ''
     ]"
   >
-    <template v-for="(action, key) in formattedActions">
+    <template v-for="(action, key) in allActions">
       <v-tooltip
         v-if="action.type !== 'modalx'"
         :disabled="!action.icon || action.forceLabel"
@@ -13,8 +13,10 @@
           <v-switch
             v-if="action.type === 'publish'"
             :modelValue="editedItem[action.key ?? 'published'] ?? action.default ?? false"
-            @update:modelValue="handleAction(action)"
             v-bind="{...action.componentProps, ...props}"
+
+            :disabled="action.disabled ?? false"
+            @update:modelValue="handleAction(action)"
           />
           <ue-modal v-else-if="action.type === 'modal' && action.endpoint && action.schema"
             :close-on-content-click="false"
@@ -101,6 +103,7 @@
 import { computed } from 'vue'
 import { useItemActions } from '@/hooks'
 import { getModel } from '@/utils/getFormData'
+import useGenerate from '@/hooks/utils/useGenerate'
 
 export default {
   name: 'FormActions',
@@ -121,25 +124,15 @@ export default {
 
   },
   setup(props, context) {
-    const { handleAction, formattedActions, hasActions } = useItemActions(props, {
+    const { handleAction, allActions, hasActions } = useItemActions(props, {
       ...context,
       actionItem: props.modelValue
     })
 
-    const valids = computed(() => formattedActions.value.map(action => true))
+    const { generateButtonProps } = useGenerate()
 
-    const generateButtonProps = (action) => {
-      return {
-        ...(action.componentProps ?? {}),
-        icon: !action.forceLabel ? action.icon : null,
-        text: action.forceLabel ? action.label : null,
-        color: action.color,
-        variant: action.variant,
-        density: action.density ?? 'comfortable',
-        size: action.size ?? 'default',
-        rounded: action.forceLabel ? null : true
-      }
-    }
+    const valids = computed(() => allActions.value.map(action => true))
+
 
     const isBadge = (action) => {
       if(!window.__isset(action.badge)){
@@ -161,7 +154,7 @@ export default {
 
     return {
       hasActions,
-      formattedActions,
+      allActions,
       handleAction,
 
       valids,
