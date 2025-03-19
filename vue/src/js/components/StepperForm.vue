@@ -587,6 +587,14 @@
         }
         return acc
       }, {})
+
+      this.lastStepModel = this.$lodash.mapValues(this.lastStepModel, (data, key) => {
+        if(this.modelValue[key]){
+          return this.modelValue[key]
+        }
+        return data
+      })
+
     }
   }
 </script>
