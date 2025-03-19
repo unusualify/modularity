@@ -9,11 +9,11 @@
         :disabled="!action.icon || action.forceLabel"
         :location="action.tooltipLocation ?? 'top'"
       >
-        <template v-slot:activator="{ props }">
+        <template v-slot:activator="tooltipActivatorScope">
           <v-switch
             v-if="action.type === 'publish'"
             :modelValue="editedItem[action.key ?? 'published'] ?? action.default ?? false"
-            v-bind="{...action.componentProps, ...props}"
+            v-bind="{...action.componentProps, ...tooltipActivatorScope.props}"
 
             :disabled="action.disabled ?? false"
             @update:modelValue="handleAction(action)"
@@ -27,15 +27,13 @@
           >
             <template v-slot:activator="modalActivatorScope">
               <v-badge v-if="isBadge(action)"
-                :content="action.badge"
-                :color="action.badgeColor ?? 'warning'"
-                :text-color="action.badgeTextColor ?? 'white'"
+                v-bind="badgeProps(action)"
               >
                 <v-btn
                   v-bind="{
                     ...generateButtonProps(action),
                     ...modalActivatorScope.props,
-                    ...props
+                    ...tooltipActivatorScope.props
                   }"
                 />
               </v-badge>
@@ -43,7 +41,7 @@
                 v-bind="{
                   ...generateButtonProps(action),
                   ...modalActivatorScope.props,
-                  ...props
+                  ...tooltipActivatorScope.props
                 }"
               />
             </template>
@@ -78,17 +76,15 @@
           </ue-modal>
           <template v-else-if="action.type !== 'modal'">
             <v-badge v-if="isBadge(action)"
-              :content="action.badge"
-              :color="action.badgeColor ?? 'warning'"
-              :text-color="action.badgeTextColor ?? 'white'"
+              v-bind="badgeProps(action)"
             >
               <v-btn
-                v-bind="{...generateButtonProps(action), ...props}"
+                v-bind="{...generateButtonProps(action), ...tooltipActivatorScope.props}"
                 @click="handleAction(action)"
               />
             </v-badge>
             <v-btn v-else
-              v-bind="{...generateButtonProps(action), ...props}"
+              v-bind="{...generateButtonProps(action), ...tooltipActivatorScope.props}"
               @click="handleAction(action)"
             />
           </template>
@@ -104,6 +100,7 @@ import { computed } from 'vue'
 import { useItemActions } from '@/hooks'
 import { getModel } from '@/utils/getFormData'
 import useGenerate from '@/hooks/utils/useGenerate'
+import useBadge from '@/hooks/utils/useBadge'
 
 export default {
   name: 'FormActions',
@@ -128,25 +125,10 @@ export default {
       ...context,
       actionItem: props.modelValue
     })
-
     const { generateButtonProps } = useGenerate()
-
+    const { isBadge, badgeProps } = useBadge()
     const valids = computed(() => allActions.value.map(action => true))
 
-
-    const isBadge = (action) => {
-      if(!window.__isset(action.badge)){
-        return false
-      }
-
-      let badge = action.badge
-
-      if(window.__isString(badge)){
-        badge = parseInt(badge)
-      }
-
-      return badge > 0
-    }
 
     const createModel = (schema) => {
       return getModel(schema, props.modelValue)
@@ -161,7 +143,8 @@ export default {
 
       createModel,
       generateButtonProps,
-      isBadge
+      isBadge,
+      badgeProps
     }
   },
 }
