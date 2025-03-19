@@ -146,6 +146,7 @@
                   </v-text-field>
 
                   <!-- <v-spacer v-else-if="hideSearchField"></v-spacer> -->
+                  <v-spacer></v-spacer>
 
                   <!-- filter button -->
                   <v-btn v-if="mainFilters.length > 0"
