@@ -17,14 +17,6 @@ import { getSubmitFormData } from '@/utils/getFormData.js'
 import { useRoot, useFormatter } from '@/hooks'
 
 import {
-  makeTableNamesProps,
-  makeTableEndpointsProps,
-  makeTableFiltersProps,
-  makeTableHeadersProps,
-  makeTableFormsProps,
-  makeTableItemActionsProps,
-  makeTableActionsProps,
-
   useTableItem,
   useTableNames,
   useTableFilters,
@@ -36,14 +28,8 @@ import {
   useTableActions,
 } from '@/hooks/table'
 
+
 export const makeTableProps = propsFactory({
-  ...makeTableNamesProps(),
-  ...makeTableEndpointsProps(),
-  ...makeTableFiltersProps(),
-  ...makeTableHeadersProps(),
-  ...makeTableFormsProps(),
-  ...makeTableItemActionsProps(),
-  ...makeTableActionsProps(),
   fillHeight: {
     type: Boolean,
     default: false,

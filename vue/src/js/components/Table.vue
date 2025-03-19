@@ -828,6 +828,16 @@ import {
   useDraggable,
 } from '@/hooks'
 
+import {
+  makeTableNamesProps,
+  makeTableEndpointsProps,
+  makeTableFiltersProps,
+  makeTableHeadersProps,
+  makeTableFormsProps,
+  makeTableItemActionsProps,
+  makeTableActionsProps,
+} from '@/hooks/table'
+
 import ActiveTableItem from '__components/labs/ActiveTableItem.vue'
 import PaymentService from './inputs/PaymentService.vue'
 
@@ -843,6 +853,13 @@ export default {
 
   },
   props: {
+    ...makeTableNamesProps(),
+    ...makeTableEndpointsProps(),
+    ...makeTableFiltersProps(),
+    ...makeTableHeadersProps(),
+    ...makeTableFormsProps(),
+    ...makeTableItemActionsProps(),
+    ...makeTableActionsProps(),
     ...makeTableProps(),
     ...makeDraggableProps(),
     ...ignoreFormatters
