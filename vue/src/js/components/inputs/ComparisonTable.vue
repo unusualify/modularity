@@ -155,10 +155,18 @@
             }
           } else{
             let rec = null
-            comparisonValue = toUpper(comparator.match(/(\w+)?(_show)/)[1])
 
             if(( rec = find(this.comparators, ['key', comparator]) ) && __isset(rec.title)){
               comparisonValue = rec.title
+            } else {
+              let match = comparator.match(/(\w+)?(_show)/)
+
+              if(match) {
+                comparisonValue = this.$headline(match[1])
+              }else {
+                comparisonValue = this.$headline(comparator)
+              }
+
             }
 
             if( __isset(rec.itemClasses)){
