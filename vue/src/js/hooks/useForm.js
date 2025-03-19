@@ -539,7 +539,6 @@ export default function useForm(props, context) {
 
   // Watch rawSchema
   watch(() => rawSchema.value, (value, oldValue) => {
-    // __log('watch rawSchema', value)
     if(oldValue === undefined) {
       return
     }
