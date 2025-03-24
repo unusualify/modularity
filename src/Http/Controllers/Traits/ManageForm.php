@@ -2,15 +2,7 @@
 
 namespace Unusualify\Modularity\Http\Controllers\Traits;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
-use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Support\Finder;
 
 trait ManageForm
 {
