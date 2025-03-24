@@ -387,7 +387,7 @@ abstract class CoreController extends LaravelController
 
     public function createAssignment($id)
     {
-        if($this->request->get('status')){
+        if($this->request->has('status')){
             $assignable = $this->repository->getById($id);
 
             $assignable->lastAssignment->update([
@@ -417,7 +417,7 @@ abstract class CoreController extends LaravelController
 
         $assignable = $this->repository->getById($id);
 
-        if($assignable->lastAssignment->status !== 'completed'){
+        if($assignable->lastAssignment && $assignable->lastAssignment->status !== 'completed'){
             $assignable->lastAssignment->update([
                 'status' => 'cancelled',
             ]);
