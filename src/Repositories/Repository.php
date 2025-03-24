@@ -23,7 +23,11 @@ use Unusualify\Modularity\Traits\ManageNames;
 
 abstract class Repository
 {
-    use DatesTrait, ManageNames, MethodTransformers, RelationTrait, DispatchEvents;
+    use DatesTrait,
+        ManageNames,
+        MethodTransformers,
+        RelationTrait,
+        DispatchEvents;
 
     /**
      * @var \Unusualify\Modularity\Models\Model
@@ -1116,8 +1120,11 @@ abstract class Repository
         if ($isFormatted) {
             return $query->get()->map(function ($item) {
                 return array_merge(
-                    $this->getShowFields($item, $this->chunkInputs($this->inputs())),
-                    $item->attributesToArray(),
+                    // array_merge(
+                    //     $this->getShowFields($item, $this->chunkInputs($this->inputs())),
+                    //     $this->getFormFields($item, $this->chunkInputs($this->inputs())),
+                    // ),
+                    $item->toArray(),
                 );
             });
         } else {
