@@ -3,6 +3,8 @@
 namespace Unusualify\Modularity\Repositories;
 
 use Exception;
+use PDO;
+use ReflectionClass;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -11,23 +13,21 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use PDO;
-use ReflectionClass;
 use Spatie\Activitylog\Facades\LogBatch;
-use Unusualify\Modularity\Entities\Behaviors\Sortable;
-use Unusualify\Modularity\Repositories\Traits\DatesTrait;
-use Unusualify\Modularity\Repositories\Traits\DispatchEvents;
-use Unusualify\Modularity\Repositories\Traits\MethodTransformers;
-use Unusualify\Modularity\Repositories\Traits\RelationTrait;
 use Unusualify\Modularity\Traits\ManageNames;
+use Unusualify\Modularity\Repositories\Contracts\Repository as RepositoryContract;
 
-abstract class Repository
+abstract class Repository implements RepositoryContract
 {
-    use DatesTrait,
-        ManageNames,
-        MethodTransformers,
-        RelationTrait,
-        DispatchEvents;
+    use ManageNames,
+        Logic\InspectTraits,
+        Logic\RelationshipHelpers,
+        Logic\MethodTransformers,
+        Logic\QueryBuilder,
+        Logic\CountBuilders,
+        Logic\Dates,
+        Logic\Relationships,
+        Logic\DispatchEvents;
 
     /**
      * @var \Unusualify\Modularity\Models\Model
@@ -38,11 +38,6 @@ abstract class Repository
      * @var string[]
      */
     protected $ignoreFieldsBeforeSave = [];
-
-    /**
-     * @var array
-     */
-    protected $countScope = [];
 
     /**
      * @var array
@@ -63,277 +58,6 @@ abstract class Repository
      * @var string|null
      */
     // public $fieldsGroupsFormFieldNameSeparator = '_';
-
-    /**
-     * @param array $with
-     * @param array $scopes
-     * @param array $orders
-     * @param int $perPage
-     * @param bool $forcePagination
-     * @return \Illuminate\Support\Collection|\Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
-    public function get($with = [], $scopes = [], $orders = [], $perPage = 20, $appends = [], $forcePagination = false)
-    {
-        $query = $this->model->query();
-        $query = $this->model->with($this->formatWiths($query, $with));
-
-        if (isset($scopes['searches']) && isset($scopes['search']) && is_array($scopes['searches'])) {
-            $translatedAttributes = $this->model->translatedAttributes ?? [];
-
-            $searches = Arr::where($scopes['searches'], function (string|int $value, int $key) use ($translatedAttributes) {
-                return ! in_array($value, $translatedAttributes);
-            });
-
-            $this->searchIn($query, $scopes, 'search', $searches);
-
-            $scope['searches'] = Arr::where($scopes['searches'], function (string|int $value, int $key) use ($translatedAttributes) {
-                return in_array($value, $translatedAttributes);
-            });
-            // unset($scopes['searches']);
-        }
-
-        $query = $this->filter($query, $scopes);
-        // $query = $this->filterBack($query, $scopes);
-
-        $query = $this->order($query, $orders);
-
-        if (! $forcePagination && $this->model instanceof Sortable) {
-            return $query->ordered()->get();
-        }
-
-        if ($perPage == -1) {
-            return $query->simplePaginate($perPage);
-        }
-
-        try {
-
-            return $query->paginate($perPage);
-
-        } catch (\Throwable $th) {
-            dd(
-                $query->toSql(),
-                $th,
-                debug_backtrace()
-            );
-        }
-
-    }
-
-    /**
-     * @return int
-     */
-    public function getCountForAll()
-    {
-        $query = $this->model->newQuery();
-
-        return $this->filter($query, $this->countScope)->count();
-    }
-
-    /**
-     * @return int
-     */
-    public function getCountForPublished()
-    {
-        $query = $this->model->newQuery();
-
-        return $this->filter($query, $this->countScope)->published()->count();
-    }
-
-    /**
-     * @return int
-     */
-    public function getCountForDraft()
-    {
-        $query = $this->model->newQuery();
-
-        return $this->filter($query, $this->countScope)->draft()->count();
-    }
-
-    /**
-     * @return int
-     */
-    public function getCountForTrash()
-    {
-        $query = $this->model->newQuery();
-
-        return $this->filter($query, $this->countScope)->onlyTrashed()->count();
-    }
-
-    /**
-     * @param array $with
-     * @param array $withCount
-     * @return \Unusualify\Modularity\Models\Model
-     *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
-    public function getById($id, $with = [], $withCount = [])
-    {
-        $query = $this->model->query();
-
-        if (classHasTrait($this->model, 'Illuminate\Database\Eloquent\SoftDeletes')) {
-            return $query->withTrashed()->with($this->formatWiths($query, $with))->withCount($withCount)->findOrFail($id);
-        } else {
-            return $query->with($this->formatWiths($query, $with))->withCount($withCount)->findOrFail($id);
-        }
-    }
-
-    /**
-     * @param string $column
-     * @param array $orders
-     * @param null $exceptId
-     * @return \Illuminate\Support\Collection
-     */
-    public function listAll($with = [], $scopes = [], $orders = [], $exceptId = null)
-    {
-        $query = $this->model->query();
-
-        $query = $this->model->with($this->formatWiths($query, $with));
-
-        if (isset($scopes['searches']) && isset($scopes['search']) && is_array($scopes['searches'])) {
-
-            $this->searchIn($query, $scopes, 'search', $scopes['searches']);
-            unset($scopes['searches']);
-        }
-
-        $query = $this->filter($query, $scopes);
-        // $query = $this->filterBack($query, $scopes);
-
-        $query = $this->order($query, $orders);
-
-        try {
-            return $query->get();
-        } catch (\Throwable $th) {
-            // throw $th;
-            dd(
-                $th,
-                debug_backtrace()
-            );
-        }
-
-    }
-
-    /**
-     * @param string $column
-     * @param array $orders
-     * @param null $exceptId
-     * @return \Illuminate\Support\Collection
-     */
-    public function list($column = 'name', $with = [], $scopes = [], $orders = [], $appends = [], $exceptId = null)
-    {
-        $query = $this->model->newQuery();
-
-        if (count($with) > 0) {
-            $query = $query->with($this->formatWiths($query, $with));
-        }
-
-        if ($exceptId) {
-            $query = $query->where($this->model->getTable() . '.id', '<>', $exceptId);
-        }
-
-        $query = $this->filter($query, $scopes);
-
-        if ($this->model instanceof Sortable) {
-            $query = $query->ordered();
-        } elseif (! empty($orders)) {
-            $query = $this->order($query, $orders);
-        }
-
-        $defaultColumns = is_array($column) ? $column : [$column];
-
-        $columns = ['id', ...$defaultColumns];
-        $oldColumns = $columns;
-
-        $tableColumns = $this->getModel()->getColumns();
-        $translatedColumns = [];
-
-        if (method_exists($this->getModel(), 'isTranslatable') && $this->model->isTranslatable()) {
-            $query = $query->withTranslation();
-            $translatedAttributes = $this->getTranslatedAttributes();
-
-            $columns = array_diff($columns, $translatedAttributes);
-            $defaultColumns = array_diff($defaultColumns, $translatedAttributes);
-            $translatedColumns = array_values(array_intersect($oldColumns, $translatedAttributes));
-            $absentColumns = array_diff($defaultColumns, $tableColumns);
-
-            if (in_array('name', $absentColumns)) {
-                $titleColumnKey = $this->getModel()->getRouteTitleColumnKey();
-                if (in_array($titleColumnKey, $translatedAttributes)) {
-                    $columns = array_filter($columns, fn ($col) => $col !== 'name');
-                    $translatedColumns[] = $titleColumnKey;
-                } else {
-                    $columns = array_filter($columns, fn ($col) => $col !== 'name');
-                    $columns[] = "{$this->getModel()->getRouteTitleColumnKey()} as name";
-                }
-            }
-
-        }
-
-        $relationships = collect($with)->map(function ($r) {
-            $r = explode('.', $r)[0];
-
-            return $r;
-        })->toArray();
-
-        $foreignableRelationships = collect($relationships)->filter(function ($r) {
-            return in_array($this->getModel()->getRelationType($r), ['BelongsTo', 'MorphTo']);
-        })->values()->toArray();
-
-        foreach ($foreignableRelationships as $r) {
-            $columns[] = $this->getModel()->{$r}()->getForeignKeyName();
-        }
-
-        $with = array_merge($this->getModel()->getWith(), $with);
-
-        // dd($columns, $appends, $with, $columns, $translatedColumns);
-
-        try {
-            // code...
-            return $query->get($columns)->map(fn ($item) => [
-                ...collect($appends)->mapWithKeys(function ($append) use ($item) {
-                    return [$append => $item->{$append}];
-                })->toArray(),
-                ...collect($with)->mapWithKeys(function ($r) use ($item) {
-                    $r = explode('.', $r)[0];
-
-                    return [$r => $item->{$r}];
-                })->toArray(),
-                ...(collect($columns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
-                ...(collect($translatedColumns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
-            ]);
-        } catch (\Throwable $th) {
-            dd(
-                $this->getModel()->getRouteTitleColumnKey(),
-                static::class,
-                $columns,
-                $appends,
-                $with,
-                $translatedColumns,
-                $foreignableRelationships,
-                $relationships,
-                $foreignableRelationships,
-                $th,
-                array_reduce(debug_backtrace(), 'backtrace_formatter', [])
-            );
-        }
-
-        // try {
-        //     return $query->get($columns);
-        // } catch (\Throwable $th) {
-        //     if (method_exists($this->model, 'getColumns')) {
-        //         $appends = $this->model->getAppends();
-        //         $differentElements = array_diff($columns, $this->model->getColumns());
-        //         // if absent columns exist in appends, we can return the result with the absent columns
-        //         if (empty(array_diff($differentElements, $appends))) {
-        //             // All differentElements exist in appends
-        //             // You can proceed with your logic here if needed
-        //             return $query->get()->map(fn ($item) => collect($columns)->map(fn ($c) => $item->{$c})->toArray());
-        //         }
-        //     }
-        //     // no absent columns exist in appends, we can't return the result with the absent columns
-        //     throw $th;
-        // }
-
-    }
 
     /**
      * @param array $fields
@@ -847,6 +571,18 @@ abstract class Repository
     }
 
     /**
+     * @return string
+     */
+    public function getLikeOperator()
+    {
+        if (DB::connection()->getPDO()->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') {
+            return 'ILIKE';
+        }
+
+        return 'LIKE';
+    }
+
+    /**
      * @return string[]
      */
     public function getReservedFields()
@@ -915,233 +651,5 @@ abstract class Repository
     public function __call($method, $parameters)
     {
         return $this->model->$method(...$parameters);
-    }
-
-    /**
-     * @param string $behavior
-     * @return bool
-     */
-    public function hasBehavior($behavior)
-    {
-        $hasBehavior = classHasTrait($this, 'Unusualify\Modularity\Repositories\Traits\\' . ucfirst($behavior) . 'Trait');
-        // dd($behavior, $hasBehavior, Str::startsWith($behavior, 'translation'));
-        if (Str::startsWith($behavior, 'translation')) {
-            $hasBehavior = $hasBehavior && $this->model->isTranslatable();
-        }
-
-        return $hasBehavior;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTranslatable($column)
-    {
-        return method_exists($this->model, 'isTranslatable') && $this->model->isTranslatable($column);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSoftDeletable()
-    {
-        return method_exists($this->model, 'isSoftDeletable') && $this->model->isSoftDeletable();
-    }
-
-    /**
-     * Post::with('user:id,username')->get();
-     * Post::query()
-     *   ->with(['user' => function ($query) {
-     *      $query->select('id', 'username');
-     *   }])
-     *
-     * @param Illuminate\Database\Eloquent\Builder $query
-     * @param array $with for instance ['roles' => ['select', 'id', 'name']]
-     * @return array
-     */
-    public function formatWiths($query, $with)
-    {
-        return array_map(function ($item) {
-
-            if(is_array($item)) {
-                if(Arr::isAssoc($item)) {
-                    if(request()->ajax()) {
-                        dd($item);
-                    }
-                    return fn($query) => array_reduce($item['functions'], fn($query, $function) => $query->$function(), $query);
-                }else{
-                    if(request()->ajax()) {
-                        // dd($item);
-                    }
-                }
-            }
-
-            return $item;
-            return is_array($item)
-                ? function ($query) use ($item) {
-
-                    if (is_array($item[0])) {
-                        foreach ($item as $key => $args) {
-                            $query->{array_shift($args)}(...$args);
-                        }
-                    } else {
-                        $query->{array_shift($item)}(...$item);
-                    }
-                    $query->without('pivot');
-                }
-            : $item;
-        }, $with);
-    }
-
-    public function definedRelations($relations = null): array
-    {
-        if (method_exists($this->model, 'definedRelations')) {
-            return $this->model->definedRelations($relations);
-        }
-
-        $relationNamespace = "Illuminate\Database\Eloquent\Relations";
-
-        $relationClassesPattern = '|' . preg_quote($relationNamespace, '|') . '|';
-
-        if ($relations) {
-            if (is_array($relations)) {
-                $relationNamespaces = implode('|', Arr::map($relations, function ($relationName) use ($relationNamespace) {
-                    return $relationNamespace . '\\' . $relationName;
-                }));
-                $relationClassesPattern = '|' . preg_quote($relationNamespaces, '|') . '|';
-
-            } elseif (is_string($relations)) {
-                $relationClassesPattern = '|' . preg_quote($relationNamespace . '\\' . $relations, '|') . '|';
-            }
-        }
-
-        $reflector = new \ReflectionClass($this->getModel());
-
-        return collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))->reduce(function ($carry, $method) use ($relationClassesPattern) {
-
-            if ($method->getNumberOfParameters() < 1) {
-                if ($method->hasReturnType()) {
-                    if (preg_match($relationClassesPattern, ($returnType = $method->getReturnType()))) {
-                        $carry[] = $method->name;
-                    }
-                } else {
-
-                }
-            }
-
-            return $carry;
-        }, []);
-
-        return collect($reflector->getMethods(\ReflectionMethod::IS_PUBLIC))
-            ->filter(fn (\ReflectionMethod $method) => $method->hasReturnType() && preg_match("{$relationClassesPattern}", $method->getReturnType()))
-            ->pluck('name')
-            ->all();
-    }
-
-    private function getForeignKeyBelongsToMany($related)
-    {
-        if (method_exists($related, 'getRelatedPivotKeyName')) {
-            $foreignKey = $related->getRelatedPivotKeyName();
-        }
-
-        return $foreignKey;
-    }
-
-    private function getForeignKeyBelongsTo($related)
-    {
-        $foreignKey = $related->getForeignKeyName();
-
-        return $foreignKey;
-    }
-
-    private function getForeignKeyHasManyThrough($related)
-    {
-        $foreignKey = $related->getSecondLocalKeyName();
-
-        return $foreignKey;
-    }
-
-    public function getCountFor($method)
-    {
-        // dd($method);
-        $methodName = 'scope' . ucfirst($method[0]);
-
-        return $this->model->$methodName();
-    }
-
-    /**
-     * @param string $class name resolution
-     * @return bool
-     */
-    public function hasModelTrait($trait)
-    {
-        $hasTrait = classHasTrait($this->getModel(), $trait);
-
-        return $hasTrait;
-    }
-
-    public function getByColumnValues($column, array $values, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null)
-    {
-        $query = $this->model->whereIn($column, $values);
-
-        $query = $query->with($this->formatWiths($query, $with));
-
-        $query = $this->filter($query, $scopes);
-
-        $query = $this->order($query, $orders);
-
-        if ($isFormatted) {
-            return $query->get()->map(function ($item) {
-                // dd($item);
-                return array_merge(
-                    $this->getShowFields($item, $this->chunkInputs($this->inputs())),
-                    $item->attributesToArray(),
-                    // $item->toArray(),
-                    // $this->getFormFields($item, $this->chunkInputs($this->inputs())),
-                    // $columnsData
-                );
-            });
-        } else {
-
-            return $query->get();
-        }
-    }
-
-    public function getByIds(array $ids, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null)
-    {
-        $query = $this->model->whereIn('id', $ids);
-
-        $query = $query->with($this->formatWiths($query, $with));
-
-        $query = $this->filter($query, $scopes);
-
-        $query = $this->order($query, $orders);
-
-        if ($isFormatted) {
-            return $query->get()->map(function ($item) {
-                return array_merge(
-                    // array_merge(
-                    //     $this->getShowFields($item, $this->chunkInputs($this->inputs())),
-                    //     $this->getFormFields($item, $this->chunkInputs($this->inputs())),
-                    // ),
-                    $item->toArray(),
-                );
-            });
-        } else {
-
-            return $query->get();
-        }
-    }
-
-    /**
-     * @return string
-     */
-    protected function getLikeOperator()
-    {
-        if (DB::connection()->getPDO()->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') {
-            return 'ILIKE';
-        }
-
-        return 'LIKE';
     }
 }
