@@ -607,82 +607,95 @@ const FormatFuncs = {
     if(handlerValue){
       let dataSet = []
       let notation = __wildcard_change(setPropFormat, handlerValue)
+
       dataSet = __data_get(handlerSchema, notation, null)
 
+      let newValue
+
       if(Array.isArray(dataSet) && (dataSet.length > 0)){
-        let newValue = dataSet.shift()
+        newValue = dataSet.shift()
 
-        if(!!newValue){
-          let matches = inputPropToFormat.match(/^(modelValue|model)$/g)
-          // __log(inputPropToFormat, matches)
-          if(matches){ // setting modelValue
-            let targetInput = _.get(schema, inputToFormat)
-            let targetInputName = targetInput.name
-            let targetForeignKey = __extractForeignKey(targetInputName)
-            let targetInputSchema = targetInput.schema ?? null
-            let isRepeater = targetInput.type == 'input-repeater'
-            let isArrayValue = Array.isArray(newValue)
+      }else if(dataSet !== undefined && dataSet !== null){
+        newValue = dataSet
+      }
 
-            if(__isset(targetInput['translated']) && targetInput['translated']){
-              let translationParts = notation.split('.')
-              let field = translationParts.pop()
-              let translationNotation = translationParts.join('.') + '.translations'
-              notation.split('.').pop()
-              let rawTranslation = __data_get(handlerSchema, translationNotation).shift()
+      if(newValue !== undefined && newValue !== null){
+        let matches = inputPropToFormat.match(/^(modelValue|model)$/g)
 
-              if(rawTranslation){
-                // TODO: translations do not comes from package_type
-                __log(rawTranslation)
-                newValue = _.reduce(languages, (acc, language) => {
-                  let translation = _.find(rawTranslation, (el) => el.locale == language) ?? rawTranslation[0]
-                  let value = translation[field] ?? null
-                  acc[language] = translation[field] ?? null
+        if(matches){ // setting modelValue
+          let targetInput = _.get(schema, inputToFormat)
+          let targetInputName = targetInput.name
+          let targetForeignKey = __extractForeignKey(targetInputName)
+          let targetInputSchema = targetInput.schema ?? null
+          let isRepeater = targetInput.type == 'input-repeater'
+          let isArrayValue = Array.isArray(newValue)
+
+          if(__isset(targetInput['translated']) && targetInput['translated']){
+            let translationParts = notation.split('.')
+            let field = translationParts.pop()
+            let translationNotation = translationParts.join('.') + '.translations'
+            notation.split('.').pop()
+            let rawTranslation = __data_get(handlerSchema, translationNotation).shift()
+
+            if(rawTranslation){
+              // TODO: translations do not comes from package_type
+              __log(rawTranslation)
+              newValue = _.reduce(languages, (acc, language) => {
+                let translation = _.find(rawTranslation, (el) => el.locale == language) ?? rawTranslation[0]
+                let value = translation[field] ?? null
+                acc[language] = translation[field] ?? null
+                return acc
+              }, {})
+            }
+          }
+
+          if(isArrayValue && newValue.length > 0){
+            let values = newValue.map((item) => {
+              if(targetInputSchema){
+                return _.reduce(targetInputSchema, (acc, value, key) => {
+                  // __log(key, value)
+                  if(isRepeater && key == targetForeignKey){
+                    acc[targetForeignKey] = item['id'] ?? null
+                  }else{
+                    acc[key] = item[key] ?? null
+                  }
+
                   return acc
                 }, {})
               }
+            })
+
+            _.set(model, inputToFormat, values)
+
+            // let currentValue = _.get(model, inputToFormat)
+            // __log( inputToFormat, __data_get(model, inputToFormat), model )
+            // if( !(Array.isArray(currentValue) && currentValue.length > 0)){
+            //   // __log('setting')
+            // }
+          }else if(!isArrayValue){
+            try{
+              _.set(model, targetInputName, newValue)
+            }catch(e){
+              console.error(e)
             }
-
-            if(isArrayValue && newValue.length > 0){
-              let values = newValue.map((item) => {
-                if(targetInputSchema){
-                  return _.reduce(targetInputSchema, (acc, value, key) => {
-                    // __log(key, value)
-                    if(isRepeater && key == targetForeignKey){
-                      acc[targetForeignKey] = item['id'] ?? null
-                    }else{
-                      acc[key] = item[key] ?? null
-                    }
-
-                    return acc
-                  }, {})
-                }
-              })
-
-              _.set(model, inputToFormat, values)
-
-              // let currentValue = _.get(model, inputToFormat)
-              // __log( inputToFormat, __data_get(model, inputToFormat), model )
-              // if( !(Array.isArray(currentValue) && currentValue.length > 0)){
-              //   // __log('setting')
-              // }
-            }else if(!isArrayValue){
-              try{
-                _.set(model, targetInputName, newValue)
-              }catch(e){
-                console.error(e)
-              }
-            }
-          }else{
-            _.set(schema, setterNotation, newValue)
-            if(inputPropToFormat.match(/schema/)){
-              _.set(schema, `${inputNotation}.default`, getModel(newValue))
-            }
-
           }
+        }else{
+          let currentValue = _.get(schema, setterNotation)
+          let lastValue = store.getters[CACHE.GET_LAST_CACHE](setterNotation) ?? currentValue
+
+          if(_.isString(newValue) && newValue == '#'){ // previous value is true
+            newValue = lastValue
+          }else if(newValue !== currentValue){
+            store.commit(CACHE.PUSH_CACHE, {key: setterNotation, value: currentValue})
+          }
+
+
+          _.set(schema, setterNotation, newValue)
+          if(inputPropToFormat.match(/schema/)){
+            _.set(schema, `${inputNotation}.default`, getModel(newValue))
+          }
+
         }
-
-
-
       }
     }
   },
@@ -735,7 +748,9 @@ const FormatFuncs = {
               eagers: eagers
             }
           })
+
           newItems.push(res.data)
+
         } catch (error) {
           // Handle the error here
           console.error('An error occurred:', error);
@@ -757,7 +772,6 @@ const FormatFuncs = {
             console.error('Error message:', error.message);
           }
         }
-
       }
     }
 
