@@ -21,6 +21,7 @@ export default function useGenerate(props, context) {
       variant: action.variant,
       density: action.density ?? 'comfortable',
       size: action.size ?? 'default',
+      disabled: action.disabled ?? action.componentProps?.disabled ?? false,
       rounded: action.forceLabel ? null : true,
     }
   }
