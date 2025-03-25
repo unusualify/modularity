@@ -398,7 +398,9 @@ export const handleEvents = ( model, schema, input, valueChanged = false) => {
   const isFieldFalsy = (Array.isArray(handlerValue) && handlerValue.length > 0) || (!Array.isArray(handlerValue) && !!handlerValue)
 
   if (input.event) {
-    input.event.split('|').forEach(event => {
+    let events = _.uniq(input.event.split('|'));
+
+    events.forEach(event => {
       let args = event.split(':')
       let methodName = args.shift()
       let runnable = true
@@ -421,7 +423,8 @@ export const handleMultiFormEvents = ( models, schemas, input, index, preview = 
   const isFieldFalsy = (Array.isArray(handlerValue) && handlerValue.length > 0) || (!Array.isArray(handlerValue) && !!handlerValue)
 
   if (input.event) {
-    input.event.split('|').forEach(event => {
+    let events = _.uniq(input.event.split('|'));
+    events.forEach(event => {
       let args = event.split(':')
       let methodName = args.shift()
 
