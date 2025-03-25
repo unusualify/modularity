@@ -843,7 +843,13 @@ trait FormSchema
                             $events[] = "formatPrependSchema:{$inputToFormat}:{$prependKey}:{$setterSchemaKey}";
                         }
 
-                        // dd($input, $patterns, $events);
+                        break;
+                    case 'removeValue': //
+                        $inputToFormat = array_shift($args) ?? '';
+
+                        if ($inputToFormat) {
+                            $events[] = "formatRemoveValue:{$inputToFormat}";
+                        }
                         break;
                     default:
                         // code...
