@@ -381,10 +381,10 @@ export default {
     this.$store.commit(USER.CLOSE_LOGIN_MODAL)
   },
 
-  $cacheGet: function (key) {
+  $cacheGet: function (key, defaultValue = null) {
     const { get } = useCache()
 
-    return get(key)
+    return get(key, defaultValue)
   },
   $cachePut: function (key, value) {
     const { put } = useCache()
@@ -396,10 +396,10 @@ export default {
 
     push(key, value)
   },
-  $cacheLast: function (key) {
+  $cacheLast: function (key, defaultValue = null) {
     const { last } = useCache()
 
-    return last(key)
+    return last(key, defaultValue)
   },
   $cacheForget: function (key) {
     const { forget } = useCache()
