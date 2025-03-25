@@ -1,24 +1,23 @@
 // useCache.js
 import { useStore } from 'vuex'
 import { CACHE } from '@/store/mutations'
+import store from '@/store'
 
 export default function useCache() {
-  const store = useStore()
-
-  const get = (key) => {
-    return store.commit(CACHE.GET_CACHE, key)
+  const get = (key, defaultValue = null) => {
+    return store.getters[CACHE.GET_CACHE](key) ?? defaultValue
   }
 
   const put = (key, value) => {
-    store.commit(CACHE.PUT_CACHE, key, value)
+    store.commit(CACHE.PUT_CACHE, {key, value})
   }
 
   const push = (key, value) => {
-    store.commit(CACHE.PUSH_CACHE, key, value)
+    store.commit(CACHE.PUSH_CACHE, {key, value})
   }
 
-  const last = (key) => {
-    return store.commit(CACHE.GET_LAST_CACHE, key)
+  const last = (key, defaultValue = null) => {
+    return store.getters[CACHE.GET_LAST_CACHE](key) ?? defaultValue
   }
 
   const forget = (key) => {

@@ -7,7 +7,7 @@ const state = {
 
 // getters
 const getters = {
-  [CACHE.GET_CACHE] (state, key) {
+  [CACHE.GET_CACHE]: (state) => (key) => {
     return state[key] ?? null
   },
   [CACHE.GET_LAST_CACHE]: (state) => (key) => {
