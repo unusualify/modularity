@@ -44,6 +44,7 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
   window.__isObject = (value) => {
     return Object.prototype.toString.call(value) === '[object Object]'
   },
+
   window.__isArray = (value) => {
     return Array.isArray(value)
   }
@@ -78,6 +79,7 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
     }
     return true
   }
+
   window.__issetReturn = (arg, defaultValue) => {
     return __isset(arg) ? arg : defaultValue
   }
@@ -519,6 +521,27 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
 
     // Format the number and add the symbol
     return `${symbol}${formatter.format(amount)}`;
+  }
+
+  window.__addParametersToUrl = (url, params) => {
+    const urlInstance = new URL(url);
+    const searchParams = urlInstance.searchParams;
+
+    Object.entries(params).forEach(([key, value]) => {
+      searchParams.set(key, value);
+    });
+
+    return urlInstance.toString();
+  }
+  window.__removeParametersFromUrl = (url, params) => {
+    const urlInstance = new URL(url);
+    const searchParams = urlInstance.searchParams;
+
+    Object.entries(params).forEach(([key, value]) => {
+      searchParams.delete(key);
+    });
+
+    return urlInstance.toString();
   }
 }
 
