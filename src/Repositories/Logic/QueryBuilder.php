@@ -161,7 +161,7 @@ trait QueryBuilder
      * @param null $exceptId
      * @return \Illuminate\Support\Collection
      */
-    public function listAll($with = [], $scopes = [], $orders = [], $exceptId = null)
+    public function listAll($with = [], $scopes = [], $orders = [])
     {
         $query = $this->model->query();
 
