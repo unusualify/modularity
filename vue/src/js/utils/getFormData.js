@@ -4,8 +4,12 @@ import filters from '@/utils/filters'
 import axios from 'axios'
 import { globalError } from './errors'
 import { checkItemConditions } from './itemConditions'
+import { replacePatternInObject, replaceVariablesFromHaystack } from './notation.js'
 import sampleModel from '@/__snapshots/getFormData/model.json';
 import sampleSchema from '@/__snapshots/getFormData/schema.json';
+
+import store from '@/store'  // Adjust path to your store file
+import { CACHE } from '@/store/mutations'
 
 const isArrayable = 'input-treeview|treeview|input-checklist|input-repeater|input-file|input-image'
 // const isMediableTypes = 'input-file|input-image'
