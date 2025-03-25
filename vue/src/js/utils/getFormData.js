@@ -1050,10 +1050,16 @@ const FormatFuncs = {
 
       if(prependerInput && __isset(prependerInput.schema)){
 
+        let prependerItems = []
+        let prependerItem
         if(Array.isArray(handlerValue)){
           if(!prependerInput.items)
             return
           // __log(handlerValue)
+          prependerItems = _.reduce(handlerValue, (acc, id) => {
+            acc[id] = _.find(prependerInput.items, (item) => item.id == id)
+            return acc
+          }, {})
           handlerValue = _.reduce(handlerValue, (acc, id) => {
             acc[id] = {
               label_prefix: __data_get(prependerInput.items, `*id=${id}.${prependerInput.itemTitle}`)?.shift(),
@@ -1071,18 +1077,22 @@ const FormatFuncs = {
           let pattern = new RegExp( String.raw`^(\d+)(${quotedPattern})`)
           for(const val in handlerValue){
             let draftSchema = _.cloneDeep(prependerInput.schema[prependKey])
+            prependerItem = prependerItems[val]
 
-            let pattern = /(\$[\w]+\$)/
+            let pattern = /(\${[\w]+}\$)/
             let _inputName = prependKey.replace(pattern, val)
             relatedKeys.push(_inputName)
             if(!oldSchema[_inputName]){
               newSchema[_inputName] = {
                 ...draftSchema,
                 name: _inputName,
-                label: draftSchema.label
-                  ? `${handlerValue[val].label_prefix} ${draftSchema.label}`
-                  : __snakeToHeadline(handlerValue.label_prefix + draftSchema.name)
+                // label: draftSchema.label
+                //   ? `${handlerValue[val].label_prefix} ${draftSchema.label}`
+                //   : __snakeToHeadline(handlerValue.label_prefix + draftSchema.name)
               }
+
+              // newSchema[_inputName] = replacePatternInObject(newSchema[_inputName], /\$(id)\$/g, val)
+              newSchema[_inputName] = replaceVariablesFromHaystack(newSchema[_inputName], prependerItem)
             }
           }
         }
