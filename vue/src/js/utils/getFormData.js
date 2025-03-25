@@ -405,7 +405,7 @@ export const handleEvents = ( model, schema, input, valueChanged = false) => {
       let methodName = args.shift()
       let runnable = true
 
-      if(methodName == 'formatSet' && !valueChanged)
+      if(methodName == 'formatSetx' && !valueChanged)
         runnable = false
 
       if(runnable && typeof FormatFuncs[methodName] !== 'undefined')
