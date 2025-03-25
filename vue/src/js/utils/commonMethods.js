@@ -263,7 +263,12 @@ export default {
           // Repeater adds a nested level to the model as an array
           displayData[key]._value = _.reduce(value, (acc, obj, id) => {
             id = __isString(id) ? parseInt(id) : id
+
             const item = input.items.find((i) => i.id == id);
+
+            if(!item)
+              return acc
+
             const _displayLabel = item.title || item.name
             // __log(item)
             // acc[_key] = {
