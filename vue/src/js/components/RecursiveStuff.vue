@@ -79,6 +79,9 @@ export default {
     // const directives = props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : []
     // __log(directives)
     // console.log(props.configuration.value);
+    const FuncPattern = /^\{(.*)\}$/
+    const CastPattern = /\$([\w|.|\_|\-]+)/
+
     const slots = computed(() => {
       // console.log(props.configuration);
       if(props.configuration.hasOwnProperty('slots'))
@@ -101,27 +104,58 @@ export default {
     function isObject (value) {
       return __isObject(value)
     }
+
     function applyCasting(value, funcs = []) {
       if(!window.__isString(value))
         return value
 
-      const matches = value.match(castPattern)
+      if(FuncPattern.test(value)) {
+        const matches = value.match(FuncPattern)
+        const evalText = matches[1]
 
-      if (matches) {
-        let result = get(props.bindData, matches[1])
+        let evalParts = evalText.split(' ').map((v) => {
+          if(CastPattern.test(v)) {
+            let evalPartMatches = v.match(CastPattern)
+            let evalPart = evalPartMatches[1]
 
-        if(result !== undefined) {
-          try {
-            funcs.forEach((func) => {
-              if(window[func] && typeof window[func] === 'function')
-                result = window[func](result)
-            })
-          } catch (e) {
-            console.error(e)
+            let evalPartCastedValue = __data_get(props.bindData, evalPart, undefined)
+
+            if(evalPartCastedValue !== undefined) {
+              return evalPartCastedValue
+            }
           }
+          return v
+        })
+
+        try {
+          return eval(evalParts.join(' '))
+        } catch (e) {
+          console.error(e)
         }
-        return result
+
+        // return eval(evalParts.join(' '))
       }
+
+      if(CastPattern.test(value)) {
+        const matches = value.match(CastPattern)
+
+        if (matches) {
+          let result = get(props.bindData, matches[1])
+
+          if(result !== undefined) {
+            try {
+              funcs.forEach((func) => {
+                if(window[func] && typeof window[func] === 'function')
+                  result = window[func](result)
+              })
+            } catch (e) {
+              console.error(e)
+            }
+          }
+          return result
+        }
+      }
+
       return value
     }
 
@@ -144,8 +178,6 @@ export default {
         }
       }
     }
-
-    const castPattern = /\$([\w|.|\_|\-]+)/
 
     const filteredAttributes = cloneDeep(props.configuration.attributes)
 
@@ -182,7 +214,7 @@ export default {
 
               configurationBindKeys.forEach((key) => {
                 let attributeName = key
-                let matches = key.match(castPattern)
+                let matches = key.match(CastPattern)
 
                 if(matches) {
                   attributeName = matches[1]
@@ -208,6 +240,11 @@ export default {
       return boundAttributes
     })
 
+    // const stringValue = computed(() => {
+    //   let bindData = props.bindData
+
+    //   return props.configuration.elements
+    // })
     return {
       // directives: props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : [],
       isTextable,
