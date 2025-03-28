@@ -329,9 +329,10 @@ import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { useForm, makeFormProps } from '@/hooks'
-import { cloneDeep, omit } from 'lodash-es'
+import { cloneDeep, omit, isObject } from 'lodash-es'
 import FormActions from './form/FormActions.vue'
 import FormEvents from './form/FormEvents.vue'
+
 export default {
   name: 'ue-form',
   components: {
@@ -358,7 +359,7 @@ export default {
   },
   setup(props, context) {
     const store = useStore()
-    const formHook = useForm(props, context)
+    const useFormInstance = useForm(props, context)
     const { t, te, locale } = useI18n({ useScope: 'global' })
     // const i18n = useI18n()
 
@@ -372,29 +373,51 @@ export default {
     const formSlots = computed(() => {
       const slots = []
 
+
       // Object.values(formHook.inputSchema).forEach((schema, index) => {
-      Object.values(formHook.issetSchema.value ? props.schema : store.state.form.inputs).forEach((schema, index) => {
-        if (Object.prototype.hasOwnProperty.call(schema, 'slots') && Object.keys(schema.slots).length > 0) {
-          Object.keys(schema.slots).forEach((slotName) => {
+      function getSlots(input, inputName, slots, parentSlotPath = '') {
+        let slotPath = parentSlotPath != '' ? `${parentSlotPath}-${inputName}` : inputName
+
+        if (Object.prototype.hasOwnProperty.call(input, 'slots') && Object.keys(input.slots).length > 0) {
+          Object.keys(input.slots).forEach((slotName) => {
             slots.push({
-              name: slotName,
-              inputName: schema.name,
               type: 'recursive-stuff',
-              context: schema.slots[slotName]
-            })
-          })
-        } else if (Object.prototype.hasOwnProperty.call(schema, 'slotable')) {
+              name: slotName,
+              inputName,
+              slotPath,
+              context: input.slots[slotName]
+            });
+          });
+        } else if (Object.prototype.hasOwnProperty.call(input, 'slotable')) {
           slots.push({
-            name: schema.slotable.name,
-            inputName: schema.slotable.slotTo,
-            selfName: schema.name,
             type: 'form',
-            schema: cloneDeep(formHook.invokeRuleGenerator({
-              [schema.name]: omit(schema, ['slotable'])
+            name: input.slotable.name,
+            inputName: input.slotable.slotTo,
+            selfName: inputName,
+            slotPath,
+            schema: cloneDeep(useFormInstance.invokeRuleGenerator({
+              [inputName]: omit(input, ['slotable'])
             }))
-          })
+          });
         }
-      })
+
+        if (input.schema && isObject(input.schema)) {
+          Object.keys(input.schema).forEach((subInputName) => {
+            let subInput = input.schema[subInputName]
+            getSlots(subInput, subInputName, slots, slotPath);
+          });
+        }
+      }
+
+      Object.keys(useFormInstance.inputSchema.value).forEach((inputName) => {
+        let input = useFormInstance.inputSchema.value[inputName]
+
+        getSlots(input, inputName, slots);
+      });
+
+      // if(slots.length > 0){
+      //   console.log(slots);
+      // }
       return slots
     })
 
@@ -458,7 +481,7 @@ export default {
     })
 
     return {
-      ...formHook,
+      ...useFormInstance,
       formClasses,
       formSlots,
       titleOptions,
