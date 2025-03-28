@@ -144,6 +144,8 @@ export default function useForm(props, context) {
 
   // Data refs
   const VForm = ref(null)
+  const id = Math.ceil(Math.random() * 1000000) + '-form'
+  const formBaseId = id + '-base'
 
   // const issetModel = ref(props.modelValue ? Object.keys(props.modelValue).length > 0 : false)
   // const issetSchema = ref(props.schema ? Object.keys(props.schema).length > 0 : false)
@@ -178,7 +180,8 @@ export default function useForm(props, context) {
   const extraValids = ref(props.actions.length ? props.actions.map(() => true) : [])
 
   const states = reactive({
-    id: Math.ceil(Math.random() * 1000000) + '-form',
+    id,
+    formBaseId,
     VForm,
 
     issetModel,
