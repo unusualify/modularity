@@ -88,7 +88,7 @@ class ProfileController extends BaseController
         $userFields = $this->userRepository->getFormFields($user, $userSchema);
 
         $userPasswordSchema = $this->createFormSchema(getFormDraft('user_password'));
-        $userPasswordFields = $this->userRepository->getFormFields($user, $userPasswordSchema, true);
+        $userPasswordFields = $this->userRepository->getFormFields($user, $userPasswordSchema, noSerialization: false);
         // dd($userSchema);
         $sectionFields = [
             [
