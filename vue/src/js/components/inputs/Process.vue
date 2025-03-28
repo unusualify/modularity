@@ -396,12 +396,12 @@ export default {
           for(const [inputName, formatter] of Object.entries(this.formatters)){
             if(schema[inputName]){
               for(const [formattedKey, formatterValues] of Object.entries(formatter)){
-
+                let newFormatterValues = formatterValues;
                 if(__isString(formatterValues)){
-                  formatterValues = formatterValues.split(',');
+                  newFormatterValues = formatterValues.split(',');
                 }
 
-                let [processableKey, formatterFunction] = formatterValues;
+                let [processableKey, formatterFunction] = newFormatterValues;
 
                 if(__isset(processable[processableKey])){
                   let value = processable[processableKey];
