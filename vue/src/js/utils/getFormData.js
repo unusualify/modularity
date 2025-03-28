@@ -534,6 +534,14 @@ const getTranslationLanguages = (input) => {
 }
 
 const FormatFuncs = {
+  toggleActivateOperations: {
+    class : 'd-none',
+    rawRules : '#',
+  },
+  toggleDeactivateOperations: {
+    class : 'd-none',
+    rawRules : '',
+  },
   formatPermalink: function(args, model, schema, input) {
     const handlerName = input.name
     const handlerSchema = schema[handlerName]
@@ -688,7 +696,6 @@ const FormatFuncs = {
           }else if(newValue !== currentValue){
             store.commit(CACHE.PUSH_CACHE, {key: setterNotation, value: currentValue})
           }
-
 
           _.set(schema, setterNotation, newValue)
           if(inputPropToFormat.match(/schema/)){
@@ -1151,6 +1158,134 @@ const FormatFuncs = {
 
   },
 
+  formatToggleInput: async function(args, model, schema, input, index = null, preview = []) {
+    const inputNotation = this.getInputToFormat(args, model, schema, index )
+
+    if(!inputNotation)
+      return
+
+    const inputToFormat = inputNotation // 1.
+    const setPropFormat = args.shift() ?? 'items.*.toggleValue' // 2.
+    let toggleLevel = args.shift() ?? '-1' // 3.
+
+    toggleLevel = parseInt(toggleLevel) ?? -1
+
+    let {handlerName, handlerSchema, handlerValue} = this.handlers(input, model, index)
+
+    if(handlerValue === undefined || handlerValue === null){
+      return
+    }
+
+    let newValue = this.getNewValue(setPropFormat, handlerValue, handlerSchema)
+
+    if(newValue !== undefined && newValue !== null && _.isBoolean(newValue)){
+      let activate = newValue
+
+      const targetInput = __data_get(schema, inputNotation)
+
+      let selfCacheMainKey = `formatToggleInput:${inputNotation}`
+
+      this.handleToggleInput(activate, inputNotation, targetInput, schema, selfCacheMainKey, toggleLevel)
+    }
+
+  },
+
+  handleToggleInput: function(isActivate, toggleSetterNotation, input, schema, cacheParent, level = -1, count = 0) {
+
+    count += 1
+
+    if(isActivate){
+      _.each(this.toggleActivateOperations, (value, propName) => {
+        let propSetterNotation = toggleSetterNotation + '.' + propName
+        let getterCachedNotation = toggleSetterNotation + '._cached-' + propName
+        let cacheKey = cacheParent ? `${cacheParent}:${propName}` : `${propName}`
+        let currentValue = _.get(schema, propSetterNotation)
+        let cachedDefaultValue = store.getters[CACHE.GET_LAST_CACHE](cacheKey) || _.get(schema, getterCachedNotation) || null
+        let newValue = currentValue
+
+        let valueChanged = false
+
+        if(value === '#'){
+          if(cachedDefaultValue){
+            newValue = cachedDefaultValue
+            valueChanged = true
+          }
+        }else{
+          switch(propName){
+            case 'class':
+              let classes = currentValue ? currentValue.split(' ') : []
+              classes = classes.filter(cls => cls !== value)
+              newValue = classes.join(' ')
+              valueChanged = true
+              break
+            case 'rawRules':
+              newValue = value
+              valueChanged = true
+              break
+          }
+        }
+
+        if(valueChanged){
+          if(cachedDefaultValue === undefined || cachedDefaultValue === null){
+            store.commit(CACHE.PUSH_CACHE, {key: cacheKey, value: currentValue})
+          }
+
+          _.set(schema, propSetterNotation, newValue)
+        }
+      })
+    }else{
+      _.each(this.toggleDeactivateOperations, (value, propName) => {
+        let propSetterNotation = toggleSetterNotation + '.' + propName
+        let getterCachedNotation = toggleSetterNotation + '._cached-' + propName
+        let cacheKey = cacheParent ? `${cacheParent}:${propName}` : `${propName}`
+        let currentValue = _.get(schema, propSetterNotation)
+        let cachedDefaultValue = store.getters[CACHE.GET_LAST_CACHE](cacheKey) || _.get(schema, getterCachedNotation) || null
+        let newValue = currentValue
+
+        let valueChanged = false
+
+        if(value === '#'){
+          if(cachedDefaultValue){
+            newValue = cachedDefaultValue
+            valueChanged = true
+          }
+        }else{
+          switch(propName){
+            case 'class':
+              let classes = currentValue ? currentValue.split(' ') : []
+              classes.push(value)
+              classes = _.uniq(classes)
+              newValue = classes.join(' ')
+
+              valueChanged = true
+              break
+            case 'rawRules':
+              newValue = value
+              valueChanged = true
+              break
+          }
+        }
+
+        if(valueChanged){
+          if(cachedDefaultValue === undefined || cachedDefaultValue === null){
+            store.commit(CACHE.PUSH_CACHE, {key: cacheKey, value: currentValue})
+          }
+          _.set(schema, propSetterNotation, newValue)
+        }
+      })
+    }
+
+    if(level > -1 && level <= count){
+      return
+    }
+
+    if(input.schema && _.isObject(input.schema)){
+      _.each(input.schema, (subInput, subInputName) => {
+        this.handleToggleInput(isActivate, `${toggleSetterNotation}.schema.${subInputName}`, subInput, schema, cacheParent, level, count)
+      })
+    }
+  },
+
   handlers: (input, model, index = null) => {
     const handlerName = input.name
     const handlerModelName = input.name
@@ -1197,9 +1332,26 @@ const FormatFuncs = {
     inputNotationParts.push(inputToFormat)
 
     return inputNotationParts.join('.')
-  }
+  },
+  getNewValue(setPropFormat, handlerValue, handlerSchema){
+    let newValue
 
+    if(handlerValue){
+      let dataSet = []
+      let notation = __wildcard_change(setPropFormat, handlerValue)
+
+      dataSet = __data_get(handlerSchema, notation, null)
+
+      if(Array.isArray(dataSet) && (dataSet.length > 0)){
+        newValue = dataSet.shift()
+
+      }else if(dataSet !== undefined && dataSet !== null){
+        newValue = dataSet
+      }
+    }
+
+    return newValue
+  },
 }
-
 
 
