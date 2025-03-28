@@ -164,7 +164,9 @@
                       >
                       <!-- v-bind="$lodash.omit($attrs, 'onUpdate:schema')" -->
                       <!-- Based on https://gist.github.com/loilo/73c55ed04917ecf5d682ec70a2a1b8e2 -->
-                      <template v-for="(_, name) in $slots" #[name]="slotData"><slot :name="name" v-bind= "{ id, obj, index,  ...slotData}" /></template>
+                      <template v-for="(_, name) in $slots" #[name]="slotData">
+                        <slot :name="name" v-bind= "{ id, obj, index,  ...slotData}" />
+                      </template>
                     </v-custom-form-base>
                   </component>
                 </template>
