@@ -216,6 +216,8 @@
 
                   :xmodelValue="attachments"
                   @xupdate:modelValue="$log('update:modelValue', $event)"
+                  @loading="loadingAttachment = true"
+                  @loaded="loadingAttachment = false"
                 >
                   <template v-slot:activator="activatorProps">
 
@@ -232,13 +234,13 @@
                 <ue-filepond-preview :source="attachments" image-size="24"/>
                 <template v-for="attachment in attachments">
                 </template>
-                <v-btn :color="color" size="default" icon="mdi-paperclip" density="compact" @click="$refs.inputFilepond.browse()" />
+                <v-btn :disabled="loadingAttachment" :color="color" size="default" icon="mdi-paperclip" density="compact" @click="$refs.inputFilepond.browse()" />
                 <v-btn
                   variant="elevated"
                   density="compact"
                   :icon="sendButtonIcon"
                   size="small"
-                  :disabled="loading || !message"
+                  :disabled="loading || !message || loadingAttachment"
                   @click="sendMessage"
                 />
               </template>
@@ -353,6 +355,7 @@
         message: '',
         messages: [],
         loading: true,
+        loadingAttachment: false,
         page: this.initialPage,
         lastPage: 1,
         dialogOpen: false,
