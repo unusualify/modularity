@@ -155,9 +155,7 @@
               @action-complete="$emit('actionComplete', $event)"
             />
 
-            <slot name="top" v-bind="{item: formItem, schema}">
-
-            </slot>
+            <slot name="top" v-bind="{item: formItem, schema}"></slot>
 
             <!-- Middle Form Actions -->
             <FormActions v-if="actionsPosition == 'middle' && isEditing"
@@ -168,7 +166,7 @@
             />
 
             <v-custom-form-base
-              :id="`ue-wrapper-${id}`"
+              :id="formBaseId"
 
               v-model="model"
               :schema="inputSchema"
@@ -183,30 +181,27 @@
               <template
                 v-for="(_slot, key) in formSlots"
                 :key="key"
-                v-slot:[`slot-inject-${_slot.name}-key-ue-wrapper-${id}-${_slot.inputName}`]="_slotData"
+                v-slot:[`slot-inject-${_slot.name}-key-${formBaseId}-${_slot.slotPath}`]="_slotScope"
                 >
                 <template v-if="_slot.type == 'form'">
                   <v-custom-form-base
-                    :id="`ue-wrapper-${id}-${_slot.name}`"
+                    :id="`${formBaseId}-${_slot.name}`"
                     v-model="model"
                     v-model:schema="_slot.schema"
                     :row="rowAttribute"
 
                     >
-
                   </v-custom-form-base>
                 </template>
                 <template v-else-if="_slot.type == 'recursive-stuff'">
                   <ue-recursive-stuff
-                    v-for="(context, i) in _slot.context.elements"
-                    :key="i"
-                    :configuration="context"
-                    :bindData="_slotData">
+                    :configuration="_slot.context"
+                    :bindData="_slotScope">
                   </ue-recursive-stuff>
+
                 </template>
                 <!-- <div>
                   {{ $log(_slot, _slotData) }}
-                  Hello
                 </div> -->
               </template>
               <!-- <template v-slot:[`slot-inject-prepend-key-treeview-slot-permissions`]="{open}" >
