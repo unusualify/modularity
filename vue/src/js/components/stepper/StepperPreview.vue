@@ -37,13 +37,13 @@
               ]"
               class="mb-4 py-4"
               elevation="2"
-              :items="[
+              :items="data.form_card_items || [
                 [
                   data.name || 'N/A ',
                   data.description || 'N/A',
                   data.tags || [],
                 ],
-                data.basePrice_show || 'N/A'
+                data.base_price_without_vat_formatted || 'N/A'
               ]"
               :actions="[
                 {
@@ -64,7 +64,7 @@
                 '_actions': 'flex-0-1',
               }"
             >
-              <!-- Name and description -->
+              <!-- Name, description, and tags -->
               <template #[`segment.1`]="segmentScope">
                 <div class="text-body-2 font-weight-medium mb-1">
                   {{ segmentScope.data[0] }}
@@ -72,7 +72,7 @@
                 <div class="text-caption">
                   {{ segmentScope.data[1] }}
                 </div>
-                <div v-if="segmentScope.data[2].length > 0" class="text-caption mt-4 d-flex ga-4 flex-wrap" >
+                <div v-if="Array.isArray(segmentScope.data[2]) && segmentScope.data[2].length > 0" class="text-caption mt-4 d-flex ga-4 flex-wrap" >
                   <v-chip v-for="tag in segmentScope.data[2]" :key="tag" variant="outlined" size="small" class="">
                     {{ tag.name ?? tag.slug }}
                   </v-chip>
@@ -116,11 +116,11 @@ export default {
   props: {
     formattedPreview: {
       type: Array,
-      required: true
+      default: () => []
     },
     previewFormData: {
       type: Array,
-      required: true
+      default: () => []
     },
     lastStepModel: {
       type: Object,
