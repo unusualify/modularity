@@ -1,6 +1,6 @@
 <template>
   <template v-if="!configuration.tag && isTextable(configuration.elements)">
-    {{ configuration.elements }}
+    {{ applyCasting(configuration.elements) }}
   </template>
   <template v-else-if="!configuration.tag && isArray(configuration.elements)">
     <component
