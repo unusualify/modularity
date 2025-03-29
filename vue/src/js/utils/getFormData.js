@@ -2,14 +2,27 @@ import _ from 'lodash-es'
 import { useI18n } from 'vue-i18n'
 import filters from '@/utils/filters'
 import axios from 'axios'
-import { globalError } from './errors'
-import { checkItemConditions } from './itemConditions'
-import { replacePatternInObject, replaceVariablesFromHaystack } from './notation.js'
-import sampleModel from '@/__snapshots/getFormData/model.json';
-import sampleSchema from '@/__snapshots/getFormData/schema.json';
 
 import store from '@/store'  // Adjust path to your store file
 import { CACHE } from '@/store/mutations'
+
+import {
+  isViewOnlyInput,
+  isFormEventInput,
+  getTranslationInputsCount,
+  getTranslationInputs,
+  flattenGroupSchema,
+  processInputs
+} from './schema'
+
+import { globalError } from './errors'
+import { checkItemConditions } from './itemConditions'
+import { replacePatternInObject, replaceVariablesFromHaystack } from './notation'
+import { getTranslationLanguages } from './locale'
+
+import sampleModel from '@/__snapshots/getFormData/model.json';
+import sampleSchema from '@/__snapshots/getFormData/schema.json';
+
 
 const isArrayable = 'input-treeview|treeview|input-checklist|input-repeater|input-file|input-image'
 // const isMediableTypes = 'input-file|input-image'
@@ -203,26 +216,8 @@ export const getFormEventSchema = (inputs, model = null, isEditing = false) => {
     if(!isEditing && __isset(input.creatable) && (input.creatable === false || input.creatable === 'hidden'))
       return false
 
-
-
     return isFormEventInput(input, model)
   })
-}
-
-export const getTranslationInputsCount = (inputs) => {
-  return getTranslationInputs(inputs).length
-}
-
-export const getTranslationInputs = (inputs, acc = []) => {
-  return _.reduce(inputs, (acc, input) => {
-    if(__isset(input) && __isset(input.schema) && ['wrap', 'group', 'repeater', 'input-repeater'].includes(input.type)){
-      acc = getTranslationInputs(input.schema, acc)
-    } else if(Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated)
-      acc.push(input)
-
-    return acc
-    // return Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated
-  }, acc)
 }
 
 export const getSubmitFormData = (inputs, item = null, rootState = null) => {
@@ -347,16 +342,16 @@ export const handleInputEvents = (events = null, fields, moduleSchema, name = nu
           // __log(methodName, e)
           if (isFieldFalsy) {
             // __log('formatPermalink', _field, slugify(_field))
-            _fields[formattedInputName] = slugify(_field)
+            _fields[formattedInputName] = filters.slugify(_field)
           }
           break
         case 'formatPermalinkPrefix':
           // __log(methodName, e)
           if (['select', 'combobox'].includes(_schema.type) && _field && isFieldFalsy) {
-            const newValue = slugify(_schema.items.find((item) => item[_schema.itemValue] === _field)[_schema.itemTitle])
+            const newValue = filters.slugify(_schema.items.find((item) => item[_schema.itemValue] === _field)[_schema.itemTitle])
             moduleSchema[formattedInputName ?? 'slug'].prefix = moduleSchema[formattedInputName ?? 'slug'].prefixFormat.replace(':' + formatingInputName, newValue)
           } else if (['text'].includes(_schema.type) && isFieldFalsy) {
-            const newValue = slugify(_field)
+            const newValue = filters.slugify(_field)
             const [firstLevelName, secondLevelName] = formattedInputName.split('.')
             moduleSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefix = moduleSchema[firstLevelName].schema[secondLevelName ?? 'slug'].prefixFormat.replace(':' + formatingInputName, newValue)
           }
@@ -470,67 +465,15 @@ export default {
   getSchema,
   getModel,
   getSubmitFormData,
+
   setSchemaInputField,
   onInputEventFormData,
+
   handleInputEvents,
   handleEvents,
   handleMultiFormEvents,
+
   testMethods
-}
-
-export const processInputs = (inputObj) => {
-  return _.reduce(inputObj, (acc, value, key) => {
-    if (value.type === 'wrap' && value.schema) {
-      Object.assign(acc, processInputs(value.schema));
-    } else if (value.type === 'groupz' && value.schema) {
-      // acc[key] = {
-      //   ...value,
-      //   schema: processInputs(value.schema)
-      // };
-    } else if (!value.slotable) {
-      acc[key] = value;
-    } else {
-      acc[key] = value;
-      // __log(inputObj, value, key)
-    }
-    return acc;
-  }, {});
-};
-
-const flattenGroupSchema = (schema, groupName) => {
-  return _.reduce(schema, (acc, value, key) => {
-    const newKey = key.split('.').filter(part => part !== groupName).join('.');
-    acc[newKey] = value;
-    return acc;
-  }, {});
-};
-
-const slugify = (newValue) => {
-  let text = ''
-  if (newValue.value && typeof newValue.value === 'string') {
-    text = newValue.value
-  } else if (typeof newValue === 'string') {
-    text = newValue
-  }
-
-  return filters.slugify(text)
-}
-
-export const isFormEventInput = (input, model) => {
-  return Object.prototype.hasOwnProperty.call(input, 'isEvent')
-    && input.isEvent
-    && ( ['select', 'autocomplete', 'combobox', 'switch'].includes(input.type)
-      || __isset(input.viewOnlyComponent)
-      || input.noSubmit
-    )
-}
-
-const isViewOnlyInput = (input) => {
-  return Object.prototype.hasOwnProperty.call(input, 'viewOnlyComponent')
-}
-
-const getTranslationLanguages = (input) => {
-  return _.map(window[import.meta.env.VUE_APP_NAME].STORE.languages.all, 'value')
 }
 
 const FormatFuncs = {
@@ -565,10 +508,10 @@ const FormatFuncs = {
     const inputFormatter = args.shift()
 
     if (['select', 'combobox'].includes(handlerSchema.type) && handlerValue && isFieldFalsy) {
-      const newValue = slugify( handlerSchema.items.find((item) => item[handlerSchema.itemValue] === handlerValue)[handlerSchema.itemTitle])
+      const newValue = filters.slugify( handlerSchema.items.find((item) => item[handlerSchema.itemValue] === handlerValue)[handlerSchema.itemTitle])
       schema[inputToFormat ?? 'slug'].prefix = schema[inputToFormat ?? 'slug'].prefixFormat.replace(':' + inputFormatter, newValue)
     } else if (['text'].includes(handlerSchema.type) && isFieldFalsy) {
-      const newValue = slugify(value)
+      const newValue = filters.slugify(value)
       const [firstLevelName, secondLevelName] = inputToFormat.split('.')
       schema[firstLevelName].schema[secondLevelName ?? 'slug'].prefix = schema[firstLevelName].schema[secondLevelName ?? 'slug'].prefixFormat.replace(':' + inputFormatter, newValue)
     }
