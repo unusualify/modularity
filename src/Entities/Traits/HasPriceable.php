@@ -41,6 +41,17 @@ trait HasPriceable
         });
     }
 
+    public function initializeHasPriceable()
+    {
+        $this->append(
+            'base_price_raw', // price excluding vat
+            'base_price_total', // price including vat
+            'base_price_formatted', // price excluding vat formatted (+ VAT)
+            'base_price_without_vat_formatted', // price excluding vat formatted
+            'base_price_total_formatted' // price including vat formatted
+        );
+    }
+
     public function prices(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(Price::class, 'priceable');
@@ -57,21 +68,41 @@ trait HasPriceable
     protected function basePriceRaw(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $this->basePrice->display_price,
+            get: fn ($value) => $this->basePrice ? $this->basePrice->price_excluding_vat : null,
+        );
+    }
+
+    protected function basePriceTotal(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->basePrice ? $this->basePrice->price_including_vat : null,
         );
     }
 
     protected function basePriceFormatted(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => \Oobook\Priceable\Facades\PriceService::formatAmount($this->basePriceRaw) . (config('priceable.prices_are_including_vat') ? '' : ' +' . __('VAT')),
+            get: fn ($value) => $this->base_price_raw
+                ? \Oobook\Priceable\Facades\PriceService::formatAmount($this->base_price_raw) . (config('priceable.prices_are_including_vat') ? '' : ' +' . __('VAT'))
+                : null,
         );
     }
 
-    protected function basePriceFormattedWithoutVat(): Attribute
+    protected function basePriceWithoutVatFormatted(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => \Oobook\Priceable\Facades\PriceService::formatAmount($this->basePriceRaw),
+            get: fn ($value) => $this->base_price_raw
+                ? \Oobook\Priceable\Facades\PriceService::formatAmount($this->base_price_raw)
+                : null,
+        );
+    }
+
+    protected function basePriceTotalFormatted(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->base_price_total
+                ? \Oobook\Priceable\Facades\PriceService::formatAmount($this->base_price_total)
+                : null,
         );
     }
 }
