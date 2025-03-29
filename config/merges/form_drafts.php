@@ -83,11 +83,8 @@ return [
             ],
         ],
         'password_confirmation' => [
-            'type' => '_password',
-            'name' => 'password_confirmation',
-            'label' => 'New Password',
+            'type' => '_password_confirmation',
             'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:6',
         ],
         'password' => [
             'type' => '_password',
@@ -208,4 +205,33 @@ return [
             'label' => 'Password',
         ],
     ],
+    'login_form' => [
+        'email' => [
+            'type' => 'text',
+            'name' => 'email',
+            // 'label' => ___('authentication.email'),
+            'label' => 'E-mail',
+            'hint' => 'enter @example.com',
+            'default' => '',
+            'col' => [
+                'lg' => 12,
+            ],
+            'rules' => [
+                ['email'],
+            ],
+        ],
+        'password' => [
+            'type' => 'password',
+            'name' => 'password',
+            'label' => 'Password',
+            'default' => '',
+            'appendInnerIcon' => '$non-visibility',
+            'slotHandlers' => [
+                'appendInner' => 'password',
+            ],
+            'col' => [
+                'lg' => 12,
+            ],
+        ],
+    ]
 ];
