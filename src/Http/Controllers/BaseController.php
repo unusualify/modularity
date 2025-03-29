@@ -63,6 +63,38 @@ abstract class BaseController extends PanelController
         $this->addIndexWiths();
 
         if ($this->request->ajax()) {
+            if($this->request->has('ids')){
+                $ids = $this->request->get('ids');
+
+                if(is_string($ids)){
+                    $ids = explode(',', $ids);
+                }
+
+                $eagers = $this->request->get('eagers') ?? [];
+                if(is_string($eagers)){
+                    $eagers = explode(',', $eagers);
+                }
+
+                $scopes = $this->request->get('scopes') ?? [];
+                if(is_string($scopes)){
+                    $scopes = explode(',', $scopes);
+                }
+
+                $orders = $this->request->get('orders') ?? [];
+                if(is_string($orders)){
+                    $orders = explode(',', $orders);
+                }
+
+                return Response::json(
+                    $this->repository->getByIds(
+                        ids: $ids,
+                        with: $eagers,
+                        scopes: $scopes,
+                        orders: $orders,
+                        isFormatted: false,
+                    )
+                );
+            }
             return Response::json([
                 'resource' => $this->getJSONData(),
                 'mainFilters' => $this->getTableMainFilters(),
