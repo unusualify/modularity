@@ -185,35 +185,7 @@ class LoginController extends Controller
                     'align' => 'center',
                     'justify' => 'center',
                 ],
-                'schema' => ($schema = $this->createFormSchema([
-                    'email' => [
-                        'type' => 'text',
-                        'name' => 'email',
-                        'label' => ___('authentication.email'),
-                        'hint' => 'enter @example.com',
-                        'default' => '',
-                        'col' => [
-                            'lg' => 12,
-                        ],
-                        'rules' => [
-                            ['email'],
-                        ],
-                    ],
-                    'password' => [
-                        'type' => 'password',
-                        'name' => 'password',
-                        'label' => 'Password',
-                        'default' => '',
-                        'appendInnerIcon' => '$non-visibility',
-                        'slotHandlers' => [
-                            'appendInner' => 'password',
-                        ],
-                        'col' => [
-                            'lg' => 12,
-                        ],
-                    ],
-                ])),
-
+                'schema' => ($schema = $this->createFormSchema(getFormDraft('login_form'))),
                 'actionUrl' => route(Route::hasAdmin('login')),
                 'buttonText' => __('authentication.sign-in'),
                 'formClass' => 'py-6',
