@@ -851,6 +851,15 @@ trait FormSchema
                             $events[] = "formatRemoveValue:{$inputToFormat}";
                         }
                         break;
+                    case 'toggleInput': // to toggle d-none class and rawRules
+                        $inputToFormat = array_shift($args) ?? '';
+                        $toggleValue = array_shift($args) ?? 'toggleValue';
+                        $toggleLevel = array_shift($args) ?? -1;
+
+                        if ($inputToFormat) {
+                            $events[] = "formatToggleInput:{$inputToFormat}:{$toggleValue}:{$toggleLevel}";
+                        }
+                        break;
                     default:
                         // code...
                         break;
