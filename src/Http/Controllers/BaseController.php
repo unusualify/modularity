@@ -173,6 +173,7 @@ abstract class BaseController extends PanelController
 
         $input = $this->validateFormRequest()->all();
 
+
         // $optionalParent = $parentId ? [$this->getParentModuleForeignKey() => $parentId] : [];
         $optionalParent = $this->nestedParentScopes();
 
@@ -249,7 +250,7 @@ abstract class BaseController extends PanelController
 
         if ($this->request->ajax()) {
 
-            return $item->toArray();
+            return Response::json($item->toArray());
             // return $data;
             // return $indexData + ['replaceUrl' => true];
         }
