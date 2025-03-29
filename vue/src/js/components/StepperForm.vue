@@ -120,7 +120,8 @@
   import { toRefs, reactive, ref, computed } from 'vue';
   import { map, reduce, find, each, filter, get, isEqual, uniq } from 'lodash-es';
 
-  import { getModel, handleMultiFormEvents } from '@/utils/getFormData.js'
+  import { getModel } from '@/utils/getFormData.js'
+  import { handleMultiFormEvents } from '@/utils/formEvents'
 
   import { useInputHandlers, useValidation } from '@/hooks'
   import api from '@/store/api/form'

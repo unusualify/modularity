@@ -417,7 +417,8 @@
 // import Vue from 'vue'
 import { getCurrentInstance } from 'vue'
 import { get, set, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex, omit } from 'lodash-es'
-import getFormData from '@/utils/getFormData.js'
+
+import formEvents from '@/utils/formEvents'
 
 // import VueMask from 'v-mask'
 // Vue.use(VueMask, {
@@ -684,7 +685,8 @@ export default {
 
       this.updateArrayFromState(this.valueIntern, this.formSchema)
 
-      getFormData.setSchemaInputField(this.formSchema, this.valueIntern)
+      // getFormData.setSchemaInputField(this.formSchema, this.valueIntern)
+      formEvents.setSchemaInputField(this.formSchema, this.valueIntern)
 
       return this.formSchema
     },
@@ -1083,7 +1085,7 @@ export default {
       let key = obj.key
       // when cascade select changed
       // this.setCascadeSelect(obj)
-      getFormData.onInputEventFormData(
+      formEvents.onInputEventFormData(
         obj,
         this.formSchema,
         this.storeStateData,
