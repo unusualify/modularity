@@ -9,7 +9,9 @@ import { useInputHandlers, useValidation, useLocale, useItemActions } from '@/ho
 import { FORM, ALERT } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
 import api from '@/store/api/form'
-import { getModel, getSubmitFormData, getSchema, handleEvents, getTranslationInputsCount, getFormEventSchema, processInputs } from '@/utils/getFormData.js'
+import { getModel, getSubmitFormData, getSchema, handleEvents, getFormEventSchema, } from '@/utils/getFormData.js'
+import { getTranslationInputsCount, processInputs } from '@/utils/schema.js'
+
 import { redirector } from '@/utils/response'
 
 export const makeFormProps = propsFactory({
