@@ -873,7 +873,7 @@ trait FormSchema
                     // if($input['name'] == 'packageCountry'){
                     //     dd($data, $events, explode('|', $data['event'] ?? ''));
                     // }
-                    $data['event'] = implode('|', array_merge($events, isset($data['event']) ? explode('|', $data['event']) : []));
+                    $data['event'] = implode('|', array_unique(array_merge($events, isset($data['event']) ? explode('|', $data['event']) : [])));
                 } catch (\Throwable $th) {
                     dd($events, $data, $th, $this->config);
                 }
