@@ -11,7 +11,8 @@ trait ManageTable
         Table\TableColumns,
         Table\TableFilters,
         Table\TableRows,
-        Table\TableBulkActions;
+        Table\TableBulkActions,
+        Table\TableActions;
 
     /**
      * @param Application $app

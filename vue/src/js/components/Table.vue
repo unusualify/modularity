@@ -168,6 +168,10 @@
                     :density="$vuetify.display.smAndDown ? 'compact' : (filterBtnOptions['density'] ?? 'comfortable')"
                   />
 
+                  <TableActions
+                    :actions="actions"
+                  />
+
                   <!-- create button -->
                   <v-btn v-if="$can('create', permissionName) && !noForm && !someSelected && createOnModal"
                     v-bind="addBtnOptions"
@@ -819,6 +823,7 @@
 import Draggable from 'vuedraggable'
 import { VDataTableRows } from 'vuetify/lib/components/VDataTable/index.mjs'
 import { VDataTableRow } from 'vuetify/lib/components/VDataTable/index.mjs'
+import TableActions from '__components/table/TableActions.vue'
 
 import {
   makeTableProps,
@@ -849,7 +854,8 @@ export default {
     ActiveTableItem,
     Draggable,
     VDataTableRow,
-    PaymentService
+    PaymentService,
+    TableActions
 
   },
   props: {

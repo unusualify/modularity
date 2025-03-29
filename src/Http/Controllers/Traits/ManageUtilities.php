@@ -70,6 +70,7 @@ trait ManageUtilities
                     'bulkActions' => $this->getTableBulkActions(),
                     'nestedData' => $this->getNestedData(),
                     'formActions' => $this->getFormActions(),
+                    'actions' => $this->getTableActions(),
                     'endpoints' => $tableEndpoints,
                 ],
                 ($this->isNested ? ['titlePrefix' => $this->nestedParentModel->getTitleValue() . ' \ '] : []),
