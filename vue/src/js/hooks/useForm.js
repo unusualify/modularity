@@ -133,7 +133,10 @@ export const makeFormProps = propsFactory({
     type: Number,
     default: 600
   },
-
+  additionalSectionDialogTitle: {
+    type: String,
+    default: 'Additional Options'
+  },
 })
 
 export default function useForm(props, context) {
@@ -182,6 +185,13 @@ export default function useForm(props, context) {
   const formEventSchema = ref(getFormEventSchema(rawSchema.value, { ...model.value, ...formItem.value }, props.isEditing))
   const extraValids = ref(props.actions.length ? props.actions.map(() => true) : [])
 
+  const hasAdditionalSection = computed(() => context.slots.right
+    || context.slots['right.top']
+    || context.slots['right.bottom']
+    || context.slots['right.middle']
+    || ['right-top', 'right-middle', 'right-bottom'].includes(props.actionsPosition)
+  )
+
   const states = reactive({
     id,
     formBaseId,
@@ -216,6 +226,10 @@ export default function useForm(props, context) {
     ),
     reference: computed(() => 'ref-' + states.id),
     hasTraslationInputs: computed(() => getTranslationInputsCount(inputSchema.value) > 0),
+
+    hasAdditionalSection,
+
+    showAdditionalSectionDialog: false,
   })
   // Methods
 

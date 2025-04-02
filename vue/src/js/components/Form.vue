@@ -225,7 +225,7 @@
             />
           </div>
 
-          <div v-if="$slots.right || $slots['right.top'] || $slots['right.bottom'] || $slots['right.middle'] || ['right-top', 'right-middle', 'right-bottom'].includes(actionsPosition)"
+          <div v-if="hasAdditionalSection && $vuetify.display.lgAndUp"
             :class="[
               `flex-grow-0 ml-${rightSlotGap}`,
             ]"
@@ -240,44 +240,75 @@
                 ...(rightSlotMinWidth ? {minWidth: `${rightSlotMinWidth}px`} : {}),
                 ...(rightSlotMaxWidth ? {maxWidth: `${rightSlotMaxWidth}px`} : {})
               }"
-              >
-
+            >
             </div>
             <slot name="right" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}">
-
-              <!-- Right Top Form Actions -->
-              <FormActions v-if="actionsPosition == 'right-top' && isEditing"
-                :modelValue="formItem"
-                :actions="actions"
+              <AdditionalSectionContent
+                :actions-position="actionsPosition"
                 :is-editing="isEditing"
-                @action-complete="$emit('actionComplete', $event)"
-              />
-
-              <slot name="right.top" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
-
-              <!-- Right Middle Form Actions -->
-              <FormActions v-if="actionsPosition == 'right-middle' && isEditing"
-                :modelValue="formItem"
+                :form-item="formItem"
                 :actions="actions"
-                :is-editing="isEditing"
                 @action-complete="$emit('actionComplete', $event)"
-              />
-
-              <slot name="right.middle" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
-
-              <!-- Right Bottom Form Actions -->
-              <FormActions v-if="actionsPosition == 'right-bottom' && isEditing"
-                :modelValue="formItem"
-                :actions="actions"
-                :is-editing="isEditing"
-                @action-complete="$emit('actionComplete', $event)"
-              />
-
-              <slot name="right.bottom" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
-
+              >
+                <template #right-top>
+                  <slot name="right.top" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                </template>
+                <template #right-middle>
+                  <slot name="right.middle" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                </template>
+                <template #right-bottom>
+                  <slot name="right.bottom" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                </template>
+              </AdditionalSectionContent>
             </slot>
-
           </div>
+
+          <!-- Mobile dialog/modal for right section -->
+          <v-btn
+            v-if="hasAdditionalSection && $vuetify.display.mdAndDown"
+            icon
+            class="mt-2"
+            @click="showAdditionalSectionDialog = true"
+          >
+            <v-icon>mdi-menu-right</v-icon>
+          </v-btn>
+
+          <v-dialog
+            v-if="hasAdditionalSection"
+            v-model="showAdditionalSectionDialog"
+            max-width="500px"
+          >
+            <v-card>
+              <v-card-title class="d-flex align-center">
+                <span>{{ additionalSectionDialogTitle || 'Additional Options' }}</span>
+                <v-spacer></v-spacer>
+                <v-btn variant="text" size="default" icon @click="showAdditionalSectionDialog = false">
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+              </v-card-title>
+              <v-card-text>
+                <slot name="right" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}">
+                  <AdditionalSectionContent
+                    :actions-position="actionsPosition"
+                    :is-editing="isEditing"
+                    :form-item="formItem"
+                    :actions="actions"
+                    @action-complete="$emit('actionComplete', $event)"
+                  >
+                    <template #right-top>
+                      <slot name="right.top" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                    </template>
+                    <template #right-middle>
+                      <slot name="right.middle" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                    </template>
+                    <template #right-bottom>
+                      <slot name="right.bottom" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                    </template>
+                  </AdditionalSectionContent>
+                </slot>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
         </div>
 
 
@@ -333,11 +364,59 @@ import { cloneDeep, omit, isObject } from 'lodash-es'
 import FormActions from './form/FormActions.vue'
 import FormEvents from './form/FormEvents.vue'
 
+// Create a new component for the right section content
+const AdditionalSectionContent = {
+  props: {
+    actionsPosition: String,
+    isEditing: Boolean,
+    formItem: Object,
+    actions: Array
+  },
+  emits: ['action-complete'],
+  template: `
+    <div>
+      <!-- Right Top Form Actions -->
+      <FormActions v-if="actionsPosition == 'right-top' && isEditing"
+        :modelValue="formItem"
+        :actions="actions"
+        :is-editing="isEditing"
+        @action-complete="$emit('actionComplete', $event)"
+      />
+
+      <slot name="right-top"></slot>
+
+      <!-- Right Middle Form Actions -->
+      <FormActions v-if="actionsPosition == 'right-middle' && isEditing"
+        :modelValue="formItem"
+        :actions="actions"
+        :is-editing="isEditing"
+        @action-complete="$emit('actionComplete', $event)"
+      />
+
+      <slot name="right-middle"></slot>
+
+      <!-- Right Bottom Form Actions -->
+      <FormActions v-if="actionsPosition == 'right-bottom' && isEditing"
+        :modelValue="formItem"
+        :actions="actions"
+        :is-editing="isEditing"
+        @action-complete="$emit('actionComplete', $event)"
+      />
+
+      <slot name="right-bottom"></slot>
+    </div>
+  `,
+  components: {
+    FormActions
+  }
+}
+
 export default {
   name: 'ue-form',
   components: {
     FormActions,
-    FormEvents
+    FormEvents,
+    AdditionalSectionContent
   },
   emits: [
     'update:valid',
@@ -350,6 +429,7 @@ export default {
   props: {
     ...makeFormProps(),
   },
+
   provide() {
       // use function syntax so that we can access `this`
       return {
