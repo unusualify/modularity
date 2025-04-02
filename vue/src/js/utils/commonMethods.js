@@ -359,7 +359,7 @@ export default {
   },
   $getDisplayKeys: function (item) {
     return _.reduce(Object.keys(item ?? {}), (acc, key) => {
-      let matches = key.match(/^([a-zA-Z0-9]+)(_show)$/)
+      let matches = key.match(/^([a-zA-Z0-9]+)(_(show|formatted))$/)
       if(matches){
         acc[key] = matches[1]
       }
