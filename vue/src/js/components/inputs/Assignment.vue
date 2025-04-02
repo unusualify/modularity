@@ -15,11 +15,11 @@
 
             <!-- Assignee Details -->
             <v-list v-if="(isAssignee || isAuthorized) && lastAssignment"
+              id="assigneeList"
               :items="[formattedAssignments[1]]"
               lines="three"
               item-props
               class="pa-0 v-input-assign__list--assignee"
-
             >
               <template v-slot:prepend="{ prependAvatar }" v-if="isAssignee">
                 <v-menu
@@ -89,6 +89,7 @@
               >
                 <template v-slot:activator="{ props }">
                   <v-btn
+                    id="createAssignmentBtn"
                     icon="mdi-account-reactivate"
                     size="default"
                     rounded
@@ -98,7 +99,7 @@
                     v-bind="props"
                     :disabled="!input || updating"
                     :loading="updating"
-                    @click="createFormModal = true"
+                    @click="createFormModalActive = true"
                   />
                 </template>
                 {{ $t('Assign') }}
@@ -107,18 +108,19 @@
               <!-- List Assignments -->
               <ue-modal
                 v-if="assignments.length > 0"
-                v-model="listAssignmentsModal"
+                v-model="listAssignmentsModalActive"
                 widthType="md"
                 transition="scroll-y-reverse-transition"
                 scrollable
                 height="450"
               >
                 <template v-slot:activator="modalActivatorScope">
-                  <v-tooltip v-if="isAuthorized"
+                  <v-tooltip
                     location="top"
                   >
                     <template v-slot:activator="tooltipActivatorScope">
                       <v-btn
+                        id="showHistoryBtn"
                         icon="mdi-clipboard-list-outline"
                         size="default"
                         rounded
@@ -161,9 +163,9 @@
           </div>
 
           <!-- Create Assignment Modal -->
-          <ue-modal v-if="isAuthorized"
+          <ue-modal
             ref="createFormModal"
-            v-model="createFormModal"
+            v-model="createFormModalActive"
             widthType="md"
 
             :persistent="updating"
@@ -172,6 +174,7 @@
             <v-card>
               <v-card-text >
                 <v-form
+                  id="createAssignmentForm"
                   ref="createForm"
                   class="d-flex flex-column"
                   @submit.prevent="createAssignment"
@@ -200,7 +203,11 @@
                       v-model="createFormModel.due_at"
                       :variant="variant"
                       :label="$t('Due Date')"
-                      :rules="[requiredRule('classic', 1, 1, 'Pick a due date'), dateRule, futureDateRule(7, 'days')]"
+                      :rules="[
+                        requiredRule('classic', 1, 1, 'Pick a due date'),
+                        dateRule(),
+                        futureDateRule(7, 'days')
+                      ]"
                       :validate-on="`submit blur`"
 
                       class="w-50"
@@ -252,7 +259,7 @@
                       density="comfortable"
                       variant="plain"
                       :loading="updating"
-                      @click="createFormModal = false"
+                      @click="createFormModalActive = false"
                     >
                       {{ $t('Cancel') }}
                     </v-btn-secondary>
@@ -330,7 +337,7 @@ export default {
 
   },
   setup (props, context) {
-    const {requiredRule, minRule, futureDateRule, dateRule} = useValidation()
+    const {requiredRule, minRule, futureDateRule, dateRule} = useValidation(props)
 
     return {
       ...useInput(props, context),
@@ -350,9 +357,9 @@ export default {
 
       assignments: [],
 
-      listAssignmentsModal: false,
+      listAssignmentsModalActive: false,
 
-      createFormModal: false,
+      createFormModalActive: false,
       createFormModel: {
         assignee_id: null,
         due_at: null,
@@ -480,7 +487,7 @@ export default {
           (response) => {
             if(response.status === 200) {
               self.assignments.unshift(response.data)
-              self.createFormModal = {
+              self.createFormModel = {
                 assignee_id: null,
                 due_at: null,
                 description: null,
