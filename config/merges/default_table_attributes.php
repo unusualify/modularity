@@ -104,31 +104,31 @@ return [
         ],
     ],
     'customRowComponent' => [
-    /**
-     * an object with the following properties:
-     * 'iteratorComponent' => 'configurable-card-iterator',
-     * 'col' => [
-     *     'cols' => 12,
-     * ]
-     *
-     * or
-     *
-     * an array of objects with the following properties:
-     * [
-     *     'name' => 'configurable-card-iterator',
-     *     'allowedRoles' => ['admin'],
-     *     'col' => [
-     *     'cols' => 12,
-     * ]
-     * ],
-     * [
-     *     'name' => 'configurable-card-iterator',
-     *     'allowedRoles' => ['manager'],
-     *     'col' => [
-     *     'cols' => 12,
-     * ]
-     * ],
-     */
+        /**
+         * an object with the following properties:
+         * 'iteratorComponent' => 'configurable-card-iterator',
+         * 'col' => [
+         *     'cols' => 12,
+         * ]
+         *
+         * or
+         *
+         * an array of objects with the following properties:
+         * [
+         *     'name' => 'configurable-card-iterator',
+         *     'allowedRoles' => ['admin'],
+         *     'col' => [
+         *     'cols' => 12,
+         * ]
+         * ],
+         * [
+         *     'name' => 'configurable-card-iterator',
+         *     'allowedRoles' => ['manager'],
+         *     'col' => [
+         *     'cols' => 12,
+         * ]
+         * ],
+         */
     ],
     'cellOptions' => [
         'maxChar' => 3,
@@ -138,7 +138,11 @@ return [
     ],
 
     'formAttributes' => [
-        'formClass' => 'px-6 pt-6 pb-0',
+        'rowAttribute' => [
+            'noGutters' => false,
+            'class' => 'py-4'
+        ],
+        'formClass' => 'mx-3 px-3 pt-6 pb-0',
         'scrollable' => true,
         'hasSubmit' => false,
         'fillHeight' => true,
