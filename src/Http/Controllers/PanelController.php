@@ -487,13 +487,6 @@ abstract class PanelController extends CoreController
         );
 
         if (@class_exists($formRequest)) {
-            // dd(
-            //     Arr::mapWithKeys($chunkInputs, function( $input, $key){
-            //         return isset($input['name']) && isset($input['rules']) && is_string($input['rules'])
-            //             ? [$input['name'] => $input['rules'] ?? []]
-            //             : [];
-            //     })
-            // );
             return App::makeWith($formRequest, [
                 'rules' => Arr::mapWithKeys($chunkInputs, function ($input, $key) {
 
