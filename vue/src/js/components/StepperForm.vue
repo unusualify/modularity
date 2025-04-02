@@ -568,7 +568,7 @@
             values: map(lastStepSelections, (data) => {
               return {
                 title: data.name || data.title || 'N/A',
-                value: data.basePrice_show || 'N/A',
+                value: data.base_price_without_vat_formatted || 'N/A',
               }
             }),
           }
