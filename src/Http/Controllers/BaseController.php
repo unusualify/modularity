@@ -631,6 +631,7 @@ abstract class BaseController extends PanelController
             $value = collect($relation->get())
                 ->pluck($column['field'])
                 ->join(', ');
+
         } elseif (isset($column['present']) && $column['present']) {
             $value = $item->presentAdmin()->{$column['field']};
         }
@@ -647,17 +648,6 @@ abstract class BaseController extends PanelController
         ) {
             $value = $value['title'] ?? $value['name'];
         }
-
-        // if($value === null) {
-        //     $appends = $item->getAppends();
-
-        //     if(in_array($column['key'], $appends)) {
-
-        //         $value = $item->{$column['key']};
-        //     } else {
-        //         // $value = '---';
-        //     }
-        // }
 
         return [
             "$field" => $value,
