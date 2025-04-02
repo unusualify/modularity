@@ -18,13 +18,24 @@ class ProcessController extends Controller
 
         $eager = $request->get('eager') ?? null;
 
+        $definedRelations = $process->processable()->getRelated()->definedRelations();
+        $nonEagerRelations = [];
+
         if ($eager) {
-            $with['processable'] = array_merge(['fileponds'], explode(',', $eager));
+            $eagerRelations = array_intersect($definedRelations, explode(',', $eager));
+            $nonEagerRelations = array_diff( explode(',', $eager), $definedRelations);
+            $with['processable'] = array_merge(['fileponds'], $eagerRelations);
+
+            // $with['processable'] = array_merge(['fileponds'], explode(',', $eager));
         } else {
             $with[] = 'processable.fileponds';
         }
 
         $process = Process::with($with)->find($process->id);
+
+        if(count($nonEagerRelations) > 0){
+            $process->processable->load($nonEagerRelations);
+        }
 
         $serializedProcess = $process->toArray();
 
@@ -38,6 +49,7 @@ class ProcessController extends Controller
             $schema = $module->getRouteInputs($processableModel->routeName());
 
             $processableFields = [];
+
             if(count($schema) > 0){
                 $processInput = Arr::first($schema, function($input){
                     return $input['type'] == 'process';
