@@ -22,23 +22,6 @@ trait HasPriceable
     public static function bootHasPriceable()
     {
         // parent::bootHasPriceable();
-
-        static::retrieved(function ($model) {
-            if (in_array('Oobook\Priceable\Traits\HasPriceable', class_uses_recursive($model)) && $model->price) {
-                $basePrice = $model->basePrice;
-                $basePriceFormatted = null;
-                if ($basePrice) {
-                    $currency = new Currency($basePrice->currency->iso_4217);
-                    $basePriceFormatted = \Oobook\Priceable\Facades\PriceService::formatAmount($basePrice->display_price, $currency);
-                }
-                $model->setAttribute('basePrice_show', $basePriceFormatted);
-            }
-        });
-        static::saving(function ($model) {
-            if (isset($model->basePrice_show)) {
-                $model->offsetUnset('basePrice_show');
-            }
-        });
     }
 
     public function initializeHasPriceable()
