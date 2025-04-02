@@ -157,15 +157,4 @@ trait PricesTrait
 
         return $fields;
     }
-
-    public function getShowFieldsPricesTrait($object, $fields, $schema = [])
-    {
-        if (isset($fields['prices']) && method_exists($object, 'prices') && $object->has('prices')) {
-            foreach ($this->getColumns(__TRAIT__) as $fieldName) {
-                $fields[$fieldName . '_show'] = $object->price_formatted;
-            }
-        }
-
-        return $fields;
-    }
 }
