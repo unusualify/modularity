@@ -23,6 +23,10 @@ trait QueryBuilder
 
         $query = $this->model->with($this->formatWiths($query, $with));
 
+        if ($perPage == -1) {
+            return $query->simplePaginate($perPage);
+        }
+
         if (isset($scopes['searches']) && isset($scopes['search']) && is_array($scopes['searches'])) {
             $translatedAttributes = $this->model->translatedAttributes ?? [];
 
@@ -44,11 +48,8 @@ trait QueryBuilder
         $query = $this->order($query, $orders);
 
         if (! $forcePagination && $this->model instanceof Sortable) {
+            return $query->ordered()->paginate($perPage);
             return $query->ordered()->get();
-        }
-
-        if ($perPage == -1) {
-            return $query->simplePaginate($perPage);
         }
 
         try {
