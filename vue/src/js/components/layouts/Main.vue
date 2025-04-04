@@ -193,9 +193,9 @@
             </v-card-text>
             <v-divider/>
             <v-card-actions class="justify-center">
-                <v-btn-cta  @click="closeAlertDialog">
+                <v-btn-secondary  @click="closeAlertDialog">
                   {{ $t('fields.close') }}
-                </v-btn-cta>
+                </v-btn-secondary>
             </v-card-actions>
           </v-card>
         </template>
