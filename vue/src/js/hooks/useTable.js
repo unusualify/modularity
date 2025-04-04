@@ -117,6 +117,18 @@ export const makeTableProps = propsFactory({
     type: String,
     default: 'top',
   },
+  disableSort: {
+    type: Boolean,
+    default: false,
+  },
+  mustSort: {
+    type: Boolean,
+    default: true,
+  },
+  multiSort: {
+    type: Boolean,
+    default: false,
+  },
 
 })
 
