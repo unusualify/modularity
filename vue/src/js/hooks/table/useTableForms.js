@@ -1,5 +1,5 @@
 // hooks/table/useTableForms.js
-import { computed, ref, nextTick, watch, toRefs, toRef } from 'vue'
+import { computed, ref, nextTick, watch, toRefs, toRef, reactive } from 'vue'
 import _ from 'lodash-es'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
@@ -33,6 +33,14 @@ export const makeTableFormsProps = propsFactory({
   addBtnOptions: {
     type: Object,
     default: () => ({})
+  },
+  noForm: {
+    type: Boolean,
+    default: false
+  },
+  formActions: {
+    type: [Array, Object],
+    default: []
   }
 })
 
@@ -51,6 +59,16 @@ export default function useTableForms(props, context) {
   const customFormAttributes = ref({})
   const customFormSchema = ref({})
   const customFormModel = ref({})
+
+  const states = reactive({
+    UeForm,
+    formActive,
+    customFormModalActive,
+
+    customFormAttributes,
+    customFormSchema,
+    customFormModel,
+  })
 
   // Computed properties
   const inputs = computed(() => props.inputFields ?? store.state.datatable.inputs ?? [])
@@ -136,14 +154,7 @@ export default function useTableForms(props, context) {
 
   return {
     // Refs
-    ...toRefs({
-      UeForm,
-      formActive,
-      customFormModalActive,
-      customFormAttributes,
-      customFormSchema,
-      customFormModel,
-    }),
+    ...toRefs(states),
 
     // Computed
     inputs,
