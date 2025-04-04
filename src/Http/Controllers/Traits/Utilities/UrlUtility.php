@@ -15,20 +15,7 @@ trait UrlUtility
      */
     protected function getUrls()
     {
-        return [
-            'languages' => route(Route::hasAdmin('api.languages.index')),
-            'base_permalinks' => Arr::mapWithKeys(getLocales(), function ($locale, $key) {
-                extract(parse_url(config('app.url'))); // $scheme, $host
-
-                return [$locale => $host];
-                dd(
-                    parse_url(config('app.url')),
-                    // config('app.url'),
-                    // request()->getHost(),
-                    // $locale, $key, getLocales()
-                );
-            }),
-        ];
+        return getModularityDefaultUrls();
     }
 
     /**
