@@ -29,10 +29,6 @@ export const makeTableItemActionsProps = propsFactory({
   iteratorType: {
     type: String,
     default: '',
-  },
-  formActions: {
-    type: Array,
-    default: []
   }
 })
 
