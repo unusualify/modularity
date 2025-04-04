@@ -37,6 +37,7 @@ export default function useSidebar () {
     hideIcons: computed(() => !state.rail && state.options.hideIcons),
     railManual: false,
     rail: computed(() => (state.options.rail || state.railManual) && lgAndUp.value),
+    hasRail: computed(() => state.options.rail),
     isHoverable: computed(() => (lgAndUp.value || state.rail) && state.options.expandOnHover),
 
     secondaryOptions: store.state.config.secondarySidebarOptions,
