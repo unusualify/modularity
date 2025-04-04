@@ -51,11 +51,11 @@ trait Allowable
     public function getAllowableItems($items, $searchKey = null, $orClosure = null, $andClosure = null): array|Collection
     {
         if (! $orClosure) {
-            $orClosure = fn($item) => false;
+            $orClosure = fn($item, $user) => false;
         }
 
         if (! $andClosure) {
-            $andClosure = fn($item) => true;
+            $andClosure = fn($item, $user) => true;
         }
 
         $isArray = is_array($items);
@@ -92,22 +92,26 @@ trait Allowable
         }
 
         if (! $orClosure) {
-            $orClosure = fn($item) => false;
+            $orClosure = fn($item, $user) => false;
         }
 
         if (! $andClosure) {
-            $andClosure = fn($item) => true;
+            $andClosure = fn($item, $user) => true;
         }
 
         $searchKey = $searchKey ?? $this->allowedRolesSearchKey ?? 'allowedRoles';
 
-        if ($andClosure($item)) {
-            if (! $this->allowableUser || ! isset($item[$searchKey])) {
+        if(!$this->allowableUser) {
+            return true;
+        }
+
+        if ($andClosure($item, $this->allowableUser)) {
+            if (! isset($item[$searchKey])) {
                 return true;
             } else {
                 $allowedRoles = is_array($item[$searchKey]) ? $item[$searchKey] : explode(',', $item[$searchKey]);
 
-                if ($orClosure($item) || $this->allowableUser->hasRole($allowedRoles)) {
+                if ($orClosure($item, $this->allowableUser) || $this->allowableUser->hasRole($allowedRoles)) {
                     return true;
                 }
             }
