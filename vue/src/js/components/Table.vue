@@ -95,6 +95,7 @@
             <!-- table controls -->
             <v-slide-x-transition :group="true">
               <div
+                key='table-controls'
                 :class="[
                   'd-flex',
                   controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'justify-end flex-grow-1',
@@ -207,7 +208,7 @@
           <v-menu
             activator="#advanced-filter-btn"
             :close-on-content-click="false"
-            :location="end"
+            location="end"
 
           >
             <v-card
@@ -397,7 +398,7 @@
             <ue-modal
               ref="customModal"
               v-model="customModalActive"
-              :transition="modals[activeModal] || 'dialog-bottom-transition'"
+              :transition="modals[activeModal].transition || 'dialog-bottom-transition'"
               :width-type="modals[activeModal].widthType || 'sm'"
               :persistent="modals[activeModal].persistent"
               :description-text="modals[activeModal].content"
