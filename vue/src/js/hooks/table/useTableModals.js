@@ -210,8 +210,6 @@ export default function useTableModals(props, context) {
 
   return {
     // States
-    ...toRefs({
-    }),
     deleteModalActive,
     customModalActive,
     actionModalActive,
