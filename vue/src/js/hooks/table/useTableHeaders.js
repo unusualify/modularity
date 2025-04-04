@@ -56,14 +56,13 @@ export default function useTableHeaders(props) {
     headers.value.filter(header => !!header.visible && header.visible === true)
   )
 
+  const hasCustomRow = computed(() =>
+    Object.keys(props.customRow || {}).length > 0
+  )
+
   const hideHeaders = computed(() =>
     props.hideHeaders || hasCustomRow.value
   )
-
-  const hasCustomRow = computed(() =>
-    Object.keys(props.customRow || {}).length
-  )
-
   // Methods
   const applyHeaders = () => {
     headers.value = _.cloneDeep(headersModel.value)
