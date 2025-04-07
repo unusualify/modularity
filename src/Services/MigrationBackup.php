@@ -488,7 +488,7 @@ class MigrationBackup
 
         if ($table) {
             $this->backupKey = $this->generateBackupKey($table);
-            dd(Cache::get($this->backupKey));
+
             return Cache::get($this->backupKey);
         }
 
