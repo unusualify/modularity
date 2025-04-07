@@ -524,7 +524,7 @@ class Module extends NwidartModule
         return $moduleRoutes;
     }
 
-    public function getRouteUris($routeName): array
+    public function getRouteUris($routeName, $withoutNamePrefix = false, $modelBindingValue = null): array
     {
         $actions = [
             'restore',
@@ -549,9 +549,25 @@ class Module extends NwidartModule
         $isParentRoute = $this->isParentRoute($routeName);
 
         $midQuote = '(.nested.[a-z|_]+)?.(';
+
         $quote = $this->fullRouteNamePrefix($isParentRoute) . '.' . snakeCase($routeName) . $midQuote . implode('|', $actions) . ')$';
 
-        return Collection::make($this->getModuleUris())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name))->toArray();
+        $uris = Collection::make($this->getModuleUris())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
+
+        if ($withoutNamePrefix) {
+            $uris = $uris->mapWithKeys(function ($uri, $name) use ($routeName, $modelBindingValue) {
+                $parts = explode('.', $name);
+                $key = array_pop($parts);
+
+                if ($modelBindingValue) {
+                    $uri = str_replace('{' . Str::snake($routeName) . '}', $modelBindingValue, $uri);
+                }
+
+                return [$key => $uri];
+            });
+        }
+
+        return $uris->toArray();
     }
 
     public function getRouteActionUri($routeName, $action, $replacements = [], $absolute = false): string
