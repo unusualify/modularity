@@ -64,9 +64,54 @@ return [
     'activator' => 'file',
 
     'oauth' => [
+
         'providers' => [
-            'google',
-            'apple',
+            'google' => [
+                'oauth_mapping' => [
+                    'avatar' => 'avatar',
+                    'token' => 'token',
+                    ''
+                ],
+                'user_mapping' => [
+                    'email' => 'email',
+                    'name' => 'name',
+                ]
+            ],
+            'apple' => [
+                'oauth_mapping' => [
+                    'email' => 'email',
+                    'name' => 'name',
+                    'avatar' => 'picture',
+                ]
+            ],
+            'github' => [
+                'oauth_mapping' => [
+                    'email' => 'email',
+                    'name' => 'name',
+                    'avatar' => 'avatar_url',
+                ]
+            ],
+        ],
+
+        'google' => [
+            'scopes' => [
+                'https://www.googleapis.com/auth/userinfo.email',
+                'https://www.googleapis.com/auth/userinfo.profile',
+            ],
+        ],
+
+        'apple' => [
+            'scopes' => [
+                'name',
+                'email'
+            ],
+        ],
+
+        'github' => [
+            'scopes' => [
+                'user',
+                'user:email',
+            ],
         ],
     ],
 ];
