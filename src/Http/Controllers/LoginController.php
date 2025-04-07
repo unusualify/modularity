@@ -12,6 +12,7 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\Factory as ViewFactory;
 use Modules\SystemUser\Repositories\UserRepository;
 use PragmaRX\Google2FA\Google2FA;
@@ -524,7 +525,9 @@ class LoginController extends Controller
             // Login and redirect
             return $this->afterAuthentication($request, $user);
         } else {
-            return $this->sendFailedLoginResponse($request);
+            throw ValidationException::withMessages([
+                'password' => [trans('auth.failed')],
+            ]);
         }
     }
 
