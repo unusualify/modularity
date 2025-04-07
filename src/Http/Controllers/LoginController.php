@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\View\Factory as ViewFactory;
 use Modules\SystemUser\Repositories\UserRepository;
 use PragmaRX\Google2FA\Google2FA;
-use Socialite;
+use Laravel\Socialite\Facades\Socialite;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
