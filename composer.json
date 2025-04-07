@@ -40,8 +40,9 @@
         "joedixon/laravel-translation": "^2.0",
         "laravel/framework": "^10",
         "laravel/horizon": "^5.30",
+        "laravel/socialite": "^5.18",
         "laravel/telescope": "^4.0|^5.0",
-        "league/glide-laravel" : "^1.0",
+        "league/glide-laravel": "^1.0",
         "nwidart/laravel-modules": "^8.0|^9.0|^10.0",
         "oobook/manage-eloquent": "^1.0",
         "oobook/post-redirector": "^1.0",
@@ -75,9 +76,7 @@
                 "ModularityVite": "Unusualify\\Modularity\\Facades\\ModularityVite"
             }
         },
-        "packages": {
-
-        }
+        "packages": {}
     },
     "autoload": {
         "psr-4": {
@@ -87,12 +86,12 @@
             "Modules\\": "modules"
         },
         "files": [
-          "src/Support/Migrations/SchemaParser.php",
-          "src/Services/Translation.php"
+            "src/Support/Migrations/SchemaParser.php",
+            "src/Services/Translation.php"
         ],
         "exclude-from-classmap": [
-          "../../../vendor/nwidart/laravel-modules/src/Support/Migrations/SchemaParser.php",
-          "../../../vendor/joedixon/laravel-translation/src/Drivers/Translation.php"
+            "../../../vendor/nwidart/laravel-modules/src/Support/Migrations/SchemaParser.php",
+            "../../../vendor/joedixon/laravel-translation/src/Drivers/Translation.php"
         ]
     },
     "autoload-dev": {
