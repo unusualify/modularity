@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_oauths', function (Blueprint $table) {
+        $userOauthTable = modularityConfig('tables.user_oauths', 'um_user_oauths');
+
+        Schema::create($userOauthTable, function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->timestamps();
             $table->string('token')->index();
@@ -29,6 +31,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_oauths');
+        $userOauthTable = modularityConfig('tables.user_oauths', 'um_user_oauths');
+        Schema::dropIfExists($userOauthTable);
     }
 };

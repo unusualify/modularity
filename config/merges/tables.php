@@ -26,4 +26,5 @@ return [
     'processes' => 'umod_processes',
     'process_histories' => 'umod_process_histories',
     'assignments' => 'um_assignments',
+    'user_oauths' => 'um_user_oauths',
 ];
