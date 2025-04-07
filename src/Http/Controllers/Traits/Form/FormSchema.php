@@ -10,9 +10,11 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Request;
 use Unusualify\Modularity\Support\Finder;
 use Unusualify\Modularity\Facades\Modularity;
-
+use Unusualify\Modularity\Traits\Allowable;
 trait FormSchema
 {
+    use Allowable;
+
     /**
      * @var array
      */
@@ -903,9 +905,7 @@ trait FormSchema
     public function filterSchemaByRoles($schema)
     {
         return Collection::make($schema)->reduce(function ($carry, $field, $name) {
-            $isAllowed = (! $this->user || ! isset($field['allowedRoles']))
-                // || $this->user->isSuperAdmin()
-                || $this->user->hasRole($field['allowedRoles']);
+            $isAllowed = $this->isAllowedItem($field, searchKey: 'allowedRoles');
 
             if (
                 $isAllowed
