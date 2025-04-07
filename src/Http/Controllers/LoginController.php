@@ -266,7 +266,7 @@ class LoginController extends Controller
                             'elements' => ___('authentication.sign-in-google'),
                             'attributes' => [
                                 'variant' => 'outlined',
-                                'href' => route(Route::hasAdmin('login.form')),
+                                'href' => route('admin.login.provider', ['provider' => 'google']),
                                 'class' => 'mt-5 mb-2 custom-auth-button',
                                 'color' => 'grey-lighten-1',
                                 'density' => 'default',
@@ -288,7 +288,7 @@ class LoginController extends Controller
                             'elements' => ___('authentication.sign-in-apple'),
                             'attributes' => [
                                 'variant' => 'outlined',
-                                'href' => route(Route::hasAdmin('login.form')),
+                                'href' => route('admin.login.provider', ['provider' => 'github']),
                                 'class' => 'my-2 custom-auth-button',
                                 'color' => 'grey-lighten-1',
                                 'density' => 'default',
