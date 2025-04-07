@@ -427,7 +427,8 @@ class LoginController extends Controller
      * @param string $provider Socialite provider
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function redirectToProvider($provider, OauthRequest $request)
+    //redirectToProvider($provider, OauthRequest $request)
+    public function redirectToProvider($provider)
     {
         return Socialite::driver($provider)
             ->scopes($this->config->get(modularityBaseKey() . '.oauth.' . $provider . '.scopes', []))
