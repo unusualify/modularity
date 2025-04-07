@@ -461,7 +461,6 @@ class LoginController extends Controller
                 if ($user->password) {
                     // If the user has a password then redirect to a form to ask for it
                     // before linking a provider to that email
-
                     $request->session()->put('oauth:user_id', $user->id);
                     $request->session()->put('oauth:user', $oauthUser);
                     $request->session()->put('oauth:provider', $provider);
@@ -496,9 +495,88 @@ class LoginController extends Controller
         $userId = $request->session()->get('oauth:user_id');
         $user = User::findOrFail($userId);
 
-        return $this->viewFactory->make('twill::auth.oauth-link', [
-            'username' => $user->email,
-            'provider' => $request->session()->get('oauth:provider'),
+        return $this->viewFactory->make(modularityBaseKey() . '::auth.login', [
+            'formAttributes' => [
+                // 'hasSubmit' => true,
+                'title' => [
+                    'text' => __('authentication.confirm-provider', ['provider' => $request->session()->get('oauth:provider')]),
+                    'tag' => 'h1',
+                    'color' => 'primary',
+                    'type' => 'h5',
+                    'weight' => 'bold',
+                    'transform' => '',
+                    'align' => 'center',
+                    'justify' => 'center',
+                ],
+                'schema' => ($schema = $this->createFormSchema([
+                    'email' => [
+                        'type' => 'text',
+                        'name' => 'email',
+                        'label' => ___('authentication.email'),
+                        'hint' => 'enter @example.com',
+                        'default' => '',
+                        'col' => [
+                            'lg' => 12,
+                        ],
+                        'rules' => [
+                            ['email'],
+                        ],
+                        'readonly' => true,
+                    ],
+                    'password' => [
+                        'type' => 'password',
+                        'name' => 'password',
+                        'label' => 'Password',
+                        'default' => '',
+                        'appendInnerIcon' => '$non-visibility',
+                        'slotHandlers' => [
+                            'appendInner' => 'password',
+                        ],
+                        'col' => [
+                            'lg' => 12,
+                        ],
+                        'rules' => [
+                            // ['password'],
+                        ],
+                    ],
+                ])),
+
+                'modelValue' => [
+                    'email' => $user->email,
+                    'password' => '',
+                ],
+
+                'actionUrl' => route(Route::hasAdmin('login.oauth.linkProvider')),
+                'buttonText' => __('authentication.sign-in'),
+                'formClass' => 'py-6',
+                'no-default-form-padding' => true,
+            ],
+            'attributes' => [
+                'noDivider' => true,
+            ],
+            'formSlots' => [
+                'bottom' => [
+                    'tag' => 'v-sheet',
+                    'attributes' => [
+                        'class' => 'd-flex pb-5 justify-space-between w-100 text-black my-5',
+                    ],
+                    'elements' => [
+                        [
+                            'tag' => 'v-btn',
+                            'elements' => __('authentication.sign-in'),
+                            'attributes' => [
+                                'variant' => 'elevated',
+                                'class' => 'v-col-5 mx-auto',
+                                'type' => 'submit',
+                                'density' => 'default',
+                                'block' => true
+                            ],
+
+                        ],
+                    ],
+                ],
+            ],
+            //'provider' => $request->session()->get('oauth:provider'),
         ]);
     }
 
