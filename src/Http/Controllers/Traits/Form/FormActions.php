@@ -5,8 +5,11 @@ namespace Unusualify\Modularity\Http\Controllers\Traits\Form;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
+use Unusualify\Modularity\Traits\Allowable;
+
 trait FormActions
 {
+    use Allowable;
 
     /**
      * @return void
@@ -47,16 +50,14 @@ trait FormActions
 
         return Collection::make($this->formActions)->reduce(function ($acc, $action, $key) use ($default_action) {
 
-            $allowedRoles = $action['allowedRoles'] ?? null;
+            $isAllowed = $this->isAllowedItem(
+                $action,
+                searchKey: 'allowedRoles',
+                orClosure: fn($item) => $this->user->isSuperAdmin(),
+            );
 
-            if (is_string($allowedRoles)) {
-                $allowedRoles = explode(',', $allowedRoles);
-            }
-
-            if ($allowedRoles && $this->user) {
-                if (! $this->user->isSuperAdmin() && ! $this->user->hasRole($allowedRoles)) {
-                    return $acc;
-                }
+            if(!$isAllowed) {
+                return $acc;
             }
 
             if (isset($action['endpoint']) && ($routeName = Route::hasAdmin($action['endpoint']))) {

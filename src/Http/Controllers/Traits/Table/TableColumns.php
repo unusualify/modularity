@@ -3,9 +3,12 @@
 namespace Unusualify\Modularity\Http\Controllers\Traits\Table;
 
 use Illuminate\Support\Collection;
+use Unusualify\Modularity\Traits\Allowable;
 
 trait TableColumns
 {
+    use Allowable;
+
     /**
      * @var array
      */
@@ -50,7 +53,10 @@ trait TableColumns
      */
     protected function getHeader($header)
     {
-        return array_merge_recursive_preserve(modularityConfig('default_header'), $this->hydrateHeader($header));
+        return array_merge_recursive_preserve(
+            modularityConfig('default_header'),
+            $this->hydrateHeader($header)
+        );
     }
 
     /**
@@ -124,31 +130,6 @@ trait TableColumns
     }
 
     /**
-     * Translate the headers
-     * @param array $headers
-     * @return array
-     */
-    public function translateHeaders($headers)
-    {
-        foreach ($headers as $key => $value) {
-
-            if (! isset($headers[$key]['title'])) {
-                continue;
-            }
-
-            $title = $headers[$key]['title'];
-            $tableHeader = 'table-headers.' . $title;
-            $translation = __($tableHeader);
-
-            if (! is_array($translation) && $translation !== $tableHeader) {
-                $headers[$key]['title'] = $translation;
-            }
-        }
-
-        return $headers;
-    }
-
-    /**
      * Filters the headers based on the user's roles.
      *
      * This method checks each header item to determine if the current user
@@ -161,15 +142,10 @@ trait TableColumns
      */
     public function filterHeadersByRoles($headers)
     {
-        return array_reduce($headers, function ($carry, $item) {
-            if ((! $this->user || ! isset($item['allowedRoles']))
-                || $this->user->isSuperAdmin()
-                || $this->user->hasRole($item['allowedRoles'])
-            ) {
-                $carry[] = $item;
-            }
-
-            return $carry;
-        }, []);
+        return $this->getAllowableItems(
+            items: $headers,
+            searchKey: 'allowedRoles',
+            orClosure: fn($item) => $this->user->isSuperAdmin(),
+        );
     }
 }

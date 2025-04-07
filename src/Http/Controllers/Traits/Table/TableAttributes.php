@@ -4,9 +4,10 @@ namespace Unusualify\Modularity\Http\Controllers\Traits\Table;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-
+use Unusualify\Modularity\Traits\Allowable;
 trait TableAttributes
 {
+    use Allowable;
     /**
      * @var array
      */
@@ -78,10 +79,7 @@ trait TableAttributes
                 $firstMatch = [];
                 foreach ($attributes['customRow'] as $component) {
                     // Skip if component doesn't pass role check
-                    if (isset($component['allowedRoles']) &&
-                        (! $this->user ||
-                        (! $this->user->hasRole($component['allowedRoles'])))
-                    ) {
+                    if(!$this->isAllowedItem($component, searchKey: 'allowedRoles')) {
                         continue;
                     }
 

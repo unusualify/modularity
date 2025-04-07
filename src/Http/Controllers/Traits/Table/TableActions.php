@@ -5,9 +5,12 @@ namespace Unusualify\Modularity\Http\Controllers\Traits\Table;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
+use Unusualify\Modularity\Traits\Allowable;
 
 trait TableActions
 {
+    use Allowable;
+
     /**
      * @var array
      */
@@ -52,14 +55,24 @@ trait TableActions
 
         return Collection::make($this->tableActions)->reduce(function ($acc, $action, $key) use ($defaultTableAction) {
             $noSuperAdmin = $action['noSuperAdmin'] ?? false;
-            $allowedRoles = $action['allowedRoles'] ?? null;
+            // $allowedRoles = $action['allowedRoles'] ?? null;
 
-            if (!(!$noSuperAdmin && $this->isSuperAdmin()) && $allowedRoles) {
+            $isAllowed = $this->isAllowedItem(
+                $action,
+                searchKey: 'allowedRoles',
+                orClosure: fn($item) => !$noSuperAdmin && $this->user->isSuperAdmin(),
+            );
 
-                if ($this->doesNotHaveAuthorization($allowedRoles)) {
-                    return $acc;
-                }
+            if(!$isAllowed) {
+                return $acc;
             }
+
+            // if (!(!$noSuperAdmin && $this->isSuperAdmin()) && $allowedRoles) {
+
+            //     if ($this->doesNotHaveAuthorization($allowedRoles)) {
+            //         return $acc;
+            //     }
+            // }
 
             if (isset($action['endpoint']) && ($routeName = Route::hasAdmin($action['endpoint']))) {
                 $route = Route::getRoutes()->getByName($routeName);
