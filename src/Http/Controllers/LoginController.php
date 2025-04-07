@@ -19,7 +19,7 @@ use Laravel\Socialite\Facades\Socialite;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
-use Unusualify\Modularity\Http\Requests\Admin\OauthRequest;
+use Unusualify\Modularity\Http\Requests\OauthRequest;
 use Unusualify\Modularity\Services\MessageStage;
 
 class LoginController extends Controller
