@@ -12,6 +12,7 @@
 
         <ue-auth
             title="'{{ __('authentication.create-an-account') ?? 'CREATE AN ACCOUNT' }}'"
+            v-bind='@json($attributes ?? [])'
             @if(isset($taskState))
                 no-divider
             @endif
