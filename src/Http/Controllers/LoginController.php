@@ -614,4 +614,131 @@ class LoginController extends Controller
     {
         return route(Route::hasAdmin('dashboard'));
     }
+
+    /**
+     * complete registration after email sent
+     */
+    public function completeRegisterForm()
+    {
+        $this->inputTypes = modularityConfig('input_types', []);
+        return $this->viewFactory->make(modularityBaseKey() . '::auth.complete-registration', [
+            'formAttributes' => [
+                'hasSubmit' => true,
+
+                // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
+                'title' => [
+                    'text' => __('authentication.complete-registration-title'),
+                    'tag' => 'h1',
+                    'color' => 'primary',
+                    'type' => 'h5',
+                    'weight' => 'bold',
+                    'transform' => '',
+                    'align' => 'center',
+                    'justify' => 'center',
+                ],
+                'schema' => $this->createFormSchema(
+                    getFormDraft(
+                        'register_password',
+                    )
+                ),
+
+                'actionUrl' => route(Route::hasAdmin('register')),
+                'buttonText' => __('authentication.complete-registration'),
+                'formClass' => 'py-6',
+                'no-default-form-padding' => true,
+
+            ],
+            'attributes' => [
+                'noDivider' => true,
+            ],
+
+            'formSlots' => [
+                'bottom' => [
+                    'tag' => 'v-sheet',
+                    'attributes' => [
+                        'class' => 'd-flex pb-5 justify-space-between w-100 text-black my-5',
+                    ],
+                    'elements' => [
+                            'tag' => 'v-btn',
+                            'elements' => __('authentication.complete-registration'),
+                            'attributes' => [
+                                'variant' => 'elevated',
+                                'class' => 'v-col-5',
+                                'type' => 'submit',
+                                'density' => 'default',
+                            ],
+
+                    ],
+                ],
+
+            ],
+        ]);
+    }
+
+    public function completeRegister(Request $request)
+    {
+        dd($request->all());
+
+        $request->validate([
+            'password' => 'required|min:8|confirmed', // Backend validation for confirmation
+        ]);
+
+        $this->validateLogin($request);
+
+
+        // If the class is using the ThrottlesLogins trait, we can automatically throttle
+        // the login attempts for this application. We'll key this by the username and
+        // the IP address of the client making these requests into this application.
+        if (method_exists($this, 'hasTooManyLoginAttempts') &&
+            $this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
+            //Log::debug('Has many too attempts');
+            return $this->sendLockoutResponse($request);
+        }
+
+        $previousRouteName = previous_route_name();
+
+        if ($this->attemptLogin($request)) {
+            if ($request->hasSession()) {
+                $request->session()->put('auth.password_confirmed_at', time());
+            }
+
+            $request->session()->regenerate();
+
+            $this->clearLoginAttempts($request);
+
+            if ($response = $this->authenticated($request, $this->guard()->user())) {
+                return $response;
+            }
+
+            $body = [
+                'variant' => MessageStage::SUCCESS,
+                'timeout' => 1500,
+                'message' => __('authentication.login-success-message'),
+            ];
+
+            if($previousRouteName === 'admin.login.form') {
+                $body['redirector'] = redirect()->intended($this->redirectTo)->getTargetUrl();
+            }
+
+            return $request->wantsJson()
+                ? new JsonResponse($body, 200)
+                : $this->sendLoginResponse($request);
+
+            // return $this->sendLoginResponse($request);
+        }
+
+        // If the login attempt was unsuccessful we will increment the number of attempts
+        // to login and redirect the user back to the login form. Of course, when this
+        // user surpasses their maximum number of attempts they will get locked out.
+        $this->incrementLoginAttempts($request);
+
+        return $request->wantsJson()
+            ? new JsonResponse([
+                $this->username() => [trans('auth.failed')],
+                'message' => __('auth.failed'),
+                'variant' => MessageStage::WARNING,
+            ])
+            : $this->sendFailedLoginResponse($request);
+    }
 }
