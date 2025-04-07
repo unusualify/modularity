@@ -104,6 +104,11 @@ class RegisterController extends Controller
                             'cols' => 6,
                             'lg' => 6,
                         ],
+                        'rules' => [
+                            ['required', 'classic', null, null, 'Password is required'],
+                            ['min', 8, 'Password must be at least 8 characters'],
+                        ],
+
                     ],
                     're_password' => [
                         'type' => 'password',
@@ -117,6 +122,9 @@ class RegisterController extends Controller
                         'col' => [
                             'cols' => 6,
                             'lg' => 6,
+                        ],
+                        'rules' => [
+                            ['required', 'classic',null, null, 'Confirm Password'],
                         ],
                     ],
                     'tos' => [
@@ -268,6 +276,7 @@ class RegisterController extends Controller
                     'variant' => MessageStage::WARNING,
                 ], 200)
                 : $request->validate($this->rules());
+            return $res;
         }
 
         $user = Company::create()->users()->create([
@@ -289,8 +298,9 @@ class RegisterController extends Controller
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'surname' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            //Surname is not mandatory.
+            //'surname' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:admin_users'],
             'password' => ['required', 'string', 'min:8'],
         ];
     }
