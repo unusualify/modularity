@@ -381,7 +381,7 @@ class LoginController extends Controller
             'message' => __('authentication.login-success-message'),
         ];
 
-        if($previousRouteName === 'admin.login.form') {
+        if(in_array($previousRouteName, ['admin.login.form', 'admin.login.oauth.showPasswordForm'])) {
             // 'redirector' => $this->redirector->intended($this->redirectPath())->getTargetUrl() . '?status=success',
             $body['redirector'] = redirect()->intended($this->redirectTo)->getTargetUrl();
         }
