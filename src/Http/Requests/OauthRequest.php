@@ -27,11 +27,12 @@ class OauthRequest extends Request
      */
     public function rules()
     {
+        $providers = array_keys(modularityConfig('oauth.providers', []));
 
         return [
             'provider' => [
                 'required',
-                Rule::in(config('modularity.oauth.providers', [])),
+                Rule::in($providers),
             ],
         ];
     }
@@ -40,6 +41,7 @@ class OauthRequest extends Request
     {
         $url = $this->redirector->getUrlGenerator();
 
-        return $url->route(config('modularity.admin_route_name_prefix') . 'login.form');
+        return $url->route(config('modularity.admin_route_name_prefix') .'.loginHandleCallbackProvider', ['provider' => $provider]);
+
     }
 }
