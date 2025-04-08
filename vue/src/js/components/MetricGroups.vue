@@ -7,7 +7,7 @@
       type: String,
       default: '',
     },
-    metrics: {
+    items: {
       type: Array,
       required: true,
     },
@@ -66,7 +66,7 @@
   });
 
   const castedMetricGroups = computed(() => {
-    return props.metrics.map(metricGroup => {
+    return props.items.map(metricGroup => {
 
 
       return {
