@@ -6,7 +6,7 @@
       type: String,
       required: true,
     },
-    metrics: {
+    items: {
       type: Array,
       default: () => [],
     },
@@ -131,7 +131,7 @@
     <!-- Metrics row -->
     <div class="d-flex flex-wrap ue-metrics__row">
       <template
-        v-for="(metric, index) in metrics"
+        v-for="(metric, index) in items"
         :key="index"
         >
         <ue-metric
@@ -139,7 +139,7 @@
             'ue-metrics__metric',
             'flex-grow-1',
           ]"
-          :style="{ width: `${100 / metrics.length}%`, minWidth: '150px' }"
+          :style="{ width: `${100 / items.length}%`, minWidth: '150px' }"
           elevation="0"
           rounded="0"
           dense
