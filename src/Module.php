@@ -174,9 +174,20 @@ class Module extends NwidartModule
         $this->fireModuleEvent('disabled', $route);
     }
 
-    public function getRoutes()
+    /**
+     * Get all routes of the module.
+     */
+    public function getRoutes(): array
     {
         return $this->moduleActivator->getRoutes();
+    }
+
+    /**
+     * Check if a route exists in the module.
+     */
+    public function hasRoute(string $routeName): bool
+    {
+        return in_array($routeName, $this->getRoutes());
     }
 
     /**
