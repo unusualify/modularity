@@ -28,6 +28,13 @@
         :configuration="_configuration"
       />
     </template>
+    <template v-if="isObject(configuration.elements)">
+      <ue-recursive-stuff
+        :key="`tag-${level}-${i}`"
+        :level="level+1"
+        :configuration="configuration.elements"
+      />
+    </template>
 
     <template v-else-if="isTextable(configuration.elements)">
       {{ applyCasting(configuration.elements) }}
@@ -249,6 +256,7 @@ export default {
       // directives: props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : [],
       isTextable,
       isArray,
+      isObject,
 
       applyCasting,
       hasSlot,
