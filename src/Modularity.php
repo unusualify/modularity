@@ -189,6 +189,14 @@ class Modularity extends FileRepository
     }
 
     /**
+     * Check if a module exists.
+     */
+    public function hasModule(string $moduleName): bool
+    {
+        return $this->has($moduleName);
+    }
+
+    /**
      * Get scanned modules paths.
      */
     public function getScanPaths(): array
