@@ -63,6 +63,11 @@ export default function useTableHeaders(props) {
   const hideHeaders = computed(() =>
     props.hideHeaders || hasCustomRow.value
   )
+
+  const editableColumns = computed(() => {
+    return rawHeaders.filter(h => h.hasOwnProperty('isColumnEditable') && h.isColumnEditable === true)
+  })
+
   // Methods
   const applyHeaders = () => {
     headers.value = _.cloneDeep(headersModel.value)
@@ -77,10 +82,12 @@ export default function useTableHeaders(props) {
     headers,
     headersModel,
     hasSearchableHeader,
+
     // Computed
     selectedHeaders,
     hideHeaders,
     hasCustomRow,
+    editableColumns,
 
     // Methods
     applyHeaders

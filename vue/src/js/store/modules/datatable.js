@@ -74,12 +74,12 @@ const getters = {
   // formatterColumns: state => {
   //   return state.headers.filter((h) => h.hasOwnProperty('formatter') && h.formatter.length > 0)
   // },
-  editableColumns: state => {
-    return state.headers.filter((h) => (h.hasOwnProperty('isColumnEditable') && h.isColumnEditable))
-  },
-  rowEditables: state => {
-    return state.headers.filter((h) => (h.hasOwnProperty('isRowEditable') && h.isRowEditable))
-  },
+  // editableColumns: state => {
+  //   return state.headers.filter((h) => (h.hasOwnProperty('isColumnEditable') && h.isColumnEditable))
+  // },
+  // rowEditables: state => {
+  //   return state.headers.filter((h) => (h.hasOwnProperty('isRowEditable') && h.isRowEditable))
+  // },
   mainFilters: state => {
     return state.mainFilters
   },
