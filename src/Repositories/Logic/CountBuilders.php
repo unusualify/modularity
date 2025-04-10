@@ -49,12 +49,16 @@ trait CountBuilders
     /**
      * @return int
      */
-    public function getCountFor($method)
+    public function getCountFor($method, $args = [])
     {
         // dd($method);
-        $methodName = 'scope' . ucfirst($method[0]);
+        $query = $this->model->newQuery();
 
-        return $this->model->$methodName();
+        if(method_exists($this->getModel(), 'scope' . ucfirst($method))) {
+            return $this->filter($query,$this->countScope)->$method(...$args)->count();
+        }
+
+        throw new \Exception('Method scope' . ucfirst($method) . ' does not exist');
     }
 
 }
