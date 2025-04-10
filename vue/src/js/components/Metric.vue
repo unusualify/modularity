@@ -38,6 +38,10 @@
       type: Boolean,
       default: false,
     },
+    center: {
+      type: Boolean,
+      default: false,
+    },
     icon: {
       type: String,
       default: null,
@@ -49,16 +53,16 @@
     return {
       'd-inline-block': !props.noInline,
       'metric-card': true,
-      'text-center': true,
-      'py-1 px-2': props.dense,
-      'py-2 px-4': !props.dense
+      'text-center': props.center,
+      'py-1 px-1': !props.dense,
+      // 'py-2 px-2': !props.dense
     };
   });
 
   const valueClasses = computed(() => {
     return [
       'font-weight-bold',
-      props.dense ? 'text-h5' : 'text-h4',
+      props.dense ? 'text-h4' : 'text-h3',
       props.color ? `text-${props.color}` : '',
       props.valueClass,
     ];
@@ -68,7 +72,7 @@
     return [
       props.color ? `text-${props.color}` : '',
       props.labelColor ? `text-${props.labelColor}` : '',
-      props.dense ? 'text-subtitle-2' : 'text-subtitle',
+      props.dense ? 'text-caption' : 'text-subtitle',
       props.labelClass
     ];
   });
