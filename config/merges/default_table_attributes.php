@@ -18,12 +18,13 @@ return [
     'tableDensity' => 'compact', // compact, comfortable, null
     // 'tableSubtitle' => '',
     'sticky' => true,
+    'fixedHeader' => true,
     'showSelect' => true,
     'striped' => true,
     'hideBorderRow' => false,
     'roundedRows' => true,
     'controlsPosition' => 'top', // top, bottom
-
+    'noFullScreen' => false,
     'toolbarOptions' => [
         'color' => 'transparent', // rgb(255,255,255,1) or utility colors like white, purple
         'border' => false, // false, 'xs', 'sm', 'md', 'lg', 'xl'.
