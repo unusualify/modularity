@@ -25,24 +25,8 @@ trait ManageUtilities
         $initialResource = $this->getJSONData();
         $filters = json_decode($this->request->get('filter'), true) ?? [];
         $headers = $this->filterHeadersByRoles($this->getIndexTableColumns());
-        $headers = $this->translateHeaders($headers);
+        $headers = hydrate_table_columns_translations($headers);
 
-        // $i = $this->repository->getModel()->hasUnreadChatMessagesForYou()->latest()->first();
-        // dd(
-        //     $this->repository->getModel()->hasUnreadChatMessagesForYou()->latest()->get()->map(fn ($i) => [
-        //         'press_release_id' => $i->id,
-        //         'chat_id' => $i->chat->id,
-
-        //         // 'chat_messages_count' => $i->chatMessages()->count(),
-        //         // 'chat_messages_count' => $i->numberOfChatMessages(),
-        //         // 'unread_chat_messages_count' => $i->numberOfUnreadChatMessages(),
-        //         'unread_chat_messages_for_you_count' => $i->numberOfUnreadChatMessagesForYou(),
-
-        //         // 'unread_messages_count' => $i->unreadChatMessages()->count(),
-
-        //     ])
-        //     ->toArray()
-        // );
         $tableAttributes = $this->hydrateTableAttributes();
         $tableEndpoints = $this->getIndexUrls() + $this->getUrls();
 
