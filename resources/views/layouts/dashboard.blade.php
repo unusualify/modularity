@@ -14,7 +14,7 @@
 @endpush
 
 @section('content')
-    <div class="dashboard pa-3">
+    <div class="dashboard pa-3 h-100">
         <ue-dashboard :blocks='@json($blocks ?? [])'>
     </div>
 @stop
