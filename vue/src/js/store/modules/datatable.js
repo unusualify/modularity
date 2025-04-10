@@ -62,12 +62,12 @@ const getters = {
   // defaultItem: state => {
   //   return state.inputs.reduce( (a,c) => (a[c.name] = c.default, a), {})
   // },
-  totalElements: state => {
-    return state.total
-  },
-  totalPage: state => {
-    return Math.ceil(state.total / state.options.itemsPerPage)
-  },
+  // totalElements: state => {
+  //   return state.total
+  // },
+  // totalPage: state => {
+  //   return Math.ceil(state.total / state.options.itemsPerPage)
+  // },
   // formatterColumns: state => {
   //   return state.headers.filter((h) => h.hasOwnProperty('formatter') && h.formatter.length > 0)
   // },
@@ -106,9 +106,11 @@ const mutations = {
 
     state.data = data
   },
+
   [DATATABLE.SET_DATATABLE_DIALOG] (state, val) {
     state.dialog = val
   },
+
   [DATATABLE.UPDATE_DATATABLE_FILTER] (state, filter) {
     state.filter = Object.assign({}, state.filter, filter)
 
@@ -140,6 +142,7 @@ const mutations = {
       return [key, val]
     }))
   },
+
   [DATATABLE.UPDATE_DATATABLE_BULK] (state, id) {
     if (state.bulk.indexOf(id) > -1) {
       state.bulk = state.bulk.filter(function (item) {

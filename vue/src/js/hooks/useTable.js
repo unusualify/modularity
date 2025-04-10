@@ -163,6 +163,9 @@ export default function useTable (props, context) {
     }
   });
 
+  const isStoreTable = computed(() => {
+    return props.endpoints.index.replace(/\/$/, '').split('?')[0] === window.location.href.replace(/\/$/, '').split('?')[0]
+  })
   // Get item-related computeds
   const tableItem = useTableItem()
   // Get name-related computeds
@@ -189,27 +192,70 @@ export default function useTable (props, context) {
 
   const searchModel = ref(store.state.datatable.search ?? '')
 
-  const isStoreTable = computed(() => {
-    return props.endpoints.index.replace(/\/$/, '').split('?')[0] === window.location.href.replace(/\/$/, '').split('?')[0]
+  // __log(props.tableOptions)
+  const optionsSelf = ref({
+    itemsPerPage: 10,
+    page: 1,
+    search: '',
+    sortBy: [],
+    groupBy: [],
+    // mustSort: props.mustSort,
+    // multiSort: props.multiSort,
+    ...(props.tableOptions ?? {}),
   })
 
-  const options = ref(props.tableOptions ?? store.state.datatable.options ?? {})
+  // const options = ref(props.tableOptions ?? store.state.datatable.options ?? {})
+  const options = ref(isStoreTable.value
+    ? store.state.datatable.options
+    : optionsSelf.value
+  )
+  // const options = computed(() => isStoreTable.value
+  //   ? store.state.datatable.options
+  //   : optionsSelf.value
+  // )
+
+  const numberOfElementsSelf = ref(props.total ?? 0)
+  const numberOfElements = computed(() => !isStoreTable.value
+     ? numberOfElementsSelf.value
+     : store.state.datatable.total
+  )
+  const numberOfPages = computed(() => Math.ceil(numberOfElements.value / options.value.itemsPerPage))
+
+  const loadItems = async (customOptions = null) => {
+    state.isLoading = true
+
+    await api.get(
+      tableEndpoints.indexUrl.value, {
+        ...(customOptions ?? options.value),
+        ...{
+          replaceUrl: false,
+        }
+      },
+      function(response){
+        numberOfElementsSelf.value = response.resource.total
+
+        if(state.enableInfiniteScroll){
+          state.elements = state.elements.push(response.resource.data)
+        }else{
+          state.elements = response.resource.data
+        }
+        state.isLoading = false
+      },
+      function(errorResponse){
+        state.isLoading = false
+        console.error(errorResponse)
+      }
+    )
+    // state.isLoading = false
+  }
 
   const state = reactive({
 
     id: Math.ceil(Math.random() * 1000000) + '-table',
+    isStoreTable,
     hideTable: false,
     searchPlaceholder: t("Type to Search"),
     fillHeight: computed(() => props.fillHeight),
-    windowSize: {
-      x: 0,
-      y: 0
-    },
-    isStoreTable,
-    options,
-    mobileTableLayout: computed(() => {
-      return smAndDown.value
-    }),
     enableCustomFooter: computed(() =>  props.paginationOptions.footerComponent === 'vuePagination'),
     footerProps: computed(() => {
       const footerProps = props.paginationOptions.footerProps
@@ -221,10 +267,21 @@ export default function useTable (props, context) {
 
       return footerProps
     }),
-    // elements: computed(() => props.items ?? store.state.datatable.data ?? []),
-    elements: elements,
+    windowSize: {
+      x: 0,
+      y: 0
+    },
+    mobileTableLayout: computed(() => {
+      return smAndDown.value
+    }),
+
+    numberOfElements,
+    options,
+
+    elements,
+
     // datatable store
-    loading: computed({
+    isLoading: computed({
       get() {
         return isStoreTable.value ? store.state.datatable.loading : loading.value
       },
@@ -237,7 +294,7 @@ export default function useTable (props, context) {
 
     activeTableItem: null,
     activeItemConfiguration: null,
-    enableInfiniteScroll: computed(() => props.paginationOptions.footerComponent === 'infiniteScroll' && getters.totalElements.value > state.elements.length),
+    enableInfiniteScroll: computed(() => props.paginationOptions.footerComponent === 'infiniteScroll' && numberOfElements.value > elements.value.length),
     draggableItems: computed(() => {
       const items = state.elements.reduce((prev, curr, currentIndex) => {
         const newItem = {
@@ -261,7 +318,7 @@ export default function useTable (props, context) {
       return items;
     }),
 
-    searchModel
+    searchModel,
   })
 
   const tableItemActions = useTableItemActions(props, {
@@ -273,18 +330,22 @@ export default function useTable (props, context) {
     }
 
   })
+
   const methods = reactive({
     onResize () {
-      state.windowSize = { x: window.innerWidth, y: window.innerHeight }
+      if(!props.noFullScreen){
+        state.windowSize = { x: window.innerWidth, y: window.innerHeight }
+      }
     },
     initialize: function () {
 
       if(!isStoreTable.value){
-        store.commit(DATATABLE.UPDATE_DATATABLE_SEARCH, '')
+        // store.commit(DATATABLE.UPDATE_DATATABLE_SEARCH, '')
+        loadItems(state.optionsSelf)
       } else {
-        state.loading = true
+        state.isLoading = true
         store.dispatch(ACTIONS.GET_DATATABLE, { callback: (res) => {
-          state.loading = false
+          state.isLoading = false
         }})
       }
       // store.commit(
@@ -293,7 +354,7 @@ export default function useTable (props, context) {
       // )
     },
     goNextPage () {
-      if (state.options.page < store.getters.totalPage) { state.options.page += 1 }
+      if (state.options.page < numberOfPages.value) { state.options.page += 1 }
     },
     goPreviousPage () {
       if (state.options.page > 1) { state.options.page -= 1 }
@@ -307,21 +368,6 @@ export default function useTable (props, context) {
       if(isIntersecting && entries[0].intersectionRatio === 1){
         methods.goNextPage()
       }
-    },
-    loadItems(options = null){
-      state.loading = true
-
-      api.get(
-        tableEndpoints.indexUrl.value, options ?? state.options, function(response){
-          const incomingDataArray = response.resource.data
-          if(state.enableInfiniteScroll){
-            state.elements = state.elements.push(incomingDataArray)
-          }else{
-            state.elements = incomingDataArray
-          }
-          state.loading = false
-        }
-      )
     },
 
     setEditedItem: tableItem.setEditedItem,
@@ -430,9 +476,8 @@ export default function useTable (props, context) {
   watch(() => state.options, (newValue, oldValue) => {
     if (isStoreTable.value) {
       store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue, infiniteScroll: state.enableInfiniteScroll }, endpoint : props.endpoints.index ?? null})
-    }else {
-      newValue.replaceUrl = false
-      methods.loadItems(newValue)
+    } else {
+      loadItems(newValue)
     }
 
   }, { deep: true })

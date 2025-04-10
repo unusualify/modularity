@@ -1,6 +1,6 @@
 <template>
-  <!-- <v-layout fluid v-resize="onResize"> -->
-    <div :class="['ue-datatable__container', noFullScreen ? '' : 'fill-height ue-datatable--full-screen_' ]">
+  <v-layout fluid v-resize="onResize" :class="[noFullScreen ? 'h-100' : '']">
+    <div :class="['ue-datatable__container', noFullScreen ? 'fill-height' : 'fill-heigh ue-datatable--full-screen' ]">
       <ActiveTableItem
         class=""
         v-model="activeTableItem"
@@ -12,10 +12,9 @@
       </ActiveTableItem>
       <v-data-table-server
         v-if="!hideTable"
-        v-bind="{...$bindAttributes(), ...footerProps}"
         :class="[
-          'px-4',
-          noFullScreen ? '' : 'h-100',
+          'px-4 h-100',
+          noFullScreenX ? 'h-100' : 'h-100',
           tableClasses,
           fullWidthWrapper ? '' : 'ue-table--narrow-wrapper',
           striped ? 'ue-datatable--striped' : '',
@@ -26,6 +25,7 @@
         id="ue-table"
 
         :headers="selectedHeaders"
+        :fixed-header="fixedHeader"
 
         :sticky="sticky"
         :items="elements"
@@ -35,18 +35,18 @@
         :search="options.search"
         :page="options.page"
 
-        :items-length="totalElements"
+        :items-length="numberOfElements"
         :item-title="titleKey"
         ref="datatable"
 
-        :height="windowSize.y - 64 - 24 - 59 - 36"
+        :height="windowSize.y - 64 - 24 - 59 - 76 - ($vuetify.display.mdAndDown ? 80 : 0)"
 
         :hide-default-header="hideHeaders"
         :multi-sort="multiSort"
         :must-sort="mustSort"
         :density="tableDensity ?? 'comfortable'"
         :disable-sort="disableSort"
-        :loading="loading"
+        :loading="isLoading"
         :loading-text="$t('Loading... Please wait')"
         :mobile="$vuetify.display.smAndDown"
 
@@ -138,7 +138,7 @@
                       'min-width: 100px'
                     ]"
                     @click:append-inner="searchItems()"
-                    :disabled="loading"
+                    :disabled="isLoading"
                     @keydown.enter="searchItems()"
                   >
                     <template #append-inner>
@@ -580,14 +580,13 @@
         </template>
 
         <!-- MARK PAGINATION BUTTONS -->
-
         <template v-if="enableCustomFooter" v-slot:bottom="{page, pageCount}">
           <div class="d-flex justify-end">
             <v-pagination
-            v-model="options.page"
-            :length="pageCount"
-            v-bind="footerProps"
-          />
+              v-model="options.page"
+              :length="pageCount"
+              v-bind="footerProps"
+            />
           </div>
         </template>
 
@@ -767,7 +766,7 @@
         <!-- MARK: Infinite Scroll Triggering Component -->
         <template v-slot:body.append>
             <v-card v-intersect="onIntersect" v-if="enableInfiniteScroll"/>
-            <v-progress-circular :indeterminate="loading" v-if="enableInfiniteScroll && loading"></v-progress-circular>
+            <v-progress-circular :indeterminate="isLoading" v-if="enableInfiniteScroll && isLoading"></v-progress-circular>
         </template>
 
         <template v-slot:default v-if="draggable">
@@ -817,7 +816,7 @@
 
       </v-data-table-server>
     </div>
-  <!-- </v-layout> -->
+  </v-layout>
 </template>
 
 <script>
@@ -906,8 +905,8 @@ export default {
 .ue-datatable__container
   width: 100%
 
-  &.ue-datatable--full-screen
-    min-height: calc(100vh - (2*12 * $spacer))
+  // &.ue-datatable--full-screen
+  //   height: calc(100vh - (2*8 * $spacer))
 
 .v-table
   &.ue-datatable
@@ -927,7 +926,7 @@ export default {
 
     &--rounded-row
       th
-        background-color: var(--table-header-color) //TODO: table action border must be variable
+        background: rgb(var(--v-theme-grey-lighten-5)) !important //TODO: table action border must be variable
       tr
         // &:first-child
         td,th
@@ -942,7 +941,7 @@ export default {
     &--striped
       tr
         &:nth-of-type(2n)
-          background-color: rgba(140,160,167, .2) //TODO: table action border must be variable
+          background-color: rgb(var(--v-theme-grey-lighten-6)) //TODO: table action border must be variable
 
   .action-dropdown
     .v-overlay__content
