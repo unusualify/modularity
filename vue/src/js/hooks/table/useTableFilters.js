@@ -51,11 +51,11 @@ export default function useTableFilters(props) {
 
   // Advanced Filters
   const advancedFilters = computed(() =>
-    store.state.datatable.advancedFilters ?? null
+    store.state.datatable.advancedFilters ?? {}
   )
 
   const mainFilters = computed(() =>
-    store.state.datatable.mainFilters ?? null
+    store.state.datatable.mainFilters ?? []
   )
 
   // Methods
