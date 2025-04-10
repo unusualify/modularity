@@ -1,7 +1,6 @@
 <template>
   <!-- TODO: V2: This component and it's incoming config can be changed and can be made with RecursiveStuff -->
   <v-card :color="container.color" density="comfortable" :elevation="container.elevation" :class="container.class">
-   <!-- {{ console.log('here2') }} -->
 
     <v-card-title style="font-weight: bolder" class="py-4"> {{ $t("AT A GLANCE") }}</v-card-title>
 
@@ -134,12 +133,12 @@ export default {
 
 
 <style lang="scss">
-.glance-icon-container{
-  width: 56px;
-  height: 56px;
-  align-items: center;
-  justify-content: center;
-  display: flex;
-  border-radius: 50%;
-}
+  .glance-icon-container{
+    width: 56px;
+    height: 56px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    border-radius: 50%;
+  }
 </style>
