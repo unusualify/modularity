@@ -187,7 +187,15 @@
             </v-slide-x-transition>
           </v-toolbar>
 
-          <v-divider v-if="controlsPosition === 'top' && $vuetify.display.mdAndUp" class="mb-4 mt-2"></v-divider>
+          <!-- Loading Progress Bar and Divider -->
+          <v-progress-linear
+            v-if="hideHeaders && isLoading"
+            class="w-100 mb-4 mt-2"
+            color="success"
+            indeterminate
+            reverse
+          ></v-progress-linear>
+          <v-divider v-else-if="controlsPosition === 'top' && $vuetify.display.mdAndUp" class="mb-4 mt-2"></v-divider>
 
           <!-- filter menu -->
           <v-menu
