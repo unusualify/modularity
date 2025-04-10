@@ -37,7 +37,17 @@ export const makeTableProps = propsFactory({
   items: {
     type: Array
   },
+  total: {
+    type: Number,
+    default: null,
+  },
+
   hideFooter: {
+    type: Boolean,
+    default: false
+  },
+
+  fixedHeader: {
     type: Boolean,
     default: false
   },
