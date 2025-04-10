@@ -299,7 +299,7 @@ trait Relationships
         return $fields;
     }
 
-    public function getShowFieldsRelationships($object, $fields, $schema = [])
+    public function _getShowFieldsRelationships($object, $fields, $schema = [])
     {
         // dd(
         //     $this->definedRelationsTypes()
