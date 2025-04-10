@@ -129,7 +129,7 @@
     </v-card-title>
 
     <!-- Metrics row -->
-    <div class="d-flex flex-wrap ue-metrics__row">
+    <div class="d-flex flex-wrap ue-metrics__row h-100">
       <template
         v-for="(metric, index) in items"
         :key="index"
@@ -139,7 +139,7 @@
             'ue-metrics__metric',
             'flex-grow-1',
           ]"
-          :style="{ width: `${100 / items.length}%`, minWidth: '150px' }"
+          :style="{ width: `${100 / items.length}%`, minWidth: '120px' }"
           elevation="0"
           rounded="0"
           dense
@@ -164,6 +164,7 @@
     border-right-color: $border-color !important;
 
   }
+
   .ue-metrics {
     border-bottom: $border-width solid;
 
