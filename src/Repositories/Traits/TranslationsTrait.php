@@ -141,7 +141,7 @@ trait TranslationsTrait
         if ($this->model->isTranslatable()) {
             $attributes = $this->model->translatedAttributes;
 
-            $query->whereHas('translations', function ($q) use ($scopes, $attributes) {
+            $query->orWhereHas('translations', function ($q) use ($scopes, $attributes) {
                 foreach ($attributes as $attribute) {
                     if (isset($scopes[$attribute]) && is_string($scopes[$attribute])) {
                         if (! (isset($scopes['searches']) && in_array($attribute, $scopes['searches']))) {
@@ -153,7 +153,9 @@ trait TranslationsTrait
                 if (isset($scopes['searches'])) {
                     $q->where(function ($query) use (&$scopes) {
                         foreach ($scopes['searches'] as $field) {
-                            $query->orWhere($field, $this->getLikeOperator(), '%' . $scopes[$field] . '%');
+                            if(isset($scopes[$field])) {
+                                $query->orWhere($field, $this->getLikeOperator(), '%' . $scopes[$field] . '%');
+                            }
                         }
                     });
                 }
