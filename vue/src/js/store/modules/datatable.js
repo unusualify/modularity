@@ -59,9 +59,6 @@ const state = {
 
 // getters
 const getters = {
-  activeHeaders: state => {
-
-  },
   // defaultItem: state => {
   //   return state.inputs.reduce( (a,c) => (a[c.name] = c.default, a), {})
   // },
