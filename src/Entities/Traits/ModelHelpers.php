@@ -148,30 +148,30 @@ trait ModelHelpers
     {
         foreach ($this->getRelations() as $relationName => $relation) {
 
-            if ($relation instanceof \Illuminate\Database\Eloquent\Collection) {
-                // dd($this, $relationName, $this->getRelations());
-                $this->{$relationName} = $relation->map(function ($related) {
+            // if ($relation instanceof \Illuminate\Database\Eloquent\Collection) {
+            //     // dd($this, $relationName, $this->getRelations());
+            //     $this->{$relationName} = $relation->map(function ($related) {
 
-                    if (method_exists($related, 'setRelationsShowFormat')) {
-                        $related->setRelationsShowFormat();
-                    }
+            //         if (method_exists($related, 'setRelationsShowFormat')) {
+            //             $related->setRelationsShowFormat();
+            //         }
 
-                    return $related;
-                });
+            //         return $related;
+            //     });
 
-                $this["{$relationName}_show"] ??= $this->{$relationName}->map(fn ($model) => modelShowFormat($model))->implode(', ');
+            //     $this["{$relationName}_show"] ??= $this->{$relationName}->map(fn ($model) => modelShowFormat($model))->implode(', ');
 
-            } elseif ($relation) {
+            // } elseif ($relation) {
 
-                if (method_exists($relation, 'setRelationsShowFormat')) {
-                    $relation->setRelationsShowFormat();
-                }
+            //     if (method_exists($relation, 'setRelationsShowFormat')) {
+            //         $relation->setRelationsShowFormat();
+            //     }
 
-                // $this->{$relationName} = $relation;
+            //     // $this->{$relationName} = $relation;
 
-                $this["{$relationName}_show"] ??= modelShowFormat($relation);
+            //     $this["{$relationName}_show"] ??= modelShowFormat($relation);
 
-            }
+            // }
         }
     }
 
