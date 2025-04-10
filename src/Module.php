@@ -535,7 +535,7 @@ class Module extends NwidartModule
         return $moduleRoutes;
     }
 
-    public function getRouteUris($routeName, $withoutNamePrefix = false, $modelBindingValue = null): array
+    public function getRouteUris($routeName): array
     {
         $actions = [
             'restore',
@@ -562,6 +562,45 @@ class Module extends NwidartModule
         $midQuote = '(.nested.[a-z|_]+)?.(';
 
         $quote = $this->fullRouteNamePrefix($isParentRoute) . '.' . snakeCase($routeName) . $midQuote . implode('|', $actions) . ')$';
+
+        $uris = Collection::make($this->getModuleUris())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
+
+        return $uris->toArray();
+    }
+
+    /**
+     * Get the main URIs of the route.
+     *
+     * @param string $routeName
+     * @param bool $withoutNamePrefix
+     * @param string|null $modelBindingValue
+     * @return array
+     */
+    public function getRouteMainUris($routeName, $withoutNamePrefix = false, $modelBindingValue = null)
+    {
+        $actions = [
+            'restore',
+            'forceDelete',
+            'duplicate',
+            'index',
+            'create',
+            'store',
+            'show',
+            'edit',
+            'update',
+            'destroy',
+            'bulkDelete',
+            'bulkForceDelete',
+            'bulkRestore',
+            'tags',
+            'tagsUpdate',
+            'assignments',
+            'createAssignment',
+        ];
+
+        $isParentRoute = $this->isParentRoute($routeName);
+
+        $quote = $this->fullRouteNamePrefix($isParentRoute) . '.' . snakeCase($routeName) . '.(' . implode('|', $actions) . ')$';
 
         $uris = Collection::make($this->getModuleUris())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
 
