@@ -31,9 +31,10 @@ export default function useSidebar () {
         store.commit(CONFIG.SET_SIDEBAR, value)
       }
     }),
-    width: computed(() => xlAndUp.value ? 320 : 256),
 
     options: store.state.config.sidebarOptions,
+
+    width: computed(() => xlAndUp.value ? 320 : (state.options.width || 264)),
     hideIcons: computed(() => !state.rail && state.options.hideIcons),
     railManual: false,
     rail: computed(() => (state.options.rail || state.railManual) && lgAndUp.value),
