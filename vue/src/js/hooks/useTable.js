@@ -185,7 +185,7 @@ export default function useTable (props, context) {
   })
   const tableModals = useTableModals(props)
 
-  const getters = mapGetters()
+  // const getters = mapGetters()
 
   const form = ref(null)
   const loading = ref(false)
@@ -450,11 +450,6 @@ export default function useTable (props, context) {
 
       return data
     },
-    searchItems(){
-      if(tableFilters.search.value !== searchModel.value){
-        tableFilters.search.value = searchModel.value
-      }
-    }
   })
 
   watch(() => tableItem.editedItem.value, (newValue, oldValue) => {
@@ -507,6 +502,6 @@ export default function useTable (props, context) {
     ...tableItemActions,
     ...tableModals,
     ...formatter,
-    ...getters,
+    // ...getters,
   }
 }

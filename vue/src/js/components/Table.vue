@@ -14,7 +14,6 @@
         v-if="!hideTable"
         :class="[
           'px-4 h-100',
-          noFullScreenX ? 'h-100' : 'h-100',
           tableClasses,
           fullWidthWrapper ? '' : 'ue-table--narrow-wrapper',
           striped ? 'ue-datatable--striped' : '',
@@ -137,9 +136,9 @@
                       // controlsPosition === 'top' || $vuetify.display.smAndDown ? 'max-width: 300px' : '',
                       'min-width: 100px'
                     ]"
-                    @click:append-inner="searchItems()"
+                    @click:append-inner="setSearchValue(searchModel)"
                     :disabled="isLoading"
-                    @keydown.enter="searchItems()"
+                    @keydown.enter="setSearchValue(searchModel)"
                   >
                     <template #append-inner>
                       <v-btn :disabled="searchModel === search" icon="mdi-magnify" variant="plain" size="compact" color="grey-darken-5" rounded @click="searchItems()" />
@@ -549,7 +548,6 @@
                 :headers="headers"
                 :rowActions = "rowActions"
                 @click-action="itemAction"
-                @edit-item = "editItem"
               >
 
                 <template v-slot:actions>
