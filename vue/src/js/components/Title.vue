@@ -77,7 +77,7 @@ const props = defineProps({
   justify: {
     type: String,
     default: 'start',
-    validator: (value) => ['start', 'center', 'end'].includes(value)
+    validator: (value) => ['start', 'center', 'end', 'space-between'].includes(value)
   },
   defaultClasses: {
     type: [String, Array],
