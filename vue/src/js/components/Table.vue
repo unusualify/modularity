@@ -908,48 +908,48 @@ export default {
 </script>
 
 <style lang="sass">
-.ue-datatable__container
-  width: 100%
+  .ue-datatable__container
+    width: 100%
 
-  // &.ue-datatable--full-screen
-  //   height: calc(100vh - (2*8 * $spacer))
+    // &.ue-datatable--full-screen
+    //   height: calc(100vh - (2*8 * $spacer))
 
-.v-table
-  &.ue-datatable
-    &--bottom-controls
-      .v-toolbar__content
-        display: block
-        height: unset !important
+  .v-table
+    &.ue-datatable
+      &--bottom-controls
+        .v-toolbar__content
+          display: block
+          height: unset !important
 
-    &--no-border-row
-      .v-table__wrapper
-        > table
-          > tbody
-            > tr:not(:last-child)
-              > td,
-              > th
-                border: none!important
+      &--no-border-row
+        .v-table__wrapper
+          > table
+            > tbody
+              > tr:not(:last-child)
+                > td,
+                > th
+                  border: none!important
 
-    &--rounded-row
-      th
-        background: rgb(var(--v-theme-grey-lighten-5)) !important //TODO: table action border must be variable
-      tr
-        // &:first-child
-        td,th
-          &:first-child
-            border-bottom-left-radius: 8px
-            border-top-left-radius: 8px
+      &--rounded-row
+        th
+          background: rgb(var(--v-theme-grey-lighten-5)) !important //TODO: table action border must be variable
+        tr
+          // &:first-child
+          td,th
+            &:first-child
+              border-bottom-left-radius: 8px
+              border-top-left-radius: 8px
 
-          &:last-child
-            border-bottom-right-radius: 8px
-            border-top-right-radius: 8px
+            &:last-child
+              border-bottom-right-radius: 8px
+              border-top-right-radius: 8px
 
-    &--striped
-      tr
-        &:nth-of-type(2n)
-          background-color: rgb(var(--v-theme-grey-lighten-6)) //TODO: table action border must be variable
+      &--striped
+        tr
+          &:nth-of-type(2n)
+            background-color: rgb(var(--v-theme-grey-lighten-6)) //TODO: table action border must be variable
 
-  .action-dropdown
-    .v-overlay__content
-      border: 1px solid #49454F !important //TODO: table action border must be variable
+    .action-dropdown
+      .v-overlay__content
+        border: 1px solid #49454F !important //TODO: table action border must be variable
 </style>
