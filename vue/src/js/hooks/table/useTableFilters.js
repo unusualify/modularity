@@ -59,7 +59,7 @@ export default function useTableFilters(props) {
   )
 
   // Methods
-  const filterStatus = (slug) => {
+  const changeFilterSlug = (slug) => {
     if (navActive.value === slug) return
 
     store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
@@ -107,7 +107,7 @@ export default function useTableFilters(props) {
     filterBtnTitle,
 
     // Methods
-    filterStatus,
+    changeFilterSlug,
     submitAdvancedFilter,
     clearAdvancedFilter,
     setSearchValue

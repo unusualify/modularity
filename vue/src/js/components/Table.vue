@@ -204,7 +204,7 @@
                 <v-list-item
                   v-for="(filter, index) in mainFilters"
                   :key="index"
-                  v-on:click.prevent="filterStatus(filter.slug)"
+                  v-on:click.prevent="changeFilterSlug(filter.slug)"
                 >
                   <v-list-item-title>{{ filter.name + '(' + filter.number+ ')' }} </v-list-item-title>
                 </v-list-item>
