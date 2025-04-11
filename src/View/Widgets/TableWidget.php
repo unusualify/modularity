@@ -28,7 +28,7 @@ class TableWidget extends ModularityWidget
         'fullWidthWrapper' => true,
         'fillHeight' => false,
 
-        'hideHeaders' => true,
+        'hideHeaders' => false,
         'hideBorderRow' => true,
         'hideDefaultFooter' => false,
         'hideSearchField' => true,
