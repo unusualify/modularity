@@ -81,6 +81,12 @@ export default function useTableFilters(props) {
     store.dispatch(ACTIONS.GET_DATATABLE)
   }
 
+  const setSearchValue = (val) => {
+    if(search.value !== val){
+      search.value = val
+    }
+  }
+
   // Filter Button Options
   const filterBtnTitle = computed(() => ({
     text: `${filterActive.value?.name} (${filterActive.value?.number})`
@@ -103,6 +109,7 @@ export default function useTableFilters(props) {
     // Methods
     filterStatus,
     submitAdvancedFilter,
-    clearAdvancedFilter
+    clearAdvancedFilter,
+    setSearchValue
   }
 }
