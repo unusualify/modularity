@@ -175,7 +175,12 @@ export default function useTable (props, context) {
   // Get endpoints-related computeds
   const tableEndpoints = useTableEndpoints(props)
   // Get filter-related computeds
-  const tableFilters = useTableFilters(props)
+  const tableFilters = useTableFilters(props, {
+    ...context,
+    ...{
+      isStoreTable
+    }
+  })
   // Get headers-related computeds
   const tableHeaders = useTableHeaders(props)
   // Get forms-related computeds

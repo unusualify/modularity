@@ -22,9 +22,9 @@ export const makeTableFiltersProps = propsFactory({
   },
 })
 
-export default function useTableFilters(props) {
+export default function useTableFilters(props, context) {
   const store = useStore()
-
+  const { isStoreTable } = context
   // Filter Status
   const filterActiveStatus = computed(() =>
     store.state.datatable.filter.status ?? 'all'
@@ -62,11 +62,14 @@ export default function useTableFilters(props) {
   const changeFilterSlug = (slug) => {
     if (navActive.value === slug) return
 
-    store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
-    store.commit(DATATABLE.UPDATE_DATATABLE_FILTER_STATUS, slug)
-    // Reset selected items when changing filter
-    store.commit(DATATABLE.REPLACE_DATATABLE_BULK, [])
-    store.dispatch(ACTIONS.GET_DATATABLE)
+    if(isStoreTable.value){
+      store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
+      store.commit(DATATABLE.UPDATE_DATATABLE_FILTER_STATUS, slug)
+      // Reset selected items when changing filter
+      store.commit(DATATABLE.REPLACE_DATATABLE_BULK, [])
+      store.dispatch(ACTIONS.GET_DATATABLE)
+    }
+
   }
 
   const submitAdvancedFilter = () => {
