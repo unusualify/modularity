@@ -42,7 +42,6 @@
     :is="parsedComponent.name"
     v-bind="{...parsedComponent.props, ...$bindAttributes()}"
   >
-    {{ $log(parsedComponent.props) }}
     {{ parsedComponent.content }}
   </component>
   <template v-else-if="subject">{{ subject }}</template>
