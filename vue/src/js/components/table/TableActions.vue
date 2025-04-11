@@ -28,9 +28,10 @@
 
 <template>
     <div :class="[
-      hasActions ? 'd-flex flex-wrap ga-2' : ''
+      (hasActions || $slots.prepend) ? 'd-flex flex-wrap ga-2' : ''
     ]"
   >
+    <slot name="prepend"></slot>
     <template v-for="(action, key) in allActions">
       <v-tooltip
         :disabled="!action.icon || action.forceLabel"
