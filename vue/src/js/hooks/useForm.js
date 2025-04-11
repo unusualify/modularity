@@ -122,7 +122,7 @@ export const makeFormProps = propsFactory({
     default: 12
   },
   rightSlotWidth: {
-    type: Number,
+    type: [Number, String],
     default: null
   },
   rightSlotMinWidth: {
