@@ -1,4 +1,5 @@
 <script setup>
+  import { computed } from 'vue'
   import { useAttrs, useSlots } from 'vue'
   import { useItemActions } from '@/hooks'
   import useGenerate from '@/hooks/utils/useGenerate.js'
@@ -16,6 +17,22 @@
   const slots = useSlots()
 
   const { generateButtonProps } = useGenerate()
+
+  // First, create references to all the generated props at the top level
+  const generatedPropsMap = {}
+  props.actions.forEach((action, key) => {
+    // if(generatedPropsMap[key]) return
+    const { generatedButtonProps } = useGenerate(action)
+    generatedPropsMap[key] = generatedButtonProps
+  })
+  // Then use the references in the computed property
+  const buttonsProps = computed(() => {
+    return Object.keys(generatedPropsMap).reduce((acc, key) => {
+      acc[key] = generatedPropsMap[key].value
+      return acc
+    }, {})
+  })
+
   const { isBadge, badgeProps } = useBadge()
 
   const { handleAction, allActions, hasActions } = useItemActions(props, {
@@ -108,13 +125,12 @@
               :text-color="action.badgeTextColor ?? 'white'"
             >
               <v-btn
-                v-bind="{...generateButtonProps(action), ...props}"
+                v-bind="{...buttonsProps[key], ...props}"
               />
             </v-badge>
             <v-btn v-else
-              v-bind="{...generateButtonProps(action), ...props}"
-
-              @click="() => console.log(generateButtonProps(action))"
+              v-bind="{...buttonsProps[key], ...props}"
+              @click="() => console.log(buttonsProps[key])"
             />
           </template>
         </template>
