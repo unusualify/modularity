@@ -1,3 +1,31 @@
+<script setup>
+  import { useAttrs, useSlots } from 'vue'
+  import { useItemActions } from '@/hooks'
+  import useGenerate from '@/hooks/utils/useGenerate.js'
+  import useBadge from '@/hooks/utils/useBadge.js'
+
+  const props = defineProps({
+    actions: {
+      type: Array,
+      required: true
+    },
+  })
+
+  const emits = defineEmits(['actionComplete'])
+  const attrs = useAttrs()
+  const slots = useSlots()
+
+  const { generateButtonProps } = useGenerate()
+  const { isBadge, badgeProps } = useBadge()
+
+  const { handleAction, allActions, hasActions } = useItemActions(props, {
+    ...attrs,
+    ...slots,
+    ...emits,
+    actionItem: props.modelValue
+  })
+</script>
+
 <template>
     <div :class="[
       hasActions ? 'd-flex flex-wrap ga-2' : ''
@@ -5,13 +33,11 @@
   >
     <template v-for="(action, key) in allActions">
       <v-tooltip
-        v-if="action.type !== 'modalx'"
         :disabled="!action.icon || action.forceLabel"
         :location="action.tooltipLocation ?? 'top'"
       >
         <template v-slot:activator="{ props }">
-          <v-switch
-            v-if="action.type === 'publish'"
+          <v-switch v-if="action.type === 'publish'"
             :modelValue="editedItem[action.key ?? 'published'] ?? action.default ?? false"
             @update:modelValue="handleAction(action)"
             v-bind="{...action.componentProps, ...props}"
@@ -97,40 +123,3 @@
   </div>
 </template>
 
-<script>
-import { computed } from 'vue'
-import { useItemActions } from '@/hooks'
-import { getModel } from '@/utils/getFormData'
-import useGenerate from '@/hooks/utils/useGenerate.js'
-import useBadge from '@/hooks/utils/useBadge.js'
-
-export default {
-  name: 'TableActions',
-  props: {
-    actions: {
-      type: Array,
-      required: true
-    },
-  },
-  setup(props, context) {
-    const { generateButtonProps } = useGenerate()
-    const { isBadge, badgeProps } = useBadge()
-
-    const { handleAction, allActions, hasActions } = useItemActions(props, {
-      ...context,
-      actionItem: props.modelValue
-    })
-
-    return {
-      generateButtonProps,
-      handleAction,
-      allActions,
-      hasActions,
-      isBadge,
-      badgeProps
-    }
-  }
-
-}
-
-</script>
