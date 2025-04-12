@@ -847,6 +847,7 @@ import {
   makeTableFormsProps,
   makeTableItemActionsProps,
   makeTableActionsProps,
+  makeTableModalsProps,
 } from '@/hooks/table'
 
 import ActiveTableItem from '__components/labs/ActiveTableItem.vue'
@@ -872,6 +873,7 @@ export default {
     ...makeTableFormsProps(),
     ...makeTableItemActionsProps(),
     ...makeTableActionsProps(),
+    ...makeTableModalsProps(),
     ...makeTableProps(),
     ...makeDraggableProps(),
     ...ignoreFormatters

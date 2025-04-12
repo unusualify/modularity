@@ -7,6 +7,15 @@ import _ from 'lodash-es'
 import ACTIONS from '@/store/actions'
 import { useTableItem, useTableNames } from '@/hooks/table'
 
+import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
+
+export const makeTableModalsProps = propsFactory({
+  openCustomModal: {
+    type: Boolean,
+    default: false,
+  },
+})
+
 export default function useTableModals(props, context) {
   const store = useStore()
   const { t } = useI18n({ useScope: 'global' })
@@ -15,7 +24,8 @@ export default function useTableModals(props, context) {
 
   // Modal States
   const deleteModalActive = ref(false)
-  const customModalActive = ref(!(_.isEmpty(store._state.data.datatable.customModal)))
+  // const customModalActive = ref(!(_.isEmpty(store._state.data.datatable.customModal)))
+  const customModalActive = ref(props.openCustomModal)
   const actionModalActive = ref(false)
   const activeModal = ref('custom')
   const selectedAction = ref(null)

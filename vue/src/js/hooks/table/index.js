@@ -6,6 +6,6 @@ export { default as useTableFilters, makeTableFiltersProps } from './useTableFil
 export { default as useTableHeaders, makeTableHeadersProps } from './useTableHeaders'
 export { default as useTableForms, makeTableFormsProps } from './useTableForms'
 export { default as useTableItemActions, makeTableItemActionsProps } from './useTableItemActions'
-export { default as useTableModals } from './useTableModals'
+export { default as useTableModals, makeTableModalsProps } from './useTableModals'
 export { default as useTableIterator, makeTableIteratorProps, tableIterableEmits } from './useTableIterator'
 export { default as useTableActions, makeTableActionsProps } from './useTableActions'
