@@ -47,6 +47,23 @@ trait ManageTable
         $this->tableAttributes = array_merge_recursive_preserve($this->getTableAttributes(), $this->tableAttributes ?? []);
     }
 
+
+    /**
+     * Get the default table options
+     *
+     * @return array
+     */
+    public function getDefaultTableOptions()
+    {
+        return [
+            'itemsPerPage' => $this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10,
+            'page' => 1,
+            'search' => '',
+            'sortBy' => [],
+            'groupBy' => [],
+        ];
+    }
+
     /**
      * getVuetifyDatatableOptions
      *
@@ -54,7 +71,7 @@ trait ManageTable
      */
     public function getVuetifyDatatableOptions()
     {
-        return [
+        return array_merge($this->getDefaultTableOptions(), [
             'page' => request()->has('page') ? intval(request()->query('page')) : 1,
             'itemsPerPage' => request()->has('itemsPerPage') ? intval(request()->query('itemsPerPage')) : ($this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10),
             'sortBy' => request()->has('sortBy') ? [request()->get('sortBy')] : [],
@@ -64,7 +81,7 @@ trait ManageTable
             // 'mustSort'      => false,
             // 'groupDesc'     => [],
             // 'sortDesc'      => request()->has('sortDesc') ? [request()->get('sortDesc')] : [],
-        ];
+        ]);
     }
 
     /**
