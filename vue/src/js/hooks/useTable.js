@@ -169,16 +169,6 @@ export default function useTable (props, context) {
   const { t, te, tm } = useI18n({ useScope: 'global' })
 
   const editedIndex = ref(-1)
-  // let items = ref(props.items ?? store.state.datatable?.data ?? [])
-  // let items = ref(props.items ?? [])
-  // const elements = computed({
-  //   get(){
-  //     return items.value;
-  //   },
-  //   set(val){
-  //     items.value = val
-  //   }
-  // });
   let elements = ref(props.items ?? [])
 
   const isStoreTable = computed(() => {
