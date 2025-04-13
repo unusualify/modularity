@@ -27,12 +27,15 @@ trait ManageUtilities
         $headers = $this->filterHeadersByRoles($this->getIndexTableColumns());
         $headers = hydrate_table_columns_translations($headers);
 
+        $scopes = $this->filterScope($this->nestedParentScopes());
         $tableAttributes = $this->hydrateTableAttributes();
         $tableEndpoints = $this->getIndexUrls() + $this->getUrls();
+        $tableMainFilters = $this->getTableMainFilters($scopes);
+
 
         $_deprecated = [
             'initialResource' => $initialResource, //
-            'tableMainFilters' => $this->getTableMainFilters(),
+            'tableMainFilters' => $tableMainFilters,
             'filters' => $filters,
             'requestFilter' => json_decode(request()->get('filter'), true) ?? [],
             'searchText' => request()->has('search') ? request()->query('search') : '', // for current text of search parameter
@@ -40,14 +43,14 @@ trait ManageUtilities
             'formSchema' => $this->filterSchemaByRoles($this->formSchema), // input fields to be used in modularity datatable component
         ];
         $data = [
-            ...$_deprecated,
+            // ...$_deprecated,
             'endpoints' => $tableEndpoints,
         ] + $this->getViewLayoutVariables();
 
         $options = [
             'moduleName' => $this->getHeadline($this->moduleName),
             'translate' => $this->routeHas('translations') || $this->hasTranslatedInput(),
-            'listOptions' => $this->getVuetifyDatatableOptions(), // options to be used in modularity table components in datatable store
+            // 'listOptions' => $this->getVuetifyDatatableOptions(), // options to be used in modularity table components in datatable store
             'tableAttributes' => array_merge(
                 [
                     'rowActions' => $this->getTableRowActions(),
@@ -56,6 +59,18 @@ trait ManageUtilities
                     'formActions' => $this->getFormActions(),
                     'actions' => $this->getTableActions(),
                     'endpoints' => $tableEndpoints,
+
+                    'navActive' => 'all',
+                    'total' => $initialResource['total'] ?? -1,
+                    'searchInitialValue' => request()->has('search') ? request()->query('search') : '',
+                    'tableOptions' => $this->getVuetifyDatatableOptions(),
+                    'columns' => $headers,
+                    'filterList' => $tableMainFilters,
+                    'filterListAdvanced' => $this->getTableAdvancedFilters(),
+                    'openCustomModal' => request()->has('customModal') ? request()->query('customModal') : false,
+
+                    'isModuleTable' => true,
+                    'defaultTableOptions' => $this->getDefaultTableOptions(),
                 ],
                 ($this->isNested ? ['titlePrefix' => $this->nestedParentModel->getTitleValue() . ' \ '] : []),
                 array_merge_recursive_preserve(
@@ -73,16 +88,17 @@ trait ManageUtilities
                 'fields' => [],
             ],
             'tableStore' => [
-                'baseUrl' => rtrim(config('app.url'), '/') . '/',
-                'headers' => $headers,
-                'searchText' => request()->has('search') ? request()->query('search') : '',
-                'options' => $this->getVuetifyDatatableOptions(),
-                'data' => $initialResource['data'],
-                'total' => $initialResource['total'] ?? 0,
-                'mainFilters' => $this->getTableMainFilters(),
-                'filter' => ['status' => $filters['status'] ?? $defaultFilterSlug ?? 'all'],
-                'advancedFilters' => $this->getTableAdvancedFilters(),
-                'customModal' => request()->has('customModal') ? request()->query('customModal') : '',
+                // 'baseUrl' => rtrim(config('app.url'), '/') . '/',
+                // 'mainFilters' => $this->getTableMainFilters(),
+                // 'advancedFilters' => $this->getTableAdvancedFilters(),
+                // 'headers' => $headers,
+                // 'searchText' => request()->has('search') ? request()->query('search') : '',
+
+                // 'options' => $this->getVuetifyDatatableOptions(),
+                // 'data' => $initialResource['data'],
+                // 'total' => $initialResource['total'] ?? 0,
+                // 'filter' => ['status' => $filters['status'] ?? $defaultFilterSlug ?? 'all'],
+                // 'customModal' => request()->has('customModal') ? request()->query('customModal') : '',
 
                 // {{-- inputs: {!! json_encode($inputs) !!}, --}}
                 // {{-- initialAsync: '{{ count($tableData['data']) ? true : false }}', --}}
@@ -107,6 +123,7 @@ trait ManageUtilities
 
         ];
 
+        // dd($data + $options);
         return array_replace_recursive($data + $options, $this->indexData($this->request));
     }
 
