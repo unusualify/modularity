@@ -73,6 +73,10 @@ trait TableFilters
             );
         }
 
+        $statusFilters = array_filter($statusFilters, function ($filter) {
+            return $filter['number'] > 0;
+        });
+
         return $statusFilters;
     }
 
