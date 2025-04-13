@@ -2,7 +2,6 @@
 import { watch, computed, nextTick, reactive, toRefs, ref, watchEffect } from 'vue'
 import { propsFactory } from "vuetify/lib/util/propsFactory.mjs";
 import { useFormatter, useRoot } from '@/hooks'
-import { useTableItemActions } from '@/hooks/table'
 
 export const makeTableIteratorProps = propsFactory({
   item: {
