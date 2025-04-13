@@ -26,7 +26,8 @@ export default function useGenerate(props, context) {
       // rounded: props.forceLabel ? null : true,
       icon: hasIcon && !smAndUp.value ? hasIcon : defaultButtonProps.icon,
       density: (hasIcon && !smAndUp.value) ? 'compact' : (props.density ?? 'comfortable'),
-      rounded: hasIcon ? false : (defaultButtonProps.rounded ?? false),
+      // rounded: hasIcon ? true : (defaultButtonProps.rounded ?? null),
+      rounded: !smAndUp.value ? true : defaultButtonProps.rounded,
     }
   })
 
@@ -51,7 +52,7 @@ export default function useGenerate(props, context) {
       density: action.density ?? 'comfortable',
       size: action.size ?? 'default',
       disabled: action.disabled ?? action.componentProps?.disabled ?? false,
-      rounded: action.forceLabel ? null : false,
+      rounded: action.forceLabel ? null : true,
     }
   }
 
