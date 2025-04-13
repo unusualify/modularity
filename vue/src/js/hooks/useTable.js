@@ -52,6 +52,17 @@ export const makeTableProps = propsFactory({
     default: false
   },
 
+  defaultTableOptions: {
+    type: Object,
+    default: () => ({
+      itemsPerPage: 10,
+      page: 1,
+      search: '',
+      sortBy: [],
+      groupBy: [],
+    }),
+  },
+
   tableOptions: {
     type: Object
   },
@@ -140,6 +151,11 @@ export const makeTableProps = propsFactory({
     default: false,
   },
 
+  isModuleTable: {
+    type: Boolean,
+    default: false,
+  },
+
 })
 
 // by convention, composable function names start with "use"
@@ -153,19 +169,80 @@ export default function useTable (props, context) {
   const { t, te, tm } = useI18n({ useScope: 'global' })
 
   const editedIndex = ref(-1)
-  let items = ref(props.items ?? store.state.datatable?.data ?? [])
-  const elements = computed({
-    get(){
-      return items.value;
-    },
-    set(val){
-      items.value = val
-    }
-  });
+  // let items = ref(props.items ?? store.state.datatable?.data ?? [])
+  // let items = ref(props.items ?? [])
+  // const elements = computed({
+  //   get(){
+  //     return items.value;
+  //   },
+  //   set(val){
+  //     items.value = val
+  //   }
+  // });
+  let elements = ref(props.items ?? [])
 
   const isStoreTable = computed(() => {
     return props.endpoints.index.replace(/\/$/, '').split('?')[0] === window.location.href.replace(/\/$/, '').split('?')[0]
   })
+
+  const form = ref(null)
+  const loading = ref(false)
+  const options = ref(_.pick({
+    ...(props.defaultTableOptions ?? {}),
+    ...(props.tableOptions ?? {}),
+  }, ['itemsPerPage', 'page', 'sortBy', 'groupBy', 'search']))
+
+  const totalNumberOfElements = ref(props.total ?? -1)
+  const totalNumberOfPages = computed(() => Math.ceil(totalNumberOfElements.value / options.value.itemsPerPage))
+
+  const updateResponseFields = (response) => {
+    totalNumberOfElements.value = response.resource.total
+    tableFilters.setMainFilters(response.mainFilters)
+    // tableFilters.advancedFilters.value = resource.advancedFilters
+
+    if(state.enableInfiniteScroll){
+      // state.elements = state.elements.push(response.resource.data)
+      elements.value = elements.value.push(response.resource.data)
+    }else{
+      // state.elements = response.resource.data
+      elements.value = response.resource.data
+    }
+  }
+
+  const loadItems = async (customOptions = null) => {
+    state.loading = true
+
+    const payload = {
+      ...(customOptions ?? options.value),
+      ...{ replaceUrl: false }
+    }
+
+    if(tableFilters.search.value !== ''){
+      payload.search = tableFilters.search.value
+    }
+
+    if(tableFilters.activeFilterSlug.value !== 'all'){
+      payload.filter = {
+        ...(payload.filter ?? {}),
+        status: tableFilters.activeFilterSlug.value,
+      }
+    }
+
+    await api.get( tableEndpoints.indexUrl.value, payload,
+      function(response){
+
+        updateResponseFields(response)
+
+        state.loading = false
+      },
+      function(errorResponse){
+        state.loading = false
+        console.error(errorResponse)
+      }
+    )
+    // state.isLoading = false
+  }
+
   // Get item-related computeds
   const tableItem = useTableItem()
   // Get name-related computeds
@@ -188,71 +265,10 @@ export default function useTable (props, context) {
     ...context,
     ...tableNames
   })
+
   const tableModals = useTableModals(props)
 
   // const getters = mapGetters()
-
-  const form = ref(null)
-  const loading = ref(false)
-
-  const searchModel = ref(store.state.datatable.search ?? '')
-
-  // __log(props.tableOptions)
-  const optionsSelf = ref({
-    itemsPerPage: 10,
-    page: 1,
-    search: '',
-    sortBy: [],
-    groupBy: [],
-    // mustSort: props.mustSort,
-    // multiSort: props.multiSort,
-    ...(props.tableOptions ?? {}),
-  })
-
-  // const options = ref(props.tableOptions ?? store.state.datatable.options ?? {})
-  const options = ref(isStoreTable.value
-    ? store.state.datatable.options
-    : optionsSelf.value
-  )
-  // const options = computed(() => isStoreTable.value
-  //   ? store.state.datatable.options
-  //   : optionsSelf.value
-  // )
-
-  const numberOfElementsSelf = ref(props.total ?? 0)
-  const numberOfElements = computed(() => !isStoreTable.value
-     ? numberOfElementsSelf.value
-     : store.state.datatable.total
-  )
-  const numberOfPages = computed(() => Math.ceil(numberOfElements.value / options.value.itemsPerPage))
-
-  const loadItems = async (customOptions = null) => {
-    state.isLoading = true
-
-    await api.get(
-      tableEndpoints.indexUrl.value, {
-        ...(customOptions ?? options.value),
-        ...{
-          replaceUrl: false,
-        }
-      },
-      function(response){
-        numberOfElementsSelf.value = response.resource.total
-
-        if(state.enableInfiniteScroll){
-          state.elements = state.elements.push(response.resource.data)
-        }else{
-          state.elements = response.resource.data
-        }
-        state.isLoading = false
-      },
-      function(errorResponse){
-        state.isLoading = false
-        console.error(errorResponse)
-      }
-    )
-    // state.isLoading = false
-  }
 
   const state = reactive({
 
@@ -279,27 +295,19 @@ export default function useTable (props, context) {
     mobileTableLayout: computed(() => {
       return smAndDown.value
     }),
-
-    numberOfElements,
+    loading,
+    totalNumberOfElements,
     options,
-
     elements,
 
+
     // datatable store
-    isLoading: computed({
-      get() {
-        return isStoreTable.value ? store.state.datatable.loading : loading.value
-      },
-      set(val) {
-        loading.value = val
-      }
-    }),
     editedIndex: editedIndex,
     selectedItems: [],
 
     activeTableItem: null,
     activeItemConfiguration: null,
-    enableInfiniteScroll: computed(() => props.paginationOptions.footerComponent === 'infiniteScroll' && numberOfElements.value > elements.value.length),
+    enableInfiniteScroll: computed(() => props.paginationOptions.footerComponent === 'infiniteScroll' && totalNumberOfElements.value > elements.value.length),
     draggableItems: computed(() => {
       const items = state.elements.reduce((prev, curr, currentIndex) => {
         const newItem = {
@@ -323,7 +331,6 @@ export default function useTable (props, context) {
       return items;
     }),
 
-    searchModel,
   })
 
   const tableItemActions = useTableItemActions(props, {
@@ -333,8 +340,8 @@ export default function useTable (props, context) {
       tableModals,
       tableEndpoints
     }
-
   })
+
 
   const methods = reactive({
     onResize () {
@@ -343,20 +350,7 @@ export default function useTable (props, context) {
       }
     },
     initialize: function () {
-
-      if(!isStoreTable.value){
-        // store.commit(DATATABLE.UPDATE_DATATABLE_SEARCH, '')
-        loadItems(state.optionsSelf)
-      } else {
-        state.isLoading = true
-        store.dispatch(ACTIONS.GET_DATATABLE, { callback: (res) => {
-          state.isLoading = false
-        }})
-      }
-      // store.commit(
-      //   DATATABLE.UPDATE_DATATABLE_OPTIONS,
-      //   window[import.meta.env.VUE_APP_NAME].STORE.datatable.options
-      // )
+      loadItems()
     },
     goNextPage () {
       if (state.options.page < numberOfPages.value) { state.options.page += 1 }
@@ -455,6 +449,20 @@ export default function useTable (props, context) {
 
       return data
     },
+
+    // filter
+    searchItems(newSearchValue){
+      if(!tableFilters.setSearchValue()) return
+
+      loadItems()
+    },
+    changeFilter(slug){
+      if(!tableFilters.setFilterSlug(slug)) return
+
+      options.value.page = 1
+      //   store.commit(DATATABLE.REPLACE_DATATABLE_BULK, [])
+      loadItems()
+    }
   })
 
   watch(() => tableItem.editedItem.value, (newValue, oldValue) => {
@@ -474,11 +482,17 @@ export default function useTable (props, context) {
     newValue || methods.resetEditedItem()
   })
   watch(() => state.options, (newValue, oldValue) => {
-    if (isStoreTable.value) {
-      store.dispatch(ACTIONS.GET_DATATABLE, { payload: { options: newValue, infiniteScroll: state.enableInfiniteScroll }, endpoint : props.endpoints.index ?? null})
-    } else {
-      loadItems(newValue)
-    }
+    loadItems(newValue)
+    // if (isStoreTable.value) {
+    //   store.dispatch(ACTIONS.GET_DATATABLE, {
+    //     payload: {
+    //       options: newValue,
+    //       infiniteScroll: state.enableInfiniteScroll
+    //     },
+    //     endpoint : props.endpoints.index ?? null})
+    // } else {
+    //   loadItems(newValue)
+    // }
 
   }, { deep: true })
   watch(() => state.elements, (newValue, oldValue) => {
@@ -489,9 +503,6 @@ export default function useTable (props, context) {
       tableItem.setEditedItem(refreshItem)
     }
   }, { deep: true })
-  watch(() => store.state.datatable.data, (newValue, oldValue) => {
-    state.elements = newValue;
-  })
 
   const formatter = useFormatter(props, context, tableHeaders.headers.value)
 

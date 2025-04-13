@@ -34,7 +34,7 @@
         :search="options.search"
         :page="options.page"
 
-        :items-length="numberOfElements"
+        :items-length="totalNumberOfElements"
         :item-title="titleKey"
         ref="datatable"
 
@@ -45,7 +45,7 @@
         :must-sort="mustSort"
         :density="tableDensity ?? 'comfortable'"
         :disable-sort="disableSort"
-        :loading="isLoading"
+        :loading="loading"
         :loading-text="$t('Loading... Please wait')"
         :mobile="$vuetify.display.smAndDown"
 
@@ -97,7 +97,8 @@
                 key='table-controls'
                 :class="[
                   'd-flex',
-                  controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'justify-end flex-grow-1',
+                  controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'flex-grow-1',
+
 
                 ]"
               >
@@ -136,9 +137,9 @@
                       // controlsPosition === 'top' || $vuetify.display.smAndDown ? 'max-width: 300px' : '',
                       'min-width: 100px'
                     ]"
-                    @click:append-inner="setSearchValue(searchModel)"
-                    :disabled="isLoading"
-                    @keydown.enter="setSearchValue(searchModel)"
+                    @click:append-inner="searchItems"
+                    :disabled="loading"
+                    @keydown.enter="searchItems"
                   >
                     <template #append-inner>
                       <v-btn :disabled="searchModel === search" icon="mdi-magnify" variant="plain" size="compact" color="grey-darken-5" rounded @click="searchItems()" />
@@ -146,31 +147,90 @@
                   </v-text-field>
 
                   <!-- <v-spacer v-else-if="hideSearchField"></v-spacer> -->
-                  <v-spacer></v-spacer>
-
-                  <!-- filter button -->
-                  <v-btn v-if="mainFilters.length > 0"
-                    id="filter-btn-activator"
-                    v-bind="{...filterBtnOptions, ...filterBtnTitle}"
-                    :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
-                    :text="$vuetify.display.smAndDown ? null : filterBtnTitle['text']"
-                    :prepend-icon="$vuetify.display.smAndDown ? null : filterBtnOptions['prepend-icon']"
-                    :density="$vuetify.display.smAndDown ? 'compact' : (filterBtnOptions['density'] ?? 'comfortable')"
-                  />
-
-                  <!-- advanced filter button -->
-                  <v-btn v-if="Object.keys(advancedFilters).length > 0"
-                    id="advanced-filter-btn"
-                    v-bind="{...filterBtnOptions, ...filterBtnTitle}"
-                    :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
-                    :text="$vuetify.display.smAndDown ? null : 'Advanced Filter'"
-                    :prepend-icon="$vuetify.display.smAndDown ? null : filterBtnOptions['prepend-icon']"
-                    :density="$vuetify.display.smAndDown ? 'compact' : (filterBtnOptions['density'] ?? 'comfortable')"
-                  />
+                  <v-spacer v-if="$vuetify.display.mdAndUp"></v-spacer>
 
                   <TableActions
                     :actions="actions"
-                  />
+                  >
+                    <template #prepend>
+                      <!-- filter menu -->
+                      <v-menu>
+                        <template v-slot:activator="{ props }">
+                          <!-- filter button -->
+                          <v-btn v-if="mainFilters.length > 0"
+                            id="filter-btn-activator"
+                            v-bind="{...filterBtnOptions, ...filterBtnTitle, ...props}"
+                            :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
+                            :Xtext="$vuetify.display.smAndDown ? null : filterBtnTitle['text']"
+                            :text="filterBtnTitle['text']"
+                            :prepend-icon="$vuetify.display.smAndDown ? null : filterBtnOptions['prepend-icon']"
+                            :block="$vuetify.display.smAndUp ? false : (filterBtnOptions['block'] ?? false)"
+                            :density="$vuetify.display.smAndDown ? 'compact' : (filterBtnOptions['density'] ?? 'comfortable')"
+
+                          />
+                        </template>
+                        <v-list>
+                          <v-list-item
+                            v-for="(filter, index) in mainFilters"
+                            :key="index"
+                            v-on:click.prevent="changeFilter(filter.slug)"
+                          >
+                            <v-list-item-title>{{ filter.name + '(' + filter.number+ ')' }} </v-list-item-title>
+                          </v-list-item>
+                        </v-list>
+                      </v-menu>
+
+
+                      <!-- advanced filter menu -->
+                      <v-menu
+                        :close-on-content-click="false"
+                        location="end"
+                      >
+                        <template v-slot:activator="{ props }">
+                          <!-- advanced filter button -->
+                          <v-btn v-if="Object.keys(advancedFilters).length > 0"
+                            id="advanced-filter-btn"
+                            v-bind="{...filterBtnOptions, ...filterBtnTitle, ...props}"
+                            :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
+                            :text="$vuetify.display.smAndDown ? null : 'Advanced Filter'"
+                            :prepend-icon="$vuetify.display.smAndDown ? null : filterBtnOptions['prepend-icon']"
+                            :block="$vuetify.display.mdAndUp ? false : (filterBtnOptions['block'] ?? false)"
+                            :density="$vuetify.display.smAndDown ? 'compact' : (filterBtnOptions['density'] ?? 'comfortable')"
+                          />
+                        </template>
+                        <v-card
+                          title="Advanced Filter"
+                          min-width="40vw"
+                          max-width="50vw"
+                        >
+                          <v-card-text>
+                            <template v-for="(filters, index) in advancedFilters" :key="index">
+                              <component v-for="(filter, ind) in filters"
+                                :is="`v-${filter.type}`"
+                                v-bind="filter.componentOptions"
+                                v-model="filter['selecteds']"
+                              />
+                            </template>
+                          </v-card-text>
+                          <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                              text="Clear"
+                              variant="plain"
+                              @click="clearAdvancedFilter"
+                            ></v-btn>
+
+                            <v-btn
+                              color="primary"
+                              text="Save"
+                              variant="tonal"
+                              @click="submitAdvancedFilter"
+                            ></v-btn>
+                          </v-card-actions>
+                        </v-card>
+                      </v-menu>
+                    </template>
+                  </TableActions>
 
                   <!-- create button -->
                   <v-btn v-if="$can('create', permissionName) && !noForm && !someSelected && createOnModal"
@@ -188,7 +248,7 @@
 
           <!-- Loading Progress Bar and Divider -->
           <v-progress-linear
-            v-if="hideHeaders && isLoading"
+            v-if="hideHeaders && loading"
             class="w-100 mb-4 mt-2"
             color="success"
             indeterminate
@@ -196,72 +256,6 @@
           ></v-progress-linear>
           <v-divider v-else-if="controlsPosition === 'top' && $vuetify.display.mdAndUp" class="mb-4 mt-2"></v-divider>
 
-          <!-- filter menu -->
-          <v-menu
-            activator="#filter-btn-activator"
-            >
-              <v-list>
-                <v-list-item
-                  v-for="(filter, index) in mainFilters"
-                  :key="index"
-                  v-on:click.prevent="changeFilterSlug(filter.slug)"
-                >
-                  <v-list-item-title>{{ filter.name + '(' + filter.number+ ')' }} </v-list-item-title>
-                </v-list-item>
-              </v-list>
-          </v-menu>
-
-          <!-- advanced filter menu -->
-          <v-menu
-            activator="#advanced-filter-btn"
-            :close-on-content-click="false"
-            location="end"
-
-          >
-            <v-card
-              title="Advanced Filter"
-              min-width="40vw"
-              max-width="50vw"
-            >
-              <v-card-text>
-                <template v-for="(filters, index) in advancedFilters" :key="index">
-                  <component v-for="(filter, ind) in filters"
-                    :is="`v-${filter.type}`"
-                    v-bind="filter.componentOptions"
-                    v-model="filter['selecteds']"
-                  />
-                </template>
-              </v-card-text>
-              <!-- <v-row class="justify-center" no-gutters>
-                <v-col
-                  cols="11"
-                  :key="index"
-                  v-for="(filters, index) in advancedFilters"
-                >
-                  <component v-for="(filter, ind) in filters"
-                    :is="`v-${filter.type}`"
-                    v-bind="filter.componentOptions"
-                    v-model="filter['selecteds']"
-                  />
-                </v-col>
-              </v-row> -->
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                  text="Clear"
-                  variant="plain"
-                  @click="clearAdvancedFilter"
-                ></v-btn>
-
-                <v-btn
-                  color="primary"
-                  text="Save"
-                  variant="tonal"
-                  @click="submitAdvancedFilter"
-                ></v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-menu>
 
           <!-- form modal -->
           <ue-modal
@@ -772,7 +766,7 @@
         <!-- MARK: Infinite Scroll Triggering Component -->
         <template v-slot:body.append>
             <v-card v-intersect="onIntersect" v-if="enableInfiniteScroll"/>
-            <v-progress-circular :indeterminate="isLoading" v-if="enableInfiniteScroll && isLoading"></v-progress-circular>
+            <v-progress-circular :indeterminate="loading" v-if="enableInfiniteScroll && loading"></v-progress-circular>
         </template>
 
         <template v-slot:default v-if="draggable">
@@ -855,6 +849,21 @@ import PaymentService from './inputs/PaymentService.vue'
 
 const { ignoreFormatters } = makeFormatterProps()
 
+console.log(
+  {
+    ...makeTableNamesProps(),
+    ...makeTableEndpointsProps(),
+    ...makeTableFiltersProps(),
+    ...makeTableHeadersProps(),
+    ...makeTableFormsProps(),
+    ...makeTableItemActionsProps(),
+    ...makeTableActionsProps(),
+    ...makeTableModalsProps(),
+    ...makeTableProps(),
+    ...makeDraggableProps(),
+    ...ignoreFormatters
+  }
+)
 export default {
   // mixins: [TableMixin],
   components: {

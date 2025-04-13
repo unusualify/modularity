@@ -7,12 +7,12 @@ import _ from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
 export const makeTableHeadersProps = propsFactory({
+  columns: {
+    type: Array
+  },
   hideHeaders: {
     type: Boolean,
     default: false
-  },
-  columns: {
-    type: Array
   },
   headerOptions: {
     type: [Array, Object],
@@ -45,7 +45,7 @@ export default function useTableHeaders(props) {
 
   let unvisibleHeaders = getUnvisibleHeaders()
   // Initialize headers
-  const rawHeaders = props.columns ?? store.state.datatable.headers ?? []
+  const rawHeaders = props.columns ?? []
   const headers = ref(rawHeaders.filter(h => !unvisibleHeaders.includes(h.key)))
   const headersModel = ref(_.cloneDeep(rawHeaders.map(h => ({...h, visible: !unvisibleHeaders.includes(h.key) ? true : false}))))
 

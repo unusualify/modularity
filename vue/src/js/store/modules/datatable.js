@@ -31,23 +31,25 @@ const deepRemoveFromObj = (items, keys = ['id', 'children'], deep = 'children') 
 }
 
 const state = {
-  baseUrl: window[import.meta.env.VUE_APP_NAME].STORE.datatable.baseUrl || '',
+  // baseUrl: window[import.meta.env.VUE_APP_NAME].STORE.datatable.baseUrl || '',
   // name: window[import.meta.env.VUE_APP_NAME].STORE.datatable.name,
-  headers: window[import.meta.env.VUE_APP_NAME].STORE.datatable.headers,
-  // inputs: window[import.meta.env.VUE_APP_NAME].STORE.datatable.inputs,
-  search: window[import.meta.env.VUE_APP_NAME].STORE.datatable.searchText ?? '',
-  options: window[import.meta.env.VUE_APP_NAME].STORE.datatable.options,
-  data: window[import.meta.env.VUE_APP_NAME].STORE.datatable.data || [],
-  total: parseInt(window[import.meta.env.VUE_APP_NAME].STORE.datatable.total),
+  // headers: window[import.meta.env.VUE_APP_NAME].STORE.datatable.headers,
 
-  filter: window[import.meta.env.VUE_APP_NAME].STORE.datatable.filter || {},
-  mainFilters: window[import.meta.env.VUE_APP_NAME].STORE.datatable.mainFilters || [],
+  // inputs: window[import.meta.env.VUE_APP_NAME].STORE.datatable.inputs,
+
+  // search: window[import.meta.env.VUE_APP_NAME].STORE.datatable.searchText ?? '',
+  // options: window[import.meta.env.VUE_APP_NAME].STORE.datatable.options,
+  // data: window[import.meta.env.VUE_APP_NAME].STORE.datatable.data || [],
+  // total: parseInt(window[import.meta.env.VUE_APP_NAME].STORE.datatable.total),
+
+  // filter: window[import.meta.env.VUE_APP_NAME].STORE.datatable.filter || {},
+  // mainFilters: window[import.meta.env.VUE_APP_NAME].STORE.datatable.mainFilters || [],
   advancedFilters: window[import.meta.env.VUE_APP_NAME].STORE.datatable.advancedFilters || [],
 
-  bulk: [],
+  // bulk: [],
   // localStorageKey: window[import.meta.env.VUE_APP_NAME].STORE.datatable.localStorageKey || window.location.pathname,
-  loading: false,
-  updateTracker: 0,
+  // loading: false,
+  // updateTracker: 0,
 
   // columns: window[import.meta.env.VUE_APP_NAME].STORE.datatable.columns || [],
   // dialog: false
@@ -59,35 +61,7 @@ const state = {
 
 // getters
 const getters = {
-  // defaultItem: state => {
-  //   return state.inputs.reduce( (a,c) => (a[c.name] = c.default, a), {})
-  // },
-  // totalElements: state => {
-  //   return state.total
-  // },
-  // totalPage: state => {
-  //   return Math.ceil(state.total / state.options.itemsPerPage)
-  // },
-  // formatterColumns: state => {
-  //   return state.headers.filter((h) => h.hasOwnProperty('formatter') && h.formatter.length > 0)
-  // },
-  // editableColumns: state => {
-  //   return state.headers.filter((h) => (h.hasOwnProperty('isColumnEditable') && h.isColumnEditable))
-  // },
-  // rowEditables: state => {
-  //   return state.headers.filter((h) => (h.hasOwnProperty('isRowEditable') && h.isRowEditable))
-  // },
-  mainFilters: state => {
-    return state.mainFilters
-  },
-  advancedFilters : state => {
-      Object.entries(state.advancedFilters).forEach(( [key, filters] )=> {
-        filters.map(filter => {
-          filter['selecteds'] ??= state.filter[key]?.[filter.slug]
-        })
-      })
-    return state.advancedFilters
-  }
+
 }
 
 const mutations = {

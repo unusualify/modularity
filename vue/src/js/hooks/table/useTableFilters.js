@@ -1,5 +1,5 @@
 // hooks/table/useTableFilters.js
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import { DATATABLE } from '@/store/mutations'
 import ACTIONS from '@/store/actions'
@@ -20,99 +20,122 @@ export const makeTableFiltersProps = propsFactory({
     type:Object,
     default: {},
   },
+  searchInitialValue: {
+    type: String,
+    default: '',
+  },
+  filterList: {
+    type: Array,
+    default: [],
+  },
+  filterListAdvanced: {
+    type: Object,
+    default: {},
+  },
 })
 
 export default function useTableFilters(props, context) {
   const store = useStore()
   const { isStoreTable } = context
-  // Filter Status
-  const filterActiveStatus = computed(() =>
-    store.state.datatable.filter.status ?? 'all'
-  )
-
-  const filterActive = computed(() =>
-    _.find(store.state.datatable.mainFilters, { slug: filterActiveStatus.value })
-  )
-
-  const navActive = computed(() =>
-    filterActive.value?.slug ?? 'all'
-  )
 
   // Search
-  const search = computed({
-    get() {
-      return store.state.datatable.search
-    },
-    set(val) {
-      store.commit(DATATABLE.UPDATE_DATATABLE_SEARCH, val)
-      store.dispatch(ACTIONS.GET_DATATABLE)
-    }
-  })
+  const search = ref(props.searchInitialValue ?? '')
+  const searchModel = ref(search.value)
 
-  // Advanced Filters
-  const advancedFilters = computed(() =>
-    store.state.datatable.advancedFilters ?? {}
-  )
-
-  const mainFilters = computed(() =>
-    store.state.datatable.mainFilters ?? []
-  )
-
-  // Methods
-  const changeFilterSlug = (slug) => {
-    if (navActive.value === slug) return
-
-    if(isStoreTable.value){
-      store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
-      store.commit(DATATABLE.UPDATE_DATATABLE_FILTER_STATUS, slug)
-      // Reset selected items when changing filter
-      store.commit(DATATABLE.REPLACE_DATATABLE_BULK, [])
-      store.dispatch(ACTIONS.GET_DATATABLE)
-    }
-
-  }
-
-  const submitAdvancedFilter = () => {
-    store.commit(DATATABLE.UPDATE_DATATABLE_ADVANCED_FILTER, advancedFilters.value)
-    store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
-    store.dispatch(ACTIONS.GET_DATATABLE)
-  }
-
-  const clearAdvancedFilter = () => {
-    store.commit(DATATABLE.RESET_DATATABLE_ADVANCED_FILTER)
-    store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
-    store.dispatch(ACTIONS.GET_DATATABLE)
-  }
-
-  const setSearchValue = (val) => {
-    if(search.value !== val){
-      search.value = val
-    }
-  }
+  // Filter Status
+  const mainFilters = ref( props.filterList ?? [])
+  const activeFilterSlug = ref(props.navActive ?? 'all')
+  const activeFilter = computed(() => _.find(mainFilters.value, { slug: activeFilterSlug.value }) )
 
   // Filter Button Options
   const filterBtnTitle = computed(() => ({
-    text: `${filterActive.value?.name} (${filterActive.value?.number})`
+    text: `${activeFilter.value?.name} (${activeFilter.value?.number})`
   }))
+
+  // Methods
+
+  const setSearchValue = (newSearchValue) => {
+    let newValue = newSearchValue ?? searchModel.value
+
+    if(search.value !== newValue){
+      search.value = newValue
+
+      return true
+    }
+
+    return false
+  }
+
+  const setFilterSlug = (slug) => {
+    if(activeFilterSlug.value !== slug){
+      activeFilterSlug.value = slug
+
+      return true
+    }
+
+    return false
+  }
+
+  const setMainFilters = (newMainFilters) => {
+    mainFilters.value = newMainFilters
+  }
+
+  const setAdvancedFilters = (newAdvancedFilters) => {
+    advancedFilters.value = newAdvancedFilters
+  }
+
+
+
+  // Advanced Filters
+  // const advancedFilters = computed(() => isStoreTable.value
+  //   ? (store.state.datatable.advancedFilters ?? {})
+  //   : (props.filterListAdvanced ?? {})
+  // )
+  const advancedFilters = computed(() => props.filterListAdvanced ?? {})
+  const submitAdvancedFilter = () => {
+    if(isStoreTable.value){
+      store.commit(DATATABLE.UPDATE_DATATABLE_ADVANCED_FILTER, advancedFilters.value)
+      store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
+      store.dispatch(ACTIONS.GET_DATATABLE)
+    } else {
+      context.emit('submitAdvancedFilter', advancedFilters.value)
+    }
+  }
+
+  const clearAdvancedFilter = () => {
+    if(isStoreTable.value){
+      store.commit(DATATABLE.RESET_DATATABLE_ADVANCED_FILTER)
+      store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
+      store.dispatch(ACTIONS.GET_DATATABLE)
+    } else {
+      context.emit('clearAdvancedFilter')
+    }
+  }
 
   return {
     // Status
-    filterActiveStatus,
-    filterActive,
-    navActive,
+    // filterActiveStatus,
+    activeFilterSlug,
+    activeFilter,
     mainFilters,
 
     // Search
     search,
+    searchModel,
 
     // Advanced Filters
     advancedFilters,
+
     filterBtnTitle,
 
     // Methods
-    changeFilterSlug,
+    // changeFilterSlug,
     submitAdvancedFilter,
     clearAdvancedFilter,
-    setSearchValue
+
+    setSearchValue,
+    setFilterSlug,
+    setMainFilters,
+    setAdvancedFilters,
   }
 }
