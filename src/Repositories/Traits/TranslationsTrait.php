@@ -165,7 +165,7 @@ trait TranslationsTrait
             //     dd($scopes, $attributes, $query->toSql(), $query->get());
 
             foreach ($attributes as $attribute) {
-                if (isset($scopes[$attribute])) {
+                if (array_key_exists($attribute, $scopes)) {
                     unset($scopes[$attribute]);
                 }
             }
