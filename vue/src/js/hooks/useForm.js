@@ -30,7 +30,7 @@ export const makeFormProps = propsFactory({
     type: String
   },
   title: {
-    type: String
+    type: [String, Object]
   },
   noTitle: {
     type: Boolean,
