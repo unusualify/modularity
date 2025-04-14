@@ -851,7 +851,9 @@ abstract class BaseController extends PanelController
 
     public function bulkDelete()
     {
-        if ($this->repository->bulkDelete(explode(',', $this->request->get('ids')))) {
+        $ids = is_array($this->request->get('ids')) ? $this->request->get('ids') : explode(',', $this->request->get('ids'));
+
+        if ($this->repository->bulkDelete($ids)) {
             return $this->respondWithSuccess(___('listing.bulk-delete.success', ['modelTitle' => $this->modelTitle]));
         }
 
@@ -861,7 +863,9 @@ abstract class BaseController extends PanelController
 
     public function bulkForceDelete()
     {
-        if ($this->repository->bulkForceDelete(explode(',', $this->request->get('ids')))) {
+        $ids = is_array($this->request->get('ids')) ? $this->request->get('ids') : explode(',', $this->request->get('ids'));
+
+        if ($this->repository->bulkForceDelete($ids)) {
             return $this->respondWithSuccess(___('listing.bulk-force-delete.success', ['modelTitle' => $this->modelTitle]));
         }
 
@@ -870,7 +874,9 @@ abstract class BaseController extends PanelController
 
     public function bulkRestore()
     {
-        if ($this->repository->bulkRestore(explode(',', $this->request->get('ids')))) {
+        $ids = is_array($this->request->get('ids')) ? $this->request->get('ids') : explode(',', $this->request->get('ids'));
+
+        if ($this->repository->bulkRestore($ids)) {
             return $this->respondWithSuccess(___('listing.bulk-restore.success', ['modelTitle' => $this->modelTitle]));
         }
 
@@ -880,6 +886,7 @@ abstract class BaseController extends PanelController
     public function reorder()
     {
         $ids = is_array($this->request->get('ids')) ? $this->request->get('ids') : explode(',', $this->request->get('ids'));
+
         if ($this->repository->getModel()->setNewOrder($ids)) {
 
             return $this->respondWithSuccess(___('listing.reorder.success', ['modelTitle' => $this->modelTitle]));
