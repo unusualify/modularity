@@ -10,7 +10,7 @@
       @submit="submit"
       :class="formClasses"
       >
-      <input v-if="!async" type="hidden" name="_token" :value="csrf"/>
+      <input v-if="!async" type="hidden" name="_token" :value="$csrf"/>
 
       <!-- Header Section -->
       <div :class="[(hasDivider || title) ? 'pb-6' : '', scrollable ? 'flex-grow-0' : '']">
