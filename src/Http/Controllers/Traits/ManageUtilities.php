@@ -23,7 +23,7 @@ trait ManageUtilities
     protected function getIndexData($prependScope = [])
     {
         $initialResource = $this->getJSONData();
-        $filters = json_decode($this->request->get('filter'), true) ?? [];
+        // $filters = json_decode($this->request->get('filter'), true) ?? [];
         $headers = $this->filterHeadersByRoles($this->getIndexTableColumns());
         $headers = hydrate_table_columns_translations($headers);
 
@@ -32,25 +32,13 @@ trait ManageUtilities
         $tableEndpoints = $this->getIndexUrls() + $this->getUrls();
         $tableMainFilters = $this->getTableMainFilters($scopes);
 
-
-        $_deprecated = [
-            'initialResource' => $initialResource, //
-            'tableMainFilters' => $tableMainFilters,
-            'filters' => $filters,
-            'requestFilter' => json_decode(request()->get('filter'), true) ?? [],
-            'searchText' => request()->has('search') ? request()->query('search') : '', // for current text of search parameter
-            'headers' => $headers, // headers to be used in modularity datatable component
-            'formSchema' => $this->filterSchemaByRoles($this->formSchema), // input fields to be used in modularity datatable component
-        ];
         $data = [
-            // ...$_deprecated,
             'endpoints' => $tableEndpoints,
         ] + $this->getViewLayoutVariables();
 
         $options = [
             'moduleName' => $this->getHeadline($this->moduleName),
             'translate' => $this->routeHas('translations') || $this->hasTranslatedInput(),
-            // 'listOptions' => $this->getVuetifyDatatableOptions(), // options to be used in modularity table components in datatable store
             'tableAttributes' => array_merge(
                 [
                     'rowActions' => $this->getTableRowActions(),
@@ -87,43 +75,16 @@ trait ManageUtilities
                 'inputs' => $this->filterSchemaByRoles($this->formSchema),
                 'fields' => [],
             ],
-            'tableStore' => [
-                // 'baseUrl' => rtrim(config('app.url'), '/') . '/',
-                // 'mainFilters' => $this->getTableMainFilters(),
-                // 'advancedFilters' => $this->getTableAdvancedFilters(),
-                // 'headers' => $headers,
-                // 'searchText' => request()->has('search') ? request()->query('search') : '',
-
-                // 'options' => $this->getVuetifyDatatableOptions(),
-                // 'data' => $initialResource['data'],
-                // 'total' => $initialResource['total'] ?? 0,
-                // 'filter' => ['status' => $filters['status'] ?? $defaultFilterSlug ?? 'all'],
-                // 'customModal' => request()->has('customModal') ? request()->query('customModal') : '',
-
-                // {{-- inputs: {!! json_encode($inputs) !!}, --}}
-                // {{-- initialAsync: '{{ count($tableData['data']) ? true : false }}', --}}
-                // {{-- name: '{{ $routeName}}', --}}
-                // {{-- columns: {!! json_encode($tableColumns) !!}, --}}
-            ],
+            'tableStore' => [],
             '__old' => [
-                // 'hiddenFilters' => $this->filters(),
-                // 'filterLinks' => $this->filterLinks ?? [],
-
-                // 'routeName' => $this->getHeadline($this->routeName),
-                // 'translateTitle' => $this->titleIsTranslatable(),
                 // 'skipCreateModal' => $this->getIndexOption('skipCreateModal'),
                 // 'reorder' => $this->getIndexOption('reorder'),
                 // 'permalink' => $this->getIndexOption('permalink'),
                 // 'bulkEdit' => $this->getIndexOption('bulkEdit'),
-                // 'titleFormKey' => $this->titleFormKey ?? $this->titleColumnKey,
-                // 'baseUrl' => $baseUrl,
-                // 'permalinkPrefix' => $this->getPermalinkPrefix($baseUrl),
-                // 'additionalTableActions' => $this->additionalTableActions(),
             ],
 
         ];
 
-        // dd($data + $options);
         return array_replace_recursive($data + $options, $this->indexData($this->request));
     }
 

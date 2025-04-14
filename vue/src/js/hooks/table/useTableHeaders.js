@@ -1,7 +1,5 @@
 // hooks/table/useTableHeaders.js
 import { computed, ref } from 'vue'
-import { useStore } from 'vuex'
-import { useI18n } from 'vue-i18n'
 import _ from 'lodash-es'
 
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
@@ -29,8 +27,6 @@ export const makeTableHeadersProps = propsFactory({
 })
 
 export default function useTableHeaders(props) {
-  const store = useStore()
-
   const getStorageKey = () => {
     // Get the current route path as the unique identifier
     const path = window.location.pathname

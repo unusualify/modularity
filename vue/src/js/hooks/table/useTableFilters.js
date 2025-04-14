@@ -1,8 +1,5 @@
 // hooks/table/useTableFilters.js
 import { computed, ref } from 'vue'
-import { useStore } from 'vuex'
-import { DATATABLE } from '@/store/mutations'
-import ACTIONS from '@/store/actions'
 import _ from 'lodash-es'
 
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
@@ -34,10 +31,7 @@ export const makeTableFiltersProps = propsFactory({
   },
 })
 
-export default function useTableFilters(props, context) {
-  const store = useStore()
-  const { isStoreTable } = context
-
+export default function useTableFilters(props) {
   // Search
   const search = ref(props.searchInitialValue ?? '')
   const searchModel = ref(search.value)
@@ -81,40 +75,39 @@ export default function useTableFilters(props, context) {
   }
 
   const setAdvancedFilters = (newAdvancedFilters) => {
-    advancedFilters.value = newAdvancedFilters
+    if(!_.isEqual(advancedFilters.value, newAdvancedFilters)){
+      advancedFilters.value = newAdvancedFilters
+    }
   }
-
-
 
   // Advanced Filters
-  // const advancedFilters = computed(() => isStoreTable.value
-  //   ? (store.state.datatable.advancedFilters ?? {})
-  //   : (props.filterListAdvanced ?? {})
-  // )
-  const advancedFilters = computed(() => props.filterListAdvanced ?? {})
-  const submitAdvancedFilter = () => {
-    if(isStoreTable.value){
-      store.commit(DATATABLE.UPDATE_DATATABLE_ADVANCED_FILTER, advancedFilters.value)
-      store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
-      store.dispatch(ACTIONS.GET_DATATABLE)
-    } else {
-      context.emit('submitAdvancedFilter', advancedFilters.value)
-    }
-  }
+  const advancedFilters = ref(props.filterListAdvanced ?? {})
+  const activeAdvancedFilters = computed(() => {
+    return Object.keys(advancedFilters.value).reduce((collection,key,index) => {
+      advancedFilters.value[key].reduce((acc, filter) => {
+        if(filter.selecteds?.length > 0){
+          if(!acc[key]){
+            acc[key] = {}
+          }
+          acc[key][filter.slug] = filter.selecteds
+        }
+        return acc
+      }, collection)
+
+      return collection
+    }, {})
+  })
 
   const clearAdvancedFilter = () => {
-    if(isStoreTable.value){
-      store.commit(DATATABLE.RESET_DATATABLE_ADVANCED_FILTER)
-      store.commit(DATATABLE.UPDATE_DATATABLE_PAGE, 1)
-      store.dispatch(ACTIONS.GET_DATATABLE)
-    } else {
-      context.emit('clearAdvancedFilter')
-    }
+    advancedFilters.value = Object.fromEntries(Object.entries(advancedFilters.value).map(([key, val]) => {
+      advancedFilters.value[key] = []
+      val.map((filter) => filter.selecteds = [])
+      return [key, val]
+    }))
   }
 
   return {
     // Status
-    // filterActiveStatus,
     activeFilterSlug,
     activeFilter,
     mainFilters,
@@ -124,18 +117,16 @@ export default function useTableFilters(props, context) {
     searchModel,
 
     // Advanced Filters
+    activeAdvancedFilters,
     advancedFilters,
 
     filterBtnTitle,
 
     // Methods
-    // changeFilterSlug,
-    submitAdvancedFilter,
-    clearAdvancedFilter,
-
     setSearchValue,
     setFilterSlug,
     setMainFilters,
     setAdvancedFilters,
+    clearAdvancedFilter,
   }
 }

@@ -8,10 +8,8 @@ import _ from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 import api from '@/store/api/datatable'
 
-import { DATATABLE, FORM } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
 
-import { mapGetters } from '@/utils/mapStore'
 import { getSubmitFormData } from '@/utils/getFormData.js'
 
 import { useRoot, useFormatter } from '@/hooks'
@@ -40,17 +38,14 @@ export const makeTableProps = propsFactory({
     type: Number,
     default: null,
   },
-
   hideFooter: {
     type: Boolean,
     default: false
   },
-
   fixedHeader: {
     type: Boolean,
     default: false
   },
-
   defaultTableOptions: {
     type: Object,
     default: () => ({
@@ -61,7 +56,6 @@ export const makeTableProps = propsFactory({
       groupBy: [],
     }),
   },
-
   tableOptions: {
     type: Object
   },
@@ -69,7 +63,6 @@ export const makeTableProps = propsFactory({
     type: [String, Array],
     default: ''
   },
-
   iteratorType: {
     type: String,
     default: '',
@@ -86,11 +79,9 @@ export const makeTableProps = propsFactory({
       return {}
     }
   },
-
   striped: Boolean,
   hideBorderRow: Boolean,
   roundedRows: Boolean,
-
   fullWidthWrapper: {
     type: Boolean,
     default: false
@@ -115,7 +106,6 @@ export const makeTableProps = propsFactory({
     type: [Array, Object],
     default: {}
   },
-
   formAttributes: {
     type: Object,
     default: {}
@@ -124,7 +114,6 @@ export const makeTableProps = propsFactory({
     type: Object,
     default: {}
   },
-
   showSelect: {
     type: Boolean,
     default: true,
@@ -149,17 +138,14 @@ export const makeTableProps = propsFactory({
     type: Boolean,
     default: false,
   },
-
   isModuleTable: {
     type: Boolean,
     default: false,
   },
-
   endpoints: {
     type: Object,
     default: {},
   },
-
 })
 
 // by convention, composable function names start with "use"
@@ -167,7 +153,6 @@ export default function useTable (props, context) {
   // state encapsulated and managed by the composable
   // a composable can also hook into its owner component's
   // lifecycle to setup and teardown side effects.
-
   const store = useStore()
   const { smAndDown } = useDisplay()
   const { t, te, tm } = useI18n({ useScope: 'global' })
@@ -189,6 +174,14 @@ export default function useTable (props, context) {
   const totalNumberOfElements = ref(props.total ?? -1)
   const totalNumberOfPages = computed(() => Math.ceil(totalNumberOfElements.value / options.value.itemsPerPage))
 
+  const setElements = (data) => {
+    elements.value = data
+  }
+
+  const pushElements = (data) => {
+    elements.value = elements.value.push(data)
+  }
+
   const updateResponseFields = (response) => {
     totalNumberOfElements.value = response.resource.total
     tableFilters.setMainFilters(response.mainFilters)
@@ -196,10 +189,10 @@ export default function useTable (props, context) {
 
     if(state.enableInfiniteScroll){
       // state.elements = state.elements.push(response.resource.data)
-      elements.value = elements.value.push(response.resource.data)
+      pushElements(response.resource.data)
     }else{
       // state.elements = response.resource.data
-      elements.value = response.resource.data
+      setElements(response.resource.data)
     }
   }
 
@@ -222,54 +215,52 @@ export default function useTable (props, context) {
       }
     }
 
-    await api.get( tableEndpoints.indexUrl.value, payload,
-      function(response){
-
-        updateResponseFields(response)
-
-        state.loading = false
-      },
-      function(errorResponse){
-        state.loading = false
-        console.error(errorResponse)
+    if(!_.isEmpty(tableFilters.activeAdvancedFilters.value)){
+      payload.filter = {
+        ...(payload.filter ?? {}),
+        ...tableFilters.activeAdvancedFilters.value,
       }
-    )
+    }
+
+    if(_.isObject(props.endpoints) && props.endpoints.index) {
+      await api.get( props.endpoints.index, payload,
+        function(response){
+
+          updateResponseFields(response)
+
+          state.loading = false
+        },
+        function(errorResponse){
+          state.loading = false
+          console.error(errorResponse)
+        }
+      )
+    } else {
+      console.error(`No index endpoint found in endpoints of props`)
+    }
+
     // state.isLoading = false
   }
 
-  // Get item-related computeds
   const tableItem = useTableItem()
-  // Get name-related computeds
   const tableNames = useTableNames(props, {
     editedIndex: editedIndex
   })
-  // Get filter-related computeds
-  const tableFilters = useTableFilters(props, {
-    ...context,
-    ...{
-      isStoreTable
-    }
-  })
-  // Get headers-related computeds
+  const tableFilters = useTableFilters(props)
   const tableHeaders = useTableHeaders(props)
-  // Get forms-related computeds
   const tableForms = useTableForms(props, {
     ...context,
     ...tableNames
   })
-
   const tableModals = useTableModals(props)
-
   const tableItemActions = useTableItemActions(props, {
     ...context,
     ...{
-      tableForms}
+      tableForms
+    }
   })
 
-  // const getters = mapGetters()
-
   const state = reactive({
-
     id: Math.ceil(Math.random() * 1000000) + '-table',
     isStoreTable,
     hideTable: false,
@@ -331,11 +322,15 @@ export default function useTable (props, context) {
 
   })
 
-
   const methods = reactive({
     onResize () {
       if(!props.noFullScreen){
         state.windowSize = { x: window.innerWidth, y: window.innerHeight }
+      }
+    },
+    onIntersect(isIntersecting, entries, observer){
+      if(isIntersecting && entries[0].intersectionRatio === 1){
+        methods.goNextPage()
       }
     },
     initialize: function () {
@@ -352,62 +347,27 @@ export default function useTable (props, context) {
         state.options = options
       }
     },
-    onIntersect(isIntersecting, entries, observer){
-      if(isIntersecting && entries[0].intersectionRatio === 1){
-        methods.goNextPage()
-      }
-    },
 
     setEditedItem: tableItem.setEditedItem,
     resetEditedItem: tableItem.resetEditedItem,
-
-    setBulkItems(){
-      store.commit(DATATABLE.REPLACE_DATATABLE_BULK, state.selectedItems)
-    },
-    async bulkAction(action){
-      methods.setBulkItems()
-      let studlyCase = _.snakeCase(action.name).toUpperCase()
-      if(__isset(ACTIONS[studlyCase])){
-        await store.dispatch(ACTIONS[studlyCase])
-        state.selectedItems = []
-      } else {
-        // console.error(`${error}`)
-        console.warn(`${action.name} may have not implemented yet on useTable.js hook`)
-      }
-    },
-    // async bulkDelete(){
-    //   await store.dispatch(ACTIONS.BULK_DELETE)
-    //   state.selectedItems = []
-    // },
-    // async bulkRestore(){
-    //   await store.dispatch(ACTIONS.BULK_RESTORE)
-    //   state.selectedItems = []
-    // },
-    // async bulkForceDelete(){
-    //   await store.dispatch(ACTIONS.BULK_DESTROY)
-    //   state.selectedItems = []
-    // },
-    confirmAction(){
-      methods.bulkAction(state.selectedAction)
-      state.actionModalActive = false
-    },
-    closeActionModal(){
-      state.actionModalActive = false
-    },
     sortElements(list){
       // state.elements = list;
 
-      api.reorder(
-        tableEndpoints.reorderUrl.value,
-        // For Optimistic UI approach, did not query for new list,
-        // used response.status and new modelValue
-        list.map((element) => element.id), function(response){
-          if(response.status === 200){
-            list.forEach((element, index) => element.position = index+1)
-            state.elements = list
+      if(_.isObject(props.endpoints) && props.endpoints.reorder) {
+        api.reorder(
+          props.endpoints.reorder,
+          // For Optimistic UI approach, did not query for new list,
+          // used response.status and new modelValue
+          list.map((element) => element.id), function(response){
+            if(response.status === 200){
+              list.forEach((element, index) => element.position = index+1)
+              state.elements = list
+            }
           }
-        }
-      )
+        )
+      } else {
+        console.error(`No reorder endpoint found in endpoints of props`)
+      }
 
     },
     hydrateNestedData: function (item, data) {
@@ -438,7 +398,6 @@ export default function useTable (props, context) {
 
       return data
     },
-
     // filter
     searchItems(newSearchValue){
       if(!tableFilters.setSearchValue()) return
@@ -449,7 +408,15 @@ export default function useTable (props, context) {
       if(!tableFilters.setFilterSlug(slug)) return
 
       options.value.page = 1
-      //   store.commit(DATATABLE.REPLACE_DATATABLE_BULK, [])
+      loadItems()
+    },
+    changeAdvancedFilter(slug){
+      options.value.page = 1
+      loadItems()
+    },
+    resetAdvancedFilter(){
+      tableFilters.clearAdvancedFilter()
+      options.value.page = 1
       loadItems()
     },
 
@@ -482,31 +449,145 @@ export default function useTable (props, context) {
   // watch(() => state.formActive, (newValue, oldValue) => {
   //   newValue || form.value.resetValidation() || methods.resetEditedItem()
   // })
-  watch(() => state.deleteModalActive, (newValue, oldValue) => {
-    newValue || methods.resetEditedItem()
-  })
+  // watch(() => state.deleteModalActive, (newValue, oldValue) => {
+  //   __log('deleteModalActive', newValue)
+  //   newValue || methods.resetEditedItem()
+  // })
   watch(() => state.options, (newValue, oldValue) => {
-    loadItems(newValue)
-    // if (isStoreTable.value) {
-    //   store.dispatch(ACTIONS.GET_DATATABLE, {
-    //     payload: {
-    //       options: newValue,
-    //       infiniteScroll: state.enableInfiniteScroll
-    //     },
-    //     endpoint : props.endpoints.index ?? null})
-    // } else {
-    //   loadItems(newValue)
-    // }
-
+    loadItems()
   }, { deep: true })
   watch(() => state.elements, (newValue, oldValue) => {
-
     // Refresh edited item
     if(state.editedIndex > -1) {
       let refreshItem = newValue[state.editedIndex]
       tableItem.setEditedItem(refreshItem)
     }
   }, { deep: true })
+
+  // Set up watchers to handle action events
+  watch(() => tableItemActions.actionEvents.event, (event) => {
+    if (event) {
+      const payload = tableItemActions.actionEvents.payload
+
+      let callbackParameters = []
+      let hasCallback = false
+      let runCallback = false
+      let updateItem = false
+      let resetItem = true
+
+      let runAlert = true
+      let isLoadItems = true
+
+      switch (event) {
+        case 'dialog':
+          if(payload.callback && typeof payload.callback === 'function') {
+            hasCallback = tableModals.modals.value.dialog
+
+            const attributes = {
+              confirmClosing: false,
+            }
+
+            switch(payload.type){
+              case 'delete':
+              case 'forceDelete':
+                attributes.description = tableNames.deleteQuestion.value
+                break
+              case 'bulkPublish':
+              case 'bulkDelete':
+              case 'bulkRestore':
+              case 'bulkDestroy':
+                callbackParameters.push(state.selectedItems)
+
+                const kebabCase = _.kebabCase(payload.type)
+                const langKey = `fields.confirm-${kebabCase}`
+                attributes.description = t(langKey, {
+                  count: state.selectedItems.length,
+                  route: tableNames.transNamePlural.value
+                })
+                break
+            }
+
+            // callbackParameters.push(successCallback)
+            // tableModals.modals.value.dialog.setConfirmCallback(() => payload.callback(...callbackParameters))
+            tableModals.modals.value.dialog.set(attributes)
+            // tableModals.modals.value.dialog.open()
+          }
+          break
+        case 'process':
+
+          if(payload.callback && typeof payload.callback === 'function') {
+            runCallback = true
+            // callbackParameters.push(successCallback)
+          }
+
+          if(payload.type === 'publish') {
+            resetItem = false
+            updateItem = true
+          }
+
+          break
+
+        case 'showCustomForm':
+          tableForms.customFormModalActive.value = true
+          break
+
+        case 'showData':
+          tableModals.modals.value.show.loadData(payload.data)
+          tableModals.modals.value.show.set(payload.action)
+          tableModals.modals.value.show.open()
+          break
+      }
+
+      let successCallback = (res) => {
+        if(res.status === 200) {
+
+          if(runAlert && res.data.variant && res.data.message){
+            store.dispatch(ACTIONS.SHOW_ALERT, res.data)
+          }
+
+          if(isLoadItems) {
+            loadItems()
+          }
+
+          if(hasCallback) {
+            try {
+              hasCallback.close()
+              hasCallback.reset()
+            } catch (error) {
+              // console.error(error)
+            }
+          }
+
+          // tableModals.modals.value.dialog.close()
+          // tableModals.modals.value.dialog.reset()
+
+          if(resetItem) {
+            tableItem.resetEditedItem()
+            state.selectedItems = []
+          }
+
+          if(updateItem && payload.item) {
+            tableItem.setEditedItem(payload.item)
+          }
+
+        }
+      }
+
+      if(runCallback) {
+        callbackParameters.push(successCallback)
+        payload.callback(...callbackParameters)
+      }
+
+      if(hasCallback) {
+        callbackParameters.push(successCallback)
+        hasCallback.setConfirmCallback(() => payload.callback(...callbackParameters))
+        hasCallback.open()
+      }
+
+      tableItemActions.actionEvents.reset()
+      // Reset the event after handling it
+    }
+  }, { immediate: true })
 
   const formatter = useFormatter(props, context, tableHeaders.headers.value)
 
@@ -522,6 +603,5 @@ export default function useTable (props, context) {
     ...tableItemActions,
     ...tableModals,
     ...formatter,
-    // ...getters,
   }
 }

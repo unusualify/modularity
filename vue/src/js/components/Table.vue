@@ -217,14 +217,14 @@
                             <v-btn
                               text="Clear"
                               variant="plain"
-                              @click="clearAdvancedFilter"
+                              @click="resetAdvancedFilter"
                             ></v-btn>
 
                             <v-btn
                               color="primary"
                               text="Save"
                               variant="tonal"
-                              @click="submitAdvancedFilter"
+                              @click="changeAdvancedFilter"
                             ></v-btn>
                           </v-card-actions>
                         </v-card>
@@ -258,8 +258,7 @@
 
 
           <!-- form modal -->
-          <ue-modal
-            v-if="!embeddedForm"
+          <ue-modal v-if="!embeddedForm"
             ref="formModal"
             v-model="formActive"
 
@@ -395,65 +394,24 @@
               </v-expand-transition>
             </div>
 
-            <!-- custom modal -->
-            <ue-modal
-              ref="customModal"
-              v-model="customModalActive"
-              :transition="modals[activeModal].transition || 'dialog-bottom-transition'"
-              :width-type="modals[activeModal].widthType || 'sm'"
-              :persistent="modals[activeModal].persistent"
-              :description-text="modals[activeModal].content"
-            >
-              <template #body="props">
-                <v-card>
-                  <v-card-title class="text-h5 text-center" style="word-break: break-word;"
-                    v-if="modals[activeModal].title">
-                    <!-- {{ modal.title }} -->
-                  </v-card-title>
-                  <v-icon
-                    v-if="modals[activeModal].img"
-                    :icon="modals[activeModal].icon"
-                    style="margin:auto; border:4px solid;border-radius:50%;padding:32px;"
-                    size="32"
-                    :color="modals[activeModal].color"/>
+            <!-- dialog modal -->
+            <ue-modal v-model="modals['dialog'].active"
+              :ref="modals['dialog'].ref"
+              :transition="'dialog-bottom-transition'"
+              :width-type="'sm'"
 
-                  <v-card-text class="text-center" style="word-break: break-word;">
-                    {{ modals[activeModal].content }}
-                  </v-card-text>
-                  <v-divider />
-                  <v-card-actions>
-                    <v-spacer />
-                    <v-btn
-                      v-if="modals[activeModal].hideModalCancel"
-                      :color="modals[activeModal].color ? modals[activeModal].color : 'blue'"
-                      text
-                      @click="modals[activeModal].closeAction()"
-                    >
-                      {{ modals[activeModal].cancelText || props.textCancel }}
-                    </v-btn>
-                    <!-- <v-btn color="blue" text @click="handleModal('confirm', modal.ref, props.onConfirm)"></v-btn> -->
-                    <v-btn
-                      :color="modals[activeModal].color ? modals[activeModal].color : 'blue'"
-                      text
-                      @click="modals[activeModal].confirmAction()"
-                    >
-                      {{ modals[activeModal].confirmText || props.textConfirm }}
-                    </v-btn>
-                    <v-spacer />
-                  </v-card-actions>
-                </v-card>
-              </template>
+              v-bind="modals['dialog'].modalAttributes ?? {}"
+            >
             </ue-modal>
 
             <!-- show modal -->
-            <ue-modal
-              v-if="modals['show'].active"
+            <ue-modal v-if="modals['show'].active"
               :ref="modals['show'].ref"
               v-model="modals['show'].active"
               :transition="modals['show'].transition || 'dialog-bottom-transition'"
               :width-type="modals['show'].widthType || 'lg'"
               :persistent="modals['show'].persistent"
-              :description-text="modals['show'].description"
+              :description="modals['show'].description"
             >
               <template v-slot:body="props">
                 <v-card class="fill-height d-flex flex-column">
@@ -495,14 +453,13 @@
             </ue-modal>
 
             <!-- custom form modal -->
-            <ue-modal
+            <ue-modal v-model="customFormModalActive"
               ref="customFormModal"
-              v-model="customFormModalActive"
               :width-type="'lg'"
             >
-            <!-- <slot name="systembar">
-              test
-            </slot> -->
+              <!-- <slot name="systembar">
+                test
+              </slot> -->
               <ue-form
                 ref="customForm"
                 v-model="customFormModel"
@@ -851,7 +808,6 @@ const { ignoreFormatters } = makeFormatterProps()
 console.log(
   {
     ...makeTableNamesProps(),
-    ...makeTableEndpointsProps(),
     ...makeTableFiltersProps(),
     ...makeTableHeadersProps(),
     ...makeTableFormsProps(),

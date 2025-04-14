@@ -4,6 +4,8 @@ import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import _ from 'lodash-es'
 
+import datatableApi from '@/store/api/datatable'
+
 import ACTIONS from '@/store/actions'
 import { useTableItem, useTableNames } from '@/hooks/table'
 
@@ -27,9 +29,57 @@ export default function useTableModals(props, context) {
   // const customModalActive = ref(!(_.isEmpty(store._state.data.datatable.customModal)))
   const customModalActive = ref(props.openCustomModal)
   const actionModalActive = ref(false)
-  const activeModal = ref('custom')
+
+  const activeModalType = ref('custom')
+
   const selectedAction = ref(null)
   const deleteModal = ref(null)
+
+
+  const activeModal = computed(() => {
+    return modals.value[activeModalType.value]
+  })
+
+  // Modal Control Methods
+  const openCustomModal = () => {
+    customModalActive.value = true
+  }
+  const closeCustomModal = () => {
+    customModalActive.value = false
+  }
+  const cleanupModals = () => {
+    if (store._state.data.datatable.customModal) {
+      __removeQueryParams(['customModal[description]', 'customModal[color]', 'customModal[icon]', 'customModal[hideModalCancel]'])
+    }
+  }
+  const setModalType = (type) => {
+    activeModalType.value = type
+  }
+
+  // Helper Methods
+  const resetCustomModal = () => {
+    modals.custom.confirmText = ''
+    modals.custom.cancelText = ''
+    modals.custom.img = ''
+    modals.custom.icon = ''
+    modals.custom.iconSize = null
+    modals.custom.title = ''
+    modals.custom.color = ''
+  }
+  const bulkAction = async (action) => {
+    const camelCase = _.camelCase(action.name)
+    if(datatableApi[camelCase]) {
+      datatableApi[camelCase](props.endpoints[camelCase], tableItem.editedItem.value.id, () => {
+
+      })
+    }
+    // if (__isset(ACTIONS[studlyCase])) {
+    //   await store.dispatch(ACTIONS[studlyCase])
+    //   selectedItems.value = []
+    // } else {
+    //   console.warn(`${action.name} may have not implemented yet on useTable.js hook`)
+    // }
+  }
 
   // Computed Properties
   const actionDialogQuestion = computed(() => {
@@ -41,44 +91,81 @@ export default function useTableModals(props, context) {
 
   // Modal Definitions
   const modals = ref({
-    'delete': {
-      content: tableNames.deleteQuestion,
-      confirmAction() {
-        if (tableItem.isSoftDeletableItem.value) {
-          store.dispatch(ACTIONS.DESTROY_ITEM, {
-            id: tableItem.editedItem.value.id,
-            callback: () => {
-              customModalActive.value = false
-            },
-            errorCallback: () => {}
-          })
-        } else {
-          store.dispatch(ACTIONS.DELETE_ITEM, {
-            id: tableItem.editedItem.value.id,
-            callback: () => {
-              customModalActive.value = false
-            },
-            errorCallback: () => {}
-          })
+    'dialog': {
+      ref: ref(null),
+      active: false,
+
+      // confirmCallback: null,
+      // rejectCallback: null,
+      modalAttributes: {
+        title: null,
+        description: null,
+        transition: 'dialog-bottom-transition',
+        widthType: 'md',
+        fullscreen: false,
+        persistent: false,
+        confirmText: t('Confirm'),
+        cancelText: t('Cancel'),
+
+        confirmClosing: false,
+        rejectClosing: true,
+
+        confirmCallback: null,
+        rejectCallback: null,
+      },
+      _oldModalAttributes: {},
+      toggle(state = null) {
+        this.active = state ?? !this.active
+      },
+      close() {
+        this.toggle(false)
+      },
+      open() {
+        this.toggle(true)
+      },
+      setConfirmCallback(callback) {
+        if(callback && typeof callback === 'function') {
+          this._oldModalAttributes.confirmCallback = this.modalAttributes.confirmCallback
+          this.modalAttributes.confirmCallback = callback
         }
       },
-      closeAction() {
-        customModalActive.value = false
-      }
-    },
-    'action': {
-      content: actionDialogQuestion,
-      confirmAction() {
-        bulkAction(selectedAction.value)
-        customModalActive.value = false
+      setRejectCallback(callback) {
+        if(callback && typeof callback === 'function') {
+          this._oldModalAttributes.rejectCallback = this.modalAttributes.rejectCallback
+          this.modalAttributes.rejectCallback = callback
+        }
       },
-      openAction(action) {
-        selectedAction.value = action
-        customModalActive.value = true
+      setQuestion(question) {
+        this._oldModalAttributes.description = this.modalAttributes.description
+        this.modalAttributes.description = question
       },
-      closeAction() {
-        customModalActive.value = false
-      }
+      setTitle(title) {
+        this._oldModalAttributes.title = this.modalAttributes.title
+        this.modalAttributes.title = title
+      },
+      set(attributes) {
+        let feasibles = Object.keys(attributes).reduce((acc, attribute) => {
+          acc[attribute] = attributes[attribute]
+          // if (this[attribute] !== undefined && !['active', 'ref', 'data', '_old'].includes(attribute)) {
+          //   acc[attribute] = attributes[attribute]
+          // }
+          return acc
+        }, {})
+        let assignables = _.reduce(feasibles, (acc, value, attribute) => {
+          acc[attribute] = value
+          this._oldModalAttributes[attribute] ??= _.cloneDeep(this.modalAttributes[attribute])
+          return acc
+        }, {})
+
+        Object.assign(this.modalAttributes, assignables)
+      },
+      reset() {
+        const self = this
+        _.each(this._oldModalAttributes, (value, attribute) => {
+          self.modalAttributes[attribute] = value
+        })
+        this._oldModalAttributes = {}
+      },
     },
     'custom': {
       content: computed(() => store._state.data.datatable.customModal.description),
@@ -90,11 +177,11 @@ export default function useTableModals(props, context) {
       title: 'Payment Complete',
       color: 'success',
       closeAction() {
-        customModalActive.value = false
+        closeCustomModal()
         resetCustomModal()
       },
       confirmAction() {
-        customModalActive.value = false
+        closeCustomModal()
         resetCustomModal()
       }
     },
@@ -163,50 +250,7 @@ export default function useTableModals(props, context) {
     }
   })
 
-  // Helper Methods
-  const resetCustomModal = () => {
-    modals.custom.confirmText = ''
-    modals.custom.cancelText = ''
-    modals.custom.img = ''
-    modals.custom.icon = ''
-    modals.custom.iconSize = null
-    modals.custom.title = ''
-    modals.custom.color = ''
-  }
 
-  const bulkAction = async (action) => {
-    const studlyCase = _.snakeCase(action.name).toUpperCase()
-    if (__isset(ACTIONS[studlyCase])) {
-      await store.dispatch(ACTIONS[studlyCase])
-      selectedItems.value = []
-    } else {
-      console.warn(`${action.name} may have not implemented yet on useTable.js hook`)
-    }
-  }
-
-  // Modal Control Methods
-  const openDeleteModal = (modal) => {
-    modal.open()
-  }
-
-  const closeDeleteModal = () => {
-    customModalActive.value = false
-  }
-
-  const closeActionModal = () => {
-    actionModalActive.value = false
-  }
-
-  const openActionModal = (action) => {
-    customModalActive.value = true
-  }
-
-  // Cleanup Method
-  const cleanupModals = () => {
-    if (store._state.data.datatable.customModal) {
-      __removeQueryParams(['customModal[description]', 'customModal[color]', 'customModal[icon]', 'customModal[hideModalCancel]'])
-    }
-  }
 
   watch(() => modals.value.show.active, (value) => {
     if (!value) {
@@ -223,20 +267,21 @@ export default function useTableModals(props, context) {
     deleteModalActive,
     customModalActive,
     actionModalActive,
-    activeModal,
     selectedAction,
     deleteModal,
+
+    activeModal,
+
     modals,
 
     // Computed
     actionDialogQuestion,
 
     // Methods
-    openDeleteModal,
-    closeDeleteModal,
-    closeActionModal,
-    openActionModal,
+    openCustomModal,
+    closeCustomModal,
     cleanupModals,
-    bulkAction
+    setModalType,
+    bulkAction,
   }
 }

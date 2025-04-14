@@ -1,9 +1,10 @@
 // hooks/table/useTableItemActions.js
 import { computed, reactive, toRefs } from 'vue'
-import { useStore } from 'vuex'
 import { useDisplay } from 'vuetify'
 import _ from 'lodash-es'
-import ACTIONS from '@/store/actions'
+
+import formApi from '@/store/api/form'
+import datatableApi from '@/store/api/datatable'
 
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
@@ -32,13 +33,24 @@ export const makeTableItemActionsProps = propsFactory({
   }
 })
 
-export default function useTableItemActions(props, { tableForms, tableModals, tableEndpoints }) {
-  const store = useStore()
+export default function useTableItemActions(props, { tableForms }) {
   const tableItem = useTableItem()
   const tableNames = useTableNames(props)
   const { can } = useAuthorization()
 
   const { smAndDown, mdAndDown, lgAndDown } = useDisplay()
+
+  // Create a reactive object to store action events
+  const actionEvents = reactive({
+    // Will contain events like: showModal, confirmAction, etc.
+    event: null,
+    payload: null,
+    // Reset the current event
+    reset: () => {
+      actionEvents.event = null
+      actionEvents.payload = null
+    }
+  })
 
   // Action Permissions
   const itemHasAction = (item, action) => {
@@ -70,24 +82,28 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
       tableItem.setEditedItem(item)
       tableForms.openForm()
     } else {
-      const route = tableEndpoints.editUrl.value.replace(':id', item.id)
-      window.open(route)
-    }
-  }
 
-  const handleDeleteAction = (item) => {
-    tableItem.setEditedItem(item)
-    tableModals.activeModal.value = 'delete'
-    tableModals.customModalActive.value = true
+      if(_.isObject(props.endpoints) && props.endpoints.edit) {
+        const route = props.endpoints.edit.replace(':id', item.id)
+        window.open(route)
+      } else {
+        console.error(`No edit endpoint found in endpoints of props`)
+      }
+
+    }
   }
 
   const handleRestoreAction = (item) => {
     tableItem.setEditedItem(item)
-    store.dispatch(ACTIONS.RESTORE_ITEM, {
-      id: item.id,
-      callback: () => {},
-      errorCallback: () => {}
-    })
+
+    const type = 'restore'
+    const callback = async (callback, errorCallback) => {
+      return await datatableApi[type](props.endpoints[type], item.id, callback, errorCallback)
+    }
+
+    actionEvents.event = 'process'
+    actionEvents.payload = { type, item, callback }
+
   }
 
   const handleDuplicateAction = (item) => {
@@ -97,29 +113,50 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
 
   const handleSwitchAction = (item, value, key) => {
 
-    store.dispatch(ACTIONS.SAVE_FORM, {
-      plain: true,
-      item: {
+    const type = 'publish'
+
+    const callback = async (callback, errorCallback) => {
+      let payload = {
         id: item.id,
-        ...{ [key]: value }
-      },
-      callback: () => {
-        item[key] = value
-        if (tableItem.editedItem.id === item.id) {
-          tableItem.setEditedItem({
-            ...tableItem.editedItem,
-            ...{ [key]: value }
-          })
-        }
-      },
-      errorCallback: () => {}
-    })
+        [key]: value
+      }
+      return await formApi.put(props.endpoints.update.replace(':id', item.id), payload, callback, errorCallback)
+    }
+
+    item[key] = value
+
+    actionEvents.event = 'process'
+    actionEvents.payload = { type, item, callback }
+  }
+
+  const handleDeleteAction = (item) => {
+    tableItem.setEditedItem(item)
+
+    let id = tableItem.editedItem.value.id
+    let type = tableItem.isSoftDeletableItem.value ? 'forceDelete' : 'delete'
+
+    const callback = async (callback, errorCallback) => {
+      if (type === 'forceDelete') {
+        return await datatableApi.forceDelete(props.endpoints.forceDelete, id, callback, errorCallback)
+      } else {
+        return await datatableApi.delete(props.endpoints.destroy, id, callback, errorCallback)
+      }
+    }
+
+    actionEvents.event = 'dialog'
+    actionEvents.payload = { type, id, callback }
   }
 
   const handleBulkAction = (action) => {
-    tableModals.activeModal.value = 'action'
-    tableModals.customModalActive.value = true
-    tableModals.selectedAction.value = action
+    const type = action.name
+    const callback = async (selectedItems, callback, errorCallback) => {
+      let actionName = _.camelCase(type)
+      if(datatableApi[actionName]){
+        return await datatableApi[actionName](props.endpoints[actionName], selectedItems, callback, errorCallback)
+      }
+    }
+    actionEvents.event = 'dialog'
+    actionEvents.payload = { type, callback }
   }
 
   const handleCustomFormAction = (action, item) => {
@@ -141,6 +178,8 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
     }
 
     tableForms.customFormModalActive.value = true
+    actionEvents.event = 'showCustomForm'
+    actionEvents.payload = { action, item }
   }
 
   const getOnlyShowData = (data, only = null) => {
@@ -200,20 +239,16 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
       data = __data_get(item, action.show, null);
     }
 
-
     if(data) {
       if(action.only) {
         data = getOnlyShowData(data, action?.only)
       } else if (action.except) {
         data = getExceptShowData(data, action?.except)
       }
-      tableModals.modals.value.show.loadData(data)
-      tableModals.modals.value.show.set(action)
-      tableModals.modals.value.show.open()
+
+      actionEvents.event = 'showData'
+      actionEvents.payload = { action, data }
     }
-    // tableModals.modals.value.show.description = action.show.description
-    // tableModals.activeModal.value = 'showModal'
-    // tableModals.showModalActive.value = true
   }
 
   // Main Action Handler
@@ -246,6 +281,7 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
       case 'bulkDelete':
       case 'bulkForceDelete':
       case 'bulkRestore':
+      case 'bulkPublish':
         handleBulkAction(_action)
         break
       default:
@@ -279,6 +315,8 @@ export default function useTableItemActions(props, { tableForms, tableModals, ta
     ...toRefs(states),
     // methods
     itemAction,
-    itemHasAction
+    itemHasAction,
+    // Add the action events to the return value
+    actionEvents
   }
 }
