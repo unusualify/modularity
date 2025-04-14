@@ -2,13 +2,21 @@
 
 namespace Unusualify\Modularity\Entities;
 
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Unusualify\Modularity\Database\Factories\CompanyFactory;
 
 class Company extends Model
 {
     use HasFactory;
-    use HasFactory;
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory() : Factory
+    {
+        return CompanyFactory::new();
+    }
 
     protected $fillable = [
         'id',
@@ -33,8 +41,4 @@ class Company extends Model
         return modularityConfig('tables.companies', parent::getTable());
     }
 
-    protected static function newFactory()
-    {
-        return new CompanyFactory;
-    }
 }
