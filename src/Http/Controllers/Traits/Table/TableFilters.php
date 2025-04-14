@@ -73,9 +73,9 @@ trait TableFilters
             );
         }
 
-        $statusFilters = array_filter($statusFilters, function ($filter) {
-            return $filter['number'] > 0;
-        });
+        $statusFilters = array_values(array_filter($statusFilters, function ($filter) {
+            return $filter['number'] > 0 || in_array($filter['slug'], ['trash', 'all']);
+        }));
 
         return $statusFilters;
     }
