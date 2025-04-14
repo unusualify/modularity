@@ -1,4 +1,3 @@
-export { default as RootMixin } from './root'
 export { default as LocaleMixin } from './locale'
 export { default as ModalMixin } from './modal'
 export { default as InputMixin } from './input'
