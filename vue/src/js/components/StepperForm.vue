@@ -96,7 +96,7 @@
         ref="modal"
         v-model="modalActive"
         :width-type="'md'"
-        :description-text="modalMessage"
+        :description="modalMessage"
         persistent
       >
         <template v-slot:body.description>
