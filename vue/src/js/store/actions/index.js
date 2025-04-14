@@ -32,6 +32,9 @@ export const SAVE_FORM = 'saveFormData'
 export const UPDATE_FORM_IN_LISTING = 'updateFormInListing'
 export const CREATE_FORM_IN_MODAL = 'createFormInModal'
 
+/* Alert */
+export const SHOW_ALERT = 'showAlert'
+
 /* Previews */
 export const GET_ALL_PREVIEWS = 'getAllPreviews'
 export const GET_PREVIEW = 'getPreview'
@@ -72,5 +75,7 @@ export default {
   GET_REVISION,
   GET_CURRENT,
   MOVE_BLOCK_TO_EDITOR,
-  DUPLICATE_BLOCK
+  DUPLICATE_BLOCK,
+
+  SHOW_ALERT,
 }
