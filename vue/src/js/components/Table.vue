@@ -60,7 +60,7 @@
           <v-toolbar
             v-bind="toolbarOptions"
             :class="[
-              'pt-1',
+              'pt-3',
             ]"
           >
             <!-- table title -->
