@@ -456,6 +456,7 @@
             <ue-modal v-model="customFormModalActive"
               ref="customFormModal"
               :width-type="'lg'"
+              persistent
             >
               <!-- <slot name="systembar">
                 test
