@@ -152,7 +152,7 @@ class Modularity extends FileRepository
         }
 
         if ($resetCache) {
-            dd($modules);
+            // dd($modules);
 
             return $this->scan();
         }
