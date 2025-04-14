@@ -250,7 +250,10 @@ export default function useTable (props, context) {
   const tableHeaders = useTableHeaders(props)
   const tableForms = useTableForms(props, {
     ...context,
-    ...tableNames
+    ...tableNames,
+    ...{
+      loadItems
+    }
   })
   const tableModals = useTableModals(props)
   const tableItemActions = useTableItemActions(props, {

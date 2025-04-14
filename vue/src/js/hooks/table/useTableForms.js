@@ -121,6 +121,7 @@ export default function useTableForms(props, context) {
       if (Object.prototype.hasOwnProperty.call(res, 'variant') &&
           res.variant.toLowerCase() === 'success') {
         closeForm()
+        context.loadItems()
       }
     })
   }
