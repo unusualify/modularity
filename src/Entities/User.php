@@ -108,22 +108,24 @@ class User extends Authenticatable
         return $this->hasRole('admin');
     }
 
-    protected function invalidCompany(): Attribute
+    protected function validCompany(): Attribute
     {
-        $inValid = false;
+        $valid = true;
 
         if ($this->company_id != null) {
+            $valid = true;
             foreach ($this->company->getAttributes() as $attr => $value) {
                 if (! str_contains($attr, '_at') && $attr != 'id') {
-                    if ($value == null) {
-                        $inValid = true;
+                    if (!$value) {
+                        $valid = false;
+                        break;
                     }
                 }
             }
         }
 
         return Attribute::make(
-            get: fn () => $inValid,
+            get: fn () => $valid,
         );
     }
 
@@ -164,8 +166,10 @@ class User extends Authenticatable
         return modularityConfig('tables.users', parent::getTable());
     }
 
-    protected static function newFactory()
+    protected static function newFactory(): \Illuminate\Database\Eloquent\Factories\Factory
     {
-        return new UserFactory;
+        return UserFactory::new();
     }
+
+
 }
