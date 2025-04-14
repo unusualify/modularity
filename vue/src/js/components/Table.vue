@@ -835,7 +835,6 @@ import {
 
 import {
   makeTableNamesProps,
-  makeTableEndpointsProps,
   makeTableFiltersProps,
   makeTableHeadersProps,
   makeTableFormsProps,
@@ -876,7 +875,6 @@ export default {
   },
   props: {
     ...makeTableNamesProps(),
-    ...makeTableEndpointsProps(),
     ...makeTableFiltersProps(),
     ...makeTableHeadersProps(),
     ...makeTableFormsProps(),

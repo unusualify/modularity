@@ -24,7 +24,6 @@ import {
   useTableForms,
   useTableItemActions,
   useTableModals,
-  useTableEndpoints,
   useTableActions,
 } from '@/hooks/table'
 
@@ -156,6 +155,11 @@ export const makeTableProps = propsFactory({
     default: false,
   },
 
+  endpoints: {
+    type: Object,
+    default: {},
+  },
+
 })
 
 // by convention, composable function names start with "use"
@@ -239,8 +243,6 @@ export default function useTable (props, context) {
   const tableNames = useTableNames(props, {
     editedIndex: editedIndex
   })
-  // Get endpoints-related computeds
-  const tableEndpoints = useTableEndpoints(props)
   // Get filter-related computeds
   const tableFilters = useTableFilters(props, {
     ...context,
@@ -257,6 +259,12 @@ export default function useTable (props, context) {
   })
 
   const tableModals = useTableModals(props)
+
+  const tableItemActions = useTableItemActions(props, {
+    ...context,
+    ...{
+      tableForms}
+  })
 
   // const getters = mapGetters()
 
@@ -321,15 +329,6 @@ export default function useTable (props, context) {
       return items;
     }),
 
-  })
-
-  const tableItemActions = useTableItemActions(props, {
-    ...context,
-    ...{
-      tableForms,
-      tableModals,
-      tableEndpoints
-    }
   })
 
 
