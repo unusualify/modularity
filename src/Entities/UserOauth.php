@@ -23,6 +23,6 @@ class UserOauth extends BaseModel
 
     public function user()
     {
-        $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
