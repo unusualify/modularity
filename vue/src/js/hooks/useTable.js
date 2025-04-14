@@ -452,6 +452,21 @@ export default function useTable (props, context) {
       options.value.page = 1
       //   store.commit(DATATABLE.REPLACE_DATATABLE_BULK, [])
       loadItems()
+    },
+
+    handleFormActionComplete(payload) {
+      // payload.action
+      // payload.response
+      const action = payload.action
+      const response = payload.response
+
+      if(action.type === 'request') {
+        loadItems()
+      }
+
+      if(action.type === 'modal') {
+        loadItems()
+      }
     }
   })
 
