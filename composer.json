@@ -64,6 +64,7 @@
         "laravel/pint": "^1.18",
         "orchestra/testbench": "^7.0|^8.23.4|^9.0",
         "larastan/larastan": "^2.0",
+        "laravel/sanctum": "^3.3",
         "phpunit/phpunit": "^9.0|^10.0.7|^11.0"
     },
     "extra": {
