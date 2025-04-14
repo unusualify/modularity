@@ -18,7 +18,8 @@
           close: () => this.close(),
           confirm: () => this.confirm(),
           open: () => this.open(),
-        }">
+        }"
+      >
         <slot name="systembar">
           <v-layout v-if="hasSystembar" style="height: 40px">
             <v-col>
@@ -35,7 +36,7 @@
             v-bind="{
                 textCancel: this.textCancel,
                 textConfirm: this.textConfirm,
-                textDescription: this.textDescription,
+                textDescription: this.description,
                 isFullActive: this.full,
 
                 open: () => this.open(),
@@ -44,26 +45,26 @@
                 toggleFullscreen: () => this.toggleFullscreen(),
             }"
             :closeDialog="close"
-            >
-            <v-card >
-              <v-card-title class="text-h5 text-center" style="word-break: break-word;">
-                <!-- {{ textDescription }} -->
-              </v-card-title>
-              <v-card-text class="text-center" style="word-break: break-word;" >
-                <slot name="body.description" v-bind="{textDescription}">
-                  {{ textDescription }}
-                </slot>
-              </v-card-text>
-              <v-divider/>
-              <v-card-actions>
-                <v-spacer/>
-                <slot name="body.options" v-bind="{textDescription}">
-                  <v-btn variant="flat" ref="modalCancel" class="modal-cancel" color="red" text @click="cancel()" :loading="rejectLoading" :disabled="rejectLoading"> {{ textCancel }}</v-btn>
-                  <v-btn variant="flat" ref="modalConfirm" class="modal-confirm" color="green" text @click="confirm()" :loading="confirmLoading" :disabled="confirmLoading"> {{ textConfirm }}</v-btn>
-                </slot>
-                <v-spacer/>
-              </v-card-actions>
-            </v-card>
+          >
+          <v-card >
+            <v-card-title v-if="title" class="text-h5 text-center" style="word-break: break-word;">
+              {{ title }}
+            </v-card-title>
+            <v-card-text v-if="description" class="text-center" style="word-break: break-word;" >
+              <slot name="body.description" v-bind="{description}">
+                {{ description }}
+              </slot>
+            </v-card-text>
+            <v-divider/>
+            <v-card-actions>
+              <v-spacer/>
+              <slot name="body.options" v-bind="{description}">
+                <v-btn ref="modalCancel" v-bind="rejectButtonAttributes" class="modal-cancel" @click="cancel()" :loading="rejectLoading" :disabled="rejectLoading"> {{ textCancel }}</v-btn>
+                <v-btn ref="modalConfirm" v-bind="confirmButtonAttributes" class="modal-confirm" @click="confirm()" :loading="confirmLoading" :disabled="confirmLoading"> {{ textConfirm }}</v-btn>
+              </slot>
+              <v-spacer/>
+            </v-card-actions>
+          </v-card>
         </slot>
       </slot>
     </template>
@@ -95,9 +96,6 @@ export default {
     textConfirm() {
       return this.confirmText !== '' ? this.confirmText : this.$t('fields.confirm')
     },
-    textDescription() {
-      return this.descriptionText
-    }
   },
   watch: {
     dialog(value) {
@@ -144,6 +142,7 @@ export default {
 
       return true
     },
+
     async confirm(callback = null) {
       let shouldClose = true
 
@@ -159,7 +158,7 @@ export default {
         let res = await this.confirmCallback()
         shouldClose = typeof res === 'boolean' ? res : true
 
-        if (shouldClose) {
+        if (shouldClose && this.confirmClosing) {
           this.closeModal()
         }
 
@@ -171,12 +170,21 @@ export default {
 
       return shouldClose
     },
-    cancel(callback = null) {
+    async cancel(callback = null) {
       if (callback) {
         callback()
       }
-      this.closeModal()
-      this.$emit('cancel')
+
+      if (this.rejectCallback && typeof this.rejectCallback === 'function') {
+        let res = await this.rejectCallback()
+        shouldClose = typeof res === 'boolean' ? res : true
+
+        if (shouldClose && this.rejectClosing) {
+          this.closeModal()
+        }
+      } else {
+        this.closeModal()
+      }
     },
     toggleFullscreen() {
       this.full = !this.full

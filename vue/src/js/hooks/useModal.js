@@ -18,6 +18,18 @@ export const makeModalProps = propsFactory({
   modelValue: {
     type: Boolean
   },
+  useModelValue: {
+    type: Boolean,
+    default: true
+  },
+  title: {
+    type: String,
+    default: null
+  },
+  description: {
+    type: String,
+    default: null
+  },
   transition: {
     type: String,
     default: 'bottom',
@@ -57,14 +69,12 @@ export const makeModalProps = propsFactory({
     type: String,
     default: ''
   },
-  descriptionText: {
-    type: String,
-    default: ''
-  },
   confirmCallback: {
     type: Function,
   },
-
+  rejectCallback: {
+    type: Function,
+  },
   rejectLoading: {
     type: Boolean,
     default: false
@@ -73,10 +83,29 @@ export const makeModalProps = propsFactory({
     type: Boolean,
     default: false
   },
-  useModelValue: {
+  rejectButtonAttributes: {
+    type: Object,
+    default: () => ({
+      color: 'red',
+      variant: 'outlined',
+    })
+  },
+  confirmButtonAttributes: {
+    type: Object,
+    default: () => ({
+      color: 'green',
+      variant: 'elevated',
+    })
+  },
+
+  confirmClosing: {
     type: Boolean,
     default: true
-  }
+  },
+  rejectClosing: {
+    type: Boolean,
+    default: true
+  },
 })
 
 export const makeModalMediaProps = propsFactory({
@@ -132,7 +161,6 @@ export default function useModal (props, context) {
     togglePersistent: computed(() => props.persistent),
     toggleScrollable: computed(() => props.scrollable),
     modalWidth: computed(() => props.widthType && !full.value ? defaultWidths[props.widthType] : null)
-
   })
   const methods = reactive({
     emitModelValue: function (val) {
