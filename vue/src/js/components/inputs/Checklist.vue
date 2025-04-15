@@ -474,7 +474,7 @@
         return !this.disabled && (!this.maxSelectable || (Array.isArray(this.input) && this.input.length < this.maxSelectable));
       },
       isMandatoryItem(item) {
-        return __data_get(item, this.mandatory, false)
+        return Boolean(__data_get(item, this.mandatory, false))
       },
       isGroupOpen(index) {
         if(this.openAllGroups){
