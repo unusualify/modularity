@@ -74,12 +74,23 @@
                   :is-completed="isCompleted"
                   @complete="onComplete"
                 >
+                  <template v-if="$slots['summary.final.body']" v-slot:body>
+                    <slot name='summary.final.body' v-bind="{
+                      models,
+                      schemas,
+                      lastStepModel,
+                      finalFormFields,
+                      lastFormPreview,
+                    }">
+
+                    </slot>
+                  </template>
                   <template v-slot:total>
                     <slot name='summary.final.total' v-bind="{payload: this.payload}">
                       <ue-text-display class="text-h5 text-white" text="$2500" subText="+ VAT" />
                     </slot>
                   </template>
-                  <template v-slotdescription>
+                  <template v-slot:description>
                     <slot name="summary.final.description">
                       At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium iusto odio
                     </slot>
