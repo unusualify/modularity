@@ -33,10 +33,10 @@ export default {
   },
   props: {
     ...makeInputProps(),
-    modelValue: {
-      type: Object,
-      default: () => ''
-    },
+    // modelValue: {
+    //   type: Object,
+    //   default: () => ''
+    // },
     items: {
       type: Object,
       default: () => []
