@@ -193,7 +193,7 @@
         default: 'models.1.pressReleasePackages'
       },
       summaryNotations: {
-        type: Array,
+        type: [Array, Object],
         default: () => {
           return {}
         }
