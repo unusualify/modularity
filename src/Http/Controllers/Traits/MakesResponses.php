@@ -98,9 +98,9 @@ trait MakesResponses
      * @param string $message
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithSuccess($message)
+    protected function respondWithSuccess($message, $attributes = [])
     {
-        return $this->respondWithJson($message, MessageStage::SUCCESS);
+        return $this->respondWithJson($message, MessageStage::SUCCESS, $attributes);
     }
 
     /**
@@ -118,9 +118,9 @@ trait MakesResponses
      * @param string $message
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithError($message)
+    protected function respondWithError($message, $attributes = [])
     {
-        return $this->respondWithJson($message, MessageStage::ERROR);
+        return $this->respondWithJson($message, MessageStage::ERROR, $attributes);
     }
 
     /**
@@ -128,9 +128,10 @@ trait MakesResponses
      * @param mixed $variant
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithJson($message, $variant)
+    protected function respondWithJson($message, $variant, $attributes = [])
     {
         return Response::json([
+            ...$attributes,
             'message' => $message,
             'variant' => $variant,
         ]);
