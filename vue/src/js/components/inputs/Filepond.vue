@@ -1,14 +1,5 @@
 <template>
-  <slot name="activator"
-    v-bind="{
-      browse,
-      addFile,
-      removeFile,
-      removeFiles,
-      getFiles,
-      getFile,
-    }"
-  />
+
   <!-- <v-btn @click="pondBrowse">Text</v-btn> -->
   <v-input
     ref="VInput"
@@ -18,10 +9,19 @@
     :rules="rules"
   >
     <template v-slot:default="defaultSlot">
+      <slot name="activator"
+        v-bind="{
+          browse,
+          addFile,
+          removeFile,
+          removeFiles,
+          getFiles,
+          getFile,
+        }"
+      />
       <div
         :class="[
           'w-100',
-          $slots.activator ? 'd-non' : ''
         ]"
         >
         <ue-title v-if="label" transform="none" padding="a-0" :weight="labelWeight" color="grey-darken-5">
@@ -107,7 +107,7 @@
   import "filepond/dist/filepond.min.css";
   import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
 
-  import { useInput, makeInputProps } from '@/hooks';
+  import { useInput, makeInputProps, makeInputEmits } from '@/hooks';
   import { globalError } from '@/utils/errors'
   import { useValidation } from '@/hooks'
 
@@ -125,7 +125,7 @@
       FilePond,
     },
     emits: [
-      'update:modelValue',
+      ...makeInputEmits,
       'loading',
       'loaded',
     ],
