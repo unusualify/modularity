@@ -70,7 +70,6 @@
                 }"
               >
                 <StepperFinalSummary
-                  :formatted-summary="formattedSummary"
                   :loading="loading"
                   :is-completed="isCompleted"
                   @complete="onComplete"
@@ -544,37 +543,6 @@
           data[index] = this.$getDisplayData(this.schemas[index], this.models[index])
         }
         return data
-      },
-      formattedSummary(){
-        let formatteds = NotationUtil.formattedSummary(this.displayInfo, this.summaryNotations)
-        let previewFormData = this.lastFormPreview
-        let lastStepModel = this.lastStepModel
-
-        const lastStepSelections = reduce(lastStepModel, function(acc, data, key){
-          let _data = Array.isArray(data) ? data : [data]
-
-          each(_data, (id) => {
-            const selected = find(previewFormData, (item) => item.id === id && item.fieldName === key)
-            if(selected){
-              acc.push(selected)
-            }
-          })
-          return acc
-        }, [])
-
-        if(lastStepSelections.length > 0){
-          formatteds['lastStepSelections'] = {
-            title: this.finalFormTitle,
-            values: map(lastStepSelections, (data) => {
-              return {
-                title: data.name || data.title || 'N/A',
-                value: data.base_price_without_vat_formatted || 'N/A',
-              }
-            }),
-          }
-        }
-
-        return formatteds
       },
       formattedPreview(){
         return NotationUtil.formattedPreview(this.displayInfo, this.previewNotations)
