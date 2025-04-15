@@ -1,13 +1,13 @@
 <template>
   <div class="ue-list-section">
     <!-- Table-like structure with flex layout -->
-    <div class="list-container" :class="{ 'align-top': verticalAlignTop }">
+    <div class="ue-list-section__container" :class="{ 'align-top': verticalAlignTop }">
       <!-- Header row -->
-      <div v-if="showHeader" class="list-row header-row" :class="headerClasses">
+      <div v-if="showHeader" class="ue-list-section__row ue-list-section__row--header" :class="headerClasses">
         <div
           v-for="(header, j) in effectiveHeaders"
           :key="`header-${j}`"
-          class="list-cell"
+          class="ue-list-section__cell"
           :class="[colClasses[j] ?? '']"
           :style="getColumnStyle(j)"
         >
@@ -17,7 +17,7 @@
         </div>
 
         <!-- Actions column header -->
-        <div v-if="$slots['row-actions']" class="list-cell actions-cell">
+        <div v-if="$slots['row-actions']" class="ue-list-section__cell ue-list-section__cell--actions">
           <slot name="actions-header">
             {{ actionsHeader }}
           </slot>
@@ -25,8 +25,8 @@
       </div>
 
       <!-- Title row if provided -->
-      <div v-if="title" class="list-row title-row">
-        <div class="title-cell">
+      <div v-if="title" class="ue-list-section__row ue-list-section__row--title">
+        <div class="ue-list-section__cell">
           <component :is="titleTag" :class="titleClasses">{{ title }}</component>
         </div>
       </div>
@@ -35,13 +35,13 @@
       <div
         v-for="(item, i) in items"
         :key="`item-${i}`"
-        class="list-row data-row"
+        class="ue-list-section__row ue-list-section__row--data"
         :class="[getRowClass(item, i), {'has-bottom-border': hasRowBottomBorder}]"
       >
         <div
           v-for="(field, j) in itemFields"
           :key="`item-field-${j}`"
-          class="list-cell"
+          class="ue-list-section__cell"
           :class="[colClasses[j] ?? '']"
           :style="getColumnStyle(j)"
         >
@@ -51,14 +51,14 @@
         </div>
 
         <!-- Actions cell -->
-        <div v-if="$slots['row-actions']" class="list-cell actions-cell">
+        <div v-if="$slots['row-actions']" class="ue-list-section__cell ue-list-section__cell--actions">
           <slot name="row-actions" v-bind="{ item, index: i }"></slot>
         </div>
       </div>
 
       <!-- Empty state message -->
-      <div v-if="items.length === 0 && emptyMessage" class="list-row empty-row">
-        <div class="empty-message">{{ emptyMessage }}</div>
+      <div v-if="items.length === 0 && emptyMessage" class="ue-list-section__row ue-list-section__row--empty">
+        <div class="ue-list-section__row--empty .ue-list-section__cell">{{ emptyMessage }}</div>
       </div>
     </div>
   </div>
@@ -206,7 +206,7 @@ export default {
 
       // Apply hoverable effect if enabled
       if (this.hoverable) {
-        classes.push('hover-effect');
+        classes.push('ue-list-section__row--hoverable');
       }
 
       // Apply custom row class function if provided
@@ -223,82 +223,82 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .ue-list-section {
   width: 100%;
+  .ue-list-section__container {
+    width: 100%;
+  }
+  .ue-list-section__row {
+    display: flex;
+    width: 100%;
+    min-height: 25px;
+    padding: 6px 0;
+    align-items: center;
+  }
+
+  .ue-list-section__row--header {
+    font-weight: bold;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    padding-bottom: 2px;
+    min-height: 35px;
+  }
+
+  .ue-list-section__row--title {
+    min-height: 35px;
+  }
+
+  .ue-list-section__cell--title {
+    flex: 1;
+    padding: 6px 0;
+  }
+
+  .ue-list-section__row--data.has-bottom-border {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .ue-list-section__cell {
+    padding-right: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0; /* Important for text truncation in flex items */
+  }
+
+  .ue-list-section__cell:last-child {
+    padding-right: 0;
+  }
+
+  /* Apply vertical-align: top when the prop is set */
+  .ue-list-section__container.align-top .ue-list-section__row {
+    align-items: flex-start;
+  }
+
+  .ue-list-section__container.align-top .ue-list-section__cell {
+    padding-top: 8px;
+  }
+
+  .ue-list-section__cell--actions {
+    width: 40px;
+    flex: 0 0 40px;
+    text-align: right;
+  }
+
+  .ue-list-section__row--empty {
+    justify-content: center;
+  }
+
+  .ue-list-section__row--empty .ue-list-section__cell {
+    text-align: center;
+    padding: 16px 0;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 14px;
+  }
+
+  .ue-list-section__row--hoverable:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
 }
 
-.list-container {
-  width: 100%;
-}
 
-.list-row {
-  display: flex;
-  width: 100%;
-  min-height: 25px;
-  padding: 6px 0;
-  align-items: center;
-}
-
-.header-row {
-  font-weight: bold;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  padding-bottom: 2px;
-  min-height: 35px;
-}
-
-.title-row {
-  min-height: 35px;
-}
-
-.title-cell {
-  flex: 1;
-  padding: 6px 0;
-}
-
-.data-row.has-bottom-border {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.list-cell {
-  padding-right: 16px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-width: 0; /* Important for text truncation in flex items */
-}
-
-.list-cell:last-child {
-  padding-right: 0;
-}
-
-/* Apply vertical-align: top when the prop is set */
-.list-container.align-top .list-row {
-  align-items: flex-start;
-}
-
-.list-container.align-top .list-cell {
-  padding-top: 8px;
-}
-
-.actions-cell {
-  width: 40px;
-  flex: 0 0 40px;
-  text-align: right;
-}
-
-.empty-row {
-  justify-content: center;
-}
-
-.empty-message {
-  text-align: center;
-  padding: 16px 0;
-  color: rgba(0, 0, 0, 0.6);
-  font-size: 14px;
-}
-
-.hover-effect:hover {
-  background-color: rgba(0, 0, 0, 0.04);
-}
 </style>
