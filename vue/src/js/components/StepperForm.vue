@@ -375,9 +375,9 @@
         let cacheFormFieldValuesKey = `preview-form-field-values-${modelNotation}`
 
         this.lastFormPreviewLoading = true
-
         let formFieldValues = this.$cacheGet(formFieldKey, {})
 
+        // get previous form field values
         let previousFormFieldValues = reduce(formFieldValues, (acc, value, key) => {
           if(value && value === true){
             acc.push(parseInt(key))
@@ -385,13 +385,14 @@
           return acc
         }, [])
 
+        // get cached form field values
         let cachedFormFieldValues = reduce(formFieldValues, (acc, value, key) => {
           acc.push(parseInt(key))
           return acc
         }, [])
 
+        // get cached form field fetched values
         let cachedFormFieldFetched = this.$cacheGet(cacheFormFieldValuesKey, [])
-
         let modelValue = get(this.models, modelNotation)
 
         if(modelValue && formField.endpoint){ // if model value is present and endpoint is present fetch new items
@@ -406,9 +407,18 @@
           let isChanged = false
 
           if(deletedIds.length > 0){ // delete items
+            isChanged = true
+
             this.lastFormPreview = this.lastFormPreview.filter(item => !deletedIds.includes(item.form_field_id))
 
-            isChanged = true
+            formFieldValues = reduce(formFieldValues, (acc, value, key) => {
+              if(deletedIds.includes(parseInt(key))){
+                acc[key] = false
+              }else{
+                acc[key] = value
+              }
+              return acc
+            }, {})
           }
 
           if(cachedNewIds.length > 0){ // get cached items acc. to form_field_id
@@ -433,7 +443,6 @@
             let response = await axios.get(endpoint)
 
             if(response.status === 200){
-
               let items = response.data
 
               items.forEach(item => {
