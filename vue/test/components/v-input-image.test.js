@@ -10,7 +10,7 @@ import ModalMedia from '../../src/js/components/modals/ModalMedia.vue'
 import i18n from '../../src/js/config/i18n'
 import store from '../../src/js/store'
 import fitGrid from '../../src/js/directives/fit-grid'
-import { wrap } from 'lodash'
+import { wrap } from 'lodash-es'
 
 global.ResizeObserver = require('resize-observer-polyfill')
 

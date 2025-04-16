@@ -4,7 +4,7 @@ import ACTIONS from '@/store/actions'
 
 import { setStorage } from '@/utils/localeStorage'
 import { redirector } from '@/utils/response'
-import { isArray, isEmpty } from 'lodash'
+import { isArray, isEmpty } from 'lodash-es'
 
 const state = {
   advancedFilters: window[import.meta.env.VUE_APP_NAME].STORE.datatable.advancedFilters || [],

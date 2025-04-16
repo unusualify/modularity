@@ -1,6 +1,6 @@
 // utils/formEventFormatters/formatFilter.js
 import formatHelpers from './helpers'
-import _ from 'lodash'
+import _ from 'lodash-es'
 
 import store from '@/store'  // Adjust path to your store file
 import { CACHE } from '@/store/mutations'

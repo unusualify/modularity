@@ -153,7 +153,7 @@
 <script setup>
 import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 import { ref, computed, watch, onMounted } from 'vue'
-import _ from 'lodash'
+import _ from 'lodash-es'
 
 const props = defineProps({
   ...makeInputProps(),
