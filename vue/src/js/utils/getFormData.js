@@ -220,7 +220,7 @@ export const getFormEventSchema = (inputs, model = null, isEditing = false) => {
     if(!isEditing && __isset(input.creatable) && (input.creatable === false || input.creatable === 'hidden'))
       return false
 
-    return isFormEventInput(input, model)
+    return isFormEventInput(input, model) && (input.conditions ? checkItemConditions(input.conditions, model) : true)
   })
 }
 
