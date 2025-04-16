@@ -1,6 +1,6 @@
 <template>
   <v-sheet-rounded class="ue-stepper-form__body d-flex w-100 flex-column justify-space-between elevation-2">
-    <v-stepper-window class="fill-height overflow-y-auto px-6" style="max-height: 80vh;">
+    <v-stepper-window id="ue-stepper-content-window" class="fill-height overflow-y-auto px-6" style="max-height: 80vh;">
       <!-- Form steps -->
       <v-stepper-window-item
         v-for="(form, i) in forms"
