@@ -3,7 +3,7 @@
     v-model="input"
     :variant="boundProps.variant"
     hide-details
-    class="v-input-assign"
+    class="v-input-assignment"
     >
     <template v-slot:default="defaultSlot">
       <div class="w-100">
@@ -19,7 +19,7 @@
               :items="[formattedAssignments[1]]"
               lines="three"
               item-props
-              class="pa-0 v-input-assign__list--assignee"
+              class="pa-0 v-input-assignment__list--assignee"
             >
               <template v-slot:prepend="{ prependAvatar }" v-if="isAssignee">
                 <v-menu
@@ -288,7 +288,7 @@
 import { useInput, makeInputProps, makeInputEmits, useValidation, useFormatter } from '@/hooks'
 
 export default {
-  name: 'v-input-assign',
+  name: 'v-input-assignment',
   emits: [...makeInputEmits],
   components: {
 
@@ -573,10 +573,10 @@ export default {
 
 <style lang="scss">
 
-.v-input-assign {
+.v-input-assignment {
   min-height: 60px;
 
-  .v-input-assign__list--assignee {
+  .v-input-assignment__list--assignee {
     .v-list-item {
       padding: 0 !important;
       min-height: 60px;
