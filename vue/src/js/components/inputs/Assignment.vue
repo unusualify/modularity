@@ -16,7 +16,7 @@
             <!-- Assignee Details -->
             <v-list v-if="(isAssignee || isAuthorized) && lastAssignment"
               id="assigneeList"
-              :items="[formattedAssignments[1]]"
+              :items="[lastFormattedAssignment]"
               lines="three"
               item-props
               class="pa-0 v-input-assignment__list--assignee"
@@ -78,7 +78,7 @@
                 <div v-html="title"></div>
               </template>
               <template v-slot:subtitle="subtitleScope">
-                <div v-html="formattedAssignments[1].subDescription"></div>
+                <div v-html="lastFormattedAssignment.subDescription"></div>
               </template>
             </v-list>
 
@@ -437,7 +437,10 @@ export default {
         }
         return acc
       }, formattedAssignments)
-    }
+    },
+    lastFormattedAssignment() {
+      return this.formattedAssignments.length > 0 ? this.formattedAssignments[1] : null
+    },
   },
   watch: {
 
