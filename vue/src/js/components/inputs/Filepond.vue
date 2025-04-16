@@ -78,13 +78,16 @@
             />
           </div>
         </slot>
-        <div class="details-container">
-          <div v-if="errorMessages.length > 0">
-            <ue-title type="caption" transform="none" padding="a-0" weight="regular" color="red" v-for="error in errorMessages" :key="error">
+        <div class="v-input__details">
+          <div v-if="errorMessages.length > 0" class="v-messages" role="alert" aria-live="polite">
+            <div class="v-messages__message">
+              {{ errorMessages.join(', ') }}
+            </div>
+            <!-- <ue-title type="caption" transform="none" padding="a-0" weight="regular" color="red" v-for="error in errorMessages" :key="error">
               {{ error }}
-            </ue-title>
+            </ue-title> -->
           </div>
-          <ue-title v-else-if="hint" type="caption" transform="none" padding="a-0" :weight="hintWeight" color="grey-darken-5">
+          <ue-title v-else-if="hint" class="v-messages" type="caption" transform="none" padding="a-0" :weight="hintWeight" color="grey-darken-5">
             <slot name="hint" v-bind="{
               hint: hint,
             }">
@@ -562,7 +565,7 @@
     }
   }
 
-  .details-container {
+  .v-input__details {
     display: flex;
     justify-content: space-between;
     align-items: center;
