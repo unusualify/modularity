@@ -120,7 +120,7 @@
                 <template v-else>
                   <!-- search field -->
                   <v-text-field
-                    v-if="!hideSearchField && isStoreTable && hasSearchableHeader"
+                    v-if="!hideSearchField && hasSearchableHeader"
                     v-model="searchModel"
                     variant="outlined"
                     :append-inner-iconx="searchModel !== search ? 'mdi-magnify' : null"
