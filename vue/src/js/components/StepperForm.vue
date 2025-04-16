@@ -11,9 +11,7 @@
         <!-- left side -->
         <v-col cols="12" lg="8" v-fit-grid>
           <StepperContent
-
             v-model="models"
-
             :schemas="schemas"
             @update:schemas="schemas = $event"
 
@@ -128,7 +126,8 @@
 
 <script>
   import { toRefs, reactive, ref, computed } from 'vue';
-  import { map, reduce, find, each, filter, get, isEqual, uniq } from 'lodash-es';
+  import { useGoTo } from 'vuetify'
+  import { map, reduce, find, each, filter, get, isEqual, uniq, isBoolean } from 'lodash-es';
 
   import { getModel } from '@/utils/getFormData.js'
   import { handleMultiFormEvents } from '@/utils/formEvents'
@@ -221,10 +220,23 @@
         }
       },
 
+      validationScrollingDuration: {
+        type: Number,
+        default: 1000
+      },
+      validationScrollingEasing: {
+        type: String,
+        default: 'easeInOutCubic'
+      },
+      validationScrollingOffset: {
+        type: Number,
+        default: 0
+      },
     },
     setup (props, context) {
       const inputHandlers = useInputHandlers()
       const validations = useValidation(props)
+      const goTo = useGoTo()
 
       const stepperActionRef = ref(null)
       const loading = ref(false)
@@ -241,6 +253,7 @@
         ...validations,
         ...toRefs(state),
         formRefs,
+        goTo,
       }
     },
     data () {
@@ -344,10 +357,41 @@
       },
       async validateForm(i) {
         const formRef = this.formRefs[i]
-        formRef.value[0].manualValidation = true
+        const form = formRef.value[0]
+        form.manualValidation = true
 
-        const result = await formRef.value[0].validate()
-        formRef.value[0].manualValidation = false
+        const result = await form.validate()
+        form.manualValidation = false
+
+        if(isBoolean(result.valid) && result.valid === false){
+          this.$nextTick(() => {
+              const el = this.$el.querySelector(".v-input--error .v-messages[role='alert']");
+              if(el){
+                let easings = [
+                  'linear',
+                  'easeInQuad',
+                  'easeOutQuad',
+                  'easeInOutQuad',
+                  'easeInCubic',
+                  'easeOutCubic',
+                  'easeInOutCubic',
+                  'easeInQuart',
+                  'easeOutQuart',
+                  'easeInOutQuart',
+                  'easeInQuint',
+                  'easeOutQuint',
+                  'easeInOutQuint',
+                ]
+
+                this.goTo(el, {
+                  container: '#ue-stepper-content-window',
+                  duration: this.validationScrollingDuration,
+                  offset: this.validationScrollingOffset,
+                  easing: this.validationScrollingEasing,
+                });
+              }
+          });
+        }
 
         return result
       },
