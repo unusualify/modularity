@@ -1,8 +1,8 @@
-// test/components/v-input-assign.test.js
+// test/components/v-input-assignment.test.js
 import { describe, expect, test, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import UEConfig from '../../src/js/plugins/UEConfig'
-import VInputAssign from '../../src/js/components/inputs/Assignment.vue'
+import VInputAssignment from '../../src/js/components/inputs/Assignment.vue'
 
 // Mock ResizeObserver
 class ResizeObserver {
@@ -89,7 +89,7 @@ describe('VInputAssignment', () => {
       }
     }
 
-    wrapper = mount(VInputAssign, {
+    wrapper = mount(VInputAssignment, {
       props: defaultProps,
       global: globalMocks,
       attachTo: document.body
@@ -120,7 +120,7 @@ describe('VInputAssignment', () => {
   describe('Unit Tests', () => {
     test('renders correctly with default props', () => {
       expect(wrapper.exists()).toBe(true)
-      expect(wrapper.find('.v-input-assign').exists()).toBe(true)
+      expect(wrapper.find('.v-input-assignment').exists()).toBe(true)
     })
 
     test('computes isAuthorized correctly', () => {

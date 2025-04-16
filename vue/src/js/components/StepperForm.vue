@@ -365,7 +365,7 @@
 
         if(isBoolean(result.valid) && result.valid === false){
           this.$nextTick(() => {
-              const el = this.$el.querySelector(".v-input--error .v-messages[role='alert']");
+              const el = this.$el.querySelector(".v-input--error .v-input__details[role='alert'] .v-messages");
               if(el){
                 let easings = [
                   'linear',

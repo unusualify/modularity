@@ -78,8 +78,8 @@
             />
           </div>
         </slot>
-        <div class="v-input__details">
-          <div v-if="errorMessages.length > 0" class="v-messages" role="alert" aria-live="polite">
+        <div class="v-input__details" role="alert" aria-live="polite">
+          <div v-if="errorMessages.length > 0" class="v-messages">
             <div class="v-messages__message">
               {{ errorMessages.join(', ') }}
             </div>

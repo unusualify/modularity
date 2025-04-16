@@ -43,7 +43,7 @@
     "vue-filepond": "^7.0.4",
     "vue-i18n": "^9.0.*",
     "vuedraggable": "^4.1.0",
-    "vuetify": "^3.5.0",
+    "vuetify": "^3.7.19",
     "vuetify-form-base": "^0.3.3",
     "vuetify-toast-snackbar": "^0.6.1",
     "vuex": "^4.1.0",
