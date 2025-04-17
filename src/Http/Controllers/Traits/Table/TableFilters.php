@@ -73,6 +73,26 @@ trait TableFilters
             );
         }
 
+        if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasAuthorizable')) {
+            $statusFilters[] = [
+                'name' => ___('listing.filter.authorized'),
+                'slug' => 'authorized',
+                'number' => $this->repository->getCountFor('hasAnyAuthorization'),
+            ];
+
+            $statusFilters[] = [
+                'name' => ___('listing.filter.unauthorized'),
+                'slug' => 'unauthorized',
+                'number' => $this->repository->getCountFor('unauthorized'),
+            ];
+
+            $statusFilters[] = [
+                'name' => ___('listing.filter.your-authorizations'),
+                'slug' => 'your-authorizations',
+                'number' => $this->repository->getCountFor('authorizedToYou'),
+            ];
+        }
+
         $statusFilters = array_values(array_filter($statusFilters, function ($filter) {
             return $filter['number'] > 0 || in_array($filter['slug'], ['trash', 'all']);
         }));

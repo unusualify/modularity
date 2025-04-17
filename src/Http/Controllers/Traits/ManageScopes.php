@@ -99,6 +99,18 @@ trait ManageScopes
                     $scope['mine'] = true;
 
                     break;
+                case 'authorized':
+                    $scope['hasAnyAuthorization'] = true;
+
+                    break;
+                case 'unauthorized':
+                    $scope['unauthorized'] = true;
+
+                    break;
+                case 'your-authorizations':
+                    $scope['authorizedToYou'] = true;
+
+                    break;
             }
 
             if (! Str::startsWith($requestFilters['status'], 'stateable')) {
