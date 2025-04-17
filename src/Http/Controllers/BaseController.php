@@ -454,7 +454,7 @@ abstract class BaseController extends PanelController
             activity()->performedOn($this->repository->getById($this->request->get('id')))->log('restored');
             // $this->handleActionEvent($this->repository->getById($this->request->get('id')), __FUNCTION__);
 
-            return $this->respondWithSuccess(__('listing.restore.success', ['modelTitle' => $this->modelTitle]));
+            return $this->respondWithSuccess(__('listing.restore.success', ['modelTitle' => $this->modelTitle]), attributes: ['location' => 'top']);
         }
 
         return $this->respondWithError(__('listing.restore.error', ['modelTitle' => $this->modelTitle]));
