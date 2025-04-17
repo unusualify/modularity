@@ -320,7 +320,13 @@ trait MethodTransformers
             $this->$method($query, $scopes);
         }
 
+        $searchesFields = $scopes['searches'] ?? [];
         unset($scopes['searches'], $scopes['search']);
+        foreach ($searchesFields as $field) {
+            if(array_key_exists($field, $scopes)){
+                unset($scopes[$field]);
+            }
+        }
 
         if (isset($scopes['exceptIds'])) {
             $query->whereNotIn($this->model->getTable() . '.id', $scopes['exceptIds']);
