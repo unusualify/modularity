@@ -131,7 +131,7 @@ trait Relationships
 
                             array_splice($idsDeleted, array_search($data[$relatedLocalKey], $idsDeleted), 1);
 
-                            $repository->update($data[$relatedLocalKey], $data + [$foreignKey => $object->id, 'blah_blah' => 'sfdas']);
+                            $repository->update($data[$relatedLocalKey], $data + [$foreignKey => $object->id]);
                         } else {
                             $repository->create(array_merge($data, [$foreignKey => $object->id]));
                         }
