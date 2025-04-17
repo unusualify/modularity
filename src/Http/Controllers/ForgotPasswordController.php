@@ -6,6 +6,7 @@ use Illuminate\Auth\Passwords\PasswordBrokerManager;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Factory as ViewFactory;
 use Unusualify\Modularity\Facades\Modularity;
@@ -27,16 +28,10 @@ class ForgotPasswordController extends Controller
 
     use ManageUtilities, SendsPasswordResetEmails;
 
-    /**
-     * @var PasswordBrokerManager
-     */
-    protected $passwordBrokerManager;
-
-    public function __construct(PasswordBrokerManager $passwordBrokerManager)
+    public function __construct()
     {
         parent::__construct();
 
-        $this->passwordBrokerManager = $passwordBrokerManager;
         $this->middleware('modularity.guest');
     }
 
@@ -45,7 +40,7 @@ class ForgotPasswordController extends Controller
      */
     public function broker()
     {
-        return $this->passwordBrokerManager->broker(Modularity::getAuthProviderName());
+        return Password::broker(Modularity::getAuthProviderName());
     }
 
     /**
