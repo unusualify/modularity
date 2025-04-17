@@ -195,4 +195,34 @@ trait HasAuthorizable
                 ->where('authorized_type', get_class($user));
         });
     }
+
+    public function scopeAuthorizedToYou($query)
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return $query;
+        }
+
+        return $query->whereHas('authorizationRecord', function ($query) use ($user) {
+            $query->where('authorized_id', $user->id)
+                ->where('authorized_type', get_class($user));
+        });
+    }
+
+    public function scopeHasAnyAuthorization($query)
+    {
+        return $query->whereHas('authorizationRecord', function ($query) {
+            $query->whereNotNull('authorized_id')
+                ->whereNotNull('authorized_type');
+        });
+    }
+
+    public function scopeUnauthorized($query)
+    {
+        return $query->whereDoesntHave('authorizationRecord', function ($query) {
+            $query->whereNotNull('authorized_id')
+                ->whereNotNull('authorized_type');
+        });
+    }
 }
