@@ -33,26 +33,22 @@ trait HasCreator
     protected static function bootHasCreator()
     {
         static::created(function ($model) {
-            if (Auth::check()) {
+            if ($model->isCustomCreatorSaving) {
+                $model->creatorRecord()->create($model->customHasCreatorFields);
+                $model->isCustomCreatorSaving = false;
+                $model->customHasCreatorFields = [];
+            }else if (Auth::check()) {
                 $guard = Auth::guard();
-
-                if ($model->isCustomCreatorSaving) {
-                    $model->creatorRecord()->create($model->customHasCreatorFields);
-                    $model->isCustomCreatorSaving = false;
-                    $model->customHasCreatorFields = [];
-                } else {
-                    $model->creatorRecord()->create([
-                        'creator_id' => $guard->id(), // creator user id
-                        'creator_type' => $guard->getProvider()->getModel(), // creator model
-                        'guard_name' => $guard->name,
-                    ]);
-                }
-
+                $model->creatorRecord()->create([
+                    'creator_id' => $guard->id(), // creator user id
+                    'creator_type' => $guard->getProvider()->getModel(), // creator model
+                    'guard_name' => $guard->name,
+                ]);
             }
         });
 
         static::saving(function ($model) {
-            if (Auth::check() && $model->custom_creator_id) {
+            if ($model->custom_creator_id) {
                 $guard = Auth::guard();
                 $model->isCustomCreatorSaving = true;
                 $model->customHasCreatorFields = [
