@@ -12,13 +12,14 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Unusualify\Modularity\Database\Factories\UserFactory;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
+use Unusualify\Modularity\Entities\Traits\HasOauth;
 use Unusualify\Modularity\Entities\Traits\HasScopes;
 use Unusualify\Modularity\Entities\Traits\IsTranslatable;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, HasRoles, HasScopes, IsTranslatable, ModelHelpers, Notifiable, HasFileponds;
+    use HasApiTokens, HasFactory, HasRoles, HasScopes, IsTranslatable, ModelHelpers, Notifiable, HasFileponds, HasOauth;
 
     /**
      * The attributes that are mass assignable.
@@ -107,22 +108,24 @@ class User extends Authenticatable
         return $this->hasRole('admin');
     }
 
-    protected function invalidCompany(): Attribute
+    protected function validCompany(): Attribute
     {
-        $inValid = false;
+        $valid = true;
 
         if ($this->company_id != null) {
+            $valid = true;
             foreach ($this->company->getAttributes() as $attr => $value) {
                 if (! str_contains($attr, '_at') && $attr != 'id') {
-                    if ($value == null) {
-                        $inValid = true;
+                    if (!$value) {
+                        $valid = false;
+                        break;
                     }
                 }
             }
         }
 
         return Attribute::make(
-            get: fn () => $inValid,
+            get: fn () => $valid,
         );
     }
 
@@ -163,8 +166,10 @@ class User extends Authenticatable
         return modularityConfig('tables.users', parent::getTable());
     }
 
-    protected static function newFactory()
+    protected static function newFactory(): \Illuminate\Database\Eloquent\Factories\Factory
     {
-        return new UserFactory;
+        return UserFactory::new();
     }
+
+
 }

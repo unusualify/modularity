@@ -861,4 +861,26 @@ if(!function_exists('data_set_with_dot_keys')){
     }
 }
 
+if(!function_exists('name_surname_resolver')){
+    function name_surname_resolver($fullName){
+        //dd('Name Surname Resolver');
+        $trimmedSpaces = trim($fullName);
+        $nameArray = explode(" ", $trimmedSpaces);
+        $nameWithSurname = [];
+        foreach ($nameArray as $name) {
+            if (preg_match('/^[\p{L}\'-]+$/u', $name)) {
+                $nameWithSurname[] = $name;
+            }
+        }
+        // dd([
+        //     count($nameWithSurname),
+        //     ...$nameWithSurname,
+        // ]);
+
+        return $nameWithSurname;
+    }
+}
+
+
+
 

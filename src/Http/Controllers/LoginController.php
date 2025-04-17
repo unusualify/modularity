@@ -12,14 +12,15 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\Factory as ViewFactory;
 use Modules\SystemUser\Repositories\UserRepository;
 use PragmaRX\Google2FA\Google2FA;
-use Socialite;
+use Laravel\Socialite\Facades\Socialite;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
-use Unusualify\Modularity\Http\Requests\Admin\OauthRequest;
+use Unusualify\Modularity\Http\Requests\OauthRequest;
 use Unusualify\Modularity\Services\MessageStage;
 
 class LoginController extends Controller
@@ -237,7 +238,7 @@ class LoginController extends Controller
                             'elements' => ___('authentication.sign-in-google'),
                             'attributes' => [
                                 'variant' => 'outlined',
-                                'href' => route(Route::hasAdmin('login.form')),
+                                'href' => route('admin.login.provider', ['provider' => 'google']),
                                 'class' => 'mt-5 mb-2 custom-auth-button',
                                 'color' => 'grey-lighten-1',
                                 'density' => 'default',
@@ -259,7 +260,7 @@ class LoginController extends Controller
                             'elements' => ___('authentication.sign-in-apple'),
                             'attributes' => [
                                 'variant' => 'outlined',
-                                'href' => route(Route::hasAdmin('login.form')),
+                                'href' => route('admin.login.provider', ['provider' => 'github']),
                                 'class' => 'my-2 custom-auth-button',
                                 'color' => 'grey-lighten-1',
                                 'density' => 'default',
@@ -352,7 +353,7 @@ class LoginController extends Controller
             'message' => __('authentication.login-success-message'),
         ];
 
-        if($previousRouteName === 'admin.login.form') {
+        if(in_array($previousRouteName, ['admin.login.form', 'admin.login.oauth.showPasswordForm'])) {
             // 'redirector' => $this->redirector->intended($this->redirectPath())->getTargetUrl() . '?status=success',
             $body['redirector'] = redirect()->intended($this->redirectTo)->getTargetUrl();
         }
@@ -398,11 +399,12 @@ class LoginController extends Controller
      * @param string $provider Socialite provider
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function redirectToProvider($provider, OauthRequest $request)
+    //redirectToProvider($provider, OauthRequest $request)
+    public function redirectToProvider($provider)
     {
         return Socialite::driver($provider)
-            ->scopes($this->config->get(modularityBaseKey() . '.oauth.' . $provider . '.scopes', []))
-            ->with($this->config->get(modularityBaseKey() . '.oauth.' . $provider . '.with', []))
+            // ->scopes($this->config->get(modularityBaseKey() . '.oauth.' . $provider . '.scopes', []))
+            // ->with($this->config->get(modularityBaseKey() . '.oauth.' . $provider . '.with', []))
             ->redirect();
     }
 
@@ -431,7 +433,6 @@ class LoginController extends Controller
                 if ($user->password) {
                     // If the user has a password then redirect to a form to ask for it
                     // before linking a provider to that email
-
                     $request->session()->put('oauth:user_id', $user->id);
                     $request->session()->put('oauth:user', $oauthUser);
                     $request->session()->put('oauth:provider', $provider);
@@ -466,9 +467,88 @@ class LoginController extends Controller
         $userId = $request->session()->get('oauth:user_id');
         $user = User::findOrFail($userId);
 
-        return $this->viewFactory->make('twill::auth.oauth-link', [
-            'username' => $user->email,
-            'provider' => $request->session()->get('oauth:provider'),
+        return $this->viewFactory->make(modularityBaseKey() . '::auth.login', [
+            'formAttributes' => [
+                // 'hasSubmit' => true,
+                'title' => [
+                    'text' => __('authentication.confirm-provider', ['provider' => $request->session()->get('oauth:provider')]),
+                    'tag' => 'h1',
+                    'color' => 'primary',
+                    'type' => 'h5',
+                    'weight' => 'bold',
+                    'transform' => '',
+                    'align' => 'center',
+                    'justify' => 'center',
+                ],
+                'schema' => ($schema = $this->createFormSchema([
+                    'email' => [
+                        'type' => 'text',
+                        'name' => 'email',
+                        'label' => ___('authentication.email'),
+                        'hint' => 'enter @example.com',
+                        'default' => '',
+                        'col' => [
+                            'lg' => 12,
+                        ],
+                        'rules' => [
+                            ['email'],
+                        ],
+                        'readonly' => true,
+                    ],
+                    'password' => [
+                        'type' => 'password',
+                        'name' => 'password',
+                        'label' => 'Password',
+                        'default' => '',
+                        'appendInnerIcon' => '$non-visibility',
+                        'slotHandlers' => [
+                            'appendInner' => 'password',
+                        ],
+                        'col' => [
+                            'lg' => 12,
+                        ],
+                        'rules' => [
+                            // ['password'],
+                        ],
+                    ],
+                ])),
+
+                'modelValue' => [
+                    'email' => $user->email,
+                    'password' => '',
+                ],
+
+                'actionUrl' => route(Route::hasAdmin('login.oauth.linkProvider')),
+                'buttonText' => __('authentication.sign-in'),
+                'formClass' => 'py-6',
+                'no-default-form-padding' => true,
+            ],
+            'attributes' => [
+                'noDivider' => true,
+            ],
+            'formSlots' => [
+                'bottom' => [
+                    'tag' => 'v-sheet',
+                    'attributes' => [
+                        'class' => 'd-flex pb-5 justify-space-between w-100 text-black my-5',
+                    ],
+                    'elements' => [
+                        [
+                            'tag' => 'v-btn',
+                            'elements' => __('authentication.sign-in'),
+                            'attributes' => [
+                                'variant' => 'elevated',
+                                'class' => 'v-col-5 mx-auto',
+                                'type' => 'submit',
+                                'density' => 'default',
+                                'block' => true
+                            ],
+
+                        ],
+                    ],
+                ],
+            ],
+            //'provider' => $request->session()->get('oauth:provider'),
         ]);
     }
 
@@ -496,12 +576,141 @@ class LoginController extends Controller
             // Login and redirect
             return $this->afterAuthentication($request, $user);
         } else {
-            return $this->sendFailedLoginResponse($request);
+            throw ValidationException::withMessages([
+                'password' => [trans('auth.failed')],
+            ]);
         }
     }
 
     public function redirectTo()
     {
         return route(Route::hasAdmin('dashboard'));
+    }
+
+    /**
+     * complete registration after email sent
+     */
+    public function completeRegisterForm()
+    {
+        $this->inputTypes = modularityConfig('input_types', []);
+        return $this->viewFactory->make(modularityBaseKey() . '::auth.complete-registration', [
+            'formAttributes' => [
+                'hasSubmit' => true,
+
+                // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
+                'title' => [
+                    'text' => __('authentication.complete-registration-title'),
+                    'tag' => 'h1',
+                    'color' => 'primary',
+                    'type' => 'h5',
+                    'weight' => 'bold',
+                    'transform' => '',
+                    'align' => 'center',
+                    'justify' => 'center',
+                ],
+                'schema' => $this->createFormSchema(
+                    getFormDraft(
+                        'register_password',
+                    )
+                ),
+
+                'actionUrl' => route(Route::hasAdmin('register')),
+                'buttonText' => __('authentication.complete-registration'),
+                'formClass' => 'py-6',
+                'no-default-form-padding' => true,
+
+            ],
+            'attributes' => [
+                'noDivider' => true,
+            ],
+
+            'formSlots' => [
+                'bottom' => [
+                    'tag' => 'v-sheet',
+                    'attributes' => [
+                        'class' => 'd-flex pb-5 justify-space-between w-100 text-black my-5',
+                    ],
+                    'elements' => [
+                            'tag' => 'v-btn',
+                            'elements' => __('authentication.complete-registration'),
+                            'attributes' => [
+                                'variant' => 'elevated',
+                                'class' => 'v-col-5',
+                                'type' => 'submit',
+                                'density' => 'default',
+                            ],
+
+                    ],
+                ],
+
+            ],
+        ]);
+    }
+
+    public function completeRegister(Request $request)
+    {
+        dd($request->all());
+
+        $request->validate([
+            'password' => 'required|min:8|confirmed', // Backend validation for confirmation
+        ]);
+
+        $this->validateLogin($request);
+
+
+        // If the class is using the ThrottlesLogins trait, we can automatically throttle
+        // the login attempts for this application. We'll key this by the username and
+        // the IP address of the client making these requests into this application.
+        if (method_exists($this, 'hasTooManyLoginAttempts') &&
+            $this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
+            //Log::debug('Has many too attempts');
+            return $this->sendLockoutResponse($request);
+        }
+
+        $previousRouteName = previous_route_name();
+
+        if ($this->attemptLogin($request)) {
+            if ($request->hasSession()) {
+                $request->session()->put('auth.password_confirmed_at', time());
+            }
+
+            $request->session()->regenerate();
+
+            $this->clearLoginAttempts($request);
+
+            if ($response = $this->authenticated($request, $this->guard()->user())) {
+                return $response;
+            }
+
+            $body = [
+                'variant' => MessageStage::SUCCESS,
+                'timeout' => 1500,
+                'message' => __('authentication.login-success-message'),
+            ];
+
+            if($previousRouteName === 'admin.login.form') {
+                $body['redirector'] = redirect()->intended($this->redirectTo)->getTargetUrl();
+            }
+
+            return $request->wantsJson()
+                ? new JsonResponse($body, 200)
+                : $this->sendLoginResponse($request);
+
+            // return $this->sendLoginResponse($request);
+        }
+
+        // If the login attempt was unsuccessful we will increment the number of attempts
+        // to login and redirect the user back to the login form. Of course, when this
+        // user surpasses their maximum number of attempts they will get locked out.
+        $this->incrementLoginAttempts($request);
+
+        return $request->wantsJson()
+            ? new JsonResponse([
+                $this->username() => [trans('auth.failed')],
+                'message' => __('auth.failed'),
+                'variant' => MessageStage::WARNING,
+            ])
+            : $this->sendFailedLoginResponse($request);
     }
 }
