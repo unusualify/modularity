@@ -407,19 +407,22 @@ export default {
 
         let appendInnerIcon = null
 
-        if(assignment.status === 'completed') {
-          subDescription += `${this.$t('Completed')}: <span class="text-success">${this.$d(new Date(assignment.completed_at), 'medium')}</span>`
-          appendInnerIcon = "<v-icon icon='mdi-check-circle-outline' color='success'/>"
-        } else if(assignment.status === 'accepted') {
-          subDescription += `${this.$t('Accepted')}: <span class="text-warning">${this.$d(new Date(assignment.accepted_at), 'medium')}</span>`
-        } else if(assignment.status === 'cancelled') {
-          subDescription += `${this.$t('Cancelled')}: <span class="font-weight-bold text-error">${this.$d(new Date(assignment.updated_at), 'medium')}</span>`
-          appendInnerIcon = "<v-icon icon='mdi-close-circle-outline' color='error'/>"
-        } else{
+        // if(assignment.status === 'completed') {
+        //   subDescription += `${this.$t('Completed')}: <span class="text-success">${this.$d(new Date(assignment.completed_at), 'medium')}</span>`
+        //   appendInnerIcon = "<v-icon icon='mdi-check-circle-outline' color='success'/>"
+        // } else if(assignment.status === 'accepted') {
+        //   subDescription += `${this.$t('Accepted')}: <span class="text-warning">${this.$d(new Date(assignment.accepted_at), 'medium')}</span>`
+        // } else if(assignment.status === 'cancelled') {
+        //   subDescription += `${this.$t('Cancelled')}: <span class="font-weight-bold text-error">${this.$d(new Date(assignment.updated_at), 'medium')}</span>`
+        //   appendInnerIcon = "<v-icon icon='mdi-close-circle-outline' color='error'/>"
+        // } else{
 
-          subDescription += `${untilText}`
-          appendInnerIcon = "<v-icon icon='mdi-clock-outline' color='info'/>"
-        }
+        //   subDescription += `${untilText}`
+        //   appendInnerIcon = "<v-icon icon='mdi-clock-outline' color='info'/>"
+        //   // appendInnerIcon = "<span class=''> <i class='mdi mdi-clock-outline text-info'/></span>"
+        // }
+        subDescription = `${assignment.status_interval_description}`
+        appendInnerIcon = assignment.status_vuetify_icon
 
         subDescription += ` ${fromText}`
 
