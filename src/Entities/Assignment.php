@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
 
 class Assignment extends Model
 {
@@ -34,6 +35,19 @@ class Assignment extends Model
         'assignee_name',
         'assignee_avatar',
         'assigner_name',
+
+        'status_label',
+        'status_color',
+        'status_icon',
+        'status_interval_description',
+        'status_vuetify_icon',
+    ];
+
+    protected $casts = [
+        'status' => AssignmentStatus::class,
+
+        'due_at' => 'datetime',
+        'completed_at' => 'datetime',
     ];
 
     public static function booted()
@@ -54,6 +68,60 @@ class Assignment extends Model
     {
         return new Attribute(
             set: fn ($value) => Carbon::parse($value)->format('Y-m-d H:i:s'),
+        );
+    }
+
+    protected function statusLabel(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->status->label(),
+        );
+    }
+
+    protected function statusColor(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->status->color(),
+        );
+    }
+
+    protected function statusIcon(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->status->icon(),
+        );
+    }
+
+    protected function statusIntervalDescription(): Attribute
+    {
+        $timeKey = 'due_at';
+
+        switch($this->status) {
+            case AssignmentStatus::COMPLETED:
+                $timeKey = 'completed_at';
+                break;
+            case AssignmentStatus::CANCELLED:
+            case AssignmentStatus::REJECTED:
+                $timeKey = 'updated_at';
+                break;
+        }
+
+        $time = $this->{$timeKey};
+
+        $formattedTime = $time->format('F j, Y'); // This line is already correct and does not need to be updated
+        // Alternatively, you can use the forHuman method of Carbon
+        // return $time->forHuman();
+
+        return new Attribute(
+            get: fn ($value) => $this->status->timeIntervalDescription() . ': '
+                . "<span class='{$this->status->timeClasses()}'>{$formattedTime}</span>",
+        );
+    }
+
+    protected function statusVuetifyIcon(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => "<v-icon icon='{$this->status->icon()}' color='{$this->status->iconColor()}'/>",
         );
     }
 
