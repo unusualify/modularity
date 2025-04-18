@@ -399,7 +399,7 @@ export default {
         let title = `to <span class="text-blue-darken-1">${assigneeName}</span> &mdash; by <span class="text-success">${assignerName}</span>`
 
         let untilText = `${this.$t('Until')}: <span class="font-weight-bold text-blue-darken-1"> ${this.$d(new Date(assignment.due_at), 'medium')}</span>`
-        let fromText = `${this.$t('From')}: <span class="text-warning">${this.$d(new Date(assignment.created_at), 'medium')}</span>`
+        let fromText = `${this.$t('From')}: <span class="">${this.$d(new Date(assignment.created_at), 'medium')}</span>`
 
         let subtitle = `${assignment.description} </br> </br>`
 
