@@ -44,6 +44,6 @@
   >
     {{ parsedComponent.content }}
   </component>
-  <template v-else-if="subject">{{ subject }}</template>
+  <template v-else-if="subject" v-html="subject"></template>
 </template>
 
