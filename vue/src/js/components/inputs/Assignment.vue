@@ -206,7 +206,7 @@
                       :rules="[
                         requiredRule('classic', 1, 1, 'Pick a due date'),
                         dateRule(),
-                        futureDateRule(7, 'days')
+                        futureDateRule(minimumDaysFutureDateRule, 'days')
                       ]"
                       :validate-on="`submit blur`"
 
@@ -335,6 +335,10 @@ export default {
       default: ['superadmin', 'admin'],
     },
 
+    minimumDaysFutureDateRule: {
+      type: Number,
+      default: 6,
+    },
   },
   setup (props, context) {
     const {requiredRule, minRule, futureDateRule, dateRule} = useValidation(props)
