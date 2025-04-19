@@ -85,11 +85,22 @@ trait Allowable
         return $newItems;
     }
 
-    public function isAllowedItem($item, $searchKey = null, $orClosure = null, $andClosure = null)
+    /**
+     * Check if the item is allowed for the current user
+     *
+     * @param array|object $item
+     * @param string|null $searchKey
+     * @param Closure|null $orClosure
+     * @param Closure|null $andClosure
+     * @param bool $disallowIfUnauthenticated
+     * @return bool
+     */
+    public function isAllowedItem($item, $searchKey = null, $orClosure = null, $andClosure = null, $disallowIfUnauthenticated = true)
     {
         if (! $this->allowableUser) {
             $this->setAllowableUser();
         }
+
 
         if (! $orClosure) {
             $orClosure = fn($item, $user) => false;
@@ -102,14 +113,18 @@ trait Allowable
         $searchKey = $searchKey ?? $this->allowedRolesSearchKey ?? 'allowedRoles';
 
         if(!$this->allowableUser) {
-            return true;
+            return !$disallowIfUnauthenticated;
         }
 
         if ($andClosure($item, $this->allowableUser)) {
-            if (! isset($item[$searchKey])) {
+            $itemType = is_array($item) ? 'array' : 'object';
+            $hasSearchKey = $itemType == 'array' ? isset($item[$searchKey]) : isset($item->{$searchKey});
+            $allowedRoles = $itemType == 'array' ? ($item[$searchKey] ?? []) : ($item->{$searchKey} ?? []);
+
+            if (! $hasSearchKey) {
                 return true;
             } else {
-                $allowedRoles = is_array($item[$searchKey]) ? $item[$searchKey] : explode(',', $item[$searchKey]);
+                $allowedRoles = is_array($allowedRoles) ? $allowedRoles : explode(',', $allowedRoles);
 
                 if ($orClosure($item, $this->allowableUser) || $this->allowableUser->hasRole($allowedRoles)) {
                     return true;
