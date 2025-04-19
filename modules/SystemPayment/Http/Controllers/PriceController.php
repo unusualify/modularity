@@ -183,25 +183,4 @@ class PriceController extends Controller
                 ]));
         }
     }
-
-    protected function updatePrice($price, $currency)
-    {
-
-        try {
-
-            $converted = $this->currencyService->convertTo($price->display_price, mb_strtoupper($currency->iso_4217));
-            $vatPercentage = ($price->vat_amount / $price->display_price) * 100;
-
-            $price->display_price = $converted / 100;
-            $price->vat_amount = ($converted * $vatPercentage) / 100;
-            $price->price_excluding_vat = ($price->display_price - $price->vat_amount) / 100;
-            $price->price_including_vat = $price->display_price;
-
-            return $price;
-
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Conversion failed.'], 400);
-        }
-
-    }
 }
