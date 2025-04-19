@@ -65,21 +65,23 @@ export default {
   props: {
     ...makeInputProps(),
     modelValue: {
-      type: Array,
+      type: [Array, Object],
       default () {
         return [
           {
-            display_price: 1.00,
+            [this.priceInputName]: 1.00,
             currency_id: 1,
             vat_rate_id: 1,
-            price_type_id: 1
+            price_type_id: 1,
+
+            raw_price: 1.00,
+            discount_percentage: 0,
           }
         ]
       }
     },
     priceInputName: {
       type: String,
-      default: 'display_price'
     },
     currencyInputName: {
       type: String,
@@ -185,7 +187,7 @@ export default {
         } else {
           this.deepModel = [
             {
-              display_price: 1.00,
+              [this.priceInputName]: 1.00,
               currency_id: 1
             }
           ]
