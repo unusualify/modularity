@@ -195,4 +195,30 @@ trait HasPriceable
                 : null,
         );
     }
+
+    public function scopeOrderByCurrencyPrice($query, $currencyId, $direction = 'asc')
+    {
+        $table = $this->getTable();
+        $priceTable = app(Price::class)->getTable();
+
+        return $query->leftJoin($priceTable, function ($join) use ($table, $priceTable, $currencyId) {
+                $join->on("{$priceTable}.priceable_id", '=', "{$table}.id")
+                    ->where("{$priceTable}.priceable_type", '=', get_class($this))
+                    ->where("{$priceTable}.currency_id", '=', $currencyId);
+            })
+            ->orderBy("{$priceTable}.raw_price", $direction)
+            ->select("{$table}.*"); // Ensure we only select fields from the main table
+    }
+
+    /**
+     * Scope a query to order by the base price's raw_price.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $direction
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOrderByBasePrice($query, $direction = 'asc')
+    {
+        return $query->orderByCurrencyPrice(Request::getUserCurrency()->id, $direction);
+    }
 }
