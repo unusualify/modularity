@@ -136,13 +136,11 @@ class PriceController extends Controller
                 if ($request->get('id')) {
 
                     $payment = Payment::find($request->get('id'));
-
                     $newPrice = $payment->price->replicate();
 
                     $newPrice->saveQuietly();
-
                     $newPrice->update([
-                        'display_price' => 0,
+                        $newPrice->priceSavingKey ?? 'price_value' => 0,
                     ]);
                 }
             } catch (\Throwable $th) {
