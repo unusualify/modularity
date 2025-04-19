@@ -10,12 +10,96 @@ class Price extends \Oobook\Priceable\Models\Price
 {
     use ModelHelpers;
 
-    protected function vatRateNumber(): Attribute
+    public static $priceSavingKey = 'price_value';
+
+    protected $casts = [
+        'discount_percentage' => 'double',
+        'valid_from' => 'datetime',
+        'valid_till' => 'datetime',
+    ];
+
+    protected $appends = [
+        'total_price',
+    ];
+
+    /**
+     * For a price we need to make sure we always have
+     * a VAT rate and a Currency. Selecting them everytime
+     * in Nova is a hassle, therefor we set some default
+     * that come from the config.
+     * @return array Array with default attributes
+     */
+    public function defaultAttributes(): array
+    {
+        return [
+            'vat_rate_id' => config('priceable.defaults.vat_rates'),
+            'currency_id' => config('priceable.defaults.currencies'),
+            'price_type_id' => config('priceable.defaults.price_type'),
+
+            'discount_percentage' => 0.00,
+        ];
+    }
+
+    /**
+     * This will make sure that the submitted amount in Nova
+     * is multiplied by 100 so we can store it in cents.
+     * @param [type] $amount [description]
+     */
+    // protected function setRawPriceAttribute(float $amount)
+    // {
+    //     $this->attributes['raw_price'] = $amount * 100;
+    // }
+
+    protected function rawPrice(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => $this->vatRate->rate,
+            get: fn ($value) => $value,
+            set: fn ($value) => $value * 100,
         );
     }
+
+    protected function vatPercentage(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => ($this->vat_amount / $this->raw_price) * 100,
+        );
+    }
+
+    protected function hasDiscount(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->discount_percentage > 0,
+        );
+    }
+
+    protected function rawDiscount(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => (int) (($this->raw_price) * ($this->discount_percentage / 100)),
+        );
+    }
+
+    protected function subTotalPrice(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => (int) (($this->raw_price + $this->vat_amount)),
+        );
+    }
+
+    protected function totalDiscount(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => (int) (($this->raw_price + $this->vat_amount) * ($this->discount_percentage / 100)),
+        );
+    }
+
+    protected function totalPrice(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => (int) (($this->raw_price + $this->vat_amount) - $this->total_discount),
+        );
+    }
+
 
     protected function currencyISO4217(): Attribute
     {
