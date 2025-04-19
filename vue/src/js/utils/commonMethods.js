@@ -329,7 +329,7 @@ export default {
           __log(this.$n(100, { style: 'currency', currency: currencyInfo.currency }))
 
           displayData[key]._value = this.$n(
-            value.find(priceItem => priceItem.currency_id === displayCurrency.id).display_price,
+            value.find(priceItem => priceItem.currency_id === displayCurrency.id).raw_price,
             { style: 'currency', currency: currencyInfo.currency }
           )
         break;
