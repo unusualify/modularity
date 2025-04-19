@@ -21,8 +21,8 @@ trait HasPayment
         self::retrieved(static function (Model $model) {
             if ($model->paymentPrice) {
                 $currency = new Currency($model->paymentPrice->currency->iso_4217);
-                $model->setAttribute('_price', \Oobook\Priceable\Facades\PriceService::formatAmount($model->paymentPrice->display_price, $currency));
-                $model->setAttribute('priceExcludingVatFormatted', \Oobook\Priceable\Facades\PriceService::formatAmount($model->paymentPrice->display_price, $currency));
+                $model->setAttribute('_price', \Oobook\Priceable\Facades\PriceService::formatAmount($model->paymentPrice->raw_price, $currency));
+                $model->setAttribute('priceExcludingVatFormatted', \Oobook\Priceable\Facades\PriceService::formatAmount($model->paymentPrice->raw_price, $currency));
                 $model->setAttribute('paymentStatus', match (true) {
                     ! $model->paidPrices()->exists() => PaymentStatus::UNPAID,
                     $model->payablePrice?->price_including_vat > 0 => PaymentStatus::PARTIALLY_PAID,
@@ -30,7 +30,7 @@ trait HasPayment
                 });
                 $model->setAttribute('paymentStatusTranslated', match (true) {
                     ! $model->paidPrices()->exists() => __('Unpaid'),
-                    $model->payablePrice?->price_including_vat > 0 => __('Partially Paid'),
+                    $model->payablePrice?->total_price > 0 => __('Partially Paid'),
                     default => __('Paid')
                 });
             }
@@ -58,7 +58,7 @@ trait HasPayment
 
     public function paymentPrice(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
-        return $this->morphOne(config('priceable.models.price'), 'priceable')
+        return $this->morphOne(Price::class, 'priceable')
             ->where('role', 'payment')
             ->latest('created_at');
     }
@@ -90,14 +90,14 @@ trait HasPayment
     protected function totalCostExcludingVat(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $this->prices->sum('price_excluding_vat')
+            get: fn ($value) => $this->prices->sum('raw_price')
         );
     }
 
     protected function totalCostIncludingVat(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $this->prices->sum('price_including_vat')
+            get: fn ($value) => $this->prices->sum('total_price')
         );
     }
 
@@ -133,8 +133,8 @@ trait HasPayment
                     if($basePrice){
                         try {
                             $price += $basePrice instanceof Model
-                                ? $basePrice->price_excluding_vat
-                                : $basePrice['price_excluding_vat'];
+                                ? $basePrice->raw_price
+                                : $basePrice['raw_price'];
                         } catch (\Exception $e) {
                             dd($e, $item);
                         }
@@ -143,8 +143,8 @@ trait HasPayment
             } else if ($relation instanceof Model) {
                 $basePrice = $relation->basePrice;
                 $price += $basePrice instanceof Model
-                    ? $basePrice->price_excluding_vat
-                    : $basePrice['price_excluding_vat'];
+                    ? $basePrice->raw_price
+                    : $basePrice['raw_price'];
             }
         }
 
@@ -163,7 +163,7 @@ trait HasPayment
     protected function payablePriceExcludingVat(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $this->payablePrice ? $this->payablePrice->price_excluding_vat : null,
+            get: fn ($value) => $this->payablePrice ? $this->payablePrice->raw_price : null,
         );
     }
 
@@ -202,7 +202,7 @@ trait HasPayment
     protected function isPartiallyPaid(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $this->payablePrice?->price_including_vat > 0,
+            get: fn ($value) => $this->payablePrice?->total_price > 0,
         );
     }
 
