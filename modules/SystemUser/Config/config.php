@@ -56,10 +56,24 @@ return [
             ],
             'inputs' => [
                 [
+                    'type' => 'text',
+                    'label' => 'Email',
+                    'name' => 'email',
+                    'rules' => 'sometimes|required',
+                    'col' => [
+                        'cols' => 12,
+                        'sm' => 8,
+                        'md' => 6,
+                    ],
+                    // 'prepend-icon' => 'mdi-card-text-outline',
+                    'dense',
+                ],
+                [
                     'label' => 'Name',
                     'name' => 'name',
                     'type' => 'text',
                     'rules' => 'sometimes|required',
+                    'editable' => false,
                     'col' => [
                         'cols' => 12,
                         'sm' => 8,
@@ -72,20 +86,28 @@ return [
                     'name' => 'company_id',
                     'label' => 'Company',
                     'type' => 'select',
-                    'repository' => 'Modules\\SystemUser\\Repositories\\CompanyRepository',
-                ],
-                [
-                    'type' => 'text',
-                    'label' => 'Email',
-                    'name' => 'email',
-                    'rules' => 'sometimes|required',
                     'col' => [
                         'cols' => 12,
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    // 'prepend-icon' => 'mdi-card-text-outline',
-                    'dense',
+                    'repository' => 'Modules\\SystemUser\\Repositories\\CompanyRepository',
+                ],
+                [
+                    'name' => 'company_name',
+                    'label' => 'Company Name',
+                    'placeholder' => 'If you want to create user with a new company, please enter the name here.',
+                    'hint' => 'If you select a company on the company field, this field will be ignored.',
+                    'editable' => 'hidden',
+                    'type' => 'text',
+                    'col' => [
+                        'cols' => 12,
+                        'sm' => 8,
+                        'md' => 6,
+                    ],
+                    'conditions' => [
+                        ['id', 'not exists'],
+                    ],
                 ],
                 [
                     'type' => 'select',
@@ -100,6 +122,7 @@ return [
                     // 'repository' => \Modules\SystemUser\Repositories\RoleRepository::class,
                     'ext' => 'scroll',
                     'connector' => 'Role|uri',
+                    'rules' => 'required',
                 ],
             ],
         ],
