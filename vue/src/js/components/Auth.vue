@@ -4,16 +4,21 @@
       <v-main class="d-flex align-center justify-center" >
         <v-row class="h-100 mw-100">
           <v-col
-            cols="12"
-            md="6"
-            lg="6"
+            v-bind="{
+              cols: '12',
+              ...(noSecondSection ? {} : {
+                md: '6',
+                lg: '6',
+              })
+            }"
             class="py-12 d-flex flex-column align-center justify-center bg-white">
             <!-- <v-card class="mx-auto"> -->
               <v-row width="85%" class="d-flex flex-column justify-center align-center">
                 <!-- <h1 class="text-primary">{{ title }}</h1> -->
                 <div class="bg-primary darken-3">
-                  <!-- <span v-svg symbol="main-logo"></span> -->
                 </div>
+
+                <span v-if="noSecondSection" v-svg symbol="main-logo-full-light"></span>
 
                 <slot name="cardTop"></slot>
 
@@ -41,8 +46,9 @@
                 </v-sheet>
 
                 <div
-                  v-if="!noDivider"
-                  class="d-flex w-100 align-center justify-center">
+                  v-if="!noDivider && $isset($slots.bottom)"
+                  class="d-flex w-100 align-center justify-center"
+                >
                   <v-divider />
                   <div class="text-no-wrap px-3">or</div>
                   <v-divider />
@@ -53,7 +59,7 @@
 
             <!-- </v-card> -->
           </v-col>
-          <v-col
+          <v-col v-if="!noSecondSection"
             cols="12"
             md="6"
             lg="6"
@@ -118,6 +124,10 @@ export default {
       default: 'CONTINUE WITHOUT LOGIN'
     },
     noDivider: {
+      type: [Boolean, Number],
+      default: false
+    },
+    noSecondSection: {
       type: [Boolean, Number],
       default: false
     }
