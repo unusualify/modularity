@@ -136,9 +136,9 @@ class ResetPasswordController extends Controller
             $resetPasswordSchema = getFormDraft('reset_password_form');
 
             return $this->viewFactory->make(modularityBaseKey() . '::auth.passwords.reset')->with([
-                'token' => $token,
-                'email' => $user->email,
-
+                'attributes' => [
+                    'noSecondSection' => true,
+                ],
                 'formAttributes' => [
                     'hasSubmit' => true,
                     'color' => 'primary',
