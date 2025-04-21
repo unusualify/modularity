@@ -80,6 +80,14 @@ return [
         'mine' => 'Mine',
         'published' => 'Published',
         'trash' => 'Trash',
+
+        'authorized' => 'Authorized',
+        'unauthorized' => 'Unauthorized',
+        'your-authorizations' => 'Your authorizations',
+        'your-role-assignments' => 'Team Tasks',
+        'my-assignments' => 'My Tasks',
+        'completed-assignments' => 'Completed Tasks',
+        'pending-assignments' => 'Pending Tasks',
     ],
     'force-delete' => [
         'error' => ':modelTitle was not destroyed. Something wrong happened!',
