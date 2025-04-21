@@ -17,35 +17,37 @@ class UWrapper
         return new self;
     }
 
-    public static function makeGridSection($elements, $attributes = [])
+    public static function makeGridSection($elements, $rowAttributes = [], $colAttributes = [])
     {
         $row = UComponent::makeVRow()
             ->setAttributes(array_merge_recursive_preserve([
                 'class' => '',
                 // 'noGutters' => true
-            ], $attributes));
+            ], $rowAttributes));
+
         foreach ($elements as $key => $element) {
             $col = UComponent::makeVCol();
 
-            $col_attributes = ['class' => 'd-flex', 'cols' => 12, 'lg' => 6];
+            $col_attributes = array_merge_recursive_preserve(['class' => '', 'cols' => 12, 'lg' => 6], $colAttributes);
 
             if (is_array($element)) {
                 $contents = $element;
                 if (isset($element['content']) && is_array($element['content'])) {
-                    $col_attributes = array_merge_recursive_preserve($col_attributes, $element['parent_attributes']);
+                    $col_attributes = array_merge_recursive_preserve($col_attributes, $element['parent_attributes'] ?? []);
 
                     $contents = $element['content'];
                 }
 
                 if (count($contents) > 1) {
-                    $div = UComponent::makeDiv()
-                        ->setAttributes([
-                            'class' => 'w-100',
-                        ]);
+                    // $div = UComponent::makeDiv()
+                    //     ->setAttributes([
+                    //         'class' => 'w-100',
+                    //     ]);
+
                     foreach ($contents as $component) {
-                        $div->addChildren($component);
+                        $col->addChildren($component);
                     }
-                    $col->addChildren($div);
+                    // $col->addChildren($div);
 
                 } else {
                     $col->addChildren($contents[0]);
