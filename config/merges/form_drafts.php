@@ -7,7 +7,7 @@ return [
             'col' => [
                 'sm' => 6,
             ],
-            'rules' => 'min:3|unique_table', // Removed |unique_table since it causes update problems on name. Name shouldn't be unique
+            'rules' => 'min:3', // Removed |unique_table since it causes update problems on name. Name shouldn't be unique
         ],
         'surname' => [
             'type' => '_name',
@@ -16,7 +16,7 @@ return [
             'col' => [
                 'sm' => 6,
             ],
-            'rules' => 'min:2',
+            // 'rules' => 'min:2',
         ],
         // 'job_title' => [
         //     'type' => '_name',
@@ -33,6 +33,7 @@ return [
             'col' => [
                 'sm' => 6,
             ],
+            'rules' => 'required|email|unique_table',
         ],
         'phone' => [
             'type' => '_phone',
@@ -232,6 +233,50 @@ return [
             'col' => [
                 'lg' => 12,
             ],
+        ],
+    ],
+    'reset_password_form' => [
+        'email' => [
+            'type' => 'text',
+            'name' => 'email',
+            'label' => 'Email',
+            'default' => '',
+            'col' => [
+                'cols' => 12,
+            ],
+            'readonly' => true,
+            'rules' => 'required|email',
+        ],
+        'password' => [
+            'type' => 'password',
+            'name' => 'password',
+            'label' => 'Password',
+            'default' => '',
+            'appendInnerIcon' => '$non-visibility',
+            'slotHandlers' => [
+                'appendInner' => 'password',
+            ],
+            'col' => [
+                'cols' => 12,
+            ],
+        ],
+        'password_confirmation' => [
+            'type' => 'password',
+            'name' => 'password_confirmation',
+            'label' => 'Password Confirmation',
+            'default' => '',
+            'appendInnerIcon' => '$non-visibility',
+            'slotHandlers' => [
+                'appendInner' => 'password',
+            ],
+            'col' => [
+                'cols' => 12,
+            ],
+        ],
+        'token' => [
+            'type' => 'hidden',
+            // "ext" => "hidden",
+            'name' => 'token',
         ],
     ]
 ];
