@@ -64,7 +64,7 @@ import { reduce, get, cloneDeep, isArray, isString, isNumber } from 'lodash-es'
 export default {
   props: {
     configuration: {
-      type: Object,
+      type: [Object, Array, String],
       default () {
         return {}
       }
