@@ -58,6 +58,7 @@ trait TableFilters
             // ];
         }
 
+        // SoftDeletable Filters
         if ($this->getIndexOption('restore') && $this->repository->isSoftDeletable()) {
             $statusFilters[] = [
                 'name' => ___('listing.filter.trash'),
@@ -66,6 +67,7 @@ trait TableFilters
             ];
         }
 
+        // Stateable Filters
         if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasStateable')) {
             $statusFilters = array_merge(
                 $statusFilters,
@@ -73,6 +75,7 @@ trait TableFilters
             );
         }
 
+        // Authorizable Filters
         if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasAuthorizable')) {
 
             if ($this->repository->getModel()->hasAuthorizationUsage()) {
@@ -96,6 +99,7 @@ trait TableFilters
             ];
         }
 
+        // Assignable Filters
         if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\Assignable')) {
             $statusFilters[] = [
                 'name' => ___('listing.filter.my-assignments'),
