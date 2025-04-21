@@ -38,4 +38,7 @@ return [
 
     'confirm-provider' => 'Confirm your {provider} account',
 
+    'verification-complete' => 'Verification',
+    'verification-complete-description' => 'Your email has been verified.',
+
 ];
