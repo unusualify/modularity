@@ -153,6 +153,7 @@ class UComponent extends Component
     public function addChildren($element)
     {
         $oldElements = $this->elements;
+        $wasIsAssoc = false;
 
         if (! is_array($oldElements)) {
             if (! empty($oldElements)) {
@@ -160,6 +161,8 @@ class UComponent extends Component
             }
         } else if (is_array($oldElements) && Arr::isAssoc($oldElements)) {
             $oldElements = [$oldElements];
+            $wasIsAssoc = true;
+            // dd($wasIsAssoc);
         }
 
         $newElement = [];
@@ -173,9 +176,14 @@ class UComponent extends Component
             $newElement = $element;
         }
 
+        if(is_array($oldElements)){
+            $oldElements[] = $newElement;
+
+        }
+
         $this->elements = is_array($oldElements)
-            ? array_merge($oldElements, $newElement)
-            : $newElement;
+            ? $oldElements
+            : [$newElement];
 
         return $this;
     }

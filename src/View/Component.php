@@ -232,6 +232,7 @@ class Component extends LaravelComponent
     public function addChildren($element)
     {
         $oldElements = $this->elements;
+        $wasIsAssoc = false;
 
         if (! is_array($oldElements)) {
             if (! empty($oldElements)) {
@@ -239,6 +240,7 @@ class Component extends LaravelComponent
             }
         } else if (is_array($oldElements) && Arr::isAssoc($oldElements)) {
             $oldElements = [$oldElements];
+            $wasIsAssoc = true;
         }
 
         $newElement = [];
@@ -252,9 +254,14 @@ class Component extends LaravelComponent
             $newElement = $element;
         }
 
+        if(is_array($oldElements)){
+            $oldElements[] = $newElement;
+
+        }
+
         $this->elements = is_array($oldElements)
-            ? array_merge($oldElements, $newElement)
-            : $newElement;
+            ? $oldElements
+            : [$newElement];
 
         return $this;
     }
