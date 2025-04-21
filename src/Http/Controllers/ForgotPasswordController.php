@@ -62,20 +62,7 @@ class ForgotPasswordController extends Controller
                     'align' => 'center',
                     'justify' => 'center',
                 ],
-                'schema' => ($schema = $this->createFormSchema([
-                    'email' => [
-                        'type' => 'text',
-                        'name' => 'email',
-                        'label' => ___('authentication.email'),
-                        'default' => '',
-                        'col' => [
-                            'cols' => 12,
-                        ],
-                        'rules' => [
-                            ['email'],
-                        ],
-                    ],
-                ])),
+                'schema' => $this->createFormSchema(getFormDraft('forgot_password_form')),
 
                 'actionUrl' => route(Route::hasAdmin('password.reset.email')),
                 'buttonText' => 'authentication.reset-send',

@@ -235,6 +235,14 @@ return [
             ],
         ],
     ],
+    'forgot_password_form' => [
+        'email' => [
+            'type' => 'text',
+            'name' => 'email',
+            'label' => 'Email',
+            'default' => '',
+        ],
+    ],
     'reset_password_form' => [
         'email' => [
             'type' => 'text',
