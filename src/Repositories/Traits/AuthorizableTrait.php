@@ -12,6 +12,6 @@ trait AuthorizableTrait
     public function filterAuthorizableTrait($query, &$scopes)
     {
         // set, cast, unset or manipulate the scopes by using query and scopes
-        $scopes['hasAuthorization'] = true;
+        // $scopes['hasAuthorization'] = true;
     }
 }
