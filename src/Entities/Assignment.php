@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
+use Unusualify\Modularity\Entities\Scopes\AssignmentScopes;
 
 class Assignment extends Model
 {
+    use AssignmentScopes;
 
     /**
 	 * The attributes that are mass assignable.
@@ -154,39 +156,6 @@ class Assignment extends Model
     public function assigner()
     {
         return $this->morphTo();
-    }
-
-    public function scopeIsAssigneeType($query, $type)
-    {
-        return $query->where('assignee_type', $type);
-    }
-
-    public function scopeIsAssignee($query, $user)
-    {
-        return $query->where('assignee_id', $user->id)
-            ->where('assignee_type', get_class($user));
-    }
-
-    public function scopeIsAssigneeRole($query, $roles)
-    {
-        return $query->whereHas('assignee', function ($query) use ($roles) {
-            $query->role($roles);
-        });
-    }
-
-    public function scopeIsCompleted($query)
-    {
-        return $query->where('status', AssignmentStatus::COMPLETED);
-    }
-
-    public function scopeIsPending($query)
-    {
-        return $query->where('status', AssignmentStatus::PENDING);
-    }
-
-    public function scopeIsCancelled($query)
-    {
-        return $query->where('status', AssignmentStatus::REJECTED);
     }
 
     public function getTable()
