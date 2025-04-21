@@ -71,11 +71,54 @@ trait AssignableScopes
         }
 
         $userRoles = $user->roles;
+        $userRoleIds = $userRoles->pluck('id')->toArray();
+        $userClass = get_class($user);
 
-        return $query->where;
+        if (empty($userRoleIds)) {
+            // User has no roles, so cannot match any assignments by role
+            return $query->whereRaw('1 = 0'); // Return no results
+        }
+
+        $assignmentTable = (new Assignment())->getTable();
+        $modelTable = $this->getTable();
+        $modelClass = get_class($this);
+        $userClass = get_class($user);
+
+        $users = $userClass::whereHas('roles', function ($query) use ($userRoleIds) {
+            $query->whereIn('id', $userRoleIds);
+        })->get();
+
+        // if user is exceptep from its role, filter it
+        // $userIds = $users->filter(fn ($u) => $u->id !== $user->id)->pluck('id');
+        // if ($userIds->isEmpty()) {
+        //     return $query->whereRaw('1 = 0');
+        // }
+        $userIds = $users->pluck('id');
+
+        $query->whereExists(function ($subQuery) use ($assignmentTable, $modelTable, $modelClass, $user, $userClass, $userIds) {
+            $userIds->each(function ($userId) use ($subQuery, $assignmentTable, $modelTable, $modelClass, $user, $userClass) {
+                $subQuery = $subQuery->orWhereExists(function ($subQuery) use ($assignmentTable, $modelTable, $modelClass, $user, $userClass, $userId) {
+                    // Create a SQL string for the subquery
+                    $latestAssignmentSql = \DB::table($assignmentTable)
+                        ->select(\DB::raw('MAX(created_at)'))
+                        ->whereColumn("{$assignmentTable}.assignable_id", "{$modelTable}.id")
+                        ->where("{$assignmentTable}.assignable_type", $modelClass)
+                        ->toSql();
+
+                    $subQuery->select(\DB::raw(1))
+                        ->from($assignmentTable)
+                        ->whereColumn("{$assignmentTable}.assignable_id", "{$modelTable}.id")
+                        ->where("{$assignmentTable}.assignable_type", $modelClass)
+                        ->where("{$assignmentTable}.assignee_id", $userId)
+                        ->where("{$assignmentTable}.assignee_type", $userClass)
+                        ->whereRaw("{$assignmentTable}.created_at = ({$latestAssignmentSql})", [$modelClass]);
+                });
+            });
+            return $subQuery;
+        });
+
+        return $query;
     }
-
-
 
     public function scopeLastStatusAssignment($query, $status)
     {
@@ -173,6 +216,7 @@ trait AssignableScopes
                 ->isAssigneeRole($userRoles);
         });
     }
+
     /**
      * Scope to check if the current user has ever been assigned to the model or has authorization
      *
