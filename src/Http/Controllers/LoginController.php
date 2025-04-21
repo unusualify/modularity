@@ -98,75 +98,6 @@ class LoginController extends Controller
     }
 
     /**
-     * Handle a login request to the application.
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    public function login(Request $request)
-    {
-        // dd(App::getLocale());
-
-        $this->validateLogin($request);
-
-        // If the class is using the ThrottlesLogins trait, we can automatically throttle
-        // the login attempts for this application. We'll key this by the username and
-        // the IP address of the client making these requests into this application.
-        if (method_exists($this, 'hasTooManyLoginAttempts') &&
-            $this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-
-            return $this->sendLockoutResponse($request);
-        }
-
-        $previousRouteName = previous_route_name();
-
-        if ($this->attemptLogin($request)) {
-            if ($request->hasSession()) {
-                $request->session()->put('auth.password_confirmed_at', time());
-            }
-
-            $request->session()->regenerate();
-
-            $this->clearLoginAttempts($request);
-
-            if ($response = $this->authenticated($request, $this->guard()->user())) {
-                return $response;
-            }
-
-            $body = [
-                'variant' => MessageStage::SUCCESS,
-                'timeout' => 1500,
-                'message' => __('authentication.login-success-message'),
-            ];
-
-            if($previousRouteName === 'admin.login.form') {
-                $body['redirector'] = redirect()->intended($this->redirectTo)->getTargetUrl();
-            }
-
-            return $request->wantsJson()
-                ? new JsonResponse($body, 200)
-                : $this->sendLoginResponse($request);
-
-            // return $this->sendLoginResponse($request);
-        }
-
-        // If the login attempt was unsuccessful we will increment the number of attempts
-        // to login and redirect the user back to the login form. Of course, when this
-        // user surpasses their maximum number of attempts they will get locked out.
-        $this->incrementLoginAttempts($request);
-
-        return $request->wantsJson()
-            ? new JsonResponse([
-                $this->username() => [trans('auth.failed')],
-                'message' => __('auth.failed'),
-                'variant' => MessageStage::WARNING,
-            ])
-            : $this->sendFailedLoginResponse($request);
-    }
-
-    /**
      * @return \Illuminate\View\View
      */
     public function showForm()
@@ -359,7 +290,7 @@ class LoginController extends Controller
         }
 
         return $request->wantsJson()
-            ? new JsonResponse($body)
+            ? new JsonResponse($body, 200)
             : $this->redirector->intended($this->redirectPath());
 
     }
@@ -585,6 +516,29 @@ class LoginController extends Controller
     public function redirectTo()
     {
         return route(Route::hasAdmin('dashboard'));
+    }
+
+    /**
+     * Send the response after the user was authenticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        if($request->wantsJson()) {
+            return new JsonResponse([
+                $this->username() => [trans('auth.failed')],
+                'message' => __('auth.failed'),
+                'variant' => MessageStage::WARNING,
+            ], 200);
+        }
+
+        throw ValidationException::withMessages([
+            $this->username() => [trans('auth.failed')],
+            'message' => __('auth.failed'),
+            'variant' => MessageStage::WARNING,
+        ]);
     }
 
     /**
