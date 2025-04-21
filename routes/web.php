@@ -25,6 +25,8 @@ Route::group(['prefix' => 'profile', 'as' => 'profile.'], function () {
 });
 Route::put('profile/company', 'ProfileController@updateCompany')->name('profile.company');
 
+Route::resource('', 'DashboardController', ['as' => 'dashboard', 'names' => ['index' => 'dashboard']])->only(['index']);
+
 Route::get('users/impersonate/stop', 'ImpersonateController@stopImpersonate')->name('impersonate.stop');
 Route::get('users/impersonate/{id}', 'ImpersonateController@impersonate')->name('impersonate');
 
