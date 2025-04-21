@@ -141,7 +141,7 @@ trait TranslationsTrait
         if ($this->model->isTranslatable()) {
             $attributes = $this->model->translatedAttributes;
 
-            $query->orWhereHas('translations', function ($q) use ($scopes, $attributes) {
+            $query->whereHas('translations', function ($q) use ($scopes, $attributes) {
                 foreach ($attributes as $attribute) {
                     if (isset($scopes[$attribute]) && is_string($scopes[$attribute])) {
                         if (! (isset($scopes['searches']) && in_array($attribute, $scopes['searches']))) {
