@@ -387,12 +387,12 @@ abstract class CoreController extends LaravelController
 
     public function createAssignment($id)
     {
-        if($this->request->has('status')){
+        if(($status = $this->request->get('status'))){
             $assignable = $this->repository->getById($id);
 
             $assignable->lastAssignment->update([
-                'status' => $this->request->get('status'),
-                'completed_at' => $this->request->get('status') === 'completed' ? now() : null,
+                'status' => $status,
+                'completed_at' => $status === 'completed' ? now() : null,
             ]);
 
             return Response::json([
