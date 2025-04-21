@@ -83,6 +83,7 @@ trait ManageScopes
 
         if (array_key_exists('status', $requestFilters)) {
             switch ($requestFilters['status']) {
+                // General Filters
                 case 'published':
                     $scope['published'] = true;
 
@@ -99,6 +100,7 @@ trait ManageScopes
                     $scope['mine'] = true;
 
                     break;
+                // Authorizable Filters
                 case 'authorized':
                     $scope['hasAnyAuthorization'] = true;
 
@@ -111,12 +113,13 @@ trait ManageScopes
                     $scope['isAuthorizedToYou'] = true;
 
                     break;
+                // Assignable Filters
                 case 'my-assignments':
                     $scope['isActiveAssignee'] = true;
 
                     break;
                 case 'your-role-assignments':
-                    $scope['everAssignedToYourRole'] = true;
+                    $scope['isActiveAssigneeForYourRole'] = true;
 
                     break;
                 case 'completed-assignments':
@@ -126,6 +129,18 @@ trait ManageScopes
                 case 'pending-assignments':
                     $scope['pendingAssignments'] = true;
                     break;
+                case 'your-completed-assignments':
+                    $scope['yourCompletedAssignments'] = true;
+                    break;
+                case 'your-pending-assignments':
+                    $scope['yourPendingAssignments'] = true;
+                    break;
+                case 'team-completed-assignments':
+                    $scope['teamCompletedAssignments'] = true;
+                    break;
+                // case 'team-pending-assignments':
+                //     $scope['teamPendingAssignments'] = true;
+                //     break;
             }
 
             if (! Str::startsWith($requestFilters['status'], 'stateable')) {

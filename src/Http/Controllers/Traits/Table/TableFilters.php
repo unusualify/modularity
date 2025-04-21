@@ -109,8 +109,10 @@ trait TableFilters
             $statusFilters[] = [
                 'name' => ___('listing.filter.your-role-assignments'),
                 'slug' => 'your-role-assignments',
-                'number' => $this->repository->getCountFor('everAssignedToYourRole'),
+                'number' => $this->repository->getCountFor('isActiveAssigneeForYourRole'),
             ];
+
+
             $statusFilters[] = [
                 'name' => ___('listing.filter.completed-assignments'),
                 'slug' => 'completed-assignments',
@@ -121,6 +123,29 @@ trait TableFilters
                 'slug' => 'pending-assignments',
                 'number' => $this->repository->getCountFor('pendingAssignments'),
             ];
+
+
+            $statusFilters[] = [
+                'name' => ___('listing.filter.your-completed-assignments'),
+                'slug' => 'your-completed-assignments',
+                'number' => $this->repository->getCountFor('yourCompletedAssignments'),
+            ];
+            $statusFilters[] = [
+                'name' => ___('listing.filter.team-completed-assignments'),
+                'slug' => 'team-completed-assignments',
+                'number' => $this->repository->getCountFor('teamCompletedAssignments'),
+            ];
+            $statusFilters[] = [
+                'name' => ___('listing.filter.your-pending-assignments'),
+                'slug' => 'your-pending-assignments',
+                'number' => $this->repository->getCountFor('yourPendingAssignments'),
+            ];
+            // $statusFilters[] = [
+            //     'name' => ___('listing.filter.team-pending-assignments'),
+            //     'slug' => 'team-pending-assignments',
+            //     'number' => $this->repository->getCountFor('teamPendingAssignments'),
+            // ];
+
         }
 
         $statusFilters = array_values(array_filter($statusFilters, function ($filter) {
