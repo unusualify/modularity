@@ -74,22 +74,48 @@ trait TableFilters
         }
 
         if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasAuthorizable')) {
-            $statusFilters[] = [
-                'name' => ___('listing.filter.authorized'),
-                'slug' => 'authorized',
-                'number' => $this->repository->getCountFor('hasAnyAuthorization'),
-            ];
 
-            $statusFilters[] = [
-                'name' => ___('listing.filter.unauthorized'),
-                'slug' => 'unauthorized',
-                'number' => $this->repository->getCountFor('unauthorized'),
-            ];
+            if ($this->repository->getModel()->hasAuthorizationUsage()) {
+                $statusFilters[] = [
+                    'name' => ___('listing.filter.authorized'),
+                    'slug' => 'authorized',
+                    'number' => $this->repository->getCountFor('hasAnyAuthorization'),
+                ];
+
+                $statusFilters[] = [
+                    'name' => ___('listing.filter.unauthorized'),
+                    'slug' => 'unauthorized',
+                    'number' => $this->repository->getCountFor('unauthorized'),
+                ];
+            }
 
             $statusFilters[] = [
                 'name' => ___('listing.filter.your-authorizations'),
                 'slug' => 'your-authorizations',
-                'number' => $this->repository->getCountFor('authorizedToYou'),
+                'number' => $this->repository->getCountFor('isAuthorizedToYou'),
+            ];
+        }
+
+        if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\Assignable')) {
+            $statusFilters[] = [
+                'name' => ___('listing.filter.my-assignments'),
+                'slug' => 'my-assignments',
+                'number' => $this->repository->getCountFor('isActiveAssignee'),
+            ];
+            $statusFilters[] = [
+                'name' => ___('listing.filter.your-role-assignments'),
+                'slug' => 'your-role-assignments',
+                'number' => $this->repository->getCountFor('everAssignedToYourRole'),
+            ];
+            $statusFilters[] = [
+                'name' => ___('listing.filter.completed-assignments'),
+                'slug' => 'completed-assignments',
+                'number' => $this->repository->getCountFor('completedAssignments'),
+            ];
+            $statusFilters[] = [
+                'name' => ___('listing.filter.pending-assignments'),
+                'slug' => 'pending-assignments',
+                'number' => $this->repository->getCountFor('pendingAssignments'),
             ];
         }
 

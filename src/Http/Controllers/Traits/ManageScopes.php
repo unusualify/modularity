@@ -108,8 +108,23 @@ trait ManageScopes
 
                     break;
                 case 'your-authorizations':
-                    $scope['authorizedToYou'] = true;
+                    $scope['isAuthorizedToYou'] = true;
 
+                    break;
+                case 'my-assignments':
+                    $scope['isActiveAssignee'] = true;
+
+                    break;
+                case 'your-role-assignments':
+                    $scope['everAssignedToYourRole'] = true;
+
+                    break;
+                case 'completed-assignments':
+                    $scope['completedAssignments'] = true;
+
+                    break;
+                case 'pending-assignments':
+                    $scope['pendingAssignments'] = true;
                     break;
             }
 
@@ -175,11 +190,13 @@ trait ManageScopes
      */
     protected function getRequestFilters()
     {
+        $searchFilters = [];
+
         if ($this->request->has('search')) {
-            return ['search' => $this->request->get('search')];
+            $searchFilters['search'] = $this->request->get('search');
         }
 
-        return json_decode($this->request->get('filter'), true) ?? [];
+        return array_merge($searchFilters, (json_decode($this->request->get('filter'), true) ?? []));
     }
 
     /**
