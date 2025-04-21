@@ -256,7 +256,7 @@
 
       </div>
 
-      <!-- <v-spacer></v-spacer> -->
+      <v-spacer v-if="pushButtonToBottom"></v-spacer>
 
       <!-- Footer Section -->
       <div :class="[scrollable ? 'flex-grow-0' : '']">

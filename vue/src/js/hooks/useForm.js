@@ -121,6 +121,10 @@ export const makeFormProps = propsFactory({
     type: Number,
     default: 12
   },
+  pushButtonToBottom: {
+    type: Boolean,
+    default: false
+  },
   rightSlotWidth: {
     type: [Number, String],
     default: null
