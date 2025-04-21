@@ -117,7 +117,7 @@
               @resize="handleResize"
               @blur="handleBlur"
               @click="handleClick"
-              >
+            >
               <template
                 v-for="(_slot, key) in formSlots"
                 :key="key"
@@ -268,6 +268,10 @@
               buttonDefaultText,
               loading
             }">
+            <slot name="options" v-bind="{
+              validForm: validModel || !serverValid,
+              loading
+            }"></slot>
             <v-btn type="submit"
               :disabled="!(validModel || !serverValid) || loading"
               class="ml-auto mb-5"
