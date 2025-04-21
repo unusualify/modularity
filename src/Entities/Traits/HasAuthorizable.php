@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Unusualify\Modularity\Entities\Authorization;
+use Unusualify\Modularity\Traits\Allowable;
 
 trait HasAuthorizable
 {
+    use Allowable;
     // protected $defaultAuthorizedModel = \App\Models\User::class;
 
     protected static $hasAuthorizableFillable = ['authorized_id', 'authorized_type'];
@@ -196,7 +198,27 @@ trait HasAuthorizable
         });
     }
 
-    public function scopeAuthorizedToYou($query)
+    /**
+     * Check if the current user has authorization usage
+     *
+     * @return bool
+     */
+    public function hasAuthorizationUsage()
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return false;
+        }
+
+        return $this->isAllowedItem(
+            item: $this,
+            searchKey: 'allowedRolesForAuthorizationManagement',
+            disallowIfUnauthenticated: false
+        );
+    }
+
+    public function scopeIsAuthorizedToYou($query)
     {
         $user = Auth::user();
 
