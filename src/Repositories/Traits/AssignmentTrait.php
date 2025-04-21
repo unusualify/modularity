@@ -160,7 +160,7 @@ trait AssignmentTrait
     public function filterAssignmentTrait($query, &$scopes)
     {
         // set, cast, unset or manipulate the scopes by using query and scopes
-        $scopes['isAssignee'] = true;
+        $scopes['everAssignedToYourRoleOrHasAuthorization'] = true;
     }
 
     /**
