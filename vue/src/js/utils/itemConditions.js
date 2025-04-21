@@ -50,6 +50,8 @@ export const checkItemConditions = (conditions, item) => {
         return Array.isArray(value) && !value.includes(actualValue);
       case 'exists':
         return actualValue !== undefined && actualValue !== null;
+      case 'not exists':
+        return actualValue === undefined || actualValue === null;
       default:
         console.warn(`Unknown operator: ${operator}`);
         return false;
