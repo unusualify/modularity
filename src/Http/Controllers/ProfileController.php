@@ -2,14 +2,19 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
 use Modules\SystemUser\Repositories\CompanyRepository;
 use Modules\SystemUser\Repositories\UserRepository;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
+use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Services\View\UComponent;
 use Unusualify\Modularity\Services\View\UWrapper;
 
@@ -65,22 +70,6 @@ class ProfileController extends BaseController
 
     public function edit($id = null, $submoduleId = null)
     {
-        // $parentId = $this->getParentId() ?? $parentId;
-        // $data = $this->getIndexData($this->isNested ? [
-        //     $this->getParentModuleForeignKey() => $parentId,
-        // ] : []);
-
-        // App::make($this->getRepositoryClass($this->modelName));
-        // dd(
-        //     get_class_methods( App::make(PressReleaseRepository::class)->get() ),
-        //     App::make(PressReleaseRepository::class)
-        //         ->get()
-        //         ->toArray(),
-        //     App::make(PressReleaseRepository::class)
-        //         ->get()
-        //         ->items()
-        //     // $this->getIndexItems([])
-        // );
 
         $user = auth()->user();
 
@@ -90,49 +79,93 @@ class ProfileController extends BaseController
         $userPasswordSchema = $this->createFormSchema(getFormDraft('user_password'));
         $userPasswordFields = $this->userRepository->getFormFields($user, $userPasswordSchema, noSerialization: false);
         // dd($userSchema);
+
+        $personalForm = UComponent::makeUeForm();
+
+        $verifyButtonAttributes = [
+            'variant' => 'plain',
+            'appendIcon' => 'mdi-check-circle-outline',
+            'color' => 'success',
+        ];
+
+        $user = Auth::user();
+        $emailVerified = $user->hasVerifiedEmail();
+
+        if($emailVerified){
+            // $userSchema['email']['appendInnerIcon'] = 'mdi-check-circle-outline';
+            $userSchema['email']['slots']['append-inner'] = UComponent::makeVIcon()
+                ->setAttributes([
+                    'icon' => 'mdi-check-circle-outline',
+                    'color' => 'success',
+                ])
+                ->render();
+        }
+
+        $personalForm = $personalForm->setAttributes([
+            'class' => 'h-50',
+            'fillHeight' => true,
+            'pushButtonToBottom' => true,
+            'formClass' => 'elevation-2 rounded',
+            'title' => [
+                'text' => __('Personal Information'),
+                // 'tag' => 'p',
+                'type' => 'h6',
+                'weight' => 'bold',
+                'transform' => '',
+                'align' => 'center',
+                'justify' => 'start',
+                // 'margin' => 'b-11',
+            ],
+
+            'buttonText' => 'Update',
+            'hasSubmit' => true,
+            'stickyButton' => false,
+            'modelValue' => $userFields,
+            'schema' => $userSchema,
+            'defaultItem' => collect($userSchema)->mapWithKeys(function ($item, $key) {
+                return [$item['name'] => $item['default'] ?? ''];
+                $carry[$key] = $item->default ?? '';
+            })->toArray(),
+
+            'actionUrl' => $this->getModuleRoute(id: $userFields['id'], action: 'update', singleton: true),
+        ]);
+
+        if(!$emailVerified){
+            $verifyButtonAttributes['href'] = route(Route::hasAdmin('admin.verification.send'));
+            $verifyButtonAttributes['readonly'] = false;
+            $verifyButtonAttributes['color'] = 'warning';
+            $verifyButtonAttributes['variant'] = 'elevated';
+            $verifyButtonAttributes['appendIcon'] = 'mdi-email-outline';
+
+            $verifyEmailButton = UComponent::makeVBtnPrimary()
+                ->setAttributes($verifyButtonAttributes)
+                ->setElements(!$emailVerified ? __('Verify Email') : __('Verified'))
+                ->render();
+
+            $personalForm = $personalForm->addSlot('options', $verifyEmailButton);
+        }
+
         $sectionFields = [
             [
+                $personalForm,
                 UComponent::makeUeForm()
                     ->setAttributes([
-                        'class' => 'mb-6',
+                        'class' => 'h-50',
+                        'fillHeight' => true,
+                        'pushButtonToBottom' => true,
                         'formClass' => 'elevation-2 rounded',
-                        'title' => [
-                            'text' => __('Personal Information'),
-                            'tag' => 'p',
-                            'type' => 'h6',
-                            'weight' => 'bold',
-                            'transform' => '',
-                            'align' => 'center',
-                            'justify' => 'left',
-                            // 'margin' => 'b-11',
-                        ],
-                        'buttonText' => 'Update',
-                        'hasSubmit' => true,
-                        'stickyButton' => false,
 
-                        'modelValue' => $userFields,
-                        'schema' => $userSchema,
-                        'defaultItem' => collect($userSchema)->mapWithKeys(function ($item, $key) {
-                            return [$item['name'] => $item['default'] ?? ''];
-                            $carry[$key] = $item->default ?? '';
-                        })->toArray(),
-
-                        'actionUrl' => $this->getModuleRoute(id: $userFields['id'], action: 'update', singleton: true),
-                    ]),
-                UComponent::makeUeForm()
-                    ->setAttributes([
-                        'formClass' => 'elevation-2 rounded',
-                        'class' => 'rounded',
                         'title' => [
                             'text' => __('Update Password'),
-                            'tag' => 'p',
+                            // 'tag' => 'p',
                             'type' => 'h6',
                             'weight' => 'bold',
                             'transform' => '',
                             'align' => 'center',
-                            'justify' => 'left',
+                            'justify' => 'start',
                             // 'margin' => 'y-6',
                         ],
+
                         'buttonText' => 'Update',
                         'hasSubmit' => true,
                         'stickyButton' => false,
@@ -157,10 +190,13 @@ class ProfileController extends BaseController
             $companyFields['district_id'] = 2;
 
             $sectionFields[] = [
-                'parent_attributes' => ['class' => 'd-flex'],
                 'content' => [
                     UComponent::makeUeForm()
                         ->setAttributes([
+                            'class' => 'h-100',
+                            'fillHeight' => true,
+                            'pushButtonToBottom' => true,
+
                             'formClass' => 'elevation-2 rounded',
                             'title' => [
                                 'text' => __('Company Information'),
@@ -193,7 +229,7 @@ class ProfileController extends BaseController
         // dd($sectionFields);
 
         $data['elements'] = [
-            UWrapper::makeGridSection($sectionFields),
+            UWrapper::makeGridSection($sectionFields, rowAttributes: ['class' => 'h-100'], colAttributes: ['class' => 'd-flex flex-column ga-6']),
         ];
         // dd($data);
         $data['endpoints'] = $this->getUrls();
