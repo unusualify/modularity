@@ -13,21 +13,25 @@ class PriceableObserver
 
         $price->discount_percentage ??= 0;
 
-        $value = $price->{$priceSavingKey} ?? 0;
-        $multiplier = $price->vatRate->multiplier();
+        $issetPriceSavingKey = isset($price->{$priceSavingKey});
 
-        if (config('priceable.prices_are_including_vat')) { // $value is with vat and substract the vat
+        if ($issetPriceSavingKey) {
+            $value = $price->{$priceSavingKey};
+            $multiplier = $price->vatRate->multiplier();
 
-            /**
-             * The added price is including the VAT. We need to calculate
-             * the price without the VAT.
-             */
-            $price->raw_price = $value / $multiplier;
-            $price->vat_amount = $value - $price->raw_price;
-        } else {
-            $price->raw_price = $value;
-            $price->vat_amount = (($value * $multiplier) - $value) * 100;
+            if (config('priceable.prices_are_including_vat')) { // $value is with vat and substract the vat
 
+                /**
+                 * The added price is including the VAT. We need to calculate
+                 * the price without the VAT.
+                 */
+                $price->raw_price = $value / $multiplier;
+                $price->vat_amount = $value - $price->raw_price;
+            } else {
+                $price->raw_price = $value;
+                $price->vat_amount = (($value * $multiplier) - $value) * 100;
+
+            }
         }
         $price->offsetUnset($priceSavingKey);
     }
