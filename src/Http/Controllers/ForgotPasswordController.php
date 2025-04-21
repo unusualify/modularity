@@ -50,6 +50,9 @@ class ForgotPasswordController extends Controller
     {
         // return $viewFactory->make(modularityBaseKey().'::auth.passwords.email');
         return $viewFactory->make(modularityBaseKey() . '::auth.passwords.email', [
+            'attributes' => [
+                'noSecondSection' => true,
+            ],
             'formAttributes' => [
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
                 'title' => [
@@ -81,10 +84,10 @@ class ForgotPasswordController extends Controller
                             'tag' => 'v-btn',
                             'elements' => __('authentication.sign-in'),
                             'attributes' => [
-                                'variant' => 'text',
+                                'variant' => 'elevated',
                                 'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'v-col-5 justify-content-start',
-                                'color' => 'grey-lighten-1',
+                                'class' => '',
+                                'color' => 'success',
                                 'density' => 'default',
                             ],
                         ],
@@ -94,7 +97,7 @@ class ForgotPasswordController extends Controller
                             'attributes' => [
                                 'variant' => 'elevated',
                                 'href' => '',
-                                'class' => 'v-col-5',
+                                'class' => '',
                                 'type' => 'submit',
                                 'density' => 'default',
                             ],
