@@ -9,6 +9,21 @@ use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
 
 trait AssignableScopes
 {
+    public function getUserForAssignable($user = null)
+    {
+        if (! Auth::check() && ! $user) {
+            return null;
+        }
+
+        $user = $user ?? Auth::user();
+
+        if (! $user) {
+            return null;
+        }
+
+        return $user;
+    }
+
     /**
      * Scope to check if the current user is the assignee
      *
@@ -17,13 +32,7 @@ trait AssignableScopes
      */
     public function scopeIsActiveAssignee($query, $user = null)
     {
-        if (! Auth::check() || ! $user) {
-            return $query;
-        }
-
-        $user = $user ?? Auth::user();
-
-        if (! $user) {
+        if (! ($user = $this->getUserForAssignable($user))) {
             return $query;
         }
 
@@ -52,14 +61,13 @@ trait AssignableScopes
 
     public function scopeIsActiveAssigneeForYourRole($query, $user = null)
     {
-        if (! Auth::check() || ! $user) {
+        if (! ($user = $this->getUserForAssignable($user))) {
             return $query;
         }
 
-        $user = $user ?? Auth::user();
-
-        if (! $user) {
-            return $query;
+        // Ensure the user model uses roles and retrieve role IDs
+        if (!method_exists($user, 'roles')) {
+            return $query->whereRaw('1 = 0'); // Return no results if roles aren't available
         }
 
         $userRoles = $user->roles;
@@ -135,13 +143,7 @@ trait AssignableScopes
      */
     public function scopeEverAssignedToYou($query)
     {
-        if (! Auth::check()) {
-            return $query;
-        }
-
-        $user = Auth::user();
-
-        if (! $user) {
+        if (! ($user = $this->getUserForAssignable())) {
             return $query;
         }
 
@@ -158,13 +160,7 @@ trait AssignableScopes
      */
     public function scopeEverAssignedToYourRole($query)
     {
-        if (! Auth::check()) {
-            return $query;
-        }
-
-        $user = Auth::user();
-
-        if (! $user) {
+        if (! ($user = $this->getUserForAssignable())) {
             return $query;
         }
 
@@ -185,13 +181,7 @@ trait AssignableScopes
      */
     public function scopeEverAssignedToYouOrHasAuthorization($query)
     {
-        if (! Auth::check()) {
-            return $query;
-        }
-
-        $user = $user ?? Auth::user();
-
-        if (! $user) {
+        if (! ($user = $this->getUserForAssignable())) {
             return $query;
         }
 
@@ -222,13 +212,7 @@ trait AssignableScopes
      */
     public function scopeEverAssignedToYourRoleOrHasAuthorization($query)
     {
-        if (! Auth::check()) {
-            return $query;
-        }
-
-        $user = $user ?? Auth::user();
-
-        if (! $user) {
+        if (! ($user = $this->getUserForAssignable())) {
             return $query;
         }
 
