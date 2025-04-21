@@ -11,6 +11,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Traits\ManageNames;
@@ -417,9 +418,9 @@ abstract class CoreController extends LaravelController
 
         $assignable = $this->repository->getById($id);
 
-        if($assignable->lastAssignment && $assignable->lastAssignment->status !== 'completed'){
+        if($assignable->lastAssignment && $assignable->lastAssignment->status !== AssignmentStatus::COMPLETED){
             $assignable->lastAssignment->update([
-                'status' => 'cancelled',
+                'status' => AssignmentStatus::CANCELLED,
             ]);
         }
 
@@ -429,6 +430,8 @@ abstract class CoreController extends LaravelController
             'due_at',
             'description',
         ]));
+
+        $assignment->refresh();
 
         return Response::json($assignment);
     }
