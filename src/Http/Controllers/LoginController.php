@@ -134,9 +134,9 @@ class LoginController extends Controller
                             'tag' => 'v-btn',
                             'elements' => __('authentication.forgot-password'),
                             'attributes' => [
-                                'variant' => 'text',
+                                'variant' => 'plain',
                                 'href' => route('admin.password.reset.link'),
-                                'class' => 'v-col-5 d-flex justify-content-start',
+                                'class' => '',
                                 'color' => 'grey-lighten-1',
                                 'density' => 'default',
 
