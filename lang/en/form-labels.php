@@ -16,6 +16,7 @@ return [
     'Name' => 'Name',
     'New Password' => 'New Password',
     'Password' => 'Password',
+    'Password Confirmation' => 'Password Confirmation',
     'Phone Number' => 'Phone Number',
     'Preferred Language' => 'Preferred Language',
     'Repeat Password' => 'Repeat Password',
