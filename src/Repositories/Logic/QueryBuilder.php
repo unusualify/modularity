@@ -261,7 +261,10 @@ trait QueryBuilder
             $columns[] = $this->getModel()->{$r}()->getForeignKeyName();
         }
 
-        $with = array_merge($this->getModel()->getWith(), $with);
+
+        if(method_exists($this->getModel(), 'getWith')) {
+            $with = array_merge($this->getModel()->getWith(), $with);
+        }
 
         // dd($columns, $appends, $with, $columns, $translatedColumns);
 
