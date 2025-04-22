@@ -171,7 +171,7 @@ export default {
     const localPaymentMethod = ref('');
     const localDefaultPaymentMethod = ref("-1");
     const selectedCurrency = ref(props.price_object.currency_id || props.currencies[0]?.id);
-    const displayPrice = ref(formatPrice.value(props.price_object.price_including_vat / 100, props.currencies[0]?.symbol || ''));
+    const displayPrice = ref(formatPrice.value(props.price_object.total_price / 100, props.currencies[0]?.symbol || ''));
 
     // Reactive state
     const localCreditCard = reactive({
@@ -230,7 +230,7 @@ export default {
       try {
         const response = await axios.post(props.api, {
           currency: selectedCurrencyObject.iso_4217,
-          amount: props.price_object.price_including_vat/ 100
+          amount: props.price_object.total_price/ 100
         });
 
         displayPrice.value = formatPrice.value(
