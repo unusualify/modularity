@@ -5,9 +5,11 @@ namespace Unusualify\Modularity\Http\Controllers\Traits\Table;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Unusualify\Modularity\Entities\Enums\Permission;
+use Unusualify\Modularity\Traits\Allowable;
 
 trait TableFilters
 {
+    use Allowable;
 
     /**
      * @param \Illuminate\Database\Eloquent\Collection $items
@@ -112,17 +114,24 @@ trait TableFilters
                 'number' => $this->repository->getCountFor('isActiveAssigneeForYourRole'),
             ];
 
+            $assignableTotalDataPermission = $this->isAllowedItem(
+                item: ['allowedRoles' => ['superadmin', 'admin', 'manager', 'account-executive']],
+                searchKey: 'allowedRoles',
+                disallowIfUnauthenticated: true
+            );
 
-            $statusFilters[] = [
-                'name' => ___('listing.filter.completed-assignments'),
-                'slug' => 'completed-assignments',
-                'number' => $this->repository->getCountFor('completedAssignments'),
-            ];
-            $statusFilters[] = [
-                'name' => ___('listing.filter.pending-assignments'),
-                'slug' => 'pending-assignments',
-                'number' => $this->repository->getCountFor('pendingAssignments'),
-            ];
+            if($assignableTotalDataPermission){
+                $statusFilters[] = [
+                    'name' => ___('listing.filter.completed-assignments'),
+                    'slug' => 'completed-assignments',
+                    'number' => $this->repository->getCountFor('completedAssignments'),
+                ];
+                $statusFilters[] = [
+                    'name' => ___('listing.filter.pending-assignments'),
+                    'slug' => 'pending-assignments',
+                    'number' => $this->repository->getCountFor('pendingAssignments'),
+                ];
+            }
 
 
             $statusFilters[] = [
