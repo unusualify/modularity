@@ -94,6 +94,13 @@ class Assignment extends Model
         );
     }
 
+    protected function statusIconColor(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->status->iconColor(),
+        );
+    }
+
     protected function statusIntervalDescription(): Attribute
     {
         $timeKey = 'due_at';
