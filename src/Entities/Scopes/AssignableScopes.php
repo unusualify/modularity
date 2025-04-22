@@ -155,7 +155,7 @@ trait AssignableScopes
 
     public function scopeTeamCompletedAssignments($query)
     {
-        return $query->lastStatusAssignment(AssignmentStatus::COMPLETED)->isActiveAssignee();
+        return $query->lastStatusAssignment(AssignmentStatus::COMPLETED)->isActiveAssigneeForYourRole();
     }
 
     public function scopePendingAssignments($query)
@@ -170,14 +170,13 @@ trait AssignableScopes
 
     public function scopeTeamPendingAssignments($query)
     {
-        return $query->lastStatusAssignment(AssignmentStatus::PENDING);
+        return $query->lastStatusAssignment(AssignmentStatus::PENDING)->isActiveAssigneeForYourRole();
     }
 
     public function scopeCancelledAssignments($query)
     {
         return $query->lastStatusAssignment(AssignmentStatus::CANCELLED);
     }
-
 
     /**
      * Check if the current user has ever been assigned to the model
