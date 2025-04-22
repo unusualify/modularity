@@ -59,5 +59,22 @@ trait Assignable
         return new Attribute(
             get: fn ($value) => $this->lastAssignment ? $this->lastAssignment->assignee->name : null,
         );
+
+    }
+
+    protected function activeAssignerName() : Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->lastAssignment ? $this->lastAssignment->assigner->name : null,
+        );
+    }
+
+    protected function activeAssignmentStatus() : Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->lastAssignment
+                ? "<v-chip variant='text' color='{$this->lastAssignment->statusIconColor}' prepend-icon='{$this->lastAssignment->statusIcon}'>{$this->lastAssignment->statusLabel}</v-chip>"
+                : null
+        );
     }
 }
