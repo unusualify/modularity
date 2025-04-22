@@ -174,6 +174,9 @@
                             v-for="(filter, index) in mainFilters"
                             :key="index"
                             v-on:click.prevent="changeFilter(filter.slug)"
+                            :class="[
+                              filter.slug === activeFilterSlug ? 'bg-primary' : ''
+                            ]"
                           >
                             <v-list-item-title>{{ filter.name + '(' + filter.number+ ')' }} </v-list-item-title>
                           </v-list-item>
