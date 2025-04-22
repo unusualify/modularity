@@ -116,7 +116,6 @@ trait ManageScopes
                 // Assignable Filters
                 case 'my-assignments':
                     $scope['isActiveAssignee'] = true;
-
                     break;
                 case 'your-role-assignments':
                     $scope['isActiveAssigneeForYourRole'] = true;
@@ -124,7 +123,6 @@ trait ManageScopes
                     break;
                 case 'completed-assignments':
                     $scope['completedAssignments'] = true;
-
                     break;
                 case 'pending-assignments':
                     $scope['pendingAssignments'] = true;
@@ -138,9 +136,9 @@ trait ManageScopes
                 case 'team-completed-assignments':
                     $scope['teamCompletedAssignments'] = true;
                     break;
-                // case 'team-pending-assignments':
-                //     $scope['teamPendingAssignments'] = true;
-                //     break;
+                case 'team-pending-assignments':
+                    $scope['teamPendingAssignments'] = true;
+                    break;
             }
 
             if (! Str::startsWith($requestFilters['status'], 'stateable')) {

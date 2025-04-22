@@ -149,11 +149,11 @@ trait TableFilters
                 'slug' => 'your-pending-assignments',
                 'number' => $this->repository->getCountFor('yourPendingAssignments'),
             ];
-            // $statusFilters[] = [
-            //     'name' => ___('listing.filter.team-pending-assignments'),
-            //     'slug' => 'team-pending-assignments',
-            //     'number' => $this->repository->getCountFor('teamPendingAssignments'),
-            // ];
+            $statusFilters[] = [
+                'name' => ___('listing.filter.team-pending-assignments'),
+                'slug' => 'team-pending-assignments',
+                'number' => $this->repository->getCountFor('teamPendingAssignments'),
+            ];
 
         }
 
