@@ -59,6 +59,12 @@ trait AssignableScopes
         });
     }
 
+    /**
+     * Scope to check if the current user is the assignee for their role
+     *
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeIsActiveAssigneeForYourRole($query, $user = null)
     {
         if (! ($user = $this->getUserForAssignable($user))) {
@@ -120,6 +126,12 @@ trait AssignableScopes
         return $query;
     }
 
+    /**
+     * Scope to get the last status assignment
+     *
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeLastStatusAssignment($query, $status)
     {
         $assignmentTable = (new Assignment())->getTable();
@@ -143,36 +155,78 @@ trait AssignableScopes
         });
     }
 
+    /**
+     * Scope to get the completed assignments
+     *
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeCompletedAssignments($query)
     {
         return $query->lastStatusAssignment(AssignmentStatus::COMPLETED);
     }
 
+    /**
+     * Scope to get the completed assignments for the current user
+     *
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeYourCompletedAssignments($query)
     {
         return $query->lastStatusAssignment(AssignmentStatus::COMPLETED)->isActiveAssignee();
     }
 
+    /**
+     * Scope to get the completed assignments for the current user's role
+     *
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeTeamCompletedAssignments($query)
     {
         return $query->lastStatusAssignment(AssignmentStatus::COMPLETED)->isActiveAssigneeForYourRole();
     }
 
+    /**
+     * Scope to get the pending assignments
+     *
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopePendingAssignments($query)
     {
         return $query->lastStatusAssignment(AssignmentStatus::PENDING);
     }
 
+    /**
+     * Scope to get the pending assignments for the current user
+     *
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeYourPendingAssignments($query)
     {
         return $query->lastStatusAssignment(AssignmentStatus::PENDING)->isActiveAssignee();
     }
 
+    /**
+     * Scope to get the pending assignments for the current user's role
+     *
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeTeamPendingAssignments($query)
     {
         return $query->lastStatusAssignment(AssignmentStatus::PENDING)->isActiveAssigneeForYourRole();
     }
 
+    /**
+     * Scope to get the cancelled assignments
+     *
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeCancelledAssignments($query)
     {
         return $query->lastStatusAssignment(AssignmentStatus::CANCELLED);
