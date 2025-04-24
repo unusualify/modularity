@@ -8,9 +8,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Unusualify\Modularity\Entities\Enums\ProcessStatus;
+use Unusualify\Modularity\Entities\Scopes\ProcessScopes;
 
 class Process extends Model
 {
+    use ProcessScopes;
+
     /**
 	 * The attributes that are mass assignable.
 	 *
