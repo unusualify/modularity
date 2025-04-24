@@ -64,6 +64,8 @@ class MetricController extends Controller
                             $connector->pushEvents($pushEvents);
                         }
                         $connector->run($metric, 'value');
+                    } else if(isset($metric['value']) && is_callable($metric['value'])) {
+                        $metric['value'] = $metric['value']();
                     }
                 }
                 $data = $metrics;

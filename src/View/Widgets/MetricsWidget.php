@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\View\Widgets;
 
-use Unusualify\Modularity\Exceptions\ModuleNotFoundException;
 use Unusualify\Modularity\Services\Connector;
 use Unusualify\Modularity\View\ModularityWidget;
 
@@ -54,6 +53,8 @@ class MetricsWidget extends ModularityWidget
                     }
 
                     $connector->run($metric, 'value');
+                } else if(isset($metric['value']) && is_callable($metric['value'])) {
+                    $metric['value'] = $metric['value']();
                 }
 
                 return $metric;
