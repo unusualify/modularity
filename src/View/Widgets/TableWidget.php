@@ -16,7 +16,7 @@ class TableWidget extends ModularityWidget
     public $widgetCol = [
         'cols' => 12,
         'lg' => 6,
-        'xl' => 4,
+        'xl' => 6,
     ];
 
     public $attributes = [
