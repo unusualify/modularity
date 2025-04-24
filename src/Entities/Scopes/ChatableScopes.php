@@ -25,4 +25,11 @@ trait ChatableScopes
             $query->where('is_read', false)->whereNot(fn ($query) => $query->authorized($guardName));
         });
     }
+
+    public function scopeHasChatMessageWaitingReaction(Builder $query): Builder
+    {
+        return $query->whereHas('latestChatMessage', function(Builder $query){
+            $query->fromClient();
+        });
+    }
 }
