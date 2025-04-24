@@ -9,14 +9,14 @@ use Unusualify\Modularity\Entities\Chat;
 use Unusualify\Modularity\Entities\ChatMessage;
 use Unusualify\Modularity\Entities\Scopes\ChatableScopes;
 
-trait HasChatable
+trait Chatable
 {
     use ChatableScopes;
 
     /**
      * Perform any actions when booting the trait
      */
-    public static function bootHasChatable(): void
+    public static function bootChatable(): void
     {
         static::retrieved(function (Model $model) {
             if ($model->chat) {
@@ -40,7 +40,7 @@ trait HasChatable
     /**
      * Laravel hook to initialize the trait
      */
-    public function initializeHasChatable(): void
+    public function initializeChatable(): void
     {
         $noAppend = static::$noChatableAppends ?? false;
 
@@ -57,6 +57,11 @@ trait HasChatable
     public function chatMessages(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
         return $this->hasManyThrough(ChatMessage::class, Chat::class, 'chatable_id', 'chat_id', 'id', 'id');
+    }
+
+    public function lastChatMessage(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
+    {
+        return $this->hasOneThrough(ChatMessage::class, Chat::class, 'chatable_id', 'chat_id', 'id', 'id')->latestOfMany();
     }
 
     public function unreadChatMessages(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
