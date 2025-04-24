@@ -59,9 +59,13 @@ trait Chatable
         return $this->hasManyThrough(ChatMessage::class, Chat::class, 'chatable_id', 'chat_id', 'id', 'id');
     }
 
-    public function lastChatMessage(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
+    public function latestChatMessage(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
-        return $this->hasOneThrough(ChatMessage::class, Chat::class, 'chatable_id', 'chat_id', 'id', 'id')->latestOfMany();
+        $chatTable = (new Chat)->getTable();
+        $chatMessageTable = (new ChatMessage)->getTable();
+
+        return $this->hasOneThrough(ChatMessage::class, Chat::class, 'chatable_id', 'chat_id', 'id', 'id')
+            ->whereRaw("{$chatMessageTable}.created_at = (select max(created_at) from {$chatMessageTable} where {$chatMessageTable}.chat_id = {$chatTable}.id)");
     }
 
     public function unreadChatMessages(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
