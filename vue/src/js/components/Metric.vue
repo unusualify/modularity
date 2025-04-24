@@ -46,6 +46,14 @@
       type: String,
       default: null,
     },
+    appendIcon: {
+      type: String,
+      default: null,
+    },
+    appendIconAttributes: {
+      type: Object,
+      default: () => ({}),
+    },
   });
 
   // Compute classes based on provided props
@@ -85,16 +93,25 @@
     :class="cardClasses"
   >
     <v-card-text>
-      <div :class="valueClasses">
-        {{ value }}
-      </div>
-      <div :class="labelClasses">
-        <v-icon
-          v-if="icon"
-          :icon="icon"
-
-        />
-        {{ label }}
+      <div class="d-flex">
+        <div v-if="appendIcon" class="d-flex align-center justify-center me-2">
+          <v-icon
+          v-bind="appendIconAttributes"
+          :icon="appendIcon"
+          />
+        </div>
+        <div>
+          <div :class="valueClasses">
+            {{ value }}
+          </div>
+          <div :class="labelClasses">
+            <v-icon
+              v-if="icon"
+              :icon="icon"
+            />
+            {{ label }}
+          </div>
+        </div>
       </div>
     </v-card-text>
   </v-card>
