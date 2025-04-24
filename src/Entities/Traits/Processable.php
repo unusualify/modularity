@@ -10,10 +10,12 @@ use Illuminate\Support\Facades\Auth;
 use Unusualify\Modularity\Entities\Enums\ProcessStatus;
 use Unusualify\Modularity\Entities\Process;
 use Unusualify\Modularity\Entities\ProcessHistory;
+use Unusualify\Modularity\Entities\Scopes\ProcessableScopes;
 
 trait Processable
 {
-    use HasFileponds;
+    use HasFileponds,
+        ProcessableScopes;
 
     /**
      * Perform any actions when booting the trait
