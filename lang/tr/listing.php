@@ -42,6 +42,21 @@ return [
         'mine' => 'Benim Eklediklerim',
         'published' => 'Yayınlanan',
         'trash' => 'Çöp',
+
+        'authorized' => 'Yetkili',
+        'unauthorized' => 'Yetkisiz',
+        'your-authorizations' => 'Yetkileriniz',
+
+        'my-assignments' => 'Görevlerim',
+        'your-role-assignments' => 'Ekip Görevleri',
+
+        'completed-assignments' => 'Tamamlanan Görevler',
+        'pending-assignments' => 'Bekleyen Görevler',
+
+        'your-completed-assignments' => 'Tamamladığınız Görevler',
+        'team-completed-assignments' => 'Ekip Tarafından Tamamlanan Görevler',
+        'your-pending-assignments' => 'Bekleyen Görevleriniz',
+        'team-pending-assignments' => 'Ekip Tarafından Bekleyen Görevler',
     ],
     'languages' => 'Diller',
     'listing-empty-message' => 'Henüz İçerik Eklenmemiş',
