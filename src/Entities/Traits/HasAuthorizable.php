@@ -156,6 +156,21 @@ trait HasAuthorizable
         return static::$defaultAuthorizedModel ?? \App\Models\User::class;
     }
 
+    public function getUserForHasAuthorization($user = null)
+    {
+        if (! Auth::check() && ! $user) {
+            return null;
+        }
+
+        $user = $user ?? Auth::user();
+
+        if (! $user) {
+            return null;
+        }
+
+        return $user;
+    }
+
     /**
      * Scope query to only include records authorized for the given user
      *
@@ -165,13 +180,7 @@ trait HasAuthorizable
      */
     public function scopeHasAuthorization($query, $user = null)
     {
-        if (! Auth::check()) {
-            return $query;
-        }
-
-        $user = $user ?? Auth::user();
-
-        if (! $user) {
+        if (! ($user = $this->getUserForHasAuthorization($user))) {
             return $query;
         }
 
@@ -205,9 +214,7 @@ trait HasAuthorizable
      */
     public function hasAuthorizationUsage()
     {
-        $user = Auth::user();
-
-        if (! $user) {
+        if (! ($user = $this->getUserForHasAuthorization())) {
             return false;
         }
 
@@ -218,17 +225,33 @@ trait HasAuthorizable
         );
     }
 
+
     public function scopeIsAuthorizedToYou($query)
     {
-        $user = Auth::user();
-
-        if (! $user) {
+        if (! ($user = $this->getUserForHasAuthorization())) {
             return $query;
         }
 
         return $query->whereHas('authorizationRecord', function ($query) use ($user) {
             $query->where('authorized_id', $user->id)
                 ->where('authorized_type', get_class($user));
+        });
+    }
+
+    public function scopeIsAuthorizedToYourRole($query)
+    {
+        if (! ($user = $this->getUserForAssignable())) {
+            return $query;
+        }
+
+        $userModel = get_class($user);
+        $userRoles = $user->roles;
+
+        return $query->whereHas('authorizationRecord', function ($query) use ($userModel, $userRoles) {
+            $query->where('authorized_type', $userModel)
+                ->whereHas('authorized', function ($query) use ($userRoles) {
+                    $query->role($userRoles);
+                });
         });
     }
 
