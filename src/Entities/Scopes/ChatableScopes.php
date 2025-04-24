@@ -15,7 +15,7 @@ trait ChatableScopes
     public function scopeHasUnreadChatMessages(Builder $query): Builder
     {
         return $query->whereHas('chatMessages', function (Builder $query) {
-            $query->where('is_read', false);
+            $query->unread();
         });
     }
 
