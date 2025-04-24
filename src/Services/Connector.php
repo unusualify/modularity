@@ -157,42 +157,49 @@ class Connector
 
             foreach($methodables as $methodable) {
 
+                $stop = false;
                 $targets = explode($this->thirdLevelSeparator, $methodable); // ->
+                $targetTypeKey = array_shift($targets);
+                $methodName = '';
+                $args = [$this->routeName];
 
-                if(count($targets) > 1) { // repository->list?scopes=hasVendablePackage&appends=number_of_countries,number_of_package_languages
-                    $targetTypeKey = array_shift($targets);
-                    $targetEventNotation = array_shift($targets);
+                switch ($targetTypeKey) {
+                    case 'uri':
+                        $this->target = $this->module;
 
-                    $targetEventNotationExploded = explode($this->fourthLevelSeparator, $targetEventNotation); // ?
+                        if(count($targets) > 0) {
+                            $args[] = array_shift($targets);
+                        }else{
+                            $args[] = 'index';
+                        }
+                        $methodName = 'getRouteActionUri';
+                        $stop = true;
 
-                    $methodName = array_shift($targetEventNotationExploded);
-                    $args = [];
+                        $events[] = [
+                            'name' => $methodName,
+                            'args' => $args,
+                        ];
 
-                    $stop = false;
-                    switch ($targetTypeKey) {
-                        case 'uri':
-                            $this->target = $this->module;
+                        break;
+                    default:
+                        $args = [];
+                        $className = $this->module->getRouteClass($this->routeName, $targetTypeKey);
 
-                            $args = [$this->routeName, $methodName];
-                            $methodName = 'getRouteActionUri';
-                            $stop = true;
+                        if(!class_exists($className)) {
+                            throw new \Exception("Class {$className} not found for connector " . $this->connector);
+                        }
 
-                            break;
-                        default:
-                            $className = $this->module->getRouteClass($this->routeName, $targetTypeKey);
+                        $this->target = app($className);
+                        $this->setKey = 'items';
 
-                            if(!class_exists($className)) {
-                                throw new \Exception("Class {$className} not found for connector " . $this->connector);
-                            }
+                        break;
+                }
 
-                            $this->target = app($className);
-
-                            $this->setKey = 'items';
-                            break;
-                    }
-
-
-                    if(!$stop){
+                if(!$stop && count($targets) > 0) { // repository->list?scopes=hasVendablePackage&appends=number_of_countries,number_of_package_languages
+                    foreach($targets as $targetEventNotation) {
+                        $targetEventNotationExploded = explode($this->fourthLevelSeparator, $targetEventNotation); // ?
+                        $methodName = array_shift($targetEventNotationExploded);
+                        $args = [];
 
                         if(count($targetEventNotationExploded) > 0) {
                             $targetEventArgs = explode($this->fifthLevelSeparator, $targetEventNotationExploded[0]); // &
@@ -225,21 +232,13 @@ class Connector
                                     $args[$argKey] = $parameter;
                                 }
                             }
-
-                        } else {
-                            dd($targetEventNotationExploded, $methodName);
-                            $args = [$targetEventNotation];
-
-                            dd($args);
                         }
+
+                        $events[] = [
+                            'name' => $methodName,
+                            'args' => $args,
+                        ];
                     }
-
-
-                    $events[] = [
-                        'name' => $methodName,
-                        'args' => $args,
-                    ];
-
 
                 }else { // function
                     // $event['uri'] = [
