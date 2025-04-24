@@ -88,3 +88,5 @@ Route::prefix('api')->group(function () {
         });
     }
 });
+
+Route::post('modularity/metrics', 'MetricController')->name('modularity.metrics');
