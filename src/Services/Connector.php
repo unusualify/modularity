@@ -257,6 +257,47 @@ class Connector
         $this->events = $events;
     }
 
+    public function getEvents()
+    {
+        return $this->events;
+    }
+
+    /**
+     * Push an event to the events array
+     * @param array $event
+     */
+    public function pushEvent($event)
+    {
+        $this->events[] = $event;
+    }
+
+    /**
+     * Get the events array
+     * @return array
+     */
+    public function unshiftEvent($event)
+    {
+        array_unshift($this->events, $event);
+    }
+
+    /**
+     * Push multiple events to the events array
+     * @param array $events
+     */
+    public function pushEvents($events)
+    {
+        $this->events = array_merge($this->events, $events);
+    }
+
+    /**
+     * Unshift multiple events to the events array
+     * @param array $events
+     */
+    public function unshiftEvents($events)
+    {
+        $this->events = array_merge($events, $this->events);
+    }
+
     /**
      * Run the connector
      * @param array|object $item
