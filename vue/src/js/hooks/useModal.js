@@ -26,6 +26,18 @@ export const makeModalProps = propsFactory({
     type: String,
     default: null
   },
+  noCloseButton: {
+    type: Boolean,
+    default: false
+  },
+  hasFullscreenButton: {
+    type: Boolean,
+    default: false
+  },
+  noActions: {
+    type: Boolean,
+    default: false
+  },
   description: {
     type: String,
     default: null
