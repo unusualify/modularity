@@ -186,7 +186,9 @@ class RouteServiceProvider extends ServiceProvider
             );
             ModularityRoutes::registerRoutes(
                 $router,
-                [],
+                [
+                    'domain' => config('app.url'),
+                ],
                 ['web'], // $middlewares,
                 $module->getClassNamespace("{$controller_namespace}\Front"),
                 $module->getDirectoryPath("{$routes_folder}/front.php"),
@@ -207,6 +209,7 @@ class RouteServiceProvider extends ServiceProvider
 
             $router->group([
                 ...[
+                    'domain' => config('app.url'),
                     'middleware' => ModularityRoutes::webMiddlewares(),
                     'namespace' => $module->getClassNamespace("{$front_controller_namespace}"),
                 ],
