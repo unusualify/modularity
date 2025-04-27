@@ -2,11 +2,9 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Modules\PressRelease\Entities\PressRelease;
+use Illuminate\Routing\Controller;
 use Unusualify\Modularity\Services\Connector;
 use Unusualify\Modularity\Services\MessageStage;
 
