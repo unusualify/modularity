@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
+use Unusualify\Modularity\Events\ModularityUserRegistered;
 use Unusualify\Modularity\Entities\Company;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
@@ -284,6 +285,8 @@ class RegisterController extends Controller
             'email' => $request['email'],
             'password' => Hash::make($request['password']),
         ]);
+
+        event(new ModularityUserRegistered($user));
 
         $user->assignRole('client-manager');
 
