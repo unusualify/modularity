@@ -35,6 +35,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   props: {
     payload: {
@@ -73,7 +75,7 @@ export default {
         return data[key?.text];
       }
       // If printKeys is single object
-      return data[this.printKeys.text];
+      return data[this.printKeys.text] ?? '';
     },
 
     getSubText(data, index = null) {
@@ -88,13 +90,15 @@ export default {
         return data[key?.subText];
       }
       // If printKeys is single object
-      return data[this.printKeys.subText];
+      return data[this.printKeys.subText] ?? '';
     },
     async sendRequest() {
       this.loading = true;
       try {
         const response = await axios.post(this.endpoint, this.payload);
-        this.values = response.data;
+        if(response.status === 200){
+          this.values = response.data;
+        }
       } catch (error) {
         console.error('Error calculating price:', error);
       } finally {
