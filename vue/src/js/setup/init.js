@@ -11,6 +11,8 @@ import store from '@/store' // Adjust the import based on your store structure
 import { CONFIG, USER } from '@/store/mutations'
 import { addParametersToUrl, replaceState } from '@/utils/pushState'
 
+import { handleSuccessResponse, handleErrorResponse } from '@/utils/response'
+
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
  * to our Laravel back-end. This library automatically handles sending the
@@ -740,16 +742,20 @@ export default function init(){
     store.commit(CONFIG.DECREASE_AXIOS_REQUEST)
 
     // Check for 401 Unauthenticated error
-    if (response.status === 401) {
-      store.commit(USER.OPEN_LOGIN_MODAL)
-    }
+    // if (response.status === 401) {
+    //   store.commit(USER.OPEN_LOGIN_MODAL)
+    // }
 
     if (response.status === 419 || response.data.message === 'CSRF token mismatch.') {
       store.commit(USER.OPEN_LOGIN_MODAL)
     }
 
+    handleSuccessResponse(response)
+
     return response;
   }, function (error) {
+    handleErrorResponse(error)
+
     store.commit(CONFIG.DECREASE_AXIOS_REQUEST)
     // Any status codes that falls outside the range of 2xx cause this function to trigger
 
