@@ -177,6 +177,7 @@
       </a17-dialog> -->
 
       <ue-alert ref='alert'></ue-alert>
+      <ue-dynamic-modal></ue-dynamic-modal>
 
       <ue-modal
         ref='dialog'
