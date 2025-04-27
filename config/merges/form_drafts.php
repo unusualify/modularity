@@ -286,5 +286,98 @@ return [
             // "ext" => "hidden",
             'name' => 'token',
         ],
+    ],
+    'register_form' => [
+        'name' => [
+            'type' => 'text',
+            'name' => 'name',
+            'label' => 'Name',
+            'default' => '',
+            'col' => [
+                'cols' => 6,
+                'lg' => 6,
+            ],
+            'rules' => 'min:3',
+        ],
+        'surname' => [
+            'type' => 'text',
+            'name' => 'surname',
+            'label' => 'Surname',
+            'default' => '',
+            'col' => [
+                'cols' => 6,
+                'lg' => 6,
+            ],
+            'rules' => 'min:2'
+        ],
+        'company' => [
+            'type' => 'text',
+            'name' => 'company',
+            'label' => 'Company',
+            'default' => '',
+            'col' => [
+                'cols' => 6,
+                'lg' => 6,
+            ],
+            'rules' => 'min:2'
+        ],
+        'email' => [
+            'type' => 'text',
+            'name' => 'email',
+            'label' => 'E-mail',
+            'default' => '',
+            'col' => [
+                'cols' => 6,
+                'lg' => 6,
+            ],
+            'rules' => 'email',
+        ],
+        'password' => [
+            'type' => 'password',
+            'name' => 'password',
+            'label' => 'Password',
+            'default' => '',
+            'appendInnerIcon' => '$non-visibility',
+            'slotHandlers' => [
+                'appendInner' => 'password',
+            ],
+            'col' => [
+                'cols' => 6,
+                'lg' => 6,
+            ],
+            'rules' => [
+                ['required', 'classic', null, null, 'Password is required'],
+                ['min', 8, 'Password must be at least 8 characters'],
+            ],
+
+        ],
+        're_password' => [
+            'type' => 'password',
+            'name' => 're-password',
+            'label' => 'Repeat Password',
+            'default' => '',
+            'appendInnerIcon' => '$non-visibility',
+            'slotHandlers' => [
+                'appendInner' => 'password',
+            ],
+            'col' => [
+                'cols' => 6,
+                'lg' => 6,
+            ],
+            'rules' => [
+                ['required', 'classic',null, null, 'Confirm Password'],
+            ],
+        ],
+        'tos' => [
+            'type' => 'checkbox',
+            'name' => 'tos',
+            'label' => 'I accept the terms of service',
+            'default' => '',
+            'col' => [
+                'cols' => 12,
+                'lg' => 12,
+            ],
+            // 'rules' => 'required',
+        ],
     ]
 ];
