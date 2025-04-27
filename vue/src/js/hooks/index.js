@@ -26,3 +26,5 @@ export { default as useForm, makeFormProps } from './useForm'
 
 export { default as useAuthorization } from './useAuthorization'
 export { default as useCache } from './useCache'
+
+export { default as useDynamicModal } from './useDynamicModal'
