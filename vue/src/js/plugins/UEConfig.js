@@ -7,7 +7,7 @@ import VCustomFormBase from '__components/others/CustomFormBase.vue'
 // Template Components
 import UEModal from '__components/modals/Modal.vue'
 import UEModalMedia from '__components/modals/ModalMedia.vue'
-
+import DynamicModal from '__components/modals/DynamicModal.vue'
 // global mixins
 
 // mutations
@@ -16,7 +16,7 @@ import { MEDIA_LIBRARY } from '@/store/mutations'
 // Add-ons
 import vuetify from '@/plugins/vuetify'
 import broadcasting from '@/plugins/broadcasting'
-
+import ModalService from '@/plugins/modalService'
 // Store
 import store from '@/store'
 
@@ -161,6 +161,7 @@ export default {
 
     // app.component('v-form-base', VFormBase);
     app.component('v-custom-form-base', VCustomFormBase)
+    app.component('ue-dynamic-modal', DynamicModal)
     app.component('ue-modal', UEModal)
     // app.component('ue-modal-dialog', UEModalDialog)
     app.component('ue-modal-media', UEModalMedia)
@@ -202,6 +203,7 @@ export default {
     app.use(FitGrid)
     app.use(Scrollable)
     app.use(Transition)
+    app.use(ModalService)
     app.provide('$app', app)
   }
 }
