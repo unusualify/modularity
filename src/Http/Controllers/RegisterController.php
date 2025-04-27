@@ -291,10 +291,10 @@ class RegisterController extends Controller
         $user->assignRole('client-manager');
 
         return $request->wantsJson()
-        ? new JsonResponse([
-            'redirector' => route(Route::hasAdmin('register.success')),
-        ], 200)
-        : $this->sendLoginResponse($request);
+            ? new JsonResponse([
+                'redirector' => route(Route::hasAdmin('register.success')),
+            ], 200)
+            : $this->sendLoginResponse($request);
     }
 
     public function rules()
@@ -303,7 +303,7 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             //Surname is not mandatory.
             //'surname' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:admin_users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:admin_users,email'],
             'password' => ['required', 'string', 'min:8'],
         ];
     }
