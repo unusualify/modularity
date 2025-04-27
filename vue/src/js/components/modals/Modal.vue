@@ -58,7 +58,7 @@
                 </template>
               </ue-title>
             </v-card-title>
-            <v-card-text v-if="description" class="text-center" style="word-break: break-word;" >
+            <v-card-text v-if="description || $slots['body.description']" class="text-center" style="word-break: break-word;" >
               <slot name="body.description" v-bind="{description}">
                 {{ description }}
               </slot>
