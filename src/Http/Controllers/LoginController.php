@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
@@ -103,6 +104,14 @@ class LoginController extends Controller
     public function showForm()
     {
         return $this->viewFactory->make(modularityBaseKey() . '::auth.login', [
+            'attributes' => [
+                'bannerDescription' => ___('authentication.banner-description'),
+                'bannerSubDescription' => Lang::has('authentication.banner-sub-description') ? ___('authentication.banner-sub-description') : null,
+                'redirectButtonText' => ___('authentication.redirect-button-text'),
+                'redirectUrl' => Route::has(modularityConfig('auth_guest_route'))
+                    ? route(modularityConfig('auth_guest_route'))
+                    : null,
+            ],
             'formAttributes' => [
                 // 'hasSubmit' => true,
 
@@ -223,7 +232,6 @@ class LoginController extends Controller
                         ],
 
                     ],
-
                 ],
             ],
         ]);

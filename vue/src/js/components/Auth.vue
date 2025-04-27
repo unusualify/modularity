@@ -63,25 +63,28 @@
             cols="12"
             md="6"
             lg="6"
-            class="px-xs-12 py-xs-3 px-sm-12 py-sm-3 pa-12 pa-md-0 d-flex flex-column align-center justify-center col-right bg-primary">
+            class="px-xs-12 py-xs-3 px-sm-12 py-sm-3 pa-12 pa-md-0 d-flex flex-column align-center justify-center col-right bg-primary"
+          >
             <div class="mw-420">
               <ue-svg-icon symbol="main-logo" class="mx-0 "></ue-svg-icon>
 
-              <h2 class="text-white mt-5 text-h4 custom-mb-8rem fs-2rem">
-                {{ description }}
-              </h2>
+              <slot name="description">
+                <h2 class="text-white mt-5 text-h4 custom-mb-8rem fs-2rem">
+                  {{ bannerDescription }}
+                </h2>
+              </slot>
               <span class="text-white">
-                <v-img :href="adImg">
-
-                </v-img>
-                {{ ad }}
+                <v-img :href="adImg"></v-img>
+                {{ bannerSubDescription }}
               </span>
               <v-btn
+                v-if="redirectUrl"
                 variant="outlined"
                 class="text-white custom-right-auth-button my-5"
                 density="default"
+                :href="redirectUrl"
                 >
-                {{ rightBtnText }}
+                {{ redirectButtonText }}
               </v-btn>
             </div>
           </v-col>
@@ -107,19 +110,23 @@ export default {
     title: {
       type: String,
     },
-    description: {
+    bannerDescription: {
       type: String,
       default: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
     },
-    ad: {
+    bannerSubDescription: {
       type: String,
-      default: '3k+ people joined us, now it’s your turn'
+      default: ''
     },
     adImg: {
       type: String,
       default: '',
     },
-    rightBtnText: {
+    redirectUrl: {
+      type: String,
+      default: null,
+    },
+    redirectButtonText: {
       type: String,
       default: 'CONTINUE WITHOUT LOGIN'
     },
