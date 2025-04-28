@@ -78,27 +78,28 @@ trait FilepondsTrait
             foreach ($this->getColumns(__TRAIT__) as $role) {
 
                 if (isset($filepondsByRole[$role])) {
-                    $input = $schema[$role];
-
-                    if ($input['translated'] ?? false) {
-                        $groupedByLocale = $filepondsByRole[$role]->groupBy('locale');
-                        foreach ($locales as $locale) {
-                            $fields[$role][$locale] = isset($groupedByLocale[$locale])
-                                ? $groupedByLocale[$locale]->map(function ($filepond) use ($object) {
-                                    return $filepond->mediableFormat() + [
-                                        'id' => $object->id,
-                                    ];
-                                })
-                                : [];
+                    if(isset($schema[$role])){
+                        $input = $schema[$role];
+                        if ($input['translated'] ?? false) {
+                            $groupedByLocale = $filepondsByRole[$role]->groupBy('locale');
+                            foreach ($locales as $locale) {
+                                $fields[$role][$locale] = isset($groupedByLocale[$locale])
+                                    ? $groupedByLocale[$locale]->map(function ($filepond) use ($object) {
+                                        return $filepond->mediableFormat() + [
+                                            'id' => $object->id,
+                                        ];
+                                    })
+                                    : [];
+                            }
+                        } else {
+                            $groupedByLocale = $filepondsByRole[$role]->groupBy('locale');
+                            $locale = isset($groupedByLocale[$default_locale]) ? $default_locale : $groupedByLocale->keys()->first();
+                            $fields[$role] = $groupedByLocale[$locale]->map(function ($filepond) use ($object) {
+                                return $filepond->mediableFormat() + [
+                                    'id' => $object->id,
+                                ];
+                            });
                         }
-                    } else {
-                        $groupedByLocale = $filepondsByRole[$role]->groupBy('locale');
-                        $locale = isset($groupedByLocale[$default_locale]) ? $default_locale : $groupedByLocale->keys()->first();
-                        $fields[$role] = $groupedByLocale[$locale]->map(function ($filepond) use ($object) {
-                            return $filepond->mediableFormat() + [
-                                'id' => $object->id,
-                            ];
-                        });
                     }
                 } else {
                     $input = $this->inputs()[$role] ?? $schema[$role] ?? null;
