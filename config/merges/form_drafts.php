@@ -2,6 +2,14 @@
 
 return [
     'user' => [
+        'avatar' => [
+            'type' => 'filepond-avatar',
+            // 'label' => 'Profile Avatar',
+            'name' => 'avatar',
+            'allow-image-preview' => true,
+            'label-idle' => 'Drop files here...',
+            'acceptedExtensions' => ['jpg', 'jpeg', 'png'],
+        ],
         'name' => [
             'type' => '_name',
             'col' => [
