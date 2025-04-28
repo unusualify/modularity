@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Unusualify\Modularity\Events\ModularityUserRegistered;
@@ -27,6 +28,14 @@ class RegisterController extends Controller
     public function showForm()
     {
         return view(modularityBaseKey() . '::auth.register', [
+            'attributes' => [
+                'bannerDescription' => ___('authentication.banner-description'),
+                'bannerSubDescription' => Lang::has('authentication.banner-sub-description') ? ___('authentication.banner-sub-description') : null,
+                'redirectButtonText' => ___('authentication.redirect-button-text'),
+                'redirectUrl' => Route::has(modularityConfig('auth_guest_route'))
+                    ? route(modularityConfig('auth_guest_route'))
+                    : null,
+            ],
             'formAttributes' => [
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
                 'title' => [
@@ -269,6 +278,7 @@ class RegisterController extends Controller
     {
         $validator = $this->validator($request->all());
 
+        return response()->json($request->all());
         if ($validator->fails()) {
             return $request->wantsJson()
                 ? new JsonResponse([
