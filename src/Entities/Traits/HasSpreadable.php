@@ -20,10 +20,17 @@ trait HasSpreadable
                 // Set property to preserve data through events
                 $model->_pendingSpreadData = $model->_spread ?: $model->prepareSpreadableJson();
             } elseif ($model->_spread) {
-                // Handle existing spread updates
-                $model->spreadable()->update([
-                    'content' => $model->_spread,
-                ]);
+                if(!$model->spreadable){
+                    $model->spreadable()->create([
+                        'content' => $model->_spread,
+                    ]);
+                }else{
+                    // Handle existing spread updates
+                    $model->spreadable()->update([
+                        'content' => $model->_spread,
+                        'updated_at' => now(),
+                    ]);
+                }
             }
 
             $model->cleanSpreadableAttributes();
