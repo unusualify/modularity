@@ -23,6 +23,7 @@ import {
   useTableItemActions,
   useTableModals,
   useTableActions,
+  useTableState
 } from '@/hooks/table'
 
 
@@ -164,11 +165,14 @@ export default function useTable (props, context) {
     return props.endpoints.index.replace(/\/$/, '').split('?')[0] === window.location.href.replace(/\/$/, '').split('?')[0]
   })
 
+  const { setLastParameters, lastParameters } = useTableState()
+
   const form = ref(null)
   const loading = ref(false)
   const options = ref(_.pick({
     ...(props.defaultTableOptions ?? {}),
     ...(props.tableOptions ?? {}),
+    ...(isStoreTable.value ? lastParameters : {})
   }, ['itemsPerPage', 'page', 'sortBy', 'groupBy', 'search']))
 
   const totalNumberOfElements = ref(props.total ?? -1)
@@ -225,6 +229,10 @@ export default function useTable (props, context) {
     if(_.isObject(props.endpoints) && props.endpoints.index) {
       await api.get( props.endpoints.index, payload,
         function(response){
+
+          if(isStoreTable.value){
+            setLastParameters(payload)
+          }
 
           updateResponseFields(response)
 
