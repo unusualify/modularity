@@ -84,14 +84,47 @@ trait TableActions
                 $action['endpoint'] = route($routeName);
             }
 
-            if (isset($action['href']) && ($routeName = Route::hasAdmin($action['href']))) {
-                $route = Route::getRoutes()->getByName($routeName);
+            if (isset($action['href'])) {
+                $routeName = $action['href'];
+                $params = [];
 
-                if(count($route->parameterNames()) > 0){
-                    throw new \Exception('Action route must not have parameters: ' . $action['href']);
+                if(is_array($action['href'])){
+                    $routeName = $action['href'][0];
+                    $params = $action['href'][1] ?? [];
                 }
 
-                $action['href'] = route($routeName);
+                if(($routeName = Route::hasAdmin($routeName))){
+                    $route = Route::getRoutes()->getByName($routeName);
+
+                    if(count($route->parameterNames())){
+                        throw new \Exception('Action route must not have parameters: ' . $routeName);
+                    }
+
+                    $url = route($routeName);
+
+                    if (count($params) > 0) {
+                        // 2) JSON‐encode any value that is an array or object
+                        $flat = collect($params)
+                            ->mapWithKeys(function($value, $key) {
+                                return [
+                                    $key => is_array($value) || is_object($value)
+                                                ? json_encode($value, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE)
+                                                : $value
+                                ];
+                            })
+                            ->all();
+
+                        // 3) Build the query string (RFC3986 encoding)
+                        //    e.g. filter={"foo":"bar"}&page=2
+                        $qs = http_build_query($flat, '', '&', PHP_QUERY_RFC3986);
+
+                        // 4) Append “?” + query string to the URL
+                        $url .= '?' . $qs;
+                    }
+
+                    $action['href'] = $url;
+                }
+
             }
 
             $acc[] = array_merge_recursive_preserve($defaultTableAction, $action);
