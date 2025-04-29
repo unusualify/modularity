@@ -53,7 +53,7 @@
                 <template #right>
                   <div class="d-flex align-center">
                     <v-btn v-if="hasFullscreenButton" :icon="full ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="compact" @click="toggleFullscreen"/>
-                    <v-btn icon="$close" variant="plain" size="compact" color="grey-darken-5" rounded @click="close()" />
+                    <v-btn v-if="hasCloseButton" icon="$close" variant="plain" size="compact" color="grey-darken-5" rounded @click="close()" />
                   </div>
                 </template>
               </ue-title>

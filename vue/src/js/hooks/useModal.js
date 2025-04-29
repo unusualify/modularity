@@ -26,7 +26,7 @@ export const makeModalProps = propsFactory({
     type: String,
     default: null
   },
-  noCloseButton: {
+  hasCloseButton: {
     type: Boolean,
     default: false
   },
