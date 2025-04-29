@@ -12,6 +12,7 @@
         autocomplete="off"
         return-object
         @update:model-value="choose"
+        :disabled="disabled"
       >
         <template #selection>
           <div v-if="activeCountry && activeCountry.iso2" :class="activeCountry.iso2.toLowerCase()" class="vti__flag" />
@@ -44,6 +45,7 @@
           @keydown="onKeyDown"
           @keyup.enter="onEnter"
           @keyup.space="onSpace"
+          :disabled="disabled"
         >
 
       </v-text-field>
@@ -140,6 +142,10 @@ export default {
     mode: {
       type: String,
       default: () => getDefault('mode')
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     },
     disabledFetchingCountry: {
       type: Boolean,
