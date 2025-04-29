@@ -56,6 +56,16 @@ return [
             ],
             'inputs' => [
                 [
+                    'type' => 'filepond-avatar',
+                    // 'label' => 'Profile Avatar',
+                    'name' => 'avatar',
+                    'allow-image-preview' => true,
+                    'label-idle' => 'Drop files here...',
+                    'rules' => 'sometimes|required:array',
+                    'disabled' => true,
+                    'noSubmit' => true,
+                ],
+                [
                     'type' => 'text',
                     'label' => 'Email',
                     'name' => 'email',
@@ -1312,6 +1322,17 @@ return [
                 ],
             ],
             'inputs' => [
+                [
+                    'type' => 'checkbox',
+                    'name' => 'is_personal',
+                    'color' => 'primary',
+                    'label' => 'I don\'t have a company',
+                    'col' => ['cols' => 12],
+                    'hideDetails' => false,
+                    // 'creatable' => 'hidden',
+                    // 'editable' => 'hidden',
+                    'spreadable' => true,
+                ],
                 [
                     'type' => 'text',
                     'title' => 'Name',
