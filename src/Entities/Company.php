@@ -5,10 +5,12 @@ namespace Unusualify\Modularity\Entities;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Unusualify\Modularity\Database\Factories\CompanyFactory;
+use Unusualify\Modularity\Entities\Traits\HasSpreadable;
 
 class Company extends Model
 {
-    use HasFactory;
+    use HasFactory,
+        HasSpreadable;
 
     /**
      * Create a new factory instance for the model.
