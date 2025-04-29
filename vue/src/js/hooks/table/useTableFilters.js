@@ -1,7 +1,7 @@
 // hooks/table/useTableFilters.js
 import { computed, ref } from 'vue'
 import _ from 'lodash-es'
-
+import { useTableState } from '@/hooks/table'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
 export const makeTableFiltersProps = propsFactory({
@@ -32,13 +32,19 @@ export const makeTableFiltersProps = propsFactory({
 })
 
 export default function useTableFilters(props) {
+  const { lastParameters, queryParameters } = useTableState()
+
   // Search
-  const search = ref(props.searchInitialValue ?? '')
+  const search = ref(lastParameters.search ?? props.searchInitialValue ?? '')
   const searchModel = ref(search.value)
 
   // Filter Status
   const mainFilters = ref( props.filterList ?? [])
-  const activeFilterSlug = ref(props.navActive ?? 'all')
+  let initialFilterSlug = lastParameters.filter?.status ?? props.navActive ?? 'all'
+  if(mainFilters.value.length > 0 && !_.find(mainFilters.value, { slug: initialFilterSlug })){
+    initialFilterSlug = 'all'
+  }
+  const activeFilterSlug = ref(initialFilterSlug)
   const activeFilter = computed(() => _.find(mainFilters.value, { slug: activeFilterSlug.value }) )
 
   // Filter Button Options
