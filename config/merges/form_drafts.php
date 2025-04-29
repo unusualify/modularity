@@ -43,12 +43,6 @@ return [
             ],
             'rules' => 'required|email|unique_table',
         ],
-        'phone' => [
-            'type' => '_phone',
-            'col' => [
-                'sm' => 6,
-            ],
-        ],
         'country' => [
             'type' => '_name',
             'name' => 'country',
@@ -57,6 +51,12 @@ return [
                 'sm' => 6,
             ],
             // 'rules' => 'min:3',
+        ],
+        'phone' => [
+            'type' => '_phone',
+            'col' => [
+                'sm' => 6,
+            ],
         ],
         'language' => [
             'type' => '_language',
@@ -104,11 +104,64 @@ return [
         ],
     ],
     'company' => [
+        'is_personal' => [
+            'type' => 'checkbox',
+            'name' => 'is_personal',
+            'color' => 'primary',
+            'label' => 'I don\'t have a company',
+            'col' => ['cols' => 12],
+            'hideDetails' => false,
+
+            'ext' => [
+                [
+                    'set',
+                    'name',
+                    'disabled',
+                    'disable_value.*.value',
+                ],
+                [
+                    'set',
+                    'tax_id',
+                    'disabled',
+                    'disable_value.*.value',
+                ],
+                [
+                    'set',
+                    'phone',
+                    'disabled',
+                    'disable_value.*.value',
+                ],
+                [
+                    'set',
+                    'email',
+                    'disabled',
+                    'disable_value.*.value',
+                ]
+            ],
+            'disable_value' => [
+                [
+                    'id' => 0,
+                    'value' => 0,
+                ],
+                [
+                    'id' => 1,
+                    'value' => 1,
+                ],
+            ]
+        ],
         'name' => [
             'type' => '_name',
-            'label' => 'Company',
+            'label' => 'Company Name',
             'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:3',
+            // 'rules' => 'sometimes|min:3',
+        ],
+        'tax_id' => [
+            'type' => 'text',
+            'name' => 'tax_id',
+            'label' => 'Tax ID',
+            'default' => '',
+            'col' => ['sm' => 6],
+            // 'rules' => 'sometimes|min:3',
         ],
         'address' => [
             'type' => 'text',
@@ -127,18 +180,18 @@ return [
             'col' => ['sm' => 6],
             'rules' => 'sometimes|min:3',
         ],
-        'state' => [
-            'type' => 'text',
-            'name' => 'state',
-            'label' => 'State/Province',
-            'default' => '',
-            'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:3',
-        ],
         'country' => [
             'type' => 'text',
             'name' => 'country',
             'label' => 'Country',
+            'default' => '',
+            'col' => ['sm' => 6],
+            'rules' => 'sometimes|min:3',
+        ],
+        'state' => [
+            'type' => 'text',
+            'name' => 'state',
+            'label' => 'State/Province',
             'default' => '',
             'col' => ['sm' => 6],
             'rules' => 'sometimes|min:3',
@@ -155,22 +208,23 @@ return [
             'type' => '_phone',
             'col' => ['sm' => 6],
         ],
-        'vat_number' => [
+        // 'vat_number' => [
+        //     'type' => 'text',
+        //     'name' => 'vat_number',
+        //     'label' => 'VAT Number',
+        //     'default' => '',
+        //     'col' => ['sm' => 6],
+        //     'rules' => 'sometimes|min:3',
+        // ],
+        'email' => [
             'type' => 'text',
-            'name' => 'vat_number',
-            'label' => 'VAT Number',
+            'name' => 'email',
+            'label' => 'Work E-mail',
             'default' => '',
             'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:3',
+            'rules' => 'sometimes|email',
         ],
-        'tax_id' => [
-            'type' => 'text',
-            'name' => 'tax_id',
-            'label' => 'Tax ID',
-            'default' => '',
-            'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:3',
-        ],
+
     ],
     'profile_shortcut' => [
         'id' => [
