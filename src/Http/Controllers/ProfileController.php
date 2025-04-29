@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
+use Modules\SystemUser\Http\Requests\CompanyRequest;
 use Modules\SystemUser\Repositories\CompanyRepository;
 use Modules\SystemUser\Repositories\UserRepository;
 use Unusualify\Modularity\Entities\Enums\Permission;
@@ -78,7 +79,6 @@ class ProfileController extends BaseController
 
         $userPasswordSchema = $this->createFormSchema(getFormDraft('user_password'));
         $userPasswordFields = $this->userRepository->getFormFields($user, $userPasswordSchema, noSerialization: false);
-        // dd($userSchema);
 
         $personalForm = UComponent::makeUeForm();
 
@@ -102,18 +102,21 @@ class ProfileController extends BaseController
         }
 
         $personalForm = $personalForm->setAttributes([
-            'class' => 'h-50',
-            'fillHeight' => true,
-            'pushButtonToBottom' => true,
-            'formClass' => 'elevation-2 rounded',
+            'class' => '',
+            // 'style' => 'min-height: 480px',
+            // 'fillHeight' => true,
+            // 'pushButtonToBottom' => true,
+            'formClass' => 'elevation-2 rounded h-100',
+
             'title' => [
-                'text' => __('Personal Information'),
+                'text' => __('User Profile'),
                 // 'tag' => 'p',
                 'type' => 'h6',
                 'weight' => 'bold',
                 'transform' => '',
                 'align' => 'center',
                 'justify' => 'start',
+                'color' => 'primary',
                 // 'margin' => 'b-11',
             ],
 
@@ -156,13 +159,15 @@ class ProfileController extends BaseController
                         'formClass' => 'elevation-2 rounded',
 
                         'title' => [
-                            'text' => __('Update Password'),
+                            'text' => __('Security'),
                             // 'tag' => 'p',
                             'type' => 'h6',
                             'weight' => 'bold',
                             'transform' => '',
                             'align' => 'center',
                             'justify' => 'start',
+
+                            'color' => 'primary',
                             // 'margin' => 'y-6',
                         ],
 
@@ -183,7 +188,9 @@ class ProfileController extends BaseController
 
         if ($user->company) {
             $companySchema = $this->createFormSchema(getFormDraft('company'));
-            $companyFields = $this->companyRepository->getFormFields(auth()->user()->company, $companySchema);
+            $company = auth()->user()->company;
+            $company = $this->companyRepository->getById($company->id);
+            $companyFields = $this->companyRepository->getFormFields($company, $companySchema);
 
             $companyFields['country_id'] = 1;
             $companyFields['city_id'] = 1;
@@ -199,13 +206,13 @@ class ProfileController extends BaseController
 
                             'formClass' => 'elevation-2 rounded',
                             'title' => [
-                                'text' => __('Company Information'),
-                                'tag' => 'p',
+                                'text' => __('Billing Profile'),
                                 'type' => 'h6',
                                 'weight' => 'bold',
                                 'transform' => '',
                                 'align' => 'center',
-                                'justify' => 'left',
+                                'justify' => 'start',
+                                'color' => 'primary',
                                 // 'margin' => 'y-6',
                             ],
                             // 'editable' => true,
@@ -290,25 +297,14 @@ class ProfileController extends BaseController
      * @param int|null $submoduleId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateCompany()
+    public function updateCompany(CompanyRequest $request)
     {
         // dd($user);
         $id = auth()->user()->company_id;
 
         $item = $this->companyRepository->getById($id);
 
-        // $item = auth()->user();
-        // dd($item);
-
-        $input = $this->request->all();
-
-        $formRequest = $this->validateFormRequest();
-
-        // dd($formRequest);
-
-        $this->companyRepository->update($id, $formRequest->all());
-
-        // $item->update($formRequest->all());
+        $this->companyRepository->update($id, $request->all());
 
         activity()->performedOn($item)->log('updated');
 
