@@ -3,6 +3,10 @@ import { ref, watch } from 'vue';
 import { useInput, makeInputProps, makeInputEmits, makeFilepondProps } from '@/hooks';
 
 const props = defineProps({
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
   ...makeInputProps(),
   ...makeFilepondProps(),
 });
@@ -24,7 +28,7 @@ const fileLoading = ref(false);
 const FilepondRef = ref(null);
 
 const browse = () => {
-  if (fileLoading.value) {
+  if (fileLoading.value || props.disabled) {
     return;
   }
   FilepondRef.value.browse();
@@ -44,7 +48,7 @@ const deactivateLoading = () => {
   <div class="v-input-filepond__avatar-wrapper" @click="browse" >
     <v-avatar
       size="90"
-      class="cursor-pointer"
+      :class="disabled ? '' : 'cursor-pointer'"
     >
       <v-img
         v-if="Input.input.value.length > 0"
@@ -68,7 +72,7 @@ const deactivateLoading = () => {
         color="success"
         indeterminate
       ></v-progress-circular>
-      <v-icon v-else size="default">mdi-account-edit-outline</v-icon>
+      <v-icon :disabled="disabled" size="default">mdi-account-edit-outline</v-icon>
     </div>
   </div>
   <v-input-filepond
