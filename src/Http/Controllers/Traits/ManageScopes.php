@@ -209,7 +209,13 @@ trait ManageScopes
             $searchFilters['search'] = $this->request->get('search');
         }
 
-        return array_merge($searchFilters, (json_decode($this->request->get('filter'), true) ?? []));
+        $filter = $this->request->get('filter');
+
+        if(is_string($filter)){
+            $filter = json_decode($filter, true);
+        }
+
+        return array_merge($searchFilters, $filter ?? []);
     }
 
     /**
