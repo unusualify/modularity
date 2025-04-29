@@ -4,7 +4,7 @@ namespace Unusualify\Modularity\Repositories\Traits;
 
 trait SpreadableTrait
 {
-    protected function beforeSaveSpreadTrait($object, $fields)
+    protected function beforeSaveSpreadableTrait($object, $fields)
     {
         // Get the spreadable model instance
         // dd($object->_spread);
@@ -14,6 +14,14 @@ trait SpreadableTrait
         // if (!$spreadableModel) {
         //     return;
         // }
+        if (!$spreadableModel && $object->exists) {
+            $object->spreadable()->create();
+        }
+
+        if (!$spreadableModel) {
+            return;
+        }
+
         $currentJson = $spreadableModel->content;
         $newJson = array_merge($currentJson, $fields['_spread'] ?? []);
         // Update the spreadable JSON
@@ -34,7 +42,7 @@ trait SpreadableTrait
      * @param array $fields
      * @return array
      */
-    protected function prepareFieldsBeforeSaveSpreadTrait($object, $fields)
+    protected function prepareFieldsBeforeSaveSpreadableTrait($object, $fields)
     {
         // Get current JSON data
         // $currentJson = json_decode($object->spreadable->json ?? '{}', true);
