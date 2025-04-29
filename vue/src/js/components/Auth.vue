@@ -112,7 +112,7 @@ export default {
     },
     bannerDescription: {
       type: String,
-      default: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      default: ''
     },
     bannerSubDescription: {
       type: String,
@@ -128,7 +128,7 @@ export default {
     },
     redirectButtonText: {
       type: String,
-      default: 'CONTINUE WITHOUT LOGIN'
+      default: ''
     },
     noDivider: {
       type: [Boolean, Number],
