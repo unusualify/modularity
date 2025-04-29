@@ -109,3 +109,23 @@ export function addParametersToUrl(url, params, prefix) {
   return url + string
 }
 
+/**
+ * Remove the given keys from window.location.search
+ * and update the URL via history.replaceState (no reload).
+ *
+ * @param {string[]} keysToRemove
+ */
+export function removeQueryKeys(keysToRemove = []) {
+  const url = new URL(window.location.href)
+
+  // delete each key
+  keysToRemove.forEach(key => url.searchParams.delete(key))
+
+  // build the new URL (pathname + updated search)
+  const newUrl = url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : '')
+
+  // replace browser state (no page reload)
+  // window.history.replaceState({}, '', newUrl)
+  window.history.pushState({}, '', newUrl)
+}
+
