@@ -180,5 +180,43 @@ return [
                 ],
             ],
         ],
+        'price' => [
+            'name' => 'Price',
+            'headline' => 'Prices',
+            'url' => 'prices',
+            'route_name' => 'price',
+            'icon' => '',
+            'table_options' => [
+                'createOnModal' => true,
+                'editOnModal' => true,
+                'isRowEditing' => false,
+                'rowActionsType' => 'inline',
+            ],
+            'headers' => [
+                [
+                    'title' => 'Id',
+                    'key' => 'id',
+                ],
+                [
+                    'title' => 'Priceable',
+                    'key' => 'priceable_type',
+                ],
+                [
+                    'title' => 'Priceable Id',
+                    'key' => 'priceable_id',
+                ],
+            ],
+            'inputs' => [
+                [
+                    'name' => 'priceable_type',
+                    'label' => 'Priceable Type',
+                    'type' => 'select',
+                    'options' => [
+                        'priceable_type' => 'Priceable Type',
+                    ],
+                ],
+
+            ],
+        ],
     ],
 ];

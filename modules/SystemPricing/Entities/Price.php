@@ -2,13 +2,14 @@
 
 namespace Modules\SystemPricing\Entities;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Modules\SystemPayment\Entities\Payment;
+use Modules\SystemPricing\Entities\Mutators\PriceMutators;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 
 class Price extends \Oobook\Priceable\Models\Price
 {
-    use ModelHelpers;
+    use ModelHelpers,
+        PriceMutators;
 
     public static $priceSavingKey = 'price_value';
 
@@ -19,7 +20,7 @@ class Price extends \Oobook\Priceable\Models\Price
     ];
 
     protected $appends = [
-        'total_price',
+        'total_amount',
     ];
 
     /**
@@ -38,95 +39,6 @@ class Price extends \Oobook\Priceable\Models\Price
 
             'discount_percentage' => 0.00,
         ];
-    }
-
-    /**
-     * This will make sure that the submitted amount in Nova
-     * is multiplied by 100 so we can store it in cents.
-     * @param [type] $amount [description]
-     */
-    // protected function setRawPriceAttribute(float $amount)
-    // {
-    //     $this->attributes['raw_price'] = $amount * 100;
-    // }
-
-    protected function rawPrice(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => $value,
-            set: fn ($value) => $value * 100,
-        );
-    }
-
-    protected function vatPercentage(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => ($this->vat_amount / $this->raw_price) * 100,
-        );
-    }
-
-    protected function hasDiscount(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => $this->discount_percentage > 0,
-        );
-    }
-
-    protected function rawDiscount(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => (int) (($this->raw_price) * ($this->discount_percentage / 100)),
-        );
-    }
-
-    protected function subTotalPrice(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => (int) (($this->raw_price + $this->vat_amount)),
-        );
-    }
-
-    protected function totalDiscount(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => (int) (($this->raw_price + $this->vat_amount) * ($this->discount_percentage / 100)),
-        );
-    }
-
-    protected function totalPrice(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => (int) (($this->raw_price + $this->vat_amount) - $this->total_discount),
-        );
-    }
-
-
-    protected function currencyISO4217(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => $this->currency->iso_4217,
-        );
-    }
-
-    protected function currencyISO4217Number(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => $this->currency->iso_4217_number,
-        );
-    }
-
-    protected function isPaid(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => $this->payment('COMPLETED')->exists(),
-        );
-    }
-
-    protected function isUnpaid(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => ! $this->isPaid,
-        );
     }
 
     public function vatRate(): \Illuminate\Database\Eloquent\Relations\BelongsTo
