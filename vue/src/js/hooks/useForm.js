@@ -162,8 +162,6 @@ export default function useForm(props, context) {
   const issetModel = ref(props.modelValue ? true : false)
   const issetSchema = ref(props.schema ? true : false)
 
-  __log(issetModel.value, issetSchema.value)
-
   const formLoading = ref(false)
   const formErrors = ref({})
 
@@ -457,7 +455,6 @@ export default function useForm(props, context) {
     handleInput: (event) => {
       const { on, key, obj } = event
       if (on === 'input' && !!key) {
-        __log('handleInput', key, obj, states.serverValid)
         if (!states.serverValid) {
           resetSchemaError(key)
         }

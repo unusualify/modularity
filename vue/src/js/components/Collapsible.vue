@@ -21,18 +21,13 @@
       />
     </div>
 
-    <transition
-      name="expand"
-      @enter="enter"
-      @after-enter="afterEnter"
-      @leave="leave"
-    >
-      <div v-if="isOpen" class="ue-collapsible__content">
+    <VExpandTransition>
+      <div v-show="isOpen" class="ue-collapsible__content">
         <div :class="['ue-collapsible__content-inner', `px-${horizontalPadding} py-${verticalPadding}`]">
           <slot></slot>
         </div>
       </div>
-    </transition>
+    </VExpandTransition>
   </div>
 </template>
 
@@ -109,40 +104,6 @@ export default {
       this.isOpen = !this.isOpen;
       this.$emit('update:modelValue', this.isOpen);
       this.$emit(this.isOpen ? 'open' : 'close');
-    },
-    enter(element) {
-      const width = getComputedStyle(element).width;
-      element.style.width = width;
-      element.style.position = 'absolute';
-      element.style.visibility = 'hidden';
-      element.style.height = 'auto';
-
-      const height = getComputedStyle(element).height;
-      element.style.width = null;
-      element.style.position = null;
-      element.style.visibility = null;
-      element.style.height = 0;
-
-      // Force repaint
-      getComputedStyle(element).height;
-
-      requestAnimationFrame(() => {
-        element.style.height = height;
-      });
-    },
-    afterEnter(element) {
-      element.style.height = 'auto';
-    },
-    leave(element) {
-      const height = getComputedStyle(element).height;
-      element.style.height = height;
-
-      // Force repaint
-      getComputedStyle(element).height;
-
-      requestAnimationFrame(() => {
-        element.style.height = 0;
-      });
     }
   },
   created() {},
@@ -151,7 +112,7 @@ export default {
     if (this.isOpen && this.$el) {
       const content = this.$el.querySelector('.ue-collapsible__content');
       if (content) {
-        content.style.height = 'auto';
+        // content.style.height = 'auto';
       }
     }
   }
@@ -208,7 +169,7 @@ export default {
     &__content {
       overflow: hidden;
       transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      height: 0;
+      // height: 0;
     }
 
     &__content-inner {
