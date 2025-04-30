@@ -309,11 +309,12 @@ class RegisterController extends Controller
 
     public function rules()
     {
+        $usersTable = modularityConfig('tables.users', 'um_users');
         return [
             'name' => ['required', 'string', 'max:255'],
             //Surname is not mandatory.
             //'surname' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:admin_users,email'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:' . $usersTable . ',email'],
             'password' => ['required', 'string', 'min:8'],
         ];
     }

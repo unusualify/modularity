@@ -143,7 +143,7 @@ class CreateSuperAdminCommand extends BaseCommand
                 hint: '',
                 required: true,
                 validate: fn ($value) => match (true) {
-                    DB::table(modularityConfig('tables.users', 'admin_users'))->where('email', $value)->exists() => $value . ' is already in use. Please use an unique e-mail',
+                    DB::table(modularityConfig('tables.users', 'um_users'))->where('email', $value)->exists() => $value . ' is already in use. Please use an unique e-mail',
                     mb_strlen($value) > 255 => 'Please enter maximum 255 characters',
                     ! filter_var($value, FILTER_VALIDATE_EMAIL) => 'Please enter a valid email pattern',
                     default => null,
@@ -211,7 +211,7 @@ class CreateSuperAdminCommand extends BaseCommand
      */
     private function validateEmail($email)
     {
-        $admin_user_table = $this->config->get(env('MODULARITY_BASE_NAME', 'modularity') . '.table.users', 'admin_users');
+        $admin_user_table = $this->config->get(env('MODULARITY_BASE_NAME', 'modularity') . '.table.users', 'um_users');
 
         return $this->validatorFactory->make(['email' => $email], [
             'email' => 'required|email|max:255|unique:' . $admin_user_table,

@@ -249,6 +249,6 @@ if (! function_exists('createDefaultRevisionsTableFields')) {
         $table->timestamps();
         $table->json('payload');
         $table->foreign("{$tableNameSingular}_id")->references('id')->on("{$tableNamePlural}")->onDelete('cascade');
-        $table->foreign('user_id')->references('id')->on(modularityConfig('tables.users', 'admin_users'))->onDelete('set null');
+        $table->foreign('user_id')->references('id')->on(modularityConfig('tables.users', 'um_users'))->onDelete('set null');
     }
 }
