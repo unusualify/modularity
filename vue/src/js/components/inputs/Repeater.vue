@@ -147,6 +147,18 @@
                           </template>
 
                         </v-custom-form-base>
+                        <!-- <ue-form
+                          :id="`ue-repeater-form-${index}`"
+                          class="w-100 h-100"
+                          :modelValue="item"
+                          @update:modelValue="onUpdateRepeaterInput($event, index)"
+                          :schema="repeaterSchemas[index]"
+                          @update:schema="console.log('update:schema', repeaterSchemas[index], $event)"
+                          :rowAttribute="formRowAttribute"
+
+                          no-default-form-padding
+                        >
+                        </ue-form> -->
                       </div>
                     </div>
                   </template>
