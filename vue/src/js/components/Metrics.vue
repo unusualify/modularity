@@ -26,6 +26,14 @@
       type: String,
       default: null
     },
+    hasGutter: {
+      type: Boolean,
+      default: false
+    },
+    gutterStep: {
+      type: Number,
+      default: 1
+    },
     rowClass: {
       type: String,
       default: null
@@ -81,8 +89,7 @@
   const titleClasses = computed(() => {
     return [
       props.color ? `text-${props.color}` : '',
-      'font-weight-medium',
-      'text-body-1'
+      'font-weight-medium text-body-1 text-wrap',
     ];
   });
 
@@ -96,8 +103,9 @@
 
   const rowClasses = computed(() => {
     return [
-      'd-flex flex-wrap ga-5',
-      props.rowClass ? props.rowClass : ''
+      'd-flex flex-wrap ga-4',
+      props.rowClass ? props.rowClass : '',
+      props.hasGutter ? `mx-n${props.gutterStep}` : ''
     ];
   });
 
@@ -146,7 +154,7 @@
     <!-- Header with title and date -->
     <v-card-title :class="headerClasses">
       <div :class="titleClasses">{{ title }}</div>
-      <div :class="filterClasses">
+      <div :class="filterClasses" style="width: 250px;">
         <v-date-input v-if="endpoint"
           v-model="dateRangeModel"
           :Xlabel="$t('')"
@@ -163,7 +171,7 @@
 
           :disabled="dateRangeLoading"
 
-          width="300"
+          class="w-100"
         >
           <!-- <template v-slot:actions="{ save, cancel, isPristine }">
             sss
