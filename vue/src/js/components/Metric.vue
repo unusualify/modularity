@@ -60,7 +60,7 @@
   const cardClasses = computed(() => {
     return {
       'd-inline-block': !props.noInline,
-      'metric-card': true,
+      'ue-metric': true,
       'text-center': props.center,
       'py-1 px-1': !props.dense,
       // 'py-2 px-2': !props.dense
@@ -92,7 +92,7 @@
     :color="cardColor"
     :class="cardClasses"
   >
-    <v-card-text>
+    <v-card-text class="pa-3 pr-0">
       <div class="d-flex">
         <div v-if="appendIcon" class="d-flex align-center justify-center me-2">
           <v-icon
@@ -118,6 +118,6 @@
 </template>
 
 <style scoped lang="sass">
-  .metric-card
+  .ue-metric
     transition: all 0.2s
 </style>
