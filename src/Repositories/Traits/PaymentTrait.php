@@ -93,7 +93,7 @@ trait PaymentTrait
 
             if (count($paymentRelations) > 0) {
 
-                $totalPrice = 0;
+                $totalAmount = 0;
                 $calculated = false;
 
                 // dd($relations);
@@ -126,7 +126,7 @@ trait PaymentTrait
 
                                 if (! is_null($price)) {
                                     $calculated = true;
-                                    $totalPrice += $price->raw_price;
+                                    $totalAmount += $price->raw_amount;
                                 }
                             }
                         }
@@ -142,14 +142,13 @@ trait PaymentTrait
                         'price_type_id' => 1,
                         'vat_rate_id' => 1,
                         'currency_id' => $currencyId,
-                        $priceSavingKey => ($totalPrice / 100),
+                        $priceSavingKey => ($totalAmount / 100),
                         'role' => 'payment',
                     ]);
-                } elseif ($object->paymentPrice && $object->paymentPrice->raw_price != $totalPrice) {
+                } elseif ($object->paymentPrice && $object->paymentPrice->raw_amount != $totalAmount) {
 
-                    $object->paymentPrice->{$priceSavingKey} = $totalPrice / 100;
+                    $object->paymentPrice->{$priceSavingKey} = $totalAmount / 100;
                     $object->paymentPrice->currency_id = $currencyId;
-                    // dd($object->price, $totalPrice, $currencyId);
                     $object->paymentPrice()->save($object->paymentPrice);
                 }
 
@@ -170,14 +169,14 @@ trait PaymentTrait
 
             if ($paymentPrice) {
                 $serialized = $paymentPrice->toArray();
-                $serialized['raw_price'] = (float) $serialized['raw_price'] / 100;
+                $serialized['raw_amount'] = (float) $serialized['raw_amount'] / 100;
                 $serialized[$priceSavingKey] = (float) $serialized[$priceSavingKey] / 100;
                 $fields['payment'] = $serialized;
             } else {
                 $fields['payment'] = [
                     array_merge_recursive_preserve($defaultPriceAttributes, [
                         $priceSavingKey => 0.00,
-                        'raw_price' => 0.00,
+                        'raw_amount' => 0.00,
                         'currency_id' => Request::getUserCurrency()->id]
                     ),
                 ];

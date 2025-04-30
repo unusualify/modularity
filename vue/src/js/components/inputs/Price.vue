@@ -74,7 +74,7 @@ export default {
             vat_rate_id: 1,
             price_type_id: 1,
 
-            raw_price: 1.00,
+            raw_amount: 1.00,
             discount_percentage: 0,
           }
         ]

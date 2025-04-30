@@ -52,7 +52,7 @@ trait TableRows
                 ],
                 'conditions' => [
                     ['state.code', 'in', ['pending-payment']],
-                    ['payable_price.total_price', '>', 0],
+                    ['payable_price.total_amount', '>', 0],
                 ],
                 //  admin.system.system_payment.payment routeName
                 //  admin.crm.template/system/system-payments/pay/{price}

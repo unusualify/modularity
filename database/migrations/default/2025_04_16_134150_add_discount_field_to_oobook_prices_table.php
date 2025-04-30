@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table(config('priceable.tables.prices'), function (Blueprint $table) {
             $table->after('price_including_vat', function (Blueprint $table) {
-                $table->bigInteger('raw_price')->default(0);
+                $table->bigInteger('raw_amount')->default(0);
                 $table->decimal('discount_percentage', 5, 2)->default(0.00);
 
             });
@@ -41,7 +41,7 @@ return new class extends Migration
         // });
 
         Schema::table(config('priceable.tables.prices'), function (Blueprint $table) {
-            $table->dropColumn('raw_price');
+            $table->dropColumn('raw_amount');
             $table->dropColumn('discount_percentage');
         });
 

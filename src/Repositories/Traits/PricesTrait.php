@@ -12,7 +12,7 @@ trait PricesTrait
 {
     protected $formatableColumns = [
         'id',
-        'raw_price',
+        'raw_amount',
         'currency_id',
         'vat_rate_id',
         'price_type_id',
@@ -125,7 +125,7 @@ trait PricesTrait
                 if (isset($pricesByRole[$role])) {
                     $fields[$role] = $pricesByRole[$role]->map(function ($price) use ($priceSavingKey) {
                         return Arr::mapWithKeys(Arr::only($price->toArray(), array_merge($this->formatableColumns, [$priceSavingKey])), function ($val, $key) use ($priceSavingKey) {
-                            if (preg_match('/display_price|price_excluding|price_including|raw_price|' . $priceSavingKey . '/', $key)) {
+                            if (preg_match('/display_price|price_excluding|price_including|raw_amount|' . $priceSavingKey . '/', $key)) {
                                 return [$key => (float) $val / 100];
                             }
 
@@ -136,7 +136,7 @@ trait PricesTrait
                     $fields[$role] = [
                         array_merge_recursive_preserve($defaultPriceAttributes, [
                             $priceSavingKey => 0.00,
-                            'raw_price' => 0.00,
+                            'raw_amount' => 0.00,
                             'currency_id' => Request::getUserCurrency()->id]
                         ),
                     ];
