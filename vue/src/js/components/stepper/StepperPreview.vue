@@ -98,6 +98,8 @@
                     :icon="$lodash.includes(lastStepModel[data.fieldName], data.id) ? 'mdi-minus' : 'mdi-plus'"
                     :color="$lodash.includes(lastStepModel[data.fieldName], data.id) ? 'grey' : 'primary'"
                     @click="$emit('final-form-action', index)"
+
+                    :readonly="$lodash.includes(protectedLastStepModel[data.fieldName], data.id)"
                   />
                 </div>
               </template>
@@ -129,6 +131,10 @@ export default {
     finalFormTitle: {
       type: String,
       required: true
+    },
+    protectedLastStepModel: {
+      type: Object,
+      default: () => {}
     }
   },
 }

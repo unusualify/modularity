@@ -30,6 +30,7 @@
 
                 :preview-form-data="lastFormPreview"
                 :last-step-model="lastStepModel"
+                :protected-last-step-model="protectedLastStepModel"
                 :final-form-title="finalFormTitle"
                 @final-form-action="handleFinalFormAction"
               />
@@ -232,6 +233,10 @@
         type: Number,
         default: 0
       },
+      protectInitialValue: {
+        type: Boolean,
+        default: false
+      },
     },
     setup (props, context) {
       const inputHandlers = useInputHandlers()
@@ -269,6 +274,8 @@
 
         lastFormPreview: [],
         lastStepModel: {},
+
+        protectedLastStepModel: {},
 
 
         previewModel: [],
@@ -736,6 +743,10 @@
         }
         return data
       })
+
+      if(this.protectInitialValue){
+        this.protectedLastStepModel = this.lastStepModel
+      }
 
     }
   }
