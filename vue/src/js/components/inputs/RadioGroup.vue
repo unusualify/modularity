@@ -8,6 +8,7 @@
           :variant="input == item[itemValue] ? 'elevated' : 'outlined'"
           @click="input=item[itemValue]"
           :disabled="$attrs.disabled ?? false"
+          :readonly="protectInitialValue"
         >
           <template #prepend>
             <v-radio :value="item[itemValue]" :disabled="$attrs.disabled ?? false"></v-radio>

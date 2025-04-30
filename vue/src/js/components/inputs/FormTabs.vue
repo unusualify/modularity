@@ -266,6 +266,9 @@ export default {
       if(!__isset(acc[item.id])){
         const baseSchema = cloneDeep(props.schema)
         for(const inputName in props.tabFields){
+          if(props.protectInitialValue){
+            baseSchema[inputName]['protectInitialValue'] = true
+          }
           if(__isset(baseSchema[inputName])){
             baseSchema[inputName]['items'] = item[props.tabFields[inputName]]
           }

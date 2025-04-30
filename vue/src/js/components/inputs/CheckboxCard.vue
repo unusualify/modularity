@@ -4,6 +4,7 @@
     hideDetails="auto"
     :variant="boundProps.variant"
     class="v-input-checkbox-card"
+    :readonly="readonly"
   >
     <template v-slot:default="defaultSlot">
       <v-card
