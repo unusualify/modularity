@@ -2,7 +2,7 @@
 import { ref, computed, watch, toRefs, reactive, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
-import { cloneDeep, isEqual } from 'lodash-es'
+import { cloneDeep, isEqual, find, reduce, set, get } from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
 import { useInputHandlers, useValidation, useLocale, useItemActions } from '@/hooks'
@@ -161,6 +161,8 @@ export default function useForm(props, context) {
   // const issetSchema = ref(props.schema ? Object.keys(props.schema).length > 0 : false)
   const issetModel = ref(props.modelValue ? true : false)
   const issetSchema = ref(props.schema ? true : false)
+
+  __log(issetModel.value, issetSchema.value)
 
   const formLoading = ref(false)
   const formErrors = ref({})
@@ -368,18 +370,58 @@ export default function useForm(props, context) {
         _errors[name] = errors[name]
       }
     }
+
     for (const name in _errors) {
       if( inputSchema.value[name]) inputSchema.value[name].errorMessages = _errors[name]
+      else if (find(chunkedRawSchema.value, chunk => chunk.name === name)) {
+        const wrapInputs = reduce(inputSchema.value, (acc, input, key) => {
+          if(input.type === 'wrap') {
+            acc.push(key)
+          }
+          return acc
+        }, [])
+
+        wrapInputs.forEach(wrapKey => {
+          if(inputSchema.value[wrapKey]['schema'][name]) {
+            inputSchema.value[wrapKey]['schema'][name].errorMessages = _errors[name]
+          }
+        })
+      }
     }
   }
 
   const resetSchemaError = (key) => {
-    inputSchema.value[key].errorMessages = []
+    if(get(inputSchema.value, `${key}`)) {
+      set(inputSchema.value, `${key}.errorMessages`, [])
+      set(inputSchema.value, `${key}.error`, false)
+    }else{
+      for (const wrapKey in inputSchema.value) {
+
+        if(inputSchema.value[wrapKey]['schema']) {
+
+          for(const nestedKey in inputSchema.value[wrapKey]['schema']) {
+            if(nestedKey === key) {
+              set(inputSchema.value, `${wrapKey}.schema.${nestedKey}.errorMessages`, [])
+              set(inputSchema.value, `${wrapKey}.schema.${nestedKey}.error`, false)
+            }
+          }
+        }
+      }
+    }
   }
 
   const resetSchemaErrors = () => {
     for (const key in inputSchema.value) {
       resetSchemaError(key)
+
+      if(inputSchema.value[key]['schema']) {
+
+        for(const nestedKey in inputSchema.value[key]['schema']) {
+          if(inputSchema.value[key]['schema'][nestedKey]) {
+            resetSchemaError(`${key}.schema.${nestedKey}`)
+          }
+        }
+      }
     }
   }
 
@@ -415,6 +457,7 @@ export default function useForm(props, context) {
     handleInput: (event) => {
       const { on, key, obj } = event
       if (on === 'input' && !!key) {
+        __log('handleInput', key, obj, states.serverValid)
         if (!states.serverValid) {
           resetSchemaError(key)
         }
