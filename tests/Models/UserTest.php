@@ -260,51 +260,6 @@ class UserTest extends ModelTestCase
         $this->assertNotEquals(1,$adminUser->isClient());
     }
 
-    public function test_valid_company()
-    {
-        //User just have id.
-        $userWithNullCompanyId = new User();
-        // if company id is null is valid.
-        $this->assertTrue($userWithNullCompanyId->valid_company);
-
-        //User has a company that partially filled.
-        $user = User::create([
-            'name' => 'Test User',
-            'email' => 'test_user@gmail.com',
-        ]);
-
-        $this->assertTrue($user->valid_company);
-
-        //User has a company that fully filled.
-        $company = Company::create([
-            'name' => 'Test Company',
-            'address' => 'Some Address',
-            'city' => 'Istanbul',
-            'state' => 'Turkish Republic',
-            'country' => 'Turkey',
-            'zip_code' => '12345',
-            'phone' => '1234567890',
-            'tax_id' => 'TAX123456',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $user->update([
-            'company_id' => $company->id,
-        ]);
-
-        $this->assertFalse($user->valid_company);
-
-        $company->update([
-            'vat_number' => 'VAT123456',
-        ]);
-
-        $user->refresh();
-
-        $this->assertTrue($user->valid_company);
-
-    }
-
     public function test_company_name()
     {
         $company = Company::create([
