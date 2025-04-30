@@ -590,7 +590,16 @@ abstract class BaseController extends PanelController
         if (preg_match('/(.*)(_relation)/', $column['key'], $matches)) {
             // $field = $column['key'];
             $relationshipName = $matches[1];
-            $relation = $item->{$matches[1]}();
+            $exploded = explode('.', $relationshipName);
+
+            $relation = null;
+            if(count($exploded) > 1){
+                $relationshipName = $exploded[1];
+                $item = $item->{$exploded[0]};
+            }else{
+                $relation = $item->{$relationshipName}();
+            }
+
             $itemTitle = $column['itemTitle'] ?? 'name';
 
             try {

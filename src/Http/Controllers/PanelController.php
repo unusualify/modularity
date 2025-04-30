@@ -725,13 +725,32 @@ abstract class PanelController extends CoreController
     {
         $model_relations = [];
 
-        // if(@method_exists($this->repository->getModel(), 'getDefinedRelations')){
-        //     $model_relations = $this->repository->getDefinedRelations();
-        // }
 
-        if (@method_exists($this->repository->getModel(), 'definedRelations')) {
-            $model_relations = $this->repository->definedRelations();
+        $exploded = explode('.', $key);
+
+        $moduleModel = $this->repository->getModel();
+        $isNestedKey = count($exploded) > 1;
+        $lastIndex = count($exploded) - 1;
+        foreach ($exploded as $i => $relation) {
+            if (@method_exists($moduleModel, 'definedRelations')) {
+                $relations = $moduleModel->definedRelations();
+
+                if($i == 0){
+                    $model_relations = $relations;
+                }
+
+                if($isNestedKey){
+                    if(in_array($relation, $relations)){
+                        if($i == $lastIndex){
+                            return true;
+                        }
+
+                        $moduleModel = $moduleModel->{$relation}()->getModel();
+                    }
+                }
+            }
         }
+
 
         if (preg_match('/(.*)(_id)/', $key, $matches)) {
             $key = pluralize($matches[1]);
