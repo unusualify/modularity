@@ -4,13 +4,14 @@ namespace Modules\SystemPayment\Entities;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Modules\SystemPricing\Entities\Price;
 use Oobook\Priceable\Models\Currency;
-use Oobook\Priceable\Models\Price;
+use Unusualify\Modularity\Entities\Traits\HasFileponds;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 
 class Payment extends \Unusualify\Payable\Models\Payment
 {
-    use ModelHelpers;
+    use ModelHelpers, HasFileponds;
 
     /**
      * Get the paymentService that owns the Payment.
