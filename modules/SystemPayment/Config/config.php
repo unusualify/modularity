@@ -113,36 +113,69 @@ return [
             'icon' => '$submodule',
             'title_column_key' => 'name',
             'table_options' => [
-                'createOnModal' => true,
+                'createOnModal' => false,
                 'editOnModal' => true,
                 'isRowEditing' => false,
                 'rowActionsType' => 'inline',
             ],
             'headers' => [
                 [
-                    'title' => 'Name',
-                    'key' => 'name',
+                    'title' => 'Owner Id',
+                    'key' => 'price.priceable',
+                    'itemTitle' => 'id',
                     'formatter' => [
                         'edit',
                     ],
-                    'searchable' => true,
+                    // 'itemTitle' => 'content->headline',
                 ],
                 [
-                    'title' => 'Payment Service',
+                    'title' => 'Owner Type',
+                    'key' => 'price',
+                    'itemTitle' => 'priceable_type',
+                    // 'itemTitle' => 'content->headline',
+                ],
+                [
+                    'title' => 'Service',
                     'key' => 'paymentService',
+                    'itemTitle' => 'title',
+                    'formatter' => [
+                        'chip',
+                        [
+                            'variant' => 'outlined',
+                            'color' => 'primary',
+                        ]
+                    ],
                 ],
                 [
-                    'title' => 'System Payment Parent',
-                    'key' => 'systemPaymentable',
+                    'title' => 'Status',
+                    'key' => 'status',
+                    'formatter' => [
+                        'chip',
+                        [
+                            'size' => 'small',
+                        ]
+                    ],
                 ],
                 [
                     'title' => 'Created Time',
                     'key' => 'created_at',
+                    'visible' => false,
                     'formatter' => [
                         'date',
-                        'long',
+                        'medium',
                     ],
-                    'searchable' => true,
+                    'searchable' => false,
+                    'sortable' => true,
+                ],
+                [
+                    'title' => 'Last Update',
+                    'key' => 'updated_at',
+                    'formatter' => [
+                        'date',
+                        'numeric',
+                    ],
+                    'searchable' => false,
+                    'sortable' => true,
                 ],
                 [
                     'title' => 'Actions',
@@ -152,16 +185,22 @@ return [
             ],
             'inputs' => [
                 [
-                    'name' => 'name',
-                    'label' => 'Name',
-                    'type' => 'text',
-                ],
-                [
                     'type' => 'select',
                     'name' => 'payment_service_id',
                     'label' => 'Payment Service',
                     'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentServiceRepository',
                     'rules' => 'sometimes|required',
+                    'editable' => false,
+                ],
+                [
+                    'type' => 'filepond',
+                    'name' => 'invoice',
+                    'label' => 'Invoice',
+                    'maxFiles' => 1,
+                    'conditions' => [
+                        ['status', '=', 'COMPLETED'],
+                    ],
+                    'acceptedExtensions' => ['pdf'],
                 ],
             ],
         ],
