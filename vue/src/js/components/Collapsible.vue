@@ -145,9 +145,7 @@ export default {
       });
     }
   },
-  created() {
-    console.log(this.isOpen)
-  },
+  created() {},
   mounted() {
     // Ensure the initial state is correct
     if (this.isOpen && this.$el) {
