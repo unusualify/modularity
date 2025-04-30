@@ -34,8 +34,8 @@
           :key="`item-${header.key}`"
           v-slot:[`item.${header.key}`]="{ item }"
           >
-          <v-btn class="ma-2" v-if="item[header.key] == '__input'" @click="input=header.id" :variant="input == header.id ? 'elevated' : 'outlined'">
-              Select
+          <v-btn class="ma-2" v-if="item[header.key] == '__input'" @click="input=header.id" :variant="input == header.id ? 'elevated' : 'outlined'" :readonly="protectInitialValue">
+              {{ $t('Select') }}
           </v-btn>
           <div v-else v-html="item[header.key]"></div>
         </template>
