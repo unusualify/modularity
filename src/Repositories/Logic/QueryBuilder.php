@@ -241,7 +241,10 @@ trait QueryBuilder
                     $translatedColumns[] = $titleColumnKey;
                 } else {
                     $columns = array_filter($columns, fn ($col) => $col !== 'name');
-                    $columns[] = "{$this->getModel()->getRouteTitleColumnKey()} as name";
+                    $titleColumnKey = $this->getModel()->getRouteTitleColumnKey();
+                    if(in_array($titleColumnKey, $tableColumns)) {
+                        $columns[] = "{$titleColumnKey} as name";
+                    }
                 }
             }
 
@@ -263,14 +266,14 @@ trait QueryBuilder
 
 
         if(method_exists($this->getModel(), 'getWith')) {
-            $with = array_merge($this->getModel()->getWith(), $with);
+            $with = array_values(array_unique(array_merge($this->getModel()->getWith(), $with)));
         }
 
-        // dd($columns, $appends, $with, $columns, $translatedColumns);
+        $columns = array_values(array_unique(array_intersect($columns, $tableColumns)));
 
         try {
             // code...
-            return $query->get($columns)->map(fn ($item) => [
+            return $query->with($with)->get($columns)->map(fn ($item) => [
                 ...collect($appends)->mapWithKeys(function ($append) use ($item) {
                     return [$append => $item->{$append}];
                 })->toArray(),
@@ -292,7 +295,6 @@ trait QueryBuilder
                 $translatedColumns,
                 $foreignableRelationships,
                 $relationships,
-                $foreignableRelationships,
                 $th,
                 array_reduce(debug_backtrace(), 'backtrace_formatter', [])
             );
