@@ -20,6 +20,10 @@ export const makeInputProps = propsFactory({
   hideIfEmpty: {
     type: Boolean,
     default: false
+  },
+  protectInitialValue: {
+    type: Boolean,
+    default: false
   }
 })
 export const makeInputEmits = [
