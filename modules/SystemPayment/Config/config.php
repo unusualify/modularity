@@ -196,7 +196,7 @@ return [
                     'type' => 'filepond',
                     'name' => 'invoice',
                     'label' => 'Invoice',
-                    'maxFiles' => 1,
+                    'max' => 1,
                     'conditions' => [
                         ['status', '=', 'COMPLETED'],
                     ],
