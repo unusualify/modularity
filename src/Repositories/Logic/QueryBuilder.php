@@ -197,7 +197,7 @@ trait QueryBuilder
      * @param null $exceptId
      * @return \Illuminate\Support\Collection
      */
-    public function list($column = 'name', $with = [], $scopes = [], $orders = [], $appends = [], $exceptId = null)
+    public function list($column = 'name', $with = [], $scopes = [], $orders = [], $appends = [], $perPage = -1, $exceptId = null, $forcePagination = false)
     {
         $query = $this->model->newQuery();
 
@@ -264,7 +264,6 @@ trait QueryBuilder
             $columns[] = $this->getModel()->{$r}()->getForeignKeyName();
         }
 
-
         if(method_exists($this->getModel(), 'getWith')) {
             $with = array_values(array_unique(array_merge($this->getModel()->getWith(), $with)));
         }
@@ -273,6 +272,25 @@ trait QueryBuilder
 
         try {
             // code...
+            if($forcePagination) {
+                $paginator = $query->with($with)->paginate($perPage);
+
+                $paginator->getCollection()->transform(fn ($item) => [
+                    ...collect($appends)->mapWithKeys(function ($append) use ($item) {
+                        return [$append => $item->{$append}];
+                    })->toArray(),
+                    ...collect($with)->mapWithKeys(function ($r) use ($item) {
+                        $r = explode('.', $r)[0];
+
+                        return [$r => $item->{$r}];
+                    })->toArray(),
+                    ...(collect($columns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
+                    ...(collect($translatedColumns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
+                ]);
+
+                return $paginator;
+            }
+
             return $query->with($with)->get($columns)->map(fn ($item) => [
                 ...collect($appends)->mapWithKeys(function ($append) use ($item) {
                     return [$append => $item->{$append}];
