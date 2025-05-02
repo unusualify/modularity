@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Entities\Traits;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Modules\SystemPayment\Entities\Payment;
 use Modules\SystemPricing\Entities\Price;
 use Money\Currency;
 use Oobook\Priceable\Facades\PriceService;
@@ -58,26 +59,37 @@ trait HasPayment
 
     public function paymentPrice(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
+        $priceTable = (new Price)->getTable();
+        $morphClass = addslashes($this->getMorphClass());
+
         return $this->morphOne(Price::class, 'priceable')
-            ->where('role', 'payment')
-            ->latest('created_at');
+            ->whereRaw("{$priceTable}.created_at = (select max(created_at) from {$priceTable} where {$priceTable}.priceable_id = '{$this->id}' and {$priceTable}.priceable_type = '{$morphClass}' and {$priceTable}.role = 'payment')");
+
+        // return $this->morphOne(Price::class, 'priceable')
+        //     ->where('role', 'payment')
+        //     ->latest('created_at');
     }
 
     public function initialPayablePrice(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
+        $priceTable = (new Price)->getTable();
+        $morphClass = addslashes($this->getMorphClass());
+
         return $this->morphOne(Price::class, 'priceable')
-            ->where('role', 'payment')
-            ->oldest('created_at');
+            ->whereRaw("{$priceTable}.created_at = (select min(created_at) from {$priceTable} where {$priceTable}.priceable_id = '{$this->id}' and {$priceTable}.priceable_type = '{$morphClass}' and {$priceTable}.role = 'payment')");
+
     }
 
     public function payablePrice(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
+        $priceTable = (new Price)->getTable();
+        $morphClass = addslashes($this->getMorphClass());
+
         return $this->morphOne(Price::class, 'priceable')
-            ->where('role', 'payment')
             // ->hasPayment(false)
             ->hasPayment(false)
             ->orWhereHas('payments', fn ($q) => $q->where('status', '!=', 'COMPLETED'))
-            ->latest('created_at');
+            ->whereRaw("{$priceTable}.created_at = (select max(created_at) from {$priceTable} where {$priceTable}.priceable_id = '{$this->id}' and {$priceTable}.priceable_type = '{$morphClass}' and {$priceTable}.role = 'payment')");
     }
 
     public function paidPrices(): \Illuminate\Database\Eloquent\Relations\MorphMany
@@ -85,6 +97,40 @@ trait HasPayment
         return $this->morphMany(Price::class, 'priceable')
             ->where('role', 'payment')
             ->hasPayment(true, 'COMPLETED');
+    }
+
+    public function payment() : \Illuminate\Database\Eloquent\Relations\HasOneThrough
+    {
+        $priceTable = (new Price)->getTable();
+        $paymentTable = (new Payment)->getTable();
+        $morphClass = $this->getMorphClass();
+
+        return $this->hasOneThrough(
+            Payment::class,
+            Price::class,
+            'priceable_id',   // Foreign key on Price table
+            'price_id',       // Foreign key on Payment table
+            'id',             // Local key on this model
+            'id'              // Local key on Price model
+        )->where("{$priceTable}.priceable_type", $morphClass)
+            ->where("{$priceTable}.role", 'payment')
+            ->latest("{$paymentTable}.created_at");
+    }
+
+    public function payments() : \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        $priceTable = (new Price)->getTable();
+        $morphClass = $this->getMorphClass();
+
+        return $this->hasManyThrough(
+            Payment::class,
+            Price::class,
+            'priceable_id',   // Foreign key on Price table
+            'price_id',       // Foreign key on Payment table
+            'id',             // Local key on this model
+            'id'              // Local key on Price model
+        )->where("{$priceTable}.priceable_type", $morphClass)
+            ->where("{$priceTable}.role", 'payment');
     }
 
     protected function totalCostExcludingVat(): Attribute
