@@ -13,6 +13,10 @@ class Payment extends \Unusualify\Payable\Models\Payment
 {
     use ModelHelpers, HasFileponds;
 
+    protected $appends = [
+        'invoice_file',
+    ];
+
     /**
      * Get the paymentService that owns the Payment.
      */
@@ -61,5 +65,14 @@ class Payment extends \Unusualify\Payable\Models\Payment
     public function currencies(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(\Modules\SystemPayment\Entities\PaymentCurrency::class);
+    }
+
+    protected function invoiceFile(): Attribute
+    {
+        $file = $this->fileponds()->where('role', 'invoice')->first();
+
+        return Attribute::make(
+            get: fn ($value) => $file ? $file->mediableFormat() : null,
+        );
     }
 }
