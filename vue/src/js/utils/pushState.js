@@ -54,8 +54,10 @@ export function replaceState (url) {
   pushState(url, true)
 }
 
-export function getURLWithoutQuery () {
-  return location.protocol + '//' + location.host + location.pathname
+export function getURLWithoutQuery (url = null) {
+  if(!url) return location.protocol + '//' + location.host + location.pathname
+
+  return getOrigin(url) + getPath(url)
 }
 
 export function getParameters (url = window.location) {
@@ -128,4 +130,13 @@ export function removeQueryKeys(keysToRemove = []) {
   // window.history.replaceState({}, '', newUrl)
   window.history.pushState({}, '', newUrl)
 }
+
+export function getOrigin(url) {
+  return new URL(url).origin
+}
+
+export function getPath(url) {
+  return new URL(url).pathname
+}
+
 
