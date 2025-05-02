@@ -468,6 +468,22 @@ abstract class PanelController extends CoreController
 
         $paginator = $this->getIndexItems(with: $with, scopes: $scopes);
 
+        $noFormatted = $this->request->get('light', false);
+
+        if($noFormatted){
+            $with = $this->request->get('eager', []);
+            $appends = $this->request->get('appends', []);
+            $column = $this->request->get('columns', [$this->titleColumnKey]);
+            $scopes = $this->request->get('scopes', []);
+            $orders = $this->request->get('orders', []);
+            $perPage = $this->request->get('itemsPerPage', $this->perPage);
+
+            return $this->getTransformer(
+                $this->repository->list(column: $column, with: $with, scopes: $scopes, orders: $orders, perPage: $perPage, appends: $appends, forcePagination: true)
+            );
+        }
+
+
         return $this->getTransformer( $this->getFormattedIndexItems($paginator) );
         // return $this->getTransformer( $paginator->toArray() );
     }
