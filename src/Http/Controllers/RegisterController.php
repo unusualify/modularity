@@ -278,7 +278,6 @@ class RegisterController extends Controller
     {
         $validator = $this->validator($request->all());
 
-        return response()->json($request->all());
         if ($validator->fails()) {
             return $request->wantsJson()
                 ? new JsonResponse([
