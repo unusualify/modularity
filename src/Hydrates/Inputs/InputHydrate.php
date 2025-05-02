@@ -138,6 +138,10 @@ abstract class InputHydrate
         foreach ($this->requirements as $attribute => $defaultValue) {
             $this->input[$attribute] ??= $defaultValue;
         }
+
+        if(isset($this->input['endpoint'])){
+            $this->input['endpoint'] = resolve_route($this->input['endpoint']);
+        }
     }
 
     /**
