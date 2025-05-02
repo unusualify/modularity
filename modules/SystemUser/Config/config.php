@@ -120,7 +120,8 @@ return [
                     ],
                 ],
                 [
-                    'type' => 'select',
+                    'type' => 'select-scroll',
+                    'componentType' => 'v-autocomplete',
                     'label' => 'Roles',
                     'name' => 'roles',
                     'rules' => 'sometimes|required',
@@ -130,7 +131,6 @@ return [
                         'md' => 6,
                     ],
                     // 'repository' => \Modules\SystemUser\Repositories\RoleRepository::class,
-                    'ext' => 'scroll',
                     'connector' => 'Role|uri',
                     'rules' => 'required',
                 ],
