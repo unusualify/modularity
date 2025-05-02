@@ -162,25 +162,7 @@ trait PaymentTrait
         if (method_exists($object, 'paymentPrice') && $object->has('paymentPrice')) {
             $priceSavingKey = Price::$priceSavingKey;
             // $query = $object->paymentPrice;
-            $defaultPriceAttributes = $object->paymentPrice()->getRelated()->defaultAttributes();
-
-            $paymentPrice = $object->paymentPrice;
-
-
-            if ($paymentPrice) {
-                $serialized = $paymentPrice->toArray();
-                $serialized['raw_amount'] = (float) $serialized['raw_amount'] / 100;
-                $serialized[$priceSavingKey] = (float) $serialized[$priceSavingKey] / 100;
-                $fields['payment'] = $serialized;
-            } else {
-                $fields['payment'] = [
-                    array_merge_recursive_preserve($defaultPriceAttributes, [
-                        $priceSavingKey => 0.00,
-                        'raw_amount' => 0.00,
-                        'currency_id' => Request::getUserCurrency()->id]
-                    ),
-                ];
-            }
+            $fields['payment'] = $object->payment;
 
         }
 
