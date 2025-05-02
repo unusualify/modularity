@@ -4,13 +4,19 @@
     v-bind="$bindAttributes()"
 
     v-model="input"
-    :class="['v-select-scroll']"
+    :class="['v-input-select-scroll']"
     :items="elements"
     :label="label"
     @update:search="searched"
     :no-filter="noFilter"
     @input.native="getItemsFromApi"
-    :return-object="false"
+    :multiple="multiple"
+    :return-object="$attrs.returnObject ?? returnObject ?? false"
+    :item-value="itemValue"
+    :item-title="itemTitle"
+
+    :loading="loading"
+    :readonly="$attrs.readonly || readonly || loading"
   >
     <template v-slot:append-item>
       <div v-if="lastPage > 0 && lastPage > page" v-intersect="endIntersect" />
@@ -20,6 +26,7 @@
 
 <script>
 import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
+import { getParameters, getURLWithoutQuery, getOrigin, getPath } from '@/utils/pushState'
 
 export default {
   name: 'v-input-select-scroll',
@@ -31,12 +38,28 @@ export default {
       type: String,
       default: 'v-autocomplete'
     },
+    itemValue: {
+      type: String,
+      default: 'id'
+    },
+    itemTitle: {
+      type: String,
+      default: 'name'
+    },
     itemsPerPage: {
       type: Number,
       default: 20
     },
     endpoint: {
       type: String,
+    },
+    multiple: {
+      type: Boolean,
+      default: false
+    },
+    items: {
+      type: Array,
+      default: () => []
     }
   },
   setup (props, context) {
@@ -47,6 +70,7 @@ export default {
   },
   data () {
     return {
+      loading: false,
       page: 1,
       limit: 100,
       lastPage: -1,
@@ -66,9 +90,12 @@ export default {
     getItemsFromApi (event) {
 
       if( !(this.page > this.lastPage) || this.lastPage < 0){
+        this.loading = true;
         return new Promise(() => {
           this.$axios.get(this.fullUrl)
             .then(response => {
+              this.loading = false;
+
               if(this.lastPage < 0)
                 this.lastPage = response.data.resource.last_page
 
@@ -83,8 +110,21 @@ export default {
               if(!!this.input){
                 let searchContinue = false;
                 let self = this
-                if(this.input && this.input.length > 0 && !self.elements.find((o) => o.id == this.input)){
-                  searchContinue = true
+
+
+                if(this.input){
+
+                  if(this.isMultiple){
+                    this.input.forEach(function(id){
+                      if(!self.elements.find((o) => o[self.itemValue] == id)){
+                        searchContinue = true
+                        return false
+                      }
+                    })
+                  }else {
+                    __log('getItemsFromApi', this.itemValue, this.input, this.elements, this.elements.find((o) => o[this.itemValue] == this.input))
+                    searchContinue = !this.elements.find((o) => o[this.itemValue] == this.input)
+                  }
                 }
 
                 if(searchContinue)
@@ -150,8 +190,18 @@ export default {
         this.updateModelValue(val)
       }
     },
+    isMultiple() {
+      return this.multiple ?? false
+    },
+    rawEndpoint() {
+      return getURLWithoutQuery(this.endpoint)
+    },
+    defaultQueryParameters() {
+      return getParameters(this.endpoint)
+    },
     queryParameters() {
       let query = new URLSearchParams({
+        ...this.defaultQueryParameters,
         page: this.page,
         itemsPerPage: this.itemsPerPage,
         ...(!!this.search ? {search: this.search} : {})
@@ -160,7 +210,7 @@ export default {
       return query.toString()
     },
     fullUrl() {
-      return `${this.endpoint}?${this.queryParameters}`
+      return `${this.rawEndpoint}?${this.queryParameters}`
     },
   },
   created () {
