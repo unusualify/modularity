@@ -108,6 +108,31 @@ trait MethodTransformers
     }
 
     /**
+     * @param string $traitClass
+     * @param string $inputName
+     * @return bool
+     */
+    public function traitHasInput($traitClass, $inputName)
+    {
+        return in_array($inputName, $this->getColumns($traitClass));
+    }
+
+    /**
+     * @param array $traitClasses
+     * @param string $inputName
+     * @return bool
+     */
+    public function anyTraitHasInput($traitClasses, $inputName)
+    {
+        foreach ($traitClasses as $traitClass) {
+            if ($this->traitHasInput($traitClass, $inputName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * @param string $slug
      * @param array $scope
      * @return int
