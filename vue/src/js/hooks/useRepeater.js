@@ -74,7 +74,7 @@ export const makeRepeaterProps = propsFactory({
       return useI18n().t('ADD NEW')
     }
   },
-  buttonHasLabel: {
+  hasButtonLabel: {
     type: Boolean,
     default: false
   },
@@ -86,9 +86,9 @@ export const makeRepeaterProps = propsFactory({
     type: Boolean,
     default: true
   },
-  hasHeaders: {
+  noHeaders: {
     type: Boolean,
-    default: true
+    default: false
   },
   isUnique: {
     type: Boolean,
@@ -237,7 +237,8 @@ export default function useRepeater (props, context) {
 
         if (initialRepeats.length > 0) {
           const parsedInitialRepeats = parseRepeaterInputs(initialRepeats).map(item => {
-            return omit(item, ['id'])
+            const omitKeys = props.autoIdGenerator ? ['id'] : []
+            return omit(item, omitKeys)
           })
           if (JSON.stringify(modelValue.value) !== JSON.stringify(parsedInitialRepeats)) {
             parsedInitialRepeats.forEach((item, index) => {
@@ -304,7 +305,7 @@ export default function useRepeater (props, context) {
       return slotableSchemas
     }),
     processedSchema: computed(() => {
-      if (props.hasHeaders) {
+      if (!props.noHeaders) {
         return reduce(cloneDeep(props.schema ?? {}), (acc, input, name) => {
           acc[name] = omit(input, ['label'])
 
@@ -320,7 +321,7 @@ export default function useRepeater (props, context) {
       }
     }),
     addButtonContent: computed(() => {
-      return props.addButtonText + (props.buttonHasLabel && __isset(props.singularLabel) ? ` ${props.singularLabel}` : '')
+      return props.addButtonText + (props.hasButtonLabel && __isset(props.singularLabel) ? ` ${props.singularLabel}` : '')
     })
   })
 
