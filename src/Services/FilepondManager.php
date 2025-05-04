@@ -272,9 +272,9 @@ class FilepondManager
         // $lastModified = Storage::disk('local')->lastModified($storagePath);
 
         return [
-            'size' => Storage::size($storageFile),
-            'type' => Storage::mimeType($storageFile),
-            'name' => basename($storageFile),
+            'size' => $storageFile ? Storage::size($storageFile) : 0,
+            'type' => $storageFile ? Storage::mimeType($storageFile) : null,
+            'name' => $storageFile ? basename($storageFile) : null,
             // 'exists' => true,
             // 'size' => $fileSize,
             // 'mime_type' => $mimeType,
@@ -307,11 +307,15 @@ class FilepondManager
 
     public function getStoragePath($uuid)
     {
+        $path = null;
         if (Storage::exists($this->file_path . '/' . $uuid)) {
             $path = $this->file_path . '/' . $uuid;
         } else {
             $tmp_file = TemporaryFilepond::where('folder_name', $uuid)->first();
-            $path = $this->tmp_file_path . $tmp_file->folder_name . '/' . $tmp_file->file_name;
+
+            if ($tmp_file) {
+                $path = $this->tmp_file_path . $tmp_file->folder_name . '/' . $tmp_file->file_name;
+            }
         }
 
         return $path;
@@ -327,7 +331,11 @@ class FilepondManager
     {
         $path = $this->getStoragePath($uuid);
 
-        return Storage::files($path)[0];
+        if ($path) {
+            return Storage::files($path)[0];
+        }
+
+        return null;
     }
 
     public function clearFolders()
