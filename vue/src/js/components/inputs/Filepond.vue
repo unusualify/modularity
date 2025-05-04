@@ -45,7 +45,16 @@
             :key="key"
             v-bind="$lodash.omit($bindAttributes(), ['rules'])"
 
-            :allow-multiple="true"
+            :allow-image-preview="allowImagePreview"
+            :allow-multiple="allowMultiple"
+            :allow-process="allowProcess"
+            :allow-remove="allowRemove"
+            :allow-reorder="allowReorder"
+            :allow-replace="allowReplace"
+            :drop-on-page="dropOnPage"
+            :drop-on-element="dropOnElement"
+            :drop-validation="dropValidation"
+
             :allow-file-type-validation="true"
             :accepted-file-types="acceptedFileTypes"
             :max-files="maxFiles"

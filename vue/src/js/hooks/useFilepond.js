@@ -57,6 +57,50 @@ export const makeFilepondProps = propsFactory({
     type: String,
     default: '',
   },
+
+  allowImagePreview: {
+    type: Boolean,
+    default: false
+  },
+  allowMultiple: {
+    type: Boolean,
+    default: false
+  },
+  allowProcess: {
+    type: Boolean,
+    default: true
+  },
+  allowRemove: {
+    type: Boolean,
+    default: true
+  },
+  allowDrop: {
+    type: Boolean,
+    default: true
+  },
+  allowReorder: {
+    type: Boolean,
+    default: false
+  },
+  allowReplace: {
+    type: Boolean,
+    default: false
+  },
+
+  dropOnPage: {
+    type: Boolean,
+    default: false
+  },
+  dropOnElement: {
+    type: Boolean,
+    default: true
+  },
+  dropValidation: {
+    type: Boolean,
+    default: false
+  },
+
+
 })
 
 export default function useFilepond(props, context) {
