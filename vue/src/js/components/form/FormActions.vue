@@ -3,6 +3,7 @@
       hasActions ? 'd-flex flex-wrap ga-4 py-4' : ''
     ]"
   >
+    <slot name="prepend" v-bind="{item: modelValue, isEditing}"></slot>
     <template v-for="(action, key) in allActions">
       <v-tooltip
         v-if="action.type !== 'modalx'"
@@ -92,6 +93,7 @@
         <span>{{ action.tooltip ?? action.label }}</span>
       </v-tooltip>
     </template>
+    <slot name="append" v-bind="{item: modelValue, isEditing}"></slot>
   </div>
 </template>
 

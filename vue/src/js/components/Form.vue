@@ -37,7 +37,14 @@
                 :actions="actions"
                 :is-editing="isEditing"
                 @action-complete="$emit('actionComplete', $event)"
-              />
+              >
+                <template #prepend>
+                  <slot name="actions.prepend"></slot>
+                </template>
+                <template #append>
+                  <slot name="actions.append"></slot>
+                </template>
+              </FormActions>
 
               <!-- Slot for headerCenter -->
               <slot name="headerCenter">
@@ -50,7 +57,14 @@
                 :actions="actions"
                 :is-editing="isEditing"
                 @action-complete="$emit('actionComplete', $event)"
-              />
+              >
+                <template #prepend="actionsScope">
+                  <slot name="actions.prepend" v-bind="actionsScope"></slot>
+                </template>
+                <template #append="actionsScope">
+                  <slot name="actions.append" v-bind="actionsScope"></slot>
+                </template>
+              </FormActions>
 
               <FormEvents v-if="formEventSchema && formEventSchema.length && model"
                 :events="formEventSchema"
@@ -96,7 +110,14 @@
               :actions="actions"
               :is-editing="isEditing"
               @action-complete="$emit('actionComplete', $event)"
-            />
+            >
+              <template #prepend="actionsScope">
+                <slot name="actions.prepend" v-bind="actionsScope"></slot>
+              </template>
+              <template #append="actionsScope">
+                <slot name="actions.append" v-bind="actionsScope"></slot>
+              </template>
+            </FormActions>
 
             <slot name="top" v-bind="{item: formItem, schema}"></slot>
 
@@ -106,7 +127,14 @@
               :actions="actions"
               :is-editing="isEditing"
               @action-complete="$emit('actionComplete', $event)"
-            />
+            >
+              <template #prepend="actionsScope">
+                <slot name="actions.prepend" v-bind="actionsScope"></slot>
+              </template>
+              <template #append="actionsScope">
+                <slot name="actions.append" v-bind="actionsScope"></slot>
+              </template>
+            </FormActions>
 
             <v-custom-form-base
               :id="formBaseId"
@@ -165,7 +193,14 @@
               :actions="actions"
               :is-editing="isEditing"
               @action-complete="$emit('actionComplete', $event)"
-            />
+            >
+              <template #prepend="actionsScope">
+                <slot name="actions.prepend" v-bind="actionsScope"></slot>
+              </template>
+              <template #append="actionsScope">
+                <slot name="actions.append" v-bind="actionsScope"></slot>
+              </template>
+            </FormActions>
           </div>
 
           <div v-if="hasAdditionalSection && $vuetify.display.lgAndUp"
@@ -328,7 +363,14 @@ const AdditionalSectionContent = {
         :actions="actions"
         :is-editing="isEditing"
         @action-complete="$emit('actionComplete', $event)"
-      />
+      >
+        <template #prepend="actionsScope">
+          <slot name="actions.prepend" v-bind="actionsScope"></slot>
+        </template>
+        <template #append="actionsScope">
+          <slot name="actions.append" v-bind="actionsScope"></slot>
+        </template>
+      </FormActions>
 
       <slot name="right-top"></slot>
 
@@ -338,7 +380,14 @@ const AdditionalSectionContent = {
         :actions="actions"
         :is-editing="isEditing"
         @action-complete="$emit('actionComplete', $event)"
-      />
+      >
+        <template #prepend="actionsScope">
+          <slot name="actions.prepend" v-bind="actionsScope"></slot>
+        </template>
+        <template #append="actionsScope">
+          <slot name="actions.append" v-bind="actionsScope"></slot>
+        </template>
+      </FormActions>
 
       <slot name="right-middle"></slot>
 
@@ -348,7 +397,14 @@ const AdditionalSectionContent = {
         :actions="actions"
         :is-editing="isEditing"
         @action-complete="$emit('actionComplete', $event)"
-      />
+      >
+        <template #prepend="actionsScope">
+          <slot name="actions.prepend" v-bind="actionsScope"></slot>
+        </template>
+        <template #append="actionsScope">
+          <slot name="actions.append" v-bind="actionsScope"></slot>
+        </template>
+      </FormActions>
 
       <slot name="right-bottom"></slot>
     </div>

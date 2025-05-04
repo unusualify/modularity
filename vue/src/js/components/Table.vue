@@ -337,6 +337,20 @@
 
                     </slot>
                   </template>
+
+
+                  <template v-if="$slots['form.actions.prepend']" v-slot:actions.prepend="actionsScope">
+                    <slot name="form.actions.prepend" v-bind="actionsScope">
+
+                    </slot>
+                  </template>
+
+                  <template v-if="$slots['form.actions.append']" v-slot:actions.append="actionsScope">
+                    <slot name="form.actions.append" v-bind="actionsScope">
+
+                    </slot>
+                  </template>
+
                 </ue-form>
                 <!-- <v-card-text>
                 </v-card-text> -->
