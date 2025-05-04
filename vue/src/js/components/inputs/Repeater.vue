@@ -14,7 +14,7 @@
         :vertical-padding="0"
       >
         <!-- Title -->
-        <template v-slot:title v-if="(label || subtitle || $slots.title || $slots.append) && !(hasHeaders && repeaterInputs.length > 0)">
+        <template v-slot:title v-if="(label || subtitle || $slots.title || $slots.append) && !(!noHeaders && repeaterInputs.length > 0)">
           <div class="d-flex" v-if="(label || subtitle) && (schema.length || Object.keys(schema).length) || $slots.append">
             <div class="d-flex flex-column">
               <ue-title v-if="label && (schema.length || Object.keys(schema).length) " :classes="['pl-0 pt-0']" color="grey-darken-5" transform="none" weight="medium">
@@ -30,7 +30,7 @@
         <template v-slot:default>
           <div class="mt-4">
             <!-- Headers -->
-            <v-row v-if="hasHeaders && repeaterInputs.length > 0" class="mb-4" no-gutters>
+            <v-row v-if="!noHeaders && repeaterInputs.length > 0" class="mb-4" no-gutters>
               <v-col v-for="header in headers" :key="header.title" v-bind="header.col">
                 {{ header.title }}
               </v-col>
