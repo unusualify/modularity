@@ -147,7 +147,8 @@ return [
                     'id' => 1,
                     'value' => 1,
                 ],
-            ]
+            ],
+            'spreadable' => true,
         ],
         'name' => [
             'type' => '_name',
