@@ -192,14 +192,6 @@ trait RepeatersTrait
     }
 
     /**
-     * Clear the relationship between the repeater and the parent(module) aka object.
-     *
-     * @param \Unusualify\Modularity\Entities\Model $object
-     * @return void
-     */
-    public function afterDelete($object) {}
-
-    /**
      * From objects input
      */
     public function getRepeaterInputs()
@@ -221,7 +213,7 @@ trait RepeatersTrait
                 return [
                     $input['name'] => ($input['translated'] ?? false) ? Arr::mapWithKeys(getLocales(), function ($locale) {
                         return [$locale => []];
-                    }) : [],
+                    }) : ($input['default'] ?? []),
                 ];
             });
         } else {
