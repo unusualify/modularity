@@ -2,8 +2,8 @@
 
 namespace Unusualify\Modularity\Tests\Models;
 
-use Unusualify\Modularity\Entities\Company;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\SystemUser\Entities\Company;
 use Unusualify\Modularity\Tests\ModelTestCase;
 
 class CompanyTest extends ModelTestCase
@@ -69,7 +69,10 @@ class CompanyTest extends ModelTestCase
             'zip_code' => '12345',
             'phone' => '123-456-7890',
             'vat_number' => 'VAT123456',
-            'tax_id' => 'TAX123456'
+            'tax_id' => 'TAX123456',
+            'spread_payload' => [
+                'is_personal' => true,
+            ]
         ]);
 
         $company->update([
@@ -93,6 +96,7 @@ class CompanyTest extends ModelTestCase
         $this->assertEquals('987-654-3210', $company->phone);
         $this->assertEquals('VAT654321', $company->vat_number);
         $this->assertEquals('TAX654321', $company->tax_id);
+        $this->assertEquals(true, $company->is_personal);
     }
 
     public function test_delete_company()
