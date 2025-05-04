@@ -2,18 +2,30 @@
 
 namespace Unusualify\Modularity\Repositories\Traits;
 
+use Illuminate\Support\Arr;
+
 trait SpreadableTrait
 {
+
+    protected function setColumnsSpreadableTrait($columns, $inputs)
+    {
+        $traitName = get_class_short_name(__TRAIT__);
+
+        $columns[$traitName] = collect($inputs ?? $this->inputs())->reduce(function ($acc, $input) {
+            if (isset($input['name']) && preg_match('/^.*spread$/', $input['type'])) {
+                $acc[] = $input['name'];
+            }
+
+            return $acc;
+        }, []);
+
+        return $columns;
+    }
     protected function beforeSaveSpreadableTrait($object, $fields)
     {
         // Get the spreadable model instance
-        // dd($object->_spread);
-        // $spreadableModel = $object->spreadable;
         $spreadableModel = $object->spreadable()->first();
 
-        // if (!$spreadableModel) {
-        //     return;
-        // }
         if (!$spreadableModel && $object->exists) {
             $object->spreadable()->create();
         }
@@ -22,19 +34,18 @@ trait SpreadableTrait
             return;
         }
 
+        $spreadableSavingKey = $object->getSpreadableSavingKey();
         $currentJson = $spreadableModel->content;
-        $newJson = array_merge($currentJson, $fields['_spread'] ?? []);
-        // Update the spreadable JSON
+        $newJson = array_merge($currentJson, $fields[$spreadableSavingKey] ?? []);
 
-        foreach ($this->getSpreadableInputKeys() as $key) {
+        // Update the spreadable JSON
+        foreach ($this->getSpreadableInputKeys($this->inputs()) as $key) {
             if (isset($fields[$key])) {
                 $newJson[$key] = $fields[$key];
             }
         }
-        // $object->_spread = $newJson;
-        // dd($object->getFillable());
-        $object->setAttribute('_spread', $newJson);
-        // dd('here');
+
+        $object->setAttribute($spreadableSavingKey, $newJson);
     }
 
     /**
@@ -44,30 +55,39 @@ trait SpreadableTrait
      */
     protected function prepareFieldsBeforeSaveSpreadableTrait($object, $fields)
     {
-        // Get current JSON data
-        // $currentJson = json_decode($object->spreadable->json ?? '{}', true);
-
         // Get spreadable fields from the model
-        $spreadableFields = $this->getSpreadableInputKeys($object);
+        $spreadableFields = $this->getSpreadableInputKeys($this->inputs());
 
         // Initialize _spread array if it doesn't exist
-        $fields['_spread'] = $fields['_spread'] ?? $object->_spread;
+        $fields[$object->getSpreadableSavingKey()] = $fields[$object->getSpreadableSavingKey()] ?? $object->{$object->getSpreadableSavingKey()};
 
         // Process each field
         foreach ($fields as $key => $value) {
             // Check if the field is spreadable
             if (in_array($key, $spreadableFields)) {
                 // Add to _spread array
-                // dd($key,$value);
-                $fields['_spread'][$key] = $value;
+                $fields[$object->getSpreadableSavingKey()][$key] = $value;
 
                 // Remove from main fields array
                 unset($fields[$key]);
+            }
+        }
 
-                // Update current JSON if the field exists
-                // if (isset($currentJson[$key])) {
-                //     $currentJson[$key] = $value;
-                // }
+        // dd($fields, $object);
+
+        return $fields;
+    }
+
+    protected function getFormFieldsSpreadableTrait($object, $fields, $schema)
+    {
+        $schema = empty($schema) ? $this->model->getRouteInputs() : $schema;
+
+        if ($object->spreadable()->exists()) {
+            $columns = $this->getColumns(__TRAIT__);
+
+            foreach ($columns as $column) {
+                // $fields[$column] = $object->spreadable->content[$column] ?? null;
+                $fields[$object->getSpreadableSavingKey()] = Arr::except($object->spreadable->content ?? [], $this->getSpreadableInputKeys($schema));
             }
         }
 
@@ -79,13 +99,12 @@ trait SpreadableTrait
      *
      * @return array
      */
-    protected function getSpreadableInputKeys()
+    protected function getSpreadableInputKeys($schema)
     {
         // Filter and return fields that are marked as spreadable
-
-        return collect($this->model->getRouteInputs())
-            ->filter(function ($field) {
-                return isset($field['spreadable']) && $field['spreadable'] === true;
+        return collect($schema)
+            ->filter(function ($input) {
+                return isset($input['name']) && isset($input['spreadable']) && $input['spreadable'] === true;
             })
             ->pluck('name')
             ->toArray();
