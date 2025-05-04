@@ -2,6 +2,8 @@
 
 namespace Unusualify\Modularity\Entities;
 
+use Unusualify\Modularity\Facades\Filepond as FilepondFacade;
+
 class Filepond extends Model
 {
     protected $fillable = [
@@ -25,6 +27,7 @@ class Filepond extends Model
             'file_name' => $this->file_name,
             'source' => route('filepond.preview', ['uuid' => $this->uuid]),
             'created_at' => $this->created_at,
+            'file' => FilepondFacade::getFileInfo($this->uuid),
             // 'source' => $this->uuid,
             // 'source' => $this->uuid . '/' .  $this->file_name,
         ];

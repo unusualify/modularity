@@ -167,15 +167,16 @@
         ],
         errorMessages: [],
         onStart: true,
-        files: isArray(this.modelValue) ? this.modelValue.map(function (file) {
+        files: isArray(this.modelValue) ? this.modelValue.map(function (filepond) {
           return {
-            source:  file.source ?? `${this.endPoints.load}${file.uuid}`,
+            source:  filepond.source ?? `${this.endPoints.load}${filepond.uuid}`,
             options: {
-              type : `${file.type ?? 'local'}`,
+              type : `${filepond.type ?? 'local'}`,
               // file initial metadata
-              // metadata: {
-              //     date: '2018-10-5T12:00',
-              // },
+              metadata: {
+                date: filepond.created_at,
+              },
+              file: filepond.file,
             }
           }
         }) : [],
