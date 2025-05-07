@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Arr;
 
 if (! function_exists('previous_route_name')) {
     /**
@@ -49,7 +50,7 @@ if (! function_exists('resolve_route')) {
                 $flat = collect($params)
                     ->mapWithKeys(function($value, $key) {
                         return [
-                            $key => is_object($value)
+                            $key => is_object($value) || (is_array($value) && Arr::isAssoc($value))
                                         ? json_encode($value, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE)
                                         : $value
                         ];
