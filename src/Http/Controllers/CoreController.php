@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
+use Unusualify\Modularity\Facades\Filepond;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Traits\ManageNames;
@@ -400,6 +401,23 @@ abstract class CoreController extends LaravelController
                 'location' => 'top',
                 'variant' => MessageStage::SUCCESS,
                 'message' => __('Assignment updated successfully!'),
+                'assignments' => $this->repository->getAssignments($id),
+            ]);
+        }
+
+        if(($attachments = $this->request->get('attachments'))){
+            $assignable = $this->repository->getById($id);
+
+            $lastAssignment = $assignable->lastAssignment;
+
+            if ($attachments) {
+                Filepond::saveFile($lastAssignment, $attachments, 'attachments');
+            }
+
+            return Response::json([
+                'location' => 'top',
+                'variant' => MessageStage::SUCCESS,
+                'message' => __('Attachments saved successfully!'),
                 'assignments' => $this->repository->getAssignments($id),
             ]);
         }
