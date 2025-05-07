@@ -353,6 +353,8 @@
                   @click:minute="onEvent({type:'click'}, obj, minute)"
                   @click:second="onEvent({type:'click'}, obj, second)"
                   @update:modelValue="onInput($event, obj)"
+
+                  @update:input="updateInput($event, obj)"
                 >
                   <!-- component doesn't work with #[s]="slotData" " -->
                   <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, model: valueIntern }"/></template>
@@ -378,6 +380,9 @@
                   @click:minute= "onEvent({type:'click'}, obj, minute)"
                   @click:second= "onEvent({type:'click'}, obj, second)"
                   @update:modelValue="onInput($event, obj)"
+
+                  @update:input="updateInput($event, obj)"
+
                 >
                   <!-- component doesn't work with #[s]="slotData" " -->
                   <template v-for="s in getInjectedScopedSlots(id, obj)" v-slot:[s]="slotData">
@@ -416,7 +421,7 @@
 // Import
 // import Vue from 'vue'
 import { getCurrentInstance } from 'vue'
-import { get, set, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex, omit } from 'lodash-es'
+import { get, set, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex, omit, cloneDeep } from 'lodash-es'
 
 import formEvents from '@/utils/formEvents'
 
@@ -1372,6 +1377,26 @@ export default {
             // ## TODO type conditional default value
           }
         })
+      }
+    },
+
+    updateInput(event, obj) {
+      if(Array.isArray(event)){
+        const oldFormSchema = cloneDeep(this.formSchema)
+        let isChanged = false
+        event.forEach(e => {
+          if(e.key && e.value && this.formSchema?.[obj.key]){
+            oldFormSchema[obj.key][e.key] = e.value
+            isChanged = true
+          }
+        })
+        if(isChanged){
+          this.formSchema = oldFormSchema
+        }
+      } else if(event.key && event.value && this.formSchema?.[obj.key]){
+        const oldFormSchema = cloneDeep(this.formSchema)
+        oldFormSchema[obj.key][event.key] = event.value
+        this.formSchema = oldFormSchema
       }
     }
   },
