@@ -32,3 +32,5 @@ export { default as useDynamicModal } from './useDynamicModal'
 export { default as useFilepond, makeFilepondProps } from './useFilepond'
 
 export { default as useInputFetch, makeInputFetchProps } from './useInputFetch'
+
+export { default as useAlert } from './useAlert'
