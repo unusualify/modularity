@@ -67,7 +67,7 @@ class AssignmentHydrate extends InputHydrate
         }
 
         $input['fetchEndpoint'] = $this->module->getRouteActionUri($this->routeName, 'assignments', [snakeCase($this->routeName) => ':id']);
-        $input['createEndpoint'] = $this->module->getRouteActionUri($this->routeName, 'createAssignment', [snakeCase($this->routeName) => ':id']);
+        $input['saveEndpoint'] = $this->module->getRouteActionUri($this->routeName, 'createAssignment', [snakeCase($this->routeName) => ':id']);
         // $input['name'] = 'assignee_id';
         // add your logic
 
