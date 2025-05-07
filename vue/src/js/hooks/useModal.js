@@ -34,6 +34,14 @@ export const makeModalProps = propsFactory({
     type: Boolean,
     default: false
   },
+  hasTitleDivider: {
+    type: Boolean,
+    default: false
+  },
+  noDefaultBodyPadding: {
+    type: Boolean,
+    default: false
+  },
   noActions: {
     type: Boolean,
     default: false

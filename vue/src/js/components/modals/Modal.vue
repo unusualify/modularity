@@ -57,8 +57,9 @@
                   </div>
                 </template>
               </ue-title>
+              <v-divider v-if="hasTitleDivider"/>
             </v-card-title>
-            <v-card-text v-if="description || $slots['body.description']" class="text-center" style="word-break: break-word;" >
+            <v-card-text v-if="description || $slots['body.description']" class="text-center" style="word-break: break-word;" :class="{'pa-0': noDefaultBodyPadding}">
               <slot name="body.description" v-bind="{description}">
                 {{ description }}
               </slot>
