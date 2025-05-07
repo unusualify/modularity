@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Http\Controllers\Traits\Table;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
+use Unusualify\Modularity\Services\Connector;
 use Unusualify\Modularity\Traits\Allowable;
 
 trait TableActions
@@ -56,6 +57,17 @@ trait TableActions
         return Collection::make($this->tableActions)->reduce(function ($acc, $action, $key) use ($defaultTableAction) {
             $noSuperAdmin = $action['noSuperAdmin'] ?? false;
             // $allowedRoles = $action['allowedRoles'] ?? null;
+            $action['is'] = true;
+
+            if(isset($action['connector'])){
+                $connector = new Connector($action['connector']);
+
+                $connector->run($action, 'is');
+            }
+
+            if(!$action['is']){
+                return $acc;
+            }
 
             $isAllowed = $this->isAllowedItem(
                 $action,
