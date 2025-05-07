@@ -1,3 +1,4 @@
+import { inject } from 'vue'
 /**
  * Composition‐API hook
  */
