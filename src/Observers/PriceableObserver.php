@@ -45,7 +45,6 @@ class PriceableObserver
             $priceSavingValue = $price->raw_amount * $price->vat_amount;
         }
 
-        // dd($priceSavingValue);
-        $price->setAttribute($priceSavingKey, $priceSavingValue);
+        $price->setAttribute($priceSavingKey, $priceSavingValue / 100);
     }
 }
