@@ -1,3 +1,298 @@
+<script setup>
+  import { ref, computed, onMounted, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
+  import {
+    useInput,
+    makeInputProps,
+    makeInputEmits,
+    useValidation,
+    useDynamicModal,
+    useAuthorization,
+    useAlert
+  } from '@/hooks'
+  import axios from 'axios'
+
+  const props = defineProps({
+    ...makeInputProps(),
+    variant: {
+      type: String,
+      default: 'outlined',
+    },
+    density: {
+      type: String,
+      default: 'default',
+    },
+    items: {
+      type: Array,
+      default: () => [],
+    },
+    fetchEndpoint: {
+      type: String,
+      default: null,
+    },
+    saveEndpoint: {
+      type: String,
+      default: null,
+    },
+    assignableType: {
+      type: String,
+      default: null,
+    },
+    assigneeType: {
+      type: String,
+      default: null,
+    },
+    authorizedRoles: {
+      type: Array,
+      default: () => ['superadmin', 'admin'],
+    },
+    minDueDays: {
+      type: Number,
+      default: 0,
+    },
+    filepond: {
+      type: Object,
+      default: null,
+    },
+  })
+
+  const emit = defineEmits([...makeInputEmits])
+
+  const { input, id , boundProps } = useInput(props, { emit })
+  const {requiredRule, minRule, futureDateRule, dateRule, invokeRule} = useValidation(props)
+  const { t, d } = useI18n()
+  const DynamicModal = useDynamicModal()
+  const Authorization = useAuthorization()
+  const Alert = useAlert()
+
+  const loading = ref(false)
+  const updating = ref(false)
+  const assignable_id = ref(props.modelValue)
+  const assignees = ref([])
+  const assignee_options = ref([])
+
+  const assignments = ref([])
+
+  const listAssignmentsModalActive = ref(false)
+
+  const createForm = ref(null)
+  const createFormModalActive = ref(false)
+  const createFormModel = ref({
+    assignee_id: null,
+    due_at: null,
+    description: null,
+  })
+  const completeModal = ref(false)
+  const attachments = ref([])
+  const attachmentsLoading = ref(false)
+
+  const isAuthorized = computed(() => {
+    return Authorization.hasRoles(props.authorizedRoles)
+  })
+  const lastAssignment = computed(() => {
+    return assignments.value.length > 0 ? assignments.value[0] : null
+  })
+  const isAssignee = computed(() => {
+    return lastAssignment.value && Authorization.isYou(lastAssignment.value.assignee_id)
+  })
+
+  const canView = computed(() => {
+    return isAuthorized.value && isAssignee.value
+  })
+
+  const formattedAssignments = computed(() => {
+    let formatteds = []
+
+    return assignments.value.reduce((acc, assignment, index) => {
+      let prependAvatar = assignment.assignee_avatar
+
+      let assignerName = Authorization.isYou(assignment.assigner_id) ? t('You') : assignment.assigner_name
+      let assigneeName = Authorization.isYou(assignment.assignee_id) ? t('You') : assignment.assignee_name
+
+      let title = `to <span class="text-blue-darken-1">${assigneeName}</span> &mdash; by <span class="text-success">${assignerName}</span>`
+
+      let untilText = `${t('Until')}: <span class="font-weight-bold text-blue-darken-1"> ${d(new Date(assignment.due_at), 'medium')}</span>`
+      let fromText = `${t('From')}: <span class="">${d(new Date(assignment.created_at), 'medium')}</span>`
+
+      let subtitle = `${assignment.description} </br> </br>`
+
+      let subDescription = ""
+
+      let appendInnerIcon = null
+
+      subDescription = `${assignment.status_interval_description}`
+      appendInnerIcon = assignment.status_vuetify_icon
+
+      subDescription += ` ${fromText}`
+
+      subtitle += subDescription
+      acc.push({
+        prependAvatar,
+        assignerName,
+        assigneeName,
+        title,
+        subtitle,
+        subDescription,
+        appendInnerIcon,
+
+        attachments: assignment.attachments ?? [],
+      })
+
+      if(index !== assignments.value.length - 1) {
+        acc.push({
+          type: 'divider',
+          inset: true,
+        })
+      }
+      return acc
+    }, formatteds)
+  })
+
+  const lastFormattedAssignment = computed(() => {
+    return formattedAssignments.value.length > 0 ? formattedAssignments.value[0] : null
+  })
+
+  watch(() => assignments.value, (newVal) => {
+    if(newVal && newVal.length > 0) {
+      attachments.value = newVal[0].attachments ?? []
+    }
+  })
+
+  const saveRequest = async (payload, successCallback = null, errorCallback = null, finallyCallback = null) => {
+    const endpoint = props.saveEndpoint.replace(':id', input.value);
+
+    axios.post(endpoint, payload)
+      .then(response => {
+        if(successCallback) {
+          successCallback(response)
+        }
+      })
+      .catch(error => {
+        if(errorCallback) {
+          errorCallback(error)
+        }
+      })
+      .finally(() => {
+        if(finallyCallback) {
+          finallyCallback()
+        }
+      })
+
+    return false
+  }
+
+  const fetchAssignments = async () => {
+    if (input.value) {
+      const endpoint = props.fetchEndpoint.replace(':id', input.value);
+
+      loading.value = true
+
+      axios.get(endpoint)
+        .then(response => {
+          if(response.status === 200) {
+            assignments.value = response.data
+          }
+        }).finally(() => {
+          loading.value = false
+        })
+    }
+  }
+
+  const createAssignment = async () => {
+    if (input.value) {
+      const valid = await createForm.value.validate()
+
+      if (!valid) {
+        return
+      }
+
+      const payload = {
+        ...createFormModel.value,
+        assignee_type: props.assigneeType,
+        assignable_id: input.value,
+        assignable_type: props.assignableType
+      }
+
+      updating.value = true
+
+      saveRequest(
+        payload,
+        (response) => {
+          if(response.status === 200) {
+            assignments.value.unshift(response.data)
+            createFormModel.value = {
+              assignee_id: null,
+              due_at: null,
+              description: null,
+            }
+          }
+        }, (error) => {
+          __log(error)
+        }, () => {
+          updating.value = false
+        }
+      )
+    }
+  }
+
+  const updateAssignment = async (payload) => {
+    if (input.value !== null) {
+      updating.value = true
+
+      let res = await saveRequest(
+        payload,
+        (response) => { // successCallback
+          if(response.status === 200) {
+            Alert.openAlert({
+              message: 'Assignment updated successfully',
+              ...response.data,
+            })
+
+            if(response.data.assignments ) {
+              assignments.value = response.data.assignments
+            }else{
+              fetchAssignments()
+            }
+            DynamicModal.close()
+          }
+        }, (error) => { // errorCallback
+          __log(error)
+        }, () => {
+          updating.value = false
+        }
+      )
+
+      return res
+    }
+
+    return false
+  }
+
+  const openCompleteModal = () => {
+    DynamicModal.open(null, {
+      'modalProps': {
+        'widthType': 'md',
+        'description': t('Are you sure you want to complete this task?'),
+        'title': t('Complete Task'),
+        'confirmText': t('Yes'),
+        'cancelText': t('No'),
+
+        'confirmLoading': updating,
+        'rejectLoading': updating,
+        'confirmCallback': async () => {
+          await updateAssignment({
+            status: 'completed'
+          })
+        }
+      }
+    })
+  }
+
+  onMounted(() => {
+    fetchAssignments()
+  })
+</script>
+
 <template>
   <v-input
     v-model="input"
@@ -343,372 +638,6 @@
     </template>
   </v-input>
 </template>
-
-<script>
-  import { ref, computed, onMounted, watch } from 'vue'
-  import { useI18n } from 'vue-i18n'
-  import {
-    useInput,
-    makeInputProps,
-    makeInputEmits,
-    useValidation,
-    useDynamicModal,
-    useAuthorization,
-    useAlert
-  } from '@/hooks'
-  import axios from 'axios'
-
-  export default {
-    name: 'v-input-assignment',
-    emits: [...makeInputEmits],
-    components: {},
-    props: {
-      ...makeInputProps(),
-      variant: {
-        type: String,
-        default: 'outlined',
-      },
-      density: {
-        type: String,
-        default: 'default',
-      },
-      items: {
-        type: Array,
-        default: [],
-      },
-      // assignments: {
-      //   type: Array,
-      //   default: null,
-      // },
-
-      fetchEndpoint: {
-        type: String,
-        default: null,
-      },
-      saveEndpoint: {
-        type: String,
-        default: null,
-      },
-
-      assignableType: {
-        type: String,
-        default: null,
-      },
-      assigneeType: {
-        type: String,
-        default: null,
-      },
-
-      authorizedRoles: {
-        type: Array,
-        default: ['superadmin', 'admin'],
-      },
-
-      minDueDays: {
-        type: Number,
-        default: 0,
-      },
-
-      filepond: {
-        type: Object,
-        default: null,
-      },
-    },
-    setup (props, context) {
-      const Input = useInput(props, context)
-      const {requiredRule, minRule, futureDateRule, dateRule, invokeRule} = useValidation(props)
-      const { t, d } = useI18n()
-      const DynamicModal = useDynamicModal()
-      const Authorization = useAuthorization()
-      const Alert = useAlert()
-
-      const loading = ref(false)
-      const updating = ref(false)
-      const assignable_id = ref(props.input)
-      const assignees = ref([])
-      const assignee_options = ref([])
-
-      const assignments = ref([])
-
-      const listAssignmentsModalActive = ref(false)
-
-      const createForm = ref(null)
-      const createFormModalActive = ref(false)
-      const createFormModel = ref({
-        assignee_id: null,
-        due_at: null,
-        description: null,
-      })
-      const completeModal = ref(false)
-      const attachments = ref([])
-      const attachmentsLoading = ref(false)
-
-      const isAuthorized = computed(() => {
-        return Authorization.hasRoles(props.authorizedRoles)
-      })
-      const lastAssignment = computed(() => {
-        return assignments.value.length > 0 ? assignments.value[0] : null
-      })
-      const isAssignee = computed(() => {
-        return lastAssignment.value && Authorization.isYou(lastAssignment.value.assignee_id)
-      })
-
-      const canView = computed(() => {
-        return isAuthorized.value && isAssignee.value
-      })
-      const formattedAssignments = computed(() => {
-        let formatteds = []
-
-        // if(assignments.value.length > 0) {
-        //   formatteds.push({ type: 'subheader', title: t('Assignments')})
-        // }
-
-        return assignments.value.reduce((acc, assignment, index) => {
-          let prependAvatar = assignment.assignee_avatar
-
-          let assignerName = Authorization.isYou(assignment.assigner_id) ? t('You') : assignment.assigner_name
-          let assigneeName = Authorization.isYou(assignment.assignee_id) ? t('You') : assignment.assignee_name
-
-          let title = `to <span class="text-blue-darken-1">${assigneeName}</span> &mdash; by <span class="text-success">${assignerName}</span>`
-
-          let untilText = `${t('Until')}: <span class="font-weight-bold text-blue-darken-1"> ${d(new Date(assignment.due_at), 'medium')}</span>`
-          let fromText = `${t('From')}: <span class="">${d(new Date(assignment.created_at), 'medium')}</span>`
-
-          let subtitle = `${assignment.description} </br> </br>`
-
-          let subDescription = ""
-
-          let appendInnerIcon = null
-
-          // if(assignment.status === 'completed') {
-          //   subDescription += `${this.$t('Completed')}: <span class="text-success">${this.$d(new Date(assignment.completed_at), 'medium')}</span>`
-          //   appendInnerIcon = "<v-icon icon='mdi-check-circle-outline' color='success'/>"
-          // } else if(assignment.status === 'accepted') {
-          //   subDescription += `${this.$t('Accepted')}: <span class="text-warning">${this.$d(new Date(assignment.accepted_at), 'medium')}</span>`
-          // } else if(assignment.status === 'cancelled') {
-          //   subDescription += `${this.$t('Cancelled')}: <span class="font-weight-bold text-error">${this.$d(new Date(assignment.updated_at), 'medium')}</span>`
-          //   appendInnerIcon = "<v-icon icon='mdi-close-circle-outline' color='error'/>"
-          // } else{
-
-          //   subDescription += `${untilText}`
-          //   appendInnerIcon = "<v-icon icon='mdi-clock-outline' color='info'/>"
-          //   // appendInnerIcon = "<span class=''> <i class='mdi mdi-clock-outline text-info'/></span>"
-          // }
-          subDescription = `${assignment.status_interval_description}`
-          appendInnerIcon = assignment.status_vuetify_icon
-
-          subDescription += ` ${fromText}`
-
-          subtitle += subDescription
-          acc.push({
-            prependAvatar,
-            assignerName,
-            assigneeName,
-            title,
-            subtitle,
-            subDescription,
-            appendInnerIcon,
-
-            attachments: assignment.attachments ?? [],
-          })
-
-          if(index !== assignments.value.length - 1) {
-            acc.push({
-              type: 'divider',
-              inset: true,
-            })
-          }
-          return acc
-        }, formatteds)
-      })
-      const lastFormattedAssignment = computed(() => {
-        return formattedAssignments.value.length > 0 ? formattedAssignments.value[0] : null
-      })
-
-      watch(() => assignments.value, (newVal) => {
-        if(newVal && newVal.length > 0) {
-          attachments.value = newVal[0].attachments ?? []
-        }
-      })
-
-
-      const saveRequest = async (payload, successCallback = null, errorCallback = null, finallyCallback = null) => {
-        const endpoint = props.saveEndpoint.replace(':id', Input.input.value);
-
-        axios.post(endpoint, payload)
-          .then(response => {
-            if(successCallback) {
-              successCallback(response)
-            }
-          })
-          .catch(error => {
-            if(errorCallback) {
-              errorCallback(error)
-            }
-          })
-          .finally(() => {
-            if(finallyCallback) {
-              finallyCallback()
-            }
-          })
-
-        return false
-      }
-
-      const fetchAssignments = async () => {
-
-        if (Input.input.value) {
-          const endpoint = props.fetchEndpoint.replace(':id', Input.input.value);
-
-          loading.value = true
-
-          axios.get(endpoint)
-            .then(response => {
-              if(response.status === 200) {
-                assignments.value = response.data
-              }
-            }).finally(() => {
-              loading.value = false
-            })
-        }
-      }
-
-      const createAssignment = async () => {
-
-        if (Input.input.value) {
-          const valid = await createForm.value.validate()
-
-          if (!valid) {
-            return
-          }
-
-          const payload = {
-            ...createFormModel.value,
-            assignee_type: props.assigneeType,
-            assignable_id: Input.input.value,
-            assignable_type: props.assignableType
-          }
-
-          updating.value = true
-
-          saveRequest(
-            payload,
-            (response) => {
-              if(response.status === 200) {
-                assignments.value.unshift(response.data)
-                createFormModel.value = {
-                  assignee_id: null,
-                  due_at: null,
-                  description: null,
-                }
-              }
-            }, (error) => {
-              __log(error)
-            }, () => {
-              updating.value = false
-            }
-          )
-
-        }
-      }
-
-      const updateAssignment = async (payload) => {
-
-        if (Input.input.value !== null) {
-
-          updating.value = true
-
-          let res = await saveRequest(
-            payload,
-            (response) => { // successCallback
-              if(response.status === 200) {
-                Alert.openAlert({
-                  message: 'Assignment updated successfully',
-                  ...response.data,
-                })
-
-                if(response.data.assignments ) {
-                  assignments.value = response.data.assignments
-                }else{
-                  fetchAssignments()
-                }
-                DynamicModal.close()
-              }
-            }, (error) => { // errorCallback
-              __log(error)
-            }, () => {
-              updating.value = false
-              // completeModal.value = false
-            }
-          )
-
-          return res
-        }
-
-        return false
-      }
-
-      const openCompleteModal = () => {
-        DynamicModal.open(null, {
-          'modalProps': {
-            'widthType': 'md',
-            'description': t('Are you sure you want to complete this task?'),
-            'title': t('Complete Task'),
-            'confirmText': t('Yes'),
-            'cancelText': t('No'),
-
-            'confirmLoading': updating,
-            'rejectLoading': updating,
-            'confirmCallback': async () => {
-              await updateAssignment({
-                status: 'completed'
-              })
-            }
-          }
-        })
-      }
-
-      onMounted(() => {
-        fetchAssignments()
-      })
-
-      return {
-        ...Input,
-        requiredRule,
-        minRule,
-        dateRule,
-        futureDateRule,
-        invokeRule,
-
-        loading,
-        updating,
-        assignable_id,
-        assignees,
-        assignee_options,
-        assignments,
-        listAssignmentsModalActive,
-        createForm,
-        createFormModalActive,
-        createFormModel,
-        completeModal,
-        attachments,
-        attachmentsLoading,
-
-        isAuthorized,
-        lastAssignment,
-        isAssignee,
-        canView,
-        formattedAssignments,
-        lastFormattedAssignment,
-
-        fetchAssignments,
-        createAssignment,
-        updateAssignment,
-        openCompleteModal,
-      }
-    },
-  }
-</script>
 
 <style lang="scss">
   .v-input-assignment {
