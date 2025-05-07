@@ -17,16 +17,23 @@
 
     :loading="loading"
     :readonly="$attrs.readonly || readonly || loading"
+
+    :rules="rules ?? $attrs.rules ?? []"
   >
-    <template v-slot:append-item>
+  <template v-slot:append-item>
       <div v-if="lastPage > 0 && lastPage > page" v-intersect="endIntersect" />
+    </template>
+    <template
+      v-for="(context, slotName) in $slots" v-slot:[slotName]="slotScope"
+      :key="`customSlot-${slotName}`"
+      >
+      <slot :name="slotName" v-bind="slotScope" />
     </template>
   </component>
 </template>
 
 <script>
-import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
-import { getParameters, getURLWithoutQuery, getOrigin, getPath } from '@/utils/pushState'
+import { useInput, makeInputProps, makeInputEmits, useInputFetch, makeInputFetchProps } from '@/hooks'
 
 export default {
   name: 'v-input-select-scroll',
@@ -34,51 +41,27 @@ export default {
 
   props: {
     ...makeInputProps(),
+    ...makeInputFetchProps(),
     componentType: {
       type: String,
       default: 'v-autocomplete'
     },
-    itemValue: {
-      type: String,
-      default: 'id'
-    },
-    itemTitle: {
-      type: String,
-      default: 'name'
-    },
-    itemsPerPage: {
-      type: Number,
-      default: 20
-    },
-    endpoint: {
-      type: String,
-    },
-    multiple: {
-      type: Boolean,
-      default: false
-    },
-    items: {
-      type: Array,
-      default: () => []
-    }
   },
   setup (props, context) {
     const inputHook = useInput(props, context)
+    const inputFetchHook = useInputFetch(props, {
+      ...context,
+      input: inputHook.input
+    })
+
     return {
-      ...inputHook
+      ...inputHook,
+      ...inputFetchHook
     }
   },
   data () {
     return {
-      loading: false,
-      page: 1,
-      limit: 100,
-      lastPage: -1,
-      selectedVendorId: null,
-      elements: [],
-      loading: true,
-      search: '',
-      noFilter: this.componentType == 'v-autocomplete' ? true : null
+      noFilter: this.componentType == 'v-autocomplete' ? true : null,
     }
   },
   methods: {
@@ -87,131 +70,12 @@ export default {
         this.getItemsFromApi()
       }
     },
-    getItemsFromApi (event) {
-
-      if( !(this.page > this.lastPage) || this.lastPage < 0){
-        this.loading = true;
-        return new Promise(() => {
-          this.$axios.get(this.fullUrl)
-            .then(response => {
-              this.loading = false;
-
-              if(this.lastPage < 0)
-                this.lastPage = response.data.resource.last_page
-
-              if(this.search == ''){
-                this.elements = this.elements.concat(response.data.resource.data ?? []);
-              }else{
-                this.elements = response.data.resource.data ?? []
-              }
-
-              this.page++;
-
-              if(!!this.input){
-                let searchContinue = false;
-                let self = this
-
-
-                if(this.input){
-
-                  if(this.isMultiple){
-                    this.input.forEach(function(id){
-                      if(!self.elements.find((o) => o[self.itemValue] == id)){
-                        searchContinue = true
-                        return false
-                      }
-                    })
-                  }else {
-                    __log('getItemsFromApi', this.itemValue, this.input, this.elements, this.elements.find((o) => o[this.itemValue] == this.input))
-                    searchContinue = !this.elements.find((o) => o[this.itemValue] == this.input)
-                  }
-                }
-
-                if(searchContinue)
-                  this.getItemsFromApi()
-              }
-              // if(this.input.length > 0){
-              //   let searchContinue = false;
-              //   let self = this
-              //   this.input.forEach(function(id){
-              //     if(!self.elements.find((o) => o.id == id)){
-              //       searchContinue = true
-              //     }
-              //     return
-              //   })
-
-              //   if(searchContinue)
-              //     this.getItemsFromApi()
-              // }
-            })
-        })
-      }
-    },
-    searched(val) {
-
-      // if( this.input.length > 0 ){
-      if( !!this.input ){
-        if(this.search = ''){
-          this.elements = []
-          this.getItemsFromApi()
-        }else{
-          this.search = ''
-        }
-
-        return
-      }
-
-      this.search = val
-      this.page = 1
-      this.lastPage = -1
-
-      if(this.search == ''){
-        this.elements = []
-      }
-
-      // if(this.input.length > 0 ){
-      //   __log('searched', val, this.input)
-      // }
-
-      this.getItemsFromApi()
-
-    },
     makeReference (key) {
       return `${key}-${states.id}`
     },
 
   },
   computed: {
-    input: {
-      get() {
-        return this.modelValue ?? null
-      },
-      set(val, old) {
-        this.updateModelValue(val)
-      }
-    },
-    isMultiple() {
-      return this.multiple ?? false
-    },
-    rawEndpoint() {
-      return getURLWithoutQuery(this.endpoint)
-    },
-    defaultQueryParameters() {
-      return getParameters(this.endpoint)
-    },
-    queryParameters() {
-      let query = new URLSearchParams({
-        ...this.defaultQueryParameters,
-        page: this.page,
-        itemsPerPage: this.itemsPerPage,
-        ...(!!this.search ? {search: this.search} : {})
-      });
-
-      return query.toString()
-    },
-    fullUrl() {
-      return `${this.rawEndpoint}?${this.queryParameters}`
-    },
   },
   created () {
     this.getItemsFromApi()
