@@ -41,6 +41,8 @@ export const makeInputEmits = [
   'click:minute',
   'click:second',
 
+  'update:input',
+
 ]
 export const makeInputInjects = ['manualValidation']
 
