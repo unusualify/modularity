@@ -711,15 +711,14 @@
 </script>
 
 <style lang="scss">
+  .v-input-assignment {
+    min-height: 60px;
 
-.v-input-assignment {
-  min-height: 60px;
-
-  .v-input-assignment__list--assignee {
-    .v-list-item {
-      padding: 0 !important;
-      min-height: 60px;
+    .v-input-assignment__list--assignee {
+      .v-list-item {
+        padding: 0 !important;
+        min-height: 60px;
+      }
     }
   }
-}
 </style>
