@@ -31,7 +31,7 @@
     widthType="md"
     v-bind="state.modalProps"
   >
-    <template #body.description>
+    <template v-if="state.component" #body.description>
       <component
         v-if="state.component"
         :is="state.component"
