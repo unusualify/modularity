@@ -71,6 +71,25 @@ class AssignmentHydrate extends InputHydrate
         // $input['name'] = 'assignee_id';
         // add your logic
 
+        if (isset($input['acceptedExtensions']) && is_array($input['acceptedExtensions'])) {
+            $input['accepted-file-types'] = $this->getAcceptedFileTypes($input['acceptedExtensions']);
+            unset($input['acceptedExtensions']);
+        }
+
+        $filepondAcceptedFileTypes = isset($input['acceptedExtensions']) && is_array($input['acceptedExtensions'])
+            ? $input['acceptedExtensions']
+            : ['pdf', 'doc', 'docx', 'pages'];
+
+        $acceptedFileTypes = $input['accepted-file-types']
+            ?? $this->getAcceptedFileTypes($filepondAcceptedFileTypes);
+        $maxAttachments = $input['max-attachments'] ?? 3;
+        $input['filepond'] = modularity_format_input([
+            'type' => 'filepond',
+            'name' => 'attachments',
+            'accepted-file-types' => $acceptedFileTypes,
+            'max' => $maxAttachments,
+        ]);
+
         return $input;
     }
 }
