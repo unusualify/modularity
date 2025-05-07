@@ -32,6 +32,7 @@
                 :last-step-model="lastStepModel"
                 :protected-last-step-model="protectedLastStepModel"
                 :final-form-title="finalFormTitle"
+                :final-form-subtitle="finalFormSubtitle"
                 @final-form-action="handleFinalFormAction"
               />
             </template>
@@ -211,6 +212,10 @@
 
 
       finalFormTitle: {
+        type: String,
+        default: null
+      },
+      finalFormSubtitle: {
         type: String,
         default: null
       },
