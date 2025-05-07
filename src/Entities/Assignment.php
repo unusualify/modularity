@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
 use Unusualify\Modularity\Entities\Scopes\AssignmentScopes;
+use Unusualify\Modularity\Entities\Traits\HasFileponds;
 
 class Assignment extends Model
 {
-    use AssignmentScopes;
+    use AssignmentScopes, HasFileponds;
 
     /**
 	 * The attributes that are mass assignable.
@@ -43,6 +44,8 @@ class Assignment extends Model
         'status_icon',
         'status_interval_description',
         'status_vuetify_icon',
+
+        'attachments',
     ];
 
     protected $casts = [
@@ -61,7 +64,17 @@ class Assignment extends Model
         });
     }
 
-    public function assignable()
+    public function assignable(): \Illuminate\Database\Eloquent\Relations\MorphTo
+    {
+        return $this->morphTo();
+    }
+
+    public function assigner(): \Illuminate\Database\Eloquent\Relations\MorphTo
+    {
+        return $this->morphTo();
+    }
+
+    public function assignee(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
         return $this->morphTo();
     }
@@ -134,11 +147,6 @@ class Assignment extends Model
         );
     }
 
-    public function assignee()
-    {
-        return $this->morphTo();
-    }
-
     protected function assigneeName(): Attribute
     {
         return new Attribute(
@@ -160,9 +168,13 @@ class Assignment extends Model
         );
     }
 
-    public function assigner()
+    protected function attachments(): Attribute
     {
-        return $this->morphTo();
+        return Attribute::make(
+            get: fn ($value) => $this->fileponds()->whereRole('attachments')->get()->map(function ($filepond) {
+                return $filepond->mediableFormat();
+            }),
+        );
     }
 
     public function getTable()
