@@ -48,30 +48,34 @@
             </template>
 
             <template v-slot:body="formModalBodyScope">
+              <v-card class="fill-height d-flex flex-column">
+                <ue-form
+                  :ref="`extra-form-${key}`"
 
-              <ue-form
-                :ref="`extra-form-${key}`"
+                  :modelValue="createModel(action.schema)"
+                  :title="action.formTitle ?? null"
+                  :schema="action.schema"
+                  :action-url="action.endpoint.replace(':id', modelValue.id)"
+                  :valid="valids[key]"
+                  :is-editing="isEditing"
 
-                :modelValue="createModel(action.schema)"
-                :title="action.formTitle ?? null"
-                :schema="action.schema"
-                :action-url="action.endpoint.replace(':id', modelValue.id)"
-                :valid="valids[key]"
-                :is-editing="isEditing"
+                  :style="formModalBodyScope.isFullActive ? 'height: 90vh !important;' : 'height: 70vh !important;'"
 
-                :style="formModalBodyScope.isFullActive ? 'height: 90vh !important;' : 'height: 70vh !important;'"
+                  fill-height
+                  scrollable
 
-                has-divider
-                has-submit
-                button-text="Save"
+                  has-divider
+                  has-submit
+                  button-text="Save"
 
-                @submitted="$emit('actionComplete', { action })"
-                @update:valid="valids[key] = $event"
+                  @submitted="$emit('actionComplete', { action })"
+                  @update:valid="valids[key] = $event"
 
-                @updatex:modelValue="$log($event)"
+                  @updatex:modelValue="$log($event)"
 
-                v-bind="action.formAttributes ?? {}"
-              />
+                  v-bind="action.formAttributes ?? {}"
+                />
+              </v-card>
             </template>
 
           </ue-modal>
