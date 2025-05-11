@@ -482,6 +482,10 @@ class RouteServiceProvider extends ServiceProvider
                     );
 
                     foreach ($routes as $key => $item) {
+                        $hasFrontRoutes = $item['has_front_routes'] ?? false;
+
+                        if(!$hasFrontRoutes) continue;
+
                         $isSingleton = $module->isSingleton($item['name']);
 
                         if (isset($item['name'])) { // && getStringOrFalse($item['name'])
