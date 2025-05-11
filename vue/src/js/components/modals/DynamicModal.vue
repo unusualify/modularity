@@ -39,6 +39,17 @@
         v-on="listeners"
       />
     </template>
+
+    <template
+      v-for="slotName in Object.keys(state.slots)"
+      :key="slotName"
+      v-slot:[slotName]="slotScope"
+    >
+      <ue-recursive-stuff
+        :configuration="state.slots[slotName]"
+        :bindData="slotScope"
+      />
+    </template>
   </ue-modal>
 </template>
 
