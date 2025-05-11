@@ -4,6 +4,7 @@ namespace Modules\SystemPayment\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Modules\SystemPayment\Entities\PaymentCurrency;
@@ -31,62 +32,85 @@ class PaymentServiceSeeder extends Seeder
     {
         $paymentServices = [
             [
-                'name' => 'iyzico',
-                'title' => 'Iyzico',
+                'name' => 'Iyzico',
+                'key' => 'iyzico',
                 'is_external' => false,
-                'is_internal' => true,
-                'image' => 'credit-card.png',
-                'currency' => 'TRY',
+                'is_internal' => false,
+                'image' => 'iyzico.png',
             ],
             [
-                'name' => 'paypal',
-                'title' => 'PayPal',
+                'name' => 'Paypal',
+                'key' => 'paypal',
                 'is_external' => true,
                 'is_internal' => false,
                 'image' => 'paypal.png',
-                'currency' => 'USD',
+                'published' => true,
+                'button_style' => 'background-color: #FCBB32 !important; color: #002C6F !important;',
+
+                'paymentCurrencies' => [
+                    PaymentCurrency::where('iso_4217', 'US')->first()->id ?? null,
+                    PaymentCurrency::where('iso_4217', 'EUR')->first()->id ?? null,
+                ]
             ],
             [
-                'name' => 'garanti-pos',
-                'title' => 'GarantiPOS',
+                'name' => 'GarantiPOS',
+                'key' => 'garanti-pos',
                 'is_external' => false,
                 'is_internal' => true,
                 'image' => 'credit-card.png',
-                'currency' => 'TRY',
+                'published' => true,
+                'paymentCurrencies' => [
+                    PaymentCurrency::where('iso_4217', 'EUR')->first()->id ?? null,
+                ],
+                'internalPaymentCurrencies' => [
+                    'TRY',
+                    'USD',
+                    'EUR',
+                ]
             ],
             [
-                'name' => 'teb-pos',
-                'title' => 'TebPOS',
+                'name' => 'TebPOS',
+                'key' => 'teb-pos',
                 'is_external' => false,
                 'is_internal' => true,
                 'image' => 'credit-card.png',
-                'currency' => 'TRY',
             ],
             [
-                'name' => 'teb-common-pos',
-                'title' => 'TebCommonPOS',
+                'name' => 'TebCommonPOS',
+                'key' => 'teb-common-pos',
                 'is_external' => false,
                 'is_internal' => true,
                 'image' => 'credit-card.png',
-                'currency' => 'TRY',
+                // 'currency' => 'TRY',
             ],
             [
-                'name' => 'ideal',
-                'title' => 'iDEAL',
+                'name' => 'iDEAL',
+                'key' => 'ideal',
                 'is_external' => true,
                 'is_internal' => false,
                 'image' => 'ideal.png',
-                'currency' => 'EUR',
+                'published' => true,
+                'button_style' => 'background-color: rgb(var(--v-theme-grey-lighten-2)) !important;',
+
+                'paymentCurrencies' => [
+                    PaymentCurrency::where('iso_4217', 'EUR')->first()->id ?? null,
+                ]
+            ],
+            [
+                'name' => 'iDEAL QR',
+                'key' => 'ideal-qr',
+                'is_external' => true,
+                'is_internal' => false,
+                'image' => 'ideal-qr.png',
+                'published' => true,
+                'button_style' => 'background-color: rgb(var(--v-theme-grey-lighten-2)) !important;',
+
+                'paymentCurrencies' => [
+                    PaymentCurrency::where('iso_4217', 'EUR')->first()->id ?? null,
+                ],
             ],
         ];
 
-        // foreach ($paymentServices as $service) {
-        //     $paymentService = PaymentService::create($service);
-
-        //     // Attach some random currencies to each payment service
-        //     $currencies = PaymentCurrency::inRandomOrder()->take(rand(1, 3))->get();
-        //     $paymentService->paymentCurrencies()->attach($currencies);
-        // }
         $superadmin = User::role('superadmin', Modularity::getAuthGuardName())->first();
 
         if (! $superadmin) {
@@ -97,22 +121,29 @@ class PaymentServiceSeeder extends Seeder
 
         Auth::guard(Modularity::getAuthGuardName())->login($superadmin);
 
-        foreach ($paymentServices as $service) {
-            $paymentService = PaymentService::create([
-                'name' => $service['name'],
-                'title' => $service['title'],
-                'is_external' => $service['is_external'],
-                'is_internal' => $service['is_internal'],
-            ]);
+        foreach ($paymentServices as $_paymentService) {
+            $paymentService = PaymentService::create(Arr::only($_paymentService, ['name', 'key', 'is_external', 'is_internal']));
 
-            $this->createAndAssociateImage($paymentService, $service['image']);
+            $this->createAndAssociateImage($paymentService, $_paymentService['image']);
 
             // Get the specified currency for the payment service
-            $currency = PaymentCurrency::where('iso_4217', $service['currency'])->first();
-            if ($currency) {
-                $paymentService->paymentCurrencies()->attach($currency->id);
-            } else {
-                $this->command->warn("Currency {$service['currency']} not found for {$service['name']}");
+            if (isset($_paymentService['paymentCurrencies'])) {
+                foreach($_paymentService['paymentCurrencies'] as $currency_id) {
+                    $paymentCurrency = PaymentCurrency::find($currency_id);
+                    if($paymentCurrency) {
+                        $paymentService->paymentCurrencies()->attach($paymentCurrency->id);
+                    }
+                }
+            }
+
+            foreach($_paymentService['internalPaymentCurrencies'] ?? [] as $iso_4217) {
+                $paymentCurrency = PaymentCurrency::firstWhere('iso_4217', $iso_4217);
+
+                if(!$paymentCurrency->payment_service_id) {
+                    $paymentCurrency->update([
+                        'payment_service_id' => $paymentService->id,
+                    ]);
+                }
             }
         }
 
@@ -128,9 +159,9 @@ class PaymentServiceSeeder extends Seeder
             $imagePath = $base_path . $imageName;
 
         } else {
-            $imagePath = base_path('vendor/unusualify/modularity/resources/assets/images/payment-service-images/' . $imageName);
+            $imagePath = base_path('vendor/unusualify/modularity/resources/assets/images/payment-services/' . $imageName);
         }
-        $imagePath = base_path('vendor/unusualify/modularity/resources/assets/images/payment-service-images/' . $imageName);
+        $imagePath = base_path('vendor/unusualify/modularity/resources/assets/images/payment-services/' . $imageName);
         // $this->command->warn("Image path: $imagePath");
 
         if (file_exists($imagePath)) {
