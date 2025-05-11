@@ -1,4 +1,6 @@
 import { reactive, inject } from 'vue'
+import { isObject, omit } from 'lodash-es'
+import { removeParameterFromHistory } from '@/utils/pushState'
 
 /**
  * Manages a single, global dialog state.
@@ -10,6 +12,7 @@ class ModalService {
       component: null,
       props: {},
       emits: {},
+      slots: {},
       data: undefined,
       onClose: undefined,
       modalProps: {}
@@ -29,6 +32,7 @@ class ModalService {
     this.state.onClose   = options.onClose
     this.state.visible   = true
     this.state.modalProps = options.modalProps || {}
+    this.state.slots     = options.slots || {}
   }
 
   /**
@@ -45,6 +49,7 @@ class ModalService {
     this.state.data      = undefined
     this.state.onClose   = undefined
     this.state.modalProps = {}
+    this.state.slots     = {}
     if (cb) {
       cb(returnData)
     }
@@ -62,6 +67,36 @@ export default {
     // for Options API: this.$dialog
     app.config.globalProperties.$modalService = service
     window.$modalService = service
+
+    // Handle URL query parameters to open modals
+    const handleUrlQueryParameters = () => {
+      const urlParams = new URLSearchParams(window.location.search)
+      const modalParam = urlParams.get('modalService')
+
+      const modalData = JSON.parse(modalParam)
+
+      if (isObject(modalData)) {
+        // Get all other parameters to pass as data
+
+        // Dispatch modal opening based on the modal parameter
+        // This needs to be adapted based on how your modals are registered/loaded
+        try {
+          // You'll need to implement this function to map modal names to components
+          // const modalComponent = app.config.globalProperties.$modalComponents?.[modalParam]
+
+          service.open(modalData.component ?? null, omit(modalData, ['component']))
+
+          removeParameterFromHistory('modalService')
+
+        } catch (error) {
+          console.error('Failed to open modal from URL parameters:', error)
+        }
+      }
+    }
+
+    // Execute once the application is mounted
+    setTimeout(handleUrlQueryParameters, 0)
+
   }
 }
 
