@@ -2,11 +2,15 @@
 
 namespace Unusualify\Modularity\Http\Controllers\Traits\Table;
 
+use Illuminate\Support\Collection;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Traits\Allowable;
 
 trait TableRows
 {
+    use Allowable;
+
     /**
      * Get the table row actions
      * @return array
@@ -164,6 +168,46 @@ trait TableRows
             $tableActions,
             Modularity::find($this->moduleName)->getNavigationActions($this->routeName)
         );
+
+        $tableActions = Collection::make($tableActions)->reduce(function ($acc, $action, $key) {
+            $noSuperAdmin = $action['noSuperAdmin'] ?? false;
+
+            // $action['is'] = true;
+            // if(isset($action['connector'])){
+            //     $connector = new Connector($action['connector']);
+
+            //     $connector->run($action, 'is');
+            // }
+            // if(!$action['is']){
+            //     return $acc;
+            // }
+
+            $isAllowed = $this->isAllowedItem(
+                $action,
+                searchKey: 'allowedRoles',
+                orClosure: fn($item) => !$noSuperAdmin && $this->user->isSuperAdmin(),
+            );
+
+            if(!$isAllowed) {
+                return $acc;
+            }
+
+            if (isset($action['href'])) {
+                $action['href'] = resolve_route($action['href']);
+            }
+
+            if (isset($action['endpoint'])) {
+                $action['endpoint'] = resolve_route($action['endpoint']);
+            }
+
+            if (isset($action['url'])) {
+                $action['url'] = resolve_route($action['url']);
+            }
+
+            $acc[] = $action;
+
+            return $acc;
+        }, []);
 
         // dropdown actions
         if (count($tableActions) > 3) {
