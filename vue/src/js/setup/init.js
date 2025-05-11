@@ -742,12 +742,12 @@ export default function init(){
     store.commit(CONFIG.DECREASE_AXIOS_REQUEST)
 
     // Check for 401 Unauthenticated error
-    // if (response.status === 401) {
-    //   store.commit(USER.OPEN_LOGIN_MODAL)
-    // }
+    if (response.status === 401 && response.data.message === 'Unauthenticated.') {
+      store.commit(USER.OPEN_LOGIN_MODAL)
+    }
 
     if (response.status === 419 || response.data.message === 'CSRF token mismatch.') {
-      store.commit(USER.OPEN_LOGIN_MODAL)
+      // store.commit(USER.OPEN_LOGIN_MODAL)
     }
 
     handleSuccessResponse(response)
