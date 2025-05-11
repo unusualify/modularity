@@ -36,7 +36,7 @@ class DashboardController extends BaseController
 
     public function index($parentId = null)
     {
-        $blocks = app()->config->get(modularityBaseKey() . '.ui_settings.dashboard.blocks');
+        $blocks = $this->app->config->get(modularityBaseKey() . '.ui_settings.dashboard.blocks');
 
         foreach ($blocks as $index => $block) {
             if($this->isAllowedItem($block, 'allowedRoles')){
