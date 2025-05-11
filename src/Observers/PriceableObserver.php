@@ -47,4 +47,9 @@ class PriceableObserver
 
         $price->setAttribute($priceSavingKey, $priceSavingValue / 100);
     }
+
+    public function replicating($price)
+    {
+        $price->offsetUnset(Price::$priceSavingKey ?? 'price_value');
+    }
 }
