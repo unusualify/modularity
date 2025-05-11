@@ -11,7 +11,7 @@ enum AssignmentStatus: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::COMPLETED => __('Completed'),
             self::PENDING => __('Pending'),
             self::REJECTED => __('Rejected'),
@@ -21,7 +21,7 @@ enum AssignmentStatus: string
 
     public function color(): string
     {
-        return match($this) {
+        return match ($this) {
             self::COMPLETED => 'text-success',
             self::PENDING => 'text-warning',
             self::REJECTED => 'text-error',
@@ -31,7 +31,7 @@ enum AssignmentStatus: string
 
     public function iconColor(): string
     {
-        return match($this) {
+        return match ($this) {
             self::COMPLETED => 'success',
             self::PENDING => 'info',
             self::REJECTED => 'error',
@@ -41,7 +41,7 @@ enum AssignmentStatus: string
 
     public function icon(): string
     {
-        return match($this) {
+        return match ($this) {
             self::COMPLETED => 'mdi-check-circle-outline',
             self::PENDING => 'mdi-clock-outline',
             self::REJECTED => 'mdi-close-circle-outline',
@@ -51,7 +51,7 @@ enum AssignmentStatus: string
 
     public function timeIntervalDescription(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => __('Until'),
             self::REJECTED => __('Rejected'),
             self::CANCELLED => __('Cancelled'),
@@ -61,12 +61,11 @@ enum AssignmentStatus: string
 
     public function timeClasses(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => 'font-weight-bold text-blue-darken-1',
             self::REJECTED => 'font-weight-bold text-error',
             self::CANCELLED => 'font-weight-bold text-warning',
             self::COMPLETED => 'font-weight-bold text-success',
         };
     }
-
 }

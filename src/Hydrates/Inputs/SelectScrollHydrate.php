@@ -34,7 +34,7 @@ class SelectScrollHydrate extends InputHydrate
             return $input;
         }
 
-        if (!isset($input['endpoint'])) {
+        if (! isset($input['endpoint'])) {
             throw new \Exception('Endpoint is required ' . $input['name']);
         }
 

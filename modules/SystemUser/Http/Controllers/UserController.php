@@ -4,8 +4,8 @@ namespace Modules\SystemUser\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Controllers\BaseController;
 

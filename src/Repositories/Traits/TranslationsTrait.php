@@ -23,7 +23,7 @@ trait TranslationsTrait
         $traitName = get_class_short_name(__TRAIT__);
 
         $_columns = collect($inputs)->reduce(function ($acc, $curr) {
-            if(isset($curr['translated']) && $curr['translated']) {
+            if (isset($curr['translated']) && $curr['translated']) {
                 $acc[] = $curr['name'];
             }
 
@@ -153,7 +153,7 @@ trait TranslationsTrait
                 if (isset($scopes['searches'])) {
                     $q->where(function ($query) use (&$scopes) {
                         foreach ($scopes['searches'] as $field) {
-                            if(isset($scopes[$field])) {
+                            if (isset($scopes[$field])) {
                                 $query->orWhere($field, $this->getLikeOperator(), '%' . $scopes[$field] . '%');
                             }
                         }

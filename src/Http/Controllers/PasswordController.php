@@ -2,25 +2,23 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
-use Unusualify\Modularity\Entities\Company;
+use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Controllers\Traits\MakesResponses;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularity\Services\MessageStage;
+
 class PasswordController extends Controller
 {
-    use  ManageUtilities, MakesResponses, ResetsPasswords;
+    use ManageUtilities, MakesResponses, ResetsPasswords;
 
     public function __construct()
     {
@@ -47,8 +45,8 @@ class PasswordController extends Controller
     /**
      * Reset the given user's password.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
-     * @param  string  $password
+     * @param \Illuminate\Contracts\Auth\CanResetPassword $user
+     * @param string $password
      * @return void
      */
     protected function resetPassword($user, $password)

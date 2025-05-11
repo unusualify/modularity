@@ -15,8 +15,6 @@ trait Assignable
 
     /**
      * Perform any actions when booting the trait
-     *
-     * @return void
      */
     public static function bootAssignable(): void
     {
@@ -25,8 +23,6 @@ trait Assignable
 
     /**
      * Laravel hook to initialize the trait
-     *
-     * @return void
      */
     public function initializeAssignable(): void
     {
@@ -35,26 +31,22 @@ trait Assignable
 
     /**
      * Get all assignments for the model
-     *
-     * @return MorphMany
      */
-    public function assignments() : MorphMany
+    public function assignments(): MorphMany
     {
         return $this->morphMany(Assignment::class, 'assignable');
     }
 
     /**
      * Get the last assignment for the model
-     *
-     * @return MorphOne
      */
-    public function lastAssignment() : MorphOne
+    public function lastAssignment(): MorphOne
     {
         return $this->morphOne(Assignment::class, 'assignable')
             ->latest('created_at');
     }
 
-    protected function activeAssigneeName() : Attribute
+    protected function activeAssigneeName(): Attribute
     {
         return new Attribute(
             get: fn ($value) => $this->lastAssignment ? $this->lastAssignment->assignee->name : null,
@@ -62,14 +54,14 @@ trait Assignable
 
     }
 
-    protected function activeAssignerName() : Attribute
+    protected function activeAssignerName(): Attribute
     {
         return new Attribute(
             get: fn ($value) => $this->lastAssignment ? $this->lastAssignment->assigner->name : null,
         );
     }
 
-    protected function activeAssignmentStatus() : Attribute
+    protected function activeAssignmentStatus(): Attribute
     {
         return new Attribute(
             get: fn ($value) => $this->lastAssignment

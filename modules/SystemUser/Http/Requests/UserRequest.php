@@ -21,16 +21,16 @@ class UserRequest extends Request
     public function rulesForCreate()
     {
         return [
-            'name' => "sometimes|required|min:4",
-            'email' => "sometimes|required|email|unique_table",
+            'name' => 'sometimes|required|min:4',
+            'email' => 'sometimes|required|email|unique_table',
         ];
     }
 
     public function rulesForUpdate()
     {
         return [
-            'name' => "sometimes|required|min:4",
-            'email' => "sometimes|required|email|unique_table",
+            'name' => 'sometimes|required|min:4',
+            'email' => 'sometimes|required|email|unique_table',
         ];
     }
 }

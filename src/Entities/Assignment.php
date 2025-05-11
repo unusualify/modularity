@@ -15,11 +15,11 @@ class Assignment extends Model
     use AssignmentScopes, HasFileponds;
 
     /**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array<int, string>
-	 */
-	protected $fillable = [
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
         'assignable_id',
         'assignable_type',
         'assignee_id',
@@ -32,7 +32,7 @@ class Assignment extends Model
         'due_at',
         'accepted_at',
         'completed_at',
-	];
+    ];
 
     protected $appends = [
         'assignee_name',
@@ -118,13 +118,15 @@ class Assignment extends Model
     {
         $timeKey = 'due_at';
 
-        switch($this->status) {
+        switch ($this->status) {
             case AssignmentStatus::COMPLETED:
                 $timeKey = 'completed_at';
+
                 break;
             case AssignmentStatus::CANCELLED:
             case AssignmentStatus::REJECTED:
                 $timeKey = 'updated_at';
+
                 break;
         }
 

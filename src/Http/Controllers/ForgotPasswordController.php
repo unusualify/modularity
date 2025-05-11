@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
-use Illuminate\Auth\Passwords\PasswordBrokerManager;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

@@ -15,7 +15,6 @@ use Modules\SystemPayment\Entities\PaymentService;
 use Modules\SystemPricing\Entities\Currency;
 use Modules\SystemPricing\Entities\Price;
 use Unusualify\Modularity\Facades\CurrencyExchange;
-use Unusualify\Modularity\Services\CurrencyExchangeService;
 use Unusualify\Modularity\View\Component;
 use Unusualify\Payable\Models\Enums\PaymentStatus;
 use Unusualify\Payable\Payable;
@@ -51,7 +50,7 @@ class PriceController extends Controller
             );
             $exchangeRate = CurrencyExchange::getExchangeRate(mb_strtoupper($requestCurrencyIso4217));
 
-            $totalAmount = intval($rawAmount * ( 1 + $price->vat_multiplier));
+            $totalAmount = intval($rawAmount * (1 + $price->vat_multiplier));
         }
 
         $paymentService = null;
@@ -60,7 +59,7 @@ class PriceController extends Controller
             $paymentCurrency = PaymentCurrency::find($currency->id);
             $paymentService = $paymentCurrency->paymentService;
 
-            if (!$paymentService) {
+            if (! $paymentService) {
                 throw new \Exception('Payment service not found for currency ' . $paymentCurrency->iso_4217);
             }
         } else {
@@ -150,7 +149,7 @@ class PriceController extends Controller
         //     $payload,
         // );
 
-        if($price->payment && in_array($price->payment->status, [PaymentStatus::PENDING, PaymentStatus::FAILED])){
+        if ($price->payment && in_array($price->payment->status, [PaymentStatus::PENDING, PaymentStatus::FAILED])) {
             $paymentPayload['id'] = $price->payment->id;
         }
 
@@ -217,7 +216,7 @@ class PriceController extends Controller
             ];
         }
 
-        $modularityPayload = $payment ? $payment->parameters->modularity ?? new \stdClass() : new \stdClass();
+        $modularityPayload = $payment ? $payment->parameters->modularity ?? new \stdClass : new \stdClass;
 
         return redirect(merge_url_query($modularityPayload->previous_url ?? route('admin.dashboard'), [
             'modalService' => [
@@ -249,15 +248,12 @@ class PriceController extends Controller
                                     'weight' => 'regular',
                                     'transform' => 'none',
                                     'justify' => 'center',
-                                ])
+                                ]),
                         ])
-                        ->render()
+                        ->render(),
                 ],
-                'modalProps' => $modalProps
-            ]
+                'modalProps' => $modalProps,
+            ],
         ]));
     }
-
-
-
 }

@@ -83,5 +83,4 @@ class FilepondHydrate extends InputHydrate
 
         return $input;
     }
-
 }

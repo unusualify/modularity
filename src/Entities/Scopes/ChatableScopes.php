@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait ChatableScopes
 {
-
     public function scopeHasChatMessages(Builder $query): Builder
     {
         return $query->whereHas('chatMessages');
@@ -28,7 +27,7 @@ trait ChatableScopes
 
     public function scopeHasChatMessageWaitingReaction(Builder $query): Builder
     {
-        return $query->whereHas('latestChatMessage', function(Builder $query){
+        return $query->whereHas('latestChatMessage', function (Builder $query) {
             $query->fromClient();
         });
     }

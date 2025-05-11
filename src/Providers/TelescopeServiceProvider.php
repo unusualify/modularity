@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
 use Laravel\Telescope\TelescopeApplicationServiceProvider;
-use Unusualify\Modularity\Entities\User;
 
 class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 {

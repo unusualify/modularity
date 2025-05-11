@@ -43,16 +43,16 @@ trait ProcessableTrait
 
                 $processInput = Arr::first($schema, fn ($item) => $item['name'] == $column);
 
-                if($processInput && $processInput['type'] == 'process' && isset($processInput['schema'])){
+                if ($processInput && $processInput['type'] == 'process' && isset($processInput['schema'])) {
 
                     $processableSchema = [];
-                    foreach($processInput['schema'] as $input){
-                        if(isset($input['name']) && !isset($fields[$input['name']])){
+                    foreach ($processInput['schema'] as $input) {
+                        if (isset($input['name']) && ! isset($fields[$input['name']])) {
                             $processableSchema[] = $input;
                         }
                     }
-                    if(count($processableSchema) > 0){
-                        $processableSchema = collect($processableSchema)->mapWithKeys(fn($item) => [$item['name'] => $item])->toArray();
+                    if (count($processableSchema) > 0) {
+                        $processableSchema = collect($processableSchema)->mapWithKeys(fn ($item) => [$item['name'] => $item])->toArray();
                         $processableFields = $this->getFormFields($object, $processableSchema, noSerialization: true);
                         $fields = array_merge($processableFields, $fields);
                     }
@@ -74,12 +74,12 @@ trait ProcessableTrait
     public function getProcessId($object, string $status = 'preparing')
     {
 
-        if ($object->exists && !$object->process()->exists()) {
+        if ($object->exists && ! $object->process()->exists()) {
 
             // Create a new process with the given status
             $process = $object->process()->create([
                 'status' => $status,
-                'name' => class_basename($object) . ' Process'
+                'name' => class_basename($object) . ' Process',
             ]);
 
             // // Refresh the relationship

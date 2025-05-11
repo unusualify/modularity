@@ -7,7 +7,6 @@ use Unusualify\Modularity\View\ModularityWidget;
 
 class BoardInformationWidget extends ModularityWidget
 {
-
     public $tag = 'ue-board-information-plus';
 
     public $widgetTag = 'v-col';
@@ -44,10 +43,10 @@ class BoardInformationWidget extends ModularityWidget
     {
         $attributes = parent::hydrateAttributes($attributes);
 
-        if(isset($attributes['cards'])) {
+        if (isset($attributes['cards'])) {
             $cards = [];
-            foreach($attributes['cards'] as $card) {
-                if(is_array($card) && Arr::isAssoc($card) && isset($card['connector'])) {
+            foreach ($attributes['cards'] as $card) {
+                if (is_array($card) && Arr::isAssoc($card) && isset($card['connector'])) {
                     $data = init_connector($card['connector']);
                     $card['data'] = $data;
                     $cards[] = $card;
@@ -58,5 +57,4 @@ class BoardInformationWidget extends ModularityWidget
 
         return $attributes;
     }
-
 }

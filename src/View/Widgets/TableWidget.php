@@ -3,8 +3,9 @@
 namespace Unusualify\Modularity\View\Widgets;
 
 use Unusualify\Modularity\Module;
-use Unusualify\Modularity\View\ModularityWidget;
 use Unusualify\Modularity\Traits\Allowable;
+use Unusualify\Modularity\View\ModularityWidget;
+
 class TableWidget extends ModularityWidget
 {
     use Allowable;
@@ -63,7 +64,6 @@ class TableWidget extends ModularityWidget
         ],
     ];
 
-
     public function hydrateAttributes($attributes)
     {
         $attributes = parent::hydrateAttributes($attributes);
@@ -87,11 +87,11 @@ class TableWidget extends ModularityWidget
             );
         }
 
-        if(isset($attributes['columns'])) {
+        if (isset($attributes['columns'])) {
             $newColumns = $this->getAllowableItems(
                 $attributes['columns'],
                 searchKey: 'allowedRoles',
-                orClosure: fn($item, $user) => $user->isSuperAdmin(),
+                orClosure: fn ($item, $user) => $user->isSuperAdmin(),
             );
 
             $newColumns = configure_table_columns($newColumns);
@@ -101,5 +101,4 @@ class TableWidget extends ModularityWidget
 
         return $attributes;
     }
-
 }

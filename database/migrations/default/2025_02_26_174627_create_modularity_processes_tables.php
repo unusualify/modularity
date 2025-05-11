@@ -31,7 +31,7 @@ return new class extends Migration
                     ->constrained($tableProcesses)
                     ->onDelete('cascade');
 
-                    $table->string('status');
+                $table->string('status');
                 $table->text('reason')->nullable();
 
                 $table->uuid('user_id')

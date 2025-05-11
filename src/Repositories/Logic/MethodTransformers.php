@@ -129,6 +129,7 @@ trait MethodTransformers
                 return true;
             }
         }
+
         return false;
     }
 
@@ -285,9 +286,9 @@ trait MethodTransformers
 
         $this->traitColumns = $this->setColumns($this->traitColumns, $chunkedInputs);
 
-        if(!$noSerialization){
+        if (! $noSerialization) {
             $fields = $object->attributesToArray();
-        }else{
+        } else {
             $fields = [];
         }
 
@@ -348,7 +349,7 @@ trait MethodTransformers
         $searchesFields = $scopes['searches'] ?? [];
         unset($scopes['searches'], $scopes['search']);
         foreach ($searchesFields as $field) {
-            if(array_key_exists($field, $scopes)){
+            if (array_key_exists($field, $scopes)) {
                 unset($scopes[$field]);
             }
         }

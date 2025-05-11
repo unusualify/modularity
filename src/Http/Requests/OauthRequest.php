@@ -41,7 +41,7 @@ class OauthRequest extends Request
     {
         $url = $this->redirector->getUrlGenerator();
 
-        return $url->route(config('modularity.admin_route_name_prefix') .'.loginHandleCallbackProvider', ['provider' => $provider]);
+        return $url->route(config('modularity.admin_route_name_prefix') . '.loginHandleCallbackProvider', ['provider' => $provider]);
 
     }
 }

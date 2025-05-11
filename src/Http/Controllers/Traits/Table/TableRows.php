@@ -13,6 +13,7 @@ trait TableRows
 
     /**
      * Get the table row actions
+     *
      * @return array
      */
     protected function getTableRowActions()
@@ -185,10 +186,10 @@ trait TableRows
             $isAllowed = $this->isAllowedItem(
                 $action,
                 searchKey: 'allowedRoles',
-                orClosure: fn($item) => !$noSuperAdmin && $this->user->isSuperAdmin(),
+                orClosure: fn ($item) => ! $noSuperAdmin && $this->user->isSuperAdmin(),
             );
 
-            if(!$isAllowed) {
+            if (! $isAllowed) {
                 return $acc;
             }
 

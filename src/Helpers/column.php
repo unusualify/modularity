@@ -1,6 +1,6 @@
 <?php
 
-if(!function_exists('hydrate_table_column')) {
+if (! function_exists('hydrate_table_column')) {
     function hydrate_table_column(array $column)
     {
         // $this->hydrateHeaderSuffix($header);
@@ -34,7 +34,7 @@ if(!function_exists('hydrate_table_column')) {
     }
 }
 
-if(!function_exists('configure_table_column')) {
+if (! function_exists('configure_table_column')) {
     function configure_table_column(array $column)
     {
         return array_merge_recursive_preserve(
@@ -44,14 +44,14 @@ if(!function_exists('configure_table_column')) {
     }
 }
 
-if(!function_exists('configure_table_columns')) {
+if (! function_exists('configure_table_columns')) {
     function configure_table_columns(array $columns)
     {
         return array_map('configure_table_column', $columns);
     }
 }
 
-if(!function_exists('hydrate_table_column_translation')) {
+if (! function_exists('hydrate_table_column_translation')) {
     function hydrate_table_column_translation(array $column)
     {
         if (! isset($column['title'])) {
@@ -72,7 +72,7 @@ if(!function_exists('hydrate_table_column_translation')) {
     }
 }
 
-if(!function_exists('hydrate_table_columns_translations')) {
+if (! function_exists('hydrate_table_columns_translations')) {
     function hydrate_table_columns_translations(array $columns)
     {
         return array_map('hydrate_table_column_translation', $columns);

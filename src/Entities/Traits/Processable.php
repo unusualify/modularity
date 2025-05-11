@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Facades\Auth;
 use Unusualify\Modularity\Entities\Enums\ProcessStatus;
@@ -19,19 +18,15 @@ trait Processable
 
     /**
      * Perform any actions when booting the trait
-     *
-     * @return void
      */
     public static function bootProcessable(): void
     {
         static::retrieved(function (Model $model) {});
 
-        static::saving(function (Model $model) {
-
-        });
+        static::saving(function (Model $model) {});
 
         static::created(function (Model $model) {
-            if( !$model->process()->exists()) {
+            if (! $model->process()->exists()) {
                 $model->process()->create([
                     'status' => ProcessStatus::PREPARING,
                 ]);
@@ -54,13 +49,8 @@ trait Processable
 
     /**
      * Laravel hook to initialize the trait
-     *
-     * @return void
      */
-    public function initializeProcessable(): void
-    {
-
-    }
+    public function initializeProcessable(): void {}
 
     public function process(): MorphOne
     {
@@ -79,7 +69,7 @@ trait Processable
             'process_id',     // Foreign key on process_histories table
             'id',             // Local key on the model using this trait
             'id'              // Local key on processes table
-        )->where(modularityConfig('tables.processes', 'm_processes').'.processable_type', static::class);
+        )->where(modularityConfig('tables.processes', 'm_processes') . '.processable_type', static::class);
     }
 
     /**
@@ -100,7 +90,6 @@ trait Processable
             ['processable_id' => $this->id, 'processable_type' => static::class],
             ['status' => $status]
         );
-
 
         $this->process->histories()->create([
             'status' => $status,
@@ -142,6 +131,4 @@ trait Processable
             ->where('status', $status)
             ->exists();
     }
-
-
 }

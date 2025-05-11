@@ -63,25 +63,25 @@ abstract class BaseController extends PanelController
         $this->addIndexWiths();
 
         if ($this->request->ajax()) {
-            if($this->request->has('ids')){
+            if ($this->request->has('ids')) {
                 $ids = $this->request->get('ids');
 
-                if(is_string($ids)){
+                if (is_string($ids)) {
                     $ids = explode(',', $ids);
                 }
 
                 $eagers = $this->request->get('eagers') ?? [];
-                if(is_string($eagers)){
+                if (is_string($eagers)) {
                     $eagers = explode(',', $eagers);
                 }
 
                 $scopes = $this->request->get('scopes') ?? [];
-                if(is_string($scopes)){
+                if (is_string($scopes)) {
                     $scopes = explode(',', $scopes);
                 }
 
                 $orders = $this->request->get('orders') ?? [];
-                if(is_string($orders)){
+                if (is_string($orders)) {
                     $orders = explode(',', $orders);
                 }
 
@@ -176,7 +176,6 @@ abstract class BaseController extends PanelController
         $this->addFormWiths();
 
         $input = $this->validateFormRequest()->all();
-
 
         // $optionalParent = $parentId ? [$this->getParentModuleForeignKey() => $parentId] : [];
         $optionalParent = $this->nestedParentScopes();
@@ -593,10 +592,10 @@ abstract class BaseController extends PanelController
             $exploded = explode('.', $relationshipName);
 
             $relation = null;
-            if(count($exploded) > 1){
+            if (count($exploded) > 1) {
                 $relationshipName = $exploded[1];
                 $item = $item->{$exploded[0]};
-            }else{
+            } else {
                 $relation = $item->{$relationshipName}();
             }
 

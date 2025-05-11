@@ -6,7 +6,6 @@ use Illuminate\Support\Arr;
 
 trait SpreadableTrait
 {
-
     protected function setColumnsSpreadableTrait($columns, $inputs)
     {
         $traitName = get_class_short_name(__TRAIT__);
@@ -21,16 +20,17 @@ trait SpreadableTrait
 
         return $columns;
     }
+
     protected function beforeSaveSpreadableTrait($object, $fields)
     {
         // Get the spreadable model instance
         $spreadableModel = $object->spreadable()->first();
 
-        if (!$spreadableModel && $object->exists) {
+        if (! $spreadableModel && $object->exists) {
             $object->spreadable()->create();
         }
 
-        if (!$spreadableModel) {
+        if (! $spreadableModel) {
             return;
         }
 

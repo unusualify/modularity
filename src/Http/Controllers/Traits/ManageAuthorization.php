@@ -2,8 +2,6 @@
 
 namespace Unusualify\Modularity\Http\Controllers\Traits;
 
-use Illuminate\Support\Facades\Auth;
-
 trait ManageAuthorization
 {
     /**
@@ -60,6 +58,6 @@ trait ManageAuthorization
      */
     public function doesNotHaveAuthorization($roles)
     {
-        return !$this->isAuthorized($roles);
+        return ! $this->isAuthorized($roles);
     }
 }

@@ -136,7 +136,7 @@ return [
                     'email',
                     'disabled',
                     'disable_value.*.value',
-                ]
+                ],
             ],
             'disable_value' => [
                 [
@@ -371,7 +371,7 @@ return [
                 'cols' => 6,
                 'lg' => 6,
             ],
-            'rules' => 'min:2'
+            'rules' => 'min:2',
         ],
         'company' => [
             'type' => 'text',
@@ -382,7 +382,7 @@ return [
                 'cols' => 6,
                 'lg' => 6,
             ],
-            'rules' => 'min:2'
+            'rules' => 'min:2',
         ],
         'email' => [
             'type' => 'text',
@@ -428,7 +428,7 @@ return [
                 'lg' => 6,
             ],
             'rules' => [
-                ['required', 'classic',null, null, 'Confirm Password'],
+                ['required', 'classic', null, null, 'Confirm Password'],
             ],
         ],
         'tos' => [
@@ -442,5 +442,5 @@ return [
             ],
             // 'rules' => 'required',
         ],
-    ]
+    ],
 ];

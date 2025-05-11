@@ -2,7 +2,4 @@
 
 namespace Unusualify\Modularity\Hydrates\Inputs;
 
-class JsonRepeaterHydrate extends RepeaterHydrate
-{
-
-}
+class JsonRepeaterHydrate extends RepeaterHydrate {}

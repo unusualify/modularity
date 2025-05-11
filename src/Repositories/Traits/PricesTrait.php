@@ -45,7 +45,6 @@ trait PricesTrait
             return;
         }
 
-
         $onlyBaseCurrency = modularityConfig('services.currency_exchange.active');
         $baseCurrency = modularityConfig('services.currency_exchange.base_currency');
         $priceSavingKey = Price::$priceSavingKey;

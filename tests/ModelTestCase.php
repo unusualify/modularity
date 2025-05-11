@@ -5,8 +5,6 @@ namespace Unusualify\Modularity\Tests;
 use Oobook\Database\Eloquent\ManageEloquentServiceProvider;
 use Spatie\Activitylog\ActivitylogServiceProvider;
 use Spatie\Activitylog\Models\Activity;
-use Unusualify\Modularity\Activators\ModularityActivator;
-
 
 abstract class ModelTestCase extends TestCase
 {
@@ -26,7 +24,7 @@ abstract class ModelTestCase extends TestCase
     {
         return array_merge(parent::getPackageProviders($app), [
             ManageEloquentServiceProvider::class,
-            ActivitylogServiceProvider::class
+            ActivitylogServiceProvider::class,
         ]);
     }
 
@@ -61,4 +59,3 @@ abstract class ModelTestCase extends TestCase
         ]);
     }
 }
-

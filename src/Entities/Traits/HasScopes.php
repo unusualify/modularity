@@ -52,6 +52,7 @@ trait HasScopes
 
     /**
      * Scope to filter records between two dates
+     *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param string $column
      * @param string $startDate
@@ -60,14 +61,16 @@ trait HasScopes
      */
     public function scopeBetween($query, $column, $startDate = null, $endDate = null)
     {
-        if($startDate && $endDate) {
+        if ($startDate && $endDate) {
             return $query->whereBetween("{$this->getTable()}.$column", [$startDate, $endDate]);
         }
+
         return $query;
     }
 
     /**
      * Scope to filter records between two dates
+     *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param string $startDate
      * @param string $endDate
@@ -75,11 +78,12 @@ trait HasScopes
      */
     public function scopeCreatedAtBetween($query, $startDate, $endDate)
     {
-        return $query->between("created_at", $startDate, $endDate);
+        return $query->between('created_at', $startDate, $endDate);
     }
 
     /**
      * Scope to filter records between two dates
+     *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param string $startDate
      * @param string $endDate
@@ -87,7 +91,7 @@ trait HasScopes
      */
     public function scopeUpdatedAtBetween($query, $startDate, $endDate)
     {
-        return $query->between("updated_at", $startDate, $endDate);
+        return $query->between('updated_at', $startDate, $endDate);
     }
 
     public static function handleScopes($query, $scopes = [])

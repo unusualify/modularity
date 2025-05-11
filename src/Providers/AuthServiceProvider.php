@@ -161,7 +161,7 @@ class AuthServiceProvider extends ServiceProvider implements DeferrableProvider
 
     public function register()
     {
-        VerifyEmail::createUrlUsing(function ($notifiable){
+        VerifyEmail::createUrlUsing(function ($notifiable) {
             $verifyUrl = URL::temporarySignedRoute(
                 'admin.verification.verify',
                 Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),

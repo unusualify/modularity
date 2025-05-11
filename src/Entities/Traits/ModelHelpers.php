@@ -187,9 +187,9 @@ trait ModelHelpers
 
     public function setStateFormatted($state)
     {
-        if($state) {
+        if ($state) {
             return "<v-chip variant='text' color='{$state->color}' prepend-icon='{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</v-chip>";
-        }else{
+        } else {
             return "<v-chip variant='text' color='grey' prepend-icon='mdi-alert-circle-outline'>" . __('No Status') . '</v-chip>';
         }
     }
@@ -299,17 +299,16 @@ trait ModelHelpers
 
     public function __call($method, $arguments)
     {
-        if (!method_exists($this, $method)) {
+        if (! method_exists($this, $method)) {
 
-            if(preg_match('/^numberOf(.*)/', $method, $matches)) {
+            if (preg_match('/^numberOf(.*)/', $method, $matches)) {
                 $relationshipTypes = $this->definedRelationsTypes();
                 $camelCase = Str::camel($matches[1]);
                 $snakeCase = Str::snake($matches[1]);
 
-
-                if(array_key_exists($camelCase, $relationshipTypes) && in_array($relationshipTypes[$camelCase], ['hasMany', 'belongsToMany', 'HasManyThrough', 'MorphMany', 'MorphToMany'])) {
+                if (array_key_exists($camelCase, $relationshipTypes) && in_array($relationshipTypes[$camelCase], ['hasMany', 'belongsToMany', 'HasManyThrough', 'MorphMany', 'MorphToMany'])) {
                     return $this->{$camelCase}()->count();
-                }else if(array_key_exists($snakeCase, $relationshipTypes) && in_array($relationshipTypes[$snakeCase], ['hasMany', 'belongsToMany', 'HasManyThrough', 'MorphMany', 'MorphToMany'])) {
+                } elseif (array_key_exists($snakeCase, $relationshipTypes) && in_array($relationshipTypes[$snakeCase], ['hasMany', 'belongsToMany', 'HasManyThrough', 'MorphMany', 'MorphToMany'])) {
                     return $this->{$snakeCase}()->count();
                 }
                 // if(is_plural($matches[1])) {
@@ -319,5 +318,4 @@ trait ModelHelpers
 
         return parent::__call($method, $arguments);
     }
-
 }

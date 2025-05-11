@@ -94,7 +94,7 @@ abstract class CoreController extends LaravelController
     {
         $perPage = $this->request->get('itemsPerPage') ?? $this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10;
 
-        if( !$this->request->ajax() ){
+        if (! $this->request->ajax()) {
             $perPage = -1;
         }
 
@@ -389,7 +389,7 @@ abstract class CoreController extends LaravelController
 
     public function createAssignment($id)
     {
-        if(($status = $this->request->get('status'))){
+        if (($status = $this->request->get('status'))) {
             $assignable = $this->repository->getById($id);
 
             $assignable->lastAssignment->update([
@@ -405,7 +405,7 @@ abstract class CoreController extends LaravelController
             ]);
         }
 
-        if(($attachments = $this->request->get('attachments'))){
+        if (($attachments = $this->request->get('attachments'))) {
             $assignable = $this->repository->getById($id);
 
             $lastAssignment = $assignable->lastAssignment;
@@ -436,7 +436,7 @@ abstract class CoreController extends LaravelController
 
         $assignable = $this->repository->getById($id);
 
-        if($assignable->lastAssignment && $assignable->lastAssignment->status !== AssignmentStatus::COMPLETED){
+        if ($assignable->lastAssignment && $assignable->lastAssignment->status !== AssignmentStatus::COMPLETED) {
             $assignable->lastAssignment->update([
                 'status' => AssignmentStatus::CANCELLED,
             ]);

@@ -99,7 +99,7 @@ trait HasPayment
             ->hasPayment(true, 'COMPLETED');
     }
 
-    public function payment() : \Illuminate\Database\Eloquent\Relations\HasOneThrough
+    public function payment(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
         $priceTable = (new Price)->getTable();
         $paymentTable = (new Payment)->getTable();
@@ -117,7 +117,7 @@ trait HasPayment
             ->latest("{$paymentTable}.created_at");
     }
 
-    public function payments() : \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    public function payments(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
         $priceTable = (new Price)->getTable();
         $morphClass = $this->getMorphClass();
@@ -176,7 +176,7 @@ trait HasPayment
                 $relation = $relation->each(function ($item) use (&$price) {
                     $basePrice = $item->basePrice ?? $item->base_price;
 
-                    if($basePrice){
+                    if ($basePrice) {
                         try {
                             $price += $basePrice instanceof Model
                                 ? $basePrice->raw_amount
@@ -186,7 +186,7 @@ trait HasPayment
                         }
                     }
                 });
-            } else if ($relation instanceof Model) {
+            } elseif ($relation instanceof Model) {
                 $basePrice = $relation->basePrice;
                 $price += $basePrice instanceof Model
                     ? $basePrice->raw_amount

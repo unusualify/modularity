@@ -8,7 +8,6 @@ trait RelationshipHelpers
 {
     /**
      * @param array|string|null $relations
-     * @return array
      */
     public function definedRelations($relations = null): array
     {

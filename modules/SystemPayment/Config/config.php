@@ -147,7 +147,7 @@ return [
                         'payable.cancel',
                         [
                             'payment' => ':id',
-                        ]
+                        ],
                     ],
                     'hasDialog' => true,
                     'dialogQuestion' => __('Are you sure you want to cancel this payment?'),
@@ -163,11 +163,11 @@ return [
                         'payable.refund',
                         [
                             'payment' => ':id',
-                        ]
+                        ],
                     ],
                     'hasDialog' => true,
                     'dialogQuestion' => __('Are you sure you want to refund this payment?'),
-                ]
+                ],
             ],
             'headers' => [
                 [
@@ -194,7 +194,7 @@ return [
                         [
                             'variant' => 'outlined',
                             'color' => 'primary',
-                        ]
+                        ],
                     ],
                 ],
                 [
@@ -208,7 +208,7 @@ return [
                         'chip',
                         [
                             'size' => 'small',
-                        ]
+                        ],
                     ],
                 ],
                 [

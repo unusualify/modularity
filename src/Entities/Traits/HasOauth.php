@@ -17,7 +17,6 @@ trait HasOauth
     }
 
     /**
-     * @param \Laravel\Socialite\Contracts\User $oauthUser
      * @param string $provider Socialite provider
      * @return \Illuminate\Database\Eloquent\Model|false
      */

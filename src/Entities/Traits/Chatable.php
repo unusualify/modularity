@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Unusualify\Modularity\Entities\Chat;
@@ -36,7 +35,6 @@ trait Chatable
         });
     }
 
-
     /**
      * Laravel hook to initialize the trait
      */
@@ -44,7 +42,7 @@ trait Chatable
     {
         $noAppend = static::$noChatableAppends ?? false;
 
-        if(!$noAppend) {
+        if (! $noAppend) {
             $this->setAppends(array_merge($this->getAppends(), ['chat_messages_count', 'unread_chat_messages_count', 'unread_chat_messages_for_you_count']));
         }
     }

@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
-use Unusualify\Modularity\Events\ModularityUserRegistered;
 use Unusualify\Modularity\Entities\Company;
 use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Events\ModularityUserRegistered;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularity\Services\MessageStage;
 
@@ -134,7 +134,7 @@ class RegisterController extends Controller
                             'lg' => 6,
                         ],
                         'rules' => [
-                            ['required', 'classic',null, null, 'Confirm Password'],
+                            ['required', 'classic', null, null, 'Confirm Password'],
                         ],
                     ],
                     'tos' => [
@@ -286,6 +286,7 @@ class RegisterController extends Controller
                     'variant' => MessageStage::WARNING,
                 ], 200)
                 : $request->validate($this->rules());
+
             return $res;
         }
 
@@ -309,10 +310,11 @@ class RegisterController extends Controller
     public function rules()
     {
         $usersTable = modularityConfig('tables.users', 'um_users');
+
         return [
             'name' => ['required', 'string', 'max:255'],
-            //Surname is not mandatory.
-            //'surname' => ['required', 'string', 'max:255'],
+            // Surname is not mandatory.
+            // 'surname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . $usersTable . ',email'],
             'password' => ['required', 'string', 'min:8'],
         ];

@@ -15,7 +15,7 @@ class Company extends Model
     /**
      * Create a new factory instance for the model.
      */
-    protected static function newFactory() : Factory
+    protected static function newFactory(): Factory
     {
         return CompanyFactory::new();
     }
@@ -42,5 +42,4 @@ class Company extends Model
     {
         return modularityConfig('tables.companies', parent::getTable());
     }
-
 }

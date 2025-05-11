@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\View\Widgets;
 
-use Unusualify\Modularity\Exceptions\ModuleNotFoundException;
 use Unusualify\Modularity\Services\Connector;
 use Unusualify\Modularity\View\ModularityWidget;
 
@@ -46,11 +45,11 @@ class MetricGroupsWidget extends ModularityWidget
         //     $attributes
         // );
 
-        if(isset($attributes['items'])) { // ue-metric-groups items (for each ue-metrics)
-            $attributes['items'] = array_map(function($metricGroup) {
-                if(isset($metricGroup['items'])) { // ue-metrics items (for each ue-metric)
-                    $metricGroup['items'] = array_map(function($metric) {
-                        if(isset($metric['connector'])) {
+        if (isset($attributes['items'])) { // ue-metric-groups items (for each ue-metrics)
+            $attributes['items'] = array_map(function ($metricGroup) {
+                if (isset($metricGroup['items'])) { // ue-metrics items (for each ue-metric)
+                    $metricGroup['items'] = array_map(function ($metric) {
+                        if (isset($metric['connector'])) {
                             // dd(init_connector($metric['connector']));
                             $connector = new Connector($metric['connector']);
 
@@ -64,7 +63,7 @@ class MetricGroupsWidget extends ModularityWidget
                 return $metricGroup;
             }, $attributes['items']);
         }
+
         return $attributes;
     }
-
 }

@@ -39,7 +39,7 @@ class DashboardController extends BaseController
         $blocks = $this->app->config->get(modularityBaseKey() . '.ui_settings.dashboard.blocks');
 
         foreach ($blocks as $index => $block) {
-            if($this->isAllowedItem($block, 'allowedRoles')){
+            if ($this->isAllowedItem($block, 'allowedRoles')) {
                 $blocks[$index] = Component::create($block);
             }
         }

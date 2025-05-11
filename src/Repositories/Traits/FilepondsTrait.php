@@ -31,13 +31,13 @@ trait FilepondsTrait
         foreach ($columns as $column) {
             $files = data_get($fields, $column) ?? null;
 
-            if(!$files){
+            if (! $files) {
                 continue;
             }
 
             $role = $column;
-            if(preg_match('/\.\*\./', $column)){
-                foreach($files as $index => $nestedFiles){
+            if (preg_match('/\.\*\./', $column)) {
+                foreach ($files as $index => $nestedFiles) {
                     $nestedRole = preg_replace('/\.\*\./', ".$index.", $column);
                     if (Arr::isAssoc($nestedFiles)) {
                         foreach ($nestedFiles as $locale => $nestedFilesByLocale) {
@@ -47,7 +47,7 @@ trait FilepondsTrait
                         Filepond::saveFile($object, $nestedFiles, $nestedRole);
                     }
                 }
-            }else {
+            } else {
 
                 if (Arr::isAssoc($files)) {
                     foreach ($files as $locale => $filesByLocale) {
@@ -88,7 +88,7 @@ trait FilepondsTrait
             foreach ($this->getColumns(__TRAIT__) as $role) {
 
                 if (isset($filepondsByRole[$role])) {
-                    if(isset($schema[$role])){
+                    if (isset($schema[$role])) {
                         $input = $schema[$role];
                         if ($input['translated'] ?? false) {
                             $groupedByLocale = $filepondsByRole[$role]->groupBy('locale');

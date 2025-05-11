@@ -36,24 +36,24 @@ class MetricsWidget extends ModularityWidget
             'valueClass' => null,
             'labelClass' => null,
             'noInline' => false,
-        ]
+        ],
     ];
 
     public function hydrateAttributes($attributes)
     {
         $attributes = parent::hydrateAttributes($attributes);
-        if(isset($attributes['items'])) { // ue-metric-groups items (for each ue-metrics)
-            $attributes['items'] = array_map(function($metric) {
-                if(isset($metric['connector'])) {
+        if (isset($attributes['items'])) { // ue-metric-groups items (for each ue-metrics)
+            $attributes['items'] = array_map(function ($metric) {
+                if (isset($metric['connector'])) {
                     // dd(init_connector($metric['connector']));
                     $connector = new Connector($metric['connector']);
 
-                    if(isset($metric['pushEvents'])) {
+                    if (isset($metric['pushEvents'])) {
                         $connector->pushEvents($metric['pushEvents']);
                     }
 
                     $connector->run($metric, 'value');
-                } else if(isset($metric['value']) && is_callable($metric['value'])) {
+                } elseif (isset($metric['value']) && is_callable($metric['value'])) {
                     $metric['value'] = $metric['value']();
                 }
 
@@ -65,5 +65,4 @@ class MetricsWidget extends ModularityWidget
 
         return $attributes;
     }
-
 }

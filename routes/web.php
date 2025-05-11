@@ -30,11 +30,11 @@ Route::prefix('register')->as('register.')
     ->middleware(['web', 'modularity.core'])
     ->group(function () {
 
-    Route::get('/password/generate/{token}', 'PasswordController@showForm')
-        ->name('password.generate.form');
-    Route::post('/password/generate', 'PasswordController@savePassword')
-        ->name('password.generate');
-});
+        Route::get('/password/generate/{token}', 'PasswordController@showForm')
+            ->name('password.generate.form');
+        Route::post('/password/generate', 'PasswordController@savePassword')
+            ->name('password.generate');
+    });
 
 Route::singleton('profile', 'ProfileController', ['names' => ['edit' => 'profile']]);
 Route::group(['prefix' => 'profile', 'as' => 'profile.'], function () {

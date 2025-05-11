@@ -50,7 +50,7 @@ class PaymentServiceSeeder extends Seeder
                 'paymentCurrencies' => [
                     PaymentCurrency::where('iso_4217', 'US')->first()->id ?? null,
                     PaymentCurrency::where('iso_4217', 'EUR')->first()->id ?? null,
-                ]
+                ],
             ],
             [
                 'name' => 'GarantiPOS',
@@ -66,7 +66,7 @@ class PaymentServiceSeeder extends Seeder
                     'TRY',
                     'USD',
                     'EUR',
-                ]
+                ],
             ],
             [
                 'name' => 'TebPOS',
@@ -94,7 +94,7 @@ class PaymentServiceSeeder extends Seeder
 
                 'paymentCurrencies' => [
                     PaymentCurrency::where('iso_4217', 'EUR')->first()->id ?? null,
-                ]
+                ],
             ],
             [
                 'name' => 'iDEAL QR',
@@ -128,18 +128,18 @@ class PaymentServiceSeeder extends Seeder
 
             // Get the specified currency for the payment service
             if (isset($_paymentService['paymentCurrencies'])) {
-                foreach($_paymentService['paymentCurrencies'] as $currency_id) {
+                foreach ($_paymentService['paymentCurrencies'] as $currency_id) {
                     $paymentCurrency = PaymentCurrency::find($currency_id);
-                    if($paymentCurrency) {
+                    if ($paymentCurrency) {
                         $paymentService->paymentCurrencies()->attach($paymentCurrency->id);
                     }
                 }
             }
 
-            foreach($_paymentService['internalPaymentCurrencies'] ?? [] as $iso_4217) {
+            foreach ($_paymentService['internalPaymentCurrencies'] ?? [] as $iso_4217) {
                 $paymentCurrency = PaymentCurrency::firstWhere('iso_4217', $iso_4217);
 
-                if(!$paymentCurrency->payment_service_id) {
+                if (! $paymentCurrency->payment_service_id) {
                     $paymentCurrency->update([
                         'payment_service_id' => $paymentService->id,
                     ]);

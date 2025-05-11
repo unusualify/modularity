@@ -1353,7 +1353,7 @@ return [
                             'email',
                             'disabled',
                             'disable_value.*.value',
-                        ]
+                        ],
                     ],
                     'disable_value' => [
                         [

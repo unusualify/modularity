@@ -33,17 +33,17 @@ class PaymentServiceHydrate extends InputHydrate
 
         $input['api'] = route('currency.convert');
 
-        $input['currencies'] = !$this->skipQueries
+        $input['currencies'] = ! $this->skipQueries
             ? PaymentCurrency::whereHas('paymentServices')
                 ->orWhereHas('paymentService')
                 ->with('paymentServices', 'paymentService')
                 ->get()
             : [];
 
-        $input['items'] = !$this->skipQueries
+        $input['items'] = ! $this->skipQueries
             ? PaymentService::published()->where('is_external', 1)->with('paymentCurrencies')->get()->toArray()
             : [];
-        $paymentServices = !$this->skipQueries
+        $paymentServices = ! $this->skipQueries
             ? PaymentService::published()->where('is_internal', 1)->with(['paymentCurrencies', 'cardTypes'])->get()->all()
             : [];
 

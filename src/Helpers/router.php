@@ -1,11 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Route;
 
 if (! function_exists('previous_route_name')) {
     /**
-     * @return string|boolean
+     * @return string|bool
      */
     function previous_route_name()
     {
@@ -28,11 +28,11 @@ if (! function_exists('array_to_query_string')) {
     function array_to_query_string(array $data)
     {
         $flat = collect($data)
-            ->mapWithKeys(function($value, $key) {
+            ->mapWithKeys(function ($value, $key) {
                 return [
                     $key => is_object($value) || (is_array($value) && Arr::isAssoc($value))
-                                ? json_encode($value, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE)
-                                : $value
+                                ? json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                                : $value,
                 ];
             })
             ->all();
@@ -74,8 +74,6 @@ if (! function_exists('merge_url_query')) {
         // Construct the new URL
         return $base_url . '?' . array_to_query_string($merged_params);
 
-
-
         if (gettype($data) == 'object') {
             $data = object_to_array($data);
         }
@@ -115,21 +113,21 @@ if (! function_exists('resolve_route')) {
         $url = $definition;
         $params = [];
 
-        if(is_array($definition)){
+        if (is_array($definition)) {
             $routeName = $definition[0];
             $params = $definition[1] ?? [];
         }
 
-        if(($routeName = Route::hasAdmin($routeName))){
+        if (($routeName = Route::hasAdmin($routeName))) {
             $route = Route::getRoutes()->getByName($routeName);
 
             $routeParameters = [];
-            if(count($route->parameterNames())){
-                foreach($route->parameterNames() as $parameter){
-                    if(isset($params[$parameter])){
+            if (count($route->parameterNames())) {
+                foreach ($route->parameterNames() as $parameter) {
+                    if (isset($params[$parameter])) {
                         $routeParameters[$parameter] = $params[$parameter];
                         unset($params[$parameter]);
-                    }else{
+                    } else {
                         throw new \Exception('Action route must not have parameters: ' . $routeName);
                     }
                 }

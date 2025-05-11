@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Oobook\Database\Eloquent\Concerns\ManageEloquent;
 
@@ -27,11 +26,11 @@ trait HasSpreadable
                 // Set property to preserve data through events
                 $model->spreadablePayload = $model->{$model->getSpreadableSavingKey()} ?: $model->prepareSpreadableJson();
             } elseif ($model->{$model->getSpreadableSavingKey()}) {
-                if(!$model->spreadable){
+                if (! $model->spreadable) {
                     $model->spreadable()->create([
                         'content' => $model->{$model->getSpreadableSavingKey()},
                     ]);
-                }else{
+                } else {
                     // Handle existing spread updates
                     $model->spreadable()->update([
                         'content' => $model->{$model->getSpreadableSavingKey()},

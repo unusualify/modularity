@@ -24,7 +24,7 @@ class Payment extends \Unusualify\Payable\Models\Payment
         'email',
         'installment',
         'parameters',
-        'response'
+        'response',
     ];
 
     protected $appends = [

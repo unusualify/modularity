@@ -13,8 +13,8 @@ use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Controllers\Traits\MakesResponses;
-use Unusualify\Modularity\Http\Controllers\Traits\ManageScopes;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageAuthorization;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageScopes;
 
 abstract class PanelController extends CoreController
 {
@@ -470,7 +470,7 @@ abstract class PanelController extends CoreController
 
         $noFormatted = $this->request->get('light', false);
 
-        if($noFormatted){
+        if ($noFormatted) {
             $with = $this->request->get('eager', []);
             $appends = $this->request->get('appends', []);
             $column = $this->request->get('columns', [$this->titleColumnKey]);
@@ -483,8 +483,7 @@ abstract class PanelController extends CoreController
             );
         }
 
-
-        return $this->getTransformer( $this->getFormattedIndexItems($paginator) );
+        return $this->getTransformer($this->getFormattedIndexItems($paginator));
         // return $this->getTransformer( $paginator->toArray() );
     }
 
@@ -741,7 +740,6 @@ abstract class PanelController extends CoreController
     {
         $model_relations = [];
 
-
         $exploded = explode('.', $key);
 
         $moduleModel = $this->repository->getModel();
@@ -751,13 +749,13 @@ abstract class PanelController extends CoreController
             if (@method_exists($moduleModel, 'definedRelations')) {
                 $relations = $moduleModel->definedRelations();
 
-                if($i == 0){
+                if ($i == 0) {
                     $model_relations = $relations;
                 }
 
-                if($isNestedKey){
-                    if(in_array($relation, $relations)){
-                        if($i == $lastIndex){
+                if ($isNestedKey) {
+                    if (in_array($relation, $relations)) {
+                        if ($i == $lastIndex) {
                             return true;
                         }
 
@@ -766,7 +764,6 @@ abstract class PanelController extends CoreController
                 }
             }
         }
-
 
         if (preg_match('/(.*)(_id)/', $key, $matches)) {
             $key = pluralize($matches[1]);

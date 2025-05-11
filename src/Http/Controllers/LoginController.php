@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\Factory as ViewFactory;
+use Laravel\Socialite\Facades\Socialite;
 use Modules\SystemUser\Repositories\UserRepository;
 use PragmaRX\Google2FA\Google2FA;
-use Laravel\Socialite\Facades\Socialite;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
@@ -292,7 +292,7 @@ class LoginController extends Controller
             'message' => __('authentication.login-success-message'),
         ];
 
-        if(in_array($previousRouteName, ['admin.login.form', 'admin.login.oauth.showPasswordForm'])) {
+        if (in_array($previousRouteName, ['admin.login.form', 'admin.login.oauth.showPasswordForm'])) {
             // 'redirector' => $this->redirector->intended($this->redirectPath())->getTargetUrl() . '?status=success',
             $body['redirector'] = redirect()->intended($this->redirectTo)->getTargetUrl();
         }
@@ -338,7 +338,7 @@ class LoginController extends Controller
      * @param string $provider Socialite provider
      * @return \Illuminate\Http\RedirectResponse
      */
-    //redirectToProvider($provider, OauthRequest $request)
+    // redirectToProvider($provider, OauthRequest $request)
     public function redirectToProvider($provider)
     {
         return Socialite::driver($provider)
@@ -480,14 +480,14 @@ class LoginController extends Controller
                                 'class' => 'v-col-5 mx-auto',
                                 'type' => 'submit',
                                 'density' => 'default',
-                                'block' => true
+                                'block' => true,
                             ],
 
                         ],
                     ],
                 ],
             ],
-            //'provider' => $request->session()->get('oauth:provider'),
+            // 'provider' => $request->session()->get('oauth:provider'),
         ]);
     }
 
@@ -529,12 +529,11 @@ class LoginController extends Controller
     /**
      * Send the response after the user was authenticated.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     protected function sendFailedLoginResponse(Request $request)
     {
-        if($request->wantsJson()) {
+        if ($request->wantsJson()) {
             return new JsonResponse([
                 $this->username() => [trans('auth.failed')],
                 'message' => __('auth.failed'),
@@ -555,6 +554,7 @@ class LoginController extends Controller
     public function completeRegisterForm()
     {
         $this->inputTypes = modularityConfig('input_types', []);
+
         return $this->viewFactory->make(modularityBaseKey() . '::auth.complete-registration', [
             'formAttributes' => [
                 'hasSubmit' => true,
@@ -593,14 +593,14 @@ class LoginController extends Controller
                         'class' => 'd-flex pb-5 justify-space-between w-100 text-black my-5',
                     ],
                     'elements' => [
-                            'tag' => 'v-btn',
-                            'elements' => __('authentication.complete-registration'),
-                            'attributes' => [
-                                'variant' => 'elevated',
-                                'class' => 'v-col-5',
-                                'type' => 'submit',
-                                'density' => 'default',
-                            ],
+                        'tag' => 'v-btn',
+                        'elements' => __('authentication.complete-registration'),
+                        'attributes' => [
+                            'variant' => 'elevated',
+                            'class' => 'v-col-5',
+                            'type' => 'submit',
+                            'density' => 'default',
+                        ],
 
                     ],
                 ],
@@ -619,14 +619,14 @@ class LoginController extends Controller
 
         $this->validateLogin($request);
 
-
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
         if (method_exists($this, 'hasTooManyLoginAttempts') &&
             $this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
-            //Log::debug('Has many too attempts');
+
+            // Log::debug('Has many too attempts');
             return $this->sendLockoutResponse($request);
         }
 
@@ -651,7 +651,7 @@ class LoginController extends Controller
                 'message' => __('authentication.login-success-message'),
             ];
 
-            if($previousRouteName === 'admin.login.form') {
+            if ($previousRouteName === 'admin.login.form') {
                 $body['redirector'] = redirect()->intended($this->redirectTo)->getTargetUrl();
             }
 

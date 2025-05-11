@@ -4,13 +4,14 @@ namespace Unusualify\Modularity\Http\Controllers\Traits\Form;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Request;
-use Unusualify\Modularity\Support\Finder;
+use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Support\Finder;
 use Unusualify\Modularity\Traits\Allowable;
+
 trait FormSchema
 {
     use Allowable;
@@ -30,6 +31,7 @@ trait FormSchema
 
     /**
      * Create the form schema
+     *
      * @param array $inputs
      * @return array
      */
@@ -42,6 +44,7 @@ trait FormSchema
 
     /**
      * Get the schema input
+     *
      * @param array $input
      * @param array $inputs
      * @return array
@@ -228,7 +231,7 @@ trait FormSchema
 
                 $foreignKey = $this->getForeignKeyFromName($this->routeName);
 
-                $input['type'] =  $input['component'] ?? 'input-repeater';
+                $input['type'] = $input['component'] ?? 'input-repeater';
                 // $input['label'] ??= pluralize($this->getHeadline($input['name']));
                 $input['autoIdGenerator'] ??= false;
 
@@ -432,7 +435,7 @@ trait FormSchema
                     return [
                         'name' => $polymorphic['name'],
                         'type' => $repositoryInstance->getModel()::class,
-                        'items' => !$this->request->ajax() ? $repositoryInstance->list() : [],
+                        'items' => ! $this->request->ajax() ? $repositoryInstance->list() : [],
                     ];
                 })->toArray();
 
@@ -535,6 +538,7 @@ trait FormSchema
 
     /**
      * Hydrate the input connector
+     *
      * @param array $input
      * @return void
      */
@@ -574,6 +578,7 @@ trait FormSchema
 
     /**
      * Hydrate the input extension
+     *
      * @param array $input
      * @param array $data
      * @param array $arrayable
@@ -852,6 +857,7 @@ trait FormSchema
                         if ($inputToFormat) {
                             $events[] = "formatRemoveValue:{$inputToFormat}";
                         }
+
                         break;
                     case 'toggleInput': // to toggle d-none class and rawRules
                         $inputToFormat = array_shift($args) ?? '';
@@ -861,6 +867,7 @@ trait FormSchema
                         if ($inputToFormat) {
                             $events[] = "formatToggleInput:{$inputToFormat}:{$toggleValue}:{$toggleLevel}";
                         }
+
                         break;
                     default:
                         // code...

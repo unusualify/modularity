@@ -63,7 +63,7 @@ class TaggerHydrate extends InputHydrate
             // $repository->getTagsList()->toArray() // this get used tags
             // $repository->getTags()->toArray() // this get all tags
 
-            $items = !$this->skipQueries
+            $items = ! $this->skipQueries
                 ? $repository->getTags()->map(fn ($tag, $index) => [
                     'id' => $tag->id,
                     'name' => $tag->name,

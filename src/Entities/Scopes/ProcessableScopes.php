@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait ProcessableScopes
 {
-
     public function scopeIsConfirmedProcess(Builder $query)
     {
         return $query->whereHas('process', function (Builder $query) {
@@ -41,6 +40,4 @@ trait ProcessableScopes
             $query->isPreparing();
         });
     }
-
-
 }

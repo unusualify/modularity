@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 trait HasPriceableMutators
 {
-
     public function initializeHasPriceableMutators()
     {
         $this->append(
@@ -24,7 +23,6 @@ trait HasPriceableMutators
 
             'base_price_total_discount_amount', // price total discount
             'base_price_total_amount', // price total
-
 
             'base_price_vat_percentage_formatted', // price vat percentage formatted
             'base_price_discount_percentage_formatted', // price discount percentage formatted
@@ -92,7 +90,6 @@ trait HasPriceableMutators
             get: fn ($value) => $this->basePrice ? $this->basePrice->vat_amount : null,
         );
     }
-
 
     protected function basePriceVatDiscountAmount(): Attribute
     {
@@ -218,7 +215,6 @@ trait HasPriceableMutators
                 : null,
         );
     }
-
 
     protected function basePriceFormatted(): Attribute
     {

@@ -28,6 +28,7 @@ class Price extends \Oobook\Priceable\Models\Price
      * a VAT rate and a Currency. Selecting them everytime
      * in Nova is a hassle, therefor we set some default
      * that come from the config.
+     *
      * @return array Array with default attributes
      */
     public function defaultAttributes(): array

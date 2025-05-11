@@ -8,12 +8,11 @@ use Unusualify\Modularity\Tests\ModelTestCase;
 
 class CompanyTest extends ModelTestCase
 {
-
     use RefreshDatabase;
 
     public function test_get_table_company()
     {
-        $company = new Company();
+        $company = new Company;
 
         $this->assertEquals(modularityConfig('tables.companies', 'companies'), $company->getTable());
     }
@@ -26,11 +25,11 @@ class CompanyTest extends ModelTestCase
 
     public function test_create_company_without_any_field()
     {
-       $company1 = Company::create([]);
-       $company2 = Company::create([]);
-       $this->assertEquals(1, $company1->id);
-       $this->assertEquals(2, $company2->id);
-       $this->assertCount(2, Company::all());
+        $company1 = Company::create([]);
+        $company2 = Company::create([]);
+        $this->assertEquals(1, $company1->id);
+        $this->assertEquals(2, $company2->id);
+        $this->assertCount(2, Company::all());
     }
 
     public function test_create_company()
@@ -44,7 +43,7 @@ class CompanyTest extends ModelTestCase
             'zip_code' => '12345',
             'phone' => '123-456-7890',
             'vat_number' => 'VAT123456',
-            'tax_id' => 'TAX123456'
+            'tax_id' => 'TAX123456',
         ]);
 
         $this->assertEquals('123 Test St', $company->address);
@@ -72,7 +71,7 @@ class CompanyTest extends ModelTestCase
             'tax_id' => 'TAX123456',
             'spread_payload' => [
                 'is_personal' => true,
-            ]
+            ],
         ]);
 
         $company->update([
@@ -84,7 +83,7 @@ class CompanyTest extends ModelTestCase
             'zip_code' => '67890',
             'phone' => '987-654-3210',
             'vat_number' => 'VAT654321',
-            'tax_id' => 'TAX654321'
+            'tax_id' => 'TAX654321',
         ]);
 
         $this->assertEquals('Updated Company', $company->name);
@@ -110,7 +109,7 @@ class CompanyTest extends ModelTestCase
             'zip_code' => '12345',
             'phone' => '123-456-7890',
             'vat_number' => 'VAT123456',
-            'tax_id' => 'TAX123456'
+            'tax_id' => 'TAX123456',
         ]);
 
         $company2 = Company::create([
@@ -122,7 +121,7 @@ class CompanyTest extends ModelTestCase
             'zip_code' => '67890',
             'phone' => '111-222-3334',
             'vat_number' => 'VAT234567',
-            'tax_id' => 'TAX234567'
+            'tax_id' => 'TAX234567',
         ]);
 
         $this->assertCount(2, Company::all());
@@ -132,5 +131,4 @@ class CompanyTest extends ModelTestCase
         $this->assertCount(1, Company::all());
 
     }
-
 }

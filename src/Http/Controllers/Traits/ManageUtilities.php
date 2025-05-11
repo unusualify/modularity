@@ -2,11 +2,9 @@
 
 namespace Unusualify\Modularity\Http\Controllers\Traits;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 use Unusualify\Modularity\Services\View\UWrapper;
 
 trait ManageUtilities

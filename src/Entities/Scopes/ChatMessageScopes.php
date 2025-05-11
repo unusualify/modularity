@@ -21,7 +21,7 @@ trait ChatMessageScopes
 
     public function scopeFromClient(Builder $query): Builder
     {
-        return $query->whereHas('creator', function(Builder $query){
+        return $query->whereHas('creator', function (Builder $query) {
             $query->role(['client-manager', 'client-assistant']);
         });
     }

@@ -3,7 +3,6 @@
 namespace Unusualify\Modularity\Repositories\Traits;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Request;
 use Modules\SystemPricing\Entities\Price;
 
 trait PaymentTrait
@@ -111,13 +110,12 @@ trait PaymentTrait
                         $requirementMet = true;
                     }
 
-
                     if ($requirementMet) {
                         $records = $object->{$relationName}()->get();
                         if ($records instanceof \Illuminate\Database\Eloquent\Collection) {
 
                             foreach ($records as $record) {
-                                $price = $record->prices->filter(function($price) use ($currencyId){
+                                $price = $record->prices->filter(function ($price) use ($currencyId) {
                                     return $price->currency_id == $currencyId;
                                 })->first();
 

@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Entities\Scopes;
 
-use Illuminate\Database\Eloquent\Builder;
 use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
 
 trait AssignmentScopes

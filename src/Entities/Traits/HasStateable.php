@@ -175,7 +175,7 @@ trait HasStateable
         ];
     }
 
-    protected function stateFormatted() : Attribute
+    protected function stateFormatted(): Attribute
     {
         $state = $this->state;
 

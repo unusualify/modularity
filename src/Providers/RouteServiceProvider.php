@@ -484,7 +484,9 @@ class RouteServiceProvider extends ServiceProvider
                     foreach ($routes as $key => $item) {
                         $hasFrontRoutes = $item['has_front_routes'] ?? false;
 
-                        if(!$hasFrontRoutes) continue;
+                        if (! $hasFrontRoutes) {
+                            continue;
+                        }
 
                         $isSingleton = $module->isSingleton($item['name']);
 
@@ -605,11 +607,11 @@ class RouteServiceProvider extends ServiceProvider
                     'uses' => "{$controllerClass}@{$customRoute}",
                 ];
 
-                if($customRoute === 'assignments') {
+                if ($customRoute === 'assignments') {
                     Route::get("{$url}/{{$snakeCase}}/assignments", $mapping);
                 }
 
-                if($customRoute === 'createAssignment') {
+                if ($customRoute === 'createAssignment') {
                     Route::post("{$url}/{{$snakeCase}}/assignments", $mapping);
                 }
 

@@ -5,9 +5,6 @@ namespace Unusualify\Modularity\Entities\Traits;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
-use Modules\PressRelease\Entities\PressReleasePackage;
-use Modules\PressRelease\Entities\PressReleasePackageAddon;
-use Unusualify\Modularity\Entities\Enums\ProcessStatus;
 use Unusualify\Modularity\Entities\Process;
 
 trait HasProcesses
@@ -27,8 +24,8 @@ trait HasProcesses
 
     protected function getProcessesRawSqlAndBindings($additionalWheres = [])
     {
-        $sqlParts  = [];
-        $bindings  = [];
+        $sqlParts = [];
+        $bindings = [];
         $parentKey = $this->getKey();
 
         foreach (static::processableRelationships() as $relationName) {
@@ -38,19 +35,18 @@ trait HasProcesses
             }
 
             // grab the HasMany (or MorphMany, etc.) instance
-            $relation     = $this->{$relationName}();
+            $relation = $this->{$relationName}();
             $relatedModel = $relation->getRelated();
-            $table        = $relatedModel->getTable();
-            $foreignKey   = $relation->getForeignKeyName();
-            $type         = get_class($relatedModel);
+            $table = $relatedModel->getTable();
+            $foreignKey = $relation->getForeignKeyName();
+            $type = get_class($relatedModel);
 
             // dd($additionalWheres);
-            $additionalWheresSql = Collection::make($additionalWheres)->map(function ($value, $column) use ($table, $foreignKey) {
+            $additionalWheresSql = Collection::make($additionalWheres)->map(function ($value, $column) {
                 return "{$column} = '{$value}'";
             })->implode(' AND ');
 
-
-            if(count($additionalWheres) > 0) {
+            if (count($additionalWheres) > 0) {
                 $additionalWheresSql = " AND {$additionalWheresSql}";
             }
 
@@ -88,14 +84,14 @@ trait HasProcesses
 
         // wrap in noConstraints so Laravel does NOT auto‐inject
         // `where processable_id = parent.id`
-        return Relation::noConstraints(function() use ($fullSql, $bindings) {
+        return Relation::noConstraints(function () use ($fullSql, $bindings) {
             return $this
                 ->hasMany(Process::class, 'processable_id', 'id')
                 ->whereRaw($fullSql, $bindings);
         });
     }
 
-    public function confirmedProcesses() : HasMany
+    public function confirmedProcesses(): HasMany
     {
         [$fullSql, $bindings] = $this->getProcessesRawSqlAndBindings([
             'status' => 'confirmed',
@@ -105,14 +101,14 @@ trait HasProcesses
 
         // wrap in noConstraints so Laravel does NOT auto‐inject
         // `where processable_id = parent.id`
-        return Relation::noConstraints(function() use ($fullSql, $bindings) {
+        return Relation::noConstraints(function () use ($fullSql, $bindings) {
             return $this
                 ->hasMany(Process::class, 'processable_id', 'id')
                 ->whereRaw($fullSql, $bindings);
         });
     }
 
-    public function rejectedProcesses() : HasMany
+    public function rejectedProcesses(): HasMany
     {
         [$fullSql, $bindings] = $this->getProcessesRawSqlAndBindings([
             'status' => 'rejected',
@@ -122,7 +118,7 @@ trait HasProcesses
 
         // wrap in noConstraints so Laravel does NOT auto‐inject
         // `where processable_id = parent.id`
-        return Relation::noConstraints(function() use ($fullSql, $bindings) {
+        return Relation::noConstraints(function () use ($fullSql, $bindings) {
             return $this
                 ->hasMany(Process::class, 'processable_id', 'id')
                 ->whereRaw($fullSql, $bindings);

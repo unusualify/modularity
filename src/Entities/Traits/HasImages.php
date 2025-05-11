@@ -106,9 +106,9 @@ trait HasImages
     private function findMedia($role, $crop = 'default', $locale = null)
     {
         $media = $this->medias->first(function ($media) use ($role, $crop, $locale) {
-            if($locale){
+            if ($locale) {
                 $localeScope = $media->pivot->locale === $locale;
-            }else{
+            } else {
                 if (modularityConfig('media_library.translated_form_fields', false)) {
                     $localeScope = $media->pivot->locale === app()->getLocale();
                 }

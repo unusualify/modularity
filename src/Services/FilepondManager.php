@@ -265,7 +265,6 @@ class FilepondManager
     {
         $storageFile = $this->getStorageFile($uuid);
 
-
         // $fileSize = Storage::disk('local')->size($storagePath);
         // $mimeType = Storage::disk('local')->mimeType($storagePath);
         // $extension = pathinfo($filepond->file_name, PATHINFO_EXTENSION);

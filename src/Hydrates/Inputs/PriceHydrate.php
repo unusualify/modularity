@@ -39,7 +39,7 @@ class PriceHydrate extends InputHydrate
         $input['clearable'] = false;
 
         $input['priceInputName'] = Price::$priceSavingKey ?? 'price_value';
-        $defaultPriceAttributes = (new Price())->defaultAttributes();
+        $defaultPriceAttributes = (new Price)->defaultAttributes();
         $input['default'] = [
             $defaultPriceAttributes,
         ];
@@ -47,14 +47,13 @@ class PriceHydrate extends InputHydrate
         $query = Currency::query()->select(['id', 'symbol as name', 'iso_4217 as iso']);
         $onlyBaseCurrency = modularityConfig('services.currency_exchange.active');
 
-
         if ($onlyBaseCurrency) {
             $baseCurrency = modularityConfig('services.currency_exchange.base_currency');
             $query = $query->where('iso_4217', mb_strtoupper($baseCurrency));
         }
 
         if (isset($input['hasVatRate']) && $input['hasVatRate']) {
-            $input['vatRates'] = !$this->skipQueries
+            $input['vatRates'] = ! $this->skipQueries
                 ? App::make(VatRateRepository::class)->list(['name', 'rate'])->map(function ($item) {
                     return [
                         'title' => $item['name'] . ' (' . $item['rate'] . '%)',
@@ -67,7 +66,7 @@ class PriceHydrate extends InputHydrate
             // dd($input);
         }
 
-        $input['items'] = !$this->skipQueries
+        $input['items'] = ! $this->skipQueries
             ? $query->get()->toArray()
             : [];
 

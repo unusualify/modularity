@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Entities;
 
-use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -89,7 +88,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
                 $model->password = Hash::make(env('DEFAULT_USER_PASSWORD', 'Hj84TlN!'));
             }
 
-            if($model->company_name && $model->company_id == null) {
+            if ($model->company_name && $model->company_id == null) {
                 $model->isCreatingCompany = true;
                 $model->bootingCompanyName = $model->company_name;
             }
@@ -98,7 +97,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
         });
 
         static::created(function ($model) {
-            if($model->isCreatingCompany) {
+            if ($model->isCreatingCompany) {
                 $model->company_id = Company::create([
                     'name' => $model->bootingCompanyName,
                 ])->id;
@@ -106,7 +105,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
         });
 
         static::updated(function ($model) {
-            if($model->isDirty('email')) {
+            if ($model->isDirty('email')) {
                 $model->email_verified_at = null;
                 $model->saveQuietly();
             }
@@ -167,8 +166,9 @@ class User extends Authenticatable implements MustVerifyEmailContract
             $valid = true;
             foreach ($this->company->getAttributes() as $attr => $value) {
                 if (! str_contains($attr, '_at') && $attr != 'id') {
-                    if (!$value) {
+                    if (! $value) {
                         $valid = false;
+
                         break;
                     }
                 }
@@ -216,7 +216,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
     /**
      * Send the password generate notification.
      *
-     * @param  string  $token
+     * @param string $token
      * @return void
      */
     public function sendGeneratePasswordNotification($token)
@@ -243,6 +243,4 @@ class User extends Authenticatable implements MustVerifyEmailContract
     {
         return UserFactory::new();
     }
-
-
 }

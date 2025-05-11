@@ -15,7 +15,7 @@ class MetricController extends Controller
         $variant = MessageStage::WARNING;
         $data = [];
 
-        if($request->has('date_range')
+        if ($request->has('date_range')
             && is_array($request->date_range)
             && count($request->date_range) > 1) {
 
@@ -23,46 +23,46 @@ class MetricController extends Controller
             $startDate = array_shift($range);
             $endDate = array_pop($range);
 
-            if($request->has('items')) {
+            if ($request->has('items')) {
                 $variant = MessageStage::SUCCESS;
 
                 $metrics = $request->items;
-                foreach($metrics as &$metric) {
+                foreach ($metrics as &$metric) {
 
-                    if(isset($metric['connector'])) {
+                    if (isset($metric['connector'])) {
                         $connector = new Connector($metric['connector']);
 
                         $pushEvents = [];
-                        if(isset($metric['connectorFilter'])) {
-                            if(isset($metric['connectorFilter']['name'])) {
+                        if (isset($metric['connectorFilter'])) {
+                            if (isset($metric['connectorFilter']['name'])) {
                                 $connectorFilter = $metric['connectorFilter'];
                                 $connectorFilter['args'] ??= [];
 
-                                if(array_key_exists('startDate', $connectorFilter['args'])) {
+                                if (array_key_exists('startDate', $connectorFilter['args'])) {
                                     $connectorFilter['args']['startDate'] = $startDate;
-                                }else{
+                                } else {
                                     $connectorFilter['args'][] = $startDate;
                                 }
 
-                                if(array_key_exists('endDate', $connectorFilter['args'])) {
+                                if (array_key_exists('endDate', $connectorFilter['args'])) {
                                     $connectorFilter['args']['endDate'] = $endDate;
-                                }else{
+                                } else {
                                     $connectorFilter['args'][] = $endDate;
                                 }
                                 $pushEvents[] = $connectorFilter;
 
                             }
                         }
-                        if(isset($metric['pushEvents'])) {
-                            if(count($pushEvents) > 0) {
+                        if (isset($metric['pushEvents'])) {
+                            if (count($pushEvents) > 0) {
                                 $pushEvents = array_merge($pushEvents, $metric['pushEvents']);
-                            }else{
+                            } else {
                                 $pushEvents = $metric['pushEvents'];
                             }
                             $connector->pushEvents($pushEvents);
                         }
                         $connector->run($metric, 'value');
-                    } else if(isset($metric['value']) && is_callable($metric['value'])) {
+                    } elseif (isset($metric['value']) && is_callable($metric['value'])) {
                         $metric['value'] = $metric['value']();
                     }
                 }

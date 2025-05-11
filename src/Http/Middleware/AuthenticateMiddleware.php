@@ -37,13 +37,13 @@ class AuthenticateMiddleware extends Middleware
             }
         }
 
-        if($request->expectsJson()) {
+        if ($request->expectsJson()) {
             $referer = $request->headers->get('referer');
             session()->put('url.intended', $referer);
 
             return response()->json([
                 'message' => 'Unauthenticated.',
-                'mode' => 'experimental'
+                'mode' => 'experimental',
                 // 'redirector' => $referer,
             ], 401);
         }

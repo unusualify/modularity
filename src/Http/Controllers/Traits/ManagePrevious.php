@@ -40,6 +40,7 @@ trait ManagePrevious
             foreach (Route::getRoutes() as $route) {
                 if ($route->matches(Request::create($previousUrl, 'HEAD'))) {
                     dd($route);
+
                     return $route;
                 }
             }

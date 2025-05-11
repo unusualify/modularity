@@ -29,7 +29,6 @@ trait HasCreator
      */
     protected $customHasCreatorFields = [];
 
-
     protected static function bootHasCreator()
     {
         static::created(function ($model) {
@@ -37,7 +36,7 @@ trait HasCreator
                 $model->creatorRecord()->create($model->customHasCreatorFields);
                 $model->isCustomCreatorSaving = false;
                 $model->customHasCreatorFields = [];
-            }else if (Auth::check()) {
+            } elseif (Auth::check()) {
                 $guard = Auth::guard();
                 $model->creatorRecord()->create([
                     'creator_id' => $guard->id(), // creator user id
@@ -91,8 +90,6 @@ trait HasCreator
 
     /**
      * Get the creator record associated with this model
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
     public function creatorRecord(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
@@ -104,8 +101,6 @@ trait HasCreator
 
     /**
      * Get the creator associated with this model through the creator record
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
      */
     public function creator(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
@@ -144,7 +139,7 @@ trait HasCreator
         $key = $this->getKey();
 
         try {
-            return (!is_null($key) && $this->creatorRecord()->exists()) ? $this->creatorRecord->creator_type : static::getDefaultCreatorModel();
+            return (! is_null($key) && $this->creatorRecord()->exists()) ? $this->creatorRecord->creator_type : static::getDefaultCreatorModel();
         } catch (\Exception $e) {
             dd($this, $this->creatorRecord);
         }
@@ -233,7 +228,7 @@ trait HasCreator
 
         $spatieRoleModel = config('permission.models.role');
 
-        if(!$abortRoleExceptions) {
+        if (! $abortRoleExceptions) {
 
             if ($hasSpatiePermission) {
                 $existingRoles = $spatieRoleModel::whereIn('name', $this->getAuthorizedRolesForCreatorRecord())->get();

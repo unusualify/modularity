@@ -124,7 +124,7 @@ trait Relationships
 
                 $idsDeleted = $relation->get()->pluck($relatedLocalKey)->toArray();
 
-                if( isset($fields[$relationName]) && is_array($fields[$relationName]) && count($fields[$relationName]) > 0){
+                if (isset($fields[$relationName]) && is_array($fields[$relationName]) && count($fields[$relationName]) > 0) {
                     foreach ($fields[$relationName] as $key => $data) {
 
                         if (isset($data[$relatedLocalKey])) {
@@ -137,7 +137,6 @@ trait Relationships
                         }
                     }
                 }
-
 
                 if (count($idsDeleted)) {
                     $repository->bulkDelete($idsDeleted);

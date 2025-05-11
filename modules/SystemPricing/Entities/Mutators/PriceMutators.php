@@ -4,12 +4,12 @@ namespace Modules\SystemPricing\Entities\Mutators;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
-
 trait PriceMutators
 {
     /**
      * This will make sure that the submitted amount in Nova
      * is multiplied by 100 so we can store it in cents.
+     *
      * @param [type] $amount [description]
      */
     // protected function setRawPriceAttribute(float $amount)
@@ -111,10 +111,10 @@ trait PriceMutators
         );
     }
 
-    protected function totalAmountExcludingVat() : Attribute
+    protected function totalAmountExcludingVat(): Attribute
     {
         return new Attribute(
-            get: fn($value) => (int) $this->discounted_raw_amount
+            get: fn ($value) => (int) $this->discounted_raw_amount
         );
     }
 

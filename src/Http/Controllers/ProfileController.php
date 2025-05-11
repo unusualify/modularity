@@ -2,20 +2,15 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
 use Modules\SystemUser\Http\Requests\CompanyRequest;
 use Modules\SystemUser\Repositories\CompanyRepository;
 use Modules\SystemUser\Repositories\UserRepository;
 use Unusualify\Modularity\Entities\Enums\Permission;
-use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
-use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Services\View\UComponent;
 use Unusualify\Modularity\Services\View\UWrapper;
 
@@ -91,7 +86,7 @@ class ProfileController extends BaseController
         $user = Auth::user();
         $emailVerified = $user->hasVerifiedEmail();
 
-        if($emailVerified){
+        if ($emailVerified) {
             // $userSchema['email']['appendInnerIcon'] = 'mdi-check-circle-outline';
             $userSchema['email']['slots']['append-inner'] = UComponent::makeVIcon()
                 ->setAttributes([
@@ -133,7 +128,7 @@ class ProfileController extends BaseController
             'actionUrl' => $this->getModuleRoute(id: $userFields['id'], action: 'update', singleton: true),
         ]);
 
-        if(!$emailVerified){
+        if (! $emailVerified) {
             $verifyButtonAttributes['href'] = route(Route::hasAdmin('admin.verification.send'));
             $verifyButtonAttributes['readonly'] = false;
             $verifyButtonAttributes['color'] = 'warning';
@@ -142,7 +137,7 @@ class ProfileController extends BaseController
 
             $verifyEmailButton = UComponent::makeVBtnPrimary()
                 ->setAttributes($verifyButtonAttributes)
-                ->setElements(!$emailVerified ? __('Verify Email') : __('Verified'))
+                ->setElements(! $emailVerified ? __('Verify Email') : __('Verified'))
                 ->render();
 
             $personalForm = $personalForm->addSlot('options', $verifyEmailButton);

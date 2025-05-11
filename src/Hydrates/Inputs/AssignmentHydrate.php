@@ -33,7 +33,7 @@ class AssignmentHydrate extends InputHydrate
         if (isset($input['assigneeType'])) {
             $assigneeType = $input['assigneeType'];
 
-            if(!class_exists($input['assigneeType'])) {
+            if (! class_exists($input['assigneeType'])) {
                 throw new \Exception('Assignee type ' . $input['assigneeType'] . ' does not exist');
             }
 
@@ -55,13 +55,13 @@ class AssignmentHydrate extends InputHydrate
             }
         }
 
-        if(!$this->skipQueries) {
+        if (! $this->skipQueries) {
             $input['items'] = benchmark(function () use ($q) {
                 return $q->get(['id', 'name']);
             }, label: '#assignment-hydrate-get-user-items', die: false, unit: 'milliseconds');
         }
 
-        if(!isset($input['assignableType'])) {
+        if (! isset($input['assignableType'])) {
             $assignableModel = $this->module->getRouteClass($this->routeName, 'model');
             $input['assignableType'] = $assignableModel;
         }

@@ -2,9 +2,8 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageForm;
 
 class VerificationController extends Controller
@@ -25,7 +24,6 @@ class VerificationController extends Controller
             ],
         ]);
     }
-
 
     public function send(Request $request)
     {

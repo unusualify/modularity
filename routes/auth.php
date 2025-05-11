@@ -29,7 +29,6 @@ if (modularityConfig('enabled.users-management')) {
     Route::get('login/oauth', 'LoginController@showPasswordForm')->name('login.oauth.showPasswordForm');
     Route::post('login/oauth', 'LoginController@linkProvider')->name('login.oauth.linkProvider');
 
-
     Route::get('/auth/{provider}/redirect', 'LoginController@redirectToProvider')->name('login.provider');
     Route::get('/auth/{provider}/callback', 'LoginController@handleProviderCallback')->name('loginHandleCallbackProvider');
 
@@ -37,7 +36,7 @@ if (modularityConfig('enabled.users-management')) {
     // Route::get('/completeRegistration', 'LoginController@completeRegisterForm')->name('completeRegistration.form');
     // Route::post('/completeRegistration', 'LoginController@completeRegister')->name('completeRegistration');
 
-    //Route::get('/withoutLogin', 'LoginController@completeRegisterForm');
+    // Route::get('/withoutLogin', 'LoginController@completeRegisterForm');
 
     Route::get('password/reset', 'ForgotPasswordController@showLinkRequestForm')->name('password.reset.link');
     Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.reset.email');

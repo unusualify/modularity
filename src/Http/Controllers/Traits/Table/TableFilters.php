@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Http\Controllers\Traits\Table;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
-use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Traits\Allowable;
 
 trait TableFilters
@@ -120,7 +119,7 @@ trait TableFilters
                 disallowIfUnauthenticated: true
             );
 
-            if($assignableTotalDataPermission){
+            if ($assignableTotalDataPermission) {
                 $statusFilters[] = [
                     'name' => ___('listing.filter.completed-assignments'),
                     'slug' => 'completed-assignments',
@@ -132,7 +131,6 @@ trait TableFilters
                     'number' => $this->repository->getCountFor('pendingAssignments'),
                 ];
             }
-
 
             $statusFilters[] = [
                 'name' => ___('listing.filter.your-completed-assignments'),
@@ -166,6 +164,7 @@ trait TableFilters
 
     /**
      * Get the advanced filters for the table
+     *
      * @return array
      */
     protected function getTableAdvancedFilters()
@@ -186,6 +185,7 @@ trait TableFilters
 
     /**
      * Get the relations filter configuration for the table
+     *
      * @param array $filter
      * @return array
      */
@@ -200,6 +200,7 @@ trait TableFilters
 
     /**
      * Get the detail filter configuration for the table
+     *
      * @param array $filter
      * @return array
      */
@@ -214,6 +215,7 @@ trait TableFilters
 
     /**
      * Get the select filter configuration for the table
+     *
      * @param array $filter
      * @return array
      */
@@ -253,6 +255,7 @@ trait TableFilters
 
     /**
      * Get the date picker filter configuration for the table
+     *
      * @param array $filter
      * @return array
      */

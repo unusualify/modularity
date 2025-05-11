@@ -15,11 +15,11 @@ class Process extends Model
     use ProcessScopes;
 
     /**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array<int, string>
-	 */
-	protected $fillable = [
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
         'processable_id',
         'processable_type',
         'status',

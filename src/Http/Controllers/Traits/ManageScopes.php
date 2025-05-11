@@ -100,7 +100,7 @@ trait ManageScopes
                     $scope['mine'] = true;
 
                     break;
-                // Authorizable Filters
+                    // Authorizable Filters
                 case 'authorized':
                     $scope['hasAnyAuthorization'] = true;
 
@@ -113,9 +113,10 @@ trait ManageScopes
                     $scope['isAuthorizedToYou'] = true;
 
                     break;
-                // Assignable Filters
+                    // Assignable Filters
                 case 'my-assignments':
                     $scope['isActiveAssignee'] = true;
+
                     break;
                 case 'your-role-assignments':
                     $scope['isActiveAssigneeForYourRole'] = true;
@@ -123,21 +124,27 @@ trait ManageScopes
                     break;
                 case 'completed-assignments':
                     $scope['completedAssignments'] = true;
+
                     break;
                 case 'pending-assignments':
                     $scope['pendingAssignments'] = true;
+
                     break;
                 case 'your-completed-assignments':
                     $scope['yourCompletedAssignments'] = true;
+
                     break;
                 case 'your-pending-assignments':
                     $scope['yourPendingAssignments'] = true;
+
                     break;
                 case 'team-completed-assignments':
                     $scope['teamCompletedAssignments'] = true;
+
                     break;
                 case 'team-pending-assignments':
                     $scope['teamPendingAssignments'] = true;
+
                     break;
             }
 
@@ -211,7 +218,7 @@ trait ManageScopes
 
         $filter = $this->request->get('filter');
 
-        if(is_string($filter)){
+        if (is_string($filter)) {
             $filter = json_decode($filter, true);
         }
 

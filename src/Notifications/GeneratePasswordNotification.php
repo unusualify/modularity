@@ -36,7 +36,7 @@ class GeneratePasswordNotification extends Notification
     /**
      * Create a notification instance.
      *
-     * @param  string  $token
+     * @param string $token
      * @return void
      */
     public function __construct($token)
@@ -47,7 +47,7 @@ class GeneratePasswordNotification extends Notification
     /**
      * Get the notification's channels.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return array|string
      */
     public function via($notifiable)
@@ -58,7 +58,7 @@ class GeneratePasswordNotification extends Notification
     /**
      * Build the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable)
@@ -71,22 +71,22 @@ class GeneratePasswordNotification extends Notification
     /**
      * Get the verify email notification mail message for the given URL.
      *
-     * @param  string  $url
+     * @param string $url
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     protected function buildMailMessage($url)
     {
         return (new MailMessage)
             ->subject(Lang::get('Generate Your Password For New Account'))
-            ->line(Lang::get("Welcome to " . env('APP_NAME') . ". Please click the button below to generate your password."))
+            ->line(Lang::get('Welcome to ' . env('APP_NAME') . '. Please click the button below to generate your password.'))
             ->action(Lang::get('Generate Password'), $url);
-            // ->line(Lang::get('If you did not create an account, no further action is required.'));
+        // ->line(Lang::get('If you did not create an account, no further action is required.'));
     }
 
     /**
      * Get the verification URL for the given notifiable.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return string
      */
     protected function generatePasswordUrl($notifiable)
@@ -110,7 +110,7 @@ class GeneratePasswordNotification extends Notification
     /**
      * Set a callback that should be used when creating the email verification URL.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
      * @return void
      */
     public static function createUrlUsing($callback)
@@ -121,7 +121,7 @@ class GeneratePasswordNotification extends Notification
     /**
      * Set a callback that should be used when building the notification mail message.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
      * @return void
      */
     public static function toMailUsing($callback)

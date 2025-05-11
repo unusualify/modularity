@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Http\Controllers\Traits;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 
 trait ManageTable
@@ -47,7 +46,6 @@ trait ManageTable
         $this->tableAttributes = array_merge_recursive_preserve($this->getTableAttributes(), $this->tableAttributes ?? []);
     }
 
-
     /**
      * Get the default table options
      *
@@ -86,6 +84,7 @@ trait ManageTable
 
     /**
      * Get the table draggable options
+     *
      * @return array
      */
     protected function getTableDraggableOptions()

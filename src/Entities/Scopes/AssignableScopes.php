@@ -36,7 +36,7 @@ trait AssignableScopes
             return $query;
         }
 
-        $assignmentTable = (new Assignment())->getTable();
+        $assignmentTable = (new Assignment)->getTable();
         $modelTable = $this->getTable();
         $modelClass = get_class($this);
         $userClass = get_class($user);
@@ -72,7 +72,7 @@ trait AssignableScopes
         }
 
         // Ensure the user model uses roles and retrieve role IDs
-        if (!method_exists($user, 'roles')) {
+        if (! method_exists($user, 'roles')) {
             return $query->whereRaw('1 = 0'); // Return no results if roles aren't available
         }
 
@@ -85,7 +85,7 @@ trait AssignableScopes
             return $query->whereRaw('1 = 0'); // Return no results
         }
 
-        $assignmentTable = (new Assignment())->getTable();
+        $assignmentTable = (new Assignment)->getTable();
         $modelTable = $this->getTable();
         $modelClass = get_class($this);
         $userClass = get_class($user);
@@ -101,9 +101,9 @@ trait AssignableScopes
         // }
         $userIds = $users->pluck('id');
 
-        $query->whereExists(function ($subQuery) use ($assignmentTable, $modelTable, $modelClass, $user, $userClass, $userIds) {
-            $userIds->each(function ($userId) use ($subQuery, $assignmentTable, $modelTable, $modelClass, $user, $userClass) {
-                $subQuery = $subQuery->orWhereExists(function ($subQuery) use ($assignmentTable, $modelTable, $modelClass, $user, $userClass, $userId) {
+        $query->whereExists(function ($subQuery) use ($assignmentTable, $modelTable, $modelClass, $userClass, $userIds) {
+            $userIds->each(function ($userId) use ($subQuery, $assignmentTable, $modelTable, $modelClass, $userClass) {
+                $subQuery = $subQuery->orWhereExists(function ($subQuery) use ($assignmentTable, $modelTable, $modelClass, $userClass, $userId) {
                     // Create a SQL string for the subquery
                     $latestAssignmentSql = \DB::table($assignmentTable)
                         ->select(\DB::raw('MAX(created_at)'))
@@ -120,6 +120,7 @@ trait AssignableScopes
                         ->whereRaw("{$assignmentTable}.created_at = ({$latestAssignmentSql})", [$modelClass]);
                 });
             });
+
             return $subQuery;
         });
 
@@ -134,7 +135,7 @@ trait AssignableScopes
      */
     public function scopeLastStatusAssignment($query, $status, $dateColumn = null, $dateRange = null)
     {
-        $assignmentTable = (new Assignment())->getTable();
+        $assignmentTable = (new Assignment)->getTable();
         $modelTable = $this->getTable();
         $modelClass = get_class($this);
 
@@ -147,10 +148,10 @@ trait AssignableScopes
                 ->toSql();
 
             if ($dateColumn && $dateRange && is_array($dateRange) && count($dateRange) > 0) {
-                if(count($dateRange) == 1) {
+                if (count($dateRange) == 1) {
                     $startDate = array_shift($dateRange);
                     $latestAssignmentSql .= " AND {$assignmentTable}.{$dateColumn} >= '{$startDate}'";
-                }else if(count($dateRange) == 2) {
+                } elseif (count($dateRange) == 2) {
                     $startDate = array_shift($dateRange);
                     $endDate = array_pop($dateRange);
                     $latestAssignmentSql .= " AND {$assignmentTable}.{$dateColumn} BETWEEN '{$startDate}' AND '{$endDate}'";
@@ -298,12 +299,12 @@ trait AssignableScopes
             $rolesToCheck = static::$assignableRolesToCheck ?? null;
 
             // If no specific roles defined, get all roles from the user
-            if (! (is_null($rolesToCheck) || empty($rolesToCheck)) ) {
+            if (! (is_null($rolesToCheck) || empty($rolesToCheck))) {
                 // Check for specific roles
                 $roleModel = config('permission.models.role');
                 $existingRoles = $roleModel::whereIn('name', $rolesToCheck)->get();
 
-                if (!$user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
+                if (! $user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
                     return $query;
                 }
             }
@@ -329,12 +330,12 @@ trait AssignableScopes
             $rolesToCheck = static::$assignableRolesToCheck ?? null;
 
             // If no specific roles defined, get all roles from the user
-            if (! (is_null($rolesToCheck) || empty($rolesToCheck)) ) {
+            if (! (is_null($rolesToCheck) || empty($rolesToCheck))) {
                 // Check for specific roles
                 $roleModel = config('permission.models.role');
                 $existingRoles = $roleModel::whereIn('name', $rolesToCheck)->get();
 
-                if (!$user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
+                if (! $user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
                     return $query;
                 }
             }

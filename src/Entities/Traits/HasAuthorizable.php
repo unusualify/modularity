@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Unusualify\Modularity\Entities\Authorization;
 use Unusualify\Modularity\Traits\Allowable;
 
@@ -104,8 +103,6 @@ trait HasAuthorizable
 
     /**
      * Get the authorization record associated with this model
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
     public function authorizationRecord(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
@@ -114,8 +111,6 @@ trait HasAuthorizable
 
     /**
      * Get the authorized user associated with this model through the authorization record
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
      */
     public function authorizedUser(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
@@ -133,6 +128,7 @@ trait HasAuthorizable
      * Get the authorized model class from the authorization record or default
      *
      * @return string The fully qualified class name of the authorized model
+     *
      * @throws \Exception If there's an error retrieving the model
      */
     final public function getAuthorizedModel()
@@ -189,12 +185,12 @@ trait HasAuthorizable
             $rolesToCheck = static::$authorizableRolesToCheck ?? null;
 
             // If no specific roles defined, get all roles from the user
-            if (! (is_null($rolesToCheck) || empty($rolesToCheck)) ) {
+            if (! (is_null($rolesToCheck) || empty($rolesToCheck))) {
                 // Check for specific roles
                 $roleModel = config('permission.models.role');
                 $existingRoles = $roleModel::whereIn('name', $rolesToCheck)->get();
 
-                if (!$user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
+                if (! $user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
                     return $query;
                 }
             }
@@ -224,7 +220,6 @@ trait HasAuthorizable
             disallowIfUnauthenticated: false
         );
     }
-
 
     public function scopeIsAuthorizedToYou($query)
     {

@@ -49,6 +49,7 @@ trait QueryBuilder
 
         if (! $forcePagination && $this->model instanceof Sortable) {
             return $query->ordered()->paginate($perPage);
+
             return $query->ordered()->get();
         }
 
@@ -85,7 +86,6 @@ trait QueryBuilder
     }
 
     /**
-     * @param array $ids
      * @param array $with
      * @param array $scopes
      * @param array $orders
@@ -121,7 +121,6 @@ trait QueryBuilder
 
     /**
      * @param string $column
-     * @param array $values
      * @param array $with
      * @param array $scopes
      * @param array $orders
@@ -224,7 +223,7 @@ trait QueryBuilder
 
         $hasTableColumnCheck = method_exists($this->getModel(), 'getTableColumns');
         $tableColumns = [];
-        if($hasTableColumnCheck) {
+        if ($hasTableColumnCheck) {
             $tableColumns = $this->getModel()->getTableColumns();
         }
 
@@ -238,7 +237,7 @@ trait QueryBuilder
             $defaultColumns = array_diff($defaultColumns, $translatedAttributes);
             $translatedColumns = array_values(array_intersect($oldColumns, $translatedAttributes));
 
-            if($hasTableColumnCheck) {
+            if ($hasTableColumnCheck) {
                 $absentColumns = array_diff($defaultColumns, $tableColumns);
                 if (in_array('name', $absentColumns)) {
                     $titleColumnKey = $this->getModel()->getRouteTitleColumnKey();
@@ -248,13 +247,12 @@ trait QueryBuilder
                     } else {
                         $columns = array_filter($columns, fn ($col) => $col !== 'name');
                         $titleColumnKey = $this->getModel()->getRouteTitleColumnKey();
-                        if(in_array($titleColumnKey, $tableColumns)) {
+                        if (in_array($titleColumnKey, $tableColumns)) {
                             $columns[] = "{$titleColumnKey} as name";
                         }
                     }
                 }
             }
-
 
         }
 
@@ -272,12 +270,12 @@ trait QueryBuilder
             $columns[] = $this->getModel()->{$r}()->getForeignKeyName();
         }
 
-        if(method_exists($this->getModel(), 'getWith')) {
+        if (method_exists($this->getModel(), 'getWith')) {
             $with = array_values(array_unique(array_merge($this->getModel()->getWith(), $with)));
         }
 
         try {
-            if($hasTableColumnCheck) {
+            if ($hasTableColumnCheck) {
                 $columns = array_values(array_unique(array_intersect($columns, $tableColumns)));
             }
         } catch (\Throwable $th) {
@@ -289,10 +287,9 @@ trait QueryBuilder
             );
         }
 
-
         try {
             // code...
-            if($forcePagination) {
+            if ($forcePagination) {
                 $paginator = $query->with($with)->paginate($perPage);
 
                 $paginator->getCollection()->transform(fn ($item) => [
@@ -372,17 +369,18 @@ trait QueryBuilder
     {
         return array_map(function ($item) {
 
-            if(is_array($item)) {
-                if(Arr::isAssoc($item)) {
-                    return fn($query) => array_reduce($item['functions'], fn($query, $function) => $query->$function(), $query);
-                }else{
-                    if(request()->ajax()) {
+            if (is_array($item)) {
+                if (Arr::isAssoc($item)) {
+                    return fn ($query) => array_reduce($item['functions'], fn ($query, $function) => $query->$function(), $query);
+                } else {
+                    if (request()->ajax()) {
                         // dd($item);
                     }
                 }
             }
 
             return $item;
+
             return is_array($item)
                 ? function ($query) use ($item) {
 
