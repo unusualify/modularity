@@ -591,7 +591,7 @@
                 <v-btn
                   :key="i"
                   v-bind="props"
-                  class="pa-0 justify-start text-capitalize"
+                  class="pa-0 justify-start text-none"
                   variant="plain"
                   :color="`primary darken-1`"
                   @click="itemAction(item, ...col.formatter)"
