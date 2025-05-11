@@ -69,8 +69,27 @@
               <v-card-actions>
                 <slot name="body.options" v-bind="{description}">
                   <v-spacer/>
-                  <v-btn ref="modalCancel" v-bind="rejectButtonAttributes" class="modal-cancel" @click="cancel()" :loading="rejectLoading" :disabled="rejectLoading"> {{ textCancel }}</v-btn>
-                  <v-btn ref="modalConfirm" v-bind="confirmButtonAttributes" class="modal-confirm" @click="confirm()" :loading="confirmLoading" :disabled="confirmLoading"> {{ textConfirm }}</v-btn>
+                  <!-- CANCEL BUTTON -->
+                  <v-btn v-if="!noCancelButton"
+                    ref="modalCancel"
+                    v-bind="rejectButtonAttributes"
+                    class="modal-cancel"
+                    @click="cancel()"
+                    :loading="rejectLoading" :disabled="rejectLoading"
+                  >
+                    {{ textCancel }}
+                  </v-btn>
+                  <!-- CONFIRM BUTTON -->
+                  <v-btn v-if="!noConfirmButton"
+                    ref="modalConfirm"
+                    v-bind="confirmButtonAttributes"
+                    class="modal-confirm"
+                    @click="confirm()"
+                    :loading="confirmLoading"
+                    :disabled="confirmLoading"
+                  >
+                    {{ textConfirm }}
+                  </v-btn>
                 </slot>
                 <v-spacer/>
               </v-card-actions>
