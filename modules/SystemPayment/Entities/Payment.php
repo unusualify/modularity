@@ -13,8 +13,23 @@ class Payment extends \Unusualify\Payable\Models\Payment
 {
     use ModelHelpers, HasFileponds;
 
+    protected $fillable = [
+        'payment_service_id',
+        'price_id',
+        'order_id',
+        'amount',
+        'currency_id',
+        'currency',
+        'status',
+        'email',
+        'installment',
+        'parameters',
+        'response'
+    ];
+
     protected $appends = [
         'invoice_file',
+        'amount_formatted',
     ];
 
     /**
@@ -30,7 +45,7 @@ class Payment extends \Unusualify\Payable\Models\Payment
         return $this->belongsTo(Price::class, 'price_id', 'id');
     }
 
-    public function currency(): HasOneThrough
+    public function priceCurrency(): HasOneThrough
     {
         return $this->hasOneThrough(
             Currency::class,
@@ -44,10 +59,12 @@ class Payment extends \Unusualify\Payable\Models\Payment
 
     public function paymentable() {}
 
-    public function currencyId(): Attribute
+    protected function amountFormatted(): Attribute
     {
-        return Attribute::make(
+        $moneyCurrency = new \Money\Currency($this->priceCurrency->iso_4217);
 
+        return Attribute::make(
+            get: fn ($value) => \Oobook\Priceable\Facades\PriceService::formatAmount($this->amount, $moneyCurrency),
         );
     }
 
