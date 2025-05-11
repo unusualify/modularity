@@ -32,7 +32,8 @@ export default {
     return _attributes
   },
   $main: function () {
-    return this.$root.$refs.main
+
+    return this.$app._instance.refs.main
   },
   $profileDialog: function () {
     return this.$root.$refs.sidebar.$refs.profileDialog
