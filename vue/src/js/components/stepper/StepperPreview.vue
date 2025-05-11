@@ -15,14 +15,25 @@
       <!-- Final form data -->
       <v-col cols="12" v-if="previewFormData.length > 0" v-fit-grid>
         <v-sheet class="px-0">
-          <ue-title
-            type="body-1"
-            font-weight="bold"
-            padding="a-0"
-            margin="y-4"
-          >
-            {{ finalFormTitle }}
-          </ue-title>
+          <div class="d-flex flex-column ga-2 my-4">
+            <ue-title
+              type="body-1"
+              font-weight="bold"
+              padding="a-0"
+            >
+              {{ finalFormTitle }}
+            </ue-title>
+            <ue-title
+              v-if="finalFormSubtitle"
+              type="caption"
+              weight="medium"
+              color="grey-darken-1"
+              transform="none"
+              padding="a-0"
+            >
+              {{ finalFormSubtitle }}
+            </ue-title>
+          </div>
           <!-- Preview form items -->
           <template
             v-for="(data, index) in previewFormData"
@@ -131,6 +142,10 @@ export default {
     finalFormTitle: {
       type: String,
       required: true
+    },
+    finalFormSubtitle: {
+      type: String,
+      default: null
     },
     protectedLastStepModel: {
       type: Object,
