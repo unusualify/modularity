@@ -132,19 +132,30 @@ trait AssignableScopes
      * @param Builder $query
      * @return Builder
      */
-    public function scopeLastStatusAssignment($query, $status)
+    public function scopeLastStatusAssignment($query, $status, $dateColumn = null, $dateRange = null)
     {
         $assignmentTable = (new Assignment())->getTable();
         $modelTable = $this->getTable();
         $modelClass = get_class($this);
 
-        return $query->whereExists(function ($subQuery) use ($assignmentTable, $modelTable, $modelClass, $status) {
+        return $query->whereExists(function ($subQuery) use ($assignmentTable, $modelTable, $modelClass, $status, $dateColumn, $dateRange) {
             // Create a SQL string for the subquery
             $latestAssignmentSql = \DB::table($assignmentTable)
                 ->select(\DB::raw('MAX(created_at)'))
                 ->whereColumn("{$assignmentTable}.assignable_id", "{$modelTable}.id")
                 ->where("{$assignmentTable}.assignable_type", $modelClass)
                 ->toSql();
+
+            if ($dateColumn && $dateRange && is_array($dateRange) && count($dateRange) > 0) {
+                if(count($dateRange) == 1) {
+                    $startDate = array_shift($dateRange);
+                    $latestAssignmentSql .= " AND {$assignmentTable}.{$dateColumn} >= '{$startDate}'";
+                }else if(count($dateRange) == 2) {
+                    $startDate = array_shift($dateRange);
+                    $endDate = array_pop($dateRange);
+                    $latestAssignmentSql .= " AND {$assignmentTable}.{$dateColumn} BETWEEN '{$startDate}' AND '{$endDate}'";
+                }
+            }
 
             $subQuery->select(\DB::raw(1))
                 ->from($assignmentTable)
