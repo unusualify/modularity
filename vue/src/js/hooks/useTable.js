@@ -516,6 +516,9 @@ export default function useTable (props, context) {
                   route: tableNames.transNamePlural.value
                 })
                 break
+              default:
+                attributes.description = payload.description ?? t('Are you sure you want to perform this action?')
+                break
             }
 
             // callbackParameters.push(successCallback)
