@@ -222,7 +222,12 @@ trait QueryBuilder
         $columns = ['id', ...$defaultColumns];
         $oldColumns = $columns;
 
-        $tableColumns = $this->getModel()->getColumns();
+        $hasTableColumnCheck = method_exists($this->getModel(), 'getTableColumns');
+        $tableColumns = [];
+        if($hasTableColumnCheck) {
+            $tableColumns = $this->getModel()->getTableColumns();
+        }
+
         $translatedColumns = [];
 
         if (method_exists($this->getModel(), 'isTranslatable') && $this->model->isTranslatable()) {
@@ -232,21 +237,24 @@ trait QueryBuilder
             $columns = array_diff($columns, $translatedAttributes);
             $defaultColumns = array_diff($defaultColumns, $translatedAttributes);
             $translatedColumns = array_values(array_intersect($oldColumns, $translatedAttributes));
-            $absentColumns = array_diff($defaultColumns, $tableColumns);
 
-            if (in_array('name', $absentColumns)) {
-                $titleColumnKey = $this->getModel()->getRouteTitleColumnKey();
-                if (in_array($titleColumnKey, $translatedAttributes)) {
-                    $columns = array_filter($columns, fn ($col) => $col !== 'name');
-                    $translatedColumns[] = $titleColumnKey;
-                } else {
-                    $columns = array_filter($columns, fn ($col) => $col !== 'name');
+            if($hasTableColumnCheck) {
+                $absentColumns = array_diff($defaultColumns, $tableColumns);
+                if (in_array('name', $absentColumns)) {
                     $titleColumnKey = $this->getModel()->getRouteTitleColumnKey();
-                    if(in_array($titleColumnKey, $tableColumns)) {
-                        $columns[] = "{$titleColumnKey} as name";
+                    if (in_array($titleColumnKey, $translatedAttributes)) {
+                        $columns = array_filter($columns, fn ($col) => $col !== 'name');
+                        $translatedColumns[] = $titleColumnKey;
+                    } else {
+                        $columns = array_filter($columns, fn ($col) => $col !== 'name');
+                        $titleColumnKey = $this->getModel()->getRouteTitleColumnKey();
+                        if(in_array($titleColumnKey, $tableColumns)) {
+                            $columns[] = "{$titleColumnKey} as name";
+                        }
                     }
                 }
             }
+
 
         }
 
@@ -268,7 +276,19 @@ trait QueryBuilder
             $with = array_values(array_unique(array_merge($this->getModel()->getWith(), $with)));
         }
 
-        $columns = array_values(array_unique(array_intersect($columns, $tableColumns)));
+        try {
+            if($hasTableColumnCheck) {
+                $columns = array_values(array_unique(array_intersect($columns, $tableColumns)));
+            }
+        } catch (\Throwable $th) {
+            dd(
+                $columns,
+                $tableColumns,
+                $this->getModel()->getColumns(),
+                $this->getModel()
+            );
+        }
+
 
         try {
             // code...

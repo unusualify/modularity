@@ -109,7 +109,7 @@ trait HasSpreadable
     public function getReservedKeys(): array
     {
         return array_merge(
-            $this->getColumns(),  // Using ManageEloquent's getColumns
+            $this->getTableColumns(),  // Using ManageEloquent's getTableColumns
             $this->definedRelations(), // Using ManageEloquent's definedRelations
             array_keys($this->getMutatedAttributes()),
             ['spreadable', '_spread']
@@ -120,7 +120,7 @@ trait HasSpreadable
     {
         $attributes = $this->getAttributes();
         $protectedKeys = array_merge(
-            $this->getColumns(), // Using ManageEloquent's getColumns
+            $this->getTableColumns(), // Using ManageEloquent's getTableColumns
             $this->definedRelations(), // Using ManageEloquent's definedRelations
             array_keys($this->getMutatedAttributes()),
             ['spreadable', $this->getSpreadableSavingKey()]
@@ -134,7 +134,7 @@ trait HasSpreadable
 
     protected function cleanSpreadableAttributes(): void
     {
-        $columns = $this->getColumns();
+        $columns = $this->getTableColumns(); // Using ManageEloquent's getTableColumns
         $attributes = $this->getAttributes();
         // TODO: Instead of removing any attribute remove the ones that you know that needs to be removed
         // Remove any attributes that aren't database columns
