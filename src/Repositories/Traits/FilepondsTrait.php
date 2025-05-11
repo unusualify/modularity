@@ -28,24 +28,34 @@ trait FilepondsTrait
     {
         $columns = $this->getColumns(__TRAIT__);
 
-        foreach ($columns as $role) {
-            $files = data_get($fields, $role) ?? null;
+        foreach ($columns as $column) {
+            $files = data_get($fields, $column) ?? null;
 
             if(!$files){
                 continue;
             }
 
-            if (Arr::isAssoc($files)) {
-                foreach ($files as $locale => $filesByLocale) {
-                    Filepond::saveFile($object, $filesByLocale, $role, $locale);
+            $role = $column;
+            if(preg_match('/\.\*\./', $column)){
+                foreach($files as $index => $nestedFiles){
+                    $nestedRole = preg_replace('/\.\*\./', ".$index.", $column);
+                    if (Arr::isAssoc($nestedFiles)) {
+                        foreach ($nestedFiles as $locale => $nestedFilesByLocale) {
+                            Filepond::saveFile($object, $nestedFilesByLocale, $nestedRole, $locale);
+                        }
+                    } else {
+                        Filepond::saveFile($object, $nestedFiles, $nestedRole);
+                    }
                 }
-            } else {
-                Filepond::saveFile($object, $files, $role);
-            }
+            }else {
 
-            // Filepond::saveFile($object, $files, $role);
-            if ($files) {
-                // Filepond::saveFile($object, $files, $role);
+                if (Arr::isAssoc($files)) {
+                    foreach ($files as $locale => $filesByLocale) {
+                        Filepond::saveFile($object, $filesByLocale, $role, $locale);
+                    }
+                } else {
+                    Filepond::saveFile($object, $files, $role);
+                }
             }
         }
     }
