@@ -4,13 +4,33 @@ namespace Modules\SystemPayment\Entities;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Modules\SystemPricing\Entities\Price;
 use Oobook\Priceable\Models\Currency;
-use Oobook\Priceable\Models\Price;
+use Unusualify\Modularity\Entities\Traits\HasFileponds;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 
 class Payment extends \Unusualify\Payable\Models\Payment
 {
-    use ModelHelpers;
+    use ModelHelpers, HasFileponds;
+
+    protected $fillable = [
+        'payment_service_id',
+        'price_id',
+        'order_id',
+        'amount',
+        'currency_id',
+        'currency',
+        'status',
+        'email',
+        'installment',
+        'parameters',
+        'response',
+    ];
+
+    protected $appends = [
+        'invoice_file',
+        'amount_formatted',
+    ];
 
     /**
      * Get the paymentService that owns the Payment.
@@ -25,7 +45,7 @@ class Payment extends \Unusualify\Payable\Models\Payment
         return $this->belongsTo(Price::class, 'price_id', 'id');
     }
 
-    public function currency(): HasOneThrough
+    public function priceCurrency(): HasOneThrough
     {
         return $this->hasOneThrough(
             Currency::class,
@@ -39,10 +59,12 @@ class Payment extends \Unusualify\Payable\Models\Payment
 
     public function paymentable() {}
 
-    public function currencyId(): Attribute
+    protected function amountFormatted(): Attribute
     {
-        return Attribute::make(
+        $moneyCurrency = new \Money\Currency($this->priceCurrency->iso_4217);
 
+        return Attribute::make(
+            get: fn ($value) => \Oobook\Priceable\Facades\PriceService::formatAmount($this->amount, $moneyCurrency),
         );
     }
 
@@ -60,5 +82,14 @@ class Payment extends \Unusualify\Payable\Models\Payment
     public function currencies(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(\Modules\SystemPayment\Entities\PaymentCurrency::class);
+    }
+
+    protected function invoiceFile(): Attribute
+    {
+        $file = $this->fileponds()->where('role', 'invoice')->first();
+
+        return Attribute::make(
+            get: fn ($value) => $file ? $file->mediableFormat() : null,
+        );
     }
 }

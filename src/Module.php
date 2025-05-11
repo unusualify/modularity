@@ -174,9 +174,20 @@ class Module extends NwidartModule
         $this->fireModuleEvent('disabled', $route);
     }
 
-    public function getRoutes()
+    /**
+     * Get all routes of the module.
+     */
+    public function getRoutes(): array
     {
         return $this->moduleActivator->getRoutes();
+    }
+
+    /**
+     * Check if a route exists in the module.
+     */
+    public function hasRoute(string $routeName): bool
+    {
+        return in_array($routeName, $this->getRoutes());
     }
 
     /**
@@ -284,11 +295,16 @@ class Module extends NwidartModule
      * @param mixed $route_name
      * @param mixed $input_name
      */
-    public function getRouteInput($route_name, $input_name = null): array
+    public function getRouteInputs($route_name, $input_name = null): array
     {
-        $inputs = $this->getRouteConfig($route_name)['inputs'];
-
         return $this->getRouteConfig($route_name)['inputs'];
+    }
+
+    public function getRouteInput($route_name, $input_name, $field = 'name'): array
+    {
+        $inputs = $this->getRouteInputs($route_name);
+
+        return Arr::first($inputs, fn ($item) => $item[$field] == $input_name);
     }
 
     /**
@@ -537,14 +553,71 @@ class Module extends NwidartModule
             'bulkRestore',
             'tags',
             'tagsUpdate',
+            'assignments',
+            'createAssignment',
         ];
 
         $isParentRoute = $this->isParentRoute($routeName);
 
         $midQuote = '(.nested.[a-z|_]+)?.(';
+
         $quote = $this->fullRouteNamePrefix($isParentRoute) . '.' . snakeCase($routeName) . $midQuote . implode('|', $actions) . ')$';
 
-        return Collection::make($this->getModuleUris())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name))->toArray();
+        $uris = Collection::make($this->getModuleUris())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
+
+        return $uris->toArray();
+    }
+
+    /**
+     * Get the main URIs of the route.
+     *
+     * @param string $routeName
+     * @param bool $withoutNamePrefix
+     * @param string|null $modelBindingValue
+     * @return array
+     */
+    public function getRouteMainUris($routeName, $withoutNamePrefix = false, $modelBindingValue = null)
+    {
+        $actions = [
+            'restore',
+            'forceDelete',
+            'duplicate',
+            'index',
+            'create',
+            'store',
+            'show',
+            'edit',
+            'update',
+            'destroy',
+            'bulkDelete',
+            'bulkForceDelete',
+            'bulkRestore',
+            'tags',
+            'tagsUpdate',
+            'assignments',
+            'createAssignment',
+        ];
+
+        $isParentRoute = $this->isParentRoute($routeName);
+
+        $quote = $this->fullRouteNamePrefix($isParentRoute) . '.' . snakeCase($routeName) . '.(' . implode('|', $actions) . ')$';
+
+        $uris = Collection::make($this->getModuleUris())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
+
+        if ($withoutNamePrefix) {
+            $uris = $uris->mapWithKeys(function ($uri, $name) use ($routeName, $modelBindingValue) {
+                $parts = explode('.', $name);
+                $key = array_pop($parts);
+
+                if ($modelBindingValue) {
+                    $uri = str_replace('{' . Str::snake($routeName) . '}', $modelBindingValue, $uri);
+                }
+
+                return [$key => $uri];
+            });
+        }
+
+        return $uris->toArray();
     }
 
     public function getRouteActionUri($routeName, $action, $replacements = [], $absolute = false): string
@@ -596,8 +669,15 @@ class Module extends NwidartModule
     public function getNavigationActions(string $routeName)
     {
         $routeName = snakeCase($routeName); // snake case
+        $routeConfig = $this->getRouteConfig($routeName);
 
         $navigationActions = [];
+
+        $customActions = $routeConfig['table_row_actions'] ?? [];
+
+        foreach ($customActions as $customAction) {
+            $navigationActions[] = $customAction;
+        }
 
         foreach ($this->getRouteConfigs() as $key => $routeConfig) {
             if (isset($routeConfig['belongs']) && in_array($routeName, $routeConfig['belongs'])) {
@@ -620,7 +700,6 @@ class Module extends NwidartModule
                 ];
 
             }
-            // code...
         }
 
         return $navigationActions;

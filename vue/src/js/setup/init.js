@@ -8,8 +8,10 @@ import moment from 'moment'
 import { useI18n } from 'vue-i18n'
 
 import store from '@/store' // Adjust the import based on your store structure
-import { CONFIG } from '@/store/mutations'
+import { CONFIG, USER } from '@/store/mutations'
 import { addParametersToUrl, replaceState } from '@/utils/pushState'
+
+import { handleSuccessResponse, handleErrorResponse } from '@/utils/response'
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
@@ -44,6 +46,7 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
   window.__isObject = (value) => {
     return Object.prototype.toString.call(value) === '[object Object]'
   },
+
   window.__isArray = (value) => {
     return Array.isArray(value)
   }
@@ -78,6 +81,7 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
     }
     return true
   }
+
   window.__issetReturn = (arg, defaultValue) => {
     return __isset(arg) ? arg : defaultValue
   }
@@ -228,7 +232,6 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
 
   window.__wildcard_change = (string, val, search_key = 'id') => {
     let values = Array.isArray(val) ? val.join(',') : val
-    // __log('wildcard_change', string, val)
     return string.replace(/^([\w\.]+)?(\*)([\w_\-\.\*]+)$/, '$1*' + `${search_key}=${values}` + '$3')
   }
 
@@ -258,7 +261,6 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
             let filterKey = filterMatches[1]
             let filterValues = filterMatches[2].split(',')
             current = lodash.filter(current, (el) => filterValues.includes( lodash.isNumber(el[filterKey]) ? el[filterKey].toString() : el[filterKey] ))
-            // __log(filterValues, current)
           }
 
           // Handle wildcard (modified for array case):
@@ -307,7 +309,6 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
       let notation = matches[1]
       let quoted = __preg_quote(matches[0])
       let parts = notation.split('.')
-      // __log(parts)
 
       let newParts = []
       for(const j in parts){
@@ -427,7 +428,6 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
   }
 
   window.__moduleTranslationName = (str) => {
-    __log(window)
     const { t, te } = useI18n({ useScope: 'global' })
 
     let isPlural = false
@@ -507,7 +507,6 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
     // Handle invalid input
     // if(isNull(preferedLocale))
     //   preferedLocale = locale.value;
-    // console.log('here', amount, symbol, preferedLocale)
     if (typeof amount !== 'number' || isNaN(amount))
       throw new Error('Amount must be a valid number');
 
@@ -519,6 +518,27 @@ import { addParametersToUrl, replaceState } from '@/utils/pushState'
 
     // Format the number and add the symbol
     return `${symbol}${formatter.format(amount)}`;
+  }
+
+  window.__addParametersToUrl = (url, params) => {
+    const urlInstance = new URL(url);
+    const searchParams = urlInstance.searchParams;
+
+    Object.entries(params).forEach(([key, value]) => {
+      searchParams.set(key, value);
+    });
+
+    return urlInstance.toString();
+  }
+  window.__removeParametersFromUrl = (url, params) => {
+    const urlInstance = new URL(url);
+    const searchParams = urlInstance.searchParams;
+
+    Object.entries(params).forEach(([key, value]) => {
+      searchParams.delete(key);
+    });
+
+    return urlInstance.toString();
   }
 }
 
@@ -624,7 +644,6 @@ function assignObjectHelpers(){
           if (!Array.equals(object1[k2], object2[k2])) { return false }
         } else if (object1[k2] instanceof Object && object2[k2] instanceof Object) {
           // recurse into another objects
-          // console.log("Recursing to compare ", this[propName],"with",object2[propName], " both named \""+propName+"\"");
           if (!Object.equals(object1[k2], object2[k2])) { return false }
         }
         // Normal value comparison for strings and numbers
@@ -673,14 +692,32 @@ export default function init(){
   window.$ = jquery
   window._ = lodash
   window.$moment = moment
-  window.axios.defaults.headers.common = {
+
+  const commonHeaders = {
     'X-Requested-With': 'XMLHttpRequest',
-    Accept: 'application/json'
+    Accept: 'application/json',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    Pragma: 'no-cache',
+    Expires: '0',
   }
+
+  window.axios.defaults.headers.common = commonHeaders
+
+  axios.defaults.headers.common = commonHeaders
+
 
   window.axios.defaults.headers.post = {
     'Content-Type': 'application/json'
   }
+
+  // Set validateStatus on both axios instances
+  const validateStatus = (status) => {
+    return (status >= 200 && status < 300) || status === 422 || status === 401 || status === 419;
+  }
+
+  // Add validateStatus config to accept 422 and 401 as valid
+  axios.defaults.validateStatus = validateStatus
+  window.axios.defaults.validateStatus = validateStatus
 
   axios.interceptors.request.use(function (config) {
     // Do something before request is sent
@@ -698,10 +735,28 @@ export default function init(){
     // Do something with response data
     store.commit(CONFIG.DECREASE_AXIOS_REQUEST)
 
+    // Check for 401 Unauthenticated error
+    if (response.status === 401 && response.data.message === 'Unauthenticated.') {
+      store.commit(USER.OPEN_LOGIN_MODAL)
+    }
+
+    if (response.status === 419 || response.data.message === 'CSRF token mismatch.') {
+      // store.commit(USER.OPEN_LOGIN_MODAL)
+    }
+
+    handleSuccessResponse(response)
+
     return response;
   }, function (error) {
+    handleErrorResponse(error)
+
     store.commit(CONFIG.DECREASE_AXIOS_REQUEST)
     // Any status codes that falls outside the range of 2xx cause this function to trigger
+
+    // Check for 401 Unauthenticated error
+    if (error.response?.status === 401) {
+      // store.commit(USER.OPEN_LOGIN_MODAL)
+    }
     // Do something with response error
     return Promise.reject(error);
   });

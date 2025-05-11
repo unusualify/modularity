@@ -56,19 +56,58 @@ abstract class BaseController extends PanelController
 
     public function index($parentId = null)
     {
-        // dd(
-        //     class_uses_recursive(auth()->guard()->user()),
-        //     get_class_methods(auth()->guard())
-        // );
+        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        $this->addWiths();
+
+        $this->addIndexWiths();
+
         if ($this->request->ajax()) {
-            return [
+            if ($this->request->has('ids')) {
+                $ids = $this->request->get('ids');
+
+                if (is_string($ids)) {
+                    $ids = explode(',', $ids);
+                }
+
+                $eagers = $this->request->get('eagers') ?? [];
+                if (is_string($eagers)) {
+                    $eagers = explode(',', $eagers);
+                }
+
+                $scopes = $this->request->get('scopes') ?? [];
+                if (is_string($scopes)) {
+                    $scopes = explode(',', $scopes);
+                }
+
+                $orders = $this->request->get('orders') ?? [];
+                if (is_string($orders)) {
+                    $orders = explode(',', $orders);
+                }
+
+                return Response::json(
+                    $this->repository->getByIds(
+                        ids: $ids,
+                        with: $eagers,
+                        scopes: $scopes,
+                        orders: $orders,
+                        isFormatted: false,
+                    )
+                );
+            }
+
+            // $scopes = $this->filterScope($this->nestedParentScopes());
+
+            return Response::json([
                 'resource' => $this->getJSONData(),
+                // 'mainFilters' => $this->getTableMainFilters($scopes),
                 'mainFilters' => $this->getTableMainFilters(),
                 'replaceUrl' => $this->getReplaceUrl(),
-            ];
-            // return $indexData + ['replaceUrl' => true];
+            ]);
         }
+
         $indexData = $this->getIndexData($this->nestedParentScopes());
+
         if ($this->request->has('openCreate') && $this->request->get('openCreate')) {
             $indexData += ['openCreate' => true];
         }
@@ -82,8 +121,6 @@ abstract class BaseController extends PanelController
             return View::exists($view);
         });
 
-        // dd($indexData);
-
         return View::make($view, $indexData);
     }
 
@@ -93,6 +130,11 @@ abstract class BaseController extends PanelController
      */
     public function create($parentModuleId = null)
     {
+        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        $this->addWiths();
+
+        $this->addFormWiths();
 
         if (! $this->getIndexOption('skipCreateModal') && false) {
             return Redirect::to(moduleRoute(
@@ -126,6 +168,12 @@ abstract class BaseController extends PanelController
     public function store($parentId = null)
     {
         // $parentId = $this->parentId ?? $parentId;
+
+        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        $this->addWiths();
+
+        $this->addFormWiths();
 
         $input = $this->validateFormRequest()->all();
 
@@ -183,6 +231,12 @@ abstract class BaseController extends PanelController
     {
         $params = $this->request->route()->parameters();
 
+        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        $this->addWiths();
+
+        $this->addFormWiths();
+
         $id = last($params);
 
         $item = $this->repository->getById(
@@ -199,7 +253,7 @@ abstract class BaseController extends PanelController
 
         if ($this->request->ajax()) {
 
-            return $item->toArray();
+            return Response::json($item->toArray());
             // return $data;
             // return $indexData + ['replaceUrl' => true];
         }
@@ -238,6 +292,12 @@ abstract class BaseController extends PanelController
     {
         $params = $this->request->route()->parameters();
 
+        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        $this->addWiths();
+
+        $this->addFormWiths();
+
         $id = last($params);
 
         if ($this->getIndexOption('editInModal')) {
@@ -266,6 +326,12 @@ abstract class BaseController extends PanelController
      */
     public function update($id, $submoduleId = null)
     {
+        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        $this->addWiths();
+
+        $this->addFormWiths();
+
         $params = $this->request->route()->parameters();
 
         $id = last($params);
@@ -387,7 +453,7 @@ abstract class BaseController extends PanelController
             activity()->performedOn($this->repository->getById($this->request->get('id')))->log('restored');
             // $this->handleActionEvent($this->repository->getById($this->request->get('id')), __FUNCTION__);
 
-            return $this->respondWithSuccess(__('listing.restore.success', ['modelTitle' => $this->modelTitle]));
+            return $this->respondWithSuccess(__('listing.restore.success', ['modelTitle' => $this->modelTitle]), attributes: ['location' => 'top']);
         }
 
         return $this->respondWithError(__('listing.restore.error', ['modelTitle' => $this->modelTitle]));
@@ -487,6 +553,7 @@ abstract class BaseController extends PanelController
      */
     protected function getItemColumnData($item, $column)
     {
+
         if (isset($column['thumb']) && $column['thumb']) {
             if (isset($column['present']) && $column['present']) {
                 return [
@@ -515,14 +582,23 @@ abstract class BaseController extends PanelController
             $value .= '">' . $nestedCount . ' ' . (mb_strtolower(Str::plural($column['title'], $nestedCount))) . '</a>';
         } else {
             $field = $column['key'];
-            $value = $item->$field;
+            $value = data_get($item, $field, null);
         }
 
         // for relationship fields
         if (preg_match('/(.*)(_relation)/', $column['key'], $matches)) {
             // $field = $column['key'];
             $relationshipName = $matches[1];
-            $relation = $item->{$matches[1]}();
+            $exploded = explode('.', $relationshipName);
+
+            $relation = null;
+            if (count($exploded) > 1) {
+                $relationshipName = $exploded[1];
+                $item = $item->{$exploded[0]};
+            } else {
+                $relation = $item->{$relationshipName}();
+            }
+
             $itemTitle = $column['itemTitle'] ?? 'name';
 
             try {
@@ -567,6 +643,7 @@ abstract class BaseController extends PanelController
             $value = collect($relation->get())
                 ->pluck($column['field'])
                 ->join(', ');
+
         } elseif (isset($column['present']) && $column['present']) {
             $value = $item->presentAdmin()->{$column['field']};
         }
@@ -728,6 +805,12 @@ abstract class BaseController extends PanelController
     {
         $params = $this->request->route()->parameters();
 
+        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+
+        $this->addWiths();
+
+        $this->addFormWiths();
+
         $id = last($params);
 
         $item = $this->repository->getById($id);
@@ -776,7 +859,9 @@ abstract class BaseController extends PanelController
 
     public function bulkDelete()
     {
-        if ($this->repository->bulkDelete(explode(',', $this->request->get('ids')))) {
+        $ids = is_array($this->request->get('ids')) ? $this->request->get('ids') : explode(',', $this->request->get('ids'));
+
+        if ($this->repository->bulkDelete($ids)) {
             return $this->respondWithSuccess(___('listing.bulk-delete.success', ['modelTitle' => $this->modelTitle]));
         }
 
@@ -786,7 +871,9 @@ abstract class BaseController extends PanelController
 
     public function bulkForceDelete()
     {
-        if ($this->repository->bulkForceDelete(explode(',', $this->request->get('ids')))) {
+        $ids = is_array($this->request->get('ids')) ? $this->request->get('ids') : explode(',', $this->request->get('ids'));
+
+        if ($this->repository->bulkForceDelete($ids)) {
             return $this->respondWithSuccess(___('listing.bulk-force-delete.success', ['modelTitle' => $this->modelTitle]));
         }
 
@@ -795,7 +882,9 @@ abstract class BaseController extends PanelController
 
     public function bulkRestore()
     {
-        if ($this->repository->bulkRestore(explode(',', $this->request->get('ids')))) {
+        $ids = is_array($this->request->get('ids')) ? $this->request->get('ids') : explode(',', $this->request->get('ids'));
+
+        if ($this->repository->bulkRestore($ids)) {
             return $this->respondWithSuccess(___('listing.bulk-restore.success', ['modelTitle' => $this->modelTitle]));
         }
 
@@ -805,6 +894,7 @@ abstract class BaseController extends PanelController
     public function reorder()
     {
         $ids = is_array($this->request->get('ids')) ? $this->request->get('ids') : explode(',', $this->request->get('ids'));
+
         if ($this->repository->getModel()->setNewOrder($ids)) {
 
             return $this->respondWithSuccess(___('listing.reorder.success', ['modelTitle' => $this->modelTitle]));

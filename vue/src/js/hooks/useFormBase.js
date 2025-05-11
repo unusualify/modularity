@@ -35,16 +35,13 @@ export default function useFormBase (props, context) {
     }),
 
     flatCombinedArraySorted: computed(() => {
-      // __log('flatCombinedArraySorted computed', this.valueIntern, this.formSchema)
       return orderBy(props.flatCombinedArray, ['schema.sort'], [orderDirection])
     }),
     storeStateData: computed(() => {
-      // __log('storeStateData computed', this.$lodash.pick(this.valueIntern, ['country_id', 'city_id', 'district_id']))
       this.updateArrayFromState(states.valueIntern, states.formSchema)
       return this.valueIntern
     }),
     storeStateSchema: computed(() => {
-      // __log('storeStateSchema computed', this.valueIntern, this.storeStateData)
 
       this.updateArrayFromState(states.valueIntern, states.formSchema)
       for (const key in states.formSchema) {
@@ -61,8 +58,6 @@ export default function useFormBase (props, context) {
   const getRow = computed(() => {
     return props.row.value || rowDefault
   })
-
-  __log(states)
 
   // expose managed state as return value
   return {

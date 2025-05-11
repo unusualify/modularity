@@ -16,7 +16,6 @@ export default {
       created (el, binding, vnode, prevVnode) {
         const Columns = binding.value
         const vm = binding.instance
-        __log(vnode, el)
         // vnode.props[key] = value
       },
       // called right before the element is inserted into the DOM.

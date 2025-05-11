@@ -14,4 +14,7 @@ return [
         'vat_rates' => 1,
         'price_type' => 1,
     ],
+    'observers' => [
+        'price' => \Unusualify\Modularity\Observers\PriceableObserver::class,
+    ],
 ];

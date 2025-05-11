@@ -93,7 +93,6 @@ export default {
     });
 
     const submitFilter = () => {
-      console.log(localFilterState)
       emit('update:filterState', { ...localFilterState.value });
       emit('submit');
       menu.value = false;

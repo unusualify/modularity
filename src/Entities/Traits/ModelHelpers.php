@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
+use Illuminate\Support\Str;
 use Oobook\Database\Eloquent\Concerns\ManageEloquent;
 use Spatie\Activitylog\ActivityLogger;
 use Spatie\Activitylog\Facades\LogBatch;
@@ -19,6 +20,10 @@ trait ModelHelpers
     public static $defaultAuthorizedModel = \Unusualify\Modularity\Entities\User::class;
 
     public static $obligatoryAuthorizationRoles = ['superadmin', 'admin', 'client-manager', 'client-assistant'];
+
+    public static $authorizableRolesToCheck = ['manager', 'account-executive'];
+
+    public static $assignableRolesToCheck = ['editor', 'reporter'];
 
     public static $defaultHasCreatorModel = \Unusualify\Modularity\Entities\User::class;
 
@@ -143,30 +148,30 @@ trait ModelHelpers
     {
         foreach ($this->getRelations() as $relationName => $relation) {
 
-            if ($relation instanceof \Illuminate\Database\Eloquent\Collection) {
-                // dd($this, $relationName, $this->getRelations());
-                $this->{$relationName} = $relation->map(function ($related) {
+            // if ($relation instanceof \Illuminate\Database\Eloquent\Collection) {
+            //     // dd($this, $relationName, $this->getRelations());
+            //     $this->{$relationName} = $relation->map(function ($related) {
 
-                    if (method_exists($related, 'setRelationsShowFormat')) {
-                        $related->setRelationsShowFormat();
-                    }
+            //         if (method_exists($related, 'setRelationsShowFormat')) {
+            //             $related->setRelationsShowFormat();
+            //         }
 
-                    return $related;
-                });
+            //         return $related;
+            //     });
 
-                $this["{$relationName}_show"] ??= $this->{$relationName}->map(fn ($model) => modelShowFormat($model))->implode(', ');
+            //     $this["{$relationName}_show"] ??= $this->{$relationName}->map(fn ($model) => modelShowFormat($model))->implode(', ');
 
-            } elseif ($relation) {
+            // } elseif ($relation) {
 
-                if (method_exists($relation, 'setRelationsShowFormat')) {
-                    $relation->setRelationsShowFormat();
-                }
+            //     if (method_exists($relation, 'setRelationsShowFormat')) {
+            //         $relation->setRelationsShowFormat();
+            //     }
 
-                // $this->{$relationName} = $relation;
+            //     // $this->{$relationName} = $relation;
 
-                $this["{$relationName}_show"] ??= modelShowFormat($relation);
+            //     $this["{$relationName}_show"] ??= modelShowFormat($relation);
 
-            }
+            // }
         }
     }
 
@@ -178,6 +183,15 @@ trait ModelHelpers
     public function setStateablePreviewNull()
     {
         return "<v-chip  color='' prepend-icon=''>" . __('No Status') . '</v-chip>';
+    }
+
+    public function setStateFormatted($state)
+    {
+        if ($state) {
+            return "<v-chip variant='text' color='{$state->color}' prepend-icon='{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</v-chip>";
+        } else {
+            return "<v-chip variant='text' color='grey' prepend-icon='mdi-alert-circle-outline'>" . __('No Status') . '</v-chip>';
+        }
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -283,4 +297,25 @@ trait ModelHelpers
     //     $activity->description = "activity.logs.message.{$eventName}";
     // }
 
+    public function __call($method, $arguments)
+    {
+        if (! method_exists($this, $method)) {
+
+            if (preg_match('/^numberOf(.*)/', $method, $matches)) {
+                $relationshipTypes = $this->definedRelationsTypes();
+                $camelCase = Str::camel($matches[1]);
+                $snakeCase = Str::snake($matches[1]);
+
+                if (array_key_exists($camelCase, $relationshipTypes) && in_array($relationshipTypes[$camelCase], ['hasMany', 'belongsToMany', 'HasManyThrough', 'MorphMany', 'MorphToMany'])) {
+                    return $this->{$camelCase}()->count();
+                } elseif (array_key_exists($snakeCase, $relationshipTypes) && in_array($relationshipTypes[$snakeCase], ['hasMany', 'belongsToMany', 'HasManyThrough', 'MorphMany', 'MorphToMany'])) {
+                    return $this->{$snakeCase}()->count();
+                }
+                // if(is_plural($matches[1])) {
+                // }
+            }
+        }
+
+        return parent::__call($method, $arguments);
+    }
 }

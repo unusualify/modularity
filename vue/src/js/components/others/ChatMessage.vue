@@ -6,11 +6,13 @@
     ]"
     >
     <div
-      style="max-width: 60%; min-width: 20%;"
+      style="max-width: 60%; min-width: 30%;"
       :class="[
-        'd-flex bg-grey-lighten-6 elevation-2 px-4 py-3 rounded',
-        reverse ? 'flex-row-reverse' : 'flex-row'
+        'd-flex bg-grey-lighten-6 elevation-2 px-4 py-3 rounded position-relative',
+        reverse ? 'flex-row-reverse' : 'flex-row',
+        isUnread ? 'v-input-chat__message--unread' : ''
       ]"
+      @mouseenter="startReading"
     >
       <!-- Avatar -->
       <v-tooltip :text="formatDate(message)" location="top">
@@ -25,27 +27,52 @@
       <div
         :stylex="{ width: `calc(50% - ${avatarSize}px)` }"
         class="w-100">
-        <!-- Message -->
+        <!-- Header with name and icons (always clear) -->
         <div
           :class="[
             'text-grey text-caption w-100 d-flex justify-space-between',
             reverse ? 'flex-row-reverse' : 'flex-row'
           ]">
           <div>{{ message.user_profile.name }}</div>
-          <!-- <div> {{ message.created_at ? $d(new Date(message.created_at), 'numeric-full') : window.$moment().fromNow() }}</div> -->
+          <div class="d-flex justify-end">
+            <v-icon
+              v-if="!noStarring"
+              :icon="message.is_starred ? 'mdi-star' : 'mdi-star-outline'"
+              :color="message.is_starred ? 'secondary' : 'grey'"
+              @click="updateMessage('is_starred', !message.is_starred)"
+            />
+            <v-icon
+              v-if="!noPinning"
+              :icon="message.is_pinned ? 'mdi-pin' : 'mdi-pin-outline'"
+              :color="message.is_pinned ? 'primary' : 'grey'"
+              @click="updateMessage('is_pinned', !message.is_pinned)"
+            />
+          </div>
         </div>
-        <div :class="['d-flex', reverse ? 'flex-row-reverse' : 'flex-row']">{{ message.content }}</div>
 
-        <!-- Attachments -->
-        <div v-if="message.attachments.length > 0" class="mt-2 pa-1 rounded" style="">
-          <ue-title :text="$t('Attachments')" padding="b-2" type="caption" color="none"/>
-          <ue-filepond-preview
-            :source="message.attachments"
-            image-size="24"
-            show-file-name
-            no-overlay
-            show-datex
-          />
+        <!-- Blurred content wrapper -->
+        <div
+          :class="[
+            'message-content',
+            isUnread ? 'message-content--unread' : ''
+          ]"
+        >
+          <!-- Message content -->
+          <div :class="['d-flex mt-2 text-break', reverse ? 'flex-row-reverse' : 'flex-row']">
+            {{ message.content }}
+          </div>
+
+          <!-- Attachments -->
+          <div v-if="message.attachments.length > 0" class="mt-2 pa-1 rounded">
+            <ue-title :text="$t('Attachments')" padding="b-2" type="caption" color="none"/>
+            <ue-filepond-preview
+              :source="message.attachments"
+              image-size="24"
+              show-file-name
+              no-overlay
+              show-datex
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -55,17 +82,51 @@
 <script>
   export default {
     props: {
+      modelValue: {
+        type: Object,
+        required: true
+      },
       avatarSize: {
         type: Number,
         default: 50
       },
-      message: {
-        type: Object,
-        required: true
-      },
       reverse: {
         type: Boolean,
         default: false
+      },
+      updateEndpoint: {
+        type: String,
+        required: true
+      },
+      noStarring: {
+        type: Boolean,
+        default: false
+      },
+      noPinning: {
+        type: Boolean,
+        default: false
+      }
+    },
+    data() {
+      return {
+        readingTimer: null
+      }
+    },
+    computed: {
+      input: {
+        get() {
+          return this.modelValue;
+        },
+        set(value) {
+          this.message = value;
+          this.$emit('update:modelValue', value);
+        }
+      },
+      message() {
+        return this.modelValue;
+      },
+      isUnread() {
+        return !this.message.is_read && !this.reverse;
       }
     },
     methods: {
@@ -83,11 +144,61 @@
         }
 
         return formattedDate;
+      },
+      updateMessage(field, value) {
+        let endpoint = this.updateEndpoint.replace(':id', this.input.id);
+
+        let self = this;
+        axios.put(endpoint, {
+          [field]: value
+        }).then(response => {
+          self.input = {
+            ...self.input,
+            [field]: value
+          };
+        });
+      },
+      startReading() {
+        if (!this.isUnread) return;
+
+        // Wait for transition to complete before marking as read
+        this.readingTimer = setTimeout(() => {
+          this.markAsRead();
+        }, 1000); // Matches the transition duration
+      },
+      markAsRead() {
+        // message.is_read = true;
+        this.updateMessage('is_read', true);
+      }
+    },
+    beforeUnmount() {
+      if (this.readingTimer) {
+        clearTimeout(this.readingTimer);
       }
     }
   }
 </script>
 
-<style>
+<style lang="scss">
+.message-content--unread {
+  filter: blur(2px);
+  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
+.v-input-chat__message--unread {
+  opacity: 0.9;
+  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    opacity: 1;
+    border-width: 1px;
+    border-color: rgba(var(--v-theme-primary), 0.6);
+    transform: scale(1.002);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    .message-content--unread {
+      filter: blur(0);
+    }
+  }
+}
 </style>

@@ -4,7 +4,7 @@
       <v-col class="d-flex flex-column justify-center px-0">
         <v-card class="pa-4 payment-container" elevation="0">
           <v-card-text class="pa-0">
-            <p class="select-title">How would you like to pay?</p>
+            <p class="select-title">{{ $t('How would you like to pay?') }}</p>
           </v-card-text>
 
           <!-- Currency Selector -->
@@ -32,18 +32,14 @@
                 :value="localDefaultPaymentMethod"
                 class="service-label"
               />
-              {{ console.log(currencyCardTypes, selectedCurrencyIso) }}
               <v-row align="center">
-                <v-col class="d-flex justify-content-end custom-service-col">
-                  <div class="service-icon-container">
-                    <v-img-icon
-                      v-for="(type, key) in currencyCardTypes[selectedCurrencyIso]"
-                      :key="`type-${key}`"
-                      :src="'/storage/uploads/' + type.logo"
-                      contain
-                      class="v-img__img--relative"
-                    />
-                  </div>
+                <v-col class="d-flex justify-content-end">
+                  <v-img-icon
+                    v-for="(currencyCardType, key) in currencyCardTypes[selectedCurrencyIso]"
+                    :key="`type-${key}`"
+                    :src="currencyCardType.logo"
+                    style="max-width: 64px;"
+                  />
                 </v-col>
               </v-row>
             </div>
@@ -56,7 +52,7 @@
               :class="{ 'selected-service--focus': localPaymentMethod === service[itemValue] }"
             >
               <v-radio
-                :label="service.title"
+                :label="service.name"
                 :value="service[itemValue]"
                 class="service-label"
               />
@@ -64,8 +60,8 @@
                 <v-col class="d-flex justify-content-end">
                   <div class="service-icon-container">
                     <v-img-icon
-                      :src="'/storage/uploads/' + service?.medias.find(item => item?.pivot?.role === 'logo')?.uuid"
-                      contain
+                      :Xsrc="'/storage/uploads/' + service?.medias.find(item => item?.pivot?.role === 'logo')?.uuid"
+                      :src="service.button_logo_url"
                       class="v-img__img--relative"
                     />
                   </div>
@@ -77,7 +73,7 @@
 
         <!-- Total Amount Display -->
         <v-card-title class="headline">
-          <p class="total">Total Pay:</p>
+          <p class="total">{{ $t('Total Amount') }}</p>
           <p class="amount">{{ displayPrice }}</p>
         </v-card-title>
       </v-col>
@@ -99,13 +95,18 @@
           density="comfortable"
           max-width="300px"
           min-width="80%"
+          class="d-flex align-center justify-center"
         >
           <v-img
             width="100px"
             contain
             max-height="36px"
-            :src="'/storage/uploads/' + selectedService?.medias.find(item => item?.pivot?.role === 'button_logo')?.uuid"
+            :src="selectedService?.button_logo_url"
           />
+          <span class="ml-2 font-weight-bold text-body-2 text-align-center" >
+            {{ displayPrice }}
+          </span>
+          <!-- {{ selectedService?.name }} -->
         </v-btn>
       </v-col>
     </v-row>
@@ -126,7 +127,6 @@ export default {
 
   emits: [
     ...makeInputEmits,
-    'update:modelValue',
     'update:price',
     'currency-converted'
   ],
@@ -141,10 +141,6 @@ export default {
       type: String,
       default: 'id'
     },
-    price_object: {
-      type: [Object, Array, Proxy],
-      default: () => ({})
-    },
     items: {
       type: Array,
       default: () => []
@@ -152,6 +148,11 @@ export default {
     currencies: {
       type: Array,
       default: () => []
+    },
+
+    price_object: {
+      type: [Object, Array, Proxy],
+      default: () => ({})
     },
     api: {
       type: String,
@@ -171,7 +172,7 @@ export default {
     const localPaymentMethod = ref('');
     const localDefaultPaymentMethod = ref("-1");
     const selectedCurrency = ref(props.price_object.currency_id || props.currencies[0]?.id);
-    const displayPrice = ref(formatPrice.value(props.price_object.price_including_vat / 100, props.currencies[0]?.symbol || ''));
+    const displayPrice = ref(formatPrice.value(props.price_object.total_amount / 100, props.currencies[0]?.symbol || ''));
 
     // Reactive state
     const localCreditCard = reactive({
@@ -201,9 +202,9 @@ export default {
     const filteredServiceItems = computed(() => {
       if (!selectedCurrency.value) return [];
 
-      return props.items.filter(service =>
-        service.payment_currencies?.some(currency => currency.id === selectedCurrency.value)
-      );
+      return props.items.filter(service => {
+        return service.payment_currencies?.some(currency => currency.id === selectedCurrency.value)
+      });
     });
 
     const selectedService = computed(() =>
@@ -230,11 +231,13 @@ export default {
       try {
         const response = await axios.post(props.api, {
           currency: selectedCurrencyObject.iso_4217,
-          amount: props.price_object.price_including_vat/ 100
+          amount: props.price_object.discounted_raw_amount / 100
         });
 
+        const calculatedAmount = response.data.converted_amount * ( 1 + props.price_object.vat_multiplier);
+
         displayPrice.value = formatPrice.value(
-          response.data.converted_amount,
+          calculatedAmount,
           selectedCurrencyObject.symbol
         );
 

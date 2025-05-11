@@ -134,13 +134,6 @@ const mutations = {
     // )
   },
   [MEDIA_LIBRARY.SAVE_MEDIAS] (state, medias) {
-    // __log(
-    //   medias,
-    //   state.connector,
-    //   state.indexToReplace,
-    //   state.selected
-    // )
-    // return
     if (state.connector) {
       const key = state.connector
       const existedSelectedConnector = state.selected[key] && state.selected[key].length
@@ -163,10 +156,6 @@ const mutations = {
     }
   },
   [MEDIA_LIBRARY.DESTROY_SPECIFIC_MEDIA] (state, media) {
-    __log(
-      media.name,
-      state.selected
-    )
     // if (state.selected[media.name]) {
     //   state.selected[media.name].splice(media.index, 1)
     //   if (state.selected[media.name].length === 0) delete state.selected[media.name]
@@ -235,7 +224,6 @@ const mutations = {
     if (newValue && newValue !== '') state.type = newValue
   },
   [MEDIA_LIBRARY.RESET_MEDIA_TYPE] (state) {
-    // __log(state)
     state.type = state.types[0].value
   },
   [MEDIA_LIBRARY.UPDATE_MEDIA_MAX] (state, newValue) {

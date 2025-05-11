@@ -1,48 +1,60 @@
 <template>
   <v-sheet>
-    <ue-title weight="medium" color="black" padding="a-0">
+    <ue-title type="body-1" weight="bold" padding="a-0">
       {{ $t('Preview & Summary').toUpperCase() }}
     </ue-title>
 
     <v-row>
       <!-- Preview cards -->
       <template v-for="(context, index) in formattedPreview" :key="`summary-${index}`">
-        <v-col cols="12" :md="context.col || 6" v-fit-grid>
-          <ue-configurable-card v-bind="context" elevation="2" class="my-2"/>
+        <v-col cols="12" :md="context.col || 6" class="d-flex">
+          <ue-configurable-card v-bind="context" elevation="2" title-color="primary" class="my-2 w-100 h-100"/>
         </v-col>
       </template>
 
       <!-- Final form data -->
       <v-col cols="12" v-if="previewFormData.length > 0" v-fit-grid>
-        <v-sheet class="px-4">
-          <ue-title
-            type="body-1"
-            color="primary"
-            font-weight="bold"
-            padding="a-0"
-            margin="y-4"
-          >
-            {{ finalFormTitle }}
-          </ue-title>
+        <v-sheet class="px-0">
+          <div class="d-flex flex-column ga-2 my-4">
+            <ue-title
+              type="body-1"
+              font-weight="bold"
+              padding="a-0"
+            >
+              {{ finalFormTitle }}
+            </ue-title>
+            <ue-title
+              v-if="finalFormSubtitle"
+              type="caption"
+              weight="medium"
+              color="grey-darken-1"
+              transform="none"
+              padding="a-0"
+            >
+              {{ finalFormSubtitle }}
+            </ue-title>
+          </div>
           <!-- Preview form items -->
           <template
             v-for="(data, index) in previewFormData"
             :key="`final-form-data-${index}`"
           >
             <ue-configurable-card
-              style="background-color: transparent;"
+              row-min-height="120px"
+              style="background-color: transparent; min-height: 150px;"
               :class="[
-                lastStepModel[data.fieldName].includes(data.id) ? 'bg-primary' : 'bg-grey-lighten-5'
+                $lodash.includes(lastStepModel[data.fieldName], data.id) ? 'bg-primary' : 'bg-grey-lighten-5',
+                'w-100'
               ]"
-              class="mx-n4 mb-4 py-4"
+              class="mb-4 py-4"
               elevation="2"
-              :items="[
+              :items="data.form_card_items || [
                 [
                   data.name || 'N/A ',
                   data.description || 'N/A',
                   data.tags || [],
                 ],
-                data.basePrice_show || 'N/A'
+                data.base_price_without_vat_formatted || 'N/A'
               ]"
               :actions="[
                 {
@@ -63,16 +75,15 @@
                 '_actions': 'flex-0-1',
               }"
             >
-              <!-- Name and description -->
+              <!-- Name, description, and tags -->
               <template #[`segment.1`]="segmentScope">
-                {{ $log(segmentScope.data) }}
                 <div class="text-body-2 font-weight-medium mb-1">
                   {{ segmentScope.data[0] }}
                 </div>
                 <div class="text-caption">
                   {{ segmentScope.data[1] }}
                 </div>
-                <div v-if="segmentScope.data[2].length > 0" class="text-caption mt-4 d-flex ga-4 flex-wrap" >
+                <div v-if="Array.isArray(segmentScope.data[2]) && segmentScope.data[2].length > 0" class="text-caption mt-4 d-flex ga-4 flex-wrap" >
                   <v-chip v-for="tag in segmentScope.data[2]" :key="tag" variant="outlined" size="small" class="">
                     {{ tag.name ?? tag.slug }}
                   </v-chip>
@@ -95,9 +106,11 @@
                     :min-width="segmentScope.actionProps.actionIconMinHeight"
                     :min-height="segmentScope.actionProps.actionIconMinHeight"
                     :size="segmentScope.actionProps.actionIconSize"
-                    :icon="lastStepModel[data.fieldName].includes(data.id) ? 'mdi-minus' : 'mdi-plus'"
-                    :color="lastStepModel[data.fieldName].includes(data.id) ? 'grey' : 'primary'"
+                    :icon="$lodash.includes(lastStepModel[data.fieldName], data.id) ? 'mdi-minus' : 'mdi-plus'"
+                    :color="$lodash.includes(lastStepModel[data.fieldName], data.id) ? 'grey' : 'primary'"
                     @click="$emit('final-form-action', index)"
+
+                    :readonly="$lodash.includes(protectedLastStepModel[data.fieldName], data.id)"
                   />
                 </div>
               </template>
@@ -112,14 +125,15 @@
 <script>
 export default {
   name: 'StepperPreview',
+  emits: ['final-form-action'],
   props: {
     formattedPreview: {
       type: Array,
-      required: true
+      default: () => []
     },
     previewFormData: {
       type: Array,
-      required: true
+      default: () => []
     },
     lastStepModel: {
       type: Object,
@@ -128,14 +142,21 @@ export default {
     finalFormTitle: {
       type: String,
       required: true
+    },
+    finalFormSubtitle: {
+      type: String,
+      default: null
+    },
+    protectedLastStepModel: {
+      type: Object,
+      default: () => {}
     }
   },
-  emits: ['final-form-action']
 }
 </script>
 
 <style scoped>
-.ue-configurable-card {
-  transition: background-color 0.2s ease;
-}
+  .ue-configurable-card {
+    transition: background-color 0.2s ease;
+  }
 </style>

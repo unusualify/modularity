@@ -18,6 +18,7 @@ class SelectScrollHydrate extends InputHydrate
         'default' => [],
         'cascadeKey' => 'items',
         'returnObject' => false,
+        'itemsPerPage' => 10,
     ];
 
     /**
@@ -33,14 +34,16 @@ class SelectScrollHydrate extends InputHydrate
             return $input;
         }
 
-        if (
-            (isset($input['ext']) && $input['ext'] == 'scroll')
-            && (isset($input['endpoint']) || isset($input['connector']))
-        ) {
-            $input['componentType'] = 'v-autocomplete';
-            $input['type'] = 'input-select-scroll';
-            unset($input['ext']);
+        if (! isset($input['endpoint'])) {
+            throw new \Exception('Endpoint is required ' . $input['name']);
         }
+
+        $input['componentType'] = 'v-autocomplete';
+        $input['type'] = 'input-select-scroll';
+        // unset($input['ext']);
+
+        $input['items'] = [];
+        $input['noRecords'] = true;
 
         return $input;
     }

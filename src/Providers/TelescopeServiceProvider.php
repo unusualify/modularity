@@ -6,16 +6,16 @@ use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
 use Laravel\Telescope\TelescopeApplicationServiceProvider;
-use Unusualify\Modularity\Entities\User;
 
 class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 {
     public function boot()
     {
+        $this->gate();
+
         Telescope::auth(function ($request) {
             return app()->environment('local') ||
-                   $request->user() instanceof User && $request->user()->isSuperAdmin() ||
-                   Gate::check('viewTelescope', [$request->user()]);
+                Gate::check('viewTelescope', [$request->user()]);
         });
     }
 
@@ -36,6 +36,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
                    $entry->isFailedRequest() ||
                    $entry->isFailedJob() ||
                    $entry->isScheduledTask() ||
+                   $entry->isSlowQuery() ||
                    $entry->hasMonitoredTag();
         });
 
@@ -67,7 +68,6 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     protected function gate(): void
     {
         Gate::define('viewTelescope', function ($user) {
-            // dd($user);
             return in_array($user->email, [
                 //
             ]);

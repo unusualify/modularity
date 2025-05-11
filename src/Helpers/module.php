@@ -4,6 +4,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\VarDumper\VarDumper;
@@ -444,11 +445,114 @@ if (! function_exists('backtrace_formatter')) {
     function backtrace_formatter($carry, $item)
     {
         try {
-            $carry[$item['file'] ?? $item['class']] = $item['line'] ?? $item['function'];
+            $carry[$item['file'] ?? $item['class']] = [
+                'line' => $item['line'] ?? null,
+                'function' => $item['function'] ?? null,
+                // 'args' => $noArgs ? null : $item['args'] ?? null,
+            ];
         } catch (\Throwable $th) {
             dd($item);
         }
 
         return $carry;
+    }
+}
+
+if (! function_exists('backtrace_formatted')) {
+    function backtrace_formatted()
+    {
+        return array_reduce(debug_backtrace(), 'backtrace_formatter', []);
+    }
+}
+
+/**
+ * Helper function to benchmark execution time of a callback
+ *
+ * Usage:
+ * $time = benchmark(function () {
+ *     // code to benchmark
+ * });
+ *
+ * @param callable $callback The function to benchmark
+ * @param bool $returnResult Whether to return the result of the callback
+ * @return mixed Time elapsed in seconds or [time, result] if $returnResult is true
+ */
+if (! function_exists('benchmark')) {
+    function benchmark(callable $callback, ?string $label = null, bool $die = false, $unit = 'milliseconds')
+    {
+        if (! $die && is_null($label)) {
+            throw new \Exception('Label is required');
+        }
+
+        if (! $die && ! modularityConfig('benchmark_enabled', false)) {
+            return $callback();
+        }
+
+        if (! in_array($unit, ['microseconds', 'milliseconds', 'seconds'])) {
+            throw new \Exception('Invalid unit: ' . $unit);
+        }
+
+        $startTime = microtime(true);
+
+        $result = $callback();
+
+        // $elapsed is in seconds by default from microtime(true)
+        $elapsed = microtime(true) - $startTime;
+
+        if ($unit === 'microseconds') {
+            $elapsed = $elapsed * 1000000;
+        } elseif ($unit === 'milliseconds') {
+            $elapsed = $elapsed * 1000;
+        }
+
+        $elapsedString = $elapsed . ' in ' . $unit;
+
+        if ($die) {
+            dd($elapsedString);
+        }
+
+        // $modularityLogDir = concatenate_path(modularityConfig('log_dir', storage_path('logs/modularity')), 'benchmarks');
+        // $channel = [
+        //     'driver' => 'single'
+        // ];
+
+        $emergencyThreshold = (int) modularityConfig('benchmark_emergency_time', 1000);
+        $elapsedMs = $elapsed * 1000;
+        $logged = false;
+        $logEvent = null;
+
+        if ($elapsedMs > $emergencyThreshold) {
+            // $modularityLogPath = concatenate_path($modularityLogDir, 'emergency.log');
+            // $channel['path'] = $modularityLogPath;
+            $logEvent = 'emergency';
+            $message = "BENCHMARK: {$elapsedMs}ms exceeded emergency threshold ({$emergencyThreshold}ms) for {$label}";
+            $logged = true;
+        }
+
+        if (! $logged && modularityConfig('benchmark_log_level') === 'debug') {
+            // $modularityLogPath = concatenate_path($modularityLogDir, 'debug.log');
+            // $channel['path'] = $modularityLogPath;
+
+            $logEvent = 'debug';
+            $message = "BENCHMARK: {$elapsedString} elapsed for {$label}";
+            $logged = true;
+        }
+
+        // if(!$logged && modularityConfig('benchmark_log_level') === 'info'){
+        //     // $modularityLogPath = concatenate_path($modularityLogDir, 'info.log');
+        //     // $channel['path'] = $modularityLogPath;
+
+        //     $logEvent = 'info';
+        //     $message = "BENCHMARK: {$elapsed} elapsed for {$label}";
+        //     $logged = true;
+        // }
+
+        if ($logged && $logEvent) {
+            // Log::build($channel)
+            Log::channel('modularity-benchmark')
+                ->{$logEvent}($message);
+        }
+
+        return $result;
     }
 }

@@ -12,7 +12,6 @@
         <v-col cols="12" lg="8" v-fit-grid>
           <StepperContent
             v-model="models"
-
             :schemas="schemas"
             @update:schemas="schemas = $event"
 
@@ -26,10 +25,14 @@
           >
             <template #preview>
               <StepperPreview
+                v-if="!lastFormPreviewLoading && isLastStep"
                 :formatted-preview="formattedPreview"
-                :preview-form-data="previewFormData"
+
+                :preview-form-data="lastFormPreview"
                 :last-step-model="lastStepModel"
+                :protected-last-step-model="protectedLastStepModel"
                 :final-form-title="finalFormTitle"
+                :final-form-subtitle="finalFormSubtitle"
                 @final-form-action="handleFinalFormAction"
               />
             </template>
@@ -39,6 +42,7 @@
         <!-- right side -->
         <v-col cols="12" lg="4">
           <StepperSummary
+
             :is-last-step="isLastStep"
             :forms="forms"
             :active-step="activeStep"
@@ -66,22 +70,31 @@
                 }"
               >
                 <StepperFinalSummary
-                  :formatted-summary="formattedSummary"
                   :loading="loading"
                   :is-completed="isCompleted"
                   @complete="onComplete"
                 >
+                  <template v-if="$slots['summary.final.body']" v-slot:body>
+                    <slot name='summary.final.body' v-bind="{
+                      models,
+                      schemas,
+                      lastStepModel,
+                      finalFormFields,
+                      lastFormPreview,
+                    }">
+
+                    </slot>
+                  </template>
                   <template v-slot:total>
                     <slot name='summary.final.total' v-bind="{payload: this.payload}">
                       <ue-text-display class="text-h5 text-white" text="$2500" subText="+ VAT" />
                     </slot>
                   </template>
-                  <template v-slotdescription>
+                  <template v-slot:description>
                     <slot name="summary.final.description">
                       At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium iusto odio
                     </slot>
                   </template>
-
                 </StepperFinalSummary>
               </slot>
             </template>
@@ -93,7 +106,7 @@
         ref="modal"
         v-model="modalActive"
         :width-type="'md'"
-        :description-text="modalMessage"
+        :description="modalMessage"
         persistent
       >
         <template v-slot:body.description>
@@ -115,9 +128,11 @@
 
 <script>
   import { toRefs, reactive, ref, computed } from 'vue';
-  import { map, reduce, find, each, filter, get, isEqual } from 'lodash-es';
+  import { useGoTo } from 'vuetify'
+  import { map, reduce, find, each, filter, get, isEqual, uniq, isBoolean } from 'lodash-es';
 
-  import { getModel, handleMultiFormEvents } from '@/utils/getFormData.js'
+  import { getModel } from '@/utils/getFormData.js'
+  import { handleMultiFormEvents } from '@/utils/formEvents'
 
   import { useInputHandlers, useValidation } from '@/hooks'
   import api from '@/store/api/form'
@@ -179,7 +194,7 @@
         default: 'models.1.pressReleasePackages'
       },
       summaryNotations: {
-        type: Array,
+        type: [Array, Object],
         default: () => {
           return {}
         }
@@ -194,39 +209,44 @@
         type: Boolean,
         default: false
       },
+
+
       finalFormTitle: {
         type: String,
         default: null
       },
-      finalFormNotations: {
-        type: Object,
-        default: () => {
-          return {
-            '0.PackageCountry': {
-              pattern: '0.wrap_location.schema.PackageCountry.items.*.package_addons',
-              inputName: 'pressReleasePackageAddons',
-            },
-            '0.PackageRegion': {
-              pattern: '0.wrap_location.schema.PackageRegion.items.*.package_addons',
-              inputName: 'pressReleasePackageAddons',
-            },
-          }
-        }
+      finalFormSubtitle: {
+        type: String,
+        default: null
       },
-      finalCardShowFields: {
+      finalFormFields: {
         type: Array,
         default: () => {
-          return [
-            ['name', 'description'],
-            ['basePrice_show'],
-          ]
+          return []
         }
-      }
+      },
 
+      validationScrollingDuration: {
+        type: Number,
+        default: 1000
+      },
+      validationScrollingEasing: {
+        type: String,
+        default: 'easeInOutCubic'
+      },
+      validationScrollingOffset: {
+        type: Number,
+        default: 0
+      },
+      protectInitialValue: {
+        type: Boolean,
+        default: false
+      },
     },
     setup (props, context) {
       const inputHandlers = useInputHandlers()
       const validations = useValidation(props)
+      const goTo = useGoTo()
 
       const stepperActionRef = ref(null)
       const loading = ref(false)
@@ -243,6 +263,7 @@
         ...validations,
         ...toRefs(state),
         formRefs,
+        goTo,
       }
     },
     data () {
@@ -255,7 +276,12 @@
         schemas: [],
         models: [],
         valids: [],
+
+        lastFormPreview: [],
         lastStepModel: {},
+
+        protectedLastStepModel: {},
+
 
         previewModel: [],
         pendingHandleFunctions: [],
@@ -273,8 +299,7 @@
         const self = this
 
         this.loading = true
-        // __log(this.payload)
-        // return
+
         api[method](this.actionUrl, this.payload, function (response) {
           self.loading = false
           self.isCompleted = true
@@ -287,36 +312,6 @@
           self.loading = false
           __log(response)
           // if (errorCallback && typeof errorCallback === 'function') errorCallback(response.data)
-        })
-        return
-        // const formData = getSubmitFormData(this.rawSchema, this.model, this.$store._state.data)
-        // const method = Object.prototype.hasOwnProperty.call(formData, 'id') ? 'put' : 'post'
-        // const self = this
-
-        api[method](this.actionUrl, formData, function (response) {
-          self.formLoading = false
-          if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
-            self.$store.commit(FORM.SET_SERVER_VALID, false)
-
-            self.formErrors = response.data.errors
-          } else if (Object.prototype.hasOwnProperty.call(response.data, 'variant')) {
-            self.$store.commit(FORM.SET_SERVER_VALID, false)
-            self.$store.commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
-          }
-
-          redirector(response.data)
-
-          if (callback && typeof callback === 'function') callback(response.data)
-        }, function (response) {
-          self.formLoading = false
-          if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
-            self.$store.commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
-          } else {
-            self.$store.dispatch(ACTIONS.HANDLE_ERRORS, response.response.data)
-            self.$store.commit(ALERT.SET_ALERT, { message: 'Your submission could not be validated, please fix and retry', variant: 'error' })
-          }
-
-          if (errorCallback && typeof errorCallback === 'function') errorCallback(response.data)
         })
       },
       isPreviewModelFilled(index){
@@ -339,7 +334,6 @@
           // if (!this.serverValid) {
           //   this.resetSchemaError(key)
           // }
-          // __log(index, key, obj, v)
           // this.handleEvent(obj)
           let availableValue = get(this.models[index], key)
           if(JSON.stringify(availableValue) !== JSON.stringify(value)){
@@ -360,47 +354,244 @@
         // all previous steps are valid
         if(this.valids.slice(0, step-1).every(v => v === true)){
           this.activeStep = step
-          // __log('goStep', step, this.valids)
         }
-      },
-      async goNextForm(callback, index) {
-        // __log(this.formRefs[index].value[0].validModel)
-        if(this.formRefs[index].value[0].validModel === true){
-          callback()
-        }else {
-          await this.validateForm(index)
-        }
-        // callback()
       },
       async nextForm(index) {
+
+        await this.validateForm(index)
+
         if(this.formRefs[index].value[0].validModel === true){
           this.activeStep += 1
-          // callback()
         }else if(index < this.forms.length) {
           await this.validateForm(index)
         }
       },
       async validateForm(i) {
         const formRef = this.formRefs[i]
-        formRef.value[0].manualValidation = true
+        const form = formRef.value[0]
+        form.manualValidation = true
 
-        const result = await formRef.value[0].validate()
-        formRef.value[0].manualValidation = false
+        const result = await form.validate()
+        form.manualValidation = false
+
+        if(isBoolean(result.valid) && result.valid === false){
+          this.$nextTick(() => {
+              const el = this.$el.querySelector(".v-input--error .v-input__details[role='alert'] .v-messages");
+              if(el){
+                let easings = [
+                  'linear',
+                  'easeInQuad',
+                  'easeOutQuad',
+                  'easeInOutQuad',
+                  'easeInCubic',
+                  'easeOutCubic',
+                  'easeInOutCubic',
+                  'easeInQuart',
+                  'easeOutQuart',
+                  'easeInOutQuart',
+                  'easeInQuint',
+                  'easeOutQuint',
+                  'easeInOutQuint',
+                ]
+
+                this.goTo(el, {
+                  container: '#ue-stepper-content-window',
+                  duration: this.validationScrollingDuration,
+                  offset: this.validationScrollingOffset,
+                  easing: this.validationScrollingEasing,
+                });
+              }
+          });
+        }
 
         return result
       },
       handleFinalFormAction(index) {
-        const data = this.previewFormData[index]
-        const fieldArray = this.lastStepModel[data.fieldName];
+        // const data = this.previewFormData[index]
+        const data = this.lastFormPreview[index]
+        const fieldName = data.fieldName
+        const fieldArray = this.lastStepModel[fieldName];
 
         // Check if the id exists in the array and toggle it
-        this.lastStepModel[data.fieldName] = fieldArray.includes(data.id)
+        this.lastStepModel[fieldName] = fieldArray.includes(data.id)
           ? fieldArray.filter((id) => id !== data.id)
           : [...fieldArray, data.id];
 
         // Force reactivity by creating a new reference
         this.lastStepModel = { ...this.lastStepModel };
       },
+      async handlePreviewFormField(formField){
+
+        if(!formField.modelNotation)
+          return
+
+        let modelNotation = formField.modelNotation
+        let formFieldKey = `preview-form-field-${modelNotation}`
+        let cacheFormFieldValuesKey = `preview-form-field-values-${modelNotation}`
+
+        this.lastFormPreviewLoading = true
+        let formFieldValues = this.$cacheGet(formFieldKey, {})
+
+        // get previous form field values
+        let previousFormFieldValues = reduce(formFieldValues, (acc, value, key) => {
+          if(value && value === true){
+            acc.push(parseInt(key))
+          }
+          return acc
+        }, [])
+
+        // get cached form field values
+        let cachedFormFieldValues = reduce(formFieldValues, (acc, value, key) => {
+          acc.push(parseInt(key))
+          return acc
+        }, [])
+
+        // get cached form field fetched values
+        let cachedFormFieldFetched = this.$cacheGet(cacheFormFieldValuesKey, [])
+        let modelValue = get(this.models, modelNotation)
+
+        if(modelValue && formField.endpoint){ // if model value is present and endpoint is present fetch new items
+          let currentIds = Array.isArray(modelValue)
+            ? modelValue
+            : [modelValue]
+
+          let newIds = currentIds.filter(id => !cachedFormFieldValues.includes(id))
+          let cachedNewIds = currentIds.filter(id => !previousFormFieldValues.includes(id) && cachedFormFieldValues.includes(id))
+
+          let deletedIds = previousFormFieldValues.filter(id => !currentIds.includes(id))
+          let isChanged = false
+
+          if(deletedIds.length > 0){ // delete items
+            isChanged = true
+
+            this.lastFormPreview = this.lastFormPreview.filter(item => !deletedIds.includes(item.form_field_id))
+
+            formFieldValues = reduce(formFieldValues, (acc, value, key) => {
+              if(deletedIds.includes(parseInt(key))){
+                acc[key] = false
+              }else{
+                acc[key] = value
+              }
+              return acc
+            }, {})
+          }
+
+          if(cachedNewIds.length > 0){ // get cached items acc. to form_field_id
+            cachedNewIds.forEach(id => {
+              let cachedNewItems = cachedFormFieldFetched.filter(item => item.form_field_id === id && item.form_field_notation === modelNotation)
+              cachedNewItems.forEach(item => {
+                this.lastFormPreview.push(item)
+              })
+              formFieldValues[id] = true
+            })
+            isChanged = true
+          }
+
+          if(newIds.length > 0){ // fetch new items
+
+            if(!formField.endpoint){
+              return
+            }
+
+            let endpoint = window.__addParametersToUrl(formField.endpoint, {ids: newIds})
+
+            let response = await axios.get(endpoint)
+
+            if(response.status === 200){
+              let items = response.data
+
+              items.forEach(item => {
+                formFieldValues[item.id] = true
+              })
+
+              if(formField.notation){
+                items = items.map(item => {
+                  let value = get(item, formField.notation, [])
+
+                  let formCardFields = formField.cardFields ?? ['name']
+                  let fieldName = formField.fieldName || modelNotation.split('.').pop()
+
+                  if(Array.isArray(value)){
+                    value = value.map(subItem => {
+                      return {
+                        ...subItem,
+                        isSelected: false,
+                        fieldName: fieldName,
+                        form_field_notation: modelNotation,
+                        form_field_id: item.id,
+                        form_card_items: formCardFields.map(cardField => {
+                          if(Array.isArray(cardField)){
+                            return cardField.map(cardItem => {
+                              return subItem[cardItem] ?? 'N/A'
+                            })
+                          }else{
+                            return subItem[cardField] ?? 'N/A'
+                          }
+                        }),
+                      }
+                    })
+                  } else { // is object
+                    value = {
+                      ...value,
+                      ...{
+                        isSelected: false,
+                        fieldName: fieldName,
+                        form_field_notation: modelNotation,
+                        form_field_id: item.id,
+                        form_card_items: formCardFields.map(cardField => {
+                          if(Array.isArray(cardField)){
+                            return cardField.map(cardItem => {
+                              return value[cardItem] ?? 'N/A'
+                            })
+                          }else{
+                            return value[cardField] ?? 'N/A'
+                          }
+                        })
+                      }
+                    }
+                  }
+                  return value
+                })
+              } else {
+                items = items.map(item => {
+                  return {
+                    ...item,
+                    form_field_notation: formField.notation,
+                    form_field_id: item.id
+                  }
+                })
+              }
+
+              let flattenedItems = reduce(items, (acc, item) => {
+                if(Array.isArray(item)){
+                  return [...acc, ...item]
+                } else {
+                  return [...acc, item]
+                }
+              }, [])
+
+              flattenedItems.forEach(item => {
+                this.$cachePush(cacheFormFieldValuesKey, item)
+                this.lastFormPreview.push(item)
+              })
+
+              if(flattenedItems.length > 0){
+                isChanged = true
+              }
+
+            }
+          }
+
+          if(isChanged){
+            this.$cachePut(formFieldKey, formFieldValues)
+          }
+
+        } else if(previousFormFieldValues.length > 0){ // clear if model value is null and previous form field values are present
+          this.lastFormPreview = this.lastFormPreview.filter(item => previousFormFieldValues.includes(item.form_field_id))
+        }
+
+        this.lastFormPreviewLoading = false
+      }
     },
     computed: {
       disabled () {
@@ -428,88 +619,37 @@
         }
         return data
       },
-      formattedSummary(){
-        let formatteds = NotationUtil.formattedSummary(this.displayInfo, this.summaryNotations)
-        let previewFormData = this.previewFormData
-        let lastStepModel = this.lastStepModel
-
-        const lastStepSelections = reduce(lastStepModel, function(acc, data, key){
-          let _data = Array.isArray(data) ? data : [data]
-
-          each(_data, (id) => {
-            const selected = find(previewFormData, (item) => item.id === id && item.fieldName === key)
-            if(selected){
-              acc.push(selected)
-            }
-          })
-          return acc
-        }, [])
-
-        if(lastStepSelections.length > 0){
-          formatteds['lastStepSelections'] = {
-            title: this.finalFormTitle,
-            values: map(lastStepSelections, (data) => {
-              return {
-                title: data.name || data.title || 'N/A',
-                value: data.basePrice_show || 'N/A',
-              }
-            }),
-          }
-        }
-
-        return formatteds
-      },
       formattedPreview(){
         return NotationUtil.formattedPreview(this.displayInfo, this.previewNotations)
       },
-      previewFormData (){
-        let data = []
-        for(const modelKey in this.finalFormNotations){
-          let _value = __data_get(this.models, modelKey)
 
-          if(!_value)
-            continue
-
-          let _notation = this.finalFormNotations[modelKey]
-          let fieldName = null
-          let notation = null
-
-          if(__isObject(_notation)){
-            notation = _notation.pattern
-            fieldName = _notation.inputName || _notation.fieldName || notation.split('.').pop()
-          }else{
-            notation = _notation
-            fieldName = notation.split('.').pop()
-          }
-
-          if(notation){
-            notation = __wildcard_change(notation, _value)
-            let dataSet = __data_get(this.schemas, notation, null)
-
-            if(dataSet){
-              const pushRecursively = (item, fieldName) => {
-                if(Array.isArray(item)){
-                  for(const subItem of item){
-                    pushRecursively(subItem, fieldName)
-                  }
-                } else if(typeof item === 'object' && item !== null){
-                  data.push({...item, fieldName, isSelected: false})
-                }
-              }
-              pushRecursively(dataSet, fieldName)
-            }
-          }
-        }
-        return data
-      },
       payload(){
         let model = reduce(this.models, function(acc, model, index){
           return {...acc, ...model}
         }, {})
 
+        let lastFormPreview = this.lastFormPreview
+
+        let lastStepModel = reduce(this.lastStepModel, function(acc, value, key){
+          if(Array.isArray(value)){
+            value = value.reduce((acc, id) => {
+              let item = lastFormPreview.find((previewItem) => previewItem.id === id && previewItem.fieldName === key)
+
+              if(item){
+                acc.push(id)
+              }
+              return acc
+            }, [])
+            acc[key] = value
+          }else{
+            acc[key] = value
+          }
+          return acc
+        }, {})
+
         return {
           ...model,
-          ...this.lastStepModel,
+          ...lastStepModel,
         }
       },
       summaryFormScopes(){
@@ -524,11 +664,7 @@
     watch: {
       schemas: {
         handler (value, oldValue) {
-          // __log('schemas watch', value, oldValue)
-          // __log(value[0].wrap_location, oldValue[0].wrap_location)
-          // __log('stepperForm schemas watch', value, this.schemas, !isEqual(value, this.schemas))
           if(!isEqual(value, this.schemas)){
-            // __log('schemas watch', value, this.schemas)
             this.schemas = value
           }
         },
@@ -544,7 +680,6 @@
             })
             this.pendingHandleFunctions = []
           }
-          // __log(value[0].wrap_location, oldValue[0].wrap_location)
           this.models.forEach((model, index) => {
             if(!!this.previewModel[index]){
               Object.keys(this.previewModel[index]).forEach((key) => {
@@ -556,12 +691,25 @@
           })
         },
         deep: true
+      },
+      activeStep: {
+        handler (value, oldValue) {
+
+          this.finalFormFields.forEach((formField) => {
+            if(formField.afterStep && formField.afterStep === oldValue){
+              this.handlePreviewFormField(formField)
+            }
+          })
+
+        },
+        deep: true
       }
     },
     created() {
       // NotationUtil.test()
 
       let self = this
+
       this.forms.forEach((form, index) => {
         let schema = form.schema
 
@@ -573,13 +721,13 @@
       })
       this.previewModel = this.preview
 
-      this.lastStepModel = reduce(this.finalFormNotations, (acc, notation, key) => {
+      this.lastStepModel = reduce(this.finalFormFields, (acc, finalFormField, key) => {
         let fieldName = null
 
-        if(__isObject(notation)){
-          fieldName = notation.inputName || notation.fieldName || notation.pattern.split('.').pop()
+        if(__isObject(finalFormField)){
+          fieldName = finalFormField.inputName || finalFormField.fieldName || finalFormField.modelNotation.split('.').pop()
         }else{
-          fieldName = notation.split('.').pop()
+          fieldName = finalFormField.split('.').pop()
         }
 
         if(!__isset(acc[fieldName])){
@@ -587,6 +735,18 @@
         }
         return acc
       }, {})
+
+      this.lastStepModel = this.$lodash.mapValues(this.lastStepModel, (data, key) => {
+        if(this.modelValue[key]){
+          return this.modelValue[key]
+        }
+        return data
+      })
+
+      if(this.protectInitialValue){
+        this.protectedLastStepModel = this.lastStepModel
+      }
+
     }
   }
 </script>

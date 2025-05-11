@@ -80,7 +80,7 @@ export default {
 
   },
   created() {
-    // __log(this.schema)
+
   }
 }
 </script>

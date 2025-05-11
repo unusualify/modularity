@@ -2,6 +2,7 @@
 
 return [
     'sidebar' => [
+        'width' => 264,
         'expandOnHover' => true,
         'rail' => false,
         'location' => 'left',

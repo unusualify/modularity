@@ -12,6 +12,7 @@
         autocomplete="off"
         return-object
         @update:model-value="choose"
+        :disabled="disabled"
       >
         <template #selection>
           <div v-if="activeCountry && activeCountry.iso2" :class="activeCountry.iso2.toLowerCase()" class="vti__flag" />
@@ -44,6 +45,7 @@
           @keydown="onKeyDown"
           @keyup.enter="onEnter"
           @keyup.space="onSpace"
+          :disabled="disabled"
         >
 
       </v-text-field>
@@ -140,6 +142,10 @@ export default {
     mode: {
       type: String,
       default: () => getDefault('mode')
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     },
     disabledFetchingCountry: {
       type: Boolean,
@@ -256,7 +262,6 @@ export default {
       return [...preferredCountries, ...this.filteredCountries]
     },
     phoneObject () {
-      // __log('phoneObject', this.input, this.activeCountry.iso2)
       const result = PhoneNumber(
         this.phone || '',
         this.activeCountry.iso2
@@ -266,9 +271,6 @@ export default {
         isValid: result.valid,
         country: this.activeCountry
       })
-
-      // __log('phoneObject computed', result, getExample(this.activeCountry.iso2).toJSON())
-      // if (result.valid) { __log('phoneObject computed isValid', result) }
 
       if (!this.phone) {
         return {
@@ -282,7 +284,6 @@ export default {
     },
     phoneText () {
       let key = '_phone'
-      // __log('phoneText computed', this.phoneObject)
       if (this.phoneObject.isValid) {
         key = this.parsedMode
       } else {
@@ -303,7 +304,6 @@ export default {
       this.$emit('onValidate', this.phoneObject)
     },
     modelValue (val, oldValue) {
-      // __log('phone.vue modelValue watch', val, this.modelValue, this.phone)
       if (__isString(val)) { this.phone = this.modelValue }
     },
     open (isDropdownOpened) {
@@ -355,7 +355,6 @@ export default {
       immediate: true
     },
     activeCountry (value) {
-      // __log('activeCountry watch', value)
       if (value && value.iso2) {
         this.boundProps.placeholder = getExample(value.iso2).toJSON().number.national
         this.boundProps.persistentPlaceholder = true
@@ -399,7 +398,6 @@ export default {
   methods: {
 
     inputOnSet (newValue, oldValue) {
-      // __log('phone watch', newValue, oldValue)
       if (newValue || __isString(newValue)) {
         if (newValue[0] === '+') {
           const code = PhoneNumber(newValue).getRegionCode()
@@ -571,7 +569,6 @@ export default {
       // Returns response.number to assign it to v-model (if being used)
       // Returns full response for cases @input is used
       // and parent wants to return the whole response.
-      // __log(this.phoneText, this.phoneObject, e, e.target)
       // this.$emit('input', this.phoneText, this.phoneObject)
       // this.$emit('onInput', this.phoneObject) // Deprecated
       // Keep the current cursor position just in case the input reformatted

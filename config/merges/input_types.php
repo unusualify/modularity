@@ -14,6 +14,7 @@ return [
                 'label' => getLabelFromLocale($locale, true),
             ];
         }, modularityConfig('available_user_locales', ['en', 'tr'])),
+        'rules' => 'sometimes:required',
     ],
     '_timezone' => [
         'type' => 'combobox',

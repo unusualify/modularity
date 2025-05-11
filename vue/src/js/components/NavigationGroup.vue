@@ -142,7 +142,6 @@ export default {
         }
       },
       set(value) {
-        // __log('setter selectIndex', value)
       },
     },
 

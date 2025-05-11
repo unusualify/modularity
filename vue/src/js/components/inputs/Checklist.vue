@@ -126,7 +126,7 @@
                               hide-details
                               :label="item[itemTitle]"
                               :class="getCheckboxClasses(item)"
-                              :readonly="isMandatoryItem(item)"
+                              :readonly="isMandatoryItem(item) || isProtected(item[itemValue])"
                             >
                               <!-- checkbox is on right -->
                               <template v-if="checkboxOnRight" #label>
@@ -171,7 +171,7 @@
                       :label="group[`${itemTitle}`]"
                       :value="group[`${itemValue}`]"
                       :disabled="!canSelectMore() && !input.includes(group[itemValue])"
-                      :readonly="isMandatoryItem(group)"
+                      :readonly="isMandatoryItem(group) || isProtected(group[itemValue])"
                       color="success"
                       hide-details
                       density="compact"
@@ -206,7 +206,7 @@
                   :title="item[itemTitle]"
                   :description="item.description"
                   :disabled="($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue]))"
-                  :readonly="isMandatoryItem(item)"
+                  :readonly="isMandatoryItem(item) || isProtected(item[itemValue])"
                   :checkboxOnRight="checkboxOnRight"
                   :stats="getCardStats(item)"
                 />
@@ -225,7 +225,7 @@
                     hide-details
                     :label="item[itemTitle]"
                     :class="getCheckboxClasses(item)"
-                    :readonly="isMandatoryItem(item)"
+                    :readonly="isMandatoryItem(item) || isProtected(item[itemValue])"
                   >
                     <template v-if="checkboxOnRight" #label>
                       <span></span>
@@ -371,6 +371,12 @@
         return max ?? 999
       })
 
+      const protectedValues = ref(props.protectInitialValue ? props.modelValue : [])
+
+      const isProtected = (id) => {
+        return protectedValues.value.includes(id)
+      }
+
       const initializeInput = (input) => {
         if(props.mandatory){
           let mandatoryItems = props.items.filter((item) => __data_get(item, props.mandatory, false))
@@ -416,7 +422,8 @@
           initializeInput
         }),
         openedGroups: toRef(openedGroups),
-        maxSelectable
+        maxSelectable,
+        isProtected
       }
     },
 
@@ -474,7 +481,7 @@
         return !this.disabled && (!this.maxSelectable || (Array.isArray(this.input) && this.input.length < this.maxSelectable));
       },
       isMandatoryItem(item) {
-        return __data_get(item, this.mandatory, false)
+        return Boolean(__data_get(item, this.mandatory, false))
       },
       isGroupOpen(index) {
         if(this.openAllGroups){

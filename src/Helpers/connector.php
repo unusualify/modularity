@@ -38,7 +38,8 @@ if (! function_exists('find_module_and_route')) {
         // dd($names, $events);
         $routeName = Str::studly(array_pop($names));
         $targetModuleName = Str::studly(array_pop($names));
-        $targetModule = Modularity::find($targetModuleName);
+
+        $targetModule = Modularity::findOrFail($targetModuleName);
 
         // dd($events);
         return [
@@ -155,38 +156,12 @@ if (! function_exists('exec_target')) {
                 }
             }
         }
+
         $item['repository'] = $repository;
 
         return $item;
 
     }
-}
-
-// if (! function_exists('get_withs')){
-//     function get_withs()
-//     {
-//         $item = [''];
-
-//         $withs = [];
-
-//         if (isset($item['cascades'])) {
-//             $withs = $item['cascades'];
-//         }
-
-//         $withs = array_merge($withs, withs());
-
-//         return $withs;
-//     }
-
-// }
-
-if (! function_exists('withs')) {
-
-    function withs(): array
-    {
-        return [];
-    }
-
 }
 
 if (! function_exists('get_item_columns')) {
@@ -223,18 +198,9 @@ if (! function_exists('get_item_columns')) {
                 })
                 ->toArray(), $columns);
         }
-        $columns = array_merge($columns, item_columns());
+        $columns = array_merge($columns, []);
 
         return $columns;
-    }
-
-}
-
-if (! function_exists('item_columns')) {
-
-    function item_columns(): array
-    {
-        return [];
     }
 
 }

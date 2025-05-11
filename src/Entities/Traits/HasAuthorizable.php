@@ -5,9 +5,11 @@ namespace Unusualify\Modularity\Entities\Traits;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Unusualify\Modularity\Entities\Authorization;
+use Unusualify\Modularity\Traits\Allowable;
 
 trait HasAuthorizable
 {
+    use Allowable;
     // protected $defaultAuthorizedModel = \App\Models\User::class;
 
     protected static $hasAuthorizableFillable = ['authorized_id', 'authorized_type'];
@@ -99,11 +101,17 @@ trait HasAuthorizable
      */
     public function initializeHasAuthorizable(): void {}
 
+    /**
+     * Get the authorization record associated with this model
+     */
     public function authorizationRecord(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
         return $this->morphOne(Authorization::class, 'authorizable');
     }
 
+    /**
+     * Get the authorized user associated with this model through the authorization record
+     */
     public function authorizedUser(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
         return $this->hasOneThrough(
@@ -116,6 +124,13 @@ trait HasAuthorizable
         );
     }
 
+    /**
+     * Get the authorized model class from the authorization record or default
+     *
+     * @return string The fully qualified class name of the authorized model
+     *
+     * @throws \Exception If there's an error retrieving the model
+     */
     final public function getAuthorizedModel()
     {
         try {
@@ -127,39 +142,127 @@ trait HasAuthorizable
         }
     }
 
+    /**
+     * Get the default authorized model class name
+     *
+     * @return string The fully qualified class name of the default authorized model
+     */
     public static function getDefaultAuthorizedModel()
     {
         return static::$defaultAuthorizedModel ?? \App\Models\User::class;
     }
 
-    public static function getObligatoryAuthorizationRoles()
+    public function getUserForHasAuthorization($user = null)
     {
-        return static::$obligatoryAuthorizationRoles ?? ['superadmin', 'admin'];
-    }
-
-    public function scopeHasAuthorization($query, $user = null)
-    {
-        if (! Auth::check()) {
-            return $query;
+        if (! Auth::check() && ! $user) {
+            return null;
         }
 
         $user = $user ?? Auth::user();
 
         if (! $user) {
+            return null;
+        }
+
+        return $user;
+    }
+
+    /**
+     * Scope query to only include records authorized for the given user
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed|null $user The user to check authorization for (defaults to authenticated user)
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeHasAuthorization($query, $user = null)
+    {
+        if (! ($user = $this->getUserForHasAuthorization($user))) {
             return $query;
         }
 
         if (in_array('Spatie\Permission\Traits\HasRoles', class_uses_recursive($user))) {
-            $roleModel = config('permission.models.role');
-            $existingRoles = $roleModel::whereIn('name', $this->getObligatoryAuthorizationRoles())->get();
-            if ($user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
-                return $query;
+            // Get roles to check from model's static property if defined
+            $rolesToCheck = static::$authorizableRolesToCheck ?? null;
+
+            // If no specific roles defined, get all roles from the user
+            if (! (is_null($rolesToCheck) || empty($rolesToCheck))) {
+                // Check for specific roles
+                $roleModel = config('permission.models.role');
+                $existingRoles = $roleModel::whereIn('name', $rolesToCheck)->get();
+
+                if (! $user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
+                    return $query;
+                }
             }
+
         }
 
         return $query->whereHas('authorizationRecord', function ($query) use ($user) {
             $query->where('authorized_id', $user->id)
                 ->where('authorized_type', get_class($user));
+        });
+    }
+
+    /**
+     * Check if the current user has authorization usage
+     *
+     * @return bool
+     */
+    public function hasAuthorizationUsage()
+    {
+        if (! ($user = $this->getUserForHasAuthorization())) {
+            return false;
+        }
+
+        return $this->isAllowedItem(
+            item: $this,
+            searchKey: 'allowedRolesForAuthorizationManagement',
+            disallowIfUnauthenticated: false
+        );
+    }
+
+    public function scopeIsAuthorizedToYou($query)
+    {
+        if (! ($user = $this->getUserForHasAuthorization())) {
+            return $query;
+        }
+
+        return $query->whereHas('authorizationRecord', function ($query) use ($user) {
+            $query->where('authorized_id', $user->id)
+                ->where('authorized_type', get_class($user));
+        });
+    }
+
+    public function scopeIsAuthorizedToYourRole($query)
+    {
+        if (! ($user = $this->getUserForAssignable())) {
+            return $query;
+        }
+
+        $userModel = get_class($user);
+        $userRoles = $user->roles;
+
+        return $query->whereHas('authorizationRecord', function ($query) use ($userModel, $userRoles) {
+            $query->where('authorized_type', $userModel)
+                ->whereHas('authorized', function ($query) use ($userRoles) {
+                    $query->role($userRoles);
+                });
+        });
+    }
+
+    public function scopeHasAnyAuthorization($query)
+    {
+        return $query->whereHas('authorizationRecord', function ($query) {
+            $query->whereNotNull('authorized_id')
+                ->whereNotNull('authorized_type');
+        });
+    }
+
+    public function scopeUnauthorized($query)
+    {
+        return $query->whereDoesntHave('authorizationRecord', function ($query) {
+            $query->whereNotNull('authorized_id')
+                ->whereNotNull('authorized_type');
         });
     }
 }

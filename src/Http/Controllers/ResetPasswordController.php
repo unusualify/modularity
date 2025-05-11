@@ -133,10 +133,12 @@ class ResetPasswordController extends Controller
         // call exists on the Password repository to check for token expiration (default 1 hour)
         // otherwise redirect to the ask reset link form with error message
         if ($user && Password::broker('users')->getRepository()->exists($user, $token)) {
-            return $this->viewFactory->make(modularityBaseKey() . '::auth.passwords.reset')->with([
-                'token' => $token,
-                'email' => $user->email,
+            $resetPasswordSchema = getFormDraft('reset_password_form');
 
+            return $this->viewFactory->make(modularityBaseKey() . '::auth.passwords.reset')->with([
+                'attributes' => [
+                    'noSecondSection' => true,
+                ],
                 'formAttributes' => [
                     'hasSubmit' => true,
                     'color' => 'primary',
@@ -147,52 +149,7 @@ class ResetPasswordController extends Controller
                         'password' => '',
                         'password_confirmation' => '',
                     ],
-                    'schema' => ($schema = $this->createFormSchema([
-                        'email' => [
-                            'type' => 'text',
-                            'name' => 'email',
-                            'label' => ___('authentication.email'),
-                            'default' => '',
-                            'col' => [
-                                'cols' => 12,
-                            ],
-                            'rules' => [
-                                ['email'],
-                            ],
-                        ],
-                        'password' => [
-                            'type' => 'password',
-                            'name' => 'password',
-                            'label' => ___('authentication.password'),
-                            'default' => '',
-                            'appendInnerIcon' => '$non-visibility',
-                            'slotHandlers' => [
-                                'appendInner' => 'password',
-                            ],
-                            'col' => [
-                                'cols' => 12,
-                            ],
-                        ],
-                        'password_confirmation' => [
-                            'type' => 'password',
-                            'name' => 'password_confirmation',
-                            'label' => ___('authentication.password-confirmation'),
-                            'default' => '',
-                            'appendInnerIcon' => '$non-visibility',
-                            'slotHandlers' => [
-                                'appendInner' => 'password',
-                            ],
-                            'col' => [
-                                'cols' => 12,
-                            ],
-                        ],
-                        'token' => [
-                            'type' => 'hidden',
-                            // "ext" => "hidden",
-                            'name' => 'token',
-                        ],
-                    ])),
-
+                    'schema' => $this->createFormSchema($resetPasswordSchema),
                     'actionUrl' => route(Route::hasAdmin('password.reset.update')),
                     'buttonText' => 'authentication.reset-password',
                     'formClass' => 'px-5',
@@ -200,7 +157,7 @@ class ResetPasswordController extends Controller
             ]);
         }
 
-        return $this->redirector->to(route('password.reset.link'))->withErrors([
+        return $this->redirector->to(route('admin.password.reset.link'))->withErrors([
             'token' => 'Your password reset token has expired or could not be found, please retry.',
         ]);
     }
@@ -303,9 +260,9 @@ class ResetPasswordController extends Controller
             'taskState' => [
                 'status' => 'success',
                 'title' => __('authentication.password-sent'),
-                'description' => __('authentication.succcess-reset-email'),
+                'description' => __('authentication.success-reset-email'),
                 'button_text' => __('authentication.go-to-sign-in'),
-                'button_url' => 'Test',
+                'button_url' => route('admin.login'),
             ],
         ]);
     }

@@ -4,10 +4,15 @@ namespace Unusualify\Modularity\Providers;
 
 // use Unusualify\Modularity\Models\Enums\UserRole;
 
+use Carbon\Carbon;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Laravel\Horizon\Horizon;
 use Spatie\Permission\Models\Permission;
 use Unusualify\Modularity\Entities\User;
@@ -151,6 +156,43 @@ class AuthServiceProvider extends ServiceProvider implements DeferrableProvider
             return app()->environment('local') || $request->user()->isSuperAdmin() || in_array($request->user()->email, [
                 'software-dev@unusualgrowth.cm',
             ]);
+        });
+    }
+
+    public function register()
+    {
+        VerifyEmail::createUrlUsing(function ($notifiable) {
+            $verifyUrl = URL::temporarySignedRoute(
+                'admin.verification.verify',
+                Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
+                [
+                    'id' => $notifiable->getKey(),
+                    'hash' => sha1($notifiable->getEmailForVerification()),
+                ]
+            );
+
+            return $verifyUrl;
+
+            dd($verifyUrl);
+
+            return 'https://yourapp.com/email/verify?verify_url=' . urlencode($verifyUrl);
+        });
+
+        VerifyEmail::toMailUsing(function ($notifiable, $verificationUrl) {
+
+            // this is what is currently being done
+            // adjust for your needs
+
+            // dd($notifiable, $verificationUrl);
+            return (new \Illuminate\Notifications\Messages\MailMessage)
+                ->subject(Lang::get('Verify Email Address'))
+                ->line(Lang::get('Please click the button below to verify your email address.'))
+                ->action(
+                    Lang::get('Verify Email Address'),
+                    $verificationUrl
+                )
+                ->line(Lang::get('If you did not create an account, no further action is required.'));
+
         });
     }
 }

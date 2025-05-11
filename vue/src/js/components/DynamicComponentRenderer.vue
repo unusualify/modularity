@@ -1,64 +1,49 @@
+<script setup>
+  import { computed } from 'vue'
+
+  const props = defineProps({
+    subject: {
+      type: String,
+      default: ''
+    }
+  })
+
+  const parseComponentString = (str) => {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(str, 'text/html')
+    const el = doc.body.firstChild
+
+    const name = el.tagName.toLowerCase()
+    let props = {}
+    const content = el.textContent
+
+    for (let i = 0; i < el.attributes.length; i++) {
+      const attr = el.attributes[i]
+      props[attr.name] = attr.value
+    }
+
+    props = { ...props }
+
+    return { name, props, content }
+  }
+
+  const isVueComponent = computed(() => {
+    return (props.subject.startsWith('<v-') || props.subject.startsWith('<ue-') ) && props.subject.endsWith('>')
+  })
+
+  const parsedComponent = computed(() => {
+    return isVueComponent.value ? parseComponentString(props.subject) : null
+  })
+</script>
+
 <template>
   <component
-    v-if="isVueComponent"
+    v-if="subject && isVueComponent"
     :is="parsedComponent.name"
-    v-bind="parsedComponent.props"
+    v-bind="{...parsedComponent.props, ...$bindAttributes()}"
   >
     {{ parsedComponent.content }}
   </component>
-  <template v-else>{{ subject }}</template>
+  <template v-else-if="subject" v-html="subject"></template>
 </template>
 
-<script>
-export default {
-  name: 'ue-dynamic-component-renderer',
-  props: {
-    subject: {
-      type: String,
-      required: true
-    }
-  },
-  data() {
-    return {
-      parsedComponent: null,
-      isVueComponent: false
-    }
-  },
-  mounted() {
-    this.parseSubject()
-  },
-  methods: {
-    parseSubject() {
-      if ( (this.subject.startsWith('<v-') || this.subject.startsWith('<ue-') ) && this.subject.endsWith('>')) {
-        this.isVueComponent = true
-        this.parsedComponent = this.parseComponentString(this.subject)
-      } else {
-        this.isVueComponent = false
-      }
-    },
-    parseComponentString(str) {
-      const parser = new DOMParser()
-      const doc = parser.parseFromString(str, 'text/html')
-      const el = doc.body.firstChild
-
-      const name = el.tagName.toLowerCase()
-      let props = {}
-      const content = el.textContent
-
-      for (let i = 0; i < el.attributes.length; i++) {
-        const attr = el.attributes[i]
-        props[attr.name] = attr.value
-      }
-
-      props = { ...props, ...this.$bindAttributes() }
-
-      return { name, props, content }
-    }
-  },
-  watch: {
-    subject() {
-      this.parseSubject()
-    }
-  }
-}
-</script>

@@ -7,6 +7,7 @@ return [
     'error' => 'There is an error!',
 
     'save-success' => 'Content saved. All good!',
+    'password-saved' => 'Password saved successfully!',
 
     'invalid-company' => 'Company fields must be filled!',
 ];

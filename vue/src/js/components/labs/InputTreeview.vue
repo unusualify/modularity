@@ -30,7 +30,7 @@ export default {
   name: 'v-input-range',
 
   created () {
-    // __log(this)
+
   },
   computed: {
 

@@ -11,18 +11,11 @@ export function generateConfigurableCardData(config, data) {
     }
   }
   // __extract(data)
-  // __log(window)
   const index = data.index;
   const schemas = data.schemas;
   const expression = "${__data_get(data, 'schemas.1.pressReleasePackages.items[0].name','EUROPE')}"
-  // __log(`${schemas.1.pressReleasePackages.items[0].name || 'EUROPE'}`)
-  // __log( `with(data) { return \`${expression}\`; }`)
   const func = new Function('data', `return \`${expression}\`;`);
-  // const func = new Function('data', `__extract(data);return __log(schemas);`);
-  __log(
-    `__extract(data);return \`${expression}\`;`,
-  )
-  __log(func(data))
+
   return result;
 }
 
@@ -60,7 +53,6 @@ function evaluateTemplateString(template, context) {
 
     // Evaluate the resulting expression
     try {
-      // __log(context, part)
       return getNestedProperty(context, part);
     } catch (error) {
       return undefined;

@@ -1,14 +1,147 @@
 // hooks/useForm.js
 import { ref, computed, watch, toRefs, reactive, nextTick } from 'vue'
 import { useStore } from 'vuex'
+import { useI18n } from 'vue-i18n'
+import { cloneDeep, isEqual, find, reduce, set, get } from 'lodash-es'
+import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
+
+import { useInputHandlers, useValidation, useLocale, useItemActions } from '@/hooks'
 import { FORM, ALERT } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
 import api from '@/store/api/form'
-import { useI18n } from 'vue-i18n'
-import { useInputHandlers, useValidation, useLocale, useItemActions } from '@/hooks'
-import { getModel, getSubmitFormData, getSchema, handleEvents, getTranslationInputsCount, getTopSchema } from '@/utils/getFormData.js'
+import { getModel, getSubmitFormData, getSchema, getFormEventSchema, } from '@/utils/getFormData.js'
+import { handleEvents } from '@/utils/formEvents'
+import { getTranslationInputsCount, processInputs } from '@/utils/schema.js'
+
 import { redirector } from '@/utils/response'
-import { cloneDeep, isEqual } from 'lodash-es'
+
+export const makeFormProps = propsFactory({
+  modelValue: {
+    type: Object,
+    // default () {
+    //   return {}
+    // }
+  },
+  formClass: {
+    type: [Array, String],
+    default: ''
+  },
+  actionUrl: {
+    type: String
+  },
+  title: {
+    type: [String, Object]
+  },
+  noTitle: {
+    type: Boolean,
+    default: false
+  },
+  schema: {
+    type: Object,
+    // default () {
+    //   return {}
+    // }
+  },
+  async: {
+    type: Boolean,
+    default: true
+  },
+  buttonText: {
+    type: String
+  },
+  hasSubmit: {
+    type: Boolean,
+    default: false
+  },
+  stickyFrame: {
+    type: Boolean,
+    default: false
+  },
+  stickyButton: {
+    type: Boolean,
+    default: false
+  },
+  rowAttribute: {
+    type: Object,
+    default () {
+      return {
+        noGutters: false,
+        class: 'py-4',
+        // justify:'center',
+        // align:'center'
+      }
+    }
+  },
+  slots: {
+    type: Object,
+    default () {
+      return {}
+    }
+  },
+  valid: {
+    type: Boolean,
+    default: null
+  },
+  isEditing: {
+    type: Boolean,
+    default: false
+  },
+  hasDivider: {
+    type: Boolean,
+    default: false
+  },
+  fillHeight: {
+    type: Boolean,
+    default: false
+  },
+  scrollable: {
+    type: Boolean,
+    default: false
+  },
+  noDefaultFormPadding: {
+    type: Boolean,
+    default: false
+  },
+  noDefaultSurface: {
+    type: Boolean,
+    default: false
+  },
+  actions: {
+    type: [Array, Object],
+    default: []
+  },
+  actionsPosition: {
+    type: String,
+    default: 'top',
+    validator(value) {
+      return ['title-right', 'title-center', 'top', 'middle', 'bottom', 'right-top', 'right-middle', 'right-bottom'].includes(value)
+    }
+  },
+  rightSlotGap: {
+    type: Number,
+    default: 12
+  },
+  pushButtonToBottom: {
+    type: Boolean,
+    default: false
+  },
+  rightSlotWidth: {
+    type: [Number, String],
+    default: null
+  },
+  rightSlotMinWidth: {
+    type: Number,
+    default: 300
+  },
+  rightSlotMaxWidth: {
+    type: Number,
+    default: 600
+  },
+  additionalSectionDialogTitle: {
+    type: String,
+    default: 'Additional Options'
+  },
+})
 
 export default function useForm(props, context) {
   const store = useStore()
@@ -21,6 +154,8 @@ export default function useForm(props, context) {
 
   // Data refs
   const VForm = ref(null)
+  const id = Math.ceil(Math.random() * 1000000) + '-form'
+  const formBaseId = id + '-base'
 
   // const issetModel = ref(props.modelValue ? Object.keys(props.modelValue).length > 0 : false)
   // const issetSchema = ref(props.schema ? Object.keys(props.schema).length > 0 : false)
@@ -34,10 +169,11 @@ export default function useForm(props, context) {
     ? props.schema
     : store.state.form.inputs)
 
+  const chunkedRawSchema = computed(() => processInputs(rawSchema.value))
+
   const defaultItem = ref(issetSchema.value
     ? getModel(rawSchema.value)
     : store.getters.defaultItem)
-
 
   const storeEditedItem = computed(() => store.state.form.editedItem)
 
@@ -47,12 +183,22 @@ export default function useForm(props, context) {
     store.state,
   ))
 
-  const inputSchema = ref(validations.invokeRuleGenerator(getSchema(rawSchema.value, model.value, props.isEditing)))
-  const topSchema = ref(getTopSchema(rawSchema.value, props.isEditing))
+  const formItem = computed(() => issetModel.value ? props.modelValue : storeEditedItem.value)
+
+  const inputSchema = ref(validations.invokeRuleGenerator(getSchema(rawSchema.value, { ...model.value, ...formItem.value }, props.isEditing)))
+  const formEventSchema = ref(getFormEventSchema(rawSchema.value, { ...model.value, ...formItem.value }, props.isEditing))
   const extraValids = ref(props.actions.length ? props.actions.map(() => true) : [])
 
+  const hasAdditionalSection = computed(() => context.slots.right
+    || context.slots['right.top']
+    || context.slots['right.bottom']
+    || context.slots['right.middle']
+    || ['right-top', 'right-middle', 'right-bottom'].includes(props.actionsPosition)
+  )
+
   const states = reactive({
-    id: Math.ceil(Math.random() * 1000000) + '-form',
+    id,
+    formBaseId,
     VForm,
 
     issetModel,
@@ -60,10 +206,11 @@ export default function useForm(props, context) {
 
     model,
     // storeEditedItem,
-    formItem: computed(() => issetModel.value ? props.modelValue : storeEditedItem.value),
+    formItem,
 
+    chunkedRawSchema,
     inputSchema,
-    topSchema,
+    formEventSchema,
     extraValids,
 
     hasStickyFrame: props.stickyFrame || props.stickyButton,
@@ -83,8 +230,10 @@ export default function useForm(props, context) {
     ),
     reference: computed(() => 'ref-' + states.id),
     hasTraslationInputs: computed(() => getTranslationInputsCount(inputSchema.value) > 0),
-    flattenedActions: computed(() => __isObject(props.actions) ? Object.values(props.actions) : props.actions),
-    hasActions: computed(() => states.flattenedActions.length > 0),
+
+    hasAdditionalSection,
+
+    showAdditionalSectionDialog: false,
   })
   // Methods
 
@@ -199,7 +348,6 @@ export default function useForm(props, context) {
   }
 
   const resetValidation = () => {
-    __log(VForm)
     VForm.value.resetValidation()
   }
 
@@ -219,38 +367,63 @@ export default function useForm(props, context) {
         _errors[name] = errors[name]
       }
     }
+
     for (const name in _errors) {
       if( inputSchema.value[name]) inputSchema.value[name].errorMessages = _errors[name]
+      else if (find(chunkedRawSchema.value, chunk => chunk.name === name)) {
+        const wrapInputs = reduce(inputSchema.value, (acc, input, key) => {
+          if(input.type === 'wrap') {
+            acc.push(key)
+          }
+          return acc
+        }, [])
+
+        wrapInputs.forEach(wrapKey => {
+          if(inputSchema.value[wrapKey]['schema'][name]) {
+            inputSchema.value[wrapKey]['schema'][name].errorMessages = _errors[name]
+          }
+        })
+      }
     }
   }
 
   const resetSchemaError = (key) => {
-    inputSchema.value[key].errorMessages = []
+    if(get(inputSchema.value, `${key}`)) {
+      set(inputSchema.value, `${key}.errorMessages`, [])
+      set(inputSchema.value, `${key}.error`, false)
+    }else{
+      for (const wrapKey in inputSchema.value) {
+
+        if(inputSchema.value[wrapKey]['schema']) {
+
+          for(const nestedKey in inputSchema.value[wrapKey]['schema']) {
+            if(nestedKey === key) {
+              set(inputSchema.value, `${wrapKey}.schema.${nestedKey}.errorMessages`, [])
+              set(inputSchema.value, `${wrapKey}.schema.${nestedKey}.error`, false)
+            }
+          }
+        }
+      }
+    }
   }
 
   const resetSchemaErrors = () => {
     for (const key in inputSchema.value) {
       resetSchemaError(key)
+
+      if(inputSchema.value[key]['schema']) {
+
+        for(const nestedKey in inputSchema.value[key]['schema']) {
+          if(inputSchema.value[key]['schema'][nestedKey]) {
+            resetSchemaError(`${key}.schema.${nestedKey}`)
+          }
+        }
+      }
     }
   }
 
   // Initialize
   const initialize = () => {
-    // rawSchema.value = issetSchema.value ? props.schema : store.state.form.inputs
-    // defaultItem.value = issetSchema.value ? getModel(rawSchema.value) : store.getters.defaultItem
-
-    // model.value = getModel(
-    //   rawSchema.value,
-    //   issetModel.value ? props.modelValue : editedItem.value,
-    //   // states.model,
-    //   store.state,
-    // )
-
-    // states.inputSchema = validations.invokeRuleGenerator(getSchema(rawSchema.value, states.model, props.isEditing))
-    // states.topSchema = getTopSchema(rawSchema.value, props.isEditing)
-    // states.extraValids = props.actions.length ? props.actions.map(() => true) : []
-
-    // __log('initialize')
     resetSchemaErrors()
   }
 
@@ -272,7 +445,7 @@ export default function useForm(props, context) {
 
         handleEvent(obj)
       }
-      // __log('useForm handleInput', event)
+
       context.emit('input', event)
     },
     handleClick: (e) => {
@@ -284,20 +457,19 @@ export default function useForm(props, context) {
       // check 'click' is from from appendIcon at key password
 
       // for click slot handlers
-      // __log(params, val)
       if (on === 'click' && params && params.tag) {
         // toggle visibility of password control
         inputHandlers.invokeInputClickHandler(obj, params.tag)
       }
     },
     handleUpdate: (e) => {
-      // __log('handleUpdate', e)
+
     },
     handleResize: (e) => {
-      // __log('handleResize', e)
+
     },
     handleBlur: (e) => {
-      // __log('handleBlur', e)
+
     },
     submit: (e, callback = null, errorCallback = null) => {
       if (validations.validModel.value) {
@@ -319,7 +491,6 @@ export default function useForm(props, context) {
       }
     },
     updatedSlotModel: (value, inputName) => {
-      __log(states.model, value, inputName)
     },
     regenerateInputSchema: (newItem) => {
       // #TODO regenerate inputschema for prefix regex pattern
@@ -327,13 +498,8 @@ export default function useForm(props, context) {
       //   if (__isset(this.rawSchema[key].event)) {
 
     },
-    getTopInputActiveLabel: (topInput) => {
-      const item = topInput.items.find(item => item[topInput.itemValue] ===  (window.__isset(states.model[topInput.name]) ? states.model[topInput.name] : -1))
-      return item ? item[topInput.itemTitle] : topInput.label
-    },
 
     updatedCustomFormBaseModelValue: (value) => {
-      __log('updatedCustomFormBaseModelValue', value)
       model.value = value
     },
   })
@@ -344,9 +510,8 @@ export default function useForm(props, context) {
     if(oldVal === undefined) return
 
     if (issetModel.value) {
-      // __log('modelValue watch', isEqual(newVal, oldVal), isEqual(newVal, model.value), newVal, model.value)
       if(isEqual(newVal, oldVal) && isEqual(newVal, model.value)) return
-      // __log('modelValue watch', newVal, oldVal)
+
       model.value = getModel(rawSchema.value, newVal, store.state)
     }
   })
@@ -361,13 +526,12 @@ export default function useForm(props, context) {
 
   watch(() => model.value, (newVal, oldVal) => { // ✅ Proper ref watching
     if (issetModel.value) {
-      // __log('model watch', isEqual(newVal, oldVal), isEqual(newVal, props.modelValue), newVal, props.modelValue)
 
       if(isEqual(newVal, oldVal) && isEqual(newVal, props.modelValue)) return
 
       context.emit('update:modelValue', newVal)
     } else {
-      // __log('useForm model watch for editedItem', newVal, oldVal)
+
     }
   }, { deep: true })
 
@@ -383,8 +547,6 @@ export default function useForm(props, context) {
 
   // Watch schema
   watch(() => props.schema, (newValue, oldValue) => {
-    // __log('schema watch', newValue)
-    // __log('schema watch', isEqual(newValue, oldValue), newValue, oldValue)
     if (!isEqual(newValue, oldValue) && issetSchema.value && !isEqual(newValue, inputSchema.value)) {
       rawSchema.value = newValue
       defaultItem.value = getModel(rawSchema.value)
@@ -396,7 +558,7 @@ export default function useForm(props, context) {
       // )
 
       inputSchema.value = validations.invokeRuleGenerator(getSchema(rawSchema.value, model.value, props.isEditing))
-      topSchema.value = getTopSchema(rawSchema.value, props.isEditing)
+      formEventSchema.value = getFormEventSchema(rawSchema.value, formItem.value, props.isEditing)
       // states.extraValids = props.actions.length ? props.actions.map(() => true) : []
       initialize()
       // context.emit('update:schema' )
@@ -405,7 +567,6 @@ export default function useForm(props, context) {
 
   // Watch inputSchema
   watch(() => inputSchema.value, (newValue, oldValue) => {
-    // __log('inputSchema watch', newValue, oldValue)
 
     // if(isEqual(newValue, oldValue) && isEqual(newValue, rawSchema.value)) return
 
@@ -418,7 +579,6 @@ export default function useForm(props, context) {
 
   // Watch rawSchema
   watch(() => rawSchema.value, (value, oldValue) => {
-    // __log('watch rawSchema', value)
     if(oldValue === undefined) {
       return
     }

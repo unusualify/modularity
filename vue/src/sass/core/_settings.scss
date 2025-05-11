@@ -1,6 +1,6 @@
 @use 'abstract' as *;
 
-@forward 'vuetify/settings' with (
+@use 'vuetify/settings' with (
   $button-icon-font-size: $button-icon-font-size,
   $button-font-size: $button-font-size,
   $button-height: $button-height,
@@ -30,13 +30,13 @@
 
   $list-padding: 8px 0px,
   $list-nav-padding: $sidebar-padding 4px,
-  $list-item-one-line-padding: 8px 13px,
+  // $list-item-one-line-padding: 8px 13px,
   $list-item-nav-subtitle-font-size: $list-item-nav-subtitle-font-size,
   // $list-item-padding: 4px calc($spacer * 6),
 
   // $list-item-icon-margin-end: 2px,
   $list-item-icon-margin-start: calc($spacer * 3),
-  $list-item-avatar-size: 56px,
+  // $list-item-avatar-size: 56px,
   // $table-border: thin solid $table-border-color !default;
 
 

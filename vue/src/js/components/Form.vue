@@ -1,5 +1,8 @@
 <template>
-  <div :class="fillHeight ? '' : ''"
+  <div
+    :class="[
+      'ue-form',
+    ]"
     :style="{height: fillHeight ? ($vuetify.display.mdAndDown ? `calc(97vh - 64px)` : `calc(97vh)` ) : ''}">
     <v-form
       :id="id"
@@ -10,157 +13,63 @@
       @submit="submit"
       :class="formClasses"
       >
-      <input v-if="!async" type="hidden" name="_token" :value="csrf"/>
+      <input v-if="!async" type="hidden" name="_token" :value="$csrf"/>
 
       <!-- Header Section -->
       <div :class="[(hasDivider || title) ? 'pb-6' : '', scrollable ? 'flex-grow-0' : '']">
         <ue-title
-          v-if="title"
+          v-if="!noTitle && title"
           padding="b-3"
           align="center"
           justify="space-between"
           v-bind="titleOptions"
         >
-          {{ titleSerialized }}
+          <template v-slot:default>
+            <slot name="header.left" v-bind="{title: titleSerialized, model: model, schema: inputSchema, formItem}">
+              {{ titleSerialized }}
+            </slot>
+          </template>
           <template v-slot:right>
             <div class="d-flex align-center">
-              <slot name="headerCenter">
-
-              </slot>
-              <!-- Form Actions -->
-              <template v-if="hasAction && false">
-                <div class="d-flex flex-wrap ga-2 mr-2">
-                  <template v-for="(action, key) in flattenedActions">
-                    <v-tooltip
-                      v-if="shouldShowAction(action) && action.type !== 'modal'"
-                      :disabled="!action.icon || action.forceLabel"
-                      :location="action.tooltipLocation ?? 'top'"
-                    >
-                      <template v-slot:activator="{ props }">
-                        <v-switch
-                          v-if="action.type === 'publish'"
-                          :modelValue="model[action.key ?? 'published'] ?? action.default ?? false"
-                          @update:modelValue="handleAction(action)"
-                        />
-                        <v-btn
-                          v-else
-                          :icon="!action.forceLabel ? action.icon : null"
-                          :text="action.forceLabel ? action.label : null"
-                          :color="action.color"
-                          :variant="action.variant"
-                          :density="action.density ?? 'comfortable'"
-                          :size="action.size ?? 'default'"
-                          :rounded="action.forceLabel ? null : true"
-                          v-bind="props"
-                          @click="handleAction(action)"
-                        />
-                      </template>
-                      <span>{{ action.tooltip ?? action.label }}</span>
-                    </v-tooltip>
-                    <v-menu v-else-if="shouldShowAction(action) && action.type === 'modal'"
-                      :close-on-content-click="false"
-                      open-on-hoverx
-                      transition="scale-transition"
-                    >
-                      <template v-slot:activator="{ props }">
-                        <v-btn
-                          :icon="!action.forceLabel ? action.icon : null"
-                          :text="action.forceLabel ? action.label : null"
-                          :color="action.color"
-                          :variant="action.variant"
-                          :density="action.density ?? 'comfortable'"
-                          :size="action.size ?? 'default'"
-                          :rounded="action.forceLabel ? null : true"
-                          v-bind="props"
-                        />
-                      </template>
-                      <v-sheet :style="$vuetify.display.mdAndDown ? {width: '70vw'} : {width: '40vw'}">
-                        <ue-form
-                          :ref="`extra-form-${key}`"
-                          :modelValue="createModel(action.schema)"
-                          @updatex:modelValue="$log($event)"
-                          :title="action.formTitle ?? null"
-                          :schema="action.schema"
-                          :action-url="action.endpoint.replace(':id', model.id)"
-                          :valid="extraValids[key]"
-                          @update:valid="extraValids[key] = $event"
-                          has-divider
-                          has-submit
-                          button-text="Save"
-                        />
-                      </v-sheet>
-                    </v-menu>
-                  </template>
-                </div>
-              </template>
-
-              <FormActions
-                v-if="isEditing"
+              <!-- Title Center Form Actions -->
+              <FormActions v-if="actionsPosition == 'title-center' && isEditing"
                 :modelValue="formItem"
                 :actions="actions"
                 :is-editing="isEditing"
                 @action-complete="$emit('actionComplete', $event)"
+              >
+                <template #prepend>
+                  <slot name="actions.prepend"></slot>
+                </template>
+                <template #append>
+                  <slot name="actions.append"></slot>
+                </template>
+              </FormActions>
+
+              <!-- Slot for headerCenter -->
+              <slot name="headerCenter">
+
+              </slot>
+
+              <!-- Title Right Form Actions -->
+              <FormActions v-if="actionsPosition == 'title-right' && isEditing"
+                :modelValue="formItem"
+                :actions="actions"
+                :is-editing="isEditing"
+                @action-complete="$emit('actionComplete', $event)"
+              >
+                <template #prepend="actionsScope">
+                  <slot name="actions.prepend" v-bind="actionsScope"></slot>
+                </template>
+                <template #append="actionsScope">
+                  <slot name="actions.append" v-bind="actionsScope"></slot>
+                </template>
+              </FormActions>
+
+              <FormEvents v-if="formEventSchema && formEventSchema.length && model"
+                :events="formEventSchema"
+                v-model="model"
               />
-              <!-- Input events-->
-              <template v-if="topSchema && topSchema.length">
-                  <template v-for="topInput in topSchema" :key="topInput.name">
-                    <v-tooltip
-                      :disabled="topInput.tooltip == ''"
-                      :location="topInput.tooltipLocation ?? 'top'"
-                    >
-                      <template v-slot:activator="{ props }">
-                        <v-switch
-                          v-if="topInput.type === 'switch'"
-                          v-bind="{...$lodash.omit(topInput, 'label'), ...props}"
-                          hide-details
-                          :modelValue="model[topInput.name] ?? topInput.default ?? false"
-                          @update:modelValue="model[topInput.name] = $event"
-                          class="mr-2"
-                        />
-                        <ue-recursive-stuff v-else-if="topInput.viewOnlyComponent"
-                          :configuration="topInput.viewOnlyComponent"
-                          :bind-data="model"
-                          v-bind="props"
-                          class="mr-2"
-                        />
-                        <v-menu v-else
-                          :close-on-content-click="false"
-                          transition="scale-transition"
-                          offset-y
-                          v-bind="props"
-                        >
-                          <template v-slot:activator="{ props }">
-                            <v-btn
-                              class="mr-2"
-                              variant="outlined"
-                              append-icon="mdi-chevron-down"
-                              v-bind="props"
-                            >
-                              <!-- {{ topInput.label }} -->
-                              {{ getTopInputActiveLabel(topInput) }}
-                              <!-- {{ topInput.items.find(item => item[topInput.itemValue] ===  ($isset(model[topInput.name]) ? model[topInput.name] : -1))[topInput.itemTitle] ?? topInput.label }} -->
-                            </v-btn>
-                          </template>
-
-                          <v-list>
-                            <v-list-item
-                              v-for="(item, index) in topInput.items"
-                              :key="item.id"
-                              @click="model[topInput.name] = item.id"
-                            >
-                              <v-list-item-title>
-                                {{ item.name }}
-                                <v-icon v-if="$isset(model[topInput.name]) && item[topInput.itemValue] === model[topInput.name]" size="small" icon="$check" color="primary"></v-icon>
-                              </v-list-item-title>
-                            </v-list-item>
-                          </v-list>
-                        </v-menu>
-                      </template>
-                      <span>{{ topInput.tooltip ?? topInput.label }}</span>
-                    </v-tooltip>
-
-                  </template>
-              </template>
 
               <!-- Language Selector -->
               <v-chip-group
@@ -178,7 +87,9 @@
                   variant="outlined"
                 ></v-chip>
               </v-chip-group>
-              <slot name="headerRight">
+
+              <!-- Slot for headerRight -->
+              <slot name="header.right">
 
               </slot>
             </div>
@@ -188,72 +99,199 @@
         <v-divider v-if="hasDivider"></v-divider>
       </div>
 
-      <!-- {{ $log(model, formItem) }} -->
       <!-- Scrollable Content Section -->
       <div :class="['d-flex', scrollable ? 'flex-grow-1 overflow-hidden mr-n5' : '']">
-        <div :class="['w-100', scrollable ? 'overflow-y-auto pr-3' : '']"
+        <div :class="['w-100 d-flex', scrollable ? 'overflow-y-auto pr-3' : '']"
         >
-          <slot name="top" v-bind="{item: formItem, schema}"></slot>
-
-          <v-custom-form-base
-            :id="`ue-wrapper-${id}`"
-
-            v-model="model"
-            :schema="inputSchema"
-            :row="rowAttribute"
-
-            @update="handleUpdate"
-            @input="handleInput"
-            @resize="handleResize"
-            @blur="handleBlur"
-            @click="handleClick"
+          <div class="flex-grow-1">
+            <!-- Top Form Actions -->
+            <FormActions v-if="actionsPosition == 'top' && isEditing"
+              :modelValue="formItem"
+              :actions="actions"
+              :is-editing="isEditing"
+              @action-complete="$emit('actionComplete', $event)"
             >
-            <template
-              v-for="(_slot, key) in formSlots"
-              :key="key"
-              v-slot:[`slot-inject-${_slot.name}-key-ue-wrapper-${id}-${_slot.inputName}`]="_slotData"
+              <template #prepend="actionsScope">
+                <slot name="actions.prepend" v-bind="actionsScope"></slot>
+              </template>
+              <template #append="actionsScope">
+                <slot name="actions.append" v-bind="actionsScope"></slot>
+              </template>
+            </FormActions>
+
+            <slot name="top" v-bind="{item: formItem, schema}"></slot>
+
+            <!-- Middle Form Actions -->
+            <FormActions v-if="actionsPosition == 'middle' && isEditing"
+              :modelValue="formItem"
+              :actions="actions"
+              :is-editing="isEditing"
+              @action-complete="$emit('actionComplete', $event)"
+            >
+              <template #prepend="actionsScope">
+                <slot name="actions.prepend" v-bind="actionsScope"></slot>
+              </template>
+              <template #append="actionsScope">
+                <slot name="actions.append" v-bind="actionsScope"></slot>
+              </template>
+            </FormActions>
+
+            <v-custom-form-base
+              :id="formBaseId"
+
+              v-model="model"
+              :schema="inputSchema"
+              :row="rowAttribute"
+
+              @update="handleUpdate"
+              @input="handleInput"
+              @resize="handleResize"
+              @blur="handleBlur"
+              @click="handleClick"
+            >
+              <template
+                v-for="(_slot, key) in formSlots"
+                :key="key"
+                v-slot:[`slot-inject-${_slot.name}-key-${formBaseId}-${_slot.slotPath}`]="_slotScope"
+                >
+                <template v-if="_slot.type == 'form'">
+                  <v-custom-form-base
+                    :id="`${formBaseId}-${_slot.name}`"
+                    v-model="model"
+                    v-model:schema="_slot.schema"
+                    :row="rowAttribute"
+
+                    >
+                  </v-custom-form-base>
+                </template>
+                <template v-else-if="_slot.type == 'recursive-stuff'">
+                  <ue-recursive-stuff
+                    :configuration="_slot.context"
+                    :bindData="_slotScope">
+                  </ue-recursive-stuff>
+
+                </template>
+              </template>
+              <!-- <template v-slot:[`slot-inject-prepend-key-treeview-slot-permissions`]="{open}" >
+                <v-icon color="blue">
+                    {{open ? 'mdi-folder-open' : 'mdi-folder'}}
+                </v-icon>
+              </template>
+              <template #slot-inject-label-key-treeview-slot-permissions="{item}" >
+                <span class="caption" >
+                  {{item.name.toUpperCase()}}
+                </span>
+              </template> -->
+            </v-custom-form-base>
+
+            <!-- Bottom Form Actions -->
+            <FormActions v-if="actionsPosition == 'bottom' && isEditing"
+              :modelValue="formItem"
+              :actions="actions"
+              :is-editing="isEditing"
+              @action-complete="$emit('actionComplete', $event)"
+            >
+              <template #prepend="actionsScope">
+                <slot name="actions.prepend" v-bind="actionsScope"></slot>
+              </template>
+              <template #append="actionsScope">
+                <slot name="actions.append" v-bind="actionsScope"></slot>
+              </template>
+            </FormActions>
+          </div>
+
+          <div v-if="hasAdditionalSection && $vuetify.display.lgAndUp"
+            :class="[
+              `flex-grow-0 ml-${rightSlotGap}`,
+            ]"
+          >
+            <div
+              :class="[
+                `pt-2 gr-4`,
+                $vuetify.display.smAndDown ? 'd-none' : 'd-flex flex-column',
+              ]"
+              :style="{
+                ...(rightSlotWidth ? {width: `${rightSlotWidth}px`} : {}),
+                ...(rightSlotMinWidth ? {minWidth: `${rightSlotMinWidth}px`} : {}),
+                ...(rightSlotMaxWidth ? {maxWidth: `${rightSlotMaxWidth}px`} : {})
+              }"
+            >
+            </div>
+            <slot name="right" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}">
+              <AdditionalSectionContent
+                :actions-position="actionsPosition"
+                :is-editing="isEditing"
+                :form-item="formItem"
+                :actions="actions"
+                @action-complete="$emit('actionComplete', $event)"
               >
-              <template v-if="_slot.type == 'form'">
-                <v-custom-form-base
-                  :id="`ue-wrapper-${id}-${_slot.name}`"
-                  v-model="model"
-                  v-model:schema="_slot.schema"
-                  :row="rowAttribute"
+                <template #right-top>
+                  <slot name="right.top" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                </template>
+                <template #right-middle>
+                  <slot name="right.middle" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                </template>
+                <template #right-bottom>
+                  <slot name="right.bottom" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                </template>
+              </AdditionalSectionContent>
+            </slot>
+          </div>
 
+          <!-- Mobile dialog/modal for right section -->
+          <v-btn
+            v-if="hasAdditionalSection && $vuetify.display.mdAndDown"
+            icon
+            class="mt-2"
+            @click="showAdditionalSectionDialog = true"
+          >
+            <v-icon>mdi-menu-right</v-icon>
+          </v-btn>
+
+          <v-dialog
+            v-if="hasAdditionalSection"
+            v-model="showAdditionalSectionDialog"
+            max-width="500px"
+          >
+            <v-card>
+              <v-card-title class="d-flex align-center">
+                <span>{{ additionalSectionDialogTitle || 'Additional Options' }}</span>
+                <v-spacer></v-spacer>
+                <v-btn variant="text" size="default" icon @click="showAdditionalSectionDialog = false">
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+              </v-card-title>
+              <v-card-text>
+                <slot name="right" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}">
+                  <AdditionalSectionContent
+                    :actions-position="actionsPosition"
+                    :is-editing="isEditing"
+                    :form-item="formItem"
+                    :actions="actions"
+                    @action-complete="$emit('actionComplete', $event)"
                   >
-
-                </v-custom-form-base>
-              </template>
-              <template v-else-if="_slot.type == 'recursive-stuff'">
-                <ue-recursive-stuff
-                  v-for="(context, i) in _slot.context.elements"
-                  :key="i"
-                  :configuration="context"
-                  :bindData="_slotData">
-                </ue-recursive-stuff>
-              </template>
-              <!-- <div>
-                {{ $log(_slot, _slotData) }}
-                Hello
-              </div> -->
-            </template>
-            <!-- <template v-slot:[`slot-inject-prepend-key-treeview-slot-permissions`]="{open}" >
-              <v-icon color="blue">
-                  {{open ? 'mdi-folder-open' : 'mdi-folder'}}
-              </v-icon>
-            </template>
-            <template #slot-inject-label-key-treeview-slot-permissions="{item}" >
-              <span class="caption" >
-                {{item.name.toUpperCase()}}
-              </span>
-            </template> -->
-          </v-custom-form-base>
+                    <template #right-top>
+                      <slot name="right.top" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                    </template>
+                    <template #right-middle>
+                      <slot name="right.middle" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                    </template>
+                    <template #right-bottom>
+                      <slot name="right.bottom" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                    </template>
+                  </AdditionalSectionContent>
+                </slot>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
         </div>
+
+
         <!-- Sticky Frame Section -->
 
       </div>
 
-      <!-- <v-spacer></v-spacer> -->
+      <v-spacer v-if="pushButtonToBottom"></v-spacer>
 
       <!-- Footer Section -->
       <div :class="[scrollable ? 'flex-grow-0' : '']">
@@ -262,9 +300,18 @@
           <slot name="submit"
             v-bind="{
               validForm: validModel || !serverValid,
-              buttonDefaultText
+              buttonDefaultText,
+              loading
             }">
-            <v-btn type="submit" :disabled="!(validModel || !serverValid) || loading" class="ml-auto mb-5">
+            <slot name="options" v-bind="{
+              validForm: validModel || !serverValid,
+              loading
+            }"></slot>
+            <v-btn type="submit"
+              :disabled="!(validModel || !serverValid) || loading"
+              class="ml-auto mb-5"
+              :loading="loading"
+              >
               {{ buttonDefaultText }}
             </v-btn>
           </slot>
@@ -291,14 +338,85 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
-import { useForm } from '@/hooks'
-import { cloneDeep, omit } from 'lodash-es'
+import { useForm, makeFormProps } from '@/hooks'
+import { cloneDeep, omit, isObject } from 'lodash-es'
 import FormActions from './form/FormActions.vue'
+import FormEvents from './form/FormEvents.vue'
+
+// Create a new component for the right section content
+const AdditionalSectionContent = {
+  props: {
+    actionsPosition: String,
+    isEditing: Boolean,
+    formItem: Object,
+    actions: [Array, Object]
+  },
+  emits: ['action-complete'],
+  template: `
+    <div>
+      <!-- Right Top Form Actions -->
+      <FormActions v-if="actionsPosition == 'right-top' && isEditing"
+        :modelValue="formItem"
+        :actions="actions"
+        :is-editing="isEditing"
+        @action-complete="$emit('actionComplete', $event)"
+      >
+        <template #prepend="actionsScope">
+          <slot name="actions.prepend" v-bind="actionsScope"></slot>
+        </template>
+        <template #append="actionsScope">
+          <slot name="actions.append" v-bind="actionsScope"></slot>
+        </template>
+      </FormActions>
+
+      <slot name="right-top"></slot>
+
+      <!-- Right Middle Form Actions -->
+      <FormActions v-if="actionsPosition == 'right-middle' && isEditing"
+        :modelValue="formItem"
+        :actions="actions"
+        :is-editing="isEditing"
+        @action-complete="$emit('actionComplete', $event)"
+      >
+        <template #prepend="actionsScope">
+          <slot name="actions.prepend" v-bind="actionsScope"></slot>
+        </template>
+        <template #append="actionsScope">
+          <slot name="actions.append" v-bind="actionsScope"></slot>
+        </template>
+      </FormActions>
+
+      <slot name="right-middle"></slot>
+
+      <!-- Right Bottom Form Actions -->
+      <FormActions v-if="actionsPosition == 'right-bottom' && isEditing"
+        :modelValue="formItem"
+        :actions="actions"
+        :is-editing="isEditing"
+        @action-complete="$emit('actionComplete', $event)"
+      >
+        <template #prepend="actionsScope">
+          <slot name="actions.prepend" v-bind="actionsScope"></slot>
+        </template>
+        <template #append="actionsScope">
+          <slot name="actions.append" v-bind="actionsScope"></slot>
+        </template>
+      </FormActions>
+
+      <slot name="right-bottom"></slot>
+    </div>
+  `,
+  components: {
+    FormActions
+  }
+}
 
 export default {
   name: 'ue-form',
   components: {
-    FormActions
+    FormActions,
+    FormEvents,
+    AdditionalSectionContent
   },
   emits: [
     'update:valid',
@@ -309,97 +427,9 @@ export default {
     'submitted'
   ],
   props: {
-    modelValue: {
-      type: Object,
-      // default () {
-      //   return {}
-      // }
-    },
-    formClass: {
-      type: [Array, String],
-      default: ''
-    },
-    actionUrl: {
-      type: String
-    },
-    title: {
-      type: String
-    },
-    schema: {
-      type: Object,
-      // default () {
-      //   return {}
-      // }
-    },
-    async: {
-      type: Boolean,
-      default: true
-    },
-    buttonText: {
-      type: String
-    },
-    hasSubmit: {
-      type: Boolean,
-      default: false
-    },
-    stickyFrame: {
-      type: Boolean,
-      default: false
-    },
-    stickyButton: {
-      type: Boolean,
-      default: false
-    },
-    rowAttribute: {
-      type: Object,
-      default () {
-        return {
-          noGutters: false,
-          class: 'py-4',
-          // justify:'center',
-          // align:'center'
-        }
-      }
-    },
-    slots: {
-      type: Object,
-      default () {
-        return {}
-      }
-    },
-    valid: {
-      type: Boolean,
-      default: null
-    },
-    isEditing: {
-      type: Boolean,
-      default: false
-    },
-    hasDivider: {
-      type: Boolean,
-      default: false
-    },
-    fillHeight: {
-      type: Boolean,
-      default: false
-    },
-    scrollable: {
-      type: Boolean,
-      default: false
-    },
-    noDefaultFormPadding: {
-      type: Boolean,
-      default: false
-    },
-    noDefaultSurface: {
-      type: Boolean,
-      default: false
-    },
-    actions: {
-      type: [Array, Object],
-      default: []
-    }
+    ...makeFormProps(),
   },
+
   provide() {
       // use function syntax so that we can access `this`
       return {
@@ -409,7 +439,7 @@ export default {
   },
   setup(props, context) {
     const store = useStore()
-    const formHook = useForm(props, context)
+    const useFormInstance = useForm(props, context)
     const { t, te, locale } = useI18n({ useScope: 'global' })
     // const i18n = useI18n()
 
@@ -423,29 +453,48 @@ export default {
     const formSlots = computed(() => {
       const slots = []
 
+
       // Object.values(formHook.inputSchema).forEach((schema, index) => {
-      Object.values(formHook.issetSchema.value ? props.schema : store.state.form.inputs).forEach((schema, index) => {
-        if (Object.prototype.hasOwnProperty.call(schema, 'slots') && Object.keys(schema.slots).length > 0) {
-          Object.keys(schema.slots).forEach((slotName) => {
+      function getSlots(input, inputName, slots, parentSlotPath = '') {
+        let slotPath = parentSlotPath != '' ? `${parentSlotPath}-${inputName}` : inputName
+
+        if (Object.prototype.hasOwnProperty.call(input, 'slots') && Object.keys(input.slots).length > 0) {
+          Object.keys(input.slots).forEach((slotName) => {
             slots.push({
-              name: slotName,
-              inputName: schema.name,
               type: 'recursive-stuff',
-              context: schema.slots[slotName]
-            })
-          })
-        } else if (Object.prototype.hasOwnProperty.call(schema, 'slotable')) {
+              name: slotName,
+              inputName,
+              slotPath,
+              context: input.slots[slotName]
+            });
+          });
+        } else if (Object.prototype.hasOwnProperty.call(input, 'slotable')) {
           slots.push({
-            name: schema.slotable.name,
-            inputName: schema.slotable.slotTo,
-            selfName: schema.name,
             type: 'form',
-            schema: cloneDeep(formHook.invokeRuleGenerator({
-              [schema.name]: omit(schema, ['slotable'])
+            name: input.slotable.name,
+            inputName: input.slotable.slotTo,
+            selfName: inputName,
+            slotPath,
+            schema: cloneDeep(useFormInstance.invokeRuleGenerator({
+              [inputName]: omit(input, ['slotable'])
             }))
-          })
+          });
         }
-      })
+
+        if (input.schema && isObject(input.schema)) {
+          Object.keys(input.schema).forEach((subInputName) => {
+            let subInput = input.schema[subInputName]
+            getSlots(subInput, subInputName, slots, slotPath);
+          });
+        }
+      }
+
+      Object.keys(useFormInstance.inputSchema.value).forEach((inputName) => {
+        let input = useFormInstance.inputSchema.value[inputName]
+
+        getSlots(input, inputName, slots);
+      });
+
       return slots
     })
 
@@ -509,11 +558,11 @@ export default {
     })
 
     return {
-      ...formHook,
+      ...useFormInstance,
       formClasses,
       formSlots,
       titleOptions,
-      titleSerialized,
+      titleSerialized
       // formColumnAttrs,
       // stickyColumnAttrs
     }

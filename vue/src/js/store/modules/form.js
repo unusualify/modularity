@@ -7,13 +7,11 @@ import { getSubmitFormData, getModel } from '@/utils/getFormData.js'
 const getFieldIndex = (stateKey, field) => {
   return stateKey.findIndex(f => f.name === field.name)
 }
-// __log(
-//   window[import.meta.env.VUE_APP_NAME].STORE.form
-// )
+
 const state = {
   baseUrl: window[import.meta.env.VUE_APP_NAME].STORE.form.baseUrl || '',
   inputs: window[import.meta.env.VUE_APP_NAME].STORE.form.inputs || {},
-  saveUrl: window[import.meta.env.VUE_APP_NAME].STORE.form.saveUrl || '',
+  // saveUrl: window[import.meta.env.VUE_APP_NAME].STORE.form.saveUrl || '',
 
   serverValid: true,
   /**
@@ -39,16 +37,15 @@ const state = {
    * Force reload on successful submit
    * @type {Boolean}
    */
-  reloadOnSuccess: window[import.meta.env.VUE_APP_NAME].STORE.form.reloadOnSuccess || false,
+  // reloadOnSuccess: window[import.meta.env.VUE_APP_NAME].STORE.form.reloadOnSuccess || false,
 
   /**
    * Determines if the form should prevent submitting before an input value is pushed into the store
    * @type {Boolean}
    */
-  isSubmitPrevented: false,
+  // isSubmitPrevented: false,
 
   loading: false,
-
   taggableItems: {}
 }
 
@@ -69,22 +66,7 @@ const mutations = {
   [FORM.RESET_EDITED_ITEM] (state) {
     state.editedItem = getModel(state.inputs)
   },
-  [FORM.PREVENT_SUBMIT] (state) {
-    state.isSubmitPrevented = true
-  },
-  [FORM.ALLOW_SUBMIT] (state) {
-    state.isSubmitPrevented = false
-  },
   // ----------- Form fields ----------- //
-  [FORM.EMPTY_FORM_FIELDS] (state, status) {
-    state.fields = []
-  },
-  [FORM.ADD_FORM_FIELDS] (state, fields) {
-    state.fields = [...state.fields, ...fields]
-  },
-  [FORM.REPLACE_FORM_FIELDS] (state, fields) {
-    state.fields = fields
-  },
   [FORM.UPDATE_FORM_FIELD] (state, field) {
     let fieldValue = field.locale ? {} : null
     const fieldIndex = getFieldIndex(state.fields, field)
@@ -103,42 +85,6 @@ const mutations = {
       value: fieldValue
     })
   },
-  [FORM.REMOVE_FORM_FIELD] (state, fieldName) {
-    state.fields.forEach(function (field, index) {
-      if (field.name === fieldName) state.fields.splice(index, 1)
-    })
-  },
-  // ----------- Modal fields ----------- //
-  [FORM.EMPTY_MODAL_FIELDS] (state, status) {
-    state.modalFields = []
-  },
-  [FORM.REPLACE_MODAL_FIELDS] (state, fields) {
-    state.modalFields = fields
-  },
-  [FORM.UPDATE_MODAL_FIELD] (state, field) {
-    let fieldValue = field.locale ? {} : null
-    const fieldIndex = getFieldIndex(state.modalFields, field)
-
-    // Update existing form field
-    if (fieldIndex !== -1) {
-      if (field.locale) fieldValue = state.modalFields[fieldIndex].value
-      // remove existing field
-      state.modalFields.splice(fieldIndex, 1)
-    }
-
-    if (field.locale) fieldValue[field.locale] = field.value
-    else fieldValue = field.value
-
-    state.modalFields.push({
-      name: field.name,
-      value: fieldValue
-    })
-  },
-  [FORM.REMOVE_MODAL_FIELD] (state, fieldName) {
-    state.modalFields.forEach(function (field, index) {
-      if (field.name === fieldName) state.modalFields.splice(index, 1)
-    })
-  },
   // ----------- Form errors and Loading ----------- //
   [FORM.UPDATE_FORM_LOADING] (state, loading) {
     state.loading = loading || !state.loading
@@ -151,9 +97,6 @@ const mutations = {
   },
   [FORM.CLEAR_FORM_ERRORS] (state) {
     state.errors = []
-  },
-  [FORM.UPDATE_FORM_SAVE_TYPE] (state, type) {
-    state.type = type
   },
 
   [FORM.SET_TAGGABLE_ITEMS] (state, { taggable_type, items }) {
@@ -168,11 +111,6 @@ const actions = {
   [ACTIONS.SAVE_FORM] ({ commit, state, getters, rootState, dispatch }, { item = null, callback = null, errorCallback = null, plain = false }) {
     commit(FORM.CLEAR_FORM_ERRORS)
     commit(FORM.UPDATE_FORM_LOADING, true)
-
-    // commit(NOTIFICATION.CLEAR_NOTIF, 'error')
-
-    // update or create etc...
-    // commit(FORM.UPDATE_FORM_SAVE_TYPE, saveType)
 
     // we can now create our submitted data object out of:
     // - our just created fields object,

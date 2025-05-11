@@ -4,7 +4,8 @@
   <v-row
     :id="id"
     v-bind="getRow"
-    v-resize.quiet="onResize">
+    v-resize.quiet="onResize"
+  >
     <!-- FORM-BASE TOP SLOT -->
     <slot :name="getFormTopSlot()" :id="id" />
     <!-- main loop over components/controls -->
@@ -43,7 +44,18 @@
               <!-- slot replaces complete item of defined KEY -> <div slot="slot-item-key-[propertyName]">-->
               <slot :name="getKeyItemSlot(obj)" v-bind= "{ obj, index, id }">
 
-                <ue-title v-if="obj.schema.type === 'title'"
+                <!-- PREVIEW -->
+                <ue-recursive-stuff v-if="obj.schema.type === 'preview' && obj.schema.configuration"
+                  :configuration="obj.schema.configuration"
+                />
+
+                <!-- DYNAMIC COMPONENT -->
+                <ue-dynamic-component-renderer v-else-if="obj.schema.type === 'dynamic-component'"
+                  :subject="obj.schema.subject"
+                />
+
+                <!-- TITLE -->
+                <ue-title v-else-if="obj.schema.type === 'title'"
                   :text="obj.schema.title ?? obj.schema.text ?? obj.schema.label ?? obj.schema.name"
                   v-bind="bindSchema(obj)"
                 />
@@ -140,6 +152,7 @@
                         <span v-html="obj.schema.subtitle"></span>
                       </ue-title>
                     </div>
+
                     <v-custom-form-base
                       :id="`${id}-${obj.key}`"
                       :modelValue="setValue(obj)"
@@ -151,7 +164,9 @@
                       >
                       <!-- v-bind="$lodash.omit($attrs, 'onUpdate:schema')" -->
                       <!-- Based on https://gist.github.com/loilo/73c55ed04917ecf5d682ec70a2a1b8e2 -->
-                      <template v-for="(_, name) in $slots" #[name]="slotData"><slot :name="name" v-bind= "{ id, obj, index,  ...slotData}" /></template>
+                      <template v-for="(_, name) in $slots" #[name]="slotData">
+                        <slot :name="name" v-bind= "{ id, obj, index,  ...slotData}" />
+                      </template>
                     </v-custom-form-base>
                   </component>
                 </template>
@@ -338,6 +353,8 @@
                   @click:minute="onEvent({type:'click'}, obj, minute)"
                   @click:second="onEvent({type:'click'}, obj, second)"
                   @update:modelValue="onInput($event, obj)"
+
+                  @update:input="updateInput($event, obj)"
                 >
                   <!-- component doesn't work with #[s]="slotData" " -->
                   <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, model: valueIntern }"/></template>
@@ -363,6 +380,9 @@
                   @click:minute= "onEvent({type:'click'}, obj, minute)"
                   @click:second= "onEvent({type:'click'}, obj, second)"
                   @update:modelValue="onInput($event, obj)"
+
+                  @update:input="updateInput($event, obj)"
+
                 >
                   <!-- component doesn't work with #[s]="slotData" " -->
                   <template v-for="s in getInjectedScopedSlots(id, obj)" v-slot:[s]="slotData">
@@ -401,8 +421,9 @@
 // Import
 // import Vue from 'vue'
 import { getCurrentInstance } from 'vue'
-import { get, set, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex, omit } from 'lodash-es'
-import getFormData from '@/utils/getFormData.js'
+import { get, set, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex, omit, cloneDeep } from 'lodash-es'
+
+import formEvents from '@/utils/formEvents'
 
 // import VueMask from 'v-mask'
 // Vue.use(VueMask, {
@@ -533,6 +554,10 @@ const second = 'second'
 const dropEffect = 'move' // 'copy, link, move
 // Default row setting if no row-attribute defined
 const rowDefault = { noGutters: false } // { noGutters:true, justify:'center', align:'center' }
+const rowGroupDefault = {
+  noGutters: false,
+  class: 'my-2'
+} // { noGutters:true, justify:'center', align:'center' }
 
 // Default col setting, overrideable by prop col or by schema.col definition
 // Default col setting, overrideable by prop flex or by schema.flex definition (flex is DEPRECATED use col instead)
@@ -582,7 +607,13 @@ export default {
     row: {
       type: [Object]
     },
+    rowGroup: {
+      type: [Object]
+    },
     col: {
+      type: [Object, Number, String]
+    },
+    colGroup: {
       type: [Object, Number, String]
     },
     flex: {
@@ -648,7 +679,6 @@ export default {
       return this.row || rowDefault
     },
     flatCombinedArraySorted () {
-      // __log('flatCombinedArraySorted computed', this.valueIntern, this.formSchema)
       return orderBy(this.flatCombinedArray, ['schema.sort'], [orderDirection])
     },
     storeStateData () {
@@ -659,7 +689,8 @@ export default {
 
       this.updateArrayFromState(this.valueIntern, this.formSchema)
 
-      getFormData.setSchemaInputField(this.formSchema, this.valueIntern)
+      // getFormData.setSchemaInputField(this.formSchema, this.valueIntern)
+      formEvents.setSchemaInputField(this.formSchema, this.valueIntern)
 
       return this.formSchema
     },
@@ -677,7 +708,7 @@ export default {
   watch: {
     schema: {
       handler (value, oldValue) {
-        // __log('schema watch', value, oldValue)
+
       },
       deep: true
     },
@@ -690,7 +721,6 @@ export default {
       deep: true
     },
     // formSchema: function (newSchema, oldSchema) {
-    //   // __log('formSchema watch', newSchema)
 
     //   this.rebuildArrays(this.valueIntern, newSchema)
 
@@ -699,7 +729,6 @@ export default {
 
     // },
     // valueIntern: function (newVal, oldVal) {
-    //   __log('valueIntern watch', newVal, oldVal)
     // }
   },
   methods: {
@@ -737,7 +766,6 @@ export default {
       // if (Object.prototype.hasOwnProperty.call(obj.schema, 'falseValue') && obj.schema.falseValue == 1) {
       //   obj.schema.falseValue = '0'
       // }
-      // __log(obj.schema)
 
       return omit(obj.schema, ['type', 'col', 'order', 'offset', 'ext', 'event'] )
       return obj.schema
@@ -962,7 +990,7 @@ export default {
       return { ...colObject, ...offsetObject, ...orderObject }
     },
     getRowGroupOrArray (obj) {
-      return obj.schema.row || this.row || rowDefault
+      return obj.schema.rowGroup || this.rowGroup || rowGroupDefault
     },
     getColGroupOrArray (obj) {
       return obj.schema.col || this.col || colDefault
@@ -1058,7 +1086,7 @@ export default {
       let key = obj.key
       // when cascade select changed
       // this.setCascadeSelect(obj)
-      getFormData.onInputEventFormData(
+      formEvents.onInputEventFormData(
         obj,
         this.formSchema,
         this.storeStateData,
@@ -1117,7 +1145,7 @@ export default {
       }
 
       delay(() => { this.emitValue(event.type, emitObj), onEventDelay })
-      // __log(emitObj)
+
       return emitObj
     },
     onClickOutside (event, obj) {
@@ -1155,14 +1183,12 @@ export default {
               ? 'onDisplay'
               : event
       // const listener = 'on' + this.$lodash.startCase(this.$lodash.camelCase(event)).replace(/ /g, '')
-      // __log(emitEvent, listener, this)
       // if (this.$attrs[`${emitEvent}:${this.id}`]) {
       //   this.deprecateEventCustomID(emitEvent)
       //   this.deprecateCombinedEvents(emitEvent, event)
       //   this.$emit(`${emitEvent}:${this.id}`, val) // listen to specific event only
       // } else if (this.$attrs[`${emitEvent}`]) {
       //   // this.deprecateCombinedEvents(emitEvent, event)
-      //   __log(emitEvent, val)
       //   this.$emit(emitEvent, val) // listen to specific event only
       // } else if (this.$attrs[`${listener}:${this.id}`]) {
       //   this.deprecateEventCustomID(event)
@@ -1171,7 +1197,6 @@ export default {
       //   // this.$emit(event, val) // listen to specific event only
       //   // this.$emit(listener, val) // listen to specific event only
       //   // this.$emit('update:schema', this.storeStateSchema) // listen to specific event only
-      //   // __log(listener, this.storeStateData)
       //   this.$emit(`${event}`, val) // listen to specific event only
       //   // this.$emit('update:modelValue', this.storeStateData) // listen to specific event only
       // }
@@ -1206,7 +1231,6 @@ export default {
         if (ix === pathArray.length - 1) object[p] = value
         object = object[p]
       })
-      // __log(object)
     },
     updateArrayFromState (data, schema) {
       this.flatCombinedArray.forEach(obj => {
@@ -1345,6 +1369,26 @@ export default {
             // ## TODO type conditional default value
           }
         })
+      }
+    },
+
+    updateInput(event, obj) {
+      if(Array.isArray(event)){
+        const oldFormSchema = cloneDeep(this.formSchema)
+        let isChanged = false
+        event.forEach(e => {
+          if(e.key && e.value && this.formSchema?.[obj.key]){
+            oldFormSchema[obj.key][e.key] = e.value
+            isChanged = true
+          }
+        })
+        if(isChanged){
+          this.formSchema = oldFormSchema
+        }
+      } else if(event.key && event.value && this.formSchema?.[obj.key]){
+        const oldFormSchema = cloneDeep(this.formSchema)
+        oldFormSchema[obj.key][event.key] = event.value
+        this.formSchema = oldFormSchema
       }
     }
   },

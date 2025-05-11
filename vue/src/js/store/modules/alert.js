@@ -1,4 +1,5 @@
 import { ALERT } from '../mutations'
+import ACTIONS from '@/store/actions'
 
 const state = {
   success: null,
@@ -56,8 +57,15 @@ const mutations = {
   },
 }
 
+const actions = {
+  [ACTIONS.SHOW_ALERT] ({ commit }, payload) {
+    commit(ALERT.SET_ALERT, payload)
+  },
+}
+
 export default {
   state,
   getters,
-  mutations
+  mutations,
+  actions
 }

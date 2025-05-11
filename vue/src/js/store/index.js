@@ -7,6 +7,7 @@ import user from './modules/user'
 import language from './modules/language'
 import browser from './modules/browser'
 import ambient from './modules/ambient'
+import cache from './modules/cache'
 
 export default createStore({
   modules: {
@@ -16,7 +17,8 @@ export default createStore({
     config,
     language,
     mediaLibrary,
-    browser
+    browser,
+    cache
   }
 
 })

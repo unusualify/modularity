@@ -16,10 +16,35 @@ export const makeInputProps = propsFactory({
   label: {
     type: String,
     default: ''
+  },
+  hideIfEmpty: {
+    type: Boolean,
+    default: false
+  },
+  protectInitialValue: {
+    type: Boolean,
+    default: false
   }
 })
-export const makeInputEmits = ['update:modelValue', 'change', 'update:preview']
-export const makeInputInjects = ['manualValidation', 'tester']
+export const makeInputEmits = [
+  'update:modelValue',
+  'change',
+  'update:preview',
+  'focus',
+  'blur',
+  'click:append',
+  'click:appendInner',
+  'click:prepend',
+  'click:prependInner',
+  'click:clear',
+  'click:hour',
+  'click:minute',
+  'click:second',
+
+  'update:input',
+
+]
+export const makeInputInjects = ['manualValidation']
 
 // by convention, composable function names start with "use"
 export default function useInput (props, context) {

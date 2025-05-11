@@ -77,11 +77,7 @@ const props = defineProps({
   justify: {
     type: String,
     default: 'start',
-    validator: (value) => ['start', 'center', 'end'].includes(value)
-  },
-  defaultClasses: {
-    type: [String, Array],
-    default: 'ue-title'
+    validator: (value) => ['start', 'center', 'end', 'space-between'].includes(value)
   },
   classes: {
     type: [String, Array]
@@ -97,6 +93,7 @@ const props = defineProps({
 });
 
 const titleClasses = computed(() => [
+  'ue-title',
   `text-${props.type}`,
   props.bg ? `bg-${props.bg}` : '',
   props.color ? `text-${props.color}` : '',
@@ -112,7 +109,5 @@ const titleClasses = computed(() => [
 </script>
 
 <style lang="sass" scoped>
-  .ue-title
-    display: flex
-    flex-direction: column
+
 </style>

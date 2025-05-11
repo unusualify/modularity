@@ -71,7 +71,6 @@ import { useInput,
 
 import { getModel, getSchema } from '@/utils/getFormData.js'
 
-// __log([...makeInputInjects])
 export default {
   name: 'v-input-form-tabs',
   emits: [...makeInputEmits],
@@ -99,11 +98,11 @@ export default {
       default: () => []
     }
   },
-  setup (props, context) {
+  setup (props, { emit }) {
     const inputHandlers = useInputHandlers()
     const validations = useValidation(props)
     const { t, te } = useI18n()
-    const inputHook = useInput(props, context)
+    const inputHook = useInput(props, { emit })
 
     const elements = ref(props.items)
     const loading = ref(true)
@@ -117,7 +116,6 @@ export default {
         let notation = matches[1]
         let quoted = __preg_quote(matches[0])
         let parts = notation.split('.')
-        // __log(parts)
 
         let newParts = []
         for(const j in parts){
@@ -184,7 +182,6 @@ export default {
 
     const getFormRef = (id) => formRefs.get(id)
 
-    // __log('FormTabs setup', props.modelValue)
     const models = ref(elements.value.reduce((acc, item) => {
       if(!__isset(acc[item.id])){
         acc[item.id] = {
@@ -195,10 +192,80 @@ export default {
       return acc
     }, {}))
 
+    const processTriggers = (newVal, updatedTabId, schemas) => {
+      let schemasChanged = false
+      const modelKeys = Object.keys(newVal)
+
+      modelKeys.forEach(triggerKey => {
+        const triggers = filter(props.triggers, trigger => trigger.trigger === triggerKey)
+
+        if(triggers.length < 1) return
+
+        const newValue = newVal[triggerKey]
+        const triggerSchema = cloneDeep(schemas[updatedTabId][triggerKey])
+        let triggerItem = null
+
+        if (triggerSchema.items && Array.isArray(triggerSchema.items)) {
+          triggerItem = triggerSchema.items.find(item => item.id == newValue)
+        }
+
+        triggers.forEach(trigger => {
+          let targetInput = cloneDeep(schemas[updatedTabId][trigger.target])
+          let rulesChanged = false
+
+          each(trigger.actions, (actionValue, actionName) => {
+            if (Array.isArray(actionValue)) {
+              if (actionName === 'class') {
+                let availableValue = targetInput?.class ?? ''
+
+                if (availableValue) {
+                  let classes = availableValue.split(' ')
+                  let [func, ...newClasses] = actionValue
+
+                  if (func === 'remove') {
+                    classes = classes.filter(cls => !newClasses.includes(cls))
+                  } else if (func === 'add') {
+                    classes = [...classes, ...newClasses]
+                  }
+                  targetInput.class = classes.join(' ')
+                  schemasChanged = true
+                }
+              }
+            } else {
+              schemasChanged = true
+              if (actionName === 'rules') {
+                rulesChanged = true
+                actionName = 'raw' + startCase(actionName)
+              }
+              if (actionName === 'disabled') {
+                targetInput['_originalDisabled'] = actionValue
+              }
+
+              if (actionName === 'items') {
+                targetInput[actionName] = __data_get(triggerItem, actionValue, [])
+              } else if (triggerItem) {
+                targetInput[actionName] = castValueMatch(actionValue, triggerItem)
+              }
+            }
+          })
+
+          schemas[updatedTabId][trigger.target] = targetInput
+          if (rulesChanged) {
+            schemas[updatedTabId] = validations.invokeRuleGenerator(schemas[updatedTabId])
+          }
+        })
+      })
+
+      return { schemas, schemasChanged }
+    }
+
     const schemas = ref(elements.value.reduce((acc, item, index) => {
       if(!__isset(acc[item.id])){
         const baseSchema = cloneDeep(props.schema)
         for(const inputName in props.tabFields){
+          if(props.protectInitialValue){
+            baseSchema[inputName]['protectInitialValue'] = true
+          }
           if(__isset(baseSchema[inputName])){
             baseSchema[inputName]['items'] = item[props.tabFields[inputName]]
           }
@@ -207,6 +274,10 @@ export default {
           })
         }
         acc[item.id] = getSchema(baseSchema, models.value?.[item.id] ?? {})
+
+        // Process initial triggers
+        const { schemas: updatedSchemas } = processTriggers(models.value[item.id], item.id, acc)
+        acc = updatedSchemas
       }
       return acc
     }, {}))
@@ -232,7 +303,6 @@ export default {
 
     watch(() => props.items, (newVal) => {
       loading.value = true
-      // __log('FormTabs items watch', newVal, loading.value)
 
       let addedItems = newVal.filter(item => !elements.value.find(el => el.id == item.id))
       let removedItems = elements.value.filter(item => !newVal.find(el => el.id == item.id))
@@ -284,6 +354,24 @@ export default {
       }, 1000)
     })
 
+    const updateModel = (newVal, updatedTabId) => {
+      let oldModels = cloneDeep(models.value)
+      let oldValue = oldModels[updatedTabId]
+      let schemasClone = cloneDeep(schemas.value)
+
+      // Process triggers
+      const { schemas: updatedSchemas, schemasChanged } = processTriggers(newVal, updatedTabId, schemasClone)
+
+      if(schemasChanged) {
+        schemas.value = cloneDeep(updatedSchemas)
+      }
+
+      oldModels[updatedTabId] = newVal
+      models.value = cloneDeep(oldModels)
+
+      emit('update:modelValue', models.value)
+    }
+
     return {
       ...inputHook,
       ...inputHandlers,
@@ -291,6 +379,8 @@ export default {
       ...toRefs(states),
       setFormRef,
       getFormRef,
+      updateModel,
+      schemas,
     }
   },
   data() {
@@ -369,110 +459,6 @@ export default {
       const result = await formRef.value[0].validate()
 
       return result
-    },
-
-    updateModel(newVal, updatedTabId) {
-      let oldModels = cloneDeep(this.models)
-      let oldValue = oldModels[updatedTabId]
-
-      // Find changed keys by comparing old and new values
-      // Get all keys from val that exist in oldValue
-      const modelKeys = Object.keys(newVal).filter(key => __isset(oldValue[key]))
-
-      // Track changes and validity
-      const changedKeys = []
-      const changedValues = {}
-
-      // Check each key for changes and validity
-      modelKeys.forEach(key => {
-        const isChanged = JSON.stringify(newVal[key]) !== JSON.stringify(oldValue[key])
-        const isValid = true // Add validation logic here if needed
-
-        if (isValid) {
-          changedKeys.push(key)
-          changedValues[key] = {
-            old: oldValue[key],
-            new: newVal[key]
-          }
-        }
-      })
-
-      let schemas = cloneDeep(this.schemas)
-      let schemasChanged = false
-
-      // __log('FormTabs updateModel', {changedValues, changedKeys, modelKeys, oldValue, newVal})
-
-      // Process triggers for valid keys, regardless of changes
-      modelKeys.forEach(triggerKey => {
-        const triggers = filter(this.triggers, trigger => trigger.trigger === triggerKey)
-
-        if(triggers.length < 1)
-          return
-
-        const newValue = newVal[triggerKey]
-        const triggerSchema = cloneDeep(this.schemas[updatedTabId][triggerKey])
-        let triggerItem = null
-
-        if (triggerSchema.items && Array.isArray(triggerSchema.items)) {
-          triggerItem = triggerSchema.items.find(item => item.id == newValue)
-        }
-
-        triggers.forEach(trigger => {
-          let targetInput = cloneDeep(this.schemas[updatedTabId][trigger.target])
-          let rulesChanged = false
-
-          each(trigger.actions, (actionValue, actionName) => {
-            if (Array.isArray(actionValue)) {
-              if (actionName === 'class') {
-                let availableValue = targetInput?.class ?? ''
-
-                if (availableValue) {
-                  let classes = availableValue.split(' ')
-                  let [func, ...newClasses] = actionValue
-
-                  if (func === 'remove') {
-                    classes = classes.filter(cls => !newClasses.includes(cls))
-                  } else if (func === 'add') {
-                    classes = [...classes, ...newClasses]
-                  }
-                  targetInput.class = classes.join(' ')
-                  schemasChanged = true
-                }
-              }
-            } else {
-              schemasChanged = true
-              if (actionName === 'rules') {
-                rulesChanged = true
-                actionName = 'raw' + startCase(actionName)
-              }
-              if (actionName === 'disabled') {
-                targetInput['_originalDisabled'] = actionValue
-              }
-
-              if (actionName === 'items') {
-                targetInput[actionName] = __data_get(triggerItem, actionValue, [])
-              } else if (triggerItem) {
-                targetInput[actionName] = this.$castValueMatch(actionValue, triggerItem)
-              }
-            }
-          })
-
-          // __log('FormTabs triggers', targetInput)
-          schemas[updatedTabId][trigger.target] = targetInput
-          if (rulesChanged) {
-            schemas[updatedTabId] = this.invokeRuleGenerator(schemas[updatedTabId])
-          }
-        })
-      })
-
-      if(schemasChanged){
-        this.schemas = cloneDeep(schemas)
-      }
-
-      oldModels[updatedTabId] = newVal
-      this.models = cloneDeep(oldModels)
-
-      this.$emit('update:modelValue', this.models)
     },
 
     init() {}

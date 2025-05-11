@@ -5,10 +5,12 @@ namespace Unusualify\Modularity\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Unusualify\Modularity\Entities\Company;
 use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Events\ModularityUserRegistered;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularity\Services\MessageStage;
 
@@ -23,9 +25,17 @@ class RegisterController extends Controller
         $this->middleware('modularity.guest');
     }
 
-    public function showLoginForm()
+    public function showForm()
     {
         return view(modularityBaseKey() . '::auth.register', [
+            'attributes' => [
+                'bannerDescription' => ___('authentication.banner-description'),
+                'bannerSubDescription' => Lang::has('authentication.banner-sub-description') ? ___('authentication.banner-sub-description') : null,
+                'redirectButtonText' => ___('authentication.redirect-button-text'),
+                'redirectUrl' => Route::has(modularityConfig('auth_guest_route'))
+                    ? route(modularityConfig('auth_guest_route'))
+                    : null,
+            ],
             'formAttributes' => [
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
                 'title' => [
@@ -104,6 +114,11 @@ class RegisterController extends Controller
                             'cols' => 6,
                             'lg' => 6,
                         ],
+                        'rules' => [
+                            ['required', 'classic', null, null, 'Password is required'],
+                            ['min', 8, 'Password must be at least 8 characters'],
+                        ],
+
                     ],
                     're_password' => [
                         'type' => 'password',
@@ -117,6 +132,9 @@ class RegisterController extends Controller
                         'col' => [
                             'cols' => 6,
                             'lg' => 6,
+                        ],
+                        'rules' => [
+                            ['required', 'classic', null, null, 'Confirm Password'],
                         ],
                     ],
                     'tos' => [
@@ -268,6 +286,8 @@ class RegisterController extends Controller
                     'variant' => MessageStage::WARNING,
                 ], 200)
                 : $request->validate($this->rules());
+
+            return $res;
         }
 
         $user = Company::create()->users()->create([
@@ -276,21 +296,26 @@ class RegisterController extends Controller
             'password' => Hash::make($request['password']),
         ]);
 
+        event(new ModularityUserRegistered($user));
+
         $user->assignRole('client-manager');
 
         return $request->wantsJson()
-        ? new JsonResponse([
-            'redirector' => route(Route::hasAdmin('register.success')),
-        ], 200)
-        : $this->sendLoginResponse($request);
+            ? new JsonResponse([
+                'redirector' => route(Route::hasAdmin('register.success')),
+            ], 200)
+            : $this->sendLoginResponse($request);
     }
 
     public function rules()
     {
+        $usersTable = modularityConfig('tables.users', 'um_users');
+
         return [
             'name' => ['required', 'string', 'max:255'],
-            'surname' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            // Surname is not mandatory.
+            // 'surname' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:' . $usersTable . ',email'],
             'password' => ['required', 'string', 'min:8'],
         ];
     }
@@ -303,7 +328,7 @@ class RegisterController extends Controller
                 'title' => __('authentication.register-title'),
                 'description' => __('authentication.register-description'),
                 'button_text' => __('authentication.register-button_text'),
-                'button_url' => 'Test',
+                'button_url' => route('admin.login'),
             ],
         ]);
     }

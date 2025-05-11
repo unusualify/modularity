@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Services\View;
 
 use BadMethodCallException;
+use Illuminate\Support\Arr;
 use Illuminate\View\Component;
 use Unusualify\Modularity\Traits\ManageNames;
 
@@ -10,23 +11,59 @@ class UComponent extends Component
 {
     use ManageNames;
 
+    /**
+     * The tag of the component
+     *
+     * @var string
+     */
     public $tag;
 
-    public $elements;
-
+    /**
+     * The attributes of the component
+     *
+     * @var array
+     */
     public $attributes = [];
 
+    /**
+     * The slots of the component
+     *
+     * @var array
+     */
     public $slots = [];
 
+    /**
+     * The directives of the component
+     *
+     * @var array
+     */
     public $directives = [];
 
-    /********************* */
+    /**
+     * The elements of the component
+     *
+     * @var array
+     */
+    public $elements = null;
 
+    /**
+     * The constructor of the component
+     */
+    public function __construct() {}
+
+    /**
+     * Make a new component
+     */
     public static function make(): self
     {
         return new self;
     }
 
+    /**
+     * Make a new component
+     *
+     * @return self
+     */
     public function makeComponent($tag, $attributes = [], $elements = '', $slots = [], $directives = [])
     {
         return $this->setTag($tag)
@@ -36,6 +73,12 @@ class UComponent extends Component
             ->setDirectives($directives);
     }
 
+    /**
+     * Set the tag of the component
+     *
+     * @param string $tag
+     * @return self
+     */
     public function setTag($tag)
     {
         $this->tag = $tag;
@@ -43,13 +86,27 @@ class UComponent extends Component
         return $this;
     }
 
+    /**
+     * Set the attributes of the component
+     *
+     * @param array $attributes
+     * @return self
+     */
     public function setAttributes($attributes)
     {
+        $attributes = $this->hydrateAttributes($attributes);
+
         $this->attributes = $attributes;
 
         return $this;
     }
 
+    /**
+     * Set the slots of the component
+     *
+     * @param array $slots
+     * @return self
+     */
     public function setSlots($slots)
     {
         $this->slots = $slots;
@@ -57,6 +114,12 @@ class UComponent extends Component
         return $this;
     }
 
+    /**
+     * Set the directives of the component
+     *
+     * @param array $directives
+     * @return self
+     */
     public function setDirectives($directives)
     {
         $this->directives = $directives;
@@ -64,6 +127,12 @@ class UComponent extends Component
         return $this;
     }
 
+    /**
+     * Set the elements of the component
+     *
+     * @param array $elements
+     * @return self
+     */
     public function setElements($elements)
     {
         if ($elements !== '') {
@@ -73,27 +142,86 @@ class UComponent extends Component
         return $this;
     }
 
+    /**
+     * Add a child to the component
+     *
+     * @param array $element
+     * @return self
+     */
     public function addChildren($element)
     {
-        if (is_string($element)) {
-            $this->elements = ___($element);
-        } elseif (is_array($element)) {
-            if (! is_array($this->elements)) {
-                $this->elements = [];
+        $oldElements = $this->elements;
+        $wasIsAssoc = false;
+
+        if (! is_array($oldElements)) {
+            if (! empty($oldElements)) {
+                $oldElements = [$oldElements];
             }
-            $this->elements[] = $element;
-        } elseif (get_class($element) === get_class($this)) {
-            if (! is_array($this->elements)) {
-                $this->elements = [];
-            }
-            $this->elements[] = $element->render();
-        } else {
-            $this->elements = $element;
+        } elseif (is_array($oldElements) && Arr::isAssoc($oldElements)) {
+            $oldElements = [$oldElements];
+            $wasIsAssoc = true;
+            // dd($wasIsAssoc);
         }
+
+        $newElement = [];
+        if (is_string($element)) {
+            $newElement = ___($element);
+        } elseif (is_array($element)) {
+            $newElement = $element;
+        } elseif (get_class($element) === get_class($this)) {
+            $newElement = $element->render();
+        } else {
+            $newElement = $element;
+        }
+
+        if (is_array($oldElements)) {
+            $oldElements[] = $newElement;
+
+        }
+
+        $this->elements = is_array($oldElements)
+            ? $oldElements
+            : [$newElement];
 
         return $this;
     }
 
+    /**
+     * Add a slot to the component
+     *
+     * @param string $slotName
+     * @param array $slotContent
+     * @return self
+     */
+    public function addSlot($slotName, $slotContent)
+    {
+        $this->slots[$slotName] = $slotContent;
+
+        return $this;
+    }
+
+    /**
+     * Hydrate the attributes of the component
+     *
+     * @param array $attributes
+     * @return array
+     */
+    public function hydrateAttributes($attributes)
+    {
+        if (! empty($attributes) && $this->tag === 'ue-table') {
+            dd($attributes, $this);
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * Call a method
+     *
+     * @param string $method
+     * @param array $args
+     * @return self
+     */
     public function __call($method, $args)
     {
 
@@ -115,6 +243,13 @@ class UComponent extends Component
         }
     }
 
+    /**
+     * Call a static method
+     *
+     * @param string $method
+     * @param array $args
+     * @return self
+     */
     public static function __callStatic($method, $args)
     {
         $instance = new static;
@@ -132,6 +267,11 @@ class UComponent extends Component
         }
     }
 
+    /**
+     * Render the component
+     *
+     * @return array
+     */
     public function render()
     {
         return [

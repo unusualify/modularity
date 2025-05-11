@@ -8,7 +8,6 @@ export default {
         el.classList.add('ue-scrollable');
 
         // Check if a height modifier is provided
-        console.log('here')
         if (binding.modifiers.height) {
           const height = binding.value;
           if (typeof height === 'number' || (typeof height === 'string' && height.match(/^\d+(\.\d+)?(px|em|rem|vh|%)$/))) {

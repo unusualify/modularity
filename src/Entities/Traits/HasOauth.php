@@ -17,11 +17,10 @@ trait HasOauth
     }
 
     /**
-     * @param \Laravel\Socialite\Contracts\User $oauthUser
      * @param string $provider Socialite provider
      * @return \Illuminate\Database\Eloquent\Model|false
      */
-    public function linkProvider($oauthUser, $provider)
+    public function linkProvider(\Laravel\Socialite\Contracts\User $oauthUser, $provider)
     {
 
         $provider = new UserOauth([

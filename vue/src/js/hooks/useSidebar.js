@@ -31,12 +31,14 @@ export default function useSidebar () {
         store.commit(CONFIG.SET_SIDEBAR, value)
       }
     }),
-    width: computed(() => xlAndUp.value ? 320 : 256),
 
     options: store.state.config.sidebarOptions,
+
+    width: computed(() => xlAndUp.value ? 320 : (state.options.width || 264)),
     hideIcons: computed(() => !state.rail && state.options.hideIcons),
     railManual: false,
     rail: computed(() => (state.options.rail || state.railManual) && lgAndUp.value),
+    hasRail: computed(() => state.options.rail),
     isHoverable: computed(() => (lgAndUp.value || state.rail) && state.options.expandOnHover),
 
     secondaryOptions: store.state.config.secondarySidebarOptions,
@@ -66,7 +68,6 @@ export default function useSidebar () {
   const methods = reactive({
     handleProfile(event){
       if(event.type === 'mouseenter' && state.profileMenu.expandOnHover) state.open.push('User')
-      console.log(event, state.profileMenu)
     },
     handleMenu(title){
       state.activeMenu = `#${title}`
@@ -74,9 +75,7 @@ export default function useSidebar () {
   })
 
   watch(lgAndUp, () => {
-    // __log('isLgAndUp', lgAndUp.value, state.rail)
     // state.expanded = !state.rail.value
-    // __log('navigationDrawer', navigationDrawer.value)
   })
   onMounted(() => {
     // methods.initializeSidebar()

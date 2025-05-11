@@ -12,13 +12,13 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Http\Controllers\Traits\MakesResponses;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageAuthorization;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageScopes;
 
 abstract class PanelController extends CoreController
 {
-    use MakesResponses, ManageScopes;
+    use MakesResponses, ManageScopes, ManageAuthorization;
 
     /**
      * @var Application
@@ -155,7 +155,7 @@ abstract class PanelController extends CoreController
     /**
      * @var int
      */
-    protected $perPage = 20;
+    protected $perPage = 10;
 
     /**
      * Name of the index column to use as name column.
@@ -254,11 +254,11 @@ abstract class PanelController extends CoreController
 
         $this->fixedFilters = array_merge((array) $this->getConfigFieldsByRoute('filters.fixed', []), $this->fixedFilters ?? []);
 
-        $this->addWiths();
+        // $this->addWiths();
 
-        $this->addIndexWiths();
+        // $this->addIndexWiths();
 
-        $this->addFormWiths();
+        // $this->addFormWiths();
 
     }
 
@@ -294,7 +294,6 @@ abstract class PanelController extends CoreController
     protected function setMiddlewarePermission()
     {
 
-        // dd('setMiddlewarePermission', $this->getSnakeCase($this->routeName), $this->user );
         // Permission::where('name', 'LIKE', "%{$this->getKebabCase($this->routeName)}%")->get(),
 
         $name = $this->getKebabCase($this->routeName);
@@ -336,7 +335,8 @@ abstract class PanelController extends CoreController
         if (count($parentParams)) {
             $nestedParentName = array_key_last($parentParams); // snakecase;
             $nestedParentId = last($parentParams);
-            $nestedParentModel = UFinder::getRouteModel($nestedParentName)::find($nestedParentId);
+            $nestedParentModel = $this->module->getRouteClass($nestedParentName, 'model');
+            $nestedParentModel = $nestedParentModel::find($nestedParentId);
 
             return [true, $nestedParentId, $nestedParentName, $nestedParentModel];
         }
@@ -450,7 +450,6 @@ abstract class PanelController extends CoreController
      */
     protected function validateFormRequest($schema = [])
     {
-
         $unauthorizedFields = Collection::make($this->fieldsPermissions)->filter(function ($permission, $field) {
             return Auth::guard(Modularity::getAuthGuardName())->user()->cannot($permission);
         })->keys();
@@ -467,7 +466,22 @@ abstract class PanelController extends CoreController
 
         $scopes = $this->filterScope($this->nestedParentScopes());
 
-        $paginator = $this->getIndexItems($with, $scopes);
+        $paginator = $this->getIndexItems(with: $with, scopes: $scopes);
+
+        $noFormatted = $this->request->get('light', false);
+
+        if ($noFormatted) {
+            $with = $this->request->get('eager', []);
+            $appends = $this->request->get('appends', []);
+            $column = $this->request->get('columns', [$this->titleColumnKey]);
+            $scopes = $this->request->get('scopes', []);
+            $orders = $this->request->get('orders', []);
+            $perPage = $this->request->get('itemsPerPage', $this->perPage);
+
+            return $this->getTransformer(
+                $this->repository->list(column: $column, with: $with, scopes: $scopes, orders: $orders, perPage: $perPage, appends: $appends, forcePagination: true)
+            );
+        }
 
         return $this->getTransformer($this->getFormattedIndexItems($paginator));
         // return $this->getTransformer( $paginator->toArray() );
@@ -488,13 +502,6 @@ abstract class PanelController extends CoreController
         );
 
         if (@class_exists($formRequest)) {
-            // dd(
-            //     Arr::mapWithKeys($chunkInputs, function( $input, $key){
-            //         return isset($input['name']) && isset($input['rules']) && is_string($input['rules'])
-            //             ? [$input['name'] => $input['rules'] ?? []]
-            //             : [];
-            //     })
-            // );
             return App::makeWith($formRequest, [
                 'rules' => Arr::mapWithKeys($chunkInputs, function ($input, $key) {
 
@@ -733,12 +740,29 @@ abstract class PanelController extends CoreController
     {
         $model_relations = [];
 
-        // if(@method_exists($this->repository->getModel(), 'getDefinedRelations')){
-        //     $model_relations = $this->repository->getDefinedRelations();
-        // }
+        $exploded = explode('.', $key);
 
-        if (@method_exists($this->repository->getModel(), 'definedRelations')) {
-            $model_relations = $this->repository->definedRelations();
+        $moduleModel = $this->repository->getModel();
+        $isNestedKey = count($exploded) > 1;
+        $lastIndex = count($exploded) - 1;
+        foreach ($exploded as $i => $relation) {
+            if (@method_exists($moduleModel, 'definedRelations')) {
+                $relations = $moduleModel->definedRelations();
+
+                if ($i == 0) {
+                    $model_relations = $relations;
+                }
+
+                if ($isNestedKey) {
+                    if (in_array($relation, $relations)) {
+                        if ($i == $lastIndex) {
+                            return true;
+                        }
+
+                        $moduleModel = $moduleModel->{$relation}()->getModel();
+                    }
+                }
+            }
         }
 
         if (preg_match('/(.*)(_id)/', $key, $matches)) {
@@ -761,7 +785,7 @@ abstract class PanelController extends CoreController
         });
 
         foreach ($methods as $key => $method) {
-            $this->indexWith += $this->{$method}();
+            $this->indexWith = array_merge($this->indexWith, $this->{$method}());
         }
     }
 

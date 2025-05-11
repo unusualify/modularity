@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Unusualify\Modularity\Http\Controllers\ChatableController;
+use Unusualify\Modularity\Http\Controllers\ChatController;
+use Unusualify\Modularity\Http\Controllers\ProcessController;
 use Unusualify\Modularity\Http\Controllers\ProfileController;
 
 /*
@@ -16,7 +17,24 @@ use Unusualify\Modularity\Http\Controllers\ProfileController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::resource('', 'DashboardController', ['as' => 'dashboard', 'names' => ['index' => 'dashboard']])->only(['index']);
+Route::get('/email/verify/{id}/{hash}', 'VerificationController@verify')
+    ->middleware(['signed'])
+    ->name('verification.verify');
+
+Route::get('/email/verification-notification', 'VerificationController@send')
+    ->middleware(['throttle:6,1,email-verification'])
+    ->name('verification.send');
+
+Route::prefix('register')->as('register.')
+    ->withoutMiddleware(['modularity.panel', 'web.auth', 'modularity.core'])
+    ->middleware(['web', 'modularity.core'])
+    ->group(function () {
+
+        Route::get('/password/generate/{token}', 'PasswordController@showForm')
+            ->name('password.generate.form');
+        Route::post('/password/generate', 'PasswordController@savePassword')
+            ->name('password.generate');
+    });
 
 Route::singleton('profile', 'ProfileController', ['names' => ['edit' => 'profile']]);
 Route::group(['prefix' => 'profile', 'as' => 'profile.'], function () {
@@ -24,18 +42,26 @@ Route::group(['prefix' => 'profile', 'as' => 'profile.'], function () {
 });
 Route::put('profile/company', 'ProfileController@updateCompany')->name('profile.company');
 
+Route::resource('', 'DashboardController', ['as' => 'dashboard', 'names' => ['index' => 'dashboard']])->only(['index']);
+
 Route::get('users/impersonate/stop', 'ImpersonateController@stopImpersonate')->name('impersonate.stop');
 Route::get('users/impersonate/{id}', 'ImpersonateController@impersonate')->name('impersonate');
 
 // system internal api routes (for ajax web routes)
 Route::prefix('api')->group(function () {
-    Route::group(['prefix' => 'chatable', 'as' => 'chatable.'], function () {
-        Route::get('{chat}', [ChatableController::class, 'index'])->name('index');
-        Route::get('{chat}/attachments', [ChatableController::class, 'attachments'])->name('attachments');
-        Route::post('{chat}', [ChatableController::class, 'store'])->name('store');
-        Route::put('{chat_message}', [ChatableController::class, 'update'])->name('update');
-        Route::get('show/{chat_message}', [ChatableController::class, 'show'])->name('show');
-        Route::delete('destroy/{chat_message}', [ChatableController::class, 'destroy'])->name('destroy');
+    Route::group(['prefix' => 'chatable', 'as' => 'chatable.', 'controller' => ChatController::class], function () {
+        Route::get('{chat}', 'index')->name('index');
+        Route::get('{chat}/attachments', 'attachments')->name('attachments');
+        Route::get('{chat}/pinned-message', 'pinnedMessage')->name('pinned-message');
+        Route::post('{chat}', 'store')->name('store');
+        Route::put('{chat_message}', 'update')->name('update');
+        Route::get('show/{chat_message}', 'show')->name('show');
+        Route::delete('destroy/{chat_message}', 'destroy')->name('destroy');
+    });
+
+    Route::group(['prefix' => 'process', 'as' => 'process.'], function () {
+        Route::get('{process}', [ProcessController::class, 'show'])->name('show');
+        Route::put('{process}', [ProcessController::class, 'update'])->name('update');
     });
 
     if (modularityConfig('enabled.media-library')) {
@@ -62,3 +88,5 @@ Route::prefix('api')->group(function () {
         });
     }
 });
+
+Route::post('modularity/metrics', 'MetricController')->name('modularity.metrics');

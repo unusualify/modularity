@@ -35,6 +35,7 @@ export default {
     })
   },
   put (endpoint, data, callback, errorCallback) {
+    const url = endpoint.replace(':id', data.id)
     axios.put(endpoint, data, {
       validateStatus: status => (status >= 200 && status < 300) || status === 422
     }).then(function (resp) {

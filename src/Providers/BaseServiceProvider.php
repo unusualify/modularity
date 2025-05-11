@@ -161,6 +161,10 @@ class BaseServiceProvider extends ServiceProvider
             return new \Unusualify\Modularity\Services\CurrencyExchangeService;
         });
 
+        $this->app->singleton('migration.backup', function (Application $app) {
+            return new \Unusualify\Modularity\Services\MigrationBackup;
+        });
+
         $this->app->alias(\Unusualify\Modularity\Facades\ModularityVite::class, 'ModularityVite');
 
         $this->app->alias(\Torann\GeoIP\Facades\GeoIP::class, 'GeoIP');

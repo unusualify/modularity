@@ -8,35 +8,46 @@ use Unusualify\Modularity\Facades\Modularity;
 
 trait HasCreator
 {
+    /**
+     * Indicates if a custom creator is currently being saved.
+     *
+     * @var bool
+     */
     protected $isCustomCreatorSaving = false;
 
+    /**
+     * The fillable attributes for the creator record.
+     *
+     * @var array
+     */
     protected static $hasCreatorFillable = ['custom_creator_id', 'custom_creator_type', 'custom_guard_name'];
 
+    /**
+     * Custom fields for the creator record.
+     *
+     * @var array
+     */
     protected $customHasCreatorFields = [];
 
     protected static function bootHasCreator()
     {
         static::created(function ($model) {
-            if (Auth::check()) {
+            if ($model->isCustomCreatorSaving) {
+                $model->creatorRecord()->create($model->customHasCreatorFields);
+                $model->isCustomCreatorSaving = false;
+                $model->customHasCreatorFields = [];
+            } elseif (Auth::check()) {
                 $guard = Auth::guard();
-
-                if ($model->isCustomCreatorSaving) {
-                    $model->creatorRecord()->create($model->customHasCreatorFields);
-                    $model->isCustomCreatorSaving = false;
-                    $model->customHasCreatorFields = [];
-                } else {
-                    $model->creatorRecord()->create([
-                        'creator_id' => $guard->id(), // creator user id
-                        'creator_type' => $guard->getProvider()->getModel(), // creator model
-                        'guard_name' => $guard->name,
-                    ]);
-                }
-
+                $model->creatorRecord()->create([
+                    'creator_id' => $guard->id(), // creator user id
+                    'creator_type' => $guard->getProvider()->getModel(), // creator model
+                    'guard_name' => $guard->name,
+                ]);
             }
         });
 
         static::saving(function ($model) {
-            if (Auth::check() && $model->custom_creator_id) {
+            if ($model->custom_creator_id) {
                 $guard = Auth::guard();
                 $model->isCustomCreatorSaving = true;
                 $model->customHasCreatorFields = [
@@ -49,6 +60,10 @@ trait HasCreator
             foreach (static::$hasCreatorFillable as $field) {
                 $model->offsetUnset($field);
             }
+        });
+
+        static::creating(function ($model) {
+            // dd($model);
         });
 
         if (in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(static::class))) {
@@ -67,6 +82,15 @@ trait HasCreator
 
     }
 
+    public function initializeHasCreator()
+    {
+        // $this->fillable = array_merge($this->fillable, ['test']);
+        // dd('initialize');
+    }
+
+    /**
+     * Get the creator record associated with this model
+     */
     public function creatorRecord(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
         return $this->morphOne(
@@ -75,6 +99,9 @@ trait HasCreator
         );
     }
 
+    /**
+     * Get the creator associated with this model through the creator record
+     */
     public function creator(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
         return $this->hasOneThrough(
@@ -92,35 +119,71 @@ trait HasCreator
     //     return self::$authorizedGuardName ?? Modularity::getAuthGuardName();
     // }
 
+    /**
+     * Get the creator record model class name
+     *
+     * @return string The fully qualified class name of the creator record model
+     */
     protected function getCreatorRecordModel()
     {
         return \Unusualify\Modularity\Entities\CreatorRecord::class;
     }
 
+    /**
+     * Get the creator model class name
+     *
+     * @return string The fully qualified class name of the creator model
+     */
     protected function getCreatorModel()
     {
+        $key = $this->getKey();
+
         try {
-            return $this->creatorRecord()->exists() ? $this->creatorRecord->creator_type : static::getDefaultCreatorModel();
+            return (! is_null($key) && $this->creatorRecord()->exists()) ? $this->creatorRecord->creator_type : static::getDefaultCreatorModel();
         } catch (\Exception $e) {
             dd($this, $this->creatorRecord);
         }
     }
 
+    /**
+     * Get the default creator model class name
+     *
+     * @return string The fully qualified class name of the default creator model
+     */
     public static function getDefaultCreatorModel()
     {
         return static::$defaultHasCreatorModel ?? \App\Models\User::class;
     }
 
+    /**
+     * Add authorized query conditions for the creator record
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $user The user to check authorization for
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     protected function addAuthorizedQueryForCreatorRecord($query, $user)
     {
         return $query;
     }
 
+    /**
+     * Add authorized user query conditions for the creator record
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $user The user to check authorization for
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     protected function addAuthorizedUserQueryForCreatorRecord($query, $user)
     {
         return $query;
     }
 
+    /**
+     * Get the authorized roles for the creator record
+     *
+     * @return array Array of authorized role names
+     */
     protected function getAuthorizedRolesForCreatorRecord()
     {
         return $this->authorizedRolesForCreatorRecord ?? [
@@ -130,6 +193,11 @@ trait HasCreator
         ];
     }
 
+    /**
+     * Get the authorized user roles for the creator record
+     *
+     * @return array Array of authorized user role names
+     */
     protected function getAuthorizedUserRolesForCreatorRecord()
     {
         return $this->authorizedUserRolesForCreatorRecord ?? [
@@ -154,14 +222,20 @@ trait HasCreator
 
         $user = auth($guardName)->user();
 
+        $abortRoleExceptions = static::$abortCreatorRoleExceptions ?? false;
+
         $hasSpatiePermission = in_array('Spatie\Permission\Traits\HasRoles', class_uses_recursive($user));
+
         $spatieRoleModel = config('permission.models.role');
 
-        if ($hasSpatiePermission) {
-            $existingRoles = $spatieRoleModel::whereIn('name', $this->getAuthorizedRolesForCreatorRecord())->get();
+        if (! $abortRoleExceptions) {
 
-            if ($user->isSuperAdmin() || $user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
-                return $query;
+            if ($hasSpatiePermission) {
+                $existingRoles = $spatieRoleModel::whereIn('name', $this->getAuthorizedRolesForCreatorRecord())->get();
+
+                if ($user->isSuperAdmin() || $user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
+                    return $query;
+                }
             }
         }
 

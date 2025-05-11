@@ -7,6 +7,7 @@
         :name="`${$attrs['name']}-${i}`"
         :modelValue="deepModel[i][priceInputName]"
         @update:modelValue="updateNumberInput($event, i)"
+        :readonly="readonly"
         >
         <template v-slot:append-inner="{isActive, isFocused, controlRef, focus, blur}">
           <v-chip @click="changeCurrency($event, i)">
@@ -16,11 +17,21 @@
       </CurrencyNumber>
       <v-select
         v-show="vatRates.length > 0"
-        v-bind="{...$lodash.omit($attrs, ['rules', 'error', 'errorMessages'])}"
+        v-bind="{...$lodash.pick($attrs, ['density', 'color', 'clearable', 'variant'])}"
         :label="$t('VAT Rate')"
         :items="vatRates"
         class="flex-grow-0"
         v-model="deepModel[i].vat_rate_id"
+      />
+      <v-number-input
+        v-if="hasDiscount"
+        v-model="deepModel[i].discount_percentage"
+        v-bind="{...$lodash.pick($attrs, ['density', 'color', 'clearable', 'variant'])}"
+        :label="$t('Discount %')"
+        control-variant="stacked"
+        :min="0"
+        :max="100"
+        :rules="[]"
       />
     </div>
     <div v-if="vatRates.length > 0" class="w-100 d-flex justify-center">
@@ -31,9 +42,9 @@
         elevation="0"
       >
         <v-card-text class="text-center py-6">
-          <div class="text-h6 text-white mb-2">Total Pay:</div>
+          <div class="text-h6 text-white mb-2">Total Pay</div>
           <div class="text-h2 text-white font-weight-bold">
-            {{ displayedCurrency[i] + ' ' + (deepModel[i].display_price * (1 + $lodash.find(vatRates, ['value', deepModel[i].vat_rate_id])?.rate / 100)).toFixed(2) }}
+            {{ displayFormattedPrice(displayedCurrency[i], deepModel[i] )}}
           </div>
         </v-card-text>
       </v-card>
@@ -54,21 +65,23 @@ export default {
   props: {
     ...makeInputProps(),
     modelValue: {
-      type: Array,
+      type: [Array, Object],
       default () {
         return [
           {
-            display_price: 1.00,
+            [this.priceInputName]: 1.00,
             currency_id: 1,
             vat_rate_id: 1,
-            price_type_id: 1
+            price_type_id: 1,
+
+            raw_amount: 1.00,
+            discount_percentage: 0,
           }
         ]
       }
     },
     priceInputName: {
       type: String,
-      default: 'display_price'
     },
     currencyInputName: {
       type: String,
@@ -96,6 +109,14 @@ export default {
     error: {
       type: Boolean,
       default: false
+    },
+    readonly: {
+      type: Boolean,
+      default: false
+    },
+    hasDiscount: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -121,6 +142,9 @@ export default {
 
   methods: {
     changeCurrency (e, index) {
+      if (this.readonly) {
+        return
+      }
       const currentIndex = this.currencies.findIndex(o => o.id === this.modelValue[index][this.currencyInputName])
 
       this.deepModel[index][this.currencyInputName] = currentIndex === this.totalCurrencies - 1 ? this.currencies[0].id : this.currencies[currentIndex + 1].id
@@ -139,6 +163,15 @@ export default {
         return item
         return {...item, [this.priceInputName]: item[this.priceInputName] * this.numberMultiplier }
       }))
+    },
+
+    displayFormattedPrice(currency, item) {
+      const vatRate = this.$lodash.find(this.vatRates, ['value', item.vat_rate_id])?.rate / 100
+      const discountPercentage = (item.discount_percentage || 0) / 100
+      const price = item[this.priceInputName]
+
+      return currency + ' ' + (price * (1 - discountPercentage) * (1 + vatRate)).toFixed(2)
+      // return currency + ' ' + Math.round(price * (1 + vatRate) * (1 - discountPercentage)).toFixed(2)
     }
   },
 
@@ -156,7 +189,7 @@ export default {
         } else {
           this.deepModel = [
             {
-              display_price: 1.00,
+              [this.priceInputName]: 1.00,
               currency_id: 1
             }
           ]
@@ -186,9 +219,7 @@ export default {
   },
 
   created () {
-    // __log(this.modelValue)
-    // __log(this.deepModel, this.modelValue)
-    // __log(this.$attrs)
+
   }
 }
 </script>

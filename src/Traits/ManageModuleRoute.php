@@ -57,7 +57,6 @@ trait ManageModuleRoute
 
     public function getRouteInputs()
     {
-
         return ! empty($conf = $this->routeConfig()) ? ($conf['inputs'] ?? []) : [];
     }
 

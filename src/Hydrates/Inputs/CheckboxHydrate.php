@@ -14,6 +14,7 @@ class CheckboxHydrate extends InputHydrate
         'color' => 'success',
         'trueValue' => 1,
         'falseValue' => 0,
+        'hideDetails' => true,
     ];
 
     /**
@@ -25,7 +26,7 @@ class CheckboxHydrate extends InputHydrate
     {
         $input = $this->input;
 
-        $input['hideDetails'] = true;
+        // $input['hideDetails'] ??= true;
         $input['default'] = 0;
 
         return $input;

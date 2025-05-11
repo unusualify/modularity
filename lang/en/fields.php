@@ -10,6 +10,12 @@ return [
     'confirm' => 'Confirm',
     'confirm-deletion' => 'Are you sure want to delete {name} {route}?',
     'confirm-soft-deletion' => 'Are you sure want to delete {name} {route} permanently?',
+
+    'confirm-bulk-publish' => 'Are you sure want to publish {count} {route}?',
+    'confirm-bulk-delete' => 'Are you sure want to delete {count} {route}?',
+    'confirm-bulk-restore' => 'Are you sure want to restore {count} {route}?',
+    'confirm-bulk-destroy' => 'Are you sure want to destroy {count} {route}?',
+
     'confirm-description' => 'Are you sure you want to do this?',
     'confirm-action' => 'Are you sure want to {action} on selected {route}',
     'country' => 'Country',

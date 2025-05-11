@@ -2,10 +2,10 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
-use Illuminate\Auth\Passwords\PasswordBrokerManager;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Factory as ViewFactory;
 use Unusualify\Modularity\Facades\Modularity;
@@ -27,16 +27,10 @@ class ForgotPasswordController extends Controller
 
     use ManageUtilities, SendsPasswordResetEmails;
 
-    /**
-     * @var PasswordBrokerManager
-     */
-    protected $passwordBrokerManager;
-
-    public function __construct(PasswordBrokerManager $passwordBrokerManager)
+    public function __construct()
     {
         parent::__construct();
 
-        $this->passwordBrokerManager = $passwordBrokerManager;
         $this->middleware('modularity.guest');
     }
 
@@ -45,7 +39,7 @@ class ForgotPasswordController extends Controller
      */
     public function broker()
     {
-        return $this->passwordBrokerManager->broker(Modularity::getAuthProviderName());
+        return Password::broker(Modularity::getAuthProviderName());
     }
 
     /**
@@ -55,6 +49,9 @@ class ForgotPasswordController extends Controller
     {
         // return $viewFactory->make(modularityBaseKey().'::auth.passwords.email');
         return $viewFactory->make(modularityBaseKey() . '::auth.passwords.email', [
+            'attributes' => [
+                'noSecondSection' => true,
+            ],
             'formAttributes' => [
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
                 'title' => [
@@ -67,20 +64,7 @@ class ForgotPasswordController extends Controller
                     'align' => 'center',
                     'justify' => 'center',
                 ],
-                'schema' => ($schema = $this->createFormSchema([
-                    'email' => [
-                        'type' => 'text',
-                        'name' => 'email',
-                        'label' => ___('authentication.email'),
-                        'default' => '',
-                        'col' => [
-                            'cols' => 12,
-                        ],
-                        'rules' => [
-                            ['email'],
-                        ],
-                    ],
-                ])),
+                'schema' => $this->createFormSchema(getFormDraft('forgot_password_form')),
 
                 'actionUrl' => route(Route::hasAdmin('password.reset.email')),
                 'buttonText' => 'authentication.reset-send',
@@ -99,10 +83,10 @@ class ForgotPasswordController extends Controller
                             'tag' => 'v-btn',
                             'elements' => __('authentication.sign-in'),
                             'attributes' => [
-                                'variant' => 'text',
+                                'variant' => 'elevated',
                                 'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'v-col-5 justify-content-start',
-                                'color' => 'grey-lighten-1',
+                                'class' => '',
+                                'color' => 'success',
                                 'density' => 'default',
                             ],
                         ],
@@ -112,7 +96,7 @@ class ForgotPasswordController extends Controller
                             'attributes' => [
                                 'variant' => 'elevated',
                                 'href' => '',
-                                'class' => 'v-col-5',
+                                'class' => '',
                                 'type' => 'submit',
                                 'density' => 'default',
                             ],

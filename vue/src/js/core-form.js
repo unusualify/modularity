@@ -20,8 +20,7 @@ store.registerModule('form', form)
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 const app = exports.createApp({
-  store,
-  mixins: [exports.RootMixin]
+  store
 })
 
 app.use(exports.UEConfig)

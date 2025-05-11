@@ -105,22 +105,27 @@
       </ue-modal>
 
       <!-- Profile Dialog -->
-      <v-dialog
+      <ue-modal
         ref="profileDialog"
-        width="500"
         v-model="$store.state.user.profileDialog"
+        Xwidth="500"
+        scrollable
       >
-        <template v-slot:default="{ isActive }">
+        <template v-slot:body="{ isActive, toggleFullscreen, close , isFullActive}">
           <v-card>
             <v-card-title>
-              <ue-title padding="0" :text="$t('Upload Profile Image')" color="grey-darken-5" transform="none" align="center" justify="space-between">
+              <ue-title padding="y-3" :text="$t('Upload Profile Image')" color="grey-darken-5" transform="none" align="center" justify="space-between">
                 <template #right>
-                  <v-btn icon="$close" variant="plain" color="grey-darken-5" size="default" @click="isActive.value = false"/>
+                  <div class="d-flex align-center">
+                    <v-icon :icon="isFullActive ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="default" @click="toggleFullscreen()"/>
+                    <v-icon icon="$close" variant="plain" color="grey-darken-5" size="default" @click="close()"/>
+                  </div>
                 </template>
               </ue-title>
               <v-divider/>
             </v-card-title>
-            <v-card-text>
+
+            <v-card-text Xstyle="height: 30vh;">
               <div class="d-flex">
                 <div class="my-3 flex-grow-0">
                   <v-avatar class="my-aut" :image="$store.getters.userProfile.avatar_url" size="100"/>
@@ -141,10 +146,23 @@
                 >
                 </ue-form>
               </div>
+              <!-- <div class="">
+                <v-radio-group
+                  v-model="dialog"
+                  messages="Select a Country from the radio group"
+                >
+                  <v-radio v-for="([label, value]) in [['1', 1], ['2', 2], ['3', 3], ['4', 4], ['5', 5], ['6', 6], ['7', 7], ['8', 8], ['9', 9], ['10', 10]]"
+                    :key="value"
+                    :label="label"
+                    :value="value"
+                  ></v-radio>
+                </v-radio-group>
+              </div> -->
             </v-card-text>
+
           </v-card>
         </template>
-      </v-dialog>
+      </ue-modal>
 
       <!-- <a17-dialog
         ref="deleteWarningMediaLibrary"
@@ -159,6 +177,8 @@
       </a17-dialog> -->
 
       <ue-alert ref='alert'></ue-alert>
+      <ue-dynamic-modal></ue-dynamic-modal>
+
       <ue-modal
         ref='dialog'
         v-model="alertDialog"
@@ -174,34 +194,57 @@
             </v-card-text>
             <v-divider/>
             <v-card-actions class="justify-center">
-                <v-btn-cta  @click="closeAlertDialog">
+                <v-btn-secondary  @click="closeAlertDialog">
                   {{ $t('fields.close') }}
-                </v-btn-cta>
+                </v-btn-secondary>
             </v-card-actions>
           </v-card>
         </template>
       </ue-modal>
 
-      <!-- <v-layout-item
-        v-if="impersonation.active"
-        class="text-end pointer-events-none"
-        model-value
-        position="bottom"
-        size="88"
+      <!-- Login Modal -->
+      <ue-modal
+        ref="loginModal"
+        v-model="$store.state.user.showLoginModal"
+        scrollable
+        transition="dialog-bottom-transition"
+        width-type="sm"
       >
-        <div class="ma-4">
-          <v-fab-transition>
-            <v-btn
-              class="mt-auto pointer-events-initial"
-              color="error"
-              elevation="8"
-              :icon="(showImpersonateToolbar ? 'mdi-chevron-down' : 'mdi-chevron-up')"
-              size="large"
-              @click="showImpersonateToolbar = !showImpersonateToolbar"
-            />
-          </v-fab-transition>
-        </div>
-      </v-layout-item> -->
+        <template v-slot:body="{ isActive, toggleFullscreen, close , isFullActive}">
+          <v-card>
+
+            <v-card-title>
+              <ue-title padding="y-3" :text="$t('Login')" color="grey-darken-5" transform="none" align="center" justify="space-between">
+                <template #right>
+                  <div class="d-flex align-center">
+                    <v-icon :icon="isFullActive ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="default" @click="toggleFullscreen()"/>
+                    <v-icon icon="$close" variant="plain" color="grey-darken-5" size="default" @click="close()"/>
+                  </div>
+                </template>
+              </ue-title>
+              <v-divider/>
+            </v-card-title>
+
+            <v-card-text>
+              <ue-form
+                class="flex-grow-1"
+                :schema="$store.state.user.loginShortcutSchema"
+                v-model="$store.state.user.loginShortcutModel"
+                :action-url="$store.state.user.loginRoute"
+
+                :async="true"
+                :hasSubmit="true"
+                no-default-form-padding
+                buttonText="fields.login"
+
+                @submitted="loginFormSubmitted"
+              >
+              </ue-form>
+            </v-card-text>
+
+          </v-card>
+        </template>
+      </ue-modal>
     </v-main>
   </v-app>
 </template>
@@ -392,7 +435,6 @@
         }
       },
       alertDialogMessage() {
-        __log('alertDialogMessage computed', this.$store.state.alert)
         return this.$store.state.alert.dialogMessage
       }
     },
@@ -437,6 +479,9 @@
             this.$store.commit(USER.SET_PROFILE_DATA, res.data)
           })
         }
+      },
+      loginFormSubmitted(res) {
+        // this.$store.commit(USER.CLOSE_LOGIN_MODAL)
       }
     }
   }

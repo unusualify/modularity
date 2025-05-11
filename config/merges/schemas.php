@@ -33,7 +33,7 @@ return [
         [
             'name' => 'published',
             'label' => 'Published',
-            'topEvent' => true,
+            'isEvent' => true,
             'type' => 'switch',
         ],
     ],

@@ -28,30 +28,39 @@ class PaymentServiceHydrate extends InputHydrate
     {
         $input = $this->input;
         $input['type'] = 'input-payment-service';
-        $ps = new PaymentService;
-        $input['currencies'] = PaymentCurrency::whereHas('paymentServices')->with('paymentServices')->get()->all();
-        $input['items'] = $ps->where('is_external', 1)->with('paymentCurrencies')->get()->all();
+
         $input['default_payment_service'] = config('modularity.default_payment_service');
+
         $input['api'] = route('currency.convert');
 
-        $cct = $ps->where('is_internal', 1)->with(['paymentCurrencies', 'cardTypes'])->get()->all();
+        $input['currencies'] = ! $this->skipQueries
+            ? PaymentCurrency::whereHas('paymentServices')
+                ->orWhereHas('paymentService')
+                ->with('paymentServices', 'paymentService')
+                ->get()
+            : [];
+
+        $input['items'] = ! $this->skipQueries
+            ? PaymentService::published()->where('is_external', 1)->with('paymentCurrencies')->get()->toArray()
+            : [];
+        $paymentServices = ! $this->skipQueries
+            ? PaymentService::published()->where('is_internal', 1)->with(['paymentCurrencies', 'cardTypes'])->get()->all()
+            : [];
 
         $mappedData = [];
-        foreach ($cct as $service) {
-            foreach ($service->paymentCurrencies as $currency) {
-                $currencyCode = $currency->iso_4217 ?? '';
-                if (! $currencyCode) {
-                    continue;
-                }
+
+        foreach ($paymentServices as $paymentService) {
+            foreach ($paymentService->internalPaymentCurrencies as $internalPaymentCurrency) {
+                $currencyCode = $internalPaymentCurrency->iso_4217 ?? '';
 
                 if (! isset($mappedData[$currencyCode])) {
                     $mappedData[$currencyCode] = [];
                 }
 
-                foreach ($service->cardTypes as $cardType) {
+                foreach ($paymentService->cardTypes as $cardType) {
                     $cardInfo = [
                         'name' => mb_strtolower($cardType->name ?? ''),
-                        'logo' => $this->getCardLogo($cardType),
+                        'logo' => $cardType->image('logo', locale: 'en'),
                     ];
 
                     if ($cardInfo['name'] && ! $this->cardExists($mappedData[$currencyCode], $cardInfo['name'])) {
@@ -63,16 +72,6 @@ class PaymentServiceHydrate extends InputHydrate
         $input['currencyCardTypes'] = $mappedData;
 
         return $input;
-
-    }
-
-    private function getCardLogo($cardType)
-    {
-        $logoMedia = $cardType->medias->first(function ($media) {
-            return $media->pivot->role === 'logo';
-        });
-
-        return $logoMedia?->uuid ?? null;
     }
 
     private function cardExists($currencyCards, $cardName)

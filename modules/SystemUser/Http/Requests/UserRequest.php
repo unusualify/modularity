@@ -20,19 +20,17 @@ class UserRequest extends Request
 
     public function rulesForCreate()
     {
-        $table_name = $this->model()->getTable();
-
         return [
-            // 'name' => "sometimes|required|unique:$table_name|min:4",
+            'name' => 'sometimes|required|min:4',
+            'email' => 'sometimes|required|email|unique_table',
         ];
     }
 
     public function rulesForUpdate()
     {
-        $table_name = $this->model()->getTable();
-
         return [
-            // 'name' => "sometimes|required|min:3|unique:{$table_name},name,".$this->id,
+            'name' => 'sometimes|required|min:4',
+            'email' => 'sometimes|required|email|unique_table',
         ];
     }
 }

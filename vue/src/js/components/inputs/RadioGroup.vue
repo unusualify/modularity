@@ -8,6 +8,7 @@
           :variant="input == item[itemValue] ? 'elevated' : 'outlined'"
           @click="input=item[itemValue]"
           :disabled="$attrs.disabled ?? false"
+          :readonly="protectInitialValue"
         >
           <template #prepend>
             <v-radio :value="item[itemValue]" :disabled="$attrs.disabled ?? false"></v-radio>
@@ -33,10 +34,10 @@ export default {
   },
   props: {
     ...makeInputProps(),
-    modelValue: {
-      type: Object,
-      default: () => ''
-    },
+    // modelValue: {
+    //   type: Object,
+    //   default: () => ''
+    // },
     items: {
       type: Object,
       default: () => []
@@ -78,7 +79,7 @@ export default {
 
   },
   created() {
-    // __log(this.schema)
+
   }
 }
 </script>

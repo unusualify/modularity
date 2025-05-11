@@ -83,6 +83,7 @@ trait ManageScopes
 
         if (array_key_exists('status', $requestFilters)) {
             switch ($requestFilters['status']) {
+                // General Filters
                 case 'published':
                     $scope['published'] = true;
 
@@ -97,6 +98,52 @@ trait ManageScopes
                     break;
                 case 'mine':
                     $scope['mine'] = true;
+
+                    break;
+                    // Authorizable Filters
+                case 'authorized':
+                    $scope['hasAnyAuthorization'] = true;
+
+                    break;
+                case 'unauthorized':
+                    $scope['unauthorized'] = true;
+
+                    break;
+                case 'your-authorizations':
+                    $scope['isAuthorizedToYou'] = true;
+
+                    break;
+                    // Assignable Filters
+                case 'my-assignments':
+                    $scope['isActiveAssignee'] = true;
+
+                    break;
+                case 'your-role-assignments':
+                    $scope['isActiveAssigneeForYourRole'] = true;
+
+                    break;
+                case 'completed-assignments':
+                    $scope['completedAssignments'] = true;
+
+                    break;
+                case 'pending-assignments':
+                    $scope['pendingAssignments'] = true;
+
+                    break;
+                case 'your-completed-assignments':
+                    $scope['yourCompletedAssignments'] = true;
+
+                    break;
+                case 'your-pending-assignments':
+                    $scope['yourPendingAssignments'] = true;
+
+                    break;
+                case 'team-completed-assignments':
+                    $scope['teamCompletedAssignments'] = true;
+
+                    break;
+                case 'team-pending-assignments':
+                    $scope['teamPendingAssignments'] = true;
 
                     break;
             }
@@ -163,11 +210,19 @@ trait ManageScopes
      */
     protected function getRequestFilters()
     {
+        $searchFilters = [];
+
         if ($this->request->has('search')) {
-            return ['search' => $this->request->get('search')];
+            $searchFilters['search'] = $this->request->get('search');
         }
 
-        return json_decode($this->request->get('filter'), true) ?? [];
+        $filter = $this->request->get('filter');
+
+        if (is_string($filter)) {
+            $filter = json_decode($filter, true);
+        }
+
+        return array_merge($searchFilters, $filter ?? []);
     }
 
     /**

@@ -1,7 +1,9 @@
+import { useI18n } from 'vue-i18n'
 import _ from 'lodash-es'
 import pluralize from 'pluralize'
+import { useAuthorization, useCache } from '@/hooks'
 
-import { ALERT, CONFIG } from '../store/mutations'
+import { ALERT, CONFIG, USER, CACHE } from '../store/mutations'
 
 export default {
   $csrf: function () {
@@ -26,11 +28,12 @@ export default {
     } else if (attributes == null) {
       return { ...this.$attrs }
     }
-    // __log(_props)
+
     return _attributes
   },
   $main: function () {
-    return this.$root.$refs.main
+
+    return this.$app._instance.refs.main
   },
   $profileDialog: function () {
     return this.$root.$refs.sidebar.$refs.profileDialog
@@ -41,12 +44,23 @@ export default {
   $closeProfileDialog: function () {
     return this.$store.state.user.profileDialog = false
   },
-  $can: function (permission) {
-    if (this.$store.getters.isSuperAdmin) {
-      return true
-    }
+  $can: function (permission, moduleName = null) {
+    const { can } = useAuthorization()
 
-    return false
+    return can(permission, moduleName)
+  },
+  $hasRoles: function (roles) {
+    const { hasRoles } = useAuthorization()
+
+    return hasRoles(roles)
+  },
+  $isYou: function (id) {
+    const { isYou } = useAuthorization()
+
+    return isYou(id)
+  },
+  $isSuperAdmin: function () {
+    return this.$store.getters.isSuperAdmin
   },
   $toggleSidebar: function () {
     this.$store.commit(CONFIG.SIDEBAR_TOGGLE)
@@ -60,7 +74,6 @@ export default {
       let notation = matches[1]
       let quoted = __preg_quote(matches[0])
       let parts = notation.split('.')
-      // __log(parts)
 
       let newParts = []
       for(const j in parts){
@@ -197,7 +210,6 @@ export default {
 
       let displayLabel = input.displayLabel || input.label || input.name || key;
       displayLabel = this.$localization(displayLabel)
-      // __log(displayLabel, input)
 
       if(!input.type || input.type == 'hidden') continue;
 
@@ -215,7 +227,6 @@ export default {
 
             delete displayData[key]
             displayData = Object.assign(displayData, this.$getDisplayData(input.schema, model))
-            // console.log(input.schema, model, getDisplayData(input.schema, model))
             // displayData[key].value = getDisplayData(input.schema, model);
           }
         break;
@@ -250,9 +261,13 @@ export default {
           // Repeater adds a nested level to the model as an array
           displayData[key]._value = _.reduce(value, (acc, obj, id) => {
             id = __isString(id) ? parseInt(id) : id
+
             const item = input.items.find((i) => i.id == id);
+
+            if(!item)
+              return acc
+
             const _displayLabel = item.title || item.name
-            // __log(item)
             // acc[_key] = {
             //   title: _key,
             //   items: {}
@@ -275,14 +290,14 @@ export default {
               let _haystack = item[_map];
               if (Array.isArray(_value) && _haystack) {
                 __displayData._value = _value.map(id => {
-                  let _item = _haystack.find(i => i.id === id);
+                  let _item = _haystack.find(i => i.id == id);
                   return _item ? _item.title || _item.name : 'N/A';
                 })
               } else {
+
                 if(!!_haystack){
-                  let item = _haystack.find(i => i.id === _value);
+                  let item = _haystack.find(i => i.id == _value);
                   _value = item ? item.title || item.name : _value;
-                  // __log(id, _key, _map, _displayData, _value)
 
                   __displayData._value = _value;
                   let __displayKeys = this.$getDisplayKeys(item);
@@ -307,19 +322,16 @@ export default {
           // const { n, locale, numberFormats, t, te } = useI18n({ useScope: 'global' })
           const currencyInfo = this.$numberFormats[this.$getLocale].currency
           const displayCurrency = input.items.find(c => c.iso === currencyInfo.currency)
-          __log(this.$n(100, { style: 'currency', currency: currencyInfo.currency }))
 
           displayData[key]._value = this.$n(
-            value.find(priceItem => priceItem.currency_id === displayCurrency.id).display_price,
+            value.find(priceItem => priceItem.currency_id === displayCurrency.id).raw_amount,
             { style: 'currency', currency: currencyInfo.currency }
           )
         break;
         default:
           if (__isObject(value)) {
-            // __log('getDisplayData is object', input.type, value, input)
             displayData[key]._value = value;
           } else if (Array.isArray(value) && input.items) {
-            // __log('getDisplayData is array', input.type, key, value, input)
             displayData[key]._value = value.map(id => {
               const item = input.items.find(i => i[input.itemValue] === id);
               return item ? item[input.itemTitle] : id;
@@ -340,14 +352,51 @@ export default {
   },
   $getDisplayKeys: function (item) {
     return _.reduce(Object.keys(item ?? {}), (acc, key) => {
-      let matches = key.match(/^([a-zA-Z0-9]+)(_show)$/)
+      let matches = key.match(/^([a-zA-Z0-9]+)(_(show|formatted))$/)
       if(matches){
         acc[key] = matches[1]
       }
       return acc
     }, {})
   },
+  $d: function (date, format = 'long') {
+    const { d } = useI18n({ useScope: 'global' })
+
+    return d(new Date(date), format)
+  },
   $copy: function(text) {
     window.navigator.clipboard.writeText(text);
+  },
+  $openLoginModal: function () {
+    this.$store.commit(USER.OPEN_LOGIN_MODAL)
+  },
+  $closeLoginModal: function () {
+    this.$store.commit(USER.CLOSE_LOGIN_MODAL)
+  },
+
+  $cacheGet: function (key, defaultValue = null) {
+    const { get } = useCache()
+
+    return get(key, defaultValue)
+  },
+  $cachePut: function (key, value) {
+    const { put } = useCache()
+
+    put(key, value)
+  },
+  $cachePush: function (key, value) {
+    const { push } = useCache()
+
+    push(key, value)
+  },
+  $cacheLast: function (key, defaultValue = null) {
+    const { last } = useCache()
+
+    return last(key, defaultValue)
+  },
+  $cacheForget: function (key) {
+    const { forget } = useCache()
+
+    forget(key)
   }
 }

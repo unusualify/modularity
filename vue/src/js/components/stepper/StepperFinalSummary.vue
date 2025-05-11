@@ -2,37 +2,12 @@
   <v-sheet class="bg-primary-darken-2">
     <!-- Title -->
     <ue-title justify="center" color="white" :text="$t('Total Amount').toUpperCase()" type="h5" />
-    <v-divider/>
+    <v-divider style="border-color: rgb(var(--v-theme-on-primary-darken-1));" />
 
     <!-- Summary sections -->
-    <template v-for="(sample, index) in formattedSummary" :key="`summary-section-${index}`">
-      <!-- Section title -->
-      <ue-title
-        :text="sample.title"
-        transform="capitalize"
-        type="h6"
-        color="white"
-        padding="x-6"
-        margin="t-6"
-        class="mx-n6 py-3 bg-primary-darken-1"
-      />
+    <slot name="body">
 
-      <!-- Section values -->
-      <v-table class="bg-transparent my-3">
-        <tbody>
-          <template v-for="(value, valueIndex) in sample.values" :key="`summary-value-${valueIndex}`">
-            <tr class="py-0">
-              <td class="border-0 h-auto py-1 pl-0 text-body-1 text-white">
-                {{ value.parentTitle || value.title || 'N/A' }}
-              </td>
-              <td class="border-0 h-auto py-1 text-right pr-0 font-weight-bold text-body-1 text-white">
-                {{ value.value || 'N/A' }}
-              </td>
-            </tr>
-          </template>
-        </tbody>
-      </v-table>
-    </template>
+    </slot>
 
   </v-sheet>
 
@@ -71,7 +46,7 @@
       :loading="loading"
       @click="$emit('complete')"
     >
-      {{ $t('Complete').toUpperCase() }}
+      {{ $t('Complete Request').toUpperCase() }}
     </v-btn-secondary>
   </v-sheet>
     <!-- </div> -->
@@ -81,16 +56,6 @@
 export default {
   name: 'StepperFinalSummary',
   props: {
-    formattedSummary: {
-      type: Object,
-      required: true,
-      validator(value) {
-        return Object.values(value).every(section => {
-          return typeof section.title === 'string' &&
-                 Array.isArray(section.values)
-        })
-      }
-    },
     loading: {
       type: Boolean,
       default: false

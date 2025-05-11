@@ -19,12 +19,24 @@ use Illuminate\Support\Facades\Route;
 
 if (modularityConfig('enabled.users-management')) {
 
-    Route::get('register', 'RegisterController@showLoginForm')->name('register.form');
+    Route::get('register', 'RegisterController@showForm')->name('register.form');
     Route::post('register', 'RegisterController@register')->name('register');
 
-    Route::get('login', 'LoginController@showLoginForm')->name('login.form');
+    Route::get('login', 'LoginController@showForm')->name('login.form');
     Route::post('login', 'LoginController@login')->name('login');
     Route::post('logout', 'LoginController@logout')->name('logout');
+
+    Route::get('login/oauth', 'LoginController@showPasswordForm')->name('login.oauth.showPasswordForm');
+    Route::post('login/oauth', 'LoginController@linkProvider')->name('login.oauth.linkProvider');
+
+    Route::get('/auth/{provider}/redirect', 'LoginController@redirectToProvider')->name('login.provider');
+    Route::get('/auth/{provider}/callback', 'LoginController@handleProviderCallback')->name('loginHandleCallbackProvider');
+
+    // #TODO add complete registration after email confirmatiosent
+    // Route::get('/completeRegistration', 'LoginController@completeRegisterForm')->name('completeRegistration.form');
+    // Route::post('/completeRegistration', 'LoginController@completeRegister')->name('completeRegistration');
+
+    // Route::get('/withoutLogin', 'LoginController@completeRegisterForm');
 
     Route::get('password/reset', 'ForgotPasswordController@showLinkRequestForm')->name('password.reset.link');
     Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.reset.email');

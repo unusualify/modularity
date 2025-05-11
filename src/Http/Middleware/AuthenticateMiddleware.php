@@ -17,7 +17,6 @@ class AuthenticateMiddleware extends Middleware
      */
     protected function redirectTo($request)
     {
-
         if (! $request->expectsJson()) {
             $modularityAdminRouteNamePrefix = Modularity::getAdminRouteNamePrefix();
             // Define auth routes that should not be stored as intended URL
@@ -36,6 +35,17 @@ class AuthenticateMiddleware extends Middleware
             if (! in_array($request->route()->getName(), $excludedRoutes)) {
                 session()->put('url.intended', url()->previous());
             }
+        }
+
+        if ($request->expectsJson()) {
+            $referer = $request->headers->get('referer');
+            session()->put('url.intended', $referer);
+
+            return response()->json([
+                'message' => 'Unauthenticated.',
+                'mode' => 'experimental',
+                // 'redirector' => $referer,
+            ], 401);
         }
 
         return route(Route::hasAdmin('login.form'));

@@ -1,5 +1,5 @@
 // hooks/useItemActions.js
-import { toRefs, computed, reactive } from 'vue'
+import { toRefs, computed, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
 import _ from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
@@ -7,6 +7,9 @@ import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 import ACTIONS from '@/store/actions'
 import { FORM, ALERT } from '@/store/mutations/index'
 import api from '@/store/api/form'
+
+import { useFormatter } from '@/hooks'
+import { checkItemConditions } from '@/utils/itemConditions';
 
 export const makeItemActionsProps = propsFactory({
   isEditing: {
@@ -21,6 +24,9 @@ export const makeItemActionsProps = propsFactory({
 
 export default function useItemActions(props, context) {
   const store = useStore()
+  const { castMatch } = useFormatter(props, context)
+
+  const Actions = _.cloneDeep(props.actions)
 
   const editingItem = context.actionItem
     || context.item
@@ -42,13 +48,6 @@ export default function useItemActions(props, context) {
     const item = sourceData.find(item => item[findKey] === findValue);
 
     return item ? item[config.return] : undefined;
-  }
-
-  // Helper method to get nested object values using dot notation
-  const getNestedValue = (obj, path) => {
-    return path.split('.').reduce((current, part) => {
-      return current && current[part] !== undefined ? current[part] : undefined;
-    }, obj);
   }
 
   const handleRequestAction = (action, endpoint) => {
@@ -82,7 +81,6 @@ export default function useItemActions(props, context) {
 
     api[method](endpoint, params,
       (response) => {
-        // __log('handleRequestAction', response)
         if (response.data.message) {
           store.commit(ALERT.SET_ALERT, {
             message: response.data.message,
@@ -147,13 +145,12 @@ export default function useItemActions(props, context) {
     document.body.removeChild(link);
   }
 
-  const can = (permission) => {
-    const name = tableNames.permissionName.value + '_' + permission
-    return store.getters.isSuperAdmin || store.getters.userPermissions[name]
-  }
-
-  const shouldShowAction = (action) => {
+  const validateAction = (action) => {
     // Base condition for editing/creating
+    if(!editingItem) {
+      return true
+    }
+
     const baseCondition = props.isEditing ? action.editable : action.creatable;
 
     // If no conditions defined, return base condition
@@ -162,51 +159,46 @@ export default function useItemActions(props, context) {
     }
 
     // Check all conditions
-    return baseCondition && action.conditions.every(condition => {
-      const [path, operator, value] = condition;
-      const actualValue = getNestedValue(editingItem, path);
-
-      switch (operator) {
-        case '=':
-        case '==':
-          return actualValue === value;
-        case '!=':
-          return actualValue !== value;
-        case '>':
-          return actualValue > value;
-        case '<':
-          return actualValue < value;
-        case '>=':
-          return actualValue >= value;
-        case '<=':
-          return actualValue <= value;
-        case 'in':
-          return Array.isArray(value) && value.includes(actualValue);
-        case 'not in':
-          return Array.isArray(value) && !value.includes(actualValue);
-        case 'exists':
-          return actualValue !== undefined && actualValue !== null;
-        default:
-          console.warn(`Unknown operator: ${operator}`);
-          return false;
-      }
-    });
+    return baseCondition && checkItemConditions(action.conditions, editingItem);
   }
 
-  const flattenedActions = computed(() => window.__isObject(props.actions)
-      ? Object.values(props.actions)
-      : props.actions
+  const formatActions = (_actions) => {
+    return _actions.map(action => {
+
+      if(editingItem) {
+        Object.keys(action).forEach(key => {
+          if (key === 'badge') {
+            action[key] = castMatch.value(action[key], editingItem)
+          }
+        })
+      }
+
+      if(!validateAction(action)) {
+        action.disabled = true
+      }
+
+      return action
+    })
+  }
+
+  const flattenedActions = ref(window.__isObject(Actions)
+      ? Object.values(Actions)
+      : Actions
   )
 
-  const states = reactive({
-    showedActions: computed(() => flattenedActions.value.filter(action => shouldShowAction(action)))
-  })
+  const allActions = computed(() => formatActions(flattenedActions.value))
+  const visibleActions = computed(() => allActions.value.filter(action => !(window.__isset(action.disabled) && action.disabled)))
 
-  // __log(states.showedActions, flattenedActions.value)
+  const states = reactive({
+    hasActions: computed(() => allActions.value.length > 0),
+    hasVisibleActions: computed(() => visibleActions.value.length > 0),
+    allActions,
+    visibleActions,
+  })
 
   const methods = reactive({
     // methods
-    shouldShowAction,
+    shouldShowAction: validateAction,
     handleAction(action) {
       if (!action.type) {
         console.warn('Action type not specified:', action);

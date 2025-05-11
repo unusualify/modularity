@@ -28,9 +28,28 @@ trait ManagePrevious
      */
     public function getPreviousRoute()
     {
-        return Route::getRoutes()->match(
-            Request::create(URL::previous())
-        );
+        $previousUrl = URL::previous();
+
+        try {
+            // Try to match the route using the previous URL
+            return Route::getRoutes()->match(
+                Request::create($previousUrl)
+            );
+        } catch (\Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException $e) {
+            // If method not allowed, try to get the route information without matching the method
+            foreach (Route::getRoutes() as $route) {
+                if ($route->matches(Request::create($previousUrl, 'HEAD'))) {
+                    dd($route);
+
+                    return $route;
+                }
+            }
+
+            return null;
+        } catch (\Exception $e) {
+            // Handle any other exceptions
+            return null;
+        }
     }
 
     /**

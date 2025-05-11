@@ -186,7 +186,9 @@ class RouteServiceProvider extends ServiceProvider
             );
             ModularityRoutes::registerRoutes(
                 $router,
-                [],
+                [
+                    'domain' => config('app.url'),
+                ],
                 ['web'], // $middlewares,
                 $module->getClassNamespace("{$controller_namespace}\Front"),
                 $module->getDirectoryPath("{$routes_folder}/front.php"),
@@ -207,6 +209,7 @@ class RouteServiceProvider extends ServiceProvider
 
             $router->group([
                 ...[
+                    'domain' => config('app.url'),
                     'middleware' => ModularityRoutes::webMiddlewares(),
                     'namespace' => $module->getClassNamespace("{$front_controller_namespace}"),
                 ],
@@ -479,6 +482,12 @@ class RouteServiceProvider extends ServiceProvider
                     );
 
                     foreach ($routes as $key => $item) {
+                        $hasFrontRoutes = $item['has_front_routes'] ?? false;
+
+                        if (! $hasFrontRoutes) {
+                            continue;
+                        }
+
                         $isSingleton = $module->isSingleton($item['name']);
 
                         if (isset($item['name'])) { // && getStringOrFalse($item['name'])
@@ -557,17 +566,22 @@ class RouteServiceProvider extends ServiceProvider
                 // 'bulkPublish',
                 // 'browser',
                 // 'feature',
-                // 'bulkFeature',
-                'tags',
-                'tagsUpdate',
                 // 'preview',
+                // 'bulkFeature',
+                // 'restoreRevision',
+
                 'restore',
                 'bulkRestore',
                 'forceDelete',
                 'bulkForceDelete',
                 'bulkDelete',
-                // 'restoreRevision',
                 'duplicate',
+
+                'tags',
+                'tagsUpdate',
+
+                'assignments',
+                'createAssignment',
             ];
 
             $controllerClass = "{$routeName}Controller";
@@ -593,6 +607,14 @@ class RouteServiceProvider extends ServiceProvider
                     'uses' => "{$controllerClass}@{$customRoute}",
                 ];
 
+                if ($customRoute === 'assignments') {
+                    Route::get("{$url}/{{$snakeCase}}/assignments", $mapping);
+                }
+
+                if ($customRoute === 'createAssignment') {
+                    Route::post("{$url}/{{$snakeCase}}/assignments", $mapping);
+                }
+
                 if (in_array($customRoute, ['browser', 'tags'])) {
                     Route::get($routeSlug, $mapping);
                 }
@@ -610,6 +632,7 @@ class RouteServiceProvider extends ServiceProvider
                         'tagsUpdate',
                     ])
                 ) {
+
                     Route::put($routeSlug, $mapping);
                 }
 
@@ -631,6 +654,7 @@ class RouteServiceProvider extends ServiceProvider
                         'bulkForceDelete',
                     ])
                 ) {
+
                     Route::post($routeSlug, $mapping);
                 }
 

@@ -66,16 +66,6 @@ export default function useModule (props, context) {
     elements: props.items,
     searchPlaceholder: t("Type to Search"),
     searchModel: '',
-    searchModel_: computed({
-      get () {
-        return ''
-      },
-      set (val) {
-        __log('setter')
-        // store.commit(DATATABLE.UPDATE_DATATABLE_SEARCH, val)
-        // store.dispatch(ACTIONS.GET_DATATABLE)
-      }
-    }),
   })
 
   const methods = reactive({

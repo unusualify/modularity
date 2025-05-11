@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Hydrates\Inputs;
 
-use Spatie\Permission\Models\Role;
 use Unusualify\Modularity\Facades\Modularity;
 
 class AuthorizeHydrate extends InputHydrate
@@ -46,14 +45,14 @@ class AuthorizeHydrate extends InputHydrate
             if (in_array('Unusualify\Modularity\Entities\Traits\HasAuthorizable', class_uses_recursive($selfModel))) {
                 $selfModel = new $selfModel;
                 $authorizedModel = $selfModel->getAuthorizedModel();
-                $input['items'] = $selfModel::all();
+                // $input['items'] = $selfModel::all();
             }
         } elseif (isset($input['routeName'])) {
             $selfModel = $this->module->getRouteClass($input['routeName'], 'model');
             if (in_array('Unusualify\Modularity\Entities\Traits\HasAuthorizable', class_uses_recursive($selfModel))) {
                 $selfModel = new $selfModel;
                 $authorizedModel = $selfModel->getAuthorizedModel();
-                $input['items'] = $selfModel::all();
+                // $input['items'] = $selfModel::all();
             }
         }
 
@@ -61,11 +60,17 @@ class AuthorizeHydrate extends InputHydrate
             $q = $authorizedModel::query();
 
             if (isset($input['scopeRole'])) {
-                $roles = Role::whereIn('name', $input['scopeRole'])->get('name');
-                $q->role($roles->map(fn ($role) => $role->name)->toArray());
+                if (in_array('Spatie\Permission\Traits\HasRoles', class_uses_recursive($authorizedModel))) {
+                    $roleModel = config('permission.models.role');
+                    $existingRoles = $roleModel::whereIn('name', $input['scopeRole'])->get();
+                    $q->role($existingRoles->map(fn ($role) => $role->name)->toArray());
+                }
             }
 
-            $input['items'] = $q->get(['id', 'name']);
+            $input['items'] = ! $this->skipQueries
+                ? $q->get(['id', 'name'])
+                : [];
+
             $input['noRecords'] = true;
         }
 

@@ -40,6 +40,7 @@ class NavigationMiddleware
             // );
             if (Auth::guest()) {
                 $navigation['sidebar'] = array_values(config(modularityBaseKey() . '-navigation.sidebar.guest'));
+                $navigation['profileMenu'] = array_values(app()->config->get(modularityBaseKey() . '.ui_settings.profileMenu.guest', default: []));
                 // $navigation['profileMenu'] = array_values( app()->config->get(modularityBaseKey(). '.ui_settings.profileMenu.client' ,default: []));
 
             } else {

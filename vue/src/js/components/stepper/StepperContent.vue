@@ -1,6 +1,6 @@
 <template>
   <v-sheet-rounded class="ue-stepper-form__body d-flex w-100 flex-column justify-space-between elevation-2">
-    <v-stepper-window class="fill-height overflow-y-auto px-6" style="max-height: 80vh;">
+    <v-stepper-window id="ue-stepper-content-window" class="fill-height overflow-y-auto px-6" style="max-height: 80vh;">
       <!-- Form steps -->
       <v-stepper-window-item
         v-for="(form, i) in forms"
@@ -86,21 +86,17 @@
     computed: {
       inputModels: {
         get () {
-          // __log('StepperContent inputModels get', this.modelValue)
           return this.modelValue
         },
         set (newVal, oldVal) {
-          // __log('StepperContent inputModels set', newVal, oldVal)
           // this.$emit('update:modelValue', newVal)
         }
       },
       inputSchemas: {
         get () {
-          // __log('StepperContent inputSchemas get', this.schemas)
           return this.schemas
         },
         set (newVal, oldVal) {
-          // __log('StepperContent inputSchemas set', newVal, oldVal)
           if (!isEqual(newVal, oldVal)) {
             // this.$emit('update:schemas', newVal)
           }
@@ -109,7 +105,6 @@
     },
     methods: {
       updateFormModel (newVal, index) {
-        // __log('StepperContent updateFormModel', newVal, index)
         this.models.splice(index, 1, newVal)
         // this.$emit('update:modelValue', [...this.models])
 
@@ -138,29 +133,11 @@
         },
         deep: true
       },
-      modelValue_: {
-        handler(newVal) {
-          __log('StepperContent modelValue watch', newVal, this.inputModels)
-          if (newVal !== this.inputModels) {
-            this.inputModels = newVal
-          }
-        },
-        deep: true
-      },
 
       schemas: {
         handler(newVal) {
           if (!isEqual(newVal, this.localSchemas)) {
             this.localSchemas = cloneDeep(newVal)
-          }
-        },
-        deep: true
-      },
-      schemas_: {
-        handler(newVal) {
-          // __log('StepperContent schemas watch', newVal, this.inputSchemas)
-          if (newVal !== this.inputSchemas) {
-            this.inputSchemas = newVal
           }
         },
         deep: true

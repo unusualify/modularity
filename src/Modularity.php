@@ -152,7 +152,7 @@ class Modularity extends FileRepository
         }
 
         if ($resetCache) {
-            dd($modules);
+            // dd($modules);
 
             return $this->scan();
         }
@@ -186,6 +186,14 @@ class Modularity extends FileRepository
         }
 
         return $modules;
+    }
+
+    /**
+     * Check if a module exists.
+     */
+    public function hasModule(string $moduleName): bool
+    {
+        return $this->has($moduleName);
     }
 
     /**

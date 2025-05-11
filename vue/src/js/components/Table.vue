@@ -1,6 +1,6 @@
 <template>
-  <!-- <v-layout fluid v-resize="onResize"> -->
-    <div :class="['ue-datatable__container', noFullScreen ? '' : 'fill-height ue-datatable--full-screen_' ]">
+  <v-layout fluid v-resize="onResize" :class="[noFullScreen ? 'h-100' : '']">
+    <div :class="['ue-datatable__container', noFullScreen ? 'fill-height' : 'fill-heigh ue-datatable--full-screen' ]">
       <ActiveTableItem
         class=""
         v-model="activeTableItem"
@@ -12,10 +12,8 @@
       </ActiveTableItem>
       <v-data-table-server
         v-if="!hideTable"
-        v-bind="{...$bindAttributes(), ...footerProps}"
         :class="[
-          'px-4',
-          noFullScreen ? '' : 'h-100',
+          'px-4 h-100',
           tableClasses,
           fullWidthWrapper ? '' : 'ue-table--narrow-wrapper',
           striped ? 'ue-datatable--striped' : '',
@@ -26,6 +24,7 @@
         id="ue-table"
 
         :headers="selectedHeaders"
+        :fixed-header="fixedHeader"
 
         :sticky="sticky"
         :items="elements"
@@ -35,11 +34,11 @@
         :search="options.search"
         :page="options.page"
 
-        :items-length="totalElements"
+        :items-length="totalNumberOfElements"
         :item-title="titleKey"
         ref="datatable"
 
-        :height="windowSize.y - 64 - 24 - 59 - 36"
+        :height="windowSize.y - 64 - 24 - 59 - 76 - ($vuetify.display.mdAndDown ? 80 : 0)"
 
         :hide-default-header="hideHeaders"
         :multi-sort="multiSort"
@@ -61,7 +60,7 @@
           <v-toolbar
             v-bind="toolbarOptions"
             :class="[
-              'pt-1',
+              'pt-3',
             ]"
           >
             <!-- table title -->
@@ -95,9 +94,11 @@
             <!-- table controls -->
             <v-slide-x-transition :group="true">
               <div
+                key='table-controls'
                 :class="[
                   'd-flex',
-                  controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'justify-end flex-grow-1',
+                  controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'flex-grow-1',
+
 
                 ]"
               >
@@ -105,7 +106,7 @@
                   <!-- bulk actions -->
                   <template v-for="(action, k) in bulkActions" :key="k">
                     <v-btn
-                      v-if="can(action.name)"
+                      v-if="$can(action.name, permissionName)"
                       v-bind="filterBtnOptions"
                       :append-icon="false"
                       :prepend-icon="(action.icon ? action.icon : `$${action.name}`)"
@@ -119,14 +120,14 @@
                 <template v-else>
                   <!-- search field -->
                   <v-text-field
-                    v-if="!hideSearchField"
-                    v-model="search"
+                    v-if="!hideSearchField && hasSearchableHeader"
+                    v-model="searchModel"
                     variant="outlined"
-                    append-inner-icon="mdi-magnify"
+                    :append-inner-iconx="searchModel !== search ? 'mdi-magnify' : null"
                     hide-details
                     density="compact"
                     single-line
-                    :placeholder="searchText"
+                    :placeholder="searchPlaceholder"
                     :class="[
                       'mr-2',
                       controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'flex-grow-1' : ''
@@ -136,32 +137,106 @@
                       // controlsPosition === 'top' || $vuetify.display.smAndDown ? 'max-width: 300px' : '',
                       'min-width: 100px'
                     ]"
-                  />
+                    @click:append-inner="searchItems"
+                    :disabled="loading"
+                    @keydown.enter="searchItems"
+                  >
+                    <template #append-inner>
+                      <v-btn :disabled="searchModel === search" icon="mdi-magnify" variant="plain" size="compact" color="grey-darken-5" rounded @click="searchItems()" />
+                    </template>
+                  </v-text-field>
 
                   <!-- <v-spacer v-else-if="hideSearchField"></v-spacer> -->
+                  <v-spacer v-if="$vuetify.display.mdAndUp"></v-spacer>
 
-                  <!-- filter button -->
-                  <v-btn v-if="mainFilters.length > 0"
-                    id="filter-btn-activator"
-                    v-bind="{...filterBtnOptions, ...filterBtnTitle}"
-                    :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
-                    :text="$vuetify.display.smAndDown ? null : filterBtnTitle['text']"
-                    :prepend-icon="$vuetify.display.smAndDown ? null : filterBtnOptions['prepend-icon']"
-                    :density="$vuetify.display.smAndDown ? 'compact' : (filterBtnOptions['density'] ?? 'comfortable')"
-                  />
+                  <TableActions
+                    :actions="actions"
+                  >
+                    <template #prepend>
+                      <!-- filter menu -->
+                      <v-menu>
+                        <template v-slot:activator="{ props }">
+                          <!-- filter button -->
+                          <v-btn v-if="mainFilters.length > 0"
+                            id="filter-btn-activator"
+                            v-bind="{...filterBtnOptions, ...filterBtnTitle, ...props}"
+                            :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
+                            :Xtext="$vuetify.display.smAndDown ? null : filterBtnTitle['text']"
+                            :text="filterBtnTitle['text']"
+                            :prepend-icon="$vuetify.display.smAndDown ? null : filterBtnOptions['prepend-icon']"
+                            :block="$vuetify.display.smAndUp ? false : (filterBtnOptions['block'] ?? false)"
+                            :density="$vuetify.display.smAndDown ? 'compact' : (filterBtnOptions['density'] ?? 'comfortable')"
 
-                  <!-- advanced filter button -->
-                  <v-btn v-if="Object.keys(advancedFilters).length > 0"
-                    id="advanced-filter-btn"
-                    v-bind="{...filterBtnOptions, ...filterBtnTitle}"
-                    :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
-                    :text="$vuetify.display.smAndDown ? null : 'Advanced Filter'"
-                    :prepend-icon="$vuetify.display.smAndDown ? null : filterBtnOptions['prepend-icon']"
-                    :density="$vuetify.display.smAndDown ? 'compact' : (filterBtnOptions['density'] ?? 'comfortable')"
-                  />
+                          />
+                        </template>
+                        <v-list>
+                          <v-list-item
+                            v-for="(filter, index) in mainFilters"
+                            :key="index"
+                            v-on:click.prevent="changeFilter(filter.slug)"
+                            :class="[
+                              filter.slug === activeFilterSlug ? 'bg-primary' : ''
+                            ]"
+                          >
+                            <v-list-item-title>{{ filter.name + '(' + filter.number+ ')' }} </v-list-item-title>
+                          </v-list-item>
+                        </v-list>
+                      </v-menu>
+
+
+                      <!-- advanced filter menu -->
+                      <v-menu
+                        :close-on-content-click="false"
+                        location="end"
+                      >
+                        <template v-slot:activator="{ props }">
+                          <!-- advanced filter button -->
+                          <v-btn v-if="Object.keys(advancedFilters).length > 0"
+                            id="advanced-filter-btn"
+                            v-bind="{...filterBtnOptions, ...filterBtnTitle, ...props}"
+                            :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
+                            :text="$vuetify.display.smAndDown ? null : 'Advanced Filter'"
+                            :prepend-icon="$vuetify.display.smAndDown ? null : filterBtnOptions['prepend-icon']"
+                            :block="$vuetify.display.mdAndUp ? false : (filterBtnOptions['block'] ?? false)"
+                            :density="$vuetify.display.smAndDown ? 'compact' : (filterBtnOptions['density'] ?? 'comfortable')"
+                          />
+                        </template>
+                        <v-card
+                          title="Advanced Filter"
+                          min-width="40vw"
+                          max-width="50vw"
+                        >
+                          <v-card-text>
+                            <template v-for="(filters, index) in advancedFilters" :key="index">
+                              <component v-for="(filter, ind) in filters"
+                                :is="`v-${filter.type}`"
+                                v-bind="filter.componentOptions"
+                                v-model="filter['selecteds']"
+                              />
+                            </template>
+                          </v-card-text>
+                          <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                              text="Clear"
+                              variant="plain"
+                              @click="resetAdvancedFilter"
+                            ></v-btn>
+
+                            <v-btn
+                              color="primary"
+                              text="Save"
+                              variant="tonal"
+                              @click="changeAdvancedFilter"
+                            ></v-btn>
+                          </v-card-actions>
+                        </v-card>
+                      </v-menu>
+                    </template>
+                  </TableActions>
 
                   <!-- create button -->
-                  <v-btn v-if="can('create') && !noForm && !someSelected && createOnModal"
+                  <v-btn v-if="$can('create', permissionName) && !noForm && !someSelected && createOnModal"
                     v-bind="addBtnOptions"
                     @click="createForm"
                     :icon="$vuetify.display.smAndDown ? addBtnOptions['prepend-icon'] : null"
@@ -174,111 +249,108 @@
             </v-slide-x-transition>
           </v-toolbar>
 
-          <v-divider v-if="controlsPosition === 'top' && $vuetify.display.mdAndUp" class="mb-4 mt-2"></v-divider>
+          <!-- Loading Progress Bar and Divider -->
+          <v-progress-linear
+            v-if="hideHeaders && loading"
+            class="w-100 mb-4 mt-2"
+            color="success"
+            indeterminate
+            reverse
+          ></v-progress-linear>
+          <v-divider v-else-if="controlsPosition === 'top' && $vuetify.display.mdAndUp" class="mb-4 mt-2"></v-divider>
 
-          <!-- filter menu -->
-          <v-menu
-            activator="#filter-btn-activator"
-            >
-              <v-list>
-                <v-list-item
-                  v-for="(filter, index) in mainFilters"
-                  :key="index"
-                  v-on:click.prevent="filterStatus(filter.slug)"
-                >
-                  <v-list-item-title>{{ filter.name + '(' + filter.number+ ')' }} </v-list-item-title>
-                </v-list-item>
-              </v-list>
-          </v-menu>
-
-          <!-- advanced filter menu -->
-          <v-menu
-            activator="#advanced-filter-btn"
-            :close-on-content-click="false"
-            :location="end"
-
-          >
-            <v-card
-              title="Advanced Filter"
-              min-width="40vw"
-              max-width="50vw"
-            >
-              <v-card-text>
-                <template v-for="(filters, index) in advancedFilters" :key="index">
-                  <component v-for="(filter, ind) in filters"
-                    :is="`v-${filter.type}`"
-                    v-bind="filter.componentOptions"
-                    v-model="filter['selecteds']"
-                  />
-                </template>
-              </v-card-text>
-              <!-- <v-row class="justify-center" no-gutters>
-                <v-col
-                  cols="11"
-                  :key="index"
-                  v-for="(filters, index) in advancedFilters"
-                >
-                  <component v-for="(filter, ind) in filters"
-                    :is="`v-${filter.type}`"
-                    v-bind="filter.componentOptions"
-                    v-model="filter['selecteds']"
-                  />
-                </v-col>
-              </v-row> -->
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                  text="Clear"
-                  variant="plain"
-                  @click="clearAdvancedFilter"
-                ></v-btn>
-
-                <v-btn
-                  color="primary"
-                  text="Save"
-                  variant="tonal"
-                  @click="submitAdvancedFilter"
-                ></v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-menu>
 
           <!-- form modal -->
-          <ue-modal
+          <ue-modal v-if="!embeddedForm"
             ref="formModal"
             v-model="formActive"
-            scrollablex
+
             transition="dialog-bottom-transition"
+            :fullscreen="false"
             width-type="lg"
-            v-if="!embeddedForm"
+            v-bind="formModalAttributes"
           >
-            <template v-slot:body="props">
+            <template v-slot:body="formModalBodyScope">
               <v-card class="fill-height d-flex flex-column">
                 <!-- <v-card-title class="text-h5 grey lighten-2"> </v-card-title> -->
                 <ue-form
-                  ref="form"
-                  :title="formTitle"
-                  :isEditing="editedIndex > -1"
+                  ref="UeForm"
+
+                  form-class="px-6 pt-6 pb-0"
                   fill-height
                   scrollable
                   has-divider
                   no-default-form-padding
-                  form-class="px-6 pt-6 pb-0"
-                  style="height: 70vh !important;"
+                  v-bind="formAttributes"
+
+                  :title="formTitle"
+                  :isEditing="editedIndex > -1"
+                  :style="formModalBodyScope.isFullActive ? 'height: 90vh !important;' : 'height: 70vh !important;'"
                   :actions="formActions"
                   @action-complete="handleFormActionComplete"
                 >
-                  <template v-slot:headerRight>
-                    <v-btn variant="plain" icon="$close" density="compact" color="grey-darken-5" rounded
-                      @click="closeForm()"
-                    ></v-btn>
+
+                  <template v-slot:header.left="headerLeftScope">
+                    <slot name="form.header.left" v-bind="headerLeftScope">
+                      {{ headerLeftScope.title }}
+                    </slot>
                   </template>
 
-                  <template v-slot:top="formTopScope">
-                    <slot name="form-top" v-bind="formTopScope">
+                  <template v-slot:header.right>
+                    <slot name="form.header.right">
+                      <v-btn :icon="formModalBodyScope.isFullActive ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="compact" @click="formModalBodyScope.toggleFullscreen()"/>
+                      <v-btn icon="$close" variant="plain" size="compact" color="grey-darken-5" rounded @click="closeForm()" />
+                    </slot>
+                  </template>
+
+                  <template v-if="$slots['form.top']" v-slot:top="topScope">
+                    <slot name="form.top" v-bind="topScope">
 
                     </slot>
                   </template>
+
+                  <template v-if="$slots['form.bottom']" v-slot:bottom="bottomScope">
+                    <slot name="form.bottom" v-bind="bottomScope">
+
+                    </slot>
+                  </template>
+
+
+                  <template v-if="$slots['form.right.top']" v-slot:right.top="rightScope">
+                    <slot name="form.right.top" v-bind="rightScope">
+
+                    </slot>
+                  </template>
+                  <template v-if="$slots['form.right.middle']" v-slot:right.middle="rightScope">
+                    <slot name="form.right.middle" v-bind="rightScope">
+
+                    </slot>
+                  </template>
+                  <template v-if="$slots['form.right.bottom']" v-slot:right.bottom="rightScope">
+                    <slot name="form.right.bottom" v-bind="rightScope">
+
+                    </slot>
+                  </template>
+
+                  <template v-slot:top="formTopScope">
+                    <slot name="form.top" v-bind="formTopScope">
+
+                    </slot>
+                  </template>
+
+
+                  <template v-if="$slots['form.actions.prepend']" v-slot:actions.prepend="actionsScope">
+                    <slot name="form.actions.prepend" v-bind="actionsScope">
+
+                    </slot>
+                  </template>
+
+                  <template v-if="$slots['form.actions.append']" v-slot:actions.append="actionsScope">
+                    <slot name="form.actions.append" v-bind="actionsScope">
+
+                    </slot>
+                  </template>
+
                 </ue-form>
                 <!-- <v-card-text>
                 </v-card-text> -->
@@ -286,12 +358,14 @@
                 <v-divider class="mx-6 mt-4"/>
                 <v-card-actions class="px-6 flex-grow-0">
                   <v-spacer></v-spacer>
-                  <!-- <v-btn-secondary @click="closeForm()"
+                  <v-btn-secondary
+                    v-if="$store.getters.isSuperAdmin"
                     :slim="false"
                     variant="outlined"
+                    @click="$refs.UeForm.validate()"
                   >
-                    {{ props.textCancel }}
-                  </v-btn-secondary> -->
+                    {{ $t('Validate') }}
+                  </v-btn-secondary>
                   <v-btn-primary
                     :slim="false"
                     variant="elevated"
@@ -319,10 +393,15 @@
                     ref="form"
                     :isEditing="editedIndex > -1"
                   >
+                    <template v-slot:header.left="headerLeftScope">
+                      <slot name="form.header.left" v-bind="headerLeftScope">
+                        {{ headerLeftScope.title }}
+                      </slot>
+                    </template>
                     <template v-slot:headerCenter>
 
                     </template>
-                    <template v-slot:headerRight>
+                    <template v-slot:header.right>
                       <v-btn class="" variant="text" icon="$close" density="compact"
                         @click="closeForm()"
                       ></v-btn>
@@ -332,65 +411,24 @@
               </v-expand-transition>
             </div>
 
-            <!-- custom modal -->
-            <ue-modal
-              ref="customModal"
-              v-model="customModalActive"
-              :transition="modals[activeModal] || 'dialog-bottom-transition'"
-              :width-type="modals[activeModal].widthType || 'sm'"
-              :persistent="modals[activeModal].persistent"
-              :description-text="modals[activeModal].content"
-            >
-              <template #body="props">
-                <v-card>
-                  <v-card-title class="text-h5 text-center" style="word-break: break-word;"
-                    v-if="modals[activeModal].title">
-                    <!-- {{ modal.title }} -->
-                  </v-card-title>
-                  <v-icon
-                    v-if="modals[activeModal].img"
-                    :icon="modals[activeModal].icon"
-                    style="margin:auto; border:4px solid;border-radius:50%;padding:32px;"
-                    size="32"
-                    :color="modals[activeModal].color"/>
+            <!-- dialog modal -->
+            <ue-modal v-model="modals['dialog'].active"
+              :ref="modals['dialog'].ref"
+              :transition="'dialog-bottom-transition'"
+              :width-type="'sm'"
 
-                  <v-card-text class="text-center" style="word-break: break-word;">
-                    {{ modals[activeModal].content }}
-                  </v-card-text>
-                  <v-divider />
-                  <v-card-actions>
-                    <v-spacer />
-                    <v-btn
-                      v-if="modals[activeModal].hideModalCancel"
-                      :color="modals[activeModal].color ? modals[activeModal].color : 'blue'"
-                      text
-                      @click="modals[activeModal].closeAction()"
-                    >
-                      {{ modals[activeModal].cancelText || props.textCancel }}
-                    </v-btn>
-                    <!-- <v-btn color="blue" text @click="handleModal('confirm', modal.ref, props.onConfirm)"></v-btn> -->
-                    <v-btn
-                      :color="modals[activeModal].color ? modals[activeModal].color : 'blue'"
-                      text
-                      @click="modals[activeModal].confirmAction()"
-                    >
-                      {{ modals[activeModal].confirmText || props.textConfirm }}
-                    </v-btn>
-                    <v-spacer />
-                  </v-card-actions>
-                </v-card>
-              </template>
+              v-bind="modals['dialog'].modalAttributes ?? {}"
+            >
             </ue-modal>
 
             <!-- show modal -->
-            <ue-modal
-              v-if="modals['show'].active"
+            <ue-modal v-if="modals['show'].active"
               :ref="modals['show'].ref"
               v-model="modals['show'].active"
               :transition="modals['show'].transition || 'dialog-bottom-transition'"
               :width-type="modals['show'].widthType || 'lg'"
               :persistent="modals['show'].persistent"
-              :description-text="modals['show'].description"
+              :description="modals['show'].description"
             >
               <template v-slot:body="props">
                 <v-card class="fill-height d-flex flex-column">
@@ -432,14 +470,14 @@
             </ue-modal>
 
             <!-- custom form modal -->
-            <ue-modal
+            <ue-modal v-model="customFormModalActive"
               ref="customFormModal"
-              v-model="customFormModalActive"
               :width-type="'lg'"
+              persistent
             >
-            <!-- <slot name="systembar">
-              test
-            </slot> -->
+              <!-- <slot name="systembar">
+                test
+              </slot> -->
               <ue-form
                 ref="customForm"
                 v-model="customFormModel"
@@ -451,7 +489,7 @@
                 form-class="px-6 pb-0"
                 style="height: 90vh !important;"
               >
-                <template v-slot:headerRight>
+                <template v-slot:header.right>
                   <v-btn class="ml-auto" variant="text" icon="$close" density="compact" color="deafult"
                     @click="customFormModalActive = false"
                   ></v-btn>
@@ -479,14 +517,12 @@
                 :headers="headers"
                 :rowActions = "rowActions"
                 @click-action="itemAction"
-                @edit-item = "editItem"
               >
 
                 <template v-slot:actions>
                   <div>
                     <div class="d-flex flex-wrap ga-2 justify-sm-end ml-n2 ml-md-0">
                       <template v-for="(action, k) in rowActions" :key="k">
-                        <!-- {{ $log(action) }} -->
                         <v-tooltip
                           v-if="itemHasAction(element, action)"
                           :text="$t( action.label ?? $headline(action.name) )"
@@ -518,14 +554,13 @@
         </template>
 
         <!-- MARK PAGINATION BUTTONS -->
-
         <template v-if="enableCustomFooter" v-slot:bottom="{page, pageCount}">
           <div class="d-flex justify-end">
             <v-pagination
-            v-model="options.page"
-            :length="pageCount"
-            v-bind="footerProps"
-          />
+              v-model="options.page"
+              :length="pageCount"
+              v-bind="footerProps"
+            />
           </div>
         </template>
 
@@ -555,7 +590,7 @@
                 <v-btn
                   :key="i"
                   v-bind="props"
-                  class="pa-0 justify-start text-capitalize"
+                  class="pa-0 justify-start text-none"
                   variant="plain"
                   :color="`primary darken-1`"
                   @click="itemAction(item, ...col.formatter)"
@@ -569,7 +604,6 @@
             </v-tooltip>
           </template>
           <template v-else-if="col.formatter == 'switch'">
-            <!-- {{ $log('switch', item, col.key) }} -->
             <v-switch
               :key="i"
               :model-value="item[col.key]"
@@ -591,7 +625,7 @@
           </template>
           <template v-else>
             <ue-recursive-stuff
-              v-bind="handleFormatter(col.formatter, window.__shorten(item[col.key], cellOptions.maxChars))"
+              v-bind="handleFormatter(col.formatter, window.__shorten(item[col.key] ?? '', cellOptions.maxChars))"
               :key="item[col.key]"
             />
           </template>
@@ -621,11 +655,11 @@
               <v-card-title>
                 <v-list class="">
                   <template v-for="(item, index) in headersModel" :key="index">
-                    <v-checkbox
-                      class="ml-n2"
-                      v-if="item.key !== 'actions'"
-                      :disabled="headersModel.filter(h => h.key !== 'actions' && h.visible === true).length < 2 && headersModel[index].visible === true"
+                    <v-checkbox v-if="item.key !== 'actions'"
                       v-model="headersModel[index].visible"
+                      color="primary"
+                      class="ml-n2"
+                      :disabled="headersModel.filter(h => h.key !== 'actions' && h.visible === true).length < 2 && headersModel[index].visible === true"
                       :label="item.title"
                       hide-details
                       density="comfortable"
@@ -755,27 +789,32 @@
 
       </v-data-table-server>
     </div>
-  <!-- </v-layout> -->
+  </v-layout>
 </template>
 
 <script>
 import Draggable from 'vuedraggable'
 import { VDataTableRows } from 'vuetify/lib/components/VDataTable/index.mjs'
 import { VDataTableRow } from 'vuetify/lib/components/VDataTable/index.mjs'
+import TableActions from '__components/table/TableActions.vue'
 
 import {
-  makeTableNamesProps,
-  makeTableEndpointsProps,
-  makeTableHeadersProps,
-  makeTableFormsProps,
-  makeTableFiltersProps,
-  makeTableItemActionsProps,
   makeTableProps,
   makeDraggableProps,
   makeFormatterProps,
   useTable,
   useDraggable,
 } from '@/hooks'
+
+import {
+  makeTableNamesProps,
+  makeTableFiltersProps,
+  makeTableHeadersProps,
+  makeTableFormsProps,
+  makeTableItemActionsProps,
+  makeTableActionsProps,
+  makeTableModalsProps,
+} from '@/hooks/table'
 
 import ActiveTableItem from '__components/labs/ActiveTableItem.vue'
 import PaymentService from './inputs/PaymentService.vue'
@@ -788,16 +827,18 @@ export default {
     ActiveTableItem,
     Draggable,
     VDataTableRow,
-    PaymentService
+    PaymentService,
+    TableActions
 
   },
   props: {
     ...makeTableNamesProps(),
-    ...makeTableEndpointsProps(),
     ...makeTableFiltersProps(),
     ...makeTableHeadersProps(),
     ...makeTableFormsProps(),
     ...makeTableItemActionsProps(),
+    ...makeTableActionsProps(),
+    ...makeTableModalsProps(),
     ...makeTableProps(),
     ...makeDraggableProps(),
     ...ignoreFormatters
@@ -821,20 +862,11 @@ export default {
         this.datatable = this.$refs.datatable;
       }
     });
-    // __log(
-    //   // this.$props,
-    //   // _.omit(this.$props ?? {}, ['columns']),
-    //   // this.$lodash.pick(this.$props ?? {}, ['name', 'fullWidthWrapper']),
-    //   Object.values(this.$lodash.omitBy(this.headers, 'actions'))
-    // )
+
+    this.initialize()
   },
   created () {
-    // this.$can(this.rowActions[0].can ?? '')
 
-    // const store = useStore();
-    // if(store._state.data.datatable.customModal){
-    //   __removeQueryParams(['customModal[description]', 'customModal[color]']);
-    // }
   },
   methods: {
   },
@@ -843,48 +875,48 @@ export default {
 </script>
 
 <style lang="sass">
-.ue-datatable__container
-  width: 100%
+  .ue-datatable__container
+    width: 100%
 
-  &.ue-datatable--full-screen
-    min-height: calc(100vh - (2*12 * $spacer))
+    // &.ue-datatable--full-screen
+    //   height: calc(100vh - (2*8 * $spacer))
 
-.v-table
-  &.ue-datatable
-    &--bottom-controls
-      .v-toolbar__content
-        display: block
-        height: unset !important
+  .v-table
+    &.ue-datatable
+      &--bottom-controls
+        .v-toolbar__content
+          display: block
+          height: unset !important
 
-    &--no-border-row
-      .v-table__wrapper
-        > table
-          > tbody
-            > tr:not(:last-child)
-              > td,
-              > th
-                border: none!important
+      &--no-border-row
+        .v-table__wrapper
+          > table
+            > tbody
+              > tr:not(:last-child)
+                > td,
+                > th
+                  border: none!important
 
-    &--rounded-row
-      th
-        background-color: var(--table-header-color) //TODO: table action border must be variable
-      tr
-        // &:first-child
-        td,th
-          &:first-child
-            border-bottom-left-radius: 8px
-            border-top-left-radius: 8px
+      &--rounded-row
+        th
+          background: rgb(var(--v-theme-grey-lighten-5)) !important //TODO: table action border must be variable
+        tr
+          // &:first-child
+          td,th
+            &:first-child
+              border-bottom-left-radius: 8px
+              border-top-left-radius: 8px
 
-          &:last-child
-            border-bottom-right-radius: 8px
-            border-top-right-radius: 8px
+            &:last-child
+              border-bottom-right-radius: 8px
+              border-top-right-radius: 8px
 
-    &--striped
-      tr
-        &:nth-of-type(2n)
-          background-color: rgba(140,160,167, .2) //TODO: table action border must be variable
+      &--striped
+        tr
+          &:nth-of-type(2n)
+            background-color: rgb(var(--v-theme-grey-lighten-6)) //TODO: table action border must be variable
 
-  .action-dropdown
-    .v-overlay__content
-      border: 1px solid #49454F !important //TODO: table action border must be variable
+    .action-dropdown
+      .v-overlay__content
+        border: 1px solid #49454F !important //TODO: table action border must be variable
 </style>

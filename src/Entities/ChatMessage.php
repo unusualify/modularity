@@ -3,12 +3,17 @@
 namespace Unusualify\Modularity\Entities;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Unusualify\Modularity\Entities\Scopes\ChatMessageScopes;
 use Unusualify\Modularity\Entities\Traits\HasCreator;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
 
 class ChatMessage extends Model
 {
-    use HasCreator, HasFileponds;
+    use HasCreator,
+        HasFileponds,
+        ChatMessageScopes;
+
+    protected static $abortCreatorRoleExceptions = true;
 
     /**
      * The attributes that are mass assignable.
@@ -17,6 +22,12 @@ class ChatMessage extends Model
      */
     protected $fillable = [
         'content',
+        'is_read',
+        'is_starred',
+        'is_pinned',
+        'is_sent',
+        'is_received',
+        'edited_at',
     ];
 
     /**
@@ -27,27 +38,32 @@ class ChatMessage extends Model
     protected $appends = ['user_profile', 'attachments'];
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'is_read' => 'boolean',
+        'is_starred' => 'boolean',
+        'is_pinned' => 'boolean',
+        'is_sent' => 'boolean',
+        'is_received' => 'boolean',
+        'edited_at' => 'datetime',
+    ];
+
+    /**
      * Perform any actions when booting the trait
      */
     public static function booted(): void
     {
-        // static::retrieved(function (Model $model) {
-        //     // dd('retrieved', $model->chatMessages);
-        //     dd(
-        //         $model->user,
-        //         get_user_profile($model->user)
-        //     );
-        //     $model->setAttribute('_chat_id', $model->chat->id);
-        //     $model->setAttribute('_chat_id', $model->chat->id);
-        // });
 
-        // static::creating(function (Model $model) {
-        //     // dd('creating', $model);
-        // });
-
-        // static::created(function (Model $model) {
-        //     $model->chat()->create();
-        // });
+        static::updated(function (Model $model) {
+            if ($model->isDirty('is_pinned') && $model->is_pinned) {
+                $model->chat->messages()->where('id', '!=', $model->id)->update([
+                    'is_pinned' => 0,
+                ]);
+            }
+        });
     }
 
     public function chat(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -58,7 +74,7 @@ class ChatMessage extends Model
     protected function userProfile(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => get_user_profile($this->creator),
+            get: fn ($value) => $this->creator ? get_user_profile($this->creator) : null,
         );
     }
 

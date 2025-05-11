@@ -255,19 +255,86 @@ class FilepondManager
         //     })->toArray();
     }
 
-    public function getEncodedFile($folder)
+    /**
+     * Get file information for a given Filepond entity
+     *
+     * @param Filepond $filepond The Filepond entity to get information for
+     * @return array The file information
+     */
+    public function getFileInfo($uuid)
     {
+        $storageFile = $this->getStorageFile($uuid);
 
-        try {
-            $path = Storage::files($this->file_path . '/' . $folder)[0];
-            // dd(Storage::path($path));
+        // $fileSize = Storage::disk('local')->size($storagePath);
+        // $mimeType = Storage::disk('local')->mimeType($storagePath);
+        // $extension = pathinfo($filepond->file_name, PATHINFO_EXTENSION);
+        // $lastModified = Storage::disk('local')->lastModified($storagePath);
 
-            return encodeImagePath(Storage::path($path));
-        } catch (\Throwable $th) {
+        return [
+            'size' => $storageFile ? Storage::size($storageFile) : 0,
+            'type' => $storageFile ? Storage::mimeType($storageFile) : null,
+            'name' => $storageFile ? basename($storageFile) : null,
+            // 'exists' => true,
+            // 'size' => $fileSize,
+            // 'mime_type' => $mimeType,
+            // 'extension' => $extension,
+            // 'last_modified' => $lastModified,
+            // 'size_formatted' => $this->formatFileSize($fileSize),
+            // 'full_path' => storage_path('app/' . $storagePath)
+        ];
+    }
 
-            return '';
+    /**
+     * Format file size to human-readable format
+     *
+     * @param int $bytes
+     * @param int $precision
+     * @return string
+     */
+    private function formatFileSize($bytes, $precision = 2)
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+
+        $bytes /= pow(1024, $pow);
+
+        return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+
+    public function getStoragePath($uuid)
+    {
+        $path = null;
+        if (Storage::exists($this->file_path . '/' . $uuid)) {
+            $path = $this->file_path . '/' . $uuid;
+        } else {
+            $tmp_file = TemporaryFilepond::where('folder_name', $uuid)->first();
+
+            if ($tmp_file) {
+                $path = $this->tmp_file_path . $tmp_file->folder_name . '/' . $tmp_file->file_name;
+            }
         }
 
+        return $path;
+    }
+
+    /**
+     * Get the storage path for a given UUID
+     *
+     * @param string $uuid The UUID of the filepond
+     * @return string The storage path of the filepond
+     */
+    public function getStorageFile($uuid)
+    {
+        $path = $this->getStoragePath($uuid);
+
+        if ($path) {
+            return Storage::files($path)[0];
+        }
+
+        return null;
     }
 
     public function clearFolders()
@@ -316,5 +383,20 @@ class FilepondManager
         }
 
         return $temporaryFileponds;
+    }
+
+    public function getEncodedFile($folder)
+    {
+
+        try {
+            $path = Storage::files($this->file_path . '/' . $folder)[0];
+            // dd(Storage::path($path));
+
+            return encodeImagePath(Storage::path($path));
+        } catch (\Throwable $th) {
+
+            return '';
+        }
+
     }
 }

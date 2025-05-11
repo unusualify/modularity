@@ -12,6 +12,12 @@ class ChatHydrate extends InputHydrate
      */
     public $requirements = [
         'default' => -1,
+        'height' => '40vh',
+        'bodyHeight' => '26vh',
+        'variant' => 'outlined', // ['elevated', 'flat', 'tonal', 'outlined', 'text', 'plain'] https://vuetifyjs.com/en/components/cards/#variants
+        'elevation' => 0,
+        'color' => 'grey-lighten-2',
+        'inputVariant' => 'outlined',
     ];
 
     /**
@@ -33,12 +39,22 @@ class ChatHydrate extends InputHydrate
             'update' => route('admin.chatable.update', ['chat_message' => ':id']),
             'destroy' => route('admin.chatable.destroy', ['chat_message' => ':id']),
             'attachments' => route('admin.chatable.attachments', ['chat' => ':id']),
+            'pinnedMessage' => route('admin.chatable.pinned-message', ['chat' => ':id']),
         ];
 
-        $acceptedFileTypes = $input['accepted-file-types']
-            ?? 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/x-iwork-pages-sffpages';
+        if (isset($input['acceptedExtensions']) && is_array($input['acceptedExtensions'])) {
+            $input['accepted-file-types'] = $this->getAcceptedFileTypes($input['acceptedExtensions']);
+            unset($input['acceptedExtensions']);
+        }
 
-        $maxAttachments = $input['max-attachments'] ?? 2;
+        $filepondAcceptedFileTypes = isset($input['acceptedExtensions']) && is_array($input['acceptedExtensions'])
+            ? $input['acceptedExtensions']
+            : ['pdf', 'doc', 'docx', 'pages'];
+
+        $acceptedFileTypes = $input['accepted-file-types']
+            ?? $this->getAcceptedFileTypes($filepondAcceptedFileTypes);
+
+        $maxAttachments = $input['max-attachments'] ?? 3;
         $input['filepond'] = modularity_format_input([
             'type' => 'filepond',
             'name' => 'attachments',

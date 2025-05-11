@@ -3,8 +3,8 @@
     <!-- <template v-if="title" v-slot:title>
       <span class="font-weight-bold text-primary text-body-1">{{ title }}</span>
     </template> -->
-    <ue-title v-if="title" :text="title" padding="x-4" class="pt-4"/>
-    <div no-gutters class="ue-configurable-card__row">
+    <ue-title v-if="title" :text="title" :color="titleColor" padding="x-4" class="pt-4"/>
+    <div no-gutters class="ue-configurable-card__row" :style="rowStyle">
       <div
         v-for="( segment,  segmentIndex) in itemsWithActions"
         :key="segmentIndex"
@@ -79,6 +79,9 @@
         type: String,
         default: ''
       },
+      titleColor: {
+        type: String,
+      },
       items: {
         type: [Object, Array],
         required: true
@@ -125,6 +128,10 @@
         type: Object,
         default: () => ({}),
         // Example format: { 0: 'd-flex', '_actions': 'd-flex' }
+      },
+      rowMinHeight: {
+        type: String,
+        default: null
       }
     },
     computed: {
@@ -136,7 +143,6 @@
         const result = { ...this.items };
         if (this.actions.length) {
           result['_actions'] = this.actions;
-          // __log(result)
         }
         return result;
       },
@@ -149,6 +155,11 @@
           return itemCount;
         }
         return Math.min(this.maxSegments, itemCount);
+      },
+      rowStyle() {
+        return {
+          ...(this.rowMinHeight ? { minHeight: this.rowMinHeight } : {})
+        }
       }
     },
     methods: {

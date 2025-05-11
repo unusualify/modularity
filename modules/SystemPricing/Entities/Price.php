@@ -2,47 +2,44 @@
 
 namespace Modules\SystemPricing\Entities;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Modules\SystemPayment\Entities\Payment;
+use Modules\SystemPricing\Entities\Mutators\PriceMutators;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 
 class Price extends \Oobook\Priceable\Models\Price
 {
-    use ModelHelpers;
+    use ModelHelpers,
+        PriceMutators;
 
-    protected function vatRateNumber(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => $this->vatRate->rate,
-        );
-    }
+    public static $priceSavingKey = 'price_value';
 
-    protected function currencyISO4217(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => $this->currency->iso_4217,
-        );
-    }
+    protected $casts = [
+        'discount_percentage' => 'double',
+        'valid_from' => 'datetime',
+        'valid_till' => 'datetime',
+    ];
 
-    protected function currencyISO4217Number(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => $this->currency->iso_4217_number,
-        );
-    }
+    protected $appends = [
+        'total_amount',
+    ];
 
-    protected function isPaid(): Attribute
+    /**
+     * For a price we need to make sure we always have
+     * a VAT rate and a Currency. Selecting them everytime
+     * in Nova is a hassle, therefor we set some default
+     * that come from the config.
+     *
+     * @return array Array with default attributes
+     */
+    public function defaultAttributes(): array
     {
-        return new Attribute(
-            get: fn ($value) => $this->payment('COMPLETED')->exists(),
-        );
-    }
+        return [
+            'vat_rate_id' => config('priceable.defaults.vat_rates'),
+            'currency_id' => config('priceable.defaults.currencies'),
+            'price_type_id' => config('priceable.defaults.price_type'),
 
-    protected function isUnpaid(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => ! $this->isPaid,
-        );
+            'discount_percentage' => 0.00,
+        ];
     }
 
     public function vatRate(): \Illuminate\Database\Eloquent\Relations\BelongsTo

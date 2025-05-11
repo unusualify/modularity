@@ -20,3 +20,6 @@ export { default as CONFIG } from './config'
 
 /* user */
 export { default as USER } from './user'
+
+/* cache */
+export { default as CACHE } from './cache'

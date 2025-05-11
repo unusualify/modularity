@@ -11,15 +11,20 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
+use Unusualify\Modularity\Facades\Filepond;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Traits\ManageNames;
 use Unusualify\Modularity\Traits\ManageTraits;
 
 abstract class CoreController extends LaravelController
 {
-    use AuthorizesRequests, DispatchesJobs, ManageNames,
-        ManageTraits,
-        ValidatesRequests;
+    use AuthorizesRequests,
+        DispatchesJobs,
+        ValidatesRequests,
+        ManageNames,
+        ManageTraits;
 
     /**
      * baseKey
@@ -58,6 +63,11 @@ abstract class CoreController extends LaravelController
      */
     protected $repository;
 
+    /**
+     * @var \Unusualify\Modularity\Module
+     */
+    protected $module;
+
     public function __construct(Request $request)
     {
         $this->baseKey = modularityBaseKey();
@@ -65,6 +75,8 @@ abstract class CoreController extends LaravelController
         $this->request = $request;
 
         $this->moduleName = $this->getModuleName();
+        $this->module = Modularity::find($this->moduleName);
+
         $this->namespace = $this->getNamespace();
         $this->routeName = $this->getRouteName();
 
@@ -78,14 +90,21 @@ abstract class CoreController extends LaravelController
      * @param bool $forcePagination
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    protected function getIndexItems($with = [], $scopes = [], $forcePagination = false)
+    protected function getIndexItems($with = [], $scopes = [], $appends = [], $forcePagination = false)
     {
+        $perPage = $this->request->get('itemsPerPage') ?? $this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10;
+
+        if (! $this->request->ajax()) {
+            $perPage = -1;
+        }
+
         return $this->transformIndexItems($this->repository->get(
-            $this->indexWith + $with,
-            $scopes,
-            $this->orderScope(),
-            $this->request->get('itemsPerPage') ?? $this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 50,
-            $forcePagination
+            with: ($this->indexWith ?? []) + $with,
+            scopes: $scopes,
+            orders: $this->orderScope(),
+            perPage: $perPage,
+            forcePagination: $forcePagination,
+            appends: $appends,
         ));
     }
 
@@ -359,5 +378,79 @@ abstract class CoreController extends LaravelController
                 ],
             ], 200);
 
+    }
+
+    public function assignments($id)
+    {
+        $assignments = $this->repository->getAssignments($id);
+
+        return Response::json($assignments);
+    }
+
+    public function createAssignment($id)
+    {
+        if (($status = $this->request->get('status'))) {
+            $assignable = $this->repository->getById($id);
+
+            $assignable->lastAssignment->update([
+                'status' => $status,
+                'completed_at' => $status === 'completed' ? now() : null,
+            ]);
+
+            return Response::json([
+                'location' => 'top',
+                'variant' => MessageStage::SUCCESS,
+                'message' => __('Assignment updated successfully!'),
+                'assignments' => $this->repository->getAssignments($id),
+            ]);
+        }
+
+        if (($attachments = $this->request->get('attachments'))) {
+            $assignable = $this->repository->getById($id);
+
+            $lastAssignment = $assignable->lastAssignment;
+
+            if ($attachments) {
+                Filepond::saveFile($lastAssignment, $attachments, 'attachments');
+            }
+
+            return Response::json([
+                'location' => 'top',
+                'variant' => MessageStage::SUCCESS,
+                'message' => __('Attachments saved successfully!'),
+                'assignments' => $this->repository->getAssignments($id),
+            ]);
+        }
+
+        $this->validate($this->request, [
+            'assignee_id' => 'required|',
+            'assignee_type' => 'required',
+
+            'assignable_id' => 'required',
+            'assignable_type' => 'required',
+
+            // 'title' => 'required',
+            'description' => 'required',
+            'due_at' => 'required|date',
+        ]);
+
+        $assignable = $this->repository->getById($id);
+
+        if ($assignable->lastAssignment && $assignable->lastAssignment->status !== AssignmentStatus::COMPLETED) {
+            $assignable->lastAssignment->update([
+                'status' => AssignmentStatus::CANCELLED,
+            ]);
+        }
+
+        $assignment = $assignable->assignments()->create($this->request->only([
+            'assignee_id',
+            'assignee_type',
+            'due_at',
+            'description',
+        ]));
+
+        $assignment->refresh();
+
+        return Response::json($assignment);
     }
 }

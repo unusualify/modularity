@@ -16,13 +16,13 @@ class UserOauth extends BaseModel
 
     public function __construct(array $attributes = [])
     {
-        $this->table = modularityConfig('users_oauth_table', 'twill_users_oauth');
+        $this->table = modularityConfig('tables.user_oauths', 'um_user_oauths');
 
         parent::__construct($attributes);
     }
 
     public function user()
     {
-        $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

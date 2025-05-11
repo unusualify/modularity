@@ -19,25 +19,27 @@
     </template>
 
     <template v-slot:body="props">
-      <v-card>
-        <!-- <v-card-title class="text-h5 grey lighten-2">
-          Logout Form
-        </v-card-title> -->
-        <v-card-text class="pt-2 text-center">
-          {{ $t('Are you sure logout?') }}
+      <v-card class="text-center">
+        <v-card-title class="">
+          <ue-title type="h5" weight="medium" justify="center" color="primary" padding="t-3">
+            {{ $t('Log Out') }}
+          </ue-title>
+        </v-card-title>
+        <v-card-text>
+          {{ $t('Are you sure you want to logout?') }}
         </v-card-text>
 
-        <v-divider></v-divider>
+        <!-- <v-divider></v-divider> -->
 
         <v-card-actions class="justify-center">
           <!-- <v-spacer></v-spacer> -->
-          <v-btn class="mr-12" variant="tonal" @click="dialog=false">
-            {{ $t('No') }}
+          <v-btn class="" variant="outlined" @click="dialog=false" density="compact">
+            {{ $t('Cancel') }}
           </v-btn>
           <v-form method="post" action="/logout">
             <input type="hidden" name="_token" :value="$csrf()">
-            <v-btn variant="tonal" color="warning" type="submit">
-              {{ $t('Yes') }}
+            <v-btn variant="elevated" type="submit" density="compact">
+              {{ $t('Log Out') }}
             </v-btn>
           </v-form>
         </v-card-actions>

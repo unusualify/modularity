@@ -368,7 +368,7 @@ return [
                             ],
                             [
                                 'title' => 'Status',
-                                'key' => '_status',
+                                'key' => 'state_formatted',
                                 'align' => 'start',
                                 'sortable' => false,
                                 'filterable' => false,
@@ -389,7 +389,7 @@ return [
                                 'type' => 'stateable',
                                 'label' => 'Status',
                                 'createable' => false,
-                                'topEvent' => true,
+                                'isEvent' => true,
                                 'allowedRoles' => ['superadmin', 'admin', 'manager'],
                             ],
                         ],

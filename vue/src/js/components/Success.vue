@@ -60,7 +60,6 @@ export default defineComponent({
     // You can access props directly here if needed
     // Example:
     // const formattedTitle = computed(() => props.title.toUpperCase())
-    // console.log(props.button_text)
     return {
       // Return computed properties or methods if needed
     }

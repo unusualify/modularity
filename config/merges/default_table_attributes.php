@@ -10,7 +10,7 @@ return [
     'rowActionsType' => 'inline',
     'hideDefaultFooter' => false,
     'tableClasses' => 'elevation-2',
-    'itemsPerPage' => 20,
+    'itemsPerPage' => 15,
     'hideHeaders' => false,
     'hideSearchField' => false,
     'multiSort' => false,
@@ -18,12 +18,13 @@ return [
     'tableDensity' => 'compact', // compact, comfortable, null
     // 'tableSubtitle' => '',
     'sticky' => true,
+    'fixedHeader' => true,
     'showSelect' => true,
     'striped' => true,
     'hideBorderRow' => false,
     'roundedRows' => true,
     'controlsPosition' => 'top', // top, bottom
-
+    'noFullScreen' => false,
     'toolbarOptions' => [
         'color' => 'transparent', // rgb(255,255,255,1) or utility colors like white, purple
         'border' => false, // false, 'xs', 'sm', 'md', 'lg', 'xl'.
@@ -42,13 +43,14 @@ return [
         'readonly' => false, // boolean to set the button readonly mode, can be used to disable button
         'ripple' => true, // boolean
         // 'rounded' => 'md', // string | number | boolean - 0, xs, sm, true, lg, xl, pill, circle, and shaped.
-        'class' => 'mx-2 text-white text-capitialize rounded px-4',
+        'class' => 'text-white text-capitialize rounded px-4',
         'size' => 'default', // sizes: x-small, small, default, large, and x-large.
         // 'icon' => 'mdi-filter-outline',
         'prepend-icon' => 'mdi-filter-outline',
         'append-icon' => 'mdi-chevron-down',
         'slim' => false,
         'density' => 'comfortable',
+        // 'block' => true,
         // 'loading' => true,
     ],
     'addBtnOptions' => [
@@ -135,5 +137,23 @@ return [
     ],
     'headerOptions' => [
         'color' => 'rgba(140,160,167, .2)', // Hex, rgba or default css colors
+    ],
+
+    'formAttributes' => [
+        'rowAttribute' => [
+            'noGutters' => false,
+            'class' => 'py-4',
+        ],
+        'formClass' => 'mx-3 px-3 pt-6 pb-0',
+        'scrollable' => true,
+        'hasSubmit' => false,
+        'fillHeight' => true,
+        'hasDivider' => true,
+        'noDefaultFormPadding' => true,
+    ],
+    'formModalAttributes' => [
+        'widthType' => 'lg',
+        'fullscreen' => false,
+        'transition' => 'dialog-bottom-transition',
     ],
 ];

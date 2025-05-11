@@ -168,7 +168,7 @@
         required: true,
       },
       imageSize: {
-        type: Number,
+        type: [Number, String],
         default: 64
       },
       showFileName: {

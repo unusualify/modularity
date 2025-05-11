@@ -18,6 +18,23 @@ trait TranslationsTrait
         return $this->prepareFieldsBeforeSaveTranslationsTrait(null, $fields);
     }
 
+    public function setColumnsTranslationsTrait($columns, $inputs)
+    {
+        $traitName = get_class_short_name(__TRAIT__);
+
+        $_columns = collect($inputs)->reduce(function ($acc, $curr) {
+            if (isset($curr['translated']) && $curr['translated']) {
+                $acc[] = $curr['name'];
+            }
+
+            return $acc;
+        }, []);
+
+        $columns[$traitName] = array_unique(array_merge($this->traitColumns[$traitName] ?? [], $_columns));
+
+        return $columns;
+    }
+
     /**
      * @param \Unusualify\Modularity\Entities\Model|null $object
      * @param array $fields
@@ -136,7 +153,9 @@ trait TranslationsTrait
                 if (isset($scopes['searches'])) {
                     $q->where(function ($query) use (&$scopes) {
                         foreach ($scopes['searches'] as $field) {
-                            $query->orWhere($field, $this->getLikeOperator(), '%' . $scopes[$field] . '%');
+                            if (isset($scopes[$field])) {
+                                $query->orWhere($field, $this->getLikeOperator(), '%' . $scopes[$field] . '%');
+                            }
                         }
                     });
                 }
@@ -146,7 +165,7 @@ trait TranslationsTrait
             //     dd($scopes, $attributes, $query->toSql(), $query->get());
 
             foreach ($attributes as $attribute) {
-                if (isset($scopes[$attribute])) {
+                if (array_key_exists($attribute, $scopes)) {
                     unset($scopes[$attribute]);
                 }
             }

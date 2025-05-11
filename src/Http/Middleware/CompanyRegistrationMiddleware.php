@@ -21,11 +21,11 @@ class CompanyRegistrationMiddleware
     public function handle($request, Closure $next)
     {
 
-        if (! $request->routeIs('*profile*')) {
-            if (auth()->user()->invalidCompany) {
-                return redirect()->route(Route::hasAdmin('profile'));
-            }
-        }
+        // if (! $request->routeIs('*profile*')) {
+        //     if (!auth()->user()->validCompany) {
+        //         return redirect()->route(Route::hasAdmin('profile'));
+        //     }
+        // }
 
         return $next($request);
     }

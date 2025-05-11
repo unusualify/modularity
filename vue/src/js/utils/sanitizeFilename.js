@@ -1,5 +1,5 @@
 // const truncate = require('truncate-utf8-bytes')
-import { truncate } from 'lodash'
+import { truncate } from 'lodash-es'
 
 /**
  * Replaces characters in strings that are illegal/unsafe for filenames.

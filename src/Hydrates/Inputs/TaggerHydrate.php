@@ -63,11 +63,13 @@ class TaggerHydrate extends InputHydrate
             // $repository->getTagsList()->toArray() // this get used tags
             // $repository->getTags()->toArray() // this get all tags
 
-            $items = $repository->getTags()->map(fn ($tag, $index) => [
-                'id' => $tag->id,
-                'name' => $tag->name,
-                'color' => $input['colors'][$index % count($input['colors'])],
-            ])->toArray();
+            $items = ! $this->skipQueries
+                ? $repository->getTags()->map(fn ($tag, $index) => [
+                    'id' => $tag->id,
+                    'name' => $tag->name,
+                    'color' => $input['colors'][$index % count($input['colors'])],
+                ])->toArray()
+                : [];
 
             $input['items'] = array_merge([['header' => true, $input['itemTitle'] => __('Select an option or create one')]], $items);
             $input['taggable'] = get_class($repository->getModel());

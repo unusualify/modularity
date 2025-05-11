@@ -54,8 +54,10 @@ export function replaceState (url) {
   pushState(url, true)
 }
 
-export function getURLWithoutQuery () {
-  return location.protocol + '//' + location.host + location.pathname
+export function getURLWithoutQuery (url = null) {
+  if(!url) return location.protocol + '//' + location.host + location.pathname
+
+  return getOrigin(url) + getPath(url)
 }
 
 export function getParameters (url = window.location) {
@@ -108,4 +110,46 @@ export function addParametersToUrl(url, params, prefix) {
 
   return url + string
 }
+
+/**
+ * Remove the given keys from window.location.search
+ * and update the URL via history.replaceState (no reload).
+ *
+ * @param {string[]} keysToRemove
+ */
+export function removeQueryKeys(keysToRemove = []) {
+  const url = new URL(window.location.href)
+
+  // delete each key
+  keysToRemove.forEach(key => url.searchParams.delete(key))
+
+  // build the new URL (pathname + updated search)
+  const newUrl = url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : '')
+
+  // replace browser state (no page reload)
+  // window.history.replaceState({}, '', newUrl)
+  window.history.pushState({}, '', newUrl)
+}
+
+export function getOrigin(url) {
+  return new URL(url).origin
+}
+
+export function getPath(url) {
+  return new URL(url).pathname
+}
+
+export function removeParameterFromUrl(url, parameter) {
+  const urlObj = new URL(url)
+  urlObj.searchParams.delete(parameter)
+  return urlObj.toString()
+}
+
+export function removeParameterFromHistory(parameter) {
+  // const urlObj = new URL(window.location.href)
+
+  // urlObj.searchParams.delete(parameter)
+  window.history.replaceState({}, '', removeParameterFromUrl(window.location.href, parameter))
+}
+
 

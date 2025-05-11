@@ -21,12 +21,10 @@ export const makeActiveTableItemProps = propsFactory({
 
 // by convention, composable function names start with "use"
 export default function useActiveTableItem (props, context) {
-  // __log(props, context)
   const model = useProxiedModel(props, 'modelValue')
   const item = computed({
     get: () => model.value,
     set: v => {
-      __log('setter', v)
       model.value = v
     }
   })
@@ -73,7 +71,7 @@ export default function useActiveTableItem (props, context) {
   })
 
   watch(() => props.itemData, (newValue, oldValue) => {
-    __log('itemData watch', newValue)
+
   })
 
   // expose managed state as return value

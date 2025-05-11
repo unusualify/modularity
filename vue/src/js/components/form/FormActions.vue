@@ -1,67 +1,103 @@
 <template>
-  <div class="d-flex flex-wrap ga-2 mr-2">
-    <template v-for="(action, key) in showedActions">
+  <div :class="[
+      hasActions ? 'd-flex flex-wrap ga-4 py-4' : ''
+    ]"
+  >
+    <slot name="prepend" v-bind="{item: modelValue, isEditing}"></slot>
+    <template v-for="(action, key) in allActions">
       <v-tooltip
-        v-if="action.type !== 'modal'"
+        v-if="action.type !== 'modalx'"
         :disabled="!action.icon || action.forceLabel"
         :location="action.tooltipLocation ?? 'top'"
       >
-        <template v-slot:activator="{ props }">
+        <template v-slot:activator="tooltipActivatorScope">
           <v-switch
             v-if="action.type === 'publish'"
             :modelValue="editedItem[action.key ?? 'published'] ?? action.default ?? false"
+            v-bind="{...action.componentProps, ...tooltipActivatorScope.props}"
+
+            :disabled="action.disabled ?? false"
             @update:modelValue="handleAction(action)"
           />
-          <v-btn
-            v-else
-            :icon="!action.forceLabel ? action.icon : null"
-            :text="action.forceLabel ? action.label : null"
-            :color="action.color"
-            :variant="action.variant"
-            :density="action.density ?? 'comfortable'"
-            :size="action.size ?? 'default'"
-            :rounded="action.forceLabel ? null : true"
-            v-bind="props"
-            @click="handleAction(action)"
-          />
+          <ue-modal v-else-if="action.type === 'modal' && action.endpoint && action.schema"
+            :close-on-content-click="false"
+            transition="scale-transition"
+            widthType="md"
+            :use-model-value="false"
+            v-bind="action.modalAttributes ?? {}"
+          >
+            <template v-slot:activator="modalActivatorScope">
+              <v-badge v-if="isBadge(action)"
+                v-bind="badgeProps(action)"
+              >
+                <v-btn
+                  v-bind="{
+                    ...generateButtonProps(action),
+                    ...modalActivatorScope.props,
+                    ...tooltipActivatorScope.props
+                  }"
+                />
+              </v-badge>
+              <v-btn v-else
+                v-bind="{
+                  ...generateButtonProps(action),
+                  ...modalActivatorScope.props,
+                  ...tooltipActivatorScope.props
+                }"
+              />
+            </template>
+
+            <template v-slot:body="formModalBodyScope">
+              <v-card class="fill-height d-flex flex-column">
+                <ue-form
+                  :ref="`extra-form-${key}`"
+
+                  :modelValue="createModel(action.schema)"
+                  :title="action.formTitle ?? null"
+                  :schema="action.schema"
+                  :action-url="action.endpoint.replace(':id', modelValue.id)"
+                  :valid="valids[key]"
+                  :is-editing="isEditing"
+
+                  :style="formModalBodyScope.isFullActive ? 'height: 90vh !important;' : 'height: 70vh !important;'"
+
+                  fill-height
+                  scrollable
+
+                  has-divider
+                  has-submit
+                  button-text="Save"
+
+                  @submitted="$emit('actionComplete', { action })"
+                  @update:valid="valids[key] = $event"
+
+                  @updatex:modelValue="$log($event)"
+
+                  v-bind="action.formAttributes ?? {}"
+                />
+              </v-card>
+            </template>
+
+          </ue-modal>
+          <template v-else-if="action.type !== 'modal'">
+            <v-badge v-if="isBadge(action)"
+              v-bind="badgeProps(action)"
+            >
+              <v-btn
+                v-bind="{...generateButtonProps(action), ...tooltipActivatorScope.props}"
+                @click="handleAction(action)"
+              />
+            </v-badge>
+            <v-btn v-else
+              v-bind="{...generateButtonProps(action), ...tooltipActivatorScope.props}"
+              @click="handleAction(action)"
+            />
+          </template>
         </template>
         <span>{{ action.tooltip ?? action.label }}</span>
       </v-tooltip>
-      <v-menu v-else-if="action.type === 'modal' && action.endpoint && action.schema"
-        :close-on-content-click="false"
-        open-on-hoverx
-        transition="scale-transition"
-      >
-        <template v-slot:activator="{ props }">
-          <v-btn
-            :icon="!action.forceLabel ? action.icon : null"
-            :text="action.forceLabel ? action.label : null"
-            :color="action.color"
-            :variant="action.variant"
-            :density="action.density ?? 'comfortable'"
-            :size="action.size ?? 'default'"
-            :rounded="action.forceLabel ? null : true"
-            v-bind="props"
-          />
-        </template>
-        <v-sheet :style="$vuetify.display.mdAndDown ? {width: '70vw'} : {width: '40vw'}">
-          <ue-form
-            :ref="`extra-form-${key}`"
-            :modelValue="createModel(action.schema)"
-            @updatex:modelValue="$log($event)"
-            :title="action.formTitle ?? null"
-            :schema="action.schema"
-            :action-url="action.endpoint.replace(':id', modelValue.id)"
-            :valid="valids[key]"
-            @update:valid="valids[key] = $event"
-            has-divider
-            has-submit
-            button-text="Save"
-            @submitted="$emit('actionComplete', { action })"
-          />
-        </v-sheet>
-      </v-menu>
     </template>
+    <slot name="append" v-bind="{item: modelValue, isEditing}"></slot>
   </div>
 </template>
 
@@ -69,6 +105,8 @@
 import { computed } from 'vue'
 import { useItemActions } from '@/hooks'
 import { getModel } from '@/utils/getFormData'
+import useGenerate from '@/hooks/utils/useGenerate'
+import useBadge from '@/hooks/utils/useBadge'
 
 export default {
   name: 'FormActions',
@@ -89,22 +127,30 @@ export default {
 
   },
   setup(props, context) {
-    const { handleAction, showedActions } = useItemActions(props, {
+    const { handleAction, allActions, hasActions } = useItemActions(props, {
       ...context,
       actionItem: props.modelValue
     })
+    const { generateButtonProps } = useGenerate()
+    const { isBadge, badgeProps } = useBadge()
+    const valids = computed(() => allActions.value.map(action => true))
 
-    const valids = computed(() => showedActions.value.map(action => true))
 
-    // __log(showedActions)
     const createModel = (schema) => {
       return getModel(schema, props.modelValue)
     }
+
     return {
-      showedActions,
+      hasActions,
+      allActions,
       handleAction,
+
+      valids,
+
       createModel,
-      valids
+      generateButtonProps,
+      isBadge,
+      badgeProps
     }
   },
 }

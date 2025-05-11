@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Model;
 
@@ -328,21 +329,10 @@ if (! function_exists('modelShowFormat')) {
     function modelShowFormat(&$model)
     {
 
-        // if( get_class_short_name($model) == 'Package'){
-        //     dd(class_uses_recursive($model));
-        // }
         if (in_array('Oobook\Priceable\Traits\HasPriceable', class_uses_recursive($model))) {
-            // dd($model->priceFormatted);
             $model['prices_show'] = $model->price_formatted;
             $model['price_show'] = $model->price_formatted;
-            // $model['prices_show'] = "<span class='text-success font-weight-bold'> {$model->price_formatted} </span>";
         }
-
-        // if(get_class($model) == 'Oobook\Priceable\Models\Price'){
-        //     dd($model->price(), $model->pricePrependingCurrencyString());
-        //     $model['prices_show'] = $model->price_formatted;
-        //     // $model['prices_show'] = "<span class='text-success font-weight-bold'> {$model->price_formatted} </span>";
-        // }
 
         if (method_exists($model, 'getShowFormat')) {
             return $model->getShowFormat();
@@ -528,41 +518,6 @@ if (! function_exists('attribute_string')) {
     }
 }
 
-if (! function_exists('merge_url_query')) {
-    function merge_url_query(string $url, object|array $data): string
-    {
-        if (gettype($data) == 'object') {
-            $data = object_to_array($data);
-        }
-        // Parse the URL
-        $parsedUrl = parse_url($url);
-
-        // Get the main URL without query parameters
-        $mainUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . ($parsedUrl['path'] ?? '');
-
-        // Parse the query string into an array
-        $queryParams = [];
-        if (isset($parsedUrl['query'])) {
-            parse_str($parsedUrl['query'], $queryParams);
-        }
-
-        if (array_key_exists(array_key_first($data), $queryParams)) {
-            unset($queryParams[array_key_first($data)]);
-        }
-
-        // Update the query parameters with new ones
-        $queryParams = array_merge($queryParams, $data);
-
-        // Convert the updated query parameters back to a string
-        $newQueryString = http_build_query($queryParams);
-
-        // Combine the main URL with the new query string
-        $finalUrl = $newQueryString ? $mainUrl . '?' . $newQueryString : $mainUrl;
-
-        return $finalUrl;
-    }
-}
-
 if (! function_exists('get_user_profile')) {
     /**
      * get_user_profile
@@ -627,5 +582,269 @@ if (! function_exists('get_file_class')) {
         }
 
         return $namespace ? $namespace . '\\' . $className : $className;
+    }
+}
+
+if (! function_exists('is_plural')) {
+    /**
+     * Check if a string is in plural form
+     *
+     * @param string $string The string to check
+     * @return bool Returns true if the string is plural, false otherwise
+     */
+    function is_plural($string)
+    {
+        return Str::plural($string) === $string;
+    }
+}
+
+if (! function_exists('replace_variables_from_haystack')) {
+    /**
+     * Recursively replace ${variable}$ patterns in array/object values with values from haystack
+     *
+     * @param mixed $input Array or object to process
+     * @param array $haystack Array containing replacement values
+     * @return mixed
+     */
+    function replace_variables_from_haystack($input, array $haystack)
+    {
+        if (is_string($input)) {
+            return preg_replace_callback('/\${([^}]+)}\$/', function ($matches) use ($haystack) {
+                $variable = $matches[1];
+
+                // Split for default value using ??
+                $variableParts = explode('??', $variable);
+                $variableNames = explode('|', $variableParts[0]);
+                $defaultValue = $variableParts[1] ?? '';
+
+                // Try each variable name in order
+                foreach ($variableNames as $variableName) {
+                    $variableName = trim($variableName);
+                    if (array_key_exists($variableName, $haystack)) {
+                        return $haystack[$variableName];
+                    }
+                }
+
+                // Return default value if no matches found
+                return $defaultValue;
+            }, $input);
+        }
+
+        if (! is_array($input) && ! is_object($input)) {
+            return $input;
+        }
+
+        $result = is_object($input) ? clone $input : [];
+
+        foreach ($input as $key => $value) {
+            if (is_array($value) || is_object($value)) {
+                $result[$key] = replace_variables_from_haystack($value, $haystack);
+            } elseif (is_string($value)) {
+                $result[$key] = replace_variables_from_haystack($value, $haystack);
+            } else {
+                $result[$key] = $value;
+            }
+        }
+
+        return $result;
+    }
+}
+
+if (! function_exists('extract_schema_extensions')) {
+    /**
+     * Extract extension configurations from nested schema arrays
+     *
+     * @param array $schema The schema to search through
+     * @return array Array of [path, property, pattern] tuples
+     */
+    function extract_schema_extensions($haystack)
+    {
+        $results = [];
+
+        if (! is_array($haystack)) {
+            return $results;
+        }
+
+        // Process current level ext configurations
+        if (isset($haystack['ext']) && is_array($haystack['ext'])) {
+
+            foreach ($haystack['ext'] as $ext) {
+                if (is_array($ext) && count($ext) >= 4 && in_array($ext[0], ['set', 'prependSchema'])) {
+                    $format = $ext[0];
+
+                    if ($format == 'set') {
+                        $setterKey = explode('.*.', $ext[3])[0];
+                        $setterInnerKey = explode('.*.', $ext[3])[1] ?? null;
+                        if (isset($haystack[$setterKey])) {
+                            $modelNotation = (isset($haystack['parentName']) ? $haystack['parentName'] . '.' : '') . $haystack['name'];
+                            $results[] = [
+                                'format' => $format,
+                                'targetPath' => $ext[1],
+                                'property' => $ext[2],
+                                'pattern' => $ext[3],
+                                'name' => $haystack['name'],
+                                'modelNotation' => $modelNotation,
+                                'setterKey' => $setterKey,
+                                'itemTitle' => $haystack['itemTitle'] ?? null,
+                                'itemValue' => $haystack['itemValue'] ?? null,
+                                'setterInnerKey' => $setterInnerKey,
+                                'setterValues' => $haystack[$setterKey],
+                            ];
+                        }
+                    } elseif ($format == 'prependSchema') {
+                        // dd($ext);
+                        // $results[] = [
+                        //     'format' => $format,
+                        //     'targetPath' => $ext[1],
+                        //     'property' => $ext[2],
+                        // ];
+                    }
+                }
+            }
+        }
+
+        // Recursively process nested schemas
+        foreach ($haystack as $key => $value) {
+            if (is_array($value) && Arr::isAssoc($value)) {
+                // Check for schema property
+                if (isset($value['schema']) && is_array($value['schema'])) {
+                    $results = array_merge($results, extract_schema_extensions($value['schema']));
+                }
+
+                // Also check if the current array itself is a schema collection
+                foreach ($value as $subKey => $subValue) {
+                    if (is_array($subValue)) {
+
+                        if (isset($subValue['schema']) && is_array($subValue['schema'])) {
+                            $results = array_merge($results, extract_schema_extensions($subValue['schema']));
+                        }
+
+                        if ($subKey == 'schema' && is_array($subValue)) {
+                            foreach ($subValue as $subSubKey => $subSubValue) {
+                                if (is_array($subSubValue)) {
+                                    $results = array_merge($results, extract_schema_extensions($subSubValue));
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+        return $results;
+    }
+}
+
+if (! function_exists('data_get_with_dot_keys')) {
+    /**
+     * Get an item from an array or object using dot notation, supporting keys with dots
+     *
+     * @param mixed $target Array or object to search
+     * @param string $path Dot notation path
+     * @param mixed $default Default value if not found
+     * @return mixed
+     */
+    function data_get_with_dot_keys($target, $path, $default = null)
+    {
+        // Handle empty cases
+        if (is_null($target) || is_null($path)) {
+            return $default;
+        }
+
+        // Split path by dots, but preserve dots within square brackets
+        preg_match_all('/\[[^\]]*\]|[^.]+/', $path, $matches);
+        $segments = $matches[0];
+
+        foreach ($segments as $segment) {
+            // Remove brackets if present
+            $segment = trim($segment, '[]');
+
+            if (is_array($target)) {
+                if (! array_key_exists($segment, $target)) {
+                    // Try with original dot notation
+                    if (array_key_exists(str_replace('\\', '', $segment), $target)) {
+                        $segment = str_replace('\\', '', $segment);
+                    } else {
+                        return $default;
+                    }
+                }
+                $target = $target[$segment];
+            } elseif (is_object($target)) {
+                if (! isset($target->{$segment})) {
+                    return $default;
+                }
+                $target = $target->{$segment};
+            } else {
+                return $default;
+            }
+        }
+
+        return $target;
+    }
+}
+
+if (! function_exists('data_set_with_dot_keys')) {
+    /**
+     * Set an item in an array or object using dot notation, supporting keys with dots
+     *
+     * @param mixed &$target Array or object to modify
+     * @param string $path Dot notation path
+     * @param mixed $value Value to set
+     * @return void
+     */
+    function data_set_with_dot_keys(&$target, $path, $value)
+    {
+        // Split path by dots, but preserve dots within square brackets
+        preg_match_all('/\[[^\]]*\]|[^.]+/', $path, $matches);
+        $segments = $matches[0];
+
+        $current = &$target;
+
+        foreach ($segments as $segment) {
+            // Remove brackets if present
+            $segment = trim($segment, '[]');
+
+            // Create arrays for missing segments
+            if (! is_array($current) && ! is_object($current)) {
+                $current = [];
+            }
+
+            if (is_array($current)) {
+                if (! array_key_exists($segment, $current)) {
+                    $current[$segment] = [];
+                }
+                $current = &$current[$segment];
+            } elseif (is_object($current)) {
+                if (! isset($current->{$segment})) {
+                    $current->{$segment} = [];
+                }
+                $current = &$current->{$segment};
+            }
+        }
+
+        $current = $value;
+    }
+}
+
+if (! function_exists('name_surname_resolver')) {
+    function name_surname_resolver($fullName)
+    {
+        // dd('Name Surname Resolver');
+        $trimmedSpaces = trim($fullName);
+        $nameArray = explode(' ', $trimmedSpaces);
+        $nameWithSurname = [];
+        foreach ($nameArray as $name) {
+            if (preg_match('/^[\p{L}\'-]+$/u', $name)) {
+                $nameWithSurname[] = $name;
+            }
+        }
+        // dd([
+        //     count($nameWithSurname),
+        //     ...$nameWithSurname,
+        // ]);
+
+        return $nameWithSurname;
     }
 }

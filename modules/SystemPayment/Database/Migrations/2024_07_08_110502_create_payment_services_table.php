@@ -11,11 +11,11 @@ return new class extends Migration
         Schema::create('payment_services', function (Blueprint $table) {
             // this will create an id, name field
             createDefaultTableFields($table);
-            $table->string('name');
-            $table->string('title');
-            $table->boolean('is_external');
-            $table->boolean('is_internal');
-            $table->string('button_style')->default('');
+            $table->string('name')->unique();
+            $table->string('key')->unique();
+            $table->boolean('is_external')->default(false);
+            $table->boolean('is_internal')->default(false);
+            $table->string('button_style')->nullable();
 
             // a "published" column, and soft delete and timestamps columns
             createDefaultExtraTableFields($table);

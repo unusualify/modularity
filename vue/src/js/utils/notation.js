@@ -134,8 +134,8 @@ const findMatchingNotations = (data, pattern) => {
       {
         'title': 'Paketler',
         'items': [
-          ['Wire', 'TRY 2.200,00'],
-          ['Premium', 'TRY 1.000,00']
+          ['Wire', 'TRY 2.200,00'],
+          ['Premium', 'TRY 1.000,00']
         ]
       },
       {
@@ -557,18 +557,72 @@ const formattedSummary = (data, formation) => {
 const test = () => {
 
   // samplePatterns.forEach(pattern => {
-  //   console.log(pattern, findMatchingNotations(sampleSource, pattern), sampleSource)
-  // })
 
-  // __log(JSON.stringify(formattedPreview(sampleSource, samplePreview), null, 2))
+    // })
+
 }
 
+// Helper function to recursively replace patterns in an object
+export function replacePatternInObject(obj, pattern, replacement) {
+  if (!obj || typeof obj !== 'object') return obj;
+
+  return Object.keys(obj).reduce((acc, key) => {
+    const value = obj[key];
+
+    if (typeof value === 'string') {
+      acc[key] = value.replace(pattern, replacement);
+    } else if (Array.isArray(value)) {
+      acc[key] = value.map(item => replacePatternInObject(item, pattern, replacement));
+    } else if (typeof value === 'object') {
+      acc[key] = replacePatternInObject(value, pattern, replacement);
+    } else {
+      acc[key] = value;
+    }
+
+    return acc;
+  }, {});
+}
+
+export function replaceVariablesFromHaystack(obj, haystack) {
+  if (!obj || typeof obj !== 'object') return obj;
+
+  const variablePattern = /\${([^}]+)}\$/g;
+
+  return Object.keys(obj).reduce((acc, key) => {
+    const value = obj[key];
+
+    if (typeof value === 'string') {
+      acc[key] = value.replace(variablePattern, (match, variable) => {
+        let variableParts = variable.split('??')
+        let variableNames = variableParts[0].split('|')
+        let defaultValue = variableParts[1] ?? '';
+
+        for(const variableName of variableNames){
+          if(haystack.hasOwnProperty(variableName)){
+            return haystack[variableName]
+          }
+        }
+        return defaultValue;
+      });
+    } else if (Array.isArray(value)) {
+      acc[key] = value.map(item => replaceVariablesFromHaystack(item, haystack));
+    } else if (typeof value === 'object') {
+      acc[key] = replaceVariablesFromHaystack(value, haystack);
+    } else {
+      acc[key] = value;
+    }
+
+    return acc;
+  }, {});
+}
 
 export default {
   findMatchingNotations,
   formattedPreview,
   formattedSummary,
-  test
+  test,
+  replacePatternInObject,
+  replaceVariablesFromHaystack
 }
 
 const samplePatterns = [
@@ -645,8 +699,8 @@ const sampleSource = [
             "_type": "input-form-tabs",
             "_value": "Wire",
             "packageFeatures": "Ücretsiz Dağıtım, 10 yayın içeriği, SEO kurallarına uygun İngilizce basın bülteni yazımı (max. 400 kelime), Seçilen medya listesine dağıtım, Partner haber sitelerine gönderim",
-            "prices": "€ 50,00",
-            "price": "€ 50,00"
+            "prices": "€ 50,00",
+            "price": "€ 50,00"
           },
           "packageLanguages": {
             "_title": "Dağıtım Dili",
@@ -666,8 +720,8 @@ const sampleSource = [
             "_type": "input-form-tabs",
             "_value": "Wire",
             "packageFeatures": "Ücretsiz Dağıtım, 10 yayın içeriği, SEO kurallarına uygun İngilizce basın bülteni yazımı (max. 400 kelime), Seçilen medya listesine dağıtım, Partner haber sitelerine gönderim",
-            "prices": "€ 46,00",
-            "price": "€ 46,00"
+            "prices": "€ 46,00",
+            "price": "€ 46,00"
           },
           "packageLanguages": {
             "_title": "Dağıtım Dili",
@@ -730,6 +784,4 @@ const sampleSource = [
     }
   }
 ]
-
-// console.log(JSON.stringify(formattedPreview(sampleSource, samplePreview), null, 2))
 
