@@ -103,11 +103,15 @@ trait HasImages
             ->withTimestamps()->orderBy(modularityConfig('tables.mediables', 'twill_mediables') . '.id', 'asc');
     }
 
-    private function findMedia($role, $crop = 'default')
+    private function findMedia($role, $crop = 'default', $locale = null)
     {
-        $media = $this->medias->first(function ($media) use ($role, $crop) {
-            if (modularityConfig('media_library.translated_form_fields', false)) {
-                $localeScope = $media->pivot->locale === app()->getLocale();
+        $media = $this->medias->first(function ($media) use ($role, $crop, $locale) {
+            if($locale){
+                $localeScope = $media->pivot->locale === $locale;
+            }else{
+                if (modularityConfig('media_library.translated_form_fields', false)) {
+                    $localeScope = $media->pivot->locale === app()->getLocale();
+                }
             }
 
             return $media->pivot->role === $role && $media->pivot->crop === $crop && ($localeScope ?? true);
@@ -147,11 +151,11 @@ trait HasImages
      * @param Media|null $media Provide a media object if you already retrieved one to prevent more SQL queries.
      * @return string|null
      */
-    public function image($role, $crop = 'default', $params = [], $has_fallback = false, $cms = false, $media = null)
+    public function image($role, $crop = 'default', $params = [], $has_fallback = false, $cms = false, $media = null, $locale = null)
     {
 
         if (! $media) {
-            $media = $this->findMedia($role, $crop);
+            $media = $this->findMedia($role, $crop, $locale);
         }
 
         if ($media) {
@@ -181,10 +185,10 @@ trait HasImages
      * @param array $params Parameters compatible with the current image service, like `w` or `h`.
      * @return array
      */
-    public function images($role, $crop = 'default', $params = [])
+    public function images($role, $crop = 'default', $params = [], $locale = null)
     {
-        $medias = $this->medias->filter(function ($media) use ($role, $crop) {
-            return $media->pivot->role === $role && $media->pivot->crop === $crop;
+        $medias = $this->medias->filter(function ($media) use ($role, $crop, $locale) {
+            return $media->pivot->role === $role && $media->pivot->crop === $crop && ($locale ? $media->pivot->locale === $locale : true);
         });
 
         $urls = [];
