@@ -129,7 +129,7 @@ export default function useImage (props, context) {
     }),
     input_: computed({
       get: () => {
--        return modelValue.value ?? []
+        return modelValue.value ?? []
       },
       set: (value, old) => {
         inputHook.updateModelValue.value(value)
