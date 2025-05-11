@@ -77,6 +77,28 @@ export default function useTableItemActions(props, { tableForms }) {
   }
 
   // Action Handlers
+  const handleDefaultAction = (item, action) => {
+    let url = action.url ?? action.endpoint ?? action.href
+
+    if(url){
+      if(url.includes(':id')){
+        url = url.replace(':id', item.id)
+      }
+
+      if(action.hasDialog){
+
+        const callback = async (callback, errorCallback) => {
+          window.open(url, action.target ?? '_self')
+        }
+
+        actionEvents.event = 'dialog'
+        actionEvents.payload = { description: action.dialogQuestion ?? null, callback }
+      }else{
+        window.open(url, action.target ?? '_self')
+      }
+    }
+  }
+
   const handleEditAction = (item) => {
     if (props.editOnModal || props.embeddedForm) {
       tableItem.setEditedItem(item)
@@ -285,6 +307,7 @@ export default function useTableItemActions(props, { tableForms }) {
         handleBulkAction(_action)
         break
       default:
+        handleDefaultAction(item, _action)
         break
     }
 
