@@ -36,7 +36,7 @@ trait PriceMutators
     protected function vatPercentage(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => ($this->vat_amount / $this->raw_amount) * 100,
+            get: fn ($value) => $this->raw_amount > 0 ? ($this->vat_amount / $this->raw_amount) * 100 : $this->vatRate->rate
         );
     }
 
