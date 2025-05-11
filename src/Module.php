@@ -669,8 +669,15 @@ class Module extends NwidartModule
     public function getNavigationActions(string $routeName)
     {
         $routeName = snakeCase($routeName); // snake case
+        $routeConfig = $this->getRouteConfig($routeName);
 
         $navigationActions = [];
+
+        $customActions = $routeConfig['table_row_actions'] ?? [];
+
+        foreach ($customActions as $customAction) {
+            $navigationActions[] = $customAction;
+        }
 
         foreach ($this->getRouteConfigs() as $key => $routeConfig) {
             if (isset($routeConfig['belongs']) && in_array($routeName, $routeConfig['belongs'])) {
@@ -693,7 +700,6 @@ class Module extends NwidartModule
                 ];
 
             }
-            // code...
         }
 
         return $navigationActions;
