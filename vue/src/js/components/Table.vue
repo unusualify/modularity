@@ -821,20 +821,6 @@ import PaymentService from './inputs/PaymentService.vue'
 
 const { ignoreFormatters } = makeFormatterProps()
 
-console.log(
-  {
-    ...makeTableNamesProps(),
-    ...makeTableFiltersProps(),
-    ...makeTableHeadersProps(),
-    ...makeTableFormsProps(),
-    ...makeTableItemActionsProps(),
-    ...makeTableActionsProps(),
-    ...makeTableModalsProps(),
-    ...makeTableProps(),
-    ...makeDraggableProps(),
-    ...ignoreFormatters
-  }
-)
 export default {
   // mixins: [TableMixin],
   components: {
