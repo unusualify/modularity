@@ -139,4 +139,17 @@ export function getPath(url) {
   return new URL(url).pathname
 }
 
+export function removeParameterFromUrl(url, parameter) {
+  const urlObj = new URL(url)
+  urlObj.searchParams.delete(parameter)
+  return urlObj.toString()
+}
+
+export function removeParameterFromHistory(parameter) {
+  // const urlObj = new URL(window.location.href)
+
+  // urlObj.searchParams.delete(parameter)
+  window.history.replaceState({}, '', removeParameterFromUrl(window.location.href, parameter))
+}
+
 
