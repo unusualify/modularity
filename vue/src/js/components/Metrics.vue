@@ -6,6 +6,10 @@
       type: String,
       required: true,
     },
+    subtitle: {
+      type: String,
+      default: null
+    },
     items: {
       type: Array,
       default: () => [],
