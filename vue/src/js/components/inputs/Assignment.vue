@@ -92,6 +92,9 @@
   const lastAssignment = computed(() => {
     return assignments.value.length > 0 ? assignments.value[0] : null
   })
+  const hasAssignment = computed(() => {
+    return assignments.value.length > 0
+  })
   const isAssignee = computed(() => {
     return lastAssignment.value && Authorization.isYou(lastAssignment.value.assignee_id)
   })
@@ -104,7 +107,7 @@
     let formatteds = []
 
     return assignments.value.reduce((acc, assignment, index) => {
-      let prependAvatar = assignment.assignee_avatar
+      let prependAvatar = assignment.assignee_avatar ?? ''
 
       let assignerName = Authorization.isYou(assignment.assigner_id) ? t('You') : assignment.assigner_name
       let assigneeName = Authorization.isYou(assignment.assignee_id) ? t('You') : assignment.assignee_name
@@ -112,7 +115,7 @@
       let title = `to <span class="text-blue-darken-1">${assigneeName}</span> &mdash; by <span class="text-success">${assignerName}</span>`
 
       let untilText = `${t('Until')}: <span class="font-weight-bold text-blue-darken-1"> ${d(new Date(assignment.due_at), 'medium')}</span>`
-      let fromText = `${t('From')}: <span class="">${d(new Date(assignment.created_at), 'medium')}</span>`
+      let fromText = `${t('From')}: <span class="">${d(assignment.created_at ? new Date(assignment.created_at) : new Date(), 'medium')}</span>`
 
       let subtitle = `${assignment.description} </br> </br>`
 
@@ -309,16 +312,15 @@
           <div class="d-flex flex-wrap gc-4 align-center px-4">
 
             <!-- Assignee Details -->
-            <v-menu
-              v-if="lastAssignment"
+            <v-menu v-if="hasAssignment"
               :close-on-content-click="false"
               location="end"
               Xopen-on-hover
             >
               <template v-slot:activator="{ props }">
-                <v-list v-if="(isAssignee || isAuthorized) && lastAssignment"
+                <v-list v-if="(isAssignee || isAuthorized) && lastFormattedAssignment"
                   id="assigneeList"
-                  :items="[{title: $t('Assignee'), prependAvatar: lastFormattedAssignment.prependAvatar, subtitle: lastFormattedAssignment.assigneeName}]"
+                  :items="[{title: $t('Assignee'), prependAvatar: lastFormattedAssignment.prependAvatar ?? '', subtitle: lastFormattedAssignment.assigneeName}]"
                   lines="three"
                   item-props
                   class="pa-0 v-input-assignment__list--assignee flex-grow-1 flex-shrink-0"
@@ -450,7 +452,7 @@
 
               <!-- List Assignments -->
               <ue-modal
-                v-if="assignments.length > 0"
+                v-if="hasAssignment"
                 v-model="listAssignmentsModalActive"
                 widthType="md"
                 transition="scroll-y-reverse-transition"
@@ -623,7 +625,7 @@
                       density="comfortable"
                       type="submit"
                       :loading="updating"
-                      :disabled="!this.input || updating || (createForm && !createForm.isValid)"
+                      :disabled="!input || updating || (createForm && !createForm.isValid)"
                     >
                       {{ $t('Assign') }}
                     </v-btn>
