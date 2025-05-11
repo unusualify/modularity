@@ -47,8 +47,9 @@ trait PaymentTrait
     {
         $priceSavingKey = Price::$priceSavingKey ?? 'price_value';
 
-        if (isset($fields['payment'])) {
-            $val = Arr::isAssoc($fields['payment']) ? $fields['payment'] : $fields['payment'][0];
+        if (isset($fields['payment_price'])) {
+            $val = Arr::isAssoc($fields['payment_price']) ? $fields['payment_price'] : $fields['payment_price'][0];
+
             $price = Price::find($val['id']);
 
             if ($price->isUnpaid) {
@@ -96,8 +97,6 @@ trait PaymentTrait
                 $totalAmount = 0;
                 $calculated = false;
 
-                // dd($relations);
-
                 foreach ($paymentRelations as $relationName) {
 
                     $relatedClass = $object->{$relationName}()->getRelated();
@@ -114,9 +113,7 @@ trait PaymentTrait
 
 
                     if ($requirementMet) {
-                        // dd($object->{$this->paymentTraitRelationName});
-                        // dd($object, $relationName, $object->{$relationName});
-                        $records = $object->{$relationName};
+                        $records = $object->{$relationName}()->get();
                         if ($records instanceof \Illuminate\Database\Eloquent\Collection) {
 
                             foreach ($records as $record) {
@@ -130,10 +127,7 @@ trait PaymentTrait
                                 }
                             }
                         }
-
                     }
-
-
                 }
 
                 if (! $object->paymentPrice && $calculated) {
@@ -146,12 +140,13 @@ trait PaymentTrait
                         'role' => 'payment',
                     ]);
                 } elseif ($object->paymentPrice && $object->paymentPrice->raw_amount != $totalAmount) {
-
-                    $object->paymentPrice->{$priceSavingKey} = $totalAmount / 100;
-                    $object->paymentPrice->currency_id = $currencyId;
-                    $object->paymentPrice()->save($object->paymentPrice);
+                    $paymentPrice = $object->paymentPrice;
+                    $paymentPrice->{$priceSavingKey} = $totalAmount / 100;
+                    // $paymentPrice->currency_id = $currencyId;
+                    $paymentPrice->save();
+                } else {
+                    // dd($calculated, $totalAmount, $object->paymentPrice->raw_amount, $object->paymentPrice);
                 }
-
             }
         }
     }
@@ -178,14 +173,14 @@ trait PaymentTrait
     {
         return [
             [
+                'type' => 'hidden',
                 'name' => 'price_id',
                 'label' => 'price_id',
-                'type' => 'hidden',
             ],
             [
+                'type' => 'payment-service',
                 'name' => 'payment_service',
                 'label' => 'Payment',
-                'type' => 'payment-service',
                 // 'connector' => 'SystemPayment:PaymentService|repository:listAll',
             ],
         ];
