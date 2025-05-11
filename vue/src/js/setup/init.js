@@ -232,7 +232,6 @@ import { handleSuccessResponse, handleErrorResponse } from '@/utils/response'
 
   window.__wildcard_change = (string, val, search_key = 'id') => {
     let values = Array.isArray(val) ? val.join(',') : val
-    // __log('wildcard_change', string, val)
     return string.replace(/^([\w\.]+)?(\*)([\w_\-\.\*]+)$/, '$1*' + `${search_key}=${values}` + '$3')
   }
 
@@ -262,7 +261,6 @@ import { handleSuccessResponse, handleErrorResponse } from '@/utils/response'
             let filterKey = filterMatches[1]
             let filterValues = filterMatches[2].split(',')
             current = lodash.filter(current, (el) => filterValues.includes( lodash.isNumber(el[filterKey]) ? el[filterKey].toString() : el[filterKey] ))
-            // __log(filterValues, current)
           }
 
           // Handle wildcard (modified for array case):
@@ -311,7 +309,6 @@ import { handleSuccessResponse, handleErrorResponse } from '@/utils/response'
       let notation = matches[1]
       let quoted = __preg_quote(matches[0])
       let parts = notation.split('.')
-      // __log(parts)
 
       let newParts = []
       for(const j in parts){
@@ -431,7 +428,6 @@ import { handleSuccessResponse, handleErrorResponse } from '@/utils/response'
   }
 
   window.__moduleTranslationName = (str) => {
-    __log(window)
     const { t, te } = useI18n({ useScope: 'global' })
 
     let isPlural = false
@@ -511,7 +507,6 @@ import { handleSuccessResponse, handleErrorResponse } from '@/utils/response'
     // Handle invalid input
     // if(isNull(preferedLocale))
     //   preferedLocale = locale.value;
-    // console.log('here', amount, symbol, preferedLocale)
     if (typeof amount !== 'number' || isNaN(amount))
       throw new Error('Amount must be a valid number');
 
@@ -649,7 +644,6 @@ function assignObjectHelpers(){
           if (!Array.equals(object1[k2], object2[k2])) { return false }
         } else if (object1[k2] instanceof Object && object2[k2] instanceof Object) {
           // recurse into another objects
-          // console.log("Recursing to compare ", this[propName],"with",object2[propName], " both named \""+propName+"\"");
           if (!Object.equals(object1[k2], object2[k2])) { return false }
         }
         // Normal value comparison for strings and numbers

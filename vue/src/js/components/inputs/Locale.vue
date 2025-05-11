@@ -105,7 +105,7 @@ export default {
     },
     attributes: {
       handler (value, oldValue) {
-        // __log('attributes watch', value, oldValue)
+
       },
       deep: true
     }
@@ -113,11 +113,9 @@ export default {
   computed: {
     input: {
       get () {
-        __log('Locale.vue inputget', this.modelValue)
         return this.modelValue
       },
       set (val, old) {
-        __log('Locale.vue input set', val, old)
         this.inputOnSet(val, old)
         this.updateModelValue(val)
         // context.emit('update:modelValue', val)
@@ -136,7 +134,6 @@ export default {
 
       this.languages.forEach((language) => {
         const attributes = cloneDeep(omit(this.attributes, ['errorMessages']))
-        // __log(attributes)
         // for textfields set initial values using the initialValues prop
         // if (this.initialValues && typeof this.initialValues === 'object' && this.initialValues[lang]) {
         //   attributes.initialValue = this.initialValues[lang]
@@ -151,7 +148,6 @@ export default {
           attributes.error = false
         }
         if (this.input) {
-          // __log(this.input[language.value])
           attributes.modelValue = this.input[language.value]
         } else if (attributes.default) {
           // attributes.modelValue = attributes.default
@@ -220,7 +216,6 @@ export default {
       // this.$emit('localize', this.currentLocale)
     },
     updateValue: function (locale, newValue) {
-      __log('updateValue', locale, newValue)
       // if (locale) {
       //   this.$emit('change', {
       //     locale,
@@ -243,10 +238,8 @@ export default {
           this.updateModelValue(this.input)
         } else if (!this.input && value) {
           this.input = {}
-          // __log(this.input, value)
           // this.input[lang] = value
           // this.updateModelValue(this.input)
-          // __log('model NOT updated', this.input, lang, value)
         }
       } catch (error) {
         __log('catch', this.input, lang, value)

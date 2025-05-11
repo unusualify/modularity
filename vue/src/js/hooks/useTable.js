@@ -389,7 +389,6 @@ export default function useTable (props, context) {
           const matches = data[key].match(valuePattern)
           if (matches) {
             const match = matches[1]
-            // __log(item)
             if (state.snakeName === match) {
               data[key] = getSubmitFormData(data.schema, item, store.state)
               if (data.actionUrl) {
@@ -454,14 +453,12 @@ export default function useTable (props, context) {
     if (newValue) {
       // hydrate abstract fields
       state.activeItemConfiguration = methods.hydrateNestedData(newValue, JSON.parse(JSON.stringify(props.nestedData)))
-      // __log(methods.hydrateNestedData(newValue, activeItemConfiguration))
     }
   }, { deep: true })
   // watch(() => state.formActive, (newValue, oldValue) => {
   //   newValue || form.value.resetValidation() || methods.resetEditedItem()
   // })
   // watch(() => state.deleteModalActive, (newValue, oldValue) => {
-  //   __log('deleteModalActive', newValue)
   //   newValue || methods.resetEditedItem()
   // })
   watch(() => state.options, (newValue, oldValue) => {

@@ -679,7 +679,6 @@ export default {
       return this.row || rowDefault
     },
     flatCombinedArraySorted () {
-      // __log('flatCombinedArraySorted computed', this.valueIntern, this.formSchema)
       return orderBy(this.flatCombinedArray, ['schema.sort'], [orderDirection])
     },
     storeStateData () {
@@ -709,7 +708,7 @@ export default {
   watch: {
     schema: {
       handler (value, oldValue) {
-        // __log('schema watch', value, oldValue)
+
       },
       deep: true
     },
@@ -722,7 +721,6 @@ export default {
       deep: true
     },
     // formSchema: function (newSchema, oldSchema) {
-    //   // __log('formSchema watch', newSchema)
 
     //   this.rebuildArrays(this.valueIntern, newSchema)
 
@@ -731,7 +729,6 @@ export default {
 
     // },
     // valueIntern: function (newVal, oldVal) {
-    //   __log('valueIntern watch', newVal, oldVal)
     // }
   },
   methods: {
@@ -769,7 +766,6 @@ export default {
       // if (Object.prototype.hasOwnProperty.call(obj.schema, 'falseValue') && obj.schema.falseValue == 1) {
       //   obj.schema.falseValue = '0'
       // }
-      // __log(obj.schema)
 
       return omit(obj.schema, ['type', 'col', 'order', 'offset', 'ext', 'event'] )
       return obj.schema
@@ -1149,7 +1145,7 @@ export default {
       }
 
       delay(() => { this.emitValue(event.type, emitObj), onEventDelay })
-      // __log(emitObj)
+
       return emitObj
     },
     onClickOutside (event, obj) {
@@ -1187,14 +1183,12 @@ export default {
               ? 'onDisplay'
               : event
       // const listener = 'on' + this.$lodash.startCase(this.$lodash.camelCase(event)).replace(/ /g, '')
-      // __log(emitEvent, listener, this)
       // if (this.$attrs[`${emitEvent}:${this.id}`]) {
       //   this.deprecateEventCustomID(emitEvent)
       //   this.deprecateCombinedEvents(emitEvent, event)
       //   this.$emit(`${emitEvent}:${this.id}`, val) // listen to specific event only
       // } else if (this.$attrs[`${emitEvent}`]) {
       //   // this.deprecateCombinedEvents(emitEvent, event)
-      //   __log(emitEvent, val)
       //   this.$emit(emitEvent, val) // listen to specific event only
       // } else if (this.$attrs[`${listener}:${this.id}`]) {
       //   this.deprecateEventCustomID(event)
@@ -1203,7 +1197,6 @@ export default {
       //   // this.$emit(event, val) // listen to specific event only
       //   // this.$emit(listener, val) // listen to specific event only
       //   // this.$emit('update:schema', this.storeStateSchema) // listen to specific event only
-      //   // __log(listener, this.storeStateData)
       //   this.$emit(`${event}`, val) // listen to specific event only
       //   // this.$emit('update:modelValue', this.storeStateData) // listen to specific event only
       // }
@@ -1238,7 +1231,6 @@ export default {
         if (ix === pathArray.length - 1) object[p] = value
         object = object[p]
       })
-      // __log(object)
     },
     updateArrayFromState (data, schema) {
       this.flatCombinedArray.forEach(obj => {

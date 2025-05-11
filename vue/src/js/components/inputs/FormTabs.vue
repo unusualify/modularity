@@ -71,7 +71,6 @@ import { useInput,
 
 import { getModel, getSchema } from '@/utils/getFormData.js'
 
-// __log([...makeInputInjects])
 export default {
   name: 'v-input-form-tabs',
   emits: [...makeInputEmits],
@@ -117,7 +116,6 @@ export default {
         let notation = matches[1]
         let quoted = __preg_quote(matches[0])
         let parts = notation.split('.')
-        // __log(parts)
 
         let newParts = []
         for(const j in parts){
@@ -184,7 +182,6 @@ export default {
 
     const getFormRef = (id) => formRefs.get(id)
 
-    // __log('FormTabs setup', props.modelValue)
     const models = ref(elements.value.reduce((acc, item) => {
       if(!__isset(acc[item.id])){
         acc[item.id] = {
@@ -306,7 +303,6 @@ export default {
 
     watch(() => props.items, (newVal) => {
       loading.value = true
-      // __log('FormTabs items watch', newVal, loading.value)
 
       let addedItems = newVal.filter(item => !elements.value.find(el => el.id == item.id))
       let removedItems = elements.value.filter(item => !newVal.find(el => el.id == item.id))

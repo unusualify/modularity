@@ -36,7 +36,6 @@
           ></v-chip>
         </template>
         <template v-slot:item="{ props, item }">
-          <!-- {{ $log(props, item) }} -->
           <v-list-item v-if="item.raw.header && search">
             <span class="mr-3">Create</span>
             <v-chip
@@ -189,7 +188,6 @@ export default {
       let newInput = this.model.map(v => v[this.handleKey])
 
       if (newInput !== this.input) {
-        // __log('newInput', newInput)
         this.input = newInput
       }
     },

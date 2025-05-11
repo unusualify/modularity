@@ -28,7 +28,6 @@ export default {
   setup(props) {
     const symbol = computed(() => {
       if (props.symbol) {
-        // console.log(props.symbol)
         return props.symbol
       }
     })

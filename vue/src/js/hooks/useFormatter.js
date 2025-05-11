@@ -135,7 +135,6 @@ export default function useFormatter (props, context, headers = []) {
         let notation = matches[1]
         let quoted = window.__preg_quote(matches[0])
         let parts = notation.split('.')
-        // __log(parts)
 
         let newParts = []
         for(const j in parts){
@@ -174,7 +173,6 @@ export default function useFormatter (props, context, headers = []) {
             let remainingQuote = '\\w\\s' + window.__preg_quote('çşıİğüö.,;?|:_')
             let pattern = new RegExp( String.raw`^([${remainingQuote}]+)?(${quoted})([${remainingQuote}]+)?$`)
 
-            // __log('castMatch', value, _value, value.match(pattern))
             if(value.match(pattern)){
               returnValue = value.replace(pattern, '$1' + _value + '$3')
             }else{

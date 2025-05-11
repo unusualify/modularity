@@ -209,7 +209,6 @@ export default {
     })
     // Fix for showDivider logic
 
-    // console.log(showSuccess.value)
     return {
       width,
       title,

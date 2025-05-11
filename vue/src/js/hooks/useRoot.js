@@ -20,8 +20,6 @@ export default function useRoot () {
   let vuetifyInstance
   let rootInstance
 
-  // __log('useRoot',  getCurrentInstanceName())
-
   onMounted(() => {
     vuetifyInstance = getCurrentInstance().proxy.$vuetify
     rootInstance = getCurrentInstance().root

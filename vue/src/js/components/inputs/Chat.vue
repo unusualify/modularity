@@ -370,7 +370,6 @@
     },
     computed: {
       currentUser() {
-        // __log(this.$store.getters.userProfile)
         return this.$store.getters.userProfile;
       },
       formattedMessages() {
@@ -469,7 +468,6 @@
                 done('empty');
               }
             } else {
-              __log(response.data)
               this.messages = this.formatMessages(response.data);
               done('empty');
             }
@@ -639,7 +637,7 @@
       },
     },
     created() {
-      // __log('Chat', this.getAttachments());
+
     },
     mounted() {
 

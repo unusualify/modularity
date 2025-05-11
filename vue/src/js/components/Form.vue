@@ -171,9 +171,6 @@
                   </ue-recursive-stuff>
 
                 </template>
-                <!-- <div>
-                  {{ $log(_slot, _slotData) }}
-                </div> -->
               </template>
               <!-- <template v-slot:[`slot-inject-prepend-key-treeview-slot-permissions`]="{open}" >
                 <v-icon color="blue">
@@ -498,9 +495,6 @@ export default {
         getSlots(input, inputName, slots);
       });
 
-      // if(slots.length > 0){
-      //   console.log(slots);
-      // }
       return slots
     })
 

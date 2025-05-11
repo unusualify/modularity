@@ -334,7 +334,6 @@
           // if (!this.serverValid) {
           //   this.resetSchemaError(key)
           // }
-          // __log(index, key, obj, v)
           // this.handleEvent(obj)
           let availableValue = get(this.models[index], key)
           if(JSON.stringify(availableValue) !== JSON.stringify(value)){
@@ -665,11 +664,7 @@
     watch: {
       schemas: {
         handler (value, oldValue) {
-          // __log('schemas watch', value, oldValue)
-          // __log(value[0].wrap_location, oldValue[0].wrap_location)
-          // __log('stepperForm schemas watch', value, this.schemas, !isEqual(value, this.schemas))
           if(!isEqual(value, this.schemas)){
-            // __log('schemas watch', value, this.schemas)
             this.schemas = value
           }
         },
@@ -685,7 +680,6 @@
             })
             this.pendingHandleFunctions = []
           }
-          // __log(value[0].wrap_location, oldValue[0].wrap_location)
           this.models.forEach((model, index) => {
             if(!!this.previewModel[index]){
               Object.keys(this.previewModel[index]).forEach((key) => {

@@ -131,7 +131,6 @@
       date_range: dateRangeModel.value,
       items: metrics.value
     }).then(response => {
-      console.log(response.data);
       if(response.data.variant === 'success') {
         metrics.value = response.data.data;
       }
@@ -146,7 +145,6 @@
       refreshMetrics();
     }
   });
-  // __log(defaultMetricAttributes.value);
 </script>
 
 <template>

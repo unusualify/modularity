@@ -435,7 +435,6 @@
         }
       },
       alertDialogMessage() {
-        __log('alertDialogMessage computed', this.$store.state.alert)
         return this.$store.state.alert.dialogMessage
       }
     },
@@ -482,7 +481,6 @@
         }
       },
       loginFormSubmitted(res) {
-        __log('Login Form Submitted', res)
         // this.$store.commit(USER.CLOSE_LOGIN_MODAL)
       }
     }

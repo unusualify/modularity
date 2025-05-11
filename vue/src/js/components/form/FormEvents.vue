@@ -86,7 +86,6 @@ export default {
         return this.modelValue ?? {}
       },
       set(value) {
-        console.log('input setter', value)
         this.$emit('update:modelValue', value)
       }
     }
@@ -102,7 +101,6 @@ export default {
       return item ? item[event.itemTitle] : event.label
     },
     getEventProps(event) {
-      // __log(event)
       return this.$lodash.omit(event, [
         'type',
         'name',

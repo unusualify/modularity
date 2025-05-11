@@ -84,13 +84,11 @@ export default {
     // const vFitGrid = resolveDirective('fit-grid')
     // const directives = [vFitGrid];
     // const directives = props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : []
-    // __log(directives)
-    // console.log(props.configuration.value);
+
     const FuncPattern = /^\{(.*)\}$/
     const CastPattern = /\$([\w|.|\_|\-]+)/
 
     const slots = computed(() => {
-      // console.log(props.configuration);
       if(props.configuration.hasOwnProperty('slots'))
         return props.configuration.slots
       else
@@ -272,7 +270,7 @@ export default {
     }
   },
   created () {
-    // console.log(this.configuration)
+
   }
 }
 </script>

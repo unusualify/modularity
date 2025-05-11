@@ -77,7 +77,6 @@
     watch: {
       tab_: {
         handler (value, oldValue) {
-          __log('tab watcher', value)
           this.$emit('update:modelValue', value)
         }
       },

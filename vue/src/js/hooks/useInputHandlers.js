@@ -26,7 +26,7 @@ export default function useInputHandlers () {
       Object.prototype.hasOwnProperty.call(obj.schema.slotHandlers, camelSlotName)) {
       const name = _.camelCase(obj.schema.slotHandlers[camelSlotName])
       const func = `${name}Handler`
-      // __log(obj.schema.slotHandlers, name, func, camelSlotName)
+
       return methods[func](obj, camelSlotName)
     }
   }

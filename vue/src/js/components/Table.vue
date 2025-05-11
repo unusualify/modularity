@@ -523,7 +523,6 @@
                   <div>
                     <div class="d-flex flex-wrap ga-2 justify-sm-end ml-n2 ml-md-0">
                       <template v-for="(action, k) in rowActions" :key="k">
-                        <!-- {{ $log(action) }} -->
                         <v-tooltip
                           v-if="itemHasAction(element, action)"
                           :text="$t( action.label ?? $headline(action.name) )"
@@ -605,7 +604,6 @@
             </v-tooltip>
           </template>
           <template v-else-if="col.formatter == 'switch'">
-            <!-- {{ $log('switch', item, col.key) }} -->
             <v-switch
               :key="i"
               :model-value="item[col.key]"

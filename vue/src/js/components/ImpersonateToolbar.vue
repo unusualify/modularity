@@ -43,7 +43,7 @@ const show = computed({
 })
 
 watch(selected, function (newValue, oldValue) {
-  __log(newValue, oldValue)
+
 })
 const impersonateRoute = computed(() => {
   return props.route.replace(':id', selected.value)

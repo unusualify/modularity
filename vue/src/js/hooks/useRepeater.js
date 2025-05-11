@@ -203,7 +203,6 @@ export default function useRepeater (props, context) {
         if (clonedSchema[uniqueField.value]) {
           const _model = parseRepeaterModel(inputs[i])
           const selfValue = _model[uniqueField.value]
-          // __log('hydrateSchemas', selfValue, uniqueFilledValues.value, state.processedSchema[uniqueField].items)
           clonedSchema[uniqueField.value].items = uniqueInput.value.items.filter(item => !(uniqueFilledValues.value.includes(item[uniqueValue]) && selfValue !== item[uniqueValue]))
         }
       }
@@ -371,7 +370,7 @@ export default function useRepeater (props, context) {
       })
     },
     onHoverContent (index) {
-      // __log('onHoverContent', index)
+
     },
     addRepeaterBlock: function () {
       if (state.isAddible) {

@@ -49,7 +49,6 @@ export const processInputs = (inputObj) => {
       acc[key] = value;
     } else {
       acc[key] = value;
-      // __log(inputObj, value, key)
     }
     return acc;
   }, {});

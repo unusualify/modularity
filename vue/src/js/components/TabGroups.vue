@@ -97,11 +97,9 @@
       },
       // search: {
       //   get () {
-      //     __log('getter')
       //     return ''
       //   },
       //   set (val) {
-      //     __log('setter', val)
       //     this.loadItems({replaceUrl: false, search: val})
       //     // store.commit(DATATABLE.UPDATE_DATATABLE_SEARCH, val)
       //     // store.dispatch(ACTIONS.GET_DATATABLE)

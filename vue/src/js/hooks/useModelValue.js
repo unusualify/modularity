@@ -11,7 +11,6 @@ export default function useModelValue (props, context, name = 'activeItem') {
   const state = reactive({
     [name]: computed({
       get () {
-        __log('getter', props.modelValue)
         return props.modelValue
       },
       set (value) {

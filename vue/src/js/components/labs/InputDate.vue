@@ -43,8 +43,6 @@ export default {
       }
     },
     dateFormattedLocale () {
-      // __log(this.input)
-      // __log(this.input, !!this.input)
       // return this.input ? this.$d(new Date(this.input), 'short') : ''
       return this.input ? this.$d(new Date(this.input), 'medium') : ''
       return this.input ? this.$d(new Date(this.input), 'long') : ''

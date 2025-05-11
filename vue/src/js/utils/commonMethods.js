@@ -28,7 +28,7 @@ export default {
     } else if (attributes == null) {
       return { ...this.$attrs }
     }
-    // __log(_props)
+
     return _attributes
   },
   $main: function () {
@@ -74,7 +74,6 @@ export default {
       let notation = matches[1]
       let quoted = __preg_quote(matches[0])
       let parts = notation.split('.')
-      // __log(parts)
 
       let newParts = []
       for(const j in parts){
@@ -211,7 +210,6 @@ export default {
 
       let displayLabel = input.displayLabel || input.label || input.name || key;
       displayLabel = this.$localization(displayLabel)
-      // __log(displayLabel, input)
 
       if(!input.type || input.type == 'hidden') continue;
 
@@ -229,7 +227,6 @@ export default {
 
             delete displayData[key]
             displayData = Object.assign(displayData, this.$getDisplayData(input.schema, model))
-            // console.log(input.schema, model, getDisplayData(input.schema, model))
             // displayData[key].value = getDisplayData(input.schema, model);
           }
         break;
@@ -271,7 +268,6 @@ export default {
               return acc
 
             const _displayLabel = item.title || item.name
-            // __log(item)
             // acc[_key] = {
             //   title: _key,
             //   items: {}
@@ -302,7 +298,6 @@ export default {
                 if(!!_haystack){
                   let item = _haystack.find(i => i.id == _value);
                   _value = item ? item.title || item.name : _value;
-                  // __log(id, _key, _map, _displayData, _value)
 
                   __displayData._value = _value;
                   let __displayKeys = this.$getDisplayKeys(item);
@@ -327,7 +322,6 @@ export default {
           // const { n, locale, numberFormats, t, te } = useI18n({ useScope: 'global' })
           const currencyInfo = this.$numberFormats[this.$getLocale].currency
           const displayCurrency = input.items.find(c => c.iso === currencyInfo.currency)
-          __log(this.$n(100, { style: 'currency', currency: currencyInfo.currency }))
 
           displayData[key]._value = this.$n(
             value.find(priceItem => priceItem.currency_id === displayCurrency.id).raw_amount,
@@ -336,10 +330,8 @@ export default {
         break;
         default:
           if (__isObject(value)) {
-            // __log('getDisplayData is object', input.type, value, input)
             displayData[key]._value = value;
           } else if (Array.isArray(value) && input.items) {
-            // __log('getDisplayData is array', input.type, key, value, input)
             displayData[key]._value = value.map(id => {
               const item = input.items.find(i => i[input.itemValue] === id);
               return item ? item[input.itemTitle] : id;

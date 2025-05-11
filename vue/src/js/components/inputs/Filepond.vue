@@ -245,7 +245,6 @@
           // onprocessfileabort(file) {}, //	Aborted processing of a file
           // onprocessfilerevert(file) {}, //	Processing of a file has been reverted
           // onprocessfile(error, file) {
-          //   __log('onprocessfile', self, file)
           //   self.input = self.input.concat({
           //     folder_name: file.serverId,
           //     file_name: file.filename,
@@ -274,7 +273,6 @@
         });
       },
       addFile(...args){
-        __log('addFile', args)
         return this.$refs.pond.addFile(...args)
       },
       browse(...args){
@@ -339,7 +337,6 @@
             axios.post( this.endPoints.process, formData, {
                 requestId,
                 onUploadProgress: e => {
-                  // __log('onUpload', e)
                   // Should call the progress method to update the progress to 100% before calling load
                   // Setting computable to false switches the loading indicator to infinite mode
                   progress(e.lengthComputable, e.loaded, e.total);
@@ -440,24 +437,22 @@
         if(this.obj && this.obj.schema && this.obj.schema.parentName){
           name = `${this.obj.schema.parentName}.${name}`
         }
-        // __log(name)
         return name
       },
     },
     watch: {
       modelValue: {
         handler(newVal) {
-          // __log('modelValue', newVal)
+
         },
       },
       disabled: {
         handler(newVal) {
-          // __log('disabled', newVal)
+
         },
       },
     },
     created() {
-      // __log('created', this.obj.schema.name)
       let rawRules = __data_get(this.obj, 'schema.rawRules', '') || '';
 
       if(this.min && this.min > 0 && !rawRules.match(/required:array:\d+/)){

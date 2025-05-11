@@ -348,7 +348,6 @@ export default function useForm(props, context) {
   }
 
   const resetValidation = () => {
-    __log(VForm)
     VForm.value.resetValidation()
   }
 
@@ -425,21 +424,6 @@ export default function useForm(props, context) {
 
   // Initialize
   const initialize = () => {
-    // rawSchema.value = issetSchema.value ? props.schema : store.state.form.inputs
-    // defaultItem.value = issetSchema.value ? getModel(rawSchema.value) : store.getters.defaultItem
-
-    // model.value = getModel(
-    //   rawSchema.value,
-    //   issetModel.value ? props.modelValue : editedItem.value,
-    //   // states.model,
-    //   store.state,
-    // )
-
-    // states.inputSchema = validations.invokeRuleGenerator(getSchema(rawSchema.value, states.model, props.isEditing))
-    // states.topSchema = getTopSchema(rawSchema.value, props.isEditing)
-    // states.extraValids = props.actions.length ? props.actions.map(() => true) : []
-
-    // __log('initialize')
     resetSchemaErrors()
   }
 
@@ -461,7 +445,7 @@ export default function useForm(props, context) {
 
         handleEvent(obj)
       }
-      // __log('useForm handleInput', event)
+
       context.emit('input', event)
     },
     handleClick: (e) => {
@@ -473,20 +457,19 @@ export default function useForm(props, context) {
       // check 'click' is from from appendIcon at key password
 
       // for click slot handlers
-      // __log(params, val)
       if (on === 'click' && params && params.tag) {
         // toggle visibility of password control
         inputHandlers.invokeInputClickHandler(obj, params.tag)
       }
     },
     handleUpdate: (e) => {
-      // __log('handleUpdate', e)
+
     },
     handleResize: (e) => {
-      // __log('handleResize', e)
+
     },
     handleBlur: (e) => {
-      // __log('handleBlur', e)
+
     },
     submit: (e, callback = null, errorCallback = null) => {
       if (validations.validModel.value) {
@@ -508,7 +491,6 @@ export default function useForm(props, context) {
       }
     },
     updatedSlotModel: (value, inputName) => {
-      __log(states.model, value, inputName)
     },
     regenerateInputSchema: (newItem) => {
       // #TODO regenerate inputschema for prefix regex pattern
@@ -518,7 +500,6 @@ export default function useForm(props, context) {
     },
 
     updatedCustomFormBaseModelValue: (value) => {
-      __log('updatedCustomFormBaseModelValue', value)
       model.value = value
     },
   })
@@ -529,9 +510,8 @@ export default function useForm(props, context) {
     if(oldVal === undefined) return
 
     if (issetModel.value) {
-      // __log('modelValue watch', isEqual(newVal, oldVal), isEqual(newVal, model.value), newVal, model.value)
       if(isEqual(newVal, oldVal) && isEqual(newVal, model.value)) return
-      // __log('modelValue watch', newVal, oldVal)
+
       model.value = getModel(rawSchema.value, newVal, store.state)
     }
   })
@@ -546,13 +526,12 @@ export default function useForm(props, context) {
 
   watch(() => model.value, (newVal, oldVal) => { // ✅ Proper ref watching
     if (issetModel.value) {
-      // __log('model watch', isEqual(newVal, oldVal), isEqual(newVal, props.modelValue), newVal, props.modelValue)
 
       if(isEqual(newVal, oldVal) && isEqual(newVal, props.modelValue)) return
 
       context.emit('update:modelValue', newVal)
     } else {
-      // __log('useForm model watch for editedItem', newVal, oldVal)
+
     }
   }, { deep: true })
 
@@ -568,8 +547,6 @@ export default function useForm(props, context) {
 
   // Watch schema
   watch(() => props.schema, (newValue, oldValue) => {
-    // __log('schema watch', newValue)
-    // __log('schema watch', isEqual(newValue, oldValue), newValue, oldValue)
     if (!isEqual(newValue, oldValue) && issetSchema.value && !isEqual(newValue, inputSchema.value)) {
       rawSchema.value = newValue
       defaultItem.value = getModel(rawSchema.value)
@@ -590,7 +567,6 @@ export default function useForm(props, context) {
 
   // Watch inputSchema
   watch(() => inputSchema.value, (newValue, oldValue) => {
-    // __log('inputSchema watch', newValue, oldValue)
 
     // if(isEqual(newValue, oldValue) && isEqual(newValue, rawSchema.value)) return
 

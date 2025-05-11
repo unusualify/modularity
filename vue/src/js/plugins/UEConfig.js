@@ -100,7 +100,6 @@ export default {
         components.keys().forEach((path) => {
           const fileName = path.split('/').pop().split('.')[0]
           const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
-          // __log(componentName, fileName, folder)
           app.component(componentName, require(`__components/${folder}${fileName}.vue`).default)
         })
       },
@@ -116,7 +115,6 @@ export default {
         // components.keys().forEach((path) => {
         //   const fileName = path.split('/').pop().split('.')[0]
         //   const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
-        //   // __log(componentName, fileName, folder)
         //   app.component(componentName, require(`__components/${folder}${fileName}.vue`).default)
         // })
       },
@@ -139,7 +137,6 @@ export default {
           this.$store.commit(ALERT.SET_ALERT, Obj)
         },
         openFreeMediaLibrary: function () {
-          // __log('openFreeMedialibrary triggered', this.$root.$refs.main.$refs)
           this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_CONNECTOR, null) // reset connector
           this.$store.commit(MEDIA_LIBRARY.RESET_MEDIA_TYPE) // reset to first available type
           this.$store.commit(MEDIA_LIBRARY.UPDATE_REPLACE_INDEX, -1) // we are not replacing an image here
