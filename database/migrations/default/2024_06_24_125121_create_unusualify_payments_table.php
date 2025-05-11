@@ -11,16 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $paymentsTable = config('payable.table', 'unfy_payments');
+        $paymentsTable = config('payable.table', 'up_payments');
 
-        // dd($paymentsTable);
         Schema::create($paymentsTable, function (Blueprint $table) {
             $table->id();
             $table->string('payment_gateway')->nullable();
             $table->string('order_id');
             $table->integer('amount');
-            $table->integer('currency_id')->nullable();
-            $table->enum('status', ['PENDING', 'CANCELLED', 'COMPLETED', 'FAILED', 'REFUNDED']);
+            $table->string('currency', 3);
+            $table->string('status')->default('PENDING');
             $table->string('email')->nullable();
             $table->integer('installment')->nullable();
             $table->json('parameters')->nullable();
@@ -35,7 +34,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        $paymentsTable = config('payable.table', 'unfy_payments');
+        $paymentsTable = config('payable.table', 'up_payments');
 
         Schema::dropIfExists($paymentsTable);
 
