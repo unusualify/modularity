@@ -321,7 +321,7 @@ trait FormSchema
                             throw new \Exception('Repository or connector not found on morphTo input: ' . $name);
                         }
 
-                        $columns = $modelClass->getColumns();
+                        $columns = $modelClass->getTableColumns();
                         $intersects = array_values(array_intersect($foreignKeys, $columns));
                         if (count($intersects) > 0) {
                             $isCascadeable = true;
@@ -389,7 +389,7 @@ trait FormSchema
                 $morphId = $input['morphId'] ?? makeMorphForeignKey(get_class_short_name($model));
                 $morphType = $input['morphType'] ?? makeMorphForeignType(get_class_short_name($model));
 
-                $columns = $modelInstance->getColumns();
+                $columns = $modelInstance->getTableColumns();
 
                 if (! (in_array($morphId, $columns) && in_array($morphType, $columns))) {
                     throw new \Exception("{$morphType} and {$morphId} columns are not present in the model " . $model);
