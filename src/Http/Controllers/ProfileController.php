@@ -152,6 +152,7 @@ class ProfileController extends BaseController
                         'fillHeight' => true,
                         'pushButtonToBottom' => true,
                         'formClass' => 'elevation-2 rounded',
+                        'clearOnSaved' => true,
 
                         'title' => [
                             'text' => __('Security'),
@@ -266,11 +267,11 @@ class ProfileController extends BaseController
 
         $this->repository->update($id, $formRequest->all(), $schema);
 
-        // $item->update($formRequest->all());
+        $response = [];
 
         activity()->performedOn($item)->log('updated');
 
-        return $this->respondWithSuccess(___('messages.save-success'));
+        return $this->respondWithSuccess(___('messages.save-success'), $response);
 
     }
 
