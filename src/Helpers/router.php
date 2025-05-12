@@ -134,7 +134,7 @@ if (! function_exists('resolve_route')) {
                 // throw new \Exception('Action route must not have parameters: ' . $routeName);
             }
 
-            $url = route($routeName, array_merge($routeParameters, $params));
+            $url = route($routeName, $routeParameters);
 
             if (count($params) > 0) {
                 $qs = array_to_query_string($params);
