@@ -440,7 +440,7 @@ return [
                 'cols' => 12,
                 'lg' => 12,
             ],
-            // 'rules' => 'required',
+            'rules' => 'required',
         ],
     ],
 ];
