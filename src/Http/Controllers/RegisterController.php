@@ -48,107 +48,7 @@ class RegisterController extends Controller
                     'align' => 'center',
                     'justify' => 'center',
                 ],
-                'schema' => ($schema = $this->createFormSchema([
-                    'name' => [
-                        'type' => 'text',
-                        'name' => 'name',
-                        'label' => 'Name',
-                        'default' => '',
-                        'col' => [
-                            'cols' => 6,
-                            'lg' => 6,
-                        ],
-                        'rules' => [
-                            ['min', 3],
-                        ],
-                    ],
-                    'surname' => [
-                        'type' => 'text',
-                        'name' => 'surname',
-                        'label' => 'Surname',
-                        'default' => '',
-                        'col' => [
-                            'cols' => 6,
-                            'lg' => 6,
-                        ],
-                        'rules' => [
-                            ['min', 2],
-                        ],
-                    ],
-                    'company' => [
-                        'type' => 'text',
-                        'name' => 'company',
-                        'label' => 'Company',
-                        'default' => '',
-                        'col' => [
-                            'cols' => 6,
-                            'lg' => 6,
-                        ],
-                        'rules' => [
-                            ['min', 2],
-                        ],
-                    ],
-                    'email' => [
-                        'type' => 'text',
-                        'name' => 'email',
-                        'label' => ___('authentication.email'),
-                        'default' => '',
-                        'col' => [
-                            'cols' => 6,
-                            'lg' => 6,
-                        ],
-                        'rules' => [
-                            ['email'],
-                        ],
-                    ],
-                    'password' => [
-                        'type' => 'password',
-                        'name' => 'password',
-                        'label' => 'Password',
-                        'default' => '',
-                        'appendInnerIcon' => '$non-visibility',
-                        'slotHandlers' => [
-                            'appendInner' => 'password',
-                        ],
-                        'col' => [
-                            'cols' => 6,
-                            'lg' => 6,
-                        ],
-                        'rules' => [
-                            ['required', 'classic', null, null, 'Password is required'],
-                            ['min', 8, 'Password must be at least 8 characters'],
-                        ],
-
-                    ],
-                    're_password' => [
-                        'type' => 'password',
-                        'name' => 're-password',
-                        'label' => 'Repeat Password',
-                        'default' => '',
-                        'appendInnerIcon' => '$non-visibility',
-                        'slotHandlers' => [
-                            'appendInner' => 'password',
-                        ],
-                        'col' => [
-                            'cols' => 6,
-                            'lg' => 6,
-                        ],
-                        'rules' => [
-                            ['required', 'classic', null, null, 'Confirm Password'],
-                        ],
-                    ],
-                    'tos' => [
-                        'type' => 'checkbox',
-                        'name' => 'tos',
-                        'label' => __('authentication.tos'),
-                        'default' => '',
-                        'col' => [
-                            'cols' => 12,
-                            'lg' => 12,
-                        ],
-                    ],
-                ])),
-
+                'schema' => $this->createFormSchema(getFormDraft('register_form')),
                 'actionUrl' => route(Route::hasAdmin('register')),
                 'buttonText' => 'authentication.register',
                 'formClass' => 'py-6',
@@ -170,7 +70,6 @@ class RegisterController extends Controller
                                 'class' => 'v-col-5 justify-content-start',
                                 'color' => 'grey-lighten-1',
                                 'density' => 'default',
-
                             ],
                         ],
                         [
@@ -245,11 +144,6 @@ class RegisterController extends Controller
 
                 ],
             ],
-            // 'defaultItem' => collect($schema)->mapWithKeys(function($item, $key){
-            //     return [ $item['name'] => $item['default'] ?? ''];
-            //     $carry[$key] = $item->default ?? '';
-            // })->toArray(),
-
         ]);
     }
 
@@ -260,11 +154,6 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        // dd(
-        //     trans('validation.unique'),
-        //     __('validation.unique'),
-        //     ___('validation.unique'),
-        // );
         return Validator::make($data, $this->rules());
     }
 
@@ -276,6 +165,7 @@ class RegisterController extends Controller
      */
     protected function register(Request $request)
     {
+        dd($request->all());
         $validator = $this->validator($request->all());
 
         if ($validator->fails()) {
@@ -332,22 +222,4 @@ class RegisterController extends Controller
             ],
         ]);
     }
-
-    // public function store(Request $request)
-    // {
-    //     dd(
-    //         $request->all()
-    //     );
-    //     $this->validate($request, [
-    //         // 'name' => 'required',
-    //         'email' => 'required|email',
-    //         'password' => 'required'
-    //     ]);
-
-    //     $user = User::create($request->only(['name', 'email', 'password']));
-
-    //     // auth()->login($user);
-
-    //     return redirect()->to('login.form');
-    // }
 }
