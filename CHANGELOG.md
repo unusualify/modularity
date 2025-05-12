@@ -2,9 +2,21 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.29.1 - 2025-05-12
+
+### :wrench: Bug Fixes
+
+- update method calls to retrieve table columns for improved accuracy by @OoBook in https://github.com/unusualify/modularity/commit/98385cff7bebb63e997f2753bb50e081967089f1
+- simplify route URL generation by removing unnecessary parameters by @OoBook in https://github.com/unusualify/modularity/commit/84a92b193712b7562a694e19afc4bae45d4dc1df
+
+### :green_heart: Workflow
+
+- update manual-release.yml by @web-flow in https://github.com/unusualify/modularity/commit/e1b03b2374be74d00411101cdc07eeeb3a2d8cc1
+
 ## v0.29.0 - 2025-05-12
 
 ### :rocket: Features
+
 - add password confirmation label for user input by @OoBook in https://github.com/unusualify/modularity/commit/f8a8408db4a1264ec472006f8801c4b2fcf565bd
 - add success message for password saving by @OoBook in https://github.com/unusualify/modularity/commit/6e5add4d8acf25ddd85331a71ecededa1b1576c3
 - enhance form component with button positioning by @OoBook in https://github.com/unusualify/modularity/commit/85ccb9456258db6d423e2b94ea58ec383039dfcc
@@ -118,6 +130,7 @@ All notable changes to `modularity` will be documented in this file
 - add computed property for assignment presence and improve avatar handling by @OoBook in https://github.com/unusualify/modularity/commit/d361f5858620788a02646143edb16ad84426d7cf
 
 ### :wrench: Bug Fixes
+
 - change orWhereHas to whereHas for translation filtering by @OoBook in https://github.com/unusualify/modularity/commit/8938bce8810439365e9a5aa89354f32cca147f5c
 - update assignment status handling with enums by @OoBook in https://github.com/unusualify/modularity/commit/1ad6883a1a462c9434b54381ef491a32f19d6152
 - update validation rules for user locale input by @OoBook in https://github.com/unusualify/modularity/commit/5d5cabbb7eec16bacc629a953bb29718b3cc65b8
@@ -152,6 +165,7 @@ All notable changes to `modularity` will be documented in this file
 - correct return statement formatting for modelValue handling by @OoBook in https://github.com/unusualify/modularity/commit/3420797ff34e293502688ca728fcafcb3f34b6df
 
 ### :recycle: Refactors
+
 - update validation rules and add reset password form by @OoBook in https://github.com/unusualify/modularity/commit/6b001072a4150ad8d39a5df63cc224ea5dca83bc
 - update validation rules for user creation and update by @OoBook in https://github.com/unusualify/modularity/commit/2742d21411c75afd28dc3496922f654e590e8b8c
 - enhance layout flexibility with conditional rendering by @OoBook in https://github.com/unusualify/modularity/commit/b5664eaf4b7bddeff6f97229869057eeb6dee8af
@@ -243,20 +257,24 @@ All notable changes to `modularity` will be documented in this file
 - simplify template structure and enhance layout by @OoBook in https://github.com/unusualify/modularity/commit/6d97586851f016a81f78946fd459dd04c1ea443c
 
 ### :lipstick: Styling
+
 - remove unnecessary console log from created lifecycle hook by @OoBook in https://github.com/unusualify/modularity/commit/dd7994c52708f955214b997eaa0529e5ab637cc8
 - streamline SCSS structure for input assignment component by @OoBook in https://github.com/unusualify/modularity/commit/b6eeb4c059555184dcc9654312cf35a09888e870
 - update button class for improved text styling by @OoBook in https://github.com/unusualify/modularity/commit/e9a3744ed24a85ebf729721ccb9e1a0a111c0184
 - lint coding styles for v0.29.0 by @OoBook in https://github.com/unusualify/modularity/commit/e5127f8fefcfb5d887736ab3fc9dc2e1026de864
 
 ### :white_check_mark: Testing
+
 - remove deprecated test_valid_company method by @OoBook in https://github.com/unusualify/modularity/commit/fe5bc31168a8b50c302885ec43af71ecd06cb8b4
 - update company test to include spread payload and personal attribute by @OoBook in https://github.com/unusualify/modularity/commit/11cd0f5604fb67e4f09b3d7753ef56a3eb097f2f
 - update endpoint naming and enhance modal test coverage by @OoBook in https://github.com/unusualify/modularity/commit/49843db3f7a9dcdf46e2b1a34d5741b97f76f0c8
 
 ### :package: Build
+
 - update build artifacts for v0.29.0 by @OoBook in https://github.com/unusualify/modularity/commit/90d04e52330b9b94719d6b935d941acb6014edfe
 
 ### :beers: Other Stuff
+
 - add verification messages for email confirmation by @OoBook in https://github.com/unusualify/modularity/commit/8cfe0fd12da124c4089e99b956242d54823b02f6
 - enhance filter organization and clarity by @OoBook in https://github.com/unusualify/modularity/commit/80910f71a641005744e3407ba70440e4b2f74d8f
 - add new comments by @OoBook in https://github.com/unusualify/modularity/commit/e80e1b97d646864b8cabcf4990517faa257ca824
