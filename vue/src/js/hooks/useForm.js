@@ -141,6 +141,11 @@ export const makeFormProps = propsFactory({
     type: String,
     default: 'Additional Options'
   },
+
+  clearOnSaved: {
+    type: Boolean,
+    default: false
+  },
 })
 
 export default function useForm(props, context) {
@@ -258,6 +263,12 @@ export default function useForm(props, context) {
           } else if (Object.prototype.hasOwnProperty.call(response.data, 'variant')) {
             store.commit(FORM.SET_SERVER_VALID, false)
             store.commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
+          }
+
+          if(props.clearOnSaved) {
+            states.model = getModel(rawSchema.value)
+            resetValidation()
+            VForm.value && VForm.value.reset()
           }
 
           context.emit('submitted', response.data)
