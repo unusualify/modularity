@@ -1,6 +1,11 @@
 <template>
   <v-sheet class="fill-height">
-    <ue-title :text="moduleTitle" :classes="[]"></ue-title>
+    <div class="py-4">
+      <ue-title :text="moduleTitle" :classes="[]" padding='a-0'></ue-title>
+      <ue-title v-if="subtitle" :text="subtitle" :classes="[]" padding='a-0' weight='light' transform='none' type='subtitle-2'></ue-title>
+    </div>
+
+    <v-divider class=""></v-divider>
     <ue-tabs-previous :items="groupedItems" v-model="activeTab">
       <template v-for="(_, name) in $slots" v-slot:[name]="slotData"><slot :name="name" v-bind="slotData"></slot></template>
     </ue-tabs-previous>
@@ -20,6 +25,9 @@
     name: 'ue-tab-groups',
     props: {
       ...makeModuleProps(),
+      subtitle: {
+        type: String,
+      },
       groupKey: {
         type: String,
         required: true
