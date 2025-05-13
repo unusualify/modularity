@@ -195,28 +195,28 @@ class LoginController extends Controller
                                 ],
                             ],
                         ],
-                        [
-                            'tag' => 'v-btn',
-                            'elements' => ___('authentication.sign-in-apple'),
-                            'attributes' => [
-                                'variant' => 'outlined',
-                                'href' => route('admin.login.provider', ['provider' => 'github']),
-                                'class' => 'my-2 custom-auth-button',
-                                'color' => 'grey-lighten-1',
-                                'density' => 'default',
+                        // [
+                        //     'tag' => 'v-btn',
+                        //     'elements' => ___('authentication.sign-in-apple'),
+                        //     'attributes' => [
+                        //         'variant' => 'outlined',
+                        //         'href' => route('admin.login.provider', ['provider' => 'github']),
+                        //         'class' => 'my-2 custom-auth-button',
+                        //         'color' => 'grey-lighten-1',
+                        //         'density' => 'default',
 
-                            ],
-                            'slots' => [
-                                'prepend' => [
-                                    'tag' => 'ue-svg-icon',
-                                    'attributes' => [
-                                        'symbol' => 'apple',
-                                        'width' => '16',
-                                        'height' => '16',
-                                    ],
-                                ],
-                            ],
-                        ],
+                        //     ],
+                        //     'slots' => [
+                        //         'prepend' => [
+                        //             'tag' => 'ue-svg-icon',
+                        //             'attributes' => [
+                        //                 'symbol' => 'apple',
+                        //                 'width' => '16',
+                        //                 'height' => '16',
+                        //             ],
+                        //         ],
+                        //     ],
+                        // ],
                         [
                             'tag' => 'v-btn',
                             'elements' => ___('authentication.create-an-account'),
