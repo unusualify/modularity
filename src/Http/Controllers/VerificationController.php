@@ -15,6 +15,7 @@ class VerificationController extends Controller
         $request->fulfill();
 
         return view(modularityBaseKey() . '::auth.success', [
+            'pageTitle' => __('authentication.verification-complete'),
             'taskState' => [
                 'status' => 'success',
                 'title' => __('authentication.verification-complete'),
