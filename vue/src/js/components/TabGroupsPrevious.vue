@@ -1,12 +1,38 @@
 <template>
   <v-sheet class="fill-height">
-    <div class="py-4">
-      <ue-title :text="moduleTitle" :classes="[]" padding='a-0'></ue-title>
-      <ue-title v-if="subtitle" :text="subtitle" :classes="[]" padding='a-0' weight='regular' transform='none' type='subtitle-2'></ue-title>
+
+    <div class="py-4 d-flex justify-space-between flex-wrap ga-2">
+      <div class="flex-1-0" style="max-width: 100%;">
+        <ue-title :text="moduleTitle" :classes="[]" padding='a-0'></ue-title>
+        <ue-title class="text-wrap" v-if="subtitle" :text="subtitle" :classes="[]" padding='a-0' weight='regular' transform='none' type='subtitle-2'></ue-title>
+      </div>
+      <div v-if="!noSearch" class="flex-1-1">
+        <v-text-field
+          v-model="searchModel"
+          label="Search"
+          variant="outlined"
+          density="compact"
+          color="primary"
+          hide-details
+          style="min-width: 300px;"
+          @keydown.enter="enterSearch"
+          >
+          <template v-slot:append-inner>
+            <v-icon v-if="searchable" icon="mdi-magnify" variant="text" @click="enterSearch"></v-icon>
+          </template>
+        </v-text-field>
+      </div>
     </div>
 
-    <v-divider class=""></v-divider>
-    <ue-tabs-previous :items="groupedItems" v-model="activeTab">
+    <v-divider></v-divider>
+    <div class="text-center pa-8" v-if="loading">
+      <v-progress-circular
+        :size="50"
+        color="primary"
+        indeterminate
+      ></v-progress-circular>
+    </div>
+    <ue-tabs-previous v-else :items="groupedItems" v-model="activeTab">
       <template v-for="(_, name) in $slots" v-slot:[name]="slotData"><slot :name="name" v-bind="slotData"></slot></template>
     </ue-tabs-previous>
   </v-sheet>
@@ -63,6 +89,16 @@
       search: {
         type: String,
         default: ''
+      },
+      noSearch: {
+        type: Boolean,
+        default: false
+      },
+      queryParameters: {
+        type: Object,
+        default: () => {
+          return {}
+        }
       }
     },
     setup (props, context) {
@@ -73,6 +109,7 @@
     },
     data () {
       return {
+        loading: false,
         searchInput: this.search,
         activeTab: Object.keys(this.groupedItems ?? {})[0] ?? 0
       }
@@ -103,18 +140,9 @@
           return acc
         }, grouped)
       },
-      // search: {
-      //   get () {
-      //     __log('getter')
-      //     return ''
-      //   },
-      //   set (val) {
-      //     __log('setter', val)
-      //     this.loadItems({replaceUrl: false, search: val})
-      //     // store.commit(DATATABLE.UPDATE_DATATABLE_SEARCH, val)
-      //     // store.dispatch(ACTIONS.GET_DATATABLE)
-      //   }
-      // },
+      searchable(){
+        return this.searchModel !== this.searchInput
+      },
     },
     watch: {
 
@@ -122,23 +150,29 @@
     methods: {
       loadItems(options = {}){
         let self = this
-        // state.loading = true
+        this.loading = true
         options = {
           ...(this.searchModel !== '' ? {  search: this.searchModel } : {}),
-          ...options
+          ...options,
+          ...this.queryParameters
         }
+
+        this.searchInput = this.searchModel
 
         api.get(this.endpoints.index, options, function(response, _raw){
           const parameters = getParameters(_raw.request.responseURL)
           self.elements = response.resource.data
 
           self.activeTab = Object.keys(self.groupedItems ?? {})?.[0] ?? 0
+          self.loading = false
           // replaceState(addParametersToUrl(getURLWithoutQuery(), parameters))
+        }, function(error){
+          self.loading = false
         })
       },
+
       enterSearch() {
         if(this.searchModel !== this.searchInput){
-          this.searchModel = this.searchInput
           this.loadItems({replaceUrl: false})
         }
       }
