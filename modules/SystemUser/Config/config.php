@@ -121,17 +121,19 @@ return [
                 ],
                 [
                     'type' => 'select-scroll',
-                    'componentType' => 'v-autocomplete',
                     'label' => 'Roles',
                     'name' => 'roles',
-                    'rules' => 'sometimes|required',
                     'col' => [
                         'cols' => 12,
                         'sm' => 8,
                         'md' => 6,
                     ],
+                    'itemTitle' => 'title',
                     // 'repository' => \Modules\SystemUser\Repositories\RoleRepository::class,
-                    'connector' => 'Role|uri',
+                    // 'connector' => 'Role|uri',
+                    'endpoint' => [
+                        'admin.system.system_user.role.index'
+                    ],
                     'rules' => 'required',
                 ],
             ],
@@ -148,7 +150,30 @@ return [
                 'isRowEditing' => true,
                 'rowActionsType' => 'inline',
             ],
+            'title_column_name' => 'title',
             'headers' => [
+                [
+                    'title' => 'Title',
+                    'key' => 'title',
+                    'align' => 'start',
+                    'sortable' => false,
+                    'filterable' => false,
+                    'groupable' => false,
+                    'divider' => false,
+                    'class' => '', // || []
+                    'cellClass' => '', // || []
+                    // 'width' => '', // || int
+                    // vuetify datatable header fields end
+
+                    // custom fields for ue-datatable start
+                    'searchable' => true,
+                    'isRowEditable' => false,
+                    'isColumnEditable' => false,
+                    'formatter' => [
+                        0 => 'edit',
+                    ],
+                    // custom fields for ue-datatable end
+                ],
                 [
                     'title' => 'Name',
                     'key' => 'name',
@@ -932,6 +957,21 @@ return [
             'inputs' => [
                 [
                     'type' => 'text',
+                    'name' => 'title',
+                    'label' => 'Title',
+                    // 'tooltip' => 'Enter a usual name',
+                    'col' => [
+                        'cols' => 10,
+                        'sm' => 10,
+                        'md' => 6,
+                        'lg' => 6,
+                        'xl' => 6,
+                    ],
+                    'rules' => 'sometimes|required|min:3',
+                    // 'prepend-icon' => 'mdi-card-text-outline',
+                ],
+                [
+                    'type' => 'text',
                     'name' => 'name',
                     'label' => 'Name',
                     'hint' => '',
@@ -945,9 +985,11 @@ return [
                         'lg' => 6,
                         'xl' => 6,
                     ],
+                    'editable' => false,
                     'rules' => 'sometimes|required|min:3',
                     // 'prepend-icon' => 'mdi-card-text-outline',
                 ],
+
                 [
                     'type' => 'text',
                     'name' => 'guard_name',
