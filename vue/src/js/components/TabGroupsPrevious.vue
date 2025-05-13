@@ -2,7 +2,7 @@
   <v-sheet class="fill-height">
     <div class="py-4">
       <ue-title :text="moduleTitle" :classes="[]" padding='a-0'></ue-title>
-      <ue-title v-if="subtitle" :text="subtitle" :classes="[]" padding='a-0' weight='light' transform='none' type='subtitle-2'></ue-title>
+      <ue-title v-if="subtitle" :text="subtitle" :classes="[]" padding='a-0' weight='regular' transform='none' type='subtitle-2'></ue-title>
     </div>
 
     <v-divider class=""></v-divider>
@@ -131,7 +131,9 @@
         api.get(this.endpoints.index, options, function(response, _raw){
           const parameters = getParameters(_raw.request.responseURL)
           self.elements = response.resource.data
-          replaceState(addParametersToUrl(getURLWithoutQuery(), parameters))
+
+          self.activeTab = Object.keys(self.groupedItems ?? {})?.[0] ?? 0
+          // replaceState(addParametersToUrl(getURLWithoutQuery(), parameters))
         })
       },
       enterSearch() {
