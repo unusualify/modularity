@@ -53,37 +53,18 @@ class RegisterController extends Controller
                 'buttonText' => 'authentication.register',
                 'formClass' => 'py-6',
                 'no-default-form-padding' => true,
+                'hasSubmit' => true,
             ],
             'formSlots' => [
-                'bottom' => [
-                    'tag' => 'v-sheet',
+                'options' => [
+                    'tag' => 'v-btn',
+                    'elements' => __('authentication.have-an-account'),
                     'attributes' => [
-                        'class' => 'd-flex pb-5 justify-space-between w-100 text-black my-5',
-                    ],
-                    'elements' => [
-                        [
-                            'tag' => 'v-btn',
-                            'elements' => __('authentication.have-an-account'),
-                            'attributes' => [
-                                'variant' => 'text',
-                                'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'v-col-5 justify-content-start',
-                                'color' => 'grey-lighten-1',
-                                'density' => 'default',
-                            ],
-                        ],
-                        [
-                            'tag' => 'v-btn',
-                            'elements' => __('authentication.register'),
-                            'attributes' => [
-                                'variant' => 'elevated',
-                                'href' => '',
-                                'class' => 'v-col-5',
-                                'type' => 'submit',
-                                'density' => 'default',
-
-                            ],
-                        ],
+                        'variant' => 'text',
+                        'href' => route(Route::hasAdmin('login.form')),
+                        'class' => '',
+                        'color' => 'grey-lighten-1',
+                        'density' => 'default',
                     ],
                 ],
             ],
@@ -141,7 +122,6 @@ class RegisterController extends Controller
                         // ],
 
                     ],
-
                 ],
             ],
         ]);
