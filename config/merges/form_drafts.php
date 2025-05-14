@@ -432,7 +432,7 @@ return [
             ],
         ],
         'tos' => [
-            'type' => 'checkbox',
+            'type' => 'input-terms-checkbox',
             'name' => 'tos',
             'label' => 'I accept the terms of service',
             'default' => '',
@@ -440,7 +440,7 @@ return [
                 'cols' => 12,
                 'lg' => 12,
             ],
-            'rules' => 'required',
+            // 'rules' => 'required',
         ],
     ],
 ];
