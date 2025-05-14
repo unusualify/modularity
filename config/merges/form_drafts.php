@@ -382,7 +382,7 @@ return [
                 'cols' => 6,
                 'lg' => 6,
             ],
-            'rules' => 'min:2',
+            // 'rules' => 'min:2',
         ],
         'email' => [
             'type' => 'text',
@@ -414,9 +414,9 @@ return [
             ],
 
         ],
-        're_password' => [
+        'password_confirmation' => [
             'type' => 'password',
-            'name' => 're-password',
+            'name' => 'password_confirmation',
             'label' => 'Repeat Password',
             'default' => '',
             'appendInnerIcon' => '$non-visibility',
