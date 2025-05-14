@@ -6,13 +6,20 @@
     class="v-input-checklist"
     >
     <template v-slot:default="defaultSlot">
-      <div class="v-input-checklist__field d-flex">
+      <div
+        :class="[
+          'v-input-checklist__field d-flex',
+          flexColumn && $vuetify.display.mdAndUp ? 'flex-wrap' : 'flex-wrap'
+        ]"
+        style="max-width: 100%;"
+      >
         <div v-if="label"
           class="d-flex flex-column"
           :style="[
-            !flexColumn ? 'flex: 0 1 25%;' : ''
+            'max-width: 100%;',
+            (flexColumn && $vuetify.display.mdAndUp) ? 'flex: 0 1 30%;' : 'flex: 1 0 100%;'
           ]"
-          >
+        >
           <ue-title v-if="label" padding="x-3" data-test="title" :color="labelColor" transform="none">
             {{ label }}
           </ue-title>
@@ -28,10 +35,14 @@
           </ue-title>
         </div>
 
-        <v-divider v-if="label || subtitle" vertical class="mr-4"></v-divider>
+        <!-- <v-divider v-if="(flexColumn && $vuetify.display.mdAndUp) && (label || subtitle)" vertical class="mr-4"></v-divider> -->
 
         <!-- treeview -->
-        <v-row v-if="isTreeview">
+        <v-row v-if="isTreeview"
+          :style="[
+            flexColumn && $vuetify.display.mdAndUp ? 'flex: 1 0 70%;' : 'flex: 1 1;'
+          ]"
+        >
           <v-col v-bind="{...treeviewCols}">
 
             <v-list v-model:opened="openedGroups">
@@ -188,10 +199,10 @@
 
         <!-- standard checkbox list -->
         <v-row v-else
-            :style="[
-              !flexColumn ? 'flex: 1 0 60%;' : ''
-            ]"
-          >
+          :style="[
+            flexColumn && $vuetify.display.mdAndUp ? 'flex: 1 1 60%;' : 'flex: 1 1;'
+          ]"
+        >
           <template v-for="(item, index) in items"
               :key="`checkbox-${index}`">
               <v-col v-bind="checkboxCol"
