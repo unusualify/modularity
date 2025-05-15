@@ -1350,6 +1350,13 @@ return [
                     'searchable' => true,
                 ],
                 [
+                    'title' => 'Country',
+                    'key' => 'country_name',
+                    'align' => 'start',
+                    // 'sortable' => true,
+                    // 'searchable' => true,
+                ],
+                [
                     'title' => 'Users',
                     'key' => 'users',
                 ],
@@ -1365,38 +1372,38 @@ return [
             ],
             'inputs' => [
                 [
-                    'type' => 'checkbox',
+                    'type' => 'radio-group',
                     'name' => 'is_personal',
                     'color' => 'primary',
-                    'label' => 'I don\'t have a company',
                     'col' => ['cols' => 12],
                     'hideDetails' => false,
-                    'ext' => [
-                        [
-                            'set',
-                            'name',
-                            'disabled',
-                            'disable_value.*.value',
-                        ],
-                        [
-                            'set',
-                            'tax_id',
-                            'disabled',
-                            'disable_value.*.value',
-                        ],
-                        [
-                            'set',
-                            'phone',
-                            'disabled',
-                            'disable_value.*.value',
-                        ],
-                        [
-                            'set',
-                            'email',
-                            'disabled',
-                            'disable_value.*.value',
-                        ],
-                    ],
+                    'spreadable' => true,
+                    // 'ext' => [
+                    //     [
+                    //         'set',
+                    //         'name',
+                    //         'disabled',
+                    //         'disable_value.*.value',
+                    //     ],
+                    //     [
+                    //         'set',
+                    //         'tax_id',
+                    //         'disabled',
+                    //         'disable_value.*.value',
+                    //     ],
+                    //     [
+                    //         'set',
+                    //         'phone',
+                    //         'disabled',
+                    //         'disable_value.*.value',
+                    //     ],
+                    //     [
+                    //         'set',
+                    //         'email',
+                    //         'disabled',
+                    //         'disable_value.*.value',
+                    //     ],
+                    // ],
                     'disable_value' => [
                         [
                             'id' => 0,
@@ -1407,7 +1414,16 @@ return [
                             'value' => 1,
                         ],
                     ],
-                    'spreadable' => true,
+                    'items' => [
+                        [
+                            'name' => 'Company',
+                            'id' => 0,
+                        ],
+                        [
+                            'name' => 'Personal',
+                            'id' => 1,
+                        ],
+                    ],
                 ],
                 [
                     'type' => 'text',
@@ -1450,23 +1466,9 @@ return [
                     'rules' => 'sometimes|required|min:5',
                 ],
                 [
-                    'type' => 'text',
-                    'title' => 'City',
-                    'name' => 'city',
-                    'label' => 'City',
-                    'placeholder' => '',
-                    'default' => '',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    'rules' => 'sometimes|required|min:3',
-                ],
-                [
-                    'type' => 'text',
+                    'type' => 'select',
                     'title' => 'Country',
-                    'name' => 'country',
+                    'name' => 'country_id',
                     'label' => 'Country',
                     'placeholder' => '',
                     'default' => '',
@@ -1475,13 +1477,28 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'rules' => 'sometimes|required|min:3',
+                    'connector' => 'SystemUtility:Country|repository:list',
+                    'rules' => 'sometimes|required',
                 ],
                 [
                     'type' => 'text',
                     'title' => 'State',
                     'name' => 'state',
                     'label' => 'State/Province',
+                    'placeholder' => '',
+                    'default' => '',
+                    'col' => [
+                        'cols' => 12,
+                        'sm' => 8,
+                        'md' => 6,
+                    ],
+                    'rules' => 'sometimes|required|min:3',
+                ],
+                [
+                    'type' => 'text',
+                    'title' => 'City',
+                    'name' => 'city',
+                    'label' => 'City',
                     'placeholder' => '',
                     'default' => '',
                     'col' => [
@@ -1522,7 +1539,6 @@ return [
                     'label' => 'Work E-mail',
                     'default' => '',
                     'col' => ['sm' => 6],
-                    'rules' => 'sometimes|email',
                 ],
                 // [
                 //     'type' => 'text',
