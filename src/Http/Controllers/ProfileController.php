@@ -188,9 +188,9 @@ class ProfileController extends BaseController
             $company = $this->companyRepository->getById($company->id);
             $companyFields = $this->companyRepository->getFormFields($company, $companySchema);
 
-            $companyFields['country_id'] = 1;
-            $companyFields['city_id'] = 1;
-            $companyFields['district_id'] = 2;
+            // $companyFields['country_id'] = 1;
+            // $companyFields['city_id'] = 1;
+            // $companyFields['district_id'] = 2;
 
             $sectionFields[] = [
                 'content' => [
