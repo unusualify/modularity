@@ -35,7 +35,7 @@
           </ue-title>
         </div>
 
-        <!-- <v-divider v-if="(flexColumn && $vuetify.display.mdAndUp) && (label || subtitle)" vertical class="mr-4"></v-divider> -->
+        <v-divider v-if="(flexColumn && $vuetify.display.mdAndUp) && (label || subtitle)" vertical class="mr-4"></v-divider>
 
         <!-- treeview -->
         <v-row v-if="isTreeview"
