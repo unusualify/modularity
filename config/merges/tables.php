@@ -27,4 +27,6 @@ return [
     'process_histories' => 'um_process_histories',
     'assignments' => 'um_assignments',
     'user_oauths' => 'um_user_oauths',
+    'countries' => 'um_countries',
+    'country_translations' => 'um_country_translations',
 ];
