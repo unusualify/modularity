@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Validator;
 use Unusualify\Modularity\Entities\Company;
 use Unusualify\Modularity\Entities\User;
@@ -159,7 +160,12 @@ class RegisterController extends Controller
             return $res;
         }
 
-        $user = Company::create()->users()->create([
+        $user = Company::create([
+            'name' => $request['company'] ?? '',
+            'spread_payload' => [
+                'is_personal' => $request['company'] ? false : true,
+            ],
+        ])->users()->create([
             'name' => $request['name'],
             'email' => $request['email'],
             'password' => Hash::make($request['password']),
@@ -183,9 +189,11 @@ class RegisterController extends Controller
         return [
             'name' => ['required', 'string', 'max:255'],
             // Surname is not mandatory.
-            // 'surname' => ['required', 'string', 'max:255'],
+            'surname' => ['required', 'string', 'max:255'],
+            // 'company' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . $usersTable . ',email'],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'tos' => ['required', 'boolean'],
         ];
     }
 
