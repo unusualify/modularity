@@ -41,6 +41,7 @@ class DefaultPermissionsSeeder extends Seeder
                 'User',
                 'Role',
                 'Permission',
+                'Company',
                 'VatRate',
                 'Currency',
                 'PriceType',
@@ -57,7 +58,8 @@ class DefaultPermissionsSeeder extends Seeder
         $roleInstances['admin']->givePermissionTo(Permission::all()->except([
             'user_forceDelete', 'user_bulkForceDelete',
             'role_forceDelete', 'role_bulkForceDelete',
-            'permission_forceDelete', 'permission_bulkForceDelete',
+            'company_forceDelete', 'company_bulkForceDelete',
+            // 'permission_forceDelete', 'permission_bulkForceDelete',
             'vat-rate_forceDelete', 'vat_rate_bulkForceDelete',
             'currency_forceDelete', 'currency_bulkForceDelete',
             'price-type_forceDelete', 'price-type_bulkForceDelete',
