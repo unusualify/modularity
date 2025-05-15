@@ -23,6 +23,7 @@ class UserRequest extends Request
         return [
             'name' => 'sometimes|required|min:4',
             'email' => 'sometimes|required|email|unique_table',
+            'country_id' => 'required|exists:um_countries,id',
         ];
     }
 
@@ -31,6 +32,7 @@ class UserRequest extends Request
         return [
             'name' => 'sometimes|required|min:4',
             'email' => 'sometimes|required|email|unique_table',
+            'country_id' => 'required|exists:um_countries,id',
         ];
     }
 }
