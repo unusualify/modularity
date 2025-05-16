@@ -207,11 +207,10 @@
                 <div class="flex-grow-0">
                   <v-avatar class="my-aut" :image="$store.getters.userProfile.avatar_url" size="40"/>
                 </div>
-                <v-input-filepond
-                  v-if="filepond"
+                <v-input-filepond v-if="filepond"
                   ref="inputFilepond"
                   class="d-non"
-                  v-bind="invokeRule($lodash.omit(filepond, ['type']))"
+                  v-bind="invokeRule($lodash.omit(filepond, ['type', 'rules', 'rawRules']))"
                   v-model="attachments"
 
                   :xmodelValue="attachments"
@@ -220,7 +219,6 @@
                   @loaded="loadingAttachment = false"
                 >
                   <template v-slot:activator="activatorProps">
-
                   </template>
                 </v-input-filepond>
               </template>
