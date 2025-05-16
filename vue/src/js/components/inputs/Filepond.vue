@@ -6,7 +6,7 @@
     v-model="input"
     hide-details
     :class="classes"
-    :rules="rules"
+    :rules="noRules ? [] : rules"
   >
     <template v-slot:default="defaultSlot">
       <slot name="activator"
@@ -455,9 +455,12 @@
     created() {
       let rawRules = __data_get(this.obj, 'schema.rawRules', '') || '';
 
-      if(this.min && this.min > 0 && !rawRules.match(/required:array:\d+/)){
-        this.rules.push(this.requiredRule('array', this.min))
+      if(this.isEditing ? this.editable === true : this.creatable === true){
+        if(!this.noRules && this.min && this.min > 0 && !rawRules.match(/required:array:\d+/)){
+          this.rules.push(this.requiredRule('array', this.min))
+        }
       }
+
     },
     mounted() {
       // Set up a MutationObserver to watch for changes in VInput's error state

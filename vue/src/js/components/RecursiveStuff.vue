@@ -26,6 +26,7 @@
         :key="`tag-${level}-${i}`"
         :level="level+1"
         :configuration="_configuration"
+        :bind-data="bindData ?? {}"
       />
     </template>
     <template v-if="isObject(configuration.elements)">
@@ -33,6 +34,7 @@
         :key="`tag-${level}-${i}`"
         :level="level+1"
         :configuration="configuration.elements"
+        :bind-data="bindData ?? {}"
       />
     </template>
 
@@ -42,10 +44,11 @@
 
     <template v-for="(slotConf,slotName) in slots"
       :key="`tag-${level}-slot-${slotName}`"
-      v-slot:[`${slotName}`]>
+      v-slot:[`${slotName}`]="slotScope">
       <ue-recursive-stuff
         :level="level+1"
         :configuration="slotConf"
+        :bind-data="{...bindData, ...slotScope}"
       />
     </template>
     <!-- <ue-recursive-stuff

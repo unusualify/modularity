@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusualify\Modularity\Observers;
+namespace Unusualify\Modularity\Entities\Observers;
 
 // use Oobook\Priceable\Models\Price;
 use Modules\SystemPricing\Entities\Price;

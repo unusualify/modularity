@@ -52,10 +52,10 @@ class StateableHydrate extends InputHydrate
         }
 
         // If default_states contains strings, convert them to objects first
-        $model = App::make($module->getRouteClass($routeName, 'model'));
+        $repository = App::make($module->getRouteClass($routeName, 'repository'));
 
         $input['items'] = ! $this->skipQueries
-            ? $model->getStateableList()
+            ? $repository->getStateableList(itemValue: 'name')
             : [];
 
         return $input;

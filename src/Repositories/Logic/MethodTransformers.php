@@ -56,12 +56,13 @@ trait MethodTransformers
 
         foreach ($fields as $key => $value) {
             if (! $this->shouldIgnoreFieldBeforeSave($key)) {
-                if (is_array($value) && empty($value)) {
-                    $fields[$key] = null;
-                }
-                if ($value === '') {
-                    $fields[$key] = null;
-                }
+                // if (is_array($value) && empty($value)) {
+                //     dd($value, $key, empty($value));
+                //     $fields[$key] = null;
+                // }
+                // if ($value === '') {
+                //     $fields[$key] = null;
+                // }
             }
         }
 
