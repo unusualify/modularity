@@ -88,6 +88,7 @@ class AssignmentHydrate extends InputHydrate
             'name' => 'attachments',
             'accepted-file-types' => $acceptedFileTypes,
             'max' => $maxAttachments,
+            'noRules' => true
         ]);
 
         return $input;
