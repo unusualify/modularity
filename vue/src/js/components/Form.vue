@@ -16,7 +16,7 @@
       <input v-if="!async" type="hidden" name="_token" :value="$csrf"/>
 
       <!-- Header Section -->
-      <div :class="[(hasDivider || title) ? 'pb-6' : '', scrollable ? 'flex-grow-0' : '']">
+      <div :class="[(hasDivider || title) ? 'pb-6 px-1' : '', scrollable ? 'flex-grow-0' : '']">
         <ue-title
           v-if="!noTitle && title"
           padding="b-3"
@@ -103,7 +103,7 @@
       <div :class="['d-flex', scrollable ? 'flex-grow-1 overflow-hidden mr-n5' : '']">
         <div :class="['w-100 d-flex', scrollable ? 'overflow-y-auto pr-3' : '']"
         >
-          <div class="flex-grow-1">
+          <div class="flex-grow-1 px-1">
             <!-- Top Form Actions -->
             <FormActions v-if="actionsPosition == 'top' && isEditing"
               :modelValue="formItem"
@@ -294,7 +294,7 @@
       <v-spacer v-if="pushButtonToBottom"></v-spacer>
 
       <!-- Footer Section -->
-      <div :class="[scrollable ? 'flex-grow-0' : '']">
+      <div :class="['px-1',scrollable ? 'flex-grow-0' : '']">
         <v-divider v-if="hasSubmit && !stickyButton && hasDivider" class="mt-6"></v-divider>
         <div class="d-flex pt-6" v-if="hasSubmit && !stickyButton">
           <slot name="submit"
