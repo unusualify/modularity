@@ -192,6 +192,10 @@ export const getModel = (inputs, item = null, rootState = null) => {
       }
     }
 
+    if(input.type == 'preview' && __isset(input.previewKey) && item && __isset(item[input.previewKey])){
+      fields[name] = item[input.previewKey]
+    }
+
     // const newFields = handleInputEvents(input.event, fields, inputs, name)._fields // return fields;
     // return newFields
     handleEvents(fields, inputs, input)
