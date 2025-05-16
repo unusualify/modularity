@@ -14,7 +14,7 @@ class CompanyTest extends ModelTestCase
     {
         $company = new Company;
 
-        $this->assertEquals(modularityConfig('tables.companies', 'companies'), $company->getTable());
+        $this->assertEquals(modularityConfig('tables.companies', 'um_companies'), $company->getTable());
     }
 
     public function test_create_company_with_factory()
@@ -39,7 +39,6 @@ class CompanyTest extends ModelTestCase
             'address' => '123 Test St',
             'city' => 'Test City',
             'state' => 'Test State',
-            'country' => 'Test Country',
             'zip_code' => '12345',
             'phone' => '123-456-7890',
             'vat_number' => 'VAT123456',
@@ -49,7 +48,6 @@ class CompanyTest extends ModelTestCase
         $this->assertEquals('123 Test St', $company->address);
         $this->assertEquals('Test City', $company->city);
         $this->assertEquals('Test State', $company->state);
-        $this->assertEquals('Test Country', $company->country);
         $this->assertEquals('12345', $company->zip_code);
         $this->assertEquals('123-456-7890', $company->phone);
         $this->assertEquals('VAT123456', $company->vat_number);
@@ -64,7 +62,6 @@ class CompanyTest extends ModelTestCase
             'address' => '123 Test St',
             'city' => 'Test City',
             'state' => 'Test State',
-            'country' => 'Test Country',
             'zip_code' => '12345',
             'phone' => '123-456-7890',
             'vat_number' => 'VAT123456',
@@ -79,7 +76,6 @@ class CompanyTest extends ModelTestCase
             'address' => '456 Updated St',
             'city' => 'Updated City',
             'state' => 'Updated State',
-            'country' => 'Updated Country',
             'zip_code' => '67890',
             'phone' => '987-654-3210',
             'vat_number' => 'VAT654321',
@@ -90,7 +86,6 @@ class CompanyTest extends ModelTestCase
         $this->assertEquals('456 Updated St', $company->address);
         $this->assertEquals('Updated City', $company->city);
         $this->assertEquals('Updated State', $company->state);
-        $this->assertEquals('Updated Country', $company->country);
         $this->assertEquals('67890', $company->zip_code);
         $this->assertEquals('987-654-3210', $company->phone);
         $this->assertEquals('VAT654321', $company->vat_number);
@@ -105,7 +100,6 @@ class CompanyTest extends ModelTestCase
             'address' => '123 Test St',
             'city' => 'Test City',
             'state' => 'Test State',
-            'country' => 'Test Country',
             'zip_code' => '12345',
             'phone' => '123-456-7890',
             'vat_number' => 'VAT123456',
@@ -117,7 +111,6 @@ class CompanyTest extends ModelTestCase
             'address' => '456 Test St',
             'city' => 'Test City 2',
             'state' => 'Test State 2',
-            'country' => 'Test Country 2',
             'zip_code' => '67890',
             'phone' => '111-222-3334',
             'vat_number' => 'VAT234567',
