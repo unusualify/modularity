@@ -144,7 +144,7 @@ return [
             'noGutters' => false,
             'class' => 'py-4',
         ],
-        'formClass' => 'mx-3 px-3 pt-6 pb-0',
+        'formClass' => 'mx-3 px-2 pt-6 pb-0',
         'scrollable' => true,
         'hasSubmit' => false,
         'fillHeight' => true,
