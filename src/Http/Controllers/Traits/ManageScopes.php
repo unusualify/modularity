@@ -148,15 +148,14 @@ trait ManageScopes
                     break;
             }
 
-            if (! Str::startsWith($requestFilters['status'], 'stateable')) {
+            if (! Str::startsWith($requestFilters['status'], 'isStateable')) {
                 unset($requestFilters['status']);
             }
         }
 
         if (array_key_exists('status', $requestFilters)) {
-            $code = Str::kebab(Str::after($requestFilters['status'], 'stateable'));
-            // $scope[$requestFilters['status']] = true;
-            $scope['stateable'] = $code;
+            $code = Str::kebab(Str::after($requestFilters['status'], 'isStateable'));
+            $scope['isStateable'] = $code;
             unset($requestFilters['status']);
         }
 
