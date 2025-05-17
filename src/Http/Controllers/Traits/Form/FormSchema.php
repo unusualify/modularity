@@ -564,7 +564,7 @@ trait FormSchema
 
             switch ($targetType) {
                 case 'uri':
-                    $input['endpoint'] = $targetModule->getRouteActionUri($routeName, empty($types) ? 'index' : array_shift($types));
+                    $input['endpoint'] = $targetModule->getRouteActionUrl($routeName, empty($types) ? 'index' : array_shift($types));
 
                     break;
                 default:
@@ -748,7 +748,7 @@ trait FormSchema
 
                                 $routeName = $this->getStudlyName($r['name']);
 
-                                return [$r['name'] => $targetModule->getRouteActionUri($routeName, 'show')];
+                                return [$r['name'] => $targetModule->getRouteActionUrl($routeName, 'show')];
                             });
                         }
 
@@ -758,7 +758,7 @@ trait FormSchema
                             $targetModule = Modularity::find($targetModuleName);
 
                             if ($targetModule) {
-                                $filterEndpoint = $targetModule->getRouteActionUri($routeName, 'show');
+                                $filterEndpoint = $targetModule->getRouteActionUrl($routeName, 'show');
                             }
                         }
                         if ($filterEndpoint) {

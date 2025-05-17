@@ -75,7 +75,7 @@ class TableWidget extends ModularityWidget
 
         if (isset($attributes['_routeName']) && isset($attributes['_module']) && $attributes['_module'] instanceof Module) {
 
-            $routeEndpoints = $attributes['_module']->getRouteMainUris(
+            $routeEndpoints = $attributes['_module']->getRouteMainUrls(
                 routeName: $attributes['_routeName'],
                 withoutNamePrefix: true,
                 modelBindingValue: ':id'

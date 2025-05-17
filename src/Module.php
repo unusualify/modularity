@@ -546,11 +546,11 @@ class Module extends NwidartModule
     }
 
     /**
-     * getModuleUris
+     * get all module urls
      *
      * @return array
      */
-    public function getModuleUris(): array
+    public function getModuleUrls(): array
     {
         $patterns = [$this->fullRouteNamePrefix()];
 
@@ -577,6 +577,7 @@ class Module extends NwidartModule
         }
 
         $quote = implode('|', $patterns);
+        dd($quote);
         $moduleRoutes = array_map(function ($r) {
             return $r->uri();
 
@@ -590,12 +591,12 @@ class Module extends NwidartModule
     }
 
     /**
-     * getRouteUris
+     * get all module route urls
      *
      * @param string $routeName
      * @return array
      */
-    public function getRouteUris($routeName): array
+    public function getRouteUrls($routeName): array
     {
         $actions = [
             'restore',
@@ -623,20 +624,20 @@ class Module extends NwidartModule
 
         $quote = $this->fullRouteNamePrefix($isParentRoute) . '.' . snakeCase($routeName) . $midQuote . implode('|', $actions) . ')$';
 
-        $uris = Collection::make($this->getModuleUris())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
+        $uris = Collection::make($this->getModuleUrls())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
 
         return $uris->toArray();
     }
 
     /**
-     * Get the main URIs of the route.
+     * Get the main URLs of the route.
      *
      * @param string $routeName
      * @param bool $withoutNamePrefix
      * @param string|null $modelBindingValue
      * @return array
      */
-    public function getRouteMainUris($routeName, $withoutNamePrefix = false, $modelBindingValue = null)
+    public function getRouteMainUrls($routeName, $withoutNamePrefix = false, $modelBindingValue = null)
     {
         $actions = [
             'restore',
@@ -662,7 +663,7 @@ class Module extends NwidartModule
 
         $quote = $this->fullRouteNamePrefix($isParentRoute) . '.' . snakeCase($routeName) . '.(' . implode('|', $actions) . ')$';
 
-        $uris = Collection::make($this->getModuleUris())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
+        $uris = Collection::make($this->getModuleUrls())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
 
         if ($withoutNamePrefix) {
             $uris = $uris->mapWithKeys(function ($uri, $name) use ($routeName, $modelBindingValue) {
@@ -689,11 +690,11 @@ class Module extends NwidartModule
      * @param bool $absolute
      * @return string
      */
-    public function getRouteActionUri(string $routeName, string $action, array $replacements = [], bool $absolute = false): string
+    public function getRouteActionUrl(string $routeName, string $action, array $replacements = [], bool $absolute = false): string
     {
         $quote = preg_quote('.' . $action);
 
-        $endpoint = '/' . Collection::make($this->getRouteUris($routeName))
+        $endpoint = '/' . Collection::make($this->getRouteUrls($routeName))
             ->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name))->first();
 
         $endpoint = replace_curly_braces($endpoint, $replacements);
@@ -787,7 +788,7 @@ class Module extends NwidartModule
                 $nestedRouteSnake = snakeCase($routeConfig['name']);
                 $routeSnake = snakeCase($routeName);
 
-                $uri = $this->getRouteActionUri(nestedRouteNameFormat($routeName, $routeConfig['name']), 'index');
+                $url = $this->getRouteActionUrl(nestedRouteNameFormat($routeName, $routeConfig['name']), 'index');
 
                 $pattern = "\{$routeSnake\}";
 
@@ -796,7 +797,7 @@ class Module extends NwidartModule
                     // 'url' => moduleRoute($routeConfig['name'],  $this->fullRouteNamePrefix() . '.' . $routeName . '.nested', 'index', [
                     //     $routeName => ':id',
                     // ]),
-                    'url' => preg_replace('/(' . $pattern . ')/', ':id', $uri),
+                    'url' => preg_replace('/(' . $pattern . ')/', ':id', $url),
                     'label' => 'modules.' . $nestedRouteSnake,
                     'icon' => '$modules',
                     'color' => 'green',
