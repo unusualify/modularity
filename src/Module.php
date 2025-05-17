@@ -241,7 +241,12 @@ class Module extends NwidartModule
         return $path . (empty($directory) ? '/' : "/$directory");
     }
 
-    public function isModularityModule()
+    /**
+     * isModularityModule
+     *
+     * @return bool
+     */
+    public function isModularityModule(): bool
     {
         $modularityModulesPath = Modularity::getVendorPath('modules');
 
@@ -300,7 +305,15 @@ class Module extends NwidartModule
         return $this->getRouteConfig($route_name)['inputs'];
     }
 
-    public function getRouteInput($route_name, $input_name, $field = 'name'): array
+    /**
+     * getRouteInput
+     *
+     * @param mixed $route_name
+     * @param mixed $input_name
+     * @param string $field
+     * @return array
+     */
+    public function getRouteInput($route_name, $input_name, string $field = 'name'): array
     {
         $inputs = $this->getRouteInputs($route_name);
 
@@ -323,16 +336,21 @@ class Module extends NwidartModule
         return $this->app['config']->get("{$this->getSnakeName()}{$notation}", []);
     }
 
-    public function setConfig($newConfig, $notation = null): mixed
+    /**
+     * setConfig
+     *
+     * @param mixed $newConfig
+     * @param mixed $notation
+     */
+    public function setConfig($newConfigValue, $notation = null): mixed
     {
-
         $notation = ! $notation ? '' : ".{$notation}";
 
         if (! $this->app['config']->has($this->getSnakeName()) && $this->app->runningInConsole() && file_exists($this->getDirectoryPath('Config/config.php'))) {
             $this->app['config']->set("{$this->getSnakeName()}", include ($this->getDirectoryPath('Config/config.php')));
         }
 
-        return $this->app['config']->set("{$this->getSnakeName()}{$notation}", $newConfig);
+        return $this->app['config']->set("{$this->getSnakeName()}{$notation}", $newConfigValue);
     }
 
     /**
@@ -353,12 +371,24 @@ class Module extends NwidartModule
         return count($this->getParentRoute()) > 0;
     }
 
+    /**
+     * isParentRoute
+     *
+     * @param string $routeName
+     * @return bool
+     */
     public function isParentRoute($routeName): bool
     {
         return count(($pr = $this->getParentRoute())) > 0 && $pr['name'] == studlyName($routeName);
     }
 
-    public function isSingleton($routeName)
+    /**
+     * isSingleton
+     *
+     * @param string $routeName
+     * @return bool
+     */
+    public function isSingleton($routeName): bool
     {
         $singularTrait = 'Unusualify\Modularity\Entities\Traits\IsSingular';
         $repository = $this->getRouteClass($routeName, 'repository', true);
@@ -459,12 +489,26 @@ class Module extends NwidartModule
         return implode('.', $prefixes);
     }
 
+    /**
+     * getRepository
+     *
+     * @param mixed $routeName
+     * @param bool $asClass
+     */
     public function getRepository($routeName, $asClass = true)
     {
         return (new Finder)->getRouteRepository($routeName, $asClass);
     }
 
-    public function routeHasTable($routeName = null, $notation = null)
+    /**
+     * routeHasTable
+     *
+     * @param mixed $routeName
+     * @param mixed $notation
+     *
+     * @return bool
+     */
+    public function routeHasTable($routeName = null, $notation = null): bool
     {
         $tableName = $this->getRepository($routeName ?? $this->getStudlyName(), false)
             ? $this->getRepository($routeName ?? $this->getStudlyName())->getModel()->getTable()
@@ -473,7 +517,12 @@ class Module extends NwidartModule
         return Schema::hasTable($tableName);
     }
 
-    public function getConfigPath()
+    /**
+     * getConfigPath
+     *
+     * @return string
+     */
+    public function getConfigPath(): string
     {
         $config_folder = GenerateConfigReader::read('config')->getPath();
 
@@ -496,6 +545,11 @@ class Module extends NwidartModule
         return ! empty($search);
     }
 
+    /**
+     * getModuleUris
+     *
+     * @return array
+     */
     public function getModuleUris(): array
     {
         $patterns = [$this->fullRouteNamePrefix()];
@@ -535,6 +589,12 @@ class Module extends NwidartModule
         return $moduleRoutes;
     }
 
+    /**
+     * getRouteUris
+     *
+     * @param string $routeName
+     * @return array
+     */
     public function getRouteUris($routeName): array
     {
         $actions = [
@@ -620,7 +680,16 @@ class Module extends NwidartModule
         return $uris->toArray();
     }
 
-    public function getRouteActionUri($routeName, $action, $replacements = [], $absolute = false): string
+    /**
+     * getRouteActionUri
+     *
+     * @param string $routeName
+     * @param string $action
+     * @param array $replacements
+     * @param bool $absolute
+     * @return string
+     */
+    public function getRouteActionUri(string $routeName, string $action, array $replacements = [], bool $absolute = false): string
     {
         $quote = preg_quote('.' . $action);
 
@@ -636,22 +705,50 @@ class Module extends NwidartModule
         return $endpoint;
     }
 
+    /**
+     * getParentNamespace
+     *
+     * @param string $target
+     * @return string
+     */
     public function getParentNamespace(string $target): string
     {
         return $this->getBaseNamespace() . '\\' . GenerateConfigReader::read(kebabCase($target))->getNamespace();
     }
 
+    /**
+     * getTargetClassNamespace
+     *
+     * @param string $target
+     * @param string|null $className
+     * @return string
+     */
     public function getTargetClassNamespace(string $target, $className = null): string
     {
         return $this->getBaseNamespace() . '\\' . GenerateConfigReader::read(kebabCase($target))->getNamespace() . ($className ? '\\' . $className : '');
     }
 
+    /**
+     * getTargetClassPath
+     *
+     * @param string $target
+     * @param string|null $className
+     * @return string
+     */
     public function getTargetClassPath(string $target, $className = null): string
     {
         return $this->getDirectoryPath(GenerateConfigReader::read(kebabCase($target))->getPath()) . ($className ? '/' . $className : '');
     }
 
-    public function getRouteClass(string $routeName, string $target, $asClass = false): string
+    /**
+     * getRouteClass
+     *
+     * @param string $routeName
+     * @param string $target
+     * @param bool $asClass
+     * @return string
+     */
+    public function getRouteClass(string $routeName, string $target, bool $asClass = false): string
     {
         $className = studlyName($routeName);
 
@@ -666,7 +763,13 @@ class Module extends NwidartModule
         return $this->getParentNamespace($target) . '\\' . $className;
     }
 
-    public function getNavigationActions(string $routeName)
+    /**
+     * getNavigationActions
+     *
+     * @param string $routeName
+     * @return array
+     */
+    public function getNavigationActions(string $routeName): array
     {
         $routeName = snakeCase($routeName); // snake case
         $routeConfig = $this->getRouteConfig($routeName);
@@ -705,6 +808,9 @@ class Module extends NwidartModule
         return $navigationActions;
     }
 
+    /**
+     * createMiddlewareAliases
+     */
     public function createMiddlewareAliases()
     {
         foreach ($this->middlewares as $name => $middleware) {
@@ -712,7 +818,13 @@ class Module extends NwidartModule
         }
     }
 
-    public function getRouteMiddlewareAliases($routeName)
+    /**
+     * getRouteMiddlewareAliases
+     *
+     * @param string $routeName
+     * @return array
+     */
+    public function getRouteMiddlewareAliases(string $routeName): array
     {
         $snakeName = snakeCase($routeName);
 
