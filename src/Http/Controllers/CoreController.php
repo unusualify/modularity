@@ -105,6 +105,7 @@ abstract class CoreController extends LaravelController
             perPage: $perPage,
             forcePagination: $forcePagination,
             appends: $appends,
+            id: $this->request->get('id') ?? null
         ));
     }
 
