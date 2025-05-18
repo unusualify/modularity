@@ -1,12 +1,16 @@
 // hooks/table/useTableState.js
 import { ref, computed, reactive, toRefs } from 'vue'
 import { removeQueryKeys } from '@/utils/pushState'
+import { pick } from 'lodash'
 
 export default function useTableState(props, context) {
 
   // Get the current route path as the unique identifier
   const path = window.location.pathname
   const filterStorageKey = `table_filters_${path}`
+
+  const removeKeys = ['id', 'page', 'itemsPerPage', 'sortBy', 'groupBy', 'filter', 'search', 'replaceUrl']
+  const cachedKeys = ['page', 'itemsPerPage', 'sortBy', 'groupBy', 'filter', 'search']
 
   const getQueryParameters = () => {
     const url = new URL(window.location.href)
@@ -42,9 +46,9 @@ export default function useTableState(props, context) {
     const url    = new URL(window.location.href)
     const params = Object.fromEntries(url.searchParams.entries())
 
-    const keysToRemove = []
+    let keysToRemove = []
     Object.keys(parameters).forEach((key) => {
-      if(Object.prototype.hasOwnProperty.call(params, key)){
+      if(Object.prototype.hasOwnProperty.call(params, key) && removeKeys.includes(key)){
         keysToRemove.push(key)
       }
     })
@@ -53,10 +57,8 @@ export default function useTableState(props, context) {
       removeQueryKeys(keysToRemove)
     }
 
-    localStorage.setItem(filterStorageKey, JSON.stringify(parameters))
+    localStorage.setItem(filterStorageKey, JSON.stringify(pick(parameters, cachedKeys)))
   }
-
-
 
   const states = reactive({
     lastParameters: getLastParameters(),
@@ -64,6 +66,7 @@ export default function useTableState(props, context) {
   })
 
   return {
+    getQueryParameters,
     getLastParameters,
     setLastParameters,
     ...states
