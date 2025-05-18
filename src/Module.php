@@ -34,6 +34,26 @@ class Module extends NwidartModule
      */
     private $middlewares = [];
 
+    private static $routeActionLists = [
+        'restore',
+        'forceDelete',
+        'duplicate',
+        'index',
+        'create',
+        'store',
+        'show',
+        'edit',
+        'update',
+        'destroy',
+        'bulkDelete',
+        'bulkForceDelete',
+        'bulkRestore',
+        'tags',
+        'tagsUpdate',
+        'assignments',
+        'createAssignment',
+    ];
+
     /**
      * The constructor.
      */
@@ -468,15 +488,18 @@ class Module extends NwidartModule
     }
 
     /**
-     * fullRouteNamePrefix
+     * Route name prefix with system prefix
+     *
+     * @param bool $isParent
+     * @return string
      */
     public function fullRouteNamePrefix($isParent = false): string
     {
         $prefixes = [];
 
-        if (($adminRouteNamePrefix = adminRouteNamePrefix())) {
-            $prefixes[] = $adminRouteNamePrefix;
-        }
+        // if (($adminRouteNamePrefix = adminRouteNamePrefix())) {
+        //     $prefixes[] = $adminRouteNamePrefix;
+        // }
 
         if ($this->hasSystemPrefix()) {
             $prefixes[] = $this->systemRouteNamePrefix();
@@ -485,6 +508,25 @@ class Module extends NwidartModule
         if (! $isParent) {
             $prefixes[] = $this->routeNameprefix();
         }
+
+        return implode('.', $prefixes);
+    }
+
+    /**
+     * Route name prefix with panel prefix (admin)
+     *
+     * @param bool $isParent
+     * @return string
+     */
+    public function panelRouteNamePrefix($isParent = false): string
+    {
+        $prefixes = [];
+
+        if (($adminRouteNamePrefix = adminRouteNamePrefix())) {
+            $prefixes[] = $adminRouteNamePrefix;
+        }
+
+        $prefixes[] = $this->fullRouteNamePrefix($isParent);
 
         return implode('.', $prefixes);
     }
@@ -560,11 +602,11 @@ class Module extends NwidartModule
 
             $prefixes = [];
 
-            $adminRouteNamePrefix = adminRouteNamePrefix();
+            // $adminRouteNamePrefix = adminRouteNamePrefix();
 
-            if (($adminRouteNamePrefix = adminRouteNamePrefix())) {
-                $prefixes[] = $adminRouteNamePrefix;
-            }
+            // if (($adminRouteNamePrefix = adminRouteNamePrefix())) {
+            //     $prefixes[] = $adminRouteNamePrefix;
+            // }
 
             if ($this->hasSystemPrefix()) {
                 $prefixes[] = $this->systemRouteNamePrefix();
@@ -577,7 +619,7 @@ class Module extends NwidartModule
         }
 
         $quote = implode('|', $patterns);
-        dd($quote);
+
         $moduleRoutes = array_map(function ($r) {
             return $r->uri();
 
@@ -594,39 +636,32 @@ class Module extends NwidartModule
      * get all module route urls
      *
      * @param string $routeName
+     * @param bool $panel
      * @return array
      */
     public function getRouteUrls($routeName): array
     {
-        $actions = [
-            'restore',
-            'forceDelete',
-            'duplicate',
-            'index',
-            'create',
-            'store',
-            'show',
-            'edit',
-            'update',
-            'destroy',
-            'bulkDelete',
-            'bulkForceDelete',
-            'bulkRestore',
-            'tags',
-            'tagsUpdate',
-            'assignments',
-            'createAssignment',
-        ];
-
         $isParentRoute = $this->isParentRoute($routeName);
 
-        $midQuote = '(.nested.[a-z|_]+)?.(';
+        $mainQuoteParts = [];
 
-        $quote = $this->fullRouteNamePrefix($isParentRoute) . '.' . snakeCase($routeName) . $midQuote . implode('|', $actions) . ')$';
+        if(!$isParentRoute){
+            $mainQuoteParts[] = $this->fullRouteNamePrefix($isParentRoute);
+        }
 
-        $uris = Collection::make($this->getModuleUrls())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
+        $mainQuoteParts[] = snakeCase($routeName);
 
-        return $uris->toArray();
+        $mainQuote = implode('.', $mainQuoteParts);
+
+        $actionsQuote = "(" . implode('|', self::$routeActionLists) . ")";
+
+        $quoteParts = [$mainQuote, $actionsQuote];
+
+        $quote = implode('.', $quoteParts) . '$';
+
+        $urls = Collection::make($this->getModuleUrls())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
+
+        return $urls->toArray();
     }
 
     /**
@@ -637,36 +672,30 @@ class Module extends NwidartModule
      * @param string|null $modelBindingValue
      * @return array
      */
-    public function getRouteMainUrls($routeName, $withoutNamePrefix = false, $modelBindingValue = null)
+    public function getRoutePanelUrls($routeName, $withoutNamePrefix = false, $modelBindingValue = null)
     {
-        $actions = [
-            'restore',
-            'forceDelete',
-            'duplicate',
-            'index',
-            'create',
-            'store',
-            'show',
-            'edit',
-            'update',
-            'destroy',
-            'bulkDelete',
-            'bulkForceDelete',
-            'bulkRestore',
-            'tags',
-            'tagsUpdate',
-            'assignments',
-            'createAssignment',
-        ];
-
         $isParentRoute = $this->isParentRoute($routeName);
 
-        $quote = $this->fullRouteNamePrefix($isParentRoute) . '.' . snakeCase($routeName) . '.(' . implode('|', $actions) . ')$';
+        $mainQuoteParts = [adminRouteNamePrefix()];
 
-        $uris = Collection::make($this->getModuleUrls())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
+        if(!$isParentRoute){
+            $mainQuoteParts[] = $this->fullRouteNamePrefix($isParentRoute);
+        }
+
+        $mainQuoteParts[] = snakeCase($routeName);
+
+        $mainQuote = implode('.', $mainQuoteParts);
+
+        $actionsQuote = "(" . implode('|', self::$routeActionLists) . ")";
+
+        $quoteParts = [$mainQuote, $actionsQuote];
+
+        $quote = implode('.', $quoteParts) . '$';
+
+        $urls = Collection::make($this->getModuleUrls())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
 
         if ($withoutNamePrefix) {
-            $uris = $uris->mapWithKeys(function ($uri, $name) use ($routeName, $modelBindingValue) {
+            $urls = $urls->mapWithKeys(function ($uri, $name) use ($routeName, $modelBindingValue) {
                 $parts = explode('.', $name);
                 $key = array_pop($parts);
 
@@ -678,7 +707,7 @@ class Module extends NwidartModule
             });
         }
 
-        return $uris->toArray();
+        return $urls->toArray();
     }
 
     /**
@@ -690,20 +719,38 @@ class Module extends NwidartModule
      * @param bool $absolute
      * @return string
      */
-    public function getRouteActionUrl(string $routeName, string $action, array $replacements = [], bool $absolute = false): string
+    public function getRouteActionUrl(string $routeName, string $action, array $replacements = [], bool $absolute = false, bool $isPanel = true): string
     {
-        $quote = preg_quote('.' . $action);
+        $quote = '';
 
-        $endpoint = '/' . Collection::make($this->getRouteUrls($routeName))
-            ->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name))->first();
+        if($isPanel){
+            $quote = preg_quote(adminRouteNamePrefix() . '.');
+        }
+        $quote .= '([a-zA-Z_\.]+)';
 
-        $endpoint = replace_curly_braces($endpoint, $replacements);
+        $quote .= preg_quote('.' . $action) . '$';
 
-        if ($absolute) {
-            return url($endpoint);
+        $routes = Collection::make($this->getRouteUrls($routeName))->filter(fn($url, $name) => preg_match('/' . $quote . '/', $name));
+        $name = $routes->keys()->first();
+
+        if(!$name){
+            // dd($routeName, $action, $quote, $routes, Collection::make($this->getRouteUrls($routeName)));
+            throw new \Exception('Route not found for ' . $routeName . ' with action "' . $action . '" on module ' . $this->getName());
         }
 
-        return $endpoint;
+        try {
+            return route(name: $name, parameters: $replacements, absolute: $absolute);
+        } catch (\Illuminate\Routing\Exceptions\UrlGenerationException $e) {
+            $relativeUrl = replace_curly_braces($routes->first(), $replacements);
+
+            if ($absolute) {
+                return url($relativeUrl);
+            }
+
+            return $relativeUrl;
+        } catch (\Throwable $th) {
+            dd($th);
+        }
     }
 
     /**

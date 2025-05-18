@@ -164,10 +164,9 @@ class RouteServiceProvider extends ServiceProvider
         foreach (Modularity::allEnabled() as $module) {
             $_groupOptions = [
                 'prefix' => $module->fullPrefix(),
-                'as' => $module->fullRouteNamePrefix() . '.',
+                'as' => $module->panelRouteNamePrefix() . '.',
             ];
             // $_groupOptions['prefix'] = $module->fullPrefix();
-            // $_groupOptions['as'] = $module->fullRouteNamePrefix() . '.';
             ModularityRoutes::registerRoutes(
                 $router,
                 [...$_groupOptions, ...(Arr::only($groupOptions, ['domain']))],
