@@ -38,12 +38,12 @@ trait HasPayment
         });
 
         self::updating(static function (Model $model) {
-            if (isset($model->_price)) {
-                $model->offsetUnset('_price');
-                $model->offsetUnset('priceExcludingVatFormatted');
-                $model->offsetUnset('paymentStatus');
-                $model->offsetUnset('paymentStatusTranslated');
-            }
+            // if (isset($model->_price)) {
+            //     $model->offsetUnset('_price');
+            //     $model->offsetUnset('priceExcludingVatFormatted');
+            //     $model->offsetUnset('paymentStatus');
+            //     $model->offsetUnset('paymentStatusTranslated');
+            // }
         });
 
         self::saving(static function (Model $model) {
