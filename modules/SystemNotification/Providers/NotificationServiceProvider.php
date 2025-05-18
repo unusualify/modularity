@@ -9,8 +9,10 @@ use Modules\SystemNotification\Events\ModelDeleted;
 use Modules\SystemNotification\Events\ModelForceDeleted;
 use Modules\SystemNotification\Events\ModelRestored;
 use Modules\SystemNotification\Events\ModelUpdated;
+use Modules\SystemNotification\Events\StateableUpdated;
 use Modules\SystemNotification\Listeners\ModelForceDeletedListener;
 use Modules\SystemNotification\Listeners\ModelListener;
+use Modules\SystemNotification\Listeners\StateableListener;
 use Throwable;
 
 use function Illuminate\Events\queueable;
@@ -26,7 +28,6 @@ class NotificationServiceProvider extends ServiceProvider
             ModelCreated::class,
             ModelListener::class
         );
-
         Event::listen(
             ModelUpdated::class,
             ModelListener::class
@@ -42,6 +43,11 @@ class NotificationServiceProvider extends ServiceProvider
         Event::listen(
             ModelForceDeleted::class,
             ModelForceDeletedListener::class
+        );
+
+        Event::listen(
+            StateableUpdated::class,
+            StateableListener::class
         );
 
         // Event::listen(

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Modules\SystemNotification\Events\StateableUpdated;
 use Unusualify\Modularity\Entities\Scopes\StateableScopes;
 use Unusualify\Modularity\Entities\State;
 use Unusualify\Modularity\Entities\Stateable;
@@ -382,6 +383,14 @@ trait HasStateable
             return;
         }
 
+        $oldState = $this->state;
+
         $this->stateable()->update(['state_id' => $newState->id]);
+
+        if($oldState && $oldState->code !== $newState->code) {
+            $cloneModel = clone $this;
+            $cloneModel->refresh();
+            StateableUpdated::dispatch($cloneModel, $cloneModel->state, $oldState);
+        }
     }
 }
