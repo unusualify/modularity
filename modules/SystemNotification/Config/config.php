@@ -13,7 +13,7 @@ return [
             'url' => 'notifications',
             'route_name' => 'notification',
             'icon' => '$submodule',
-            'title_column_key' => 'name',
+            'title_column_key' => 'id',
             'table_options' => [
                 'createOnModal' => true,
                 'editOnModal' => true,
@@ -22,19 +22,27 @@ return [
             ],
             'headers' => [
                 [
-                    'title' => 'Name',
-                    'key' => 'name',
-                    'formatter' => [
-                        'edit',
-                    ],
+                    'title' => 'Message',
+                    'key' => 'data.message',
                     'searchable' => true,
+                    'formatter' => [
+                        'shorten',
+                        10
+                    ],
+                ],
+                [
+                    'title' => 'Read',
+                    'key' => 'is_read',
+                    'formatter' => [
+                        'status'
+                    ],
                 ],
                 [
                     'title' => 'Created Time',
                     'key' => 'created_at',
                     'formatter' => [
                         'date',
-                        'long',
+                        'medium',
                     ],
                     'searchable' => true,
                 ],
@@ -46,8 +54,8 @@ return [
             ],
             'inputs' => [
                 [
-                    'name' => 'name',
-                    'label' => 'Name',
+                    'name' => 'data->message',
+                    'label' => 'Message',
                     'type' => 'text',
                 ],
             ],
