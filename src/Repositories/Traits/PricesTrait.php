@@ -125,7 +125,7 @@ trait PricesTrait
                     $fields[$role] = $pricesByRole[$role]->map(function ($price) use ($priceSavingKey) {
                         return Arr::mapWithKeys(Arr::only($price->toArray(), array_merge($this->formatableColumns, [$priceSavingKey])), function ($val, $key) use ($priceSavingKey) {
                             if (preg_match('/display_price|price_excluding|price_including|raw_amount|' . $priceSavingKey . '/', $key)) {
-                                return [$key => (float) $val / 100];
+                                return [$key => (float) $val];
                             }
 
                             return [$key => $val];
