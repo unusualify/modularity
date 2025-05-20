@@ -192,6 +192,12 @@ trait ManageScopes
             $scope[$key] = $value;
         }
 
+        $scopes = (array) $this->getConfigFieldsByRoute('scopes', []);
+
+        foreach ($scopes as $key => $value) {
+            $scope[$key] = $value;
+        }
+
         if (array_key_exists('relations', $requestFilters)) {
 
             foreach ($requestFilters['relations'] as $relationship => $value) {
