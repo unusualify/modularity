@@ -170,8 +170,8 @@ export default {
       const discountPercentage = (item.discount_percentage || 0) / 100
       const price = item[this.priceInputName]
 
-      return currency + ' ' + (price * (1 - discountPercentage) * (1 + vatRate)).toFixed(2)
-      // return currency + ' ' + Math.round(price * (1 + vatRate) * (1 - discountPercentage)).toFixed(2)
+      // return currency + ' ' + (price * (1 - discountPercentage) * (1 + vatRate)).toFixed(2)
+      return currency + ' ' + (Math.round(price * (1 - discountPercentage)) * (1 + vatRate)).toFixed(2)
     }
   },
 
