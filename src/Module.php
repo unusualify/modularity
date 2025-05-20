@@ -747,7 +747,7 @@ class Module extends NwidartModule
                 return url($relativeUrl);
             }
 
-            return $relativeUrl;
+            return str_starts_with($relativeUrl, '/') ? $relativeUrl : '/' . $relativeUrl;
         } catch (\Throwable $th) {
             dd($th);
         }
