@@ -1,12 +1,12 @@
 <?php
 
-namespace Modules\SystemUtility\Database\Seeders;
+namespace Unusualify\Modularity\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
 use Modules\SystemUtility\Entities\Country;
 
-class CountrySeeder extends Seeder
+class DefaultCountrySeeder extends Seeder
 {
     /**
      * Run the database seeds.
