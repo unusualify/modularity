@@ -72,7 +72,7 @@
                         density="compact"
                         :modelValue="isAllSelected(group)"
                         @update:modelValue="updatedParent($event, group)"
-                        :readonly="isMandatoryItem(group)"
+                        :readonly="isMandatoryItem(group) || readonly"
                       >
                         <template v-slot:prepend>
                           <v-icon
@@ -137,7 +137,7 @@
                               hide-details
                               :label="item[itemTitle]"
                               :class="getCheckboxClasses(item)"
-                              :readonly="isMandatoryItem(item) || isProtected(item[itemValue])"
+                              :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
                             >
                               <!-- checkbox is on right -->
                               <template v-if="checkboxOnRight" #label>
@@ -164,7 +164,7 @@
                         color="success"
                         hide-details
                         density="compact"
-                        :readonly="isMandatoryItem(item)"
+                        :readonly="isMandatoryItem(item) || readonly"
                         >
                       </v-checkbox>
                     </v-list-item>
@@ -182,7 +182,7 @@
                       :label="group[`${itemTitle}`]"
                       :value="group[`${itemValue}`]"
                       :disabled="!canSelectMore() && !input.includes(group[itemValue])"
-                      :readonly="isMandatoryItem(group) || isProtected(group[itemValue])"
+                      :readonly="isMandatoryItem(group) || isProtected(group[itemValue]) || readonly"
                       color="success"
                       hide-details
                       density="compact"
@@ -217,7 +217,7 @@
                   :title="item[itemTitle]"
                   :description="item.description"
                   :disabled="($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue]))"
-                  :readonly="isMandatoryItem(item) || isProtected(item[itemValue])"
+                  :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
                   :checkboxOnRight="checkboxOnRight"
                   :stats="getCardStats(item)"
                 />
@@ -236,7 +236,7 @@
                     hide-details
                     :label="item[itemTitle]"
                     :class="getCheckboxClasses(item)"
-                    :readonly="isMandatoryItem(item) || isProtected(item[itemValue])"
+                    :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
                   >
                     <template v-if="checkboxOnRight" #label>
                       <span></span>
@@ -268,6 +268,10 @@
         default: null
       },
       disabled: {
+        type: Boolean,
+        default: false
+      },
+      readonly: {
         type: Boolean,
         default: false
       },
