@@ -60,7 +60,8 @@ trait TableRows
                     ],
                     'conditions' => [
                         ['state.code', 'in', ['pending-payment']],
-                        ['payable_price.total_amount', '>', 0],
+                        // ['payable_price.total_amount', '>', 0],
+                        ['payment.status', 'not in', ['COMPLETED']],
                     ],
                     //  admin.system.system_payment.payment routeName
                     //  admin.crm.template/system/system-payments/pay/{price}
