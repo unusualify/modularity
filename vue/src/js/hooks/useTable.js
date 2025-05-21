@@ -182,6 +182,29 @@ export default function useTable (props, context) {
     elements.value = data
   }
 
+  const updateElementItem = (id, data) => {
+    const index = elements.value.findIndex(element => element.id === id)
+    if(index !== -1) {
+      elements.value[index] = data
+    }
+  }
+
+  const updateElementItemAttributes = (id, attributes) => {
+    const index = elements.value.findIndex(element => element.id === id)
+    if(index !== -1) {
+      Object.keys(attributes).forEach(key => {
+        elements.value[index][key] = attributes[key]
+      })
+    }
+  }
+
+  const updateElementItemAttribute = (id, attribute, value) => {
+    const index = elements.value.findIndex(element => element.id === id)
+    if(index !== -1) {
+      elements.value[index][attribute] = value
+    }
+  }
+
   const pushElements = (data) => {
     elements.value = elements.value.push(data)
   }
@@ -279,7 +302,8 @@ export default function useTable (props, context) {
   const tableItemActions = useTableItemActions(props, {
     ...context,
     ...{
-      tableForms
+      tableForms,
+      loadItems
     }
   })
 
