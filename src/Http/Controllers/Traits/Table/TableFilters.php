@@ -155,6 +155,16 @@ trait TableFilters
 
         }
 
+        $customMainFilters = $this->getConfigFieldsByRoute('table_filters', []);
+
+        foreach ($customMainFilters as $filter) {
+            $statusFilters[] = [
+                'name' => $filter->name,
+                'slug' => $filter->slug,
+                'number' => $this->repository->getCountFor($filter->scope ?? $filter->slug),
+            ];
+        }
+
         $statusFilters = array_values(array_filter($statusFilters, function ($filter) {
             return $filter['number'] > 0 || in_array($filter['slug'], ['trash', 'all']);
         }));

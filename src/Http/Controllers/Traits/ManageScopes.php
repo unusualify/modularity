@@ -146,6 +146,19 @@ trait ManageScopes
                     $scope['teamPendingAssignments'] = true;
 
                     break;
+
+                default:
+                    $customMainFilters = $this->getConfigFieldsByRoute('table_filters', []);
+
+                    $customMainFilter = Collection::make($customMainFilters)->filter(function ($filter) use ($requestFilters) {
+                        return isset($filter->slug) && $filter->slug == $requestFilters['status'];
+                    })->first();
+
+                    if ($customMainFilter) {
+                        $scope[$customMainFilter->scope ?? $customMainFilter->slug] = true;
+                    };
+
+                    break;
             }
 
             if (! Str::startsWith($requestFilters['status'], 'isStateable')) {
