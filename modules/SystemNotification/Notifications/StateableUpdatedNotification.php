@@ -14,7 +14,12 @@ class StateableUpdatedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public $model, public $newState, public $oldState) {}
+    private $token;
+
+    public function __construct(public $model, public $newState, public $oldState)
+    {
+        $this->token = uniqid();
+    }
 
     public function via($notifiable): array
     {
@@ -75,34 +80,18 @@ class StateableUpdatedNotification extends Notification implements ShouldQueue
         ]);
     }
 
-    public function toMail($notifiable): MailMessage
+    public function getStateableHtmlMessage(\Illuminate\Database\Eloquent\Model $model): string
     {
-        $moduleRouteHeadline = $this->getModuleRouteHeadline($this->model);
-        $url = $this->getStateableUrl($this->model);
-
-        return (new MailMessage)
-            ->subject($moduleRouteHeadline . ' Status Changed')
-            // ->greeting(__('Hi, :name', ['name' => $notifiable->name]))
-            // ->line($this->getStateableMessage($this->model))
-            // ->action('View ' . $moduleRouteHeadline, $url)
-            // ->line('Thank you for using our application!')
-            // ->salutation(new HtmlString('Best Regards, <br>' . config('app.name')));
-            ->markdown('modularity::mails.stateable', [
-                'userName' => $notifiable->name,
-                'message' => $this->getStateableMessage($this->model),
-                'state' => $this->newState->name,
-                'actionText' => 'View ' . $moduleRouteHeadline,
-                'actionUrl' => $url,
-                'level' => 'success',
-                'displayableActionUrl' => $url,
-            ]);
+        return $this->getStateableMessage($model) . $model->state_formatted;
     }
 
-    public function toArray($notifiable): array
+    public function getStateableActionText(\Illuminate\Database\Eloquent\Model $model): string
     {
-        return [
+        $moduleRouteHeadline = $this->getModuleRouteHeadline($model);
 
-        ];
+        return __('View :item', [
+            'item' => $moduleRouteHeadline,
+        ]);
     }
 
     public function shouldSend(object $notifiable, string $channel): bool
@@ -122,11 +111,74 @@ class StateableUpdatedNotification extends Notification implements ShouldQueue
 
     public function toDatabase(object $notifiable): array
     {
+        $redirector = $this->getStateableUrl($this->model);
+        $hasRedirector = $redirector ? true : false;
+
         return [
+            'token' => $this->token,
             'message' => $this->getStateableMessage($this->model) . $this->newState->name,
+            'htmlMessage' => $this->getStateableHtmlMessage($this->model),
+            'hasRedirector' => $hasRedirector,
+            'redirector' => $redirector,
+            'redirectorText' => $this->getStateableActionText($this->model),
             // 'model' => $this->model,
             // 'newState' => $this->newState,
             // 'oldState' => $this->oldState,
+        ];
+    }
+
+    public function getNotificationUrl(object $notifiable): string
+    {
+        $notificationRecord = $notifiable->notifications()
+            ->where('type', get_class($this))
+            ->where('data->token', $this->token)
+            ->latest()
+            ->first();
+
+        $stateableUrl = null;
+
+        if($notificationRecord){
+            $stateableUrl = route('admin.system.system_notification.my_notification.show', [
+                'my_notification' => $notificationRecord->id,
+                'redirector' => true
+            ]);
+        }
+
+        return $stateableUrl;
+    }
+
+    public function toMail($notifiable): MailMessage
+    {
+        $moduleRouteHeadline = $this->getModuleRouteHeadline($this->model);
+        $url = $this->getStateableUrl($this->model);
+
+        // Get the latest notification record from database
+        $stateableUrl = method_exists($this, 'getNotificationUrl')
+            ? $this->getNotificationUrl($notifiable)
+            : null;
+
+        return (new MailMessage)
+            ->subject($moduleRouteHeadline . ' Status Changed')
+            // ->greeting(__('Hi, :name', ['name' => $notifiable->name]))
+            // ->line($this->getStateableMessage($this->model))
+            // ->action('View ' . $moduleRouteHeadline, $url)
+            // ->line('Thank you for using our application!')
+            // ->salutation(new HtmlString('Best Regards, <br>' . config('app.name')));
+            ->markdown('modularity::mails.stateable', [
+                'userName' => $notifiable->name,
+                'message' => $this->getStateableMessage($this->model),
+                'state' => $this->newState->name,
+                'actionText' => $this->getStateableActionText($this->model),
+                'actionUrl' => $stateableUrl ?? $url,
+                'level' => 'success',
+                'displayableActionUrl' => $stateableUrl ?? $url,
+            ]);
+    }
+
+    public function toArray($notifiable): array
+    {
+        return [
+
         ];
     }
 }
