@@ -115,9 +115,11 @@
           <p class="text-subtitle-1 grey--text">{{ $t('Congratulations! Your PR request is complete.') }}</p>
         </template>
         <template v-slot:body.options>
-          <v-btn variant="flat" color="success" @click="completed">
-            {{ $t('Go Back') }}
-          </v-btn>
+          <div class="d-flex justify-center w-100">
+            <v-btn variant="flat" color="success" @click="completed">
+              {{ $t('Go Back') }}
+            </v-btn>
+          </div>
         </template>
       </ue-modal>
 
