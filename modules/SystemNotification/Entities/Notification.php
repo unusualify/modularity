@@ -47,6 +47,16 @@ class Notification extends Model
         'read_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'is_read',
+        'is_mine',
+        'message',
+        'html_message',
+        'redirector',
+        'has_redirector',
+        'redirector_text',
+    ];
+
     /**
      * Get the notifiable entity that the notification belongs to.
      *
@@ -98,6 +108,50 @@ class Notification extends Model
         );
     }
 
+    protected function isMine() : Attribute
+    {
+        $user = auth()->user() ?? null;
+
+        return new Attribute(
+            get: fn ($value) => $user ? ($this->notifiable_type === $user->getMorphClass() && $this->notifiable_id == $user->id) : false,
+        );
+    }
+
+    protected function message() : Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->data['message'] ?? '',
+        );
+    }
+
+    protected function htmlMessage() : Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->data['htmlMessage'] ?? '',
+        );
+    }
+
+    protected function redirector() : Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->data['redirector'] ?? '',
+        );
+    }
+
+    protected function hasRedirector() : Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->data['hasRedirector'] ?? false,
+        );
+    }
+
+    protected function redirectorText() : Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->data['redirectorText'] ?? '',
+        );
+    }
+
     /**
      * Determine if a notification has not been read.
      *
@@ -128,6 +182,24 @@ class Notification extends Model
     public function scopeUnread(Builder $query)
     {
         return $query->whereNull('read_at');
+    }
+
+    public function scopeMyNotification(Builder $query)
+    {
+        return $query->where('notifiable_type', auth()->user()->getMorphClass())
+            ->where('notifiable_id', auth()->user()->id);
+    }
+
+    public function scopeCompanyNotification(Builder $query)
+    {
+        $company = auth()->user()->company;
+
+        if($company){
+            return $query->where('notifiable_type', auth()->user()->getMorphClass())
+                ->whereIn('notifiable_id', $company->users->pluck('id'));
+        }
+
+        return $query->myNotification();
     }
 
     /**
