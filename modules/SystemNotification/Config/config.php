@@ -110,7 +110,7 @@ return [
                     ],
                     'modalService' => [
                         'modalProps' => [
-                            'title' => 'Notification',
+                            'title' => '$subject',
                             'hasCloseButton' => true,
                             'noActions' => true,
                         ],
@@ -130,7 +130,7 @@ return [
                                         ]),
                                     Component::makeDiv()
                                         ->setAttributes([
-                                            'class' => 'd-flex justify-center',
+                                            'class' => 'd-flex justify-center my-4',
                                         ])
                                         ->setElements([
                                             Component::makeVBtn()
@@ -155,7 +155,7 @@ return [
                     ],
                     'modalService' => [
                         'modalProps' => [
-                            'title' => 'Notification',
+                            'title' => '$subject',
                             'hasCloseButton' => true,
                             'noActions' => true,
                         ],
@@ -175,7 +175,7 @@ return [
                                         ]),
                                     Component::makeDiv()
                                         ->setAttributes([
-                                            'class' => 'd-flex justify-center',
+                                            'class' => 'd-flex justify-center my-4',
                                         ])
                                         ->setElements([
                                             Component::makeVBtn()
@@ -241,8 +241,18 @@ return [
             ],
             'headers' => [
                 [
+                    'title' => 'Subject',
+                    'key' => 'subject',
+                    'formatter' => [
+                        'shorten',
+                        30
+                    ],
+                    'searchKey' => 'data->subject',
+                    'searchable' => true,
+                ],
+                [
                     'title' => 'Message',
-                    'key' => 'data.message',
+                    'key' => 'message',
                     'formatter' => [
                         'shorten',
                         30
