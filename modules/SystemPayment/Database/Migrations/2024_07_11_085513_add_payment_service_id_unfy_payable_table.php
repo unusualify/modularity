@@ -14,13 +14,13 @@ return new class extends Migration
     {
         Schema::disableForeignKeyConstraints();
 
-        $price = new Price;
-        $priceTableName = $price->getTable();
+        $priceTableName = config('priceable.tables.prices', 'unfy_prices');
+        $currencyTableName = config('priceable.tables.currencies', 'unfy_currencies');
 
-        Schema::table(config('payable.table', 'up_payments'), function (Blueprint $table) use ($priceTableName) {
+        Schema::table(config('payable.table', 'up_payments'), function (Blueprint $table) use ($priceTableName, $currencyTableName) {
             $table->foreignId('payment_service_id')->after('id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('price_id')->after('payment_service_id')->constrained($priceTableName);
-            $table->foreignId('currency_id')->after('price_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('currency_id')->after('price_id')->constrained($currencyTableName);
         });
 
         Schema::enableForeignKeyConstraints();
