@@ -6,6 +6,8 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Modules\SystemNotification\Events\AssignmentCreated;
+use Modules\SystemNotification\Events\AssignmentUpdated;
 use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
 use Unusualify\Modularity\Entities\Scopes\AssignmentScopes;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
@@ -62,6 +64,14 @@ class Assignment extends Model
             $assignment->assigner_id = $guard->id();
             $assignment->assigner_type = get_class(auth()->user());
         });
+
+        static::created(function ($assignment) {
+            AssignmentCreated::dispatch($assignment);
+        });
+
+        static::updated(function ($assignment) {
+            AssignmentUpdated::dispatch($assignment);
+        });
     }
 
     public function assignable(): \Illuminate\Database\Eloquent\Relations\MorphTo
@@ -89,28 +99,28 @@ class Assignment extends Model
     protected function statusLabel(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => $this->status->label(),
+            get: fn ($value) =>  $this->status ? $this->status->label() : null,
         );
     }
 
     protected function statusColor(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => $this->status->color(),
+            get: fn ($value) => $this->status ? $this->status->color() : null,
         );
     }
 
     protected function statusIcon(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => $this->status->icon(),
+            get: fn ($value) => $this->status ? $this->status->icon() : null,
         );
     }
 
     protected function statusIconColor(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => $this->status->iconColor(),
+            get: fn ($value) => $this->status ? $this->status->iconColor() : null,
         );
     }
 
@@ -137,15 +147,15 @@ class Assignment extends Model
         // return $time->forHuman();
 
         return new Attribute(
-            get: fn ($value) => $this->status->timeIntervalDescription() . ': '
-                . "<span class='{$this->status->timeClasses()}'>{$formattedTime}</span>",
+            get: fn ($value) => $this->status ? $this->status->timeIntervalDescription() . ': '
+                . "<span class='{$this->status->timeClasses()}'>{$formattedTime}</span>" : null,
         );
     }
 
     protected function statusVuetifyIcon(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => "<v-icon icon='{$this->status->icon()}' color='{$this->status->iconColor()}'/>",
+            get: fn ($value) => $this->status ? "<v-icon icon='{$this->status->icon()}' color='{$this->status->iconColor()}'/>" : null,
         );
     }
 
