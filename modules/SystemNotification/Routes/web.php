@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\SystemNotification\Http\Controllers\MyNotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,8 +15,12 @@ use Illuminate\Support\Facades\Route;
 | Now create something great!
 |
 */
-Route::middleware(['web.auth', 'unusual.core'])->group(function () {
+Route::middleware(['web.auth', ...\Unusualify\Modularity\Facades\ModularityRoutes::defaultMiddlewares()])->group(function(){
 
-    Route::middleware(('unusual.panel'))->group(function () {});
+    Route::middleware((\Unusualify\Modularity\Facades\ModularityRoutes::defaultPanelMiddlewares()))->group(function(){
+        Route::prefix('notifications')->as('my_notification.')->group(function(){
+            Route::get('bulk-mark-read', [MyNotificationController::class, 'markReadMyNotifications'])->name('bulkMarkRead');
+        });
+    });
 
 });
