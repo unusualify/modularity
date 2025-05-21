@@ -46,6 +46,8 @@ class DefaultPermissionsSeeder extends Seeder
                 'Currency',
                 'PriceType',
                 'Payment',
+                'Notification',
+                'MyNotification',
             ], $modularityAuthGuardName),
         ]);
 
@@ -56,6 +58,7 @@ class DefaultPermissionsSeeder extends Seeder
         // Assign permissions to roles
         // Admin gets most permissions except some sensitive ones
         $roleInstances['admin']->givePermissionTo(Permission::all()->except([
+            'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete',
             'user_forceDelete', 'user_bulkForceDelete',
             'role_forceDelete', 'role_bulkForceDelete',
             'company_forceDelete', 'company_bulkForceDelete',
@@ -69,6 +72,7 @@ class DefaultPermissionsSeeder extends Seeder
         // Manager gets operational permissions
         $roleInstances['manager']->givePermissionTo([
             'dashboard', 'mediaLibrary',
+            'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete',
             'user_view', 'user_create', 'user_edit',
             'vat-rate_view', 'vat-rate_create', 'vat-rate_edit',
             'currency_view', 'currency_create', 'currency_edit',
@@ -79,16 +83,20 @@ class DefaultPermissionsSeeder extends Seeder
         // Editor gets content-related permissions
         $roleInstances['editor']->givePermissionTo([
             'dashboard', 'mediaLibrary',
+            'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete'
+
         ]);
 
         // Reporter gets view-only permissions
         $roleInstances['reporter']->givePermissionTo([
             'dashboard', 'mediaLibrary',
+            'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete'
         ]);
 
         // Client Manager gets client-specific permissions
         $roleInstances['client-manager']->givePermissionTo([
             'dashboard',
+            'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete',
             'user_view', 'user_create', 'user_edit', 'user_delete',
             'payment_view', 'payment_create',
         ]);
@@ -96,6 +104,7 @@ class DefaultPermissionsSeeder extends Seeder
         // Client Assistant gets limited client permissions
         $roleInstances['client-assistant']->givePermissionTo([
             'dashboard',
+            'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete',
             'user_view',
             'payment_view',
         ]);
