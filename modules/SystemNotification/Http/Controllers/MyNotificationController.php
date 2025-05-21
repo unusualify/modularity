@@ -33,13 +33,11 @@ class MyNotificationController extends BaseController
             }
         }
 
-        if ($notification->user_id !== auth()->user()->id) {
+        if (!$notification->is_mine) {
             abort(403, 'Unauthorized action.');
         }
 
-        $notification->update(['is_read' => true]);
-
-        return view('systemnotification::my-notification.show', compact('notification'));
+        return parent::show($id, $submoduleId);
     }
 
     public function index_($parentId = null)
