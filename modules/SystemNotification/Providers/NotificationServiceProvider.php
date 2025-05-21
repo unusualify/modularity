@@ -4,14 +4,20 @@ namespace Modules\SystemNotification\Providers;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Modules\SystemNotification\Events\AssignmentCreated;
+use Modules\SystemNotification\Events\AssignmentUpdated;
 use Modules\SystemNotification\Events\ModelCreated;
 use Modules\SystemNotification\Events\ModelDeleted;
 use Modules\SystemNotification\Events\ModelForceDeleted;
 use Modules\SystemNotification\Events\ModelRestored;
 use Modules\SystemNotification\Events\ModelUpdated;
+use Modules\SystemNotification\Events\PaymentCompleted;
+use Modules\SystemNotification\Events\PaymentFailed;
 use Modules\SystemNotification\Events\StateableUpdated;
+use Modules\SystemNotification\Listeners\AssignableListener;
 use Modules\SystemNotification\Listeners\ModelForceDeletedListener;
 use Modules\SystemNotification\Listeners\ModelListener;
+use Modules\SystemNotification\Listeners\PaymentListener;
 use Modules\SystemNotification\Listeners\StateableListener;
 use Throwable;
 
@@ -48,6 +54,26 @@ class NotificationServiceProvider extends ServiceProvider
         Event::listen(
             StateableUpdated::class,
             StateableListener::class
+        );
+
+        Event::listen(
+            AssignmentCreated::class,
+            AssignableListener::class
+        );
+
+        Event::listen(
+            AssignmentUpdated::class,
+            AssignableListener::class
+        );
+
+        Event::listen(
+            PaymentCompleted::class,
+            PaymentListener::class
+        );
+
+        Event::listen(
+            PaymentFailed::class,
+            PaymentListener::class
         );
 
         // Event::listen(
