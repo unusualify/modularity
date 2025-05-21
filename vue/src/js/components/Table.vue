@@ -418,6 +418,8 @@
               :width-type="'sm'"
 
               v-bind="modals['dialog'].modalAttributes ?? {}"
+
+              has-fullscreen-button
             >
             </ue-modal>
 
@@ -429,43 +431,26 @@
               :width-type="modals['show'].widthType || 'lg'"
               :persistent="modals['show'].persistent"
               :description="modals['show'].description"
+              :title="modals['show'].title"
+              has-fullscreen-button
+              has-close-button
+              no-confirm-button
+              has-title-divider
+              cancel-text="Close"
+              :reject-button-attributes="{
+                variant: 'elevated',
+                color: 'primary',
+              }"
+              scrollable
             >
-              <template v-slot:body="props">
-                <v-card class="fill-height d-flex flex-column">
-                  <v-card-title>
-                    <ue-title
-                      padding="a-3"
-                      color="grey-darken-5"
-                      align="center"
-                      justify="space-between"
-                    >
-                      {{ modals['show'].title }}
-                      <template v-slot:right>
-                      </template>
-                    </ue-title>
-                  </v-card-title>
-
-                  <v-divider class="mx-6"/>
-                  <v-card-text>
-                    <ue-recursive-data-viewer
-                      :data="modals['show'].data"
-                      :all-array-items-open="false"
-                      :all-array-items-closed="false"
-                    />
-                  </v-card-text>
-
-                  <v-divider class="mx-6 mt-4"/>
-                  <v-card-actions class="px-6 flex-grow-0">
-                    <v-spacer></v-spacer>
-                    <v-btn-primary
-                      :slim="false"
-                      variant="elevated"
-                      @click="modals['show'].cancel()"
-                    >
-                      {{ $t('fields.close') }}
-                    </v-btn-primary>
-                  </v-card-actions>
-                </v-card>
+              <template v-slot:body.description>
+                <div class="d-flex text-start">
+                  <ue-recursive-data-viewer
+                    :data="modals['show'].data"
+                    :all-array-items-open="false"
+                    :all-array-items-closed="false"
+                  />
+                </div>
               </template>
             </ue-modal>
 
