@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
+use Modules\SystemNotification\Events\PaymentCompleted;
+use Modules\SystemNotification\Events\PaymentFailed;
 use Modules\SystemPayment\Entities\Payment;
 use Modules\SystemPayment\Entities\PaymentCurrency;
 use Modules\SystemPayment\Entities\PaymentService;
@@ -201,6 +203,7 @@ class PriceController extends Controller
             ];
 
             if ($payment) {
+                PaymentCompleted::dispatch($payment);
                 // $newPrice = $payment->price->replicate();
                 // $newPrice->saveQuietly();
 
@@ -211,6 +214,9 @@ class PriceController extends Controller
                 // ]);
             }
         } else {
+            if ($payment) {
+                PaymentFailed::dispatch($payment);
+            }
             $modalProps = [
                 'noConfirmButton' => true,
             ];
