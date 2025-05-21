@@ -46,7 +46,7 @@ trait ManageUtilities
                     'actions' => $this->getTableActions(),
                     'endpoints' => $tableEndpoints,
 
-                    'navActive' => 'all',
+                    'navActive' => $this->getConfigFieldsByRoute('default_filter_status', 'all'),
                     'total' => $initialResource['total'] ?? -1,
                     'searchInitialValue' => request()->has('search') ? request()->query('search') : '',
                     'tableOptions' => $this->getVuetifyDatatableOptions(),
