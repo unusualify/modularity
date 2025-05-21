@@ -9,8 +9,8 @@ export default function useTableState(props, context) {
   const path = window.location.pathname
   const filterStorageKey = `table_filters_${path}`
 
-  const removeKeys = ['id', 'page', 'itemsPerPage', 'sortBy', 'groupBy', 'filter', 'search', 'replaceUrl']
-  const cachedKeys = ['page', 'itemsPerPage', 'sortBy', 'groupBy', 'filter', 'search']
+  const removeKeys = ['id', 'page', 'itemsPerPage', 'sortBy', 'groupBy', 'filter', 'replaceUrl']
+  const cachedKeys = ['page', 'itemsPerPage', 'sortBy', 'groupBy', 'filter']
 
   const getQueryParameters = () => {
     const url = new URL(window.location.href)
