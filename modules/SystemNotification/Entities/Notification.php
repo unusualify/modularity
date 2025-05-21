@@ -50,6 +50,7 @@ class Notification extends Model
     protected $appends = [
         'is_read',
         'is_mine',
+        'subject',
         'message',
         'html_message',
         'redirector',
@@ -117,6 +118,13 @@ class Notification extends Model
         );
     }
 
+    protected function subject() : Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->data['subject'] ?? '',
+        );
+    }
+
     protected function message() : Attribute
     {
         return new Attribute(
@@ -148,7 +156,7 @@ class Notification extends Model
     protected function redirectorText() : Attribute
     {
         return new Attribute(
-            get: fn ($value) => $this->data['redirectorText'] ?? '',
+            get: fn ($value) => $this->data['redirectorText'] ?? $this->data['actionText'] ?? '',
         );
     }
 
