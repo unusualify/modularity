@@ -136,7 +136,7 @@ return [
                 'rowActionsType' => 'inline',
             ],
             'table_row_actions' => [
-                [
+                'cancel' => [
                     'name' => 'cancel',
                     'icon' => 'mdi-credit-card-remove-outline',
                     'color' => 'error',
@@ -152,7 +152,7 @@ return [
                     'hasDialog' => true,
                     'dialogQuestion' => __('Are you sure you want to cancel this payment?'),
                 ],
-                [
+                'refund' => [
                     'name' => 'refund',
                     'icon' => 'mdi-credit-card-refund-outline',
                     'color' => 'warning',
