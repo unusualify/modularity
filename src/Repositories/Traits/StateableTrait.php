@@ -12,9 +12,10 @@ trait StateableTrait
         $query = $model::query();
         $scopes = [];
 
-        foreach ($this->traitsMethods('filter') as $method) {
-            $this->$method($query, $scopes);
-        }
+        // foreach ($this->traitsMethods('filter') as $method) {
+        //     $this->$method($query, $scopes);
+        // }
+        $this->filter($query, $scopes);
 
         $defaultStates = $model::getDefaultStates();
         $defaultStateCodes = array_column($defaultStates, 'code');
