@@ -35,7 +35,6 @@ class NavigationMiddleware
                     $profileMenuKey = 'superadmin';
                 } elseif (count($user->roles) > 0 && $user->isClient()) {
                     $sidebarKey = 'client';
-                    $profileMenuKey = 'client';
                 }
             }
 
@@ -44,9 +43,9 @@ class NavigationMiddleware
 
             $navigation = [
                 'current_url' => url()->current(),
-                'sidebar' => array_values(Navigation::formatSidebarMenu(config($sidebarConfigKey))),
+                'sidebar' => array_values(Navigation::formatSidebarMenu(config($sidebarConfigKey, []))),
                 'breadcrumbs' => [],
-                'profileMenu' => array_values(Navigation::formatSidebarMenu(config($profileMenuConfigKey))),
+                'profileMenu' => array_values(Navigation::formatSidebarMenu(config($profileMenuConfigKey, []))),
             ];
 
             // setActiveMenuItem($configuration['sidebar'], $configuration['current_url']);
