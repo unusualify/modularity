@@ -69,8 +69,8 @@ class PaymentFailedNotification extends FeatureNotification implements ShouldQue
             ->line('Price: ' . $model->amount_formatted)
             ->line('Payment ID: ' . $model->id)
             ->line('Payment Order ID: ' . $model->order_id)
-            ->line('Payment Service: ' . $model->paymentService ? $model->paymentService->name : $model->payment_gateway)
-            ->line('Payment Request: ' . json_encode($model->parameters))
-            ->line('Payment Response: ' . json_encode($model->response));
+            ->line('Payment Service: ' . ($model->paymentService ? $model->paymentService->name : $model->payment_gateway))
+            ->line('Payment Request: ' . json_encode($model->parameters, JSON_PRETTY_PRINT))
+            ->line('Payment Response: ' . json_encode($model->response, JSON_PRETTY_PRINT));
     }
 }
