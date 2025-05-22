@@ -27,7 +27,7 @@ class AssignableListener implements ShouldHandleEventsAfterCommit
 
         if($assignee){
             if($isCreated){
-                // $assignee->notify(new TaskAssignedNotification($model));
+                $assignee->notify(new TaskAssignedNotification($model));
             } else {
                 if($assignee->id == $activeUser->id){
                     $assigner->notify(new TaskUpdatedNotification($model));
