@@ -6,9 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Nwidart\Modules\Facades\Module;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Services\Connector;
 use Unusualify\Modularity\Traits\ManageNames;
 
-class UNavigation
+class ModularityNavigation
 {
     use ManageNames;
 
@@ -69,6 +70,20 @@ class UNavigation
             }
         }
         unset($array['route_name']);
+
+        if (isset($array['connector'])) {
+            $connector = new Connector($array['connector']);
+
+            dd($connector);
+
+            if (isset($metric['pushEvents'])) {
+                $connector->pushEvents($metric['pushEvents']);
+            }
+
+            $connector->run($array, 'badge');
+        } elseif (isset($array['badge']) && is_callable($array['badge'])) {
+            $array['badge'] = $array['badge']();
+        }
 
         return array_merge_recursive_preserve([
             'is_active' => $is_active,

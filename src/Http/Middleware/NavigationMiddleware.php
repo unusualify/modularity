@@ -8,7 +8,7 @@ use App\Models\RoleHierarchy;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
-use Unusualify\Modularity\Facades\UNavigation;
+use Unusualify\Modularity\Facades\Navigation;
 
 class NavigationMiddleware
 {
@@ -21,10 +21,10 @@ class NavigationMiddleware
     public function handle($request, Closure $next)
     {
         app()->config->set([
-            modularityBaseKey() . '-navigation.sidebar' => UNavigation::formatSidebarMenus(app()->config->get(modularityBaseKey() . '-navigation.sidebar')),
+            modularityBaseKey() . '-navigation.sidebar' => Navigation::formatSidebarMenus(app()->config->get(modularityBaseKey() . '-navigation.sidebar')),
         ]);
         app()->config->set([
-            modularityBaseKey() . '.ui_settings.profileMenu' => UNavigation::formatSidebarMenus(app()->config->get(modularityBaseKey() . '.ui_settings.profileMenu')),
+            modularityBaseKey() . '.ui_settings.profileMenu' => Navigation::formatSidebarMenus(app()->config->get(modularityBaseKey() . '.ui_settings.profileMenu')),
         ]);
         view()->composer([modularityBaseKey() . '::layouts.master', 'translation::layout'], function ($view) {
 
