@@ -127,7 +127,7 @@ class StateableUpdatedNotification extends Notification implements ShouldQueue
         ];
     }
 
-    public function getNotificationUrl(object $notifiable): string
+    public function getNotificationUrl(object $notifiable)
     {
         $notificationRecord = $notifiable->notifications()
             ->where('type', get_class($this))
