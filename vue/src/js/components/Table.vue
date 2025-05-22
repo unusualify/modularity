@@ -97,9 +97,7 @@
                 key='table-controls'
                 :class="[
                   'd-flex',
-                  controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'flex-grow-1',
-
-
+                  controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'flex-grow-1 flex-shrink-0',
                 ]"
               >
                 <template v-if="someSelected">
@@ -135,7 +133,7 @@
                     :style="[
                       'display: inline',
                       // controlsPosition === 'top' || $vuetify.display.smAndDown ? 'max-width: 300px' : '',
-                      'min-width: 100px'
+                      'min-width: 165px'
                     ]"
                     @click:append-inner="searchItems"
                     :disabled="loading"
@@ -195,14 +193,14 @@
                             id="advanced-filter-btn"
                             v-bind="{...filterBtnOptions, ...filterBtnTitle, ...props}"
                             :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
-                            :text="$vuetify.display.smAndDown ? null : 'Advanced Filter'"
+                            :text="$vuetify.display.smAndDown ? null : 'Filters'"
                             :prepend-icon="$vuetify.display.smAndDown ? null : filterBtnOptions['prepend-icon']"
                             :block="$vuetify.display.mdAndUp ? false : (filterBtnOptions['block'] ?? false)"
                             :density="$vuetify.display.smAndDown ? 'compact' : (filterBtnOptions['density'] ?? 'comfortable')"
                           />
                         </template>
                         <v-card
-                          title="Advanced Filter"
+                          title="Filters"
                           min-width="40vw"
                           max-width="50vw"
                         >
@@ -225,7 +223,7 @@
 
                             <v-btn
                               color="primary"
-                              text="Save"
+                              text="Apply"
                               variant="tonal"
                               @click="changeAdvancedFilter"
                             ></v-btn>
