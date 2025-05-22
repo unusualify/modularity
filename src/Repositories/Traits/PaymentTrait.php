@@ -139,8 +139,7 @@ trait PaymentTrait
                         $priceSavingKey => ($totalAmount / 100),
                         'role' => 'payment',
                     ]);
-                } elseif ($object->paymentPrice && $object->paymentPrice->raw_amount != $totalAmount) {
-                    // $paymentPrice = $object->paymentPrice;
+                } elseif ($paymentPrice && $paymentPrice->raw_amount != $totalAmount) {
                     $paymentPrice->{$priceSavingKey} = $totalAmount / 100;
                     // $paymentPrice->currency_id = $currencyId;
                     $paymentPrice->save();
@@ -155,7 +154,7 @@ trait PaymentTrait
     {
 
         if (method_exists($object, 'paymentPrice') && $object->has('paymentPrice')) {
-            $priceSavingKey = Price::$priceSavingKey;
+            // $priceSavingKey = Price::$priceSavingKey;
             // $query = $object->paymentPrice;
             $fields['payment'] = $object->payment;
 
