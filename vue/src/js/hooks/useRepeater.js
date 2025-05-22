@@ -262,8 +262,14 @@ export default function useRepeater (props, context) {
         return []
       }
       // let clonedSchema = cloneDeep(rawSchema.value)
-      const initialRepeats = hydrateRepeaterModels(Array.isArray(modelValue.value) ? modelValue.value : [])
+      const initialValue = Array.isArray(modelValue.value) ? modelValue.value : []
+      const initialRepeats = hydrateRepeaterModels(initialValue)
 
+
+      if (props.min > 0 && initialValue.length < props.min) {
+        const schema = invokeRuleGenerator(rawSchema.value)
+        initialRepeats.push(hydrateRepeaterModel(getModel(schema), 1))
+      }
 
       if (initialRepeats.length > 0) {
         const parsedInitialRepeats = parseRepeaterModels(initialRepeats).map(item => {
@@ -276,10 +282,7 @@ export default function useRepeater (props, context) {
           })
         }
       }
-      // if (props.min > 0 && initialRepeats.length < props.min) {
-      //   const schema = invokeRuleGenerator(rawSchema)
-      //   initialRepeats.push(hydrateRepeaterInput(getModel(schema), 1))
-      // }
+
       if (isUnique) {
         uniqueFilledValues.value = reduce(cloneDeep(initialRepeats), (acc, _rawModel) => {
           const _model = parseRepeaterModel(_rawModel)
