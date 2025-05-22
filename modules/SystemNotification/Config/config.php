@@ -88,9 +88,12 @@ return [
             'icon' => '$submodule',
             'title_column_key' => 'created_at',
             'scopes' => [
-                'companyNotification' => true
+                'myNotification' => true,
+                // 'companyNotification' => true
             ],
             'table_options' => [
+                'subtitle' => __('You can easily monitor the entire process by following the notifications.'),
+
                 'createOnModal' => false,
                 'editOnModal' => false,
                 'isRowEditing' => false,
@@ -223,11 +226,11 @@ return [
             ],
             'default_filter_status' => 'my-notification',
             'table_filters' => [
-                'my-notification' => [
-                    'name' => 'My Notifications',
-                    'slug' => 'my-notification',
-                    'scope' => 'myNotification',
-                ],
+                // 'my-notification' => [
+                //     'name' => 'Mine',
+                //     'slug' => 'my-notification',
+                //     'scope' => 'myNotification',
+                // ],
                 'read' => [
                     'name' => 'Read',
                     'slug' => 'read',
