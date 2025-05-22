@@ -174,6 +174,7 @@ return [
                     'title' => 'Owner Id',
                     'key' => 'price.priceable',
                     'itemTitle' => 'id',
+                    'allowedRoles' => ['superadmin'],
                     'formatter' => [
                         'edit',
                     ],
@@ -183,7 +184,13 @@ return [
                     'title' => 'Owner Type',
                     'key' => 'price',
                     'itemTitle' => 'priceable_type',
+                    'allowedRoles' => ['superadmin'],
                     // 'itemTitle' => 'content->headline',
+                ],
+                [
+                    'title' => 'Related',
+                    'key' => 'paymentable',
+                    'itemTitle' => 'id',
                 ],
                 [
                     'title' => 'Service',
