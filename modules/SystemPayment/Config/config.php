@@ -188,7 +188,7 @@ return [
                 [
                     'title' => 'Service',
                     'key' => 'paymentService',
-                    'itemTitle' => 'title',
+                    // 'itemTitle' => 'title',
                     'formatter' => [
                         'chip',
                         [
