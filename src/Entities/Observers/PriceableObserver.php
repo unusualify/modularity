@@ -16,7 +16,7 @@ class PriceableObserver
         $issetPriceSavingKey = isset($price->{$priceSavingKey});
 
         if ($issetPriceSavingKey) {
-            $value = $price->{$priceSavingKey};
+            $newRawValue = $price->{$priceSavingKey} * 100;
             $multiplier = $price->vatRate->multiplier();
 
             if (config('priceable.prices_are_including_vat')) { // $value is with vat and substract the vat
@@ -25,11 +25,11 @@ class PriceableObserver
                  * The added price is including the VAT. We need to calculate
                  * the price without the VAT.
                  */
-                $price->raw_amount = $value / $multiplier;
-                $price->vat_amount = $value - $price->raw_amount;
+                $price->raw_amount = $newRawValue / $multiplier;
+                $price->vat_amount = $newRawValue - $price->raw_amount;
             } else {
-                $price->raw_amount = $value;
-                $price->vat_amount = (($value * $multiplier) - $value) * 100;
+                $price->raw_amount = $newRawValue;
+                $price->vat_amount = (($newRawValue * $multiplier) - $newRawValue);
 
             }
         }
@@ -42,7 +42,7 @@ class PriceableObserver
         $priceSavingValue = $price->raw_amount;
 
         if (config('priceable.prices_are_including_vat')) { // $value is with vat and substract the vat
-            $priceSavingValue = $price->raw_amount * $price->vat_amount;
+            $priceSavingValue = $price->raw_amount + $price->vat_amount;
         }
 
         $price->setAttribute($priceSavingKey, $priceSavingValue / 100);
