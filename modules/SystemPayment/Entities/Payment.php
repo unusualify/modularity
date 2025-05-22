@@ -61,7 +61,8 @@ class Payment extends \Unusualify\Payable\Models\Payment
 
     protected function amountFormatted(): Attribute
     {
-        $moneyCurrency = new \Money\Currency($this->priceCurrency->iso_4217);
+        $currency = Currency::find($this->currency_id);
+        $moneyCurrency = new \Money\Currency($currency->iso_4217);
 
         return Attribute::make(
             get: fn ($value) => \Oobook\Priceable\Facades\PriceService::formatAmount($this->amount, $moneyCurrency),
