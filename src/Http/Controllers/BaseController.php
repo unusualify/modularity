@@ -393,7 +393,12 @@ abstract class BaseController extends PanelController
             }
 
             // if()
-            return $this->respondWithSuccess(___('messages.save-success'));
+
+            if($this->request->ajax()) {
+                return $this->respondWithSuccess(___('messages.save-success'));
+            }
+
+            return redirect()->back();
         }
     }
 
