@@ -22,6 +22,8 @@ trait PriceMutators
         $this->append(
             'discounted_raw_amount',
             'vat_multiplier',
+            'is_paid',
+            'is_unpaid',
         );
     }
 
