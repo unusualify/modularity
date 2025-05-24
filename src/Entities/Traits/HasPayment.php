@@ -57,6 +57,15 @@ trait HasPayment
 
     }
 
+    public function initializeHasPayment(): void
+    {
+        $this->append([
+            'is_paid',
+            'is_partially_paid',
+            'is_unpaid',
+        ]);
+    }
+
     public function paymentPrice(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
         $priceTable = (new Price)->getTable();
@@ -245,19 +254,21 @@ trait HasPayment
         );
     }
 
-    protected function isPartiallyPaid(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $this->payablePrice?->total_amount > 0,
-        );
-    }
-
     protected function isUnpaid(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => ! $this->paidPrices()->exists(),
+            get: fn ($value) => $this->payablePrice()->exists(),
         );
     }
+
+    protected function isPartiallyPaid(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->is_paid && $this->is_unpaid,
+        );
+    }
+
+
 
     // protected function paymentStatus(): Attribute
     // {
