@@ -96,12 +96,11 @@ abstract class BaseController extends PanelController
                 );
             }
 
-            // $scopes = $this->filterScope($this->nestedParentScopes());
 
             return Response::json([
                 'resource' => $this->getJSONData(),
-                // 'mainFilters' => $this->getTableMainFilters($scopes),
-                'mainFilters' => $this->getTableMainFilters(),
+                'mainFilters' => $this->getTableMainFilters($this->getExactScope()),
+                // 'mainFilters' => $this->getTableMainFilters(),
                 'replaceUrl' => $this->getReplaceUrl(),
             ]);
         }
