@@ -13,6 +13,7 @@ class TaskAssignedNotification extends FeatureNotification implements ShouldQueu
 
     public function __construct($model)
     {
+        // $model is a assignment model
         parent::__construct($model);
     }
 
@@ -35,14 +36,19 @@ class TaskAssignedNotification extends FeatureNotification implements ShouldQueu
         ];
     }
 
-    public function getNotificationMailSubject(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
+    public function getModuleRouteHeadline(\Illuminate\Database\Eloquent\Model $model): string
     {
-        return __('A Task Has Been Assigned To You');
+        return parent::getModuleRouteHeadline($model->assignable);
     }
 
     public function getModelTitleField(\Illuminate\Database\Eloquent\Model $model): string
     {
         return parent::getModelTitleField($model->assignable);
+    }
+
+    public function getNotificationMailSubject(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
+    {
+        return __('A Task Has Been Assigned To You');
     }
 
     public function getNotificationMessage(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
