@@ -214,15 +214,33 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
         if($moduleName && $routeName){
             $module = Modularity::find($moduleName);
 
-            return $module->getRouteActionUrl(
-                routeName: $routeName,
-                action: 'index',
-                replacements: [
-                    'id' => $model->id
-                ],
-                absolute: true,
-                isPanel: true
-            );
+            $routeConfig = $module->getRouteConfig($routeName);
+
+            $defaultEditOnModal = config('modularity.default_table_attributes.editOnModal', true);
+
+            $editOnModal = data_get($routeConfig, 'table_options.editOnModal', $defaultEditOnModal);
+
+            if($editOnModal){
+                return $module->getRouteActionUrl(
+                    routeName: $routeName,
+                    action: 'index',
+                    replacements: [
+                        'id' => $model->id
+                    ],
+                    absolute: true,
+                    isPanel: true
+                );
+            }else{
+                return $module->getRouteActionUrl(
+                    routeName: $routeName,
+                    action: 'edit',
+                    replacements: [
+                        Str::snake($routeName) => $model->id
+                    ],
+                    absolute: true,
+                    isPanel: true
+                );
+            }
         }
 
         return null;
