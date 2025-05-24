@@ -21,19 +21,19 @@ trait HasPayment
 
         self::retrieved(static function (Model $model) {
             if ($model->paymentPrice) {
-                $currency = new Currency($model->paymentPrice->currency->iso_4217);
-                $model->setAttribute('_price', \Oobook\Priceable\Facades\PriceService::formatAmount($model->paymentPrice->raw_amount, $currency));
-                $model->setAttribute('priceExcludingVatFormatted', \Oobook\Priceable\Facades\PriceService::formatAmount($model->paymentPrice->raw_amount, $currency));
-                $model->setAttribute('paymentStatus', match (true) {
-                    ! $model->paidPrices()->exists() => PaymentStatus::UNPAID,
-                    $model->payablePrice?->price_including_vat > 0 => PaymentStatus::PARTIALLY_PAID,
-                    default => PaymentStatus::PAID
-                });
-                $model->setAttribute('paymentStatusTranslated', match (true) {
-                    ! $model->paidPrices()->exists() => __('Unpaid'),
-                    $model->payablePrice?->total_amount > 0 => __('Partially Paid'),
-                    default => __('Paid')
-                });
+                // $currency = new Currency($model->paymentPrice->currency->iso_4217);
+                // $model->setAttribute('_price', \Oobook\Priceable\Facades\PriceService::formatAmount($model->paymentPrice->raw_amount, $currency));
+                // $model->setAttribute('priceExcludingVatFormatted', \Oobook\Priceable\Facades\PriceService::formatAmount($model->paymentPrice->raw_amount, $currency));
+                // $model->setAttribute('paymentStatus', match (true) {
+                //     ! $model->paidPrices()->exists() => PaymentStatus::UNPAID,
+                //     $model->payablePrice?->price_including_vat > 0 => PaymentStatus::PARTIALLY_PAID,
+                //     default => PaymentStatus::PAID
+                // });
+                // $model->setAttribute('paymentStatusTranslated', match (true) {
+                //     ! $model->paidPrices()->exists() => __('Unpaid'),
+                //     $model->payablePrice?->total_amount > 0 => __('Partially Paid'),
+                //     default => __('Paid')
+                // });
             }
         });
 
@@ -63,6 +63,8 @@ trait HasPayment
             'is_paid',
             'is_partially_paid',
             'is_unpaid',
+            'is_refunded',
+            'payment_status_formatted',
         ]);
     }
 
@@ -268,7 +270,25 @@ trait HasPayment
         );
     }
 
+    protected function isRefunded(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->payment()->where('status', 'REFUNDED')->exists(),
+        );
+    }
 
+    protected function paymentStatusFormatted(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => match(true) {
+                $this->is_refunded => "<v-chip color='error'>" . __('Refunded') . "</v-chip>",
+                $this->is_paid => "<v-chip color='success'>" . __('Paid') . "</v-chip>",
+                $this->is_partially_paid => "<v-chip color='warning'>" . __('Partially Paid') . "</v-chip>",
+                $this->is_unpaid => "<v-chip color='error'>" . __('Unpaid') . "</v-chip>",
+                default => "<v-chip>" . __('Not Ready') . "</v-chip>",
+            },
+        );
+    }
 
     // protected function paymentStatus(): Attribute
     // {
