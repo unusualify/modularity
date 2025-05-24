@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Unusualify\Modularity\Entities\Authorization;
@@ -121,6 +122,15 @@ trait HasAuthorizable
             'id',
             'id',
             'authorized_id'
+        );
+    }
+
+    protected function isAuthorized() : Attribute
+    {
+        return new Attribute(
+            get: function () {
+                return $this->authorizedUser()->exists();
+            }
         );
     }
 
