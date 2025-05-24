@@ -44,6 +44,11 @@ trait TableFilters
                 'slug' => 'published',
                 'number' => $this->repository->getCountByStatusSlug('published', $scope),
             ];
+            // $statusFilters[] = [
+            //     'name' => ___('listing.filter.draft'),
+            //     'slug' => 'draft',
+            //     'number' => $this->repository->getCountByStatusSlug('draft', $scope),
+            // ];
         }
 
         if ($this->getIndexOption('publish')) {
