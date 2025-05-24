@@ -164,7 +164,7 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
         $mailMessage = $mailMessage->salutation(!is_null($this->salutationMessage) ? $this->salutationMessage : new HtmlString('Best Regards, <br>' . config('app.name')));
 
         if(method_exists($this, 'getMailMessage')){
-            $mailMessage = $this->getMailMessage($mailMessage, $this->model);
+            $mailMessage = $this->getMailMessage($notifiable, $mailMessage, $this->model);
         }
 
         return $mailMessage;

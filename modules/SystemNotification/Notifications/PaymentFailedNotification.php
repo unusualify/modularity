@@ -63,7 +63,7 @@ class PaymentFailedNotification extends FeatureNotification implements ShouldQue
         return parent::getNotificationRedirector($notifiable, $model->price && $model->price->priceable ? $model->price->priceable : $model);
     }
 
-    public function getMailMessage(MailMessage $mailMessage, \Illuminate\Database\Eloquent\Model $model): MailMessage
+    public function getMailMessage(object $notifiable, MailMessage $mailMessage, \Illuminate\Database\Eloquent\Model $model): MailMessage
     {
         return $mailMessage
             ->line('Price: ' . $model->amount_formatted)

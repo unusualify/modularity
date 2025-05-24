@@ -50,7 +50,7 @@ class TaskUpdatedNotification extends FeatureNotification implements ShouldQueue
         return parent::getNotificationRedirector($notifiable, $model->assignable);
     }
 
-    public function getMailMessage(MailMessage $mailMessage, \Illuminate\Database\Eloquent\Model $model): MailMessage
+    public function getMailMessage(object $notifiable, MailMessage $mailMessage, \Illuminate\Database\Eloquent\Model $model): MailMessage
     {
         return $mailMessage->line('Status: ' . $model->status_label);
     }
