@@ -34,8 +34,10 @@ class PaymentListener implements ShouldHandleEventsAfterCommit
                 //throw $th;
             }
         } else {
-            $superadmin = \Unusualify\Modularity\Entities\User::role('superadmin')->first();
-            $superadmin->notify(new PaymentFailedNotification($payment));
+            $superadmins = \Unusualify\Modularity\Entities\User::role('superadmin')->get();
+            foreach ($superadmins as $superadmin) {
+                $superadmin->notify(new PaymentFailedNotification($payment));
+            }
         }
     }
 }
