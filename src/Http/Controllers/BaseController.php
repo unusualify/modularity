@@ -667,6 +667,35 @@ abstract class BaseController extends PanelController
     }
 
     /**
+     * @param \Unusualify\Modularity\Models\Model $item
+     * @return array
+     */
+    protected function getCustomRowData($item)
+    {
+        $customRows = $this->tableAttributes['customRow'] ?? [];
+        $customRowFillable = [];
+
+        foreach($customRows as $customRow){
+            if(isset($customRow['allowedRoles']) && $this->user->hasRole($customRow['allowedRoles'])){
+                if($customRow['itemAttributes'] && is_array($customRow['itemAttributes'])){
+                    $customRowFillable = $customRow['itemAttributes'];
+                }else{
+                    $customRowFillable = [];
+                }
+                break;
+            }
+        }
+
+        $customRowData = [];
+
+        foreach($customRowFillable as $fillable){
+            $customRowData[$fillable] = $item->{$fillable};
+        }
+
+        return $customRowData;
+    }
+
+    /**
      * @param \Illuminate\Database\Eloquent\Collection $items
      * @return array
      */
