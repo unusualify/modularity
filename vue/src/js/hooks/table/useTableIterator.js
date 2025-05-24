@@ -3,7 +3,23 @@ import { watch, computed, nextTick, reactive, toRefs, ref, watchEffect } from 'v
 import { propsFactory } from "vuetify/lib/util/propsFactory.mjs";
 import { useFormatter, useRoot } from '@/hooks'
 
+import { useTableItemActions } from '@/hooks/table'
+
 export const makeTableIteratorProps = propsFactory({
+  name: {
+    type: String,
+    default: ''
+  },
+  titlePrefix: {
+    type: String,
+    default: ''
+  },
+  titleKey: {
+    type: String,
+    default: 'name'
+  },
+
+
   item: {
     type: Object,
     default: {}
@@ -28,6 +44,7 @@ export const tableIterableEmits = [
 ]
 
 export default function useTableIterator(props, context){
+  const { itemHasAction } = useTableItemActions(props, context)
 
   const state = reactive({
     id: Math.ceil(Math.random() * 1000000 ) + ' -iterator',
@@ -54,60 +71,8 @@ export default function useTableIterator(props, context){
     isSoftDeletable (item) {
       return !!(__isset(item.deleted_at) && item.deleted_at)
     },
-    itemHasAction: function (item, action) {
-      let hasAction = true
-      switch (action.name) {
-        case 'edit':
-          if (methods.isSoftDeletable(item)) {
-            hasAction = false
-          } else {
-            hasAction = hasAction = methods.canItemAction(action)
-          }
-          break
-        case 'delete':
-          if (methods.isSoftDeletable(item)) {
-            hasAction = false
-          } else {
-            hasAction = methods.canItemAction(action)
-          }
-          break
-        case 'forceDelete':
-          if (methods.isSoftDeletable(item)) {
-            hasAction = methods.canItemAction(action)
-          } else {
-            hasAction = false
-          }
-          break
-        case 'restore':
-          if (methods.isSoftDeletable(item)) {
-            hasAction = methods.canItemAction(action)
-          } else {
-            hasAction = false
-          }
-          break
-        case 'duplicate':
-          if (methods.isSoftDeletable(item)) {
-            hasAction = false
-          }
-          break
-        case 'switch':
-          if (methods.isSoftDeletable(item)) {
-            hasAction = false
-          }
-          break
-        case 'activate':
-          if (methods.isSoftDeletable(item)) {
-            hasAction = false
-          }
-          break
-        default:
-          break
-      }
-
-      return hasAction
-    },
     itemAction: (item, action) => {
-      return context.emit('click-action',item,action)
+      return context.emit('click-action', item, action)
     },
     editItem: (item) => {
       context.emit('edit-item', item)
@@ -117,7 +82,8 @@ export default function useTableIterator(props, context){
   return {
     ...toRefs(methods),
     ...toRefs(state),
-    ...formatter
+    ...formatter,
+    itemHasAction
   }
 
 }
