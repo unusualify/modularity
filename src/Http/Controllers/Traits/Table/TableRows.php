@@ -31,7 +31,7 @@ trait TableRows
                     'forceLabel' => true,
                     // 'can' => 'pay',
                     // 'color' => 'red darken-2',
-                    'color' => 'primary',
+                    'color' => 'success',
                     'form' => [
                         'attributes' => [
                             'title' => [
@@ -52,10 +52,11 @@ trait TableRows
                         ],
                         'model_formatter' => [
                             'price_id' => 'payment_price.id', // lodash get method
+                            // 'price_id' => 'paymentPrice.id', // lodash get method
                         ],
                         'schema_formatter' => [
                             'payment_service.price_object' => 'payment_price',
-
+                            // 'payment_service.price_object' => 'paymentPrice',
                         ],
                     ],
                     'conditions' => [
@@ -82,9 +83,9 @@ trait TableRows
             if ($this->getIndexOption('edit')) {
                 $tableActions[] = [
                     'name' => 'edit',
-                    // 'can' => $this->permissionPrefix(Permission::EDIT->value),
-                    // 'color' => 'green darken-2',
                     'color' => 'primary darken-2',
+                    'can' => $this->permissionPrefix(Permission::EDIT->value),
+                    // 'color' => 'green darken-2',
                 ];
             }
 
@@ -169,11 +170,37 @@ trait TableRows
             }
         }
 
+        $tableNavigationActions = Modularity::find($this->moduleName)->getNavigationActions($this->routeName);
+        $tableActionsCollection = collect($tableActions);
+
+        foreach ($tableNavigationActions as $key => $navigationAction) {
+            $mergeable = isset($navigationAction['merge']) ? (bool) $navigationAction['merge'] : false;
+
+            if(isset($navigationAction['name']) && $mergeable){
+                $isFound = false;
+                $tableActionsCollection = $tableActionsCollection->reduce(function ($acc, $action) use ($navigationAction, &$isFound) {
+                    if($action['name'] == $navigationAction['name']){
+                        $acc->push(array_merge($action, $navigationAction));
+                        $isFound = true;
+                    }else{
+                        $acc->push($action);
+                    }
+
+                    return $acc;
+                }, collect([]));
+
+                if($isFound){
+                    unset($tableNavigationActions[$key]);
+                }
+            }
+        }
+
+        $tableActions = $tableActionsCollection->toArray();
 
         // navigation actions
         $tableActions = array_merge(
             $tableActions,
-            Modularity::find($this->moduleName)->getNavigationActions($this->routeName)
+            $tableNavigationActions
         );
 
         $tableActions = Collection::make($tableActions)->reduce(function ($acc, $action, $key) {
