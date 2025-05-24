@@ -496,9 +496,13 @@
               <component
                 :is="`ue-${customRow.name}`"
                 :key="element.id"
+                :name="name"
+                :titlePrefix="titlePrefix"
+                :titleKey="titleKey"
+
                 :item="element"
                 :headers="headers"
-                :rowActions = "rowActions"
+                :rowActions="rowActions"
                 @click-action="itemAction"
               >
 
@@ -548,8 +552,7 @@
         </template>
 
         <!-- Custom Slots -->
-        <template
-          v-for="(context, slotName) in slots" v-slot:[slotName]
+        <template v-for="(context, slotName) in slots" v-slot:[slotName]
           :key="`customSlot-${slotName}`"
           >
           <div>
@@ -562,8 +565,7 @@
         </template>
 
         <!-- #formatterColumns -->
-        <template
-          v-for="(col, i) in formatterColumns"
+        <template v-for="(col, i) in formatterColumns"
           :key="`formatter-${i}`"
           v-slot:[`item.${col.key}`]="{ item }"
         >
