@@ -69,6 +69,23 @@ trait ManageScopes
         $this->tableOrders = $this->getTableOrders();
     }
 
+    protected function getExactScope()
+    {
+        $scope = [];
+
+        foreach ($this->fixedFilters as $key => $value) {
+            $scope[$key] = $value;
+        }
+
+        $configScopes = (array) $this->getConfigFieldsByRoute('scopes', []);
+
+        foreach ($configScopes as $key => $value) {
+            $scope[$key] = $value;
+        }
+
+        return $scope;
+    }
+
     /**
      * @param array $prepend
      * @return array
@@ -201,15 +218,7 @@ trait ManageScopes
             }
         }
 
-        foreach ($this->fixedFilters as $key => $value) {
-            $scope[$key] = $value;
-        }
-
-        $scopes = (array) $this->getConfigFieldsByRoute('scopes', []);
-
-        foreach ($scopes as $key => $value) {
-            $scope[$key] = $value;
-        }
+        $scope = array_merge($this->getExactScope(), $scope);
 
         if (array_key_exists('relations', $requestFilters)) {
 
@@ -263,7 +272,6 @@ trait ManageScopes
         $this->request->merge(['filter' => json_encode($filters)]);
     }
 
-    /**
     /**
      * @return array
      */
