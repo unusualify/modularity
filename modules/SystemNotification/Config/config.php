@@ -95,7 +95,7 @@ return [
                 'subtitle' => __('You can easily monitor the entire process by following the notifications.'),
 
                 'createOnModal' => false,
-                'editOnModal' => false,
+                'editOnModal' => true,
                 'isRowEditing' => false,
                 'rowActionsType' => 'inline',
             ],
@@ -204,13 +204,13 @@ return [
                         ]
                     ]
                 ],
-                'delete' => [
-                    'name' => 'delete',
-                    'label' => 'Delete',
-                    'icon' => 'mdi-delete',
-                    'color' => 'error',
-                    'variant' => 'outlined',
-                ]
+                // 'delete' => [
+                //     'name' => 'delete',
+                //     'label' => 'Delete',
+                //     'icon' => 'mdi-delete',
+                //     'color' => 'error',
+                //     'variant' => 'outlined',
+                // ]
             ],
             'table_actions' => [
                 'bulk-mark-read' => [
