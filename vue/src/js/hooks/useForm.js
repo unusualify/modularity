@@ -146,6 +146,11 @@ export const makeFormProps = propsFactory({
     type: Boolean,
     default: false
   },
+  refreshOnSaved: {
+    type: Boolean,
+    default: false
+  },
+
 })
 
 export default function useForm(props, context) {
@@ -247,6 +252,7 @@ export default function useForm(props, context) {
   }
 
   const saveForm = (callback = null, errorCallback = null) => {
+
     if (props.actionUrl) {
       formErrors.value = {}
       formLoading.value = true
@@ -272,8 +278,21 @@ export default function useForm(props, context) {
           }
 
           context.emit('submitted', response.data)
-          redirector(response.data)
-          if (callback && typeof callback === 'function') callback(response.data)
+
+          let callbackFunction = callback
+
+          if(!props.refreshOnSaved) {
+            redirector(response.data)
+          } else {
+            let __reload = () => {
+              window.location.reload(true)
+            }
+            callbackFunction = (data) => {
+              if(callback && typeof callback === 'function') callback(data)
+              __reload()
+            }
+          }
+          if (callbackFunction && typeof callbackFunction === 'function') callbackFunction(response.data)
         },
         (response) => {
           formLoading.value = false
@@ -289,7 +308,24 @@ export default function useForm(props, context) {
       )
     } else {
       nextTick(() => {
-        store.dispatch(ACTIONS.SAVE_FORM, { item: null, callback, errorCallback })
+        let __reload = () => {
+          window.location.reload(true)
+        }
+
+        let callbackFunction = callback
+
+        if(props.refreshOnSaved) {
+          callbackFunction = (data) => {
+            if(callback && typeof callback === 'function') callback(data)
+            __reload()
+          }
+        }
+
+        store.dispatch(ACTIONS.SAVE_FORM, { item: null, callback: callbackFunction, errorCallback })
+
+        // if(props.refreshOnSaved) {
+        //   window.location.reload()
+        // }
       })
     }
   }
@@ -318,7 +354,16 @@ export default function useForm(props, context) {
     input.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     form.appendChild(input)
 
+    if(props.isEditing) {
+      const input = document.createElement('input')
+      input.type = 'hidden'
+      input.name = '_method'
+      input.value = 'PUT'
+      form.appendChild(input)
+    }
+
     document.body.appendChild(form)
+
     form.submit()
   }
 
