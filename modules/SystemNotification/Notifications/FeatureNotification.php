@@ -47,6 +47,16 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
         $this->token = uniqid();
     }
 
+    public function getModel(): \Illuminate\Database\Eloquent\Model
+    {
+        return $this->model;
+    }
+
+    public function getToken(): string
+    {
+        return $this->token;
+    }
+
     /**
      * Get the module route headline of the model.
      *
