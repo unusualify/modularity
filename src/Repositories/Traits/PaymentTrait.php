@@ -117,9 +117,10 @@ trait PaymentTrait
                         if ($records instanceof \Illuminate\Database\Eloquent\Collection) {
 
                             foreach ($records as $record) {
-                                $price = $record->prices->filter(function ($price) use ($currencyId) {
-                                    return $price->currency_id == $currencyId;
-                                })->first();
+                                $price = $record->basePrice;
+                                // $price = $record->prices->filter(function ($price) use ($currencyId) {
+                                //     return $price->currency_id == $currencyId;
+                                // })->first();
 
                                 if (! is_null($price)) {
                                     $calculated = true;
