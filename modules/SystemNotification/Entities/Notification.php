@@ -198,6 +198,11 @@ class Notification extends Model
             ->where('notifiable_id', auth()->user()->id);
     }
 
+    public function scopeMyUnreadNotification(Builder $query)
+    {
+        return $query->myNotification()->unread();
+    }
+
     public function scopeCompanyNotification(Builder $query)
     {
         $company = auth()->user()->company;
