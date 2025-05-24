@@ -145,7 +145,7 @@ trait HasAuthorizable
     {
         try {
             return $this->authorizationRecord()->exists()
-                ? $this->authorizationRecord->authorized_type
+                ? ($this->authorizationRecord ? $this->authorizationRecord->authorized_type : $this->getDefaultAuthorizedModel())
                 : $this->getDefaultAuthorizedModel();
         } catch (\Exception $e) {
             dd($this, $this->authorizationRecord, $e);
