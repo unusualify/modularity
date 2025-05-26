@@ -37,7 +37,7 @@ class DefaultUsersSeeder extends Seeder
                 'language' => 'en',
                 'timezone' => 'Europe/London',
                 'password' => '$2y$10$./.YS6k9clh6IU1cOdJLcuqqnY1FkxzjAcJ5Wv8qoQj6nYGV.fjqy',
-            ]
+            ],
         ]);
 
     }

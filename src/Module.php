@@ -263,8 +263,6 @@ class Module extends NwidartModule
 
     /**
      * isModularityModule
-     *
-     * @return bool
      */
     public function isModularityModule(): bool
     {
@@ -330,8 +328,6 @@ class Module extends NwidartModule
      *
      * @param mixed $route_name
      * @param mixed $input_name
-     * @param string $field
-     * @return array
      */
     public function getRouteInput($route_name, $input_name, string $field = 'name'): array
     {
@@ -395,7 +391,6 @@ class Module extends NwidartModule
      * isParentRoute
      *
      * @param string $routeName
-     * @return bool
      */
     public function isParentRoute($routeName): bool
     {
@@ -406,7 +401,6 @@ class Module extends NwidartModule
      * isSingleton
      *
      * @param string $routeName
-     * @return bool
      */
     public function isSingleton($routeName): bool
     {
@@ -491,7 +485,6 @@ class Module extends NwidartModule
      * Route name prefix with system prefix
      *
      * @param bool $isParent
-     * @return string
      */
     public function fullRouteNamePrefix($isParent = false): string
     {
@@ -516,7 +509,6 @@ class Module extends NwidartModule
      * Route name prefix with panel prefix (admin)
      *
      * @param bool $isParent
-     * @return string
      */
     public function panelRouteNamePrefix($isParent = false): string
     {
@@ -547,8 +539,6 @@ class Module extends NwidartModule
      *
      * @param mixed $routeName
      * @param mixed $notation
-     *
-     * @return bool
      */
     public function routeHasTable($routeName = null, $notation = null): bool
     {
@@ -561,8 +551,6 @@ class Module extends NwidartModule
 
     /**
      * getConfigPath
-     *
-     * @return string
      */
     public function getConfigPath(): string
     {
@@ -589,8 +577,6 @@ class Module extends NwidartModule
 
     /**
      * get all module urls
-     *
-     * @return array
      */
     public function getModuleUrls(): array
     {
@@ -637,7 +623,6 @@ class Module extends NwidartModule
      *
      * @param string $routeName
      * @param bool $panel
-     * @return array
      */
     public function getRouteUrls($routeName): array
     {
@@ -645,7 +630,7 @@ class Module extends NwidartModule
 
         $mainQuoteParts = [];
 
-        if(!$isParentRoute){
+        if (! $isParentRoute) {
             $mainQuoteParts[] = $this->fullRouteNamePrefix($isParentRoute);
         }
 
@@ -653,7 +638,7 @@ class Module extends NwidartModule
 
         $mainQuote = implode('.', $mainQuoteParts);
 
-        $actionsQuote = "(" . implode('|', self::$routeActionLists) . ")";
+        $actionsQuote = '(' . implode('|', self::$routeActionLists) . ')';
 
         $quoteParts = [$mainQuote, $actionsQuote];
 
@@ -678,7 +663,7 @@ class Module extends NwidartModule
 
         $mainQuoteParts = [adminRouteNamePrefix()];
 
-        if(!$isParentRoute){
+        if (! $isParentRoute) {
             $mainQuoteParts[] = $this->fullRouteNamePrefix($isParentRoute);
         }
 
@@ -686,7 +671,7 @@ class Module extends NwidartModule
 
         $mainQuote = implode('.', $mainQuoteParts);
 
-        $actionsQuote = "(" . implode('|', self::$routeActionLists) . ")";
+        $actionsQuote = '(' . implode('|', self::$routeActionLists) . ')';
 
         $quoteParts = [$mainQuote, $actionsQuote];
 
@@ -712,28 +697,22 @@ class Module extends NwidartModule
 
     /**
      * getRouteActionUri
-     *
-     * @param string $routeName
-     * @param string $action
-     * @param array $replacements
-     * @param bool $absolute
-     * @return string
      */
     public function getRouteActionUrl(string $routeName, string $action, array $replacements = [], bool $absolute = false, bool $isPanel = true): string
     {
         $quote = '';
 
-        if($isPanel){
+        if ($isPanel) {
             $quote = preg_quote(adminRouteNamePrefix() . '.');
         }
         $quote .= '([a-zA-Z_\.]+)';
 
         $quote .= preg_quote('.' . $action) . '$';
 
-        $routes = Collection::make($this->getRouteUrls($routeName))->filter(fn($url, $name) => preg_match('/' . $quote . '/', $name));
+        $routes = Collection::make($this->getRouteUrls($routeName))->filter(fn ($url, $name) => preg_match('/' . $quote . '/', $name));
         $name = $routes->keys()->first();
 
-        if(!$name){
+        if (! $name) {
             // dd($routeName, $action, $quote, $routes, Collection::make($this->getRouteUrls($routeName)));
             throw new \Exception('Route not found for ' . $routeName . ' with action "' . $action . '" on module ' . $this->getName());
         }
@@ -755,9 +734,6 @@ class Module extends NwidartModule
 
     /**
      * getParentNamespace
-     *
-     * @param string $target
-     * @return string
      */
     public function getParentNamespace(string $target): string
     {
@@ -767,9 +743,7 @@ class Module extends NwidartModule
     /**
      * getTargetClassNamespace
      *
-     * @param string $target
      * @param string|null $className
-     * @return string
      */
     public function getTargetClassNamespace(string $target, $className = null): string
     {
@@ -779,9 +753,7 @@ class Module extends NwidartModule
     /**
      * getTargetClassPath
      *
-     * @param string $target
      * @param string|null $className
-     * @return string
      */
     public function getTargetClassPath(string $target, $className = null): string
     {
@@ -790,11 +762,6 @@ class Module extends NwidartModule
 
     /**
      * getRouteClass
-     *
-     * @param string $routeName
-     * @param string $target
-     * @param bool $asClass
-     * @return string
      */
     public function getRouteClass(string $routeName, string $target, bool $asClass = false): string
     {
@@ -813,9 +780,6 @@ class Module extends NwidartModule
 
     /**
      * getNavigationActions
-     *
-     * @param string $routeName
-     * @return array
      */
     public function getNavigationActions(string $routeName): array
     {
@@ -868,9 +832,6 @@ class Module extends NwidartModule
 
     /**
      * getRouteMiddlewareAliases
-     *
-     * @param string $routeName
-     * @return array
      */
     public function getRouteMiddlewareAliases(string $routeName): array
     {

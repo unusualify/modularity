@@ -280,12 +280,12 @@ trait HasPayment
     protected function paymentStatusFormatted(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => match(true) {
-                $this->is_refunded => "<v-chip color='error'>" . __('Refunded') . "</v-chip>",
-                $this->is_paid => "<v-chip color='success'>" . __('Paid') . "</v-chip>",
-                $this->is_partially_paid => "<v-chip color='warning'>" . __('Partially Paid') . "</v-chip>",
-                $this->is_unpaid => "<v-chip color='error'>" . __('Unpaid') . "</v-chip>",
-                default => "<v-chip>" . __('Not Ready') . "</v-chip>",
+            get: fn ($value) => match (true) {
+                $this->is_refunded => "<v-chip color='error'>" . __('Refunded') . '</v-chip>',
+                $this->is_paid => "<v-chip color='success'>" . __('Paid') . '</v-chip>',
+                $this->is_partially_paid => "<v-chip color='warning'>" . __('Partially Paid') . '</v-chip>',
+                $this->is_unpaid => "<v-chip color='error'>" . __('Unpaid') . '</v-chip>',
+                default => '<v-chip>' . __('Not Ready') . '</v-chip>',
             },
         );
     }

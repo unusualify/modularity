@@ -10,7 +10,6 @@ use Unusualify\Modularity\Entities\User;
 
 class StateableListener implements ShouldHandleEventsAfterCommit
 {
-
     /**
      * Create the event listener.
      */
@@ -28,7 +27,7 @@ class StateableListener implements ShouldHandleEventsAfterCommit
         $newState = $event->newState;
         $oldState = $event->oldState;
 
-        if($model->creator){
+        if ($model->creator) {
             $model->creator->notify(new StateableUpdatedNotification($model, $newState, $oldState));
         } else {
             // Notification::route('mail', 'oguz.bukcuoglu@gmail.com')

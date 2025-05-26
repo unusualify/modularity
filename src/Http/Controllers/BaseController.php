@@ -96,7 +96,6 @@ abstract class BaseController extends PanelController
                 );
             }
 
-
             return Response::json([
                 'resource' => $this->getJSONData(),
                 'mainFilters' => $this->getTableMainFilters($this->getExactScope()),
@@ -394,7 +393,7 @@ abstract class BaseController extends PanelController
 
             // if()
 
-            if($this->request->ajax()) {
+            if ($this->request->ajax()) {
                 return $this->respondWithSuccess(___('messages.save-success'));
             }
 
@@ -518,7 +517,7 @@ abstract class BaseController extends PanelController
                     // ($this->tableAttributes['editOnModal'] ?? true) ? $item->toArray() : ['id' => $itemId],
                     $item->toArray(),
                     $necessaryTableData,
-                    ( ($this->tableAttributes['editOnModal'] ?? true) ? $this->repository->getFormFields($item, $schema) : []),
+                    (($this->tableAttributes['editOnModal'] ?? true) ? $this->repository->getFormFields($item, $schema) : []),
                     // $this->repository->getFormFields($item, $schema),
                     $columnsData,
                     $this->getCustomRowData($item),
@@ -678,20 +677,21 @@ abstract class BaseController extends PanelController
         $customRows = $this->tableAttributes['customRow'] ?? [];
         $customRowFillable = [];
 
-        foreach($customRows as $customRow){
-            if(isset($customRow['allowedRoles']) && $this->user->hasRole($customRow['allowedRoles'])){
-                if($customRow['itemAttributes'] && is_array($customRow['itemAttributes'])){
+        foreach ($customRows as $customRow) {
+            if (isset($customRow['allowedRoles']) && $this->user->hasRole($customRow['allowedRoles'])) {
+                if ($customRow['itemAttributes'] && is_array($customRow['itemAttributes'])) {
                     $customRowFillable = $customRow['itemAttributes'];
-                }else{
+                } else {
                     $customRowFillable = [];
                 }
+
                 break;
             }
         }
 
         $customRowData = [];
 
-        foreach($customRowFillable as $fillable){
+        foreach ($customRowFillable as $fillable) {
             $customRowData[$fillable] = $item->{$fillable};
         }
 

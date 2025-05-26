@@ -38,6 +38,7 @@ trait ManageTable
                 })->map(function ($item) {
                     $this->dehydrateHeaderSuffix($item);
                     $searchKey = $item['searchKey'] ?? $item['key'];
+
                     return $searchKey;
                 })->implode('|'),
             ];

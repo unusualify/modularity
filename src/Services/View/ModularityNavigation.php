@@ -83,10 +83,10 @@ class ModularityNavigation
             $array['badge'] = $array['badge']();
         }
 
-        if(isset($array['badge'])){
-            if($array['badge'] < 1){
+        if (isset($array['badge'])) {
+            if ($array['badge'] < 1) {
                 unset($array['badge']);
-            }else{
+            } else {
                 $array['badge'] = (int) $array['badge'];
                 $array['badgeProps'] = array_merge([
                     'color' => 'secondary',

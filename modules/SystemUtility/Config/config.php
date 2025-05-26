@@ -76,7 +76,7 @@ return [
                 ],
             ],
         ],
-    	'country' => [
+        'country' => [
             'name' => 'Country',
             'headline' => 'Countries',
             'url' => 'countries',
@@ -156,5 +156,5 @@ return [
                 ],
             ],
         ],
-	],
+    ],
 ];

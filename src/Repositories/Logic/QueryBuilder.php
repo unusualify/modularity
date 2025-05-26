@@ -56,7 +56,7 @@ trait QueryBuilder
 
         $page = request()->get('page') ?? null;
 
-        if($id){
+        if ($id) {
             $totalRows = $query->count();
             // $totalPages = ceil($totalRows / $perPage);
 
@@ -65,7 +65,7 @@ trait QueryBuilder
             // $orderColumns = $query->getQuery()->orders ?? [];
 
             // Get the position of the record
-            if($cloneQuery->where('id', $id)->exists()){
+            if ($cloneQuery->where('id', $id)->exists()) {
                 $cloneQuery = clone $query;
 
                 // Get all IDs in the correct query order

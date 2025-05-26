@@ -125,7 +125,7 @@ trait HasAuthorizable
         );
     }
 
-    protected function isAuthorized() : Attribute
+    protected function isAuthorized(): Attribute
     {
         return new Attribute(
             get: function () {

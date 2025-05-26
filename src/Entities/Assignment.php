@@ -99,7 +99,7 @@ class Assignment extends Model
     protected function statusLabel(): Attribute
     {
         return new Attribute(
-            get: fn ($value) =>  $this->status ? $this->status->label() : null,
+            get: fn ($value) => $this->status ? $this->status->label() : null,
         );
     }
 

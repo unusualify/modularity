@@ -11,25 +11,25 @@ class Country extends Model
     use HasTranslation;
 
     /**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array<int, string>
-	 */
-	protected $fillable = [
-		'published',
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'published',
         'code',
-		'phone_code',
-	];
+        'phone_code',
+    ];
 
     /**
-	 * The translated attributes that are assignable for hasTranslation Trait.
-	 *
-	 * @var array<int, string>
-	 */
-	public $translatedAttributes = [
-		'name',
-		'active'
-	];
+     * The translated attributes that are assignable for hasTranslation Trait.
+     *
+     * @var array<int, string>
+     */
+    public $translatedAttributes = [
+        'name',
+        'active',
+    ];
 
     public function companies(): \Illuminate\Database\Eloquent\Relations\HasMany
     {

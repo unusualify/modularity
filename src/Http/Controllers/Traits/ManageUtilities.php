@@ -138,7 +138,7 @@ trait ManageUtilities
                 ),
                 'isEditing' => $itemId ? true : false,
                 'actions' => $this->getFormActions(),
-                ...(($formAttributes['async'] ?? true) ? [] : [ 'actionUrl' => $this->getFormUrl($itemId)]),
+                ...(($formAttributes['async'] ?? true) ? [] : ['actionUrl' => $this->getFormUrl($itemId)]),
             ], $formAttributes),
             'endpoints' => [
                 ((bool) $itemId ? 'update' : 'store') => $this->getFormUrl($itemId),

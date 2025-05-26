@@ -29,14 +29,14 @@ return [
                     'searchable' => true,
                     'formatter' => [
                         'shorten',
-                        10
+                        10,
                     ],
                 ],
                 [
                     'title' => 'Read',
                     'key' => 'is_read',
                     'formatter' => [
-                        'status'
+                        'status',
                     ],
                 ],
                 [
@@ -61,7 +61,7 @@ return [
                     'type' => 'text',
                 ],
             ],
-            /** TODO: Add multiple routes for my-notification and company-notification, sample clone routing configuration */
+        /** TODO: Add multiple routes for my-notification and company-notification, sample clone routing configuration */
             // 'multiple' => [
             //     'my-notification' => [
             //         'url' => 'my-notifications',
@@ -80,7 +80,7 @@ return [
 
             // ]
         ],
-    	'my_notification' => [
+        'my_notification' => [
             'name' => 'MyNotification',
             'headline' => 'Notifications',
             'url' => 'notifications',
@@ -109,7 +109,7 @@ return [
                     // 'href' => 'notification.read',
                     // 'target' => '_blank',
                     'conditions' => [
-                        ['is_read', '=', true]
+                        ['is_read', '=', true],
                     ],
                     'modalService' => [
                         'modalProps' => [
@@ -144,8 +144,8 @@ return [
                                                 ])
                                                 ->setElements('$redirector_text'),
                                         ]),
-                                ])
-                        ]
+                                ]),
+                        ],
                     ],
                 ],
                 'unread' => [
@@ -154,7 +154,7 @@ return [
                     'color' => 'warning',
                     'variant' => 'flat',
                     'conditions' => [
-                        ['is_read', '!=', true]
+                        ['is_read', '!=', true],
                     ],
                     'modalService' => [
                         'modalProps' => [
@@ -189,8 +189,8 @@ return [
                                                 ])
                                                 ->setElements('$redirector_text'),
                                         ]),
-                                ])
-                        ]
+                                ]),
+                        ],
                     ],
                     'preProcesses' => [
                         [
@@ -199,10 +199,10 @@ return [
                                 'read_at' => '{new Date()}',
                             ],
                             'conditions' => [
-                                ['is_mine', '=', true]
+                                ['is_mine', '=', true],
                             ],
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
                 // 'delete' => [
                 //     'name' => 'delete',
@@ -222,7 +222,7 @@ return [
                     'density' => 'comfortable',
                     'href' => 'admin.system.system_notification.my_notification.bulkMarkRead',
                     'target' => '_self',
-                ]
+                ],
             ],
             'default_filter_status' => 'my-notification',
             'table_filters' => [
@@ -248,7 +248,7 @@ return [
                     'key' => 'subject',
                     'formatter' => [
                         'shorten',
-                        30
+                        30,
                     ],
                     'searchKey' => 'data->subject',
                     'searchable' => true,
@@ -258,7 +258,7 @@ return [
                     'key' => 'message',
                     'formatter' => [
                         'shorten',
-                        30
+                        30,
                     ],
                     'searchKey' => 'data->message',
                     'searchable' => true,
@@ -268,7 +268,7 @@ return [
                     'key' => 'is_read',
 
                     'formatter' => [
-                        'status'
+                        'status',
                     ],
                 ],
                 [
@@ -292,7 +292,7 @@ return [
                     'name' => 'message',
                     'label' => 'Message',
                     'editable' => 'hidden',
-                    'noSubmit' => true
+                    'noSubmit' => true,
                 ],
                 [
                     'type' => 'preview',
@@ -329,11 +329,11 @@ return [
                                     'class' => 'font-weight-bold text-wrap pt-2 text-primary',
                                 ],
                                 'elements' => '$messagePreview',
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ],
             ],
         ],
-	],
+    ],
 ];

@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 trait StateableTrait
 {
-    public function getStateableFilterList() : array
+    public function getStateableFilterList(): array
     {
         $model = $this->getModel();
         $query = $model::query();

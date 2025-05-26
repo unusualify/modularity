@@ -6,9 +6,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\HtmlString;
-use Illuminate\Support\Str;
-use Unusualify\Modularity\Facades\Modularity;
 
 class StateableUpdatedNotification extends FeatureNotification implements ShouldQueue
 {
@@ -35,7 +32,6 @@ class StateableUpdatedNotification extends FeatureNotification implements Should
     {
         return true;
     }
-
 
     public function getNotificationMessage(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
     {

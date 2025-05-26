@@ -22,7 +22,7 @@ class Stateable extends Model
 
     public $timestamps = false;
 
-    public function state() : \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function state(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(modularityConfig('models.state', 'Unusualify\Modularity\Entities\State'));
     }

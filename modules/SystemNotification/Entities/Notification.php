@@ -102,14 +102,14 @@ class Notification extends Model
         return $this->read_at !== null;
     }
 
-    protected function isRead() : Attribute
+    protected function isRead(): Attribute
     {
         return new Attribute(
             get: fn ($value) => $this->read_at !== null,
         );
     }
 
-    protected function isMine() : Attribute
+    protected function isMine(): Attribute
     {
         $user = auth()->user() ?? null;
 
@@ -118,42 +118,42 @@ class Notification extends Model
         );
     }
 
-    protected function subject() : Attribute
+    protected function subject(): Attribute
     {
         return new Attribute(
             get: fn ($value) => $this->data['subject'] ?? '',
         );
     }
 
-    protected function message() : Attribute
+    protected function message(): Attribute
     {
         return new Attribute(
             get: fn ($value) => $this->data['message'] ?? '',
         );
     }
 
-    protected function htmlMessage() : Attribute
+    protected function htmlMessage(): Attribute
     {
         return new Attribute(
             get: fn ($value) => $this->data['htmlMessage'] ?? '',
         );
     }
 
-    protected function redirector() : Attribute
+    protected function redirector(): Attribute
     {
         return new Attribute(
             get: fn ($value) => $this->data['redirector'] ?? '',
         );
     }
 
-    protected function hasRedirector() : Attribute
+    protected function hasRedirector(): Attribute
     {
         return new Attribute(
             get: fn ($value) => $this->data['hasRedirector'] ?? false,
         );
     }
 
-    protected function redirectorText() : Attribute
+    protected function redirectorText(): Attribute
     {
         return new Attribute(
             get: fn ($value) => $this->data['redirectorText'] ?? $this->data['actionText'] ?? '',
@@ -173,7 +173,6 @@ class Notification extends Model
     /**
      * Scope a query to only include read notifications.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeRead(Builder $query)
@@ -184,7 +183,6 @@ class Notification extends Model
     /**
      * Scope a query to only include unread notifications.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeUnread(Builder $query)
@@ -207,7 +205,7 @@ class Notification extends Model
     {
         $company = auth()->user()->company;
 
-        if($company){
+        if ($company) {
             return $query->where('notifiable_type', auth()->user()->getMorphClass())
                 ->whereIn('notifiable_id', $company->users->pluck('id'));
         }
@@ -218,7 +216,6 @@ class Notification extends Model
     /**
      * Create a new database notification collection instance.
      *
-     * @param  array  $models
      * @return \Illuminate\Notifications\DatabaseNotificationCollection
      */
     public function newCollection(array $models = [])

@@ -2,12 +2,8 @@
 
 namespace Unusualify\Modularity\Http\Middleware;
 
-use App\Http\Menus\GetSidebarMenu;
-use App\Models\Menulist;
-use App\Models\RoleHierarchy;
 use Closure;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Permission\Models\Role;
 use Unusualify\Modularity\Facades\Navigation;
 
 class NavigationMiddleware
@@ -22,7 +18,7 @@ class NavigationMiddleware
     {
         view()->composer([modularityBaseKey() . '::layouts.master', 'translation::layout'], function ($view) {
 
-            $sidebarKey  = 'default';
+            $sidebarKey = 'default';
             $profileMenuKey = 'default';
 
             if (Auth::guest()) {

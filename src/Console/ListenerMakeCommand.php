@@ -70,7 +70,7 @@ class ListenerMakeCommand extends BaseCommand
         $allModules = Modularity::all();
 
         foreach ($allModules as $module) {
-            if(file_exists($moduleEventsPath = $module->getTargetClassPath('event'))){
+            if (file_exists($moduleEventsPath = $module->getTargetClassPath('event'))) {
                 $paths[] = $moduleEventsPath;
             }
         }
@@ -96,7 +96,7 @@ class ListenerMakeCommand extends BaseCommand
             return $carry;
         }, collect());
 
-        if ($events->count() > 0 ) {
+        if ($events->count() > 0) {
             $eventClass = select(
                 label: 'Select one if you want to use a specific abstract event class',
                 options: ['No' => 'No'] + $events->keys()->toArray(),

@@ -5,5 +5,3 @@ return [
     'state' => 'State | States | {n} States',
     'country' => 'Country | Countries | {n} Countries',
 ];
-
-    

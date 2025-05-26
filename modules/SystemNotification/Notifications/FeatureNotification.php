@@ -59,9 +59,6 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
 
     /**
      * Get the module route headline of the model.
-     *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @return string
      */
     public function getModuleRouteHeadline(\Illuminate\Database\Eloquent\Model $model): string
     {
@@ -72,9 +69,6 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
 
     /**
      * Get the title field of the model.
-     *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @return string
      */
     public function getModelTitleField(\Illuminate\Database\Eloquent\Model $model): string
     {
@@ -94,9 +88,6 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
 
     /**
      * Get the database feature fields for the notification.
-     *
-     * @param object $notifiable
-     * @return array
      */
     public function toDatabase(object $notifiable): array
     {
@@ -105,9 +96,6 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
 
     /**
      * Get the database feature fields for the notification.
-     *
-     * @param object $notifiable
-     * @return array
      */
     public function toDatabaseFeatureFields(object $notifiable): array
     {
@@ -134,7 +122,6 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
      * Get the mail message for the notification.
      *
      * @param object $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable): MailMessage
     {
@@ -157,13 +144,13 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
             ->greeting(__('Hi, :name', ['name' => $notifiable->name]))
             ->line($this->getNotificationMessage($notifiable, $this->model));
 
-        if($redirector){
+        if ($redirector) {
             $mailMessage->action('View ' . $moduleRouteHeadline, $redirector);
         }
 
-        $mailMessage = $mailMessage->salutation(!is_null($this->salutationMessage) ? $this->salutationMessage : new HtmlString('Best Regards, <br>' . config('app.name')));
+        $mailMessage = $mailMessage->salutation(! is_null($this->salutationMessage) ? $this->salutationMessage : new HtmlString('Best Regards, <br>' . config('app.name')));
 
-        if(method_exists($this, 'getMailMessage')){
+        if (method_exists($this, 'getMailMessage')) {
             $mailMessage = $this->getMailMessage($notifiable, $mailMessage, $this->model);
         }
 
@@ -172,10 +159,6 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
 
     /**
      * Get the subject for the notification.
-     *
-     * @param object $notifiable
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @return string
      */
     public function getNotificationSubject(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
     {
@@ -184,10 +167,6 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
 
     /**
      * Get the message for the notification.
-     *
-     * @param object $notifiable
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @return string
      */
     public function getNotificationMessage(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
     {
@@ -199,10 +178,6 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
 
     /**
      * Get the action text for the notification.
-     *
-     * @param object $notifiable
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @return string
      */
     public function getNotificationActionText(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
     {
@@ -212,8 +187,6 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
     /**
      * Get the redirector to use in the notification system.
      *
-     * @param object $notifiable
-     * @param \Illuminate\Database\Eloquent\Model $model
      * @return string|null
      */
     public function getNotificationRedirector(object $notifiable, \Illuminate\Database\Eloquent\Model $model)
@@ -221,7 +194,7 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
         $moduleName = method_exists($model, 'moduleName') ? $model->moduleName() : null;
         $routeName = method_exists($model, 'routeName') ? $model->routeName() : null;
 
-        if($moduleName && $routeName){
+        if ($moduleName && $routeName) {
             $module = Modularity::find($moduleName);
 
             $routeConfig = $module->getRouteConfig($routeName);
@@ -230,22 +203,22 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
 
             $editOnModal = data_get($routeConfig, 'table_options.editOnModal', $defaultEditOnModal);
 
-            if($editOnModal){
+            if ($editOnModal) {
                 return $module->getRouteActionUrl(
                     routeName: $routeName,
                     action: 'index',
                     replacements: [
-                        'id' => $model->id
+                        'id' => $model->id,
                     ],
                     absolute: true,
                     isPanel: true
                 );
-            }else{
+            } else {
                 return $module->getRouteActionUrl(
                     routeName: $routeName,
                     action: 'edit',
                     replacements: [
-                        Str::snake($routeName) => $model->id
+                        Str::snake($routeName) => $model->id,
                     ],
                     absolute: true,
                     isPanel: true
@@ -259,7 +232,6 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
     /**
      * Get the redirector for the email action button.
      *
-     * @param object $notifiable
      * @return string|null
      */
     public function getNotificationMailRedirector(object $notifiable, \Illuminate\Database\Eloquent\Model $model)
@@ -272,14 +244,13 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
 
         $mailRedirector = null;
 
-        if($notificationRecord){
+        if ($notificationRecord) {
             $mailRedirector = route('admin.system.system_notification.my_notification.show', [
                 'my_notification' => $notificationRecord->id,
-                'redirector' => true
+                'redirector' => true,
             ]);
         }
 
         return $mailRedirector;
     }
-
 }

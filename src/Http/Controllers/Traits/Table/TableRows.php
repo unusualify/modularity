@@ -22,7 +22,7 @@ trait TableRows
 
         $noDefaultTableRowActions = $this->getConfigFieldsByRoute('no_default_table_row_actions', false);
 
-        if (!$noDefaultTableRowActions) {
+        if (! $noDefaultTableRowActions) {
             // if $this->repository has hasPayment
             if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasPayment')) {
                 $tableActions[] = [
@@ -176,20 +176,20 @@ trait TableRows
         foreach ($tableNavigationActions as $key => $navigationAction) {
             $mergeable = isset($navigationAction['merge']) ? (bool) $navigationAction['merge'] : false;
 
-            if(isset($navigationAction['name']) && $mergeable){
+            if (isset($navigationAction['name']) && $mergeable) {
                 $isFound = false;
                 $tableActionsCollection = $tableActionsCollection->reduce(function ($acc, $action) use ($navigationAction, &$isFound) {
-                    if($action['name'] == $navigationAction['name']){
+                    if ($action['name'] == $navigationAction['name']) {
                         $acc->push(array_merge($action, $navigationAction));
                         $isFound = true;
-                    }else{
+                    } else {
                         $acc->push($action);
                     }
 
                     return $acc;
                 }, collect([]));
 
-                if($isFound){
+                if ($isFound) {
                     unset($tableNavigationActions[$key]);
                 }
             }

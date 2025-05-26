@@ -263,6 +263,7 @@ abstract class Request extends FormRequest
     protected function mergeSchemaRules($rules)
     {
         return $rules;
+
         return formatRulesSchema(
             array_merge_recursive_preserve(
                 parseRulesSchema($this->rules),

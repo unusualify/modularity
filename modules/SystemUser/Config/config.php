@@ -132,7 +132,7 @@ return [
                     // 'repository' => \Modules\SystemUser\Repositories\RoleRepository::class,
                     // 'connector' => 'Role|uri',
                     'endpoint' => [
-                        'admin.system.system_user.role.index'
+                        'admin.system.system_user.role.index',
                     ],
                     'rules' => 'required',
                 ],

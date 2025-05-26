@@ -59,13 +59,11 @@ class Payment extends \Unusualify\Payable\Models\Payment
 
     /**
      * Get the polymorphic model that the price belongs to.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function paymentable() : \Illuminate\Database\Eloquent\Relations\MorphTo
+    public function paymentable(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
         // Use a custom MorphTo relation with dynamic keys
-        return \Illuminate\Database\Eloquent\Relations\MorphTo::noConstraints(function() {
+        return \Illuminate\Database\Eloquent\Relations\MorphTo::noConstraints(function () {
             // This will create a MorphTo relation with dynamic foreign key and owner key
             // based on the Price relation
             // UGLY MANIPULATION

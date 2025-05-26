@@ -60,7 +60,7 @@ class ChatHydrate extends InputHydrate
             // 'name' => 'attachments',
             'accepted-file-types' => $acceptedFileTypes,
             'max' => $maxAttachments,
-            'noRules' => true
+            'noRules' => true,
         ]);
 
         $input['name'] = '_chat_id';

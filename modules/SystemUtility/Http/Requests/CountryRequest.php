@@ -14,7 +14,7 @@ class CountryRequest extends Request
     public function rulesForAll()
     {
         return [
-		];
+        ];
     }
 
     /**

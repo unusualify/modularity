@@ -2,13 +2,11 @@
 
 namespace Modules\SystemNotification\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Lang;
 use Unusualify\Modularity\Http\Controllers\BaseController;
 
 class MyNotificationController extends BaseController
 {
-
     /**
      * @var string
      */
@@ -23,17 +21,17 @@ class MyNotificationController extends BaseController
     {
         $notification = $this->repository->findOrFail($id);
 
-        if($notification->is_mine){
+        if ($notification->is_mine) {
             $notification->markAsRead();
         }
 
-        if($this->request->has('redirector') && $this->request->get('redirector') == true){
-            if($notification->hasRedirector){
+        if ($this->request->has('redirector') && $this->request->get('redirector') == true) {
+            if ($notification->hasRedirector) {
                 return redirect($notification->redirector);
             }
         }
 
-        if (!$notification->is_mine) {
+        if (! $notification->is_mine) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -49,11 +47,10 @@ class MyNotificationController extends BaseController
     {
         $this->repository->getModel()->myNotification()->get()->markAsRead();
 
-        if($this->request->ajax()){
+        if ($this->request->ajax()) {
             return $this->respondWithSuccess(Lang::get('messages.notifications.mark-read-success'));
         }
 
         return redirect()->back()->with('success', __('messages.notifications.mark-read-success'));
     }
-
 }

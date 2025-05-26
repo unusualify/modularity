@@ -173,7 +173,7 @@ trait ManageScopes
 
                     if ($customMainFilter) {
                         $scope[$customMainFilter->scope ?? $customMainFilter->slug] = true;
-                    };
+                    }
 
                     break;
             }

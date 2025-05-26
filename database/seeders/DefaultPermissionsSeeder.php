@@ -83,14 +83,14 @@ class DefaultPermissionsSeeder extends Seeder
         // Editor gets content-related permissions
         $roleInstances['editor']->givePermissionTo([
             'dashboard', 'mediaLibrary',
-            'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete'
+            'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete',
 
         ]);
 
         // Reporter gets view-only permissions
         $roleInstances['reporter']->givePermissionTo([
             'dashboard', 'mediaLibrary',
-            'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete'
+            'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete',
         ]);
 
         // Client Manager gets client-specific permissions

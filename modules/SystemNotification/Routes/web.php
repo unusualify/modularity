@@ -15,10 +15,10 @@ use Modules\SystemNotification\Http\Controllers\MyNotificationController;
 | Now create something great!
 |
 */
-Route::middleware(['web.auth', ...\Unusualify\Modularity\Facades\ModularityRoutes::defaultMiddlewares()])->group(function(){
+Route::middleware(['web.auth', ...\Unusualify\Modularity\Facades\ModularityRoutes::defaultMiddlewares()])->group(function () {
 
-    Route::middleware((\Unusualify\Modularity\Facades\ModularityRoutes::defaultPanelMiddlewares()))->group(function(){
-        Route::prefix('notifications')->as('my_notification.')->group(function(){
+    Route::middleware((\Unusualify\Modularity\Facades\ModularityRoutes::defaultPanelMiddlewares()))->group(function () {
+        Route::prefix('notifications')->as('my_notification.')->group(function () {
             Route::get('bulk-mark-read', [MyNotificationController::class, 'markReadMyNotifications'])->name('bulkMarkRead');
         });
     });

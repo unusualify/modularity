@@ -11,7 +11,6 @@ use Unusualify\Modularity\Entities\Scopes\StateableScopes;
 use Unusualify\Modularity\Entities\State;
 use Unusualify\Modularity\Entities\Stateable;
 
-
 trait HasStateable
 {
     use StateableScopes;
@@ -78,7 +77,7 @@ trait HasStateable
             'stateable_id',
             'state_id'
         )
-        ->orWhereIn('code', $defaultStateCodes);
+            ->orWhereIn('code', $defaultStateCodes);
         // ->withPivot('is_active');
     }
 
@@ -92,7 +91,7 @@ trait HasStateable
             'id',
             'created_at'
         )
-        ->orWhereIn('code', $defaultStateCodes);
+            ->orWhereIn('code', $defaultStateCodes);
         // ->withPivot('is_active');
     }
 
@@ -109,7 +108,7 @@ trait HasStateable
             'state_id'
         )
         // ->where(modularityConfig('tables.stateables', 'um_stateables') . '.is_active', 1)
-        ->where($stateableTable . '.stateable_type', get_class($this));
+            ->where($stateableTable . '.stateable_type', get_class($this));
     }
 
     public function stateable(): \Illuminate\Database\Eloquent\Relations\MorphOne
@@ -126,7 +125,7 @@ trait HasStateable
     {
         $originalState = $this->getRelationValue('state');
 
-        if(!$originalState) {
+        if (! $originalState) {
             return null;
         }
 
@@ -161,7 +160,6 @@ trait HasStateable
     }
 
     /**
-     * @param array $defaultAttributes
      * @return array
      */
     protected static function formatStateableState(array|string $state, array $defaultAttributes = [])
@@ -172,12 +170,12 @@ trait HasStateable
         ], $defaultAttributes ?? [], Arr::only(is_array($state) ? $state : [], ['icon', 'color']));
 
         $code = null;
-        if(is_string($state)) {
-            if($state === ''){
+        if (is_string($state)) {
+            if ($state === '') {
                 throw new \InvalidArgumentException('State cannot be empty string');
             }
             $code = $state;
-        } else if (is_array($state)) {
+        } elseif (is_array($state)) {
             try {
                 $code = $state['code'];
             } catch (\Throwable $th) {
@@ -188,10 +186,10 @@ trait HasStateable
         $defaultName = Str::headline($code);
         $nameAttribute = (is_array($state) && isset($state['name'])) ? $state['name'] : $defaultName;
 
-        $translations = array_reduce(self::getStateableTranslationLanguages(), function($carry, $lang) use ($defaultName, $nameAttribute) {
-            if(is_string($nameAttribute)) {
+        $translations = array_reduce(self::getStateableTranslationLanguages(), function ($carry, $lang) use ($defaultName, $nameAttribute) {
+            if (is_string($nameAttribute)) {
                 $name = $nameAttribute;
-            } else if (is_array($nameAttribute) && isset($nameAttribute[$lang])) {
+            } elseif (is_array($nameAttribute) && isset($nameAttribute[$lang])) {
                 $name = $nameAttribute[$lang];
             } else {
                 $name = $defaultName;
@@ -215,7 +213,7 @@ trait HasStateable
     public static function getDefaultState()
     {
         if (isset(static::$default_state)) {
-            if( !is_array(static::$default_state)) {
+            if (! is_array(static::$default_state)) {
                 throw new \InvalidArgumentException('Default state must be an array');
             }
 
@@ -252,13 +250,14 @@ trait HasStateable
         $state = [];
 
         foreach (self::getDefaultStates() as $state) {
-            if(is_string($state)) {
-                if($state === $code) {
+            if (is_string($state)) {
+                if ($state === $code) {
                     break;
                 }
-            } else if (is_array($state) && isset($state['code'])) {
-                if($state['code'] === $code) {
+            } elseif (is_array($state) && isset($state['code'])) {
+                if ($state['code'] === $code) {
                     $state = $state;
+
                     break;
                 }
             }
@@ -276,7 +275,7 @@ trait HasStateable
             $stateModel = State::where('code', $state['code'])->first() ?? State::create($state);
             $isActive = $state['code'] === $initialState['code'];
             // $this->states()->attach($stateModel->id, ['is_active' => $isActive]);
-            if($isActive) {
+            if ($isActive) {
                 $this->stateable()->updateOrCreate(['stateable_id' => $this->id, 'stateable_type' => get_class($this)], ['state_id' => $stateModel->id]);
             }
         }
@@ -287,6 +286,7 @@ trait HasStateable
      *
      * @param array $scopes
      * @return array
+     *
      * @deprecated Use StateableTrait::getStateableFilterList instead
      */
     public static function defaultStateables($scopes = [])
@@ -374,8 +374,9 @@ trait HasStateable
 
     protected function updateStateable()
     {
-        if(!$this->modelStateableIsUpdating)
+        if (! $this->modelStateableIsUpdating) {
             return;
+        }
 
         $newState = State::find($this->modelStateableIsUpdatingId);
 
@@ -387,7 +388,7 @@ trait HasStateable
 
         $this->stateable()->update(['state_id' => $newState->id]);
 
-        if($oldState && $oldState->code !== $newState->code) {
+        if ($oldState && $oldState->code !== $newState->code) {
             $cloneModel = clone $this;
             $cloneModel->refresh();
             StateableUpdated::dispatch($cloneModel, $cloneModel->state, $oldState);

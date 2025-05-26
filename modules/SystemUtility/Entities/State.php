@@ -8,5 +8,4 @@ use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 class State extends \Unusualify\Modularity\Entities\State
 {
     use IsTranslatable, ModelHelpers;
-
 }

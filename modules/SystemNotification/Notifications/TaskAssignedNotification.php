@@ -54,7 +54,7 @@ class TaskAssignedNotification extends FeatureNotification implements ShouldQueu
         return __('The :moduleRouteHeadline :modelTitleField has been assigned to you as a task.', [
             'moduleRouteHeadline' => $this->getModuleRouteHeadline($model),
             'modelTitleField' => "'{$this->getModelTitleField($model)}'",
-        ]);;
+        ]);
     }
 
     public function getNotificationRedirector(object $notifiable, \Illuminate\Database\Eloquent\Model $model)

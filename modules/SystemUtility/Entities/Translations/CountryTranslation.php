@@ -2,8 +2,8 @@
 
 namespace Modules\SystemUtility\Entities\Translations;
 
-use Unusualify\Modularity\Entities\Model;
 use Modules\SystemUtility\Entities\Country;
+use Unusualify\Modularity\Entities\Model;
 
 class CountryTranslation extends Model
 {
