@@ -165,8 +165,8 @@ class ModularityRoutes
         Route::aliasMiddleware('navigation', NavigationMiddleware::class);
 
         Route::middlewareGroup('modularity.core', [
-            'language',
             'impersonate',
+            'language',
             'navigation',
         ]);
 

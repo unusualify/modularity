@@ -25,6 +25,10 @@ export const makeFilepondProps = propsFactory({
     type: Array,
     default: () => [],
   },
+  noRules: {
+    type: Boolean,
+    default: false
+  },
   hintWeight: {
     type: String,
     default: 'thin',

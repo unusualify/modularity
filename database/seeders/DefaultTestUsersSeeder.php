@@ -18,7 +18,7 @@ class DefaultTestUsersSeeder extends Seeder
             'address' => '123 Main St',
             'city' => 'Default City',
             'state' => 'Default State',
-            'country' => 'Default Country',
+            'country_id' => 1,
             'zip_code' => '12345',
             'phone' => '123-456-7890',
             'vat_number' => 'VAT123456',

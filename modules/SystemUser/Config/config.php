@@ -121,17 +121,19 @@ return [
                 ],
                 [
                     'type' => 'select-scroll',
-                    'componentType' => 'v-autocomplete',
                     'label' => 'Roles',
                     'name' => 'roles',
-                    'rules' => 'sometimes|required',
                     'col' => [
                         'cols' => 12,
                         'sm' => 8,
                         'md' => 6,
                     ],
+                    'itemTitle' => 'title',
                     // 'repository' => \Modules\SystemUser\Repositories\RoleRepository::class,
-                    'connector' => 'Role|uri',
+                    // 'connector' => 'Role|uri',
+                    'endpoint' => [
+                        'admin.system.system_user.role.index'
+                    ],
                     'rules' => 'required',
                 ],
             ],
@@ -148,7 +150,30 @@ return [
                 'isRowEditing' => true,
                 'rowActionsType' => 'inline',
             ],
+            'title_column_name' => 'title',
             'headers' => [
+                [
+                    'title' => 'Title',
+                    'key' => 'title',
+                    'align' => 'start',
+                    'sortable' => false,
+                    'filterable' => false,
+                    'groupable' => false,
+                    'divider' => false,
+                    'class' => '', // || []
+                    'cellClass' => '', // || []
+                    // 'width' => '', // || int
+                    // vuetify datatable header fields end
+
+                    // custom fields for ue-datatable start
+                    'searchable' => true,
+                    'isRowEditable' => false,
+                    'isColumnEditable' => false,
+                    'formatter' => [
+                        0 => 'edit',
+                    ],
+                    // custom fields for ue-datatable end
+                ],
                 [
                     'title' => 'Name',
                     'key' => 'name',
@@ -932,6 +957,21 @@ return [
             'inputs' => [
                 [
                     'type' => 'text',
+                    'name' => 'title',
+                    'label' => 'Title',
+                    // 'tooltip' => 'Enter a usual name',
+                    'col' => [
+                        'cols' => 10,
+                        'sm' => 10,
+                        'md' => 6,
+                        'lg' => 6,
+                        'xl' => 6,
+                    ],
+                    'rules' => 'sometimes|required|min:3',
+                    // 'prepend-icon' => 'mdi-card-text-outline',
+                ],
+                [
+                    'type' => 'text',
                     'name' => 'name',
                     'label' => 'Name',
                     'hint' => '',
@@ -945,9 +985,11 @@ return [
                         'lg' => 6,
                         'xl' => 6,
                     ],
+                    'editable' => false,
                     'rules' => 'sometimes|required|min:3',
                     // 'prepend-icon' => 'mdi-card-text-outline',
                 ],
+
                 [
                     'type' => 'text',
                     'name' => 'guard_name',
@@ -1308,6 +1350,13 @@ return [
                     'searchable' => true,
                 ],
                 [
+                    'title' => 'Country',
+                    'key' => 'country_name',
+                    'align' => 'start',
+                    // 'sortable' => true,
+                    // 'searchable' => true,
+                ],
+                [
                     'title' => 'Users',
                     'key' => 'users',
                 ],
@@ -1323,38 +1372,38 @@ return [
             ],
             'inputs' => [
                 [
-                    'type' => 'checkbox',
+                    'type' => 'radio-group',
                     'name' => 'is_personal',
                     'color' => 'primary',
-                    'label' => 'I don\'t have a company',
                     'col' => ['cols' => 12],
                     'hideDetails' => false,
-                    'ext' => [
-                        [
-                            'set',
-                            'name',
-                            'disabled',
-                            'disable_value.*.value',
-                        ],
-                        [
-                            'set',
-                            'tax_id',
-                            'disabled',
-                            'disable_value.*.value',
-                        ],
-                        [
-                            'set',
-                            'phone',
-                            'disabled',
-                            'disable_value.*.value',
-                        ],
-                        [
-                            'set',
-                            'email',
-                            'disabled',
-                            'disable_value.*.value',
-                        ],
-                    ],
+                    'spreadable' => true,
+                    // 'ext' => [
+                    //     [
+                    //         'set',
+                    //         'name',
+                    //         'disabled',
+                    //         'disable_value.*.value',
+                    //     ],
+                    //     [
+                    //         'set',
+                    //         'tax_id',
+                    //         'disabled',
+                    //         'disable_value.*.value',
+                    //     ],
+                    //     [
+                    //         'set',
+                    //         'phone',
+                    //         'disabled',
+                    //         'disable_value.*.value',
+                    //     ],
+                    //     [
+                    //         'set',
+                    //         'email',
+                    //         'disabled',
+                    //         'disable_value.*.value',
+                    //     ],
+                    // ],
                     'disable_value' => [
                         [
                             'id' => 0,
@@ -1365,7 +1414,16 @@ return [
                             'value' => 1,
                         ],
                     ],
-                    'spreadable' => true,
+                    'items' => [
+                        [
+                            'name' => 'Company',
+                            'id' => 0,
+                        ],
+                        [
+                            'name' => 'Personal',
+                            'id' => 1,
+                        ],
+                    ],
                 ],
                 [
                     'type' => 'text',
@@ -1408,23 +1466,9 @@ return [
                     'rules' => 'sometimes|required|min:5',
                 ],
                 [
-                    'type' => 'text',
-                    'title' => 'City',
-                    'name' => 'city',
-                    'label' => 'City',
-                    'placeholder' => '',
-                    'default' => '',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    'rules' => 'sometimes|required|min:3',
-                ],
-                [
-                    'type' => 'text',
+                    'type' => 'select',
                     'title' => 'Country',
-                    'name' => 'country',
+                    'name' => 'country_id',
                     'label' => 'Country',
                     'placeholder' => '',
                     'default' => '',
@@ -1433,13 +1477,28 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'rules' => 'sometimes|required|min:3',
+                    'connector' => 'SystemUtility:Country|repository:list',
+                    'rules' => 'sometimes|required',
                 ],
                 [
                     'type' => 'text',
                     'title' => 'State',
                     'name' => 'state',
                     'label' => 'State/Province',
+                    'placeholder' => '',
+                    'default' => '',
+                    'col' => [
+                        'cols' => 12,
+                        'sm' => 8,
+                        'md' => 6,
+                    ],
+                    'rules' => 'sometimes|required|min:3',
+                ],
+                [
+                    'type' => 'text',
+                    'title' => 'City',
+                    'name' => 'city',
+                    'label' => 'City',
                     'placeholder' => '',
                     'default' => '',
                     'col' => [
@@ -1480,7 +1539,6 @@ return [
                     'label' => 'Work E-mail',
                     'default' => '',
                     'col' => ['sm' => 6],
-                    'rules' => 'sometimes|email',
                 ],
                 // [
                 //     'type' => 'text',

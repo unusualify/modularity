@@ -43,10 +43,10 @@
             <slot :name="getTypeItemSlot(obj)" v-bind= "{ obj, index, id }">
               <!-- slot replaces complete item of defined KEY -> <div slot="slot-item-key-[propertyName]">-->
               <slot :name="getKeyItemSlot(obj)" v-bind= "{ obj, index, id }">
-
                 <!-- PREVIEW -->
                 <ue-recursive-stuff v-if="obj.schema.type === 'preview' && obj.schema.configuration"
                   :configuration="obj.schema.configuration"
+                  :bind-data="valueIntern"
                 />
 
                 <!-- DYNAMIC COMPONENT -->

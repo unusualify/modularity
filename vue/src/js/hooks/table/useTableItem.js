@@ -21,6 +21,10 @@ export default function useTableItem(props, context) {
     isSoftDeletable(editedItem.value)
   )
 
+  const itemIsDeleted = computed(() =>
+    isDeleted(editedItem.value)
+  )
+
   // Methods
   const setEditedItem = (item) => {
     store.commit(FORM.SET_EDITED_ITEM, item)
@@ -36,15 +40,21 @@ export default function useTableItem(props, context) {
     return !!(__isset(item.deleted_at) && item.deleted_at)
   }
 
+  const isDeleted = (item) => {
+    return !!(__isset(item.deleted_at) && item.deleted_at)
+  }
+
 
   return {
     // refs
     editedItem,
     isSoftDeletableItem,
+    itemIsDeleted,
 
     // methods
     setEditedItem,
     resetEditedItem,
-    isSoftDeletable
+    isSoftDeletable,
+    isDeleted
   }
 }

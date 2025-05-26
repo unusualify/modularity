@@ -44,8 +44,6 @@ class ProcessHydrate extends InputHydrate
                 ...($eager ? ['eager' => $eager] : []),
             ]);
             $input['updateEndpoint'] = route('admin.process.update', ['process' => ':id']);
-            // $input['fetchEndpoint'] = $module->getRouteActionUri($input['_routeName'], 'show');
-            // $input['updateEndpoint'] = $module->getRouteActionUri($input['_routeName'], 'update');
 
         } else {
             throw new \Exception('Invalid input for ' . $this->input['name'] . ' input');

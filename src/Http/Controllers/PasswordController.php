@@ -131,6 +131,13 @@ class PasswordController extends Controller
             }
         );
 
+        $email = $request->get('email');
+
+        if ($email) {
+            $user = User::where('email', $email)->first();
+            $user->markEmailAsVerified();
+        }
+
         return $request->wantsJson()
             ? $this->respondWithSuccess(__('messages.password-saved'), ['redirector' => route(Route::hasAdmin('profile'))])
             : redirect()->route(Route::hasAdmin('profile'));

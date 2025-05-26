@@ -105,6 +105,7 @@ abstract class CoreController extends LaravelController
             perPage: $perPage,
             forcePagination: $forcePagination,
             appends: $appends,
+            id: $this->request->get('id') ?? null
         ));
     }
 
@@ -437,7 +438,7 @@ abstract class CoreController extends LaravelController
         $assignable = $this->repository->getById($id);
 
         if ($assignable->lastAssignment && $assignable->lastAssignment->status !== AssignmentStatus::COMPLETED) {
-            $assignable->lastAssignment->update([
+            $assignable->lastAssignment->updateQuietly([
                 'status' => AssignmentStatus::CANCELLED,
             ]);
         }

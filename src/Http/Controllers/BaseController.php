@@ -96,12 +96,11 @@ abstract class BaseController extends PanelController
                 );
             }
 
-            // $scopes = $this->filterScope($this->nestedParentScopes());
 
             return Response::json([
                 'resource' => $this->getJSONData(),
-                // 'mainFilters' => $this->getTableMainFilters($scopes),
-                'mainFilters' => $this->getTableMainFilters(),
+                'mainFilters' => $this->getTableMainFilters($this->getExactScope()),
+                // 'mainFilters' => $this->getTableMainFilters(),
                 'replaceUrl' => $this->getReplaceUrl(),
             ]);
         }
@@ -394,7 +393,12 @@ abstract class BaseController extends PanelController
             }
 
             // if()
-            return $this->respondWithSuccess(___('messages.save-success'));
+
+            if($this->request->ajax()) {
+                return $this->respondWithSuccess(___('messages.save-success'));
+            }
+
+            return redirect()->back();
         }
     }
 
@@ -497,22 +501,27 @@ abstract class BaseController extends PanelController
 
             $itemId = $this->getItemIdentifier($item);
 
+            $necessaryTableData = [
+                'id' => $itemId,
+                $this->titleColumnKey => $name,
+                'deleted_at' => $item->deleted_at,
+                // 'publish_start_date' => $item->publish_start_date,
+                // 'publish_end_date' => $item->publish_end_date,
+                // 'edit' => $canEdit ? $this->getModuleRoute($itemId, 'edit') : null,
+                // 'duplicate' => $canDuplicate ? $this->getModuleRoute($itemId, 'duplicate') : null,
+                // 'delete' => $itemCanDelete ? $this->getModuleRoute($itemId, 'destroy') : null,
+            ];
+
             return array_replace(
                 array_merge(
-                    $this->repository->getShowFields($item, $schema),
-
+                    (($this->tableAttributes['editOnModal'] ?? true) ? $this->repository->getShowFields($item, $schema) : []),
+                    // ($this->tableAttributes['editOnModal'] ?? true) ? $item->toArray() : ['id' => $itemId],
                     $item->toArray(),
-                    [
-                        // 'id' => $itemId,
-                        $this->titleColumnKey => $name,
-                        // 'publish_start_date' => $item->publish_start_date,
-                        // 'publish_end_date' => $item->publish_end_date,
-                        // 'edit' => $canEdit ? $this->getModuleRoute($itemId, 'edit') : null,
-                        // 'duplicate' => $canDuplicate ? $this->getModuleRoute($itemId, 'duplicate') : null,
-                        // 'delete' => $itemCanDelete ? $this->getModuleRoute($itemId, 'destroy') : null,
-                    ],
-                    $this->repository->getFormFields($item, $schema),
-                    $columnsData
+                    $necessaryTableData,
+                    ( ($this->tableAttributes['editOnModal'] ?? true) ? $this->repository->getFormFields($item, $schema) : []),
+                    // $this->repository->getFormFields($item, $schema),
+                    $columnsData,
+                    $this->getCustomRowData($item),
                     // + ($this->getIndexOption('editInModal') ? [
                     //     'editInModal' => $this->getModuleRoute($itemId, 'edit'),
                     //     'updateUrl' => $this->getModuleRoute($itemId, 'update'),
@@ -538,12 +547,6 @@ abstract class BaseController extends PanelController
         });
 
         return $paginator->toArray();
-        // dd($paginator);
-        // $paginator['data'] = collect($paginator->items())->map(function ($item) use ($translated) {
-
-        // })->toArray();
-        // dd($paginator);
-        // return $paginator;
     }
 
     /**
@@ -664,6 +667,35 @@ abstract class BaseController extends PanelController
         return [
             "$field" => $value,
         ];
+    }
+
+    /**
+     * @param \Unusualify\Modularity\Models\Model $item
+     * @return array
+     */
+    protected function getCustomRowData($item)
+    {
+        $customRows = $this->tableAttributes['customRow'] ?? [];
+        $customRowFillable = [];
+
+        foreach($customRows as $customRow){
+            if(isset($customRow['allowedRoles']) && $this->user->hasRole($customRow['allowedRoles'])){
+                if($customRow['itemAttributes'] && is_array($customRow['itemAttributes'])){
+                    $customRowFillable = $customRow['itemAttributes'];
+                }else{
+                    $customRowFillable = [];
+                }
+                break;
+            }
+        }
+
+        $customRowData = [];
+
+        foreach($customRowFillable as $fillable){
+            $customRowData[$fillable] = $item->{$fillable};
+        }
+
+        return $customRowData;
     }
 
     /**

@@ -15,7 +15,7 @@ use Unusualify\Modularity\Http\ViewComposers\Localization;
 use Unusualify\Modularity\Http\ViewComposers\MediasUploaderConfig;
 use Unusualify\Modularity\Http\ViewComposers\Urls;
 use Unusualify\Modularity\Modularity;
-use Unusualify\Modularity\Services\View\UNavigation;
+use Unusualify\Modularity\Services\View\ModularityNavigation;
 use Unusualify\Modularity\Support\FileLoader;
 use Unusualify\Modularity\Translation\Translator;
 
@@ -88,12 +88,12 @@ class BaseServiceProvider extends ServiceProvider
         // Register scheduler class instead of direct command
         $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
             $schedule->command('modularity:fileponds:scheduler --days=7')
-                ->everyDay();
+                ->daily();
             // ->everyFiveMinutes();
             // ->appendOutputTo(storage_path('logs/scheduler.log'));
 
             $schedule->command('telescope:prune --hours=168')
-                ->everyDay()
+                ->daily()
                 ->appendOutputTo(storage_path('logs/scheduler.log'));
 
         });
@@ -133,7 +133,7 @@ class BaseServiceProvider extends ServiceProvider
         //     return new ModuleActivator($app);
         // });
 
-        $this->app->singleton('modularity.navigation', UNavigation::class);
+        $this->app->singleton('modularity.navigation', ModularityNavigation::class);
 
         $this->app->singleton('model.relation.namespace', function () {
             return "Illuminate\Database\Eloquent\Relations";

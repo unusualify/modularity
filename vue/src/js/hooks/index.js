@@ -34,3 +34,5 @@ export { default as useFilepond, makeFilepondProps } from './useFilepond'
 export { default as useInputFetch, makeInputFetchProps } from './useInputFetch'
 
 export { default as useAlert } from './useAlert'
+
+export { default as useCastAttributes } from './useCastAttributes'

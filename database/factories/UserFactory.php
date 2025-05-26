@@ -30,7 +30,6 @@ class UserFactory extends Factory
             'language' => fake()->languageCode(),
             'timezone' => fake()->timezone(),
             'phone' => fake()->phoneNumber(),
-            'country' => fake()->country(),
             'email_verified_at' => now(),
             'password' => Hash::make(env('DEFAULT_USER_PASSWORD')), // password
             'remember_token' => Str::random(10),

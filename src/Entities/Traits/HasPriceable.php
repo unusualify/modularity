@@ -32,10 +32,13 @@ trait HasPriceable
 
     public function basePrice(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
-        // dd(Request::getUserCurrency());
-        // return $this->prices()->where('currency_id', Request::getUserCurrency()->id);
         return $this->morphOne(Price::class, 'priceable')
             ->where('currency_id', Request::getUserCurrency()->id);
+    }
+
+    public function scopeHasBasePrice($query)
+    {
+        return $query->whereHas('basePrice');
     }
 
     public function scopeOrderByCurrencyPrice($query, $currencyId, $direction = 'asc')

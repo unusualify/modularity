@@ -28,7 +28,13 @@
                   :title="item.name"
                   :prepend-icon="!hideIcons ? item.icon : null"
                   nav
-                ></v-list-item>
+                >
+                  <template v-if="item.badge" v-slot:prepend="prependScope">
+                    <v-badge color="warning" v-bind="item.badgeProps ?? {}" :content="formatBadgeContent(item.badge)">
+                      <v-icon :icon="item.icon"></v-icon>
+                    </v-badge>
+                  </template>
+                </v-list-item>
               </div>
             </template>
             <span>{{ item.name }}</span>
@@ -39,7 +45,6 @@
 
       <template v-else-if="isMenu(item)">
         <v-list-item
-
           nav
           :title="item.name"
           :prepend-icon="item.icon"
@@ -51,7 +56,11 @@
 
           @click="$emit('activateMenu', item.menuActivator)"
           >
-          <!-- @click="sideBar.methods.handleMenu(item.menuActivator)" -->
+          <template v-if="item.badge" v-slot:prepend="prependScope">
+            <v-badge color="warning" v-bind="item.badgeProps ?? {}" :content="formatBadgeContent(item.badge)">
+              <v-icon :icon="item.icon"></v-icon>
+            </v-badge>
+          </template>
         </v-list-item>
         <v-menu
           v-if="activeMenu === `#${item.menuActivator}`"
@@ -72,7 +81,13 @@
             <component
               :is="getComponentType(item)"
               v-bind="getComponentProps(item, i)"
-            />
+            >
+              <template v-if="item.badge" v-slot:prepend="prependScope">
+                <v-badge color="warning" v-bind="item.badgeProps ?? {}" :content="formatBadgeContent(item.badge)">
+                  <v-icon v-bind="item.iconProps ?? {}" :icon="item.icon"></v-icon>
+                </v-badge>
+              </template>
+            </component>
           </div>
         </template>
         <span>{{ item.name }}</span>
@@ -171,19 +186,21 @@ export default {
 
       if (this.isSubgroup(item)) {
         return {
-          ...baseProps,
+          ...(item.props ?? {}),
           'prepend-icon': item.icon,
           value: item.name,
           items: item.items,
           level: this.level + 1,
+          ...baseProps,
         };
       }
 
       if (this.isMenu(item)) {
         return {
-          ...baseProps,
           item,
+          ...(item.props ?? {}),
           hideIcons: this.hideIcons,
+          ...baseProps,
         };
       }
 
@@ -237,7 +254,13 @@ export default {
     isEvent: (item) => !!item.attr,
     isHeader: (item) => !item.href && !item.route && !item.items && !!item.name,
     isMenu: (item) => !!item.menuItems,
-    isMenuRoute(item){ return !item.menuItems && this.profileMenu && (!!item.route || !!item.href)}
+    isMenuRoute(item){ return !item.menuItems && this.profileMenu && (!!item.route || !!item.href)},
+
+    formatBadgeContent(badge) {
+      let value = parseInt(badge);
+      if (value > 9) return '9+';
+      return value;
+    },
   },
 };
 </script>

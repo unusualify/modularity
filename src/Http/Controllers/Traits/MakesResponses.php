@@ -29,7 +29,7 @@ trait MakesResponses
                 }
 
                 if ($this->module->isSingleton($this->routeName)) {
-                    $back_link = $this->module->getRouteActionUri($this->routeName, 'show', $params, true);
+                    $back_link = $this->module->getRouteActionUrl($this->routeName, 'show', $params, true);
                 } else {
                     $back_link = $this->request->headers->get('referer') ?? moduleRoute(
                         $this->routeName,

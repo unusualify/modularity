@@ -130,13 +130,15 @@ return [
             'icon' => '$submodule',
             'title_column_key' => 'name',
             'table_options' => [
+                'subtitle' => __('You can check all the payments that you receive and the invoices related to the payments here according to company list.'),
+
                 'createOnModal' => false,
                 'editOnModal' => true,
                 'isRowEditing' => false,
                 'rowActionsType' => 'inline',
             ],
             'table_row_actions' => [
-                [
+                'cancel' => [
                     'name' => 'cancel',
                     'icon' => 'mdi-credit-card-remove-outline',
                     'color' => 'error',
@@ -152,7 +154,7 @@ return [
                     'hasDialog' => true,
                     'dialogQuestion' => __('Are you sure you want to cancel this payment?'),
                 ],
-                [
+                'refund' => [
                     'name' => 'refund',
                     'icon' => 'mdi-credit-card-refund-outline',
                     'color' => 'warning',
@@ -174,6 +176,7 @@ return [
                     'title' => 'Owner Id',
                     'key' => 'price.priceable',
                     'itemTitle' => 'id',
+                    'allowedRoles' => ['superadmin'],
                     'formatter' => [
                         'edit',
                     ],
@@ -183,12 +186,18 @@ return [
                     'title' => 'Owner Type',
                     'key' => 'price',
                     'itemTitle' => 'priceable_type',
+                    'allowedRoles' => ['superadmin'],
                     // 'itemTitle' => 'content->headline',
+                ],
+                [
+                    'title' => 'Related',
+                    'key' => 'paymentable',
+                    'itemTitle' => 'id',
                 ],
                 [
                     'title' => 'Service',
                     'key' => 'paymentService',
-                    'itemTitle' => 'title',
+                    // 'itemTitle' => 'title',
                     'formatter' => [
                         'chip',
                         [

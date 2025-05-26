@@ -523,7 +523,7 @@
             v-model="createFormModalActive"
             widthType="md"
 
-            :persistent="updating"
+            persistent
             transition="scale-transition"
           >
             <v-card>

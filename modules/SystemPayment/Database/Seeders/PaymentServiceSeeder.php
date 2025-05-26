@@ -48,8 +48,7 @@ class PaymentServiceSeeder extends Seeder
                 'button_style' => 'background-color: #FCBB32 !important; color: #002C6F !important;',
 
                 'paymentCurrencies' => [
-                    PaymentCurrency::where('iso_4217', 'US')->first()->id ?? null,
-                    PaymentCurrency::where('iso_4217', 'EUR')->first()->id ?? null,
+                    PaymentCurrency::where('iso_4217', 'USD')->first()->id ?? null,
                 ],
             ],
             [
@@ -122,7 +121,7 @@ class PaymentServiceSeeder extends Seeder
         Auth::guard(Modularity::getAuthGuardName())->login($superadmin);
 
         foreach ($paymentServices as $_paymentService) {
-            $paymentService = PaymentService::create(Arr::only($_paymentService, ['name', 'key', 'is_external', 'is_internal']));
+            $paymentService = PaymentService::create(Arr::only($_paymentService, ['name', 'key', 'is_external', 'is_internal', 'published', 'button_style']));
 
             $this->createAndAssociateImage($paymentService, $_paymentService['image']);
 

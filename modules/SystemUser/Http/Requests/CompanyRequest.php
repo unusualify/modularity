@@ -20,6 +20,7 @@ class CompanyRequest extends Request
             'address' => 'required|min:5',
             // 'city' => 'sometimes|required|min:3',
             // 'country' => 'sometimes|required|min:3',
+            'country_id' => 'required|exists:um_countries,id',
             'state' => 'required|min:3',
             'zip_code' => 'required|min:5',
             'email' => 'sometimes|required_if:is_personal,false',

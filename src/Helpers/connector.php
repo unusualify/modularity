@@ -99,7 +99,7 @@ if (! function_exists('find_target')) {
 
         switch ($targetType) {
             case 'uri':
-                $item['endpoint'] = $moduleClass->getRouteActionUri($routeName, empty($types) ? 'index' : array_shift($types));
+                $item['endpoint'] = $moduleClass->getRouteActionUrl($routeName, empty($types) ? 'index' : array_shift($types));
 
                 break;
             default:

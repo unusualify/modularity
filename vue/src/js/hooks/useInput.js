@@ -24,6 +24,18 @@ export const makeInputProps = propsFactory({
   protectInitialValue: {
     type: Boolean,
     default: false
+  },
+  isEditing: {
+    type: Boolean,
+    default: false
+  },
+  editable: {
+    type: [Boolean, String],
+    default: true
+  },
+  creatable: {
+    type: [Boolean, String],
+    default: true
   }
 })
 export const makeInputEmits = [

@@ -80,15 +80,18 @@ export default function useFormatter (props, context, headers = []) {
       }
     },
     statusFormatter:(value, placeHolders = null, colors = null) => {
+      const trueValue = value === true || value === 'true' || value === 1 || value === '1'
+
       return {
         configuration : {
-          tag: 'p',
+          tag: 'v-icon',
           attributes : {
+            size: 'small',
             style: {
-              color: colors?.[value] ?? 'red'
+              color: trueValue ? 'green' : 'red'
             },
+            icon: trueValue ? 'mdi-check' : 'mdi-close'
           },
-          elements: placeHolders?.[value] ?? value
         }
 
       }
@@ -199,7 +202,7 @@ export default function useFormatter (props, context, headers = []) {
     const func = `${name}Formatter`
 
     try {
-      if(!value) {
+      if(value === null || value === undefined || value === '') {
         return {
           configuration: {
             elements: ''
@@ -207,6 +210,7 @@ export default function useFormatter (props, context, headers = []) {
         }
       }
       return methods[func](value, ..._(args))
+
     } catch (error) {
       console.error(`${error}: ${func}`);
     }
