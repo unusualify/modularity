@@ -901,7 +901,7 @@ class RouteGenerator extends Generator
     {
         $module = Modularity::findOrFail($this->module);
 
-        $module->setModuleActivator($this->module);
+        // $module->setModuleActivator($this->module);
 
         $route = $this->getName();
 

@@ -69,6 +69,23 @@ trait ManageScopes
         $this->tableOrders = $this->getTableOrders();
     }
 
+    protected function getExactScope()
+    {
+        $scope = [];
+
+        foreach ($this->fixedFilters as $key => $value) {
+            $scope[$key] = $value;
+        }
+
+        $configScopes = (array) $this->getConfigFieldsByRoute('scopes', []);
+
+        foreach ($configScopes as $key => $value) {
+            $scope[$key] = $value;
+        }
+
+        return $scope;
+    }
+
     /**
      * @param array $prepend
      * @return array
@@ -146,17 +163,29 @@ trait ManageScopes
                     $scope['teamPendingAssignments'] = true;
 
                     break;
+
+                default:
+                    $customMainFilters = $this->getConfigFieldsByRoute('table_filters', []);
+
+                    $customMainFilter = Collection::make($customMainFilters)->filter(function ($filter) use ($requestFilters) {
+                        return isset($filter->slug) && $filter->slug == $requestFilters['status'];
+                    })->first();
+
+                    if ($customMainFilter) {
+                        $scope[$customMainFilter->scope ?? $customMainFilter->slug] = true;
+                    }
+
+                    break;
             }
 
-            if (! Str::startsWith($requestFilters['status'], 'stateable')) {
+            if (! Str::startsWith($requestFilters['status'], 'isStateable')) {
                 unset($requestFilters['status']);
             }
         }
 
         if (array_key_exists('status', $requestFilters)) {
-            $code = Str::kebab(Str::after($requestFilters['status'], 'stateable'));
-            // $scope[$requestFilters['status']] = true;
-            $scope['stateable'] = $code;
+            $code = Str::kebab(Str::after($requestFilters['status'], 'isStateable'));
+            $scope['isStateable'] = $code;
             unset($requestFilters['status']);
         }
 
@@ -189,9 +218,7 @@ trait ManageScopes
             }
         }
 
-        foreach ($this->fixedFilters as $key => $value) {
-            $scope[$key] = $value;
-        }
+        $scope = array_merge($this->getExactScope(), $scope);
 
         if (array_key_exists('relations', $requestFilters)) {
 
@@ -245,7 +272,6 @@ trait ManageScopes
         $this->request->merge(['filter' => json_encode($filters)]);
     }
 
-    /**
     /**
      * @return array
      */

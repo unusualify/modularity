@@ -66,8 +66,8 @@ class AssignmentHydrate extends InputHydrate
             $input['assignableType'] = $assignableModel;
         }
 
-        $input['fetchEndpoint'] = $this->module->getRouteActionUri($this->routeName, 'assignments', [snakeCase($this->routeName) => ':id']);
-        $input['saveEndpoint'] = $this->module->getRouteActionUri($this->routeName, 'createAssignment', [snakeCase($this->routeName) => ':id']);
+        $input['fetchEndpoint'] = $this->module->getRouteActionUrl($this->routeName, 'assignments', [snakeCase($this->routeName) => ':id']);
+        $input['saveEndpoint'] = $this->module->getRouteActionUrl($this->routeName, 'createAssignment', [snakeCase($this->routeName) => ':id']);
         // $input['name'] = 'assignee_id';
         // add your logic
 
@@ -88,6 +88,7 @@ class AssignmentHydrate extends InputHydrate
             'name' => 'attachments',
             'accepted-file-types' => $acceptedFileTypes,
             'max' => $maxAttachments,
+            'noRules' => true,
         ]);
 
         return $input;

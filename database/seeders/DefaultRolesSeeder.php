@@ -21,30 +21,37 @@ class DefaultRolesSeeder extends Seeder
         $modularityAuthGuardName = Modularity::getAuthGuardName();
         DB::table($table)->insert([
             [
+                'title' => 'Super Admin',
                 'name' => 'superadmin',
                 'guard_name' => $modularityAuthGuardName,
             ],
             [
+                'title' => 'Admin',
                 'name' => 'admin',
                 'guard_name' => $modularityAuthGuardName,
             ],
             [
+                'title' => 'Account Manager',
                 'name' => 'manager',
                 'guard_name' => $modularityAuthGuardName,
             ],
             [
+                'title' => 'Editor',
                 'name' => 'editor',
                 'guard_name' => $modularityAuthGuardName,
             ],
             [
+                'title' => 'Reporter',
                 'name' => 'reporter',
                 'guard_name' => $modularityAuthGuardName,
             ],
             [
+                'title' => 'Client Manager',
                 'name' => 'client-manager',
                 'guard_name' => $modularityAuthGuardName,
             ],
             [
+                'title' => 'Client Assistant',
                 'name' => 'client-assistant',
                 'guard_name' => $modularityAuthGuardName,
             ],

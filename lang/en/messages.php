@@ -9,5 +9,9 @@ return [
     'save-success' => 'Content saved. All good!',
     'password-saved' => 'Password saved successfully!',
 
+    'notifications' => [
+        'mark-read-success' => 'Notifications marked as read.',
+    ],
+
     'invalid-company' => 'Company fields must be filled!',
 ];

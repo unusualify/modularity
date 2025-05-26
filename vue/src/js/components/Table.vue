@@ -97,9 +97,7 @@
                 key='table-controls'
                 :class="[
                   'd-flex',
-                  controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'flex-grow-1',
-
-
+                  controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'flex-grow-1 flex-shrink-0',
                 ]"
               >
                 <template v-if="someSelected">
@@ -135,7 +133,7 @@
                     :style="[
                       'display: inline',
                       // controlsPosition === 'top' || $vuetify.display.smAndDown ? 'max-width: 300px' : '',
-                      'min-width: 100px'
+                      'min-width: 165px'
                     ]"
                     @click:append-inner="searchItems"
                     :disabled="loading"
@@ -195,14 +193,14 @@
                             id="advanced-filter-btn"
                             v-bind="{...filterBtnOptions, ...filterBtnTitle, ...props}"
                             :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
-                            :text="$vuetify.display.smAndDown ? null : 'Advanced Filter'"
+                            :text="$vuetify.display.smAndDown ? null : 'Filters'"
                             :prepend-icon="$vuetify.display.smAndDown ? null : filterBtnOptions['prepend-icon']"
                             :block="$vuetify.display.mdAndUp ? false : (filterBtnOptions['block'] ?? false)"
                             :density="$vuetify.display.smAndDown ? 'compact' : (filterBtnOptions['density'] ?? 'comfortable')"
                           />
                         </template>
                         <v-card
-                          title="Advanced Filter"
+                          title="Filters"
                           min-width="40vw"
                           max-width="50vw"
                         >
@@ -225,7 +223,7 @@
 
                             <v-btn
                               color="primary"
-                              text="Save"
+                              text="Apply"
                               variant="tonal"
                               @click="changeAdvancedFilter"
                             ></v-btn>
@@ -418,6 +416,8 @@
               :width-type="'sm'"
 
               v-bind="modals['dialog'].modalAttributes ?? {}"
+
+              has-fullscreen-button
             >
             </ue-modal>
 
@@ -429,43 +429,26 @@
               :width-type="modals['show'].widthType || 'lg'"
               :persistent="modals['show'].persistent"
               :description="modals['show'].description"
+              :title="modals['show'].title"
+              has-fullscreen-button
+              has-close-button
+              no-confirm-button
+              has-title-divider
+              cancel-text="Close"
+              :reject-button-attributes="{
+                variant: 'elevated',
+                color: 'primary',
+              }"
+              scrollable
             >
-              <template v-slot:body="props">
-                <v-card class="fill-height d-flex flex-column">
-                  <v-card-title>
-                    <ue-title
-                      padding="a-3"
-                      color="grey-darken-5"
-                      align="center"
-                      justify="space-between"
-                    >
-                      {{ modals['show'].title }}
-                      <template v-slot:right>
-                      </template>
-                    </ue-title>
-                  </v-card-title>
-
-                  <v-divider class="mx-6"/>
-                  <v-card-text>
-                    <ue-recursive-data-viewer
-                      :data="modals['show'].data"
-                      :all-array-items-open="false"
-                      :all-array-items-closed="false"
-                    />
-                  </v-card-text>
-
-                  <v-divider class="mx-6 mt-4"/>
-                  <v-card-actions class="px-6 flex-grow-0">
-                    <v-spacer></v-spacer>
-                    <v-btn-primary
-                      :slim="false"
-                      variant="elevated"
-                      @click="modals['show'].cancel()"
-                    >
-                      {{ $t('fields.close') }}
-                    </v-btn-primary>
-                  </v-card-actions>
-                </v-card>
+              <template v-slot:body.description>
+                <div class="d-flex text-start">
+                  <ue-recursive-data-viewer
+                    :data="modals['show'].data"
+                    :all-array-items-open="false"
+                    :all-array-items-closed="false"
+                  />
+                </div>
               </template>
             </ue-modal>
 
@@ -513,9 +496,13 @@
               <component
                 :is="`ue-${customRow.name}`"
                 :key="element.id"
+                :name="name"
+                :titlePrefix="titlePrefix"
+                :titleKey="titleKey"
+
                 :item="element"
                 :headers="headers"
-                :rowActions = "rowActions"
+                :rowActions="rowActions"
                 @click-action="itemAction"
               >
 
@@ -565,8 +552,7 @@
         </template>
 
         <!-- Custom Slots -->
-        <template
-          v-for="(context, slotName) in slots" v-slot:[slotName]
+        <template v-for="(context, slotName) in slots" v-slot:[slotName]
           :key="`customSlot-${slotName}`"
           >
           <div>
@@ -579,8 +565,7 @@
         </template>
 
         <!-- #formatterColumns -->
-        <template
-          v-for="(col, i) in formatterColumns"
+        <template v-for="(col, i) in formatterColumns"
           :key="`formatter-${i}`"
           v-slot:[`item.${col.key}`]="{ item }"
         >

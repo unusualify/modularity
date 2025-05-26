@@ -9,7 +9,7 @@ class NotificationController extends BaseController
     /**
      * @var string
      */
-    protected $moduleName = 'Notification';
+    protected $moduleName = 'SystemNotification';
 
     /**
      * @var string

@@ -78,7 +78,7 @@
   const cardClasses = computed(() => {
     return [
       !props.noInline ? 'd-inline-block' : '',
-      'rounded-lg',
+      // 'rounded-lg',
       // 'overflow-hidden',
     ];
   });

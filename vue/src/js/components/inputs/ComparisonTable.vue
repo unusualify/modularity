@@ -16,6 +16,7 @@
         disable-sort
         hide-default-footer
 
+        :mobile-breakpoint="`md`"
         >
         <!-- header slots -->
         <template

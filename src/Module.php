@@ -34,6 +34,26 @@ class Module extends NwidartModule
      */
     private $middlewares = [];
 
+    private static $routeActionLists = [
+        'restore',
+        'forceDelete',
+        'duplicate',
+        'index',
+        'create',
+        'store',
+        'show',
+        'edit',
+        'update',
+        'destroy',
+        'bulkDelete',
+        'bulkForceDelete',
+        'bulkRestore',
+        'tags',
+        'tagsUpdate',
+        'assignments',
+        'createAssignment',
+    ];
+
     /**
      * The constructor.
      */
@@ -241,7 +261,10 @@ class Module extends NwidartModule
         return $path . (empty($directory) ? '/' : "/$directory");
     }
 
-    public function isModularityModule()
+    /**
+     * isModularityModule
+     */
+    public function isModularityModule(): bool
     {
         $modularityModulesPath = Modularity::getVendorPath('modules');
 
@@ -300,7 +323,13 @@ class Module extends NwidartModule
         return $this->getRouteConfig($route_name)['inputs'];
     }
 
-    public function getRouteInput($route_name, $input_name, $field = 'name'): array
+    /**
+     * getRouteInput
+     *
+     * @param mixed $route_name
+     * @param mixed $input_name
+     */
+    public function getRouteInput($route_name, $input_name, string $field = 'name'): array
     {
         $inputs = $this->getRouteInputs($route_name);
 
@@ -323,16 +352,21 @@ class Module extends NwidartModule
         return $this->app['config']->get("{$this->getSnakeName()}{$notation}", []);
     }
 
-    public function setConfig($newConfig, $notation = null): mixed
+    /**
+     * setConfig
+     *
+     * @param mixed $newConfig
+     * @param mixed $notation
+     */
+    public function setConfig($newConfigValue, $notation = null): mixed
     {
-
         $notation = ! $notation ? '' : ".{$notation}";
 
         if (! $this->app['config']->has($this->getSnakeName()) && $this->app->runningInConsole() && file_exists($this->getDirectoryPath('Config/config.php'))) {
             $this->app['config']->set("{$this->getSnakeName()}", include ($this->getDirectoryPath('Config/config.php')));
         }
 
-        return $this->app['config']->set("{$this->getSnakeName()}{$notation}", $newConfig);
+        return $this->app['config']->set("{$this->getSnakeName()}{$notation}", $newConfigValue);
     }
 
     /**
@@ -353,12 +387,22 @@ class Module extends NwidartModule
         return count($this->getParentRoute()) > 0;
     }
 
+    /**
+     * isParentRoute
+     *
+     * @param string $routeName
+     */
     public function isParentRoute($routeName): bool
     {
         return count(($pr = $this->getParentRoute())) > 0 && $pr['name'] == studlyName($routeName);
     }
 
-    public function isSingleton($routeName)
+    /**
+     * isSingleton
+     *
+     * @param string $routeName
+     */
+    public function isSingleton($routeName): bool
     {
         $singularTrait = 'Unusualify\Modularity\Entities\Traits\IsSingular';
         $repository = $this->getRouteClass($routeName, 'repository', true);
@@ -438,15 +482,17 @@ class Module extends NwidartModule
     }
 
     /**
-     * fullRouteNamePrefix
+     * Route name prefix with system prefix
+     *
+     * @param bool $isParent
      */
     public function fullRouteNamePrefix($isParent = false): string
     {
         $prefixes = [];
 
-        if (($adminRouteNamePrefix = adminRouteNamePrefix())) {
-            $prefixes[] = $adminRouteNamePrefix;
-        }
+        // if (($adminRouteNamePrefix = adminRouteNamePrefix())) {
+        //     $prefixes[] = $adminRouteNamePrefix;
+        // }
 
         if ($this->hasSystemPrefix()) {
             $prefixes[] = $this->systemRouteNamePrefix();
@@ -459,12 +505,42 @@ class Module extends NwidartModule
         return implode('.', $prefixes);
     }
 
+    /**
+     * Route name prefix with panel prefix (admin)
+     *
+     * @param bool $isParent
+     */
+    public function panelRouteNamePrefix($isParent = false): string
+    {
+        $prefixes = [];
+
+        if (($adminRouteNamePrefix = adminRouteNamePrefix())) {
+            $prefixes[] = $adminRouteNamePrefix;
+        }
+
+        $prefixes[] = $this->fullRouteNamePrefix($isParent);
+
+        return implode('.', $prefixes);
+    }
+
+    /**
+     * getRepository
+     *
+     * @param mixed $routeName
+     * @param bool $asClass
+     */
     public function getRepository($routeName, $asClass = true)
     {
         return (new Finder)->getRouteRepository($routeName, $asClass);
     }
 
-    public function routeHasTable($routeName = null, $notation = null)
+    /**
+     * routeHasTable
+     *
+     * @param mixed $routeName
+     * @param mixed $notation
+     */
+    public function routeHasTable($routeName = null, $notation = null): bool
     {
         $tableName = $this->getRepository($routeName ?? $this->getStudlyName(), false)
             ? $this->getRepository($routeName ?? $this->getStudlyName())->getModel()->getTable()
@@ -473,7 +549,10 @@ class Module extends NwidartModule
         return Schema::hasTable($tableName);
     }
 
-    public function getConfigPath()
+    /**
+     * getConfigPath
+     */
+    public function getConfigPath(): string
     {
         $config_folder = GenerateConfigReader::read('config')->getPath();
 
@@ -496,7 +575,10 @@ class Module extends NwidartModule
         return ! empty($search);
     }
 
-    public function getModuleUris(): array
+    /**
+     * get all module urls
+     */
+    public function getModuleUrls(): array
     {
         $patterns = [$this->fullRouteNamePrefix()];
 
@@ -506,11 +588,11 @@ class Module extends NwidartModule
 
             $prefixes = [];
 
-            $adminRouteNamePrefix = adminRouteNamePrefix();
+            // $adminRouteNamePrefix = adminRouteNamePrefix();
 
-            if (($adminRouteNamePrefix = adminRouteNamePrefix())) {
-                $prefixes[] = $adminRouteNamePrefix;
-            }
+            // if (($adminRouteNamePrefix = adminRouteNamePrefix())) {
+            //     $prefixes[] = $adminRouteNamePrefix;
+            // }
 
             if ($this->hasSystemPrefix()) {
                 $prefixes[] = $this->systemRouteNamePrefix();
@@ -523,6 +605,7 @@ class Module extends NwidartModule
         }
 
         $quote = implode('|', $patterns);
+
         $moduleRoutes = array_map(function ($r) {
             return $r->uri();
 
@@ -535,77 +618,69 @@ class Module extends NwidartModule
         return $moduleRoutes;
     }
 
-    public function getRouteUris($routeName): array
+    /**
+     * get all module route urls
+     *
+     * @param string $routeName
+     * @param bool $panel
+     */
+    public function getRouteUrls($routeName): array
     {
-        $actions = [
-            'restore',
-            'forceDelete',
-            'duplicate',
-            'index',
-            'create',
-            'store',
-            'show',
-            'edit',
-            'update',
-            'destroy',
-            'bulkDelete',
-            'bulkForceDelete',
-            'bulkRestore',
-            'tags',
-            'tagsUpdate',
-            'assignments',
-            'createAssignment',
-        ];
-
         $isParentRoute = $this->isParentRoute($routeName);
 
-        $midQuote = '(.nested.[a-z|_]+)?.(';
+        $mainQuoteParts = [];
 
-        $quote = $this->fullRouteNamePrefix($isParentRoute) . '.' . snakeCase($routeName) . $midQuote . implode('|', $actions) . ')$';
+        if (! $isParentRoute) {
+            $mainQuoteParts[] = $this->fullRouteNamePrefix($isParentRoute);
+        }
 
-        $uris = Collection::make($this->getModuleUris())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
+        $mainQuoteParts[] = snakeCase($routeName);
 
-        return $uris->toArray();
+        $mainQuote = implode('.', $mainQuoteParts);
+
+        $actionsQuote = '(' . implode('|', self::$routeActionLists) . ')';
+
+        $quoteParts = [$mainQuote, $actionsQuote];
+
+        $quote = implode('.', $quoteParts) . '$';
+
+        $urls = Collection::make($this->getModuleUrls())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
+
+        return $urls->toArray();
     }
 
     /**
-     * Get the main URIs of the route.
+     * Get the main URLs of the route.
      *
      * @param string $routeName
      * @param bool $withoutNamePrefix
      * @param string|null $modelBindingValue
      * @return array
      */
-    public function getRouteMainUris($routeName, $withoutNamePrefix = false, $modelBindingValue = null)
+    public function getRoutePanelUrls($routeName, $withoutNamePrefix = false, $modelBindingValue = null)
     {
-        $actions = [
-            'restore',
-            'forceDelete',
-            'duplicate',
-            'index',
-            'create',
-            'store',
-            'show',
-            'edit',
-            'update',
-            'destroy',
-            'bulkDelete',
-            'bulkForceDelete',
-            'bulkRestore',
-            'tags',
-            'tagsUpdate',
-            'assignments',
-            'createAssignment',
-        ];
-
         $isParentRoute = $this->isParentRoute($routeName);
 
-        $quote = $this->fullRouteNamePrefix($isParentRoute) . '.' . snakeCase($routeName) . '.(' . implode('|', $actions) . ')$';
+        $mainQuoteParts = [adminRouteNamePrefix()];
 
-        $uris = Collection::make($this->getModuleUris())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
+        if (! $isParentRoute) {
+            $mainQuoteParts[] = $this->fullRouteNamePrefix($isParentRoute);
+        }
+
+        $mainQuoteParts[] = snakeCase($routeName);
+
+        $mainQuote = implode('.', $mainQuoteParts);
+
+        $actionsQuote = '(' . implode('|', self::$routeActionLists) . ')';
+
+        $quoteParts = [$mainQuote, $actionsQuote];
+
+        $quote = implode('.', $quoteParts) . '$';
+
+        $urls = Collection::make($this->getModuleUrls())->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name));
 
         if ($withoutNamePrefix) {
-            $uris = $uris->mapWithKeys(function ($uri, $name) use ($routeName, $modelBindingValue) {
+            $urls = $urls->mapWithKeys(function ($uri, $name) use ($routeName, $modelBindingValue) {
                 $parts = explode('.', $name);
                 $key = array_pop($parts);
 
@@ -617,41 +692,78 @@ class Module extends NwidartModule
             });
         }
 
-        return $uris->toArray();
+        return $urls->toArray();
     }
 
-    public function getRouteActionUri($routeName, $action, $replacements = [], $absolute = false): string
+    /**
+     * getRouteActionUri
+     */
+    public function getRouteActionUrl(string $routeName, string $action, array $replacements = [], bool $absolute = false, bool $isPanel = true): string
     {
-        $quote = preg_quote('.' . $action);
+        $quote = '';
 
-        $endpoint = '/' . Collection::make($this->getRouteUris($routeName))
-            ->filter(fn ($uri, $name) => preg_match('/' . $quote . '/', $name))->first();
+        if ($isPanel) {
+            $quote = preg_quote(adminRouteNamePrefix() . '.');
+        }
+        $quote .= '([a-zA-Z_\.]+)';
 
-        $endpoint = replace_curly_braces($endpoint, $replacements);
+        $quote .= preg_quote('.' . $action) . '$';
 
-        if ($absolute) {
-            return url($endpoint);
+        $routes = Collection::make($this->getRouteUrls($routeName))->filter(fn ($url, $name) => preg_match('/' . $quote . '/', $name));
+        $name = $routes->keys()->first();
+
+        if (! $name) {
+            // dd($routeName, $action, $quote, $routes, Collection::make($this->getRouteUrls($routeName)));
+            throw new \Exception('Route not found for ' . $routeName . ' with action "' . $action . '" on module ' . $this->getName());
         }
 
-        return $endpoint;
+        try {
+            return route(name: $name, parameters: $replacements, absolute: $absolute);
+        } catch (\Illuminate\Routing\Exceptions\UrlGenerationException $e) {
+            $relativeUrl = replace_curly_braces($routes->first(), $replacements);
+
+            if ($absolute) {
+                return url($relativeUrl);
+            }
+
+            return str_starts_with($relativeUrl, '/') ? $relativeUrl : '/' . $relativeUrl;
+        } catch (\Throwable $th) {
+            dd($th);
+        }
     }
 
+    /**
+     * getParentNamespace
+     */
     public function getParentNamespace(string $target): string
     {
         return $this->getBaseNamespace() . '\\' . GenerateConfigReader::read(kebabCase($target))->getNamespace();
     }
 
+    /**
+     * getTargetClassNamespace
+     *
+     * @param string|null $className
+     */
     public function getTargetClassNamespace(string $target, $className = null): string
     {
         return $this->getBaseNamespace() . '\\' . GenerateConfigReader::read(kebabCase($target))->getNamespace() . ($className ? '\\' . $className : '');
     }
 
+    /**
+     * getTargetClassPath
+     *
+     * @param string|null $className
+     */
     public function getTargetClassPath(string $target, $className = null): string
     {
         return $this->getDirectoryPath(GenerateConfigReader::read(kebabCase($target))->getPath()) . ($className ? '/' . $className : '');
     }
 
-    public function getRouteClass(string $routeName, string $target, $asClass = false): string
+    /**
+     * getRouteClass
+     */
+    public function getRouteClass(string $routeName, string $target, bool $asClass = false): string
     {
         $className = studlyName($routeName);
 
@@ -666,7 +778,10 @@ class Module extends NwidartModule
         return $this->getParentNamespace($target) . '\\' . $className;
     }
 
-    public function getNavigationActions(string $routeName)
+    /**
+     * getNavigationActions
+     */
+    public function getNavigationActions(string $routeName): array
     {
         $routeName = snakeCase($routeName); // snake case
         $routeConfig = $this->getRouteConfig($routeName);
@@ -684,7 +799,7 @@ class Module extends NwidartModule
                 $nestedRouteSnake = snakeCase($routeConfig['name']);
                 $routeSnake = snakeCase($routeName);
 
-                $uri = $this->getRouteActionUri(nestedRouteNameFormat($routeName, $routeConfig['name']), 'index');
+                $url = $this->getRouteActionUrl(nestedRouteNameFormat($routeName, $routeConfig['name']), 'index');
 
                 $pattern = "\{$routeSnake\}";
 
@@ -693,7 +808,7 @@ class Module extends NwidartModule
                     // 'url' => moduleRoute($routeConfig['name'],  $this->fullRouteNamePrefix() . '.' . $routeName . '.nested', 'index', [
                     //     $routeName => ':id',
                     // ]),
-                    'url' => preg_replace('/(' . $pattern . ')/', ':id', $uri),
+                    'url' => preg_replace('/(' . $pattern . ')/', ':id', $url),
                     'label' => 'modules.' . $nestedRouteSnake,
                     'icon' => '$modules',
                     'color' => 'green',
@@ -705,6 +820,9 @@ class Module extends NwidartModule
         return $navigationActions;
     }
 
+    /**
+     * createMiddlewareAliases
+     */
     public function createMiddlewareAliases()
     {
         foreach ($this->middlewares as $name => $middleware) {
@@ -712,7 +830,10 @@ class Module extends NwidartModule
         }
     }
 
-    public function getRouteMiddlewareAliases($routeName)
+    /**
+     * getRouteMiddlewareAliases
+     */
+    public function getRouteMiddlewareAliases(string $routeName): array
     {
         $snakeName = snakeCase($routeName);
 

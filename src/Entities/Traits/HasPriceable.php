@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Support\Facades\Request;
 use Modules\SystemPricing\Entities\Price;
-use Money\Currency;
 use Oobook\Priceable\Traits\HasPriceable as TraitsHasPriceable;
 use Unusualify\Modularity\Entities\Mutators\HasPriceableMutators;
 
@@ -32,10 +31,13 @@ trait HasPriceable
 
     public function basePrice(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
-        // dd(Request::getUserCurrency());
-        // return $this->prices()->where('currency_id', Request::getUserCurrency()->id);
         return $this->morphOne(Price::class, 'priceable')
             ->where('currency_id', Request::getUserCurrency()->id);
+    }
+
+    public function scopeHasBasePrice($query)
+    {
+        return $query->whereHas('basePrice');
     }
 
     public function scopeOrderByCurrencyPrice($query, $currencyId, $direction = 'asc')

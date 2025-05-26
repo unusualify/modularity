@@ -1,5 +1,5 @@
 <template>
-  <v-stepper v-model="activeStep" color="prima" :class="['ue-stepper-form','ue-stepper--no-background', 'fill-height  d-flex flex-column']">
+  <v-stepper v-model="activeStep" color="prima" :class="['ue-stepper-form','ue-stepper--no-background', 'fill-height  d-flex flex-column']" :mobile-breakpoint="`md`">
     <template v-slot:default="{ prev, next }">
       <StepperHeader
         :forms="forms"
@@ -9,7 +9,7 @@
 
       <v-row class="mt-4 flex-fill">
         <!-- left side -->
-        <v-col cols="12" lg="8" v-fit-grid>
+        <v-col cols="12" lg="8" v-fit-grid order-lg="1" order="2">
           <StepperContent
             v-model="models"
             :schemas="schemas"
@@ -40,7 +40,7 @@
         </v-col>
 
         <!-- right side -->
-        <v-col cols="12" lg="4">
+        <v-col cols="12" lg="4" order-lg="2" order="1">
           <StepperSummary
 
             :is-last-step="isLastStep"
@@ -115,9 +115,11 @@
           <p class="text-subtitle-1 grey--text">{{ $t('Congratulations! Your PR request is complete.') }}</p>
         </template>
         <template v-slot:body.options>
-          <v-btn variant="flat" color="success" @click="completed">
-            {{ $t('Go Back') }}
-          </v-btn>
+          <div class="d-flex justify-center w-100">
+            <v-btn variant="flat" color="success" @click="completed">
+              {{ $t('Go Back') }}
+            </v-btn>
+          </div>
         </template>
       </ue-modal>
 

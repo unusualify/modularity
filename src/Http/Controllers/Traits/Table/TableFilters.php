@@ -44,6 +44,11 @@ trait TableFilters
                 'slug' => 'published',
                 'number' => $this->repository->getCountByStatusSlug('published', $scope),
             ];
+            // $statusFilters[] = [
+            //     'name' => ___('listing.filter.draft'),
+            //     'slug' => 'draft',
+            //     'number' => $this->repository->getCountByStatusSlug('draft', $scope),
+            // ];
         }
 
         if ($this->getIndexOption('publish')) {
@@ -153,6 +158,16 @@ trait TableFilters
                 'number' => $this->repository->getCountFor('teamPendingAssignments'),
             ];
 
+        }
+
+        $customMainFilters = $this->getConfigFieldsByRoute('table_filters', []);
+
+        foreach ($customMainFilters as $filter) {
+            $statusFilters[] = [
+                'name' => $filter->name,
+                'slug' => $filter->slug,
+                'number' => $this->repository->getCountFor($filter->scope ?? $filter->slug),
+            ];
         }
 
         $statusFilters = array_values(array_filter($statusFilters, function ($filter) {

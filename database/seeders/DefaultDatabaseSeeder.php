@@ -18,6 +18,7 @@ class DefaultDatabaseSeeder extends Seeder
             DefaultCurrencySeeder::class,
             DefaultVatRateSeeder::class,
             DefaultPriceTypeSeeder::class,
+            DefaultCountrySeeder::class,
         ]);
     }
 }

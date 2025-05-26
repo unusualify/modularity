@@ -46,7 +46,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
         'language',
         'timezone',
         'phone',
-        'country',
+        'country_id',
         'password',
         'published',
     ];

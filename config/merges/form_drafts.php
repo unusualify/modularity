@@ -43,13 +43,15 @@ return [
             ],
             'rules' => 'required|email|unique_table',
         ],
-        'country' => [
-            'type' => '_name',
-            'name' => 'country',
+        'country_id' => [
+            'type' => 'select',
+            'name' => 'country_id',
             'label' => 'Country',
             'col' => [
                 'sm' => 6,
             ],
+            'connector' => 'SystemUtility:Country|repository:list',
+            'rules' => 'sometimes|required',
             // 'rules' => 'min:3',
         ],
         'phone' => [
@@ -173,26 +175,27 @@ return [
                 'sm' => 12,
             ],
         ],
-        'city' => [
-            'type' => 'text',
-            'name' => 'city',
-            'label' => 'City',
-            'default' => '',
-            'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:3',
-        ],
-        'country' => [
-            'type' => 'text',
-            'name' => 'country',
+        'country_id' => [
+            'type' => 'select',
+            'name' => 'country_id',
             'label' => 'Country',
             'default' => '',
+            'connector' => 'SystemUtility:Country|repository:list',
             'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:3',
+            'rules' => 'sometimes|required',
         ],
         'state' => [
             'type' => 'text',
             'name' => 'state',
             'label' => 'State/Province',
+            'default' => '',
+            'col' => ['sm' => 6],
+            'rules' => 'sometimes|min:3',
+        ],
+        'city' => [
+            'type' => 'text',
+            'name' => 'city',
+            'label' => 'City',
             'default' => '',
             'col' => ['sm' => 6],
             'rules' => 'sometimes|min:3',
@@ -382,7 +385,7 @@ return [
                 'cols' => 6,
                 'lg' => 6,
             ],
-            'rules' => 'min:2',
+            // 'rules' => 'min:2',
         ],
         'email' => [
             'type' => 'text',
@@ -414,9 +417,9 @@ return [
             ],
 
         ],
-        're_password' => [
+        'password_confirmation' => [
             'type' => 'password',
-            'name' => 're-password',
+            'name' => 'password_confirmation',
             'label' => 'Repeat Password',
             'default' => '',
             'appendInnerIcon' => '$non-visibility',
@@ -432,7 +435,7 @@ return [
             ],
         ],
         'tos' => [
-            'type' => 'checkbox',
+            'type' => 'input-terms-checkbox',
             'name' => 'tos',
             'label' => 'I accept the terms of service',
             'default' => '',

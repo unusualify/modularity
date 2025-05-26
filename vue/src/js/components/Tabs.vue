@@ -1,5 +1,5 @@
 <template>
-  <v-tabs v-model="tab" align-tabs="center">
+  <v-tabs v-model="tab" align-tabs="center" center-active show-arrows>
     <template v-for="element in elements" :key="`tab-${element[tabValue]}`" :value="element[tabValue]">
       <slot :name="`tab.${element[tabValue]}`">
         <v-tab :value="element[tabValue]">

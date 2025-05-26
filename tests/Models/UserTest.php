@@ -39,7 +39,6 @@ class UserTest extends ModelTestCase
             'language' => 'en',
             'timezone' => 'UTC',
             'phone' => '1234567890',
-            'country' => 'Test Country',
             'password' => 'password',
             'published' => 1,
             'company_id' => null,
@@ -52,7 +51,6 @@ class UserTest extends ModelTestCase
         $this->assertEquals('en', $user->language);
         $this->assertEquals('UTC', $user->timezone);
         $this->assertEquals('1234567890', $user->phone);
-        $this->assertEquals('Test Country', $user->country);
         $this->assertEquals('password', $user->password);
         $this->assertEquals(1, $user->published);
     }
@@ -67,7 +65,6 @@ class UserTest extends ModelTestCase
             'language' => 'en',
             'timezone' => 'UTC',
             'phone' => '1234567890',
-            'country' => 'Test Country',
             'password' => 'password',
             'published' => 1,
             'company_id' => null,
@@ -81,7 +78,6 @@ class UserTest extends ModelTestCase
             'language' => 'fr',
             'timezone' => 'America/New_York',
             'phone' => '0987654321',
-            'country' => 'Updated Country',
             'password' => 'new_password',
             'published' => 0,
         ]);
@@ -93,7 +89,6 @@ class UserTest extends ModelTestCase
         $this->assertEquals('fr', $user->language);
         $this->assertEquals('America/New_York', $user->timezone);
         $this->assertEquals('0987654321', $user->phone);
-        $this->assertEquals('Updated Country', $user->country);
         $this->assertEquals('new_password', $user->password);
         $this->assertEquals(0, $user->published);
     }
@@ -108,7 +103,6 @@ class UserTest extends ModelTestCase
             'language' => 'en',
             'timezone' => 'UTC',
             'phone' => '1234567890',
-            'country' => 'Country1',
             'password' => 'password',
             'published' => 1,
             'company_id' => null,
@@ -122,7 +116,6 @@ class UserTest extends ModelTestCase
             'language' => 'fr',
             'timezone' => 'America/New_York',
             'phone' => '0987654321',
-            'country' => 'Country2',
             'password' => 'new_password',
             'published' => 0,
             'company_id' => null,

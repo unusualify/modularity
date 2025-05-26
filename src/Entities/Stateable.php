@@ -15,13 +15,20 @@ class Stateable extends Model
         'state_id',
         'stateable_id',
         'stateable_type',
-        'color',
-        'icon',
+        // 'color',
+        // 'icon',
         'is_active',
     ];
 
+    public $timestamps = false;
+
+    public function state(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(modularityConfig('models.state', 'Unusualify\Modularity\Entities\State'));
+    }
+
     public function getTable()
     {
-        return modularityConfig('tables.stateables', 'modularity_stateables');
+        return modularityConfig('tables.stateables', 'um_stateables');
     }
 }

@@ -46,6 +46,8 @@ trait PaymentTrait
     {
         $priceSavingKey = Price::$priceSavingKey ?? 'price_value';
 
+        $paymentPrice = $object->paymentPrice()->first();
+
         if (isset($fields['payment_price'])) {
             $val = Arr::isAssoc($fields['payment_price']) ? $fields['payment_price'] : $fields['payment_price'][0];
 
@@ -82,7 +84,7 @@ trait PaymentTrait
                 ]));
                 $newPrice->save();
             }
-        } elseif (! $object->paymentPrice || (isset($fields['force_payment_update']) && $fields['force_payment_update'])) {
+        } elseif (! $paymentPrice || (isset($fields['force_payment_update']) && $fields['force_payment_update'])) {
             $session_currency = request()->getUserCurrency()->id;
             // dd($fields);
             $currencyId = isset($fields['currency_id'])
@@ -115,9 +117,10 @@ trait PaymentTrait
                         if ($records instanceof \Illuminate\Database\Eloquent\Collection) {
 
                             foreach ($records as $record) {
-                                $price = $record->prices->filter(function ($price) use ($currencyId) {
-                                    return $price->currency_id == $currencyId;
-                                })->first();
+                                $price = $record->basePrice;
+                                // $price = $record->prices->filter(function ($price) use ($currencyId) {
+                                //     return $price->currency_id == $currencyId;
+                                // })->first();
 
                                 if (! is_null($price)) {
                                     $calculated = true;
@@ -128,7 +131,7 @@ trait PaymentTrait
                     }
                 }
 
-                if (! $object->paymentPrice && $calculated) {
+                if (! $paymentPrice && $calculated) {
 
                     $object->paymentPrice()->create([
                         'price_type_id' => 1,
@@ -137,8 +140,7 @@ trait PaymentTrait
                         $priceSavingKey => ($totalAmount / 100),
                         'role' => 'payment',
                     ]);
-                } elseif ($object->paymentPrice && $object->paymentPrice->raw_amount != $totalAmount) {
-                    $paymentPrice = $object->paymentPrice;
+                } elseif ($paymentPrice && $paymentPrice->raw_amount != $totalAmount) {
                     $paymentPrice->{$priceSavingKey} = $totalAmount / 100;
                     // $paymentPrice->currency_id = $currencyId;
                     $paymentPrice->save();
@@ -153,7 +155,7 @@ trait PaymentTrait
     {
 
         if (method_exists($object, 'paymentPrice') && $object->has('paymentPrice')) {
-            $priceSavingKey = Price::$priceSavingKey;
+            // $priceSavingKey = Price::$priceSavingKey;
             // $query = $object->paymentPrice;
             $fields['payment'] = $object->payment;
 

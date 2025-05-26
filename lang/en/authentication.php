@@ -41,4 +41,9 @@ return [
     'verification-complete' => 'Verification',
     'verification-complete-description' => 'Your email has been verified.',
 
+    'success' => 'Authentication successful',
+    'success-description' => 'You have been successfully authenticated.',
+
+    'terms-policy' => 'Terms Policy',
+    'conditions-policy' => 'Conditions Policy',
 ];

@@ -172,10 +172,12 @@ export default {
     const width = computed(() => {
       // name is reactive and
       // must use .value
+
       switch (name.value) {
-        case 'xs': return 300
+        case 'xs': return 400
+        case 'md': return 400
+        case 'lg': return 500
         case 'xl': return 600
-        case 'xxl': return 600
         default: return 400
       }
     })

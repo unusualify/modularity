@@ -64,9 +64,16 @@ class ListenerMakeCommand extends BaseCommand
 
         $paths = [
             base_path('app/Events'),
-            Modularity::getModulePath('/**/Events'),
             Modularity::getVendorPath('/src/Events'),
         ];
+
+        $allModules = Modularity::all();
+
+        foreach ($allModules as $module) {
+            if (file_exists($moduleEventsPath = $module->getTargetClassPath('event'))) {
+                $paths[] = $moduleEventsPath;
+            }
+        }
 
         $implements = [];
         $namespaces = [];
@@ -91,14 +98,16 @@ class ListenerMakeCommand extends BaseCommand
 
         if ($events->count() > 0) {
             $eventClass = select(
-                label: 'Select the event class',
-                options: $events->keys()->toArray(),
-                default: $events->keys()->first(),
+                label: 'Select one if you want to use a specific abstract event class',
+                options: ['No' => 'No'] + $events->keys()->toArray(),
+                default: 'No',
             );
 
-            $eventClassShortName = get_class_short_name($eventClass);
-            $eventParameter = $eventClassShortName . ' $event';
-            $namespaces[] = $eventClass;
+            if ($eventClass != 'No') {
+                $eventClassShortName = get_class_short_name($eventClass);
+                $eventParameter = $eventClassShortName . ' $event';
+                $namespaces[] = $eventClass;
+            }
         } else {
             $this->warn('No event found');
         }

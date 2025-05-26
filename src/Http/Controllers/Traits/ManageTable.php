@@ -36,7 +36,10 @@ trait ManageTable
                 'search' => collect($this->indexTableColumns ?? [])->filter(function ($item) {
                     return isset($item['searchable']) ? $item['searchable'] : false;
                 })->map(function ($item) {
-                    return $this->dehydrateHeaderSuffix($item) ? $item['key'] : $item['key'];
+                    $this->dehydrateHeaderSuffix($item);
+                    $searchKey = $item['searchKey'] ?? $item['key'];
+
+                    return $searchKey;
                 })->implode('|'),
             ];
         }

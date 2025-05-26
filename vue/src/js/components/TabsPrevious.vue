@@ -1,8 +1,8 @@
 <template>
-  <v-tabs v-model="tab" align-tabs="center">
+  <v-tabs v-model="activeTab" align-tabs="center" center-active show-arrows>
     <v-tab v-for="key in Object.keys(items)" :key="`tab-${key}`" :value="key">{{ key }}</v-tab>
   </v-tabs>
-  <v-tabs-window v-model="tab">
+  <v-tabs-window v-model="activeTab">
     <v-tabs-window-item
       v-for="(key, n) in Object.keys(items)"
       :key="`tab-window-${key}`"
@@ -27,6 +27,10 @@
       RowFormat
     },
     props: {
+      modelValue: {
+        type: String,
+        default: null
+      },
       itemTitle: {
         type: String,
         default: 'name'
@@ -41,8 +45,18 @@
     },
     data () {
       return {
-        tab: Object.keys(this.items)[0] ?? null,
+        // tab: Object.keys(this.items)[0] ?? null,
         models: {},
+      }
+    },
+    computed: {
+      activeTab: {
+        get() {
+          return this.modelValue ?? Object.keys(this.items)[0] ?? null
+        },
+        set(val) {
+          this.$emit('update:modelValue', val)
+        }
       }
     },
     created(){

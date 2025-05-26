@@ -15,15 +15,16 @@ trait QueryBuilder
      * @param array $orders
      * @param int $perPage
      * @param bool $forcePagination
+     * @param int|string|null $id
      * @return \Illuminate\Support\Collection|\Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function get($with = [], $scopes = [], $orders = [], $perPage = 20, $appends = [], $forcePagination = false)
+    public function get($with = [], $scopes = [], $orders = [], $perPage = 20, $appends = [], $forcePagination = false, $id = null)
     {
         $query = $this->model->query();
 
         $query = $this->model->with($this->formatWiths($query, $with));
 
-        if ($perPage == -1) {
+        if ($perPage < 0) {
             return $query->simplePaginate($perPage);
         }
 
@@ -53,9 +54,36 @@ trait QueryBuilder
             return $query->ordered()->get();
         }
 
+        $page = request()->get('page') ?? null;
+
+        if ($id) {
+            $totalRows = $query->count();
+            // $totalPages = ceil($totalRows / $perPage);
+
+            // Create a clone of the query to find the position of the record
+            $cloneQuery = clone $query;
+            // $orderColumns = $query->getQuery()->orders ?? [];
+
+            // Get the position of the record
+            if ($cloneQuery->where('id', $id)->exists()) {
+                $cloneQuery = clone $query;
+
+                // Get all IDs in the correct query order
+                $orderedIds = $cloneQuery->pluck('id')->toArray();
+
+                // Find the position of our target ID in the ordered results
+                $position = array_search($id, $orderedIds);
+
+                if ($position !== false) {
+                    // Calculate which page the record is on (1-based pagination)
+                    $page = (int) floor($position / $perPage) + 1;
+                }
+            }
+        }
+
         try {
 
-            return $query->paginate($perPage);
+            return $query->paginate($perPage, page: $page);
 
         } catch (\Throwable $th) {
             dd(

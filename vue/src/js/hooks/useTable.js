@@ -165,7 +165,7 @@ export default function useTable (props, context) {
     return props.endpoints.index.replace(/\/$/, '').split('?')[0] === window.location.href.replace(/\/$/, '').split('?')[0]
   })
 
-  const { setLastParameters, lastParameters } = useTableState()
+  const { setLastParameters, lastParameters, getQueryParameters } = useTableState()
 
   const form = ref(null)
   const loading = ref(false)
@@ -182,14 +182,44 @@ export default function useTable (props, context) {
     elements.value = data
   }
 
+  const updateElementItem = (id, data) => {
+    const index = elements.value.findIndex(element => element.id === id)
+    if(index !== -1) {
+      elements.value[index] = data
+    }
+  }
+
+  const updateElementItemAttributes = (id, attributes) => {
+    const index = elements.value.findIndex(element => element.id === id)
+    if(index !== -1) {
+      Object.keys(attributes).forEach(key => {
+        elements.value[index][key] = attributes[key]
+      })
+    }
+  }
+
+  const updateElementItemAttribute = (id, attribute, value) => {
+    const index = elements.value.findIndex(element => element.id === id)
+    if(index !== -1) {
+      elements.value[index][attribute] = value
+    }
+  }
+
   const pushElements = (data) => {
     elements.value = elements.value.push(data)
   }
 
-  const updateResponseFields = (response) => {
+  const updatingOptions = ref(false)
+
+  const updateResponseFields = (response, queryParameters = {}) => {
     totalNumberOfElements.value = response.resource.total
     tableFilters.setMainFilters(response.mainFilters)
     // tableFilters.advancedFilters.value = resource.advancedFilters
+
+    if(state.options.page !== response.resource.current_page){
+      updatingOptions.value = true
+      state.options.page = response.resource.current_page
+    }
 
     if(state.enableInfiniteScroll){
       // state.elements = state.elements.push(response.resource.data)
@@ -197,6 +227,10 @@ export default function useTable (props, context) {
     }else{
       // state.elements = response.resource.data
       setElements(response.resource.data)
+    }
+
+    if(queryParameters.id){
+      openItemForm(queryParameters.id)
     }
   }
 
@@ -227,6 +261,7 @@ export default function useTable (props, context) {
     }
 
     if(_.isObject(props.endpoints) && props.endpoints.index) {
+      const queryParameters = getQueryParameters()
       await api.get( props.endpoints.index, payload,
         function(response){
 
@@ -234,7 +269,7 @@ export default function useTable (props, context) {
             setLastParameters(payload)
           }
 
-          updateResponseFields(response)
+          updateResponseFields(response, queryParameters)
 
           state.loading = false
         },
@@ -267,9 +302,17 @@ export default function useTable (props, context) {
   const tableItemActions = useTableItemActions(props, {
     ...context,
     ...{
-      tableForms
+      tableForms,
+      loadItems
     }
   })
+
+  const openItemForm = (id) => {
+    const item = state.elements.find(element => element.id == id)
+    if(item){
+      tableItemActions.itemAction(item, 'edit')
+    }
+  }
 
   const state = reactive({
     id: Math.ceil(Math.random() * 1000000) + '-table',
@@ -345,7 +388,11 @@ export default function useTable (props, context) {
       }
     },
     initialize: function () {
-      loadItems()
+      const queryParameters = getQueryParameters()
+
+      const customOptions = _.pick(queryParameters, ['id'])
+
+      loadItems(customOptions)
     },
     goNextPage () {
       if (state.options.page < numberOfPages.value) { state.options.page += 1 }
@@ -462,7 +509,11 @@ export default function useTable (props, context) {
   //   newValue || methods.resetEditedItem()
   // })
   watch(() => state.options, (newValue, oldValue) => {
-    loadItems()
+    if(!updatingOptions.value){
+      loadItems()
+    }else{
+      updatingOptions.value = false
+    }
   }, { deep: true })
   watch(() => state.elements, (newValue, oldValue) => {
     // Refresh edited item

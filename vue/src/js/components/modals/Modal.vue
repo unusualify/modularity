@@ -61,7 +61,7 @@
             </v-card-title>
             <v-card-text v-if="description || $slots['body.description']" class="text-center" style="word-break: break-word;" :class="{'pa-0': noDefaultBodyPadding}">
               <slot name="body.description" v-bind="{description}">
-                {{ description }}
+                <div v-html="description" />
               </slot>
             </v-card-text>
             <template v-if="!noActions">

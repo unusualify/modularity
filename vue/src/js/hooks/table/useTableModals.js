@@ -35,7 +35,6 @@ export default function useTableModals(props, context) {
   const selectedAction = ref(null)
   const deleteModal = ref(null)
 
-
   const activeModal = computed(() => {
     return modals.value[activeModalType.value]
   })
@@ -249,8 +248,6 @@ export default function useTableModals(props, context) {
       },
     }
   })
-
-
 
   watch(() => modals.value.show.active, (value) => {
     if (!value) {

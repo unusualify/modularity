@@ -22,16 +22,18 @@ trait PriceMutators
         $this->append(
             'discounted_raw_amount',
             'vat_multiplier',
+            'is_paid',
+            'is_unpaid',
         );
     }
 
-    protected function rawAmount(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => $value,
-            set: fn ($value) => $value * 100,
-        );
-    }
+    // protected function rawAmount(): Attribute
+    // {
+    //     return new Attribute(
+    //         get: fn ($value) => $value,
+    //         set: fn ($value) => $value * 100,
+    //     );
+    // }
 
     protected function vatPercentage(): Attribute
     {

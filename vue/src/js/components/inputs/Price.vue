@@ -44,7 +44,7 @@
         <v-card-text class="text-center py-6">
           <div class="text-h6 text-white mb-2">Total Pay</div>
           <div class="text-h2 text-white font-weight-bold">
-            {{ displayFormattedPrice(displayedCurrency[i], deepModel[i] )}}
+            {{ displayFormattedPrice(displayedCurrencyISO4217[i], deepModel[i] )}}
           </div>
         </v-card-text>
       </v-card>
@@ -169,9 +169,15 @@ export default {
       const vatRate = this.$lodash.find(this.vatRates, ['value', item.vat_rate_id])?.rate / 100
       const discountPercentage = (item.discount_percentage || 0) / 100
       const price = item[this.priceInputName]
+      const amount = (Math.round(price * (1 - discountPercentage)) * (1 + vatRate)).toFixed(2)
 
-      return currency + ' ' + (price * (1 - discountPercentage) * (1 + vatRate)).toFixed(2)
-      // return currency + ' ' + Math.round(price * (1 + vatRate) * (1 - discountPercentage)).toFixed(2)
+      // return currency + ' ' + (price * (1 - discountPercentage) * (1 + vatRate)).toFixed(2)
+      try{
+        return Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(amount)
+      }catch(err){
+        console.log(err)
+      }
+      return currency + ' ' + amount
     }
   },
 
@@ -211,6 +217,11 @@ export default {
     displayedCurrency () {
       return this.deepModel.map((item, i) => {
         return this.currencies.find(o => { return o.id === item[this.currencyInputName] }).name
+      })
+    },
+    displayedCurrencyISO4217 () {
+      return this.deepModel.map((item, i) => {
+        return this.currencies.find(o => { return o.id === item[this.currencyInputName] }).iso
       })
     },
     totalCurrencies () {

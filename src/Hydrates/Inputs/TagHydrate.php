@@ -40,8 +40,8 @@ class TagHydrate extends InputHydrate
             $input['chips'] = false;
             $input['multiple'] ??= false;
 
-            $input['endpoint'] = $module->getRouteActionUri($input['_routeName'], 'tags');
-            $input['updateEndpoint'] = $module->getRouteActionUri($input['_routeName'], 'tagsUpdate');
+            $input['endpoint'] = $module->getRouteActionUrl($input['_routeName'], 'tags');
+            $input['updateEndpoint'] = $module->getRouteActionUrl($input['_routeName'], 'tagsUpdate');
             $input['items'] = ! $this->skipQueries
                 ? $repository->getTags()->toArray()
                 : [];
