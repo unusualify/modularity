@@ -238,7 +238,8 @@ export default function useTable (props, context) {
     state.loading = true
 
     const payload = {
-      ...(customOptions ?? options.value),
+      ...options.value,
+      ...(customOptions ?? {}),
       ...{ replaceUrl: false }
     }
 
