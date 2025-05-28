@@ -28,6 +28,19 @@ import {
 
 
 export const makeTableProps = propsFactory({
+  elevation: {
+    type: [Number, String],
+  },
+  rounded: {
+    type: [Boolean, String],
+  },
+  tableElevation: {
+    type: [Number, String],
+  },
+  tableRounded: {
+    type: [Boolean, String],
+  },
+
   fillHeight: {
     type: Boolean,
     default: false,

@@ -1,5 +1,10 @@
 <template>
-  <v-layout fluid v-resize="onResize" :class="[noFullScreen ? 'h-100' : '']">
+  <v-layout fluid v-resize="onResize"
+    :class="[
+      noFullScreen ? 'h-100' : '',
+      rounded ? $lodash.isBoolean(rounded) ? 'rounded' : `rounded-${rounded}` : '',
+      elevation ? `elevation-${elevation}` : '',
+    ]">
     <div :class="['ue-datatable__container', noFullScreen ? 'fill-height' : 'fill-heigh ue-datatable--full-screen' ]">
       <ActiveTableItem
         class=""
@@ -15,7 +20,9 @@
         :class="[
           'px-4 h-100',
           tableClasses,
+          rounded ? $lodash.isBoolean(rounded) ? 'rounded' : `rounded-${rounded}` : '',
           fullWidthWrapper ? '' : 'ue-table--narrow-wrapper',
+          tableElevation ? `elevation-${tableElevation}` : '',
           striped ? 'ue-datatable--striped' : '',
           roundedRows ? 'ue-datatable--rounded-row' : '',
           hideBorderRow ? 'ue-datatable--no-border-row' : '',
