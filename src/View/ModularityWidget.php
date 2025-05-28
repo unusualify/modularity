@@ -26,7 +26,7 @@ class ModularityWidget extends Component
             'cols' => 12,
         ],
         'widgetAttributes' => [
-            'class' => 'h-50 overflow-y-auto',
+            'class' => 'overflow-y-auto',
         ],
         'widgetSlots' => [],
     ];
@@ -117,6 +117,13 @@ class ModularityWidget extends Component
         }
 
         return $widgetConfig;
+    }
+
+    public function setWidgetAlias(string $widgetAlias)
+    {
+        $this->widgetAlias = $widgetAlias;
+
+        return $this;
     }
 
     public function setWidgetCol(array $widgetCol)
