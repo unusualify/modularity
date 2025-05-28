@@ -155,7 +155,11 @@
   >
     <!-- Header with title and date -->
     <v-card-title :class="headerClasses">
-      <div :class="titleClasses">{{ title }}</div>
+      <div class="py-2">
+        <ue-title padding="a-0" :text="title" :class="titleClasses" />
+        <ue-title padding="a-0" :text="subtitle" type="caption" weight="medium" color="grey-darken-1" transform="none"/>
+      </div>
+      <!-- <div :class="titleClasses">{{ title }}</div> -->
       <div :class="filterClasses" style="width: 250px;">
         <v-date-input v-if="endpoint"
           v-model="dateRangeModel"
