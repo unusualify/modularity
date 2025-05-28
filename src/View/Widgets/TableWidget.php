@@ -62,6 +62,9 @@ class TableWidget extends ModularityWidget
             'image' => '', // image link for the background of the toolbar
             // 'height' => '90',
         ],
+        'paginationOptions' => [
+            'footerComponent' => 'vuePagination',
+        ],
     ];
 
     public function hydrateAttributes($attributes)
