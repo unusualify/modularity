@@ -324,6 +324,7 @@ export default function useTable (props, context) {
     enableCustomFooter: computed(() =>  props.paginationOptions.footerComponent === 'vuePagination'),
     footerProps: computed(() => {
       const footerProps = props.paginationOptions.footerProps
+
       if(state.enableInfiniteScroll){
         return {
           'hide-default-footer' : true,
@@ -332,6 +333,14 @@ export default function useTable (props, context) {
 
       return footerProps
     }),
+    defaultPaginationButtonProps: {
+      elevation: 1,
+      color: 'grey-darken-5',
+      class: 'bg-surface',
+      variant: 'text',
+      density: 'compact',
+      size: 'small',
+    },
     windowSize: {
       x: 0,
       y: 0
@@ -341,6 +350,10 @@ export default function useTable (props, context) {
     }),
     loading,
     totalNumberOfElements,
+    totalNumberOfPages,
+    availablePages: computed(() => {
+      return Array.from({ length: totalNumberOfPages.value }, (_, i) => i + 1)
+    }),
     options,
     elements,
 

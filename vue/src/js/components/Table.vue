@@ -542,12 +542,79 @@
 
         <!-- MARK PAGINATION BUTTONS -->
         <template v-if="enableCustomFooter" v-slot:bottom="{page, pageCount}">
-          <div class="d-flex justify-end">
-            <v-pagination
-              v-model="options.page"
-              :length="pageCount"
-              v-bind="footerProps"
-            />
+          <div class="d-flex justify-end py-4">
+            <v-container class="max-width text-center">
+              <v-pagination v-if="!loading"
+                v-model="options.page"
+                :length="totalNumberOfPages"
+
+                density="compact"
+                size="small"
+                total-visible="3"
+                show-first-last-page
+                v-bind="footerProps"
+              >
+                <template #first="{ onClick, disabled, icon }">
+                  <v-btn
+                    v-bind="defaultPaginationButtonProps"
+                    icon="mdi-chevron-double-left"
+                    @click="onClick"
+                    :disabled="disabled"
+                  />
+                </template>
+                <template #prev="{ onClick, disabled, icon }">
+                  <v-btn
+                    v-bind="defaultPaginationButtonProps"
+                    :icon="icon"
+                    @click="onClick"
+                    :disabled="disabled"
+                  />
+                </template>
+                <!-- <template #item>
+                  <v-menu>
+                    <template #activator="{ props }">
+                      <v-btn
+                        v-bind="{ ...props, ...defaultPaginationButtonProps }"
+                        :icon="options.page"
+                        @click="onClick"
+                        :disabled="disabled"
+                      >
+                        {{ options.page }}
+                      </v-btn>
+                    </template>
+                    <v-list
+                      class="overflow-y-auto"
+                      max-height="200"
+                      >
+                      <v-list-item v-for="page in availablePages" :key="page" @click="options.page = page">
+                        {{ page }}
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+                </template> -->
+                <template #next="{ onClick, disabled, icon }">
+                  <v-btn
+                    v-bind="defaultPaginationButtonProps"
+                    :icon="icon"
+                    @click="onClick"
+                    :disabled="disabled"
+                  />
+                </template>
+                <template #last="{ onClick, disabled, icon }">
+                  <v-btn
+                    v-bind="defaultPaginationButtonProps"
+                    icon="mdi-chevron-double-right"
+                    @click="onClick"
+                    :disabled="disabled"
+                  />
+                </template>
+              </v-pagination>
+              <v-progress-circular v-else
+                width="3"
+                size="small"
+                indeterminate
+              ></v-progress-circular>
+            </v-container>
           </div>
         </template>
 
