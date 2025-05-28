@@ -9,7 +9,9 @@ return [
     'isRowEditing' => false,
     'rowActionsType' => 'inline',
     'hideDefaultFooter' => false,
-    'tableClasses' => 'elevation-2',
+    'tableElevation' => 2,
+    'tableRounded' => true,
+
     'itemsPerPage' => 15,
     'hideHeaders' => false,
     'hideSearchField' => false,
