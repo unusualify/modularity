@@ -155,7 +155,7 @@
                       <v-menu>
                         <template v-slot:activator="{ props }">
                           <!-- filter button -->
-                          <v-btn v-if="mainFilters.length > 0"
+                          <v-btn v-if="mainFilters.length > 0 && !hideFilters"
                             id="filter-btn-activator"
                             v-bind="{...filterBtnOptions, ...filterBtnTitle, ...props}"
                             :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
@@ -189,7 +189,7 @@
                       >
                         <template v-slot:activator="{ props }">
                           <!-- advanced filter button -->
-                          <v-btn v-if="Object.keys(advancedFilters).length > 0"
+                          <v-btn v-if="Object.keys(advancedFilters).length > 0 && !hideAdvancedFilters"
                             id="advanced-filter-btn"
                             v-bind="{...filterBtnOptions, ...filterBtnTitle, ...props}"
                             :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
