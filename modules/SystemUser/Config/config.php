@@ -61,9 +61,11 @@ return [
                     'name' => 'avatar',
                     'allow-image-preview' => true,
                     'label-idle' => 'Drop files here...',
-                    'rules' => 'sometimes|required:array',
+                    // 'rules' => 'sometimes|required:array',
                     'disabled' => true,
                     'noSubmit' => true,
+                    'creatable' => 'hidden',
+                    'editable' => false,
                 ],
                 [
                     'type' => 'text',
@@ -121,6 +123,7 @@ return [
                 ],
                 [
                     'type' => 'select-scroll',
+                    'componentType' => 'v-combobox',
                     'label' => 'Roles',
                     'name' => 'roles',
                     'col' => [
@@ -129,12 +132,11 @@ return [
                         'md' => 6,
                     ],
                     'itemTitle' => 'title',
-                    // 'repository' => \Modules\SystemUser\Repositories\RoleRepository::class,
-                    // 'connector' => 'Role|uri',
                     'endpoint' => [
                         'admin.system.system_user.role.index',
                     ],
                     'rules' => 'required',
+                    'editable' => false,
                 ],
             ],
         ],
