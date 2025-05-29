@@ -277,6 +277,10 @@ class LoginController extends Controller
             $body['redirector'] = redirect()->intended($this->redirectTo)->getTargetUrl();
         }
 
+        if ($request->has('_timezone')) {
+            session()->put('timezone', $request->get('_timezone'));
+        }
+
         return $request->wantsJson()
             ? new JsonResponse($body, 200)
             : $this->redirector->intended($this->redirectPath());
