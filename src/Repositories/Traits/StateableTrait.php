@@ -45,6 +45,53 @@ trait StateableTrait
             ->toArray();
     }
 
+    public function getTableFiltersStateableTrait($scope): array
+    {
+        $model = $this->getModel();
+
+        $defaultStates = $model::getDefaultStates();
+        $defaultStateCodes = array_column($defaultStates, 'code');
+
+        return $model::getStateModel()::whereIn('code', $defaultStateCodes)
+            ->get()
+            ->map(function ($state) use ($scope) {
+                $studlyCode = Str::studly($state->code);
+
+                return [
+                    'name' => $state->name ?? $state->translations->first()->name,
+                    'code' => $state->code,
+                    'slug' => "isStateable{$studlyCode}",
+                    'methods' => 'getCountByStatusSlug',
+                    'params' => [$state->code, $scope],
+                    ...(isset(static::$stateableFilterUserRoles) ? ['allowedRoles' => static::$stateableFilterUserRoles] : []),
+                ];
+            })
+            ->sortBy(function ($state) use ($defaultStateCodes) {
+                return array_search($state['code'], $defaultStateCodes);
+            })
+            ->values()
+            ->toArray();
+    }
+
+    public function getCountByStatusSlugStateableTrait($slug, $scope = [])
+    {
+        $model = $this->getModel();
+
+        if($model){
+
+            $defaultStates = $model::getDefaultStates();
+            $defaultStateCodes = array_column($defaultStates, 'code');
+
+            if (in_array($slug, $defaultStateCodes)) {
+                $query = $model::where($scope);
+
+                return $query->isStateableCount($slug);
+            }
+        }
+
+        return false;
+    }
+
     public function getStateableList($itemValue = 'name')
     {
         $model = $this->getModel();
