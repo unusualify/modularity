@@ -4,7 +4,9 @@
       noFullScreen ? 'h-100' : '',
       rounded ? $lodash.isBoolean(rounded) ? 'rounded' : `rounded-${rounded}` : '',
       elevation ? `elevation-${elevation}` : '',
-    ]">
+    ]"
+    :style="$vuetify.display.lgAndUp ? 'max-height: calc(100vh - 24px)' : 'max-height: calc(100vh - 24px - 64px)'"
+    >
     <div :class="['ue-datatable__container', noFullScreen ? 'fill-height' : 'fill-heigh ue-datatable--full-screen' ]">
       <ActiveTableItem
         class=""
