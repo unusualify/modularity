@@ -335,7 +335,7 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { useForm, makeFormProps } from '@/hooks'
@@ -554,6 +554,13 @@ export default {
         xl: '6',
         'order-lg': '1',
         'order-xl': '1'
+      }
+    })
+
+    onMounted(() => {
+      let timezoneInput = document.getElementById('timezone_session')
+      if (timezoneInput && useFormInstance.model.value && useFormInstance.model.value._timezone) {
+        useFormInstance.model.value._timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       }
     })
 
