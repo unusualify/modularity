@@ -1,5 +1,6 @@
 <script setup>
   import { computed, ref, watch } from 'vue';
+  import { isObject } from 'lodash-es';
 
   const props = defineProps({
     title: {
@@ -121,6 +122,19 @@
 
   const metrics = ref(props.items);
 
+  const filterableMetrics = computed(() => {
+    return metrics.value.filter(metric => {
+      return metric.connectorFilter
+        && isObject(metric.connectorFilter)
+        && metric.connectorFilter.name
+        && metric.connectorFilter.args;
+    });
+  });
+
+  const hasFilterableMetric = computed(() => {
+    return filterableMetrics.value.length > 0;
+  });
+
   const dateRangeModel = ref(null);
   const dateRangeLoading = ref(false);
 
@@ -141,7 +155,7 @@
     });
   }
   watch(dateRangeModel, (newValue, oldValue) => {
-    if(Array.isArray(newValue) && newValue.length > 1) {
+    if(Array.isArray(newValue) && newValue.length > 1 || (!newValue && oldValue && oldValue.length > 1)) {
       refreshMetrics();
     }
   });
@@ -160,8 +174,8 @@
         <ue-title padding="a-0" :text="subtitle" type="caption" weight="medium" color="grey-darken-1" transform="none"/>
       </div>
       <!-- <div :class="titleClasses">{{ title }}</div> -->
-      <div :class="filterClasses" style="width: 250px;">
-        <v-date-input v-if="endpoint"
+      <div :class="filterClasses" style="width: 280px;" v-if="hasFilterableMetric && endpoint">
+        <v-date-input
           v-model="dateRangeModel"
           :Xlabel="$t('')"
           :validate-on="`submit blur`"
@@ -174,6 +188,7 @@
           required
           hide-details
           multiple="range"
+          clearable
 
           :disabled="dateRangeLoading"
 
@@ -206,7 +221,20 @@
               ...defaultMetricAttributes,
               ...metric
             }"
-          />
+          >
+            <template v-if="metric.filtered" v-slot:value="valueScope">
+              <v-badge
+                color="green"
+                class="text-white"
+                icon="mdi-filter-check"
+                X-floating
+              >
+                <div :class="valueScope.classes">
+                  {{ valueScope.value }}
+                </div>
+              </v-badge>
+            </template>
+          </ue-metric>
         </template>
       </div>
     </v-card-text>
