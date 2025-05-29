@@ -299,6 +299,22 @@ class Connector
         $this->events = array_merge($events, $this->events);
     }
 
+    public function updateEventParameters($eventName, $parameters)
+    {
+        $events = Collection::make($this->events);
+
+        $eventIndex = $events->search(function ($event) use ($eventName) {
+            return $event['name'] === $eventName;
+        });
+
+        if ($eventIndex !== false) {
+            $event = $events[$eventIndex];
+            $this->events[$eventIndex]['args'] = array_merge($event['args'], $parameters);
+        }
+
+        // dd($this->events);
+    }
+
     /**
      * Run the connector
      *
