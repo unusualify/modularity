@@ -139,7 +139,9 @@ trait AssignableScopes
         $modelTable = $this->getTable();
         $modelClass = get_class($this);
 
-        return $query->whereExists(function ($subQuery) use ($assignmentTable, $modelTable, $modelClass, $status, $dateColumn, $dateRange) {
+        $userTimezone = session('timezone') ?? 'Europe/London';
+
+        return $query->whereExists(function ($subQuery) use ($assignmentTable, $modelTable, $modelClass, $status, $dateColumn, $dateRange, $userTimezone) {
             // Create a SQL string for the subquery
             $latestAssignmentSql = \DB::table($assignmentTable)
                 ->select(\DB::raw('MAX(created_at)'))
@@ -147,13 +149,30 @@ trait AssignableScopes
                 ->where("{$assignmentTable}.assignable_type", $modelClass)
                 ->toSql();
 
-            if ($dateColumn && $dateRange && is_array($dateRange) && count($dateRange) > 0) {
-                if (count($dateRange) == 1) {
-                    $startDate = array_shift($dateRange);
-                    $latestAssignmentSql .= " AND {$assignmentTable}.{$dateColumn} >= '{$startDate}'";
-                } elseif (count($dateRange) == 2) {
-                    $startDate = array_shift($dateRange);
-                    $endDate = array_pop($dateRange);
+            if ($dateColumn && $dateRange) {
+
+                if(is_array($dateRange) && count($dateRange) > 0) {
+                    if (count($dateRange) == 1) {
+                        $startDate = array_shift($dateRange);
+                        $latestAssignmentSql .= " AND {$assignmentTable}.{$dateColumn} >= '{$startDate}'";
+                    } elseif (count($dateRange) == 2) {
+                        $startDate = array_shift($dateRange);
+                        $endDate = array_pop($dateRange);
+                        $latestAssignmentSql .= " AND {$assignmentTable}.{$dateColumn} BETWEEN '{$startDate}' AND '{$endDate}'";
+                    }
+                } else if (is_string($dateRange) && $dateRange == 'today') {
+                    // Get user's local start and end of day, then convert to UTC for database comparison
+                    $startDate = now($userTimezone)->startOfDay()->utc()->format('Y-m-d H:i:s');
+                    $endDate = now($userTimezone)->endOfDay()->utc()->format('Y-m-d H:i:s');
+
+                    $latestAssignmentSql .= " AND {$assignmentTable}.{$dateColumn} BETWEEN '{$startDate}' AND '{$endDate}'";
+                } else if (is_string($dateRange) && $dateRange == 'this_week') {
+                    $startDate = now($userTimezone)->startOfWeek()->utc()->format('Y-m-d H:i:s');
+                    $endDate = now($userTimezone)->endOfWeek()->utc()->format('Y-m-d H:i:s');
+                    $latestAssignmentSql .= " AND {$assignmentTable}.{$dateColumn} BETWEEN '{$startDate}' AND '{$endDate}'";
+                } else if (is_string($dateRange) && $dateRange == 'this_month') {
+                    $startDate = now($userTimezone)->startOfMonth()->utc()->format('Y-m-d H:i:s');
+                    $endDate = now($userTimezone)->endOfMonth()->utc()->format('Y-m-d H:i:s');
                     $latestAssignmentSql .= " AND {$assignmentTable}.{$dateColumn} BETWEEN '{$startDate}' AND '{$endDate}'";
                 }
             }
