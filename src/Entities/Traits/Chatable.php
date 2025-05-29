@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Unusualify\Modularity\Entities\Chat;
 use Unusualify\Modularity\Entities\ChatMessage;
+use Unusualify\Modularity\Entities\CreatorRecord;
 use Unusualify\Modularity\Entities\Scopes\ChatableScopes;
 
 trait Chatable
@@ -57,6 +58,15 @@ trait Chatable
         return $this->hasManyThrough(ChatMessage::class, Chat::class, 'chatable_id', 'chat_id', 'id', 'id');
     }
 
+    public function creatorChatMessages(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
+    {
+        $creator = $this->creator;
+
+        return $this->whereHas('chatMessages', function ($query) use ($creator) {
+            $query->isCreator($creator->id, $creator->guard_name);
+        });
+    }
+
     public function latestChatMessage(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
         $chatTable = (new Chat)->getTable();
@@ -74,6 +84,37 @@ trait Chatable
     public function unreadChatMessagesForYou(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
         return $this->unreadChatMessages()->whereNot(fn ($query) => $query->authorized());
+    }
+
+    public function unreadChatMessagesFromClient(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->unreadChatMessages()->where(fn ($query) => $query->fromClient());
+    }
+
+    public function unreadChatMessagesFromCreator(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        $creatorRecordTable = (new CreatorRecord())->getTable();
+        $chatMessageTable = (new ChatMessage())->getTable();
+        $chatTable = (new Chat())->getTable();
+        $currentClass = static::class;
+
+        return $this->unreadChatMessages()->where(function ($messageQuery) use ($creatorRecordTable, $chatMessageTable, $chatTable, $currentClass) {
+            $creatableTableAlias = 'creatable_creators';
+            $chatableTableAlias = 'chatable_creators';
+
+            $messageQuery->whereExists(function ($subQuery) use ($creatorRecordTable, $chatMessageTable, $chatTable, $creatableTableAlias, $chatableTableAlias, $currentClass) {
+                $subQuery->select(\DB::raw(1))
+                    ->from($creatorRecordTable . ' as ' . $creatableTableAlias)
+                    ->join($creatorRecordTable . ' as ' . $chatableTableAlias, function ($join) use ($creatableTableAlias, $chatableTableAlias) {
+                        $join->on($creatableTableAlias . '.creator_id', '=', $chatableTableAlias . '.creator_id')
+                             ->on($creatableTableAlias . '.guard_name', '=', $chatableTableAlias . '.guard_name');
+                    })
+                    ->whereColumn($creatableTableAlias . '.creatable_id', $chatTable . '.chatable_id')
+                    ->where($creatableTableAlias . '.creatable_type', $currentClass)
+                    ->whereColumn($chatableTableAlias . '.creatable_id', $chatMessageTable . '.id')
+                    ->where($chatableTableAlias . '.creatable_type', ChatMessage::class);
+            });
+        });
     }
 
     protected function chatMessagesCount(): Attribute
@@ -94,6 +135,27 @@ trait Chatable
     {
         return new Attribute(
             get: fn () => $this->numberOfUnreadChatMessagesForYou(),
+        );
+    }
+
+    protected function unreadChatMessagesFromCreatorCount(): Attribute
+    {
+        return new Attribute(
+            get: fn () => $this->numberOfUnreadChatMessagesFromCreator(),
+        );
+    }
+
+    protected function unreadChatMessagesFromClientCount(): Attribute
+    {
+        return new Attribute(
+            get: fn () => $this->numberOfUnreadChatMessagesFromClient(),
+        );
+    }
+
+    public function isUnanswered(): Attribute
+    {
+        return new Attribute(
+            get: fn () => $this->numberOfUnansweredCreatorChatMessages(),
         );
     }
 }
