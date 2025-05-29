@@ -18,9 +18,9 @@
     :loading="loading"
     :readonly="$attrs.readonly || readonly || loading"
 
-    :rules="rules ?? $attrs.rules ?? []"
+    :rules="rules"
   >
-  <template v-slot:append-item>
+    <template v-slot:append-item>
       <div v-if="lastPage > 0 && lastPage > page" v-intersect="endIntersect" />
     </template>
     <template
@@ -42,13 +42,25 @@ export default {
   props: {
     ...makeInputProps(),
     ...makeInputFetchProps(),
+    rules: {
+      type: Array,
+      default: () => []
+    },
     componentType: {
       type: String,
       default: 'v-autocomplete'
     },
   },
   setup (props, context) {
-    const inputHook = useInput(props, context)
+    const initializeInput = (val) => {
+      __log(val)
+
+      return val
+    }
+    const inputHook = useInput(props, {
+      ...context,
+      initializeInput
+    })
     const inputFetchHook = useInputFetch(props, {
       ...context,
       input: inputHook.input
