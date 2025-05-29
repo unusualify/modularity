@@ -261,6 +261,9 @@ return [
         ],
     ],
     'login_shortcut' => [
+        'timezone' => [
+            'type' => '_timezone',
+        ],
         'email' => [
             'type' => 'email',
             'name' => 'email',
@@ -273,6 +276,9 @@ return [
         ],
     ],
     'login_form' => [
+        'timezone' => [
+            'type' => '_timezone',
+        ],
         'email' => [
             'type' => 'text',
             'name' => 'email',
