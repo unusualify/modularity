@@ -114,6 +114,37 @@ trait HasCreator
         );
     }
 
+    public function company(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        $creatorRecordModel = new ($this->getCreatorRecordModel());
+        $creatorModel = new ($this->getCreatorModel());
+
+        $companyModel = new Company;
+        $query = Company::query()
+            ->select($companyModel->getTable() . '.*')  // Only select company fields
+            ->join(
+                $creatorModel->getTable(),
+                $creatorModel->getTable() . '.company_id',
+                '=',
+                $companyModel->getTable() . '.id'
+            )
+            ->join(
+                $creatorRecordModel->getTable(),
+                function ($join) use ($creatorRecordModel, $creatorModel) {
+                    $join->on($creatorRecordModel->getTable() . '.creator_id', '=', $creatorModel->getTable() . '.id')
+                        ->where($creatorRecordModel->getTable() . '.creatable_type', '=', get_class($this))
+                        ->where($creatorRecordModel->getTable() . '.creatable_id', '=', $this->id);
+                }
+            );
+
+        return new \Illuminate\Database\Eloquent\Relations\HasOne(
+            $query,
+            $this,
+            $creatorRecordModel->getTable() . '.creatable_id',
+            'id'
+        );
+    }
+
     // protected static function getAuthorizedGuardName()
     // {
     //     return self::$authorizedGuardName ?? Modularity::getAuthGuardName();
@@ -207,6 +238,23 @@ trait HasCreator
     }
 
     /**
+     * Scope a query to only include related creator records.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int $creator_id
+     * @param string|null $guardName
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeIsCreator($query, $creator_id, $guardName = null)
+    {
+        $guardName ??= Auth::guard()->name;
+
+        return $query->whereHas('creatorRecord', function ($query) use ($creator_id, $guardName) {
+            $query->where('creator_id', $creator_id)->where('guard_name', $guardName);
+        });
+    }
+
+    /**
      * Scope a query to only include the current user's revisions.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
@@ -256,36 +304,5 @@ trait HasCreator
                 $query = $this->addAuthorizedUserQueryForCreatorRecord($query, $user);
             });
         });
-    }
-
-    public function company(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
-        $creatorRecordModel = new ($this->getCreatorRecordModel());
-        $creatorModel = new ($this->getCreatorModel());
-
-        $companyModel = new Company;
-        $query = Company::query()
-            ->select($companyModel->getTable() . '.*')  // Only select company fields
-            ->join(
-                $creatorModel->getTable(),
-                $creatorModel->getTable() . '.company_id',
-                '=',
-                $companyModel->getTable() . '.id'
-            )
-            ->join(
-                $creatorRecordModel->getTable(),
-                function ($join) use ($creatorRecordModel, $creatorModel) {
-                    $join->on($creatorRecordModel->getTable() . '.creator_id', '=', $creatorModel->getTable() . '.id')
-                        ->where($creatorRecordModel->getTable() . '.creatable_type', '=', get_class($this))
-                        ->where($creatorRecordModel->getTable() . '.creatable_id', '=', $this->id);
-                }
-            );
-
-        return new \Illuminate\Database\Eloquent\Relations\HasOne(
-            $query,
-            $this,
-            $creatorRecordModel->getTable() . '.creatable_id',
-            'id'
-        );
     }
 }
