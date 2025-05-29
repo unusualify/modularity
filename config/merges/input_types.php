@@ -81,4 +81,10 @@ return [
         'label' => 'Status',
         'default' => true,
     ],
+    '_timezone' => [
+        'type' => 'hidden',
+        'name' => '_timezone',
+        'default' => 'Europe/London',
+        'id' => 'timezone_session'
+    ]
 ];
