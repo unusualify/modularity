@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularity\Http\Controllers\Traits\Table;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Unusualify\Modularity\Traits\Allowable;
@@ -25,7 +26,8 @@ trait TableFilters
             // 'name' => modularityTrans("{$this->baseKey}::lang.listing.filter.all-items"),
             'name' => ___('listing.filter.all-items'),
             'slug' => 'all',
-            'number' => $this->repository->getCountByStatusSlug('all', $scope),
+            'methods' => 'getCountByStatusSlug',
+            'params' => ['all', $scope],
         ];
 
         // if ($this->routeHasTrait('revisions') && $this->getIndexOption('create')) {
@@ -42,26 +44,20 @@ trait TableFilters
             $statusFilters[] = [
                 'name' => ___('listing.filter.published'),
                 'slug' => 'published',
-                'number' => $this->repository->getCountByStatusSlug('published', $scope),
+                'methods' => 'getCountByStatusSlug',
+                'params' => ['published', $scope],
             ];
             // $statusFilters[] = [
             //     'name' => ___('listing.filter.draft'),
             //     'slug' => 'draft',
-            //     'number' => $this->repository->getCountByStatusSlug('draft', $scope),
+            //      'method' => 'getCountByStatusSlug',
+            //      'params' => ['draft', $scope],
+            //      'number' => $this->repository->getCountByStatusSlug('draft', $scope),
             // ];
         }
 
         if ($this->getIndexOption('publish')) {
-            // $statusFilters[] = [
-            //     'name' => ___("listing.filter.published"),
-            //     'slug' => 'published',
-            //     'number' => $this->repository->getCountByStatusSlug('published', $scope),
-            // ];
-            // $statusFilters[] = [
-            //     'name' => ___("listing.filter.draft"),
-            //     'slug' => 'draft',
-            //     'number' => $this->repository->getCountByStatusSlug('draft', $scope),
-            // ];
+
         }
 
         // SoftDeletable Filters
@@ -69,96 +65,17 @@ trait TableFilters
             $statusFilters[] = [
                 'name' => ___('listing.filter.trash'),
                 'slug' => 'trash',
-                'number' => $this->repository->getCountByStatusSlug('trash', $scope),
+                'force' => true,
+                'methods' => 'getCountByStatusSlug',
+                'params' => ['trash', $scope],
             ];
         }
 
-        // Stateable Filters
-        if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasStateable')) {
-            $statusFilters = array_merge(
-                $statusFilters,
-                $this->repository->getStateableFilterList(),
-            );
-        }
-
-        // Authorizable Filters
-        if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasAuthorizable')) {
-
-            if ($this->repository->getModel()->hasAuthorizationUsage()) {
-                $statusFilters[] = [
-                    'name' => ___('listing.filter.authorized'),
-                    'slug' => 'authorized',
-                    'number' => $this->repository->getCountFor('hasAnyAuthorization'),
-                ];
-
-                $statusFilters[] = [
-                    'name' => ___('listing.filter.unauthorized'),
-                    'slug' => 'unauthorized',
-                    'number' => $this->repository->getCountFor('unauthorized'),
-                ];
-            }
-
-            $statusFilters[] = [
-                'name' => ___('listing.filter.your-authorizations'),
-                'slug' => 'your-authorizations',
-                'number' => $this->repository->getCountFor('isAuthorizedToYou'),
-            ];
-        }
-
-        // Assignable Filters
-        if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\Assignable')) {
-            $statusFilters[] = [
-                'name' => ___('listing.filter.my-assignments'),
-                'slug' => 'my-assignments',
-                'number' => $this->repository->getCountFor('isActiveAssignee'),
-            ];
-            $statusFilters[] = [
-                'name' => ___('listing.filter.your-role-assignments'),
-                'slug' => 'your-role-assignments',
-                'number' => $this->repository->getCountFor('isActiveAssigneeForYourRole'),
-            ];
-
-            $assignableTotalDataPermission = $this->isAllowedItem(
-                item: ['allowedRoles' => ['superadmin', 'admin', 'manager', 'account-executive']],
-                searchKey: 'allowedRoles',
-                disallowIfUnauthenticated: true
-            );
-
-            if ($assignableTotalDataPermission) {
-                $statusFilters[] = [
-                    'name' => ___('listing.filter.completed-assignments'),
-                    'slug' => 'completed-assignments',
-                    'number' => $this->repository->getCountFor('completedAssignments'),
-                ];
-                $statusFilters[] = [
-                    'name' => ___('listing.filter.pending-assignments'),
-                    'slug' => 'pending-assignments',
-                    'number' => $this->repository->getCountFor('pendingAssignments'),
-                ];
-            }
-
-            $statusFilters[] = [
-                'name' => ___('listing.filter.your-completed-assignments'),
-                'slug' => 'your-completed-assignments',
-                'number' => $this->repository->getCountFor('yourCompletedAssignments'),
-            ];
-            $statusFilters[] = [
-                'name' => ___('listing.filter.team-completed-assignments'),
-                'slug' => 'team-completed-assignments',
-                'number' => $this->repository->getCountFor('teamCompletedAssignments'),
-            ];
-            $statusFilters[] = [
-                'name' => ___('listing.filter.your-pending-assignments'),
-                'slug' => 'your-pending-assignments',
-                'number' => $this->repository->getCountFor('yourPendingAssignments'),
-            ];
-            $statusFilters[] = [
-                'name' => ___('listing.filter.team-pending-assignments'),
-                'slug' => 'team-pending-assignments',
-                'number' => $this->repository->getCountFor('teamPendingAssignments'),
-            ];
-
-        }
+        // repository table filters
+        $statusFilters = array_merge(
+            $statusFilters,
+            $this->repository->getTableFilters($scope),
+        );
 
         $customMainFilters = $this->getConfigFieldsByRoute('table_filters', []);
 
@@ -166,13 +83,51 @@ trait TableFilters
             $statusFilters[] = [
                 'name' => $filter->name,
                 'slug' => $filter->slug,
-                'number' => $this->repository->getCountFor($filter->scope ?? $filter->slug),
+                'methods' => 'getCountFor',
+                'params' => [$filter->scope ?? $filter->slug],
+                ...(isset($filter->allowedRoles) ? ['allowedRoles' => $filter->allowedRoles] : []),
             ];
         }
 
-        $statusFilters = array_values(array_filter($statusFilters, function ($filter) {
-            return $filter['number'] > 0 || in_array($filter['slug'], ['trash', 'all']);
-        }));
+        $statusFilters = Collection::make($statusFilters)->reduce(function ($carry, $filter) {
+            if(isset($filter['allowedRoles'])){
+                $isAllowed = $this->isAllowedItem(
+                    item: ['allowedRoles' => $filter['allowedRoles']],
+                    searchKey: 'allowedRoles',
+                    disallowIfUnauthenticated: true
+                );
+
+                if(!$isAllowed){
+                    return $carry;
+                }
+            }
+
+            if(!isset($filter['number'])){
+                if(!isset($filter['methods'])){
+                    throw new \Exception('Number or methods is required for the filter: ' . $filter['slug']);
+                }
+
+                if(!isset($filter['params'])){
+                    throw new \Exception('Params is required for the filter: ' . $filter['slug']);
+                }
+
+                if(is_string($filter['methods'])){
+                    $count = $this->repository->{$filter['methods']}(...$filter['params']);
+                }else{
+                    throw new \Exception('Methods must be a string for the filter: ' . $filter['slug']);
+                }
+
+                if($count < 1 && !($filter['force'] ?? false)){
+                    return $carry;
+                }
+
+                $filter['number'] = $count;
+            }
+
+            $carry[] = Arr::except($filter, ['methods', 'params', 'force']);
+
+            return $carry;
+        }, []);
 
         return $statusFilters;
     }
