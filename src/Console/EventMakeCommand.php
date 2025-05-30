@@ -74,9 +74,16 @@ class EventMakeCommand extends BaseCommand
 
         $abstractEventPaths = [
             base_path('app/Events'),
-            Modularity::getModulePath('/**/Events'),
             Modularity::getVendorPath('/src/Events'),
         ];
+
+        $allModules = Modularity::all();
+
+        foreach ($allModules as $module) {
+            if (file_exists($moduleEventsPath = $module->getTargetClassPath('event'))) {
+                $abstractEventPaths[] = $moduleEventsPath;
+            }
+        }
         $abstractEventClasses = collect(Finder::create()->files()->depth(0)->in($abstractEventPaths))->reduce(function ($carry, $file) {
             $className = get_file_class($file->getRealPath());
 
@@ -90,15 +97,17 @@ class EventMakeCommand extends BaseCommand
             return $carry;
         }, collect());
 
-        if ($abstractEventClasses->count() > 0 && confirm('Do you want use a specific abstract event class?', default: false)) {
+        if ($abstractEventClasses->count() > 0) {
             $abstractEventClass = select(
                 label: 'Select the abstract event class',
-                options: $abstractEventClasses->keys()->toArray(),
-                default: $abstractEventClasses->keys()->first(),
+                options: ['No' => 'No'] + $abstractEventClasses->keys()->toArray(),
+                default: 'No',
             );
-            $abstractEventClassShortName = get_class_short_name($abstractEventClass);
-            $namespaces[] = $abstractEventClass;
-            $extend = $abstractEventClassShortName;
+            if ($abstractEventClass != 'No') {
+                $abstractEventClassShortName = get_class_short_name($abstractEventClass);
+                $namespaces[] = $abstractEventClass;
+                $extend = $abstractEventClassShortName;
+            }
         }
 
         if ($this->option('should-dispatch-after-commit')) {
