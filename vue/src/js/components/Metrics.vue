@@ -224,9 +224,11 @@
           >
             <template v-if="metric.filtered" v-slot:value="valueScope">
               <v-badge
-                color="green"
+                color="grey-lighten-4"
                 class="text-white"
                 icon="mdi-filter-check"
+                inline
+                Xdot
                 X-floating
               >
                 <div :class="valueScope.classes">
