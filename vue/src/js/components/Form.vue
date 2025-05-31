@@ -216,26 +216,26 @@
                 ...(rightSlotMaxWidth ? {maxWidth: `${rightSlotMaxWidth}px`} : {})
               }"
             >
+              <slot name="right" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}">
+                <AdditionalSectionContent
+                  :actions-position="actionsPosition"
+                  :is-editing="isEditing"
+                  :form-item="formItem"
+                  :actions="actions"
+                  @action-complete="$emit('actionComplete', $event)"
+                >
+                  <template #right-top>
+                    <slot name="right.top" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                  </template>
+                  <template #right-middle>
+                    <slot name="right.middle" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                  </template>
+                  <template #right-bottom>
+                    <slot name="right.bottom" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                  </template>
+                </AdditionalSectionContent>
+              </slot>
             </div>
-            <slot name="right" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}">
-              <AdditionalSectionContent
-                :actions-position="actionsPosition"
-                :is-editing="isEditing"
-                :form-item="formItem"
-                :actions="actions"
-                @action-complete="$emit('actionComplete', $event)"
-              >
-                <template #right-top>
-                  <slot name="right.top" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
-                </template>
-                <template #right-middle>
-                  <slot name="right.middle" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
-                </template>
-                <template #right-bottom>
-                  <slot name="right.bottom" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
-                </template>
-              </AdditionalSectionContent>
-            </slot>
           </div>
 
           <!-- Mobile dialog/modal for right section -->
