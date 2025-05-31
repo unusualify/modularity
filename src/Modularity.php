@@ -442,8 +442,12 @@ class Modularity extends FileRepository
             }
 
             foreach ($this->getClasses($entityPath) as $_class) {
-                if (get_class_short_name(App::make($_class)) === studlyName($routeName)) {
-                    $models[] = $_class;
+                try {
+                    if (get_class_short_name(App::make($_class)) === studlyName($routeName)) {
+                        $models[] = $_class;
+                    }
+                } catch (\Exception $e) {
+                    // TODO: get only classes
                 }
             }
         }
