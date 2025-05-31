@@ -20,7 +20,7 @@ export const makeInputFetchProps = propsFactory({
   },
   page: {
     type: Number,
-    default: 1
+    default: null
   },
   lastPage: {
     type: Number,
@@ -43,7 +43,7 @@ export default function useInputFetch(props, context) {
   const loading = ref(false)
 
   const rawEndpoint = ref(getURLWithoutQuery(props.endpoint))
-  const page = ref(props.page || 1)
+  const page = ref(props.page || null)
   const lastPage = ref(props.lastPage || -1)
   const search = ref('')
 
@@ -53,7 +53,7 @@ export default function useInputFetch(props, context) {
   const queryParameters = computed(() => {
     let query = new URLSearchParams({
       ...defaultQueryParameters.value,
-      page: page.value,
+      ...(!!page.value ? {page: page.value} : {}),
       itemsPerPage: props.itemsPerPage,
       ...(!!search.value ? {search: search.value} : {})
     })
