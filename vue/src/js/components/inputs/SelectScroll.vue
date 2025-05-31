@@ -52,15 +52,7 @@ export default {
     },
   },
   setup (props, context) {
-    const initializeInput = (val) => {
-      __log(val)
-
-      return val
-    }
-    const inputHook = useInput(props, {
-      ...context,
-      initializeInput
-    })
+    const inputHook = useInput(props, context)
     const inputFetchHook = useInputFetch(props, {
       ...context,
       input: inputHook.input
