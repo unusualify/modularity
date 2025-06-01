@@ -43,8 +43,8 @@
           </template>
         </v-card-item>
 
-        <v-card-text>
-          Lorem ipsum dolor sit amet consteqtequr Lorem ipsum
+        <v-card-text v-if="description">
+          {{ description }}
         </v-card-text>
 
         <v-card-text v-if="stats">
@@ -58,10 +58,6 @@
               <div :class="`text-body-2 text-${stat.color || 'primary'}`">{{ stat.label }}</div>
             </v-col>
           </v-row>
-        </v-card-text>
-
-        <v-card-text v-if="description">
-          {{ description }}
         </v-card-text>
       </v-card>
     </template>
