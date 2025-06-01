@@ -27,6 +27,7 @@ trait TableFilters
             'name' => ___('listing.filter.all-items'),
             'slug' => 'all',
             'methods' => 'getCountByStatusSlug',
+            'force' => true,
             'params' => ['all', $scope],
         ];
 
