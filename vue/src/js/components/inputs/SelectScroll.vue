@@ -17,11 +17,12 @@
 
     :loading="loading"
     :readonly="$attrs.readonly || readonly || loading"
+    :hide-no-data="loading"
 
     :rules="rules"
   >
     <template v-slot:append-item>
-      <div v-if="lastPage > 0 && lastPage > page" v-intersect="endIntersect" />
+      <div v-if="lastPage > 0 && lastPage >= nextPage" v-intersect="endIntersect" />
     </template>
     <template
       v-for="(context, slotName) in $slots" v-slot:[slotName]="slotScope"
@@ -65,7 +66,7 @@ export default {
   },
   data () {
     return {
-      noFilter: this.componentType == 'v-autocomplete' ? true : null,
+      noFilter: this.lastPage > 0 && this.lastPage >= this.nextPage,
     }
   },
   methods: {
