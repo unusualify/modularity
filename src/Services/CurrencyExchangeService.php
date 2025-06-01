@@ -69,10 +69,10 @@ class CurrencyExchangeService
         }
 
         if ($round == 'ceil') {
-            return ceil($amount * $rates[$targetCurrency]);
+            return ceil($amount * $rates[$targetCurrency], $decimals);
         }
         if ($round == 'floor') {
-            return floor($amount * $rates[$targetCurrency]);
+            return floor($amount * $rates[$targetCurrency], $decimals);
         }
 
         return round($amount * $rates[$targetCurrency], $decimals);
@@ -81,7 +81,7 @@ class CurrencyExchangeService
     /**
      * Get exchange rate for a specific currency.
      */
-    public function getExchangeRate(string $currency): float
+    public function getExchangeRate(string $currency, int $decimals = 2, string $round = 'round'): float
     {
         $rates = $this->fetchExchangeRates();
 
@@ -89,6 +89,12 @@ class CurrencyExchangeService
             throw new \Exception("Unsupported currency: {$currency}");
         }
 
-        return $rates[$currency];
+        if ($round == 'ceil') {
+            return ceil($rates[$currency]);
+        }
+        if ($round == 'floor') {
+            return floor($rates[$currency], $decimals);
+        }
+        return round($rates[$currency], $decimals);
     }
 }

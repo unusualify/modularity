@@ -39,7 +39,7 @@ class CurrencyExchangeController extends Controller
             'currency' => 'required|string|size:3',
         ]);
         try {
-            $converted = $this->currencyService->convertTo($request->amount, mb_strtoupper($request->currency));
+            $converted = $this->currencyService->convertTo($request->amount, mb_strtoupper($request->currency), decimals: 2, round: 'round');
 
             return response()->json([
                 'converted_amount' => $converted,
