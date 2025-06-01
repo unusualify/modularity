@@ -48,6 +48,7 @@ class DefaultPermissionsSeeder extends Seeder
                 'Payment',
                 'Notification',
                 'MyNotification',
+                'Country',
             ], $modularityAuthGuardName),
         ]);
 
@@ -67,6 +68,7 @@ class DefaultPermissionsSeeder extends Seeder
             'currency_forceDelete', 'currency_bulkForceDelete',
             'price-type_forceDelete', 'price-type_bulkForceDelete',
             'payment_forceDelete', 'payment_bulkForceDelete',
+            'country_forceDelete', 'country_bulkForceDelete',
         ]));
 
         // Manager gets operational permissions
@@ -78,19 +80,21 @@ class DefaultPermissionsSeeder extends Seeder
             'currency_view', 'currency_create', 'currency_edit',
             'price-type_view', 'price-type_create', 'price-type_edit',
             'payment_view', 'payment_create', 'payment_edit',
+            'country_view', 'country_create', 'country_edit',
         ]);
 
         // Editor gets content-related permissions
         $roleInstances['editor']->givePermissionTo([
             'dashboard', 'mediaLibrary',
             'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete',
-
+            'country_view'
         ]);
 
         // Reporter gets view-only permissions
         $roleInstances['reporter']->givePermissionTo([
             'dashboard', 'mediaLibrary',
             'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete',
+            'country_view'
         ]);
 
         // Client Manager gets client-specific permissions
@@ -99,6 +103,7 @@ class DefaultPermissionsSeeder extends Seeder
             'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete',
             'user_view', 'user_create', 'user_edit', 'user_delete',
             'payment_view', 'payment_create',
+            'country_view'
         ]);
 
         // Client Assistant gets limited client permissions
@@ -107,6 +112,7 @@ class DefaultPermissionsSeeder extends Seeder
             'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete',
             'user_view',
             'payment_view',
+            'country_view'
         ]);
 
     }
