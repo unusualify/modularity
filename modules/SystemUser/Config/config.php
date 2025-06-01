@@ -122,21 +122,25 @@ return [
                     ],
                 ],
                 [
-                    'type' => 'select-scroll',
-                    'componentType' => 'v-combobox',
+                    'type' => 'combobox',
                     'label' => 'Roles',
                     'name' => 'roles',
+                    'chips' => true,
+                    'itemTitle' => 'title',
                     'col' => [
                         'cols' => 12,
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'itemTitle' => 'title',
-                    'endpoint' => [
-                        'admin.system.system_user.role.index',
-                    ],
                     'rules' => 'required',
                     'editable' => false,
+                    'connector' => 'SystemUser:Role|repository:list:column=title',
+
+                    // 'type' => 'select-scroll',
+                    // 'page' => 1,
+                    // 'endpoint' => [
+                    //     'admin.system.system_user.role.index',
+                    // ],
                 ],
             ],
         ],
