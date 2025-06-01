@@ -133,7 +133,6 @@ abstract class Request extends FormRequest
         if (! $localeActive) {
             $rules = $this->updateRules($rules, $fields, reset($locales));
         }
-        dd($rules);
 
         return $rules;
     }
