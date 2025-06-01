@@ -15,6 +15,8 @@ class DefaultCountrySeeder extends Seeder
     {
         Schema::disableForeignKeyConstraints();
 
+        config(['translatable.locales' => ['en', 'tr']]);
+
         Country::truncate();
         $countries = [
             ['id' => 1, 'code' => 'AF', 'en' => ['name' => 'Afghanistan'], 'tr' => ['name' => 'Afganistan'], 'phone_code' => 93],
