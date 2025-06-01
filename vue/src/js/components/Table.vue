@@ -98,7 +98,7 @@
               />
             </div>
 
-            <v-divider v-if="controlsPosition === 'bottom' || $vuetify.display.smAndDown" class="my-3"></v-divider>
+            <v-divider v-if="controlsPosition === 'bottom' || $vuetify.display.smAndDown" class="my-2"></v-divider>
 
             <!-- table controls -->
             <v-slide-x-transition :group="true">
@@ -264,7 +264,7 @@
             indeterminate
             reverse
           ></v-progress-linear>
-          <v-divider v-else-if="controlsPosition === 'top' && $vuetify.display.mdAndUp" class="mb-4 mt-2"></v-divider>
+          <v-divider v-else-if="controlsPosition === 'top' && $vuetify.display.mdAndUp" class="mb-2 mt-2"></v-divider>
 
 
           <!-- form modal -->
