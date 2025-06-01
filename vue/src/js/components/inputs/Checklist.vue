@@ -212,7 +212,7 @@
                   v-if="isCard"
                   v-model="input"
                   :value="item[itemValue]"
-                  :class="getCheckboxClasses(item)"
+                  :class="[getCheckboxClasses(item), 'h-100']"
                   :color="checkboxColor"
                   :title="item[itemTitle]"
                   :description="item.description"
