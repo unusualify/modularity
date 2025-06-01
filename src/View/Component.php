@@ -395,7 +395,7 @@ class Component extends LaravelComponent
     {
         $instance = new static;
 
-        if (preg_match('/make([V|Ue][A-Za-z]{1,20}|Template|Div)/', $method, $match)) {
+        if (preg_match('/make([V|Ue][A-Za-z]{1,20}|Template|Div|Span)/', $method, $match)) {
             $tag = $instance->getKebabCase($match[1]);
 
             return $instance->makeComponent($tag, ...$args);
