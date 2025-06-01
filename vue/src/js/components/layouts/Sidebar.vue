@@ -103,7 +103,7 @@
               <v-tooltip text="Logout" location="top" :disabled="!(rail && !isHoverable)">
                 <template v-slot:activator="tooltipActivator">
                   <div v-bind="tooltipActivator.props">
-                    <v-list-item prepend-icon="mdi-logout" v-bind="props">
+                    <v-list-item prepend-icon="mdi-logout" v-bind="props" :disabled="$store.getters.isGuest">
                       {{ $t("authentication.logout") }}
                     </v-list-item>
                   </div>
@@ -114,7 +114,7 @@
           </ue-logout-modal>
 
           <!-- About Dialog -->
-          <v-dialog ref="aboutDialog" max-width="500" v-if="$store.getters.versions && !$store.getters.isClient && !$store.getters.isSuperAdmin">
+          <v-dialog ref="aboutDialog" max-width="500" v-if="$store.getters.versions && !$store.getters.isGuest && !$store.getters.isClient && !$store.getters.isSuperAdmin">
             <template v-slot:activator="{ props: activatorProps }">
               <v-list-item prepend-icon="mdi-information" v-bind="activatorProps">
                 {{ $t("About") }}
