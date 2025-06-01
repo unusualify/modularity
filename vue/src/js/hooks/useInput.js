@@ -79,8 +79,12 @@ export default function useInput (props, context) {
       get: () => {
         let _val = modelValue.value ?? props?.default ?? props?.obj?.schema?.default ?? []
 
-        if(Array.isArray(_val) && Object.prototype.hasOwnProperty.call(props, 'multiple') && !_val.multiple && _val.length === 0){
+        if(Array.isArray(_val) && Object.prototype.hasOwnProperty.call(props, 'multiple') && !props.multiple && _val.length === 0){
           _val = !Array.isArray(modelValue.value) ? modelValue.value : null
+        }
+
+        if(!Array.isArray(_val) && Object.prototype.hasOwnProperty.call(props, 'multiple') && props.multiple){
+          _val = []
         }
 
         return context.initializeInput ? context.initializeInput(_val) : _val
