@@ -227,6 +227,7 @@ return [
             'default' => '',
             'col' => ['sm' => 6],
             'rules' => 'sometimes|email',
+            'spreadable' => true,
         ],
 
     ],

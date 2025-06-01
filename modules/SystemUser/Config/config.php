@@ -1541,6 +1541,7 @@ return [
                     'label' => 'Work E-mail',
                     'default' => '',
                     'col' => ['sm' => 6],
+                    'spreadable' => true,
                 ],
                 // [
                 //     'type' => 'text',
