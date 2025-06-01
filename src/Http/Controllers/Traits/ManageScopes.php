@@ -281,9 +281,8 @@ trait ManageScopes
 
         if ($this->request->has('sortBy')) {
 
-            foreach ($this->request->get('sortBy') as $str) {
-                $sort = json_decode($str);
-                // dd($sort);
+            foreach ($this->request->get('sortBy') as $object) {
+                $sort = is_array($object) ? (object) $object : json_decode($object);
 
                 if (preg_match('/(.*)(_timestamp)/', $sort->key, $matches)) {
                     $sort->key = $matches[1];
