@@ -20,7 +20,7 @@ export const makeInputFetchProps = propsFactory({
   },
   page: {
     type: Number,
-    default: null
+    default: 1
   },
   lastPage: {
     type: Number,
