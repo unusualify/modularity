@@ -43,9 +43,9 @@ export default function useInputFetch(props, context) {
   const loading = ref(false)
 
   const rawEndpoint = ref(getURLWithoutQuery(props.endpoint))
-  const activePage = ref(props.page || null)
-  const lastPage = ref(props.lastPage || -1)
-  const nextPage = ref(props.lastPage > 0 ? props.lastPage + 1 : props.page || null)
+  const activePage = ref(props.page || 1)
+  const activeLastPage = ref(props.lastPage || -1)
+  const nextPage = ref(activeLastPage.value > 0 ? activeLastPage.value + 1 : props.page || 1)
   const search = ref('')
 
   const elements = ref(props.items || [])
@@ -68,7 +68,7 @@ export default function useInputFetch(props, context) {
 
   const getItemsFromApi = async () => {
 
-    if( !(nextPage.value > lastPage.value) || lastPage.value < 0){
+    if( !(nextPage.value > activeLastPage.value) || activeLastPage.value < 0){
       loading.value = true;
 
       return new Promise(() => {
@@ -78,15 +78,14 @@ export default function useInputFetch(props, context) {
 
             if(response.status == 200){
 
-              if(lastPage.value < 0)
-                lastPage.value = response.data.resource.last_page
+              if(activeLastPage.value < 0)
+                activeLastPage.value = response.data.resource.last_page
 
               if(search.value == ''){
                 elements.value = elements.value.concat(response.data.resource.data ?? []);
               }else{
                 elements.value = response.data.resource.data ?? []
               }
-
               // page.value++;
 
               activePage.value = response.data.resource.current_page
@@ -121,7 +120,7 @@ export default function useInputFetch(props, context) {
                     },
                     {
                       key: 'lastPage',
-                      value: lastPage.value
+                      value: activeLastPage.value
                     },
                     {
                       key: 'page',
@@ -129,7 +128,10 @@ export default function useInputFetch(props, context) {
                     }
                   ])
                 }
+              }else{
+                loading.value = false;
               }
+
             }
           })
       })
@@ -149,7 +151,7 @@ export default function useInputFetch(props, context) {
     }
 
     search.value = searchVal
-    page.value = 1
+    activePage.value = 1
     nextPage.value = 1
     lastPage.value = -1
 
@@ -165,6 +167,7 @@ export default function useInputFetch(props, context) {
     elements,
     getItemsFromApi,
     activePage,
+    activeLastPage,
     nextPage,
     searchOnInputFetch
   }
