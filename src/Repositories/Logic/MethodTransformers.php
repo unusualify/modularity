@@ -143,6 +143,12 @@ trait MethodTransformers
     {
         $this->countScope = $scope;
 
+        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
+            if (($count = $this->$method($slug)) !== false) {
+                return $count;
+            }
+        }
+
         switch ($slug) {
             case 'all':
                 return $this->getCountForAll();
@@ -152,12 +158,6 @@ trait MethodTransformers
                 return $this->getCountForDraft();
             case 'trash':
                 return $this->getCountForTrash();
-        }
-
-        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
-            if (($count = $this->$method($slug)) !== false) {
-                return $count;
-            }
         }
 
         return 0;
@@ -333,6 +333,22 @@ trait MethodTransformers
         }
 
         return $fields;
+    }
+
+    /**
+     * Get Table Default Filters on the Route Controller
+     *
+     * @return array
+     */
+    public function getTableFilters($scope = [])
+    {
+        $tableFilters = [];
+
+        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
+            $tableFilters = array_merge($tableFilters, $this->$method($scope));
+        }
+
+        return $tableFilters;
     }
 
     /**

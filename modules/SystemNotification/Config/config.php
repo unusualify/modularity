@@ -266,7 +266,6 @@ return [
                 [
                     'title' => 'Read',
                     'key' => 'is_read',
-
                     'formatter' => [
                         'status',
                     ],

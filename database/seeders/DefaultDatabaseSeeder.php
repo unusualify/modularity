@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Modules\SystemPayment\Database\Seeders\SystemPaymentDatabaseSeeder;
 
 class DefaultDatabaseSeeder extends Seeder
 {
@@ -19,6 +20,7 @@ class DefaultDatabaseSeeder extends Seeder
             DefaultVatRateSeeder::class,
             DefaultPriceTypeSeeder::class,
             DefaultCountrySeeder::class,
+            SystemPaymentDatabaseSeeder::class,
         ]);
     }
 }

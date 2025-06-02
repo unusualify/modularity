@@ -73,8 +73,9 @@
 
         <!-- Total Amount Display -->
         <v-card-title class="headline">
-          <p class="total">{{ $t('Total Amount') }}</p>
-          <p class="amount">{{ displayPrice }}</p>
+          <p class="total mb-2">{{ $t('Total Amount') }}</p>
+          <p class="amount mb-2">{{ displayPrice }}</p>
+          <p class="" v-if="isExchanged">{{ $t('Exchange Rate') }}: ~{{ exchangeRate }}</p>
         </v-card-title>
       </v-col>
 
@@ -161,6 +162,10 @@ export default {
     currencyCardTypes: {
       type: [Object, Proxy, Array],
       default: () => ({})
+    },
+    baseCurrency: {
+      type: String,
+      default: 'EUR'
     }
   },
 
@@ -220,6 +225,12 @@ export default {
       set: (newValue) => emit('update:modelValue', newValue)
     });
 
+    const isExchanged = computed(() =>
+      selectedCurrencyObj.value?.iso_4217 !== props.baseCurrency
+    );
+
+    const exchangeRate = ref(0);
+
     // Methods
     const handleCurrencyChange = async (newCurrencyId) => {
       selectedCurrency.value = newCurrencyId;
@@ -233,6 +244,8 @@ export default {
           currency: selectedCurrencyObject.iso_4217,
           amount: props.price_object.discounted_raw_amount / 100
         });
+
+        exchangeRate.value = response.data.exchange_rate;
 
         const calculatedAmount = response.data.converted_amount * ( 1 + props.price_object.vat_multiplier);
 
@@ -278,6 +291,8 @@ export default {
       handleCurrencyChange,
       displayPrice,
       selectedService,
+      exchangeRate,
+      isExchanged,
     };
   }
 };

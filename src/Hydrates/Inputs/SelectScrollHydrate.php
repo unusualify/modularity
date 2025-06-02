@@ -15,10 +15,10 @@ class SelectScrollHydrate extends InputHydrate
     public $requirements = [
         'itemValue' => 'id',
         'itemTitle' => 'name',
-        'default' => [],
         'cascadeKey' => 'items',
         'returnObject' => false,
         'itemsPerPage' => 10,
+        'multiple' => false,
     ];
 
     /**
@@ -38,10 +38,11 @@ class SelectScrollHydrate extends InputHydrate
             throw new \Exception('Endpoint is required ' . $input['name']);
         }
 
-        $input['componentType'] = 'v-autocomplete';
+        $input['componentType'] ??= 'v-autocomplete';
         $input['type'] = 'input-select-scroll';
         // unset($input['ext']);
 
+        $input['default'] = $input['multiple'] ? [] : null;
         $input['items'] = [];
         $input['noRecords'] = true;
 

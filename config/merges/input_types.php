@@ -13,7 +13,7 @@ return [
                 'value' => $locale,
                 'label' => getLabelFromLocale($locale, true),
             ];
-        }, modularityConfig('available_user_locales', ['en', 'tr'])),
+        }, modularityConfig('available_user_locales', ['en'])),
         'rules' => 'sometimes:required',
     ],
     '_timezone' => [
@@ -80,5 +80,11 @@ return [
         'name' => 'published',
         'label' => 'Status',
         'default' => true,
+    ],
+    '_timezone' => [
+        'type' => 'hidden',
+        'name' => '_timezone',
+        'default' => 'Europe/London',
+        'id' => 'timezone_session',
     ],
 ];

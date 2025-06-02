@@ -21,8 +21,10 @@ class LanguageMiddleware
         if ($request->user() && $request->user()->language) {
             $locale = $request->user()->language;
         } else {
-            if (mb_strtolower(geoip()->getLocation($request->ip())->iso_code) === 'tr') {
-                $locale = 'tr';
+            if (env('AUTO_LOCALE_FINDER', false)) {
+                if (mb_strtolower(geoip()->getLocation($request->ip())->iso_code) === 'tr') {
+                    $locale = 'tr';
+                }
             }
         }
 

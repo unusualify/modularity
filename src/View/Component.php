@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\View;
 
 use BadMethodCallException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Config;
 use Illuminate\View\Component as LaravelComponent;
 use Unusualify\Modularity\Traits\ManageNames;
 
@@ -55,6 +56,13 @@ class Component extends LaravelComponent
 
     public static function create($config)
     {
+        if (isset($config['widgetAlias'])) {
+            $config = array_merge_recursive_preserve(
+                Config::get('modularity.widgets.' . $config['widgetAlias'], []),
+                array_except($config, ['widgetAlias'])
+            );
+        }
+
         if (! (isset($config['widget']) || isset($config['component']) || isset($config['tag']))) {
             throw new \Exception('Widget, component or tag is required for component creation');
         }
@@ -69,6 +77,8 @@ class Component extends LaravelComponent
 
             $widget = $widgetClass::make();
 
+            $alias = $config['widgetAlias'] ?? null;
+
             $component = $widget->useWidgetConfig()
                 ->mergeSlots($config['slots'] ?? [])
                 ->setWidgetCol(array_merge_recursive_preserve(
@@ -82,8 +92,13 @@ class Component extends LaravelComponent
                 ->setWidgetSlots(array_merge_recursive_preserve(
                     $widget->widgetSlots ?? [],
                     $config['widgetSlots'] ?? [],
-                ))
-                ->mergeAttributes($config['attributes'] ?? []);
+                ));
+
+            if ($alias) {
+                $component->setWidgetAlias($alias);
+            }
+
+            $component->mergeAttributes($config['attributes'] ?? []);
 
         } elseif (isset($config['component'])) {
             $component->setComponent($config['component'])
@@ -379,7 +394,7 @@ class Component extends LaravelComponent
     {
         $instance = new static;
 
-        if (preg_match('/make([V|Ue][A-Za-z]{1,20}|Template|Div)/', $method, $match)) {
+        if (preg_match('/make([V|Ue][A-Za-z]{1,20}|Template|Div|Span)/', $method, $match)) {
             $tag = $instance->getKebabCase($match[1]);
 
             return $instance->makeComponent($tag, ...$args);

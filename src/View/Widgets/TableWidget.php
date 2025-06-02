@@ -21,8 +21,6 @@ class TableWidget extends ModularityWidget
     ];
 
     public $attributes = [
-        'class' => 'h-100',
-
         'createOnModal' => false,
         'editOnModal' => false,
 
@@ -39,7 +37,6 @@ class TableWidget extends ModularityWidget
 
         'showSelect' => false,
         'style' => '',
-        'class' => 'elevation-2',
 
         'tableOptions' => [
             'page' => 1,
@@ -51,7 +48,9 @@ class TableWidget extends ModularityWidget
         ],
         'noFullScreen' => true,
 
-        'tableClasses' => 'elevation-2',
+        'class' => '',
+        'elevation' => 2,
+        'rounded' => true,
         'toolbarOptions' => [
             'color' => 'transparent', // rgb(255,255,255,1) or utility colors like white, purple
             'border' => false, // false, 'xs', 'sm', 'md', 'lg', 'xl'.
@@ -61,6 +60,9 @@ class TableWidget extends ModularityWidget
             'elevation' => 0, // string or number refers to elevation
             'image' => '', // image link for the background of the toolbar
             // 'height' => '90',
+        ],
+        'paginationOptions' => [
+            'footerComponent' => 'vuePagination',
         ],
     ];
 

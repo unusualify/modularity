@@ -79,7 +79,7 @@
               }
             ]"
             :item-fields="['title', 'value']"
-            :col-classes="['text-h5 font-weight-medium', 'd-flex justify-end']"
+            :col-classes="['text-h5 font-weight-medium text-wrap', 'd-flex justify-end']"
             :col-ratios="[1,2]"
           >
               <template v-slot:field.1="slotScope">
@@ -124,7 +124,7 @@
               :item-fields="['title', 'value']"
               :col-classes="['font-weight-medium text-wrap', 'd-flex justify-start']"
               item-classes="text-body-2"
-              :col-ratios="[1,2]"
+              :col-ratios="[5,7]"
               vertical-align-top
             >
               <template v-slot:field.1="slotScope">
@@ -136,6 +136,11 @@
                     image-size="24"
                     style="width: 155px;"
                   />
+                  <template
+                    v-else-if="(formInput.type === 'text' && formInput.ext === 'date') || (formInput.type === 'date-input')"
+                  >
+                    {{ slotScope.value ? $d(slotScope.value, 'numeric') : '' }}
+                  </template>
                   <template
                     v-else
                     class="text-subtitle-1"

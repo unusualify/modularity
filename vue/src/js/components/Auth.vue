@@ -174,11 +174,12 @@ export default {
       // must use .value
 
       switch (name.value) {
-        case 'xs': return 400
-        case 'md': return 400
+        case 'xs': return 300
+        case 'sm': return 450
+        case 'md': return 450
         case 'lg': return 500
         case 'xl': return 600
-        default: return 400
+        default: return 300
       }
     })
 

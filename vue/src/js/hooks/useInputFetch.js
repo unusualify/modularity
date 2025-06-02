@@ -43,8 +43,9 @@ export default function useInputFetch(props, context) {
   const loading = ref(false)
 
   const rawEndpoint = ref(getURLWithoutQuery(props.endpoint))
-  const page = ref(props.page || 1)
-  const lastPage = ref(props.lastPage || -1)
+  const activePage = ref(props.page || 1)
+  const activeLastPage = ref(props.lastPage || -1)
+  const nextPage = ref(activeLastPage.value > 0 ? activeLastPage.value + 1 : props.page || 1)
   const search = ref('')
 
   const elements = ref(props.items || [])
@@ -53,7 +54,7 @@ export default function useInputFetch(props, context) {
   const queryParameters = computed(() => {
     let query = new URLSearchParams({
       ...defaultQueryParameters.value,
-      page: page.value,
+      ...(!!nextPage.value ? {page: nextPage.value} : {}),
       itemsPerPage: props.itemsPerPage,
       ...(!!search.value ? {search: search.value} : {})
     })
@@ -67,27 +68,28 @@ export default function useInputFetch(props, context) {
 
   const getItemsFromApi = async () => {
 
-    if( !(page.value > lastPage.value) || lastPage.value < 0){
+    if( !(nextPage.value > activeLastPage.value) || activeLastPage.value < 0){
       loading.value = true;
 
       return new Promise(() => {
         axios.get(fullUrl.value)
           .then(response => {
 
-            loading.value = false;
 
             if(response.status == 200){
 
-              if(lastPage.value < 0)
-                lastPage.value = response.data.resource.last_page
+              if(activeLastPage.value < 0)
+                activeLastPage.value = response.data.resource.last_page
 
               if(search.value == ''){
                 elements.value = elements.value.concat(response.data.resource.data ?? []);
               }else{
                 elements.value = response.data.resource.data ?? []
               }
+              // page.value++;
 
-              page.value++;
+              activePage.value = response.data.resource.current_page
+              nextPage.value = response.data.resource.current_page + 1
 
               if(!!context.input.value){
                 let searchContinue = false;
@@ -109,6 +111,8 @@ export default function useInputFetch(props, context) {
                 if(searchContinue)
                   getItemsFromApi()
                 else {
+                  loading.value = false;
+
                   context.emit('update:input', [
                     {
                       key: 'items',
@@ -116,15 +120,18 @@ export default function useInputFetch(props, context) {
                     },
                     {
                       key: 'lastPage',
-                      value: lastPage.value
+                      value: activeLastPage.value
                     },
                     {
                       key: 'page',
-                      value: page.value
+                      value: activePage.value
                     }
                   ])
                 }
+              }else{
+                loading.value = false;
               }
+
             }
           })
       })
@@ -144,7 +151,8 @@ export default function useInputFetch(props, context) {
     }
 
     search.value = searchVal
-    page.value = 1
+    activePage.value = 1
+    nextPage.value = 1
     lastPage.value = -1
 
     if(search.value == ''){
@@ -158,6 +166,9 @@ export default function useInputFetch(props, context) {
     loading,
     elements,
     getItemsFromApi,
+    activePage,
+    activeLastPage,
+    nextPage,
     searchOnInputFetch
   }
 

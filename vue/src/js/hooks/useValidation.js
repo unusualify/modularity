@@ -164,6 +164,10 @@ export default function useValidation (props) {
         const today = new Date();
         const futureDate = new Date(today);
 
+        if(_.isString(interval)) {
+          interval = parseInt(interval)
+        }
+
         switch (unit.toLowerCase()) {
             case 'minutes':
                 futureDate.setMinutes(today.getMinutes() + interval);

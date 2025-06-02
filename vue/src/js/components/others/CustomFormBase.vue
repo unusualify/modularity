@@ -472,7 +472,8 @@ const typeToComponent = {
   file: 'v-file-input',
   switch: 'v-switch',
   checkbox: 'v-checkbox',
-  card: 'v-card'
+  card: 'v-card',
+  hidden: 'input'
   /*
     HOW TO USE CUSTOM Components
     1)

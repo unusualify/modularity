@@ -67,6 +67,15 @@ export default {
     'secondary-darken-5': '#8E3515',  // R:142 G:53  B:21
     'secondary-darken-6': '#7C2F13',  // R:124 G:47  B:19
 
+    'on-secondary': '#FFFFFF',
+    'on-secondary-lighten-1': '#FFFFFF',
+    'on-secondary-lighten-2': '#FFFFFF',
+    'on-secondary-darken-1': '#FFFFFF',
+    'on-secondary-darken-2': '#FFFFFF',
+    'on-secondary-darken-3': '#FFFFFF',
+    'on-secondary-darken-4': '#FFFFFF',
+    'on-secondary-darken-5': '#FFFFFF',
+
     grey: '#768184',                // R:118 G:129 B:132
     'grey-lighten-1': '#879092',    // R:135 G:144 B:146
     'grey-lighten-2': '#999FA1',    // R:153 G:159 B:161
@@ -91,6 +100,13 @@ export default {
     'grey-accent-7': '#171D1E',     // R:23  G:29  B:30
 
 
+    'on-green-lighten-1': '#FFFFFF',
+    'on-green-lighten-2': '#FFFFFF',
+    'on-green-lighten-3': '#FFFFFF',
+    'on-green-lighten-4': '#FFFFFF',
+    'on-green-lighten-5': '#FFFFFF',
+    'on-green-lighten-6': '#FFFFFF',
+
     // surface: '#FFFFFF',
     // 'surface-bright': '#FFFFFF',
     // 'surface-light': '#EEEEEE',
@@ -99,9 +115,6 @@ export default {
 
     // secondary: '#F08712',
     // 'secondary-darken-1': '#018786',
-
-
-
 
 
     // // State colors

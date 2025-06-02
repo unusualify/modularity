@@ -29,6 +29,14 @@ export const makeTableFiltersProps = propsFactory({
     type: Object,
     default: {},
   },
+  hideFilters: {
+    type: Boolean,
+    default: false,
+  },
+  hideAdvancedFilters: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 export default function useTableFilters(props) {

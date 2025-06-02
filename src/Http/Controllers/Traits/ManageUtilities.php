@@ -125,6 +125,7 @@ trait ManageUtilities
         $formAttributes = $this->formAttributes;
 
         $data = [
+            'model' => $item,
             'translate' => $this->routeHas('translations') || $this->hasTranslatedInput(),
             'formAttributes' => array_merge([
                 'modelValue' => array_merge(

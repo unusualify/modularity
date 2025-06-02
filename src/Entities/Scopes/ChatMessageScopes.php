@@ -25,4 +25,11 @@ trait ChatMessageScopes
             $query->role(['client-manager', 'client-assistant']);
         });
     }
+
+    public function scopeFromCreator(Builder $query, $creatorId, $creatorType): Builder
+    {
+        return $query->whereHas('creator', function (Builder $query) use ($creatorId, $creatorType) {
+            $query->where('creator_id', $creatorId)->where('creator_type', $creatorType);
+        });
+    }
 }

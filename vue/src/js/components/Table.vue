@@ -1,5 +1,12 @@
 <template>
-  <v-layout fluid v-resize="onResize" :class="[noFullScreen ? 'h-100' : '']">
+  <v-layout fluid v-resize="onResize"
+    :class="[
+      noFullScreen ? 'h-100' : '',
+      rounded ? $lodash.isBoolean(rounded) ? 'rounded' : `rounded-${rounded}` : '',
+      elevation ? `elevation-${elevation}` : '',
+    ]"
+    :style="$vuetify.display.lgAndUp ? 'max-height: calc(100vh - 24px)' : 'max-height: calc(100vh - 24px - 64px)'"
+    >
     <div :class="['ue-datatable__container', noFullScreen ? 'fill-height' : 'fill-heigh ue-datatable--full-screen' ]">
       <ActiveTableItem
         class=""
@@ -15,7 +22,9 @@
         :class="[
           'px-4 h-100',
           tableClasses,
+          rounded ? $lodash.isBoolean(rounded) ? 'rounded' : `rounded-${rounded}` : '',
           fullWidthWrapper ? '' : 'ue-table--narrow-wrapper',
+          tableElevation ? `elevation-${tableElevation}` : '',
           striped ? 'ue-datatable--striped' : '',
           roundedRows ? 'ue-datatable--rounded-row' : '',
           hideBorderRow ? 'ue-datatable--no-border-row' : '',
@@ -89,7 +98,7 @@
               />
             </div>
 
-            <v-divider v-if="controlsPosition === 'bottom' || $vuetify.display.smAndDown" class="my-3"></v-divider>
+            <v-divider v-if="controlsPosition === 'bottom' || $vuetify.display.smAndDown" class="my-2"></v-divider>
 
             <!-- table controls -->
             <v-slide-x-transition :group="true">
@@ -155,7 +164,7 @@
                       <v-menu>
                         <template v-slot:activator="{ props }">
                           <!-- filter button -->
-                          <v-btn v-if="mainFilters.length > 0"
+                          <v-btn v-if="mainFilters.length > 0 && !hideFilters"
                             id="filter-btn-activator"
                             v-bind="{...filterBtnOptions, ...filterBtnTitle, ...props}"
                             :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
@@ -189,7 +198,7 @@
                       >
                         <template v-slot:activator="{ props }">
                           <!-- advanced filter button -->
-                          <v-btn v-if="Object.keys(advancedFilters).length > 0"
+                          <v-btn v-if="Object.keys(advancedFilters).length > 0 && !hideAdvancedFilters"
                             id="advanced-filter-btn"
                             v-bind="{...filterBtnOptions, ...filterBtnTitle, ...props}"
                             :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
@@ -255,7 +264,7 @@
             indeterminate
             reverse
           ></v-progress-linear>
-          <v-divider v-else-if="controlsPosition === 'top' && $vuetify.display.mdAndUp" class="mb-4 mt-2"></v-divider>
+          <v-divider v-else-if="controlsPosition === 'top' && $vuetify.display.mdAndUp" class="mb-2 mt-2"></v-divider>
 
 
           <!-- form modal -->
@@ -542,12 +551,79 @@
 
         <!-- MARK PAGINATION BUTTONS -->
         <template v-if="enableCustomFooter" v-slot:bottom="{page, pageCount}">
-          <div class="d-flex justify-end">
-            <v-pagination
-              v-model="options.page"
-              :length="pageCount"
-              v-bind="footerProps"
-            />
+          <div class="d-flex justify-end py-4">
+            <v-container class="max-width text-center">
+              <v-pagination v-if="!loading"
+                v-model="options.page"
+                :length="totalNumberOfPages"
+
+                density="compact"
+                size="small"
+                total-visible="3"
+                show-first-last-page
+                v-bind="footerProps"
+              >
+                <template #first="{ onClick, disabled, icon }">
+                  <v-btn
+                    v-bind="defaultPaginationButtonProps"
+                    icon="mdi-chevron-double-left"
+                    @click="onClick"
+                    :disabled="disabled"
+                  />
+                </template>
+                <template #prev="{ onClick, disabled, icon }">
+                  <v-btn
+                    v-bind="defaultPaginationButtonProps"
+                    :icon="icon"
+                    @click="onClick"
+                    :disabled="disabled"
+                  />
+                </template>
+                <!-- <template #item>
+                  <v-menu>
+                    <template #activator="{ props }">
+                      <v-btn
+                        v-bind="{ ...props, ...defaultPaginationButtonProps }"
+                        :icon="options.page"
+                        @click="onClick"
+                        :disabled="disabled"
+                      >
+                        {{ options.page }}
+                      </v-btn>
+                    </template>
+                    <v-list
+                      class="overflow-y-auto"
+                      max-height="200"
+                      >
+                      <v-list-item v-for="page in availablePages" :key="page" @click="options.page = page">
+                        {{ page }}
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+                </template> -->
+                <template #next="{ onClick, disabled, icon }">
+                  <v-btn
+                    v-bind="defaultPaginationButtonProps"
+                    :icon="icon"
+                    @click="onClick"
+                    :disabled="disabled"
+                  />
+                </template>
+                <template #last="{ onClick, disabled, icon }">
+                  <v-btn
+                    v-bind="defaultPaginationButtonProps"
+                    icon="mdi-chevron-double-right"
+                    @click="onClick"
+                    :disabled="disabled"
+                  />
+                </template>
+              </v-pagination>
+              <v-progress-circular v-else
+                width="3"
+                size="small"
+                indeterminate
+              ></v-progress-circular>
+            </v-container>
           </div>
         </template>
 

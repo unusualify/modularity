@@ -227,6 +227,7 @@ return [
             'default' => '',
             'col' => ['sm' => 6],
             'rules' => 'sometimes|email',
+            'spreadable' => true,
         ],
 
     ],
@@ -261,6 +262,9 @@ return [
         ],
     ],
     'login_shortcut' => [
+        'timezone' => [
+            'type' => '_timezone',
+        ],
         'email' => [
             'type' => 'email',
             'name' => 'email',
@@ -273,6 +277,9 @@ return [
         ],
     ],
     'login_form' => [
+        'timezone' => [
+            'type' => '_timezone',
+        ],
         'email' => [
             'type' => 'text',
             'name' => 'email',

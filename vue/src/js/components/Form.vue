@@ -216,26 +216,26 @@
                 ...(rightSlotMaxWidth ? {maxWidth: `${rightSlotMaxWidth}px`} : {})
               }"
             >
+              <slot name="right" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}">
+                <AdditionalSectionContent
+                  :actions-position="actionsPosition"
+                  :is-editing="isEditing"
+                  :form-item="formItem"
+                  :actions="actions"
+                  @action-complete="$emit('actionComplete', $event)"
+                >
+                  <template #right-top>
+                    <slot name="right.top" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                  </template>
+                  <template #right-middle>
+                    <slot name="right.middle" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                  </template>
+                  <template #right-bottom>
+                    <slot name="right.bottom" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                  </template>
+                </AdditionalSectionContent>
+              </slot>
             </div>
-            <slot name="right" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}">
-              <AdditionalSectionContent
-                :actions-position="actionsPosition"
-                :is-editing="isEditing"
-                :form-item="formItem"
-                :actions="actions"
-                @action-complete="$emit('actionComplete', $event)"
-              >
-                <template #right-top>
-                  <slot name="right.top" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
-                </template>
-                <template #right-middle>
-                  <slot name="right.middle" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
-                </template>
-                <template #right-bottom>
-                  <slot name="right.bottom" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
-                </template>
-              </AdditionalSectionContent>
-            </slot>
           </div>
 
           <!-- Mobile dialog/modal for right section -->
@@ -335,7 +335,7 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { useForm, makeFormProps } from '@/hooks'
@@ -554,6 +554,13 @@ export default {
         xl: '6',
         'order-lg': '1',
         'order-xl': '1'
+      }
+    })
+
+    onMounted(() => {
+      let timezoneInput = document.getElementById('timezone_session')
+      if (timezoneInput && useFormInstance.model.value && useFormInstance.model.value._timezone) {
+        useFormInstance.model.value._timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       }
     })
 

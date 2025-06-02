@@ -8,7 +8,6 @@
     :items="elements"
     :label="label"
     @update:search="searched"
-    :no-filter="noFilter"
     @input.native="getItemsFromApi"
     :multiple="multiple"
     :return-object="$attrs.returnObject ?? returnObject ?? false"
@@ -16,12 +15,14 @@
     :item-title="itemTitle"
 
     :loading="loading"
-    :readonly="$attrs.readonly || readonly || loading"
+    :readonly="$attrs.readonly || readonly || elements.length === 0"
+    :hide-no-data="loading"
+    :no-filter="noFilter"
 
-    :rules="rules ?? $attrs.rules ?? []"
+    :rules="rules"
   >
-  <template v-slot:append-item>
-      <div v-if="lastPage > 0 && lastPage > page" v-intersect="endIntersect" />
+    <template v-slot:append-item>
+      <div v-if="activeLastPage > 0 && activeLastPage >= nextPage" v-intersect="handleIntersect" />
     </template>
     <template
       v-for="(context, slotName) in $slots" v-slot:[slotName]="slotScope"
@@ -42,6 +43,10 @@ export default {
   props: {
     ...makeInputProps(),
     ...makeInputFetchProps(),
+    rules: {
+      type: Array,
+      default: () => []
+    },
     componentType: {
       type: String,
       default: 'v-autocomplete'
@@ -61,11 +66,11 @@ export default {
   },
   data () {
     return {
-      noFilter: this.componentType == 'v-autocomplete' ? true : null,
+      noFilter: this.activeLastPage > 0 && this.activeLastPage >= this.nextPage,
     }
   },
   methods: {
-    endIntersect(entries, observer, isIntersecting) {
+    handleIntersect(isIntersecting, entries, observer) {
       if (isIntersecting) {
         this.getItemsFromApi()
       }

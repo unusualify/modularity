@@ -101,16 +101,20 @@
           />
         </div>
         <div>
-          <div :class="valueClasses">
-            {{ value }}
-          </div>
-          <div :class="labelClasses">
-            <v-icon
-              v-if="icon"
-              :icon="icon"
-            />
-            {{ label }}
-          </div>
+          <slot name="value" v-bind="{ value, classes: valueClasses }">
+            <div :class="valueClasses">
+              {{ value }}
+            </div>
+          </slot>
+          <slot name="label" v-bind="{ label, classes: labelClasses, icon }">
+            <div :class="labelClasses">
+              <v-icon
+                v-if="icon"
+                :icon="icon"
+              />
+              {{ label }}
+            </div>
+          </slot>
         </div>
       </div>
     </v-card-text>
