@@ -83,7 +83,10 @@ trait StateableTrait
             $defaultStateCodes = array_column($defaultStates, 'code');
 
             if (in_array($slug, $defaultStateCodes)) {
-                $query = $model::where($scope);
+                $query = $model::query();
+                $scopes = [];
+
+                $this->filter($query, $scopes);
 
                 return $query->isStateableCount($slug);
             }

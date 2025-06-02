@@ -160,8 +160,6 @@ trait MethodTransformers
                 return $this->getCountForTrash();
         }
 
-
-
         return 0;
     }
 
