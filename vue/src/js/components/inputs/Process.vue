@@ -79,7 +79,7 @@
               }
             ]"
             :item-fields="['title', 'value']"
-            :col-classes="['text-h5 font-weight-medium', 'd-flex justify-end']"
+            :col-classes="['text-h5 font-weight-medium text-wrap', 'd-flex justify-end']"
             :col-ratios="[1,2]"
           >
               <template v-slot:field.1="slotScope">
