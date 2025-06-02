@@ -2,6 +2,102 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.31.0 - 2025-06-02
+
+### :rocket: Features
+
+- enhance pagination component with custom buttons and loading indicator by @OoBook in https://github.com/unusualify/modularity/commit/9af28a989141c3289077928a80042b6593d1f345
+- add pagination options for footer component by @OoBook in https://github.com/unusualify/modularity/commit/483ab5781cc6d5152db3a91c1857eb1b74cb7ca2
+- add conditional visibility for filter buttons by @OoBook in https://github.com/unusualify/modularity/commit/71c7cf5d479bbbb6204b62a8aaccdd290e395a94
+- enhance widget configuration handling by @OoBook in https://github.com/unusualify/modularity/commit/3dcead55c2c2347be7d2fcfac47c112ee242bd3b
+- enhance header layout with subtitle support by @OoBook in https://github.com/unusualify/modularity/commit/de00a0655ae7a129f018c27013f0c000dd76399c
+- add rounded and elevation props for enhanced styling by @OoBook in https://github.com/unusualify/modularity/commit/878caf940518d3c40c2a8aaa65b8c8462f4e8e1f
+- introduce slots for value and label customization by @OoBook in https://github.com/unusualify/modularity/commit/591be788aebb7767a819c3be2dfc3d6eb14bad07
+- add new color variables for secondary and green themes by @OoBook in https://github.com/unusualify/modularity/commit/500dba8b45a65dad561ab45bffa416ded99098da
+- set timezone on form mount by @OoBook in https://github.com/unusualify/modularity/commit/f26119e865dd989e0f71651d716e29b35c37c161
+- add hidden timezone input field by @OoBook in https://github.com/unusualify/modularity/commit/e297f7573d39795ba6dfc5565c3c09126180fc28
+- implement auto locale detection based on environment setting by @OoBook in https://github.com/unusualify/modularity/commit/76a94aa433507eca5392cd6eb243e69b65a318d0
+- add method to update event parameters by @OoBook in https://github.com/unusualify/modularity/commit/59f4b2cf9e0a28fda8a3bcec7356f7f5caa82189
+- store user timezone in session after authentication by @OoBook in https://github.com/unusualify/modularity/commit/642b45b5126cc120d18b1311d27d34b83ed29367
+- add  creator record scope by @OoBook in https://github.com/unusualify/modularity/commit/96d840b529286b72ef662b86ec71b3c1a06aa95d
+- add timezone field to login forms by @OoBook in https://github.com/unusualify/modularity/commit/ac5e93cd9e867618d9e6eea7efb7e7b427909003
+- update column ratios and add date formatting for text inputs by @OoBook in https://github.com/unusualify/modularity/commit/44939718b7dd1a94bca1095dcf38cd32e3902f7a
+- enhance last status assignment query with timezone support by @OoBook in https://github.com/unusualify/modularity/commit/d55fbaf3c38a2cc8151f5ee15bfe48d6c54b9475
+- enhance date range handling in metrics processing by @OoBook in https://github.com/unusualify/modularity/commit/0d9f9e1f26631d8bbb2f293601689c3d7c9007ab
+- add scopes for unanswered chat messages by @OoBook in https://github.com/unusualify/modularity/commit/f4a590b45b68bc2f1100e78ec4e06c460a162fdd
+- enhance metrics filtering and date input handling by @OoBook in https://github.com/unusualify/modularity/commit/5a80ae26bacdcf655a7b612e0b2fa076889380fd
+- streamline count retrieval and add table filters by @OoBook in https://github.com/unusualify/modularity/commit/a9c68cdb6cdcb89fb2c36a85bf46f9a7165af710
+- add methods for table filters and count retrieval by @OoBook in https://github.com/unusualify/modularity/commit/6729c779bd09b1d93e6eecf753606937ede029df
+- add method for table filters based on authorization by @OoBook in https://github.com/unusualify/modularity/commit/94c098d0dc7b87bd9e1104da39a6cdc03d94775b
+- add table filters for assignment retrieval by @OoBook in https://github.com/unusualify/modularity/commit/443cdc1c281c527e71246b78b98207344816f2ab
+- add validation for user roles to prevent assignment of superadmin role by @OoBook in https://github.com/unusualify/modularity/commit/208384b08e950aa009eaeab92fbbbd68e7bfc822
+- add scopes for filtering chat messages by creator by @OoBook in https://github.com/unusualify/modularity/commit/0e6be1da5424cc2758c1e7e4b668ed9a62b63fab
+- add events for process history creation and update by @OoBook in https://github.com/unusualify/modularity/commit/8eaaf4865d7a872796b713236172a02d1a18fcd2
+- include SystemPaymentDatabaseSeeder in default seeding process by @OoBook in https://github.com/unusualify/modularity/commit/bff6b7215071d9290d29ae115edeaadff88906eb
+- configure translatable locales for country seeding by @OoBook in https://github.com/unusualify/modularity/commit/7bca40432d545c03be813c03964cbd6d101b3407
+- introduce event for user registration process by @OoBook in https://github.com/unusualify/modularity/commit/f6c7ed1f7e0dfcec7317295596be39bcec3b3ad8
+
+### :wrench: Bug Fixes
+
+- ensure custom options are merged correctly by @OoBook in https://github.com/unusualify/modularity/commit/cd35891969b098026dda6e7f3d7c77457c10a97b
+- update asset publishing tag for modularity by @OoBook in https://github.com/unusualify/modularity/commit/41b5af2a6e7ae15a93550e93d5283c23074cbdac
+- add support for hidden input type by @OoBook in https://github.com/unusualify/modularity/commit/b1cf78ac62e2ddcbcbbbd7ecda4045a20ed9e550
+- update available user locales to include only English by @OoBook in https://github.com/unusualify/modularity/commit/158c594e091227e528903274d6d6531289a4ac32
+- adjust max-height style for responsive design by @OoBook in https://github.com/unusualify/modularity/commit/b3ab4277a1907f2ded3e43e3081ff450fea63240
+- enhance event class selection and module integration by @OoBook in https://github.com/unusualify/modularity/commit/e992fccfe8e8901465cb78b9f903558260617228
+- update badge color and styling for improved visibility by @OoBook in https://github.com/unusualify/modularity/commit/7e1c0a2d8cfee10302aaf883497112735084d14a
+- adjust responsive width values for display sizes by @OoBook in https://github.com/unusualify/modularity/commit/70c87bf3df44721d7c83f9936478a737972c7e64
+- update default page value and query parameter handling by @OoBook in https://github.com/unusualify/modularity/commit/79558fd1c009769e95a8ffa2186dbe37baf000f0
+- handle string interval conversion for date calculations by @OoBook in https://github.com/unusualify/modularity/commit/4b2838d8870ba3caa3774d513417743364d7a6ef
+- exclude interfaces from model retrieval logic by @OoBook in https://github.com/unusualify/modularity/commit/e6f0b48538cd75f88c9ccd9de2ec7665749ba110
+- handle exceptions during model retrieval by @OoBook in https://github.com/unusualify/modularity/commit/d420f953926593ee165951b5d7c62e5dcc3f6352
+- enhance default value handling for multiple inputs by @OoBook in https://github.com/unusualify/modularity/commit/4a8a19078119ad5cc8cb6e9657e3cbc91a89aba3
+- improve pagination logic and loading state handling by @OoBook in https://github.com/unusualify/modularity/commit/988a7ffc7c83c7505e9aa61982405389a0f4fccb
+- add 'spreadable' property to email fields for enhanced flexibility by @OoBook in https://github.com/unusualify/modularity/commit/e2b2c3c0572e6738dbe62a998f7a392de442b8ea
+- improve sort handling in orderScope method by @OoBook in https://github.com/unusualify/modularity/commit/0030ce6ccd2cdebf4e1c23bc72981b239fe1b057
+- update default page value for improved pagination behavior by @OoBook in https://github.com/unusualify/modularity/commit/3f5bed676cdaac58842f70f6d957302955e7ea3c
+- add 'force' property to main filters for enhanced functionality by @OoBook in https://github.com/unusualify/modularity/commit/8c2157e38e6a33f3329be1de8e8505599e205d18
+- update description rendering logic for improved clarity by @OoBook in https://github.com/unusualify/modularity/commit/650366a6648d183451d2ed0db4c741e7eda4f619
+- add height class to checkbox for improved layout consistency by @OoBook in https://github.com/unusualify/modularity/commit/96ece835bd3421b3aa92d375a22161197809c7af
+- extend regex to include 'Span' for component creation by @OoBook in https://github.com/unusualify/modularity/commit/aeb4d73c4aba5951d03b8627e0acb7c3d367bfee
+- update dialog visibility conditions for guest users by @OoBook in https://github.com/unusualify/modularity/commit/086595b65d4eae2a83ba7b93ebf33803f0f701ea
+- enhance currency conversion and exchange rate handling by @OoBook in https://github.com/unusualify/modularity/commit/e61a72bb583620d51d79cd1a7a5f0bdb740831dd
+- remove debug statement from rulesForTranslatedFields method by @OoBook in https://github.com/unusualify/modularity/commit/e1f2f372ed3f9f42af85ff9045f1ba43904aea4f
+- update asset publishing tag for modularity by @OoBook in https://github.com/unusualify/modularity/commit/8ec6f96cb7f08662c75bebbcc287bf18fb0c7ec9
+- update roles configuration for improved component integration by @OoBook in https://github.com/unusualify/modularity/commit/4930fdf6dce72a559fb5ae750d21ca9bb6d11a42
+- clean up code and improve query handling by @OoBook in https://github.com/unusualify/modularity/commit/ca865eac273fc9c94a4084003840a891ad544102
+- update column classes for improved text wrapping by @OoBook in https://github.com/unusualify/modularity/commit/b47c3706d276988597de9baa86588b069ee67449
+- update pagination logic and variable naming for clarity by @OoBook in https://github.com/unusualify/modularity/commit/fdd78fb2e6a0c53fa3c7b0b4af77e9950b1ea0db
+- refine pagination logic and improve readonly state handling by @OoBook in https://github.com/unusualify/modularity/commit/4aed602d45db7523812014dffa3c4bc287b8b90e
+
+### :recycle: Refactors
+
+- add setWidgetAlias method and update widget class by @OoBook in https://github.com/unusualify/modularity/commit/d88013dd79d54f9ad813903a6d076051f07b3962
+- update default table attributes for styling enhancements by @OoBook in https://github.com/unusualify/modularity/commit/ee6282f5cb840d9d04416cb1685987cff2c55ff5
+- update class attributes for improved styling by @OoBook in https://github.com/unusualify/modularity/commit/5ef1d619241f5afca9e39bfff03b20e215f10814
+- refactor filter retrieval and enhance flexibility by @OoBook in https://github.com/unusualify/modularity/commit/8bee6dbfcf0fd279f2f30736e7070c09558cf33a
+- enhance input handling and default value management by @OoBook in https://github.com/unusualify/modularity/commit/24730904cf20b82cf2afe67a5fcc9762bf535ff0
+- enhance input props and default value handling by @OoBook in https://github.com/unusualify/modularity/commit/c1b240fa975433d04da9672b106a3f98af6d2082
+- update input properties for user roles and avatar handling by @OoBook in https://github.com/unusualify/modularity/commit/c601b9e11800cfd2209c519e5039d7265dee5417
+- streamline right slot structure for improved readability by @OoBook in https://github.com/unusualify/modularity/commit/d72991d3022d9da31271a6297a61d521ba82c362
+- adjust divider margins for improved layout consistency by @OoBook in https://github.com/unusualify/modularity/commit/eaca77b7e78f1d01abc0f2fd0f08ef490821b2d3
+- remove unused seeder for default test users by @OoBook in https://github.com/unusualify/modularity/commit/5ea106ad3141a8c3c02e743fcf47c0f84642cff1
+
+### :lipstick: Styling
+
+- lint coding styles for v0.31.0 by @OoBook in https://github.com/unusualify/modularity/commit/039dd2993541c759d4a2365f03f1096c965a7f4a
+
+### :package: Build
+
+- update build artifacts for v0.31.0 by @OoBook in https://github.com/unusualify/modularity/commit/9dfca9fad7a1d61493cf24aab05fb237f18554cb
+
+### :beers: Other Stuff
+
+- remove unnecessary newline in config.php by @OoBook in https://github.com/unusualify/modularity/commit/70ebd8d726d364b0918fe69e6efeba3fd9a5a00a
+- add todo lastHistory method by @OoBook in https://github.com/unusualify/modularity/commit/357ef4759bde97b9b44c09e52a1e2e44d4afc1f8
+- remove initializeInput by @OoBook in https://github.com/unusualify/modularity/commit/e96a2880d374523e17fe4cd6bf82451114b06f43
+- add country permissions for role management by @OoBook in https://github.com/unusualify/modularity/commit/b8170fd61d7cf1a5730a4c7b0000316e634f2915
+
 ## v0.30.0 - 2025-05-26
 
 ### :rocket: Features
