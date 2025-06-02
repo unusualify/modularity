@@ -12,6 +12,7 @@ use Illuminate\Validation\Rules;
 use Unusualify\Modularity\Entities\Company;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Events\ModularityUserRegistered;
+use Unusualify\Modularity\Events\ModularityUserRegistering;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularity\Services\MessageStage;
 
@@ -147,6 +148,8 @@ class RegisterController extends Controller
     protected function register(Request $request)
     {
         $validator = $this->validator($request->all());
+
+        event(new ModularityUserRegistering($request));
 
         if ($validator->fails()) {
             return $request->wantsJson()
