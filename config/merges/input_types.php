@@ -85,6 +85,6 @@ return [
         'type' => 'hidden',
         'name' => '_timezone',
         'default' => 'Europe/London',
-        'id' => 'timezone_session'
-    ]
+        'id' => 'timezone_session',
+    ],
 ];

@@ -19,7 +19,7 @@ class MetricController extends Controller
 
             $range = $request->date_range;
             $validFilter = false;
-            if(is_array($range) && count($range) > 1) {
+            if (is_array($range) && count($range) > 1) {
                 $startDate = array_shift($range);
                 $endDate = array_pop($range);
                 $validFilter = true;
@@ -44,10 +44,10 @@ class MetricController extends Controller
                                 $connectorFilter = $metric['connectorFilter'];
                                 $connectorFilter['args'] ??= [];
 
-                                if($validFilter) {
-                                    if(isset($connectorFilter['passRange']) && $connectorFilter['passRange']) {
+                                if ($validFilter) {
+                                    if (isset($connectorFilter['passRange']) && $connectorFilter['passRange']) {
                                         $connectorFilter['args']['dateRange'] = [$startDate, $endDate];
-                                    }else{
+                                    } else {
                                         if (array_key_exists('startDate', $connectorFilter['args'])) {
                                             $connectorFilter['args']['startDate'] = $startDate;
                                         } else {
@@ -62,12 +62,12 @@ class MetricController extends Controller
                                     }
                                     $metric['filtered'] = true;
 
-                                    if(isset($connectorFilter['changeParameters']) && $connectorFilter['changeParameters']) {
+                                    if (isset($connectorFilter['changeParameters']) && $connectorFilter['changeParameters']) {
                                         $connector->updateEventParameters($connectorFilter['name'], $connectorFilter['args']);
-                                    }else{
+                                    } else {
                                         $pushEvents[] = $connectorFilter;
                                     }
-                                }else{
+                                } else {
                                     $metric['filtered'] = false;
                                 }
                             }

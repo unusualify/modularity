@@ -8,8 +8,5 @@ class ModularityUserRegistering
 {
     use SerializesModels;
 
-    public function __construct(public $request)
-    {
-
-    }
+    public function __construct(public $request) {}
 }

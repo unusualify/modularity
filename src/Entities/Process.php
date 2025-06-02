@@ -62,7 +62,7 @@ class Process extends Model
 
         return $this->hasOne(ProcessHistory::class)
             ->latest();
-            // ->whereRaw("{$processHistoryTable}.created_at = (select max(created_at) from {$processHistoryTable} where {$processHistoryTable}.process_id = {$processTable}.id)");
+        // ->whereRaw("{$processHistoryTable}.created_at = (select max(created_at) from {$processHistoryTable} where {$processHistoryTable}.process_id = {$processTable}.id)");
     }
 
     protected function statusLabel(): Attribute

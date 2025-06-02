@@ -93,9 +93,9 @@ trait Chatable
 
     public function unreadChatMessagesFromCreator(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
-        $creatorRecordTable = (new CreatorRecord())->getTable();
-        $chatMessageTable = (new ChatMessage())->getTable();
-        $chatTable = (new Chat())->getTable();
+        $creatorRecordTable = (new CreatorRecord)->getTable();
+        $chatMessageTable = (new ChatMessage)->getTable();
+        $chatTable = (new Chat)->getTable();
         $currentClass = static::class;
 
         return $this->unreadChatMessages()->where(function ($messageQuery) use ($creatorRecordTable, $chatMessageTable, $chatTable, $currentClass) {
@@ -107,7 +107,7 @@ trait Chatable
                     ->from($creatorRecordTable . ' as ' . $creatableTableAlias)
                     ->join($creatorRecordTable . ' as ' . $chatableTableAlias, function ($join) use ($creatableTableAlias, $chatableTableAlias) {
                         $join->on($creatableTableAlias . '.creator_id', '=', $chatableTableAlias . '.creator_id')
-                             ->on($creatableTableAlias . '.guard_name', '=', $chatableTableAlias . '.guard_name');
+                            ->on($creatableTableAlias . '.guard_name', '=', $chatableTableAlias . '.guard_name');
                     })
                     ->whereColumn($creatableTableAlias . '.creatable_id', $chatTable . '.chatable_id')
                     ->where($creatableTableAlias . '.creatable_type', $currentClass)

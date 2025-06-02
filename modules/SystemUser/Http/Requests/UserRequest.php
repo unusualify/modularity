@@ -2,7 +2,6 @@
 
 namespace Modules\SystemUser\Http\Requests;
 
-use Illuminate\Validation\Rule;
 use Unusualify\Modularity\Http\Requests\Request;
 
 class UserRequest extends Request
@@ -44,13 +43,13 @@ class UserRequest extends Request
                             }
                         } else {
                             // Check if roles is a single integer ID
-                            if ((int)$value === $superadminId) {
+                            if ((int) $value === $superadminId) {
                                 $fail('The roles field cannot be the superadmin role.');
                             }
                         }
                     }
-                }
-            ]
+                },
+            ],
             // 'country_id' => 'required|exists:um_countries,id',
         ];
     }

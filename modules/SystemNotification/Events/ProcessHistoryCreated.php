@@ -4,11 +4,9 @@ namespace Modules\SystemNotification\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Unusualify\Modularity\Entities\ProcessHistory;
 
 class ProcessHistoryCreated implements ShouldDispatchAfterCommit
@@ -48,5 +46,4 @@ class ProcessHistoryCreated implements ShouldDispatchAfterCommit
             new Channel('process-history-created'),
         ];
     }
-
 }

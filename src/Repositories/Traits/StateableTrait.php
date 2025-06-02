@@ -77,7 +77,7 @@ trait StateableTrait
     {
         $model = $this->getModel();
 
-        if($model){
+        if ($model) {
 
             $defaultStates = $model::getDefaultStates();
             $defaultStateCodes = array_column($defaultStates, 'code');

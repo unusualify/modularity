@@ -7,7 +7,6 @@ use Nwidart\Modules\Support\Stub;
 use Symfony\Component\Finder\Finder;
 use Unusualify\Modularity\Facades\Modularity;
 
-use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\text;
 

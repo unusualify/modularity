@@ -91,34 +91,34 @@ trait TableFilters
         }
 
         $statusFilters = Collection::make($statusFilters)->reduce(function ($carry, $filter) {
-            if(isset($filter['allowedRoles'])){
+            if (isset($filter['allowedRoles'])) {
                 $isAllowed = $this->isAllowedItem(
                     item: ['allowedRoles' => $filter['allowedRoles']],
                     searchKey: 'allowedRoles',
                     disallowIfUnauthenticated: true
                 );
 
-                if(!$isAllowed){
+                if (! $isAllowed) {
                     return $carry;
                 }
             }
 
-            if(!isset($filter['number'])){
-                if(!isset($filter['methods'])){
+            if (! isset($filter['number'])) {
+                if (! isset($filter['methods'])) {
                     throw new \Exception('Number or methods is required for the filter: ' . $filter['slug']);
                 }
 
-                if(!isset($filter['params'])){
+                if (! isset($filter['params'])) {
                     throw new \Exception('Params is required for the filter: ' . $filter['slug']);
                 }
 
-                if(is_string($filter['methods'])){
+                if (is_string($filter['methods'])) {
                     $count = $this->repository->{$filter['methods']}(...$filter['params']);
-                }else{
+                } else {
                     throw new \Exception('Methods must be a string for the filter: ' . $filter['slug']);
                 }
 
-                if($count < 1 && !($filter['force'] ?? false)){
+                if ($count < 1 && ! ($filter['force'] ?? false)) {
                     return $carry;
                 }
 

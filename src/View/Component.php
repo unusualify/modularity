@@ -94,7 +94,6 @@ class Component extends LaravelComponent
                     $config['widgetSlots'] ?? [],
                 ));
 
-
             if ($alias) {
                 $component->setWidgetAlias($alias);
             }

@@ -87,14 +87,14 @@ class DefaultPermissionsSeeder extends Seeder
         $roleInstances['editor']->givePermissionTo([
             'dashboard', 'mediaLibrary',
             'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete',
-            'country_view'
+            'country_view',
         ]);
 
         // Reporter gets view-only permissions
         $roleInstances['reporter']->givePermissionTo([
             'dashboard', 'mediaLibrary',
             'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete',
-            'country_view'
+            'country_view',
         ]);
 
         // Client Manager gets client-specific permissions
@@ -103,7 +103,7 @@ class DefaultPermissionsSeeder extends Seeder
             'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete',
             'user_view', 'user_create', 'user_edit', 'user_delete',
             'payment_view', 'payment_create',
-            'country_view'
+            'country_view',
         ]);
 
         // Client Assistant gets limited client permissions
@@ -112,7 +112,7 @@ class DefaultPermissionsSeeder extends Seeder
             'my-notification_view', 'my-notification_edit', 'my-notification_delete', 'my-notification_bulkDelete', 'my-notification_forceDelete', 'my-notification_bulkForceDelete',
             'user_view',
             'payment_view',
-            'country_view'
+            'country_view',
         ]);
 
     }

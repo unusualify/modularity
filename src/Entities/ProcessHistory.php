@@ -30,6 +30,7 @@ class ProcessHistory extends Model
             ProcessHistoryCreated::dispatch($processHistory);
         });
     }
+
     /**
      * Get the parent processable model
      */

@@ -95,6 +95,7 @@ class CurrencyExchangeService
         if ($round == 'floor') {
             return floor($rates[$currency], $decimals);
         }
+
         return round($rates[$currency], $decimals);
     }
 }

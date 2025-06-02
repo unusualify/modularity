@@ -151,7 +151,7 @@ trait AssignableScopes
 
             if ($dateColumn && $dateRange) {
 
-                if(is_array($dateRange) && count($dateRange) > 0) {
+                if (is_array($dateRange) && count($dateRange) > 0) {
                     if (count($dateRange) == 1) {
                         $startDate = array_shift($dateRange);
                         $latestAssignmentSql .= " AND {$assignmentTable}.{$dateColumn} >= '{$startDate}'";
@@ -160,17 +160,17 @@ trait AssignableScopes
                         $endDate = array_pop($dateRange);
                         $latestAssignmentSql .= " AND {$assignmentTable}.{$dateColumn} BETWEEN '{$startDate}' AND '{$endDate}'";
                     }
-                } else if (is_string($dateRange) && $dateRange == 'today') {
+                } elseif (is_string($dateRange) && $dateRange == 'today') {
                     // Get user's local start and end of day, then convert to UTC for database comparison
                     $startDate = now($userTimezone)->startOfDay()->utc()->format('Y-m-d H:i:s');
                     $endDate = now($userTimezone)->endOfDay()->utc()->format('Y-m-d H:i:s');
 
                     $latestAssignmentSql .= " AND {$assignmentTable}.{$dateColumn} BETWEEN '{$startDate}' AND '{$endDate}'";
-                } else if (is_string($dateRange) && $dateRange == 'this_week') {
+                } elseif (is_string($dateRange) && $dateRange == 'this_week') {
                     $startDate = now($userTimezone)->startOfWeek()->utc()->format('Y-m-d H:i:s');
                     $endDate = now($userTimezone)->endOfWeek()->utc()->format('Y-m-d H:i:s');
                     $latestAssignmentSql .= " AND {$assignmentTable}.{$dateColumn} BETWEEN '{$startDate}' AND '{$endDate}'";
-                } else if (is_string($dateRange) && $dateRange == 'this_month') {
+                } elseif (is_string($dateRange) && $dateRange == 'this_month') {
                     $startDate = now($userTimezone)->startOfMonth()->utc()->format('Y-m-d H:i:s');
                     $endDate = now($userTimezone)->endOfMonth()->utc()->format('Y-m-d H:i:s');
                     $latestAssignmentSql .= " AND {$assignmentTable}.{$dateColumn} BETWEEN '{$startDate}' AND '{$endDate}'";

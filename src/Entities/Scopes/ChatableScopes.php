@@ -45,9 +45,9 @@ trait ChatableScopes
 
                 $subQuery->select(\DB::raw(1))
                     ->from($creatorRecordTable . ' as ' . $creatableTableAlias)
-                    ->join($creatorRecordTable . ' as ' . $chatableTableAlias, function ($join) use ($chatMessageTable, $creatableTableAlias, $chatableTableAlias) {
+                    ->join($creatorRecordTable . ' as ' . $chatableTableAlias, function ($join) use ($creatableTableAlias, $chatableTableAlias) {
                         $join->on($creatableTableAlias . '.creator_id', '=', $chatableTableAlias . '.creator_id')
-                             ->on($creatableTableAlias . '.guard_name', '=', $chatableTableAlias . '.guard_name');
+                            ->on($creatableTableAlias . '.guard_name', '=', $chatableTableAlias . '.guard_name');
                     })
                     ->whereColumn($creatableTableAlias . '.creatable_id', $this->getTable() . '.id')
                     ->where($creatableTableAlias . '.creatable_type', static::class)
