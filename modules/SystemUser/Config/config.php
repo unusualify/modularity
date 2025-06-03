@@ -95,6 +95,19 @@ return [
                     'dense',
                 ],
                 [
+                    'label' => 'Surname',
+                    'name' => 'surname',
+                    'type' => 'text',
+                    'editable' => false,
+                    'col' => [
+                        'cols' => 12,
+                        'sm' => 8,
+                        'md' => 6,
+                    ],
+                    // 'prepend-icon' => 'mdi-card-text-outline',
+                    'dense',
+                ],
+                [
                     'name' => 'company_id',
                     'label' => 'Company',
                     'type' => 'select',
