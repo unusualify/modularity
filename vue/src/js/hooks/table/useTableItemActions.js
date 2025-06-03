@@ -64,11 +64,11 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
       case 'switch':
       case 'duplicate':
       case 'activate':
-        hasAction = !tableItem.itemIsDeleted.value && can(action.name, tableNames.permissionName.value)
+        hasAction = !tableItem.isDeleted(item) && can(action.name, tableNames.permissionName.value)
         break
       case 'forceDelete':
       case 'restore':
-        hasAction = tableItem.itemIsDeleted.value && can(action.name, tableNames.permissionName.value)
+        hasAction = tableItem.isDeleted(item) && can(action.name, tableNames.permissionName.value)
         break
       default:
         break
