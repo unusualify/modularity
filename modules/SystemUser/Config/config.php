@@ -133,7 +133,7 @@ return [
                         'md' => 6,
                     ],
                     'rules' => 'required',
-                    'editable' => false,
+                    // 'editable' => false,
                     'connector' => 'SystemUser:Role|repository:list:column=title',
 
                     // 'type' => 'select-scroll',
