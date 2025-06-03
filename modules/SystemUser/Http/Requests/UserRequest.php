@@ -23,7 +23,7 @@ class UserRequest extends Request
         $rolesTable = config('permission.table_names.roles', 'sp_roles');
 
         return [
-            'name' => 'sometimes|required|min:4',
+            'name' => 'sometimes|required|min:2',
             'email' => 'sometimes|required|email|unique_table',
             'roles' => [
                 'required',
@@ -57,7 +57,7 @@ class UserRequest extends Request
     public function rulesForUpdate()
     {
         return [
-            'name' => 'sometimes|required|min:4',
+            'name' => 'sometimes|required|min:2',
             'email' => 'sometimes|required|email|unique_table',
             'country_id' => 'required|exists:um_countries,id',
             // 'roles' => 'missing',
