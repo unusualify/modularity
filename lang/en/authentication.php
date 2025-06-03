@@ -36,6 +36,8 @@ return [
     'register-description' => 'Congratulations! Your registration is complete.',
     'register-button_text' => 'Go to Sign In?',
 
+    'generate-password' => 'Generate Password',
+
     'confirm-provider' => 'Confirm your {provider} account',
 
     'verification-complete' => 'Verification',

@@ -135,6 +135,20 @@ class ResetPasswordController extends Controller
         if ($user && Password::broker('users')->getRepository()->exists($user, $token)) {
             $resetPasswordSchema = getFormDraft('reset_password_form');
 
+            $formSlots = [
+                'options' => [
+                    'tag' => 'v-btn',
+                    'elements' => __('Resend'),
+                    'attributes' => [
+                        'variant' => 'plain',
+                        'href' => route('admin.password.reset.link'),
+                        'class' => '',
+                        'color' => 'grey-lighten-1',
+                        'density' => 'default',
+                    ],
+                ],
+            ];
+
             return $this->viewFactory->make(modularityBaseKey() . '::auth.passwords.reset')->with([
                 'attributes' => [
                     'noSecondSection' => true,
@@ -154,6 +168,7 @@ class ResetPasswordController extends Controller
                     'buttonText' => 'authentication.reset-password',
                     'formClass' => 'px-5',
                 ],
+                'formSlots' => $formSlots,
             ]);
         }
 
