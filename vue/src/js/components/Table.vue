@@ -128,6 +128,8 @@
                   <!-- search field -->
                   <v-text-field
                     v-if="!hideSearchField && hasSearchableHeader"
+                    id="search-field"
+                    ref="searchField"
                     v-model="searchModel"
                     variant="outlined"
                     :append-inner-iconx="searchModel !== search ? 'mdi-magnify' : null"
@@ -640,6 +642,89 @@
           </div>
         </template>
 
+        <!-- #header actions slot -->
+        <template v-slot:header.actions="_obj">
+          <v-menu
+            :close-on-content-click="false"
+            location="bottom"
+            >
+            <template v-slot:activator="{ props }">
+              <v-btn
+                size="large"
+                variant="plain"
+                color="black"
+                icon="mdi-cog-outline"
+                v-bind="props"
+              />
+              <!-- <v-icon
+                size="large"
+                icon="mdi-cog-outline"
+                v-bind="props"
+              /> -->
+            </template>
+            <v-card>
+              <v-card-title>
+                <v-list class="">
+                  <template v-for="(item, index) in headersModel" :key="index">
+                    <v-checkbox v-if="item.key !== 'actions'"
+                      v-model="headersModel[index].visible"
+                      color="primary"
+                      class="ml-n2"
+                      :disabled="headersModel.filter(h => h.key !== 'actions' && h.visible === true).length < 2 && headersModel[index].visible === true"
+                      :label="item.title"
+                      hide-details
+                      density="comfortable"
+                    />
+                  </template>
+                </v-list>
+              </v-card-title>
+              <v-card-actions>
+                <v-btn
+                  color="primary"
+                  text="Save"
+                  variant="tonal"
+                  @click="applyHeaders"
+                  block
+                ></v-btn>
+              </v-card-actions>
+            </v-card>
+
+          </v-menu>
+        </template>
+
+        <!-- #formattable headers -->
+        <template v-for="(header, i) in formattableHeaders"
+          :key="`formattable-header-${i}`"
+          v-slot:[`header.${header.key}`]="headerScope"
+        >
+          {{ headerScope.column.title }}
+          <v-tooltip v-if="header.searchable" :text="$t('Search')">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                v-bind="props"
+                color="medium-emphasis"
+                size="small"
+                icon="mdi-table-search"
+
+                @click="$refs.searchField.focus()"
+              ></v-icon>
+            </template>
+          </v-tooltip>
+          <v-tooltip v-if="header.removable" :text="$t('Remove Column')">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                v-if="header.removable"
+                color="medium-emphasis"
+                size="small"
+                icon="$close"
+                @click="removeHeader(header.key)"
+                v-bind="props"
+              ></v-icon>
+            </template>
+          </v-tooltip>
+
+        </template>
+
         <!-- #formatterColumns -->
         <template v-for="(col, i) in formatterColumns"
           :key="`formatter-${i}`"
@@ -690,56 +775,6 @@
               :key="item[col.key]"
             />
           </template>
-        </template>
-
-        <!-- #header actions slot -->
-        <template v-slot:header.actions="_obj">
-          <v-menu
-            :close-on-content-click="false"
-            location="bottom"
-            >
-            <template v-slot:activator="{ props }">
-              <v-btn
-                size="large"
-                variant="plain"
-                color="black"
-                icon="mdi-cog-outline"
-                v-bind="props"
-              />
-              <!-- <v-icon
-                size="large"
-                icon="mdi-cog-outline"
-                v-bind="props"
-              /> -->
-            </template>
-            <v-card>
-              <v-card-title>
-                <v-list class="">
-                  <template v-for="(item, index) in headersModel" :key="index">
-                    <v-checkbox v-if="item.key !== 'actions'"
-                      v-model="headersModel[index].visible"
-                      color="primary"
-                      class="ml-n2"
-                      :disabled="headersModel.filter(h => h.key !== 'actions' && h.visible === true).length < 2 && headersModel[index].visible === true"
-                      :label="item.title"
-                      hide-details
-                      density="comfortable"
-                    />
-                  </template>
-                </v-list>
-              </v-card-title>
-              <v-card-actions>
-                <v-btn
-                  color="primary"
-                  text="Save"
-                  variant="tonal"
-                  @click="applyHeaders"
-                  block
-                ></v-btn>
-              </v-card-actions>
-            </v-card>
-
-          </v-menu>
         </template>
 
         <!-- #item actions slot-->
@@ -975,7 +1010,9 @@ export default {
       &--striped
         tr
           &:nth-of-type(2n)
-            background-color: rgb(var(--v-theme-grey-lighten-6)) //TODO: table action border must be variable
+            td
+              background-color: rgb(var(--v-theme-grey-lighten-6)) !important //TODO: table action border must be variable
+
 
     .action-dropdown
       .v-overlay__content
