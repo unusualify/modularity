@@ -108,16 +108,18 @@
         :width-type="'md'"
         :description="modalMessage"
         persistent
+
+        v-bind="responseModalOptions"
       >
         <template v-slot:body.description>
-          <v-icon size="64" color="success" class="mb-4">mdi-check-circle-outline</v-icon>
-          <h2 class="text-h4 mb-4 text-success">{{ $t('Request Complete') }}</h2>
-          <p class="text-subtitle-1 grey--text">{{ $t('Congratulations! Your PR request is complete.') }}</p>
+          <v-icon size="64" color="success" class="mb-4">{{ responseModalIcon }}</v-icon>
+          <h2 class="text-h4 mb-4 text-success">{{ responseModalTitle }}</h2>
+          <p class="text-subtitle-1 grey--text">{{ responseModalMessage }}</p>
         </template>
         <template v-slot:body.options>
           <div class="d-flex justify-center w-100">
             <v-btn variant="flat" color="success" @click="completed">
-              {{ $t('Go Back') }}
+              {{ responseModalButtonText }}
             </v-btn>
           </div>
         </template>
@@ -211,8 +213,6 @@
         type: Boolean,
         default: false
       },
-
-
       finalFormTitle: {
         type: String,
         default: null
@@ -227,7 +227,6 @@
           return []
         }
       },
-
       validationScrollingDuration: {
         type: Number,
         default: 1000
@@ -244,6 +243,29 @@
         type: Boolean,
         default: false
       },
+
+      responseModalIcon: {
+        type: String,
+        default: 'mdi-check-circle-outline'
+      },
+      responseModalTitle: {
+        type: String,
+        default: 'Request Complete'
+      },
+      responseModalMessage: {
+        type: String,
+        default: 'Congratulations! Your request was completed successfully.'
+      },
+      responseModalButtonText: {
+        type: String,
+        default: 'Ok'
+      },
+      responseModalOptions: {
+        type: Array,
+        default: () => {
+          return []
+        }
+      }
     },
     setup (props, context) {
       const inputHandlers = useInputHandlers()
