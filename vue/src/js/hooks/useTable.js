@@ -678,7 +678,7 @@ export default function useTable (props, context) {
     }
   }, { immediate: true })
 
-  const formatter = useFormatter(props, context, tableHeaders.headers.value)
+  const formatter = useFormatter(props, context, tableHeaders.selectedHeaders)
 
   return {
     form,
