@@ -14,22 +14,12 @@ class UserRequest extends Request
     public function rulesForAll()
     {
         return [
-
-        ];
-    }
-
-    public function rulesForCreate()
-    {
-        $rolesTable = config('permission.table_names.roles', 'sp_roles');
-
-        return [
-            'name' => 'sometimes|required|min:2',
-            'email' => 'sometimes|required|email|unique_table',
             'roles' => [
                 'required',
                 function ($attribute, $value, $fail) {
+                    $rolesTable = config('permission.table_names.roles', 'sp_roles');
                     // Get superadmin role ID
-                    $superadminRole = \DB::table('sp_roles')
+                    $superadminRole = \DB::table($rolesTable)
                         ->where('name', 'superadmin')
                         ->first();
 
@@ -50,7 +40,15 @@ class UserRequest extends Request
                     }
                 },
             ],
-            // 'country_id' => 'required|exists:um_countries,id',
+        ];
+    }
+
+    public function rulesForCreate()
+    {
+        return [
+            'name' => 'sometimes|required|min:2',
+            'email' => 'sometimes|required|email|unique_table',
+            'country_id' => 'sometimes|required|exists:um_countries,id',
         ];
     }
 
@@ -59,7 +57,7 @@ class UserRequest extends Request
         return [
             'name' => 'sometimes|required|min:2',
             'email' => 'sometimes|required|email|unique_table',
-            'country_id' => 'required|exists:um_countries,id',
+            'country_id' => 'sometimes|required|exists:um_countries,id',
             // 'roles' => 'missing',
         ];
     }
