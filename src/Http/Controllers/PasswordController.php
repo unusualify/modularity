@@ -82,7 +82,7 @@ class PasswordController extends Controller
         ];
         try {
             $routeName = $request->route()->getName();
-            if($routeName == 'admin.register.password.generate.form') {
+            if ($routeName == 'admin.register.password.generate.form') {
                 $buttonText = __('authentication.generate-password');
             }
 
@@ -156,7 +156,7 @@ class PasswordController extends Controller
             }
         );
 
-        if($response !== Password::PASSWORD_RESET) {
+        if ($response !== Password::PASSWORD_RESET) {
             return $request->wantsJson()
                 ? $this->respondWithError(trans($response))
                 : redirect()->back()->with('error', trans($response));
