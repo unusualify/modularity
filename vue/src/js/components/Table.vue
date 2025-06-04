@@ -39,6 +39,7 @@
         :items="elements"
         :hover="true"
 
+        :items-per-page-options="itemsPerPageOptions"
         :items-per-page="options.itemsPerPage"
         :search="options.search"
         :page="options.page"
