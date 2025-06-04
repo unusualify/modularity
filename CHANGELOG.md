@@ -2,6 +2,34 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.32.0 - 2025-06-04
+
+### :rocket: Features
+
+- add 'Surname' field to SystemUser configuration by @OoBook in https://github.com/unusualify/modularity/commit/9d4bd1a74c9ab614f1f013a2aeecf82754e9e867
+- change Role model of Role module by @OoBook in https://github.com/unusualify/modularity/commit/2340b2a2ada7f6a388e86b8338a53b1fc772a6b2
+- add setFirstDefault feature to InputHydrate class by @OoBook in https://github.com/unusualify/modularity/commit/49e91e66ba1f1d236fc47d8884ea9b55d1f5c039
+
+### :wrench: Bug Fixes
+
+- update item deletion checks for consistency by @OoBook in https://github.com/unusualify/modularity/commit/16b11e1dcca4a46073ca106ab6d91912a1be5c08
+- update name validation rule to require a minimum of 2 characters by @OoBook in https://github.com/unusualify/modularity/commit/9fdaf72318e925846e60dc699f07b7445c690124
+- comment out 'editable' property in SystemUser configuration by @OoBook in https://github.com/unusualify/modularity/commit/08953614d0d684940be7b5ec91996a3f04c92b10
+- add password generation feature and enhance reset password form by @OoBook in https://github.com/unusualify/modularity/commit/5e0eaffb740417d06f50767257525512d4b9a3e3
+- change validation rule of UserRequest by @OoBook in https://github.com/unusualify/modularity/commit/fbcf2119115c263630c1091be46d818e1a33b250
+
+### :recycle: Refactors
+
+- restrict users from role updating except superadmin and admin by @OoBook in https://github.com/unusualify/modularity/commit/9c4e802e872d126364032b93d421048a441fe24e
+
+### :lipstick: Styling
+
+- lint coding styles for v0.32.0 by @OoBook in https://github.com/unusualify/modularity/commit/27ff5c8615f85143433ece9dbf903d27bb59f43f
+
+### :package: Build
+
+- update build artifacts for v0.32.0 by @OoBook in https://github.com/unusualify/modularity/commit/d3cc676eb795ca047e3027984ad7a29f5008fc43
+
 ## v0.31.0 - 2025-06-02
 
 ### :rocket: Features
