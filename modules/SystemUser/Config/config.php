@@ -40,6 +40,7 @@ return [
                 [
                     'title' => 'Roles',
                     'key' => 'roles',
+                    'itemTitle' => 'title',
                 ],
                 [
                     'title' => 'Status',
@@ -145,6 +146,7 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
+                    'allowedRoles' => ['superadmin', 'admin'],
                     'rules' => 'required',
                     // 'editable' => false,
                     'connector' => 'SystemUser:Role|repository:list:column=title',
@@ -1045,6 +1047,7 @@ return [
                         'xl' => 12,
                     ],
                     'connector' => 'SystemUser:Permission|repository',
+                    'allowedRoles' => ['superadmin', 'admin'],
                     // 'route' => 'permission',
                     // 'model' => Spatie\Permission\Models\Permission::class,
                 ],
