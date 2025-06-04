@@ -272,7 +272,7 @@ trait Relationships
             }
         }
 
-        foreach ($schema as $key => $input) {
+        foreach ($schema ?? [] as $key => $input) {
             if (isset($input['ext']) && $input['ext'] == 'relationship') {
                 $repository = UFinder::getRouteRepository(Str::singular($input['name']), asClass: true);
                 $relationshipName = $input['relationship'] ?? $input['name'];
