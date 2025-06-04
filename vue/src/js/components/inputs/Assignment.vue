@@ -228,6 +228,7 @@
               due_at: null,
               description: null,
             }
+            createFormModalActive.value = false
           }
         }, (error) => {
           __log(error)
