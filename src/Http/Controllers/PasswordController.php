@@ -64,7 +64,31 @@ class PasswordController extends Controller
 
     public function showForm(Request $request, $token)
     {
-        // dd($request->all(), $token);
+        $routeName = null;
+        $buttonText = __('authentication.reset-password');
+
+        $formSlots = [
+            'options' => [
+                'tag' => 'v-btn',
+                'elements' => __('Resend'),
+                'attributes' => [
+                    'variant' => 'plain',
+                    'href' => route('admin.password.reset.link'),
+                    'class' => '',
+                    'color' => 'grey-lighten-1',
+                    'density' => 'default',
+                ],
+            ],
+        ];
+        try {
+            $routeName = $request->route()->getName();
+            if ($routeName == 'admin.register.password.generate.form') {
+                $buttonText = __('authentication.generate-password');
+            }
+
+        } catch (\Throwable $th) {
+
+        }
         $token = $request->route()->parameter('token');
         $email = $request->get('email');
 
@@ -88,7 +112,7 @@ class PasswordController extends Controller
                 'hasSubmit' => true,
                 'color' => 'primary',
                 'actionUrl' => route(Route::hasAdmin('register.password.generate')),
-                'buttonText' => 'authentication.reset-password',
+                'buttonText' => $buttonText,
                 'modelValue' => [
                     'email' => $email,
                     'password' => '',
@@ -98,6 +122,7 @@ class PasswordController extends Controller
 
                 'schema' => $this->createFormSchema($resetPasswordSchema),
             ],
+            'formSlots' => $formSlots,
         ]);
     }
 
@@ -130,6 +155,12 @@ class PasswordController extends Controller
                 $this->resetPassword($user, $password);
             }
         );
+
+        if ($response !== Password::PASSWORD_RESET) {
+            return $request->wantsJson()
+                ? $this->respondWithError(trans($response))
+                : redirect()->back()->with('error', trans($response));
+        }
 
         $email = $request->get('email');
 

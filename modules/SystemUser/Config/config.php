@@ -40,6 +40,7 @@ return [
                 [
                     'title' => 'Roles',
                     'key' => 'roles',
+                    'itemTitle' => 'title',
                 ],
                 [
                     'title' => 'Status',
@@ -95,6 +96,19 @@ return [
                     'dense',
                 ],
                 [
+                    'label' => 'Surname',
+                    'name' => 'surname',
+                    'type' => 'text',
+                    'editable' => false,
+                    'col' => [
+                        'cols' => 12,
+                        'sm' => 8,
+                        'md' => 6,
+                    ],
+                    // 'prepend-icon' => 'mdi-card-text-outline',
+                    'dense',
+                ],
+                [
                     'name' => 'company_id',
                     'label' => 'Company',
                     'type' => 'select',
@@ -132,8 +146,9 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
+                    'allowedRoles' => ['superadmin', 'admin'],
                     'rules' => 'required',
-                    'editable' => false,
+                    // 'editable' => false,
                     'connector' => 'SystemUser:Role|repository:list:column=title',
 
                     // 'type' => 'select-scroll',
@@ -1032,6 +1047,7 @@ return [
                         'xl' => 12,
                     ],
                     'connector' => 'SystemUser:Permission|repository',
+                    'allowedRoles' => ['superadmin', 'admin'],
                     // 'route' => 'permission',
                     // 'model' => Spatie\Permission\Models\Permission::class,
                 ],

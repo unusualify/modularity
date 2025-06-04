@@ -213,6 +213,9 @@ abstract class InputHydrate
             $input['items'] = $items;
 
             if (count($input['items']) > 0) {
+                if (isset($input['setFirstDefault']) && $input['setFirstDefault']) {
+                    $input['default'] = $input['items'][0][$input['itemValue']];
+                }
                 if (! isset($input['items'][0][$input['itemTitle']])) {
                     $input['itemTitle'] = array_keys(Arr::except($input['items'][0], [$input['itemValue']]))[0];
                 }
