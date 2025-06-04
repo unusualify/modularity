@@ -222,6 +222,13 @@
         payload,
         (response) => {
           if(response.status === 200) {
+            Alert.openAlert({
+              message: 'Assignment created successfully',
+              location: 'top',
+              variant: 'success',
+              ...response.data,
+            })
+
             assignments.value.unshift(response.data)
             createFormModel.value = {
               assignee_id: null,
