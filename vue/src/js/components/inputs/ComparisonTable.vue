@@ -7,15 +7,21 @@
     class="v-input-comparison-table"
     :class="{'v-input-comparison-table--striped': striped, 'v-input-comparison-table--highlighted': highlighted}"
     :rules="$attrs.rules"
+    :style="inputAndTableStyle"
     >
     <template v-slot:default="defaultSlot">
       <v-data-table
+        :class="[
+          'h-100'
+        ]"
+        :style="inputAndTableStyle"
+
         :headers="headers"
         :items="comparisonItems"
         itemsLength="0"
         disable-sort
         hide-default-footer
-
+        :items-per-page="itemsPerPage"
         :mobile-breakpoint="`md`"
         >
         <!-- header slots -->
@@ -49,7 +55,7 @@
 <script>
   import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
   import Table from '../Table.vue'
-  import { find, toUpper } from 'lodash-es';
+  import { find, toUpper, isNumber, isString } from 'lodash-es';
 
   export default {
     name: 'v-input-comparison-table',
@@ -86,6 +92,14 @@
       highlighted: {
         type: Boolean,
         default: true
+      },
+      itemsPerPage: {
+        type: Number,
+        default: 50
+      },
+      maxHeight: {
+        type: [String, Number],
+        default: null
       }
     },
     setup (props, context) {
@@ -105,6 +119,30 @@
         return [{title: this.label, key: 'comparator_name'}].concat( this.items.map((item) => {
           return {title: item.name, key: item.name, align: 'center', id: item.id}
         }))
+      },
+      inputAndTableStyle() {
+        let maxHeight = this.maxHeight
+
+        let style = {}
+
+        if(maxHeight){
+          if(isNumber(maxHeight)){
+            maxHeight = `${maxHeight}px`
+          }
+
+          if(isString(maxHeight)){
+            let isNumberable = isNumber(parseInt(maxHeight))
+            if(isNumberable){
+              maxHeight = `${parseInt(maxHeight)}px`
+            } else {
+              maxHeight = maxHeight
+            }
+          }
+
+          style.maxHeight = maxHeight
+        }
+
+        return style
       },
       comparisonItems() {
         let commonComparators = Object.keys(this.comparators).reduce((acc, confKey) => {

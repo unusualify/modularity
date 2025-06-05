@@ -6,7 +6,7 @@
 
 /* width */
 ::-webkit-scrollbar
-  width: 8px
+  width: 14px
 
 
 /* Track */
@@ -17,7 +17,10 @@
 /* Handle */
 ::-webkit-scrollbar-thumb
   background: $scrollbar-thumb-color
-  border-radius: 8px
+  border-right: 4px transparent solid
+  border-left: 4px transparent solid
+  background-clip: padding-box
+  border-radius: 9999px
 
 
 /* Handle on hover */

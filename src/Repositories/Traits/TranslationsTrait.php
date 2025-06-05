@@ -141,28 +141,25 @@ trait TranslationsTrait
         if ($this->model->isTranslatable()) {
             $attributes = $this->model->translatedAttributes;
 
-            $query->whereHas('translations', function ($q) use ($scopes, $attributes) {
-                foreach ($attributes as $attribute) {
-                    if (isset($scopes[$attribute]) && is_string($scopes[$attribute])) {
-                        if (! (isset($scopes['searches']) && in_array($attribute, $scopes['searches']))) {
-                            $q->where($attribute, $this->getLikeOperator(), '%' . $scopes[$attribute] . '%');
-                        }
-                    }
-                }
+            $query->orWhereHas('translations', function ($q) use ($scopes, $attributes) {
+                // foreach ($attributes as $attribute) {
+                //     if (isset($scopes[$attribute]) && is_string($scopes[$attribute])) {
+                //         if (! (isset($scopes['searches']) && in_array($attribute, $scopes['searches']))) {
+                //             $q->orWhere($attribute, $this->getLikeOperator(), '%' . $scopes[$attribute] . '%');
+                //         }
+                //     }
+                // }
 
                 if (isset($scopes['searches'])) {
-                    $q->where(function ($query) use (&$scopes) {
+                    $q->where(function ($query) use (&$scopes, $attributes) {
                         foreach ($scopes['searches'] as $field) {
-                            if (isset($scopes[$field])) {
+                            if (isset($scopes[$field]) && in_array($field, $attributes)) {
                                 $query->orWhere($field, $this->getLikeOperator(), '%' . $scopes[$field] . '%');
                             }
                         }
                     });
                 }
             });
-
-            // if(get_class_short_name($this) == 'FaqRepository')
-            //     dd($scopes, $attributes, $query->toSql(), $query->get());
 
             foreach ($attributes as $attribute) {
                 if (array_key_exists($attribute, $scopes)) {

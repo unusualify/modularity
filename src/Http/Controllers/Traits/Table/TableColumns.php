@@ -90,7 +90,7 @@ trait TableColumns
         }
 
         if ($header['key'] == 'actions') {
-            $header['width'] ??= '100px';
+            $header['width'] ??= 100;
             $header['align'] ??= 'center';
             $header['sortable'] ??= false;
         }

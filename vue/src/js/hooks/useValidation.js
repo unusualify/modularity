@@ -161,7 +161,9 @@ export default function useValidation (props) {
     dateRule: (msg) => v => !v || !isNaN(Date.parse(v)) || msg || 'Invalid date format',
     futureDateRule: (interval = 0, unit = 'days', msg) => v => {
         if (!v) return true;
-        const today = new Date();
+        let today = new Date();
+        today.setHours(0, 0, 0, 0);
+
         const futureDate = new Date(today);
 
         if(_.isString(interval)) {

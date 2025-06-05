@@ -24,7 +24,7 @@ trait QueryBuilder
 
         $query = $this->model->with($this->formatWiths($query, $with));
 
-        if ($perPage < 0) {
+        if ($perPage === 0) {
             return $query->simplePaginate($perPage);
         }
 
