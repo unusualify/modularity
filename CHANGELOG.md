@@ -2,6 +2,40 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.33.0 - 2025-06-05
+
+### :rocket: Features
+
+- enhance table functionality with pagination and max height support by @OoBook in https://github.com/unusualify/modularity/commit/9b0da3f9b3919043c87d3dcb9dc565f83a949c11
+- add header removal functionality and enhance header filtering by @OoBook in https://github.com/unusualify/modularity/commit/592cf11359a57e570790d0a6db0c1f5a2b208976
+- enhance header actions and search functionality by @OoBook in https://github.com/unusualify/modularity/commit/7e7de44b4e2669676709a6c929e8414676695327
+- enhance response modal with dynamic properties by @OoBook in https://github.com/unusualify/modularity/commit/8e1f4c0d1a92376889d76753e0e9a62210d8482f
+- add success alert on assignment creation by @OoBook in https://github.com/unusualify/modularity/commit/7d2ef950a439d56e1ae0f7613ef620a072da5ef4
+- add items per page options for improved pagination flexibility by @OoBook in https://github.com/unusualify/modularity/commit/f6941150cf82286d742b6bcf59b2b1690aa369ae
+
+### :wrench: Bug Fixes
+
+- update formatter to use selected headers for improved functionality by @OoBook in https://github.com/unusualify/modularity/commit/94fd9383837a5cd3da44d6d79aa624e2f20c349e
+- ensure future date validation considers time by resetting hours to midnight by @OoBook in https://github.com/unusualify/modularity/commit/da048137a8aba446e03169f8a386abd1202f2c17
+- close create form modal after submission to improve user experience by @OoBook in https://github.com/unusualify/modularity/commit/a0aa424b3f8320180e0eefb84ba9ac9431cf4417
+- adjust pagination logic to handle zero items per page correctly by @OoBook in https://github.com/unusualify/modularity/commit/f05da66b4c7f1b66f6c67e936a4edcc41fe213b8
+- handle null schema in getFormFieldsRelationships to prevent errors by @OoBook in https://github.com/unusualify/modularity/commit/917284e2516da5529ef41b19f1217fdaa555097e
+- modify translation query logic for improved flexibility by @OoBook in https://github.com/unusualify/modularity/commit/fb53ca5707a77aa2dce2abd0d3f01a3ee2e47494
+
+### :recycle: Refactors
+
+- increase scrollbar width and enhance thumb styling by @OoBook in https://github.com/unusualify/modularity/commit/6046ed2a56c553a7c1ea0be7a7c156819c81f9ba
+- optimize header filtering logic and improve null handling by @OoBook in https://github.com/unusualify/modularity/commit/1e3fe4168d836a899be5e9ae6a6fbc3c81e39ce9
+- update default header properties for improved consistency and functionality by @OoBook in https://github.com/unusualify/modularity/commit/a61355025fbe99c45ba732dae4aac81f6b1650fe
+
+### :package: Build
+
+- update build artifacts for v0.33.0 by @OoBook in https://github.com/unusualify/modularity/commit/bd0ed1e5b24a8be0b29f837ee869e79d5c5ecb7c
+
+### :beers: Other Stuff
+
+- change default width for action headers from '100px' to 100 for consistency by @OoBook in https://github.com/unusualify/modularity/commit/be983fa88371b8c8db5aaa715e13f3679830b63d
+
 ## v0.32.0 - 2025-06-04
 
 ### :rocket: Features
