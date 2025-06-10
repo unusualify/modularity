@@ -141,25 +141,24 @@ trait TranslationsTrait
         if ($this->model->isTranslatable()) {
             $attributes = $this->model->translatedAttributes;
 
-            $query->orWhereHas('translations', function ($q) use ($scopes, $attributes) {
-                // foreach ($attributes as $attribute) {
-                //     if (isset($scopes[$attribute]) && is_string($scopes[$attribute])) {
-                //         if (! (isset($scopes['searches']) && in_array($attribute, $scopes['searches']))) {
-                //             $q->orWhere($attribute, $this->getLikeOperator(), '%' . $scopes[$attribute] . '%');
-                //         }
-                //     }
-                // }
+            $translatableValues = [];
+            if (isset($scopes['searches'])) {
+                foreach ($scopes['searches'] as $field) {
+                    if (isset($scopes[$field]) && in_array($field, $attributes)) {
+                        $translatableValues[$field] = $scopes[$field];
+                    }
+                }
+            }
 
-                if (isset($scopes['searches'])) {
-                    $q->where(function ($query) use (&$scopes, $attributes) {
-                        foreach ($scopes['searches'] as $field) {
-                            if (isset($scopes[$field]) && in_array($field, $attributes)) {
-                                $query->orWhere($field, $this->getLikeOperator(), '%' . $scopes[$field] . '%');
-                            }
+            if (count($translatableValues) > 0) {
+                $query->orWhereHas('translations', function ($q) use ($translatableValues) {
+                    $q->where(function ($q) use ($translatableValues) {
+                        foreach ($translatableValues as $field => $value) {
+                            $q->orWhere($field, $this->getLikeOperator(), '%' . $value . '%');
                         }
                     });
-                }
-            });
+                });
+            }
 
             foreach ($attributes as $attribute) {
                 if (array_key_exists($attribute, $scopes)) {
