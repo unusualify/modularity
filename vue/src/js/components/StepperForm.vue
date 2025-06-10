@@ -9,7 +9,7 @@
 
       <v-row class="mt-4 flex-fill">
         <!-- left side -->
-        <v-col cols="12" lg="8" v-fit-grid order-lg="1" order="2">
+        <v-col cols="12" lg="8" md="8" v-fit-grid order-md="1" order="2">
           <StepperContent
             v-model="models"
             :schemas="schemas"
@@ -40,7 +40,7 @@
         </v-col>
 
         <!-- right side -->
-        <v-col cols="12" lg="4" order-lg="2" order="1">
+        <v-col cols="12" lg="4" md="4" order-md="2" order="1">
           <StepperSummary
 
             :is-last-step="isLastStep"
