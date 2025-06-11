@@ -2,6 +2,40 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.34.0 - 2025-06-11
+
+### :rocket: Features
+
+- enhance sidebar menu item handling with role-based access control by @OoBook in https://github.com/unusualify/modularity/commit/00fb5eb2a7ea5769f5c625a699925d594e72d953
+- enhance validation and button behavior for improved user experience by @OoBook in https://github.com/unusualify/modularity/commit/289e479c9e267beb66db1de7b169cb8b49ea0bfd
+- add computed property for flattened processable details by @OoBook in https://github.com/unusualify/modularity/commit/d446e1fa807efafa069840720d033e8cafbdbcfb
+- enhance email message handling for notifications by @OoBook in https://github.com/unusualify/modularity/commit/5d88430e4f0de22a423fc3c9fafadc4c52e10b38
+- add stateableCode attribute for improved state management by @OoBook in https://github.com/unusualify/modularity/commit/ffecc32e1f3e24379ac59b7993d85167ebeabf19
+- add noAutoGenerateSchema prop to control schema generation by @OoBook in https://github.com/unusualify/modularity/commit/adaeb6823cc3cfad15cb442278efb8de5a7389a0
+- add no-auto-generate-schema attribute to Form component by @OoBook in https://github.com/unusualify/modularity/commit/2caaaca7571630ca6d2bee165481e1237ed89f69
+- integrate authorization checks for form submission by @OoBook in https://github.com/unusualify/modularity/commit/9791f7443a661e0374897eebf31e2ad40c050c57
+- enhance button behavior based on submittability state by @OoBook in https://github.com/unusualify/modularity/commit/845631e3c99e7801189164f75518b323a76ca462
+
+### :wrench: Bug Fixes
+
+- streamline translation query handling for improved clarity by @OoBook in https://github.com/unusualify/modularity/commit/d9012ea6af886f7927a36d527f9df961579fe88b
+- improve file removal logic for better error handling by @OoBook in https://github.com/unusualify/modularity/commit/47c724989df2b04fcc4c94e2154583fc98a928ce
+- update tooltip visibility condition for search functionality by @OoBook in https://github.com/unusualify/modularity/commit/a1b20dded7b69e110d0e131a2f5ab0b68f85a42b
+
+### :recycle: Refactors
+
+- update layout and clean up unused code by @OoBook in https://github.com/unusualify/modularity/commit/37269df843ec343dd6ba5ba31f3bc0d061f0e5ff
+- comment out unused logic for clarity and streamline caching by @OoBook in https://github.com/unusualify/modularity/commit/a7bac31e2f072db9b2f9c72a907f8b4b9467fcd3
+
+### :lipstick: Styling
+
+- lint coding styles for v0.34.0 by @OoBook in https://github.com/unusualify/modularity/commit/25435834383782daa948eb8d38920c53d5232007
+
+### :package: Build
+
+- update build artifacts for v0.33.0 by @invalid-email-address in https://github.com/unusualify/modularity/commit/5211f01f2a90f775476099f6a562c9d2acb54ef6
+- update build artifacts for v0.34.0 by @OoBook in https://github.com/unusualify/modularity/commit/29c3c095240cd9f3bf89dcb5dd37ac28fccb5e05
+
 ## v0.33.0 - 2025-06-05
 
 ### :rocket: Features
