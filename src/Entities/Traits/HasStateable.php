@@ -146,6 +146,13 @@ trait HasStateable
         ];
     }
 
+    protected function stateableCode(): Attribute
+    {
+        return new Attribute(
+            get: fn () => $this->state ? $this->state->code : null,
+        );
+    }
+
     protected function stateFormatted(): Attribute
     {
         $state = $this->state;
