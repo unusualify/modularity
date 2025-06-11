@@ -9,7 +9,7 @@
 
       <v-row class="mt-4 flex-fill">
         <!-- left side -->
-        <v-col cols="12" lg="8" v-fit-grid order-lg="1" order="2">
+        <v-col cols="12" lg="8" md="8" v-fit-grid order-md="1" order="2">
           <StepperContent
             v-model="models"
             :schemas="schemas"
@@ -40,7 +40,7 @@
         </v-col>
 
         <!-- right side -->
-        <v-col cols="12" lg="4" order-lg="2" order="1">
+        <v-col cols="12" lg="4" md="4" order-md="2" order="1">
           <StepperSummary
 
             :is-last-step="isLastStep"
@@ -457,12 +457,12 @@
         let formFieldValues = this.$cacheGet(formFieldKey, {})
 
         // get previous form field values
-        let previousFormFieldValues = reduce(formFieldValues, (acc, value, key) => {
-          if(value && value === true){
-            acc.push(parseInt(key))
-          }
-          return acc
-        }, [])
+        // let previousFormFieldValues = reduce(formFieldValues, (acc, value, key) => {
+        //   if(value && value === true){
+        //     acc.push(parseInt(key))
+        //   }
+        //   return acc
+        // }, [])
 
         // get cached form field values
         let cachedFormFieldValues = reduce(formFieldValues, (acc, value, key) => {
@@ -475,44 +475,59 @@
         let modelValue = get(this.models, modelNotation)
 
         if(modelValue && formField.endpoint){ // if model value is present and endpoint is present fetch new items
+
+          this.lastFormPreview = []
+
           let currentIds = Array.isArray(modelValue)
             ? modelValue
             : [modelValue]
 
           let newIds = currentIds.filter(id => !cachedFormFieldValues.includes(id))
-          let cachedNewIds = currentIds.filter(id => !previousFormFieldValues.includes(id) && cachedFormFieldValues.includes(id))
+          let cachedIds = currentIds.filter(id => cachedFormFieldValues.includes(id))
+          // let cachedNewIds = currentIds.filter(id => !previousFormFieldValues.includes(id) && cachedFormFieldValues.includes(id))
 
-          let deletedIds = previousFormFieldValues.filter(id => !currentIds.includes(id))
-          let isChanged = false
+          // let deletedIds = previousFormFieldValues.filter(id => !currentIds.includes(id))
+          // let isChanged = false
 
-          if(deletedIds.length > 0){ // delete items
-            isChanged = true
+          // if(deletedIds.length > 0){ // delete items
+          //   isChanged = true
 
-            this.lastFormPreview = this.lastFormPreview.filter(item => !deletedIds.includes(item.form_field_id))
+          //   this.lastFormPreview = this.lastFormPreview.filter(item => !deletedIds.includes(item.form_field_id))
 
-            formFieldValues = reduce(formFieldValues, (acc, value, key) => {
-              if(deletedIds.includes(parseInt(key))){
-                acc[key] = false
-              }else{
-                acc[key] = value
-              }
-              return acc
-            }, {})
-          }
+          //   formFieldValues = reduce(formFieldValues, (acc, value, key) => {
+          //     if(deletedIds.includes(parseInt(key))){
+          //       acc[key] = false
+          //     }else{
+          //       acc[key] = value
+          //     }
+          //     return acc
+          //   }, {})
+          // }
 
-          if(cachedNewIds.length > 0){ // get cached items acc. to form_field_id
-            cachedNewIds.forEach(id => {
-              let cachedNewItems = cachedFormFieldFetched.filter(item => item.form_field_id === id && item.form_field_notation === modelNotation)
-              cachedNewItems.forEach(item => {
+          // if(cachedNewIds.length > 0){ // get cached items acc. to form_field_id
+          //   cachedNewIds.forEach(id => {
+          //     let cachedNewItems = cachedFormFieldFetched.filter(item => item.form_field_id === id && item.form_field_notation === modelNotation)
+          //     cachedNewItems.forEach(item => {
+          //       this.lastFormPreview.push(item)
+          //     })
+          //     formFieldValues[id] = true
+          //   })
+          //   isChanged = true
+          // }
+
+          if(cachedIds.length > 0){ // get cached items acc. to form_field_id
+            cachedIds.forEach(id => {
+              let cachedItems = cachedFormFieldFetched.filter(item => item.form_field_id === id && item.form_field_notation === modelNotation)
+              cachedItems.forEach(item => {
                 this.lastFormPreview.push(item)
               })
               formFieldValues[id] = true
             })
-            isChanged = true
+            // isChanged = true
           }
 
           if(newIds.length > 0){ // fetch new items
-
+            __log('newIds', newIds)
             if(!formField.endpoint){
               return
             }
@@ -599,20 +614,21 @@
                 this.lastFormPreview.push(item)
               })
 
-              if(flattenedItems.length > 0){
-                isChanged = true
-              }
+              // if(flattenedItems.length > 0){
+              //   isChanged = true
+              // }
 
             }
           }
 
-          if(isChanged){
+          // if(isChanged){
             this.$cachePut(formFieldKey, formFieldValues)
-          }
+          // }
 
-        } else if(previousFormFieldValues.length > 0){ // clear if model value is null and previous form field values are present
-          this.lastFormPreview = this.lastFormPreview.filter(item => previousFormFieldValues.includes(item.form_field_id))
         }
+        // else if(previousFormFieldValues.length > 0){ // clear if model value is null and previous form field values are present
+        //   this.lastFormPreview = this.lastFormPreview.filter(item => previousFormFieldValues.includes(item.form_field_id))
+        // }
 
         this.lastFormPreviewLoading = false
       }

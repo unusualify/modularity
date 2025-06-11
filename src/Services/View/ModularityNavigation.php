@@ -7,11 +7,12 @@ use Illuminate\Support\Facades\Route;
 use Nwidart\Modules\Facades\Module;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Services\Connector;
+use Unusualify\Modularity\Traits\Allowable;
 use Unusualify\Modularity\Traits\ManageNames;
 
 class ModularityNavigation
 {
-    use ManageNames;
+    use ManageNames, Allowable;
 
     protected $request;
 
@@ -47,11 +48,40 @@ class ModularityNavigation
     public function sidebarMenuItem($array)
     {
         $is_active = 0;
-        if (isset($array['items'])) {
-            $array['items'] = array_map(function ($item) {
-                return $this->sidebarMenuItem($item);
-            }, $array['items']);
+
+        if (isset($array['can']) || isset($array['allowedRoles'])) {
+            $user = auth()->user();
+
+            $result = false;
+
+            if (isset($array['can']) && is_string($array['can'])) {
+                $result = $user->can($array['can']);
+            }
+
+            if (isset($array['allowedRoles'])) {
+                $result = $this->isAllowedItem(
+                    $array,
+                    searchKey: 'allowedRoles',
+                    disallowIfUnauthenticated: true
+                );
+            }
+
+            if (! $result) {
+                return false;
+            }
         }
+
+        if (isset($array['items'])) {
+            $array['items'] = array_reduce($array['items'], function ($carry, $item) {
+                $res = $this->sidebarMenuItem($item);
+                if ($res) {
+                    $carry[] = $res;
+                }
+
+                return $carry;
+            }, []);
+        }
+
         if (isset($array['menuItems'])) {
             $array['menuItems'] = array_map(function ($item) {
                 return $this->sidebarMenuItem($item);

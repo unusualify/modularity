@@ -8,6 +8,8 @@
       transition="dialog-bottom-transition"
       width-type="md"
       full
+
+      eager
     >
       <template v-slot:body="formModalBodyScope">
         <v-card class="fill-height d-flex flex-column">
@@ -97,17 +99,28 @@
           <v-row v-if="$hasRoles(processableEditableRoles)">
             <v-col cols="12" class="text-center" v-if="formSchema && processableModel">
               <v-btn
+                ref="editButton"
                 colorx="primary"
-                color=""
                 density="compact"
-                variant="outlined"
+                :variant="bothFormAndProcessableValid ? 'outlined' : 'elevated'"
+                :elevation="bothFormAndProcessableValid ? null : 10"
+                :color="bothFormAndProcessableValid ? 'success' : onlyOneValid ? 'warning' : 'secondary'"
+                :prepend-icon="bothFormAndProcessableValid ? 'mdi-check-circle-outline' :  (onlyOneValid ? 'mdi-progress-question' : 'mdi-gesture-tap')"
                 @click="$log('edit', $refs.formModal.open())"
                 class="mb-4"
               >
-                {{ $t('Edit') }}
+                {{ bothFormAndProcessableValid ? $t('Edit') : onlyOneValid ? $t('Complete') : $t('Fill') }}
               </v-btn>
             </v-col>
           </v-row>
+
+          <ue-list-section v-if="flattenedProcessableDetails.length > 0"
+            :items="flattenedProcessableDetails"
+            :item-fields="['title', 'value']"
+            :col-classes="['font-weight-medium text-wrap', 'd-flex justify-start']"
+            :col-ratios="[5,7]"
+          >
+          </ue-list-section>
 
           <!-- Processable display -->
           <template v-if="processableModel">
@@ -181,6 +194,8 @@
                   variant="elevated"
                   :loading="updating"
                   @click="updateProcess('waiting_for_confirmation')"
+
+                  :disabled="!bothFormAndProcessableValid"
                 >
                   {{ processModel.next_action_label }}
                 </v-btn>
@@ -259,7 +274,6 @@
           </v-row>
         </v-card-actions>
 
-
       </template>
     </v-card>
 
@@ -294,6 +308,10 @@ export default {
       type: String,
       default: 'name'
     },
+    processableDetails: {
+      type: Array,
+      default: () => [],
+    },
 
     schema: {
       type: Object,
@@ -324,8 +342,6 @@ export default {
       type: Object,
       default: () => {}
     },
-
-
   },
   setup (props, context) {
     const initializeInput = (val) => {
@@ -338,13 +354,26 @@ export default {
 
     const UeForm = ref(null)
 
+    const processableValid = ref(false)
+
     const formIsValid = computed(() => {
       return UeForm.value?.validModel ?? null
     })
 
+    const processValid = ref(false)
+
     const states = reactive({
       UeForm,
       formIsValid,
+      processValid,
+      processableValid,
+
+      bothFormAndProcessableValid: computed(() => {
+        return processableValid.value && formIsValid.value
+      }),
+      onlyOneValid: computed(() => {
+        return (processableValid.value && !formIsValid.value) || (!processableValid.value && formIsValid.value)
+      }),
     })
 
     return {
@@ -370,6 +399,23 @@ export default {
   computed: {
     title() {
       return this.$lodash.get(this.processModel.processable, this.processableTitle, '')
+    },
+
+    flattenedProcessableDetails() {
+      const processable = this.processModel?.processable ?? {}
+
+      let details = []
+
+      for(const detail of this.processableDetails){
+        if(__isset(detail.field) && __isset(detail.title)) {
+          details.push({
+            title: this.$t(detail.title),
+            value: this.$lodash.get(processable, detail.field, ''),
+          })
+        }
+      }
+
+      return details
     }
   },
   watch: {
@@ -381,7 +427,11 @@ export default {
     },
     processableModel: {
       handler(val) {
-
+        if(!!val){
+          this.$nextTick(() => {
+            // __log('processableModel', val)
+          })
+        }
       },
       immediate: true
     }
@@ -410,6 +460,7 @@ export default {
 
                 if(__isset(processable[processableKey])){
                   let value = processable[processableKey];
+
                   if(__isset(value[formatterFunction])){
                     schema[inputName][formattedKey] = value[formatterFunction];
                   }
@@ -434,9 +485,17 @@ export default {
           .then(response => {
             self.loading = false
             if(response.status === 200) {
+
               self.processModel = response.data
+              __log('processModel', self.processModel)
               self.processableModel = self.processModel?.processable ?? {}
               self.setSchema()
+
+              self.$nextTick(async () => {
+                await self.UeForm.validate()
+                await self.UeForm.VForm.resetValidation()
+                self.processableValid = self.UeForm.validModel
+              })
             }
           }).catch(error => {
 
@@ -445,8 +504,19 @@ export default {
           })
       }
     },
-    updateProcess(status) {
+    async updateProcess(status) {
+
       if (this.input) {
+        await this.$refs.UeForm.validate()
+        const isValid = this.$refs.UeForm.validModel
+
+        if(!isValid){
+
+          this.$store.commit(ALERT.SET_ALERT, { message: this.$t('Please fill all the required fields'), variant: 'error', location: 'top', timeout: 2000 })
+
+          return
+        }
+
         this.updating = true
         const endpoint = this.updateEndpoint.replace(':id', this.input);
 
@@ -456,6 +526,7 @@ export default {
         }
 
         const self = this
+
         axios.put(endpoint, data).then(response => {
           if(response.status === 200) {
             self.promptModalActive = false
@@ -469,7 +540,7 @@ export default {
         })
       }
     },
-    updateProcessable() {
+    async updateProcessable() {
 
       if(this.input){
 

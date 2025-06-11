@@ -207,9 +207,20 @@
       removeFilepond: function(error, file) {
         const uuid = file.filename ?? file.serverId?.replace(`/${file.filename}`, '') ?? file.uuid;
 
-        const newInput = this.input.filter((asset) => asset.uuid != uuid);
+        let index = this.input.findIndex((asset) => asset.uuid == uuid);
 
-        this.input = newInput
+        if(index == -1){
+          const source = file.source
+
+          index = this.input.findIndex((asset) => asset.source == source);
+        }
+
+        if(index != -1){
+          const newInput = this.input.slice(0, index).concat(this.input.slice(index + 1));
+          this.input = newInput
+        }else {
+          console.error('removeFilepond error not found', file, this.input)
+        }
       },
 
       init() {
@@ -424,6 +435,7 @@
           return this.modelValue ?? []
         },
         set(val){
+          __log('input set', val)
           this.updateModelValue(val)
         }
       },
