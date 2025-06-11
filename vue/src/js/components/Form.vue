@@ -143,6 +143,8 @@
               :schema="inputSchema"
               :row="rowAttribute"
 
+              no-auto-generate-schema
+
               @update="handleUpdate"
               @input="handleInput"
               @resize="handleResize"
