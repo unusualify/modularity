@@ -310,11 +310,12 @@
               loading
             }"></slot>
             <v-btn type="submit"
-              :disabled="!(validModel || !serverValid) || loading"
+              :disabled="!(validModel || !serverValid) || loading || !isSubmittable"
               class="ml-auto mb-5"
               :loading="loading"
+              :color="!isSubmittable ? 'warning' : 'primary'"
               >
-              {{ buttonDefaultText }}
+              {{ !isSubmittable ? 'No Operation To Perform' : buttonDefaultText }}
             </v-btn>
           </slot>
         </div>
