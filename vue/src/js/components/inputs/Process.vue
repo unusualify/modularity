@@ -114,6 +114,14 @@
             </v-col>
           </v-row>
 
+          <ue-list-section v-if="flattenedProcessableDetails.length > 0"
+            :items="flattenedProcessableDetails"
+            :item-fields="['title', 'value']"
+            :col-classes="['font-weight-medium text-wrap', 'd-flex justify-start']"
+            :col-ratios="[5,7]"
+          >
+          </ue-list-section>
+
           <!-- Processable display -->
           <template v-if="processableModel">
             <ue-list-section
@@ -300,6 +308,10 @@ export default {
       type: String,
       default: 'name'
     },
+    processableDetails: {
+      type: Array,
+      default: () => [],
+    },
 
     schema: {
       type: Object,
@@ -330,8 +342,6 @@ export default {
       type: Object,
       default: () => {}
     },
-
-
   },
   setup (props, context) {
     const initializeInput = (val) => {
@@ -389,6 +399,23 @@ export default {
   computed: {
     title() {
       return this.$lodash.get(this.processModel.processable, this.processableTitle, '')
+    },
+
+    flattenedProcessableDetails() {
+      const processable = this.processModel?.processable ?? {}
+
+      let details = []
+
+      for(const detail of this.processableDetails){
+        if(__isset(detail.field) && __isset(detail.title)) {
+          details.push({
+            title: this.$t(detail.title),
+            value: this.$lodash.get(processable, detail.field, ''),
+          })
+        }
+      }
+
+      return details
     }
   },
   watch: {
@@ -460,6 +487,7 @@ export default {
             if(response.status === 200) {
 
               self.processModel = response.data
+              __log('processModel', self.processModel)
               self.processableModel = self.processModel?.processable ?? {}
               self.setSchema()
 
