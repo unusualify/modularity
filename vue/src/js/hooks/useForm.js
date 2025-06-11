@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { cloneDeep, isEqual, find, reduce, set, get } from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
-import { useInputHandlers, useValidation, useLocale, useItemActions } from '@/hooks'
+import { useInputHandlers, useValidation, useLocale, useItemActions, useAuthorization } from '@/hooks'
 import { FORM, ALERT } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
 import api from '@/store/api/form'
@@ -161,6 +161,7 @@ export default function useForm(props, context) {
   const inputHandlers = useInputHandlers()
   const validations = useValidation(props)
   const locale = useLocale()
+  const { hasRoles } = useAuthorization()
 
   // Data refs
   const VForm = ref(null)
@@ -199,6 +200,33 @@ export default function useForm(props, context) {
   const formEventSchema = ref(getFormEventSchema(rawSchema.value, { ...model.value, ...formItem.value }, props.isEditing))
   const extraValids = ref(props.actions.length ? props.actions.map(() => true) : [])
 
+  const checkSubmittable = (item) => {
+    let result = false
+    if(!(Object.prototype.hasOwnProperty.call(item, 'noSubmit') && item.noSubmit)) {
+      result = true
+    }
+
+    if(result && Object.prototype.hasOwnProperty.call(item, 'allowedRoles') && Array.isArray(item.allowedRoles)) {
+      if(!hasRoles(item.allowedRoles)) {
+        result = false
+      }
+    }
+
+    return result
+  }
+
+  const isSubmittable = computed(() => {
+    return find(inputSchema.value, (input) => {
+      let result = false
+      if(['wrap', 'group'].includes(input.type)) {
+        result = find(input.schema, checkSubmittable)
+      } else {
+        result = checkSubmittable(input)
+      }
+      return result
+    }) || find(formEventSchema.value, checkSubmittable) ? true : false
+  })
+
   const hasAdditionalSection = computed(() => context.slots.right
     || context.slots['right.top']
     || context.slots['right.bottom']
@@ -221,6 +249,7 @@ export default function useForm(props, context) {
     chunkedRawSchema,
     inputSchema,
     formEventSchema,
+    isSubmittable,
     extraValids,
 
     hasStickyFrame: props.stickyFrame || props.stickyButton,
