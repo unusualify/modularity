@@ -77,6 +77,7 @@ class ModularityNavigation
                 if ($res) {
                     $carry[] = $res;
                 }
+
                 return $carry;
             }, []);
         }
