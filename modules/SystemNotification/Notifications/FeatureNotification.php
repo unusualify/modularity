@@ -139,10 +139,14 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
 
         $redirector = $mailRedirector ?? $redirector ?? null;
 
+        $message = method_exists($this, 'getNotificationMailMessage')
+            ? $this->getNotificationMailMessage($notifiable, $this->model)
+            : $this->getNotificationMessage($notifiable, $this->model);
+
         $mailMessage = (new MailMessage)
             ->subject($mailSubject)
             ->greeting(__('Hi, :name', ['name' => $notifiable->name]))
-            ->line($this->getNotificationMessage($notifiable, $this->model));
+            ->line($message);
 
         if ($redirector) {
             $mailMessage->action('View ' . $moduleRouteHeadline, $redirector);
