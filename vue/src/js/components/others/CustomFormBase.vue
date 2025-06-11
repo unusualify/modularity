@@ -630,6 +630,10 @@ export default {
     schema: {
       type: [Object, Array],
       default: () => ({})
+    },
+    noAutoGenerateSchema: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -1345,7 +1349,7 @@ export default {
       this.tryAutogenerateModelStructure(model, schema)
 
       // no schema defined or empty -> autogenerate basic schema
-      if (isEmpty(schema)) this.autogenerateSchema(model)
+      if (isEmpty(schema) && !this.noAutoGenerateSchema) this.autogenerateSchema(model)
 
       // create flatted working array from schema and value
       this.flatCombinedArray = this.flattenAndCombineToArray(this.storeStateData, this.storeStateSchema)
