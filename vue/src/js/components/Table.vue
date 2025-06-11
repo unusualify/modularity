@@ -699,7 +699,7 @@
           v-slot:[`header.${header.key}`]="headerScope"
         >
           {{ headerScope.column.title }}
-          <v-tooltip v-if="header.searchable" :text="$t('Search')">
+          <v-tooltip v-if="header.searchable && !hideSearchField" :text="$t('Search')">
             <template v-slot:activator="{ props }">
               <v-icon
                 v-bind="props"
