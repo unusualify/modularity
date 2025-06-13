@@ -243,11 +243,6 @@ trait Relationships
 
     public function getFormFieldsRelationships($object, $fields, $schema = [])
     {
-        // dd(
-        //     $object->packageFeatures->toArray(),
-        //     // $object->packageFeatures->toArray(),
-        //     // $object->newPackageFeatures,
-        // );
         $inputs = $this->inputs();
         $morphToRelations = $this->getMorphToRelations();
         // $hasManyRelations = $this->getHasManyRelations();
