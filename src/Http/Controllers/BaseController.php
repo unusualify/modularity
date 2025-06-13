@@ -239,8 +239,9 @@ abstract class BaseController extends PanelController
 
         $item = $this->repository->getById(
             $id,
-            $this->request->get('eagers') ?? [],
+            with: $this->request->get('eagers') ?? [],
             // $this->formWithCount
+            lazy: $this->request->get('lazy') ?? [],
         );
 
         $data = array_merge(
