@@ -84,8 +84,7 @@ trait HasCreator
 
     public function initializeHasCreator()
     {
-        // $this->fillable = array_merge($this->fillable, ['test']);
-        // dd('initialize');
+        $this->mergeFillable(static::$hasCreatorFillable ?? []);
     }
 
     /**
