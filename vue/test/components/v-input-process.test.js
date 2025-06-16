@@ -222,17 +222,37 @@ describe('VInputProcess tests', () => {
       }
     }
 
+    const schema = {
+      name: {
+        type: 'text',
+        name: 'name'
+      }
+    }
+
     const wrapper = await factory({
       modelValue: 1,
-      process: processData
+      process: processData,
+      schema: schema
     })
 
     // Mock methods
     wrapper.vm.canAction = () => true
     const updateProcessSpy = vi.spyOn(wrapper.vm, 'updateProcess')
 
+    // Properly mock UeForm with validate method
+    wrapper.vm.UeForm = {
+      validModel: true,
+      model: {
+        id: 101,
+        name: 'Updated Test Process'
+      },
+      validate: vi.fn().mockResolvedValue(true), // Add mock validate method
+      VForm: {
+        resetValidation: vi.fn()
+      }
+    }
     // Call the method directly since we're stubbing the button
-    wrapper.vm.updateProcess('waiting_for_confirmation')
+    await wrapper.vm.updateProcess('waiting_for_confirmation')
 
     expect(updateProcessSpy).toHaveBeenCalledWith('waiting_for_confirmation')
     expect(global.axios.put).toHaveBeenCalled()
@@ -255,6 +275,7 @@ describe('VInputProcess tests', () => {
 
     // Mock UeForm ref
     wrapper.vm.UeForm = {
+      validModel: true,
       model: {
         id: 101,
         name: 'Updated Test Process'
