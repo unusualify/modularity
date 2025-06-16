@@ -2,6 +2,64 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.35.0 - 2025-06-16
+
+### :rocket: Features
+
+- enhance model retrieval with connectedRelationship support by @OoBook in https://github.com/unusualify/modularity/commit/28facf156ecb04b57aafd07ac395d0bfc1afc0fc
+- enhance getById method with lazy loading support by @OoBook in https://github.com/unusualify/modularity/commit/192e68930b162cd8b85b35c41dc3c127929381c1
+- enhance hydration logic to support lazy loading by @OoBook in https://github.com/unusualify/modularity/commit/283bcba15d8c1b208db50eed8fa347bfe17b5003
+- add support for lazy loading in filter formatting by @OoBook in https://github.com/unusualify/modularity/commit/6a590571b1bb3cb04544695f9c95a0ce366b4b41
+- add comparatorValue prop and improve value retrieval by @OoBook in https://github.com/unusualify/modularity/commit/4614a57a67908935a2937a014ec6eaff50fe498f
+- enhance afterSaveRelationships method for improved relationship management by @OoBook in https://github.com/unusualify/modularity/commit/b88b99c30b97952c709b457caf1b975f62dd1c42
+- add new Expansion component for collapsible content by @OoBook in https://github.com/unusualify/modularity/commit/7dbcb5e47d2067efe0919cd3fd14c9b298640253
+- enhance schema binding with additional props by @OoBook in https://github.com/unusualify/modularity/commit/d5a2b921d54d5e6e1c059b0a1647b158a7582b57
+- add sorting functionality for checklist items by @OoBook in https://github.com/unusualify/modularity/commit/6be32e1bb7de13b2d23848ffd7e8ef7cc1b83899
+- add FileFactory and enhance File entity with size attributes by @OoBook in https://github.com/unusualify/modularity/commit/12489fbe7c8c660369a274036144aa0748aefc07
+- introduce MediaFactory and integrate HasFactory trait by @OoBook in https://github.com/unusualify/modularity/commit/580fe5fd49298b71b60ff8983f6e4874c26a0a52
+- enhance orderByCurrencyPrice and orderByBasePrice methods by @OoBook in https://github.com/unusualify/modularity/commit/ab6e11a8240269d427d6c6eb8fc7d531a64229b8
+- add validation rules to Price input component by @OoBook in https://github.com/unusualify/modularity/commit/abe71305a098bc9eef183a8a6eafbc30ff10a26b
+- add pricing saving key to default attributes by @OoBook in https://github.com/unusualify/modularity/commit/a044df7b5e667e97aecf3c4cdd43d030113bb921
+- set default price value in hydrate method by @OoBook in https://github.com/unusualify/modularity/commit/e9ebfe1f55f55ac33f687c4a4e075b93671e2974
+- enhance v-text-field attributes for improved validation by @OoBook in https://github.com/unusualify/modularity/commit/53d30b0b2efd35b23ce1c25e09db8d87714cab79
+- add errorMessages prop for enhanced error handling by @OoBook in https://github.com/unusualify/modularity/commit/1968d8528bae12f68e24c8939526827f65a95df7
+- refactor input handling and enhance error management by @OoBook in https://github.com/unusualify/modularity/commit/b90273e3fa3d865ce0ac30acbb9fa16f348cc4de
+- enhance respondWithRedirect method to accept additional attributes by @OoBook in https://github.com/unusualify/modularity/commit/331bae87bed548857be1bbf44ed9fbaaffdb819e
+- update getTableAttribute method to accept a default value by @OoBook in https://github.com/unusualify/modularity/commit/14e60f367c66c917af449a123a2f4004d73bad0b
+- add redirect option after item creation by @OoBook in https://github.com/unusualify/modularity/commit/2989b666c2007b012c50db0aafa08d725155dbc0
+- enhance redirect logic based on response data by @OoBook in https://github.com/unusualify/modularity/commit/e16ce750a79706876bb3679d57aa582a9fe66a2f
+
+### :wrench: Bug Fixes
+
+- add null/undefined check for target input by @OoBook in https://github.com/unusualify/modularity/commit/6faa39c45336c03374affed60989fa3bc80641ff
+- update minValueRule to handle undefined and null values by @OoBook in https://github.com/unusualify/modularity/commit/cafacc4baf71140ff69273024cfffde32da63b06
+
+### :recycle: Refactors
+
+- update getById method to use named parameters for improved clarity by @OoBook in https://github.com/unusualify/modularity/commit/4d6db1d00da8e702757bfb5c84364d226b7104c0
+- remove commented-out debug code in getFormFieldsRelationships method by @OoBook in https://github.com/unusualify/modularity/commit/197d4942a06a9d0ed33ffc291b769be0e1d444e8
+- remove commented-out code related to HasCreator trait by @OoBook in https://github.com/unusualify/modularity/commit/632baa12b16b4ca7297733399df4feeec6603f00
+- streamline configuration and cache handling by @OoBook in https://github.com/unusualify/modularity/commit/be6cc18e4611ac62a0a04557eaa2328b828be858
+- optimize admin URL configuration handling by @OoBook in https://github.com/unusualify/modularity/commit/a75f74ac602fb392d111b7393004fdceebee9ffd
+- replace modularityConfig calls with Modularity methods by @OoBook in https://github.com/unusualify/modularity/commit/aebadf8c328f4d198326672101782e101e591082
+- replace Fragment with span for improved HTML semantics by @OoBook in https://github.com/unusualify/modularity/commit/178108f43fd5f756ba15b32d22020c7e917e5899
+- streamline modal rendering and improve validation checks by @OoBook in https://github.com/unusualify/modularity/commit/e1b4b84812c50ba033d74b76f35748c029b1e5b9
+
+### :lipstick: Styling
+
+- lint coding styles for v0.35.0 by @OoBook in https://github.com/unusualify/modularity/commit/d823ae6a938af2817d017d4ef3ec4ae3ac978dae
+
+### :white_check_mark: Testing
+
+- add comprehensive tests for File model functionality by @OoBook in https://github.com/unusualify/modularity/commit/eb332a0de23cabc38ac4a51c8441643e69d1a40c
+- enhance modularity configuration setup for testing by @OoBook in https://github.com/unusualify/modularity/commit/f80e4b45cf340548114623f8cf0e90baf48fa3c8
+- add comprehensive tests for Media model functionality by @OoBook in https://github.com/unusualify/modularity/commit/5c833e8a8eed702b6d19b87e6f3c7aa00bc77fe9
+- enhance updateProcess method and mock UeForm validation by @OoBook in https://github.com/unusualify/modularity/commit/fd31b1b56def53a5776185c5c9bd59ea65f15782
+
+### :package: Build
+
+- update build artifacts for v0.35.0 by @OoBook in https://github.com/unusualify/modularity/commit/5009e2ca0176e7d3212db40de3c87ef6af745a4c
+
 ## v0.34.0 - 2025-06-11
 
 ### :rocket: Features
