@@ -8,6 +8,7 @@
         :modelValue="deepModel[i][priceInputName]"
         @update:modelValue="updateNumberInput($event, i)"
         :readonly="readonly"
+        :rules="rules"
         >
         <template v-slot:append-inner="{isActive, isFocused, controlRef, focus, blur}">
           <v-chip @click="changeCurrency($event, i)">
@@ -23,8 +24,7 @@
         class="flex-grow-0"
         v-model="deepModel[i].vat_rate_id"
       />
-      <v-number-input
-        v-if="hasDiscount"
+      <v-number-input v-if="hasDiscount"
         v-model="deepModel[i].discount_percentage"
         v-bind="{...$lodash.pick($attrs, ['density', 'color', 'clearable', 'variant'])}"
         :label="$t('Discount %')"
