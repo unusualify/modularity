@@ -107,10 +107,12 @@ trait MakesResponses
      * @param string $redirectUrl
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithRedirect($redirectUrl)
+    protected function respondWithRedirect($redirectUrl, $attributes = [])
     {
         return Response::json([
             'redirect' => $redirectUrl,
+            'redirector' => $redirectUrl,
+            ...$attributes,
         ]);
     }
 
