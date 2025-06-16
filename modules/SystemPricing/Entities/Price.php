@@ -33,12 +33,15 @@ class Price extends \Oobook\Priceable\Models\Price
      */
     public function defaultAttributes(): array
     {
+        $pricingSavingKey = Price::$priceSavingKey;
+
         return [
             'vat_rate_id' => config('priceable.defaults.vat_rates'),
             'currency_id' => config('priceable.defaults.currencies'),
             'price_type_id' => config('priceable.defaults.price_type'),
 
             'discount_percentage' => 0.00,
+            $pricingSavingKey => 0.00,
         ];
     }
 

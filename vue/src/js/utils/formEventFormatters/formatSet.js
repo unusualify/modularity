@@ -34,6 +34,11 @@ export default async function formatSet(args, model, schema, input, index = null
 
       if (matches) { // setting modelValue
         let targetInput = _.get(schema, inputToFormat)
+
+        if (targetInput == undefined || targetInput == null) {
+          return
+        }
+
         let targetInputName = targetInput.name
         let targetForeignKey = __extractForeignKey(targetInputName)
         let targetInputSchema = targetInput.schema ?? null

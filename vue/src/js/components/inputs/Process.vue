@@ -1,7 +1,6 @@
 <template>
   <div>
-    <ue-modal
-      v-if="formSchema && processableModel"
+    <ue-modal v-if="formSchema && processableModel"
       ref="formModal"
       v-model="formActive"
       scrollablex
@@ -300,7 +299,6 @@ export default {
       type: String,
       default: 'outlined',
     },
-
     process: {
       type: Object
     },
@@ -312,7 +310,6 @@ export default {
       type: Array,
       default: () => [],
     },
-
     schema: {
       type: Object,
     },
@@ -320,7 +317,6 @@ export default {
       type: Object,
       default: () => {}
     },
-
     fetchEndpoint: {
       type: String,
       required: true,
@@ -329,7 +325,6 @@ export default {
       type: String,
       required: true,
     },
-
     processableEditableRoles: {
       type: Array,
       default: () => ['superadmin']
@@ -392,7 +387,6 @@ export default {
 
       formActive: false,
       formSchema: this.process ? this.formatSchema() : null,
-
       promptModalActive: false,
     }
   },
@@ -487,14 +481,15 @@ export default {
             if(response.status === 200) {
 
               self.processModel = response.data
-              __log('processModel', self.processModel)
               self.processableModel = self.processModel?.processable ?? {}
               self.setSchema()
 
               self.$nextTick(async () => {
-                await self.UeForm.validate()
-                await self.UeForm.VForm.resetValidation()
-                self.processableValid = self.UeForm.validModel
+                if(self.UeForm){
+                  await self.UeForm.validate()
+                  await self.UeForm.VForm.resetValidation()
+                  self.processableValid = self.UeForm.validModel
+                }
               })
             }
           }).catch(error => {
@@ -507,8 +502,8 @@ export default {
     async updateProcess(status) {
 
       if (this.input) {
-        await this.$refs.UeForm.validate()
-        const isValid = this.$refs.UeForm.validModel
+        await this.UeForm.validate()
+        const isValid = this.UeForm.validModel
 
         if(!isValid){
 

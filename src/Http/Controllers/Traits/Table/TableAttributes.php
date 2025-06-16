@@ -56,9 +56,9 @@ trait TableAttributes
      * @param mixed $attribute
      * @return bool|mixed returns referenced value or false if it's not defined at module config->table_options
      */
-    public function getTableAttribute($attribute)
+    public function getTableAttribute($attribute, $default = null)
     {
-        return $this->tableAttributes[$attribute] ?? null;
+        return $this->tableAttributes[$attribute] ?? $default;
     }
 
     /**

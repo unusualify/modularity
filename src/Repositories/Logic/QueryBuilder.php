@@ -102,15 +102,45 @@ trait QueryBuilder
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function getById($id, $with = [], $withCount = [])
+    public function getById($id, $with = [], $withCount = [], $lazy = [])
     {
         $query = $this->model->query();
 
+        $withs = $this->formatWiths($query, $with);
+
         if (classHasTrait($this->model, 'Illuminate\Database\Eloquent\SoftDeletes')) {
-            return $query->withTrashed()->with($this->formatWiths($query, $with))->withCount($withCount)->findOrFail($id);
+            $result = $query->withTrashed()->with($withs)->withCount($withCount)->findOrFail($id);
         } else {
-            return $query->with($this->formatWiths($query, $with))->withCount($withCount)->findOrFail($id);
+            $result = $query->with($withs)->withCount($withCount)->findOrFail($id);
         }
+
+        if ($lazy && count($lazy) > 0 && $result instanceof \Illuminate\Database\Eloquent\Model) {
+            foreach ($lazy as $relation) {
+                $parts = explode('.', $relation);
+
+                if (count($parts) > 1) {
+                    foreach ($parts as $i => $part) {
+                        if ($i === 0) {
+                            $result = $result->load($part);
+                        } else {
+                            if ($result->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Model) {
+                                $result = $result->{$parts[$i - 1]}->load($part);
+                            } elseif ($result->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Collection) {
+                                $result->{$parts[$i - 1]} = $result->{$parts[$i - 1]}->map(function ($item) use ($part) {
+                                    $item->{$part};
+
+                                    return $item;
+                                });
+                            }
+                        }
+                    }
+                } else {
+                    $result->load($relation);
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -142,7 +172,6 @@ trait QueryBuilder
                 );
             });
         } else {
-
             return $query->get();
         }
     }

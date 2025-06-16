@@ -1,20 +1,36 @@
 <template>
   <template v-for="(price,i) in deepModel" :key="`price-${i}`">
     <div class="d-flex w-100 ga-2">
-      <CurrencyNumber
-        class="flex-grow-1"
-        v-bind="{label, ...$attrs }"
-        :name="`${$attrs['name']}-${i}`"
-        :modelValue="deepModel[i][priceInputName]"
-        @update:modelValue="updateNumberInput($event, i)"
-        :readonly="readonly"
+      <v-input
+        :ref="(el) => setInputRef(i, el)"
+        v-model="deepModel[i][priceInputName]"
+        class="v-input-price"
+        v-bind="{...$lodash.pick($attrs, ['error', 'errorMessages'])}"
+        :rules="rules"
+        hide-details
         >
-        <template v-slot:append-inner="{isActive, isFocused, controlRef, focus, blur}">
-          <v-chip @click="changeCurrency($event, i)">
-            {{ displayedCurrency[i] }}
-          </v-chip>
+        <template v-slot:default="defaultSlot">
+          <CurrencyNumber
+            class="flex-grow-1"
+            v-bind="{label, ...$attrs }"
+            :name="`${$attrs['name']}-${i}`"
+            :modelValue="deepModel[i][priceInputName]"
+            @update:modelValue="updateNumberInput($event, i)"
+            :readonly="readonly"
+            :errorMessages="errorMessages[i]"
+            >
+            <template v-slot:append-inner="{isActive, isFocused, controlRef, focus, blur}">
+              <v-chip @click="changeCurrency($event, i)">
+                {{ displayedCurrency[i] }}
+              </v-chip>
+            </template>
+          </CurrencyNumber>
         </template>
-      </CurrencyNumber>
+
+        <template v-slot:details>
+          {{ errorMessages[i] }}
+        </template>
+      </v-input>
       <v-select
         v-show="vatRates.length > 0"
         v-bind="{...$lodash.pick($attrs, ['density', 'color', 'clearable', 'variant'])}"
@@ -53,6 +69,7 @@
 </template>
 
 <script>
+import { ref, reactive } from 'vue'
 import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 import CurrencyNumber from '__components/others/CurrencyNumber'
 
@@ -122,21 +139,41 @@ export default {
   setup (props, context) {
     const inputHook = useInput(props, context)
 
+    const deepModel = ref(Array.isArray(props.modelValue)
+      ? props.modelValue.map((item) => {
+          return item
+          return {...item, [props.priceInputName]: item[props.priceInputName] / props.numberMultiplier }
+        })
+      : [props.modelValue])
+
+    const errorMessages = ref(deepModel.value.map((item) => {
+      return []
+    }))
+
+    const inputRefs = reactive(new Map())
+
+    const setInputRef = (id, el) => {
+      if (el) {
+        inputRefs.set(id, el)
+      } else {
+        inputRefs.delete(id)
+      }
+    }
+    const getInputRef = (id) => inputRefs.get(id)
 
     // const { modelValue } = toRefs(props)
     return {
-      ...inputHook
+      ...inputHook,
+      deepModel,
+      inputRefs,
+      setInputRef,
+      getInputRef,
+      errorMessages
     }
   },
 
   data () {
     return {
-      deepModel: Array.isArray(this.modelValue)
-        ? this.modelValue.map((item) => {
-            return item
-            return {...item, [this.priceInputName]: item[this.priceInputName] / this.numberMultiplier }
-          })
-        : [this.modelValue]
     }
   },
 
@@ -153,6 +190,16 @@ export default {
     },
     updateNumberInput (e, index) {
       this.deepModel[index][this.priceInputName] = e
+
+      this.$nextTick(() => {
+        try{
+          let inputRef = this.inputRefs.get(index)
+          this.errorMessages[index] = inputRef.errorMessages
+        }catch(err){
+          console.error(err)
+        }
+      })
+
     },
     updateVatRate (e, index) {
       this.deepModel[index].vat_rate_id = e

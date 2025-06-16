@@ -156,6 +156,10 @@ export const getModel = (inputs, item = null, rootState = null) => {
           }
         }
       }
+
+      if(Object.prototype.hasOwnProperty.call(input, 'connectedRelationship') && _.isString(input.connectedRelationship) && item && __isset(item[input.connectedRelationship])){
+        value = item[input.connectedRelationship]
+      }
     }
 
     if (__isObject(input)) {

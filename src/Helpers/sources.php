@@ -67,7 +67,8 @@ if (! function_exists('adminRouteNamePrefix')) {
 
     function adminRouteNamePrefix()
     {
-        return rtrim(ltrim(modularityConfig('admin_route_name_prefix', 'admin'), '.'), '.');
+        return Modularity::getAdminRouteNamePrefix();
+        // return rtrim(ltrim(modularityConfig('admin_route_name_prefix', 'admin'), '.'), '.');
     }
 }
 
@@ -75,9 +76,10 @@ if (! function_exists('adminUrlPrefix')) {
 
     function adminUrlPrefix()
     {
-        return modularityConfig('admin_app_url')
-            ? false
-            : rtrim(ltrim(modularityConfig('admin_app_path', 'admin'), '/'), '/');
+        return Modularity::getAdminUrlPrefix();
+        // return modularityConfig('admin_app_url')
+        //     ? false
+        //     : rtrim(ltrim(modularityConfig('admin_app_path', 'admin'), '/'), '/');
     }
 }
 

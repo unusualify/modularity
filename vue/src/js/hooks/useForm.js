@@ -310,7 +310,7 @@ export default function useForm(props, context) {
 
           let callbackFunction = callback
 
-          if(!props.refreshOnSaved) {
+          if(!props.refreshOnSaved || (Object.prototype.hasOwnProperty.call(response.data, 'forceRedirect') && response.data.forceRedirect)) {
             redirector(response.data)
           } else {
             let __reload = () => {
@@ -346,7 +346,16 @@ export default function useForm(props, context) {
         if(props.refreshOnSaved) {
           callbackFunction = (data) => {
             if(callback && typeof callback === 'function') callback(data)
-            __reload()
+            if(Object.prototype.hasOwnProperty.call(data, 'forceRedirect') && data.forceRedirect) {
+              redirector(data)
+            }else{
+              __reload()
+            }
+          }
+        } else {
+          callbackFunction = (data) => {
+            redirector(data)
+            if(callback && typeof callback === 'function') callback(data)
           }
         }
 

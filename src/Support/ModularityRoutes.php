@@ -87,10 +87,12 @@ class ModularityRoutes
 
     public function groupOptions(): array
     {
+        $adminAppUrl = modularityConfig('admin_app_url', false);
+
         return [
             'as' => adminRouteNamePrefix() . '.',
-            ...(modularityConfig('admin_app_url')
-                ? ['domain' => modularityConfig('admin_app_url')]
+            ...($adminAppUrl
+                ? ['domain' => $adminAppUrl]
                 : ['prefix' => adminUrlPrefix()]
             ),
 

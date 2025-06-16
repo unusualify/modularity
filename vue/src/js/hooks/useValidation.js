@@ -142,7 +142,7 @@ export default function useValidation (props) {
     // Numeric validation rules
     numberRule: (msg) => v => !isNaN(parseFloat(v)) && isFinite(v) || msg || 'Must be a valid number',
     integerRule: (msg) => v => Number.isInteger(Number(v)) || msg || 'Must be an integer',
-    minValueRule: (min, msg) => v => !v || Number(v) >= min || msg || `Must be at least ${min}`,
+    minValueRule: (min, msg) => v => v === undefined || v === null || Number(v) >= min  || msg || `Must be at least ${min}`,
     maxValueRule: (max, msg) => v => !v || Number(v) <= max || msg || `Must not exceed ${max}`,
 
     // String format validation rules

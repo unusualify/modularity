@@ -8,7 +8,7 @@
     ]"
   >
     <slot v-bind="{text}">
-      <Fragment v-html="text" />
+      <span v-html="text" />
     </slot>
     <slot name="right">
 

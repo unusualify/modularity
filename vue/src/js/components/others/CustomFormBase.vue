@@ -142,6 +142,8 @@
                     v-if="obj.schema && obj.schema.schema"
                     :is="checkInternGroupType(obj)"
                     v-bind="bindSchema(obj)"
+                    :title="obj.schema.typeIntTitle ?? null"
+                    :modelValue="obj.schema.typeIntModelValue || false"
                     @click="onEvent($event, obj)"
                   >
                     <!-- <v-card-title v-if="obj.schema.title">{{obj.schema.title}}</v-card-title>
@@ -805,7 +807,7 @@ export default {
       //  in type 'wrap|group' you can define with typeInt: a component as group - schema: { group1: { type:'wrap', typeInt:'v-card', ... } ...}
       const typeInt = obj.schema.typeInt || defaultInternGroupType
 
-      return typeInt.startsWith('v-') ? typeInt : `v-${typeInt}`
+      return typeInt.startsWith('v-') || typeInt.startsWith('ue-') ? typeInt : `v-${typeInt}`
     },
     // GET ITERATION KEY FOR TYPE ARRAY
     getKeyForArray (id, obj, item, index) {

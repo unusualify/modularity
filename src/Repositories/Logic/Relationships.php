@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\UFinder;
+use Unusualify\Modularity\Repositories\Repository;
 
 trait Relationships
 {
@@ -122,24 +123,71 @@ trait Relationships
                 $foreignKey = $relation->getForeignKeyName(); // parent_name_id
                 $repository = UFinder::getRouteRepository(Str::singular($relationName), asClass: true);
 
+                if ((bool) $repository && $repository instanceof Repository) {
+                    $idsDeleted = $relation->get()->pluck($relatedLocalKey)->toArray();
+
+                    if (isset($fields[$relationName]) && is_array($fields[$relationName]) && count($fields[$relationName]) > 0) {
+                        foreach ($fields[$relationName] as $key => $data) {
+
+                            if (isset($data[$relatedLocalKey])) {
+
+                                array_splice($idsDeleted, array_search($data[$relatedLocalKey], $idsDeleted), 1);
+
+                                $repository->update($data[$relatedLocalKey], $data + [$foreignKey => $object->id]);
+                            } else {
+                                $repository->create(array_merge($data, [$foreignKey => $object->id]));
+                            }
+                        }
+                    }
+
+                    if (count($idsDeleted)) {
+                        $repository->bulkDelete($idsDeleted);
+                    }
+                } else {
+                    // $relatedModel = $relation->getRelated();
+                    // $fillable = $relatedModel->getFillable();
+
+                    // foreach ($fields[$relationName] as $key => $data) {
+                    //     if(Arr::isAssoc($data)){
+                    //         $relatedModelClass = $relatedModel::class;
+                    //         $record = $data[$foreignKey] ? $relatedModelClass::where($foreignKey, $data[$foreignKey])->first() : null;
+                    //         $saveData = Arr::only($data, array_values(array_diff($fillable, [$foreignKey])));
+                    //         if($record){
+                    //             $record->update($saveData);
+                    //         } else {
+
+                    //             $object->{$relationName}()->create(
+                    //                 $saveData
+                    //             );
+                    //         }
+                    //     }
+                    // }
+                }
+
+            }
+        }
+
+        foreach ($this->getMorphManyRelations() as $relationName) {
+            if (isset($fields[$relationName]) && $fields[$relationName] && $relationName != 'tags') {
+                $relation = $object->{$relationName}();
+                $relatedLocalKey = $relation->getLocalKeyName(); // id
+                $relatedModel = $relation->getRelated();
                 $idsDeleted = $relation->get()->pluck($relatedLocalKey)->toArray();
 
-                if (isset($fields[$relationName]) && is_array($fields[$relationName]) && count($fields[$relationName]) > 0) {
-                    foreach ($fields[$relationName] as $key => $data) {
+                foreach ($fields[$relationName] as $key => $morphManyData) {
+                    if (isset($morphManyData['id']) && $morphManyData['id']) {
+                        $record = $relatedModel->find($morphManyData['id']);
 
-                        if (isset($data[$relatedLocalKey])) {
+                        array_splice($idsDeleted, array_search($morphManyData[$relatedLocalKey], $idsDeleted), 1);
 
-                            array_splice($idsDeleted, array_search($data[$relatedLocalKey], $idsDeleted), 1);
-
-                            $repository->update($data[$relatedLocalKey], $data + [$foreignKey => $object->id]);
-                        } else {
-                            $repository->create(array_merge($data, [$foreignKey => $object->id]));
-                        }
+                        $record->update($morphManyData);
+                    } else {
+                        $object->{$relationName}()->create($morphManyData);
                     }
                 }
 
                 if (count($idsDeleted)) {
-                    $repository->bulkDelete($idsDeleted);
+                    $relatedModel->whereIn($relatedLocalKey, $idsDeleted)->delete();
                 }
             }
         }
@@ -199,6 +247,7 @@ trait Relationships
         $morphToRelations = $this->getMorphToRelations();
         // $hasManyRelations = $this->getHasManyRelations();
         $belongsToManyRelations = $this->getBelongsToManyRelations();
+        $morphManyRelations = $this->getMorphManyRelations();
 
         foreach ($this->getMorphToManyRelations() as $relationName) {
             if (array_key_exists($relationName, $inputs)) {
@@ -232,43 +281,68 @@ trait Relationships
             }
         }
 
-        // dd($fields);
         foreach ($inputs as $key => $input) {
+            if (isset($input['name'])) {
+                if (in_array($input['name'], $belongsToManyRelations)) {
+                    if (preg_match('/repeater/', $input['type'])) {
+                        $query = $object->{$input['name']}();
 
-            if (isset($input['name']) && in_array($input['name'], $belongsToManyRelations)) {
-                if (preg_match('/repeater/', $input['type'])) {
-                    $query = $object->{$input['name']}();
+                        if ($input['orderable'] ?? false) {
+                            $query->orderBy('position');
+                        }
 
-                    if ($input['orderable'] ?? false) {
-                        $query->orderBy('position');
-                    }
-
-                    $fields[$input['name']] = $query->get()->map(function ($item) {
-                        // dd(
-                        //     $item->pivot->active,
-                        //     get_class_methods($item->pivot),
-                        //     $item->pivot->getCasts(),
-                        //     $item->pivot->toArray(),
-                        //     // $item->getRawAttributes(),
-                        // );
-                        return $item->pivot->toArray();
-                    });
-
-                } else {
-                    try {
-                        // code...
-                        $fields[$input['name']] = $object->{$input['name']}->map(function ($item) {
-                            return $item->id;
+                        $fields[$input['name']] = $query->get()->map(function ($item) {
+                            // dd(
+                            //     $item->pivot->active,
+                            //     get_class_methods($item->pivot),
+                            //     $item->pivot->getCasts(),
+                            //     $item->pivot->toArray(),
+                            //     // $item->getRawAttributes(),
+                            // );
+                            return $item->pivot->toArray();
                         });
-                    } catch (\Throwable $th) {
-                        dd(
-                            $object,
-                            $object->packageFeatures,
-                            $input['name'],
-                            $th
-                        );
+
+                    } else {
+                        try {
+                            // code...
+                            $fields[$input['name']] = $object->{$input['name']}->map(function ($item) {
+                                return $item->id;
+                            });
+                        } catch (\Throwable $th) {
+                            dd(
+                                $object,
+                                $object->packageFeatures,
+                                $input['name'],
+                                $th
+                            );
+                        }
+                    }
+                } elseif (in_array($input['name'], $morphManyRelations)) {
+                    if (preg_match('/repeater/', $input['type'])) {
+                        $query = $object->{$input['name']}();
+
+                        $columns = array_reduce($input['schema'] ?? [], function ($acc, $item) {
+                            if (isset($item['name'])) {
+                                $acc[] = $item['name'];
+                            }
+
+                            return $acc;
+                        }, []);
+
+                        if ($input['draggable'] ?? false) {
+                            $columns[] = 'position';
+                            $query->orderBy('position');
+                        }
+
+                        $fields[$input['name']] = $query->get()->map(function ($item) use ($columns) {
+                            return Arr::only($item->toArray(), $columns);
+                        });
                     }
                 }
+            }
+
+            if (isset($input['connectedRelationship']) && is_string($input['connectedRelationship'])) {
+                $fields[$input['connectedRelationship']] = $object->{$input['connectedRelationship']};
             }
         }
 

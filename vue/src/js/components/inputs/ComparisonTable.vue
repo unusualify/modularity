@@ -55,7 +55,7 @@
 <script>
   import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
   import Table from '../Table.vue'
-  import { find, toUpper, isNumber, isString } from 'lodash-es';
+  import { find, toUpper, isNumber, isString, get } from 'lodash-es';
 
   export default {
     name: 'v-input-comparison-table',
@@ -76,6 +76,10 @@
       comparatorField: {
         type: String,
         default: 'name'
+      },
+      comparatorValue: {
+        type: String,
+        default: 'value'
       },
       comparators: {
         type: Object,
@@ -220,7 +224,14 @@
               let found = find( item[this.comparatorField], ['id', comparator.id] )
 
               if(found){
-                rowData[item.name] = found.pivot.value
+                let value = get(found, this.comparatorValue, 'unknown')
+
+                if(value === 'unknown'){
+                  console.error(`${this.comparatorField} not found for ${this.comparatorValue}`)
+                  value = ''
+                }
+                rowData[item.name] = value
+
                 // rowData[item.name] = found.pivot.active == '1'
                 //   ? '<span class="mdi mdi-check text-info font-weight-bold"></span>'
                 //   : '<span class="mdi mdi-close text-error font-weight-bold"></span>'

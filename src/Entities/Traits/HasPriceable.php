@@ -40,15 +40,18 @@ trait HasPriceable
         return $query->whereHas('basePrice');
     }
 
-    public function scopeOrderByCurrencyPrice($query, $currencyId, $direction = 'asc')
+    public function scopeOrderByCurrencyPrice($query, $currencyId, $direction = 'asc', $role = null)
     {
         $table = $this->getTable();
         $priceTable = app(Price::class)->getTable();
 
-        return $query->leftJoin($priceTable, function ($join) use ($table, $priceTable, $currencyId) {
+        return $query->leftJoin($priceTable, function ($join) use ($table, $priceTable, $currencyId, $role) {
             $join->on("{$priceTable}.priceable_id", '=', "{$table}.id")
                 ->where("{$priceTable}.priceable_type", '=', get_class($this))
-                ->where("{$priceTable}.currency_id", '=', $currencyId);
+                ->where("{$priceTable}.currency_id", '=', $currencyId)
+                ->when($role, function ($query) use ($role) {
+                    $query->where('role', $role);
+                });
         })
             ->orderBy("{$priceTable}.raw_amount", $direction)
             ->select("{$table}.*"); // Ensure we only select fields from the main table
@@ -61,8 +64,8 @@ trait HasPriceable
      * @param string $direction
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeOrderByBasePrice($query, $direction = 'asc')
+    public function scopeOrderByBasePrice($query, $direction = 'asc', $role = null)
     {
-        return $query->orderByCurrencyPrice(Request::getUserCurrency()->id, $direction);
+        return $query->orderByCurrencyPrice(currencyId: Request::getUserCurrency()->id, direction: $direction, role: $role);
     }
 }

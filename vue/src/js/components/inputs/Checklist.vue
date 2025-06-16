@@ -203,7 +203,7 @@
             flexColumn && $vuetify.display.mdAndUp ? 'flex: 1 1 60%;' : 'flex: 1 1;'
           ]"
         >
-          <template v-for="(item, index) in items"
+          <template v-for="(item, index) in flattenedItems"
               :key="`checkbox-${index}`">
               <v-col v-bind="checkboxCol"
                 class=""
@@ -290,6 +290,14 @@
       items: {
         type: Array,
         default: () => []
+      },
+      orderBy: {
+        type: String,
+        default: null
+      },
+      orderByDirection: {
+        type: String,
+        default: 'asc'
       },
       checkboxColor: {
         type: String,
@@ -431,6 +439,22 @@
 
       const openedGroups = ref([])
 
+      const flattenedItems = computed(() => {
+        let items = props.items
+
+        if(props.orderBy){
+          items.sort((a, b) => {
+            if(props.orderByDirection === 'asc'){
+              return a[props.orderBy].localeCompare(b[props.orderBy])
+            } else {
+              return b[props.orderBy].localeCompare(a[props.orderBy])
+            }
+          })
+        }
+
+        return items
+      })
+
       return {
         ...useInput(props, {
           ...context,
@@ -438,7 +462,8 @@
         }),
         openedGroups: toRef(openedGroups),
         maxSelectable,
-        isProtected
+        isProtected,
+        flattenedItems
       }
     },
 
@@ -599,14 +624,27 @@
         }
 
         const array = Object.values(groups)
+
         array.sort(function (left, right) {
-          return left.hasOwnProperty('items') ? 1 : right.hasOwnProperty('items') ? -1 : 0
+          return left.hasOwnProperty('items') ? 1 : (right.hasOwnProperty('items') ? -1 : 0)
         })
 
         if(this.closeAllGroups){
           this.openedGroups = []
         } else {
           this.openedGroups = !this.openAllGroups ? [array[0].name] : array.map((group) => group.name)
+        }
+
+        if(this.orderBy){
+          for(const i in array){
+            array[i].items.sort((a, b) => {
+              if(this.orderByDirection === 'asc'){
+                return a[this.orderBy].localeCompare(b[this.orderBy])
+              } else {
+                return b[this.orderBy].localeCompare(a[this.orderBy])
+              }
+            })
+          }
         }
 
         return array
