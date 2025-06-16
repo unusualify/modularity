@@ -1,9 +1,9 @@
 <template>
   <v-text-field
-    v-model="formattedValue"
-    v-bind="{...$bindAttributes($lodash.pick($attrs, ['label']))}"
     ref="inputRef"
-    :rules="[]"
+    v-model="formattedValue"
+    v-bind="{...$bindAttributes($lodash.pick($attrs, ['label', 'rules', 'error', 'errorMessages'] ))}"
+    :rules="rules"
     >
     <!-- <slot v-for="(_, name) in $slots" :name="name" :slot="name" /> -->
     <!-- <template v-for="(_, name) in $scopedSlots" :slot="name" slot-scope="slotData"><slot :name="name" v-bind="slotData" /></template> -->
