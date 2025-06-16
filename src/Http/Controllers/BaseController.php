@@ -210,12 +210,20 @@ abstract class BaseController extends PanelController
             ));
         }
 
+        if ($this->getTableAttribute('redirectAfterCreate', false)) {
+            return $this->respondWithRedirect(moduleRoute($this->routeName,
+                $this->generateRoutePrefix(noNested: true),
+                'edit',
+                [Str::snake($this->routeName) => $this->getItemIdentifier($item)]
+            ), ['variant' => MessageStage::SUCCESS, 'forceRedirect' => true]);
+        }
+
         return $this->request->ajax()
             ? $this->respondWithSuccess(___('messages.save-success'))
             : $this->respondWithRedirect(moduleRoute($this->routeName,
-                $this->routePrefix,
+                $this->generateRoutePrefix(noNested: true),
                 'edit',
-                [Str::singular(last(explode('.', $this->moduleName))) => $this->getItemIdentifier($item)]
+                [Str::snake($this->routeName) => $this->getItemIdentifier($item)]
             ));
     }
 
