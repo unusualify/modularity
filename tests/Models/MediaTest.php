@@ -7,8 +7,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Unusualify\Modularity\Entities\Media;
-use Unusualify\Modularity\Tests\ModelTestCase;
 use Unusualify\Modularity\Services\MediaLibrary\ImageService;
+use Unusualify\Modularity\Tests\ModelTestCase;
 
 class MediaTest extends ModelTestCase
 {
@@ -26,7 +26,7 @@ class MediaTest extends ModelTestCase
             'alt_text' => 'Test Alt Text',
             'caption' => 'Test Caption',
             'width' => 1920,
-            'height' => 1080
+            'height' => 1080,
         ]);
     }
 

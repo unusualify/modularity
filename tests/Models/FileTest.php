@@ -5,8 +5,8 @@ namespace Unusualify\Modularity\Tests\Models;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Unusualify\Modularity\Entities\File;
-use Unusualify\Modularity\Tests\ModelTestCase;
 use Unusualify\Modularity\Services\FileLibrary\FileService;
+use Unusualify\Modularity\Tests\ModelTestCase;
 
 class FileTest extends ModelTestCase
 {
@@ -21,7 +21,7 @@ class FileTest extends ModelTestCase
         $this->file = File::factory()->create([
             'uuid' => 'test-uuid-1',
             'filename' => 'test-file.jpg',
-            'size' => 1048576 // 1MB
+            'size' => 1048576, // 1MB
         ]);
     }
 

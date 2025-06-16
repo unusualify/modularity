@@ -55,11 +55,13 @@ class FormTabsHydrate extends InputHydrate
 
         $input['eagers'] = array_reduce($eagers, function ($acc, $item) {
             $acc = array_merge($acc, $item);
+
             return $acc;
         }, []);
 
         $input['lazy'] = array_reduce($lazy, function ($acc, $item) {
             $acc = array_merge($acc, $item);
+
             return $acc;
         }, []);
 

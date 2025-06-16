@@ -123,7 +123,7 @@ trait Relationships
                 $foreignKey = $relation->getForeignKeyName(); // parent_name_id
                 $repository = UFinder::getRouteRepository(Str::singular($relationName), asClass: true);
 
-                if(!!$repository && $repository instanceof Repository){
+                if ((bool) $repository && $repository instanceof Repository) {
                     $idsDeleted = $relation->get()->pluck($relatedLocalKey)->toArray();
 
                     if (isset($fields[$relationName]) && is_array($fields[$relationName]) && count($fields[$relationName]) > 0) {
@@ -175,7 +175,7 @@ trait Relationships
                 $idsDeleted = $relation->get()->pluck($relatedLocalKey)->toArray();
 
                 foreach ($fields[$relationName] as $key => $morphManyData) {
-                    if(isset($morphManyData['id']) && $morphManyData['id']){
+                    if (isset($morphManyData['id']) && $morphManyData['id']) {
                         $record = $relatedModel->find($morphManyData['id']);
 
                         array_splice($idsDeleted, array_search($morphManyData[$relatedLocalKey], $idsDeleted), 1);
@@ -283,7 +283,7 @@ trait Relationships
 
         foreach ($inputs as $key => $input) {
             if (isset($input['name'])) {
-                if(in_array($input['name'], $belongsToManyRelations)){
+                if (in_array($input['name'], $belongsToManyRelations)) {
                     if (preg_match('/repeater/', $input['type'])) {
                         $query = $object->{$input['name']}();
 
@@ -317,14 +317,15 @@ trait Relationships
                             );
                         }
                     }
-                }elseif(in_array($input['name'], $morphManyRelations)){
+                } elseif (in_array($input['name'], $morphManyRelations)) {
                     if (preg_match('/repeater/', $input['type'])) {
                         $query = $object->{$input['name']}();
 
-                        $columns = array_reduce($input['schema'] ?? [], function($acc, $item){
-                            if(isset($item['name'])){
+                        $columns = array_reduce($input['schema'] ?? [], function ($acc, $item) {
+                            if (isset($item['name'])) {
                                 $acc[] = $item['name'];
                             }
+
                             return $acc;
                         }, []);
 
@@ -340,7 +341,7 @@ trait Relationships
                 }
             }
 
-            if(isset($input['connectedRelationship']) && is_string($input['connectedRelationship'])){
+            if (isset($input['connectedRelationship']) && is_string($input['connectedRelationship'])) {
                 $fields[$input['connectedRelationship']] = $object->{$input['connectedRelationship']};
             }
         }

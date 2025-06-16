@@ -32,6 +32,7 @@ class File extends Model
             get: fn () => bytesToHuman($this->size ?? 0),
         );
     }
+
     public function sizeInMb(): Attribute
     {
         return Attribute::make(

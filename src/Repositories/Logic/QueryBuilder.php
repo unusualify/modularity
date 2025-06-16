@@ -123,11 +123,12 @@ trait QueryBuilder
                         if ($i === 0) {
                             $result = $result->load($part);
                         } else {
-                            if($result->{$parts[$i-1]} instanceof \Illuminate\Database\Eloquent\Model) {
-                                $result = $result->{$parts[$i-1]}->load($part);
-                            } else if ($result->{$parts[$i-1]} instanceof \Illuminate\Database\Eloquent\Collection) {
-                                $result->{$parts[$i-1]} = $result->{$parts[$i-1]}->map(function ($item) use ($part) {
+                            if ($result->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Model) {
+                                $result = $result->{$parts[$i - 1]}->load($part);
+                            } elseif ($result->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Collection) {
+                                $result->{$parts[$i - 1]} = $result->{$parts[$i - 1]}->map(function ($item) use ($part) {
                                     $item->{$part};
+
                                     return $item;
                                 });
                             }
