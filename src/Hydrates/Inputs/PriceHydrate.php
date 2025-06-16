@@ -40,9 +40,14 @@ class PriceHydrate extends InputHydrate
 
         $input['priceInputName'] = Price::$priceSavingKey ?? 'price_value';
         $defaultPriceAttributes = (new Price)->defaultAttributes();
+
+        $defaultValue = $input['default'] ?? 0.01;
         $input['default'] = [
             $defaultPriceAttributes,
         ];
+        foreach ($input['default'] as $key => $value) {
+            $input['default'][$key][Price::$priceSavingKey] = $defaultValue;
+        }
 
         $query = Currency::query()->select(['id', 'symbol as name', 'iso_4217 as iso']);
         $onlyBaseCurrency = modularityConfig('services.currency_exchange.active');
