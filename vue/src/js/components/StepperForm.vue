@@ -243,7 +243,6 @@
         type: Boolean,
         default: false
       },
-
       responseModalIcon: {
         type: String,
         default: 'mdi-check-circle-outline'
@@ -261,9 +260,9 @@
         default: 'Ok'
       },
       responseModalOptions: {
-        type: Array,
+        type: Object,
         default: () => {
-          return []
+          return {}
         }
       }
     },
@@ -662,7 +661,6 @@
       formattedPreview(){
         return NotationUtil.formattedPreview(this.displayInfo, this.previewNotations)
       },
-
       payload(){
         let model = reduce(this.models, function(acc, model, index){
           return {...acc, ...model}
