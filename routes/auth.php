@@ -33,10 +33,6 @@ if (modularityConfig('enabled.users-management')) {
     Route::get('/auth/{provider}/redirect', 'LoginController@redirectToProvider')->name('login.provider');
     Route::get('/auth/{provider}/callback', 'LoginController@handleProviderCallback')->name('loginHandleCallbackProvider');
 
-    // #TODO add complete registration after email confirmatiosent
-    // Route::get('/completeRegistration', 'LoginController@completeRegisterForm')->name('completeRegistration.form');
-    // Route::post('/completeRegistration', 'LoginController@completeRegister')->name('completeRegistration');
-
     //Route::get('/withoutLogin', 'LoginController@completeRegisterForm');
 
     Route::get('password/reset', 'ForgotPasswordController@showLinkRequestForm')->name('password.reset.link');
@@ -47,5 +43,12 @@ if (modularityConfig('enabled.users-management')) {
     Route::post('password/reset', 'ResetPasswordController@reset')->name('password.reset.update');
 
     Route::get('register/success', 'RegisterController@success')->name('register.success');
+
+    //Register with email verification
+    Route::get('pre/register', 'PreRegisterController@showEmailForm')->name('pre-register.email-form');
+    Route::post('pre/register', 'PreRegisterController@sendVerificationLinkEmail')->name('pre-register');
+
+    Route::get('complete/register/{token}', 'CompleteRegisterController@showCompleteRegisterForm')->name('complete.register.form');
+    Route::post('complete/register', 'CompleteRegisterController@completeRegister')->name('complete.register');
 
 }
