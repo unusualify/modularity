@@ -27,4 +27,6 @@ return [
     'process_histories' => 'umod_process_histories',
     'assignments' => 'um_assignments',
     'user_oauths' => 'um_user_oauths',
+    'email_verification_tokens' => 'um_email_verification_tokens',
+
 ];
