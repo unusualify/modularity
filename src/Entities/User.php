@@ -16,10 +16,11 @@ use Unusualify\Modularity\Entities\Traits\HasOauth;
 use Unusualify\Modularity\Entities\Traits\HasScopes;
 use Unusualify\Modularity\Entities\Traits\IsTranslatable;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
+use Unusualify\Modularity\Entities\Traits\Auth\CanRegister;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, HasRoles, HasScopes, IsTranslatable, ModelHelpers, Notifiable, HasFileponds, HasOauth;
+    use HasApiTokens, HasFactory, HasRoles, HasScopes, IsTranslatable, ModelHelpers, Notifiable, HasFileponds, HasOauth, CanRegister;
 
     /**
      * The attributes that are mass assignable.
@@ -38,6 +39,7 @@ class User extends Authenticatable
         'country',
         'password',
         'published',
+        'email_verified_at',
     ];
 
     /**
@@ -171,5 +173,9 @@ class User extends Authenticatable
         return UserFactory::new();
     }
 
+    public function sendEmailVerification($token)
+    {
+        $this->notify(new \Unusualify\Modularity\Notifications\EmailVerification($token));
+    }
 
 }
