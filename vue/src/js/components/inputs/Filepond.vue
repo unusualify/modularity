@@ -41,9 +41,10 @@
         >
           <FilePond
             ref="pond"
-            :id="key"
             :key="key"
+            :id="key"
             v-bind="$lodash.omit($bindAttributes(), ['rules'])"
+            :name="name"
 
             :allow-image-preview="allowImagePreview"
             :allow-multiple="allowMultiple"
@@ -58,11 +59,17 @@
             :allow-file-type-validation="true"
             :accepted-file-types="acceptedFileTypes"
             :max-files="maxFiles"
-            :name="name"
 
             :disabled="disabled"
             :allow-drop="!disabled"
             :allow-browse="!disabled"
+
+            :allow-file-size-validation="allowFileSizeValidation"
+            :max-file-size="maxFileSize"
+            :min-file-size="minFileSize"
+            :max-total-file-size="maxTotalFileSize"
+            :label-max-file-size="labelMaxFileSize"
+            :label-max-file-size-exceeded="labelMaxFileSizeExceeded"
 
             :files="files"
             :server="server"
@@ -115,6 +122,8 @@
   // Import image preview and file type validation plugins
   import FilePondPluginImagePreview from "filepond-plugin-image-preview";
   import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+  import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
+
   import "filepond/dist/filepond.min.css";
   import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
 
@@ -130,6 +139,7 @@
   const FilePond = vueFilePond(
     FilePondPluginImagePreview,
     FilePondPluginFileValidateType,
+    FilePondPluginFileValidateSize,
 
   );
 
