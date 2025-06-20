@@ -174,7 +174,6 @@ export default {
     app.config.globalProperties.registerComponents(includeFormInputs, 'inputs', 'VInput')
     app.config.globalProperties.registerComponents(includeCustomComponents, 'customs', 'UeCustom')
 
-    __log(app._context.components)
     // app.config.globalProperties.registerComponents(includeCustomFormInputs, 'customs/inputs', 'v-input')
     // // Configurations
     // Vue.config.productionTip = isProd
