@@ -96,6 +96,13 @@ export default {
     triggers: {
       type: Object,
       default: () => []
+    },
+    protectDefiner: {
+      type: String,
+    },
+    protectedInputs: {
+      type: Array,
+      default: () => ['*']
     }
   },
   setup (props, { emit }) {
@@ -262,8 +269,19 @@ export default {
     const schemas = ref(elements.value.reduce((acc, item, index) => {
       if(!__isset(acc[item.id])){
         const baseSchema = cloneDeep(props.schema)
+
+        let protectInitialValue = props.protectInitialValue
+          && props.protectDefiner
+          && __isset(props.modelValue[item.id])
+          && __isset(props.modelValue[item.id][props.protectDefiner])
+          && props.modelValue[item.id][props.protectDefiner] !== null
+          && props.modelValue[item.id][props.protectDefiner] !== undefined
+
         for(const inputName in props.tabFields){
-          if(props.protectInitialValue){
+          if(protectInitialValue
+            && Array.isArray(props.protectedInputs)
+            && props.protectedInputs.length > 0
+            && (props.protectedInputs[0] === '*' || props.protectedInputs.includes(inputName))){
             baseSchema[inputName]['protectInitialValue'] = true
           }
           if(__isset(baseSchema[inputName])){
