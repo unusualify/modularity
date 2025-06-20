@@ -37,5 +37,6 @@ return [
     'register-button_text' => 'Go to Sign In?',
 
     'confirm-provider' => 'Confirm your {provider} account',
-
+    'complete-registration-title' => 'COMPLETE REGISTRATION',
+    'complete-registration' => 'Complete Registration',
 ];
