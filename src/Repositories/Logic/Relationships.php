@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Facades\ModularityLog;
 use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Repositories\Repository;
 
@@ -121,47 +122,47 @@ trait Relationships
                 $relation = $object->{$relationName}();
                 $relatedLocalKey = $relation->getLocalKeyName(); // id
                 $foreignKey = $relation->getForeignKeyName(); // parent_name_id
-                $repository = UFinder::getRouteRepository(Str::singular($relationName), asClass: true);
+                $repository = \Unusualify\Modularity\Facades\UFinder::getRouteRepository(Str::singular($relationName), asClass: true);
+                $hasRepository = (bool) $repository && $repository instanceof Repository;
 
-                if ((bool) $repository && $repository instanceof Repository) {
-                    $idsDeleted = $relation->get()->pluck($relatedLocalKey)->toArray();
+                if (isset($fields[$relationName])) {
+                    $idsDeleted = $hasRepository ?
+                        $relation->get()->pluck($relatedLocalKey)->toArray()
+                        : [];
 
-                    if (isset($fields[$relationName]) && is_array($fields[$relationName]) && count($fields[$relationName]) > 0) {
+                    if(is_array($fields[$relationName]) && count($fields[$relationName]) > 0){
                         foreach ($fields[$relationName] as $key => $data) {
 
-                            if (isset($data[$relatedLocalKey])) {
+                            if(is_array($data) && Arr::isAssoc($data)){
+                                if($hasRepository){
+                                    if (isset($data[$relatedLocalKey])) {
+                                        array_splice($idsDeleted, array_search($data[$relatedLocalKey], $idsDeleted), 1);
 
-                                array_splice($idsDeleted, array_search($data[$relatedLocalKey], $idsDeleted), 1);
+                                        $repository->update($data[$relatedLocalKey], $data + [$foreignKey => $object->id]);
+                                    } else {
+                                        $repository->create(array_merge($data, [$foreignKey => $object->id]));
+                                    }
+                                } else {
+                                    $idsDeleted = [];
+                                }
 
-                                $repository->update($data[$relatedLocalKey], $data + [$foreignKey => $object->id]);
-                            } else {
-                                $repository->create(array_merge($data, [$foreignKey => $object->id]));
+                            } else if(is_numeric($data)){
+                                ModularityLog::critical('Found numeric data in hasMany relationship on afterSaveRelationships', [
+                                    'relationName' => $relationName,
+                                    'data' => $data,
+                                    'idsDeleted' => $idsDeleted,
+                                    'repository' => $repository::class,
+                                ]);
+                                if(in_array($data, $idsDeleted)){
+                                    array_splice($idsDeleted, array_search($data, $idsDeleted), 1);
+                                }
                             }
                         }
+
+                        if (count($idsDeleted) > 0) {
+                            $repository->bulkDelete($idsDeleted);
+                        }
                     }
-
-                    if (count($idsDeleted)) {
-                        $repository->bulkDelete($idsDeleted);
-                    }
-                } else {
-                    // $relatedModel = $relation->getRelated();
-                    // $fillable = $relatedModel->getFillable();
-
-                    // foreach ($fields[$relationName] as $key => $data) {
-                    //     if(Arr::isAssoc($data)){
-                    //         $relatedModelClass = $relatedModel::class;
-                    //         $record = $data[$foreignKey] ? $relatedModelClass::where($foreignKey, $data[$foreignKey])->first() : null;
-                    //         $saveData = Arr::only($data, array_values(array_diff($fillable, [$foreignKey])));
-                    //         if($record){
-                    //             $record->update($saveData);
-                    //         } else {
-
-                    //             $object->{$relationName}()->create(
-                    //                 $saveData
-                    //             );
-                    //         }
-                    //     }
-                    // }
                 }
 
             }
