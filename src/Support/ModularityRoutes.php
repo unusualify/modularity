@@ -10,6 +10,7 @@ use Unusualify\Modularity\Http\Middleware\CompanyRegistrationMiddleware;
 use Unusualify\Modularity\Http\Middleware\HostableMiddleware;
 use Unusualify\Modularity\Http\Middleware\ImpersonateMiddleware;
 use Unusualify\Modularity\Http\Middleware\LanguageMiddleware;
+use Unusualify\Modularity\Http\Middleware\LogMiddleware;
 use Unusualify\Modularity\Http\Middleware\NavigationMiddleware;
 use Unusualify\Modularity\Http\Middleware\RedirectIfAuthenticatedMiddleware;
 
@@ -18,6 +19,7 @@ class ModularityRoutes
     public $counter = 1;
 
     private $defaultMiddlewares = [
+        'modularity.log',
         'modularity.core',
     ];
 
@@ -161,6 +163,8 @@ class ModularityRoutes
             'modularity.auth:' . $authGuardName,
             // 'auth',
         ]);
+
+        Route::aliasMiddleware('modularity.log', LogMiddleware::class);
 
         Route::aliasMiddleware('language', LanguageMiddleware::class);
         Route::aliasMiddleware('impersonate', ImpersonateMiddleware::class);
