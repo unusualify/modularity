@@ -2,6 +2,47 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.36.0 - 2025-06-22
+
+### :rocket: Features
+
+- add file size validation options to Filepond component by @OoBook in https://github.com/unusualify/modularity/commit/ace4d9111250a39f07b0ff901096b0f75e1016aa
+- add protectDefiner and protectedInputs props for enhanced input protection by @OoBook in https://github.com/unusualify/modularity/commit/10601d90e48c761e163c8990a7f3b56172e28a07
+- enhance getByIds method with lazy loading support by @OoBook in https://github.com/unusualify/modularity/commit/c048a782fd1621acdf061fd969849b04f324be22
+- add scope methods for state filtering by @OoBook in https://github.com/unusualify/modularity/commit/a960c813bb9d34b3cef24fa3dfdcfc1f33abd419
+- enhance form handling with improved data structure and response management by @OoBook in https://github.com/unusualify/modularity/commit/b8e251f0d07856b0602b63c1ee690a5710443dc6
+- improve field selection logic and UI feedback by @OoBook in https://github.com/unusualify/modularity/commit/3d4e8ef04b679c6d5dc0a25c394dd939dad7a597
+- implement modular logging system with email notifications by @OoBook in https://github.com/unusualify/modularity/commit/c54da5ba7a790f2a4ebb110cc96130a63f04c3fe
+- add hydrate_input_type function for enhanced input processing by @OoBook in https://github.com/unusualify/modularity/commit/c6852a56abd4815bba355188d7545f004673953b
+
+### :wrench: Bug Fixes
+
+- improve afterSaveRelationships logic and add logging for numeric data by @OoBook in https://github.com/unusualify/modularity/commit/3213c8677fab0b2e5dbb26a953cf7548e5fd55e8
+- update getFormattedIndexItems method to use data_get for improved clarity by @OoBook in https://github.com/unusualify/modularity/commit/16693b790151a1c3e1352e6ae88c37e6320f4e74
+- improve loading state handling in StepperPreview component by @OoBook in https://github.com/unusualify/modularity/commit/7c2efbddfbdd5a3bc351063dd070fa06744055af
+
+### :zap: Performance
+
+- simplify getIndexData method by removing unused variables by @OoBook in https://github.com/unusualify/modularity/commit/d24fae361fc38e84192b8450b9512a3d82530fe9
+
+### :recycle: Refactors
+
+- update component naming conventions to PascalCase by @OoBook in https://github.com/unusualify/modularity/commit/6a8f3972d506c13ac34f377e9f106608a96f69cb
+- update responseModalOptions type and clean up code by @OoBook in https://github.com/unusualify/modularity/commit/cb9be188baab878ac0e5ece83c54dcc1afc5958c
+- simplify input hydration logic by utilizing hydrate_input_type function by @OoBook in https://github.com/unusualify/modularity/commit/fccb2d1b48ba504d805f5a926043575045616ee2
+
+### :lipstick: Styling
+
+- lint coding styles for v0.36.0 by @OoBook in https://github.com/unusualify/modularity/commit/860f84daebd603ad9025eb021ad96fcb015780b6
+
+### :package: Build
+
+- update build artifacts for v0.36.0 by @OoBook in https://github.com/unusualify/modularity/commit/dc4740dbadb8572cd3b6df2236a75d000f4c5c02
+
+### :beers: Other Stuff
+
+- remove logging statement for cleaner code by @OoBook in https://github.com/unusualify/modularity/commit/ad2e9e2086f75a73518629d922745d7a91610acf
+
 ## v0.35.0 - 2025-06-16
 
 ### :rocket: Features
