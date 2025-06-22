@@ -130,11 +130,11 @@ trait Relationships
                         $relation->get()->pluck($relatedLocalKey)->toArray()
                         : [];
 
-                    if(is_array($fields[$relationName]) && count($fields[$relationName]) > 0){
+                    if (is_array($fields[$relationName]) && count($fields[$relationName]) > 0) {
                         foreach ($fields[$relationName] as $key => $data) {
 
-                            if(is_array($data) && Arr::isAssoc($data)){
-                                if($hasRepository){
+                            if (is_array($data) && Arr::isAssoc($data)) {
+                                if ($hasRepository) {
                                     if (isset($data[$relatedLocalKey])) {
                                         array_splice($idsDeleted, array_search($data[$relatedLocalKey], $idsDeleted), 1);
 
@@ -146,14 +146,14 @@ trait Relationships
                                     $idsDeleted = [];
                                 }
 
-                            } else if(is_numeric($data)){
+                            } elseif (is_numeric($data)) {
                                 ModularityLog::critical('Found numeric data in hasMany relationship on afterSaveRelationships', [
                                     'relationName' => $relationName,
                                     'data' => $data,
                                     'idsDeleted' => $idsDeleted,
                                     'repository' => $repository::class,
                                 ]);
-                                if(in_array($data, $idsDeleted)){
+                                if (in_array($data, $idsDeleted)) {
                                     array_splice($idsDeleted, array_search($data, $idsDeleted), 1);
                                 }
                             }

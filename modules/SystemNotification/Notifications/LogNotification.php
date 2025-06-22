@@ -16,10 +16,7 @@ class LogNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    public function __construct(protected LogRecord $record)
-    {
-
-    }
+    public function __construct(protected LogRecord $record) {}
 
     public function via($notifiable): array
     {

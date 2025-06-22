@@ -2,12 +2,11 @@
 
 namespace Unusualify\Modularity\Logging;
 
-use Monolog\Logger;
-use Monolog\Level;
-use Monolog\Handler\AbstractProcessingHandler;
-use Monolog\LogRecord;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
+use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Level;
+use Monolog\LogRecord;
 
 class ModularityLogHandler extends AbstractProcessingHandler
 {
@@ -16,7 +15,7 @@ class ModularityLogHandler extends AbstractProcessingHandler
     public function __construct($level = Level::Debug)
     {
         parent::__construct($level);
-        $this->logPath = storage_path('logs' .  '/' . env('MODULARITY_LOG_FILE', 'modularity.log'));
+        $this->logPath = storage_path('logs' . '/' . env('MODULARITY_LOG_FILE', 'modularity.log'));
     }
 
     protected function write(LogRecord $record): void
@@ -43,8 +42,8 @@ class ModularityLogHandler extends AbstractProcessingHandler
             $record->message
         );
 
-        if (!empty($record->context)) {
-            $formattedMessage .= "Context: " . json_encode($record->context, JSON_PRETTY_PRINT) . "\n";
+        if (! empty($record->context)) {
+            $formattedMessage .= 'Context: ' . json_encode($record->context, JSON_PRETTY_PRINT) . "\n";
         }
 
         file_put_contents(
