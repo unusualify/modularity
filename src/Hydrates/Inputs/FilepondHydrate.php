@@ -39,6 +39,14 @@ class FilepondHydrate extends InputHydrate
         'dropOnPage' => false, // FilePond will catch all files dropped on the webpage
         'dropOnElement' => true, // Require drop on the FilePond element itself to catch the file.
         'dropValidation' => false, // When enabled, files are validated before they are dropped. A file is not added when it's invalid.
+
+        // File Size Validation
+        'allowFileSizeValidation' => true,
+        'maxFileSize' => '5MB', // 5MB
+        'minFileSize' => '1KB', // 1KB
+        'maxTotalFileSize' => null,
+        'labelMaxFileSize' => 'Maximum file size is {filesize}',
+        'labelMaxFileSizeExceeded' => 'File is too large',
     ];
 
     /**

@@ -24,8 +24,7 @@
             @form-valid="updateFormValid($event)"
           >
             <template #preview>
-              <StepperPreview
-                v-if="!lastFormPreviewLoading && isLastStep"
+              <StepperPreview v-if="!lastFormPreviewLoading && isLastStep"
                 :formatted-preview="formattedPreview"
 
                 :preview-form-data="lastFormPreview"
@@ -35,6 +34,12 @@
                 :final-form-subtitle="finalFormSubtitle"
                 @final-form-action="handleFinalFormAction"
               />
+              <div v-else-if="lastFormPreviewLoading && isLastStep"
+                class="d-flex align-center justify-center"
+                style="height: 70vh;"
+              >
+                <v-progress-circular model-value="20" indeterminate/>
+              </div>
             </template>
           </StepperContent>
         </v-col>
@@ -133,14 +138,13 @@
 <script>
   import { toRefs, reactive, ref, computed } from 'vue';
   import { useGoTo } from 'vuetify'
-  import { map, reduce, find, each, filter, get, isEqual, uniq, isBoolean } from 'lodash-es';
+  import { map, reduce, find, each, filter, get, isEqual, uniq, isBoolean, cloneDeep, isString, isObject } from 'lodash-es';
 
   import { getModel } from '@/utils/getFormData.js'
   import { handleMultiFormEvents } from '@/utils/formEvents'
 
   import { useInputHandlers, useValidation } from '@/hooks'
   import api from '@/store/api/form'
-
 
   import NotationUtil from '@/utils/notation';
 
@@ -243,7 +247,6 @@
         type: Boolean,
         default: false
       },
-
       responseModalIcon: {
         type: String,
         default: 'mdi-check-circle-outline'
@@ -261,9 +264,9 @@
         default: 'Ok'
       },
       responseModalOptions: {
-        type: Array,
+        type: Object,
         default: () => {
-          return []
+          return {}
         }
       }
     },
@@ -296,17 +299,13 @@
         modalActive: false,
         modalMessage: '',
         isCompleted: false,
-
+        lastFormPreviewLoading: false,
         schemas: [],
         models: [],
         valids: [],
-
         lastFormPreview: [],
         lastStepModel: {},
-
         protectedLastStepModel: {},
-
-
         previewModel: [],
         pendingHandleFunctions: [],
       }
@@ -325,10 +324,16 @@
         this.loading = true
 
         api[method](this.actionUrl, this.payload, function (response) {
-          self.loading = false
-          self.isCompleted = true
-          self.modalMessage = response.data.message
-          self.modalActive = true
+
+          if(response.status === 200 && response.data.variant === 'success'){
+            self.loading = false
+            self.isCompleted = true
+            self.modalMessage = response.data.message
+            self.modalActive = true
+          }else{
+            self.loading = false
+            this.$store.commit(ALERT.SET_ALERT,  response.data)
+          }
           // redirector(response.data)
 
           // if (callback && typeof callback === 'function') callback(response.data)
@@ -430,19 +435,52 @@
 
         return result
       },
-      handleFinalFormAction(index) {
+      handleFinalFormAction({index, event}) {
         // const data = this.previewFormData[index]
         const data = this.lastFormPreview[index]
         const fieldName = data.fieldName
-        const fieldArray = this.lastStepModel[fieldName];
+        const fieldFormat = data._fieldFormat ?? 'id'
+        const lastStepModel = cloneDeep(this.lastStepModel)
+        let fieldArray = this.lastStepModel[fieldName] ?? [];
 
         // Check if the id exists in the array and toggle it
-        this.lastStepModel[fieldName] = fieldArray.includes(data.id)
-          ? fieldArray.filter((id) => id !== data.id)
-          : [...fieldArray, data.id];
+        if(isString(fieldFormat)){
+          lastStepModel[fieldName] = fieldArray.includes(data[fieldFormat])
+            ? fieldArray.filter((id) => id !== data[fieldFormat])
+            : [...fieldArray, data[fieldFormat]];
+        }else if(isObject(fieldFormat)){
+          const fieldFormatUniqueKey = data._fieldFormatUniqueKey ?? 'id'
+          const fieldFormatSourceKey = data._fieldFormatSourceKey ?? 'id'
+
+          if(event === false){
+            for(const key in fieldArray){
+              let value = fieldArray[key]
+              if(isObject(value)){
+                if(event === false){
+                  if(value[fieldFormatUniqueKey] === data[fieldFormatSourceKey]){
+                    fieldArray.splice(key, 1)
+                    break
+                  }
+                }
+              }
+            }
+          } else if(event === true){
+            let itemPayload = {}
+
+            for(const field in fieldFormat){
+              const key = fieldFormat[field]
+              itemPayload[field] = get(data, key)
+            }
+
+            fieldArray.push(itemPayload)
+          }
+
+          lastStepModel[fieldName] = fieldArray
+
+        }
 
         // Force reactivity by creating a new reference
-        this.lastStepModel = { ...this.lastStepModel };
+        this.lastStepModel = lastStepModel;
       },
       async handlePreviewFormField(formField){
 
@@ -455,14 +493,6 @@
 
         this.lastFormPreviewLoading = true
         let formFieldValues = this.$cacheGet(formFieldKey, {})
-
-        // get previous form field values
-        // let previousFormFieldValues = reduce(formFieldValues, (acc, value, key) => {
-        //   if(value && value === true){
-        //     acc.push(parseInt(key))
-        //   }
-        //   return acc
-        // }, [])
 
         // get cached form field values
         let cachedFormFieldValues = reduce(formFieldValues, (acc, value, key) => {
@@ -484,36 +514,6 @@
 
           let newIds = currentIds.filter(id => !cachedFormFieldValues.includes(id))
           let cachedIds = currentIds.filter(id => cachedFormFieldValues.includes(id))
-          // let cachedNewIds = currentIds.filter(id => !previousFormFieldValues.includes(id) && cachedFormFieldValues.includes(id))
-
-          // let deletedIds = previousFormFieldValues.filter(id => !currentIds.includes(id))
-          // let isChanged = false
-
-          // if(deletedIds.length > 0){ // delete items
-          //   isChanged = true
-
-          //   this.lastFormPreview = this.lastFormPreview.filter(item => !deletedIds.includes(item.form_field_id))
-
-          //   formFieldValues = reduce(formFieldValues, (acc, value, key) => {
-          //     if(deletedIds.includes(parseInt(key))){
-          //       acc[key] = false
-          //     }else{
-          //       acc[key] = value
-          //     }
-          //     return acc
-          //   }, {})
-          // }
-
-          // if(cachedNewIds.length > 0){ // get cached items acc. to form_field_id
-          //   cachedNewIds.forEach(id => {
-          //     let cachedNewItems = cachedFormFieldFetched.filter(item => item.form_field_id === id && item.form_field_notation === modelNotation)
-          //     cachedNewItems.forEach(item => {
-          //       this.lastFormPreview.push(item)
-          //     })
-          //     formFieldValues[id] = true
-          //   })
-          //   isChanged = true
-          // }
 
           if(cachedIds.length > 0){ // get cached items acc. to form_field_id
             cachedIds.forEach(id => {
@@ -523,11 +523,9 @@
               })
               formFieldValues[id] = true
             })
-            // isChanged = true
           }
 
           if(newIds.length > 0){ // fetch new items
-            __log('newIds', newIds)
             if(!formField.endpoint){
               return
             }
@@ -567,6 +565,10 @@
                             return subItem[cardField] ?? 'N/A'
                           }
                         }),
+
+                        _fieldFormat: formField.format ?? 'id',
+                        _fieldFormatSourceKey: formField.formatSourceKey ?? 'id',
+                        _fieldFormatUniqueKey: formField.formatUniqueKey ?? 'id',
                       }
                     })
                   } else { // is object
@@ -585,7 +587,10 @@
                           }else{
                             return value[cardField] ?? 'N/A'
                           }
-                        })
+                        }),
+                        _fieldFormat: formField.format ?? 'id',
+                        _fieldFormatSourceKey: formField.formatSourceKey ?? 'id',
+                        _fieldFormatUniqueKey: formField.formatUniqueKey ?? 'id',
                       }
                     }
                   }
@@ -613,22 +618,12 @@
                 this.$cachePush(cacheFormFieldValuesKey, item)
                 this.lastFormPreview.push(item)
               })
-
-              // if(flattenedItems.length > 0){
-              //   isChanged = true
-              // }
-
             }
           }
 
-          // if(isChanged){
-            this.$cachePut(formFieldKey, formFieldValues)
-          // }
+          this.$cachePut(formFieldKey, formFieldValues)
 
         }
-        // else if(previousFormFieldValues.length > 0){ // clear if model value is null and previous form field values are present
-        //   this.lastFormPreview = this.lastFormPreview.filter(item => previousFormFieldValues.includes(item.form_field_id))
-        // }
 
         this.lastFormPreviewLoading = false
       }
@@ -662,7 +657,6 @@
       formattedPreview(){
         return NotationUtil.formattedPreview(this.displayInfo, this.previewNotations)
       },
-
       payload(){
         let model = reduce(this.models, function(acc, model, index){
           return {...acc, ...model}
@@ -672,11 +666,13 @@
 
         let lastStepModel = reduce(this.lastStepModel, function(acc, value, key){
           if(Array.isArray(value)){
-            value = value.reduce((acc, id) => {
-              let item = lastFormPreview.find((previewItem) => previewItem.id === id && previewItem.fieldName === key)
+            value = value.reduce((acc, element) => {
+              let item = isObject(element)
+                ? lastFormPreview.find((previewItem) => previewItem[previewItem._fieldFormatSourceKey ?? 'id'] === element[previewItem._fieldFormatUniqueKey ?? 'id'] && previewItem.fieldName === key)
+                : lastFormPreview.find((previewItem) => previewItem.id === element && previewItem.fieldName === key)
 
               if(item){
-                acc.push(id)
+                acc.push(element)
               }
               return acc
             }, [])
@@ -784,7 +780,7 @@
       })
 
       if(this.protectInitialValue){
-        this.protectedLastStepModel = this.lastStepModel
+        this.protectedLastStepModel = cloneDeep(this.lastStepModel)
       }
 
     }

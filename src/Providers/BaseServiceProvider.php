@@ -6,8 +6,8 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
-use Unusualify\Modularity\Activators\ModuleActivator;
 use Unusualify\Modularity\Exceptions\AuthConfigurationException;
 use Unusualify\Modularity\Http\ViewComposers\CurrentUser;
 use Unusualify\Modularity\Http\ViewComposers\FilesUploaderConfig;
@@ -64,6 +64,8 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->bootBaseViewComponents();
 
+        $this->bootModularityLogChannel();
+
         ResetPassword::createUrlUsing(function ($notifiable, string $token) {
             return url(route('admin.password.reset', [
                 'token' => $token,
@@ -97,7 +99,6 @@ class BaseServiceProvider extends ServiceProvider
                 ->appendOutputTo(storage_path('logs/scheduler.log'));
 
         });
-
     }
 
     /**
@@ -477,5 +478,19 @@ class BaseServiceProvider extends ServiceProvider
                 $this->app['files']->put(__DIR__ . "/../../config/merges/{$name}.php", php_array_file_content($array));
             }
         }
+    }
+
+    private function bootModularityLogChannel()
+    {
+        $this->app['config']->set('logging.channels.modularity', [
+            'driver' => 'monolog',
+            'handler' => \Unusualify\Modularity\Logging\ModularityLogHandler::class,
+            'level' => env('MODULARITY_LOG_LEVEL', 'debug'),
+            // 'bubble' => true,
+        ]);
+
+        $this->app->singleton('modularity.log', function () {
+            return Log::channel('modularity');
+        });
     }
 }

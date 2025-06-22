@@ -151,7 +151,7 @@ trait QueryBuilder
      * @param array $schema
      * @return \Illuminate\Support\Collection
      */
-    public function getByIds(array $ids, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null)
+    public function getByIds(array $ids, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null, $lazy = [])
     {
         $query = $this->model->whereIn('id', $ids);
 
@@ -162,7 +162,34 @@ trait QueryBuilder
         $query = $this->order($query, $orders);
 
         if ($isFormatted) {
-            return $query->get()->map(function ($item) {
+            return $query->get()->map(function ($item) use ($lazy) {
+
+                if ($lazy && count($lazy) > 0 && $item instanceof \Illuminate\Database\Eloquent\Model) {
+                    foreach ($lazy as $relation) {
+                        $parts = explode('.', $relation);
+
+                        if (count($parts) > 1) {
+                            foreach ($parts as $i => $part) {
+                                if ($i === 0) {
+                                    $item = $item->load($part);
+                                } else {
+                                    if ($item->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Model) {
+                                        $item = $item->{$parts[$i - 1]}->load($part);
+                                    } elseif ($item->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Collection) {
+                                        $item->{$parts[$i - 1]} = $item->{$parts[$i - 1]}->map(function ($item) use ($part) {
+                                            $item->{$part};
+
+                                            return $item;
+                                        });
+                                    }
+                                }
+                            }
+                        } else {
+                            $item->load($relation);
+                        }
+                    }
+                }
+
                 return array_merge(
                     // array_merge(
                     //     $this->getShowFields($item, $this->chunkInputs($this->inputs())),
@@ -172,7 +199,41 @@ trait QueryBuilder
                 );
             });
         } else {
-            return $query->get();
+            $result = $query->get();
+
+            if ($lazy && count($lazy) > 0) {
+                $result = $result->map(function ($item) use ($lazy) {
+                    if ($lazy && count($lazy) > 0 && $item instanceof \Illuminate\Database\Eloquent\Model) {
+                        foreach ($lazy as $relation) {
+                            $parts = explode('.', $relation);
+
+                            if (count($parts) > 1) {
+                                foreach ($parts as $i => $part) {
+                                    if ($i === 0) {
+                                        $item = $item->load($part);
+                                    } else {
+                                        if ($item->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Model) {
+                                            $item = $item->{$parts[$i - 1]}->load($part);
+                                        } elseif ($item->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Collection) {
+                                            $item->{$parts[$i - 1]} = $item->{$parts[$i - 1]}->map(function ($item) use ($part) {
+                                                $item->{$part};
+
+                                                return $item;
+                                            });
+                                        }
+                                    }
+                                }
+                            } else {
+                                $item->load($relation);
+                            }
+                        }
+                    }
+
+                    return $item;
+                });
+            }
+
+            return $result;
         }
     }
 

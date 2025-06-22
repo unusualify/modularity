@@ -20,8 +20,6 @@ trait ManageUtilities
      */
     protected function getIndexData($prependScope = [])
     {
-        $initialResource = $this->getJSONData();
-        // $filters = json_decode($this->request->get('filter'), true) ?? [];
         $headers = $this->filterHeadersByRoles($this->getIndexTableColumns());
         $headers = hydrate_table_columns_translations($headers);
 
@@ -47,7 +45,7 @@ trait ManageUtilities
                     'endpoints' => $tableEndpoints,
 
                     'navActive' => $this->getConfigFieldsByRoute('default_filter_status', 'all'),
-                    'total' => $initialResource['total'] ?? -1,
+                    'total' => -1,
                     'searchInitialValue' => request()->has('search') ? request()->query('search') : '',
                     'tableOptions' => $this->getVuetifyDatatableOptions(),
                     'columns' => $headers,
@@ -179,7 +177,6 @@ trait ManageUtilities
              ] : []);
 
         return array_replace_recursive($data, $customFormData);
-
     }
 
     /**

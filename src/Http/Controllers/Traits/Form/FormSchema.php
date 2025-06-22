@@ -531,9 +531,7 @@ trait FormSchema
      */
     protected function hydrateInputType(&$input)
     {
-        if (array_key_exists($input['type'], $this->inputTypes)) {
-            $input = array_merge($this->inputTypes[$input['type']], Arr::except($input, ['type']));
-        }
+        $input = hydrate_input_type($input);
     }
 
     /**

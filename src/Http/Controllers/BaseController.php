@@ -486,7 +486,8 @@ abstract class BaseController extends PanelController
                 return $this->getItemColumnData($item, $column);
             })->toArray();
 
-            $name = $columnsData[$this->titleColumnKey] ?? $this->searchTitleKeyValue($columnsData);
+            // $name = $columnsData[$this->titleColumnKey] ?? $this->searchTitleKeyValue($columnsData);
+            $name = data_get($item, $this->titleColumnKey, '');
 
             if (empty($name)) {
                 if ($translated) {

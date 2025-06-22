@@ -61,7 +61,6 @@ export const makeFilepondProps = propsFactory({
     type: String,
     default: '',
   },
-
   allowImagePreview: {
     type: Boolean,
     default: false
@@ -90,7 +89,6 @@ export const makeFilepondProps = propsFactory({
     type: Boolean,
     default: false
   },
-
   dropOnPage: {
     type: Boolean,
     default: false
@@ -103,8 +101,30 @@ export const makeFilepondProps = propsFactory({
     type: Boolean,
     default: false
   },
-
-
+  allowFileSizeValidation: {
+    type: Boolean,
+    default: true
+  },
+  maxFileSize: {
+    type: String,
+    default: '5MB'
+  },
+  minFileSize: {
+    type: String,
+    default: '1KB'
+  },
+  maxTotalFileSize: {
+    type: String,
+    default: null
+  },
+  labelMaxFileSize: {
+    type: String,
+    default: 'Maximum file size is {filesize}'
+  },
+  labelMaxFileSizeExceeded: {
+    type: String,
+    default: 'File is too large'
+  }
 })
 
 export default function useFilepond(props, context) {
