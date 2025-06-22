@@ -24,8 +24,7 @@
             @form-valid="updateFormValid($event)"
           >
             <template #preview>
-              <StepperPreview
-                v-if="!lastFormPreviewLoading && isLastStep"
+              <StepperPreview v-if="!lastFormPreviewLoading && isLastStep"
                 :formatted-preview="formattedPreview"
 
                 :preview-form-data="lastFormPreview"
@@ -35,6 +34,12 @@
                 :final-form-subtitle="finalFormSubtitle"
                 @final-form-action="handleFinalFormAction"
               />
+              <div v-else-if="lastFormPreviewLoading && isLastStep"
+                class="d-flex align-center justify-center"
+                style="height: 70vh;"
+              >
+                <v-progress-circular model-value="20" indeterminate/>
+              </div>
             </template>
           </StepperContent>
         </v-col>
@@ -294,17 +299,13 @@
         modalActive: false,
         modalMessage: '',
         isCompleted: false,
-
+        lastFormPreviewLoading: false,
         schemas: [],
         models: [],
         valids: [],
-
         lastFormPreview: [],
         lastStepModel: {},
-
         protectedLastStepModel: {},
-
-
         previewModel: [],
         pendingHandleFunctions: [],
       }
