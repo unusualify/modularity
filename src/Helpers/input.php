@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Unusualify\Modularity\Hydrates\InputHydrator;
 
@@ -30,9 +31,24 @@ if (! function_exists('modularity_default_input')) {
 if (! function_exists('hydrate_input')) {
     function hydrate_input(array $input, $module = null, $routeName = null, $skipQueries = null)
     {
+        $input = hydrate_input_type($input);
+
         $hydrator = new InputHydrator($input, $module, $routeName, $skipQueries);
 
         return $hydrator->hydrate();
+    }
+}
+
+if (! function_exists('hydrate_input_type')) {
+    function hydrate_input_type(array $input)
+    {
+        $inputTypes = modularityConfig('input_types', []);
+
+        if (array_key_exists($input['type'], $inputTypes)) {
+            return array_merge($inputTypes[$input['type']], Arr::except($input, ['type']));
+        }
+
+        return $input;
     }
 }
 
