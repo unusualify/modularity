@@ -238,7 +238,7 @@ class ResetPasswordController extends Controller
      */
     private function getUserFromToken($token)
     {
-        $clearToken = DB::table($this->config->get('auth.' . Modularity::getAuthProviderName() . '.table', 'password_resets'))->where('token', $token)->first();
+        $clearToken = DB::table($this->config->get('auth.passwords.' . Modularity::getAuthProviderName() . '.table', 'password_resets'))->where('token', $token)->first();
 
 
         if ($clearToken) {
