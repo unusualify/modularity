@@ -5,18 +5,13 @@
     ref="VInput"
     v-model="input"
     hide-details
-    :class="class"
-    :rules="rules"
+    :class="classes"
+    :rules="noRules ? [] : rules"
   >
     <template v-slot:default="defaultSlot">
       <slot name="activator"
         v-bind="{
-          browse,
-          addFile,
-          removeFile,
-          removeFiles,
-          getFiles,
-          getFile,
+          ...slotBindings,
         }"
       />
       <div
@@ -41,44 +36,64 @@
           </slot>
         </ue-title>
 
-        <slot name="body">
-          <div
-            :class="[
-              'fileField',
-              $slots.activator ? 'd-none' : ''
-            ]"
-          >
-            <FilePond
-              ref="pond"
-              :id="key"
-              :key="key"
-              v-bind="$lodash.omit($bindAttributes(), ['rules'])"
+        <div
+          :class="fileFieldClasses"
+        >
+          <FilePond
+            ref="pond"
+            :key="key"
+            :id="key"
+            v-bind="$lodash.omit($bindAttributes(), ['rules'])"
+            :name="name"
 
-              :allow-multiple="true"
-              :allow-file-type-validation="true"
-              :accepted-file-types="acceptedFileTypes"
-              :max-files="maxFiles"
-              :name="name"
+            :allow-image-preview="allowImagePreview"
+            :allow-multiple="allowMultiple"
+            :allow-process="allowProcess"
+            :allow-remove="allowRemove"
+            :allow-reorder="allowReorder"
+            :allow-replace="allowReplace"
+            :drop-on-page="dropOnPage"
+            :drop-on-element="dropOnElement"
+            :drop-validation="dropValidation"
 
-              :disabled="disabled"
-              :allow-drop="!disabled"
-              :allow-browse="!disabled"
+            :allow-file-type-validation="true"
+            :accepted-file-types="acceptedFileTypes"
+            :max-files="maxFiles"
 
-              :files="files"
-              :server="server"
-              @processfile="postProcessFilepond"
-              @removefile="removeFilepond"
+            :disabled="disabled"
+            :allow-drop="!disabled"
+            :allow-browse="!disabled"
 
-              @onaddfilestart="$emit('loading')"
-              @onaddfileprogress="$emit('loading')"
-              @onaddfile="$emit('loaded')"
+            :allow-file-size-validation="allowFileSizeValidation"
+            :max-file-size="maxFileSize"
+            :min-file-size="minFileSize"
+            :max-total-file-size="maxTotalFileSize"
+            :label-max-file-size="labelMaxFileSize"
+            :label-max-file-size-exceeded="labelMaxFileSizeExceeded"
 
+            :files="files"
+            :server="server"
+            @processfile="postProcessFilepond"
+            @removefile="removeFilepond"
 
-              @init="init"
-            />
-          </div>
+            @addfilestart="$emit('loadingFile', $event)"
+            @addfileprogress="$emit('loadingFileProgress', $event)"
+            @addfile="$emit('loadedFile', $event)"
+            @init="init"
+
+            @warning="warning"
+            @error="error"
+          />
+        </div>
+
+        <slot name="body"
+          v-bind="{
+            ...slotBindings
+          }"
+          @click="browse"
+        >
         </slot>
-        <div class="v-input__details" role="alert" aria-live="polite">
+        <div v-if="!hideDetails" class="v-input__details" role="alert" aria-live="polite">
           <div v-if="errorMessages.length > 0" class="v-messages">
             <div class="v-messages__message">
               {{ errorMessages.join(', ') }}
@@ -107,18 +122,24 @@
   // Import image preview and file type validation plugins
   import FilePondPluginImagePreview from "filepond-plugin-image-preview";
   import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+  import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
+
   import "filepond/dist/filepond.min.css";
   import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
 
   import { useInput, makeInputProps, makeInputEmits } from '@/hooks';
+  import { useFilepond, makeFilepondProps } from '@/hooks';
+
   import { globalError } from '@/utils/errors'
   import { useValidation } from '@/hooks'
 
+  import { ALERT } from '@/store/mutations'
   // Create component
   const Component = 'Filepond'
   const FilePond = vueFilePond(
     FilePondPluginImagePreview,
     FilePondPluginFileValidateType,
+    FilePondPluginFileValidateSize,
 
   );
 
@@ -134,53 +155,7 @@
     ],
     props: {
       ...makeInputProps(),
-      hint: {
-        type: String,
-        default: null,
-      },
-      disabled: {
-        type: Boolean,
-        default: false,
-      },
-      min: {
-        type: Number,
-      },
-      rules: {
-        type: Array,
-        default: () => [],
-      },
-      hintWeight: {
-        type: String,
-        default: 'thin',
-      },
-      maxFiles: {
-        type: Number,
-        default: 2,
-      },
-      endPoints: {
-        type: Object,
-        default: () => ({}),
-      },
-      class: {
-        type: String,
-        default: '',
-      },
-      labelWeight: {
-        type: String,
-        default: 'regular',
-      },
-      subtitle: {
-        type: String,
-        default: null,
-      },
-      subtitleWeight: {
-        type: String,
-        default: 'thin',
-      },
-      acceptedFileTypes: {
-        type: String,
-        default: '',
-      },
+      ...makeFilepondProps(),
     },
     setup(props, context) {
       const { requiredRule } = useValidation(props)
@@ -192,20 +167,39 @@
     },
     data() {
       return {
+        classes: [
+          'v-input-filepond',
+          this.class ?? '',
+        ],
+        fileFieldClasses: [
+          'v-input-filepond__file-field',
+          (this.$slots.activator || this.$slots.body) ? 'd-none' : ''
+        ],
         errorMessages: [],
         onStart: true,
-        files: isArray(this.modelValue) ? this.modelValue.map(function (file) {
-            return {
-              source:  file.source ?? `${this.endPoints.load}${file.uuid}`,
-              options: {
-                type : `${file.type ?? 'local'}`,
-                // file initial metadata
-                // metadata: {
-                //     date: '2018-10-5T12:00',
-                // },
-              }
+        files: isArray(this.modelValue) ? this.modelValue.map(function (filepond) {
+          return {
+            source:  filepond.source ?? `${this.endPoints.load}${filepond.uuid}`,
+            options: {
+              type : `${filepond.type ?? 'local'}`,
+              // file initial metadata
+              metadata: {
+                date: filepond.created_at,
+              },
+              file: filepond.file,
             }
-          }) : [],
+          }
+        }) : [],
+        slotBindings: {
+          browse: this.browse,
+          addFile: this.addFile,
+          removeFile: this.removeFile,
+          removeFiles: this.removeFiles,
+          getFiles: this.getFiles,
+          getFile: this.getFile,
+          files: this.files,
+
+        },
       }
     },
     methods:{
@@ -223,10 +217,22 @@
       removeFilepond: function(error, file) {
         const uuid = file.filename ?? file.serverId?.replace(`/${file.filename}`, '') ?? file.uuid;
 
-        const newInput = this.input.filter((asset) => asset.uuid != uuid);
+        let index = this.input.findIndex((asset) => asset.uuid == uuid);
 
-        this.input = newInput
+        if(index == -1){
+          const source = file.source
+
+          index = this.input.findIndex((asset) => asset.source == source);
+        }
+
+        if(index != -1){
+          const newInput = this.input.slice(0, index).concat(this.input.slice(index + 1));
+          this.input = newInput
+        }else {
+          console.error('removeFilepond error not found', file, this.input)
+        }
       },
+
       init() {
         // const files = isArray(this.input) ? this.input.map(function (file) {
         //       return {
@@ -260,7 +266,6 @@
           // onprocessfileabort(file) {}, //	Aborted processing of a file
           // onprocessfilerevert(file) {}, //	Processing of a file has been reverted
           // onprocessfile(error, file) {
-          //   __log('onprocessfile', self, file)
           //   self.input = self.input.concat({
           //     folder_name: file.serverId,
           //     file_name: file.filename,
@@ -306,6 +311,18 @@
       getFile(...args){
         return this.$refs.pond.getFile(...args)
       },
+
+      warning(message){
+        this.$store.commit(ALERT.SET_ALERT, {
+          message: message.body,
+          variant: 'warning',
+        })
+      },
+
+      error(message){
+        __log('error', message)
+      },
+
     },
     computed:{
       server() {
@@ -341,7 +358,6 @@
             axios.post( this.endPoints.process, formData, {
                 requestId,
                 onUploadProgress: e => {
-                  // __log('onUpload', e)
                   // Should call the progress method to update the progress to 100% before calling load
                   // Setting computable to false switches the loading indicator to infinite mode
                   progress(e.lengthComputable, e.loaded, e.total);
@@ -429,6 +445,7 @@
           return this.modelValue ?? []
         },
         set(val){
+          __log('input set', val)
           this.updateModelValue(val)
         }
       },
@@ -442,29 +459,30 @@
         if(this.obj && this.obj.schema && this.obj.schema.parentName){
           name = `${this.obj.schema.parentName}.${name}`
         }
-        // __log(name)
         return name
       },
     },
     watch: {
       modelValue: {
         handler(newVal) {
-          // __log('modelValue', newVal)
+
         },
       },
       disabled: {
         handler(newVal) {
-          // __log('disabled', newVal)
+
         },
       },
     },
     created() {
-      // __log('created', this.obj.schema.name)
       let rawRules = __data_get(this.obj, 'schema.rawRules', '') || '';
 
-      if(this.min && this.min > 0 && !rawRules.match(/required:array:\d+/)){
-        this.rules.push(this.requiredRule('array', this.min))
+      if(this.isEditing ? this.editable === true : this.creatable === true){
+        if(!this.noRules && this.min && this.min > 0 && !rawRules.match(/required:array:\d+/)){
+          this.rules.push(this.requiredRule('array', this.min))
+        }
       }
+
     },
     mounted() {
       // Set up a MutationObserver to watch for changes in VInput's error state
@@ -486,7 +504,7 @@
 </script>
 
 <style lang="scss" scoped>
-  .fileField {
+  .v-input-filepond__file-field {
     width: 100%;
     display: block;
     border-radius: 4px;

@@ -8,7 +8,6 @@ trait TableBulkActions
 {
     /**
      * Bulk actions for the table when selected items are present
-     * @return array
      */
     protected function getTableBulkActions(): array
     {

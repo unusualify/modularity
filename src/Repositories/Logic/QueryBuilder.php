@@ -15,15 +15,16 @@ trait QueryBuilder
      * @param array $orders
      * @param int $perPage
      * @param bool $forcePagination
+     * @param int|string|null $id
      * @return \Illuminate\Support\Collection|\Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function get($with = [], $scopes = [], $orders = [], $perPage = 20, $appends = [], $forcePagination = false)
+    public function get($with = [], $scopes = [], $orders = [], $perPage = 20, $appends = [], $forcePagination = false, $id = null)
     {
         $query = $this->model->query();
 
         $query = $this->model->with($this->formatWiths($query, $with));
 
-        if ($perPage == -1) {
+        if ($perPage === 0) {
             return $query->simplePaginate($perPage);
         }
 
@@ -49,12 +50,40 @@ trait QueryBuilder
 
         if (! $forcePagination && $this->model instanceof Sortable) {
             return $query->ordered()->paginate($perPage);
+
             return $query->ordered()->get();
+        }
+
+        $page = request()->get('page') ?? null;
+
+        if ($id) {
+            $totalRows = $query->count();
+            // $totalPages = ceil($totalRows / $perPage);
+
+            // Create a clone of the query to find the position of the record
+            $cloneQuery = clone $query;
+            // $orderColumns = $query->getQuery()->orders ?? [];
+
+            // Get the position of the record
+            if ($cloneQuery->where('id', $id)->exists()) {
+                $cloneQuery = clone $query;
+
+                // Get all IDs in the correct query order
+                $orderedIds = $cloneQuery->pluck('id')->toArray();
+
+                // Find the position of our target ID in the ordered results
+                $position = array_search($id, $orderedIds);
+
+                if ($position !== false) {
+                    // Calculate which page the record is on (1-based pagination)
+                    $page = (int) floor($position / $perPage) + 1;
+                }
+            }
         }
 
         try {
 
-            return $query->paginate($perPage);
+            return $query->paginate($perPage, page: $page);
 
         } catch (\Throwable $th) {
             dd(
@@ -73,19 +102,48 @@ trait QueryBuilder
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function getById($id, $with = [], $withCount = [])
+    public function getById($id, $with = [], $withCount = [], $lazy = [])
     {
         $query = $this->model->query();
 
+        $withs = $this->formatWiths($query, $with);
+
         if (classHasTrait($this->model, 'Illuminate\Database\Eloquent\SoftDeletes')) {
-            return $query->withTrashed()->with($this->formatWiths($query, $with))->withCount($withCount)->findOrFail($id);
+            $result = $query->withTrashed()->with($withs)->withCount($withCount)->findOrFail($id);
         } else {
-            return $query->with($this->formatWiths($query, $with))->withCount($withCount)->findOrFail($id);
+            $result = $query->with($withs)->withCount($withCount)->findOrFail($id);
         }
+
+        if ($lazy && count($lazy) > 0 && $result instanceof \Illuminate\Database\Eloquent\Model) {
+            foreach ($lazy as $relation) {
+                $parts = explode('.', $relation);
+
+                if (count($parts) > 1) {
+                    foreach ($parts as $i => $part) {
+                        if ($i === 0) {
+                            $result = $result->load($part);
+                        } else {
+                            if ($result->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Model) {
+                                $result = $result->{$parts[$i - 1]}->load($part);
+                            } elseif ($result->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Collection) {
+                                $result->{$parts[$i - 1]} = $result->{$parts[$i - 1]}->map(function ($item) use ($part) {
+                                    $item->{$part};
+
+                                    return $item;
+                                });
+                            }
+                        }
+                    }
+                } else {
+                    $result->load($relation);
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
-     * @param array $ids
      * @param array $with
      * @param array $scopes
      * @param array $orders
@@ -93,7 +151,7 @@ trait QueryBuilder
      * @param array $schema
      * @return \Illuminate\Support\Collection
      */
-    public function getByIds(array $ids, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null)
+    public function getByIds(array $ids, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null, $lazy = [])
     {
         $query = $this->model->whereIn('id', $ids);
 
@@ -104,7 +162,34 @@ trait QueryBuilder
         $query = $this->order($query, $orders);
 
         if ($isFormatted) {
-            return $query->get()->map(function ($item) {
+            return $query->get()->map(function ($item) use ($lazy) {
+
+                if ($lazy && count($lazy) > 0 && $item instanceof \Illuminate\Database\Eloquent\Model) {
+                    foreach ($lazy as $relation) {
+                        $parts = explode('.', $relation);
+
+                        if (count($parts) > 1) {
+                            foreach ($parts as $i => $part) {
+                                if ($i === 0) {
+                                    $item = $item->load($part);
+                                } else {
+                                    if ($item->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Model) {
+                                        $item = $item->{$parts[$i - 1]}->load($part);
+                                    } elseif ($item->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Collection) {
+                                        $item->{$parts[$i - 1]} = $item->{$parts[$i - 1]}->map(function ($item) use ($part) {
+                                            $item->{$part};
+
+                                            return $item;
+                                        });
+                                    }
+                                }
+                            }
+                        } else {
+                            $item->load($relation);
+                        }
+                    }
+                }
+
                 return array_merge(
                     // array_merge(
                     //     $this->getShowFields($item, $this->chunkInputs($this->inputs())),
@@ -114,14 +199,46 @@ trait QueryBuilder
                 );
             });
         } else {
+            $result = $query->get();
 
-            return $query->get();
+            if ($lazy && count($lazy) > 0) {
+                $result = $result->map(function ($item) use ($lazy) {
+                    if ($lazy && count($lazy) > 0 && $item instanceof \Illuminate\Database\Eloquent\Model) {
+                        foreach ($lazy as $relation) {
+                            $parts = explode('.', $relation);
+
+                            if (count($parts) > 1) {
+                                foreach ($parts as $i => $part) {
+                                    if ($i === 0) {
+                                        $item = $item->load($part);
+                                    } else {
+                                        if ($item->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Model) {
+                                            $item = $item->{$parts[$i - 1]}->load($part);
+                                        } elseif ($item->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Collection) {
+                                            $item->{$parts[$i - 1]} = $item->{$parts[$i - 1]}->map(function ($item) use ($part) {
+                                                $item->{$part};
+
+                                                return $item;
+                                            });
+                                        }
+                                    }
+                                }
+                            } else {
+                                $item->load($relation);
+                            }
+                        }
+                    }
+
+                    return $item;
+                });
+            }
+
+            return $result;
         }
     }
 
     /**
      * @param string $column
-     * @param array $values
      * @param array $with
      * @param array $scopes
      * @param array $orders
@@ -197,7 +314,7 @@ trait QueryBuilder
      * @param null $exceptId
      * @return \Illuminate\Support\Collection
      */
-    public function list($column = 'name', $with = [], $scopes = [], $orders = [], $appends = [], $exceptId = null)
+    public function list($column = 'name', $with = [], $scopes = [], $orders = [], $appends = [], $perPage = -1, $exceptId = null, $forcePagination = false)
     {
         $query = $this->model->newQuery();
 
@@ -222,7 +339,12 @@ trait QueryBuilder
         $columns = ['id', ...$defaultColumns];
         $oldColumns = $columns;
 
-        $tableColumns = $this->getModel()->getColumns();
+        $hasTableColumnCheck = method_exists($this->getModel(), 'getTableColumns');
+        $tableColumns = [];
+        if ($hasTableColumnCheck) {
+            $tableColumns = $this->getModel()->getTableColumns();
+        }
+
         $translatedColumns = [];
 
         if (method_exists($this->getModel(), 'isTranslatable') && $this->model->isTranslatable()) {
@@ -232,16 +354,21 @@ trait QueryBuilder
             $columns = array_diff($columns, $translatedAttributes);
             $defaultColumns = array_diff($defaultColumns, $translatedAttributes);
             $translatedColumns = array_values(array_intersect($oldColumns, $translatedAttributes));
-            $absentColumns = array_diff($defaultColumns, $tableColumns);
 
-            if (in_array('name', $absentColumns)) {
-                $titleColumnKey = $this->getModel()->getRouteTitleColumnKey();
-                if (in_array($titleColumnKey, $translatedAttributes)) {
-                    $columns = array_filter($columns, fn ($col) => $col !== 'name');
-                    $translatedColumns[] = $titleColumnKey;
-                } else {
-                    $columns = array_filter($columns, fn ($col) => $col !== 'name');
-                    $columns[] = "{$this->getModel()->getRouteTitleColumnKey()} as name";
+            if ($hasTableColumnCheck) {
+                $absentColumns = array_diff($defaultColumns, $tableColumns);
+                if (in_array('name', $absentColumns)) {
+                    $titleColumnKey = $this->getModel()->getRouteTitleColumnKey();
+                    if (in_array($titleColumnKey, $translatedAttributes)) {
+                        $columns = array_filter($columns, fn ($col) => $col !== 'name');
+                        $translatedColumns[] = $titleColumnKey;
+                    } else {
+                        $columns = array_filter($columns, fn ($col) => $col !== 'name');
+                        $titleColumnKey = $this->getModel()->getRouteTitleColumnKey();
+                        if (in_array($titleColumnKey, $tableColumns)) {
+                            $columns[] = "{$titleColumnKey} as name";
+                        }
+                    }
                 }
             }
 
@@ -261,13 +388,45 @@ trait QueryBuilder
             $columns[] = $this->getModel()->{$r}()->getForeignKeyName();
         }
 
-        $with = array_merge($this->getModel()->getWith(), $with);
+        if (method_exists($this->getModel(), 'getWith')) {
+            $with = array_values(array_unique(array_merge($this->getModel()->getWith(), $with)));
+        }
 
-        // dd($columns, $appends, $with, $columns, $translatedColumns);
+        try {
+            if ($hasTableColumnCheck) {
+                $columns = array_values(array_unique(array_intersect($columns, $tableColumns)));
+            }
+        } catch (\Throwable $th) {
+            dd(
+                $columns,
+                $tableColumns,
+                $this->getModel()->getColumns(),
+                $this->getModel()
+            );
+        }
 
         try {
             // code...
-            return $query->get($columns)->map(fn ($item) => [
+            if ($forcePagination) {
+                $paginator = $query->with($with)->paginate($perPage);
+
+                $paginator->getCollection()->transform(fn ($item) => [
+                    ...collect($appends)->mapWithKeys(function ($append) use ($item) {
+                        return [$append => $item->{$append}];
+                    })->toArray(),
+                    ...collect($with)->mapWithKeys(function ($r) use ($item) {
+                        $r = explode('.', $r)[0];
+
+                        return [$r => $item->{$r}];
+                    })->toArray(),
+                    ...(collect($columns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
+                    ...(collect($translatedColumns)->mapWithKeys(fn ($column) => [$column => $item->{$column}])->toArray()),
+                ]);
+
+                return $paginator;
+            }
+
+            return $query->with($with)->get($columns)->map(fn ($item) => [
                 ...collect($appends)->mapWithKeys(function ($append) use ($item) {
                     return [$append => $item->{$append}];
                 })->toArray(),
@@ -289,7 +448,6 @@ trait QueryBuilder
                 $translatedColumns,
                 $foreignableRelationships,
                 $relationships,
-                $foreignableRelationships,
                 $th,
                 array_reduce(debug_backtrace(), 'backtrace_formatter', [])
             );
@@ -329,17 +487,18 @@ trait QueryBuilder
     {
         return array_map(function ($item) {
 
-            if(is_array($item)) {
-                if(Arr::isAssoc($item)) {
-                    return fn($query) => array_reduce($item['functions'], fn($query, $function) => $query->$function(), $query);
-                }else{
-                    if(request()->ajax()) {
+            if (is_array($item)) {
+                if (Arr::isAssoc($item)) {
+                    return fn ($query) => array_reduce($item['functions'], fn ($query, $function) => $query->$function(), $query);
+                } else {
+                    if (request()->ajax()) {
                         // dd($item);
                     }
                 }
             }
 
             return $item;
+
             return is_array($item)
                 ? function ($query) use ($item) {
 

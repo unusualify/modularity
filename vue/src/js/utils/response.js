@@ -1,3 +1,4 @@
+import { isObject, omit } from 'lodash-es'
 /*
 * Gather selected items in a selected object (currently used for medias and browsers)
 * if a block is passed as second argument, we retrieve selected items namespaced by the block id
@@ -14,4 +15,17 @@ export const redirector = (data, timeout = 1000) => {
     }, timeout, data)
     // window.location.replace(resp.data.redirect)
   }
+}
+
+export const handleSuccessResponse = (response) => {
+  if (response.status === 200) {
+    // open temporary modal
+    if (response.data.modalService && isObject(response.data.modalService)) {
+      window.$modalService.open(response.data.modalService.component ?? null, omit(response.data.modalService, ['component']))
+    }
+  }
+}
+
+export const handleErrorResponse = (error) => {
+  __log(error)
 }

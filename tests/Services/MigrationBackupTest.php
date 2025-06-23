@@ -3,11 +3,10 @@
 namespace Unusualify\Modularity\Tests\Services;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
-use Unusualify\Modularity\Tests\TestCase;
+use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularity\Facades\MigrationBackup;
+use Unusualify\Modularity\Tests\TestCase;
 
 class MigrationBackupTest extends TestCase
 {
@@ -147,7 +146,7 @@ class MigrationBackupTest extends TestCase
                 return DB::select("PRAGMA foreign_key_list({$table})");
 
             case 'mysql':
-                return DB::select("
+                return DB::select('
                     SELECT
                         COLUMN_NAME,
                         REFERENCED_TABLE_NAME,
@@ -156,7 +155,7 @@ class MigrationBackupTest extends TestCase
                     WHERE TABLE_SCHEMA = DATABASE()
                         AND TABLE_NAME = ?
                         AND REFERENCED_TABLE_NAME IS NOT NULL
-                ", [$table]);
+                ', [$table]);
 
             case 'pgsql':
                 return DB::select("
@@ -233,7 +232,7 @@ class MigrationBackupTest extends TestCase
         // Copy data from old table to new table
         $oldData = DB::table($oldTable)->get();
         foreach ($oldData as $record) {
-            $data = (array)$record;
+            $data = (array) $record;
             unset($data['email']); // Remove email field
             $data['phone'] = null; // Add phone field
             DB::table($tempTable)->insert($data);

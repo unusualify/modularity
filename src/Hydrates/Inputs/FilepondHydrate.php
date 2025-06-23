@@ -24,21 +24,29 @@ class FilepondHydrate extends InputHydrate
         ],
 
         // Multiple file upload functionalities
-        'allow-multiple' => true,
+        'allowMultiple' => true,
         'max-files' => 2,
 
         // Other Functionalities
-        'allow-drop' => true,
-        'allow-replace' => true, // only works when allowMultiple is false
-        'allow-remove' => true,
-        'allow-reorder' => false,
-        'allow-process' => true,
-        'allow-image-preview' => false,
+        'allowDrop' => true,
+        'allowReplace' => true, // only works when allowMultiple is false
+        'allowRemove' => true,
+        'allowReorder' => false,
+        'allowProcess' => true,
+        'allowImagePreview' => false,
 
         // Drag-Drop Properties
-        'drop-on-page' => false, // FilePond will catch all files dropped on the webpage
-        'drop-on-element' => true, // Require drop on the FilePond element itself to catch the file.
-        'drop-validation' => false, // When enabled, files are validated before they are dropped. A file is not added when it's invalid.
+        'dropOnPage' => false, // FilePond will catch all files dropped on the webpage
+        'dropOnElement' => true, // Require drop on the FilePond element itself to catch the file.
+        'dropValidation' => false, // When enabled, files are validated before they are dropped. A file is not added when it's invalid.
+
+        // File Size Validation
+        'allowFileSizeValidation' => true,
+        'maxFileSize' => '5MB', // 5MB
+        'minFileSize' => '1KB', // 1KB
+        'maxTotalFileSize' => null,
+        'labelMaxFileSize' => 'Maximum file size is {filesize}',
+        'labelMaxFileSizeExceeded' => 'File is too large',
     ];
 
     /**
@@ -83,5 +91,4 @@ class FilepondHydrate extends InputHydrate
 
         return $input;
     }
-
 }

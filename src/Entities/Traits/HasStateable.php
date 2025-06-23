@@ -4,61 +4,40 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Modules\SystemNotification\Events\StateableUpdated;
+use Unusualify\Modularity\Entities\Scopes\StateableScopes;
 use Unusualify\Modularity\Entities\State;
 use Unusualify\Modularity\Entities\Stateable;
 
 trait HasStateable
 {
+    use StateableScopes;
+
     public $_preserved_stateable;
+
+    protected static $stateModel = 'Modules\SystemUtility\Entities\State';
 
     protected static $hasStateableFillable = [
         'initial_stateable',
         'stateable_id',
-        // '_stateable',
-        // '_status',
     ];
 
     protected $customInitialStateable = null;
 
-    protected $modelStateIsUpdating = false;
+    protected $modelStateableIsUpdating = false;
 
-    protected $modelStateIsUpdatingId = null;
-
-    protected static $stateModel = 'Modules\SystemUtility\Entities\State';
-
-    protected $_stateableSourceFields = [];
-
-    protected $_originalFillable = null;
+    protected $modelStateableIsUpdatingId = null;
 
     public static function bootHasStateable(): void
     {
         self::saving(static function (Model $model) {
-            if (isset($model->initial_stateable)) {
-                $defaultStates = $model->getDefaultStates();
+            $model->startOffStateable();
 
-                $initialStateFound = collect($defaultStates)->firstWhere('code', $model->initial_stateable);
+            $model->stateableUpdatingCheck();
 
-                if ($initialStateFound) {
-                    $model->customInitialStateable = $initialStateFound;
-                }
-            }
-
-            if (isset($model->_status)) {
-                $model->_preserved_stateable = $model->_stateable;
-            }
-
-            if (isset($model->stateable_id)) {
-                $model->modelStateIsUpdating = true;
-                $model->modelStateIsUpdatingId = $model->stateable_id;
-            }
-
-            $model->offsetUnset('_stateable');
-            $model->offsetUnset('_status');
-
-            foreach (static::$hasStateableFillable as $field) {
-                $model->offsetUnset($field);
-            }
+            $model->clearStateableFillable();
         });
 
         self::created(static function (Model $model) {
@@ -66,97 +45,60 @@ trait HasStateable
         });
 
         self::retrieved(static function (Model $model) {
-            $state = $model->states->first(function ($state) {
-                return $state->pivot->is_active === 1;
-            });
+            $state = $model->state;
 
             if (! is_null($state)) {
-                $defaultState = collect($model->getDefaultStates())->firstWhere('code', $state->code);
-
-                if ($defaultState) {
-                    $attributes = array_merge(
-                        $state->toArray(),
-                        array_merge(
-                            $defaultState,
-                            $state->attributesToArray()
-                        )
-                    );
-                    $state->fill($attributes);
-                }
-
                 $model->setAttribute('stateable_id', $state->id);
-
-                $model->setAttribute('_stateable', $state->id);
-                // $model->setAttribute(
-                //     '_status',
-                //     method_exists($model, 'setStateablePreview')
-                //         ? $model->setStateablePreview($state)
-                //         : "<span class='text-{$state->color} mdi-{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</span>"
-                // );
-            } else {
-                // $model->setAttribute(
-                //     '_status',
-                //     method_exists($model, 'setStateablePreviewNull')
-                //         ? $model->setStateablePreviewNull()
-                //         : "<span class='text-grey mdi-alert-circle-outline'>No State</span>"
-                // );
             }
         });
 
         self::saved(static function (Model $model) {
-            $newState = State::find($model->_preserved_stateable) ?? State::find($model->modelStateIsUpdatingId);
-
-            if (is_null($newState)) {
-                return false;
-            }
-
-            $currentActiveState = $model->states()
-                ->wherePivot('is_active', 1)
-                ->first();
-
-            if ($currentActiveState && $currentActiveState->id !== $newState->id) {
-                $model->states()->updateExistingPivot($currentActiveState->id, [
-                    'is_active' => 0,
-                ]);
-            }
-
-            $existingRelationship = $model->states()
-                ->where('state_id', $newState->id)
-                ->first();
-
-            if ($existingRelationship) {
-                $model->states()->updateExistingPivot($newState->id, [
-                    'is_active' => 1,
-                ]);
-            } else {
-                $model->states()->attach($newState->id, [
-                    'is_active' => 1,
-                ]);
-            }
+            $model->updateStateable();
         });
     }
 
     public function initializeHasStateable()
     {
-        // $this->setAppends(['state_formatted']);
+        $this->append(['state_formatted']);
 
-        $this->mergeFillable(['_stateable']);
+        $this->mergeFillable(static::$hasStateableFillable);
     }
 
-    public function states(): \Illuminate\Database\Eloquent\Relations\MorphToMany
+    public function statees(): \Illuminate\Database\Eloquent\Relations\MorphToMany
     {
+        $defaultStates = $this->getDefaultStates();
+        $defaultStateCodes = array_column($defaultStates, 'code');
+
         return $this->morphToMany(
             static::$stateModel,
             'stateable',
             // config('modularity.states.table', 'stateables'),
-            modularityConfig('tables.stateables', 'modularity_stateables'),
+            modularityConfig('tables.stateables', 'um_stateables'),
             'stateable_id',
             'state_id'
-        )->withPivot('is_active');
+        )
+            ->orWhereIn('code', $defaultStateCodes);
+        // ->withPivot('is_active');
+    }
+
+    public function states(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        $defaultStates = $this->getDefaultStates();
+        $defaultStateCodes = array_column($defaultStates, 'code');
+
+        return $this->hasMany(
+            static::$stateModel,
+            'id',
+            'created_at'
+        )
+            ->orWhereIn('code', $defaultStateCodes);
+        // ->withPivot('is_active');
     }
 
     public function state(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
+        $stateableTable = (new Stateable)->getTable();
+
         return $this->hasOneThrough(
             static::$stateModel,
             Stateable::class,
@@ -164,8 +106,37 @@ trait HasStateable
             'id',
             'id',
             'state_id'
-        )->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.stateable_type', get_class($this))
-            ->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.is_active', 1);
+        )
+        // ->where(modularityConfig('tables.stateables', 'um_stateables') . '.is_active', 1)
+            ->where($stateableTable . '.stateable_type', get_class($this));
+    }
+
+    public function stateable(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(Stateable::class, 'stateable');
+    }
+
+    /**
+     * Get the state relationship with configuration applied.
+     *
+     * @return mixed
+     */
+    public function getStateAttribute()
+    {
+        $originalState = $this->getRelationValue('state');
+
+        if (! $originalState) {
+            return null;
+        }
+
+        $originalState->fill($this->getStateConfiguration($originalState->code));
+
+        return $originalState;
+    }
+
+    public static function getStateModel()
+    {
+        return static::$stateModel;
     }
 
     public static function getStateableTranslationLanguages()
@@ -175,7 +146,14 @@ trait HasStateable
         ];
     }
 
-    protected function stateFormatted() : Attribute
+    protected function stateableCode(): Attribute
+    {
+        return new Attribute(
+            get: fn () => $this->state ? $this->state->code : null,
+        );
+    }
+
+    protected function stateFormatted(): Attribute
     {
         $state = $this->state;
 
@@ -188,122 +166,136 @@ trait HasStateable
         );
     }
 
-    protected static function setFormattedState($state, $defaultAttributes = null)
+    /**
+     * @return array
+     */
+    protected static function formatStateableState(array|string $state, array $defaultAttributes = [])
     {
-        if (is_null($defaultAttributes)) {
-            $defaultAttributes = [
-                'icon' => '$warning',
-                'color' => 'warning',
-            ];
-        }
+        $defaultAttributes = array_merge([
+            'icon' => '$info',
+            'color' => 'info',
+        ], $defaultAttributes ?? [], Arr::only(is_array($state) ? $state : [], ['icon', 'color']));
 
+        $code = null;
         if (is_string($state)) {
-            $stateData = [
-                'code' => $state,
-            ];
-
-            // Add translations for each language
-            foreach (self::getStateableTranslationLanguages() as $lang) {
-                $stateData[$lang] = [
-                    'name' => Str::headline($state),
-                    'active' => true,
-                ];
+            if ($state === '') {
+                throw new \InvalidArgumentException('State cannot be empty string');
             }
-
-            // Merge with default attributes
-            $stateData = array_merge($stateData, $defaultAttributes);
-        } else {
-            $stateData = $state;
-            // If translations are not set, add them
-            if (! array_key_exists(app()->getLocale(), $stateData)) {
-                foreach (self::getStateableTranslationLanguages() as $lang) {
-                    $stateData[$lang] = [
-                        'name' => Str::headline(
-                            isset($stateData['name']) && isset($stateData['name'][$lang])
-                                ? $stateData['name'][$lang]
-                                : ($stateData['code'] ?? $state['code'])
-                        ),
-                        'active' => true,
-                    ];
-                }
-            }
-            // Merge with default attributes if icon or color is not set
-            if (! isset($stateData['icon']) || ! isset($stateData['color'])) {
-                $stateData = array_merge($defaultAttributes, $stateData);
+            $code = $state;
+        } elseif (is_array($state)) {
+            try {
+                $code = $state['code'];
+            } catch (\Throwable $th) {
+                throw new \InvalidArgumentException('State must have a code attribute');
             }
         }
 
-        return $stateData;
-    }
+        $defaultName = Str::headline($code);
+        $nameAttribute = (is_array($state) && isset($state['name'])) ? $state['name'] : $defaultName;
 
-    public static function getDefaultStates()
-    {
-        return array_map(function ($state) {
-            // dd($this->setFormattedState($state, $this->getDefaultState()));
-            return self::setFormattedState($state, self::getDefaultState());
-        }, static::$default_states ?? []);
+        $translations = array_reduce(self::getStateableTranslationLanguages(), function ($carry, $lang) use ($defaultName, $nameAttribute) {
+            if (is_string($nameAttribute)) {
+                $name = $nameAttribute;
+            } elseif (is_array($nameAttribute) && isset($nameAttribute[$lang])) {
+                $name = $nameAttribute[$lang];
+            } else {
+                $name = $defaultName;
+            }
+
+            $carry[$lang] = [
+                'name' => $name,
+                'active' => true,
+            ];
+
+            return $carry;
+        }, []);
+
+        return [
+            ...$defaultAttributes,
+            ...$translations,
+            'code' => $code,
+        ];
     }
 
     public static function getDefaultState()
     {
         if (isset(static::$default_state)) {
-            if (! isset(static::$default_state['code'])) {
-                throw new \InvalidArgumentException('Default state must have a code attribute');
+            if (! is_array(static::$default_state)) {
+                throw new \InvalidArgumentException('Default state must be an array');
             }
 
-            return self::setFormattedState(static::$default_state);
+            return Arr::only(static::$default_state, ['icon', 'color']);
         }
 
         return self::getInitialState() ?? [
             'code' => 'default',
-            'icon' => '$warning',
-            'color' => 'warning',
+            'icon' => '$info',
+            'color' => 'info',
         ];
     }
 
     public static function getInitialState()
     {
         if (isset(static::$initial_state)) {
-            return self::setFormattedState(static::$initial_state);
+            return self::formatStateableState(static::$initial_state ?? []);
         }
 
         return isset(static::$default_states[0])
-            ? self::setFormattedState(static::$default_states[0])
+            ? self::formatStateableState(static::$default_states[0] ?? [])
             : null;
     }
 
-    public function createNonExistantStates()
+    public static function getDefaultStates()
+    {
+        return array_map(function ($state) {
+            return self::formatStateableState($state, self::getDefaultState());
+        }, static::$default_states ?? []);
+    }
+
+    public static function getStateConfiguration($code)
+    {
+        $state = [];
+
+        foreach (self::getDefaultStates() as $state) {
+            if (is_string($state)) {
+                if ($state === $code) {
+                    break;
+                }
+            } elseif (is_array($state) && isset($state['code'])) {
+                if ($state['code'] === $code) {
+                    $state = $state;
+
+                    break;
+                }
+            }
+        }
+
+        return Arr::only($state, ['icon', 'color']);
+    }
+
+    protected function createNonExistantStates()
     {
         $defaultStates = $this->getDefaultStates();
         $initialState = $this->customInitialStateable ?? $this->getInitialState();
 
         foreach ($defaultStates as $state) {
-            $_state = State::where('code', $state['code'])->first() ?? State::create($state);
+            $stateModel = State::where('code', $state['code'])->first() ?? State::create($state);
             $isActive = $state['code'] === $initialState['code'];
-            $this->states()->attach($_state->id, ['is_active' => $isActive]);
+            // $this->states()->attach($stateModel->id, ['is_active' => $isActive]);
+            if ($isActive) {
+                $this->stateable()->updateOrCreate(['stateable_id' => $this->id, 'stateable_type' => get_class($this)], ['state_id' => $stateModel->id]);
+            }
         }
     }
 
-    public static function getStateableList($itemValue = 'name')
-    {
-        $defaultStates = self::getDefaultStates();
-        $defaultStateCodes = array_column($defaultStates, 'code');
-
-        return State::whereIn('code', $defaultStateCodes)
-            ->get()
-            ->sortBy(function ($state) use ($defaultStateCodes) {
-                return array_search($state->code, $defaultStateCodes);
-            })
-            ->map(function ($state) use ($itemValue) {
-                return [
-                    'id' => $state->id,
-                    $itemValue => $state->name,
-                ];
-            })
-            ->values()
-            ->toArray();
-    }
-
+    /**
+     * Get the default stateables with the number of items in each state.
+     *
+     * @param array $scopes
+     * @return array
+     *
+     * @deprecated Use StateableTrait::getStateableFilterList instead
+     */
     public static function defaultStateables($scopes = [])
     {
         $defaultStates = self::getDefaultStates();
@@ -314,15 +306,15 @@ trait HasStateable
             ->map(function ($state) use ($scopes) {
                 $studlyCode = Str::studly($state->code);
 
+                // dd(static::query()->toRawSql());
                 $number = static::handleScopes(static::query(), $scopes)
-                    ->stateableCount($state->code);
+                    ->isStateableCount($state->code);
 
                 return [
                     'name' => $state->name ?? $state->translations->first()->name,
                     'code' => $state->code,
-                    'slug' => "stateable{$studlyCode}",
+                    'slug' => "isStateable{$studlyCode}",
                     'number' => $number,
-                    // 'number' => static::query()->where('stateable', $state->code)->count(),
                 ];
             })
             ->sortBy(function ($state) use ($defaultStateCodes) {
@@ -335,95 +327,78 @@ trait HasStateable
             ->toArray();
     }
 
-    public function scopeStateable($query, $code)
+    protected function clearStateableFillable()
     {
-        return $query->whereHas('state', function ($q) use ($code) {
-            $q->where($q->getModel()->getTable() . '.code', $code);
-        });
+        $this->offsetUnset('_stateable');
+        $this->offsetUnset('_status');
+        foreach (static::$hasStateableFillable as $field) {
+            $this->offsetUnset($field);
+        }
     }
 
-    public function scopeStateableCount($query, $code)
+    protected function startOffStateable()
     {
-        return $query->stateable($code)->count();
+        if (isset($this->initial_stateable)) {
+            $defaultStates = $this->getDefaultStates();
+
+            $initialStateFound = collect($defaultStates)->firstWhere('code', $this->initial_stateable);
+
+            if ($initialStateFound) {
+                $this->customInitialStateable = $initialStateFound;
+            }
+        }
     }
 
-    // public function __call($method, $parameters)
-    // {
-    //     // if (Str::startsWith($method, 'stateable') && !Str::endsWith($method, 'Count')) {
-    //     //     dd($method, $parameters);
-    //     //     return $this->stateable(Str::after($method, 'scopeStateable'));
-    //     // }
-
-    //     return parent::__call($method, $parameters);
-    // }
-
-    public function scopeDistributed()
+    protected function setPreservedStateable()
     {
-        return $this->scopeAuthorized($this)
-            ->whereHas('states', function ($q) {
-                $q->where('code', 'distributed')
-                    ->where(modularityConfig('tables.stateables', 'modularity_stateables') . '.is_active', 1);
-            });
+        if (isset($this->_status)) {
+            dd(
+                $this->_status,
+                $this->_preserved_stateable,
+                $this->_stateable,
+            );
+            $this->_preserved_stateable = $this->_stateable;
+        }
     }
 
-    public function scopeDistributedCount()
+    protected function stateableUpdatingCheck()
     {
-
-        return $this->scopeDistributed()->count();
-
+        if (isset($this->stateable_id) && $this->stateable->id !== $this->stateable_id) {
+            $this->modelStateableIsUpdating = true;
+            $this->modelStateableIsUpdatingId = $this->stateable_id;
+        }
     }
 
-    // Since countries doesn't have a relation with States this can be added to PressRelease model
-    public function scopeDistributedCountries()
+    protected function isModelStateableUpdating()
     {
-        // return $this->scopeDistributed()
-        //     ->join('press_release_packages', 'press_releases.id', '=', 'press_release_packages.press_release_id')
-        //     ->join('umod_snapshots', function($join) {
-        //         $join->on('press_release_packages.id', '=', 'umod_snapshots.snapshotable_id')
-        //             ->where('umod_snapshots.snapshotable_type', '=', 'Modules\PressRelease\Entities\PressReleasePackage');
-        //     })
-        //     ->join('packages', function($join) {
-        //         $join->on('packages.id', '=', 'umod_snapshots.source_id')
-        //             ->where('umod_snapshots.source_type', '=', 'Modules\Package\Entities\Package');
-        //     })
-        //     ->select(\DB::raw('COUNT(DISTINCT packages.packageable_id) as country_count'))
-        //     ->where('packages.packageable_type', '=', 'Modules\Package\Entities\PackageCountry')
-        //     ->value('country_count');
-        return $this->scopeDistributed()
-            ->join('press_release_packages', 'press_releases.id', '=', 'press_release_packages.press_release_id')
-            ->join('umod_snapshots', function ($join) {
-                $join->on('press_release_packages.id', '=', 'umod_snapshots.snapshotable_id')
-                    ->where('umod_snapshots.snapshotable_type', '=', 'Modules\PressRelease\Entities\PressReleasePackage');
-            })
-            ->join('packages', function ($join) {
-                $join->on('packages.id', '=', 'umod_snapshots.source_id')
-                    ->where('umod_snapshots.source_type', '=', 'Modules\Package\Entities\Package');
-            })
-            ->leftJoin('package_regions', function ($join) {
-                $join->on('package_regions.id', '=', 'packages.packageable_id')
-                    ->where('packages.packageable_type', '=', 'Modules\Package\Entities\PackageRegion');
-            })
-            ->leftJoin('package_countries as region_countries', 'region_countries.package_region_id', '=', 'package_regions.id')
-            ->leftJoin('package_countries as direct_countries', function ($join) {
-                $join->on('direct_countries.id', '=', 'packages.packageable_id')
-                    ->where('packages.packageable_type', '=', 'Modules\Package\Entities\PackageCountry');
-            })
-            ->select(\DB::raw('COUNT(DISTINCT COALESCE(region_countries.id, direct_countries.id)) as country_count'))
-            ->value('country_count');
+        return $this->modelStateableIsUpdating;
+    }
 
-        // $test = $this->scopeDistributed()
-        // ->join('press_release_packages', 'press_releases.id', '=', 'press_release_packages.press_release_id')
-        // ->join('umod_snapshots', function($join) {
-        //     $join->on('press_release_packages.id', '=', 'umod_snapshots.snapshotable_id')
-        //         ->where('umod_snapshots.snapshotable_type', '=', 'Modules\PressRelease\Entities\PressReleasePackage');
-        // })
-        // ->join('packages', function($join) {
-        //     $join->on('packages.id', '=', 'umod_snapshots.source_id')
-        //         ->where('umod_snapshots.source_type', '=', 'Modules\Package\Entities\Package');
-        // })
-        // ->select(\DB::raw('COUNT(DISTINCT packages.packageable_id) as country_count'))
-        // ->where('packages.packageable_type', '=', 'Modules\Package\Entities\PackageCountry')
-        // ->value('country_count');
-        // dd($test);
+    protected function getModelStateableUpdatingId()
+    {
+        return $this->modelStateableIsUpdatingId;
+    }
+
+    protected function updateStateable()
+    {
+        if (! $this->modelStateableIsUpdating) {
+            return;
+        }
+
+        $newState = State::find($this->modelStateableIsUpdatingId);
+
+        if (is_null($newState)) {
+            return;
+        }
+
+        $oldState = $this->state;
+
+        $this->stateable()->update(['state_id' => $newState->id]);
+
+        if ($oldState && $oldState->code !== $newState->code) {
+            $cloneModel = clone $this;
+            $cloneModel->refresh();
+            StateableUpdated::dispatch($cloneModel, $cloneModel->state, $oldState);
+        }
     }
 }

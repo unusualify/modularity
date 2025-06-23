@@ -29,11 +29,11 @@ trait Allowable
         $guard = $this->allowableUserGuard ?? null;
 
         if ($guard) {
-            if(Auth::guard($guard)->check()) {
+            if (Auth::guard($guard)->check()) {
                 $this->allowableUser = Auth::guard($guard)->user();
             }
         } else {
-            if(Auth::check()) {
+            if (Auth::check()) {
                 $this->allowableUser = Auth::user();
             }
         }
@@ -46,23 +46,22 @@ trait Allowable
      * @param string|null $searchKey
      * @param Closure|null $orClosure
      * @param Closure|null $andClosure
-     * @return array|Collection
      */
     public function getAllowableItems($items, $searchKey = null, $orClosure = null, $andClosure = null): array|Collection
     {
         if (! $orClosure) {
-            $orClosure = fn($item, $user) => false;
+            $orClosure = fn ($item, $user) => false;
         }
 
         if (! $andClosure) {
-            $andClosure = fn($item, $user) => true;
+            $andClosure = fn ($item, $user) => true;
         }
 
         $isArray = is_array($items);
 
         if ($isArray) {
             $items = collect($items);
-        } else if (! $items instanceof Collection) {
+        } elseif (! $items instanceof Collection) {
             throw new \Exception('Invalid items type, must be an array or a collection');
         }
 
@@ -70,13 +69,12 @@ trait Allowable
 
         $newItems = $items->reduce(function ($carry, $item) use ($searchKey, $orClosure, $andClosure) {
 
-            if($this->isAllowedItem($item, $searchKey, $orClosure, $andClosure)) {
+            if ($this->isAllowedItem($item, $searchKey, $orClosure, $andClosure)) {
                 $carry->push($item);
             }
 
             return $carry;
         }, collect([]));
-
 
         if ($isArray) {
             return $newItems->toArray();
@@ -85,31 +83,45 @@ trait Allowable
         return $newItems;
     }
 
-    public function isAllowedItem($item, $searchKey = null, $orClosure = null, $andClosure = null)
+    /**
+     * Check if the item is allowed for the current user
+     *
+     * @param array|object $item
+     * @param string|null $searchKey
+     * @param Closure|null $orClosure
+     * @param Closure|null $andClosure
+     * @param bool $disallowIfUnauthenticated
+     * @return bool
+     */
+    public function isAllowedItem($item, $searchKey = null, $orClosure = null, $andClosure = null, $disallowIfUnauthenticated = true)
     {
         if (! $this->allowableUser) {
             $this->setAllowableUser();
         }
 
         if (! $orClosure) {
-            $orClosure = fn($item, $user) => false;
+            $orClosure = fn ($item, $user) => false;
         }
 
         if (! $andClosure) {
-            $andClosure = fn($item, $user) => true;
+            $andClosure = fn ($item, $user) => true;
         }
 
         $searchKey = $searchKey ?? $this->allowedRolesSearchKey ?? 'allowedRoles';
 
-        if(!$this->allowableUser) {
-            return true;
+        if (! $this->allowableUser) {
+            return ! $disallowIfUnauthenticated;
         }
 
         if ($andClosure($item, $this->allowableUser)) {
-            if (! isset($item[$searchKey])) {
+            $itemType = is_array($item) ? 'array' : 'object';
+            $hasSearchKey = $itemType == 'array' ? isset($item[$searchKey]) : isset($item->{$searchKey});
+            $allowedRoles = $itemType == 'array' ? ($item[$searchKey] ?? []) : ($item->{$searchKey} ?? []);
+
+            if (! $hasSearchKey) {
                 return true;
             } else {
-                $allowedRoles = is_array($item[$searchKey]) ? $item[$searchKey] : explode(',', $item[$searchKey]);
+                $allowedRoles = is_array($allowedRoles) ? $allowedRoles : explode(',', $allowedRoles);
 
                 if ($orClosure($item, $this->allowableUser) || $this->allowableUser->hasRole($allowedRoles)) {
                     return true;

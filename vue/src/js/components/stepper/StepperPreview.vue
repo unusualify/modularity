@@ -15,14 +15,25 @@
       <!-- Final form data -->
       <v-col cols="12" v-if="previewFormData.length > 0" v-fit-grid>
         <v-sheet class="px-0">
-          <ue-title
-            type="body-1"
-            font-weight="bold"
-            padding="a-0"
-            margin="y-4"
-          >
-            {{ finalFormTitle }}
-          </ue-title>
+          <div class="d-flex flex-column ga-2 my-4">
+            <ue-title
+              type="body-1"
+              font-weight="bold"
+              padding="a-0"
+            >
+              {{ finalFormTitle }}
+            </ue-title>
+            <ue-title
+              v-if="finalFormSubtitle"
+              type="caption"
+              weight="medium"
+              color="grey-darken-1"
+              transform="none"
+              padding="a-0"
+            >
+              {{ finalFormSubtitle }}
+            </ue-title>
+          </div>
           <!-- Preview form items -->
           <template
             v-for="(data, index) in previewFormData"
@@ -32,7 +43,7 @@
               row-min-height="120px"
               style="background-color: transparent; min-height: 150px;"
               :class="[
-                $lodash.includes(lastStepModel[data.fieldName], data.id) ? 'bg-primary' : 'bg-grey-lighten-5',
+                fieldSelected(data) ? 'bg-primary' : 'bg-grey-lighten-5',
                 'w-100'
               ]"
               class="mb-4 py-4"
@@ -95,9 +106,13 @@
                     :min-width="segmentScope.actionProps.actionIconMinHeight"
                     :min-height="segmentScope.actionProps.actionIconMinHeight"
                     :size="segmentScope.actionProps.actionIconSize"
-                    :icon="$lodash.includes(lastStepModel[data.fieldName], data.id) ? 'mdi-minus' : 'mdi-plus'"
-                    :color="$lodash.includes(lastStepModel[data.fieldName], data.id) ? 'grey' : 'primary'"
-                    @click="$emit('final-form-action', index)"
+                    :icon="getFieldIcon(data)"
+                    :color="getFieldColor(data)"
+                    @click="$emit('final-form-action', {
+                      index: index,
+                      event: !fieldSelected(data)
+                    })"
+                    :readonly="isReadOnly(data)"
                   />
                 </div>
               </template>
@@ -110,6 +125,8 @@
 </template>
 
 <script>
+import { isString, isObject, includes } from 'lodash-es'
+
 export default {
   name: 'StepperPreview',
   emits: ['final-form-action'],
@@ -129,8 +146,64 @@ export default {
     finalFormTitle: {
       type: String,
       required: true
+    },
+    finalFormSubtitle: {
+      type: String,
+      default: null
+    },
+    protectedLastStepModel: {
+      type: Object,
+      default: () => {}
     }
   },
+  methods: {
+    fieldSelected(data) {
+      const fieldName = data.fieldName
+      const values = this.lastStepModel[fieldName] ?? []
+      const fieldFormat = data._fieldFormat ?? 'id'
+      const fieldFormatUniqueKey = data._fieldFormatUniqueKey ?? 'id'
+      const fieldFormatSourceKey = data._fieldFormatSourceKey ?? 'id'
+
+      let selected = false
+      if(isString(fieldFormat)){
+        result = includes(values, data[fieldFormat])
+      }else if(isObject(fieldFormat)){
+        let item = values.find(item => item[fieldFormatUniqueKey] === data[fieldFormatSourceKey])
+        selected = item !== undefined && item !== null
+      }
+
+      return selected
+    },
+    getFieldIcon(data) {
+      return this.fieldSelected(data) ? 'mdi-minus' : 'mdi-plus'
+    },
+    getFieldColor(data) {
+      return this.fieldSelected(data) ? 'grey' : 'primary'
+    },
+    isReadOnly(data) {
+      const fieldName = data.fieldName
+      const values = this.protectedLastStepModel[fieldName] ?? []
+      const fieldFormat = data._fieldFormat ?? 'id'
+      const fieldFormatUniqueKey = data._fieldFormatUniqueKey ?? 'id'
+      const fieldFormatSourceKey = data._fieldFormatSourceKey ?? 'id'
+      let exists = false
+
+      if(isString(fieldFormat)){
+        exists = includes(values, data[fieldFormat])
+      }else if(isObject(fieldFormat)){
+        let item = values.find(item => __isset(data[fieldFormatSourceKey])
+          && __isset(item[fieldFormatUniqueKey])
+          && item[fieldFormatUniqueKey] === data[fieldFormatSourceKey])
+        exists = item !== undefined && item !== null
+      }
+
+      return exists
+    }
+
+  },
+  created() {
+
+  }
 }
 </script>
 

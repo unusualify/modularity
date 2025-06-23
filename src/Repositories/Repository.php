@@ -3,8 +3,6 @@
 namespace Unusualify\Modularity\Repositories;
 
 use Exception;
-use PDO;
-use ReflectionClass;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -13,9 +11,11 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use PDO;
+use ReflectionClass;
 use Spatie\Activitylog\Facades\LogBatch;
-use Unusualify\Modularity\Traits\ManageNames;
 use Unusualify\Modularity\Repositories\Contracts\Repository as RepositoryContract;
+use Unusualify\Modularity\Traits\ManageNames;
 
 abstract class Repository implements RepositoryContract
 {

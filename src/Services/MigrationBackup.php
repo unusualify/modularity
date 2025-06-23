@@ -10,10 +10,15 @@ use Illuminate\Support\Str;
 class MigrationBackup
 {
     protected string $backupKey;
+
     protected string $caller;
+
     protected string $table;
+
     protected array $schemaSnapshot = [];
+
     protected bool $constraintsDisabled = false;
+
     protected array $schemaChanges = [];
 
     protected function generateBackupKey(string $table): string
@@ -51,29 +56,31 @@ class MigrationBackup
                 // Get outgoing foreign keys
                 $outgoing = DB::select("PRAGMA foreign_key_list({$table})");
                 foreach ($outgoing as $fk) {
-                    \Log::info("Found outgoing foreign key in {$table}:", (array)$fk);
+                    \Log::info("Found outgoing foreign key in {$table}:", (array) $fk);
                     $foreignKeys[] = [
                         'name' => "fk_{$table}_{$fk->from}",
                         'local_column' => $fk->from,
                         'foreign_table' => $fk->table,
-                        'foreign_column' => $fk->to
+                        'foreign_column' => $fk->to,
                     ];
                 }
 
                 // Get incoming foreign keys
                 $tables = Schema::getConnection()->getDoctrineSchemaManager()->listTableNames();
                 foreach ($tables as $otherTable) {
-                    if ($otherTable === $table) continue;
+                    if ($otherTable === $table) {
+                        continue;
+                    }
 
                     $incoming = DB::select("PRAGMA foreign_key_list({$otherTable})");
                     foreach ($incoming as $fk) {
                         if ($fk->table === $table) {
-                            \Log::info("Found incoming foreign key to {$table} from {$otherTable}:", (array)$fk);
+                            \Log::info("Found incoming foreign key to {$table} from {$otherTable}:", (array) $fk);
                             $foreignKeys[] = [
                                 'name' => "fk_{$otherTable}_{$fk->from}",
                                 'local_column' => $fk->to,
                                 'foreign_table' => $otherTable,
-                                'foreign_column' => $fk->from
+                                'foreign_column' => $fk->from,
                             ];
                         }
                     }
@@ -85,6 +92,7 @@ class MigrationBackup
         }
 
         \Log::info("All foreign keys for {$table}:", $foreignKeys);
+
         return $foreignKeys;
     }
 
@@ -103,19 +111,21 @@ class MigrationBackup
                         'nullable' => $columnInfo->Null === 'YES',
                         'default' => $columnInfo->Default,
                     ];
+
                     break;
 
                 case 'pgsql':
-                    $columnInfo = DB::select("
+                    $columnInfo = DB::select('
                         SELECT column_name, data_type, is_nullable, column_default
                         FROM information_schema.columns
                         WHERE table_name = ? AND column_name = ?
-                    ", [$table, $column])[0];
+                    ', [$table, $column])[0];
                     $types[$column] = [
                         'type' => $columnInfo->data_type,
                         'nullable' => $columnInfo->is_nullable === 'YES',
                         'default' => $columnInfo->column_default,
                     ];
+
                     break;
 
                 case 'sqlite':
@@ -123,16 +133,17 @@ class MigrationBackup
                     $columnData = collect($columnInfo)->firstWhere('name', $column);
                     $types[$column] = [
                         'type' => $columnData->type,
-                        'nullable' => !$columnData->notnull,
+                        'nullable' => ! $columnData->notnull,
                         'default' => $columnData->dflt_value,
                     ];
+
                     break;
             }
         }
 
         return [
             'columns' => $types,
-            'foreign_keys' => $this->getForeignKeys($table)
+            'foreign_keys' => $this->getForeignKeys($table),
         ];
     }
 
@@ -144,7 +155,7 @@ class MigrationBackup
         $this->schemaSnapshot[$table] = $this->getTableSchema($table);
 
         // Store initial schema if not exists
-        if (!isset($this->schemaChanges[$table]['initial'])) {
+        if (! isset($this->schemaChanges[$table]['initial'])) {
             $this->schemaChanges[$table]['initial'] = $this->schemaSnapshot[$table];
         }
     }
@@ -168,8 +179,8 @@ class MigrationBackup
         $previousSchema = $this->schemaSnapshot[$table];
 
         // Debug
-        \Log::info("Previous schema:", ['columns' => array_keys($previousSchema['columns'])]);
-        \Log::info("Current schema:", ['columns' => array_keys($currentSchema['columns'])]);
+        \Log::info('Previous schema:', ['columns' => array_keys($previousSchema['columns'])]);
+        \Log::info('Current schema:', ['columns' => array_keys($currentSchema['columns'])]);
 
         $changes = [
             'added' => array_diff_key(
@@ -182,19 +193,19 @@ class MigrationBackup
             ),
             'modified' => array_filter(
                 $currentSchema['columns'],
-                function($column, $name) use ($previousSchema) {
+                function ($column, $name) use ($previousSchema) {
                     return isset($previousSchema['columns'][$name]) &&
                            $previousSchema['columns'][$name] !== $column;
                 },
                 ARRAY_FILTER_USE_BOTH
-            )
+            ),
         ];
 
         // Debug
-        \Log::info("Detected changes:", $changes);
+        \Log::info('Detected changes:', $changes);
 
         // Store changes if any found
-        if (!empty(array_filter($changes))) {
+        if (! empty(array_filter($changes))) {
             $timestamp = now()->toDateTimeString();
             $this->schemaChanges[$table]['changes'][$timestamp] = $changes;
             $this->schemaChanges[$table]['current'] = $currentSchema;
@@ -217,12 +228,15 @@ class MigrationBackup
         switch ($driver) {
             case 'mysql':
                 DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
                 break;
             case 'pgsql':
                 DB::statement('SET CONSTRAINTS ALL DEFERRED');
+
                 break;
             case 'sqlite':
                 DB::statement('PRAGMA foreign_keys=OFF');
+
                 break;
         }
 
@@ -234,7 +248,7 @@ class MigrationBackup
      */
     protected function enableConstraints(): void
     {
-        if (!$this->constraintsDisabled) {
+        if (! $this->constraintsDisabled) {
             return;
         }
 
@@ -243,12 +257,15 @@ class MigrationBackup
         switch ($driver) {
             case 'mysql':
                 DB::statement('SET FOREIGN_KEY_CHECKS=1');
+
                 break;
             case 'pgsql':
                 DB::statement('SET CONSTRAINTS ALL IMMEDIATE');
+
                 break;
             case 'sqlite':
                 DB::statement('PRAGMA foreign_keys=ON');
+
                 break;
         }
 
@@ -274,7 +291,7 @@ class MigrationBackup
             // Debug: Log the schema snapshot and foreign keys
             \Log::info("Schema snapshot for {$table}:", [
                 'columns' => array_keys($this->schemaSnapshot[$table]['columns']),
-                'foreign_keys' => $this->schemaSnapshot[$table]['foreign_keys']
+                'foreign_keys' => $this->schemaSnapshot[$table]['foreign_keys'],
             ]);
 
             $query = DB::table($table);
@@ -284,7 +301,7 @@ class MigrationBackup
 
             $backupData[$table] = [
                 'data' => $query->get()->toArray(),
-                'schema' => $this->schemaSnapshot[$table]
+                'schema' => $this->schemaSnapshot[$table],
             ];
 
             if ($includeRelated) {
@@ -298,16 +315,16 @@ class MigrationBackup
                     ->values()
                     ->all();
 
-                \Log::info("Found related tables:", $relatedTables);
+                \Log::info('Found related tables:', $relatedTables);
 
                 foreach ($relatedTables as $relatedTable) {
                     \Log::info("Processing related table: {$relatedTable}");
 
-                    if (!isset($backupData[$relatedTable]) && Schema::hasTable($relatedTable)) {
+                    if (! isset($backupData[$relatedTable]) && Schema::hasTable($relatedTable)) {
                         $this->takeSchemaSnapshot($relatedTable);
                         $backupData[$relatedTable] = [
                             'data' => DB::table($relatedTable)->get()->toArray(),
-                            'schema' => $this->schemaSnapshot[$relatedTable]
+                            'schema' => $this->schemaSnapshot[$relatedTable],
                         ];
                         \Log::info("Added related table {$relatedTable} to backup");
                     }
@@ -316,14 +333,14 @@ class MigrationBackup
         }
 
         // Debug: Log final backup data structure
-        \Log::info("Final backup data structure:", [
+        \Log::info('Final backup data structure:', [
             'tables' => array_keys($backupData),
-            'main_table' => $table
+            'main_table' => $table,
         ]);
 
         Cache::put($this->backupKey, [
             'main_table' => $table,
-            'tables' => $backupData
+            'tables' => $backupData,
         ]);
 
         $migrationBackups = Cache::get($this->getMigrationBackupsKey(), []);
@@ -365,12 +382,12 @@ class MigrationBackup
     {
         $backup = Cache::get($backupKey);
 
-        if (!$backup) {
+        if (! $backup) {
             return false;
         }
 
         foreach ($backup['tables'] as $table => $tableData) {
-            if (!Schema::hasTable($table)) {
+            if (! Schema::hasTable($table)) {
                 continue;
             }
 
@@ -402,7 +419,7 @@ class MigrationBackup
 
         // Set defaults for new columns
         foreach ($currentSchema['columns'] as $column => $info) {
-            if (!isset($record[$column])) {
+            if (! isset($record[$column])) {
                 $record[$column] = $this->getDefaultValueForType($info['type']);
             }
         }
@@ -426,9 +443,9 @@ class MigrationBackup
     protected function getDefaultValueForType(string $type): mixed
     {
         // Extract base type without length/precision
-        $baseType = strtolower(preg_replace('/\(.*\)/', '', $type));
+        $baseType = mb_strtolower(preg_replace('/\(.*\)/', '', $type));
 
-        return match($baseType) {
+        return match ($baseType) {
             'json', 'text', 'varchar', 'char' => '',
             'int', 'bigint', 'smallint', 'tinyint' => 0,
             'decimal', 'float', 'double' => 0.0,
@@ -461,9 +478,9 @@ class MigrationBackup
             'removed' => array_diff_key($previousSchema['columns'], $currentSchema['columns']),
             'modified' => array_filter(
                 array_intersect_key($currentSchema['columns'], $previousSchema['columns']),
-                fn($column, $info) => $previousSchema['columns'][$column] !== $info,
+                fn ($column, $info) => $previousSchema['columns'][$column] !== $info,
                 ARRAY_FILTER_USE_BOTH
-            )
+            ),
         ];
     }
 
@@ -476,6 +493,7 @@ class MigrationBackup
         if ($table) {
             return $this->schemaChanges[$table] ?? [];
         }
+
         return $this->schemaChanges;
     }
 
@@ -519,7 +537,7 @@ class MigrationBackup
             Cache::forget($this->getMigrationBackupsKey());
         }
 
-        if (!$table || empty(Cache::get($this->getMigrationBackupsKey(), []))) {
+        if (! $table || empty(Cache::get($this->getMigrationBackupsKey(), []))) {
             Cache::forget($this->getSchemaChangesKey());
         }
     }

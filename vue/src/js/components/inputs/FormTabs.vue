@@ -71,7 +71,6 @@ import { useInput,
 
 import { getModel, getSchema } from '@/utils/getFormData.js'
 
-// __log([...makeInputInjects])
 export default {
   name: 'v-input-form-tabs',
   emits: [...makeInputEmits],
@@ -97,6 +96,13 @@ export default {
     triggers: {
       type: Object,
       default: () => []
+    },
+    protectDefiner: {
+      type: String,
+    },
+    protectedInputs: {
+      type: Array,
+      default: () => ['*']
     }
   },
   setup (props, { emit }) {
@@ -117,7 +123,6 @@ export default {
         let notation = matches[1]
         let quoted = __preg_quote(matches[0])
         let parts = notation.split('.')
-        // __log(parts)
 
         let newParts = []
         for(const j in parts){
@@ -184,7 +189,6 @@ export default {
 
     const getFormRef = (id) => formRefs.get(id)
 
-    // __log('FormTabs setup', props.modelValue)
     const models = ref(elements.value.reduce((acc, item) => {
       if(!__isset(acc[item.id])){
         acc[item.id] = {
@@ -265,7 +269,21 @@ export default {
     const schemas = ref(elements.value.reduce((acc, item, index) => {
       if(!__isset(acc[item.id])){
         const baseSchema = cloneDeep(props.schema)
+
+        let protectInitialValue = props.protectInitialValue
+          && props.protectDefiner
+          && __isset(props.modelValue[item.id])
+          && __isset(props.modelValue[item.id][props.protectDefiner])
+          && props.modelValue[item.id][props.protectDefiner] !== null
+          && props.modelValue[item.id][props.protectDefiner] !== undefined
+
         for(const inputName in props.tabFields){
+          if(protectInitialValue
+            && Array.isArray(props.protectedInputs)
+            && props.protectedInputs.length > 0
+            && (props.protectedInputs[0] === '*' || props.protectedInputs.includes(inputName))){
+            baseSchema[inputName]['protectInitialValue'] = true
+          }
           if(__isset(baseSchema[inputName])){
             baseSchema[inputName]['items'] = item[props.tabFields[inputName]]
           }
@@ -303,7 +321,6 @@ export default {
 
     watch(() => props.items, (newVal) => {
       loading.value = true
-      // __log('FormTabs items watch', newVal, loading.value)
 
       let addedItems = newVal.filter(item => !elements.value.find(el => el.id == item.id))
       let removedItems = elements.value.filter(item => !newVal.find(el => el.id == item.id))

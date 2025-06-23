@@ -10,13 +10,14 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\Factory as ViewFactory;
+use Laravel\Socialite\Facades\Socialite;
 use Modules\SystemUser\Repositories\UserRepository;
 use PragmaRX\Google2FA\Google2FA;
-use Laravel\Socialite\Facades\Socialite;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
@@ -98,80 +99,19 @@ class LoginController extends Controller
     }
 
     /**
-     * Handle a login request to the application.
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    public function login(Request $request)
-    {
-        // dd(App::getLocale());
-
-        $this->validateLogin($request);
-
-        // If the class is using the ThrottlesLogins trait, we can automatically throttle
-        // the login attempts for this application. We'll key this by the username and
-        // the IP address of the client making these requests into this application.
-        if (method_exists($this, 'hasTooManyLoginAttempts') &&
-            $this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-
-            return $this->sendLockoutResponse($request);
-        }
-
-        $previousRouteName = previous_route_name();
-
-        if ($this->attemptLogin($request)) {
-            if ($request->hasSession()) {
-                $request->session()->put('auth.password_confirmed_at', time());
-            }
-
-            $request->session()->regenerate();
-
-            $this->clearLoginAttempts($request);
-
-            if ($response = $this->authenticated($request, $this->guard()->user())) {
-                return $response;
-            }
-
-            $body = [
-                'variant' => MessageStage::SUCCESS,
-                'timeout' => 1500,
-                'message' => __('authentication.login-success-message'),
-            ];
-
-            if($previousRouteName === 'admin.login.form') {
-                $body['redirector'] = redirect()->intended($this->redirectTo)->getTargetUrl();
-            }
-
-            return $request->wantsJson()
-                ? new JsonResponse($body, 200)
-                : $this->sendLoginResponse($request);
-
-            // return $this->sendLoginResponse($request);
-        }
-
-        // If the login attempt was unsuccessful we will increment the number of attempts
-        // to login and redirect the user back to the login form. Of course, when this
-        // user surpasses their maximum number of attempts they will get locked out.
-        $this->incrementLoginAttempts($request);
-
-        return $request->wantsJson()
-            ? new JsonResponse([
-                $this->username() => [trans('auth.failed')],
-                'message' => __('auth.failed'),
-                'variant' => MessageStage::WARNING,
-            ])
-            : $this->sendFailedLoginResponse($request);
-    }
-
-    /**
      * @return \Illuminate\View\View
      */
     public function showForm()
     {
         return $this->viewFactory->make(modularityBaseKey() . '::auth.login', [
+            'attributes' => [
+                'bannerDescription' => ___('authentication.banner-description'),
+                'bannerSubDescription' => Lang::has('authentication.banner-sub-description') ? ___('authentication.banner-sub-description') : null,
+                'redirectButtonText' => ___('authentication.redirect-button-text'),
+                'redirectUrl' => Route::has(modularityConfig('auth_guest_route'))
+                    ? route(modularityConfig('auth_guest_route'))
+                    : null,
+            ],
             'formAttributes' => [
                 // 'hasSubmit' => true,
 
@@ -191,38 +131,18 @@ class LoginController extends Controller
                 'buttonText' => __('authentication.sign-in'),
                 'formClass' => 'py-6',
                 'no-default-form-padding' => true,
+                'hasSubmit' => true,
             ],
             'formSlots' => [
-                'bottom' => [
-                    'tag' => 'v-sheet',
+                'options' => [
+                    'tag' => 'v-btn',
+                    'elements' => __('authentication.forgot-password'),
                     'attributes' => [
-                        'class' => 'd-flex pb-5 justify-space-between w-100 text-black my-5',
-                    ],
-                    'elements' => [
-                        [
-                            'tag' => 'v-btn',
-                            'elements' => __('authentication.forgot-password'),
-                            'attributes' => [
-                                'variant' => 'text',
-                                'href' => route('admin.password.reset.link'),
-                                'class' => 'v-col-5 d-flex justify-content-start',
-                                'color' => 'grey-lighten-1',
-                                'density' => 'default',
-
-                            ],
-                        ],
-                        [
-                            'tag' => 'v-btn',
-                            'elements' => __('authentication.sign-in'),
-                            'attributes' => [
-                                'variant' => 'elevated',
-                                'href' => '',
-                                'class' => 'v-col-5',
-                                'type' => 'submit',
-                                'density' => 'default',
-
-                            ],
-                        ],
+                        'variant' => 'plain',
+                        'href' => route('admin.password.reset.link'),
+                        'class' => '',
+                        'color' => 'grey-lighten-1',
+                        'density' => 'default',
                     ],
                 ],
             ],
@@ -255,28 +175,28 @@ class LoginController extends Controller
                                 ],
                             ],
                         ],
-                        [
-                            'tag' => 'v-btn',
-                            'elements' => ___('authentication.sign-in-apple'),
-                            'attributes' => [
-                                'variant' => 'outlined',
-                                'href' => route('admin.login.provider', ['provider' => 'github']),
-                                'class' => 'my-2 custom-auth-button',
-                                'color' => 'grey-lighten-1',
-                                'density' => 'default',
+                        // [
+                        //     'tag' => 'v-btn',
+                        //     'elements' => ___('authentication.sign-in-apple'),
+                        //     'attributes' => [
+                        //         'variant' => 'outlined',
+                        //         'href' => route('admin.login.provider', ['provider' => 'github']),
+                        //         'class' => 'my-2 custom-auth-button',
+                        //         'color' => 'grey-lighten-1',
+                        //         'density' => 'default',
 
-                            ],
-                            'slots' => [
-                                'prepend' => [
-                                    'tag' => 'ue-svg-icon',
-                                    'attributes' => [
-                                        'symbol' => 'apple',
-                                        'width' => '16',
-                                        'height' => '16',
-                                    ],
-                                ],
-                            ],
-                        ],
+                        //     ],
+                        //     'slots' => [
+                        //         'prepend' => [
+                        //             'tag' => 'ue-svg-icon',
+                        //             'attributes' => [
+                        //                 'symbol' => 'apple',
+                        //                 'width' => '16',
+                        //                 'height' => '16',
+                        //             ],
+                        //         ],
+                        //     ],
+                        // ],
                         [
                             'tag' => 'v-btn',
                             'elements' => ___('authentication.create-an-account'),
@@ -292,7 +212,6 @@ class LoginController extends Controller
                         ],
 
                     ],
-
                 ],
             ],
         ]);
@@ -353,13 +272,17 @@ class LoginController extends Controller
             'message' => __('authentication.login-success-message'),
         ];
 
-        if(in_array($previousRouteName, ['admin.login.form', 'admin.login.oauth.showPasswordForm'])) {
+        if (in_array($previousRouteName, ['admin.login.form', 'admin.login.oauth.showPasswordForm'])) {
             // 'redirector' => $this->redirector->intended($this->redirectPath())->getTargetUrl() . '?status=success',
             $body['redirector'] = redirect()->intended($this->redirectTo)->getTargetUrl();
         }
 
+        if ($request->has('_timezone')) {
+            session()->put('timezone', $request->get('_timezone'));
+        }
+
         return $request->wantsJson()
-            ? new JsonResponse($body)
+            ? new JsonResponse($body, 200)
             : $this->redirector->intended($this->redirectPath());
 
     }
@@ -399,7 +322,7 @@ class LoginController extends Controller
      * @param string $provider Socialite provider
      * @return \Illuminate\Http\RedirectResponse
      */
-    //redirectToProvider($provider, OauthRequest $request)
+    // redirectToProvider($provider, OauthRequest $request)
     public function redirectToProvider($provider)
     {
         return Socialite::driver($provider)
@@ -541,14 +464,14 @@ class LoginController extends Controller
                                 'class' => 'v-col-5 mx-auto',
                                 'type' => 'submit',
                                 'density' => 'default',
-                                'block' => true
+                                'block' => true,
                             ],
 
                         ],
                     ],
                 ],
             ],
-            //'provider' => $request->session()->get('oauth:provider'),
+            // 'provider' => $request->session()->get('oauth:provider'),
         ]);
     }
 
@@ -588,11 +511,34 @@ class LoginController extends Controller
     }
 
     /**
+     * Send the response after the user was authenticated.
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        if ($request->wantsJson()) {
+            return new JsonResponse([
+                $this->username() => [trans('auth.failed')],
+                'message' => __('auth.failed'),
+                'variant' => MessageStage::WARNING,
+            ], 200);
+        }
+
+        throw ValidationException::withMessages([
+            $this->username() => [trans('auth.failed')],
+            'message' => __('auth.failed'),
+            'variant' => MessageStage::WARNING,
+        ]);
+    }
+
+    /**
      * complete registration after email sent
      */
     public function completeRegisterForm()
     {
         $this->inputTypes = modularityConfig('input_types', []);
+
         return $this->viewFactory->make(modularityBaseKey() . '::auth.complete-registration', [
             'formAttributes' => [
                 'hasSubmit' => true,
@@ -631,14 +577,14 @@ class LoginController extends Controller
                         'class' => 'd-flex pb-5 justify-space-between w-100 text-black my-5',
                     ],
                     'elements' => [
-                            'tag' => 'v-btn',
-                            'elements' => __('authentication.complete-registration'),
-                            'attributes' => [
-                                'variant' => 'elevated',
-                                'class' => 'v-col-5',
-                                'type' => 'submit',
-                                'density' => 'default',
-                            ],
+                        'tag' => 'v-btn',
+                        'elements' => __('authentication.complete-registration'),
+                        'attributes' => [
+                            'variant' => 'elevated',
+                            'class' => 'v-col-5',
+                            'type' => 'submit',
+                            'density' => 'default',
+                        ],
 
                     ],
                 ],
@@ -657,14 +603,14 @@ class LoginController extends Controller
 
         $this->validateLogin($request);
 
-
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
         if (method_exists($this, 'hasTooManyLoginAttempts') &&
             $this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
-            //Log::debug('Has many too attempts');
+
+            // Log::debug('Has many too attempts');
             return $this->sendLockoutResponse($request);
         }
 
@@ -689,7 +635,7 @@ class LoginController extends Controller
                 'message' => __('authentication.login-success-message'),
             ];
 
-            if($previousRouteName === 'admin.login.form') {
+            if ($previousRouteName === 'admin.login.form') {
                 $body['redirector'] = redirect()->intended($this->redirectTo)->getTargetUrl();
             }
 

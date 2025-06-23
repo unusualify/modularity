@@ -2,9 +2,6 @@
 
 namespace Unusualify\Modularity\Hydrates\Inputs;
 
-use Illuminate\Support\Facades\App;
-use Unusualify\Modularity\Facades\Modularity;
-
 class RelationshipsHydrate extends InputHydrate
 {
     /**

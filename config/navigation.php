@@ -1,6 +1,6 @@
 <?php
 
-use Unusualify\Modularity\Facades\UNavigation;
+use Unusualify\Modularity\Facades\Navigation;
 
 return [
     /*
@@ -29,12 +29,12 @@ return [
                 'name' => 'Modules',
                 'icon' => '$header',
             ],
-            ...UNavigation::modulesMenu(),
+            ...Navigation::modulesMenu(),
             '_system_settings' => [
                 'name' => 'System Settings',
                 'icon' => '$header',
             ],
-            ...UNavigation::systemMenu(),
+            ...Navigation::systemMenu(),
             'media_library' => [
                 'name' => 'Media Library',
                 'icon' => '$media',

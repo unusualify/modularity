@@ -177,6 +177,7 @@
       </a17-dialog> -->
 
       <ue-alert ref='alert'></ue-alert>
+      <ue-dynamic-modal></ue-dynamic-modal>
 
       <ue-modal
         ref='dialog'
@@ -434,7 +435,6 @@
         }
       },
       alertDialogMessage() {
-        __log('alertDialogMessage computed', this.$store.state.alert)
         return this.$store.state.alert.dialogMessage
       }
     },
@@ -481,7 +481,6 @@
         }
       },
       loginFormSubmitted(res) {
-        __log('Login Form Submitted', res)
         // this.$store.commit(USER.CLOSE_LOGIN_MODAL)
       }
     }

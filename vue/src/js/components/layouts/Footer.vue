@@ -67,7 +67,7 @@
     // }),
 
     created(){
-      console.log('created Footer', this.show);
+
     }
   }
 </script>

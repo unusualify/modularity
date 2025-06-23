@@ -516,7 +516,6 @@ export default {
     init: function () {
       // this.showImg = false
       const imgLoaded = () => {
-        // __log('imgLoaded')
         this.setNaturalDimensions()
         this.setOriginalDimensions()
 

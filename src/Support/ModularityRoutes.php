@@ -10,6 +10,7 @@ use Unusualify\Modularity\Http\Middleware\CompanyRegistrationMiddleware;
 use Unusualify\Modularity\Http\Middleware\HostableMiddleware;
 use Unusualify\Modularity\Http\Middleware\ImpersonateMiddleware;
 use Unusualify\Modularity\Http\Middleware\LanguageMiddleware;
+use Unusualify\Modularity\Http\Middleware\LogMiddleware;
 use Unusualify\Modularity\Http\Middleware\NavigationMiddleware;
 use Unusualify\Modularity\Http\Middleware\RedirectIfAuthenticatedMiddleware;
 
@@ -18,6 +19,7 @@ class ModularityRoutes
     public $counter = 1;
 
     private $defaultMiddlewares = [
+        'modularity.log',
         'modularity.core',
     ];
 
@@ -87,10 +89,12 @@ class ModularityRoutes
 
     public function groupOptions(): array
     {
+        $adminAppUrl = modularityConfig('admin_app_url', false);
+
         return [
             'as' => adminRouteNamePrefix() . '.',
-            ...(modularityConfig('admin_app_url')
-                ? ['domain' => modularityConfig('admin_app_url')]
+            ...($adminAppUrl
+                ? ['domain' => $adminAppUrl]
                 : ['prefix' => adminUrlPrefix()]
             ),
 
@@ -160,13 +164,15 @@ class ModularityRoutes
             // 'auth',
         ]);
 
+        Route::aliasMiddleware('modularity.log', LogMiddleware::class);
+
         Route::aliasMiddleware('language', LanguageMiddleware::class);
         Route::aliasMiddleware('impersonate', ImpersonateMiddleware::class);
         Route::aliasMiddleware('navigation', NavigationMiddleware::class);
 
         Route::middlewareGroup('modularity.core', [
-            'language',
             'impersonate',
+            'language',
             'navigation',
         ]);
 

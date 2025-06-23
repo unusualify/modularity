@@ -12,11 +12,11 @@
 
 
 @section('content')
-    <div class="pa-3">
+    <div class="profile pa-3 h-100">
         @foreach ($elements as $i => $context)
             <ue-recursive-stuff
                 :configuration='@json($context)'
-                />
+            />
         @endforeach
     </div>
 @stop

@@ -1,5 +1,6 @@
 <?php
 
 return [
-    'notification' => 'Notification | Notifications | {n} Notifications',
+    'notification' => 'All Notifications | All Notifications | {n} All Notifications',
+    'my_notification' => 'Notification | Notifications | {n} Notifications',
 ];

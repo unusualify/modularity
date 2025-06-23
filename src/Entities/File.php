@@ -2,13 +2,16 @@
 
 namespace Unusualify\Modularity\Entities;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
+use Unusualify\Modularity\Database\Factories\FileFactory;
 use Unusualify\Modularity\Entities\Traits\HasCreator;
 use Unusualify\Modularity\Services\FileLibrary\FileService;
 
 class File extends Model
 {
-    use HasCreator;
+    use HasFactory, HasCreator;
 
     public $timestamps = true;
 
@@ -18,9 +21,23 @@ class File extends Model
         'size',
     ];
 
-    public function getSizeAttribute($value)
+    protected static function newFactory(): \Illuminate\Database\Eloquent\Factories\Factory
     {
-        return bytesToHuman($value);
+        return FileFactory::new();
+    }
+
+    public function sizeForHuman(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => bytesToHuman($this->size ?? 0),
+        );
+    }
+
+    public function sizeInMb(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => ($this->size ?? 0) / 1048576,
+        );
     }
 
     public function canDeleteSafely()
@@ -42,8 +59,8 @@ class File extends Model
             'name' => $this->filename,
             'src' => FileService::getUrl($this->uuid),
             'original' => FileService::getUrl($this->uuid),
-            'size' => $this->size,
-            'filesizeInMb' => number_format($this->attributes['size'] / 1048576, 2),
+            'size' => $this->size_for_human,
+            'filesizeInMb' => number_format($this->size_in_mb, 2),
         ];
     }
 

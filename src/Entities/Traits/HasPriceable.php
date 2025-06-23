@@ -2,15 +2,15 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\Request;
 use Modules\SystemPricing\Entities\Price;
-use Money\Currency;
 use Oobook\Priceable\Traits\HasPriceable as TraitsHasPriceable;
+use Unusualify\Modularity\Entities\Mutators\HasPriceableMutators;
 
 trait HasPriceable
 {
-    use TraitsHasPriceable;
+    use TraitsHasPriceable,
+        HasPriceableMutators;
 
     /**
      * Boot the trait.
@@ -24,17 +24,6 @@ trait HasPriceable
         // parent::bootHasPriceable();
     }
 
-    public function initializeHasPriceable()
-    {
-        $this->append(
-            'base_price_raw', // price excluding vat
-            'base_price_total', // price including vat
-            'base_price_formatted', // price excluding vat formatted (+ VAT)
-            'base_price_without_vat_formatted', // price excluding vat formatted
-            'base_price_total_formatted' // price including vat formatted
-        );
-    }
-
     public function prices(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(Price::class, 'priceable');
@@ -42,50 +31,41 @@ trait HasPriceable
 
     public function basePrice(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
-        // dd(Request::getUserCurrency());
-        // return $this->prices()->where('currency_id', Request::getUserCurrency()->id);
         return $this->morphOne(Price::class, 'priceable')
             ->where('currency_id', Request::getUserCurrency()->id);
     }
 
-    protected function basePriceRaw(): Attribute
+    public function scopeHasBasePrice($query)
     {
-        return Attribute::make(
-            get: fn ($value) => $this->basePrice ? $this->basePrice->price_excluding_vat : null,
-        );
+        return $query->whereHas('basePrice');
     }
 
-    protected function basePriceTotal(): Attribute
+    public function scopeOrderByCurrencyPrice($query, $currencyId, $direction = 'asc', $role = null)
     {
-        return Attribute::make(
-            get: fn ($value) => $this->basePrice ? $this->basePrice->price_including_vat : null,
-        );
+        $table = $this->getTable();
+        $priceTable = app(Price::class)->getTable();
+
+        return $query->leftJoin($priceTable, function ($join) use ($table, $priceTable, $currencyId, $role) {
+            $join->on("{$priceTable}.priceable_id", '=', "{$table}.id")
+                ->where("{$priceTable}.priceable_type", '=', get_class($this))
+                ->where("{$priceTable}.currency_id", '=', $currencyId)
+                ->when($role, function ($query) use ($role) {
+                    $query->where('role', $role);
+                });
+        })
+            ->orderBy("{$priceTable}.raw_amount", $direction)
+            ->select("{$table}.*"); // Ensure we only select fields from the main table
     }
 
-    protected function basePriceFormatted(): Attribute
+    /**
+     * Scope a query to order by the base price's raw_amount.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $direction
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOrderByBasePrice($query, $direction = 'asc', $role = null)
     {
-        return Attribute::make(
-            get: fn ($value) => $this->base_price_raw
-                ? \Oobook\Priceable\Facades\PriceService::formatAmount($this->base_price_raw) . (config('priceable.prices_are_including_vat') ? '' : ' +' . __('VAT'))
-                : null,
-        );
-    }
-
-    protected function basePriceWithoutVatFormatted(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $this->base_price_raw
-                ? \Oobook\Priceable\Facades\PriceService::formatAmount($this->base_price_raw)
-                : null,
-        );
-    }
-
-    protected function basePriceTotalFormatted(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $this->base_price_total
-                ? \Oobook\Priceable\Facades\PriceService::formatAmount($this->base_price_total)
-                : null,
-        );
+        return $query->orderByCurrencyPrice(currencyId: Request::getUserCurrency()->id, direction: $direction, role: $role);
     }
 }

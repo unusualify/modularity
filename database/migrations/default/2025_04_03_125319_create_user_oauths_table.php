@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         $userOauthTable = modularityConfig('tables.user_oauths', 'um_user_oauths');
+        $usersTable = modularityConfig('tables.users', 'um_users');
 
-        Schema::create($userOauthTable, function (Blueprint $table) {
+        Schema::create($userOauthTable, function (Blueprint $table) use ($usersTable) {
             $table->bigIncrements('id');
             $table->timestamps();
             $table->string('token')->index();
@@ -21,7 +22,7 @@ return new class extends Migration
             $table->longText('avatar')->nullable();
             $table->string('oauth_id')->index();
             $table->bigInteger('user_id')->unsigned()->index();
-            $table->foreign('user_id')->references('id')->on('admin_users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on($usersTable)->onDelete('cascade');
         });
 
     }

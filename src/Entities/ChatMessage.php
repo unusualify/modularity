@@ -3,12 +3,15 @@
 namespace Unusualify\Modularity\Entities;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Unusualify\Modularity\Entities\Scopes\ChatMessageScopes;
 use Unusualify\Modularity\Entities\Traits\HasCreator;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
 
 class ChatMessage extends Model
 {
-    use HasCreator, HasFileponds;
+    use HasCreator,
+        HasFileponds,
+        ChatMessageScopes;
 
     protected static $abortCreatorRoleExceptions = true;
 

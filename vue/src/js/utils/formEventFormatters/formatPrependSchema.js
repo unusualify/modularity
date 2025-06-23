@@ -50,7 +50,7 @@ export default async function formatPrependSchema(args, model, schema, input, in
       if(Array.isArray(handlerValue)){
         if(!prependerInput.items)
           return
-        // __log(handlerValue)
+
         prependerItems = _.reduce(handlerValue, (acc, id) => {
           acc[id] = _.find(prependerInput.items, (item) => item.id == id)
           return acc

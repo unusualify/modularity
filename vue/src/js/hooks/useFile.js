@@ -90,7 +90,6 @@ export default function useFile (props, context) {
     }),
     input_: computed({
       get: () => {
-        // __log('input getter', modelValue.value)
         return modelValue.value ?? []
       },
       set: (value, old) => {
@@ -115,11 +114,6 @@ export default function useFile (props, context) {
 
       // return arrayOfIds
       if (getters.selectedItemsByIds.value[props.name]) {
-        // __log(
-        //   'itemsIds',
-        //   getters.selectedItemsByIds.value[props.name],
-        //   states.input
-        // )
         return getters.selectedItemsByIds.value[props.name].join()
       } else {
         return ''
@@ -147,11 +141,9 @@ export default function useFile (props, context) {
 
   watch(() => store.state.mediaLibrary.selected[props.name], (newValue, oldValue) => {
     if (store.state.mediaLibrary.isInserted && states.mediableActive) {
-      // __log('mediaLibrary.selected changed', newValue, states.input)
       states.mediableActive = false
       store.commit(MEDIA_LIBRARY.UPDATE_IS_INSERTED, false)
       states.input = newValue
-      // __log(states.input)
     }
   }, { deep: true })
   watch(() => states.input, (value, oldValue) => {

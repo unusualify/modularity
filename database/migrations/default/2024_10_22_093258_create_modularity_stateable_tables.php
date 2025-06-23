@@ -35,7 +35,7 @@ return new class extends Migration
         if (! Schema::hasTable($stateablesTable)) {
             Schema::create($stateablesTable, function (Blueprint $table) use ($stateablesTable, $stateTable) {
                 createDefaultMorphPivotTableFields($table, modelName: 'State', tableName: $stateablesTable, morphedTableName: $stateTable);
-                $table->boolean('is_active')->default(false);
+                // $table->boolean('is_active')->default(false);
             });
         }
 

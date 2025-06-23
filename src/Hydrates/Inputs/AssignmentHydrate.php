@@ -33,7 +33,7 @@ class AssignmentHydrate extends InputHydrate
         if (isset($input['assigneeType'])) {
             $assigneeType = $input['assigneeType'];
 
-            if(!class_exists($input['assigneeType'])) {
+            if (! class_exists($input['assigneeType'])) {
                 throw new \Exception('Assignee type ' . $input['assigneeType'] . ' does not exist');
             }
 
@@ -55,21 +55,41 @@ class AssignmentHydrate extends InputHydrate
             }
         }
 
-        if(!$this->skipQueries) {
+        if (! $this->skipQueries) {
             $input['items'] = benchmark(function () use ($q) {
                 return $q->get(['id', 'name']);
             }, label: '#assignment-hydrate-get-user-items', die: false, unit: 'milliseconds');
         }
 
-        if(!isset($input['assignableType'])) {
+        if (! isset($input['assignableType'])) {
             $assignableModel = $this->module->getRouteClass($this->routeName, 'model');
             $input['assignableType'] = $assignableModel;
         }
 
-        $input['fetchEndpoint'] = $this->module->getRouteActionUri($this->routeName, 'assignments', [snakeCase($this->routeName) => ':id']);
-        $input['createEndpoint'] = $this->module->getRouteActionUri($this->routeName, 'createAssignment', [snakeCase($this->routeName) => ':id']);
+        $input['fetchEndpoint'] = $this->module->getRouteActionUrl($this->routeName, 'assignments', [snakeCase($this->routeName) => ':id']);
+        $input['saveEndpoint'] = $this->module->getRouteActionUrl($this->routeName, 'createAssignment', [snakeCase($this->routeName) => ':id']);
         // $input['name'] = 'assignee_id';
         // add your logic
+
+        if (isset($input['acceptedExtensions']) && is_array($input['acceptedExtensions'])) {
+            $input['accepted-file-types'] = $this->getAcceptedFileTypes($input['acceptedExtensions']);
+            unset($input['acceptedExtensions']);
+        }
+
+        $filepondAcceptedFileTypes = isset($input['acceptedExtensions']) && is_array($input['acceptedExtensions'])
+            ? $input['acceptedExtensions']
+            : ['pdf', 'doc', 'docx', 'pages'];
+
+        $acceptedFileTypes = $input['accepted-file-types']
+            ?? $this->getAcceptedFileTypes($filepondAcceptedFileTypes);
+        $maxAttachments = $input['max-attachments'] ?? 3;
+        $input['filepond'] = modularity_format_input([
+            'type' => 'filepond',
+            'name' => 'attachments',
+            'accepted-file-types' => $acceptedFileTypes,
+            'max' => $maxAttachments,
+            'noRules' => true,
+        ]);
 
         return $input;
     }

@@ -26,6 +26,11 @@ class StateableUpdated implements ShouldDispatchAfterCommit
      */
     public $queue = 'default';
 
+    public function __construct(public $model, public $newState, public $oldState)
+    {
+        //
+    }
+
     public function broadcastOn(): array
     {
         return [

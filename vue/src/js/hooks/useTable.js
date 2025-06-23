@@ -23,10 +23,24 @@ import {
   useTableItemActions,
   useTableModals,
   useTableActions,
+  useTableState
 } from '@/hooks/table'
 
 
 export const makeTableProps = propsFactory({
+  elevation: {
+    type: [Number, String],
+  },
+  rounded: {
+    type: [Boolean, String],
+  },
+  tableElevation: {
+    type: [Number, String],
+  },
+  tableRounded: {
+    type: [Boolean, String],
+  },
+
   fillHeight: {
     type: Boolean,
     default: false,
@@ -55,6 +69,31 @@ export const makeTableProps = propsFactory({
       sortBy: [],
       groupBy: [],
     }),
+  },
+  itemsPerPageOptions: {
+    type: Array,
+    default: () => [
+      {
+        title: '10',
+        value: 10,
+      },
+      {
+        title: '15',
+        value: 15,
+      },
+      {
+        title: '25',
+        value: 25,
+      },
+      {
+        title: '50',
+        value: 50,
+      },
+      {
+        title: '100',
+        value: 100,
+      }
+    ],
   },
   tableOptions: {
     type: Object
@@ -164,11 +203,14 @@ export default function useTable (props, context) {
     return props.endpoints.index.replace(/\/$/, '').split('?')[0] === window.location.href.replace(/\/$/, '').split('?')[0]
   })
 
+  const { setLastParameters, lastParameters, getQueryParameters } = useTableState()
+
   const form = ref(null)
   const loading = ref(false)
   const options = ref(_.pick({
     ...(props.defaultTableOptions ?? {}),
     ...(props.tableOptions ?? {}),
+    ...(isStoreTable.value ? lastParameters : {})
   }, ['itemsPerPage', 'page', 'sortBy', 'groupBy', 'search']))
 
   const totalNumberOfElements = ref(props.total ?? -1)
@@ -178,14 +220,44 @@ export default function useTable (props, context) {
     elements.value = data
   }
 
+  const updateElementItem = (id, data) => {
+    const index = elements.value.findIndex(element => element.id === id)
+    if(index !== -1) {
+      elements.value[index] = data
+    }
+  }
+
+  const updateElementItemAttributes = (id, attributes) => {
+    const index = elements.value.findIndex(element => element.id === id)
+    if(index !== -1) {
+      Object.keys(attributes).forEach(key => {
+        elements.value[index][key] = attributes[key]
+      })
+    }
+  }
+
+  const updateElementItemAttribute = (id, attribute, value) => {
+    const index = elements.value.findIndex(element => element.id === id)
+    if(index !== -1) {
+      elements.value[index][attribute] = value
+    }
+  }
+
   const pushElements = (data) => {
     elements.value = elements.value.push(data)
   }
 
-  const updateResponseFields = (response) => {
+  const updatingOptions = ref(false)
+
+  const updateResponseFields = (response, queryParameters = {}) => {
     totalNumberOfElements.value = response.resource.total
     tableFilters.setMainFilters(response.mainFilters)
     // tableFilters.advancedFilters.value = resource.advancedFilters
+
+    if(state.options.page !== response.resource.current_page){
+      updatingOptions.value = true
+      state.options.page = response.resource.current_page
+    }
 
     if(state.enableInfiniteScroll){
       // state.elements = state.elements.push(response.resource.data)
@@ -194,13 +266,18 @@ export default function useTable (props, context) {
       // state.elements = response.resource.data
       setElements(response.resource.data)
     }
+
+    if(queryParameters.id){
+      openItemForm(queryParameters.id)
+    }
   }
 
   const loadItems = async (customOptions = null) => {
     state.loading = true
 
     const payload = {
-      ...(customOptions ?? options.value),
+      ...options.value,
+      ...(customOptions ?? {}),
       ...{ replaceUrl: false }
     }
 
@@ -223,10 +300,15 @@ export default function useTable (props, context) {
     }
 
     if(_.isObject(props.endpoints) && props.endpoints.index) {
+      const queryParameters = getQueryParameters()
       await api.get( props.endpoints.index, payload,
         function(response){
 
-          updateResponseFields(response)
+          if(isStoreTable.value){
+            setLastParameters(payload)
+          }
+
+          updateResponseFields(response, queryParameters)
 
           state.loading = false
         },
@@ -259,9 +341,17 @@ export default function useTable (props, context) {
   const tableItemActions = useTableItemActions(props, {
     ...context,
     ...{
-      tableForms
+      tableForms,
+      loadItems
     }
   })
+
+  const openItemForm = (id) => {
+    const item = state.elements.find(element => element.id == id)
+    if(item){
+      tableItemActions.itemAction(item, 'edit')
+    }
+  }
 
   const state = reactive({
     id: Math.ceil(Math.random() * 1000000) + '-table',
@@ -272,6 +362,7 @@ export default function useTable (props, context) {
     enableCustomFooter: computed(() =>  props.paginationOptions.footerComponent === 'vuePagination'),
     footerProps: computed(() => {
       const footerProps = props.paginationOptions.footerProps
+
       if(state.enableInfiniteScroll){
         return {
           'hide-default-footer' : true,
@@ -280,6 +371,14 @@ export default function useTable (props, context) {
 
       return footerProps
     }),
+    defaultPaginationButtonProps: {
+      elevation: 1,
+      color: 'grey-darken-5',
+      class: 'bg-surface',
+      variant: 'text',
+      density: 'compact',
+      size: 'small',
+    },
     windowSize: {
       x: 0,
       y: 0
@@ -289,6 +388,10 @@ export default function useTable (props, context) {
     }),
     loading,
     totalNumberOfElements,
+    totalNumberOfPages,
+    availablePages: computed(() => {
+      return Array.from({ length: totalNumberOfPages.value }, (_, i) => i + 1)
+    }),
     options,
     elements,
 
@@ -337,7 +440,11 @@ export default function useTable (props, context) {
       }
     },
     initialize: function () {
-      loadItems()
+      const queryParameters = getQueryParameters()
+
+      const customOptions = _.pick(queryParameters, ['id'])
+
+      loadItems(customOptions)
     },
     goNextPage () {
       if (state.options.page < numberOfPages.value) { state.options.page += 1 }
@@ -381,7 +488,6 @@ export default function useTable (props, context) {
           const matches = data[key].match(valuePattern)
           if (matches) {
             const match = matches[1]
-            // __log(item)
             if (state.snakeName === match) {
               data[key] = getSubmitFormData(data.schema, item, store.state)
               if (data.actionUrl) {
@@ -446,18 +552,20 @@ export default function useTable (props, context) {
     if (newValue) {
       // hydrate abstract fields
       state.activeItemConfiguration = methods.hydrateNestedData(newValue, JSON.parse(JSON.stringify(props.nestedData)))
-      // __log(methods.hydrateNestedData(newValue, activeItemConfiguration))
     }
   }, { deep: true })
   // watch(() => state.formActive, (newValue, oldValue) => {
   //   newValue || form.value.resetValidation() || methods.resetEditedItem()
   // })
   // watch(() => state.deleteModalActive, (newValue, oldValue) => {
-  //   __log('deleteModalActive', newValue)
   //   newValue || methods.resetEditedItem()
   // })
   watch(() => state.options, (newValue, oldValue) => {
-    loadItems()
+    if(!updatingOptions.value){
+      loadItems()
+    }else{
+      updatingOptions.value = false
+    }
   }, { deep: true })
   watch(() => state.elements, (newValue, oldValue) => {
     // Refresh edited item
@@ -507,6 +615,9 @@ export default function useTable (props, context) {
                   count: state.selectedItems.length,
                   route: tableNames.transNamePlural.value
                 })
+                break
+              default:
+                attributes.description = payload.description ?? t('Are you sure you want to perform this action?')
                 break
             }
 
@@ -592,7 +703,7 @@ export default function useTable (props, context) {
     }
   }, { immediate: true })
 
-  const formatter = useFormatter(props, context, tableHeaders.headers.value)
+  const formatter = useFormatter(props, context, tableHeaders.selectedHeaders)
 
   return {
     form,

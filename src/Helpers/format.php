@@ -518,41 +518,6 @@ if (! function_exists('attribute_string')) {
     }
 }
 
-if (! function_exists('merge_url_query')) {
-    function merge_url_query(string $url, object|array $data): string
-    {
-        if (gettype($data) == 'object') {
-            $data = object_to_array($data);
-        }
-        // Parse the URL
-        $parsedUrl = parse_url($url);
-
-        // Get the main URL without query parameters
-        $mainUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . ($parsedUrl['path'] ?? '');
-
-        // Parse the query string into an array
-        $queryParams = [];
-        if (isset($parsedUrl['query'])) {
-            parse_str($parsedUrl['query'], $queryParams);
-        }
-
-        if (array_key_exists(array_key_first($data), $queryParams)) {
-            unset($queryParams[array_key_first($data)]);
-        }
-
-        // Update the query parameters with new ones
-        $queryParams = array_merge($queryParams, $data);
-
-        // Convert the updated query parameters back to a string
-        $newQueryString = http_build_query($queryParams);
-
-        // Combine the main URL with the new query string
-        $finalUrl = $newQueryString ? $mainUrl . '?' . $newQueryString : $mainUrl;
-
-        return $finalUrl;
-    }
-}
-
 if (! function_exists('get_user_profile')) {
     /**
      * get_user_profile
@@ -641,9 +606,10 @@ if (! function_exists('replace_variables_from_haystack')) {
      * @param array $haystack Array containing replacement values
      * @return mixed
      */
-    function replace_variables_from_haystack($input, array $haystack) {
+    function replace_variables_from_haystack($input, array $haystack)
+    {
         if (is_string($input)) {
-            return preg_replace_callback('/\${([^}]+)}\$/', function($matches) use ($haystack) {
+            return preg_replace_callback('/\${([^}]+)}\$/', function ($matches) use ($haystack) {
                 $variable = $matches[1];
 
                 // Split for default value using ??
@@ -664,7 +630,7 @@ if (! function_exists('replace_variables_from_haystack')) {
             }, $input);
         }
 
-        if (!is_array($input) && !is_object($input)) {
+        if (! is_array($input) && ! is_object($input)) {
             return $input;
         }
 
@@ -673,7 +639,7 @@ if (! function_exists('replace_variables_from_haystack')) {
         foreach ($input as $key => $value) {
             if (is_array($value) || is_object($value)) {
                 $result[$key] = replace_variables_from_haystack($value, $haystack);
-            } else if (is_string($value)) {
+            } elseif (is_string($value)) {
                 $result[$key] = replace_variables_from_haystack($value, $haystack);
             } else {
                 $result[$key] = $value;
@@ -684,18 +650,18 @@ if (! function_exists('replace_variables_from_haystack')) {
     }
 }
 
-
-if(!function_exists('extract_schema_extensions')){
+if (! function_exists('extract_schema_extensions')) {
     /**
      * Extract extension configurations from nested schema arrays
      *
      * @param array $schema The schema to search through
      * @return array Array of [path, property, pattern] tuples
      */
-    function extract_schema_extensions($haystack) {
+    function extract_schema_extensions($haystack)
+    {
         $results = [];
 
-        if (!is_array($haystack)) {
+        if (! is_array($haystack)) {
             return $results;
         }
 
@@ -706,10 +672,10 @@ if(!function_exists('extract_schema_extensions')){
                 if (is_array($ext) && count($ext) >= 4 && in_array($ext[0], ['set', 'prependSchema'])) {
                     $format = $ext[0];
 
-                    if($format == 'set'){
+                    if ($format == 'set') {
                         $setterKey = explode('.*.', $ext[3])[0];
                         $setterInnerKey = explode('.*.', $ext[3])[1] ?? null;
-                        if(isset($haystack[$setterKey])){
+                        if (isset($haystack[$setterKey])) {
                             $modelNotation = (isset($haystack['parentName']) ? $haystack['parentName'] . '.' : '') . $haystack['name'];
                             $results[] = [
                                 'format' => $format,
@@ -725,7 +691,7 @@ if(!function_exists('extract_schema_extensions')){
                                 'setterValues' => $haystack[$setterKey],
                             ];
                         }
-                    } else if($format == 'prependSchema'){
+                    } elseif ($format == 'prependSchema') {
                         // dd($ext);
                         // $results[] = [
                         //     'format' => $format,
@@ -749,13 +715,13 @@ if(!function_exists('extract_schema_extensions')){
                 foreach ($value as $subKey => $subValue) {
                     if (is_array($subValue)) {
 
-                        if(isset($subValue['schema']) && is_array($subValue['schema'])){
+                        if (isset($subValue['schema']) && is_array($subValue['schema'])) {
                             $results = array_merge($results, extract_schema_extensions($subValue['schema']));
                         }
 
-                        if($subKey  == 'schema' && is_array($subValue)){
-                            foreach($subValue as $subSubKey => $subSubValue){
-                                if(is_array($subSubValue)){
+                        if ($subKey == 'schema' && is_array($subValue)) {
+                            foreach ($subValue as $subSubKey => $subSubValue) {
+                                if (is_array($subSubValue)) {
                                     $results = array_merge($results, extract_schema_extensions($subSubValue));
                                 }
                             }
@@ -771,7 +737,7 @@ if(!function_exists('extract_schema_extensions')){
     }
 }
 
-if(!function_exists('data_get_with_dot_keys')){
+if (! function_exists('data_get_with_dot_keys')) {
     /**
      * Get an item from an array or object using dot notation, supporting keys with dots
      *
@@ -780,7 +746,8 @@ if(!function_exists('data_get_with_dot_keys')){
      * @param mixed $default Default value if not found
      * @return mixed
      */
-    function data_get_with_dot_keys($target, $path, $default = null) {
+    function data_get_with_dot_keys($target, $path, $default = null)
+    {
         // Handle empty cases
         if (is_null($target) || is_null($path)) {
             return $default;
@@ -795,7 +762,7 @@ if(!function_exists('data_get_with_dot_keys')){
             $segment = trim($segment, '[]');
 
             if (is_array($target)) {
-                if (!array_key_exists($segment, $target)) {
+                if (! array_key_exists($segment, $target)) {
                     // Try with original dot notation
                     if (array_key_exists(str_replace('\\', '', $segment), $target)) {
                         $segment = str_replace('\\', '', $segment);
@@ -805,7 +772,7 @@ if(!function_exists('data_get_with_dot_keys')){
                 }
                 $target = $target[$segment];
             } elseif (is_object($target)) {
-                if (!isset($target->{$segment})) {
+                if (! isset($target->{$segment})) {
                     return $default;
                 }
                 $target = $target->{$segment};
@@ -818,8 +785,7 @@ if(!function_exists('data_get_with_dot_keys')){
     }
 }
 
-
-if(!function_exists('data_set_with_dot_keys')){
+if (! function_exists('data_set_with_dot_keys')) {
     /**
      * Set an item in an array or object using dot notation, supporting keys with dots
      *
@@ -828,7 +794,8 @@ if(!function_exists('data_set_with_dot_keys')){
      * @param mixed $value Value to set
      * @return void
      */
-    function data_set_with_dot_keys(&$target, $path, $value) {
+    function data_set_with_dot_keys(&$target, $path, $value)
+    {
         // Split path by dots, but preserve dots within square brackets
         preg_match_all('/\[[^\]]*\]|[^.]+/', $path, $matches);
         $segments = $matches[0];
@@ -840,17 +807,17 @@ if(!function_exists('data_set_with_dot_keys')){
             $segment = trim($segment, '[]');
 
             // Create arrays for missing segments
-            if (!is_array($current) && !is_object($current)) {
+            if (! is_array($current) && ! is_object($current)) {
                 $current = [];
             }
 
             if (is_array($current)) {
-                if (!array_key_exists($segment, $current)) {
+                if (! array_key_exists($segment, $current)) {
                     $current[$segment] = [];
                 }
                 $current = &$current[$segment];
             } elseif (is_object($current)) {
-                if (!isset($current->{$segment})) {
+                if (! isset($current->{$segment})) {
                     $current->{$segment} = [];
                 }
                 $current = &$current->{$segment};
@@ -861,11 +828,12 @@ if(!function_exists('data_set_with_dot_keys')){
     }
 }
 
-if(!function_exists('name_surname_resolver')){
-    function name_surname_resolver($fullName){
-        //dd('Name Surname Resolver');
+if (! function_exists('name_surname_resolver')) {
+    function name_surname_resolver($fullName)
+    {
+        // dd('Name Surname Resolver');
         $trimmedSpaces = trim($fullName);
-        $nameArray = explode(" ", $trimmedSpaces);
+        $nameArray = explode(' ', $trimmedSpaces);
         $nameWithSurname = [];
         foreach ($nameArray as $name) {
             if (preg_match('/^[\p{L}\'-]+$/u', $name)) {
@@ -880,7 +848,3 @@ if(!function_exists('name_surname_resolver')){
         return $nameWithSurname;
     }
 }
-
-
-
-

@@ -63,13 +63,14 @@
         secondarySidebarOptions : {!! json_encode(modularityConfig('ui_settings.secondarySidebar')) !!},
     },
     window['{{ modularityConfig('js_namespace') }}'].STORE.user = {
+        isGuest: {{ json_encode(auth()->guest()) }},
         profile: {!! json_encode($currentUser) !!},
         profileRoute: '{{ route(Route::hasAdmin('profile.update')) }}',
-        profileShortcutModel: {!! json_encode($profileShortcutModel) !!},
-        profileShortcutSchema: {!! json_encode($profileShortcutSchema) !!},
+        profileShortcutModel: {!! json_encode($profileShortcutModel ?? new StdClass()) !!},
+        profileShortcutSchema: {!! json_encode($profileShortcutSchema ?? new StdClass()) !!},
 
-        loginShortcutModel: {!! json_encode($loginShortcutModel) !!},
-        loginShortcutSchema: {!! json_encode($loginShortcutSchema) !!},
+        loginShortcutModel: {!! json_encode($loginShortcutModel ?? new StdClass()) !!},
+        loginShortcutSchema: {!! json_encode($loginShortcutSchema ?? new StdClass()) !!},
         loginRoute: '{{ route('admin.login') }}',
     },
 

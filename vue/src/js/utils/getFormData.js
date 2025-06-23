@@ -67,8 +67,8 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
       inputColClass = inputColClass.split(' ');
     }
 
-    let isCreatable = input.creatable;
-    let isEditable = input.editable;
+    let isCreatable = input.creatable ?? true;
+    let isEditable = input.editable ?? true;
 
     // Check if the input has createable property and it's false or hidden
     if ((isCreatable === false || isCreatable === 'hidden') && !isEditing) {
@@ -93,6 +93,10 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
     if (__isset(input) && __isset(input.schema) && ['wrap', 'group', 'repeater', 'input-repeater'].includes(input.type)) {
       input.schema = getSchema(input.schema, input.type === 'wrap' ? model : model[key], isEditing);
     }
+
+    input.creatable = isCreatable
+    input.editable = isEditable
+    input.isEditing = isEditing
 
     // Always add the input to the accumulator
     acc[key] = input;
@@ -152,6 +156,10 @@ export const getModel = (inputs, item = null, rootState = null) => {
           }
         }
       }
+
+      if(Object.prototype.hasOwnProperty.call(input, 'connectedRelationship') && _.isString(input.connectedRelationship) && item && __isset(item[input.connectedRelationship])){
+        value = item[input.connectedRelationship]
+      }
     }
 
     if (__isObject(input)) {
@@ -186,6 +194,10 @@ export const getModel = (inputs, item = null, rootState = null) => {
           fields[name] = value
         }
       }
+    }
+
+    if(input.type == 'preview' && __isset(input.previewKey) && item && __isset(item[input.previewKey])){
+      fields[name] = item[input.previewKey]
     }
 
     // const newFields = handleInputEvents(input.event, fields, inputs, name)._fields // return fields;

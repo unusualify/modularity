@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Repositories\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Request;
+use Modules\SystemPricing\Entities\Price;
 use Oobook\Priceable\Models\Currency;
 use Unusualify\Modularity\Facades\CurrencyExchange;
 
@@ -11,16 +12,11 @@ trait PricesTrait
 {
     protected $formatableColumns = [
         'id',
-        'display_price',
+        'raw_amount',
         'currency_id',
         'vat_rate_id',
         'price_type_id',
-    ];
-
-    protected $defaultPriceData = [
-        'currency_id' => 1,
-        'vat_rate_id' => 1,
-        'price_type_id' => 1,
+        'discount_percentage',
     ];
 
     public function setColumnsPricesTrait($columns, $inputs)
@@ -51,24 +47,25 @@ trait PricesTrait
 
         $onlyBaseCurrency = modularityConfig('services.currency_exchange.active');
         $baseCurrency = modularityConfig('services.currency_exchange.base_currency');
+        $priceSavingKey = Price::$priceSavingKey;
 
         foreach ($this->getColumns(__TRAIT__) as $name) {
             if ($name !== 'payment' && isset($fields[$name])) {
                 $existingPrices = $object->prices()->where('role', $name)->get();
+                $defaultPriceAttributes = $object->prices()->getRelated()->defaultAttributes();
 
                 foreach ($fields[$name] as $priceData) {
                     $priceModel = isset($priceData['id'])
                         ? $existingPrices->where('id', $priceData['id'])->first()
                         : null;
-                    // dd($priceData, $priceModel, $this->defaultPriceData);
-                    $data = array_merge_recursive_preserve($this->defaultPriceData, $priceData + ['role' => $name]);
+                    $data = array_merge_recursive_preserve($defaultPriceAttributes, $priceData + ['role' => $name]);
 
                     if ($onlyBaseCurrency) {
                         foreach ([1, 2, 3] as $key => $id) {
                             $_currency = Currency::find($id);
                             if ($_currency->iso_4217 !== $baseCurrency) {
                                 $_data = array_merge($data, [
-                                    'display_price' => round(CurrencyExchange::convertTo($data['display_price'], $_currency->iso_4217), 2),
+                                    $priceSavingKey => round(CurrencyExchange::convertTo($data[$priceSavingKey], $_currency->iso_4217), 2),
                                     'currency_id' => $_currency->id,
                                 ]);
 
@@ -108,7 +105,10 @@ trait PricesTrait
     public function getFormFieldsPricesTrait($object, $fields)
     {
         if (method_exists($object, 'prices') && $object->has('prices')) {
+            $priceSavingKey = Price::$priceSavingKey;
             $onlyBaseCurrency = modularityConfig('services.currency_exchange.active');
+            $priceModel = $object->prices()->getRelated();
+            $defaultPriceAttributes = $priceModel->defaultAttributes();
 
             $query = $object->prices();
 
@@ -118,16 +118,14 @@ trait PricesTrait
 
             $prices = $query->get();
             $pricesByRole = $prices->groupBy('role');
+            // dd($prices, $pricesByRole);
 
             foreach ($this->getColumns(__TRAIT__) as $role) {
                 if (isset($pricesByRole[$role])) {
-                    $fields[$role] = $pricesByRole[$role]->map(function ($price) {
-                        // dd();
-                        // $convertedPrice = CurrencyExchange::convertTo($price->display_price, 'TRY');
-
-                        return Arr::mapWithKeys(Arr::only($price->toArray(), $this->formatableColumns), function ($val, $key) {
-                            if (preg_match('/display_price|price_excluding|price_including/', $key)) {
-                                return [$key => (float) $val / 100];
+                    $fields[$role] = $pricesByRole[$role]->map(function ($price) use ($priceSavingKey) {
+                        return Arr::mapWithKeys(Arr::only($price->toArray(), array_merge($this->formatableColumns, [$priceSavingKey])), function ($val, $key) use ($priceSavingKey) {
+                            if (preg_match('/display_price|price_excluding|price_including|raw_amount|' . $priceSavingKey . '/', $key)) {
+                                return [$key => (float) $val];
                             }
 
                             return [$key => $val];
@@ -135,8 +133,9 @@ trait PricesTrait
                     });
                 } else {
                     $fields[$role] = [
-                        array_merge_recursive_preserve($this->defaultPriceData, [
-                            'display_price' => 0.00,
+                        array_merge_recursive_preserve($defaultPriceAttributes, [
+                            $priceSavingKey => 0.00,
+                            'raw_amount' => 0.00,
                             'currency_id' => Request::getUserCurrency()->id]
                         ),
                     ];

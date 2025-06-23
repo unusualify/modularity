@@ -36,7 +36,17 @@ export default function useTableHeaders(props) {
 
   const getUnvisibleHeaders = () => {
     const unvisibleHeaders = localStorage.getItem(getStorageKey())
+
     return unvisibleHeaders ? unvisibleHeaders.split(',') : []
+  }
+
+  const removeHeader = (key) => {
+    const index = headersModel.value.findIndex(h => h.key === key)
+    headersModel.value[index].visible = false
+
+    const unvisibleHeaders = headersModel.value.filter((h, index) => !h.visible).map(h => h.key)
+    localStorage.setItem(getStorageKey(), unvisibleHeaders.join(','))
+    headers.value = _.cloneDeep(headersModel.value.filter(h => h.visible))
   }
 
   let unvisibleHeaders = getUnvisibleHeaders()
@@ -60,8 +70,12 @@ export default function useTableHeaders(props) {
     props.hideHeaders || hasCustomRow.value
   )
 
-  const editableColumns = computed(() => {
-    return rawHeaders.filter(h => h.hasOwnProperty('isColumnEditable') && h.isColumnEditable === true)
+  const formattableHeaders = computed(() => {
+    return rawHeaders.filter(h => {
+      return (h.hasOwnProperty('columnEditable') && h.columnEditable === true)
+      || (h.hasOwnProperty('removable') && h.removable === true)
+      || (h.hasOwnProperty('searchable') && h.searchable === true)
+    })
   })
 
   // Methods
@@ -83,9 +97,10 @@ export default function useTableHeaders(props) {
     selectedHeaders,
     hideHeaders,
     hasCustomRow,
-    editableColumns,
+    formattableHeaders,
 
     // Methods
+    removeHeader,
     applyHeaders
   }
 }

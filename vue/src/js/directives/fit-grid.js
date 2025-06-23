@@ -9,9 +9,6 @@ export default {
       },
       // called right before the element is inserted into the DOM.
       beforeMount (el, binding, vnode, prevVnode) {
-        // __log(
-        //   el
-        // )
         el.classList.add('d-flex')
 
         el.firstElementChild.classList.add('h-100', 'w-100')

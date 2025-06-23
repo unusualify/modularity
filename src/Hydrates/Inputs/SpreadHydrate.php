@@ -55,6 +55,16 @@ class SpreadHydrate extends InputHydrate
             // dd( array_merge($input['reservedKeys'], $spreadableInputs->toArray()));
             $input['reservedKeys'] = array_merge($input['reservedKeys'], $spreadableInputs->toArray());
         }
+
+        $input['col'] = [
+            'cols' => 12,
+            'sm' => 12,
+            'md' => 12,
+            'lg' => 12,
+            'xl' => 12,
+        ];
+
+        $input['name'] = $model->getSpreadableSavingKey();
         // dd($input['reservedKeys']);
         // $input['reservedKeys'] = collect($this->module->getRouteInput($input['_routeName']))
         // ->filter(fn($item) => $item['name'] !== '_spread')

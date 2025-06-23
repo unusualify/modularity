@@ -14,9 +14,9 @@ trait TableColumns
      */
     protected $indexTableColumns;
 
-
     /**
      * Get the index table columns for the table
+     *
      * @return array
      */
     public function getIndexTableColumns()
@@ -31,7 +31,7 @@ trait TableColumns
 
             $visibleColumns = explode(',', $this->request->get('columns') ?? $headers->pluck('key')->implode(','));
 
-            return $this->indexTableColumns = $headers->reduce(function ($carry, $item) use ($visibleColumns) {
+            return $this->indexTableColumns = $headers->reduce(function ($carry, $item) {
                 $header = $this->getHeader((array) $item);
                 if (isset($item->key)) {
                     // if ($item->key !== 'actions' && ! in_array($item->key, $visibleColumns)) {
@@ -48,6 +48,7 @@ trait TableColumns
 
     /**
      * Get the header for the table
+     *
      * @param array $header
      * @return array
      */
@@ -61,6 +62,7 @@ trait TableColumns
 
     /**
      * Hydrate the header
+     *
      * @param array $header
      * @return array
      */
@@ -88,7 +90,7 @@ trait TableColumns
         }
 
         if ($header['key'] == 'actions') {
-            $header['width'] ??= '100px';
+            $header['width'] ??= 100;
             $header['align'] ??= 'center';
             $header['sortable'] ??= false;
         }
@@ -98,6 +100,7 @@ trait TableColumns
 
     /**
      * Hydrate the header suffix
+     *
      * @param array $header
      * @return void
      */
@@ -121,6 +124,7 @@ trait TableColumns
 
     /**
      * Dehydrate the header suffix
+     *
      * @param array $header
      * @return void
      */
@@ -145,7 +149,7 @@ trait TableColumns
         return $this->getAllowableItems(
             items: $headers,
             searchKey: 'allowedRoles',
-            orClosure: fn($item) => $this->user->isSuperAdmin(),
+            orClosure: fn ($item) => $this->user->isSuperAdmin(),
         );
     }
 }

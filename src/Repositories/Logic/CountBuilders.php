@@ -54,11 +54,10 @@ trait CountBuilders
         // dd($method);
         $query = $this->model->newQuery();
 
-        if(method_exists($this->getModel(), 'scope' . ucfirst($method))) {
-            return $this->filter($query,$this->countScope)->$method(...$args)->count();
+        if (method_exists($this->getModel(), 'scope' . ucfirst($method))) {
+            return $this->filter($query, $this->countScope)->$method(...$args)->count();
         }
 
         throw new \Exception('Method scope' . ucfirst($method) . ' does not exist');
     }
-
 }

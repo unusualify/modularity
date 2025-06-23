@@ -26,6 +26,34 @@ export const makeModalProps = propsFactory({
     type: String,
     default: null
   },
+  hasCloseButton: {
+    type: Boolean,
+    default: false
+  },
+  hasFullscreenButton: {
+    type: Boolean,
+    default: false
+  },
+  hasTitleDivider: {
+    type: Boolean,
+    default: false
+  },
+  noDefaultBodyPadding: {
+    type: Boolean,
+    default: false
+  },
+  noActions: {
+    type: Boolean,
+    default: false
+  },
+  noCancelButton: {
+    type: Boolean,
+    default: false
+  },
+  noConfirmButton: {
+    type: Boolean,
+    default: false
+  },
   description: {
     type: String,
     default: null
@@ -86,14 +114,14 @@ export const makeModalProps = propsFactory({
   rejectButtonAttributes: {
     type: Object,
     default: () => ({
-      color: 'red',
+      color: 'error',
       variant: 'outlined',
     })
   },
   confirmButtonAttributes: {
     type: Object,
     default: () => ({
-      color: 'green',
+      color: 'success',
       variant: 'elevated',
     })
   },

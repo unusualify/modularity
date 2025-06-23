@@ -5,10 +5,14 @@ namespace Unusualify\Modularity\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules;
 use Unusualify\Modularity\Entities\Company;
 use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Events\ModularityUserRegistered;
+use Unusualify\Modularity\Events\ModularityUserRegistering;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularity\Services\MessageStage;
 
@@ -26,6 +30,14 @@ class RegisterController extends Controller
     public function showForm()
     {
         return view(modularityBaseKey() . '::auth.register', [
+            'attributes' => [
+                'bannerDescription' => ___('authentication.banner-description'),
+                'bannerSubDescription' => Lang::has('authentication.banner-sub-description') ? ___('authentication.banner-sub-description') : null,
+                'redirectButtonText' => ___('authentication.redirect-button-text'),
+                'redirectUrl' => Route::has(modularityConfig('auth_guest_route'))
+                    ? route(modularityConfig('auth_guest_route'))
+                    : null,
+            ],
             'formAttributes' => [
                 // 'modelValue' => new User(['name', 'surname', 'email', 'password']),
                 'title' => [
@@ -38,143 +50,23 @@ class RegisterController extends Controller
                     'align' => 'center',
                     'justify' => 'center',
                 ],
-                'schema' => ($schema = $this->createFormSchema([
-                    'name' => [
-                        'type' => 'text',
-                        'name' => 'name',
-                        'label' => 'Name',
-                        'default' => '',
-                        'col' => [
-                            'cols' => 6,
-                            'lg' => 6,
-                        ],
-                        'rules' => [
-                            ['min', 3],
-                        ],
-                    ],
-                    'surname' => [
-                        'type' => 'text',
-                        'name' => 'surname',
-                        'label' => 'Surname',
-                        'default' => '',
-                        'col' => [
-                            'cols' => 6,
-                            'lg' => 6,
-                        ],
-                        'rules' => [
-                            ['min', 2],
-                        ],
-                    ],
-                    'company' => [
-                        'type' => 'text',
-                        'name' => 'company',
-                        'label' => 'Company',
-                        'default' => '',
-                        'col' => [
-                            'cols' => 6,
-                            'lg' => 6,
-                        ],
-                        'rules' => [
-                            ['min', 2],
-                        ],
-                    ],
-                    'email' => [
-                        'type' => 'text',
-                        'name' => 'email',
-                        'label' => ___('authentication.email'),
-                        'default' => '',
-                        'col' => [
-                            'cols' => 6,
-                            'lg' => 6,
-                        ],
-                        'rules' => [
-                            ['email'],
-                        ],
-                    ],
-                    'password' => [
-                        'type' => 'password',
-                        'name' => 'password',
-                        'label' => 'Password',
-                        'default' => '',
-                        'appendInnerIcon' => '$non-visibility',
-                        'slotHandlers' => [
-                            'appendInner' => 'password',
-                        ],
-                        'col' => [
-                            'cols' => 6,
-                            'lg' => 6,
-                        ],
-                        'rules' => [
-                            ['required', 'classic', null, null, 'Password is required'],
-                            ['min', 8, 'Password must be at least 8 characters'],
-                        ],
-
-                    ],
-                    're_password' => [
-                        'type' => 'password',
-                        'name' => 're-password',
-                        'label' => 'Repeat Password',
-                        'default' => '',
-                        'appendInnerIcon' => '$non-visibility',
-                        'slotHandlers' => [
-                            'appendInner' => 'password',
-                        ],
-                        'col' => [
-                            'cols' => 6,
-                            'lg' => 6,
-                        ],
-                        'rules' => [
-                            ['required', 'classic',null, null, 'Confirm Password'],
-                        ],
-                    ],
-                    'tos' => [
-                        'type' => 'checkbox',
-                        'name' => 'tos',
-                        'label' => __('authentication.tos'),
-                        'default' => '',
-                        'col' => [
-                            'cols' => 12,
-                            'lg' => 12,
-                        ],
-                    ],
-                ])),
-
+                'schema' => $this->createFormSchema(getFormDraft('register_form')),
                 'actionUrl' => route(Route::hasAdmin('register')),
                 'buttonText' => 'authentication.register',
                 'formClass' => 'py-6',
                 'no-default-form-padding' => true,
+                'hasSubmit' => true,
             ],
             'formSlots' => [
-                'bottom' => [
-                    'tag' => 'v-sheet',
+                'options' => [
+                    'tag' => 'v-btn',
+                    'elements' => __('authentication.have-an-account'),
                     'attributes' => [
-                        'class' => 'd-flex pb-5 justify-space-between w-100 text-black my-5',
-                    ],
-                    'elements' => [
-                        [
-                            'tag' => 'v-btn',
-                            'elements' => __('authentication.have-an-account'),
-                            'attributes' => [
-                                'variant' => 'text',
-                                'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'v-col-5 justify-content-start',
-                                'color' => 'grey-lighten-1',
-                                'density' => 'default',
-
-                            ],
-                        ],
-                        [
-                            'tag' => 'v-btn',
-                            'elements' => __('authentication.register'),
-                            'attributes' => [
-                                'variant' => 'elevated',
-                                'href' => '',
-                                'class' => 'v-col-5',
-                                'type' => 'submit',
-                                'density' => 'default',
-
-                            ],
-                        ],
+                        'variant' => 'text',
+                        'href' => route(Route::hasAdmin('login.form')),
+                        'class' => '',
+                        'color' => 'grey-lighten-1',
+                        'density' => 'default',
                     ],
                 ],
             ],
@@ -207,39 +99,33 @@ class RegisterController extends Controller
                                 ],
                             ],
                         ],
-                        [
-                            'tag' => 'v-btn',
-                            'elements' => ___('authentication.sign-in-apple'),
-                            'attributes' => [
-                                'variant' => 'outlined',
-                                'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'my-2 custom-auth-button',
-                                'color' => 'grey-lighten-1',
-                                'density' => 'default',
+                        // [
+                        //     'tag' => 'v-btn',
+                        //     'elements' => ___('authentication.sign-in-apple'),
+                        //     'attributes' => [
+                        //         'variant' => 'outlined',
+                        //         'href' => route(Route::hasAdmin('login.form')),
+                        //         'class' => 'my-2 custom-auth-button',
+                        //         'color' => 'grey-lighten-1',
+                        //         'density' => 'default',
 
-                            ],
-                            'slots' => [
-                                'prepend' => [
-                                    'tag' => 'ue-svg-icon',
-                                    'attributes' => [
-                                        'symbol' => 'apple',
-                                        'width' => '16',
-                                        'height' => '16',
+                        //     ],
+                        //     'slots' => [
+                        //         'prepend' => [
+                        //             'tag' => 'ue-svg-icon',
+                        //             'attributes' => [
+                        //                 'symbol' => 'apple',
+                        //                 'width' => '16',
+                        //                 'height' => '16',
 
-                                    ],
-                                ],
-                            ],
-                        ],
+                        //             ],
+                        //         ],
+                        //     ],
+                        // ],
 
                     ],
-
                 ],
             ],
-            // 'defaultItem' => collect($schema)->mapWithKeys(function($item, $key){
-            //     return [ $item['name'] => $item['default'] ?? ''];
-            //     $carry[$key] = $item->default ?? '';
-            // })->toArray(),
-
         ]);
     }
 
@@ -250,11 +136,6 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        // dd(
-        //     trans('validation.unique'),
-        //     __('validation.unique'),
-        //     ___('validation.unique'),
-        // );
         return Validator::make($data, $this->rules());
     }
 
@@ -268,6 +149,8 @@ class RegisterController extends Controller
     {
         $validator = $this->validator($request->all());
 
+        event(new ModularityUserRegistering($request));
+
         if ($validator->fails()) {
             return $request->wantsJson()
                 ? new JsonResponse([
@@ -276,32 +159,44 @@ class RegisterController extends Controller
                     'variant' => MessageStage::WARNING,
                 ], 200)
                 : $request->validate($this->rules());
+
             return $res;
         }
 
-        $user = Company::create()->users()->create([
+        $user = Company::create([
+            'name' => $request['company'] ?? '',
+            'spread_payload' => [
+                'is_personal' => $request['company'] ? false : true,
+            ],
+        ])->users()->create([
             'name' => $request['name'],
             'email' => $request['email'],
             'password' => Hash::make($request['password']),
         ]);
 
+        event(new ModularityUserRegistered($user));
+
         $user->assignRole('client-manager');
 
         return $request->wantsJson()
-        ? new JsonResponse([
-            'redirector' => route(Route::hasAdmin('register.success')),
-        ], 200)
-        : $this->sendLoginResponse($request);
+            ? new JsonResponse([
+                'redirector' => route(Route::hasAdmin('register.success')),
+            ], 200)
+            : $this->sendLoginResponse($request);
     }
 
     public function rules()
     {
+        $usersTable = modularityConfig('tables.users', 'um_users');
+
         return [
             'name' => ['required', 'string', 'max:255'],
-            //Surname is not mandatory.
-            //'surname' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:admin_users'],
-            'password' => ['required', 'string', 'min:8'],
+            // Surname is not mandatory.
+            'surname' => ['required', 'string', 'max:255'],
+            // 'company' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:' . $usersTable . ',email'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'tos' => ['required', 'boolean'],
         ];
     }
 
@@ -317,22 +212,4 @@ class RegisterController extends Controller
             ],
         ]);
     }
-
-    // public function store(Request $request)
-    // {
-    //     dd(
-    //         $request->all()
-    //     );
-    //     $this->validate($request, [
-    //         // 'name' => 'required',
-    //         'email' => 'required|email',
-    //         'password' => 'required'
-    //     ]);
-
-    //     $user = User::create($request->only(['name', 'email', 'password']));
-
-    //     // auth()->login($user);
-
-    //     return redirect()->to('login.form');
-    // }
 }

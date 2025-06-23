@@ -58,12 +58,12 @@ class TaggerHydrate extends InputHydrate
                 throw new \Exception('Repository ' . $repository . ' does not have TagsTrait in ' . $this->input['name'] . ' input');
             }
 
-            $input['fetchEndpoint'] = $module->getRouteActionUri($input['_routeName'], 'tags');
-            $input['updateEndpoint'] = $module->getRouteActionUri($input['_routeName'], 'tagsUpdate');
+            $input['fetchEndpoint'] = $module->getRouteActionUrl($input['_routeName'], 'tags');
+            $input['updateEndpoint'] = $module->getRouteActionUrl($input['_routeName'], 'tagsUpdate');
             // $repository->getTagsList()->toArray() // this get used tags
             // $repository->getTags()->toArray() // this get all tags
 
-            $items = !$this->skipQueries
+            $items = ! $this->skipQueries
                 ? $repository->getTags()->map(fn ($tag, $index) => [
                     'id' => $tag->id,
                     'name' => $tag->name,

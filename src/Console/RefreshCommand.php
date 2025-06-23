@@ -45,7 +45,7 @@ class RefreshCommand extends BaseCommand
     {
         $this->call('vendor:publish', [
             '--provider' => 'Unusualify\Modularity\LaravelServiceProvider',
-            '--tag' => 'assets',
+            '--tag' => 'modularity-assets',
             '--force' => true,
         ]);
     }

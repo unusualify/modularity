@@ -120,7 +120,7 @@ abstract class InputHydrate
         ?Module $module = null,
         ?string $routeName = null,
         bool $skipQueries = false
-    ){
+    ) {
         $this->input = $input;
 
         $this->module = $module;
@@ -137,6 +137,10 @@ abstract class InputHydrate
     {
         foreach ($this->requirements as $attribute => $defaultValue) {
             $this->input[$attribute] ??= $defaultValue;
+        }
+
+        if (isset($this->input['endpoint'])) {
+            $this->input['endpoint'] = resolve_route($this->input['endpoint']);
         }
     }
 
@@ -197,9 +201,9 @@ abstract class InputHydrate
 
             $params = array_merge_recursive($params, ['with' => $this->getWiths()]);
 
-            $items =  [];
+            $items = [];
 
-            if(!$this->skipQueries) {
+            if (! $this->skipQueries) {
                 $items = call_user_func_array([$repository, $methodName], [
                     ...($methodName == 'list' ? ['column' => [$input['itemTitle'] ?? 'name', ...$this->getItemColumns()]] : []),
                     ...$params,
@@ -209,6 +213,9 @@ abstract class InputHydrate
             $input['items'] = $items;
 
             if (count($input['items']) > 0) {
+                if (isset($input['setFirstDefault']) && $input['setFirstDefault']) {
+                    $input['default'] = $input['items'][0][$input['itemValue']];
+                }
                 if (! isset($input['items'][0][$input['itemTitle']])) {
                     $input['itemTitle'] = array_keys(Arr::except($input['items'][0], [$input['itemValue']]))[0];
                 }
@@ -350,13 +357,12 @@ abstract class InputHydrate
     {
         return isset($this->input['_moduleName'])
             ? Modularity::find($this->input['_moduleName'])
-            : ((!$noSelfModule && $this->hasModule())
+            : ((! $noSelfModule && $this->hasModule())
                 ? $this->module
                 : throw new \Exception($noSelfModule
                     ? "No connector or module definition in '" . ($this->input['name'] ?? $this->input['type']) . "' input"
                     : "No Module in '" . ($this->input['name'] ?? $this->input['type']) . "' input"));
     }
-
 
     final protected function hasModule()
     {
@@ -382,7 +388,7 @@ abstract class InputHydrate
     {
         return isset($this->input['_routeName'])
             ? $this->input['_routeName']
-            : ((!$noSelfRouteName && $this->hasRouteName())
+            : ((! $noSelfRouteName && $this->hasRouteName())
                 ? $this->routeName
                 : throw new \Exception($noSelfRouteName
                     ? "No connector or route definition in '" . ($this->input['name'] ?? $this->input['type']) . "' input"
@@ -390,8 +396,6 @@ abstract class InputHydrate
                 )
             );
     }
-
-
 
     /**
      * Handle magic method __toString.

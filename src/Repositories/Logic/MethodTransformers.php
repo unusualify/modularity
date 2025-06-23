@@ -56,12 +56,13 @@ trait MethodTransformers
 
         foreach ($fields as $key => $value) {
             if (! $this->shouldIgnoreFieldBeforeSave($key)) {
-                if (is_array($value) && empty($value)) {
-                    $fields[$key] = null;
-                }
-                if ($value === '') {
-                    $fields[$key] = null;
-                }
+                // if (is_array($value) && empty($value)) {
+                //     dd($value, $key, empty($value));
+                //     $fields[$key] = null;
+                // }
+                // if ($value === '') {
+                //     $fields[$key] = null;
+                // }
             }
         }
 
@@ -108,6 +109,32 @@ trait MethodTransformers
     }
 
     /**
+     * @param string $traitClass
+     * @param string $inputName
+     * @return bool
+     */
+    public function traitHasInput($traitClass, $inputName)
+    {
+        return in_array($inputName, $this->getColumns($traitClass));
+    }
+
+    /**
+     * @param array $traitClasses
+     * @param string $inputName
+     * @return bool
+     */
+    public function anyTraitHasInput($traitClasses, $inputName)
+    {
+        foreach ($traitClasses as $traitClass) {
+            if ($this->traitHasInput($traitClass, $inputName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param string $slug
      * @param array $scope
      * @return int
@@ -115,6 +142,12 @@ trait MethodTransformers
     public function getCountByStatusSlug($slug, $scope = [])
     {
         $this->countScope = $scope;
+
+        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
+            if (($count = $this->$method($slug)) !== false) {
+                return $count;
+            }
+        }
 
         switch ($slug) {
             case 'all':
@@ -125,12 +158,6 @@ trait MethodTransformers
                 return $this->getCountForDraft();
             case 'trash':
                 return $this->getCountForTrash();
-        }
-
-        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
-            if (($count = $this->$method($slug)) !== false) {
-                return $count;
-            }
         }
 
         return 0;
@@ -260,9 +287,9 @@ trait MethodTransformers
 
         $this->traitColumns = $this->setColumns($this->traitColumns, $chunkedInputs);
 
-        if(!$noSerialization){
+        if (! $noSerialization) {
             $fields = $object->attributesToArray();
-        }else{
+        } else {
             $fields = [];
         }
 
@@ -309,6 +336,22 @@ trait MethodTransformers
     }
 
     /**
+     * Get Table Default Filters on the Route Controller
+     *
+     * @return array
+     */
+    public function getTableFilters($scope = [])
+    {
+        $tableFilters = [];
+
+        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
+            $tableFilters = array_merge($tableFilters, $this->$method($scope));
+        }
+
+        return $tableFilters;
+    }
+
+    /**
      * @param \Illuminate\Database\Query\Builder $query
      * @return \Illuminate\Database\Query\Builder
      */
@@ -320,7 +363,13 @@ trait MethodTransformers
             $this->$method($query, $scopes);
         }
 
+        $searchesFields = $scopes['searches'] ?? [];
         unset($scopes['searches'], $scopes['search']);
+        foreach ($searchesFields as $field) {
+            if (array_key_exists($field, $scopes)) {
+                unset($scopes[$field]);
+            }
+        }
 
         if (isset($scopes['exceptIds'])) {
             $query->whereNotIn($this->model->getTable() . '.id', $scopes['exceptIds']);

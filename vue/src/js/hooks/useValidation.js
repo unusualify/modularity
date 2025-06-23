@@ -115,7 +115,6 @@ export default function useValidation (props) {
           max = (max == undefined) ? -1 : max;
           let $msg = ((minOrExact == max || max < 0) ? `Requires exactly ${minOrExact} items` : `Requires at least ${minOrExact}${((max != Infinity  && max != undefined) ? ', and maximum of:' + max : '')}) elements`);
           // let $msg = ((max != Infinity) ? ', maximum:' + max : '');
-          // __log(v.length, minOrExact, max )
           if(Array.isArray(v)) {
             return v.length >= minOrExact && ( max < 0 || v.length <= max) || msg || $msg;
           }
@@ -136,7 +135,6 @@ export default function useValidation (props) {
     // requiredArrayRule: (msg, l = 1) => v => (Array.isArray(v) && v.length >= l) || msg || ''
     // confirmedRule: (confirmInputValue, msg) => v => {
     //   // const _val = toRef('model.' + confirmationValue)
-    //   __log(v, confirmInputValue)
     //   return v === confirmInputValue || msg || 'Passwords do not match'
     //   // return v === this.model[confirmationValue] || msg || 'Passwords do not match'
     // }
@@ -144,7 +142,7 @@ export default function useValidation (props) {
     // Numeric validation rules
     numberRule: (msg) => v => !isNaN(parseFloat(v)) && isFinite(v) || msg || 'Must be a valid number',
     integerRule: (msg) => v => Number.isInteger(Number(v)) || msg || 'Must be an integer',
-    minValueRule: (min, msg) => v => !v || Number(v) >= min || msg || `Must be at least ${min}`,
+    minValueRule: (min, msg) => v => v === undefined || v === null || Number(v) >= min  || msg || `Must be at least ${min}`,
     maxValueRule: (max, msg) => v => !v || Number(v) <= max || msg || `Must not exceed ${max}`,
 
     // String format validation rules
@@ -163,8 +161,14 @@ export default function useValidation (props) {
     dateRule: (msg) => v => !v || !isNaN(Date.parse(v)) || msg || 'Invalid date format',
     futureDateRule: (interval = 0, unit = 'days', msg) => v => {
         if (!v) return true;
-        const today = new Date();
+        let today = new Date();
+        today.setHours(0, 0, 0, 0);
+
         const futureDate = new Date(today);
+
+        if(_.isString(interval)) {
+          interval = parseInt(interval)
+        }
 
         switch (unit.toLowerCase()) {
             case 'minutes':
@@ -302,7 +306,6 @@ export default function useValidation (props) {
   })
 
   // function invokeRuleValidator () {
-  //   // __log(methods, obj.schema, methods.hasOwnProperty('passwordHandler'))
   //   const camelSlotName = _.camelCase(slotName)
 
   //   if (obj.schema.hasOwnProperty('slotHandlers') &&
@@ -416,7 +419,6 @@ export default function useValidation (props) {
             }
             const method = rule[0] + 'Rule'
             if (Object.prototype.hasOwnProperty.call(ruleMethods, method)) {
-              // __log(name, method, rule.slice(1))
               inputs[name].rules.push(ruleMethods[method](...(rule.slice(1))))
               // try {
               //
@@ -436,7 +438,7 @@ export default function useValidation (props) {
   }
 
   watch(() => state.valid, (newValue, oldValue) => {
-    // __log('validForm watch', newValue, oldValue)
+
   })
   // expose managed state as return value
   return {

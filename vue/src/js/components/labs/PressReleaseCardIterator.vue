@@ -63,7 +63,7 @@ import { makeFormatterProps } from '@/hooks/useFormatter';
     }
   },
   created(){
-    // console.log('ConfigurableCardIterator created', this.item, this.headers, this.iteratorOptions, this.rowActions)
+
   }
 
   }

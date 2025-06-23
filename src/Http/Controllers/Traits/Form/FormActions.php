@@ -41,9 +41,6 @@ trait FormActions
         $this->formActions = array_merge_recursive_preserve($formActions, $this->formActions ?? []);
     }
 
-    /**
-     * @return array
-     */
     public function getFormActions(): array
     {
         $default_action = (array) Config::get(modularityBaseKey() . '.default_form_action');
@@ -53,10 +50,10 @@ trait FormActions
             $isAllowed = $this->isAllowedItem(
                 $action,
                 searchKey: 'allowedRoles',
-                orClosure: fn($item) => $this->user->isSuperAdmin(),
+                orClosure: fn ($item) => $this->user->isSuperAdmin(),
             );
 
-            if(!$isAllowed) {
+            if (! $isAllowed) {
                 return $acc;
             }
 

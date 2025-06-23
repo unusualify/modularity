@@ -16,7 +16,6 @@ class CompanyFactory extends Factory
             'address' => fake()->address(),
             'city' => fake()->city(),
             'state' => fake()->word(),
-            'country' => fake()->countryCode(),
             'zip_code' => fake()->postcode(),
             'phone' => fake()->phoneNumber(),
             'vat_number' => fake()->unique()->randomNumber(2),

@@ -27,7 +27,7 @@ return new class extends Migration
                 $table->string('language')->default('en');
                 $table->string('timezone')->default('Europe/London');
                 $table->string('phone', 20)->nullable();
-                $table->string('country', 100)->nullable();
+                $table->integer('country_id')->nullable();
                 $table->string('password')->nullable();
                 $table->rememberToken();
                 $table->timestamps();

@@ -29,30 +29,25 @@ trait HasCreator
      */
     protected $customHasCreatorFields = [];
 
-
     protected static function bootHasCreator()
     {
         static::created(function ($model) {
-            if (Auth::check()) {
+            if ($model->isCustomCreatorSaving) {
+                $model->creatorRecord()->create($model->customHasCreatorFields);
+                $model->isCustomCreatorSaving = false;
+                $model->customHasCreatorFields = [];
+            } elseif (Auth::check()) {
                 $guard = Auth::guard();
-
-                if ($model->isCustomCreatorSaving) {
-                    $model->creatorRecord()->create($model->customHasCreatorFields);
-                    $model->isCustomCreatorSaving = false;
-                    $model->customHasCreatorFields = [];
-                } else {
-                    $model->creatorRecord()->create([
-                        'creator_id' => $guard->id(), // creator user id
-                        'creator_type' => $guard->getProvider()->getModel(), // creator model
-                        'guard_name' => $guard->name,
-                    ]);
-                }
-
+                $model->creatorRecord()->create([
+                    'creator_id' => $guard->id(), // creator user id
+                    'creator_type' => $guard->getProvider()->getModel(), // creator model
+                    'guard_name' => $guard->name,
+                ]);
             }
         });
 
         static::saving(function ($model) {
-            if (Auth::check() && $model->custom_creator_id) {
+            if ($model->custom_creator_id) {
                 $guard = Auth::guard();
                 $model->isCustomCreatorSaving = true;
                 $model->customHasCreatorFields = [
@@ -89,14 +84,11 @@ trait HasCreator
 
     public function initializeHasCreator()
     {
-        // $this->fillable = array_merge($this->fillable, ['test']);
-        // dd('initialize');
+        $this->mergeFillable(static::$hasCreatorFillable ?? []);
     }
 
     /**
      * Get the creator record associated with this model
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
     public function creatorRecord(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
@@ -108,8 +100,6 @@ trait HasCreator
 
     /**
      * Get the creator associated with this model through the creator record
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
      */
     public function creator(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
@@ -120,6 +110,37 @@ trait HasCreator
             'id',
             'id',
             'creator_id'
+        );
+    }
+
+    public function company(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        $creatorRecordModel = new ($this->getCreatorRecordModel());
+        $creatorModel = new ($this->getCreatorModel());
+
+        $companyModel = new Company;
+        $query = Company::query()
+            ->select($companyModel->getTable() . '.*')  // Only select company fields
+            ->join(
+                $creatorModel->getTable(),
+                $creatorModel->getTable() . '.company_id',
+                '=',
+                $companyModel->getTable() . '.id'
+            )
+            ->join(
+                $creatorRecordModel->getTable(),
+                function ($join) use ($creatorRecordModel, $creatorModel) {
+                    $join->on($creatorRecordModel->getTable() . '.creator_id', '=', $creatorModel->getTable() . '.id')
+                        ->where($creatorRecordModel->getTable() . '.creatable_type', '=', get_class($this))
+                        ->where($creatorRecordModel->getTable() . '.creatable_id', '=', $this->id);
+                }
+            );
+
+        return new \Illuminate\Database\Eloquent\Relations\HasOne(
+            $query,
+            $this,
+            $creatorRecordModel->getTable() . '.creatable_id',
+            'id'
         );
     }
 
@@ -148,7 +169,7 @@ trait HasCreator
         $key = $this->getKey();
 
         try {
-            return (!is_null($key) && $this->creatorRecord()->exists()) ? $this->creatorRecord->creator_type : static::getDefaultCreatorModel();
+            return (! is_null($key) && $this->creatorRecord()->exists()) ? $this->creatorRecord->creator_type : static::getDefaultCreatorModel();
         } catch (\Exception $e) {
             dd($this, $this->creatorRecord);
         }
@@ -216,6 +237,23 @@ trait HasCreator
     }
 
     /**
+     * Scope a query to only include related creator records.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int $creator_id
+     * @param string|null $guardName
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeIsCreator($query, $creator_id, $guardName = null)
+    {
+        $guardName ??= Auth::guard()->name;
+
+        return $query->whereHas('creatorRecord', function ($query) use ($creator_id, $guardName) {
+            $query->where('creator_id', $creator_id)->where('guard_name', $guardName);
+        });
+    }
+
+    /**
      * Scope a query to only include the current user's revisions.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
@@ -237,7 +275,7 @@ trait HasCreator
 
         $spatieRoleModel = config('permission.models.role');
 
-        if(!$abortRoleExceptions) {
+        if (! $abortRoleExceptions) {
 
             if ($hasSpatiePermission) {
                 $existingRoles = $spatieRoleModel::whereIn('name', $this->getAuthorizedRolesForCreatorRecord())->get();
@@ -265,36 +303,5 @@ trait HasCreator
                 $query = $this->addAuthorizedUserQueryForCreatorRecord($query, $user);
             });
         });
-    }
-
-    public function company(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
-        $creatorRecordModel = new ($this->getCreatorRecordModel());
-        $creatorModel = new ($this->getCreatorModel());
-
-        $companyModel = new Company;
-        $query = Company::query()
-            ->select($companyModel->getTable() . '.*')  // Only select company fields
-            ->join(
-                $creatorModel->getTable(),
-                $creatorModel->getTable() . '.company_id',
-                '=',
-                $companyModel->getTable() . '.id'
-            )
-            ->join(
-                $creatorRecordModel->getTable(),
-                function ($join) use ($creatorRecordModel, $creatorModel) {
-                    $join->on($creatorRecordModel->getTable() . '.creator_id', '=', $creatorModel->getTable() . '.id')
-                        ->where($creatorRecordModel->getTable() . '.creatable_type', '=', get_class($this))
-                        ->where($creatorRecordModel->getTable() . '.creatable_id', '=', $this->id);
-                }
-            );
-
-        return new \Illuminate\Database\Eloquent\Relations\HasOne(
-            $query,
-            $this,
-            $creatorRecordModel->getTable() . '.creatable_id',
-            'id'
-        );
     }
 }

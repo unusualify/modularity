@@ -2,16 +2,18 @@
 
 namespace Unusualify\Modularity\Entities;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Database\Factories\MediaFactory;
 use Unusualify\Modularity\Entities\Traits\HasCreator;
 use Unusualify\Modularity\Services\MediaLibrary\ImageService;
 
 class Media extends Model
 {
-    use HasCreator;
+    use HasFactory, HasCreator;
 
     public $timestamps = true;
 
@@ -23,6 +25,11 @@ class Media extends Model
         'width',
         'height',
     ];
+
+    protected static function newFactory(): \Illuminate\Database\Eloquent\Factories\Factory
+    {
+        return MediaFactory::new();
+    }
 
     public function __construct(array $attributes = [])
     {

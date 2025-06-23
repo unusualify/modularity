@@ -1,5 +1,7 @@
 <?php
 
+use Unusualify\Payable\Models\Enums\PaymentStatus;
+
 return [
     'name' => 'SystemPayment',
     'system_prefix' => true,
@@ -22,12 +24,7 @@ return [
             ],
             'headers' => [
                 [
-                    'title' => 'Payment Service Name',
-                    'key' => 'title',
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Payment Service Slug',
+                    'title' => 'Service Name',
                     'key' => 'name',
                     'formatter' => [
                         'edit',
@@ -35,11 +32,31 @@ return [
                     'searchable' => true,
                 ],
                 [
+                    'title' => 'Service Slug',
+                    'key' => 'key',
+                    'searchable' => true,
+                ],
+                [
+                    'title' => 'Credit Card Currencies',
+                    'key' => 'internalPaymentCurrencies',
+                ],
+                [
+                    'title' => 'External Supported Currencies',
+                    'key' => 'paymentCurrencies',
+                ],
+                [
+                    'title' => 'Status',
+                    'key' => 'published',
+                    'formatter' => [
+                        'switch',
+                    ],
+                ],
+                [
                     'title' => 'Created Time',
                     'key' => 'created_at',
                     'formatter' => [
                         'date',
-                        'long',
+                        'medium',
                     ],
                     'searchable' => true,
                 ],
@@ -52,12 +69,12 @@ return [
             'inputs' => [
                 [
                     'type' => 'text',
-                    'name' => 'title',
+                    'name' => 'name',
                     'label' => 'Payment Service Name',
                     'rules' => 'sometimes|required',
                 ],
                 [
-                    'name' => 'name',
+                    'name' => 'key',
                     'label' => 'Payment Service Slug',
                     'type' => 'text',
                 ],
@@ -113,36 +130,116 @@ return [
             'icon' => '$submodule',
             'title_column_key' => 'name',
             'table_options' => [
-                'createOnModal' => true,
+                'subtitle' => __('You can check all the payments that you receive and the invoices related to the payments here according to company list.'),
+
+                'createOnModal' => false,
                 'editOnModal' => true,
                 'isRowEditing' => false,
                 'rowActionsType' => 'inline',
             ],
+            'table_row_actions' => [
+                'cancel' => [
+                    'name' => 'cancel',
+                    'icon' => 'mdi-credit-card-remove-outline',
+                    'color' => 'error',
+                    'conditions' => [
+                        ['is_cancelable', '=', true],
+                    ],
+                    'url' => [
+                        'payable.cancel',
+                        [
+                            'payment' => ':id',
+                        ],
+                    ],
+                    'hasDialog' => true,
+                    'dialogQuestion' => __('Are you sure you want to cancel this payment?'),
+                ],
+                'refund' => [
+                    'name' => 'refund',
+                    'icon' => 'mdi-credit-card-refund-outline',
+                    'color' => 'warning',
+                    'conditions' => [
+                        ['is_refundable', '=', true],
+                    ],
+                    'url' => [
+                        'payable.refund',
+                        [
+                            'payment' => ':id',
+                        ],
+                    ],
+                    'hasDialog' => true,
+                    'dialogQuestion' => __('Are you sure you want to refund this payment?'),
+                ],
+            ],
             'headers' => [
                 [
-                    'title' => 'Name',
-                    'key' => 'name',
+                    'title' => 'Owner Id',
+                    'key' => 'price.priceable',
+                    'itemTitle' => 'id',
+                    'allowedRoles' => ['superadmin'],
                     'formatter' => [
                         'edit',
                     ],
-                    'searchable' => true,
+                    // 'itemTitle' => 'content->headline',
                 ],
                 [
-                    'title' => 'Payment Service',
+                    'title' => 'Owner Type',
+                    'key' => 'price',
+                    'itemTitle' => 'priceable_type',
+                    'allowedRoles' => ['superadmin'],
+                    // 'itemTitle' => 'content->headline',
+                ],
+                [
+                    'title' => 'Related',
+                    'key' => 'paymentable',
+                    'itemTitle' => 'id',
+                ],
+                [
+                    'title' => 'Service',
                     'key' => 'paymentService',
+                    // 'itemTitle' => 'title',
+                    'formatter' => [
+                        'chip',
+                        [
+                            'variant' => 'outlined',
+                            'color' => 'primary',
+                        ],
+                    ],
                 ],
                 [
-                    'title' => 'System Payment Parent',
-                    'key' => 'systemPaymentable',
+                    'title' => 'Amount',
+                    'key' => 'amount_formatted',
+                ],
+                [
+                    'title' => 'Status',
+                    'key' => 'status',
+                    'formatter' => [
+                        'chip',
+                        [
+                            'size' => 'small',
+                        ],
+                    ],
                 ],
                 [
                     'title' => 'Created Time',
                     'key' => 'created_at',
+                    'visible' => false,
                     'formatter' => [
                         'date',
-                        'long',
+                        'medium',
                     ],
-                    'searchable' => true,
+                    'searchable' => false,
+                    'sortable' => true,
+                ],
+                [
+                    'title' => 'Last Update',
+                    'key' => 'updated_at',
+                    'formatter' => [
+                        'date',
+                        'numeric',
+                    ],
+                    'searchable' => false,
+                    'sortable' => true,
                 ],
                 [
                     'title' => 'Actions',
@@ -152,16 +249,32 @@ return [
             ],
             'inputs' => [
                 [
-                    'name' => 'name',
-                    'label' => 'Name',
-                    'type' => 'text',
-                ],
-                [
                     'type' => 'select',
                     'name' => 'payment_service_id',
                     'label' => 'Payment Service',
                     'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentServiceRepository',
                     'rules' => 'sometimes|required',
+                    'editable' => false,
+                ],
+                [
+                    'type' => 'filepond',
+                    'name' => 'invoice',
+                    'label' => 'Invoice',
+                    'max' => 1,
+                    'conditions' => [
+                        ['status', '=', 'COMPLETED'],
+                    ],
+                    'allowedRoles' => ['superadmin', 'admin', 'manager', 'account-executive'],
+                    'acceptedExtensions' => ['pdf'],
+                ],
+                [
+                    'type' => 'select',
+                    'name' => 'status',
+                    'label' => 'Status',
+                    'itemTitle' => 'name',
+                    'itemValue' => 'value',
+                    'items' => PaymentStatus::cases(),
+                    'allowedRoles' => ['superadmin', 'admin', 'manager', 'account-executive'],
                 ],
             ],
         ],
@@ -189,11 +302,21 @@ return [
                     'searchable' => true,
                 ],
                 [
+                    'title' => 'Services',
+                    'key' => 'paymentServices',
+                    'itemTitle' => 'name',
+                ],
+                [
+                    'title' => 'Credit Card Service',
+                    'key' => 'paymentService',
+                    'itemTitle' => 'name',
+                ],
+                [
                     'title' => 'Created Time',
                     'key' => 'created_at',
                     'formatter' => [
                         'date',
-                        'long',
+                        'medium',
                     ],
                     'searchable' => true,
                 ],
@@ -211,12 +334,12 @@ return [
                     'disabled',
                 ],
                 [
-                    'name' => 'paymentServices',
-                    'label' => 'Payment Service',
+                    'name' => 'payment_service_id',
+                    'label' => 'Internal Payment Service (for credit card payment)',
                     'type' => 'select',
                     'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentServiceRepository',
-                    'multiple',
-                    'itemTitle' => 'title',
+                    'multiple' => false,
+                    'itemTitle' => 'name',
                 ],
             ],
         ],
@@ -243,7 +366,7 @@ return [
                     'searchable' => true,
                 ],
                 [
-                    'title' => 'Card Type',
+                    'title' => 'Slug',
                     'key' => 'card_type',
                     'searchable' => true,
                 ],
@@ -252,7 +375,7 @@ return [
                     'key' => 'created_at',
                     'formatter' => [
                         'date',
-                        'long',
+                        'medium',
                     ],
                     'searchable' => true,
                 ],

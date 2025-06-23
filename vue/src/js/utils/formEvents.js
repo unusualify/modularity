@@ -42,7 +42,6 @@ export const onInputEventFormData = (obj, schema, stateData, sortedStateData, va
     onInputEventFormData(sortedStateData[sortIndex], schema, stateData, sortedStateData, value)
 
   } else if ((obj.schema.type === 'select') && obj.schema.hasOwnProperty('autofill')) {
-    __log('autofill')
     // obj.schema.autofill.forEach(element => {
     //   if (schema[element].autofillable) {
     //     stateData[element] = _.find(obj.schema.items, ['id', value[obj.key]])?.[element] ?? ''
@@ -65,14 +64,11 @@ export const handleInputEvents = (events = null, fields, moduleSchema, name = nu
       const [methodName, formattedInputName, formatingInputName] = e.split(':')
       switch (methodName) {
         case 'formatPermalink':
-          // __log(methodName, e)
           if (isFieldFalsy) {
-            // __log('formatPermalink', _field, slugify(_field))
             _fields[formattedInputName] = filters.slugify(_field)
           }
           break
         case 'formatPermalinkPrefix':
-          // __log(methodName, e)
           if (['select', 'combobox'].includes(_schema.type) && _field && isFieldFalsy) {
             const newValue = filters.slugify(_schema.items.find((item) => item[_schema.itemValue] === _field)[_schema.itemTitle])
             moduleSchema[formattedInputName ?? 'slug'].prefix = moduleSchema[formattedInputName ?? 'slug'].prefixFormat.replace(':' + formatingInputName, newValue)
@@ -83,7 +79,6 @@ export const handleInputEvents = (events = null, fields, moduleSchema, name = nu
           }
           break
         case 'formatLock':
-          // __log(methodName, e)
           if (['select', 'combobox'].includes(_schema.type) && _field) {
             const lockInput = _schema.items.find((item) => item[_schema.itemValue] === _field)?.[formatingInputName]
             moduleSchema[formattedInputName].disabled = !!lockInput
@@ -98,10 +93,6 @@ export const handleInputEvents = (events = null, fields, moduleSchema, name = nu
           }
           break
         case 'formatFilter':
-          // __log(
-          //   methodName,
-          //   e
-          // )
           break
         default:
           break
@@ -165,10 +156,6 @@ export const handleMultiFormEvents = ( models, schemas, input, index, preview = 
       const _input = _.cloneDeep(input.schema[name])
       _input.name = `${input.name}.${input.schema[name].name}`
       _input.key = `${input.name}.schema.${input.schema[name].name}`
-      // __log(
-      //   // _.get(schemas, `[${index}].${_input.key}`),
-      //   // _.get(models, `[${index}].${_input.name}`),
-      // )
     }
   }
 }

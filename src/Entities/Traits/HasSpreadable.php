@@ -2,14 +2,20 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Oobook\Database\Eloquent\Concerns\ManageEloquent;
 
 trait HasSpreadable
 {
     use ManageEloquent;
 
-    protected $_pendingSpreadData;
+    protected $spreadablePayload;
+
+    protected $spreadableMutatorMethods = [];
+
+    protected $spreadableMutatorAttributes = [];
 
     public static function bootHasSpreadable()
     {
@@ -18,43 +24,64 @@ trait HasSpreadable
             // Store the spread data before cleaning
             if (! $model->exists) {
                 // Set property to preserve data through events
-                $model->_pendingSpreadData = $model->_spread ?: $model->prepareSpreadableJson();
-            } elseif ($model->_spread) {
-                // Handle existing spread updates
-                $model->spreadable()->update([
-                    'content' => $model->_spread,
-                ]);
+                $model->spreadablePayload = $model->{$model->getSpreadableSavingKey()} ?: $model->prepareSpreadableJson();
+            } elseif ($model->{$model->getSpreadableSavingKey()}) {
+                if (! $model->spreadable) {
+                    $model->spreadable()->create([
+                        'content' => $model->{$model->getSpreadableSavingKey()},
+                    ]);
+                } else {
+                    // Handle existing spread updates
+                    $model->spreadable()->update([
+                        'content' => $model->{$model->getSpreadableSavingKey()},
+                        'updated_at' => now(),
+                    ]);
+                }
             }
 
-            $model->cleanSpreadableAttributes();
+            $model->offsetUnset($model->getSpreadableSavingKey());
+
+            // $model->cleanSpreadableAttributes();
+            // dd($model);
         });
 
         self::created(static function (Model $model) {
-            $model->spreadable()->create($model->_pendingSpreadData ?? []);
+            $model->spreadable()->create([
+                'content' => $model->spreadablePayload ?? [],
+            ]);
+            foreach ($model->spreadablePayload as $key => $value) {
+                if (! $model->isProtectedAttribute($key)) {
+                    $model->append($key);
+                    $model->spreadableMutatorMethods['get' . Str::studly($key) . 'Attribute'] = $value;
+                    $model->spreadableMutatorAttributes[$key] = $value;
+                    $model->spreadableMutatorAttributes[Str::camel($key)] = $value;
+                }
+            }
+
         });
 
         self::retrieved(static function (Model $model) {
             // If there's a spread model, load its attributes
-            // dd('text');
-            // dd($model);
-            if ($model->spreadable) {
+            if ($model->spreadable()->exists()) {
                 $jsonData = $model->spreadable->content ?? [];
 
                 // Set spreadable attributes on model, excluding protected attributes
+                // dd($jsonData, $model);
                 foreach ($jsonData as $key => $value) {
                     if (! $model->isProtectedAttribute($key)) {
-                        $model->setAttribute($key, $value);
+                        $model->append($key);
+                        $model->spreadableMutatorMethods['get' . Str::studly($key) . 'Attribute'] = $value;
+                        $model->spreadableMutatorAttributes[$key] = $value;
+                        $model->spreadableMutatorAttributes[Str::camel($key)] = $value;
                     }
                 }
 
                 // Set _spread attribute
-                $model->setAttribute('_spread', $jsonData);
-                // dd($model->_spread);
+                // $model->setAttribute($model->getSpreadableSavingKey(), $jsonData);
 
             } else {
-                // dd('here');
                 // Initialize empty _spread if no spreadable exists
-                $model->setAttribute('_spread', []);
+                // $model->setAttribute($model->getSpreadableSavingKey(), []);
             }
         });
 
@@ -62,7 +89,9 @@ trait HasSpreadable
 
     public function initializeHasSpreadable()
     {
-        $this->mergeFillable(['_spread']);
+        $this->mergeFillable([$this->getSpreadableSavingKey()]);
+
+        // $this->append($this->getSpreadableSavingKey());
     }
 
     // TODO: rename relation to spread as well
@@ -73,15 +102,13 @@ trait HasSpreadable
 
     protected function isProtectedAttribute(string $key): bool
     {
-
         return in_array($key, $this->getReservedKeys());
     }
 
     public function getReservedKeys(): array
     {
-
         return array_merge(
-            $this->getColumns(),  // Using ManageEloquent's getColumns
+            $this->getTableColumns(),  // Using ManageEloquent's getTableColumns
             $this->definedRelations(), // Using ManageEloquent's definedRelations
             array_keys($this->getMutatedAttributes()),
             ['spreadable', '_spread']
@@ -92,10 +119,10 @@ trait HasSpreadable
     {
         $attributes = $this->getAttributes();
         $protectedKeys = array_merge(
-            $this->getColumns(), // Using ManageEloquent's getColumns
+            $this->getTableColumns(), // Using ManageEloquent's getTableColumns
             $this->definedRelations(), // Using ManageEloquent's definedRelations
             array_keys($this->getMutatedAttributes()),
-            ['spreadable', '_spread']
+            ['spreadable', $this->getSpreadableSavingKey()]
         );
 
         return array_diff_key(
@@ -106,15 +133,40 @@ trait HasSpreadable
 
     protected function cleanSpreadableAttributes(): void
     {
-        $columns = $this->getColumns();
+        $columns = $this->getTableColumns(); // Using ManageEloquent's getTableColumns
         $attributes = $this->getAttributes();
         // TODO: Instead of removing any attribute remove the ones that you know that needs to be removed
         // Remove any attributes that aren't database columns
+
+        // $this->spreadable->content ??= [];
         foreach ($attributes as $key => $value) {
             if (! in_array($key, $columns)) {
                 unset($this->attributes[$key]);
             }
         }
 
+    }
+
+    final public static function getSpreadableSavingKey()
+    {
+        return static::$spreadableSavingKey ?? 'spread_payload';
+    }
+
+    public function __call($method, $arguments)
+    {
+        if (array_key_exists($method, $this->spreadableMutatorMethods)) {
+            return $this->spreadableMutatorMethods[$method];
+        }
+
+        return parent::__call($method, $arguments);
+    }
+
+    public function __get($key)
+    {
+        if (array_key_exists($key, $this->spreadableMutatorAttributes)) {
+            return $this->spreadableMutatorAttributes[$key];
+        }
+
+        return parent::__get($key);
     }
 }

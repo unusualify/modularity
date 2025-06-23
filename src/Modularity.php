@@ -19,16 +19,6 @@ class Modularity extends FileRepository
     private $activator;
 
     /**
-     * @var ConfigRepository
-     */
-    private $modularityConfig;
-
-    /**
-     * @var CacheManager
-     */
-    private $modularityCache;
-
-    /**
      * @var string
      */
     private static $authGuardName = 'modularity';
@@ -75,13 +65,9 @@ class Modularity extends FileRepository
         $this->appPath = realpath(get_installed_composer()['root']['install_path']);
         $this->vendorPath = realpath(get_installed_composer()['versions']['unusualify/modularity']['install_path']);
         $this->vendorDir = trim(Str::replaceFirst($this->appPath, '', $this->vendorPath), DIRECTORY_SEPARATOR);
-
-        $this->modularityCache = $app['cache'];
-        $this->modularityConfig = $app['config'];
-
         $this->activator = $app[\Nwidart\Modules\Contracts\ActivatorInterface::class];
 
-        $this->retainModulesPath = $this->modularityConfig->get('modules.paths.modules');
+        $this->retainModulesPath = $this->app['config']->get('modules.paths.modules');
 
     }
 
@@ -243,7 +229,7 @@ class Modularity extends FileRepository
      */
     public function getCached()
     {
-        $store = $this->modularityCache->store($this->modularityConfig->get('modules.cache.driver'));
+        $store = $this->app['cache']->store($this->app['config']->get('modules.cache.driver'));
 
         if ($store->has($this->config('cache.key'))) {
             return $store->get($this->config('cache.key'));
@@ -275,6 +261,16 @@ class Modularity extends FileRepository
         return config([
             'modules.cache.enabled' => false,
         ]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function config(string $key, $default = null)
+    {
+        return $this->app['config']->get('modules.' . $key,
+            $this->app['config']->get('modularity.' . $key, $default)
+        );
     }
 
     final public function isDevelopment()
@@ -310,19 +306,14 @@ class Modularity extends FileRepository
         return $this->config('app_url');
     }
 
+    public function hasAdminAppUrl(): bool
+    {
+        return $this->config('admin_app_url') !== null;
+    }
+
     public function getAdminAppUrl()
     {
         return $this->config('admin_app_url');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function config(string $key, $default = null)
-    {
-        return $this->modularityConfig->get('modules.' . $key,
-            $this->modularityConfig->get('modularity.' . $key, $default)
-        );
     }
 
     public function getAdminRouteNamePrefix()
@@ -332,7 +323,7 @@ class Modularity extends FileRepository
 
     public function getAdminUrlPrefix()
     {
-        return $this->config('admin_app_url')
+        return $this->hasAdminAppUrl()
             ? false
             : rtrim(ltrim($this->config('admin_app_path', 'admin'), '/'), '/');
     }
@@ -442,8 +433,12 @@ class Modularity extends FileRepository
             }
 
             foreach ($this->getClasses($entityPath) as $_class) {
-                if (get_class_short_name(App::make($_class)) === studlyName($routeName)) {
-                    $models[] = $_class;
+                try {
+                    if (get_class_short_name(App::make($_class)) === studlyName($routeName)) {
+                        $models[] = $_class;
+                    }
+                } catch (\Exception $e) {
+                    // TODO: get only classes
                 }
             }
         }

@@ -68,7 +68,6 @@ export default function useSidebar () {
   const methods = reactive({
     handleProfile(event){
       if(event.type === 'mouseenter' && state.profileMenu.expandOnHover) state.open.push('User')
-      console.log(event, state.profileMenu)
     },
     handleMenu(title){
       state.activeMenu = `#${title}`
@@ -76,9 +75,7 @@ export default function useSidebar () {
   })
 
   watch(lgAndUp, () => {
-    // __log('isLgAndUp', lgAndUp.value, state.rail)
     // state.expanded = !state.rail.value
-    // __log('navigationDrawer', navigationDrawer.value)
   })
   onMounted(() => {
     // methods.initializeSidebar()

@@ -3,8 +3,9 @@
 namespace Unusualify\Modularity\View\Widgets;
 
 use Unusualify\Modularity\Module;
-use Unusualify\Modularity\View\ModularityWidget;
 use Unusualify\Modularity\Traits\Allowable;
+use Unusualify\Modularity\View\ModularityWidget;
+
 class TableWidget extends ModularityWidget
 {
     use Allowable;
@@ -16,12 +17,10 @@ class TableWidget extends ModularityWidget
     public $widgetCol = [
         'cols' => 12,
         'lg' => 6,
-        'xl' => 4,
+        'xl' => 6,
     ];
 
     public $attributes = [
-        'class' => 'h-100',
-
         'createOnModal' => false,
         'editOnModal' => false,
 
@@ -38,7 +37,6 @@ class TableWidget extends ModularityWidget
 
         'showSelect' => false,
         'style' => '',
-        'class' => 'elevation-2',
 
         'tableOptions' => [
             'page' => 1,
@@ -50,7 +48,9 @@ class TableWidget extends ModularityWidget
         ],
         'noFullScreen' => true,
 
-        'tableClasses' => 'elevation-2',
+        'class' => '',
+        'elevation' => 2,
+        'rounded' => true,
         'toolbarOptions' => [
             'color' => 'transparent', // rgb(255,255,255,1) or utility colors like white, purple
             'border' => false, // false, 'xs', 'sm', 'md', 'lg', 'xl'.
@@ -61,8 +61,10 @@ class TableWidget extends ModularityWidget
             'image' => '', // image link for the background of the toolbar
             // 'height' => '90',
         ],
+        'paginationOptions' => [
+            'footerComponent' => 'vuePagination',
+        ],
     ];
-
 
     public function hydrateAttributes($attributes)
     {
@@ -75,7 +77,7 @@ class TableWidget extends ModularityWidget
 
         if (isset($attributes['_routeName']) && isset($attributes['_module']) && $attributes['_module'] instanceof Module) {
 
-            $routeEndpoints = $attributes['_module']->getRouteMainUris(
+            $routeEndpoints = $attributes['_module']->getRoutePanelUrls(
                 routeName: $attributes['_routeName'],
                 withoutNamePrefix: true,
                 modelBindingValue: ':id'
@@ -87,11 +89,11 @@ class TableWidget extends ModularityWidget
             );
         }
 
-        if(isset($attributes['columns'])) {
+        if (isset($attributes['columns'])) {
             $newColumns = $this->getAllowableItems(
                 $attributes['columns'],
                 searchKey: 'allowedRoles',
-                orClosure: fn($item, $user) => $user->isSuperAdmin(),
+                orClosure: fn ($item, $user) => $user->isSuperAdmin(),
             );
 
             $newColumns = configure_table_columns($newColumns);
@@ -101,5 +103,4 @@ class TableWidget extends ModularityWidget
 
         return $attributes;
     }
-
 }

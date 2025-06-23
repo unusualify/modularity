@@ -7,9 +7,7 @@ import { getSubmitFormData, getModel } from '@/utils/getFormData.js'
 const getFieldIndex = (stateKey, field) => {
   return stateKey.findIndex(f => f.name === field.name)
 }
-// __log(
-//   window[import.meta.env.VUE_APP_NAME].STORE.form
-// )
+
 const state = {
   baseUrl: window[import.meta.env.VUE_APP_NAME].STORE.form.baseUrl || '',
   inputs: window[import.meta.env.VUE_APP_NAME].STORE.form.inputs || {},

@@ -55,6 +55,6 @@ class State extends Model
 
     public function getTable()
     {
-        return modularityConfig('tables.states', 'modularity_states');
+        return modularityConfig('tables.states', 'um_states');
     }
 }

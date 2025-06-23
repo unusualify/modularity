@@ -2,12 +2,14 @@
 
 namespace Unusualify\Modularity\Http\Controllers\Traits\Table;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
-use Unusualify\Modularity\Entities\Enums\Permission;
+use Unusualify\Modularity\Traits\Allowable;
 
 trait TableFilters
 {
+    use Allowable;
 
     /**
      * @param \Illuminate\Database\Eloquent\Collection $items
@@ -24,7 +26,9 @@ trait TableFilters
             // 'name' => modularityTrans("{$this->baseKey}::lang.listing.filter.all-items"),
             'name' => ___('listing.filter.all-items'),
             'slug' => 'all',
-            'number' => $this->repository->getCountByStatusSlug('all', $scope),
+            'methods' => 'getCountByStatusSlug',
+            'force' => true,
+            'params' => ['all', $scope],
         ];
 
         // if ($this->routeHasTrait('revisions') && $this->getIndexOption('create')) {
@@ -41,47 +45,97 @@ trait TableFilters
             $statusFilters[] = [
                 'name' => ___('listing.filter.published'),
                 'slug' => 'published',
-                'number' => $this->repository->getCountByStatusSlug('published', $scope),
+                'methods' => 'getCountByStatusSlug',
+                'params' => ['published', $scope],
             ];
+            // $statusFilters[] = [
+            //     'name' => ___('listing.filter.draft'),
+            //     'slug' => 'draft',
+            //      'method' => 'getCountByStatusSlug',
+            //      'params' => ['draft', $scope],
+            //      'number' => $this->repository->getCountByStatusSlug('draft', $scope),
+            // ];
         }
 
         if ($this->getIndexOption('publish')) {
-            // $statusFilters[] = [
-            //     'name' => ___("listing.filter.published"),
-            //     'slug' => 'published',
-            //     'number' => $this->repository->getCountByStatusSlug('published', $scope),
-            // ];
-            // $statusFilters[] = [
-            //     'name' => ___("listing.filter.draft"),
-            //     'slug' => 'draft',
-            //     'number' => $this->repository->getCountByStatusSlug('draft', $scope),
-            // ];
+
         }
 
+        // SoftDeletable Filters
         if ($this->getIndexOption('restore') && $this->repository->isSoftDeletable()) {
             $statusFilters[] = [
                 'name' => ___('listing.filter.trash'),
                 'slug' => 'trash',
-                'number' => $this->repository->getCountByStatusSlug('trash', $scope),
+                'force' => true,
+                'methods' => 'getCountByStatusSlug',
+                'params' => ['trash', $scope],
             ];
         }
 
-        if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasStateable')) {
-            $statusFilters = array_merge(
-                $statusFilters,
-                $this->repository->getStateableFilterList(),
-            );
+        // repository table filters
+        $statusFilters = array_merge(
+            $statusFilters,
+            $this->repository->getTableFilters($scope),
+        );
+
+        $customMainFilters = $this->getConfigFieldsByRoute('table_filters', []);
+
+        foreach ($customMainFilters as $filter) {
+            $statusFilters[] = [
+                'name' => $filter->name,
+                'slug' => $filter->slug,
+                'methods' => 'getCountFor',
+                'params' => [$filter->scope ?? $filter->slug],
+                ...(isset($filter->allowedRoles) ? ['allowedRoles' => $filter->allowedRoles] : []),
+            ];
         }
 
-        $statusFilters = array_values(array_filter($statusFilters, function ($filter) {
-            return $filter['number'] > 0 || in_array($filter['slug'], ['trash', 'all']);
-        }));
+        $statusFilters = Collection::make($statusFilters)->reduce(function ($carry, $filter) {
+            if (isset($filter['allowedRoles'])) {
+                $isAllowed = $this->isAllowedItem(
+                    item: ['allowedRoles' => $filter['allowedRoles']],
+                    searchKey: 'allowedRoles',
+                    disallowIfUnauthenticated: true
+                );
+
+                if (! $isAllowed) {
+                    return $carry;
+                }
+            }
+
+            if (! isset($filter['number'])) {
+                if (! isset($filter['methods'])) {
+                    throw new \Exception('Number or methods is required for the filter: ' . $filter['slug']);
+                }
+
+                if (! isset($filter['params'])) {
+                    throw new \Exception('Params is required for the filter: ' . $filter['slug']);
+                }
+
+                if (is_string($filter['methods'])) {
+                    $count = $this->repository->{$filter['methods']}(...$filter['params']);
+                } else {
+                    throw new \Exception('Methods must be a string for the filter: ' . $filter['slug']);
+                }
+
+                if ($count < 1 && ! ($filter['force'] ?? false)) {
+                    return $carry;
+                }
+
+                $filter['number'] = $count;
+            }
+
+            $carry[] = Arr::except($filter, ['methods', 'params', 'force']);
+
+            return $carry;
+        }, []);
 
         return $statusFilters;
     }
 
     /**
      * Get the advanced filters for the table
+     *
      * @return array
      */
     protected function getTableAdvancedFilters()
@@ -102,6 +156,7 @@ trait TableFilters
 
     /**
      * Get the relations filter configuration for the table
+     *
      * @param array $filter
      * @return array
      */
@@ -116,6 +171,7 @@ trait TableFilters
 
     /**
      * Get the detail filter configuration for the table
+     *
      * @param array $filter
      * @return array
      */
@@ -130,6 +186,7 @@ trait TableFilters
 
     /**
      * Get the select filter configuration for the table
+     *
      * @param array $filter
      * @return array
      */
@@ -169,6 +226,7 @@ trait TableFilters
 
     /**
      * Get the date picker filter configuration for the table
+     *
      * @param array $filter
      * @return array
      */

@@ -8,7 +8,7 @@ import datatableApi from '@/store/api/datatable'
 
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
-import { useAuthorization } from '@/hooks'
+import { useAuthorization, useDynamicModal, useCastAttributes } from '@/hooks'
 import { useTableItem, useTableNames } from '@/hooks/table'
 
 import { checkItemConditions } from '@/utils/itemConditions';
@@ -33,10 +33,12 @@ export const makeTableItemActionsProps = propsFactory({
   }
 })
 
-export default function useTableItemActions(props, { tableForms }) {
+export default function useTableItemActions(props, { tableForms, loadItems }) {
   const tableItem = useTableItem()
   const tableNames = useTableNames(props)
   const { can } = useAuthorization()
+  const DynamicModal = useDynamicModal()
+  const { castObjectAttributes } = useCastAttributes()
 
   const { smAndDown, mdAndDown, lgAndDown } = useDisplay()
 
@@ -62,11 +64,11 @@ export default function useTableItemActions(props, { tableForms }) {
       case 'switch':
       case 'duplicate':
       case 'activate':
-        hasAction = !tableItem.isSoftDeletable(item) && can(action.name, tableNames.permissionName.value)
+        hasAction = !tableItem.isDeleted(item) && can(action.name, tableNames.permissionName.value)
         break
       case 'forceDelete':
       case 'restore':
-        hasAction = tableItem.isSoftDeletable(item) && can(action.name, tableNames.permissionName.value)
+        hasAction = tableItem.isDeleted(item) && can(action.name, tableNames.permissionName.value)
         break
       default:
         break
@@ -77,6 +79,32 @@ export default function useTableItemActions(props, { tableForms }) {
   }
 
   // Action Handlers
+  const handleDefaultAction = async (item, action) => {
+    let url = action.url ?? action.endpoint ?? action.href
+
+    if(url){
+      if(url.includes(':id')){
+        url = url.replace(':id', item.id)
+      }
+
+      if(action.hasDialog){
+
+        const callback = async (callback, errorCallback) => {
+          window.open(url, action.target ?? '_self')
+        }
+
+        actionEvents.event = 'dialog'
+        actionEvents.payload = { description: action.dialogQuestion ?? null, callback }
+      }else{
+        window.open(url, action.target ?? '_self')
+      }
+    }
+
+    if(action.modalService && _.isObject(action.modalService)){
+      DynamicModal.open(action.modalService.component ?? null, _.omit(castObjectAttributes(action.modalService, item), ['component']))
+    }
+  }
+
   const handleEditAction = (item) => {
     if (props.editOnModal || props.embeddedForm) {
       tableItem.setEditedItem(item)
@@ -251,9 +279,51 @@ export default function useTableItemActions(props, { tableForms }) {
     }
   }
 
+  const runPreProcess = (preProcess, item) => {
+    let type = null
+    let payload = null
+    let conditions = null
+
+    if(_.isArray(preProcess)) {
+      type = preProcess[0]
+      payload = preProcess[1]
+    }else if(_.isObject(preProcess)) {
+      type = preProcess.type
+      payload = preProcess.payload
+      conditions = preProcess.conditions
+    }
+
+    if(!checkItemConditions(conditions, item)) return
+
+    if (type === 'post') {
+      if(props.endpoints.store) {
+        // return formApi.post(props.endpoints.store, preProcess.params)
+      }
+    } else if (type === 'put') {
+      if(props.endpoints.update && item && item.id) {
+        return formApi.put(props.endpoints.update.replace(':id', item.id), castObjectAttributes(payload, item), function(response) {
+          if(response.status === 200 && response.data.variant === 'success') {
+            loadItems()
+          }
+        }, function(error) {
+          console.log(error)
+        })
+      }
+    }
+  }
+
+  const preProcessAction = (action, item) => {
+    if (action.preProcesses) {
+      action.preProcesses.forEach(preProcess => {
+        runPreProcess(preProcess, item)
+      })
+    }
+  }
   // Main Action Handler
   const itemAction = (item = null, action = null, ...args) => {
     const _action = __isString(action) ? { name: action } : action
+
+    preProcessAction(_action, item)
 
     switch (_action.name) {
       case 'edit':
@@ -285,6 +355,7 @@ export default function useTableItemActions(props, { tableForms }) {
         handleBulkAction(_action)
         break
       default:
+        handleDefaultAction(item, _action)
         break
     }
 

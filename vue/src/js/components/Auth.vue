@@ -4,16 +4,21 @@
       <v-main class="d-flex align-center justify-center" >
         <v-row class="h-100 mw-100">
           <v-col
-            cols="12"
-            md="6"
-            lg="6"
+            v-bind="{
+              cols: '12',
+              ...(noSecondSection ? {} : {
+                md: '6',
+                lg: '6',
+              })
+            }"
             class="py-12 d-flex flex-column align-center justify-center bg-white">
             <!-- <v-card class="mx-auto"> -->
               <v-row width="85%" class="d-flex flex-column justify-center align-center">
                 <!-- <h1 class="text-primary">{{ title }}</h1> -->
                 <div class="bg-primary darken-3">
-                  <!-- <span v-svg symbol="main-logo"></span> -->
                 </div>
+
+                <span v-if="noSecondSection" v-svg symbol="main-logo-full-light"></span>
 
                 <slot name="cardTop"></slot>
 
@@ -41,8 +46,9 @@
                 </v-sheet>
 
                 <div
-                  v-if="!noDivider"
-                  class="d-flex w-100 align-center justify-center">
+                  v-if="!noDivider && $isset($slots.bottom)"
+                  class="d-flex w-100 align-center justify-center"
+                >
                   <v-divider />
                   <div class="text-no-wrap px-3">or</div>
                   <v-divider />
@@ -53,29 +59,32 @@
 
             <!-- </v-card> -->
           </v-col>
-          <v-col
+          <v-col v-if="!noSecondSection"
             cols="12"
             md="6"
             lg="6"
-            class="px-xs-12 py-xs-3 px-sm-12 py-sm-3 pa-12 pa-md-0 d-flex flex-column align-center justify-center col-right bg-primary">
+            class="px-xs-12 py-xs-3 px-sm-12 py-sm-3 pa-12 pa-md-0 d-flex flex-column align-center justify-center col-right bg-primary"
+          >
             <div class="mw-420">
               <ue-svg-icon symbol="main-logo" class="mx-0 "></ue-svg-icon>
 
-              <h2 class="text-white mt-5 text-h4 custom-mb-8rem fs-2rem">
-                {{ description }}
-              </h2>
+              <slot name="description">
+                <h2 class="text-white mt-5 text-h4 custom-mb-8rem fs-2rem">
+                  {{ bannerDescription }}
+                </h2>
+              </slot>
               <span class="text-white">
-                <v-img :href="adImg">
-
-                </v-img>
-                {{ ad }}
+                <v-img :href="adImg"></v-img>
+                {{ bannerSubDescription }}
               </span>
               <v-btn
+                v-if="redirectUrl"
                 variant="outlined"
                 class="text-white custom-right-auth-button my-5"
                 density="default"
+                :href="redirectUrl"
                 >
-                {{ rightBtnText }}
+                {{ redirectButtonText }}
               </v-btn>
             </div>
           </v-col>
@@ -101,23 +110,31 @@ export default {
     title: {
       type: String,
     },
-    description: {
+    bannerDescription: {
       type: String,
-      default: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      default: ''
     },
-    ad: {
+    bannerSubDescription: {
       type: String,
-      default: '3k+ people joined us, now it’s your turn'
+      default: ''
     },
     adImg: {
       type: String,
       default: '',
     },
-    rightBtnText: {
+    redirectUrl: {
       type: String,
-      default: 'CONTINUE WITHOUT LOGIN'
+      default: null,
+    },
+    redirectButtonText: {
+      type: String,
+      default: ''
     },
     noDivider: {
+      type: [Boolean, Number],
+      default: false
+    },
+    noSecondSection: {
       type: [Boolean, Number],
       default: false
     }
@@ -155,11 +172,14 @@ export default {
     const width = computed(() => {
       // name is reactive and
       // must use .value
+
       switch (name.value) {
         case 'xs': return 300
+        case 'sm': return 450
+        case 'md': return 450
+        case 'lg': return 500
         case 'xl': return 600
-        case 'xxl': return 600
-        default: return 400
+        default: return 300
       }
     })
 
@@ -192,7 +212,6 @@ export default {
     })
     // Fix for showDivider logic
 
-    // console.log(showSuccess.value)
     return {
       width,
       title,

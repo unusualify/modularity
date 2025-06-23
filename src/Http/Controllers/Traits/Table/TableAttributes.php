@@ -5,9 +5,11 @@ namespace Unusualify\Modularity\Http\Controllers\Traits\Table;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Unusualify\Modularity\Traits\Allowable;
+
 trait TableAttributes
 {
     use Allowable;
+
     /**
      * @var array
      */
@@ -54,13 +56,14 @@ trait TableAttributes
      * @param mixed $attribute
      * @return bool|mixed returns referenced value or false if it's not defined at module config->table_options
      */
-    public function getTableAttribute($attribute)
+    public function getTableAttribute($attribute, $default = null)
     {
-        return $this->tableAttributes[$attribute] ?? null;
+        return $this->tableAttributes[$attribute] ?? $default;
     }
 
     /**
      * Hydrate the table attributes
+     *
      * @return void
      */
     protected function hydrateTableAttributes()
@@ -79,7 +82,7 @@ trait TableAttributes
                 $firstMatch = [];
                 foreach ($attributes['customRow'] as $component) {
                     // Skip if component doesn't pass role check
-                    if(!$this->isAllowedItem($component, searchKey: 'allowedRoles')) {
+                    if (! $this->isAllowedItem($component, searchKey: 'allowedRoles')) {
                         continue;
                     }
 
@@ -100,6 +103,7 @@ trait TableAttributes
 
     /**
      * Set the table attributes
+     *
      * @param array $tableOptions
      * @return void
      */
@@ -117,6 +121,7 @@ trait TableAttributes
 
     /**
      * Hydrate the custom row
+     *
      * @param array $customRow
      * @return array
      */
@@ -130,7 +135,6 @@ trait TableAttributes
 
     /**
      * Add relations on index page
-     * @return array
      */
     protected function addIndexWithsTableHeaders(): array
     {
@@ -138,17 +142,17 @@ trait TableAttributes
 
         $rawHeaders = $this->getConfigFieldsByRoute('headers', []);
 
-        if(count($rawHeaders) > 0){
+        if (count($rawHeaders) > 0) {
             $model = $this->repository->getModel();
-            if(method_exists($model, 'hasRelation')) {
+            if (method_exists($model, 'hasRelation')) {
                 foreach ($rawHeaders as $header) {
-                    if(isset($header->with)) {
+                    if (isset($header->with)) {
                         $with = is_string($header->with) ? [$header->with] : (array) $header->with;
 
-                        if(Arr::isAssoc($with)) {
-                            foreach($with as $relationshipName => $mappings) {
-                                if(isset($mappings['functions'])) {
-                                    $withs[$relationshipName] = fn($query) => array_reduce($mappings['functions'], fn($query, $function) => $query->$function(), $query);
+                        if (Arr::isAssoc($with)) {
+                            foreach ($with as $relationshipName => $mappings) {
+                                if (isset($mappings['functions'])) {
+                                    $withs[$relationshipName] = fn ($query) => array_reduce($mappings['functions'], fn ($query, $function) => $query->$function(), $query);
                                 } else {
                                     $withs[$relationshipName] = $mappings;
                                 }

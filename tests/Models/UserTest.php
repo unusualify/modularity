@@ -2,24 +2,23 @@
 
 namespace Unusualify\Modularity\Tests\Models;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Unusualify\Modularity\Tests\ModelTestCase;
-use Unusualify\Modularity\Entities\User;
-use Unusualify\Modularity\Entities\Company;
-use Unusualify\Modularity\Facades\Modularity;
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Session;
+use Spatie\Permission\Models\Role;
+use Unusualify\Modularity\Entities\Company;
 use Unusualify\Modularity\Entities\Filepond;
+use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Tests\ModelTestCase;
 
 class UserTest extends ModelTestCase
 {
-
     use RefreshDatabase;
 
     public function test_get_table_user()
     {
-        $user = new User();
+        $user = new User;
         $this->assertEquals(modularityConfig('tables.users', 'users'), $user->getTable());
     }
 
@@ -40,7 +39,6 @@ class UserTest extends ModelTestCase
             'language' => 'en',
             'timezone' => 'UTC',
             'phone' => '1234567890',
-            'country' => 'Test Country',
             'password' => 'password',
             'published' => 1,
             'company_id' => null,
@@ -49,11 +47,10 @@ class UserTest extends ModelTestCase
         $this->assertEquals('Test User', $user->name);
         $this->assertEquals('Test Surname', $user->surname);
         $this->assertEquals('Test Job Title', $user->job_title);
-        $this->assertEquals('test_user@gmail.com',$user->email);
+        $this->assertEquals('test_user@gmail.com', $user->email);
         $this->assertEquals('en', $user->language);
         $this->assertEquals('UTC', $user->timezone);
         $this->assertEquals('1234567890', $user->phone);
-        $this->assertEquals('Test Country', $user->country);
         $this->assertEquals('password', $user->password);
         $this->assertEquals(1, $user->published);
     }
@@ -68,22 +65,19 @@ class UserTest extends ModelTestCase
             'language' => 'en',
             'timezone' => 'UTC',
             'phone' => '1234567890',
-            'country' => 'Test Country',
             'password' => 'password',
             'published' => 1,
             'company_id' => null,
-            ]);
-
+        ]);
 
         $user->update([
-            'name' =>'Updated User',
+            'name' => 'Updated User',
             'surname' => 'Updated Surname',
             'job_title' => 'Updated Job Title',
             'email' => 'updated_test_user@gmail.com',
             'language' => 'fr',
             'timezone' => 'America/New_York',
             'phone' => '0987654321',
-            'country' => 'Updated Country',
             'password' => 'new_password',
             'published' => 0,
         ]);
@@ -91,11 +85,10 @@ class UserTest extends ModelTestCase
         $this->assertEquals('Updated User', $user->name);
         $this->assertEquals('Updated Surname', $user->surname);
         $this->assertEquals('Updated Job Title', $user->job_title);
-        $this->assertEquals('updated_test_user@gmail.com',$user->email);
+        $this->assertEquals('updated_test_user@gmail.com', $user->email);
         $this->assertEquals('fr', $user->language);
         $this->assertEquals('America/New_York', $user->timezone);
         $this->assertEquals('0987654321', $user->phone);
-        $this->assertEquals('Updated Country', $user->country);
         $this->assertEquals('new_password', $user->password);
         $this->assertEquals(0, $user->published);
     }
@@ -110,22 +103,19 @@ class UserTest extends ModelTestCase
             'language' => 'en',
             'timezone' => 'UTC',
             'phone' => '1234567890',
-            'country' => 'Country1',
             'password' => 'password',
             'published' => 1,
             'company_id' => null,
-            ]);
-
+        ]);
 
         $user2 = User::create([
-            'name' =>'User2',
+            'name' => 'User2',
             'surname' => 'Surname2',
             'job_title' => 'Job Title2',
             'email' => 'user_2@gmail.com',
             'language' => 'fr',
             'timezone' => 'America/New_York',
             'phone' => '0987654321',
-            'country' => 'Country2',
             'password' => 'new_password',
             'published' => 0,
             'company_id' => null,
@@ -138,7 +128,6 @@ class UserTest extends ModelTestCase
         $this->assertCount(1, User::all());
 
     }
-
 
     public function test_user_belongs_to_a_company()
     {
@@ -155,7 +144,7 @@ class UserTest extends ModelTestCase
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => 'password',
-            'company_id' => $company->id
+            'company_id' => $company->id,
         ]);
 
         $this->assertInstanceOf(
@@ -167,9 +156,7 @@ class UserTest extends ModelTestCase
         $this->assertEquals($company->id, $user->company->id);
     }
 
-
-
-    //checks for setImpersonating, stopImpersonating and isImpersonating
+    // checks for setImpersonating, stopImpersonating and isImpersonating
     public function test_impersonating()
     {
         $user1 = User::create([
@@ -198,7 +185,7 @@ class UserTest extends ModelTestCase
         // Check if user1 is not impersonating
         $this->assertTrue($user1->isImpersonating());
 
-        //Stop impersonation
+        // Stop impersonation
         $user1->stopImpersonating();
 
         // Check if user1 is not impersonating anymore
@@ -206,8 +193,7 @@ class UserTest extends ModelTestCase
 
     }
 
-
-    //checks for isSuperAdmin, isAdmin, isClient
+    // checks for isSuperAdmin, isAdmin, isClient
     public function test_role_types()
     {
 
@@ -250,59 +236,14 @@ class UserTest extends ModelTestCase
         $this->assertTrue($adminUser->isAdmin());
 
         $clientUser->assignRole('client-manager');
-        $this->assertEquals(1,$clientUser->isClient());
+        $this->assertEquals(1, $clientUser->isClient());
 
         $this->assertFalse($superadminUser->isAdmin());
         $this->assertFalse($adminUser->isSuperAdmin());
         $this->assertFalse($clientUser->isAdmin());
 
-        $this->assertNotEquals(1,$superadminUser->isClient());
-        $this->assertNotEquals(1,$adminUser->isClient());
-    }
-
-    public function test_valid_company()
-    {
-        //User just have id.
-        $userWithNullCompanyId = new User();
-        // if company id is null is valid.
-        $this->assertTrue($userWithNullCompanyId->valid_company);
-
-        //User has a company that partially filled.
-        $user = User::create([
-            'name' => 'Test User',
-            'email' => 'test_user@gmail.com',
-        ]);
-
-        $this->assertTrue($user->valid_company);
-
-        //User has a company that fully filled.
-        $company = Company::create([
-            'name' => 'Test Company',
-            'address' => 'Some Address',
-            'city' => 'Istanbul',
-            'state' => 'Turkish Republic',
-            'country' => 'Turkey',
-            'zip_code' => '12345',
-            'phone' => '1234567890',
-            'tax_id' => 'TAX123456',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $user->update([
-            'company_id' => $company->id,
-        ]);
-
-        $this->assertFalse($user->valid_company);
-
-        $company->update([
-            'vat_number' => 'VAT123456',
-        ]);
-
-        $user->refresh();
-
-        $this->assertTrue($user->valid_company);
-
+        $this->assertNotEquals(1, $superadminUser->isClient());
+        $this->assertNotEquals(1, $adminUser->isClient());
     }
 
     public function test_company_name()
@@ -347,7 +288,7 @@ class UserTest extends ModelTestCase
             'company_id' => $companyWithName->id,
         ]);
 
-        $result = $user->name . ' (' . $user->company_name.')';
+        $result = $user->name . ' (' . $user->company_name . ')';
         $this->assertEquals($result, $user->nameWithCompany);
 
         // $user->refresh();
@@ -358,7 +299,7 @@ class UserTest extends ModelTestCase
 
         $user->refresh();
 
-        $result = $user->name . ' (' . $user->company_name.'System User'.')';
+        $result = $user->name . ' (' . $user->company_name . 'System User' . ')';
         $this->assertEquals($result, $user->nameWithCompany);
 
     }
@@ -390,7 +331,7 @@ class UserTest extends ModelTestCase
 
     public function test_avatar()
     {
-        //without any related filepond
+        // without any related filepond
         $userWithoutFilepond = User::factory()->create();
         $this->assertEquals('/vendor/modularity/jpg/anonymous.jpg', $userWithoutFilepond->avatar);
 
@@ -403,7 +344,7 @@ class UserTest extends ModelTestCase
             'filepondable_id' => $user->id,
             'filepondable_type' => get_class($user),
             'role' => 'avatar',
-            'locale' => 'en'
+            'locale' => 'en',
         ]);
 
         $expectedSource = route('filepond.preview', ['uuid' => 'first-uuid-123']);
@@ -415,7 +356,7 @@ class UserTest extends ModelTestCase
             'filepondable_id' => $user->id,
             'filepondable_type' => get_class($user),
             'role' => 'avatar',
-            'locale' => 'en'
+            'locale' => 'en',
         ]);
 
         // Expected source URL from the first filepond
@@ -477,9 +418,5 @@ class UserTest extends ModelTestCase
         $this->assertFalse($company2->users->contains($user1));
         $this->assertFalse($company2->users->contains($user2));
 
-
     }
-
-
-
 }

@@ -26,7 +26,7 @@ class ModularityWidget extends Component
             'cols' => 12,
         ],
         'widgetAttributes' => [
-            'class' => 'h-50 overflow-y-auto',
+            'class' => 'overflow-y-auto',
         ],
         'widgetSlots' => [],
     ];
@@ -72,15 +72,15 @@ class ModularityWidget extends Component
 
         $this->widgetAlias = Str::kebab(preg_replace('/Widget$/', '', get_class_short_name(static::class)));
 
-        if(!isset($this->tag)){
-            if(self::class !== static::class){
+        if (! isset($this->tag)) {
+            if (static::class !== self::class) {
                 $this->tag = $this->widgetAlias;
             } else {
                 $this->tag = $this->widgetDefaultConfig['tag'];
             }
         }
 
-        if(count($this->attributes) > 0){
+        if (count($this->attributes) > 0) {
             $this->attributes = $this->hydrateAttributes($this->attributes);
         }
     }
@@ -88,8 +88,6 @@ class ModularityWidget extends Component
     /**
      * Create a widget from a template
      *
-     * @param string $templateName
-     * @param array $customAttributes
      * @return static
      */
     public static function fromWidgetTemplate(string $templateName, array $customAttributes = [])
@@ -114,11 +112,18 @@ class ModularityWidget extends Component
     {
         $widgetConfig = Config::get('modularity.widgets.' . $widgetAlias, null);
 
-        if(!$widgetConfig){
+        if (! $widgetConfig) {
             throw new \Exception('Widget template not found');
         }
 
         return $widgetConfig;
+    }
+
+    public function setWidgetAlias(string $widgetAlias)
+    {
+        $this->widgetAlias = $widgetAlias;
+
+        return $this;
     }
 
     public function setWidgetCol(array $widgetCol)
@@ -145,7 +150,6 @@ class ModularityWidget extends Component
     /**
      * Use the widget config on modularity.widgets.{$widgetAlias}
      *
-     * @param bool $useWidgetConfig
      * @return static
      */
     public function useWidgetConfig(bool $useWidgetConfig = true)

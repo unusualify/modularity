@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Http\Controllers\Traits;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 
 trait ManageTable
@@ -37,7 +36,10 @@ trait ManageTable
                 'search' => collect($this->indexTableColumns ?? [])->filter(function ($item) {
                     return isset($item['searchable']) ? $item['searchable'] : false;
                 })->map(function ($item) {
-                    return $this->dehydrateHeaderSuffix($item) ? $item['key'] : $item['key'];
+                    $this->dehydrateHeaderSuffix($item);
+                    $searchKey = $item['searchKey'] ?? $item['key'];
+
+                    return $searchKey;
                 })->implode('|'),
             ];
         }
@@ -46,7 +48,6 @@ trait ManageTable
 
         $this->tableAttributes = array_merge_recursive_preserve($this->getTableAttributes(), $this->tableAttributes ?? []);
     }
-
 
     /**
      * Get the default table options
@@ -86,6 +87,7 @@ trait ManageTable
 
     /**
      * Get the table draggable options
+     *
      * @return array
      */
     protected function getTableDraggableOptions()

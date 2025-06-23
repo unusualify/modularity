@@ -26,7 +26,6 @@ export default {
               const hasDNone = el.classList.contains('d-none')
               // Handle transition when d-none is added/removed
               if (hasDNone) {
-                __log('observer', hasDNone, el)
                 el.classList.remove(`${type}-1`)
               } else {
                 // Small delay to ensure d-none is fully removed

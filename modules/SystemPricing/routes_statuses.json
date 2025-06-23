@@ -1,5 +1,6 @@
 {
     "VatRate": true,
     "Currency": true,
-    "PriceType": true
+    "PriceType": true,
+    "Price": true
 }

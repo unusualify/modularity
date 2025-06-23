@@ -310,7 +310,6 @@ export default {
       }))
     },
     warningDeleteMessage: function () {
-      console.log(this.allowDelete + '+ HEREEE')
       if (this.allowDelete) {
         if (this.hasMultipleMedias) {
           return this.$trans('media-library.dialogs.delete.allow-delete-multiple-medias', 'Some files are used and can\'t be deleted. Do you want to delete the others ?')
@@ -396,7 +395,6 @@ export default {
         api.delete(this.firstMedia.deleteUrl, (resp) => {
           this.loading = false
           this.$emit('delete', this.mediasIdsToDelete)
-          console.log(this.$refs.warningDelete)
           this.$refs.warningDelete.close()
           this.$store.commit(ALERT.SET_ALERT, { message: resp.data.message, variant: resp.data.variant })
           // this.$emit();

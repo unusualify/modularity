@@ -23,7 +23,7 @@ trait TranslationsTrait
         $traitName = get_class_short_name(__TRAIT__);
 
         $_columns = collect($inputs)->reduce(function ($acc, $curr) {
-            if(isset($curr['translated']) && $curr['translated']) {
+            if (isset($curr['translated']) && $curr['translated']) {
                 $acc[] = $curr['name'];
             }
 
@@ -141,28 +141,24 @@ trait TranslationsTrait
         if ($this->model->isTranslatable()) {
             $attributes = $this->model->translatedAttributes;
 
-            $query->orWhereHas('translations', function ($q) use ($scopes, $attributes) {
-                foreach ($attributes as $attribute) {
-                    if (isset($scopes[$attribute]) && is_string($scopes[$attribute])) {
-                        if (! (isset($scopes['searches']) && in_array($attribute, $scopes['searches']))) {
-                            $q->where($attribute, $this->getLikeOperator(), '%' . $scopes[$attribute] . '%');
-                        }
+            $translatableValues = [];
+            if (isset($scopes['searches'])) {
+                foreach ($scopes['searches'] as $field) {
+                    if (isset($scopes[$field]) && in_array($field, $attributes)) {
+                        $translatableValues[$field] = $scopes[$field];
                     }
                 }
+            }
 
-                if (isset($scopes['searches'])) {
-                    $q->where(function ($query) use (&$scopes) {
-                        foreach ($scopes['searches'] as $field) {
-                            if(isset($scopes[$field])) {
-                                $query->orWhere($field, $this->getLikeOperator(), '%' . $scopes[$field] . '%');
-                            }
+            if (count($translatableValues) > 0) {
+                $query->orWhereHas('translations', function ($q) use ($translatableValues) {
+                    $q->where(function ($q) use ($translatableValues) {
+                        foreach ($translatableValues as $field => $value) {
+                            $q->orWhere($field, $this->getLikeOperator(), '%' . $value . '%');
                         }
                     });
-                }
-            });
-
-            // if(get_class_short_name($this) == 'FaqRepository')
-            //     dd($scopes, $attributes, $query->toSql(), $query->get());
+                });
+            }
 
             foreach ($attributes as $attribute) {
                 if (array_key_exists($attribute, $scopes)) {

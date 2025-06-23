@@ -43,10 +43,10 @@
             <slot :name="getTypeItemSlot(obj)" v-bind= "{ obj, index, id }">
               <!-- slot replaces complete item of defined KEY -> <div slot="slot-item-key-[propertyName]">-->
               <slot :name="getKeyItemSlot(obj)" v-bind= "{ obj, index, id }">
-
                 <!-- PREVIEW -->
                 <ue-recursive-stuff v-if="obj.schema.type === 'preview' && obj.schema.configuration"
                   :configuration="obj.schema.configuration"
+                  :bind-data="valueIntern"
                 />
 
                 <!-- DYNAMIC COMPONENT -->
@@ -142,6 +142,8 @@
                     v-if="obj.schema && obj.schema.schema"
                     :is="checkInternGroupType(obj)"
                     v-bind="bindSchema(obj)"
+                    :title="obj.schema.typeIntTitle ?? null"
+                    :modelValue="obj.schema.typeIntModelValue || false"
                     @click="onEvent($event, obj)"
                   >
                     <!-- <v-card-title v-if="obj.schema.title">{{obj.schema.title}}</v-card-title>
@@ -353,6 +355,8 @@
                   @click:minute="onEvent({type:'click'}, obj, minute)"
                   @click:second="onEvent({type:'click'}, obj, second)"
                   @update:modelValue="onInput($event, obj)"
+
+                  @update:input="updateInput($event, obj)"
                 >
                   <!-- component doesn't work with #[s]="slotData" " -->
                   <template v-for="s in getInjectedScopedSlots(id, obj)" #[s]><slot :name="getKeyInjectSlot(obj, s)" v-bind= "{ id, obj, index, model: valueIntern }"/></template>
@@ -378,6 +382,9 @@
                   @click:minute= "onEvent({type:'click'}, obj, minute)"
                   @click:second= "onEvent({type:'click'}, obj, second)"
                   @update:modelValue="onInput($event, obj)"
+
+                  @update:input="updateInput($event, obj)"
+
                 >
                   <!-- component doesn't work with #[s]="slotData" " -->
                   <template v-for="s in getInjectedScopedSlots(id, obj)" v-slot:[s]="slotData">
@@ -416,7 +423,7 @@
 // Import
 // import Vue from 'vue'
 import { getCurrentInstance } from 'vue'
-import { get, set, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex, omit } from 'lodash-es'
+import { get, set, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex, omit, cloneDeep } from 'lodash-es'
 
 import formEvents from '@/utils/formEvents'
 
@@ -467,7 +474,8 @@ const typeToComponent = {
   file: 'v-file-input',
   switch: 'v-switch',
   checkbox: 'v-checkbox',
-  card: 'v-card'
+  card: 'v-card',
+  hidden: 'input'
   /*
     HOW TO USE CUSTOM Components
     1)
@@ -624,6 +632,10 @@ export default {
     schema: {
       type: [Object, Array],
       default: () => ({})
+    },
+    noAutoGenerateSchema: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -674,7 +686,6 @@ export default {
       return this.row || rowDefault
     },
     flatCombinedArraySorted () {
-      // __log('flatCombinedArraySorted computed', this.valueIntern, this.formSchema)
       return orderBy(this.flatCombinedArray, ['schema.sort'], [orderDirection])
     },
     storeStateData () {
@@ -704,7 +715,7 @@ export default {
   watch: {
     schema: {
       handler (value, oldValue) {
-        // __log('schema watch', value, oldValue)
+
       },
       deep: true
     },
@@ -717,7 +728,6 @@ export default {
       deep: true
     },
     // formSchema: function (newSchema, oldSchema) {
-    //   // __log('formSchema watch', newSchema)
 
     //   this.rebuildArrays(this.valueIntern, newSchema)
 
@@ -726,7 +736,6 @@ export default {
 
     // },
     // valueIntern: function (newVal, oldVal) {
-    //   __log('valueIntern watch', newVal, oldVal)
     // }
   },
   methods: {
@@ -764,7 +773,6 @@ export default {
       // if (Object.prototype.hasOwnProperty.call(obj.schema, 'falseValue') && obj.schema.falseValue == 1) {
       //   obj.schema.falseValue = '0'
       // }
-      // __log(obj.schema)
 
       return omit(obj.schema, ['type', 'col', 'order', 'offset', 'ext', 'event'] )
       return obj.schema
@@ -799,7 +807,7 @@ export default {
       //  in type 'wrap|group' you can define with typeInt: a component as group - schema: { group1: { type:'wrap', typeInt:'v-card', ... } ...}
       const typeInt = obj.schema.typeInt || defaultInternGroupType
 
-      return typeInt.startsWith('v-') ? typeInt : `v-${typeInt}`
+      return typeInt.startsWith('v-') || typeInt.startsWith('ue-') ? typeInt : `v-${typeInt}`
     },
     // GET ITERATION KEY FOR TYPE ARRAY
     getKeyForArray (id, obj, item, index) {
@@ -1144,7 +1152,7 @@ export default {
       }
 
       delay(() => { this.emitValue(event.type, emitObj), onEventDelay })
-      // __log(emitObj)
+
       return emitObj
     },
     onClickOutside (event, obj) {
@@ -1182,14 +1190,12 @@ export default {
               ? 'onDisplay'
               : event
       // const listener = 'on' + this.$lodash.startCase(this.$lodash.camelCase(event)).replace(/ /g, '')
-      // __log(emitEvent, listener, this)
       // if (this.$attrs[`${emitEvent}:${this.id}`]) {
       //   this.deprecateEventCustomID(emitEvent)
       //   this.deprecateCombinedEvents(emitEvent, event)
       //   this.$emit(`${emitEvent}:${this.id}`, val) // listen to specific event only
       // } else if (this.$attrs[`${emitEvent}`]) {
       //   // this.deprecateCombinedEvents(emitEvent, event)
-      //   __log(emitEvent, val)
       //   this.$emit(emitEvent, val) // listen to specific event only
       // } else if (this.$attrs[`${listener}:${this.id}`]) {
       //   this.deprecateEventCustomID(event)
@@ -1198,7 +1204,6 @@ export default {
       //   // this.$emit(event, val) // listen to specific event only
       //   // this.$emit(listener, val) // listen to specific event only
       //   // this.$emit('update:schema', this.storeStateSchema) // listen to specific event only
-      //   // __log(listener, this.storeStateData)
       //   this.$emit(`${event}`, val) // listen to specific event only
       //   // this.$emit('update:modelValue', this.storeStateData) // listen to specific event only
       // }
@@ -1233,7 +1238,6 @@ export default {
         if (ix === pathArray.length - 1) object[p] = value
         object = object[p]
       })
-      // __log(object)
     },
     updateArrayFromState (data, schema) {
       this.flatCombinedArray.forEach(obj => {
@@ -1347,7 +1351,7 @@ export default {
       this.tryAutogenerateModelStructure(model, schema)
 
       // no schema defined or empty -> autogenerate basic schema
-      if (isEmpty(schema)) this.autogenerateSchema(model)
+      if (isEmpty(schema) && !this.noAutoGenerateSchema) this.autogenerateSchema(model)
 
       // create flatted working array from schema and value
       this.flatCombinedArray = this.flattenAndCombineToArray(this.storeStateData, this.storeStateSchema)
@@ -1372,6 +1376,26 @@ export default {
             // ## TODO type conditional default value
           }
         })
+      }
+    },
+
+    updateInput(event, obj) {
+      if(Array.isArray(event)){
+        const oldFormSchema = cloneDeep(this.formSchema)
+        let isChanged = false
+        event.forEach(e => {
+          if(e.key && e.value && this.formSchema?.[obj.key]){
+            oldFormSchema[obj.key][e.key] = e.value
+            isChanged = true
+          }
+        })
+        if(isChanged){
+          this.formSchema = oldFormSchema
+        }
+      } else if(event.key && event.value && this.formSchema?.[obj.key]){
+        const oldFormSchema = cloneDeep(this.formSchema)
+        oldFormSchema[obj.key][event.key] = event.value
+        this.formSchema = oldFormSchema
       }
     }
   },

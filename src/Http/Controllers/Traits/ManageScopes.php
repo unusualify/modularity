@@ -69,6 +69,23 @@ trait ManageScopes
         $this->tableOrders = $this->getTableOrders();
     }
 
+    protected function getExactScope()
+    {
+        $scope = [];
+
+        foreach ($this->fixedFilters as $key => $value) {
+            $scope[$key] = $value;
+        }
+
+        $configScopes = (array) $this->getConfigFieldsByRoute('scopes', []);
+
+        foreach ($configScopes as $key => $value) {
+            $scope[$key] = $value;
+        }
+
+        return $scope;
+    }
+
     /**
      * @param array $prepend
      * @return array
@@ -83,6 +100,7 @@ trait ManageScopes
 
         if (array_key_exists('status', $requestFilters)) {
             switch ($requestFilters['status']) {
+                // General Filters
                 case 'published':
                     $scope['published'] = true;
 
@@ -99,17 +117,75 @@ trait ManageScopes
                     $scope['mine'] = true;
 
                     break;
+                    // Authorizable Filters
+                case 'authorized':
+                    $scope['hasAnyAuthorization'] = true;
+
+                    break;
+                case 'unauthorized':
+                    $scope['unauthorized'] = true;
+
+                    break;
+                case 'your-authorizations':
+                    $scope['isAuthorizedToYou'] = true;
+
+                    break;
+                    // Assignable Filters
+                case 'my-assignments':
+                    $scope['isActiveAssignee'] = true;
+
+                    break;
+                case 'your-role-assignments':
+                    $scope['isActiveAssigneeForYourRole'] = true;
+
+                    break;
+                case 'completed-assignments':
+                    $scope['completedAssignments'] = true;
+
+                    break;
+                case 'pending-assignments':
+                    $scope['pendingAssignments'] = true;
+
+                    break;
+                case 'your-completed-assignments':
+                    $scope['yourCompletedAssignments'] = true;
+
+                    break;
+                case 'your-pending-assignments':
+                    $scope['yourPendingAssignments'] = true;
+
+                    break;
+                case 'team-completed-assignments':
+                    $scope['teamCompletedAssignments'] = true;
+
+                    break;
+                case 'team-pending-assignments':
+                    $scope['teamPendingAssignments'] = true;
+
+                    break;
+
+                default:
+                    $customMainFilters = $this->getConfigFieldsByRoute('table_filters', []);
+
+                    $customMainFilter = Collection::make($customMainFilters)->filter(function ($filter) use ($requestFilters) {
+                        return isset($filter->slug) && $filter->slug == $requestFilters['status'];
+                    })->first();
+
+                    if ($customMainFilter) {
+                        $scope[$customMainFilter->scope ?? $customMainFilter->slug] = true;
+                    }
+
+                    break;
             }
 
-            if (! Str::startsWith($requestFilters['status'], 'stateable')) {
+            if (! Str::startsWith($requestFilters['status'], 'isStateable')) {
                 unset($requestFilters['status']);
             }
         }
 
         if (array_key_exists('status', $requestFilters)) {
-            $code = Str::kebab(Str::after($requestFilters['status'], 'stateable'));
-            // $scope[$requestFilters['status']] = true;
-            $scope['stateable'] = $code;
+            $code = Str::kebab(Str::after($requestFilters['status'], 'isStateable'));
+            $scope['isStateable'] = $code;
             unset($requestFilters['status']);
         }
 
@@ -142,9 +218,7 @@ trait ManageScopes
             }
         }
 
-        foreach ($this->fixedFilters as $key => $value) {
-            $scope[$key] = $value;
-        }
+        $scope = array_merge($this->getExactScope(), $scope);
 
         if (array_key_exists('relations', $requestFilters)) {
 
@@ -163,11 +237,19 @@ trait ManageScopes
      */
     protected function getRequestFilters()
     {
+        $searchFilters = [];
+
         if ($this->request->has('search')) {
-            return ['search' => $this->request->get('search')];
+            $searchFilters['search'] = $this->request->get('search');
         }
 
-        return json_decode($this->request->get('filter'), true) ?? [];
+        $filter = $this->request->get('filter');
+
+        if (is_string($filter)) {
+            $filter = json_decode($filter, true);
+        }
+
+        return array_merge($searchFilters, $filter ?? []);
     }
 
     /**
@@ -191,7 +273,6 @@ trait ManageScopes
     }
 
     /**
-    /**
      * @return array
      */
     protected function orderScope()
@@ -200,9 +281,8 @@ trait ManageScopes
 
         if ($this->request->has('sortBy')) {
 
-            foreach ($this->request->get('sortBy') as $str) {
-                $sort = json_decode($str);
-                // dd($sort);
+            foreach ($this->request->get('sortBy') as $object) {
+                $sort = is_array($object) ? (object) $object : json_decode($object);
 
                 if (preg_match('/(.*)(_timestamp)/', $sort->key, $matches)) {
                     $sort->key = $matches[1];

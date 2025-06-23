@@ -6,11 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use Unusualify\Modularity\Entities\Enums\Permission;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
+use Unusualify\Modularity\Traits\Allowable;
 use Unusualify\Modularity\View\Component;
 
 class DashboardController extends BaseController
 {
-    use ManageUtilities;
+    use ManageUtilities, Allowable;
 
     /**
      * @var string
@@ -35,10 +36,12 @@ class DashboardController extends BaseController
 
     public function index($parentId = null)
     {
-        $blocks = app()->config->get(modularityBaseKey() . '.ui_settings.dashboard.blocks');
+        $blocks = $this->app->config->get(modularityBaseKey() . '.ui_settings.dashboard.blocks');
 
         foreach ($blocks as $index => $block) {
-            $blocks[$index] = Component::create($block);
+            if ($this->isAllowedItem($block, 'allowedRoles')) {
+                $blocks[$index] = Component::create($block);
+            }
         }
 
         $endpoints = $this->getUrls();

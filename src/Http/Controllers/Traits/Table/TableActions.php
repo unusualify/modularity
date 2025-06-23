@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Http\Controllers\Traits\Table;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
+use Unusualify\Modularity\Services\Connector;
 use Unusualify\Modularity\Traits\Allowable;
 
 trait TableActions
@@ -46,9 +47,6 @@ trait TableActions
         $this->tableActions = array_merge_recursive_preserve($tableActions, $this->tableActions ?? []);
     }
 
-    /**
-     * @return array
-     */
     public function getTableActions(): array
     {
         $defaultTableAction = (array) Config::get(modularityBaseKey() . '.default_table_action', []);
@@ -56,14 +54,25 @@ trait TableActions
         return Collection::make($this->tableActions)->reduce(function ($acc, $action, $key) use ($defaultTableAction) {
             $noSuperAdmin = $action['noSuperAdmin'] ?? false;
             // $allowedRoles = $action['allowedRoles'] ?? null;
+            $action['is'] = true;
+
+            if (isset($action['connector'])) {
+                $connector = new Connector($action['connector']);
+
+                $connector->run($action, 'is');
+            }
+
+            if (! $action['is']) {
+                return $acc;
+            }
 
             $isAllowed = $this->isAllowedItem(
                 $action,
                 searchKey: 'allowedRoles',
-                orClosure: fn($item) => !$noSuperAdmin && $this->user->isSuperAdmin(),
+                orClosure: fn ($item) => ! $noSuperAdmin && $this->user->isSuperAdmin(),
             );
 
-            if(!$isAllowed) {
+            if (! $isAllowed) {
                 return $acc;
             }
 
@@ -77,21 +86,15 @@ trait TableActions
             if (isset($action['endpoint']) && ($routeName = Route::hasAdmin($action['endpoint']))) {
                 $route = Route::getRoutes()->getByName($routeName);
 
-                if(count($route->parameterNames()) > 0){
+                if (count($route->parameterNames()) > 0) {
                     throw new \Exception('Action route must not have parameters: ' . $action['endpoint']);
                 }
 
                 $action['endpoint'] = route($routeName);
             }
 
-            if (isset($action['href']) && ($routeName = Route::hasAdmin($action['href']))) {
-                $route = Route::getRoutes()->getByName($routeName);
-
-                if(count($route->parameterNames()) > 0){
-                    throw new \Exception('Action route must not have parameters: ' . $action['href']);
-                }
-
-                $action['href'] = route($routeName);
+            if (isset($action['href'])) {
+                $action['href'] = resolve_route($action['href']);
             }
 
             $acc[] = array_merge_recursive_preserve($defaultTableAction, $action);

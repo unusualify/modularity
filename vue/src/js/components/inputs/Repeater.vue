@@ -2,7 +2,7 @@
   <v-input
     :class="[
       'v-input-repeater',
-      repeaterInputs.length === 0 && hideIfEmpty ? 'd-none' : ''
+      totalRepeats === 0 && hideIfEmpty ? 'd-none' : ''
     ]"
   >
     <div class="w-100">
@@ -14,7 +14,7 @@
         :vertical-padding="0"
       >
         <!-- Title -->
-        <template v-slot:title v-if="(label || subtitle || $slots.title || $slots.append) && !(hasHeaders && repeaterInputs.length > 0)">
+        <template v-slot:title v-if="(label || subtitle || $slots.title || $slots.append) && !(!noHeaders && hasRepeaterModels)">
           <div class="d-flex" v-if="(label || subtitle) && (schema.length || Object.keys(schema).length) || $slots.append">
             <div class="d-flex flex-column">
               <ue-title v-if="label && (schema.length || Object.keys(schema).length) " :classes="['pl-0 pt-0']" color="grey-darken-5" transform="none" weight="medium">
@@ -30,7 +30,7 @@
         <template v-slot:default>
           <div class="mt-4">
             <!-- Headers -->
-            <v-row v-if="hasHeaders && repeaterInputs.length > 0" class="mb-4" no-gutters>
+            <v-row v-if="!noHeaders && hasRepeaterModels" class="mb-4" no-gutters>
               <v-col v-for="header in headers" :key="header.title" v-bind="header.col">
                 {{ header.title }}
               </v-col>
@@ -39,7 +39,7 @@
             <div v-if="draggable" :class="['v-input-repeater__block v-input-repeater__block--draggable']">
               <Draggable
                 class="v-input-repeater__content"
-                v-model="repeaterInputs"
+                v-model="repeaterModels"
                 item-key="id"
                 v-bind="dragOptions"
                 >
@@ -63,9 +63,9 @@
                             <v-custom-form-base
                               :id="`ue-repeater-form-${itemSlot.index}`"
                               :modelValue="itemSlot.element"
-                              @update:modelValue="onUpdateRepeaterInput($event, itemSlot.index)"
+                              @update:modelValue="onUpdateRepeaterModel($event, itemSlot.index)"
                               :schema="repeaterSchemas[itemSlot.index]"
-                              @update:schema="console.log(repeaterSchemas[itemSlot.index])"
+                              @update:schema="onUpdateRepeaterSchema($event, itemSlot.index)"
                               :row="formRowAttribute"
                             >
                               <!-- <template v-slot:[`slot-top-ue-repeater-form-${itemSlot.index}`]>
@@ -107,7 +107,7 @@
 
             <!-- Static -->
             <v-row v-else class="v-input-repeater__block" v-bind="rowAttribute">
-              <v-col v-for="(item, index) in repeaterInputs" :key="item.id" v-bind="$lodash.pick(formCol, ['cols', 'xs', 'sm', 'md', 'lg', 'xl'])">
+              <v-col v-for="(item, index) in repeaterModels" :key="item.id" v-bind="$lodash.pick(formCol, ['cols', 'xs', 'sm', 'md', 'lg', 'xl'])">
                 <v-hover>
                   <template v-slot:default="{ isHovering, props }">
                     <div :class="['v-input-repeater__item', isHovering ? 'active' :'', draggable ? 'draggable': '']" v-bind="props">
@@ -127,9 +127,9 @@
                           :id="`ue-repeater-form-${index}`"
                           class="w-100 h-100"
                           :modelValue="item"
-                          @update:modelValue="onUpdateRepeaterInput($event, index)"
+                          @update:modelValue="onUpdateRepeaterModel($event, index)"
                           :schema="repeaterSchemas[index]"
-                          @update:schema="console.log(repeaterSchemas[index])"
+                          @update:schema="onUpdateRepeaterSchema($event, index)"
                           :row="formRowAttribute"
                         >
 
@@ -147,6 +147,18 @@
                           </template>
 
                         </v-custom-form-base>
+                        <!-- <ue-form
+                          :id="`ue-repeater-form-${index}`"
+                          class="w-100 h-100"
+                          :modelValue="item"
+                          @update:modelValue="onUpdateRepeaterInput($event, index)"
+                          :schema="repeaterSchemas[index]"
+                          @update:schema="console.log('update:schema', repeaterSchemas[index], $event)"
+                          :rowAttribute="formRowAttribute"
+
+                          no-default-form-padding
+                        >
+                        </ue-form> -->
                       </div>
                     </div>
                   </template>

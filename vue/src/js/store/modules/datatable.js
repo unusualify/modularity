@@ -81,7 +81,7 @@ const actions = {
       }
 
       const url = endpoint ?? window[import.meta.env.VUE_APP_NAME].ENDPOINTS.index
-      // __log(parameters)
+
       api.get(url,parameters, function (resp) {
         const tableData = payload.infiniteScroll ? state.data.concat(resp.resource.data) : resp.resource.data
 

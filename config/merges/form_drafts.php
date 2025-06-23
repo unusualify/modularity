@@ -2,12 +2,20 @@
 
 return [
     'user' => [
+        'avatar' => [
+            'type' => 'filepond-avatar',
+            // 'label' => 'Profile Avatar',
+            'name' => 'avatar',
+            'allow-image-preview' => true,
+            'label-idle' => 'Drop files here...',
+            'acceptedExtensions' => ['jpg', 'jpeg', 'png'],
+        ],
         'name' => [
             'type' => '_name',
             'col' => [
                 'sm' => 6,
             ],
-            'rules' => 'min:3|unique_table', // Removed |unique_table since it causes update problems on name. Name shouldn't be unique
+            'rules' => 'min:3', // Removed |unique_table since it causes update problems on name. Name shouldn't be unique
         ],
         'surname' => [
             'type' => '_name',
@@ -16,7 +24,7 @@ return [
             'col' => [
                 'sm' => 6,
             ],
-            'rules' => 'min:2',
+            // 'rules' => 'min:2',
         ],
         // 'job_title' => [
         //     'type' => '_name',
@@ -33,21 +41,24 @@ return [
             'col' => [
                 'sm' => 6,
             ],
+            'rules' => 'required|email|unique_table',
+        ],
+        'country_id' => [
+            'type' => 'select',
+            'name' => 'country_id',
+            'label' => 'Country',
+            'col' => [
+                'sm' => 6,
+            ],
+            'connector' => 'SystemUtility:Country|repository:list',
+            'rules' => 'sometimes|required',
+            // 'rules' => 'min:3',
         ],
         'phone' => [
             'type' => '_phone',
             'col' => [
                 'sm' => 6,
             ],
-        ],
-        'country' => [
-            'type' => '_name',
-            'name' => 'country',
-            'label' => 'Country',
-            'col' => [
-                'sm' => 6,
-            ],
-            // 'rules' => 'min:3',
         ],
         'language' => [
             'type' => '_language',
@@ -95,11 +106,65 @@ return [
         ],
     ],
     'company' => [
+        'is_personal' => [
+            'type' => 'checkbox',
+            'name' => 'is_personal',
+            'color' => 'primary',
+            'label' => 'I don\'t have a company',
+            'col' => ['cols' => 12],
+            'hideDetails' => false,
+
+            'ext' => [
+                [
+                    'set',
+                    'name',
+                    'disabled',
+                    'disable_value.*.value',
+                ],
+                [
+                    'set',
+                    'tax_id',
+                    'disabled',
+                    'disable_value.*.value',
+                ],
+                [
+                    'set',
+                    'phone',
+                    'disabled',
+                    'disable_value.*.value',
+                ],
+                [
+                    'set',
+                    'email',
+                    'disabled',
+                    'disable_value.*.value',
+                ],
+            ],
+            'disable_value' => [
+                [
+                    'id' => 0,
+                    'value' => 0,
+                ],
+                [
+                    'id' => 1,
+                    'value' => 1,
+                ],
+            ],
+            'spreadable' => true,
+        ],
         'name' => [
             'type' => '_name',
-            'label' => 'Company',
+            'label' => 'Company Name',
             'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:3',
+            // 'rules' => 'sometimes|min:3',
+        ],
+        'tax_id' => [
+            'type' => 'text',
+            'name' => 'tax_id',
+            'label' => 'Tax ID',
+            'default' => '',
+            'col' => ['sm' => 6],
+            // 'rules' => 'sometimes|min:3',
         ],
         'address' => [
             'type' => 'text',
@@ -110,13 +175,14 @@ return [
                 'sm' => 12,
             ],
         ],
-        'city' => [
-            'type' => 'text',
-            'name' => 'city',
-            'label' => 'City',
+        'country_id' => [
+            'type' => 'select',
+            'name' => 'country_id',
+            'label' => 'Country',
             'default' => '',
+            'connector' => 'SystemUtility:Country|repository:list',
             'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:3',
+            'rules' => 'sometimes|required',
         ],
         'state' => [
             'type' => 'text',
@@ -126,10 +192,10 @@ return [
             'col' => ['sm' => 6],
             'rules' => 'sometimes|min:3',
         ],
-        'country' => [
+        'city' => [
             'type' => 'text',
-            'name' => 'country',
-            'label' => 'Country',
+            'name' => 'city',
+            'label' => 'City',
             'default' => '',
             'col' => ['sm' => 6],
             'rules' => 'sometimes|min:3',
@@ -146,22 +212,24 @@ return [
             'type' => '_phone',
             'col' => ['sm' => 6],
         ],
-        'vat_number' => [
+        // 'vat_number' => [
+        //     'type' => 'text',
+        //     'name' => 'vat_number',
+        //     'label' => 'VAT Number',
+        //     'default' => '',
+        //     'col' => ['sm' => 6],
+        //     'rules' => 'sometimes|min:3',
+        // ],
+        'email' => [
             'type' => 'text',
-            'name' => 'vat_number',
-            'label' => 'VAT Number',
+            'name' => 'email',
+            'label' => 'Work E-mail',
             'default' => '',
             'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:3',
+            'rules' => 'sometimes|email',
+            'spreadable' => true,
         ],
-        'tax_id' => [
-            'type' => 'text',
-            'name' => 'tax_id',
-            'label' => 'Tax ID',
-            'default' => '',
-            'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:3',
-        ],
+
     ],
     'profile_shortcut' => [
         'id' => [
@@ -194,6 +262,9 @@ return [
         ],
     ],
     'login_shortcut' => [
+        'timezone' => [
+            'type' => '_timezone',
+        ],
         'email' => [
             'type' => 'email',
             'name' => 'email',
@@ -206,6 +277,9 @@ return [
         ],
     ],
     'login_form' => [
+        'timezone' => [
+            'type' => '_timezone',
+        ],
         'email' => [
             'type' => 'text',
             'name' => 'email',
@@ -233,5 +307,150 @@ return [
                 'lg' => 12,
             ],
         ],
-    ]
+    ],
+    'forgot_password_form' => [
+        'email' => [
+            'type' => 'text',
+            'name' => 'email',
+            'label' => 'Email',
+            'default' => '',
+        ],
+    ],
+    'reset_password_form' => [
+        'email' => [
+            'type' => 'text',
+            'name' => 'email',
+            'label' => 'Email',
+            'default' => '',
+            'col' => [
+                'cols' => 12,
+            ],
+            'readonly' => true,
+            'rules' => 'required|email',
+        ],
+        'password' => [
+            'type' => 'password',
+            'name' => 'password',
+            'label' => 'Password',
+            'default' => '',
+            'appendInnerIcon' => '$non-visibility',
+            'slotHandlers' => [
+                'appendInner' => 'password',
+            ],
+            'col' => [
+                'cols' => 12,
+            ],
+        ],
+        'password_confirmation' => [
+            'type' => 'password',
+            'name' => 'password_confirmation',
+            'label' => 'Password Confirmation',
+            'default' => '',
+            'appendInnerIcon' => '$non-visibility',
+            'slotHandlers' => [
+                'appendInner' => 'password',
+            ],
+            'col' => [
+                'cols' => 12,
+            ],
+        ],
+        'token' => [
+            'type' => 'hidden',
+            // "ext" => "hidden",
+            'name' => 'token',
+        ],
+    ],
+    'register_form' => [
+        'name' => [
+            'type' => 'text',
+            'name' => 'name',
+            'label' => 'Name',
+            'default' => '',
+            'col' => [
+                'cols' => 6,
+                'lg' => 6,
+            ],
+            'rules' => 'min:3',
+        ],
+        'surname' => [
+            'type' => 'text',
+            'name' => 'surname',
+            'label' => 'Surname',
+            'default' => '',
+            'col' => [
+                'cols' => 6,
+                'lg' => 6,
+            ],
+            'rules' => 'min:2',
+        ],
+        'company' => [
+            'type' => 'text',
+            'name' => 'company',
+            'label' => 'Company',
+            'default' => '',
+            'col' => [
+                'cols' => 6,
+                'lg' => 6,
+            ],
+            // 'rules' => 'min:2',
+        ],
+        'email' => [
+            'type' => 'text',
+            'name' => 'email',
+            'label' => 'E-mail',
+            'default' => '',
+            'col' => [
+                'cols' => 6,
+                'lg' => 6,
+            ],
+            'rules' => 'email',
+        ],
+        'password' => [
+            'type' => 'password',
+            'name' => 'password',
+            'label' => 'Password',
+            'default' => '',
+            'appendInnerIcon' => '$non-visibility',
+            'slotHandlers' => [
+                'appendInner' => 'password',
+            ],
+            'col' => [
+                'cols' => 6,
+                'lg' => 6,
+            ],
+            'rules' => [
+                ['required', 'classic', null, null, 'Password is required'],
+                ['min', 8, 'Password must be at least 8 characters'],
+            ],
+
+        ],
+        'password_confirmation' => [
+            'type' => 'password',
+            'name' => 'password_confirmation',
+            'label' => 'Repeat Password',
+            'default' => '',
+            'appendInnerIcon' => '$non-visibility',
+            'slotHandlers' => [
+                'appendInner' => 'password',
+            ],
+            'col' => [
+                'cols' => 6,
+                'lg' => 6,
+            ],
+            'rules' => [
+                ['required', 'classic', null, null, 'Confirm Password'],
+            ],
+        ],
+        'tos' => [
+            'type' => 'input-terms-checkbox',
+            'name' => 'tos',
+            'label' => 'I accept the terms of service',
+            'default' => '',
+            'col' => [
+                'cols' => 12,
+                'lg' => 12,
+            ],
+            // 'rules' => 'required',
+        ],
+    ],
 ];

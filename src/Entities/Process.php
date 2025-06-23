@@ -8,15 +8,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Unusualify\Modularity\Entities\Enums\ProcessStatus;
+use Unusualify\Modularity\Entities\Scopes\ProcessScopes;
 
 class Process extends Model
 {
+    use ProcessScopes;
+
     /**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array<int, string>
-	 */
-	protected $fillable = [
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
         'processable_id',
         'processable_type',
         'status',
@@ -53,7 +56,13 @@ class Process extends Model
 
     public function lastHistory(): HasOne
     {
-        return $this->hasOne(ProcessHistory::class)->latest();
+        // #TODO: This is a temporary fix to get the latest history
+        // $processTable = $this->getTable();
+        // $processHistoryTable = (new ProcessHistory)->getTable();
+
+        return $this->hasOne(ProcessHistory::class)
+            ->latest();
+        // ->whereRaw("{$processHistoryTable}.created_at = (select max(created_at) from {$processHistoryTable} where {$processHistoryTable}.process_id = {$processTable}.id)");
     }
 
     protected function statusLabel(): Attribute

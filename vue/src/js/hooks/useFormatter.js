@@ -1,9 +1,8 @@
 // hooks/formatter .js
 
-// import { ref, watch, computed, nextTick } from 'vue'
+import { ref, reactive, toRefs, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import _ from 'lodash-es'
-import { ref, reactive, toRefs, h } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/propsFactory.mjs'
 
 export const makeFormatterProps = propsFactory({
@@ -13,15 +12,17 @@ export const makeFormatterProps = propsFactory({
   }
 })
 // by convention, composable function names start with "use"
-export default function useFormatter (props, context, headers = []) {
+export default function useFormatter (props, context, headers = null) {
   // state encapsulated and managed by the composable
   const { d, te, t } = useI18n({ useScope: 'global' })
 
-  const formatterColumns = ref(headers.filter((h) =>
-    Object.prototype.hasOwnProperty.call(h, 'formatter') &&
-    h.formatter.length > 0 &&
-    (!Object.prototype.hasOwnProperty.call(props, 'ignoreFormatters') || !props.ignoreFormatters.includes(h.formatter[0]))
-  ))
+  const formatterColumns = computed(() => {
+    return (headers?.value ?? []).filter((h) =>
+      Object.prototype.hasOwnProperty.call(h, 'formatter') &&
+      h.formatter.length > 0 &&
+      (!Object.prototype.hasOwnProperty.call(props, 'ignoreFormatters') || !props.ignoreFormatters.includes(h.formatter[0]))
+    )
+  })
 
   const methods = reactive({
     dateFormatter: function (value, datetimeFormat = 'long') {
@@ -80,15 +81,18 @@ export default function useFormatter (props, context, headers = []) {
       }
     },
     statusFormatter:(value, placeHolders = null, colors = null) => {
+      const trueValue = value === true || value === 'true' || value === 1 || value === '1'
+
       return {
         configuration : {
-          tag: 'p',
+          tag: 'v-icon',
           attributes : {
+            size: 'small',
             style: {
-              color: colors?.[value] ?? 'red'
+              color: trueValue ? 'green' : 'red'
             },
+            icon: trueValue ? 'mdi-check' : 'mdi-close'
           },
-          elements: placeHolders?.[value] ?? value
         }
 
       }
@@ -135,7 +139,6 @@ export default function useFormatter (props, context, headers = []) {
         let notation = matches[1]
         let quoted = window.__preg_quote(matches[0])
         let parts = notation.split('.')
-        // __log(parts)
 
         let newParts = []
         for(const j in parts){
@@ -174,7 +177,6 @@ export default function useFormatter (props, context, headers = []) {
             let remainingQuote = '\\w\\s' + window.__preg_quote('çşıİğüö.,;?|:_')
             let pattern = new RegExp( String.raw`^([${remainingQuote}]+)?(${quoted})([${remainingQuote}]+)?$`)
 
-            // __log('castMatch', value, _value, value.match(pattern))
             if(value.match(pattern)){
               returnValue = value.replace(pattern, '$1' + _value + '$3')
             }else{
@@ -201,7 +203,7 @@ export default function useFormatter (props, context, headers = []) {
     const func = `${name}Formatter`
 
     try {
-      if(!value) {
+      if(value === null || value === undefined || value === '') {
         return {
           configuration: {
             elements: ''
@@ -209,6 +211,7 @@ export default function useFormatter (props, context, headers = []) {
         }
       }
       return methods[func](value, ..._(args))
+
     } catch (error) {
       console.error(`${error}: ${func}`);
     }

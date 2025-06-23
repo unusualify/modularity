@@ -53,8 +53,6 @@ class UComponent extends Component
 
     /**
      * Make a new component
-     *
-     * @return self
      */
     public static function make(): self
     {
@@ -153,13 +151,16 @@ class UComponent extends Component
     public function addChildren($element)
     {
         $oldElements = $this->elements;
+        $wasIsAssoc = false;
 
         if (! is_array($oldElements)) {
             if (! empty($oldElements)) {
                 $oldElements = [$oldElements];
             }
-        } else if (is_array($oldElements) && Arr::isAssoc($oldElements)) {
+        } elseif (is_array($oldElements) && Arr::isAssoc($oldElements)) {
             $oldElements = [$oldElements];
+            $wasIsAssoc = true;
+            // dd($wasIsAssoc);
         }
 
         $newElement = [];
@@ -173,9 +174,14 @@ class UComponent extends Component
             $newElement = $element;
         }
 
+        if (is_array($oldElements)) {
+            $oldElements[] = $newElement;
+
+        }
+
         $this->elements = is_array($oldElements)
-            ? array_merge($oldElements, $newElement)
-            : $newElement;
+            ? $oldElements
+            : [$newElement];
 
         return $this;
     }
@@ -202,12 +208,13 @@ class UComponent extends Component
      */
     public function hydrateAttributes($attributes)
     {
-        if(!empty($attributes) && $this->tag === 'ue-table'){
+        if (! empty($attributes) && $this->tag === 'ue-table') {
             dd($attributes, $this);
         }
 
         return $attributes;
     }
+
     /**
      * Call a method
      *

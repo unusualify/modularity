@@ -557,10 +557,9 @@ const formattedSummary = (data, formation) => {
 const test = () => {
 
   // samplePatterns.forEach(pattern => {
-  //   console.log(pattern, findMatchingNotations(sampleSource, pattern), sampleSource)
-  // })
 
-  // __log(JSON.stringify(formattedPreview(sampleSource, samplePreview), null, 2))
+    // })
+
 }
 
 // Helper function to recursively replace patterns in an object
@@ -785,6 +784,4 @@ const sampleSource = [
     }
   }
 ]
-
-// console.log(JSON.stringify(formattedPreview(sampleSource, samplePreview), null, 2))
 

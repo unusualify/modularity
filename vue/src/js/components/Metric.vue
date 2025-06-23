@@ -46,13 +46,21 @@
       type: String,
       default: null,
     },
+    appendIcon: {
+      type: String,
+      default: null,
+    },
+    appendIconAttributes: {
+      type: Object,
+      default: () => ({}),
+    },
   });
 
   // Compute classes based on provided props
   const cardClasses = computed(() => {
     return {
       'd-inline-block': !props.noInline,
-      'metric-card': true,
+      'ue-metric': true,
       'text-center': props.center,
       'py-1 px-1': !props.dense,
       // 'py-2 px-2': !props.dense
@@ -84,23 +92,36 @@
     :color="cardColor"
     :class="cardClasses"
   >
-    <v-card-text>
-      <div :class="valueClasses">
-        {{ value }}
-      </div>
-      <div :class="labelClasses">
-        <v-icon
-          v-if="icon"
-          :icon="icon"
-
-        />
-        {{ label }}
+    <v-card-text class="pa-3 pr-0">
+      <div class="d-flex">
+        <div v-if="appendIcon" class="d-flex align-center justify-center me-2">
+          <v-icon
+          v-bind="appendIconAttributes"
+          :icon="appendIcon"
+          />
+        </div>
+        <div>
+          <slot name="value" v-bind="{ value, classes: valueClasses }">
+            <div :class="valueClasses">
+              {{ value }}
+            </div>
+          </slot>
+          <slot name="label" v-bind="{ label, classes: labelClasses, icon }">
+            <div :class="labelClasses">
+              <v-icon
+                v-if="icon"
+                :icon="icon"
+              />
+              {{ label }}
+            </div>
+          </slot>
+        </div>
       </div>
     </v-card-text>
   </v-card>
 </template>
 
 <style scoped lang="sass">
-  .metric-card
+  .ue-metric
     transition: all 0.2s
 </style>

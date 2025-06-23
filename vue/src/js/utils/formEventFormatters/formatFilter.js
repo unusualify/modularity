@@ -33,6 +33,7 @@ export default async function formatFilter(args, model, schema, input, index = n
 
   let setterNotation = `${inputNotation}.${inputPropToFormat}`
   let eagers = _.get(schema, `${inputNotation}.eagers`) ?? [];
+  let lazy = _.get(schema, `${inputNotation}.lazy`) ?? [];
 
   if( !_.get(schema, setterNotation))
     _.set(schema, setterNotation, [])
@@ -50,10 +51,15 @@ export default async function formatFilter(args, model, schema, input, index = n
 
     if( !newItems.find((el) => el.id == id) ) {
       try {
+        let params = {}
+        if(lazy.length > 0){
+          params.lazy = lazy
+        }
+        if(eagers.length > 0){
+          params.eagers = eagers
+        }
         let res = await axios.get(endpoint.replace(`{${_.snakeCase(modelValue)}}`, id), {
-          params: {
-            eagers: eagers
-          }
+          params
         })
 
         newItems.push(res.data)

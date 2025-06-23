@@ -17,13 +17,32 @@ use Unusualify\Modularity\Http\Controllers\ProfileController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::resource('', 'DashboardController', ['as' => 'dashboard', 'names' => ['index' => 'dashboard']])->only(['index']);
+Route::get('/email/verify/{id}/{hash}', 'VerificationController@verify')
+    ->middleware(['signed'])
+    ->name('verification.verify');
+
+Route::get('/email/verification-notification', 'VerificationController@send')
+    ->middleware(['throttle:6,1,email-verification'])
+    ->name('verification.send');
+
+Route::prefix('register')->as('register.')
+    ->withoutMiddleware(['modularity.panel', 'web.auth', 'modularity.core'])
+    ->middleware(['web', 'modularity.core'])
+    ->group(function () {
+
+        Route::get('/password/generate/{token}', 'PasswordController@showForm')
+            ->name('password.generate.form');
+        Route::post('/password/generate', 'PasswordController@savePassword')
+            ->name('password.generate');
+    });
 
 Route::singleton('profile', 'ProfileController', ['names' => ['edit' => 'profile']]);
 Route::group(['prefix' => 'profile', 'as' => 'profile.'], function () {
     Route::get('show', [ProfileController::class, 'display'])->name('show');
 });
 Route::put('profile/company', 'ProfileController@updateCompany')->name('profile.company');
+
+Route::resource('', 'DashboardController', ['as' => 'dashboard', 'names' => ['index' => 'dashboard']])->only(['index']);
 
 Route::get('users/impersonate/stop', 'ImpersonateController@stopImpersonate')->name('impersonate.stop');
 Route::get('users/impersonate/{id}', 'ImpersonateController@impersonate')->name('impersonate');
@@ -69,3 +88,5 @@ Route::prefix('api')->group(function () {
         });
     }
 });
+
+Route::post('modularity/metrics', 'MetricController')->name('modularity.metrics');

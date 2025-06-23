@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Hydrates\Inputs;
 
-use Spatie\Permission\Models\Role;
 use Unusualify\Modularity\Facades\Modularity;
 
 class AuthorizeHydrate extends InputHydrate
@@ -68,7 +67,7 @@ class AuthorizeHydrate extends InputHydrate
                 }
             }
 
-            $input['items'] = !$this->skipQueries
+            $input['items'] = ! $this->skipQueries
                 ? $q->get(['id', 'name'])
                 : [];
 

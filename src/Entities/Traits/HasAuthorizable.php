@@ -2,13 +2,15 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Unusualify\Modularity\Entities\Authorization;
+use Unusualify\Modularity\Traits\Allowable;
 
 trait HasAuthorizable
 {
+    use Allowable;
     // protected $defaultAuthorizedModel = \App\Models\User::class;
 
     protected static $hasAuthorizableFillable = ['authorized_id', 'authorized_type'];
@@ -102,8 +104,6 @@ trait HasAuthorizable
 
     /**
      * Get the authorization record associated with this model
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
     public function authorizationRecord(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
@@ -112,8 +112,6 @@ trait HasAuthorizable
 
     /**
      * Get the authorized user associated with this model through the authorization record
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
      */
     public function authorizedUser(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
@@ -127,17 +125,27 @@ trait HasAuthorizable
         );
     }
 
+    protected function isAuthorized(): Attribute
+    {
+        return new Attribute(
+            get: function () {
+                return $this->authorizedUser()->exists();
+            }
+        );
+    }
+
     /**
      * Get the authorized model class from the authorization record or default
      *
      * @return string The fully qualified class name of the authorized model
+     *
      * @throws \Exception If there's an error retrieving the model
      */
     final public function getAuthorizedModel()
     {
         try {
             return $this->authorizationRecord()->exists()
-                ? $this->authorizationRecord->authorized_type
+                ? ($this->authorizationRecord ? $this->authorizationRecord->authorized_type : $this->getDefaultAuthorizedModel())
                 : $this->getDefaultAuthorizedModel();
         } catch (\Exception $e) {
             dd($this, $this->authorizationRecord, $e);
@@ -154,6 +162,21 @@ trait HasAuthorizable
         return static::$defaultAuthorizedModel ?? \App\Models\User::class;
     }
 
+    public function getUserForHasAuthorization($user = null)
+    {
+        if (! Auth::check() && ! $user) {
+            return null;
+        }
+
+        $user = $user ?? Auth::user();
+
+        if (! $user) {
+            return null;
+        }
+
+        return $user;
+    }
+
     /**
      * Scope query to only include records authorized for the given user
      *
@@ -163,13 +186,7 @@ trait HasAuthorizable
      */
     public function scopeHasAuthorization($query, $user = null)
     {
-        if (! Auth::check()) {
-            return $query;
-        }
-
-        $user = $user ?? Auth::user();
-
-        if (! $user) {
+        if (! ($user = $this->getUserForHasAuthorization($user))) {
             return $query;
         }
 
@@ -178,12 +195,12 @@ trait HasAuthorizable
             $rolesToCheck = static::$authorizableRolesToCheck ?? null;
 
             // If no specific roles defined, get all roles from the user
-            if (! (is_null($rolesToCheck) || empty($rolesToCheck)) ) {
+            if (! (is_null($rolesToCheck) || empty($rolesToCheck))) {
                 // Check for specific roles
                 $roleModel = config('permission.models.role');
                 $existingRoles = $roleModel::whereIn('name', $rolesToCheck)->get();
 
-                if (!$user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
+                if (! $user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
                     return $query;
                 }
             }
@@ -193,6 +210,69 @@ trait HasAuthorizable
         return $query->whereHas('authorizationRecord', function ($query) use ($user) {
             $query->where('authorized_id', $user->id)
                 ->where('authorized_type', get_class($user));
+        });
+    }
+
+    /**
+     * Check if the current user has authorization usage
+     *
+     * @return bool
+     */
+    public function hasAuthorizationUsage()
+    {
+        if (! ($user = $this->getUserForHasAuthorization())) {
+            return false;
+        }
+
+        return $this->isAllowedItem(
+            item: $this,
+            searchKey: 'allowedRolesForAuthorizationManagement',
+            disallowIfUnauthenticated: false
+        );
+    }
+
+    public function scopeIsAuthorizedToYou($query)
+    {
+        if (! ($user = $this->getUserForHasAuthorization())) {
+            return $query;
+        }
+
+        return $query->whereHas('authorizationRecord', function ($query) use ($user) {
+            $query->where('authorized_id', $user->id)
+                ->where('authorized_type', get_class($user));
+        });
+    }
+
+    public function scopeIsAuthorizedToYourRole($query)
+    {
+        if (! ($user = $this->getUserForAssignable())) {
+            return $query;
+        }
+
+        $userModel = get_class($user);
+        $userRoles = $user->roles;
+
+        return $query->whereHas('authorizationRecord', function ($query) use ($userModel, $userRoles) {
+            $query->where('authorized_type', $userModel)
+                ->whereHas('authorized', function ($query) use ($userRoles) {
+                    $query->role($userRoles);
+                });
+        });
+    }
+
+    public function scopeHasAnyAuthorization($query)
+    {
+        return $query->whereHas('authorizationRecord', function ($query) {
+            $query->whereNotNull('authorized_id')
+                ->whereNotNull('authorized_type');
+        });
+    }
+
+    public function scopeUnauthorized($query)
+    {
+        return $query->whereDoesntHave('authorizationRecord', function ($query) {
+            $query->whereNotNull('authorized_id')
+                ->whereNotNull('authorized_type');
         });
     }
 }

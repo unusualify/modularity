@@ -188,7 +188,7 @@ export default {
     // 'a17-checkbox': a17Checkbox
   },
   setup (props, { attrs, slots, emit }) {
-    // __log(props, attrs, slots, emit)
+
   },
   props: {
     ...makeModalMediaProps(),
@@ -289,10 +289,6 @@ export default {
       return navItem[0]
     },
     canInsert: function () {
-      // __log(
-      //   this.selectedMedias,
-      //   this.usedMedias
-      // )
       return !this.selectedMedias.some(sMedia => !!this.usedMedias.find(uMedia => uMedia.id === sMedia.id))
     },
     ...mapState({
@@ -557,7 +553,6 @@ export default {
       // let formdata = null;
       const form = this.$refs.form
       const formdata = self.cleanEmptyFilters(this.sharedFilterState);
-      // console.log(formdata)
 
       // see api/media-library for actual ajax
       api.get(this.endpoint, formdata, (resp) => {
@@ -663,7 +658,6 @@ export default {
   },
 
   created () {
-    // __log(this.type)
     if (!this.gridLoaded) {
       this.reloadGrid()
     }

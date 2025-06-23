@@ -227,6 +227,7 @@ class Finder
                     $reflection->isUserDefined()
                     && ! $reflection->isTrait()
                     && ! $reflection->isAbstract()
+                    && ! $reflection->isInterface()
                     && $reflection->isSubclassOf("Illuminate\Database\Eloquent\Model")
                 ) {
                     // dd($reflection->getName());

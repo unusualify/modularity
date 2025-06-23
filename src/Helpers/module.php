@@ -477,39 +477,37 @@ if (! function_exists('backtrace_formatted')) {
  * @param bool $returnResult Whether to return the result of the callback
  * @return mixed Time elapsed in seconds or [time, result] if $returnResult is true
  */
-if (!function_exists('benchmark')) {
-    function benchmark(callable $callback, string $label = null, bool $die = false, $unit = 'milliseconds')
+if (! function_exists('benchmark')) {
+    function benchmark(callable $callback, ?string $label = null, bool $die = false, $unit = 'milliseconds')
     {
-        if(!$die && is_null($label)){
+        if (! $die && is_null($label)) {
             throw new \Exception('Label is required');
         }
 
-        if(!$die && !modularityConfig('benchmark_enabled', false)){
+        if (! $die && ! modularityConfig('benchmark_enabled', false)) {
             return $callback();
         }
 
-        if(!in_array($unit, ['microseconds', 'milliseconds', 'seconds'])){
+        if (! in_array($unit, ['microseconds', 'milliseconds', 'seconds'])) {
             throw new \Exception('Invalid unit: ' . $unit);
         }
 
         $startTime = microtime(true);
-
 
         $result = $callback();
 
         // $elapsed is in seconds by default from microtime(true)
         $elapsed = microtime(true) - $startTime;
 
-        if($unit === 'microseconds') {
+        if ($unit === 'microseconds') {
             $elapsed = $elapsed * 1000000;
-        } else if($unit === 'milliseconds') {
+        } elseif ($unit === 'milliseconds') {
             $elapsed = $elapsed * 1000;
         }
 
-
         $elapsedString = $elapsed . ' in ' . $unit;
 
-        if($die){
+        if ($die) {
             dd($elapsedString);
         }
 
@@ -523,7 +521,7 @@ if (!function_exists('benchmark')) {
         $logged = false;
         $logEvent = null;
 
-        if($elapsedMs > $emergencyThreshold){
+        if ($elapsedMs > $emergencyThreshold) {
             // $modularityLogPath = concatenate_path($modularityLogDir, 'emergency.log');
             // $channel['path'] = $modularityLogPath;
             $logEvent = 'emergency';
@@ -531,7 +529,7 @@ if (!function_exists('benchmark')) {
             $logged = true;
         }
 
-        if(!$logged && modularityConfig('benchmark_log_level') === 'debug'){
+        if (! $logged && modularityConfig('benchmark_log_level') === 'debug') {
             // $modularityLogPath = concatenate_path($modularityLogDir, 'debug.log');
             // $channel['path'] = $modularityLogPath;
 
@@ -549,7 +547,7 @@ if (!function_exists('benchmark')) {
         //     $logged = true;
         // }
 
-        if($logged && $logEvent){
+        if ($logged && $logEvent) {
             // Log::build($channel)
             Log::channel('modularity-benchmark')
                 ->{$logEvent}($message);

@@ -6,13 +6,20 @@
     class="v-input-checklist"
     >
     <template v-slot:default="defaultSlot">
-      <div class="v-input-checklist__field d-flex">
+      <div
+        :class="[
+          'v-input-checklist__field d-flex',
+          flexColumn && $vuetify.display.mdAndUp ? 'flex-wrap' : 'flex-wrap'
+        ]"
+        style="max-width: 100%;"
+      >
         <div v-if="label"
           class="d-flex flex-column"
           :style="[
-            !flexColumn ? 'flex: 0 1 25%;' : ''
+            'max-width: 100%;',
+            (flexColumn && $vuetify.display.mdAndUp) ? 'flex: 0 1 30%;' : 'flex: 1 0 100%;'
           ]"
-          >
+        >
           <ue-title v-if="label" padding="x-3" data-test="title" :color="labelColor" transform="none">
             {{ label }}
           </ue-title>
@@ -28,10 +35,14 @@
           </ue-title>
         </div>
 
-        <v-divider v-if="label || subtitle" vertical class="mr-4"></v-divider>
+        <v-divider v-if="(flexColumn && $vuetify.display.mdAndUp) && (label || subtitle)" vertical class="mr-4"></v-divider>
 
         <!-- treeview -->
-        <v-row v-if="isTreeview">
+        <v-row v-if="isTreeview"
+          :style="[
+            flexColumn && $vuetify.display.mdAndUp ? 'flex: 1 0 70%;' : 'flex: 1 1;'
+          ]"
+        >
           <v-col v-bind="{...treeviewCols}">
 
             <v-list v-model:opened="openedGroups">
@@ -61,7 +72,7 @@
                         density="compact"
                         :modelValue="isAllSelected(group)"
                         @update:modelValue="updatedParent($event, group)"
-                        :readonly="isMandatoryItem(group)"
+                        :readonly="isMandatoryItem(group) || readonly"
                       >
                         <template v-slot:prepend>
                           <v-icon
@@ -126,7 +137,7 @@
                               hide-details
                               :label="item[itemTitle]"
                               :class="getCheckboxClasses(item)"
-                              :readonly="isMandatoryItem(item)"
+                              :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
                             >
                               <!-- checkbox is on right -->
                               <template v-if="checkboxOnRight" #label>
@@ -153,7 +164,7 @@
                         color="success"
                         hide-details
                         density="compact"
-                        :readonly="isMandatoryItem(item)"
+                        :readonly="isMandatoryItem(item) || readonly"
                         >
                       </v-checkbox>
                     </v-list-item>
@@ -171,7 +182,7 @@
                       :label="group[`${itemTitle}`]"
                       :value="group[`${itemValue}`]"
                       :disabled="!canSelectMore() && !input.includes(group[itemValue])"
-                      :readonly="isMandatoryItem(group)"
+                      :readonly="isMandatoryItem(group) || isProtected(group[itemValue]) || readonly"
                       color="success"
                       hide-details
                       density="compact"
@@ -188,11 +199,11 @@
 
         <!-- standard checkbox list -->
         <v-row v-else
-            :style="[
-              !flexColumn ? 'flex: 1 0 60%;' : ''
-            ]"
-          >
-          <template v-for="(item, index) in items"
+          :style="[
+            flexColumn && $vuetify.display.mdAndUp ? 'flex: 1 1 60%;' : 'flex: 1 1;'
+          ]"
+        >
+          <template v-for="(item, index) in flattenedItems"
               :key="`checkbox-${index}`">
               <v-col v-bind="checkboxCol"
                 class=""
@@ -201,12 +212,12 @@
                   v-if="isCard"
                   v-model="input"
                   :value="item[itemValue]"
-                  :class="getCheckboxClasses(item)"
+                  :class="[getCheckboxClasses(item), 'h-100']"
                   :color="checkboxColor"
                   :title="item[itemTitle]"
                   :description="item.description"
                   :disabled="($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue]))"
-                  :readonly="isMandatoryItem(item)"
+                  :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
                   :checkboxOnRight="checkboxOnRight"
                   :stats="getCardStats(item)"
                 />
@@ -225,7 +236,7 @@
                     hide-details
                     :label="item[itemTitle]"
                     :class="getCheckboxClasses(item)"
-                    :readonly="isMandatoryItem(item)"
+                    :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
                   >
                     <template v-if="checkboxOnRight" #label>
                       <span></span>
@@ -260,6 +271,10 @@
         type: Boolean,
         default: false
       },
+      readonly: {
+        type: Boolean,
+        default: false
+      },
       subtitle: {
         type: String,
         default: null
@@ -275,6 +290,14 @@
       items: {
         type: Array,
         default: () => []
+      },
+      orderBy: {
+        type: String,
+        default: null
+      },
+      orderByDirection: {
+        type: String,
+        default: 'asc'
       },
       checkboxColor: {
         type: String,
@@ -371,6 +394,12 @@
         return max ?? 999
       })
 
+      const protectedValues = ref(props.protectInitialValue ? props.modelValue : [])
+
+      const isProtected = (id) => {
+        return protectedValues.value.includes(id)
+      }
+
       const initializeInput = (input) => {
         if(props.mandatory){
           let mandatoryItems = props.items.filter((item) => __data_get(item, props.mandatory, false))
@@ -410,13 +439,31 @@
 
       const openedGroups = ref([])
 
+      const flattenedItems = computed(() => {
+        let items = props.items
+
+        if(props.orderBy){
+          items.sort((a, b) => {
+            if(props.orderByDirection === 'asc'){
+              return a[props.orderBy].localeCompare(b[props.orderBy])
+            } else {
+              return b[props.orderBy].localeCompare(a[props.orderBy])
+            }
+          })
+        }
+
+        return items
+      })
+
       return {
         ...useInput(props, {
           ...context,
           initializeInput
         }),
         openedGroups: toRef(openedGroups),
-        maxSelectable
+        maxSelectable,
+        isProtected,
+        flattenedItems
       }
     },
 
@@ -577,14 +624,27 @@
         }
 
         const array = Object.values(groups)
+
         array.sort(function (left, right) {
-          return left.hasOwnProperty('items') ? 1 : right.hasOwnProperty('items') ? -1 : 0
+          return left.hasOwnProperty('items') ? 1 : (right.hasOwnProperty('items') ? -1 : 0)
         })
 
         if(this.closeAllGroups){
           this.openedGroups = []
         } else {
           this.openedGroups = !this.openAllGroups ? [array[0].name] : array.map((group) => group.name)
+        }
+
+        if(this.orderBy){
+          for(const i in array){
+            array[i].items.sort((a, b) => {
+              if(this.orderByDirection === 'asc'){
+                return a[this.orderBy].localeCompare(b[this.orderBy])
+              } else {
+                return b[this.orderBy].localeCompare(a[this.orderBy])
+              }
+            })
+          }
         }
 
         return array

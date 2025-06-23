@@ -4,13 +4,14 @@ namespace Unusualify\Modularity\Http\Controllers\Traits\Form;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Request;
-use Unusualify\Modularity\Support\Finder;
+use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Support\Finder;
 use Unusualify\Modularity\Traits\Allowable;
+
 trait FormSchema
 {
     use Allowable;
@@ -30,6 +31,7 @@ trait FormSchema
 
     /**
      * Create the form schema
+     *
      * @param array $inputs
      * @return array
      */
@@ -42,6 +44,7 @@ trait FormSchema
 
     /**
      * Get the schema input
+     *
      * @param array $input
      * @param array $inputs
      * @return array
@@ -228,7 +231,7 @@ trait FormSchema
 
                 $foreignKey = $this->getForeignKeyFromName($this->routeName);
 
-                $input['type'] =  $input['component'] ?? 'input-repeater';
+                $input['type'] = $input['component'] ?? 'input-repeater';
                 // $input['label'] ??= pluralize($this->getHeadline($input['name']));
                 $input['autoIdGenerator'] ??= false;
 
@@ -318,7 +321,7 @@ trait FormSchema
                             throw new \Exception('Repository or connector not found on morphTo input: ' . $name);
                         }
 
-                        $columns = $modelClass->getColumns();
+                        $columns = $modelClass->getTableColumns();
                         $intersects = array_values(array_intersect($foreignKeys, $columns));
                         if (count($intersects) > 0) {
                             $isCascadeable = true;
@@ -386,7 +389,7 @@ trait FormSchema
                 $morphId = $input['morphId'] ?? makeMorphForeignKey(get_class_short_name($model));
                 $morphType = $input['morphType'] ?? makeMorphForeignType(get_class_short_name($model));
 
-                $columns = $modelInstance->getColumns();
+                $columns = $modelInstance->getTableColumns();
 
                 if (! (in_array($morphId, $columns) && in_array($morphType, $columns))) {
                     throw new \Exception("{$morphType} and {$morphId} columns are not present in the model " . $model);
@@ -432,7 +435,7 @@ trait FormSchema
                     return [
                         'name' => $polymorphic['name'],
                         'type' => $repositoryInstance->getModel()::class,
-                        'items' => !$this->request->ajax() ? $repositoryInstance->list() : [],
+                        'items' => ! $this->request->ajax() ? $repositoryInstance->list() : [],
                     ];
                 })->toArray();
 
@@ -528,13 +531,12 @@ trait FormSchema
      */
     protected function hydrateInputType(&$input)
     {
-        if (array_key_exists($input['type'], $this->inputTypes)) {
-            $input = array_merge($this->inputTypes[$input['type']], Arr::except($input, ['type']));
-        }
+        $input = hydrate_input_type($input);
     }
 
     /**
      * Hydrate the input connector
+     *
      * @param array $input
      * @return void
      */
@@ -560,7 +562,7 @@ trait FormSchema
 
             switch ($targetType) {
                 case 'uri':
-                    $input['endpoint'] = $targetModule->getRouteActionUri($routeName, empty($types) ? 'index' : array_shift($types));
+                    $input['endpoint'] = $targetModule->getRouteActionUrl($routeName, empty($types) ? 'index' : array_shift($types));
 
                     break;
                 default:
@@ -574,6 +576,7 @@ trait FormSchema
 
     /**
      * Hydrate the input extension
+     *
      * @param array $input
      * @param array $data
      * @param array $arrayable
@@ -743,7 +746,7 @@ trait FormSchema
 
                                 $routeName = $this->getStudlyName($r['name']);
 
-                                return [$r['name'] => $targetModule->getRouteActionUri($routeName, 'show')];
+                                return [$r['name'] => $targetModule->getRouteActionUrl($routeName, 'show')];
                             });
                         }
 
@@ -753,7 +756,7 @@ trait FormSchema
                             $targetModule = Modularity::find($targetModuleName);
 
                             if ($targetModule) {
-                                $filterEndpoint = $targetModule->getRouteActionUri($routeName, 'show');
+                                $filterEndpoint = $targetModule->getRouteActionUrl($routeName, 'show');
                             }
                         }
                         if ($filterEndpoint) {
@@ -852,6 +855,7 @@ trait FormSchema
                         if ($inputToFormat) {
                             $events[] = "formatRemoveValue:{$inputToFormat}";
                         }
+
                         break;
                     case 'toggleInput': // to toggle d-none class and rawRules
                         $inputToFormat = array_shift($args) ?? '';
@@ -861,6 +865,7 @@ trait FormSchema
                         if ($inputToFormat) {
                             $events[] = "formatToggleInput:{$inputToFormat}:{$toggleValue}:{$toggleLevel}";
                         }
+
                         break;
                     default:
                         // code...

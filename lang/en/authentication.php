@@ -36,7 +36,18 @@ return [
     'register-description' => 'Congratulations! Your registration is complete.',
     'register-button_text' => 'Go to Sign In?',
 
+    'generate-password' => 'Generate Password',
+
     'confirm-provider' => 'Confirm your {provider} account',
     'complete-registration-title' => 'COMPLETE REGISTRATION',
     'complete-registration' => 'Complete Registration',
+
+    'verification-complete' => 'Verification',
+    'verification-complete-description' => 'Your email has been verified.',
+
+    'success' => 'Authentication successful',
+    'success-description' => 'You have been successfully authenticated.',
+
+    'terms-policy' => 'Terms Policy',
+    'conditions-policy' => 'Conditions Policy',
 ];

@@ -46,7 +46,7 @@
       :loading="loading"
       @click="$emit('complete')"
     >
-      {{ $t('Complete').toUpperCase() }}
+      {{ $t('Complete Request').toUpperCase() }}
     </v-btn-secondary>
   </v-sheet>
     <!-- </div> -->

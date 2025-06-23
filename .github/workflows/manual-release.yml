@@ -1,24 +1,54 @@
 name: Manual Release
+
 on:
   workflow_dispatch:
     inputs:
+      initial_tag:
+        type: string
+        description: The initial tag name
+        default: v0.0.0
+      prerelease:
+        type: choice
+        description: Prerelease mode
+        options:
+          - 'false'
+          - 'alpha'
+          - 'beta'
+          - 'rc'
+      force_release:
+        type: boolean
+        description: Force release
+        default: false
       tag:
-        description: The semantic tag name
-        required: true
-
+        type: string
+        description: The tag name
+        default: ''
 permissions:
   contents: write
 
 jobs:
-  test:
+  release:
+    # needs: test
+    name: Release
+    # if: success()
     runs-on: ubuntu-latest
-    name: Test
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: oobook/automated-release@v1
+
+      - uses: oobook/automated-tag@v1
+        id: tag-generation
+        with:
+          gh_token: ${{ github.token }}
+          initial_tag: ${{ github.event.inputs.initial_tag }}
+          prerelease: ${{ github.event.inputs.prerelease }}
+          force_release: ${{ github.event.inputs.force_release }}
+          tag: ${{ github.event.inputs.tag }}
+
+      - name: Create Release
+        uses: oobook/automated-release@v1
+        id: release-generation
         with:
           gh_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.event.inputs.tag }}
-          prerelease: 'true'
-
+          tag: "${{ steps.tag-generation.outputs.tag }}"
+          prerelease: true

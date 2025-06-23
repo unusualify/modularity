@@ -6,7 +6,10 @@ import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 import { omit } from 'lodash-es'
 
 export const makeInputProps = propsFactory({
-  modelValue: null,
+  modelValue: {
+    type: [Array, Object, String, Number, Boolean],
+    default: null
+  },
   obj: {
     type: Object,
     default () {
@@ -20,6 +23,26 @@ export const makeInputProps = propsFactory({
   hideIfEmpty: {
     type: Boolean,
     default: false
+  },
+  default: {
+    type: [Array, Object, String, Number, Boolean],
+    default: null
+  },
+  protectInitialValue: {
+    type: Boolean,
+    default: false
+  },
+  isEditing: {
+    type: Boolean,
+    default: false
+  },
+  editable: {
+    type: [Boolean, String],
+    default: true
+  },
+  creatable: {
+    type: [Boolean, String],
+    default: true
   }
 })
 export const makeInputEmits = [
@@ -37,6 +60,8 @@ export const makeInputEmits = [
   'click:minute',
   'click:second',
 
+  'update:input',
+
 ]
 export const makeInputInjects = ['manualValidation']
 
@@ -53,6 +78,14 @@ export default function useInput (props, context) {
     input: computed({
       get: () => {
         let _val = modelValue.value ?? props?.default ?? props?.obj?.schema?.default ?? []
+
+        if(Array.isArray(_val) && Object.prototype.hasOwnProperty.call(props, 'multiple') && !props.multiple && _val.length === 0){
+          _val = !Array.isArray(modelValue.value) ? modelValue.value : null
+        }
+
+        if(!Array.isArray(_val) && Object.prototype.hasOwnProperty.call(props, 'multiple') && props.multiple){
+          _val = []
+        }
 
         return context.initializeInput ? context.initializeInput(_val) : _val
       },

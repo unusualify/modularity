@@ -2,11 +2,9 @@
 
 namespace Modules\SystemUser\Repositories;
 
-use Illuminate\Support\Arr;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Repositories\Repository;
 use Unusualify\Modularity\Repositories\Traits\FilepondsTrait;
-use Unusualify\Modularity\Entities\UserOauth;
 
 class UserRepository extends Repository
 {
@@ -29,12 +27,13 @@ class UserRepository extends Repository
     /**
      * @param \Laravel\Socialite\Contracts\User $oauthUser
      * @param string $provider
-     * @return boolean
+     * @return bool
      */
     public function oauthIsUserLinked($oauthUser, $provider)
     {
-        //dd('Is user linked');
+        // dd('Is user linked');
         $user = $this->oauthUser($oauthUser);
+
         return $user->providers()
             ->where(['provider' => $provider, 'oauth_id' => $oauthUser->id])
             ->exists();
@@ -71,14 +70,14 @@ class UserRepository extends Repository
         // $defaultRole = twillModel('role')::where('name', config('twill.oauth.permissions_default_role'))->first();
 
         // } else {
-             //$roleKeyValue = ['role' => config('twill.oauth.default_role')];
+        // $roleKeyValue = ['role' => config('twill.oauth.default_role')];
         // }
 
         $fullName = $oauthUser->name;
-        $nameWithSurname= name_surname_resolver($fullName);
+        $nameWithSurname = name_surname_resolver($fullName);
         $nameArray = array_slice($nameWithSurname, 0, count($nameWithSurname) - 1);
-        $name = implode(" ",$nameArray);
-        $surname= end($nameWithSurname);
+        $name = implode(' ', $nameArray);
+        $surname = end($nameWithSurname);
         $email = $oauthUser->email;
         // dd(
         //     [
@@ -92,8 +91,7 @@ class UserRepository extends Repository
             'surname' => $surname,
             'email' => $email,
             'published' => true,
-        ] /*+ $roleKeyValue*/);
-
+        ] /* + $roleKeyValue */);
 
         $user->save();
 
@@ -103,5 +101,4 @@ class UserRepository extends Repository
 
         return $user;
     }
-
 }

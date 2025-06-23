@@ -24,5 +24,4 @@ interface Repository
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function getModel();
-
 }

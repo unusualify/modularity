@@ -26,6 +26,7 @@
         :key="`tag-${level}-${i}`"
         :level="level+1"
         :configuration="_configuration"
+        :bind-data="bindData ?? {}"
       />
     </template>
     <template v-if="isObject(configuration.elements)">
@@ -33,6 +34,7 @@
         :key="`tag-${level}-${i}`"
         :level="level+1"
         :configuration="configuration.elements"
+        :bind-data="bindData ?? {}"
       />
     </template>
 
@@ -42,10 +44,11 @@
 
     <template v-for="(slotConf,slotName) in slots"
       :key="`tag-${level}-slot-${slotName}`"
-      v-slot:[`${slotName}`]>
+      v-slot:[`${slotName}`]="slotScope">
       <ue-recursive-stuff
         :level="level+1"
         :configuration="slotConf"
+        :bind-data="{...bindData, ...slotScope}"
       />
     </template>
     <!-- <ue-recursive-stuff
@@ -64,7 +67,7 @@ import { reduce, get, cloneDeep, isArray, isString, isNumber } from 'lodash-es'
 export default {
   props: {
     configuration: {
-      type: Object,
+      type: [Object, Array, String],
       default () {
         return {}
       }
@@ -84,13 +87,11 @@ export default {
     // const vFitGrid = resolveDirective('fit-grid')
     // const directives = [vFitGrid];
     // const directives = props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : []
-    // __log(directives)
-    // console.log(props.configuration.value);
+
     const FuncPattern = /^\{(.*)\}$/
     const CastPattern = /\$([\w|.|\_|\-]+)/
 
     const slots = computed(() => {
-      // console.log(props.configuration);
       if(props.configuration.hasOwnProperty('slots'))
         return props.configuration.slots
       else
@@ -272,7 +273,7 @@ export default {
     }
   },
   created () {
-    // console.log(this.configuration)
+
   }
 }
 </script>

@@ -14,25 +14,58 @@ class UserRequest extends Request
     public function rulesForAll()
     {
         return [
+            'roles' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $rolesTable = config('permission.table_names.roles', 'sp_roles');
+                    // Get superadmin role ID
+                    $superadminRole = \DB::table($rolesTable)
+                        ->where('name', 'superadmin')
+                        ->first();
 
+                    if ($superadminRole) {
+                        $superadminId = $superadminRole->id;
+
+                        // Check if roles is an array
+                        if (is_array($value)) {
+                            if (in_array($superadminId, $value)) {
+                                $fail('The roles field cannot contain the superadmin role.');
+                            }
+                        } else {
+                            // Check if roles is a single integer ID
+                            if ((int) $value === $superadminId) {
+                                $fail('The roles field cannot be the superadmin role.');
+                            }
+                        }
+                    }
+                },
+            ],
         ];
     }
 
     public function rulesForCreate()
     {
-        $table_name = $this->model()->getTable();
-
         return [
-            // 'name' => "sometimes|required|unique:$table_name|min:4",
+            'name' => 'sometimes|required|min:2',
+            'email' => 'sometimes|required|email|unique_table',
+            'country_id' => 'sometimes|required|exists:um_countries,id',
         ];
     }
 
     public function rulesForUpdate()
     {
-        $table_name = $this->model()->getTable();
-
         return [
-            // 'name' => "sometimes|required|min:3|unique:{$table_name},name,".$this->id,
+            'name' => 'sometimes|required|min:2',
+            'email' => 'sometimes|required|email|unique_table',
+            'country_id' => 'sometimes|required|exists:um_countries,id',
+            // 'roles' => 'missing',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'roles.unique' => 'The superadmin role is not allowed to be assigned to a user.',
         ];
     }
 }

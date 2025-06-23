@@ -1,5 +1,8 @@
 <template>
-  <div :class="fillHeight ? '' : ''"
+  <div
+    :class="[
+      'ue-form',
+    ]"
     :style="{height: fillHeight ? ($vuetify.display.mdAndDown ? `calc(97vh - 64px)` : `calc(97vh)` ) : ''}">
     <v-form
       :id="id"
@@ -13,7 +16,7 @@
       <input v-if="!async" type="hidden" name="_token" :value="$csrf"/>
 
       <!-- Header Section -->
-      <div :class="[(hasDivider || title) ? 'pb-6' : '', scrollable ? 'flex-grow-0' : '']">
+      <div :class="[(hasDivider || title) ? 'pb-6 px-1' : '', scrollable ? 'flex-grow-0' : '']">
         <ue-title
           v-if="!noTitle && title"
           padding="b-3"
@@ -34,7 +37,14 @@
                 :actions="actions"
                 :is-editing="isEditing"
                 @action-complete="$emit('actionComplete', $event)"
-              />
+              >
+                <template #prepend>
+                  <slot name="actions.prepend"></slot>
+                </template>
+                <template #append>
+                  <slot name="actions.append"></slot>
+                </template>
+              </FormActions>
 
               <!-- Slot for headerCenter -->
               <slot name="headerCenter">
@@ -47,7 +57,14 @@
                 :actions="actions"
                 :is-editing="isEditing"
                 @action-complete="$emit('actionComplete', $event)"
-              />
+              >
+                <template #prepend="actionsScope">
+                  <slot name="actions.prepend" v-bind="actionsScope"></slot>
+                </template>
+                <template #append="actionsScope">
+                  <slot name="actions.append" v-bind="actionsScope"></slot>
+                </template>
+              </FormActions>
 
               <FormEvents v-if="formEventSchema && formEventSchema.length && model"
                 :events="formEventSchema"
@@ -86,14 +103,21 @@
       <div :class="['d-flex', scrollable ? 'flex-grow-1 overflow-hidden mr-n5' : '']">
         <div :class="['w-100 d-flex', scrollable ? 'overflow-y-auto pr-3' : '']"
         >
-          <div class="flex-grow-1">
+          <div class="flex-grow-1 px-1">
             <!-- Top Form Actions -->
             <FormActions v-if="actionsPosition == 'top' && isEditing"
               :modelValue="formItem"
               :actions="actions"
               :is-editing="isEditing"
               @action-complete="$emit('actionComplete', $event)"
-            />
+            >
+              <template #prepend="actionsScope">
+                <slot name="actions.prepend" v-bind="actionsScope"></slot>
+              </template>
+              <template #append="actionsScope">
+                <slot name="actions.append" v-bind="actionsScope"></slot>
+              </template>
+            </FormActions>
 
             <slot name="top" v-bind="{item: formItem, schema}"></slot>
 
@@ -103,7 +127,14 @@
               :actions="actions"
               :is-editing="isEditing"
               @action-complete="$emit('actionComplete', $event)"
-            />
+            >
+              <template #prepend="actionsScope">
+                <slot name="actions.prepend" v-bind="actionsScope"></slot>
+              </template>
+              <template #append="actionsScope">
+                <slot name="actions.append" v-bind="actionsScope"></slot>
+              </template>
+            </FormActions>
 
             <v-custom-form-base
               :id="formBaseId"
@@ -112,12 +143,14 @@
               :schema="inputSchema"
               :row="rowAttribute"
 
+              no-auto-generate-schema
+
               @update="handleUpdate"
               @input="handleInput"
               @resize="handleResize"
               @blur="handleBlur"
               @click="handleClick"
-              >
+            >
               <template
                 v-for="(_slot, key) in formSlots"
                 :key="key"
@@ -140,9 +173,6 @@
                   </ue-recursive-stuff>
 
                 </template>
-                <!-- <div>
-                  {{ $log(_slot, _slotData) }}
-                </div> -->
               </template>
               <!-- <template v-slot:[`slot-inject-prepend-key-treeview-slot-permissions`]="{open}" >
                 <v-icon color="blue">
@@ -162,7 +192,14 @@
               :actions="actions"
               :is-editing="isEditing"
               @action-complete="$emit('actionComplete', $event)"
-            />
+            >
+              <template #prepend="actionsScope">
+                <slot name="actions.prepend" v-bind="actionsScope"></slot>
+              </template>
+              <template #append="actionsScope">
+                <slot name="actions.append" v-bind="actionsScope"></slot>
+              </template>
+            </FormActions>
           </div>
 
           <div v-if="hasAdditionalSection && $vuetify.display.lgAndUp"
@@ -181,26 +218,26 @@
                 ...(rightSlotMaxWidth ? {maxWidth: `${rightSlotMaxWidth}px`} : {})
               }"
             >
+              <slot name="right" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}">
+                <AdditionalSectionContent
+                  :actions-position="actionsPosition"
+                  :is-editing="isEditing"
+                  :form-item="formItem"
+                  :actions="actions"
+                  @action-complete="$emit('actionComplete', $event)"
+                >
+                  <template #right-top>
+                    <slot name="right.top" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                  </template>
+                  <template #right-middle>
+                    <slot name="right.middle" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                  </template>
+                  <template #right-bottom>
+                    <slot name="right.bottom" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                  </template>
+                </AdditionalSectionContent>
+              </slot>
             </div>
-            <slot name="right" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}">
-              <AdditionalSectionContent
-                :actions-position="actionsPosition"
-                :is-editing="isEditing"
-                :form-item="formItem"
-                :actions="actions"
-                @action-complete="$emit('actionComplete', $event)"
-              >
-                <template #right-top>
-                  <slot name="right.top" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
-                </template>
-                <template #right-middle>
-                  <slot name="right.middle" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
-                </template>
-                <template #right-bottom>
-                  <slot name="right.bottom" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
-                </template>
-              </AdditionalSectionContent>
-            </slot>
           </div>
 
           <!-- Mobile dialog/modal for right section -->
@@ -236,13 +273,13 @@
                     @action-complete="$emit('actionComplete', $event)"
                   >
                     <template #right-top>
-                      <slot name="right.top" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                      <slot name="right.top" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
                     </template>
                     <template #right-middle>
-                      <slot name="right.middle" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                      <slot name="right.middle" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
                     </template>
                     <template #right-bottom>
-                      <slot name="right.bottom" v-bind="{item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                      <slot name="right.bottom" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
                     </template>
                   </AdditionalSectionContent>
                 </slot>
@@ -256,10 +293,10 @@
 
       </div>
 
-      <!-- <v-spacer></v-spacer> -->
+      <v-spacer v-if="pushButtonToBottom"></v-spacer>
 
       <!-- Footer Section -->
-      <div :class="[scrollable ? 'flex-grow-0' : '']">
+      <div :class="['px-1',scrollable ? 'flex-grow-0' : '']">
         <v-divider v-if="hasSubmit && !stickyButton && hasDivider" class="mt-6"></v-divider>
         <div class="d-flex pt-6" v-if="hasSubmit && !stickyButton">
           <slot name="submit"
@@ -268,12 +305,17 @@
               buttonDefaultText,
               loading
             }">
+            <slot name="options" v-bind="{
+              validForm: validModel || !serverValid,
+              loading
+            }"></slot>
             <v-btn type="submit"
-              :disabled="!(validModel || !serverValid) || loading"
+              :disabled="!(validModel || !serverValid) || loading || !isSubmittable"
               class="ml-auto mb-5"
               :loading="loading"
+              :color="!isSubmittable ? 'warning' : 'primary'"
               >
-              {{ buttonDefaultText }}
+              {{ !isSubmittable ? 'No Operation To Perform' : buttonDefaultText }}
             </v-btn>
           </slot>
         </div>
@@ -296,7 +338,7 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { useForm, makeFormProps } from '@/hooks'
@@ -321,7 +363,14 @@ const AdditionalSectionContent = {
         :actions="actions"
         :is-editing="isEditing"
         @action-complete="$emit('actionComplete', $event)"
-      />
+      >
+        <template #prepend="actionsScope">
+          <slot name="actions.prepend" v-bind="actionsScope"></slot>
+        </template>
+        <template #append="actionsScope">
+          <slot name="actions.append" v-bind="actionsScope"></slot>
+        </template>
+      </FormActions>
 
       <slot name="right-top"></slot>
 
@@ -331,7 +380,14 @@ const AdditionalSectionContent = {
         :actions="actions"
         :is-editing="isEditing"
         @action-complete="$emit('actionComplete', $event)"
-      />
+      >
+        <template #prepend="actionsScope">
+          <slot name="actions.prepend" v-bind="actionsScope"></slot>
+        </template>
+        <template #append="actionsScope">
+          <slot name="actions.append" v-bind="actionsScope"></slot>
+        </template>
+      </FormActions>
 
       <slot name="right-middle"></slot>
 
@@ -341,7 +397,14 @@ const AdditionalSectionContent = {
         :actions="actions"
         :is-editing="isEditing"
         @action-complete="$emit('actionComplete', $event)"
-      />
+      >
+        <template #prepend="actionsScope">
+          <slot name="actions.prepend" v-bind="actionsScope"></slot>
+        </template>
+        <template #append="actionsScope">
+          <slot name="actions.append" v-bind="actionsScope"></slot>
+        </template>
+      </FormActions>
 
       <slot name="right-bottom"></slot>
     </div>
@@ -435,9 +498,6 @@ export default {
         getSlots(input, inputName, slots);
       });
 
-      // if(slots.length > 0){
-      //   console.log(slots);
-      // }
       return slots
     })
 
@@ -497,6 +557,13 @@ export default {
         xl: '6',
         'order-lg': '1',
         'order-xl': '1'
+      }
+    })
+
+    onMounted(() => {
+      let timezoneInput = document.getElementById('timezone_session')
+      if (timezoneInput && useFormInstance.model.value && useFormInstance.model.value._timezone) {
+        useFormInstance.model.value._timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       }
     })
 

@@ -8,3 +8,4 @@ export { default as useTableItemActions, makeTableItemActionsProps } from './use
 export { default as useTableModals, makeTableModalsProps } from './useTableModals'
 export { default as useTableIterator, makeTableIteratorProps, tableIterableEmits } from './useTableIterator'
 export { default as useTableActions, makeTableActionsProps } from './useTableActions'
+export { default as useTableState } from './useTableState'

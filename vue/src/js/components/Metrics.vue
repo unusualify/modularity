@@ -1,10 +1,15 @@
 <script setup>
-  import { computed } from 'vue';
+  import { computed, ref, watch } from 'vue';
+  import { isObject } from 'lodash-es';
 
   const props = defineProps({
     title: {
       type: String,
       required: true,
+    },
+    subtitle: {
+      type: String,
+      default: null
     },
     items: {
       type: Array,
@@ -26,6 +31,18 @@
       type: String,
       default: null
     },
+    hasGutter: {
+      type: Boolean,
+      default: false
+    },
+    gutterStep: {
+      type: Number,
+      default: 1
+    },
+    rowClass: {
+      type: String,
+      default: null
+    },
     noInline: {
       type: Boolean,
       default: false
@@ -39,79 +56,109 @@
       default: null
     },
 
-    metricColor: {
-      type: String,
+    metricWidth: {
+      type: [String, Number],
       default: null
     },
-    metricCardColor: {
+    minMetricWidth: {
+      type: [String, Number],
+      default: 130
+    },
+
+    metricAttributes: {
+      type: Object,
+      default: () => ({})
+    },
+
+    endpoint: {
       type: String,
       default: null
-    },
-    metricLabelColor: {
-      type: String,
-      default: null
-    },
-    metricValueClass: {
-      type: String,
-      default: null
-    },
-    metricLabelClass: {
-      type: String,
-      default: null
-    },
-    metricNoInline: {
-      type: Boolean,
-      default: false
     }
   });
 
   const cardClasses = computed(() => {
     return [
-      'ue-metrics',
       !props.noInline ? 'd-inline-block' : '',
-      'rounded-lg',
-      'overflow-hidden',
+      // 'rounded-lg',
+      // 'overflow-hidden',
     ];
   });
 
   const headerClasses = computed(() => {
     return [
-      'ue-metrics__header',
       props.bgHeaderColor ? `bg-${props.bgHeaderColor}` : '',
       'd-flex justify-space-between align-center pa-4',
-      'rounded-t-lg',
-      'border-s-sm border-e-sm border-t-sm'
     ];
   });
 
   const titleClasses = computed(() => {
     return [
       props.color ? `text-${props.color}` : '',
-      'font-weight-medium',
-      'text-body-1'
+      'font-weight-medium text-body-1 text-wrap',
     ];
   });
 
   const filterClasses = computed(() => {
     return [
       props.filterColor ? `text-${props.filterColor}` : '',
-      'text-body-2',
-      'text-medium-emphasis'
+      // 'text-body-2 text-medium-emphasis',
+      'd-flex align-center'
+    ];
+  });
+
+  const rowClasses = computed(() => {
+    return [
+      'd-flex flex-wrap ga-4',
+      props.rowClass ? props.rowClass : '',
+      props.hasGutter ? `mx-n${props.gutterStep}` : ''
     ];
   });
 
   const defaultMetricAttributes = computed(() => {
     return {
-      ...(props.metricColor ? {color: props.metricColor} : {}),
-      ...(props.metricCardColor ? {cardColor: props.metricCardColor} : {}),
-      ...(props.metricLabelColor ? {labelColor: props.metricLabelColor} : {}),
-      ...(props.metricValueClass ? {valueClass: props.metricValueClass} : {}),
-      ...(props.metricLabelClass ? {labelClass: props.metricLabelClass} : {}),
-      ...(props.metricNoInline ? {noInline: props.metricNoInline} : {}),
+      ...(props.metricAttributes ?? {})
     };
   });
 
-  // __log(defaultMetricAttributes.value);
+  const metrics = ref(props.items);
+
+  const filterableMetrics = computed(() => {
+    return metrics.value.filter(metric => {
+      return metric.connectorFilter
+        && isObject(metric.connectorFilter)
+        && metric.connectorFilter.name
+        && metric.connectorFilter.args;
+    });
+  });
+
+  const hasFilterableMetric = computed(() => {
+    return filterableMetrics.value.length > 0;
+  });
+
+  const dateRangeModel = ref(null);
+  const dateRangeLoading = ref(false);
+
+  const refreshMetrics = () => {
+    dateRangeLoading.value = true;
+
+    axios.post(props.endpoint, {
+      date_range: dateRangeModel.value,
+      items: metrics.value
+    }).then(response => {
+      if(response.data.variant === 'success') {
+        metrics.value = response.data.data;
+      }
+    }).catch(error => {
+      console.log(error);
+    }).finally(() => {
+      dateRangeLoading.value = false;
+    });
+  }
+  watch(dateRangeModel, (newValue, oldValue) => {
+    if(Array.isArray(newValue) && newValue.length > 1 || (!newValue && oldValue && oldValue.length > 1)) {
+      refreshMetrics();
+    }
+  });
 </script>
 
 <template>
@@ -122,62 +169,81 @@
   >
     <!-- Header with title and date -->
     <v-card-title :class="headerClasses">
-      <div :class="titleClasses">{{ title }}</div>
-      <div v-if="date" :class="filterClasses">
-        {{ dateLabel }} {{ date }}
+      <div class="py-2">
+        <ue-title padding="a-0" :text="title" :class="titleClasses" />
+        <ue-title padding="a-0" :text="subtitle" type="caption" weight="medium" color="grey-darken-1" transform="none"/>
+      </div>
+      <!-- <div :class="titleClasses">{{ title }}</div> -->
+      <div :class="filterClasses" style="width: 280px;" v-if="hasFilterableMetric && endpoint">
+        <v-date-input
+          v-model="dateRangeModel"
+          :Xlabel="$t('')"
+          :validate-on="`submit blur`"
+          variant="outlined"
+          density="compact"
+          prepend-icon=""
+          append-inner-icon="$calendar"
+          persistent-placeholder
+          show-adjacent-months
+          required
+          hide-details
+          multiple="range"
+          clearable
+
+          :disabled="dateRangeLoading"
+
+          class="w-100"
+        >
+          <!-- <template v-slot:actions="{ save, cancel, isPristine }">
+            sss
+          </template> -->
+        </v-date-input>
+        <!-- {{ dateLabel }} {{ date }} -->
       </div>
     </v-card-title>
 
-    <!-- Metrics row -->
-    <div class="d-flex flex-wrap ue-metrics__row h-100">
-      <template
-        v-for="(metric, index) in items"
-        :key="index"
-        >
-        <ue-metric
-          :class="[
-            'ue-metrics__metric',
-            'flex-grow-1',
-          ]"
-          :style="{ width: `${100 / items.length}%`, minWidth: '120px' }"
-          elevation="0"
-          rounded="0"
-          dense
-          no-inline
-          v-bind="{
-            ...defaultMetricAttributes,
-            ...metric
-          }"
-        />
-      </template>
-    </div>
+    <v-card-text>
+      <!-- Metrics row -->
+      <div :class="rowClasses">
+        <template
+          v-for="(metric, index) in metrics"
+          :key="index"
+          >
+          <ue-metric
+            :style="[
+              metricWidth ? `width: ${metricWidth}` : '',
+              minMetricWidth ? `min-width: ${minMetricWidth}px` : '',
+            ]"
+
+            dense
+            no-inline
+            v-bind="{
+              ...defaultMetricAttributes,
+              ...metric
+            }"
+          >
+            <template v-if="metric.filtered" v-slot:value="valueScope">
+              <v-badge
+                color="grey-lighten-4"
+                class="text-white"
+                icon="mdi-filter-check"
+                inline
+                Xdot
+                X-floating
+              >
+                <div :class="valueScope.classes">
+                  {{ valueScope.value }}
+                </div>
+              </v-badge>
+            </template>
+          </ue-metric>
+        </template>
+      </div>
+    </v-card-text>
+
   </v-card>
 </template>
 
 <style scoped lang="scss">
-  $border-width: 1px;
-  $border-color: rgba(0, 0, 0, 0.92);
 
-  .ue-metrics,
-  .ue-metrics__header {
-    border-color: $border-color !important;
-    border-right-color: $border-color !important;
-
-  }
-
-  .ue-metrics {
-    border-bottom: $border-width solid;
-
-    .ue-metrics__row {
-      border-left: $border-width solid $border-color !important;
-    }
-
-    .ue-metrics__metric {
-      border-top: $border-width solid;
-      border-block-start-color: $border-color !important;
-
-      border-right: $border-width solid $border-color !important;
-      border-block-end-color: $border-color !important;
-    }
-  }
 </style>

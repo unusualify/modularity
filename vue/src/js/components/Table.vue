@@ -1,5 +1,12 @@
 <template>
-  <v-layout fluid v-resize="onResize" :class="[noFullScreen ? 'h-100' : '']">
+  <v-layout fluid v-resize="onResize"
+    :class="[
+      noFullScreen ? 'h-100' : '',
+      rounded ? $lodash.isBoolean(rounded) ? 'rounded' : `rounded-${rounded}` : '',
+      elevation ? `elevation-${elevation}` : '',
+    ]"
+    :style="$vuetify.display.lgAndUp ? 'max-height: calc(100vh - 24px)' : 'max-height: calc(100vh - 24px - 64px)'"
+    >
     <div :class="['ue-datatable__container', noFullScreen ? 'fill-height' : 'fill-heigh ue-datatable--full-screen' ]">
       <ActiveTableItem
         class=""
@@ -15,7 +22,9 @@
         :class="[
           'px-4 h-100',
           tableClasses,
+          rounded ? $lodash.isBoolean(rounded) ? 'rounded' : `rounded-${rounded}` : '',
           fullWidthWrapper ? '' : 'ue-table--narrow-wrapper',
+          tableElevation ? `elevation-${tableElevation}` : '',
           striped ? 'ue-datatable--striped' : '',
           roundedRows ? 'ue-datatable--rounded-row' : '',
           hideBorderRow ? 'ue-datatable--no-border-row' : '',
@@ -30,6 +39,7 @@
         :items="elements"
         :hover="true"
 
+        :items-per-page-options="itemsPerPageOptions"
         :items-per-page="options.itemsPerPage"
         :search="options.search"
         :page="options.page"
@@ -89,7 +99,7 @@
               />
             </div>
 
-            <v-divider v-if="controlsPosition === 'bottom' || $vuetify.display.smAndDown" class="my-3"></v-divider>
+            <v-divider v-if="controlsPosition === 'bottom' || $vuetify.display.smAndDown" class="my-2"></v-divider>
 
             <!-- table controls -->
             <v-slide-x-transition :group="true">
@@ -97,9 +107,7 @@
                 key='table-controls'
                 :class="[
                   'd-flex',
-                  controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'flex-grow-1',
-
-
+                  controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'flex-grow-1 flex-shrink-0',
                 ]"
               >
                 <template v-if="someSelected">
@@ -121,6 +129,8 @@
                   <!-- search field -->
                   <v-text-field
                     v-if="!hideSearchField && hasSearchableHeader"
+                    id="search-field"
+                    ref="searchField"
                     v-model="searchModel"
                     variant="outlined"
                     :append-inner-iconx="searchModel !== search ? 'mdi-magnify' : null"
@@ -135,7 +145,7 @@
                     :style="[
                       'display: inline',
                       // controlsPosition === 'top' || $vuetify.display.smAndDown ? 'max-width: 300px' : '',
-                      'min-width: 100px'
+                      'min-width: 165px'
                     ]"
                     @click:append-inner="searchItems"
                     :disabled="loading"
@@ -157,7 +167,7 @@
                       <v-menu>
                         <template v-slot:activator="{ props }">
                           <!-- filter button -->
-                          <v-btn v-if="mainFilters.length > 0"
+                          <v-btn v-if="mainFilters.length > 0 && !hideFilters"
                             id="filter-btn-activator"
                             v-bind="{...filterBtnOptions, ...filterBtnTitle, ...props}"
                             :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
@@ -174,6 +184,9 @@
                             v-for="(filter, index) in mainFilters"
                             :key="index"
                             v-on:click.prevent="changeFilter(filter.slug)"
+                            :class="[
+                              filter.slug === activeFilterSlug ? 'bg-primary' : ''
+                            ]"
                           >
                             <v-list-item-title>{{ filter.name + '(' + filter.number+ ')' }} </v-list-item-title>
                           </v-list-item>
@@ -188,18 +201,18 @@
                       >
                         <template v-slot:activator="{ props }">
                           <!-- advanced filter button -->
-                          <v-btn v-if="Object.keys(advancedFilters).length > 0"
+                          <v-btn v-if="Object.keys(advancedFilters).length > 0 && !hideAdvancedFilters"
                             id="advanced-filter-btn"
                             v-bind="{...filterBtnOptions, ...filterBtnTitle, ...props}"
                             :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
-                            :text="$vuetify.display.smAndDown ? null : 'Advanced Filter'"
+                            :text="$vuetify.display.smAndDown ? null : 'Filters'"
                             :prepend-icon="$vuetify.display.smAndDown ? null : filterBtnOptions['prepend-icon']"
                             :block="$vuetify.display.mdAndUp ? false : (filterBtnOptions['block'] ?? false)"
                             :density="$vuetify.display.smAndDown ? 'compact' : (filterBtnOptions['density'] ?? 'comfortable')"
                           />
                         </template>
                         <v-card
-                          title="Advanced Filter"
+                          title="Filters"
                           min-width="40vw"
                           max-width="50vw"
                         >
@@ -222,7 +235,7 @@
 
                             <v-btn
                               color="primary"
-                              text="Save"
+                              text="Apply"
                               variant="tonal"
                               @click="changeAdvancedFilter"
                             ></v-btn>
@@ -254,7 +267,7 @@
             indeterminate
             reverse
           ></v-progress-linear>
-          <v-divider v-else-if="controlsPosition === 'top' && $vuetify.display.mdAndUp" class="mb-4 mt-2"></v-divider>
+          <v-divider v-else-if="controlsPosition === 'top' && $vuetify.display.mdAndUp" class="mb-2 mt-2"></v-divider>
 
 
           <!-- form modal -->
@@ -334,6 +347,20 @@
 
                     </slot>
                   </template>
+
+
+                  <template v-if="$slots['form.actions.prepend']" v-slot:actions.prepend="actionsScope">
+                    <slot name="form.actions.prepend" v-bind="actionsScope">
+
+                    </slot>
+                  </template>
+
+                  <template v-if="$slots['form.actions.append']" v-slot:actions.append="actionsScope">
+                    <slot name="form.actions.append" v-bind="actionsScope">
+
+                    </slot>
+                  </template>
+
                 </ue-form>
                 <!-- <v-card-text>
                 </v-card-text> -->
@@ -401,6 +428,8 @@
               :width-type="'sm'"
 
               v-bind="modals['dialog'].modalAttributes ?? {}"
+
+              has-fullscreen-button
             >
             </ue-modal>
 
@@ -412,43 +441,26 @@
               :width-type="modals['show'].widthType || 'lg'"
               :persistent="modals['show'].persistent"
               :description="modals['show'].description"
+              :title="modals['show'].title"
+              has-fullscreen-button
+              has-close-button
+              no-confirm-button
+              has-title-divider
+              cancel-text="Close"
+              :reject-button-attributes="{
+                variant: 'elevated',
+                color: 'primary',
+              }"
+              scrollable
             >
-              <template v-slot:body="props">
-                <v-card class="fill-height d-flex flex-column">
-                  <v-card-title>
-                    <ue-title
-                      padding="a-3"
-                      color="grey-darken-5"
-                      align="center"
-                      justify="space-between"
-                    >
-                      {{ modals['show'].title }}
-                      <template v-slot:right>
-                      </template>
-                    </ue-title>
-                  </v-card-title>
-
-                  <v-divider class="mx-6"/>
-                  <v-card-text>
-                    <ue-recursive-data-viewer
-                      :data="modals['show'].data"
-                      :all-array-items-open="false"
-                      :all-array-items-closed="false"
-                    />
-                  </v-card-text>
-
-                  <v-divider class="mx-6 mt-4"/>
-                  <v-card-actions class="px-6 flex-grow-0">
-                    <v-spacer></v-spacer>
-                    <v-btn-primary
-                      :slim="false"
-                      variant="elevated"
-                      @click="modals['show'].cancel()"
-                    >
-                      {{ $t('fields.close') }}
-                    </v-btn-primary>
-                  </v-card-actions>
-                </v-card>
+              <template v-slot:body.description>
+                <div class="d-flex text-start">
+                  <ue-recursive-data-viewer
+                    :data="modals['show'].data"
+                    :all-array-items-open="false"
+                    :all-array-items-closed="false"
+                  />
+                </div>
               </template>
             </ue-modal>
 
@@ -496,9 +508,13 @@
               <component
                 :is="`ue-${customRow.name}`"
                 :key="element.id"
+                :name="name"
+                :titlePrefix="titlePrefix"
+                :titleKey="titleKey"
+
                 :item="element"
                 :headers="headers"
-                :rowActions = "rowActions"
+                :rowActions="rowActions"
                 @click-action="itemAction"
               >
 
@@ -506,7 +522,6 @@
                   <div>
                     <div class="d-flex flex-wrap ga-2 justify-sm-end ml-n2 ml-md-0">
                       <template v-for="(action, k) in rowActions" :key="k">
-                        <!-- {{ $log(action) }} -->
                         <v-tooltip
                           v-if="itemHasAction(element, action)"
                           :text="$t( action.label ?? $headline(action.name) )"
@@ -539,18 +554,84 @@
 
         <!-- MARK PAGINATION BUTTONS -->
         <template v-if="enableCustomFooter" v-slot:bottom="{page, pageCount}">
-          <div class="d-flex justify-end">
-            <v-pagination
-              v-model="options.page"
-              :length="pageCount"
-              v-bind="footerProps"
-            />
+          <div class="d-flex justify-end py-4">
+            <v-container class="max-width text-center">
+              <v-pagination v-if="!loading"
+                v-model="options.page"
+                :length="totalNumberOfPages"
+
+                density="compact"
+                size="small"
+                total-visible="3"
+                show-first-last-page
+                v-bind="footerProps"
+              >
+                <template #first="{ onClick, disabled, icon }">
+                  <v-btn
+                    v-bind="defaultPaginationButtonProps"
+                    icon="mdi-chevron-double-left"
+                    @click="onClick"
+                    :disabled="disabled"
+                  />
+                </template>
+                <template #prev="{ onClick, disabled, icon }">
+                  <v-btn
+                    v-bind="defaultPaginationButtonProps"
+                    :icon="icon"
+                    @click="onClick"
+                    :disabled="disabled"
+                  />
+                </template>
+                <!-- <template #item>
+                  <v-menu>
+                    <template #activator="{ props }">
+                      <v-btn
+                        v-bind="{ ...props, ...defaultPaginationButtonProps }"
+                        :icon="options.page"
+                        @click="onClick"
+                        :disabled="disabled"
+                      >
+                        {{ options.page }}
+                      </v-btn>
+                    </template>
+                    <v-list
+                      class="overflow-y-auto"
+                      max-height="200"
+                      >
+                      <v-list-item v-for="page in availablePages" :key="page" @click="options.page = page">
+                        {{ page }}
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+                </template> -->
+                <template #next="{ onClick, disabled, icon }">
+                  <v-btn
+                    v-bind="defaultPaginationButtonProps"
+                    :icon="icon"
+                    @click="onClick"
+                    :disabled="disabled"
+                  />
+                </template>
+                <template #last="{ onClick, disabled, icon }">
+                  <v-btn
+                    v-bind="defaultPaginationButtonProps"
+                    icon="mdi-chevron-double-right"
+                    @click="onClick"
+                    :disabled="disabled"
+                  />
+                </template>
+              </v-pagination>
+              <v-progress-circular v-else
+                width="3"
+                size="small"
+                indeterminate
+              ></v-progress-circular>
+            </v-container>
           </div>
         </template>
 
         <!-- Custom Slots -->
-        <template
-          v-for="(context, slotName) in slots" v-slot:[slotName]
+        <template v-for="(context, slotName) in slots" v-slot:[slotName]
           :key="`customSlot-${slotName}`"
           >
           <div>
@@ -560,60 +641,6 @@
               :configuration="configuration"
             />
           </div>
-        </template>
-
-        <!-- #formatterColumns -->
-        <template
-          v-for="(col, i) in formatterColumns"
-          :key="`formatter-${i}`"
-          v-slot:[`item.${col.key}`]="{ item }"
-        >
-          <template v-if="col.formatter == 'edit' || col.formatter == 'activate'">
-            <v-tooltip :text="item[col.key]" :key="i">
-              <template v-slot:activator="{ props }">
-                <v-btn
-                  :key="i"
-                  v-bind="props"
-                  class="pa-0 justify-start text-capitalize"
-                  variant="plain"
-                  :color="`primary darken-1`"
-                  @click="itemAction(item, ...col.formatter)"
-                >
-                  {{ col.key.match(/^id|uuid$/) ? window.__shorten(item[col.key], 8) : item[col.key] }}
-                </v-btn>
-                <template v-if="col.key.match(/^id|uuid$/)">
-                  <ue-copy-text :text="item[col.key]" />
-                </template>
-              </template>
-            </v-tooltip>
-          </template>
-          <template v-else-if="col.formatter == 'switch'">
-            <!-- {{ $log('switch', item, col.key) }} -->
-            <v-switch
-              :key="i"
-              :model-value="item[col.key]"
-              color="success"
-              :true-value="1"
-              false-value="0"
-              hide-details
-              @update:modelValue="itemAction(item, 'switch', $event, col.key )"
-            >
-              <template v-slot:label></template>
-            </v-switch>
-          </template>
-          <template v-else-if="col.formatter == 'dynamic'">
-            <ue-dynamic-component-renderer
-              :subject="item[col.key]"
-              :key="item[col.key]"
-            >
-            </ue-dynamic-component-renderer>
-          </template>
-          <template v-else>
-            <ue-recursive-stuff
-              v-bind="handleFormatter(col.formatter, window.__shorten(item[col.key] ?? '', cellOptions.maxChars))"
-              :key="item[col.key]"
-            />
-          </template>
         </template>
 
         <!-- #header actions slot -->
@@ -664,6 +691,91 @@
             </v-card>
 
           </v-menu>
+        </template>
+
+        <!-- #formattable headers -->
+        <template v-for="(header, i) in formattableHeaders"
+          :key="`formattable-header-${i}`"
+          v-slot:[`header.${header.key}`]="headerScope"
+        >
+          {{ headerScope.column.title }}
+          <v-tooltip v-if="header.searchable && !hideSearchField" :text="$t('Search')">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                v-bind="props"
+                color="medium-emphasis"
+                size="small"
+                icon="mdi-table-search"
+
+                @click="$refs.searchField.focus()"
+              ></v-icon>
+            </template>
+          </v-tooltip>
+          <v-tooltip v-if="header.removable" :text="$t('Remove Column')">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                v-if="header.removable"
+                color="medium-emphasis"
+                size="small"
+                icon="$close"
+                @click="removeHeader(header.key)"
+                v-bind="props"
+              ></v-icon>
+            </template>
+          </v-tooltip>
+
+        </template>
+
+        <!-- #formatterColumns -->
+        <template v-for="(col, i) in formatterColumns"
+          :key="`formatter-${i}`"
+          v-slot:[`item.${col.key}`]="{ item }"
+        >
+          <template v-if="col.formatter == 'edit' || col.formatter == 'activate'">
+            <v-tooltip :text="item[col.key]" :key="i">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  :key="i"
+                  v-bind="props"
+                  class="pa-0 justify-start text-none"
+                  variant="plain"
+                  :color="`primary darken-1`"
+                  @click="itemAction(item, ...col.formatter)"
+                >
+                  {{ col.key.match(/^id|uuid$/) ? window.__shorten(item[col.key], 8) : item[col.key] }}
+                </v-btn>
+                <template v-if="col.key.match(/^id|uuid$/)">
+                  <ue-copy-text :text="item[col.key]" />
+                </template>
+              </template>
+            </v-tooltip>
+          </template>
+          <template v-else-if="col.formatter == 'switch'">
+            <v-switch
+              :key="i"
+              :model-value="item[col.key]"
+              color="success"
+              :true-value="1"
+              false-value="0"
+              hide-details
+              @update:modelValue="itemAction(item, 'switch', $event, col.key )"
+            >
+              <template v-slot:label></template>
+            </v-switch>
+          </template>
+          <template v-else-if="col.formatter == 'dynamic'">
+            <ue-dynamic-component-renderer
+              :subject="item[col.key]"
+              :key="item[col.key]"
+            >
+            </ue-dynamic-component-renderer>
+          </template>
+          <template v-else>
+            <ue-recursive-stuff
+              v-bind="handleFormatter(col.formatter, window.__shorten(item[col.key] ?? '', cellOptions.maxChars))"
+              :key="item[col.key]"
+            />
+          </template>
         </template>
 
         <!-- #item actions slot-->
@@ -806,20 +918,6 @@ import PaymentService from './inputs/PaymentService.vue'
 
 const { ignoreFormatters } = makeFormatterProps()
 
-console.log(
-  {
-    ...makeTableNamesProps(),
-    ...makeTableFiltersProps(),
-    ...makeTableHeadersProps(),
-    ...makeTableFormsProps(),
-    ...makeTableItemActionsProps(),
-    ...makeTableActionsProps(),
-    ...makeTableModalsProps(),
-    ...makeTableProps(),
-    ...makeDraggableProps(),
-    ...ignoreFormatters
-  }
-)
 export default {
   // mixins: [TableMixin],
   components: {
@@ -913,7 +1011,9 @@ export default {
       &--striped
         tr
           &:nth-of-type(2n)
-            background-color: rgb(var(--v-theme-grey-lighten-6)) //TODO: table action border must be variable
+            td
+              background-color: rgb(var(--v-theme-grey-lighten-6)) !important //TODO: table action border must be variable
+
 
     .action-dropdown
       .v-overlay__content

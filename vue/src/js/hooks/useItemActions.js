@@ -81,7 +81,6 @@ export default function useItemActions(props, context) {
 
     api[method](endpoint, params,
       (response) => {
-        // __log('handleRequestAction', response)
         if (response.data.message) {
           store.commit(ALERT.SET_ALERT, {
             message: response.data.message,

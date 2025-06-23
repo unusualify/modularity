@@ -9,7 +9,9 @@ return [
     'isRowEditing' => false,
     'rowActionsType' => 'inline',
     'hideDefaultFooter' => false,
-    'tableClasses' => 'elevation-2',
+    'tableElevation' => 2,
+    'tableRounded' => true,
+
     'itemsPerPage' => 15,
     'hideHeaders' => false,
     'hideSearchField' => false,
@@ -43,13 +45,14 @@ return [
         'readonly' => false, // boolean to set the button readonly mode, can be used to disable button
         'ripple' => true, // boolean
         // 'rounded' => 'md', // string | number | boolean - 0, xs, sm, true, lg, xl, pill, circle, and shaped.
-        'class' => 'mx-2 text-white text-capitialize rounded px-4',
+        'class' => 'text-white text-capitialize rounded px-4',
         'size' => 'default', // sizes: x-small, small, default, large, and x-large.
         // 'icon' => 'mdi-filter-outline',
         'prepend-icon' => 'mdi-filter-outline',
         'append-icon' => 'mdi-chevron-down',
         'slim' => false,
         'density' => 'comfortable',
+        // 'block' => true,
         // 'loading' => true,
     ],
     'addBtnOptions' => [
@@ -105,31 +108,31 @@ return [
         ],
     ],
     'customRowComponent' => [
-        /**
-         * an object with the following properties:
-         * 'iteratorComponent' => 'configurable-card-iterator',
-         * 'col' => [
-         *     'cols' => 12,
-         * ]
-         *
-         * or
-         *
-         * an array of objects with the following properties:
-         * [
-         *     'name' => 'configurable-card-iterator',
-         *     'allowedRoles' => ['admin'],
-         *     'col' => [
-         *     'cols' => 12,
-         * ]
-         * ],
-         * [
-         *     'name' => 'configurable-card-iterator',
-         *     'allowedRoles' => ['manager'],
-         *     'col' => [
-         *     'cols' => 12,
-         * ]
-         * ],
-         */
+    /**
+     * an object with the following properties:
+     * 'iteratorComponent' => 'configurable-card-iterator',
+     * 'col' => [
+     *     'cols' => 12,
+     * ]
+     *
+     * or
+     *
+     * an array of objects with the following properties:
+     * [
+     *     'name' => 'configurable-card-iterator',
+     *     'allowedRoles' => ['admin'],
+     *     'col' => [
+     *     'cols' => 12,
+     * ]
+     * ],
+     * [
+     *     'name' => 'configurable-card-iterator',
+     *     'allowedRoles' => ['manager'],
+     *     'col' => [
+     *     'cols' => 12,
+     * ]
+     * ],
+     */
     ],
     'cellOptions' => [
         'maxChar' => 3,
@@ -141,9 +144,9 @@ return [
     'formAttributes' => [
         'rowAttribute' => [
             'noGutters' => false,
-            'class' => 'py-4'
+            'class' => 'py-4',
         ],
-        'formClass' => 'mx-3 px-3 pt-6 pb-0',
+        'formClass' => 'mx-3 px-2 pt-6 pb-0',
         'scrollable' => true,
         'hasSubmit' => false,
         'fillHeight' => true,

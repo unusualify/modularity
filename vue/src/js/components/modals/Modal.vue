@@ -48,22 +48,52 @@
           >
           <v-card >
             <v-card-title v-if="title" class="text-h5 text-center" style="word-break: break-word;">
-              {{ title }}
+              <ue-title justify="space-between" padding="y-2">
+                {{ title }}
+                <template #right>
+                  <div class="d-flex align-center">
+                    <v-btn v-if="hasFullscreenButton" :icon="full ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="compact" @click="toggleFullscreen"/>
+                    <v-btn v-if="hasCloseButton" icon="$close" variant="plain" size="compact" color="grey-darken-5" rounded @click="close()" />
+                  </div>
+                </template>
+              </ue-title>
+              <v-divider v-if="hasTitleDivider"/>
             </v-card-title>
-            <v-card-text v-if="description" class="text-center" style="word-break: break-word;" >
+            <v-card-text v-if="description || $slots['body.description']" class="text-center" style="word-break: break-word;" :class="{'pa-0': noDefaultBodyPadding}">
               <slot name="body.description" v-bind="{description}">
-                {{ description }}
+                <div v-html="description" />
               </slot>
             </v-card-text>
-            <v-divider/>
-            <v-card-actions>
-              <v-spacer/>
-              <slot name="body.options" v-bind="{description}">
-                <v-btn ref="modalCancel" v-bind="rejectButtonAttributes" class="modal-cancel" @click="cancel()" :loading="rejectLoading" :disabled="rejectLoading"> {{ textCancel }}</v-btn>
-                <v-btn ref="modalConfirm" v-bind="confirmButtonAttributes" class="modal-confirm" @click="confirm()" :loading="confirmLoading" :disabled="confirmLoading"> {{ textConfirm }}</v-btn>
-              </slot>
-              <v-spacer/>
-            </v-card-actions>
+            <template v-if="!noActions">
+              <v-divider/>
+              <v-card-actions>
+                <slot name="body.options" v-bind="{description}">
+                  <v-spacer/>
+                  <!-- CANCEL BUTTON -->
+                  <v-btn v-if="!noCancelButton"
+                    ref="modalCancel"
+                    v-bind="rejectButtonAttributes"
+                    class="modal-cancel"
+                    @click="cancel()"
+                    :loading="rejectLoading" :disabled="rejectLoading"
+                  >
+                    {{ textCancel }}
+                  </v-btn>
+                  <!-- CONFIRM BUTTON -->
+                  <v-btn v-if="!noConfirmButton"
+                    ref="modalConfirm"
+                    v-bind="confirmButtonAttributes"
+                    class="modal-confirm"
+                    @click="confirm()"
+                    :loading="confirmLoading"
+                    :disabled="confirmLoading"
+                  >
+                    {{ textConfirm }}
+                  </v-btn>
+                </slot>
+                <v-spacer/>
+              </v-card-actions>
+            </template>
           </v-card>
         </slot>
       </slot>

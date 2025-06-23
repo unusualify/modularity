@@ -21,13 +21,16 @@ class LanguageMiddleware
         if ($request->user() && $request->user()->language) {
             $locale = $request->user()->language;
         } else {
-            if (mb_strtolower(geoip()->getLocation($request->ip())->iso_code) === 'tr') {
-                $locale = 'tr';
+            if (env('AUTO_LOCALE_FINDER', false)) {
+                if (mb_strtolower(geoip()->getLocation($request->ip())->iso_code) === 'tr') {
+                    $locale = 'tr';
+                }
             }
         }
 
         config([modularityBaseKey() . '.locale' => $locale]);
         config([modularityBaseKey() . '.timezone' => auth()->user()->timezone ?? 'Europe/London']);
+
         App::setLocale($locale);
         App::setFallbackLocale(modularityConfig('fallback_locale'));
 
@@ -43,6 +46,8 @@ class LanguageMiddleware
             $currencyModel = Currency::where('iso_4217', config('priceable.currency'))->first();
             $request->setUserCurrency($currencyModel);
         }
+
+        config(['priceable.currency_locale' => config('app.locale')]);
 
         \Carbon\CarbonInterval::setLocale(config('app.locale'));
         \Carbon\Carbon::setLocale(config('app.locale'));

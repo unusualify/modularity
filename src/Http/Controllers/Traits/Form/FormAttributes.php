@@ -13,7 +13,6 @@ trait FormAttributes
 
     /**
      * Get the form attributes
-     * @return array
      */
     public function getFormAttributes(): array
     {
@@ -29,5 +28,4 @@ trait FormAttributes
 
         return [];
     }
-
 }

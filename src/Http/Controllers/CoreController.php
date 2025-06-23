@@ -11,6 +11,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
+use Unusualify\Modularity\Facades\Filepond;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Traits\ManageNames;
@@ -92,8 +94,8 @@ abstract class CoreController extends LaravelController
     {
         $perPage = $this->request->get('itemsPerPage') ?? $this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10;
 
-        if( !$this->request->ajax() ){
-            $perPage = -1;
+        if (! $this->request->ajax()) {
+            $perPage = 0;
         }
 
         return $this->transformIndexItems($this->repository->get(
@@ -103,6 +105,7 @@ abstract class CoreController extends LaravelController
             perPage: $perPage,
             forcePagination: $forcePagination,
             appends: $appends,
+            id: $this->request->get('id') ?? null
         ));
     }
 
@@ -387,18 +390,35 @@ abstract class CoreController extends LaravelController
 
     public function createAssignment($id)
     {
-        if($this->request->has('status')){
+        if (($status = $this->request->get('status'))) {
             $assignable = $this->repository->getById($id);
 
             $assignable->lastAssignment->update([
-                'status' => $this->request->get('status'),
-                'completed_at' => $this->request->get('status') === 'completed' ? now() : null,
+                'status' => $status,
+                'completed_at' => $status === 'completed' ? now() : null,
             ]);
 
             return Response::json([
                 'location' => 'top',
                 'variant' => MessageStage::SUCCESS,
                 'message' => __('Assignment updated successfully!'),
+                'assignments' => $this->repository->getAssignments($id),
+            ]);
+        }
+
+        if (($attachments = $this->request->get('attachments'))) {
+            $assignable = $this->repository->getById($id);
+
+            $lastAssignment = $assignable->lastAssignment;
+
+            if ($attachments) {
+                Filepond::saveFile($lastAssignment, $attachments, 'attachments');
+            }
+
+            return Response::json([
+                'location' => 'top',
+                'variant' => MessageStage::SUCCESS,
+                'message' => __('Attachments saved successfully!'),
                 'assignments' => $this->repository->getAssignments($id),
             ]);
         }
@@ -417,9 +437,9 @@ abstract class CoreController extends LaravelController
 
         $assignable = $this->repository->getById($id);
 
-        if($assignable->lastAssignment && $assignable->lastAssignment->status !== 'completed'){
-            $assignable->lastAssignment->update([
-                'status' => 'cancelled',
+        if ($assignable->lastAssignment && $assignable->lastAssignment->status !== AssignmentStatus::COMPLETED) {
+            $assignable->lastAssignment->updateQuietly([
+                'status' => AssignmentStatus::CANCELLED,
             ]);
         }
 
@@ -429,6 +449,8 @@ abstract class CoreController extends LaravelController
             'due_at',
             'description',
         ]));
+
+        $assignment->refresh();
 
         return Response::json($assignment);
     }

@@ -4,8 +4,9 @@ namespace Unusualify\Modularity\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Unusualify\Modularity\Entities\Process;
-use Unusualify\Modularity\Entities\User;
+use Modules\SystemNotification\Events\ProcessHistoryCreated;
+use Modules\SystemNotification\Events\ProcessHistoryUpdated;
+use Unusualify\Modularity\Entities\Enums\ProcessStatus;
 
 class ProcessHistory extends Model
 {
@@ -14,6 +15,21 @@ class ProcessHistory extends Model
         'reason',
         'user_id',
     ];
+
+    protected $casts = [
+        'status' => ProcessStatus::class,
+    ];
+
+    public static function booted(): void
+    {
+        static::updated(function (ProcessHistory $processHistory) {
+            ProcessHistoryUpdated::dispatch($processHistory);
+        });
+
+        static::created(function (ProcessHistory $processHistory) {
+            ProcessHistoryCreated::dispatch($processHistory);
+        });
+    }
 
     /**
      * Get the parent processable model

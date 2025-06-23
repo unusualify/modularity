@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\View;
 
 use BadMethodCallException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Config;
 use Illuminate\View\Component as LaravelComponent;
 use Unusualify\Modularity\Traits\ManageNames;
 
@@ -53,10 +54,16 @@ class Component extends LaravelComponent
      */
     public function __construct() {}
 
-
     public static function create($config)
     {
-        if (!(isset($config['widget']) || isset($config['component']) || isset($config['tag']))) {
+        if (isset($config['widgetAlias'])) {
+            $config = array_merge_recursive_preserve(
+                Config::get('modularity.widgets.' . $config['widgetAlias'], []),
+                array_except($config, ['widgetAlias'])
+            );
+        }
+
+        if (! (isset($config['widget']) || isset($config['component']) || isset($config['tag']))) {
             throw new \Exception('Widget, component or tag is required for component creation');
         }
 
@@ -64,11 +71,13 @@ class Component extends LaravelComponent
 
         if (isset($config['widget'])) {
             $widgetClass = 'Unusualify\\Modularity\\View\\Widgets\\' . $config['widget'];
-            if(!class_exists($widgetClass)) {
+            if (! class_exists($widgetClass)) {
                 throw new \Exception('Widget class ' . $widgetClass . ' does not exist');
             }
 
             $widget = $widgetClass::make();
+
+            $alias = $config['widgetAlias'] ?? null;
 
             $component = $widget->useWidgetConfig()
                 ->mergeSlots($config['slots'] ?? [])
@@ -83,18 +92,21 @@ class Component extends LaravelComponent
                 ->setWidgetSlots(array_merge_recursive_preserve(
                     $widget->widgetSlots ?? [],
                     $config['widgetSlots'] ?? [],
-                ))
-                ->mergeAttributes($config['attributes'] ?? []);
+                ));
 
-        } else if (isset($config['component'])) {
+            if ($alias) {
+                $component->setWidgetAlias($alias);
+            }
+
+            $component->mergeAttributes($config['attributes'] ?? []);
+
+        } elseif (isset($config['component'])) {
             $component->setComponent($config['component'])
                 ->mergeAttributes($config['attributes'] ?? []);
-        } else if (isset($config['tag'])) {
+        } elseif (isset($config['tag'])) {
             $component->setTag($config['tag'])
                 ->mergeAttributes($config['attributes'] ?? []);
         }
-
-
 
         return $component->render();
     }
@@ -232,13 +244,15 @@ class Component extends LaravelComponent
     public function addChildren($element)
     {
         $oldElements = $this->elements;
+        $wasIsAssoc = false;
 
         if (! is_array($oldElements)) {
             if (! empty($oldElements)) {
                 $oldElements = [$oldElements];
             }
-        } else if (is_array($oldElements) && Arr::isAssoc($oldElements)) {
+        } elseif (is_array($oldElements) && Arr::isAssoc($oldElements)) {
             $oldElements = [$oldElements];
+            $wasIsAssoc = true;
         }
 
         $newElement = [];
@@ -252,9 +266,14 @@ class Component extends LaravelComponent
             $newElement = $element;
         }
 
+        if (is_array($oldElements)) {
+            $oldElements[] = $newElement;
+
+        }
+
         $this->elements = is_array($oldElements)
-            ? array_merge($oldElements, $newElement)
-            : $newElement;
+            ? $oldElements
+            : [$newElement];
 
         return $this;
     }
@@ -281,7 +300,7 @@ class Component extends LaravelComponent
      */
     public function hydrateAttributes($attributes)
     {
-        if ( isset($attributes['connector']) ) {
+        if (isset($attributes['connector'])) {
             $connectorInfo = find_module_and_route($attributes['connector']);
             $attributes['_module'] = $connectorInfo['module'];
             $attributes['_routeName'] = $connectorInfo['route'];
@@ -375,7 +394,7 @@ class Component extends LaravelComponent
     {
         $instance = new static;
 
-        if (preg_match('/make([V|Ue][A-Za-z]{1,20}|Template|Div)/', $method, $match)) {
+        if (preg_match('/make([V|Ue][A-Za-z]{1,20}|Template|Div|Span)/', $method, $match)) {
             $tag = $instance->getKebabCase($match[1]);
 
             return $instance->makeComponent($tag, ...$args);

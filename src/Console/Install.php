@@ -171,7 +171,7 @@ class Install extends BaseCommand
 
         $this->call('vendor:publish', [
             '--provider' => 'Unusualify\Modularity\LaravelServiceProvider',
-            '--tag' => 'assets',
+            '--tag' => 'modularity-assets',
         ]);
     }
 

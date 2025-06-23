@@ -22,9 +22,6 @@ trait ManageForm
         $this->formAttributes = array_merge_recursive_preserve($this->getFormAttributes(), $this->formAttributes ?? []);
     }
 
-    /**
-     * @return array
-     */
     protected function addWithsManageForm(): array
     {
         return collect(array_to_object($this->formSchema))->filter(function ($input) {

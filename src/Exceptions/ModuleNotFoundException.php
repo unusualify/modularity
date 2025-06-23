@@ -17,7 +17,7 @@ class ModuleNotFoundException extends Exception
     public static function moduleMissing($message = null): self
     {
         return new self(
-            $message ?? "Missing module name",
+            $message ?? 'Missing module name',
             self::MODULE_MISSING
         );
     }
@@ -25,7 +25,7 @@ class ModuleNotFoundException extends Exception
     public static function routeMissing($message = null): self
     {
         return new self(
-            $message ?? "Missing route name",
+            $message ?? 'Missing route name',
             self::ROUTE_MISSING
         );
     }
@@ -33,7 +33,7 @@ class ModuleNotFoundException extends Exception
     public static function moduleNotFound($message = null): self
     {
         return new self(
-            $message ?? "Module not found",
+            $message ?? 'Module not found',
             self::MODULE_NOT_FOUND
         );
     }
@@ -41,7 +41,7 @@ class ModuleNotFoundException extends Exception
     public static function routeNotFound($message = null): self
     {
         return new self(
-            $message ?? "Route not found",
+            $message ?? 'Route not found',
             self::ROUTE_NOT_FOUND
         );
     }

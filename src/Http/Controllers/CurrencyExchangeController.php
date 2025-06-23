@@ -39,9 +39,12 @@ class CurrencyExchangeController extends Controller
             'currency' => 'required|string|size:3',
         ]);
         try {
-            $converted = $this->currencyService->convertTo($request->amount, mb_strtoupper($request->currency));
+            $converted = $this->currencyService->convertTo($request->amount, mb_strtoupper($request->currency), decimals: 2, round: 'round');
 
-            return response()->json(['converted_amount' => $converted], 200);
+            return response()->json([
+                'converted_amount' => $converted,
+                'exchange_rate' => $this->currencyService->getExchangeRate(mb_strtoupper($request->currency)),
+            ], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Conversion failed.'], 400);
         }

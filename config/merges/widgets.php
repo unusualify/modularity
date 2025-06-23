@@ -2,157 +2,11 @@
 
 return [
     'table' => [
-        'tag' => 'v-col',
+        'tag' => 'ue-table',
+        'widgetSlots' => [],
         'component' => 'ue-table',
-        'connector' => 'PressRelease:PressRelease|repository:listAll:scopes=pressReleaseRegion',
-        'col' => [
-            'cols' => 12,
-            'xxl' => 12,
-            'xl' => 12,
-            'lg' => 12,
-            's' => 12,
-            'class' => '',
-        ],
         'attributes' => [
-            'name' => 'Press Release',
-            'customTitle' => 'MANAGE PRESS RELEASE',
-            // 'tableType' => 'dashboard',
-            'elevation' => 2,
-            'tableClasses' => 'elevation-2',
-            'createOnModal' => false,
-            'editOnModal' => false,
-            'rowActionsType' => 'dropdown',
-            'hideDefaultFooter' => true,
-            'hideBorderRow' => true,
-            'sticky' => true,
-            'striped' => true,
-            'roundedRows' => true,
-            'showSelect' => false,
-            'toolbarOptions' => [
-                'color' => 'transparent', // rgb(255,255,255,1) or utility colors like white, purple
-                'border' => false, // false, 'xs', 'sm', 'md', 'lg', 'xl'.
-                'rounded' => false, // This can be 0, xs, sm, true, lg, xl, pill, circle, and shaped. string | number | boolean
-                'collapse' => false, // false, true,
-                'density' => 'default', // prominent, comfortable, compact, default
-                'elevation' => 0, // string or number refers to elevation
-                'image' => '', // image link for the background of the toolbar
-            ],
-            'headerOptions' => [
-                'color' => 'rgba(140,160,167, .2)', // Hex, rgba or default css colors
-            ],
 
-            'hideHeaders' => false,
-            'fullWidthWrapper' => true,
-            'hideSearchField' => true,
-            'fillHeight' => false,
-            'style' => '',
-            'columns' => [
-                [
-                    'title' => 'Date',
-                    'key' => 'created_at',
-                    'align' => 'start',
-                    'formatter' => [
-                        'date',
-                        'short',
-                    ],
-                    'sortable' => true,
-                    'filterable' => false,
-                    'groupable' => false,
-                    'divider' => false,
-                    'class' => '',
-                    'cellClass' => '',
-                    'width' => '',
-                    'searchable' => true,
-                    'isRowEditable' => true,
-                    'isColumnEditable' => true,
-                    'visible' => true,
-                ],
-                [
-                    'title' => 'PR Headline',
-                    'key' => 'content.headline',
-                    'align' => 'start',
-                    'sortable' => false,
-                    'filterable' => false,
-                    'groupable' => false,
-                    'divider' => false,
-                    'class' => '',
-                    'cellClass' => '',
-                    'width' => '',
-                    'searchable' => true,
-                    'isRowEditable' => true,
-                    'isColumnEditable' => true,
-                    'visible' => true,
-                ],
-                [
-                    'title' => 'Region',
-                    'key' => 'region_names',
-                    'align' => 'start',
-                    'sortable' => false,
-                    'filterable' => false,
-                    'groupable' => false,
-                    'divider' => false,
-                    'class' => '',
-                    'cellClass' => '',
-                    'width' => '',
-                    'searchable' => true,
-                    'isRowEditable' => true,
-                    'isColumnEditable' => true,
-                    'visible' => true,
-                ],
-                [
-                    'title' => 'Status',
-                    'key' => 'state_formatted',
-                    'align' => 'start',
-                    'sortable' => false,
-                    'filterable' => false,
-                    'groupable' => false,
-                    'divider' => false,
-                    'class' => '',
-                    'cellClass' => '',
-                    'width' => '',
-                    'searchable' => true,
-                    'isRowEditable' => true,
-                    'isColumnEditable' => true,
-                    'visible' => true,
-                    'formatter' => [
-                        'dynamic',
-                    ],
-                ],
-                [
-                    'type' => 'stateable',
-                    'label' => 'Status',
-                    'createable' => false,
-                    'isEvent' => true,
-                    'allowedRoles' => ['superadmin', 'admin', 'manager'],
-                ],
-            ],
-            'tableOptions' => [
-                'page' => 1,
-                'sortBy' => [],
-                'multiSort' => false,
-                'mustSort' => false,
-                'groupBy' => [],
-                'itemsPerPage' => 10,
-                'tableType' => 'dashboard', // !!!!!!
-            ],
-            'slots' => [
-                'bottom' => [
-                    'elements' => [
-                        [
-                            'tag' => 'div',
-                            'attributes' => [
-                                'class' => 'text-right pa-8',
-                            ],
-                            'elements' => [
-                                [
-                                    'tag' => 'v-btn-tertiary',
-                                    'elements' => 'MANAGE PRESS RELEASES',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
         ],
     ],
     'board-information-plus' => [
@@ -168,9 +22,9 @@ return [
         ],
         'attributes' => [
             'container' => [
-                'color' => '#F8F8FF',
-                'elevation' => 10,
-                'class' => '',
+                'color' => '',
+                'elevation' => 2,
+                'class' => 'h-100',
             ],
             'cardAttribute' => [
                 'variant' => 'outlined',
@@ -181,7 +35,7 @@ return [
                 'titleColor' => 'grey',
                 'infoClass' => 'text-h4 pa-0',
                 'infoColor' => 'text-primary',
-                'class' => 'px-4 py-6',
+                'class' => 'px-4 py-6 h-100',
                 'infoLineHeight' => '1',
                 'infoFontWeight' => '700',
             ],

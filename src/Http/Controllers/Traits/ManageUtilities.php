@@ -2,11 +2,9 @@
 
 namespace Unusualify\Modularity\Http\Controllers\Traits;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 use Unusualify\Modularity\Services\View\UWrapper;
 
 trait ManageUtilities
@@ -22,8 +20,6 @@ trait ManageUtilities
      */
     protected function getIndexData($prependScope = [])
     {
-        $initialResource = $this->getJSONData();
-        // $filters = json_decode($this->request->get('filter'), true) ?? [];
         $headers = $this->filterHeadersByRoles($this->getIndexTableColumns());
         $headers = hydrate_table_columns_translations($headers);
 
@@ -48,8 +44,8 @@ trait ManageUtilities
                     'actions' => $this->getTableActions(),
                     'endpoints' => $tableEndpoints,
 
-                    'navActive' => 'all',
-                    'total' => $initialResource['total'] ?? -1,
+                    'navActive' => $this->getConfigFieldsByRoute('default_filter_status', 'all'),
+                    'total' => -1,
                     'searchInitialValue' => request()->has('search') ? request()->query('search') : '',
                     'tableOptions' => $this->getVuetifyDatatableOptions(),
                     'columns' => $headers,
@@ -113,9 +109,9 @@ trait ManageUtilities
      */
     protected function getFormData($id = null)
     {
-        $schema = $this->formSchema;
-
         $item = $this->getFormItem($id);
+        $customFormData = $this->formData($this->request, $item);
+        $schema = $this->formSchema;
 
         $fullRoutePrefix = 'admin.' . ($this->routePrefix ? $this->routePrefix . '.' : '') . $this->moduleName . '.';
         $previewRouteName = $fullRoutePrefix . 'preview';
@@ -124,24 +120,31 @@ trait ManageUtilities
         // $localizedPermalinkBase = $this->getLocalizedPermalinkBase();
 
         $itemId = $this->getItemIdentifier($item);
+        $formAttributes = $this->formAttributes;
 
         $data = [
+            'model' => $item,
             'translate' => $this->routeHas('translations') || $this->hasTranslatedInput(),
             'formAttributes' => array_merge([
-                'modelValue' => $this->repository->getFormFields($item, $this->chunkInputs(all: true, schema: $schema)),
+                'modelValue' => array_merge(
+                    $item->toArray(),
+                    // $this->repository->getFormFields($item, $this->chunkInputs(all: true, schema: $schema)),
+                    $this->repository->getFormFields($item, $schema),
+                ),
                 'title' => __(((bool) $itemId
                     ? 'fields.edit-item'
                     : 'fields.new-item'), ['item' => trans_choice('modules.' . snakeCase($this->routeName), 1)]
                 ),
                 'isEditing' => $itemId ? true : false,
-            ], $this->formAttributes),
+                'actions' => $this->getFormActions(),
+                ...(($formAttributes['async'] ?? true) ? [] : ['actionUrl' => $this->getFormUrl($itemId)]),
+            ], $formAttributes),
             'endpoints' => [
                 ((bool) $itemId ? 'update' : 'store') => $this->getFormUrl($itemId),
             ] + $this->getUrls(),
             'formStore' => [
                 'inputs' => $this->filterSchemaByRoles($schema),
             ],
-
             '__old' => [
                 // 'editable' => !!$itemId,
                 // 'moduleName' => $this->moduleName,
@@ -173,8 +176,7 @@ trait ManageUtilities
                  'restoreUrl' => moduleRoute($this->moduleName, $this->routePrefix, 'restoreRevision', [$itemId]),
              ] : []);
 
-        return array_replace_recursive($data, $this->formData($this->request, $item));
-
+        return array_replace_recursive($data, $customFormData);
     }
 
     /**

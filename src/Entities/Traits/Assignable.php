@@ -6,16 +6,15 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Support\Facades\Auth;
 use Unusualify\Modularity\Entities\Assignment;
+use Unusualify\Modularity\Entities\Scopes\AssignableScopes;
 
 trait Assignable
 {
+    use AssignableScopes;
 
     /**
      * Perform any actions when booting the trait
-     *
-     * @return void
      */
     public static function bootAssignable(): void
     {
@@ -24,65 +23,50 @@ trait Assignable
 
     /**
      * Laravel hook to initialize the trait
-     *
-     * @return void
      */
     public function initializeAssignable(): void
     {
         $this->append('active_assignee_name');
     }
 
-    public function assignments() : MorphMany
+    /**
+     * Get all assignments for the model
+     */
+    public function assignments(): MorphMany
     {
         return $this->morphMany(Assignment::class, 'assignable');
     }
 
-    public function lastAssignment() : MorphOne
+    /**
+     * Get the last assignment for the model
+     */
+    public function lastAssignment(): MorphOne
     {
         return $this->morphOne(Assignment::class, 'assignable')
-            ->latest();
+            ->latest('created_at');
     }
 
-    protected function activeAssigneeName() : Attribute
+    protected function activeAssigneeName(): Attribute
     {
         return new Attribute(
             get: fn ($value) => $this->lastAssignment ? $this->lastAssignment->assignee->name : null,
         );
+
     }
 
-    public function scopeIsAssignee($query)
+    protected function activeAssignerName(): Attribute
     {
-        if (! Auth::check()) {
-            return $query;
-        }
-
-        $user = $user ?? Auth::user();
-
-        if (! $user) {
-            return $query;
-        }
-
-        if (in_array('Spatie\Permission\Traits\HasRoles', class_uses_recursive($user))) {
-            // Get roles to check from model's static property if defined
-            $rolesToCheck = static::$assignableRolesToCheck ?? null;
-
-            // If no specific roles defined, get all roles from the user
-            if (! (is_null($rolesToCheck) || empty($rolesToCheck)) ) {
-                // Check for specific roles
-                $roleModel = config('permission.models.role');
-                $existingRoles = $roleModel::whereIn('name', $rolesToCheck)->get();
-
-                if (!$user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
-                    return $query;
-                }
-            }
-
-        }
-
-        return $query->whereHas('lastAssignment', function ($query) use ($user) {
-            $query->where('assignee_id', $user->id)
-                ->where('assignee_type', get_class($user));
-        });
+        return new Attribute(
+            get: fn ($value) => $this->lastAssignment ? $this->lastAssignment->assigner->name : null,
+        );
     }
 
+    protected function activeAssignmentStatus(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->lastAssignment
+                ? "<v-chip variant='text' color='{$this->lastAssignment->statusIconColor}' prepend-icon='{$this->lastAssignment->statusIcon}'>{$this->lastAssignment->statusLabel}</v-chip>"
+                : null
+        );
+    }
 }

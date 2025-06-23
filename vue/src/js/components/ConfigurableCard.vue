@@ -143,7 +143,6 @@
         const result = { ...this.items };
         if (this.actions.length) {
           result['_actions'] = this.actions;
-          // __log(result)
         }
         return result;
       },

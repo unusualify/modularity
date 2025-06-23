@@ -48,7 +48,6 @@ export default {
   },
   methods: {
     setValue (e) {
-      __log('setValue', e.target.name)
       this[e.target.name] = e.target.value
     },
     openModal () {
@@ -84,7 +83,6 @@ export default {
   },
   created () {
     // setInterval((self) => {
-    //   __log('show', self.show)
     // }, 5000, this)
   }
 }
