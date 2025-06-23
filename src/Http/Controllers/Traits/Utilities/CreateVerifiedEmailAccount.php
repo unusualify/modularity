@@ -117,8 +117,8 @@ trait CreateVerifiedEmailAccount
 
         $user->save();
         $freshUser = User::find($user->id);
-        // $freshUser->assignRole('client-manager');
-        $user->company()->create();
+        $freshUser->assignRole('client-manager');
+        $freshUser->company()->create();
 
         event(new VerifiedEmailRegister($user));
 
