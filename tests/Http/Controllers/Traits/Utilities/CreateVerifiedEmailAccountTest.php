@@ -153,7 +153,7 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
 
         $this->controller->registerEmail($credentials);
 
-        $this->assertDatabaseHas('admin_users', [
+        $this->assertDatabaseHas(modularityConfig('tables.users', 'um_users'), [
             'name' => $credentials['name'],
             'surname' => $credentials['surname'],
             'email' => $credentials['email'],
@@ -161,7 +161,7 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
         ]);
 
         // Check password separately
-        $user = DB::table('admin_users')->where('email', $credentials['email'])->first();
+        $user = DB::table(modularityConfig('tables.users', 'um_users'))->where('email', $credentials['email'])->first();
         $this->assertTrue(Hash::check($credentials['password'], $user->password));
 
         Event::assertDispatched(VerifiedEmailRegister::class);

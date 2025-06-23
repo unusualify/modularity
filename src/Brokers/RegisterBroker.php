@@ -83,7 +83,8 @@ class RegisterBroker extends PasswordBroker implements RegisterBrokerContract
 
     public function emailIsRegistered($email)
     {
-        $isRegistered = DB::table('admin_users')->where('email', $email)->exists();
+        $isRegistered = DB::table(modularityConfig('tables.users', 'um_users'))->where('email', $email)->exists();
+
         return $isRegistered;
     }
 
