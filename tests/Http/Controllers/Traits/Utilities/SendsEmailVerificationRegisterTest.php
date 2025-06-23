@@ -115,7 +115,7 @@ class SendsEmailVerificationRegisterTest extends ModelTestCase
         $this->assertEquals('http://localhost', $response->getTargetUrl());
 
         // Test the session flash message
-        $this->assertEquals(RegisterBroker::VERIFICATION_LINK_SENT, $response->getSession()->get('status'));
+        $this->assertEquals('We have emailed your email verification link.', $response->getSession()->get('status'));
 
         User::create([
             'name' => 'test',
@@ -134,7 +134,7 @@ class SendsEmailVerificationRegisterTest extends ModelTestCase
 
         $firstFailedResponseMessage = $failedResponseMessages[0];
 
-        $this->assertEquals(RegisterBroker::ALREADY_REGISTERED, $firstFailedResponseMessage);
+        $this->assertEquals('This email is already registered.', $firstFailedResponseMessage);
 
     }
 }
