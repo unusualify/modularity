@@ -105,7 +105,7 @@ return [
                     'label' => 'Logo',
                     'type' => 'image',
                     'name' => 'logo',
-                    'rules' => 'sometimes|required:array',
+                    // 'rules' => 'sometimes|required:array',
                     'isIcon' => true,
                 ],
                 [
