@@ -178,6 +178,7 @@
     &__row
       display: flex
       flex-wrap: wrap
+      max-width: 100%
       // padding-bottom: calc(12 * $spacer / 2)
 
       .ue-configurable-card__col
@@ -188,6 +189,7 @@
     .ue-configurable-card__col
       // flex: 1
       min-width: 0
+      max-width: 100%
       padding: 0 calc($spacer * 4)
       margin: calc($spacer * 4) 0
       &--seperator
