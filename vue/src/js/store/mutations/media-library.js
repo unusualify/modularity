@@ -1,4 +1,8 @@
 /* media-library */
+export const SET_ACCESSIBLE = 'setMediaLibraryAccessible'
+export const SET_SHOW_MODAL = 'setMediaLibraryShowModal'
+export const OPEN_MODAL = 'openMediaLibraryModal'
+export const CLOSE_MODAL = 'closeMediaLibraryModal'
 export const UPDATE_MEDIA_TYPE_TOTAL = 'updateMediaTypeTotal'
 export const INCREMENT_MEDIA_TYPE_TOTAL = 'incrementMediaTypeTotal'
 export const DECREMENT_MEDIA_TYPE_TOTAL = 'decrementMediaTypeTotal'
@@ -28,6 +32,10 @@ export const ADD_MEDIAS = 'addMedias'
 export const UPDATE_IS_INSERTED = 'updateIsInserted'
 
 export default {
+  SET_ACCESSIBLE,
+  SET_SHOW_MODAL,
+  OPEN_MODAL,
+  CLOSE_MODAL,
   UPDATE_MEDIA_TYPE_TOTAL,
   INCREMENT_MEDIA_TYPE_TOTAL,
   DECREMENT_MEDIA_TYPE_TOTAL,

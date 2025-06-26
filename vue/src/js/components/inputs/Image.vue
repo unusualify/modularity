@@ -359,14 +359,15 @@ export default {
       this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_FILESIZE_MAX, this.filesizeMax || 0)
       this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_WIDTH_MIN, this.widthMin || 0)
       this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_HEIGHT_MIN, this.heightMin || 0)
-      if (this.$main() && this.$main().$refs.mediaLibrary) {
+
+      if (this.$store.getters.mediaLibraryAccessible) {
         if (__isset(this.$store.state.mediaLibrary.selected[name])) {
           this.$store.state.mediaLibrary.selected[name] = []
         }
         this.$store.state.mediaLibrary.selected[name] = this.input
 
         // this.mediableActive = true
-        this.$main().$refs.mediaLibrary.openModal()
+        this.$store.commit(MEDIA_LIBRARY.OPEN_MODAL)
         this.$nextTick(() => { this.mediableActive = true })
       }
     },

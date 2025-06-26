@@ -11,6 +11,16 @@ import ACTIONS from '@/store/actions'
 
 const state = {
   /**
+   * Show the modal of the media library
+   * @type {boolean}
+   */
+  showModal: false,
+  /**
+   * Check if the media library is accessible
+   * @type {boolean}
+   */
+  accessible: false,
+  /**
    * An object of all crops available for cropper component configuration
    * @type {Object}
    */
@@ -95,6 +105,7 @@ const state = {
 
 // getters
 const getters = {
+  mediaLibraryAccessible: (state) => state.accessible,
   mediasByBlockId: (state) => (id) => {
     const ids = Object.keys(state.selected).filter(key => key.startsWith(`blocks[${id}]`))
     const medias = {}
@@ -104,6 +115,19 @@ const getters = {
 }
 
 const mutations = {
+  [MEDIA_LIBRARY.SET_ACCESSIBLE] (state, accessible) {
+    state.accessible = accessible
+  },
+  [MEDIA_LIBRARY.SET_SHOW_MODAL] (state, showModal) {
+    state.showModal = showModal
+  },
+  [MEDIA_LIBRARY.OPEN_MODAL] (state) {
+    state.showModal = true
+  },
+  [MEDIA_LIBRARY.CLOSE_MODAL] (state) {
+    state.showModal = false
+  },
+
   [MEDIA_LIBRARY.UPDATE_MEDIA_TYPE_TOTAL] (state, type) {
     state.types = state.types.map(t => {
       if (t.value === type.type) t.total = type.total
