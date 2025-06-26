@@ -13,11 +13,9 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getClasses(string $path)
  * @method static \Illuminate\Support\Collection getAllModels()
  *
- * @deprecated Use \Unusualify\Modularity\Facades\ModularityFinder instead
- *
  * @see \Unusualify\Modularity\Support\Finder
  */
-class UFinder extends Facade
+class ModularityFinder extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
