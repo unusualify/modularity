@@ -70,7 +70,8 @@
                 '_actions': '',
               }"
               :column-classes="{
-                '0': 'flex-1-1-100 flex-md-1-0',
+                // '0': 'flex-1-1-100 flex-md-1-0',
+                '0': 'flex-1-1-0',
                 '1': 'flex-0-1 d-flex align-center',
                 '_actions': 'flex-0-1',
               }"
@@ -80,9 +81,8 @@
                 <div class="text-body-2 font-weight-medium mb-1">
                   {{ segmentScope.data[0] }}
                 </div>
-                <div class="text-caption">
-                  {{ segmentScope.data[1] }}
-                </div>
+                <p class="text-caption" style="white-space: pre-wrap; word-wrap: break-word;" v-html="segmentScope.data[1]">
+                </p>
                 <div v-if="Array.isArray(segmentScope.data[2]) && segmentScope.data[2].length > 0" class="text-caption mt-4 d-flex ga-4 flex-wrap" >
                   <v-chip v-for="tag in segmentScope.data[2]" :key="tag" variant="outlined" size="small" class="">
                     {{ tag.name ?? tag.slug }}
@@ -92,7 +92,7 @@
 
               <!-- Price -->
               <template #[`segment.2`]="segmentScope">
-                <div class="text-h4 font-weight-medium py-auto">
+                <div class="text-h4 font-weight-medium py-auto justify-center w-100">
                   {{ segmentScope.data }}
                 </div>
               </template>
