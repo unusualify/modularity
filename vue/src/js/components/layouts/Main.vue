@@ -86,7 +86,6 @@
       <ue-modal-media v-if="$store.getters.mediaLibraryAccessible"
         ref="mediaLibrary"
         v-model="$store.state.mediaLibrary.showModal"
-        v-modelX="$mediaLibraryService.isOpen"
       ></ue-modal-media>
 
       <!-- Delete Warning Media Modal -->
@@ -420,7 +419,6 @@
           }
         ],
 
-        showMediaLibrary: false,
         showDeleteWarning: false,
         showImpersonateToolbar: false
       }
