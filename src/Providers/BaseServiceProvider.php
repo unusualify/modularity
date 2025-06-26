@@ -98,6 +98,8 @@ class BaseServiceProvider extends ServiceProvider
                 ->daily()
                 ->appendOutputTo(storage_path('logs/scheduler.log'));
 
+            $schedule->command('modularity:scheduler:chatable')
+                ->everyMinute();
         });
     }
 
