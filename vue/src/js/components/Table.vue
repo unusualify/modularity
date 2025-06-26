@@ -734,16 +734,14 @@
           <template v-if="col.formatter == 'edit' || col.formatter == 'activate'">
             <v-tooltip :text="item[col.key]" :key="i">
               <template v-slot:activator="{ props }">
-                <v-btn
+                <span
                   :key="i"
                   v-bind="props"
-                  class="pa-0 justify-start text-none"
-                  variant="plain"
-                  :color="`primary darken-1`"
+                  class="pa-0 justify-start text-none text-wrap text-primary darken-1 cursor-pointer"
                   @click="itemAction(item, ...col.formatter)"
                 >
-                  {{ col.key.match(/^id|uuid$/) ? window.__shorten(item[col.key], 8) : item[col.key] }}
-                </v-btn>
+                  {{ window.__shorten(item[col.key], item[col.key].textLength ?? 8) }}
+                </span>
                 <template v-if="col.key.match(/^id|uuid$/)">
                   <ue-copy-text :text="item[col.key]" />
                 </template>
