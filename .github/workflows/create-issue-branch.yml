@@ -12,7 +12,7 @@ jobs:
   create_branch:
     runs-on: ubuntu-latest
     if: |
-      contains(github.event.issue.labels.*.name, 'accepted') &&
+      contains(github.event.issue.labels.*.name, 'planned') &&
       (contains(github.event.issue.labels.*.name, 'enhancement') || contains(github.event.issue.labels.*.name, 'bug'))
     steps:
       - name: Parse Issue
