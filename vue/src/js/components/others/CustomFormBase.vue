@@ -46,7 +46,10 @@
                 <!-- PREVIEW -->
                 <ue-recursive-stuff v-if="obj.schema.type === 'preview' && obj.schema.configuration"
                   :configuration="obj.schema.configuration"
-                  :bind-data="valueIntern"
+                  :bind-data="{
+                    ...valueIntern,
+                    ...formItem
+                  }"
                 />
 
                 <!-- DYNAMIC COMPONENT -->
@@ -631,6 +634,10 @@ export default {
     },
     schema: {
       type: [Object, Array],
+      default: () => ({})
+    },
+    formItem: {
+      type: Object,
       default: () => ({})
     },
     noAutoGenerateSchema: {
