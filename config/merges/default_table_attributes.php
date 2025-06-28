@@ -152,6 +152,13 @@ return [
         'fillHeight' => true,
         'hasDivider' => true,
         'noDefaultFormPadding' => true,
+        'title' => [
+            'transform' => 'uppercase',
+            'justify' => 'space-between',
+            'align' => 'center',
+            'padding' => 'b-3',
+            'weight' => 'bold',
+        ],
     ],
     'formModalAttributes' => [
         'widthType' => 'lg',
