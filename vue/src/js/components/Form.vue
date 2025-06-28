@@ -16,7 +16,7 @@
       <input v-if="!async" type="hidden" name="_token" :value="$csrf"/>
 
       <!-- Header Section -->
-      <div :class="[(hasDivider || title) ? 'pb-6 px-1' : '', scrollable ? 'flex-grow-0' : '']">
+      <div :class="[(hasDivider || title) ? 'pb-2 px-1' : '', scrollable ? 'flex-grow-0' : '']">
         <ue-title v-if="!noTitle && title"
           padding="b-3"
           align="center"
