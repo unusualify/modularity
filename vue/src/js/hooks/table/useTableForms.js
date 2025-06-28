@@ -116,14 +116,12 @@ export default function useTableForms(props, context) {
     openForm()
   }
 
-  const confirmFormModal = () => {
-    UeForm.value.submit(null, (res) => {
-      if (Object.prototype.hasOwnProperty.call(res, 'variant') &&
-          res.variant.toLowerCase() === 'success') {
-        closeForm()
-        context.loadItems()
-      }
-    })
+  const handleFormSubmission = (data) => {
+    if (Object.prototype.hasOwnProperty.call(data, 'variant') &&
+        data.variant.toLowerCase() === 'success') {
+      closeForm()
+      context.loadItems()
+    }
   }
 
   // Watch effect for form active state
@@ -155,6 +153,6 @@ export default function useTableForms(props, context) {
     openForm,
     closeForm,
     createForm,
-    confirmFormModal,
+    handleFormSubmission,
   }
 }
