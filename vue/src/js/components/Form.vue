@@ -17,16 +17,26 @@
 
       <!-- Header Section -->
       <div :class="[(hasDivider || title) ? 'pb-6 px-1' : '', scrollable ? 'flex-grow-0' : '']">
-        <ue-title
-          v-if="!noTitle && title"
+        <ue-title v-if="!noTitle && title"
           padding="b-3"
           align="center"
           justify="space-between"
           v-bind="titleOptions"
         >
           <template v-slot:default>
-            <slot name="header.left" v-bind="{title: titleSerialized, model: model, schema: inputSchema, formItem}">
-              {{ titleSerialized }}
+            <slot name="header.left" v-bind="{title: titleSerialized, subtitle: subtitle ?? null, model: model, schema: inputSchema, formItem}">
+              <span>
+                {{ titleSerialized }}
+                <ue-title v-if="subtitle"
+                  :text="subtitle"
+                  type="caption"
+                  weight="medium"
+                  color="grey-darken-1"
+                  transform="none"
+                  padding="a-0"
+                />
+              </span>
+              <!-- subtitle -->
             </slot>
           </template>
           <template v-slot:right>
@@ -69,6 +79,7 @@
               <FormEvents v-if="formEventSchema && formEventSchema.length && model"
                 :events="formEventSchema"
                 v-model="model"
+                :form-item="formItem"
               />
 
               <!-- Language Selector -->
@@ -142,6 +153,7 @@
               v-model="model"
               :schema="inputSchema"
               :row="rowAttribute"
+              :form-item="formItem"
 
               no-auto-generate-schema
 
@@ -295,21 +307,24 @@
 
       <v-spacer v-if="pushButtonToBottom"></v-spacer>
 
-      <!-- Footer Section -->
-      <div :class="['px-1',scrollable ? 'flex-grow-0' : '']">
-        <v-divider v-if="hasSubmit && !stickyButton && hasDivider" class="mt-6"></v-divider>
+      <!-- Bottom Section -->
+      <div :class="['px-1',scrollable ? 'flex-grow-0' : '']" v-if="(hasSubmit && isSubmittable) || $slots.submit || $slots.options || $slots.bottom">
+        <v-divider v-if="hasSubmit && !stickyButton && hasDivider" class=""></v-divider>
         <div class="d-flex pt-6" v-if="hasSubmit && !stickyButton">
           <slot name="submit"
             v-bind="{
+              isSubmittable,
               validForm: validModel || !serverValid,
               buttonDefaultText,
               loading
             }">
             <slot name="options" v-bind="{
+              isSubmittable,
               validForm: validModel || !serverValid,
               loading
             }"></slot>
-            <v-btn type="submit"
+            <v-btn v-if="isSubmittable"
+              type="submit"
               :disabled="!(validModel || !serverValid) || loading || !isSubmittable"
               class="ml-auto mb-5"
               :loading="loading"
@@ -528,8 +543,8 @@ export default {
       }
 
       return te(title)
-        ? t(title).toLocaleUpperCase(locale.value.toUpperCase())
-        : title.toLocaleUpperCase(locale.value.toUpperCase())
+        ? t(title)
+        : title
     })
 
     const formColumnAttrs = computed(() => {
