@@ -18,8 +18,8 @@
         :disabled="disabled"
       >
         <v-card-item>
-          <template #prepend>
-            <v-checkbox v-if="!checkboxOnRight"
+          <template #prepend v-if="!checkboxOnRight">
+            <v-checkbox
               v-model="input"
               :value="value"
               :disabled="disabled"
@@ -164,6 +164,9 @@
       &--disabled
         opacity: 0.6
         cursor: not-allowed
+
+      .v-input-checkbox-card__title
+        padding: 0
 
       .v-card-item
         padding: 16px
