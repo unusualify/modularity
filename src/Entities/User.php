@@ -18,6 +18,7 @@ use Unusualify\Modularity\Entities\Traits\HasOauth;
 use Unusualify\Modularity\Entities\Traits\HasScopes;
 use Unusualify\Modularity\Entities\Traits\IsTranslatable;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
+use Unusualify\Modularity\Entities\Traits\Auth\CanRegister;
 use Unusualify\Modularity\Notifications\GeneratePasswordNotification;
 
 class User extends Authenticatable implements MustVerifyEmailContract
@@ -30,7 +31,8 @@ class User extends Authenticatable implements MustVerifyEmailContract
         ModelHelpers,
         Notifiable,
         HasFileponds,
-        HasOauth;
+        HasOauth,
+        CanRegister;
 
     /**
      * The attributes that are mass assignable.
@@ -49,6 +51,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
         'country_id',
         'password',
         'published',
+        'email_verified_at',
     ];
 
     /**
@@ -242,5 +245,10 @@ class User extends Authenticatable implements MustVerifyEmailContract
     protected static function newFactory(): \Illuminate\Database\Eloquent\Factories\Factory
     {
         return UserFactory::new();
+    }
+
+    public function sendEmailVerification($token)
+    {
+        $this->notify(new \Unusualify\Modularity\Notifications\EmailVerification($token));
     }
 }

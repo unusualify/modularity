@@ -168,6 +168,11 @@ class BaseServiceProvider extends ServiceProvider
             return new \Unusualify\Modularity\Services\MigrationBackup;
         });
 
+        $this->app->singleton('auth.register', function (Application $app) {
+            return new \Unusualify\Modularity\Brokers\RegisterBrokerManager($app);
+        });
+
+
         $this->app->alias(\Unusualify\Modularity\Facades\ModularityVite::class, 'ModularityVite');
 
         $this->app->alias(\Torann\GeoIP\Facades\GeoIP::class, 'GeoIP');
@@ -284,9 +289,9 @@ class BaseServiceProvider extends ServiceProvider
             // }
         }
 
-        if (! config('modules.scan.enabled')) {
-            throw new \Exception('Modules scan is not enabled, set scan.enabled to true in config/modules.php');
-        }
+        // if (! config('modules.scan.enabled')) {
+        //     throw new \Exception('Modules scan is not enabled, set scan.enabled to true in config/modules.php');
+        // }
 
     }
 
