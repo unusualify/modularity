@@ -4,11 +4,13 @@
     <v-row>
       <v-col v-for="(item, i) in items" :key="`col-${item[itemValue]}`" :cols="12" :md="6">
         <v-btn
-          block class="v-input-radio-group__btn"
+          block
+          class="v-input-radio-group__btn"
+          :color="color"
           :variant="input == item[itemValue] ? 'elevated' : 'outlined'"
-          @click="input=item[itemValue]"
           :disabled="$attrs.disabled ?? false"
           :readonly="protectInitialValue"
+          @click="input=item[itemValue]"
         >
           <template #prepend>
             <v-radio :value="item[itemValue]" :disabled="$attrs.disabled ?? false"></v-radio>
@@ -53,6 +55,10 @@ export default {
     descriptionTitle: {
       type: String,
       default: 'description'
+    },
+    color: {
+      type: String,
+      default: 'primary'
     }
   },
   setup (props, context) {
