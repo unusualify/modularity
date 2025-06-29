@@ -62,8 +62,7 @@
 
                     <!-- group expand activator -->
                     <template v-slot:activator="{ props, isOpen }">
-                      <v-checkbox
-                        v-if="!noGroupAllSelectable"
+                      <v-checkbox v-if="!noGroupAllSelectable"
                         class="ue-checklist-checkbox"
                         :label="group[`${itemTitle}`]"
                         color="success"
@@ -119,12 +118,16 @@
                           :key="`checkbox-${index}`"
                           v-bind="checkboxCol"
                           class="pb-0 pr-0 "
-                          >
+                        >
                           <div
                             :class="getCheckboxContainerClasses(item)"
                           >
                             <!-- checkbox is on right -->
-                            <span v-if="checkboxOnRight" :class="[($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue])) ? 'v-input-checklist__label--disabled' : '']">{{ item[itemTitle] }}</span>
+                            <span v-if="checkboxOnRight"
+                              :class="getItemLabelClasses(item)"
+                            >
+                              {{ item[itemTitle] }}
+                            </span>
                             <v-spacer v-if="checkboxOnRight"></v-spacer>
 
                             <!-- checkbox -->
@@ -133,7 +136,7 @@
                               v-model="input"
                               :disabled="($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue]))"
                               :value="item[itemValue]"
-                              :color="checkboxColor"
+                              :color="checkboxColor ?? color ?? 'primary'"
                               hide-details
                               :label="item[itemTitle]"
                               :class="getCheckboxClasses(item)"
@@ -199,40 +202,48 @@
 
         <!-- standard checkbox list -->
         <v-row v-else
-          :style="[
-            flexColumn && $vuetify.display.mdAndUp ? 'flex: 1 1 60%;' : 'flex: 1 1;'
-          ]"
+          :style="getRowStyles()"
+          :no-gutters="$vuetify.display.xs"
+          class="align-stretch"
         >
           <template v-for="(item, index) in flattenedItems"
               :key="`checkbox-${index}`">
-              <v-col v-bind="checkboxCol"
+              <v-col
+                cols="12"
+                sm="6"
+                md="4"
+                lg="3"
+                v-bind="checkboxCol"
                 class=""
                 >
-                <v-input-checkbox-card
-                  v-if="isCard"
+                <v-input-checkbox-card v-if="isCard"
                   v-model="input"
                   :value="item[itemValue]"
                   :class="[getCheckboxClasses(item), 'h-100']"
-                  :color="checkboxColor"
+                  :color="checkboxColor ?? color ?? 'primary'"
                   :title="item[itemTitle]"
                   :description="item.description"
                   :disabled="($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue]))"
                   :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
                   :checkboxOnRight="checkboxOnRight"
                   :stats="getCardStats(item)"
+                  :activeTitleColor="activeTextColor"
                 />
-                <div
-                  v-else
+                <div v-else
                   :class="getCheckboxContainerClasses(item)"
                 >
-                  <span v-if="checkboxOnRight" :class="[($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue])) ? 'v-input-checklist__label--disabled' : '']">{{ item[itemTitle] }}</span>
+                  <span v-if="checkboxOnRight"
+                    :class="getItemLabelClasses(item)"
+                  >
+                    {{ item[itemTitle] }}
+                  </span>
                   <v-spacer v-if="checkboxOnRight"></v-spacer>
                   <v-checkbox
                     data-test="checkbox"
                     v-model="input"
                     :value="item[itemValue]"
                     :disabled="($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue]))"
-                    :color="checkboxColor"
+                    :color="checkboxColor ?? color ?? 'primary'"
                     hide-details
                     :label="item[itemTitle]"
                     :class="getCheckboxClasses(item)"
@@ -264,6 +275,22 @@
     props: {
       ...makeInputProps(),
       color: {
+        type: String,
+        default: null
+      },
+      labelColor: {
+        type: String,
+        default: 'grey-darken-1'
+      },
+      subtitleColor: {
+        type: String,
+        default: 'grey-darken-1'
+      },
+      activeTextColor: {
+        type: String,
+        default: null
+      },
+      checkboxColor: {
         type: String,
         default: null
       },
@@ -299,10 +326,6 @@
         type: String,
         default: 'asc'
       },
-      checkboxColor: {
-        type: String,
-        default: 'primary'
-      },
       isTreeview: {
         type: Boolean,
         default: false
@@ -319,13 +342,10 @@
         type: String,
         default: null
       },
-      labelColor: {
-        type: String,
-        default: 'grey-darken-1'
-      },
-      subtitleColor: {
-        type: String,
-        default: 'grey-darken-1'
+
+      truncateItemLabel: {
+        type: Boolean,
+        default: false
       },
       flexColumn: {
         type: Boolean,
@@ -335,6 +355,10 @@
         type: Boolean,
         default: false
       },
+      checkboxHighlightedColor: {
+        type: String,
+        default: 'grey-lighten-5'
+      },
       checkboxPosition: {
         type: String,
         default: 'right'
@@ -342,7 +366,10 @@
       checkboxCol: {
         type: Object,
         default: () => ({
-          cols: 3
+          cols: 3,
+          sm: 6,
+          md: 4,
+          lg: 3,
         })
       },
       noGroupAllSelectable: {
@@ -380,7 +407,7 @@
       cardStats: {
         type: Array,
         default: () => []
-      },
+      }
     },
     setup (props, context) {
       const maxSelectable = computed(() => {
@@ -501,20 +528,42 @@
           })
         }
       },
+      getRowStyles() {
+        const baseStyle = 'flex: 1 1;';
+        if (this.flexColumn && this.$vuetify.display.mdAndUp) {
+          return `${baseStyle} flex: 1 1 60%;`;
+        }
+        return baseStyle;
+      },
       getCheckboxContainerClasses(item) {
         const isSelected = Array.isArray(this.input) && this.input.includes(item[this.itemValue]);
         return [
-          this.checkboxOnRight ? 'd-flex align-center pl-4 pr-1 rounded-sm' : '',
+          // Base classes for all screen sizes
+          'd-flex align-center rounded-sm',
+          // Responsive padding
+          // this.checkboxOnRight ? 'pl-2 pl-sm-3 pl-md-4 pr-1' : 'px-2',
+          this.checkboxOnRight ? 'pl-2' : 'px-2',
+          // Selection state
           this.checkboxOnRight && isSelected ? 'checked' : '',
-          this.checkboxOnRight && this.checkboxHighlighted && isSelected ? 'bg-grey-lighten-5 text-primary font-weight-bold' : ''
+          // Highlighted state with responsive background
+          this.checkboxHighlighted && isSelected ? `bg-${this.checkboxHighlightedColor}` : '',
         ];
+      },
+      getItemLabelClasses(item) {
+        const isSelected = Array.isArray(this.input) && this.input.includes(item[this.itemValue]);
+        return [
+          (this.$attrs.disabled ?? false) || (!this.canSelectMore() && !this.input.includes(item[this.itemValue])) ? 'v-input-checklist__label--disabled' : '',
+          isSelected ? `font-weight-bold ${this.activeTextColor ? `text-${this.activeTextColor}` : ''}` : '',
+          this.truncateItemLabel ? 'text-truncate text-wrap' : '',
+        ]
       },
       getCheckboxClasses(item) {
         const isSelected = Array.isArray(this.input) && this.input.includes(item[this.itemValue]);
         return [
+          'flex-shrink-0 flex-grow-0',
           this.checkboxOnLeft ? 'rounded-sm' : '',
           this.checkboxOnLeft && isSelected ? 'checked' : '',
-          this.checkboxOnLeft && this.checkboxHighlighted && isSelected ? 'bg-grey-lighten-5 text-primary font-weight-bold' : ''
+          // this.checkboxHighlighted && isSelected ? 'font-weight-bold' : '',
         ];
       },
       canSelectMore() {
