@@ -19,8 +19,7 @@
       >
         <v-card-item>
           <template #prepend>
-            <v-checkbox
-              v-if="!checkboxOnRight"
+            <v-checkbox v-if="!checkboxOnRight"
               v-model="input"
               :value="value"
               :disabled="disabled"
@@ -29,10 +28,16 @@
               :readonly="readonly"
             />
           </template>
-          <v-card-title :class="['v-input-checkbox-card__title', input[value] ? 'v-input-checkbox-card__title--selected' : '']">{{ title }}</v-card-title>
+          <v-card-title
+            :class="[
+              'v-input-checkbox-card__title',
+              input.includes(value) ? `v-input-checkbox-card__title--selected ${activeTitleColor ? `text-${activeTitleColor}` : ''}` : '',
+            ]"
+          >
+            {{ title }}
+          </v-card-title>
           <template #append>
-            <v-checkbox
-              v-if="checkboxOnRight"
+            <v-checkbox v-if="checkboxOnRight"
               v-model="input"
               :value="value"
               :disabled="disabled"
@@ -90,6 +95,14 @@
       },
       value: {
         type: [Number, String],
+        default: null
+      },
+      activeColor: {
+        type: String,
+        default: null
+      },
+      activeTitleColor: {
+        type: String,
         default: null
       },
       checkboxColor: {
