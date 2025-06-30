@@ -14,7 +14,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Unusualify\Modularity\Tests\Http\Controllers\ControllerUsingCreateVerifiedEmailAccount;
 use Illuminate\Support\Facades\Event;
+use Modules\SystemUser\Entities\Role;
 use Unusualify\Modularity\Events\VerifiedEmailRegister;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\Register;
 
 class CreateVerifiedEmailAccountTest extends ModelTestCase
@@ -68,7 +70,11 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
             $this->brokerConfig,
         );
 
-
+        Role::updateOrCreate([
+            'name' => 'client-manager',
+        ], [
+            'guard_name' => Modularity::getAuthGuardName(),
+        ]);
     }
 
     public function testBroker()
@@ -199,8 +205,7 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
 
         $this->assertEquals('http://localhost/home', $response->getTargetUrl());
 
-        $this->assertEquals(RegisterBroker::VERIFICATION_SUCCESS, $response->getSession()->get('status'));
-
+        $this->assertEquals('Registration has been completed successfully.', $response->getSession()->get('status'));
     }
 
 }
