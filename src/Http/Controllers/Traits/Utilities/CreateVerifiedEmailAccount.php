@@ -113,12 +113,12 @@ trait CreateVerifiedEmailAccount
     {
         $user = $this->setUserRegister($credentials);
 
-        $user->setRememberToken(Str::random(60));
+        // $user->setRememberToken(Str::random(60));
+        // $user->save();
 
-        $user->save();
-        $freshUser = User::find($user->id);
-        $freshUser->assignRole('client-manager');
-        $freshUser->company()->create();
+        // $freshUser = User::find($user->id);
+        // $freshUser->assignRole('client-manager');
+        $user->company()->create();
 
         event(new VerifiedEmailRegister($user));
 
@@ -127,12 +127,22 @@ trait CreateVerifiedEmailAccount
 
     public function setUserRegister(array $credentials)
     {
-        $user = new User();
-        $user->name = $credentials['name'];
-        $user->surname = $credentials['surname'];
-        $user->email = $credentials['email'];
-        $user->email_verified_at = now();
-        $user->password = Hash::make($credentials['password']);
+        $user = User::create([
+            'name' => $credentials['name'],
+            'surname' => $credentials['surname'],
+            'email' => $credentials['email'],
+            'email_verified_at' => now(),
+            'password' => Hash::make($credentials['password']),
+        ]);
+        $user->setRememberToken(Str::random(60));
+
+        $user->assignRole('client-manager');
+        // $user = new User();
+        // $user->name = $credentials['name'];
+        // $user->surname = $credentials['surname'];
+        // $user->email = $credentials['email'];
+        // $user->email_verified_at = now();
+        // $user->password = Hash::make($credentials['password']);
 
         return $user;
     }
