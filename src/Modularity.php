@@ -54,6 +54,13 @@ class Modularity extends FileRepository
     private $retainModulesPath = null;
 
     /**
+     * The callback that should be used to create the page title.
+     *
+     * @var \Closure|null
+     */
+    public static $pageTitleCallback;
+
+    /**
      * The constructor.
      *
      * @param string|null $path
@@ -281,6 +288,31 @@ class Modularity extends FileRepository
     final public function isProduction()
     {
         return ! $this->isDevelopment();
+    }
+
+    /**
+     * Create a page title callback.
+     *
+     * @param \Closure $callback
+     * @return void
+     */
+    public static function createPageTitle($callback)
+    {
+        self::$pageTitleCallback = $callback;
+    }
+
+    /**
+     * Get the page title.
+     *
+     * @return string
+     */
+    final public function pageTitle()
+    {
+        if (static::$pageTitleCallback) {
+            return call_user_func(static::$pageTitleCallback);
+        }
+
+        return app('config')->get('app.name');
     }
 
     public function setSystemModulesPath()
